@@ -11,6 +11,7 @@
   <link rel="apple-touch-icon" href="img/icon-192.png">
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -154,6 +155,26 @@
       <div id="progress-subjects"></div>
       <div id="visited-missions"></div>
     </div>
+  </div>
+
+  <!-- ========== CHAT FAMILIAR ========== -->
+  <div id="view-chat" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Chat Familiar</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll chat-scroll" id="chat-scroll">
+      <div id="chat-messages" class="chat-messages">
+        <div class="chat-empty" id="chat-empty">Cargando mensajes…</div>
+      </div>
+    </div>
+    <form id="chat-form" class="chat-bar">
+      <input id="chat-input" class="chat-input" type="text" placeholder="Escribe un mensaje…" autocomplete="off" maxlength="500">
+      <button type="submit" class="chat-send-btn" aria-label="Enviar mensaje">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </form>
   </div>
 
   <!-- ========== PERFIL ========== -->
@@ -699,6 +720,9 @@
       <button class="drawer-item" data-view="view-progreso">
         <i class="fa-solid fa-chart-line"></i><span>Mi Progreso</span>
       </button>
+      <button class="drawer-item" data-view="view-chat">
+        <i class="fa-solid fa-comments"></i><span>Chat Familiar</span>
+      </button>
       <button class="drawer-item" data-view="view-perfil">
         <i class="fa-solid fa-chalkboard-user"></i><span>Herramientas del Docente</span>
       </button>
@@ -737,6 +761,7 @@
   <script src="js/tools/plan-accion.js"></script>
   <script src="js/tools/parte-mensual.js"></script>
   <script src="js/tools/collage-maker.js"></script>
+  <script src="js/chat.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

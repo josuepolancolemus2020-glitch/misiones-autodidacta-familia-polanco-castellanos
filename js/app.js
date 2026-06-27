@@ -415,6 +415,8 @@ function switchView(id) {
 
   const scroll = document.querySelector(`#${id} .view-scroll`);
   if (scroll) scroll.scrollTop = 0;
+
+  if (id === 'view-chat' && typeof chatScrollToBottom === 'function') chatScrollToBottom();
 }
 
 /* ─────────────────────────────────────────────
