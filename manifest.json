@@ -1,6 +1,6 @@
 {
-  "name": "M.E.T.A.S. Misiones Educativas",
-  "short_name": "M.E.T.A.S.",
+  "name": "F.A.R.O. Familia, Aprendizaje, Recursos y Organización",
+  "short_name": "F.A.R.O.",
   "description": "Aplicación de misiones educativas interactiva.",
   "start_url": "./index.html",
   "display": "standalone",

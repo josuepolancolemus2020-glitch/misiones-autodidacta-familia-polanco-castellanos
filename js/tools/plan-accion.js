@@ -331,7 +331,7 @@ tbody tr:nth-child(even){background:#f8fafc;}
   </tbody>
 </table>
 
-<div class="footer">Generado con M.E.T.A.S. — Misiones Educativas Tecnológicas Asincrónicas y Sincrónicas · ${fecha}</div>
+<div class="footer">Generado con F.A.R.O. — Familia, Aprendizaje, Recursos y Organización · ${fecha}</div>
 </div>
 </body></html>`;
 

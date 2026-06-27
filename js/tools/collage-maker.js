@@ -367,7 +367,7 @@ function _coDrawOverlays(ctx, W, H) {
   ctx.font         = `500 ${isVert ? 22 : 18}px Arial, sans-serif`;
   ctx.textAlign    = 'right';
   ctx.textBaseline = 'bottom';
-  ctx.fillText('M.E.T.A.S.', W - 16, H - 10);
+  ctx.fillText('F.A.R.O.', W - 16, H - 10);
 }
 
 // Redibujo rápido usando imágenes ya cargadas (sin I/O)
@@ -896,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!dataUrl) dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       const a  = document.createElement('a');
       a.href   = dataUrl;
-      a.download = 'evidencia-metas.jpg';
+      a.download = 'evidencia-faro.jpg';
       a.click();
     } finally {
       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-download"></i> Descargar / Guardar Imagen'; }

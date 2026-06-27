@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meta-app-v14';
+const CACHE_NAME = 'faro-app-v1';
 const STATIC_ASSETS = [
   './img/logo.png',
   './img/icon-192.png',
