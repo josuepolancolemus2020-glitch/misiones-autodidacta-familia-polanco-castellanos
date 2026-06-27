@@ -532,6 +532,9 @@ document.addEventListener('DOMContentLoaded', () => {
     toast('Sin notificaciones nuevas por ahora');
   });
 
+  // Acceso directo al Chat Familiar
+  document.getElementById('chat-shortcut-btn')?.addEventListener('click', () => switchView('view-chat'));
+
   // ── Header oculto al hacer scroll (acumulador anti-tembladera) ──
   document.querySelectorAll('.view-scroll').forEach(scroll => {
     let lastY = 0;

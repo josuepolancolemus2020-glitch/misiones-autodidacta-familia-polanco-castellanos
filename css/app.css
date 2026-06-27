@@ -42,6 +42,7 @@ a { text-decoration: none; color: inherit; }
 /* ====== LOGIN ====== */
 .login-screen {
   height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,7 +195,7 @@ a { text-decoration: none; color: inherit; }
 @media (hover: hover) { .drawer-logout-item:hover { background: #fef2f2; } }
 
 /* ====== VIEWS ====== */
-.view { display: none; flex-direction: column; height: 100vh; overflow: hidden; animation: fadeUp .25s ease; }
+.view { display: none; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; animation: fadeUp .25s ease; }
 .view.active { display: flex; }
 
 @keyframes fadeUp {
@@ -273,17 +274,18 @@ a { text-decoration: none; color: inherit; }
   text-align: center;
 }
 
-.notif-btn {
+.header-actions { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+
+.header-icon-btn {
   background: none; border: none; cursor: pointer;
   font-size: 21px; color: var(--text);
   position: relative;
   width: 38px; height: 38px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
-  margin-left: auto;
   transition: background .15s;
 }
-.notif-btn:active { background: var(--bg); }
+.header-icon-btn:active { background: var(--bg); }
 
 .notif-dot {
   position: absolute; top: 6px; right: 6px;
