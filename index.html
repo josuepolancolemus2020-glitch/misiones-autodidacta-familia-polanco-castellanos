@@ -192,18 +192,21 @@
     <div class="view-scroll fin-scroll">
 
       <div class="fin-summary-grid">
-        <div class="fin-summary-card fin-balance">
+        <button type="button" class="fin-summary-card fin-balance" data-findetail="saldo">
           <div class="fin-card-label">Saldo Familiar Disponible</div>
           <div class="fin-card-value" id="fin-saldo-total">—</div>
-        </div>
-        <div class="fin-summary-card fin-expense">
+          <div class="fin-card-hint">Ver detalle <i class="fa-solid fa-chevron-right"></i></div>
+        </button>
+        <button type="button" class="fin-summary-card fin-expense" data-findetail="gastos">
           <div class="fin-card-label">Gastos del Mes</div>
           <div class="fin-card-value" id="fin-gastos-mes">—</div>
-        </div>
-        <div class="fin-summary-card fin-debt">
+          <div class="fin-card-hint">Ver detalle <i class="fa-solid fa-chevron-right"></i></div>
+        </button>
+        <button type="button" class="fin-summary-card fin-debt" data-findetail="deudas">
           <div class="fin-card-label">Total de Deudas Pendientes</div>
           <div class="fin-card-value" id="fin-deudas-total">—</div>
-        </div>
+          <div class="fin-card-hint">Ver detalle <i class="fa-solid fa-chevron-right"></i></div>
+        </button>
       </div>
 
       <h2 class="section-title">Últimos Movimientos</h2>
@@ -326,6 +329,19 @@
 
         <button type="submit" class="fin-submit-btn">Guardar Deuda</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal de detalle: qué compone cada tarjeta resumen de Finanzas -->
+  <div id="fin-detail-modal-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <h3 class="fin-detail-title" id="fin-detail-title">Detalle</h3>
+        <button type="button" class="fin-modal-close" id="fin-detail-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="fin-detail-content" class="fin-detail-content"></div>
     </div>
   </div>
 

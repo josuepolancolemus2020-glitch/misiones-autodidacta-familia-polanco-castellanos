@@ -9,7 +9,9 @@ const FIN_DEUDAS_TABLE        = 'deudas';
 // ingreso real, así que se excluye de "Gastos del Mes".
 const FIN_TRANSFER_CATEGORY = 'Envío Familiar';
 
-let _finCuentasCache = [];
+let _finCuentasCache  = [];
+let _finGastosMesCache = [];
+let _finDeudasCache    = [];
 
 function _finCurrentUserName() {
   const session = (typeof verificarSesion === 'function') ? verificarSesion() : null;
@@ -51,8 +53,8 @@ async function initFinanzas() {
 
   const [cuentasRes, gastosRes, deudasRes] = await Promise.all([
     _sb.from(FIN_CUENTAS_TABLE).select('*').order('nombre'),
-    _sb.from(FIN_TRANSACCIONES_TABLE).select('monto').eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', _finStartOfMonth()),
-    _sb.from(FIN_DEUDAS_TABLE).select('monto_total, monto_pagado'),
+    _sb.from(FIN_TRANSACCIONES_TABLE).select('*').eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', _finStartOfMonth()).order('fecha', { ascending: false }),
+    _sb.from(FIN_DEUDAS_TABLE).select('*').order('fecha_limite', { ascending: true, nullsFirst: false }),
   ]);
 
   if (cuentasRes.error) {
@@ -67,14 +69,16 @@ async function initFinanzas() {
   if (gastosRes.error) {
     console.error('[Finanzas] Error cargando gastos del mes:', gastosRes.error);
   } else {
-    const totalGastos = (gastosRes.data || []).reduce((sum, t) => sum + Number(t.monto || 0), 0);
+    _finGastosMesCache = gastosRes.data || [];
+    const totalGastos = _finGastosMesCache.reduce((sum, t) => sum + Number(t.monto || 0), 0);
     document.getElementById('fin-gastos-mes').textContent = _finMoney(totalGastos);
   }
 
   if (deudasRes.error) {
     console.error('[Finanzas] Error cargando deudas:', deudasRes.error);
   } else {
-    const totalDeuda = (deudasRes.data || []).reduce(
+    _finDeudasCache = deudasRes.data || [];
+    const totalDeuda = _finDeudasCache.reduce(
       (sum, d) => sum + (Number(d.monto_total || 0) - Number(d.monto_pagado || 0)), 0
     );
     document.getElementById('fin-deudas-total').textContent = _finMoney(totalDeuda);
@@ -172,6 +176,94 @@ function _finFillCuentaSelect(selectId, cuentas) {
     opt.textContent = `${c.nombre} (${_finMoney(c.saldo_actual)})`;
     select.appendChild(opt);
   });
+}
+
+/* ─────────────────────────────────────────────
+   DETALLE DE TARJETAS RESUMEN
+───────────────────────────────────────────── */
+
+function _finDetailRow(title, subtitle, amountText, amountClass) {
+  const row = document.createElement('div');
+  row.className = 'fin-detail-row';
+
+  const main = document.createElement('div');
+  main.className = 'fin-detail-row-main';
+
+  const titleEl = document.createElement('div');
+  titleEl.className = 'fin-detail-row-title';
+  titleEl.textContent = title;
+  main.appendChild(titleEl);
+
+  if (subtitle) {
+    const subEl = document.createElement('div');
+    subEl.className = 'fin-detail-row-sub';
+    subEl.textContent = subtitle;
+    main.appendChild(subEl);
+  }
+
+  const amountEl = document.createElement('div');
+  amountEl.className = 'fin-detail-row-amount' + (amountClass ? ' ' + amountClass : '');
+  amountEl.textContent = amountText;
+
+  row.append(main, amountEl);
+  return row;
+}
+
+function _finDetailEmpty(msg) {
+  const div = document.createElement('div');
+  div.className = 'fin-empty';
+  div.textContent = msg;
+  return div;
+}
+
+function finOpenDetail(kind) {
+  const overlay = document.getElementById('fin-detail-modal-overlay');
+  const title   = document.getElementById('fin-detail-title');
+  const content = document.getElementById('fin-detail-content');
+  if (!overlay || !title || !content) return;
+
+  content.innerHTML = '';
+
+  if (kind === 'saldo') {
+    title.textContent = 'Saldo por Cuenta';
+    if (!_finCuentasCache.length) {
+      content.appendChild(_finDetailEmpty('Aún no has registrado ninguna cuenta.'));
+    } else {
+      _finCuentasCache.forEach(c => {
+        content.appendChild(_finDetailRow(c.nombre, null, _finMoney(c.saldo_actual)));
+      });
+    }
+  } else if (kind === 'gastos') {
+    title.textContent = 'Gastos del Mes';
+    if (!_finGastosMesCache.length) {
+      content.appendChild(_finDetailEmpty('Sin gastos registrados este mes.'));
+    } else {
+      _finGastosMesCache.forEach(t => {
+        const sub = `${t.usuario || 'Familia'} · ${t.categoria || ''} · ${_finFormatDate(t.fecha)}`;
+        content.appendChild(_finDetailRow(t.descripcion || t.categoria || 'Gasto', sub, '- ' + _finMoney(t.monto), 'fin-detail-out'));
+      });
+    }
+  } else if (kind === 'deudas') {
+    title.textContent = 'Deudas Pendientes';
+    if (!_finDeudasCache.length) {
+      content.appendChild(_finDetailEmpty('Aún no has registrado ninguna deuda.'));
+    } else {
+      _finDeudasCache.forEach(d => {
+        const pendiente = Number(d.monto_total || 0) - Number(d.monto_pagado || 0);
+        let sub = `Pagado ${_finMoney(d.monto_pagado)} de ${_finMoney(d.monto_total)}`;
+        if (d.fecha_limite) sub += ` · Vence ${_finFormatDate(d.fecha_limite)}`;
+        if (d.estado) sub += ` · ${d.estado}`;
+        content.appendChild(_finDetailRow(d.descripcion || 'Deuda', sub, _finMoney(pendiente), 'fin-detail-debt'));
+      });
+    }
+  }
+
+  overlay.style.display = 'flex';
+}
+
+function finCloseDetail() {
+  const overlay = document.getElementById('fin-detail-modal-overlay');
+  if (overlay) overlay.style.display = 'none';
 }
 
 /* ─────────────────────────────────────────────
@@ -416,4 +508,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fin-form-transferencia')?.addEventListener('submit', finSubmitTransferencia);
   document.getElementById('fin-form-cuenta')?.addEventListener('submit', finSubmitCuenta);
   document.getElementById('fin-form-deuda')?.addEventListener('submit', finSubmitDeuda);
+
+  // Detalle de las tarjetas resumen (Saldo / Gastos del Mes / Deudas)
+  document.querySelector('.fin-summary-grid')?.addEventListener('click', e => {
+    const card = e.target.closest('[data-findetail]');
+    if (card) finOpenDetail(card.dataset.findetail);
+  });
+  document.getElementById('fin-detail-close')?.addEventListener('click', finCloseDetail);
+  document.getElementById('fin-detail-modal-overlay')?.addEventListener('click', e => {
+    if (e.target.id === 'fin-detail-modal-overlay') finCloseDetail();
+  });
 });
