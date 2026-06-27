@@ -4,6 +4,11 @@ const FIN_CUENTAS_TABLE       = 'cuentas';
 const FIN_TRANSACCIONES_TABLE = 'transacciones';
 const FIN_DEUDAS_TABLE        = 'deudas';
 
+// Categoría reservada para movimientos que solo mueven dinero entre cuentas
+// de la familia (ej. darle efectivo a un familiar). No es un gasto ni un
+// ingreso real, así que se excluye de "Gastos del Mes".
+const FIN_TRANSFER_CATEGORY = 'Transferencia Interna';
+
 let _finCuentasCache = [];
 
 function _finCurrentUserName() {
@@ -46,7 +51,7 @@ async function initFinanzas() {
 
   const [cuentasRes, gastosRes, deudasRes] = await Promise.all([
     _sb.from(FIN_CUENTAS_TABLE).select('*').order('nombre'),
-    _sb.from(FIN_TRANSACCIONES_TABLE).select('monto').eq('tipo', 'egreso').gte('fecha', _finStartOfMonth()),
+    _sb.from(FIN_TRANSACCIONES_TABLE).select('monto').eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', _finStartOfMonth()),
     _sb.from(FIN_DEUDAS_TABLE).select('monto_total, monto_pagado'),
   ]);
 
@@ -110,14 +115,18 @@ async function finLoadMovimientos() {
 }
 
 function _finRenderMovimiento(t) {
+  const esTransferencia = t.categoria === FIN_TRANSFER_CATEGORY;
   const esIngreso = t.tipo === 'ingreso';
+
+  const tono = esTransferencia ? 'transfer' : (esIngreso ? 'in' : 'out');
 
   const row = document.createElement('div');
   row.className = 'fin-mov-row';
 
   const icon = document.createElement('div');
-  icon.className = 'fin-mov-icon ' + (esIngreso ? 'fin-mov-in' : 'fin-mov-out');
-  icon.innerHTML = `<i class="fa-solid ${esIngreso ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>`;
+  icon.className = 'fin-mov-icon fin-mov-' + tono;
+  const iconClass = esTransferencia ? 'fa-right-left' : (esIngreso ? 'fa-arrow-up' : 'fa-arrow-down');
+  icon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
 
   const info = document.createElement('div');
   info.className = 'fin-mov-info';
@@ -133,7 +142,7 @@ function _finRenderMovimiento(t) {
   info.append(desc, meta);
 
   const amount = document.createElement('div');
-  amount.className = 'fin-mov-amount ' + (esIngreso ? 'fin-mov-in' : 'fin-mov-out');
+  amount.className = 'fin-mov-amount fin-mov-' + tono;
   amount.textContent = (esIngreso ? '+ ' : '- ') + _finMoney(t.monto);
 
   row.append(icon, info, amount);
@@ -141,7 +150,11 @@ function _finRenderMovimiento(t) {
 }
 
 function _finRenderCuentaOptions(cuentas) {
-  const select = document.getElementById('fin-t-cuenta');
+  ['fin-t-cuenta', 'fin-tr-origen', 'fin-tr-destino'].forEach(id => _finFillCuentaSelect(id, cuentas));
+}
+
+function _finFillCuentaSelect(selectId, cuentas) {
+  const select = document.getElementById(selectId);
   if (!select) return;
   select.innerHTML = '';
 
@@ -169,8 +182,10 @@ function finOpenModal(tab) {
   const overlay = document.getElementById('fin-modal-overlay');
   if (!overlay) return;
   overlay.style.display = 'flex';
-  const fechaInput = document.getElementById('fin-t-fecha');
-  if (fechaInput && !fechaInput.value) fechaInput.value = _finToday();
+  ['fin-t-fecha', 'fin-tr-fecha'].forEach(id => {
+    const input = document.getElementById(id);
+    if (input && !input.value) input.value = _finToday();
+  });
   finSwitchTab(tab || 'transaccion');
 }
 
@@ -183,9 +198,10 @@ function finSwitchTab(tab) {
   document.querySelectorAll('.fin-modal-tab').forEach(btn => {
     btn.classList.toggle('fin-modal-tab-active', btn.dataset.fintab === tab);
   });
-  document.getElementById('fin-form-transaccion').style.display = tab === 'transaccion' ? 'flex' : 'none';
-  document.getElementById('fin-form-cuenta').style.display      = tab === 'cuenta'      ? 'flex' : 'none';
-  document.getElementById('fin-form-deuda').style.display       = tab === 'deuda'       ? 'flex' : 'none';
+  document.getElementById('fin-form-transaccion').style.display    = tab === 'transaccion'    ? 'flex' : 'none';
+  document.getElementById('fin-form-transferencia').style.display  = tab === 'transferencia'  ? 'flex' : 'none';
+  document.getElementById('fin-form-cuenta').style.display         = tab === 'cuenta'         ? 'flex' : 'none';
+  document.getElementById('fin-form-deuda').style.display          = tab === 'deuda'          ? 'flex' : 'none';
 }
 
 /* ─────────────────────────────────────────────
@@ -243,6 +259,81 @@ async function finSubmitTransaccion(e) {
   if (typeof toast === 'function') toast('✅ Transacción registrada');
   e.target.reset();
   document.getElementById('fin-t-fecha').value = _finToday();
+  if (btn) btn.disabled = false;
+  finCloseModal();
+  await initFinanzas();
+}
+
+async function finSubmitTransferencia(e) {
+  e.preventDefault();
+  if (!_sb) return;
+
+  const origenId   = document.getElementById('fin-tr-origen').value;
+  const destinoId   = document.getElementById('fin-tr-destino').value;
+  const monto        = parseFloat(document.getElementById('fin-tr-monto').value);
+  const descripcion  = document.getElementById('fin-tr-descripcion').value.trim() || 'Transferencia entre cuentas';
+  const fecha         = document.getElementById('fin-tr-fecha').value;
+
+  if (!origenId || !destinoId || !monto || monto <= 0) return;
+
+  if (origenId === destinoId) {
+    if (typeof toast === 'function') toast('La cuenta origen y destino deben ser distintas');
+    return;
+  }
+
+  const btn = e.target.querySelector('.fin-submit-btn');
+  if (btn) btn.disabled = true;
+  const usuario = _finCurrentUserName();
+
+  // Dos movimientos enlazados: egreso en origen + ingreso en destino,
+  // ambos bajo la categoría reservada para que NO se cuenten como
+  // gasto/ingreso real en el dashboard.
+  const { error: errInsert } = await _sb.from(FIN_TRANSACCIONES_TABLE).insert([
+    { tipo: 'egreso',  monto, categoria: FIN_TRANSFER_CATEGORY, descripcion, fecha, usuario, cuenta_id: origenId },
+    { tipo: 'ingreso', monto, categoria: FIN_TRANSFER_CATEGORY, descripcion, fecha, usuario, cuenta_id: destinoId },
+  ]);
+
+  if (errInsert) {
+    console.error('[Finanzas] Error guardando transferencia:', errInsert);
+    if (typeof toast === 'function') toast('No se pudo guardar la transferencia');
+    if (btn) btn.disabled = false;
+    return;
+  }
+
+  // Actualiza ambos saldos con lectura fresca antes de escribir
+  const { data: cuentasActuales, error: errSelect } = await _sb
+    .from(FIN_CUENTAS_TABLE)
+    .select('id, saldo_actual')
+    .in('id', [origenId, destinoId]);
+
+  if (errSelect) {
+    console.error('[Finanzas] Error leyendo saldos:', errSelect);
+  } else {
+    const origenActual  = cuentasActuales.find(c => String(c.id) === String(origenId));
+    const destinoActual = cuentasActuales.find(c => String(c.id) === String(destinoId));
+
+    const updates = [];
+    if (origenActual) {
+      updates.push(
+        _sb.from(FIN_CUENTAS_TABLE)
+          .update({ saldo_actual: Number(origenActual.saldo_actual || 0) - monto })
+          .eq('id', origenId)
+      );
+    }
+    if (destinoActual) {
+      updates.push(
+        _sb.from(FIN_CUENTAS_TABLE)
+          .update({ saldo_actual: Number(destinoActual.saldo_actual || 0) + monto })
+          .eq('id', destinoId)
+      );
+    }
+    const results = await Promise.all(updates);
+    results.forEach(r => { if (r.error) console.error('[Finanzas] Error actualizando saldo:', r.error); });
+  }
+
+  if (typeof toast === 'function') toast('✅ Transferencia registrada');
+  e.target.reset();
+  document.getElementById('fin-tr-fecha').value = _finToday();
   if (btn) btn.disabled = false;
   finCloseModal();
   await initFinanzas();
@@ -322,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('fin-form-transaccion')?.addEventListener('submit', finSubmitTransaccion);
+  document.getElementById('fin-form-transferencia')?.addEventListener('submit', finSubmitTransferencia);
   document.getElementById('fin-form-cuenta')?.addEventListener('submit', finSubmitCuenta);
   document.getElementById('fin-form-deuda')?.addEventListener('submit', finSubmitDeuda);
 });

@@ -224,6 +224,7 @@
       <div class="fin-modal-head">
         <div class="fin-modal-tabs">
           <button type="button" class="fin-modal-tab fin-modal-tab-active" data-fintab="transaccion">Transacción</button>
+          <button type="button" class="fin-modal-tab" data-fintab="transferencia">Transferencia</button>
           <button type="button" class="fin-modal-tab" data-fintab="cuenta">Cuenta</button>
           <button type="button" class="fin-modal-tab" data-fintab="deuda">Deuda</button>
         </div>
@@ -270,6 +271,32 @@
         <input id="fin-t-fecha" class="fin-input" type="date" required>
 
         <button type="submit" class="fin-submit-btn">Guardar Transacción</button>
+      </form>
+
+      <!-- Transferencia entre cuentas de la familia (no cuenta como gasto/ingreso real) -->
+      <form id="fin-form-transferencia" class="fin-form" style="display:none;">
+        <p class="fin-hint">Para mover dinero entre cuentas de la familia (ej. darle efectivo a alguien). No se contabiliza como gasto ni ingreso real.</p>
+
+        <label class="fin-label" for="fin-tr-origen">Cuenta origen</label>
+        <select id="fin-tr-origen" class="fin-select" required>
+          <option value="" disabled selected>Cargando cuentas…</option>
+        </select>
+
+        <label class="fin-label" for="fin-tr-destino">Cuenta destino</label>
+        <select id="fin-tr-destino" class="fin-select" required>
+          <option value="" disabled selected>Cargando cuentas…</option>
+        </select>
+
+        <label class="fin-label" for="fin-tr-monto">Monto</label>
+        <input id="fin-tr-monto" class="fin-input" type="number" step="0.01" min="0.01" placeholder="0.00" required>
+
+        <label class="fin-label" for="fin-tr-descripcion">Descripción</label>
+        <input id="fin-tr-descripcion" class="fin-input" type="text" placeholder="Ej. Efectivo para gastos de la semana" maxlength="200">
+
+        <label class="fin-label" for="fin-tr-fecha">Fecha</label>
+        <input id="fin-tr-fecha" class="fin-input" type="date" required>
+
+        <button type="submit" class="fin-submit-btn">Guardar Transferencia</button>
       </form>
 
       <!-- Nueva Cuenta -->
