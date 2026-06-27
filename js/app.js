@@ -10,10 +10,10 @@ const MEMBERS = [
 ];
 
 const MODULES = [
-  { id: 'finanzas',          label: 'Finanzas',          sub: 'Gestión de Presupuesto', icon: 'fa-sack-dollar',    color: 'fin', ready: false },
+  { id: 'finanzas',          label: 'Finanzas',          sub: 'Gestión de Presupuesto', icon: 'fa-sack-dollar',    color: 'fin', ready: true,  view: 'view-finanzas' },
   { id: 'organizacion',      label: 'Organización',      sub: 'Agenda y Eventos',       icon: 'fa-calendar-days',  color: 'org', ready: false },
   { id: 'salud',             label: 'Salud y Bienestar', sub: 'Citas y Vacunas',        icon: 'fa-heart-pulse',    color: 'sal', ready: false },
-  { id: 'aprendizaje-unido', label: 'Aprendizaje Unido', sub: 'Zonas F.A.R.O.',         icon: 'fa-graduation-cap', color: 'apr', ready: true  },
+  { id: 'aprendizaje-unido', label: 'Aprendizaje Unido', sub: 'Zonas F.A.R.O.',         icon: 'fa-graduation-cap', color: 'apr', ready: true,  view: 'view-misiones' },
 ];
 
 const LEVELS = [
@@ -147,12 +147,12 @@ function renderModules() {
   if (!grid) return;
 
   grid.innerHTML = MODULES.map(mod => {
-    let countText;
-    if (mod.ready) {
+    let countText = 'Próximamente';
+    if (mod.id === 'aprendizaje-unido') {
       const total = MISSIONS.filter(m => m.modulo === mod.id).length;
       countText = total === 1 ? '1 misión' : `${total} misiones`;
-    } else {
-      countText = 'Próximamente';
+    } else if (mod.id === 'finanzas') {
+      countText = 'Abrir dashboard';
     }
     return `
       <button class="module-card ${mod.color}${mod.ready ? '' : ' soon'}" data-module="${mod.id}">
@@ -167,8 +167,8 @@ function renderModules() {
 function goToModule(modId) {
   const mod = MODULES.find(x => x.id === modId);
   if (!mod) return;
-  if (mod.ready) {
-    switchView('view-misiones');
+  if (mod.ready && mod.view) {
+    switchView(mod.view);
   } else {
     toast(`🔜 ${mod.label} estará disponible próximamente`);
   }
@@ -412,6 +412,7 @@ function switchView(id) {
   if (id === 'view-plan-accion')    paInit();
   if (id === 'view-parte-mensual')  { /* la UI se recalcula en tiempo real con inputs */ }
   if (id === 'view-collage')        initCollage();
+  if (id === 'view-finanzas' && typeof initFinanzas === 'function') initFinanzas();
 
   const scroll = document.querySelector(`#${id} .view-scroll`);
   if (scroll) scroll.scrollTop = 0;
@@ -483,8 +484,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const moduleEl = document.getElementById('module-select');
   if (moduleEl) {
     moduleEl.addEventListener('change', () => {
+      const mod = MODULES.find(x => x.id === moduleEl.value);
       goToModule(moduleEl.value);
-      moduleEl.value = 'aprendizaje-unido';
+      if (!mod || !mod.ready) moduleEl.value = 'aprendizaje-unido';
       moduleEl.blur();
     });
   }
