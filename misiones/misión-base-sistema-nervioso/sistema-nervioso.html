@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misión El Sistema Nervioso | policastsapien.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/sistema-nervioso.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones&filter=naturales" class="xp-back-btn" title="Regresar a misiones de C. Naturales">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+    <img src="../../img/logo.png" alt="Logo" class="xp-back-logo">
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Aprendiz 🌱</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🧠</div>
+    <div class="hero-text">
+      <h1>Misión <span>El Sistema Nervioso</span></h1>
+      <p class="sub">¡Explora el cerebro, las neuronas, el impulso nervioso y los cuidados del sistema nervioso! 🧠</p>
+      <div class="badge">🧠 II y III Ciclo · Ciencias Naturales · Biología Humana</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🧠 ¿Qué es el Sistema Nervioso?</h2>
+    <p>El <strong>sistema nervioso</strong> es el sistema de control y comunicación del cuerpo humano. Recibe información del ambiente (estímulos), la procesa y envía respuestas a los músculos y glándulas. Está formado por el <strong>encéfalo</strong>, la <strong>médula espinal</strong> y todos los <strong>nervios periféricos</strong> del cuerpo.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Dato clave:</strong> El cerebro humano contiene aproximadamente <strong>86,000 millones de neuronas</strong>. Una sola neurona puede conectarse con hasta <strong>10,000 otras neuronas</strong> a través de sinapsis. Los impulsos nerviosos viajan a velocidades de hasta <strong>120 m/s</strong>.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>⚡ Divisiones del Sistema Nervioso</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🧠 Sistema Nervioso Central (SNC)</h4>
+        <p>Formado por el <strong>encéfalo</strong> (cerebro, cerebelo, tronco encefálico) y la <strong>médula espinal</strong>. Es el centro de procesamiento: recibe, interpreta y genera respuestas a los estímulos. Protegido por el cráneo y la columna vertebral.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🔌 Sistema Nervioso Periférico (SNP)</h4>
+        <p>Formado por los <strong>nervios craneales</strong> (12 pares) y <strong>nervios espinales</strong> (31 pares). Conecta el SNC con los órganos, músculos y receptores sensoriales del cuerpo. Se divide en voluntario (somático) e involuntario (autónomo).</p>
+      </div>
+    </div>
+    <div class="vs-grid">
+      <div class="vs-box vs-c">
+        <h4>✋ Sistema Nervioso Voluntario</h4>
+        <p>Controla los <strong>músculos esqueléticos</strong> bajo control consciente: caminar, escribir, hablar, saltar. Las órdenes parten de la <strong>corteza motora</strong> del cerebro y viajan por nervios motores hasta los músculos.</p>
+      </div>
+      <div class="vs-box vs-d">
+        <h4>💓 Sistema Nervioso Autónomo</h4>
+        <p>Controla funciones <strong>involuntarias</strong>: latido cardíaco, digestión, respiración automática, control de la pupila. Se divide en <strong>simpático</strong> (activa en situaciones de estrés: "lucha o huye") y <strong>parasimpático</strong> (calma y restaura).</p>
+      </div>
+    </div>
+    <figure class="img-visual-wrap">
+      <img src="img/diagrama-anatomico-del-sistema-nervioso.webp" class="img-visual-wide" alt="Diagrama anatómico del sistema nervioso mostrando SNC y SNP" loading="lazy">
+      <figcaption class="img-caption">El SNC (cerebro, cerebelo, tronco y médula espinal) procesa los impulsos; el SNP (nervios periféricos) los conecta con el resto del cuerpo.</figcaption>
+    </figure>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧠 El arco reflejo</span><br>
+      <span>El <span class="hl">arco reflejo</span> es la respuesta más rápida del sistema nervioso. No pasa por el cerebro: el estímulo viaja de la <span class="hl2">neurona sensorial → médula espinal → neurona motora → músculo</span>. Ejemplo: al tocar algo caliente, retiras la mano antes de sentir dolor.</span>
+    </div>
+    <figure class="img-visual-wrap">
+      <img src="img/el-arco-reflejo-explicado-graficamente.webp" class="img-visual" alt="Infografía del arco reflejo: 5 pasos desde el receptor hasta el efector muscular" loading="lazy">
+      <figcaption class="img-caption">El arco reflejo: Receptor → Neurona sensorial → Médula espinal → Neurona motora → Efector. Sin pasar por el cerebro.</figcaption>
+    </figure>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🔬 La Neurona: unidad funcional</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🔬 Partes de la neurona</h4>
+        <p><strong>Soma (cuerpo celular)</strong>: contiene el núcleo.<br><strong>Dendritas</strong>: reciben impulsos de otras neuronas.<br><strong>Axón</strong>: transmite el impulso hacia otras células.<br><strong>Vaina de mielina</strong>: acelera la transmisión del impulso.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>⚡ Tipos de neurona</h4>
+        <p><strong>Sensorial (aferente)</strong>: capta estímulos de receptores y los envía al SNC.<br><strong>Motora (eferente)</strong>: lleva órdenes del SNC a músculos y glándulas.<br><strong>Interneurona</strong>: conecta neuronas entre sí dentro del SNC.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Velocidad impulso</div><div class="stat-val">120 m/s</div></div>
+      <div class="stat-item"><div class="stat-label">Neuronas en cerebro</div><div class="stat-val">86,000M</div></div>
+      <div class="stat-item"><div class="stat-label">Sinapsis por neurona</div><div class="stat-val">~10,000</div></div>
+      <div class="stat-item"><div class="stat-label">Pares nervios craneales</div><div class="stat-val">12 pares</div></div>
+    </div>
+    <figure class="img-visual-wrap">
+      <img src="img/partes-de-una-neuroa-explicadas.webp" class="img-visual" alt="Infografía con las partes de una neurona: dendritas, soma, axón, vaina de mielina, nodos de Ranvier y terminales axónicas" loading="lazy">
+      <figcaption class="img-caption">Partes de la neurona: dendritas (reciben), soma (núcleo), axón (transmite), vaina de mielina (acelera) y terminales axónicas (liberan neurotransmisores).</figcaption>
+    </figure>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🧬 El Encéfalo: cerebro, cerebelo y tronco</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🧠 Cerebro</h4>
+        <p>La parte más grande del encéfalo. Dividido en dos hemisferios por el <strong>cuerpo calloso</strong>. La <strong>corteza cerebral</strong> controla el pensamiento, la memoria, el lenguaje, los movimientos voluntarios y los sentidos. El lóbulo frontal rige la personalidad y razonamiento.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>⚖️ Cerebelo</h4>
+        <p>Ubicado en la parte posterior del encéfalo. Coordina el <strong>equilibrio, la postura y los movimientos finos</strong>. No inicia movimientos: los afina y sincroniza. Un daño en el cerebelo produce <strong>ataxia</strong> (pérdida de coordinación motora).</p>
+      </div>
+    </div>
+    <div class="vs-grid">
+      <div class="vs-box vs-c">
+        <h4>🔗 Tronco encefálico</h4>
+        <p>Conecta el cerebro con la médula espinal. Controla funciones vitales: <strong>respiración, frecuencia cardíaca y presión arterial</strong>. Incluye el mesencéfalo, protuberancia y bulbo raquídeo. Un daño grave en esta zona es incompatible con la vida.</p>
+      </div>
+      <div class="vs-box vs-d">
+        <h4>🦴 Médula espinal</h4>
+        <p>Cordón nervioso dentro de la columna vertebral. Conduce los impulsos entre el encéfalo y el resto del cuerpo. También procesa <strong>reflejos medulares</strong> (arco reflejo) sin necesitar al cerebro. Longitud aprox. <strong>45 cm</strong> en adultos.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>⚡ El Impulso Nervioso y la Sinapsis</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>⚡ ¿Cómo viaja el impulso?</h4>
+        <p>Un estímulo genera un <strong>potencial de acción</strong> en la membrana de la neurona. Este impulso eléctrico recorre el axón hasta el botón sináptico, donde libera <strong>neurotransmisores</strong> al espacio sináptico que activan la neurona siguiente.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🔗 La sinapsis</h4>
+        <p>Espacio entre dos neuronas. Los <strong>neurotransmisores</strong> (dopamina, serotonina, acetilcolina) cruzan la sinapsis química para transmitir el impulso. La mielina acelera el proceso saltando entre <strong>nodos de Ranvier</strong> (conducción saltatoria).</p>
+      </div>
+    </div>
+    <figure class="img-visual-wrap">
+      <img src="img/sinapsis-entre-dos-neuronas.webp" class="img-visual" alt="Diagrama de la sinapsis entre dos neuronas mostrando botón sináptico, vesículas, neurotransmisores y receptores" loading="lazy">
+      <figcaption class="img-caption">En la sinapsis química, el botón sináptico libera neurotransmisores (dopamina, serotonina) que cruzan la hendidura y activan la neurona postsináptica.</figcaption>
+    </figure>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🔬 Ruta del impulso nervioso</span><br>
+      <span><span class="hl">Receptor sensorial</span> → Neurona sensorial → Médula espinal / Encéfalo → <span class="hl2">Interneurona</span> → Neurona motora → <span class="hl3">Efector</span> (músculo o glándula) → Respuesta.</span>
+    </div>
+    <figure class="img-visual-wrap">
+      <img src="img/principales-neurotransmisores-y-sus-funciones.webp" class="img-visual" alt="Infografía de los principales neurotransmisores: dopamina, serotonina, acetilcolina y GABA con sus funciones" loading="lazy">
+      <figcaption class="img-caption">Los cuatro principales neurotransmisores: Dopamina (movimiento), Serotonina (estado de ánimo), Acetilcolina (músculos) y GABA (inhibición).</figcaption>
+    </figure>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>⚠️ Enfermedades y Cuidados del Sistema Nervioso</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🩺 Enfermedades principales</h4>
+        <p>• <strong>Alzheimer</strong>: degeneración progresiva de la memoria<br>• <strong>Parkinson</strong>: pérdida de dopamina, temblores<br>• <strong>Epilepsia</strong>: descargas eléctricas anormales<br>• <strong>Esclerosis múltiple</strong>: daño a la mielina<br>• <strong>Meningitis</strong>: inflamación de las meninges</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>💚 Hábitos de cuidado</h4>
+        <p>• <strong>Dormir</strong> 8–9 horas: consolida la memoria<br>• <strong>Ejercicio físico</strong>: aumenta BDNF (factor neuroprotector)<br>• <strong>Lectura y aprendizaje</strong>: fortalece redes neuronales<br>• <strong>Evitar alcohol y drogas</strong>: son neurotóxicos<br>• <strong>Casco en deportes</strong>: previene trauma craneal</p>
+      </div>
+    </div>
+    <div class="img-duo">
+      <figure class="img-visual-wrap" style="margin:0;">
+        <img src="img/comparativa-visual-de-enfermedades-neurodegenerativas.webp" class="img-visual" alt="Comparativa visual de Alzheimer, Parkinson y Esclerosis Múltiple" loading="lazy">
+        <figcaption class="img-caption">Alzheimer (pérdida de neuronas), Parkinson (falta de dopamina) y Esclerosis múltiple (daño a la mielina).</figcaption>
+      </figure>
+      <figure class="img-visual-wrap" style="margin:0;">
+        <img src="img/habitos-saludables-para-un-cerebro-fuerte.webp" class="img-visual" alt="Infografía de 7 hábitos saludables para el sistema nervioso: dormir, ejercicio, lectura, juegos, música, casco y alimentación" loading="lazy">
+        <figcaption class="img-caption">7 hábitos para cuidar tu sistema nervioso: dormir 8 h, ejercicio, lectura, juegos, música, casco y alimentación balanceada.</figcaption>
+      </figure>
+    </div>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🧠 Cerebro</div><div class="t-info">Pensamiento · Memoria · Lenguaje</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">⚖️ Cerebelo</div><div class="t-info">Equilibrio · Coordinación · Postura</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🔗 Tronco</div><div class="t-info">Respiración · Latido · Vital</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🦴 Médula</div><div class="t-info">Reflejos · Conducción · 45 cm</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">⚡ Sinapsis</div><div class="t-info">Neurotransmisores · Dopamina</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🔌 SNP</div><div class="t-info">12 pares craneales · 31 espinales</div></div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 Laboratorio del Sistema Nervioso</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una parte del sistema nervioso y un aspecto para explorar sus características. ¡Combina todos para aprender!</p>
+    <div id="lab-sentence" class="lab-sentence">🧠 Explorando: <strong>Cerebro</strong> → <strong>Estructura</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🧠 Parte:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="cerebro" onclick="labShowParte('cerebro')">🧠 Cerebro</button>
+        <button class="lab-btn lab-cont-btn" data-parte="cerebelo" onclick="labShowParte('cerebelo')">⚖️ Cerebelo</button>
+        <button class="lab-btn lab-cont-btn" data-parte="medula" onclick="labShowParte('medula')">🦴 Médula</button>
+        <button class="lab-btn lab-cont-btn" data-parte="snp" onclick="labShowParte('snp')">🔌 SNP</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">🔬 Estructura</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚡ Función</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">⚠️ Enfermedades</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💚 Cuidados</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards — Toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 14</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 9</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica los Conceptos</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Practicar con diferentes categorías te ayudará a dominar el tema.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica el concepto</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra o término solicitado:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: Ruta del Impulso Nervioso</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por ruta)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva ruta</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la Parte de la Neurona</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez por parte)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Parte 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Cuál es la parte o tipo de neurona que se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>💊 Neuro-Empareja: Neurotransmisor → Función</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Cuál es la función o enfermedad relacionada con este neurotransmisor?</p>
+    <div class="neuro-trans-display" id="neuroTrans">Dopamina</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🩺 Enfermedades: ¿Qué provoca cada una?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona la característica principal de esta enfermedad del sistema nervioso:</p>
+    <div class="neuro-trans-display" id="enferDisease">Alzheimer</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final — ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica el término del sistema nervioso rápidamente.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: Al terminar, usa "Variar pareja" para jugar con otras categorías y ganar más agilidad.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">SNC</button>
+        <button class="btn btn-sec" onclick="">SNP</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🤍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🤍 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🧠 Pensamiento Crítico</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · El Sistema Nervioso · II y III Ciclo · Ciencias Naturales</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Centro Educativo:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Grado y Sección:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Nº Lista:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final — El Sistema Nervioso</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Copia el examen en tu cuaderno y responde las preguntas, después selecciona <strong>Ver Pauta</strong> para que te autoevalúes. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · Pensamiento Crítico · El Sistema Nervioso · II y III Ciclo</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Centro Educativo:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Grado y Sección:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Nº Lista:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🧠 Prueba de Pensamiento Crítico — El Sistema Nervioso</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde cada caso con tus propias palabras (en pantalla o en tu cuaderno), compara con la <strong>Pauta</strong> y anótate el puntaje de cada sección. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Misión completada!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🧠</span>
+  </button>
+</div>
+
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-blue">
+    <h2>📁 Recursos del Tema</h2>
+    <p style="font-size:0.9rem;margin-bottom:1rem;">Aquí encontrarás materiales de apoyo para esta misión: presentaciones, documentos PDF, guías de estudio y más. El docente irá agregando recursos en esta carpeta.</p>
+    <a href="https://drive.google.com/drive/folders/1sistema_nervioso_recursos"
+       target="_blank" rel="noopener noreferrer"
+       class="btn btn-pri"
+       style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 87.3 78" aria-hidden="true">
+        <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H.1c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+        <path d="M43.65 25L29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.3 48.2c-.8 1.4-1.2 2.95-1.2 4.5h27.5z" fill="#00ac47"/>
+        <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.8l5.85 11.5z" fill="#ea4335"/>
+        <path d="M43.65 25L57.4 1.2C56.05.4 54.5 0 52.95 0H34.35c-1.55 0-3.1.45-4.45 1.2z" fill="#00832d"/>
+        <path d="M59.8 52.7H27.5L13.75 76.5c1.35.8 2.9 1.25 4.45 1.25h50.8c1.55 0 3.1-.45 4.45-1.25z" fill="#2684fc"/>
+        <path d="M73.4 26.35l-12.65-21.9c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.15 27.7H87.2c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+      </svg>
+      Abrir carpeta en Google Drive
+    </a>
+    <div class="tip" style="margin-top:1.2rem;">
+      <span class="ti">💡</span>
+      <div>Los archivos se abren directamente en el navegador. Puedes descargarlos o verlos sin necesidad de una cuenta de Google.</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Misión El Sistema Nervioso</div>
+    <div class="diploma-mascot" aria-hidden="true">🧠</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo M.E.T.A.S</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧬</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🤍</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo M.E.T.A.S</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Limita el uso del teléfono móvil solo como herramienta de aprendizaje de lo contrario puede ser perjudicial» 🌱 · Lee, interactúa, recuerda el saber.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/sistema-nervioso.js"></script>
+</body>
+</html>
