@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1e3a7c">
+  <title>Misión — M.E.T.A.S.</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+  <style>
+    /* ── Página de misión dinámica ── */
+    body { overflow-y: auto; }
+
+    .mision-topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: var(--shadow);
+    }
+    .btn-back {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-back:hover { background: var(--border); }
+    .topbar-brand {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--brand);
+      flex: 1;
+      text-align: center;
+    }
+    .xp-badge {
+      background: #fef9c3;
+      color: #92400e;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* ── Contenedor principal ── */
+    .mision-wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    /* ── Tarjeta de encabezado de misión ── */
+    .mision-header-card {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      border-left: 5px solid var(--brand);
+    }
+    .mision-icono { font-size: 2.4rem; line-height: 1; flex-shrink: 0; }
+    .mision-meta { flex: 1; min-width: 0; }
+    #titulo-mision {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0 0 4px;
+    }
+    #subtitulo-mision {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+    #descripcion-mision {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* ── Tarjeta de quiz ── */
+    .quiz-card {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 22px 20px;
+      box-shadow: var(--shadow);
+    }
+    .quiz-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .quiz-xp-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    #progreso-quiz {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    #pregunta-texto {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    /* ── Opciones ── */
+    .quiz-opciones {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .quiz-opcion {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 0.92rem;
+      text-align: left;
+      transition: border-color .18s, background .18s;
+      color: var(--text);
+      font-family: inherit;
+      width: 100%;
+    }
+    .quiz-opcion:hover:not(:disabled) { border-color: var(--brand-light); background: #eff6ff; }
+    .quiz-opcion.sel { border-color: var(--brand-mid); background: #dbeafe; }
+    .quiz-opcion.correcto { border-color: #16a34a !important; background: #dcfce7 !important; color: #14532d; }
+    .quiz-opcion.correcto::before { content: '✓ '; font-weight: 900; color: #16a34a; }
+    .quiz-opcion.incorrecto { border-color: #dc2626 !important; background: #fee2e2 !important; color: #7f1d1d; }
+    .quiz-opcion.incorrecto::before { content: '✗ '; font-weight: 900; color: #dc2626; }
+
+    /* ── Botones de acción ── */
+    .quiz-acciones { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .btn-verificar {
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .18s;
+    }
+    .btn-verificar:hover:not(:disabled) { opacity: .88; }
+    .btn-verificar:disabled { opacity: .5; cursor: default; }
+    .btn-siguiente {
+      background: var(--brand-mid);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      display: none;
+      transition: opacity .18s;
+    }
+    .btn-siguiente:hover { opacity: .88; }
+    .btn-reiniciar {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .18s;
+    }
+    .btn-reiniciar:hover { opacity: .75; }
+
+    /* ── Feedback ── */
+    #feedback-mision {
+      display: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      margin-top: 4px;
+      animation: fadeInFb .2s ease;
+    }
+    #feedback-mision.show { display: block; }
+    #feedback-mision.ok { background: #dcfce7; color: #15803d; border: 1.5px solid #16a34a; }
+    #feedback-mision.ok::before { content: '✓ '; }
+    #feedback-mision.err { background: #fee2e2; color: #dc2626; border: 1.5px solid #dc2626; }
+    #feedback-mision.err::before { content: '✗ '; }
+    @keyframes fadeInFb { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    /* ── Pantalla de resultado ── */
+    .resultado-card {
+      background: var(--surface);
+      border-radius: var(--r);
+      padding: 32px 20px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .resultado-emoji { font-size: 3.2rem; margin-bottom: 12px; }
+    .resultado-titulo { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; color: var(--text); }
+    .resultado-score { font-size: 1rem; color: var(--brand-mid); font-weight: 700; margin-bottom: 6px; }
+    .resultado-xp { font-size: 0.9rem; color: var(--muted); margin-bottom: 20px; }
+    .resultado-acciones { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-resultado {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: none;
+      transition: opacity .18s;
+    }
+    .btn-resultado:hover { opacity: .88; }
+    .btn-resultado.primary { background: var(--brand); color: white; }
+    .btn-resultado.secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+
+    /* ── Estado de carga / error ── */
+    .cargando {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+    }
+    .cargando p:first-child { font-size: 2.5rem; margin-bottom: 12px; }
+    .error-card {
+      background: #fee2e2;
+      color: #dc2626;
+      border-radius: var(--r);
+      padding: 28px 20px;
+      margin: 20px;
+      text-align: center;
+    }
+    .error-card p:first-child { font-size: 1.8rem; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Barra superior de navegación -->
+  <nav class="mision-topbar">
+    <a href="index.html" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Volver
+    </a>
+    <span class="topbar-brand">M.E.T.A.S.</span>
+    <span class="xp-badge" id="xp-badge">⭐ 0 XP</span>
+  </nav>
+
+  <!-- Contenido dinámico inyectado por motor-misiones.js -->
+  <main id="contenedor-principal">
+    <div class="cargando">
+      <p>⏳</p>
+      <p>Cargando misión...</p>
+    </div>
+  </main>
+
+  <script src="js/motor-misiones.js"></script>
+</body>
+</html>

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1e3a7c">
+  <title>M.E.T.A.S. — Misiones Educativas Tecnológicas Asincrónicas y Sincrónicas</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+</head>
+<body>
+
+  <!-- ========== INICIO ========== -->
+  <div id="view-inicio" class="view active">
+    <header class="app-header">
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir menú">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="brand-center">
+        <div class="brand-logo">M.E.T.A.S.</div>
+        <div class="brand-sub">Misiones Educativas Tecnológicas Asincrónicas y Sincrónicas</div>
+      </div>
+      <button class="notif-btn" id="notif-btn" aria-label="Notificaciones">
+        <i class="fa-regular fa-bell"></i>
+        <span class="notif-dot" id="notif-dot" hidden></span>
+      </button>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Pensador del día -->
+      <div class="pensador-card">
+        <div class="pensador-foto-wrap">
+          <img src="img/jose-cecilio-del-valle-edit.webp" alt="José Cecilio del Valle" class="pensador-foto">
+        </div>
+        <div class="pensador-cita">
+          <p class="pensador-text">América de día cuando escriba. América de noche cuando piense. El estudio más digno de un americano es América.</p>
+          <span class="pensador-autor">— José Cecilio del Valle</span>
+        </div>
+      </div>
+
+      <!-- Saludo y Motivación -->
+      <div class="motivacion-card">
+        <div class="motiv-greeting">
+          <span class="motiv-avatar">🎓</span>
+          <div>
+            <div class="motiv-saludo">¡Hola,</div>
+            <div class="motiv-nombre" id="home-name">estudiante americano:</div>
+          </div>
+        </div>
+        <div class="motiv-cita">
+          <p class="motiv-text" id="motiv-text"></p>
+          <span class="motiv-autor" id="motiv-autor"></span>
+        </div>
+      </div>
+    <div class="selectors-container">
+        
+        <div class="selector-group">
+          <label><i class="fa-solid fa-earth-americas"></i> Elige tu País</label>
+          <select id="country-select" class="custom-select">
+            <option value="HN">🇭🇳 Honduras</option>
+            <option value="SV">🇸🇻 El Salvador</option>
+            <option value="GT">🇬🇹 Guatemala</option>
+            <option value="MX">🇲🇽 México</option>
+            <option value="NI">🇳🇮 Nicaragua</option>
+            <option value="CR">🇨🇷 Costa Rica</option>
+            <option value="PA">🇵🇦 Panamá</option>
+          </select>
+        </div>
+
+        <div class="selector-group">
+          <label><i class="fa-solid fa-graduation-cap"></i> Grado</label>
+          <select id="grade-select" class="custom-select">
+            <option value="1-3">1° a 3° Grado</option>
+            <option value="4-6">4° a 6° Grado</option>
+            <option value="7-9" selected>7° a 9° Grado</option>
+            <option value="bach">Bachillerato</option>
+          </select>
+        </div>
+
+      </div>
+      <!-- Tarjeta de datos del país -->
+      <div class="country-card">
+
+        <!-- Encabezado: bandera visual + nombre + lema -->
+        <div class="cc-head">
+          <div class="cc-head-info">
+            <div class="cc-exploring">Explorando</div>
+            <div class="cc-country-name" id="cc-country-name">Honduras</div>
+            <div class="cc-lema" id="cc-lema"></div>
+          </div>
+          <span class="cc-emoji-flag" id="cc-flag">🇭🇳</span>
+        </div>
+
+        <!-- Símbolos patrios -->
+        <div class="cc-simbolos" id="cc-simbolos"></div>
+
+        <!-- Curiosidad deslizable -->
+        <div class="cc-curious-block" id="cc-swipe-area">
+          <span class="cc-curious-label">¿Sabías que…?</span>
+          <p class="cc-text" id="cc-text"></p>
+        </div>
+
+        <!-- Footer: categoría + navegación -->
+        <div class="cc-footer">
+          <span class="cc-category" id="cc-category"></span>
+          <div class="cc-nav">
+            <button class="cc-nav-btn" id="cc-prev" aria-label="Anterior">‹</button>
+            <div class="cc-dots" id="cc-dots"></div>
+            <button class="cc-nav-btn" id="cc-next" aria-label="Siguiente">›</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Subjects -->
+      <h2 class="section-title">Explorar por materia</h2>
+      <div class="subjects-row">
+        <button class="subj-chip esp" data-subject="español">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Español</span>
+          <em>5 misiones</em>
+        </button>
+        <button class="subj-chip mat" data-subject="matemáticas">
+          <i class="fa-solid fa-superscript"></i>
+          <span>Matemáticas</span>
+          <em>4 misiones</em>
+        </button>
+        <button class="subj-chip cnat" data-subject="naturales">
+          <i class="fa-solid fa-seedling"></i>
+          <span>C. Naturales</span>
+          <em>3 misiones</em>
+        </button>
+        <button class="subj-chip csoc" data-subject="sociales">
+          <i class="fa-solid fa-earth-americas"></i>
+          <span>C. Sociales</span>
+          <em>3 misiones</em>
+        </button>
+      </div>
+
+      <!-- Featured + Recent (solo Honduras) -->
+      <div id="featured-section">
+        <h2 class="section-title">Misión destacada</h2>
+        <div id="featured-card" class="featured-card"></div>
+
+        <div id="recent-wrap" hidden>
+          <h2 class="section-title">Continúa explorando</h2>
+          <div id="recent-list" class="small-list"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== MISIONES ========== -->
+  <div id="view-misiones" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Misiones</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="search-input" type="search" placeholder="Buscar misión…" autocomplete="off">
+      </div>
+      <div class="pills-wrap">
+        <div class="pills-row">
+          <button class="pill active" data-filter="all">Todas</button>
+          <button class="pill" data-filter="español">Español</button>
+          <button class="pill" data-filter="matemáticas">Matemáticas</button>
+        </div>
+        <div class="pills-row">
+          <button class="pill" data-filter="naturales">C. Naturales</button>
+          <button class="pill" data-filter="sociales">C. Sociales</button>
+        </div>
+      </div>
+      <div id="proceres-section"></div>
+      <div id="missions-container" class="missions-list"></div>
+    </div>
+  </div>
+
+  <!-- ========== PROGRESO ========== -->
+  <div id="view-progreso" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Mi Progreso</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+      <div id="progress-overview"></div>
+      <div id="progress-subjects"></div>
+      <div id="visited-missions"></div>
+    </div>
+  </div>
+
+  <!-- ========== PERFIL ========== -->
+  <div id="view-perfil" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Mi Perfil</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Herramientas del Docente -->
+      <div class="setting-group teacher-panel-group">
+        <div class="teacher-panel-head">
+          <i class="fa-solid fa-chalkboard-user teacher-panel-icon"></i>
+          <label class="setting-label" style="margin-bottom:0;">Herramientas del Docente</label>
+        </div>
+        <p class="teacher-panel-desc">Recursos y herramientas para el aula.</p>
+
+        <button class="teacher-ge-btn" id="goto-gobierno-btn">
+          <i class="fa-solid fa-check-to-slot"></i>
+          <span>🗳️ Gobierno Escolar 2026</span>
+          <i class="fa-solid fa-chevron-right teacher-ge-arrow"></i>
+        </button>
+
+        <div class="teacher-tools-grid">
+          <div class="teacher-tool-item">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Rúbricas</span>
+          </div>
+          <button class="teacher-tool-item teacher-tool-active" id="goto-parte-btn">
+            <i class="fa-solid fa-calendar-check"></i>
+            <span>Parte Mensual</span>
+          </button>
+          <div class="teacher-tool-item">
+            <i class="fa-solid fa-stopwatch"></i>
+            <span>Cronómetro</span>
+          </div>
+          <div class="teacher-tool-item">
+            <i class="fa-solid fa-file-pen"></i>
+            <span>Evaluaciones</span>
+          </div>
+          <button class="teacher-tool-item teacher-tool-active" id="goto-plan-btn">
+            <i class="fa-solid fa-chart-column"></i>
+            <span>Plan de Acción</span>
+          </button>
+          <div class="teacher-tool-item">
+            <i class="fa-solid fa-clipboard-question"></i>
+            <span>Prueba Formativa</span>
+          </div>
+          <div class="teacher-tool-item">
+            <i class="fa-solid fa-stethoscope"></i>
+            <span>Eval. Diagnóstica</span>
+          </div>
+          <button class="teacher-tool-item teacher-tool-active" id="goto-collage-btn">
+            <i class="fa-solid fa-images"></i>
+            <span>Collage</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== GOBIERNO ESCOLAR ========== -->
+  <div id="view-gobierno" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="gobierno-back-btn" aria-label="Volver al perfil">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Gobierno Escolar 2026</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Configuración (Secretario de Mesa) -->
+      <div id="ge-config-view" class="ge-card">
+        <p class="ge-subtitle"><i class="fa-solid fa-chalkboard-user"></i> Secretario de mesa: configura las planillas antes de iniciar la urna.</p>
+        <div class="ge-planillas-container">
+          <div class="ge-planilla">
+            <label>📋 Planilla 1</label>
+            <input type="text" id="ge-planilla-1" placeholder="Nombre de la planilla (ej: Planilla Azul)" class="ge-input">
+            <div class="ge-img-upload">
+              <input type="file" id="ge-img-1" accept="image/*" hidden>
+              <button class="ge-upload-btn" onclick="document.getElementById('ge-img-1').click()">
+                <i class="fa-solid fa-camera"></i> Foto
+              </button>
+              <img id="ge-preview-1" class="ge-preview" src="" hidden>
+            </div>
+            <input type="text" id="ge-name-1" placeholder="Candidato principal (opcional)" class="ge-input">
+          </div>
+          <div class="ge-planilla">
+            <label>📋 Planilla 2</label>
+            <input type="text" id="ge-planilla-2" placeholder="Nombre de la planilla (ej: Planilla Roja)" class="ge-input">
+            <div class="ge-img-upload">
+              <input type="file" id="ge-img-2" accept="image/*" hidden>
+              <button class="ge-upload-btn" onclick="document.getElementById('ge-img-2').click()">
+                <i class="fa-solid fa-camera"></i> Foto
+              </button>
+              <img id="ge-preview-2" class="ge-preview" src="" hidden>
+            </div>
+            <input type="text" id="ge-name-2" placeholder="Candidato principal (opcional)" class="ge-input">
+          </div>
+        </div>
+        <!-- Vista previa de fotos -->
+        <div id="ge-preview-section" class="ge-preview-section" style="display:none;">
+          <p class="ge-preview-title">Vista previa de candidatos</p>
+          <div class="ge-preview-candidates">
+            <div class="ge-prev-card" id="ge-prev-1" style="display:none;">
+              <img id="ge-big-preview-1" class="ge-big-preview" src="">
+              <span id="ge-big-name-1" class="ge-big-name">Planilla 1</span>
+            </div>
+            <div class="ge-prev-card" id="ge-prev-2" style="display:none;">
+              <img id="ge-big-preview-2" class="ge-big-preview" src="">
+              <span id="ge-big-name-2" class="ge-big-name">Planilla 2</span>
+            </div>
+          </div>
+        </div>
+        <button class="ge-btn" id="ge-save-config-btn">
+          <i class="fa-solid fa-lock-open"></i> Guardar y Habilitar Urna
+        </button>
+      </div>
+
+      <!-- Ingreso de Código de Votación -->
+      <div id="ge-code-view" class="ge-card" hidden>
+        <div class="ge-header-actions">
+          <span class="ge-badge"><i class="fa-solid fa-circle-dot"></i> Urna Activa</span>
+          <button class="ge-icon-btn" id="ge-end-voting-btn" aria-label="Finalizar votación">
+            <i class="fa-solid fa-lock"></i>
+          </button>
+        </div>
+        <p class="ge-subtitle">Ingresa tu código para votar. Formato: <strong>Grado + Sección + NºLista</strong> — Grado del 1 al 6, Sección A ó B, lista hasta 99. Ej: <strong>4B26</strong></p>
+        <div class="ge-code-box">
+          <input type="text" id="ge-code-input" placeholder="ej: 4B26" class="ge-input ge-code-input" maxlength="4" autocomplete="off" inputmode="text">
+          <div id="ge-code-error" class="ge-code-error" hidden></div>
+          <button class="ge-btn" id="ge-validate-code-btn">
+            <i class="fa-solid fa-check"></i> Validar Código y Votar
+          </button>
+        </div>
+      </div>
+
+      <!-- Papeleta de Votación -->
+      <div id="ge-voting-view" class="ge-card" hidden>
+        <div class="ge-ballot-header">
+          <span class="ge-badge-voter" id="ge-ballot-voter-code"></span>
+          <p class="ge-subtitle">Toca la planilla de tu elección. Solo puedes votar <strong>una vez</strong>.</p>
+        </div>
+        <div class="ge-voting-container">
+          <button class="ge-vote-btn" id="ge-vote-1">
+            <div class="ge-vote-emoji" id="ge-vote-emoji-1">🗳️</div>
+            <img id="ge-vote-img-1" class="ge-vote-img" src="" hidden>
+            <span id="ge-vote-planilla-1" class="ge-vote-planilla"></span>
+            <span id="ge-vote-name-1" class="ge-vote-name"></span>
+          </button>
+          <button class="ge-vote-btn" id="ge-vote-2">
+            <div class="ge-vote-emoji" id="ge-vote-emoji-2">🗳️</div>
+            <img id="ge-vote-img-2" class="ge-vote-img" src="" hidden>
+            <span id="ge-vote-planilla-2" class="ge-vote-planilla"></span>
+            <span id="ge-vote-name-2" class="ge-vote-name"></span>
+          </button>
+        </div>
+        <div id="ge-vote-feedback" class="ge-feedback" hidden>
+          <i class="fa-solid fa-circle-check"></i> ¡Voto registrado con éxito!
+        </div>
+      </div>
+
+      <!-- Resultados -->
+      <div id="ge-results-view" class="ge-card" hidden>
+        <div class="ge-header-actions">
+          <span class="ge-badge">📊 Resultados</span>
+          <button class="ge-icon-btn" id="ge-reset-btn" aria-label="Reiniciar">
+            <i class="fa-solid fa-arrow-rotate-left"></i>
+          </button>
+        </div>
+        <div class="ge-results-list">
+          <div class="ge-result-item">
+            <span id="ge-res-name-1" class="ge-res-name">Planilla 1</span>
+            <span id="ge-res-votes-1" class="ge-res-votes">0 votos</span>
+          </div>
+          <div class="ge-result-item">
+            <span id="ge-res-name-2" class="ge-res-name">Planilla 2</span>
+            <span id="ge-res-votes-2" class="ge-res-votes">0 votos</span>
+          </div>
+        </div>
+        <div class="ge-other-urnas">
+          <p class="ge-urnas-title"><i class="fa-solid fa-mobile-screen"></i> Sumar resultados de otras urnas (teléfonos):</p>
+          <div class="ge-urna-row-header">
+            <span></span>
+            <span class="ge-urna-col-lbl" id="ge-urna-lbl-p1">P1</span>
+            <span class="ge-urna-col-lbl" id="ge-urna-lbl-p2">P2</span>
+          </div>
+          <div class="ge-urna-row">
+            <span class="ge-urna-lbl">📱 Urna 2</span>
+            <input type="number" id="ge-u2-p1" placeholder="0" class="ge-input ge-mini-input" min="0">
+            <input type="number" id="ge-u2-p2" placeholder="0" class="ge-input ge-mini-input" min="0">
+          </div>
+          <div class="ge-urna-row">
+            <span class="ge-urna-lbl">📱 Urna 3</span>
+            <input type="number" id="ge-u3-p1" placeholder="0" class="ge-input ge-mini-input" min="0">
+            <input type="number" id="ge-u3-p2" placeholder="0" class="ge-input ge-mini-input" min="0">
+          </div>
+          <div class="ge-urna-row">
+            <span class="ge-urna-lbl">📱 Urna 4</span>
+            <input type="number" id="ge-u4-p1" placeholder="0" class="ge-input ge-mini-input" min="0">
+            <input type="number" id="ge-u4-p2" placeholder="0" class="ge-input ge-mini-input" min="0">
+          </div>
+        </div>
+        <div class="ge-total-wrap">
+          <div class="ge-total-item">
+            <span class="ge-total-label" id="ge-total-label-1">Total P1</span>
+            <span id="ge-total-1" class="ge-total-val">0</span>
+          </div>
+          <div class="ge-total-item">
+            <span class="ge-total-label" id="ge-total-label-2">Total P2</span>
+            <span id="ge-total-2" class="ge-total-val">0</span>
+          </div>
+        </div>
+        <div id="ge-winner-wrap" class="ge-winner-wrap"></div>
+        <p class="ge-votes-count" id="ge-votes-count"></p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== PLAN DE ACCIÓN ========== -->
+  <div id="view-plan-accion" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="plan-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Plan de Acción</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Datos de la evaluación -->
+      <div class="pa-card">
+        <div class="pa-card-title">📋 Datos de la Evaluación</div>
+        <div class="pa-row-2">
+          <div class="pa-field"><label>Grado</label><input type="text" id="pa-grado" class="pa-inp-field" placeholder="ej: 6°"></div>
+          <div class="pa-field"><label>Sección</label><input type="text" id="pa-seccion" class="pa-inp-field" placeholder="ej: 1"></div>
+        </div>
+        <div class="pa-field" style="margin-bottom:10px;">
+          <label>Docente</label>
+          <input type="text" id="pa-docente" class="pa-inp-field" placeholder="Nombre completo del docente">
+        </div>
+        <div class="pa-field">
+          <label>Nombre de la Evaluación / Misión</label>
+          <input type="text" id="pa-evaluacion" class="pa-inp-field" placeholder="ej: 1ª E — Coordenadas y Paralelos">
+        </div>
+      </div>
+
+      <!-- Entrada de calificaciones -->
+      <div class="pa-card">
+        <div class="pa-card-title">✏️ Calificaciones</div>
+
+        <!-- Tabs de entrada + botón Generar -->
+        <div class="pa-entry-tabs">
+          <button class="pa-etab pa-etab-active" data-etab="manual">Entrada manual</button>
+          <button class="pa-etab" data-etab="pegar">Pegar lista</button>
+        </div>
+        <button class="pa-gen-btn" id="pa-generate-btn" style="margin-bottom:14px;">
+          <i class="fa-solid fa-chart-column"></i> Generar Análisis
+        </button>
+
+        <!-- Manual -->
+        <div id="pa-entry-manual">
+          <p class="pa-optional-hint">💡 El nombre es <strong>opcional</strong>. Si lo omite, se usará el número de lista como referencia.</p>
+          <div class="pa-col-header">
+            <span class="pa-ch-num">#</span>
+            <span class="pa-ch-name">Nombre (opcional)</span>
+            <span class="pa-ch-grade">Nota</span>
+            <span style="width:28px;"></span>
+          </div>
+          <div id="pa-students-list"></div>
+          <button class="pa-add-btn" id="pa-add-student-btn">
+            <i class="fa-solid fa-plus"></i> Agregar estudiante
+          </button>
+        </div>
+
+        <!-- Pegar -->
+        <div id="pa-entry-pegar" style="display:none;">
+          <p class="pa-paste-hint">Una línea por estudiante: <strong>Nombre, Nota</strong><br>La nota puede ser un número (0-100) o <strong>NSP</strong></p>
+          <textarea id="pa-paste-area" class="pa-paste-area" placeholder="Ada Sarai Sevilla, NSP&#10;Ashly Belén Miranda, 35&#10;Brianna Monserrath López, 100&#10;..."></textarea>
+          <button class="pa-add-btn" id="pa-import-btn"><i class="fa-solid fa-file-import"></i> Importar lista</button>
+        </div>
+
+      </div>
+
+      <!-- Dashboard (se genera dinámicamente) -->
+      <div id="pa-dashboard" style="display:none;"></div>
+
+    </div>
+  </div>
+
+  <!-- ========== PARTE MENSUAL ========== -->
+  <div id="view-parte-mensual" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="parte-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Parte Mensual</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Datos del grupo -->
+      <div class="parte-card">
+        <h3 class="parte-section-title">📋 Datos del Grupo</h3>
+        <div class="parte-row-2">
+          <div class="parte-field">
+            <label>Grado</label>
+            <input type="text" id="pm-grado" placeholder="ej: 7°" class="parte-input">
+          </div>
+          <div class="parte-field">
+            <label>Sección</label>
+            <div class="pm-seccion-btns">
+              <button class="pm-sec-btn pm-sec-active" data-sec="A">A</button>
+              <button class="pm-sec-btn" data-sec="B">B</button>
+              <button class="pm-sec-btn" data-sec="C">C</button>
+              <button class="pm-sec-btn" data-sec="D">D</button>
+            </div>
+          </div>
+        </div>
+        <div class="parte-row-2">
+          <div class="parte-field">
+            <label>Mes</label>
+            <select id="pm-mes" class="parte-input">
+              <option value="2">Febrero</option>
+              <option value="3">Marzo</option>
+              <option value="4" selected>Abril</option>
+              <option value="5">Mayo</option>
+              <option value="6">Junio</option>
+              <option value="7">Julio</option>
+              <option value="8">Agosto</option>
+              <option value="9">Septiembre</option>
+              <option value="10">Octubre</option>
+              <option value="11">Noviembre</option>
+            </select>
+          </div>
+          <div class="parte-field">
+            <label>Año</label>
+            <input type="number" id="pm-anio" value="2026" class="parte-input">
+          </div>
+        </div>
+        <div class="parte-field" style="margin-bottom:0;">
+          <label>Días Trabajados <span class="pm-hint">(los proporciona el director)</span></label>
+          <input type="number" id="pm-dias" placeholder="ej: 22" class="parte-input" min="1" max="31">
+        </div>
+      </div>
+
+      <!-- Matrícula -->
+      <div class="parte-card">
+        <h3 class="parte-section-title">👥 Matrícula</h3>
+        <div class="pm-tabla-mat">
+          <div class="pm-mat-head">
+            <span></span><span>Varones (H)</span><span>Niñas (M)</span><span>Total</span>
+          </div>
+          <div class="pm-mat-row">
+            <span class="pm-mat-lbl">Anterior</span>
+            <input type="number" id="pm-ant-h" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <input type="number" id="pm-ant-m" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <span class="pm-mat-total" id="pm-ant-tot">0</span>
+          </div>
+          <div class="pm-mat-row pm-mat-sub">
+            <span class="pm-mat-lbl">+ Ingresos</span>
+            <input type="number" id="pm-ing-h" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <input type="number" id="pm-ing-m" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <span class="pm-mat-total" id="pm-ing-tot">0</span>
+          </div>
+          <div class="pm-mat-row pm-mat-sub">
+            <span class="pm-mat-lbl">− Desertores</span>
+            <input type="number" id="pm-des-h" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <input type="number" id="pm-des-m" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <span class="pm-mat-total" id="pm-des-tot">0</span>
+          </div>
+          <div class="pm-mat-row pm-mat-sub">
+            <span class="pm-mat-lbl">± Traslados</span>
+            <input type="number" id="pm-tra-h" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <input type="number" id="pm-tra-m" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <span class="pm-mat-total" id="pm-tra-tot">0</span>
+          </div>
+          <div class="pm-mat-row pm-mat-actual">
+            <span class="pm-mat-lbl">= Actual</span>
+            <span class="pm-mat-total" id="pm-act-h">0</span>
+            <span class="pm-mat-total" id="pm-act-m">0</span>
+            <span class="pm-mat-total pm-mat-grand" id="pm-act-tot">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inasistencias -->
+      <div class="parte-card">
+        <h3 class="parte-section-title">📅 Inasistencias del Mes</h3>
+        <div class="pm-tabla-mat">
+          <div class="pm-mat-head">
+            <span></span><span>Varones (H)</span><span>Niñas (M)</span><span>Total</span>
+          </div>
+          <div class="pm-mat-row">
+            <span class="pm-mat-lbl">Inasistencias</span>
+            <input type="number" id="pm-inas-h" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <input type="number" id="pm-inas-m" class="parte-input pm-mat-inp" min="0" placeholder="0">
+            <span class="pm-mat-total pm-mat-grand" id="pm-inas-tot">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resultados -->
+      <div class="parte-card pm-resultados-card">
+        <h3 class="parte-section-title">📊 Resultados</h3>
+        <div class="pm-resultado-item">
+          <div class="pm-res-lbl-wrap">
+            <span class="pm-res-label">Asistencia Media</span>
+            <span class="pm-res-formula">Matrícula − (Inasist. ÷ Días trabajados)</span>
+          </div>
+          <span class="pm-res-value" id="pm-asist-media">—</span>
+        </div>
+        <div class="pm-resultado-item" style="border-bottom:none;">
+          <div class="pm-res-lbl-wrap">
+            <span class="pm-res-label">Tanto por Ciento</span>
+            <span class="pm-res-formula">(Asist. Media ÷ Matrícula) × 100</span>
+          </div>
+          <span class="pm-res-value pm-pct-value" id="pm-pct-asist">—</span>
+        </div>
+        <div class="pm-bar-wrap">
+          <div class="pm-bar-fill" id="pm-bar-fill" style="width:0%"></div>
+        </div>
+        <div class="pm-semaforo" id="pm-semaforo"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== COLLAGE DE EVIDENCIAS ========== -->
+  <div id="view-collage" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="collage-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Collage de Evidencias</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Logo del centro -->
+      <div class="pa-card">
+        <div class="pa-card-title"><i class="fa-solid fa-school co-title-icon"></i> Logo del Centro</div>
+        <label class="co-upload-label" for="co-logo-input">
+          <i class="fa-solid fa-image"></i>
+          <span>Seleccionar logo <em>(opcional)</em></span>
+        </label>
+        <input type="file" id="co-logo-input" accept="image/*" style="display:none;">
+        <div id="co-logo-preview" class="co-logo-preview" style="display:none;">
+          <img id="co-logo-img" src="" alt="Logo del centro">
+          <button class="co-remove-btn" id="co-logo-remove" title="Quitar logo">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Texto de evidencia -->
+      <div class="pa-card">
+        <div class="pa-card-title"><i class="fa-solid fa-pen-to-square co-title-icon"></i> Texto de Evidencia</div>
+        <textarea id="co-text" class="pa-paste-area co-textarea" rows="2"
+          placeholder="Ej: Laboratorio de Ciencias — 7° Grado A · Mayo 2026"></textarea>
+      </div>
+
+      <!-- Formato -->
+      <div class="pa-card">
+        <div class="pa-card-title"><i class="fa-solid fa-crop-simple co-title-icon"></i> Formato del Collage</div>
+        <div class="co-format-row">
+          <label class="co-format-opt">
+            <input type="radio" name="co-format" value="square" checked>
+            <span class="co-format-card">
+              <i class="fa-regular fa-square"></i>
+              <b>Cuadrado 1:1</b>
+              <small>Instagram / WhatsApp</small>
+            </span>
+          </label>
+          <label class="co-format-opt">
+            <input type="radio" name="co-format" value="vertical">
+            <span class="co-format-card">
+              <i class="fa-solid fa-mobile-screen"></i>
+              <b>Vertical 9:16</b>
+              <small>Historia / Reels</small>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Fotografías -->
+      <div class="pa-card">
+        <div class="pa-card-title">
+          <i class="fa-solid fa-camera co-title-icon"></i> Fotografías
+          <span class="co-photo-count" id="co-photo-count">0 / 6</span>
+        </div>
+        <label class="co-upload-label" for="co-photos-input">
+          <i class="fa-solid fa-images"></i>
+          <span>Seleccionar fotos <em>(máx. 6)</em></span>
+        </label>
+        <input type="file" id="co-photos-input" accept="image/*" multiple style="display:none;">
+        <div id="co-photos-thumbs" class="co-thumbs-grid"></div>
+      </div>
+
+      <!-- Botón generar -->
+      <button class="pa-gen-btn" id="co-generate-btn">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Generar Collage
+      </button>
+
+      <!-- Vista previa + descarga -->
+      <div id="co-preview-wrap" class="co-preview-wrap" style="display:none;">
+        <div class="pa-card-title" style="margin-bottom:12px;">
+          <i class="fa-solid fa-image co-title-icon"></i> Vista Previa
+        </div>
+        <div class="co-canvas-stage" id="co-canvas-stage">
+          <canvas id="collage-canvas" class="co-canvas"></canvas>
+          <div class="co-grid-overlay" id="co-grid-overlay" aria-hidden="true"></div>
+        </div>
+        <button class="pa-print-btn" id="co-download-btn" type="button">
+          <i class="fa-solid fa-download"></i> Descargar / Guardar Imagen
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== DRAWER ========== -->
+  <div id="drawer-overlay" class="drawer-overlay"></div>
+  <aside id="app-drawer" class="app-drawer" role="navigation" aria-label="Menú principal">
+    <div class="drawer-head">
+      <div class="drawer-brand">M.E.T.A.S.</div>
+      <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Cerrar menú">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="drawer-nav">
+      <button class="drawer-item active" data-view="view-inicio">
+        <i class="fa-solid fa-house"></i><span>Inicio</span>
+      </button>
+      <button class="drawer-item" data-view="view-misiones">
+        <i class="fa-solid fa-rocket"></i><span>Misiones</span>
+      </button>
+      <button class="drawer-item" data-view="view-progreso">
+        <i class="fa-solid fa-chart-line"></i><span>Mi Progreso</span>
+      </button>
+      <button class="drawer-item" data-view="view-perfil">
+        <i class="fa-solid fa-chalkboard-user"></i><span>Herramientas del Docente</span>
+      </button>
+      <button class="drawer-item" data-view="view-gobierno">
+        <i class="fa-solid fa-check-to-slot"></i><span>Gobierno Escolar 2026</span>
+      </button>
+    </nav>
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label">Configuración</div>
+    <div class="drawer-config-list">
+      <div class="drawer-config-item">
+        <i class="fa-solid fa-gear"></i><span>Ajustes generales</span>
+        <span class="drawer-soon-badge">Pronto</span>
+      </div>
+      <div class="drawer-config-item">
+        <i class="fa-solid fa-palette"></i><span>Apariencia</span>
+        <span class="drawer-soon-badge">Pronto</span>
+      </div>
+      <div class="drawer-config-item">
+        <i class="fa-solid fa-bell"></i><span>Notificaciones</span>
+        <span class="drawer-soon-badge">Pronto</span>
+      </div>
+    </div>
+  </aside>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/data/misiones.js"></script>
+  <script src="js/data/proceres.js"></script>
+  <script src="js/data/paises.js"></script>
+  <script src="js/data/frases.js"></script>
+  <script src="js/tools/gobierno-escolar.js"></script>
+  <script src="js/tools/plan-accion.js"></script>
+  <script src="js/tools/parte-mensual.js"></script>
+  <script src="js/tools/collage-maker.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+
+</body>
+</html>

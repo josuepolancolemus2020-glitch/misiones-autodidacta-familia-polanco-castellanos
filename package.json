@@ -1,0 +1,32 @@
+{
+  "name": "misiones-educativas_a-policastsapien.com",
+  "version": "1.0.0",
+  "description": "Bienvenido a mi colección de actividades interactivas HTML para enseñar gramática de una manera lúdica y visual. Aquí encontrarás misiones sobre adjetivos, verbos y muchos otros temas.",
+  "main": "sw.js",
+  "scripts": {
+    "build:www": "robocopy . www /E /XD android node_modules .git www _dev /XF *.md package.json package-lock.json capacitor.config.json .gitignore /NFL /NDL /NJH /NJS /NC /NS & exit 0",
+    "sync": "npm run build:www && npx cap sync",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josuepolancolemus2020-glitch/misiones-educativas_a-policastsapien.com.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/josuepolancolemus2020-glitch/misiones-educativas_a-policastsapien.com/issues"
+  },
+  "homepage": "https://github.com/josuepolancolemus2020-glitch/misiones-educativas_a-policastsapien.com#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/filesystem": "^8.1.2",
+    "@capacitor/share": "^8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.3.1"
+  }
+}
