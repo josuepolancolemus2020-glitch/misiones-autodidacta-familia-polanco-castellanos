@@ -14,6 +14,34 @@
 </head>
 <body>
 
+  <!-- ========== LOGIN ========== -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-brand">
+        <i class="fa-solid fa-compass login-compass"></i>
+        <div class="login-title">F.A.R.O.</div>
+        <div class="login-sub">FAMILIA, APRENDIZAJE, RECURSOS Y ORGANIZACIÓN</div>
+      </div>
+      <form id="login-form" class="login-form">
+        <label class="login-label" for="login-user">¿Quién eres?</label>
+        <select id="login-user" class="login-select" required>
+          <option value="josue">Josué Edmundo</option>
+          <option value="evelyn">Evelyn Sarahí</option>
+          <option value="jael">Jael</option>
+          <option value="angelly">Angelly</option>
+        </select>
+        <label class="login-label" for="login-pin">PIN</label>
+        <input id="login-pin" class="login-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" required>
+        <p id="login-error" class="login-error" hidden>PIN incorrecto. Intenta de nuevo.</p>
+        <button type="submit" class="login-btn">
+          Ingresar <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="app-container" style="display:none;">
+
   <!-- ========== INICIO ========== -->
   <div id="view-inicio" class="view active">
     <header class="app-header">
@@ -693,10 +721,16 @@
         <i class="fa-solid fa-bell"></i><span>Notificaciones</span>
         <span class="drawer-soon-badge">Pronto</span>
       </div>
+      <button class="drawer-config-item drawer-logout-item" id="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i><span>Cerrar sesión</span>
+      </button>
     </div>
   </aside>
 
+  </div>
+
   <script src="js/html2canvas.min.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/data/misiones.js"></script>
   <script src="js/data/frases.js"></script>
   <script src="js/tools/gobierno-escolar.js"></script>

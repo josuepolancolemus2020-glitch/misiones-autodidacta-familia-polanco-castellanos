@@ -186,6 +186,10 @@ function renderHome() {
   // Saludo
   document.getElementById('home-name').textContent = member.short + '!';
 
+  // Mantener el selector "Ver Miembro" sincronizado con el perfil activo
+  const memberEl = document.getElementById('member-select');
+  if (memberEl && memberEl.value !== s.currentMember) memberEl.value = s.currentMember;
+
   // Frase motivacional (índice global de rotación)
   const frase = FRASES[_motivIdx];
   document.getElementById('motiv-text').textContent  = frase.texto;
@@ -435,6 +439,16 @@ function toast(msg) {
 ───────────────────────────────────────────── */
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Si ya hay una sesión de familia activa, ese miembro es el perfil activo
+  if (typeof verificarSesion === 'function') {
+    const session = verificarSesion();
+    if (session && MEMBERS.find(m => m.id === session.user)) {
+      const s = load();
+      s.currentMember = session.user;
+      save(s);
+    }
+  }
 
   // Render inicial
   renderHome();
