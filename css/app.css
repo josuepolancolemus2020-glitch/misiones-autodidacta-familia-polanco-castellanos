@@ -12,6 +12,11 @@
   --csoc: #dc2626; --csoc-bg: #fef2f2; --csoc-border: rgba(220,38,38,.2);
   --bach: #7c3aed; --bach-bg: #faf5ff; --bach-border: rgba(124,58,237,.2);
 
+  --fin: #ea580c; --fin-bg: #fff7ed; --fin-border: rgba(234,88,12,.2);
+  --org: #7c3aed; --org-bg: #f5f3ff; --org-border: rgba(124,58,237,.2);
+  --sal: #e11d48; --sal-bg: #fff1f2; --sal-border: rgba(225,29,72,.2);
+  --apr: #16a34a; --apr-bg: #f0fdf4; --apr-border: rgba(22,163,74,.2);
+
   --bg:      #f0f4f9;
   --surface: #ffffff;
   --border:  #e2e8f0;
@@ -399,34 +404,42 @@ a { text-decoration: none; color: inherit; }
   font-style: italic;
 }
 
-/* ====== SUBJECT CHIPS (Arreglo de cuadrícula 2x2) ====== */
-.subjects-row {
+/* ====== MODULE CARDS (Explorar Módulos, cuadrícula 2x2) ====== */
+.modules-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
   margin-bottom: 24px;
 }
 
-.subj-chip {
+.module-card {
   width: 100%;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 16px 10px;
-  border-radius: var(--r); 
-  border: 1.5px solid transparent;
-  cursor: pointer; 
-  background: var(--surface);
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  padding: 16px 14px;
+  border-radius: var(--r);
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  text-align: left;
   transition: transform .15s, box-shadow .15s;
 }
 
-.subj-chip:active { transform: scale(.95); }
-.subj-chip i    { font-size: 26px; margin-bottom: 4px; }
-.subj-chip span { font-size: 13px; font-weight: 700; line-height: 1; text-align: center; }
-.subj-chip em   { font-size: 11px; font-style: normal; opacity: .7; font-weight: 500; }
+.module-card:active { transform: scale(.96); }
+.module-card .mod-icon  { font-size: 20px; margin-bottom: 6px; }
+.module-card .mod-title { font-size: 14px; font-weight: 800; line-height: 1.2; }
+.module-card .mod-sub   { font-size: 11px; opacity: .9; margin-bottom: 6px; }
+.module-card .mod-count {
+  font-size: 10px; font-weight: 700;
+  background: rgba(255,255,255,.22);
+  padding: 3px 9px; border-radius: 20px;
+}
 
-.subj-chip.esp  { background: var(--esp-bg);  color: var(--esp);  border-color: var(--esp-border); }
-.subj-chip.mat  { background: var(--mat-bg);  color: var(--mat);  border-color: var(--mat-border); }
-.subj-chip.cnat { background: var(--cnat-bg); color: var(--cnat); border-color: var(--cnat-border); }
-.subj-chip.csoc { background: var(--csoc-bg); color: var(--csoc); border-color: var(--csoc-border); }
+.module-card.soon { opacity: .82; }
+
+.module-card.fin { background: linear-gradient(135deg, var(--fin), #fb923c); }
+.module-card.org { background: linear-gradient(135deg, var(--org), #a78bfa); }
+.module-card.sal { background: linear-gradient(135deg, var(--sal), #fb7185); }
+.module-card.apr { background: linear-gradient(135deg, var(--apr), #4ade80); }
 
 /* ====== FEATURED CARD ====== */
 .featured-card {
@@ -544,6 +557,9 @@ a { text-decoration: none; color: inherit; }
 .mc-icon.cnat { background: var(--cnat-bg); color: var(--cnat); }
 .mc-icon.csoc { background: var(--csoc-bg); color: var(--csoc); }
 .mc-icon.bach { background: var(--bach-bg); color: var(--bach); }
+.mc-icon.apr  { background: var(--apr-bg);  color: var(--apr); }
+
+.small-icon.apr { background: var(--apr-bg); color: var(--apr); }
 
 .mc-subj.esp  { background: var(--esp-bg);  color: var(--esp); }
 .mc-subj.mat  { background: var(--mat-bg);  color: var(--mat); }
@@ -563,6 +579,7 @@ a { text-decoration: none; color: inherit; }
   border-radius: 20px; padding: 24px; color: #fff; text-align: center;
   margin-bottom: 20px; box-shadow: 0 10px 28px rgba(30,58,124,.25);
 }
+.po-member    { font-size: 12px; font-weight: 700; opacity: .85; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
 .po-emoji     { font-size: 44px; margin-bottom: 8px; }
 .po-level     { font-size: 22px; font-weight: 800; }
 .po-rank      { font-size: 14px; opacity: .85; margin-bottom: 12px; }
@@ -1514,8 +1531,8 @@ a { text-decoration: none; color: inherit; }
 
   .view-scroll { padding: 20px 28px 28px; }
 
-  /* Materias: 4 en una fila */
-  .subjects-row { grid-template-columns: repeat(4, 1fr); }
+  /* Módulos: 4 en una fila */
+  .modules-grid { grid-template-columns: repeat(4, 1fr); }
 
   /* Símbolos: 4 columnas */
   .cc-sim-grid { grid-template-columns: repeat(4, 1fr); }

@@ -34,21 +34,21 @@
       <!-- Pensador del día -->
       <div class="pensador-card">
         <div class="pensador-foto-wrap">
-          <img src="img/jose-cecilio-del-valle-edit.webp" alt="José Cecilio del Valle" class="pensador-foto">
+          <img src="img/leonardo-da-vinci.jpg" alt="Leonardo da Vinci" class="pensador-foto">
         </div>
         <div class="pensador-cita">
-          <p class="pensador-text">América de día cuando escriba. América de noche cuando piense. El estudio más digno de un americano es América.</p>
-          <span class="pensador-autor">— José Cecilio del Valle</span>
+          <p class="pensador-text">El aprendizaje continuo es el camino a la grandeza personal y familiar. ¡Caminemos juntos!</p>
+          <span class="pensador-autor">— Leonardo da Vinci</span>
         </div>
       </div>
 
       <!-- Saludo y Motivación -->
       <div class="motivacion-card">
         <div class="motiv-greeting">
-          <span class="motiv-avatar">🎓</span>
+          <span class="motiv-avatar">🧭</span>
           <div>
             <div class="motiv-saludo">¡Hola,</div>
-            <div class="motiv-nombre" id="home-name">estudiante americano:</div>
+            <div class="motiv-nombre" id="home-name">Familia:</div>
           </div>
         </div>
         <div class="motiv-cita">
@@ -57,91 +57,34 @@
         </div>
       </div>
     <div class="selectors-container">
-        
+
         <div class="selector-group">
-          <label><i class="fa-solid fa-earth-americas"></i> Elige tu País</label>
-          <select id="country-select" class="custom-select">
-            <option value="HN">🇭🇳 Honduras</option>
-            <option value="SV">🇸🇻 El Salvador</option>
-            <option value="GT">🇬🇹 Guatemala</option>
-            <option value="MX">🇲🇽 México</option>
-            <option value="NI">🇳🇮 Nicaragua</option>
-            <option value="CR">🇨🇷 Costa Rica</option>
-            <option value="PA">🇵🇦 Panamá</option>
+          <label><i class="fa-solid fa-users"></i> Ver Miembro</label>
+          <select id="member-select" class="custom-select">
+            <option value="josue">Josué Edmundo</option>
+            <option value="evelyn">Evelyn Sarahi</option>
+            <option value="jael">Jael</option>
+            <option value="angelly">Angelly</option>
           </select>
         </div>
 
         <div class="selector-group">
-          <label><i class="fa-solid fa-graduation-cap"></i> Grado</label>
-          <select id="grade-select" class="custom-select">
-            <option value="1-3">1° a 3° Grado</option>
-            <option value="4-6">4° a 6° Grado</option>
-            <option value="7-9" selected>7° a 9° Grado</option>
-            <option value="bach">Bachillerato</option>
+          <label><i class="fa-solid fa-table-cells-large"></i> Ver Módulo</label>
+          <select id="module-select" class="custom-select">
+            <option value="finanzas">Finanzas</option>
+            <option value="organizacion">Organización</option>
+            <option value="salud">Salud y Bienestar</option>
+            <option value="aprendizaje-unido" selected>Aprendizaje Unido</option>
           </select>
         </div>
 
       </div>
-      <!-- Tarjeta de datos del país -->
-      <div class="country-card">
 
-        <!-- Encabezado: bandera visual + nombre + lema -->
-        <div class="cc-head">
-          <div class="cc-head-info">
-            <div class="cc-exploring">Explorando</div>
-            <div class="cc-country-name" id="cc-country-name">Honduras</div>
-            <div class="cc-lema" id="cc-lema"></div>
-          </div>
-          <span class="cc-emoji-flag" id="cc-flag">🇭🇳</span>
-        </div>
+      <!-- Módulos -->
+      <h2 class="section-title">Explorar Módulos</h2>
+      <div class="modules-grid" id="modules-grid"></div>
 
-        <!-- Símbolos patrios -->
-        <div class="cc-simbolos" id="cc-simbolos"></div>
-
-        <!-- Curiosidad deslizable -->
-        <div class="cc-curious-block" id="cc-swipe-area">
-          <span class="cc-curious-label">¿Sabías que…?</span>
-          <p class="cc-text" id="cc-text"></p>
-        </div>
-
-        <!-- Footer: categoría + navegación -->
-        <div class="cc-footer">
-          <span class="cc-category" id="cc-category"></span>
-          <div class="cc-nav">
-            <button class="cc-nav-btn" id="cc-prev" aria-label="Anterior">‹</button>
-            <div class="cc-dots" id="cc-dots"></div>
-            <button class="cc-nav-btn" id="cc-next" aria-label="Siguiente">›</button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Subjects -->
-      <h2 class="section-title">Explorar por materia</h2>
-      <div class="subjects-row">
-        <button class="subj-chip esp" data-subject="español">
-          <i class="fa-solid fa-book-open"></i>
-          <span>Español</span>
-          <em>5 misiones</em>
-        </button>
-        <button class="subj-chip mat" data-subject="matemáticas">
-          <i class="fa-solid fa-superscript"></i>
-          <span>Matemáticas</span>
-          <em>4 misiones</em>
-        </button>
-        <button class="subj-chip cnat" data-subject="naturales">
-          <i class="fa-solid fa-seedling"></i>
-          <span>C. Naturales</span>
-          <em>3 misiones</em>
-        </button>
-        <button class="subj-chip csoc" data-subject="sociales">
-          <i class="fa-solid fa-earth-americas"></i>
-          <span>C. Sociales</span>
-          <em>3 misiones</em>
-        </button>
-      </div>
-
-      <!-- Featured + Recent (solo Honduras) -->
+      <!-- Featured + Recent -->
       <div id="featured-section">
         <h2 class="section-title">Misión destacada</h2>
         <div id="featured-card" class="featured-card"></div>
@@ -159,7 +102,7 @@
   <div id="view-misiones" class="view">
     <header class="app-header compact">
       <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
-      <h1 class="view-title">Misiones</h1>
+      <h1 class="view-title">Aprendizaje Unido</h1>
       <div></div>
     </header>
     <div class="view-scroll">
@@ -167,18 +110,6 @@
         <i class="fa-solid fa-magnifying-glass"></i>
         <input id="search-input" type="search" placeholder="Buscar misión…" autocomplete="off">
       </div>
-      <div class="pills-wrap">
-        <div class="pills-row">
-          <button class="pill active" data-filter="all">Todas</button>
-          <button class="pill" data-filter="español">Español</button>
-          <button class="pill" data-filter="matemáticas">Matemáticas</button>
-        </div>
-        <div class="pills-row">
-          <button class="pill" data-filter="naturales">C. Naturales</button>
-          <button class="pill" data-filter="sociales">C. Sociales</button>
-        </div>
-      </div>
-      <div id="proceres-section"></div>
       <div id="missions-container" class="missions-list"></div>
     </div>
   </div>
@@ -735,7 +666,7 @@
         <i class="fa-solid fa-house"></i><span>Inicio</span>
       </button>
       <button class="drawer-item" data-view="view-misiones">
-        <i class="fa-solid fa-rocket"></i><span>Misiones</span>
+        <i class="fa-solid fa-rocket"></i><span>Aprendizaje Unido</span>
       </button>
       <button class="drawer-item" data-view="view-progreso">
         <i class="fa-solid fa-chart-line"></i><span>Mi Progreso</span>
@@ -767,8 +698,6 @@
 
   <script src="js/html2canvas.min.js"></script>
   <script src="js/data/misiones.js"></script>
-  <script src="js/data/proceres.js"></script>
-  <script src="js/data/paises.js"></script>
   <script src="js/data/frases.js"></script>
   <script src="js/tools/gobierno-escolar.js"></script>
   <script src="js/tools/plan-accion.js"></script>

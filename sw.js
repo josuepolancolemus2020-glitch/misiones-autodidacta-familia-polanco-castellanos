@@ -1,9 +1,8 @@
 const CACHE_NAME = 'faro-app-v1';
 const STATIC_ASSETS = [
-  './img/logo.png',
   './img/icon-192.png',
   './img/icon-512.png',
-  './img/jose-cecilio-del-valle-edit.webp',
+  './img/leonardo-da-vinci.jpg',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
