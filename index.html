@@ -218,13 +218,13 @@
     </button>
   </div>
 
-  <!-- Modal de registro: Transacción / Cuenta / Deuda -->
+  <!-- Modal de registro: Gasto Externo / Envío Familiar / Cuenta / Deuda -->
   <div id="fin-modal-overlay" class="fin-modal-overlay" style="display:none;">
     <div class="fin-modal">
       <div class="fin-modal-head">
         <div class="fin-modal-tabs">
-          <button type="button" class="fin-modal-tab fin-modal-tab-active" data-fintab="transaccion">Transacción</button>
-          <button type="button" class="fin-modal-tab" data-fintab="transferencia">Transferencia</button>
+          <button type="button" class="fin-modal-tab fin-modal-tab-active" data-fintab="transaccion">Gasto Externo</button>
+          <button type="button" class="fin-modal-tab" data-fintab="transferencia">Envío Familiar</button>
           <button type="button" class="fin-modal-tab" data-fintab="cuenta">Cuenta</button>
           <button type="button" class="fin-modal-tab" data-fintab="deuda">Deuda</button>
         </div>
@@ -233,7 +233,7 @@
         </button>
       </div>
 
-      <!-- Registrar Transacción -->
+      <!-- Registrar Gasto Externo (dinero real que entra o sale de la familia) -->
       <form id="fin-form-transaccion" class="fin-form">
         <label class="fin-label" for="fin-t-tipo">Tipo</label>
         <select id="fin-t-tipo" class="fin-select" required>
@@ -270,12 +270,12 @@
         <label class="fin-label" for="fin-t-fecha">Fecha</label>
         <input id="fin-t-fecha" class="fin-input" type="date" required>
 
-        <button type="submit" class="fin-submit-btn">Guardar Transacción</button>
+        <button type="submit" class="fin-submit-btn">Guardar Gasto Externo</button>
       </form>
 
-      <!-- Transferencia entre cuentas de la familia (no cuenta como gasto/ingreso real) -->
+      <!-- Envío Familiar: mover dinero entre cuentas de la familia (no cuenta como gasto/ingreso real) -->
       <form id="fin-form-transferencia" class="fin-form" style="display:none;">
-        <p class="fin-hint">Para mover dinero entre cuentas de la familia (ej. darle efectivo a alguien). No se contabiliza como gasto ni ingreso real.</p>
+        <p class="fin-hint">Para enviar dinero entre cuentas de la familia (ej. darle efectivo a alguien). No se contabiliza como gasto ni ingreso real.</p>
 
         <label class="fin-label" for="fin-tr-origen">Cuenta origen</label>
         <select id="fin-tr-origen" class="fin-select" required>
@@ -296,7 +296,7 @@
         <label class="fin-label" for="fin-tr-fecha">Fecha</label>
         <input id="fin-tr-fecha" class="fin-input" type="date" required>
 
-        <button type="submit" class="fin-submit-btn">Guardar Transferencia</button>
+        <button type="submit" class="fin-submit-btn">Guardar Envío Familiar</button>
       </form>
 
       <!-- Nueva Cuenta -->

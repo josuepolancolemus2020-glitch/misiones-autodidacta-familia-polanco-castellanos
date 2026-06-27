@@ -7,7 +7,7 @@ const FIN_DEUDAS_TABLE        = 'deudas';
 // Categoría reservada para movimientos que solo mueven dinero entre cuentas
 // de la familia (ej. darle efectivo a un familiar). No es un gasto ni un
 // ingreso real, así que se excluye de "Gastos del Mes".
-const FIN_TRANSFER_CATEGORY = 'Transferencia Interna';
+const FIN_TRANSFER_CATEGORY = 'Envío Familiar';
 
 let _finCuentasCache = [];
 
@@ -231,8 +231,8 @@ async function finSubmitTransaccion(e) {
   });
 
   if (errInsert) {
-    console.error('[Finanzas] Error guardando transacción:', errInsert);
-    if (typeof toast === 'function') toast('No se pudo guardar la transacción');
+    console.error('[Finanzas] Error guardando gasto externo:', errInsert);
+    if (typeof toast === 'function') toast('No se pudo guardar el gasto externo');
     if (btn) btn.disabled = false;
     return;
   }
@@ -256,7 +256,7 @@ async function finSubmitTransaccion(e) {
     if (errUpdate) console.error('[Finanzas] Error actualizando saldo:', errUpdate);
   }
 
-  if (typeof toast === 'function') toast('✅ Transacción registrada');
+  if (typeof toast === 'function') toast('✅ Gasto Externo registrado');
   e.target.reset();
   document.getElementById('fin-t-fecha').value = _finToday();
   if (btn) btn.disabled = false;
@@ -271,7 +271,7 @@ async function finSubmitTransferencia(e) {
   const origenId   = document.getElementById('fin-tr-origen').value;
   const destinoId   = document.getElementById('fin-tr-destino').value;
   const monto        = parseFloat(document.getElementById('fin-tr-monto').value);
-  const descripcion  = document.getElementById('fin-tr-descripcion').value.trim() || 'Transferencia entre cuentas';
+  const descripcion  = document.getElementById('fin-tr-descripcion').value.trim() || 'Envío familiar entre cuentas';
   const fecha         = document.getElementById('fin-tr-fecha').value;
 
   if (!origenId || !destinoId || !monto || monto <= 0) return;
@@ -294,8 +294,8 @@ async function finSubmitTransferencia(e) {
   ]);
 
   if (errInsert) {
-    console.error('[Finanzas] Error guardando transferencia:', errInsert);
-    if (typeof toast === 'function') toast('No se pudo guardar la transferencia');
+    console.error('[Finanzas] Error guardando envío familiar:', errInsert);
+    if (typeof toast === 'function') toast('No se pudo guardar el envío familiar');
     if (btn) btn.disabled = false;
     return;
   }
@@ -331,7 +331,7 @@ async function finSubmitTransferencia(e) {
     results.forEach(r => { if (r.error) console.error('[Finanzas] Error actualizando saldo:', r.error); });
   }
 
-  if (typeof toast === 'function') toast('✅ Transferencia registrada');
+  if (typeof toast === 'function') toast('✅ Envío Familiar registrado');
   e.target.reset();
   document.getElementById('fin-tr-fecha').value = _finToday();
   if (btn) btn.disabled = false;
