@@ -338,6 +338,34 @@ a { text-decoration: none; color: inherit; }
 .chat-topics-filter { background: var(--surface); border-bottom: 1px solid var(--border); }
 .chat-topics-send   { background: var(--surface); border-top: 1px solid var(--border); }
 
+.chat-msg-actions-topics {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  padding: 0 0 18px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.chat-msg-delete-btn {
+  width: 100%;
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform .15s;
+}
+.chat-msg-delete-btn:active { transform: scale(.98); }
+
 .chat-topic-chip {
   flex-shrink: 0; white-space: nowrap;
   background: var(--bg);

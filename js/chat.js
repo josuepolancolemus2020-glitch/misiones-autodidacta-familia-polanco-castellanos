@@ -42,6 +42,7 @@ function _chatRenderMessage(msg) {
   const wrap = document.createElement('div');
   wrap.className = 'chat-msg' + (esMio ? ' mine' : '');
   wrap.dataset.msgId = msg.id;
+  wrap.dataset.msgTema = msg.tema || 'General';
 
   const topicClass = _chatTopicClass(msg.tema);
   if (topicClass) {
@@ -217,6 +218,38 @@ async function chatDeleteMessage(id) {
   _chatShowEmptyStateIfNeeded();
 }
 
+async function chatAssignTopic(id, tema) {
+  if (!_sb) return;
+  const { error } = await _sb.from(CHAT_TABLE).update({ tema }).eq('id', id);
+  if (error) {
+    console.error('[Chat] Error asignando tema:', error);
+    if (typeof toast === 'function') toast('No se pudo cambiar el tema');
+    return;
+  }
+  if (typeof toast === 'function') toast(`Movido a "${tema}"`);
+}
+
+/* ─────────────────────────────────────────────
+   MENÚ DE ACCIONES AL TOCAR UN MENSAJE
+───────────────────────────────────────────── */
+
+let _chatActionMsgId = null;
+
+function chatOpenMsgActions(id, temaActual) {
+  _chatActionMsgId = id;
+  document.querySelectorAll('#chat-msg-actions-overlay .chat-topic-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.tema === (temaActual || 'General'));
+  });
+  const overlay = document.getElementById('chat-msg-actions-overlay');
+  if (overlay) overlay.style.display = 'flex';
+}
+
+function chatCloseMsgActions() {
+  _chatActionMsgId = null;
+  const overlay = document.getElementById('chat-msg-actions-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
 function chatSubscribe() {
   if (_chatChannel || !_sb) return;
   _chatChannel = _sb
@@ -246,6 +279,17 @@ function chatSubscribe() {
       document.querySelector(`.chat-msg[data-msg-id="${payload.old.id}"]`)?.remove();
       _chatShowEmptyStateIfNeeded();
     })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: CHAT_TABLE }, payload => {
+      const el = document.querySelector(`.chat-msg[data-msg-id="${payload.new.id}"]`);
+      if (!el) return;
+      const coincideFiltro = !_chatFilterTopic || payload.new.tema === _chatFilterTopic;
+      if (!coincideFiltro) {
+        el.remove();
+        _chatShowEmptyStateIfNeeded();
+      } else {
+        el.replaceWith(_chatRenderMessage(payload.new));
+      }
+    })
     .subscribe();
 }
 
@@ -258,10 +302,29 @@ document.addEventListener('DOMContentLoaded', () => {
     _chatHideNewMessageBadge();
   });
 
-  // Tocar cualquier mensaje (propio o ajeno) ofrece borrarlo
+  // Tocar cualquier mensaje (propio o ajeno) abre el menú de mover/eliminar
   document.getElementById('chat-messages')?.addEventListener('click', e => {
     const msgEl = e.target.closest('.chat-msg');
-    if (msgEl && msgEl.dataset.msgId) chatDeleteMessage(msgEl.dataset.msgId);
+    if (msgEl && msgEl.dataset.msgId) chatOpenMsgActions(msgEl.dataset.msgId, msgEl.dataset.msgTema);
+  });
+
+  document.getElementById('chat-msg-actions-close')?.addEventListener('click', chatCloseMsgActions);
+  document.getElementById('chat-msg-actions-overlay')?.addEventListener('click', e => {
+    if (e.target.id === 'chat-msg-actions-overlay') chatCloseMsgActions();
+  });
+
+  document.querySelector('#chat-msg-actions-overlay .chat-msg-actions-topics')?.addEventListener('click', e => {
+    const chip = e.target.closest('.chat-topic-chip');
+    if (!chip || !_chatActionMsgId) return;
+    chatAssignTopic(_chatActionMsgId, chip.dataset.tema);
+    chatCloseMsgActions();
+  });
+
+  document.getElementById('chat-msg-delete-btn')?.addEventListener('click', () => {
+    if (!_chatActionMsgId) return;
+    const id = _chatActionMsgId;
+    chatCloseMsgActions();
+    chatDeleteMessage(id);
   });
 
   document.getElementById('chat-scroll')?.addEventListener('scroll', () => {
