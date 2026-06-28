@@ -216,6 +216,69 @@ function _finDetailEmpty(msg) {
   return div;
 }
 
+function _finCuentaDetailRow(c) {
+  const row = document.createElement('div');
+  row.className = 'fin-detail-row';
+
+  const main = document.createElement('div');
+  main.className = 'fin-detail-row-main';
+  const titleEl = document.createElement('div');
+  titleEl.className = 'fin-detail-row-title';
+  titleEl.textContent = c.nombre;
+  main.appendChild(titleEl);
+
+  const actions = document.createElement('div');
+  actions.className = 'fin-detail-row-actions';
+
+  const amountEl = document.createElement('div');
+  amountEl.className = 'fin-detail-row-amount';
+  amountEl.textContent = _finMoney(c.saldo_actual);
+
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button';
+  delBtn.className = 'fin-detail-delete-btn';
+  delBtn.setAttribute('aria-label', `Eliminar cuenta ${c.nombre}`);
+  delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+  delBtn.addEventListener('click', () => finDeleteCuenta(c.id, c.nombre));
+
+  actions.append(amountEl, delBtn);
+  row.append(main, actions);
+  return row;
+}
+
+async function finDeleteCuenta(id, nombre) {
+  if (!_sb) return;
+
+  const { count, error: errCheck } = await _sb
+    .from(FIN_TRANSACCIONES_TABLE)
+    .select('id', { count: 'exact', head: true })
+    .eq('cuenta_id', id);
+
+  if (errCheck) {
+    console.error('[Finanzas] Error verificando movimientos de la cuenta:', errCheck);
+  } else if (count > 0) {
+    if (typeof toast === 'function') {
+      toast(`No se puede eliminar: "${nombre}" tiene ${count} movimiento${count !== 1 ? 's' : ''} registrado${count !== 1 ? 's' : ''}`);
+    }
+    return;
+  }
+
+  const ok = confirm(`¿Eliminar la cuenta "${nombre}"? Esta acción no se puede deshacer.`);
+  if (!ok) return;
+
+  const { error } = await _sb.from(FIN_CUENTAS_TABLE).delete().eq('id', id);
+
+  if (error) {
+    console.error('[Finanzas] Error eliminando cuenta:', error);
+    if (typeof toast === 'function') toast('No se pudo eliminar la cuenta');
+    return;
+  }
+
+  if (typeof toast === 'function') toast('🗑️ Cuenta eliminada');
+  await initFinanzas();
+  finOpenDetail('saldo');
+}
+
 function finOpenDetail(kind) {
   const overlay = document.getElementById('fin-detail-modal-overlay');
   const title   = document.getElementById('fin-detail-title');
@@ -230,7 +293,7 @@ function finOpenDetail(kind) {
       content.appendChild(_finDetailEmpty('Aún no has registrado ninguna cuenta.'));
     } else {
       _finCuentasCache.forEach(c => {
-        content.appendChild(_finDetailRow(c.nombre, null, _finMoney(c.saldo_actual)));
+        content.appendChild(_finCuentaDetailRow(c));
       });
     }
   } else if (kind === 'gastos') {
@@ -323,8 +386,8 @@ async function finSubmitTransaccion(e) {
   });
 
   if (errInsert) {
-    console.error('[Finanzas] Error guardando gasto externo:', errInsert);
-    if (typeof toast === 'function') toast('No se pudo guardar el gasto externo');
+    console.error('[Finanzas] Error guardando transacción:', errInsert);
+    if (typeof toast === 'function') toast('No se pudo guardar la transacción');
     if (btn) btn.disabled = false;
     return;
   }
@@ -348,7 +411,7 @@ async function finSubmitTransaccion(e) {
     if (errUpdate) console.error('[Finanzas] Error actualizando saldo:', errUpdate);
   }
 
-  if (typeof toast === 'function') toast('✅ Gasto Externo registrado');
+  if (typeof toast === 'function') toast('✅ Transacción registrada');
   e.target.reset();
   document.getElementById('fin-t-fecha').value = _finToday();
   if (btn) btn.disabled = false;
