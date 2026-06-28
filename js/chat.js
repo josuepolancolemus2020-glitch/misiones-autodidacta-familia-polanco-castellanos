@@ -41,6 +41,7 @@ function _chatRenderMessage(msg) {
 
   const wrap = document.createElement('div');
   wrap.className = 'chat-msg' + (esMio ? ' mine' : '');
+  wrap.dataset.msgId = msg.id;
 
   const topicClass = _chatTopicClass(msg.tema);
   if (topicClass) {
@@ -163,8 +164,7 @@ async function chatLoadHistory() {
 
   container.innerHTML = '';
   if (!data || !data.length) {
-    container.innerHTML = '<div class="chat-empty" id="chat-empty">Aún no hay mensajes' +
-      (_chatFilterTopic ? ` en "${_chatFilterTopic}"` : '') + '. ¡Sé el primero en escribir!</div>';
+    container.innerHTML = _chatEmptyStateHTML();
     return;
   }
 
@@ -187,6 +187,34 @@ async function chatSendMessage(texto) {
     console.error('[Chat] Error enviando mensaje:', error);
     if (typeof toast === 'function') toast('No se pudo enviar el mensaje');
   }
+}
+
+function _chatEmptyStateHTML() {
+  return '<div class="chat-empty" id="chat-empty">Aún no hay mensajes' +
+    (_chatFilterTopic ? ` en "${_chatFilterTopic}"` : '') + '. ¡Sé el primero en escribir!</div>';
+}
+
+function _chatShowEmptyStateIfNeeded() {
+  const container = document.getElementById('chat-messages');
+  if (container && !container.querySelector('.chat-msg')) {
+    container.innerHTML = _chatEmptyStateHTML();
+  }
+}
+
+async function chatDeleteMessage(id) {
+  if (!_sb) return;
+  const ok = confirm('¿Eliminar este mensaje? Esta acción no se puede deshacer.');
+  if (!ok) return;
+
+  const { error } = await _sb.from(CHAT_TABLE).delete().eq('id', id);
+  if (error) {
+    console.error('[Chat] Error eliminando mensaje:', error);
+    if (typeof toast === 'function') toast('No se pudo eliminar el mensaje');
+    return;
+  }
+
+  document.querySelector(`.chat-msg[data-msg-id="${id}"]`)?.remove();
+  _chatShowEmptyStateIfNeeded();
 }
 
 function chatSubscribe() {
@@ -214,6 +242,10 @@ function chatSubscribe() {
         _chatPlayAlertSound();
       }
     })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: CHAT_TABLE }, payload => {
+      document.querySelector(`.chat-msg[data-msg-id="${payload.old.id}"]`)?.remove();
+      _chatShowEmptyStateIfNeeded();
+    })
     .subscribe();
 }
 
@@ -224,6 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('chat-new-msg-badge')?.addEventListener('click', () => {
     chatScrollToBottom();
     _chatHideNewMessageBadge();
+  });
+
+  // Tocar cualquier mensaje (propio o ajeno) ofrece borrarlo
+  document.getElementById('chat-messages')?.addEventListener('click', e => {
+    const msgEl = e.target.closest('.chat-msg');
+    if (msgEl && msgEl.dataset.msgId) chatDeleteMessage(msgEl.dataset.msgId);
   });
 
   document.getElementById('chat-scroll')?.addEventListener('scroll', () => {

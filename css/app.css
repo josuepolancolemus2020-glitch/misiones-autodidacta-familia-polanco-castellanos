@@ -406,7 +406,10 @@ a { text-decoration: none; color: inherit; }
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   padding: 8px 12px;
+  cursor: pointer;
+  transition: transform .1s;
 }
+.chat-msg:active { transform: scale(.97); }
 .chat-msg.mine {
   align-self: flex-end;
   background: linear-gradient(135deg, var(--brand), var(--brand-mid));
