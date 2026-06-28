@@ -561,9 +561,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) return;
       ticking = true;
       requestAnimationFrame(() => {
-        const header = scroll.closest('.view') && scroll.closest('.view').querySelector('.app-header');
-        // Solo ocultar header en vistas principales (hamburguesa), nunca en vistas secundarias (botón atrás)
-        if (!header || !header.querySelector('.hamburger-btn')) { ticking = false; return; }
+        const view   = scroll.closest('.view');
+        const header = view && view.querySelector('.app-header');
+        // Solo ocultar header en vistas principales (hamburguesa), nunca en vistas secundarias (botón atrás).
+        // En el Chat se deja siempre fijo: con el aviso de notificaciones y los chips de tema
+        // arriba, esconder el header se sentía como un temblor en vez de algo suave.
+        if (!header || !header.querySelector('.hamburger-btn') || view.id === 'view-chat') { ticking = false; return; }
         const y = Math.max(0, scroll.scrollTop);
 
         if (y <= 4) {
