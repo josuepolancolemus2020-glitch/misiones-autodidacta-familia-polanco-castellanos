@@ -371,7 +371,29 @@ a { text-decoration: none; color: inherit; }
 .chat-msg-tema.tema-hogar    { background: var(--brand-light); }
 .chat-msg-tema.tema-eventos  { background: var(--org); }
 
-.chat-scroll { display: flex; flex-direction: column; padding-bottom: 16px; }
+.chat-scroll { position: relative; display: flex; flex-direction: column; padding-bottom: 16px; }
+
+.chat-new-msg-badge {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  z-index: 5;
+}
+.chat-new-msg-badge:active { transform: translateX(-50%) scale(.96); }
 
 .chat-messages { display: flex; flex-direction: column; gap: 10px; flex: 1; }
 

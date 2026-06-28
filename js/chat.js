@@ -126,6 +126,22 @@ function chatScrollToBottom() {
   if (scroll) scroll.scrollTop = scroll.scrollHeight;
 }
 
+function _chatIsNearBottom() {
+  const scroll = document.getElementById('chat-scroll');
+  if (!scroll) return true;
+  return scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight < 120;
+}
+
+function _chatShowNewMessageBadge() {
+  const badge = document.getElementById('chat-new-msg-badge');
+  if (badge) badge.style.display = 'flex';
+}
+
+function _chatHideNewMessageBadge() {
+  const badge = document.getElementById('chat-new-msg-badge');
+  if (badge) badge.style.display = 'none';
+}
+
 async function chatLoadHistory() {
   const container = document.getElementById('chat-messages');
   if (!container) return;
@@ -179,13 +195,22 @@ function chatSubscribe() {
     .channel('mensajes-realtime')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: CHAT_TABLE }, payload => {
       const coincideFiltro = !_chatFilterTopic || payload.new.tema === _chatFilterTopic;
+      const esMio = payload.new.usuario === _chatCurrentMemberName();
       const container = document.getElementById('chat-messages');
+
       if (container && coincideFiltro) {
+        // Igual que WhatsApp: si estás leyendo mensajes viejos arriba, no te
+        // saltamos hasta abajo — solo avisamos con una insignia discreta.
+        const debeBajar = esMio || _chatIsNearBottom();
         document.getElementById('chat-empty')?.remove();
         container.appendChild(_chatRenderMessage(payload.new));
-        chatScrollToBottom();
+        if (debeBajar) {
+          chatScrollToBottom();
+        } else {
+          _chatShowNewMessageBadge();
+        }
       }
-      if (payload.new.usuario !== _chatCurrentMemberName()) {
+      if (!esMio) {
         _chatPlayAlertSound();
       }
     })
@@ -195,6 +220,15 @@ function chatSubscribe() {
 document.addEventListener('DOMContentLoaded', () => {
   chatLoadHistory();
   chatSubscribe();
+
+  document.getElementById('chat-new-msg-badge')?.addEventListener('click', () => {
+    chatScrollToBottom();
+    _chatHideNewMessageBadge();
+  });
+
+  document.getElementById('chat-scroll')?.addEventListener('scroll', () => {
+    if (_chatIsNearBottom()) _chatHideNewMessageBadge();
+  }, { passive: true });
 
   // Chips de filtro: qué tema mostrar en el historial
   document.getElementById('chat-filter-topics')?.addEventListener('click', e => {
