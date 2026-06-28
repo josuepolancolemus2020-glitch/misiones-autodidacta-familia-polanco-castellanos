@@ -176,10 +176,26 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
+    <div class="chat-topics chat-topics-filter" id="chat-filter-topics">
+      <button type="button" class="chat-topic-chip active" data-tema="">Todas</button>
+      <button type="button" class="chat-topic-chip tema-escuela" data-tema="Escuela">🎓 Escuela</button>
+      <button type="button" class="chat-topic-chip tema-finanzas" data-tema="Finanzas">💰 Finanzas</button>
+      <button type="button" class="chat-topic-chip tema-salud" data-tema="Salud">🩺 Salud</button>
+      <button type="button" class="chat-topic-chip tema-hogar" data-tema="Hogar">🏠 Hogar</button>
+      <button type="button" class="chat-topic-chip tema-eventos" data-tema="Eventos">📅 Eventos</button>
+    </div>
     <div class="view-scroll chat-scroll" id="chat-scroll">
       <div id="chat-messages" class="chat-messages">
         <div class="chat-empty" id="chat-empty">Cargando mensajes…</div>
       </div>
+    </div>
+    <div class="chat-topics chat-topics-send" id="chat-send-topics">
+      <button type="button" class="chat-topic-chip active" data-tema="General">General</button>
+      <button type="button" class="chat-topic-chip tema-escuela" data-tema="Escuela">🎓 Escuela</button>
+      <button type="button" class="chat-topic-chip tema-finanzas" data-tema="Finanzas">💰 Finanzas</button>
+      <button type="button" class="chat-topic-chip tema-salud" data-tema="Salud">🩺 Salud</button>
+      <button type="button" class="chat-topic-chip tema-hogar" data-tema="Hogar">🏠 Hogar</button>
+      <button type="button" class="chat-topic-chip tema-eventos" data-tema="Eventos">📅 Eventos</button>
     </div>
     <form id="chat-form" class="chat-bar">
       <input id="chat-input" class="chat-input" type="text" placeholder="Escribe un mensaje…" autocomplete="off" maxlength="500">

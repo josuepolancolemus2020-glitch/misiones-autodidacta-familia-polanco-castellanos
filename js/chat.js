@@ -9,6 +9,13 @@ const _sb = (window.supabase && window.supabase.createClient)
   : null;
 
 let _chatChannel = null;
+let _chatSendTopic   = 'General'; // tema con el que se etiqueta el próximo mensaje a enviar
+let _chatFilterTopic = '';        // '' = Todas; si no, filtra el historial por ese tema
+
+function _chatTopicClass(tema) {
+  if (!tema || tema === 'General') return '';
+  return 'tema-' + tema.toLowerCase();
+}
 
 function _chatCurrentMemberName() {
   const session = (typeof verificarSesion === 'function') ? verificarSesion() : null;
@@ -34,6 +41,14 @@ function _chatRenderMessage(msg) {
 
   const wrap = document.createElement('div');
   wrap.className = 'chat-msg' + (esMio ? ' mine' : '');
+
+  const topicClass = _chatTopicClass(msg.tema);
+  if (topicClass) {
+    const tema = document.createElement('div');
+    tema.className = 'chat-msg-tema ' + topicClass;
+    tema.textContent = msg.tema;
+    wrap.appendChild(tema);
+  }
 
   const author = document.createElement('div');
   author.className = 'chat-msg-author';
@@ -120,11 +135,9 @@ async function chatLoadHistory() {
     return;
   }
 
-  const { data, error } = await _sb
-    .from(CHAT_TABLE)
-    .select('*')
-    .order('creado_at', { ascending: false })
-    .limit(25);
+  let query = _sb.from(CHAT_TABLE).select('*');
+  if (_chatFilterTopic) query = query.eq('tema', _chatFilterTopic);
+  const { data, error } = await query.order('creado_at', { ascending: false }).limit(25);
 
   if (error) {
     console.error('[Chat] Error cargando mensajes:', error);
@@ -134,7 +147,8 @@ async function chatLoadHistory() {
 
   container.innerHTML = '';
   if (!data || !data.length) {
-    container.innerHTML = '<div class="chat-empty" id="chat-empty">Aún no hay mensajes. ¡Sé el primero en escribir!</div>';
+    container.innerHTML = '<div class="chat-empty" id="chat-empty">Aún no hay mensajes' +
+      (_chatFilterTopic ? ` en "${_chatFilterTopic}"` : '') + '. ¡Sé el primero en escribir!</div>';
     return;
   }
 
@@ -150,6 +164,7 @@ async function chatSendMessage(texto) {
   const { error } = await _sb.from(CHAT_TABLE).insert({
     usuario: _chatCurrentMemberName(),
     mensaje: trimmed,
+    tema:    _chatSendTopic,
   });
 
   if (error) {
@@ -163,8 +178,9 @@ function chatSubscribe() {
   _chatChannel = _sb
     .channel('mensajes-realtime')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: CHAT_TABLE }, payload => {
+      const coincideFiltro = !_chatFilterTopic || payload.new.tema === _chatFilterTopic;
       const container = document.getElementById('chat-messages');
-      if (container) {
+      if (container && coincideFiltro) {
         document.getElementById('chat-empty')?.remove();
         container.appendChild(_chatRenderMessage(payload.new));
         chatScrollToBottom();
@@ -179,6 +195,25 @@ function chatSubscribe() {
 document.addEventListener('DOMContentLoaded', () => {
   chatLoadHistory();
   chatSubscribe();
+
+  // Chips de filtro: qué tema mostrar en el historial
+  document.getElementById('chat-filter-topics')?.addEventListener('click', e => {
+    const chip = e.target.closest('.chat-topic-chip');
+    if (!chip) return;
+    document.querySelectorAll('#chat-filter-topics .chat-topic-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    _chatFilterTopic = chip.dataset.tema;
+    chatLoadHistory();
+  });
+
+  // Chips de envío: con qué tema se etiqueta el próximo mensaje
+  document.getElementById('chat-send-topics')?.addEventListener('click', e => {
+    const chip = e.target.closest('.chat-topic-chip');
+    if (!chip) return;
+    document.querySelectorAll('#chat-send-topics .chat-topic-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    _chatSendTopic = chip.dataset.tema;
+  });
 
   const form  = document.getElementById('chat-form');
   const input = document.getElementById('chat-input');

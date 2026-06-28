@@ -328,6 +328,49 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ====== CHAT FAMILIAR ====== */
+.chat-topics {
+  display: flex; gap: 6px;
+  padding: 10px 14px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  flex-shrink: 0;
+}
+.chat-topics::-webkit-scrollbar { display: none; }
+.chat-topics-filter { background: var(--surface); border-bottom: 1px solid var(--border); }
+.chat-topics-send   { background: var(--surface); border-top: 1px solid var(--border); }
+
+.chat-topic-chip {
+  flex-shrink: 0; white-space: nowrap;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  padding: 6px 13px;
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .15s;
+}
+.chat-topic-chip.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+.chat-topic-chip.tema-escuela.active  { background: var(--apr); border-color: var(--apr); }
+.chat-topic-chip.tema-finanzas.active { background: var(--fin); border-color: var(--fin); }
+.chat-topic-chip.tema-salud.active    { background: var(--sal); border-color: var(--sal); }
+.chat-topic-chip.tema-hogar.active    { background: var(--brand); border-color: var(--brand); }
+.chat-topic-chip.tema-eventos.active  { background: var(--org); border-color: var(--org); }
+
+.chat-msg-tema {
+  display: inline-block;
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+  padding: 2px 8px; border-radius: 8px;
+  margin-bottom: 4px;
+  color: #fff;
+}
+.chat-msg-tema.tema-escuela  { background: var(--apr); }
+.chat-msg-tema.tema-finanzas { background: var(--fin); }
+.chat-msg-tema.tema-salud    { background: var(--sal); }
+.chat-msg-tema.tema-hogar    { background: var(--brand-light); }
+.chat-msg-tema.tema-eventos  { background: var(--org); }
+
 .chat-scroll { display: flex; flex-direction: column; padding-bottom: 16px; }
 
 .chat-messages { display: flex; flex-direction: column; gap: 10px; flex: 1; }
