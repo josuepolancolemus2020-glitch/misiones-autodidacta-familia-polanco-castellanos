@@ -48,3 +48,39 @@ self.addEventListener('fetch', event => {
     );
   }
 });
+
+// Notificaciones push del Chat Familiar (llegan aunque la app esté cerrada)
+self.addEventListener('push', event => {
+  let payload = { title: 'F.A.R.O.', body: 'Tienes un mensaje nuevo en el Chat Familiar.' };
+  try {
+    if (event.data) payload = event.data.json();
+  } catch (_) {}
+
+  event.waitUntil(
+    self.registration.showNotification(payload.title || 'F.A.R.O.', {
+      body: payload.body || '',
+      icon: './img/icon-192.png',
+      badge: './img/icon-192.png',
+      tag: 'faro-chat',
+      data: { url: payload.url || './index.html?view=chat' },
+    })
+  );
+});
+
+// Al tocar la notificación: abre o enfoca la app en el Chat Familiar
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const targetUrl = (event.notification.data && event.notification.data.url) || './index.html?view=chat';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientsArr => {
+      for (const client of clientsArr) {
+        if ('focus' in client) {
+          client.postMessage({ type: 'faro-open-chat' });
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
+    })
+  );
+});

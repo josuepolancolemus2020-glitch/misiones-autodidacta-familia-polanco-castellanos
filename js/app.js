@@ -418,6 +418,7 @@ function switchView(id) {
   if (scroll) scroll.scrollTop = 0;
 
   if (id === 'view-chat' && typeof chatScrollToBottom === 'function') chatScrollToBottom();
+  if (id === 'view-chat' && typeof pushUpdateBannerUI === 'function') pushUpdateBannerUI();
 }
 
 /* ─────────────────────────────────────────────
@@ -459,10 +460,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Iniciar rotación automática con tiempo adaptado a la lectura
   scheduleNextTick();
 
-  // Si se regresa desde una misión con ?view=misiones, ir directamente
+  // Si se regresa desde una misión con ?view=misiones, o desde una
+  // notificación push del chat con ?view=chat, ir directamente
   const _urlParams = new URLSearchParams(window.location.search);
   if (_urlParams.get('view') === 'misiones') {
     switchView('view-misiones');
+  } else if (_urlParams.get('view') === 'chat') {
+    switchView('view-chat');
+  }
+
+  // Si la app ya estaba abierta y se tocó una notificación del chat
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', e => {
+      if (e.data && e.data.type === 'faro-open-chat') switchView('view-chat');
+    });
   }
 
   // Selector de miembro

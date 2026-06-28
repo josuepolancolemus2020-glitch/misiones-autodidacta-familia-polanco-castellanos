@@ -169,6 +169,13 @@
       <h1 class="view-title">Chat Familiar</h1>
       <div></div>
     </header>
+    <div id="push-banner" class="push-banner" style="display:none;">
+      <span id="push-banner-text" class="push-banner-text"></span>
+      <button type="button" id="push-banner-btn" class="push-banner-btn">Activar</button>
+      <button type="button" id="push-banner-dismiss" class="push-banner-dismiss" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
     <div class="view-scroll chat-scroll" id="chat-scroll">
       <div id="chat-messages" class="chat-messages">
         <div class="chat-empty" id="chat-empty">Cargando mensajes…</div>
@@ -930,6 +937,7 @@
   <script src="js/tools/parte-mensual.js"></script>
   <script src="js/tools/collage-maker.js"></script>
   <script src="js/chat.js"></script>
+  <script src="js/push.js"></script>
   <script src="js/finanzas.js"></script>
   <script src="js/app.js"></script>
   <script>
