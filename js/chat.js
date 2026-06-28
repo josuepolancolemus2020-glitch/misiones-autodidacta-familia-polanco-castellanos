@@ -51,6 +51,61 @@ function _chatRenderMessage(msg) {
   return wrap;
 }
 
+/* ─────────────────────────────────────────────
+   SONIDO DE ALERTA (mientras la app está abierta)
+   No hay forma de elegir/subir el volumen del sistema desde un sitio
+   web; esto suena tan fuerte como el volumen actual del dispositivo
+   lo permita. Se genera con Web Audio (sin archivo externo) para
+   poder controlar tono y duración.
+───────────────────────────────────────────── */
+
+let _chatAudioCtx = null;
+
+function _chatEnsureAudioCtx() {
+  if (_chatAudioCtx) return _chatAudioCtx;
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return null;
+  _chatAudioCtx = new AudioCtx();
+  return _chatAudioCtx;
+}
+
+// "Desbloquea" el audio en el primer toque del usuario, para que el
+// aviso pueda sonar después aunque llegue sin interacción directa.
+document.addEventListener('click', () => {
+  const ctx = _chatEnsureAudioCtx();
+  if (ctx && ctx.state === 'suspended') ctx.resume();
+}, { once: true, capture: true });
+
+function _chatPlayAlertSound() {
+  const ctx = _chatEnsureAudioCtx();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume();
+
+  const beep = (startTime, freq, duration) => {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square'; // más penetrante que una onda sinusoidal
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(1, startTime + 0.02);
+    gain.gain.setValueAtTime(1, startTime + duration - 0.03);
+    gain.gain.linearRampToValueAtTime(0, startTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+  };
+
+  try {
+    const now = ctx.currentTime;
+    beep(now,        1100, 0.18);
+    beep(now + 0.22, 1100, 0.18);
+    beep(now + 0.44, 1500, 0.28);
+  } catch (e) {
+    console.error('[Chat] No se pudo reproducir el sonido de alerta:', e);
+  }
+}
+
 function chatScrollToBottom() {
   const scroll = document.getElementById('chat-scroll');
   if (scroll) scroll.scrollTop = scroll.scrollHeight;
@@ -109,10 +164,14 @@ function chatSubscribe() {
     .channel('mensajes-realtime')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: CHAT_TABLE }, payload => {
       const container = document.getElementById('chat-messages');
-      if (!container) return;
-      document.getElementById('chat-empty')?.remove();
-      container.appendChild(_chatRenderMessage(payload.new));
-      chatScrollToBottom();
+      if (container) {
+        document.getElementById('chat-empty')?.remove();
+        container.appendChild(_chatRenderMessage(payload.new));
+        chatScrollToBottom();
+      }
+      if (payload.new.usuario !== _chatCurrentMemberName()) {
+        _chatPlayAlertSound();
+      }
     })
     .subscribe();
 }

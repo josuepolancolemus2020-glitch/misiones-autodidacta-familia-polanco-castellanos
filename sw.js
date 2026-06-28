@@ -62,6 +62,13 @@ self.addEventListener('push', event => {
       icon: './img/icon-192.png',
       badge: './img/icon-192.png',
       tag: 'faro-chat',
+      // Vibración fuerte (Android) y notificación persistente hasta
+      // que se toque, para que sea difícil pasarla por alto. El
+      // sonido en sí lo decide Android con su tono de notificación
+      // configurado — eso no se puede elegir ni subir desde la web.
+      vibrate: [300, 150, 300, 150, 300],
+      requireInteraction: true,
+      renotify: true,
       data: { url: payload.url || './index.html?view=chat' },
     })
   );
