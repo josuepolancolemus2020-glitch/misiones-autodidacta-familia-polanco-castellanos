@@ -394,6 +394,119 @@
     </div>
   </div>
 
+  <!-- ========== INVENTARIO FAMILIAR ========== -->
+  <div id="view-inventario" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Inventario Familiar</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll inv-scroll">
+
+      <div class="inv-summary-grid">
+        <div class="inv-summary-card inv-total">
+          <div class="fin-card-label">Artículos Registrados</div>
+          <div class="fin-card-value" id="inv-total-items">—</div>
+        </div>
+        <div class="inv-summary-card inv-value">
+          <div class="fin-card-label">Valor Estimado Total</div>
+          <div class="fin-card-value" id="inv-total-valor">—</div>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="inv-search-input" type="search" placeholder="Buscar artículo…" autocomplete="off">
+      </div>
+
+      <div class="inv-chips" id="inv-filter-chips">
+        <button type="button" class="inv-chip active" data-ubicacion="">Todas</button>
+        <button type="button" class="inv-chip" data-ubicacion="Sala">Sala</button>
+        <button type="button" class="inv-chip" data-ubicacion="Cocina">Cocina</button>
+        <button type="button" class="inv-chip" data-ubicacion="Dormitorio">Dormitorio</button>
+        <button type="button" class="inv-chip" data-ubicacion="Baño">Baño</button>
+        <button type="button" class="inv-chip" data-ubicacion="Bodega">Bodega</button>
+        <button type="button" class="inv-chip" data-ubicacion="Garaje">Garaje</button>
+        <button type="button" class="inv-chip" data-ubicacion="Patio">Patio</button>
+        <button type="button" class="inv-chip" data-ubicacion="Oficina">Oficina</button>
+        <button type="button" class="inv-chip" data-ubicacion="Otro">Otro</button>
+      </div>
+
+      <div id="inv-items-list" class="inv-items-list">
+        <div class="fin-empty">Cargando artículos…</div>
+      </div>
+
+    </div>
+
+    <button class="fin-fab" id="inv-fab" aria-label="Agregar artículo">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+  </div>
+
+  <!-- Formulario de Inventario: nuevo artículo o edición -->
+  <div id="inv-modal-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <h3 class="fin-detail-title" id="inv-modal-title">Nuevo Artículo</h3>
+        <button type="button" class="fin-modal-close" id="inv-modal-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="inv-form" class="fin-form">
+        <label class="fin-label" for="inv-f-nombre">Nombre</label>
+        <input id="inv-f-nombre" class="fin-input" type="text" placeholder="Ej. Refrigeradora LG" maxlength="120" required>
+
+        <label class="fin-label" for="inv-f-categoria">Categoría</label>
+        <select id="inv-f-categoria" class="fin-select">
+          <option value="Electrodomésticos">Electrodomésticos</option>
+          <option value="Muebles">Muebles</option>
+          <option value="Electrónica">Electrónica</option>
+          <option value="Herramientas">Herramientas</option>
+          <option value="Cocina y Utensilios">Cocina y Utensilios</option>
+          <option value="Ropa y Calzado">Ropa y Calzado</option>
+          <option value="Documentos">Documentos</option>
+          <option value="Vehículos">Vehículos</option>
+          <option value="Decoración">Decoración</option>
+          <option value="Juguetes">Juguetes</option>
+          <option value="Otros">Otros</option>
+        </select>
+
+        <label class="fin-label" for="inv-f-ubicacion">Ubicación</label>
+        <select id="inv-f-ubicacion" class="fin-select">
+          <option value="Sala">Sala</option>
+          <option value="Cocina">Cocina</option>
+          <option value="Dormitorio">Dormitorio</option>
+          <option value="Baño">Baño</option>
+          <option value="Bodega">Bodega</option>
+          <option value="Garaje">Garaje</option>
+          <option value="Patio">Patio</option>
+          <option value="Oficina">Oficina</option>
+          <option value="Otro">Otro</option>
+        </select>
+
+        <label class="fin-label" for="inv-f-estado">Estado</label>
+        <select id="inv-f-estado" class="fin-select">
+          <option value="Nuevo">Nuevo</option>
+          <option value="Bueno" selected>Bueno</option>
+          <option value="Regular">Regular</option>
+          <option value="Necesita Reparación">Necesita Reparación</option>
+          <option value="Dañado">Dañado</option>
+        </select>
+
+        <label class="fin-label" for="inv-f-valor">Valor Estimado</label>
+        <input id="inv-f-valor" class="fin-input" type="number" step="0.01" min="0" placeholder="0.00">
+
+        <label class="fin-label" for="inv-f-notas">Notas</label>
+        <textarea id="inv-f-notas" class="fin-input inv-notas-area" rows="2" placeholder="Ej. Garantía hasta 2027, factura en la bodega…" maxlength="300"></textarea>
+
+        <button type="submit" class="fin-submit-btn" id="inv-submit-btn">Guardar Artículo</button>
+        <button type="button" class="chat-msg-delete-btn" id="inv-delete-btn" style="display:none;">
+          <i class="fa-solid fa-trash"></i> Eliminar artículo
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- ========== PERFIL ========== -->
   <div id="view-perfil" class="view">
     <header class="app-header compact">
@@ -981,6 +1094,7 @@
   <script src="js/chat.js"></script>
   <script src="js/push.js"></script>
   <script src="js/finanzas.js"></script>
+  <script src="js/inventario.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

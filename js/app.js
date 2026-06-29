@@ -14,6 +14,7 @@ const MODULES = [
   { id: 'organizacion',      label: 'Organización',      sub: 'Agenda y Eventos',       icon: 'fa-calendar-days',  color: 'org', ready: false },
   { id: 'salud',             label: 'Salud y Bienestar', sub: 'Citas y Vacunas',        icon: 'fa-heart-pulse',    color: 'sal', ready: false },
   { id: 'aprendizaje-unido', label: 'Aprendizaje Unido', sub: 'Zonas F.A.R.O.',         icon: 'fa-graduation-cap', color: 'apr', ready: true,  view: 'view-misiones' },
+  { id: 'inventario',        label: 'Inventario Familiar', sub: 'Bienes del Hogar',    icon: 'fa-boxes-stacked',  color: 'inv', ready: true,  view: 'view-inventario' },
 ];
 
 const LEVELS = [
@@ -413,6 +414,7 @@ function switchView(id) {
   if (id === 'view-parte-mensual')  { /* la UI se recalcula en tiempo real con inputs */ }
   if (id === 'view-collage')        initCollage();
   if (id === 'view-finanzas' && typeof initFinanzas === 'function') initFinanzas();
+  if (id === 'view-inventario' && typeof initInventario === 'function') initInventario();
 
   const scroll = document.querySelector(`#${id} .view-scroll`);
   if (scroll) scroll.scrollTop = 0;
