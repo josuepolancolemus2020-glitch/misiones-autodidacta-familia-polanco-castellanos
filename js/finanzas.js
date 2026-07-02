@@ -13,6 +13,15 @@ let _finCuentasCache  = [];
 let _finGastosMesCache = [];
 let _finDeudasCache    = [];
 
+// Estado del detalle de "Gastos del Mes": qué mes se está viendo y qué
+// tarjeta abrió el modal de detalle. Permite navegar a meses anteriores.
+let _finGastosView   = null; // { year, month(0-based) }
+let _finDetailKind   = null; // 'saldo' | 'gastos' | 'deudas'
+
+// Estado de edición de una transacción (para reutilizar el formulario).
+let _finEditingId       = null;
+let _finEditingOriginal = null; // { monto, tipo, cuenta_id } previos
+
 function _finCurrentUserName() {
   const session = (typeof verificarSesion === 'function') ? verificarSesion() : null;
   if (session) return session.nombre;
@@ -90,6 +99,59 @@ async function initFinanzas() {
 function _finStartOfMonth() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+// Rango [inicio, fin) de un mes concreto (month es 0-based).
+function _finMonthRange(year, month) {
+  const pad = x => String(x).padStart(2, '0');
+  const start = `${year}-${pad(month + 1)}-01`;
+  const ny = month === 11 ? year + 1 : year;
+  const nm = month === 11 ? 0 : month + 1;
+  const end = `${ny}-${pad(nm + 1)}-01`;
+  return { start, end };
+}
+
+function _finMonthLabel(year, month) {
+  return new Date(year, month, 1).toLocaleDateString('es-HN', { month: 'long', year: 'numeric' });
+}
+
+// Lee/escribe saldo de una cuenta aplicando un delta (con lectura fresca).
+async function _finApplyBalanceDelta(cuentaId, delta) {
+  if (!cuentaId || !delta) return;
+  const { data, error } = await _sb
+    .from(FIN_CUENTAS_TABLE)
+    .select('saldo_actual')
+    .eq('id', cuentaId)
+    .single();
+  if (error) {
+    console.error('[Finanzas] Error leyendo saldo para ajuste:', error);
+    return;
+  }
+  const nuevo = Number(data.saldo_actual || 0) + delta;
+  const { error: errUpd } = await _sb
+    .from(FIN_CUENTAS_TABLE)
+    .update({ saldo_actual: nuevo })
+    .eq('id', cuentaId);
+  if (errUpd) console.error('[Finanzas] Error actualizando saldo:', errUpd);
+}
+
+// Trae los egresos reales (sin envíos familiares) de un mes concreto.
+async function _finFetchGastosMes(year, month) {
+  const { start, end } = _finMonthRange(year, month);
+  const { data, error } = await _sb
+    .from(FIN_TRANSACCIONES_TABLE)
+    .select('*')
+    .eq('tipo', 'egreso')
+    .neq('categoria', FIN_TRANSFER_CATEGORY)
+    .gte('fecha', start)
+    .lt('fecha', end)
+    .order('fecha', { ascending: false })
+    .order('id', { ascending: false });
+  if (error) {
+    console.error('[Finanzas] Error cargando gastos del mes:', error);
+    return [];
+  }
+  return data || [];
 }
 
 async function finLoadMovimientos() {
@@ -279,12 +341,13 @@ async function finDeleteCuenta(id, nombre) {
   finOpenDetail('saldo');
 }
 
-function finOpenDetail(kind) {
+async function finOpenDetail(kind) {
   const overlay = document.getElementById('fin-detail-modal-overlay');
   const title   = document.getElementById('fin-detail-title');
   const content = document.getElementById('fin-detail-content');
   if (!overlay || !title || !content) return;
 
+  _finDetailKind = kind;
   content.innerHTML = '';
 
   if (kind === 'saldo') {
@@ -297,15 +360,11 @@ function finOpenDetail(kind) {
       });
     }
   } else if (kind === 'gastos') {
-    title.textContent = 'Gastos del Mes';
-    if (!_finGastosMesCache.length) {
-      content.appendChild(_finDetailEmpty('Sin gastos registrados este mes.'));
-    } else {
-      _finGastosMesCache.forEach(t => {
-        const sub = `${t.usuario || 'Familia'} · ${t.categoria || ''} · ${_finFormatDate(t.fecha)}`;
-        content.appendChild(_finDetailRow(t.descripcion || t.categoria || 'Gasto', sub, '- ' + _finMoney(t.monto), 'fin-detail-out'));
-      });
-    }
+    const now = new Date();
+    _finGastosView = { year: now.getFullYear(), month: now.getMonth() };
+    overlay.style.display = 'flex';
+    await _finRenderGastosDetail();
+    return;
   } else if (kind === 'deudas') {
     title.textContent = 'Deudas Pendientes';
     if (!_finDeudasCache.length) {
@@ -327,6 +386,181 @@ function finOpenDetail(kind) {
 function finCloseDetail() {
   const overlay = document.getElementById('fin-detail-modal-overlay');
   if (overlay) overlay.style.display = 'none';
+  _finDetailKind = null;
+}
+
+/* ─────────────────────────────────────────────
+   DETALLE DE GASTOS CON NAVEGACIÓN POR MES
+───────────────────────────────────────────── */
+
+function _finGastosNav() {
+  const nav = document.createElement('div');
+  nav.className = 'fin-month-nav';
+
+  const prev = document.createElement('button');
+  prev.type = 'button';
+  prev.className = 'fin-month-nav-btn';
+  prev.setAttribute('aria-label', 'Mes anterior');
+  prev.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+  prev.addEventListener('click', () => _finChangeGastosMonth(-1));
+
+  const label = document.createElement('div');
+  label.className = 'fin-month-nav-label';
+  label.textContent = _finMonthLabel(_finGastosView.year, _finGastosView.month);
+
+  const next = document.createElement('button');
+  next.type = 'button';
+  next.className = 'fin-month-nav-btn';
+  next.setAttribute('aria-label', 'Mes siguiente');
+  next.innerHTML = '<i class="fa-solid fa-chevron-right"></i>';
+  const now = new Date();
+  next.disabled = _finGastosView.year === now.getFullYear() && _finGastosView.month === now.getMonth();
+  next.addEventListener('click', () => _finChangeGastosMonth(1));
+
+  nav.append(prev, label, next);
+  return nav;
+}
+
+function _finChangeGastosMonth(delta) {
+  let { year, month } = _finGastosView;
+  month += delta;
+  if (month < 0) { month = 11; year--; }
+  else if (month > 11) { month = 0; year++; }
+  _finGastosView = { year, month };
+  _finRenderGastosDetail();
+}
+
+function _finGastoDetailRow(t) {
+  const row = document.createElement('div');
+  row.className = 'fin-detail-row';
+
+  const main = document.createElement('div');
+  main.className = 'fin-detail-row-main';
+  const titleEl = document.createElement('div');
+  titleEl.className = 'fin-detail-row-title';
+  titleEl.textContent = t.descripcion || t.categoria || 'Gasto';
+  const subEl = document.createElement('div');
+  subEl.className = 'fin-detail-row-sub';
+  subEl.textContent = `${t.usuario || 'Familia'} · ${t.categoria || ''} · ${_finFormatDate(t.fecha)}`;
+  main.append(titleEl, subEl);
+
+  const actions = document.createElement('div');
+  actions.className = 'fin-detail-row-actions';
+
+  const amountEl = document.createElement('div');
+  amountEl.className = 'fin-detail-row-amount fin-detail-out';
+  amountEl.textContent = '- ' + _finMoney(t.monto);
+
+  const editBtn = document.createElement('button');
+  editBtn.type = 'button';
+  editBtn.className = 'fin-detail-edit-btn';
+  editBtn.setAttribute('aria-label', 'Editar gasto');
+  editBtn.innerHTML = '<i class="fa-solid fa-pen"></i>';
+  editBtn.addEventListener('click', () => finEditTransaccion(t));
+
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button';
+  delBtn.className = 'fin-detail-delete-btn';
+  delBtn.setAttribute('aria-label', 'Eliminar gasto');
+  delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+  delBtn.addEventListener('click', () => finDeleteTransaccion(t));
+
+  actions.append(amountEl, editBtn, delBtn);
+  row.append(main, actions);
+  return row;
+}
+
+async function _finRenderGastosDetail() {
+  const title   = document.getElementById('fin-detail-title');
+  const content = document.getElementById('fin-detail-content');
+  if (!content || !_finGastosView) return;
+
+  const { year, month } = _finGastosView;
+  if (title) title.textContent = 'Gastos · ' + _finMonthLabel(year, month);
+
+  content.innerHTML = '';
+  content.appendChild(_finGastosNav());
+
+  const listWrap = document.createElement('div');
+  listWrap.className = 'fin-detail-content';
+  listWrap.innerHTML = '<div class="fin-empty">Cargando…</div>';
+  content.appendChild(listWrap);
+
+  const gastos = await _finFetchGastosMes(year, month);
+
+  // Evita renderizar datos viejos si el usuario cambió de mes mientras cargaba.
+  if (!_finGastosView || _finGastosView.year !== year || _finGastosView.month !== month) return;
+
+  listWrap.innerHTML = '';
+  if (!gastos.length) {
+    listWrap.appendChild(_finDetailEmpty('Sin gastos registrados en este mes.'));
+    return;
+  }
+
+  gastos.forEach(t => listWrap.appendChild(_finGastoDetailRow(t)));
+
+  const total = gastos.reduce((s, t) => s + Number(t.monto || 0), 0);
+  const totalRow = document.createElement('div');
+  totalRow.className = 'fin-month-total';
+  const totalLabel = document.createElement('span');
+  totalLabel.textContent = 'Total del mes';
+  const totalValue = document.createElement('span');
+  totalValue.textContent = '- ' + _finMoney(total);
+  totalRow.append(totalLabel, totalValue);
+  content.appendChild(totalRow);
+}
+
+// Re-renderiza el detalle de gastos si está abierto (tras editar/eliminar).
+async function _finRefreshGastosDetailIfOpen() {
+  const overlay = document.getElementById('fin-detail-modal-overlay');
+  if (overlay && overlay.style.display !== 'none' && _finDetailKind === 'gastos') {
+    await _finRenderGastosDetail();
+  }
+}
+
+async function finDeleteTransaccion(t) {
+  if (!_sb) return;
+  const ok = confirm(`¿Eliminar el gasto "${t.descripcion || t.categoria || 'Gasto'}" de ${_finMoney(t.monto)}? Esta acción no se puede deshacer.`);
+  if (!ok) return;
+
+  const { error } = await _sb.from(FIN_TRANSACCIONES_TABLE).delete().eq('id', t.id);
+  if (error) {
+    console.error('[Finanzas] Error eliminando gasto:', error);
+    if (typeof toast === 'function') toast('No se pudo eliminar el gasto');
+    return;
+  }
+
+  // Revierte el efecto que tuvo sobre el saldo de su cuenta.
+  const effect = (t.tipo === 'ingreso' ? 1 : -1) * Number(t.monto || 0);
+  await _finApplyBalanceDelta(t.cuenta_id, -effect);
+
+  if (typeof toast === 'function') toast('🗑️ Gasto eliminado');
+  await initFinanzas();
+  await _finRefreshGastosDetailIfOpen();
+}
+
+function finEditTransaccion(t) {
+  _finEditingId = t.id;
+  _finEditingOriginal = {
+    monto: Number(t.monto || 0),
+    tipo: t.tipo,
+    cuenta_id: t.cuenta_id,
+  };
+
+  const overlay = document.getElementById('fin-modal-overlay');
+  if (!overlay) return;
+  overlay.style.display = 'flex';
+  finSwitchTab('transaccion');
+
+  document.getElementById('fin-t-tipo').value        = t.tipo || 'egreso';
+  document.getElementById('fin-t-monto').value       = t.monto;
+  document.getElementById('fin-t-categoria').value   = t.categoria || 'Otros';
+  document.getElementById('fin-t-descripcion').value = t.descripcion || '';
+  document.getElementById('fin-t-cuenta').value      = t.cuenta_id || '';
+  document.getElementById('fin-t-fecha').value       = t.fecha || _finToday();
+
+  const btn = document.querySelector('#fin-form-transaccion .fin-submit-btn');
+  if (btn) btn.textContent = 'Actualizar Transacción';
 }
 
 /* ─────────────────────────────────────────────
@@ -336,6 +570,13 @@ function finCloseDetail() {
 function finOpenModal(tab) {
   const overlay = document.getElementById('fin-modal-overlay');
   if (!overlay) return;
+
+  // Alta nueva: sale de cualquier modo de edición previo.
+  _finEditingId = null;
+  _finEditingOriginal = null;
+  const editBtn = document.querySelector('#fin-form-transaccion .fin-submit-btn');
+  if (editBtn) editBtn.textContent = 'Guardar Transacción';
+
   overlay.style.display = 'flex';
   ['fin-t-fecha', 'fin-tr-fecha'].forEach(id => {
     const input = document.getElementById(id);
@@ -347,6 +588,10 @@ function finOpenModal(tab) {
 function finCloseModal() {
   const overlay = document.getElementById('fin-modal-overlay');
   if (overlay) overlay.style.display = 'none';
+  _finEditingId = null;
+  _finEditingOriginal = null;
+  const btn = document.querySelector('#fin-form-transaccion .fin-submit-btn');
+  if (btn) btn.textContent = 'Guardar Transacción';
 }
 
 function finSwitchTab(tab) {
@@ -378,6 +623,46 @@ async function finSubmitTransaccion(e) {
 
   const btn = e.target.querySelector('.fin-submit-btn');
   if (btn) btn.disabled = true;
+
+  // ── Modo edición: actualiza el registro y reconcilia los saldos ──
+  if (_finEditingId) {
+    const editId = _finEditingId;
+    const orig = _finEditingOriginal || {};
+
+    const { error: errUpd } = await _sb
+      .from(FIN_TRANSACCIONES_TABLE)
+      .update({ tipo, monto, categoria, descripcion, fecha, cuenta_id: cuentaId })
+      .eq('id', editId);
+
+    if (errUpd) {
+      console.error('[Finanzas] Error actualizando transacción:', errUpd);
+      if (typeof toast === 'function') toast('No se pudo actualizar la transacción');
+      if (btn) btn.disabled = false;
+      return;
+    }
+
+    // Efecto sobre el saldo: ingreso suma, egreso resta.
+    const oldEffect = (orig.tipo === 'ingreso' ? 1 : -1) * Number(orig.monto || 0);
+    const newEffect = (tipo === 'ingreso' ? 1 : -1) * monto;
+
+    if (String(orig.cuenta_id) === String(cuentaId)) {
+      await _finApplyBalanceDelta(cuentaId, newEffect - oldEffect);
+    } else {
+      if (orig.cuenta_id) await _finApplyBalanceDelta(orig.cuenta_id, -oldEffect);
+      await _finApplyBalanceDelta(cuentaId, newEffect);
+    }
+
+    if (typeof toast === 'function') toast('✅ Transacción actualizada');
+    _finEditingId = null;
+    _finEditingOriginal = null;
+    e.target.reset();
+    document.getElementById('fin-t-fecha').value = _finToday();
+    if (btn) { btn.disabled = false; btn.textContent = 'Guardar Transacción'; }
+    finCloseModal();
+    await initFinanzas();
+    await _finRefreshGastosDetailIfOpen();
+    return;
+  }
 
   const { error: errInsert } = await _sb.from(FIN_TRANSACCIONES_TABLE).insert({
     tipo, monto, categoria, descripcion, fecha,

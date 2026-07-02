@@ -286,6 +286,39 @@ a { text-decoration: none; color: inherit; }
 }
 .fin-detail-delete-btn:active { background: #fee2e2; color: #dc2626; }
 
+.fin-detail-edit-btn {
+  background: none; border: none; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted); font-size: 12px; flex-shrink: 0;
+  transition: background .15s, color .15s;
+}
+.fin-detail-edit-btn:active { background: var(--fin-bg); color: var(--fin); }
+
+/* Navegación por mes en el detalle de Gastos */
+.fin-month-nav {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 4px;
+}
+.fin-month-nav-btn {
+  background: var(--bg); border: none; cursor: pointer;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text); font-size: 13px; flex-shrink: 0;
+}
+.fin-month-nav-btn:disabled { opacity: .35; cursor: default; }
+.fin-month-nav-label {
+  font-size: 13px; font-weight: 800; color: var(--text);
+  text-transform: capitalize;
+}
+.fin-month-total {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; margin-top: 4px;
+  font-size: 13px; font-weight: 800; color: var(--text);
+  border-top: 1px dashed var(--border);
+}
+.fin-month-total span:last-child { color: #dc2626; }
+
 @media (min-width: 600px) {
   .fin-summary-grid { flex-direction: row; }
   .fin-summary-card { flex: 1; }
