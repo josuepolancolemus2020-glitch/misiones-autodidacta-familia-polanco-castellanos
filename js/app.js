@@ -431,11 +431,14 @@ function switchView(id) {
   if (id === 'view-fin-stats' && typeof initFinStats === 'function') initFinStats();
   if (id === 'view-inventario' && typeof initInventario === 'function') initInventario();
   if (id === 'view-destellos' && typeof initDestellos === 'function') initDestellos();
+  if (id === 'view-redaccion' && typeof initRedaccion === 'function') initRedaccion();
 
   // El FAB de Destellos vive en toda la app, excepto en el Chat
-  // (ahí estorbaría sobre la barra de escritura).
+  // (estorbaría sobre la barra de escritura) y el editor de Redacción
+  // (taparía el texto mientras se escribe).
   const desFab = document.getElementById('destello-fab');
-  if (desFab) desFab.style.display = id === 'view-chat' ? 'none' : 'flex';
+  if (desFab) desFab.style.display =
+    (id === 'view-chat' || id === 'view-redaccion-editor') ? 'none' : 'flex';
 
   const scroll = document.querySelector(`#${id} .view-scroll`);
   if (scroll) scroll.scrollTop = 0;
