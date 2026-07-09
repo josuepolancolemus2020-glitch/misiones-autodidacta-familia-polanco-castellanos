@@ -82,6 +82,10 @@
       <!-- Acceso rápido: todo a un toque -->
       <h2 class="section-title">Acceso Rápido</h2>
       <div class="qa-grid" id="quick-access">
+        <button type="button" class="qa-item" data-qa="view-destellos">
+          <span class="qa-icon qa-des"><i class="fa-solid fa-bolt"></i></span>
+          <span class="qa-label">Destellos</span>
+        </button>
         <button type="button" class="qa-item" data-qa="view-habitos">
           <span class="qa-icon qa-hab"><i class="fa-solid fa-seedling"></i></span>
           <span class="qa-label">Hábitos</span>
@@ -674,6 +678,10 @@
         <p class="teacher-panel-desc">Recursos y herramientas para el hogar.</p>
 
         <div class="teacher-tools-grid">
+          <button class="teacher-tool-item teacher-tool-active" id="goto-destellos-btn">
+            <i class="fa-solid fa-bolt"></i>
+            <span>Destellos</span>
+          </button>
           <button class="teacher-tool-item teacher-tool-active" id="goto-habitos-btn">
             <i class="fa-solid fa-seedling"></i>
             <span>Tracker de Hábitos</span>
@@ -700,6 +708,41 @@
           </div>
         </div>
       </div>
+
+    </div>
+  </div>
+
+  <!-- ========== DESTELLOS ⚡ (captura rápida de ideas) ========== -->
+  <div id="view-destellos" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="destellos-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Destellos</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <div class="des-intro-card">
+        <div class="des-intro-icon"><i class="fa-solid fa-bolt"></i></div>
+        <div>
+          <p class="des-intro-text">Ideas y pendientes capturados al vuelo, antes de que se apaguen.</p>
+          <span class="des-intro-count" id="des-count"></span>
+        </div>
+      </div>
+
+      <div class="des-filter-tabs" id="des-filter-tabs">
+        <button type="button" class="des-ftab des-ftab-active" data-f="pendientes">Pendientes</button>
+        <button type="button" class="des-ftab" data-f="hechos">Hechos</button>
+        <button type="button" class="des-ftab" data-f="todos">Todos</button>
+      </div>
+
+      <div class="des-proj-chips" id="des-view-projs"></div>
+
+      <div id="des-list"></div>
+      <p class="fin-empty" id="des-empty" style="display:none;">
+        Nada por aquí. Cuando se te cruce algo por la mente,<br>toca el ⚡ y captúralo.
+      </p>
 
     </div>
   </div>
@@ -911,6 +954,9 @@
         <i class="fa-solid fa-comments"></i><span>Chat Familiar</span>
       </button>
       <div class="drawer-section-label drawer-tools-label">Herramientas</div>
+      <button class="drawer-item" data-view="view-destellos">
+        <i class="fa-solid fa-bolt"></i><span>Destellos</span>
+      </button>
       <button class="drawer-item" data-view="view-finanzas">
         <i class="fa-solid fa-sack-dollar"></i><span>Finanzas</span>
       </button>
@@ -948,6 +994,33 @@
     </div>
   </aside>
 
+  <!-- ========== DESTELLO FAB (captura rápida global) ========== -->
+  <button type="button" class="destello-fab" id="destello-fab" aria-label="Capturar un destello">
+    <i class="fa-solid fa-bolt"></i>
+  </button>
+
+  <!-- Modal de captura rápida -->
+  <div id="des-modal-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="des-modal-title"><i class="fa-solid fa-bolt"></i> Nuevo destello</div>
+        <button type="button" class="fin-modal-close" id="des-modal-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <p class="des-modal-hint">Captúralo antes de que se apague ⚡</p>
+      <textarea id="des-texto" class="des-textarea" rows="3" maxlength="500"
+        placeholder="¿Qué se te cruzó por la mente?"></textarea>
+      <label class="fin-label" for="des-proyecto">Proyecto (opcional)</label>
+      <input type="text" id="des-proyecto" class="des-proj-input" maxlength="30"
+        placeholder="ej: familia-app, escuela, hogar…">
+      <div class="des-proj-chips" id="des-proj-chips"></div>
+      <button type="button" class="des-save-btn" id="des-save-btn">
+        <i class="fa-solid fa-bolt"></i> Capturar
+      </button>
+    </div>
+  </div>
+
   <!-- ========== NAVEGACIÓN INFERIOR ========== -->
   <nav class="bottom-nav" id="bottom-nav" aria-label="Navegación principal">
     <button type="button" class="nav-item active" data-view="view-inicio">
@@ -980,6 +1053,7 @@
   <script src="js/push.js"></script>
   <script src="js/finanzas.js"></script>
   <script src="js/inventario.js"></script>
+  <script src="js/tools/destellos.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

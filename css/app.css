@@ -2541,3 +2541,132 @@ body {
 /* Acceso rapido: Finanzas Familia (naranja) y Collage pasa a gris */
 .qa-finfam { background: linear-gradient(135deg, #ea580c, #fb923c); }
 .qa-col    { background: linear-gradient(135deg, #64748b, #94a3b8); }
+
+/* ══════════════════════════════════════════════
+   DESTELLOS ⚡ — captura rápida de ideas
+══════════════════════════════════════════════ */
+
+/* Icono en Acceso Rápido (dorado, como el destello de un faro) */
+.qa-des { background: linear-gradient(135deg, #d97706, #fbbf24); }
+
+/* ── Botón flotante global ── */
+.destello-fab {
+  position: fixed;
+  right: 18px;
+  bottom: calc(var(--nav-h) + 18px + env(safe-area-inset-bottom, 0px));
+  width: 56px; height: 56px;
+  border: none; border-radius: 50%;
+  background: linear-gradient(135deg, #d97706, #fbbf24);
+  color: #fff; font-size: 21px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 18px rgba(217,119,6,.45);
+  cursor: pointer; z-index: 95;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.destello-fab:active { transform: scale(.9); box-shadow: 0 3px 10px rgba(217,119,6,.4); }
+
+/* ── Modal de captura ── */
+.des-modal-title {
+  font-size: 17px; font-weight: 800; color: var(--text);
+  display: flex; align-items: center; gap: 9px;
+}
+.des-modal-title i { color: #d97706; }
+.des-modal-hint { font-size: 12.5px; color: var(--muted); margin: -8px 0 12px; }
+.des-textarea {
+  width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  background: var(--bg); padding: 12px 14px; font: inherit; font-size: 15px;
+  color: var(--text); resize: none; outline: none;
+}
+.des-textarea:focus { border-color: #d97706; background: var(--surface); }
+.des-proj-input {
+  width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  background: var(--bg); padding: 10px 14px; font: inherit; font-size: 14px;
+  color: var(--text); outline: none;
+}
+.des-proj-input:focus { border-color: #d97706; background: var(--surface); }
+.des-save-btn {
+  width: 100%; margin-top: 16px;
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+  color: #fff; border: none; border-radius: 12px;
+  padding: 13px; font-size: 15px; font-weight: 800; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+  cursor: pointer; box-shadow: 0 4px 12px rgba(217,119,6,.35);
+  transition: transform .12s ease;
+}
+.des-save-btn:active { transform: scale(.97); }
+
+/* ── Chips de proyecto ── */
+.des-proj-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.des-proj-chip {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px;
+  padding: 5px 12px; font-size: 12px; font-weight: 700; color: var(--muted);
+  cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 6px;
+  transition: all .15s;
+}
+.des-proj-chip i { font-size: 10px; }
+.des-proj-chip-active {
+  background: #fffbeb; border-color: #d97706; color: #b45309;
+}
+
+/* ── Vista: bandeja de destellos ── */
+.des-intro-card {
+  background: linear-gradient(135deg, #1e3a7c, #2258d4);
+  border-radius: var(--r); padding: 16px 18px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 14px; color: #fff;
+  box-shadow: var(--shadow-md);
+}
+.des-intro-icon {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  background: linear-gradient(135deg, #d97706, #fbbf24);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; color: #fff;
+}
+.des-intro-text { font-size: 13px; line-height: 1.45; opacity: .92; }
+.des-intro-count { font-size: 12px; font-weight: 800; color: #fbbf24; }
+
+.des-filter-tabs {
+  display: flex; gap: 4px; background: var(--surface); border-radius: 12px;
+  padding: 4px; margin-bottom: 12px; box-shadow: var(--shadow);
+}
+.des-ftab {
+  flex: 1; background: none; border: none; cursor: pointer;
+  padding: 9px; border-radius: 9px; font-size: 12.5px; font-weight: 700;
+  color: var(--muted); font-family: inherit; transition: all .15s;
+}
+.des-ftab-active { background: #fffbeb; color: #b45309; }
+
+#des-view-projs { margin-bottom: 12px; margin-top: 0; }
+
+.des-card {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 13px 14px; margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+.des-check {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
+  border: 2px solid var(--faint); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  color: transparent; font-size: 11px; cursor: pointer;
+  transition: all .15s;
+}
+.des-card-done .des-check {
+  background: #16a34a; border-color: #16a34a; color: #fff;
+}
+.des-card-body { flex: 1; min-width: 0; }
+.des-text { font-size: 14.5px; line-height: 1.45; color: var(--text); word-wrap: break-word; }
+.des-card-done .des-text { text-decoration: line-through; color: var(--muted); }
+.des-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; align-items: center; }
+.des-proj-badge {
+  font-size: 11px; font-weight: 700; color: #b45309;
+  background: #fffbeb; border-radius: 6px; padding: 2px 8px;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.des-proj-badge i { font-size: 9px; }
+.des-date { font-size: 11px; color: var(--faint); display: inline-flex; align-items: center; gap: 5px; }
+.des-del {
+  background: none; border: none; cursor: pointer; flex-shrink: 0;
+  color: var(--faint); font-size: 13px; padding: 4px; margin-top: 1px;
+  transition: color .15s;
+}
+.des-del:active { color: #dc2626; }
