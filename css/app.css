@@ -2802,3 +2802,17 @@ body {
 
 /* Destellos: chips de miembro (espacio personal de cada quien) */
 .des-member-chips { margin-bottom: 12px; }
+
+/* Redacción: entradilla (párrafo introductorio) y etiquetas del editor */
+.red-e-label {
+  display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .05em;
+  color: var(--muted); text-transform: uppercase; margin: 0 0 4px 2px;
+}
+.red-e-label-opcional { font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--faint); }
+.red-e-entradilla {
+  width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  background: #eef2ff; padding: 12px 14px; font: inherit; font-size: 14px;
+  font-style: italic; line-height: 1.55; color: var(--text);
+  resize: vertical; outline: none; margin-bottom: 12px;
+}
+.red-e-entradilla:focus { border-color: #4f46e5; background: var(--surface); }

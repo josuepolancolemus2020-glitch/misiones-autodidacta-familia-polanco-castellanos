@@ -21,6 +21,7 @@ create table if not exists public.redaccion_notas (
   seccion         text not null default 'ACTUALIDAD',
   tipo            text not null default 'Artículo',
   estado          text not null default 'idea',  -- idea | borrador | revision | listo
+  entradilla      text not null default '',      -- párrafo introductorio opcional
   cuerpo          text not null default ''
 );
 

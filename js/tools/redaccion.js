@@ -316,8 +316,9 @@ function redOpenEditor(id) {
   const n = redNota();
   if (!n) return;
 
-  document.getElementById('red-e-titulo').value = n.titulo || '';
-  document.getElementById('red-e-cuerpo').value = n.cuerpo || '';
+  document.getElementById('red-e-titulo').value     = n.titulo || '';
+  document.getElementById('red-e-entradilla').value = n.entradilla || '';
+  document.getElementById('red-e-cuerpo').value     = n.cuerpo || '';
 
   // Selects: sección, tipo, estado, edición
   const secSel = document.getElementById('red-e-seccion');
@@ -363,8 +364,9 @@ function redSetSaveState(estado) {
 
 function redCamposEditor() {
   return {
-    titulo:  document.getElementById('red-e-titulo').value.trim(),
-    cuerpo:  document.getElementById('red-e-cuerpo').value,
+    titulo:     document.getElementById('red-e-titulo').value.trim(),
+    entradilla: document.getElementById('red-e-entradilla').value.trim(),
+    cuerpo:     document.getElementById('red-e-cuerpo').value,
     seccion: document.getElementById('red-e-seccion').value,
     tipo:    document.getElementById('red-e-tipo').value,
     estado:  document.getElementById('red-e-estado').value,
@@ -420,8 +422,10 @@ async function redEliminarNota() {
 
 function redNotaMd(n) {
   const est = redEstadoInfo(n.estado);
+  const entradilla = (n.entradilla || '').trim();
   return `### ${n.titulo || 'Sin título'}\n` +
     `*${n.tipo} · ${redAutorInfo(n.autor)} · ${est.label} · ${redPalabras(n.cuerpo)} palabras*\n\n` +
+    (entradilla ? `**Entradilla:** ${entradilla}\n\n` : '') +
     `${(n.cuerpo || '').trim()}\n`;
 }
 
@@ -508,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('red-ed-crear-btn')?.addEventListener('click', redCrearEdicion);
 
   // Editor: autoguardado
-  ['red-e-titulo', 'red-e-cuerpo'].forEach(id =>
+  ['red-e-titulo', 'red-e-entradilla', 'red-e-cuerpo'].forEach(id =>
     document.getElementById(id)?.addEventListener('input', redQueueSave));
   ['red-e-seccion', 'red-e-tipo', 'red-e-estado', 'red-e-edicion'].forEach(id =>
     document.getElementById(id)?.addEventListener('change', redQueueSave));
