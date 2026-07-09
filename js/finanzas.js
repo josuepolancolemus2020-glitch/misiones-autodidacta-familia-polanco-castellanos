@@ -6,21 +6,49 @@ const FIN_DEUDAS_TABLE        = 'deudas';
 
 // Categoría reservada para movimientos que solo mueven dinero entre cuentas
 // de la familia (ej. darle efectivo a un familiar). No es un gasto ni un
-// ingreso real, así que se excluye de "Gastos del Mes".
+// ingreso real, así que se excluye de "Gastos del Mes" y de las estadísticas.
 const FIN_TRANSFER_CATEGORY = 'Envío Familiar';
 
-let _finCuentasCache  = [];
+// Categorías con emoji. El value se guarda tal cual en la base de datos
+// (coincide con las categorías ya registradas para no romper el historial).
+const FIN_CATS_EGRESO = [
+  { v: 'Alimentación',    e: '🍚', label: 'Alimentación' },
+  { v: 'Transporte',      e: '🚌', label: 'Transporte' },
+  { v: 'Vivienda',        e: '🏠', label: 'Vivienda' },
+  { v: 'Servicios',       e: '💡', label: 'Servicios (agua, luz, internet)' },
+  { v: 'Salud',           e: '🩺', label: 'Salud' },
+  { v: 'Educación',       e: '📚', label: 'Educación' },
+  { v: 'Entretenimiento', e: '🎮', label: 'Entretenimiento' },
+  { v: 'Ropa y Calzado',  e: '👕', label: 'Ropa y Calzado' },
+  { v: 'Ahorro',          e: '🐷', label: 'Ahorro' },
+  { v: 'Deuda',           e: '💳', label: 'Pago de deuda' },
+  { v: 'Otros',           e: '📦', label: 'Otros' },
+];
+const FIN_CATS_INGRESO = [
+  { v: 'Salario',  e: '💼', label: 'Salario' },
+  { v: 'Negocio',  e: '🛍️', label: 'Negocio / Ventas' },
+  { v: 'Remesa',   e: '💸', label: 'Remesa' },
+  { v: 'Regalo',   e: '🎁', label: 'Regalo' },
+  { v: 'Otros',    e: '📦', label: 'Otros' },
+];
+
+let _finCuentasCache   = [];
 let _finGastosMesCache = [];
 let _finDeudasCache    = [];
 
-// Estado del detalle de "Gastos del Mes": qué mes se está viendo y qué
-// tarjeta abrió el modal de detalle. Permite navegar a meses anteriores.
-let _finGastosView   = null; // { year, month(0-based) }
-let _finDetailKind   = null; // 'saldo' | 'gastos' | 'deudas'
+// Filtro activo de la lista "Últimos Movimientos" ('' | ingreso | egreso | transfer)
+let _finMovFilter = '';
+
+// Estado del modal de detalle: qué tarjeta lo abrió y qué mes se está viendo.
+let _finDetailKind = null; // 'saldo' | 'gastos' | 'deudas' | 'historial'
+let _finGastosView = null; // { year, month(0-based) } — compartido por gastos e historial
 
 // Estado de edición de una transacción (para reutilizar el formulario).
 let _finEditingId       = null;
 let _finEditingOriginal = null; // { monto, tipo, cuenta_id } previos
+
+// Deuda a la que se le está registrando un abono.
+let _finAbonoDeuda = null;
 
 function _finCurrentUserName() {
   const session = (typeof verificarSesion === 'function') ? verificarSesion() : null;
@@ -37,6 +65,12 @@ function _finMoney(n) {
   return 'L. ' + num.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// Versión compacta para gráficas y etiquetas (sin decimales).
+function _finMoneyShort(n) {
+  const num = Number(n) || 0;
+  return 'L. ' + Math.round(num).toLocaleString('es-HN');
+}
+
 function _finToday() {
   const d = new Date();
   const pad = x => String(x).padStart(2, '0');
@@ -47,6 +81,34 @@ function _finFormatDate(iso) {
   if (!iso) return '';
   const d = new Date(iso + 'T00:00:00');
   return d.toLocaleDateString('es-HN', { day: 'numeric', month: 'short' });
+}
+
+function _finCatEmoji(cat) {
+  if (cat === FIN_TRANSFER_CATEGORY) return '🔁';
+  const found = FIN_CATS_EGRESO.find(c => c.v === cat) || FIN_CATS_INGRESO.find(c => c.v === cat);
+  return found ? found.e : '📦';
+}
+
+// Rellena el select de categoría según el tipo. Si `selected` es una categoría
+// vieja que ya no está en la lista, se agrega como opción extra para no perderla.
+function _finFillCategoriaSelect(tipo, selected) {
+  const select = document.getElementById('fin-t-categoria');
+  if (!select) return;
+  const cats = tipo === 'ingreso' ? FIN_CATS_INGRESO : FIN_CATS_EGRESO;
+  select.innerHTML = '';
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.v;
+    opt.textContent = `${c.e} ${c.label}`;
+    select.appendChild(opt);
+  });
+  if (selected && !cats.find(c => c.v === selected)) {
+    const opt = document.createElement('option');
+    opt.value = selected;
+    opt.textContent = `📦 ${selected}`;
+    select.appendChild(opt);
+  }
+  if (selected) select.value = selected;
 }
 
 /* ─────────────────────────────────────────────
@@ -60,9 +122,14 @@ async function initFinanzas() {
     return;
   }
 
-  const [cuentasRes, gastosRes, deudasRes] = await Promise.all([
+  const now = new Date();
+  const prevRange = _finMonthRange(now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear(),
+                                   now.getMonth() === 0 ? 11 : now.getMonth() - 1);
+
+  const [cuentasRes, gastosRes, gastosPrevRes, deudasRes] = await Promise.all([
     _sb.from(FIN_CUENTAS_TABLE).select('*').order('nombre'),
     _sb.from(FIN_TRANSACCIONES_TABLE).select('*').eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', _finStartOfMonth()).order('fecha', { ascending: false }),
+    _sb.from(FIN_TRANSACCIONES_TABLE).select('monto').eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', prevRange.start).lt('fecha', prevRange.end),
     _sb.from(FIN_DEUDAS_TABLE).select('*').order('fecha_limite', { ascending: true, nullsFirst: false }),
   ]);
 
@@ -81,6 +148,19 @@ async function initFinanzas() {
     _finGastosMesCache = gastosRes.data || [];
     const totalGastos = _finGastosMesCache.reduce((sum, t) => sum + Number(t.monto || 0), 0);
     document.getElementById('fin-gastos-mes').textContent = _finMoney(totalGastos);
+
+    // Comparación con el mes anterior en la propia tarjeta.
+    const deltaEl = document.getElementById('fin-gastos-delta');
+    if (deltaEl) {
+      const prevTotal = (gastosPrevRes.data || []).reduce((s, t) => s + Number(t.monto || 0), 0);
+      if (!gastosPrevRes.error && prevTotal > 0) {
+        const pct = ((totalGastos - prevTotal) / prevTotal) * 100;
+        const arrow = pct >= 0 ? '▲' : '▼';
+        deltaEl.textContent = `${arrow} ${Math.abs(pct).toFixed(0)}% vs mes pasado`;
+      } else {
+        deltaEl.textContent = '';
+      }
+    }
   }
 
   if (deudasRes.error) {
@@ -88,7 +168,7 @@ async function initFinanzas() {
   } else {
     _finDeudasCache = deudasRes.data || [];
     const totalDeuda = _finDeudasCache.reduce(
-      (sum, d) => sum + (Number(d.monto_total || 0) - Number(d.monto_pagado || 0)), 0
+      (sum, d) => sum + Math.max(0, Number(d.monto_total || 0) - Number(d.monto_pagado || 0)), 0
     );
     document.getElementById('fin-deudas-total').textContent = _finMoney(totalDeuda);
   }
@@ -154,13 +234,38 @@ async function _finFetchGastosMes(year, month) {
   return data || [];
 }
 
+// Trae TODOS los movimientos (ingresos, egresos y envíos) de un mes concreto.
+async function _finFetchMovimientosMes(year, month) {
+  const { start, end } = _finMonthRange(year, month);
+  const { data, error } = await _sb
+    .from(FIN_TRANSACCIONES_TABLE)
+    .select('*')
+    .gte('fecha', start)
+    .lt('fecha', end)
+    .order('fecha', { ascending: false })
+    .order('id', { ascending: false });
+  if (error) {
+    console.error('[Finanzas] Error cargando historial:', error);
+    return [];
+  }
+  return data || [];
+}
+
 async function finLoadMovimientos() {
   const container = document.getElementById('fin-movimientos-list');
   if (!container || !_sb) return;
 
-  const { data, error } = await _sb
-    .from(FIN_TRANSACCIONES_TABLE)
-    .select('*')
+  let query = _sb.from(FIN_TRANSACCIONES_TABLE).select('*');
+
+  if (_finMovFilter === 'ingreso') {
+    query = query.eq('tipo', 'ingreso').neq('categoria', FIN_TRANSFER_CATEGORY);
+  } else if (_finMovFilter === 'egreso') {
+    query = query.eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY);
+  } else if (_finMovFilter === 'transfer') {
+    query = query.eq('categoria', FIN_TRANSFER_CATEGORY);
+  }
+
+  const { data, error } = await query
     .order('fecha', { ascending: false })
     .order('id', { ascending: false })
     .limit(10);
@@ -191,8 +296,7 @@ function _finRenderMovimiento(t) {
 
   const icon = document.createElement('div');
   icon.className = 'fin-mov-icon fin-mov-' + tono;
-  const iconClass = esTransferencia ? 'fa-right-left' : (esIngreso ? 'fa-arrow-up' : 'fa-arrow-down');
-  icon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+  icon.textContent = _finCatEmoji(t.categoria);
 
   const info = document.createElement('div');
   info.className = 'fin-mov-info';
@@ -212,11 +316,17 @@ function _finRenderMovimiento(t) {
   amount.textContent = (esIngreso ? '+ ' : '- ') + _finMoney(t.monto);
 
   row.append(icon, info, amount);
+
+  // Tocar un movimiento (que no sea envío familiar) lo abre para editar.
+  if (!esTransferencia) {
+    row.classList.add('fin-mov-tappable');
+    row.addEventListener('click', () => finEditTransaccion(t));
+  }
   return row;
 }
 
 function _finRenderCuentaOptions(cuentas) {
-  ['fin-t-cuenta', 'fin-tr-origen', 'fin-tr-destino'].forEach(id => _finFillCuentaSelect(id, cuentas));
+  ['fin-t-cuenta', 'fin-tr-origen', 'fin-tr-destino', 'fin-a-cuenta'].forEach(id => _finFillCuentaSelect(id, cuentas));
 }
 
 function _finFillCuentaSelect(selectId, cuentas) {
@@ -341,6 +451,163 @@ async function finDeleteCuenta(id, nombre) {
   finOpenDetail('saldo');
 }
 
+/* ── Deudas: fila con progreso, abonar y eliminar ── */
+
+function _finDeudaDetailRow(d) {
+  const total    = Number(d.monto_total || 0);
+  const pagado   = Number(d.monto_pagado || 0);
+  const pendiente = Math.max(0, total - pagado);
+  const pct       = total > 0 ? Math.min(100, (pagado / total) * 100) : 0;
+  const saldada   = pendiente <= 0;
+
+  const row = document.createElement('div');
+  row.className = 'fin-deuda-card';
+
+  const top = document.createElement('div');
+  top.className = 'fin-deuda-top';
+
+  const titleEl = document.createElement('div');
+  titleEl.className = 'fin-detail-row-title';
+  titleEl.textContent = (saldada ? '✅ ' : '') + (d.descripcion || 'Deuda');
+
+  const amountEl = document.createElement('div');
+  amountEl.className = 'fin-detail-row-amount' + (saldada ? '' : ' fin-detail-debt');
+  amountEl.textContent = saldada ? 'Saldada' : _finMoney(pendiente);
+
+  top.append(titleEl, amountEl);
+
+  const sub = document.createElement('div');
+  sub.className = 'fin-detail-row-sub';
+  let subText = `Pagado ${_finMoney(pagado)} de ${_finMoney(total)} (${pct.toFixed(0)}%)`;
+  if (d.fecha_limite) subText += ` · Vence ${_finFormatDate(d.fecha_limite)}`;
+  sub.textContent = subText;
+
+  const track = document.createElement('div');
+  track.className = 'fs-bar-track fin-deuda-track';
+  const fill = document.createElement('div');
+  fill.className = 'fs-bar-fill' + (saldada ? ' fin-deuda-fill-done' : '');
+  fill.style.width = pct.toFixed(1) + '%';
+  track.appendChild(fill);
+
+  const actions = document.createElement('div');
+  actions.className = 'fin-deuda-actions';
+
+  if (!saldada) {
+    const abonarBtn = document.createElement('button');
+    abonarBtn.type = 'button';
+    abonarBtn.className = 'fin-abono-btn';
+    abonarBtn.innerHTML = '<i class="fa-solid fa-hand-holding-dollar"></i> Abonar';
+    abonarBtn.addEventListener('click', () => finOpenAbono(d));
+    actions.appendChild(abonarBtn);
+  }
+
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button';
+  delBtn.className = 'fin-detail-delete-btn';
+  delBtn.setAttribute('aria-label', 'Eliminar deuda');
+  delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+  delBtn.addEventListener('click', () => finDeleteDeuda(d));
+  actions.appendChild(delBtn);
+
+  row.append(top, sub, track, actions);
+  return row;
+}
+
+async function finDeleteDeuda(d) {
+  if (!_sb) return;
+  const ok = confirm(`¿Eliminar la deuda "${d.descripcion || 'Deuda'}"? Los abonos ya registrados como gastos no se borran.`);
+  if (!ok) return;
+
+  const { error } = await _sb.from(FIN_DEUDAS_TABLE).delete().eq('id', d.id);
+  if (error) {
+    console.error('[Finanzas] Error eliminando deuda:', error);
+    if (typeof toast === 'function') toast('No se pudo eliminar la deuda');
+    return;
+  }
+  if (typeof toast === 'function') toast('🗑️ Deuda eliminada');
+  await initFinanzas();
+  finOpenDetail('deudas');
+}
+
+/* ── Abono a deuda ── */
+
+function finOpenAbono(d) {
+  _finAbonoDeuda = d;
+  const overlay = document.getElementById('fin-abono-overlay');
+  if (!overlay) return;
+
+  const pendiente = Math.max(0, Number(d.monto_total || 0) - Number(d.monto_pagado || 0));
+  const info = document.getElementById('fin-abono-info');
+  if (info) info.textContent = `"${d.descripcion || 'Deuda'}" — pendiente: ${_finMoney(pendiente)}. El abono se registrará también como gasto (Pago de deuda) en la cuenta que elijas.`;
+
+  const monto = document.getElementById('fin-a-monto');
+  if (monto) { monto.value = ''; monto.max = pendiente > 0 ? String(pendiente) : ''; }
+  const fecha = document.getElementById('fin-a-fecha');
+  if (fecha) fecha.value = _finToday();
+
+  _finFillCuentaSelect('fin-a-cuenta', _finCuentasCache);
+  overlay.style.display = 'flex';
+}
+
+function finCloseAbono() {
+  const overlay = document.getElementById('fin-abono-overlay');
+  if (overlay) overlay.style.display = 'none';
+  _finAbonoDeuda = null;
+}
+
+async function finSubmitAbono(e) {
+  e.preventDefault();
+  if (!_sb || !_finAbonoDeuda) return;
+
+  const d        = _finAbonoDeuda;
+  const monto    = parseFloat(document.getElementById('fin-a-monto').value);
+  const cuentaId = document.getElementById('fin-a-cuenta').value;
+  const fecha    = document.getElementById('fin-a-fecha').value;
+  if (!monto || monto <= 0 || !cuentaId) return;
+
+  const btn = e.target.querySelector('.fin-submit-btn');
+  if (btn) btn.disabled = true;
+
+  const nuevoPagado = Number(d.monto_pagado || 0) + monto;
+  const total       = Number(d.monto_total || 0);
+
+  const { error: errDeuda } = await _sb
+    .from(FIN_DEUDAS_TABLE)
+    .update({ monto_pagado: nuevoPagado, estado: nuevoPagado >= total ? 'pagada' : 'pendiente' })
+    .eq('id', d.id);
+
+  if (errDeuda) {
+    console.error('[Finanzas] Error registrando abono:', errDeuda);
+    if (typeof toast === 'function') toast('No se pudo registrar el abono');
+    if (btn) btn.disabled = false;
+    return;
+  }
+
+  // El abono también es un gasto real: queda en el historial y descuenta saldo.
+  const { error: errTrans } = await _sb.from(FIN_TRANSACCIONES_TABLE).insert({
+    tipo: 'egreso',
+    monto,
+    categoria: 'Deuda',
+    descripcion: `Abono: ${d.descripcion || 'Deuda'}`,
+    fecha,
+    usuario: _finCurrentUserName(),
+    cuenta_id: cuentaId,
+  });
+  if (errTrans) {
+    console.error('[Finanzas] Error guardando el gasto del abono:', errTrans);
+  } else {
+    await _finApplyBalanceDelta(cuentaId, -monto);
+  }
+
+  if (typeof toast === 'function') {
+    toast(nuevoPagado >= total ? '🎉 ¡Deuda saldada por completo!' : '✅ Abono registrado');
+  }
+  if (btn) btn.disabled = false;
+  finCloseAbono();
+  await initFinanzas();
+  finOpenDetail('deudas');
+}
+
 async function finOpenDetail(kind) {
   const overlay = document.getElementById('fin-detail-modal-overlay');
   const title   = document.getElementById('fin-detail-title');
@@ -359,24 +626,18 @@ async function finOpenDetail(kind) {
         content.appendChild(_finCuentaDetailRow(c));
       });
     }
-  } else if (kind === 'gastos') {
+  } else if (kind === 'gastos' || kind === 'historial') {
     const now = new Date();
     _finGastosView = { year: now.getFullYear(), month: now.getMonth() };
     overlay.style.display = 'flex';
-    await _finRenderGastosDetail();
+    await _finRenderMesDetail();
     return;
   } else if (kind === 'deudas') {
     title.textContent = 'Deudas Pendientes';
     if (!_finDeudasCache.length) {
       content.appendChild(_finDetailEmpty('Aún no has registrado ninguna deuda.'));
     } else {
-      _finDeudasCache.forEach(d => {
-        const pendiente = Number(d.monto_total || 0) - Number(d.monto_pagado || 0);
-        let sub = `Pagado ${_finMoney(d.monto_pagado)} de ${_finMoney(d.monto_total)}`;
-        if (d.fecha_limite) sub += ` · Vence ${_finFormatDate(d.fecha_limite)}`;
-        if (d.estado) sub += ` · ${d.estado}`;
-        content.appendChild(_finDetailRow(d.descripcion || 'Deuda', sub, _finMoney(pendiente), 'fin-detail-debt'));
-      });
+      _finDeudasCache.forEach(d => content.appendChild(_finDeudaDetailRow(d)));
     }
   }
 
@@ -390,7 +651,7 @@ function finCloseDetail() {
 }
 
 /* ─────────────────────────────────────────────
-   DETALLE DE GASTOS CON NAVEGACIÓN POR MES
+   DETALLE POR MES (gastos / historial completo)
 ───────────────────────────────────────────── */
 
 function _finGastosNav() {
@@ -427,10 +688,13 @@ function _finChangeGastosMonth(delta) {
   if (month < 0) { month = 11; year--; }
   else if (month > 11) { month = 0; year++; }
   _finGastosView = { year, month };
-  _finRenderGastosDetail();
+  _finRenderMesDetail();
 }
 
-function _finGastoDetailRow(t) {
+function _finMovimientoDetailRow(t) {
+  const esTransferencia = t.categoria === FIN_TRANSFER_CATEGORY;
+  const esIngreso = t.tipo === 'ingreso';
+
   const row = document.createElement('div');
   row.className = 'fin-detail-row';
 
@@ -438,7 +702,7 @@ function _finGastoDetailRow(t) {
   main.className = 'fin-detail-row-main';
   const titleEl = document.createElement('div');
   titleEl.className = 'fin-detail-row-title';
-  titleEl.textContent = t.descripcion || t.categoria || 'Gasto';
+  titleEl.textContent = `${_finCatEmoji(t.categoria)} ${t.descripcion || t.categoria || 'Movimiento'}`;
   const subEl = document.createElement('div');
   subEl.className = 'fin-detail-row-sub';
   subEl.textContent = `${t.usuario || 'Familia'} · ${t.categoria || ''} · ${_finFormatDate(t.fecha)}`;
@@ -448,35 +712,43 @@ function _finGastoDetailRow(t) {
   actions.className = 'fin-detail-row-actions';
 
   const amountEl = document.createElement('div');
-  amountEl.className = 'fin-detail-row-amount fin-detail-out';
-  amountEl.textContent = '- ' + _finMoney(t.monto);
+  amountEl.className = 'fin-detail-row-amount ' +
+    (esTransferencia ? 'fin-detail-transfer' : (esIngreso ? 'fin-detail-in' : 'fin-detail-out'));
+  amountEl.textContent = (esIngreso ? '+ ' : '- ') + _finMoney(t.monto);
+  actions.appendChild(amountEl);
 
-  const editBtn = document.createElement('button');
-  editBtn.type = 'button';
-  editBtn.className = 'fin-detail-edit-btn';
-  editBtn.setAttribute('aria-label', 'Editar gasto');
-  editBtn.innerHTML = '<i class="fa-solid fa-pen"></i>';
-  editBtn.addEventListener('click', () => finEditTransaccion(t));
+  if (!esTransferencia) {
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.className = 'fin-detail-edit-btn';
+    editBtn.setAttribute('aria-label', 'Editar movimiento');
+    editBtn.innerHTML = '<i class="fa-solid fa-pen"></i>';
+    editBtn.addEventListener('click', () => finEditTransaccion(t));
+    actions.appendChild(editBtn);
 
-  const delBtn = document.createElement('button');
-  delBtn.type = 'button';
-  delBtn.className = 'fin-detail-delete-btn';
-  delBtn.setAttribute('aria-label', 'Eliminar gasto');
-  delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
-  delBtn.addEventListener('click', () => finDeleteTransaccion(t));
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'fin-detail-delete-btn';
+    delBtn.setAttribute('aria-label', 'Eliminar movimiento');
+    delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+    delBtn.addEventListener('click', () => finDeleteTransaccion(t));
+    actions.appendChild(delBtn);
+  }
 
-  actions.append(amountEl, editBtn, delBtn);
   row.append(main, actions);
   return row;
 }
 
-async function _finRenderGastosDetail() {
+async function _finRenderMesDetail() {
   const title   = document.getElementById('fin-detail-title');
   const content = document.getElementById('fin-detail-content');
   if (!content || !_finGastosView) return;
 
+  const kind = _finDetailKind;
   const { year, month } = _finGastosView;
-  if (title) title.textContent = 'Gastos · ' + _finMonthLabel(year, month);
+  if (title) {
+    title.textContent = (kind === 'historial' ? 'Historial · ' : 'Gastos · ') + _finMonthLabel(year, month);
+  }
 
   content.innerHTML = '';
   content.appendChild(_finGastosNav());
@@ -486,47 +758,66 @@ async function _finRenderGastosDetail() {
   listWrap.innerHTML = '<div class="fin-empty">Cargando…</div>';
   content.appendChild(listWrap);
 
-  const gastos = await _finFetchGastosMes(year, month);
+  const rows = kind === 'historial'
+    ? await _finFetchMovimientosMes(year, month)
+    : await _finFetchGastosMes(year, month);
 
   // Evita renderizar datos viejos si el usuario cambió de mes mientras cargaba.
-  if (!_finGastosView || _finGastosView.year !== year || _finGastosView.month !== month) return;
+  if (!_finGastosView || _finGastosView.year !== year || _finGastosView.month !== month || _finDetailKind !== kind) return;
 
   listWrap.innerHTML = '';
-  if (!gastos.length) {
-    listWrap.appendChild(_finDetailEmpty('Sin gastos registrados en este mes.'));
+  if (!rows.length) {
+    listWrap.appendChild(_finDetailEmpty(kind === 'historial'
+      ? 'Sin movimientos registrados en este mes.'
+      : 'Sin gastos registrados en este mes.'));
     return;
   }
 
-  gastos.forEach(t => listWrap.appendChild(_finGastoDetailRow(t)));
+  rows.forEach(t => listWrap.appendChild(_finMovimientoDetailRow(t)));
 
-  const total = gastos.reduce((s, t) => s + Number(t.monto || 0), 0);
-  const totalRow = document.createElement('div');
-  totalRow.className = 'fin-month-total';
-  const totalLabel = document.createElement('span');
-  totalLabel.textContent = 'Total del mes';
-  const totalValue = document.createElement('span');
-  totalValue.textContent = '- ' + _finMoney(total);
-  totalRow.append(totalLabel, totalValue);
-  content.appendChild(totalRow);
+  // Totales del mes al pie.
+  if (kind === 'historial') {
+    const reales = rows.filter(t => t.categoria !== FIN_TRANSFER_CATEGORY);
+    const ing = reales.filter(t => t.tipo === 'ingreso').reduce((s, t) => s + Number(t.monto || 0), 0);
+    const gas = reales.filter(t => t.tipo === 'egreso').reduce((s, t) => s + Number(t.monto || 0), 0);
+    content.appendChild(_finTotalRow('Ingresos del mes', '+ ' + _finMoney(ing), 'in'));
+    content.appendChild(_finTotalRow('Gastos del mes', '- ' + _finMoney(gas), 'out'));
+    content.appendChild(_finTotalRow('Balance', (ing - gas >= 0 ? '+ ' : '- ') + _finMoney(Math.abs(ing - gas)), ing - gas >= 0 ? 'in' : 'out'));
+  } else {
+    const total = rows.reduce((s, t) => s + Number(t.monto || 0), 0);
+    content.appendChild(_finTotalRow('Total del mes', '- ' + _finMoney(total), 'out'));
+  }
 }
 
-// Re-renderiza el detalle de gastos si está abierto (tras editar/eliminar).
+function _finTotalRow(labelText, valueText, tone) {
+  const totalRow = document.createElement('div');
+  totalRow.className = 'fin-month-total' + (tone ? ' fin-total-' + tone : '');
+  const totalLabel = document.createElement('span');
+  totalLabel.textContent = labelText;
+  const totalValue = document.createElement('span');
+  totalValue.textContent = valueText;
+  totalRow.append(totalLabel, totalValue);
+  return totalRow;
+}
+
+// Re-renderiza el detalle mensual si está abierto (tras editar/eliminar).
 async function _finRefreshGastosDetailIfOpen() {
   const overlay = document.getElementById('fin-detail-modal-overlay');
-  if (overlay && overlay.style.display !== 'none' && _finDetailKind === 'gastos') {
-    await _finRenderGastosDetail();
+  if (overlay && overlay.style.display !== 'none' && (_finDetailKind === 'gastos' || _finDetailKind === 'historial')) {
+    await _finRenderMesDetail();
   }
 }
 
 async function finDeleteTransaccion(t) {
   if (!_sb) return;
-  const ok = confirm(`¿Eliminar el gasto "${t.descripcion || t.categoria || 'Gasto'}" de ${_finMoney(t.monto)}? Esta acción no se puede deshacer.`);
+  const nombre = t.descripcion || t.categoria || 'Movimiento';
+  const ok = confirm(`¿Eliminar "${nombre}" de ${_finMoney(t.monto)}? Esta acción no se puede deshacer.`);
   if (!ok) return;
 
   const { error } = await _sb.from(FIN_TRANSACCIONES_TABLE).delete().eq('id', t.id);
   if (error) {
-    console.error('[Finanzas] Error eliminando gasto:', error);
-    if (typeof toast === 'function') toast('No se pudo eliminar el gasto');
+    console.error('[Finanzas] Error eliminando movimiento:', error);
+    if (typeof toast === 'function') toast('No se pudo eliminar el movimiento');
     return;
   }
 
@@ -534,7 +825,7 @@ async function finDeleteTransaccion(t) {
   const effect = (t.tipo === 'ingreso' ? 1 : -1) * Number(t.monto || 0);
   await _finApplyBalanceDelta(t.cuenta_id, -effect);
 
-  if (typeof toast === 'function') toast('🗑️ Gasto eliminado');
+  if (typeof toast === 'function') toast('🗑️ Movimiento eliminado');
   await initFinanzas();
   await _finRefreshGastosDetailIfOpen();
 }
@@ -552,9 +843,9 @@ function finEditTransaccion(t) {
   overlay.style.display = 'flex';
   finSwitchTab('transaccion');
 
-  document.getElementById('fin-t-tipo').value        = t.tipo || 'egreso';
+  document.getElementById('fin-t-tipo').value = t.tipo || 'egreso';
+  _finFillCategoriaSelect(t.tipo || 'egreso', t.categoria || 'Otros');
   document.getElementById('fin-t-monto').value       = t.monto;
-  document.getElementById('fin-t-categoria').value   = t.categoria || 'Otros';
   document.getElementById('fin-t-descripcion').value = t.descripcion || '';
   document.getElementById('fin-t-cuenta').value      = t.cuenta_id || '';
   document.getElementById('fin-t-fecha').value       = t.fecha || _finToday();
@@ -582,6 +873,7 @@ function finOpenModal(tab) {
     const input = document.getElementById(id);
     if (input && !input.value) input.value = _finToday();
   });
+  _finFillCategoriaSelect(document.getElementById('fin-t-tipo')?.value || 'egreso');
   finSwitchTab(tab || 'transaccion');
 }
 
@@ -678,27 +970,13 @@ async function finSubmitTransaccion(e) {
   }
 
   // Actualiza matemáticamente el saldo de la cuenta afectada
-  const { data: cuentaActual, error: errSelect } = await _sb
-    .from(FIN_CUENTAS_TABLE)
-    .select('saldo_actual')
-    .eq('id', cuentaId)
-    .single();
-
-  if (errSelect) {
-    console.error('[Finanzas] Error leyendo saldo actual:', errSelect);
-  } else {
-    const delta = tipo === 'ingreso' ? monto : -monto;
-    const nuevoSaldo = Number(cuentaActual.saldo_actual || 0) + delta;
-    const { error: errUpdate } = await _sb
-      .from(FIN_CUENTAS_TABLE)
-      .update({ saldo_actual: nuevoSaldo })
-      .eq('id', cuentaId);
-    if (errUpdate) console.error('[Finanzas] Error actualizando saldo:', errUpdate);
-  }
+  const delta = tipo === 'ingreso' ? monto : -monto;
+  await _finApplyBalanceDelta(cuentaId, delta);
 
   if (typeof toast === 'function') toast('✅ Transacción registrada');
   e.target.reset();
   document.getElementById('fin-t-fecha').value = _finToday();
+  _finFillCategoriaSelect(document.getElementById('fin-t-tipo')?.value || 'egreso');
   if (btn) btn.disabled = false;
   finCloseModal();
   await initFinanzas();
@@ -838,6 +1116,340 @@ async function finSubmitDeuda(e) {
 }
 
 /* ─────────────────────────────────────────────
+   ESTADÍSTICAS
+   Todo se calcula a partir de las transacciones reales
+   (los envíos familiares se excluyen siempre).
+───────────────────────────────────────────── */
+
+let _finStatsView = null; // { year, month(0-based) }
+
+async function initFinStats() {
+  if (!_sb) return;
+  if (!_finStatsView) {
+    const now = new Date();
+    _finStatsView = { year: now.getFullYear(), month: now.getMonth() };
+  }
+  await _finRenderStats();
+}
+
+function _finChangeStatsMonth(delta) {
+  let { year, month } = _finStatsView;
+  month += delta;
+  if (month < 0) { month = 11; year--; }
+  else if (month > 11) { month = 0; year++; }
+  _finStatsView = { year, month };
+  _finRenderStats();
+}
+
+// Trae los movimientos reales de los últimos 6 meses terminando en el mes visto.
+async function _finFetchStatsRange(year, month) {
+  const startDate = new Date(year, month - 5, 1);
+  const pad = x => String(x).padStart(2, '0');
+  const start = `${startDate.getFullYear()}-${pad(startDate.getMonth() + 1)}-01`;
+  const { end } = _finMonthRange(year, month);
+
+  const { data, error } = await _sb
+    .from(FIN_TRANSACCIONES_TABLE)
+    .select('tipo, monto, categoria, descripcion, fecha, usuario')
+    .neq('categoria', FIN_TRANSFER_CATEGORY)
+    .gte('fecha', start)
+    .lt('fecha', end)
+    .order('fecha', { ascending: false });
+
+  if (error) {
+    console.error('[Finanzas] Error cargando estadísticas:', error);
+    return null;
+  }
+  return data || [];
+}
+
+function _finMonthKey(year, month) {
+  return `${year}-${String(month + 1).padStart(2, '0')}`;
+}
+
+function _finRowMonthKey(fecha) {
+  return (fecha || '').slice(0, 7);
+}
+
+async function _finRenderStats() {
+  const { year, month } = _finStatsView;
+
+  const label = document.getElementById('fs-month-label');
+  if (label) label.textContent = _finMonthLabel(year, month);
+  const nextBtn = document.getElementById('fs-next-month');
+  const now = new Date();
+  const esMesActual = year === now.getFullYear() && month === now.getMonth();
+  if (nextBtn) nextBtn.disabled = esMesActual;
+
+  const rows = await _finFetchStatsRange(year, month);
+
+  // Evita pintar datos viejos si el usuario cambió de mes mientras cargaba.
+  if (!_finStatsView || _finStatsView.year !== year || _finStatsView.month !== month) return;
+  if (rows === null) {
+    const cat = document.getElementById('fs-cat-chart');
+    if (cat) cat.innerHTML = '<div class="fin-empty">No se pudieron cargar las estadísticas.</div>';
+    return;
+  }
+
+  const viewKey = _finMonthKey(year, month);
+  const prevDate = new Date(year, month - 1, 1);
+  const prevKey = _finMonthKey(prevDate.getFullYear(), prevDate.getMonth());
+
+  // ── Agregados por mes (para KPIs y tendencia) ──
+  const porMes = {}; // key → { ing, gas }
+  rows.forEach(t => {
+    const k = _finRowMonthKey(t.fecha);
+    if (!porMes[k]) porMes[k] = { ing: 0, gas: 0 };
+    if (t.tipo === 'ingreso') porMes[k].ing += Number(t.monto || 0);
+    else porMes[k].gas += Number(t.monto || 0);
+  });
+
+  const mes  = porMes[viewKey] || { ing: 0, gas: 0 };
+  const prev = porMes[prevKey] || { ing: 0, gas: 0 };
+  const balance = mes.ing - mes.gas;
+
+  // ── KPIs ──
+  _finSetText('fs-kpi-ingresos', _finMoney(mes.ing));
+  _finSetText('fs-kpi-gastos', _finMoney(mes.gas));
+  const balEl = document.getElementById('fs-kpi-balance');
+  if (balEl) {
+    balEl.textContent = (balance >= 0 ? '+ ' : '- ') + _finMoney(Math.abs(balance));
+    balEl.classList.toggle('fs-in', balance >= 0);
+    balEl.classList.toggle('fs-out', balance < 0);
+  }
+
+  _finSetDelta('fs-delta-ingresos', mes.ing, prev.ing, true);
+  _finSetDelta('fs-delta-gastos', mes.gas, prev.gas, false);
+
+  const tasaEl = document.getElementById('fs-kpi-tasa');
+  if (tasaEl) {
+    if (mes.ing > 0) {
+      const tasa = (balance / mes.ing) * 100;
+      tasaEl.textContent = tasa >= 0
+        ? `Ahorraron el ${tasa.toFixed(0)}% de sus ingresos 💪`
+        : `Gastaron ${Math.abs(tasa).toFixed(0)}% más de lo que ingresó ⚠️`;
+    } else {
+      tasaEl.textContent = mes.gas > 0 ? 'Sin ingresos registrados este mes' : '';
+    }
+  }
+
+  // ── Ritmo de gasto (solo para el mes en curso) ──
+  const ritmoCard = document.getElementById('fs-ritmo-card');
+  const ritmoContent = document.getElementById('fs-ritmo-content');
+  if (ritmoCard && ritmoContent) {
+    if (esMesActual && mes.gas > 0) {
+      const diaHoy = now.getDate();
+      const diasMes = new Date(year, month + 1, 0).getDate();
+      const promedio = mes.gas / diaHoy;
+      const proyeccion = promedio * diasMes;
+      ritmoCard.style.display = 'block';
+      ritmoContent.innerHTML = '';
+      ritmoContent.appendChild(_finRitmoRow('Gasto promedio por día', _finMoney(promedio)));
+      ritmoContent.appendChild(_finRitmoRow(`Proyección al cierre (${diasMes} días)`, _finMoney(proyeccion)));
+      if (prev.gas > 0) {
+        const dif = proyeccion - prev.gas;
+        ritmoContent.appendChild(_finRitmoRow('Comparado con el mes pasado',
+          (dif >= 0 ? '+ ' : '- ') + _finMoney(Math.abs(dif)), dif > 0 ? 'fs-out' : 'fs-in'));
+      }
+    } else {
+      ritmoCard.style.display = 'none';
+    }
+  }
+
+  // ── Filas del mes visto ──
+  const mesRows = rows.filter(t => _finRowMonthKey(t.fecha) === viewKey);
+  const gastosMes = mesRows.filter(t => t.tipo === 'egreso');
+
+  // ── Gastos por categoría ──
+  _finRenderBarChart('fs-cat-chart', _finGroupSum(gastosMes, t => t.categoria || 'Otros'), {
+    empty: 'Sin gastos en este mes.',
+    total: mes.gas,
+    nameFn: cat => `${_finCatEmoji(cat)} ${cat}`,
+  });
+
+  // ── Gastos por miembro ──
+  _finRenderBarChart('fs-member-chart', _finGroupSum(gastosMes, t => t.usuario || 'Familia'), {
+    empty: 'Sin gastos en este mes.',
+    total: mes.gas,
+    nameFn: u => u,
+  });
+
+  // ── Tendencia de 6 meses ──
+  _finRenderTrend(porMes, year, month);
+
+  // ── Top 5 gastos del mes ──
+  const topWrap = document.getElementById('fs-top-list');
+  if (topWrap) {
+    topWrap.innerHTML = '';
+    const top = [...gastosMes].sort((a, b) => Number(b.monto) - Number(a.monto)).slice(0, 5);
+    if (!top.length) {
+      topWrap.appendChild(_finDetailEmpty('Sin gastos en este mes.'));
+    } else {
+      top.forEach(t => topWrap.appendChild(_finDetailRow(
+        `${_finCatEmoji(t.categoria)} ${t.descripcion || t.categoria || 'Gasto'}`,
+        `${t.usuario || 'Familia'} · ${_finFormatDate(t.fecha)}`,
+        '- ' + _finMoney(t.monto),
+        'fin-detail-out'
+      )));
+    }
+  }
+}
+
+function _finSetText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+// Delta vs mes anterior. goodWhenUp: subir ingresos es bueno; subir gastos, malo.
+function _finSetDelta(id, actual, anterior, goodWhenUp) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!anterior || anterior <= 0) { el.textContent = ''; return; }
+  const pct = ((actual - anterior) / anterior) * 100;
+  const up = pct >= 0;
+  el.textContent = `${up ? '▲' : '▼'} ${Math.abs(pct).toFixed(0)}% vs mes anterior`;
+  const good = up === goodWhenUp;
+  el.classList.toggle('fs-delta-good', good);
+  el.classList.toggle('fs-delta-bad', !good);
+}
+
+function _finRitmoRow(labelText, valueText, valueClass) {
+  const row = document.createElement('div');
+  row.className = 'fs-ritmo-row';
+  const lbl = document.createElement('span');
+  lbl.className = 'fs-ritmo-label';
+  lbl.textContent = labelText;
+  const val = document.createElement('span');
+  val.className = 'fs-ritmo-value' + (valueClass ? ' ' + valueClass : '');
+  val.textContent = valueText;
+  row.append(lbl, val);
+  return row;
+}
+
+// Agrupa y suma montos por clave; devuelve [{ name, total, count }] ordenado.
+function _finGroupSum(rows, keyFn) {
+  const map = {};
+  rows.forEach(t => {
+    const k = keyFn(t);
+    if (!map[k]) map[k] = { name: k, total: 0, count: 0 };
+    map[k].total += Number(t.monto || 0);
+    map[k].count++;
+  });
+  return Object.values(map).sort((a, b) => b.total - a.total);
+}
+
+// Gráfica de barras horizontales (un solo tono: magnitud de una misma medida).
+function _finRenderBarChart(containerId, groups, opts) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  if (!groups.length) {
+    wrap.appendChild(_finDetailEmpty(opts.empty));
+    return;
+  }
+
+  const max = groups[0].total || 1;
+  groups.forEach(g => {
+    const row = document.createElement('div');
+    row.className = 'fs-bar-row';
+
+    const name = document.createElement('span');
+    name.className = 'fs-bar-name';
+    name.textContent = opts.nameFn(g.name);
+    name.title = `${g.count} movimiento${g.count !== 1 ? 's' : ''}`;
+
+    const track = document.createElement('div');
+    track.className = 'fs-bar-track';
+    const fill = document.createElement('div');
+    fill.className = 'fs-bar-fill';
+    fill.style.width = Math.max(2, (g.total / max) * 100).toFixed(1) + '%';
+    track.appendChild(fill);
+
+    const val = document.createElement('span');
+    val.className = 'fs-bar-val';
+    const pct = opts.total > 0 ? Math.round((g.total / opts.total) * 100) : 0;
+    val.innerHTML = `${_finMoneyShort(g.total)} <span class="fs-bar-pct">(${pct}%)</span>`;
+
+    row.append(name, track, val);
+    wrap.appendChild(row);
+  });
+}
+
+// Tendencia de 6 meses: barras agrupadas ingresos (verde) vs gastos (rojo).
+function _finRenderTrend(porMes, year, month) {
+  const wrap = document.getElementById('fs-trend-chart');
+  const caption = document.getElementById('fs-trend-caption');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  wrap.className = 'fs-trend';
+
+  const meses = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(year, month - i, 1);
+    meses.push({
+      key: _finMonthKey(d.getFullYear(), d.getMonth()),
+      label: d.toLocaleDateString('es-HN', { month: 'short' }),
+      full: _finMonthLabel(d.getFullYear(), d.getMonth()),
+    });
+  }
+
+  const max = Math.max(1, ...meses.map(m => {
+    const v = porMes[m.key] || { ing: 0, gas: 0 };
+    return Math.max(v.ing, v.gas);
+  }));
+
+  const sinDatos = meses.every(m => !porMes[m.key]);
+  if (sinDatos) {
+    wrap.className = '';
+    wrap.appendChild(_finDetailEmpty('Aún no hay suficientes datos para la tendencia.'));
+    if (caption) caption.textContent = '';
+    return;
+  }
+
+  meses.forEach((m, idx) => {
+    const v = porMes[m.key] || { ing: 0, gas: 0 };
+
+    const col = document.createElement('button');
+    col.type = 'button';
+    col.className = 'fs-trend-col';
+    col.setAttribute('aria-label', `${m.full}: ingresos ${_finMoneyShort(v.ing)}, gastos ${_finMoneyShort(v.gas)}`);
+
+    const bars = document.createElement('div');
+    bars.className = 'fs-trend-bars';
+
+    const barIn = document.createElement('div');
+    barIn.className = 'fs-trend-bar fs-trend-bar-in';
+    barIn.style.height = Math.max(v.ing > 0 ? 3 : 1, (v.ing / max) * 100).toFixed(1) + '%';
+
+    const barOut = document.createElement('div');
+    barOut.className = 'fs-trend-bar fs-trend-bar-out';
+    barOut.style.height = Math.max(v.gas > 0 ? 3 : 1, (v.gas / max) * 100).toFixed(1) + '%';
+
+    bars.append(barIn, barOut);
+
+    const lbl = document.createElement('span');
+    lbl.className = 'fs-trend-month';
+    lbl.textContent = m.label.replace('.', '');
+
+    col.append(bars, lbl);
+    col.addEventListener('click', () => {
+      wrap.querySelectorAll('.fs-trend-col').forEach(c => c.classList.remove('fs-trend-active'));
+      col.classList.add('fs-trend-active');
+      if (caption) {
+        const bal = v.ing - v.gas;
+        caption.textContent = `${m.full}: +${_finMoneyShort(v.ing)} ingresos · −${_finMoneyShort(v.gas)} gastos · balance ${bal >= 0 ? '+' : '−'}${_finMoneyShort(Math.abs(bal))}`;
+      }
+    });
+
+    wrap.appendChild(col);
+
+    // El mes visto arranca seleccionado para que la leyenda nunca esté vacía.
+    if (idx === meses.length - 1) col.click();
+  });
+}
+
+/* ─────────────────────────────────────────────
    INIT
 ───────────────────────────────────────────── */
 
@@ -857,6 +1469,25 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fin-form-cuenta')?.addEventListener('submit', finSubmitCuenta);
   document.getElementById('fin-form-deuda')?.addEventListener('submit', finSubmitDeuda);
 
+  // Las categorías del formulario dependen del tipo (ingreso/egreso).
+  _finFillCategoriaSelect('egreso');
+  document.getElementById('fin-t-tipo')?.addEventListener('change', e => {
+    _finFillCategoriaSelect(e.target.value);
+  });
+
+  // Filtros de la lista de movimientos.
+  document.getElementById('fin-mov-chips')?.addEventListener('click', e => {
+    const chip = e.target.closest('[data-movfilter]');
+    if (!chip) return;
+    _finMovFilter = chip.dataset.movfilter;
+    document.querySelectorAll('#fin-mov-chips .fam-chip').forEach(c =>
+      c.classList.toggle('fam-chip-active', c === chip));
+    finLoadMovimientos();
+  });
+
+  // Historial completo con navegación por mes.
+  document.getElementById('fin-see-all')?.addEventListener('click', () => finOpenDetail('historial'));
+
   // Detalle de las tarjetas resumen (Saldo / Gastos del Mes / Deudas)
   document.querySelector('.fin-summary-grid')?.addEventListener('click', e => {
     const card = e.target.closest('[data-findetail]');
@@ -866,4 +1497,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fin-detail-modal-overlay')?.addEventListener('click', e => {
     if (e.target.id === 'fin-detail-modal-overlay') finCloseDetail();
   });
+
+  // Abono a deuda.
+  document.getElementById('fin-form-abono')?.addEventListener('submit', finSubmitAbono);
+  document.getElementById('fin-abono-close')?.addEventListener('click', finCloseAbono);
+  document.getElementById('fin-abono-overlay')?.addEventListener('click', e => {
+    if (e.target.id === 'fin-abono-overlay') finCloseAbono();
+  });
+
+  // Estadísticas.
+  document.getElementById('fin-goto-stats')?.addEventListener('click', () => switchView('view-fin-stats'));
+  document.getElementById('fin-stats-back-btn')?.addEventListener('click', () => switchView('view-finanzas'));
+  document.getElementById('fs-prev-month')?.addEventListener('click', () => _finChangeStatsMonth(-1));
+  document.getElementById('fs-next-month')?.addEventListener('click', () => _finChangeStatsMonth(1));
 });

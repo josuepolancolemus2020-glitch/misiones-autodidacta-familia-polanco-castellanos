@@ -413,6 +413,7 @@ function switchView(id) {
   if (id === 'view-redes'   && typeof initRedes === 'function')   initRedes();
   if (id === 'view-collage')        initCollage();
   if (id === 'view-finanzas' && typeof initFinanzas === 'function') initFinanzas();
+  if (id === 'view-fin-stats' && typeof initFinStats === 'function') initFinStats();
   if (id === 'view-inventario' && typeof initInventario === 'function') initInventario();
 
   const scroll = document.querySelector(`#${id} .view-scroll`);

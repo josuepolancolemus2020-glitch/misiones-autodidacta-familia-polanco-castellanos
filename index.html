@@ -249,6 +249,7 @@
         <button type="button" class="fin-summary-card fin-expense" data-findetail="gastos">
           <div class="fin-card-label">Gastos del Mes</div>
           <div class="fin-card-value" id="fin-gastos-mes">—</div>
+          <div class="fin-card-delta" id="fin-gastos-delta"></div>
           <div class="fin-card-hint">Ver detalle <i class="fa-solid fa-chevron-right"></i></div>
         </button>
         <button type="button" class="fin-summary-card fin-debt" data-findetail="deudas">
@@ -258,7 +259,22 @@
         </button>
       </div>
 
-      <h2 class="section-title">Últimos Movimientos</h2>
+      <button type="button" class="fin-stats-btn" id="fin-goto-stats">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Estadísticas y Análisis</span>
+        <i class="fa-solid fa-chevron-right fin-stats-arrow"></i>
+      </button>
+
+      <div class="fin-mov-header">
+        <h2 class="section-title fin-mov-title">Últimos Movimientos</h2>
+        <button type="button" class="fin-see-all-btn" id="fin-see-all">Ver historial</button>
+      </div>
+      <div class="fin-mov-chips" id="fin-mov-chips">
+        <button type="button" class="fam-chip fam-chip-active" data-movfilter="">Todos</button>
+        <button type="button" class="fam-chip" data-movfilter="ingreso">Ingresos</button>
+        <button type="button" class="fam-chip" data-movfilter="egreso">Gastos</button>
+        <button type="button" class="fam-chip" data-movfilter="transfer">Envíos</button>
+      </div>
       <div id="fin-movimientos-list" class="fin-mov-list">
         <div class="fin-empty">Cargando movimientos…</div>
       </div>
@@ -268,6 +284,78 @@
     <button class="fin-fab" id="fin-fab" aria-label="Agregar registro">
       <i class="fa-solid fa-plus"></i>
     </button>
+  </div>
+
+  <!-- ========== FINANZAS: ESTADÍSTICAS ========== -->
+  <div id="view-fin-stats" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="fin-stats-back-btn" aria-label="Volver a Finanzas">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Estadísticas</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <div class="fin-month-nav fs-month-nav">
+        <button type="button" class="fin-month-nav-btn" id="fs-prev-month" aria-label="Mes anterior">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div class="fin-month-nav-label" id="fs-month-label">—</div>
+        <button type="button" class="fin-month-nav-btn" id="fs-next-month" aria-label="Mes siguiente">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="fs-kpi-grid">
+        <div class="fs-kpi">
+          <span class="fs-kpi-label">Ingresos</span>
+          <span class="fs-kpi-value fs-in" id="fs-kpi-ingresos">—</span>
+          <span class="fs-kpi-delta" id="fs-delta-ingresos"></span>
+        </div>
+        <div class="fs-kpi">
+          <span class="fs-kpi-label">Gastos</span>
+          <span class="fs-kpi-value fs-out" id="fs-kpi-gastos">—</span>
+          <span class="fs-kpi-delta" id="fs-delta-gastos"></span>
+        </div>
+        <div class="fs-kpi fs-kpi-wide">
+          <span class="fs-kpi-label">Balance del mes</span>
+          <span class="fs-kpi-value" id="fs-kpi-balance">—</span>
+          <span class="fs-kpi-delta" id="fs-kpi-tasa"></span>
+        </div>
+      </div>
+
+      <div class="pa-card" id="fs-ritmo-card" style="display:none;">
+        <div class="pa-card-title">⏱️ Ritmo de gasto</div>
+        <div id="fs-ritmo-content"></div>
+      </div>
+
+      <div class="pa-card">
+        <div class="pa-card-title">📂 Gastos por categoría</div>
+        <div id="fs-cat-chart"></div>
+      </div>
+
+      <div class="pa-card">
+        <div class="pa-card-title">👥 Gastos por miembro</div>
+        <div id="fs-member-chart"></div>
+      </div>
+
+      <div class="pa-card">
+        <div class="pa-card-title">📈 Tendencia — últimos 6 meses</div>
+        <div class="fs-legend">
+          <span class="fs-legend-item"><span class="fs-dot fs-dot-in"></span> Ingresos</span>
+          <span class="fs-legend-item"><span class="fs-dot fs-dot-out"></span> Gastos</span>
+        </div>
+        <div id="fs-trend-chart"></div>
+        <p class="fs-trend-hint" id="fs-trend-caption"></p>
+      </div>
+
+      <div class="pa-card">
+        <div class="pa-card-title">🔝 Mayores gastos del mes</div>
+        <div id="fs-top-list"></div>
+      </div>
+
+    </div>
   </div>
 
   <!-- Modal de registro: Transacción / Envío Familiar / Cuenta / Deuda -->
@@ -298,17 +386,7 @@
 
         <label class="fin-label" for="fin-t-categoria">Categoría</label>
         <select id="fin-t-categoria" class="fin-select" required>
-          <option value="Alimentación">Alimentación</option>
-          <option value="Transporte">Transporte</option>
-          <option value="Vivienda">Vivienda</option>
-          <option value="Servicios">Servicios (agua, luz, internet)</option>
-          <option value="Salud">Salud</option>
-          <option value="Educación">Educación</option>
-          <option value="Entretenimiento">Entretenimiento</option>
-          <option value="Salario">Salario</option>
-          <option value="Ahorro">Ahorro</option>
-          <option value="Deuda">Pago de deuda</option>
-          <option value="Otros">Otros</option>
+          <option value="Otros">Cargando categorías…</option>
         </select>
 
         <label class="fin-label" for="fin-t-descripcion">Descripción</label>
@@ -391,6 +469,34 @@
         </button>
       </div>
       <div id="fin-detail-content" class="fin-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- Modal de abono a deuda -->
+  <div id="fin-abono-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <h3 class="fin-detail-title">Abonar a Deuda</h3>
+        <button type="button" class="fin-modal-close" id="fin-abono-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="fin-form-abono" class="fin-form">
+        <p class="fin-hint" id="fin-abono-info"></p>
+
+        <label class="fin-label" for="fin-a-monto">Monto del abono</label>
+        <input id="fin-a-monto" class="fin-input" type="number" step="0.01" min="0.01" placeholder="0.00" required>
+
+        <label class="fin-label" for="fin-a-cuenta">Pagar desde la cuenta</label>
+        <select id="fin-a-cuenta" class="fin-select" required>
+          <option value="" disabled selected>Cargando cuentas…</option>
+        </select>
+
+        <label class="fin-label" for="fin-a-fecha">Fecha</label>
+        <input id="fin-a-fecha" class="fin-input" type="date" required>
+
+        <button type="submit" class="fin-submit-btn">Registrar Abono</button>
+      </form>
     </div>
   </div>
 

@@ -2319,3 +2319,108 @@ a { text-decoration: none; color: inherit; }
 .rs-agree-check.rs-agree-done { background: #16a34a; border-color: #16a34a; color: #fff; }
 .rs-agree-text { flex: 1; font-size: 13px; color: var(--text); line-height: 1.4; }
 .rs-agree-text-done { text-decoration: line-through; color: var(--muted); }
+
+/* ====== FINANZAS: MEJORAS Y ESTADISTICAS ====== */
+
+/* Delta en la tarjeta de gastos del mes */
+.fin-card-delta { font-size: 11px; font-weight: 700; opacity: .9; margin-top: -4px; margin-bottom: 6px; min-height: 13px; }
+
+/* Boton hacia estadisticas */
+.fin-stats-btn {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-mid));
+  color: #fff; border: none; border-radius: var(--r-sm);
+  padding: 14px 16px; font-size: 14px; font-weight: 700;
+  cursor: pointer; margin: 14px 0;
+  box-shadow: 0 4px 12px rgba(30,58,124,.25);
+  transition: transform .15s;
+}
+.fin-stats-btn:active { transform: scale(.97); }
+.fin-stats-btn i:first-child { font-size: 18px; }
+.fin-stats-arrow { margin-left: auto; opacity: .7; }
+
+/* Cabecera y filtros de movimientos */
+.fin-mov-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.fin-mov-title { margin: 0 !important; }
+.fin-see-all-btn { background: none; border: none; color: var(--brand); font-weight: 700; font-size: 12px; cursor: pointer; padding: 4px 0; }
+.fin-mov-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.fin-mov-tappable { cursor: pointer; }
+.fin-mov-tappable:active { background: var(--bg); }
+
+/* Colores de montos en el detalle */
+.fin-detail-in { color: #16a34a !important; }
+.fin-detail-transfer { color: var(--muted) !important; }
+
+/* KPIs de estadisticas */
+.fs-month-nav { margin-bottom: 14px; }
+.fs-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.fs-kpi {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 3px; box-shadow: var(--shadow);
+}
+.fs-kpi-wide { grid-column: 1 / -1; }
+.fs-kpi-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+.fs-kpi-value { font-size: 20px; font-weight: 800; color: var(--text); }
+.fs-kpi-value.fs-in  { color: #16a34a; }
+.fs-kpi-value.fs-out { color: #dc2626; }
+.fs-kpi-delta { font-size: 11px; font-weight: 600; color: var(--muted); min-height: 13px; }
+.fs-delta-good { color: #16a34a; }
+.fs-delta-bad  { color: #dc2626; }
+
+/* Ritmo de gasto */
+.fs-ritmo-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.fs-ritmo-row:last-child { border-bottom: none; }
+.fs-ritmo-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+.fs-ritmo-value { font-size: 13px; font-weight: 800; color: var(--text); }
+.fs-ritmo-value.fs-in  { color: #16a34a; }
+.fs-ritmo-value.fs-out { color: #dc2626; }
+
+/* Barras horizontales (categorias / miembros) */
+.fs-bar-row { display: grid; grid-template-columns: minmax(90px, 40%) 1fr auto; align-items: center; gap: 8px; margin-bottom: 9px; }
+.fs-bar-name { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fs-bar-track { background: var(--bg); border-radius: 4px; height: 10px; overflow: hidden; }
+.fs-bar-fill { height: 100%; background: var(--brand-mid); border-radius: 0 4px 4px 0; min-width: 2px; }
+.fs-bar-val { font-size: 11px; font-weight: 700; color: var(--text); text-align: right; white-space: nowrap; }
+.fs-bar-pct { color: var(--muted); font-weight: 600; }
+
+/* Leyenda de la tendencia */
+.fs-legend { display: flex; gap: 14px; margin-bottom: 10px; }
+.fs-legend-item { font-size: 11px; font-weight: 600; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.fs-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+.fs-dot-in  { background: #16a34a; }
+.fs-dot-out { background: #dc2626; }
+
+/* Grafica de tendencia (6 meses) */
+.fs-trend { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; align-items: end; }
+.fs-trend-col {
+  display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
+  background: none; border: none; cursor: pointer;
+  border-radius: 8px; padding: 4px 2px; transition: background .15s;
+}
+.fs-trend-col.fs-trend-active { background: var(--bg); }
+.fs-trend-bars { display: flex; align-items: flex-end; gap: 2px; height: 100px; }
+.fs-trend-bar { width: 11px; border-radius: 4px 4px 0 0; min-height: 1px; }
+.fs-trend-bar-in  { background: #16a34a; }
+.fs-trend-bar-out { background: #dc2626; }
+.fs-trend-month { font-size: 10px; font-weight: 700; color: var(--muted); margin-top: 5px; text-transform: capitalize; }
+.fs-trend-hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 10px; min-height: 14px; font-weight: 600; }
+
+/* Deudas: tarjeta con progreso y acciones */
+.fin-deuda-card { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.fin-deuda-card:last-child { border-bottom: none; }
+.fin-deuda-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 3px; }
+.fin-deuda-track { margin-top: 8px; }
+.fin-deuda-fill-done { background: #16a34a; }
+.fin-deuda-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 9px; }
+.fin-abono-btn {
+  background: #dcfce7; color: #16a34a; border: none;
+  border-radius: 8px; padding: 7px 12px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+.fin-abono-btn:active { transform: scale(.95); }
+
+/* Tonos del pie de totales del detalle mensual */
+.fin-month-total.fin-total-in  span:last-child { color: #16a34a; }
+.fin-month-total.fin-total-out span:last-child { color: #dc2626; }
