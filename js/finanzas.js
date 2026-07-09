@@ -32,6 +32,53 @@ const FIN_CATS_INGRESO = [
   { v: 'Otros',    e: '📦', label: 'Otros' },
 ];
 
+// Categorías propias del presupuesto de la escuela.
+const FIN_CATS_EGRESO_ESCUELA = [
+  { v: 'Material Didáctico',   e: '📖', label: 'Material Didáctico' },
+  { v: 'Papelería',            e: '📎', label: 'Papelería' },
+  { v: 'Mantenimiento',        e: '🔧', label: 'Mantenimiento' },
+  { v: 'Aseo y Limpieza',      e: '🧹', label: 'Aseo y Limpieza' },
+  { v: 'Actividades Escolares', e: '🎉', label: 'Actividades Escolares' },
+  { v: 'Alimentación',         e: '🍚', label: 'Alimentación / Merienda' },
+  { v: 'Transporte',           e: '🚌', label: 'Transporte' },
+  { v: 'Mobiliario',           e: '🪑', label: 'Mobiliario y Equipo' },
+  { v: 'Deuda',                e: '💳', label: 'Pago de deuda' },
+  { v: 'Otros',                e: '📦', label: 'Otros' },
+];
+const FIN_CATS_INGRESO_ESCUELA = [
+  { v: 'Fondos Asignados',   e: '🏛️', label: 'Fondos Asignados' },
+  { v: 'Aportes de Padres',  e: '👪', label: 'Aportes de Padres' },
+  { v: 'Ventas y Rifas',     e: '🎟️', label: 'Ventas y Rifas' },
+  { v: 'Donaciones',         e: '🤝', label: 'Donaciones' },
+  { v: 'Otros',              e: '📦', label: 'Otros' },
+];
+
+// Contexto del presupuesto activo: 'familia' | 'escuela'. Cada contexto tiene
+// sus propias cuentas, movimientos, deudas y estadísticas; nunca se mezclan.
+let _finContexto = 'familia';
+
+// ¿La base de datos ya tiene la columna `contexto`? (null = aún no verificado)
+// Si no existe, el modo Familia sigue funcionando igual que siempre y el modo
+// Escuela pide ejecutar el script supabase/sql/finanzas_contexto.sql.
+let _finCtxSupported = null;
+
+async function _finCheckContexto() {
+  if (_finCtxSupported !== null || !_sb) return _finCtxSupported;
+  const { error } = await _sb.from(FIN_CUENTAS_TABLE).select('contexto').limit(1);
+  _finCtxSupported = !error;
+  return _finCtxSupported;
+}
+
+// Aplica el filtro de contexto a una consulta (si la columna ya existe).
+function _finCtx(q) {
+  return _finCtxSupported ? q.eq('contexto', _finContexto) : q;
+}
+
+// Datos de contexto para agregar a un insert (si la columna ya existe).
+function _finCtxData() {
+  return _finCtxSupported ? { contexto: _finContexto } : {};
+}
+
 let _finCuentasCache   = [];
 let _finGastosMesCache = [];
 let _finDeudasCache    = [];
@@ -85,8 +132,19 @@ function _finFormatDate(iso) {
 
 function _finCatEmoji(cat) {
   if (cat === FIN_TRANSFER_CATEGORY) return '🔁';
-  const found = FIN_CATS_EGRESO.find(c => c.v === cat) || FIN_CATS_INGRESO.find(c => c.v === cat);
+  const found = FIN_CATS_EGRESO.find(c => c.v === cat)
+    || FIN_CATS_INGRESO.find(c => c.v === cat)
+    || FIN_CATS_EGRESO_ESCUELA.find(c => c.v === cat)
+    || FIN_CATS_INGRESO_ESCUELA.find(c => c.v === cat);
   return found ? found.e : '📦';
+}
+
+// Lista de categorías según tipo y contexto activo.
+function _finCats(tipo) {
+  if (_finContexto === 'escuela') {
+    return tipo === 'ingreso' ? FIN_CATS_INGRESO_ESCUELA : FIN_CATS_EGRESO_ESCUELA;
+  }
+  return tipo === 'ingreso' ? FIN_CATS_INGRESO : FIN_CATS_EGRESO;
 }
 
 // Rellena el select de categoría según el tipo. Si `selected` es una categoría
@@ -94,7 +152,7 @@ function _finCatEmoji(cat) {
 function _finFillCategoriaSelect(tipo, selected) {
   const select = document.getElementById('fin-t-categoria');
   if (!select) return;
-  const cats = tipo === 'ingreso' ? FIN_CATS_INGRESO : FIN_CATS_EGRESO;
+  const cats = _finCats(tipo);
   select.innerHTML = '';
   cats.forEach(c => {
     const opt = document.createElement('option');
@@ -122,15 +180,18 @@ async function initFinanzas() {
     return;
   }
 
+  await _finCheckContexto();
+  _finUpdateContextoUI();
+
   const now = new Date();
   const prevRange = _finMonthRange(now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear(),
                                    now.getMonth() === 0 ? 11 : now.getMonth() - 1);
 
   const [cuentasRes, gastosRes, gastosPrevRes, deudasRes] = await Promise.all([
-    _sb.from(FIN_CUENTAS_TABLE).select('*').order('nombre'),
-    _sb.from(FIN_TRANSACCIONES_TABLE).select('*').eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', _finStartOfMonth()).order('fecha', { ascending: false }),
-    _sb.from(FIN_TRANSACCIONES_TABLE).select('monto').eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', prevRange.start).lt('fecha', prevRange.end),
-    _sb.from(FIN_DEUDAS_TABLE).select('*').order('fecha_limite', { ascending: true, nullsFirst: false }),
+    _finCtx(_sb.from(FIN_CUENTAS_TABLE).select('*')).order('nombre'),
+    _finCtx(_sb.from(FIN_TRANSACCIONES_TABLE).select('*')).eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', _finStartOfMonth()).order('fecha', { ascending: false }),
+    _finCtx(_sb.from(FIN_TRANSACCIONES_TABLE).select('monto')).eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', prevRange.start).lt('fecha', prevRange.end),
+    _finCtx(_sb.from(FIN_DEUDAS_TABLE).select('*')).order('fecha_limite', { ascending: true, nullsFirst: false }),
   ]);
 
   if (cuentasRes.error) {
@@ -218,9 +279,9 @@ async function _finApplyBalanceDelta(cuentaId, delta) {
 // Trae los egresos reales (sin envíos familiares) de un mes concreto.
 async function _finFetchGastosMes(year, month) {
   const { start, end } = _finMonthRange(year, month);
-  const { data, error } = await _sb
+  const { data, error } = await _finCtx(_sb
     .from(FIN_TRANSACCIONES_TABLE)
-    .select('*')
+    .select('*'))
     .eq('tipo', 'egreso')
     .neq('categoria', FIN_TRANSFER_CATEGORY)
     .gte('fecha', start)
@@ -237,9 +298,9 @@ async function _finFetchGastosMes(year, month) {
 // Trae TODOS los movimientos (ingresos, egresos y envíos) de un mes concreto.
 async function _finFetchMovimientosMes(year, month) {
   const { start, end } = _finMonthRange(year, month);
-  const { data, error } = await _sb
+  const { data, error } = await _finCtx(_sb
     .from(FIN_TRANSACCIONES_TABLE)
-    .select('*')
+    .select('*'))
     .gte('fecha', start)
     .lt('fecha', end)
     .order('fecha', { ascending: false })
@@ -255,7 +316,7 @@ async function finLoadMovimientos() {
   const container = document.getElementById('fin-movimientos-list');
   if (!container || !_sb) return;
 
-  let query = _sb.from(FIN_TRANSACCIONES_TABLE).select('*');
+  let query = _finCtx(_sb.from(FIN_TRANSACCIONES_TABLE).select('*'));
 
   if (_finMovFilter === 'ingreso') {
     query = query.eq('tipo', 'ingreso').neq('categoria', FIN_TRANSFER_CATEGORY);
@@ -592,6 +653,7 @@ async function finSubmitAbono(e) {
     fecha,
     usuario: _finCurrentUserName(),
     cuenta_id: cuentaId,
+    ..._finCtxData(),
   });
   if (errTrans) {
     console.error('[Finanzas] Error guardando el gasto del abono:', errTrans);
@@ -960,6 +1022,7 @@ async function finSubmitTransaccion(e) {
     tipo, monto, categoria, descripcion, fecha,
     usuario: _finCurrentUserName(),
     cuenta_id: cuentaId,
+    ..._finCtxData(),
   });
 
   if (errInsert) {
@@ -1007,8 +1070,8 @@ async function finSubmitTransferencia(e) {
   // ambos bajo la categoría reservada para que NO se cuenten como
   // gasto/ingreso real en el dashboard.
   const { error: errInsert } = await _sb.from(FIN_TRANSACCIONES_TABLE).insert([
-    { tipo: 'egreso',  monto, categoria: FIN_TRANSFER_CATEGORY, descripcion, fecha, usuario, cuenta_id: origenId },
-    { tipo: 'ingreso', monto, categoria: FIN_TRANSFER_CATEGORY, descripcion, fecha, usuario, cuenta_id: destinoId },
+    { tipo: 'egreso',  monto, categoria: FIN_TRANSFER_CATEGORY, descripcion, fecha, usuario, cuenta_id: origenId, ..._finCtxData() },
+    { tipo: 'ingreso', monto, categoria: FIN_TRANSFER_CATEGORY, descripcion, fecha, usuario, cuenta_id: destinoId, ..._finCtxData() },
   ]);
 
   if (errInsert) {
@@ -1068,7 +1131,7 @@ async function finSubmitCuenta(e) {
   const btn = e.target.querySelector('.fin-submit-btn');
   if (btn) btn.disabled = true;
 
-  const { error } = await _sb.from(FIN_CUENTAS_TABLE).insert({ nombre, saldo_actual: saldo });
+  const { error } = await _sb.from(FIN_CUENTAS_TABLE).insert({ nombre, saldo_actual: saldo, ..._finCtxData() });
 
   if (error) {
     console.error('[Finanzas] Error guardando cuenta:', error);
@@ -1101,6 +1164,7 @@ async function finSubmitDeuda(e) {
     monto_pagado: montoPagado,
     fecha_limite: fechaLimite,
     estado: montoPagado >= montoTotal ? 'pagada' : 'pendiente',
+    ..._finCtxData(),
   });
 
   if (error) {
@@ -1116,6 +1180,57 @@ async function finSubmitDeuda(e) {
 }
 
 /* ─────────────────────────────────────────────
+   CONTEXTO: FAMILIA ⇄ ESCUELA
+───────────────────────────────────────────── */
+
+async function finToggleContexto() {
+  const ok = await _finCheckContexto();
+  if (!ok) {
+    if (typeof toast === 'function') {
+      toast('Falta habilitar la base de datos: ejecuta supabase/sql/finanzas_contexto.sql en Supabase');
+    }
+    return;
+  }
+  _finContexto = _finContexto === 'familia' ? 'escuela' : 'familia';
+
+  // Limpia el filtro de movimientos para no confundir al cambiar de mundo.
+  _finMovFilter = '';
+  document.querySelectorAll('#fin-mov-chips .fam-chip').forEach(c =>
+    c.classList.toggle('fam-chip-active', c.dataset.movfilter === ''));
+
+  _finUpdateContextoUI();
+  if (typeof toast === 'function') {
+    toast(_finContexto === 'escuela' ? '🏫 Finanzas de la Escuela' : '🏠 Finanzas de la Familia');
+  }
+  await initFinanzas();
+}
+
+function _finUpdateContextoUI() {
+  const esEscuela = _finContexto === 'escuela';
+
+  const title = document.getElementById('fin-view-title');
+  if (title) title.textContent = esEscuela ? 'Finanzas · Escuela' : 'Finanzas';
+
+  const statsTitle = document.getElementById('fs-view-title');
+  if (statsTitle) statsTitle.textContent = esEscuela ? 'Estadísticas · Escuela' : 'Estadísticas';
+
+  const saldoLabel = document.getElementById('fin-saldo-label');
+  if (saldoLabel) saldoLabel.textContent = esEscuela ? 'Saldo Escolar Disponible' : 'Saldo Familiar Disponible';
+
+  const label = document.getElementById('fin-ctx-label');
+  if (label) label.textContent = esEscuela ? 'Volver a Finanzas de la Familia' : 'Finanzas Escuela Josué Polanco';
+
+  const icon = document.getElementById('fin-ctx-icon');
+  if (icon) icon.className = 'fa-solid ' + (esEscuela ? 'fa-house' : 'fa-school');
+
+  const btn = document.getElementById('fin-ctx-btn');
+  if (btn) btn.classList.toggle('fin-ctx-btn-volver', esEscuela);
+
+  // El select de categorías del formulario depende del contexto.
+  _finFillCategoriaSelect(document.getElementById('fin-t-tipo')?.value || 'egreso');
+}
+
+/* ─────────────────────────────────────────────
    ESTADÍSTICAS
    Todo se calcula a partir de las transacciones reales
    (los envíos familiares se excluyen siempre).
@@ -1125,6 +1240,7 @@ let _finStatsView = null; // { year, month(0-based) }
 
 async function initFinStats() {
   if (!_sb) return;
+  await _finCheckContexto();
   if (!_finStatsView) {
     const now = new Date();
     _finStatsView = { year: now.getFullYear(), month: now.getMonth() };
@@ -1148,9 +1264,9 @@ async function _finFetchStatsRange(year, month) {
   const start = `${startDate.getFullYear()}-${pad(startDate.getMonth() + 1)}-01`;
   const { end } = _finMonthRange(year, month);
 
-  const { data, error } = await _sb
+  const { data, error } = await _finCtx(_sb
     .from(FIN_TRANSACCIONES_TABLE)
-    .select('tipo, monto, categoria, descripcion, fecha, usuario')
+    .select('tipo, monto, categoria, descripcion, fecha, usuario'))
     .neq('categoria', FIN_TRANSFER_CATEGORY)
     .gte('fecha', start)
     .lt('fecha', end)
@@ -1504,6 +1620,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fin-abono-overlay')?.addEventListener('click', e => {
     if (e.target.id === 'fin-abono-overlay') finCloseAbono();
   });
+
+  // Cambio de presupuesto: Familia ⇄ Escuela.
+  document.getElementById('fin-ctx-btn')?.addEventListener('click', finToggleContexto);
 
   // Estadísticas.
   document.getElementById('fin-goto-stats')?.addEventListener('click', () => switchView('view-fin-stats'));

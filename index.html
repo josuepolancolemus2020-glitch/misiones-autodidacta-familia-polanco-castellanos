@@ -235,14 +235,14 @@
   <div id="view-finanzas" class="view">
     <header class="app-header compact">
       <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
-      <h1 class="view-title">Finanzas</h1>
+      <h1 class="view-title" id="fin-view-title">Finanzas</h1>
       <div></div>
     </header>
     <div class="view-scroll fin-scroll">
 
       <div class="fin-summary-grid">
         <button type="button" class="fin-summary-card fin-balance" data-findetail="saldo">
-          <div class="fin-card-label">Saldo Familiar Disponible</div>
+          <div class="fin-card-label" id="fin-saldo-label">Saldo Familiar Disponible</div>
           <div class="fin-card-value" id="fin-saldo-total">—</div>
           <div class="fin-card-hint">Ver detalle <i class="fa-solid fa-chevron-right"></i></div>
         </button>
@@ -262,6 +262,12 @@
       <button type="button" class="fin-stats-btn" id="fin-goto-stats">
         <i class="fa-solid fa-chart-pie"></i>
         <span>Estadísticas y Análisis</span>
+        <i class="fa-solid fa-chevron-right fin-stats-arrow"></i>
+      </button>
+
+      <button type="button" class="fin-ctx-btn" id="fin-ctx-btn">
+        <i class="fa-solid fa-school" id="fin-ctx-icon"></i>
+        <span id="fin-ctx-label">Finanzas Escuela Josué Polanco</span>
         <i class="fa-solid fa-chevron-right fin-stats-arrow"></i>
       </button>
 
@@ -292,7 +298,7 @@
       <button class="back-icon-btn" id="fin-stats-back-btn" aria-label="Volver a Finanzas">
         <i class="fa-solid fa-arrow-left"></i>
       </button>
-      <h1 class="view-title">Estadísticas</h1>
+      <h1 class="view-title" id="fs-view-title">Estadísticas</h1>
       <div></div>
     </header>
     <div class="view-scroll">
