@@ -1183,6 +1183,16 @@ async function finSubmitDeuda(e) {
    CONTEXTO: FAMILIA ⇄ ESCUELA
 ───────────────────────────────────────────── */
 
+// Acceso directo al presupuesto de la escuela (desde el Acceso Rápido del inicio).
+async function finGoEscuela() {
+  const ok = await _finCheckContexto();
+  if (ok) _finContexto = 'escuela';
+  switchView('view-finanzas');
+  if (!ok && typeof toast === 'function') {
+    toast('Falta habilitar la base de datos: ejecuta supabase/sql/finanzas_contexto.sql');
+  }
+}
+
 async function finToggleContexto() {
   const ok = await _finCheckContexto();
   if (!ok) {

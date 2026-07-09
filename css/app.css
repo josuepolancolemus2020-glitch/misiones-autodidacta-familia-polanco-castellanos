@@ -2462,3 +2462,64 @@ body {
 }
 .view { height: 100%; }
 .login-screen { height: 100%; }
+
+/* ====== NAVEGACION INFERIOR ====== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; width: 100%;
+  height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex; z-index: 90;
+  box-shadow: 0 -4px 16px rgba(15,23,42,.08);
+}
+.nav-item {
+  flex: 1; background: none; border: none; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .2px;
+}
+.nav-item i { font-size: 19px; transition: transform .15s; }
+.nav-item.active { color: var(--brand); }
+.nav-item:active i { transform: scale(.88); }
+
+/* El FAB de finanzas flota por encima de la barra */
+.fin-fab { bottom: calc(var(--nav-h) + 16px + env(safe-area-inset-bottom, 0px)); }
+
+/* En pantallas grandes la barra se centra y el scroll le deja espacio */
+@media (min-width: 600px) {
+  .view-scroll { padding-bottom: calc(var(--nav-h) + 28px); }
+  .bottom-nav { left: 50%; transform: translateX(-50%); max-width: 700px; }
+}
+@media (min-width: 1024px) {
+  .view-scroll { padding-bottom: calc(var(--nav-h) + 32px); }
+  .bottom-nav { max-width: 960px; }
+}
+
+/* ====== ACCESO RAPIDO (inicio) ====== */
+.qa-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px 8px; margin-bottom: 24px;
+}
+.qa-item {
+  background: none; border: none; cursor: pointer; padding: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.qa-icon {
+  width: 54px; height: 54px; border-radius: 18px; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 21px; box-shadow: var(--shadow-md);
+  transition: transform .15s;
+}
+.qa-item:active .qa-icon { transform: scale(.9); }
+.qa-label { font-size: 11px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.15; }
+.qa-hab { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.qa-red { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
+.qa-pro { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+.qa-inv { background: linear-gradient(135deg, #0d9488, #2dd4bf); }
+.qa-esc { background: linear-gradient(135deg, #b45309, #f59e0b); }
+.qa-est { background: linear-gradient(135deg, #db2777, #f472b6); }
+.qa-col { background: linear-gradient(135deg, #ea580c, #fb923c); }
+.qa-fam { background: linear-gradient(135deg, #1e3a7c, #3b82f6); }
+
+/* Etiqueta de seccion "Herramientas" dentro del drawer */
+.drawer-tools-label { margin-top: 14px; }

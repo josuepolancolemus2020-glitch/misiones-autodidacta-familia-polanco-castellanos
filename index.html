@@ -65,17 +65,6 @@
     </header>
     <div class="view-scroll">
 
-      <!-- Pensador del día -->
-      <div class="pensador-card">
-        <div class="pensador-foto-wrap">
-          <img src="img/leonardo-da-vinci.jpg" alt="Leonardo da Vinci" class="pensador-foto">
-        </div>
-        <div class="pensador-cita">
-          <p class="pensador-text">El aprendizaje continuo es el camino a la grandeza personal y familiar. ¡Caminemos juntos!</p>
-          <span class="pensador-autor">— Leonardo da Vinci</span>
-        </div>
-      </div>
-
       <!-- Saludo y Motivación -->
       <div class="motivacion-card">
         <div class="motiv-greeting">
@@ -90,8 +79,44 @@
           <span class="motiv-autor" id="motiv-autor"></span>
         </div>
       </div>
-    <div class="selectors-container">
+      <!-- Acceso rápido: todo a un toque -->
+      <h2 class="section-title">Acceso Rápido</h2>
+      <div class="qa-grid" id="quick-access">
+        <button type="button" class="qa-item" data-qa="view-habitos">
+          <span class="qa-icon qa-hab"><i class="fa-solid fa-seedling"></i></span>
+          <span class="qa-label">Hábitos</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-redes">
+          <span class="qa-icon qa-red"><i class="fa-solid fa-mobile-screen-button"></i></span>
+          <span class="qa-label">Redes</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-progreso">
+          <span class="qa-icon qa-pro"><i class="fa-solid fa-chart-line"></i></span>
+          <span class="qa-label">Progreso</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-inventario">
+          <span class="qa-icon qa-inv"><i class="fa-solid fa-boxes-stacked"></i></span>
+          <span class="qa-label">Inventario</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="escuela">
+          <span class="qa-icon qa-esc"><i class="fa-solid fa-school"></i></span>
+          <span class="qa-label">Escuela</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-fin-stats">
+          <span class="qa-icon qa-est"><i class="fa-solid fa-chart-pie"></i></span>
+          <span class="qa-label">Estadísticas</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-collage">
+          <span class="qa-icon qa-col"><i class="fa-solid fa-images"></i></span>
+          <span class="qa-label">Collage</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-perfil">
+          <span class="qa-icon qa-fam"><i class="fa-solid fa-people-roof"></i></span>
+          <span class="qa-label">Herramientas</span>
+        </button>
+      </div>
 
+      <div class="selectors-container">
         <div class="selector-group">
           <label><i class="fa-solid fa-users"></i> Ver Miembro</label>
           <select id="member-select" class="custom-select">
@@ -101,17 +126,6 @@
             <option value="angelly">Angelly</option>
           </select>
         </div>
-
-        <div class="selector-group">
-          <label><i class="fa-solid fa-table-cells-large"></i> Ver Módulo</label>
-          <select id="module-select" class="custom-select">
-            <option value="finanzas">Finanzas</option>
-            <option value="organizacion">Organización</option>
-            <option value="salud">Salud y Bienestar</option>
-            <option value="aprendizaje-unido" selected>Aprendizaje Unido</option>
-          </select>
-        </div>
-
       </div>
 
       <!-- Módulos -->
@@ -126,6 +140,17 @@
         <div id="recent-wrap" hidden>
           <h2 class="section-title">Continúa explorando</h2>
           <div id="recent-list" class="small-list"></div>
+        </div>
+      </div>
+
+      <!-- Pensador del día -->
+      <div class="pensador-card">
+        <div class="pensador-foto-wrap">
+          <img src="img/leonardo-da-vinci.jpg" alt="Leonardo da Vinci" class="pensador-foto">
+        </div>
+        <div class="pensador-cita">
+          <p class="pensador-text">El aprendizaje continuo es el camino a la grandeza personal y familiar. ¡Caminemos juntos!</p>
+          <span class="pensador-autor">— Leonardo da Vinci</span>
         </div>
       </div>
 
@@ -873,6 +898,19 @@
       <button class="drawer-item" data-view="view-chat">
         <i class="fa-solid fa-comments"></i><span>Chat Familiar</span>
       </button>
+      <div class="drawer-section-label drawer-tools-label">Herramientas</div>
+      <button class="drawer-item" data-view="view-finanzas">
+        <i class="fa-solid fa-sack-dollar"></i><span>Finanzas</span>
+      </button>
+      <button class="drawer-item" data-view="view-habitos">
+        <i class="fa-solid fa-seedling"></i><span>Tracker de Hábitos</span>
+      </button>
+      <button class="drawer-item" data-view="view-redes">
+        <i class="fa-solid fa-mobile-screen-button"></i><span>Redes Sociales</span>
+      </button>
+      <button class="drawer-item" data-view="view-inventario">
+        <i class="fa-solid fa-boxes-stacked"></i><span>Inventario Familiar</span>
+      </button>
       <button class="drawer-item" data-view="view-perfil">
         <i class="fa-solid fa-people-roof"></i><span>Herramientas de Familia</span>
       </button>
@@ -897,6 +935,25 @@
       </button>
     </div>
   </aside>
+
+  <!-- ========== NAVEGACIÓN INFERIOR ========== -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Navegación principal">
+    <button type="button" class="nav-item active" data-view="view-inicio">
+      <i class="fa-solid fa-house"></i><span>Inicio</span>
+    </button>
+    <button type="button" class="nav-item" data-view="view-misiones">
+      <i class="fa-solid fa-graduation-cap"></i><span>Misiones</span>
+    </button>
+    <button type="button" class="nav-item" data-view="view-habitos">
+      <i class="fa-solid fa-seedling"></i><span>Hábitos</span>
+    </button>
+    <button type="button" class="nav-item" data-view="view-chat">
+      <i class="fa-solid fa-comments"></i><span>Chat</span>
+    </button>
+    <button type="button" class="nav-item" data-view="view-finanzas">
+      <i class="fa-solid fa-sack-dollar"></i><span>Finanzas</span>
+    </button>
+  </nav>
 
   </div>
 

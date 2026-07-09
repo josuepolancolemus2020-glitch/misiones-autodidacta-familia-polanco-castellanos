@@ -405,6 +405,15 @@ function switchView(id) {
   const item = document.querySelector(`.drawer-item[data-view="${id}"]`);
   if (item) item.classList.add('active');
 
+  // Barra inferior: marcar destino activo y ocultarla en el Chat
+  // (ahí la barra de escritura ocupa el borde inferior).
+  const bottomNav = document.getElementById('bottom-nav');
+  if (bottomNav) {
+    bottomNav.style.display = id === 'view-chat' ? 'none' : 'flex';
+    bottomNav.querySelectorAll('.nav-item').forEach(b =>
+      b.classList.toggle('active', b.dataset.view === id));
+  }
+
   if (id === 'view-inicio')   renderHome();
   if (id === 'view-misiones') renderMissions(currentQuery);
   if (id === 'view-progreso') renderProgress();
@@ -493,16 +502,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Selector de módulo (acceso rápido)
-  const moduleEl = document.getElementById('module-select');
-  if (moduleEl) {
-    moduleEl.addEventListener('change', () => {
-      const mod = MODULES.find(x => x.id === moduleEl.value);
-      goToModule(moduleEl.value);
-      if (!mod || !mod.ready) moduleEl.value = 'aprendizaje-unido';
-      moduleEl.blur();
-    });
-  }
+  // Barra de navegación inferior
+  document.getElementById('bottom-nav')?.addEventListener('click', e => {
+    const btn = e.target.closest('.nav-item');
+    if (btn) switchView(btn.dataset.view);
+  });
+
+  // Acceso Rápido del inicio
+  document.getElementById('quick-access')?.addEventListener('click', e => {
+    const btn = e.target.closest('[data-qa]');
+    if (!btn) return;
+    if (btn.dataset.qa === 'escuela') {
+      if (typeof finGoEscuela === 'function') finGoEscuela();
+      return;
+    }
+    switchView(btn.dataset.qa);
+  });
 
   // Tarjetas de "Explorar Módulos"
   document.getElementById('modules-grid')?.addEventListener('click', e => {
@@ -550,52 +565,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Acceso directo al Chat Familiar
   document.getElementById('chat-shortcut-btn')?.addEventListener('click', () => switchView('view-chat'));
 
-  // ── Header oculto al hacer scroll (acumulador anti-tembladera) ──
-  document.querySelectorAll('.view-scroll').forEach(scroll => {
-    let lastY = 0;
-    let accumulated = 0;
-    let ticking = false;
-    const HIDE_THRESHOLD = 22;
-
-    scroll.addEventListener('scroll', () => {
-      if (ticking) return;
-      const active = document.activeElement;
-      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const view   = scroll.closest('.view');
-        const header = view && view.querySelector('.app-header');
-        // Solo ocultar header en vistas principales (hamburguesa), nunca en vistas secundarias (botón atrás).
-        // En el Chat se deja siempre fijo: con el aviso de notificaciones y los chips de tema
-        // arriba, esconder el header se sentía como un temblor en vez de algo suave.
-        if (!header || !header.querySelector('.hamburger-btn') || view.id === 'view-chat') { ticking = false; return; }
-        const y = Math.max(0, scroll.scrollTop);
-
-        if (y <= 4) {
-          header.style.transform = '';
-          header.style.marginBottom = '';
-          lastY = 0; accumulated = 0;
-          ticking = false;
-          return;
-        }
-
-        const delta = y - lastY;
-        lastY = y;
-        accumulated += delta;
-
-        if (accumulated > HIDE_THRESHOLD && y > 56) {
-          const h = header.offsetHeight;
-          header.style.transform = `translateY(-${h}px)`;
-          header.style.marginBottom = `-${h}px`;
-          accumulated = 0;
-        } else if (accumulated < -HIDE_THRESHOLD) {
-          header.style.transform = '';
-          header.style.marginBottom = '';
-          accumulated = 0;
-        }
-        ticking = false;
-      });
-    }, { passive: true });
-  });
+  // El header ya no se oculta al hacer scroll: el efecto (transform +
+  // margen negativo) reacomodaba el layout cerca del fondo y producía
+  // la tembladera del encabezado. Los headers son compactos y fijos.
 
 });
