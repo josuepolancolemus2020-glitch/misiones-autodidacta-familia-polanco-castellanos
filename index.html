@@ -100,11 +100,11 @@
         </button>
         <button type="button" class="qa-item" data-qa="escuela">
           <span class="qa-icon qa-esc"><i class="fa-solid fa-school"></i></span>
-          <span class="qa-label">Escuela</span>
+          <span class="qa-label">Finanzas Escuela</span>
         </button>
         <button type="button" class="qa-item" data-qa="view-fin-stats">
           <span class="qa-icon qa-est"><i class="fa-solid fa-chart-pie"></i></span>
-          <span class="qa-label">Estadísticas</span>
+          <span class="qa-label">Estadísticas Finanzas</span>
         </button>
         <button type="button" class="qa-item" data-qa="view-collage">
           <span class="qa-icon qa-col"><i class="fa-solid fa-images"></i></span>
@@ -128,8 +128,8 @@
         </div>
       </div>
 
-      <!-- Módulos -->
-      <h2 class="section-title">Explorar Módulos</h2>
+      <!-- Materias de aprendizaje -->
+      <h2 class="section-title">Materias de Aprendizaje</h2>
       <div class="modules-grid" id="modules-grid"></div>
 
       <!-- Featured + Recent -->
@@ -168,6 +168,14 @@
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input id="search-input" type="search" placeholder="Buscar misión…" autocomplete="off">
+      </div>
+      <div class="fam-member-chips materia-chips" id="materia-chips">
+        <button type="button" class="fam-chip fam-chip-active" data-materia="">Todas</button>
+        <button type="button" class="fam-chip" data-materia="esp">📖 Español</button>
+        <button type="button" class="fam-chip" data-materia="mat">🔢 Matemáticas</button>
+        <button type="button" class="fam-chip" data-materia="cnat">🔬 C. Naturales</button>
+        <button type="button" class="fam-chip" data-materia="csoc">🌎 C. Sociales</button>
+        <button type="button" class="fam-chip" data-materia="epis">🦉 Epistemología</button>
       </div>
       <div id="missions-container" class="missions-list"></div>
     </div>

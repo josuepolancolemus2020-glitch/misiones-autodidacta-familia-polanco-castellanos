@@ -9,12 +9,14 @@ const MEMBERS = [
   { id: 'angelly', name: 'Angelly Polanco Castellanos',         short: 'Angelly',       emoji: '👧' },
 ];
 
-const MODULES = [
-  { id: 'finanzas',          label: 'Finanzas',          sub: 'Gestión de Presupuesto', icon: 'fa-sack-dollar',    color: 'fin', ready: true,  view: 'view-finanzas' },
-  { id: 'organizacion',      label: 'Organización',      sub: 'Agenda y Eventos',       icon: 'fa-calendar-days',  color: 'org', ready: false },
-  { id: 'salud',             label: 'Salud y Bienestar', sub: 'Citas y Vacunas',        icon: 'fa-heart-pulse',    color: 'sal', ready: false },
-  { id: 'aprendizaje-unido', label: 'Aprendizaje Unido', sub: 'Zonas F.A.R.O.',         icon: 'fa-graduation-cap', color: 'apr', ready: true,  view: 'view-misiones' },
-  { id: 'inventario',        label: 'Inventario Familiar', sub: 'Bienes del Hogar',    icon: 'fa-boxes-stacked',  color: 'inv', ready: true,  view: 'view-inventario' },
+// Materias del área de aprendizaje. Las herramientas (Finanzas, Inventario,
+// Hábitos…) viven en el Acceso Rápido y la barra inferior, no aquí.
+const MATERIAS = [
+  { id: 'esp',  label: 'Español',            sub: 'Lengua y Literatura', icon: 'fa-book-open',            color: 'esp' },
+  { id: 'mat',  label: 'Matemáticas',        sub: 'Números y Lógica',    icon: 'fa-square-root-variable', color: 'mat' },
+  { id: 'cnat', label: 'Ciencias Naturales', sub: 'Vida y Naturaleza',   icon: 'fa-flask',                color: 'cnat' },
+  { id: 'csoc', label: 'Ciencias Sociales',  sub: 'Historia y Sociedad', icon: 'fa-earth-americas',       color: 'csoc' },
+  { id: 'epis', label: 'Epistemología',      sub: 'Filosofía y Ciencia', icon: 'fa-brain',                color: 'bach' },
 ];
 
 const LEVELS = [
@@ -147,32 +149,23 @@ function renderModules() {
   const grid = document.getElementById('modules-grid');
   if (!grid) return;
 
-  grid.innerHTML = MODULES.map(mod => {
-    let countText = 'Próximamente';
-    if (mod.id === 'aprendizaje-unido') {
-      const total = MISSIONS.filter(m => m.modulo === mod.id).length;
-      countText = total === 1 ? '1 misión' : `${total} misiones`;
-    } else if (mod.id === 'finanzas') {
-      countText = 'Abrir dashboard';
-    }
+  grid.innerHTML = MATERIAS.map(mat => {
+    const total = MISSIONS.filter(m => m.materia === mat.id).length;
+    const countText = total === 0 ? 'Próximamente'
+      : (total === 1 ? '1 misión' : `${total} misiones`);
     return `
-      <button class="module-card ${mod.color}${mod.ready ? '' : ' soon'}" data-module="${mod.id}">
-        <i class="fa-solid ${mod.icon} mod-icon"></i>
-        <span class="mod-title">${mod.label}</span>
-        <span class="mod-sub">${mod.sub}</span>
+      <button class="module-card ${mat.color}${total ? '' : ' soon'}" data-materia="${mat.id}">
+        <i class="fa-solid ${mat.icon} mod-icon"></i>
+        <span class="mod-title">${mat.label}</span>
+        <span class="mod-sub">${mat.sub}</span>
         <span class="mod-count">${countText}</span>
       </button>`;
   }).join('');
 }
 
-function goToModule(modId) {
-  const mod = MODULES.find(x => x.id === modId);
-  if (!mod) return;
-  if (mod.ready && mod.view) {
-    switchView(mod.view);
-  } else {
-    toast(`🔜 ${mod.label} estará disponible próximamente`);
-  }
+function goToMateria(matId) {
+  _materiaFilter = matId || '';
+  switchView('view-misiones');
 }
 
 /* ─────────────────────────────────────────────
@@ -249,8 +242,14 @@ function renderMissions(query) {
   const s  = load();
   const ms = memberState(s, s.currentMember);
 
+  // Chips de materia sincronizados con el filtro activo
+  document.querySelectorAll('#materia-chips .fam-chip').forEach(c =>
+    c.classList.toggle('fam-chip-active', (c.dataset.materia || '') === _materiaFilter));
+
   const container = document.getElementById('missions-container');
   let list = [...MISSIONS];
+
+  if (_materiaFilter) list = list.filter(m => m.materia === _materiaFilter);
 
   if (query && query.trim()) {
     const q = query.trim().toLowerCase();
@@ -258,12 +257,18 @@ function renderMissions(query) {
   }
 
   if (!list.length) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔍</div>
-        <h3>Sin resultados</h3>
-        <p>Intenta con otro término de búsqueda.</p>
-      </div>`;
+    const mat = MATERIAS.find(x => x.id === _materiaFilter);
+    container.innerHTML = _materiaFilter && !(query && query.trim())
+      ? `<div class="empty-state">
+          <div class="empty-icon">📚</div>
+          <h3>Aún no hay misiones de ${mat ? mat.label : 'esta materia'}</h3>
+          <p>Muy pronto agregaremos misiones aquí.</p>
+        </div>`
+      : `<div class="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h3>Sin resultados</h3>
+          <p>Intenta con otro término de búsqueda.</p>
+        </div>`;
     return;
   }
 
@@ -316,19 +321,19 @@ function renderProgress() {
     </div>`;
 
   document.getElementById('progress-subjects').innerHTML = `
-    <h2 class="section-title" style="margin-bottom:12px;">Por módulo</h2>
-    ${MODULES.map(mod => {
-      const total = MISSIONS.filter(m => m.modulo === mod.id).length;
-      const done  = MISSIONS.filter(m => m.modulo === mod.id && ms.visited.includes(m.id)).length;
+    <h2 class="section-title" style="margin-bottom:12px;">Por materia</h2>
+    ${MATERIAS.map(mat => {
+      const total = MISSIONS.filter(m => m.materia === mat.id).length;
+      const done  = MISSIONS.filter(m => m.materia === mat.id && ms.visited.includes(m.id)).length;
       const p = total ? Math.round((done / total) * 100) : 0;
       return `
         <div class="sp-item">
           <div class="sp-top">
-            <span class="sp-name">${mod.label}</span>
+            <span class="sp-name">${mat.label}</span>
             <span class="sp-cnt">${done} / ${total}</span>
           </div>
           <div class="sp-track">
-            <div class="sp-fill" style="width:${p}%; background:var(--${mod.color});"></div>
+            <div class="sp-fill" style="width:${p}%; background:var(--${mat.color});"></div>
           </div>
         </div>`;
     }).join('')}`;
@@ -396,6 +401,7 @@ window.visitMission = visitMission;
 ───────────────────────────────────────────── */
 
 let currentQuery = '';
+let _materiaFilter = ''; // '' = todas las materias
 
 function switchView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -519,10 +525,18 @@ document.addEventListener('DOMContentLoaded', () => {
     switchView(btn.dataset.qa);
   });
 
-  // Tarjetas de "Explorar Módulos"
+  // Tarjetas de "Materias de Aprendizaje"
   document.getElementById('modules-grid')?.addEventListener('click', e => {
     const btn = e.target.closest('.module-card');
-    if (btn) goToModule(btn.dataset.module);
+    if (btn) goToMateria(btn.dataset.materia);
+  });
+
+  // Chips de materia en la vista de misiones
+  document.getElementById('materia-chips')?.addEventListener('click', e => {
+    const chip = e.target.closest('[data-materia]');
+    if (!chip) return;
+    _materiaFilter = chip.dataset.materia || '';
+    renderMissions(currentQuery);
   });
 
   // ── Drawer / Hamburguesa ──

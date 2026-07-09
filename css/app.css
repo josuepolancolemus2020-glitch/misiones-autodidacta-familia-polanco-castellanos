@@ -2523,3 +2523,17 @@ body {
 
 /* Etiqueta de seccion "Herramientas" dentro del drawer */
 .drawer-tools-label { margin-top: 14px; }
+
+/* FIX CRITICO: el shell fijo dejaba a #app-container sin altura definida,
+   .view{height:100%} colapsaba y el scroll interno moria. */
+#app-container { height: 100%; }
+
+/* Tarjetas de materias de aprendizaje */
+.module-card.esp  { background: linear-gradient(135deg, var(--esp), #f59e0b); }
+.module-card.mat  { background: linear-gradient(135deg, var(--mat), #60a5fa); }
+.module-card.cnat { background: linear-gradient(135deg, var(--cnat), #2dd4bf); }
+.module-card.csoc { background: linear-gradient(135deg, var(--csoc), #f87171); }
+.module-card.bach { background: linear-gradient(135deg, var(--bach), #a78bfa); }
+
+/* Chips de materias en la vista de misiones */
+.materia-chips { margin-bottom: 14px; }
