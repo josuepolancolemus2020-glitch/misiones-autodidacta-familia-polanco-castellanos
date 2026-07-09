@@ -1742,52 +1742,6 @@ a { text-decoration: none; color: inherit; }
   padding-left: 8px;
 }
 
-/* ====== GOBIERNO ESCOLAR ====== */
-.ge-card {
-  background: var(--surface); border-radius: var(--r);
-  padding: 18px 20px; box-shadow: var(--shadow);
-  border: 1px solid var(--border); border-left: 4px solid var(--brand);
-  margin-bottom: 20px;
-}
-.ge-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.4; }
-.ge-header-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.ge-badge { font-size: 11px; font-weight: 700; background: var(--brand-light); color: #fff; padding: 4px 10px; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-.ge-icon-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .15s; }
-.ge-icon-btn:hover { background: var(--surface); border-color: var(--brand); color: var(--brand); }
-
-.ge-planillas-container { display: flex; flex-direction: column; gap: 16px; margin-bottom: 18px; }
-.ge-planilla { background: var(--bg); padding: 14px; border-radius: var(--r-sm); border: 1px solid var(--border); }
-.ge-planilla label { display: block; font-size: 12px; font-weight: 700; color: var(--brand); margin-bottom: 8px; text-transform: uppercase; }
-.ge-img-upload { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.ge-upload-btn { background: #fff; border: 1px dashed var(--brand-light); color: var(--brand); font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: 8px; cursor: pointer; flex: 1; text-align: center; transition: background .15s; }
-.ge-upload-btn:hover { background: var(--mat-bg); }
-.ge-preview { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brand); background: #fff; }
-.ge-input { width: 100%; border: 1px solid var(--border); padding: 10px 12px; border-radius: 8px; font-size: 14px; outline: none; background: #fff; transition: border-color .15s; }
-.ge-input:focus { border-color: var(--brand-light); }
-.ge-btn { width: 100%; background: var(--brand); color: #fff; font-weight: 700; padding: 12px; border: none; border-radius: 8px; cursor: pointer; transition: background .15s; }
-.ge-btn:hover { background: var(--brand-mid); }
-
-.ge-voting-container { display: flex; gap: 12px; justify-content: space-around; margin-bottom: 12px; }
-.ge-vote-btn { flex: 1; background: var(--bg); border: 2px solid var(--border); border-radius: var(--r); padding: 16px 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; transition: all .15s; }
-.ge-vote-btn:active { transform: scale(0.95); }
-.ge-vote-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--brand-light); background: #fff; pointer-events: none; }
-.ge-vote-name { font-size: 14px; font-weight: 700; color: var(--text); pointer-events: none; text-align: center; }
-
-.ge-feedback { text-align: center; background: #22c55e; color: #fff; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 14px; animation: fadeUp .25s ease; }
-
-.ge-results-list { margin-bottom: 20px; }
-.ge-result-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
-.ge-res-name { font-weight: 700; font-size: 15px; color: var(--text); }
-.ge-res-votes { font-weight: 700; font-size: 14px; color: var(--brand); background: var(--mat-bg); padding: 4px 10px; border-radius: 12px; }
-
-.ge-urnas-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
-.ge-urnas-inputs { display: flex; gap: 10px; margin-bottom: 20px; }
-
-.ge-total-wrap { display: flex; gap: 12px; }
-.ge-total-item { flex: 1; background: var(--brand); color: #fff; padding: 14px; border-radius: var(--r-sm); text-align: center; box-shadow: var(--shadow); }
-.ge-total-label { display: block; font-size: 11px; font-weight: 600; opacity: 0.8; text-transform: uppercase; margin-bottom: 4px; }
-.ge-total-val { display: block; font-size: 24px; font-weight: 800; line-height: 1; }
-
 .proc-footer {
   display: flex;
   justify-content: space-between;
@@ -1997,20 +1951,6 @@ a { text-decoration: none; color: inherit; }
 }
 .back-icon-btn:active { background: var(--bg); }
 
-/* Botón Gobierno Escolar en Herramientas del Docente */
-.teacher-ge-btn {
-  width: 100%; display: flex; align-items: center; gap: 12px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-mid));
-  color: #fff; border: none; border-radius: var(--r-sm);
-  padding: 14px 16px; font-size: 14px; font-weight: 700;
-  cursor: pointer; margin-bottom: 14px;
-  box-shadow: 0 4px 12px rgba(30,58,124,.25);
-  transition: transform .15s, box-shadow .15s;
-}
-.teacher-ge-btn:active { transform: scale(.97); }
-.teacher-ge-btn i:first-child { font-size: 18px; }
-.teacher-ge-arrow { margin-left: auto; opacity: .7; }
-
 .teacher-panel-group { border-left: 4px solid var(--accent) !important; }
 .teacher-panel-head {
   display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
@@ -2035,62 +1975,6 @@ a { text-decoration: none; color: inherit; }
   text-transform: uppercase; letter-spacing: .3px;
 }
 .teacher-tool-coming { opacity: 0.45; }
-
-/* ====== GOBIERNO ESCOLAR – NUEVOS ESTILOS ====== */
-.ge-code-box { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
-.ge-code-input {
-  font-size: 22px !important; font-weight: 800 !important;
-  text-align: center; letter-spacing: 4px; text-transform: uppercase;
-  padding: 14px !important;
-}
-.ge-code-error {
-  background: #fef2f2; border: 1px solid #fecaca;
-  color: #dc2626; padding: 9px 12px; border-radius: 8px;
-  font-size: 13px; font-weight: 600; line-height: 1.4;
-}
-.ge-ballot-header { margin-bottom: 12px; }
-.ge-badge-voter {
-  display: block; margin-bottom: 8px;
-  font-size: 11px; font-weight: 700;
-  background: #22c55e; color: #fff;
-  padding: 4px 12px; border-radius: 12px;
-  text-align: center; letter-spacing: .4px;
-}
-.ge-vote-planilla {
-  font-size: 13px; font-weight: 800; color: var(--brand);
-  text-align: center; pointer-events: none; line-height: 1.2;
-}
-.ge-vote-emoji { font-size: 40px; pointer-events: none; }
-.ge-urna-row-header {
-  display: grid; grid-template-columns: 1fr 72px 72px;
-  gap: 6px; margin-bottom: 4px;
-}
-.ge-urna-col-lbl {
-  font-size: 10px; font-weight: 700; color: var(--muted);
-  text-align: center; text-transform: uppercase; letter-spacing: .5px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.ge-urna-row {
-  display: grid; grid-template-columns: 1fr 72px 72px;
-  gap: 6px; align-items: center; margin-bottom: 6px;
-}
-.ge-urna-lbl { font-size: 12px; font-weight: 700; color: var(--text); }
-.ge-mini-input { width: 72px !important; text-align: center !important; font-weight: 700 !important; padding: 8px 4px !important; }
-.ge-other-urnas { margin-bottom: 16px; }
-.ge-winner-wrap { margin-top: 14px; }
-.ge-winner {
-  background: linear-gradient(135deg, var(--brand), var(--brand-light));
-  color: #fff; padding: 14px; border-radius: var(--r-sm);
-  text-align: center; font-size: 15px; font-weight: 700;
-  animation: fadeUp .3s ease;
-}
-.ge-votes-count { text-align: center; font-size: 12px; color: var(--muted); margin-top: 10px; }
-.ge-preview-section { margin-bottom: 18px; }
-.ge-preview-title { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; text-align: center; }
-.ge-preview-candidates { display: flex; gap: 16px; justify-content: center; }
-.ge-prev-card { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; }
-.ge-big-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--brand); background: #fff; box-shadow: var(--shadow-md); display: block; }
-.ge-big-name { font-size: 12px; font-weight: 700; color: var(--text); text-align: center; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ====== TABLET (600px+) ====== */
 @media (min-width: 600px) {
@@ -2361,3 +2245,77 @@ a { text-decoration: none; color: inherit; }
 .co-grid-overlay .grid-separator-h.is-dragging {
   background-color: rgba(30, 58, 124, 0.08);
 }
+
+/* ====== HERRAMIENTAS DE FAMILIA — Habitos y Redes Sociales ====== */
+
+/* Chips de miembro (compartidos) */
+.fam-member-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.fam-chip {
+  border: 1.5px solid var(--border); background: var(--bg);
+  border-radius: 20px; padding: 8px 14px;
+  font-size: 13px; font-weight: 600; color: var(--text);
+  cursor: pointer; transition: all .15s;
+}
+.fam-chip:active { transform: scale(.95); }
+.fam-chip-active {
+  background: var(--brand); border-color: var(--brand);
+  color: #fff; font-weight: 700;
+}
+
+/* Tracker de Habitos */
+.ht-week-label { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.ht-empty { font-size: 13px; color: var(--muted); text-align: center; padding: 10px 0; }
+.ht-habit {
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 12px; margin-bottom: 10px;
+}
+.ht-habit-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.ht-habit-name { flex: 1; font-size: 14px; font-weight: 700; color: var(--text); word-break: break-word; }
+.ht-streak { font-size: 12px; font-weight: 700; color: #d97706; white-space: nowrap; }
+.ht-del-btn {
+  background: none; border: none; color: #dc2626;
+  cursor: pointer; font-size: 14px; padding: 4px 6px;
+}
+.ht-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.ht-day { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ht-day-lbl { font-size: 10px; font-weight: 700; color: var(--muted); }
+.ht-day-dot {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid var(--border); background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: transparent; cursor: pointer; transition: all .15s;
+}
+.ht-day-dot:active { transform: scale(.9); }
+.ht-day-dot.ht-done { background: #16a34a; border-color: #16a34a; color: #fff; }
+.ht-day-dot.ht-today { border-color: var(--brand); border-width: 2.5px; }
+.ht-day-dot.ht-future { opacity: .35; cursor: default; }
+
+/* Redes Sociales - tiempo de pantalla */
+.rs-used-wrap { display: flex; align-items: baseline; gap: 8px; margin: 6px 0 4px; }
+.rs-used-value { font-size: 32px; font-weight: 800; color: var(--brand); }
+.rs-used-sub { font-size: 13px; color: var(--muted); }
+.rs-quick-btns { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
+.rs-qbtn {
+  border: 1.5px solid var(--border); background: var(--bg);
+  border-radius: 8px; padding: 8px 12px;
+  font-size: 13px; font-weight: 700; color: var(--text);
+  cursor: pointer; transition: all .15s;
+}
+.rs-qbtn:active { transform: scale(.95); }
+.rs-qbtn-reset { color: #dc2626; border-color: rgba(220,38,38,.35); }
+
+/* Redes Sociales - acuerdos familiares */
+.rs-agree-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.rs-agree-item:last-child { border-bottom: none; }
+.rs-agree-check {
+  width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+  border: 1.5px solid var(--border); background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: transparent; cursor: pointer; transition: all .15s;
+}
+.rs-agree-check.rs-agree-done { background: #16a34a; border-color: #16a34a; color: #fff; }
+.rs-agree-text { flex: 1; font-size: 13px; color: var(--text); line-height: 1.4; }
+.rs-agree-text-done { text-decoration: line-through; color: var(--muted); }

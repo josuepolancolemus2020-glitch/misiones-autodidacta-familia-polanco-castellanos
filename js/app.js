@@ -365,7 +365,7 @@ function renderProgress() {
 ───────────────────────────────────────────── */
 
 function renderProfile() {
-  // Sección solo muestra herramientas del docente (por ahora)
+  // Sección solo muestra herramientas de familia (por ahora)
 }
 
 /* ─────────────────────────────────────────────
@@ -409,9 +409,8 @@ function switchView(id) {
   if (id === 'view-misiones') renderMissions(currentQuery);
   if (id === 'view-progreso') renderProgress();
   if (id === 'view-perfil')   renderProfile();
-  if (id === 'view-gobierno')       renderGobiernoEscolar();
-  if (id === 'view-plan-accion')    paInit();
-  if (id === 'view-parte-mensual')  { /* la UI se recalcula en tiempo real con inputs */ }
+  if (id === 'view-habitos' && typeof initHabitos === 'function') initHabitos();
+  if (id === 'view-redes'   && typeof initRedes === 'function')   initRedes();
   if (id === 'view-collage')        initCollage();
   if (id === 'view-finanzas' && typeof initFinanzas === 'function') initFinanzas();
   if (id === 'view-inventario' && typeof initInventario === 'function') initInventario();
