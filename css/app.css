@@ -2441,3 +2441,12 @@ a { text-decoration: none; color: inherit; }
   background: linear-gradient(135deg, #475569, #64748b);
   box-shadow: 0 4px 12px rgba(71,85,105,.25);
 }
+
+/* ====== FIX: tembladera al llegar al final del scroll ======
+   Al terminar el scroll interno, el gesto se encadenaba al documento y el
+   navegador movia su barra / hacia el rebote elastico, sacudiendo el header.
+   Se corta la cadena de overscroll en todos los contenedores con scroll. */
+html, body { overscroll-behavior: none; }
+.view-scroll,
+.fin-modal,
+.app-drawer { overscroll-behavior: contain; }
