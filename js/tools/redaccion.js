@@ -11,16 +11,19 @@
 
 const RED_T_EDICIONES = 'redaccion_ediciones';
 const RED_T_NOTAS     = 'redaccion_notas';
+const RED_T_CONFIG    = 'redaccion_config';
 const RED_PENDING_KEY = 'faro_redaccion_pending_v1';
 
 const RED_SECCIONES = [
   'PORTADA', 'EDITORIAL', 'ACTUALIDAD', 'REPORTE INVESTIGATIVO',
-  'TECNOLOGÍA', 'CULTURA', 'FILOSOFÍA Y AULA', 'AVISOS', 'OTRA',
+  'TECNOLOGÍA', 'CULTURA', 'FILOSOFÍA Y AULA', 'AVISOS',
 ];
 const RED_TIPOS = [
   'Artículo', 'Nota de prensa', 'Editorial', 'Aviso',
   'Reseña', 'Entrevista', 'Reporte', 'Idea',
 ];
+const RED_NUEVA_SECCION = '__nueva_seccion__';
+const RED_NUEVO_TIPO    = '__nuevo_tipo__';
 const RED_ESTADOS = [
   { id: 'idea',     label: '💭 Idea',     cls: 'red-est-idea' },
   { id: 'borrador', label: '✏️ Borrador', cls: 'red-est-borrador' },
@@ -30,6 +33,7 @@ const RED_ESTADOS = [
 
 let _redEdiciones = [];      // todas las ediciones, recientes primero
 let _redNotas     = [];      // todas las notas
+let _redConfig    = { secciones: [], tipos: [] };  // personalizados (compartidos)
 let _redEdicion   = null;    // id de la edición seleccionada; 'banco' = sin edición
 let _redNotaId    = null;    // nota abierta en el editor
 let _redSaveTimer = null;
@@ -60,6 +64,24 @@ function redPalabras(txt) {
 
 function redEstadoInfo(id) {
   return RED_ESTADOS.find(e => e.id === id) || RED_ESTADOS[0];
+}
+
+/* Secciones y tipos disponibles: los base + los personalizados guardados */
+function redSeccionesAll() {
+  return [...RED_SECCIONES, ..._redConfig.secciones.filter(s => !RED_SECCIONES.includes(s))];
+}
+function redTiposAll() {
+  return [...RED_TIPOS, ..._redConfig.tipos.filter(t => !RED_TIPOS.includes(t))];
+}
+
+async function redGuardarConfig(clave) {
+  if (!_sb) return;
+  const { error } = await _sb.from(RED_T_CONFIG)
+    .upsert({ clave, valor: _redConfig[clave] });
+  if (error) {
+    console.error('[Redacción] Error guardando config:', error);
+    if (typeof toast === 'function') toast('No se pudo guardar (¿falta el SQL de config?)');
+  }
 }
 
 /* Quincena actual: [1–15] o [16–fin de mes] */
@@ -114,10 +136,18 @@ async function initRedaccion() {
 
   await redFlushPending();
 
-  const [ed, no] = await Promise.all([
+  const [ed, no, cf] = await Promise.all([
     _sb.from(RED_T_EDICIONES).select('*').order('numero', { ascending: false }),
     _sb.from(RED_T_NOTAS).select('*').order('actualizado_at', { ascending: false }),
+    _sb.from(RED_T_CONFIG).select('*'),
   ]);
+
+  // La config es opcional: si su tabla aún no existe, se sigue sin personalizados
+  if (!cf.error && cf.data) {
+    cf.data.forEach(row => {
+      if (Array.isArray(row.valor)) _redConfig[row.clave] = row.valor;
+    });
+  }
 
   if (ed.error || no.error) {
     console.error('[Redacción] Error cargando:', ed.error || no.error);
@@ -151,7 +181,23 @@ function redNotasDeEdicion() {
 function redRender() {
   redRenderCabecera();
   redRenderChips();
+  redRenderPortada();
   redRenderNotas();
+}
+
+/* Bloque "Titulares de portada" de la edición seleccionada */
+function redRenderPortada() {
+  const el = document.getElementById('red-portada-card');
+  if (!el) return;
+  const notas = redNotasDeEdicion().filter(n => n.en_portada);
+  if (!notas.length || _redEdicion === 'banco') { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = '<div class="red-portada-head"><i class="fa-solid fa-star"></i> Titulares de portada</div>' +
+    notas.map(n => `
+      <div class="red-portada-item">
+        <span class="red-portada-titulo">${n.titulo ? redEsc(n.titulo) : '<em>Sin título</em>'}</span>
+        <span class="red-portada-sec">${redEsc(n.seccion)}</span>
+      </div>`).join('');
 }
 
 function redRenderCabecera() {
@@ -211,7 +257,7 @@ function redRenderNotas() {
   if (emptyEl) emptyEl.style.display = notas.length ? 'none' : 'block';
 
   // Agrupar por sección, en el orden editorial de la revista
-  const orden = [...RED_SECCIONES.filter(s => s !== 'OTRA')];
+  const orden = redSeccionesAll();
   notas.forEach(n => { if (!orden.includes(n.seccion)) orden.push(n.seccion); });
 
   list.innerHTML = orden.map(sec => {
@@ -225,6 +271,7 @@ function redRenderNotas() {
         <div class="red-nota-main">
           <span class="red-nota-titulo">${n.titulo ? redEsc(n.titulo) : '<em class="red-sin-titulo">Sin título</em>'}</span>
           <div class="red-nota-meta">
+            ${n.en_portada ? '<span class="red-badge red-badge-portada">⭐ Portada</span>' : ''}
             <span class="red-badge ${est.cls}">${est.label}</span>
             <span class="red-badge red-badge-tipo">${redEsc(n.tipo)}</span>
             <span class="red-nota-autor">${redAutorInfo(n.autor)}</span>
@@ -322,16 +369,18 @@ function redOpenEditor(id) {
 
   // Selects: sección, tipo, estado, edición
   const secSel = document.getElementById('red-e-seccion');
-  const secciones = [...RED_SECCIONES];
+  const secciones = redSeccionesAll();
   if (!secciones.includes(n.seccion)) secciones.unshift(n.seccion);
   secSel.innerHTML = secciones.map(s =>
-    `<option value="${redEsc(s)}" ${s === n.seccion ? 'selected' : ''}>${redEsc(s)}</option>`).join('');
+    `<option value="${redEsc(s)}" ${s === n.seccion ? 'selected' : ''}>${redEsc(s)}</option>`).join('') +
+    `<option value="${RED_NUEVA_SECCION}">➕ Nueva sección…</option>`;
 
   const tipoSel = document.getElementById('red-e-tipo');
-  const tipos = [...RED_TIPOS];
+  const tipos = redTiposAll();
   if (!tipos.includes(n.tipo)) tipos.unshift(n.tipo);
   tipoSel.innerHTML = tipos.map(t =>
-    `<option value="${redEsc(t)}" ${t === n.tipo ? 'selected' : ''}>${redEsc(t)}</option>`).join('');
+    `<option value="${redEsc(t)}" ${t === n.tipo ? 'selected' : ''}>${redEsc(t)}</option>`).join('') +
+    `<option value="${RED_NUEVO_TIPO}">➕ Nuevo tipo…</option>`;
 
   const estSel = document.getElementById('red-e-estado');
   estSel.innerHTML = RED_ESTADOS.map(e =>
@@ -342,9 +391,23 @@ function redOpenEditor(id) {
     _redEdiciones.map(e =>
       `<option value="${e.id}" ${e.id === n.edicion_id ? 'selected' : ''}>${redEsc(e.titulo)}</option>`).join('');
 
+  // Toggle de portada
+  const pBtn = document.getElementById('red-e-portada-btn');
+  if (pBtn) pBtn.classList.toggle('red-portada-on', !!n.en_portada);
+  redUpdatePortadaBtn();
+
   redUpdateContador();
   redSetSaveState('ok');
   switchView('view-redaccion-editor');
+}
+
+function redUpdatePortadaBtn() {
+  const btn = document.getElementById('red-e-portada-btn');
+  if (!btn) return;
+  const on = btn.classList.contains('red-portada-on');
+  btn.innerHTML = on
+    ? '<i class="fa-solid fa-star"></i> En portada — su título saldrá en los titulares'
+    : '<i class="fa-regular fa-star"></i> Destacar en portada';
 }
 
 function redUpdateContador() {
@@ -372,6 +435,7 @@ function redCamposEditor() {
     estado:  document.getElementById('red-e-estado').value,
     edicion_id: document.getElementById('red-e-edicion').value
       ? Number(document.getElementById('red-e-edicion').value) : null,
+    en_portada: document.getElementById('red-e-portada-btn')?.classList.contains('red-portada-on') || false,
     actualizado_at: new Date().toISOString(),
   };
 }
@@ -406,6 +470,41 @@ async function redSaveNow() {
   }
 }
 
+/* ── Mover nota a otra edición ── */
+
+function redOpenMover() {
+  const n = redNota();
+  const list = document.getElementById('red-mover-list');
+  if (!n || !list) return;
+
+  const opciones = [
+    { id: '', label: '🗃️ Banco de ideas' },
+    ..._redEdiciones.map(e => ({ id: String(e.id), label: `📰 ${e.titulo}${e.archivada ? ' 📦' : ''}` })),
+  ];
+  list.innerHTML = opciones.map(o => {
+    const actual = (o.id === '' && !n.edicion_id) || Number(o.id) === n.edicion_id;
+    return `<button type="button" class="red-mover-item ${actual ? 'red-mover-actual' : ''}"
+      data-ed="${o.id}" ${actual ? 'disabled' : ''}>
+      ${redEsc(o.label)}${actual ? ' <span class="red-mover-tag">actual</span>' : ''}
+    </button>`;
+  }).join('');
+
+  list.querySelectorAll('.red-mover-item:not([disabled])').forEach(btn =>
+    btn.addEventListener('click', async () => {
+      document.getElementById('red-e-edicion').value = btn.dataset.ed;
+      await redSaveNow();
+      redCloseMover();
+      if (typeof toast === 'function') toast('📦 Nota movida');
+    }));
+
+  document.getElementById('red-mover-overlay').style.display = 'flex';
+}
+
+function redCloseMover() {
+  const overlay = document.getElementById('red-mover-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
 async function redEliminarNota() {
   const n = redNota();
   if (!n || !_sb) return;
@@ -434,11 +533,19 @@ function redEdicionMd() {
   const notas = redNotasDeEdicion();
   const titulo = _redEdicion === 'banco' ? 'Banco de ideas' : (ed ? ed.titulo : 'Edición');
 
-  const orden = [...RED_SECCIONES.filter(s => s !== 'OTRA')];
+  const orden = redSeccionesAll();
   notas.forEach(n => { if (!orden.includes(n.seccion)) orden.push(n.seccion); });
 
   let md = `# PolicastSapien — ${titulo}\n\n`;
   md += `*Exportado el ${new Date().toLocaleDateString('es')} desde F.A.R.O. · ${notas.length} notas*\n\n`;
+
+  // Titulares elegidos para la portada, al inicio del documento
+  const portada = notas.filter(n => n.en_portada);
+  if (portada.length) {
+    md += `\n## ⭐ PORTADA — Titulares\n\n`;
+    portada.forEach(n => { md += `- ${n.titulo || 'Sin título'} *(${n.seccion})*\n`; });
+    md += '\n';
+  }
   orden.forEach(sec => {
     const deSec = notas.filter(n => n.seccion === sec);
     if (!deSec.length) return;
@@ -514,8 +621,52 @@ document.addEventListener('DOMContentLoaded', () => {
   // Editor: autoguardado
   ['red-e-titulo', 'red-e-entradilla', 'red-e-cuerpo'].forEach(id =>
     document.getElementById(id)?.addEventListener('input', redQueueSave));
-  ['red-e-seccion', 'red-e-tipo', 'red-e-estado', 'red-e-edicion'].forEach(id =>
+  ['red-e-estado', 'red-e-edicion'].forEach(id =>
     document.getElementById(id)?.addEventListener('change', redQueueSave));
+
+  // Sección y tipo: la última opción del select permite crear uno nuevo
+  const nuevoEnSelect = (selId, marker, configKey, promptTxt, mayusculas) => {
+    const sel = document.getElementById(selId);
+    sel?.addEventListener('change', () => {
+      if (sel.value !== marker) { redQueueSave(); return; }
+      const n = redNota();
+      const previo = n ? (configKey === 'secciones' ? n.seccion : n.tipo) : sel.options[0].value;
+      let nombre = (prompt(promptTxt) || '').trim();
+      if (!nombre) { sel.value = previo; return; }
+      if (mayusculas) nombre = nombre.toUpperCase();
+      if (!_redConfig[configKey].includes(nombre) &&
+          !(configKey === 'secciones' ? RED_SECCIONES : RED_TIPOS).includes(nombre)) {
+        _redConfig[configKey].push(nombre);
+        redGuardarConfig(configKey);
+      }
+      // Insertar la opción (si no existe) y seleccionarla
+      if (![...sel.options].some(o => o.value === nombre)) {
+        const opt = document.createElement('option');
+        opt.value = nombre; opt.textContent = nombre;
+        sel.insertBefore(opt, sel.querySelector(`option[value="${marker}"]`));
+      }
+      sel.value = nombre;
+      redQueueSave();
+    });
+  };
+  nuevoEnSelect('red-e-seccion', RED_NUEVA_SECCION, 'secciones',
+    'Nombre de la nueva sección (ej: EN HOMBROS DE GIGANTES):', true);
+  nuevoEnSelect('red-e-tipo', RED_NUEVO_TIPO, 'tipos',
+    'Nombre del nuevo tipo de nota (ej: Crónica):', false);
+
+  // Toggle de portada
+  document.getElementById('red-e-portada-btn')?.addEventListener('click', () => {
+    document.getElementById('red-e-portada-btn').classList.toggle('red-portada-on');
+    redUpdatePortadaBtn();
+    redQueueSave();
+  });
+
+  // Mover nota a otra edición
+  document.getElementById('red-e-mover-btn')?.addEventListener('click', redOpenMover);
+  document.getElementById('red-mover-close')?.addEventListener('click', redCloseMover);
+  document.getElementById('red-mover-overlay')?.addEventListener('click', e => {
+    if (e.target.id === 'red-mover-overlay') redCloseMover();
+  });
 
   document.getElementById('red-e-copiar-btn')?.addEventListener('click', redCopiarNota);
   document.getElementById('red-e-eliminar-btn')?.addEventListener('click', redEliminarNota);

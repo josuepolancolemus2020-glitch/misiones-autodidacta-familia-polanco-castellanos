@@ -2816,3 +2816,47 @@ body {
   resize: vertical; outline: none; margin-bottom: 12px;
 }
 .red-e-entradilla:focus { border-color: #4f46e5; background: var(--surface); }
+
+/* Redacción: portada, mover nota y personalizados */
+.red-badge-portada { background: #fffbeb; color: #b45309; }
+
+.red-portada-card {
+  background: var(--surface); border: 1.5px solid #fbbf24;
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.red-portada-head {
+  font-size: 12px; font-weight: 800; letter-spacing: .06em;
+  color: #b45309; margin-bottom: 8px; display: flex; align-items: center; gap: 7px;
+}
+.red-portada-item {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  padding: 6px 0; border-bottom: 1px dashed var(--border);
+}
+.red-portada-item:last-child { border-bottom: none; padding-bottom: 0; }
+.red-portada-titulo { font-size: 13.5px; font-weight: 700; color: var(--text); }
+.red-portada-sec { font-size: 10.5px; font-weight: 700; color: var(--faint); white-space: nowrap; }
+
+.red-portada-toggle {
+  width: 100%; background: var(--surface); border: 1.5px dashed var(--border);
+  border-radius: var(--r-sm); padding: 11px 14px; margin-bottom: 12px;
+  font-size: 13px; font-weight: 700; color: var(--muted);
+  cursor: pointer; font-family: inherit; text-align: left;
+  display: flex; align-items: center; gap: 9px; transition: all .15s;
+}
+.red-portada-toggle.red-portada-on {
+  background: #fffbeb; border-style: solid; border-color: #fbbf24; color: #b45309;
+}
+
+.red-mover-item {
+  width: 100%; background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 13px 14px; margin-bottom: 8px;
+  font-size: 14px; font-weight: 700; color: var(--text); text-align: left;
+  cursor: pointer; font-family: inherit; transition: all .15s;
+}
+.red-mover-item:active { transform: scale(.98); }
+.red-mover-actual { opacity: .55; cursor: default; }
+.red-mover-tag {
+  font-size: 10px; font-weight: 800; color: #4338ca; background: #eef2ff;
+  border-radius: 6px; padding: 2px 7px; margin-left: 6px;
+}

@@ -22,7 +22,14 @@ create table if not exists public.redaccion_notas (
   tipo            text not null default 'Artículo',
   estado          text not null default 'idea',  -- idea | borrador | revision | listo
   entradilla      text not null default '',      -- párrafo introductorio opcional
-  cuerpo          text not null default ''
+  cuerpo          text not null default '',
+  en_portada      boolean not null default false -- ⭐ su título va en la portada
+);
+
+-- Configuración compartida de Redacción (secciones y tipos personalizados)
+create table if not exists public.redaccion_config (
+  clave  text primary key,                -- 'secciones' | 'tipos'
+  valor  jsonb not null default '[]'::jsonb
 );
 
 create index if not exists redaccion_notas_edicion_idx
@@ -32,3 +39,4 @@ create index if not exists redaccion_notas_edicion_idx
 -- el desarrollo de esta app familiar.
 alter table public.redaccion_ediciones disable row level security;
 alter table public.redaccion_notas disable row level security;
+alter table public.redaccion_config disable row level security;
