@@ -12,9 +12,10 @@
 const DES_TABLE      = 'destellos';
 const DES_OUTBOX_KEY = 'faro_destellos_outbox_v1';
 
-let _desCache    = [];            // destellos del miembro actual, recientes primero
+let _desCache    = [];            // destellos del miembro que se está viendo
 let _desFilter   = 'pendientes';  // 'pendientes' | 'hechos' | 'todos'
 let _desProyecto = '';            // '' = todos los proyectos
+let _desMember   = null;          // miembro cuyo espacio se está viendo (por defecto: quien inició sesión)
 
 /* ── Helpers ── */
 
@@ -115,8 +116,11 @@ async function desCapturar() {
     desFlushOutbox();
   }
 
-  // Si el usuario está viendo la lista, refrescarla
-  if (document.getElementById('view-destellos')?.classList.contains('active')) initDestellos();
+  // Si el usuario está viendo la lista, volver a su propio espacio y refrescar
+  if (document.getElementById('view-destellos')?.classList.contains('active')) {
+    _desMember = desMiembro();
+    initDestellos();
+  }
 }
 
 /* ── Chips de proyectos usados recientemente ── */
@@ -148,6 +152,9 @@ async function initDestellos() {
   const list = document.getElementById('des-list');
   if (!list) return;
 
+  if (!_desMember) _desMember = desMiembro();
+  desRenderMemberChips();
+
   await desFlushOutbox();
 
   if (!_sb) {
@@ -157,7 +164,7 @@ async function initDestellos() {
 
   const { data, error } = await _sb.from(DES_TABLE)
     .select('*')
-    .eq('miembro', desMiembro())
+    .eq('miembro', _desMember)
     .order('creado_at', { ascending: false });
 
   if (error) {
@@ -170,17 +177,35 @@ async function initDestellos() {
   desRenderView();
 }
 
+/* Chips para elegir de quién es el espacio que se está viendo */
+function desRenderMemberChips() {
+  const wrap = document.getElementById('des-member-chips');
+  if (!wrap || typeof MEMBERS === 'undefined') return;
+  wrap.innerHTML = MEMBERS.map(m => `
+    <button type="button" class="fam-chip ${m.id === _desMember ? 'fam-chip-active' : ''}" data-member="${m.id}">
+      ${m.emoji} ${desEsc(m.short.split(' ')[0])}
+    </button>`).join('');
+  wrap.querySelectorAll('.fam-chip').forEach(btn => btn.addEventListener('click', () => {
+    _desMember = btn.dataset.member;
+    _desProyecto = '';
+    initDestellos();
+  }));
+}
+
 function desRenderView() {
   const list    = document.getElementById('des-list');
   const emptyEl = document.getElementById('des-empty');
   const countEl = document.getElementById('des-count');
   if (!list) return;
 
-  // Contador de pendientes
+  // Contador de pendientes (aclara de quién es el espacio si es de otro)
+  const yo = desMiembro();
+  const m = (typeof MEMBERS !== 'undefined') ? MEMBERS.find(x => x.id === _desMember) : null;
+  const deQuien = (_desMember !== yo && m) ? ` de ${m.short.split(' ')[0]}` : '';
   const nPend = _desCache.filter(d => !d.hecho).length;
   if (countEl) countEl.textContent = nPend
-    ? `${nPend} pendiente${nPend === 1 ? '' : 's'} por atender`
-    : '¡Todo atendido! 🎉';
+    ? `${nPend} pendiente${nPend === 1 ? '' : 's'}${deQuien} por atender`
+    : `¡Todo atendido${deQuien}! 🎉`;
 
   // Tabs de filtro
   document.querySelectorAll('#des-filter-tabs .des-ftab').forEach(b =>
