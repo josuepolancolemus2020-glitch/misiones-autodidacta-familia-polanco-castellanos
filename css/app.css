@@ -2537,3 +2537,7 @@ body {
 
 /* Chips de materias en la vista de misiones */
 .materia-chips { margin-bottom: 14px; }
+
+/* Acceso rapido: Finanzas Familia (naranja) y Collage pasa a gris */
+.qa-finfam { background: linear-gradient(135deg, #ea580c, #fb923c); }
+.qa-col    { background: linear-gradient(135deg, #64748b, #94a3b8); }

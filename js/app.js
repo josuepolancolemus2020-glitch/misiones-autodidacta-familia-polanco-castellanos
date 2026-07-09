@@ -522,6 +522,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof finGoEscuela === 'function') finGoEscuela();
       return;
     }
+    if (btn.dataset.qa === 'familia') {
+      if (typeof finGoFamilia === 'function') finGoFamilia();
+      return;
+    }
     switchView(btn.dataset.qa);
   });
 

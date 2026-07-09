@@ -1183,6 +1183,13 @@ async function finSubmitDeuda(e) {
    CONTEXTO: FAMILIA ⇄ ESCUELA
 ───────────────────────────────────────────── */
 
+// Acceso directo al presupuesto familiar (desde el Acceso Rápido del inicio).
+async function finGoFamilia() {
+  await _finCheckContexto();
+  _finContexto = 'familia';
+  switchView('view-finanzas');
+}
+
 // Acceso directo al presupuesto de la escuela (desde el Acceso Rápido del inicio).
 async function finGoEscuela() {
   const ok = await _finCheckContexto();
