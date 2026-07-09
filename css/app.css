@@ -2450,3 +2450,15 @@ html, body { overscroll-behavior: none; }
 .view-scroll,
 .fin-modal,
 .app-drawer { overscroll-behavior: contain; }
+
+/* Refuerzo anti-tembladera: el shell de la app se fija al viewport.
+   Antes las vistas median 100dvh y cada movimiento de la barra del
+   navegador recalculaba la altura (el header "temblaba" al hacer scroll
+   hasta el fondo). Con el body fijo, el layout ya no depende de dvh. */
+body {
+  position: fixed;
+  inset: 0;
+  margin: 0 auto;
+}
+.view { height: 100%; }
+.login-screen { height: 100%; }
