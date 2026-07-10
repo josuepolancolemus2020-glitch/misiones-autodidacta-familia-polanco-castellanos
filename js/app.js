@@ -432,6 +432,7 @@ function switchView(id) {
   if (id === 'view-inventario' && typeof initInventario === 'function') initInventario();
   if (id === 'view-destellos' && typeof initDestellos === 'function') initDestellos();
   if (id === 'view-redaccion' && typeof initRedaccion === 'function') initRedaccion();
+  if (id === 'view-antena' && typeof initAntena === 'function') initAntena();
 
   // El FAB de Destellos vive en toda la app, excepto en el Chat
   // (estorbaría sobre la barra de escritura) y el editor de Redacción

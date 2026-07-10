@@ -90,6 +90,10 @@
           <span class="qa-icon qa-redac"><i class="fa-solid fa-pen-nib"></i></span>
           <span class="qa-label">Redacción</span>
         </button>
+        <button type="button" class="qa-item" data-qa="view-antena">
+          <span class="qa-icon qa-ant"><i class="fa-solid fa-tower-broadcast"></i></span>
+          <span class="qa-label">Antena</span>
+        </button>
         <button type="button" class="qa-item" data-qa="view-habitos">
           <span class="qa-icon qa-hab"><i class="fa-solid fa-seedling"></i></span>
           <span class="qa-label">Hábitos</span>
@@ -690,6 +694,10 @@
             <i class="fa-solid fa-pen-nib"></i>
             <span>Redacción</span>
           </button>
+          <button class="teacher-tool-item teacher-tool-active" id="goto-antena-btn">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <span>Antena</span>
+          </button>
           <button class="teacher-tool-item teacher-tool-active" id="goto-habitos-btn">
             <i class="fa-solid fa-seedling"></i>
             <span>Tracker de Hábitos</span>
@@ -857,6 +865,62 @@
         <button type="button" class="red-accion-btn red-accion-peligro" id="red-e-eliminar-btn">
           <i class="fa-solid fa-trash"></i> Eliminar
         </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== ANTENA 📡 (gestión de redes sociales) ========== -->
+  <div id="view-antena" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="antena-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Antena</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <p class="fin-empty" id="ant-sin-conexion" style="display:none;">No se pudo conectar con Antena.</p>
+
+      <!-- Login con enlace mágico (sesión real, no el PIN familiar) -->
+      <div id="ant-login" style="display:none;">
+        <div class="ant-login-card">
+          <div class="ant-login-icon"><i class="fa-solid fa-tower-broadcast"></i></div>
+          <h2 class="ant-login-title">Centro de transmisión</h2>
+          <p class="ant-login-sub">
+            Esta herramienta maneja tus cuentas de redes sociales, así que
+            requiere una sesión segura además del PIN familiar.
+          </p>
+          <input type="email" id="ant-email" class="des-proj-input" placeholder="tu@correo.com"
+            autocomplete="email" inputmode="email">
+          <button type="button" class="ant-login-btn" id="ant-enviar-btn">
+            <i class="fa-solid fa-envelope"></i> Enviarme el enlace mágico
+          </button>
+          <p class="ant-login-msg" id="ant-login-msg"></p>
+        </div>
+      </div>
+
+      <!-- Panel principal -->
+      <div id="ant-dashboard" style="display:none;">
+
+        <div class="ant-cabecera">
+          <div class="ant-cab-titulo"><i class="fa-solid fa-tower-broadcast"></i> Centro de transmisión</div>
+          <div class="ant-cab-session">
+            <span id="ant-session-email"></span>
+            <button type="button" class="ant-logout-btn" id="ant-logout-btn">Salir</button>
+          </div>
+        </div>
+
+        <h2 class="section-title">Cuentas conectadas</h2>
+        <div class="ant-cuentas-grid" id="ant-cuentas-grid"></div>
+
+        <h2 class="section-title">Próximas publicaciones</h2>
+        <div id="ant-pubs-list"></div>
+        <p class="fin-empty" id="ant-pubs-empty" style="display:none;">
+          Aún no hay publicaciones.<br>El programador llega en la Fase 2 junto con la conexión de X. 📡
+        </p>
+
       </div>
 
     </div>
@@ -1075,6 +1139,9 @@
       <button class="drawer-item" data-view="view-redaccion">
         <i class="fa-solid fa-pen-nib"></i><span>Redacción</span>
       </button>
+      <button class="drawer-item" data-view="view-antena">
+        <i class="fa-solid fa-tower-broadcast"></i><span>Antena</span>
+      </button>
       <button class="drawer-item" data-view="view-finanzas">
         <i class="fa-solid fa-sack-dollar"></i><span>Finanzas</span>
       </button>
@@ -1207,6 +1274,7 @@
   <script src="js/inventario.js"></script>
   <script src="js/tools/destellos.js"></script>
   <script src="js/tools/redaccion.js"></script>
+  <script src="js/tools/antena.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
