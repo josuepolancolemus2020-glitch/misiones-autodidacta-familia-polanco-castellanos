@@ -15,10 +15,15 @@ const ANT_T_DESTINOS = 'antena_destinos';
 
 const ANT_PLATAFORMAS = [
   { id: 'x',        nombre: 'X (Twitter)',      icon: 'fa-brands fa-x-twitter', cls: 'ant-x',  conectable: true },
-  { id: 'facebook', nombre: 'Facebook Páginas', icon: 'fa-brands fa-facebook',  cls: 'ant-fb', fase: 'Disponible en la Fase 3' },
+  { id: 'facebook', nombre: 'Facebook Páginas', icon: 'fa-brands fa-facebook',  cls: 'ant-fb', conectable: true, multi: true },
   { id: 'youtube',  nombre: 'YouTube',          icon: 'fa-brands fa-youtube',   cls: 'ant-yt', fase: 'Disponible en la Fase 5' },
   { id: 'tiktok',   nombre: 'TikTok',           icon: 'fa-brands fa-tiktok',    cls: 'ant-tk', fase: 'Disponible en la Fase 5' },
 ];
+
+const ANT_LINK_POST = {
+  x:        id => `https://x.com/i/web/status/${encodeURIComponent(id)}`,
+  facebook: id => `https://www.facebook.com/${encodeURIComponent(id)}`,
+};
 
 const ANT_ESTADO_LBL = {
   borrador: '📝 Borrador', programada: '⏰ Programada', publicando: '📤 Publicando…',
@@ -27,6 +32,7 @@ const ANT_ESTADO_LBL = {
 
 let _antSession = null;
 let _antCuentas = [];
+let _antDestSel = new Set(); // cuentas elegidas como destino en el compositor
 
 /* ── Sesión ── */
 
@@ -103,30 +109,43 @@ async function antRenderCuentas() {
   else _antCuentas = data || [];
 
   grid.innerHTML = ANT_PLATAFORMAS.map(p => {
-    const c = _antCuentas.find(x => x.plataforma === p.id);
-    if (c) {
+    const cuentas = _antCuentas.filter(x => x.plataforma === p.id);
+
+    // Filas de cuentas conectadas (una plataforma puede tener varias: Páginas de FB)
+    const filas = cuentas.map(c => {
       const alerta = c.estado === 'requiere_reconexion';
-      return `<div class="ant-plat-card ant-plat-conectada">
-        <span class="ant-plat-icon ${p.cls}"><i class="${p.icon}"></i></span>
-        <div class="ant-plat-info">
-          <span class="ant-plat-nombre">${p.nombre}</span>
-          <span class="ant-plat-estado ${alerta ? 'ant-estado-alerta' : 'ant-estado-ok'}">
-            ${alerta ? '⚠️ Requiere reconexión' : `✓ ${antEsc(c.nombre_visible || 'Conectada')}`}
-          </span>
-          ${alerta
-            ? `<button type="button" class="ant-conectar-btn" data-conectar="${p.id}">Reconectar</button>`
-            : `<button type="button" class="ant-desconectar-btn" data-desconectar="${c.id}">Desconectar</button>`}
-        </div>
+      return `<div class="ant-cuenta-fila">
+        <span class="ant-plat-estado ${alerta ? 'ant-estado-alerta' : 'ant-estado-ok'}">
+          ${alerta ? '⚠️ ' : '✓ '}${antEsc(c.nombre_visible || 'Conectada')}
+        </span>
+        <button type="button" class="ant-desconectar-btn" data-desconectar="${c.id}" aria-label="Desconectar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>`;
+    }).join('');
+
+    let accion = '';
+    if (p.conectable) {
+      const alerta = cuentas.some(c => c.estado === 'requiere_reconexion');
+      if (!cuentas.length) {
+        accion = `<button type="button" class="ant-conectar-btn" data-conectar="${p.id}">
+          <i class="fa-solid fa-plug"></i> Conectar</button>`;
+      } else if (alerta) {
+        accion = `<button type="button" class="ant-conectar-btn" data-conectar="${p.id}">Reconectar</button>`;
+      } else if (p.multi) {
+        accion = `<button type="button" class="ant-conectar-btn ant-conectar-sec" data-conectar="${p.id}">
+          <i class="fa-solid fa-rotate"></i> Actualizar páginas</button>`;
+      }
+    } else if (!cuentas.length) {
+      accion = `<span class="ant-plat-estado ant-estado-pronto">${p.fase}</span>`;
     }
-    return `<div class="ant-plat-card">
+
+    return `<div class="ant-plat-card ${cuentas.length ? 'ant-plat-conectada' : ''}">
       <span class="ant-plat-icon ${p.cls}"><i class="${p.icon}"></i></span>
       <div class="ant-plat-info">
         <span class="ant-plat-nombre">${p.nombre}</span>
-        ${p.conectable
-          ? `<button type="button" class="ant-conectar-btn" data-conectar="${p.id}">
-               <i class="fa-solid fa-plug"></i> Conectar</button>`
-          : `<span class="ant-plat-estado ant-estado-pronto">${p.fase}</span>`}
+        ${filas}
+        ${accion}
       </div>
     </div>`;
   }).join('');
@@ -137,15 +156,39 @@ async function antRenderCuentas() {
     btn.addEventListener('click', () => antDesconectar(Number(btn.dataset.desconectar))));
 
   // El compositor aparece solo si hay al menos una cuenta activa
+  const activas = _antCuentas.filter(c => c.estado === 'activa');
   const composer = document.getElementById('ant-composer');
-  if (composer) {
-    composer.style.display = _antCuentas.some(c => c.estado === 'activa') ? 'block' : 'none';
-  }
+  if (composer) composer.style.display = activas.length ? 'block' : 'none';
+
+  // Chips de destino: por defecto, todas las cuentas activas seleccionadas
+  _antDestSel = new Set(activas.map(c => c.id));
+  antRenderDestChips();
+}
+
+/* Chips para elegir a qué cuentas/páginas sale la publicación */
+function antRenderDestChips() {
+  const wrap = document.getElementById('ant-dest-chips');
+  if (!wrap) return;
+  const activas = _antCuentas.filter(c => c.estado === 'activa');
+  wrap.innerHTML = activas.map(c => {
+    const p = ANT_PLATAFORMAS.find(x => x.id === c.plataforma);
+    const sel = _antDestSel.has(c.id);
+    return `<button type="button" class="ant-dest-chip ${sel ? 'ant-dest-chip-on' : ''}" data-dest="${c.id}">
+      <i class="${p ? p.icon : ''}"></i> ${antEsc(c.nombre_visible || c.plataforma)}
+    </button>`;
+  }).join('');
+  wrap.querySelectorAll('.ant-dest-chip').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const id = Number(btn.dataset.dest);
+      if (_antDestSel.has(id)) _antDestSel.delete(id);
+      else _antDestSel.add(id);
+      antRenderDestChips();
+    }));
 }
 
 async function antConectar(plataforma) {
-  if (plataforma !== 'x') return;
-  if (typeof toast === 'function') toast('Abriendo autorización de X…');
+  if (!['x', 'facebook'].includes(plataforma)) return;
+  if (typeof toast === 'function') toast(`Abriendo autorización de ${plataforma === 'x' ? 'X' : 'Facebook'}…`);
   const { data, error } = await _sb.functions.invoke('antena-oauth-start', {
     body: { plataforma },
   });
@@ -198,8 +241,11 @@ async function antProgramar(ahora) {
     }
   }
 
-  const activas = _antCuentas.filter(c => c.estado === 'activa');
-  if (!activas.length) { if (typeof toast === 'function') toast('Conecta una cuenta primero'); return; }
+  const activas = _antCuentas.filter(c => c.estado === 'activa' && _antDestSel.has(c.id));
+  if (!activas.length) {
+    if (typeof toast === 'function') toast('Elige al menos un destino');
+    return;
+  }
 
   const { data: pub, error } = await _sb.from(ANT_T_PUBS).insert({
     usuario_id: _antSession.user.id,
@@ -280,12 +326,21 @@ async function antRenderPublicaciones() {
 
   if (hechas) {
     hechas.innerHTML = publicadas.map(p => {
-      const d = (p.destinos || []).find(x => x.post_externo_id);
+      const links = (p.destinos || [])
+        .filter(d => d.post_externo_id)
+        .map(d => {
+          const cuenta = _antCuentas.find(c => c.id === d.cuenta_id);
+          const plat = cuenta?.plataforma || 'x';
+          const fn = ANT_LINK_POST[plat];
+          const lbl = plat === 'facebook' ? (cuenta?.nombre_visible || 'Facebook') : 'X';
+          return fn ? `<a class="ant-pub-link" href="${fn(d.post_externo_id)}" target="_blank" rel="noopener">
+            Ver en ${antEsc(lbl)} <i class="fa-solid fa-up-right-from-square"></i></a>` : '';
+        }).join('');
       return `<div class="ant-pub-card ant-pub-hecha">
         <div class="ant-pub-body">${antEsc((p.cuerpo || '').slice(0, 120))}</div>
         <div class="ant-pub-meta">
           <span class="red-badge red-badge-tipo">✅ Publicada</span>
-          ${d?.post_externo_id ? `<a class="ant-pub-link" href="https://x.com/i/web/status/${encodeURIComponent(d.post_externo_id)}" target="_blank" rel="noopener">Ver en X <i class="fa-solid fa-up-right-from-square"></i></a>` : ''}
+          ${links}
         </div>
       </div>`;
     }).join('') || '<p class="fin-empty">Aún nada publicado.</p>';
@@ -324,13 +379,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('view-antena')?.classList.contains('active')) initAntena();
   });
 
-  if (window.location.hash.startsWith('#antena-x-')) {
-    const ok = window.location.hash === '#antena-x-conectada';
+  if (window.location.hash.startsWith('#antena-')) {
+    const hash = window.location.hash;
     history.replaceState(null, '', window.location.pathname + window.location.search);
+    const MSG = {
+      '#antena-x-conectada':  '📡 ¡Cuenta de X conectada!',
+      '#antena-x-error':      'La conexión con X falló. Intenta de nuevo.',
+      '#antena-fb-conectada': '📡 ¡Páginas de Facebook conectadas!',
+      '#antena-fb-error':     'La conexión con Facebook falló. Intenta de nuevo.',
+      '#antena-fb-sinpaginas': 'Facebook no devolvió Páginas. ¿Tu usuario administra alguna Página?',
+    };
     setTimeout(() => {
-      if (typeof toast === 'function') {
-        toast(ok ? '📡 ¡Cuenta de X conectada!' : 'La conexión con X falló. Intenta de nuevo.');
-      }
+      if (typeof toast === 'function' && MSG[hash]) toast(MSG[hash]);
       if (typeof verificarSesion === 'function' && verificarSesion() && typeof switchView === 'function') {
         switchView('view-antena');
       }

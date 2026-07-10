@@ -6,10 +6,11 @@
 // publica en cada red destino. Reintenta con espera creciente
 // (2, 10, 30 min) y tras 3 fallos marca error.
 //
-// Secrets necesarios: X_CLIENT_ID, X_CLIENT_SECRET
+// Secrets necesarios: X_CLIENT_ID, X_CLIENT_SECRET, ANTENA_CRON_SECRET
 //
-// "Enforce JWT Verification": ACTIVADO. Además, solo acepta la
-// service_role key (la que usa el cron), nunca a un usuario normal.
+// "Enforce JWT Verification": DESACTIVADO (los proyectos con llaves
+// nuevas sb_* no tienen JWT clásico para el cron). En su lugar, la
+// función exige la contraseña del reloj en el header x-antena-cron.
 
 import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2";
 
@@ -22,7 +23,9 @@ const RETRASOS_MIN = [2, 10, 30]; // backoff entre reintentos
 
 /* Renueva el access token si está por vencer (margen de 5 minutos). */
 async function asegurarToken(svc: SupabaseClient, cuenta: any) {
-  const expira = cuenta.token_expira_at ? new Date(cuenta.token_expira_at).getTime() : 0;
+  // Los tokens de Página de Facebook no caducan de forma programada
+  if (!cuenta.token_expira_at) return cuenta;
+  const expira = new Date(cuenta.token_expira_at).getTime();
   if (expira - Date.now() > 5 * 60 * 1000) return cuenta;
 
   if (!cuenta.refresh_token) throw new Error("Token vencido y sin refresh_token");
@@ -77,13 +80,35 @@ async function publicarEn(cuenta: any, pub: any): Promise<string> {
     }
     return body.data.id;
   }
+
+  if (cuenta.plataforma === "facebook") {
+    const res = await fetch(
+      `https://graph.facebook.com/v21.0/${cuenta.cuenta_externa_id}/feed`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: pub.cuerpo, access_token: cuenta.access_token }),
+      },
+    );
+    const body = await res.json();
+    if (!res.ok || !body?.id) {
+      throw new Error(`Facebook respondió ${res.status}: ${JSON.stringify(body).slice(0, 300)}`);
+    }
+    return body.id; // formato "pageid_postid"
+  }
+
   throw new Error(`Plataforma no soportada aún: ${cuenta.plataforma}`);
 }
 
+const CRON_SECRET = Deno.env.get("ANTENA_CRON_SECRET") ?? "";
+
 Deno.serve(async (req) => {
-  // Solo el cron (con la service_role key) puede invocar esta función
+  // Solo el cron (con la contraseña del reloj) puede invocar esta función
   const bearer = (req.headers.get("Authorization") ?? "").replace("Bearer ", "");
-  if (bearer !== SERVICE_KEY) {
+  const cronHeader = req.headers.get("x-antena-cron") ?? "";
+  const autorizado =
+    (CRON_SECRET && cronHeader === CRON_SECRET) || bearer === SERVICE_KEY;
+  if (!autorizado) {
     return new Response(JSON.stringify({ error: "No autorizado" }), { status: 403 });
   }
 
