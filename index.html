@@ -938,13 +938,34 @@
           </div>
         </div>
 
+        <!-- Calendario (Fase 4) -->
+        <h2 class="section-title">Calendario</h2>
+        <div class="ant-cal-card">
+          <div class="ant-cal-head">
+            <button type="button" class="ant-cal-nav" id="ant-cal-prev" aria-label="Mes anterior">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span class="ant-cal-titulo" id="ant-cal-titulo"></span>
+            <button type="button" class="ant-cal-nav" id="ant-cal-next" aria-label="Mes siguiente">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+          <div class="ant-cal-grid" id="ant-cal-grid"></div>
+          <div id="ant-cal-detalle"></div>
+        </div>
+
         <h2 class="section-title">Próximas publicaciones</h2>
         <div id="ant-pubs-list"></div>
         <p class="fin-empty" id="ant-pubs-empty" style="display:none;">
           Nada en cola. Conecta tu cuenta y programa tu primera transmisión. 📡
         </p>
 
-        <h2 class="section-title">Publicadas recientemente</h2>
+        <div class="ant-section-row">
+          <h2 class="section-title">Publicadas recientemente</h2>
+          <button type="button" class="ant-met-btn" id="ant-met-btn">
+            <i class="fa-solid fa-chart-simple"></i> Actualizar métricas
+          </button>
+        </div>
         <div id="ant-hechas-list"></div>
 
       </div>

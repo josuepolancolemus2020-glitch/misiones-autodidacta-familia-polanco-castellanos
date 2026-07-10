@@ -3031,3 +3031,81 @@ body {
 .ant-dest-chip-on {
   background: #e0f2fe; border-color: #0ea5e9; color: #075985;
 }
+
+/* Antena Fase 4: calendario y métricas */
+.ant-cal-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 14px; box-shadow: var(--shadow); margin-bottom: 6px;
+}
+.ant-cal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin-bottom: 10px;
+}
+.ant-cal-titulo { font-size: 14px; font-weight: 800; color: var(--text); }
+.ant-cal-nav {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  width: 30px; height: 30px; font-size: 12px; color: var(--muted);
+  cursor: pointer; font-family: inherit;
+}
+.ant-cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+}
+.ant-cal-dow {
+  text-align: center; font-size: 10px; font-weight: 800;
+  color: var(--faint); padding: 2px 0; text-transform: uppercase;
+}
+.ant-cal-dia {
+  background: none; border: 1.5px solid transparent; border-radius: 9px;
+  padding: 3px 0 4px; cursor: pointer; font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-height: 36px;
+}
+.ant-cal-num { font-size: 12px; font-weight: 700; color: var(--text); }
+.ant-cal-hoy { background: #e0f2fe; }
+.ant-cal-hoy .ant-cal-num { color: #075985; }
+.ant-cal-sel { border-color: #0ea5e9; }
+.ant-cal-dots { display: flex; gap: 2px; min-height: 5px; }
+.ant-cal-dot {
+  width: 5px; height: 5px; border-radius: 50%; display: inline-block;
+  flex-shrink: 0;
+}
+.ant-dot-programada { background: #0ea5e9; }
+.ant-dot-publicando { background: #f59e0b; }
+.ant-dot-publicada  { background: #22c55e; }
+.ant-dot-error      { background: #dc2626; }
+.ant-dot-borrador   { background: var(--faint); }
+
+.ant-cal-det { border-top: 1px solid var(--border); margin-top: 10px; padding-top: 10px; }
+.ant-cal-det-titulo {
+  font-size: 11px; font-weight: 800; letter-spacing: .04em;
+  color: var(--muted); text-transform: uppercase; margin-bottom: 6px;
+}
+.ant-cal-det-vacio { font-size: 12.5px; color: var(--faint); }
+.ant-cal-det-item {
+  display: flex; align-items: center; gap: 8px; padding: 4px 0;
+  font-size: 12.5px; color: var(--text);
+}
+.ant-cal-det-hora { font-weight: 700; color: var(--muted); flex-shrink: 0; }
+.ant-cal-det-txt {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.ant-section-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.ant-met-btn {
+  background: var(--surface); border: 1.5px solid #7dd3fc; border-radius: 8px;
+  color: #0369a1; padding: 5px 12px; font-size: 11px; font-weight: 800;
+  cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+.ant-met-btn:disabled { opacity: .55; cursor: wait; }
+.ant-met-chips {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+  border-top: 1px dashed var(--border); padding-top: 8px;
+}
+.ant-met-chip {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  background: var(--bg); border-radius: 7px; padding: 3px 8px;
+  display: inline-flex; align-items: center; gap: 5px;
+}
