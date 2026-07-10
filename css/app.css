@@ -2940,3 +2940,67 @@ body {
 .ant-pub-body { font-size: 14px; color: var(--text); line-height: 1.5; }
 .ant-pub-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
 .ant-pub-fecha { font-size: 11px; color: var(--faint); display: inline-flex; align-items: center; gap: 5px; }
+
+/* Antena Fase 2: conectar, compositor y acciones */
+.ant-conectar-btn {
+  margin-top: 5px; background: linear-gradient(135deg, #0369a1, #0ea5e9);
+  color: #fff; border: none; border-radius: 8px; padding: 5px 12px;
+  font-size: 11px; font-weight: 800; cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.ant-desconectar-btn {
+  margin-top: 5px; background: none; border: none; padding: 0;
+  font-size: 10.5px; font-weight: 700; color: var(--faint);
+  cursor: pointer; font-family: inherit; text-decoration: underline;
+}
+
+.ant-composer-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);
+  padding: 14px; box-shadow: var(--shadow); margin-bottom: 6px;
+}
+.ant-composer-texto {
+  width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  background: var(--bg); padding: 12px 14px; font: inherit; font-size: 15px;
+  line-height: 1.5; color: var(--text); resize: vertical; outline: none;
+}
+.ant-composer-texto:focus { border-color: #0ea5e9; background: var(--surface); }
+.ant-composer-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; margin: 10px 0;
+}
+.ant-composer-count { font-size: 11.5px; font-weight: 700; color: var(--faint); }
+.ant-count-max { color: #dc2626; }
+.ant-composer-fecha {
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  background: var(--surface); padding: 8px 10px; font: inherit; font-size: 13px;
+  color: var(--text); outline: none;
+}
+.ant-composer-btns { display: flex; gap: 8px; }
+.ant-btn-programar, .ant-btn-ahora {
+  flex: 1; border: none; border-radius: 12px; padding: 12px;
+  font-size: 13.5px; font-weight: 800; font-family: inherit; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.ant-btn-programar {
+  background: linear-gradient(135deg, #0369a1, #0ea5e9); color: #fff;
+  box-shadow: 0 4px 12px rgba(3,105,161,.3);
+}
+.ant-btn-ahora {
+  background: var(--surface); border: 1.5px solid #0ea5e9; color: #0369a1;
+}
+
+.ant-pub-accion {
+  background: none; border: 1px solid var(--border); border-radius: 7px;
+  padding: 3px 10px; font-size: 11px; font-weight: 700; color: var(--muted);
+  cursor: pointer; font-family: inherit;
+}
+.ant-pub-borrar { color: #dc2626; border-color: rgba(220,38,38,.3); }
+.ant-pub-error {
+  margin-top: 8px; font-size: 11.5px; color: #b45309;
+  background: #fffbeb; border-radius: 8px; padding: 7px 10px;
+}
+.ant-pub-hecha { opacity: .85; }
+.ant-pub-link {
+  font-size: 11.5px; font-weight: 700; color: #0369a1;
+  display: inline-flex; align-items: center; gap: 5px;
+}

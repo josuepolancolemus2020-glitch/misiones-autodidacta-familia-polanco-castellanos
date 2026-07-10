@@ -915,11 +915,35 @@
         <h2 class="section-title">Cuentas conectadas</h2>
         <div class="ant-cuentas-grid" id="ant-cuentas-grid"></div>
 
+        <!-- Compositor (aparece cuando hay una cuenta conectada) -->
+        <div id="ant-composer" style="display:none;">
+          <h2 class="section-title">Nueva publicación</h2>
+          <div class="ant-composer-card">
+            <textarea id="ant-composer-texto" class="ant-composer-texto" maxlength="280" rows="4"
+              placeholder="¿Qué vas a transmitir hoy?"></textarea>
+            <div class="ant-composer-row">
+              <span class="ant-composer-count" id="ant-composer-count">0/280</span>
+              <input type="datetime-local" id="ant-composer-fecha" class="ant-composer-fecha">
+            </div>
+            <div class="ant-composer-btns">
+              <button type="button" class="ant-btn-programar" id="ant-programar-btn">
+                <i class="fa-regular fa-clock"></i> Programar
+              </button>
+              <button type="button" class="ant-btn-ahora" id="ant-ahora-btn">
+                <i class="fa-solid fa-paper-plane"></i> Publicar ahora
+              </button>
+            </div>
+          </div>
+        </div>
+
         <h2 class="section-title">Próximas publicaciones</h2>
         <div id="ant-pubs-list"></div>
         <p class="fin-empty" id="ant-pubs-empty" style="display:none;">
-          Aún no hay publicaciones.<br>El programador llega en la Fase 2 junto con la conexión de X. 📡
+          Nada en cola. Conecta tu cuenta y programa tu primera transmisión. 📡
         </p>
+
+        <h2 class="section-title">Publicadas recientemente</h2>
+        <div id="ant-hechas-list"></div>
 
       </div>
 
