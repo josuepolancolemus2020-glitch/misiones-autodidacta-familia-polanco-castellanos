@@ -1,10 +1,14 @@
 -- Ejecutar en Supabase -> SQL Editor.
 -- ANTENA 📡 — Fase 2: conexión OAuth de X y programador (pg_cron).
 --
--- ⚠️ ANTES DE EJECUTAR: reemplaza PEGA_AQUI_TU_SERVICE_ROLE_KEY (aparece
--- 1 vez abajo) por tu service_role key real. La encuentras en:
--- Dashboard -> Project Settings -> API keys -> "service_role" (Reveal).
--- NUNCA la publiques ni la subas a GitHub: solo pégala en el SQL Editor.
+-- ⚠️ ANTES DE EJECUTAR: reemplaza PEGA_AQUI_TU_ANTENA_CRON_SECRET (aparece
+-- 1 vez abajo) por el valor del secret ANTENA_CRON_SECRET de las Edge
+-- Functions (Dashboard -> Edge Functions -> Secrets). Es la "contraseña
+-- del reloj" que la función antena-publicar exige en el header
+-- x-antena-cron. NO uses la service_role key aquí: en proyectos con las
+-- llaves nuevas (sb_*) el Bearer clásico ya no coincide y la función
+-- responde 403 "No autorizado" (los mensajes se quedan en Programada).
+-- NUNCA publiques el secret ni lo subas a GitHub: solo pégalo en el SQL Editor.
 
 -- ─────────────────────────────────────────────
 -- 1. Estados temporales del flujo OAuth (PKCE)
@@ -36,7 +40,7 @@ select cron.schedule(
     url     := 'https://bzrnjvalpwlcnpszvwim.supabase.co/functions/v1/antena-publicar',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer PEGA_AQUI_TU_SERVICE_ROLE_KEY'
+      'x-antena-cron', 'PEGA_AQUI_TU_ANTENA_CRON_SECRET'
     ),
     body    := '{}'::jsonb
   );

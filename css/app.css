@@ -3031,6 +3031,24 @@ body {
 .ant-dest-chip-on {
   background: #e0f2fe; border-color: #0ea5e9; color: #075985;
 }
+.ant-dest-chip-off { opacity: .4; cursor: not-allowed; }
+
+/* Antena Fase 5a: candado de publicación privada */
+.ant-privada-btn {
+  width: 100%; margin-top: 10px; border-radius: 12px; padding: 10px 12px;
+  font-size: 12.5px; font-weight: 700; font-family: inherit; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--bg); border: 1.5px dashed var(--border); color: var(--faint);
+  transition: all .15s;
+}
+.ant-privada-btn.ant-privada-on {
+  background: #fef3c7; border: 1.5px solid #f59e0b; color: #92400e;
+}
+.ant-badge-privada { background: #fef3c7; color: #92400e; }
+.ant-pub-hacerpublica {
+  background: linear-gradient(135deg, #b45309, #f59e0b); color: #fff;
+  border: none;
+}
 
 /* Antena Fase 4: calendario y métricas */
 .ant-cal-card {

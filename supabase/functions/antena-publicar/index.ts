@@ -82,12 +82,18 @@ async function publicarEn(cuenta: any, pub: any): Promise<string> {
   }
 
   if (cuenta.plataforma === "facebook") {
+    // privada=true → post oculto (published=false): solo los admins de la
+    // Página lo ven, hasta que antena-visibilidad lo haga público.
     const res = await fetch(
       `https://graph.facebook.com/v21.0/${cuenta.cuenta_externa_id}/feed`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: pub.cuerpo, access_token: cuenta.access_token }),
+        body: JSON.stringify({
+          message: pub.cuerpo,
+          access_token: cuenta.access_token,
+          ...(pub.privada ? { published: false } : {}),
+        }),
       },
     );
     const body = await res.json();
@@ -142,6 +148,16 @@ Deno.serve(async (req) => {
     let maxIntentos = 0;
 
     for (const dest of dests ?? []) {
+      // Solo Facebook admite posts privados: descartar sin reintentos
+      if (pub.privada && dest.cuenta?.plataforma !== "facebook") {
+        await svc.from("antena_destinos").update({
+          estado: "error",
+          intentos: 3,
+          ultimo_error: "Solo Facebook admite publicaciones privadas",
+        }).eq("id", dest.id);
+        continue;
+      }
+
       try {
         if (!dest.cuenta) throw new Error("La cuenta ya no existe");
         if (dest.cuenta.estado !== "activa") throw new Error("La cuenta requiere reconexión");

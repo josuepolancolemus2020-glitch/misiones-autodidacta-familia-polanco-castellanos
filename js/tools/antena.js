@@ -36,6 +36,7 @@ const ANT_ESTADO_LBL = {
 let _antSession = null;
 let _antCuentas = [];
 let _antDestSel = new Set(); // cuentas elegidas como destino en el compositor
+let _antPrivada = true;      // 🔒 por defecto: nada sale público sin querer
 let _antCalMes = null;       // primer día del mes mostrado en el calendario
 let _antCalDiaSel = null;    // día seleccionado (número) o null
 
@@ -176,20 +177,42 @@ function antRenderDestChips() {
   const wrap = document.getElementById('ant-dest-chips');
   if (!wrap) return;
   const activas = _antCuentas.filter(c => c.estado === 'activa');
+
+  // Solo Facebook admite posts privados: con el candado puesto,
+  // los demás destinos quedan bloqueados y deseleccionados.
+  if (_antPrivada) {
+    activas.filter(c => c.plataforma !== 'facebook').forEach(c => _antDestSel.delete(c.id));
+  }
+
   wrap.innerHTML = activas.map(c => {
     const p = ANT_PLATAFORMAS.find(x => x.id === c.plataforma);
-    const sel = _antDestSel.has(c.id);
-    return `<button type="button" class="ant-dest-chip ${sel ? 'ant-dest-chip-on' : ''}" data-dest="${c.id}">
+    const bloqueada = _antPrivada && c.plataforma !== 'facebook';
+    const sel = !bloqueada && _antDestSel.has(c.id);
+    return `<button type="button"
+      class="ant-dest-chip ${sel ? 'ant-dest-chip-on' : ''} ${bloqueada ? 'ant-dest-chip-off' : ''}"
+      data-dest="${c.id}" ${bloqueada ? 'disabled title="No admite publicaciones privadas"' : ''}>
       <i class="${p ? p.icon : ''}"></i> ${antEsc(c.nombre_visible || c.plataforma)}
     </button>`;
   }).join('');
-  wrap.querySelectorAll('.ant-dest-chip').forEach(btn =>
+  wrap.querySelectorAll('.ant-dest-chip:not([disabled])').forEach(btn =>
     btn.addEventListener('click', () => {
       const id = Number(btn.dataset.dest);
       if (_antDestSel.has(id)) _antDestSel.delete(id);
       else _antDestSel.add(id);
       antRenderDestChips();
     }));
+
+  antRenderPrivadaBtn();
+}
+
+/* El candado del compositor: privada (solo tú) o pública directa */
+function antRenderPrivadaBtn() {
+  const btn = document.getElementById('ant-privada-btn');
+  if (!btn) return;
+  btn.classList.toggle('ant-privada-on', _antPrivada);
+  btn.innerHTML = _antPrivada
+    ? '<i class="fa-solid fa-lock"></i> Privada: solo tú la verás, hasta que la apruebes'
+    : '<i class="fa-solid fa-lock-open"></i> Pública: visible para todos al publicarse';
 }
 
 async function antConectar(plataforma) {
@@ -249,7 +272,9 @@ async function antProgramar(ahora) {
 
   const activas = _antCuentas.filter(c => c.estado === 'activa' && _antDestSel.has(c.id));
   if (!activas.length) {
-    if (typeof toast === 'function') toast('Elige al menos un destino');
+    if (typeof toast === 'function') {
+      toast(_antPrivada ? 'El modo privado necesita una Página de Facebook' : 'Elige al menos un destino');
+    }
     return;
   }
 
@@ -258,6 +283,7 @@ async function antProgramar(ahora) {
     cuerpo: texto,
     programada_at: fecha.toISOString(),
     estado: 'programada',
+    privada: _antPrivada,
   }).select().single();
   if (error || !pub) {
     console.error('[Antena] Error creando publicación:', error);
@@ -456,6 +482,7 @@ async function antRenderPublicaciones() {
       <div class="ant-pub-body">${antEsc((p.cuerpo || p.titulo || '').slice(0, 160))}</div>
       <div class="ant-pub-meta">
         <span class="red-badge red-badge-tipo">${ANT_ESTADO_LBL[p.estado] || p.estado}</span>
+        ${p.privada ? '<span class="red-badge ant-badge-privada"><i class="fa-solid fa-lock"></i> Privada</span>' : ''}
         ${p.programada_at ? `<span class="ant-pub-fecha"><i class="fa-regular fa-clock"></i> ${new Date(p.programada_at).toLocaleString('es')}</span>` : ''}
         ${p.estado === 'programada' ? `<button type="button" class="ant-pub-accion" data-cancelar="${p.id}">Cancelar</button>` : ''}
         ${['error', 'cancelada', 'borrador'].includes(p.estado) ? `<button type="button" class="ant-pub-accion ant-pub-borrar" data-borrar="${p.id}">Borrar</button>` : ''}
@@ -521,13 +548,38 @@ async function antRenderPublicaciones() {
       return `<div class="ant-pub-card ant-pub-hecha">
         <div class="ant-pub-body">${antEsc((p.cuerpo || '').slice(0, 120))}</div>
         <div class="ant-pub-meta">
-          <span class="red-badge red-badge-tipo">✅ Publicada</span>
+          <span class="red-badge red-badge-tipo">${p.privada ? '🔒 Publicada en privado' : '✅ Publicada'}</span>
+          ${p.privada ? `<button type="button" class="ant-pub-accion ant-pub-hacerpublica" data-hacerpublica="${p.id}">
+            <i class="fa-solid fa-bullhorn"></i> Hacer pública</button>` : ''}
           ${links}
         </div>
         ${metricas}
       </div>`;
     }).join('') || '<p class="fin-empty">Aún nada publicado.</p>';
+
+    hechas.querySelectorAll('[data-hacerpublica]').forEach(btn =>
+      btn.addEventListener('click', () => antHacerPublica(Number(btn.dataset.hacerpublica), btn)));
   }
+}
+
+/* Voltear una publicación privada a pública (Edge Function antena-visibilidad) */
+async function antHacerPublica(pubId, btn) {
+  if (!confirm('¿Hacer pública esta publicación? Todos podrán verla en Facebook.')) return;
+  if (btn) btn.disabled = true;
+  if (typeof toast === 'function') toast('📣 Haciéndola pública…');
+
+  const { data, error } = await _sb.functions.invoke('antena-visibilidad', {
+    body: { publicacion_id: pubId },
+  });
+
+  if (btn) btn.disabled = false;
+  if (error || data?.fallidos) {
+    console.error('[Antena] Error haciendo pública:', error || data);
+    if (typeof toast === 'function') toast('No se pudo hacer pública. Intenta de nuevo.');
+    return;
+  }
+  if (typeof toast === 'function') toast('📣 ¡Ya es pública!');
+  antRenderPublicaciones();
 }
 
 function antEsc(s) {
@@ -552,6 +604,12 @@ document.addEventListener('DOMContentLoaded', () => {
     await _sb?.auth.signOut();
     initAntena();
   });
+
+  document.getElementById('ant-privada-btn')?.addEventListener('click', () => {
+    _antPrivada = !_antPrivada;
+    antRenderDestChips();
+  });
+  antRenderPrivadaBtn();
 
   document.getElementById('ant-composer-texto')?.addEventListener('input', antActualizarContador);
   document.getElementById('ant-programar-btn')?.addEventListener('click', () => antProgramar(false));
