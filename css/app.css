@@ -2565,6 +2565,12 @@ body {
 }
 .destello-fab:active { transform: scale(.9); box-shadow: 0 3px 10px rgba(217,119,6,.4); }
 
+/* En Finanzas e Inventario hay un botón "+" abajo a la derecha:
+   el destello se apila justo encima (56px del "+" + 14px de aire) para no taparlo. */
+.destello-fab-apilado {
+  bottom: calc(var(--nav-h) + 18px + 70px + env(safe-area-inset-bottom, 0px));
+}
+
 /* ── Modal de captura ── */
 .des-modal-title {
   font-size: 17px; font-weight: 800; color: var(--text);

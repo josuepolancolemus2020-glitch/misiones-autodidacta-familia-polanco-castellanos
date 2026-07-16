@@ -438,8 +438,14 @@ function switchView(id) {
   // (estorbaría sobre la barra de escritura) y el editor de Redacción
   // (taparía el texto mientras se escribe).
   const desFab = document.getElementById('destello-fab');
-  if (desFab) desFab.style.display =
-    (id === 'view-chat' || id === 'view-redaccion-editor') ? 'none' : 'flex';
+  if (desFab) {
+    desFab.style.display =
+      (id === 'view-chat' || id === 'view-redaccion-editor') ? 'none' : 'flex';
+    // En las herramientas que tienen su propio botón "+" (Finanzas e
+    // Inventario) el destello se apila arriba para no tapar al "+".
+    const vistasConMasFab = ['view-finanzas', 'view-inventario'];
+    desFab.classList.toggle('destello-fab-apilado', vistasConMasFab.includes(id));
+  }
 
   const scroll = document.querySelector(`#${id} .view-scroll`);
   if (scroll) scroll.scrollTop = 0;
