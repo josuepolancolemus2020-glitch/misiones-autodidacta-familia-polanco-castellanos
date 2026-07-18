@@ -102,7 +102,12 @@ Deno.serve(async (req) => {
     url.searchParams.set("client_id", FB_CLIENT_ID);
     url.searchParams.set("redirect_uri", redirectUri);
     url.searchParams.set("state", st.state);
-    url.searchParams.set("scope", "pages_show_list,pages_read_engagement,pages_manage_posts");
+    // pages_read_engagement: leer el feed de la Página (el observatorio).
+    // pages_read_user_content: comentarios y posts de la audiencia.
+    // read_insights: impresiones y métricas de los posts.
+    url.searchParams.set("scope",
+      "pages_show_list,pages_read_engagement,pages_read_user_content," +
+      "pages_manage_posts,read_insights");
     return json({ url: url.toString() });
   } catch (e) {
     console.error("[antena-oauth-start] Error:", e);

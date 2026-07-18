@@ -1,13 +1,15 @@
 'use strict';
 
 /* ─────────────────────────────────────────────
-   ANTENA 📡 — gestión de redes sociales (Fase 4)
-   Sesión con enlace mágico + conexión OAuth
-   + compositor con programación + calendario
-   mensual + métricas. El publicador (Edge
-   Function antena-publicar) despierta cada
-   minuto vía pg_cron; el recolector
-   (antena-metricas) cada 4 horas.
+   ANTENA 📡 — EL OBSERVATORIO (Fase 5b)
+   Se publica desde la app de cada red (Facebook
+   lo hace mejor); Antena OBSERVA: métricas de
+   todo el feed de la Página, comentarios por
+   responder y resumen semanal. El recolector
+   (Edge Function antena-metricas) barre cada
+   4 horas vía pg_cron.
+   El compositor de Fase 2-5a queda dormido
+   (#ant-legado en index.html) por si vuelve.
    Los tokens OAuth JAMÁS llegan a este código.
 ───────────────────────────────────────────── */
 
@@ -76,8 +78,7 @@ async function initAntena() {
   if (emailEl) emailEl.textContent = _antSession.user.email;
 
   await antRenderCuentas();
-  await antRenderPublicaciones();
-  await antRenderCalendario();
+  await antRenderObservatorio();
 }
 
 async function antEnviarEnlace() {
@@ -162,10 +163,10 @@ async function antRenderCuentas() {
   grid.querySelectorAll('[data-desconectar]').forEach(btn =>
     btn.addEventListener('click', () => antDesconectar(Number(btn.dataset.desconectar))));
 
-  // El compositor aparece solo si hay al menos una cuenta activa
+  // Compositor retirado (Fase 5b): publicar se hace desde cada red
   const activas = _antCuentas.filter(c => c.estado === 'activa');
   const composer = document.getElementById('ant-composer');
-  if (composer) composer.style.display = activas.length ? 'block' : 'none';
+  if (composer) composer.style.display = 'none';
 
   // Chips de destino: por defecto, todas las cuentas activas seleccionadas
   _antDestSel = new Set(activas.map(c => c.id));
@@ -439,20 +440,184 @@ function antNum(n) {
 async function antActualizarMetricas() {
   const btn = document.getElementById('ant-met-btn');
   if (btn) btn.disabled = true;
-  if (typeof toast === 'function') toast('📊 Consultando las redes…');
+  if (typeof toast === 'function') toast('📡 Barriendo la Página…');
 
   const { data, error } = await _sb.functions.invoke('antena-metricas', { body: {} });
 
   if (btn) btn.disabled = false;
   if (error) {
-    console.error('[Antena] Error actualizando métricas:', error);
-    if (typeof toast === 'function') toast('No se pudieron actualizar las métricas');
+    console.error('[Antena] Error actualizando el observatorio:', error);
+    if (typeof toast === 'function') toast('No se pudo actualizar el observatorio');
     return;
   }
   if (typeof toast === 'function') {
-    toast(data?.capturadas ? `📊 Métricas actualizadas (${data.capturadas})` : '📊 Métricas al día');
+    toast(data?.posts ? `📡 Observatorio al día (${data.posts} posts)` : '📡 Observatorio al día');
   }
-  antRenderPublicaciones();
+  antRenderObservatorio();
+}
+
+/* ── Observatorio (Fase 5b): resumen, feed y comentarios ── */
+
+function antHace(iso) {
+  if (!iso) return '';
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 3600)  return `hace ${Math.max(1, Math.floor(s / 60))} min`;
+  if (s < 86400) return `hace ${Math.floor(s / 3600)} h`;
+  return `hace ${Math.floor(s / 86400)} d`;
+}
+
+async function antRenderObservatorio() {
+  await Promise.all([antRenderResumenYFeed(), antRenderComentarios()]);
+}
+
+async function antRenderResumenYFeed() {
+  const resEl     = document.getElementById('ant-resumen');
+  const feedEl    = document.getElementById('ant-feed-list');
+  const feedEmpty = document.getElementById('ant-feed-empty');
+  if (!resEl || !feedEl || !_sb || !_antSession) return;
+
+  const { data: postsData, error } = await _sb.from('antena_posts')
+    .select('id, mensaje, permalink, creado_en_red')
+    .order('creado_en_red', { ascending: false })
+    .limit(30);
+  if (error) { console.error('[Antena] Error cargando el feed:', error); return; }
+  const posts = postsData || [];
+
+  // Última foto de métricas de cada post
+  const ultimas = new Map();
+  if (posts.length) {
+    const { data: mets } = await _sb.from('antena_post_metricas')
+      .select('post_id, vistas, likes, comentarios, compartidos')
+      .in('post_id', posts.map(p => p.id))
+      .order('capturado_at', { ascending: false });
+    (mets || []).forEach(m => { if (!ultimas.has(m.post_id)) ultimas.set(m.post_id, m); });
+  }
+
+  // Historia de seguidores: la más reciente y la más cercana a hace 7 días
+  const { data: segs } = await _sb.from('antena_pagina_metricas')
+    .select('seguidores, capturado_at')
+    .order('capturado_at', { ascending: false })
+    .limit(120);
+  const segAhora = segs?.[0] || null;
+  const hace7d = Date.now() - 7 * 24 * 3600 * 1000;
+  const segPrevio = (segs || []).find(s => new Date(s.capturado_at).getTime() <= hace7d) || null;
+
+  // ── Resumen semanal (esta semana vs la anterior) ──
+  const SEM = 7 * 24 * 3600 * 1000;
+  const enSemana = (p, n) => {
+    const t = new Date(p.creado_en_red || 0).getTime();
+    return t > Date.now() - n * SEM && t <= Date.now() - (n - 1) * SEM;
+  };
+  const suma = lista => lista.reduce((a, p) => {
+    const m = ultimas.get(p.id);
+    if (m) { a.vistas += m.vistas; a.likes += m.likes; a.com += m.comentarios; a.comp += m.compartidos; }
+    return a;
+  }, { vistas: 0, likes: 0, com: 0, comp: 0 });
+
+  const estaSem = posts.filter(p => enSemana(p, 1));
+  const antSem  = posts.filter(p => enSemana(p, 2));
+  const tot     = suma(estaSem);
+  const totAnt  = suma(antSem);
+  const mejor   = [...estaSem].sort((a, b) => {
+    const ma = ultimas.get(a.id), mb = ultimas.get(b.id);
+    return ((mb?.vistas || 0) - (ma?.vistas || 0)) || ((mb?.likes || 0) - (ma?.likes || 0));
+  })[0];
+
+  const flecha = (hoy, ayer) => {
+    if (hoy === ayer) return '';
+    return hoy > ayer
+      ? '<span class="ant-res-up">▲</span>'
+      : '<span class="ant-res-down">▼</span>';
+  };
+  const deltaSeg = segAhora && segPrevio ? segAhora.seguidores - segPrevio.seguidores : null;
+
+  if (!posts.length && !segAhora) {
+    resEl.innerHTML = '';
+  } else {
+    resEl.innerHTML = `<div class="ant-res-card">
+      <div class="ant-res-grid">
+        <div class="ant-res-stat">
+          <span class="ant-res-num">${segAhora ? antNum(segAhora.seguidores) : '—'}</span>
+          <span class="ant-res-lbl">Seguidores</span>
+          ${deltaSeg !== null && deltaSeg !== 0 ? `<span class="ant-res-delta ${deltaSeg > 0 ? 'ant-res-up' : 'ant-res-down'}">${deltaSeg > 0 ? '+' : ''}${deltaSeg} esta semana</span>` : ''}
+        </div>
+        <div class="ant-res-stat">
+          <span class="ant-res-num">${estaSem.length}</span>
+          <span class="ant-res-lbl">Posts esta semana</span>
+        </div>
+        <div class="ant-res-stat">
+          <span class="ant-res-num">${antNum(tot.vistas)} ${flecha(tot.vistas, totAnt.vistas)}</span>
+          <span class="ant-res-lbl">Alcance</span>
+        </div>
+        <div class="ant-res-stat">
+          <span class="ant-res-num">${antNum(tot.likes)} ${flecha(tot.likes, totAnt.likes)}</span>
+          <span class="ant-res-lbl">Me gusta</span>
+        </div>
+      </div>
+      ${mejor && ultimas.get(mejor.id) ? `<div class="ant-res-mejor">
+        <i class="fa-solid fa-trophy"></i> Mejor post:
+        “${antEsc((mejor.mensaje || '').slice(0, 60))}”
+      </div>` : ''}
+    </div>`;
+  }
+
+  // ── Feed de la Página ──
+  if (feedEmpty) feedEmpty.style.display = posts.length ? 'none' : 'block';
+  feedEl.innerHTML = posts.slice(0, 15).map(p => {
+    const m = ultimas.get(p.id);
+    const metricas = m ? `<div class="ant-met-chips">
+      <span class="ant-met-chip" title="Alcance"><i class="fa-regular fa-eye"></i> ${antNum(m.vistas)}</span>
+      <span class="ant-met-chip" title="Me gusta"><i class="fa-regular fa-heart"></i> ${antNum(m.likes)}</span>
+      <span class="ant-met-chip" title="Comentarios"><i class="fa-regular fa-comment"></i> ${antNum(m.comentarios)}</span>
+      <span class="ant-met-chip" title="Compartidos"><i class="fa-solid fa-retweet"></i> ${antNum(m.compartidos)}</span>
+    </div>` : '';
+    return `<div class="ant-pub-card">
+      <div class="ant-pub-body">${antEsc((p.mensaje || '(sin texto)').slice(0, 140))}</div>
+      <div class="ant-pub-meta">
+        <span class="ant-pub-fecha"><i class="fa-regular fa-clock"></i> ${antHace(p.creado_en_red)}</span>
+        ${p.permalink ? `<a class="ant-pub-link" href="${p.permalink}" target="_blank" rel="noopener">
+          Ver en Facebook <i class="fa-solid fa-up-right-from-square"></i></a>` : ''}
+      </div>
+      ${metricas}
+    </div>`;
+  }).join('');
+}
+
+async function antRenderComentarios() {
+  const list  = document.getElementById('ant-coms-list');
+  const empty = document.getElementById('ant-coms-empty');
+  if (!list || !_sb || !_antSession) return;
+
+  const { data, error } = await _sb.from('antena_comentarios')
+    .select('id, autor, mensaje, permalink, creado_en_red, post:antena_posts(mensaje)')
+    .eq('respondido_pagina', false)
+    .eq('atendida', false)
+    .order('creado_en_red', { ascending: false })
+    .limit(15);
+  if (error) { console.error('[Antena] Error cargando comentarios:', error); return; }
+  const coms = data || [];
+
+  if (empty) empty.style.display = coms.length ? 'none' : 'block';
+  list.innerHTML = coms.map(c => `<div class="ant-com-card">
+    <div class="ant-com-head">
+      <strong>${antEsc(c.autor || 'Alguien')}</strong>
+      <span class="ant-com-hace">${antHace(c.creado_en_red)}</span>
+    </div>
+    <div class="ant-com-msg">${antEsc((c.mensaje || '').slice(0, 200))}</div>
+    ${c.post?.mensaje ? `<div class="ant-com-post">en: “${antEsc(c.post.mensaje.slice(0, 60))}”</div>` : ''}
+    <div class="ant-com-btns">
+      ${c.permalink ? `<a class="ant-com-responder" href="${c.permalink}" target="_blank" rel="noopener">
+        <i class="fa-solid fa-reply"></i> Responder</a>` : ''}
+      <button type="button" class="ant-pub-accion" data-atender="${c.id}">
+        <i class="fa-solid fa-check"></i> Atendido</button>
+    </div>
+  </div>`).join('');
+
+  list.querySelectorAll('[data-atender]').forEach(btn =>
+    btn.addEventListener('click', async () => {
+      await _sb.from('antena_comentarios').update({ atendida: true }).eq('id', Number(btn.dataset.atender));
+      antRenderComentarios();
+    }));
 }
 
 /* ── Listas de publicaciones ── */

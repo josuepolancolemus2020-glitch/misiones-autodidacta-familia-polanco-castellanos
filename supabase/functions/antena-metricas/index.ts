@@ -1,13 +1,15 @@
 // Edge Function: antena-metricas
 //
-// EL RECOLECTOR. pg_cron la despierta cada 4 horas (ver
+// EL OBSERVADOR (Fase 5b). pg_cron la despierta cada 4 horas (ver
 // supabase/sql/antena_fase4.sql) y también se puede invocar desde la app
-// con el botón "Actualizar métricas". Recorre los destinos publicados en
-// los últimos 30 días, pregunta a cada red cómo le fue al post y guarda
-// una foto (snapshot) en antena_metricas.
+// con el botón "Actualizar". Recorre el feed completo de cada Página de
+// Facebook conectada —se publique desde donde se publique—, y guarda:
+//   · los posts nuevos que descubra (antena_posts)
+//   · una foto de las métricas de cada post (antena_post_metricas)
+//   · los comentarios y si la Página ya los respondió (antena_comentarios)
+//   · la cantidad de seguidores (antena_pagina_metricas)
 //
 // Secrets necesarios: ANTENA_CRON_SECRET (para el cron).
-// X_CLIENT_ID/SECRET no hacen falta: se usa el access token guardado.
 //
 // "Enforce JWT Verification": DESACTIVADO (igual que antena-publicar).
 // Autorización aceptada por cualquiera de estas tres vías:
@@ -21,7 +23,7 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const CRON_SECRET  = Deno.env.get("ANTENA_CRON_SECRET") ?? "";
 
-const DIAS_VENTANA   = 30; // solo posts publicados hace menos de esto
+const FEED_LIMIT     = 25; // posts recientes a vigilar por Página
 const HORAS_FRESCURA = 2;  // no repetir snapshot si hay uno más nuevo que esto
 
 const CORS = {
@@ -29,53 +31,17 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-/* Métricas de un post de Página de Facebook. */
-async function metricasFacebook(cuenta: any, postId: string) {
-  const base = `https://graph.facebook.com/v21.0/${encodeURIComponent(postId)}`;
-  const res = await fetch(
-    `${base}?fields=likes.summary(true),comments.summary(true),shares` +
-    `&access_token=${encodeURIComponent(cuenta.access_token)}`,
-  );
+const GRAPH = "https://graph.facebook.com/v21.0";
+
+/* GET al Graph API con el token de la Página. */
+async function graphGet(path: string, params: Record<string, string>, token: string) {
+  const qs = new URLSearchParams({ ...params, access_token: token });
+  const res = await fetch(`${GRAPH}/${path}?${qs}`);
   const body = await res.json();
   if (!res.ok) {
     throw new Error(`Facebook respondió ${res.status}: ${JSON.stringify(body).slice(0, 200)}`);
   }
-
-  // Las impresiones van por el endpoint de insights; si falla no es fatal
-  let vistas = 0;
-  try {
-    const ins = await fetch(
-      `${base}/insights?metric=post_impressions&access_token=${encodeURIComponent(cuenta.access_token)}`,
-    );
-    const insBody = await ins.json();
-    vistas = Number(insBody?.data?.[0]?.values?.[0]?.value ?? 0);
-  } catch (_) { /* posts muy nuevos aún no tienen insights */ }
-
-  return {
-    vistas,
-    likes:       Number(body?.likes?.summary?.total_count ?? 0),
-    comentarios: Number(body?.comments?.summary?.total_count ?? 0),
-    compartidos: Number(body?.shares?.count ?? 0),
-  };
-}
-
-/* Métricas públicas de un tweet. Puede fallar por créditos (402): se tolera. */
-async function metricasX(cuenta: any, tweetId: string) {
-  const res = await fetch(
-    `https://api.x.com/2/tweets/${encodeURIComponent(tweetId)}?tweet.fields=public_metrics`,
-    { headers: { Authorization: `Bearer ${cuenta.access_token}` } },
-  );
-  const body = await res.json();
-  const m = body?.data?.public_metrics;
-  if (!res.ok || !m) {
-    throw new Error(`X respondió ${res.status}: ${JSON.stringify(body).slice(0, 200)}`);
-  }
-  return {
-    vistas:      Number(m.impression_count ?? 0),
-    likes:       Number(m.like_count ?? 0),
-    comentarios: Number(m.reply_count ?? 0),
-    compartidos: Number(m.retweet_count ?? 0) + Number(m.quote_count ?? 0),
-  };
+  return body;
 }
 
 Deno.serve(async (req) => {
@@ -105,48 +71,98 @@ Deno.serve(async (req) => {
       { status: 403, headers: { ...CORS, "Content-Type": "application/json" } });
   }
 
-  // ── Destinos publicados dentro de la ventana ──
-  const desde = new Date(Date.now() - DIAS_VENTANA * 24 * 3600 * 1000).toISOString();
-  const { data: dests, error } = await svc
-    .from("antena_destinos")
-    .select("id, post_externo_id, publicado_at, cuenta:antena_cuentas(*)")
-    .eq("estado", "publicada")
-    .not("post_externo_id", "is", null)
-    .gte("publicado_at", desde);
-  if (error) {
-    return new Response(JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...CORS, "Content-Type": "application/json" } });
-  }
+  const { data: cuentas } = await svc
+    .from("antena_cuentas")
+    .select("*")
+    .eq("plataforma", "facebook")
+    .eq("estado", "activa");
 
-  // Saltar destinos con snapshot reciente (evita spam del botón)
   const frescoDesde = new Date(Date.now() - HORAS_FRESCURA * 3600 * 1000).toISOString();
-  const { data: frescas } = await svc
-    .from("antena_metricas")
-    .select("destino_id")
-    .gte("capturado_at", frescoDesde);
-  const yaFrescos = new Set((frescas ?? []).map((f) => f.destino_id));
+  let posts = 0, snapshots = 0, comentarios = 0, fallidas = 0;
 
-  let capturadas = 0, saltadas = 0, fallidas = 0;
-
-  for (const dest of dests ?? []) {
-    if (yaFrescos.has(dest.id)) { saltadas++; continue; }
-    const cuenta = dest.cuenta;
-    if (!cuenta || cuenta.estado !== "activa") { saltadas++; continue; }
-
+  for (const cuenta of cuentas ?? []) {
     try {
-      let m;
-      if (cuenta.plataforma === "facebook") m = await metricasFacebook(cuenta, dest.post_externo_id);
-      else if (cuenta.plataforma === "x")   m = await metricasX(cuenta, dest.post_externo_id);
-      else { saltadas++; continue; }
+      const pageId = cuenta.cuenta_externa_id;
 
-      await svc.from("antena_metricas").insert({ destino_id: dest.id, ...m });
-      capturadas++;
+      // ── 1. Seguidores de la Página ──
+      const pagina = await graphGet(pageId, { fields: "followers_count" }, cuenta.access_token);
+      const { data: ultPag } = await svc.from("antena_pagina_metricas")
+        .select("id").eq("cuenta_id", cuenta.id)
+        .gte("capturado_at", frescoDesde).limit(1);
+      if (!ultPag?.length) {
+        await svc.from("antena_pagina_metricas").insert({
+          cuenta_id: cuenta.id,
+          seguidores: Number(pagina?.followers_count ?? 0),
+        });
+      }
+
+      // ── 2. El feed completo, con comentarios y sus respuestas ──
+      const feed = await graphGet(`${pageId}/feed`, {
+        limit: String(FEED_LIMIT),
+        fields: "id,message,created_time,permalink_url,shares,likes.summary(true)," +
+          "comments.summary(true).limit(25){id,from,message,created_time,permalink_url," +
+          "comments.limit(10){from}}",
+      }, cuenta.access_token);
+
+      for (const post of feed?.data ?? []) {
+        // 2a. Registrar el post (venga de Antena, de Facebook o de donde sea)
+        const { data: fila, error: upErr } = await svc.from("antena_posts").upsert({
+          cuenta_id: cuenta.id,
+          post_externo_id: post.id,
+          mensaje: (post.message ?? "").slice(0, 500),
+          permalink: post.permalink_url ?? null,
+          creado_en_red: post.created_time ?? null,
+          actualizado_at: new Date().toISOString(),
+        }, { onConflict: "cuenta_id,post_externo_id" }).select("id").single();
+        if (upErr || !fila) throw new Error(`upsert post: ${upErr?.message}`);
+        posts++;
+
+        // 2b. Snapshot de métricas (con frescura para no llenar la tabla)
+        const { data: ultMet } = await svc.from("antena_post_metricas")
+          .select("id").eq("post_id", fila.id)
+          .gte("capturado_at", frescoDesde).limit(1);
+        if (!ultMet?.length) {
+          let vistas = 0;
+          try {
+            const ins = await graphGet(`${post.id}/insights`,
+              { metric: "post_impressions" }, cuenta.access_token);
+            vistas = Number(ins?.data?.[0]?.values?.[0]?.value ?? 0);
+          } catch (_) { /* posts muy nuevos aún no tienen insights */ }
+
+          await svc.from("antena_post_metricas").insert({
+            post_id: fila.id,
+            vistas,
+            likes:       Number(post?.likes?.summary?.total_count ?? 0),
+            comentarios: Number(post?.comments?.summary?.total_count ?? 0),
+            compartidos: Number(post?.shares?.count ?? 0),
+          });
+          snapshots++;
+        }
+
+        // 2c. Comentarios de la audiencia (los de la propia Página no cuentan)
+        for (const com of post?.comments?.data ?? []) {
+          if (!com?.id || com?.from?.id === pageId) continue;
+          const respondida = (com?.comments?.data ?? [])
+            .some((r: any) => r?.from?.id === pageId);
+          // upsert sin tocar "atendida": lo marcado a mano se respeta
+          const { error: comErr } = await svc.from("antena_comentarios").upsert({
+            post_id: fila.id,
+            comentario_externo_id: com.id,
+            autor: com?.from?.name ?? "Alguien",
+            mensaje: (com.message ?? "").slice(0, 500),
+            permalink: com.permalink_url ?? post.permalink_url ?? null,
+            creado_en_red: com.created_time ?? null,
+            respondido_pagina: respondida,
+          }, { onConflict: "comentario_externo_id" });
+          if (!comErr) comentarios++;
+        }
+      }
     } catch (e) {
       fallidas++;
-      console.error(`[antena-metricas] Destino ${dest.id} falló:`, e);
+      console.error(`[antena-metricas] Cuenta ${cuenta.id} falló:`, e);
     }
   }
 
-  return new Response(JSON.stringify({ capturadas, saltadas, fallidas }),
+  return new Response(JSON.stringify({ posts, snapshots, comentarios, fallidas }),
     { status: 200, headers: { ...CORS, "Content-Type": "application/json" } });
 });

@@ -950,6 +950,33 @@
         <h2 class="section-title">Cuentas conectadas</h2>
         <div class="ant-cuentas-grid" id="ant-cuentas-grid"></div>
 
+        <!-- ═══ OBSERVATORIO (Fase 5b) ═══
+             Se publica desde la app de cada red; aquí se observa. -->
+        <div class="ant-section-row">
+          <h2 class="section-title">Resumen semanal</h2>
+          <button type="button" class="ant-met-btn" id="ant-met-btn">
+            <i class="fa-solid fa-satellite-dish"></i> Actualizar
+          </button>
+        </div>
+        <div id="ant-resumen"></div>
+
+        <h2 class="section-title">Comentarios por responder</h2>
+        <div id="ant-coms-list"></div>
+        <p class="fin-empty" id="ant-coms-empty" style="display:none;">
+          Nada pendiente. La audiencia está atendida. 💬
+        </p>
+
+        <h2 class="section-title">Publicaciones de la Página</h2>
+        <div id="ant-feed-list"></div>
+        <p class="fin-empty" id="ant-feed-empty" style="display:none;">
+          Aún no hay posts registrados. Toca «Actualizar» arriba. 📡
+        </p>
+
+        <!-- ═══ SECCIONES DORMIDAS (compositor Fase 2-5a) ═══
+             Publicar desde Antena se retiró: Facebook lo hace mejor.
+             El código queda por si algún día vuelve (p. ej. hilos de X). -->
+        <div id="ant-legado" style="display:none;">
+
         <!-- Compositor (aparece cuando hay una cuenta conectada) -->
         <div id="ant-composer" style="display:none;">
           <h2 class="section-title">Nueva publicación</h2>
@@ -998,11 +1025,10 @@
 
         <div class="ant-section-row">
           <h2 class="section-title">Publicadas recientemente</h2>
-          <button type="button" class="ant-met-btn" id="ant-met-btn">
-            <i class="fa-solid fa-chart-simple"></i> Actualizar métricas
-          </button>
         </div>
         <div id="ant-hechas-list"></div>
+
+        </div><!-- /ant-legado -->
 
       </div>
 

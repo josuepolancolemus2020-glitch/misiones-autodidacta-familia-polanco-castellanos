@@ -93,7 +93,20 @@ Deno.serve(async (req) => {
         return volverALaApp("#antena-fb-sinpaginas");
       }
 
-      // 2d. Guardar cada Página como cuenta conectada independiente.
+      // 2d. Preguntar qué permisos concedió de verdad el usuario (Facebook
+      // recorta en silencio los que la app no tiene o los que él desmarque).
+      let concedidos: string[] = [];
+      try {
+        const permRes = await fetch(
+          `${FB_API}/me/permissions?access_token=${encodeURIComponent(userToken)}`,
+        );
+        const permBody = await permRes.json();
+        concedidos = (permBody?.data ?? [])
+          .filter((p: any) => p?.status === "granted")
+          .map((p: any) => p.permission);
+      } catch (_) { /* si falla, se guarda la lista vacía */ }
+
+      // 2e. Guardar cada Página como cuenta conectada independiente.
       // Los tokens de Página derivados de un token de usuario de larga
       // duración no caducan de forma programada (token_expira_at null).
       for (const pg of paginas) {
@@ -105,7 +118,7 @@ Deno.serve(async (req) => {
           access_token: pg.access_token,
           refresh_token: null,
           token_expira_at: null,
-          scopes: ["pages_manage_posts"],
+          scopes: concedidos,
           estado: "activa",
           actualizado_at: new Date().toISOString(),
         }, { onConflict: "plataforma,cuenta_externa_id" });
