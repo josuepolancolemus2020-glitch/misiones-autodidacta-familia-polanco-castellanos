@@ -57,9 +57,48 @@ function redAutorInfo(id) {
   return m ? `${m.emoji} ${m.short.split(' ')[0]}` : id;
 }
 
+/* El cuerpo puede ser HTML (editor con formato) o texto plano (notas viejas) */
+function redPlano(html) {
+  if (!html) return '';
+  if (!html.includes('<')) return html;
+  const div = document.createElement('div');
+  div.innerHTML = html
+    .replace(/<br[^>]*>/gi, '\n')
+    .replace(/<\/(div|p|h[1-6]|li)>/gi, '\n');
+  return div.textContent;
+}
+
 function redPalabras(txt) {
-  const t = (txt || '').trim();
+  const t = redPlano(txt || '').trim();
   return t ? t.split(/\s+/).length : 0;
+}
+
+/* HTML del editor → Markdown (negrita/cursiva; el resto queda como texto) */
+function redMdNodo(node) {
+  if (node.nodeType === Node.TEXT_NODE) return node.textContent;
+  if (node.nodeType !== Node.ELEMENT_NODE) return '';
+  const inner = [...node.childNodes].map(redMdNodo).join('');
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'br') return '\n';
+  if (tag === 'b' || tag === 'strong') return inner.trim() ? `**${inner}**` : inner;
+  if (tag === 'i' || tag === 'em')     return inner.trim() ? `*${inner}*`  : inner;
+  if (tag === 'div' || tag === 'p' || tag === 'li') return '\n' + inner;
+  return inner; // <u>, <font>, <span>… : se conserva solo el texto
+}
+
+function redMdDesdeHtml(html) {
+  if (!html || !html.includes('<')) return html || '';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return redMdNodo(div).replace(/\n{3,}/g, '\n\n').replace(/^\n+/, '');
+}
+
+/* Estado del texto frente a sus límites: '' | 'ok' | 'amarillo' | 'rojo' */
+function redEstadoLimite(pal, min, max) {
+  if (!min && !max) return '';
+  if (max && pal > max) return 'rojo';
+  if (min && pal < min) return 'amarillo';
+  return 'ok';
 }
 
 function redEstadoInfo(id) {
@@ -266,6 +305,7 @@ function redRenderNotas() {
     const filas = deSec.map(n => {
       const est = redEstadoInfo(n.estado);
       const pal = redPalabras(n.cuerpo);
+      const lim = redEstadoLimite(pal, n.limite_amarillo, n.limite_rojo);
       return `
       <button type="button" class="red-nota" data-nota="${n.id}">
         <div class="red-nota-main">
@@ -275,7 +315,7 @@ function redRenderNotas() {
             <span class="red-badge ${est.cls}">${est.label}</span>
             <span class="red-badge red-badge-tipo">${redEsc(n.tipo)}</span>
             <span class="red-nota-autor">${redAutorInfo(n.autor)}</span>
-            <span class="red-nota-pal">${pal} palabra${pal === 1 ? '' : 's'}</span>
+            <span class="red-nota-pal ${lim ? `red-pal-${lim}` : ''}">${pal} palabra${pal === 1 ? '' : 's'}${lim === 'rojo' ? ' 🔴' : lim === 'amarillo' ? ' 🟡' : ''}</span>
           </div>
         </div>
         <i class="fa-solid fa-chevron-right red-nota-arrow"></i>
@@ -365,7 +405,15 @@ function redOpenEditor(id) {
 
   document.getElementById('red-e-titulo').value     = n.titulo || '';
   document.getElementById('red-e-entradilla').value = n.entradilla || '';
-  document.getElementById('red-e-cuerpo').value     = n.cuerpo || '';
+
+  // Notas viejas guardadas como texto plano: convertir saltos de línea a <br>
+  const cuerpo = n.cuerpo || '';
+  document.getElementById('red-e-cuerpo').innerHTML = cuerpo.includes('<')
+    ? cuerpo
+    : redEsc(cuerpo).replace(/\n/g, '<br>');
+
+  document.getElementById('red-e-lim-amarillo').value = n.limite_amarillo || '';
+  document.getElementById('red-e-lim-rojo').value     = n.limite_rojo || '';
 
   // Selects: sección, tipo, estado, edición
   const secSel = document.getElementById('red-e-seccion');
@@ -413,8 +461,19 @@ function redUpdatePortadaBtn() {
 function redUpdateContador() {
   const el = document.getElementById('red-e-contador');
   if (!el) return;
-  const txt = document.getElementById('red-e-cuerpo')?.value || '';
-  el.textContent = `${redPalabras(txt)} palabras · ${txt.length} caracteres`;
+  const html  = document.getElementById('red-e-cuerpo')?.innerHTML || '';
+  const plano = redPlano(html);
+  const pal   = redPalabras(html);
+  const min   = Number(document.getElementById('red-e-lim-amarillo')?.value) || 0;
+  const max   = Number(document.getElementById('red-e-lim-rojo')?.value) || 0;
+  const lim   = redEstadoLimite(pal, min, max);
+
+  let txt = `${pal} palabra${pal === 1 ? '' : 's'} · ${plano.length} caracteres`;
+  if (lim === 'rojo')          txt += ` · 🔴 Sobran ${pal - max} (máx. ${max})`;
+  else if (lim === 'amarillo') txt += ` · 🟡 Faltan ${min - pal} para el mínimo (${min})`;
+  else if (lim === 'ok')       txt += ' · ✅ Dentro del límite';
+  el.textContent = txt;
+  el.className = `red-e-contador${lim ? ` red-cont-${lim}` : ''}`;
 }
 
 function redSetSaveState(estado) {
@@ -426,10 +485,13 @@ function redSetSaveState(estado) {
 }
 
 function redCamposEditor() {
+  const cuerpoEl = document.getElementById('red-e-cuerpo');
   return {
     titulo:     document.getElementById('red-e-titulo').value.trim(),
     entradilla: document.getElementById('red-e-entradilla').value.trim(),
-    cuerpo:     document.getElementById('red-e-cuerpo').value,
+    cuerpo:     redPlano(cuerpoEl.innerHTML).trim() ? cuerpoEl.innerHTML : '',
+    limite_amarillo: Number(document.getElementById('red-e-lim-amarillo').value) || null,
+    limite_rojo:     Number(document.getElementById('red-e-lim-rojo').value) || null,
     seccion: document.getElementById('red-e-seccion').value,
     tipo:    document.getElementById('red-e-tipo').value,
     estado:  document.getElementById('red-e-estado').value,
@@ -525,7 +587,7 @@ function redNotaMd(n) {
   return `### ${n.titulo || 'Sin título'}\n` +
     `*${n.tipo} · ${redAutorInfo(n.autor)} · ${est.label} · ${redPalabras(n.cuerpo)} palabras*\n\n` +
     (entradilla ? `**Entradilla:** ${entradilla}\n\n` : '') +
-    `${(n.cuerpo || '').trim()}\n`;
+    `${redMdDesdeHtml(n.cuerpo || '').trim()}\n`;
 }
 
 function redEdicionMd() {
@@ -619,10 +681,45 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('red-ed-crear-btn')?.addEventListener('click', redCrearEdicion);
 
   // Editor: autoguardado
-  ['red-e-titulo', 'red-e-entradilla', 'red-e-cuerpo'].forEach(id =>
+  ['red-e-titulo', 'red-e-entradilla', 'red-e-cuerpo',
+   'red-e-lim-amarillo', 'red-e-lim-rojo'].forEach(id =>
     document.getElementById(id)?.addEventListener('input', redQueueSave));
   ['red-e-estado', 'red-e-edicion'].forEach(id =>
     document.getElementById(id)?.addEventListener('change', redQueueSave));
+
+  // Barra de formato del cuerpo
+  const cuerpoEl = document.getElementById('red-e-cuerpo');
+  document.querySelectorAll('#red-e-toolbar .red-tb-btn').forEach(btn => {
+    // mousedown en vez de click: no roba el foco (ni la selección) del editor
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault();
+      document.execCommand(btn.dataset.cmd, false, null);
+      redQueueSave();
+    });
+  });
+  const aplicarFormato = (selId, cmd) => {
+    const sel = document.getElementById(selId);
+    sel?.addEventListener('change', () => {
+      if (!sel.value) return;
+      cuerpoEl?.focus();
+      document.execCommand(cmd, false, sel.value);
+      sel.value = ''; // el select actúa como menú: vuelve a su etiqueta
+      redQueueSave();
+    });
+  };
+  aplicarFormato('red-e-fuente', 'fontName');
+  aplicarFormato('red-e-tamano', 'fontSize');
+
+  // Pegar siempre como texto plano (evita arrastrar estilos de otras apps)
+  cuerpoEl?.addEventListener('paste', e => {
+    e.preventDefault();
+    const txt = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, txt);
+  });
+  // Al borrar todo suele quedar un <br> suelto: limpiarlo para que vuelva el placeholder
+  cuerpoEl?.addEventListener('input', () => {
+    if (!cuerpoEl.textContent && cuerpoEl.innerHTML !== '') cuerpoEl.innerHTML = '';
+  });
 
   // Sección y tipo: la última opción del select permite crear uno nuevo
   const nuevoEnSelect = (selId, marker, configKey, promptTxt, mayusculas) => {

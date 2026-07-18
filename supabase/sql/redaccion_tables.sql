@@ -23,8 +23,14 @@ create table if not exists public.redaccion_notas (
   estado          text not null default 'idea',  -- idea | borrador | revision | listo
   entradilla      text not null default '',      -- párrafo introductorio opcional
   cuerpo          text not null default '',
-  en_portada      boolean not null default false -- ⭐ su título va en la portada
+  en_portada      boolean not null default false, -- ⭐ su título va en la portada
+  limite_amarillo int,                    -- 🟡 mínimo de palabras (recuadro de Canva)
+  limite_rojo     int                     -- 🔴 máximo de palabras (recuadro de Canva)
 );
+
+-- Migración para bases ya creadas (no hace nada si las columnas ya existen)
+alter table public.redaccion_notas add column if not exists limite_amarillo int;
+alter table public.redaccion_notas add column if not exists limite_rojo int;
 
 -- Configuración compartida de Redacción (secciones y tipos personalizados)
 create table if not exists public.redaccion_config (

@@ -850,8 +850,43 @@
         placeholder="Párrafo corto que presenta la nota y engancha al lector…"></textarea>
 
       <label class="red-e-label" for="red-e-cuerpo">Cuerpo de la nota</label>
-      <textarea id="red-e-cuerpo" class="red-e-cuerpo"
-        placeholder="Escribe aquí tu nota, artículo o aviso…&#10;&#10;El texto se guarda solo mientras escribes."></textarea>
+
+      <!-- Barra de formato del cuerpo -->
+      <div class="red-e-toolbar" id="red-e-toolbar">
+        <button type="button" class="red-tb-btn" data-cmd="bold" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+        <button type="button" class="red-tb-btn" data-cmd="italic" title="Cursiva"><i class="fa-solid fa-italic"></i></button>
+        <button type="button" class="red-tb-btn" data-cmd="underline" title="Subrayado"><i class="fa-solid fa-underline"></i></button>
+        <select id="red-e-fuente" class="red-tb-select" title="Tipo de letra">
+          <option value="">Letra</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="'Times New Roman', serif">Times</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="'Courier New', monospace">Courier</option>
+        </select>
+        <select id="red-e-tamano" class="red-tb-select" title="Tamaño de letra">
+          <option value="">Tamaño</option>
+          <option value="2">Pequeña</option>
+          <option value="3">Normal</option>
+          <option value="4">Grande</option>
+          <option value="6">Muy grande</option>
+        </select>
+        <button type="button" class="red-tb-btn" data-cmd="removeFormat" title="Quitar formato"><i class="fa-solid fa-eraser"></i></button>
+      </div>
+
+      <div id="red-e-cuerpo" class="red-e-cuerpo" contenteditable="true"
+        data-placeholder="Escribe aquí tu nota, artículo o aviso… El texto se guarda solo mientras escribes."></div>
+
+      <!-- Límite de palabras (para encajar en los recuadros de Canva) -->
+      <div class="red-e-limites">
+        <span class="red-e-lim-label"><i class="fa-solid fa-ruler-horizontal"></i> Límite de palabras</span>
+        <label class="red-e-lim-campo">🟡 Mín.
+          <input type="number" id="red-e-lim-amarillo" class="red-e-lim-input" min="0" inputmode="numeric" placeholder="—">
+        </label>
+        <label class="red-e-lim-campo">🔴 Máx.
+          <input type="number" id="red-e-lim-rojo" class="red-e-lim-input" min="0" inputmode="numeric" placeholder="—">
+        </label>
+      </div>
 
       <div class="red-e-contador" id="red-e-contador">0 palabras · 0 caracteres</div>
 
