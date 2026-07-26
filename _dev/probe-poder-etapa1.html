@@ -33,7 +33,7 @@ window.addEventListener('load', async () => {
   const dentro = e => w.eval(e);
   try {
     log('── LA MISIÓN ──');
-    ok(d.querySelectorAll('.sec').length === 14, '14 secciones, con Recursos incluida', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones (las 14 del molde y Casos del proyecto)', 'secciones: ' + d.querySelectorAll('.sec').length);
     ok(/Ruta del Poder · Etapa 1 de 6/.test(d.body.textContent), 'se presenta como etapa 1 de 6', 'no se presenta como etapa de la ruta');
     ok(!/M\.E\.T\.A\.S|frontend|switchView/.test(d.querySelector('#s-aprende').textContent), 'sin restos del módulo del que se copió', 'quedan textos del módulo anterior');
     ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
@@ -64,11 +64,30 @@ window.addEventListener('load', async () => {
     ok(crit.length > 200, 'la Interpelación del Vendedor se genera', 'interpelación vacía');
     ok(!/Panorama M\.E\.T\.A\.S/.test(crit + d.body.textContent), 'los rótulos de prueba llevan el nombre correcto', 'las pruebas siguen diciendo Panorama M.E.T.A.S');
 
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      const cajas = casos.querySelectorAll('.card');
+      ok(cajas.length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + cajas.length);
+      const txt = casos.textContent;
+      ['ONG', 'Secretaría', 'inversionista', 'editorial', 'candidato', 'aula', 'negocios', 'anuncios']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok(/M\.E\.T\.A\.S/.test(txt), 'los casos son sobre el futuro de M.E.T.A.S', 'los casos no mencionan el proyecto');
+      ok(/con qué condición|con condiciones/i.test(txt), 'cada caso cierra con su condición', 'los casos no plantean condiciones');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+    }
+    /* La prueba competencial decide sobre el proyecto, no sobre casos genéricos */
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/M\.E\.T\.A\.S/.test(decisiones) && /inversionista/.test(decisiones),
+      'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
     log('\n── FICHA ──');
     const r = await fetch('/fichas/ficha-poder-activos-pasivos.html');
     const txt = r.ok ? await r.text() : '';
     ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
     ok((txt.match(/class="pagina"/g) || []).length === 3, '3 páginas para imprimir', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/Caso del proyecto/.test(txt), 'la ficha trae el caso del proyecto con su pauta', 'la ficha no trae caso del proyecto');
     ok(/PATRIMONIO \(activos menos deudas\)/.test(txt), 'trae el balance de la casa para llenar', 'no trae el balance');
     ok(/Pauta de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
     const rec = d.querySelector('#s-recursos a[href*="ficha-poder"]');
