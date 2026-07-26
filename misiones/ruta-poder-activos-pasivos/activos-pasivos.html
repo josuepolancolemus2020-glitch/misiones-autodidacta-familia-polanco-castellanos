@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Autocapacitación M.E.T.A.S · Módulo 2: El frontend | policastsapien.com</title>
+<title>Ruta del Poder · Etapa 1: Activos y Pasivos | F.A.R.O.</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/modulo-2-frontend.css">
+<link rel="stylesheet" href="css/activos-pasivos.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -25,11 +25,11 @@
 
 <header class="hero" role="banner">
   <div class="hero-inner">
-    <div class="hero-mascot" aria-hidden="true">🗺️</div>
+    <div class="hero-mascot" aria-hidden="true">💰</div>
     <div class="hero-text">
-      <h1>Autocapacitación <span>El frontend por dentro</span></h1>
-      <p class="sub">Un index, 57 misiones y un solo molde: el mapa de piezas 🧩</p>
-      <div class="badge">🎓 Ingeniería del propio sistema · Módulo 2 de 8 · Metalingüística</div>
+      <h1>Activos y <span>Pasivos</span></h1>
+      <p class="sub">Qué mete dinero a tu bolsillo y qué lo saca, mes a mes 💵</p>
+      <div class="badge">💰 Ruta del Poder · Etapa 1 de 6 · Economía de la familia</div>
     </div>
   </div>
 </header>
@@ -39,61 +39,61 @@
 <!-- ===== APRENDE ===== -->
 <div class="sec active" id="s-aprende" role="tabpanel">
   <div class="card ac-teal">
-    <h2>🗺️ ¿Cómo está armado el frontend?</h2>
-    <p>El frontend de <strong>M.E.T.A.S</strong> es <strong>un solo index.html con 13 vistas</strong>, <strong>57 misiones</strong> que repiten el mismo molde de tres archivos y catorce secciones, <strong>7 herramientas</strong> del maestro en <code>js/tools</code> y unas pocas <strong>capas comunes</strong> que todos comparten. Esa es la <strong>frase maestra</strong> del módulo: no hay framework, hay convención.</p>
+    <h2>💰 La pregunta que ordena todo</h2>
+    <p>Un <strong>activo</strong> mete dinero a tu bolsillo, o te ahorra un gasto, aunque no estés trabajando. Un <strong>pasivo</strong> lo saca mes a mes, lo uses o no. Esa es la <strong>frase maestra</strong> de esta etapa, y su prueba no es el precio: es <strong>en qué dirección mueve el dinero</strong>. La misma motocicleta es activo si reparte pedidos pagados y pasivo si solo pasea.</p>
     <div class="tip">
       <span class="ti">💡</span>
-      <div><strong>Qué se estudia aquí:</strong> el Módulo 1 dio el panorama de los cuatro frentes; este entra al primero de ellos y lo abre pieza por pieza. Al terminar deberías poder dibujar el árbol del proyecto de memoria y decir, de cada carpeta, de qué es responsable. Todo lo que afirma este módulo fue contado y verificado contra el repositorio real el 26 de julio de 2026.</div>
+      <div><strong>Por qué esta misión abre la Ruta del Poder:</strong> el dinero de una familia no se decide en el sueldo, se decide en lo que hace con lo que le sobra. Sin esta distinción, cada aumento de ingreso se convierte en una cuota nueva. Con ella, el mismo ingreso empieza a comprar libertad. Los ejemplos van en <strong>lempiras</strong> y salen de decisiones reales: la moto, el cuarto, la máquina de coser, la tarjeta.</div>
     </div>
   </div>
 
   <div class="card ac-gold">
-    <h2>📊 Dos preguntas que revelan el frontend</h2>
+    <h2>📊 Dos preguntas que revelan tu situación</h2>
     <div class="vs-grid">
       <div class="vs-box vs-a">
-        <h4>🔀 ¿Dónde está la navegación?</h4>
-        <p>En <strong>una sola función</strong>: <code>switchView()</code>, dentro de js/app.js. Apaga la vista activa y enciende otra. No hay recarga, no hay router de librería, no hay dirección web nueva por pantalla.</p>
+        <h4>🌊 ¿Cuánto te queda cada mes?</h4>
+        <p>Es el <strong>flujo de caja</strong>: lo que entra menos lo que sale. Manda más que el sueldo, porque una familia con buen ingreso y flujo negativo vive del crédito sin darse cuenta.</p>
       </div>
       <div class="vs-box vs-b">
-        <h4>📐 ¿Dónde está la misión?</h4>
-        <p>En su <strong>propia carpeta</strong>, con su HTML, su JS y su CSS. La aplicación no la contiene: la <strong>enlaza</strong> desde el catálogo <code>js/data/misiones.js</code> y la abre como página aparte.</p>
+        <h4>🏛️ ¿Qué te queda si vendes todo?</h4>
+        <p>Es el <strong>patrimonio</strong>: activos menos deudas. Puede ser negativo aunque haya bienes vistosos. El flujo es la película; el patrimonio, la foto de fin de año.</p>
       </div>
     </div>
     <div class="ex-box">
       <span class="ex-tag ex-f">⚙️ La idea clave para defender</span><br>
-      <span>Las 57 misiones <span class="hl">NO son 57 desarrollos</span>: son un molde repetido con contenido distinto. Por eso una corrección en el molde se vuelve <span class="hl2">una corrección en las 57</span>.</span>
+      <span>Dos familias con el <span class="hl">mismo ingreso</span> terminan en lugares distintos: una convierte su sobrante en activos y la otra en cuotas. No es suerte, es <span class="hl2">la dirección del flujo</span>.</span>
     </div>
   </div>
 
   <div class="card ac-jade">
-    <h2>🌳 Recorrido del repositorio, pieza por pieza</h2>
-    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver de qué es responsable.</p>
+    <h2>🪜 Los seis pasos, en orden</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada paso para ver qué hay que hacer y por qué va en ese lugar.</p>
     <div class="timeline-wrap">
       <div class="timeline-track" id="timelineTrack"></div>
     </div>
     <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
-      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🗺️</span>
-      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza del recorrido.</div>
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🪜</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un paso del camino.</div>
     </div>
   </div>
 
   <div class="card ac-purple">
-    <h2>🔁 Simulación: el viaje de un toque</h2>
-    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué encuentra la aplicación cuando abre la misión.</p>
+    <h2>🔁 Simulación: el lempira que sobró</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué hace la familia con lo que le quedó este mes.</p>
     <div class="method-sim" id="methodSim">
       <div class="method-steps" id="methodSteps">
-        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">👆</span><span class="ms-text"><strong>El toque:</strong> el alumno elige una misión en la vista Misiones del index.</span></div>
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📥</span><span class="ms-text"><strong>Entra el ingreso:</strong> cae el salario del mes, digamos L 14,000.</span></div>
         <div class="method-arrow" id="ma1">⬇️</div>
-        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">📇</span><span class="ms-text"><strong>Consulta al catálogo:</strong> app.js busca esa misión en js/data/misiones.js y toma su carpeta, su materia y su XP.</span></div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🏠</span><span class="ms-text"><strong>Salen los gastos de vivir:</strong> comida, transporte, servicios y colegio. Quedan L 2,500.</span></div>
         <div class="method-arrow" id="ma2">⬇️</div>
-        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">📐</span><span class="ms-text"><strong>Se abre el molde:</strong> misiones/&lt;carpeta&gt;/&lt;mision&gt;.html carga su JS y su CSS propios, con las mismas 14 secciones de siempre.</span></div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🤔</span><span class="ms-text"><strong>Aparece la decisión:</strong> con esos L 2,500 se puede dar la prima de un bien de uso o comprar algo que produzca.</span></div>
         <div class="method-arrow" id="ma3">⬇️</div>
-        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🔍</span><span class="ms-text"><strong>Pregunta del molde:</strong> ¿esta misión trae traducción de autor?</span></div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">✍️</span><span class="ms-text"><strong>Se firma o no se firma:</strong> la decisión de un minuto compromete los próximos meses.</span></div>
       </div>
       <div class="method-branch" id="methodBranch">
-        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿La misión tiene su archivo -en.js?</p>
-        <button class="btn btn-d" onclick="resolveMethod(false)">🇭🇳 No, solo español</button>
-        <button class="btn btn-pri" onclick="resolveMethod(true)">🌐 Sí, está traducida</button>
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿A dónde va ese sobrante?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🕳️ A un pasivo</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">💰 A un activo</button>
       </div>
       <div class="method-result" id="methodResult"></div>
       <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
@@ -109,67 +109,67 @@
 <!-- ===== ESTRUCTURA ===== -->
 <div class="sec" id="s-estructura" role="tabpanel">
   <div class="card ac-teal">
-    <h2>📐 El molde de una misión</h2>
+    <h2>🧾 Las cuatro casillas de la economía familiar</h2>
     <div class="vs-grid">
       <div class="vs-box vs-a">
-        <h4>🗂️ Tres archivos (y a veces cuatro)</h4>
-        <p>Cada misión vive en su carpeta de <code>misiones/</code> con su <strong>HTML</strong>, su <strong>js/</strong> y su <strong>css/</strong>. Si tiene traducción de autor suma un cuarto: <strong>&lt;mision&gt;-en.js</strong>. Nada de la misión se mezcla con el resto de la aplicación.</p>
+        <h4>📥 Ingreso y 📤 egreso</h4>
+        <p>Lo que <strong>entra</strong> y lo que <strong>sale</strong> en el mes. Son movimientos: se miden en un período. Su resta es el flujo de caja, y ahí se ve si la familia construye o se aprieta.</p>
       </div>
       <div class="vs-box vs-b">
-        <h4>🧩 Catorce secciones iguales</h4>
-        <p>Aprende, Estructura, Laboratorio, Flashcards, Quiz, Clasifica, Identifica, Completa, Widgets, Reto, Sopa, Tareas, Evaluación y Recursos. Las mismas en las <strong>57</strong>: quien aprende a moverse en una, se mueve en todas.</p>
+        <h4>💰 Activo y 🕳️ pasivo</h4>
+        <p>Lo que <strong>tienes</strong> y lo que <strong>debes o te cuesta</strong>. Son posiciones: se miden en un momento. Su resta es el patrimonio, la foto honesta de dónde está la familia.</p>
       </div>
     </div>
     <div class="ex-box">
-      <span class="ex-tag ex-d">📏 La plantilla manda</span><br>
-      <span>Que se parezcan no es casualidad: lo fija <span class="hl">PLANTILLA-MISIONES.md</span> y lo vigilan los arneses de verificación. La uniformidad es <span class="hl2">una decisión sostenida</span>, no un accidente feliz.</span>
+      <span class="ex-tag ex-d">📏 La confusión más cara</span><br>
+      <span>Mezclar <span class="hl">tener</span> con <span class="hl2">poder pagar</span>. Se puede tener terreno y no poder cubrir una emergencia el martes: eso es falta de liquidez, y es lo que empuja a vender barato o a endeudarse caro.</span>
     </div>
   </div>
 
   <div class="card ac-amber">
-    <h2>🧱 Lógica, datos y capas comunes</h2>
+    <h2>🔢 Los números que hay que saber de memoria</h2>
     <div class="vs-grid">
       <div class="vs-box vs-a">
-        <h4>⚙️ Lógica (js/ y js/tools/)</h4>
-        <p><strong>app.js</strong> manda la navegación y el catálogo; <strong>js/tools</strong> guarda las siete herramientas del maestro; y las capas comunes (registro, diálogos, presentación, supabase, sincronización docente e idioma) las usan todas las pantallas.</p>
+        <h4>🛟 Antes de invertir, protegerse</h4>
+        <p>El <strong>fondo de emergencia</strong> va primero: de tres a seis meses de gastos, disponibles y separados. Sin él, el primer imprevisto obliga a rematar un activo o a firmar deuda cara.</p>
       </div>
       <div class="vs-box vs-b">
-        <h4>🗃️ Datos (js/data/)</h4>
-        <p>Ocho archivos de <strong>datos puros</strong>, sin lógica: misiones (el catálogo), campeonismo-bank, dcnb-map, diagnosticos, consejos-padres, frases, paises y proceres. Se pueden leer y corregir sin tocar el motor.</p>
+        <h4>🔥 La deuda más cara, primero</h4>
+        <p>Se ordenan por <strong>tasa de interés</strong>, no por tamaño. Se paga el mínimo en todas y se ataca la más cara; al apagar una, su cuota se suma a la siguiente. El interés compuesto deja de trabajar en contra.</p>
       </div>
     </div>
     <div class="stat-bar">
-      <div class="stat-item"><div class="stat-label">Vistas del index</div><div class="stat-val">13</div></div>
-      <div class="stat-item"><div class="stat-label">Misiones y fichas</div><div class="stat-val">57</div></div>
-      <div class="stat-item"><div class="stat-label">Herramientas</div><div class="stat-val">7</div></div>
-      <div class="stat-item"><div class="stat-label">Bancos de datos</div><div class="stat-val">8</div></div>
+      <div class="stat-item"><div class="stat-label">Fondo de emergencia</div><div class="stat-val">3 a 6</div></div>
+      <div class="stat-item"><div class="stat-label">Meses para medir el flujo</div><div class="stat-val">1</div></div>
+      <div class="stat-item"><div class="stat-label">Casillas que ordenan todo</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
     </div>
     <div class="ex-box">
       <span class="ex-tag ex-m">🔑 En sus palabras</span><br>
-      <span>Separar <span class="hl">datos de lógica</span> es lo que permite agregar una misión, una pregunta o un consejo sin abrir el motor. El catálogo es la única fuente: <span class="hl2">lo que no está ahí, no existe</span> para la aplicación.</span>
+      <span>El costo de una compra a crédito es <span class="hl">cuota por plazo</span>, no la cuota. Y a eso hay que sumarle lo que el bien <span class="hl2">pierde de valor</span> mientras se paga.</span>
     </div>
   </div>
 
   <div class="card ac-jade">
-    <h2>🛰️ Lo que vive fuera del index</h2>
+    <h2>🧰 Hazlo con tus propios datos</h2>
     <div class="vs-grid">
       <div class="vs-box vs-a">
-        <h4>📄 Páginas satélite</h4>
-        <p><strong>padres.html</strong> (asistente de la familia), <strong>panel-docente.html</strong>, <strong>consulta-nube.html</strong>, <strong>registro.html</strong>, <strong>camp-vivo.html</strong>, <strong>evaluaciones.html</strong> y <strong>mision.html</strong>: entradas propias para públicos que no pasan por la aplicación.</p>
+        <h4>💵 Finanzas de F.A.R.O</h4>
+        <p>La herramienta <strong>Finanzas Familia</strong> ya registra ingresos y egresos: ahí sale tu flujo real de este mes, no el que recuerdas. Un mes completo anotado vale más que cualquier teoría.</p>
       </div>
       <div class="vs-box vs-b">
-        <h4>🖨️ El papel</h4>
-        <p><code>fichas/</code> guarda una <strong>ficha imprimible por misión</strong>, su índice y el mapa curricular DCNB. Y los kits de capacitación viven también como páginas sueltas, listas para imprimir tamaño carta.</p>
+        <h4>📦 Inventario</h4>
+        <p>La lista de bienes de la familia es la <strong>primera columna del patrimonio</strong>. Al lado de cada uno, escribe si mete o saca dinero: en una tarde queda armado el balance de la casa.</p>
       </div>
     </div>
-    <p style="font-size:0.9rem;margin:0.8rem 0;">La regla transversal del frontend es la <strong>convención</strong>: mismo molde, mismos nombres, mismas secciones. Lo que la sostiene no es un compilador, son la plantilla y los arneses.</p>
+    <p style="font-size:0.9rem;margin:0.8rem 0;">La regla transversal de esta ruta es medir antes de opinar: <strong>números primero, decisiones después</strong>. Casi nadie acierta de memoria en qué se le va el dinero.</p>
     <div class="type-grid">
-      <div class="type-chip tc-teal"><div class="t-art">🏠 index.html</div><div class="t-info">13 vistas, una sola página</div></div>
-      <div class="type-chip tc-gold"><div class="t-art">⚙️ js/app.js</div><div class="t-info">switchView y catálogo</div></div>
-      <div class="type-chip tc-jade"><div class="t-art">📐 misiones/</div><div class="t-info">57 carpetas, mismo molde</div></div>
-      <div class="type-chip tc-amber"><div class="t-art">🧰 js/tools/</div><div class="t-info">7 herramientas del maestro</div></div>
-      <div class="type-chip tc-purple"><div class="t-art">🗃️ js/data/</div><div class="t-info">8 bancos de datos puros</div></div>
-      <div class="type-chip tc-blue"><div class="t-art">🖨️ fichas/</div><div class="t-info">Una ficha por misión</div></div>
+      <div class="type-chip tc-teal"><div class="t-art">💰 Activo</div><div class="t-info">Mete dinero sin tus horas</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🕳️ Pasivo</div><div class="t-info">Saca dinero, lo uses o no</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🌊 Flujo</div><div class="t-info">Entra menos sale</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🏛️ Patrimonio</div><div class="t-info">Activos menos deudas</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🛟 Fondo</div><div class="t-info">3 a 6 meses de gastos</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🔁 Interés</div><div class="t-info">A favor o en contra</div></div>
     </div>
   </div>
 
@@ -182,9 +182,9 @@
 <!-- ===== LAB ===== -->
 <div class="sec" id="s-lab" role="tabpanel">
   <div class="card ac-jade">
-    <h2>🧪 Laboratorio de las 4 piezas</h2>
-    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto para explorarla. ¡Combínalas todas para dominar el mapa!</p>
-    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>index.html (la portada)</strong> → <strong>Qué es</strong></div>
+    <h2>🧪 Laboratorio de las 4 casillas</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una casilla y un aspecto para explorarla. ¡Combínalas todas para dominar el tablero!</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El activo</strong> → <strong>Qué es</strong></div>
     <div class="lab-stage">
       <div id="lab-display" class="lab-display-box">
         <!-- Rellenado por JS -->
@@ -192,18 +192,18 @@
     </div>
     <div class="lab-controls">
       <div class="lab-group">
-        <span class="lab-group-label">🧩 Pieza:</span>
-        <button class="lab-btn lab-cont-btn" data-parte="portada" onclick="labShowParte('portada')">🏠 Portada</button>
-        <button class="lab-btn lab-cont-btn" data-parte="mision" onclick="labShowParte('mision')">📐 Misión</button>
-        <button class="lab-btn lab-cont-btn" data-parte="tools" onclick="labShowParte('tools')">🧰 Herramientas</button>
-        <button class="lab-btn lab-cont-btn" data-parte="capas" onclick="labShowParte('capas')">🧱 Capas</button>
+        <span class="lab-group-label">🧩 Casilla:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="activo" onclick="labShowParte('activo')">💰 Activo</button>
+        <button class="lab-btn lab-cont-btn" data-parte="pasivo" onclick="labShowParte('pasivo')">🕳️ Pasivo</button>
+        <button class="lab-btn lab-cont-btn" data-parte="flujo" onclick="labShowParte('flujo')">🌊 Flujo</button>
+        <button class="lab-btn lab-cont-btn" data-parte="patrimonio" onclick="labShowParte('patrimonio')">🏛️ Patrimonio</button>
       </div>
       <div class="lab-group">
         <span class="lab-group-label">📌 Aspecto:</span>
         <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
         <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo funciona</button>
         <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">⚠️ Riesgos y límites</button>
-        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 Ejemplo real</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En lempiras</button>
       </div>
     </div>
   </div>
@@ -260,7 +260,7 @@
 <!-- ===== CLASIFICA ===== -->
 <div class="sec" id="s-clasifica" role="tabpanel">
   <div class="card ac-jade">
-    <h2>🗂️ Clasifica las Piezas del Sistema</h2>
+    <h2>🗂️ Clasifica: ¿mete o saca dinero?</h2>
     <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
     <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
     <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
@@ -285,7 +285,7 @@
 <!-- ===== IDENTIFICA ===== -->
 <div class="sec" id="s-identifica" role="tabpanel">
   <div class="card ac-purple">
-    <h2>🔍 Identifica el término técnico</h2>
+    <h2>🔍 Identifica el término económico</h2>
     <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
     <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
     <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
@@ -324,7 +324,7 @@
 <div class="sec" id="s-widgets" role="tabpanel">
 
   <div class="card ac-teal">
-    <h2>🔗 Ordena: secuencias del sistema</h2>
+    <h2>🔗 Ordena: los pasos en su orden</h2>
     <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
     <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
     <div class="sort-list" id="routeList"></div>
@@ -336,7 +336,7 @@
   </div>
 
   <div class="card ac-gold">
-    <h2>🔬 Identifica la pieza</h2>
+    <h2>🔬 Identifica el concepto</h2>
     <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
     <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
     <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la arquitectura se describe?</p>
@@ -350,7 +350,7 @@
   </div>
 
   <div class="card ac-jade">
-    <h2>📚 Empareja: Archivo → Responsabilidad</h2>
+    <h2>📚 Empareja: caso → qué es</h2>
     <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
     <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
     <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Cuál es la responsabilidad de este archivo del repositorio?</p>
@@ -363,7 +363,7 @@
   </div>
 
   <div class="card ac-purple">
-    <h2>🧐 Problemas reales: ¿qué pieza los resuelve?</h2>
+    <h2>🧐 Problemas reales: ¿qué está pasando?</h2>
     <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
     <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
     <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona la pieza de la arquitectura que responde a:</p>
@@ -463,17 +463,17 @@
 <div class="sec" id="s-evaluacion" role="tabpanel">
   <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
     <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
-    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🧠 Interpelación del Ingeniero</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🧠 Interpelación del Vendedor</button>
   </div>
   <div id="evalConceptWrap">
   <div class="card ac-purple">
     <div class="eval-print-header">
-      <h2>Evaluación Final · El frontend de M.E.T.A.S · Autocapacitación Técnica</h2>
+      <h2>Evaluación Final · Activos y Pasivos · Ruta del Poder</h2>
       <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
       <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
       <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
     </div>
-    <h2 id="eval-screen-title">🎓 Evaluación Final: el frontend de M.E.T.A.S</h2>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: activos y pasivos</h2>
     <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
     <div class="eval-controls">
       <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
@@ -487,13 +487,13 @@
   <div id="evalCritWrap" style="display:none;">
   <div class="card ac-amber">
     <div class="eval-print-header">
-      <h2>Evaluación Competencial · Interpelación del Ingeniero · El frontend de M.E.T.A.S</h2>
+      <h2>Evaluación Competencial · Interpelación del Vendedor · Activos y Pasivos</h2>
       <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
       <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
       <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
     </div>
-    <h2 id="evalcrit-screen-title">🧠 Interpelación del Ingeniero: el frontend de M.E.T.A.S</h2>
-    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">El simulacro central del kit: responde cada objeción con tus propias palabras (en pantalla o en tu cuaderno), compara con la <strong>Pauta</strong> y anótate el puntaje de cada sección. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <h2 id="evalcrit-screen-title">🧠 Interpelación del Vendedor: te quieren hacer firmar</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">El simulacro central de la etapa: alguien te empuja a firmar. Responde con tus propias palabras (en pantalla o en tu cuaderno), compara con la <strong>Pauta</strong> y anótate el puntaje de cada sección. <strong>Genera una nueva prueba cuando quieras.</strong></p>
     <div class="eval-controls">
       <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
       <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
@@ -517,29 +517,29 @@
 
     <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
       <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
-      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Tres páginas tamaño carta: el mapa en una tabla, actividades sin pantalla, simulacro de interpelación y pauta de respuestas. Para estudiar lejos del teclado.</p>
-      <a href="../../fichas/ficha-autocap-modulo-2.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Tres páginas tamaño carta con el <strong>balance de la familia</strong> para llenar a mano: las cuatro casillas, el flujo del mes, el simulacro del vendedor y la pauta de respuestas.</p>
+      <a href="../../fichas/ficha-poder-activos-pasivos.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
     </div>
 
-    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Fuentes de este módulo</h3>
-    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Todo lo que afirma la misión sale de estos documentos y del código real. Si algo cambia en el sistema, aquí se comprueba primero.</p>
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba midiendo un mes real de la familia.</p>
     <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
-      <li><a href="https://github.com/josuepolancolemus2020-glitch/misiones-educativas_a-policastsapien.com/blob/main/PLAN-AUTOCAPACITACION.md" target="_blank" rel="noopener noreferrer">Temario de los 8 módulos</a> (PLAN-AUTOCAPACITACION.md)</li>
-      <li><a href="https://github.com/josuepolancolemus2020-glitch/misiones-educativas_a-policastsapien.com/blob/main/PLANTILLA-MISIONES.md" target="_blank" rel="noopener noreferrer">La plantilla que fija el molde</a> (PLANTILLA-MISIONES.md)</li>
-      <li><a href="https://github.com/josuepolancolemus2020-glitch/misiones-educativas_a-policastsapien.com" target="_blank" rel="noopener noreferrer">El repositorio de M.E.T.A.S</a>: index.html, js/app.js, js/tools, js/data, misiones/ y fichas/</li>
-      <li><a href="https://metas.policastsapien.com/kit-auto-2.html" target="_blank" rel="noopener noreferrer">Kit imprimible del Módulo 2</a> (la versión de papel de este mismo módulo, con su diagrama del árbol del frontend)</li>
+      <li><a href="../../index.html">💵 Finanzas Familia</a>: registra un mes completo de ingresos y egresos y saca tu flujo real.</li>
+      <li><a href="../../index.html">📦 Inventario</a>: lista los bienes y marca cuáles meten y cuáles sacan dinero.</li>
+      <li><a href="../../index.html">⚡ Destellos</a>: apunta ahí las compras que estuviste a punto de firmar y revísalas en frío a los siete días.</li>
+      <li><a href="../../fichas/ficha-poder-activos-pasivos.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: el balance de la casa cabe en una página.</li>
     </ul>
 
     <div class="tip">
       <span class="ti">💡</span>
-      <div><strong>Cómo estudiar este módulo:</strong> primero recorrer las secciones en pantalla, después imprimir la ficha y dibujar el árbol del proyecto de memoria, y al final responder el simulacro en voz alta. Lo que no se pueda explicar sin leer, todavía no está aprendido.</div>
+      <div><strong>Cómo estudiar esta etapa:</strong> recorrer las secciones, imprimir la ficha y llenar el balance con números de verdad, y al final responder el simulacro del vendedor en voz alta. La prueba de que está aprendido es poder decir que no, con un número en la mano, sin quedar mal.</div>
     </div>
   </div>
 
   <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
     <span class="nsb-icon">🏅</span>
     <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
-    <span class="nsb-arrow">🗺️</span>
+    <span class="nsb-arrow">💰</span>
   </button>
 </div>
 
@@ -550,8 +550,8 @@
   <div class="diploma-card">
     <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
     <div class="diploma-title">CONSTANCIA DE LOGRO</div>
-    <div class="diploma-sub">Autocapacitación M.E.T.A.S · Módulo 2: El frontend</div>
-    <div class="diploma-mascot" aria-hidden="true">🗺️</div>
+    <div class="diploma-sub">Ruta del Poder · Etapa 1: Activos y Pasivos</div>
+    <div class="diploma-mascot" aria-hidden="true">💰</div>
     <div class="diploma-name" id="diplName">Estudiante</div>
     <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
     <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
@@ -597,7 +597,7 @@
 <footer class="credits">
   <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
   <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
-  <div class="mot">«Estudiar lo que construimos es construir dos veces» 🌱 · Serie de Autocapacitación Técnica M.E.T.A.S · Módulo 2 de 8.</div>
+  <div class="mot">«No es cuánto ganas: es cuánto te queda trabajando cuando dejas de trabajar» 🌱 · 💰 Ruta del Poder · Etapa 1 de 6.</div>
   <div class="cred-contact">
     <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
     <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
@@ -612,6 +612,6 @@
 </footer>
 
   <script src="js/html2canvas.min.js"></script>
-  <script src="js/modulo-2-frontend.js"></script>
+  <script src="js/activos-pasivos.js"></script>
 </body>
 </html>

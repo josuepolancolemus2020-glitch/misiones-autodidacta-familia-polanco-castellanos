@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta del Poder, etapa 1</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-poder-activos-pasivos/activos-pasivos.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la misión nueva (bancos, laboratorio, pruebas, ficha) y que la
+   Ruta del Poder ya muestre su primera etapa construida. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 14, '14 secciones, con Recursos incluida', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta del Poder · Etapa 1 de 6/.test(d.body.textContent), 'se presenta como etapa 1 de 6', 'no se presenta como etapa de la ruta');
+    ok(!/M\.E\.T\.A\.S|frontend|switchView/.test(d.querySelector('#s-aprende').textContent), 'sin restos del módulo del que se copió', 'quedan textos del módulo anterior');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('Object.keys(parteData).join(",")') === 'activo,pasivo,flujo,patrimonio', 'laboratorio con las 4 casillas', 'casillas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 6, 'los 6 pasos del camino', 'pasos: ' + dentro('timelineData.length'));
+    ok(/faro_poder/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/El activo/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el activo', 'abre en otra casilla');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'la Interpelación del Vendedor se genera', 'interpelación vacía');
+    ok(!/Panorama M\.E\.T\.A\.S/.test(crit + d.body.textContent), 'los rótulos de prueba llevan el nombre correcto', 'las pruebas siguen diciendo Panorama M.E.T.A.S');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-poder-activos-pasivos.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 3, '3 páginas para imprimir', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/PATRIMONIO \(activos menos deudas\)/.test(txt), 'trae el balance de la casa para llenar', 'no trae el balance');
+    ok(/Pauta de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    const rec = d.querySelector('#s-recursos a[href*="ficha-poder"]');
+    ok(!!rec, 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const cards = [...da.querySelectorAll('.ruta-card')];
+    const poder = cards.find(c => /Ruta del Poder/.test(c.textContent));
+    ok(!!poder, 'la Ruta del Poder está en el mapa', 'no aparece la ruta');
+    if (poder) {
+      ok(poder.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + poder.querySelectorAll('.re-link').length);
+      ok(poder.querySelectorAll('.ruta-etapa-futura').length === 5, 'y 5 etapas por construir con nombre', 'futuras: ' + poder.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/El presupuesto real/.test(poder.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    da.querySelector('.fam-chip[data-materia="eco"]').click(); await esperar(250);
+    ok(da.querySelectorAll('#missions-container .mission-card').length === 1, 'la materia Poder Económico muestra su misión', 'muestra ' + da.querySelectorAll('#missions-container .mission-card').length);
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

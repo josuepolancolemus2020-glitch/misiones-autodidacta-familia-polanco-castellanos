@@ -22,7 +22,8 @@ f.onload = async () => {
   try {
     log('── CARGA ──');
     ok(errores.length === 0, 'sin errores de JavaScript', 'errores: ' + errores.join(' | '));
-    ok(d.querySelectorAll('.sec').length === 13, '13 paneles de sección', 'hay ' + d.querySelectorAll('.sec').length + ' paneles');
+    /* 14 desde que el módulo tiene su sección de Recursos, como las misiones de M.E.T.A.S */
+    ok(d.querySelectorAll('.sec').length === 14, '14 paneles de sección', 'hay ' + d.querySelectorAll('.sec').length + ' paneles');
     ok(/Módulo 2 de 8/.test(d.body.textContent), 'se presenta como Módulo 2 de 8', 'no dice Módulo 2 de 8');
     ok(!/Panorama M\.E\.T\.A\.S/.test(d.body.textContent), 'sin restos del Módulo 1', 'quedan textos del Módulo 1');
 
