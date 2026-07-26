@@ -16,6 +16,12 @@
   --org: #7c3aed; --org-bg: #f5f3ff; --org-border: rgba(124,58,237,.2);
   --sal: #e11d48; --sal-bg: #fff1f2; --sal-border: rgba(225,29,72,.2);
   --apr: #16a34a; --apr-bg: #f0fdf4; --apr-border: rgba(22,163,74,.2);
+  /* Materias del adulto: ingeniería del propio sistema, persuasión, marca y poder */
+  --ing:  #0f6f6c; --ing-bg:  #ecfdf5; --ing-border: rgba(15,111,108,.2);
+  --psi:  #9333ea; --psi-bg:  #faf5ff; --psi-border: rgba(147,51,234,.2);
+  --mkt:  #db2777; --mkt-bg:  #fdf2f8; --mkt-border: rgba(219,39,119,.2);
+  --eco:  #ca8a04; --eco-bg:  #fefce8; --eco-border: rgba(202,138,4,.2);
+  --pol:  #1d4ed8; --pol-bg:  #eff6ff; --pol-border: rgba(29,78,216,.2);
   --inv: #0d9488; --inv-bg: #f0fdfa; --inv-border: rgba(13,148,136,.2);
 
   --bg:      #f0f4f9;
@@ -706,6 +712,28 @@ a { text-decoration: none; color: inherit; }
   transition: background .15s;
 }
 .header-icon-btn:active { background: var(--bg); }
+@media (hover: hover) { .header-icon-btn:hover { background: var(--bg); } }
+
+/* ── Botón 🔄 Actualizar ──
+   Igual que en M.E.T.A.S: fuerza traer la última versión publicada
+   (borra el service worker y las cachés) y deja al usuario donde
+   estaba. Va en TODOS los encabezados, no solo en el inicio. */
+.refresh-btn {
+  background: none; border: none; cursor: pointer;
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--text);
+  transition: background .15s, color .15s;
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.refresh-btn:active { background: var(--bg); }
+@media (hover: hover) { .refresh-btn:hover { background: var(--bg); } }
+.app-header > .refresh-btn { margin-left: auto; }   /* en los compactos, a la derecha */
+.refresh-btn i.spin { animation: refreshSpin .6s ease; }
+@keyframes refreshSpin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .refresh-btn i.spin { animation: none; }
+}
 
 .notif-dot {
   position: absolute; top: 6px; right: 6px;
@@ -3228,3 +3256,51 @@ body {
   background: var(--bg); border-radius: 7px; padding: 3px 8px;
   display: inline-flex; align-items: center; gap: 5px;
 }
+
+/* ══════════════════════════════════════════════
+   MIS RUTAS — el mapa de series por etapas
+   Una ruta se lee de arriba abajo: etapas construidas (tocables) y
+   etapas previstas (en gris). El color viene de la materia de la ruta.
+══════════════════════════════════════════════ */
+.qa-rutas { background: linear-gradient(135deg, #0f766e, #2dd4bf); }
+
+.rutas-intro {
+  margin: 0 0 14px; font-size: 13.5px; line-height: 1.5; color: var(--muted, #64748b);
+}
+.ruta-card {
+  background: var(--surface, #fff); border: 1px solid var(--border, #e2e8f0);
+  border-radius: 16px; padding: 14px; margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(15,23,42,.06);
+}
+.ruta-head { display: flex; align-items: flex-start; gap: 10px; }
+.ruta-emoji { font-size: 26px; line-height: 1; flex-shrink: 0; }
+.ruta-titulos { min-width: 0; }
+.ruta-nombre { margin: 0; font-size: 16px; font-weight: 800; color: var(--text, #0f172a); }
+.ruta-lema   { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--muted, #64748b); }
+
+.ruta-barra-wrap {
+  height: 8px; border-radius: 999px; background: var(--bg, #f1f5f9);
+  overflow: hidden; margin: 12px 0 6px;
+}
+.ruta-barra { height: 100%; border-radius: 999px; transition: width .3s ease; }
+.ruta-cuenta { margin: 0 0 10px; font-size: 12px; font-weight: 700; color: var(--muted, #64748b); }
+
+.ruta-etapas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ruta-etapa {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 12px;
+  background: var(--bg, #f8fafc); border: 1px solid var(--border, #e2e8f0);
+}
+.re-num {
+  flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: #fff; background: #94a3b8;
+}
+.re-txt { min-width: 0; flex: 1; font-size: 13.5px; line-height: 1.35; color: var(--text, #0f172a); }
+.re-link { text-decoration: none; font-weight: 700; }
+.re-link:active { opacity: .7; }
+.re-estado { flex-shrink: 0; font-size: 11.5px; font-weight: 700; color: var(--muted, #64748b); }
+.ruta-etapa-hecha { border-color: rgba(22,163,74,.35); background: var(--apr-bg, #f0fdf4); }
+.ruta-etapa-hecha .re-estado { color: var(--apr, #16a34a); }
+.ruta-etapa-futura { opacity: .62; }
+.ruta-etapa-futura .re-txt { font-style: italic; }

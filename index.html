@@ -82,6 +82,10 @@
       <!-- Acceso rápido: todo a un toque -->
       <h2 class="section-title">Acceso Rápido</h2>
       <div class="qa-grid" id="quick-access">
+        <button type="button" class="qa-item" data-qa="view-rutas">
+          <span class="qa-icon qa-rutas"><i class="fa-solid fa-map-signs"></i></span>
+          <span class="qa-label">Mis Rutas</span>
+        </button>
         <button type="button" class="qa-item" data-qa="view-destellos">
           <span class="qa-icon qa-des"><i class="fa-solid fa-bolt"></i></span>
           <span class="qa-label">Destellos</span>
@@ -192,12 +196,30 @@
         <button type="button" class="fam-chip" data-materia="cnat">🔬 C. Naturales</button>
         <button type="button" class="fam-chip" data-materia="csoc">🌎 C. Sociales</button>
         <button type="button" class="fam-chip" data-materia="epis">🦉 Epistemología</button>
+        <button type="button" class="fam-chip" data-materia="ing">🏗️ Ingeniería del Sistema</button>
+        <button type="button" class="fam-chip" data-materia="psi">🧠 Psicología y Persuasión</button>
+        <button type="button" class="fam-chip" data-materia="mkt">📈 Marketing y Marca</button>
+        <button type="button" class="fam-chip" data-materia="eco">💰 Poder Económico</button>
+        <button type="button" class="fam-chip" data-materia="pol">🏛️ Poder Político</button>
       </div>
       <div id="missions-container" class="missions-list"></div>
     </div>
   </div>
 
   <!-- ========== PROGRESO ========== -->
+  <!-- ========== RUTAS DE APRENDIZAJE ========== -->
+  <div id="view-rutas" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Mis Rutas</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+      <p class="rutas-intro">Cada ruta es una serie ordenada: las etapas se recorren en orden y el mapa muestra también lo que falta por construir.</p>
+      <div id="rutas-container"></div>
+    </div>
+  </div>
+
   <div id="view-progreso" class="view">
     <header class="app-header compact">
       <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
@@ -1234,6 +1256,9 @@
       </button>
       <button class="drawer-item" data-view="view-misiones">
         <i class="fa-solid fa-rocket"></i><span>Aprendizaje Unido</span>
+      </button>
+      <button class="drawer-item" data-view="view-rutas">
+        <i class="fa-solid fa-map-signs"></i><span>Mis Rutas</span>
       </button>
       <button class="drawer-item" data-view="view-progreso">
         <i class="fa-solid fa-chart-line"></i><span>Mi Progreso</span>

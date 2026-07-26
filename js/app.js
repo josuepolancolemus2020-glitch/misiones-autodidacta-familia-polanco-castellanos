@@ -17,6 +17,13 @@ const MATERIAS = [
   { id: 'cnat', label: 'Ciencias Naturales', sub: 'Vida y Naturaleza',   icon: 'fa-flask',                color: 'cnat' },
   { id: 'csoc', label: 'Ciencias Sociales',  sub: 'Historia y Sociedad', icon: 'fa-earth-americas',       color: 'csoc' },
   { id: 'epis', label: 'Epistemología',      sub: 'Filosofía y Ciencia', icon: 'fa-brain',                color: 'bach' },
+  /* Materias del adulto: lo que la familia necesita para manejar su propio
+     proyecto. Conviven con las escolares, que siguen sirviendo a las hijas. */
+  { id: 'ing',  label: 'Ingeniería del Sistema', sub: 'Estudiar lo que construimos', icon: 'fa-diagram-project', color: 'ing' },
+  { id: 'psi',  label: 'Psicología y Persuasión', sub: 'Influencia, sesgos y defensa', icon: 'fa-masks-theater', color: 'psi' },
+  { id: 'mkt',  label: 'Marketing y Marca',   sub: 'Audiencia, oferta y relato',   icon: 'fa-bullhorn',        color: 'mkt' },
+  { id: 'eco',  label: 'Poder Económico',     sub: 'Dinero, activos y decisiones',  icon: 'fa-sack-dollar',     color: 'eco' },
+  { id: 'pol',  label: 'Poder Político',      sub: 'Instituciones y negociación',   icon: 'fa-landmark',        color: 'pol' },
 ];
 
 const LEVELS = [
@@ -293,6 +300,74 @@ function renderMissions(query) {
 }
 
 /* ─────────────────────────────────────────────
+   RENDER — RUTAS
+   Una ruta es una serie ordenada por etapas. El mapa enseña el camino
+   COMPLETO: las etapas que ya existen como misión (con su estado para el
+   miembro activo) y las que están previstas pero aún no construidas, que
+   se ven en gris y no se pueden tocar. Así se sabe siempre cuánto falta.
+───────────────────────────────────────────── */
+
+function rutaEtapas(rutaKey) {
+  const ruta  = RUTAS[rutaKey];
+  const hechas = MISSIONS.filter(m => m.ruta === rutaKey).sort((a, b) => (a.etapa || 0) - (b.etapa || 0));
+  const total = Math.max(ruta.etapas || 0, ...hechas.map(m => m.etapa || 0), 0);
+  const previstas = (typeof ETAPAS_PREVISTAS !== 'undefined' && ETAPAS_PREVISTAS[rutaKey]) || {};
+  const etapas = [];
+  for (let n = 1; n <= total; n++) {
+    const mision = hechas.find(m => m.etapa === n);
+    etapas.push(mision
+      ? { n, mision, titulo: mision.title, existe: true }
+      : { n, titulo: previstas[n] || 'Etapa por construir', existe: false });
+  }
+  return { ruta, etapas, total, hechas: hechas.length };
+}
+
+function renderRutas() {
+  const cont = document.getElementById('rutas-container');
+  if (!cont) return;
+  const s  = load();
+  const ms = memberState(s, s.currentMember);
+
+  cont.innerHTML = Object.keys(RUTAS).map(key => {
+    const { ruta, etapas, total, hechas } = rutaEtapas(key);
+    const visitadas = etapas.filter(e => e.existe && ms.visited.includes(e.mision.id)).length;
+    const pct = total ? Math.round((visitadas / total) * 100) : 0;
+
+    return `
+      <div class="ruta-card">
+        <div class="ruta-head">
+          <span class="ruta-emoji" aria-hidden="true">${ruta.emoji}</span>
+          <div class="ruta-titulos">
+            <h3 class="ruta-nombre">${ruta.nombre}</h3>
+            <p class="ruta-lema">${ruta.lema}</p>
+          </div>
+        </div>
+        <div class="ruta-barra-wrap">
+          <div class="ruta-barra" style="width:${pct}%; background:var(--${ruta.color});"></div>
+        </div>
+        <p class="ruta-cuenta">${visitadas} de ${total} etapas recorridas · ${hechas} construida${hechas === 1 ? '' : 's'}</p>
+        <ol class="ruta-etapas">
+          ${etapas.map(e => {
+            if (!e.existe) return `
+              <li class="ruta-etapa ruta-etapa-futura">
+                <span class="re-num">${e.n}</span>
+                <span class="re-txt">${e.titulo}</span>
+                <span class="re-estado">Por construir</span>
+              </li>`;
+            const visitada = ms.visited.includes(e.mision.id);
+            return `
+              <li class="ruta-etapa ${visitada ? 'ruta-etapa-hecha' : ''}">
+                <span class="re-num" style="background:var(--${ruta.color});">${e.n}</span>
+                <a class="re-txt re-link" href="${e.mision.url}" onclick="visitMission(${e.mision.id}); return false;">${e.mision.icon} ${e.titulo}</a>
+                <span class="re-estado">${visitada ? '✔ Recorrida' : '+' + e.mision.xp + ' XP'}</span>
+              </li>`;
+          }).join('')}
+        </ol>
+      </div>`;
+  }).join('');
+}
+
+/* ─────────────────────────────────────────────
    RENDER — PROGRESS
 ───────────────────────────────────────────── */
 
@@ -422,6 +497,7 @@ function switchView(id) {
 
   if (id === 'view-inicio')   renderHome();
   if (id === 'view-misiones') renderMissions(currentQuery);
+  if (id === 'view-rutas')    renderRutas();
   if (id === 'view-progreso') renderProgress();
   if (id === 'view-perfil')   renderProfile();
   if (id === 'view-habitos' && typeof initHabitos === 'function') initHabitos();
@@ -602,5 +678,44 @@ document.addEventListener('DOMContentLoaded', () => {
   // El header ya no se oculta al hacer scroll: el efecto (transform +
   // margen negativo) reacomodaba el layout cerca del fondo y producía
   // la tembladera del encabezado. Los headers son compactos y fijos.
+
+  /* ── Botón 🔄 Actualizar (mismo que en M.E.T.A.S) ──
+     El sitio se publica con cada push, pero el teléfono guarda su copia:
+     el service worker y las cachés siguen sirviendo lo viejo hasta que se
+     renuevan. Este botón las borra y recarga, así que un toque basta para
+     tener SIEMPRE la última versión, sin desinstalar ni limpiar a mano.
+     Va en todos los encabezados para no perder el lugar donde se estaba. */
+  async function faroForzarActualizacion(btn) {
+    const ic = btn && btn.querySelector ? (btn.querySelector('i') || btn) : null;
+    if (ic) { ic.classList.remove('spin'); void ic.offsetWidth; ic.classList.add('spin'); }
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      if (window.caches && caches.keys) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    } catch (_) {}
+    toast('🔄 Actualizando…');
+    setTimeout(() => location.reload(), 250);
+  }
+  window.faroForzarActualizacion = faroForzarActualizacion;
+
+  document.querySelectorAll('.app-header').forEach(h => {
+    if (h.querySelector('.refresh-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'refresh-btn';
+    btn.setAttribute('aria-label', 'Actualizar la aplicación');
+    btn.title = 'Actualizar (traer lo último y quedarte donde estás)';
+    btn.innerHTML = '<i class="fa-solid fa-arrow-rotate-right"></i>';
+    const actions = h.querySelector('.header-actions');
+    if (actions) actions.insertBefore(btn, actions.firstChild);
+    else h.appendChild(btn);
+  });
+
+  document.querySelectorAll('.refresh-btn').forEach(b =>
+    b.addEventListener('click', () => faroForzarActualizacion(b)));
 
 });
