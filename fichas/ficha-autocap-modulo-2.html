@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Autocapacitación M.E.T.A.S · Módulo 2: El frontend</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/autocapacitacion-metas/modulo-2-frontend.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · Módulo 2: El frontend, mapa de piezas</div>
+    <div class="f-meta"><b>Serie:</b> Autocapacitación Técnica M.E.T.A.S · Módulo 2 de 8 · <b>Ruta:</b> 🏗️ Ingeniería del Sistema</div>
+    <div class="f-meta"><b>Tema:</b> un index.html con 13 vistas, 57 misiones con el mismo molde de tres archivos y catorce secciones, 7 herramientas del maestro, 8 bancos de datos, las páginas satélite y las 57 fichas imprimibles.</div>
+    <div class="f-meta"><b>Cifras verificadas contra el repositorio el 26 de julio de 2026.</b></div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Dibujar de memoria el <strong>árbol del proyecto</strong> y decir de qué responde cada carpeta.</li>
+    <li>Explicar cómo se cambia de pantalla sin recargar y por qué no hace falta un enrutador.</li>
+    <li>Describir el <strong>molde de una misión</strong> y por qué se repite 57 veces.</li>
+    <li>Justificar la separación entre <strong>lógica</strong> (js/) y <strong>datos</strong> (js/data/).</li>
+    <li>Explicar qué hace falta para que un cambio publicado <strong>llegue a un teléfono</strong>.</li>
+    <li>Responder cuatro objeciones sobre la arquitectura sin negar la deuda técnica real.</li>
+  </ol>
+
+  <h2>🗺️ 1. El mapa en una tabla</h2>
+  <table>
+    <tr><th>Pieza</th><th>Cuánto hay</th><th>De qué responde</th></tr>
+    <tr><td><code>index.html</code></td><td>1 archivo, 13 vistas</td><td>La aplicación entera: las vistas se muestran y ocultan.</td></tr>
+    <tr><td><code>js/app.js</code></td><td>1</td><td>Navegación con <code>switchView()</code>, catálogo en pantalla y arranque de herramientas.</td></tr>
+    <tr><td><code>js/tools/</code></td><td>7</td><td>Plan de acción, Mi aula, Campeonísimo, gobierno escolar, parte mensual, collage e instalación.</td></tr>
+    <tr><td><code>js/data/</code></td><td>8</td><td>Datos puros: catálogo de misiones, banco del Campeonísimo, mapa DCNB, diagnósticos, consejos, frases, países y próceres.</td></tr>
+    <tr><td><code>misiones/</code></td><td>57 carpetas</td><td>Cada misión con su HTML, su JS y su CSS (y su <code>-en.js</code> si está traducida).</td></tr>
+    <tr><td><code>fichas/</code></td><td>57 fichas</td><td>Una hoja imprimible por misión, más su índice y el mapa curricular.</td></tr>
+    <tr><td>Páginas satélite</td><td>7</td><td>padres, panel docente, consulta nube, registro, camp-vivo, evaluaciones y misión.</td></tr>
+    <tr><td>Capas comunes</td><td>7</td><td>app, registro, diálogos, presentación, supabase, sincronización docente e idioma.</td></tr>
+  </table>
+
+  <h2>📐 2. El molde de una misión</h2>
+  <div class="caja">
+    Tres archivos propios (<strong>HTML + JS + CSS</strong>), un cuarto si hay traducción de autor
+    (<strong>-en.js</strong>), y <strong>catorce secciones</strong> iguales en las 57: Aprende, Estructura,
+    Laboratorio, Flashcards, Quiz, Clasifica, Identifica, Completa, Widgets, Reto, Sopa, Tareas,
+    Evaluación y Recursos.
+  </div>
+  <div class="caja caja-amb">
+    <strong>La idea que hay que defender:</strong> las 57 misiones no son 57 desarrollos, son un molde repetido con
+    contenido distinto. Por eso una corrección en el molde se vuelve una corrección en las 57, como pasó con la
+    barra de XP que desbordaba la pantalla del teléfono.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 1</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>✍️ 3. Actividades sin pantalla</h2>
+
+  <h3>A. Dibuja el árbol del proyecto</h3>
+  <p>De memoria, sin abrir la computadora. Escribe al lado de cada carpeta una frase con su responsabilidad.</p>
+  <div class="caja" style="min-height:55mm;"></div>
+
+  <h3>B. Une cada archivo con su responsabilidad</h3>
+  <table>
+    <tr><th style="width:38%">Archivo</th><th>Responsabilidad</th></tr>
+    <tr><td><code>js/app.js</code></td><td></td></tr>
+    <tr><td><code>js/data/misiones.js</code></td><td></td></tr>
+    <tr><td><code>js/tools/registros-admin.js</code></td><td></td></tr>
+    <tr><td><code>js/metas-i18n.js</code></td><td></td></tr>
+    <tr><td><code>sw.js</code></td><td></td></tr>
+  </table>
+
+  <h3>C. Diagnóstico rápido: ¿qué falló?</h3>
+  <ol>
+    <li>Creé la carpeta de una misión nueva y no aparece en la aplicación. → ______________________</li>
+    <li>Corregí un texto, hice push, y en el teléfono sigue el viejo. → ______________________</li>
+    <li>El APK no muestra el cambio que sí se ve en la web. → ______________________</li>
+    <li>Un rótulo de una misión traducida se quedó en español. → ______________________</li>
+  </ol>
+
+  <h2>🧠 4. Simulacro de interpelación</h2>
+  <h3>1) «Todo en un index.html con divs que se ocultan no es arquitectura; es lo que hacíamos en 2010.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>2) «Tienes 57 carpetas con el mismo código repetido: eso es duplicación insostenible.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>3) «Si el catálogo es un archivo escrito a mano, ¿qué pasa cuando lleguen a 500 misiones?»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 2</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <div class="pauta">
+    <h2>✅ Pauta de respuestas</h2>
+
+    <h3>B. Archivo y responsabilidad</h3>
+    <ul>
+      <li><code>js/app.js</code>: navegación entre vistas, catálogo en pantalla y arranque de las herramientas.</li>
+      <li><code>js/data/misiones.js</code>: el catálogo (id, título, materia, ruta, XP e ícono).</li>
+      <li><code>js/tools/registros-admin.js</code>: Mi aula (lista, asistencia, notas, conducta y colectas).</li>
+      <li><code>js/metas-i18n.js</code>: diccionario de rótulos comunes para pasar la interfaz a inglés.</li>
+      <li><code>sw.js</code>: service worker, guarda la copia local del sitio y decide cuándo renovarla.</li>
+    </ul>
+
+    <h3>C. Diagnóstico</h3>
+    <ol>
+      <li>Falta su entrada en <code>js/data/misiones.js</code>: la aplicación no escanea carpetas, lee el catálogo.</li>
+      <li>Faltó subir el <code>CACHE_NAME</code> de <code>sw.js</code> y las etiquetas <code>?v=</code>.</li>
+      <li>Falta regenerar el espejo <code>www/</code> con <code>npm run build:www</code> antes de empaquetar.</li>
+      <li>Se cambió el rótulo en la misión pero no su clave en el diccionario del motor de idioma.</li>
+    </ol>
+
+    <h3>Simulacro: respuestas modelo</h3>
+    <p><strong>1)</strong> El hecho es cierto: son vistas que se muestran y ocultan. La interpretación falla al ignorar el contexto. Sin build ni dependencias, el sitio carga en escuelas con internet pobre, se puede editar en cualquier computadora y lo mantiene una sola persona. La navegación completa se lee en una función, <code>switchView()</code>, y el costo asumido (un archivo grande) se paga con orden y convención.</p>
+    <p><strong>2)</strong> No es copia y pega ciega: es un molde con 14 secciones iguales, fijado por la plantilla del proyecto y verificado por arneses que comprueban determinismo, traducción y layout. Ese molde convierte cualquier arreglo en un arreglo replicable, y una misión nueva se levanta en horas. La deuda honesta es que un arreglo hay que replicarlo, y por eso existen las pruebas.</p>
+    <p><strong>3)</strong> Con 500 misiones el catálogo a mano sí sería un problema, y ahí tocaría generarlo. Hoy son 57, el archivo es revisable en el historial de cambios y obliga a un paso consciente al publicar contenido. Se cambia cuando el dolor aparezca, no antes: en un sitio estático sin servidor, un archivo de datos es coherente con el resto de las decisiones.</p>
+
+    <h3>Criterio de logro</h3>
+    <p>Responder las tres objeciones nombrando <strong>la pieza concreta</strong> y <strong>reconociendo la deuda</strong> de cada decisión. Negar el costo debilita la respuesta; explicarlo la fortalece.</p>
+  </div>
+
+  <h2>🎓 Cierre metalingüístico</h2>
+  <p>Dibuja el árbol del proyecto en una hoja y explícaselo a alguien de la familia en cinco minutos. Anota abajo la pregunta que no supiste responder: esa es la siguiente sesión de estudio.</p>
+  <div class="caja">
+    <div class="raya-resp"></div><div class="raya-resp"></div>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 3</span></div>
+</section>
+
+</div>
+</body>
+</html>

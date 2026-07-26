@@ -504,6 +504,38 @@
   </div>
   </div>
   <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Tres páginas tamaño carta: el mapa en una tabla, actividades sin pantalla, simulacro de interpelación y pauta de respuestas. Para estudiar lejos del teclado.</p>
+      <a href="../../fichas/ficha-autocap-modulo-2.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Fuentes de este módulo</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Todo lo que afirma la misión sale de estos documentos y del código real. Si algo cambia en el sistema, aquí se comprueba primero.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="https://github.com/josuepolancolemus2020-glitch/misiones-educativas_a-policastsapien.com/blob/main/PLAN-AUTOCAPACITACION.md" target="_blank" rel="noopener noreferrer">Temario de los 8 módulos</a> (PLAN-AUTOCAPACITACION.md)</li>
+      <li><a href="https://github.com/josuepolancolemus2020-glitch/misiones-educativas_a-policastsapien.com/blob/main/PLANTILLA-MISIONES.md" target="_blank" rel="noopener noreferrer">La plantilla que fija el molde</a> (PLANTILLA-MISIONES.md)</li>
+      <li><a href="https://github.com/josuepolancolemus2020-glitch/misiones-educativas_a-policastsapien.com" target="_blank" rel="noopener noreferrer">El repositorio de M.E.T.A.S</a>: index.html, js/app.js, js/tools, js/data, misiones/ y fichas/</li>
+      <li><a href="https://metas.policastsapien.com/kit-auto-1.html" target="_blank" rel="noopener noreferrer">Kit imprimible del Módulo 1</a> (versión de papel de la serie)</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar este módulo:</strong> primero recorrer las secciones en pantalla, después imprimir la ficha y dibujar el árbol del proyecto de memoria, y al final responder el simulacro en voz alta. Lo que no se pueda explicar sin leer, todavía no está aprendido.</div>
+    </div>
+  </div>
+
   <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
     <span class="nsb-icon">🏅</span>
     <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
@@ -558,6 +590,7 @@
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
   <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
 </nav>
 

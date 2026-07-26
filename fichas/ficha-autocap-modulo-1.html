@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Autocapacitación M.E.T.A.S · Módulo 1: Panorama</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/autocapacitacion-metas/modulo-1-panorama.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · Módulo 1: Panorama técnico</div>
+    <div class="f-meta"><b>Serie:</b> Autocapacitación Técnica M.E.T.A.S · Módulo 1 de 8 · <b>Ruta:</b> 🏗️ Ingeniería del Sistema</div>
+    <div class="f-meta"><b>Tema:</b> qué es M.E.T.A.S técnicamente: aplicación web estática y offline-first, distribuida por tres frentes (web, PWA y APK) desde un mismo código, con Supabase como nube para lo único que exige servidor.</div>
+    <div class="f-meta"><b>Para qué:</b> poder explicar el sistema completo, y defender cada decisión, ante un ingeniero que lo cuestione.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Decir la <strong>frase maestra</strong> sin leerla y desglosar cada término.</li>
+    <li>Explicar por qué <strong>no hay servidor propio</strong> y por qué eso es una fortaleza.</li>
+    <li>Describir el <strong>viaje de un dato</strong> desde el dispositivo hasta la consulta de la familia.</li>
+    <li>Distinguir la <strong>capa local</strong> (fuente de verdad) de la <strong>capa nube</strong> (copia y extensión).</li>
+    <li>Nombrar los <strong>cuatro frentes</strong> y qué aporta cada uno.</li>
+    <li>Responder tres objeciones típicas con hechos, no con opiniones.</li>
+  </ol>
+
+  <h2>🏗️ 1. La frase maestra</h2>
+  <div class="caja">
+    <strong>M.E.T.A.S</strong> es una aplicación <strong>web estática y offline-first</strong> que se distribuye por
+    <strong>tres frentes</strong> (web, PWA y APK Android) desde <strong>un mismo código</strong>, y usa
+    <strong>Supabase</strong> como nube para lo único que de verdad necesita servidor.
+  </div>
+  <table>
+    <tr><th>Término</th><th>Qué significa en este proyecto</th></tr>
+    <tr><td>Web estática</td><td>Archivos HTML, CSS y JS entregados tal cual por GitHub Pages. Ningún programa arma páginas en un servidor.</td></tr>
+    <tr><td>Offline-first</td><td>El dispositivo primero: los datos viven en <code>localStorage</code> y la nube es copia, no requisito.</td></tr>
+    <tr><td>PWA</td><td>La misma página, instalable, que abre sin conexión gracias al <em>service worker</em>.</td></tr>
+    <tr><td>APK</td><td>El mismo código empaquetado con Capacitor como aplicación firmada de Android.</td></tr>
+    <tr><td>Supabase</td><td>PostgreSQL como servicio: funciones RPC como única puerta, RLS por fila y deduplicación por <code>evento_id</code>.</td></tr>
+  </table>
+
+  <h2>🔁 2. El viaje de un dato</h2>
+  <ol>
+    <li>El dato <strong>nace</strong> en el dispositivo (una evaluación terminada, un análisis generado).</li>
+    <li><strong>Guardado local inmediato</strong> en <code>localStorage</code>: un corte de luz ya no pierde nada.</li>
+    <li>Una copia entra al <strong>outbox</strong> con su <code>evento_id</code> único.</li>
+    <li>Con internet, el lote <strong>sube</strong> a Supabase; sin internet, espera y se reintenta solo.</li>
+    <li>El maestro lo consulta en su panel y la familia en el asistente, cada quien con su clave.</li>
+  </ol>
+  <div class="caja caja-amb">
+    <strong>La idea que hay que defender:</strong> los tres frentes no son tres desarrollos. Un solo código se entrega
+    de tres maneras, y por eso una sola persona puede mantener el sistema completo.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 1</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>✍️ 3. Actividades sin pantalla</h2>
+
+  <h3>A. Dibuja el sistema de memoria</h3>
+  <p>En el recuadro, dibuja los cuatro frentes y las flechas que los unen. Marca con una X dónde vive la fuente de verdad.</p>
+  <div class="caja" style="min-height:52mm;"></div>
+
+  <h3>B. Completa</h3>
+  <ol>
+    <li>El sitio se publica desde GitHub __________ con dominio propio (archivo __________).</li>
+    <li>Los datos del usuario viven primero en __________.</li>
+    <li>La cola local de eventos pendientes se llama __________.</li>
+    <li>Los duplicados se evitan con el __________ único de cada evento.</li>
+    <li>El APK de Android se genera con __________.</li>
+  </ol>
+
+  <h3>C. Verdadero o falso (y por qué)</h3>
+  <table>
+    <tr><th style="width:62%">Afirmación</th><th>V / F</th><th>Porque…</th></tr>
+    <tr><td>M.E.T.A.S necesita un servidor propio encendido.</td><td></td><td></td></tr>
+    <tr><td>Sin internet el alumno no puede trabajar.</td><td></td><td></td></tr>
+    <tr><td>La clave que aparece en el código es una fuga de seguridad.</td><td></td><td></td></tr>
+    <tr><td>El APK se programó aparte del sitio web.</td><td></td><td></td></tr>
+  </table>
+
+  <h2>🧠 4. Simulacro de interpelación</h2>
+  <p>Responde en voz alta, con tus palabras, en tres o cuatro frases. Después escribe la versión corta.</p>
+  <h3>1) «¿Dónde está tu servidor?»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>2) «¿Y si GitHub o Supabase se caen, tu escuela se queda sin nada?»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>3) «Vi tu clave de API publicada en el código fuente.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 2</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <div class="pauta">
+    <h2>✅ Pauta de respuestas</h2>
+
+    <h3>B. Completa</h3>
+    <ol>
+      <li>GitHub <strong>Pages</strong>, con el archivo <strong>CNAME</strong>.</li>
+      <li><strong>localStorage</strong>.</li>
+      <li><strong>Outbox</strong>.</li>
+      <li><strong>evento_id</strong>.</li>
+      <li><strong>Capacitor</strong>.</li>
+    </ol>
+
+    <h3>C. Verdadero o falso</h3>
+    <ol>
+      <li><strong>Falso.</strong> No hay servidor propio: el frontend es estático y la nube es un servicio.</li>
+      <li><strong>Falso.</strong> Es offline-first: la copia local abre y guarda sin red.</li>
+      <li><strong>Falso.</strong> Es la clave pública (anon): solo permite lo que RLS y las funciones RPC autorizan. La peligrosa, <code>service_role</code>, jamás sale del servidor.</li>
+      <li><strong>Falso.</strong> Es el mismo código, empaquetado con Capacitor.</li>
+    </ol>
+
+    <h3>Simulacro: respuestas modelo</h3>
+    <p><strong>1)</strong> No hay servidor propio. El frontend es estático en GitHub Pages y lo único que exige servidor lo hace Supabase como servicio. Menos piezas propias significa menos que se cae, menos que mantener y un costo cercano a cero, que es la condición para que esto sea sostenible en una escuela pública.</p>
+    <p><strong>2)</strong> La aplicación es offline-first: abre y guarda sin red porque el service worker guarda la copia local y los datos viven en el dispositivo. Una caída de la nube afecta la sincronización, no la clase; cuando vuelve, el outbox reenvía y el <code>evento_id</code> evita duplicados.</p>
+    <p><strong>3)</strong> Esa clave es la pública, y va en el código a propósito: solo puede hacer lo que autorizan las reglas RLS y las funciones RPC. Las escrituras exigen cuenta docente y hay límite por IP real. La clave con poder, <code>service_role</code>, no está en el repositorio ni llega al navegador.</p>
+
+    <h3>Criterio de logro</h3>
+    <p>Responder las tres objeciones sin mirar la ficha, nombrando en cada una <strong>la pieza concreta</strong> que sostiene la respuesta. Si en alguna solo se puede decir «funciona bien», falta estudio.</p>
+  </div>
+
+  <h2>🎓 Cierre metalingüístico</h2>
+  <p>Explícale este módulo, en cinco minutos y sin palabras técnicas, a alguien de la familia. Si se entiende, está aprendido.</p>
+  <div class="caja">
+    <p style="margin:0"><strong>Persona a quien se lo expliqué:</strong> ______________________ &nbsp;&nbsp; <strong>Fecha:</strong> ____________</p>
+    <p style="margin:8px 0 0"><strong>Lo que no supe responder:</strong></p>
+    <div class="raya-resp"></div><div class="raya-resp"></div>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 3</span></div>
+</section>
+
+</div>
+</body>
+</html>
