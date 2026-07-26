@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Módulo 2</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:900px;border:0;background:#fff}pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/misiones/autocapacitacion-metas/modulo-2-frontend.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+f.onload = async () => {
+  const w = f.contentWindow, d = f.contentDocument;
+  const errores = [];
+  w.addEventListener('error', e => errores.push(e.message));
+  await esperar(1200);
+  try {
+    log('── CARGA ──');
+    ok(errores.length === 0, 'sin errores de JavaScript', 'errores: ' + errores.join(' | '));
+    ok(d.querySelectorAll('.sec').length === 13, '13 paneles de sección', 'hay ' + d.querySelectorAll('.sec').length + ' paneles');
+    ok(/Módulo 2 de 8/.test(d.body.textContent), 'se presenta como Módulo 2 de 8', 'no dice Módulo 2 de 8');
+    ok(!/Panorama M\.E\.T\.A\.S/.test(d.body.textContent), 'sin restos del Módulo 1', 'quedan textos del Módulo 1');
+
+    /* los bancos son const de módulo: se leen evaluando dentro de la página */
+    const dentro = expr => w.eval(expr);
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('idData.length') === 8 && dentro('cmpData.length') === 8, '8 identifica y 8 completa', 'identifica/completa fuera de 8');
+    ok(dentro('timelineData.length') === 8, '8 piezas en el recorrido del repositorio', 'recorrido: ' + dentro('timelineData.length'));
+    ok(dentro('Object.keys(parteData).join(",")') === 'portada,mision,tools,capas', 'laboratorio con las 4 piezas nuevas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+
+    log('\n── SOPA DE LETRAS ──');
+    let sopaOk = true, detalle = '';
+    const sopaSets = w.eval('sopaSets');
+    sopaSets.forEach((s, i) => {
+      if (s.grid.length !== s.size) { sopaOk = false; detalle += ` set${i}: filas≠size`; }
+      s.grid.forEach(fila => { if (fila.length !== s.size) { sopaOk = false; detalle += ` set${i}: fila corta`; } });
+      s.words.forEach(p => {
+        const leido = p.cells.map(([r, c]) => s.grid[r][c]).join('');
+        if (leido !== p.w) { sopaOk = false; detalle += ` ${p.w}≠${leido}`; }
+      });
+    });
+    ok(sopaOk, 'las palabras se leen en la cuadrícula (' + sopaSets.map(s => s.words.length).join(' + ') + ')', 'cuadrícula inconsistente:' + detalle);
+
+    log('\n── ACTIVIDADES EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/index\.html \(la portada\)/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en la portada', 'el laboratorio no abre en la portada');
+    w.labShowParte('mision'); await esperar(100);
+    ok(/Una misión \(el molde\)/.test(d.getElementById('lab-sentence').textContent), 'cambia de pieza al tocar', 'no cambia de pieza');
+    w.go('s-flash'); await esperar(150);
+    ok(/1 \/ 16/.test(d.getElementById('fcCtr').textContent), 'el contador de tarjetas dice 1 / 16', 'contador: ' + d.getElementById('fcCtr').textContent);
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'el quiz salió vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'la evaluación salió vacía');
+    w.genEvalCrit(); await esperar(300);
+    ok(d.getElementById('evalCritOut').textContent.length > 200, 'la interpelación del ingeniero se genera', 'la interpelación salió vacía');
+    w.go('s-sopa'); await esperar(250);
+    ok(d.querySelectorAll('.sopa-cell, .sc, td').length > 40, 'la sopa se dibuja en pantalla', 'la sopa no se dibujó');
+
+    log('\n── PROGRESO PROPIO ──');
+    const clave = w.eval('SAVE_KEY');
+    ok(/m2/.test(clave || ''), 'clave de progreso propia (' + clave + ')', 'comparte la clave con el Módulo 1: ' + clave);
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+};
+</script>
+</body>
+</html>
