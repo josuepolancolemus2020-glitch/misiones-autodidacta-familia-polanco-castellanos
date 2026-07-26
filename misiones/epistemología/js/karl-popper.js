@@ -85,15 +85,15 @@ function prevFC(){sfx('click');fcIdx=(fcIdx-1+fcData.length)%fcData.length;upFC(
 // ===================== QUIZ DATA =====================
 const qzData=[
   {q:'¿Qué criterio propuso Popper para distinguir la ciencia de la pseudociencia?',o:['a) La utilidad práctica','b) La falsabilidad','c) La antigüedad de la teoría','d) El consenso de los expertos'],c:1},
-  {q:'Según Popper, ¿qué problema tiene la inducción?',o:['a) Es demasiado lenta','b) Ningún número de casos particulares prueba una ley universal','c) Solo sirve en matemáticas','d) Fue inventada por Marx'],c:1},
-  {q:'¿Qué representa el "cisne negro" en la epistemología de Popper?',o:['a) Una metáfora sobre la suerte','b) Un caso que refuta una generalización aceptada','c) Un símbolo del Círculo de Viena','d) Una teoría científica'],c:1},
-  {q:'¿Cuál es la relación de Popper con el Círculo de Viena?',o:['a) Fue su fundador','b) Fue miembro activo toda su vida','c) Dialogó con ellos pero nunca fue miembro, y se opuso a su verificacionismo','d) Nunca tuvo contacto con ellos'],c:2},
-  {q:'¿Qué obra escribió Popper durante su exilio en Nueva Zelanda?',o:['a) El Capital','b) La sociedad abierta y sus enemigos','c) Así habló Zaratustra','d) El origen de las especies'],c:1},
-  {q:'¿Qué es la "paradoja de la tolerancia"?',o:['a) Tolerar todo sin excepción','b) No tolerar nunca a nadie','c) La tolerancia ilimitada puede destruir la tolerancia misma','d) Una contradicción lógica sin solución'],c:2},
-  {q:'Para Popper, ¿por qué el psicoanálisis freudiano es un ejemplo de pseudociencia?',o:['a) Porque es muy antiguo','b) Porque puede explicar cualquier conducta sin arriesgar predicciones falsables','c) Porque no usa matemáticas','d) Porque fue rechazado por la medicina'],c:1},
-  {q:'¿Qué propone la "ingeniería social gradual" frente al cambio utópico?',o:['a) No cambiar nada nunca','b) Reformas pequeñas, reversibles y comprobables','c) Una revolución total e inmediata','d) Dejar el cambio al azar'],c:1},
-  {q:'¿Qué es el "Mundo 3" en la filosofía tardía de Popper?',o:['a) Un planeta hipotético','b) El mundo de los objetos físicos','c) El mundo de las experiencias subjetivas','d) El mundo del conocimiento objetivo: teorías, problemas, libros'],c:3},
-  {q:'¿Qué institución académica acogió a Popper desde 1946 hasta su retiro?',o:['a) La Universidad de Viena','b) Harvard','c) La London School of Economics (LSE)','d) La Sorbona'],c:2},
+  {q:'Según Popper, ¿qué problema tiene la inducción?',o:['a) Es demasiado lenta','b) Solo sirve en matemáticas','c) Ningún número de casos particulares prueba una ley universal','d) Fue inventada por Marx'],c:2},
+  {q:'¿Qué representa el "cisne negro" en la epistemología de Popper?',o:['a) Una metáfora sobre la suerte','b) Un símbolo del Círculo de Viena','c) Una teoría científica','d) Un caso que refuta una generalización aceptada'],c:3},
+  {q:'¿Cuál es la relación de Popper con el Círculo de Viena?',o:['a) Fue su fundador','b) Dialogó con ellos pero nunca fue miembro, y se opuso a su verificacionismo','c) Fue miembro activo toda su vida','d) Nunca tuvo contacto con ellos'],c:1},
+  {q:'¿Qué obra escribió Popper durante su exilio en Nueva Zelanda?',o:['a) El Capital','b) Así habló Zaratustra','c) El origen de las especies','d) La sociedad abierta y sus enemigos'],c:3},
+  {q:'¿Qué es la "paradoja de la tolerancia"?',o:['a) Tolerar todo sin excepción','b) La tolerancia ilimitada puede destruir la tolerancia misma','c) No tolerar nunca a nadie','d) Una contradicción lógica sin solución'],c:1},
+  {q:'Para Popper, ¿por qué el psicoanálisis freudiano es un ejemplo de pseudociencia?',o:['a) Porque puede explicar cualquier conducta sin arriesgar predicciones falsables','b) Porque es muy antiguo','c) Porque no usa matemáticas','d) Porque fue rechazado por la medicina'],c:0},
+  {q:'¿Qué propone la "ingeniería social gradual" frente al cambio utópico?',o:['a) No cambiar nada nunca','b) Una revolución total e inmediata','c) Reformas pequeñas, reversibles y comprobables','d) Dejar el cambio al azar'],c:2},
+  {q:'¿Qué es el "Mundo 3" en la filosofía tardía de Popper?',o:['a) El mundo del conocimiento objetivo: teorías, problemas, libros','b) Un planeta hipotético','c) El mundo de los objetos físicos','d) El mundo de las experiencias subjetivas'],c:0},
+  {q:'¿Qué institución académica acogió a Popper desde 1946 hasta su retiro?',o:['a) La London School of Economics (LSE)','b) La Universidad de Viena','c) Harvard','d) La Sorbona'],c:0},
 ];
 let qzIdx=0,qzSel=-1,qzDone=false;
 function buildQz(){qzIdx=0;qzSel=-1;qzDone=false;showQz();}
@@ -137,14 +137,14 @@ function resetId(){sfx('click');idIdx=0;showId();document.getElementById('fbId')
 
 // ===================== COMPLETA =====================
 const cmpData=[
-  {s:'El criterio de ___ separa la ciencia de la pseudociencia.',opts:['verificación','falsabilidad','popularidad'],c:1},
-  {s:'Para Popper, ninguna teoría científica puede ser ___ con certeza absoluta, solo refutada o corroborada.',opts:['probada','inventada','memorizada'],c:0},
-  {s:'El método científico avanza mediante conjeturas y ___.',opts:['repeticiones','refutaciones','votaciones'],c:1},
-  {s:'Popper rechazó la ___ como base lógica de la ciencia, pues ningún número de casos confirma una ley universal.',opts:['inducción','deducción','intuición'],c:0},
-  {s:'En 1919, el eclipse que puso a prueba la teoría de ___ se convirtió en el modelo de ciencia para Popper.',opts:['Freud','Einstein','Marx'],c:1},
-  {s:'Una sociedad ___ permite el cambio pacífico de gobierno mediante la crítica racional.',opts:['cerrada','abierta','tribal'],c:1},
-  {s:'La paradoja de la ___ sostiene que no se debe tolerar a quien busca destruir la tolerancia misma.',opts:['libertad','tolerancia','igualdad'],c:1},
-  {s:"En su obra 'Conocimiento objetivo', Popper describe el Mundo 3 como el reino del conocimiento ___.",opts:['secreto','objetivo','heredado'],c:1},
+  {s:'El criterio de ___ separa la ciencia de la pseudociencia.',opts:['falsabilidad','verificación','popularidad'],c:0},
+  {s:'Para Popper, ninguna teoría científica puede ser ___ con certeza absoluta, solo refutada o corroborada.',opts:['inventada','probada','memorizada'],c:1},
+  {s:'El método científico avanza mediante conjeturas y ___.',opts:['repeticiones','votaciones','refutaciones'],c:2},
+  {s:'Popper rechazó la ___ como base lógica de la ciencia, pues ningún número de casos confirma una ley universal.',opts:['deducción','inducción','intuición'],c:1},
+  {s:'En 1919, el eclipse que puso a prueba la teoría de ___ se convirtió en el modelo de ciencia para Popper.',opts:['Freud','Marx','Einstein'],c:2},
+  {s:'Una sociedad ___ permite el cambio pacífico de gobierno mediante la crítica racional.',opts:['abierta','cerrada','tribal'],c:0},
+  {s:'La paradoja de la ___ sostiene que no se debe tolerar a quien busca destruir la tolerancia misma.',opts:['tolerancia','libertad','igualdad'],c:0},
+  {s:'En su obra \'Conocimiento objetivo\', Popper describe el Mundo 3 como el reino del conocimiento ___.',opts:['secreto','objetivo','heredado'],c:1},
 ];
 let cmpIdx=0,cmpSel=-1,cmpDone=false;
 function showCmp(){if(cmpIdx>=cmpData.length){document.getElementById('cmpSent').innerHTML='🎉 ¡Completado!';document.getElementById('cmpOpts').innerHTML='';fin('s-completa');return;}const d=cmpData[cmpIdx];document.getElementById('cmpProg').textContent=`Oración ${cmpIdx+1} de ${cmpData.length}`;document.getElementById('cmpSent').innerHTML=d.s.replace('___','<span class="blank">___</span>');const opts=document.getElementById('cmpOpts');opts.innerHTML='';cmpSel=-1;cmpDone=false;d.opts.forEach((o,i)=>{const b=document.createElement('button');b.className='cmp-opt';b.textContent=o;b.onclick=()=>{if(cmpDone)return;document.querySelectorAll('.cmp-opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');cmpSel=i;sfx('click');};opts.appendChild(b);});}
@@ -347,20 +347,20 @@ const evalTFBank=[
   {q:'Según Popper, la historia humana sigue leyes inevitables que se pueden predecir con certeza.',a:false},
 ];
 const evalMCBank=[
-  {q:'¿Qué criterio propuso Popper para distinguir la ciencia de la pseudociencia?',o:['a) La utilidad práctica','b) La falsabilidad','c) La antigüedad de la teoría','d) El consenso de los expertos'],a:1},
-  {q:'Según Popper, ¿qué problema tiene la inducción?',o:['a) Es demasiado lenta','b) Ningún número de casos particulares prueba una ley universal','c) Solo sirve en matemáticas','d) Fue inventada por Marx'],a:1},
-  {q:'¿Qué representa el "cisne negro" en la epistemología de Popper?',o:['a) Una metáfora sobre la suerte','b) Un caso que refuta una generalización aceptada','c) Un símbolo del Círculo de Viena','d) Una teoría científica'],a:1},
-  {q:'¿Cuál es la relación de Popper con el Círculo de Viena?',o:['a) Fue su fundador','b) Fue miembro activo toda su vida','c) Dialogó con ellos pero nunca fue miembro, y se opuso a su verificacionismo','d) Nunca tuvo contacto con ellos'],a:2},
-  {q:'¿Qué obra escribió Popper durante su exilio en Nueva Zelanda?',o:['a) El Capital','b) La sociedad abierta y sus enemigos','c) Así habló Zaratustra','d) El origen de las especies'],a:1},
+  {q:'¿Qué criterio propuso Popper para distinguir la ciencia de la pseudociencia?',o:['a) La utilidad práctica','b) La antigüedad de la teoría','c) El consenso de los expertos','d) La falsabilidad'],a:3},
+  {q:'Según Popper, ¿qué problema tiene la inducción?',o:['a) Ningún número de casos particulares prueba una ley universal','b) Es demasiado lenta','c) Solo sirve en matemáticas','d) Fue inventada por Marx'],a:0},
+  {q:'¿Qué representa el "cisne negro" en la epistemología de Popper?',o:['a) Un caso que refuta una generalización aceptada','b) Una metáfora sobre la suerte','c) Un símbolo del Círculo de Viena','d) Una teoría científica'],a:0},
+  {q:'¿Cuál es la relación de Popper con el Círculo de Viena?',o:['a) Fue su fundador','b) Dialogó con ellos pero nunca fue miembro, y se opuso a su verificacionismo','c) Fue miembro activo toda su vida','d) Nunca tuvo contacto con ellos'],a:1},
+  {q:'¿Qué obra escribió Popper durante su exilio en Nueva Zelanda?',o:['a) La sociedad abierta y sus enemigos','b) El Capital','c) Así habló Zaratustra','d) El origen de las especies'],a:0},
   {q:'¿Qué es la "paradoja de la tolerancia"?',o:['a) Tolerar todo sin excepción','b) No tolerar nunca a nadie','c) La tolerancia ilimitada puede destruir la tolerancia misma','d) Una contradicción lógica sin solución'],a:2},
-  {q:'Para Popper, ¿por qué el psicoanálisis freudiano es un ejemplo de pseudociencia?',o:['a) Porque es muy antiguo','b) Porque puede explicar cualquier conducta sin arriesgar predicciones falsables','c) Porque no usa matemáticas','d) Porque fue rechazado por la medicina'],a:1},
-  {q:'¿Qué propone la "ingeniería social gradual" frente al cambio utópico?',o:['a) No cambiar nada nunca','b) Reformas pequeñas, reversibles y comprobables','c) Una revolución total e inmediata','d) Dejar el cambio al azar'],a:1},
-  {q:'¿Qué es el "Mundo 3" en la filosofía tardía de Popper?',o:['a) Un planeta hipotético','b) El mundo de los objetos físicos','c) El mundo de las experiencias subjetivas','d) El mundo del conocimiento objetivo: teorías, problemas, libros'],a:3},
-  {q:'¿Qué institución académica acogió a Popper desde 1946 hasta su retiro?',o:['a) La Universidad de Viena','b) Harvard','c) La London School of Economics (LSE)','d) La Sorbona'],a:2},
-  {q:'¿Qué significa "verosimilitud" en la filosofía de Popper?',o:['a) Que una teoría es absolutamente verdadera','b) La cercanía relativa de una teoría a la verdad','c) Un sinónimo de falsabilidad','d) Un tipo de prueba experimental'],a:1},
+  {q:'Para Popper, ¿por qué el psicoanálisis freudiano es un ejemplo de pseudociencia?',o:['a) Porque es muy antiguo','b) Porque no usa matemáticas','c) Porque puede explicar cualquier conducta sin arriesgar predicciones falsables','d) Porque fue rechazado por la medicina'],a:2},
+  {q:'¿Qué propone la "ingeniería social gradual" frente al cambio utópico?',o:['a) No cambiar nada nunca','b) Una revolución total e inmediata','c) Reformas pequeñas, reversibles y comprobables','d) Dejar el cambio al azar'],a:2},
+  {q:'¿Qué es el "Mundo 3" en la filosofía tardía de Popper?',o:['a) Un planeta hipotético','b) El mundo del conocimiento objetivo: teorías, problemas, libros','c) El mundo de los objetos físicos','d) El mundo de las experiencias subjetivas'],a:1},
+  {q:'¿Qué institución académica acogió a Popper desde 1946 hasta su retiro?',o:['a) La Universidad de Viena','b) Harvard','c) La Sorbona','d) La London School of Economics (LSE)'],a:3},
+  {q:'¿Qué significa "verosimilitud" en la filosofía de Popper?',o:['a) Que una teoría es absolutamente verdadera','b) Un sinónimo de falsabilidad','c) La cercanía relativa de una teoría a la verdad','d) Un tipo de prueba experimental'],a:2},
   {q:'¿Qué propone el "racionalismo crítico" de Popper?',o:['a) Buscar certezas absolutas','b) Estar abierto a la crítica y dispuesto a revisar nuestras creencias','c) Rechazar toda forma de razón','d) Aceptar solo lo que dicen las autoridades'],a:1},
-  {q:'¿Qué crítica hace Popper al historicismo?',o:['a) Que es una ciencia exacta','b) Que predice el futuro de la historia humana como si siguiera leyes inevitables, sin poder ser puesto a prueba','c) Que fue inventado por Einstein','d) Que solo se aplica a la biología'],a:1},
-  {q:'¿En qué año fue nombrado "Sir" Karl Popper?',o:['a) 1934','b) 1945','c) 1965','d) 1994'],a:2},
+  {q:'¿Qué crítica hace Popper al historicismo?',o:['a) Que es una ciencia exacta','b) Que fue inventado por Einstein','c) Que solo se aplica a la biología','d) Que predice el futuro de la historia humana como si siguiera leyes inevitables, sin poder ser puesto a prueba'],a:3},
+  {q:'¿En qué año fue nombrado "Sir" Karl Popper?',o:['a) 1965','b) 1934','c) 1945','d) 1994'],a:0},
   {q:'¿Qué evento de 1919 marcó el modelo de "buena ciencia" para Popper?',o:['a) La revolución rusa','b) La prueba experimental de la teoría de la relatividad de Einstein durante un eclipse','c) La publicación de El Capital','d) El fin de la Primera Guerra Mundial'],a:1},
 ];
 const evalCPBank=[

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Quiz de las seis misiones</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:300px;height:200px;border:0;background:#fff;margin:0 4px 4px 0}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<div id="marcos"></div>
+<pre id="out">midiendo…</pre>
+<script>
+/* Carga las seis misiones y comprueba, en cada una, que el quiz funcione y
+   que la respuesta correcta NO esté siempre en la misma letra. Es la sonda
+   que evita que el sesgo vuelva a colarse al copiar el molde. */
+const MISIONES = [
+  ['epistemología', 'karl-popper'],
+  ['misión-base-sistema-nervioso', 'sistema-nervioso'],
+  ['autocapacitacion-metas', 'modulo-1-panorama'],
+  ['autocapacitacion-metas', 'modulo-2-frontend'],
+  ['ruta-poder-activos-pasivos', 'activos-pasivos'],
+  ['ruta-persuasion-palancas', 'palancas-influencia'],
+];
+const out = document.getElementById('out');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+const LETRAS = ['a','b','c','d'];
+
+const marcos = document.getElementById('marcos');
+MISIONES.forEach(([dir, mis], i) => {
+  const f = document.createElement('iframe');
+  f.id = 'f' + i;
+  f.src = '/misiones/' + encodeURIComponent(dir) + '/' + mis + '.html';
+  marcos.appendChild(f);
+});
+
+window.addEventListener('load', async () => {
+  await esperar(2200);
+  for (let i = 0; i < MISIONES.length; i++) {
+    const [, mis] = MISIONES[i];
+    const marco = document.getElementById('f' + i);
+    const w = marco.contentWindow, d = marco.contentDocument;
+    log('\n── ' + mis + ' ──');
+    try {
+      const dentro = e => w.eval(e);
+      /* Reparto por banco */
+      [['qzData','c'], ['evalMCBank','a'], ['cmpData','c']].forEach(([banco, clave]) => {
+        const cuenta = dentro(`(function(){const c=[0,0,0,0];${banco}.forEach(q=>{if(typeof q.${clave}==='number')c[q.${clave}]++});return c})()`);
+        const total = cuenta.reduce((a, b) => a + b, 0);
+        const peor = Math.max(...cuenta);
+        const pct = Math.round(peor / total * 100);
+        ok(pct <= 40, banco + ': ' + cuenta.map((n, j) => LETRAS[j] + '=' + n).join(' ') + ' (máx ' + pct + '%)',
+          banco + ' concentra el ' + pct + '% en la letra ' + LETRAS[cuenta.indexOf(peor)]);
+      });
+      /* El quiz sigue funcionando y la opción marcada correcta es la del banco */
+      w.go('s-quiz'); await esperar(200);
+      ok(d.getElementById('qzQ').textContent.length > 8, 'el quiz pinta su pregunta', 'el quiz salió vacío');
+      const nOpts = d.querySelectorAll('#qzOpts .qz-opt').length;
+      ok(nOpts >= 3, 'pinta ' + nOpts + ' opciones', 'opciones: ' + nOpts);
+      const idx = dentro('qzData[0].c');
+      const textoBanco = dentro('qzData[0].o[qzData[0].c]').replace(/^[a-d]\)\s*/, '').trim();
+      const textoPantalla = d.querySelectorAll('#qzOpts .qz-opt')[idx].textContent.replace(/^[a-d]\)\s*/, '').trim();
+      ok(textoPantalla.includes(textoBanco.slice(0, 25)) || textoBanco.includes(textoPantalla.slice(0, 25)),
+        'la opción correcta del banco coincide con la de la pantalla', 'la pantalla y el banco no coinciden');
+      /* Evaluación final: que se siga generando */
+      w.go('s-evaluacion'); await esperar(150);
+      w.genEval(); await esperar(300);
+      ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    } catch (e) { fallos++; log('  ✘ error: ' + e.message); }
+  }
+  log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+});
+</script>
+</body>
+</html>

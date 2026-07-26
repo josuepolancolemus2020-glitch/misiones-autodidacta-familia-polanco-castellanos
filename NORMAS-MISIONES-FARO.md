@@ -63,9 +63,36 @@ inversionista por porcentaje, editorial y las fichas, político y el
 Campeonísimo, cobro por aula, patrocinio local, anuncios en el APK) quedan como
 molde de tono y de forma para las etapas siguientes.
 
-## 4. Verificación antes de publicar
+## 4. Las respuestas correctas se reparten entre a, b, c y d
+
+**Norma nueva, 26 de julio de 2026.** El quiz, la evaluación final y «completa
+la oración» se pintan en **orden fijo**: el motor no baraja esas opciones (sí
+baraja los widgets). Si al escribir el banco la correcta queda siempre en la
+misma letra, se aprueba sin leer y la misión no mide nada.
+
+Ninguna letra puede concentrar más del **40%** de las respuestas de un banco.
+Se revisa y se corrige con una sola herramienta:
+
+```
+node _dev/reparte-respuestas.js --revisar   (informa y falla si hay sesgo)
+node _dev/reparte-respuestas.js             (reparte y renumera los prefijos)
+```
+
+Reparte con semilla fija, mueve la opción correcta a su nueva posición y
+renumera los prefijos «a) b) c) d)» del texto. No cambia enunciados, ni
+opciones, ni cuál es la respuesta correcta. Al copiar el molde de otra misión
+hay que correrlo, porque el sesgo se hereda con los bancos.
+
+## 5. Verificación antes de publicar
 
 Toda misión nueva se mide con una sonda en `_dev/` (Chrome headless a 380 px,
 con `_dev/servidor-estatico.js`): secciones completas, bancos con su tamaño,
 laboratorio, las dos pruebas generándose con el nombre correcto, la sopa
 legible, la ficha respondiendo, y la ruta mostrando la etapa en el mapa.
+
+Además, dos comprobaciones que valen para TODAS las misiones a la vez:
+
+- `node _dev/reparte-respuestas.js --revisar`: el reparto de las letras.
+- `_dev/probe-quiz-todas.html`: carga las seis misiones y comprueba que el
+  quiz funcione, que la opción marcada como correcta sea la del banco y que
+  ninguna letra pase del 40%.
