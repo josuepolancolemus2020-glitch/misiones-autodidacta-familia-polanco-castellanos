@@ -26,6 +26,7 @@ const MISSIONS = [
   { id: 3, title: 'Autocapacitación M.E.T.A.S · Módulo 1: Panorama técnico', modulo: 'aprendizaje-unido', materia: 'ing', color: 'apr', xp: 40, icon: '🏗️', ruta: 'ingenieria', etapa: 1, url: 'misiones/autocapacitacion-metas/modulo-1-panorama.html' },
   { id: 4, title: 'Autocapacitación M.E.T.A.S · Módulo 2: El frontend',      modulo: 'aprendizaje-unido', materia: 'ing', color: 'apr', xp: 40, icon: '🗺️', ruta: 'ingenieria', etapa: 2, url: 'misiones/autocapacitacion-metas/modulo-2-frontend.html' },
   { id: 5, title: 'Activos y Pasivos: qué mete y qué saca dinero',           modulo: 'aprendizaje-unido', materia: 'eco', color: 'apr', xp: 40, icon: '💰', ruta: 'poder',      etapa: 1, url: 'misiones/ruta-poder-activos-pasivos/activos-pasivos.html' },
+  { id: 6, title: 'Las seis palancas de la influencia',                      modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 40, icon: '🧠', ruta: 'persuasion', etapa: 1, url: 'misiones/ruta-persuasion-palancas/palancas-influencia.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -39,6 +40,13 @@ const ETAPAS_PREVISTAS = {
     6: 'Distribución y ciclo de vida',
     7: 'Decisiones de ingeniería: los porqués',
     8: 'Glosario y simulacro final',
+  },
+  persuasion: {
+    2: 'Sesgos: los atajos que deciden por ti',
+    3: 'Marcos: quien pone el marco gana la conversación',
+    4: 'Tácticas de presión y sus antídotos',
+    5: 'Preguntar y escuchar: influir sin empujar',
+    6: 'Narrativa: contar el proyecto para que otros quieran entrar',
   },
   poder: {
     2: 'El presupuesto real: a dónde se va el dinero',
