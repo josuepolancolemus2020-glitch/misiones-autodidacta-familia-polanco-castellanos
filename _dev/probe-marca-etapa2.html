@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Marca, etapa 2</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-marca-oferta/oferta.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 2 de la Ruta de la Marca («La oferta: qué se entrega y a qué
+   precio»): bancos, la postura del tema, laboratorio, las dos pruebas impresas con
+   su nombre, los casos del proyecto, la ficha y la ruta con DOS etapas tocables. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+/* El guion largo se escribe por su punto de código para no meter el carácter
+   literal en ningún fuente de la casa (norma 1-bis). */
+const RAYA = /\u2014/;
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Marca · Etapa 2 de 6/.test(d.body.textContent), 'se presenta como Ruta de la Marca · Etapa 2 de 6', 'no se presenta como etapa 2 de su ruta');
+    ok(!/Etapa 1 de 6/.test(d.body.textContent), 'ya no se presenta como etapa 1 de 6', 'todavía dice Etapa 1 de 6');
+    ok(!/característica y beneficio|promesa en doce palabras|las cuatro audiencias|Prueba de la promesa|el logo que no salvó/i.test(d.body.textContent), 'sin restos de la etapa de la que se copió', 'quedan textos de Para quién y qué le cambia');
+    ok(!RAYA.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/\u2014/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('Object.keys(parteData).join(",")') === 'alcance,precio,prueba,salida', 'laboratorio con las 4 piezas de la oferta', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas de una oferta', 'piezas: ' + dentro('timelineData.length'));
+    ok(/faro_mkt_oferta/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LA POSTURA DEL TEMA ──');
+    /* Las diez del plan. Este bloque es el que impide que la misión quede bonita y vacía. */
+    const texto = d.body.textContent.replace(/\s+/g, ' ');
+    const secCasos = d.getElementById('s-casos');
+    const txtCasos = (secCasos ? secCasos.textContent : '').replace(/\s+/g, ' ');
+    const vecesNoIncluye = (texto.match(/no incluye/gi) || []).length;
+    ok(vecesNoIncluye >= 4, 'el «no incluye» se practica y no solo se define (' + vecesNoIncluye + ' veces)', 'el «no incluye» sale ' + vecesNoIncluye + ' veces: quedó como definición');
+    ok(/el costo es el piso|costo.{0,20}piso, (nunca|no) el precio/i.test(texto), 'el costo es el piso, nunca el precio', 'falta la regla del costo como piso: así se cotiza sumando horas');
+    ok(/(quien|el que) dice la primera cifra/i.test(texto), 'el ancla: quien dice la primera cifra la fija', 'falta el ancla de precio, la única defensa en una negociación');
+    ok(/se baja el precio quitando|quitando alcance|no quita alcance/i.test(texto), 'el precio se baja quitando alcance', 'falta la regla del descuento: el precio nuevo se instala sin que nadie lo note');
+    ok(/escalón gratis/i.test(texto) && /prueba sin riesgo/i.test(texto), 'el escalón gratis sale con su función y su peligro', 'el escalón gratis no aparece como prueba sin riesgo');
+    ok(/no se paga solo se apaga/i.test(texto), 'lo que no se paga solo se apaga', 'falta la frase que autoriza a cobrar sin culpa');
+    ok(/La oferta de una página/i.test(texto) && /oferta de una página/i.test(dentro('critDecisionBank.join(" ")')), 'el producto de la etapa, en la misión y en las decisiones', 'la oferta de una página no está con su nombre exacto');
+    ok(/cinco reglas de la oferta/i.test(texto), 'trae las cinco reglas de la oferta', 'faltan las cinco reglas de la oferta');
+    ok(/por unidad/i.test(texto) && /suscripción/i.test(texto) && /proyecto cerrado/i.test(texto), 'las tres formas de cobrar: unidad, suscripción y proyecto cerrado', 'falta alguna de las tres formas de cobrar');
+    ok(/L 30/.test(txtCasos) && /L 250/.test(txtCasos) && /L 8\.000/.test(txtCasos) && /L 4\.500/.test(txtCasos), 'los casos llevan sus cifras en lempiras (norma 3)', 'los casos perdieron las cifras en lempiras');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/El alcance/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el alcance', 'abre en otra pieza');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'la prueba de cuánto cobro por esto se genera', 'prueba competencial vacía');
+    const cabeceras = [...d.querySelectorAll('.eval-print-header')].map(h => h.textContent).join(' ');
+    const rotulos = d.getElementById('eval-screen-title').textContent + d.getElementById('evalcrit-screen-title').textContent +
+                    d.getElementById('evalOut').textContent + crit + cabeceras;
+    ok(!/Las seis palancas|Panorama|La puerta de la casa digital|La máquina que predice|Quién decide de verdad|Para quién y qué le cambia|Sesgos|El presupuesto real|Los datos de los demás/.test(rotulos), 'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+    ok(/Cuánto cobro por esto/.test(cabeceras) && /Evaluación Final · La oferta · Ruta de la Marca/.test(cabeceras), 'las dos cabeceras impresas llevan el nombre de esta misión', 'las cabeceras impresas no dicen cómo se llaman estas dos pruebas');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = secCasos;
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['ficha suelta', 'aula al mes', 'patrocinador', 'editorial', 'personalizada', 'descuento', 'visibilidad', 'anuncios']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+      ok(/La oferta de una página/i.test(txt), 'trae la oferta de una página', 'falta la oferta de una página');
+      ok(/cinco reglas de la oferta/i.test(txt), 'trae las cinco reglas', 'faltan las cinco reglas');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/L 8\.000|L 4\.500|L 1\.800/.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-marca-oferta.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/La oferta de una página/i.test(txt), 'la ficha trae la oferta de una página', 'falta la oferta de una página');
+    ok(/cinco reglas de la oferta/i.test(txt), 'la ficha trae las cinco reglas de la oferta', 'faltan las cinco reglas');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-marca-oferta"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const marca = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Marca/.test(c.textContent));
+    ok(!!marca, 'la Ruta de la Marca está en el mapa', 'no aparece la ruta');
+    if (marca) {
+      ok(marca.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + marca.querySelectorAll('.re-link').length);
+      ok(marca.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + marca.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/La oferta: qué se entrega y a qué precio/.test(marca.textContent), 'la etapa 2 sale con el título de la misión', 'la etapa 2 sigue saliendo como prevista');
+      ok(/El relato: contar el proyecto sin inflarlo/i.test(marca.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="mkt"]');
+    ok(!!chip, 'la materia Marketing y Marca tiene su chip', 'no hay chip de Marketing y Marca');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      const of = tarjetas.find(t => /qué se entrega y a qué precio/i.test(t.textContent));
+      ok(!!of && /🔒/.test(of.textContent), 'la misión de la oferta lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>
