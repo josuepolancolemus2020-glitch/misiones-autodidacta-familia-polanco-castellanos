@@ -12,12 +12,21 @@
   table.balance td { height: 24px; }
   table.balance td.dinero { width: 26%; text-align: right; font-family: 'Fira Code', monospace; }
   .total td { font-weight: 800; background: var(--pri-suave); }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .fuente { font-size: 11.5px; color: var(--gris); }
+  .mini { font-size: 12px; color: var(--gris); }
+  td.num { text-align: right; font-family: 'Fira Code', monospace; white-space: nowrap; }
 </style>
 </head>
 <body>
 <button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
 
 <div class="doc">
+
+
+
 
 <!-- ═══════════ PÁGINA 1 ═══════════ -->
 <section class="pagina">
@@ -27,42 +36,58 @@
   <div class="fh">
     <div class="f-badge">📄 Ficha de estudio · Activos y Pasivos</div>
     <div class="f-meta"><b>Ruta:</b> 💰 Ruta del Poder · Etapa 1 de 6 · <b>Materia:</b> Poder Económico</div>
-    <div class="f-meta"><b>Tema:</b> qué mete dinero al bolsillo y qué lo saca; flujo de caja y patrimonio; el costo real de comprar a crédito; y cómo responder cuando alguien empuja a firmar.</div>
-    <div class="f-meta"><b>Regla de la etapa:</b> números primero, decisiones después.</div>
+    <div class="f-meta"><b>Tema:</b> qué mete dinero al bolsillo y qué lo saca; flujo de caja y patrimonio; el costo real de comprar a crédito; el orden en que se paga; y cómo responder cuando alguien empuja a firmar.</div>
   </div>
 
   <h2>🎯 Objetivos</h2>
   <ol>
-    <li>Clasificar cualquier bien preguntando <strong>hacia dónde mueve el dinero</strong>, no cuánto costó.</li>
-    <li>Calcular el <strong>flujo de caja</strong> de un mes real de la familia.</li>
-    <li>Calcular el <strong>patrimonio</strong>: activos menos deudas.</li>
-    <li>Sacar el <strong>costo total</strong> de una compra a crédito (cuota por plazo).</li>
-    <li>Reconocer las señales de una promesa de rendimiento imposible.</li>
-    <li>Decir que no, con un número en la mano, sin quedar mal.</li>
+    <li>Clasificar cualquier bien preguntando <strong>hacia dónde mueve el dinero</strong>, no cuánto costó ni cómo se ve.</li>
+    <li>Calcular el <strong>flujo de caja</strong> de un mes real de la familia y el <strong>patrimonio</strong> del año.</li>
+    <li>Sacar el <strong>costo total</strong> de una compra a crédito y compararlo con el precio de contado.</li>
+    <li>Explicar por qué una <strong>cuota baja</strong> puede ser una deuda cara, y calcularlo con números.</li>
+    <li>Ordenar en qué se usa el dinero que sobra: fondo, deuda cara, activo.</li>
+    <li>Reconocer las señales de una <strong>promesa de rendimiento imposible</strong> antes de entrar.</li>
+    <li>Analizar una oferta al proyecto M.E.T.A.S con las cuatro casillas y responder con una <strong>condición</strong>.</li>
+    <li>Decir que no con un número en la mano, sin quedar mal y sin discutir.</li>
   </ol>
 
-  <h2>💰 1. Las cuatro casillas</h2>
-  <table>
-    <tr><th>Casilla</th><th>Qué es</th><th>Ejemplo de aquí</th></tr>
-    <tr><td><b>Activo</b></td><td>Mete dinero o ahorra un gasto sin consumir tus horas</td><td>Cuarto alquilado, máquina de coser, mercadería que rota</td></tr>
-    <tr><td><b>Pasivo</b></td><td>Saca dinero mes a mes, lo uses o no</td><td>Cuota de consumo, moto de paseo, suscripción olvidada</td></tr>
-    <tr><td><b>Ingreso</b></td><td>Lo que entra en el período</td><td>Salario, ventas, alquiler cobrado</td></tr>
-    <tr><td><b>Egreso</b></td><td>Lo que sale en el período</td><td>Comida, servicios, cuotas, mantenimiento</td></tr>
-  </table>
-  <div class="caja">
-    <strong>Flujo de caja</strong> = ingresos menos egresos (la película del mes). &nbsp;·&nbsp;
-    <strong>Patrimonio</strong> = activos menos deudas (la foto del año).
-  </div>
+  <h2>🧭 La idea que sostiene toda la etapa</h2>
+  <p>Casi nadie decide el dinero con una cuenta: lo decide con una sensación. La sensación dice «me lo merezco», «está barato», «es una inversión», y esas tres frases han comprado más pasivos que cualquier vendedor. La cuenta dice otra cosa, y siempre dice lo mismo: <strong>¿hacia dónde mueve el dinero esto que estoy comprando?</strong></p>
+  <p>Un <strong>activo</strong> mete dinero al bolsillo, o ahorra un gasto que ya estaba, sin consumir tus horas. Un <strong>pasivo</strong> lo saca mes a mes, se use o no. No es una lista de cosas buenas y cosas malas: <em>la misma cosa cambia de casilla según para qué se use</em>. Esa es toda la idea, y es la que hay que poder explicar en la mesa.</p>
+  <p>Conviene decirlo completo, porque aquí se cuela el malentendido más común: esto <b>no es un manual para no gastar</b>. Gastar es parte de vivir, y una familia que no se da gustos no sostiene ningún plan. Lo que cambia es el orden: primero el número, después la decisión, y los gustos pagados con lo que sobró, no con lo que va a sobrar.</p>
+
   <div class="caja caja-amb">
-    <strong>La prueba que decide:</strong> la misma motocicleta es <b>activo</b> si reparte pedidos pagados y <b>pasivo</b> si solo pasea. El precio no dice nada; la dirección del dinero, todo.
+    <strong>La prueba que decide:</strong> la misma motocicleta es <b>activo</b> si reparte pedidos pagados y <b>pasivo</b> si solo pasea. El precio no dice nada; la dirección del dinero, todo. Antes de comprar, la pregunta no es «¿me alcanza la cuota?», sino <b>«¿esto se paga solo?»</b>.
   </div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 1 de 6</span></div>
+  <div class="caja">
+    <strong>Cómo estudiar esta ficha:</strong> primero la teoría y las cuatro casillas, en una sentada; después se llenan el balance y el flujo con los papeles del mes en la mano, que es donde la teoría se vuelve incómoda y por eso sirve; luego los casos, que son los que fijan la idea; y al final los ejercicios con lápiz. La pauta de las últimas páginas se lee <b>después</b> de responder. Lo que se busca no es saber la definición: es que, cuando alguien apure una firma, salga la cuenta antes que la respuesta.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 1 de 10</span></div>
 </section>
 
 <!-- ═══════════ PÁGINA 2 ═══════════ -->
 <section class="pagina">
-  <h2>🧮 2. El balance de la casa (llénalo a mano)</h2>
+  <h2>💰 Las cuatro casillas</h2>
+  <table>
+    <tr><th style="width:16%">Casilla</th><th>Qué es</th><th style="width:34%">Ejemplo de aquí</th></tr>
+    <tr><td><b>Activo</b></td><td>Mete dinero o ahorra un gasto sin consumir tus horas</td><td>Cuarto alquilado, máquina de coser, mercadería que rota, herramienta que evita alquilar</td></tr>
+    <tr><td><b>Pasivo</b></td><td>Saca dinero mes a mes, lo uses o no</td><td>Cuota de consumo, moto de paseo, suscripción olvidada, terreno que solo paga impuesto</td></tr>
+    <tr><td><b>Ingreso</b></td><td>Lo que entra en el período</td><td>Salario, ventas, alquiler cobrado, remesa</td></tr>
+    <tr><td><b>Egreso</b></td><td>Lo que sale en el período</td><td>Comida, servicios, cuotas, mantenimiento, transporte</td></tr>
+  </table>
+  <div class="caja">
+    <strong>Flujo de caja</strong> = ingresos menos egresos: la película del mes. &nbsp;·&nbsp;
+    <strong>Patrimonio</strong> = activos menos deudas: la foto del año. Se pueden tener las dos cosas al revés, y pasa seguido: familias con buen flujo y patrimonio en cero, y familias con patrimonio grande que no tienen para el mes. La primera vive bien y no avanza; la segunda parece que llegó y vive apretada.
+  </div>
+
+  <div class="caja caja-amb">
+    <strong>Las tres que casi todos clasifican mal:</strong> el <b>carro nuevo</b> para ir al trabajo se llama inversión, pero cobra cuota, seguro, combustible y pierde valor cada año. El <b>terreno quieto</b> se compra «para el futuro» y mientras tanto paga impuesto sin dar flujo. Y la <b>casa propia</b> es mixta: ahorra el alquiler, que cuenta, pero cobra mantenimiento e impuesto. En las tres, la respuesta honesta depende del número, no de la opinión.
+  </div>
+
+<h2>🧮 El balance de la casa (llénalo a mano)</h2>
+  <p>Con lo que hay hoy, sin adornar. En activos va lo que <b>produce o ahorra</b>; lo demás es cosa que se tiene, y una cosa que se tiene no es un activo.</p>
   <table class="balance">
     <tr><th>Lo que tengo (activos)</th><th class="dinero">Valor L</th><th>Lo que debo (deudas)</th><th class="dinero">Saldo L</th></tr>
     <tr><td></td><td class="dinero"></td><td></td><td class="dinero"></td></tr>
@@ -73,7 +98,12 @@
     <tr class="total"><td colspan="3">PATRIMONIO (activos menos deudas)</td><td class="dinero"></td></tr>
   </table>
 
-  <h2>🌊 3. El flujo de un mes real</h2>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h2>🌊 El flujo de un mes real</h2>
   <p>Usa <b>Finanzas Familia</b> de F.A.R.O o los recibos del mes. Sin adornar: el mes que fue, no el que debió ser.</p>
   <table class="balance">
     <tr><th>Entró (ingresos)</th><th class="dinero">L</th><th>Salió (egresos)</th><th class="dinero">L</th></tr>
@@ -87,15 +117,156 @@
     <p style="margin:0"><strong>¿A dónde fue ese sobrante?</strong> Escríbelo aquí, con nombre y apellido:</p>
     <div class="raya-resp"></div>
   </div>
+  <p class="mini"><b>Cómo se lee:</b> flujo positivo y patrimonio creciendo es el camino. Flujo positivo con patrimonio parado significa que el sobrante se está yendo en cosas que no quedan. Flujo negativo con patrimonio grande significa que se está viviendo de vender lo que se tiene, y eso tiene fecha de vencimiento.</p>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 2 de 6</span></div>
+  <div class="caja caja-amb">
+    <strong>Los tres números que conviene saber de memoria:</strong> cuánto <b>entra</b> al mes, cuánto <b>sale</b> al mes, y cuánto se debe <b>en total</b>. Una familia que no sabe decir esos tres de memoria no está decidiendo su dinero: está reaccionando a lo que aparece. Se anotan una vez y se revisan el mismo día de cada mes, con la aplicación o con un cuaderno, da igual: lo que importa es que sean los de verdad y que los sepan los dos.
+  </div>
+
+<h2>💳 El costo real del crédito</h2>
+  <p>La pregunta que hace el vendedor es «¿le alcanza la cuota?». Es la pregunta equivocada a propósito: la cuota es lo que se paga por mes, no lo que cuesta la cosa. Lo que cuesta es <b>cuota × plazo</b>, y esa resta contra el precio de contado es el precio del crédito.</p>
+  <table>
+    <tr><th>Un equipo de L 12,000 de contado</th><th class="num">Cuota</th><th class="num">Plazo</th><th class="num">Costo total</th><th class="num">Lo que cuesta el crédito</th></tr>
+    <tr><td>Plan A</td><td class="num">L 1,150</td><td class="num">12</td><td class="num">L 13,800</td><td class="num">L 1,800</td></tr>
+    <tr><td>Plan B</td><td class="num">L 750</td><td class="num">24</td><td class="num">L 18,000</td><td class="num">L 6,000</td></tr>
+    <tr><td>Plan C, «la cuota más cómoda»</td><td class="num">L 550</td><td class="num">36</td><td class="num">L 19,800</td><td class="num">L 7,800</td></tr>
+  </table>
+  <p>La cuota del plan C es la mitad de la del plan A, y por eso se siente barata. Pero paga <b>L 6,000 más</b> por el mismo equipo, que es la mitad de lo que costaba de contado. La cuota baja no es un descuento: es el mismo dinero repartido en más meses, con más intereses encima.</p>
+
+  <div class="caja caja-amb">
+    <strong>La regla del 72, para calcular de cabeza:</strong> dividí 72 entre la tasa y te dice en cuánto tiempo se duplica una deuda o un ahorro. Al 5% mensual, 72 ÷ 5 = poco más de 14: la deuda se duplica en catorce meses. Al 12% anual, 72 ÷ 12 = 6 años. Sirve para las dos direcciones, y por eso el interés compuesto es el mejor socio o el peor acreedor.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 3 de 10</span></div>
 </section>
 
-<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
 <section class="pagina">
-  <h2>✍️ 4. Ejercicios sin pantalla</h2>
+  <h2>📉 Lo que casi nadie suma</h2>
+  <ul>
+    <li><b>La depreciación.</b> Un vehículo nuevo pierde una parte grande de su valor en los primeros años, y el más golpeado es el primero. Se paga cuota por algo que vale menos cada mes.</li>
+    <li><b>El mantenimiento y el seguro.</b> Van aparte de la cuota, y aparecen justo cuando no hay.</li>
+    <li><b>Las horas.</b> Un negocio que exige tus tardes no es ingreso pasivo: es un segundo trabajo, y hay que decidirlo sabiendo eso.</li>
+    <li><b>El costo de oportunidad.</b> Cada lempira puesto en una cosa es un lempira que no está en otra. La pregunta no es «¿puedo pagarlo?», sino «¿esto es lo mejor que puedo hacer con este dinero hoy?».</li>
+    <li><b>La inflación.</b> El dinero quieto pierde poder de compra todos los años. Guardar bajo el colchón también tiene costo, solo que no lo cobran de frente.</li>
+  </ul>
 
-  <h3>A. Clasifica: escribe A (activo) o P (pasivo)</h3>
+  <h2>🛡️ En qué orden se usa el dinero que sobra</h2>
+  <ol>
+    <li><b>Fondo mínimo de emergencia</b>, aunque sea un mes de gastos. Sin fondo, el primer imprevisto obliga a endeudarse otra vez, y el esfuerzo anterior se pierde.</li>
+    <li><b>La deuda más cara primero</b>, no la más grande. Una deuda al 5% mensual cuesta más que tres al 15% anual.</li>
+    <li><b>El activo que se paga solo</b>, empezando por el más barato de probar.</li>
+    <li><b>El gusto</b>, que también va en la lista y se paga de contado. Un presupuesto sin gustos no lo sostiene ninguna familia.</li>
+  </ol>
+
+<h2>🔬 Casos de estudio de la vida real I: lo que se midió</h2>
+  <p>Esto no es opinión de manual. Son estudios conocidos, con lo que enseñan y con lo que no.</p>
+
+  <div class="caso">
+    <h3>1. Los ganadores de lotería y las víctimas de accidente</h3>
+    <p><b>Brickman, Coates y Janoff-Bulman (1978)</b> compararon a ganadores grandes de lotería con personas que habían quedado con una lesión grave y con gente común. Al poco tiempo, los ganadores <b>no se declaraban mucho más felices</b> que el grupo común, y decían disfrutar menos de los placeres cotidianos.</p>
+    <p><b>Lo que enseña:</b> el salto de ingreso se vuelve la nueva normalidad muy rápido, y el gasto sube con él. Por eso mejorar el sueldo sin cambiar la costumbre no cambia el patrimonio: cambia el nivel de los pasivos.</p>
+    <p class="fuente">Brickman, Coates y Janoff-Bulman, <em>Journal of Personality and Social Psychology</em>, 1978. Muestra pequeña, pero el efecto (adaptación) se ha repetido en estudios posteriores.</p>
+  </div>
+
+  <div class="caso">
+    <h3>2. El malvavisco de Stanford</h3>
+    <p>En los experimentos de <b>Walter Mischel</b> (desde 1972) se ofrecía a un niño un dulce ahora o dos si esperaba unos minutos solo con el dulce enfrente. Los que esperaban mostraron, años después, mejores resultados en varias medidas.</p>
+    <p><b>Lo que enseña, con su matiz:</b> réplicas más grandes (Watts, Duncan y Quan, 2018) encontraron un efecto <b>bastante más pequeño</b> al tomar en cuenta el entorno de la familia. O sea: esperar ayuda, pero no es fuerza de voluntad pura. En una casa donde lo prometido no siempre llega, esperar es una apuesta racional que sale mal. La lección práctica no es «ten más voluntad»: es <b>construir el entorno</b>, con el dinero separado antes de que pase por las manos.</p>
+    <p class="fuente">Mischel y Ebbesen, 1970; Watts, Duncan y Quan, <em>Psychological Science</em>, 2018.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>3. El millonario de al lado</h3>
+    <p><b>Stanley y Danko (1996)</b> estudiaron a familias con patrimonio alto en Estados Unidos y encontraron un patrón que sorprendió: la mayoría <b>no vivía como rica</b>. Casas modestas, carros usados, presupuesto anotado. La riqueza estaba en lo acumulado, no en lo exhibido.</p>
+    <p><b>Lo que enseña:</b> el gasto que se ve y el patrimonio que existe son cosas distintas, y muchas veces van en direcciones opuestas. Vivir como si ya se hubiera llegado es la forma más segura de no llegar.</p>
+    <p class="fuente">Stanley y Danko, <em>The Millionaire Next Door</em>, 1996. Es un estudio de un país y una época, así que el patrón vale como señal, no como ley.</p>
+  </div>
+
+  <div class="caso">
+    <h3>4. La aritmética del 5% mensual</h3>
+    <p>No es un estudio, es una cuenta, y conviene hacerla una vez en la vida para no olvidarla. Un préstamo al <b>5% mensual</b> no cuesta 60% al año: cuesta <b>casi 80%</b>, porque el interés se calcula sobre lo que ya creció. L 10,000 sin abonar se vuelven cerca de L 18,000 en doce meses.</p>
+    <p><b>Lo que enseña:</b> ninguna inversión normal rinde eso, así que pagar esa deuda <b>es</b> la mejor inversión disponible. Cuando alguien pregunta si conviene invertir teniendo una deuda cara, la respuesta ya está en el número.</p>
+  </div>
+
+<h2>🛒 Casos de estudio de la vida real II: la calle de aquí</h2>
+
+  <div class="caso">
+    <h3>5. El préstamo de la esquina</h3>
+    <p>Presta rápido, sin papeles y sin preguntar para qué, con cobro diario o semanal. La tasa no se dice en porcentaje anual, se dice en cuota: «solo me da cien diarios». Cien diarios sobre un préstamo de dos mil, por un mes, es un costo que ninguna institución podría cobrar de frente.</p>
+    <p><b>Lo que enseña:</b> cuando el precio se dice en cuota y no en tasa, hay que convertirlo uno mismo antes de aceptar. Y el trato amable del prestamista es parte del producto: la reciprocidad sostiene deudas que en números no se sostienen.</p>
+  </div>
+
+  <div class="caso">
+    <h3>6. La pirámide del 20% mensual</h3>
+    <p>Cada cierto tiempo aparece una «financiera» o un grupo de inversión que promete rendimientos imposibles y muestra vecinos que ya cobraron. Los primeros cobran de verdad, con el dinero de los que van entrando. Cuando deja de entrar gente, se cae, y pierde el último, que suele ser el que entró porque vio cobrar a los primeros.</p>
+    <p><b>Lo que enseña:</b> la señal no es el porcentaje, es <b>de dónde sale</b> el rendimiento. Un negocio real puede explicar qué produce el dinero y quién responde por escrito. Si la respuesta es «así funciona, mire a fulano», eso no es una explicación: es prueba social usada como anzuelo.</p>
+  </div>
+
+  <div class="caso">
+    <h3>7. La tienda de la cuota cómoda</h3>
+    <p>El electrodoméstico se anuncia por su cuota, nunca por su precio total, y el contrato agrega seguro, cargos por manejo y a veces garantía extendida. El cliente compara cuotas entre tiendas, no precios, así que la competencia se da en la cuota y no en el costo.</p>
+    <p><b>Lo que enseña:</b> pedir siempre <b>el precio de contado y el costo total financiado</b>, los dos en el mismo papel. Si no lo quieren poner por escrito, ya se contestó la pregunta.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>8. La pulpería que fía</h3>
+    <p>Una pulpería de barrio vende bien y aun así nunca tiene efectivo. La causa suele ser la misma: fía a los vecinos y no lleva cuenta de cuánto le deben. La mercadería sale, el dinero no entra, y para reponer se pide prestado. En el papel el negocio gana; en la caja no hay.</p>
+    <p><b>Lo que enseña:</b> un negocio puede ser rentable y quebrar igual, porque <b>rentabilidad y flujo no son lo mismo</b>. Lo fiado es una cuenta por cobrar, o sea un activo, pero solo si se cobra: sin registro y sin fecha, es un regalo con otro nombre.</p>
+  </div>
+
+  <div class="caso">
+    <h3>9. La remesa que llegó y se fue</h3>
+    <p>Llega dinero de un familiar en el extranjero y se usa en consumo del mes: comida, ropa, una fiesta, una reparación. El mes siguiente hay que esperar la próxima. Cuando una parte fija se destina a algo que produce (herramienta, mercadería, curso, deuda cara), la remesa deja de ser un sueldo prestado y empieza a construir.</p>
+    <p><b>Lo que enseña:</b> el problema no es el consumo, es que <b>todo</b> sea consumo. Una regla simple y sostenible: apartar un porcentaje fijo apenas entra, antes de que el dinero pase por las manos, que es justo lo que enseñaba el caso 2.</p>
+  </div>
+
+<h2>🏛️ Casos del proyecto: lo que sí va a tocar la puerta</h2>
+  <p>Las decisiones que vienen no son de manual: son sobre M.E.T.A.S. Cada caso se analiza con las cuatro preguntas, y ninguna se acepta o se rechaza completa: se acepta <b>con condiciones</b>.</p>
+
+  <div class="caso">
+    <h3>10. La ONG que regala 300 tablets</h3>
+    <p>Ofrece 300 tablets para tres escuelas si la portada lleva su logo por dos años y se le entrega un informe trimestral de uso.</p>
+    <p><b>Qué mete:</b> tracción real, 300 alumnos usando el sistema y casos que se pueden mostrar. <b>Qué saca:</b> horas recurrentes, porque un informe trimestral por dos años es trabajo que alguien hace. <b>Qué compromete:</b> el espacio de portada, que es de la marca del proyecto. <b>Condición:</b> informe que la aplicación genere sola, logo en la sección de aliados, datos agregados y nunca de menores.</p>
+  </div>
+
+  <div class="caso">
+    <h3>11. El inversionista que ofrece L 500,000 por el 30%</h3>
+    <p>Un empresario propone financiar el crecimiento a cambio del 30% del proyecto y un puesto en las decisiones de contenido.</p>
+    <p><b>Qué mete:</b> dinero de una sola vez y contactos. <b>Qué saca:</b> el 30% de lo que venga después, para siempre. <b>Qué compromete:</b> lo que más vale, que es decidir qué se enseña y cómo. <b>La pregunta que decide:</b> ¿ese dinero produce más de lo que cuesta ceder el timón? Casi siempre hay una versión más barata: financiar una etapa concreta, con plazo y sin voz en el contenido.</p>
+  </div>
+
+  <div class="caso">
+    <h3>12. La editorial que quiere imprimir las fichas</h3>
+    <p>Propone imprimir y vender las 57 fichas con su sello, pagando una regalía por ejemplar, con exclusividad de cinco años.</p>
+    <p><b>Qué mete:</b> impresión pagada y distribución que el proyecto no tiene. <b>Qué saca:</b> el precio final se decide fuera y puede dejar fuera a las escuelas pobres. <b>Qué compromete:</b> cinco años de exclusividad, que es una eternidad para un proyecto que cambia cada mes. <b>Condición:</b> exclusividad corta, precio tope acordado, y libertad de seguir regalando la versión digital.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>13. Cobrar por aula</h3>
+    <p>No es una oferta de nadie: es la decisión propia de si M.E.T.A.S cobra una cuota anual por aula. Aquí las cuatro casillas se usan en la otra dirección, la de crear un activo.</p>
+    <p><b>Qué mete:</b> ingreso recurrente que no depende de una donación. <b>Qué saca:</b> soporte, facturación y una promesa de continuidad que hay que cumplir. <b>Qué compromete:</b> la puerta abierta a la escuela que no puede pagar, que es el motivo del proyecto. <b>Condición:</b> cobrar donde hay presupuesto (privadas, alcaldías, ONG) y mantener gratis lo básico para el aula pública.</p>
+  </div>
+
+<h2>✍️ Ejercicios sin pantalla</h2>
+  <p>Con lápiz, sin calculadora salvo donde se pide, y sin ver la pauta del final.</p>
+
+  <h3>Ejercicio 1. Clasifica: escribe A (activo) o P (pasivo)</h3>
   <ol>
     <li>___ Cuarto que se alquila en L 2,000 al mes.</li>
     <li>___ Televisor comprado a 24 cuotas de L 750.</li>
@@ -103,35 +274,48 @@
     <li>___ Moto usada solo para pasear, con cuota y seguro.</li>
     <li>___ Herramienta que te evita alquilar una cada semana.</li>
     <li>___ Suscripción que nadie de la casa usa.</li>
+    <li>___ Terreno sin uso que paga impuesto cada año.</li>
+    <li>___ Curso de tres meses que te habilita para cobrar un servicio.</li>
   </ol>
 
-  <h3>B. El costo real del crédito</h3>
+  <h3>Ejercicio 2. El costo real del crédito</h3>
   <p>Un equipo cuesta <b>L 12,000</b> de contado. A crédito son <b>24 cuotas de L 750</b>.</p>
   <ol>
     <li>Costo total a crédito: 24 × 750 = L ____________</li>
     <li>Cuánto cuesta el crédito: ____________ menos 12,000 = L ____________</li>
+    <li>Ese sobrecosto, ¿qué porcentaje es del precio de contado? ____________ %</li>
     <li>Si el equipo no produce ingreso, ¿de dónde sale esa diferencia? ____________________</li>
   </ol>
 
-  <h3>C. Decide y justifica</h3>
-  <p>Sobran L 2,500 este mes. Hay una deuda al 5% mensual y no hay fondo de emergencia. ¿Qué haces primero y por qué?</p>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>Ejercicio 3. Convierte la cuota en tasa</h3>
+  <p>Don Chepe presta <b>L 2,000</b> y cobra <b>L 100 diarios durante 24 días</b>, sin papeles y sin preguntar para qué.</p>
+  <ol>
+    <li>Cuánto se devuelve en total: 100 × 24 = L ____________</li>
+    <li>Cuánto es el interés: ____________ menos 2,000 = L ____________</li>
+    <li>Ese interés, ¿qué porcentaje es de lo prestado, y en menos de un mes? ____________ %</li>
+    <li>¿Qué negocio tendría que tener el que pide, para que ese préstamo le convenga? ____________________</li>
+  </ol>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 3 de 6</span></div>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 7 de 10</span></div>
 </section>
 
-<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
 <section class="pagina">
-  <h2>🧠 5. Simulacro del vendedor</h2>
-  <h3>1) «Llévelo hoy, la cuota es de apenas L 750, ni la va a sentir.»</h3>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  <h3>2) «Este negocio paga 20% mensual garantizado, pero tiene que entrar esta semana.»</h3>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  <h3>3) «Un carro nuevo es una inversión y le da estatus.»</h3>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>Ejercicio 4. El orden del dinero</h3>
+  <p>Sobran L 2,500 este mes. Hay una deuda al 5% mensual, no hay fondo de emergencia y falta una herramienta de L 3,000 que ahorraría L 400 al mes de alquiler. Escribe el orden y el porqué.</p>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
 
-  <h2>🏛️ 6. Caso del proyecto (lo que sí va a pasar)</h2>
-  <p>Una ONG ofrece <b>300 tablets</b> para tres escuelas de M.E.T.A.S si la portada lleva su logo por dos años y se le entrega un informe trimestral de uso. Analízalo con las cuatro casillas antes de leer la pauta.</p>
+<h3>Ejercicio 5. Encuentra la omisión</h3>
+  <p>En cada oferta, escribe <b>qué información falta</b> para poder decidir.</p>
+  <ol>
+    <li>«Llévelo hoy con cuota de L 550 y sin prima.» → ____________________________________</li>
+    <li>«Le presto sin papeles, solo me da cien diarios.» → ________________________________</li>
+    <li>«Este negocio paga 20% mensual, entre esta semana.» → ______________________________</li>
+    <li>«Le regalamos el primer año del sistema para su escuela.» → ________________________</li>
+  </ol>
+
+  <h3>Ejercicio 6. El caso del proyecto</h3>
+  <p>Una ONG ofrece 300 tablets para tres escuelas si la portada lleva su logo por dos años y se entrega un informe trimestral. Analízalo antes de leer la pauta.</p>
   <table>
     <tr><th style="width:32%">Pregunta</th><th>Tu respuesta</th></tr>
     <tr><td><b>¿Qué mete?</b></td><td></td></tr>
@@ -140,43 +324,70 @@
     <tr><td><b>¿Con qué condición se acepta?</b></td><td></td></tr>
   </table>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 4 de 6</span></div>
+  <h3>Ejercicio 7. Simulacro del vendedor</h3>
+  <p>Contesta en voz alta y luego escribe la versión corta, siempre con un número dentro.</p>
+  <h3>1) «Llévelo hoy, la cuota es de apenas L 750, ni la va a sentir.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>2) «Este negocio paga 20% mensual garantizado, pero tiene que entrar esta semana.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>3) «Un carro nuevo es una inversión y le da estatus.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 8 de 10</span></div>
 </section>
 
-<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
 <section class="pagina">
   <div class="pauta">
-    <h2>✅ Pauta de respuestas</h2>
+    <h2>✅ Pauta completa de respuestas</h2>
+    <p class="mini">Cubre los siete ejercicios, sin dejar ninguno a medias. En los de redacción lo que se califica es que aparezcan los elementos en negrita.</p>
 
-    <h3>A. Clasifica</h3>
-    <p>1) <b>A</b> · 2) <b>P</b> · 3) <b>A</b> · 4) <b>P</b> · 5) <b>A</b> (ahorra un gasto recurrente) · 6) <b>P</b>.</p>
-
-    <h3>B. El costo real del crédito</h3>
-    <p>24 × 750 = <b>L 18,000</b>. El crédito cuesta <b>L 6,000</b> sobre el precio de contado. Si el equipo no produce ingreso, esos L 6,000 salen de tu trabajo futuro, y encima el bien vale menos cada mes por depreciación.</p>
-
-    <h3>C. Decide y justifica</h3>
-    <p>Primero un <b>fondo mínimo</b> (aunque sea un mes de gastos) y luego atacar la deuda al 5% mensual, que es carísima: un 5% mensual compuesto supera el 79% en un año. Sin fondo, el primer imprevisto obliga a endeudarse otra vez y el esfuerzo se pierde.</p>
-
-    <h3>Simulacro: respuestas modelo</h3>
-    <p><strong>1)</strong> «La cuota sí es baja, pero el costo no es la cuota: son 24 por 750, o sea 18,000 por algo que de contado vale 12,000. Con ese equipo no gano nada extra, así que esos 6,000 los pago yo. Si me lo deja al precio de contado o me demuestra que produce más que su interés, lo hablamos; si no, paso.»</p>
-    <p><strong>2)</strong> «Un rendimiento altísimo y garantizado no existe: donde hay retorno hay riesgo. Y la prisa para entrar es la señal que faltaba. Los esquemas que pagan a los primeros con el dinero de los siguientes se caen cuando deja de entrar gente, y ahí pierde el último. No entro, y voy a avisarle a la familia.»</p>
-    <p><strong>3)</strong> «Inversión es lo que produce; un carro de uso personal cuesta cuota, combustible, seguro y mantenimiento, y pierde valor cada año. Si consigo contratos por el carro, hago el número: cuánto ingreso extra genera contra cuánto cuesta al mes. Si no da, es un gusto, y los gustos se pagan de contado, no con años de cuotas.»</p>
-
+    <h3>Ejercicio 1. Clasifica</h3>
+    <p>1) <b>A</b> · 2) <b>P</b> · 3) <b>A</b> · 4) <b>P</b> · 5) <b>A</b>, porque ahorra un gasto recurrente · 6) <b>P</b> · 7) <b>P</b> mientras no produzca, aunque suba de precio: la plusvalía no paga el impuesto de este año · 8) <b>A</b> si de verdad se cobra el servicio; un curso que no se usa es un gasto, no una inversión.</p>
+    <p>Los que se prestan a discusión son el 5, el 7 y el 8, y conviene discutirlos: la herramienta es activo porque <b>ahorra un gasto que ya existía</b>, que cuenta igual que un ingreso; el terreno quieto saca dinero todos los años aunque su precio suba en el papel; y el curso solo cuenta cuando se convierte en un servicio cobrado. La regla para los tres es la misma: <b>si no se puede decir cuánto mete o cuánto ahorra al mes, todavía no es un activo</b>.</p>
   </div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 5 de 6</span></div>
+  <div class="pauta">
+    <h3>Ejercicio 2. El costo real del crédito</h3>
+    <p>24 × 750 = <b>L 18,000</b>. El crédito cuesta <b>L 6,000</b> sobre el precio de contado, que es un <b>50%</b> del precio de contado. Si el equipo no produce ingreso, esos L 6,000 salen de tu trabajo futuro, y encima el bien vale menos cada mes por depreciación. La comparación honesta no es cuota contra cuota: es <b>costo total contra precio de contado</b>.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Ejercicio 3. Convierte la cuota en tasa</h3>
+    <p>Se devuelven <b>L 2,400</b> (100 × 24). El interés es de <b>L 400</b> sobre L 2,000, o sea un <b>20% en 24 días</b>. Puesto en meses, es más del 20% mensual, que compuesto pasa del 700% al año. Para que a alguien le convenga, su negocio tendría que rendir más que eso, y ningún negocio normal lo hace: por eso este préstamo casi nunca se paga con ganancia, se paga con otro préstamo. Sirve solo para una emergencia cortísima y con fecha de salida escrita.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Ejercicio 4. El orden del dinero</h3>
+    <p>Primero un <b>fondo mínimo</b>, aunque sea parcial, porque sin él el próximo imprevisto reabre la deuda. Después la <b>deuda al 5% mensual</b>, que en doce meses cuesta cerca del 80% y por eso le gana a cualquier inversión disponible. La herramienta va tercera, y no porque sea mala: es un activo bueno (L 400 al mes sobre L 3,000 se paga en menos de ocho meses), pero comprarla con la deuda cara viva es pagar 5% mensual para ahorrar menos que eso. Con la deuda saldada, esa herramienta es la mejor compra de la lista.</p>
+  </div>
+
+<div class="pauta">
+    <h3>Ejercicio 5. Encuentra la omisión</h3>
+    <p>1) <b>El precio de contado y el costo total</b>: cuota por plazo, más seguro y cargos. 2) <b>La tasa real</b>: cien diarios sobre lo prestado, convertido a porcentaje mensual, y qué pasa si un día no se paga. 3) <b>De dónde sale el rendimiento</b> y <b>quién responde por escrito</b>; el porcentaje es lo de menos. 4) <b>Qué se paga del segundo año en adelante</b>, si los datos se pueden sacar al irse, y cuántas horas de trabajo propio cuesta la instalación.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 9 de 10</span></div>
 </section>
 
-<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
 <section class="pagina">
   <div class="pauta">
-    <h2>✅ Pauta de respuestas (continúa)</h2>
+    <h3>Ejercicio 6. El caso del proyecto</h3>
+    <p><b>Qué mete:</b> un activo del proyecto, 300 alumnos usando el sistema, tracción y casos reales. <b>Qué saca:</b> horas, porque un informe trimestral por dos años es trabajo recurrente. <b>Qué compromete:</b> el espacio de portada durante dos años. <b>Condición:</b> informe que la aplicación genere sola, logo en la sección de aliados y no en la portada, datos agregados y nunca de menores, y todo por escrito con fecha de vencimiento.</p>
+  </div>
 
-    <h3>6. El caso del proyecto</h3>
-    <p><b>¿Qué mete?</b> Un activo del proyecto: 300 alumnos usando el sistema, tracción y casos reales. <b>¿Qué saca?</b> Horas, porque un informe trimestral por dos años es trabajo recurrente. <b>¿Qué compromete?</b> El logo en la portada ocupa espacio de tu marca durante dos años. <b>¿Con qué condición se acepta?</b> Informe que la aplicación genere sola, logo en la sección de aliados y no en la portada, y datos agregados, nunca de menores. Casi ninguna oferta se acepta o se rechaza completa: se acepta <b>con condiciones</b>, y las condiciones se piensan en frío, no con alguien enfrente esperando la firma.</p>
+  <div class="pauta">
+    <h3>Ejercicio 7. Simulacro: respuestas modelo</h3>
+    <p><b>1)</b> «La cuota sí es baja, pero el costo no es la cuota: son 24 por 750, o sea 18,000 por algo que de contado vale 12,000. Con ese equipo no gano nada extra, así que esos 6,000 los pago yo. Si me lo deja al precio de contado, lo hablamos; si no, paso.»</p>
+    <p><b>2)</b> «Un rendimiento altísimo y garantizado no existe: donde hay retorno hay riesgo. Explíqueme de dónde sale ese 20% y quién responde por escrito. Y la prisa para entrar es la señal que faltaba, así que no entro, y voy a avisarle a la familia.»</p>
+    <p><b>3)</b> «Inversión es lo que produce. Un carro de uso personal cuesta cuota, combustible, seguro y mantenimiento, y pierde valor cada año. Si consigo contratos por el carro, hago el número: cuánto ingreso extra genera contra cuánto cuesta al mes. Si no da, es un gusto, y los gustos se pagan de contado.»</p>
+  </div>
 
+  <div class="pauta">
     <h3>Criterio de logro</h3>
-    <p>Responder el simulacro <strong>con un número</strong> en las tres, y sin justificar la decisión con emoción: si en alguna solo se puede decir «no me conviene», falta calcular. En el caso del proyecto, la respuesta debe terminar en una <strong>condición</strong>, no en un sí ni en un no.</p>
+    <p>Responder las tres del simulacro <strong>con un número</strong> y sin justificar la decisión con emoción: si en alguna solo se puede decir «no me conviene», falta calcular. En el caso del proyecto, terminar en una <strong>condición</strong>, no en un sí ni en un no.</p>
+    <p>Y la parte que no se califica con lápiz: el <b>balance</b> y el <b>flujo</b> tienen que estar llenos con números reales, no con los que quedan bonitos. Si al llenarlos aparece un pasivo que nadie quería nombrar, la ficha ya sirvió. La etapa se da por cerrada cuando la familia puede decir de memoria cuánto entra, cuánto sale y cuánto se debe, y cuando existe una regla escrita que las dos personas aceptaron.</p>
   </div>
 
   <h2>🎓 Cierre: el acuerdo de la casa</h2>
@@ -187,8 +398,11 @@
     <p style="margin:8px 0 0"><strong>La revisamos el día:</strong> ____________ &nbsp;&nbsp; <strong>Responsable:</strong> ______________________</p>
   </div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 6 de 6</span></div>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 1 · Página 10 de 10</span></div>
 </section>
+
+
+
 
 </div>
 </body>

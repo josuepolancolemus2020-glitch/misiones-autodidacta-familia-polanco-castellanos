@@ -1,0 +1,12 @@
+# Dónde empieza cada página de la ficha de Activos y Pasivos (norma 6: 10 páginas).
+# Calculados con _dev/mide-ficha-paginas.html?cortes=1. Los que caen en un caso
+# se escriben con su <h3>: repagina-ficha.js retrocede solo hasta el <div>.
+<h2>💰 Las cuatro casillas</h2>
+<h2>🌊 El flujo de un mes real</h2>
+<h2>📉 Lo que casi nadie suma</h2>
+<h3>3. El millonario de al lado</h3>
+<h3>8. La pulpería que fía</h3>
+<h3>13. Cobrar por aula</h3>
+<h3>Ejercicio 4. El orden del dinero</h3>
+<h2>✅ Pauta completa de respuestas</h2>
+<h3>Ejercicio 6. El caso del proyecto</h3>
