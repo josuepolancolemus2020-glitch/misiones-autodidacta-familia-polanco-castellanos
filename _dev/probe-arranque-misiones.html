@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · el arranque de todas las misiones</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:320px;height:180px;border:0;background:#fff;margin:0 4px 4px 0}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<div id="marcos"></div>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba que el DOMContentLoaded de cada misión llegue ENTERO al final.
+
+   De dónde sale esta sonda: al copiar el molde, `let labParte` se quedaba
+   apuntando a una pieza de la misión anterior (el famoso 'centro', que era del
+   mapa de actores de Poder Político). updateLabDisplay() hacía entonces
+   parteData['centro'][labAspecto] y lanzaba excepción, y como la excepción
+   salta dentro del DOMContentLoaded se llevaba consigo lo que venía después:
+   renderAchPanel(). Seis misiones publicadas tenían el laboratorio en blanco y
+   el panel de logros vacío, y ninguna sonda se enteraba, porque las sondas
+   miraban el texto que el HTML ya trae escrito y no lo que pinta el JS.
+
+   La lección, y por eso esta sonda existe: no basta comprobar que el contenido
+   esté en el archivo, hay que comprobar que el arranque lo pinte.
+
+   Uso:  node _dev/servidor-estatico.js  y abrir esta página             */
+const out = document.getElementById('out'); const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('    ✔ '+bien); else { fallos++; log('    ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+async function catalogo() {
+  const src = await (await fetch('/js/data/misiones.js')).text();
+  return new Function(src + '; return MISSIONS;')();
+}
+
+window.addEventListener('load', async () => {
+  const MIS = await catalogo();
+  log('catálogo: ' + MIS.length + ' misiones\n');
+  for (const m of MIS) {
+    const f = document.createElement('iframe');
+    f.src = '/' + m.url.split('/').map(encodeURIComponent).join('/');
+    document.getElementById('marcos').appendChild(f);
+    const errores = [];
+    await new Promise(r => f.addEventListener('load', r, { once: true }));
+    try { f.contentWindow.addEventListener('error', e => errores.push(e.message)); } catch (e) {}
+    await esperar(900);
+    const d = f.contentDocument, w = f.contentWindow;
+    log('── ' + m.title.slice(0, 50) + ' ──');
+    try {
+      /* El panel de logros es lo ÚLTIMO que pinta el arranque: si está vacío,
+         algo lanzó excepción antes y se comió el resto. */
+      ok(d.getElementById('achList') && d.getElementById('achList').children.length > 0,
+        'el arranque llega al final (panel de logros pintado)',
+        'el arranque se cortó: el panel de logros quedó vacío');
+      /* El laboratorio de piezas, cuando la misión lo tiene */
+      const tieneLab = w.eval('typeof parteData !== "undefined"');
+      if (tieneLab) {
+        const claves = w.eval('Object.keys(parteData)');
+        const parte = w.eval('labParte');
+        ok(claves.includes(parte), "abre en una pieza que existe ('" + parte + "')",
+          "abre en '" + parte + "' y las piezas son: " + claves.join(', '));
+        ok((d.getElementById('lab-display').textContent || '').trim().length > 20,
+          'el laboratorio pinta su primera pieza',
+          'el laboratorio arranca en blanco');
+        ok(!!d.querySelector('.lab-cont-btn.active-pri'),
+          'la primera pieza sale resaltada', 'ninguna pieza sale resaltada');
+      }
+      if (errores.length) { fallos++; log('    ✘ errores: ' + errores.join(' | ')); }
+    } catch (e) { fallos++; log('    ✘ ' + e.message); }
+    f.remove();
+  }
+  log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+});
+</script>
+</body>
+</html>
