@@ -1,0 +1,13 @@
+# Cortes de la ficha de Marca etapa 1 (nueve cortes = diez páginas).
+# Salen de _dev/mide-ficha-paginas.html?f=ficha-marca-audiencia-promesa.html&cortes=1,
+# pero escritos con anclajes únicos: el medidor propone «<div class="caso">» a
+# secas y ese fragmento se repite doce veces en la ficha.
+<h2>⚖️ Característica y beneficio</h2>
+<h3>👩‍🏫 La maestra</h3>
+<h2>📅 El momento también vende</h2>
+<h3>3. El número que nadie puede comprobar</h3>
+<h3>5. «Que sirva para todos los grados y materias»</h3>
+<table class="audit">
+<h3>Ejercicio 3 · Con prueba o sin prueba</h3>
+<h3>Ejercicio 2 · Cazar la audiencia vaga</h3>
+<h3>Ejercicio 6 · Reescribir en doce palabras</h3>
