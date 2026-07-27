@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Máquina que Predice, etapa 1</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-maquina-que-predice/maquina-predice.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 1 de Inteligencia Artificial: bancos, laboratorio, pruebas
+   impresas con su propio nombre, casos del proyecto, ficha, y que la
+   aplicación muestre la materia, la ruta y el sello familiar. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones (las 14 del molde y Casos del proyecto)', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Máquina que Predice · Etapa 1 de 6/.test(d.body.textContent), 'se presenta como etapa 1 de 6', 'no se presenta como etapa de la ruta');
+    ok(!/clave|contraseña|phishing/i.test(d.querySelector('#s-aprende').textContent), 'sin restos de la etapa de la que se copió', 'quedan textos de La puerta de la casa digital');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('Object.keys(parteData).join(",")') === 'token,contexto,alucinacion,encargo', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas de la máquina', 'piezas de la máquina: ' + dentro('timelineData.length'));
+    ok(/faro_ia_predice/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/El token/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el token', 'abre en otra pieza');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'el simulacro de verificación se genera', 'simulacro vacío');
+    /* Los rótulos se miran solo dentro de las pruebas: la misión sí cita a la
+       Ruta de la Persuasión a propósito, en Recursos y en el caso 8. */
+    const rotulos = d.getElementById('eval-screen-title').textContent + d.getElementById('evalcrit-screen-title').textContent +
+                    d.getElementById('evalOut').textContent + crit + d.querySelectorAll('.eval-print-header')[0].textContent;
+    ok(!/Las seis palancas|Persuasión|Panorama|La puerta de la casa digital|Auditoría de la casa/.test(rotulos), 'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      const cajas = casos.querySelectorAll('.card');
+      ok(cajas.length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + cajas.length);
+      const txt = casos.textContent;
+      ['diez páginas', 'tandas grandes', 'sin leer', 'regala inteligencia', 'escribe el código', 'inglés', 'niñas', 'corte de luz']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      ok(/La norma que salió|La regla de la casa|Qué se verifica|La condición con la que sí|Lo que sí sobrevive|La distinción|La prueba de que|El puente con/i.test(txt), 'cada caso trae su salida concreta', 'los casos no traen salida');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+      ok(/cinco reglas de la casa para usar IA/i.test(txt), 'trae las cinco reglas de uso', 'faltan las cinco reglas');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/M\.E\.T\.A\.S/.test(decisiones) && /(estudiantes|Jael)/.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-maquina-que-predice.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/Lista de verificación/i.test(txt), 'la ficha trae la lista de verificación', 'la ficha no trae la lista de verificación');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    const rec = d.querySelector('#s-recursos a[href*="ficha-maquina"]');
+    ok(!!rec, 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const cards = [...da.querySelectorAll('.ruta-card')];
+    const casa = cards.find(c => /Ruta de la Máquina que Predice/.test(c.textContent));
+    ok(!!casa, 'la Ruta de la Máquina que Predice está en el mapa', 'no aparece la ruta');
+    if (casa) {
+      ok(casa.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + casa.querySelectorAll('.re-link').length);
+      ok(casa.querySelectorAll('.ruta-etapa-futura').length === 5, 'y 5 etapas por construir con nombre', 'futuras: ' + casa.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/Pedir bien/i.test(casa.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="ia"]');
+    ok(!!chip, 'la materia Inteligencia Artificial tiene su chip', 'no hay chip de Inteligencia Artificial');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = da.querySelectorAll('#missions-container .mission-card');
+      ok(tarjetas.length === 1, 'la materia muestra su misión', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length === 1 && /🔒/.test(tarjetas[0].textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

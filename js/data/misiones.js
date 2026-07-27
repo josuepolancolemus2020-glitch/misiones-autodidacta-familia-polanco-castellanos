@@ -18,6 +18,8 @@ const RUTAS = {
                 lema: 'Audiencia, oferta y relato: que el trabajo se vea' },
   poder:      { nombre: 'Ruta del Poder',                    emoji: '💰', color: 'eco',  etapas: 6,
                 lema: 'Dinero, activos, instituciones y negociación' },
+  maquina:    { nombre: 'Ruta de la Máquina que Predice', emoji: '🤖', color: 'ia',   etapas: 6,
+                lema: 'Usarla sin creerle: qué hace bien, qué inventa y qué nunca se le delega' },
   casacerrada:{ nombre: 'Ruta de la Casa Cerrada',           emoji: '🔐', color: 'cib',  etapas: 6,
                 lema: 'Quién entra, qué se guarda y qué se pierde el día que falle algo' },
 };
@@ -31,6 +33,7 @@ const MISSIONS = [
   { id: 6, title: 'Las seis palancas de la influencia',                      modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 40, icon: '🧠', ruta: 'persuasion', etapa: 1, url: 'misiones/ruta-persuasion-palancas/palancas-influencia.html' },
   /* Sello familiar: las misiones de las rutas del adulto marcadas así son
      material de la casa. No salen al sitio público ni a la revista. */
+  { id: 11, title: 'La máquina que predice: qué es y qué no es un modelo de lenguaje', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🤖', ruta: 'maquina', etapa: 1, sello: 'familiar', url: 'misiones/ruta-maquina-que-predice/maquina-predice.html' },
   { id: 12, title: 'La puerta de la casa digital: quién entra y con qué llave', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🔐', ruta: 'casacerrada', etapa: 1, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-la-puerta/la-puerta.html' },
 ];
 
@@ -52,6 +55,13 @@ const ETAPAS_PREVISTAS = {
     4: 'Tácticas de presión y sus antídotos',
     5: 'Preguntar y escuchar: influir sin empujar',
     6: 'Narrativa: contar el proyecto para que otros quieran entrar',
+  },
+  maquina: {
+    2: 'Pedir bien: el encargo, el contexto y el ejemplo',
+    3: 'Verificar: nadie firma lo que no leyó',
+    4: 'La IA que programa: qué revisar antes de subir',
+    5: 'Datos, privacidad y las niñas',
+    6: 'Qué se automatiza en M.E.T.A.S y qué no se le delega jamás',
   },
   casacerrada: {
     2: 'Los datos de los demás: menores, ley y sentido común',

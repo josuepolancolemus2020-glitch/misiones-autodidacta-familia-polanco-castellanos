@@ -25,6 +25,7 @@ const MATERIAS = [
   { id: 'eco',  label: 'Poder Económico',     sub: 'Dinero, activos y decisiones',  icon: 'fa-sack-dollar',     color: 'eco' },
   { id: 'pol',  label: 'Poder Político',      sub: 'Instituciones y negociación',   icon: 'fa-landmark',        color: 'pol' },
   { id: 'cib',  label: 'Ciberseguridad',      sub: 'La casa cerrada: llaves y datos', icon: 'fa-shield-halved', color: 'cib' },
+  { id: 'ia',   label: 'Inteligencia Artificial', sub: 'La máquina que predice',      icon: 'fa-robot',         color: 'ia' },
 ];
 
 const LEVELS = [
