@@ -1,0 +1,13 @@
+# Dónde empieza cada página de la ficha del Módulo 1 (norma 6: 10 páginas).
+# Tal como los calculó _dev/mide-ficha-paginas.html?cortes=1. Los que caen dentro
+# de una caja o de una pauta se escriben con un trozo de su contenido:
+# repagina-ficha.js retrocede solo hasta la apertura del bloque.
+<h2>🧭 2. Por qué estática, dicho completo</h2>
+<h2>🔁 4. El viaje de un dato</h2>
+<strong>El error clásico, y por qué pasa:</strong>
+<h3>2. Knight Capital: 45 minutos, 440 millones</h3>
+<h2>🏛️ 9. Casos del propio proyecto (hipotéticos, y probables)</h2>
+<h2>✍️ 11. Actividades sin pantalla</h2>
+<h3>E. Ordena la publicación</h3>
+<h3>A. Dibuja el sistema de memoria</h3>
+<p><b>3)</b> «Esa es la clave pública

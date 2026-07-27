@@ -6,11 +6,23 @@
 <title>Ficha de estudio · Autocapacitación M.E.T.A.S · Módulo 1: Panorama</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #0369a1; --pri-suave: #f0f9ff; --sec: #7c2d12; --sec-suave: #fff7ed; }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .fuente { font-size: 11.5px; color: var(--gris); }
+  .mini { font-size: 12px; color: var(--gris); }
+  td.centro { text-align: center; }
+</style>
 </head>
 <body>
 <button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
 
 <div class="doc">
+
+
+
 
 <!-- ═══════════ PÁGINA 1 ═══════════ -->
 <section class="pagina">
@@ -27,58 +39,226 @@
   <h2>🎯 Objetivos</h2>
   <ol>
     <li>Decir la <strong>frase maestra</strong> sin leerla y desglosar cada término.</li>
-    <li>Explicar por qué <strong>no hay servidor propio</strong> y por qué eso es una fortaleza.</li>
-    <li>Describir el <strong>viaje de un dato</strong> desde el dispositivo hasta la consulta de la familia.</li>
+    <li>Explicar por qué <strong>no hay servidor propio</strong> y por qué eso es una fortaleza, no una carencia.</li>
+    <li>Describir el <strong>viaje de un dato</strong> desde el dispositivo hasta la consulta de la familia, y qué pasa si falla cada paso.</li>
     <li>Distinguir la <strong>capa local</strong> (fuente de verdad) de la <strong>capa nube</strong> (copia y extensión).</li>
-    <li>Nombrar los <strong>cuatro frentes</strong> y qué aporta cada uno.</li>
-    <li>Responder tres objeciones típicas con hechos, no con opiniones.</li>
+    <li>Nombrar los <strong>cuatro frentes</strong>, qué aporta cada uno y qué hace falta para que un cambio llegue a cada uno.</li>
+    <li>Explicar por qué la clave que está en el código <strong>no es una fuga</strong>, y cuál sí lo sería.</li>
+    <li>Reconocer, en fallas reales de la industria, el riesgo equivalente en este proyecto.</li>
+    <li>Responder tres objeciones típicas con hechos, reconociendo la deuda que sí existe.</li>
   </ol>
 
-  <h2>🏗️ 1. La frase maestra</h2>
+  <div class="caja">
+    <strong>Cómo estudiar esta ficha:</strong> primero la frase maestra y el glosario, hasta poder decirlos sin leer; después el viaje del dato y la seguridad, que es donde están las preguntas incómodas; luego los casos, que muestran cómo se cae un sistema de verdad; y al final los ejercicios y el simulacro, en voz alta. La pauta se lee <b>después</b> de responder. El examen real no es esta hoja: es una conversación con alguien que sabe, y esa se aprueba explicando simple y reconociendo lo que falta.
+  </div>
+
+<h2>🏗️ 1. La frase maestra</h2>
   <div class="caja">
     <strong>M.E.T.A.S</strong> es una aplicación <strong>web estática y offline-first</strong> que se distribuye por
     <strong>tres frentes</strong> (web, PWA y APK Android) desde <strong>un mismo código</strong>, y usa
     <strong>Supabase</strong> como nube para lo único que de verdad necesita servidor.
   </div>
   <table>
-    <tr><th>Término</th><th>Qué significa en este proyecto</th></tr>
-    <tr><td>Web estática</td><td>Archivos HTML, CSS y JS entregados tal cual por GitHub Pages. Ningún programa arma páginas en un servidor.</td></tr>
-    <tr><td>Offline-first</td><td>El dispositivo primero: los datos viven en <code>localStorage</code> y la nube es copia, no requisito.</td></tr>
-    <tr><td>PWA</td><td>La misma página, instalable, que abre sin conexión gracias al <em>service worker</em>.</td></tr>
-    <tr><td>APK</td><td>El mismo código empaquetado con Capacitor como aplicación firmada de Android.</td></tr>
+    <tr><th style="width:22%">Término</th><th>Qué significa en este proyecto</th></tr>
+    <tr><td>Web estática</td><td>Archivos HTML, CSS y JS entregados tal cual por GitHub Pages. Ningún programa arma páginas en un servidor: lo que se sube es lo que llega.</td></tr>
+    <tr><td>Offline-first</td><td>El dispositivo primero: los datos viven en <code>localStorage</code> y la nube es copia, no requisito. Sin internet la clase sigue.</td></tr>
+    <tr><td>PWA</td><td>La misma página, instalable, que abre sin conexión gracias al <em>service worker</em>, un archivo que guarda una copia del sitio en el teléfono.</td></tr>
+    <tr><td>APK</td><td>El mismo código empaquetado con Capacitor como aplicación firmada de Android, para instalar sin tienda.</td></tr>
     <tr><td>Supabase</td><td>PostgreSQL como servicio: funciones RPC como única puerta, RLS por fila y deduplicación por <code>evento_id</code>.</td></tr>
   </table>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 1 de 6</span></div>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 1 de 10</span></div>
 </section>
 
 <!-- ═══════════ PÁGINA 2 ═══════════ -->
 <section class="pagina">
-  <h2>🔁 2. El viaje de un dato</h2>
-  <ol>
-    <li>El dato <strong>nace</strong> en el dispositivo (una evaluación terminada, un análisis generado).</li>
-    <li><strong>Guardado local inmediato</strong> en <code>localStorage</code>: un corte de luz ya no pierde nada.</li>
-    <li>Una copia entra al <strong>outbox</strong> con su <code>evento_id</code> único.</li>
-    <li>Con internet, el lote <strong>sube</strong> a Supabase; sin internet, espera y se reintenta solo.</li>
-    <li>El maestro lo consulta en su panel y la familia en el asistente, cada quien con su clave.</li>
-  </ol>
-  <div class="caja caja-amb">
-    <strong>La idea que hay que defender:</strong> los tres frentes no son tres desarrollos. Un solo código se entrega
-    de tres maneras, y por eso una sola persona puede mantener el sistema completo.
+  <h2>🧭 2. Por qué estática, dicho completo</h2>
+  <p>Una web <b>dinámica</b> arma cada página en un servidor cuando alguien la pide: hay un programa corriendo, una base de datos detrás, actualizaciones de seguridad, una factura mensual y alguien que responda cuando se cae a las once de la noche. Una web <b>estática</b> entrega archivos ya hechos: no hay programa que atacar ni proceso que se caiga, y el costo tiende a cero.</p>
+  <table>
+    <tr><th style="width:26%">&nbsp;</th><th>Web dinámica</th><th>M.E.T.A.S (estática)</th></tr>
+    <tr><td>Qué corre en el servidor</td><td>Un programa por cada visita</td><td>Nada: se entregan archivos</td></tr>
+    <tr><td>Qué se cae</td><td>El servidor, la base, el proceso</td><td>Solo la entrega del archivo</td></tr>
+    <tr><td>Costo mensual</td><td>Hosting, base, mantenimiento</td><td>Cercano a cero</td></tr>
+    <tr><td>Quién lo mantiene</td><td>Un equipo, o una persona ocupada</td><td>Una persona, y sigue siendo posible</td></tr>
+    <tr><td>La deuda honesta</td><td>Complejidad y costo permanentes</td><td>Menos automatismo: hay pasos manuales al publicar</td></tr>
+  </table>
+  <p class="mini">Esa última fila es la que hay que decir sin que la pregunten. Reconocer el costo de la decisión es lo que vuelve creíble el resto, y es justo lo contrario de lo que hace quien defiende una arquitectura por orgullo.</p>
+
+  <div class="caja">
+    <strong>Entonces, ¿qué sí exige servidor?</strong> Tres cosas, y solo tres: <b>guardar</b> lo que el maestro sube para que sobreviva al teléfono, <b>compartir</b> ese dato entre el panel docente y la familia, y <b>decidir quién ve qué</b>. Eso es exactamente lo que hace Supabase, y nada más. Todo lo demás (las 57 misiones, las evaluaciones, los widgets, las fichas) es contenido que se entrega tal cual y funciona sin nube. Cuando alguien pregunte qué parte necesita internet, esa es la lista completa, y es corta a propósito.
   </div>
 
-  <h2>✍️ 3. Actividades sin pantalla</h2>
+<h2>📴 3. Offline-first, que es la decisión de fondo</h2>
+  <p>En una escuela hondureña la conexión no es un supuesto: hay días sin internet, teléfonos con datos agotados y aulas donde la señal no entra. Un sistema que exige conexión no es un sistema útil ahí, por bueno que sea. Por eso el orden está invertido a propósito: <strong>el dato nace y vive en el dispositivo</strong>, y la nube es una copia que llega cuando puede.</p>
+  <table>
+    <tr><th style="width:30%">Pieza</th><th>Qué hace</th><th style="width:28%">Si falla</th></tr>
+    <tr><td><code>localStorage</code></td><td>Guarda el progreso, las notas y los registros en el propio dispositivo, sin pedir permiso ni conexión.</td><td>Se pierde lo local si se borran los datos del navegador; por eso existe la copia en nube.</td></tr>
+    <tr><td>Service worker (<code>sw.js</code>)</td><td>Guarda una copia del sitio para abrirlo sin internet y decide cuándo renovarla.</td><td>El usuario sigue viendo la versión vieja hasta que cambie el <code>CACHE_NAME</code>.</td></tr>
+    <tr><td>Outbox</td><td>Cola local de eventos pendientes de subir, cada uno con su <code>evento_id</code>.</td><td>Nada se pierde: espera y reintenta cuando vuelve la red.</td></tr>
+    <tr><td><code>evento_id</code></td><td>Identificador único por evento; la base rechaza el repetido.</td><td>Sin él, un reintento crearía notas duplicadas.</td></tr>
+  </table>
+  <div class="caja caja-amb">
+    <strong>La idea que hay que defender:</strong> la conexión es una <b>mejora</b>, no un requisito. Un sistema offline-first se prueba desconectando el teléfono a mitad de una evaluación: si la clase termina igual y el dato sube solo cuando vuelve la señal, la arquitectura está bien. Si hay que repetir la evaluación, no lo está.
+  </div>
 
-  <h3>A. Dibuja el sistema de memoria</h3>
-  <p>En el recuadro, dibuja los cuatro frentes y las flechas que los unen. Marca con una X dónde vive la fuente de verdad.</p>
-  <div class="caja" style="min-height:52mm;"></div>
-
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 2 de 6</span></div>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 2 de 10</span></div>
 </section>
 
 <!-- ═══════════ PÁGINA 3 ═══════════ -->
 <section class="pagina">
-  <h2>✍️ 3. Actividades sin pantalla (continúa)</h2>
+  <h2>🔁 4. El viaje de un dato</h2>
+  <ol>
+    <li>El dato <strong>nace</strong> en el dispositivo: una evaluación terminada, un análisis generado, una asistencia marcada.</li>
+    <li><strong>Guardado local inmediato</strong> en <code>localStorage</code>: un corte de luz ya no pierde nada.</li>
+    <li>Una copia entra al <strong>outbox</strong> con su <code>evento_id</code> único.</li>
+    <li>Con internet, el lote <strong>sube</strong> a Supabase por una función RPC; sin internet, espera y se reintenta solo.</li>
+    <li>La base <strong>deduplica</strong> por <code>evento_id</code>: si el mismo evento llega dos veces, entra una.</li>
+    <li>El maestro lo consulta en su panel y la familia en el asistente, cada quien con su clave y viendo solo lo suyo.</li>
+  </ol>
+  <table>
+    <tr><th style="width:34%">Qué falla</th><th>Qué pasa de verdad</th></tr>
+    <tr><td>Se va el internet a media evaluación</td><td>Nada visible: el dato ya está local y el outbox espera.</td></tr>
+    <tr><td>Se va la luz y se apaga el teléfono</td><td>Se conserva lo guardado hasta ese momento, porque se guarda en cada paso, no al final.</td></tr>
+    <tr><td>Supabase está caído</td><td>La clase sigue. Se afecta la sincronización, no el aula.</td></tr>
+    <tr><td>El maestro reinstala la aplicación</td><td>Se pierde lo local no sincronizado. Lo subido se recupera desde la nube.</td></tr>
+    <tr><td>El mismo lote se envía dos veces</td><td>La base lo rechaza por <code>evento_id</code>: no hay notas duplicadas.</td></tr>
+  </table>
+  <div class="caja">
+    <strong>La pregunta que resume el módulo:</strong> ¿dónde está la <b>fuente de verdad</b>? En el dispositivo. La nube es copia, respaldo y puente entre maestro y familia. Quien entienda eso, entiende el sistema completo, porque todas las demás decisiones salen de ahí.
+  </div>
+  <p class="mini"><b>Y lo que el sistema NO hace, dicho antes de que lo pregunten:</b> no obliga al alumno a crear cuenta para trabajar (la cuenta es del maestro, y solo para lo que se sincroniza), no guarda datos de menores en la nube más allá de lo agregado, y no resuelve el caso de dos maestros editando la misma nota a la vez, porque en un aula real eso no pasa. Saber qué queda fuera es parte de saber qué es el sistema.</p>
+
+<h2>🚚 5. Los cuatro frentes y cómo llega un cambio</h2>
+  <table>
+    <tr><th style="width:18%">Frente</th><th>Qué aporta</th><th style="width:34%">Qué hace falta para que un cambio llegue</th></tr>
+    <tr><td><b>Web</b></td><td>Entrar sin instalar nada, desde cualquier computadora de la escuela.</td><td>Un <code>git push</code>: GitHub Pages publica lo que hay en la rama.</td></tr>
+    <tr><td><b>PWA</b></td><td>Instalable, abre sin conexión, se siente aplicación.</td><td>Subir el <code>CACHE_NAME</code> de <code>sw.js</code> y las etiquetas <code>?v=</code>, o el teléfono sigue con la copia vieja.</td></tr>
+    <tr><td><b>APK</b></td><td>Instalar sin tienda, en teléfonos donde la PWA no basta.</td><td>Regenerar el espejo <code>www/</code> con <code>npm run build:www</code> y volver a empaquetar y firmar.</td></tr>
+    <tr><td><b>Nube</b></td><td>Panel docente, consulta de la familia, respaldo.</td><td>Cambiar la función RPC o la política RLS en Supabase, que es lo único que vive fuera del repositorio.</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 3 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <div class="caja caja-amb">
+    <strong>El error clásico, y por qué pasa:</strong> «corregí el texto, hice push, y en el teléfono sigue el viejo». No es un error del sistema: es el service worker haciendo su trabajo, que es servir la copia guardada. Mientras el <code>CACHE_NAME</code> no cambie, el teléfono no tiene motivo para bajar nada. Los tres pasos de publicación (push, subir caché, regenerar espejo) son la deuda que se paga por no tener servidor.
+  </div>
+  <p class="mini">Dicho de otra forma: el sistema cambió la complejidad de <b>operar un servidor</b> por la complejidad de <b>publicar bien</b>. La segunda se resuelve con una lista de tres pasos; la primera no se resuelve nunca del todo.</p>
+
+<h2>🔐 6. La seguridad, y la pregunta que siempre llega</h2>
+  <p>En el código fuente, a la vista de cualquiera, aparece una clave de Supabase. Es la pregunta que hace todo el que sabe un poco, y hay que contestarla con precisión, porque la respuesta corta («no pasa nada») suena a excusa.</p>
+  <table>
+    <tr><th style="width:24%">Clave</th><th>Qué permite</th><th style="width:26%">Dónde vive</th></tr>
+    <tr><td><code>anon</code> (pública)</td><td>Solo lo que autoricen las políticas RLS y las funciones RPC. Está pensada para ir en el navegador.</td><td>En el código, a propósito.</td></tr>
+    <tr><td><code>service_role</code></td><td>Todo, saltándose RLS. Es la que de verdad importa.</td><td>Jamás en el repositorio ni en el navegador.</td></tr>
+  </table>
+  <ul>
+    <li><b>RLS (seguridad por fila):</b> la base decide, fila por fila, qué puede ver o escribir quien pregunta. Aunque alguien use la clave pública, no ve lo que no le toca.</li>
+    <li><b>Funciones RPC como única puerta:</b> no se escribe directo en las tablas; se llama a una función que valida lo que entra. Menos superficie, menos sorpresas.</li>
+    <li><b>Deduplicación por <code>evento_id</code>:</b> reenviar no es duplicar.</li>
+    <li><b>Datos de menores:</b> lo que sale del aula va agregado siempre que se pueda, y nunca se comparte con un tercero por conveniencia.</li>
+  </ul>
+  <div class="caja">
+    <strong>La respuesta de una frase:</strong> «Esa es la clave pública, y va en el código a propósito: solo puede hacer lo que autorizan las reglas de la base. La clave con poder no está en el repositorio ni llega al navegador.» Si insisten, se ofrece mostrar una política RLS. Nada convence más que enseñar el candado.
+  </div>
+
+<h2>🔬 7. Casos de estudio reales: cómo se cae un sistema</h2>
+
+  <div class="caso">
+    <h3>1. GitLab y la noche de los cinco respaldos</h3>
+    <p>El 31 de enero de 2017, un ingeniero de GitLab, cansado y en plena incidencia, borró por error el directorio de datos de la base de producción. Al ir a restaurar descubrieron que <b>ninguno de sus cinco métodos de respaldo funcionaba</b> como creían. Se salvaron con una copia de un servidor de pruebas de unas seis horas antes, y perdieron el trabajo de esas horas. Lo contaron todo en público, mientras ocurría.</p>
+    <p><b>Lo que enseña aquí:</b> un respaldo que no se ha restaurado nunca no es un respaldo, es una intención. Y aplica directo: la copia en Supabase solo cuenta como respaldo el día que se pruebe restaurarla en un dispositivo vacío.</p>
+    <p class="fuente">Postmortem público de GitLab, 2017.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>2. Knight Capital: 45 minutos, 440 millones</h3>
+    <p>El 1 de agosto de 2012, una firma financiera desplegó una versión nueva en ocho servidores, pero en uno quedó código viejo activo. Ese servidor empezó a comprar y vender solo, sin control. En <b>45 minutos</b> perdieron alrededor de 440 millones de dólares y la empresa desapareció poco después.</p>
+    <p><b>Lo que enseña aquí:</b> el peligro no fue el código, fue el <b>despliegue desparejo</b>: unas piezas actualizadas y otras no. Es exactamente el riesgo de este proyecto cuando la web queda nueva, la PWA con caché viejo y el APK sin regenerar. Por eso los tres pasos de publicación van juntos o no van.</p>
+    <p class="fuente">Informe de la SEC sobre el incidente de Knight Capital, 2013.</p>
+  </div>
+
+  <div class="caso">
+    <h3>3. Las claves que se filtran en GitHub</h3>
+    <p>Un estudio de la Universidad Estatal de Carolina del Norte (2019) rastreó repositorios públicos y encontró <b>miles de claves y credenciales</b> filtradas, muchas subidas por descuido y activas durante meses.</p>
+    <p><b>Lo que enseña aquí:</b> el riesgo es real, y por eso la distinción entre la clave <code>anon</code> y la <code>service_role</code> no es un tecnicismo: es la diferencia entre un repositorio público sano y un desastre. La regla práctica: antes de subir algo, preguntarse qué podría hacer un desconocido con eso.</p>
+    <p class="fuente">Meli, McNiece y Reaves, NDSS, 2019.</p>
+  </div>
+
+<h2>☁️ 8. Casos de estudio reales: cuando se cae el proveedor</h2>
+
+  <div class="caso">
+    <h3>4. El día que Facebook desapareció de internet</h3>
+    <p>El 6 de octubre de 2021, un cambio de configuración dejó a Facebook, Instagram y WhatsApp fuera de línea unas seis horas en todo el mundo. Ni los propios empleados podían entrar a sus sistemas internos, que dependían de la misma infraestructura.</p>
+    <p><b>Lo que enseña aquí:</b> las caídas grandes existen y le pasan a quien tiene miles de ingenieros, así que no es un riesgo que se resuelva con esfuerzo. Se resuelve con <b>diseño</b>: si el aula depende de la nube, la caída es un problema del aula; si no depende, es una molestia de la sincronización.</p>
+  </div>
+
+  <div class="caso">
+    <h3>5. La caída de S3 que rompió medio internet</h3>
+    <p>En febrero de 2017, un comando mal escrito durante un mantenimiento en Amazon Web Services dejó fuera de servicio el almacenamiento de una región entera durante horas. Cayeron miles de sitios que ni sabían que dependían de ahí, y hasta el panel que informa el estado del servicio estaba alojado en el servicio caído.</p>
+    <p><b>Lo que enseña aquí:</b> conviene saber de qué se depende <b>de verdad</b>. En M.E.T.A.S son tres piezas: GitHub Pages para entregar el sitio, Supabase para la nube, y el dispositivo. Solo la tercera es imprescindible para dar clase, y esa es la respuesta corta a «¿y si se caen?».</p>
+  </div>
+
+  <div class="caso">
+    <h3>6. La línea de código que tumbó a Cloudflare</h3>
+    <p>En julio de 2019, una regla nueva con una expresión regular mal escrita se desplegó a toda la red de Cloudflare y consumió la CPU de sus servidores. Medio internet devolvió errores durante unos treinta minutos, por un cambio pequeño que se publicó de golpe en todas partes.</p>
+    <p><b>Lo que enseña aquí:</b> lo peligroso no es el tamaño del cambio, es <b>publicarlo sin escalones</b>. En este proyecto el equivalente barato son los arneses de <code>_dev/</code>: correrlos antes de publicar es la manera de que un cambio de una línea no llegue roto a las 57 misiones.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <h2>🏛️ 9. Casos del propio proyecto (hipotéticos, y probables)</h2>
+
+  <div class="caso">
+    <h3>6. Supabase cambia su plan gratuito</h3>
+    <p>Un día el proveedor anuncia que el plan que usa M.E.T.A.S sube de precio o desaparece. <b>Qué se pierde:</b> el panel docente en nube y la consulta de la familia. <b>Qué NO se pierde:</b> las aulas siguen trabajando, porque el dato vive en el dispositivo. <b>Qué hay que tener listo antes:</b> una exportación completa y probada, y saber que Postgres es estándar, así que la base se puede llevar a otro proveedor. La portabilidad no se improvisa el día del anuncio.</p>
+  </div>
+
+  <div class="caso">
+    <h3>8. La Secretaría pide alojar todo en un servidor del Estado</h3>
+    <p>Suena razonable y trae ventajas, pero cambia el proyecto: aparece un servidor que hay que operar, actualizar y explicar, y una dependencia de una oficina que también cambia de gente. <b>La respuesta con condición:</b> aceptar un espejo alojado por ellos, mantener el original en GitHub Pages, y que el aula siga funcionando sin ninguno de los dos.</p>
+  </div>
+
+  <div class="caso">
+    <h3>9. Un maestro cambia de teléfono a mitad de parcial</h3>
+    <p>Instala la aplicación en el equipo nuevo y aparece vacía. <b>Qué pasó:</b> el <code>localStorage</code> es del dispositivo, no de la persona. <b>Qué se recupera:</b> todo lo que ya había subido, entrando con su cuenta docente. <b>Qué se pierde:</b> lo que quedó en el outbox del teléfono viejo y nunca tuvo señal. <b>La lección para el manual del maestro:</b> antes de cambiar de equipo, abrir la aplicación con internet y esperar a que la cola quede vacía.</p>
+  </div>
+
+  <div class="caso">
+    <h3>10. Alguien publica la clave pública en un grupo de WhatsApp</h3>
+    <p>Un maestro copia un pedazo del código y lo comparte. <b>Qué pasa de verdad:</b> nada nuevo, porque esa clave ya está en el navegador de todos los que abren el sitio y solo puede lo que autorizan RLS y las funciones RPC. <b>Qué sí sería grave:</b> que alguien compartiera una credencial de administrador o la <code>service_role</code>. <b>Lo que conviene revisar ese día:</b> que ninguna política RLS esté abierta de más, porque el susto es buen momento para auditarlas.</p>
+  </div>
+
+<h2>🧰 10. Lo que hay que saber hacer con las manos</h2>
+  <p>Un módulo técnico no se aprueba explicando: se aprueba pudiendo hacerlo. Estos son los cuatro procedimientos de este nivel, en el orden en que se usan.</p>
+  <table>
+    <tr><th style="width:30%">Procedimiento</th><th>Los pasos, en orden</th></tr>
+    <tr><td><b>Publicar un cambio</b></td><td>1. Correr los arneses de <code>_dev/</code>. 2. <code>git push</code>. 3. Subir <code>CACHE_NAME</code> en <code>sw.js</code> y las <code>?v=</code>. 4. <code>npm run build:www</code> si el cambio debe llegar al APK.</td></tr>
+    <tr><td><b>Probar el modo sin internet</b></td><td>Abrir la PWA, activar el modo avión, completar una evaluación, volver a conectar y comprobar que el dato aparece en el panel una sola vez.</td></tr>
+    <tr><td><b>Probar el respaldo</b></td><td>Exportar desde Supabase, borrar los datos del navegador en un equipo de prueba, entrar con la cuenta docente y verificar que todo volvió.</td></tr>
+    <tr><td><b>Revisar la seguridad</b></td><td>Repasar que ninguna política RLS permita más de lo necesario y que <code>service_role</code> no aparezca en ningún archivo del repositorio.</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h2>✍️ 11. Actividades sin pantalla</h2>
+
+  <h3>A. Dibuja el sistema de memoria</h3>
+  <p>En el recuadro, dibuja los cuatro frentes y las flechas que los unen. Marca con una X dónde vive la fuente de verdad.</p>
+  <div class="caja" style="min-height:42mm;"></div>
 
   <h3>B. Completa</h3>
   <ol>
@@ -87,85 +267,139 @@
     <li>La cola local de eventos pendientes se llama __________.</li>
     <li>Los duplicados se evitan con el __________ único de cada evento.</li>
     <li>El APK de Android se genera con __________.</li>
+    <li>La clave que sí sería una fuga grave se llama __________.</li>
   </ol>
 
   <h3>C. Verdadero o falso (y por qué)</h3>
   <table>
-    <tr><th style="width:62%">Afirmación</th><th>V / F</th><th>Porque…</th></tr>
+    <tr><th style="width:58%">Afirmación</th><th class="centro" style="width:10%">V / F</th><th>Porque…</th></tr>
     <tr><td>M.E.T.A.S necesita un servidor propio encendido.</td><td></td><td></td></tr>
     <tr><td>Sin internet el alumno no puede trabajar.</td><td></td><td></td></tr>
     <tr><td>La clave que aparece en el código es una fuga de seguridad.</td><td></td><td></td></tr>
     <tr><td>El APK se programó aparte del sitio web.</td><td></td><td></td></tr>
+    <tr><td>Si Supabase se cae, la evaluación del aula se pierde.</td><td></td><td></td></tr>
+    <tr><td>Un respaldo que existe ya es un respaldo que sirve.</td><td></td><td></td></tr>
+    <tr><td>Publicar en la web alcanza para que el APK muestre el cambio.</td><td></td><td></td></tr>
   </table>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 3 de 6</span></div>
+  <h3>D. Diagnóstico: ¿qué falló?</h3>
+  <ol>
+    <li>Corregí un texto, hice push, y en el teléfono sigue el viejo. → ______________________</li>
+    <li>El APK no muestra el cambio que sí se ve en la web. → ______________________</li>
+    <li>Una nota aparece dos veces en el panel docente. → ______________________</li>
+    <li>Un maestro entra en su teléfono nuevo y no ve nada. → ______________________</li>
+  </ol>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 7 de 10</span></div>
 </section>
 
-<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
 <section class="pagina">
-  <h2>🧠 4. Simulacro de interpelación</h2>
+  <h3>E. Ordena la publicación</h3>
+  <p>Numera del 1 al 4 los pasos para que un cambio llegue a los cuatro frentes, y tacha el que se puede saltar cuando el cambio solo toca la web.</p>
+  <table>
+    <tr><th class="centro" style="width:12%">Nº</th><th>Paso</th></tr>
+    <tr><td></td><td>Regenerar el espejo <code>www/</code> con <code>npm run build:www</code></td></tr>
+    <tr><td></td><td>Subir el <code>CACHE_NAME</code> de <code>sw.js</code> y las etiquetas <code>?v=</code></td></tr>
+    <tr><td></td><td>Correr los arneses de <code>_dev/</code></td></tr>
+    <tr><td></td><td><code>git push</code> a la rama que publica GitHub Pages</td></tr>
+  </table>
+
+<h2>🧠 11. Simulacro de interpelación</h2>
   <p>Responde en voz alta, con tus palabras, en tres o cuatro frases. Después escribe la versión corta.</p>
   <h3>1) «¿Dónde está tu servidor?»</h3>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
   <h3>2) «¿Y si GitHub o Supabase se caen, tu escuela se queda sin nada?»</h3>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
   <h3>3) «Vi tu clave de API publicada en el código fuente.»</h3>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>4) «¿Cómo sabes que tus respaldos sirven?»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 4 de 6</span></div>
-</section>
-
-<!-- ═══════════ PÁGINA 5 ═══════════ -->
-<section class="pagina">
-  <div class="pauta">
-    <h2>✅ Pauta de respuestas</h2>
-
-    <h3>B. Completa</h3>
-    <ol>
-      <li>GitHub <strong>Pages</strong>, con el archivo <strong>CNAME</strong>.</li>
-      <li><strong>localStorage</strong>.</li>
-      <li><strong>Outbox</strong>.</li>
-      <li><strong>evento_id</strong>.</li>
-      <li><strong>Capacitor</strong>.</li>
-    </ol>
-
-    <h3>C. Verdadero o falso</h3>
-    <ol>
-      <li><strong>Falso.</strong> No hay servidor propio: el frontend es estático y la nube es un servicio.</li>
-      <li><strong>Falso.</strong> Es offline-first: la copia local abre y guarda sin red.</li>
-      <li><strong>Falso.</strong> Es la clave pública (anon): solo permite lo que RLS y las funciones RPC autorizan. La peligrosa, <code>service_role</code>, jamás sale del servidor.</li>
-      <li><strong>Falso.</strong> Es el mismo código, empaquetado con Capacitor.</li>
-    </ol>
-
-  </div>
-
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 5 de 6</span></div>
-</section>
-
-<!-- ═══════════ PÁGINA 6 ═══════════ -->
-<section class="pagina">
-  <div class="pauta">
-    <h2>✅ Pauta de respuestas (continúa)</h2>
-
-    <h3>Simulacro: respuestas modelo</h3>
-    <p><strong>1)</strong> No hay servidor propio. El frontend es estático en GitHub Pages y lo único que exige servidor lo hace Supabase como servicio. Menos piezas propias significa menos que se cae, menos que mantener y un costo cercano a cero, que es la condición para que esto sea sostenible en una escuela pública.</p>
-    <p><strong>2)</strong> La aplicación es offline-first: abre y guarda sin red porque el service worker guarda la copia local y los datos viven en el dispositivo. Una caída de la nube afecta la sincronización, no la clase; cuando vuelve, el outbox reenvía y el <code>evento_id</code> evita duplicados.</p>
-    <p><strong>3)</strong> Esa clave es la pública, y va en el código a propósito: solo puede hacer lo que autorizan las reglas RLS y las funciones RPC. Las escrituras exigen cuenta docente y hay límite por IP real. La clave con poder, <code>service_role</code>, no está en el repositorio ni llega al navegador.</p>
-
-    <h3>Criterio de logro</h3>
-    <p>Responder las tres objeciones sin mirar la ficha, nombrando en cada una <strong>la pieza concreta</strong> que sostiene la respuesta. Si en alguna solo se puede decir «funciona bien», falta estudio.</p>
-  </div>
-
-  <h2>🎓 Cierre metalingüístico</h2>
+  <h2>🎓 12. Cierre metalingüístico</h2>
   <p>Explícale este módulo, en cinco minutos y sin palabras técnicas, a alguien de la familia. Si se entiende, está aprendido.</p>
   <div class="caja">
     <p style="margin:0"><strong>Persona a quien se lo expliqué:</strong> ______________________ &nbsp;&nbsp; <strong>Fecha:</strong> ____________</p>
-    <p style="margin:8px 0 0"><strong>Lo que no supe responder:</strong></p>
+    <p style="margin:8px 0 0"><strong>Lo que no supe responder, que es la siguiente sesión de estudio:</strong></p>
     <div class="raya-resp"></div><div class="raya-resp"></div>
   </div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 6 de 6</span></div>
+<h2>✅ Pauta completa de respuestas</h2>
+  <p class="mini">Cubre las cuatro actividades y el simulacro. En las de redacción lo que se califica es que aparezcan los elementos en negrita.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 8 de 10</span></div>
 </section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <div class="pauta">
+    <h3>A. Dibuja el sistema de memoria</h3>
+    <p>Debe aparecer el <b>dispositivo</b> con la X de la fuente de verdad, y desde ahí flechas hacia los cuatro frentes: <b>web</b> (GitHub Pages), <b>PWA</b> (service worker con la copia local), <b>APK</b> (Capacitor sobre el espejo <code>www/</code>) y <b>nube</b> (Supabase, con el outbox como puente). Si la X quedó en la nube, el módulo no está entendido todavía.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>B. Completa</h3>
+    <p>1) GitHub <b>Pages</b>, archivo <b>CNAME</b> · 2) <b>localStorage</b> · 3) <b>outbox</b> · 4) <b>evento_id</b> · 5) <b>Capacitor</b> · 6) <b>service_role</b>.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>C. Verdadero o falso</h3>
+    <p>1) <b>Falso:</b> no hay servidor propio, el frontend es estático y la nube es un servicio. 2) <b>Falso:</b> es offline-first, la copia local abre y guarda sin red. 3) <b>Falso:</b> es la clave pública (anon) y solo permite lo que autorizan RLS y las funciones RPC; la peligrosa es <code>service_role</code>, que jamás sale del servidor. 4) <b>Falso:</b> es el mismo código empaquetado con Capacitor. 5) <b>Falso:</b> la evaluación está en el dispositivo y el outbox la sube cuando el servicio vuelva. 6) <b>Falso:</b> un respaldo que nunca se restauró es una intención, no un respaldo, que es la lección del caso de GitLab. 7) <b>Falso:</b> el APK se arma del espejo <code>www/</code>, así que hace falta regenerarlo y volver a empaquetar.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>D. Diagnóstico</h3>
+    <p>1) Faltó subir el <b><code>CACHE_NAME</code></b> de <code>sw.js</code> y las etiquetas <code>?v=</code>: el service worker sigue sirviendo su copia. 2) Faltó regenerar el espejo <b><code>www/</code></b> con <code>npm run build:www</code> antes de empaquetar. 3) Se envió el mismo evento con <b><code>evento_id</code> distinto</b>, o se creó uno nuevo al reintentar: la deduplicación solo funciona si el identificador se conserva. 4) No falló nada: el <b><code>localStorage</code> es del dispositivo</b>, y en el equipo nuevo solo aparece lo que ya se había sincronizado.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>E. Ordena la publicación</h3>
+    <p><b>1</b> los arneses de <code>_dev/</code>, <b>2</b> el <code>git push</code>, <b>3</b> el <code>CACHE_NAME</code> y las <code>?v=</code>, <b>4</b> el espejo <code>www/</code>. El que se puede saltar cuando el cambio solo toca la web es el <b>cuarto</b>, porque el espejo solo hace falta para empaquetar el APK. Los arneses van primero a propósito: publicar y después probar es el orden que costó 440 millones en el caso de Knight Capital.</p>
+  </div>
+
+<div class="pauta">
+    <h3>Simulacro: respuestas modelo</h3>
+    <p><b>1)</b> «No hay servidor propio. El frontend es estático en GitHub Pages y lo único que exige servidor lo hace Supabase como servicio. Menos piezas propias significa menos que se cae, menos que mantener y un costo cercano a cero, que es la condición para que esto sea sostenible en una escuela pública.»</p>
+    <p><b>2)</b> «La aplicación es offline-first: abre y guarda sin red porque el service worker guarda la copia local y los datos viven en el dispositivo. Una caída de la nube afecta la sincronización, no la clase; cuando vuelve, el outbox reenvía y el <code>evento_id</code> evita duplicados.»</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 9 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <div class="pauta">
+    <p><b>3)</b> «Esa es la clave pública, y va en el código a propósito: solo puede hacer lo que autorizan las reglas RLS y las funciones RPC. Las escrituras exigen cuenta docente. La clave con poder, <code>service_role</code>, no está en el repositorio ni llega al navegador. Si quiere, le muestro una política.»</p>
+    <p><b>4)</b> «Porque restauro. Un respaldo que nunca se probó no es respaldo: le pasó a GitLab con cinco métodos a la vez. Lo que vale es haber recuperado los datos en un dispositivo vacío y haber visto que todo está.»</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Criterio de logro</h3>
+    <p>Responder las cuatro objeciones sin mirar la ficha, nombrando en cada una <strong>la pieza concreta</strong> que sostiene la respuesta, y <strong>reconociendo la deuda</strong> cuando exista: los tres pasos de publicación son un costo real y decirlo fortalece la respuesta. Si en alguna solo se puede decir «funciona bien», falta estudio.</p>
+    <p>El módulo se da por aprobado cuando se puede dibujar el sistema de memoria en una servilleta, de una sola vez, y explicárselo a alguien que no sabe de computadoras sin usar la palabra «servidor».</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Y la parte que no se responde con lápiz</h3>
+    <p>Los cuatro procedimientos de la sección 10 se aprueban <b>haciéndolos</b>, no explicándolos, y conviene anotar la fecha de la última vez:</p>
+    <table>
+      <tr><th style="width:52%">Procedimiento</th><th>Última vez que lo hice</th></tr>
+      <tr><td>Publicar un cambio completo, con los cuatro pasos</td><td></td></tr>
+      <tr><td>Probar el modo sin internet de punta a punta</td><td></td></tr>
+      <tr><td>Restaurar un respaldo en un equipo vacío</td><td></td></tr>
+      <tr><td>Revisar las políticas RLS una por una</td><td></td></tr>
+    </table>
+  </div>
+
+  <div class="caja">
+    <strong>Lo que sigue, en el Módulo 2:</strong> este módulo mira el sistema desde afuera, como quien lo describe. El siguiente lo abre: el mapa de piezas del frontend, el molde de las 57 misiones, qué archivo responde de qué, y por qué un catálogo escrito a mano es una decisión y no un descuido. Conviene llegar allá con esta ficha respondida, porque el Módulo 2 da por sabidos el <code>localStorage</code>, el service worker y la publicación en tres pasos.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 1 · Página 10 de 10</span></div>
+</section>
+
+
+
 
 </div>
 </body>
