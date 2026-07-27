@@ -1,0 +1,19 @@
+# Cortes de la ficha de Poder Político etapa 2 (nueve cortes = diez páginas).
+# Anclajes únicos: el medidor propone «<div class="caso">», «<div class="caja">»
+# y «<div class="pauta">» a secas, y esos fragmentos se repiten por toda la ficha,
+# así que aquí se ancla en el <h2> o el <h3> que va dentro del bloque (o en su
+# <strong> de apertura, cuando la caja no lleva encabezado). El repaginador
+# retrocede solo hasta la apertura del <div> que contiene el anclaje, de modo que
+# el bloque nunca queda partido.
+# Los títulos de ejercicio se repiten (una vez en el enunciado y otra en la pauta):
+# los cortes se buscan en orden, así que «Ejercicio 3» encuentra el enunciado y
+# «Ejercicio 2», que se busca después, ya solo puede caer en la pauta.
+<strong>La pregunta que las separa</strong>
+<strong>Lo que se cede y lo que no.</strong>
+<strong>La regla incómoda:</strong>
+<h3>🧾 3. La constancia que pide un patrocinador</h3>
+<h2>📋 El expediente del proyecto en una hoja</h2>
+<h2>📆 La revisión de enero</h2>
+<h3>Ejercicio 3 · Llena la hoja de seguimiento</h3>
+<h3>Ejercicio 2 · Qué papel hace falta</h3>
+<h2>🗝️ Glosario de normas y trámites</h2>
