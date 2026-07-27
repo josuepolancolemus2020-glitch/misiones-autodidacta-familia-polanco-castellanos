@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Ruta de la Casa Cerrada · Etapa 2: Los datos de los demás</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #334155; --pri-suave: #f1f5f9; --sec: #0369a1; --sec-suave: #f0f9ff; }
+  .guion li { margin: 5px 0; }
+  table.tres th:nth-child(1) { width: 26%; }
+  table.tres th:nth-child(2), table.tres th:nth-child(3) { width: 25%; }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .mini { font-size: 12px; color: var(--gris); }
+  table.audit td:nth-child(1) { width: 6%; text-align: center; }
+  table.audit td:nth-child(3), table.audit td:nth-child(4) { width: 16%; text-align: center; height: 26px; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/ruta-casa-cerrada-datos/datos.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · Los datos de los demás</div>
+    <div class="f-meta"><b>Ruta:</b> 🔐 Ruta de la Casa Cerrada · Etapa 2 de 6 · <b>Materia:</b> Ciberseguridad</div>
+    <div class="f-meta"><b>Tema:</b> qué se guarda de otras personas, con qué finalidad, quién lo ve, cuánto tiempo y qué se hace si se filtra, con el inventario de datos y la política de una página para llenar a mano.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Separar el <strong>dato que identifica</strong> del <strong>dato agregado</strong>, y usar el segundo siempre que se pueda.</li>
+    <li>Escribir la <strong>finalidad</strong> de cada dato en una línea, y quedarse con el <strong>mínimo</strong> que la cumple.</li>
+    <li>Saber <strong>quién autoriza</strong> cuando hay menores, y hasta dónde llega esa autorización.</li>
+    <li>Ponerle a cada dato <strong>dueño de acceso y fecha de borrado</strong> desde el primer día.</li>
+    <li>Tener escrito el <strong>plan de incidente</strong>: qué se hace, en qué orden, si algo se filtra.</li>
+    <li>Llenar el <strong>inventario de datos</strong> de M.E.T.A.S y su <strong>política de una página</strong>.</li>
+  </ol>
+
+  <h2>🧭 La frase de la que sale todo</h2>
+  <p>Los datos de un niño <b>no son tuyos</b>: son suyos y de su familia, y tú solo los tienes prestados mientras hagan falta. Parece obvio hasta que llega la primera petición razonable, de alguien conocido y con buena intención, y se contesta que sí sin pensar.</p>
+  <p>De ahí las tres preguntas de esta etapa: <b>¿qué guardo exactamente?</b>, <b>¿por cuánto tiempo?</b> y <b>¿quién responde si se filtra?</b> Las tres se contestan por escrito y antes de guardar nada, porque después ya hay algo que perder.</p>
+
+  <h2>🏠 Por qué esta etapa sigue a La puerta</h2>
+  <p>En la etapa 1 se aprendió a controlar <b>quién entra</b>. Aquí se decide <b>qué hay adentro para robar</b>, que es la otra mitad del mismo problema. La puerta más segura del mundo no sirve de nada si dentro se guardó, por si acaso, el nombre completo y la escuela de trescientos niños.</p>
+  <div class="caja">
+    <strong>La postura de esta casa:</strong> con menores, <b>la duda siempre se resuelve hacia el no</b>. No es miedo legal ni exceso de celo: es que el daño de una filtración no lo paga quien la causó. Lo paga un niño que no eligió nada de esto y que ni siquiera sabía que sus datos estaban ahí.
+  </div>
+  <p><b>Y lo que esta etapa no es:</b> no es dejar de medir ni negarse a colaborar con nadie. Es descubrir que <b>casi todo lo que piden «con nombres» se resuelve igual de bien sin ellos</b>. Cuando se ofrece el conteo en vez de la lista, la mayoría de las veces la otra persona dice que sí y el problema desaparece.</p>
+  <p class="mini"><b>Una cosa que conviene aceptar desde el principio:</b> este proyecto ya guarda datos de otras personas, y algunos se guardaron sin pasar por ninguno de los pasos de esta ficha. No pasa nada: el inventario existe justamente para descubrirlos. Lo que no se puede es seguir sin saber cuáles son.</p>
+  <p class="mini"><b>Cómo se estudia esta ficha:</b> se lee entera una vez, y después se vuelve con el inventario de la página 7 en la mano y se llena fila por fila mirando el proyecto de verdad. Lo que se aprende leyendo es el vocabulario; lo que cambia algo es la lista escrita.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 1 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>⚖️ Dato que identifica y dato agregado</h2>
+  <table class="tres">
+    <tr><th>Lo que es</th><th>🪪 Identifica</th><th>📊 Agregado</th></tr>
+    <tr><td>De quién habla</td><td>De una persona concreta</td><td>De un grupo</td></tr>
+    <tr><td>Ejemplo</td><td>Nombre y apellido, correo, foto</td><td>22 de sexto lo completaron</td></tr>
+    <tr><td>Se puede compartir</td><td>Solo con autorización y motivo</td><td>Sí, sin miedo</td></tr>
+    <tr><td>Si se filtra</td><td>Daña a personas</td><td>No daña a nadie</td></tr>
+  </table>
+  <div class="caja">
+    <strong>Cuidado con la combinación.</strong> Escuela, grado y sección por separado no dicen nada; <b>juntos señalan a una persona</b> en un aula de treinta. Un dato puede identificar sin contener ningún nombre, y ese es el error más común al creer que algo es agregado.
+  </div>
+
+  <h2>🧩 Las siete piezas, primera parte</h2>
+  <table class="tres">
+    <tr><th>Pieza</th><th>Qué decide</th><th>Dónde se rompe</th></tr>
+    <tr><td>1. Qué dato es</td><td>Todo lo demás</td><td>Al olvidar la combinación</td></tr>
+    <tr><td>2. Para qué se pide</td><td>Si se guarda o no</td><td>Con el «por si acaso»</td></tr>
+    <tr><td>3. El mínimo</td><td>Cuánto hay que proteger</td><td>Al copiar el formulario entero</td></tr>
+    <tr><td>4. Quién lo ve</td><td>Quién responde</td><td>Con «el equipo» sin nombres</td></tr>
+  </table>
+
+  <h2>🧩 Las siete piezas, segunda parte</h2>
+  <table class="tres">
+    <tr><th>Pieza</th><th>Qué decide</th><th>Dónde se rompe</th></tr>
+    <tr><td>5. Cuánto se guarda</td><td>Que no se quede para siempre</td><td>Al no poner fecha nunca</td></tr>
+    <tr><td>6. Quién autoriza</td><td>Si se puede usar</td><td>Al tomar el permiso equivocado</td></tr>
+    <tr><td>7. Si se filtra</td><td>Cuánto daño hace</td><td>Improvisando ese mismo día</td></tr>
+  </table>
+  <p class="mini"><b>Cómo se usan:</b> las siete se contestan <b>antes</b> de guardar el primer dato, y las siete caben en la política de una página. Si alguna queda en blanco, ese dato todavía no se puede guardar.</p>
+
+<h2>✂️ Minimizar: el arte de quitar campos</h2>
+  <p>Minimizar es quedarse con el menor número de campos que todavía cumple la finalidad. Se busca <b>quitando</b>, no añadiendo: se van eliminando campos hasta que la finalidad deja de cumplirse, y se para justo antes de ese punto.</p>
+  <table class="tres">
+    <tr><th>Para qué</th><th>Lo que se suele pedir</th><th>El mínimo que sirve</th></tr>
+    <tr><td>Medir si una misión funcionó</td><td>Nombre, sección, correo</td><td>Grado y fecha</td></tr>
+    <tr><td>Poner el nombre en la constancia</td><td>Nombre completo en el servidor</td><td>Nombre de pila, en el teléfono</td></tr>
+    <tr><td>Enseñar que se usa en el aula</td><td>Foto del grupo con caras</td><td>Foto de manos y pantalla</td></tr>
+    <tr><td>Que la escuela lleve su registro</td><td>Notas con nombre en el proyecto</td><td>Un identificador que traduce la escuela</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <div class="caja">
+    <strong>La regla que resume la página:</strong> <b>lo que no se guarda no se puede perder</b>. Cada campo que se quita es un campo que no hay que proteger, ni cifrar, ni borrar, ni explicar el día que alguien pregunte.
+  </div>
+
+  <div class="caso">
+    <h3>🕵️ La trampa de la combinación</h3>
+    <p><b>Qué pasa:</b> tres datos que por separado no dicen nada pueden señalar a una persona al juntarse. «Sexto grado» no identifica; «sexto grado, sección B, escuela tal, la única niña que usó la misión en inglés» identifica a una sola persona sin escribir ningún nombre.</p>
+    <p><b>Por qué importa:</b> casi todos los descuidos de este tipo pasan al creer que algo era agregado. La prueba práctica es preguntarse: <b>¿cuántas personas cumplen esta descripción?</b> Si la respuesta es una, dos o tres, es un dato que identifica.</p>
+    <p><b>Cómo se arregla:</b> subir el nivel del agrupamiento (por grado en vez de por sección) o quitar una de las variables. Si al hacerlo el dato deja de servir para la finalidad, es que la finalidad exigía identificar, y entonces hace falta autorización.</p>
+  </div>
+
+  <h2>👨‍👩‍👧 Quién autoriza cuando hay menores</h2>
+  <div class="caso">
+    <h3>La familia, y para un uso concreto</h3>
+    <p>Un niño no puede autorizar que se publique su foto ni que se guarde su nombre: <b>autoriza su madre, su padre o quien lo tenga a cargo</b>. Y la autorización es para algo específico, no un permiso general para siempre.</p>
+    <p><b>El error más común:</b> tomar el permiso de la maestra como si fuera el de las familias. Ella puede autorizar que se entre a su aula; no puede autorizar que las caras de sus alumnos salgan a internet.</p>
+    <p><b>Y el segundo error:</b> creer que lo que sirve para el mural del aula sirve para una publicación pública. Son dos cosas distintas y se preguntan por separado, aunque la respuesta acabe siendo la misma.</p>
+  </div>
+  <p class="mini"><b>El derecho a irse:</b> quien autorizó puede cambiar de opinión cuando quiera. Si una familia pide que se borren los datos de su hija, se borran, se confirma por escrito con la fecha y <b>no se pregunta el motivo</b>.</p>
+  <p class="mini"><b>Y una cortesía que vale mucho:</b> cuando se pide una autorización, decir también qué pasa si la respuesta es no. Casi siempre no pasa nada (el niño usa el material igual, solo que no sale en la foto), y saberlo hace que la familia conteste con calma en vez de con desconfianza.</p>
+
+<h2>🛠️ Los cuatro pasos antes de guardar un dato</h2>
+  <ol class="guion">
+    <li><b>Escribir para qué.</b> Una línea concreta. Si no se puede escribir en una línea, el dato no se pide. «Por si acaso» y «para estadísticas» no son finalidades.</li>
+    <li><b>Quedarse con el mínimo.</b> Quitar campos hasta que la finalidad deje de cumplirse y parar justo antes. Anotar por qué se queda cada uno.</li>
+    <li><b>Decidir quién lo ve.</b> Con nombre y cargo, no por grupos. Si no se puede nombrar a la persona, es que nadie está respondiendo por eso.</li>
+    <li><b>Ponerle fecha de borrado.</b> Desde el primer día. Un dato sin caducidad se queda para siempre, y algún día lo hereda alguien que no sabe qué es.</li>
+  </ol>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 3 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <h2>🚨 Qué se hace si algo se filtra</h2>
+  <p>El plan se escribe <b>antes</b>, porque el día que pasa nadie está en condiciones de improvisar bien. Cinco pasos, en este orden y sin saltarse ninguno:</p>
+  <ol class="guion">
+    <li><b>Cortar el acceso.</b> Cambiar las claves de todo lo que ese aparato o esa cuenta podía abrir, <b>antes</b> de averiguar nada más.</li>
+    <li><b>Saber qué salió.</b> Qué datos exactamente y de cuántas personas. Sin esto, lo que se avise después será falso.</li>
+    <li><b>Avisar.</b> A las familias afectadas, sin adornos y sin esperar a tenerlo todo claro.</li>
+    <li><b>Escribir qué se cambió</b> para que no vuelva a pasar. Un incidente sin cambio se repite el año siguiente.</li>
+    <li><b>Guardar el registro</b> del incidente con su fecha, que es lo que permite aprender de él.</li>
+  </ol>
+  <div class="caja">
+    <strong>La regla incómoda:</strong> <b>ocultarlo cuesta más que contarlo</b>. Una filtración avisada a tiempo se perdona casi siempre; una que se descubre después, casi nunca. Y quien la descubre suele ser justo la persona a la que menos convenía.
+  </div>
+
+  <h2>💬 Cómo se dice que no sin romper la relación</h2>
+  <p>Casi ninguna petición de datos se rechaza entera. Se contesta con lo que sí se puede dar, que suele resolver lo mismo, y eso convierte un no en una propuesta.</p>
+  <table class="tres">
+    <tr><th>Lo que piden</th><th>Lo que se contesta</th><th>Por qué funciona</th></tr>
+    <tr><td>La lista con nombres</td><td>«Te mando el conteo, dime si te sirve»</td><td>Casi siempre sirve</td></tr>
+    <tr><td>Publicar la foto</td><td>«Va la de manos y pantalla»</td><td>Enseña lo mismo sin permisos</td></tr>
+    <tr><td>Guardar las notas</td><td>«El registro queda en el centro»</td><td>Cada quien responde por lo suyo</td></tr>
+    <tr><td>Datos de uso para una empresa</td><td>«Agregados y por escrito»</td><td>Deja el trato posible sin exponer</td></tr>
+  </table>
+  <p class="mini"><b>La frase que más sirve</b> es una pregunta, no una negativa: «¿qué vas a hacer con ellos que no puedas hacer con el conteo?». Casi siempre la otra persona lo piensa por primera vez ahí mismo, y la petición se reduce sola.</p>
+
+  <h2>🚦 Señales de que hay un problema esperando</h2>
+  <table class="tres">
+    <tr><th>Lo que se nota</th><th>Qué significa</th><th>Qué se hace</th></tr>
+    <tr><td>Nadie sabe qué campos hay</td><td>No existe el inventario</td><td>Listarlos todos esta semana</td></tr>
+    <tr><td>Hay copias en varios teléfonos</td><td>Accesos que no se vigilan</td><td>Una fuente y avisos por canal</td></tr>
+    <tr><td>Ningún dato tiene fecha</td><td>Todo se queda para siempre</td><td>Poner plazos al inventario</td></tr>
+    <tr><td>El respaldo no está cifrado</td><td>La copia es la base entera</td><td>Cifrarlo y anotar quién tiene la clave</td></tr>
+  </table>
+
+<h2>🛡️ Las ocho peticiones, primera parte</h2>
+  <p>Ocho situaciones que este proyecto va a enfrentar, casi todas de buena fe. En cada una, qué se pide y con qué mínimo se cumple lo mismo.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>1. La escuela que pide guardar notas de menores</h3>
+    <p><b>Qué se pide:</b> rendimiento académico con nombre, que es de lo más delicado que existe. Una nota mala guardada mal puede seguir a un niño años.</p>
+    <p><b>Lo que casi nadie ve:</b> aceptar esos datos es aceptar <b>responder por ellos</b>, aunque el que los pidió sea el centro.</p>
+    <p><b>La condición con la que sí:</b> el registro con nombres se queda en el centro; el proyecto guarda un identificador que solo la escuela sabe traducir, con finalidad escrita, acceso nombrado y borrado al cerrar el año.</p>
+  </div>
+
+  <div class="caso">
+    <h3>2. La foto de los niños usando la aplicación</h3>
+    <p><b>Qué se pide:</b> publicar una foto buenísima de una sección trabajando, con permiso de la maestra.</p>
+    <p><b>El error:</b> el permiso que hace falta lo da la familia de cada niño que salga, y para esa publicación concreta.</p>
+    <p><b>Lo que sí se puede:</b> la foto de las manos y la pantalla. Cumple lo mismo y no necesita permiso de nadie. Si la cara aporta algo que la mano no, se pide autorización escrita, una por niño.</p>
+  </div>
+
+  <div class="caso">
+    <h3>3. Los correos de los padres en copia visible</h3>
+    <p><b>Qué pasó:</b> un aviso a treinta familias con todos los correos en el campo «Para».</p>
+    <p><b>Lo que es:</b> una filtración completa y pequeña, y <b>lo enviado no vuelve</b>. <b>Cómo se evita:</b> copia oculta siempre que los destinatarios no se conozcan entre sí, o el canal del centro. Y si ya pasó: avisar, disculparse y decir qué se cambió.</p>
+  </div>
+
+  <div class="caso">
+    <h3>4. El APK que guarda el nombre completo</h3>
+    <p><b>Qué se plantea:</b> guardar el nombre del estudiante en el servidor para personalizar la constancia.</p>
+    <p><b>El mínimo:</b> basta el nombre de pila, y ni hace falta que salga del teléfono. <b>La regla:</b> guardar en el aparato lo que solo sirve en el aparato. El dato que nunca viaja a un servidor no se puede filtrar desde el servidor, y nadie tiene que responder por él.</p>
+  </div>
+
+<h2>🛡️ Las ocho peticiones, segunda parte</h2>
+
+  <div class="caso">
+    <h3>5. La empresa que ofrece una función a cambio de datos de uso</h3>
+    <p><b>Qué se ofrece:</b> añadir gratis una función de inteligencia artificial a cambio de recibir los datos de uso de los estudiantes.</p>
+    <p><b>Qué saca:</b> datos de menores hacia una empresa sobre la que el proyecto no manda y a la que las familias nunca autorizaron nada. Lo que sale no vuelve.</p>
+    <p><b>La condición con la que sí:</b> agregados y sin identificadores, con un documento que diga qué reciben, para qué y por cuánto tiempo. Si eso no les sirve, no hay trato, y no pasa nada.</p>
+  </div>
+
+  <div class="caso">
+    <h3>6. El maestro que pide el listado completo del aula</h3>
+    <p><b>Qué se pide:</b> los nombres de quiénes de su sección entraron a las misiones esta semana.</p>
+    <p><b>Lo que sí es legítimo:</b> él es su maestro y responde por ellos; la petición no es abusiva. <b>Cómo se resuelve igual:</b> preguntar qué va a hacer con la lista. Si es para saber si la actividad funcionó, el conteo le sirve igual y no crea una copia más. Cada copia es un sitio del que se puede filtrar.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>7. La copia de seguridad en el teléfono perdido</h3>
+    <p><b>Qué pasó:</b> el respaldo de la base de datos estaba sin clave en un teléfono que se quedó en un bus.</p>
+    <p><b>Lo que se olvidó:</b> que la copia contiene lo mismo que la base. Sin cifrar es la base entera regalada, y encima <b>nadie se entera</b> de que se la llevaron.</p>
+    <p><b>Lo que hay que tener escrito:</b> dónde viven las copias, con qué clave están cifradas y quién la tiene. Y el primer paso del plan: cambiar claves antes de averiguar nada.</p>
+  </div>
+
+  <div class="caso">
+    <h3>8. La familia que pide borrar los datos de su hija</h3>
+    <p><b>Qué se pide:</b> que se borre todo lo que el proyecto tenga de una niña concreta.</p>
+    <p><b>Por qué es la prueba de fuego:</b> si no se sabe dónde está cada dato de esa niña, es que nunca hubo inventario. Y si no se puede borrar, es que se guardó más de lo que se podía sostener.</p>
+    <p><b>Cómo se responde:</b> se borra, se confirma con fecha y no se pregunta el motivo. Conviene hacer este simulacro <b>una vez al año</b>, aunque nadie lo pida.</p>
+  </div>
+
+<h2>📋 Inventario de datos</h2>
+  <p>Una fila por cada campo que el proyecto guarda de otras personas. Sin «etcétera»: lo que no está en la lista es lo que nadie revisa.</p>
+  <table class="audit">
+    <tr><th>Nº</th><th>Campo y dónde vive</th><th>¿Identifica?</th><th>Se borra el</th></tr>
+    <tr><td>1</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>2</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>3</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>4</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>5</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>6</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  </table>
+  <p class="mini"><b>Dónde buscar campos olvidados:</b> los respaldos, las hojas de cálculo en el correo, los archivos enviados por WhatsApp, las capturas de pantalla y la carpeta de fotos del teléfono. Casi siempre hay más datos fuera de la base que dentro.</p>
+
+  <h2>📝 Política de una página</h2>
+  <p>Se llena a lápiz y después se pasa a limpio. Es lo que se enseña cuando alguien pregunta qué hace el proyecto con los datos.</p>
+  <ol class="lineas-4">
+    <li>Qué se guarda (la lista completa, sin etcétera): ________________________</li>
+    <li>Para qué, una línea por dato: ____________________________________________</li>
+    <li>Quién lo ve, con nombre y cargo: _________________________________________</li>
+    <li>Cuánto tiempo se guarda: _________________________________________________</li>
+  </ol>
+  <ol class="lineas-4">
+    <li>Qué se hace si se filtra, y a quién se avisa primero: ___________________</li>
+    <li>Quién responde por todo esto (una persona, con nombre): _________________</li>
+    <li>Fecha de la próxima revisión del inventario: ____________________________</li>
+  </ol>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h2>📆 La revisión anual del inventario</h2>
+  <p>Una vez al año, con el inventario delante y sin prisa, se hacen cinco cosas. Toma menos de una hora y es lo único que evita que la lista envejezca.</p>
+  <ol class="guion">
+    <li><b>Borrar lo vencido</b>, incluidos los respaldos, que son los que conservan lo que ya se borró de la base.</li>
+    <li><b>Quitar accesos</b> de quien cambió de rol o dejó el proyecto.</li>
+    <li><b>Buscar campos nuevos</b> que se colaron sin pasar por los cuatro pasos.</li>
+    <li><b>Hacer el simulacro del caso 8</b>: intentar borrar de verdad todo lo de una persona.</li>
+    <li><b>Anotar la fecha</b> de la próxima revisión en la política de una página.</li>
+  </ol>
+  <p class="mini"><b>Por qué una vez al año y no cuando haga falta:</b> «cuando haga falta» nunca llega, porque nadie se acuerda de un inventario mientras todo funciona. Una fecha fija en el calendario, aunque sea arbitraria, es lo único que ha demostrado funcionar en esta casa.</p>
+  <p class="mini"><b>Y una regla para el día de la revisión:</b> nada de discutir si un campo hace falta mientras se revisa. Se marca con una interrogación, se sigue, y al final se decide sobre los marcados. Si no, la revisión se atasca en el primer campo dudoso y no se termina nunca.</p>
+
+  <h2>🗣️ Qué se contesta cuando piden datos</h2>
+  <ol class="guion">
+    <li><b>«¿Para qué los vas a usar?»</b> Con calma, no como reproche. La respuesta casi siempre reduce la petición sola.</li>
+    <li><b>«Te mando el conteo por grado, dime si te sirve.»</b> La mayoría de las veces sirve.</li>
+    <li><b>«Lo veo y te contesto mañana.»</b> Nadie manda un archivo con nombres el mismo día que se lo piden.</li>
+    <li>Y siempre: apuntar qué se envió, a quién y con qué fecha. Eso es la mitad del inventario.</li>
+  </ol>
+
+<h2>✍️ Ejercicios sin pantalla</h2>
+  <p class="mini">Se responden a lápiz. Las respuestas están en la pauta del final, no aquí.</p>
+
+  <div class="caso">
+    <h3>Ejercicio 1 · Identifica o agregado</h3>
+    <p>Escribe I o A al lado de cada dato.</p>
+    <ol class="lineas-4">
+      <li>( ) El correo de la madre</li>
+      <li>( ) 22 estudiantes de sexto lo completaron</li>
+      <li>( ) Escuela, grado y sección juntos</li>
+      <li>( ) El porcentaje que usó la ficha impresa</li>
+    </ol>
+  </div>
+
+  <div class="caso">
+    <h3>Ejercicio 2 · Buscar el mínimo</h3>
+    <p>Escribe el mínimo que cumple cada finalidad.</p>
+    <ol class="lineas-4">
+      <li>Saber si la misión funcionó en sexto: __________________________________</li>
+      <li>Poner el nombre en la constancia: ______________________________________</li>
+      <li>Enseñar que se usa en un aula: _________________________________________</li>
+    </ol>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 7 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>Ejercicio 3 · Quién autoriza</h3>
+    <p>Responde sí o no y explica en media línea.</p>
+    <ol class="lineas-4">
+      <li>( ) La maestra puede autorizar publicar las caras de su sección</li>
+      <li>( ) Un niño de doce años puede autorizar que se guarde su nombre</li>
+      <li>( ) El permiso para el mural del aula sirve para internet</li>
+    </ol>
+  </div>
+
+  <div class="caso">
+    <h3>Ejercicio 4 · El teléfono perdido</h3>
+    <p>Se perdió un teléfono con el respaldo sin cifrar. Escribe los tres primeros pasos, en orden.</p>
+    <ol class="lineas-4">
+      <li>Primero: _______________________________________________________________</li>
+      <li>Después: _______________________________________________________________</li>
+      <li>Y luego: _______________________________________________________________</li>
+    </ol>
+  </div>
+
+  <div class="caso">
+    <h3>Ejercicio 5 · La petición del maestro</h3>
+    <p>Un maestro pide el listado con nombres de su sección. Escribe en tres líneas qué le contestas.</p>
+    <ol class="lineas-4">
+      <li>Le pregunto: ___________________________________________________________</li>
+      <li>Le ofrezco: ____________________________________________________________</li>
+      <li>Y si insiste con nombres: ______________________________________________</li>
+    </ol>
+  </div>
+
+  <div class="caso">
+    <h3>Ejercicio 6 · Tu inventario de verdad</h3>
+    <p>Llena tres filas del inventario de la página 7 con datos que el proyecto guarde hoy, y responde:</p>
+    <ol class="lineas-4">
+      <li>El campo que no sabía que guardábamos: ________________________________</li>
+      <li>El que se puede quitar sin perder nada: _______________________________</li>
+      <li>El que no tiene fecha de borrado: _____________________________________</li>
+    </ol>
+  </div>
+
+<h2>✅ Pauta completa de respuestas</h2>
+
+  <div class="pauta">
+    <h3>Ejercicio 1 · Identifica o agregado</h3>
+    <ol>
+      <li>El correo de la madre: <b>I</b>. Llega a una persona concreta.</li>
+      <li>22 estudiantes de sexto: <b>A</b>. Habla de un grupo y no señala a nadie.</li>
+      <li>Escuela, grado y sección juntos: <b>I</b>. Es el caso que más engaña: sin ningún nombre, identifica.</li>
+      <li>El porcentaje que usó la ficha: <b>A</b>. Sirve para decidir y no expone a nadie.</li>
+    </ol>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 8 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <div class="pauta">
+    <h3>Ejercicio 2 · Buscar el mínimo</h3>
+    <ol>
+      <li>Medir la misión: <b>grado y fecha</b>, sin nombre ni sección.</li>
+      <li>La constancia: <b>el nombre de pila</b>, guardado solo en el teléfono.</li>
+      <li>Enseñar el uso: <b>una foto de las manos y la pantalla</b>, sin caras.</li>
+    </ol>
+    <p class="mini">Se da por buena cualquier respuesta que cumpla la finalidad con menos campos que la petición original. Lo que se corrige es si sobra algún dato, no la redacción.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Ejercicio 3 · Quién autoriza</h3>
+    <ol>
+      <li>La maestra: <b>no</b>. Puede autorizar la entrada a su aula, no que salgan las caras de sus alumnos.</li>
+      <li>Un niño de doce: <b>no</b>. Autoriza su madre, su padre o quien lo tenga a cargo.</li>
+      <li>El permiso del mural: <b>no</b>. Son dos usos distintos y se preguntan por separado.</li>
+    </ol>
+  </div>
+
+  <div class="pauta">
+    <h3>Ejercicio 4 · El teléfono perdido</h3>
+    <ol>
+      <li><b>Cortar el acceso:</b> cambiar las claves de todo lo que ese teléfono podía abrir, antes de nada más.</li>
+      <li><b>Saber qué salió:</b> qué datos contenía el respaldo y de cuántas personas.</li>
+      <li><b>Avisar</b> a las familias afectadas, sin adornos, y escribir qué se cambió para que no se repita.</li>
+    </ol>
+    <p class="mini">El orden importa: buscar el teléfono o averiguar detalles antes de cortar accesos es el error que convierte un susto en una filtración.</p>
+  </div>
+
+<h2>✅ Pauta (continúa)</h2>
+
+  <div class="pauta">
+    <h3>Ejercicio 5 · La petición del maestro</h3>
+    <ol>
+      <li><b>Le pregunto</b> para qué va a usar la lista, con calma y sin que suene a reproche.</li>
+      <li><b>Le ofrezco</b> el conteo por grado, que casi siempre cumple lo mismo y no crea una copia nueva.</li>
+      <li><b>Si insiste con nombres</b> y de verdad hace falta para acompañar a un estudiante concreto, se manda solo lo de ese estudiante, por un canal que deje registro, y se apunta qué se envió y cuándo.</li>
+    </ol>
+  </div>
+
+  <div class="pauta">
+    <h3>Ejercicio 6 · Tu inventario de verdad</h3>
+    <p>No tiene solución única. Está bien hecho si aparece <b>al menos un campo que no estaba previsto</b> (casi siempre sale de los respaldos, del correo o de las capturas de pantalla), si el campo que sobra se puede quitar sin que ninguna finalidad deje de cumplirse, y si el campo sin fecha de borrado queda con una fecha escrita ese mismo día.</p>
+    <p class="mini">Si al hacerlo sale que todos los campos son necesarios y todos tienen fecha, conviene repetirlo mirando fuera de la base de datos: ahí es donde vive lo que se olvida.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 9 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <h2>🗝️ Glosario de los datos ajenos</h2>
+  <table class="tres">
+    <tr><th>Término</th><th>Qué es</th><th>En M.E.T.A.S</th></tr>
+    <tr><td>Dato que identifica</td><td>Llega a una persona concreta</td><td>Nombre, correo, foto</td></tr>
+    <tr><td>Dato agregado</td><td>Habla de un grupo</td><td>22 de sexto lo completaron</td></tr>
+    <tr><td>Finalidad</td><td>El para qué, en una línea</td><td>Saber si la misión funcionó</td></tr>
+    <tr><td>Minimización</td><td>El mínimo que cumple la finalidad</td><td>Grado y fecha</td></tr>
+  </table>
+  <table class="tres">
+    <tr><th>Término</th><th>Qué es</th><th>En M.E.T.A.S</th></tr>
+    <tr><td>Seudonimización</td><td>El nombre cambiado por un código</td><td>Identificador que traduce la escuela</td></tr>
+    <tr><td>Plazo de borrado</td><td>La fecha en que el dato se elimina</td><td>Al cerrar el año escolar</td></tr>
+    <tr><td>Plan de incidente</td><td>Qué se hace si se filtra</td><td>Cortar, ver, avisar, escribir</td></tr>
+    <tr><td>Inventario</td><td>La lista de todo lo guardado</td><td>La tabla de la página 7</td></tr>
+  </table>
+  <h2>⚖️ Una nota sobre la ley</h2>
+  <p>Honduras no tiene todavía una ley de protección de datos personales tan detallada como la de otros países, y eso hace que mucha gente asuma que <b>entonces se puede todo</b>. Es justo al revés: donde la norma no dicta el límite, el límite lo pone quien guarda los datos, y esa responsabilidad no desaparece por no estar escrita en un artículo.</p>
+  <p class="mini">Además, lo que hoy no está regulado puede estarlo mañana, y las prácticas que se adoptaron antes son las que quedan. Un proyecto que ya minimiza, ya pone plazos y ya tiene inventario no tiene que cambiar nada el día que la norma llegue. Y si algún día M.E.T.A.S trabaja con una institución de fuera, esas prácticas son justo lo que le van a pedir por escrito.</p>
+
+  <h2>🎓 Cierre: el campo que te toca revisar</h2>
+  <ol class="lineas-4">
+    <li>El dato de otra persona que más me preocupa hoy es: __________________</li>
+    <li>Lo voy a quitar, reducir o ponerle fecha antes del: ___________________</li>
+    <li>Quien responde por él, con nombre, es: ________________________________</li>
+  </ol>
+  <div class="caja">
+    <strong>Lo que hay que llevarse de esta etapa:</strong> la seguridad de los datos ajenos no se consigue con contraseñas más largas, sino <b>guardando menos</b>. Cada campo que no se pide es un campo que no hay que proteger, ni explicar, ni borrar el día que una familia lo reclame. La prueba de que está aprendido es poder decir, de cada dato, para qué está, quién lo ve y cuándo se borra.
+  </div>
+  <div class="caja-amb">
+    <strong>🔒 Material de la casa.</strong> Esta ficha es parte del conocimiento familiar de F.A.R.O. No se publica en el sitio ni se comparte fuera de la familia: describe qué guarda este proyecto de otras personas y dónde están sus puntos débiles.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 2 · Página 10 de 10</span></div>
+</section>
+
+
+</div>
+</body>
+</html>

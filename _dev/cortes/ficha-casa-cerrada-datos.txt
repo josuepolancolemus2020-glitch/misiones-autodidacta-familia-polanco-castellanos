@@ -1,0 +1,12 @@
+# Cortes de la ficha de Ciberseguridad etapa 2 (nueve cortes = diez páginas).
+# Anclajes únicos: el medidor propone «<div class="caso">», «<div class="caja">»
+# y «<div class="pauta">» a secas, y esos fragmentos se repiten por la ficha.
+<h2>⚖️ Dato que identifica y dato agregado</h2>
+<strong>La regla que resume la página:</strong>
+<h2>🚨 Qué se hace si algo se filtra</h2>
+<h3>1. La escuela que pide guardar notas de menores</h3>
+<h3>7. La copia de seguridad en el teléfono perdido</h3>
+<h2>📆 La revisión anual del inventario</h2>
+<h3>Ejercicio 3 · Quién autoriza</h3>
+<h3>Ejercicio 2 · Buscar el mínimo</h3>
+<h2>🗝️ Glosario de los datos ajenos</h2>
