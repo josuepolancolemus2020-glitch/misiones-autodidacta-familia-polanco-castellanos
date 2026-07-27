@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta del Poder · Etapa 2: El presupuesto real | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/presupuesto.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Gasta sin apuntar 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🧾</div>
+    <div class="hero-text">
+      <h1>El presupuesto real: <span>a dónde se va el dinero</span></h1>
+      <p class="sub">Y la hora, que es lo más caro y lo único que nadie apunta 💰</p>
+      <div class="badge">💰 Ruta del Poder · Etapa 2 de 6 · Poder Económico</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🧾 La frase maestra, y las tres preguntas que la vuelven útil</h2>
+    <p>Un proyecto no quiebra por gastar mucho: quiebra por <strong>no saber cuánto cuesta lo que regala</strong>. La etapa 1 enseñó a separar lo que mete dinero de lo que lo saca. Esta enseña a ponerle número, incluyendo el número que casi nadie escribe: <strong>la hora de quien lo hace</strong>. Ante cualquier gasto o cualquier precio, tres preguntas: <strong>¿esto es fijo o variable?</strong>, <strong>¿cuánto cuesta de verdad una unidad?</strong> y <strong>¿cuántas hacen falta para no perder?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Por qué esta etapa sigue a Activos y Pasivos:</strong> allá se aprendió a mirar una cosa y decir si mete o saca dinero. Aquí se aprende a <strong>medirlo</strong>, que es lo que convierte una intuición en una decisión. Sin números, «esto sale caro» y «esto sale barato» son dos opiniones, y la que gana es la del que habla más fuerte.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Dos preguntas antes de poner un precio</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🧮 ¿Cuánto me cuesta a mí?</h4>
+        <p>No lo que se pagó en efectivo: <strong>todo</strong>. El papel, la tinta, la hoja que salió mal, el viaje a sacar copias y las horas de quien lo revisó. Un costo que no se apunta no desaparece: lo paga alguien, y casi siempre eres tú.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>⏳ ¿Qué dejo de hacer por esto?</h4>
+        <p>El <strong>costo de oportunidad</strong>: las tres horas que se van en un taller son tres horas que no se usaron en construir una ruta. No aparece en ningún recibo y es el gasto más grande del proyecto, todos los meses.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>Si no sabes lo que te cuesta una unidad, <span class="hl">no puedes regalarla ni venderla</span>. Regalar sin saber el costo no es generosidad: es <span class="hl2">una cuenta que llega después</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas del presupuesto</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué mide, dónde se esconde y cómo se calcula en M.E.T.A.S.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza del presupuesto.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la ficha que salía gratis</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces cuando te piden treinta fichas impresas.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🙋</span><span class="ms-text"><strong>La petición:</strong> «regálame treinta fichas impresas para mi sección».</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🖨️</span><span class="ms-text"><strong>La cuenta rápida:</strong> «es solo papel y tinta, sale casi gratis».</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🚌</span><span class="ms-text"><strong>Lo que no se contó:</strong> el viaje, las hojas que salieron mal y hora y media de revisión.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🧾</span><span class="ms-text"><strong>El número real:</strong> no eran 60 lempiras. Eran 60 más una tarde entera.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué haces antes de decir que sí?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🤷 Calculo el papel y la tinta</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🧮 Calculo el costo por unidad completo</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚖️ Costo fijo y costo variable</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🏠 El costo fijo</h4>
+        <p>Se paga <strong>igual haya trabajo o no</strong>: el dominio, el hospedaje, los datos del teléfono. No sube si se atienden diez aulas en vez de una, y por eso cada aula nueva lo abarata. Es el que decide cuánto hay que hacer para no perder.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>📄 El costo variable</h4>
+        <p>Sube con <strong>cada unidad</strong>: el papel de cada ficha, la tinta, el pasaje de cada taller. Crecer no lo abarata, lo multiplica. Es el que decide si el precio de una unidad deja algo o no deja nada.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧭 Cómo se usa la diferencia</span><br>
+      <span>El fijo se cubre <span class="hl">con volumen</span>; el variable, <span class="hl">con precio</span>. Confundirlos es lo que hace pensar que una cosa deja dinero cuando en realidad <span class="hl2">solo estaba tapando el dominio de este mes</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🛡️ Los cuatro pasos para armar un presupuesto</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. Listar los fijos y 2. medir una unidad</h4>
+        <p><strong>Los fijos del mes:</strong> todo lo que se paga aunque nadie use nada, incluido lo que hoy es gratis y algún día no lo será. <strong>Una unidad:</strong> cronometrar y anotar lo que cuesta hacer una ficha de verdad, una sola, sin redondear hacia abajo.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. Poner precio a la hora y 4. sacar el equilibrio</h4>
+        <p><strong>La hora:</strong> un número, aunque incomode. Sin él, el trabajo propio vale cero y todo parece rentable. <strong>El equilibrio:</strong> cuántas unidades hacen falta para cubrir los fijos y no perder. Ese número manda sobre todos los demás.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas del presupuesto</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Sobres del mes</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Pasos para armarlo</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 En una línea</span><br>
+      <span>El <span class="hl">punto de equilibrio</span> es la única cifra que hay que saber de memoria: cuántas aulas, cuántas fichas o cuántos talleres hacen falta <span class="hl2">para que el mes no salga del bolsillo de la casa</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>✉️ El sobre del mes</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🗂️ Repartir antes de gastar</h4>
+        <p>El dinero se separa <strong>el día que entra</strong>, no cuando se acaba: fijos, variables, ahorro y reinversión. Un sobre vacío es una respuesta clara; una cuenta con saldo, en cambio, siempre parece que alcanza para una cosa más.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🔀 Qué se rompe al mover un sobre</h4>
+        <p>Sacar del sobre de fijos para reinvertir se siente inteligente y es lo que <strong>apaga el dominio en marzo</strong>. La regla: de los fijos no se saca nunca, y lo que sobra al final del mes va a ahorro antes que a una idea nueva.</p>
+      </div>
+    </div>
+    <p style="font-size:0.9rem;margin:0.8rem 0;">La regla que sale de aquí: <strong>un proyecto familiar se muere por goteo, no de golpe</strong>. Nadie decide cerrarlo; simplemente un mes no alcanzó, se pagó de la casa, y al tercer mes ya nadie sabe cuánto costaba ni cuánto entraba.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🏠 Fijo</div><div class="t-info">Se paga aunque no pase nada</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">📄 Variable</div><div class="t-info">Sube con cada unidad</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">⏳ La hora</div><div class="t-info">El más caro y el no apuntado</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">📈 Margen</div><div class="t-info">Lo que queda por unidad</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">⚖️ Equilibrio</div><div class="t-info">Cuántas para no perder</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">✉️ Sobres</div><div class="t-info">Repartir antes de gastar</div></div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 La calculadora del costo real</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para saber cuánto cuesta de verdad lo que hoy se regala.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Los costos fijos</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🧮 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="fijos" onclick="labShowParte('fijos')">🏠 Costos fijos</button>
+        <button class="lab-btn lab-cont-btn" data-parte="variables" onclick="labShowParte('variables')">📄 Costos variables</button>
+        <button class="lab-btn lab-cont-btn" data-parte="hora" onclick="labShowParte('hora')">⏳ El costo de la hora</button>
+        <button class="lab-btn lab-cont-btn" data-parte="equilibrio" onclick="labShowParte('equilibrio')">⚖️ El punto de equilibrio</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se calcula</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se esconde</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 Los números de M.E.T.A.S</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se arma un presupuesto</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del presupuesto se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 El sobre del mes: ¿de dónde sale?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿De qué sobre del mes sale este gasto?</p>
+    <div class="neuro-trans-display" id="neuroTrans">El dominio metas.policastsapien.com</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Cuentas que salieron mal: ¿qué faltó contar?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué faltó en la cuenta:</p>
+    <div class="neuro-trans-display" id="enferDisease">El taller dejó 2.400 lempiras y quedó la sensación de haber perdido</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada gasto lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">Fijo</button>
+        <button class="btn btn-sec" onclick="">Variable</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🧮 La cuenta sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · El presupuesto real · Ruta del Poder</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: el presupuesto real</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La cuenta sobre la mesa · El presupuesto real</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🧮 La cuenta sobre la mesa: qué cuesta de verdad</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una oferta o una petición con números. Di qué costos faltan en la cuenta, cuál es el costo por unidad de verdad y cuántas unidades hacen falta para no perder (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🧾</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧾 Casos del proyecto: las cuentas de M.E.T.A.S</h2>
+    <p>Ocho cuentas que este proyecto tiene que saber hacer. En cada una: qué costos se ven, cuáles no, y cuántas unidades hacen falta para que la cosa no salga del bolsillo de la casa.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Aviso sobre los números:</strong> las cifras en lempiras son <strong>realistas pero inventadas</strong>, puestas para que la cuenta se pueda hacer a lápiz. Los precios de verdad se confirman antes de usarlos en una decisión. Lo que sí es real es el método, y ese no cambia con los precios.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🏫 Caso 1: cobrar 150 lempiras al mes por aula</h2>
+    <p>Se propone una cuota mensual por aula. Los fijos del mes son unos 750 lempiras: dominio, datos del teléfono y una reserva para impresión.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚖️ El punto de equilibrio</span><br>
+      <span>750 entre 150 son <span class="hl">cinco aulas</span> solo para cubrir los fijos. Pero si además se quiere pagar una hora de trabajo a 100 lempiras, y el acompañamiento come cuatro horas al mes, hacen falta <span class="hl2">nueve aulas</span>, no cinco.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> el número que importa no es el precio, es <strong>cuántas</strong>. Y ese número cambia por completo en cuanto la hora deja de valer cero. Antes de anunciar una cuota hay que saber a partir de qué aula deja de ser trabajo regalado.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🖨️ Caso 2: la impresora de 4.500 lempiras</h2>
+    <p>Comprarla ahorraría unos 2 lempiras por ficha frente a mandarlas a imprimir fuera.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧮 En cuántas se paga sola</span><br>
+      <span>4.500 entre 2 son <span class="hl">2.250 fichas</span>. A cuarenta fichas al mes son casi cinco años. La pregunta no es si ahorra: es <span class="hl2">si el proyecto va a seguir vivo</span> el tiempo que tarda en pagarse.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> una inversión no se juzga por lo que ahorra por unidad, sino por el <strong>tiempo que tarda en devolverse</strong> comparado con la vida esperada del proyecto. Y hay un costo que no aparece: la tinta y el mantenimiento, que son variables y siguen corriendo.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📄 Caso 3: cuánto cuesta de verdad una ficha impresa</h2>
+    <p>La cuenta rápida dice «papel y tinta, dos lempiras». La cuenta completa dice otra cosa.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔎 Lo que no se apunta</span><br>
+      <span>Diez páginas de papel y tinta, más <span class="hl">las hojas que salen mal</span>, más el viaje si se imprime fuera, más los veinte minutos de revisión final. A 100 lempiras la hora, esos veinte minutos son <span class="hl2">33 lempiras</span>, y son el gasto más grande de la ficha.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> en un proyecto hecho a mano, <strong>el costo dominante casi siempre es el tiempo</strong>. Por eso automatizar la revisión vale más que ahorrar en papel, y por eso las herramientas de <code>_dev/</code> son una decisión económica, no solo técnica.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎓 Caso 4: el taller presencial a 800 lempiras por maestro</h2>
+    <p>Ocho maestros, un sábado. Entran 6.400 lempiras. Se gastan 900 en pasajes, refrigerio y copias.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⏳ Dónde está el hueco</span><br>
+      <span>Quedan 5.500 y parece excelente, hasta contar las horas: <span class="hl">seis del taller y ocho de preparar</span>. Catorce horas a 100 son 1.400, así que el margen real es 4.100. Sigue siendo bueno, pero <span class="hl2">es la mitad de lo que parecía</span>.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> los talleres son el ingreso más rápido y el que peor escala, porque se pagan con horas que no se pueden repetir. Sirven para financiar lo que sí escala, y no al revés.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📱 Caso 5: la aplicación gratis con anuncios</h2>
+    <p>Se propone poner anuncios en el APK para sacar unos ingresos sin cobrarle a nadie.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">💸 Cuánto entra de verdad</span><br>
+      <span>Con el tráfico de hoy, la publicidad daría unas <span class="hl">decenas de lempiras al mes</span>: no cubre ni el dominio. Y el costo no es monetario: es la maestra que abre la ficha y ve un anuncio <span class="hl2">encima del material de su clase</span>.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> antes de aceptar un ingreso hay que calcular <strong>cuánto es en realidad</strong>. Muchos ingresos que suenan bien no llegan ni al punto de equilibrio, y aun así cobran un precio en confianza que sí es grande. Esto se cruza con la etapa 1 de la Ruta de la Marca.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>☁️ Caso 6: el hospedaje que hoy es gratis</h2>
+    <p>El sitio y la base de datos están en planes gratuitos. Hoy el fijo de infraestructura es casi cero.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🕰️ El fijo que todavía no llegó</span><br>
+      <span>Gratis no es un precio: es <span class="hl">un precio aplazado</span>. Si algún día hay que pagar hospedaje y base de datos, el fijo mensual sube y el punto de equilibrio sube con él, <span class="hl2">de golpe y sin aviso</span>.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> en el presupuesto se anota lo que hoy es gratis con su <strong>precio de mercado entre paréntesis</strong>. Así, el día que llegue la factura, ya se sabía cuántas aulas hacían falta y no hay que decidir con prisa.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🤝 Caso 7: los 8.000 lempiras del patrocinador</h2>
+    <p>Un negocio ofrece 8.000 lempiras por su logo en las fichas del año.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧾 ¿Ingreso o compromiso?</span><br>
+      <span>Ocho mil suenan a mucho hasta preguntarse <span class="hl">qué obliga a hacer</span>: si implica rediseñar portadas, mandar reportes y atender reuniones, son quizá quince horas. A 100 la hora, el ingreso real baja a 6.500, <span class="hl2">y llega una sola vez</span>.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> todo ingreso trae un costo escondido en horas. La pregunta correcta no es «¿cuánto me dan?», es <strong>«¿cuánto me queda por hora invertida?»</strong>, y con eso se comparan ofertas que parecían muy distintas.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>⏳ Caso 8: la hora que no se cobra a nadie</h2>
+    <p>El proyecto lleva cientos de horas y ninguna aparece en ninguna cuenta.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🪙 El gasto más grande y el único invisible</span><br>
+      <span>Si la hora vale cero, <span class="hl">todo parece rentable</span> y ninguna decisión se puede comparar. Ponerle precio no significa cobrarla: significa <span class="hl2">poder decidir entre dos usos</span> de la misma tarde.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> el número de la hora se elige una vez y se usa siempre, aunque nadie lo pague. Con él, «hacer treinta fichas a mano» y «pasar la tarde automatizándolas» dejan de ser gustos y pasan a ser una comparación con resultado.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La planilla del costo real, y las cinco reglas</h2>
+    <p>Toda cuenta de este proyecto se arma con las mismas seis líneas:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Fijos del mes:</strong> lo que se paga aunque nadie use nada, con lo gratis anotado a precio de mercado.</li>
+      <li><strong>Variables por unidad:</strong> materiales, traslado y lo que salió mal.</li>
+      <li><strong>Horas por unidad</strong> multiplicadas por el precio de la hora.</li>
+      <li><strong>Costo por unidad</strong> = variables más horas.</li>
+      <li><strong>Margen</strong> = precio menos costo por unidad.</li>
+      <li><strong>Punto de equilibrio</strong> = fijos entre margen.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas del presupuesto</span><br>
+      <span>1. La hora <span class="hl">siempre tiene precio</span>, aunque no se cobre. 2. Lo gratis se anota <span class="hl">con su precio entre paréntesis</span>. 3. Antes de regalar algo se sabe cuánto cuesta una unidad. 4. El dinero se reparte en sobres <span class="hl">el día que entra</span>. 5. De los fijos <span class="hl2">no se saca nunca</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas del presupuesto</strong>, la planilla del costo real, el presupuesto de doce meses en blanco, el reparto en sobres, las ocho cuentas de M.E.T.A.S, seis ejercicios con números para hacer a lápiz y la pauta completa.</p>
+      <a href="../../fichas/ficha-poder-presupuesto.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con el presupuesto real de M.E.T.A.S escrito y con una cifra medida, no estimada.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../index.html">💵 Finanzas</a>: el módulo de F.A.R.O es el sitio donde viven estos números. Los fijos del mes se cargan una vez y dejan de discutirse.</li>
+      <li><a href="../../index.html">⚡ Destellos</a>: apunta las horas que se van en cada cosa durante dos semanas. Sin ese registro, el precio de la hora es una opinión.</li>
+      <li><a href="../../misiones/ruta-poder-activos-pasivos/activos-pasivos.html">💰 Activos y Pasivos</a>: la etapa 1 de esta misma ruta. Allá se decide si una cosa mete o saca dinero; aquí se le pone el número.</li>
+      <li><a href="../../misiones/ruta-marca-audiencia-promesa/audiencia-promesa.html">📈 Para quién y qué le cambia</a>: el caso 5 se ve igual desde la marca. Un ingreso que cuesta confianza casi nunca sale a cuenta.</li>
+      <li><a href="../../fichas/ficha-poder-presupuesto.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la planilla del costo real y el presupuesto de doce meses caben en una página cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> elegir <strong>un precio para la hora</strong> y no volver a discutirlo, medir cuánto cuesta de verdad una ficha con cronómetro, y llenar el presupuesto de doce meses marcando la primera cifra que hoy no se conoce con certeza. La prueba de que está aprendido es poder decir de memoria <strong>cuántas aulas hacen falta para que el mes no salga del bolsillo de la casa</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🧾</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta del Poder · Etapa 2: El presupuesto real</div>
+    <div class="diploma-mascot" aria-hidden="true">🧾</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🧾</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Si no sabes lo que te cuesta una unidad, no puedes regalarla ni venderla» 🌱 · 💰 Ruta del Poder · Etapa 2 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/presupuesto.js"></script>
+</body>
+</html>

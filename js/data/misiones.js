@@ -37,6 +37,7 @@ const MISSIONS = [
      material de la casa. No salen al sitio público ni a la revista. */
   { id: 7, title: 'Sesgos: los atajos que deciden por ti', modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 45, icon: '🪞', ruta: 'persuasion', etapa: 2, sello: 'familiar', url: 'misiones/ruta-persuasion-sesgos/sesgos.html' },
   { id: 8, title: 'Para quién y qué le cambia: audiencia y promesa antes que el logo', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 40, icon: '🎯', ruta: 'marca', etapa: 1, sello: 'familiar', url: 'misiones/ruta-marca-audiencia-promesa/audiencia-promesa.html' },
+  { id: 9, title: 'El presupuesto real: a dónde se va el dinero (y la hora)', modulo: 'aprendizaje-unido', materia: 'eco', color: 'apr', xp: 45, icon: '🧾', ruta: 'poder', etapa: 2, sello: 'familiar', url: 'misiones/ruta-poder-presupuesto/presupuesto.html' },
   { id: 10, title: 'Quién decide de verdad: el mapa del poder que toca a M.E.T.A.S', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '🏛️', ruta: 'politico', etapa: 1, sello: 'familiar', url: 'misiones/ruta-politica-mapa-poder/mapa-poder.html' },
   { id: 11, title: 'La máquina que predice: qué es y qué no es un modelo de lenguaje', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🤖', ruta: 'maquina', etapa: 1, sello: 'familiar', url: 'misiones/ruta-maquina-que-predice/maquina-predice.html' },
   { id: 12, title: 'La puerta de la casa digital: quién entra y con qué llave', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🔐', ruta: 'casacerrada', etapa: 1, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-la-puerta/la-puerta.html' },
@@ -89,7 +90,6 @@ const ETAPAS_PREVISTAS = {
     6: 'El engaño: phishing e ingeniería social en la familia',
   },
   poder: {
-    2: 'El presupuesto real: a dónde se va el dinero',
     3: 'La deuda por dentro: interés, plazo y costo total',
     4: 'Del salario al activo: ingresos que no dependen de tus horas',
     5: 'Poder local: municipio, patronato y presupuesto público',
