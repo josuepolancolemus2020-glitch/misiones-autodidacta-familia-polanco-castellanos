@@ -94,7 +94,7 @@ window.addEventListener('load', async () => {
     ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
     ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
     ok(/Auditoría de la casa/.test(txt), 'la ficha trae la auditoría para llenar a lápiz', 'la ficha no trae la auditoría');
-    ok(/Pauta de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
     const rec = d.querySelector('#s-recursos a[href*="ficha-casa-cerrada"]');
     ok(!!rec, 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
 

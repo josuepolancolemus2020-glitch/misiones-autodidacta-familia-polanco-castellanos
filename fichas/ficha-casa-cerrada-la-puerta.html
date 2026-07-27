@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Ruta de la Casa Cerrada · Etapa 1: La puerta de la casa digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #334155; --pri-suave: #f1f5f9; --sec: #b91c1c; --sec-suave: #fef2f2; }
+  table.piezas td { height: 26px; }
+  .guion li { margin: 5px 0; }
+  table.tres th:nth-child(1) { width: 26%; }
+  table.tres th:nth-child(2), table.tres th:nth-child(3) { width: 25%; }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .caso .fuente { font-size: 11.5px; color: var(--gris); margin-top: 6px; }
+  .mini { font-size: 12px; color: var(--gris); }
+  .mapa li { margin: 3px 0; }
+  table.audit td:nth-child(1) { width: 6%; text-align: center; }
+  table.audit td:nth-child(3), table.audit td:nth-child(4) { width: 9%; text-align: center; height: 26px; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/ruta-casa-cerrada-la-puerta/la-puerta.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · La puerta de la casa digital</div>
+    <div class="f-meta"><b>Ruta:</b> 🔐 Ruta de la Casa Cerrada · Etapa 1 de 6 · <b>Materia:</b> Ciberseguridad</div>
+    <div class="f-meta"><b>Tema:</b> quién entra y con qué llave. Las siete piezas de la puerta (identificación, autenticación, autorización, huella y sal, límite de intentos, validación, copia y registro), los tres daños posibles y la auditoría de la propia casa.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Separar sin dudar las tres palabras que casi nadie separa: <strong>identificación</strong>, <strong>autenticación</strong> y <strong>autorización</strong>.</li>
+    <li>Explicar por qué una contraseña se guarda como <strong>huella con sal</strong> y nunca como texto.</li>
+    <li>Distinguir los tres daños: que algo <strong>se filtre</strong>, que <strong>se pierda</strong> o que <strong>se altere</strong>, y saber qué pieza protege de cada uno.</li>
+    <li>Aplicar el <strong>menor privilegio</strong> y la regla <strong>3-2-1</strong> de copias en un caso concreto.</li>
+    <li>Reconocer el <strong>engaño a la persona</strong> (phishing) y responder sin prisa.</li>
+    <li>Auditar F.A.R.O y M.E.T.A.S con las diez preguntas de la página 7 y dejar por escrito las <strong>cinco reglas de la casa</strong>, cada una con su responsable.</li>
+  </ol>
+
+  <h2>🧭 Por qué esta casa ya tiene algo que perder</h2>
+  <p>Hace dos años, todo lo que esta familia tenía en la computadora se podía perder sin que doliera demasiado: archivos que se volvían a hacer. Hoy no. Hoy hay un chat familiar con conversaciones de meses, un registro de finanzas con lo que entra y lo que sale, un inventario de la casa, los hábitos de cada quien, los destellos que se capturan al vuelo y el progreso de estudio de dos menores de edad, con su nombre. Todo eso vive en una nube que se abre con una dirección y una clave.</p>
+  <p>Seguridad, entonces, ya no es un tema de películas ni de empresas grandes. Es una pregunta doméstica y muy concreta: <b>¿quién puede entrar a esto, qué puede hacer adentro y qué pasa el día que algo falle?</b> Las tres partes de la pregunta importan por igual, y la tercera es la que más se olvida, porque no hay ningún villano en ella: hay un teléfono que se cayó al agua.</p>
+  <p>Conviene decirlo de una vez, sin dramatismo: <b>ninguna casa está cerrada del todo</b>. Siempre se puede entrar con suficiente tiempo, dinero o suerte. Lo que se busca no es la puerta perfecta, es que entrar cueste mucho más de lo que vale lo que hay adentro, y que el día que alguien entre, se sepa qué se llevó y se pueda recuperar. Eso es todo. Quien te prometa seguridad absoluta te está vendiendo algo.</p>
+
+  <h2>🔤 Las tres palabras que casi nadie separa</h2>
+  <p>Casi todos los desastres caseros salen de confundir estas tres. Se parecen, empiezan igual y significan cosas distintas:</p>
+  <table>
+    <tr><th style="width:24%">Palabra</th><th style="width:38%">Qué es</th><th>Ejemplo en la casa</th></tr>
+    <tr><td><b>Identificación</b></td><td>Quién <b>dices</b> que eres. No prueba nada: cualquiera puede escribir el correo de otro.</td><td>Tocar el chip con tu nombre al abrir F.A.R.O.</td></tr>
+    <tr><td><b>Autenticación</b></td><td>Cómo <b>pruebas</b> que eres tú: algo que sabes (clave), algo que tienes (el teléfono) o algo que eres (la huella).</td><td>Escribir la clave, o el código que llega al teléfono.</td></tr>
+    <tr><td><b>Autorización</b></td><td>Qué te <b>dejan hacer</b> una vez adentro: leer, escribir, borrar, y sobre qué cosas.</td><td>Que Jael pueda ver sus misiones pero no las finanzas ni los destellos de su mamá.</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 1 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>🧱 Las piezas 1 a 3, por dentro</h2>
+
+  
+
+    <h3>🪪 1. Identificación</h3>
+  <p><b>El mecanismo:</b> es solo un nombre. Sirve para saber de quién es cada dato y para poder decir después «esto lo hizo tal persona». Por sí sola no protege absolutamente nada, y confundirla con seguridad es el primer error clásico: un correo se escribe, un nombre se elige, un número de identidad se copia.</p>
+  <table class="tres">
+    <tr><th>Cómo se ve</th><th>Qué aporta</th><th>Qué NO aporta</th></tr>
+    <tr><td>«Soy Josué, este es mi correo.»</td><td>Poder separar los datos por persona y llevar registro de quién hizo qué.</td><td>Ninguna prueba. Cualquiera puede escribir ese mismo correo.</td></tr>
+  </table>
+  <p class="mini"><b>En el proyecto:</b> los chips de miembro en F.A.R.O son identificación pura. Elegir «Evelyn» no prueba que seas Evelyn; solo dice de quién son los datos que se van a mostrar.</p>
+
+  <h3>🔑 2. Autenticación</h3>
+  <p><b>El mecanismo:</b> pedir una prueba que solo el dueño puede dar. Se apoya en tres factores, y mezclar dos distintos es lo que de verdad cierra la puerta: <b>algo que sabes</b> (la clave), <b>algo que tienes</b> (el teléfono donde llega el código) y <b>algo que eres</b> (la huella o la cara). Dos claves distintas siguen siendo un solo factor; una clave más un código al teléfono son dos.</p>
+  <table class="tres">
+    <tr><th>Factor</th><th>Ventaja</th><th>Debilidad</th></tr>
+    <tr><td>Algo que sabes: la clave.</td><td>Gratis, no depende de ningún aparato.</td><td>Se olvida, se repite en varios sitios y se puede pedir con engaños.</td></tr>
+    <tr><td>Algo que tienes: el código al teléfono.</td><td>Aunque roben la clave, sin el teléfono no entran.</td><td>Se pierde el teléfono, y el número se puede robar en la compañía telefónica.</td></tr>
+    <tr><td>Algo que eres: la huella digital.</td><td>Rápido y cómodo, no se olvida.</td><td>No se puede cambiar: una huella filtrada lo está para siempre.</td></tr>
+  </table>
+  <p class="mini"><b>En el proyecto:</b> hoy la aplicación familiar tiene un acceso compartido. Quien tenga la dirección y esa clave entra como cualquiera de los cuatro, y no queda rastro de quién fue.</p>
+
+  <h3>🚦 3. Autorización</h3>
+  <p><b>El mecanismo:</b> una vez adentro, el sistema decide para cada acción si la permite o no. La regla que la gobierna se llama <b>menor privilegio</b>: cada quien puede hacer solo lo que necesita, y nada más. No es desconfianza, es reducir el tamaño del accidente. Si una cuenta nunca necesitó borrar, que no pueda borrar; así, el día que alguien se equivoque o entre con esa cuenta, el daño posible ya está acotado.</p>
+  <table class="tres">
+    <tr><th>Pregunta que responde</th><th>Bien puesta</th><th>Mal puesta</th></tr>
+    <tr><td>¿Qué filas puede ver?</td><td>Cada miembro ve las suyas; los padres ven además las de las hijas.</td><td>Todos ven todo porque «es familia».</td></tr>
+    <tr><td>¿Qué puede borrar?</td><td>Solo lo propio, y el borrado deja rastro.</td><td>Cualquiera borra cualquier fila y no queda registro.</td></tr>
+  </table>
+  <p class="mini"><b>En el proyecto:</b> en la nube esto se llama seguridad por fila, y hoy está apagada a propósito para simplificar el desarrollo. Es la deuda más grande de la casa y la más barata de pagar.</p>
+
+  <div class="caja">
+    <strong>La frase para memorizar:</strong> entrar a la casa <b>no es</b> entrar a todos los cuartos. Un sistema puede autenticar perfecto y no autorizar nada, y entonces cualquiera que entre lo puede todo. Es exactamente el estado de F.A.R.O hoy, y por eso esta etapa se estudia con la casa en la mano.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h2>🧱 Las piezas 4 y 5, por dentro</h2>
+
+  
+
+    <h3>🧮 4. La huella y la sal</h3>
+  <p><b>El mecanismo:</b> el sistema nunca guarda tu contraseña. Guarda una <b>huella</b>: un resultado que se calcula a partir de la clave y del que <b>no se puede volver atrás</b>. Cuando entras, se calcula otra vez la huella de lo que escribiste y se comparan las dos huellas. Si coinciden, eres tú. Así, ni el dueño del sistema puede leer tu clave, y una tabla robada no entrega ninguna.</p>
+  <p>La <b>sal</b> es un texto al azar, distinto para cada usuario, que se mezcla con la clave antes de calcular la huella. Sin sal, dos personas que eligieron «123456» guardan exactamente la misma huella, y entonces basta con una tabla publicada de huellas comunes para reventarlas todas de golpe. Con sal, las dos huellas son distintas y hay que atacar cada cuenta por separado, que es justo lo que se busca: encarecer el trabajo del atacante.</p>
+  <table>
+    <tr><th style="width:34%">Cómo se guarda</th><th>Qué pasa si roban la tabla</th></tr>
+    <tr><td>La clave tal como se escribió.</td><td>Se entregan todas las claves de una vez. Y como la gente las repite, también se abren sus correos y sus redes.</td></tr>
+    <tr><td>Huella sin sal.</td><td>Las claves comunes caen en segundos con tablas ya publicadas. Las raras aguantan.</td></tr>
+    <tr><td>Huella con sal y algoritmo lento.</td><td>Cada cuenta hay que atacarla aparte y cada intento cuesta tiempo. Las claves largas se vuelven inalcanzables.</td></tr>
+  </table>
+  <p class="mini"><b>Detalle que importa:</b> para claves se usan algoritmos <b>a propósito lentos</b>. Suena absurdo hasta que se piensa del otro lado: al dueño le cuesta un cuarto de segundo entrar, y al atacante le multiplica por millones el costo de probar.</p>
+
+  <h3>⏱️ 5. El límite de intentos</h3>
+  <p><b>El mecanismo:</b> una persona que no recuerda su clave prueba tres o cuatro veces y se rinde. Un programa prueba cientos por minuto, toda la noche, sin cansarse y sin aburrirse. Esa es la asimetría que hay que romper, y se rompe con algo muy simple: después de varios fallos, el sistema <b>espera</b>, y la espera <b>crece</b>.</p>
+  <table>
+    <tr><th style="width:30%">Fallos seguidos</th><th>Respuesta razonable</th></tr>
+    <tr><td>1 a 4</td><td>Nada. Equivocarse es normal.</td></tr>
+    <tr><td>5</td><td>Unos segundos de espera antes del siguiente intento.</td></tr>
+    <tr><td>10</td><td>Minutos de espera, y aviso al dueño de la cuenta.</td></tr>
+    <tr><td>Muchos, desde un mismo origen</td><td>Bloqueo temporal de ese origen, nunca de la cuenta.</td></tr>
+  </table>
+  <p><b>El detalle que casi todos hacen mal:</b> bloquear <b>la cuenta</b> tras varios fallos parece prudente y es un regalo para el atacante: con solo fallar a propósito deja fuera al dueño legítimo. Se limita el <b>intento</b>, no la persona.</p>
+  <p class="mini"><b>La cuenta que conviene hacer una vez en la vida:</b> con espera creciente, un ataque que probaba quinientas claves por minuto pasa a probar unas pocas por hora. Lo que le tomaba una noche le toma años, y ahí deja de valer la pena. La defensa no fue hacerlo imposible: fue hacerlo aburrido y caro.</p>
+
+  <div class="caja">
+    <strong>Las tres primeras, en una frase:</strong> la identificación <b>nombra</b>, la autenticación <b>prueba</b> y la autorización <b>limita</b>. Fíjate en que solo la tercera reduce el daño cuando algo ya salió mal: las otras dos intentan que no pase, la tercera acepta que a veces pasa. Por eso, si hubiera que arreglar una sola pieza en esta casa, sería esta.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 3 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <h2>🧱 Las piezas 6 y 7, y los tres daños</h2>
+
+  
+
+    <h3>🧪 6. Validar lo que entra</h3>
+  <p><b>El mecanismo:</b> todo lo que llega de afuera se revisa <b>en el servidor</b>: el largo, el tipo, la forma, los valores posibles. La revisión que hace la pantalla es comodidad para el usuario, no protección: cualquiera puede mandar datos directo al servidor sin pasar por el formulario. La regla, dicha en corto: <b>nunca confíes en lo que llega</b>, ni siquiera de tu propia aplicación.</p>
+  <table>
+    <tr><th style="width:38%">Qué se revisa</th><th>Qué evita</th></tr>
+    <tr><td>Largo máximo del texto.</td><td>Que alguien mande un millón de letras y llene la base de datos.</td></tr>
+    <tr><td>Tipo y forma (fecha, número, correo).</td><td>Datos basura que rompen las cuentas y los listados después.</td></tr>
+    <tr><td>Que el que escribe sea el dueño de la fila.</td><td>Que un miembro escriba en el espacio de otro.</td></tr>
+    <tr><td>Cantidad de escrituras por minuto.</td><td>Las cuatro mil filas de basura un lunes por la mañana.</td></tr>
+  </table>
+
+  <h3>💾 7. La copia y el registro</h3>
+  <p><b>El mecanismo:</b> las seis piezas anteriores intentan que no pase nada malo. Estas dos aceptan que va a pasar. La <b>copia</b> permite volver atrás; el <b>registro</b> permite saber qué ocurrió y desde cuándo. Sin registro, después de un susto hay que asumir lo peor de todo, que es la posición más cara.</p>
+  <p>La regla de las copias se llama <b>3-2-1</b>: tres copias de lo que dolería perder, en dos lugares distintos, y una fuera de la casa. Y una advertencia que se aprende siempre tarde: <b>una copia que nunca se restauró no es una copia</b>, es una esperanza. Hay que probarla una vez al año, con calma, no el día del desastre.</p>
+
+  <h3>⚖️ Los tres daños posibles</h3>
+  <table>
+    <tr><th style="width:22%">Daño</th><th style="width:34%">Qué significa</th><th>Qué pieza protege</th></tr>
+    <tr><td><b>Se filtra</b><br>(confidencialidad)</td><td>Lo ve quien no debía. No se puede deshacer: lo que salió, salió.</td><td>Autenticación, autorización, huella con sal.</td></tr>
+    <tr><td><b>Se pierde</b><br>(disponibilidad)</td><td>Ya no está cuando se necesita. Es el más frecuente y el que menos se previene.</td><td>Copias 3-2-1 y prueba de recuperación.</td></tr>
+    <tr><td><b>Se altera</b><br>(integridad)</td><td>Alguien lo cambió sin permiso. Es el más silencioso: un saldo cambiado no avisa.</td><td>Autorización, registro de cambios, validación.</td></tr>
+  </table>
+  <div class="caja">
+    <strong>Ejercicio mental de treinta segundos, para hacerlo hoy:</strong> piensa en el dato de esta casa que más dolería perder. ¿Duele porque se vería (se filtra), porque desaparecería (se pierde) o porque alguien podría cambiarlo sin que nadie lo note (se altera)? La respuesta te dice cuál de las siete piezas te toca arreglar primero. Casi siempre, en una familia, la respuesta es <b>se pierde</b>, y casi siempre la gente se pone a estudiar contraseñas.
+  </div>
+
+  <div class="caja">
+    <strong>Cómo se combinan estas dos:</strong> la huella con sal protege lo que ya está guardado (si roban la tabla) y el límite protege la puerta (mientras alguien la golpea). Son daños distintos y por eso hacen falta las dos. Una casa con excelente caja fuerte y la puerta abierta sigue siendo una casa abierta.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <h2>🔬 Casos de estudio reales I: lo que ya pasó</h2>
+  <p>Cuatro casos documentados públicamente. No se estudian para asustarse, sino porque cada uno enseña exactamente una de las piezas, y porque a todos les pasó por algo que parecía menor el día que se decidió.</p>
+
+  <div class="caso">
+    <h3>1. RockYou, 2009 · las claves guardadas tal como se escribieron</h3>
+    <p>Una empresa de aplicaciones para redes sociales guardaba las contraseñas de sus usuarios en texto legible. Cuando entraron a su base de datos, se publicaron unos <b>32 millones de contraseñas reales</b>, con su usuario. Esa lista sigue usándose hoy: es la base de los diccionarios con los que se prueban claves comunes.</p>
+    <p><b>Lo que enseña:</b> el daño no terminó en esa empresa. Como la gente repite claves, esa lista abrió cuentas en otros sitios durante años, y todavía sirve para adivinar las de quien elige «te amo123». Guardar en texto no fue un descuido técnico: fue decidir no gastar en la huella.</p>
+    <p class="fuente">Fuente: filtración pública de diciembre de 2009, ampliamente documentada y todavía usada como diccionario de pruebas.</p>
+  </div>
+
+  <div class="caso">
+    <h3>2. LinkedIn, 2012 · huella sin sal</h3>
+    <p>Se publicaron millones de huellas de contraseñas de esa red. Estaban calculadas con un algoritmo rápido y <b>sin sal</b>, así que buena parte se descifró en poco tiempo comparando contra listas ya conocidas. Años después apareció que el robo había sido mucho mayor de lo que se creyó al principio.</p>
+    <p><b>Lo que enseña:</b> guardar huellas no basta si se hace mal. Sin sal, las claves comunes caen enseguida; con un algoritmo rápido, hasta las medianas. Y una segunda lección incómoda: al principio se supo solo una parte, porque casi nunca se sabe el tamaño real de una filtración el primer día.</p>
+    <p class="fuente">Fuente: filtración de junio de 2012 y su ampliación conocida en 2016, reconocidas públicamente por la empresa.</p>
+  </div>
+
+  <div class="caso">
+    <h3>3. Mirai, 2016 · las claves de fábrica</h3>
+    <p>Un programa recorrió internet probando en cámaras y enrutadores domésticos las <b>claves que traen de fábrica</b>, esas que nadie cambia. Con los cientos de miles de aparatos que fue tomando armó una red que tumbó servicios grandes durante horas. Ninguno de esos aparatos fue «pirateado» en el sentido de película: se entró con la llave que venía en el manual.</p>
+    <p><b>Lo que enseña:</b> el ataque más rentable no es el más ingenioso, es el que se puede repetir un millón de veces sin costo. Y que un aparato de la casa puede ser usado contra terceros sin que el dueño note nada.</p>
+    <p class="fuente">Fuente: ataques de octubre de 2016 y análisis públicos posteriores del código, que se publicó.</p>
+  </div>
+
+  <div class="caso">
+    <h3>4. Contraseñas en los registros internos, 2019 · el error silencioso</h3>
+    <p>Una empresa muy grande anunció ella misma que, por un fallo en cómo escribía sus registros internos, había guardado <b>cientos de millones de contraseñas en texto legible</b> dentro de sus propios sistemas, accesibles para miles de empleados. Nadie las robó desde afuera: el problema estuvo adentro y durante años.</p>
+    <p><b>Lo que enseña:</b> no basta con hashear al guardar; hay que cuidar por dónde pasa el dato antes. Y enseña algo bueno: la empresa lo publicó y forzó el cambio de claves. Reconocer temprano es parte de la defensa.</p>
+    <p class="fuente">Fuente: aviso público de la propia compañía, marzo de 2019.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <h2>🏠 Casos de estudio II: la calle y esta casa</h2>
+
+  <div class="caso">
+    <h3>5. El mensaje que parece de la casa</h3>
+    <p>Llega un mensaje, a veces desde el número de un conocido al que ya le tomaron la cuenta: «se me trabó la aplicación, mandame tu clave y lo reviso, es rapidito». O un correo con el logo perfecto: «su cuenta será cerrada hoy, confirme aquí». Prisa, autoridad y un enlace.</p>
+    <p><b>Lo que enseña:</b> aquí no falla ningún programa; falla la confianza, que es la puerta más barata de abrir. Es persuasión pura, la misma escasez de la etapa 1 de la Ruta de la Persuasión, y la defensa es la misma: no se decide en caliente. Regla de la casa: <b>nadie de soporte pide claves, nunca</b>, y ante cualquier mensaje con prisa se pregunta en el chat familiar antes de tocar nada.</p>
+  </div>
+
+  <div class="caso">
+    <h3>6. El archivo de instalación que circula por mensaje</h3>
+    <p>El APK de la aplicación se comparte por WhatsApp para que un maestro lo pruebe. Adentro va la clave con la que el programa habla con la nube. Todo lo que viaja dentro de una aplicación se puede abrir y leer con herramientas comunes.</p>
+    <p><b>Lo que enseña:</b> hay que separar <b>la clave pública</b> (puede viajar, porque sola no autoriza nada si las reglas por fila están puestas) de <b>la clave de administración</b> (se salta todas las reglas, y por eso nunca sale del servidor ni entra al repositorio). Y si una se filtró: se cambia primero y se explica después.</p>
+  </div>
+
+  <div class="caso">
+    <h3>7. El teléfono que se pierde con la sesión abierta</h3>
+    <p>Se cae al agua, se olvida en una feria escolar o se lo roban. Adentro: la aplicación abierta, el chat, las finanzas y las fotos de las fichas del mes.</p>
+    <p><b>Lo que enseña:</b> es el caso más probable de todos y no tiene villano. Se defiende con tres cosas aburridas: bloqueo de pantalla en el teléfono, sesión que se cierra sola tras un tiempo, y copia 3-2-1 de lo que dolería perder. La primera hora importa: cerrar sesión desde otro aparato, cambiar la clave y avisar en la casa.</p>
+  </div>
+
+  <div class="caso">
+    <h3>8. La escuela que pide guardar notas de menores</h3>
+    <p>Un centro propone que M.E.T.A.S guarde nombres, grados y notas de sus alumnos, y que los maestros entren con <b>una sola cuenta compartida por grado</b>.</p>
+    <p><b>Lo que enseña:</b> son datos de menores ajenos, y quien los guarda responde si se filtran. La condición para aceptar: permiso firmado de los padres, solo los datos mínimos (sin dirección ni teléfono), una cuenta por maestro y no por grado, borrado al terminar el año y por escrito quién responde. Menos datos guardados es menos daño posible: la mejor forma de proteger un dato es <b>no tenerlo</b>.</p>
+  </div>
+
+  <p class="mini"><b>La cuenta que conviene tener a mano:</b> de los ocho casos de estas dos páginas, siete se prevenían con algo que no cuesta dinero: una línea de mensaje, una regla por tabla, una espera que crece, una cuenta por persona, una copia al mes y una conversación de familia. El octavo, el de la escuela, se previene con una hoja firmada. Ninguno necesitaba comprar nada.</p>
+
+  <div class="caja">
+    <strong>Lo que tienen en común los ocho casos:</strong> en ninguno hizo falta un genio. Hizo falta una pieza que faltaba, una prisa o una comodidad. Por eso esta etapa no termina en teoría: termina en la auditoría de la página siguiente y en cinco reglas escritas con nombre al lado.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h2>🔎 Auditoría de la casa: diez preguntas</h2>
+  <p>Se llena a lápiz, mirando la aplicación de verdad, no de memoria. Marca ✓ si está resuelto y ✗ si no. Lo que quede en ✗ se apunta en Destellos ese mismo día, con su proyecto.</p>
+  <table class="audit">
+    <tr><th>#</th><th>Pregunta</th><th>✓</th><th>✗</th></tr>
+    <tr><td>1</td><td>¿Cada miembro entra con su propia clave, distinta de la de los demás?</td><td></td><td></td></tr>
+    <tr><td>2</td><td>¿Esa clave es distinta de la del correo y de las redes?</td><td></td><td></td></tr>
+    <tr><td>3</td><td>¿El sistema responde lo mismo si el correo no existe que si la clave está mal?</td><td></td><td></td></tr>
+    <tr><td>4</td><td>¿Hay espera creciente después de varios intentos fallidos?</td><td></td><td></td></tr>
+    <tr><td>5</td><td>¿Cada quien puede ver y borrar solo sus propias filas (seguridad por fila)?</td><td></td><td></td></tr>
+    <tr><td>6</td><td>¿La clave de administración está fuera del código y del repositorio?</td><td></td><td></td></tr>
+    <tr><td>7</td><td>¿Se valida en el servidor el largo y el tipo de lo que llega de los formularios?</td><td></td><td></td></tr>
+    <tr><td>8</td><td>¿Hay copia de las tablas, con la regla 3-2-1, y se restauró alguna vez?</td><td></td><td></td></tr>
+    <tr><td>9</td><td>¿Queda registro de quién entró y de quién borró algo?</td><td></td><td></td></tr>
+    <tr><td>10</td><td>¿La familia sabe qué hacer con un mensaje que pide una clave con prisa?</td><td></td><td></td></tr>
+  </table>
+  <p class="mini">Resultado honesto: ______ de 10. Fecha de la auditoría: ______________. Próxima revisión: ______________.</p>
+
+  <h2>💾 El plan de copias de esta casa</h2>
+  <table>
+    <tr><th style="width:34%">Qué se copia</th><th style="width:22%">Cada cuánto</th><th>Dónde queda la copia de fuera</th></tr>
+    <tr><td>Tablas de la nube (chat, finanzas, inventario, destellos, hábitos)</td><td></td><td></td></tr>
+    <tr><td>Fichas y misiones (el repositorio)</td><td></td><td></td></tr>
+    <tr><td>Fotos y documentos de la familia</td><td></td><td></td></tr>
+    <tr><td>Claves y accesos (dónde están anotados y quién los tiene)</td><td></td><td></td></tr>
+  </table>
+  <p class="mini"><b>Prueba anual de recuperación:</b> fecha en que se restauró una copia completa y funcionó: ______________. Quien la hizo: ______________.</p>
+
+  <h2>🚨 Qué se hace en la primera hora</h2>
+  <p class="mini">Se llena antes de necesitarlo: el día del susto nadie piensa bien.</p>
+  <table>
+    <tr><th style="width:44%">Qué pasó</th><th>Los tres primeros pasos, en orden</th></tr>
+    <tr><td>Se perdió el teléfono con la sesión abierta.</td><td>1. Cerrar la sesión desde otro aparato. 2. Cambiar la clave. 3. Avisar en el chat familiar.</td></tr>
+    <tr><td>Se filtró una clave de servicio.</td><td>1. Cambiarla de inmediato. 2. Revisar el registro de lo que se tocó. 3. Sacarla del código y del historial.</td></tr>
+  </table>
+
+  <div class="caja">
+    <strong>Cómo se lee el resultado:</strong> un ✗ no es un fracaso, es una tarea con nombre. Lo grave no es tener huecos, es no saber cuáles son. Una casa auditada con seis ✗ escritos está mejor protegida que una casa con diez ✓ imaginarios.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 7 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
+<section class="pagina">
+  <h2>✍️ Ejercicios sin pantalla</h2>
+  <p class="mini">Se responden a lápiz. Las respuestas están en la pauta de la página 9, y no se miran antes.</p>
+
+  <h3>Ejercicio 1 · Las tres palabras</h3>
+  <p>Escribe al lado de cada situación si es identificación, autenticación o autorización:</p>
+  <ol class="lineas-4">
+    <li>Tocar el chip con tu nombre al abrir F.A.R.O: ______________________________</li>
+    <li>Escribir la clave familiar: ______________________________</li>
+    <li>Que Jael no pueda abrir la sección de finanzas: ______________________________</li>
+    <li>Que el sistema sepa de quién es cada destello: ______________________________</li>
+  </ol>
+
+  <h3>Ejercicio 2 · Huella y sal</h3>
+  <p>Dos personas eligen la misma clave. Explica en tres líneas qué se guarda en cada caso y por qué la sal cambia el resultado.</p>
+  <ol class="lineas-4"><li>_______________________________________________________________________</li>
+  <li>_______________________________________________________________________</li>
+  <li>_______________________________________________________________________</li></ol>
+
+  <h3>Ejercicio 3 · El daño que corresponde</h3>
+  <p>Marca si el caso es <b>se filtra</b>, <b>se pierde</b> o <b>se altera</b>:</p>
+  <ol class="lineas-4">
+    <li>El teléfono se cae al agua y no había copia: ______________________________</li>
+    <li>Publican el chat familiar en un grupo: ______________________________</li>
+    <li>Alguien cambia un saldo en la tabla de finanzas y nadie lo nota: ______________</li>
+    <li>Se cierra la cuenta de la nube por error de facturación: ______________________</li>
+  </ol>
+
+  <h3>Ejercicio 4 · Corrige el error</h3>
+  <p>Cada frase tiene un error. Escríbela corregida:</p>
+  <ol class="lineas-4">
+    <li>«La clave está escondida dentro de la aplicación, así que nadie la va a encontrar.»<br>__________________________________________________________________</li>
+    <li>«Tras cinco fallos bloqueamos la cuenta del usuario para protegerlo.»<br>__________________________________________________________________</li>
+    <li>«Ya validamos en la pantalla, el servidor puede confiar.»<br>__________________________________________________________________</li>
+    <li>«Tenemos copia: está en otra carpeta del mismo teléfono.»<br>__________________________________________________________________</li>
+  </ol>
+
+  <h3>Ejercicio 5 · El caso del proyecto</h3>
+  <p>Una escuela quiere que M.E.T.A.S guarde las notas de 180 menores, con una cuenta compartida por grado. Escribe las cuatro condiciones con las que aceptarías, y una razón para no aceptar si el centro no las firma.</p>
+  <ol class="lineas-4"><li>_______________________________________________________________________</li>
+  <li>_______________________________________________________________________</li>
+  <li>_______________________________________________________________________</li>
+  <li>_______________________________________________________________________</li></ol>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 8 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <h3>Ejercicio 6 · Las cinco reglas de tu casa</h3>
+  <p>Escríbelas con tus palabras y ponle responsable a cada una. Sin responsable no es una regla.</p>
+  <table>
+    <tr><th style="width:70%">Regla</th><th>Responsable</th></tr>
+    <tr><td>1.</td><td></td></tr>
+    <tr><td>2.</td><td></td></tr>
+    <tr><td>3.</td><td></td></tr>
+    <tr><td>4.</td><td></td></tr>
+    <tr><td>5.</td><td></td></tr>
+  </table>
+
+  <div class="pauta">
+    <h2>✅ Pauta completa de respuestas</h2>
+
+    <h3>Ejercicio 1 · Las tres palabras</h3>
+    <ol>
+      <li><b>Identificación.</b> Dice quién eres, no lo prueba.</li>
+      <li><b>Autenticación.</b> Es la prueba, aunque hoy sea compartida y por eso débil.</li>
+      <li><b>Autorización.</b> Ya estás adentro; se decide qué puedes tocar.</li>
+      <li><b>Identificación.</b> Sirve para separar los datos por persona.</li>
+    </ol>
+
+    <h3>Ejercicio 2 · Huella y sal</h3>
+    <p>Sin sal, las dos personas guardan <b>la misma huella</b>, así que una lista publicada de huellas comunes revienta las dos cuentas de un solo golpe. Con sal, a cada clave se le mezcla un texto al azar distinto, de modo que las huellas guardadas son <b>diferentes</b> aunque la clave sea la misma, y hay que atacar cada cuenta por separado. En ningún caso se guarda la clave: solo la huella, que no se puede devolver.</p>
+
+    <h3>Ejercicio 3 · El daño que corresponde</h3>
+    <ol>
+      <li><b>Se pierde</b> (disponibilidad).</li>
+      <li><b>Se filtra</b> (confidencialidad).</li>
+      <li><b>Se altera</b> (integridad). Es el más silencioso: sin registro no se nota.</li>
+      <li><b>Se pierde</b> (disponibilidad). No hubo atacante y el daño es igual.</li>
+    </ol>
+
+    <h3>Ejercicio 4 · Corrige el error</h3>
+    <ol>
+      <li>Todo lo que viaja dentro de una aplicación se puede abrir y leer: un secreto que viaja no es secreto. La clave de administración se queda en el servidor; la pública solo puede viajar si las reglas por fila están puestas.</li>
+      <li>Bloquear la cuenta deja fuera al dueño con solo fallar a propósito. Se limita el <b>intento</b> con esperas que crecen, no la persona.</li>
+      <li>La pantalla se puede saltar mandando los datos directo al servidor. La validación de la pantalla es comodidad; la del servidor es la que protege.</li>
+      <li>Una copia en el mismo aparato se pierde con el original. La regla es 3-2-1: tres copias, dos lugares, una fuera de la casa, y probada al menos una vez.</li>
+    </ol>
+
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 9 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <div class="pauta">
+    <h2>✅ Pauta (continúa)</h2>
+    <h3>Ejercicio 5 · El caso del proyecto</h3>
+    <p>Condiciones razonables: (1) permiso firmado de los padres, con qué se guarda y por cuánto tiempo; (2) solo los datos mínimos, sin dirección ni teléfono, porque el mejor cuidado de un dato es no tenerlo; (3) una cuenta por maestro, nunca compartida por grado, para que quede rastro de quién hizo qué; (4) borrado al terminar el año escolar y constancia de ese borrado. Y por escrito quién responde si algo se filtra. Si el centro no firma, la respuesta es no: sin papel, el que responde por datos de menores ajenos eres tú, y ninguna tracción paga eso.</p>
+
+    <h3>Ejercicio 6 · Las cinco reglas</h3>
+    <p>Respuesta abierta, pero una buena versión se parece a esta: una llave por persona, larga y sin repetir; ninguna llave se manda por mensaje; nadie toca lo que no le toca; copia mensual de lo que dolería perder; lo raro se cuenta el mismo día. Lo que se califica no es la redacción: es que <b>cada regla tenga un responsable con nombre</b> y una fecha de revisión.</p>
+  </div>
+
+  <h2>🗝️ Glosario de la puerta</h2>
+  <table>
+    <tr><th style="width:30%">Término</th><th>En palabras de la casa</th></tr>
+    <tr><td>Identificación</td><td>Quién dices que eres.</td></tr>
+    <tr><td>Autenticación</td><td>Cómo lo pruebas: algo que sabes, que tienes o que eres.</td></tr>
+    <tr><td>Autorización</td><td>Qué te dejan hacer una vez adentro.</td></tr>
+    <tr><td>Huella (hash)</td><td>Resultado que sale de la clave y del que no se puede volver atrás.</td></tr>
+    <tr><td>Sal</td><td>Texto al azar por usuario que evita huellas repetidas.</td></tr>
+    <tr><td>Menor privilegio</td><td>Cada quien puede hacer solo lo que necesita.</td></tr>
+    <tr><td>Seguridad por fila</td><td>La regla que decide qué filas toca cada quien dentro de una tabla.</td></tr>
+    <tr><td>Regla 3-2-1</td><td>Tres copias, dos lugares, una fuera de la casa.</td></tr>
+    <tr><td>Phishing</td><td>Engaño que le pide la llave a la persona, no al programa.</td></tr>
+    <tr><td>Doble factor</td><td>Algo que sabes más algo que tienes.</td></tr>
+  </table>
+
+  <h2>🎓 Cierre: la puerta que te toca cerrar primero</h2>
+  <p>De las siete piezas, siempre hay una que en tu casa está más floja que las demás, y casi nunca es la que uno cree. Escríbela aquí, con la fecha en que te comprometes a cerrarla:</p>
+  <ol class="lineas-4">
+    <li>La pieza más floja de esta casa hoy es: ______________________________________</li>
+    <li>Se arregla haciendo: __________________________________________________</li>
+    <li>Le toca a: ______________________ y queda listo el día: ____________________</li>
+  </ol>
+  <div class="caja">
+    <strong>Lo que hay que llevarse de esta etapa:</strong> la seguridad de una familia no se compra ni se instala, se acuerda. Siete piezas, tres daños, una auditoría honesta y cinco reglas escritas con nombre al lado. Nada de esto exige ser programador: exige decidir en frío lo que después se sostiene con prisa.
+  </div>
+  <div class="caja-amb">
+    <strong>🔒 Material de la casa.</strong> Esta ficha es parte del conocimiento familiar de F.A.R.O. No se publica en el sitio ni se comparte fuera de la familia: enseña dónde están las puertas de esta casa, y eso solo lo debe saber quien vive en ella.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 1 · Página 10 de 10</span></div>
+</section>
+
+</div>
+</body>
+</html>
