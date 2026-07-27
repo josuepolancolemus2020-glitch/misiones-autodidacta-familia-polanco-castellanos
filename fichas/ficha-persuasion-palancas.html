@@ -10,6 +10,15 @@
   :root { --pri: #7e22ce; --pri-suave: #faf5ff; --sec: #be185d; --sec-suave: #fdf2f8; }
   table.palancas td { height: 26px; }
   .guion li { margin: 5px 0; }
+  /* Ficha larga: cada palanca se lee en sus tres versiones, una al lado de otra */
+  table.tres th:nth-child(1) { width: 26%; }
+  table.tres th:nth-child(2), table.tres th:nth-child(3) { width: 25%; }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .caso .fuente { font-size: 11.5px; color: var(--gris); margin-top: 6px; }
+  .mini { font-size: 12px; color: var(--gris); }
+  .mapa li { margin: 3px 0; }
 </style>
 </head>
 <body>
@@ -32,15 +41,315 @@
   <h2>🎯 Objetivos</h2>
   <ol>
     <li>Nombrar las <strong>seis palancas</strong> y reconocer la frase típica de cada una.</li>
+    <li>Explicar <strong>por qué funciona</strong> cada palanca, no solo cómo se llama.</li>
     <li>Distinguir el uso <strong>honesto</strong> del <strong>manipulado</strong> de la misma palanca.</li>
     <li>Aplicar los cuatro antídotos: nombrar, esperar, verificar y condicionar.</li>
     <li>Recitar el <strong>guion de la respuesta serena</strong> sin leerlo.</li>
-    <li>Analizar una oferta real al proyecto identificando palanca y omisión.</li>
+    <li>Reconocer las palancas en <strong>casos documentados</strong> y en la calle.</li>
+    <li>Analizar una oferta real al proyecto identificando palanca, omisión y condición.</li>
     <li>Usar las palancas con la verdad para explicar M.E.T.A.S a quien no lo conoce.</li>
   </ol>
 
-  <h2>🎚️ 1. La tabla de las seis palancas</h2>
-  <p>Llénala tú: escribe la frase típica que has escuchado y el antídoto que usarías.</p>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 1 de 17</span></div>
+</section>
+
+<section class="pagina">
+  <h2>🧭 Qué es una palanca y por qué importa</h2>
+  <p>Nadie decide solo con datos. Decidir con toda la información, cada vez, costaría horas que no tenemos, así que el cerebro usa <strong>atajos</strong>: reglas cortas que casi siempre aciertan. «Si me hizo un favor, le debo algo.» «Si todos lo hacen, ha de ser seguro.» «Si sabe más que yo, le creo.» Esos atajos no son un defecto: son lo que nos permite vivir sin quedarnos paralizados.</p>
+  <p>Una <strong>palanca</strong> es un atajo de esos, usado a propósito. Y aquí está lo importante: <strong>la palanca funciona se conozca o no</strong>. Saber cómo opera no te vuelve inmune, igual que saber de ilusiones ópticas no hace que la línea deje de verse más larga. Lo que sí cambia es que puedes <strong>nombrarla</strong>, y nombrarla es lo que te devuelve el tiempo de pensar.</p>
+
+  <div class="caja">
+    <strong>Persuadir:</strong> mover a alguien hacia una decisión que le conviene, con información completa y tiempo para pensar. &nbsp;·&nbsp;
+    <strong>Manipular:</strong> conseguir el sí escondiendo o torciendo lo que la otra persona necesita para decidir.
+  </div>
+  <p>La línea no está en usar la palanca. Está en <strong>qué hay sobre la mesa</strong> cuando la usas. Por eso la prueba es una sola pregunta, y conviene aprendérsela de memoria: <em>si supiera todo lo que yo sé, ¿seguiría diciendo sí?</em> Si la respuesta es no, el sí que consigas no será una decisión: será un cobro.</p>
+
+  <div class="caja caja-amb">
+    <strong>La defensa que sirve para todo:</strong> la regla de las <b>24 horas</b>. Un límite real aguanta un día; una urgencia fabricada se cae, y esa caída es exactamente la información que faltaba. No cuesta dinero, no exige carácter y funciona con cualquiera de las seis.
+  </div>
+
+  <h2>🗺️ Cómo usar esta ficha</h2>
+  <ul class="mapa">
+    <li><b>Páginas 3 a 5:</b> las seis palancas, una por una, con su mecanismo y su antídoto.</li>
+    <li><b>Página 6:</b> las tácticas compuestas, que son las que de verdad se usan.</li>
+    <li><b>Páginas 7 a 10:</b> nueve casos de estudio de la vida real, de laboratorio y de la calle.</li>
+    <li><b>Página 11:</b> el guion de la respuesta serena y cómo ensayarlo.</li>
+    <li><b>Páginas 12 a 14:</b> los siete ejercicios, para hacer con lápiz.</li>
+    <li><b>Páginas 15 a 17:</b> la pauta completa. Ahí está la respuesta de todo lo que se propone, y al final el cierre.</li>
+  </ul>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 2 de 17</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>🎚️ Las palancas 1 a 3, por dentro</h2>
+
+  <h3>🎁 1. Reciprocidad</h3>
+  <p><b>El mecanismo:</b> devolver lo que recibimos es de las reglas más antiguas que tenemos, y funciona incluso cuando el regalo <b>no se pidió</b>. Ahí está la trampa: la deuda se siente igual aunque uno nunca aceptó entrar en el trato.</p>
+  <table class="tres">
+    <tr><th>Frase típica</th><th>Uso honesto</th><th>Uso manipulado</th></tr>
+    <tr><td>«Le dejo estas muestras y luego hablamos.»</td><td>Dar valor real antes de pedir: un kit, una capacitación, sin condición escondida.</td><td>Un regalo calculado para que te cueste negarte cuando llegue la petición.</td></tr>
+  </table>
+  <p><b>Antídoto:</b> agradecer el regalo y decidir aparte, <em>como si no existiera</em>. Esa es la parte que cuesta: el regalo ya es tuyo, no tiene por qué entrar en la cuenta de la decisión.</p>
+
+  <h3>🪜 2. Compromiso y coherencia</h3>
+  <p><b>El mecanismo:</b> queremos sostener lo que ya dijimos, sobre todo si lo dijimos en público o por escrito. Cambiar de opinión se siente como quedar mal, y eso pesa más que el contenido de la decisión.</p>
+  <table class="tres">
+    <tr><th>Frase típica</th><th>Uso honesto</th><th>Uso manipulado</th></tr>
+    <tr><td>«Usted mismo dijo que quería premios para los niños.»</td><td>Acuerdos por etapas claras, donde cada etapa se pacta a la vista.</td><td>Arrancar un sí pequeño para cobrarlo después como uno grande (pie en la puerta).</td></tr>
+  </table>
+  <p><b>Antídoto:</b> tratar cada petición como <strong>nueva</strong>. Lo que dije antes lo dije con la información de antes. «Sí a aquello» no es «sí a esto».</p>
+
+  <h3>👥 3. Prueba social</h3>
+  <p><b>El mecanismo:</b> si otros <b>como yo</b> lo hacen, parece seguro. Y pesa más cuanto más se parecen a mí: el vecino convence más que el experto lejano.</p>
+  <table class="tres">
+    <tr><th>Frase típica</th><th>Uso honesto</th><th>Uso manipulado</th></tr>
+    <tr><td>«Todos los colegios del municipio ya firmaron.»</td><td>Resultados reales y verificables, con nombres que se pueden llamar.</td><td>Cifras infladas, testimonios comprados, un «todos» que nadie ha contado.</td></tr>
+  </table>
+  <p><b>Antídoto:</b> pedir la lista <em>y hablar con alguien de la lista</em>. Las dos mitades importan: la lista sola se inventa, la llamada no.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 3 de 17</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h2>🎚️ Las palancas 4 y 5, por dentro</h2>
+
+  <h3>🎓 4. Autoridad</h3>
+  <p><b>El mecanismo:</b> obedecemos señales de experiencia, y muchas veces obedecemos <b>la señal</b> más que la experiencia: el título, la bata, el tecnicismo, el tono seguro. Es un atajo razonable, porque no podemos verificarlo todo.</p>
+  <table class="tres">
+    <tr><th>Frase típica</th><th>Uso honesto</th><th>Uso manipulado</th></tr>
+    <tr><td>«Se lo digo como ingeniero con veinte años de experiencia.»</td><td>Competencia comprobable, explicada en términos que el otro pueda evaluar.</td><td>Autoridad prestada, o lenguaje difícil puesto a propósito para que no preguntes.</td></tr>
+  </table>
+  <p><b>Antídoto:</b> pedir que lo explique <strong>en una frase simple</strong>. La autoridad real explica sin molestarse; la prestada se incomoda justo ahí. Esa incomodidad es el dato.</p>
+
+  <h3>🤝 5. Simpatía</h3>
+  <p><b>El mecanismo:</b> decimos sí a quien nos cae bien, y nos cae bien quien se nos parece, quien nos halaga y quien pasa tiempo con nosotros. Por eso la venta empieza con media hora de conversación amable que no es sobre el producto.</p>
+  <table class="tres">
+    <tr><th>Frase típica</th><th>Uso honesto</th><th>Uso manipulado</th></tr>
+    <tr><td>«Usted y yo somos iguales, gente de trabajo.»</td><td>Trato genuino y respeto, que hacen posible una conversación difícil.</td><td>Halago instrumental y amistad fabricada para el momento de la firma.</td></tr>
+  </table>
+  <p><b>Antídoto:</b> separar la persona del contenido con una pregunta concreta: <em>¿aceptaría esto mismo si me lo dijera alguien antipático?</em></p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 4 de 17</span></div>
+</section>
+
+<section class="pagina">
+  <h2>🎚️ La palanca 6, y una séptima que conviene</h2>
+
+  <h3>⏳ 6. Escasez</h3>
+  <p><b>El mecanismo:</b> perder pesa más que ganar. La misma oferta duele más si se puede perder que lo que ilusiona si se puede tomar, y por eso el plazo mueve más que el descuento.</p>
+  <table class="tres">
+    <tr><th>Frase típica</th><th>Uso honesto</th><th>Uso manipulado</th></tr>
+    <tr><td>«Quedan dos cupos y cierro hoy.»</td><td>Un límite real y verificable: el cupo del aula, la fecha del torneo.</td><td>Urgencia fabricada: «solo hoy», cupos que nunca se acaban, precios que nunca suben.</td></tr>
+  </table>
+  <p><b>Antídoto:</b> la regla de las 24 horas. Y si la oferta se cae solo por eso, no perdiste una oportunidad: <strong>evitaste un problema</strong>.</p>
+
+  <div class="caja">
+    <strong>Fíjate en el patrón:</strong> las tres tienen la misma estructura. La versión honesta <b>pone algo sobre la mesa</b> (valor real, etapas claras, resultados verificables). La manipulada <b>quita algo</b> (la condición escondida, la petición que venía después, la lista que no existe). Si aprendes a preguntar «¿qué falta aquí?», tienes las seis resueltas.
+  </div>
+
+  <h3>⚓ 7. El anclaje (no es de Cialdini, pero llega en el mismo paquete)</h3>
+  <p><b>El mecanismo:</b> el <b>primer número</b> que se dice marca toda la conversación. Aunque sea absurdo, lo que venga después se mide contra él, y hasta quien lo rechaza termina negociando alrededor suyo.</p>
+  <p><b>Antídoto:</b> llegar con <strong>tu propio número ya calculado</strong>, de preferencia por escrito, y decirlo primero cuando se pueda. No se trata de ganar la negociación: se trata de que la referencia no la ponga el otro.</p>
+
+  <div class="caja">
+    <strong>Regla práctica:</strong> cuando sientas prisa, ganas de quedar bien, o pena de preguntar, esas tres sensaciones son el <b>aviso</b>, no el argumento. Casi siempre significan que hay una palanca operando. La calma no es lentitud: es la única posición desde donde se ve.
+  </div>
+
+  <div class="caja caja-amb">
+    <strong>Un aviso honesto:</strong> estas palancas no son sucias. Son la manera en que la gente decide, y tú las usas todos los días sin proponértelo. La Ruta de la Persuasión se estudia en las <b>dos direcciones</b>: para no ceder ante quien presiona, y para lograr que un maestro, un director o un patrocinador entienda M.E.T.A.S. Lo sucio no es la técnica: es la mentira.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 5 de 17</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <h2>🧩 Las tácticas compuestas</h2>
+  <p>En la calle casi nunca llega una palanca sola. Llegan combinadas y en un orden pensado. Estas son las seis combinaciones que más vas a encontrar.</p>
+
+  <table>
+    <tr><th style="width:22%">Táctica</th><th>Cómo se arma</th><th style="width:30%">Cómo se corta</th></tr>
+    <tr>
+      <td><b>Pie en la puerta</b></td>
+      <td>Piden algo mínimo («solo firme que le interesa»), y una vez que dijiste sí, la petición crece apoyada en tu propia coherencia.</td>
+      <td>Tratar cada petición como nueva, y decirlo en voz alta: «eso fue otra cosa, esto lo decido aparte».</td>
+    </tr>
+    <tr>
+      <td><b>Puerta en la cara</b></td>
+      <td>Piden algo enorme que vas a rechazar, y enseguida piden lo que de verdad querían. El segundo pedido parece un favor que te hacen.</td>
+      <td>Comparar la segunda petición con <b>cero</b>, no con la primera. ¿La aceptaría si me la hubieran pedido de entrada?</td>
+    </tr>
+    <tr>
+      <td><b>Anclaje con descuento</b></td>
+      <td>Un precio inicial alto y luego una rebaja «especial para usted». La rebaja se mide contra el ancla, no contra el valor real.</td>
+      <td>Llegar con tu número calculado y preguntar el precio a secas: ¿cuánto cuesta esto para cualquiera?</td>
+    </tr>
+    <tr>
+      <td><b>Urgencia con prueba social</b></td>
+      <td>«Quedan dos cupos <em>y ya hay otro interesado</em>.» El plazo y la multitud empujan juntos.</td>
+      <td>Pedir 24 horas y pedir la lista. Si las dos cosas molestan, ya está contestado.</td>
+    </tr>
+    <tr>
+      <td><b>Autoridad prestada</b></td>
+      <td>No dicen «yo sé», dicen «esto lo respalda tal institución», o lo envuelven en tecnicismos.</td>
+      <td>Pedir la frase simple, y pedir el documento donde esa institución lo respalda.</td>
+    </tr>
+    <tr>
+      <td><b>La escalera del compromiso</b></td>
+      <td>Una cadena de síes pequeños (una reunión, una prueba, una firma «sin compromiso») que al final hacen carísimo decir que no.</td>
+      <td>Poner la condición desde el <b>primer</b> escalón, no en el último. Es el único momento barato.</td>
+    </tr>
+  </table>
+
+  <h2>🔎 Las cuatro preguntas que abren cualquier oferta</h2>
+  <ol>
+    <li><b>¿Cuánto cuesta en total?</b> No el pago mensual: el total, incluyendo horas de trabajo tuyas.</li>
+    <li><b>¿Quién responde si falla?</b> Con nombre, no «la empresa».</li>
+    <li><b>¿Qué me comprometo a dar a cambio?</b> Todo: dinero, tiempo, exclusividad, nombre, datos.</li>
+    <li><b>¿Se puede verificar?</b> El plazo, la lista, el respaldo, el permiso. Si nada se puede verificar, ya sabes.</li>
+  </ol>
+  <p class="mini">Estas cuatro preguntas no acusan a nadie. Son las que hace cualquier persona que va a firmar, y quien viene con la verdad las contesta sin incomodarse.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 6 de 17</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <h2>🔬 Casos de estudio de la vida real I: lo que se midió</h2>
+  <p>Estas palancas no son opinión. Se estudiaron con experimentos, y los números son parte de lo que hay que saber.</p>
+
+  <div class="caso">
+    <h3>1. Las tarjetas de Navidad a desconocidos · reciprocidad</h3>
+    <p>El sociólogo <b>Phillip Kunz</b> envió en 1974 tarjetas de Navidad a cientos de personas <b>que no conocía</b>, sacadas de un directorio. Recibió alrededor de doscientas respuestas. Muchas traían cartas largas y fotos familiares, y varias personas siguieron escribiéndole durante años sin saber nunca quién era.</p>
+    <p><b>Lo que enseña:</b> la deuda se activa <b>sola</b>, sin relación previa y sin que el regalo se haya pedido. Por eso la muestra gratis, el almuerzo y el kit funcionan aunque uno se diga «esto no me va a influir».</p>
+    <p class="fuente">Kunz y Woolcott, «Season's greetings», <em>Social Science Research</em>, 1976.</p>
+  </div>
+
+  <div class="caso">
+    <h3>2. El letrero enorme en el jardín · compromiso y coherencia</h3>
+    <p><b>Freedman y Fraser</b> (1966) pidieron a vecinos permiso para instalar en su jardín un cartel gigante y feo que decía «Maneje con cuidado». Casi todos dijeron que no: aceptó alrededor del <b>17%</b>. Pero a otro grupo le habían pedido dos semanas antes algo mínimo: pegar en la ventana una calcomanía pequeña sobre seguridad vial. De ese grupo aceptó el cartel gigante más del <b>75%</b>.</p>
+    <p><b>Lo que enseña:</b> el primer sí, aunque sea diminuto, cambia la imagen que uno tiene de sí mismo («soy de los que apoyan estas causas»), y el segundo sí ya no se decide por el cartel: se decide por sostener esa imagen. Es el <b>pie en la puerta</b>, medido.</p>
+    <p class="fuente">Freedman y Fraser, «Compliance without pressure», <em>Journal of Personality and Social Psychology</em>, 1966.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 7 de 17</span></div>
+</section>
+
+<section class="pagina">
+  <div class="caso">
+    <h3>3. Las toallas del hotel · prueba social</h3>
+    <p>Se compararon dos letreros en habitaciones de hotel. Uno pedía reusar la toalla <b>por el medio ambiente</b>. El otro decía que <b>la mayoría de los huéspedes de ese hotel</b> reusaba su toalla. El segundo consiguió bastante más reúso. Y una tercera versión, que decía que la mayoría de los huéspedes <b>de esa misma habitación</b> lo hacía, funcionó todavía mejor.</p>
+    <p><b>Lo que enseña:</b> la prueba social pega más cuanto más se parece el grupo a uno. Por eso en una escuela convence más «tres maestros de este municipio» que «miles de usuarios en el mundo».</p>
+    <p class="fuente">Goldstein, Cialdini y Griskevicius, <em>Journal of Consumer Research</em>, 2008.</p>
+  </div>
+
+  <div class="caso">
+    <h3>4. La obediencia a la bata blanca · autoridad</h3>
+    <p>En los experimentos de <b>Stanley Milgram</b> (Yale, inicios de los sesenta) se pedía a personas comunes aplicar descargas eléctricas crecientes a otra persona. No había descargas reales, pero ellos no lo sabían. Aunque escuchaban quejas y súplicas, alrededor de <b>dos de cada tres</b> llegaron hasta el final, con un experimentador de bata que solo repetía con calma: «el experimento requiere que continúe».</p>
+    <p><b>Lo que enseña:</b> no hacía falta amenaza ni premio. Bastaba la <b>señal</b> de autoridad y un lugar que parecía serio. Si eso mueve a la gente hasta ahí, un tecnicismo dicho con seguridad mueve una firma sin ningún esfuerzo.</p>
+    <p class="fuente">Milgram, «Behavioral study of obedience», 1963. Sus métodos hoy no pasarían un comité de ética, y el dato hay que leerlo con eso presente.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 8 de 17</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <h2>🛒 Casos de estudio de la vida real II: la calle</h2>
+
+  <div class="caso">
+    <h3>5. La joyería que subió el precio y vendió todo · autoridad y anclaje</h3>
+    <p>Cialdini cuenta el caso de una tienda de joyería turquesa que no lograba vender un lote. Antes de un viaje, la dueña dejó una nota para rebajar todo «×½». La empleada entendió «×2» y <b>duplicó</b> los precios. Al volver, el lote estaba vendido.</p>
+    <p><b>Lo que enseña:</b> los turistas no sabían de turquesa, así que usaron el atajo <b>caro es bueno</b>. Cuando uno no puede juzgar la calidad, el precio se vuelve el argumento. Sirve de aviso al presentar M.E.T.A.S: regalarlo todo puede leerse como que no vale.</p>
+  </div>
+
+  <div class="caso">
+    <h3>6. La sala de tiempo compartido · las seis a la vez</h3>
+    <p>La invitación llega con desayuno y un regalo (<b>reciprocidad</b>). El vendedor pasa una hora encontrándote cosas en común (<b>simpatía</b>). Enseña la lista de familias que ya compraron (<b>prueba social</b>). Presenta a un «gerente» que autoriza un precio especial (<b>autoridad</b>). El precio de lista es altísimo y la oferta es la mitad (<b>anclaje</b>). Y todo vence al salir por la puerta (<b>escasez</b>).</p>
+    <p><b>Lo que enseña:</b> la táctica no es ninguna de las seis: es <b>el orden y la duración</b>. Después de tres horas, decir que no cuesta más que firmar. El antídoto es de logística, no de carácter: poner de antemano la hora a la que uno se va.</p>
+  </div>
+
+  <div class="caso">
+    <h3>7. El «20% mensual garantizado» · escasez y prueba social</h3>
+    <p>Aparece una financiera o un grupo de inversión que ofrece rendimientos imposibles y muestra a vecinos que ya cobraron. Los primeros de verdad cobran, con el dinero de los que van entrando, y eso alimenta la prueba social. Siempre hay un cupo que se cierra y siempre hay alguien conocido adentro.</p>
+    <p><b>Lo que enseña:</b> la palanca no está en la promesa, está en <b>el vecino que sí cobró</b>. Contra eso no sirve discutir el porcentaje: sirve preguntar de dónde sale el rendimiento y quién responde por escrito. Un negocio real aguanta esa pregunta.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 9 de 17</span></div>
+</section>
+
+<section class="pagina">
+  <div class="caso">
+    <h3>8. El político en la escuela · coherencia y reciprocidad</h3>
+    <p>Alguien ofrece pagar premios, uniformes o impresiones, y luego recuerda lo que uno mismo dijo: «usted quería premios para los niños, ¿verdad?». La petición que sigue casi nunca es dinero: es <b>el nombre</b>, la foto, el logo, el acto.</p>
+    <p><b>Lo que enseña:</b> el aporte y lo que se pide a cambio son cosas separadas, y hay que separarlas en voz alta. La salida no es rechazar el apoyo: es tener <b>reglas publicadas</b>, iguales para cualquiera que quiera apoyar. Con una regla escrita, el no deja de ser personal.</p>
+  </div>
+
+  <div class="caso">
+    <h3>9. El contador que corre y las «últimas unidades» · escasez fabricada</h3>
+    <p>En tiendas en línea es normal el reloj que descuenta, el «quedan 2 en existencia» y el «13 personas están viendo esto». Muchos de esos avisos se reinician solos al recargar la página.</p>
+    <p><b>Lo que enseña:</b> aquí la verificación es gratis y toma diez segundos: recarga, o vuelve mañana. Es la regla de las 24 horas en versión rápida, y deja una idea útil: <b>una escasez real no se reinicia</b>.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 10 de 17</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h2>📝 El guion de la respuesta serena</h2>
+  <p>Cuatro frases que sirven para casi cualquier oferta con presión. No es para ganar la conversación: es para <b>recuperar el tiempo</b> de decidir. Escríbelas con tus palabras y practícalas en voz alta hasta que salgan sin pensar.</p>
+
+  <ol class="guion">
+    <li><b>Reconocer</b> lo que sí es cierto: _______________________________________________</li>
+    <li><b>Nombrar</b> la palanca, sin pelear: ________________________________________________</li>
+    <li><b>Pedir</b> lo que falta, por escrito: __________________________________________________</li>
+    <li><b>Condicionar</b>: en qué versión sí diría que sí: ____________________________________</li>
+  </ol>
+
+  <h3>Cómo suena mal y cómo suena bien</h3>
+  <table>
+    <tr><th style="width:50%">Así no</th><th>Así sí</th></tr>
+    <tr>
+      <td>«A mí no me venga con presiones, esas técnicas ya me las sé.»</td>
+      <td>«Le agradezco el apoyo, en serio. Esto suena a urgencia; ¿el plazo es real? Mándemelo por escrito y le contesto mañana.»</td>
+    </tr>
+    <tr>
+      <td>«No puedo decidir, tengo que consultarlo, es que fíjese que…»</td>
+      <td>«Las decisiones de este tamaño las tomo en 24 horas. Mañana le confirmo.»</td>
+    </tr>
+    <tr>
+      <td>«Está bien, pero que conste que no me convenció.»</td>
+      <td>«Sí, con dos condiciones: el logo va en aliados y no en portada, y el informe lo genera el sistema solo.»</td>
+    </tr>
+  </table>
+  <p class="mini">La diferencia no es el tono: es que la columna derecha <b>termina en algo concreto</b>. Reconocer sin condición es ceder; condición sin reconocer es pelear.</p>
+
+  <h3>Ensayo (hazlo en voz alta, es la parte que sirve)</h3>
+  <p>Que alguien de la casa lea una de estas frases y tú contestes con el guion completo, sin leerlo. Marca la casilla cuando te salga sin trabarte.</p>
+  <table>
+    <tr><th style="width:78%">Frase de presión</th><th>✔</th></tr>
+    <tr><td>«Necesito su firma hoy porque mañana cambia el precio.»</td><td></td></tr>
+    <tr><td>«Después de todo lo que le hemos apoyado…»</td><td></td></tr>
+    <tr><td>«Todos los directores del municipio ya entraron.»</td><td></td></tr>
+    <tr><td>«Se lo digo como ingeniero, no hay que darle más vuelta.»</td><td></td></tr>
+    <tr><td>«Usted mismo dijo que quería premios para los niños.»</td><td></td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 11 de 17</span></div>
+</section>
+
+<section class="pagina">
+  <h2>✍️ Ejercicios sin pantalla</h2>
+
+  <div class="caja caja-amb">
+    <strong>Por qué conviene no justificarse:</strong> cada explicación que das abre una puerta para rebatirte, y la conversación se alarga, que es justo lo que le sirve a quien presiona. «Mañana le contesto» no necesita motivo. Un motivo se discute; una regla, no.
+  </div>
+
+  <h3>Ejercicio 1. La tabla de las seis palancas</h3>
+  <p>Llénala de memoria, sin volver a las páginas 3 a 5.</p>
   <table class="palancas">
     <tr><th style="width:22%">Palanca</th><th>Frase típica que la delata</th><th style="width:32%">Tu antídoto</th></tr>
     <tr><td><b>🎁 Reciprocidad</b></td><td></td><td></td></tr>
@@ -51,31 +360,7 @@
     <tr><td><b>⏳ Escasez</b></td><td></td><td></td></tr>
   </table>
 
-  <div class="caja">
-    <strong>Persuadir:</strong> mover a alguien hacia una decisión que le conviene, con información completa y tiempo para pensar. &nbsp;·&nbsp;
-    <strong>Manipular:</strong> conseguir el sí escondiendo o torciendo lo que necesita para decidir.
-  </div>
-  <div class="caja caja-amb">
-    <strong>La defensa que sirve para todo:</strong> la regla de las <b>24 horas</b>. Un límite real aguanta un día; una urgencia fabricada se cae, y esa caída es la información que faltaba.
-  </div>
-
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 1</span></div>
-</section>
-
-<!-- ═══════════ PÁGINA 2 ═══════════ -->
-<section class="pagina">
-  <h2>📝 2. El guion de la respuesta serena</h2>
-  <p>Cuatro frases para casi cualquier oferta con presión. Escríbelas con tus palabras y practícalas en voz alta.</p>
-  <ol class="guion">
-    <li><b>Reconocer:</b> _______________________________________________</li>
-    <li><b>Nombrar:</b> ________________________________________________</li>
-    <li><b>Pedir:</b> __________________________________________________</li>
-    <li><b>Condicionar:</b> ____________________________________________</li>
-  </ol>
-
-  <h2>✍️ 3. Ejercicios sin pantalla</h2>
-
-  <h3>A. Nombra la palanca</h3>
+  <h3>Ejercicio 2. Nombra la palanca</h3>
   <ol>
     <li>«Le dejo estas muestras y luego hablamos.» → ____________________</li>
     <li>«Todos los colegios del municipio ya firmaron.» → ____________________</li>
@@ -83,20 +368,52 @@
     <li>«Se lo digo como ingeniero con veinte años de experiencia.» → ____________________</li>
     <li>«Usted mismo dijo que quería premios para los niños.» → ____________________</li>
     <li>«Usted y yo somos iguales, gente de trabajo.» → ____________________</li>
+    <li>«El precio de lista es L 80,000, pero a usted se lo dejo en L 45,000.» → ____________________</li>
+    <li>«Solo firme que le interesa, no es ningún compromiso.» → ____________________</li>
+    <li>«Esto lo respalda una fundación internacional.» → ____________________</li>
+    <li>«Ya hay otro colegio interesado en ese cupo.» → ____________________</li>
   </ol>
 
-  <h3>B. Honesto o manipulado</h3>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 12 de 17</span></div>
+</section>
+
+<section class="pagina">
+  <h3>Ejercicio 3. Honesto o manipulado, y por qué</h3>
   <table>
-    <tr><th style="width:62%">Uso de la palanca</th><th>H / M</th><th>Por qué</th></tr>
+    <tr><th style="width:58%">Uso de la palanca</th><th style="width:10%">H / M</th><th>Por qué</th></tr>
     <tr><td>Mostrar tres escuelas reales con nombres y teléfonos.</td><td></td><td></td></tr>
     <tr><td>Decir «cientos de aulas ya lo usan» sin lista.</td><td></td><td></td></tr>
     <tr><td>Regalar un kit y capacitación antes de cobrar algo.</td><td></td><td></td></tr>
     <tr><td>Inventar que el precio sube mañana.</td><td></td><td></td></tr>
     <tr><td>Decir con claridad qué NO resuelve el sistema.</td><td></td><td></td></tr>
+    <tr><td>Regalar el kit y a la semana volver a pedir la firma.</td><td></td><td></td></tr>
+    <tr><td>Avisar que el cupo del torneo se cierra el 30, y que es real.</td><td></td><td></td></tr>
+    <tr><td>Explicar con tecnicismos para que no pregunten el costo.</td><td></td><td></td></tr>
   </table>
 
-  <h3>C. El caso del proyecto</h3>
-  <p>Una ONG dejó 300 tablets en tres escuelas y ahora pide el logo de M.E.T.A.S en la portada por dos años.</p>
+  <h3>Ejercicio 4. Encuentra la omisión</h3>
+  <p>En cada oferta, escribe <b>qué información falta</b> para poder decidir.</p>
+  <ol>
+    <li>«Le regalamos la plataforma el primer año.» → ____________________________________</li>
+    <li>«La instalación no le cuesta nada.» → ____________________________________</li>
+    <li>«Solo necesitamos que mencione nuestra marca en el manual.» → ____________________</li>
+    <li>«Le damos datos móviles gratis para 500 alumnos.» → ____________________________</li>
+  </ol>
+
+  <h3>Ejercicio 5. Reescribe en versión honesta</h3>
+  <p>La misma palanca, pero poniendo sobre la mesa lo que falta.</p>
+  <ol>
+    <li>«Cientos de aulas ya lo usan.» → _________________________________________________</li>
+    <li>«Este precio es solo por hoy.» → _________________________________________________</li>
+    <li>«Como experto le digo que es lo mejor.» → ________________________________________</li>
+  </ol>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 13 de 17</span></div>
+</section>
+
+<section class="pagina">
+  <h3>Ejercicio 6. El caso del proyecto</h3>
+  <p>Una ONG dejó 300 tablets en tres escuelas y ahora pide el logo de M.E.T.A.S en la portada por dos años, más un informe trimestral de uso.</p>
   <table>
     <tr><td style="width:34%"><b>Palanca que se usa</b></td><td></td></tr>
     <tr><td><b>Lo que no se está diciendo</b></td><td></td></tr>
@@ -104,38 +421,80 @@
     <tr><td><b>Tu condición para decir sí</b></td><td></td></tr>
   </table>
 
-  <h2>🛡️ 4. Simulacro de presión</h2>
+  <h3>Ejercicio 7. Simulacro de presión</h3>
+  <p>Contesta con el guion completo: reconocer, nombrar, pedir y condicionar.</p>
   <h3>1) «Después de todo lo que le hemos apoyado, necesito su firma hoy porque mañana cambia el precio.»</h3>
   <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
   <h3>2) «Todos los directores del municipio ya adoptaron esta plataforma.»</h3>
   <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
   <h3>3) «Se lo digo como ingeniero: no hay que darle más vuelta.»</h3>
   <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>4) Un alcalde ofrece L 250,000 para imprimir fichas y pide su foto en la contraportada, tres meses antes de las elecciones.</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>5) «Usted mismo dijo que quería premios para los niños; déjeme ponerle mi nombre al torneo.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 2</span></div>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 14 de 17</span></div>
 </section>
 
-<!-- ═══════════ PÁGINA 3 ═══════════ -->
 <section class="pagina">
   <div class="pauta">
-    <h2>✅ Pauta de respuestas</h2>
+    <h2>✅ Pauta completa de respuestas (1 de 3)</h2>
+    <p class="mini">Cubre los siete ejercicios. En los de redacción no hay una sola respuesta correcta: lo que se califica es que aparezcan los elementos marcados en negrita.</p>
 
-    <h3>A. Nombra la palanca</h3>
-    <p>1) Reciprocidad · 2) Prueba social · 3) Escasez · 4) Autoridad · 5) Coherencia · 6) Simpatía.</p>
+    <h3>Ejercicio 1. La tabla de las seis palancas</h3>
+    <table>
+      <tr><th style="width:20%">Palanca</th><th>Frase típica</th><th style="width:38%">Antídoto</th></tr>
+      <tr><td>Reciprocidad</td><td>«Le dejo estas muestras y luego hablamos.»</td><td>Agradecer el regalo y decidir aparte, como si no existiera.</td></tr>
+      <tr><td>Coherencia</td><td>«Usted mismo dijo que…»</td><td>Tratar cada petición como nueva.</td></tr>
+      <tr><td>Prueba social</td><td>«Todos los colegios ya firmaron.»</td><td>Pedir la lista y hablar con alguien de la lista.</td></tr>
+      <tr><td>Autoridad</td><td>«Se lo digo como ingeniero…»</td><td>Pedir que lo explique en una frase simple.</td></tr>
+      <tr><td>Simpatía</td><td>«Usted y yo somos iguales.»</td><td>¿Aceptaría esto de alguien antipático?</td></tr>
+      <tr><td>Escasez</td><td>«Quedan dos cupos y cierro hoy.»</td><td>La regla de las 24 horas.</td></tr>
+    </table>
 
-    <h3>B. Honesto o manipulado</h3>
-    <p><b>H</b> las escuelas verificables (la lista existe y se puede llamar). <b>M</b> los «cientos de aulas» sin lista. <b>H</b> el kit y la capacitación antes de cobrar, si de verdad no obligan a nada. <b>M</b> el precio que sube mañana si el plazo es inventado. <b>H</b> decir qué no resuelve el sistema: reconocer límites vuelve creíble lo demás.</p>
+    <h3>Ejercicio 2. Nombra la palanca</h3>
+    <p>1) Reciprocidad · 2) Prueba social · 3) Escasez · 4) Autoridad · 5) Coherencia · 6) Simpatía · 7) Anclaje · 8) Pie en la puerta, que es coherencia · 9) Autoridad prestada · 10) Escasez reforzada con prueba social.</p>
 
-    <h3>C. El caso del proyecto</h3>
-    <p><b>Palanca:</b> reciprocidad, el favor llegó primero. <b>Omisión:</b> cuántas horas cuesta el informe trimestral por dos años y quién las hace. <b>Respuesta:</b> agradecer el equipo y decidir el logo como si el equipo no existiera. <b>Condición:</b> informe que la aplicación genere sola, logo en la sección de aliados y no en la portada, datos agregados y nunca de menores.</p>
+    <h3>Ejercicio 3. Honesto o manipulado</h3>
+    <p><b>H</b> las escuelas verificables: la lista existe y se puede llamar. <b>M</b> los «cientos de aulas» sin lista: se cae en la primera verificación. <b>H</b> el kit y la capacitación antes de cobrar, <em>si de verdad no obligan a nada</em>. <b>M</b> el precio que sube mañana, si el plazo es inventado. <b>H</b> decir qué no resuelve el sistema: reconocer límites vuelve creíble lo demás. <b>M</b> regalar y volver a la semana a cobrarlo: el mismo regalo cambia de naturaleza según para qué estaba puesto. <b>H</b> el cupo del torneo con fecha real y verificable. <b>M</b> el tecnicismo puesto para que no pregunten: la autoridad real explica simple.</p>
 
-    <h3>Simulacro: respuestas modelo</h3>
-    <p><strong>1)</strong> «Les agradezco el apoyo, en serio. Y justo por eso quiero decidirlo bien: mándeme por escrito qué ofrecen y qué piden, y le contesto mañana. Si el precio de hoy no aguanta un día, entonces el precio no era el punto.»</p>
-    <p><strong>2)</strong> «Qué bueno. ¿Cuáles colegios y con quién puedo hablar? Me sirve saber cómo les fue con el soporte. Cuando tenga esos dos nombres, seguimos.»</p>
-    <p><strong>3)</strong> «Le creo la experiencia. Explíquemelo en una frase simple para poder decidir, porque el que firma soy yo. Si no se puede decir simple, todavía no lo entiendo lo suficiente para aceptarlo.»</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 15 de 17</span></div>
+</section>
+
+<section class="pagina">
+  <div class="pauta">
+    <h2>✅ Pauta completa de respuestas (2 de 3)</h2>
+
+    <h3>Ejercicio 4. Encuentra la omisión</h3>
+    <p>1) <b>Qué se paga del segundo año en adelante</b>, y si los datos se pueden sacar si uno se va. 2) <b>Cuántas horas de trabajo propio</b> cuesta la instalación y quién las pone. 3) <b>Qué se está comprando con esa mención</b>: exclusividad, uso del nombre, y por cuánto tiempo. 4) <b>Qué se hace con los datos</b> de los 500 alumnos, quién los recibe, y qué pasa cuando se acabe el regalo.</p>
+
+    <h3>Ejercicio 5. Reescribe en versión honesta</h3>
+    <p>1) «Lo usan tres escuelas; aquí están los nombres y el teléfono de dos maestros, llámelos.» 2) «El precio sube el 30 porque cambia el costo de impresión; si prefiere, decida después y le respeto este hasta esa fecha.» 3) «Le explico en una frase por qué conviene, y si no le cuadra, dígamelo.» Se califica que la versión honesta <b>agregue lo verificable</b> y <b>no quite el tiempo</b> de decidir.</p>
+
+    <h3>Ejercicio 6. El caso del proyecto</h3>
+    <p><b>Palanca:</b> reciprocidad, el favor llegó primero, reforzada con coherencia si ya se agradeció el apoyo en público. <b>Omisión:</b> cuántas horas cuesta el informe trimestral por dos años y quién las hace, y si el logo en portada implica exclusividad frente a otros aliados. <b>Respuesta:</b> agradecer el equipo y decidir el logo <em>como si el equipo no existiera</em>. <b>Condición:</b> informe que la aplicación genere sola, logo en la sección de aliados y no en la portada, datos agregados y nunca de menores, y todo por escrito con fecha de vencimiento.</p>
+
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 16 de 17</span></div>
+</section>
+
+<section class="pagina">
+  <div class="pauta">
+    <h2>✅ Pauta completa de respuestas (3 de 3)</h2>
+
+    <h3>Ejercicio 7. Simulacro: respuestas modelo</h3>
+    <p><b>1)</b> «Les agradezco el apoyo, en serio. Y justo por eso quiero decidirlo bien: mándeme por escrito qué ofrecen y qué piden, y le contesto mañana. Si el precio de hoy no aguanta un día, entonces el precio no era el punto.»</p>
+    <p><b>2)</b> «Qué bueno. ¿Cuáles colegios y con quién puedo hablar? Me sirve saber cómo les fue con el soporte. Cuando tenga esos dos nombres, seguimos.»</p>
+    <p><b>3)</b> «Le creo la experiencia. Explíquemelo en una frase simple para poder decidir, porque el que firma soy yo. Si no se puede decir simple, todavía no lo entiendo lo suficiente para aceptarlo.»</p>
+    <p><b>4)</b> «El aporte lo agradecemos y lo necesitamos. La contraportada es otra cosa: tenemos reglas de patrocinio publicadas, iguales para cualquiera, y en temporada electoral no ponemos caras. Con el logo en aliados y el crédito en la página de créditos, aceptamos hoy mismo.»</p>
+    <p><b>5)</b> «Sí dije que quería premios, y lo sostengo. Eso no incluye el nombre del torneo, que es del proyecto y de los niños. Financie los premios y su apoyo aparece igual que el de cualquier otro patrocinador; el nombre no está en negociación.»</p>
 
     <h3>Criterio de logro</h3>
-    <p>Nombrar la palanca <strong>sin pelear</strong> y responder con una condición, no con un discurso. Si la respuesta suena a discusión ganada, falta calma; si termina sin condición ni plazo, falta cierre.</p>
+    <p>Nombrar la palanca <strong>sin pelear</strong> y responder con una <strong>condición</strong>, no con un discurso. Si la respuesta suena a discusión ganada, falta calma; si termina sin condición ni plazo, falta cierre. En los cinco casos del simulacro debe aparecer al menos <b>una cosa pedida por escrito</b> y <b>un plazo propio</b>.</p>
   </div>
 
   <h2>🎓 Cierre: la palanca que más te mueve</h2>
@@ -146,7 +505,7 @@
     <div class="raya-resp"></div><div class="raya-resp"></div>
   </div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 3</span></div>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🧠 Ruta de la Persuasión · Etapa 1 · Página 17 de 17</span></div>
 </section>
 
 </div>

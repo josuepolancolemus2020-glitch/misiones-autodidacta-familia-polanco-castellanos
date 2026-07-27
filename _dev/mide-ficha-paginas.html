@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Medir · páginas de una ficha al imprimir</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
+iframe{position:absolute;left:-9999px;top:0;border:0}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+<script>
+/* Mide cuánto mide cada .pagina de una ficha CON LAS REGLAS DE IMPRESIÓN
+   aplicadas, que es lo único que importa: en pantalla la hoja lleva 32 mm de
+   relleno y la letra es más chica, así que medir en pantalla engaña.
+
+   El truco: se carga la ficha en un iframe del ancho real del papel (carta
+   menos márgenes = 194 mm) y se le inyectan como reglas normales las mismas
+   que la hoja aplica dentro de @media print.
+
+   Uso:  /_dev/mide-ficha-paginas.html?f=ficha-persuasion-palancas.html      */
+const params = new URLSearchParams(location.search);
+const ficha = params.get('f') || 'ficha-persuasion-palancas.html';
+const UTIL = 226;   /* lo que de verdad cabe: ver la nota de min-height en ficha.css */
+
+const marco = document.createElement('iframe');
+marco.style.width = '194mm';
+marco.style.height = '400px';
+marco.src = '/fichas/' + ficha;
+document.body.appendChild(marco);
+
+marco.addEventListener('load', async () => {
+  const d = marco.contentDocument;
+  const s = d.createElement('style');
+  s.textContent = `
+    body { background:#fff; padding:0; font-size:11.5pt; }
+    .doc { max-width:none; }
+    .pagina { box-shadow:none; border-radius:0; padding:0; margin:0; min-height:0; }
+    .imprimir-btn, .volver { display:none; }`;
+  d.head.appendChild(s);
+
+  /* Hay que esperar a la tipografía: con la de reserva el texto ocupa menos y
+     la medida sale corta, que fue justo el error que hizo dar por buena una
+     ficha que al imprimir se partía en dos. */
+  try { await d.fonts.ready; } catch (e) {}
+  await new Promise(r => setTimeout(r, 1200));
+
+  {
+    const mm = 96 / 25.4;
+    const paginas = [...d.querySelectorAll('.pagina')];
+    let desbordan = 0;
+    const filas = paginas.map((sec, i) => {
+      const h = sec.getBoundingClientRect().height / mm;
+      const mal = h > UTIL;
+      if (mal) desbordan++;
+      const sobra = mal ? `  ✘ sobran ${Math.ceil(h - UTIL)} mm` : '  ✔';
+      return `pág ${String(i + 1).padStart(2)}: ${h.toFixed(0).padStart(4)} mm${sobra}`;
+    });
+    const out = document.getElementById('out');
+    out.textContent = `${ficha}\nalto útil de la carta: ${UTIL} mm · ${paginas.length} páginas declaradas\n\n`
+      + filas.join('\n') + '\n\n'
+      + (desbordan ? `✖ ${desbordan} página(s) se parten en dos al imprimir`
+                   : `✅ las ${paginas.length} páginas caben: el PDF sale de ${paginas.length} hojas`);
+  }
+});
+</script>
+</body>
+</html>

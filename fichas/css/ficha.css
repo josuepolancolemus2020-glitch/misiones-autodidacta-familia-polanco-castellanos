@@ -88,7 +88,13 @@ th { background: var(--pri-suave); font-weight: 800; }
   .doc { max-width: none; }
   .pagina {
     box-shadow: none; border-radius: 0; padding: 0; margin: 0;
-    page-break-after: always; min-height: 253mm;
+    /* 226 mm, no 253. Chrome, al imprimir sin márgenes personalizados, deja
+       unos 228 mm útiles (la carta menos una pulgada por lado), muy por
+       debajo de 253. Con 253 CADA hoja se pasaba por un pelo y arrastraba una
+       hoja en blanco detrás: las fichas salían del doble de páginas.
+       Se mide con _dev/mide-ficha-paginas.html y se confirma imprimiendo a
+       PDF, que es el único juez. Ninguna .pagina debe pasar de 226 mm. */
+    page-break-after: always; min-height: 226mm;
   }
   .pagina:last-child { page-break-after: auto; }
   .imprimir-btn, .volver { display: none; }
