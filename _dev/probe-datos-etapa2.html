@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Casa Cerrada, etapa 2</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-casa-cerrada-datos/datos.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 2 de la Ruta de la Casa Cerrada: bancos, laboratorio,
+   pruebas impresas con su nombre, casos, ficha y la ruta con DOS etapas. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Casa Cerrada · Etapa 2 de 6/.test(d.body.textContent), 'se presenta como etapa 2 de 6', 'no se presenta como etapa de la ruta');
+    ok(!/punto de equilibrio|costo por unidad|margen por aula/i.test(d.body.textContent), 'sin restos de la etapa de la que se copió', 'quedan textos de El presupuesto real');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('Object.keys(parteData).join(",")') === 'minimo,acceso,plazo,incidente', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas del manejo de datos', 'piezas: ' + dentro('timelineData.length'));
+    ok(/faro_cib_datos/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LA POSTURA CON MENORES ──');
+    /* Una misión sobre datos de niños que no diga estas cosas no sirve. */
+    const texto = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/no son tuyos|prestados/i.test(texto), 'dice que los datos del menor no son del proyecto', 'no deja claro de quién son los datos');
+    ok(/la duda .{0,20}hacia el no|duda se resuelve hacia el no/i.test(texto), 'la duda con menores se resuelve hacia el no', 'falta la regla de la duda');
+    ok(/autoriza su (madre|familia)|lo da su familia|autoriza su madre/i.test(texto), 'deja claro que autoriza la familia, no el menor', 'no dice quién autoriza');
+    ok(/agregado/i.test(texto) && /sin nombres|no identifica/i.test(texto), 'ofrece el dato agregado como alternativa', 'no plantea la alternativa agregada');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/El mínimo necesario/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el mínimo necesario', 'abre en otra pieza');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'la petición que llega se genera', 'prueba competencial vacía');
+    const rotulos = d.getElementById('eval-screen-title').textContent + d.getElementById('evalcrit-screen-title').textContent +
+                    d.getElementById('evalOut').textContent + crit + d.querySelectorAll('.eval-print-header')[0].textContent;
+    ok(!/Las seis palancas|Panorama|La puerta de la casa digital|La máquina que predice|Quién decide de verdad|Para quién y qué le cambia|Sesgos|El presupuesto real/.test(rotulos), 'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['notas de menores', 'foto de los niños', 'correos de los padres', 'nombre completo', 'datos de uso', 'listado completo', 'copia de seguridad', 'borrar los datos']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+      ok(/cinco reglas de los datos ajenos/i.test(txt), 'trae las cinco reglas', 'faltan las cinco reglas');
+      ok(/política de una página/i.test(txt), 'trae la política de una página', 'falta la política de una página');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/M\.E\.T\.A\.S|constancia|respaldo/.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-casa-cerrada-datos.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/Inventario de datos/i.test(txt), 'la ficha trae el inventario de datos', 'falta el inventario');
+    ok(/Política de una página/i.test(txt), 'la ficha trae la política de una página', 'falta la política');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-casa-cerrada-datos"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const casa = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Casa Cerrada/.test(c.textContent));
+    ok(!!casa, 'la Ruta de la Casa Cerrada está en el mapa', 'no aparece la ruta');
+    if (casa) {
+      ok(casa.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + casa.querySelectorAll('.re-link').length);
+      ok(casa.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + casa.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/Los datos de los demás/.test(casa.textContent), 'la etapa 2 sale con el título de la misión', 'la etapa 2 sigue saliendo como prevista');
+      ok(/El código que no confía/i.test(casa.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="cib"]');
+    ok(!!chip, 'la materia Ciberseguridad tiene su chip', 'no hay chip de Ciberseguridad');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      const dat = tarjetas.find(t => /datos de los demás/i.test(t.textContent));
+      ok(!!dat && /🔒/.test(dat.textContent), 'la misión de los datos lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

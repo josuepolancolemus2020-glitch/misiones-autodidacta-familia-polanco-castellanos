@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Casa Cerrada · Etapa 2: Los datos de los demás | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/datos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Guarda todo por si acaso 📦</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🛡️</div>
+    <div class="hero-text">
+      <h1>Los datos de los demás: <span>menores, ley y sentido común</span></h1>
+      <p class="sub">La etapa 1 cerró la puerta. Esta decide qué se guarda dentro, por cuánto tiempo y quién responde 🔐</p>
+      <div class="badge">🔐 Ruta de la Casa Cerrada · Etapa 2 de 6 · Ciberseguridad</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🛡️ La frase maestra, y las tres preguntas que la vuelven útil</h2>
+    <p>Los datos de un niño <strong>no son tuyos</strong>: son suyos y de su familia, y tú solo los tienes prestados mientras hagan falta. Esa frase parece obvia hasta que llega la primera petición razonable y se contesta que sí sin pensar. Por eso, ante cualquier dato que se vaya a guardar, tres preguntas: <strong>¿qué guardo exactamente?</strong>, <strong>¿por cuánto tiempo?</strong> y <strong>¿quién responde si se filtra?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Por qué esta etapa sigue a La puerta de la casa digital:</strong> allá se aprendió a controlar <strong>quién entra</strong>. Aquí se decide <strong>qué hay adentro para robar</strong>, que es la otra mitad del problema. La puerta más segura del mundo no sirve de nada si dentro se guardó, por si acaso, el nombre completo y la escuela de trescientos niños.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Dos preguntas antes de guardar cualquier dato</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🎯 ¿Para qué lo necesito?</h4>
+        <p>Un dato se pide <strong>para algo concreto</strong> y ese algo se puede escribir en una línea. «Por si acaso» y «para tener estadísticas» no son finalidades: son la forma en que se acumula lo que después se filtra.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>✂️ ¿Cuál es el mínimo que sirve?</h4>
+        <p>Casi siempre hace falta <strong>menos de lo que se pide</strong>. Para saber si una misión funcionó no hace falta el nombre: basta el grado y la fecha. El dato que no se guarda <strong>no se puede perder</strong>.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>Con menores, la duda <span class="hl">siempre se resuelve hacia el no</span>. No por miedo legal: porque el daño de una filtración <span class="hl2">no lo paga quien la causó</span>, lo paga un niño que no eligió nada de esto.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas del manejo de datos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué decide, dónde se rompe y cómo está hoy en M.E.T.A.S.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: el listado que alguien pidió por WhatsApp</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces cuando te piden datos con buena intención.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📩</span><span class="ms-text"><strong>La petición:</strong> «pásame el listado de los alumnos que usaron las misiones, con nombres».</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🤝</span><span class="ms-text"><strong>Quién lo pide:</strong> una maestra conocida, para un informe de su centro. No hay mala intención.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">📤</span><span class="ms-text"><strong>El envío:</strong> el archivo sale por WhatsApp y ya no vuelve. Queda en su teléfono, en su nube y en el grupo al que lo reenvíe.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🕳️</span><span class="ms-text"><strong>El día que falle:</strong> si ese teléfono se pierde, los nombres salieron de aquí. Y quien respondía eras tú.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué mandas?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">📄 El listado completo con nombres</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">📊 El conteo por grado, sin nombres</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚖️ Dato que identifica y dato agregado</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🪪 El dato que identifica</h4>
+        <p>El que permite llegar <strong>a una persona concreta</strong>: nombre y apellido, correo, teléfono, foto, la combinación de escuela, grado y sección. Se guarda solo si hace falta, se protege siempre y se borra cuando deja de servir.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>📊 El dato agregado</h4>
+        <p>El que habla de <strong>un grupo</strong>: «22 estudiantes de sexto completaron la misión en marzo». Sirve igual para decidir, no identifica a nadie y por eso <strong>se puede compartir sin miedo</strong>.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧭 Cómo se usa la diferencia</span><br>
+      <span>Casi todo lo que se pide «con nombres» <span class="hl">se resuelve igual de bien agregado</span>. Cuando alguien insiste en los nombres, la pregunta educada es: <span class="hl2">«¿qué vas a hacer con ellos que no puedas hacer con el conteo?»</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🛡️ Los cuatro pasos antes de guardar un dato</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. Escribir para qué y 2. quedarse con el mínimo</h4>
+        <p><strong>Para qué:</strong> una línea concreta. Si no se puede escribir, el dato no se pide. <strong>El mínimo:</strong> quitar campos hasta que la finalidad deje de cumplirse, y quedarse justo antes de ese punto. Lo que no se guarda no se puede perder ni filtrar.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. Decidir quién lo ve y 4. cuándo se borra</h4>
+        <p><strong>Quién lo ve:</strong> por nombre y cargo, no «los maestros» en general. <strong>Cuándo se borra:</strong> una fecha escrita desde el primer día. Un dato sin fecha de caducidad se queda para siempre, y algún día lo hereda alguien que no sabe qué es.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas del manejo</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Pasos antes de guardar</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Preguntas del inventario</div><div class="stat-val">5</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 En una línea</span><br>
+      <span>Un dato guardado sin <span class="hl">finalidad, dueño de acceso y fecha de borrado</span> no es un dato: es <span class="hl2">una deuda esperando</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>👨‍👩‍👧 Los menores no consienten: consiente su familia</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>📝 Quién autoriza</h4>
+        <p>Un niño no puede autorizar que se publique su foto ni que se guarde su nombre: <strong>autoriza su madre, su padre o quien lo tenga a cargo</strong>. Y la autorización es para algo concreto, no un permiso general para siempre.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🚪 El derecho a irse</h4>
+        <p>Quien autorizó puede <strong>cambiar de opinión</strong>. Si una familia pide que se borren los datos de su hija, se borran y se le dice cuándo quedó hecho. No hace falta que expliquen por qué.</p>
+      </div>
+    </div>
+    <p style="font-size:0.9rem;margin:0.8rem 0;">La regla que sale de aquí: <strong>lo que sirve para una fiesta escolar no sirve para internet</strong>. Que una madre acepte que su hija salga en el mural del aula no significa que acepte verla en una publicación pública, y hay que preguntarlo por separado.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🪪 Identifica</div><div class="t-info">Nombre, correo, foto</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">📊 Agregado</div><div class="t-info">Conteos sin nombres</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">✂️ Mínimo</div><div class="t-info">Solo lo que hace falta</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">⏱️ Plazo</div><div class="t-info">Fecha de borrado escrita</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">👀 Acceso</div><div class="t-info">Con nombre y cargo</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🚨 Incidente</div><div class="t-info">Qué se hace si se filtra</div></div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El inventario de datos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para saber qué se guarda hoy y qué habría que cambiar.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El mínimo necesario</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🛡️ Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="minimo" onclick="labShowParte('minimo')">✂️ El mínimo necesario</button>
+        <button class="lab-btn lab-cont-btn" data-parte="acceso" onclick="labShowParte('acceso')">👀 Quién lo ve</button>
+        <button class="lab-btn lab-cont-btn" data-parte="plazo" onclick="labShowParte('plazo')">⏱️ Cuánto se guarda</button>
+        <button class="lab-btn lab-cont-btn" data-parte="incidente" onclick="labShowParte('incidente')">🚨 Si se filtra</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se decide</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se rompe</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 Cómo está en M.E.T.A.S</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se decide guardar un dato</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del manejo de datos se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 Reduce el dato: ¿con qué basta?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Cuál es el mínimo que cumple la misma finalidad?</p>
+    <div class="neuro-trans-display" id="neuroTrans">Saber si la misión de fracciones funcionó en sexto</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Filtraciones: ¿qué falló ahí?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué falló de verdad:</p>
+    <div class="neuro-trans-display" id="enferDisease">Los correos de treinta padres quedaron visibles para todos</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada dato lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">Identifica</button>
+        <button class="btn btn-sec" onclick="">Agregado</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🛡️ La petición que llega</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Los datos de los demás · Ruta de la Casa Cerrada</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: los datos de los demás</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La petición que llega · Los datos de los demás</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🛡️ La petición que llega: qué se entrega y qué no</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso alguien pide datos, casi siempre con buena intención. Di qué se está pidiendo de verdad, con qué mínimo se cumple la misma finalidad y qué se contesta por escrito (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🛡️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🛡️ Casos del proyecto: los datos que M.E.T.A.S puede llegar a tener</h2>
+    <p>Ocho peticiones que este proyecto va a recibir, casi todas de buena fe. En cada una: qué se está pidiendo, con qué mínimo se cumple lo mismo y qué se contesta.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo trabajar la sección:</strong> tapa el análisis, lee la petición y di en voz alta qué mandarías y qué no. Al final quedan el inventario de datos, la política de una página y el plan de qué hacer si algo se filtra, que son el producto de esta etapa.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📋 Caso 1: la escuela que pide guardar notas de menores</h2>
+    <p>Un centro quiere que M.E.T.A.S guarde las calificaciones de sus estudiantes para llevar el registro del año.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎯 Qué se está pidiendo de verdad</span><br>
+      <span>Guardar <span class="hl">rendimiento académico con nombre</span> de menores, que es de lo más delicado que existe: una nota mala guardada mal puede seguir a un niño años. Y el que responde por esos datos <span class="hl2">pasa a ser el proyecto</span>, no la escuela.</span>
+    </div>
+    <p><strong>La condición con la que sí:</strong> el registro con nombres se queda en el centro, que es quien tiene la relación con las familias. M.E.T.A.S guarda un identificador que la escuela sabe traducir y nosotros no. Además: por escrito para qué es, quién lo consulta y cuándo se borra, que es al terminar el año escolar.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📸 Caso 2: la foto de los niños usando la aplicación</h2>
+    <p>Sale una foto buenísima de una sección trabajando con las misiones y da ganas de publicarla.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚖️ Lo que parece un permiso y no lo es</span><br>
+      <span>Que la maestra deje tomar la foto <span class="hl">no es el permiso que hace falta</span>: quien autoriza es la familia de cada niño que salga, y para <span class="hl2">esta publicación concreta</span>, no para siempre ni para cualquier sitio.</span>
+    </div>
+    <p><strong>Lo que sí se puede hacer:</strong> la foto de las manos y la pantalla, sin caras. Cumple lo mismo (enseñar que se usa de verdad) y no necesita permiso de nadie. Cuando la cara aporta algo que no aporta la mano, entonces sí se pide autorización por escrito, una por niño.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📧 Caso 3: los correos de los padres en copia visible</h2>
+    <p>Se manda un aviso a treinta familias y todos los correos van en el campo «Para».</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🚨 Una filtración pequeña y completa</span><br>
+      <span>Cada familia acaba de recibir <span class="hl">los correos de las otras veintinueve</span>. No hubo ataque ni descuido grave: hubo un campo mal elegido. Y no hay forma de recogerlo: <span class="hl2">lo enviado no vuelve</span>.</span>
+    </div>
+    <p><strong>Cómo se evita:</strong> copia oculta siempre que haya más de un destinatario que no se conozca entre sí, o mejor, un aviso por el canal del centro. Y cuando ya pasó: avisar, pedir disculpas y decir qué se cambió para que no vuelva a ocurrir. Ocultarlo cuesta más que contarlo.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📱 Caso 4: el APK que guarda el nombre completo</h2>
+    <p>La aplicación pide el nombre del estudiante para personalizar la constancia y lo guarda en el teléfono.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">✂️ Dónde está el mínimo</span><br>
+      <span>Para poner un nombre en la constancia <span class="hl">basta con el nombre de pila</span>, y ni siquiera hace falta que salga del teléfono. El dato que <span class="hl2">nunca viaja a un servidor</span> es el único que no se puede filtrar desde el servidor.</span>
+    </div>
+    <p><strong>La regla que se aplica:</strong> guardar en el aparato lo que solo sirve en el aparato. La constancia se arma en el teléfono, con lo que el usuario escribió, y el proyecto no se entera. Eso además ahorra tener que responder por ello.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🤖 Caso 5: la empresa que ofrece una función a cambio de los datos de uso</h2>
+    <p>Ofrecen añadir gratis una función de inteligencia artificial a cambio de recibir los datos de uso de los estudiantes.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">💸 Qué se paga con eso</span><br>
+      <span>Mete una función vistosa. Saca <span class="hl">datos de menores hacia una empresa</span> sobre la que el proyecto no manda y a la que las familias nunca autorizaron nada. Y lo que sale ya no se puede traer de vuelta.</span>
+    </div>
+    <p><strong>La condición con la que sí:</strong> datos agregados y sin identificadores, con un documento que diga qué reciben, para qué y por cuánto tiempo. Si eso no les sirve, la respuesta es no, y no pasa nada: la función vistosa vale menos que la confianza de una maestra.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🧑‍🏫 Caso 6: el maestro que pide el listado completo del aula</h2>
+    <p>Quiere saber quiénes de su sección entraron a las misiones esta semana, con nombres.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🤔 La petición legítima que igual se reduce</span><br>
+      <span>Aquí <span class="hl">sí hay una relación directa</span>: él es su maestro y responde por ellos. Pero conviene preguntar qué va a hacer con la lista, porque si es para saber si la actividad funcionó, <span class="hl2">el conteo por grado le sirve igual</span> y no crea una copia más.</span>
+    </div>
+    <p><strong>Cómo se resuelve:</strong> el conteo por defecto y la lista solo si de verdad hace falta para acompañar a un estudiante concreto. Cada copia de una lista con nombres es un sitio más del que se puede filtrar, y las copias no se pueden vigilar.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>💾 Caso 7: la copia de seguridad en el teléfono que se perdió</h2>
+    <p>El respaldo de la base de datos estaba en el teléfono, sin clave, y el teléfono se quedó en un bus.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔐 La copia también es un sitio</span><br>
+      <span>Se protege el servidor y se olvida que <span class="hl">la copia contiene lo mismo</span>. Un respaldo sin cifrar es la base de datos entera regalada, y encima <span class="hl2">nadie se entera de que se la llevaron</span>.</span>
+    </div>
+    <p><strong>Lo que hay que tener escrito:</strong> dónde viven las copias, con qué clave están cifradas y quién la tiene. Y en el plan de incidente, el primer paso: cambiar las claves de todo lo que ese aparato podía abrir, antes de averiguar nada más.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🚪 Caso 8: la familia que pide borrar los datos de su hija</h2>
+    <p>Una madre escribe pidiendo que se borre todo lo que el proyecto tenga de su hija.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">✅ La prueba de fuego del sistema</span><br>
+      <span>Esta petición <span class="hl">mide todo lo demás</span>: si no se sabe dónde está cada dato de esa niña, es que nunca hubo inventario. Y si el borrado no se puede hacer, es que <span class="hl2">se guardó más de lo que se podía sostener</span>.</span>
+    </div>
+    <p><strong>Cómo se responde:</strong> se borra, se confirma por escrito con la fecha, y no se pregunta el motivo. Si algo no se puede borrar por una razón real, se dice cuál y hasta cuándo. Este caso es el mejor examen que hay del inventario de datos, y conviene hacerlo de mentira una vez al año.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La política de una página, y las cinco reglas</h2>
+    <p>Todo lo que este proyecto guarda de otras personas cabe en una página con cinco puntos:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué se guarda:</strong> la lista completa de campos, sin «etcétera».</li>
+      <li><strong>Para qué:</strong> una línea por cada dato, concreta y verificable.</li>
+      <li><strong>Quién lo ve:</strong> con nombre y cargo, no «el equipo».</li>
+      <li><strong>Cuánto tiempo:</strong> una fecha o una condición clara de borrado.</li>
+      <li><strong>Qué se hace si se filtra:</strong> a quién se avisa, en qué orden y en cuánto tiempo.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas de los datos ajenos</span><br>
+      <span>1. Lo que no se guarda <span class="hl">no se puede perder</span>. 2. Con menores, la duda se resuelve <span class="hl">hacia el no</span>. 3. Agregado antes que con nombres, siempre. 4. Todo dato nace con <span class="hl">fecha de borrado</span>. 5. Si se filtra, <span class="hl2">se avisa</span>: ocultarlo cuesta más que contarlo.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas del manejo de datos</strong>, la diferencia entre dato que identifica y dato agregado, las ocho peticiones que va a recibir el proyecto, el <strong>inventario de datos</strong> y la <strong>política de una página</strong> para llenar a lápiz, el plan de qué hacer si algo se filtra, seis ejercicios y la pauta completa.</p>
+      <a href="../../fichas/ficha-casa-cerrada-datos.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con el inventario de datos de M.E.T.A.S escrito, campo por campo.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../misiones/ruta-casa-cerrada-la-puerta/la-puerta.html">🔐 La puerta de la casa digital</a>: la etapa 1 de esta misma ruta. Allá se decide quién entra; aquí, qué hay adentro que valga la pena robar.</li>
+      <li><a href="../../index.html">⚡ Destellos</a>: cada vez que alguien te pida datos, apúntalo con fecha y con lo que enviaste. Esa lista es la mitad del inventario.</li>
+      <li><a href="../../index.html">💬 Chat Familiar</a>: las peticiones de datos se contestan en frío. Nadie manda un archivo con nombres el mismo día que se lo piden.</li>
+      <li><a href="../../misiones/ruta-maquina-que-predice/maquina-predice.html">🤖 La máquina que predice</a>: el caso 5 es exactamente el que se estudia allá. Lo que se le entrega a una IA sale de casa igual que cualquier otro dato.</li>
+      <li><a href="../../fichas/ficha-casa-cerrada-datos.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: el inventario y la política de una página caben en una hoja cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> llenar el inventario con <strong>todos los campos que hoy guarda el proyecto</strong>, sin dejar ninguno fuera por vergüenza, escribir la política de una página y hacer el simulacro del caso 8: intentar borrar de verdad todo lo de una persona. La prueba de que está aprendido es poder decir, de cada dato, <strong>para qué está, quién lo ve y cuándo se borra</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🛡️</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Casa Cerrada · Etapa 2: Los datos de los demás</div>
+    <div class="diploma-mascot" aria-hidden="true">🛡️</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🛡️</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Los datos de un niño no son tuyos: los tienes prestados mientras hagan falta» 🌱 · 🔐 Ruta de la Casa Cerrada · Etapa 2 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/datos.js"></script>
+</body>
+</html>
