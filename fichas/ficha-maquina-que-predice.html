@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Ruta de la Máquina que Predice · Etapa 1: Qué es y qué no es un modelo de lenguaje</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #0891b2; --pri-suave: #ecfeff; --sec: #7c3aed; --sec-suave: #f5f3ff; }
+  .guion li { margin: 5px 0; }
+  table.tres th:nth-child(1) { width: 26%; }
+  table.tres th:nth-child(2), table.tres th:nth-child(3) { width: 25%; }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .caso .fuente { font-size: 11.5px; color: var(--gris); margin-top: 6px; }
+  .mini { font-size: 12px; color: var(--gris); }
+  table.audit td:nth-child(1) { width: 6%; text-align: center; }
+  table.audit td:nth-child(3), table.audit td:nth-child(4) { width: 9%; text-align: center; height: 26px; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/ruta-maquina-que-predice/maquina-predice.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · La máquina que predice</div>
+    <div class="f-meta"><b>Ruta:</b> 🤖 Ruta de la Máquina que Predice · Etapa 1 de 6 · <b>Materia:</b> Inteligencia Artificial</div>
+    <div class="f-meta"><b>Tema:</b> qué es y qué no es un modelo de lenguaje. Las siete piezas (token, ventana de contexto, entrenamiento, predicción, alucinación, encargo y verificación), por qué inventa con seguridad, cuánto cuesta y cómo se verifica.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Explicar en una frase qué hace un modelo de lenguaje, y <strong>deducir de esa frase</strong> tanto sus aciertos como sus invenciones.</li>
+    <li>Usar bien las palabras <strong>token</strong>, <strong>ventana de contexto</strong>, <strong>alucinación</strong> y <strong>verificación</strong>.</li>
+    <li>Distinguir las tareas donde rinde muchísimo (cambiar la forma) de aquellas donde no se le delega nada (decidir la verdad).</li>
+    <li>Entender la aritmética del costo y por qué esta casa trabaja en <strong>tandas grandes</strong>.</li>
+    <li>Escribir un <strong>encargo con sus cinco partes</strong> y verificar lo que entrega antes de firmarlo.</li>
+    <li>Dejar acordadas las <strong>cinco reglas de la casa</strong> para usar inteligencia artificial, incluida la de las hijas.</li>
+  </ol>
+
+  <h2>🧭 La frase de la que sale todo</h2>
+  <p>Un modelo de lenguaje <b>predice la siguiente palabra</b>. Eso es todo lo que hace. Leyó cantidades enormes de texto y ajustó millones de números hasta volverse extraordinariamente bueno en una sola tarea: dado todo lo anterior, calcular qué palabra viene después. Cuando responde, elige una, la agrega a lo anterior, y vuelve a calcular. Palabra por palabra, hasta terminar.</p>
+  <p>De ahí salen las dos caras que conviene tener siempre presentes. La primera: escribe con una soltura asombrosa, ordena ideas, cambia de tono, traduce, resume, imita una estructura. La segunda: <b>no distingue entre acertar y sonar bien</b>. Cuando le preguntan algo sobre lo que no tiene con qué acertar, no se calla ni avisa; sigue prediciendo lo más probable. Y lo más probable <i>se parece</i> a una respuesta correcta. Por eso una cita inventada trae autor, título, página y año, todo bien puesto.</p>
+  <p>Conviene decirlo sin drama y sin fe: <b>no consulta una base de datos de verdades, no busca en internet salvo que le den una herramienta para hacerlo, y no sabe que existe</b>. Tratarla como oráculo produce desastres; tratarla como una máquina de borradores extremadamente veloz produce trabajo de verdad.</p>
+
+  <h2>🏠 Por qué esta materia entra en la casa</h2>
+  <p>Aquí no se estudia inteligencia artificial por curiosidad ni por moda. M.E.T.A.S y F.A.R.O se construyen todos los días con una: escribe misiones, código, fichas y traducciones. Quien no entiende la herramienta con la que trabaja, trabaja a ciegas, y en este caso trabajar a ciegas ya costó una ficha con diecinueve páginas cuando debía tener diez.</p>
+  <div class="caja">
+    <strong>La regla que resume la etapa:</strong> úsala donde <b>el error se corrige barato</b> (un borrador, un resumen, una traducción que se revisa). Donde equivocarse sale caro (un dato publicado, una cuenta, una decisión que afecta a otros), la máquina propone y <b>una persona decide y firma</b>.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 1 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>🧩 Las piezas 1 a 3, por dentro</h2>
+
+  <h3>🔤 1. El token</h3>
+  <p><b>Qué es:</b> la pieza en la que la máquina parte el texto antes de trabajar con él. No son letras ni palabras exactas: son pedazos frecuentes. En español un token es, en promedio, de <b>tres a cuatro letras</b>. «Casa» suele ser un token; «extraordinariamente» son varios; un signo de puntuación suele ser uno.</p>
+  <p><b>Por qué importa:</b> todo se cuenta y se cobra en tokens, los que entran y los que salen. Y lo que sale cuesta bastante más que lo que entra, porque generarlo es el trabajo caro.</p>
+  <table>
+    <tr><th style="width:38%">Referencia (julio de 2026)</th><th>Orden de magnitud</th></tr>
+    <tr><td>Un modelo grande, entrada</td><td>Alrededor de 5 dólares por millón de tokens</td></tr>
+    <tr><td>Un modelo grande, salida</td><td>Alrededor de 25 dólares por millón de tokens</td></tr>
+    <tr><td>Un modelo pequeño y rápido</td><td>Del orden de cinco veces más barato</td></tr>
+    <tr><td>Un millón de tokens, en palabras</td><td>Unas 750.000 palabras: varias novelas</td></tr>
+  </table>
+  <p class="mini"><b>Ojo con las cifras:</b> los precios cambian y hay que comprobarlos en la fuente antes de citarlos. Lo que no cambia es la forma: se paga por token, la salida cuesta más, y los modelos pequeños cuestan una fracción de los grandes.</p>
+
+  <p class="mini"><b>Para calcular a ojo:</b> una página de texto corrido ronda los 500 o 600 tokens, así que una ficha de diez páginas anda por los 6.000. El código gasta más que la prosa, y los acentos y las eñes también suman. Nunca uses un contador hecho para otra marca de modelo: cada uno parte el texto a su manera y la cuenta no se traslada.</p>
+  <h3>🪟 2. La ventana de contexto</h3>
+  <p><b>Qué es:</b> todo lo que cabe en una conversación. Tus mensajes, los archivos que pegaste, y todas las respuestas anteriores. Los modelos grandes de 2026 llegan al <b>millón de tokens</b>; los pequeños, a unos doscientos mil.</p>
+  <p><b>Lo que casi nadie entiende a la primera:</b> la máquina <b>no recuerda</b>. En cada turno se le vuelve a enviar la conversación completa, desde el principio. Lo que parece memoria es simplemente texto que viaja otra vez.</p>
+  <table class="tres">
+    <tr><th>Situación</th><th>Qué pasa de verdad</th><th>Consecuencia práctica</th></tr>
+    <tr><td>Le explicas algo y sigue trabajando</td><td>Ese texto viaja de nuevo en cada turno</td><td>A más turnos, más veces se paga lo mismo</td></tr>
+    <tr><td>Se cierra la conversación</td><td>Se pierde todo el contexto</td><td>La memoria del proyecto tiene que estar escrita</td></tr>
+    <tr><td>La ventana se llena</td><td>Hay que resumir o empezar limpio</td><td>Conviene cambiar de sesión al cambiar de tema</td></tr>
+  </table>
+
+  <h3>📚 3. El entrenamiento y el corte de conocimiento</h3>
+  <p><b>Qué es:</b> la etapa anterior, larguísima y carísima, en la que el modelo leyó enormes cantidades de texto y ajustó sus números. Cuando tú lo usas, esa etapa terminó: <b>ya no aprende</b>. Lo que le expliques hoy no queda para mañana ni para nadie más.</p>
+  <p>El <b>corte de conocimiento</b> es la fecha hasta la que llegó ese texto. De ahí en adelante no sabe nada, salvo lo que tú pegues en la conversación o lo que traiga con una herramienta de búsqueda. Preguntarle por algo reciente sin darle la fuente es pedirle exactamente que invente.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h2>🧩 Las piezas 4 y 5, por dentro</h2>
+
+  <h3>🎲 4. La predicción</h3>
+  <p><b>Cómo funciona por dentro:</b> en cada paso la máquina calcula una probabilidad para muchísimas palabras posibles y elige una. Después repite el cálculo con esa palabra ya incluida. No hay un plan previo de la respuesta completa: la respuesta <b>se va construyendo</b> palabra por palabra.</p>
+  <p>Dos consecuencias que se notan todos los días. La primera: dos respuestas a la misma pregunta no son idénticas, porque la elección tiene algo de azar. La segunda, más importante: la máquina <b>no tiene un medidor de confianza</b> que puedas leer. Escribe igual de fluido cuando lo sabe y cuando no.</p>
+  <p><b>Sobre la temperatura.</b> Durante años hubo un control llamado así para decidir cuánta variedad tenía la respuesta: baja para respuestas parejas, alta para creativas. En los modelos más nuevos de 2026 <b>ese control ya no se puede tocar</b>: la variedad se pide con palabras dentro del encargo («proponme cuatro versiones muy distintas»), que además funciona mejor porque se puede explicar qué tipo de variedad se busca.</p>
+  <p><b>Pensar antes de responder.</b> Los modelos actuales pueden razonar un rato antes de contestar, y en problemas de varios pasos aciertan bastante más. Ese pensamiento también consume tokens y también puede equivocarse: pensar más no es lo mismo que tener la información.</p>
+
+  <h3>🌫️ 5. La alucinación</h3>
+  <p><b>Qué es:</b> inventar con seguridad. Una cita, un artículo de ley, una cifra, una función de programación que no existe. La palabra suena a enfermedad rara y engaña: no es una falla ocasional del sistema, <b>es el sistema funcionando donde no había con qué acertar</b>.</p>
+  <table>
+    <tr><th style="width:40%">Dónde inventa más</th><th>Por qué</th></tr>
+    <tr><td>Datos muy específicos: páginas, artículos, fechas, cifras</td><td>Tienen forma muy reconocible y muchas variantes posibles</td></tr>
+    <tr><td>Citas textuales de libros o leyes</td><td>Sabe cómo suena una cita mucho mejor que cuál es</td></tr>
+    <tr><td>Cosas que solo tú puedes saber</td><td>Tu proyecto, tus archivos, lo que hicieron ayer</td></tr>
+    <tr><td>Hechos posteriores a su corte de conocimiento</td><td>Nunca los leyó, pero puede predecir cómo se verían</td></tr>
+    <tr><td>Medir y contar</td><td>Predecir no es contar: son operaciones distintas</td></tr>
+  </table>
+  <p><b>La señal de alarma que hay que memorizar:</b> cuanto más específico, redondo y bien puesto suena un dato, <b>más conviene abrir la fuente</b>. La invención no llega con aspecto de duda: llega con aspecto de precisión.</p>
+  <p><b>Cómo se nota, en la práctica.</b> Hay tres señales que casi nunca fallan: el dato es <b>demasiado redondo</b> para lo específico que es; la fuente es <b>verificable pero incómoda</b> de verificar (una página exacta de un libro que no tienes a mano); y cuando le pides que amplíe, <b>amplía sin dudar</b> y da más detalles igual de precisos. Esa tercera es la más útil: una persona que no sabe titubea, la máquina no.</p>
+  <p class="mini"><b>Un matiz que conviene tener claro:</b> con el texto delante (un archivo que le pegaste, un documento que abrió con una herramienta) la máquina inventa muchísimo menos, porque ya no tiene que predecir lo que dice: lo está leyendo. Por eso «resume este PDF» es mucho más confiable que «qué dice el PDF tal», y por eso vale la pena darle la fuente antes de preguntarle por ella.</p>
+  <div class="caja">
+    <strong>Y una trampa que es nuestra, no suya:</strong> el <b>sesgo de fluidez</b>. Un texto bien escrito nos convence más que uno torpe, aunque digan lo mismo. Como la máquina escribe siempre bien, el texto que más ganas da de aprobar sin revisar es justamente el que más conviene revisar.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 3 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <h2>🧩 Las piezas 6 y 7, y la aritmética del costo</h2>
+
+  <h3>📋 6. El encargo</h3>
+  <p><b>Qué es:</b> lo que le pides. Un buen encargo se parece más a una orden de trabajo que a una pregunta, y trae cinco partes. Lo que no le digas, la máquina lo rellena con lo más probable, que casi nunca es lo que hacía falta.</p>
+  <table>
+    <tr><th style="width:26%">Parte</th><th>Ejemplo real de esta casa</th></tr>
+    <tr><td><b>Quién</b> lo usa</td><td>Una maestra de sexto grado en Honduras, con la ficha impresa</td></tr>
+    <tr><td><b>Para qué</b></td><td>Dar una clase de fracciones de 45 minutos sin preparar nada más</td></tr>
+    <tr><td><b>Con qué reglas</b></td><td>Las normas de F.A.R.O: diez páginas, sin guiones largos, respuestas repartidas</td></tr>
+    <tr><td>Un <b>ejemplo</b></td><td>La ficha de Activos y Pasivos, que salió bien</td></tr>
+    <tr><td><b>Cuándo termina</b></td><td>Cuando el PDF tiene diez hojas contadas y la sonda pasa entera</td></tr>
+  </table>
+
+  <h3>🔎 7. La verificación</h3>
+  <p><b>Qué es:</b> comprobar en la fuente real lo que se puede comprobar. No es leer otra vez ni preguntarle de nuevo a la máquina (la segunda respuesta se predice igual que la primera, y con la primera ya dentro de la conversación). Verificar es <b>salir de la conversación</b>: abrir el PDF, rehacer la cuenta, tocar el enlace, buscar la cita.</p>
+  <p><b>Es lo único</b> que convierte una respuesta en algo que se puede firmar. Y el orden importa: primero lo medible, que es rápido y objetivo; después la lectura completa, que es lenta.</p>
+
+  <h3>💵 La aritmética que explica las tandas grandes</h3>
+  <p>Como en cada turno se reenvía la conversación completa, el costo no crece con el trabajo hecho: crece con la <b>cantidad de turnos</b>. Con una conversación de cierto tamaño, nueve mensajitos de «sigue» pueden costar bastante más que dos tandas grandes que hacen exactamente lo mismo.</p>
+  <table>
+    <tr><th style="width:38%">Lo que abarata</th><th>Cuánto</th></tr>
+    <tr><td>La caché: repetir el mismo principio de conversación</td><td>Alrededor de la décima parte del precio de entrada</td></tr>
+    <tr><td>Cambiar algo del principio</td><td>Se pierde la caché entera y se vuelve a pagar completo</td></tr>
+    <tr><td>Dejar pasar mucho tiempo entre mensajes</td><td>La caché dura pocos minutos: se pierde igual</td></tr>
+  </table>
+  <p><b>Un ejemplo con números redondos, para ver la forma.</b> Supón una conversación que ya lleva 50.000 tokens y un trabajo que necesita nueve intervenciones. Si se hace en nueve turnos, esos 50.000 viajan nueve veces: 450.000 tokens de entrada. Si se hace en dos tandas, viajan dos veces: 100.000. El trabajo entregado es el mismo. Por eso «hazlo en una sola pasada, con todo el contexto de una vez» no es prisa: es la forma barata de pedir.</p>
+  <p class="mini"><b>El costo escondido de razonar.</b> Cuando la máquina piensa antes de responder también gasta tokens de salida, que son los caros, y no siempre hacen falta: en tareas mecánicas conviene pedirle poco esfuerzo, y guardar el esfuerzo alto para lo difícil de verdad. Es la misma idea que en la casa: no se estudia con la misma intensidad una lista del mandado que un examen.</p>
+  <div class="caja">
+    <strong>Regla práctica de la casa:</strong> dos o tres tandas grandes por misión, un solo «sigue» por tanda, y leer cada archivo grande <b>una sola vez</b> por turno. No es manía de ahorro: es que cada turno reenvía todo lo anterior, y el motor de una misión pesa más de cien mil tokens él solo.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <h2>🔬 Casos de estudio reales: cuando le creyeron</h2>
+  <p>Cuatro casos documentados públicamente. Ninguno pasó por usar la herramienta: pasaron por <b>firmar sin verificar</b>.</p>
+
+  <div class="caso">
+    <h3>1. Los abogados y las sentencias que no existían (2023)</h3>
+    <p>Dos abogados de Nueva York presentaron ante un tribunal un escrito con varias sentencias citadas como precedente. Las sentencias habían sido generadas por una IA y <b>no existían</b>: nombres de casos, números de expediente y citas textuales, todo con forma perfecta. Cuando la parte contraria no logró encontrarlas, el juez pidió copias; el escrito se derrumbó. Los abogados fueron sancionados con una multa.</p>
+    <p><b>Lo que enseña:</b> el problema no fue usar la herramienta, fue presentar como cierto algo que nadie comprobó. Verificar habría costado quince minutos en una base de datos judicial. Y fíjate en el detalle importante: <b>las citas falsas eran perfectas por fuera</b>, porque eso es exactamente lo que la máquina sabe imitar.</p>
+    <p class="fuente">Fuente: caso Mata contra Avianca, Tribunal Federal del Distrito Sur de Nueva York, sanción de junio de 2023, ampliamente documentado.</p>
+  </div>
+
+  <div class="caso">
+    <h3>2. El error en el anuncio de un buscador (2023)</h3>
+    <p>Una empresa muy grande presentó su asistente de inteligencia artificial con un ejemplo en el propio anuncio publicitario. En la respuesta mostrada, el sistema atribuía al telescopio espacial James Webb una primera fotografía de un planeta fuera del sistema solar; ese logro era anterior y de otro telescopio. El error se detectó en horas y le costó a la empresa un golpe fuerte de credibilidad.</p>
+    <p><b>Lo que enseña:</b> ni siquiera un equipo enorme, en la respuesta más revisada del año, se libra si el paso de verificación no está en el proceso. La invención no avisa. Y si pasó ahí, puede pasar en una ficha hecha un martes por la noche.</p>
+    <p class="fuente">Fuente: anuncio público de febrero de 2023 y la corrección posterior, ampliamente cubiertos por la prensa.</p>
+  </div>
+
+  <div class="caso">
+    <h3>3. El asistente de una aerolínea y una promesa que la empresa tuvo que cumplir (2024)</h3>
+    <p>El asistente automático del sitio de una aerolínea le explicó a un pasajero una política de descuento que no era la real. Cuando la empresa se negó a aplicarla, el pasajero reclamó y un tribunal falló a su favor: la empresa <b>era responsable</b> de lo que dijo su asistente, igual que de lo que dice cualquier otra parte de su sitio.</p>
+    <p><b>Lo que enseña:</b> lo que la máquina dice en tu nombre lo dices tú. Es exactamente la regla de la casa aplicada por un tribunal: quien publica responde, sin importar quién escribió el borrador.</p>
+    <p class="fuente">Fuente: resolución del tribunal civil de Columbia Británica, Canadá, febrero de 2024.</p>
+  </div>
+
+  <div class="caso">
+    <h3>4. La ficha que decía diez páginas y tenía diecinueve (2026, esta casa)</h3>
+    <p>Se pidió una ficha de exactamente diez páginas. La máquina confirmó que estaba lista, en diez páginas. El PDF impreso tenía diecinueve. No mintió: <b>no puede medir</b>. Predijo la frase que suele seguir a esa pregunta, y esa frase es «sí».</p>
+    <p><b>Lo que enseña:</b> de este error salió la norma 6 de F.A.R.O, la que dice que <b>el PDF es el único juez</b>. Cada norma escrita de esta casa protege de un error que ya se cometió, y esta protege del más silencioso de todos: creerle a la máquina algo que ella no puede saber.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <h2>🏠 Casos de esta casa: cómo se usa aquí</h2>
+
+  <div class="caso">
+    <h3>5. Escribir una misión completa</h3>
+    <p>La máquina redacta una misión de quince secciones en minutos: teoría, quiz, ejercicios y evaluación.</p>
+    <p><b>Cómo se usa bien:</b> se le da un ejemplo que ya salió bien, se le dan las normas como parte del encargo, y se revisa entero antes de publicar. Lo que se verifica siempre: los datos con fuente, las cuentas, los enlaces, las fechas, los nombres propios y todo lo medible. Lo demás se lee de corrido una vez.</p>
+    <p><b>Lo que no se hace nunca:</b> publicar una misión el mismo minuto en que se generó.</p>
+  </div>
+
+  <div class="caso">
+    <h3>6. Escribir el código de la aplicación</h3>
+    <p>Buena parte de F.A.R.O y de M.E.T.A.S la escribe una IA, incluida la parte que toca el chat familiar y las finanzas.</p>
+    <p><b>Qué se revisa antes de subir:</b> que haga solo lo que se pidió (no de paso otras tres cosas), que no toque llaves ni datos que no le tocan, que se pruebe de verdad en el teléfono, y que el mensaje del commit diga <b>por qué</b>, no solo qué. Rápido no es lo mismo que revisado, y los huecos que audita la etapa de Ciberseguridad también se abren por aceptar código sin leerlo.</p>
+  </div>
+
+  <div class="caso">
+    <h3>7. Traducir las misiones al inglés</h3>
+    <p>Aquí la máquina rinde muchísimo, porque el trabajo es <b>cambiar la forma</b> de algo que ya es correcto, no decidir qué es correcto.</p>
+    <p><b>Lo que igual hay que revisar:</b> nombres propios, unidades, ejemplos con dinero en lempiras, y los juegos de palabras, que se pierden o se sustituyen por otros inventados.</p>
+  </div>
+
+  <div class="caso">
+    <h3>8. Las niñas y las tareas</h3>
+    <p>Jael y Angelly van a usar estas herramientas, ahora o en dos años. La pregunta no es si, es cómo.</p>
+    <p><b>La regla que sí funciona:</b> que la máquina <b>explique</b>, no que responda. «Explícame por qué se hace así» está bien; «hazme la tarea» no, porque lo que se compra con eso es no aprender. La prueba de que se usó bien es poder explicar el resultado <b>sin la pantalla enfrente</b>, que es la misma prueba de defensa oral que usa esta familia para todo lo demás.</p>
+  </div>
+
+  <div class="caso">
+    <h3>9. El corte de luz y la conversación perdida</h3>
+    <p>Se va la luz, se cierra la terminal, y con ella la conversación entera. La máquina no recuerda nada de lo que llevaban horas construyendo.</p>
+    <p><b>Lo que enseña:</b> todo lo que «sabía» de tu proyecto vivía en la ventana de contexto de esa sesión. Lo que sobrevive es el repositorio, las normas escritas y los mensajes de commit. Por eso se hace commit en cada punto de control y por eso los mensajes explican el porqué: <b>la memoria del proyecto no está en la máquina, está en lo que quedó escrito</b>. En una casa con cortes de luz frecuentes, esto no es teoría.</p>
+  </div>
+  <div class="caja">
+    <strong>El patrón de los ocho casos:</strong> donde el trabajo es dar forma, la máquina multiplica lo que una persona puede hacer. Donde el trabajo es decidir qué es cierto o qué conviene, la persona no se puede quitar del medio. Toda la etapa cabe en esa frontera.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h2>📝 La plantilla del encargo</h2>
+  <p>Se llena a lápiz antes de escribirle nada a la máquina. Con la práctica sale de memoria, pero al principio conviene tenerla delante.</p>
+  <table>
+    <tr><th style="width:26%">Parte</th><th>Tu encargo de hoy</th></tr>
+    <tr><td><b>Quién</b> lo va a usar</td><td></td></tr>
+    <tr><td><b>Para qué</b> le sirve</td><td></td></tr>
+    <tr><td><b>Con qué reglas</b></td><td></td></tr>
+    <tr><td>Un <b>ejemplo</b> parecido</td><td></td></tr>
+    <tr><td><b>Cuándo</b> está terminado</td><td></td></tr>
+  </table>
+
+  <h2>🔎 Lista de verificación antes de firmar</h2>
+  <p>Se marca ✓ lo comprobado y ✗ lo que falló. Nada se publica con un ✗ sin resolver.</p>
+  <table class="audit">
+    <tr><th>#</th><th>Comprobación</th><th>✓</th><th>✗</th></tr>
+    <tr><td>1</td><td>¿Conté las páginas en el PDF, en vez de preguntarlas?</td><td></td><td></td></tr>
+    <tr><td>2</td><td>¿Abrí la fuente de cada dato citado y dice lo que aquí dice?</td><td></td><td></td></tr>
+    <tr><td>3</td><td>¿Rehice las cuentas por fuera (a mano o con calculadora)?</td><td></td><td></td></tr>
+    <tr><td>4</td><td>¿Toqué cada enlace y existe?</td><td></td><td></td></tr>
+    <tr><td>5</td><td>¿Revisé nombres propios, fechas y unidades?</td><td></td><td></td></tr>
+    <tr><td>6</td><td>¿Leí el texto entero una vez, de corrido?</td><td></td><td></td></tr>
+    <tr><td>7</td><td>¿Cumple las normas que puse en el encargo?</td><td></td><td></td></tr>
+    <tr><td>8</td><td>¿Hace solo lo que pedí, sin añadidos que nadie pidió?</td><td></td><td></td></tr>
+    <tr><td>9</td><td>¿Queda escrito de dónde salió cada cosa, para dentro de un año?</td><td></td><td></td></tr>
+    <tr><td>10</td><td>¿Puedo defender esto si alguien me pregunta de dónde salió?</td><td></td><td></td></tr>
+  </table>
+  <p class="mini">Resultado honesto: ______ de 10. Qué se corrigió: ______________________________. Firma de quien revisó: ______________.</p>
+
+  <h2>🤔 Tres preguntas antes de abrir la máquina</h2>
+  <p class="mini">Si las tres respuestas van en contra, esa tarea no es para ella.</p>
+  <table>
+    <tr><th style="width:46%">Pregunta</th><th>Qué significa un sí</th></tr>
+    <tr><td>¿El trabajo es dar forma a algo que ya sé?</td><td>Rinde muchísimo: borrador, resumen, traducción, formato</td></tr>
+    <tr><td>¿Puedo verificar lo importante en una fuente?</td><td>Se puede usar: el error se detecta antes de publicar</td></tr>
+    <tr><td>¿El error se corrige barato?</td><td>Adelante. Si es caro, la máquina propone y decide una persona</td></tr>
+  </table>
+  <div class="caja">
+    <strong>Cómo se lee el resultado:</strong> las comprobaciones 1 a 5 son objetivas y rápidas, y ahí se cae casi todo lo que falla. Las 6 a 10 son de criterio y son las que evitan publicar algo correcto pero inservible. La número 10 es la más dura y la más importante: si la respuesta es «me lo dio la máquina», todavía no está lista.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 7 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
+<section class="pagina">
+  <h2>✍️ Ejercicios sin pantalla</h2>
+  <p class="mini">Se responden a lápiz. Las respuestas están en la pauta de la página 9, y no se miran antes.</p>
+
+  <h3>Ejercicio 1 · La frase que lo explica todo</h3>
+  <p>Escribe en una línea qué hace un modelo de lenguaje, y en dos más por qué eso explica que invente citas perfectas.</p>
+  <ol class="lineas-4"><li>_______________________________________________________________________</li>
+  <li>_______________________________________________________________________</li>
+  <li>_______________________________________________________________________</li></ol>
+
+  <h3>Ejercicio 2 · Se le pide o se verifica</h3>
+  <p>Marca con P lo que se le puede pedir y con V lo que hay que verificar por fuera:</p>
+  <ol class="lineas-4">
+    <li>Un primer borrador de una misión: ______</li>
+    <li>Cuántas páginas quedó la ficha: ______</li>
+    <li>Traducir un texto correcto al inglés: ______</li>
+    <li>Una cita textual con página: ______</li>
+    <li>Resumir un documento que le diste: ______</li>
+    <li>La suma de los gastos del mes: ______</li>
+  </ol>
+
+  <h3>Ejercicio 3 · Por qué cuesta más</h3>
+  <p>Explica en dos líneas por qué nueve mensajes cortos cuestan más que dos tandas grandes, aunque el trabajo sea el mismo.</p>
+  <ol class="lineas-4"><li>_______________________________________________________________________</li>
+  <li>_______________________________________________________________________</li></ol>
+
+  <h3>Ejercicio 4 · Corrige el error</h3>
+  <p>Cada frase tiene un error. Escríbela corregida:</p>
+  <ol class="lineas-4">
+    <li>«Le pregunté dos veces y contestó lo mismo, así que es cierto.»<br>__________________________________________________________________</li>
+    <li>«Si el texto está bien escrito y suena seguro, se puede publicar.»<br>__________________________________________________________________</li>
+    <li>«La máquina recuerda lo que trabajamos ayer.»<br>__________________________________________________________________</li>
+    <li>«Como es inteligencia artificial, sabe las noticias de esta semana.»<br>__________________________________________________________________</li>
+  </ol>
+
+  <h3>Ejercicio 5 · Escribe un encargo de verdad</h3>
+  <p>Elige algo que necesites esta semana y escribe el encargo con sus cinco partes.</p>
+  <ol class="lineas-4"><li>Quién: _________________________________________________________</li>
+  <li>Para qué: ______________________________________________________</li>
+  <li>Con qué reglas: ________________________________________________</li>
+  <li>Ejemplo parecido: ______________________________________________</li>
+  <li>Cuándo está terminado: _________________________________________</li></ol>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 8 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <h3>Ejercicio 6 · Las cinco reglas de tu casa</h3>
+  <p>Escríbelas con tus palabras y ponle responsable a cada una.</p>
+  <table>
+    <tr><th style="width:70%">Regla</th><th>Responsable</th></tr>
+    <tr><td>1.</td><td></td></tr>
+    <tr><td>2.</td><td></td></tr>
+    <tr><td>3.</td><td></td></tr>
+    <tr><td>4.</td><td></td></tr>
+    <tr><td>5.</td><td></td></tr>
+  </table>
+
+  <p class="mini"><b>Cómo calificarse:</b> los ejercicios 1 a 4 tienen respuesta correcta y se comparan con la pauta. Los ejercicios 5 y 6 no: se juzgan por si el encargo es comprobable y por si cada regla tiene un nombre al lado. Sin responsable, la regla no cuenta.</p>
+
+  <div class="pauta">
+    <h2>✅ Pauta completa de respuestas</h2>
+
+    <h3>Ejercicio 1 · La frase que lo explica todo</h3>
+    <p>Predice la siguiente palabra a partir de todo lo anterior, usando lo que aprendió leyendo enormes cantidades de texto; no consulta una base de verdades. Por eso inventa citas perfectas: cuando no tiene con qué acertar sigue prediciendo lo más probable, y lo más probable <b>se parece</b> a una cita real, con autor, página y año bien puestos. La invención no llega con aspecto de duda, llega con aspecto de precisión.</p>
+
+    <h3>Ejercicio 2 · Se le pide o se verifica</h3>
+    <p><b>1.</b> P (borrador: el error se corrige barato). <b>2.</b> V (no puede medir; se cuenta en el PDF). <b>3.</b> P (cambiar la forma de algo ya correcto). <b>4.</b> V (es donde más inventa). <b>5.</b> P, si le diste el documento; sin documento pasa a V. <b>6.</b> V (las cuentas se rehacen por fuera).</p>
+
+    <h3>Ejercicio 3 · Por qué cuesta más</h3>
+    <p>Porque la máquina no recuerda: en cada turno se le vuelve a enviar la conversación completa. A más turnos, más veces se paga por el mismo texto. La caché abarata la parte repetida a alrededor de la décima parte, pero dura pocos minutos y se pierde si cambia el principio, así que muchos mensajitos separados terminan costando bastante más que dos tandas grandes.</p>
+
+    <h3>Ejercicio 4 · Corrige el error</h3>
+    <ol>
+      <li>Repetir la pregunta no verifica nada: la segunda respuesta se predice igual que la primera, y encima con la primera ya dentro de la conversación. Verificar es salir de la conversación e ir a la fuente.</li>
+      <li>La seguridad del texto no dice nada sobre si es cierto: escribe igual de bien cuando acierta y cuando inventa. Eso es el sesgo de fluidez, y es nuestro.</li>
+      <li>No hay memoria entre conversaciones: todo lo que sabe del proyecto vive en la ventana de contexto de esa sesión. La memoria del proyecto tiene que estar en el repositorio y en lo escrito.</li>
+      <li>Su conocimiento termina en la fecha de su corte; lo posterior no lo leyó. Solo lo sabe si se lo pegas o si tiene una herramienta para buscarlo, y aun así hay que revisar lo que trajo.</li>
+    </ol>
+
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 9 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <div class="pauta">
+    <h2>✅ Pauta (continúa)</h2>
+    <h3>Ejercicio 5 · El encargo</h3>
+    <p>Respuesta abierta. Se califica que estén las cinco partes y, sobre todo, que la última sea <b>comprobable</b>: «cuando el PDF tenga diez hojas contadas» sirve; «cuando quede bien» no sirve, porque deja que la máquina decida ella cuándo terminó. Si las reglas de F.A.R.O no aparecen en el encargo, el resultado no las va a cumplir: no son un extra, son parte del pedido.</p>
+
+    <h3>Ejercicio 6 · Las cinco reglas</h3>
+    <p>Respuesta abierta, pero una buena versión se parece a esta: nadie firma lo que no leyó; lo que se puede medir se mide en la fuente; se le pide con las cinco partes; datos de otras personas jamás entran en un encargo; y para las hijas, que explique y no que responda. Lo que se califica no es la redacción: es que <b>cada regla tenga responsable con nombre</b> y una fecha de revisión.</p>
+  </div>
+
+  <h2>🗝️ Glosario de la máquina</h2>
+  <table>
+    <tr><th style="width:30%">Término</th><th>En palabras de la casa</th></tr>
+    <tr><td>Modelo de lenguaje</td><td>Programa que predice la siguiente palabra</td></tr>
+    <tr><td>Token</td><td>La pieza en que se parte el texto: tres o cuatro letras</td></tr>
+    <tr><td>Ventana de contexto</td><td>Todo lo que cabe en una conversación</td></tr>
+    <tr><td>Entrenamiento</td><td>La etapa anterior en que leyó enormes cantidades de texto</td></tr>
+    <tr><td>Corte de conocimiento</td><td>La fecha hasta la que llegó lo que leyó</td></tr>
+    <tr><td>Alucinación</td><td>Inventar un dato con toda seguridad</td></tr>
+    <tr><td>Temperatura</td><td>El viejo control de variedad, que ya no se toca</td></tr>
+    <tr><td>Caché</td><td>Lo que abarata el texto ya enviado antes</td></tr>
+    <tr><td>Herramientas</td><td>Buscar o abrir un archivo en vez de adivinar</td></tr>
+    <tr><td>Sesgo de fluidez</td><td>Creerle porque escribe bien</td></tr>
+  </table>
+
+  <h2>🎓 Cierre: lo que te toca decidir</h2>
+  <p>Esta herramienta va a estar en la casa toda la vida de tus hijas. No hay una postura correcta entre prohibirla y creerle: hay un modo de usarla que se puede defender. Escríbelo:</p>
+  <ol class="lineas-4">
+    <li>Lo que en esta casa <b>sí</b> se le delega: __________________________________</li>
+    <li>Lo que <b>nunca</b> se le delega: ___________________________________________</li>
+    <li>Quién revisa antes de publicar: ______________________ desde: ____________</li>
+  </ol>
+  <div class="caja">
+    <strong>Lo que hay que llevarse de esta etapa:</strong> la máquina no sabe, predice. Es un borrador infinito, veloz y sin cansancio, y eso es muchísimo. Pero el último paso, el que se firma, el que responde cuando alguien pregunta de dónde salió el dato, sigue siendo humano. Esa frontera no la mueve ninguna versión nueva.
+  </div>
+  <div class="caja-amb">
+    <strong>🔒 Material de la casa.</strong> Esta ficha es parte del conocimiento familiar de F.A.R.O. No se publica en el sitio ni se comparte fuera de la familia: cuenta cómo se construye este proyecto por dentro, y eso solo lo debe saber quien vive aquí.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina que Predice · Etapa 1 · Página 10 de 10</span></div>
+</section>
+
+</div>
+</body>
+</html>
