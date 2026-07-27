@@ -2727,12 +2727,36 @@ body {
 }
 .des-proj-badge i { font-size: 9px; }
 .des-date { font-size: 11px; color: var(--faint); display: inline-flex; align-items: center; gap: 5px; }
+.des-card-tools { display: flex; align-items: center; gap: 2px; flex-shrink: 0; margin-top: 1px; }
+.des-edit,
 .des-del {
   background: none; border: none; cursor: pointer; flex-shrink: 0;
-  color: var(--faint); font-size: 13px; padding: 4px; margin-top: 1px;
+  color: var(--faint); font-size: 13px; padding: 4px;
   transition: color .15s;
 }
 .des-del:active { color: #dc2626; }
+.des-edit:active { color: #d97706; }
+.des-text[data-edit] { cursor: text; }
+
+/* ── Tarjeta en modo edición ── */
+.des-card-editing { border-color: #f59e0b; box-shadow: 0 0 0 2px #fef3c7; }
+.des-edit-area {
+  width: 100%; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+  background: var(--bg); padding: 10px 12px; font: inherit; font-size: 14.5px;
+  line-height: 1.45; color: var(--text); resize: vertical; outline: none;
+}
+.des-edit-area:focus { border-color: #d97706; background: var(--surface); }
+.des-edit-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+.des-edit-cancel,
+.des-edit-save {
+  border: none; border-radius: 10px; cursor: pointer;
+  font-family: inherit; font-size: 13.5px; font-weight: 800;
+  padding: 9px 16px;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.des-edit-cancel { background: var(--bg); color: var(--muted); }
+.des-edit-save { background: linear-gradient(135deg, #d97706, #f59e0b); color: #fff; }
+.des-edit-save:active { opacity: .85; }
 
 /* ══════════════════════════════════════════════
    REDACCIÓN 📰 · sala de redacción de la revista

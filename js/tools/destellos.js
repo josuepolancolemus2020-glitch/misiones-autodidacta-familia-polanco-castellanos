@@ -16,6 +16,7 @@ let _desCache    = [];            // destellos del miembro que se está viendo
 let _desFilter   = 'pendientes';  // 'pendientes' | 'hechos' | 'todos'
 let _desProyecto = '';            // '' = todos los proyectos
 let _desMember   = null;          // miembro cuyo espacio se está viendo (por defecto: quien inició sesión)
+let _desEditando = null;          // id (texto) del destello que se está reescribiendo
 
 /* ── Helpers ── */
 
@@ -153,6 +154,7 @@ async function initDestellos() {
   if (!list) return;
 
   if (!_desMember) _desMember = desMiembro();
+  _desEditando = null;
   desRenderMemberChips();
 
   await desFlushOutbox();
@@ -192,6 +194,32 @@ function desRenderMemberChips() {
   }));
 }
 
+/* Guardar la reescritura de un destello (optimista: se ve al instante) */
+async function desGuardarEdicion(id) {
+  const area = document.querySelector(`[data-area="${id}"]`);
+  const d    = _desCache.find(x => String(x.id) === String(id));
+  if (!area || !d) return;
+
+  const nuevo = area.value.trim();
+  if (!nuevo) { area.focus(); return; }          // un destello vacío no se guarda
+  if (nuevo === d.texto) { _desEditando = null; desRenderView(); return; }
+
+  const anterior = d.texto;
+  d.texto = nuevo;
+  _desEditando = null;
+  desRenderView();
+
+  if (!_sb) { d.texto = anterior; desRenderView(); return; }
+  const { error } = await _sb.from(DES_TABLE).update({ texto: nuevo }).eq('id', d.id);
+  if (error) {
+    d.texto = anterior;                          // no se pudo: se deja como estaba
+    desRenderView();
+    if (typeof toast === 'function') toast('No se pudo guardar el cambio');
+  } else if (typeof toast === 'function') {
+    toast('✏️ Destello actualizado');
+  }
+}
+
 function desRenderView() {
   const list    = document.getElementById('des-list');
   const emptyEl = document.getElementById('des-empty');
@@ -224,22 +252,66 @@ function desRenderView() {
 
   if (emptyEl) emptyEl.style.display = lista.length ? 'none' : 'block';
 
-  list.innerHTML = lista.map(d => `
+  list.innerHTML = lista.map(d => {
+    // Modo edición: el texto se cambia por un cuadro de escritura en la misma tarjeta
+    if (String(d.id) === _desEditando) {
+      return `
+    <div class="des-card des-card-editing">
+      <div class="des-card-body">
+        <textarea class="des-edit-area" data-area="${d.id}" rows="4"
+                  aria-label="Editar el destello">${desEsc(d.texto)}</textarea>
+        <div class="des-edit-actions">
+          <button type="button" class="des-edit-cancel" data-cancel="${d.id}">Cancelar</button>
+          <button type="button" class="des-edit-save" data-save="${d.id}">
+            <i class="fa-solid fa-check"></i> Guardar
+          </button>
+        </div>
+      </div>
+    </div>`;
+    }
+    return `
     <div class="des-card ${d.hecho ? 'des-card-done' : ''}">
       <button class="des-check" data-check="${d.id}" aria-label="${d.hecho ? 'Marcar pendiente' : 'Marcar hecho'}">
         <i class="fa-solid fa-check"></i>
       </button>
       <div class="des-card-body">
-        <p class="des-text">${desEsc(d.texto)}</p>
+        <p class="des-text" data-edit="${d.id}" title="Tocar para editar">${desEsc(d.texto)}</p>
         <div class="des-meta">
           ${d.proyecto ? `<span class="des-proj-badge"><i class="fa-solid fa-folder"></i> ${desEsc(d.proyecto)}</span>` : ''}
           <span class="des-date"><i class="fa-regular fa-clock"></i> ${desFecha(d.creado_at)}</span>
         </div>
       </div>
-      <button class="des-del" data-del="${d.id}" aria-label="Eliminar destello">
-        <i class="fa-solid fa-trash"></i>
-      </button>
-    </div>`).join('');
+      <div class="des-card-tools">
+        <button class="des-edit" data-edit="${d.id}" aria-label="Editar destello">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button class="des-del" data-del="${d.id}" aria-label="Eliminar destello">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Abrir el modo edición (con el lápiz o tocando el propio texto)
+  list.querySelectorAll('[data-edit]').forEach(el => el.addEventListener('click', () => {
+    _desEditando = el.dataset.edit;
+    desRenderView();
+    const area = list.querySelector(`[data-area="${_desEditando}"]`);
+    if (area) { area.focus(); area.setSelectionRange(area.value.length, area.value.length); }
+  }));
+
+  list.querySelectorAll('.des-edit-cancel').forEach(btn => btn.addEventListener('click', () => {
+    _desEditando = null;
+    desRenderView();
+  }));
+
+  list.querySelectorAll('.des-edit-save').forEach(btn =>
+    btn.addEventListener('click', () => desGuardarEdicion(btn.dataset.save)));
+
+  list.querySelectorAll('.des-edit-area').forEach(area => area.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { _desEditando = null; desRenderView(); }
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) desGuardarEdicion(area.dataset.area);
+  }));
 
   list.querySelectorAll('.des-check').forEach(btn => btn.addEventListener('click', async () => {
     const d = _desCache.find(x => String(x.id) === btn.dataset.check);
@@ -294,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('#des-filter-tabs .des-ftab').forEach(btn =>
     btn.addEventListener('click', () => {
       _desFilter = btn.dataset.f;
+      _desEditando = null;
       desRenderView();
     }));
 

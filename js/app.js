@@ -710,9 +710,25 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.setAttribute('aria-label', 'Actualizar la aplicación');
     btn.title = 'Actualizar (traer lo último y quedarte donde estás)';
     btn.innerHTML = '<i class="fa-solid fa-arrow-rotate-right"></i>';
-    const actions = h.querySelector('.header-actions');
-    if (actions) actions.insertBefore(btn, actions.firstChild);
-    else h.appendChild(btn);
+
+    /* El encabezado es una rejilla de tres columnas (atrás · título · hueco).
+       Si el botón se cuelga suelto del encabezado ocupa una CUARTA celda y la
+       rejilla lo baja a una segunda fila: el icono aparecía debajo del título.
+       Por eso se envuelve la tercera celda en una zona de acciones y el botón
+       entra ahí: siempre arriba, a la derecha, en la misma línea del título. */
+    let actions = h.querySelector('.header-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'header-actions';
+      const tercera = h.children[2];
+      if (tercera) {
+        h.replaceChild(actions, tercera);
+        actions.appendChild(tercera);   // conserva lo que hubiera en esa celda
+      } else {
+        h.appendChild(actions);
+      }
+    }
+    actions.insertBefore(btn, actions.firstChild);
   });
 
   document.querySelectorAll('.refresh-btn').forEach(b =>
