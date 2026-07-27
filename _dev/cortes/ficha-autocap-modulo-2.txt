@@ -1,0 +1,12 @@
+# Dónde empieza cada página de la ficha del Módulo 2 (norma 6: 10 páginas).
+# Calculados con _dev/mide-ficha-paginas.html?cortes=1 y retocados para que
+# ninguna hoja abra con una nota al pie de la anterior.
+<p class="mini">Vale la pena aprenderse los números
+<h2>📐 4. El molde de una misión</h2>
+<h2>🧩 6. Las capas comunes, y la trampa que muerde</h2>
+<strong>Lo que se hereda sin querer:</strong>
+<h3>5. Shopify, un monolito que factura miles de millones</h3>
+<h2>✍️ 11. Actividades sin pantalla</h2>
+<h3>E. Decide: duplicar o abstraer</h3>
+<h3>C. Diagnóstico</h3>
+<h3>Criterio de logro</h3>

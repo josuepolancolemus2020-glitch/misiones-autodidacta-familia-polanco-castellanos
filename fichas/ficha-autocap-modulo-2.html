@@ -6,11 +6,23 @@
 <title>Ficha de estudio · Autocapacitación M.E.T.A.S · Módulo 2: El frontend</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #4338ca; --pri-suave: #eef2ff; --sec: #9d174d; --sec-suave: #fdf2f8; }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .fuente { font-size: 11.5px; color: var(--gris); }
+  .mini { font-size: 12px; color: var(--gris); }
+  td.centro { text-align: center; }
+</style>
 </head>
 <body>
 <button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
 
 <div class="doc">
+
+
+
 
 <!-- ═══════════ PÁGINA 1 ═══════════ -->
 <section class="pagina">
@@ -31,17 +43,18 @@
     <li>Describir el <strong>molde de una misión</strong> y por qué se repite 57 veces.</li>
     <li>Justificar la separación entre <strong>lógica</strong> (js/) y <strong>datos</strong> (js/data/).</li>
     <li>Explicar qué hace falta para que un cambio publicado <strong>llegue a un teléfono</strong>.</li>
+    <li>Decir en qué momento la duplicación deja de convenir, con una señal concreta.</li>
+    <li>Reconocer, en decisiones reales de la industria, el mismo dilema que tiene este proyecto.</li>
     <li>Responder cuatro objeciones sobre la arquitectura sin negar la deuda técnica real.</li>
   </ol>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 1 de 6</span></div>
-</section>
+  <div class="caja">
+    <strong>Cómo estudiar esta ficha:</strong> primero el mapa, hasta poder dibujarlo sin ver; después el molde de la misión y las capas comunes, que es donde se rompen las cosas cuando se toca una y se olvida la otra; luego los casos, que muestran a empresas grandes tomando esta misma decisión; y al final las actividades y el simulacro, en voz alta. La pauta se lee <b>después</b> de responder.
+  </div>
 
-<!-- ═══════════ PÁGINA 2 ═══════════ -->
-<section class="pagina">
-  <h2>🗺️ 1. El mapa en una tabla</h2>
+<h2>🗺️ 1. El mapa en una tabla</h2>
   <table>
-    <tr><th>Pieza</th><th>Cuánto hay</th><th>De qué responde</th></tr>
+    <tr><th style="width:26%">Pieza</th><th style="width:16%">Cuánto hay</th><th>De qué responde</th></tr>
     <tr><td><code>index.html</code></td><td>1 archivo, 13 vistas</td><td>La aplicación entera: las vistas se muestran y ocultan.</td></tr>
     <tr><td><code>js/app.js</code></td><td>1</td><td>Navegación con <code>switchView()</code>, catálogo en pantalla y arranque de herramientas.</td></tr>
     <tr><td><code>js/tools/</code></td><td>7</td><td>Plan de acción, Mi aula, Campeonísimo, gobierno escolar, parte mensual, collage e instalación.</td></tr>
@@ -52,7 +65,48 @@
     <tr><td>Capas comunes</td><td>7</td><td>app, registro, diálogos, presentación, supabase, sincronización docente e idioma.</td></tr>
   </table>
 
-  <h2>📐 2. El molde de una misión</h2>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 1 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <p class="mini">Vale la pena aprenderse los números, no por presumirlos, sino porque cuando alguien pregunta «¿qué tan grande es esto?» la respuesta con cifras cambia la conversación: deja de ser una aplicación de escuela y pasa a ser un sistema con partes contadas.</p>
+
+<h2>🖥️ 2. Trece vistas en un archivo, y por qué</h2>
+  <p>No hay enrutador ni framework. Las trece pantallas viven en el mismo <code>index.html</code> y una función, <code>switchView()</code>, oculta la que estaba y muestra la que toca. Se puede leer entera de una sentada, no hay proceso de compilación y el sitio abre en cualquier computadora vieja de la escuela.</p>
+  <table>
+    <tr><th style="width:32%">&nbsp;</th><th>Con framework</th><th>Aquí</th></tr>
+    <tr><td>Para cambiar de pantalla</td><td>Enrutador, componentes, estado</td><td>Una función de pocas líneas</td></tr>
+    <tr><td>Para publicar un cambio</td><td>Compilar y desplegar</td><td>Subir el archivo</td></tr>
+    <tr><td>Para entender el sistema</td><td>Aprender el framework primero</td><td>Leer HTML, CSS y JS</td></tr>
+    <tr><td>La deuda honesta</td><td>Complejidad y dependencias que envejecen</td><td>Un archivo grande y disciplina de convención</td></tr>
+  </table>
+
+<h2>🔍 3. Dónde se toca para cambiar cada cosa</h2>
+  <p>Esta es la tabla que hay que tener en la cabeza, porque es la que convierte «hay que arreglar algo» en «sé dónde está».</p>
+  <table>
+    <tr><th style="width:46%">Lo que hay que cambiar</th><th>El archivo</th></tr>
+    <tr><td>El título, la materia o los XP de una misión</td><td><code>js/data/misiones.js</code></td></tr>
+    <tr><td>El contenido, los bancos o los widgets de una misión</td><td><code>misiones/&lt;carpeta&gt;/js/&lt;mision&gt;.js</code></td></tr>
+    <tr><td>El aspecto de una misión (colores, layout)</td><td><code>misiones/&lt;carpeta&gt;/css/&lt;mision&gt;.css</code></td></tr>
+    <tr><td>Una pregunta del Campeonísimo</td><td><code>js/data/campeonismo-bank.js</code></td></tr>
+    <tr><td>Cómo se navega entre pantallas</td><td><code>js/app.js</code>, función <code>switchView()</code></td></tr>
+    <tr><td>Un rótulo que aparece en toda la aplicación</td><td>La capa común que corresponda, y su clave en <code>js/metas-i18n.js</code></td></tr>
+    <tr><td>Que un cambio llegue a los teléfonos ya instalados</td><td><code>sw.js</code> (<code>CACHE_NAME</code>) y las etiquetas <code>?v=</code></td></tr>
+    <tr><td>Lo que ve la familia o el panel docente</td><td>No es un archivo: es una función RPC o una política RLS en Supabase</td></tr>
+  </table>
+  <p class="mini">La última fila es la que más confunde al principio: hay cosas que no están en el repositorio. Si algo se ve distinto para dos usuarios distintos, casi nunca es el código: es una política de la base.</p>
+
+  <div class="caja">
+    <strong>Cómo se busca cuando no se sabe dónde está:</strong> se busca el <b>texto que se ve en pantalla</b>, no el nombre del archivo. Un rótulo, un mensaje de error, el título de un botón: casi siempre aparece una sola vez y lleva directo al lugar. Si aparece en 57 archivos, ya está dicha la otra respuesta: eso vive en el molde y hay que corregirlo con una herramienta, no a mano. Esta manera de buscar vale más que memorizar el árbol, porque sigue funcionando cuando el proyecto crece.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h2>📐 4. El molde de una misión</h2>
   <div class="caja">
     Tres archivos propios (<strong>HTML + JS + CSS</strong>), un cuarto si hay traducción de autor
     (<strong>-en.js</strong>), y <strong>catorce secciones</strong> iguales en las 57: Aprende, Estructura,
@@ -65,16 +119,152 @@
     barra de XP que desbordaba la pantalla del teléfono.
   </div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 2 de 6</span></div>
+  <h2>♻️ 5. Cuándo duplicar y cuándo abstraer</h2>
+  <p>Copiar un molde 57 veces se ve mal en una revisión de código, y la crítica tiene parte de razón. Pero la alternativa (un motor único que genere las 57 misiones) también cobra: cualquier misión que necesite algo distinto obliga a tocar el motor, y un error en el motor rompe las 57 a la vez, no una.</p>
+  <table>
+    <tr><th style="width:50%">Conviene duplicar cuando…</th><th>Conviene abstraer cuando…</th></tr>
+    <tr><td>Las piezas se parecen hoy pero van a divergir</td><td>El cambio se repite igual en todas, una y otra vez</td></tr>
+    <tr><td>El error queda contenido en una misión</td><td>Ya se olvidó replicar un arreglo más de una vez</td></tr>
+    <tr><td>Se puede verificar con un arnés automático</td><td>La verificación empieza a costar más que el motor</td></tr>
+  </table>
+  <p><b>La señal concreta para este proyecto:</b> el día que un arreglo del molde haya que replicarlo a mano y se olvide en alguna misión, la duplicación dejó de convenir. Hasta entonces, lo que sostiene la decisión son los arneses de <code>_dev/</code>, que comprueban determinismo, traducción y layout en todas a la vez.</p>
+  <p class="mini">Conviene distinguir dos duplicaciones que se ven iguales y no lo son: la del <b>molde</b> (57 archivos con la misma forma y distinto contenido), que es una decisión, y la <b>accidental</b> (la misma función copiada en tres herramientas porque hacía falta rápido), que es deuda. La primera se defiende; la segunda se paga en cuanto se note.</p>
+
+<h2>🗃️ 5. Lógica y datos, separados a propósito</h2>
+  <p>En <code>js/data/</code> no hay una sola línea que haga algo: son listas. El catálogo de misiones, el banco del Campeonísimo, el mapa curricular, los diagnósticos, los consejos, las frases, los países y los próceres. La lógica que los usa vive en <code>js/</code> y en <code>js/tools/</code>.</p>
+  <ul>
+    <li><b>Se puede revisar el contenido sin leer código.</b> Un maestro puede verificar una pregunta del banco sin saber programar.</li>
+    <li><b>El historial de cambios se vuelve legible:</b> se ve qué contenido cambió y cuándo, sin ruido de lógica.</li>
+    <li><b>El error de dato no rompe la aplicación:</b> una misión mal escrita en el catálogo no aparece, pero el resto sigue.</li>
+  </ul>
+  <div class="caja caja-amb">
+    <strong>El catálogo escrito a mano, que es la objeción favorita:</strong> <code>js/data/misiones.js</code> se edita a mano, y por eso una carpeta nueva no aparece hasta que se agrega su entrada. No es un descuido: obliga a un paso consciente al publicar contenido, se revisa en el historial y no exige ningún proceso de compilación. Con 57 entradas es cómodo; con 500 no lo sería, y ese día se genera. Se cambia cuando el dolor aparezca, no antes.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 3 de 10</span></div>
 </section>
 
-<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
 <section class="pagina">
-  <h2>✍️ 3. Actividades sin pantalla</h2>
+  <h2>🧩 6. Las capas comunes, y la trampa que muerde</h2>
+  <p>Siete archivos son compartidos por todo. Tocar uno toca el sistema entero, y ahí está el riesgo.</p>
+  <table>
+    <tr><th style="width:30%">Capa</th><th>De qué responde</th><th style="width:26%">Qué se rompe si falla</th></tr>
+    <tr><td>App</td><td>Navegación, catálogo en pantalla, arranque</td><td>Todo, de una vez</td></tr>
+    <tr><td>Registro</td><td>Quién es el usuario y qué le toca ver</td><td>El maestro entra pero no ve su aula</td></tr>
+    <tr><td>Diálogos</td><td>Avisos y confirmaciones comunes</td><td>Acciones que se ejecutan sin preguntar</td></tr>
+    <tr><td>Presentación</td><td>Estilos y componentes compartidos</td><td>El aspecto, en las 57 a la vez</td></tr>
+    <tr><td>Supabase</td><td>La conversación con la nube</td><td>La sincronización, no el aula</td></tr>
+    <tr><td>Sincronización docente</td><td>El outbox y los reintentos</td><td>Datos que quedan varados sin subir</td></tr>
+    <tr><td>Idioma</td><td>El diccionario de rótulos comunes</td><td>Rótulos en español dentro del modo inglés</td></tr>
+  </table>
+  <div class="caja">
+    <strong>La trampa del diccionario:</strong> <code>js/metas-i18n.js</code> traduce usando <b>el texto en español como clave</b>. Si en una misión se corrige un rótulo («🃏 Flashcards: toca para voltear») y no se corrige la clave del diccionario, ese rótulo <b>deja de traducirse</b> y nadie lo nota hasta que alguien abre la misión en inglés. Regla: el rótulo y su clave se cambian <b>a la vez</b>, y después se pasa el verificador de bancos traducidos. Es el tipo de error que no da ningún aviso: no rompe nada, solo deja de funcionar en silencio, que es la peor clase de falla que puede tener un sistema.
+  </div>
+
+<h2>🌱 7. Cómo nace una misión nueva</h2>
+  <p>El procedimiento completo, en el orden en que se hace. Los pasos 5 y 6 son los que más se olvidan.</p>
+  <table>
+    <tr><th class="centro" style="width:8%">Nº</th><th>Paso</th></tr>
+    <tr><td class="centro">1</td><td>Copiar el molde de una misión parecida y renombrar los tres archivos.</td></tr>
+    <tr><td class="centro">2</td><td>Cambiar la <b>clave de progreso</b> (<code>SAVE_KEY</code>): si se hereda, dos misiones se pisan el avance.</td></tr>
+    <tr><td class="centro">3</td><td>Escribir el contenido y los bancos, cuidando el reparto de las respuestas correctas.</td></tr>
+    <tr><td class="centro">4</td><td>Revisar lo que se arrastra del molde: rótulos de las pruebas con el nombre de la misión anterior y la pieza inicial del laboratorio.</td></tr>
+    <tr><td class="centro">5</td><td>Agregar la entrada en <code>js/data/misiones.js</code>, o la misión no existe para la aplicación.</td></tr>
+    <tr><td class="centro">6</td><td>Crear su ficha imprimible en <code>fichas/</code> y enlazarla desde la sección de Recursos.</td></tr>
+    <tr><td class="centro">7</td><td>Correr los arneses de <code>_dev/</code>, publicar y subir el <code>CACHE_NAME</code>.</td></tr>
+  </table>
+  <p class="mini">Este orden no es burocracia: cada paso salió de un error que ya pasó. El de la clave de progreso apareció cuando dos misiones compartían avance; el del catálogo, cuando una carpeta nueva no aparecía y se buscó el problema en el código durante media hora.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <div class="caja">
+    <strong>Lo que se hereda sin querer:</strong> al copiar un molde viajan también los guiones largos del motor y los rótulos de las pruebas impresas. Por eso la norma de estilo se verifica con un grep antes de publicar: es más barato que descubrirlo cuando la ficha ya está fotocopiada.
+  </div>
+
+<h2>🔬 8. Casos de estudio reales: el mismo dilema, en grande</h2>
+
+  <div class="caso">
+    <h3>1. Prime Video vuelve al monolito</h3>
+    <p>En 2023, un equipo de Amazon Prime Video contó públicamente que su servicio de monitoreo de calidad, construido con microservicios y funciones sin servidor, les resultaba caro y lento de escalar. Lo <b>reunieron en un solo proceso</b> y reportaron una reducción de costos de alrededor del <b>90%</b>.</p>
+    <p><b>Lo que enseña aquí:</b> ni el monolito ni la separación son buenos en abstracto: dependen del caso y del tamaño. Que un equipo de Amazon publique que volvió atrás es el mejor argumento contra la idea de que una arquitectura simple es una arquitectura ingenua.</p>
+    <p class="fuente">Blog de ingeniería de Prime Video, 2023.</p>
+  </div>
+
+  <div class="caso">
+    <h3>2. La ley de Gall</h3>
+    <p>John Gall escribió en 1975 una frase que se ha sostenido: «un sistema complejo que funciona invariablemente resultó de un sistema simple que funcionaba. Un sistema complejo diseñado desde cero nunca funciona, y no se puede parchear para que funcione».</p>
+    <p><b>Lo que enseña aquí:</b> M.E.T.A.S empezó con una misión y un archivo. La arquitectura de hoy no se diseñó en una pizarra: creció de algo que ya servía. Es exactamente el camino que Gall describe, y conviene decirlo así cuando alguien proponga rehacerlo todo «bien» desde cero.</p>
+    <p class="fuente">John Gall, <em>Systemantics</em>, 1975.</p>
+  </div>
+
+  <div class="caso">
+    <h3>3. Netscape y la reescritura que mató al producto</h3>
+    <p>Netscape decidió reescribir su navegador desde cero a finales de los noventa. Tardaron años en volver a tener un producto competitivo, y en ese tiempo perdieron el mercado. Joel Spolsky lo llamó «el peor error estratégico que puede cometer una empresa de software».</p>
+    <p><b>Lo que enseña aquí:</b> la tentación de rehacer aparece justo cuando el sistema ya tiene usuarios, que es cuando más caro sale. Si algún día M.E.T.A.S cambia de arquitectura, será por partes y con el sistema viejo funcionando, no con un año en blanco.</p>
+    <p class="fuente">Joel Spolsky, «Things You Should Never Do, Part I», 2000.</p>
+  </div>
+
+<h2>🧵 9. Casos de estudio: duplicar no siempre es pecado</h2>
+
+  <div class="caso">
+    <h3>4. «Un poco de copia es mejor que un poco de dependencia»</h3>
+    <p>Es un proverbio del lenguaje Go, dicho por Rob Pike. La idea: cada abstracción compartida crea un vínculo permanente entre partes que quizá deban evolucionar por separado, y ese vínculo se paga en cada cambio futuro.</p>
+    <p><b>Lo que enseña aquí:</b> las 57 misiones repetidas no son un accidente que haya que esconder, son un intercambio elegido: se paga en replicar arreglos y se cobra en independencia. Lo que vuelve válido el intercambio es tener con qué verificarlo, y eso son los arneses.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>5. Shopify, un monolito que factura miles de millones</h3>
+    <p>Shopify sostiene desde hace más de una década una aplicación monolítica en Ruby on Rails, una de las más grandes del mundo, y ha publicado cómo la organizó por dentro (en componentes) en vez de partirla en servicios.</p>
+    <p><b>Lo que enseña aquí:</b> el tamaño no obliga a fragmentar. Obliga a <b>ordenar</b>. Aquí el orden son las convenciones del molde y la separación entre lógica y datos, que cumplen el mismo papel a otra escala.</p>
+  </div>
+
+  <div class="caso">
+    <h3>6. Healthcare.gov, o lo que pasa cuando nadie ve el sistema completo</h3>
+    <p>El portal de salud de Estados Unidos se lanzó en octubre de 2013 y colapsó el primer día: 55 contratistas, decenas de piezas que solo funcionaban por separado y nadie con la vista del conjunto. Lo arregló después un equipo pequeño que primero midió y luego cambió lo mínimo.</p>
+    <p><b>Lo que enseña aquí:</b> el número de piezas no es gratis. Cada una que se agrega hay que poder sostenerla en la cabeza. En este proyecto eso se traduce en una regla simple: si una pieza nueva no cabe en el mapa de la sección 1, todavía no está lista para entrar.</p>
+  </div>
+
+  <h2>🏛️ 10. Casos del propio proyecto</h2>
+
+  <div class="caso">
+    <h3>6. Llegan las 500 misiones</h3>
+    <p><b>Qué se rompe primero:</b> el catálogo a mano y el tiempo de carga del listado, no las misiones en sí. <b>Qué se hace:</b> generar <code>misiones.js</code> desde las carpetas con un script, y paginar el listado. <b>Qué no hay que hacer:</b> anticiparlo hoy, porque un generador sin necesidad es una pieza más que mantener y una más que puede fallar.</p>
+  </div>
+
+  <div class="caso">
+    <h3>7. Hay que cambiar el color de una materia en las 57 misiones</h3>
+    <p><b>Qué se toca:</b> el color vive en el CSS de cada misión, así que son 57 archivos. <b>Cómo se hace sin romper nada:</b> con un script en <code>_dev/</code> que aplique el cambio y liste lo que no encajó, igual que el que barrió los guiones largos, y después un arnés que compruebe el resultado. <b>Lo que enseña:</b> en un sistema con molde repetido, el trabajo no es editar 57 veces: es <b>escribir la herramienta</b> que edita 57 veces y deja constancia de lo que no pudo.</p>
+  </div>
+
+  <div class="caso">
+    <h3>8. Un maestro pide una misión de su propia materia</h3>
+    <p><b>Qué pasa de verdad:</b> no hace falta programar. Se copia el molde, se cambia la clave de progreso, se escribe el contenido y se agrega la entrada al catálogo. <b>Qué hace falta cuidar:</b> que los bancos tengan el tamaño mínimo y que las respuestas correctas queden repartidas, porque eso no lo avisa el navegador. <b>La decisión de fondo:</b> mantener el molde tan simple que un maestro con paciencia pueda usarlo es una <b>meta de diseño</b>, no una consecuencia.</p>
+  </div>
+
+  <div class="caso">
+    <h3>9. Un ingeniero propone convertirlo todo a React</h3>
+    <p><b>Qué se gana:</b> componentes reutilizables y una comunidad enorme. <b>Qué se pierde:</b> el sitio deja de ser archivos que se abren en cualquier lado, aparece un paso de compilación y la aplicación pasa a depender de versiones que envejecen. <b>La respuesta con condición:</b> si alguna vez se hace, se hace por partes, empezando por una herramienta suelta del panel docente, y con el sistema actual funcionando mientras tanto.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h2>✍️ 11. Actividades sin pantalla</h2>
 
   <h3>A. Dibuja el árbol del proyecto</h3>
   <p>De memoria, sin abrir la computadora. Escribe al lado de cada carpeta una frase con su responsabilidad.</p>
-  <div class="caja" style="min-height:55mm;"></div>
+  <div class="caja" style="min-height:40mm;"></div>
 
   <h3>B. Une cada archivo con su responsabilidad</h3>
   <table>
@@ -86,37 +276,60 @@
     <tr><td><code>sw.js</code></td><td></td></tr>
   </table>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 3 de 6</span></div>
-</section>
-
-<!-- ═══════════ PÁGINA 4 ═══════════ -->
-<section class="pagina">
-  <h2>✍️ 3. Actividades sin pantalla (continúa)</h2>
-
   <h3>C. Diagnóstico rápido: ¿qué falló?</h3>
   <ol>
     <li>Creé la carpeta de una misión nueva y no aparece en la aplicación. → ______________________</li>
     <li>Corregí un texto, hice push, y en el teléfono sigue el viejo. → ______________________</li>
     <li>El APK no muestra el cambio que sí se ve en la web. → ______________________</li>
     <li>Un rótulo de una misión traducida se quedó en español. → ______________________</li>
+    <li>Dos misiones distintas muestran el mismo porcentaje de avance. → ______________________</li>
   </ol>
 
-  <h2>🧠 4. Simulacro de interpelación</h2>
-  <h3>1) «Todo en un index.html con divs que se ocultan no es arquitectura; es lo que hacíamos en 2010.»</h3>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  <h3>2) «Tienes 57 carpetas con el mismo código repetido: eso es duplicación insostenible.»</h3>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  <h3>3) «Si el catálogo es un archivo escrito a mano, ¿qué pasa cuando lleguen a 500 misiones?»</h3>
-  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+<h3>D. ¿Dónde lo toco?</h3>
+  <p>Escribe el archivo (o la capa) donde se resuelve cada encargo, sin ver la sección 3.</p>
+  <table>
+    <tr><th style="width:54%">El encargo</th><th>Dónde se toca</th></tr>
+    <tr><td>«Súbele los XP a la misión de Fracciones»</td><td></td></tr>
+    <tr><td>«Cambiá una pregunta del Campeonísimo»</td><td></td></tr>
+    <tr><td>«La familia ve notas que no son de su hijo»</td><td></td></tr>
+    <tr><td>«El botón de volver quedó tapado en el teléfono»</td><td></td></tr>
+    <tr><td>«El cambio no llega a los que ya instalaron la aplicación»</td><td></td></tr>
+  </table>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 4 de 6</span></div>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 7 de 10</span></div>
 </section>
 
-<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
 <section class="pagina">
-  <div class="pauta">
-    <h2>✅ Pauta de respuestas</h2>
+  <h3>E. Decide: duplicar o abstraer</h3>
+  <p>Marca <b>D</b> (duplicar) o <b>A</b> (abstraer) y escribe la razón en tres palabras.</p>
+  <table>
+    <tr><th style="width:60%">La situación</th><th class="centro" style="width:10%">D / A</th><th>Por qué</th></tr>
+    <tr><td>El botón de compartir por WhatsApp, igual en las 57 misiones</td><td></td><td></td></tr>
+    <tr><td>El widget del laboratorio, distinto en cada misión</td><td></td><td></td></tr>
+    <tr><td>La barra de XP, que ya se corrigió una vez en las 57</td><td></td><td></td></tr>
+    <tr><td>El banco de preguntas de cada misión</td><td></td><td></td></tr>
+  </table>
 
+  <h2>🧠 12. Simulacro de interpelación</h2>
+  <h3>1) «Todo en un index.html con divs que se ocultan no es arquitectura; es lo que hacíamos en 2010.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>2) «Tienes 57 carpetas con el mismo código repetido: eso es duplicación insostenible.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>3) «Si el catálogo es un archivo escrito a mano, ¿qué pasa cuando lleguen a 500 misiones?»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  <h3>4) «Esto habría que rehacerlo con un framework moderno.»</h3>
+  <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+
+<h2>✅ Pauta completa de respuestas</h2>
+  <p class="mini">Cubre las cuatro actividades y el simulacro. En las de redacción lo que se califica es que aparezcan los elementos en negrita.</p>
+
+  <div class="pauta">
+    <h3>A. El árbol del proyecto</h3>
+    <p>Debe aparecer <code>index.html</code> como la aplicación entera, <code>js/</code> con la lógica y las capas comunes, <code>js/data/</code> como datos puros, <code>js/tools/</code> con las siete herramientas del maestro, <code>misiones/</code> con las 57 carpetas, <code>fichas/</code> con las 57 hojas imprimibles y <code>sw.js</code> aparte, porque no es una carpeta sino el que decide qué copia se sirve.</p>
+  </div>
+
+  <div class="pauta">
     <h3>B. Archivo y responsabilidad</h3>
     <ul>
       <li><code>js/app.js</code>: navegación entre vistas, catálogo en pantalla y arranque de las herramientas.</li>
@@ -125,42 +338,74 @@
       <li><code>js/metas-i18n.js</code>: diccionario de rótulos comunes para pasar la interfaz a inglés.</li>
       <li><code>sw.js</code>: service worker, guarda la copia local del sitio y decide cuándo renovarla.</li>
     </ul>
+  </div>
 
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 8 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <div class="pauta">
     <h3>C. Diagnóstico</h3>
     <ol>
       <li>Falta su entrada en <code>js/data/misiones.js</code>: la aplicación no escanea carpetas, lee el catálogo.</li>
       <li>Faltó subir el <code>CACHE_NAME</code> de <code>sw.js</code> y las etiquetas <code>?v=</code>.</li>
       <li>Falta regenerar el espejo <code>www/</code> con <code>npm run build:www</code> antes de empaquetar.</li>
       <li>Se cambió el rótulo en la misión pero no su clave en el diccionario del motor de idioma.</li>
+      <li>La misión nueva heredó la <code>SAVE_KEY</code> de la que se copió, así que comparten el avance.</li>
     </ol>
-
   </div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 5 de 6</span></div>
+<div class="pauta">
+    <h3>D. ¿Dónde lo toco?</h3>
+    <p><code>js/data/misiones.js</code> los XP · <code>js/data/campeonismo-bank.js</code> la pregunta · <b>una política RLS en Supabase</b> lo que ve la familia, que no está en el repositorio · <code>misiones/&lt;carpeta&gt;/css/</code> el botón tapado, y si el problema está en el molde, las 57 a la vez · <code>sw.js</code> con su <code>CACHE_NAME</code> y las <code>?v=</code> para que el cambio llegue.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>E. Duplicar o abstraer</h3>
+    <p><b>A</b> el botón de WhatsApp, porque es idéntico y ya se ha corregido en bloque. <b>D</b> el widget del laboratorio, porque cada misión lo necesita distinto y abstraerlo obligaría a un motor con excepciones. <b>A</b> la barra de XP: es la señal de la que habla la sección 4, ya se replicó un arreglo a las 57 y eso es exactamente lo que indica que conviene una capa común. <b>D</b> los bancos de preguntas, que son contenido y no lógica, y viven separados a propósito.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Simulacro: respuestas modelo</h3>
+    <p><b>1)</b> «El hecho es cierto: son vistas que se muestran y ocultan. Lo que falla es la interpretación, porque ignora el contexto. Sin build ni dependencias, el sitio carga en escuelas con internet pobre, se edita en cualquier computadora y lo mantiene una sola persona. La navegación completa se lee en una función, <code>switchView()</code>, y el costo asumido, un archivo grande, se paga con orden y convención.»</p>
+    <p><b>2)</b> «No es copia ciega: es un molde de 14 secciones, fijado por la plantilla del proyecto y verificado por arneses que comprueban determinismo, traducción y layout. Ese molde convierte cualquier arreglo en un arreglo replicable y una misión nueva se levanta en horas. La deuda honesta es que un arreglo hay que replicarlo, y por eso existen las pruebas. Amazon publicó en 2023 que volvió al monolito por razones parecidas.»</p>
+  </div>
+
+  <div class="pauta">
+    <p><b>3)</b> «Con 500 misiones el catálogo a mano sí sería un problema, y ahí tocaría generarlo desde las carpetas. Hoy son 57, el archivo es revisable en el historial y obliga a un paso consciente al publicar contenido. Se cambia cuando el dolor aparezca, no antes: un generador sin necesidad es una pieza más que mantener.»</p>
+    <p><b>4)</b> «Puede llegar el día, y si llega será por partes, empezando por una herramienta suelta y con el sistema actual funcionando. Reescribir entero es el error que le costó el mercado a Netscape. Lo que ganaría en componentes lo perdería en simplicidad de publicación, que es justo lo que permite que esto lo sostenga una persona.»</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 9 de 10</span></div>
 </section>
 
-<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
 <section class="pagina">
   <div class="pauta">
-    <h2>✅ Pauta de respuestas (continúa)</h2>
-
-    <h3>Simulacro: respuestas modelo</h3>
-    <p><strong>1)</strong> El hecho es cierto: son vistas que se muestran y ocultan. La interpretación falla al ignorar el contexto. Sin build ni dependencias, el sitio carga en escuelas con internet pobre, se puede editar en cualquier computadora y lo mantiene una sola persona. La navegación completa se lee en una función, <code>switchView()</code>, y el costo asumido (un archivo grande) se paga con orden y convención.</p>
-    <p><strong>2)</strong> No es copia y pega ciega: es un molde con 14 secciones iguales, fijado por la plantilla del proyecto y verificado por arneses que comprueban determinismo, traducción y layout. Ese molde convierte cualquier arreglo en un arreglo replicable, y una misión nueva se levanta en horas. La deuda honesta es que un arreglo hay que replicarlo, y por eso existen las pruebas.</p>
-    <p><strong>3)</strong> Con 500 misiones el catálogo a mano sí sería un problema, y ahí tocaría generarlo. Hoy son 57, el archivo es revisable en el historial de cambios y obliga a un paso consciente al publicar contenido. Se cambia cuando el dolor aparezca, no antes: en un sitio estático sin servidor, un archivo de datos es coherente con el resto de las decisiones.</p>
-
     <h3>Criterio de logro</h3>
-    <p>Responder las tres objeciones nombrando <strong>la pieza concreta</strong> y <strong>reconociendo la deuda</strong> de cada decisión. Negar el costo debilita la respuesta; explicarlo la fortalece.</p>
+    <p>Responder las cuatro objeciones nombrando <strong>la pieza concreta</strong> y <strong>reconociendo la deuda</strong> de cada decisión: negar el costo debilita la respuesta, explicarlo la fortalece. El módulo se da por aprobado cuando se puede dibujar el árbol del proyecto de memoria y decir, sin dudar, qué archivo hay que tocar para cada uno de los cinco diagnósticos.</p>
   </div>
 
-  <h2>🎓 Cierre metalingüístico</h2>
-  <p>Dibuja el árbol del proyecto en una hoja y explícaselo a alguien de la familia en cinco minutos. Anota abajo la pregunta que no supiste responder: esa es la siguiente sesión de estudio.</p>
+  <div class="pauta">
+    <h3>El examen de la servilleta</h3>
+    <p>La prueba final de este módulo no se escribe: se dibuja. En una servilleta, de una sola vez y sin borrar, tienen que salir el <b>index.html</b> con sus vistas, las carpetas de <b>lógica</b>, <b>datos</b>, <b>misiones</b> y <b>fichas</b>, las <b>capas comunes</b> a un lado y <b>sw.js</b> aparte, con una flecha que explique por qué un cambio no llega a un teléfono ya instalado. Si el dibujo sale, el módulo está.</p>
+    <table>
+      <tr><th style="width:52%">Intento</th><th>Fecha</th><th>Qué faltó</th></tr>
+      <tr><td>Primero</td><td></td><td></td></tr>
+      <tr><td>Segundo</td><td></td><td></td></tr>
+    </table>
+  </div>
+
   <div class="caja">
-    <div class="raya-resp"></div><div class="raya-resp"></div>
+    <strong>Lo que sigue, en el Módulo 3:</strong> la capa de datos por dentro. Cómo se guarda el progreso, qué forma tienen los registros de Mi aula, cómo viaja el outbox y qué hace exactamente cada función RPC del lado de Supabase. Conviene llegar allá con el árbol de este módulo dibujado de memoria, porque el Módulo 3 no vuelve a explicar dónde vive cada cosa.
   </div>
 
-  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 6 de 6</span></div>
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>Autocapacitación Técnica M.E.T.A.S · Módulo 2 · Página 10 de 10</span></div>
 </section>
+
+
+
 
 </div>
 </body>
