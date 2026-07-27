@@ -1,0 +1,21 @@
+# Cortes de la ficha de Marketing y Marca etapa 2, La oferta (nueve cortes = diez páginas).
+# Anclajes: el medidor propone «<div class="caso">», «<div class="caja">» y
+# «<div class="pauta">» a secas, y esos fragmentos se repiten decenas de veces por la
+# ficha, así que aquí se usa el <h2> o el <h3> que va dentro del bloque, como en el
+# archivo de cortes de la referencia. El repaginador retrocede solo hasta la apertura
+# del <div> que envuelve al encabezado, así que el bloque no se parte.
+# Dos anclajes salen dos veces en la ficha (el ejercicio y su pauta comparten el <h3>):
+# «Ejercicio 2 · Escribe el «no incluye»» y «Ejercicio 5 · El descuento de las veinte
+# aulas». No hay ambigüedad porque el repaginador busca cada corte SOLO en lo que queda
+# después del corte anterior: el de Ejercicio 2 cae después de «Las cinco reglas», donde
+# lo primero que aparece es el ejercicio; el de Ejercicio 5 cae después de «Pauta
+# completa de respuestas», donde ya solo quedan pautas.
+<h2>⚖️ La promesa y la oferta</h2>
+<h3>🪤 La trampa: esperar a que el otro diga la cifra</h3>
+<h2>🚦 Señales de que hay un problema esperando</h2>
+<h3>4. 📚 La editorial que quiere las fichas</h3>
+<h3>8. 🆓 El gratis para siempre con anuncios</h3>
+<h2>📜 Las cinco reglas de la oferta</h2>
+<h3>Ejercicio 2 · Escribe el «no incluye»</h3>
+<h2>✅ Pauta completa de respuestas</h2>
+<h3>Ejercicio 5 · El descuento de las veinte aulas</h3>
