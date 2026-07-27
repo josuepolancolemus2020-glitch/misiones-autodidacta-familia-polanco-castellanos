@@ -20,6 +20,8 @@ const RUTAS = {
                 lema: 'Dinero, activos, instituciones y negociación' },
   maquina:    { nombre: 'Ruta de la Máquina que Predice', emoji: '🤖', color: 'ia',   etapas: 6,
                 lema: 'Usarla sin creerle: qué hace bien, qué inventa y qué nunca se le delega' },
+  politico:   { nombre: 'Ruta del Poder Político', emoji: '🏛️', color: 'pol',  etapas: 6,
+                lema: 'Quién decide, quién traba y cómo se firma lo que se acuerda' },
   casacerrada:{ nombre: 'Ruta de la Casa Cerrada',           emoji: '🔐', color: 'cib',  etapas: 6,
                 lema: 'Quién entra, qué se guarda y qué se pierde el día que falle algo' },
 };
@@ -33,6 +35,7 @@ const MISSIONS = [
   { id: 6, title: 'Las seis palancas de la influencia',                      modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 40, icon: '🧠', ruta: 'persuasion', etapa: 1, url: 'misiones/ruta-persuasion-palancas/palancas-influencia.html' },
   /* Sello familiar: las misiones de las rutas del adulto marcadas así son
      material de la casa. No salen al sitio público ni a la revista. */
+  { id: 10, title: 'Quién decide de verdad: el mapa del poder que toca a M.E.T.A.S', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '🏛️', ruta: 'politico', etapa: 1, sello: 'familiar', url: 'misiones/ruta-politica-mapa-poder/mapa-poder.html' },
   { id: 11, title: 'La máquina que predice: qué es y qué no es un modelo de lenguaje', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🤖', ruta: 'maquina', etapa: 1, sello: 'familiar', url: 'misiones/ruta-maquina-que-predice/maquina-predice.html' },
   { id: 12, title: 'La puerta de la casa digital: quién entra y con qué llave', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🔐', ruta: 'casacerrada', etapa: 1, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-la-puerta/la-puerta.html' },
 ];
@@ -55,6 +58,13 @@ const ETAPAS_PREVISTAS = {
     4: 'Tácticas de presión y sus antídotos',
     5: 'Preguntar y escuchar: influir sin empujar',
     6: 'Narrativa: contar el proyecto para que otros quieran entrar',
+  },
+  politico: {
+    2: 'Normas y trámites: qué papel hace falta y quién lo emite',
+    3: 'La mesa: negociar con una institución',
+    4: 'Alianzas, patronato y comunidad',
+    5: 'El dinero público: presupuesto, compras y constancias',
+    6: 'Reputación y riesgo político: no quedar amarrado a nadie',
   },
   maquina: {
     2: 'Pedir bien: el encargo, el contexto y el ejemplo',
