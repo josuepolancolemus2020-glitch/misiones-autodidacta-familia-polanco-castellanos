@@ -1,0 +1,15 @@
+# Cortes de la ficha de Persuasión etapa 2 (nueve cortes = diez páginas).
+# Salen de _dev/mide-ficha-paginas.html?f=ficha-persuasion-sesgos.html&cortes=1,
+# pero escritos con anclajes únicos: el medidor propone «<div class="caso">» y
+# «<div class="pauta">» a secas, y esos fragmentos se repiten por toda la ficha.
+# Dos cortes se subieron al <h2> que el medidor dejaba colgando al final de la
+# hoja anterior (la hoja no debe cerrar con un título huérfano).
+<table class="tres">
+<h3>🔍 La confirmación</h3>
+<h3>📅 El exceso de confianza</h3>
+<h2>🔗 Dónde se enganchan las palancas de la etapa 1</h2>
+<h2>🪞 Los casos de M.E.T.A.S, segunda parte</h2>
+<h2>❓ La hoja de las cinco preguntas</h2>
+<h3>Ejercicio 2 · Sesgo o palanca</h3>
+<h2>✅ Pauta completa de respuestas</h2>
+<h3>Cómo se corrige el ejercicio 6, que es el que importa</h3>

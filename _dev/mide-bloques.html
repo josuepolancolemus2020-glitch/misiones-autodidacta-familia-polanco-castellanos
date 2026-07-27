@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Medir · bloques de una ficha y si caben en diez hojas</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
+iframe{position:absolute;left:-9999px;top:0;border:0}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+<script>
+/* Mide CADA BLOQUE de una ficha con las reglas de impresión aplicadas y dice si
+   el contenido puede repartirse en diez hojas.
+
+   Para qué sirve: cuando mide-ficha-paginas.html?cortes=1 responde «no hay
+   manera de repartir estos N bloques», no dice por qué. Casi siempre es que los
+   bloques son demasiado gruesos (una tabla de siete filas, una pauta entera en
+   un solo div, una lista de nueve renglones), y entonces el mínimo real de hojas
+   es once aunque el total quepa de sobra en diez.
+
+   El reparto de una ficha es CONTIGUO (los bloques no se reordenan), así que el
+   empaquetado voraz da el mínimo exacto de hojas: si aquí salen 11, no hay
+   reparto posible en 10 y hay que partir bloques o podar. La lista de los más
+   altos dice cuáles partir.
+
+   Uso:  /_dev/mide-bloques.html?f=ficha-persuasion-sesgos.html                  */
+const params = new URLSearchParams(location.search);
+const ficha = params.get('f');
+const UTIL = 252;   /* lo mismo que mide-ficha-paginas.html: medido con el PDF */
+const FLOJA = 215;
+const PAGS = 10;
+
+const marco = document.createElement('iframe');
+marco.style.width = '194mm';
+marco.style.height = '400px';
+marco.src = '/fichas/' + ficha;
+document.body.appendChild(marco);
+
+marco.addEventListener('load', async () => {
+  const d = marco.contentDocument;
+  const s = d.createElement('style');
+  /* Las mismas reglas que ficha.css aplica dentro de @media print. Si allá
+     cambia la letra o el interlineado, aquí también, o la medida miente. */
+  s.textContent = `
+    body { background:#fff; padding:0; font-size:10pt; line-height:1.38; }
+    .doc { max-width:none; }
+    .pagina { box-shadow:none; border-radius:0; padding:0; margin:0; min-height:0; }
+    h2 { margin:12px 0 5px; }
+    h3 { margin:8px 0 3px; }
+    p, li { margin:4px 0; }
+    .caja, .pauta { padding:8px 11px; margin:8px 0; }
+    .caso { padding:7px 10px; margin:7px 0; }
+    .fh { padding:9px 11px; margin-bottom:11px; }
+    .idline { margin-bottom:9px; }
+    table { margin:7px 0; }
+    th, td { padding:4px 7px; }
+    .raya-resp { height:15px; margin:6px 0; }
+    .lineas-4 .raya-resp:last-child { margin-bottom:9px; }
+    .pie { margin-top:11px; padding-top:5px; }
+    .imprimir-btn, .volver { display:none; }`;
+  d.head.appendChild(s);
+  try { await d.fonts.ready; } catch (e) {}
+  await new Promise(r => setTimeout(r, 1200));
+
+  const mm = 96 / 25.4;
+  const piezas = [];
+  let pag = 0;
+  d.querySelectorAll('.pagina').forEach(sec => {
+    pag++;
+    [...sec.children].forEach(el => {
+      if (el.classList.contains('pie')) return;
+      const h = el.getBoundingClientRect().height / mm
+        + parseFloat(getComputedStyle(el).marginTop) / mm
+        + parseFloat(getComputedStyle(el).marginBottom) / mm;
+      piezas.push({
+        h, pag,
+        etiqueta: '<' + el.tagName.toLowerCase() + (el.className ? '.' + String(el.className).split(' ')[0] : '') + '>',
+        texto: (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 44),
+      });
+    });
+  });
+
+  /* Voraz: para un reparto contiguo es óptimo en número de hojas. */
+  let hojas = 1, actual = 0;
+  piezas.forEach(p => { if (actual + p.h > UTIL) { hojas++; actual = p.h; } else actual += p.h; });
+
+  const total = piezas.reduce((a, p) => a + p.h, 0);
+  const altos = [...piezas].sort((a, b) => b.h - a.h).slice(0, 10);
+  const objetivoMin = PAGS * FLOJA, objetivoMax = Math.round(PAGS * UTIL * 0.91);
+
+  const veredicto = hojas > PAGS
+    ? `✖ el mínimo real son ${hojas} hojas: hay que PARTIR los bloques más altos (o podar ${Math.ceil(total - objetivoMax)} mm)`
+    : total < objetivoMin
+      ? `✖ caben en ${hojas} hojas pero falta contenido: hay que añadir unos ${Math.ceil(objetivoMin - total)} mm`
+      : `✔ reparto posible en ${PAGS} hojas. Ahora sí: mide-ficha-paginas.html?f=${ficha}&cortes=1`;
+
+  document.getElementById('out').textContent =
+    `${ficha}\n${piezas.length} bloques · total ${total.toFixed(0)} mm · objetivo entre ${objetivoMin} y ${objetivoMax} mm\n`
+    + `voraz: ${hojas} hojas (tope ${UTIL} mm)\n\n${veredicto}\n\n`
+    + `── los diez bloques más altos ──\n`
+    + altos.map(p => `p${String(p.pag).padStart(2)}  ${p.h.toFixed(1).padStart(6)} mm  ${p.etiqueta}  ${p.texto}`).join('\n');
+});
+</script>
+</body>
+</html>
