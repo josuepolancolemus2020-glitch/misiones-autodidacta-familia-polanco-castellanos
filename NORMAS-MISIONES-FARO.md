@@ -91,21 +91,39 @@ fichas no son un resumen: son el material de estudio de la familia y el tema se
 explica completo, con casos reales y la pauta de todo lo que se propone. Ni más,
 porque una ficha que se estira pierde el hilo.
 
-Y llenas: **cada página va entre 190 y 226 mm** de alto. Los 226 son lo que de
-verdad cabe en una carta (Chrome deja unos 228 útiles), y por debajo de 190 la
-hoja se ve a medio usar, que fue justo lo que se vio al imprimir la ficha de las
-palancas. La única que puede ir más corta es la última.
+Y llenas: **cada página va entre 215 y 252 mm** de alto, con la letra de
+impresión en **10 pt**. Los 252 son lo que de verdad se puede poner dentro de una
+hoja de esta plantilla, medido con el PDF en la mano. La única que puede ir más
+corta es la última.
 
-Se mide, no se calcula a ojo:
+⚠️ **De dónde salen los 252, porque el número equivocado costó dos vueltas.** La
+carta mide 279,4 mm y la hoja declara 11 mm de margen, así que el papel deja
+257,4. Pero con `min-height: 257mm` **cada hoja salía partida en dos** (19 en vez
+de 10), porque el margen del primer bloque de la sección se suma por fuera. Con
+252 salen las diez justas. Y el valor anterior, 226, era peor: es la carta menos
+una pulgada por lado, o sea el margen **por defecto de Chrome**, no el que
+declara esta hoja; por creerlo se desperdiciaban 26 mm por página y la ficha se
+veía llena a dos tercios, con la letra encogida a 9,5 pt para que «cupiera».
+
+Se mide, no se calcula a ojo, y se confirma imprimiendo:
 
 ```
 node _dev/servidor-estatico.js
-_dev/mide-ficha-paginas.html?f=<ficha>.html     (Chrome headless, --dump-dom)
+_dev/mide-ficha-paginas.html?f=<ficha>.html              (mide las páginas)
+_dev/mide-ficha-paginas.html?f=<ficha>.html&cortes=1     (propone los 10 cortes)
+node _dev/repagina-ficha.js fichas/<ficha>.html          (los aplica)
+chrome --headless --print-to-pdf=... http://localhost:8124/fichas/<ficha>.html
 ```
 
-La herramienta carga la ficha con las reglas de `@media print` aplicadas (en
-pantalla la hoja lleva otro relleno y otra letra, así que medir en pantalla
-engaña) y falla si alguna página desborda, si alguna queda floja o si no son 10.
+El medidor carga la ficha con las reglas de `@media print` aplicadas (en pantalla
+la hoja lleva otro relleno y otra letra, así que medir en pantalla engaña) y falla
+si alguna página desborda, si alguna queda floja o si no son 10. **El PDF es el
+único juez**: si al contar sus hojas no salen 10, la medida estaba mintiendo.
+
+Dos cosas que se aprendieron repartiendo: el contenido no puede pasar del **91%**
+de la capacidad (unos 2.290 mm en total), porque cada hoja cierra donde termina un
+bloque y sobra lo que ese bloque no alcanzaba a llenar; y los **bloques grandes hay
+que partirlos** (una pauta de 140 mm no se reparte, una caja por ejercicio sí).
 
 Cómo se llenan diez páginas sin relleno: el tema por dentro (mecanismo, no solo
 definición), **casos de estudio reales** con su fuente, un guion de qué decir,

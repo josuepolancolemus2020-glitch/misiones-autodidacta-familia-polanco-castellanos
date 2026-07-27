@@ -19,8 +19,15 @@ iframe{position:absolute;left:-9999px;top:0;border:0}</style>
    Uso:  /_dev/mide-ficha-paginas.html?f=ficha-persuasion-palancas.html      */
 const params = new URLSearchParams(location.search);
 const ficha = params.get('f') || 'ficha-persuasion-palancas.html';
-const UTIL = 226;   /* lo que de verdad cabe: ver la nota de min-height en ficha.css */
-const FLOJA = 190;  /* por debajo de esto la hoja se ve a medio usar (norma 6) */
+const UTIL = 252;   /* medido llevando la ficha a PDF y contando hojas: con 257
+                       cada hoja se partía en dos, porque el margen del primer
+                       bloque se suma por fuera de la sección. Con 252 salen las
+                       diez justas. La sonda _dev/probe-alto-util.html mide el
+                       papel; esto mide lo que de verdad se puede poner dentro. */
+const FLOJA = 215;  /* por debajo se ve a medio usar. No se puede exigir más: las
+                       secciones no se parten, así que cada hoja cierra donde
+                       termina un bloque y sobra lo que ese bloque no alcanzaba
+                       a llenar. Entre 215 y 257 el hueco no se nota. */
 const PAGS = 10;    /* toda ficha de F.A.R.O va en diez páginas (norma 6) */
 
 const marco = document.createElement('iframe');
@@ -35,7 +42,7 @@ marco.addEventListener('load', async () => {
   /* Las mismas reglas que ficha.css aplica dentro de @media print. Si allá
      cambia la letra o el interlineado, aquí también, o la medida miente. */
   s.textContent = `
-    body { background:#fff; padding:0; font-size:9.5pt; line-height:1.34; }
+    body { background:#fff; padding:0; font-size:10pt; line-height:1.38; }
     .doc { max-width:none; }
     .pagina { box-shadow:none; border-radius:0; padding:0; margin:0; min-height:0; }
     h2 { margin:12px 0 5px; }

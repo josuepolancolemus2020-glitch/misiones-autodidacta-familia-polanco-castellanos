@@ -84,13 +84,13 @@ th { background: var(--pri-suave); font-weight: 800; }
 
 @media print {
   @page { size: letter; margin: 11mm 11mm; }
-  /* 9,5pt y 1,34 de interlínea: con 11.5pt y 1.5 la hoja se llenaba con muy
-     poco texto y la ficha de las palancas se estiraba a 17 hojas, la mitad
-     de ellas a medio usar. Sigue siendo letra cómoda de leer (es la de un
-     libro), y es lo que permite que el tema completo entre en las 10 páginas
-     llenas que pide la norma 6. Si esto cambia, hay que cambiar igual la
-     copia de estas reglas en _dev/mide-ficha-paginas.html o la medida miente. */
-  body { background: #fff; padding: 0; font-size: 9.5pt; line-height: 1.34; }
+  /* 10pt con 1,38 de interlínea. Se bajó a 9,5 para que cupiera el contenido y
+     fue un error de cálculo: el alto útil no era 226 mm sino 257 (ver la nota
+     de min-height), así que la letra chica dejaba la hoja llena a dos tercios
+     y con un hueco enorme abajo. Con 10pt el texto llega hasta el margen
+     inferior y se lee cómodo. Si esto cambia, hay que cambiar igual la copia
+     de estas reglas en _dev/mide-ficha-paginas.html, o la medida miente. */
+  body { background: #fff; padding: 0; font-size: 10pt; line-height: 1.38; }
   .doc { max-width: none; }
   h2 { margin: 12px 0 5px; }
   h3 { margin: 8px 0 3px; }
@@ -106,13 +106,16 @@ th { background: var(--pri-suave); font-weight: 800; }
   .pie { margin-top: 11px; padding-top: 5px; }
   .pagina {
     box-shadow: none; border-radius: 0; padding: 0; margin: 0;
-    /* 226 mm, no 253. Chrome, al imprimir sin márgenes personalizados, deja
-       unos 228 mm útiles (la carta menos una pulgada por lado), muy por
-       debajo de 253. Con 253 CADA hoja se pasaba por un pelo y arrastraba una
-       hoja en blanco detrás: las fichas salían del doble de páginas.
-       Se mide con _dev/mide-ficha-paginas.html y se confirma imprimiendo a
-       PDF, que es el único juez. Ninguna .pagina debe pasar de 226 mm. */
-    page-break-after: always; min-height: 226mm;
+    /* 252 mm, medidos con el PDF en la mano, no supuestos. La carta mide 279,4
+       de alto y esta hoja declara 11 mm de margen arriba y abajo, así que el
+       papel deja 257,4; pero con min-height 257 CADA hoja salía partida en dos
+       (19 hojas en vez de 10), porque el margen del primer bloque de la
+       sección se suma por fuera. Con 252 salen las diez justas.
+       Antes decía 226 (la carta menos una pulgada por lado), que es el margen
+       por defecto de Chrome y NO el que declara esta hoja: ese error dejaba
+       26 mm sin usar en cada página y hacía creer que el contenido no cabía.
+       Se comprueba con --print-to-pdf y contando las hojas del PDF. */
+    page-break-after: always; min-height: 252mm;
   }
   .pagina:last-child { page-break-after: auto; }
   .imprimir-btn, .volver { display: none; }
