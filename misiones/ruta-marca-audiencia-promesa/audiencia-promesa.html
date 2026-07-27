@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Marca · Etapa 1: Para quién y qué le cambia | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/audiencia-promesa.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Vendedor de humo 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🎯</div>
+    <div class="hero-text">
+      <h1>Para quién y <span>qué le cambia</span></h1>
+      <p class="sub">Audiencia y promesa antes que el logo: la marca es lo que recuerdan cuando no estás 📣</p>
+      <div class="badge">📈 Ruta de la Marca · Etapa 1 de 6 · Marketing y Marca</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🎯 La frase maestra, y las tres preguntas que la vuelven útil</h2>
+    <p>La marca no es el logo ni los colores: es <strong>la promesa que alguien recuerda cuando uno no está presente</strong>. Si la maestra le dice a otra maestra «eso me salvó la clase del lunes», eso es la marca. El logo solo es la etiqueta que le pegamos a esa frase para que se pueda señalar. Por eso, antes de dibujar nada, tres preguntas: <strong>¿para quién es?</strong>, <strong>¿qué le cambia?</strong> y <strong>¿con qué lo compruebo?</strong> Sin las tres, no hay marca: hay adorno.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Por qué esta etapa abre la Ruta de la Marca:</strong> M.E.T.A.S ya existe y funciona, pero un trabajo que nadie sabe explicar en una frase no se recomienda solo. Esta etapa no enseña a vender humo: enseña a decir con precisión <strong>a quién le sirve esto y qué le resuelve</strong>, que es la única publicidad que sobrevive al primer uso.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Dos preguntas antes de escribir una sola línea</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🎯 ¿Para quién exactamente?</h4>
+        <p>«Para todo el mundo» no es nadie. Si el material sirve igual a una maestra de sexto, a un ingeniero y a un abuelo, entonces no le habla a ninguno. Se elige <strong>una persona concreta</strong>, con su hora del día y su problema del lunes. Lo que no se puede describir con nombre y situación, todavía no está elegido.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🔁 ¿Qué le cambia a esa persona?</h4>
+        <p>Nadie quiere una aplicación. La maestra quiere <strong>terminar de calificar</strong> y que la clase no se le caiga. El resultado se mide en su vida, no en la nuestra: menos horas, menos apuro, menos vergüenza delante del grupo. <strong>Lo que ofreces vale por lo que le resuelve</strong>, no por lo bien hecho que esté.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>Una promesa sin prueba <span class="hl">es publicidad</span>. No por mentirosa: porque quien la escucha no tiene cómo verificarla, y lo que no se puede verificar <span class="hl2">no se repite a un tercero</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas de una marca</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué resuelve, dónde se rompe y cómo se ve en M.E.T.A.S.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza de la marca.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: el logo que no salvó nada</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide por dónde se empieza cuando hay presupuesto para una sola cosa.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">💡</span><span class="ms-text"><strong>La idea:</strong> «lo que le falta al proyecto es imagen: un logo bonito y un nombre en inglés».</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🎨</span><span class="ms-text"><strong>El gasto:</strong> se van tres semanas y el presupuesto en colores, tipografía y tarjetas.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🤷</span><span class="ms-text"><strong>La prueba:</strong> se lo enseñas a una maestra y pregunta «¿y esto para qué me sirve?».</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🕳️</span><span class="ms-text"><strong>El hueco:</strong> el logo se ve precioso y nadie sabe repetir qué hace el proyecto.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">Con presupuesto para una sola cosa, ¿por dónde empiezas?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🎨 Por el logo y los colores</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🎯 Por la audiencia y la promesa</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚖️ Característica y beneficio</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🔧 La característica</h4>
+        <p>Lo que el trabajo <strong>es o tiene</strong>: 57 misiones, funciona sin internet, ficha de diez páginas, tres idiomas. Es verdad, es verificable y es necesaria. Pero por sí sola no convence a nadie, porque le habla al producto y no a la persona.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>❤️ El beneficio</h4>
+        <p>Lo que <strong>le cambia a quien lo usa</strong>: la maestra no prepara la clase del lunes a medianoche, la madre no gasta datos, el niño no se queda atrás cuando se va la luz. Es la misma característica, contada desde el otro lado de la mesa.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧭 Cómo se usa la diferencia</span><br>
+      <span>Toda característica se traduce con dos palabras: <span class="hl">«…para que…»</span>. Funciona sin internet <span class="hl">para que</span> la clase no dependa de la señal. Si después del «para que» no aparece una persona, <span class="hl2">todavía no es un beneficio</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🛡️ Los cuatro pasos para construir una promesa</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. Elegir a quién y 2. nombrar el dolor</h4>
+        <p><strong>Elegir:</strong> una audiencia concreta, aunque parezca que se pierde el resto (no se pierde: se gana quien sí recomienda). <strong>Nombrar el dolor:</strong> decirlo con sus palabras, no con las nuestras. Si la persona no se reconoce en la frase, deja de leer ahí mismo.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. Escribir el resultado y 4. mostrar la prueba</h4>
+        <p><strong>El resultado</strong> en una frase corta y verificable, sin adjetivos. <strong>La prueba:</strong> algo que se pueda tocar hoy (una ficha impresa, una misión abierta en el teléfono, una maestra que lo diga con su nombre). Sin prueba, la promesa es publicidad.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas de la marca</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Audiencias de M.E.T.A.S</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Pasos de la promesa</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 En una línea</span><br>
+      <span>La promesa se escribe en <span class="hl">doce palabras</span> y se sostiene con <span class="hl2">tres pruebas</span>. Si no cabe en doce palabras, es que todavía no se decidió para quién es.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📅 El momento también vende</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🗓️ El calendario de la maestra</h4>
+        <p>El año lectivo va de <strong>febrero a noviembre</strong>. Lo que se le ofrece en enero entra al plan del año entero; lo mismo en octubre llega cuando ya está cerrando notas. <strong>La misma promesa vale distinto según el mes</strong> en que se dice.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>⏰ La hora del día</h4>
+        <p>Las decisiones de material no se toman a media mañana: se toman <strong>de noche</strong>, cuando falta la clase de mañana. Una promesa que exige registrarse, esperar un correo y buscar el archivo, a esa hora, ya se perdió.</p>
+      </div>
+    </div>
+    <p style="font-size:0.9rem;margin:0.8rem 0;">La regla que sale de aquí: <strong>la promesa se cumple donde está la persona</strong>, no donde nos queda cómodo. Si la audiencia solo tiene teléfono y datos contados, una promesa que pesa 8 megas está rota antes de empezar.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">👩‍🏫 Maestra</div><div class="t-info">Quiere terminar a tiempo</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">👩 Madre</div><div class="t-info">Quiere que el hijo avance</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🏫 Director</div><div class="t-info">Quiere que nada explote</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🤝 Patrocinador</div><div class="t-info">Quiere algo que mostrar</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">📄 La prueba</div><div class="t-info">Lo que se puede tocar hoy</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🗣️ El boca a boca</div><div class="t-info">La marca de verdad</div></div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 Laboratorio de las 4 audiencias</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una audiencia y un aspecto. Combínalas todas para saber a quién le hablas y con qué frase.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>La maestra</strong> → <strong>Quién es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🎯 Audiencia:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="maestra" onclick="labShowParte('maestra')">👩‍🏫 La maestra</button>
+        <button class="lab-btn lab-cont-btn" data-parte="madre" onclick="labShowParte('madre')">👩 La madre</button>
+        <button class="lab-btn lab-cont-btn" data-parte="director" onclick="labShowParte('director')">🏫 El director</button>
+        <button class="lab-btn lab-cont-btn" data-parte="patrocinador" onclick="labShowParte('patrocinador')">🤝 El patrocinador</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Quién es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Qué quiere de verdad</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Qué la hace irse</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 La promesa y su prueba</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se construye de verdad</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la marca se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 Traduce: característica → beneficio</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿En qué se convierte esta característica cuando se cuenta desde el otro lado?</p>
+    <div class="neuro-trans-display" id="neuroTrans">Las misiones funcionan sin internet</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Promesas rotas: ¿qué falló ahí?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué falló de verdad:</p>
+    <div class="neuro-trans-display" id="enferDisease">Le gustó a todos y no lo usó nadie</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada frase lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">Característica</button>
+        <button class="btn btn-sec" onclick="">Beneficio</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🎯 Prueba de la promesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Para quién y qué le cambia · Ruta de la Marca</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: para quién y qué le cambia</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · Prueba de la promesa · Para quién y qué le cambia</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🎯 Prueba de la promesa: a quién le habla y con qué prueba</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso llega un mensaje, una oferta o un consejo sobre cómo debería presentarse M.E.T.A.S. Di a quién le habla de verdad, qué promete, con qué se comprueba y cómo lo reescribirías (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">📈</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📈 Casos del proyecto: la promesa de M.E.T.A.S puesta a prueba</h2>
+    <p>Ocho situaciones que este proyecto va a enfrentar en cuanto se le vea más. En cada una: a quién le habla de verdad, qué se está prometiendo, con qué se comprueba y qué se cede sin darse cuenta.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo trabajar la sección:</strong> tapa el análisis, lee el caso y di en voz alta para quién es, qué le cambia y con qué lo compruebas. Al final quedan la promesa en doce palabras y las cinco reglas de la marca, que son el producto de esta etapa.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>👩‍🏫 Caso 1: la maestra de sexto, nueve de la noche</h2>
+    <p>Mañana toca fracciones, no tiene material preparado y está buscando en el teléfono con el niño ya dormido.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎯 A quién le habla y qué promete</span><br>
+      <span>Esta es <span class="hl">la audiencia principal</span>, y su promesa no es «aprendizaje gamificado»: es <span class="hl2">«mañana tienes la clase lista»</span>. Todo lo que estorbe a esa hora (registrarse, esperar un correo, buscar el archivo) rompe la promesa aunque el contenido sea excelente.</span>
+    </div>
+    <p><strong>Lo que hay que proteger:</strong> que la ficha se abra e imprima en menos de tres clics, sin cuenta y sin instalar nada. La medida de éxito de esta audiencia no es cuánto le gustó: es <strong>si la usó esa misma noche</strong>. Si tardó tres clics de más, se perdió la clienta y ni se entera uno.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>👩 Caso 2: la madre que solo tiene el teléfono</h2>
+    <p>Datos contados, un solo aparato para toda la casa y la luz que se va tres veces por semana.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚖️ Dónde se rompe la promesa</span><br>
+      <span>La promesa «tu hijo puede seguir estudiando en casa» <span class="hl">se cae con el peso</span>: si una misión pesa demasiado o exige estar conectado, la promesa era falsa para ella desde el principio. Y una promesa que falla la primera vez <span class="hl2">no tiene segunda</span>.</span>
+    </div>
+    <p><strong>La prueba que la sostiene:</strong> que las misiones funcionen sin internet una vez abiertas y que la ficha se pueda imprimir en la pulpería del barrio. Aquí la característica técnica (funciona sin conexión) es exactamente el beneficio, y por eso se dice primero.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🤝 Caso 3: el patrocinador local y los 8.000 lempiras</h2>
+    <p>Un negocio de la zona ofrece 8.000 lempiras a cambio de su logo en la portada de todas las fichas.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">💰 Qué mete y qué saca</span><br>
+      <span>Mete dinero real y contacto local. Saca <span class="hl">espacio de marca en la portada</span>, que es justo donde la maestra decide en dos segundos si esto es material educativo o publicidad. Lo que se cede no es el espacio: es <span class="hl2">la lectura de qué es esto</span>.</span>
+    </div>
+    <p><strong>La condición con la que sí:</strong> logo en la contraportada y con tamaño definido por escrito, nunca en la portada ni junto al nombre del autor. Se cede espacio; no se cede el criterio pedagógico ni la autoría. Y las reglas se publican iguales para todos, para que el próximo no se sienta rechazado.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎨 Caso 4: «cámbiale el nombre y ponle un logo moderno»</h2>
+    <p>Alguien con buena intención aconseja un nombre en inglés, colores nuevos y una tipografía «más profesional».</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🕳️ El consejo que suena bien</span><br>
+      <span>Es el error clásico: empezar por <span class="hl">lo que se ve</span> en vez de por lo que se promete. Un logo nuevo no cambia si la maestra entiende para qué le sirve, y un nombre en inglés en un centro rural <span class="hl2">aleja en vez de acercar</span>.</span>
+    </div>
+    <p><strong>El orden correcto:</strong> primero la audiencia, después la promesa, después la prueba, y solo al final el nombre y el logo, que existen para etiquetar lo anterior. Un cambio de imagen antes de tener promesa es dinero gastado en la etiqueta de un frasco vacío.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🌍 Caso 5: «que sirva para todos los grados y todas las materias»</h2>
+    <p>Una escuela pide que el material cubra de primero a noveno, todas las asignaturas, y además sirva a los padres.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📉 La trampa de crecer hacia los lados</span><br>
+      <span>Sonar para todos <span class="hl">es no sonar para nadie</span>: el mensaje se vuelve tan general que nadie se reconoce en él, y el trabajo se reparte tan fino que ninguna materia queda buena. La audiencia amplia <span class="hl2">se gana estrechando</span>, no al revés.</span>
+    </div>
+    <p><strong>La contraoferta:</strong> hacerlo impecable para un grado y una materia, con la maestra de ese grado diciéndolo con su nombre, y de ahí crecer. Un proyecto conocido por «las mejores fichas de sexto» abre más puertas que uno conocido por «material educativo variado».</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📣 Caso 6: «usado por miles de maestros»</h2>
+    <p>Alguien propone poner esa frase en la portada del sitio porque «así se ve más serio».</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🚨 La cifra que nadie puede comprobar</span><br>
+      <span>Es una promesa <span class="hl">sin prueba</span>, y una sola persona que pregunte «¿cuántos exactamente?» derriba todo lo demás, incluso lo que sí era cierto. La confianza no se pierde por parecer pequeño: <span class="hl2">se pierde por parecer inflado</span>.</span>
+    </div>
+    <p><strong>Lo que sí se puede decir:</strong> el número real, con fecha, aunque sea chico («57 misiones y 43 fichas, usadas en tres centros desde febrero»). Un número pequeño y verificable convence más que uno grande y vago, porque el que lo lee sabe que puede comprobarlo.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📚 Caso 7: la editorial que pone su marca encima</h2>
+    <p>Una editorial ofrece distribuir las fichas en su catálogo, con su sello en la portada y el autor en la página de créditos.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🏷️ Alcance a cambio de nombre</span><br>
+      <span>Mete distribución de verdad. Saca <span class="hl">la marca</span>: si el material circula con otro sello, quien lo recuerde recordará a la editorial. El trabajo llega lejos y <span class="hl2">la reputación se queda en otra parte</span>.</span>
+    </div>
+    <p><strong>La condición con la que sí:</strong> el nombre del autor en la portada, no en los créditos, y una licencia que permita seguir publicando lo propio. La marca es el único activo que no se recupera si se regala: se puede volver a hacer una ficha, no se puede volver a ser el primero que la hizo.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📱 Caso 8: la página grande que ofrece difusión</h2>
+    <p>Una página con mucho público ofrece publicar las misiones a cambio de que no se publiquen en ningún otro lado durante un año.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🔒 El público prestado</span><br>
+      <span>Mete audiencia inmediata. Saca la <span class="hl">relación directa</span>: al final del año el público es de la página, no del proyecto, y hay que volver a empezar. Público prestado <span class="hl2">se devuelve completo</span>.</span>
+    </div>
+    <p><strong>La versión en la que sí:</strong> difusión sin exclusividad, con enlace al sitio propio y el nombre visible, de modo que cada publicación deje algo que se queda. Se colabora para que la gente sepa dónde encontrarte después, no para vivir dentro de la casa de otro.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La promesa en doce palabras, y las cinco reglas</h2>
+    <p>La promesa de M.E.T.A.S, escrita como se enseña en esta etapa:</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎯 Doce palabras</span><br>
+      <span>«Misiones y fichas listas para imprimir: la maestra tiene mañana la clase preparada».</span>
+    </div>
+    <p>Y las tres pruebas que la sostienen, todas verificables hoy:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Las fichas impresas:</strong> diez páginas con pauta, listas para el aula sin preparar nada.</li>
+      <li><strong>El Campeonísimo:</strong> preguntas de siete materias funcionando, no una promesa futura.</li>
+      <li><strong>El teléfono con datos escasos:</strong> las misiones abren y siguen funcionando sin conexión.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas de la marca</span><br>
+      <span>1. Primero <span class="hl">para quién</span>, después qué. 2. Toda característica se traduce con <span class="hl">«para que»</span>. 3. Promesa sin prueba <span class="hl">no se publica</span>. 4. Números reales con fecha, aunque sean chicos. 5. El nombre y el logo van <span class="hl2">al final</span>, nunca al principio.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas de la marca</strong>, el mapa de las cuatro audiencias de M.E.T.A.S, la traducción de característica a beneficio, ocho casos del proyecto, el constructor de promesa para llenar a lápiz, el guion de presentación de dos minutos, seis ejercicios y la pauta completa.</p>
+      <a href="../../fichas/ficha-marca-audiencia-promesa.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba escribiendo la promesa y comprobándola con una persona de verdad.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../index.html">⚡ Destellos</a>: cada vez que alguien te pregunte «¿y eso qué es?», apunta la respuesta que diste. En un mes tendrás tu promesa real escrita por ti mismo.</li>
+      <li><a href="../../index.html">💬 Chat Familiar</a>: la promesa se prueba en voz alta. Si al decirla en la casa alguien pregunta «¿para quién?», todavía no está lista.</li>
+      <li><a href="../../misiones/ruta-persuasion-palancas/palancas-influencia.html">🧠 Las seis palancas</a>: los casos 6 y 8 son persuasión pura. Aquí ves cómo se construye una promesa honesta; allá, cómo te la aplican inflada.</li>
+      <li><a href="../../misiones/ruta-politica-mapa-poder/mapa-poder.html">🏛️ Quién decide de verdad</a>: los casos 3 y 7 se cierran con un acuerdo por escrito. La promesa se piensa aquí y se firma allá.</li>
+      <li><a href="../../fichas/ficha-marca-audiencia-promesa.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: el constructor de promesa y el mapa de audiencias caben en una página cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> aprender la diferencia entre característica y beneficio hasta traducirlas sin pensar, llenar el mapa de las cuatro audiencias <strong>con una persona real en cada casilla</strong>, y escribir la promesa en doce palabras con sus tres pruebas. La prueba de que está aprendido es que otra persona de la casa pueda repetir la promesa <strong>de memoria y sin cambiarla</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">📈</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Marca · Etapa 1: Para quién y qué le cambia</div>
+    <div class="diploma-mascot" aria-hidden="true">🎯</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">📈</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«La marca no es el logo: es la promesa que alguien recuerda cuando uno no está» 🌱 · 📈 Ruta de la Marca · Etapa 1 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/audiencia-promesa.js"></script>
+</body>
+</html>

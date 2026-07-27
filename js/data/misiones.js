@@ -35,6 +35,7 @@ const MISSIONS = [
   { id: 6, title: 'Las seis palancas de la influencia',                      modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 40, icon: '🧠', ruta: 'persuasion', etapa: 1, url: 'misiones/ruta-persuasion-palancas/palancas-influencia.html' },
   /* Sello familiar: las misiones de las rutas del adulto marcadas así son
      material de la casa. No salen al sitio público ni a la revista. */
+  { id: 8, title: 'Para quién y qué le cambia: audiencia y promesa antes que el logo', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 40, icon: '🎯', ruta: 'marca', etapa: 1, sello: 'familiar', url: 'misiones/ruta-marca-audiencia-promesa/audiencia-promesa.html' },
   { id: 10, title: 'Quién decide de verdad: el mapa del poder que toca a M.E.T.A.S', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '🏛️', ruta: 'politico', etapa: 1, sello: 'familiar', url: 'misiones/ruta-politica-mapa-poder/mapa-poder.html' },
   { id: 11, title: 'La máquina que predice: qué es y qué no es un modelo de lenguaje', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🤖', ruta: 'maquina', etapa: 1, sello: 'familiar', url: 'misiones/ruta-maquina-que-predice/maquina-predice.html' },
   { id: 12, title: 'La puerta de la casa digital: quién entra y con qué llave', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🔐', ruta: 'casacerrada', etapa: 1, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-la-puerta/la-puerta.html' },
@@ -58,6 +59,13 @@ const ETAPAS_PREVISTAS = {
     4: 'Tácticas de presión y sus antídotos',
     5: 'Preguntar y escuchar: influir sin empujar',
     6: 'Narrativa: contar el proyecto para que otros quieran entrar',
+  },
+  marca: {
+    2: 'La oferta: qué se entrega y a qué precio',
+    3: 'El relato: contar el proyecto sin inflarlo',
+    4: 'Canales: dónde está la audiencia y qué se publica',
+    5: 'Prueba y reputación: números reales y quien lo dice por ti',
+    6: 'Crecer sin romper la promesa',
   },
   politico: {
     2: 'Normas y trámites: qué papel hace falta y quién lo emite',
