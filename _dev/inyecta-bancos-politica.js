@@ -348,11 +348,11 @@ B.critErrorBank = JSON.stringify([
 ]);
 
 B.critDecisionBank = JSON.stringify([
-  'El sí de la directora alcanza para dos secciones de sexto y 480 lempiras impresos, ¿o hace falta un papel de más arriba? ¿Qué se pide, a quién y antes de qué?',
+  'El sí de la directora alcanza para meter las misiones de M.E.T.A.S en dos secciones de sexto y 480 lempiras impresos, ¿o hace falta un papel de más arriba? ¿Qué se pide, a quién y antes de qué?',
   'Catorce centros y un solo papel: ¿la oficina a la que vas emite el aval o solo recomienda, y qué tiene que decir ese papel para no quemar el proyecto en el aula?',
   'La ferretería aporta 8.000 lempiras y pide constancia: ¿quién la emite, qué dice exactamente y qué se adjunta para poder demostrarlo?',
   'Veinte aulas a 150 lempiras al mes: ¿se cobra como persona o como organización, y cuál de las dos puede pagar el centro?',
-  'Cinco mil ejemplares de las fichas: ¿qué se cede exactamente, qué no se cede nunca y en qué momento se escribe?',
+  'Cinco mil ejemplares de las fichas de M.E.T.A.S impresos por una institución: ¿qué se cede exactamente, qué no se cede nunca y en qué momento se escribe?',
   'Las quince tabletas de 90.000 lempiras: ¿carta de entendimiento o convenio, y qué va en el apartado de qué no incluye?',
   'Treinta niños en la foto y ningún papel: ¿quién emite ese permiso, para qué uso concreto, y qué se publica mientras tanto?',
   'Nadie pidió que quedara nada por escrito de la reunión: ¿qué se manda hoy mismo, con qué palabras y dónde se guarda?',
