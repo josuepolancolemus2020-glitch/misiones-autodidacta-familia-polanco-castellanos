@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Persuasión · Etapa 2: Sesgos, los atajos que deciden por ti | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/sesgos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Decide en caliente 🔥</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🪞</div>
+    <div class="hero-text">
+      <h1>Sesgos: los atajos <span>que deciden por ti</span></h1>
+      <p class="sub">La etapa 1 enseñó las palancas que otro usa sobre ti. Esta enseña las trampas que ya están dentro 🧠</p>
+      <div class="badge">🧠 Ruta de la Persuasión · Etapa 2 de 6 · Psicología y Persuasión</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🪞 La frase maestra, y las tres preguntas que la vuelven útil</h2>
+    <p>Un sesgo <strong>no es un error de gente tonta</strong>: es un atajo que el cerebro usa para ahorrar energía, y que la mayoría de las veces acierta. Por eso no se puede apagar. Lo único que se puede hacer es <strong>compensarlo</strong>, y para eso hay que saber cuál se está disparando. Ante cualquier decisión que importe, tres preguntas: <strong>¿de dónde salió ese número?</strong>, <strong>¿qué me haría cambiar de opinión?</strong> y <strong>¿qué decidiría si empezara hoy desde cero?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Por qué esta etapa sigue a las seis palancas:</strong> en la etapa 1 había alguien enfrente aplicando una palanca, y bastaba con reconocerlo. Aquí <strong>no hay nadie</strong>: la trampa ya estaba puesta antes de que llegara la oferta. Por eso los antídotos no son frases para responder, son <strong>procedimientos que se escriben antes</strong>, cuando todavía no hay presión.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Dos preguntas antes de cualquier decisión</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>👀 ¿Qué me están haciendo mirar?</h4>
+        <p>Toda oferta trae algo brillante al frente: una cifra, un plazo, un nombre conocido. Lo que se mira primero <strong>fija el terreno</strong> de todo lo que viene después. Preguntarse qué ocupa el centro de la mesa es la mitad del trabajo.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🕳️ ¿Qué no estoy viendo?</h4>
+        <p>La otra mitad: lo que no aparece. Los que probaron lo mismo y fracasaron, el dato que contradice, la opción de no hacer nada. <strong>Lo que no está en la mesa también decide</strong>, y decide más, precisamente porque no se ve.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>La decisión se escribe <span class="hl">antes</span> de hablar con nadie. No por desconfianza: porque después de la conversación ya no se sabe cuánto de lo que uno piensa <span class="hl2">lo pensó uno</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧠 Los ocho sesgos, uno por uno</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada sesgo para ver su gatillo, qué hace por dentro y con qué se compensa.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧠</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un sesgo.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: el ancla que no viste</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces cuando el otro pone el primer número.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">💬</span><span class="ms-text"><strong>La apertura:</strong> «esto vale doscientos mil, pero por ser ustedes, ochenta mil».</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🎯</span><span class="ms-text"><strong>El terreno:</strong> ya no se discute cuánto vale, se discute cuánto se baja.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🤝</span><span class="ms-text"><strong>El regateo:</strong> se cierra en sesenta mil y se siente que se ganó algo.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🪞</span><span class="ms-text"><strong>El espejo:</strong> nunca se calculó cuánto vale de verdad. Ese número lo puso el otro.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué haces cuando escuchas la primera cifra?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">💸 Negocio a partir de ese número</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">📝 Saco el número que calculé antes</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚖️ Sesgo y palanca</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🧠 El sesgo viene de dentro</h4>
+        <p>Está en la cabeza antes de que llegue nadie. No hay intención ni culpable: el cerebro toma el atajo solo. Por eso <strong>no se defiende reconociendo a nadie</strong>, se defiende con un procedimiento escrito de antemano.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🎣 La palanca viene de fuera</h4>
+        <p>Alguien la aplica a propósito: urgencia, favor previo, autoridad prestada. Se defiende nombrándola en voz alta, que fue lo de la etapa 1. <strong>Hay alguien enfrente</strong>, y eso ya es una ventaja.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧭 Cómo se usa la diferencia</span><br>
+      <span>Lo peligroso es la combinación: casi toda palanca <span class="hl">se apoya en un sesgo que ya estaba ahí</span>. La urgencia funciona porque existe la aversión a la pérdida. Quien tapa el sesgo <span class="hl2">deja la palanca sin dónde agarrarse</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🛡️ Los cuatro pasos para decidir en frío</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. Escribir antes y 2. poner uno el número</h4>
+        <p><strong>Escribir antes:</strong> qué se busca y qué se aceptaría, antes de la primera conversación. <strong>Poner uno el número:</strong> quien habla primero de cifras fija el terreno. Si el otro ya lo puso, se dice en voz alta «ese número es tuyo» y se saca el propio.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. Buscar lo que contradice y 4. empezar hoy</h4>
+        <p><strong>Contradecir:</strong> preguntarse qué dato haría cambiar de opinión, y salir a buscarlo. <strong>Empezar hoy:</strong> decidir como si no se hubiera invertido nada todavía. Lo gastado no vuelve, y no es un argumento.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Sesgos que se estudian</div><div class="stat-val">8</div></div>
+      <div class="stat-item"><div class="stat-label">Preguntas en frío</div><div class="stat-val">5</div></div>
+      <div class="stat-item"><div class="stat-label">Pasos para decidir</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 En una línea</span><br>
+      <span>El antídoto de un sesgo <span class="hl">nunca es «tener cuidado»</span>. Es una pregunta escrita que se contesta <span class="hl2">antes de que haya alguien esperando</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📅 El momento también sesga</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🌙 La hora y el cansancio</h4>
+        <p>De noche, después de un día largo, el cerebro toma más atajos porque le queda menos combustible. <strong>Ninguna decisión que importe se toma cansado</strong>, y menos si alguien la trajo justo a esa hora.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>⏳ El plazo y el público</h4>
+        <p>Un plazo corto y una persona esperando desactivan la parte que compara. Por eso la respuesta siempre es la misma: <strong>«lo veo y te contesto mañana»</strong>. Si eso rompe el trato, el trato dependía de que no lo pensaras.</p>
+      </div>
+    </div>
+    <p style="font-size:0.9rem;margin:0.8rem 0;">La regla que sale de aquí: <strong>separar el momento de escuchar del momento de decidir</strong>. Escuchar se puede hacer en cualquier lado; decidir se hace solo, con la hoja de las cinco preguntas delante y sin nadie mirando el reloj.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">⚓ Anclaje</div><div class="t-info">El primer número manda</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🔍 Confirmación</div><div class="t-info">Solo se ve lo que encaja</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">😰 Pérdida</div><div class="t-info">Duele más perder que ganar</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🕳️ Costo hundido</div><div class="t-info">Lo gastado no vuelve</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">✨ Halo</div><div class="t-info">Bueno en algo, bueno en todo</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🏆 Superviviente</div><div class="t-info">Solo se ven los que ganaron</div></div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 La sala de espejos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona un sesgo y un aspecto. Combínalos todos para reconocerlo antes de que decida por ti.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El anclaje</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🧠 Sesgo:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="anclaje" onclick="labShowParte('anclaje')">⚓ Anclaje</button>
+        <button class="lab-btn lab-cont-btn" data-parte="confirmacion" onclick="labShowParte('confirmacion')">🔍 Confirmación</button>
+        <button class="lab-btn lab-cont-btn" data-parte="perdida" onclick="labShowParte('perdida')">😰 Aversión a la pérdida</button>
+        <button class="lab-btn lab-cont-btn" data-parte="hundido" onclick="labShowParte('hundido')">🕳️ Costo hundido</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se dispara</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se ve en el proyecto</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 El antídoto</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se decide en frío</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica el sesgo por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Sesgo 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué sesgo se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 Caza el sesgo: frase → qué está usando</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿En qué sesgo se apoya esta frase?</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Esto vale doscientos mil, pero te lo dejo en ochenta»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Decisiones que salieron mal: ¿qué sesgo fue?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué falló de verdad:</p>
+    <div class="neuro-trans-display" id="enferDisease">Se siguió un año más con algo que ya no servía</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada situación lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">Sesgo</button>
+        <button class="btn btn-sec" onclick="">Palanca</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🪞 La sala de espejos</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Sesgos, los atajos que deciden por ti · Ruta de la Persuasión</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: los atajos que deciden por ti</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La sala de espejos · Sesgos, los atajos que deciden por ti</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🪞 La sala de espejos: qué sesgo está decidiendo</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una decisión a punto de tomarse sobre M.E.T.A.S. Di qué sesgo está trabajando, qué información falta en la mesa y qué pregunta escribirías antes de contestar (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🪞</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🪞 Casos del proyecto: los espejos de M.E.T.A.S</h2>
+    <p>Ocho decisiones que este proyecto va a tener que tomar. En cada una: qué sesgo está trabajando por debajo, qué información falta en la mesa y con qué pregunta escrita se desactiva.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo trabajar la sección:</strong> tapa el análisis, lee el caso y di en voz alta qué sesgo está operando y qué preguntarías antes de contestar. Al final quedan la hoja de las cinco preguntas en frío y las cinco reglas, que son el producto de esta etapa.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>⚓ Caso 1: el inversionista y los doscientos mil</h2>
+    <p>Abre así: «esto vale 200.000 lempiras, y te doy 80.000 por el 40%». Suena a que se está regalando algo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧠 El sesgo que trabaja: anclaje</span><br>
+      <span>Los 200.000 no salieron de ningún cálculo: <span class="hl">los puso quien compra</span>. A partir de ahí toda la conversación es cuánto se baja, y nunca cuánto vale. El regateo se siente como una victoria y <span class="hl2">se cierra donde el otro quería</span>.</span>
+    </div>
+    <p><strong>La pregunta que lo desactiva:</strong> «¿de dónde salió esa cifra?». Y la regla de fondo: la valoración la propone quien construyó, no quien compra, y se calcula en casa antes de la reunión. Si el número propio no está escrito antes, el número del otro va a ganar siempre.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🕳️ Caso 2: setecientas horas en el motor de misiones</h2>
+    <p>Aparece una plataforma que hace el 80% de lo que hace el motor propio, por 30 dólares al mes.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧠 El sesgo que trabaja: costo hundido</span><br>
+      <span>Las setecientas horas <span class="hl">ya se gastaron y no vuelven</span>, se decida lo que se decida. Meterlas en la balanza no protege la inversión: <span class="hl2">añade horas nuevas a las perdidas</span>.</span>
+    </div>
+    <p><strong>La pregunta que lo desactiva:</strong> «si empezara hoy desde cero, ¿qué elegiría?». Y ojo, la respuesta puede ser seguir con el motor propio: hay razones buenas (control, funciona sin internet, no depende de nadie). Lo que no vale como razón es «ya invertí mucho».</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🏆 Caso 3: el canal educativo del millón de vistas</h2>
+    <p>Se propone copiar la táctica de un canal que explotó: vídeos cortos, títulos llamativos, publicar a diario.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧠 El sesgo que trabaja: superviviente</span><br>
+      <span>Se ve al que ganó y <span class="hl">no a los cuatrocientos que hicieron exactamente lo mismo</span> y desaparecieron. Como los que fracasaron no publican su fracaso, la muestra que uno mira <span class="hl2">está formada solo por ganadores</span>.</span>
+    </div>
+    <p><strong>La pregunta que lo desactiva:</strong> «¿cuántos hicieron esto mismo y no funcionó?». Si no se puede responder, la táctica no está probada: está contada. Lo que sí se puede copiar es el método verificable, no el resultado.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🔍 Caso 4: preguntarle solo a quien ya usa M.E.T.A.S</h2>
+    <p>Para saber si el proyecto va bien, se le pregunta a las maestras que lo usan todas las semanas.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧠 El sesgo que trabaja: confirmación</span><br>
+      <span>Se busca información donde <span class="hl">solo puede salir un sí</span>. Las que lo abrieron una vez y no volvieron son las que tienen la respuesta útil, y son justo a las que no se les pregunta porque <span class="hl2">contestar duele</span>.</span>
+    </div>
+    <p><strong>La pregunta que lo desactiva:</strong> «¿qué dato me haría cambiar de opinión, y dónde lo busco?». En este caso: hablar con tres maestras que dejaron de usarlo. Una hora de esas conversaciones vale más que veinte felicitaciones.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>😰 Caso 5: «si no aceptas hoy, la oferta se cae»</h2>
+    <p>Una institución ofrece un convenio y avisa que el presupuesto se cierra el viernes.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧠 El sesgo que trabaja: aversión a la pérdida</span><br>
+      <span>Perder duele <span class="hl">alrededor del doble</span> de lo que alegra ganar lo mismo. Por eso la urgencia funciona: no vende el beneficio, vende <span class="hl2">el miedo a quedarse sin él</span>. Y el plazo, muchas veces, es más flexible de lo que parece.</span>
+    </div>
+    <p><strong>La pregunta que lo desactiva:</strong> «si esto no tuviera fecha, ¿lo aceptaría igual?». Si la respuesta es no, entonces no se está aceptando el convenio: se está huyendo de la pérdida. Aquí se cruza con la palanca de urgencia de la etapa 1.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📢 Caso 6: la queja ruidosa contra los cuarenta usos silenciosos</h2>
+    <p>Una maestra se queja fuerte de que una misión no le sirvió. Ese mes hubo cuarenta usos sin ningún comentario.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧠 El sesgo que trabaja: disponibilidad</span><br>
+      <span>Lo que se recuerda con fuerza <span class="hl">se siente más probable de lo que es</span>. Una queja vívida pesa más que cuarenta usos callados, y el proyecto termina cambiando por el caso más ruidoso <span class="hl2">y no por el más frecuente</span>.</span>
+    </div>
+    <p><strong>La pregunta que lo desactiva:</strong> «¿cuántos casos hay de esto, sobre cuántos en total?». La queja se atiende siempre, porque puede tener razón; lo que no se hace es rediseñar el proyecto entero por un caso sin mirar el número.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>✨ Caso 7: la propuesta que suena bien porque el nombre suena bien</h2>
+    <p>Una institución conocida propone un convenio con condiciones que, leídas con calma, no convienen.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧠 El sesgo que trabaja: halo</span><br>
+      <span>Bueno en una cosa se contagia a todas las demás: si la institución es seria, <span class="hl">se supone que la propuesta también</span>. Pero el prestigio dice cómo son en lo suyo, <span class="hl2">no si este trato concreto conviene</span>.</span>
+    </div>
+    <p><strong>La pregunta que lo desactiva:</strong> «¿aceptaría esto mismo si lo propusiera un desconocido?». El truco práctico es leer la propuesta con el nombre tapado. Y aquí se cruza con la palanca de autoridad de la etapa 1: la diferencia es que el halo se lo pone uno solo.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📅 Caso 8: «las seis etapas de la ruta salen en un mes»</h2>
+    <p>Al planear una ruta nueva se calcula que las seis etapas estarán listas en cuatro semanas.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧠 El sesgo que trabaja: exceso de confianza</span><br>
+      <span>Se estima con <span class="hl">el mejor día imaginable</span>: sin cortes de luz, sin la ficha que hubo que rehacer, sin el domingo que se fue en otra cosa. Casi todo tarda más, y lo sabemos, y <span class="hl2">volvemos a estimar igual</span>.</span>
+    </div>
+    <p><strong>La pregunta que lo desactiva:</strong> «¿cuánto tardó de verdad la última vez?». El antídoto no es ser pesimista: es mirar el historial propio. Si la etapa anterior tomó tres tandas, esta va a tomar tres, no una.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La hoja de las cinco preguntas, y las cinco reglas</h2>
+    <p>Antes de contestar cualquier oferta que importe, se responden estas cinco por escrito y a solas:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>¿De dónde salió ese número?</strong> Y si lo puso el otro, ¿cuál es el mío?</li>
+      <li><strong>¿Qué dato me haría cambiar de opinión?</strong> ¿Dónde lo busco y a quién le pregunto?</li>
+      <li><strong>Si empezara hoy desde cero, ¿elegiría esto?</strong> Lo gastado no cuenta.</li>
+      <li><strong>¿Cuántos casos hay de esto, sobre cuántos en total?</strong> El ruido no es la frecuencia.</li>
+      <li><strong>Si no tuviera fecha, ¿lo aceptaría igual?</strong> Y si no, ¿qué estoy evitando perder?</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas de la decisión en frío</span><br>
+      <span>1. La decisión <span class="hl">se escribe antes</span> de la conversación. 2. El primer número <span class="hl">lo pone uno</span>. 3. Se busca a propósito lo que contradice. 4. Nada que importe se decide <span class="hl">cansado ni con alguien esperando</span>. 5. Lo invertido <span class="hl2">no es un argumento</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con los <strong>ocho sesgos</strong> y sus antídotos, la diferencia entre sesgo y palanca, los ocho casos de M.E.T.A.S, el <strong>cuaderno de decisiones en frío</strong> para llenar a lápiz, la hoja de las cinco preguntas, seis ejercicios y la pauta completa.</p>
+      <a href="../../fichas/ficha-persuasion-sesgos.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba cazándose a uno mismo en una decisión real.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../index.html">⚡ Destellos</a>: apunta cada decisión que tomes con su fecha y el número que tenías escrito antes. En un mes tendrás tu propio historial para estimar sin exceso de confianza.</li>
+      <li><a href="../../index.html">💬 Chat Familiar</a>: la hoja de las cinco preguntas se contesta en frío. Pasarla por el chat obliga a escribirla, y escribir es lo que rompe el atajo.</li>
+      <li><a href="../../misiones/ruta-persuasion-palancas/palancas-influencia.html">🧠 Las seis palancas</a>: la etapa 1 de esta misma ruta. Casi toda palanca se apoya en un sesgo de aquí: la urgencia en la aversión a la pérdida, la autoridad en el halo.</li>
+      <li><a href="../../misiones/ruta-marca-audiencia-promesa/audiencia-promesa.html">📈 Para quién y qué le cambia</a>: el caso 4 es el mismo problema visto desde la marca. Allá se busca la prueba; aquí, el dato que contradice.</li>
+      <li><a href="../../fichas/ficha-persuasion-sesgos.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: el cuaderno de decisiones y las cinco preguntas caben en una página cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> aprender los ocho sesgos hasta nombrarlos sin pensar, llenar el cuaderno de decisiones con <strong>una decisión real que tengas pendiente</strong>, y contestar la hoja de las cinco preguntas antes de la próxima conversación que importe. La prueba de que está aprendido es <strong>haberte cazado a ti mismo</strong> al menos una vez, y haberlo apuntado.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🪞</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Persuasión · Etapa 2: Sesgos, los atajos que deciden por ti</div>
+    <div class="diploma-mascot" aria-hidden="true">🪞</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🪞</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Un sesgo no se apaga: se compensa, y solo se compensa lo que se sabe nombrar» 🌱 · 🧠 Ruta de la Persuasión · Etapa 2 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/sesgos.js"></script>
+</body>
+</html>

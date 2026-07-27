@@ -35,6 +35,7 @@ const MISSIONS = [
   { id: 6, title: 'Las seis palancas de la influencia',                      modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 40, icon: '🧠', ruta: 'persuasion', etapa: 1, url: 'misiones/ruta-persuasion-palancas/palancas-influencia.html' },
   /* Sello familiar: las misiones de las rutas del adulto marcadas así son
      material de la casa. No salen al sitio público ni a la revista. */
+  { id: 7, title: 'Sesgos: los atajos que deciden por ti', modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 45, icon: '🪞', ruta: 'persuasion', etapa: 2, sello: 'familiar', url: 'misiones/ruta-persuasion-sesgos/sesgos.html' },
   { id: 8, title: 'Para quién y qué le cambia: audiencia y promesa antes que el logo', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 40, icon: '🎯', ruta: 'marca', etapa: 1, sello: 'familiar', url: 'misiones/ruta-marca-audiencia-promesa/audiencia-promesa.html' },
   { id: 10, title: 'Quién decide de verdad: el mapa del poder que toca a M.E.T.A.S', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '🏛️', ruta: 'politico', etapa: 1, sello: 'familiar', url: 'misiones/ruta-politica-mapa-poder/mapa-poder.html' },
   { id: 11, title: 'La máquina que predice: qué es y qué no es un modelo de lenguaje', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🤖', ruta: 'maquina', etapa: 1, sello: 'familiar', url: 'misiones/ruta-maquina-que-predice/maquina-predice.html' },
@@ -54,7 +55,6 @@ const ETAPAS_PREVISTAS = {
     8: 'Glosario y simulacro final',
   },
   persuasion: {
-    2: 'Sesgos: los atajos que deciden por ti',
     3: 'Marcos: quien pone el marco gana la conversación',
     4: 'Tácticas de presión y sus antídotos',
     5: 'Preguntar y escuchar: influir sin empujar',
