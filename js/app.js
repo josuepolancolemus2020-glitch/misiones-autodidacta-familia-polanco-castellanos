@@ -24,6 +24,7 @@ const MATERIAS = [
   { id: 'mkt',  label: 'Marketing y Marca',   sub: 'Audiencia, oferta y relato',   icon: 'fa-bullhorn',        color: 'mkt' },
   { id: 'eco',  label: 'Poder Económico',     sub: 'Dinero, activos y decisiones',  icon: 'fa-sack-dollar',     color: 'eco' },
   { id: 'pol',  label: 'Poder Político',      sub: 'Instituciones y negociación',   icon: 'fa-landmark',        color: 'pol' },
+  { id: 'cib',  label: 'Ciberseguridad',      sub: 'La casa cerrada: llaves y datos', icon: 'fa-shield-halved', color: 'cib' },
 ];
 
 const LEVELS = [
@@ -287,7 +288,7 @@ function renderMissions(query) {
          href="${m.url}">
         <div class="mc-icon ${m.color}">${m.icon}</div>
         <div class="mc-info">
-          <div class="mc-title">${m.title}</div>
+          <div class="mc-title">${m.sello === 'familiar' ? '<span class="mc-sello" title="Material solo de la familia: no se publica">🔒</span> ' : ''}${m.title}</div>
           <div class="mc-meta">
             ${visited
               ? `<span class="mc-done"><i class="fa-solid fa-check"></i> Visitada</span>`

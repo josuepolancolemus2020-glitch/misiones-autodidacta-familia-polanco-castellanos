@@ -22,6 +22,7 @@
   --mkt:  #db2777; --mkt-bg:  #fdf2f8; --mkt-border: rgba(219,39,119,.2);
   --eco:  #ca8a04; --eco-bg:  #fefce8; --eco-border: rgba(202,138,4,.2);
   --pol:  #1d4ed8; --pol-bg:  #eff6ff; --pol-border: rgba(29,78,216,.2);
+  --cib:  #334155; --cib-bg:  #f1f5f9; --cib-border: rgba(51,65,85,.2);
   --inv: #0d9488; --inv-bg: #f0fdfa; --inv-border: rgba(13,148,136,.2);
 
   --bg:      #f0f4f9;
@@ -1169,6 +1170,7 @@ a { text-decoration: none; color: inherit; }
 .mc-icon.mkt  { background: var(--mkt-bg);  color: var(--mkt); }
 .mc-icon.eco  { background: var(--eco-bg);  color: var(--eco); }
 .mc-icon.pol  { background: var(--pol-bg);  color: var(--pol); }
+.mc-icon.cib  { background: var(--cib-bg);  color: var(--cib); }
 
 .small-icon.apr { background: var(--apr-bg); color: var(--apr); }
 .small-icon.esp  { background: var(--esp-bg);  color: var(--esp); }
@@ -1181,6 +1183,7 @@ a { text-decoration: none; color: inherit; }
 .small-icon.mkt  { background: var(--mkt-bg);  color: var(--mkt); }
 .small-icon.eco  { background: var(--eco-bg);  color: var(--eco); }
 .small-icon.pol  { background: var(--pol-bg);  color: var(--pol); }
+.small-icon.cib  { background: var(--cib-bg);  color: var(--cib); }
 
 .mc-subj.esp  { background: var(--esp-bg);  color: var(--esp); }
 .mc-subj.mat  { background: var(--mat-bg);  color: var(--mat); }
@@ -1192,6 +1195,7 @@ a { text-decoration: none; color: inherit; }
 .mc-subj.mkt  { background: var(--mkt-bg);  color: var(--mkt); }
 .mc-subj.eco  { background: var(--eco-bg);  color: var(--eco); }
 .mc-subj.pol  { background: var(--pol-bg);  color: var(--pol); }
+.mc-subj.cib  { background: var(--cib-bg);  color: var(--cib); }
 
 /* ====== EMPTY STATE ====== */
 .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
@@ -2591,6 +2595,10 @@ body {
 .module-card.mkt  { background: linear-gradient(135deg, var(--mkt),  #f472b6); }
 .module-card.eco  { background: linear-gradient(135deg, var(--eco),  #facc15); }
 .module-card.pol  { background: linear-gradient(135deg, var(--pol),  #60a5fa); }
+.module-card.cib  { background: linear-gradient(135deg, var(--cib),  #64748b); }
+
+/* Sello familiar: material que no se publica, solo vive en F.A.R.O */
+.mc-sello { font-size: 12px; vertical-align: 1px; }
 
 /* Chips de materias en la vista de misiones */
 .materia-chips { margin-bottom: 14px; }

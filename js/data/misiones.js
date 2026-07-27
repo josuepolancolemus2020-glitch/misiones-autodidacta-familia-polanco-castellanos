@@ -18,6 +18,8 @@ const RUTAS = {
                 lema: 'Audiencia, oferta y relato: que el trabajo se vea' },
   poder:      { nombre: 'Ruta del Poder',                    emoji: '💰', color: 'eco',  etapas: 6,
                 lema: 'Dinero, activos, instituciones y negociación' },
+  casacerrada:{ nombre: 'Ruta de la Casa Cerrada',           emoji: '🔐', color: 'cib',  etapas: 6,
+                lema: 'Quién entra, qué se guarda y qué se pierde el día que falle algo' },
 };
 
 const MISSIONS = [
@@ -27,6 +29,9 @@ const MISSIONS = [
   { id: 4, title: 'Autocapacitación M.E.T.A.S · Módulo 2: El frontend',      modulo: 'aprendizaje-unido', materia: 'ing', color: 'apr', xp: 40, icon: '🗺️', ruta: 'ingenieria', etapa: 2, url: 'misiones/autocapacitacion-metas/modulo-2-frontend.html' },
   { id: 5, title: 'Activos y Pasivos: qué mete y qué saca dinero',           modulo: 'aprendizaje-unido', materia: 'eco', color: 'apr', xp: 40, icon: '💰', ruta: 'poder',      etapa: 1, url: 'misiones/ruta-poder-activos-pasivos/activos-pasivos.html' },
   { id: 6, title: 'Las seis palancas de la influencia',                      modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 40, icon: '🧠', ruta: 'persuasion', etapa: 1, url: 'misiones/ruta-persuasion-palancas/palancas-influencia.html' },
+  /* Sello familiar: las misiones de las rutas del adulto marcadas así son
+     material de la casa. No salen al sitio público ni a la revista. */
+  { id: 12, title: 'La puerta de la casa digital: quién entra y con qué llave', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🔐', ruta: 'casacerrada', etapa: 1, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-la-puerta/la-puerta.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -47,6 +52,13 @@ const ETAPAS_PREVISTAS = {
     4: 'Tácticas de presión y sus antídotos',
     5: 'Preguntar y escuchar: influir sin empujar',
     6: 'Narrativa: contar el proyecto para que otros quieran entrar',
+  },
+  casacerrada: {
+    2: 'Los datos de los demás: menores, ley y sentido común',
+    3: 'El código que no confía: validación, límites e inyección',
+    4: 'Llaves y secretos: claves, entornos y repositorios',
+    5: 'Copias y desastre: perder el teléfono, borrar sin querer',
+    6: 'El engaño: phishing e ingeniería social en la familia',
   },
   poder: {
     2: 'El presupuesto real: a dónde se va el dinero',
