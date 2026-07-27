@@ -40,8 +40,8 @@ f.onload = async () => {
 
     log('\n── MATERIAS ──');
     const mats = w.eval('MATERIAS.map(m=>m.id).join(",")');
-    ok(mats === 'esp,mat,cnat,csoc,epis,ing,psi,mkt,eco,pol', '10 materias: 5 escolares y 5 del adulto', 'materias: ' + mats);
-    ok(d.querySelectorAll('#materia-chips .fam-chip').length === 11, '11 chips (Todas + las 10 materias)', 'chips: ' + d.querySelectorAll('#materia-chips .fam-chip').length);
+    ok(mats === 'esp,mat,cnat,csoc,epis,ing,psi,mkt,eco,pol,cib,ia', '12 materias: 5 escolares y 7 del adulto', 'materias: ' + mats);
+    ok(d.querySelectorAll('#materia-chips .fam-chip').length === 13, '13 chips (Todas + las 12 materias)', 'chips: ' + d.querySelectorAll('#materia-chips .fam-chip').length);
     w.switchView('view-misiones'); await esperar(200);
     d.querySelector('.fam-chip[data-materia="ing"]').click(); await esperar(250);
     ok(d.querySelectorAll('#missions-container .mission-card').length === 2,
@@ -51,7 +51,17 @@ f.onload = async () => {
     log('\n── MAPA DE RUTAS ──');
     w.switchView('view-rutas'); await esperar(300);
     const cards = d.querySelectorAll('.ruta-card');
-    ok(cards.length === 6, '6 rutas en el mapa', 'rutas: ' + cards.length);
+    ok(cards.length === 9, '9 rutas en el mapa', 'rutas: ' + cards.length);
+    /* Las seis rutas del adulto van por la etapa 2: si alguna se queda con una
+       sola etapa tocable es que la misión nueva no llegó al catálogo. */
+    [['Ruta de la Persuasión', 2], ['Ruta de la Marca', 2], ['Ruta del Poder', 2],
+     ['Ruta de la Máquina que Predice', 2], ['Ruta del Poder Político', 2],
+     ['Ruta de la Casa Cerrada', 2]].forEach(([nombre, tocables]) => {
+      const r = [...cards].find(c => (c.querySelector('.ruta-nombre') || {}).textContent === nombre);
+      if (!r) { fallos++; log('  ✘ falta ' + nombre); return; }
+      const n = r.querySelectorAll('.re-link').length;
+      ok(n === tocables, nombre + ': ' + n + ' etapas tocables', nombre + ': ' + n + ' etapas tocables y se esperaban ' + tocables);
+    });
     const ing = [...cards].find(c => /Ingeniería del Sistema/.test(c.textContent));
     ok(!!ing, 'está la Ruta de la Ingeniería del Sistema', 'falta la ruta técnica');
     if (ing) {

@@ -42,6 +42,9 @@ const MISSIONS = [
   { id: 11, title: 'La máquina que predice: qué es y qué no es un modelo de lenguaje', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🤖', ruta: 'maquina', etapa: 1, sello: 'familiar', url: 'misiones/ruta-maquina-que-predice/maquina-predice.html' },
   { id: 12, title: 'La puerta de la casa digital: quién entra y con qué llave', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🔐', ruta: 'casacerrada', etapa: 1, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-la-puerta/la-puerta.html' },
   { id: 13, title: 'Los datos de los demás: menores, ley y sentido común', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🛡️', ruta: 'casacerrada', etapa: 2, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-datos/datos.html' },
+  { id: 14, title: 'La oferta: qué se entrega y a qué precio', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 45, icon: '🏷️', ruta: 'marca', etapa: 2, sello: 'familiar', url: 'misiones/ruta-marca-oferta/oferta.html' },
+  { id: 15, title: 'Normas y trámites: qué papel hace falta y quién lo emite', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '📜', ruta: 'politico', etapa: 2, sello: 'familiar', url: 'misiones/ruta-politica-normas-tramites/normas-tramites.html' },
+  { id: 16, title: 'Pedir bien: el encargo, el contexto y el ejemplo', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '📝', ruta: 'maquina', etapa: 2, sello: 'familiar', url: 'misiones/ruta-maquina-pedir-bien/pedir-bien.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -63,21 +66,18 @@ const ETAPAS_PREVISTAS = {
     6: 'Narrativa: contar el proyecto para que otros quieran entrar',
   },
   marca: {
-    2: 'La oferta: qué se entrega y a qué precio',
     3: 'El relato: contar el proyecto sin inflarlo',
     4: 'Canales: dónde está la audiencia y qué se publica',
     5: 'Prueba y reputación: números reales y quien lo dice por ti',
     6: 'Crecer sin romper la promesa',
   },
   politico: {
-    2: 'Normas y trámites: qué papel hace falta y quién lo emite',
     3: 'La mesa: negociar con una institución',
     4: 'Alianzas, patronato y comunidad',
     5: 'El dinero público: presupuesto, compras y constancias',
     6: 'Reputación y riesgo político: no quedar amarrado a nadie',
   },
   maquina: {
-    2: 'Pedir bien: el encargo, el contexto y el ejemplo',
     3: 'Verificar: nadie firma lo que no leyó',
     4: 'La IA que programa: qué revisar antes de subir',
     5: 'Datos, privacidad y las niñas',
