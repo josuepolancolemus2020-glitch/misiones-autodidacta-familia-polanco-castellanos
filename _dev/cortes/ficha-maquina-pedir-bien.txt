@@ -1,0 +1,28 @@
+# Cortes de la ficha de Inteligencia Artificial etapa 2 (nueve cortes = diez páginas).
+# Cada línea es el trozo de HTML que debe QUEDAR AL INICIO de una página.
+#
+# Anclajes únicos: el medidor propone «<div class="caso">», «<div class="pauta">» y
+# «<table class="tres">» a secas, y esos fragmentos se repiten por toda la ficha, así
+# que aquí se ancla en el <h2> o en el <h3> que va DENTRO del bloque, como hace el
+# archivo de cortes de la ficha de referencia. repagina-ficha.js retrocede solo hasta
+# la apertura del <div> que quedó sin cerrar, así que el caso o la pauta no se parten.
+# (Las tablas llevan además una segunda clase propia, «tres polos», «hoja llena2», etc.,
+# para que se pueda anclar en la apertura de una tabla, como en el corte de la página 2:
+# «<table class="tres">» a secas sale cinco veces y no serviría. Lo que no se puede es
+# anclar DENTRO de una tabla: ahí el corte partiría el HTML en dos.)
+#
+# Ojo con los dos <h3> repetidos: «Ejercicio 3 · El caso de las diez páginas» y
+# «Ejercicio 5 · Corregir el encargo, no la respuesta» aparecen dos veces cada uno, una
+# en el enunciado y otra en la pauta. El script busca cada corte en lo que queda DESPUÉS
+# del corte anterior, así que el orden de esta lista los resuelve: el de Ejercicio 5 cae
+# en el enunciado (viene antes) y el de Ejercicio 3 cae en la pauta (su enunciado ya se
+# consumió en la página 7). Si se reordena la lista, dejan de apuntar donde deben.
+<table class="tres polos">
+<h2>🛠️ Cómo se escribe un encargo, paso a paso</h2>
+<h2>🚦 Señales de que hay un problema esperando</h2>
+<h3>5. 💵 Los números del proyecto que no tiene</h3>
+<h2>📋 La hoja de encargo, casillas 5 a 7</h2>
+<h2>🗣️ Qué se contesta antes de dar por bueno un resultado</h2>
+<h3>Ejercicio 5 · Corregir el encargo, no la respuesta</h3>
+<h3>Ejercicio 3 · El caso de las diez páginas</h3>
+<h2>🚫 Lo que no se le encarga</h2>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Máquina que Predice, etapa 2</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-maquina-pedir-bien/pedir-bien.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 2 de la Ruta de la Máquina que Predice («Pedir bien: el encargo,
+   el contexto y el ejemplo»): bancos, la postura del tema, el laboratorio, las dos
+   pruebas impresas con su nombre, los casos del proyecto, la ficha y la ruta con DOS
+   etapas tocables. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+/* El guion largo se escribe por su punto de código para no meter el carácter
+   literal en ningún fuente de la casa (norma 1-bis). */
+const RAYA = /\u2014/;
+/* ¿Aparecen todas estas palabras en una ventana de texto que arranca en «ancla»? */
+function cerca(texto, ancla, palabras, ventana){
+  const re = new RegExp(ancla, 'gi'); let m;
+  while ((m = re.exec(texto)) !== null) {
+    const trozo = texto.slice(m.index, m.index + (ventana || 700));
+    if (palabras.every(p => new RegExp(p, 'i').test(trozo))) return true;
+  }
+  return false;
+}
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Máquina que Predice · Etapa 2 de 6/.test(d.body.textContent), 'se presenta como Ruta de la Máquina que Predice · Etapa 2 de 6', 'no se presenta como etapa 2 de su ruta');
+    ok(!/Etapa 1 de 6/.test(d.body.textContent), 'ya no se presenta como etapa 1 de 6', 'todavía dice Etapa 1 de 6');
+    ok(!/qué es y qué no es|Simulacro de verificación|corte de conocimiento|temperatura|Cazador de invenciones/i.test(d.body.textContent), 'sin restos de la etapa de la que se copió', 'quedan textos de La máquina que predice');
+    ok(!RAYA.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/\u2014/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('Object.keys(parteData).join(",")') === 'contexto,ejemplo,restricciones,criterio', 'laboratorio con las 4 piezas donde se pierde el trabajo', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas de un encargo', 'piezas: ' + dentro('timelineData.length'));
+    ok(/faro_ia_pedir/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LA POSTURA DEL TEMA ──');
+    /* Las diez del plan. Este bloque es el que impide que la misión quede bonita y vacía. */
+    const texto = d.body.textContent.replace(/\s+/g, ' ');
+    const secCasos = d.getElementById('s-casos');
+    const txtCasos = (secCasos ? secCasos.textContent : '').replace(/\s+/g, ' ');
+    ok(/no adivina lo que está en tu cabeza/i.test(texto), 'la frase maestra: no adivina lo que está en tu cabeza', 'falta la frase maestra: sin tesis la etapa es una lista de consejos');
+    ok(/faltaba contexto/i.test(texto), 'dice la causa raíz: faltaba contexto', 'falta la causa raíz: se sigue culpando a la máquina y no al encargo');
+    ok(/pregúntamelo, no lo inventes/i.test(texto), 'la restricción que más sirve, literal', 'falta «si te falta un dato, pregúntamelo, no lo inventes»');
+    ok(/se corrige el encargo/i.test(texto) && /no la respuesta/i.test(texto), 'el hábito de la etapa: se corrige el encargo, no la respuesta', 'falta el hábito: sin esto se parcha a mano toda la vida');
+    ok(cerca(texto, 'hoja de encargo', ['papel', 'tarea', 'contexto', 'formato', 'ejemplo', 'restricci', 'criterio']), 'la hoja de encargo con sus siete casillas nombradas', 'la hoja de encargo no aparece con sus siete casillas nombradas');
+    ok(/cinco reglas del encargo/i.test(texto), 'el segundo producto: las cinco reglas del encargo', 'faltan las cinco reglas del encargo con su nombre literal');
+    ok(/diecinueve/i.test(texto) && /diez páginas/i.test(texto) && /norma 6/i.test(texto), 'el caso de las diez páginas que salieron diecinueve, con la norma 6', 'falta el caso que ancla la etapa: diez páginas, diecinueve y la norma 6');
+    ok(/lempiras/i.test(txtCasos) && /L 1\.140/.test(txtCasos) && /L 180/.test(txtCasos) && /L 470/.test(txtCasos), 'los casos llevan sus cifras en lempiras (norma 3)', 'los casos perdieron las cifras en lempiras y vuelven a ser de manual');
+    ok(/El encargo que se escribe/.test(d.getElementById('evalcrit-screen-title').textContent) && /Pedir bien/.test(d.getElementById('eval-screen-title').textContent), 'las dos pruebas se llaman por su nombre en pantalla', 'los rótulos de las pruebas no llevan el nombre de esta etapa');
+    ok(cerca(texto, 'un ejemplo', ['tres párrafos|una página de instrucciones'], 300) && /guardar el encargo|la colección/i.test(texto), 'el ejemplo sustituye explicación y lo que se acumula es el encargo', 'faltan las dos ideas que se olvidan primero: el ejemplo y el encargo guardado');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/El contexto/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el contexto', 'abre en otra pieza');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'el encargo que se escribe se genera', 'prueba competencial vacía');
+    const cabeceras = [...d.querySelectorAll('.eval-print-header')].map(h => h.textContent).join(' ');
+    const rotulos = d.getElementById('eval-screen-title').textContent + d.getElementById('evalcrit-screen-title').textContent +
+                    d.getElementById('evalOut').textContent + crit + cabeceras;
+    ok(!/Las seis palancas|Panorama|La puerta de la casa digital|La máquina que predice|Quién decide de verdad|Para quién y qué le cambia|Sesgos|El presupuesto real|Los datos de los demás|La oferta: qué se entrega|Normas y trámites|Simulacro de verificación|qué es y qué no es/.test(rotulos), 'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+    ok(/El encargo que se escribe/.test(cabeceras) && /Evaluación Final · Pedir bien · Ruta de la Máquina que Predice/.test(cabeceras), 'las dos cabeceras impresas llevan el nombre de esta misión', 'las cabeceras impresas no dicen cómo se llaman estas dos pruebas');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = secCasos;
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['misión completa', 'diecinueve', 'sin dar el archivo', 'diez líneas', 'L 4\\.800', 'media hoja', 'olvidar', 'encargo guardado']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+      ok(/hoja de encargo/i.test(txt), 'trae la hoja de encargo', 'falta la hoja de encargo');
+      ok(/cinco reglas del encargo/i.test(txt), 'trae las cinco reglas', 'faltan las cinco reglas');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/L 180|L 470|L 750|L 3\.750/.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-maquina-pedir-bien.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/La hoja de encargo/i.test(txt), 'la ficha trae la hoja de encargo', 'falta la hoja de encargo');
+    ok(/cinco reglas del encargo/i.test(txt), 'la ficha trae las cinco reglas del encargo', 'faltan las cinco reglas');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-maquina-pedir-bien"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const maq = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Máquina que Predice/.test(c.textContent));
+    ok(!!maq, 'la Ruta de la Máquina que Predice está en el mapa', 'no aparece la ruta');
+    if (maq) {
+      ok(maq.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + maq.querySelectorAll('.re-link').length);
+      ok(maq.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + maq.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/Pedir bien: el encargo, el contexto y el ejemplo/.test(maq.textContent), 'la etapa 2 sale con el título de la misión', 'la etapa 2 sigue saliendo como prevista');
+      ok(/Verificar: nadie firma lo que no leyó/i.test(maq.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="ia"]');
+    ok(!!chip, 'la materia Inteligencia Artificial tiene su chip', 'no hay chip de Inteligencia Artificial');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      const pb = tarjetas.find(t => /el encargo, el contexto y el ejemplo/i.test(t.textContent));
+      ok(!!pb && /🔒/.test(pb.textContent), 'la misión de pedir bien lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

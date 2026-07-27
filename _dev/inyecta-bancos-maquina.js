@@ -352,14 +352,14 @@ B.critErrorBank = JSON.stringify([
 ]);
 
 B.critDecisionBank = JSON.stringify([
-  'Son las diez de la noche y los ocho casos volvieron genéricos y con guiones largos: ¿los arreglas a mano o reescribes el encargo con las siete piezas?',
-  'La ficha dice diez páginas y hay 30 juegos por imprimir a L 2 la página: ¿qué se mide antes de mandar a imprimir, con qué y quién lo mide?',
-  'Hace falta el resumen de costos del mes para una reunión con un director: ¿qué se adjunta y qué dos restricciones se escriben?',
-  'La conversación lleva cuatro horas y repite cosas ya descartadas: ¿se sigue ahí o se abre otra, y qué lleva el encargo de arranque?',
-  'Hay que pedirle las 15 preguntas de verdadero y falso de esta misión: ¿qué va en cada una de las siete casillas y cuál dejarías en «no aplica»?',
-  'La tanda salió perfecta a la primera: ¿qué se guarda, dónde, y qué parte se cambia para reutilizarlo en la próxima misión?',
-  'Quieres que copie el tono de tus casos: ¿pegas una muestra o describes el estilo, y qué dices que NO hay que imitar?',
-  'La misión completa se puede pedir de una vez o en seis vueltas cortas: ¿cuál sale más barata y con qué condición funciona la grande?',
+  'Son las diez de la noche y los ocho casos volvieron genéricos y con guiones largos: arreglarlos a mano son dos horas de tu tiempo (L 500) y reescribir el encargo con las siete piezas son veinte minutos más una tanda de L 180. ¿Qué haces, y qué queda escrito para la próxima misión?',
+  'La ficha dice diez páginas y hay 30 juegos por imprimir a L 2 la página: si trae diecinueve son L 1.140 en vez de L 600. ¿Qué se mide antes de mandar a imprimir, con qué y quién lo mide?',
+  'Hace falta el resumen de costos del mes para una reunión con un director y la tabla que devolvió dice L 4.800 de servidor, pero el recibo dice L 1.150: ¿qué se adjunta y qué dos restricciones se escriben?',
+  'La conversación lleva cuatro horas, repite cosas ya descartadas y recuperar el hilo a mano costó una hora (L 250): ¿se sigue ahí o se abre otra, y qué lleva el encargo de arranque?',
+  'Hay que pedirle las 15 preguntas de verdadero y falso de esta misión, y rehacerlas a mano son tres horas (L 750): ¿qué va en cada una de las siete casillas y cuál dejarías en «no aplica»?',
+  'La tanda salió perfecta a la primera y guardar ese encargo ahorró L 3.750 en las seis misiones del año: ¿qué se guarda, dónde, y qué parte se cambia para reutilizarlo en la próxima?',
+  'Quieres que copie el tono de tus casos y cada vuelta perdida por describir el estilo con adjetivos son L 180 de tanda: ¿pegas una muestra o describes el estilo, y qué dices que NO hay que imitar?',
+  'La misión completa se puede pedir de una vez por L 180 o en seis vueltas cortas por L 470: ¿cuál sale más barata y con qué condición funciona la grande?',
 ]);
 
 /* `critDecisionGuide` no es una lista, así que va fuera de `B` (igual que en los
