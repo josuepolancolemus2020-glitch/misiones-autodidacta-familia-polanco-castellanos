@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · evaluación de Las seis palancas</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:560px;border:0;background:#fff}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-persuasion-palancas/palancas-influencia.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba en el navegador de verdad (no solo en el arnés de Node) que las
+   30 formas funcionan: que el selector aparezca, que elegir la Forma N pinte
+   la Forma N, y que la misma forma repetida dé exactamente la misma prueba. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+window.addEventListener('load', async () => {
+  await esperar(1800);
+  const f = document.getElementById('m');
+  const d = f.contentDocument, w = f.contentWindow;
+
+  /* ── Evaluación conceptual ── */
+  log('🎓 Evaluación conceptual');
+  w.genEval();
+  await esperar(200);
+  const sel = d.getElementById('evalFormaSel');
+  ok(sel, 'aparece el selector de forma', 'no se inyectó el selector de forma');
+  ok(sel && sel.options.length === 30, '30 formas en el selector',
+     `el selector trae ${sel ? sel.options.length : 0} formas`);
+
+  const titulo = d.getElementById('eval-screen-title').textContent;
+  ok(/Forma \d+/.test(titulo), 'el título dice qué forma es: ' + titulo.slice(0, 60),
+     'el título no indica la forma');
+
+  /* Elegir la Forma 7 tiene que pintar la Forma 7, dos veces igual */
+  /* Hay que disparar el change: es ese evento el que fija la forma elegida.
+     Poner solo .value por código no lo dispara y la app se queda con la suya. */
+  function pintaForma(n){
+    sel.value = String(n);
+    sel.dispatchEvent(new w.Event('change'));
+    w.genEval();
+    return d.getElementById('evalOut').textContent;
+  }
+  const a1 = pintaForma(7); await esperar(120);
+  const a2 = pintaForma(7); await esperar(120);
+  ok(a1 === a2, 'la Forma 7 repetida da exactamente la misma prueba',
+     'la misma forma dio dos pruebas distintas');
+  const b1 = pintaForma(12); await esperar(120);
+  ok(a1 !== b1, 'la Forma 12 es distinta de la 7', 'dos formas distintas dieron lo mismo');
+  ok(d.getElementById('eval-screen-title').textContent.includes('Forma 12'),
+     'elegir la Forma 12 pinta la Forma 12', 'el selector no manda sobre la forma');
+
+  const items = d.querySelectorAll('#evalOut .eval-item').length;
+  ok(items >= 16, `${items} reactivos en pantalla (4 secciones × 5, más pareados)`,
+     `solo ${items} reactivos`);
+
+  /* ── Simulacro de Presión ── */
+  log('');
+  log('🧠 Simulacro de Presión');
+  w.evalSwitchMode('crit');
+  await esperar(300);
+  const selC = d.getElementById('evalCritFormaSel');
+  ok(selC, 'aparece su selector de forma', 'no se inyectó el selector del Simulacro');
+  ok(selC && selC.options.length === 30, '30 formas en el selector', 'no son 30 formas');
+
+  function pintaCrit(n){ selC.value = String(n); selC.dispatchEvent(new w.Event('change')); w.genEvalCrit(); return d.getElementById('evalCritOut').textContent; }
+  const c1 = pintaCrit(5); await esperar(120);
+  const c2 = pintaCrit(5); await esperar(120);
+  ok(c1 === c2, 'la Forma 5 repetida da exactamente la misma prueba',
+     'la misma forma dio dos simulacros distintos');
+  const c3 = pintaCrit(9); await esperar(120);
+  ok(c1 !== c3, 'la Forma 9 es distinta de la 5', 'dos formas distintas dieron lo mismo');
+
+  const txt = d.getElementById('evalCritOut').textContent;
+  ok(/Simulacro de Presión/.test(txt), 'la sección I se llama Simulacro de Presión',
+     'la sección I sigue con el nombre del molde');
+  ok(!/arquitectura de M\.E\.T\.A\.S|panorama técnico|del ingeniero/.test(txt),
+     'no queda texto del molde de Ingeniería', 'sigue habiendo texto heredado en pantalla');
+  ok(/palanca/i.test(txt), 'las preguntas hablan de palancas', 'la prueba no menciona las palancas');
+  const secciones = d.querySelectorAll('#evalCritOut .eval-section-title').length;
+  ok(secciones === 5, 'las 5 secciones de 20 pts', `salieron ${secciones} secciones`);
+
+  log('');
+  log(fallos ? `✖ ${fallos} fallo(s)` : '✅ TODO EN VERDE: las 30 formas funcionan en el navegador.');
+});
+</script>
+</body>
+</html>
