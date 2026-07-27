@@ -84,8 +84,26 @@ th { background: var(--pri-suave); font-weight: 800; }
 
 @media print {
   @page { size: letter; margin: 11mm 11mm; }
-  body { background: #fff; padding: 0; font-size: 11.5pt; }
+  /* 9,5pt y 1,34 de interlínea: con 11.5pt y 1.5 la hoja se llenaba con muy
+     poco texto y la ficha de las palancas se estiraba a 17 hojas, la mitad
+     de ellas a medio usar. Sigue siendo letra cómoda de leer (es la de un
+     libro), y es lo que permite que el tema completo entre en las 10 páginas
+     llenas que pide la norma 6. Si esto cambia, hay que cambiar igual la
+     copia de estas reglas en _dev/mide-ficha-paginas.html o la medida miente. */
+  body { background: #fff; padding: 0; font-size: 9.5pt; line-height: 1.34; }
   .doc { max-width: none; }
+  h2 { margin: 12px 0 5px; }
+  h3 { margin: 8px 0 3px; }
+  p, li { margin: 4px 0; }
+  .caja, .pauta { padding: 8px 11px; margin: 8px 0; }
+  .caso { padding: 7px 10px; margin: 7px 0; }
+  .fh { padding: 9px 11px; margin-bottom: 11px; }
+  .idline { margin-bottom: 9px; }
+  table { margin: 7px 0; }
+  th, td { padding: 4px 7px; }
+  .raya-resp { height: 15px; margin: 6px 0; }
+  .lineas-4 .raya-resp:last-child { margin-bottom: 9px; }
+  .pie { margin-top: 11px; padding-top: 5px; }
   .pagina {
     box-shadow: none; border-radius: 0; padding: 0; margin: 0;
     /* 226 mm, no 253. Chrome, al imprimir sin márgenes personalizados, deja

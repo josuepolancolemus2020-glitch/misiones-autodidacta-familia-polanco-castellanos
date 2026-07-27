@@ -1,13 +1,14 @@
 # Dónde empieza cada página de la ficha de las seis palancas (norma 6: 10 páginas).
-# Nueve cortes para diez páginas. Se mide con _dev/mide-ficha-paginas.html y se
-# mueve una línea de aquí, no las etiquetas del HTML. Si el corte cae dentro de
-# un bloque (el <h3> de un caso), la herramienta retrocede sola hasta su <div>.
+# Nueve cortes para diez páginas. Los calcula _dev/mide-ficha-paginas.html?cortes=1
+# y se pegan aquí; luego se retocan a mano si algún corte parte una explicación.
+# Si un corte cae dentro de un bloque (el <h3> de un caso), repagina-ficha.js
+# retrocede solo hasta la apertura de ese bloque.
 <h2>🎚️ Las palancas 1 a 3, por dentro</h2>
-<h2>🎚️ La palanca 6, y una séptima que conviene</h2>
+<h2>🎚️ Las palancas 4 y 5, por dentro</h2>
+<h3>⚓ 7. El anclaje (no es de Cialdini, pero llega en el mismo paquete)</h3>
 <h2>🔬 Casos de estudio de la vida real I: lo que se midió</h2>
-<h3>5. La joyería que subió el precio y vendió todo · autoridad y anclaje</h3>
-<h2>📝 El guion de la respuesta serena</h2>
-<h3>Ejercicio 3. Honesto o manipulado, y por qué</h3>
-<h3>Ejercicio 6. El caso del proyecto</h3>
-<h2>✅ Pauta completa de respuestas (1 de 3)</h2>
-<h3>Ejercicio 5. Reescribe en versión honesta</h3>
+<h3>5. La sala de tiempo compartido · las seis a la vez</h3>
+<h3>Cómo suena mal y cómo suena bien</h3>
+<h3>Ejercicio 3. Honesto o manipulado, por qué, y cómo se diría honesto</h3>
+<h3>3) Un alcalde ofrece L 250,000 para imprimir fichas y pide su foto en la contraportada, tres meses antes de las elecciones.</h3>
+<h3>Ejercicio 4. Encuentra la omisión</h3>

@@ -65,18 +65,85 @@ marco.addEventListener('load', async () => {
      pieza suelta de la ficha (cada encabezado, tabla, caja o caso). Con esa
      lista se calcula dónde tienen que caer los diez cortes ANTES de tocar el
      HTML, que es mucho más rápido que repaginar a ciegas y volver a medir. */
-  if (params.get('bloques')) {
+  if (params.get('bloques') || params.get('cortes')) {
     const piezas = [];
     d.querySelectorAll('.pagina').forEach(sec => {
       [...sec.children].forEach(el => {
         if (el.classList.contains('pie')) return;
-        const h = el.getBoundingClientRect().height / mm;
-        const margen = parseFloat(getComputedStyle(el).marginTop) / mm + parseFloat(getComputedStyle(el).marginBottom) / mm;
-        const texto = (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 58);
-        piezas.push(`${(h + margen).toFixed(1).padStart(6)} mm  <${el.tagName.toLowerCase()}${el.className ? '.' + el.className.split(' ')[0] : ''}>  ${texto}`);
+        const h = el.getBoundingClientRect().height / mm
+          + parseFloat(getComputedStyle(el).marginTop) / mm
+          + parseFloat(getComputedStyle(el).marginBottom) / mm;
+        piezas.push({
+          h,
+          ancla: el.outerHTML.split('\n')[0].trim(),
+          texto: (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 56),
+          etiqueta: `<${el.tagName.toLowerCase()}${el.className ? '.' + el.className.split(' ')[0] : ''}>`,
+        });
       });
     });
-    document.getElementById('out').textContent = `${ficha} · ${piezas.length} bloques\n\n` + piezas.join('\n');
+
+    if (params.get('bloques')) {
+      document.getElementById('out').textContent = `${ficha} · ${piezas.length} bloques\n\n`
+        + piezas.map(p => `${p.h.toFixed(1).padStart(6)} mm  ${p.etiqueta}  ${p.texto}`).join('\n');
+      return;
+    }
+
+    /* Modo cortes (?cortes=1): reparte los bloques en las 10 páginas que pide
+       la norma y propone los anclajes, listos para pegarlos en
+       _dev/cortes/<ficha>.txt.
+
+       No sirve ir llenando hasta el tope (lo probé): eso deja la última hoja
+       con dos líneas, porque no mira lo que viene después. Es el problema de
+       justificar un párrafo, así que se resuelve igual, con programación
+       dinámica: se minimiza la suma de los huecos al cuadrado, de modo que
+       diez huecos parecidos ganan a nueve páginas llenas y una vacía. */
+    const n = piezas.length;
+    const acum = [0];
+    piezas.forEach(p => acum.push(acum[acum.length - 1] + p.h));
+    const alto = (i, j) => acum[j] - acum[i];          /* bloques [i, j) */
+    const INF = Infinity;
+    const esTitulo = p => /^<h[234]/.test(p.ancla);
+    const coste = (i, j, ultima) => {
+      const h = alto(i, j);
+      if (h > UTIL) return INF;                         /* no cabe en la hoja */
+      /* Una página no debería terminar en un encabezado (el título se queda en
+         una hoja y su contenido en la otra). Pesa mucho, pero no se prohíbe:
+         si no, con la ficha casi llena el reparto se queda sin solución. */
+      const penalizaTitulo = esTitulo(piezas[j - 1]) ? 20000 : 0;
+      /* Y conviene que empiece por algo que abra: un título, un caso, una
+         caja de pauta. Empezar a media explicación se admite, pero pesa. */
+      const abre = i === 0 || esTitulo(piezas[i]) || /^<div class="(caso|pauta|caja)/.test(piezas[i].ancla);
+      const penalizaInicio = abre ? 0 : 6000;
+      if (h < FLOJA && !ultima) return (UTIL - h) * (UTIL - h) * 4 + penalizaInicio + penalizaTitulo;  /* hoja a medias: penaliza fuerte */
+      return (UTIL - h) * (UTIL - h) + penalizaInicio + penalizaTitulo;
+    };
+    const dp = Array.from({ length: PAGS + 1 }, () => new Array(n + 1).fill(INF));
+    const de = Array.from({ length: PAGS + 1 }, () => new Array(n + 1).fill(-1));
+    dp[0][0] = 0;
+    for (let k = 1; k <= PAGS; k++) {
+      for (let j = 1; j <= n; j++) {
+        for (let i = k - 1; i < j; i++) {
+          if (dp[k - 1][i] === INF) continue;
+          const c = coste(i, j, k === PAGS && j === n);
+          if (c === INF) continue;
+          if (dp[k - 1][i] + c < dp[k][j]) { dp[k][j] = dp[k - 1][i] + c; de[k][j] = i; }
+        }
+      }
+    }
+    const paginas = [];
+    if (dp[PAGS][n] === INF) {
+      document.getElementById('out').textContent = `${ficha}\n\n✖ no hay manera de repartir estos ${n} bloques en ${PAGS} páginas de ${UTIL} mm.\n`
+        + `El contenido suma ${acum[n].toFixed(0)} mm y en ${PAGS} hojas caben ${PAGS * UTIL} mm.\n`
+        + (acum[n] > PAGS * UTIL ? 'Sobra contenido: hay que podar.' : 'Cabe, pero algún bloque suelto es demasiado alto o deja huecos: hay que partirlo.');
+      return;
+    }
+    { let j = n; for (let k = PAGS; k >= 1; k--) { const i = de[k][j]; paginas.unshift(piezas.slice(i, j)); j = i; } }
+    const suma = a => a.reduce((s, p) => s + p.h, 0);
+    const lineas = paginas.map((pg, i) => `pág ${String(i + 1).padStart(2)}: ${suma(pg).toFixed(0).padStart(4)} mm · ${pg[0].texto}`);
+    const anclas = paginas.slice(1).map(pg => pg[0].ancla);
+    document.getElementById('out').textContent =
+      `${ficha} · reparto en ${paginas.length} páginas (tope ${UTIL} mm)\n\n${lineas.join('\n')}\n\n`
+      + `── cortes para _dev/cortes/ ──\n${anclas.join('\n')}`;
     return;
   }
 
