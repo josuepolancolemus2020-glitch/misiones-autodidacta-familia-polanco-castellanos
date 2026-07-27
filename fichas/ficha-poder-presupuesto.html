@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Ruta del Poder · Etapa 2: El presupuesto real</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #a16207; --pri-suave: #fefce8; --sec: #1d4ed8; --sec-suave: #eff6ff; }
+  .guion li { margin: 5px 0; }
+  table.tres th:nth-child(1) { width: 26%; }
+  table.tres th:nth-child(2), table.tres th:nth-child(3) { width: 25%; }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .mini { font-size: 12px; color: var(--gris); }
+  table.audit td:nth-child(1) { width: 6%; text-align: center; }
+  table.audit td:nth-child(3), table.audit td:nth-child(4) { width: 16%; text-align: center; height: 26px; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/ruta-poder-presupuesto/presupuesto.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · El presupuesto real</div>
+    <div class="f-meta"><b>Ruta:</b> 💰 Ruta del Poder · Etapa 2 de 6 · <b>Materia:</b> Poder Económico</div>
+    <div class="f-meta"><b>Tema:</b> costo fijo y variable, el costo de la hora, el costo por unidad, el margen y el punto de equilibrio, con la planilla del costo real y el presupuesto de doce meses para llenar a mano.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Separar <strong>costo fijo</strong> de <strong>costo variable</strong> y saber qué decide cada uno.</li>
+    <li>Ponerle un <strong>precio a la hora</strong> propia y usarlo siempre, aunque nadie la pague.</li>
+    <li>Calcular el <strong>costo por unidad</strong> completo de una ficha, un taller y un aula.</li>
+    <li>Sacar el <strong>margen</strong> y el <strong>punto de equilibrio</strong>, y no confundir precio con margen.</li>
+    <li>Repartir el mes en <strong>cuatro sobres</strong> y saber por qué de los fijos no se saca.</li>
+    <li>Llenar el <strong>presupuesto de doce meses</strong> marcando la primera cifra que hoy no se conoce.</li>
+  </ol>
+
+  <h2>🧭 La frase de la que sale todo</h2>
+  <p>Un proyecto no quiebra por gastar mucho: quiebra por <b>no saber cuánto cuesta lo que regala</b>. La etapa 1 enseñó a mirar una cosa y decir si mete o saca dinero. Esta enseña a ponerle número, y el número que casi nadie escribe es el más grande de todos: <b>la hora de quien hace el trabajo</b>.</p>
+  <p>De ahí las tres preguntas de esta etapa: <b>¿esto es fijo o variable?</b>, <b>¿cuánto cuesta de verdad una unidad?</b> y <b>¿cuántas hacen falta para no perder?</b> Sin esas tres, «sale caro» y «sale barato» son dos opiniones, y gana la del que habla más fuerte.</p>
+
+  <h2>🏠 Por qué esta etapa entra en la casa</h2>
+  <p>Porque un proyecto familiar no cierra de golpe: <b>se muere por goteo</b>. Un mes no alcanzó y se pagó de la casa, al segundo se dejó de contar, y al tercero ya nadie sabe cuánto costaba ni cuánto entraba. Nadie decidió cerrarlo, y sin embargo se cerró.</p>
+  <div class="caja">
+    <strong>Aviso sobre los números de esta ficha:</strong> las cifras en lempiras son <b>realistas pero inventadas</b>, puestas para que la cuenta se pueda hacer a lápiz. Los precios de verdad se confirman antes de usarlos en una decisión. Lo que no cambia con los precios es el método, y el método es lo que se estudia aquí.
+  </div>
+  <p><b>Y lo que esta etapa no es:</b> no es volverse tacaño ni dejar de regalar. Regalar está bien y este proyecto va a seguir regalando mucho. Lo que no está bien es <b>regalar sin saber cuánto cuesta</b>, porque entonces no es una decisión: es una cuenta que llega después y la paga la casa.</p>
+  <p><b>Cómo se estudia esta ficha:</b> no de corrido. Se lee la página del juego de números hasta tenerlo claro, se hace una sola cuenta a lápiz, y se comprueba con la pauta antes de seguir. Las cuentas de aquí son sencillas a propósito: lo difícil de un presupuesto nunca es la aritmética, es <b>acordarse de contar lo que no llega en un recibo</b>.</p>
+  <p class="mini">Y una advertencia: al hacer las cuentas de esta ficha van a salir números incómodos. Eso no es una mala noticia, es la primera vez que se ven. Un proyecto que sabe cuánto pierde puede decidir; uno que no lo sabe solo puede esperar.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 1 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>⚖️ Costo fijo y costo variable</h2>
+  <table class="tres">
+    <tr><th>Lo que es</th><th>🏠 Costo fijo</th><th>📄 Costo variable</th></tr>
+    <tr><td>Cuándo se paga</td><td>Aunque no pase nada</td><td>Con cada unidad</td></tr>
+    <tr><td>Si se crece</td><td>Se reparte y abarata</td><td>Se multiplica</td></tr>
+    <tr><td>Qué decide</td><td>Cuánto volumen hace falta</td><td>Si el precio deja algo</td></tr>
+    <tr><td>Ejemplo</td><td>El dominio del sitio</td><td>El papel de cada ficha</td></tr>
+  </table>
+  <div class="caja">
+    <strong>La regla corta:</strong> el fijo se cubre <b>con volumen</b> y el variable <b>con precio</b>. Confundirlos es lo que hace creer que algo deja dinero cuando en realidad solo estaba tapando el dominio de este mes.
+  </div>
+
+  <h2>🧩 Las siete piezas, primera parte</h2>
+  <table class="tres">
+    <tr><th>Pieza</th><th>Qué mide</th><th>Dónde se esconde</th></tr>
+    <tr><td>1. El ingreso</td><td>Lo que entra y de dónde</td><td>En contar lo único como si volviera</td></tr>
+    <tr><td>2. El costo fijo</td><td>Lo que se paga siempre</td><td>En lo que hoy es gratis</td></tr>
+    <tr><td>3. El costo variable</td><td>Lo que sube por unidad</td><td>En las hojas malas y el traslado</td></tr>
+    <tr><td>4. El costo de la hora</td><td>El precio del propio tiempo</td><td>En todas partes: nadie lo factura</td></tr>
+  </table>
+
+  <h2>🧩 Las siete piezas, segunda parte</h2>
+  <table class="tres">
+    <tr><th>Pieza</th><th>Qué mide</th><th>Dónde se esconde</th></tr>
+    <tr><td>5. El costo por unidad</td><td>Variables más horas</td><td>Cuando solo se cuenta el efectivo</td></tr>
+    <tr><td>6. El margen</td><td>Precio menos costo</td><td>Cuando se confunde con el precio</td></tr>
+    <tr><td>7. El punto de equilibrio</td><td>Cuántas para no perder</td><td>Al dividir entre el precio</td></tr>
+  </table>
+  <p class="mini"><b>El orden importa:</b> las piezas se calculan de la 1 a la 7 y cada una necesita la anterior. Saltarse la 4, que es la hora, hace que las tres últimas salgan mal sin que se note, porque salen <b>mejor</b> de lo que son.</p>
+
+<h2>🧮 El juego de números de esta casa</h2>
+  <p>Todas las cuentas de esta ficha salen de aquí. Se fijan una vez y se usan siempre, para que ninguna cuenta se contradiga con otra.</p>
+  <table class="tres">
+    <tr><th>Concepto</th><th>Valor</th><th>De dónde sale</th></tr>
+    <tr><td>Fijos del mes</td><td>750 L</td><td>Dominio 250, datos 350, impresión 150</td></tr>
+    <tr><td>Precio de la hora</td><td>100 L</td><td>Elegido una vez y no se discute</td></tr>
+    <tr><td>Cuota por aula</td><td>150 L</td><td>Propuesta de la etapa</td></tr>
+    <tr><td>Soporte por aula</td><td>50 L</td><td>Media hora al mes por 100</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <div class="caja">
+    <strong>De ahí salen las dos cifras que mandan:</strong> el <b>margen por aula</b> es 150 menos 50, o sea <b>100 lempiras</b>. Y el <b>punto de equilibrio</b> es 750 entre 100, o sea <b>ocho aulas</b>. No cinco: cinco es lo que sale si se olvida que atender un aula cuesta tiempo.
+  </div>
+
+  <h2>📄 Cuánto cuesta de verdad una ficha impresa</h2>
+  <div class="caso">
+    <h3>La cuenta rápida y la cuenta completa</h3>
+    <p><b>La rápida:</b> diez páginas de papel y tinta, unos 20 lempiras. Con eso se decide regalar treinta fichas sin pensarlo.</p>
+    <p><b>La completa:</b> 20 de papel y tinta, unos 3 de hojas que salen mal y traslado, y <b>20 minutos de revisión final</b>, que a 100 la hora son 33. Total: unos <b>56 lempiras</b> por ficha.</p>
+    <p><b>Lo que enseña:</b> el costo dominante no es el papel, es <b>el tiempo</b>. Por eso automatizar la revisión vale más que ahorrar en papel, y por eso las herramientas de <code>_dev</code> son una decisión económica y no solo técnica.</p>
+  </div>
+
+  <h2>⏳ El costo de la hora, la pieza que todo el mundo se salta</h2>
+  <p>Ponerle precio a la hora <b>no significa cobrarla</b>. Significa poder elegir entre dos usos de la misma tarde. Con la hora a cero, todo parece rentable y ninguna decisión se puede comparar; con la hora a 100, «hacer treinta fichas a mano» y «pasar la tarde automatizándolas» dejan de ser cuestión de gusto y pasan a ser una comparación con resultado.</p>
+  <p class="mini"><b>Cómo se elige el número:</b> no hace falta que sea justo, hace falta que sea <b>el mismo siempre</b>. Un número usado de forma constante ordena las decisiones; un número perfecto que se cambia cada vez no sirve para nada.</p>
+
+  <div class="caso">
+    <h3>🔀 El costo de oportunidad: la tarde que se gasta dos veces</h3>
+    <p><b>Qué es:</b> lo que se deja de hacer por hacer otra cosa. No aparece en ningún recibo y por eso casi nadie lo cuenta, pero es el gasto que más decide en un proyecto que se hace con horas prestadas al descanso.</p>
+    <p><b>El ejemplo de la casa:</b> un sábado se puede dar un taller (4.100 lempiras de margen) o construir una etapa nueva de una ruta (cero lempiras hoy, y una misión que sirve para siempre). Las dos cosas cuestan el mismo sábado, así que <b>elegir una es pagar la otra</b>.</p>
+    <p><b>La regla:</b> no se decide por lo que entra hoy, se decide por lo que queda dentro de un año. Los talleres financian; las misiones se quedan. Un proyecto que solo hace talleres nunca crece, y uno que solo construye nunca cobra.</p>
+  </div>
+
+<h2>🛠️ Los cuatro pasos para armar un presupuesto</h2>
+  <ol class="guion">
+    <li><b>Listar los fijos del mes.</b> Todo lo que se paga aunque nadie use nada, incluido lo que hoy es gratis, anotado con su precio de mercado entre paréntesis.</li>
+    <li><b>Medir una unidad.</b> Con cronómetro y una sola vez: qué cuesta hacer una ficha de verdad, sin redondear hacia abajo y contando lo que salió mal.</li>
+    <li><b>Ponerle precio a la hora.</b> Un número, aunque incomode. Sin él, el trabajo propio vale cero y todo parece rentable.</li>
+    <li><b>Sacar el equilibrio.</b> Fijos entre margen, nunca entre precio. Ese número manda sobre todos los demás y se sabe de memoria.</li>
+  </ol>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 3 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <h2>✉️ El sobre del mes</h2>
+  <p>El dinero se separa <b>el día que entra</b>, no cuando se acaba. Cuatro sobres, en este orden: fijos, variables, ahorro y reinversión. Un sobre vacío es una respuesta clara; una cuenta con saldo siempre parece que alcanza para una cosa más.</p>
+  <table class="tres">
+    <tr><th>Sobre</th><th>Qué entra ahí</th><th>La regla</th></tr>
+    <tr><td>🏠 Fijos</td><td>Dominio, datos, impresión</td><td>De aquí no se saca nunca</td></tr>
+    <tr><td>📄 Variables</td><td>Papel, tinta, pasajes</td><td>Se ajusta con lo previsto del mes</td></tr>
+    <tr><td>🏦 Ahorro</td><td>El mes que no alcance</td><td>Se aparta antes de pensar en nada nuevo</td></tr>
+    <tr><td>🌱 Reinversión</td><td>Equipo, herramientas</td><td>Solo con lo que sobre al final</td></tr>
+  </table>
+  <div class="caja">
+    <strong>La regla que más cuesta cumplir:</strong> sacar del sobre de fijos para reinvertir se siente inteligente y es <b>exactamente lo que apaga el dominio en marzo</b>. Cuando eso pasa, el sitio se cae sin que nadie lo haya decidido, y recuperarlo cuesta más que lo que se iba a ahorrar.
+  </div>
+
+  <h2>🚦 Señales de que la cuenta está mal hecha</h2>
+  <table class="tres">
+    <tr><th>Lo que se nota</th><th>Qué falta casi siempre</th><th>Qué se hace</th></tr>
+    <tr><td>«Esto sale casi gratis»</td><td>Las horas y lo que sale mal</td><td>Cronometrar una unidad</td></tr>
+    <tr><td>El mes sale de la casa</td><td>El equilibrio real</td><td>Recalcular con el margen</td></tr>
+    <tr><td>Un ingreso que no se nota</td><td>Las horas que obliga</td><td>Dividir entre horas invertidas</td></tr>
+    <tr><td>Una factura que sorprende</td><td>Lo gratis sin precio anotado</td><td>Anotarlo entre paréntesis</td></tr>
+  </table>
+  <p class="mini"><b>La señal más común de todas</b> es la cuarta, y llega siempre en el peor momento: cuando el servicio que era gratis empieza a cobrar, o cuando sube el precio del paquete de datos. No se puede evitar que pase; lo que sí se puede es que no sorprenda.</p>
+  <p class="mini">Las cuatro señales tienen el mismo remedio y es siempre el mismo: <b>medir una vez y dejarlo escrito</b>. Una cifra medida vale para todo el año; una estimada hay que volver a discutirla cada mes.</p>
+
+  <h2>🔁 Ingreso recurrente e ingreso único</h2>
+  <p>Dos ingresos del mismo tamaño no valen lo mismo, y esa diferencia decide en qué se invierte el tiempo.</p>
+  <table class="tres">
+    <tr><th>Lo que es</th><th>🔁 Recurrente</th><th>💸 Único</th></tr>
+    <tr><td>Cuándo vuelve</td><td>Solo, cada mes</td><td>Nunca: hay que volver a conseguirlo</td></tr>
+    <tr><td>Qué cuesta mantenerlo</td><td>El soporte de cada aula</td><td>Todo el esfuerzo, otra vez</td></tr>
+    <tr><td>Para qué sirve</td><td>Para sostener el mes</td><td>Para financiar lo que sí se repite</td></tr>
+    <tr><td>Ejemplo</td><td>La cuota por aula</td><td>Un taller, un patrocinio</td></tr>
+  </table>
+  <p class="mini"><b>La cuenta que lo demuestra:</b> ocho aulas a 100 de margen dan 800 al mes, o sea 9.600 al año sin volver a pedir nada. Un patrocinio de 6.500 netos suena mayor el primer día y al año siguiente <b>vale cero</b> si nadie lo renueva.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <h2>🧾 Las cuentas de M.E.T.A.S, primera parte</h2>
+  <p>Ocho cuentas que este proyecto tiene que saber hacer. Todas con el juego de números de la página 3.</p>
+
+  <div class="caso">
+    <h3>1. Cobrar 150 lempiras al mes por aula</h3>
+    <p>Fijos 750. Cada aula come media hora de soporte al mes, o sea 50 lempiras.</p>
+    <p><b>La cuenta:</b> margen 150 menos 50 igual a 100. Equilibrio 750 entre 100 igual a <b>ocho aulas</b>.</p>
+    <p><b>Lo que enseña:</b> el número que importa no es el precio, es <b>cuántas</b>. Y cambia por completo en cuanto la hora deja de valer cero.</p>
+  </div>
+
+  <div class="caso">
+    <h3>2. La impresora de 4.500 lempiras</h3>
+    <p>Ahorraría unos 2 lempiras por ficha frente a mandarlas fuera. Hoy se imprimen unas cuarenta al mes.</p>
+    <p><b>La cuenta:</b> 4.500 entre 2 son <b>2.250 fichas</b>. A cuarenta al mes, casi cinco años.</p>
+    <p><b>Lo que enseña:</b> una inversión no se juzga por lo que ahorra por unidad, sino por el <b>tiempo que tarda en devolverse</b> comparado con la vida esperada del proyecto. Y la tinta y el mantenimiento siguen corriendo aparte.</p>
+  </div>
+
+  <div class="caso">
+    <h3>3. Las treinta fichas «de regalo»</h3>
+    <p>Una maestra pide treinta fichas impresas para su sección.</p>
+    <p><b>La cuenta:</b> 56 por ficha son <b>1.680 lempiras</b>, de los cuales unos 990 son tiempo. Casi dos veces los fijos del mes.</p>
+    <p><b>Lo que enseña:</b> regalar está bien, pero se regala <b>sabiendo</b>. Con el número delante se puede ofrecer otra cosa: el archivo listo para que ella imprima, que cuesta cero.</p>
+  </div>
+
+  <div class="caso">
+    <h3>4. El taller a 800 lempiras por maestro</h3>
+    <p>Ocho maestros un sábado. Entran 6.400. Se gastan 900 en pasajes, refrigerio y copias. Se meten seis horas de taller y ocho de preparación.</p>
+    <p><b>La cuenta:</b> 6.400 menos 900 son 5.500. Catorce horas a 100 son 1.400. Margen real: <b>4.100 lempiras</b>, unos 293 por hora.</p>
+    <p><b>Lo que enseña:</b> los talleres son el ingreso más rápido y el que peor escala. Sirven para financiar lo que sí se repite, no al revés.</p>
+  </div>
+
+<h2>🧾 Las cuentas de M.E.T.A.S, segunda parte</h2>
+
+  <div class="caso">
+    <h3>5. La aplicación gratis con anuncios</h3>
+    <p>Se propone poner anuncios en el APK para tener ingresos sin cobrarle a nadie.</p>
+    <p><b>La cuenta:</b> con el tráfico de hoy, unas decenas de lempiras al mes. <b>No cubre ni el dominio</b>, que son 250.</p>
+    <p><b>Lo que enseña:</b> antes de aceptar un ingreso hay que calcular cuánto es <b>en realidad</b>. Y este además cobra un precio grande en confianza, que es lo que estudia la Ruta de la Marca.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>6. El hospedaje que hoy es gratis</h3>
+    <p>El sitio y la base de datos están en planes gratuitos, así que el fijo de infraestructura es casi cero.</p>
+    <p><b>La cuenta:</b> si algún día costaran 300 al mes, los fijos pasarían de 750 a 1.050 y el equilibrio saltaría de ocho a <b>once aulas</b>.</p>
+    <p><b>Lo que enseña:</b> gratis no es un precio, es un <b>precio aplazado</b>. Se anota en el presupuesto con su precio de mercado entre paréntesis, para no decidir con la factura encima.</p>
+  </div>
+
+  <div class="caso">
+    <h3>7. Los 8.000 lempiras del patrocinador</h3>
+    <p>Un negocio ofrece 8.000 por su logo en las fichas del año. El trato implica rediseñar portadas, mandar reportes y atender reuniones: unas quince horas.</p>
+    <p><b>La cuenta:</b> 8.000 menos 1.500 de horas son <b>6.500</b>, y llegan una sola vez. Son unos 433 lempiras por hora invertida.</p>
+    <p><b>Lo que enseña:</b> la pregunta correcta no es «¿cuánto me dan?», es <b>«¿cuánto me queda por hora invertida?»</b>. Con eso se comparan ofertas que parecían muy distintas.</p>
+  </div>
+
+  <div class="caso">
+    <h3>8. La hora que no se cobra a nadie</h3>
+    <p>El proyecto lleva cientos de horas y ninguna aparece en ninguna cuenta.</p>
+    <p><b>La cuenta:</b> solo cien horas, a 100 lempiras, son <b>10.000</b>: más que todos los fijos de un año.</p>
+    <p><b>Lo que enseña:</b> el gasto más grande del proyecto es el único invisible. Ponerle precio no es cobrarlo: es <b>poder comparar</b> dos usos de la misma tarde.</p>
+  </div>
+  <p class="mini"><b>Lo que tienen en común las ocho cuentas:</b> en ninguna falla la aritmética. Lo que falla es la lista de lo que entra en la cuenta. Por eso el método no es calcular mejor, es <b>tener escrita la lista</b> de lo que siempre hay que contar: materiales, lo que sale mal, el traslado, las horas y lo que hoy es gratis.</p>
+
+<h2>🧮 Planilla del costo real</h2>
+  <p>Una hoja por cada cosa que se entrega: una ficha, un taller, un aula al mes.</p>
+  <ol class="lineas-4">
+    <li>Lo que se entrega (una unidad): ________________________________________</li>
+    <li>Materiales por unidad: __________________________________________________</li>
+    <li>Lo que sale mal y el traslado: __________________________________________</li>
+    <li>Minutos que toma, cronometrados: ________________________________________</li>
+  </ol>
+  <ol class="lineas-4">
+    <li>Esos minutos en lempiras (a ____ la hora): ______________________________</li>
+    <li><b>Costo por unidad</b> (materiales + fallos + horas): _________________</li>
+    <li>Precio que se cobra: ____________________________________________________</li>
+    <li><b>Margen</b> (precio menos costo): _______________________________________</li>
+  </ol>
+  <div class="caja">
+    <strong>Punto de equilibrio</strong> = fijos del mes ÷ margen = ________ ÷ ________ = <b>________ unidades</b>.<br>
+    Esta es la cifra que se aprende de memoria. Si no se sabe de memoria, no está aprendida.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h2>📊 Qué escala y qué no</h2>
+  <p>Escalar es atender el doble sin que cueste el doble. Es lo único que permite crecer sin que crezcan las horas.</p>
+  <table class="tres">
+    <tr><th>Lo que se entrega</th><th>¿Escala?</th><th>Por qué</th></tr>
+    <tr><td>Una misión publicada</td><td>Sí</td><td>El mismo archivo sirve a mil</td></tr>
+    <tr><td>La ficha en PDF</td><td>Sí</td><td>Se imprime sin pedir permiso</td></tr>
+    <tr><td>Un taller presencial</td><td>No</td><td>Se paga con un sábado cada vez</td></tr>
+    <tr><td>El soporte por teléfono</td><td>No</td><td>Cada aula nueva cuesta lo mismo</td></tr>
+  </table>
+  <p class="mini"><b>Cómo se usa esta tabla:</b> lo que no escala se acepta con un tope escrito («hasta cuatro talleres al año»), y lo que sí escala es donde va el tiempo que sobra. Crecer con servicios que no escalan es cómo un proyecto se atasca en una sola persona.</p>
+
+  <h2>📅 Presupuesto de doce meses</h2>
+  <p>Se llena a lápiz y se marca con un círculo <b>la primera cifra que hoy no se conoce con certeza</b>. Esa es la que hay que ir a medir esta semana.</p>
+  <table class="audit">
+    <tr><th>Nº</th><th>Concepto</th><th>Al mes</th><th>Al año</th></tr>
+    <tr><td>1</td><td>Fijos: dominio, datos, impresión</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>2</td><td>Fijos aplazados (hoy gratis)</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>3</td><td>Variables previstos</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>4</td><td>Horas del proyecto, en lempiras</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>5</td><td>Ingresos recurrentes (aulas)</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>6</td><td>Ingresos únicos (talleres, patrocinios)</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>7</td><td>Resultado: entra menos sale</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  </table>
+  <p class="mini"><b>Cómo se lee:</b> si la línea 7 sale negativa, la diferencia la está pagando la casa todos los meses. Ese número, y no la sensación, es el que dice si el proyecto se sostiene.</p>
+
+<h2>✍️ Ejercicios sin pantalla</h2>
+  <p class="mini">Se responden a lápiz, con el juego de números de la página 3. Las respuestas están en la pauta del final.</p>
+
+  <div class="caso">
+    <h3>Ejercicio 1 · Fijo o variable</h3>
+    <p>Escribe F o V al lado de cada gasto.</p>
+    <ol class="lineas-4">
+      <li>( ) El dominio del sitio</li>
+      <li>( ) El papel de una ficha</li>
+      <li>( ) Los datos del teléfono</li>
+      <li>( ) El refrigerio de un taller</li>
+    </ol>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 7 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
+<section class="pagina">
+  <div class="caso">
+    <h3>Ejercicio 2 · El costo de una ficha</h3>
+    <p>Con 20 de materiales, 3 de fallos y traslado, y 20 minutos de revisión a 100 la hora:</p>
+    <ol class="lineas-4">
+      <li>Los 20 minutos en lempiras: ___________________________________________</li>
+      <li>Costo por ficha: ______________________________________________________</li>
+      <li>Costo de treinta fichas: ______________________________________________</li>
+    </ol>
+  </div>
+
+  <div class="caso">
+    <h3>Ejercicio 3 · El punto de equilibrio</h3>
+    <p>Fijos 750, cuota por aula 150, soporte por aula 50.</p>
+    <ol class="lineas-4">
+      <li>Margen por aula: ______________________________________________________</li>
+      <li>Punto de equilibrio en aulas: _________________________________________</li>
+      <li>Si el hospedaje empieza a costar 300, ¿cuántas aulas? _________________</li>
+    </ol>
+  </div>
+
+  <div class="caso">
+    <h3>Ejercicio 4 · El taller</h3>
+    <p>Ocho maestros a 800, gastos 900, catorce horas a 100.</p>
+    <ol class="lineas-4">
+      <li>Ingreso total: ________________________________________________________</li>
+      <li>Margen real después de gastos y horas: ________________________________</li>
+      <li>Lempiras por hora invertida: __________________________________________</li>
+    </ol>
+  </div>
+
+  <div class="caso">
+    <h3>Ejercicio 5 · Comparar dos ofertas</h3>
+    <p>Un patrocinio de 8.000 que exige quince horas, contra doce talleres al año de 4.100 con catorce horas cada uno. Responde en dos líneas cuál conviene y por qué.</p>
+    <ol class="lineas-4">
+      <li>Por hora invertida gana: ______________________________________________</li>
+      <li>Y aun así elegiría ____________ porque _______________________________</li>
+    </ol>
+  </div>
+
+  <div class="caso">
+    <h3>Ejercicio 6 · Tu presupuesto de verdad</h3>
+    <p>Llena la línea 7 del presupuesto de doce meses con las cifras que tengas hoy y responde:</p>
+    <ol class="lineas-4">
+      <li>El resultado del mes es: ______________________________________________</li>
+      <li>La primera cifra que no conozco con certeza: __________________________</li>
+      <li>Cómo y cuándo la voy a medir: _________________________________________</li>
+    </ol>
+    <p class="mini">Si la línea 7 te sale positiva a la primera, vuelve a la línea 4: casi siempre es que las horas quedaron fuera.</p>
+    <p class="mini">Y si sale negativa, tampoco pasa nada: casi todos los proyectos empiezan ahí. Lo que importa es saber <b>de cuánto</b> es el hueco y cuántas aulas lo cierran.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 8 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <h2>✅ Pauta completa de respuestas</h2>
+
+  <div class="pauta">
+    <h3>Ejercicio 1 · Fijo o variable</h3>
+    <ol>
+      <li>El dominio del sitio: <b>F</b>. Se paga igual haya una aula o veinte.</li>
+      <li>El papel de una ficha: <b>V</b>. Sube con cada ficha que se imprime.</li>
+      <li>Los datos del teléfono: <b>F</b>. Se pagan todos los meses igual.</li>
+      <li>El refrigerio de un taller: <b>V</b>. Depende de cuántos participantes.</li>
+    </ol>
+    <p class="mini">La prueba para dudas: pregúntate si el gasto cambia al atender un aula más. Si no cambia, es fijo.</p>
+    <p class="mini">Ojo con un caso que confunde: la impresión se pone aquí como fijo porque se aparta una reserva del mes, pero el papel de cada ficha concreta es variable. El mismo concepto puede caer de los dos lados según cómo se presupueste, y lo que decide es <b>si el número cambia al hacer una unidad más</b>.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Ejercicio 2 · El costo de una ficha</h3>
+    <ol>
+      <li>Veinte minutos son un tercio de hora: 100 ÷ 3 = <b>33 lempiras</b>.</li>
+      <li>20 + 3 + 33 = <b>56 lempiras</b> por ficha.</li>
+      <li>56 × 30 = <b>1.680 lempiras</b>, de los cuales unos 990 son tiempo.</li>
+    </ol>
+    <p class="mini">Se da por buena cualquier respuesta entre 54 y 58 en la línea 2: lo que se corrige es que se hayan contado las tres partes, no el redondeo.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Ejercicio 3 · El punto de equilibrio</h3>
+    <ol>
+      <li>Margen: 150 − 50 = <b>100 lempiras por aula</b>.</li>
+      <li>Equilibrio: 750 ÷ 100 = <b>8 aulas</b>. No cinco: cinco sale de dividir entre el precio.</li>
+      <li>Con el hospedaje a 300, los fijos son 1.050: 1.050 ÷ 100 = <b>11 aulas</b>.</li>
+    </ol>
+    <p class="mini">Fíjate en lo que hizo el tercer punto: 300 lempiras de fijo nuevo se convirtieron en <b>tres aulas más</b> de trabajo. Un fijo nunca es solo un pago: es volumen obligatorio.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Ejercicio 4 · El taller</h3>
+    <ol>
+      <li>Ingreso: 8 × 800 = <b>6.400 lempiras</b>.</li>
+      <li>6.400 − 900 − 1.400 = <b>4.100 lempiras</b> de margen real.</li>
+      <li>4.100 ÷ 14 = <b>293 lempiras por hora</b>, casi el triple del precio de la hora.</li>
+    </ol>
+    <p class="mini">Que la hora del taller rinda el triple no significa que haya que dar solo talleres: significa que un sábado de taller vale 4.100 y por eso conviene saber qué se deja de hacer ese sábado.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 9 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <h2>✅ Pauta (continúa)</h2>
+
+  <div class="pauta">
+    <h3>Ejercicio 5 · Comparar dos ofertas</h3>
+    <p><b>Por hora invertida gana el patrocinio:</b> 8.000 menos 1.500 de horas son 6.500, y 6.500 entre quince horas son <b>433 lempiras la hora</b>. El taller deja 4.100 entre catorce horas, o sea <b>293</b>.</p>
+    <p><b>Y aun así conviene el taller</b>, por dos cosas que ese número no mide: se repite doce veces al año (49.200 contra 6.500 una sola vez) y no compromete espacio de marca en las fichas. Se da por buena cualquiera de las dos respuestas <b>si se justifica con el número y con lo que el número deja fuera</b>.</p>
+  </div>
+
+  <div class="pauta">
+    <h3>Ejercicio 6 · Tu presupuesto de verdad</h3>
+    <p>No tiene solución única. Está bien resuelto si la línea 7 sale de sumar y restar cifras propias y no copiadas de esta ficha, y si la cifra marcada como incierta es <b>medible esta semana</b>: cuántas horas de soporte come de verdad un aula, cuánto cuesta hoy el paquete de papel, cuántas fichas se imprimen al mes.</p>
+  </div>
+
+  <h2>🗝️ Glosario del presupuesto</h2>
+  <table class="tres">
+    <tr><th>Término</th><th>Qué es</th><th>En M.E.T.A.S</th></tr>
+    <tr><td>Costo fijo</td><td>Se paga aunque no pase nada</td><td>750 al mes</td></tr>
+    <tr><td>Costo variable</td><td>Sube con cada unidad</td><td>23 por ficha</td></tr>
+    <tr><td>Costo de la hora</td><td>El precio del propio tiempo</td><td>100 la hora</td></tr>
+    <tr><td>Costo por unidad</td><td>Variables más horas</td><td>56 por ficha</td></tr>
+  </table>
+  <table class="tres">
+    <tr><th>Término</th><th>Qué es</th><th>En M.E.T.A.S</th></tr>
+    <tr><td>Margen</td><td>Precio menos costo por unidad</td><td>100 por aula</td></tr>
+    <tr><td>Punto de equilibrio</td><td>Fijos entre margen</td><td>8 aulas</td></tr>
+    <tr><td>Plazo de retorno</td><td>Cuándo se paga sola una compra</td><td>2.250 fichas</td></tr>
+    <tr><td>Fijo aplazado</td><td>Lo gratis que algún día cobrará</td><td>Hospedaje y base de datos</td></tr>
+  </table>
+
+  <h2>🎓 Cierre: la cifra que te toca medir</h2>
+  <ol class="lineas-4">
+    <li>Mi punto de equilibrio hoy es de ________ aulas o ________ fichas.</li>
+    <li>La cifra que no conozco y voy a medir es: ____________________________</li>
+    <li>La mido antes del: ____________________________________________________</li>
+  </ol>
+  <div class="caja">
+    <strong>Lo que hay que llevarse de esta etapa:</strong> el proyecto no se sostiene con entusiasmo, se sostiene con un número que se sabe de memoria. Ese número es cuántas aulas, cuántas fichas o cuántos talleres hacen falta <b>para que el mes no salga del bolsillo de la casa</b>. Todo lo demás de esta ficha existe para poder calcularlo.
+  </div>
+  <div class="caja-amb">
+    <strong>🔒 Material de la casa.</strong> Esta ficha es parte del conocimiento familiar de F.A.R.O. No se publica en el sitio ni se comparte fuera de la familia: contiene los números con los que se decide por este proyecto.
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 2 · Página 10 de 10</span></div>
+</section>
+
+
+</div>
+</body>
+</html>

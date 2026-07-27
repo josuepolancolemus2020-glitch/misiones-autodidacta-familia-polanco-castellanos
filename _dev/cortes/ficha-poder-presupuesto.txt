@@ -1,0 +1,15 @@
+# Cortes de la ficha de Poder Económico etapa 2 (nueve cortes = diez páginas).
+# Salen de _dev/mide-ficha-paginas.html?f=ficha-poder-presupuesto.html&cortes=1,
+# escritos con anclajes únicos porque el medidor propone «<div class="caja">»,
+# «<div class="caso">» y «<div class="pauta">» a secas, y se repiten.
+# El último corte se subió al <h2> de la pauta que continúa, para que la hoja
+# anterior no cierre con un título huérfano.
+<h2>⚖️ Costo fijo y costo variable</h2>
+<strong>De ahí salen las dos cifras que mandan:</strong>
+<h2>✉️ El sobre del mes</h2>
+<h2>🧾 Las cuentas de M.E.T.A.S, primera parte</h2>
+<h3>6. El hospedaje que hoy es gratis</h3>
+<h2>📊 Qué escala y qué no</h2>
+<h3>Ejercicio 2 · El costo de una ficha</h3>
+<h2>✅ Pauta completa de respuestas</h2>
+<h2>✅ Pauta (continúa)</h2>
