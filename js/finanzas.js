@@ -88,7 +88,7 @@ let _finMovFilter = '';
 
 // Estado del modal de detalle: qué tarjeta lo abrió y qué mes se está viendo.
 let _finDetailKind = null; // 'saldo' | 'gastos' | 'deudas' | 'historial'
-let _finGastosView = null; // { year, month(0-based) } — compartido por gastos e historial
+let _finGastosView = null; // { year, month(0-based) }: compartido por gastos e historial
 
 // Estado de edición de una transacción (para reutilizar el formulario).
 let _finEditingId       = null;
@@ -599,7 +599,7 @@ function finOpenAbono(d) {
 
   const pendiente = Math.max(0, Number(d.monto_total || 0) - Number(d.monto_pagado || 0));
   const info = document.getElementById('fin-abono-info');
-  if (info) info.textContent = `"${d.descripcion || 'Deuda'}" — pendiente: ${_finMoney(pendiente)}. El abono se registrará también como gasto (Pago de deuda) en la cuenta que elijas.`;
+  if (info) info.textContent = `"${d.descripcion || 'Deuda'}" · pendiente: ${_finMoney(pendiente)}. El abono se registrará también como gasto (Pago de deuda) en la cuenta que elijas.`;
 
   const monto = document.getElementById('fin-a-monto');
   if (monto) { monto.value = ''; monto.max = pendiente > 0 ? String(pendiente) : ''; }

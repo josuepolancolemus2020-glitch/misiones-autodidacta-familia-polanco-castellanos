@@ -261,7 +261,7 @@ function chatSubscribe() {
 
       if (container && coincideFiltro) {
         // Igual que WhatsApp: si estás leyendo mensajes viejos arriba, no te
-        // saltamos hasta abajo — solo avisamos con una insignia discreta.
+        // saltamos hasta abajo: solo avisamos con una insignia discreta.
         const debeBajar = esMio || _chatIsNearBottom();
         document.getElementById('chat-empty')?.remove();
         container.appendChild(_chatRenderMessage(payload.new));

@@ -1,7 +1,7 @@
 'use strict';
 
 /* ─────────────────────────────────────────────
-   DESTELLOS ⚡ — captura rápida de ideas
+   DESTELLOS ⚡ · captura rápida de ideas
    "Captúralo antes de que se apague."
    Botón flotante global → modal de captura en 3 segundos.
    Datos en Supabase (tabla `destellos`), personales por miembro.

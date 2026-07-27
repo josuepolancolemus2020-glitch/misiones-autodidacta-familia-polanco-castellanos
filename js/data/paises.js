@@ -8,7 +8,7 @@ const COUNTRY_DATA = {
       { emoji: '🇭🇳', nombre: 'La Bandera', tipo: 'Símbolo patrio', img: 'img/honduras_img/simbolos/bandera.webp',
         info: 'Tres franjas horizontales: azul, blanca y azul. Las cinco estrellas azules del centro representan a los países que formaron la República Federal de Centroamérica. Adoptada oficialmente el 16 de septiembre de 1825.' },
       { emoji: '🛡️', nombre: 'El Escudo', tipo: 'Símbolo patrio', img: 'img/honduras_img/simbolos/escudo.webp',
-        info: 'Muestra un óvalo central con volcanes, el sol naciente, un arco iris y dos torres que representan las fortalezas del país. A los lados, dos cornucopias simbolizan la abundancia natural. Pinos enmarcan la escena. El texto reza: "República de Honduras, Libre, Soberana e Independiente — 15 de septiembre de 1821".' },
+        info: 'Muestra un óvalo central con volcanes, el sol naciente, un arco iris y dos torres que representan las fortalezas del país. A los lados, dos cornucopias simbolizan la abundancia natural. Pinos enmarcan la escena. El texto reza: "República de Honduras, Libre, Soberana e Independiente · 15 de septiembre de 1821".' },
       { emoji: '🎵', nombre: 'El Himno Nacional', tipo: 'Símbolo patrio', img: 'img/honduras_img/simbolos/himno.webp',
         info: 'Letra de Augusto C. Coello y música del compositor alemán Carlos Hartling. Adoptado oficialmente el 15 de noviembre de 1915. Su coro comienza: "Tu bandera es un lampo de cielo, por un bloque de nieve cruzado…"' },
     ],

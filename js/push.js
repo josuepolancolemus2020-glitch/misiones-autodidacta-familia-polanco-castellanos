@@ -1,6 +1,6 @@
 'use strict';
 
-// Llave pública VAPID — esta sí es segura de exponer en el cliente,
+// Llave pública VAPID: esta sí es segura de exponer en el cliente,
 // es el equivalente a la "llave pública" de una firma digital. La
 // llave privada vive únicamente como secreto en la Edge Function de
 // Supabase y nunca debe estar en este repositorio.

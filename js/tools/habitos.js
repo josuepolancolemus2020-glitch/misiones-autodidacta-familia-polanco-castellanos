@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────
-   TRACKER DE HÁBITOS — por miembro de la familia
+   TRACKER DE HÁBITOS · por miembro de la familia
    Semana lunes-domingo; toca un día para marcarlo.
    Datos en localStorage: { memberId: [ {id, name, log:{fecha:true}} ] }
 ───────────────────────────────────────────── */

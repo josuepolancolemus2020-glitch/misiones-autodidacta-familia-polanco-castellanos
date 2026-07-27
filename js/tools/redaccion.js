@@ -1,7 +1,7 @@
 'use strict';
 
 /* ─────────────────────────────────────────────
-   REDACCIÓN 📰 — sala de redacción de la revista
+   REDACCIÓN 📰 · sala de redacción de la revista
    PolicastSapien (quincenal).
    Ediciones → notas (sección, tipo, estado, autor)
    → editor con autoguardado → exportar a Markdown
@@ -454,7 +454,7 @@ function redUpdatePortadaBtn() {
   if (!btn) return;
   const on = btn.classList.contains('red-portada-on');
   btn.innerHTML = on
-    ? '<i class="fa-solid fa-star"></i> En portada — su título saldrá en los titulares'
+    ? '<i class="fa-solid fa-star"></i> En portada: su título saldrá en los titulares'
     : '<i class="fa-regular fa-star"></i> Destacar en portada';
 }
 
@@ -598,13 +598,13 @@ function redEdicionMd() {
   const orden = redSeccionesAll();
   notas.forEach(n => { if (!orden.includes(n.seccion)) orden.push(n.seccion); });
 
-  let md = `# PolicastSapien — ${titulo}\n\n`;
+  let md = `# PolicastSapien · ${titulo}\n\n`;
   md += `*Exportado el ${new Date().toLocaleDateString('es')} desde F.A.R.O. · ${notas.length} notas*\n\n`;
 
   // Titulares elegidos para la portada, al inicio del documento
   const portada = notas.filter(n => n.en_portada);
   if (portada.length) {
-    md += `\n## ⭐ PORTADA — Titulares\n\n`;
+    md += `\n## ⭐ PORTADA · Titulares\n\n`;
     portada.forEach(n => { md += `- ${n.titulo || 'Sin título'} *(${n.seccion})*\n`; });
     md += '\n';
   }

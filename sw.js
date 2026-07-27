@@ -1,4 +1,4 @@
-const CACHE_NAME = 'faro-app-v1';
+const CACHE_NAME = 'faro-app-v2';
 const STATIC_ASSETS = [
   './img/icon-192.png',
   './img/icon-512.png',
@@ -65,7 +65,7 @@ self.addEventListener('push', event => {
       // Vibración fuerte (Android) y notificación persistente hasta
       // que se toque, para que sea difícil pasarla por alto. El
       // sonido en sí lo decide Android con su tono de notificación
-      // configurado — eso no se puede elegir ni subir desde la web.
+      // configurado: eso no se puede elegir ni subir desde la web.
       vibrate: [300, 150, 300, 150, 300],
       requireInteraction: true,
       renotify: true,

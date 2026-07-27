@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · arreglos del 26-jul</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:560px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-persuasion-palancas/palancas-influencia.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba los dos arreglos visuales del 26-jul:
+   1. Al tocar una palanca aparece de verdad su uso honesto, su uso manipulado
+      y su antídoto (el panel traía display:none EN LÍNEA y el JS solo añadía
+      una clase, que nunca puede ganarle a un estilo en línea).
+   2. Las cinco materias del adulto pintan su color y no salen grises. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session',
+    JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(2000);
+
+  /* ── 1. Las seis palancas ── */
+  log('🎚️ Las seis palancas, una por una');
+  const d = document.getElementById('m').contentDocument;
+  const nodos = d.querySelectorAll('.tl-node');
+  ok(nodos.length === 6, 'las 6 palancas se pintan', `se pintaron ${nodos.length}, no 6`);
+
+  const panel = d.getElementById('tlInfo');
+  ok(panel && d.defaultView.getComputedStyle(panel).display === 'none',
+    'el panel arranca oculto', 'el panel ya se veía antes de tocar nada');
+
+  let todasAbren = 0, conAntidoto = 0;
+  for (let i = 0; i < nodos.length; i++) {
+    nodos[i].click();
+    await esperar(90);
+    const vis = d.defaultView.getComputedStyle(panel).display;
+    const txt = d.getElementById('tlInfoText').textContent;
+    if (vis !== 'none' && txt.length > 40) todasAbren++;
+    /* Lo que el usuario dijo que no se veía: las tres lecturas de la palanca */
+    if (/Honesta:/.test(txt) && /Manipulada:/.test(txt) && /Antídoto:/.test(txt)) conAntidoto++;
+  }
+  ok(todasAbren === 6, 'las 6 abren su panel al tocarlas', `solo ${todasAbren} de 6 abren`);
+  ok(conAntidoto === 6, 'las 6 muestran uso honesto, uso manipulado y antídoto',
+     `solo ${conAntidoto} de 6 traen las tres lecturas`);
+
+  /* ── 2. Colores de las materias ── */
+  log('');
+  log('🎨 Materias de Aprendizaje');
+  const ad = appFrame.contentDocument;
+  const tarjetas = ad.querySelectorAll('.module-card');
+  ok(tarjetas.length >= 10, `${tarjetas.length} tarjetas de materia`, 'no se pintaron las materias');
+
+  const sinColor = [];
+  tarjetas.forEach(t => {
+    const bg = ad.defaultView.getComputedStyle(t).backgroundImage;
+    /* Sin su regla .module-card.<materia> no hay gradiente y la tarjeta sale gris */
+    if (!bg || bg === 'none') sinColor.push(t.dataset.materia);
+  });
+  ok(sinColor.length === 0, 'las 10 materias llevan su color',
+     'sin color: ' + sinColor.join(', '));
+
+  log('');
+  log(fallos ? `✖ ${fallos} fallo(s)` : '✅ TODO EN VERDE: palancas y colores arreglados.');
+});
+</script>
+</body>
+</html>

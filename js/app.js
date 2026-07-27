@@ -37,7 +37,7 @@ const LEVELS = [
 
 
 /* ─────────────────────────────────────────────
-   STATE — perfiles por miembro de la familia
+   STATE · perfiles por miembro de la familia
 ───────────────────────────────────────────── */
 
 const KEY = 'faro_v1';
@@ -139,7 +139,7 @@ function tickRotation() {
   _motivIdx = (_motivIdx + 1) % FRASES.length;
   const frase = FRASES[_motivIdx];
   fadeUpdate('motiv-text',  frase.texto);
-  fadeUpdate('motiv-autor', '— ' + frase.autor);
+  fadeUpdate('motiv-autor', '· ' + frase.autor);
   scheduleNextTick();
 }
 
@@ -149,7 +149,7 @@ function scheduleNextTick() {
 }
 
 /* ─────────────────────────────────────────────
-   RENDER — MÓDULOS
+   RENDER · MÓDULOS
 ───────────────────────────────────────────── */
 
 function renderModules() {
@@ -176,7 +176,7 @@ function goToMateria(matId) {
 }
 
 /* ─────────────────────────────────────────────
-   RENDER — HOME
+   RENDER · HOME
 ───────────────────────────────────────────── */
 
 function renderHome() {
@@ -194,7 +194,7 @@ function renderHome() {
   // Frase motivacional (índice global de rotación)
   const frase = FRASES[_motivIdx];
   document.getElementById('motiv-text').textContent  = frase.texto;
-  document.getElementById('motiv-autor').textContent = '— ' + frase.autor;
+  document.getElementById('motiv-autor').textContent = '· ' + frase.autor;
 
   // Módulos
   renderModules();
@@ -242,7 +242,7 @@ function renderHome() {
 }
 
 /* ─────────────────────────────────────────────
-   RENDER — MISSIONS (Aprendizaje Unido)
+   RENDER · MISSIONS (Aprendizaje Unido)
 ───────────────────────────────────────────── */
 
 function renderMissions(query) {
@@ -300,7 +300,7 @@ function renderMissions(query) {
 }
 
 /* ─────────────────────────────────────────────
-   RENDER — RUTAS
+   RENDER · RUTAS
    Una ruta es una serie ordenada por etapas. El mapa enseña el camino
    COMPLETO: las etapas que ya existen como misión (con su estado para el
    miembro activo) y las que están previstas pero aún no construidas, que
@@ -368,7 +368,7 @@ function renderRutas() {
 }
 
 /* ─────────────────────────────────────────────
-   RENDER — PROGRESS
+   RENDER · PROGRESS
 ───────────────────────────────────────────── */
 
 function renderProgress() {
@@ -441,7 +441,7 @@ function renderProgress() {
 }
 
 /* ─────────────────────────────────────────────
-   RENDER — PROFILE
+   RENDER · PROFILE
 ───────────────────────────────────────────── */
 
 function renderProfile() {

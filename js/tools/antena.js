@@ -1,7 +1,7 @@
 'use strict';
 
 /* ─────────────────────────────────────────────
-   ANTENA 📡 — EL OBSERVATORIO (Fase 5b)
+   ANTENA 📡 · EL OBSERVATORIO (Fase 5b)
    Se publica desde la app de cada red (Facebook
    lo hace mejor); Antena OBSERVA: métricas de
    todo el feed de la Página, comentarios por
@@ -537,7 +537,7 @@ async function antRenderResumenYFeed() {
     resEl.innerHTML = `<div class="ant-res-card">
       <div class="ant-res-grid">
         <div class="ant-res-stat">
-          <span class="ant-res-num">${segAhora ? antNum(segAhora.seguidores) : '—'}</span>
+          <span class="ant-res-num">${segAhora ? antNum(segAhora.seguidores) : 's/d'}</span>
           <span class="ant-res-lbl">Seguidores</span>
           ${deltaSeg !== null && deltaSeg !== 0 ? `<span class="ant-res-delta ${deltaSeg > 0 ? 'ant-res-up' : 'ant-res-down'}">${deltaSeg > 0 ? '+' : ''}${deltaSeg} esta semana</span>` : ''}
         </div>

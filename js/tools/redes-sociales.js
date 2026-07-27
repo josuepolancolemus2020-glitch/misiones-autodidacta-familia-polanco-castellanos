@@ -107,9 +107,9 @@ function rsRenderPantalla() {
       semaEl.innerHTML = '';
     } else {
       const icon = pct < 75 ? '✅' : pct <= 100 ? '⚠️' : '🔴';
-      const msg  = pct < 75 ? 'Dentro del límite — ¡bien!'
-                 : pct <= 100 ? 'Cerca del límite — ir cerrando'
-                 : 'Límite superado — hora de desconectar 🌳';
+      const msg  = pct < 75 ? 'Dentro del límite: ¡bien!'
+                 : pct <= 100 ? 'Cerca del límite: ir cerrando'
+                 : 'Límite superado: hora de desconectar 🌳';
       semaEl.innerHTML = `<span class="pm-semaforo-text">${icon} ${msg}</span>`;
     }
   }

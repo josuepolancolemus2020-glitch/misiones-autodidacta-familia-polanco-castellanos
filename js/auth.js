@@ -4,7 +4,7 @@
  * Este "login" es solo para elegir perfil y personalizar el saludo.
  * El sitio es estático y el repositorio es público: cualquiera puede
  * leer este archivo directamente, así que los PIN de abajo NO protegen
- * nada — no reutilices aquí una contraseña real de otro lugar.
+ * nada: no reutilices aquí una contraseña real de otro lugar.
  */
 
 const FARO_USERS = {

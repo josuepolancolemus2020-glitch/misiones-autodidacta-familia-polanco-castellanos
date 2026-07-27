@@ -7,10 +7,10 @@ let _coPhotos   = [];   // File[]
 let _coLogoFile = null; // File | null
 
 // Cache de render (se rellena en coGenerate, se usa en _coRedraw)
-let _coImgCache  = [];   // HTMLImageElement[]  — fotos ya cargadas
+let _coImgCache  = [];   // HTMLImageElement[] : fotos ya cargadas
 let _coLogoCache = null; // HTMLImageElement | null
-let _coSlots     = [];   // { x,y,w,h }[] — layout calculado
-let _coOffsets   = [];   // { dx,dy }[]   — desplazamiento por foto (px canvas)
+let _coSlots     = [];   // { x,y,w,h }[]: layout calculado
+let _coOffsets   = [];   // { dx,dy }[]  : desplazamiento por foto (px canvas)
 let _coMeta      = null; // { W,H,bannerH,photoH,text,format }
 
 // Ratios de cuadrícula editables (0–1); se reinician al generar de nuevo
@@ -296,7 +296,7 @@ function _coDrawOverlays(ctx, W, H) {
   ctx.fillStyle = '#1e3a7c';
   ctx.fillRect(0, bannerY, W, 5);
 
-  // ── Logo circular — object-fit: cover (sin bordes blancos) ────────
+  // ── Logo circular · object-fit: cover (sin bordes blancos) ────────
   const LOGO_D = isVert ? 130 : 106;
   const LOGO_R = LOGO_D / 2;
   const PAD    = 26;

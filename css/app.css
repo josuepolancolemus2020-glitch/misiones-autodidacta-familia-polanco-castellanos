@@ -1163,14 +1163,35 @@ a { text-decoration: none; color: inherit; }
 .mc-icon.csoc { background: var(--csoc-bg); color: var(--csoc); }
 .mc-icon.bach { background: var(--bach-bg); color: var(--bach); }
 .mc-icon.apr  { background: var(--apr-bg);  color: var(--apr); }
+/* Materias del adulto: llevan su color igual que las escolares */
+.mc-icon.ing  { background: var(--ing-bg);  color: var(--ing); }
+.mc-icon.psi  { background: var(--psi-bg);  color: var(--psi); }
+.mc-icon.mkt  { background: var(--mkt-bg);  color: var(--mkt); }
+.mc-icon.eco  { background: var(--eco-bg);  color: var(--eco); }
+.mc-icon.pol  { background: var(--pol-bg);  color: var(--pol); }
 
 .small-icon.apr { background: var(--apr-bg); color: var(--apr); }
+.small-icon.esp  { background: var(--esp-bg);  color: var(--esp); }
+.small-icon.mat  { background: var(--mat-bg);  color: var(--mat); }
+.small-icon.cnat { background: var(--cnat-bg); color: var(--cnat); }
+.small-icon.csoc { background: var(--csoc-bg); color: var(--csoc); }
+.small-icon.bach { background: var(--bach-bg); color: var(--bach); }
+.small-icon.ing  { background: var(--ing-bg);  color: var(--ing); }
+.small-icon.psi  { background: var(--psi-bg);  color: var(--psi); }
+.small-icon.mkt  { background: var(--mkt-bg);  color: var(--mkt); }
+.small-icon.eco  { background: var(--eco-bg);  color: var(--eco); }
+.small-icon.pol  { background: var(--pol-bg);  color: var(--pol); }
 
 .mc-subj.esp  { background: var(--esp-bg);  color: var(--esp); }
 .mc-subj.mat  { background: var(--mat-bg);  color: var(--mat); }
 .mc-subj.cnat { background: var(--cnat-bg); color: var(--cnat); }
 .mc-subj.csoc { background: var(--csoc-bg); color: var(--csoc); }
 .mc-subj.bach { background: var(--bach-bg); color: var(--bach); }
+.mc-subj.ing  { background: var(--ing-bg);  color: var(--ing); }
+.mc-subj.psi  { background: var(--psi-bg);  color: var(--psi); }
+.mc-subj.mkt  { background: var(--mkt-bg);  color: var(--mkt); }
+.mc-subj.eco  { background: var(--eco-bg);  color: var(--eco); }
+.mc-subj.pol  { background: var(--pol-bg);  color: var(--pol); }
 
 /* ====== EMPTY STATE ====== */
 .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
@@ -1377,7 +1398,7 @@ a { text-decoration: none; color: inherit; }
   transition: border-color 0.55s ease;
 }
 
-/* — Encabezado — */
+/* · Encabezado: */
 .cc-head {
   display: flex;
   align-items: flex-start;
@@ -1431,7 +1452,7 @@ a { text-decoration: none; color: inherit; }
   align-self: center;
 }
 
-/* — Símbolos patrios — */
+/* · Símbolos patrios: */
 .cc-simbolos { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
 
 .cc-sim-section {}
@@ -1564,7 +1585,7 @@ a { text-decoration: none; color: inherit; }
   width: 100%;
 }
 
-/* — Curiosidad deslizable — */
+/* · Curiosidad deslizable: */
 .cc-curious-block {
   background: var(--bg);
   border-radius: 10px;
@@ -1621,7 +1642,7 @@ a { text-decoration: none; color: inherit; }
   padding: 0 10px;
 }
 
-/* — Footer — */
+/* · Footer: */
 .cc-footer {
   display: flex;
   justify-content: space-between;
@@ -1640,7 +1661,7 @@ a { text-decoration: none; color: inherit; }
   transition: color 0.55s ease;
 }
 
-/* — Navegación prev/next — */
+/* · Navegación prev/next: */
 .cc-nav {
   display: flex;
   align-items: center;
@@ -1668,7 +1689,7 @@ a { text-decoration: none; color: inherit; }
   .cc-nav-btn:hover { border-color: var(--brand-light); color: var(--brand); }
 }
 
-/* — Puntitos — */
+/* · Puntitos: */
 .cc-dots {
   display: flex;
   gap: 4px;
@@ -2274,7 +2295,7 @@ a { text-decoration: none; color: inherit; }
   background-color: rgba(30, 58, 124, 0.08);
 }
 
-/* ====== HERRAMIENTAS DE FAMILIA — Habitos y Redes Sociales ====== */
+/* ====== HERRAMIENTAS DE FAMILIA · Habitos y Redes Sociales ====== */
 
 /* Chips de miembro (compartidos) */
 .fam-member-chips { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -2562,6 +2583,14 @@ body {
 .module-card.cnat { background: linear-gradient(135deg, var(--cnat), #2dd4bf); }
 .module-card.csoc { background: linear-gradient(135deg, var(--csoc), #f87171); }
 .module-card.bach { background: linear-gradient(135deg, var(--bach), #a78bfa); }
+/* Materias del adulto. Sin estas cinco reglas la tarjeta se queda sin fondo y
+   sale gris, aunque la materia ya tenga misiones: el color no depende de
+   «Próximamente» (eso es solo la opacidad de .soon) sino de esta clase. */
+.module-card.ing  { background: linear-gradient(135deg, var(--ing),  #2dd4bf); }
+.module-card.psi  { background: linear-gradient(135deg, var(--psi),  #c084fc); }
+.module-card.mkt  { background: linear-gradient(135deg, var(--mkt),  #f472b6); }
+.module-card.eco  { background: linear-gradient(135deg, var(--eco),  #facc15); }
+.module-card.pol  { background: linear-gradient(135deg, var(--pol),  #60a5fa); }
 
 /* Chips de materias en la vista de misiones */
 .materia-chips { margin-bottom: 14px; }
@@ -2571,7 +2600,7 @@ body {
 .qa-col    { background: linear-gradient(135deg, #64748b, #94a3b8); }
 
 /* ══════════════════════════════════════════════
-   DESTELLOS ⚡ — captura rápida de ideas
+   DESTELLOS ⚡ · captura rápida de ideas
 ══════════════════════════════════════════════ */
 
 /* Icono en Acceso Rápido (dorado, como el destello de un faro) */
@@ -2706,7 +2735,7 @@ body {
 .des-del:active { color: #dc2626; }
 
 /* ══════════════════════════════════════════════
-   REDACCIÓN 📰 — sala de redacción de la revista
+   REDACCIÓN 📰 · sala de redacción de la revista
 ══════════════════════════════════════════════ */
 
 /* Icono en Acceso Rápido (índigo tinta de pluma) */
@@ -2948,7 +2977,7 @@ body {
 }
 
 /* ══════════════════════════════════════════════
-   ANTENA 📡 — gestión de redes sociales
+   ANTENA 📡 · gestión de redes sociales
 ══════════════════════════════════════════════ */
 
 .qa-ant { background: linear-gradient(135deg, #0369a1, #38bdf8); }
@@ -3258,7 +3287,7 @@ body {
 }
 
 /* ══════════════════════════════════════════════
-   MIS RUTAS — el mapa de series por etapas
+   MIS RUTAS · el mapa de series por etapas
    Una ruta se lee de arriba abajo: etapas construidas (tocables) y
    etapas previstas (en gris). El color viene de la materia de la ruta.
 ══════════════════════════════════════════════ */
