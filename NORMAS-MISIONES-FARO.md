@@ -21,7 +21,7 @@ Cada misión lleva además:
 
 - **clave de progreso propia** en `SAVE_KEY` (nunca compartida con otra misión);
 - **ficha imprimible** en `fichas/`, con la hoja común `fichas/css/ficha.css`,
-  tres páginas y pauta de respuestas;
+  **diez páginas** y pauta completa (ver norma 6);
 - **sección de Recursos** que enlaza su ficha y sus fuentes reales;
 - **color propio** en `--pri` y `--sec` de su CSS.
 
@@ -83,7 +83,37 @@ renumera los prefijos «a) b) c) d)» del texto. No cambia enunciados, ni
 opciones, ni cuál es la respuesta correcta. Al copiar el molde de otra misión
 hay que correrlo, porque el sesgo se hereda con los bancos.
 
-## 5. Verificación antes de publicar
+## 6. La ficha va en diez páginas, y llenas
+
+**Norma nueva, pedida por el autor el 26 de julio de 2026.** Toda ficha de
+F.A.R.O tiene **exactamente 10 páginas tamaño carta**. Ni menos, porque estas
+fichas no son un resumen: son el material de estudio de la familia y el tema se
+explica completo, con casos reales y la pauta de todo lo que se propone. Ni más,
+porque una ficha que se estira pierde el hilo.
+
+Y llenas: **cada página va entre 190 y 226 mm** de alto. Los 226 son lo que de
+verdad cabe en una carta (Chrome deja unos 228 útiles), y por debajo de 190 la
+hoja se ve a medio usar, que fue justo lo que se vio al imprimir la ficha de las
+palancas. La única que puede ir más corta es la última.
+
+Se mide, no se calcula a ojo:
+
+```
+node _dev/servidor-estatico.js
+_dev/mide-ficha-paginas.html?f=<ficha>.html     (Chrome headless, --dump-dom)
+```
+
+La herramienta carga la ficha con las reglas de `@media print` aplicadas (en
+pantalla la hoja lleva otro relleno y otra letra, así que medir en pantalla
+engaña) y falla si alguna página desborda, si alguna queda floja o si no son 10.
+
+Cómo se llenan diez páginas sin relleno: el tema por dentro (mecanismo, no solo
+definición), **casos de estudio reales** con su fuente, un guion de qué decir,
+ejercicios para lápiz y la **pauta completa**, sin dejar ninguno a medias. Las
+respuestas de un ejercicio nunca se imprimen en la misma página que el
+ejercicio: van en la pauta del final.
+
+## 7. Verificación antes de publicar
 
 Toda misión nueva se mide con una sonda en `_dev/` (Chrome headless a 380 px,
 con `_dev/servidor-estatico.js`): secciones completas, bancos con su tamaño,

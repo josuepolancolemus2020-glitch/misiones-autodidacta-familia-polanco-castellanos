@@ -20,6 +20,8 @@ iframe{position:absolute;left:-9999px;top:0;border:0}</style>
 const params = new URLSearchParams(location.search);
 const ficha = params.get('f') || 'ficha-persuasion-palancas.html';
 const UTIL = 226;   /* lo que de verdad cabe: ver la nota de min-height en ficha.css */
+const FLOJA = 190;  /* por debajo de esto la hoja se ve a medio usar (norma 6) */
+const PAGS = 10;    /* toda ficha de F.A.R.O va en diez páginas (norma 6) */
 
 const marco = document.createElement('iframe');
 marco.style.width = '194mm';
@@ -30,10 +32,24 @@ document.body.appendChild(marco);
 marco.addEventListener('load', async () => {
   const d = marco.contentDocument;
   const s = d.createElement('style');
+  /* Las mismas reglas que ficha.css aplica dentro de @media print. Si allá
+     cambia la letra o el interlineado, aquí también, o la medida miente. */
   s.textContent = `
-    body { background:#fff; padding:0; font-size:11.5pt; }
+    body { background:#fff; padding:0; font-size:9.5pt; line-height:1.34; }
     .doc { max-width:none; }
     .pagina { box-shadow:none; border-radius:0; padding:0; margin:0; min-height:0; }
+    h2 { margin:12px 0 5px; }
+    h3 { margin:8px 0 3px; }
+    p, li { margin:4px 0; }
+    .caja, .pauta { padding:8px 11px; margin:8px 0; }
+    .caso { padding:7px 10px; margin:7px 0; }
+    .fh { padding:9px 11px; margin-bottom:11px; }
+    .idline { margin-bottom:9px; }
+    table { margin:7px 0; }
+    th, td { padding:4px 7px; }
+    .raya-resp { height:15px; margin:6px 0; }
+    .lineas-4 .raya-resp:last-child { margin-bottom:9px; }
+    .pie { margin-top:11px; padding-top:5px; }
     .imprimir-btn, .volver { display:none; }`;
   d.head.appendChild(s);
 
@@ -43,22 +59,50 @@ marco.addEventListener('load', async () => {
   try { await d.fonts.ready; } catch (e) {}
   await new Promise(r => setTimeout(r, 1200));
 
+  const mm = 96 / 25.4;
+
+  /* Modo bloques (?bloques=1): en vez de medir las páginas de ahora, mide cada
+     pieza suelta de la ficha (cada encabezado, tabla, caja o caso). Con esa
+     lista se calcula dónde tienen que caer los diez cortes ANTES de tocar el
+     HTML, que es mucho más rápido que repaginar a ciegas y volver a medir. */
+  if (params.get('bloques')) {
+    const piezas = [];
+    d.querySelectorAll('.pagina').forEach(sec => {
+      [...sec.children].forEach(el => {
+        if (el.classList.contains('pie')) return;
+        const h = el.getBoundingClientRect().height / mm;
+        const margen = parseFloat(getComputedStyle(el).marginTop) / mm + parseFloat(getComputedStyle(el).marginBottom) / mm;
+        const texto = (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 58);
+        piezas.push(`${(h + margen).toFixed(1).padStart(6)} mm  <${el.tagName.toLowerCase()}${el.className ? '.' + el.className.split(' ')[0] : ''}>  ${texto}`);
+      });
+    });
+    document.getElementById('out').textContent = `${ficha} · ${piezas.length} bloques\n\n` + piezas.join('\n');
+    return;
+  }
+
   {
-    const mm = 96 / 25.4;
     const paginas = [...d.querySelectorAll('.pagina')];
-    let desbordan = 0;
+    let desbordan = 0, flojas = 0;
     const filas = paginas.map((sec, i) => {
       const h = sec.getBoundingClientRect().height / mm;
-      const mal = h > UTIL;
-      if (mal) desbordan++;
-      const sobra = mal ? `  ✘ sobran ${Math.ceil(h - UTIL)} mm` : '  ✔';
-      return `pág ${String(i + 1).padStart(2)}: ${h.toFixed(0).padStart(4)} mm${sobra}`;
+      const ultima = i === paginas.length - 1;
+      if (h > UTIL) { desbordan++; return fila(i, h, `✘ sobran ${Math.ceil(h - UTIL)} mm`); }
+      /* La última puede ir más corta: es la que cierra, no se rellena por rellenar */
+      if (h < FLOJA && !ultima) { flojas++; return fila(i, h, `◻ floja: caben ${Math.floor(UTIL - h)} mm más`); }
+      return fila(i, h, '✔');
     });
+    function fila(i, h, nota) {
+      return `pág ${String(i + 1).padStart(2)}: ${h.toFixed(0).padStart(4)} mm  ${nota}`;
+    }
+    const problemas = [];
+    if (paginas.length !== PAGS) problemas.push(`✖ son ${paginas.length} páginas y la norma 6 pide ${PAGS}`);
+    if (desbordan) problemas.push(`✖ ${desbordan} página(s) se parten en dos al imprimir`);
+    if (flojas) problemas.push(`✖ ${flojas} página(s) quedan a medio usar (mínimo ${FLOJA} mm)`);
     const out = document.getElementById('out');
-    out.textContent = `${ficha}\nalto útil de la carta: ${UTIL} mm · ${paginas.length} páginas declaradas\n\n`
+    out.textContent = `${ficha}\nalto útil ${UTIL} mm · mínimo por hoja ${FLOJA} mm · ${paginas.length} páginas declaradas\n\n`
       + filas.join('\n') + '\n\n'
-      + (desbordan ? `✖ ${desbordan} página(s) se parten en dos al imprimir`
-                   : `✅ las ${paginas.length} páginas caben: el PDF sale de ${paginas.length} hojas`);
+      + (problemas.length ? problemas.join('\n')
+                          : `✅ las ${PAGS} páginas caben y ninguna queda a medias`);
   }
 });
 </script>

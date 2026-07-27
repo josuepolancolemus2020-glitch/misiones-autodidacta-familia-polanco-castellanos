@@ -1,0 +1,13 @@
+# Dónde empieza cada página de la ficha de las seis palancas (norma 6: 10 páginas).
+# Nueve cortes para diez páginas. Se mide con _dev/mide-ficha-paginas.html y se
+# mueve una línea de aquí, no las etiquetas del HTML. Si el corte cae dentro de
+# un bloque (el <h3> de un caso), la herramienta retrocede sola hasta su <div>.
+<h2>🎚️ Las palancas 1 a 3, por dentro</h2>
+<h2>🎚️ La palanca 6, y una séptima que conviene</h2>
+<h2>🔬 Casos de estudio de la vida real I: lo que se midió</h2>
+<h3>5. La joyería que subió el precio y vendió todo · autoridad y anclaje</h3>
+<h2>📝 El guion de la respuesta serena</h2>
+<h3>Ejercicio 3. Honesto o manipulado, y por qué</h3>
+<h3>Ejercicio 6. El caso del proyecto</h3>
+<h2>✅ Pauta completa de respuestas (1 de 3)</h2>
+<h3>Ejercicio 5. Reescribe en versión honesta</h3>
