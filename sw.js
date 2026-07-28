@@ -1,8 +1,13 @@
-const CACHE_NAME = 'faro-app-v2';
+const CACHE_NAME = 'faro-app-v3';
 const STATIC_ASSETS = [
   './img/icon-192.png',
   './img/icon-512.png',
   './img/leonardo-da-vinci.jpg',
+  // La librería de Supabase se pre-cachea desde la instalación, no solo cuando
+  // una carga con red la deja guardada de paso. Sin este archivo no hay cliente,
+  // y sin cliente nadie entra ni ve un dato: es lo único externo que, si falta,
+  // deja la aplicación inservible en vez de fea.
+  './js/supabase.min.js',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];

@@ -11,7 +11,14 @@
   <link rel="apple-touch-icon" href="img/icon-192.png">
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- La librería de Supabase vive AQUÍ, no en un CDN. Antes se traía de
+       jsdelivr y eso la volvía un punto único de fallo: sin ese archivo no hay
+       cliente, y sin cliente nadie entra ni ve un dato. Con el APK y con datos
+       escasos eso no es aceptable, y con la puerta nueva sería quedarse fuera
+       de la propia casa. Copiada de @supabase/supabase-js 2.110.9 (dist/umd).
+       Para subirla de versión: npm pack @supabase/supabase-js@2 y copiar de
+       nuevo package/dist/umd/supabase.js aquí. -->
+  <script src="js/supabase.min.js"></script>
 </head>
 <body>
 
