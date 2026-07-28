@@ -48,6 +48,7 @@ const MISSIONS = [
   { id: 17, title: 'El código que no confía: validación, límites e inyección', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🚦', ruta: 'casacerrada', etapa: 3, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-codigo/codigo.html' },
   { id: 18, title: 'El relato: contar el proyecto sin inflarlo', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 45, icon: '📣', ruta: 'marca', etapa: 3, sello: 'familiar', url: 'misiones/ruta-marca-relato/relato.html' },
   { id: 19, title: 'La mesa: negociar con una institución', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '🤝', ruta: 'politico', etapa: 3, sello: 'familiar', url: 'misiones/ruta-politica-mesa/mesa.html' },
+  { id: 20, title: 'Marcos: quien pone el marco gana la conversación', modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 45, icon: '🖼️', ruta: 'persuasion', etapa: 3, sello: 'familiar', url: 'misiones/ruta-persuasion-marcos/marcos.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -63,7 +64,6 @@ const ETAPAS_PREVISTAS = {
     8: 'Glosario y simulacro final',
   },
   persuasion: {
-    3: 'Marcos: quien pone el marco gana la conversación',
     4: 'Tácticas de presión y sus antídotos',
     5: 'Preguntar y escuchar: influir sin empujar',
     6: 'Narrativa: contar el proyecto para que otros quieran entrar',
