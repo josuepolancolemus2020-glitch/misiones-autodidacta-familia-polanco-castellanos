@@ -64,7 +64,9 @@ window.addEventListener('load', async () => {
     ok(!!pass, 'pide contraseña, no un PIN de cuatro dígitos', 'sigue el campo de PIN');
     ok(pass && pass.type === 'password', 'el campo va oculto', 'la contraseña se ve al escribirla');
     ok(pass && !pass.maxLength || pass.maxLength < 0 || pass.maxLength > 20, 'no limita la contraseña a cuatro caracteres', 'sigue limitada a ' + (pass && pass.maxLength));
-    ok(!!d.getElementById('login-user'), 'sigue eligiendo quién eres', 'falta el selector de miembro');
+    const correo = d.getElementById('login-correo');
+    ok(!!correo && correo.type === 'email', 'se entra con el correo', 'falta el campo de correo');
+    ok(!d.getElementById('login-user'), 'ya no hay lista de nombres que obligue a llevar los correos en el código', 'sigue el desplegable de miembros');
 
     log('\n── UN SOLO CLIENTE (el fallo que la sonda no vio la primera vez) ──');
     /* La primera versión de esta sonda daba «todo en orden» justo en el estado
@@ -103,12 +105,32 @@ window.addEventListener('load', async () => {
     ok(/storageKey:\s*'faro_antena'/.test(ant), 'la Antena tiene su propio almacén de sesión', 'la Antena comparte sesión con la familia');
     ok(!/(?<![A-Za-z0-9_])_sb(?![A-Za-z0-9_])/.test(ant), 'la Antena no toca el cliente de la casa', 'la Antena sigue usando el cliente de la familia: su Salir cerraría la sesión de todos');
 
+    log('\n── NINGÚN CORREO DE LA FAMILIA EN EL CÓDIGO ──');
+    /* El repositorio es publico hoy. Los correos reales de los cuatro no pueden
+       vivir en el, ni siquiera «temporalmente»: lo temporal queda indexado. */
+    const CORREO = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+    /* Un placeholder de formulario es texto de ejemplo que se ve en la casilla
+       vacía, no un correo de nadie: se quita antes de mirar. Si no, la sonda
+       cantaría fuga por el «tu@correo.com» de la Antena y acabaríamos
+       ignorándola, que es como mueren las comprobaciones. */
+    for (const f of ['/js/auth.js', '/index.html']) {
+      const c = (await (await fetch(f)).text()).replace(/placeholder\s*=\s*"[^"]*"/g, '');
+      const hallados = (c.match(CORREO) || []).filter(x => !/ejemplo\.com|@ejemplo|example\.|@correo\.com/i.test(x));
+      ok(hallados.length === 0, 'sin correos en ' + f, f + ' trae correos: ' + hallados.slice(0, 3).join(', '));
+    }
+
     log('\n── LO QUE EL SQL TIENE QUE EXIGIR ──');
     const sql = await (await fetch('/supabase/sql/seguridad_familia.sql')).text();
     /* Igual que arriba: fuera los comentarios, que aquí explican justamente el
        «using (true)» que no debe quedar en el código. */
     const sqlCodigo = sql.split('\n').filter(l => !/^\s*--/.test(l)).join('\n');
     ok(/create or replace function public\.es_familia/.test(sqlCodigo), 'define quién es de la casa', 'no hay función de pertenencia');
+    ok(/create table if not exists public\.familia_miembros/.test(sqlCodigo), 'la pertenencia vive en una tabla', 'la pertenencia no está en una tabla');
+    ok(/familia_miembros where user_id = auth\.uid\(\)/.test(sqlCodigo), 'es_familia pregunta a esa tabla', 'es_familia no consulta la tabla');
+    ok(!/user_metadata/.test(sqlCodigo), 'no decide permisos con metadatos que el usuario puede cambiar', 'usa user_metadata para autorizar: el usuario puede reescribirlo');
+    const authSrc = await (await fetch('/js/auth.js')).text();
+    ok(/familia_miembros/.test(authSrc) && !/user_metadata/.test(authSrc.replace(/\/\*[\s\S]*?\*\//g, '')),
+       'la aplicación también saca la identidad de la tabla', 'la aplicación sigue confiando en los metadatos');
     ok(!/using \(true\)/.test(sqlCodigo), 'ninguna política dice «using (true)»', 'sigue habiendo using (true): cualquiera que se registre entraría');
     ok(/es_familia\(\)/.test(sqlCodigo) && (sqlCodigo.match(/es_familia\(\)/g) || []).length >= 6,
        'todas las políticas preguntan por la familia (' + (sqlCodigo.match(/es_familia\(\)/g) || []).length + ' veces)',

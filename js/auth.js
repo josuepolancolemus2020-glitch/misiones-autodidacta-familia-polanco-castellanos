@@ -26,13 +26,19 @@
  *     ocurre no se pinta nada, y cuando termina se decide qué mostrar.
  *
  * ── Qué hay que configurar para que esto funcione ───────────────────
- * 1. Crear los cuatro usuarios en Supabase (Authentication → Users) con
- *    los correos de la tabla MIEMBROS de abajo.
- * 2. Contraseñas NUEVAS: los cuatro PIN anteriores estuvieron en un
- *    repositorio público y se dan por quemados.
- * 3. Con correos inventados (los de @faro.local) hay que desactivar la
- *    confirmación por correo en Authentication → Providers → Email, o
- *    los usuarios nunca quedan confirmados y nadie entra.
+ * 1. Los cuatro usuarios creados en Supabase (Authentication → Users),
+ *    con sus correos reales y contraseñas NUEVAS: los cuatro PIN
+ *    anteriores estuvieron en un repositorio público y se dan por
+ *    quemados.
+ * 2. Una fila por cada uno en la tabla familia_miembros, que dice qué
+ *    miembro es cada usuario. La crea y la siembra
+ *    supabase/sql/seguridad_familia.sql.
+ * 3. Apagar «Allow new users to sign up» en Authentication → Providers
+ *    → Email, o cualquiera se registra en el proyecto.
+ *
+ * Los correos NO están en este archivo ni en ninguno del repositorio, y
+ * es a propósito: son los correos reales de la familia y este código lo
+ * lee cualquiera. Quien entra escribe el suyo.
  *
  * NO se aplica la seguridad por fila hasta que esto esté probado: el
  * orden está en PLAN-FARO-PRIVADO.md y alterarlo deja la casa sin luz.
@@ -40,14 +46,16 @@
  */
 
 /* Los cuatro de la casa. El id es el mismo que en MEMBERS de app.js: de ahí
-   cuelga el progreso de cada quien, así que no se cambia. El correo es solo
-   la credencial de entrada, y puede ser real o inventado mientras coincida
-   con el usuario creado en Supabase. */
+   cuelga el progreso de cada quien, así que no se cambia.
+   AQUÍ NO HAY CORREOS, y es a propósito: este archivo lo lee cualquiera que
+   abra la aplicación, así que los correos de la familia no viven en él. Quién
+   es cada quien lo dice la tabla familia_miembros DESPUÉS de entrar. Los
+   nombres sí se quedan: ya están por toda la aplicación y no son un secreto. */
 const MIEMBROS = {
-  josue:   { nombre: 'Josué Edmundo', correo: 'josue@faro.local' },
-  evelyn:  { nombre: 'Evelyn Sarahí', correo: 'evelyn@faro.local' },
-  jael:    { nombre: 'Jael',          correo: 'jael@faro.local' },
-  angelly: { nombre: 'Angelly',       correo: 'angelly@faro.local' },
+  josue:   { nombre: 'Josué Edmundo' },
+  evelyn:  { nombre: 'Evelyn Sarahí' },
+  jael:    { nombre: 'Jael' },
+  angelly: { nombre: 'Angelly' },
 };
 
 const AUTH_KEY = 'faro_session';   /* solo para borrar el rastro del login viejo */
@@ -84,16 +92,29 @@ window.faroSb = _authSb;
 /* La copia en memoria de quién entró. Es lo único que lee verificarSesion(). */
 let _sesionActual = null;
 
-/* Traduce la sesión de Supabase al { user, nombre } que espera la aplicación.
-   El id del miembro viaja en los metadatos del usuario; si faltara, se deduce
-   del correo, que es la parte de antes de la arroba. */
-function _mapearSesion(sesion) {
-  if (!sesion || !sesion.user) return null;
-  const u = sesion.user;
-  let id = (u.user_metadata && u.user_metadata.miembro) || '';
-  if (!MIEMBROS[id]) id = String(u.email || '').split('@')[0].toLowerCase();
-  if (!MIEMBROS[id]) return null;      /* autenticado, pero no es de la casa */
-  return { user: id, nombre: MIEMBROS[id].nombre };
+/* Quién es el que entró, según la BASE DE DATOS.
+   Se pregunta a la tabla familia_miembros, que solo un administrador puede
+   escribir. NO se usa user_metadata: en Supabase el propio usuario puede
+   cambiarse sus metadatos con updateUser(), así que decidir permisos con eso
+   es dejar que cada quien se ponga el sello que quiera. Y tampoco se deduce
+   del correo, que era adivinar.
+   Devuelve null si el autenticado no tiene fila: entró en el proyecto, pero
+   no es de la casa. */
+async function _quienEs(sesion) {
+  if (!sesion || !sesion.user || !_authSb) return null;
+  try {
+    const { data, error } = await _authSb
+      .from('familia_miembros')
+      .select('miembro')
+      .eq('user_id', sesion.user.id)
+      .maybeSingle();
+    if (error || !data) return null;
+    const id = String(data.miembro || '').toLowerCase();
+    if (!MIEMBROS[id]) return null;
+    return { user: id, nombre: MIEMBROS[id].nombre };
+  } catch (_) {
+    return null;
+  }
 }
 
 /* ─────────────────────────────────────────────
@@ -106,15 +127,17 @@ function verificarSesion() {
 }
 
 /* Asíncrona: quien la llame debe esperarla. Solo la usa la pantalla de login. */
-async function iniciarSesion(user, contrasena) {
-  const m = MIEMBROS[user];
-  if (!m || !_authSb) return false;
+async function iniciarSesion(correo, contrasena) {
+  if (!_authSb) return false;
   const { data, error } = await _authSb.auth.signInWithPassword({
-    email: m.correo,
+    email: String(correo || '').trim(),
     password: String(contrasena),
   });
   if (error || !data || !data.session) return false;
-  _sesionActual = _mapearSesion(data.session);
+  _sesionActual = await _quienEs(data.session);
+  /* Autenticado pero sin fila en familia_miembros: no es de la casa. Se le
+     cierra la sesión en el acto, para no dejar un token vivo dando vueltas. */
+  if (!_sesionActual) { try { await _authSb.auth.signOut(); } catch (_) {} }
   return !!_sesionActual;
 }
 
@@ -141,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginScreen  = document.getElementById('login-screen');
   const appContainer = document.getElementById('app-container');
   const form         = document.getElementById('login-form');
-  const userEl       = document.getElementById('login-user');
+  const correoEl     = document.getElementById('login-correo');
   const passEl       = document.getElementById('login-pass') || document.getElementById('login-pin');
   const errEl        = document.getElementById('login-error');
   const btnEl        = form ? form.querySelector('.login-btn') : null;
@@ -182,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     try {
       const { data } = await _authSb.auth.getSession();
-      _sesionActual = _mapearSesion(data && data.session);
+      _sesionActual = await _quienEs(data && data.session);
     } catch (_) {
       _sesionActual = null;
     }
@@ -195,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (_authSb) {
     _authSb.auth.onAuthStateChange((evento, sesion) => {
       if (evento === 'SIGNED_OUT') { _sesionActual = null; mostrarLogin(); }
-      else if (sesion) _sesionActual = _mapearSesion(sesion) || _sesionActual;
+      else if (sesion && !_sesionActual) _quienEs(sesion).then(s => { if (s) _sesionActual = s; });
     });
   }
 
@@ -206,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (btnEl) { btnEl.disabled = true; btnEl.dataset.txt = btnEl.innerHTML; btnEl.textContent = 'Entrando…'; }
 
       let ok = false;
-      try { ok = await iniciarSesion(userEl.value, passEl.value); } catch (_) { ok = false; }
+      try { ok = await iniciarSesion(correoEl.value, passEl.value); } catch (_) { ok = false; }
 
       if (btnEl) { btnEl.disabled = false; if (btnEl.dataset.txt) btnEl.innerHTML = btnEl.dataset.txt; }
 
