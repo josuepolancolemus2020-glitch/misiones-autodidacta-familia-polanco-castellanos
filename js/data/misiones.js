@@ -47,6 +47,7 @@ const MISSIONS = [
   { id: 16, title: 'Pedir bien: el encargo, el contexto y el ejemplo', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '📝', ruta: 'maquina', etapa: 2, sello: 'familiar', url: 'misiones/ruta-maquina-pedir-bien/pedir-bien.html' },
   { id: 17, title: 'El código que no confía: validación, límites e inyección', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🚦', ruta: 'casacerrada', etapa: 3, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-codigo/codigo.html' },
   { id: 18, title: 'El relato: contar el proyecto sin inflarlo', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 45, icon: '📣', ruta: 'marca', etapa: 3, sello: 'familiar', url: 'misiones/ruta-marca-relato/relato.html' },
+  { id: 19, title: 'La mesa: negociar con una institución', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '🤝', ruta: 'politico', etapa: 3, sello: 'familiar', url: 'misiones/ruta-politica-mesa/mesa.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -73,7 +74,6 @@ const ETAPAS_PREVISTAS = {
     6: 'Crecer sin romper la promesa',
   },
   politico: {
-    3: 'La mesa: negociar con una institución',
     4: 'Alianzas, patronato y comunidad',
     5: 'El dinero público: presupuesto, compras y constancias',
     6: 'Reputación y riesgo político: no quedar amarrado a nadie',

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta del Poder Político · Etapa 3: La mesa, negociar con una institución | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/mesa.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Va a la mesa a ver qué sale 🚶</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🤝</div>
+    <div class="hero-text">
+      <h1>La mesa: <span>negociar con una institución</span></h1>
+      <p class="sub">Quién decide, qué riesgo protege, qué moneda tiene cuando no tiene dinero y cómo se cierra por escrito 🤝</p>
+      <div class="badge">🏛️ Ruta del Poder Político · Etapa 3 de 6 · Poder Político</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🤝 La frase maestra, y el fallo que más caro sale</h2>
+    <p>Negociar con una institución <strong>no es negociar con una persona</strong>. La persona que te recibe casi nunca puede decir sí, aunque casi siempre puede decir no. La institución no tiene prisa, no tiene memoria y lo que protege no es su dinero: es <strong>que no le caiga un problema a quien firma</strong>. Casi toda negativa que parece burocracia es alguien evitando un riesgo que nadie le va a agradecer haber corrido.</p>
+    <p>Y el fallo que más caro sale no es que te digan que no. Es <strong>el sí que no es un sí</strong>: «vamos a verlo», «déjelo conmigo», «estamos en eso». Callar no le cuesta nada a una institución, así que el silencio puede durar meses. Quien se queda esperando pierde el año escolar sin que nadie le haya dicho nunca que no.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Por qué esta etapa sigue a Normas y trámites:</strong> la etapa 1 dijo <strong>quién decide</strong> y la 2 dijo <strong>qué papel hace falta</strong>. Aquí se sienta uno con ellos. Y lo que se aprende no es a hablar mejor: es a <strong>preparar antes lo que en la sala ya no se puede pensar</strong>, porque con seis personas mirando, ceder un poco siempre parece razonable.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Dos preguntas antes de sentarse</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🪑 ¿Quién firma esto?</h4>
+        <p>Se pregunta antes de preparar nada, y se pregunta así de directo. Sirve para saber si lo que se puede cerrar hoy es <strong>un acuerdo o una recomendación</strong>, y para llevar algo que la persona de enfrente sí pueda autorizar sin pedirle permiso a nadie.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🎯 ¿Para qué lo necesitan?</h4>
+        <p>Es la pregunta que separa <strong>la posición del interés</strong>. «Queremos las misiones gratis para el departamento» es la posición; «necesito enseñar algo hecho en el informe de fin de año» es el interés. A la posición solo se puede decir sí o no; al interés se le pueden ofrecer <strong>dos o tres salidas</strong>.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>Casi ninguna mesa se cierra entera. Se cierra <span class="hl">un pedazo pequeño y pronto</span>: un centro, una sección, un mes. Eso baja el riesgo del que firma, que era lo que lo tenía frenado, y crea <span class="hl2">un hecho que hace fácil la siguiente conversación</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas de una mesa</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué decide, dónde se rompe y cómo está hoy en M.E.T.A.S.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza de la mesa.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: «déjelo conmigo, yo lo muevo»</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces con una respuesta que no es ni un sí ni un no.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🪑</span><span class="ms-text"><strong>La reunión:</strong> va bien. Escucharon, preguntaron cosas buenas y les gustó el material.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🤲</span><span class="ms-text"><strong>El cierre:</strong> «déjelo conmigo, yo lo muevo». Nadie dijo que no y todos se despidieron contentos.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">📭</span><span class="ms-text"><strong>El silencio:</strong> pasan tres semanas. Un correo sin contestar. «Estará ocupado, no hay que molestar».</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">⏳</span><span class="ms-text"><strong>El reloj:</strong> ellos siguen cobrando pase lo que pase. Tú tienes un año escolar que corre y ya se fue un mes.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué haces?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">😶 Esperar: quedó en que él lo movía</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">📅 Poner fecha y decir qué pasa si no hay respuesta</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚖️ Posición e interés</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🗣️ La posición</h4>
+        <p>Lo que piden en voz alta, ya convertido en una sola salida: «gratis para el departamento», «tiene que estar en nuestro servidor», «exclusividad por zona». Es lo que se oye, y contestarle solo permite <strong>decir sí o decir no</strong>.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🎯 El interés</h4>
+        <p>Para qué lo piden de verdad: enseñar algo hecho en el informe, cumplir una meta que les pusieron, que no los culpen si algo sale mal. <strong>Casi siempre hay dos maneras de cubrir el interés</strong> y solo una de dar la posición.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧭 Cómo se usa la diferencia</span><br>
+      <span>Se pregunta <span class="hl">antes de proponer nada</span>, con cuatro palabras: «¿para qué lo necesitan?». Cuesta cinco segundos y cambia la reunión entera, porque a partir de ahí <span class="hl2">tú traes las salidas</span> en vez de contestar a la suya.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🛡️ Lo que se prepara en casa y ya no se piensa en la sala</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. El mínimo y 2. el límite</h4>
+        <p><strong>El mínimo:</strong> lo que necesitas de verdad para que valga la pena, que casi nunca es la lista de deseos. <strong>El límite:</strong> la línea que no se cruza, decidida en frío y en casa. Se escribe antes porque en la reunión, con gente delante, ceder un poco siempre parece razonable y se decide con la emoción alta.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. La alternativa y 4. las tres monedas</h4>
+        <p><strong>La alternativa:</strong> qué haces si te levantas. Es lo único que da fuerza de verdad, porque quien no tiene a dónde ir acepta cualquier cosa y eso se nota sin que lo digas. <strong>Las monedas:</strong> tres cosas concretas que puedes pedir además de dinero, escritas y en orden.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas de la mesa</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Se prepara en casa</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Casos del proyecto</div><div class="stat-val">8</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 En una línea</span><br>
+      <span>Ir a una mesa sin <span class="hl">mínimo, límite y alternativa escritos</span> no es negociar: es <span class="hl2">ir a ver qué te ofrecen</span>, y lo que te ofrecen siempre es lo que a ellos les conviene.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🪙 La moneda que no es dinero</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>✅ Lo que sí es moneda</h4>
+        <p>Una <strong>constancia firmada</strong> por el distrito, el transporte y los viáticos de una capacitación, la impresión de mil fichas, horas pagadas dentro de la jornada, una carta de presentación a tres directores con nombre. Todo eso lo tienen aunque no tengan presupuesto.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>💨 Lo que es humo</h4>
+        <p>«Visibilidad», «le vamos a recomendar mucho», «esto le abre muchas puertas», «el otro año lo vemos». La prueba para distinguirlos es corta: <strong>una moneda se puede escribir con número, con fecha y con nombre</strong>. El humo no.</p>
+      </div>
+    </div>
+    <p style="font-size:0.9rem;margin:0.8rem 0;">Y la regla que evita la mitad de los malos tratos: <strong>nada se cede suelto</strong>. Cada cosa que das lleva pegada una petición en la misma frase. «Puedo bajar a 100 si el acuerdo pasa de un año a tres» no es regatear: es cambiar una cosa por otra, que es exactamente lo que se hace en una mesa.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🪑 Quién firma</div><div class="t-info">Se pregunta antes</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🎯 El interés</div><div class="t-info">Para qué lo piden</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🪙 La moneda</div><div class="t-info">Número, fecha y nombre</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">⛔ El límite</div><div class="t-info">Decidido en frío</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🌱 El piloto</div><div class="t-info">Pequeño y pronto</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">📝 La minuta</div><div class="t-info">El mismo día</div></div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 La sala de preparación</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para saber cómo prepara M.E.T.A.S una mesa y qué le falta.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Quién está enfrente</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🤝 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="enfrente" onclick="labShowParte('enfrente')">🪑 Quién está enfrente</button>
+        <button class="lab-btn lab-cont-btn" data-parte="moneda" onclick="labShowParte('moneda')">🪙 La moneda que no es dinero</button>
+        <button class="lab-btn lab-cont-btn" data-parte="limite" onclick="labShowParte('limite')">⛔ El límite que no se cruza</button>
+        <button class="lab-btn lab-cont-btn" data-parte="cierre" onclick="labShowParte('cierre')">📝 El cierre por escrito</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se prepara</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se rompe</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 Cómo está en M.E.T.A.S</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se prepara y se cierra una mesa</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la mesa se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 La salida que sí funciona</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué propones ante lo que piden?</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Queremos las misiones gratis para todo el departamento»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Mesas que salieron mal: ¿qué falló ahí?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué falló de verdad:</p>
+    <div class="neuro-trans-display" id="enferDisease">Se acordó todo con un funcionario y al mes lo trasladaron</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada frase lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🗣️ Posición</button>
+        <button class="btn btn-sec" onclick="">🎯 Interés</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🤝 La mesa que se cierra</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · La mesa · Ruta del Poder Político</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: la mesa</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La mesa que se cierra · La mesa</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🤝 La mesa que se cierra: interés, piloto y minuta</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso una institución pide algo y quien lo pide casi nunca es quien firma. Di cuál es la posición y cuál el interés, quién decide de verdad y qué riesgo protege, qué piloto propones y con qué moneda, y qué va en la minuta (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🤝</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🤝 Casos del proyecto: ocho mesas que le esperan a M.E.T.A.S</h2>
+    <p>Ocho conversaciones que este proyecto va a tener con una institución. En cada una: cuál es la posición, cuál el interés que hay debajo, qué piloto se propone y con qué moneda se cobra.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo trabajar la sección:</strong> tapa el análisis, lee el caso y di en voz alta <strong>qué preguntarías primero</strong>. Casi siempre la primera pregunta correcta es una de dos: «¿quién firma esto?» o «¿para qué lo necesitan?». Al final quedan la minuta de una página y las cinco reglas, que son el producto de esta etapa.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🗺️ Caso 1: la mesa con la dirección departamental</h2>
+    <p>Convocan a una reunión: quieren las misiones para todos los centros del departamento, sin costo, empezando el mes que viene. Quien preside no puede firmar convenios.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎯 Posición e interés</span><br>
+      <span>La posición es «todo el departamento, gratis, ya». El interés casi siempre es más pequeño: <span class="hl">poder enseñar algo hecho</span> en el informe de fin de año, o cumplir una meta que le pusieron a quien te recibió. Y el que preside <span class="hl2">no puede decir sí, pero sí puede decir no</span>.</span>
+    </div>
+    <p><strong>Lo que se propone:</strong> un piloto en tres centros, un mes, con constancia firmada por el distrito y un informe agregado al terminar. Es pequeño, es pronto, cubre el interés entero y esa persona sí lo puede autorizar sola. Y en la minuta: qué incluye, cuándo termina y qué pasa el día siguiente, con las dos opciones nombradas.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>😶 Caso 2: «déjelo conmigo, yo lo muevo»</h2>
+    <p>La reunión fue muy bien. Han pasado tres meses y dos correos sin respuesta.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⏳ El sí que no es un sí</span><br>
+      <span>No hubo mala fe: <span class="hl">callar no le cuesta nada a una institución</span> y decir que no sí cuesta. Mientras tanto ellos siguen cobrando pase lo que pase y tú tienes un año escolar que corre. <span class="hl2">El daño no es la negativa: es el tiempo.</span></span>
+    </div>
+    <p><strong>Cómo se corta:</strong> se pone fecha en la propia reunión, en voz alta y sin sonar a amenaza: «te llamo el 15, y si para entonces no hay respuesta lo entiendo como que este año no se puede y seguimos con los centros que ya tenemos». Eso convierte el silencio en una respuesta, que es todo lo que hacía falta.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>👀 Caso 3: la rebaja pedida delante de seis personas</h2>
+    <p>En una reunión con seis personas de la institución, quien preside pide bajar el precio de 150 lempiras por aula al mes a la mitad.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎭 La mesa pública</span><br>
+      <span>Con gente delante, quien pregunta ya no negocia contigo: <span class="hl">negocia con lo que van a pensar de él</span>. Contestar ahí es contestar en el peor momento posible, y ceder un poco siempre parece razonable cuando <span class="hl2">seis personas esperan una respuesta</span>.</span>
+    </div>
+    <p><strong>Qué se contesta:</strong> nada de números en la sala. «Les mando dos opciones por escrito mañana». Y al día siguiente van las dos, cada una con su condición pegada: 150 con acuerdo de un año, o 100 si el acuerdo pasa a tres años y lo firma el distrito. No es regatear: es cambiar una cosa por otra.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>✍️ Caso 4: alcance a cambio del nombre del autor</h2>
+    <p>Ofrecen adoptar las misiones para el departamento si el material sale a nombre de la institución y sin el nombre del autor.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⛔ Dónde está el límite</span><br>
+      <span>El alcance es una moneda de verdad y vale mucho. Pero la autoría <span class="hl">es de las pocas cosas que no vuelven</span>: una vez que el material circula sin nombre, recuperarlo pide una pelea que no se gana. Y el interés real de ellos <span class="hl2">no era quitar el nombre</span>: era que se viera que el proyecto es suyo.</span>
+    </div>
+    <p><strong>Lo que se cede y lo que no:</strong> se cede el logotipo institucional en la portada, que cubre ese interés entero y no cuesta nada. El nombre del autor se queda, en pequeño si hace falta, en el pie. Es un límite escrito en frío y en casa, justamente para no tener que decidirlo con seis personas mirando.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🗳️ Caso 5: la alcaldía, las fichas y las elecciones</h2>
+    <p>La alcaldía ofrece imprimir 5.000 fichas si el logotipo va en la portada. Hay elecciones municipales en ocho meses.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📅 El calendario también negocia</span><br>
+      <span>La impresión es una moneda excelente: es gasto real del proyecto y ellos ya la tienen. Lo que hay que mirar es <span class="hl">la fecha</span>: un logotipo en la portada a ocho meses de una elección deja de ser un patrocinio y pasa a ser <span class="hl2">material de campaña</span> a ojos de quien no votó por ellos.</span>
+    </div>
+    <p><strong>La condición con la que sí:</strong> el logotipo de la alcaldía como institución, no de la persona ni del partido, sin foto y sin lema; la ficha con su fecha de edición; y nada de entregas en actos públicos durante los tres meses previos a la elección. Si eso no les sirve, lo que querían no era imprimir fichas.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🌱 Caso 6: el piloto que lleva un año sin cerrarse</h2>
+    <p>Un centro lleva un año usando las misiones «de prueba». Nunca se firmó nada, nadie ha pagado y el director ya habla del proyecto como si fuera suyo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🕳️ El piloto sin fecha de fin</span><br>
+      <span>Un piloto es la mejor herramienta de esta etapa y <span class="hl">sin fecha de fin es la peor trampa</span>: se convierte en un año de uso gratis, y cuanto más dura, más difícil resulta cobrar por algo <span class="hl2">que ya se estaba dando</span>.</span>
+    </div>
+    <p><strong>Cómo se cierra sin romper la relación:</strong> no se reclama el año pasado, que ya se perdió y reclamarlo solo gasta la relación. Se escribe lo que pasó como lo que fue («un año de piloto, con estos resultados») y se propone la continuidad con condiciones normales desde la fecha que viene. El error se paga una vez, no dos.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔄 Caso 7: trasladaron al funcionario</h2>
+    <p>Cambian a la persona con la que se acordó todo. El nuevo pide que le expliquen el proyecto desde el principio y no encuentra ningún papel del acuerdo anterior.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📄 La institución no recuerda</span><br>
+      <span>El acuerdo estaba con una persona, no con la institución, así que <span class="hl">se fue con ella</span>. Y el que llega no tiene ninguna obligación de sostener lo que no está escrito: <span class="hl2">sostenerlo sería asumir un riesgo ajeno</span>, que es justo lo que nadie hace.</span>
+    </div>
+    <p><strong>Lo que salva la situación:</strong> las minutas. Si cada reunión dejó media hoja enviada el mismo día, a nombre de la institución y con copia a quien decide, el que llega encuentra el expediente hecho y la conversación empieza en el minuto veinte en vez de en el cero. Y si no las hubo, esta es la lección: empezar a hacerlas hoy.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🖥️ Caso 8: el aval a cambio de los datos</h2>
+    <p>Ponen como condición para dar el aval que la aplicación se aloje en su servidor y que ellos administren los datos de los estudiantes.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🔐 El interés detrás de la condición</span><br>
+      <span>Casi nunca quieren los datos: quieren <span class="hl">no cargar con el problema si algo se filtra</span>. Es el riesgo del funcionario otra vez, y confundir eso con un capricho lleva a discutir de servidores cuando <span class="hl2">se estaba hablando de responsabilidad</span>.</span>
+    </div>
+    <p><strong>Lo que se propone:</strong> que el registro con nombres se quede en el centro y el proyecto guarde un identificador que solo ellos saben traducir, más un informe agregado cuando lo pidan. Eso cubre el interés completo, y además es exactamente lo que manda la etapa 2 de la Ruta de la Casa Cerrada. Aquí las dos rutas se tocan: el límite de allá es el argumento de acá.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La minuta de una página, y las cinco reglas</h2>
+    <p>Todo lo que sale de una mesa cabe en media hoja enviada el mismo día, con cinco puntos:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué se acordó:</strong> en frases cortas, sin adornos.</li>
+      <li><strong>Quién hace qué:</strong> con nombre, no «la institución» ni «el proyecto».</li>
+      <li><strong>Para cuándo:</strong> una fecha, no «a la brevedad».</li>
+      <li><strong>Qué quedó fuera:</strong> lo que se habló y no entró, que es lo que casi nadie escribe.</li>
+      <li><strong>Cuándo es la siguiente:</strong> fecha puesta antes de colgar.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas de la mesa</span><br>
+      <span>1. Se pregunta <span class="hl">quién firma</span> antes de preparar nada. 2. Se contesta al interés, nunca a la posición. 3. Nada se cede suelto: cada cesión lleva su condición pegada. 4. Se cierra <span class="hl">pequeño y pronto</span>, con fecha de fin escrita. 5. Sin minuta no hubo acuerdo: <span class="hl2">hubo una conversación agradable</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas de la mesa</strong>, posición e interés, la moneda que no es dinero, las <strong>ocho mesas que le esperan al proyecto</strong>, la <strong>hoja de preparación</strong> y la <strong>minuta</strong> para llenar a lápiz, seis ejercicios y la pauta completa.</p>
+      <a href="../../fichas/ficha-politica-mesa.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba llenando la hoja de preparación antes de la próxima reunión, y escribiendo la minuta el mismo día.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../misiones/ruta-politica-mapa-poder/mapa-poder.html">🏛️ Quién decide de verdad</a>: la etapa 1. De ahí sale quién firma, quién traba y quién solo transmite.</li>
+      <li><a href="../../misiones/ruta-politica-normas-tramites/normas-tramites.html">📜 Normas y trámites</a>: la etapa 2. La minuta de aquí alimenta el expediente de allá.</li>
+      <li><a href="../../misiones/ruta-marca-oferta/oferta.html">🏷️ La oferta</a>: el precio y lo que no incluye se deciden allá. A la mesa se llega con eso ya escrito.</li>
+      <li><a href="../../misiones/ruta-casa-cerrada-datos/datos.html">🛡️ Los datos de los demás</a>: el caso 8 se resuelve con lo de allá. El límite de esa etapa es el argumento de esta.</li>
+      <li><a href="../../index.html">⚡ Destellos</a>: después de cada reunión, apunta qué se acordó y qué quedó fuera. Eso es media minuta ya escrita.</li>
+      <li><a href="../../fichas/ficha-politica-mesa.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja de preparación y la minuta caben en una hoja cada una.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar la próxima reunión de verdad que tenga el proyecto y llenar la hoja de preparación entera antes de ir: <strong>quién firma, el interés que se supone, el mínimo, el límite, la alternativa y las tres monedas</strong>. Después de la reunión, escribir la minuta el mismo día. La prueba de que está aprendido es salir de una mesa con <strong>una fecha y un papel</strong>, aunque el acuerdo sea pequeño.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🤝</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta del Poder Político · Etapa 3: La mesa</div>
+    <div class="diploma-mascot" aria-hidden="true">🤝</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🤝</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Quien te recibe casi nunca puede decir sí, pero casi siempre puede decir no» 🌱 · 🏛️ Ruta del Poder Político · Etapa 3 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/mesa.js"></script>
+</body>
+</html>
