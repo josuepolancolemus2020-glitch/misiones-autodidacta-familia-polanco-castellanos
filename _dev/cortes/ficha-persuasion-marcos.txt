@@ -1,0 +1,16 @@
+# Cortes de la ficha de Persuasión etapa 3 (nueve cortes = diez páginas).
+# Anclajes únicos: el medidor propone «<div class="caso">», «<div class="caja">» y
+# «<div class="pauta">» a secas, y eso se repite por toda la ficha. Los <h3> de
+# los ejercicios salen dos veces (enunciado y pauta), pero los cortes se buscan
+# EN ORDEN sobre lo que queda, así que la segunda vez cae en la pauta.
+# Ojo también con las tablas: retrocede() solo retrocede sobre <div>, así que un
+# corte dentro de una <table> la parte entre dos hojas sin que nada avise.
+<h2>⚖️ El marco y el sesgo</h2>
+<strong>Y un quinto que no es una frase, es una palabra:</strong>
+<h2>🔄 Reencuadrar en tres movimientos</h2>
+<h3>3. «O te adaptas a la plataforma del Estado o te quedas fuera»</h3>
+<h2>📝 La hoja del reencuadre</h2>
+<h2>📆 Cómo se entrena esto</h2>
+<h3>Ejercicio 5 · Devuelve la carga</h3>
+<h3>Ejercicio 4 · La tercera salida</h3>
+<h2>🔄 Un reencuadre de verdad, palabra por palabra</h2>

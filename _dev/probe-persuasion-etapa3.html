@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Persuasión, etapa 3</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-persuasion-marcos/marcos.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 3 de la Ruta de la Persuasión: bancos, laboratorio,
+   pruebas impresas con su nombre, los ocho marcos, la ficha y la ruta con TRES
+   etapas. Cada ok() se escribió mirando primero que fallara con la misión sin
+   terminar, que es lo que enseña la etapa 3 de la Casa Cerrada. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Persuasión · Etapa 3 de 6/.test(d.body.textContent), 'se presenta como etapa 3 de 6', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se busca el VOCABULARIO de la etapa 2, no su título.
+       Sesgo y anclaje SÍ aparecen a propósito, porque esta etapa remite a la
+       anterior; lo que no puede quedar es su temario. */
+    ok(!/costo hundido|sesgo del superviviente|exceso de confianza|sesgo de disponibilidad/i.test(d.body.textContent), 'sin restos de la etapa de la que se copió', 'queda el temario de Sesgos');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('Object.keys(parteData).join(",")') === 'marco,referencia,prueba,reencuadre', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas del encuadre', 'piezas: ' + dentro('timelineData.length'));
+    ok(/faro_psi_marcos/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LA POSTURA ANTE EL MARCO ──');
+    const texto = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/decide de qué se (va a )?discut/i.test(texto), 'define el marco por lo que decide', 'no define bien qué es un marco');
+    ok(/justificand/i.test(texto), 'nombra la señal de alarma', 'no aparece la señal de justificarse');
+    ok(/comparado con qué/i.test(texto), 'trae la pregunta del punto de comparación', 'falta «¿comparado con qué?»');
+    ok(/tercera salida/i.test(texto), 'busca la tercera salida en las disyuntivas', 'no plantea la tercera salida');
+    ok(/quien afirma/i.test(texto), 'reparte la carga de la prueba', 'no habla de quién carga con la prueba');
+    ok(/verdad recortada/i.test(texto), 'distingue marco de mentira', 'no aclara que un marco no es mentir');
+    ok(/aceptar/i.test(texto) && /reencuadr/i.test(texto), 'enseña el reencuadre empezando por aceptar', 'no enseña los tres movimientos');
+    /* Esta etapa se apoya en la 2 a propósito: si no la nombra, se pierde el hilo */
+    ok(/sesgo/i.test(texto), 'conecta con los sesgos de la etapa 2', 'no conecta con la etapa anterior');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/El marco/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el marco', 'abre en otra pieza');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'quién puso el marco se genera', 'prueba competencial vacía');
+    const rotulos = d.getElementById('eval-screen-title').textContent + d.getElementById('evalcrit-screen-title').textContent +
+                    d.getElementById('evalOut').textContent + crit + d.querySelectorAll('.eval-print-header')[0].textContent;
+    ok(!/Las seis palancas|Panorama|La puerta de la casa digital|Los datos de los demás|La máquina que predice|Quién decide de verdad|Para quién y qué le cambia|El presupuesto real|La sala de espejos|los atajos que deciden por ti|Autocapacitación Técnica/.test(rotulos), 'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['por qué cobras', 'básico', 'plataforma del Estado', 'demuéstrame', 'solo un logo', 'importaran los niños', 'ponemos la plataforma', 'perdiendo la oportunidad']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      /* Los ocho tienen que traer el reencuadre completo, no solo el diagnóstico */
+      /* «(aceptar)» y «(aceptar el valor)»: se cuenta la apertura, no la frase */
+      ok((txt.match(/\(aceptar/g) || []).length === 8, 'los ocho casos traen el reencuadre completo', 'casos con reencuadre: ' + (txt.match(/\(aceptar/g) || []).length);
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      /* No puede repetir los casos de las etapas 1 y 2 de esta misma ruta */
+      ok(!/300 tablets|setecientas horas|millón de vistas|48 horas/i.test(txt), 'no repite casos de las etapas 1 y 2', 'repite un caso de otra etapa de la ruta');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+      ok(/cinco reglas de los marcos/i.test(txt), 'trae las cinco reglas', 'faltan las cinco reglas');
+      ok(/hoja del reencuadre/i.test(txt), 'trae la hoja del reencuadre', 'falta la hoja del reencuadre');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/cobras|básico|plataforma del Estado|logo|niños/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-persuasion-marcos.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/La hoja del reencuadre/i.test(txt), 'la ficha trae la hoja del reencuadre', 'falta la hoja del reencuadre');
+    ok(/El cazador de marcos/i.test(txt), 'la ficha trae el cazador de marcos', 'falta el cazador de marcos');
+    ok(/palabra por palabra/i.test(txt), 'la ficha trae el reencuadre de ejemplo', 'falta el ejemplo trabajado');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(!/—/.test(txt), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok((txt.match(/<table/g) || []).length === (txt.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar: un corte partió una tabla');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-persuasion-marcos"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const psi = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Persuasión/.test(c.textContent));
+    ok(!!psi, 'la Ruta de la Persuasión está en el mapa', 'no aparece la ruta');
+    if (psi) {
+      ok(psi.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + psi.querySelectorAll('.re-link').length);
+      ok(psi.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + psi.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/Marcos/.test(psi.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
+      ok(/Tácticas de presión/i.test(psi.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="psi"]');
+    ok(!!chip, 'la materia Psicología y Persuasión tiene su chip', 'no hay chip de Psicología');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      const mar = tarjetas.find(t => /marcos/i.test(t.textContent));
+      ok(!!mar && /🔒/.test(mar.textContent), 'la misión de los marcos lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

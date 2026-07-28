@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Persuasión · Etapa 3: Marcos, quien pone el marco gana la conversación | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/marcos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Contesta lo que le preguntan 🗯️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🖼️</div>
+    <div class="hero-text">
+      <h1>Marcos: <span>quien pone el marco gana la conversación</span></h1>
+      <p class="sub">No te ganan con argumentos: te ganan eligiendo de qué se discute 🖼️</p>
+      <div class="badge">🧠 Ruta de la Persuasión · Etapa 3 de 6 · Psicología y Persuasión</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🖼️ La frase maestra, y la señal que la delata</h2>
+    <p>Un <strong>marco</strong> es la manera de plantear una situación, y lo que hace es decidir <strong>de qué se va a discutir y de qué no</strong>. No es un truco de palabras: es lo que consigue que unas preguntas parezcan razonables y que otras ni se le ocurran a nadie. Por eso quien pone el marco gana: el que contesta dentro del marco ajeno <strong>ya aceptó lo más importante sin discutirlo</strong>.</p>
+    <p>Y hay una señal que lo delata, incómoda de aceptar: <strong>notar que te estás justificando</strong>. Justificarse significa que la carga de la prueba cayó de tu lado y no fuiste tú quien lo decidió. Se puede tener razón en cada argumento de una conversación y perderla entera, porque se estuvo respondiendo a la pregunta equivocada.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Por qué esta etapa sigue a Sesgos:</strong> la etapa 1 enseñó <strong>las palancas</strong> que otro usa sobre ti y la 2 enseñó <strong>los sesgos</strong> que ya viven en tu cabeza. El marco es lo que las conecta: es <strong>cómo otro activa tus sesgos desde fuera</strong>, sin mentir en nada. Contar lo mismo como pérdida en vez de como ganancia no es una mentira, y decide igual.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Dos preguntas antes de contestar</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🔎 ¿Qué da esto por hecho?</h4>
+        <p>Todo marco <strong>presupone algo sin decirlo</strong>. «¿Cuánto descuento me hace?» presupone que hay descuento; «¿por qué cobras si es educación?» presupone que lo educativo se regala. Nombrar lo que se da por hecho es la mitad del trabajo, y ya lo desarma.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🧭 ¿Comparado con qué?</h4>
+        <p>Caro, barato, básico o avanzado <strong>no significan nada por sí solos</strong>. Quien elige la comparación ya eligió la conclusión, así que la pregunta corta y sin ironía es esa. Casi siempre la comparación real es mucho más favorable que la que pusieron.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>Un marco <span class="hl">no es una mentira: es una verdad recortada</span>. Por eso no se responde llamando mentiroso a nadie, sino <span class="hl2">ampliando el recorte</span> hasta que se vea lo que quedaba fuera.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas del encuadre</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué decide, dónde se pierde y cómo aparece en M.E.T.A.S.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza del encuadre.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: «¿y por qué cobras, si esto es educación?»</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces cuando la pregunta ya trae la respuesta dentro.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🙋</span><span class="ms-text"><strong>La pregunta:</strong> una directora, con toda naturalidad y sin ninguna mala intención, pregunta por qué cobras si esto es educación.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🖼️</span><span class="ms-text"><strong>El marco:</strong> da por hecho que lo educativo se regala. Nadie lo dijo, pero a partir de ahí todo lo que digas es una defensa.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🚨</span><span class="ms-text"><strong>La señal:</strong> notas el impulso de explicar los costos. Ahí está la alarma: el impulso de justificarte.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">⏱️</span><span class="ms-text"><strong>El momento:</strong> tienes dos segundos para decidir si contestas la pregunta o cambias de qué va la conversación.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué haces?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🗯️ Explicar los costos con detalle</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🏷️ Nombrar el marco y proponer otro</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚖️ El marco y el sesgo</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🪞 El sesgo (etapa 2)</h4>
+        <p>Vive <strong>dentro de tu cabeza</strong> y está ahí antes de que llegue nadie. No se puede apagar, solo compensar. Es la razón por la que un marco funciona: hay un atajo esperando a que alguien lo empuje.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🖼️ El marco (esta etapa)</h4>
+        <p>Viene <strong>de fuera</strong> y es una decisión de otra persona, muchas veces sin darse cuenta ella tampoco. Es la forma de plantear las cosas que activa ese atajo. Se puede ver, nombrar y cambiar; el sesgo no.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧭 Cómo se usa la diferencia</span><br>
+      <span>Contra el sesgo se trabaja <span class="hl">antes</span>, en frío y con una lista de preguntas. Contra el marco se trabaja <span class="hl2">en el momento</span>, y solo hace falta una cosa: <span class="hl">notar la señal y parar</span> antes de contestar el contenido.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎣 Los cuatro marcos que más aparecen</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. La pregunta cargada y 2. la comparación</h4>
+        <p><strong>La pregunta cargada</strong> ya trae la respuesta dentro: contestar con un número acepta la premisa. <strong>La comparación</strong> decide la conclusión antes de discutir: «básico comparado con una plataforma grande» está elegido para perder, cuando la alternativa real de esa maestra es la fotocopia de ayer.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. La falsa disyuntiva y 4. el marco moral</h4>
+        <p><strong>La disyuntiva</strong> ofrece dos salidas que convienen a quien las ofrece y esconde una tercera. <strong>El marco moral</strong> convierte una decisión práctica en una prueba de bondad: «si de verdad te importaran los niños». Es el más difícil, porque cualquier respuesta dentro de él suena a mala persona.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas del encuadre</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Marcos frecuentes</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Movimientos del reencuadre</div><div class="stat-val">3</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 En una línea</span><br>
+      <span>Y hay un quinto que no es una frase, es una palabra: <span class="hl">el «solo»</span>. «Es solo un logo», «solo esta vez». Se quita la palabra, se vuelve a leer, y <span class="hl2">casi siempre suena distinto</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🔄 Reencuadrar en tres movimientos</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. Aceptar, y no se puede saltar</h4>
+        <p>Debajo de casi todo marco hay una <strong>preocupación legítima</strong>: un presupuesto que no alcanza, el miedo a perder el tiempo, una meta que cumplir. Se acepta primero, en voz alta. Sin este paso, los otros dos suenan a evasiva o a soberbia.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>2. Rechazar la manera y 3. proponer</h4>
+        <p><strong>Rechazar la manera</strong>, no a la persona: «me parece que estamos discutiendo si esto se regala». <strong>Proponer</strong> el marco propio, mejor en forma de pregunta, para que la otra persona entre en él por su cuenta y no empujada.</p>
+      </div>
+    </div>
+    <p style="font-size:0.9rem;margin:0.8rem 0;">Y la parte que se prepara en casa: <strong>el marco propio</strong>. Una frase que diga de qué va esta conversación, qué se decide hoy y qué no se discute. Quien llega sin marco propio <strong>adopta el ajeno por educación</strong>, sin darse cuenta y sin que nadie lo obligue.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">❓ Cargada</div><div class="t-info">Ya trae la respuesta</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">📐 Comparación</div><div class="t-info">¿Comparado con qué?</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🚪 Disyuntiva</div><div class="t-info">Falta la tercera salida</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">😇 Moral</div><div class="t-info">Prueba de bondad</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">⚖️ La prueba</div><div class="t-info">La enseña quien afirma</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🔄 Reencuadre</div><div class="t-info">Aceptar, rechazar, proponer</div></div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller del encuadre</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para saber qué marcos le llegan a M.E.T.A.S y cómo se contestan.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El marco</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🖼️ Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="marco" onclick="labShowParte('marco')">🖼️ El marco</button>
+        <button class="lab-btn lab-cont-btn" data-parte="referencia" onclick="labShowParte('referencia')">📐 El punto de comparación</button>
+        <button class="lab-btn lab-cont-btn" data-parte="prueba" onclick="labShowParte('prueba')">⚖️ La carga de la prueba</button>
+        <button class="lab-btn lab-cont-btn" data-parte="reencuadre" onclick="labShowParte('reencuadre')">🔄 El reencuadre</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se detecta</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se pierde</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 Cómo está en M.E.T.A.S</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se responde a un marco</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del encuadre se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 El reencuadre: ¿qué contestas?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Cuál respuesta cambia el terreno de la conversación?</p>
+    <div class="neuro-trans-display" id="neuroTrans">«¿Por qué cobras si es educación?»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Conversaciones perdidas: ¿qué falló ahí?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué falló de verdad:</p>
+    <div class="neuro-trans-display" id="enferDisease">Salió de la reunión explicando durante veinte minutos por qué cobra</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada frase lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🎣 Te lo ponen</button>
+        <button class="btn btn-sec" onclick="">📋 Lo traes</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🖼️ Quién puso el marco</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Marcos · Ruta de la Persuasión</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: los marcos</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · Quién puso el marco · Marcos</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🖼️ Quién puso el marco: nombrarlo y cambiarlo</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso alguien plantea algo de una manera que da por hecho lo importante, casi siempre sin mala intención. Di cuál es el marco y qué presupone, qué preocupación legítima hay debajo y cómo lo reencuadras en tres movimientos (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🖼️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🖼️ Casos del proyecto: ocho marcos que le llegan a M.E.T.A.S</h2>
+    <p>Ocho frases que este proyecto va a oír, casi todas sin mala intención. En cada una: cuál es el marco, qué da por hecho, qué preocupación legítima hay debajo y cómo se reencuadra.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo trabajar la sección:</strong> tapa el análisis, lee la frase y di en voz alta <strong>qué da por hecho sin decirlo</strong>. Después practica el reencuadre completo, con los tres movimientos y en ese orden. Si te sale sin el primero, vuelve a empezar: sin aceptar la preocupación, todo lo demás suena a evasiva.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>💰 Caso 1: «¿y por qué cobras, si esto es educación?»</h2>
+    <p>Lo pregunta una directora, con toda naturalidad y sin mala intención. Para ella lo educativo se regala.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎯 Qué da por hecho</span><br>
+      <span>Que <span class="hl">lo educativo no se cobra</span>, así que cualquier cosa que digas después es una defensa. Y ojo con la trampa fina: explicar los costos es contestar dentro del marco, y <span class="hl2">cuanto más se explica, más se confirma</span> que había algo que justificar.</span>
+    </div>
+    <p><strong>El reencuadre:</strong> «entiendo lo que dices, y es verdad que casi todo lo escolar se comparte» (aceptar). «Creo que estamos discutiendo si esto se regala, y lo que traigo es otra cosa» (rechazar la manera). «No cobro la educación: cobro el trabajo de hacerla. ¿Cómo se sostiene el año que viene si no?» (proponer). A partir de ahí ya se puede hablar de números.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📐 Caso 2: «comparado con una plataforma de verdad, esto es básico»</h2>
+    <p>Lo dicen en una demostración y los demás asienten. La palabra queda flotando.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚖️ El punto de comparación</span><br>
+      <span>La comparación <span class="hl">está elegida para que se pierda</span>, y enumerar funciones la acepta: cuanto más se enumera, más pequeño parece. Pero la alternativa real de esa maestra <span class="hl2">no es una plataforma de millones: es la fotocopia de ayer</span>, o nada.</span>
+    </div>
+    <p><strong>El reencuadre:</strong> «tienes razón en que no compite con eso» (aceptar). «¿Comparado con qué lo dices?» (rechazar la manera, con una pregunta corta y sin ironía). «Hoy la maestra de sexto elige entre esto y una fotocopia; contra eso se mide, y para eso está hecho» (proponer).</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🚪 Caso 3: «o te adaptas a la plataforma del Estado o te quedas fuera»</h2>
+    <p>Lo plantea un técnico, convencido de que ayuda. Y las dos opciones suenan a las únicas.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎭 La falsa disyuntiva</span><br>
+      <span>Las dos salidas <span class="hl">convienen a quien las ofrece</span>, y ninguna de las dos es esperar. La señal es esa: cuando en un «o esto o lo otro» falta la opción de <span class="hl2">no hacer nada por ahora</span>, casi siempre falta también una tercera.</span>
+    </div>
+    <p><strong>El reencuadre:</strong> «es cierto que si el Estado estandariza, hay que contar con eso» (aceptar). «No creo que sean las dos únicas» (rechazar la manera). «Hay una tercera: que las fichas funcionen al lado, en papel y sin depender de ninguna plataforma. ¿Qué haría falta para probarlo un mes?» (proponer, con fecha).</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>⚖️ Caso 4: «demuéstrame que esto funciona»</h2>
+    <p>Lo dice un posible aliado y se queda esperando, sin decir qué habría que ver para darlo por bueno.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🏋️ La carga de la prueba</span><br>
+      <span>La carga cayó de tu lado <span class="hl">sin que nadie lo decidiera</span>, y quien la lleva trabaja el doble y aun así no convence, porque <span class="hl2">nadie definió qué sería suficiente</span>. Una prueba sin criterio no se puede aprobar nunca.</span>
+    </div>
+    <p><strong>El reencuadre:</strong> «me parece justo, es tu tiempo el que se juega» (aceptar). «Antes de ponerme a enseñarte cosas» (rechazar la manera). «¿Qué tendrías que ver para darlo por bueno?» (proponer). Esa pregunta convierte una exigencia infinita en una lista concreta, y suele ser más corta de lo que uno temía.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🤏 Caso 5: «es solo un logo en la portada»</h2>
+    <p>Lo dice un patrocinador y suena razonable. Es una palabra, no una frase entera.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔍 El «solo»</span><br>
+      <span>La palabra <span class="hl">encoge la petición antes de que la mires</span>. Y casi nunca viene sola: la siguiente llega con el mismo «solo» y ya con el precedente puesto. Se quita la palabra y se lee otra vez: «<span class="hl2">un logotipo en la portada de todo el material</span>».</span>
+    </div>
+    <p><strong>El reencuadre:</strong> «claro que quieres que se vea, es lo normal» (aceptar). «Déjame leerlo sin el solo, para decidirlo bien» (rechazar la manera). «Un logotipo en la portada de todo el material del año: eso se puede, y va con su sitio, su tamaño y su fecha» (proponer). Aceptado así, deja de ser un favor y pasa a ser un trato.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>😇 Caso 6: «si de verdad te importaran los niños, lo harías gratis»</h2>
+    <p>Cierra la conversación y no deja sitio. Cualquier respuesta dentro de esa frase suena a mala persona.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🕯️ El marco moral</span><br>
+      <span>Es el más difícil porque <span class="hl">cambia el terreno</span>: ya no se discute una decisión, se discute tu carácter. Si explicas costos pareces interesado, si te defiendes pareces culpable, y si aceptas <span class="hl2">pierdes el proyecto entero</span>.</span>
+    </div>
+    <p><strong>El reencuadre:</strong> no se discute si a uno le importan los niños, que es justo lo que el marco quiere. «Me importan» (aceptar el valor). «Y por eso no lo hago gratis» (rechazar la manera). «Lo gratis se apaga en marzo. Quiero que esto exista el año que viene, y para eso tiene que pagarse solo» (proponer). No acusa a nadie y cambia el terreno.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🎭 Caso 7: «nosotros ponemos la plataforma, ustedes el contenido»</h2>
+    <p>Lo propone una empresa y sigue hablando de calendarios, como si eso ya estuviera acordado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📄 El marco de los papeles</span><br>
+      <span>En esa frase <span class="hl">ya se decidió quién es el dueño y quién el proveedor</span>, sin discutirlo. Y el que pone «el contenido» en un trato así suele acabar siendo <span class="hl2">reemplazable</span>, porque el contenido se encarga a otro y la plataforma no.</span>
+    </div>
+    <p><strong>El reencuadre:</strong> «la plataforma sería útil, no lo dudo» (aceptar). «Antes de repartir papeles» (rechazar la manera). «¿De quién es lo que se haga, quién puede retirarlo y qué pasa si se acaba el trato?» (proponer). Tres preguntas que se contestan en dos minutos y que cambian el trato entero.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📉 Caso 8: «estás perdiendo la oportunidad»</h2>
+    <p>Lo dice un maestro con buena intención, cuando lo que está sobre la mesa es ceder la autoría a cambio de llegar al departamento.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚖️ Ganancia y pérdida</span><br>
+      <span>Lo mismo contado como <span class="hl">lo que pierdes</span> pesa mucho más que contado como lo que conservas: es el sesgo de la etapa 2 activado desde fuera. Nadie mintió, solo <span class="hl2">se eligió de qué lado contarlo</span>.</span>
+    </div>
+    <p><strong>El reencuadre:</strong> «es una oportunidad de verdad, y me interesa» (aceptar). «Dicho así parece que solo se pierde por no aceptar» (rechazar la manera). «Contado del otro lado: conservo la autoría y sigo con los centros que ya tengo. ¿Se puede llegar al departamento sin tocar eso?» (proponer). Casi siempre se puede, y nadie lo había preguntado.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La hoja del reencuadre, y las cinco reglas</h2>
+    <p>Todo lo de esta etapa cabe en media hoja que se lleva escrita a cualquier conversación importante:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>De qué va esta conversación</strong>, en una frase mía.</li>
+      <li><strong>Qué se decide hoy</strong> y qué no se decide hoy.</li>
+      <li><strong>Qué no se discute</strong>: la autoría, los datos de menores, el criterio pedagógico.</li>
+      <li><strong>Mi punto de comparación</strong>, dicho antes de que pongan otro.</li>
+      <li><strong>La tercera salida</strong> que voy a proponer si aparece un «o esto o lo otro».</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas de los marcos</span><br>
+      <span>1. Si te estás <span class="hl">justificando</span>, el marco lo puso otro. 2. Antes de contestar, mira qué da por hecho la pregunta. 3. A toda comparación: «¿comparado con qué?». 4. En todo «o esto o lo otro» <span class="hl">busca la tercera</span>. 5. Se reencuadra <span class="hl2">aceptando primero</span>, siempre.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas del encuadre</strong>, los cuatro marcos que más aparecen, los tres movimientos del reencuadre, los <strong>ocho marcos que le llegan al proyecto</strong>, la <strong>hoja del reencuadre</strong> para llenar a lápiz, seis ejercicios y la pauta completa.</p>
+      <a href="../../fichas/ficha-persuasion-marcos.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba cazando un marco en una conversación de verdad y escribiendo después cómo lo habrías reencuadrado.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../misiones/ruta-persuasion-palancas/palancas-influencia.html">🧠 Las seis palancas</a>: la etapa 1. El marco es el envase; la palanca es lo que va dentro.</li>
+      <li><a href="../../misiones/ruta-persuasion-sesgos/sesgos.html">🪞 Sesgos</a>: la etapa 2. El sesgo está en tu cabeza; el marco es cómo otro lo activa desde fuera.</li>
+      <li><a href="../../misiones/ruta-politica-mesa/mesa.html">🤝 La mesa</a>: la etapa 3 de Poder Político. El marco propio de aquí es la preparación de allá.</li>
+      <li><a href="../../misiones/ruta-marca-relato/relato.html">📣 El relato</a>: la etapa 3 de Marca. Elegir el punto de comparación es lo mismo mirado desde el otro lado.</li>
+      <li><a href="../../index.html">⚡ Destellos</a>: cuando cace un marco, apúntalo con la frase exacta y la fecha. Esa lista es el mejor material de estudio que hay.</li>
+      <li><a href="../../fichas/ficha-persuasion-marcos.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja del reencuadre cabe en media página.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> durante una semana, apuntar <strong>cada vez que se note el impulso de justificarse</strong>, con la frase exacta que lo provocó. Al final de la semana, escribir el reencuadre de cada una con los tres movimientos. La prueba de que está aprendido es notar el marco <strong>antes</strong> de contestar, y llegar a las conversaciones importantes con el marco propio ya escrito.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🖼️</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Persuasión · Etapa 3: Marcos</div>
+    <div class="diploma-mascot" aria-hidden="true">🖼️</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🖼️</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Si te estás justificando, el marco lo puso otro» 🌱 · 🧠 Ruta de la Persuasión · Etapa 3 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/marcos.js"></script>
+</body>
+</html>
