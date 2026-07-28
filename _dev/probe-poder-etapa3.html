@@ -139,8 +139,13 @@ window.addEventListener('load', async () => {
     const eco = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta del Poder$/m.test((c.querySelector('.ruta-nombre') || {}).textContent || ''));
     ok(!!eco, 'la Ruta del Poder está en el mapa', 'no aparece la ruta');
     if (eco) {
-      ok(eco.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + eco.querySelectorAll('.re-link').length);
-      ok(eco.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + eco.querySelectorAll('.ruta-etapa-futura').length);
+      /* La cuenta exacta de etapas tocables la lleva _dev/probe-rutas.html, que
+         se actualiza cada vez que se añade una misión. Aquí solo se comprueba
+         que esta etapa llegó al mapa y que las seis siguen listadas: si esta
+         sonda contara el total, se pondría en rojo cada vez que crece la ruta
+         sin que nada de esta etapa se hubiera roto. */
+      ok(eco.querySelectorAll('.re-link').length >= 3, 'con sus etapas 1, 2 y 3 ya tocables', 'la etapa 3 no es tocable');
+      ok(eco.querySelectorAll('.re-link').length + eco.querySelectorAll('.ruta-etapa-futura').length === 6, 'las 6 etapas de la ruta están en el mapa', 'etapas en el mapa: ' + (eco.querySelectorAll('.re-link').length + eco.querySelectorAll('.ruta-etapa-futura').length));
       ok(/La deuda por dentro/.test(eco.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
       ok(/Del salario al activo/i.test(eco.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -150,7 +155,7 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length >= 3, 'la materia muestra sus misiones', 'muestra ' + tarjetas.length);
       const deu = tarjetas.find(t => /deuda/i.test(t.textContent));
       ok(!!deu && /🔒/.test(deu.textContent), 'la misión de la deuda lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }

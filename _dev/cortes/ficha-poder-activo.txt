@@ -1,0 +1,18 @@
+# Cortes de fichas/ficha-poder-activo.html (norma 6: diez páginas)
+# Cada línea es un trozo literal del HTML que debe QUEDAR AL INICIO de una
+# página. La página 1 empieza sola, así que hacen falta nueve.
+#
+# Todos los anclajes son <h2> o <div class="caja ...">: ninguno cae dentro de
+# un <table>, porque retrocede() solo sabe retroceder sobre <div> y partiría
+# la tabla en dos hojas. La tabla de los ocho ingresos va partida en dos
+# (ingresos-a e ingresos-b) para que el reparto pueda cortar entre el cuarto
+# y el quinto caso.
+<h2>🪜 La escalera: de la hora al sistema</h2>
+<h2>🧩 Las siete piezas de un activo</h2>
+<h2>🌱 Lo que no cuenta como subir de escalón</h2>
+<h2>📜 A nombre de quién queda</h2>
+<h2>📝 La hoja del activo</h2>
+<h2>🏡 Los ocho ingresos del proyecto, en su escalón</h2>
+<div class="caja ej2">
+<div class="caja ej6">
+<div class="pauta pa5">

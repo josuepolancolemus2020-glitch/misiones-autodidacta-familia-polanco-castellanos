@@ -58,6 +58,7 @@ const MISSIONS = [
   { id: 24, title: 'La IA que programa: qué revisar antes de subir', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '⌨️', ruta: 'maquina', etapa: 4, sello: 'familiar', url: 'misiones/ruta-maquina-programa/programa.html' },
   { id: 25, title: 'Tácticas de presión y sus antídotos', modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 45, icon: '⏱️', ruta: 'persuasion', etapa: 4, sello: 'familiar', url: 'misiones/ruta-persuasion-presion/presion.html' },
   { id: 26, title: 'Canales: dónde está la audiencia y qué se publica', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 45, icon: '📡', ruta: 'marca', etapa: 4, sello: 'familiar', url: 'misiones/ruta-marca-canales/canales.html' },
+  { id: 27, title: 'Del salario al activo: ingresos que no dependen de tus horas', modulo: 'aprendizaje-unido', materia: 'eco', color: 'apr', xp: 45, icon: '🌱', ruta: 'poder', etapa: 4, sello: 'familiar', url: 'misiones/ruta-poder-activo/activo.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -91,7 +92,6 @@ const ETAPAS_PREVISTAS = {
     6: 'El engaño: phishing e ingeniería social en la familia',
   },
   poder: {
-    4: 'Del salario al activo: ingresos que no dependen de tus horas',
     5: 'Poder local: municipio, patronato y presupuesto público',
     6: 'Negociación: pedir, ceder y cerrar por escrito',
   },

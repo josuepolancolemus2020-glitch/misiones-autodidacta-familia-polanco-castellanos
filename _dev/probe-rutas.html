@@ -55,11 +55,13 @@ f.onload = async () => {
     w.switchView('view-rutas'); await esperar(300);
     const cards = d.querySelectorAll('.ruta-card');
     ok(cards.length === 9, '9 rutas en el mapa', 'rutas: ' + cards.length);
-    /* Dos rutas del adulto van por la etapa 3 y cuatro por la 4. Si alguna se
-       queda corta es que la misión nueva no llegó al catálogo. */
-    [['Ruta del Poder', 3], ['Ruta del Poder Político', 3],
+    /* Solo el Poder Político sigue por la etapa 3; las otras cinco rutas del
+       adulto van por la 4. Si alguna se queda corta es que la misión nueva no
+       llegó al catálogo. */
+    [['Ruta del Poder Político', 3],
      ['Ruta de la Persuasión', 4], ['Ruta de la Máquina que Predice', 4],
-     ['Ruta de la Marca', 4], ['Ruta de la Casa Cerrada', 4]].forEach(([nombre, tocables]) => {
+     ['Ruta de la Marca', 4], ['Ruta del Poder', 4],
+     ['Ruta de la Casa Cerrada', 4]].forEach(([nombre, tocables]) => {
       const r = [...cards].find(c => (c.querySelector('.ruta-nombre') || {}).textContent === nombre);
       if (!r) { fallos++; log('  ✘ falta ' + nombre); return; }
       const n = r.querySelectorAll('.re-link').length;

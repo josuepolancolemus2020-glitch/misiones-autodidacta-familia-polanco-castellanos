@@ -86,10 +86,10 @@ window.addEventListener('load', async () => {
     const r = await fetch('/fichas/ficha-poder-activos-pasivos.html');
     const txt = r.ok ? await r.text() : '';
     ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
-    ok((txt.match(/class="pagina"/g) || []).length === 3, '3 páginas para imprimir', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
-    ok(/Caso del proyecto/.test(txt), 'la ficha trae el caso del proyecto con su pauta', 'la ficha no trae caso del proyecto');
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/caso del proyecto/i.test(txt), 'la ficha trae el caso del proyecto con su pauta', 'la ficha no trae caso del proyecto');
     ok(/PATRIMONIO \(activos menos deudas\)/.test(txt), 'trae el balance de la casa para llenar', 'no trae el balance');
-    ok(/Pauta de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
     const rec = d.querySelector('#s-recursos a[href*="ficha-poder"]');
     ok(!!rec, 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
 
@@ -100,13 +100,21 @@ window.addEventListener('load', async () => {
     const poder = cards.find(c => /Ruta del Poder/.test(c.textContent));
     ok(!!poder, 'la Ruta del Poder está en el mapa', 'no aparece la ruta');
     if (poder) {
-      ok(poder.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + poder.querySelectorAll('.re-link').length);
-      ok(poder.querySelectorAll('.ruta-etapa-futura').length === 5, 'y 5 etapas por construir con nombre', 'futuras: ' + poder.querySelectorAll('.ruta-etapa-futura').length);
+      /* La cuenta exacta de etapas tocables la lleva _dev/probe-rutas.html, que
+         se actualiza cada vez que se añade una misión. Aquí solo se comprueba
+         que esta etapa llegó al mapa y que las seis siguen listadas: si esta
+         sonda contara el total, se pondría en rojo cada vez que crece la ruta
+         sin que nada de esta etapa se hubiera roto. */
+      ok(poder.querySelectorAll('.re-link').length >= 1, 'con su etapa 1 ya tocable', 'la etapa 1 no es tocable');
+      ok(poder.querySelectorAll('.re-link').length + poder.querySelectorAll('.ruta-etapa-futura').length === 6, 'las 6 etapas de la ruta están en el mapa', 'etapas en el mapa: ' + (poder.querySelectorAll('.re-link').length + poder.querySelectorAll('.ruta-etapa-futura').length));
       ok(/El presupuesto real/.test(poder.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
     wa.switchView('view-misiones'); await esperar(200);
     da.querySelector('.fam-chip[data-materia="eco"]').click(); await esperar(250);
-    ok(da.querySelectorAll('#missions-container .mission-card').length === 1, 'la materia Poder Económico muestra su misión', 'muestra ' + da.querySelectorAll('#missions-container .mission-card').length);
+    /* Se busca esta misión entre las de la materia, no el total: la materia
+       crece con cada etapa nueva y el total no dice nada de esta etapa. */
+    ok([...da.querySelectorAll('#missions-container .mission-card')].some(t => /Activos y Pasivos/i.test(t.textContent)),
+       'la materia Poder Económico muestra su misión', 'la misión no aparece entre las ' + da.querySelectorAll('#missions-container .mission-card').length + ' de la materia');
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
   } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
