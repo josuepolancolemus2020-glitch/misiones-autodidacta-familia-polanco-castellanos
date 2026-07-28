@@ -121,6 +121,10 @@
           <span class="qa-icon qa-inv"><i class="fa-solid fa-boxes-stacked"></i></span>
           <span class="qa-label">Inventario</span>
         </button>
+        <button type="button" class="qa-item" data-qa="view-boveda">
+          <span class="qa-icon qa-bov"><i class="fa-solid fa-file-shield"></i></span>
+          <span class="qa-label">La Bóveda</span>
+        </button>
         <button type="button" class="qa-item" data-qa="familia">
           <span class="qa-icon qa-finfam"><i class="fa-solid fa-sack-dollar"></i></span>
           <span class="qa-label">Finanzas Familia</span>
@@ -695,6 +699,118 @@
         <button type="button" class="chat-msg-delete-btn" id="inv-delete-btn" style="display:none;">
           <i class="fa-solid fa-trash"></i> Eliminar artículo
         </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========== LA BÓVEDA ========== -->
+  <!-- Los documentos personales de la familia. El archivo vive en un depósito
+       PRIVADO de Storage y solo se abre con enlaces firmados de 60 segundos;
+       la ficha (de quién, qué es, cuándo vence) vive en la tabla documentos.
+       Ver supabase/sql/boveda_documentos.sql y js/tools/boveda.js. -->
+  <div id="view-boveda" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">La Bóveda</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll bov-scroll">
+
+      <div class="bov-summary-grid">
+        <div class="bov-summary-card bov-guardados">
+          <div class="fin-card-label">Guardados</div>
+          <div class="fin-card-value" id="bov-total">s/d</div>
+        </div>
+        <div class="bov-summary-card bov-pronto">
+          <div class="fin-card-label">Vencen en 30 días</div>
+          <div class="fin-card-value" id="bov-por-vencer">s/d</div>
+        </div>
+        <div class="bov-summary-card bov-vencido">
+          <div class="fin-card-label">Ya vencidos</div>
+          <div class="fin-card-value" id="bov-vencidos">s/d</div>
+        </div>
+      </div>
+
+      <!-- La franja del aviso: un número en una tarjeta se olvida, esto dice
+           qué documento es y para cuándo. Lo llena js/tools/boveda.js. -->
+      <div id="bov-aviso" class="bov-aviso" style="display:none;"></div>
+
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="bov-search-input" type="search" placeholder="Buscar documento…" autocomplete="off">
+      </div>
+
+      <!-- Los chips los pinta boveda.js desde BOV_QUIENES y BOV_TIPOS, para que
+           la lista de miembros y de tipos exista en un solo sitio. -->
+      <div class="bov-chips" id="bov-filter-quien"></div>
+      <div class="bov-chips" id="bov-filter-tipo"></div>
+
+      <div id="bov-list" class="bov-list">
+        <div class="fin-empty">Cargando documentos…</div>
+      </div>
+
+    </div>
+
+    <button class="fin-fab" id="bov-fab" aria-label="Guardar documento">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+  </div>
+
+  <!-- Formulario de la Bóveda: subir un documento nuevo -->
+  <div id="bov-modal-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <h3 class="fin-detail-title" id="bov-modal-title">Guardar Documento</h3>
+        <button type="button" class="fin-modal-close" id="bov-modal-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="bov-form" class="fin-form">
+        <label class="fin-label" for="bov-f-titulo">Título</label>
+        <input id="bov-f-titulo" class="fin-input" type="text" placeholder="Ej. Partida de nacimiento" maxlength="120" required>
+
+        <label class="fin-label" for="bov-f-quien">De quién es</label>
+        <select id="bov-f-quien" class="fin-select">
+          <option value="familia" selected>Familia</option>
+          <option value="josue">Josué</option>
+          <option value="evelyn">Evelyn</option>
+          <option value="jael">Jael</option>
+          <option value="angelly">Angelly</option>
+        </select>
+
+        <!-- Los valores tienen que ser los mismos que en BOV_TIPOS de
+             js/tools/boveda.js: de ahí sale el icono de cada tarjeta. -->
+        <label class="fin-label" for="bov-f-tipo">Tipo</label>
+        <select id="bov-f-tipo" class="fin-select">
+          <option value="partida">Partida</option>
+          <option value="identidad">Identidad</option>
+          <option value="titulo">Título</option>
+          <option value="licencia">Licencia</option>
+          <option value="escritura">Escritura</option>
+          <option value="recibo">Recibo</option>
+          <option value="medico">Médico</option>
+          <option value="otro" selected>Otro</option>
+        </select>
+
+        <label class="fin-label" for="bov-f-emitido">Fecha de emisión</label>
+        <input id="bov-f-emitido" class="fin-input" type="date">
+
+        <label class="fin-label" for="bov-f-vence">Vence (déjalo vacío si no caduca)</label>
+        <input id="bov-f-vence" class="fin-input" type="date">
+
+        <label class="fin-label" for="bov-f-notas">Notas</label>
+        <textarea id="bov-f-notas" class="fin-input bov-notas-area" rows="2" placeholder="Ej. El original en papel está en la carpeta azul…" maxlength="300"></textarea>
+
+        <!-- Se esconde al corregir los datos de un documento que ya existe: ahi
+             el archivo no se cambia, solo la ficha. Ver bovEditar(). -->
+        <div id="bov-campo-archivo">
+          <label class="fin-label" for="bov-f-archivo">Archivo (máximo 10 MB)</label>
+          <input id="bov-f-archivo" class="fin-input bov-file-input" type="file" required>
+        </div>
+
+        <div id="bov-form-msg" class="bov-form-msg" style="display:none;"></div>
+
+        <button type="submit" class="fin-submit-btn" id="bov-submit-btn">Guardar Documento</button>
       </form>
     </div>
   </div>
@@ -1297,6 +1413,9 @@
       <button class="drawer-item" data-view="view-inventario">
         <i class="fa-solid fa-boxes-stacked"></i><span>Inventario Familiar</span>
       </button>
+      <button class="drawer-item" data-view="view-boveda">
+        <i class="fa-solid fa-file-shield"></i><span>La Bóveda</span>
+      </button>
       <button class="drawer-item" data-view="view-perfil">
         <i class="fa-solid fa-people-roof"></i><span>Herramientas de Familia</span>
       </button>
@@ -1418,6 +1537,8 @@
   <script src="js/tools/destellos.js"></script>
   <script src="js/tools/redaccion.js"></script>
   <script src="js/tools/antena.js"></script>
+  <!-- Después de chat.js a propósito: de ahí sale el _sb compartido. -->
+  <script src="js/tools/boveda.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

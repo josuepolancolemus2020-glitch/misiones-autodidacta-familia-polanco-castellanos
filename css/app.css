@@ -450,6 +450,158 @@ a { text-decoration: none; color: inherit; }
 
 .inv-notas-area { resize: vertical; min-height: 60px; font-family: inherit; }
 
+/* ====== LA BÓVEDA ====== */
+/* Reutiliza lo que ya existe (fin-card-label, fin-card-value, search-box,
+   fin-empty, fin-fab, fin-modal) y solo añade lo propio: el semáforo de los
+   vencimientos, que es la razón de ser de la vista. Los colores de ese
+   semáforo son los mismos que los del inventario para «dañado» y «regular»,
+   para que rojo y ámbar signifiquen lo mismo en toda la aplicación. */
+.bov-scroll { padding-bottom: 100px; }
+
+/* Tres tarjetas en fila caben en un teléfono si el texto es pequeño; en
+   pantallas muy estrechas se parten solas. */
+.bov-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+@media (max-width: 340px) {
+  .bov-summary-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.bov-summary-card {
+  border-radius: var(--r);
+  padding: 13px 12px;
+  color: #fff;
+  box-shadow: var(--shadow-md);
+  min-width: 0;
+}
+.bov-summary-card .fin-card-label { font-size: 10px; line-height: 1.25; }
+.bov-summary-card .fin-card-value { font-size: 22px; }
+.bov-summary-card.bov-guardados { background: linear-gradient(135deg, var(--cib), #64748b); }
+.bov-summary-card.bov-pronto    { background: linear-gradient(135deg, #ca8a04, #eab308); }
+.bov-summary-card.bov-vencido   { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+
+.bov-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  border-radius: var(--r-sm);
+  padding: 11px 13px;
+  margin-bottom: 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.bov-aviso-vencido { background: #fef2f2; color: #991b1b; border: 1px solid rgba(220,38,38,.25); }
+.bov-aviso-pronto  { background: #fefce8; color: #854d0e; border: 1px solid rgba(202,138,4,.25); }
+
+.bov-chips {
+  display: flex; gap: 6px;
+  margin-bottom: 10px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.bov-chips::-webkit-scrollbar { display: none; }
+/* La segunda fila de chips, la que separa del listado. Iba con :last-of-type,
+   que aquí no casa con nada porque cuenta entre TODOS los hermanos del mismo
+   tipo y el último div de la sección es otro. Era CSS muerto. */
+.bov-chips + .bov-chips { margin-bottom: 16px; }
+.bov-chip {
+  flex-shrink: 0; white-space: nowrap;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .15s;
+}
+.bov-chip.active { background: var(--cib); border-color: var(--cib); color: #fff; }
+
+.bov-list { display: flex; flex-direction: column; gap: 10px; }
+
+.bov-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 14px;
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.bov-card-icon {
+  flex-shrink: 0;
+  width: 38px; height: 38px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--cib-bg);
+  color: var(--cib);
+  font-size: 15px;
+}
+
+.bov-card-main { flex: 1; min-width: 0; }
+.bov-card-title {
+  font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px;
+  overflow-wrap: anywhere;
+}
+.bov-card-meta { font-size: 11.5px; color: var(--muted); text-transform: capitalize; }
+.bov-card-notes {
+  font-size: 11px; color: var(--faint); margin-top: 5px; line-height: 1.4;
+  overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+
+/* El semáforo. Lo vencido y lo que está por vencer tienen que saltar a la
+   vista sin leer: si hay que buscar la fecha, el aviso no sirve. */
+.bov-vence-badge {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px;
+  padding: 3px 9px; border-radius: 8px;
+  white-space: nowrap;
+}
+.bov-vence-vencido { background: #991b1b; color: #fff; }
+.bov-vence-pronto  { background: #ca8a04; color: #fff; }
+.bov-vence-vigente { background: var(--cib-bg); color: var(--cib); }
+
+.bov-card-tools { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.bov-tool {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .15s;
+}
+.bov-tool:active { transform: scale(.92); }
+.bov-tool-del { color: #dc2626; background: #fee2e2; border-color: rgba(220,38,38,.2); }
+
+.bov-notas-area { resize: vertical; min-height: 60px; font-family: inherit; }
+.bov-file-input { padding: 10px 12px; font-size: 13px; }
+
+/* El mensaje del formulario. Se queda puesto a propósito, al revés que el
+   toast: quien pelea con una subida que falla necesita releerlo. */
+.bov-form-msg {
+  margin-top: 12px;
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  font-size: 12.5px; font-weight: 600; line-height: 1.4;
+  background: var(--cib-bg);
+  color: var(--cib);
+  overflow-wrap: anywhere;
+}
+.bov-form-msg-error { background: #fef2f2; color: #991b1b; }
+
 /* ====== CHAT FAMILIAR ====== */
 .chat-topics {
   display: flex; gap: 6px;
@@ -2573,6 +2725,9 @@ body {
 .qa-red { background: linear-gradient(135deg, #7c3aed, #a78bfa); }
 .qa-pro { background: linear-gradient(135deg, #2563eb, #60a5fa); }
 .qa-inv { background: linear-gradient(135deg, #0d9488, #2dd4bf); }
+/* La Bóveda va en el gris pizarra de la casa cerrada (--cib), el mismo de
+   Ciberseguridad: es la misma idea, llaves y datos que no salen. */
+.qa-bov { background: linear-gradient(135deg, var(--cib), #64748b); }
 .qa-esc { background: linear-gradient(135deg, #b45309, #f59e0b); }
 .qa-est { background: linear-gradient(135deg, #db2777, #f472b6); }
 .qa-col { background: linear-gradient(135deg, #ea580c, #fb923c); }

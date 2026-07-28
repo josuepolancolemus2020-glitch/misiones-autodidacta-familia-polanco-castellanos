@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · La Bóveda de documentos</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de la Bóveda de documentos personales.
+
+   Se escribió ANTES que el módulo, a propósito y contra lo que el informe
+   exige, no contra lo que hubiera en los archivos. Una sonda escrita después,
+   leyendo el código ya hecho, es un espejo: aprueba cualquier cosa que se haya
+   escrito, incluso la equivocada. Esta es un examen.
+
+   Sin credenciales no se puede subir un archivo de verdad (y además el proxy de
+   estas sesiones bloquea supabase.co), así que se comprueba lo que sí se puede:
+   el cableado de la vista, la forma del módulo leída en la fuente, y lo que el
+   SQL tiene que exigir.
+
+   Dos cosas que esta familia de sondas aprendió a base de fallar:
+
+   1. Los comentarios se quitan ANTES de aplicar cualquier expresión regular.
+      Si no, la regla caza el texto que EXPLICA el fallo (el comentario que dice
+      «ojo, nunca getPublicUrl») y pinta un rojo falso. Un rojo falso se ignora,
+      y una sonda que se ignora ya no comprueba nada.
+   2. Se distingue lo que se puede comprobar siempre (leyendo la fuente) de lo
+      que solo se puede con la librería cargada y sesión iniciada. Lo segundo se
+      dice SALTADO. Un verde que no significa nada es peor que un hueco. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0, avisos = 0, saltados = 0, sinJuzgar = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+/* ok = si falla, la sonda SUSPENDE. aviso = falta de acabado, no suspende. */
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+function aviso(c, bien, mal){ if(c) log('  ✔ '+bien); else { avisos++; log('  ⚠ '+mal); } }
+function saltado(razon){ saltados++; log('  · SALTADO: '+razon); }
+function nojuzgado(que){ sinJuzgar++; log('  ? sin juzgar: '+que); }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* Devuelve el texto o null si el archivo todavía no existe. No revienta: que
+   falte el archivo es un fallo con nombre, no una excepción que deje sin correr
+   las otras treinta comprobaciones. */
+async function fuente(ruta){
+  try { const r = await fetch(ruta); return r.ok ? await r.text() : null; }
+  catch(e){ return null; }
+}
+
+/* Fuera comentarios, cada lenguaje con su forma. */
+const sinComJs   = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+const sinComHtml = s => s.replace(/<!--[\s\S]*?-->/g, '');
+function sinComSql(s){
+  /* Un raspado a mano y no un replace de /--.*$/, porque ese destrozaría
+     cualquier cadena que lleve dos guiones seguidos. Se lleva la cuenta de si
+     vamos dentro de comillas simples y ahí no se toca nada.
+
+     La primera versión de esta función también seguía los bloques $$ ... $$ y
+     NO les quitaba los comentarios de dentro, por miedo a estropear el cuerpo
+     de una función. Estaba mal y se vio en la primera pasada: el bloque de
+     comprobación del SQL lleva un comentario que dice «ni un using (true)», y
+     la sonda lo cazaba y suspendía un archivo correcto. Dentro de un bloque
+     $$ el «--» también es comentario, así que se quita igual. */
+  let o = '', i = 0, cadena = false;
+  while (i < s.length) {
+    const c = s[i];
+    if (!cadena && s.substr(i, 2) === '--') { while (i < s.length && s[i] !== '\n') i++; continue; }
+    if (c === "'") cadena = !cadena;
+    o += c; i++;
+  }
+  return o.replace(/\/\*[\s\S]*?\*\//g, '');
+}
+/* El guion largo se escribe por su punto de código, nunca literal: si no, este
+   archivo incumpliría la misma norma que comprueba y el grep de la casa lo
+   cazaría a él. */
+const GUION = /\u2014/;
+const CORREO = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+
+/* Trocea el SQL en sentencias create policy completas, para juzgar cada
+   política por separado en vez de mirar el archivo entero y dar por buena una
+   que no pide es_familia() porque su vecina sí lo pide. */
+function politicas(sql){ return sql.match(/create\s+policy[\s\S]*?;/gi) || []; }
+
+window.addEventListener('load', async () => {
+  await esperar(2500);
+  const w = f.contentWindow, d = f.contentDocument;
+  try {
+
+    /* ═════ 1. LOS CUATRO ENGANCHES DE LA VISTA ═════ */
+    log('── LOS CUATRO ENGANCHES ──');
+    /* Sin los cuatro, la vista existe y no se llega a ella. Ya pasó con otra
+       herramienta: el módulo estaba entero y no había por dónde abrirlo. */
+    const vista = d.getElementById('view-boveda');
+    ok(!!vista, 'existe la vista view-boveda', 'no existe la vista view-boveda');
+    ok(vista && vista.classList.contains('view'), 'la vista lleva la clase view', 'view-boveda no lleva la clase view: no entraría en el cambio de vistas');
+    ok(!!d.querySelector('.qa-item[data-qa="view-boveda"]'), 'está en el Acceso Rápido', 'falta el .qa-item con data-qa="view-boveda"');
+    ok(!!d.querySelector('.drawer-item[data-view="view-boveda"]'), 'está en el menú lateral', 'falta el .drawer-item con data-view="view-boveda"');
+    ok(!!d.querySelector('script[src*="tools/boveda.js"]'), 'index.html carga js/tools/boveda.js', 'no se carga el script del módulo');
+
+    const idx = await fuente('/index.html');
+    if (idx === null) { fallos++; log('  ✘ no se pudo leer index.html'); }
+    else {
+      const idxCod = sinComHtml(idx);
+      /* Los enganches se buscan con los comentarios fuera: index.html está lleno
+         de comentarios en mayúsculas con el nombre de cada vista, y uno que
+         dijera «BOVEDA» daría un verde sin que exista nada. */
+      ok(/data-qa\s*=\s*"view-boveda"/.test(idxCod), 'el enganche del Acceso Rápido está en el código, no en un comentario', 'el data-qa solo aparece dentro de un comentario');
+      ok(/data-view\s*=\s*"view-boveda"/.test(idxCod), 'el enganche del menú está en el código, no en un comentario', 'el data-view solo aparece dentro de un comentario');
+      aviso(/fa-folder-tree|fa-vault|fa-file-shield/.test(idxCod), 'usa un icono de los propuestos', 'el icono no es fa-folder-tree, fa-vault ni fa-file-shield');
+      aviso(!GUION.test(idx), 'index.html sin guiones largos', 'index.html trae guiones largos');
+    }
+
+    /* ═════ 2. EL CAMBIO DE VISTA LO ARRANCA ═════ */
+    log('\n── switchView ARRANCA EL MÓDULO ──');
+    const appJs = await fuente('/js/app.js');
+    if (appJs === null) { fallos++; log('  ✘ no se pudo leer js/app.js'); }
+    else {
+      const appCod = sinComJs(appJs);
+      ok(/view-boveda[\s\S]{0,120}initBoveda\s*\(\s*\)/.test(appCod),
+         'switchView llama a initBoveda para view-boveda',
+         'switchView no arranca la bóveda: la vista abriría vacía');
+      ok(/typeof\s+initBoveda\s*===\s*['"]function['"]/.test(appCod),
+         'comprueba que initBoveda exista antes de llamarla', 'llama a initBoveda sin comprobar que exista: reventaría si falla la carga del script');
+      aviso(!GUION.test(appJs), 'js/app.js sin guiones largos', 'js/app.js trae guiones largos');
+    }
+
+    /* ═════ 3. EL MÓDULO, LEÍDO EN LA FUENTE ═════ */
+    log('\n── EL MÓDULO (fuente) ──');
+    const modBruto = await fuente('/js/tools/boveda.js');
+    let mod = null;
+    if (modBruto === null) {
+      fallos++;
+      log('  ✘ no existe js/tools/boveda.js');
+      ['no crea cliente propio','no redeclara _sb','usa createSignedUrl','nunca getPublicUrl',
+       'depósito privado desde el navegador','borra huérfanos','límite de tamaño','vencimientos',
+       'sin guiones largos en el módulo'].forEach(nojuzgado);
+    } else {
+      /* Comentarios fuera ANTES de nada. El módulo va a llevar escrito por qué
+         nunca se usa getPublicUrl, y esa frase no puede suspender la sonda. */
+      mod = sinComJs(modBruto);
+
+      log('  · un solo cliente');
+      /* El peor fallo de la tanda anterior: auth.js tenía su cliente y chat.js
+         otro, la sesión iba por uno y los datos por otro, y con la seguridad por
+         fila encendida la casa quedaba muda. */
+      ok(!/createClient\s*\(/.test(mod), 'no crea un cliente propio', 'crea su propio cliente: la sesión no viajaría con los datos');
+      ok(!/(?:const|let|var)\s+_sb\b/.test(mod), 'no redeclara _sb', 'redeclara _sb: chat.js ya lo declara con const y el navegador mataría todos los scripts siguientes');
+      ok(/(?<![A-Za-z0-9_])_sb(?![A-Za-z0-9_])/.test(mod), 'usa el cliente compartido _sb', 'no usa el cliente compartido');
+      ok(!/window\.faroSb\s*=/.test(mod), 'no reescribe window.faroSb', 'reescribe el cliente compartido de la casa');
+      ok(!/storageKey\s*:/.test(mod), 'no monta un almacén de sesión aparte', 'usa storageKey propio: dos clientes se pelearían por renovar el token');
+      /* Tres formas válidas de guardarse, y la primera pasada de esta sonda solo
+         admitía la segunda: dio rojo a un módulo que se protegía con typeof, que
+         además es la más segura de las tres (si chat.js no cargó, nombrar _sb a
+         secas revienta con ReferenceError antes de poder comprobar nada). */
+      ok(/typeof\s+_sb\s*[!=]==?\s*['"]undefined['"]|if\s*\(\s*!\s*_sb|_sb\s*===?\s*null/.test(mod),
+         'se guarda de que no haya cliente', 'no comprueba que _sb exista: reventaría sin sesión');
+      aviso(/sin (conexi|sesi)|no hay (conexi|sesi)/i.test(mod), 'lo dice con un mensaje claro', 'no se ve el mensaje de «sin conexión» para cuando no hay cliente');
+
+      log('  · el depósito es privado y así se trata');
+      ok(!/getPublicUrl/.test(mod), 'nunca getPublicUrl', 'usa getPublicUrl: sería una fuga permanente de las partidas de nacimiento');
+      ok(!/object\/public\//.test(mod), 'no arma URLs públicas a mano', 'arma la URL pública del objeto a mano, que es lo mismo que getPublicUrl con otro nombre');
+      ok(/createSignedUrl/.test(mod), 'ver y descargar con enlace firmado', 'no usa createSignedUrl');
+      /* El plazo puede ir escrito como número o como constante con nombre. Las
+         dos formas son correctas, así que la constante se resuelve leyendo su
+         declaración; si no se puede resolver, se avisa en vez de suspender. */
+      const argsFirma = [...mod.matchAll(/createSignedUrl\s*\(\s*[^,()]+,\s*([A-Za-z0-9_.]+)/g)].map(m => m[1]);
+      const valorDe = a => {
+        if (/^\d+$/.test(a)) return +a;
+        const m = mod.match(new RegExp('(?:const|let|var)\\s+' + a.replace(/[.$*+?^{}()|[\]\\]/g, '\\$&') + '\\s*=\\s*(\\d+)'));
+        return m ? +m[1] : null;
+      };
+      const segs = argsFirma.map(valorDe), legibles = segs.filter(s => s !== null);
+      ok(argsFirma.length > 0, 'los enlaces firmados llevan plazo', 'createSignedUrl sin plazo a la vista');
+      ok(legibles.every(n => n > 0 && n <= 300), 'el plazo es corto (' + (legibles.join(', ') || 's/d') + ' s)',
+         'los enlaces firmados duran de más: ' + legibles.join(', ') + ' s');
+      if (argsFirma.length && !legibles.length) { avisos++; log('  ⚠ no se pudo leer el plazo de la firma: revísalo a mano'); }
+      ok(!/createBucket|updateBucket/.test(mod), 'no toca la configuración del depósito desde el navegador', 'crea o modifica el depósito desde el navegador: eso es del SQL, y desde aquí podría dejarlo público');
+      /* El nombre puede ir en una constante (BOV_DEPOSITO = 'documentos'), que es
+         como se escribe en esta casa. Se busca la cadena, no la llamada: la
+         primera pasada exigía from('documentos') literal y dio rojo a un módulo
+         correcto. */
+      ok(/['"]documentos['"]/.test(mod), 'nombra el depósito y la tabla documentos', 'no se ve el nombre documentos por ningún lado');
+      ok(/storage\s*\.\s*from\s*\(/.test(mod), 'entra al depósito por storage.from', 'no usa storage.from: no estaría hablando con el depósito');
+
+      log('  · subir sin dejar basura');
+      ok(/\.remove\s*\(/.test(mod), 'sabe borrar objetos del depósito', 'nunca borra objetos: si la fila falla tras subir, queda un archivo huérfano que nadie ve ni puede quitar');
+      aviso(/Date\.now\(\)|crypto\.randomUUID/.test(mod), 'la ruta lleva marca de tiempo o azar', 'la ruta parece adivinable');
+      aviso(/user\s*\.\s*id|getUser\s*\(/.test(mod), 'la ruta cuelga del identificador del usuario', 'la ruta no cuelga del usuario');
+      ok(/1024\s*\*\s*1024|10485760|MAX_?BYTES|MAX_?TAM/i.test(mod), 'hay límite de tamaño', 'no hay límite de tamaño: la familia sube desde el teléfono con datos escasos');
+      aviso(/sanea|saniti|normalize\s*\(|replace\s*\(\s*\//i.test(mod), 'sanea el nombre del archivo', 'no se ve el saneo del nombre del archivo');
+
+      log('  · borrar y vencimientos');
+      aviso(/confirm\s*\([^)]*(\$\{|\+)/.test(mod), 'la confirmación de borrado dice qué documento es', 'confirma el borrado sin nombrar el documento');
+      ok(/vence/.test(mod), 'el módulo trabaja con la fecha de vencimiento', 'no mira los vencimientos, que son media utilidad del asunto');
+      aviso(/order\s*\(\s*['"]vence['"]|sort\s*\(/.test(mod), 'ordena por lo que vence primero', 'no se ve el orden por vencimiento');
+      aviso(/\b30\b/.test(mod), 'avisa de lo que vence en 30 días', 'no se ve el aviso de los 30 días');
+
+      log('  · normas de la casa');
+      ok(!GUION.test(modBruto), 'sin guiones largos (norma 1)', 'quedan guiones largos en el módulo');
+      ok(!/sb_secret|service_role|eyJ[A-Za-z0-9_-]{10}/.test(mod), 'no lleva claves de servicio', 'lleva una clave que no debe estar en el navegador');
+      const correosMod = (modBruto.match(CORREO) || []).filter(x => !/ejemplo\.com|@ejemplo|example\./i.test(x));
+      ok(correosMod.length === 0, 'sin correos de la familia', 'trae correos: ' + correosMod.slice(0, 3).join(', '));
+    }
+
+    /* ═════ 4. EL MÓDULO, VIVO ═════ */
+    log('\n── EL MÓDULO SIN SESIÓN (vivo) ──');
+    ok(typeof w.initBoveda === 'function', 'initBoveda existe y es función', 'no hay initBoveda: switchView no tendría qué llamar');
+    if (typeof w.initBoveda === 'function') {
+      /* Que no reviente sin sesión importa de verdad: initBoveda corre en cuanto
+         alguien toca el Acceso Rápido, y una excepción ahí deja la vista en
+         blanco sin decir por qué. */
+      let exploto = null;
+      try { const r = w.initBoveda(); if (r && typeof r.then === 'function') await r.catch(e => { exploto = e; }); }
+      catch (e) { exploto = e; }
+      ok(!exploto, 'initBoveda no revienta sin sesión', 'initBoveda revienta sin sesión: ' + (exploto && exploto.message));
+    } else {
+      nojuzgado('initBoveda no revienta sin sesión');
+    }
+
+    const hayLib = !!(w.supabase && w.supabase.createClient);
+    if (!hayLib) {
+      saltado('la librería de Supabase no cargó en este entorno, no hay objetos vivos que mirar');
+    } else {
+      ok(!!w.faroSb, 'window.faroSb tiene el cliente compartido', 'no hay cliente compartido');
+      /* Comprobar la identidad del cliente pide que el módulo esté cargado Y que
+         la librería exista. Con las dos cosas vale la pena, porque la fuente
+         puede decir _sb y aun así apuntar a otro sitio. */
+      let mismo = null;
+      try { mismo = w.eval('typeof _sb !== "undefined" && _sb === window.faroSb'); } catch (e) { mismo = null; }
+      if (mismo === null) saltado('no se pudo leer _sb dentro de la aplicación');
+      else ok(mismo, 'la bóveda usa el mismo cliente que la puerta', 'hay más de un cliente vivo: la sesión no viajaría con los datos');
+    }
+
+    /* ═════ 5. EL SQL ═════ */
+    log('\n── EL SQL DE LA BÓVEDA ──');
+    const sqlBruto = await fuente('/supabase/sql/boveda_documentos.sql');
+    if (sqlBruto === null) {
+      fallos++;
+      log('  ✘ no existe supabase/sql/boveda_documentos.sql');
+      ['tabla documentos con sus columnas','seguridad por fila encendida','depósito privado',
+       'las cuatro políticas de storage','ninguna sin es_familia()','ningún using (true)',
+       'idempotente','falla fuerte','consulta de comprobación'].forEach(nojuzgado);
+    } else {
+      /* Otra vez: comentarios fuera. La cabecera de este archivo va a explicar
+         justamente por qué no puede haber un using (true), y esa frase no puede
+         suspender al archivo que la escribe. */
+      const sql = sinComSql(sqlBruto);
+
+      log('  · la tabla');
+      ok(/create table if not exists public\.documentos/i.test(sql), 'crea public.documentos y no falla si ya está', 'no crea la tabla documentos de forma idempotente');
+      const bloque = (sql.match(/create table if not exists public\.documentos[\s\S]*?;/i) || [''])[0];
+      const cols = ['id','creado_at','subido_por','de_quien','titulo','tipo','emitido','vence','notas',
+                    'archivo_ruta','archivo_nombre','archivo_tipo','archivo_bytes'];
+      const faltan = cols.filter(c => !new RegExp('(^|[\\s(,])' + c + '\\s').test(bloque));
+      ok(faltan.length === 0, 'están las trece columnas que pide el informe', 'faltan columnas: ' + faltan.join(', '));
+      aviso(/subido_por[^,]*references auth\.users/i.test(bloque), 'subido_por apunta a auth.users', 'subido_por no referencia auth.users');
+      aviso(/de_quien[\s\S]{0,200}(josue|familia)/i.test(bloque), 'de_quien está acotado a los cinco valores', 'de_quien admite cualquier texto');
+
+      log('  · la seguridad por fila de la tabla');
+      ok(/alter table public\.documentos enable row level security/i.test(sql), 'seguridad por fila encendida en documentos', 'la tabla queda con la seguridad apagada: la clave publicable la leería entera');
+      const polDocs = politicas(sql).filter(p => /public\.documentos|on\s+documentos/i.test(p));
+      ok(polDocs.length > 0, 'hay política sobre documentos', 'no hay ninguna política sobre documentos: con la seguridad encendida y sin política, ni la familia entra');
+      ok(polDocs.every(p => /to authenticated/i.test(p)), 'las políticas de documentos van a authenticated', 'alguna política de documentos no dice to authenticated');
+      ok(polDocs.every(p => /using\s*\(\s*public\.es_familia\(\)/i.test(p)) &&
+         polDocs.some(p => /with check\s*\(\s*public\.es_familia\(\)/i.test(p)),
+         'documentos exige es_familia() para leer y para escribir',
+         'documentos no exige es_familia() en using y with check');
+
+      log('  · el depósito, privado');
+      /* Un depósito público sería una carpeta abierta en internet, y ahí van las
+         partidas de nacimiento de dos niñas. */
+      ok(/insert into storage\.buckets/i.test(sql), 'crea el depósito documentos', 'no crea el depósito');
+      const insBucket = (sql.match(/insert into storage\.buckets[\s\S]*?;/i) || [''])[0];
+      ok(/'documentos'/.test(insBucket), 'el depósito se llama documentos', 'el depósito no se llama documentos');
+      ok(/\bfalse\b/i.test(insBucket) && !/\btrue\b/i.test(insBucket), 'se crea con public = false', 'el depósito NO se crea privado');
+      ok(/on conflict/i.test(insBucket), 'se puede correr dos veces', 'sin on conflict: la segunda pasada revienta');
+      ok(!/update storage\.buckets[\s\S]{0,200}public\s*=\s*true/i.test(sql), 'nunca vuelve público el depósito', 'hay un update que pone el depósito en público');
+      /* on conflict do nothing tiene una trampa: si el depósito ya existía y era
+         público, la segunda pasada no lo arregla y el script dice que todo bien.
+         Por eso hace falta o forzarlo a privado o comprobarlo y reventar. */
+      const fuerzaPrivado = /update storage\.buckets[\s\S]{0,200}public\s*=\s*false/i.test(sql);
+      const compruebaPrivado = (sql.match(/do\s*\$\$[\s\S]*?\$\$\s*;/gi) || [])
+        .some(b => /storage\.buckets/i.test(b) && /public/i.test(b) && /raise exception/i.test(b));
+      ok(fuerzaPrivado || compruebaPrivado,
+         'si el depósito ya existía, lo deja privado o revienta',
+         'un depósito público preexistente sobreviviría al script en silencio: falta forzarlo a false o comprobarlo con raise exception');
+
+      log('  · las políticas del depósito');
+      const polObj = politicas(sql).filter(p => /storage\.objects/i.test(p));
+      ok(polObj.length >= 1, 'hay políticas sobre storage.objects', 'sin políticas en storage.objects nadie sube ni baja nada');
+      const ops = ['select','insert','update','delete'];
+      const cubiertas = ops.filter(o => polObj.some(p => new RegExp('for\\s+' + o, 'i').test(p) || /for\s+all/i.test(p)));
+      ok(cubiertas.length === 4, 'cubre las cuatro operaciones', 'faltan operaciones: ' + ops.filter(o => !cubiertas.includes(o)).join(', '));
+      ok(polObj.every(p => /bucket_id\s*=\s*'documentos'/i.test(p)),
+         'cada política se ata al depósito documentos',
+         'alguna política de storage.objects no filtra por bucket_id: se aplicaría a TODOS los depósitos del proyecto');
+      ok(polObj.every(p => /es_familia\(\)/i.test(p)), 'cada política del depósito pide es_familia()', 'alguna política del depósito no pide es_familia()');
+
+      log('  · la trampa que ya costó una ronda');
+      /* to authenticated NO significa «uno de los cuatro»: significa cualquiera
+         con sesión en el proyecto, y con el alta pública abierta eso es
+         cualquiera que se registre. */
+      const todas = politicas(sql);
+      const sinFamilia = todas.filter(p => !/es_familia\(\)/i.test(p));
+      ok(sinFamilia.length === 0, 'las ' + todas.length + ' políticas del archivo piden es_familia()',
+         sinFamilia.length + ' política(s) sin es_familia(): ' + sinFamilia.map(p => (p.match(/create\s+policy\s+"?([\w.]+)"?/i) || [,'?'])[1]).join(', '));
+      ok(!/using\s*\(\s*true\s*\)/i.test(sql), 'ningún using (true)', 'hay using (true): cualquiera que se registre leería los documentos de la familia');
+      ok(!/with check\s*\(\s*true\s*\)/i.test(sql), 'ningún with check (true)', 'hay with check (true): cualquiera que se registre escribiría en la bóveda');
+      /* El «(?!\s*\.)» evita el rojo falso de un «to public.algo»: ahí public es
+         el esquema, no el rol que se abre a internet entero. */
+      ok(!/\bto\s+(?:anon|public)\b(?!\s*\.)/i.test(sql), 'ninguna política se abre a anon ni a public', 'una política se concede a anon o public: eso es internet entero');
+
+      log('  · idempotencia y ruido');
+      const drops = (sql.match(/drop policy if exists/gi) || []).length;
+      ok(drops >= todas.length, 'cada política se puede recrear (' + drops + ' drop / ' + todas.length + ' create)', 'faltan drop policy if exists: la segunda pasada revienta');
+      ok(/\bbegin\s*;/i.test(sql) && /\bcommit\s*;/i.test(sql), 'va en bloque transaccional', 'no es transaccional: un fallo a media hoja dejaría medio aplicado');
+      ok(/raise exception/i.test(sql), 'falla fuerte si algo no queda como debe', 'no hay raise exception: ya pasó dos veces que un raise notice dejara creer que algo se hizo');
+      aviso(/pg_policies|storage\.buckets/i.test((sqlBruto.split(/commit\s*;/i).pop() || '')),
+            'termina con una consulta de comprobación que se puede leer', 'no hay consulta de comprobación al final');
+      ok(!GUION.test(sqlBruto), 'el SQL sin guiones largos (norma 1)', 'quedan guiones largos en el SQL');
+      const correosSql = (sqlBruto.match(CORREO) || []).filter(x => !/ejemplo\.com|@ejemplo|example\./i.test(x));
+      ok(correosSql.length === 0, 'el SQL no trae correos de la familia', 'el SQL trae correos: ' + correosSql.slice(0, 3).join(', '));
+    }
+
+    /* ═════ 6. LO QUE NO SE PUEDE PROBAR AQUÍ ═════ */
+    log('\n── LO QUE ESTA SONDA NO PRUEBA ──');
+    saltado('subir, firmar y descargar de verdad: pide sesión de uno de los cuatro y el proxy bloquea supabase.co');
+    saltado('que el depósito esté privado EN Supabase: el SQL declara, el panel manda. Se mira a mano tras aplicarlo');
+    saltado('que una petición cruda a /rest/v1/documentos sin sesión devuelva []: esa es la prueba que cuenta y se hace fuera');
+
+    /* ═════ 7. LA HOJA DE ESTILO ═════ */
+    log('\n── EL ESTILO ──');
+    const css = await fuente('/css/app.css');
+    if (css === null) { avisos++; log('  ⚠ no se pudo leer css/app.css'); }
+    else {
+      aviso(/BOVEDA|BÓVEDA/i.test(css), 'hay sección de la bóveda en app.css', 'falta la sección de la bóveda en app.css');
+      aviso(!GUION.test(css), 'app.css sin guiones largos', 'app.css trae guiones largos');
+      if (idx) {
+        const v = (idx.match(/<div id="view-boveda"[\s\S]*?\n  <\/div>/) || [''])[0];
+        aviso(/fin-card-label|fin-card-value|search-box|fin-empty/.test(v),
+              'la vista reutiliza las clases que ya existen', 'la vista inventa clases en vez de reutilizar fin-card-label, search-box, fin-empty');
+      }
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden')
+        + (avisos ? '  ·  ' + avisos + ' avisos' : '')
+        + (sinJuzgar ? '  ·  ' + sinJuzgar + ' sin juzgar (falta el archivo)' : '')
+        + (saltados ? '  ·  ' + saltados + ' saltados' : ''));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>
