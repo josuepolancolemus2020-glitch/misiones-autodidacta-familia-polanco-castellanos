@@ -74,7 +74,7 @@ las rutas del adulto se leen desde github.com y desde el sitio de Pages. El
 sello `familiar` y el candado 🔒 de las tarjetas son decorativos mientras eso sea
 así, tal y como avisaba el capítulo 0 de `PROPUESTA-RUTAS-DEL-ADULTO.md`.
 
-### 1.2 Los datos de la familia se leen Y se escriben
+### 1.2 Los datos de la familia se leen Y se escriben · ✅ CERRADO
 
 `js/chat.js` lleva la clave de Supabase. **La clave está bien**: es del tipo
 `sb_publishable_`, diseñado para vivir en el navegador. El problema es que la
@@ -90,9 +90,16 @@ para leer y escribir sin abrir la aplicación siquiera:
 | `redaccion_config` | su configuración |
 | `push_subscriptions` | a qué teléfonos llegan las notificaciones |
 
-`push_subscriptions` es la peor: con eso se pueden mandar notificaciones a los
-teléfonos de la casa. De la tabla del **chat** no se sabe: su seguridad no se
-declara en ningún `.sql` del repositorio y hay que mirarla en Supabase.
+`push_subscriptions` era la peor: con eso se pueden mandar notificaciones a los
+teléfonos de la casa.
+
+Ya está cerrado. Al ir a aplicarlo aparecieron cuatro tablas más que la lista
+original no traía y que habrían quedado abiertas justo después de dar la casa
+por cerrada: `mensajes` (el chat familiar entero), `cuentas`, `transacciones` y
+`deudas`. Se encontraron leyendo qué tablas nombra el código de verdad, en vez
+de fiarse de los `.sql` del repositorio, que solo dicen lo que se pensó.
+Lección para la próxima: la lista se saca del código y se confirma con la
+consulta que lista TODAS las tablas con su estado.
 
 ### 1.3 Cualquiera con la dirección abre la aplicación · ✅ CERRADO
 
@@ -156,10 +163,11 @@ Lo que se planeó originalmente y quedó obsoleto:
    que en la práctica escriban la contraseña una vez y no cada vez.
 4. Borrar `FARO_USERS` y sus PIN del código.
 
-### Tanda 2 · Cerrar los datos (seguridad por fila) · ESCRITA, SIN APLICAR
+### Tanda 2 · Cerrar los datos (seguridad por fila) · ✅ HECHA
 
-Está en `supabase/sql/seguridad_familia_2_datos.sql` y **no se ejecuta hasta que
-los cuatro hayan entrado**, cada uno en su aparato. No tres.
+Está en `supabase/sql/seguridad_familia_2_datos.sql`. Se ejecutó el 28 de julio,
+después de que los cuatro entraran cada uno en su aparato, y se comprobó que
+nadie perdió datos y que en incógnito no sale nada.
 
 Cubre diez tablas, no seis: a las de la casa se sumaron `mensajes` (el chat
 entero), `cuentas`, `transacciones` y `deudas`, que en la primera versión se
