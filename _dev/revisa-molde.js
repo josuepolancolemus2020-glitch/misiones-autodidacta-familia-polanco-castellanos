@@ -78,11 +78,21 @@ for (const m of misiones) {
   else if (claves.has(clave)) falla(`comparte la clave «${clave}» con ${claves.get(clave)}`);
   else claves.set(clave, m.nombre);
 
-  /* 4. Norma 1-bis: ningún guion largo en lo que se publica. */
+  /* 4. La tarjeta que se manda por WhatsApp se copia entera del molde y casi
+        nadie la lee después: en «El relato» decía «Etapa 2» y describía la
+        oferta. Se compara con la etapa que la propia misión anuncia. */
+  const etapaHtml = (html.match(/Etapa (\d+) de \d+/) || [])[1];
+  const tarjeta = (js.match(/function compartirMision\(\)\{[^\n]*/) || [''])[0];
+  const etapaTarjeta = (tarjeta.match(/Etapa (\d+)\*/) || [])[1];
+  if (etapaHtml && etapaTarjeta && etapaHtml !== etapaTarjeta) {
+    falla(`se presenta como etapa ${etapaHtml} y la tarjeta de WhatsApp dice etapa ${etapaTarjeta}`);
+  }
+
+  /* 5. Norma 1-bis: ningún guion largo en lo que se publica. */
   const largos = (html.match(/—/g) || []).length + (js.match(/—/g) || []).length;
   if (largos) falla(`quedan ${largos} guiones largos (norma 1-bis)`);
 
-  /* 5. Las quince secciones, en la misión y en la barra de navegación. */
+  /* 6. Las quince secciones, en la misión y en la barra de navegación. */
   const secs = (html.match(/class="sec\b/g) || []).length;
   if (secs !== 15) {
     if (ANTES_DEL_MOLDE.has(m.nombre)) avisos.push(`${m.nombre}: ${secs} secciones (anterior al molde de 15)`);

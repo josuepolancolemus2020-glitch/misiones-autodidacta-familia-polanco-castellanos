@@ -57,6 +57,7 @@ const MISSIONS = [
   { id: 23, title: 'Llaves y secretos: claves, entornos y repositorios', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🗝️', ruta: 'casacerrada', etapa: 4, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-llaves/llaves.html' },
   { id: 24, title: 'La IA que programa: qué revisar antes de subir', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '⌨️', ruta: 'maquina', etapa: 4, sello: 'familiar', url: 'misiones/ruta-maquina-programa/programa.html' },
   { id: 25, title: 'Tácticas de presión y sus antídotos', modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 45, icon: '⏱️', ruta: 'persuasion', etapa: 4, sello: 'familiar', url: 'misiones/ruta-persuasion-presion/presion.html' },
+  { id: 26, title: 'Canales: dónde está la audiencia y qué se publica', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 45, icon: '📡', ruta: 'marca', etapa: 4, sello: 'familiar', url: 'misiones/ruta-marca-canales/canales.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -73,7 +74,6 @@ const ETAPAS_PREVISTAS = {
     6: 'Narrativa: contar el proyecto para que otros quieran entrar',
   },
   marca: {
-    4: 'Canales: dónde está la audiencia y qué se publica',
     5: 'Prueba y reputación: números reales y quien lo dice por ti',
     6: 'Crecer sin romper la promesa',
   },

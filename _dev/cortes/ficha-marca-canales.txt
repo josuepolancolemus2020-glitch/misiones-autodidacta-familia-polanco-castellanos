@@ -1,0 +1,19 @@
+# Cortes de fichas/ficha-marca-canales.html (norma 6: diez páginas)
+# Cada línea es un trozo literal del HTML que debe QUEDAR AL INICIO de una
+# página. La página 1 empieza sola, así que hacen falta nueve.
+#
+# La tabla de los ocho canales va partida en dos (canales-a y canales-b) para
+# que el reparto pueda cortar entre el cuarto y el quinto: 142 mm de una pieza
+# no dejaban repartir las diez hojas. Las clases extra están para poder anclar
+# aquí, porque el anclaje se busca con indexOf a partir del corte anterior.
+# Y ningún anclaje puede caer DENTRO de un <table>: retrocede() solo sabe
+# retroceder sobre <div>. Anclar en la etiqueta de apertura sí vale.
+<h2>🎩 Por qué esta etapa sigue al Relato</h2>
+<h2>🏠 Propio, prestado y alquilado</h2>
+<h2>✍️ Qué se publica: el reparto de tres</h2>
+<h2>📅 El ritmo real</h2>
+<h2>🌱 El primer canal, cuando no hay ninguno</h2>
+<table class="casos canales-b">
+<div class="caja ej2">
+<div class="caja ej7">
+<div class="pauta pa5">

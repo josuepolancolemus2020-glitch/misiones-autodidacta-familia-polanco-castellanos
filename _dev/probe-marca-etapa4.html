@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Marca, etapa 4</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-marca-canales/canales.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 4 de la Ruta de la Marca: bancos, laboratorio, pruebas
+   impresas con su nombre, las siete piezas del canal, los ocho canales que el
+   proyecto tiene delante, la ficha y la ruta con CUATRO etapas.
+
+   Se escribió mirando primero que fallara con la misión sin terminar: una
+   comprobación que nunca se ha visto en rojo no se sabe si funciona. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Marca · Etapa 4 de 6/.test(d.body.textContent), 'se presenta como etapa 4 de 6', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: no valen como marcador ni «relato» ni «inflarlo», que
+       aparecen a propósito porque lo que se publica en un canal es el relato y
+       esta etapa se apoya en la anterior. Lo que no puede quedar es su
+       aparato: el denominador, la comprobación delante de alguien y la cifra
+       sin fecha. */
+    ok(!/denominador|aguanta que lo comprueben|cifra sin fecha|con cifra, denominador y fecha/i.test(d.body.textContent),
+       'sin restos de la etapa de la que se copió', 'queda el temario de El relato');
+    ok(!/Simulacro de Presión: la interpelación/.test(d.body.textContent), 'sin el rótulo heredado de Poder Político', 'queda «Simulacro de Presión: la interpelación»');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('Object.keys(parteData).join(",")') === 'gente,ritmo,puerta,medida', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas de un canal', 'piezas: ' + dentro('timelineData.length'));
+    ok(/faro_mkt_canales/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    ok(dentro('labParte') === 'gente', 'el laboratorio arranca en su primera pieza', 'arranca en: ' + dentro('labParte'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LA POSTURA ANTE EL CANAL ──');
+    const texto = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/donde ya está tu gente|ya está tu gente/i.test(texto), 'trae la frase maestra', 'falta «donde ya está tu gente»');
+    ok(/doce meses/i.test(texto) && /campaña/i.test(texto), 'distingue un canal de una campaña', 'no distingue canal de campaña');
+    ok(/sin contestar/i.test(texto), 'trae la señal de alarma de la etapa', 'falta la señal de alarma');
+    ok(/alcanza/i.test(texto) && /retiene/i.test(texto), 'separa alcanzar de retener', 'no separa alcanzar de retener');
+    ok(/propio/i.test(texto) && /prestado/i.test(texto) && /alquilado/i.test(texto), 'nombra los tres tipos de canal', 'faltan los tipos de canal');
+    ok(/puerta/i.test(texto), 'trae la puerta', 'no aparece la puerta');
+    ok(/semana peor/i.test(texto), 'el ritmo se mide con la semana peor del año', 'no dice cómo se mide el ritmo');
+    ok(/enseñar/i.test(texto) && /mostrar/i.test(texto) && /pedir/i.test(texto), 'trae el reparto de lo que se publica', 'falta el reparto de tres');
+    ok(/seguidores/i.test(texto), 'avisa de las medidas que no dicen nada', 'no habla de las medidas vacías');
+    /* Esta etapa se apoya en las tres anteriores a propósito */
+    ok(/audiencia|para quién/i.test(texto), 'conecta con la etapa 1 (la audiencia)', 'no conecta con la etapa 1');
+    ok(/oferta|precio/i.test(texto), 'conecta con la etapa 2 (la oferta)', 'no conecta con la etapa 2');
+    ok(/relato/i.test(texto), 'conecta con la etapa 3 (el relato)', 'no conecta con la etapa 3');
+
+    log('\n── LAS SIETE PIEZAS ESTÁN NOMBRADAS ──');
+    ['la gente', 'la promesa', 'el ritmo', 'el formato', 'la puerta', 'la medida', 'el cierre']
+      .forEach(k => { if (!new RegExp(k, 'i').test(texto)) { fallos++; log('  ✘ falta la pieza: ' + k); } });
+    ok(/veintitrés|23 maestras/i.test(texto), 'el canal que ya existe está contado con su número', 'no dice cuántas maestras hay en el grupo');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/La gente/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en «La gente»', 'abre en otra pieza');
+    ok(!!d.querySelector('.lab-cont-btn.active-pri'), 'y con su botón resaltado', 'ningún botón del laboratorio queda resaltado');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'la prueba «El canal que se sostiene» se genera', 'prueba competencial vacía');
+    const rotulos = d.getElementById('eval-screen-title').textContent + d.getElementById('evalcrit-screen-title').textContent +
+                    d.getElementById('evalOut').textContent + crit + d.querySelectorAll('.eval-print-header')[0].textContent;
+    ok(!/Las seis palancas|Panorama|La puerta de la casa digital|Los datos de los demás|Quién decide de verdad|Para quién y qué le cambia|El presupuesto real|La deuda por dentro|Pedir bien|Verificar|La IA que programa|La cuenta sobre la mesa|La sala de espejos|la interpelación|Autocapacitación Técnica|El relato|Etapa 3|Etapa 2/.test(rotulos),
+       'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+    ok(!/denominador|inflad/i.test(crit), 'las preguntas III y IV son las de esta etapa', 'quedan preguntas de la etapa 3');
+    ok(/El canal sobre la mesa/.test(crit), 'la sección I lleva el nombre de esta etapa', 'la sección I no se llama «El canal sobre la mesa»');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['WhatsApp', 'fotocopia', 'heredada', 'correo mensual', 'videos', 'charla', 'pagada', 'colegas']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      /* No puede repetir los casos de las etapas 1, 2 y 3 de esta misma ruta */
+      ok(!/por qué cobras|el logo antes que|precio por hora|premio nacional/i.test(txt), 'no repite casos de las etapas anteriores', 'repite un caso de otra etapa de la ruta');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+      ok(/cinco reglas de los canales/i.test(txt), 'trae las cinco reglas', 'faltan las cinco reglas');
+      ok(/hoja del canal/i.test(txt), 'trae la hoja del canal', 'falta la hoja del canal');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/grupo|página|correos|videos|charla|pagada|colegas|hoja/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-marca-canales.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/La hoja del canal/i.test(txt), 'la ficha trae la hoja del canal', 'falta la hoja del canal');
+    ok(/Las siete piezas de un canal/i.test(txt), 'la ficha trae las siete piezas', 'faltan las siete piezas');
+    ok(/Cómo se aprovecha una charla/i.test(txt), 'la ficha trae el guion de la charla', 'falta el guion de la charla');
+    ok(/El primer canal, cuando no hay ninguno/i.test(txt), 'la ficha dice por dónde empezar', 'falta el primer canal');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(!/—/.test(txt), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok((txt.match(/<table/g) || []).length === (txt.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar: un corte partió una tabla');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-marca-canales"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const rm = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Marca/.test(c.textContent));
+    ok(!!rm, 'la Ruta de la Marca está en el mapa', 'no aparece la ruta');
+    if (rm) {
+      /* La cuenta exacta de etapas tocables la lleva _dev/probe-rutas.html, que
+         se actualiza cada vez que se añade una misión. Aquí solo se comprueba
+         que esta etapa llegó al mapa y que las seis siguen listadas. */
+      ok(rm.querySelectorAll('.re-link').length >= 4, 'con sus etapas 1 a 4 ya tocables', 'la etapa 4 no es tocable');
+      ok(rm.querySelectorAll('.re-link').length + rm.querySelectorAll('.ruta-etapa-futura').length === 6, 'las 6 etapas de la ruta están en el mapa', 'etapas en el mapa: ' + (rm.querySelectorAll('.re-link').length + rm.querySelectorAll('.ruta-etapa-futura').length));
+      ok(/Canales/.test(rm.textContent), 'la etapa 4 sale con el título de la misión', 'la etapa 4 sigue saliendo como prevista');
+      ok(/Prueba y reputación/i.test(rm.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="mkt"]');
+    ok(!!chip, 'la materia Marketing y Marca tiene su chip', 'no hay chip de Marketing y Marca');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length >= 4, 'la materia muestra sus misiones', 'muestra ' + tarjetas.length);
+      const cn = tarjetas.find(t => /Canales/i.test(t.textContent));
+      ok(!!cn && /🔒/.test(cn.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

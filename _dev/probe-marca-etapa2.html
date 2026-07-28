@@ -124,8 +124,13 @@ window.addEventListener('load', async () => {
     const marca = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Marca/.test(c.textContent));
     ok(!!marca, 'la Ruta de la Marca está en el mapa', 'no aparece la ruta');
     if (marca) {
-      ok(marca.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + marca.querySelectorAll('.re-link').length);
-      ok(marca.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + marca.querySelectorAll('.ruta-etapa-futura').length);
+      /* La cuenta exacta de etapas tocables la lleva _dev/probe-rutas.html, que
+         se actualiza cada vez que se añade una misión. Aquí solo se comprueba
+         que esta etapa llegó al mapa y que las seis siguen listadas: si esta
+         sonda contara el total, se pondría en rojo cada vez que crece la ruta
+         sin que nada de esta etapa se hubiera roto. */
+      ok(marca.querySelectorAll('.re-link').length >= 2, 'con sus etapas 1 y 2 ya tocables', 'la etapa 2 no es tocable');
+      ok(marca.querySelectorAll('.re-link').length + marca.querySelectorAll('.ruta-etapa-futura').length === 6, 'las 6 etapas de la ruta están en el mapa', 'etapas en el mapa: ' + (marca.querySelectorAll('.re-link').length + marca.querySelectorAll('.ruta-etapa-futura').length));
       ok(/La oferta: qué se entrega y a qué precio/.test(marca.textContent), 'la etapa 2 sale con el título de la misión', 'la etapa 2 sigue saliendo como prevista');
       ok(/El relato: contar el proyecto sin inflarlo/i.test(marca.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -135,7 +140,7 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length >= 2, 'la materia muestra sus misiones', 'muestra ' + tarjetas.length);
       const of = tarjetas.find(t => /qué se entrega y a qué precio/i.test(t.textContent));
       ok(!!of && /🔒/.test(of.textContent), 'la misión de la oferta lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
