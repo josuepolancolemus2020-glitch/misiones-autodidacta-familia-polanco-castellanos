@@ -20,26 +20,31 @@ pierde por el camino.
 | `familia_miembros` creada y sembrada con los cuatro | ✅ hecho (paso 1 del SQL) |
 | La pantalla de entrada nueva, publicada en `main` | ✅ hecho |
 | Que los cuatro entren de verdad, cada uno en su aparato | ✅ hecho, los cuatro |
-| **Cerrar los datos (paso 2 del SQL)** | ✅ aplicado · ⏳ falta la prueba del extraño |
+| **Cerrar los datos (paso 2 del SQL)** | ✅ **hecho y comprobado de las dos maneras** |
 | La clave de servicio en la función de notificaciones | ⚠️ **urgente**: los avisos están rotos |
 | Apagar el alta pública de cuentas | ⛔ pendiente |
 | Compilar y repartir el APK | ⛔ pendiente |
 | Apagar Pages y poner el repositorio en privado | ⛔ pendiente |
 
-**Lo que esto significa hoy:** se aplicó el paso 2 y **la mitad está
-comprobada**: los cuatro siguen viendo todo lo suyo, o sea que las políticas
-reconocen a la familia y no se perdió ningún dato.
+**Lo que esto significa hoy:** los datos de la familia están cerrados, y esta
+vez comprobado de las dos maneras, que son distintas y hacen falta las dos:
 
-Falta la otra mitad, que es la que de verdad dice si la casa cerró: **que un
-extraño no vea nada**. Y hay que hacerla bien, porque es fácil hacerla mal:
-abrir la aplicación en incógnito e INICIAR SESIÓN no prueba nada, porque
-entonces se entra como familia. La prueba es pedirle los datos al servidor
-directamente, con la clave pública y sin sesión ninguna:
+1. **Que la familia no perdiera nada.** Los cuatro entraron y siguen viendo sus
+   destellos, su inventario, su chat y sus finanzas.
+2. **Que un extraño no vea nada.** Pedirle los datos al servidor directamente,
+   con la clave pública y sin sesión, devuelve `[]`. Esa misma petición, hasta
+   el 28 de julio de 2026, devolvía todo.
+
+La segunda es la que cuenta, y es fácil hacerla mal: abrir la aplicación en
+incógnito **e iniciar sesión** no prueba nada, porque entonces se entra como
+familia. Se probó así primero y se dio por buena por error. La prueba es la
+petición cruda:
 
     https://<proyecto>.supabase.co/rest/v1/destellos?select=*&apikey=<clave>
 
-Pegado en la barra de direcciones de una ventana de incógnito. Si devuelve `[]`,
-la casa cerró. Si devuelve las ideas de la familia, no.
+Se comprobó sobre `destellos`. Las otras ocho tablas de acceso común recibieron
+la política idéntica en la misma transacción, así que están igual, pero repetir
+la prueba cambiando el nombre de la tabla cuesta diez segundos y no sobra.
 
 **Lo que sigue abierto, y no hay que confundirlo:**
 
