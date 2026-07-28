@@ -59,6 +59,7 @@ const MISSIONS = [
   { id: 25, title: 'Tácticas de presión y sus antídotos', modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 45, icon: '⏱️', ruta: 'persuasion', etapa: 4, sello: 'familiar', url: 'misiones/ruta-persuasion-presion/presion.html' },
   { id: 26, title: 'Canales: dónde está la audiencia y qué se publica', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 45, icon: '📡', ruta: 'marca', etapa: 4, sello: 'familiar', url: 'misiones/ruta-marca-canales/canales.html' },
   { id: 27, title: 'Del salario al activo: ingresos que no dependen de tus horas', modulo: 'aprendizaje-unido', materia: 'eco', color: 'apr', xp: 45, icon: '🌱', ruta: 'poder', etapa: 4, sello: 'familiar', url: 'misiones/ruta-poder-activo/activo.html' },
+  { id: 28, title: 'Alianzas, patronato y comunidad', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '🫂', ruta: 'politico', etapa: 4, sello: 'familiar', url: 'misiones/ruta-politica-alianzas/alianzas.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -79,7 +80,6 @@ const ETAPAS_PREVISTAS = {
     6: 'Crecer sin romper la promesa',
   },
   politico: {
-    4: 'Alianzas, patronato y comunidad',
     5: 'El dinero público: presupuesto, compras y constancias',
     6: 'Reputación y riesgo político: no quedar amarrado a nadie',
   },

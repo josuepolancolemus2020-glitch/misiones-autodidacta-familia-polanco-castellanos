@@ -105,8 +105,13 @@ window.addEventListener('load', async () => {
     const casa = cards.find(c => /Ruta del Poder Político/.test(c.textContent));
     ok(!!casa, 'la Ruta del Poder Político está en el mapa', 'no aparece la ruta');
     if (casa) {
-      ok(casa.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + casa.querySelectorAll('.re-link').length);
-      ok(casa.querySelectorAll('.ruta-etapa-futura').length === 5, 'y 5 etapas por construir con nombre', 'futuras: ' + casa.querySelectorAll('.ruta-etapa-futura').length);
+      /* La cuenta exacta de etapas tocables la lleva _dev/probe-rutas.html, que
+         se actualiza cada vez que se añade una misión. Aquí solo se comprueba
+         que esta etapa llegó al mapa y que las seis siguen listadas: si esta
+         sonda contara el total, se pondría en rojo cada vez que crece la ruta
+         sin que nada de esta etapa se hubiera roto. */
+      ok(casa.querySelectorAll('.re-link').length >= 1, 'con su etapa 1 ya tocable', 'la etapa 1 no es tocable');
+      ok(casa.querySelectorAll('.re-link').length + casa.querySelectorAll('.ruta-etapa-futura').length === 6, 'las 6 etapas de la ruta están en el mapa', 'etapas en el mapa: ' + (casa.querySelectorAll('.re-link').length + casa.querySelectorAll('.ruta-etapa-futura').length));
       ok(/Normas y trámites/i.test(casa.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
     wa.switchView('view-misiones'); await esperar(200);
@@ -115,8 +120,9 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = da.querySelectorAll('#missions-container .mission-card');
-      ok(tarjetas.length === 1, 'la materia muestra su misión', 'muestra ' + tarjetas.length);
-      ok(tarjetas.length === 1 && /🔒/.test(tarjetas[0].textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
+      const mp = [...tarjetas].find(t => /Quién decide de verdad/i.test(t.textContent));
+      ok(!!mp, 'la materia muestra esta misión', 'la misión no aparece entre las ' + tarjetas.length + ' de la materia');
+      ok(!!mp && /🔒/.test(mp.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));

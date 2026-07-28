@@ -1,0 +1,18 @@
+# Cortes de fichas/ficha-politica-alianzas.html (norma 6: diez páginas)
+# Cada línea es un trozo literal del HTML que debe QUEDAR AL INICIO de una
+# página. La página 1 empieza sola, así que hacen falta nueve.
+#
+# Las tablas llevan una segunda clase (preguntas, patronato, acta, comunidad,
+# relevo, electoral, perder, primera, nogracias, alianzas-a, alianzas-b)
+# porque el anclaje se busca con indexOf a partir del corte anterior y un
+# «<table class="tres">» a secas aparece diez veces. Y ningún anclaje puede
+# caer DENTRO de un <table>: retrocede() solo sabe retroceder sobre <div>.
+<h2>🎩 Por qué esta etapa sigue a La mesa</h2>
+<h2>🎭 Los cuatro tipos de aliado, y el que no lo es</h2>
+<h2>📖 La regla del acta</h2>
+<table class="tres relevo">
+<h2>📝 La hoja de la alianza</h2>
+<table class="casos alianzas-b">
+<div class="caja ej2">
+<div class="caja ej7">
+<div class="pauta pa5">
