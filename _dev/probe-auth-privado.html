@@ -120,7 +120,15 @@ window.addEventListener('load', async () => {
     }
 
     log('\n── LO QUE EL SQL TIENE QUE EXIGIR ──');
-    const sql = await (await fetch('/supabase/sql/seguridad_familia.sql')).text();
+    /* Dos archivos y en este orden a proposito: el 1 crea la puerta y no cambia
+       nada de lo que ya funciona; el 2 cierra los datos y si se corre antes de
+       tiempo deja a la familia sin leer ni escribir. La sonda los mira juntos. */
+    const sql1 = await (await fetch('/supabase/sql/seguridad_familia_1_puerta.sql')).text();
+    const sql2 = await (await fetch('/supabase/sql/seguridad_familia_2_datos.sql')).text();
+    const sql = sql1 + '\n' + sql2;
+    ok(/PASO 1 de 2/.test(sql1) && /PASO 2 de 2/.test(sql2), 'el SQL va en dos pasos numerados', 'los dos pasos no se distinguen');
+    ok(!/create table if not exists public\.familia_miembros/.test(sql2), 'el paso 2 no rehace la puerta', 'el paso 2 duplica la tabla');
+    ok(/NO SE EJECUTA hasta que/.test(sql2), 'el paso 2 avisa de sus condiciones', 'el paso 2 no avisa de cuando se puede correr');
     /* Igual que arriba: fuera los comentarios, que aquí explican justamente el
        «using (true)» que no debe quedar en el código. */
     const sqlCodigo = sql.split('\n').filter(l => !/^\s*--/.test(l)).join('\n');
