@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Ruta de la Casa Cerrada · Etapa 4: Llaves y secretos</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #713f12; --pri-suave: #fffbeb; --sec: #1e3a8a; --sec-suave: #eff6ff; }
+  .guion li { margin: 5px 0; }
+  .mini { font-size: 12px; color: var(--gris); }
+  table.tres th:nth-child(1) { width: 24%; }
+  table.llaves { font-size: 11.5px; }
+  table.llaves th:nth-child(1) { width: 22%; }
+  table.llaves th:nth-child(2) { width: 40%; }
+  table.audit td:nth-child(1) { width: 5%; text-align: center; }
+  table.inv { font-size: 11.5px; }
+  table.inv td { height: 20px; }
+  table.inv th:nth-child(1) { width: 22%; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/ruta-casa-cerrada-llaves/llaves.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · Llaves y secretos</div>
+    <div class="f-meta"><b>Ruta:</b> 🔐 Ruta de la Casa Cerrada · Etapa 4 de 6 · <b>Materia:</b> Ciberseguridad</div>
+    <div class="f-meta"><b>Tema:</b> qué es un secreto de verdad, el alcance de cada llave, dónde debe vivir, por qué el historial no olvida, cómo se rota y quién la custodia.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Distinguir un <b>secreto</b> de algo que solo está escondido, y saber por qué hay claves a la vista que no son un descuido.</li>
+    <li>Medir el <b>alcance</b> de una llave: qué puede hacer quien la tenga, en la peor lectura posible.</li>
+    <li>Saber <b>dónde vive</b> cada tipo de llave, y por qué el repositorio nunca es el sitio.</li>
+    <li><b>Rotar</b> en vez de borrar, el mismo día, y saber qué llave de esta casa no se puede rotar.</li>
+    <li>Llenar el <b>inventario de llaves</b> con custodio y suplente, sin escribir ninguna clave dentro.</li>
+  </ol>
+
+  <h2>🧭 De dónde viene esta etapa</h2>
+  <p>La etapa 1 puso la puerta y explicó las políticas de seguridad por fila. La 2 ordenó los datos de los demás. La 3 enseñó a desconfiar de lo que llega de fuera. Esta trata de <b>las llaves</b>, y hace falta después de las tres: sin entender qué protege una política, no se puede juzgar si una clave a la vista es un descuido o una decisión.</p>
+
+  <h2>🗝️ La frase maestra</h2>
+  <div class="caja">
+    <p><b>Una llave no se juzga por si está a la vista, sino por lo que puede abrir.</b> Un secreto no es lo que está escondido: es lo que da un poder que no corresponde a quien lo encuentre.</p>
+  </div>
+
+  <h2>🚨 La señal de alarma de esta etapa</h2>
+  <div class="caja caja-amb">
+    <p><b>La frase «lo pongo aquí un momento para probar».</b> Ese momento es exactamente cuando se filtran casi todas las claves del mundo.</p>
+    <p class="mini">El archivo se guarda, se sube con el resto y nadie vuelve a mirarlo. No hay un ataque: hay una prisa de un martes.</p>
+  </div>
+
+  <h2>❓ Las tres preguntas, antes de escribir una clave en cualquier sitio</h2>
+  <ol>
+    <li><b>¿Esto es un secreto?</b> Es decir: ¿qué haría alguien que lo encuentre?</li>
+    <li><b>¿Este sitio se sube</b> al repositorio, o se comparte con alguien?</li>
+    <li><b>¿Qué pasa si se filtra?</b> ¿Se puede rotar, y cuánto cuesta hacerlo?</li>
+  </ol>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 1 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>👑 Las dos llaves del mismo servicio</h2>
+  <p>Es la distinción que ordena toda la etapa, y está en el proyecto ahora mismo:</p>
+  <table class="tres">
+    <tr><th>&nbsp;</th><th>La clave anónima</th><th>La clave de servicio</th></tr>
+    <tr><td>Dónde está</td><td>En el código: <code>js/auth.js</code> y <code>js/chat.js</code></td><td>En las variables del servicio, en ningún archivo</td></tr>
+    <tr><td>Quién la ve</td><td>Cualquiera con un teléfono</td><td>Solo las funciones de borde</td></tr>
+    <tr><td>Qué puede hacer</td><td>Nada sola: la frenan las políticas por fila</td><td>Leer y escribir cualquier fila de cualquier familia</td></tr>
+    <tr><td>¿Es un secreto?</td><td>No, y está bien así</td><td>Sí, el más grande del proyecto</td></tr>
+  </table>
+  <div class="caja">
+    <p><b>El corolario incómodo:</b> la clave anónima es pública <b>porque</b> las políticas de seguridad por fila están puestas. Si esas políticas estuvieran mal escritas, esta misma clave a la vista abriría la casa entera. Lo que protege no es la clave: es lo que se estudió en la etapa 1.</p>
+  </div>
+
+  <h2>👀 Qué NO es un secreto, y por qué conviene saberlo</h2>
+  <p>Tratar como secreto lo que no lo es tiene un costo: se esconde el trabajo, no se puede pedir ayuda y al final nadie sabe qué proteger de verdad. Estas cosas del proyecto <b>se pueden enseñar sin miedo</b>:</p>
+  <ul>
+    <li><b>El código entero</b>, incluida la clave anónima. Quien lo lea aprende cómo está hecho, y eso no abre nada.</li>
+    <li><b>Las políticas de seguridad en SQL.</b> Enseñarlas es como enseñar la cerradura: no da la llave, y además permite que alguien encuentre un fallo.</li>
+    <li><b>La estructura de las tablas</b> y los nombres de las variables de entorno. El nombre no es el valor.</li>
+    <li><b>El dominio y las direcciones</b> de los servicios: están en la barra del navegador de todas formas.</li>
+  </ul>
+  <p class="mini">Y al revés: si algo se esconde y nadie sabe decir qué poder daría encontrarlo, no es un secreto.</p>
+
+  <h2>🧩 Las siete piezas de un secreto</h2>
+  <table>
+    <tr><th>Pieza</th><th>Qué es</th><th>Dónde se pierde</th></tr>
+    <tr><td><b>1. El secreto</b></td><td>Lo que da un poder que no corresponde</td><td>Al confundirlo con lo que está escondido</td></tr>
+    <tr><td><b>2. El alcance</b></td><td>Qué puede hacer quien la tenga</td><td>Al pedir más permisos «por si acaso»</td></tr>
+    <tr><td><b>3. El entorno</b></td><td>Las variables del servicio: donde vive</td><td>En el archivo de prueba de un martes</td></tr>
+    <tr><td><b>4. El historial</b></td><td>La memoria del repositorio</td><td>Al creer que borrar una línea borra el pasado</td></tr>
+    <tr><td><b>5. La rotación</b></td><td>Cambiarla para que la vieja no abra</td><td>Al dejarlo para el fin de semana</td></tr>
+    <tr><td><b>6. El custodio</b></td><td>Quién la tiene, y quién más la alcanza</td><td>Al guardarla «por seguridad» sin decírselo a nadie</td></tr>
+    <tr><td><b>7. La salida</b></td><td>Qué se hace el día que se escapa</td><td>Al callarlo por vergüenza</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h2>🏠 Dónde vive un secreto</h2>
+  <p>Un secreto no se guarda «en un lugar seguro»: se guarda en un sitio que <b>no se sube y no se comparte</b>. Los cuatro posibles, del peor al bueno:</p>
+  <table class="tres">
+    <tr><th>Dónde</th><th>Qué pasa</th><th>¿Vale?</th></tr>
+    <tr><td>En el código</td><td>Se sube con el primer empujón y queda en el historial para siempre</td><td>Nunca</td></tr>
+    <tr><td>En un archivo aparte</td><td>Sirve solo si está en el <code>.gitignore</code>, y una línea de más lo sube</td><td>Con cuidado</td></tr>
+    <tr><td>En el gestor de claves</td><td>Bien para contraseñas de personas, no para llaves de servicios</td><td>Según</td></tr>
+    <tr><td>En las variables del servicio</td><td>No pasa por el repositorio ni por el navegador</td><td>Sí</td></tr>
+  </table>
+  <p class="mini">En este proyecto el <code>.gitignore</code> tiene <b>una sola línea</b>. Hoy no es un fallo, porque no hay archivos de claves. Es una decisión que hay que revisar <b>el día que aparezca el primero</b>, no después.</p>
+
+  <h2>🔍 El glosario de los paneles</h2>
+  <p class="mini">Los servicios no usan las palabras de esta ficha. Estas son las que vas a ver:</p>
+  <table>
+    <tr><th>Como lo llaman</th><th>Qué es de verdad</th></tr>
+    <tr><td>anon key, public key</td><td>La clave anónima: viaja al navegador y está hecha para verse</td></tr>
+    <tr><td>service role, secret key</td><td>La clave de servicio: salta todas las políticas. Nunca al cliente</td></tr>
+    <tr><td>secrets, environment variables</td><td>Las variables del servicio: el sitio donde vive un secreto</td></tr>
+    <tr><td>scope, permisos</td><td>El alcance: qué puede hacer quien la tenga. Se pide el mínimo</td></tr>
+    <tr><td>revoke, revocar</td><td>Rotar un token: dejarlo sin valor desde el servicio</td></tr>
+    <tr><td>personal access token</td><td>Una llave con tu nombre: si se filtra, el daño va a tu cuenta</td></tr>
+    <tr><td>keystore</td><td>El archivo con la firma del APK. Es el que no se puede rotar</td></tr>
+    <tr><td>rotate, regenerate</td><td>El botón que de verdad cierra la puerta</td></tr>
+  </table>
+
+  <h2>📜 El repositorio recuerda</h2>
+  <div class="caja">
+    <p><b>Borrar no borra.</b> Quitar la clave del archivo y volver a subir deja el archivo limpio y el historial intacto. Cualquiera con una copia ve la versión anterior, y hay copias en cada aparato clonado, en el servicio y en los respaldos.</p>
+    <p><b>Rotar sí cierra.</b> Rotar es cambiar la clave en el servicio para que la vieja deje de servir. Es lo único que cierra de verdad, y funciona aunque la clave ya esté copiada en cien sitios: deja de abrir.</p>
+  </div>
+  <div class="caja caja-amb">
+    <p><b>Un secreto que se subió una vez ya no es un secreto, aunque lo borres.</b> Se rota, no se borra, y se rota el mismo día.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 3 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <h2>🔄 El procedimiento de rotación, paso a paso</h2>
+  <p>Se hace en este orden y no en otro. Lo primero no es investigar: es cerrar.</p>
+  <ol class="guion">
+    <li><b>Rotar la clave en el servicio.</b> Hoy, ahora, antes de averiguar nada. Cuesta cinco minutos.</li>
+    <li><b>Comprobar que la aplicación sigue viva</b> con la clave nueva: entrar, guardar algo, ver que sincroniza.</li>
+    <li><b>Mirar los registros</b> del servicio: si alguien usó la vieja, desde dónde y cuándo.</li>
+    <li><b>Quitar la clave del archivo</b> y añadir ese archivo al <code>.gitignore</code>, para que no vuelva.</li>
+    <li><b>Anotar en el inventario</b> la fecha, qué pasó y qué se cambió.</li>
+    <li><b>Contarlo en casa.</b> Una filtración callada se repite, porque nadie aprendió nada de ella.</li>
+  </ol>
+  <div class="caja caja-amb">
+    <p><b>La regla de la duda:</b> si no se sabe si alguien la vio, <b>se rota igual</b>. Rotar cuesta cinco minutos; no rotar puede costar el proyecto. La duda no es un motivo para esperar, es un motivo para actuar.</p>
+  </div>
+
+  <h2>🚪 Privado no es cerrado</h2>
+  <p>F.A.R.O vive en un repositorio privado y ahí está el material de la casa. Pero <b>privado significa «no lo ve cualquiera», no significa cifrado</b>. Lo ve quien tenga acceso, quien tenga un token robado de alguna de esas cuentas, y todo el mundo el día que alguien cambie la visibilidad con dos clics.</p>
+  <div class="caja">
+    <p><b>La regla se sostiene igual de estricta:</b> dentro de un repositorio, aunque sea privado, no van secretos. Lo privado sirve para proteger <b>el contenido</b> de la casa, no <b>las llaves</b> de la casa.</p>
+  </div>
+
+  <h2>👥 Las llaves de personas son otra cosa</h2>
+  <p>Hasta aquí se habló de llaves de servicios. Las de personas (las cuentas con las que se entra a los paneles) se cuidan distinto, y son las que de verdad abren todo lo demás:</p>
+  <table class="tres">
+    <tr><th>Qué</th><th>Regla de la casa</th></tr>
+    <tr><td>La contraseña</td><td>Distinta en cada servicio, guardada en el gestor, nunca en un chat ni en un papel en el escritorio</td></tr>
+    <tr><td>El segundo factor</td><td>Activado en la cuenta del correo, la del repositorio y la del servicio. Sin él, la contraseña es media llave</td></tr>
+    <tr><td>Los códigos de recuperación</td><td>Impresos y guardados aparte. Son la llave de la llave, y se pierden en el momento peor</td></tr>
+    <tr><td>El correo de la cuenta</td><td>Es la llave maestra: quien entra al correo recupera todo lo demás. Se protege primero que nada</td></tr>
+    <tr><td>Quién tiene acceso</td><td>Se revisa la lista cada cierto tiempo. Un acceso no caduca solo cuando alguien deja de colaborar</td></tr>
+  </table>
+  <p class="mini">El orden real de importancia: el correo primero, después el segundo factor, y solo entonces las claves de los servicios.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <h2>🗝️ Las ocho llaves de esta casa</h2>
+  <p class="mini">Las seis primeras están en el repositorio ahora mismo y se pueden abrir y mirar. Ninguna fila trae una clave escrita, ni la traerá: se nombra qué llave es, qué abre y dónde vive.</p>
+  <table class="llaves">
+    <tr><th>La llave</th><th>Qué pasa con ella</th><th>Lo que enseña</th></tr>
+    <tr><td><b>1 ·</b> La clave anónima, a la vista en el código</td><td>Está en <code>js/auth.js</code> y <code>js/chat.js</code>, se descarga con la aplicación y no es un descuido: la frenan las políticas por fila</td><td>«Hay una clave en el código» no es un diagnóstico. La pregunta es qué puede hacer esa clave</td></tr>
+    <tr><td><b>2 ·</b> La clave de servicio</td><td>La usan las seis funciones de borde. Salta todas las políticas: lee y escribe cualquier fila de cualquier familia</td><td>El mismo servicio da dos llaves con poderes opuestos. El nombre importa más que el servicio</td></tr>
+    <tr><td><b>3 ·</b> Los tokens de la Antena</td><td>Publican en redes en nombre del proyecto. No abren datos: abren voz</td><td>Hay llaves que abren identidad, y su daño se mide en confianza, no en datos</td></tr>
+    <tr><td><b>4 ·</b> El repositorio privado</td><td>Protege del paseante, no del descuido: un acceso, un token robado o un cambio de visibilidad lo abren</td><td>Privado no es cifrado. Sirve para el contenido, no para las llaves</td></tr>
+  </table>
+  <table class="llaves">
+    <tr><th>La llave</th><th>Qué pasa con ella</th><th>Lo que enseña</th></tr>
+    <tr><td><b>5 ·</b> El historial y el <code>.gitignore</code></td><td>El <code>.gitignore</code> tiene una línea. Hoy sobra; el día del primer archivo de claves, ya no</td><td>Se escribe antes, no después. Y lo subido se rota, no se borra</td></tr>
+    <tr><td><b>6 ·</b> La firma del APK</td><td>La aplicación va a los cuatro teléfonos firmada. Si se pierde no hay actualización posible; si se filtra, otros firman como tú</td><td>Casi todo se rota; esta no. Copia aparte y prueba anual</td></tr>
+    <tr><td><b>7 ·</b> La captura de pantalla del martes</td><td>Se pide ayuda por chat con una imagen del panel y en la esquina se ve un token entero</td><td>Los secretos se escapan por donde no se vigila. Mirar la captura antes de mandarla</td></tr>
+    <tr><td><b>8 ·</b> La llave que solo sabe una persona</td><td>Dominio, servicio y tienda a nombre de uno solo, y nadie más sabe dónde están las claves</td><td>Sin suplente no es seguridad: es un punto único de fallo con otro nombre</td></tr>
+  </table>
+
+<h2>📋 El inventario de llaves, para llenar a lápiz</h2>
+  <p>Seis columnas, y <b>ninguna es la clave</b>. Lo que se apunta es dónde está y cómo se recupera, nunca el secreto.</p>
+  <table class="inv">
+    <tr><th>Nombre de la llave</th><th>Qué abre</th><th>Dónde vive</th><th>Custodio</th><th>Suplente</th><th>¿Rota?</th></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <p class="mini"><b>Última revisión del inventario:</b> ______________ · <b>Quién la hizo:</b> ______________</p>
+  <div class="caja caja-amb">
+    <p>La columna que caduca antes no es ninguna de las seis: es <b>la fecha de revisión</b>. Un inventario de hace dos años dice quién custodiaba una llave que ya se rotó tres veces, y eso es peor que no tener inventario, porque da confianza falsa.</p>
+  </div>
+  <p class="mini">Lleno va a la Bóveda de F.A.R.O: no se manda por chat ni se sube al repositorio.</p>
+
+  <h2>📆 La revisión de cada tres meses</h2>
+  <p>El inventario no se llena una vez: se revisa. Son quince minutos cada tres meses y esto es lo que se mira:</p>
+  <table class="audit">
+    <tr><th>#</th><th>Qué se comprueba</th><th>Fecha</th><th>¿Bien?</th></tr>
+    <tr><td>1</td><td>¿Sigue siendo cierto quién custodia cada llave?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>2</td><td>¿Hay accesos de gente que ya no colabora?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>3</td><td>¿Hay tokens de redes que ya no se usan? Se revocan</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>4</td><td>¿El repositorio sigue siendo privado?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>5</td><td>¿La copia de la firma del APK sigue sirviendo?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>6</td><td>¿Apareció algún archivo de claves sin estar en el <code>.gitignore</code>?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+  </table>
+  <p class="mini">La 5 es la que más se salta y la única que no tiene arreglo si falla. Probar la copia significa usarla de verdad una vez, no mirar que el archivo esté ahí.</p>
+
+<h2>🔬 Un inventario de verdad, ya lleno</h2>
+  <p class="mini">Así se ve el de este proyecto. Fíjate en que se entiende todo sin que aparezca ni una clave.</p>
+  <table class="llaves">
+    <tr><th>Nombre</th><th>Qué abre y dónde vive</th><th>Custodio · ¿Rota?</th></tr>
+    <tr><td>Clave anónima</td><td>Deja que el navegador hable con la nube. Vive en el código, a la vista, y no es secreta</td><td>Nadie en concreto · Sí</td></tr>
+    <tr><td>Clave de servicio</td><td>Todas las filas de todas las familias. Vive en las variables del servicio</td><td>Josué · suplente Evelyn · Sí</td></tr>
+    <tr><td>Tokens de la Antena</td><td>Publican en las redes del proyecto. Viven en la tabla de la Antena, en la nube</td><td>Josué · suplente Evelyn · Sí</td></tr>
+    <tr><td>Cuenta del dominio</td><td>El nombre del sitio y su renovación. Vive en el gestor de claves</td><td>Josué · suplente Evelyn · Sí</td></tr>
+    <tr><td>Firma del APK</td><td>Publica actualizaciones de la aplicación. Vive fuera del repositorio, con copia aparte</td><td>Josué · suplente Evelyn · <b>NO</b></td></tr>
+  </table>
+
+  <h2>⚠️ La llave que no se puede rotar, y qué se hace con ella</h2>
+  <p>Casi todas las llaves se arreglan rotando. La firma del APK, no: si se pierde, <b>no hay forma de publicar una actualización de esa misma aplicación</b> y hay que empezar otra y reinstalar en los cuatro teléfonos. Si se filtra, cualquiera firma algo que el teléfono acepta como si fuera tuyo.</p>
+  <p>Por eso cambia de categoría entera y lleva tres cuidados que las demás no necesitan:</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <ol class="cuidados">
+    <li><b>Copia en otro sitio físico</b>, no en la misma computadora ni en la misma nube.</li>
+    <li><b>Anotada en el testamento técnico</b>, con dónde está la copia y cómo se llega a ella.</li>
+    <li><b>Una prueba al año</b> de que la copia sirve de verdad. Una copia que nadie ha probado es una copia que se supone.</li>
+  </ol>
+
+  <h2>🔌 Al conectar un servicio nuevo</h2>
+  <p>El momento de decidir bien es el primero, porque después las llaves se multiplican solas. Seis pasos, en orden:</p>
+  <ol class="guion">
+    <li><b>Pedir el alcance mínimo.</b> Si pide permiso para publicar y solo hace falta leer, se pide leer.</li>
+    <li><b>Preguntar si esa llave se puede rotar.</b> Si no, entra desde hoy en la categoría de la firma del APK.</li>
+    <li><b>Ponerla en las variables del servicio</b> antes de escribir una sola línea de código que la use.</li>
+    <li><b>Apuntarla en el inventario</b> el mismo día, con custodio y suplente. Mañana ya no se acuerda nadie.</li>
+    <li><b>Probar que funciona</b> y borrar cualquier archivo temporal que se haya creado para probar.</li>
+    <li><b>Anotar cómo se revoca</b>, con el enlace del panel. El día que haga falta, será con prisa.</li>
+  </ol>
+  <p class="mini">El que más se salta es el cuarto. Una llave que se creó y no se apuntó no la va a rotar nadie, porque nadie sabe que existe.</p>
+
+<h2>📸 Por dónde se escapan de verdad</h2>
+  <p>Casi nunca por un ataque. Estas son las vías reales, ordenadas por lo común que son:</p>
+  <table class="tres">
+    <tr><th>La vía</th><th>Cómo pasa</th><th>La costumbre que lo evita</th></tr>
+    <tr><td>La captura</td><td>Se manda una imagen del panel para pedir ayuda y hay un token en la esquina</td><td>Mirar la captura antes de mandarla, y recortar si hay duda</td></tr>
+    <tr><td>El archivo de prueba</td><td>«Lo pongo aquí un momento» y acaba subido con el resto</td><td>La clave va al entorno desde el primer intento, nunca al archivo</td></tr>
+    <tr><td>El correo reenviado</td><td>Se reenvía una conversación con la clave abajo del todo</td><td>Bajar hasta el final antes de reenviar nada</td></tr>
+    <tr><td>El colaborador que se fue</td><td>Nadie le quitó el acceso, y el acceso no caduca solo</td><td>Quitar accesos el mismo día, y revisar la lista cada cierto tiempo</td></tr>
+    <tr><td>El respaldo olvidado</td><td>Una copia de la base en una carpeta compartida de hace un año</td><td>Los respaldos también se inventarían, y también caducan</td></tr>
+  </table>
+  <div class="caja">
+    <p>Lo que tienen en común las cinco: <b>no hay un fallo de programación</b>, hay una persona que no sabía que estaba mandando una llave. Por eso la defensa tampoco es técnica: es una costumbre, y las costumbres se enseñan en casa y se repiten.</p>
+  </div>
+
+  <h2>⏱️ Una filtración de verdad, minuto a minuto</h2>
+  <p class="mini">Así se ve el procedimiento cuando pasa. Es un martes y son las 4 de la tarde.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 7 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
+<section class="pagina">
+  <div class="caja minuto">
+    <p><b>4:02</b> · Se manda una captura del panel al grupo de la familia para preguntar por qué una función no responde. En la esquina, el token entero.</p>
+    <p><b>4:09</b> · Alguien lo nota. La primera reacción es borrar el mensaje: <b>no sirve</b>. En WhatsApp el mensaje ya se descargó en los otros teléfonos y quedó en sus respaldos.</p>
+    <p><b>4:11</b> · Se abre el panel del servicio y <b>se rota la clave</b>. Todo lo demás espera. Dos minutos.</p>
+    <p><b>4:14</b> · Se comprueba que la aplicación sigue viva: entrar, guardar un destello, ver que sincroniza.</p>
+    <p><b>4:20</b> · Ahora sí, los registros: nadie usó la clave vieja en esos dieciocho minutos. Se respira.</p>
+    <p><b>4:25</b> · Se anota en el inventario: qué llave, qué día, por dónde salió y qué se cambió.</p>
+    <p><b>Por la noche</b> · Se cuenta en casa, sin regañar a nadie. La costumbre que queda es «mirar la captura antes de mandarla», y esa se enseña contándolo, no escondiéndolo.</p>
+  </div>
+  <p class="mini">Lo que hizo bien esta historia no fue reaccionar rápido: fue <b>reaccionar en el orden correcto</b>. Borrar el mensaje se siente como hacer algo y no cierra nada; rotar se siente insuficiente y es lo único que sirvió.</p>
+
+  <h2>🔑 Las cinco reglas de las llaves</h2>
+  <div class="caja caja-amb reglas">
+    <ol>
+      <li>Una llave se juzga por <b>lo que puede abrir</b>, no por si está a la vista.</li>
+      <li>La clave de servicio no viaja nunca al navegador ni al repositorio: <b>vive en el entorno</b>.</li>
+      <li>El historial recuerda: lo que se subió una vez <b>se rota, no se borra</b>.</li>
+      <li>Cada llave tiene custodio <b>y suplente</b>.</li>
+      <li>Antes de escribir una clave en cualquier sitio: <b>¿esto se sube?</b></li>
+    </ol>
+  </div>
+
+<h2>✏️ Ejercicios para hacer a lápiz</h2>
+  <p class="mini">Las respuestas están en la pauta de la página siguiente. Hazlos primero.</p>
+
+  <div class="caja ej1">
+    <h3>Ejercicio 1 · Secreto o no</h3>
+    <p>Marca <b>S</b> si es un secreto y <b>N</b> si se puede ver:</p>
+    <ol>
+      <li>La clave anónima que está en <code>js/auth.js</code>. ____</li>
+      <li>La clave de servicio de las funciones de borde. ____</li>
+      <li>El nombre de una tabla de la base de datos. ____</li>
+      <li>Un token de red social de la Antena. ____</li>
+    </ol>
+  </div>
+
+  <div class="caja ej2">
+    <h3>Ejercicio 2 · El alcance</h3>
+    <p>Escribe en una frase qué puede hacer quien tenga cada una, <b>en la peor lectura</b>:</p>
+    <ol>
+      <li>La clave anónima: ______________________________</li>
+      <li>La clave de servicio: ______________________________</li>
+      <li>Un token de la Antena: ______________________________</li>
+    </ol>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 8 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <div class="caja ej3">
+    <h3>Ejercicio 3 · ¿Cierra o no cierra?</h3>
+    <p>Marca <b>C</b> si cierra la puerta y <b>N</b> si no cierra nada:</p>
+    <ol>
+      <li>Borrar la línea del archivo y volver a subir. ____</li>
+      <li>Rotar la clave en el servicio. ____</li>
+      <li>Añadir el archivo al <code>.gitignore</code> después de haberlo subido. ____</li>
+      <li>Volver el repositorio privado. ____</li>
+    </ol>
+  </div>
+
+  <div class="caja ej4">
+    <h3>Ejercicio 4 · El orden de la rotación</h3>
+    <p>Numera del 1 al 6 en el orden correcto:</p>
+    <p>____ Mirar los registros · ____ Rotar la clave · ____ Contarlo en casa · ____ Anotar en el inventario · ____ Comprobar que la aplicación sigue viva · ____ Quitar la clave del archivo</p>
+  </div>
+
+  <div class="caja ej5">
+    <h3>Ejercicio 5 · La llave sin retorno</h3>
+    <ol>
+      <li>¿Cuál es la única llave de este proyecto que no se puede rotar? ____________</li>
+      <li>¿Qué pasa si se pierde? ____________</li>
+      <li>Escribe los tres cuidados que lleva: ____________</li>
+    </ol>
+  </div>
+
+  <div class="caja ej6">
+    <h3>Ejercicio 6 · El custodio</h3>
+    <p>«Solo yo sé dónde están las claves, así están más seguras.»</p>
+    <ol>
+      <li>¿Qué tiene de cierto esa frase? ____________</li>
+      <li>¿Qué esconde? ____________</li>
+      <li>¿Qué se comparte con el suplente, si no es la clave? ____________</li>
+    </ol>
+  </div>
+
+<h2>✅ Pauta completa de respuestas</h2>
+
+  <div class="pauta pa1">
+    <h3>Ejercicio 1 · Secreto o no</h3>
+    <ol>
+      <li>Clave anónima: <b>N</b>. Tiene que viajar al navegador y sola no abre nada.</li>
+      <li>Clave de servicio: <b>S</b>. Salta todas las políticas por fila.</li>
+      <li>Nombre de una tabla: <b>N</b>. Es estructura, no llave.</li>
+      <li>Token de la Antena: <b>S</b>. Publica en nombre del proyecto.</li>
+    </ol>
+    <p class="mini">La prueba para dudas: ¿qué haría alguien que lo encuentre? Si la respuesta incomoda, es un secreto.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 9 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <div class="pauta pa2">
+    <h3>Ejercicio 2 · El alcance</h3>
+    <ol>
+      <li>Anónima: <b>nada por sí sola</b>; solo lo que las políticas por fila permitan a ese usuario.</li>
+      <li>De servicio: <b>leer y escribir cualquier fila de cualquier familia</b>, sin permiso de nadie.</li>
+      <li>Token: <b>publicar en nombre del proyecto</b> en esa red, y según los permisos pedidos, borrar o leer.</li>
+    </ol>
+  </div>
+
+  <div class="pauta pa3">
+    <h3>Ejercicio 3 · ¿Cierra o no cierra?</h3>
+    <ol>
+      <li>Borrar la línea: <b>N</b>. Queda en el historial, en los clones y en los respaldos.</li>
+      <li>Rotar: <b>C</b>. Es lo único que cierra, aunque haya copias.</li>
+      <li><code>.gitignore</code> después: <b>N</b>. Llega tarde por definición.</li>
+      <li>Volverlo privado: <b>N</b>. Privado no es cifrado, y el historial viaja igual.</li>
+    </ol>
+  </div>
+
+  <div class="pauta pa4">
+    <h3>Ejercicio 4 · El orden de la rotación</h3>
+    <p><b>1.</b> Rotar la clave · <b>2.</b> Comprobar que la aplicación sigue viva · <b>3.</b> Mirar los registros · <b>4.</b> Quitar la clave del archivo · <b>5.</b> Anotar en el inventario · <b>6.</b> Contarlo en casa.</p>
+    <p class="mini">Lo que más se falla es poner los registros primero. Se investiga <b>después</b> de cerrar: mirar quién entró mientras la puerta sigue abierta no sirve de nada.</p>
+  </div>
+
+  <div class="pauta pa5">
+    <h3>Ejercicio 5 · La llave sin retorno</h3>
+    <ol>
+      <li>La <b>firma del APK</b>.</li>
+      <li>No se puede publicar ninguna actualización de esa aplicación: hay que empezar otra y reinstalar en los cuatro teléfonos.</li>
+      <li>Copia en otro sitio físico, anotada en el testamento técnico, y una prueba al año de que la copia sirve.</li>
+    </ol>
+  </div>
+
+  <div class="pauta pa6">
+    <h3>Ejercicio 6 · El custodio</h3>
+    <ol>
+      <li>Es cierto que nadie más puede filtrarla: la superficie de filtración es la mínima posible.</li>
+      <li>Esconde que <b>el proyecto entero cabe en una cabeza</b>. Si esa persona falta, el dominio no se renueva y el sitio se apaga solo.</li>
+      <li>Se comparte <b>el camino</b>: dónde está guardada y cómo se llega a ella. No hace falta compartir el secreto.</li>
+    </ol>
+    <p class="mini">Y la regla que vale para toda la ficha: ante la duda de si alguien vio una clave, se rota igual. Rotar cuesta cinco minutos.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🔐 Ruta de la Casa Cerrada · Etapa 4 · Página 10 de 10</span></div>
+</section>
+
+
+</div>
+</body>
+</html>
