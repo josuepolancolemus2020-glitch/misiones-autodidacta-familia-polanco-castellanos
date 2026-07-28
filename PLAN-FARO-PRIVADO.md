@@ -85,15 +85,23 @@ para leer y escribir sin abrir la aplicación siquiera:
 teléfonos de la casa. De la tabla del **chat** no se sabe: su seguridad no se
 declara en ningún `.sql` del repositorio y hay que mirarla en Supabase.
 
-### 1.3 Cualquiera con la dirección abre la aplicación
+### 1.3 Cualquiera con la dirección abre la aplicación · ✅ CERRADO
 
-`js/auth.js` no autentica: guarda en `localStorage` cuál perfil se eligió. Y los
-**cuatro PIN están escritos en texto plano** en ese archivo, dentro de un
-repositorio público.
+Así estaba: `js/auth.js` no autenticaba, guardaba en `localStorage` cuál perfil
+se había elegido, y los **cuatro PIN estaban escritos en texto plano** en ese
+archivo, dentro de un repositorio público.
 
-> **Los cuatro PIN de `js/auth.js` están quemados.** Se cambian, y no se
-> reutilizan en ningún otro sitio. Un repositorio público se copia, se indexa y
-> se conserva: darlos por perdidos es lo único prudente.
+Ya no. La puerta pide contraseña de verdad contra Supabase Auth, y los PIN se
+borraron del código.
+
+> **Los cuatro PIN viejos siguen quemados**, aunque ya no estén en el archivo.
+> Estuvieron publicados y un repositorio público se copia, se indexa y se
+> conserva. No se reutilizan en ningún otro sitio, nunca.
+
+**Ojo con la confusión fácil:** que la puerta esté cerrada no cierra 1.2. Son
+cosas distintas y el agujero de los datos sigue abierto hasta el paso 2 del SQL,
+porque las tablas no preguntan por la puerta: preguntan por la clave, y esa la
+lleva cualquiera que abra el código.
 
 ---
 
@@ -152,26 +160,38 @@ creer que la casa quedaba cerrada.
 La política, con la identidad ya disponible:
 
 ```sql
--- El molde, tabla por tabla. Nada de anon: solo sesión iniciada.
+-- El molde, tabla por tabla. Nada de anon: solo los cuatro de la casa.
 alter table public.destellos enable row level security;
 
 create policy destellos_familia on public.destellos
   for all
   to authenticated
-  using (true)
-  with check (true);
+  using (public.es_familia())
+  with check (public.es_familia());
 ```
 
-Es decir: **cualquiera de los cuatro, con sesión iniciada, puede todo; quien no
-tiene sesión, nada.** Para una familia de cuatro eso es suficiente y es mucho
+⚠️ **La primera versión de este plan escribía `using (true)`, y estaba mal.**
+Lo encontró la revisión adversaria y merece quedar escrito, porque es un error
+que parece correcto: `to authenticated` **no** significa «uno de los cuatro»,
+significa «cualquiera con una sesión iniciada en este proyecto». Y como la clave
+publicable va en el navegador (correctamente), cualquiera podía registrarse con
+su propio correo, recibir un permiso válido y leer y escribir todo, sin abrir
+siquiera la aplicación. La política que parecía cerrar la casa la dejaba abierta
+a quien supiera pedir una cuenta.
+
+Por eso existe `es_familia()`, que pregunta si quien consulta tiene fila en
+`familia_miembros`. Es decir: **los cuatro pueden todo; cualquier otro, nada,
+tenga cuenta o no.** Para una familia de cuatro eso es suficiente y es mucho
 mejor que hilar fino y equivocarse. Después, si hace falta, se afina (que las
 finanzas solo las vean los padres, por ejemplo).
 
-`push_subscriptions` merece una política más estrecha: cada quien ve y borra
-**solo su propia suscripción**, comparando con `auth.uid()`.
+`push_subscriptions` lleva una política más estrecha: cada quien ve y borra
+**solo su propia suscripción**, comparando con `auth.uid()`. Una suscripción
+ajena en malas manos es poder mandar notificaciones al teléfono de otro.
 
 Y hay que revisar tabla por tabla en Supabase, no en el repositorio, porque lo
-declarado y lo aplicado pueden no coincidir.
+declarado y lo aplicado pueden no coincidir. El propio archivo del paso 2
+termina con la consulta que lo dice.
 
 ### Tanda 3 · Cerrar la casa (repositorio y Pages)
 
