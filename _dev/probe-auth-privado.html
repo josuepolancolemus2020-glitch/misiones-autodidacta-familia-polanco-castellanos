@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · La puerta de verdad</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la autenticación real de F.A.R.O SIN necesitar credenciales:
+   que el contrato síncrono siga en pie, que la puerta esté cerrada por
+   defecto, que no queden PIN en el código y que el mensaje de error no
+   diga de más. Lo que NO puede comprobar es entrar de verdad: eso pide
+   los cuatro usuarios creados en Supabase y se prueba a mano. */
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+window.addEventListener('load', async () => {
+  await esperar(2000);
+  const w = f.contentWindow, d = f.contentDocument;
+  try {
+    log('── EL CÓDIGO ──');
+    const src = await (await fetch('/js/auth.js')).text();
+    ok(!/pin:\s*'\d/.test(src), 'no quedan PIN escritos en el código', 'todavía hay PIN en js/auth.js');
+    ok(!/FARO_USERS/.test(src), 'la tabla de usuarios con PIN ya no existe', 'FARO_USERS sigue ahí');
+    ok(/signInWithPassword/.test(src), 'entra con Supabase Auth', 'no usa Supabase Auth');
+    ok(/persistSession:\s*true/.test(src) && /autoRefreshToken:\s*true/.test(src),
+       'la sesión se guarda y se renueva sola', 'la sesión no persiste: pediría la clave a diario');
+    ok(!/—/.test(src), 'sin guiones largos (norma 1-bis)', 'quedan guiones largos');
+
+    log('\n── EL CONTRATO SÍNCRONO ──');
+    /* Ocho archivos llaman a verificarSesion() sin await. Si algún día
+       devuelve una promesa, todos leerían un objeto siempre verdadero y
+       la aplicación se creería con sesión sin tenerla. */
+    ok(typeof w.verificarSesion === 'function', 'verificarSesion existe', 'falta verificarSesion');
+    const r = w.verificarSesion();
+    ok(!(r && typeof r.then === 'function'), 'verificarSesion NO devuelve una promesa', 'devuelve una promesa: los ocho llamadores se romperían');
+    ok(r === null || (r && typeof r.user === 'string'), 'devuelve null o { user, nombre }', 'devuelve algo con otra forma');
+
+    log('\n── LA PUERTA, CERRADA POR DEFECTO ──');
+    ok(w.verificarSesion() === null, 'sin credenciales no hay sesión', 'hay sesión sin haber entrado');
+    const app = d.getElementById('app-container');
+    ok(app && getComputedStyle(app).display === 'none', 'la aplicación está oculta', 'la aplicación se ve sin haber entrado');
+    const login = d.getElementById('login-screen');
+    ok(login && getComputedStyle(login).display !== 'none', 'se muestra la pantalla de entrada', 'no se muestra la entrada');
+
+    log('\n── EL LOGIN VIEJO YA NO ABRE ──');
+    /* La prueba que importa: sembrar la sesión falsa que usaban las sondas
+       antiguas y comprobar que YA NO sirve para entrar. */
+    w.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+    ok(w.verificarSesion() === null, 'la sesión inventada en el teléfono no vale', 'todavía se entra escribiendo en localStorage');
+    w.localStorage.removeItem('faro_session');
+
+    log('\n── LA PANTALLA ──');
+    const pass = d.getElementById('login-pass');
+    ok(!!pass, 'pide contraseña, no un PIN de cuatro dígitos', 'sigue el campo de PIN');
+    ok(pass && pass.type === 'password', 'el campo va oculto', 'la contraseña se ve al escribirla');
+    ok(pass && !pass.maxLength || pass.maxLength < 0 || pass.maxLength > 20, 'no limita la contraseña a cuatro caracteres', 'sigue limitada a ' + (pass && pass.maxLength));
+    ok(!!d.getElementById('login-user'), 'sigue eligiendo quién eres', 'falta el selector de miembro');
+
+    log('\n── EL MENSAJE DE ERROR NO DICE DE MÁS ──');
+    /* Etapa 1 de la Ruta de la Casa Cerrada, aplicada a la propia casa:
+       el error no debe confirmar qué cuentas existen. */
+    const err = d.getElementById('login-error');
+    const txt = (err ? err.textContent : '') + src;
+    ok(!/ese (correo|usuario) no existe|usuario no encontrado|no existe la cuenta/i.test(txt),
+       'no revela si la cuenta existe', 'el mensaje confirma qué cuentas existen');
+    ok(!/PIN incorrecto/i.test(err ? err.textContent : ''), 'ya no habla de PIN', 'el mensaje sigue hablando del PIN');
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>
