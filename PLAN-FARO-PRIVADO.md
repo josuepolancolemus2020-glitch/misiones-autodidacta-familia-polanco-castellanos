@@ -5,7 +5,34 @@ público. Ni el código, ni las misiones, ni la aplicación. Solo los cuatro. Y
 además, guardar aquí documentos personales y contraseñas de la familia.
 
 Este documento dice qué hace falta para eso de verdad, en qué orden, y qué se
-pierde por el camino. Estado: **plan**, nada aplicado todavía.
+pierde por el camino.
+
+---
+
+## Dónde vamos (se actualiza al terminar cada paso)
+
+Última revisión: 28 de julio de 2026.
+
+| | estado |
+|---|---|
+| La librería de Supabase, dentro del repositorio | ✅ hecho |
+| Los cuatro usuarios creados en Supabase Auth | ✅ hecho, con correos reales |
+| `familia_miembros` creada y sembrada con los cuatro | ✅ hecho (paso 1 del SQL) |
+| La pantalla de entrada nueva, publicada en `main` | ✅ hecho |
+| Que los cuatro entren de verdad, cada uno en su aparato | 🔄 probándose |
+| Cerrar los datos (paso 2 del SQL) | ⛔ **no**, hasta que los cuatro entren |
+| Apagar el alta pública de cuentas | ⛔ pendiente |
+| La clave de servicio en la función de notificaciones | ⛔ pendiente |
+| Compilar y repartir el APK | ⛔ pendiente |
+| Apagar Pages y poner el repositorio en privado | ⛔ pendiente |
+
+**Lo que esto significa hoy, sin adornos:** la puerta nueva ya está puesta y
+pide contraseña de verdad, pero **los datos siguen abiertos**. Cualquiera con la
+clave publicable, que va en el código como debe ser, todavía puede leer y
+escribir las tablas de la casa sin pasar por esa puerta. Eso lo cierra el paso 2
+y nada más. Hasta entonces, F.A.R.O parece cerrada y no lo está.
+
+Y el repositorio sigue público, así que las dieciséis misiones se leen.
 
 ---
 
@@ -90,10 +117,20 @@ muerta: todas las consultas se rechazan y no hay con qué autorizarlas.
 
 ## 3. El plan, en cuatro tandas
 
-### Tanda 1 · La puerta de verdad (autenticación)
+### Tanda 1 · La puerta de verdad (autenticación) · ✅ HECHA
 
-Cambiar el «login» de perfil por **Supabase Auth** con los cuatro miembros como
-usuarios reales (correo y contraseña). Qué implica:
+Se cambió el «login» de perfil por **Supabase Auth**. Cómo quedó, que difiere de
+lo que se había planeado aquí y conviene que quede escrito:
+
+- **Se entra con el correo**, no eligiendo el nombre de una lista. El
+  desplegable obligaba a llevar los cuatro correos escritos en el código, y el
+  código lo lee cualquiera.
+- **Quién es cada quien lo dice la tabla `familia_miembros`**, no el código ni
+  los metadatos del usuario (que el propio usuario puede reescribir).
+- Los correos de la familia **no están en el repositorio**. Se escribieron una
+  vez en el editor de Supabase, que es privado.
+
+Lo que se planeó originalmente y quedó obsoleto:
 
 1. Crear los cuatro usuarios en Supabase. Contraseñas nuevas, no los PIN viejos.
 2. Reescribir `js/auth.js`: `signInWithPassword`, sesión de Supabase en vez de
@@ -102,10 +139,17 @@ usuarios reales (correo y contraseña). Qué implica:
    que en la práctica escriban la contraseña una vez y no cada vez.
 4. Borrar `FARO_USERS` y sus PIN del código.
 
-### Tanda 2 · Cerrar los datos (seguridad por fila)
+### Tanda 2 · Cerrar los datos (seguridad por fila) · ESCRITA, SIN APLICAR
 
-Con identidad ya disponible, encender la seguridad por fila en las seis tablas y
-en el chat, con la política más simple que sirve para una familia:
+Está en `supabase/sql/seguridad_familia_2_datos.sql` y **no se ejecuta hasta que
+los cuatro hayan entrado**, cada uno en su aparato. No tres.
+
+Cubre diez tablas, no seis: a las de la casa se sumaron `mensajes` (el chat
+entero), `cuentas`, `transacciones` y `deudas`, que en la primera versión se
+habían dejado «para mirar a mano» y eso las dejaba abiertas justo después de
+creer que la casa quedaba cerrada.
+
+La política, con la identidad ya disponible:
 
 ```sql
 -- El molde, tabla por tabla. Nada de anon: solo sesión iniciada.
