@@ -1,0 +1,22 @@
+# Cortes de fichas/ficha-maquina-programa.html (norma 6: diez páginas)
+# Cada línea es un trozo literal del HTML que debe QUEDAR AL INICIO de una
+# página. La página 1 empieza sola, así que hacen falta nueve.
+#
+# Dos avisos que ya costaron tiempo en fichas anteriores:
+#   · el anclaje se busca con indexOf a partir del corte anterior, así que
+#     tiene que ser único DESPUÉS del corte de arriba. Por eso las tablas
+#     <table class="tres"> llevan aquí una segunda clase (pedir, donde,
+#     piezas, mirar, estados): sin ella, el corte 3 caía en la tabla de
+#     «Revisar el cambio» en vez de en la de «Cómo se pide un cambio».
+#   · un anclaje nunca puede caer dentro de un <table>: retrocede() solo
+#     sabe retroceder sobre <div>, y el corte partiría la tabla en dos.
+#     Anclar en la etiqueta de apertura de la tabla sí vale.
+<h2>💥 Los cinco fallos del código que llega hecho</h2>
+<h2>📋 Revisar el cambio, no el archivo</h2>
+<table class="tres pedir">
+<h2>🗣️ El guion de la revisión en voz alta</h2>
+<h2>🔬 Tres cambios comentados</h2>
+<h2>🏡 Seis fallos de verdad, de esta casa</h2>
+<h2>📝 Hoja de revisión antes de subir</h2>
+<div class="caja ej4">
+<div class="pauta pa3">

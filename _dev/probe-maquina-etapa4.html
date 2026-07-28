@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Máquina que Predice, etapa 4</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-maquina-programa/programa.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 4 de la Ruta de la Máquina que Predice: bancos,
+   laboratorio, pruebas impresas con su nombre, los ocho casos con lo que
+   enseñan, que los seis reales estén contados con lo que los delató, la ficha
+   y la ruta con CUATRO etapas.
+
+   Se escribió mirando primero que fallara con la misión sin terminar, que es
+   justamente la regla que enseña esta etapa: una comprobación que nunca se ha
+   visto en rojo no se sabe si funciona. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Máquina que Predice · Etapa 4 de 6/.test(d.body.textContent), 'se presenta como etapa 4 de 6', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se busca el VOCABULARIO propio de la etapa 3, no la
+       palabra «verificar», que aparece a propósito porque esta etapa es la
+       misma idea aplicada al código. Lo que no puede quedar es su temario. */
+    ok(!/dato falso bien escrito|escala de riesgo|comprobar por fuera|hoja de verificación|la firma al pie/i.test(d.body.textContent),
+       'sin restos de la etapa de la que se copió', 'queda el temario de Verificar');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('Object.keys(parteData).join(",")') === 'entiendo,alcance,prueba,deshacer', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas de la revisión', 'piezas: ' + dentro('timelineData.length'));
+    ok(/faro_ia_programa/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    ok(dentro('labParte') === 'entiendo', 'el laboratorio arranca en su primera pieza', 'arranca en: ' + dentro('labParte'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LA POSTURA ANTE EL CÓDIGO ──');
+    const texto = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/funcion[oó] a la primera/i.test(texto), 'trae la señal de alarma de la etapa', 'falta «funcionó a la primera»');
+    ok(/no es|distinto/i.test(texto) && /est[aá] bien/i.test(texto), 'distingue funcionar de estar bien', 'no distingue funcionar de estar bien');
+    ok(/borrado silencioso/i.test(texto), 'nombra el fallo que no se nota', 'no aparece el borrado silencioso');
+    ok(/alcance/i.test(texto) && /archivos/i.test(texto), 'manda mirar el alcance del cambio', 'no habla del alcance');
+    ok(/l[ií]neas que desaparecen|lo borrado/i.test(texto), 'manda leer lo que desaparece', 'no manda leer lo borrado');
+    ok(/lista vac[ií]a/i.test(texto), 'incluye el caso de la lista vacía', 'no aparece la lista vacía');
+    ok(/dependencia|librer[ií]a/i.test(texto), 'avisa de la dependencia de regalo', 'no avisa de las librerías nuevas');
+    ok(/deshacer/i.test(texto), 'la última defensa es poder deshacer', 'no aparece deshacer');
+    ok(/no se sube/i.test(texto), 'deja dicho qué no se sube', 'no dice qué no se sube');
+    /* Esta etapa se apoya en las tres anteriores a propósito */
+    ok(/predice|predecir/i.test(texto), 'conecta con la etapa 1 (el modelo predice)', 'no conecta con la etapa 1');
+    ok(/encargo|pedir bien/i.test(texto), 'conecta con la etapa 2 (el encargo)', 'no conecta con la etapa 2');
+    ok(/palabras propias/i.test(texto), 'conecta con la etapa 3 (explicarlo con palabras propias)', 'no conecta con la etapa 3');
+
+    log('\n── LOS SEIS FALLOS REALES ESTÁN CONTADOS ──');
+    ok(/28 de julio de 2026/.test(texto), 'los casos llevan su fecha', 'no dice cuándo pasaron');
+    ok(/faro_familia_v1/.test(texto) && /faro_v1/.test(texto), 'el caso de la llave equivocada trae los dos nombres', 'faltan las dos claves');
+    ok(/sexta/i.test(texto) && /par[aá]metro/i.test(texto), 'el de la herramienta dice qué cambió el sexto día', 'no dice por qué falló la sexta vez');
+    ok(/veintinueve|29/.test(texto) && /treinta|30/.test(texto), 'el del generador trae los dos números', 'faltan el 29 y el 30');
+    ok(/tabla/i.test(texto) && /retroced/i.test(texto), 'el del corte explica qué no sabía retroceder', 'no explica el corte que partió la tabla');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/Lo entiendo/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en «Lo entiendo»', 'abre en otra pieza');
+    ok(!!d.querySelector('.lab-cont-btn.active-pri'), 'y con su botón resaltado', 'ningún botón del laboratorio queda resaltado');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'la prueba «Antes de subir» se genera', 'prueba competencial vacía');
+    const rotulos = d.getElementById('eval-screen-title').textContent + d.getElementById('evalcrit-screen-title').textContent +
+                    d.getElementById('evalOut').textContent + crit + d.querySelectorAll('.eval-print-header')[0].textContent;
+    ok(!/Las seis palancas|Panorama|La puerta de la casa digital|Los datos de los demás|Quién decide de verdad|Para quién y qué le cambia|El presupuesto real|La deuda por dentro|Pedir bien|El encargo que se escribe|La cuenta sobre la mesa|La sala de espejos|la interpelación|Autocapacitación Técnica|Verificar|La firma al pie|La entrega sobre la mesa|Etapa 3/.test(rotulos),
+       'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+    ok(!/omisión|escala de riesgo|comprobar por fuera/i.test(crit), 'las preguntas III y IV son las de esta etapa', 'quedan preguntas de la etapa 3');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['lista vacía', 'faro_v1', 'ventana', 'cinco veces', 'tabla', 'generador', 'librería', 'archivo']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok((txt.match(/Lo que enseña/g) || []).length === 8, 'los ocho casos cierran con lo que enseñan', 'casos con lección: ' + (txt.match(/Lo que enseña/g) || []).length);
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      /* No puede repetir los casos de las etapas 1, 2 y 3 de esta misma ruta */
+      ok(!/diecinueve|arréglame|media hoja|conversación llena|226 milímetros|trescientas copias/i.test(txt), 'no repite casos de las etapas anteriores', 'repite un caso de otra etapa de la ruta');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+      ok(/cinco reglas del código que llega hecho/i.test(txt), 'trae las cinco reglas', 'faltan las cinco reglas');
+      ok(/cinco preguntas antes de subir/i.test(txt), 'trae las cinco preguntas', 'faltan las cinco preguntas antes de subir');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/archivo|alcance|librer|deshacer|prueba|borr/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-maquina-programa.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/Hoja de revisión antes de subir/i.test(txt), 'la ficha trae la hoja de revisión', 'falta la hoja de revisión');
+    ok(/Seis fallos de verdad, de esta casa/i.test(txt), 'la ficha trae los seis fallos reales', 'faltan los seis fallos reales');
+    ok(/Tres cambios comentados/i.test(txt), 'la ficha trae los tres cambios comentados', 'faltan los tres cambios comentados');
+    ok(/El guion de la revisión en voz alta/i.test(txt), 'la ficha trae el guion en voz alta', 'falta el guion');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(!/—/.test(txt), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok((txt.match(/<table/g) || []).length === (txt.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar: un corte partió una tabla');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-maquina-programa"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const ia = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Máquina que Predice/.test(c.textContent));
+    ok(!!ia, 'la Ruta de la Máquina que Predice está en el mapa', 'no aparece la ruta');
+    if (ia) {
+      /* La cuenta exacta de etapas tocables la lleva _dev/probe-rutas.html, que
+         se actualiza cada vez que se añade una misión. Aquí solo se comprueba
+         que esta etapa llegó al mapa y que las seis siguen listadas: si esta
+         sonda contara el total, se pondría en rojo cada vez que crece la ruta
+         sin que nada de esta etapa se hubiera roto. */
+      ok(ia.querySelectorAll('.re-link').length >= 4, 'con sus etapas 1 a 4 ya tocables', 'la etapa 4 no es tocable');
+      ok(ia.querySelectorAll('.re-link').length + ia.querySelectorAll('.ruta-etapa-futura').length === 6, 'las 6 etapas de la ruta están en el mapa', 'etapas en el mapa: ' + (ia.querySelectorAll('.re-link').length + ia.querySelectorAll('.ruta-etapa-futura').length));
+      ok(/La IA que programa/.test(ia.textContent), 'la etapa 4 sale con el título de la misión', 'la etapa 4 sigue saliendo como prevista');
+      ok(/Datos, privacidad y las niñas/i.test(ia.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="ia"]');
+    ok(!!chip, 'la materia Inteligencia Artificial tiene su chip', 'no hay chip de Inteligencia Artificial');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length >= 4, 'la materia muestra sus misiones', 'muestra ' + tarjetas.length);
+      const pro = tarjetas.find(t => /IA que programa/i.test(t.textContent));
+      ok(!!pro && /🔒/.test(pro.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

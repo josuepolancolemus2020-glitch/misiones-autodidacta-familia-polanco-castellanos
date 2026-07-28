@@ -55,6 +55,7 @@ const MISSIONS = [
   { id: 21, title: 'La deuda por dentro: interés, plazo y costo total', modulo: 'aprendizaje-unido', materia: 'eco', color: 'apr', xp: 45, icon: '💳', ruta: 'poder', etapa: 3, sello: 'familiar', url: 'misiones/ruta-poder-deuda/deuda.html' },
   { id: 22, title: 'Verificar: nadie firma lo que no leyó', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🔎', ruta: 'maquina', etapa: 3, sello: 'familiar', url: 'misiones/ruta-maquina-verificar/verificar.html' },
   { id: 23, title: 'Llaves y secretos: claves, entornos y repositorios', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🗝️', ruta: 'casacerrada', etapa: 4, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-llaves/llaves.html' },
+  { id: 24, title: 'La IA que programa: qué revisar antes de subir', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '⌨️', ruta: 'maquina', etapa: 4, sello: 'familiar', url: 'misiones/ruta-maquina-programa/programa.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -82,7 +83,6 @@ const ETAPAS_PREVISTAS = {
     6: 'Reputación y riesgo político: no quedar amarrado a nadie',
   },
   maquina: {
-    4: 'La IA que programa: qué revisar antes de subir',
     5: 'Datos, privacidad y las niñas',
     6: 'Qué se automatiza en M.E.T.A.S y qué no se le delega jamás',
   },

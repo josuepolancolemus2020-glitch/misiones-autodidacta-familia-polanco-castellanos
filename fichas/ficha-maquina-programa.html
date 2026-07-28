@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Ruta de la Máquina que Predice · Etapa 4: La IA que programa</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #0c4a6e; --pri-suave: #f0f9ff; --sec: #a21caf; --sec-suave: #fdf4ff; }
+  .guion li { margin: 5px 0; }
+  .mini { font-size: 12px; color: var(--gris); }
+  code { font-family: 'Fira Code', monospace; font-size: 11.5px; background: #eef2f7;
+         border-radius: 3px; padding: 0 3px; }
+  table.tres th:nth-child(1) { width: 22%; }
+  table.casos { font-size: 11.5px; }
+  table.casos th:nth-child(1) { width: 26%; }
+  table.casos th:nth-child(2) { width: 37%; }
+  table.fallos { font-size: 11.5px; }
+  table.fallos th:nth-child(1) { width: 20%; }
+  table.fallos th:nth-child(4) { width: 26%; }
+  table.hoja td:nth-child(1) { width: 5%; text-align: center; }
+  table.hoja td:nth-child(3) { width: 13%; text-align: center; height: 22px; }
+  table.blanco td { height: 15px; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+
+
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/ruta-maquina-programa/programa.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · La IA que programa</div>
+    <div class="f-meta"><b>Ruta:</b> 🤖 Ruta de la Máquina que Predice · Etapa 4 de 6 · <b>Materia:</b> Inteligencia Artificial</div>
+    <div class="f-meta"><b>Tema:</b> qué se revisa en el código que llega hecho antes de subirlo: el alcance, las líneas que desaparecen, la dependencia de regalo, el caso incómodo, la comprobación que nunca falló y poder deshacer.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Distinguir <b>funciona</b> de <b>está bien</b>, que no son lo mismo y se parecen mucho en pantalla.</li>
+    <li>Reconocer los <b>cinco fallos</b> del código que llega hecho, y cuál de ellos no se nota al probar.</li>
+    <li>Revisar <b>el cambio</b> y no el archivo, empezando por las líneas que desaparecen.</li>
+    <li>Probar el <b>caso que decide</b> en vez del que propone la máquina, y ver fallar una comprobación antes de creerle.</li>
+    <li>Subir de manera que se pueda <b>deshacer</b>: un cambio por vez, con su mensaje diciendo el porqué.</li>
+  </ol>
+
+  <h2>🔎 La frase maestra</h2>
+  <div class="caja">
+    <p><b>«Funciona» no es «está bien».</b> Funciona significa que hace lo que pediste <b>en el caso que probaste</b>. Está bien significa eso, y además que no rompe nada más, que se puede explicar línea por línea y que se puede deshacer mañana.</p>
+  </div>
+
+  <h2>🚨 La señal de alarma de esta etapa</h2>
+  <div class="caja caja-amb">
+    <p><b>«Funcionó a la primera.»</b> No es una buena noticia: es el momento de más riesgo, porque nada te obligó a mirar.</p>
+    <p class="mini">Cuando algo falla, uno lo lee entero para arreglarlo. Cuando funciona, uno lo sube. La ejecución hace de comprobante falso: el código no suena bien, corre, y correr parece prueba suficiente. Con un texto todavía queda la duda; con algo que se mueve en la pantalla, la duda se va sola.</p>
+  </div>
+
+  <h2>🎩 Por qué aquí se abandona antes la verificación</h2>
+  <p>En la etapa 3 el problema era un texto que sonaba bien. Con un texto uno todavía sabe que hay que ir a comprobar los datos por fuera. Con un cambio de código no: se ejecuta delante de ti, hace lo que pediste y no queda nada evidente que sospechar. Parece que <b>se verificó solo</b>.</p>
+  <p>Pero la máquina probó una cosa y tú necesitas otra: ella, que el programa no revienta con el caso cómodo; tú, si aguanta el martes por la mañana en el teléfono viejo de una maestra sin señal, con la lista vacía y la clase esperando.</p>
+  <p class="mini">Esta etapa no añade desconfianza: añade <b>dónde mirar</b>. Son seis sitios concretos, y en cinco minutos se recorren los seis.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 1 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>💥 Los cinco fallos del código que llega hecho</h2>
+  <table class="fallos">
+    <tr><th>Fallo</th><th>En qué consiste</th><th>Cómo se caza</th><th>Cuándo se nota si no</th></tr>
+    <tr><td><b>1. El caso fácil</b></td><td>Funciona con señal, datos completos y una sola persona</td><td>Probar el caso incómodo, no el que propuso ella</td><td>El día que lo usa alguien de verdad</td></tr>
+    <tr><td><b>2. El alcance</b></td><td>Toca archivos que nadie pidió tocar</td><td>Mirar la lista de archivos modificados, uno por uno</td><td>Semanas después, en un sitio sin relación</td></tr>
+    <tr><td><b>3. Lo que no sabe de tu casa</b></td><td>Código correcto que no encaja con tus normas ni tus nombres</td><td>Comparar con lo que ya está escrito al lado</td><td>Cuando el proyecto deja de parecerse a sí mismo</td></tr>
+    <tr><td><b>4. La dependencia</b></td><td>Añade una librería «porque es lo estándar»</td><td>Leer las primeras líneas del archivo</td><td>Cuando algo deja de funcionar sin internet</td></tr>
+    <tr><td><b>5. El borrado silencioso</b></td><td>Reescribe el archivo entero y se lleva un arreglo anterior</td><td>Leer las líneas que <b>desaparecen</b></td><td>Meses después, cuando vuelve un fallo ya resuelto</td></tr>
+  </table>
+  <p class="mini">Los cuatro primeros se notan al probar. El quinto no: lo que se borró funcionaba, y precisamente por eso no lo estabas mirando. Es el único de los cinco que no da ninguna señal el día que ocurre.</p>
+
+  <h2>⚖️ Los dos estados de un cambio</h2>
+  <table class="tres estados">
+    <tr><th>&nbsp;</th><th>Funciona</th><th>Está bien</th></tr>
+    <tr><td><b>Qué demuestra</b></td><td>Que hace lo pedido en el caso que se probó</td><td>Eso, y además que no rompió nada más</td></tr>
+    <tr><td><b>Quién lo comprueba</b></td><td>La máquina, ejecutándolo</td><td>Tú, leyendo lo que cambió</td></tr>
+    <tr><td><b>Cuánto tarda</b></td><td>Segundos</td><td>Minutos, y a veces media hora</td></tr>
+    <tr><td><b>Qué se puede hacer mañana</b></td><td>Nada: si falla, hay que empezar de cero</td><td>Explicarlo, arreglarlo o deshacerlo</td></tr>
+  </table>
+  <p>La prueba práctica para saber en cuál de los dos estás: <b>intenta contarle el cambio a alguien</b>, en voz alta, sin volver a mirarlo. Si puedes, está bien. Si no puedes, funciona, que es otra cosa.</p>
+
+  <h2>📖 Glosario de la etapa</h2>
+  <table class="casos">
+    <tr><th>Palabra</th><th>Qué quiere decir aquí</th><th>Con qué se confunde</th></tr>
+    <tr><td><b>El cambio</b></td><td>Lo que se movió: líneas que llegan, líneas que se van</td><td>Con el archivo, que es el resultado ya mezclado</td></tr>
+    <tr><td><b>La dependencia</b></td><td>Código de fuera del que pasa a depender el proyecto</td><td>Con una línea más, que es como se ve</td></tr>
+    <tr><td><b>El caso que decide</b></td><td>El que rompe una suposición cómoda</td><td>Con el caso raro, que suena a excepción</td></tr>
+    <tr><td><b>El borrado silencioso</b></td><td>Un arreglo anterior que desaparece al reescribir</td><td>Con nada: no deja señal el día que pasa</td></tr>
+    <tr><td><b>Comprobación</b></td><td>Código que se pone en rojo cuando algo se rompe</td><td>Con la que nunca se ha visto en rojo, que es un adorno</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h2>📋 Revisar el cambio, no el archivo</h2>
+  <p>Un archivo entero se lee y todo parece razonable: está ordenado, tiene sus nombres, hace su trabajo. El <b>cambio</b> enseña otra cosa: qué se movió y qué desapareció. Ahí es donde vive lo caro.</p>
+  <table class="tres mirar">
+    <tr><th>Qué se mira</th><th>Qué se busca</th><th>Qué avisa</th></tr>
+    <tr><td><b>1. La lista de archivos</b></td><td>¿Este archivo tenía que estar aquí?</td><td>Un archivo de más es el primer aviso de que el alcance se fue de madre</td></tr>
+    <tr><td><b>2. Las líneas borradas</b></td><td>¿Alguien pidió quitar esto?</td><td>Nadie pidió borrarlas: es el fallo más caro y el que menos se mira</td></tr>
+    <tr><td><b>3. Las líneas añadidas</b></td><td>¿Entiendo cada una? ¿Traen algo de fuera?</td><td>Una importación nueva al principio es una decisión de arquitectura</td></tr>
+    <tr><td><b>4. Lo que no cambió</b></td><td>¿Quedó algo que ahora miente?</td><td>El comentario viejo, la norma sin cumplir, el nombre que ya no aplica</td></tr>
+  </table>
+  <p class="mini">De las cuatro, la segunda es la que casi nadie hace. Se lee lo que llega, que es lo interesante, y se pasa por encima lo que se va, que es lo aburrido. El orden correcto es el contrario: <b>primero lo borrado</b>.</p>
+
+  <h2>📦 La dependencia de regalo</h2>
+  <p>La máquina propone una librería para formatear una fecha «porque es lo estándar». En un proyecto grande con compilación puede que lo sea. En este, que es HTML, CSS y JavaScript sin compilar y tiene que abrir sin internet en el teléfono de una maestra, <b>no es una línea: es una decisión de arquitectura</b>, tomada por alguien que no conoce ninguna de tus decisiones anteriores.</p>
+  <p>Tres preguntas antes de aceptar cualquier cosa que llegue de fuera: ¿funciona con el aparato en modo avión? ¿Sabría arreglarlo si mañana deja de estar? ¿Lo estoy metiendo por una necesidad real o porque venía puesto en la respuesta? Si la tercera respuesta es «venía puesto», se quita y ya está.</p>
+
+  <p class="mini">En este proyecto la respuesta a la primera pregunta manda sobre las otras dos: la aplicación tiene que abrir en un teléfono sin datos, así que cualquier cosa que necesite descargarse queda descartada antes de discutir si es buena.</p>
+
+  <h2>🏠 Lo que no sabe de tu casa</h2>
+  <p>La máquina sabe cómo se escribe código. No sabe tus normas, tus nombres, lo que ya decidiste ni lo que está prohibido aquí. Escribe <b>código correcto que no encaja</b>, y encaja peor cuanto más grande es el archivo que reescribe: en un cambio de tres líneas se ve enseguida; en un archivo entero se cuela entre lo que sí estaba bien.</p>
+  <p class="mini">La comprobación es barata y casi nadie la hace: <b>mirar lo que ya está escrito al lado</b>. Si las demás pantallas guardan de una manera y esta guarda de otra, no hace falta saber cuál es mejor; basta con que sean dos, porque dentro de un año habrá que acordarse de las dos.</p>
+
+  <h2>🙋 Cómo se pide un cambio para poder revisarlo</h2>
+  <p>Media revisión se decide antes de revisar nada, en cómo se pidió. Un cambio se puede pedir de manera que sea revisable en cinco minutos o de manera que no lo sea de ninguna forma, y el trabajo de la máquina es el mismo en los dos casos.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 3 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <table class="tres pedir">
+    <tr><th>En vez de pedir</th><th>Pedir</th><th>Qué se gana</th></tr>
+    <tr><td>«Arregla la pantalla de misiones»</td><td>«Arregla el promedio cuando la lista está vacía, sin tocar nada más»</td><td>El alcance queda dicho antes, no negociado después</td></tr>
+    <tr><td>«Reescribe este archivo mejor»</td><td>«Cambia solo esta función y déjame ver qué líneas quitas»</td><td>Se puede leer lo borrado, que es donde vive lo caro</td></tr>
+    <tr><td>«Haz que funcione»</td><td>«Haz que funcione sin internet y con la lista vacía»</td><td>El caso incómodo entra desde el principio</td></tr>
+    <tr><td>«Arregla estas cinco cosas»</td><td>«Empecemos por la primera»</td><td>Cada cosa sube por separado y se puede deshacer sola</td></tr>
+  </table>
+  <p class="mini">Las cuatro tienen la misma forma: <b>poner el límite antes</b>. Una petición sin límites no es más libre, es solo más difícil de revisar.</p>
+
+<h2>🧪 El caso que luce y el caso que decide</h2>
+  <p>Cuando la máquina propone cómo probar algo, propone el caso que funciona. No por engañar: propone el caso normal, y el caso normal es justamente el que no aporta información. Que un programa funcione con datos completos solo dice que <b>no está roto del todo</b>.</p>
+  <table class="casos">
+    <tr><th>Caso que decide</th><th>Qué destapa</th><th>Por qué da pereza</th></tr>
+    <tr><td>Sin señal, o con señal mala</td><td>Todo lo que dependía de internet sin decirlo</td><td>Hay que poner el modo avión y esperar</td></tr>
+    <tr><td>La lista vacía</td><td>Cuentas, promedios y comprobaciones que devuelven cualquier cosa</td><td>Hay que borrar los datos de prueba</td></tr>
+    <tr><td>Un aparato viejo o pequeño</td><td>Botones que no caben, letras que no se leen, lentitud</td><td>Hay que buscar otro teléfono</td></tr>
+    <tr><td>Un nombre con tilde o con ñ</td><td>Acentos rotos, archivos que no se guardan</td><td>Hay que escribirlo a mano</td></tr>
+    <tr><td>Dos personas a la vez</td><td>Datos que se pisan y desapariciones sin explicación</td><td>Hacen falta dos aparatos</td></tr>
+  </table>
+  <p class="mini">Regla corta: <b>el caso que da pereza montar es el que hay que montar</b>. Da pereza justamente porque es distinto de lo que ya está listo en la pantalla, y por eso es el único que trae información nueva. Los demás confirman lo que ya se sabía.</p>
+
+  <h2>🟢 La prueba que nunca falló</h2>
+  <p>Una comprobación que no se ha visto nunca en rojo <b>no se sabe si funciona</b>. Puede estar comprobando lo que dices, o puede estar mirando a otro lado y saludando. Desde fuera se ven exactamente igual: verde.</p>
+  <p>El único modo de saberlo es <b>romper a propósito</b> lo que debería detectar y mirar que se ponga en rojo. Cuesta un minuto y es la diferencia entre una comprobación y un adorno. Y hay un caso que sale gratis y que casi nadie escribe: preguntar <b>si hay algo que comprobar</b>. Recorrer una lista vacía preguntando si todos sus elementos cumplen algo devuelve que sí, porque no hay ninguno que lo incumpla.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <h2>🗣️ El guion de la revisión en voz alta</h2>
+  <p>Se hace hablando, aunque no haya nadie escuchando. Hablar obliga a terminar las frases, y una frase que no se puede terminar es exactamente el sitio donde no se entendió nada.</p>
+  <ol class="guion">
+    <li>«Este cambio toca <b>estos</b> archivos, y cada uno está aquí porque…»</li>
+    <li>«Estas líneas <b>desaparecen</b>. Se pueden ir porque…»</li>
+    <li>«Estas líneas llegan. La primera hace…, la segunda hace…»</li>
+    <li>«No trae nada de fuera» (o «trae esto, y lo acepto porque…»).</li>
+    <li>«Lo probé <b>así</b>, que es el caso que puede fallarle a alguien.»</li>
+    <li>«Si mañana sale mal, se deshace <b>de esta manera</b>.»</li>
+  </ol>
+  <p class="mini">Si alguna de las seis se queda a medias, ahí está el trabajo pendiente. No hace falta ninguna herramienta para descubrirlo: solo terminar la frase.</p>
+
+<h2>🛠️ Dónde se pone una comprobación</h2>
+  <p>El mejor sitio para una comprobación no es un archivo aparte que hay que acordarse de ejecutar: es <b>dentro de la herramienta que produce la cosa</b>. Ahí no se puede olvidar, no se puede saltar y falla en el momento exacto en que algo se rompe, no días después.</p>
+  <table class="tres donde">
+    <tr><th>Dónde</th><th>Cuándo avisa</th><th>Qué hace falta para que sirva</th></tr>
+    <tr><td>En la cabeza de quien revisa</td><td>Si se acuerda</td><td>Acordarse siempre, que no pasa</td></tr>
+    <tr><td>En una sonda aparte</td><td>Cuando se ejecuta</td><td>Ejecutarla, y que además esté bien escrita</td></tr>
+    <tr><td><b>Dentro de la herramienta</b></td><td>Siempre, en el acto</td><td>Nada: se niega a producir el archivo si algo no cuadra</td></tr>
+  </table>
+  <p class="mini">La forma concreta es sencilla: la herramienta cuenta, compara con lo que debería salir y, si no coincide, <b>no escribe nada y lo dice</b>. Un archivo que no se escribió se nota; uno que se escribió mal, no.</p>
+
+  <h2>📢 Avisar en vez de callar</h2>
+  <p>Una herramienta que busca un trozo de texto para reemplazarlo tiene dos maneras de comportarse cuando no lo encuentra: callarse y seguir, o decirlo. Callarse es más cómodo de programar y sale más caro que cualquier otra cosa de esta ficha, porque el resultado <b>parece correcto</b>: el archivo se generó, no hubo errores, todo verde. Solo que un trozo se quedó como estaba.</p>
+  <p>Decirlo cuesta una línea. La regla, entonces: <b>una herramienta que no encuentra lo que busca tiene que quejarse</b>, aunque sea la sexta vez que se ejecuta y las cinco anteriores hayan ido bien.</p>
+
+  <h2>↩️ Deshacer</h2>
+  <p>Es la última defensa: la que actúa cuando todo lo demás falló. Y es la única que no depende de haber acertado. Se consigue con tres costumbres: <b>un cambio por vez</b>, cada uno con su <b>mensaje diciendo el porqué</b> (no el qué, que ya se ve en el propio cambio), y subir <b>poco y seguido</b> en vez de mucho de golpe.</p>
+  <p class="mini">La diferencia práctica: con un cambio por vez, un error es un rato perdido. Con cinco cosas juntas en un solo envío, el mismo error es una tarde separando lo que servía de lo que no.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <h2>🔬 Tres cambios comentados</h2>
+  <div class="caja">
+    <h3>Uno · El que se acepta</h3>
+    <p>Toca un archivo. Quita tres líneas y pone cinco. Lo quitado es la cuenta que dividía sin mirar si había alguien; lo puesto es la misma cuenta con una pregunta antes. Se entiende leyéndolo una vez y se prueba en diez segundos con la lista vacía.</p>
+    <p class="mini">Señal buena: el cambio es del tamaño del problema. Un problema pequeño que llega con un cambio grande es un cambio que trae cosas de más.</p>
+  </div>
+  <div class="caja">
+    <h3>Dos · El que se parte</h3>
+    <p>Toca cuatro archivos. Arregla el promedio, cambia de sitio dos botones, renombra una función y pone un comentario nuevo. Todo está bien hecho, y por eso mismo cuesta: si mañana falla el promedio, deshacerlo se lleva por delante los botones.</p>
+    <p class="mini">No se rechaza por malo, se rechaza por mezclado. Se pide otra vez, una cosa cada vez, y cada una sube con su mensaje.</p>
+  </div>
+  <div class="caja caja-amb">
+    <h3>Tres · El que se devuelve</h3>
+    <p>Un solo archivo, pero entero: setecientas líneas quitadas y setecientas veinte puestas. Al abrirlo funciona. Nadie sabe, ni quien lo escribió, qué había en esas setecientas líneas que se fueron.</p>
+    <p class="mini">Este es el que produce el borrado silencioso. Da igual lo bien que funcione hoy: no se puede revisar, y <b>lo que no se puede revisar no se sube</b>. Tampoco se sube el código que no entiendes, ni nada que no se pueda deshacer mañana.</p>
+  </div>
+
+<h2>🧩 Las siete piezas, en orden</h2>
+  <p class="mini">Van en ese orden por una razón: cada una es más barata que la siguiente. Entender cuesta minutos; deshacer cuesta un día. Y la séptima solo hace falta cuando las seis anteriores no bastaron.</p>
+  <table class="tres piezas">
+    <tr><th>Pieza</th><th>Para qué sirve</th><th>Qué pasa si se salta</th></tr>
+    <tr><td><b>1. Lo entiendo</b></td><td>Poder arreglarlo el día que falle</td><td>A las diez de la noche estás tú delante y la máquina no</td></tr>
+    <tr><td><b>2. El alcance</b></td><td>Ver si el cambio se fue de madre</td><td>Se cambian cosas que nadie pidió cambiar</td></tr>
+    <tr><td><b>3. El borrado</b></td><td>Cazar el fallo más caro de los cinco</td><td>Vuelve un problema que se arregló hace semanas</td></tr>
+    <tr><td><b>4. La dependencia</b></td><td>Que la arquitectura la decidas tú</td><td>El proyecto engorda solo, sin que nadie lo decida</td></tr>
+    <tr><td><b>5. La prueba real</b></td><td>Saber si aguanta lo que de verdad pasa</td><td>Funciona en tu teléfono y no en el de la maestra</td></tr>
+    <tr><td><b>6. La comprobación</b></td><td>Que el fallo avise solo la próxima vez</td><td>Se comprueba el día que hay tiempo, o sea nunca</td></tr>
+    <tr><td><b>7. Deshacer</b></td><td>Volver atrás sin arrastrar lo demás</td><td>Un error se convierte en una tarde de arqueología</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h2>🏡 Seis fallos de verdad, de esta casa</h2>
+  <p class="mini">Los seis pasaron construyendo esta misma aplicación, en un solo día de trabajo. No son ejemplos inventados: cada uno costó tiempo, cada uno dejó una regla y ninguno se habría cazado leyendo el código con más atención.</p>
+  <table class="casos">
+    <tr><th>Qué pasó</th><th>Por qué no se vio</th><th>La regla que dejó</th></tr>
+    <tr><td><b>La prueba verde sobre la lista vacía.</b> Cinco comprobaciones en verde a la primera, sobre un catálogo que no había cargado</td><td>El código estaba bien escrito. Recorrer una lista vacía preguntando si todos cumplen algo devuelve que sí</td><td>Antes de creerle a una prueba, verla fallar una vez</td></tr>
+    <tr><td><b>La sonda que limpiaba la llave equivocada.</b> Borraba <code>faro_familia_v1</code>; la real se llama <code>faro_v1</code></td><td>Pasaba igual, porque el navegador de prueba arranca siempre vacío</td><td>Las pruebas también se copian mal: comprobar los nombres contra el original</td></tr>
+    <tr><td><b>El dato que no estaba donde se buscaba.</b> Una sonda leía el catálogo desde la ventana y salía indefinido</td><td>Una declaración fija no queda colgada de la ventana; se ve igual en el archivo</td><td>Copiar la manera de mirar de una sonda que ya funcionaba</td></tr>
+  </table>
+  <table class="casos">
+    <tr><th>Qué pasó</th><th>Por qué no se vio</th><th>La regla que dejó</th></tr>
+    <tr><td><b>La herramienta que falló a la sexta.</b> Reescribía un trozo del molde buscándolo por el nombre de un parámetro, renombrado en la misión anterior</td><td>Había funcionado cinco veces seguidas. El mismo código, otro contexto</td><td>Que la herramienta avise cuando no encuentra lo que busca</td></tr>
+    <tr><td><b>El corte que partió una tabla.</b> Un punto de corte de página cayó dentro de una tabla y el repaginador no supo retroceder</td><td>El resultado se generó sin errores; se vio al mirar el PDF</td><td>El PDF es el único juez, y los anclajes van fuera de las tablas</td></tr>
+    <tr><td><b>El generador que contó veintinueve.</b> Una página tenía que llevar treinta preguntas y trajo veintinueve</td><td>Veintinueve preguntas se ven igual que treinta, y contarlas a mano es lo que nadie hace</td><td>La comprobación, dentro de la herramienta que produce la cosa</td></tr>
+  </table>
+  <p class="mini">De los seis, el último es el único que <b>no costó tiempo</b>: lo cazó una línea dentro del propio generador, que se negó a escribir el archivo. La diferencia con los otros cinco no fue la inteligencia de nadie, sino dónde estaba puesta la comprobación.</p>
+  <div class="caja caja-amb">
+    <p><b>Lo que los seis tienen en común.</b> En ninguno el resultado se veía mal. Al contrario: el archivo se generó, la sonda salió verde, la herramienta terminó sin quejarse. Lo que falló no fue la atención de nadie, sino que <b>nada avisaba</b>.</p>
+    <p class="mini">Por eso las reglas de esta ficha no piden mirar mejor: piden mirar <b>otra cosa</b> (lo borrado, la lista de archivos, el caso incómodo) y dejar puesta una comprobación que hable sola la próxima vez.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 7 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
+<section class="pagina">
+  <h2>📝 Hoja de revisión antes de subir</h2>
+  <p class="mini">Se imprime y se rellena por cada cambio. Si alguna casilla queda vacía, el cambio no sube todavía.</p>
+  <table class="hoja">
+    <tr><th>&nbsp;</th><th>Comprobación</th><th>Hecho</th><th>Anotación</th></tr>
+    <tr><td>1</td><td>Puedo explicar cada parte con mis palabras</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>2</td><td>Miré la lista de archivos tocados, uno por uno</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>3</td><td>Leí las líneas que desaparecen antes que las que llegan</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>4</td><td>No entra ninguna librería ni manera nueva sin decidirlo</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>5</td><td>Lo probé con el caso incómodo, no con el fácil</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>6</td><td>Si añadí una comprobación, la vi fallar a propósito</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>7</td><td>Sube un solo cambio, con su mensaje diciendo el porqué</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>8</td><td>Sé cómo deshacerlo mañana sin arrastrar nada más</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  </table>
+
+  <div class="caja ej1">
+    <h3>Ejercicio 1 · Funciona o está bien</h3>
+    <p>Escribe <b>F</b> si solo demuestra que funciona y <b>B</b> si demuestra que está bien:</p>
+    <ol>
+      <li>Se ejecutó y no dio ningún error. ____</li>
+      <li>Puedo contar qué hace cada parte sin volver a mirarlo. ____</li>
+      <li>La pantalla muestra lo que esperaba. ____</li>
+      <li>Sé qué archivos tocó y por qué cada uno. ____</li>
+    </ol>
+  </div>
+
+  <div class="caja ej2">
+    <h3>Ejercicio 2 · El caso que decide</h3>
+    <p>Para cada función, escribe <b>un</b> caso incómodo que la pondría a prueba de verdad:</p>
+    <ol>
+      <li>Una pantalla que muestra el promedio de puntos de la familia. ______</li>
+      <li>Un botón que guarda el avance de una misión. ______</li>
+      <li>Una ficha que se imprime desde el teléfono. ______</li>
+    </ol>
+  </div>
+
+<div class="caja ej3">
+    <h3>Ejercicio 3 · Caza el fallo</h3>
+    <p>Di cuál de los cinco fallos es cada situación, y cómo se habría cazado:</p>
+    <ol>
+      <li>Pediste arreglar un botón y el cambio toca cuatro archivos. ______</li>
+      <li>Al principio del archivo apareció una importación que no estaba. ______</li>
+      <li>Funciona perfecto en tu computadora con internet. ______</li>
+      <li>Volvió un error que se había arreglado el mes pasado. ______</li>
+    </ol>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 8 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <div class="caja ej4">
+    <h3>Ejercicio 4 · La comprobación adornada</h3>
+    <p>Una comprobación recorre las misiones y confirma que todas tienen su ficha. Sale en verde. Escribe <b>dos</b> maneras distintas de que esté saliendo verde sin comprobar nada:</p>
+    <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  </div>
+
+  <div class="caja ej5">
+    <h3>Ejercicio 5 · El mensaje del cambio</h3>
+    <p>Reescribe estos mensajes para que digan <b>el porqué</b> y no el qué:</p>
+    <ol>
+      <li>«Cambios varios». ______</li>
+      <li>«Actualiza el archivo de la aplicación». ______</li>
+    </ol>
+  </div>
+
+  <div class="caja ej6">
+    <h3>Ejercicio 6 · Decisión</h3>
+    <p>Son las nueve de la noche. La máquina te entregó un cambio que reescribe entero el archivo principal de la aplicación, funciona al abrirlo y trae una librería nueva para las fechas. Mañana quieres enseñárselo a la familia.</p>
+    <ol>
+      <li>¿Lo subes, lo partes o lo devuelves? ______</li>
+      <li>¿Qué mirarías primero, y por qué eso antes que nada? ______</li>
+      <li>¿Con qué caso lo probarías? ______</li>
+    </ol>
+  </div>
+
+<h2>✅ Pauta completa de respuestas</h2>
+
+  <div class="pauta pa1">
+    <h3>Ejercicio 1 · Funciona o está bien</h3>
+    <ol>
+      <li><b>F</b>. Que no dé error solo dice que no reventó en el caso que se probó.</li>
+      <li><b>B</b>. Poder explicarlo es lo que permite arreglarlo mañana.</li>
+      <li><b>F</b>. La pantalla enseña el caso fácil, que es el que se montó.</li>
+      <li><b>B</b>. Saber el alcance es saber qué más pudo cambiar sin querer.</li>
+    </ol>
+  </div>
+
+  <div class="pauta pa2">
+    <h3>Ejercicio 2 · El caso que decide</h3>
+    <ol>
+      <li>Promedio: <b>la lista vacía</b>, o una sola persona con cero puntos. Dividir entre cero es la trampa clásica.</li>
+      <li>Guardar: <b>sin señal</b>, o el mismo botón dos veces seguidas, o con el almacenamiento lleno.</li>
+      <li>Imprimir: <b>un teléfono viejo y pequeño</b>, en vertical, con el nombre más largo de la familia.</li>
+    </ol>
+    <p class="mini">Vale cualquier caso que rompa una suposición cómoda. No vale «con muchos datos», que es el caso fácil con más volumen.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 9 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <div class="pauta pa3">
+    <h3>Ejercicio 3 · Caza el fallo</h3>
+    <ol>
+      <li><b>El alcance.</b> Se caza mirando la lista de archivos antes de leer nada.</li>
+      <li><b>La dependencia.</b> Se caza leyendo las primeras líneas del archivo.</li>
+      <li><b>El caso fácil.</b> Se caza probando en modo avión y en el aparato de otra persona.</li>
+      <li><b>El borrado silencioso.</b> Se caza leyendo las líneas que desaparecieron.</li>
+    </ol>
+  </div>
+
+  <div class="pauta pa4">
+    <h3>Ejercicio 4 · La comprobación adornada</h3>
+    <ol>
+      <li><b>La lista llegó vacía.</b> Preguntar si todos cumplen algo sobre cero elementos devuelve que sí.</li>
+      <li><b>Está mirando el sitio equivocado.</b> Una carpeta que no existe también devuelve cero fichas que revisar.</li>
+    </ol>
+    <p class="mini">Se acepta cualquier otra con la misma forma: no hay nada que mirar, y eso se cuenta como éxito.</p>
+  </div>
+
+  <div class="pauta pa5">
+    <h3>Ejercicio 5 · El mensaje del cambio</h3>
+    <ol>
+      <li>«Arregla el promedio cuando la familia todavía no tiene puntos: dividía entre cero y mostraba un guion.»</li>
+      <li>«Guarda el avance también sin señal, porque en el aula de la maestra no hay internet.»</li>
+    </ol>
+    <p class="mini">La prueba: un mensaje sirve si dentro de seis meses explica por qué se hizo, no qué se tocó. Lo tocado ya está en el cambio.</p>
+  </div>
+
+  <div class="pauta pa6">
+    <h3>Ejercicio 6 · Decisión</h3>
+    <ol>
+      <li><b>Se devuelve y se parte.</b> Un archivo entero reescrito no se puede revisar, y a las nueve de la noche menos.</li>
+      <li><b>Las líneas que desaparecen</b>, antes que nada: es el único de los cinco fallos que no se nota probando, y un archivo completo es justo donde se cuela.</li>
+      <li>Con el caso incómodo que use la familia mañana: el teléfono más viejo, sin señal y con la lista de misiones vacía.</li>
+    </ol>
+    <p class="mini">La librería de fechas se devuelve sin discutir: en un proyecto sin compilación que tiene que abrir en modo avión, eso no es una línea, es una decisión de arquitectura.</p>
+  </div>
+
+  <h2>🧭 Lo que se lleva de esta etapa</h2>
+  <div class="caja">
+    <p>La etapa 3 enseñó a no fiarse de una respuesta que suena bien. Esta enseña lo mismo un escalón más abajo, donde es más difícil: <b>a no fiarse de algo que además funciona</b>. Funcionar es la forma que tiene el código de sonar bien. Y deja una costumbre: cuando algo falle, además de arreglarlo, <b>poner la comprobación dentro de la herramienta</b> que lo produjo.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 4 · Página 10 de 10</span></div>
+</section>
+
+
+
+</div>
+</body>
+</html>
