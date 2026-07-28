@@ -1,0 +1,214 @@
+# Plan · F.A.R.O totalmente privado
+
+Qué pidió el autor el 28 de julio de 2026: que **nada** de este proyecto sea
+público. Ni el código, ni las misiones, ni la aplicación. Solo los cuatro. Y
+además, guardar aquí documentos personales y contraseñas de la familia.
+
+Este documento dice qué hace falta para eso de verdad, en qué orden, y qué se
+pierde por el camino. Estado: **plan**, nada aplicado todavía.
+
+---
+
+## 0. Lo que hay que entender antes de tocar nada
+
+F.A.R.O se diseñó como **sitio estático publicado en GitHub Pages**. Esa
+decisión fue buena para lo que era (una aplicación de la casa, gratis, que abre
+en cualquier teléfono) pero es **incompatible con «totalmente privado»**, y no
+por un descuido que se pueda parchar: es la premisa del diseño.
+
+GitHub Pages, en cualquier plan que no sea Enterprise, publica **un sitio web
+público**. Siempre. Pagar el plan Pro (unos 4 dólares al mes) solo consigue que
+el **repositorio** sea privado mientras el **sitio** sigue abierto a cualquiera
+con la dirección. Y como en F.A.R.O las misiones **son** los archivos del sitio,
+pagar no cierra nada de lo que importa.
+
+Conclusión, sin rodeos: **Pages se apaga.** Y entonces hay que resolver por
+dónde entran los cuatro, porque hoy entran por una dirección web.
+
+---
+
+## 1. Lo que está abierto hoy
+
+Tres agujeros distintos. Solo el segundo permite daño a datos reales.
+
+### 1.1 El código y las misiones se leen
+
+El repositorio es público. Las dieciséis misiones, sus fichas y todo el texto de
+las rutas del adulto se leen desde github.com y desde el sitio de Pages. El
+sello `familiar` y el candado 🔒 de las tarjetas son decorativos mientras eso sea
+así, tal y como avisaba el capítulo 0 de `PROPUESTA-RUTAS-DEL-ADULTO.md`.
+
+### 1.2 Los datos de la familia se leen Y se escriben
+
+`js/chat.js` lleva la clave de Supabase. **La clave está bien**: es del tipo
+`sb_publishable_`, diseñado para vivir en el navegador. El problema es que la
+seguridad por fila está **apagada** en seis tablas, y con eso esa clave basta
+para leer y escribir sin abrir la aplicación siquiera:
+
+| tabla | qué guarda |
+|---|---|
+| `destellos` | ideas y apuntes |
+| `inventario` | el inventario de la casa |
+| `redaccion_ediciones` | la revista |
+| `redaccion_notas` | las notas |
+| `redaccion_config` | su configuración |
+| `push_subscriptions` | a qué teléfonos llegan las notificaciones |
+
+`push_subscriptions` es la peor: con eso se pueden mandar notificaciones a los
+teléfonos de la casa. De la tabla del **chat** no se sabe: su seguridad no se
+declara en ningún `.sql` del repositorio y hay que mirarla en Supabase.
+
+### 1.3 Cualquiera con la dirección abre la aplicación
+
+`js/auth.js` no autentica: guarda en `localStorage` cuál perfil se eligió. Y los
+**cuatro PIN están escritos en texto plano** en ese archivo, dentro de un
+repositorio público.
+
+> **Los cuatro PIN de `js/auth.js` están quemados.** Se cambian, y no se
+> reutilizan en ningún otro sitio. Un repositorio público se copia, se indexa y
+> se conserva: darlos por perdidos es lo único prudente.
+
+---
+
+## 2. Por qué la seguridad por fila no se puede arreglar sola
+
+Para escribir una política de seguridad por fila hace falta **una identidad que
+comprobar**: la base de datos tiene que poder preguntar «¿quién es este?». Hoy
+no hay quién. El «login» elige perfil en el teléfono y la base de datos nunca se
+entera.
+
+Por eso el orden importa y no se puede alterar:
+
+```
+autenticación de verdad  →  seguridad por fila  →  bóveda de documentos
+```
+
+Encender la seguridad por fila antes de tener autenticación deja la aplicación
+muerta: todas las consultas se rechazan y no hay con qué autorizarlas.
+
+---
+
+## 3. El plan, en cuatro tandas
+
+### Tanda 1 · La puerta de verdad (autenticación)
+
+Cambiar el «login» de perfil por **Supabase Auth** con los cuatro miembros como
+usuarios reales (correo y contraseña). Qué implica:
+
+1. Crear los cuatro usuarios en Supabase. Contraseñas nuevas, no los PIN viejos.
+2. Reescribir `js/auth.js`: `signInWithPassword`, sesión de Supabase en vez de
+   `localStorage`, y renovación de sesión para que no pida contraseña cada día.
+3. Que las hijas puedan entrar fácil: sesión larga en su propio teléfono, para
+   que en la práctica escriban la contraseña una vez y no cada vez.
+4. Borrar `FARO_USERS` y sus PIN del código.
+
+### Tanda 2 · Cerrar los datos (seguridad por fila)
+
+Con identidad ya disponible, encender la seguridad por fila en las seis tablas y
+en el chat, con la política más simple que sirve para una familia:
+
+```sql
+-- El molde, tabla por tabla. Nada de anon: solo sesión iniciada.
+alter table public.destellos enable row level security;
+
+create policy destellos_familia on public.destellos
+  for all
+  to authenticated
+  using (true)
+  with check (true);
+```
+
+Es decir: **cualquiera de los cuatro, con sesión iniciada, puede todo; quien no
+tiene sesión, nada.** Para una familia de cuatro eso es suficiente y es mucho
+mejor que hilar fino y equivocarse. Después, si hace falta, se afina (que las
+finanzas solo las vean los padres, por ejemplo).
+
+`push_subscriptions` merece una política más estrecha: cada quien ve y borra
+**solo su propia suscripción**, comparando con `auth.uid()`.
+
+Y hay que revisar tabla por tabla en Supabase, no en el repositorio, porque lo
+declarado y lo aplicado pueden no coincidir.
+
+### Tanda 3 · Cerrar la casa (repositorio y Pages)
+
+Solo cuando las tandas 1 y 2 estén probadas, porque este paso corta la entrada
+actual:
+
+1. **Compilar y repartir el APK** a los cuatro. `capacitor.config.json` no tiene
+   bloque `server`, así que el APK empaqueta los archivos y funciona sin red:
+   es la única puerta que no exige un sitio público.
+2. **Apagar GitHub Pages** de este repositorio.
+3. **Poner el repositorio en privado**: Settings → General → Danger Zone →
+   Change repository visibility → Make private.
+
+Lo que se pierde: abrir F.A.R.O escribiendo una dirección en el navegador. A
+partir de aquí se entra por la aplicación instalada. Es el precio de que no haya
+nada público, y no hay forma de evitarlo sin pagar Enterprise.
+
+### Tanda 4 · La bóveda de documentos
+
+Ya con la casa cerrada, guardar documentos personales de la familia (partidas,
+identidades, títulos, recibos). Diseño propuesto:
+
+- Supabase Storage con un depósito **privado**, nunca público.
+- Subida y descarga solo con sesión iniciada, por enlaces firmados que caducan.
+- Cada documento con su fila en una tabla: qué es, de quién, cuándo caduca (los
+  documentos caducan: pasaportes, licencias) y quién lo subió.
+- Aviso cuando algo esté por vencer, que es la mitad de la utilidad de tener esto.
+
+---
+
+## 4. Las contraseñas: lo que recomiendo, y por qué
+
+Pediste guardar también **las contraseñas de la familia**. Aquí la recomendación
+es no hacerlo en F.A.R.O, y conviene que quede escrito el porqué:
+
+1. Un gestor de contraseñas mal hecho es **peor que no tener ninguno**, porque
+   concentra todo en un sitio y da la sensación de estar protegido.
+2. Hacerlo bien no es guardar el texto: es **cifrado del lado del cliente**, con
+   una clave maestra que **nunca** llega al servidor, derivación de clave con
+   coste alto, y un plan de recuperación para el día que alguien la olvide. Cada
+   una de esas cuatro cosas mal hecha lo tira todo.
+3. Ya existen hechos y auditados. **Bitwarden** tiene plan gratuito, funciona en
+   los cuatro teléfonos y tiene organización familiar. **KeePass** es gratis y
+   ni siquiera sube nada: el archivo vive donde tú digas.
+4. El tiempo de construir eso está mejor puesto en las etapas 3 de las rutas.
+
+**Si aun así se quiere en F.A.R.O**, el mínimo aceptable, sin excepciones:
+
+- Cifrado en el teléfono con una clave maestra que no se guarda en ninguna parte
+  ni viaja al servidor.
+- El servidor guarda **solo texto cifrado**. Una fuga completa de la base de
+  datos no debe revelar ni una contraseña.
+- Sin recuperación mágica: si se olvida la clave maestra, se pierde. Cualquier
+  «recuperar contraseña» que funcione es una puerta trasera.
+
+Eso es una tanda entera por sí sola, y va después de la 4, nunca antes.
+
+---
+
+## 5. Lo que hay que hacer y quién lo hace
+
+| # | qué | quién |
+|---|---|---|
+| 1 | Cambiar los cuatro PIN quemados donde se hayan reutilizado | el autor, hoy |
+| 2 | Revisar en Supabase qué tablas tienen la seguridad apagada de verdad | el autor o Claude con acceso de lectura |
+| 3 | Crear los cuatro usuarios de Supabase Auth | el autor |
+| 4 | Reescribir `js/auth.js` y probar la entrada de los cuatro | Claude |
+| 5 | Las políticas de seguridad por fila, tabla por tabla | Claude escribe, el autor aplica |
+| 6 | Compilar y repartir el APK | el autor (hace falta Android SDK) |
+| 7 | Apagar Pages y poner el repositorio en privado | el autor |
+| 8 | La bóveda de documentos | Claude |
+
+---
+
+## 6. Lo que este plan no resuelve
+
+- **Supabase sigue siendo un tercero.** Los datos están en su servidor. Privado
+  frente a extraños no es privado frente al proveedor. Para una familia es un
+  trato razonable, pero conviene saberlo y no confundirlo.
+- **El APK se comparte por archivo.** Quien reciba el APK tiene la aplicación,
+  aunque sin contraseña no vea ningún dato: por eso la tanda 1 va primera.
+- **Las copias de seguridad son parte de la privacidad.** Perder los datos
+  también es perderlos. Eso es la etapa 5 de la Ruta de la Casa Cerrada, y aquí
+  deja de ser materia de estudio para ser tarea.
