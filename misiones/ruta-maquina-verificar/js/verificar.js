@@ -362,7 +362,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   showNeuro();
   showEnfer();
   updateLabDisplay();
-  document.querySelector('[data-parte="contexto"]')?.classList.add('active-pri');
+  document.querySelector('[data-parte="leer"]')?.classList.add('active-pri');
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });
