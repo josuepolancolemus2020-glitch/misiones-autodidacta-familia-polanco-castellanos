@@ -21,10 +21,14 @@ pierde por el camino.
 | La pantalla de entrada nueva, publicada en `main` | ✅ hecho |
 | Que los cuatro entren de verdad, cada uno en su aparato | ✅ hecho, los cuatro |
 | **Cerrar los datos (paso 2 del SQL)** | ✅ **hecho y comprobado de las dos maneras** |
-| La clave de servicio en la función de notificaciones | ⚠️ **urgente**: los avisos están rotos |
-| Apagar el alta pública de cuentas | ⛔ pendiente |
-| Compilar y repartir el APK | ⛔ pendiente |
-| Apagar Pages y poner el repositorio en privado | ⛔ pendiente |
+| La Bóveda de documentos | ✅ instalada y probada |
+| El sitio privado en Cloudflare, con puerta | ✅ **hecho**: `faro-dq7.pages.dev` tras Access |
+| Que los cuatro entren por la dirección nueva | ⏳ falta que prueben Evelyn, Jael y Angelly |
+| La mudanza del progreso, aparato por aparato | ⏳ pendiente, y va ANTES de apagar Pages |
+| Apagar Pages y poner el repositorio en privado | ⛔ el último paso |
+| La clave de servicio en la función de notificaciones | ⚠️ los avisos siguen rotos |
+| Apagar el alta pública de cuentas en Supabase | ⛔ pendiente |
+| Compilar y repartir el APK | ⛔ **ya no hace falta**: la PWA se actualiza sola |
 
 **Lo que esto significa hoy:** los datos de la familia están cerrados, y esta
 vez comprobado de las dos maneras, que son distintas y hacen falta las dos:
@@ -48,8 +52,9 @@ la prueba cambiando el nombre de la tabla cuesta diez segundos y no sobra.
 
 **Lo que sigue abierto, y no hay que confundirlo:**
 
-- **El repositorio es público**, así que las dieciséis misiones y todo el código
-  se leen desde github.com y desde Pages. Eso lo cierra la tanda 3, no la 2.
+- **El repositorio sigue público**, así que las dieciséis misiones y todo el
+  código se leen desde github.com. La copia de Cloudflare ya no: quedó detrás de
+  la puerta. Falta apagar GitHub Pages y cambiar la visibilidad.
 - **Las notificaciones del chat están rotas desde este momento**, y en silencio.
   La función send-chat-push lee push_subscriptions con la clave anon, y esa
   clave ya no ve ninguna fila. No da error: devuelve cero. Hay que cambiarla a
@@ -225,7 +230,7 @@ Y hay que revisar tabla por tabla en Supabase, no en el repositorio, porque lo
 declarado y lo aplicado pueden no coincidir. El propio archivo del paso 2
 termina con la consulta que lo dice.
 
-### Tanda 3 · Cerrar la casa (repositorio y Pages)
+### Tanda 3 · Cerrar la casa (repositorio y Pages) · EN CURSO
 
 Solo cuando las tandas 1 y 2 estén probadas, porque este paso corta la entrada
 actual:
