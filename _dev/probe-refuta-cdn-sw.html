@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · sw.js y el CDN</title></head>
+<body>
+<pre id="out"></pre>
+<script>
+const out = document.getElementById('out');
+const log = m => { out.textContent += m + '\n'; };
+
+(async function () {
+  /* ¿Qué recursos externos se alcanzan desde aquí? */
+  for (const u of [
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+    'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap',
+  ]) {
+    try { await fetch(u, { mode: 'no-cors' }); log('OK   ' + u.slice(0, 60)); }
+    catch (e) { log('FALLA ' + u.slice(0, 60)); }
+  }
+
+  log('');
+  log('── service worker ──');
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    log('register(): ok');
+    await new Promise(r => setTimeout(r, 3500));
+    log('installing/waiting/active: ' + !!reg.installing + '/' + !!reg.waiting + '/' + !!reg.active);
+    const keys = await caches.keys();
+    log('cachés: ' + JSON.stringify(keys));
+    for (const k of keys) {
+      const c = await caches.open(k);
+      const req = await c.keys();
+      log('  ' + k + ' -> ' + req.length + ' entradas');
+      req.forEach(r => log('     · ' + r.url));
+    }
+    log('¿supabase-js en caché? : ' + !!(await caches.match('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2')));
+    await reg.unregister();
+  } catch (e) {
+    log('service worker: ' + e.name + ' ' + e.message);
+  }
+
+  log('');
+  log('── mision.html ──');
+  const r = await fetch('/mision.html');
+  const t = await r.text();
+  log('carga jsdelivr : ' + /jsdelivr/.test(t));
+  log('carga auth.js  : ' + /auth\.js/.test(t));
+  log('login-screen   : ' + /login-screen/.test(t));
+  log('');
+  log('FIN');
+})();
+</script>
+</body>
+</html>

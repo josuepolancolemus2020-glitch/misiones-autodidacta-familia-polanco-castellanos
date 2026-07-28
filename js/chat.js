@@ -4,9 +4,13 @@ const SUPABASE_URL = 'https://bzrnjvalpwlcnpszvwim.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_74mJW5LoxPZOWtIi7YrBEw_0y9JjSfM';
 const CHAT_TABLE   = 'mensajes';
 
-const _sb = (window.supabase && window.supabase.createClient)
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-  : null;
+/* El cliente lo crea js/auth.js, que carga antes que este archivo, y de aquí
+   cuelgan los siete módulos que tocan la nube. NO se crea otro: si la sesión de
+   la familia vive en un cliente y las consultas salen por otro, con la seguridad
+   por fila encendida la casa se queda muda y de fuera sigue entrando cualquiera.
+   Si algún día auth.js dejara de cargar antes, esto queda en null y los módulos
+   ya saben tratarlo, que es mejor que consultar sin sesión. */
+const _sb = window.faroSb || null;
 
 let _chatChannel = null;
 let _chatSendTopic   = 'General'; // tema con el que se etiqueta el próximo mensaje a enviar

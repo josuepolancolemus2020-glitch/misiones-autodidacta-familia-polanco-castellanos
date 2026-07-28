@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Sonda: push.js y user_id</title>
+<pre id="out">(corriendo)</pre>
+
+<!-- Elementos que auth.js y push.js esperan encontrar -->
+<div id="login-screen"></div>
+<div id="app-container"></div>
+<form id="login-form"><input id="login-user"><input id="login-pass"><button class="login-btn">e</button></form>
+<div id="login-error" hidden></div>
+<div id="push-banner"><span id="push-banner-text"></span><button id="push-banner-btn"></button><button id="push-banner-dismiss"></button></div>
+
+<script>
+const L = [];
+function log(s){ L.push(s); document.getElementById('out').textContent = L.join('\n'); }
+
+// ── Stub de supabase-js: registra CADA createClient y CADA upsert ──
+const clientesCreados = [];
+const upsertsVistos   = [];
+
+function fakeClient(etiqueta, opciones) {
+  const c = {
+    __etiqueta: etiqueta,
+    __opciones: opciones || {},
+    from(tabla) {
+      return {
+        upsert(fila, opts) {
+          upsertsVistos.push({ cliente: etiqueta, tabla, fila, opts });
+          return Promise.resolve({ error: null });
+        },
+        select(){ return { limit: () => Promise.resolve({ error: null }) }; },
+        insert(){ return Promise.resolve({ error: null }); },
+      };
+    },
+    auth: {
+      getSession: () => Promise.resolve({ data: { session: null } }),
+      signInWithPassword: () => Promise.resolve({ data: null, error: { message: 'stub' } }),
+      onAuthStateChange(){ return { data: { subscription: { unsubscribe(){} } } }; },
+      signOut: () => Promise.resolve({}),
+    },
+    channel(){ return { on(){ return this; }, subscribe(){ return this; } }; },
+    functions: { invoke: () => Promise.resolve({ data: null, error: null }) },
+  };
+  clientesCreados.push(c);
+  return c;
+}
+
+window.supabase = {
+  createClient(url, key, opciones) {
+    // La etiqueta la decide el ORDEN: auth.js carga primero, chat.js despues.
+    const etiqueta = 'cliente#' + (clientesCreados.length + 1);
+    return fakeClient(etiqueta, opciones);
+  }
+};
+
+// ── Stubs del navegador que pushSubscribe necesita ──
+window.Notification = { permission: 'default', requestPermission: () => Promise.resolve('granted') };
+window.PushManager  = function(){};
+Object.defineProperty(navigator, 'serviceWorker', {
+  configurable: true,
+  value: {
+    ready: Promise.resolve({
+      pushManager: {
+        getSubscription: () => Promise.resolve(null),
+        subscribe: () => Promise.resolve({
+          toJSON: () => ({ endpoint: 'https://fcm.example/ENDPOINT-DE-PRUEBA',
+                           keys: { p256dh: 'P256DH', auth: 'AUTH' } })
+        })
+      }
+    })
+  }
+});
+</script>
+
+<script src="/js/auth.js"></script>
+<script src="/js/chat.js"></script>
+<script src="/js/push.js"></script>
+
+<script>
+window.addEventListener('load', async () => {
+  await new Promise(r => setTimeout(r, 400));
+
+  log('CLIENTES SUPABASE CREADOS: ' + clientesCreados.length);
+  clientesCreados.forEach((c, i) => {
+    const sk = (c.__opciones.auth && c.__opciones.auth.storageKey) || '(por defecto: sb-<ref>-auth-token)';
+    log('  ' + c.__etiqueta + '  storageKey = ' + sk);
+  });
+  log('');
+  log('window.faroSb es ..... ' + (window.faroSb ? window.faroSb.__etiqueta : 'null'));
+  // _sb es const de modulo global en chat.js
+  const sbGlobal = (typeof _sb !== 'undefined') ? _sb : null;
+  log('_sb (el que usa push) . ' + (sbGlobal ? sbGlobal.__etiqueta : 'null'));
+  log('¿son el MISMO objeto? . ' + (sbGlobal === window.faroSb));
+  log('');
+
+  // Simular el clic en «Activar notificaciones»
+  const r = await pushSubscribe();
+  log('pushSubscribe() devolvio: ' + JSON.stringify(r));
+  log('');
+  log('UPSERTS OBSERVADOS: ' + upsertsVistos.length);
+  upsertsVistos.forEach(u => {
+    log('  cliente=' + u.cliente + '  tabla=' + u.tabla);
+    log('  columnas enviadas: ' + JSON.stringify(Object.keys(u.fila)));
+    log('  ¿incluye user_id? .. ' + ('user_id' in u.fila));
+    log('  fila: ' + JSON.stringify(u.fila));
+    log('  opts: ' + JSON.stringify(u.opts));
+  });
+});
+</script>

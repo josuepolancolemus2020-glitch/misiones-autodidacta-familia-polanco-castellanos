@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · el cliente de datos llega tarde</title>
+<style>body{font-family:system-ui;background:#111;color:#eee;margin:0;padding:10px}
+pre{background:#000;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+<div id="login-screen" style="display:none">
+  <form id="login-form">
+    <select id="login-user"><option value="josue">Josué</option></select>
+    <input id="login-pass" type="password"><p id="login-error" hidden></p>
+    <button class="login-btn" type="submit">Ingresar</button>
+  </form>
+</div>
+<div id="app-container" style="display:none">la aplicación</div>
+
+<script>
+window.__L = [];
+const log = s => window.__L.push(s);
+window.__userCalls = 0;
+const _fetch = window.fetch.bind(window);
+window.fetch = async (input, init) => {
+  const url = typeof input === 'string' ? input : (input && input.url) || '';
+  if (url.includes('/auth/v1/user')) {
+    window.__userCalls++;
+    return new Response(JSON.stringify({
+      id: '00000000-0000-4000-8000-000000000001', aud: 'authenticated', role: 'authenticated',
+      email: 'josue@gmail.com', user_metadata: {}, app_metadata: { provider: 'email' },
+      created_at: new Date().toISOString(),
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  }
+  if (url.includes('supabase.co')) return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  return _fetch(input, init);
+};
+const cuerpo = btoa(JSON.stringify({ sub: 'x', email: 'josue@gmail.com', exp: Math.floor(Date.now()/1000)+3600 })).replace(/=+$/,'');
+location.hash = 'access_token=eyJhbGciOiJIUzI1NiJ9.' + cuerpo + '.f&expires_in=3600&refresh_token=r&token_type=bearer&type=magiclink';
+</script>
+
+<script src="/_dev/vendor/supabase.js"></script>
+<script src="/js/auth.js"></script>
+
+<script>
+/* Caso pesimista del revisor: el cliente de datos (chat.js) no llega hasta
+   MUCHO despues de que auth.js haya recogido el token y limpiado el hash. */
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+window.addEventListener('load', async () => {
+  await esperar(2500);
+  log('hash antes de cargar chat.js: "' + location.hash + '"');
+  log('llamadas a /user hasta aqui: ' + window.__userCalls);
+  await new Promise(r => { const s = document.createElement('script'); s.src = '/js/chat.js'; s.onload = r; document.body.appendChild(s); });
+  await esperar(1500);
+  log('llamadas a /user tras chat.js: ' + window.__userCalls);
+  let ses = 'n/d';
+  try { const { data } = await eval('_sb').auth.getSession(); ses = data.session ? data.session.user.email : 'ninguna'; } catch (e) { ses = 'error ' + e.message; }
+  log('sesion del cliente de datos (_sb): ' + ses);
+  log('claves en localStorage: ' + Object.keys(localStorage).join(', '));
+  log('verificarSesion(): ' + JSON.stringify(window.verificarSesion()));
+  document.getElementById('out').textContent = window.__L.join('\n');
+});
+</script>
+</body>
+</html>

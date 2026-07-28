@@ -31,7 +31,10 @@ window.addEventListener('load', async () => {
     ok(/signInWithPassword/.test(src), 'entra con Supabase Auth', 'no usa Supabase Auth');
     ok(/persistSession:\s*true/.test(src) && /autoRefreshToken:\s*true/.test(src),
        'la sesión se guarda y se renueva sola', 'la sesión no persiste: pediría la clave a diario');
-    ok(!/—/.test(src), 'sin guiones largos (norma 1-bis)', 'quedan guiones largos');
+    /* El guion largo se escribe por su punto de código, no literal: si no, este
+       archivo incumpliría la misma norma que comprueba, y el grep de la casa lo
+       cazaría a él. */
+    ok(!/\u2014/.test(src), 'sin guiones largos (norma 1-bis)', 'quedan guiones largos');
 
     log('\n── EL CONTRATO SÍNCRONO ──');
     /* Ocho archivos llaman a verificarSesion() sin await. Si algún día
@@ -62,6 +65,65 @@ window.addEventListener('load', async () => {
     ok(pass && pass.type === 'password', 'el campo va oculto', 'la contraseña se ve al escribirla');
     ok(pass && !pass.maxLength || pass.maxLength < 0 || pass.maxLength > 20, 'no limita la contraseña a cuatro caracteres', 'sigue limitada a ' + (pass && pass.maxLength));
     ok(!!d.getElementById('login-user'), 'sigue eligiendo quién eres', 'falta el selector de miembro');
+
+    log('\n── UN SOLO CLIENTE (el fallo que la sonda no vio la primera vez) ──');
+    /* La primera versión de esta sonda daba «todo en orden» justo en el estado
+       en que la aplicación estaba muerta: auth.js tenía su cliente y chat.js
+       otro, así que la sesión iba por un lado y TODOS los datos por otro. Con
+       la seguridad por fila encendida eso deja la casa muda sin cerrarle la
+       puerta a nadie. Se comprueba desde entonces. */
+    /* Dos formas de comprobarlo, y hacen falta las dos. El cableado se lee en
+       la fuente y se puede comprobar siempre. Los objetos vivos solo existen si
+       la librería del CDN cargó, cosa que no pasa sin red: en ese caso se dice
+       que se saltó, en vez de dar un verde o un rojo que no significan nada. */
+    const fuente = await (await fetch('/js/chat.js')).text();
+    ok(!/createClient\s*\(/.test(fuente), 'chat.js ya no crea cliente propio', 'chat.js sigue creando su propio cliente');
+    ok(/const _sb = window\.faroSb/.test(fuente), 'chat.js toma el cliente de auth.js', 'chat.js no toma el cliente compartido');
+    /* Sin comentarios: si no, la regla caza el texto que EXPLICA el fallo. */
+    const codigo = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    ok(!/storageKey\s*:/.test(codigo), 'el cliente de la casa no usa un almacén aparte', 'storageKey propio: dos clientes se pelearían por renovar el token');
+    ok(/window\.faroSb\s*=/.test(codigo), 'auth.js publica el cliente para los demás', 'auth.js no publica su cliente');
+
+    const hayLib = !!(w.supabase && w.supabase.createClient);
+    if (!hayLib) {
+      log('  · objetos vivos: SALTADO, la librería del CDN no cargó en este entorno');
+      log('    (y eso mismo es el riesgo: sin ese archivo NADIE entra. Ver PLAN-FARO-PRIVADO.md)');
+    } else {
+      ok(!!w.faroSb, 'window.faroSb tiene cliente', 'no hay cliente compartido');
+      ok(w.eval('typeof _sb !== "undefined" && _sb === window.faroSb'),
+         'chat.js y los siete módulos usan ESE mismo cliente',
+         'chat.js usa un cliente distinto: la sesión no viajaría con los datos');
+    }
+
+    log('\n── LA ANTENA, CON IDENTIDAD APARTE ──');
+    /* La Antena entra con enlace mágico y sus tablas tienen políticas atadas a
+       ESE usuario. Compartir cliente haría que su botón de Salir cerrara la
+       sesión de toda la casa. */
+    const ant = await (await fetch('/js/tools/antena.js')).text();
+    ok(/storageKey:\s*'faro_antena'/.test(ant), 'la Antena tiene su propio almacén de sesión', 'la Antena comparte sesión con la familia');
+    ok(!/(?<![A-Za-z0-9_])_sb(?![A-Za-z0-9_])/.test(ant), 'la Antena no toca el cliente de la casa', 'la Antena sigue usando el cliente de la familia: su Salir cerraría la sesión de todos');
+
+    log('\n── LO QUE EL SQL TIENE QUE EXIGIR ──');
+    const sql = await (await fetch('/supabase/sql/seguridad_familia.sql')).text();
+    /* Igual que arriba: fuera los comentarios, que aquí explican justamente el
+       «using (true)» que no debe quedar en el código. */
+    const sqlCodigo = sql.split('\n').filter(l => !/^\s*--/.test(l)).join('\n');
+    ok(/create or replace function public\.es_familia/.test(sqlCodigo), 'define quién es de la casa', 'no hay función de pertenencia');
+    ok(!/using \(true\)/.test(sqlCodigo), 'ninguna política dice «using (true)»', 'sigue habiendo using (true): cualquiera que se registre entraría');
+    ok(/es_familia\(\)/.test(sqlCodigo) && (sqlCodigo.match(/es_familia\(\)/g) || []).length >= 6,
+       'todas las políticas preguntan por la familia (' + (sqlCodigo.match(/es_familia\(\)/g) || []).length + ' veces)',
+       'alguna política no comprueba la pertenencia');
+    ['destellos','inventario','redaccion_ediciones','redaccion_notas','redaccion_config','mensajes','cuentas','transacciones','deudas']
+      .forEach(t => { if (!new RegExp("'" + t + "'").test(sql)) { fallos++; log('  ✘ el SQL no cubre la tabla ' + t); } });
+    ok(/'mensajes'/.test(sql) && /'cuentas'/.test(sql), 'cubre el chat y las finanzas', 'deja fuera el chat o las finanzas');
+    ok(/Allow new users to sign up/.test(sql), 'avisa de apagar el alta pública', 'no avisa del alta pública: el agujero seguiría abierto');
+    ok(/SERVICE_ROLE/.test(sql), 'avisa de la clave de la función de notificaciones', 'no avisa de que las notificaciones se romperían');
+
+    log('\n── LO QUE EL SQL EXIGE, ¿LO CUMPLE EL CÓDIGO? ──');
+    const pushSrc = await (await fetch('/js/push.js')).text();
+    ok(/user_id:\s*userId/.test(pushSrc), 'push.js escribe el user_id que la política exige', 'push.js no escribe user_id: ninguna suscripción se guardaría');
+    const fn = await (await fetch('/supabase/functions/send-chat-push/index.ts')).text();
+    ok(/SUPABASE_SERVICE_ROLE_KEY/.test(fn), 'la función de notificaciones usa la clave de servicio', 'la función usa la clave anon: no vería ninguna suscripción');
 
     log('\n── EL MENSAJE DE ERROR NO DICE DE MÁS ──');
     /* Etapa 1 de la Ruta de la Casa Cerrada, aplicada a la propia casa:

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · refutar dos clientes</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:360px;height:220px;border:0;background:#fff}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; function log(s){ L.push(s); out.textContent = L.join('\n'); }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* Doble de supabase-js: registra cada createClient, cada tabla tocada,
+   cada canal Realtime y a que cliente le llega el token. */
+const DOBLE = `
+window.__reg = { clientes: [], toques: [], canales: [] };
+(function(){
+  let n = 0;
+  function cliente(url, key, opts){
+    const id = 'cli' + (++n);
+    const sk = (opts && opts.auth && opts.auth.storageKey) || 'sb-<ref>-auth-token (por defecto)';
+    let sesion = null;
+    window.__reg.clientes.push({ id: id, storageKey: sk });
+    const qb = (tabla, op) => {
+      const rec = () => {
+        window.__reg.toques.push({ cliente: id, tabla: tabla, op: op,
+          tokenDelCliente: sesion ? 'SESION' : 'anon' });
+      };
+      const p = { then: (res) => { rec(); return Promise.resolve({ data: [], error: null }).then(res); } };
+      ['select','insert','update','delete','upsert','order','limit','eq','neq','gte','lt','single','not','in','is','filter','range','maybeSingle','match','or','lte','gt','contains','overlaps','ilike','like'].forEach(m => { p[m] = () => p; });
+      return p;
+    };
+    return {
+      __id: id, __storageKey: sk,
+      from: (t) => qb(t, 'from'),
+      channel: (nombre) => {
+        const ch = { on: () => ch, subscribe: () => { window.__reg.canales.push({ cliente: id, canal: nombre, token: sesion ? 'SESION' : 'anon' }); return ch; } };
+        return ch;
+      },
+      functions: { invoke: () => Promise.resolve({ data: null, error: null }) },
+      removeChannel: () => {},
+      auth: {
+        getSession: () => Promise.resolve({ data: { session: sesion }, error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } }),
+        signInWithPassword: (cred) => {
+          sesion = { access_token: 'TOKEN-DE-' + id, user: { email: cred.email, user_metadata: {} } };
+          window.__reg.login = { cliente: id, email: cred.email };
+          return Promise.resolve({ data: { session: sesion, user: sesion.user }, error: null });
+        },
+        signInWithOtp: () => Promise.resolve({ data: {}, error: null }),
+        signOut: () => { sesion = null; return Promise.resolve({ error: null }); },
+        setSession: (s) => { sesion = s; return Promise.resolve({ data: { session: s }, error: null }); },
+        getUser: () => Promise.resolve({ data: { user: sesion && sesion.user }, error: null })
+      }
+    };
+  }
+  window.supabase = { createClient: cliente };
+})();
+`;
+
+window.addEventListener('load', async () => {
+  let html = await (await fetch('/index.html')).text();
+  /* Cambiar el supabase-js real por el doble; dejar el resto igual. */
+  html = html.replace(/<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@2"><\/script>/,
+                      '<scr' + 'ipt>' + DOBLE + '</scr' + 'ipt>');
+  html = html.replace(/<head>/i, '<head><base href="/">');
+
+  const doc = f.contentDocument;
+  doc.open(); doc.write(html); doc.close();
+
+  await esperar(3500);
+  const w = f.contentWindow, d = f.contentDocument;
+  const R = w.__reg || {};
+
+  log('¿se cambio el supabase real por el doble? ' + (R.clientes ? 'si' : 'NO — la medicion no vale'));
+  log('');
+  log('CLIENTES CREADOS: ' + (R.clientes || []).length);
+  (R.clientes || []).forEach(c => log('  ' + c.id + '  storageKey = ' + c.storageKey));
+  try { log('  _sb === window.faroSb ? ' + w.eval('typeof _sb!=="undefined" && _sb === window.faroSb')); } catch(e){ log('  eval: '+e.message); }
+  try { log('  _sb.__id = ' + w.eval('_sb.__id') + '   faroSb.__id = ' + w.faroSb.__id); } catch(e){}
+  log('');
+
+  const app = d.getElementById('app-container'), lg = d.getElementById('login-screen');
+  log('PANTALLA: login display=' + (lg ? getComputedStyle(lg).display : 'n/d') +
+      '  vis=' + (lg ? getComputedStyle(lg).visibility : 'n/d') +
+      '   app display=' + (app ? getComputedStyle(app).display : 'n/d'));
+  log('verificarSesion() = ' + JSON.stringify(w.verificarSesion()));
+  log('');
+  log('TABLAS TOCADAS SOLO POR ABRIR LA PAGINA (sin entrar):');
+  (R.toques || []).forEach(t => log('  ' + t.cliente + ' -> ' + t.tabla + '   [' + t.tokenDelCliente + ']'));
+  if (!(R.toques || []).length) log('  (ninguna)');
+  log('CANALES REALTIME: ' + JSON.stringify(R.canales));
+  log('');
+
+  /* Ahora se llama a lo que cada modulo hace al abrir su pantalla. */
+  const antes = (R.toques || []).length;
+  for (const fn of ['initInventario','initFinanzas','initRedaccion','initDestellos']) {
+    if (typeof w[fn] === 'function') { try { await w[fn](); } catch(e){ log(fn + ' lanzo: ' + e.message); } }
+    else log(fn + ' no existe');
+  }
+  if (typeof w.chatSendMessage === 'function') { try { await w.chatSendMessage('intruso'); } catch(e){} }
+  await esperar(600);
+  log('TABLAS TOCADAS AL ABRIR LOS MODULOS (sesion nula):');
+  (R.toques || []).slice(antes).forEach(t => log('  ' + t.cliente + ' -> ' + t.tabla + '   [' + t.tokenDelCliente + ']'));
+  log('');
+
+  /* Entrar de verdad con la contraseña correcta y ver a quien le llega el token. */
+  const ok = await w.iniciarSesion('josue', 'contrasena-correcta');
+  log('iniciarSesion("josue") = ' + ok + '   verificarSesion() = ' + JSON.stringify(w.verificarSesion()));
+  log('login registrado en: ' + JSON.stringify(R.login));
+  const antes2 = (R.toques || []).length;
+  if (typeof w.initInventario === 'function') { try { await w.initInventario(); } catch(e){} }
+  if (typeof w.chatLoadHistory === 'function') { try { await w.chatLoadHistory(); } catch(e){} }
+  await esperar(400);
+  log('DESPUES DE ENTRAR, con que token consultan los modulos:');
+  (R.toques || []).slice(antes2).forEach(t => log('  ' + t.cliente + ' -> ' + t.tabla + '   [' + t.tokenDelCliente + ']'));
+  log('');
+  log('FIN');
+});
+</script>
+</body>
+</html>

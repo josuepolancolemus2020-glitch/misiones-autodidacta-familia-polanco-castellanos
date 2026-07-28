@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · refutar la carrera de arranque del chat</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:200px;border:0;background:#fff}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; function log(s){ L.push(s); out.textContent = L.join('\n'); }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const REF  = 'bzrnjvalpwlcnpszvwim';
+const KEY_ = 'sb_publishable_74mJW5LoxPZOWtIi7YrBEw_0y9JjSfM';
+
+function jwt(){
+  const b64 = o => btoa(JSON.stringify(o)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  return b64({alg:'HS256',typ:'JWT'}) + '.' +
+         b64({sub:'00000000-0000-0000-0000-000000000001', role:'authenticated',
+              email:'jael@faro.local', exp: 2069999999, iat: 1700000000,
+              aud:'authenticated', session_id:'sess-1'}) + '.firmafalsa';
+}
+function sesionFalsa(){
+  return { access_token: jwt(), refresh_token:'r1', token_type:'bearer',
+           expires_in: 999999999, expires_at: 2069999999,
+           user: { id:'00000000-0000-0000-0000-000000000001', aud:'authenticated',
+                   role:'authenticated', email:'jael@faro.local',
+                   user_metadata:{miembro:'jael'}, app_metadata:{} } };
+}
+
+/* Espia: se inyecta ANTES de supabase-js y de los scripts de la casa.
+   Anota cada peticion con su instante y con el Authorization que sale. */
+const ESPIA = `
+window.__t0 = performance.now();
+window.__reg = [];
+(function(){
+  function anota(tipo, url, auth){
+    window.__reg.push({ ms: Math.round(performance.now() - window.__t0),
+                        tipo: tipo, url: String(url), auth: auth || '' });
+  }
+  window.__anota = anota;
+  const fetchReal = window.fetch.bind(window);
+  window.fetch = function(u, o){
+    const url = String((u && u.url) || u);
+    if (url.indexOf('${REF}.supabase.co') !== -1) {
+      const h = (o && o.headers) || {};
+      const get = k => (h.get ? h.get(k) : (h[k] || h[k.toLowerCase()]));
+      const a = String(get('Authorization') || get('authorization') || '(sin cabecera)');
+      const etiqueta = a.indexOf('.firmafalsa') !== -1 ? 'SESION' :
+                       (a.indexOf('sb_publishable_') !== -1 ? 'ANONIMO' : a.slice(0,30));
+      let via = 'rest';
+      if (url.indexOf('/auth/v1/') !== -1) via = 'auth';
+      if (url.indexOf('/functions/v1/') !== -1) via = 'functions';
+      anota(via, url.replace('https://${REF}.supabase.co',''), etiqueta);
+      return Promise.resolve(new Response('[]', {status:200, headers:{'Content-Type':'application/json'}}));
+    }
+    return fetchReal(u, o);
+  };
+  const WSReal = window.WebSocket;
+  window.WebSocket = function(url, protos){
+    anota('realtime', String(url).slice(0,200),
+          String(url).indexOf('.firmafalsa') !== -1 ? 'SESION-en-url' : 'sin-token-en-url');
+    /* Doble mudo: ni conecta ni reintenta contra la red. */
+    const o = { url:url, readyState:0, bufferedAmount:0, extensions:'', protocol:'',
+                send(){}, close(){}, addEventListener(){}, removeEventListener(){},
+                onopen:null, onclose:null, onerror:null, onmessage:null };
+    return o;
+  };
+  window.WebSocket.CONNECTING = 0; window.WebSocket.OPEN = 1;
+  window.WebSocket.CLOSING = 2;    window.WebSocket.CLOSED = 3;
+})();
+`;
+
+window.addEventListener('load', async () => {
+  localStorage.clear();
+  /* Escenario del revisor, pero SIN carrera posible: la sesion ya esta
+     guardada antes de que se cargue una sola linea de la aplicacion. */
+  localStorage.setItem('faro_auth', JSON.stringify(sesionFalsa()));
+
+  let html = await (await fetch('/index.html')).text();
+  html = html.replace(/<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@2"><\/script>/,
+                      '<scr'+'ipt src="/_dev/vendor/supabase.js"></scr'+'ipt>');
+  html = html.replace(/<head>/i, '<head><base href="/"><scr'+'ipt>'+ESPIA+'</scr'+'ipt>');
+
+  const doc = f.contentDocument;
+  doc.open(); doc.write(html); doc.close();
+  await esperar(4000);
+
+  const w = f.contentWindow, d = f.contentDocument;
+  const R = w.__reg || [];
+
+  log('¿espia puesto? ' + (w.__reg ? 'si' : 'NO — la medicion no vale'));
+  log('¿supabase-js real dentro del iframe? ' + (!!(w.supabase && w.supabase.createClient)));
+  log('sesion guardada en faro_auth ANTES de arrancar: si (jael@faro.local, no caduca)');
+  log('');
+  log('══ 1 · LINEA DE TIEMPO DE ARRANQUE (con la sesion YA guardada) ══');
+  if (!R.length) log('  (ninguna peticion registrada)');
+  R.forEach(r => log('  ' + String(r.ms).padStart(5) + ' ms  ' + r.tipo.padEnd(9) + ' ' +
+                     r.auth.padEnd(14) + ' ' + r.url.slice(0,110)));
+  log('');
+
+  const sesionApp = (typeof w.verificarSesion === 'function') ? w.verificarSesion() : null;
+  log('verificarSesion() despues del arranque: ' + (sesionApp ? JSON.stringify(sesionApp) : 'null'));
+  const login = d.getElementById('login-screen');
+  log('pantalla de login visible: ' + (login ? (login.style.display === 'none' ? 'NO (entro)' : 'SI') : '(no existe)'));
+  log('texto del chat: ' + ((d.getElementById('chat-messages')||{}).textContent||'').trim().slice(0,80));
+  log('');
+
+  log('══ 2 · ¿DE QUIEN ES CADA CLIENTE? ══');
+  const cliAuth  = w.faroSb;
+  log('  window.faroSb (auth) existe: ' + !!cliAuth);
+  const sA = cliAuth ? (await cliAuth.auth.getSession()).data.session : null;
+  log('  cliente de AUTH ve sesion:  ' + (sA ? 'SI · ' + sA.user.email : 'NO'));
+  log('  ¿chat.js usa window.faroSb?: ' + (w._sb === w.faroSb ? 'SI' : 'NO — crea el suyo'));
+  log('  claves en localStorage: ' + JSON.stringify(Object.keys(w.localStorage)));
+  log('');
+
+  log('══ 3 · EL ARREGLO QUE PROPONE EL REVISOR, APLICADO A MANO ══');
+  log('  (llamar otra vez a chatLoadHistory()/chatSubscribe() ya CON sesion)');
+  const antes = R.length;
+  w._chatChannel = null;              // para que chatSubscribe() vuelva a abrir canal
+  await w.chatLoadHistory();
+  w.chatSubscribe();
+  await esperar(600);
+  const nuevas = (w.__reg || []).slice(antes);
+  if (!nuevas.length) log('  (no se registro ninguna peticion nueva)');
+  nuevas.forEach(r => log('  ' + String(r.ms).padStart(5) + ' ms  ' + r.tipo.padEnd(9) + ' ' +
+                          r.auth.padEnd(14) + ' ' + r.url.slice(0,110)));
+  const sigueAnon = nuevas.some(r => r.auth === 'ANONIMO');
+  log('');
+  log('  ¿la recarga TARDIA, con la sesion ya restaurada, sale autenticada? ' +
+      (nuevas.some(r => r.auth === 'SESION') ? 'SI' : 'NO — sigue ANONIMA'));
+  log('  => el momento no es la causa: ' + (sigueAnon ? 'la causa es el cliente equivocado' : 'revisar'));
+  log('');
+  log('FIN');
+});
+</script>
+</body>
+</html>

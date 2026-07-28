@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · refutar antena OTP</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:400px;border:0;background:#fff}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; function log(s){ L.push(s); out.textContent = L.join('\n'); }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+window.addEventListener('load', async () => {
+  await esperar(4000);
+  const w = f.contentWindow, d = f.contentDocument;
+  try {
+    log('supabase-js cargado: ' + (typeof w.supabase));
+    log('window.faroSb: ' + (w.faroSb ? 'cliente' : String(w.faroSb)));
+    let sbInfo = 'n/d';
+    try { sbInfo = w.eval('typeof _sb === "undefined" ? "undefined" : (_sb ? "cliente" : String(_sb))'); } catch(e){ sbInfo = 'eval falla: '+e.message; }
+    log('_sb (chat.js): ' + sbInfo);
+    try { log('_sb === faroSb ? ' + w.eval('typeof _sb!=="undefined" && _sb === window.faroSb')); } catch(e){}
+    log('verificarSesion(): ' + JSON.stringify(w.verificarSesion ? w.verificarSesion() : 'no existe'));
+    log('typeof antEnviarEnlace: ' + typeof w.antEnviarEnlace);
+    log('typeof iniciarSesion (global): ' + typeof w.iniciarSesion);
+    log('#ant-email existe: ' + !!d.getElementById('ant-email'));
+    const app = d.getElementById('app-container');
+    log('app-container display: ' + (app ? getComputedStyle(app).display : 'n/d'));
+
+    // Interceptar la llamada de red para NO crear cuentas de verdad.
+    try {
+      w.eval('window.__cap=null; if(typeof _sb!=="undefined" && _sb){ _sb.auth.signInWithOtp = function(o){ window.__cap = JSON.parse(JSON.stringify(o)); return Promise.resolve({data:{},error:null}); }; }');
+    } catch(e){ log('no se pudo interceptar: '+e.message); }
+
+    const inp = d.getElementById('ant-email');
+    if (inp) inp.value = 'intruso@gmail.com';
+    if (typeof w.antEnviarEnlace === 'function') {
+      try { await w.antEnviarEnlace(); } catch(e){ log('antEnviarEnlace lanzo: '+e.message); }
+    }
+    await esperar(400);
+    log('argumentos capturados: ' + JSON.stringify(w.__cap));
+    const msg = d.getElementById('ant-login-msg');
+    log('mensaje en pantalla: ' + (msg ? msg.textContent.trim() : 'n/d'));
+    log('sesion despues: ' + JSON.stringify(w.verificarSesion ? w.verificarSesion() : null));
+    log('FIN');
+  } catch (e) { log('EXCEPCION ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · orden real de index.html</title>
+<style>body{font-family:system-ui;background:#111;color:#eee;margin:0;padding:10px}
+pre{background:#000;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+
+<!-- DOM minimo que espera auth.js -->
+<div id="login-screen" style="display:none">
+  <form id="login-form">
+    <select id="login-user"><option value="josue">Josué</option></select>
+    <input id="login-pass" type="password">
+    <p id="login-error" hidden></p>
+    <button class="login-btn" type="submit">Ingresar</button>
+  </form>
+</div>
+<div id="app-container" style="display:none">la aplicación</div>
+<button id="logout-btn">Cerrar sesión</button>
+
+<script>
+/* ── Registro ── */
+window.__L = [];
+window.__log = s => { window.__L.push(s); };
+/* Capturar los avisos de supabase-js (el de «Multiple GoTrueClient») */
+const _warn = console.warn.bind(console);
+console.warn = (...a) => { window.__L.push('WARN: ' + a.map(String).join(' ').slice(0, 160)); _warn(...a); };
+
+/* ── Red simulada: el proyecto real no se alcanza desde aqui ──
+   Solo hace falta responder a GET /auth/v1/user, que es lo unico que
+   consulta supabase-js al recoger un token del hash (flujo implicito). */
+window.__userCalls = [];
+const _fetch = window.fetch.bind(window);
+window.fetch = async (input, init) => {
+  const url = typeof input === 'string' ? input : (input && input.url) || '';
+  if (url.includes('/auth/v1/user')) {
+    const auth = (init && init.headers && (init.headers.Authorization || init.headers.authorization)) || '';
+    window.__userCalls.push(String(auth).slice(0, 24));
+    return new Response(JSON.stringify({
+      id: '00000000-0000-4000-8000-000000000001',
+      aud: 'authenticated', role: 'authenticated',
+      email: 'josue@gmail.com',            /* correo de FUERA de la casa */
+      user_metadata: {},                    /* sin metadatos: el caso del enlace magico */
+      app_metadata: { provider: 'email' },
+      created_at: new Date().toISOString(),
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  }
+  if (url.includes('supabase.co')) {
+    window.__L.push('fetch inesperado: ' + url.slice(0, 90));
+    return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  }
+  return _fetch(input, init);
+};
+
+/* Un token de mentira, pero con la forma de uno real (no se verifica aqui) */
+const cuerpo = btoa(JSON.stringify({ sub: '00000000-0000-4000-8000-000000000001', email: 'josue@gmail.com', exp: Math.floor(Date.now()/1000)+3600 })).replace(/=+$/,'');
+const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.' + cuerpo + '.firmafalsa';
+/* Asi vuelve el navegador de un enlace magico (flujo implicito, el de por defecto) */
+location.hash = 'access_token=' + TOKEN + '&expires_in=3600&refresh_token=refresco123&token_type=bearer&type=magiclink';
+window.__L.push('hash puesto: ' + location.hash.slice(0, 40) + '…');
+</script>
+
+<script src="/_dev/vendor/supabase.js"></script>
+<!-- Mismo orden que index.html: auth.js (1401) antes que chat.js (1407) -->
+<script src="/js/auth.js"></script>
+<!-- Los cinco archivos que index.html mete ENTRE auth.js (1401) y chat.js (1407) -->
+<script src="/js/data/misiones.js"></script>
+<script src="/js/data/frases.js"></script>
+<script src="/js/tools/habitos.js"></script>
+<script src="/js/tools/redes-sociales.js"></script>
+<script src="/js/tools/collage-maker.js"></script>
+<script src="/js/chat.js"></script>
+
+<script>
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+window.addEventListener('load', async () => {
+  const out = document.getElementById('out');
+  const log = window.__log;
+  await esperar(3000);
+
+  log('');
+  log('── clientes ──');
+  log('faroSb (auth.js): ' + (window.faroSb ? 'cliente' : String(window.faroSb)));
+  let sbTipo = 'n/d';
+  try { sbTipo = eval('typeof _sb === "undefined" ? "undefined" : (_sb ? "cliente" : String(_sb))'); } catch (e) { sbTipo = 'error: ' + e.message; }
+  log('_sb (chat.js): ' + sbTipo);
+  try { log('¿son el mismo objeto?: ' + eval('_sb === window.faroSb')); } catch (e) {}
+
+  log('');
+  log('── llamadas a /auth/v1/user (una por cliente que recogio el token) ── ' + window.__userCalls.length);
+  window.__userCalls.forEach((a, i) => log('  #' + (i + 1) + ' ' + a + '…'));
+
+  log('');
+  log('── almacenamiento ──');
+  Object.keys(localStorage).forEach(k => {
+    let v = localStorage.getItem(k);
+    let correo = '';
+    try { correo = JSON.parse(v).user.email; } catch (_) {}
+    log('  ' + k + '  →  ' + (correo ? 'sesion de ' + correo : (v || '').slice(0, 40)));
+  });
+
+  log('');
+  log('── hash tras la inicializacion ── "' + location.hash + '"');
+
+  log('');
+  log('── sesiones vivas segun cada cliente ──');
+  try { const { data } = await window.faroSb.auth.getSession(); log('  faroSb : ' + (data.session ? data.session.user.email : 'ninguna')); } catch (e) { log('  faroSb : error ' + e.message); }
+  try { const { data } = await eval('_sb').auth.getSession(); log('  _sb    : ' + (data.session ? data.session.user.email : 'ninguna')); } catch (e) { log('  _sb    : error ' + e.message); }
+
+  log('');
+  log('── la casa ──');
+  log('verificarSesion(): ' + JSON.stringify(window.verificarSesion ? window.verificarSesion() : 'no existe'));
+  log('app-container visible: ' + (document.getElementById('app-container').style.display !== 'none'));
+  log('login-screen display: "' + document.getElementById('login-screen').style.display + '"');
+  log('_mapearSesion(josue@gmail.com): ' + JSON.stringify(window._mapearSesion ? window._mapearSesion({ user: { email: 'josue@gmail.com' } }) : 'no expuesta'));
+  log('_mapearSesion(ajeno@gmail.com): ' + JSON.stringify(window._mapearSesion ? window._mapearSesion({ user: { email: 'ajeno@gmail.com' } }) : 'no expuesta'));
+
+  log('');
+  log('── cerrarSesion(): ¿toca al cliente de datos? ──');
+  try {
+    await window.cerrarSesion();
+    const a = await window.faroSb.auth.getSession();
+    const b = await eval('_sb').auth.getSession();
+    log('  tras cerrarSesion → faroSb: ' + (a.data.session ? a.data.session.user.email : 'ninguna')
+        + ' | _sb: ' + (b.data.session ? b.data.session.user.email : 'ninguna'));
+  } catch (e) { log('  error: ' + e.message); }
+
+  out.textContent = window.__L.join('\n');
+});
+</script>
+</body>
+</html>

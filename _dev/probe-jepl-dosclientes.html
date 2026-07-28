@@ -1,0 +1,61 @@
+<!doctype html><meta charset="utf-8"><title>sonda dos clientes</title>
+<pre id="out">corriendo…</pre>
+<script src="/_dev/vendor/supabase.js"></script>
+<script>
+const L=[]; const log=(...a)=>{L.push(a.join(' ')); document.getElementById('out').textContent=L.join('\n');};
+const URL_='https://bzrnjvalpwlcnpszvwim.supabase.co';
+const KEY='sb_publishable_74mJW5LoxPZOWtIi7YrBEw_0y9JjSfM';
+
+// --- interceptar fetch para ver que Authorization sale y responder sin red ---
+const capturado=[];
+window.fetch = async (input, init) => {
+  const url = (typeof input==='string')?input:input.url;
+  const hdr = (init&&init.headers)|| (input&&input.headers) || {};
+  const get = k => hdr.get ? hdr.get(k) : (hdr[k]||hdr[k.toLowerCase()]);
+  capturado.push({url, auth:get('Authorization'), apikey:get('apikey')});
+  return new Response('[]', {status:200, headers:{'content-type':'application/json'}});
+};
+
+(async () => {
+  if (!window.supabase || !window.supabase.createClient) { log('NO cargo supabase-js'); return; }
+  log('supabase-js cargado');
+
+  // igual que js/auth.js
+  const authSb = window.supabase.createClient(URL_, KEY, {
+    auth:{ persistSession:true, autoRefreshToken:true, storageKey:'faro_auth' }
+  });
+  // igual que js/chat.js
+  const sb = window.supabase.createClient(URL_, KEY);
+
+  log('mismo objeto? ' + (authSb===sb));
+
+  // JWT sintetico con rol authenticated, exp lejano
+  const b64 = o => btoa(JSON.stringify(o)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const exp = Math.floor(Date.now()/1000)+3600;
+  const jwt = b64({alg:'HS256',typ:'JWT'})+'.'+b64({
+    sub:'11111111-1111-1111-1111-111111111111', role:'authenticated', aud:'authenticated',
+    email:'josue@faro.local', exp, iat:Math.floor(Date.now()/1000),
+    user_metadata:{miembro:'josue'}, app_metadata:{}
+  })+'.ZmlybWFmYWxzYQ';
+
+  const r = await authSb.auth.setSession({ access_token: jwt, refresh_token: 'refresh-falso' });
+  log('setSession en authSb -> sesion? ' + !!(r.data && r.data.session) + ' err=' + (r.error? r.error.message : 'ninguno'));
+
+  const claves = Object.keys(localStorage).sort();
+  log('claves en localStorage: ' + JSON.stringify(claves));
+
+  const a = await authSb.auth.getSession();
+  const b = await sb.auth.getSession();
+  log('authSb.getSession -> ' + (a.data.session ? 'SI hay sesion' : 'null'));
+  log('  _sb.getSession -> ' + (b.data.session ? 'SI hay sesion' : 'null'));
+
+  capturado.length = 0;
+  await sb.from('destellos').select('*');
+  await authSb.from('destellos').select('*');
+  for (const c of capturado) {
+    const quien = c.auth === 'Bearer '+jwt ? 'JWT DE SESION' : (c.auth === 'Bearer '+KEY ? 'CLAVE PUBLICABLE (rol anon)' : c.auth);
+    log('peticion ' + c.url.split('/rest/')[1] + '  Authorization=' + quien);
+  }
+  log('FIN');
+})().catch(e=>log('EXCEPCION '+e));
+</script>

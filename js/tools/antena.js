@@ -13,6 +13,20 @@
    Los tokens OAuth JAMÁS llegan a este código.
 ───────────────────────────────────────────── */
 
+/* ⚠️ CLIENTE PROPIO, SEPARADO DEL DE LA CASA.
+   La Antena tiene su PROPIA identidad: se entra con enlace mágico al correo
+   (antEnviarEnlace) y sus ocho tablas tienen políticas atadas a ese usuario.
+   Si compartiera el cliente con F.A.R.O pasarían tres cosas malas: su
+   getSession vería la sesión de la familia y creería que ya entró, su
+   signInWithOtp reemplazaría la sesión de la familia, y su botón de Salir
+   cerraría la sesión de toda la casa. Almacén aparte, entonces. */
+const _antSb = (window.supabase && window.supabase.createClient && window.faroSb)
+  ? window.supabase.createClient(
+      window.faroSb.supabaseUrl || AUTH_SUPABASE_URL,
+      window.faroSb.supabaseKey || AUTH_SUPABASE_KEY,
+      { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'faro_antena' } })
+  : null;
+
 const ANT_T_CUENTAS  = 'antena_cuentas';
 const ANT_T_PUBS     = 'antena_publicaciones';
 const ANT_T_DESTINOS = 'antena_destinos';
@@ -45,9 +59,9 @@ let _antCalDiaSel = null;    // día seleccionado (número) o null
 /* ── Sesión ── */
 
 async function antGetSession() {
-  if (!_sb) return null;
+  if (!_antSb) return null;
   try {
-    const { data } = await _sb.auth.getSession();
+    const { data } = await _antSb.auth.getSession();
     return data.session || null;
   } catch (_) { return null; }
 }
@@ -57,7 +71,7 @@ async function initAntena() {
   const dashEl  = document.getElementById('ant-dashboard');
   if (!loginEl || !dashEl) return;
 
-  if (!_sb) {
+  if (!_antSb) {
     loginEl.style.display = 'none';
     dashEl.style.display = 'none';
     document.getElementById('ant-sin-conexion').style.display = 'block';
@@ -90,7 +104,7 @@ async function antEnviarEnlace() {
   msgEl.textContent = 'Enviando enlace…';
   msgEl.className = 'ant-login-msg';
 
-  const { error } = await _sb.auth.signInWithOtp({
+  const { error } = await _antSb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: window.location.origin + window.location.pathname },
   });
@@ -111,7 +125,7 @@ async function antRenderCuentas() {
   const grid = document.getElementById('ant-cuentas-grid');
   if (!grid) return;
 
-  const { data, error } = await _sb.from(ANT_T_CUENTAS)
+  const { data, error } = await _antSb.from(ANT_T_CUENTAS)
     .select('id, plataforma, nombre_visible, estado, conectada_at');
   if (error) { console.error('[Antena] Error cargando cuentas:', error); _antCuentas = []; }
   else _antCuentas = data || [];
@@ -219,7 +233,7 @@ function antRenderPrivadaBtn() {
 async function antConectar(plataforma) {
   if (!['x', 'facebook'].includes(plataforma)) return;
   if (typeof toast === 'function') toast(`Abriendo autorización de ${plataforma === 'x' ? 'X' : 'Facebook'}…`);
-  const { data, error } = await _sb.functions.invoke('antena-oauth-start', {
+  const { data, error } = await _antSb.functions.invoke('antena-oauth-start', {
     body: { plataforma },
   });
   if (error || !data?.url) {
@@ -232,7 +246,7 @@ async function antConectar(plataforma) {
 
 async function antDesconectar(cuentaId) {
   if (!confirm('¿Desconectar esta cuenta? Las publicaciones programadas hacia ella fallarán.')) return;
-  const { error } = await _sb.from(ANT_T_CUENTAS).delete().eq('id', cuentaId);
+  const { error } = await _antSb.from(ANT_T_CUENTAS).delete().eq('id', cuentaId);
   if (error) { if (typeof toast === 'function') toast('No se pudo desconectar'); return; }
   if (typeof toast === 'function') toast('Cuenta desconectada');
   antRenderCuentas();
@@ -279,7 +293,7 @@ async function antProgramar(ahora) {
     return;
   }
 
-  const { data: pub, error } = await _sb.from(ANT_T_PUBS).insert({
+  const { data: pub, error } = await _antSb.from(ANT_T_PUBS).insert({
     usuario_id: _antSession.user.id,
     cuerpo: texto,
     programada_at: fecha.toISOString(),
@@ -292,12 +306,12 @@ async function antProgramar(ahora) {
     return;
   }
 
-  const { error: dErr } = await _sb.from(ANT_T_DESTINOS).insert(
+  const { error: dErr } = await _antSb.from(ANT_T_DESTINOS).insert(
     activas.map(c => ({ publicacion_id: pub.id, cuenta_id: c.id })),
   );
   if (dErr) {
     console.error('[Antena] Error creando destinos:', dErr);
-    await _sb.from(ANT_T_PUBS).delete().eq('id', pub.id);
+    await _antSb.from(ANT_T_PUBS).delete().eq('id', pub.id);
     if (typeof toast === 'function') toast('No se pudo programar');
     return;
   }
@@ -322,7 +336,7 @@ function antFechaLocal(d) {
 async function antRenderCalendario() {
   const grid = document.getElementById('ant-cal-grid');
   const tit  = document.getElementById('ant-cal-titulo');
-  if (!grid || !tit || !_sb || !_antSession) return;
+  if (!grid || !tit || !_antSb || !_antSession) return;
 
   if (!_antCalMes) {
     const hoy = new Date();
@@ -333,7 +347,7 @@ async function antRenderCalendario() {
   const titulo = ini.toLocaleDateString('es', { month: 'long', year: 'numeric' });
   tit.textContent = titulo.charAt(0).toUpperCase() + titulo.slice(1);
 
-  const { data, error } = await _sb.from(ANT_T_PUBS)
+  const { data, error } = await _antSb.from(ANT_T_PUBS)
     .select('id, cuerpo, estado, programada_at')
     .gte('programada_at', ini.toISOString())
     .lt('programada_at', fin.toISOString())
@@ -442,7 +456,7 @@ async function antActualizarMetricas() {
   if (btn) btn.disabled = true;
   if (typeof toast === 'function') toast('📡 Barriendo la Página…');
 
-  const { data, error } = await _sb.functions.invoke('antena-metricas', { body: {} });
+  const { data, error } = await _antSb.functions.invoke('antena-metricas', { body: {} });
 
   if (btn) btn.disabled = false;
   if (error) {
@@ -474,9 +488,9 @@ async function antRenderResumenYFeed() {
   const resEl     = document.getElementById('ant-resumen');
   const feedEl    = document.getElementById('ant-feed-list');
   const feedEmpty = document.getElementById('ant-feed-empty');
-  if (!resEl || !feedEl || !_sb || !_antSession) return;
+  if (!resEl || !feedEl || !_antSb || !_antSession) return;
 
-  const { data: postsData, error } = await _sb.from('antena_posts')
+  const { data: postsData, error } = await _antSb.from('antena_posts')
     .select('id, mensaje, permalink, creado_en_red')
     .order('creado_en_red', { ascending: false })
     .limit(30);
@@ -486,7 +500,7 @@ async function antRenderResumenYFeed() {
   // Última foto de métricas de cada post
   const ultimas = new Map();
   if (posts.length) {
-    const { data: mets } = await _sb.from('antena_post_metricas')
+    const { data: mets } = await _antSb.from('antena_post_metricas')
       .select('post_id, vistas, likes, comentarios, compartidos')
       .in('post_id', posts.map(p => p.id))
       .order('capturado_at', { ascending: false });
@@ -494,7 +508,7 @@ async function antRenderResumenYFeed() {
   }
 
   // Historia de seguidores: la más reciente y la más cercana a hace 7 días
-  const { data: segs } = await _sb.from('antena_pagina_metricas')
+  const { data: segs } = await _antSb.from('antena_pagina_metricas')
     .select('seguidores, capturado_at')
     .order('capturado_at', { ascending: false })
     .limit(120);
@@ -586,9 +600,9 @@ async function antRenderResumenYFeed() {
 async function antRenderComentarios() {
   const list  = document.getElementById('ant-coms-list');
   const empty = document.getElementById('ant-coms-empty');
-  if (!list || !_sb || !_antSession) return;
+  if (!list || !_antSb || !_antSession) return;
 
-  const { data, error } = await _sb.from('antena_comentarios')
+  const { data, error } = await _antSb.from('antena_comentarios')
     .select('id, autor, mensaje, permalink, creado_en_red, post:antena_posts(mensaje)')
     .eq('respondido_pagina', false)
     .eq('atendida', false)
@@ -615,7 +629,7 @@ async function antRenderComentarios() {
 
   list.querySelectorAll('[data-atender]').forEach(btn =>
     btn.addEventListener('click', async () => {
-      await _sb.from('antena_comentarios').update({ atendida: true }).eq('id', Number(btn.dataset.atender));
+      await _antSb.from('antena_comentarios').update({ atendida: true }).eq('id', Number(btn.dataset.atender));
       antRenderComentarios();
     }));
 }
@@ -628,7 +642,7 @@ async function antRenderPublicaciones() {
   const hechas  = document.getElementById('ant-hechas-list');
   if (!list) return;
 
-  const { data, error } = await _sb.from(ANT_T_PUBS)
+  const { data, error } = await _antSb.from(ANT_T_PUBS)
     .select('*, destinos:antena_destinos(id, estado, post_externo_id, ultimo_error, cuenta_id)')
     .order('creado_at', { ascending: false })
     .limit(40);
@@ -658,13 +672,13 @@ async function antRenderPublicaciones() {
 
   list.querySelectorAll('[data-cancelar]').forEach(btn => btn.addEventListener('click', async () => {
     if (!confirm('¿Cancelar esta publicación programada?')) return;
-    await _sb.from(ANT_T_PUBS).update({ estado: 'cancelada' }).eq('id', btn.dataset.cancelar);
+    await _antSb.from(ANT_T_PUBS).update({ estado: 'cancelada' }).eq('id', btn.dataset.cancelar);
     antRenderPublicaciones();
     antRenderCalendario();
   }));
   list.querySelectorAll('[data-borrar]').forEach(btn => btn.addEventListener('click', async () => {
     if (!confirm('¿Borrar definitivamente?')) return;
-    await _sb.from(ANT_T_PUBS).delete().eq('id', btn.dataset.borrar);
+    await _antSb.from(ANT_T_PUBS).delete().eq('id', btn.dataset.borrar);
     antRenderPublicaciones();
     antRenderCalendario();
   }));
@@ -675,7 +689,7 @@ async function antRenderPublicaciones() {
       (p.destinos || []).filter(d => d.post_externo_id).map(d => d.id));
     const ultMet = new Map();
     if (destIds.length) {
-      const { data: mets } = await _sb.from(ANT_T_METRICAS)
+      const { data: mets } = await _antSb.from(ANT_T_METRICAS)
         .select('destino_id, vistas, likes, comentarios, compartidos')
         .in('destino_id', destIds)
         .order('capturado_at', { ascending: false });
@@ -733,7 +747,7 @@ async function antHacerPublica(pubId, btn) {
   if (btn) btn.disabled = true;
   if (typeof toast === 'function') toast('📣 Haciéndola pública…');
 
-  const { data, error } = await _sb.functions.invoke('antena-visibilidad', {
+  const { data, error } = await _antSb.functions.invoke('antena-visibilidad', {
     body: { publicacion_id: pubId },
   });
 
@@ -766,7 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('ant-logout-btn')?.addEventListener('click', async () => {
-    await _sb?.auth.signOut();
+    await _antSb?.auth.signOut();
     initAntena();
   });
 
@@ -785,7 +799,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('ant-met-btn')?.addEventListener('click', antActualizarMetricas);
 
   // Al volver del enlace mágico o de la autorización de X
-  _sb?.auth.onAuthStateChange(() => {
+  _antSb?.auth.onAuthStateChange(() => {
     if (document.getElementById('view-antena')?.classList.contains('active')) initAntena();
   });
 

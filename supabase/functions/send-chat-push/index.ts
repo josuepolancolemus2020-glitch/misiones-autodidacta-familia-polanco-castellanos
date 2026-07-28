@@ -7,10 +7,18 @@
 // hayan activado las notificaciones, excepto al que envió el mensaje.
 //
 // Variables de entorno necesarias (Project Settings -> Edge Functions
-// -> Secrets). SUPABASE_URL y SUPABASE_ANON_KEY ya las provee
+// -> Secrets). SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY ya las provee
 // Supabase automáticamente en cada función; solo hace falta agregar:
 //   VAPID_PUBLIC_KEY
 //   VAPID_PRIVATE_KEY
+//
+// POR QUE LA CLAVE DE SERVICIO Y NO LA ANON: al encender la seguridad
+// por fila en push_subscriptions (supabase/sql/seguridad_familia.sql),
+// la clave anon deja de ver suscripciones. Y lo peor es que NO da error:
+// devuelve cero filas, así que las notificaciones del chat dejarían de
+// llegar en silencio. La clave de servicio salta la seguridad por fila y
+// aquí es correcta, porque esto corre en el servidor y nunca llega al
+// navegador. Esa clave NO se pone jamás en el código del cliente.
 //
 // Al crear esta función en el Dashboard, desactiva "Enforce JWT
 // Verification" -- la llama el trigger de la base de datos, no un
@@ -19,7 +27,7 @@
 import webpush from "npm:web-push@3.6.7";
 
 const SUPABASE_URL      = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+const SUPABASE_KEY      = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const VAPID_PUBLIC_KEY  = Deno.env.get("VAPID_PUBLIC_KEY")!;
 const VAPID_PRIVATE_KEY = Deno.env.get("VAPID_PRIVATE_KEY")!;
 
@@ -35,8 +43,8 @@ async function eliminarSuscripcion(endpoint: string) {
     {
       method: "DELETE",
       headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
       },
     }
   );
@@ -53,8 +61,8 @@ Deno.serve(async (req) => {
 
     const subsRes = await fetch(`${SUPABASE_URL}/rest/v1/push_subscriptions?select=*`, {
       headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
       },
     });
     const subs = await subsRes.json();

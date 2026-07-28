@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1e3a7c">
+  <title>F.A.R.O. · Familia, Aprendizaje, Recursos y Organización</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="apple-touch-icon" href="img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="img/icon-512.png">
+  <script>
+  /* Stub de red SOLO para el escenario de login manual (?stub=1). Se instala
+     antes de cargar supabase-js para que el cliente lo capture. */
+  (function(){
+    if (location.search.indexOf('stub=1') === -1) return;
+    const real = window.fetch;
+    function jwt(){
+      const b64=o=>btoa(JSON.stringify(o)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+      return b64({alg:'HS256',typ:'JWT'})+'.'+b64({sub:'00000000-0000-0000-0000-000000000002',
+        role:'authenticated',email:'jael@faro.local',exp:2069999999,iat:1700000000,
+        aud:'authenticated',session_id:'s2'})+'.firmafalsa';
+    }
+    window.fetch=function(u,o){
+      const url=String(u&&u.url?u.url:u);
+      if(url.indexOf('/auth/v1/token')!==-1){
+        const espera = location.search.indexOf('lento=1')!==-1 ? 600 : 0;
+        const body={access_token:jwt(),token_type:'bearer',expires_in:999999999,
+          expires_at:2069999999,refresh_token:'r2',
+          user:{id:'00000000-0000-0000-0000-000000000002',aud:'authenticated',
+                role:'authenticated',email:'jael@faro.local',
+                user_metadata:{miembro:'jael'},app_metadata:{},created_at:'2024-01-01T00:00:00Z'}};
+        return new Promise(res=>setTimeout(()=>res(new Response(JSON.stringify(body),{status:200,headers:{'Content-Type':'application/json'}})), espera));
+      }
+      if(url.indexOf('/auth/v1/')!==-1){
+        return Promise.resolve(new Response(JSON.stringify({}),{status:200,headers:{'Content-Type':'application/json'}}));
+      }
+      return real.apply(this,arguments);
+    };
+  })();
+  </script>
+  <script src="/_dev/vendor/supabase.js"></script>
+</head>
+<body>
+
+  <!-- ========== LOGIN ========== -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-brand">
+        <i class="fa-solid fa-compass login-compass"></i>
+        <div class="login-title">F.A.R.O.</div>
+        <div class="login-sub">FAMILIA, APRENDIZAJE, RECURSOS Y ORGANIZACIÓN</div>
+      </div>
+      <form id="login-form" class="login-form">
+        <label class="login-label" for="login-user">¿Quién eres?</label>
+        <select id="login-user" class="login-select" required>
+          <option value="josue">Josué Edmundo</option>
+          <option value="evelyn">Evelyn Sarahí</option>
+          <option value="jael">Jael</option>
+          <option value="angelly">Angelly</option>
+        </select>
+        <label class="login-label" for="login-pass">Contraseña</label>
+        <input id="login-pass" class="login-input" type="password" placeholder="Tu contraseña" autocomplete="current-password" required>
+        <p id="login-error" class="login-error" hidden>No se pudo entrar. Revisa la contraseña e intenta de nuevo.</p>
+        <button type="submit" class="login-btn">
+          Ingresar <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="app-container" style="display:none;">
+
+  <!-- ========== INICIO ========== -->
+  <div id="view-inicio" class="view active">
+    <header class="app-header">
+      <button class="hamburger-btn" id="hamburger-btn" aria-label="Abrir menú">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="brand-center">
+        <div class="brand-logo">F.A.R.O.</div>
+        <div class="brand-sub">Familia, Aprendizaje, Recursos y Organización</div>
+      </div>
+      <div class="header-actions">
+        <button class="header-icon-btn" id="chat-shortcut-btn" aria-label="Abrir Chat Familiar">
+          <i class="fa-solid fa-comments"></i>
+        </button>
+        <button class="header-icon-btn" id="notif-btn" aria-label="Notificaciones">
+          <i class="fa-regular fa-bell"></i>
+          <span class="notif-dot" id="notif-dot" hidden></span>
+        </button>
+      </div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Saludo y Motivación -->
+      <div class="motivacion-card">
+        <div class="motiv-greeting">
+          <span class="motiv-avatar">🧭</span>
+          <div>
+            <div class="motiv-saludo">¡Hola,</div>
+            <div class="motiv-nombre" id="home-name">Familia:</div>
+          </div>
+        </div>
+        <div class="motiv-cita">
+          <p class="motiv-text" id="motiv-text"></p>
+          <span class="motiv-autor" id="motiv-autor"></span>
+        </div>
+      </div>
+      <!-- Acceso rápido: todo a un toque -->
+      <h2 class="section-title">Acceso Rápido</h2>
+      <div class="qa-grid" id="quick-access">
+        <button type="button" class="qa-item" data-qa="view-rutas">
+          <span class="qa-icon qa-rutas"><i class="fa-solid fa-map-signs"></i></span>
+          <span class="qa-label">Mis Rutas</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-destellos">
+          <span class="qa-icon qa-des"><i class="fa-solid fa-bolt"></i></span>
+          <span class="qa-label">Destellos</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-redaccion">
+          <span class="qa-icon qa-redac"><i class="fa-solid fa-pen-nib"></i></span>
+          <span class="qa-label">Redacción</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-antena">
+          <span class="qa-icon qa-ant"><i class="fa-solid fa-tower-broadcast"></i></span>
+          <span class="qa-label">Antena</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-habitos">
+          <span class="qa-icon qa-hab"><i class="fa-solid fa-seedling"></i></span>
+          <span class="qa-label">Hábitos</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-redes">
+          <span class="qa-icon qa-red"><i class="fa-solid fa-mobile-screen-button"></i></span>
+          <span class="qa-label">Redes</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-progreso">
+          <span class="qa-icon qa-pro"><i class="fa-solid fa-chart-line"></i></span>
+          <span class="qa-label">Progreso</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-inventario">
+          <span class="qa-icon qa-inv"><i class="fa-solid fa-boxes-stacked"></i></span>
+          <span class="qa-label">Inventario</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="familia">
+          <span class="qa-icon qa-finfam"><i class="fa-solid fa-sack-dollar"></i></span>
+          <span class="qa-label">Finanzas Familia</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="escuela">
+          <span class="qa-icon qa-esc"><i class="fa-solid fa-school"></i></span>
+          <span class="qa-label">Finanzas Escuela</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-fin-stats">
+          <span class="qa-icon qa-est"><i class="fa-solid fa-chart-pie"></i></span>
+          <span class="qa-label">Estadísticas Finanzas</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-collage">
+          <span class="qa-icon qa-col"><i class="fa-solid fa-images"></i></span>
+          <span class="qa-label">Collage</span>
+        </button>
+        <button type="button" class="qa-item" data-qa="view-perfil">
+          <span class="qa-icon qa-fam"><i class="fa-solid fa-people-roof"></i></span>
+          <span class="qa-label">Herramientas</span>
+        </button>
+      </div>
+
+      <div class="selectors-container">
+        <div class="selector-group">
+          <label><i class="fa-solid fa-users"></i> Ver Miembro</label>
+          <select id="member-select" class="custom-select">
+            <option value="josue">Josué Edmundo</option>
+            <option value="evelyn">Evelyn Sarahi</option>
+            <option value="jael">Jael</option>
+            <option value="angelly">Angelly</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Materias de aprendizaje -->
+      <h2 class="section-title">Materias de Aprendizaje</h2>
+      <div class="modules-grid" id="modules-grid"></div>
+
+      <!-- Featured + Recent -->
+      <div id="featured-section">
+        <h2 class="section-title">Misión destacada</h2>
+        <div id="featured-card" class="featured-card"></div>
+
+        <div id="recent-wrap" hidden>
+          <h2 class="section-title">Continúa explorando</h2>
+          <div id="recent-list" class="small-list"></div>
+        </div>
+      </div>
+
+      <!-- Pensador del día -->
+      <div class="pensador-card">
+        <div class="pensador-foto-wrap">
+          <img src="img/leonardo-da-vinci.jpg" alt="Leonardo da Vinci" class="pensador-foto">
+        </div>
+        <div class="pensador-cita">
+          <p class="pensador-text">El aprendizaje continuo es el camino a la grandeza personal y familiar. ¡Caminemos juntos!</p>
+          <span class="pensador-autor">· Leonardo da Vinci</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== MISIONES ========== -->
+  <div id="view-misiones" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Aprendizaje Unido</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="search-input" type="search" placeholder="Buscar misión…" autocomplete="off">
+      </div>
+      <div class="fam-member-chips materia-chips" id="materia-chips">
+        <button type="button" class="fam-chip fam-chip-active" data-materia="">Todas</button>
+        <button type="button" class="fam-chip" data-materia="esp">📖 Español</button>
+        <button type="button" class="fam-chip" data-materia="mat">🔢 Matemáticas</button>
+        <button type="button" class="fam-chip" data-materia="cnat">🔬 C. Naturales</button>
+        <button type="button" class="fam-chip" data-materia="csoc">🌎 C. Sociales</button>
+        <button type="button" class="fam-chip" data-materia="epis">🦉 Epistemología</button>
+        <button type="button" class="fam-chip" data-materia="ing">🏗️ Ingeniería del Sistema</button>
+        <button type="button" class="fam-chip" data-materia="psi">🧠 Psicología y Persuasión</button>
+        <button type="button" class="fam-chip" data-materia="mkt">📈 Marketing y Marca</button>
+        <button type="button" class="fam-chip" data-materia="eco">💰 Poder Económico</button>
+        <button type="button" class="fam-chip" data-materia="pol">🏛️ Poder Político</button>
+        <button type="button" class="fam-chip" data-materia="cib">🔐 Ciberseguridad</button>
+        <button type="button" class="fam-chip" data-materia="ia">🤖 Inteligencia Artificial</button>
+      </div>
+      <div id="missions-container" class="missions-list"></div>
+    </div>
+  </div>
+
+  <!-- ========== PROGRESO ========== -->
+  <!-- ========== RUTAS DE APRENDIZAJE ========== -->
+  <div id="view-rutas" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Mis Rutas</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+      <p class="rutas-intro">Cada ruta es una serie ordenada: las etapas se recorren en orden y el mapa muestra también lo que falta por construir.</p>
+      <div id="rutas-container"></div>
+    </div>
+  </div>
+
+  <div id="view-progreso" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Mi Progreso</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+      <div id="progress-overview"></div>
+      <div id="progress-subjects"></div>
+      <div id="visited-missions"></div>
+    </div>
+  </div>
+
+  <!-- ========== CHAT FAMILIAR ========== -->
+  <div id="view-chat" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Chat Familiar</h1>
+      <div></div>
+    </header>
+    <div id="push-banner" class="push-banner" style="display:none;">
+      <span id="push-banner-text" class="push-banner-text"></span>
+      <button type="button" id="push-banner-btn" class="push-banner-btn">Activar</button>
+      <button type="button" id="push-banner-dismiss" class="push-banner-dismiss" aria-label="Cerrar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="chat-topics chat-topics-filter" id="chat-filter-topics">
+      <button type="button" class="chat-topic-chip active" data-tema="">Todas</button>
+      <button type="button" class="chat-topic-chip tema-escuela" data-tema="Escuela">🎓 Escuela</button>
+      <button type="button" class="chat-topic-chip tema-finanzas" data-tema="Finanzas">💰 Finanzas</button>
+      <button type="button" class="chat-topic-chip tema-salud" data-tema="Salud">🩺 Salud</button>
+      <button type="button" class="chat-topic-chip tema-hogar" data-tema="Hogar">🏠 Hogar</button>
+      <button type="button" class="chat-topic-chip tema-eventos" data-tema="Eventos">📅 Eventos</button>
+    </div>
+    <div class="view-scroll chat-scroll" id="chat-scroll">
+      <div id="chat-messages" class="chat-messages">
+        <div class="chat-empty" id="chat-empty">Cargando mensajes…</div>
+      </div>
+      <button type="button" id="chat-new-msg-badge" class="chat-new-msg-badge" style="display:none;">
+        <i class="fa-solid fa-arrow-down"></i> Mensaje nuevo
+      </button>
+    </div>
+    <div class="chat-topics chat-topics-send" id="chat-send-topics">
+      <button type="button" class="chat-topic-chip active" data-tema="General">General</button>
+      <button type="button" class="chat-topic-chip tema-escuela" data-tema="Escuela">🎓 Escuela</button>
+      <button type="button" class="chat-topic-chip tema-finanzas" data-tema="Finanzas">💰 Finanzas</button>
+      <button type="button" class="chat-topic-chip tema-salud" data-tema="Salud">🩺 Salud</button>
+      <button type="button" class="chat-topic-chip tema-hogar" data-tema="Hogar">🏠 Hogar</button>
+      <button type="button" class="chat-topic-chip tema-eventos" data-tema="Eventos">📅 Eventos</button>
+    </div>
+    <form id="chat-form" class="chat-bar">
+      <input id="chat-input" class="chat-input" type="text" placeholder="Escribe un mensaje…" autocomplete="off" maxlength="500">
+      <button type="submit" class="chat-send-btn" aria-label="Enviar mensaje">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </form>
+  </div>
+
+  <!-- Menú al tocar un mensaje: moverlo a otro tema o eliminarlo -->
+  <div id="chat-msg-actions-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <h3 class="fin-detail-title">Mover mensaje a un tema</h3>
+        <button type="button" class="fin-modal-close" id="chat-msg-actions-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="chat-topics chat-msg-actions-topics">
+        <button type="button" class="chat-topic-chip" data-tema="General">General</button>
+        <button type="button" class="chat-topic-chip tema-escuela" data-tema="Escuela">🎓 Escuela</button>
+        <button type="button" class="chat-topic-chip tema-finanzas" data-tema="Finanzas">💰 Finanzas</button>
+        <button type="button" class="chat-topic-chip tema-salud" data-tema="Salud">🩺 Salud</button>
+        <button type="button" class="chat-topic-chip tema-hogar" data-tema="Hogar">🏠 Hogar</button>
+        <button type="button" class="chat-topic-chip tema-eventos" data-tema="Eventos">📅 Eventos</button>
+      </div>
+      <button type="button" class="chat-msg-delete-btn" id="chat-msg-delete-btn">
+        <i class="fa-solid fa-trash"></i> Eliminar mensaje
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== FINANZAS ========== -->
+  <div id="view-finanzas" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title" id="fin-view-title">Finanzas</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll fin-scroll">
+
+      <div class="fin-summary-grid">
+        <button type="button" class="fin-summary-card fin-balance" data-findetail="saldo">
+          <div class="fin-card-label" id="fin-saldo-label">Saldo Familiar Disponible</div>
+          <div class="fin-card-value" id="fin-saldo-total">s/d</div>
+          <div class="fin-card-hint">Ver detalle <i class="fa-solid fa-chevron-right"></i></div>
+        </button>
+        <button type="button" class="fin-summary-card fin-expense" data-findetail="gastos">
+          <div class="fin-card-label">Gastos del Mes</div>
+          <div class="fin-card-value" id="fin-gastos-mes">s/d</div>
+          <div class="fin-card-delta" id="fin-gastos-delta"></div>
+          <div class="fin-card-hint">Ver detalle <i class="fa-solid fa-chevron-right"></i></div>
+        </button>
+        <button type="button" class="fin-summary-card fin-debt" data-findetail="deudas">
+          <div class="fin-card-label">Total de Deudas Pendientes</div>
+          <div class="fin-card-value" id="fin-deudas-total">s/d</div>
+          <div class="fin-card-hint">Ver detalle <i class="fa-solid fa-chevron-right"></i></div>
+        </button>
+      </div>
+
+      <button type="button" class="fin-stats-btn" id="fin-goto-stats">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Estadísticas y Análisis</span>
+        <i class="fa-solid fa-chevron-right fin-stats-arrow"></i>
+      </button>
+
+      <button type="button" class="fin-ctx-btn" id="fin-ctx-btn">
+        <i class="fa-solid fa-school" id="fin-ctx-icon"></i>
+        <span id="fin-ctx-label">Finanzas Escuela Josué Polanco</span>
+        <i class="fa-solid fa-chevron-right fin-stats-arrow"></i>
+      </button>
+
+      <div class="fin-mov-header">
+        <h2 class="section-title fin-mov-title">Últimos Movimientos</h2>
+        <button type="button" class="fin-see-all-btn" id="fin-see-all">Ver historial</button>
+      </div>
+      <div class="fin-mov-chips" id="fin-mov-chips">
+        <button type="button" class="fam-chip fam-chip-active" data-movfilter="">Todos</button>
+        <button type="button" class="fam-chip" data-movfilter="ingreso">Ingresos</button>
+        <button type="button" class="fam-chip" data-movfilter="egreso">Gastos</button>
+        <button type="button" class="fam-chip" data-movfilter="transfer">Envíos</button>
+      </div>
+      <div id="fin-movimientos-list" class="fin-mov-list">
+        <div class="fin-empty">Cargando movimientos…</div>
+      </div>
+
+    </div>
+
+    <button class="fin-fab" id="fin-fab" aria-label="Agregar registro">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+  </div>
+
+  <!-- ========== FINANZAS: ESTADÍSTICAS ========== -->
+  <div id="view-fin-stats" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="fin-stats-back-btn" aria-label="Volver a Finanzas">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title" id="fs-view-title">Estadísticas</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <div class="fin-month-nav fs-month-nav">
+        <button type="button" class="fin-month-nav-btn" id="fs-prev-month" aria-label="Mes anterior">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div class="fin-month-nav-label" id="fs-month-label">s/d</div>
+        <button type="button" class="fin-month-nav-btn" id="fs-next-month" aria-label="Mes siguiente">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="fs-kpi-grid">
+        <div class="fs-kpi">
+          <span class="fs-kpi-label">Ingresos</span>
+          <span class="fs-kpi-value fs-in" id="fs-kpi-ingresos">s/d</span>
+          <span class="fs-kpi-delta" id="fs-delta-ingresos"></span>
+        </div>
+        <div class="fs-kpi">
+          <span class="fs-kpi-label">Gastos</span>
+          <span class="fs-kpi-value fs-out" id="fs-kpi-gastos">s/d</span>
+          <span class="fs-kpi-delta" id="fs-delta-gastos"></span>
+        </div>
+        <div class="fs-kpi fs-kpi-wide">
+          <span class="fs-kpi-label">Balance del mes</span>
+          <span class="fs-kpi-value" id="fs-kpi-balance">s/d</span>
+          <span class="fs-kpi-delta" id="fs-kpi-tasa"></span>
+        </div>
+      </div>
+
+      <div class="pa-card" id="fs-ritmo-card" style="display:none;">
+        <div class="pa-card-title">⏱️ Ritmo de gasto</div>
+        <div id="fs-ritmo-content"></div>
+      </div>
+
+      <div class="pa-card">
+        <div class="pa-card-title">📂 Gastos por categoría</div>
+        <div id="fs-cat-chart"></div>
+      </div>
+
+      <div class="pa-card">
+        <div class="pa-card-title">👥 Gastos por miembro</div>
+        <div id="fs-member-chart"></div>
+      </div>
+
+      <div class="pa-card">
+        <div class="pa-card-title">📈 Tendencia · últimos 6 meses</div>
+        <div class="fs-legend">
+          <span class="fs-legend-item"><span class="fs-dot fs-dot-in"></span> Ingresos</span>
+          <span class="fs-legend-item"><span class="fs-dot fs-dot-out"></span> Gastos</span>
+        </div>
+        <div id="fs-trend-chart"></div>
+        <p class="fs-trend-hint" id="fs-trend-caption"></p>
+      </div>
+
+      <div class="pa-card">
+        <div class="pa-card-title">🔝 Mayores gastos del mes</div>
+        <div id="fs-top-list"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal de registro: Transacción / Envío Familiar / Cuenta / Deuda -->
+  <div id="fin-modal-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="fin-modal-tabs">
+          <button type="button" class="fin-modal-tab fin-modal-tab-active" data-fintab="transaccion">Transacción</button>
+          <button type="button" class="fin-modal-tab" data-fintab="transferencia">Envío Familiar</button>
+          <button type="button" class="fin-modal-tab" data-fintab="cuenta">Cuenta</button>
+          <button type="button" class="fin-modal-tab" data-fintab="deuda">Deuda</button>
+        </div>
+        <button type="button" class="fin-modal-close" id="fin-modal-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Registrar Transacción (dinero real que entra o sale de la familia) -->
+      <form id="fin-form-transaccion" class="fin-form">
+        <label class="fin-label" for="fin-t-tipo">Tipo</label>
+        <select id="fin-t-tipo" class="fin-select" required>
+          <option value="ingreso">Ingreso</option>
+          <option value="egreso" selected>Egreso</option>
+        </select>
+
+        <label class="fin-label" for="fin-t-monto">Monto</label>
+        <input id="fin-t-monto" class="fin-input" type="number" step="0.01" min="0.01" placeholder="0.00" required>
+
+        <label class="fin-label" for="fin-t-categoria">Categoría</label>
+        <select id="fin-t-categoria" class="fin-select" required>
+          <option value="Otros">Cargando categorías…</option>
+        </select>
+
+        <label class="fin-label" for="fin-t-descripcion">Descripción</label>
+        <input id="fin-t-descripcion" class="fin-input" type="text" placeholder="Ej. Compra de mercado" maxlength="200">
+
+        <label class="fin-label" for="fin-t-cuenta">Cuenta</label>
+        <select id="fin-t-cuenta" class="fin-select" required>
+          <option value="" disabled selected>Cargando cuentas…</option>
+        </select>
+
+        <label class="fin-label" for="fin-t-fecha">Fecha</label>
+        <input id="fin-t-fecha" class="fin-input" type="date" required>
+
+        <button type="submit" class="fin-submit-btn">Guardar Transacción</button>
+      </form>
+
+      <!-- Envío Familiar: mover dinero entre cuentas de la familia (no cuenta como gasto/ingreso real) -->
+      <form id="fin-form-transferencia" class="fin-form" style="display:none;">
+        <p class="fin-hint">Para enviar dinero entre cuentas de la familia (ej. darle efectivo a alguien). No se contabiliza como gasto ni ingreso real.</p>
+
+        <label class="fin-label" for="fin-tr-origen">Cuenta origen</label>
+        <select id="fin-tr-origen" class="fin-select" required>
+          <option value="" disabled selected>Cargando cuentas…</option>
+        </select>
+
+        <label class="fin-label" for="fin-tr-destino">Cuenta destino</label>
+        <select id="fin-tr-destino" class="fin-select" required>
+          <option value="" disabled selected>Cargando cuentas…</option>
+        </select>
+
+        <label class="fin-label" for="fin-tr-monto">Monto</label>
+        <input id="fin-tr-monto" class="fin-input" type="number" step="0.01" min="0.01" placeholder="0.00" required>
+
+        <label class="fin-label" for="fin-tr-descripcion">Descripción</label>
+        <input id="fin-tr-descripcion" class="fin-input" type="text" placeholder="Ej. Efectivo para gastos de la semana" maxlength="200">
+
+        <label class="fin-label" for="fin-tr-fecha">Fecha</label>
+        <input id="fin-tr-fecha" class="fin-input" type="date" required>
+
+        <button type="submit" class="fin-submit-btn">Guardar Envío Familiar</button>
+      </form>
+
+      <!-- Nueva Cuenta -->
+      <form id="fin-form-cuenta" class="fin-form" style="display:none;">
+        <label class="fin-label" for="fin-c-nombre">Nombre de la cuenta</label>
+        <input id="fin-c-nombre" class="fin-input" type="text" placeholder="Ej. Cuenta de Ahorros" required>
+
+        <label class="fin-label" for="fin-c-saldo">Saldo inicial</label>
+        <input id="fin-c-saldo" class="fin-input" type="number" step="0.01" placeholder="0.00" required>
+
+        <button type="submit" class="fin-submit-btn">Guardar Cuenta</button>
+      </form>
+
+      <!-- Nueva Deuda -->
+      <form id="fin-form-deuda" class="fin-form" style="display:none;">
+        <label class="fin-label" for="fin-d-descripcion">Descripción</label>
+        <input id="fin-d-descripcion" class="fin-input" type="text" placeholder="Ej. Préstamo del carro" required>
+
+        <label class="fin-label" for="fin-d-total">Monto total</label>
+        <input id="fin-d-total" class="fin-input" type="number" step="0.01" min="0.01" placeholder="0.00" required>
+
+        <label class="fin-label" for="fin-d-pagado">Monto ya pagado</label>
+        <input id="fin-d-pagado" class="fin-input" type="number" step="0.01" min="0" placeholder="0.00" value="0">
+
+        <label class="fin-label" for="fin-d-fecha">Fecha límite</label>
+        <input id="fin-d-fecha" class="fin-input" type="date">
+
+        <button type="submit" class="fin-submit-btn">Guardar Deuda</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de detalle: qué compone cada tarjeta resumen de Finanzas -->
+  <div id="fin-detail-modal-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <h3 class="fin-detail-title" id="fin-detail-title">Detalle</h3>
+        <button type="button" class="fin-modal-close" id="fin-detail-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="fin-detail-content" class="fin-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- Modal de abono a deuda -->
+  <div id="fin-abono-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <h3 class="fin-detail-title">Abonar a Deuda</h3>
+        <button type="button" class="fin-modal-close" id="fin-abono-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="fin-form-abono" class="fin-form">
+        <p class="fin-hint" id="fin-abono-info"></p>
+
+        <label class="fin-label" for="fin-a-monto">Monto del abono</label>
+        <input id="fin-a-monto" class="fin-input" type="number" step="0.01" min="0.01" placeholder="0.00" required>
+
+        <label class="fin-label" for="fin-a-cuenta">Pagar desde la cuenta</label>
+        <select id="fin-a-cuenta" class="fin-select" required>
+          <option value="" disabled selected>Cargando cuentas…</option>
+        </select>
+
+        <label class="fin-label" for="fin-a-fecha">Fecha</label>
+        <input id="fin-a-fecha" class="fin-input" type="date" required>
+
+        <button type="submit" class="fin-submit-btn">Registrar Abono</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========== INVENTARIO FAMILIAR ========== -->
+  <div id="view-inventario" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Inventario Familiar</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll inv-scroll">
+
+      <div class="inv-summary-grid">
+        <div class="inv-summary-card inv-total">
+          <div class="fin-card-label">Artículos Registrados</div>
+          <div class="fin-card-value" id="inv-total-items">s/d</div>
+        </div>
+        <div class="inv-summary-card inv-value">
+          <div class="fin-card-label">Valor Estimado Total</div>
+          <div class="fin-card-value" id="inv-total-valor">s/d</div>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="inv-search-input" type="search" placeholder="Buscar artículo…" autocomplete="off">
+      </div>
+
+      <div class="inv-chips" id="inv-filter-chips">
+        <button type="button" class="inv-chip active" data-ubicacion="">Todas</button>
+        <button type="button" class="inv-chip" data-ubicacion="Sala">Sala</button>
+        <button type="button" class="inv-chip" data-ubicacion="Cocina">Cocina</button>
+        <button type="button" class="inv-chip" data-ubicacion="Dormitorio">Dormitorio</button>
+        <button type="button" class="inv-chip" data-ubicacion="Baño">Baño</button>
+        <button type="button" class="inv-chip" data-ubicacion="Bodega">Bodega</button>
+        <button type="button" class="inv-chip" data-ubicacion="Garaje">Garaje</button>
+        <button type="button" class="inv-chip" data-ubicacion="Patio">Patio</button>
+        <button type="button" class="inv-chip" data-ubicacion="Oficina">Oficina</button>
+        <button type="button" class="inv-chip" data-ubicacion="Otro">Otro</button>
+      </div>
+
+      <div id="inv-items-list" class="inv-items-list">
+        <div class="fin-empty">Cargando artículos…</div>
+      </div>
+
+    </div>
+
+    <button class="fin-fab" id="inv-fab" aria-label="Agregar artículo">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+  </div>
+
+  <!-- Formulario de Inventario: nuevo artículo o edición -->
+  <div id="inv-modal-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <h3 class="fin-detail-title" id="inv-modal-title">Nuevo Artículo</h3>
+        <button type="button" class="fin-modal-close" id="inv-modal-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="inv-form" class="fin-form">
+        <label class="fin-label" for="inv-f-nombre">Nombre</label>
+        <input id="inv-f-nombre" class="fin-input" type="text" placeholder="Ej. Refrigeradora LG" maxlength="120" required>
+
+        <label class="fin-label" for="inv-f-categoria">Categoría</label>
+        <select id="inv-f-categoria" class="fin-select">
+          <option value="Electrodomésticos">Electrodomésticos</option>
+          <option value="Muebles">Muebles</option>
+          <option value="Electrónica">Electrónica</option>
+          <option value="Herramientas">Herramientas</option>
+          <option value="Cocina y Utensilios">Cocina y Utensilios</option>
+          <option value="Ropa y Calzado">Ropa y Calzado</option>
+          <option value="Documentos">Documentos</option>
+          <option value="Vehículos">Vehículos</option>
+          <option value="Decoración">Decoración</option>
+          <option value="Juguetes">Juguetes</option>
+          <option value="Otros">Otros</option>
+        </select>
+
+        <label class="fin-label" for="inv-f-ubicacion">Ubicación</label>
+        <select id="inv-f-ubicacion" class="fin-select">
+          <option value="Sala">Sala</option>
+          <option value="Cocina">Cocina</option>
+          <option value="Dormitorio">Dormitorio</option>
+          <option value="Baño">Baño</option>
+          <option value="Bodega">Bodega</option>
+          <option value="Garaje">Garaje</option>
+          <option value="Patio">Patio</option>
+          <option value="Oficina">Oficina</option>
+          <option value="Otro">Otro</option>
+        </select>
+
+        <label class="fin-label" for="inv-f-estado">Estado</label>
+        <select id="inv-f-estado" class="fin-select">
+          <option value="Nuevo">Nuevo</option>
+          <option value="Bueno" selected>Bueno</option>
+          <option value="Regular">Regular</option>
+          <option value="Necesita Reparación">Necesita Reparación</option>
+          <option value="Dañado">Dañado</option>
+        </select>
+
+        <label class="fin-label" for="inv-f-valor">Valor Estimado</label>
+        <input id="inv-f-valor" class="fin-input" type="number" step="0.01" min="0" placeholder="0.00">
+
+        <label class="fin-label" for="inv-f-notas">Notas</label>
+        <textarea id="inv-f-notas" class="fin-input inv-notas-area" rows="2" placeholder="Ej. Garantía hasta 2027, factura en la bodega…" maxlength="300"></textarea>
+
+        <button type="submit" class="fin-submit-btn" id="inv-submit-btn">Guardar Artículo</button>
+        <button type="button" class="chat-msg-delete-btn" id="inv-delete-btn" style="display:none;">
+          <i class="fa-solid fa-trash"></i> Eliminar artículo
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========== PERFIL ========== -->
+  <div id="view-perfil" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Mi Perfil</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Herramientas de Familia -->
+      <div class="setting-group teacher-panel-group">
+        <div class="teacher-panel-head">
+          <i class="fa-solid fa-people-roof teacher-panel-icon"></i>
+          <label class="setting-label" style="margin-bottom:0;">Herramientas de Familia</label>
+        </div>
+        <p class="teacher-panel-desc">Recursos y herramientas para el hogar.</p>
+
+        <div class="teacher-tools-grid">
+          <button class="teacher-tool-item teacher-tool-active" id="goto-destellos-btn">
+            <i class="fa-solid fa-bolt"></i>
+            <span>Destellos</span>
+          </button>
+          <button class="teacher-tool-item teacher-tool-active" id="goto-redaccion-btn">
+            <i class="fa-solid fa-pen-nib"></i>
+            <span>Redacción</span>
+          </button>
+          <button class="teacher-tool-item teacher-tool-active" id="goto-antena-btn">
+            <i class="fa-solid fa-tower-broadcast"></i>
+            <span>Antena</span>
+          </button>
+          <button class="teacher-tool-item teacher-tool-active" id="goto-habitos-btn">
+            <i class="fa-solid fa-seedling"></i>
+            <span>Tracker de Hábitos</span>
+          </button>
+          <button class="teacher-tool-item teacher-tool-active" id="goto-redes-btn">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <span>Redes Sociales</span>
+          </button>
+          <button class="teacher-tool-item teacher-tool-active" id="goto-collage-btn">
+            <i class="fa-solid fa-images"></i>
+            <span>Collage</span>
+          </button>
+          <div class="teacher-tool-item">
+            <i class="fa-solid fa-stopwatch"></i>
+            <span>Cronómetro</span>
+          </div>
+          <div class="teacher-tool-item">
+            <i class="fa-solid fa-broom"></i>
+            <span>Tareas del Hogar</span>
+          </div>
+          <div class="teacher-tool-item">
+            <i class="fa-solid fa-bullseye"></i>
+            <span>Metas Familiares</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== DESTELLOS ⚡ (captura rápida de ideas) ========== -->
+  <div id="view-destellos" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="destellos-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Destellos</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <div class="des-intro-card">
+        <div class="des-intro-icon"><i class="fa-solid fa-bolt"></i></div>
+        <div>
+          <p class="des-intro-text">Ideas y pendientes capturados al vuelo, antes de que se apaguen.</p>
+          <span class="des-intro-count" id="des-count"></span>
+        </div>
+      </div>
+
+      <!-- Espacio de cada miembro: elige de quién ver los destellos -->
+      <div class="fam-member-chips des-member-chips" id="des-member-chips"></div>
+
+      <div class="des-filter-tabs" id="des-filter-tabs">
+        <button type="button" class="des-ftab des-ftab-active" data-f="pendientes">Pendientes</button>
+        <button type="button" class="des-ftab" data-f="hechos">Hechos</button>
+        <button type="button" class="des-ftab" data-f="todos">Todos</button>
+      </div>
+
+      <div class="des-proj-chips" id="des-view-projs"></div>
+
+      <div id="des-list"></div>
+      <p class="fin-empty" id="des-empty" style="display:none;">
+        Nada por aquí. Cuando se te cruce algo por la mente,<br>toca el ⚡ y captúralo.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ========== REDACCIÓN 📰 (sala de redacción de la revista) ========== -->
+  <div id="view-redaccion" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="redaccion-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Redacción</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Cabecera de la edición seleccionada -->
+      <div class="red-cabecera">
+        <div class="red-ed-titulo" id="red-ed-titulo"></div>
+        <div class="red-ed-meta" id="red-ed-meta"></div>
+      </div>
+
+      <!-- Selector de ediciones -->
+      <div class="red-ed-chips" id="red-ed-chips"></div>
+
+      <!-- Titulares elegidos para la portada -->
+      <div class="red-portada-card" id="red-portada-card" style="display:none;"></div>
+
+      <!-- Acciones -->
+      <div class="red-acciones">
+        <button type="button" class="red-accion-btn red-accion-principal" id="red-nueva-nota-btn">
+          <i class="fa-solid fa-pen-nib"></i> Nueva nota
+        </button>
+        <button type="button" class="red-accion-btn" id="red-exportar-btn">
+          <i class="fa-solid fa-file-export"></i> Exportar
+        </button>
+      </div>
+
+      <!-- Notas agrupadas por sección -->
+      <div id="red-list"></div>
+      <p class="fin-empty" id="red-empty" style="display:none;">
+        Aún no hay notas aquí.<br>Toca <strong>Nueva nota</strong> y empieza a escribir. 📰
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ========== REDACCIÓN: EDITOR DE NOTA ========== -->
+  <div id="view-redaccion-editor" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="red-editor-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Escribiendo</h1>
+      <span class="red-save-state red-save-ok" id="red-e-save-state">Guardado ✓</span>
+    </header>
+    <div class="view-scroll">
+
+      <input type="text" id="red-e-titulo" class="red-e-titulo" maxlength="140"
+        placeholder="Título de la nota…">
+
+      <div class="red-e-selects">
+        <div class="red-e-campo">
+          <label>Sección</label>
+          <select id="red-e-seccion" class="red-e-select"></select>
+        </div>
+        <div class="red-e-campo">
+          <label>Tipo</label>
+          <select id="red-e-tipo" class="red-e-select"></select>
+        </div>
+        <div class="red-e-campo">
+          <label>Estado</label>
+          <select id="red-e-estado" class="red-e-select"></select>
+        </div>
+        <div class="red-e-campo">
+          <label>Edición</label>
+          <select id="red-e-edicion" class="red-e-select"></select>
+        </div>
+      </div>
+
+      <button type="button" class="red-portada-toggle" id="red-e-portada-btn">
+        <i class="fa-regular fa-star"></i> Destacar en portada
+      </button>
+
+      <label class="red-e-label" for="red-e-entradilla">Entradilla <span class="red-e-label-opcional">(opcional: introduce el tema)</span></label>
+      <textarea id="red-e-entradilla" class="red-e-entradilla" rows="3" maxlength="400"
+        placeholder="Párrafo corto que presenta la nota y engancha al lector…"></textarea>
+
+      <label class="red-e-label" for="red-e-cuerpo">Cuerpo de la nota</label>
+
+      <!-- Barra de formato del cuerpo -->
+      <div class="red-e-toolbar" id="red-e-toolbar">
+        <button type="button" class="red-tb-btn" data-cmd="bold" title="Negrita"><i class="fa-solid fa-bold"></i></button>
+        <button type="button" class="red-tb-btn" data-cmd="italic" title="Cursiva"><i class="fa-solid fa-italic"></i></button>
+        <button type="button" class="red-tb-btn" data-cmd="underline" title="Subrayado"><i class="fa-solid fa-underline"></i></button>
+        <select id="red-e-fuente" class="red-tb-select" title="Tipo de letra">
+          <option value="">Letra</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="'Times New Roman', serif">Times</option>
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="'Courier New', monospace">Courier</option>
+        </select>
+        <select id="red-e-tamano" class="red-tb-select" title="Tamaño de letra">
+          <option value="">Tamaño</option>
+          <option value="2">Pequeña</option>
+          <option value="3">Normal</option>
+          <option value="4">Grande</option>
+          <option value="6">Muy grande</option>
+        </select>
+        <button type="button" class="red-tb-btn" data-cmd="removeFormat" title="Quitar formato"><i class="fa-solid fa-eraser"></i></button>
+      </div>
+
+      <div id="red-e-cuerpo" class="red-e-cuerpo" contenteditable="true"
+        data-placeholder="Escribe aquí tu nota, artículo o aviso… El texto se guarda solo mientras escribes."></div>
+
+      <!-- Límite de palabras (para encajar en los recuadros de Canva) -->
+      <div class="red-e-limites">
+        <span class="red-e-lim-label"><i class="fa-solid fa-ruler-horizontal"></i> Límite de palabras</span>
+        <label class="red-e-lim-campo">🟡 Mín.
+          <input type="number" id="red-e-lim-amarillo" class="red-e-lim-input" min="0" inputmode="numeric" placeholder="">
+        </label>
+        <label class="red-e-lim-campo">🔴 Máx.
+          <input type="number" id="red-e-lim-rojo" class="red-e-lim-input" min="0" inputmode="numeric" placeholder="">
+        </label>
+      </div>
+
+      <div class="red-e-contador" id="red-e-contador">0 palabras · 0 caracteres</div>
+
+      <div class="red-e-acciones">
+        <button type="button" class="red-accion-btn" id="red-e-copiar-btn">
+          <i class="fa-solid fa-copy"></i> Copiar
+        </button>
+        <button type="button" class="red-accion-btn" id="red-e-mover-btn">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i> Mover
+        </button>
+        <button type="button" class="red-accion-btn red-accion-peligro" id="red-e-eliminar-btn">
+          <i class="fa-solid fa-trash"></i> Eliminar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== ANTENA 📡 (gestión de redes sociales) ========== -->
+  <div id="view-antena" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="antena-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Antena</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <p class="fin-empty" id="ant-sin-conexion" style="display:none;">No se pudo conectar con Antena.</p>
+
+      <!-- Login con enlace mágico (sesión real, no el PIN familiar) -->
+      <div id="ant-login" style="display:none;">
+        <div class="ant-login-card">
+          <div class="ant-login-icon"><i class="fa-solid fa-tower-broadcast"></i></div>
+          <h2 class="ant-login-title">Centro de transmisión</h2>
+          <p class="ant-login-sub">
+            Esta herramienta maneja tus cuentas de redes sociales, así que
+            requiere una sesión segura además del PIN familiar.
+          </p>
+          <input type="email" id="ant-email" class="des-proj-input" placeholder="tu@correo.com"
+            autocomplete="email" inputmode="email">
+          <button type="button" class="ant-login-btn" id="ant-enviar-btn">
+            <i class="fa-solid fa-envelope"></i> Enviarme el enlace mágico
+          </button>
+          <p class="ant-login-msg" id="ant-login-msg"></p>
+        </div>
+      </div>
+
+      <!-- Panel principal -->
+      <div id="ant-dashboard" style="display:none;">
+
+        <div class="ant-cabecera">
+          <div class="ant-cab-titulo"><i class="fa-solid fa-tower-broadcast"></i> Centro de transmisión</div>
+          <div class="ant-cab-session">
+            <span id="ant-session-email"></span>
+            <button type="button" class="ant-logout-btn" id="ant-logout-btn">Salir</button>
+          </div>
+        </div>
+
+        <h2 class="section-title">Cuentas conectadas</h2>
+        <div class="ant-cuentas-grid" id="ant-cuentas-grid"></div>
+
+        <!-- ═══ OBSERVATORIO (Fase 5b) ═══
+             Se publica desde la app de cada red; aquí se observa. -->
+        <div class="ant-section-row">
+          <h2 class="section-title">Resumen semanal</h2>
+          <button type="button" class="ant-met-btn" id="ant-met-btn">
+            <i class="fa-solid fa-satellite-dish"></i> Actualizar
+          </button>
+        </div>
+        <div id="ant-resumen"></div>
+
+        <h2 class="section-title">Comentarios por responder</h2>
+        <div id="ant-coms-list"></div>
+        <p class="fin-empty" id="ant-coms-empty" style="display:none;">
+          Nada pendiente. La audiencia está atendida. 💬
+        </p>
+
+        <h2 class="section-title">Publicaciones de la Página</h2>
+        <div id="ant-feed-list"></div>
+        <p class="fin-empty" id="ant-feed-empty" style="display:none;">
+          Aún no hay posts registrados. Toca «Actualizar» arriba. 📡
+        </p>
+
+        <!-- ═══ SECCIONES DORMIDAS (compositor Fase 2-5a) ═══
+             Publicar desde Antena se retiró: Facebook lo hace mejor.
+             El código queda por si algún día vuelve (p. ej. hilos de X). -->
+        <div id="ant-legado" style="display:none;">
+
+        <!-- Compositor (aparece cuando hay una cuenta conectada) -->
+        <div id="ant-composer" style="display:none;">
+          <h2 class="section-title">Nueva publicación</h2>
+          <div class="ant-composer-card">
+            <textarea id="ant-composer-texto" class="ant-composer-texto" maxlength="280" rows="4"
+              placeholder="¿Qué vas a transmitir hoy?"></textarea>
+            <div class="ant-dest-label">Publicar en:</div>
+            <div class="ant-dest-chips" id="ant-dest-chips"></div>
+            <button type="button" id="ant-privada-btn" class="ant-privada-btn"></button>
+            <div class="ant-composer-row">
+              <span class="ant-composer-count" id="ant-composer-count">0/280</span>
+              <input type="datetime-local" id="ant-composer-fecha" class="ant-composer-fecha">
+            </div>
+            <div class="ant-composer-btns">
+              <button type="button" class="ant-btn-programar" id="ant-programar-btn">
+                <i class="fa-regular fa-clock"></i> Programar
+              </button>
+              <button type="button" class="ant-btn-ahora" id="ant-ahora-btn">
+                <i class="fa-solid fa-paper-plane"></i> Publicar ahora
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendario (Fase 4) -->
+        <h2 class="section-title">Calendario</h2>
+        <div class="ant-cal-card">
+          <div class="ant-cal-head">
+            <button type="button" class="ant-cal-nav" id="ant-cal-prev" aria-label="Mes anterior">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <span class="ant-cal-titulo" id="ant-cal-titulo"></span>
+            <button type="button" class="ant-cal-nav" id="ant-cal-next" aria-label="Mes siguiente">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+          <div class="ant-cal-grid" id="ant-cal-grid"></div>
+          <div id="ant-cal-detalle"></div>
+        </div>
+
+        <h2 class="section-title">Próximas publicaciones</h2>
+        <div id="ant-pubs-list"></div>
+        <p class="fin-empty" id="ant-pubs-empty" style="display:none;">
+          Nada en cola. Conecta tu cuenta y programa tu primera transmisión. 📡
+        </p>
+
+        <div class="ant-section-row">
+          <h2 class="section-title">Publicadas recientemente</h2>
+        </div>
+        <div id="ant-hechas-list"></div>
+
+        </div><!-- /ant-legado -->
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== TRACKER DE HÁBITOS ========== -->
+  <div id="view-habitos" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="habitos-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Tracker de Hábitos</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Selector de miembro -->
+      <div class="parte-card">
+        <h3 class="parte-section-title">👤 ¿De quién son los hábitos?</h3>
+        <div class="fam-member-chips" id="ht-member-chips"></div>
+      </div>
+
+      <!-- Hábitos de la semana -->
+      <div class="parte-card">
+        <h3 class="parte-section-title">📅 Semana actual</h3>
+        <p class="ht-week-label" id="ht-week-label"></p>
+        <div id="ht-habit-list"></div>
+        <p class="ht-empty" id="ht-empty" style="display:none;">Aún no hay hábitos. ¡Agrega el primero! 🌱</p>
+      </div>
+
+      <!-- Nuevo hábito -->
+      <div class="parte-card">
+        <h3 class="parte-section-title">➕ Nuevo hábito</h3>
+        <input type="text" id="ht-new-name" class="parte-input" placeholder="ej: Leer 20 minutos" maxlength="40">
+        <button class="pa-add-btn" id="ht-add-btn" style="margin-top:10px;">
+          <i class="fa-solid fa-plus"></i> Agregar hábito
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== MANEJO DE REDES SOCIALES ========== -->
+  <div id="view-redes" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="redes-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Redes Sociales</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Selector de miembro -->
+      <div class="parte-card">
+        <h3 class="parte-section-title">👤 Miembro</h3>
+        <div class="fam-member-chips" id="rs-member-chips"></div>
+      </div>
+
+      <!-- Tiempo de pantalla -->
+      <div class="parte-card">
+        <h3 class="parte-section-title">📱 Tiempo de pantalla de hoy</h3>
+        <div class="parte-field">
+          <label>Límite diario (minutos)</label>
+          <input type="number" id="rs-limit" class="parte-input" min="0" max="600" placeholder="ej: 60">
+        </div>
+        <div class="rs-used-wrap">
+          <span class="rs-used-value" id="rs-used">0</span>
+          <span class="rs-used-sub" id="rs-limit-sub">min usados</span>
+        </div>
+        <div class="rs-quick-btns">
+          <button class="rs-qbtn" data-mins="15">+15 min</button>
+          <button class="rs-qbtn" data-mins="30">+30 min</button>
+          <button class="rs-qbtn" data-mins="-15">−15 min</button>
+          <button class="rs-qbtn rs-qbtn-reset" id="rs-reset-btn">Reiniciar día</button>
+        </div>
+        <div class="pm-bar-wrap">
+          <div class="pm-bar-fill" id="rs-bar" style="width:0%"></div>
+        </div>
+        <div class="pm-semaforo" id="rs-semaforo"></div>
+      </div>
+
+      <!-- Acuerdos familiares -->
+      <div class="parte-card">
+        <h3 class="parte-section-title">🤝 Acuerdos familiares</h3>
+        <p class="teacher-panel-desc">Reglas de uso de redes y pantallas acordadas en familia. Marquen las que ya se cumplen hoy.</p>
+        <div id="rs-acuerdos-list"></div>
+        <input type="text" id="rs-new-acuerdo" class="parte-input" placeholder="Nuevo acuerdo…" maxlength="120" style="margin-top:10px;">
+        <button class="pa-add-btn" id="rs-add-acuerdo-btn" style="margin-top:10px;">
+          <i class="fa-solid fa-plus"></i> Agregar acuerdo
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== COLLAGE DE EVIDENCIAS ========== -->
+  <div id="view-collage" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="collage-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Collage de Evidencias</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+
+      <!-- Logo del centro -->
+      <div class="pa-card">
+        <div class="pa-card-title"><i class="fa-solid fa-school co-title-icon"></i> Logo del Centro</div>
+        <label class="co-upload-label" for="co-logo-input">
+          <i class="fa-solid fa-image"></i>
+          <span>Seleccionar logo <em>(opcional)</em></span>
+        </label>
+        <input type="file" id="co-logo-input" accept="image/*" style="display:none;">
+        <div id="co-logo-preview" class="co-logo-preview" style="display:none;">
+          <img id="co-logo-img" src="" alt="Logo del centro">
+          <button class="co-remove-btn" id="co-logo-remove" title="Quitar logo">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Texto de evidencia -->
+      <div class="pa-card">
+        <div class="pa-card-title"><i class="fa-solid fa-pen-to-square co-title-icon"></i> Texto de Evidencia</div>
+        <textarea id="co-text" class="pa-paste-area co-textarea" rows="2"
+          placeholder="Ej: Laboratorio de Ciencias · 7° Grado A · Mayo 2026"></textarea>
+      </div>
+
+      <!-- Formato -->
+      <div class="pa-card">
+        <div class="pa-card-title"><i class="fa-solid fa-crop-simple co-title-icon"></i> Formato del Collage</div>
+        <div class="co-format-row">
+          <label class="co-format-opt">
+            <input type="radio" name="co-format" value="square" checked>
+            <span class="co-format-card">
+              <i class="fa-regular fa-square"></i>
+              <b>Cuadrado 1:1</b>
+              <small>Instagram / WhatsApp</small>
+            </span>
+          </label>
+          <label class="co-format-opt">
+            <input type="radio" name="co-format" value="vertical">
+            <span class="co-format-card">
+              <i class="fa-solid fa-mobile-screen"></i>
+              <b>Vertical 9:16</b>
+              <small>Historia / Reels</small>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Fotografías -->
+      <div class="pa-card">
+        <div class="pa-card-title">
+          <i class="fa-solid fa-camera co-title-icon"></i> Fotografías
+          <span class="co-photo-count" id="co-photo-count">0 / 6</span>
+        </div>
+        <label class="co-upload-label" for="co-photos-input">
+          <i class="fa-solid fa-images"></i>
+          <span>Seleccionar fotos <em>(máx. 6)</em></span>
+        </label>
+        <input type="file" id="co-photos-input" accept="image/*" multiple style="display:none;">
+        <div id="co-photos-thumbs" class="co-thumbs-grid"></div>
+      </div>
+
+      <!-- Botón generar -->
+      <button class="pa-gen-btn" id="co-generate-btn">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Generar Collage
+      </button>
+
+      <!-- Vista previa + descarga -->
+      <div id="co-preview-wrap" class="co-preview-wrap" style="display:none;">
+        <div class="pa-card-title" style="margin-bottom:12px;">
+          <i class="fa-solid fa-image co-title-icon"></i> Vista Previa
+        </div>
+        <div class="co-canvas-stage" id="co-canvas-stage">
+          <canvas id="collage-canvas" class="co-canvas"></canvas>
+          <div class="co-grid-overlay" id="co-grid-overlay" aria-hidden="true"></div>
+        </div>
+        <button class="pa-print-btn" id="co-download-btn" type="button">
+          <i class="fa-solid fa-download"></i> Descargar / Guardar Imagen
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== DRAWER ========== -->
+  <div id="drawer-overlay" class="drawer-overlay"></div>
+  <aside id="app-drawer" class="app-drawer" role="navigation" aria-label="Menú principal">
+    <div class="drawer-head">
+      <div class="drawer-brand">F.A.R.O.</div>
+      <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Cerrar menú">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <nav class="drawer-nav">
+      <button class="drawer-item active" data-view="view-inicio">
+        <i class="fa-solid fa-house"></i><span>Inicio</span>
+      </button>
+      <button class="drawer-item" data-view="view-misiones">
+        <i class="fa-solid fa-rocket"></i><span>Aprendizaje Unido</span>
+      </button>
+      <button class="drawer-item" data-view="view-rutas">
+        <i class="fa-solid fa-map-signs"></i><span>Mis Rutas</span>
+      </button>
+      <button class="drawer-item" data-view="view-progreso">
+        <i class="fa-solid fa-chart-line"></i><span>Mi Progreso</span>
+      </button>
+      <button class="drawer-item" data-view="view-chat">
+        <i class="fa-solid fa-comments"></i><span>Chat Familiar</span>
+      </button>
+      <div class="drawer-section-label drawer-tools-label">Herramientas</div>
+      <button class="drawer-item" data-view="view-destellos">
+        <i class="fa-solid fa-bolt"></i><span>Destellos</span>
+      </button>
+      <button class="drawer-item" data-view="view-redaccion">
+        <i class="fa-solid fa-pen-nib"></i><span>Redacción</span>
+      </button>
+      <button class="drawer-item" data-view="view-antena">
+        <i class="fa-solid fa-tower-broadcast"></i><span>Antena</span>
+      </button>
+      <button class="drawer-item" data-view="view-finanzas">
+        <i class="fa-solid fa-sack-dollar"></i><span>Finanzas</span>
+      </button>
+      <button class="drawer-item" data-view="view-habitos">
+        <i class="fa-solid fa-seedling"></i><span>Tracker de Hábitos</span>
+      </button>
+      <button class="drawer-item" data-view="view-redes">
+        <i class="fa-solid fa-mobile-screen-button"></i><span>Redes Sociales</span>
+      </button>
+      <button class="drawer-item" data-view="view-inventario">
+        <i class="fa-solid fa-boxes-stacked"></i><span>Inventario Familiar</span>
+      </button>
+      <button class="drawer-item" data-view="view-perfil">
+        <i class="fa-solid fa-people-roof"></i><span>Herramientas de Familia</span>
+      </button>
+    </nav>
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label">Configuración</div>
+    <div class="drawer-config-list">
+      <div class="drawer-config-item">
+        <i class="fa-solid fa-gear"></i><span>Ajustes generales</span>
+        <span class="drawer-soon-badge">Pronto</span>
+      </div>
+      <div class="drawer-config-item">
+        <i class="fa-solid fa-palette"></i><span>Apariencia</span>
+        <span class="drawer-soon-badge">Pronto</span>
+      </div>
+      <div class="drawer-config-item">
+        <i class="fa-solid fa-bell"></i><span>Notificaciones</span>
+        <span class="drawer-soon-badge">Pronto</span>
+      </div>
+      <button class="drawer-config-item drawer-logout-item" id="logout-btn">
+        <i class="fa-solid fa-right-from-bracket"></i><span>Cerrar sesión</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Modal: nueva edición de la revista -->
+  <div id="red-ed-modal-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="des-modal-title"><i class="fa-solid fa-newspaper" style="color:#4f46e5;"></i> Nueva edición</div>
+        <button type="button" class="fin-modal-close" id="red-ed-modal-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <label class="fin-label" for="red-ed-num">Número de edición</label>
+      <input type="number" id="red-ed-num" class="des-proj-input" min="1" max="999">
+      <label class="fin-label" for="red-ed-nombre">Título</label>
+      <input type="text" id="red-ed-nombre" class="des-proj-input" maxlength="60">
+      <label class="fin-label" for="red-ed-cierre">Fecha de cierre</label>
+      <input type="date" id="red-ed-cierre" class="des-proj-input">
+      <button type="button" class="red-crear-btn" id="red-ed-crear-btn">
+        <i class="fa-solid fa-newspaper"></i> Crear edición
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: mover nota a otra edición -->
+  <div id="red-mover-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="des-modal-title"><i class="fa-solid fa-arrow-right-arrow-left" style="color:#4f46e5;"></i> Mover nota a…</div>
+        <button type="button" class="fin-modal-close" id="red-mover-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="red-mover-list"></div>
+    </div>
+  </div>
+
+  <!-- ========== DESTELLO FAB (captura rápida global) ========== -->
+  <button type="button" class="destello-fab" id="destello-fab" aria-label="Capturar un destello">
+    <i class="fa-solid fa-bolt"></i>
+  </button>
+
+  <!-- Modal de captura rápida -->
+  <div id="des-modal-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="des-modal-title"><i class="fa-solid fa-bolt"></i> Nuevo destello</div>
+        <button type="button" class="fin-modal-close" id="des-modal-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <p class="des-modal-hint">Captúralo antes de que se apague ⚡</p>
+      <textarea id="des-texto" class="des-textarea" rows="3" maxlength="500"
+        placeholder="¿Qué se te cruzó por la mente?"></textarea>
+      <label class="fin-label" for="des-proyecto">Proyecto (opcional)</label>
+      <input type="text" id="des-proyecto" class="des-proj-input" maxlength="30"
+        placeholder="ej: familia-app, escuela, hogar…">
+      <div class="des-proj-chips" id="des-proj-chips"></div>
+      <button type="button" class="des-save-btn" id="des-save-btn">
+        <i class="fa-solid fa-bolt"></i> Capturar
+      </button>
+    </div>
+  </div>
+
+  <!-- ========== NAVEGACIÓN INFERIOR ========== -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Navegación principal">
+    <button type="button" class="nav-item active" data-view="view-inicio">
+      <i class="fa-solid fa-house"></i><span>Inicio</span>
+    </button>
+    <button type="button" class="nav-item" data-view="view-misiones">
+      <i class="fa-solid fa-graduation-cap"></i><span>Misiones</span>
+    </button>
+    <button type="button" class="nav-item" data-view="view-habitos">
+      <i class="fa-solid fa-seedling"></i><span>Hábitos</span>
+    </button>
+    <button type="button" class="nav-item" data-view="view-chat">
+      <i class="fa-solid fa-comments"></i><span>Chat</span>
+    </button>
+    <button type="button" class="nav-item" data-view="view-finanzas">
+      <i class="fa-solid fa-sack-dollar"></i><span>Finanzas</span>
+    </button>
+  </nav>
+
+  </div>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data/misiones.js"></script>
+  <script src="js/data/frases.js"></script>
+  <script src="js/tools/habitos.js"></script>
+  <script src="js/tools/redes-sociales.js"></script>
+  <script src="js/tools/collage-maker.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/push.js"></script>
+  <script src="js/finanzas.js"></script>
+  <script src="js/inventario.js"></script>
+  <script src="js/tools/destellos.js"></script>
+  <script src="js/tools/redaccion.js"></script>
+  <script src="js/tools/antena.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+  (function(){
+    window.__t0 = performance.now();
+    window.__reg = [];
+    const t = () => Math.round(performance.now() - window.__t0);
+    function apunta(ev, extra){ window.__reg.push(Object.assign({t:t(), ev}, extra||{})); }
+    window.__apunta = apunta;
+
+    const vsReal = window.verificarSesion;
+    window.__vsReal = vsReal;
+    window.verificarSesion = function(){
+      const r = vsReal();
+      apunta('verificarSesion()', {devuelve: r ? r.user : 'null'});
+      return r;
+    };
+    ['renderHome','renderMissions','renderRutas','renderProgress','renderProfile','switchView'].forEach(n=>{
+      const f = window[n];
+      if (typeof f !== 'function') return;
+      window[n] = function(){
+        let quien='?'; try { quien = load().currentMember; } catch(_){}
+        apunta(n+'()', {miembro: quien, arg: (n==='switchView'? String(arguments[0]) : undefined)});
+        return f.apply(this, arguments);
+      };
+    });
+    /* cuando la sesion de verdad queda disponible */
+    let visto=false;
+    setInterval(()=>{ const s=vsReal(); if(s&&!visto){ visto=true; apunta('SESION DISPONIBLE',{quien:s.user}); } }, 5);
+  })();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+
+</body>
+</html>

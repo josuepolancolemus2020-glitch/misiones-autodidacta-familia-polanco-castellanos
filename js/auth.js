@@ -61,12 +61,21 @@ const AUTH_KEY = 'faro_session';   /* solo para borrar el rastro del login viejo
 const AUTH_SUPABASE_URL = 'https://bzrnjvalpwlcnpszvwim.supabase.co';
 const AUTH_SUPABASE_KEY = 'sb_publishable_74mJW5LoxPZOWtIi7YrBEw_0y9JjSfM';
 
+/* ⚠️ UN SOLO CLIENTE EN TODA LA APLICACIÓN, y este es. No se crea otro.
+   Por qué está escrito tan fuerte: la primera versión de este archivo creaba su
+   propio cliente con storageKey aparte, mientras chat.js creaba el suyo y de él
+   colgaban los siete módulos que tocan la nube (chat, finanzas, inventario,
+   push, antena, destellos, redaccion). Resultado: la sesión vivía en un cliente
+   y TODOS los datos pasaban por el otro, que iba como anónimo. Con la seguridad
+   por fila encendida eso deja la casa muda (cero filas, sin error, como si los
+   datos se hubieran perdido) sin cerrarle la puerta a nadie de fuera.
+   Tampoco se le pone storageKey propio: dos clientes sobre el mismo almacén se
+   pelean al renovar el token. Uno, y basta. */
 const _authSb = (window.supabase && window.supabase.createClient)
   ? window.supabase.createClient(AUTH_SUPABASE_URL, AUTH_SUPABASE_KEY, {
       auth: {
         persistSession: true,     /* la sesión sobrevive a cerrar la aplicación */
         autoRefreshToken: true,   /* y se renueva sola: nadie escribe la clave a diario */
-        storageKey: 'faro_auth',
       },
     })
   : null;

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · el arranque de app.js y el miembro de la sesion</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:260px;border:0;background:#fff}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+<div id="marco"></div>
+<script>
+const out = document.getElementById('out'); const L = [];
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+function jwt(){
+  const b64 = o => btoa(JSON.stringify(o)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  return b64({alg:'HS256',typ:'JWT'}) + '.' +
+         b64({sub:'00000000-0000-0000-0000-000000000001', role:'authenticated',
+              email:'jael@faro.local', exp: 2069999999, iat: 1700000000,
+              aud:'authenticated', session_id:'sess-1'}) + '.firmafalsa';
+}
+function sesionFalsaJael(){
+  return { access_token: jwt(), refresh_token: 'r1', token_type:'bearer',
+           expires_in: 999999999, expires_at: 2069999999,
+           user: { id:'00000000-0000-0000-0000-000000000001', aud:'authenticated',
+                   role:'authenticated', email:'jael@faro.local',
+                   user_metadata:{ miembro:'jael' }, app_metadata:{} } };
+}
+
+async function misionesIds(){
+  const src = await (await fetch('/js/data/misiones.js')).text();
+  return new Function(src + '; return MISSIONS.map(m=>m.id);')();
+}
+
+function estado(ids5){
+  return { currentMember: 'angelly',
+           members: { josue:{xp:0,visited:[],lastVisited:[]},
+                      evelyn:{xp:0,visited:[],lastVisited:[]},
+                      jael:{xp:0,visited:[],lastVisited:[]},
+                      angelly:{xp:250,visited:ids5,lastVisited:ids5.slice(0,3)} } };
+}
+
+function radiografia(w){
+  const d = w.document;
+  const activa = [...d.querySelectorAll('.view.active')].map(v=>v.id).join(',') || '(ninguna)';
+  const cont = d.getElementById('app-container');
+  const visibles = cont && getComputedStyle(cont).display !== 'none';
+  const login = d.getElementById('login-screen');
+  const loginVis = login && getComputedStyle(login).display !== 'none' && login.style.visibility !== 'hidden';
+  const tarjetas = d.querySelectorAll('#missions-container .mission-card').length;
+  const visitadas = d.querySelectorAll('#missions-container .mission-card.visited').length;
+  const sellos = d.querySelectorAll('#missions-container .mc-done').length;
+  let cm = '?'; try { cm = w.load().currentMember; } catch(_){}
+  const saludo = (d.getElementById('home-name')||{}).textContent || '(sin saludo)';
+  return { activa, visibles, loginVis, tarjetas, visitadas, sellos, cm, saludo,
+           sesion: (w.__vsReal && w.__vsReal()) ? w.__vsReal().user : 'null' };
+}
+function pinta(r){
+  log('    vista activa .................. ' + r.activa);
+  log('    app-container visible ......... ' + r.visibles + '   (login visible: ' + r.loginVis + ')');
+  log('    sesion (verificarSesion) ...... ' + r.sesion);
+  log('    estado.currentMember .......... ' + r.cm);
+  log('    saludo del Inicio ............. ' + r.saludo);
+  log('    tarjetas de mision pintadas ... ' + r.tarjetas +
+      '   con marca «Visitada»: ' + r.visitadas + ' (sellos: ' + r.sellos + ')');
+}
+function pintaReg(w){
+  log('    cronologia (ms desde que acaba de cargarse el ultimo script):');
+  (w.__reg||[]).slice(0,26).forEach(e=>{
+    log('      ' + String(e.t).padStart(5) + ' ms  ' + e.ev +
+        (e.devuelve !== undefined ? '  -> ' + e.devuelve : '') +
+        (e.arg !== undefined && e.arg !== 'undefined' ? '  ' + e.arg : '') +
+        (e.miembro !== undefined ? '  [miembro: ' + e.miembro + ']' : '') +
+        (e.quien !== undefined ? '  ' + e.quien : ''));
+  });
+}
+
+async function cargar(url){
+  document.getElementById('marco').innerHTML = '';
+  const f = document.createElement('iframe');
+  f.src = url;
+  document.getElementById('marco').appendChild(f);
+  await new Promise(r => f.addEventListener('load', r, { once:true }));
+  return f;
+}
+
+window.addEventListener('load', async () => {
+  const ids = await misionesIds();
+  const cinco = ids.slice(0, 5);
+  log('catalogo: ' + ids.length + ' misiones · a Angelly se le marcan 5 como visitadas: ' + cinco.join(','));
+  log('');
+
+  /* ══ A · se vuelve de una mision con ?view=misiones y HAY sesion guardada de JAEL,
+        mientras el estado del telefono todavia dice currentMember=angelly ══ */
+  log('══ A · arranque con sesion guardada (jael) y estado viejo (angelly) ══');
+  localStorage.clear();
+  localStorage.setItem('faro_v1', JSON.stringify(estado(cinco)));
+  localStorage.setItem('faro_auth', JSON.stringify(sesionFalsaJael()));
+  let f = await cargar('/_dev/faro-local.html?view=misiones');
+  await esperar(3000);
+  pintaReg(f.contentWindow);
+  log('');
+  pinta(radiografia(f.contentWindow));
+  log('');
+
+  /* ══ B · el caso literal del revisor: NO hay sesion, entra Jael a mano ══ */
+  log('══ B · sin sesion guardada; se vuelve con ?view=misiones y Jael entra a mano ══');
+  localStorage.clear();
+  localStorage.setItem('faro_v1', JSON.stringify(estado(cinco)));
+  f = await cargar('/_dev/faro-local.html?view=misiones&stub=1');
+  await esperar(1500);
+  let w = f.contentWindow, d = w.document;
+  log('  antes de entrar:');
+  pinta(radiografia(w));
+  d.getElementById('login-user').value = 'jael';
+  d.getElementById('login-pass').value = 'loquesea';
+  d.getElementById('login-form').dispatchEvent(new w.Event('submit', {cancelable:true, bubbles:true}));
+  await esperar(2000);
+  log('  despues de que Jael entra:');
+  pinta(radiografia(w));
+  log('');
+
+  /* ══ C · lo que el revisor dice haber medido: la sesion guardada esta caducada,
+        asi que restaurarla cuesta una llamada de red (aqui 600 ms) ══ */
+  log('══ C · sesion guardada de jael CADUCADA (restaurar cuesta red: 600 ms) ══');
+  localStorage.clear();
+  localStorage.setItem('faro_v1', JSON.stringify(estado(cinco)));
+  const caducada = sesionFalsaJael();
+  caducada.expires_at = 1700000000; caducada.expires_in = -1;   /* ya vencida */
+  localStorage.setItem('faro_auth', JSON.stringify(caducada));
+  f = await cargar('/_dev/faro-local.html?view=misiones&stub=1&lento=1');
+  await esperar(3000);
+  pintaReg(f.contentWindow);
+  log('');
+  pinta(radiografia(f.contentWindow));
+  log('');
+  log('FIN');
+});
+</script>
+</body>
+</html>

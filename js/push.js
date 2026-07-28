@@ -64,7 +64,24 @@ async function pushSubscribe() {
   const me  = _pushCurrentMember();
   const sub = subscription.toJSON();
 
+  /* El dueño de la suscripcion, que la politica de seguridad por fila exige:
+     cada quien solo ve y borra la suya, porque una suscripcion ajena en malas
+     manos es poder mandar notificaciones al telefono de otro. Sin esta linea el
+     insert se rechaza siempre y el telefono no vuelve a registrarse nunca.
+     Se lee del servidor y no de la copia en memoria: si la sesion todavia se
+     esta restaurando, aqui esperamos a que este. */
+  let userId = null;
+  try {
+    const { data } = await _sb.auth.getUser();
+    userId = data && data.user ? data.user.id : null;
+  } catch (_) {}
+  if (!userId) {
+    console.warn('[Push] Sin sesion todavia: la suscripcion se guardara al volver a entrar.');
+    return false;
+  }
+
   const { error } = await _sb.from(PUSH_SUBSCRIPTIONS_TABLE).upsert({
+    user_id:   userId,
     member_id: me.id,
     nombre:    me.nombre,
     endpoint:  sub.endpoint,

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Banco de pruebas · pantalla de entrada</title></head>
+<body>
+  <!-- Copia literal del bloque de entrada de index.html, con el cliente de
+       Supabase servido en local porque el CDN no se alcanza desde la sonda. -->
+  <div id="login-screen">
+    <div class="login-card">
+      <form id="login-form" class="login-form">
+        <label class="login-label" for="login-user">¿Quién eres?</label>
+        <select id="login-user" class="login-select" required>
+          <option value="josue">Josué Edmundo</option>
+          <option value="evelyn">Evelyn Sarahí</option>
+          <option value="jael">Jael</option>
+          <option value="angelly">Angelly</option>
+        </select>
+        <label class="login-label" for="login-pass">Contraseña</label>
+        <input id="login-pass" class="login-input" type="password" placeholder="Tu contraseña" autocomplete="current-password" required>
+        <p id="login-error" class="login-error" hidden>No se pudo entrar. Revisa la contraseña e intenta de nuevo.</p>
+        <button type="submit" class="login-btn">Ingresar</button>
+      </form>
+    </div>
+  </div>
+  <div id="app-container" style="display:none;">la aplicación</div>
+
+  <script src="/_dev/vendor/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

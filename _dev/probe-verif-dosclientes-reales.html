@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · dos clientes, ARCHIVOS REALES</title>
+<style>body{font-family:system-ui;background:#111;color:#eee;margin:0;padding:10px}
+pre{background:#000;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<!-- DOM minimo que espera auth.js -->
+<div id="login-screen"><form id="login-form">
+  <select id="login-user"><option value="jael">jael</option></select>
+  <input id="login-pass" type="password">
+  <div id="login-error" hidden></div>
+  <button class="login-btn" type="submit">Entrar</button>
+</form></div>
+<div id="app-container" style="display:none"></div>
+<div id="chat-messages"></div>
+
+<pre id="out">midiendo…</pre>
+
+<script>
+/* ── Se intercepta la red ANTES de cargar nada. El servidor de Supabase se
+      emula: el token de contrasena se concede, y en /rest/v1 se aplica a mano
+      la regla del .sql (solo rol authenticated pasa). ── */
+const L = []; const REG = [];
+function log(s){ L.push(s); const o=document.getElementById('out'); if(o) o.textContent=L.join('\n'); }
+const KEY_PUB = 'sb_publishable_74mJW5LoxPZOWtIi7YrBEw_0y9JjSfM';
+
+function b64u(o){ return btoa(JSON.stringify(o)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+const JWT_USUARIO = b64u({alg:'HS256',typ:'JWT'})+'.'+b64u({
+  sub:'11111111-1111-1111-1111-111111111111', role:'authenticated', aud:'authenticated',
+  email:'jael@faro.local', exp: 2069999999, iat: 1700000000, session_id:'s1'})+'.firma';
+const SESION_FALSA = {
+  access_token: JWT_USUARIO, refresh_token:'r1', token_type:'bearer',
+  expires_in: 999999999, expires_at: 2069999999,
+  user:{ id:'11111111-1111-1111-1111-111111111111', aud:'authenticated', role:'authenticated',
+         email:'jael@faro.local', user_metadata:{miembro:'jael'}, app_metadata:{},
+         created_at:'2024-01-01T00:00:00Z' }
+};
+
+const fetchReal = window.fetch.bind(window);
+window.fetch = function(input, init){
+  const url = String(input && input.url ? input.url : input);
+  const met = ((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+  const hs  = (init && init.headers) || (input && input.headers) || {};
+  const get = k => { try { return hs.get ? hs.get(k) : (hs[k] || hs[k.toLowerCase()]); } catch(_) { return null; } };
+  const auth = String(get('Authorization') || get('authorization') || '');
+
+  if (url.indexOf('/auth/v1/token') !== -1) {
+    return Promise.resolve(new Response(JSON.stringify(SESION_FALSA),
+      {status:200, headers:{'Content-Type':'application/json'}}));
+  }
+  if (url.indexOf('/auth/v1/user') !== -1) {
+    return Promise.resolve(new Response(JSON.stringify(SESION_FALSA.user),
+      {status:200, headers:{'Content-Type':'application/json'}}));
+  }
+  if (url.indexOf('/rest/v1/') !== -1) {
+    const tabla = url.split('/rest/v1/')[1].split('?')[0];
+    const rol = auth.indexOf(KEY_PUB) !== -1 ? 'anon'
+              : (auth.indexOf(JWT_USUARIO) !== -1 ? 'authenticated' : 'desconocido');
+    REG.push(met + ' ' + tabla + '  →  rol ' + rol);
+    if (rol === 'authenticated') {
+      return Promise.resolve(new Response('[]', {status:200, headers:{'Content-Type':'application/json'}}));
+    }
+    /* Lo que hace PostgREST con RLS «to authenticated» y peticion anon */
+    if (met === 'GET') {
+      return Promise.resolve(new Response('[]', {status:200, headers:{'Content-Type':'application/json'}}));
+    }
+    return Promise.resolve(new Response(JSON.stringify({
+      code:'42501', message:'new row violates row-level security policy for table "'+tabla+'"'}),
+      {status:403, headers:{'Content-Type':'application/json'}}));
+  }
+  return fetchReal(input, init);
+};
+localStorage.clear();
+window.toast = function(m){ log('    toast(): «' + m + '»'); };
+</script>
+
+<!-- supabase-js REAL (copia local del paquete oficial) y los ARCHIVOS DEL PROYECTO -->
+<script src="/_dev/vendor/supabase.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/chat.js"></script>
+
+<script>
+window.addEventListener('load', async () => {
+  log('supabase-js real: ' + !!(window.supabase && window.supabase.createClient));
+  log('');
+  log('══ 1 · ¿son el mismo cliente? ══');
+  log('  window.faroSb (auth.js) === _sb (chat.js): ' + (window.faroSb === _sb));
+  log('');
+
+  log('══ 2 · entrar de verdad por iniciarSesion() de auth.js ══');
+  const ok = await iniciarSesion('jael', 'contrasena-correcta');
+  log('  iniciarSesion → ' + ok);
+  const s = verificarSesion();
+  log('  verificarSesion() → ' + JSON.stringify(s));
+  log('  claves en localStorage: ' + JSON.stringify(Object.keys(localStorage)));
+  const a1 = await window.faroSb.auth.getSession();
+  const a2 = await _sb.auth.getSession();
+  log('  cliente de AUTH  ve sesion: ' + (a1.data.session ? 'SI · '+a1.data.session.user.email : 'NO'));
+  log('  cliente de DATOS ve sesion: ' + (a2.data.session ? 'SI · '+a2.data.session.user.email : 'NO'));
+  log('');
+
+  log('══ 3 · la aplicacion trabajando, con la sesion iniciada ══');
+  await chatSendMessage('hola familia');           // js/chat.js, funcion real
+  const inv = await _sb.from('inventario').select('*').order('nombre');
+  log('  inventario: filas=' + ((inv.data||[]).length) + '  error=' + (inv.error ? inv.error.code : 'ninguno'));
+  const des = await _sb.from('destellos').select('*');
+  log('  destellos:  filas=' + ((des.data||[]).length) + '  error=' + (des.error ? des.error.code : 'ninguno'));
+  const notas = await _sb.from('redaccion_notas').select('*');
+  log('  redaccion:  filas=' + ((notas.data||[]).length) + '  error=' + (notas.error ? notas.error.code : 'ninguno'));
+  const push = await _sb.from('push_subscriptions').upsert({ endpoint:'x' });
+  log('  push upsert: error=' + (push.error ? push.error.code : 'ninguno'));
+  log('');
+  log('══ 4 · registro de peticiones vistas por el servidor ══');
+  REG.forEach(r => log('  ' + r));
+  log('');
+  log('══ 5 · contraste: la MISMA peticion por el cliente de auth ══');
+  const inv2 = await window.faroSb.from('inventario').select('*');
+  log('  ' + REG[REG.length-1]);
+  log('  error=' + (inv2.error ? inv2.error.code : 'ninguno'));
+  log('');
+  log('FIN');
+});
+</script>
+</body>
+</html>

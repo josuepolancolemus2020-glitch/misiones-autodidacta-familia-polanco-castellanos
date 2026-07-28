@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · getSession() que no resuelve</title></head>
+<body>
+<pre id="out"></pre>
+<script>
+const out = document.getElementById('out');
+const log = m => { out.textContent += m + '\n'; };
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* Stub de @supabase/supabase-js: el cliente carga bien (script del CDN en
+   caché o service worker), pero la llamada de red que hace getSession()
+   para refrescar un token caducado NUNCA resuelve. Es el agujero negro:
+   la conexión acepta el paquete y no contesta jamás. */
+function stub(nunca) {
+  return `
+  <script>
+  window.__llamadas = [];
+  const colgada = () => new Promise(() => {});
+  const canal = { on(){return canal;}, subscribe(){return canal;}, unsubscribe(){return Promise.resolve();}, send(){return Promise.resolve();} };
+  const consulta = {};
+  ['select','insert','update','delete','upsert','eq','neq','gt','gte','lt','lte','order','limit','single','maybeSingle','in','is','or','filter','range','not','contains']
+    .forEach(m => consulta[m] = () => consulta);
+  consulta.then = (res) => res({ data: [], error: null });
+  window.supabase = {
+    createClient: () => ({
+      auth: {
+        getSession: () => { window.__llamadas.push('getSession');
+          if (${nunca} === 1) return colgada();
+          if (${nunca} === 2) return Promise.reject(new TypeError('Failed to fetch'));
+          return Promise.resolve({ data: { session: null }, error: null }); },
+        getUser: () => colgada(),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } }),
+        signInWithPassword: () => Promise.resolve({ data: null, error: { message: 'stub' } }),
+        signInWithOtp: () => Promise.resolve({ data: null, error: { message: 'stub' } }),
+        signOut: () => Promise.resolve({ error: null }),
+      },
+      from: () => consulta,
+      channel: () => canal,
+      removeChannel: () => Promise.resolve(),
+      rpc: () => consulta,
+      functions: { invoke: () => Promise.resolve({ data: null, error: null }) },
+      storage: { from: () => ({ upload: () => Promise.resolve({ data: null, error: null }), getPublicUrl: () => ({ data: { publicUrl: '' } }) }) },
+    })
+  };
+  <\/script>`;
+}
+
+async function montar(nunca) {
+  let html = await (await fetch('/index.html')).text();
+  /* Sustituye el <script> del CDN por el stub, ANTES de que corra js/auth.js */
+  html = html.replace(/<script src="https:\/\/cdn\.jsdelivr\.net[^>]*><\/script>/, stub(nunca));
+  html = html.replace('<head>', '<head><base href="/">');
+  const f = document.createElement('iframe');
+  f.style.cssText = 'width:390px;height:700px;border:1px solid #999';
+  document.body.appendChild(f);
+  f.srcdoc = html;
+  await new Promise(res => { f.onload = res; setTimeout(res, 8000); });
+  return f;
+}
+
+function foto(f, etiqueta) {
+  const w = f.contentWindow, d = f.contentDocument;
+  const login = d.getElementById('login-screen');
+  const app   = d.getElementById('app-container');
+  const cs = e => e ? getComputedStyle(e) : null;
+  const cl = cs(login), ca = cs(app);
+  const visibles = [...d.body.querySelectorAll('*')].filter(e => {
+    const s = getComputedStyle(e);
+    if (s.display === 'none' || s.visibility === 'hidden' || s.opacity === '0') return false;
+    const r = e.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && (e.textContent || '').trim().length > 0;
+  });
+  log('  [' + etiqueta + ']');
+  log('    login-screen  visibility=' + (cl ? cl.visibility : 'n/a') + '  display=' + (cl ? cl.display : 'n/a'));
+  log('    app-container display='    + (ca ? ca.display : 'n/a'));
+  log('    llamadas a getSession: ' + JSON.stringify(w.__llamadas));
+  log('    verificarSesion(): ' + JSON.stringify(w.verificarSesion ? w.verificarSesion() : 'n/a'));
+  log('    elementos con texto visible en <body>: ' + visibles.length);
+  const textoVisible = visibles.slice(-6).map(e => e.tagName + ':' + (e.textContent || '').trim().slice(0, 40));
+  log('    ultimos: ' + JSON.stringify(textoVisible));
+  const bg = getComputedStyle(d.body).backgroundColor;
+  log('    fondo del body: ' + bg);
+}
+
+(async function () {
+  try {
+    log('══ CASO A · getSession() NUNCA resuelve (red agujero negro) ══');
+    const fa = await montar(1);
+    await esperar(3000);  foto(fa, 't = ~3 s');
+    await esperar(8000);  foto(fa, 't = ~11 s');
+
+    log('');
+    log('══ CASO B · control: getSession() resuelve con session=null ══');
+    const fb = await montar(0);
+    await esperar(2000);  foto(fb, 't = ~2 s');
+
+    log('');
+    log('══ CASO C · red que FALLA rapido (portal cautivo / sin datos) ══');
+    const fc = await montar(2);
+    await esperar(2000);  foto(fc, 't = ~2 s');
+
+    log('');
+    log('FIN');
+  } catch (e) { log('EXCEPCION: ' + e.message + '\n' + e.stack); }
+})();
+</script>
+</body>
+</html>
