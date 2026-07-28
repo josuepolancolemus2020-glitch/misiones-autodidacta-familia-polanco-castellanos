@@ -30,6 +30,46 @@ pierde por el camino.
 | Apagar el alta pública de cuentas en Supabase | ⛔ pendiente |
 | Compilar y repartir el APK | ⛔ **ya no hace falta**: la PWA se actualiza sola |
 
+## ⏸ PENDIENTE, para retomar
+
+Se pospuso la prueba con las hijas a la noche del 28 de julio, porque no estaban
+conectadas. Lo que queda, **en este orden y sin saltarse ninguno**:
+
+**1. Que entren los otros tres.** Evelyn, Jael y Angelly, cada uno en SU aparato,
+en `https://faro-dq7.pages.dev/`. Pasan dos puertas: el código que Cloudflare
+manda al correo, y después su contraseña de F.A.R.O. Las dos son normales.
+
+**2. La mudanza del progreso**, aparato por aparato. Va ANTES de apagar nada,
+porque necesita que la dirección vieja siga viva:
+
+   · en la dirección VIEJA (la de github.io): abrir `mudanza.html`, «Guardar»;
+   · en la NUEVA: `faro-dq7.pages.dev/mudanza.html`, «Restaurar»;
+   · comprobar que el XP volvió, e instalar ahí la PWA.
+
+**3. Cerrar la casa vieja**, solo cuando los cuatro estén dentro y con su
+progreso: GitHub → Settings → Pages → apagar, y Settings → General → Danger
+Zone → Make private.
+
+   ⚠️ Después de ponerlo privado, comprobar que Cloudflare sigue desplegando:
+   un cambio pequeño, un empujón, y mirar que el despliegue salga en verde. No
+   darlo por hecho.
+
+**4. Sueltos que no bloquean nada pero siguen ahí:**
+
+   · Las notificaciones del chat están rotas y en silencio. Se arregla volviendo
+     a desplegar `send-chat-push`, que en el repositorio ya usa la clave de
+     servicio. Después, cada quien abre la aplicación una vez para volver a
+     suscribirse.
+   · Apagar el alta pública de cuentas en Supabase (Authentication → Providers →
+     Email). La función es_familia() ya detiene a quien se registre, pero la
+     puerta no debería estar abierta.
+
+**Lo que NO hace falta hacer:** compilar y repartir el APK. Con el sitio privado
+en Cloudflare, la PWA se actualiza con cada `git push` y nadie tiene que
+reinstalar nada.
+
+---
+
 **Lo que esto significa hoy:** los datos de la familia están cerrados, y esta
 vez comprobado de las dos maneras, que son distintas y hacen falta las dos:
 
