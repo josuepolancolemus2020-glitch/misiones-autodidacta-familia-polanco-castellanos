@@ -93,6 +93,10 @@
           <span class="qa-icon qa-rutas"><i class="fa-solid fa-map-signs"></i></span>
           <span class="qa-label">Mis Rutas</span>
         </button>
+        <button type="button" class="qa-item" data-qa="view-asignaciones">
+          <span class="qa-icon qa-asig"><i class="fa-solid fa-feather-pointed"></i></span>
+          <span class="qa-label">Asignaciones</span>
+        </button>
         <button type="button" class="qa-item" data-qa="view-destellos">
           <span class="qa-icon qa-des"><i class="fa-solid fa-bolt"></i></span>
           <span class="qa-label">Destellos</span>
@@ -230,6 +234,19 @@
     <div class="view-scroll">
       <p class="rutas-intro">Cada ruta es una serie ordenada: las etapas se recorren en orden y el mapa muestra también lo que falta por construir.</p>
       <div id="rutas-container"></div>
+    </div>
+  </div>
+
+  <!-- ========== ASIGNACIONES METALINGÜÍSTICAS ========== -->
+  <div id="view-asignaciones" class="view">
+    <header class="app-header compact">
+      <button class="hamburger-btn" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <h1 class="view-title">Asignaciones</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+      <p class="rutas-intro">Las etapas 3 a 10 de la Ruta de la Ingeniería no son misiones: son asignaciones metalingüísticas. El material de estudio es el propio sistema, M.E.T.A.S y F.A.R.O, y lo que se entrega es lenguaje: nombrar, explicar, traducir, defender y documentar.</p>
+      <div id="asignaciones-container"></div>
     </div>
   </div>
 
@@ -1385,6 +1402,9 @@
       <button class="drawer-item" data-view="view-rutas">
         <i class="fa-solid fa-map-signs"></i><span>Mis Rutas</span>
       </button>
+      <button class="drawer-item" data-view="view-asignaciones">
+        <i class="fa-solid fa-feather-pointed"></i><span>Asignaciones</span>
+      </button>
       <button class="drawer-item" data-view="view-progreso">
         <i class="fa-solid fa-chart-line"></i><span>Mi Progreso</span>
       </button>
@@ -1527,6 +1547,7 @@
   <script src="js/auth.js"></script>
   <script src="js/data/misiones.js"></script>
   <script src="js/data/frases.js"></script>
+  <script src="js/data/asignaciones.js"></script>
   <script src="js/tools/habitos.js"></script>
   <script src="js/tools/redes-sociales.js"></script>
   <script src="js/tools/collage-maker.js"></script>

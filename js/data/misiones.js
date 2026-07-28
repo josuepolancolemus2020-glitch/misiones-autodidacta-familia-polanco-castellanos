@@ -6,8 +6,11 @@
             etapa ocupa; sin entrada aquí, para la aplicación no existe. */
 
 const RUTAS = {
-  ingenieria: { nombre: 'Ruta de la Ingeniería del Sistema', emoji: '🏗️', color: 'ing',  etapas: 8,
-                lema: 'Estudiar M.E.T.A.S hasta poder defenderlo ante cualquier ingeniero' },
+  /* 10 etapas: las 2 primeras son misiones normales (Panorama y Frontend) y de
+     la 3 a la 10 van las asignaciones metalingüísticas de js/data/asignaciones.js,
+     que no se aprueban en pantalla sino defendiéndolas en voz alta. */
+  ingenieria: { nombre: 'Ruta de la Ingeniería del Sistema', emoji: '🏗️', color: 'ing',  etapas: 10,
+                lema: 'Estudiar M.E.T.A.S y F.A.R.O hasta poder defenderlos ante cualquier ingeniero' },
   pensamiento:{ nombre: 'Ruta del Pensamiento',              emoji: '🦉', color: 'bach', etapas: 4,
                 lema: 'Cómo se sabe lo que se sabe: epistemología y método' },
   cuerpo:     { nombre: 'Ruta del Cuerpo',                   emoji: '🧠', color: 'cnat', etapas: 4,
@@ -57,14 +60,11 @@ const MISSIONS = [
    camino completo y no solo lo hecho. Viene del temario oficial de la serie
    (PLAN-AUTOCAPACITACION.md en el repositorio de M.E.T.A.S). */
 const ETAPAS_PREVISTAS = {
-  ingenieria: {
-    3: 'Datos locales: el corazón offline-first',
-    4: 'La nube Supabase: tablas, funciones y roles',
-    5: 'Seguridad: el módulo más interpelable',
-    6: 'Distribución y ciclo de vida',
-    7: 'Decisiones de ingeniería: los porqués',
-    8: 'Glosario y simulacro final',
-  },
+  /* La Ingeniería ya no tiene etapas «por construir»: de la 3 a la 10 son
+     asignaciones. El temario técnico que estaba aquí no se perdió, quedó
+     repartido entre ellas: «Glosario» está en A1, «Datos locales» en A2,
+     «Decisiones de ingeniería» en A3, «La nube Supabase» en A1 y A7,
+     «Seguridad» en A5 y A8, y «Distribución y ciclo de vida» en A7. */
   persuasion: {
     4: 'Tácticas de presión y sus antídotos',
     5: 'Preguntar y escuchar: influir sin empujar',

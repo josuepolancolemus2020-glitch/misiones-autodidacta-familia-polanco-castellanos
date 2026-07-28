@@ -309,19 +309,30 @@ function renderMissions(query) {
    se ven en gris y no se pueden tocar. Así se sabe siempre cuánto falta.
 ───────────────────────────────────────────── */
 
+/* Las asignaciones metalingüísticas ocupan etapas de la Ruta de la Ingeniería
+   pero NO son misiones: no tienen quiz ni XP automático, así que no están en
+   MISSIONS (si estuvieran, las sondas que recorren el catálogo buscando un
+   quiz fallarían). Por eso el mapa de rutas las lee de aquí. */
+function asignacionesDeRuta(rutaKey) {
+  if (rutaKey !== 'ingenieria' || typeof ASIGNACIONES === 'undefined') return [];
+  return ASIGNACIONES;
+}
+
 function rutaEtapas(rutaKey) {
   const ruta  = RUTAS[rutaKey];
   const hechas = MISSIONS.filter(m => m.ruta === rutaKey).sort((a, b) => (a.etapa || 0) - (b.etapa || 0));
-  const total = Math.max(ruta.etapas || 0, ...hechas.map(m => m.etapa || 0), 0);
+  const asigs = asignacionesDeRuta(rutaKey);
+  const total = Math.max(ruta.etapas || 0, ...hechas.map(m => m.etapa || 0), ...asigs.map(a => a.n || 0), 0);
   const previstas = (typeof ETAPAS_PREVISTAS !== 'undefined' && ETAPAS_PREVISTAS[rutaKey]) || {};
   const etapas = [];
   for (let n = 1; n <= total; n++) {
     const mision = hechas.find(m => m.etapa === n);
-    etapas.push(mision
-      ? { n, mision, titulo: mision.title, existe: true }
-      : { n, titulo: previstas[n] || 'Etapa por construir', existe: false });
+    if (mision) { etapas.push({ n, mision, titulo: mision.title, existe: true }); continue; }
+    const asig = asigs.find(a => a.n === n);
+    if (asig) { etapas.push({ n, asig, titulo: asig.titulo, existe: true }); continue; }
+    etapas.push({ n, titulo: previstas[n] || 'Etapa por construir', existe: false });
   }
-  return { ruta, etapas, total, hechas: hechas.length };
+  return { ruta, etapas, total, hechas: hechas.length + asigs.length };
 }
 
 function renderRutas() {
@@ -332,7 +343,9 @@ function renderRutas() {
 
   cont.innerHTML = Object.keys(RUTAS).map(key => {
     const { ruta, etapas, total, hechas } = rutaEtapas(key);
-    const visitadas = etapas.filter(e => e.existe && ms.visited.includes(e.mision.id)).length;
+    const visitadas = etapas.filter(e => e.existe && (e.asig
+      ? estadoAsignacion(ms, e.asig.id).estado === 'defendida'
+      : ms.visited.includes(e.mision.id))).length;
     const pct = total ? Math.round((visitadas / total) * 100) : 0;
 
     return `
@@ -356,6 +369,15 @@ function renderRutas() {
                 <span class="re-txt">${e.titulo}</span>
                 <span class="re-estado">Por construir</span>
               </li>`;
+            if (e.asig) {
+              const est = estadoAsignacion(ms, e.asig.id);
+              return `
+              <li class="ruta-etapa ${est.estado === 'defendida' ? 'ruta-etapa-hecha' : ''}">
+                <span class="re-num" style="background:var(--${ruta.color});">${e.n}</span>
+                <a class="re-txt re-link" href="#" onclick="abrirAsignacion('${e.asig.id}'); return false;">${e.asig.icon} ${e.titulo}</a>
+                <span class="re-estado">${est.estado === 'defendida' ? '✔ Defendida' : est.estado === 'curso' ? '✎ En curso' : '+' + e.asig.xp + ' XP'}</span>
+              </li>`;
+            }
             const visitada = ms.visited.includes(e.mision.id);
             return `
               <li class="ruta-etapa ${visitada ? 'ruta-etapa-hecha' : ''}">
@@ -366,6 +388,125 @@ function renderRutas() {
           }).join('')}
         </ol>
       </div>`;
+  }).join('');
+}
+
+/* ─────────────────────────────────────────────
+   RENDER · ASIGNACIONES METALINGÜÍSTICAS
+   ─────────────────────────────────────────────
+   No se aprueban en pantalla: el XP lo otorga quien tomó la defensa, así que
+   aquí solo se registra el estado y quién la tomó. El producto (el documento)
+   vive en la Bóveda, no aquí.
+───────────────────────────────────────────── */
+
+function estadoAsignacion(ms, id) {
+  const todas = (ms && ms.asignaciones) || {};
+  return todas[id] || { estado: 'nueva', tomo: '', fecha: '' };
+}
+
+function guardarAsignacion(id, cambios) {
+  const s  = load();
+  const ms = memberState(s, s.currentMember);
+  ms.asignaciones = ms.asignaciones || {};
+  ms.asignaciones[id] = Object.assign(estadoAsignacion(ms, id), cambios);
+  s.members[s.currentMember] = ms;
+  save(s);
+  return ms;
+}
+
+function marcarAsignacion(id, estado) {
+  const previo = estadoAsignacion(memberState(load(), null), id);
+  /* El XP de una asignación se otorga UNA sola vez, al registrar la defensa.
+     Volver a marcarla defendida no vuelve a pagar. */
+  if (estado === 'defendida' && previo.estado !== 'defendida') {
+    const asig = ASIGNACIONES.find(a => a.id === id);
+    const sel  = document.getElementById('asig-tomo-' + id);
+    const tomo = sel ? sel.value : '';
+    if (!tomo) { alert('Antes de registrar la defensa hay que decir quién la tomó.'); return; }
+    const s  = load();
+    const ms = memberState(s, s.currentMember);
+    ms.xp += (asig ? asig.xp : 0);
+    ms.asignaciones = ms.asignaciones || {};
+    ms.asignaciones[id] = { estado: 'defendida', tomo, fecha: new Date().toISOString().slice(0, 10) };
+    s.members[s.currentMember] = ms;
+    save(s);
+  } else {
+    guardarAsignacion(id, { estado });
+  }
+  renderAsignaciones();
+  renderRutas();
+}
+
+function abrirAsignacion(id) {
+  switchView('view-asignaciones');
+  setTimeout(() => {
+    const el = document.getElementById('asig-' + id);
+    if (!el) return;
+    el.open = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 60);
+}
+
+function renderAsignaciones() {
+  const cont = document.getElementById('asignaciones-container');
+  if (!cont || typeof ASIGNACIONES === 'undefined') return;
+  const s  = load();
+  const ms = memberState(s, s.currentMember);
+  const defendidas = ASIGNACIONES.filter(a => estadoAsignacion(ms, a.id).estado === 'defendida').length;
+
+  const cabecera = `
+    <div class="asig-resumen">
+      <p class="asig-cuenta"><strong>${defendidas}</strong> de ${ASIGNACIONES.length} asignaciones defendidas</p>
+      <div class="ruta-barra-wrap"><div class="ruta-barra" style="width:${Math.round((defendidas / ASIGNACIONES.length) * 100)}%; background:var(--ing);"></div></div>
+      <p class="asig-nota">Una asignación no se aprueba en pantalla: se defiende en voz alta, de pie y sin leer, delante de otro miembro de la familia. El XP lo otorga quien la toma.</p>
+    </div>`;
+
+  cont.innerHTML = cabecera + ASIGNACIONES.map(a => {
+    const est = estadoAsignacion(ms, a.id);
+    const opciones = MEMBERS.map(m => `<option value="${m.id}"${est.tomo === m.id ? ' selected' : ''}>${m.emoji} ${m.short}</option>`).join('');
+    return `
+      <details class="asig-card asig-${est.estado}" id="asig-${a.id}">
+        <summary class="asig-head">
+          <span class="asig-num">${a.n}</span>
+          <span class="asig-icon" aria-hidden="true">${a.icon}</span>
+          <span class="asig-titulos"><strong>${a.titulo}</strong><em>${a.lema}</em></span>
+          <span class="asig-estado">${est.estado === 'defendida' ? '✔ Defendida' : est.estado === 'curso' ? '✎ En curso' : '+' + a.xp + ' XP'}</span>
+        </summary>
+        <div class="asig-cuerpo">
+          <h4>1 · El encargo</h4>
+          <p>${a.encargo}</p>
+          <p class="asig-producto"><strong>Producto:</strong> ${a.producto}</p>
+
+          <h4>2 · El material</h4>
+          <ul class="asig-material">${a.material.map(m => `<li><code>${m.ruta}</code> ${m.que}</li>`).join('')}</ul>
+
+          <h4>3 · El vocabulario obligatorio</h4>
+          <p class="asig-nota">Si el producto no usa estos términos, y bien usados, no está terminado.</p>
+          <div class="asig-vocab">${a.vocabulario.map(v => `<span class="asig-term">${v}</span>`).join('')}</div>
+
+          <h4>4 · La defensa</h4>
+          <p class="asig-nota">Cinco preguntas, respondidas sin leer.</p>
+          <ol class="asig-defensa">${a.defensa.map(q => `<li>${q}</li>`).join('')}</ol>
+
+          <h4>5 · El sello</h4>
+          <p>${a.sello}</p>
+
+          <div class="asig-cierre">
+            <p><strong>Está terminada cuando:</strong> ${a.terminada}</p>
+            <p><strong>El error típico:</strong> ${a.error}</p>
+          </div>
+
+          <div class="asig-acciones">
+            <button class="asig-btn" onclick="marcarAsignacion('${a.id}','nueva')">Sin empezar</button>
+            <button class="asig-btn" onclick="marcarAsignacion('${a.id}','curso')">✎ En curso</button>
+            <label class="asig-tomo">La tomó:
+              <select id="asig-tomo-${a.id}">${opciones}</select>
+            </label>
+            <button class="asig-btn asig-btn-ok" onclick="marcarAsignacion('${a.id}','defendida')">✔ Registrar defensa</button>
+          </div>
+          ${est.estado === 'defendida' ? `<p class="asig-acta">Defendida el ${est.fecha}, ante ${getMember(est.tomo).short}. +${a.xp} XP.</p>` : ''}
+        </div>
+      </details>`;
   }).join('');
 }
 
@@ -500,6 +641,7 @@ function switchView(id) {
   if (id === 'view-inicio')   renderHome();
   if (id === 'view-misiones') renderMissions(currentQuery);
   if (id === 'view-rutas')    renderRutas();
+  if (id === 'view-asignaciones') renderAsignaciones();
   if (id === 'view-progreso') renderProgress();
   if (id === 'view-perfil')   renderProfile();
   if (id === 'view-habitos' && typeof initHabitos === 'function') initHabitos();
