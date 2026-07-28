@@ -1,0 +1,21 @@
+# Cortes de fichas/ficha-poder-deuda.html (norma 6: diez páginas y llenas).
+# Cada línea es lo que tiene que QUEDAR ARRIBA de una página. La 1 empieza
+# sola, así que aquí van nueve.
+#
+# Dos avisos que costaron tiempo en las fichas anteriores:
+#   · <div class="caja">, "caja-amb" y <div class="pauta"> NO son únicos en
+#     esta ficha, así que los ejercicios y la pauta llevan clase propia
+#     (ej1..ej6, pa1..pa6) y las cinco reglas llevan "reglas". Sin eso, el
+#     anclaje cae en el primer bloque parecido y la ficha se parte donde no es.
+#   · un anclaje NUNCA puede caer dentro de un <table>: retrocede() solo
+#     retrocede sobre <div>, así que dejaría la tabla abierta en una hoja y
+#     cerrada en la otra.
+<h2>🔢 El juego de números de esta ficha</h2>
+<h3>Interés sobre el monto, o tasa plana</h3>
+<h3>Lo que enseña el cuadro de un vistazo</h3>
+<h2>✂️ Del monto aprobado al monto que llega</h2>
+<h2>📝 La hoja de las siete preguntas antes de firmar</h2>
+<h2>🗣️ El guion: qué decir en el mostrador</h2>
+<div class="caja caja-amb reglas">
+<div class="caja ej3">
+<div class="pauta pa2">
