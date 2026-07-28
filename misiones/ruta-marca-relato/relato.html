@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Marca · Etapa 3: El relato, contar el proyecto sin inflarlo | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/relato.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Adorna sin darse cuenta 🎈</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">📣</div>
+    <div class="hero-text">
+      <h1>El relato: <span>contar el proyecto sin inflarlo</span></h1>
+      <p class="sub">Lo que otro repite cuando tú no estás delante, y que tiene que aguantar que lo comprueben 📣</p>
+      <div class="badge">📈 Ruta de la Marca · Etapa 3 de 6 · Marketing y Marca</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📣 La frase maestra, y por qué inflar sale caro</h2>
+    <p>El relato no es lo que tú dices: es <strong>lo que otra persona repite cuando tú no estás delante</strong>. Por eso no puede llevar nada que no aguante una comprobación, porque quien lo repite no va a poder defenderlo, y porque el que lo escuche va a abrir el producto tarde o temprano.</p>
+    <p>Y esa es la parte que casi nadie calcula: <strong>inflar es pedir un préstamo contra la confianza</strong>. Nadie te desmiente en la reunión, la conversación va bien y sales con la sensación de haberlo hecho mejor. La cuenta llega meses después, cuando alguien abre lo que le prometiste, y entonces no discute contigo: simplemente no vuelve, y además lo cuenta.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Por qué esta etapa sigue a La oferta:</strong> la etapa 1 decidió <strong>para quién</strong> y la 2 decidió <strong>qué se entrega y a qué precio</strong>. Esta decide <strong>cómo se cuenta lo que ya existe</strong>, que no es lo mismo que venderlo. Una oferta impecable no sobrevive a un relato inflado: la persona llega con una idea equivocada, recibe exactamente lo prometido en el papel, y aun así se siente engañada.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Dos preguntas antes de decir una frase sobre el proyecto</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🧾 ¿Esto se puede comprobar?</h4>
+        <p>Si alguien te pidiera la prueba ahora mismo, <strong>¿qué le enseñarías?</strong> Un archivo, una fecha, una ficha impresa, la aplicación abierta. Lo que no se puede enseñar no es un hecho: es una opinión bien vestida, y quien escucha la descuenta sin decírtelo.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>📐 ¿De cuántos y en cuánto tiempo?</h4>
+        <p>Un número sin denominador ni fecha <strong>no significa nada</strong>. «Cuarenta» no dice nada; «cuarenta de una sección de cuarenta y dos, en marzo» sí. Es la forma más educada de exagerar, porque no llega a ser mentira y engaña igual.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>Una cifra <span class="hl">pequeña y exacta convence más</span> que una grande y borrosa, porque se puede comprobar en el momento. «Veintidós de sexto, en marzo» <span class="hl2">abre una conversación</span> que «cientos de usuarios» cierra.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas del relato</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué decide, dónde se infla y cómo está hoy en M.E.T.A.S.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza del relato.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: «¿cuántas escuelas usan esto?»</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué contestas cuando la respuesta verdadera suena a poco.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🙋</span><span class="ms-text"><strong>La pregunta:</strong> en una reunión, alguien que podría ayudar pregunta cuántas escuelas usan las misiones.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🏫</span><span class="ms-text"><strong>La verdad:</strong> una, en prueba, desde enero. Y suena a poco dicho en voz alta delante de gente.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🎈</span><span class="ms-text"><strong>La tentación:</strong> decir «varias». No es una cifra, nadie la puede desmentir, y además pronto será cierto.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🕳️</span><span class="ms-text"><strong>Lo que viene después:</strong> la siguiente pregunta siempre es «¿cuáles?», y a esa no se le puede contestar con un adjetivo.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué contestas?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🎈 «Varias, y creciendo»</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">📊 «Una, en prueba desde enero»</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚖️ El relato y la publicidad</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>📢 La publicidad</h4>
+        <p>La controlas tú, la pagas tú y todo el mundo sabe que la escribiste tú. Por eso <strong>se descuenta automáticamente</strong>: nadie espera que un anuncio hable de sus propios límites, y nadie decide nada importante basándose solo en él.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>📣 El relato</h4>
+        <p>Lo repite <strong>otra persona</strong>, con sus palabras y sin ti delante. Vale mucho más justamente por eso, y por eso mismo no puede llevar nada frágil: quien lo repite no va a poder defenderlo si alguien pregunta.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧭 Cómo se usa la diferencia</span><br>
+      <span>La prueba práctica: <span class="hl">¿esta frase la puede repetir la maestra en la sala de maestros</span> sin quedar en ridículo si alguien la comprueba? Si no, <span class="hl2">no es relato: es anuncio</span>, y hay que reescribirla.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎈 Las cuatro formas de inflar</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. La cifra sin denominador y 2. el futuro en presente</h4>
+        <p><strong>La cifra:</strong> «más de mil descargas», sin decir de cuántos ni cuándo. <strong>El futuro:</strong> decir «trabajamos con escuelas» cuando hay una y de prueba. Esta segunda es la más común y la más fácil de justificarse por dentro, porque uno de verdad cree que va a pasar. Y quien escucha decide cosas hoy con un dato que todavía no existe.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. El adjetivo que tapa y 4. el nosotros que agranda</h4>
+        <p><strong>El adjetivo:</strong> «innovador», «líder», «de altísima calidad». Cada uno ocupa el sitio de una cifra que no se quiso decir. <strong>El nosotros:</strong> «nuestro equipo de contenidos» cuando son cuatro personas de una casa. No protege nada y te obliga a sostener después un tamaño que no tienes.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas del relato</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Formas de inflar</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Largos del relato</div><div class="stat-val">3</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 En una línea</span><br>
+      <span>Las cuatro se corrigen igual: <span class="hl">se quita y se sustituye por lo que sí se puede enseñar</span>. Y casi siempre debajo de la frase grande <span class="hl2">hay una verdad pequeña que sirve</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📏 Los tres largos y los tres públicos</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>⏱️ Una frase, un minuto, una página</h4>
+        <p>El mismo relato tiene que caber en los tres largos. <strong>Si la frase y la página no dicen lo mismo, una de las dos está inflada</strong>, y casi siempre es la frase, porque es la que se dice con prisa y delante de alguien.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🎯 Tres públicos, una sola verdad</h4>
+        <p>La maestra, la madre y quien pone dinero necesitan <strong>énfasis distintos, no verdades distintas</strong>. Cambia qué se pone delante y cuánto se explica. No cambia ni un dato, porque los tres acaban hablando entre ellos.</p>
+      </div>
+    </div>
+    <p style="font-size:0.9rem;margin:0.8rem 0;">La regla que sale de aquí: <strong>si una versión del relato no se puede decir delante de las otras dos personas, está inflada</strong>. Es la misma prueba de la sala de maestros, aplicada a uno mismo.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">📣 Qué es</div><div class="t-info">Una frase sin adjetivos</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">📊 Qué ya pasó</div><div class="t-info">Cifra, denominador y fecha</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🧾 La prueba</div><div class="t-info">Lo que se pone sobre la mesa</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🚧 Lo que falta</div><div class="t-info">Dicho antes de que pregunten</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🙋 Qué se pide</div><div class="t-info">Una petición concreta</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">📅 La fecha</div><div class="t-info">Y la de su revisión</div></div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller del relato</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para saber qué se puede contar hoy de M.E.T.A.S y qué todavía no.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El hecho comprobable</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">📣 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="hecho" onclick="labShowParte('hecho')">🧾 El hecho comprobable</button>
+        <button class="lab-btn lab-cont-btn" data-parte="cifra" onclick="labShowParte('cifra')">📊 La cifra con denominador</button>
+        <button class="lab-btn lab-cont-btn" data-parte="falta" onclick="labShowParte('falta')">🚧 Lo que todavía no es</button>
+        <button class="lab-btn lab-cont-btn" data-parte="fecha" onclick="labShowParte('fecha')">📅 El relato caduca</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se escribe</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se infla</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 Cómo está en M.E.T.A.S</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se escribe el relato</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del relato se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 Desinfla la frase: ¿cómo se dice de verdad?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Cuál es la versión que se puede comprobar?</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Cientos de estudiantes usan nuestras misiones»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Relatos inflados: ¿qué falló ahí?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué falló de verdad:</p>
+    <div class="neuro-trans-display" id="enferDisease">«Más de mil descargas» y nadie pregunta de cuántos ni cuándo</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada frase lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🧾 Comprobable</button>
+        <button class="btn btn-sec" onclick="">🎈 Inflado</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">📣 El relato que se sostiene</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · El relato · Ruta de la Marca</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: el relato</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El relato que se sostiene · El relato</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">📣 El relato que se sostiene: qué se afirma y qué se puede comprobar</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una frase sobre el proyecto que suena bien y no aguanta que la comprueben. Di qué se está afirmando, qué parte es cierta hoy, cuál de las cuatro formas de inflar aparece y cómo lo dirías tú con cifra, denominador y fecha (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">📣</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📣 Casos del proyecto: ocho frases que este proyecto podría decir</h2>
+    <p>Ocho situaciones en las que M.E.T.A.S y F.A.R.O tienen que contarse. Tres ya pasaron de verdad en esta casa y están marcadas; las otras cinco van a llegar. En cada una: qué se afirma, qué se puede comprobar hoy y cómo se dice sin inflar.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo trabajar la sección:</strong> tapa el análisis, lee la frase y di en voz alta cuál de las <strong>cuatro formas de inflar</strong> aparece y cómo lo dirías tú. Casi siempre hay debajo <strong>una verdad pequeña que sirve</strong>, y esa es la que se cuenta. Al final quedan el relato de una página y las cinco reglas, que son el producto de esta etapa.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📄 Caso 1: el texto de presentación que quedó viejo · pasó de verdad</h2>
+    <p>El README del repositorio sigue diciendo que esto es «una colección de actividades interactivas para enseñar gramática» y enlaza el sitio público de misiones de español.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎯 Qué se está afirmando</span><br>
+      <span>Que el proyecto es lo que era <span class="hl">hace más de un año</span>. Hoy F.A.R.O es la aplicación privada de la familia, con diecisiete misiones, nueve rutas, la Bóveda, el chat y las finanzas. Nadie mintió: <span class="hl2">el texto se quedó quieto mientras lo demás se movía</span>.</span>
+    </div>
+    <p><strong>Cómo se dice sin inflar:</strong> se reescribe con lo que hay hoy, con su fecha, y se le pone fecha de revisión, igual que un dato lleva plazo de borrado. Un relato viejo no exagera a propósito y engaña igual, y encima nadie se queja, porque nadie sabe que debería quejarse.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🔒 Caso 2: el candado que decía «no se comparte» · pasó de verdad</h2>
+    <p>Las tarjetas de las misiones familiares pintan un candado 🔒 y el catálogo las marca como material de la casa, mientras el repositorio se leía entero desde internet.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚖️ Un símbolo también es un relato</span><br>
+      <span>El candado <span class="hl">contaba una historia que no era cierta</span>, y a quien más engañaba era a los de dentro: da la sensación de estar protegido, que es peor que saberse expuesto. <span class="hl2">Un relato no son solo las palabras</span>: es todo lo que hace creer algo.</span>
+    </div>
+    <p><strong>Cómo se resolvió:</strong> se arregló la realidad, no el símbolo. El repositorio se cerró y la aplicación quedó detrás de una puerta, y entonces el candado pasó a decir la verdad. Cuando un símbolo y un hecho no coinciden, se corrige el hecho si se puede, y si no, se quita el símbolo.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📏 Caso 3: la ficha que decía diez páginas · pasó de verdad</h2>
+    <p>Se afirmó que la ficha tenía diez páginas. Al llevarla a PDF tenía diecinueve, y nadie lo había comprobado antes de decirlo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🚨 Afirmar sin comprobar</span><br>
+      <span>No hubo intención de exagerar: hubo <span class="hl">una afirmación que nadie contrastó con la fuente</span>. Y basta una así para que todo lo demás pase a revisión, porque quien la descubre ya no sabe <span class="hl2">qué más se dijo sin mirar</span>.</span>
+    </div>
+    <p><strong>La regla que nació de ahí:</strong> el PDF es el único juez. Aplicada al relato: cada cifra que se dice se comprueba contra la cosa, no contra el recuerdo ni contra lo que se pensaba hacer. Comprobar cuesta un minuto; recuperar la credibilidad, meses.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🏫 Caso 4: «¿cuántas escuelas usan esto?»</h2>
+    <p>Hay una, en prueba, desde enero. La respuesta verdadera suena a poco dicha en voz alta delante de gente.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">✂️ El futuro contado en presente</span><br>
+      <span>«Varias» no es una cifra, no se puede desmentir y <span class="hl">pronto va a ser cierto</span>: por eso es la exageración más fácil de justificarse por dentro. Pero la siguiente pregunta siempre es <span class="hl2">«¿cuáles?»</span>, y a esa no se le contesta con un adjetivo.</span>
+    </div>
+    <p><strong>Cómo se dice sin inflar:</strong> «una, en prueba desde enero, y estamos buscando la segunda». La cifra pequeña es comprobable, y la última parte convierte la respuesta en una petición concreta: la pregunta deja de ser un examen y pasa a ser una conversación sobre quién podría ser esa segunda.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🤝 Caso 5: el patrocinador y la «alianza estratégica»</h2>
+    <p>Un patrocinador local ofrece 8.000 lempiras para imprimir fichas y pide que en la portada y en el sitio se le nombre «alianza estratégica».</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">💸 Qué mete y qué saca</span><br>
+      <span>Mete dinero que sirve: en un proyecto de casa, 8.000 lempiras <span class="hl">cubren impresión y hospedaje un buen rato</span>. Saca una palabra que describe una relación que no existe, y el día que alguien pregunte en qué consiste la alianza, <span class="hl2">el que queda mal no es el patrocinador</span>.</span>
+    </div>
+    <p><strong>La condición con la que sí:</strong> se acepta el dinero y se le llama por su nombre, «patrocinio de la edición de marzo», con el logotipo en el sitio acordado y la fecha. Si necesita la palabra alianza para que le sirva, lo que quiere no es patrocinar: es figurar, y eso se negocia aparte y con otro precio.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📡 Caso 6: el pico de la Antena contado como si fuera lo normal</h2>
+    <p>El resumen semanal de la Antena trae un día muy por encima del resto, y se plantea enseñar ese dato solo, sin el promedio.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🤔 Exagerar sin escribir una cifra falsa</span><br>
+      <span>El número es <span class="hl">verdadero</span> y la frase es una exageración: elegir el mejor punto y presentarlo como lo habitual infla el relato sin mentir en ningún dato. Y es lo más difícil de defender después, porque la otra persona ya no sabe <span class="hl2">qué más se eligió a dedo</span>.</span>
+    </div>
+    <p><strong>Cómo se dice sin inflar:</strong> se enseña el promedio, y si el pico interesa se dice que fue un pico y qué lo causó. Eso además es más útil que el número solo, porque explica algo que se puede repetir.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📰 Caso 7: el reportaje de la revista sin fuente</h2>
+    <p>La revista PolicastSapien va a publicar un reportaje investigativo con una cifra que llegó por un mensaje reenviado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔗 Quien afirma es quien enseña</span><br>
+      <span>Una cifra sin fuente no es información: es <span class="hl">un rumor con formato de revista</span>. Y el formato es justamente lo que la hace peligrosa, porque le presta credibilidad que no tiene. Si sale mal, <span class="hl2">no se cae el párrafo: se cae el reportaje entero</span>.</span>
+    </div>
+    <p><strong>Cómo se resuelve:</strong> se busca la fuente antes de imprimir, y si no aparece, se quita. Cuesta un párrafo y salva el reportaje. La regla de la casa para la revista es la misma que para el relato: sin fuente no se publica, y la enseña quien afirma, no la busca quien pregunta.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>👩‍🏫 Caso 8: «¿está probado en el aula?»</h2>
+    <p>Una maestra pregunta si el material está probado. Se usó en una sección de sexto y nunca lo ha revisado un maestro de fuera de la casa.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🚧 Lo que se dice antes de que lo descubran</span><br>
+      <span>Aquí la tentación es un adjetivo: «probado», «validado». Pero <span class="hl">ella lo va a comprobar sola</span> en la primera clase, y va a saber en diez minutos si alguien de su oficio lo revisó. <span class="hl2">Decirlo tú primero cuesta una frase; que lo descubra ella cuesta la relación</span>.</span>
+    </div>
+    <p><strong>Cómo se dice sin inflar:</strong> «se usó en una sección de sexto y funcionó; lo que falta es que lo revise un maestro de fuera, y me encantaría que fueras tú». Nombrar el límite no resta: convierte la debilidad en la petición, que es lo que se quería de esa conversación.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 El relato de una página, y las cinco reglas</h2>
+    <p>Todo lo que este proyecto puede decir de sí mismo cabe en una página con cinco piezas:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué es:</strong> una frase sin un solo adjetivo.</li>
+      <li><strong>Para quién:</strong> con el nombre de quien lo usa, no «todo el mundo».</li>
+      <li><strong>Qué ha pasado ya:</strong> cifras con denominador y fecha, y la prueba de cada una.</li>
+      <li><strong>Qué todavía no es:</strong> los tres límites que más incomoda decir.</li>
+      <li><strong>Qué se pide:</strong> una petición concreta, en una línea.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas del relato honesto</span><br>
+      <span>1. El relato es <span class="hl">lo que otro repite</span>, así que tiene que aguantar que lo comprueben. 2. Toda cifra lleva denominador y fecha. 3. Los adjetivos se tachan y se mira qué queda. 4. Lo que falta <span class="hl">lo dices tú primero</span>. 5. El relato lleva fecha, porque uno viejo <span class="hl2">miente sin que nadie lo toque</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas del relato</strong>, las cuatro formas de inflar, los tres largos y los tres públicos, los <strong>ocho casos del proyecto</strong>, el <strong>relato de una página</strong> y el <strong>desinflador</strong> para llenar a lápiz, seis ejercicios y la pauta completa.</p>
+      <a href="../../fichas/ficha-marca-relato.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba escribiendo el relato de una página de M.E.T.A.S y comprobando cada cifra antes de decirla en voz alta.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../misiones/ruta-marca-audiencia-promesa/audiencia-promesa.html">🎯 Para quién y qué le cambia</a>: la etapa 1 de esta ruta. De ahí sale la audiencia y la promesa que el relato tiene que sostener.</li>
+      <li><a href="../../misiones/ruta-marca-oferta/oferta.html">🏷️ La oferta</a>: la etapa 2. Una oferta impecable no sobrevive a un relato inflado.</li>
+      <li><a href="../../index.html">📰 Redacción</a>: la revista PolicastSapien es donde el relato se escribe de verdad. El caso 7 se decide ahí, antes de imprimir.</li>
+      <li><a href="../../index.html">📡 Antena</a>: el resumen semanal trae los números reales. Es el sitio donde se comprueba una cifra antes de decirla.</li>
+      <li><a href="../../index.html">🖼️ Collage de evidencias</a>: la prueba que se toca. Una foto del aula vale más que cualquier adjetivo.</li>
+      <li><a href="../../fichas/ficha-marca-relato.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: el relato de una página y el desinflador caben en una hoja cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> escribir el relato de una página de M.E.T.A.S, <strong>comprobar cada cifra contra la cosa</strong> y no contra el recuerdo, tachar todos los adjetivos y ver qué queda en pie. Después decirlo en voz alta en los tres largos: una frase, un minuto y una página. La prueba de que está aprendido es que <strong>los tres digan exactamente lo mismo</strong> y que ninguno se caiga si alguien pide la prueba.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">📣</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Marca · Etapa 3: El relato</div>
+    <div class="diploma-mascot" aria-hidden="true">📣</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">📣</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«El relato es lo que otro repite cuando tú no estás; inflarlo es pedir prestado contra la confianza» 🌱 · 📈 Ruta de la Marca · Etapa 3 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/relato.js"></script>
+</body>
+</html>

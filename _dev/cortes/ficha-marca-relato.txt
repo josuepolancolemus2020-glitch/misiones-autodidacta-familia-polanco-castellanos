@@ -1,0 +1,15 @@
+# Cortes de la ficha de Marca etapa 3 (nueve cortes = diez páginas).
+# Anclajes únicos: el medidor propone «<div class="caso">», «<div class="caja">»,
+# «<div class="pauta">» y «<table class="tres">» a secas, y eso se repite por toda
+# la ficha. Los <h3> de los ejercicios salen dos veces (el enunciado y su pauta),
+# pero los cortes se buscan EN ORDEN sobre lo que queda, así que la segunda vez
+# cae en la pauta, que es lo que se quiere.
+<h2>⚖️ El relato y la publicidad</h2>
+<strong>La regla que resume la página:</strong>
+<table class="tres publicos">
+<h3>3. La ficha que decía diez páginas (pasó de verdad)</h3>
+<h3>8. «¿Está probado en el aula?»</h3>
+<p class="mini"><b>Por qué una fecha fija:</b>
+<h3>Ejercicio 5 · El patrocinador</h3>
+<h3>Ejercicio 4 · Los tres que incomodan</h3>
+<h2>📏 El relato de M.E.T.A.S en sus tres largos</h2>

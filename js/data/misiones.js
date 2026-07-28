@@ -46,6 +46,7 @@ const MISSIONS = [
   { id: 15, title: 'Normas y trámites: qué papel hace falta y quién lo emite', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '📜', ruta: 'politico', etapa: 2, sello: 'familiar', url: 'misiones/ruta-politica-normas-tramites/normas-tramites.html' },
   { id: 16, title: 'Pedir bien: el encargo, el contexto y el ejemplo', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '📝', ruta: 'maquina', etapa: 2, sello: 'familiar', url: 'misiones/ruta-maquina-pedir-bien/pedir-bien.html' },
   { id: 17, title: 'El código que no confía: validación, límites e inyección', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🚦', ruta: 'casacerrada', etapa: 3, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-codigo/codigo.html' },
+  { id: 18, title: 'El relato: contar el proyecto sin inflarlo', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 45, icon: '📣', ruta: 'marca', etapa: 3, sello: 'familiar', url: 'misiones/ruta-marca-relato/relato.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -67,7 +68,6 @@ const ETAPAS_PREVISTAS = {
     6: 'Narrativa: contar el proyecto para que otros quieran entrar',
   },
   marca: {
-    3: 'El relato: contar el proyecto sin inflarlo',
     4: 'Canales: dónde está la audiencia y qué se publica',
     5: 'Prueba y reputación: números reales y quien lo dice por ti',
     6: 'Crecer sin romper la promesa',
