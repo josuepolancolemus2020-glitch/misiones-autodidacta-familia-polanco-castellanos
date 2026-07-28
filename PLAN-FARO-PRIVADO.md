@@ -19,20 +19,29 @@ pierde por el camino.
 | Los cuatro usuarios creados en Supabase Auth | ✅ hecho, con correos reales |
 | `familia_miembros` creada y sembrada con los cuatro | ✅ hecho (paso 1 del SQL) |
 | La pantalla de entrada nueva, publicada en `main` | ✅ hecho |
-| Que los cuatro entren de verdad, cada uno en su aparato | 🔄 probándose |
-| Cerrar los datos (paso 2 del SQL) | ⛔ **no**, hasta que los cuatro entren |
+| Que los cuatro entren de verdad, cada uno en su aparato | ✅ hecho, los cuatro |
+| **Cerrar los datos (paso 2 del SQL)** | ✅ **hecho y comprobado** |
+| La clave de servicio en la función de notificaciones | ⚠️ **urgente**: los avisos están rotos |
 | Apagar el alta pública de cuentas | ⛔ pendiente |
-| La clave de servicio en la función de notificaciones | ⛔ pendiente |
 | Compilar y repartir el APK | ⛔ pendiente |
 | Apagar Pages y poner el repositorio en privado | ⛔ pendiente |
 
-**Lo que esto significa hoy, sin adornos:** la puerta nueva ya está puesta y
-pide contraseña de verdad, pero **los datos siguen abiertos**. Cualquiera con la
-clave publicable, que va en el código como debe ser, todavía puede leer y
-escribir las tablas de la casa sin pasar por esa puerta. Eso lo cierra el paso 2
-y nada más. Hasta entonces, F.A.R.O parece cerrada y no lo está.
+**Lo que esto significa hoy:** los datos de la familia están cerrados. Se aplicó
+el paso 2 y se comprobó de las dos maneras que hay que comprobarlo: los cuatro
+siguen viendo todo lo suyo, y en una ventana de incógnito, sin iniciar sesión,
+no sale ni un dato. Antes bastaba con tener la dirección.
 
-Y el repositorio sigue público, así que las dieciséis misiones se leen.
+**Lo que sigue abierto, y no hay que confundirlo:**
+
+- **El repositorio es público**, así que las dieciséis misiones y todo el código
+  se leen desde github.com y desde Pages. Eso lo cierra la tanda 3, no la 2.
+- **Las notificaciones del chat están rotas desde este momento**, y en silencio.
+  La función send-chat-push lee push_subscriptions con la clave anon, y esa
+  clave ya no ve ninguna fila. No da error: devuelve cero. Hay que cambiarla a
+  la clave de servicio.
+- **Todos tienen que volver a suscribirse** a las notificaciones abriendo la
+  aplicación: el paso 2 borró las suscripciones viejas, que no tenían dueño y
+  por eso nadie podía verlas ni borrarlas.
 
 ---
 
