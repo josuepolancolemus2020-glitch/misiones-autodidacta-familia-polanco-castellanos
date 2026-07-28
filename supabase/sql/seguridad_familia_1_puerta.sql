@@ -86,8 +86,16 @@ comment on function public.es_familia() is
 -- usuario en Authentication → Users. Los correos se escriben AQUI, en el
 -- editor de Supabase, que es privado, y NO en el repositorio.
 --
--- Si un correo no coincide con ningun usuario, esa persona no queda sembrada y
--- no podra entrar: el aviso del final lo dice por su nombre.
+-- ANTES DE EDITAR, si no recuerdas con que correo creaste a cada quien, corre
+-- esto solo y copia los correos EXACTOS de la lista:
+--
+--     select email from auth.users order by email;
+--
+-- Si un correo no coincide con ningun usuario, este bloque FALLA a proposito y
+-- no deja nada a medias. La primera version solo avisaba, y el editor decia
+-- «Success» mientras la tabla se quedaba vacia: eso es fallar en silencio, que
+-- es justo lo que enseña a no hacer la Ruta de la Casa Cerrada. Ahora se cae
+-- con un error rojo que dice a quien le falta.
 
 do $$
 declare
@@ -101,8 +109,12 @@ declare
   i int;
   uid uuid;
   sin_usuario text[] := '{}';
+  cuantos int;
 begin
   for i in 1 .. array_length(pares, 1) loop
+    if pares[i][1] like 'CAMBIAME-%' then
+      raise exception 'FALTA EDITAR LOS CORREOS. La linea de % todavia dice CAMBIAME. Pon arriba los cuatro correos reales (los ves con: select email from auth.users) y vuelve a ejecutar.', pares[i][2];
+    end if;
     select id into uid from auth.users where lower(email) = lower(pares[i][1]);
     if uid is null then
       sin_usuario := sin_usuario || pares[i][2];
@@ -114,7 +126,13 @@ begin
   end loop;
 
   if array_length(sin_usuario, 1) is not null then
-    raise warning 'NO SE SEMBRARON (no hay usuario con ese correo): %. Revisa Authentication -> Users y vuelve a correr este bloque, o esas personas NO podran entrar.', sin_usuario;
+    raise exception 'NO HAY USUARIO CON ESE CORREO para: %. Revisa Authentication -> Users, copia los correos exactos y vuelve a ejecutar. No se sembro nada.', sin_usuario;
+  end if;
+
+  -- Cinturon y tirantes: que de verdad hayan quedado las cuatro filas.
+  select count(*) into cuantos from public.familia_miembros;
+  if cuantos <> 4 then
+    raise exception 'Quedaron % filas en familia_miembros y tienen que ser 4. No se sembro nada.', cuantos;
   else
     raise notice 'Los cuatro sembrados correctamente.';
   end if;
