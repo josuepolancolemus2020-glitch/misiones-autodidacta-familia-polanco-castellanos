@@ -56,6 +56,7 @@ const MISSIONS = [
   { id: 22, title: 'Verificar: nadie firma lo que no leyó', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🔎', ruta: 'maquina', etapa: 3, sello: 'familiar', url: 'misiones/ruta-maquina-verificar/verificar.html' },
   { id: 23, title: 'Llaves y secretos: claves, entornos y repositorios', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🗝️', ruta: 'casacerrada', etapa: 4, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-llaves/llaves.html' },
   { id: 24, title: 'La IA que programa: qué revisar antes de subir', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '⌨️', ruta: 'maquina', etapa: 4, sello: 'familiar', url: 'misiones/ruta-maquina-programa/programa.html' },
+  { id: 25, title: 'Tácticas de presión y sus antídotos', modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 45, icon: '⏱️', ruta: 'persuasion', etapa: 4, sello: 'familiar', url: 'misiones/ruta-persuasion-presion/presion.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -68,7 +69,6 @@ const ETAPAS_PREVISTAS = {
      «Decisiones de ingeniería» en A3, «La nube Supabase» en A1 y A7,
      «Seguridad» en A5 y A8, y «Distribución y ciclo de vida» en A7. */
   persuasion: {
-    4: 'Tácticas de presión y sus antídotos',
     5: 'Preguntar y escuchar: influir sin empujar',
     6: 'Narrativa: contar el proyecto para que otros quieran entrar',
   },

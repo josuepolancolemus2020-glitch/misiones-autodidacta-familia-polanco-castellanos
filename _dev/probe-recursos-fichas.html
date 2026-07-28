@@ -35,9 +35,12 @@ async function revisaModulo(id, nombre, fichaEsperada) {
   const r = await fetch(url);
   const txt = r.ok ? await r.text() : '';
   ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
-  ok(/Pauta de respuestas/.test(txt), 'la ficha trae su pauta de respuestas', 'la ficha no trae pauta');
+  ok(/Pauta completa de respuestas/.test(txt), 'la ficha trae su pauta de respuestas', 'la ficha no trae pauta');
   ok(/css\/ficha\.css/.test(txt), 'la ficha usa la hoja común de fichas', 'la ficha no enlaza la hoja común');
-  ok((txt.match(/class="pagina"/g) || []).length === 3, 'la ficha tiene 3 páginas para imprimir', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+  /* Las dos fichas de Autocapacitación nacieron con tres páginas y pasaron a
+     las diez de la norma 6 sin que esta sonda se enterara: llevaba meses en
+     rojo por una expectativa vieja, no por un fallo. */
+  ok((txt.match(/class="pagina"/g) || []).length === 10, 'la ficha tiene 10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
 }
 
 window.addEventListener('load', async () => {

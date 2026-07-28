@@ -1,0 +1,19 @@
+# Cortes de fichas/ficha-persuasion-presion.html (norma 6: diez páginas)
+# Cada línea es un trozo literal del HTML que debe QUEDAR AL INICIO de una
+# página. La página 1 empieza sola, así que hacen falta nueve.
+#
+# Las tablas llevan una segunda clase (prisa, senales, noes, pedir, precio,
+# antidoto, preguntas, aprieta, glosario, presiones, presiones-b) justamente
+# para poder anclar aquí: el anclaje se busca con indexOf a partir del corte
+# anterior, y un «<table class="tres">» a secas aparece nueve veces.
+# Y ningún anclaje puede caer DENTRO de un <table>: retrocede() solo sabe
+# retroceder sobre <div>. Anclar en la etiqueta de apertura sí vale.
+<h2>🎣 Las siete tácticas de presión</h2>
+<h2>⚖️ La urgencia real y la fabricada</h2>
+<h2>🙂 Lo que no es presión</h2>
+<h2>🤝 Cómo se pide sin presionar</h2>
+<table class="tres prisa">
+<table class="casos presiones-b">
+<div class="caja ej2">
+<div class="caja ej7">
+<div class="pauta pa5">

@@ -125,8 +125,13 @@ window.addEventListener('load', async () => {
     const psi = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Persuasión/.test(c.textContent));
     ok(!!psi, 'la Ruta de la Persuasión está en el mapa', 'no aparece la ruta');
     if (psi) {
-      ok(psi.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + psi.querySelectorAll('.re-link').length);
-      ok(psi.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + psi.querySelectorAll('.ruta-etapa-futura').length);
+      /* La cuenta exacta de etapas tocables la lleva _dev/probe-rutas.html, que
+         se actualiza cada vez que se añade una misión. Aquí solo se comprueba
+         que esta etapa llegó al mapa y que las seis siguen listadas: si esta
+         sonda contara el total, se pondría en rojo cada vez que crece la ruta
+         sin que nada de esta etapa se hubiera roto. */
+      ok(psi.querySelectorAll('.re-link').length >= 3, 'con sus etapas 1, 2 y 3 ya tocables', 'la etapa 3 no es tocable');
+      ok(psi.querySelectorAll('.re-link').length + psi.querySelectorAll('.ruta-etapa-futura').length === 6, 'las 6 etapas de la ruta están en el mapa', 'etapas en el mapa: ' + (psi.querySelectorAll('.re-link').length + psi.querySelectorAll('.ruta-etapa-futura').length));
       ok(/Marcos/.test(psi.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
       ok(/Tácticas de presión/i.test(psi.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -136,7 +141,7 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length >= 3, 'la materia muestra sus misiones', 'muestra ' + tarjetas.length);
       const mar = tarjetas.find(t => /marcos/i.test(t.textContent));
       ok(!!mar && /🔒/.test(mar.textContent), 'la misión de los marcos lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
