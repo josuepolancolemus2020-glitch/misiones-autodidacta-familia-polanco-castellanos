@@ -1,0 +1,15 @@
+# Cortes de la ficha de Ciberseguridad etapa 3 (nueve cortes = diez páginas).
+# Anclajes únicos: el medidor propone «<div class="caso">» y «<div class="pauta">»
+# a secas, y esos fragmentos se repiten por toda la ficha. Los <h3> de los
+# ejercicios y de la pauta también se repiten, pero los cortes se buscan EN
+# ORDEN sobre lo que queda, así que la segunda vez cae en la pauta, que es
+# justo lo que se quiere.
+<h2>⚖️ Comprobar en el aparato y comprobar en el servidor</h2>
+<strong>La regla que resume la página:</strong>
+<h2>🔔 Fallar cerrado y fallar en silencio</h2>
+<h3>2. El service worker que guardó la pantalla de acceso como app.js</h3>
+<h3>7. La prueba que no podía salir mal</h3>
+<h2>📆 La revisión de las entradas, una vez al año</h2>
+<h3>Ejercicio 3 · La condición parecida</h3>
+<h3>Ejercicio 2 · Validar o limitar</h3>
+<h3>Ejercicio 6 · Tu registro de verdad</h3>

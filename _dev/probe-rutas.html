@@ -52,11 +52,11 @@ f.onload = async () => {
     w.switchView('view-rutas'); await esperar(300);
     const cards = d.querySelectorAll('.ruta-card');
     ok(cards.length === 9, '9 rutas en el mapa', 'rutas: ' + cards.length);
-    /* Las seis rutas del adulto van por la etapa 2: si alguna se queda con una
-       sola etapa tocable es que la misión nueva no llegó al catálogo. */
+    /* Las rutas del adulto van por la etapa 2, y la Casa Cerrada por la 3: si
+       alguna se queda corta es que la misión nueva no llegó al catálogo. */
     [['Ruta de la Persuasión', 2], ['Ruta de la Marca', 2], ['Ruta del Poder', 2],
      ['Ruta de la Máquina que Predice', 2], ['Ruta del Poder Político', 2],
-     ['Ruta de la Casa Cerrada', 2]].forEach(([nombre, tocables]) => {
+     ['Ruta de la Casa Cerrada', 3]].forEach(([nombre, tocables]) => {
       const r = [...cards].find(c => (c.querySelector('.ruta-nombre') || {}).textContent === nombre);
       if (!r) { fallos++; log('  ✘ falta ' + nombre); return; }
       const n = r.querySelectorAll('.re-link').length;
