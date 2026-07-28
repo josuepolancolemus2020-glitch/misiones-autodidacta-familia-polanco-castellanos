@@ -1,0 +1,21 @@
+# Cortes de fichas/ficha-casa-cerrada-llaves.html (norma 6: diez páginas y llenas).
+# Cada línea es lo que tiene que QUEDAR ARRIBA de una página. La 1 empieza
+# sola, así que aquí van nueve.
+#
+# Lo aprendido repaginando las fichas anteriores:
+#   · <ol>, <div class="caja"> y <div class="pauta"> se repiten mucho, así que
+#     los bloques que sirven de anclaje llevan clase propia: "cuidados",
+#     "minuto", ej1..ej6 y pa1..pa6. Sin eso el corte cae en el primer bloque
+#     parecido y la ficha se parte donde no es.
+#   · un anclaje NUNCA puede caer dentro de un <table>: retrocede() solo
+#     retrocede sobre <div>, así que dejaría la tabla abierta en una hoja y
+#     cerrada en la otra.
+<h2>👑 Las dos llaves del mismo servicio</h2>
+<h2>🏠 Dónde vive un secreto</h2>
+<h2>🔄 El procedimiento de rotación, paso a paso</h2>
+<h2>🗝️ Las ocho llaves de esta casa</h2>
+<p class="mini"><b>Última revisión del inventario:</b> ______________ · <b>Quién la hizo:</b> ______________</p>
+<ol class="cuidados">
+<div class="caja minuto">
+<div class="caja ej3">
+<div class="pauta pa2">

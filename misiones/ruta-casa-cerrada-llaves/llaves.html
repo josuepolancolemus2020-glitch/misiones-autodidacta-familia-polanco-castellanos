@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Casa Cerrada · Etapa 4: Llaves y secretos | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/llaves.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Guarda las llaves donde caigan 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🗝️</div>
+    <div class="hero-text">
+      <h1>Llaves y secretos: <span>claves, entornos y repositorios</span></h1>
+      <p class="sub">Una llave no se juzga por si está a la vista, sino por lo que puede abrir 🗝️</p>
+      <div class="badge">🔐 Ruta de la Casa Cerrada · Etapa 4 de 6 · Ciberseguridad</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🗝️ La frase maestra, y las tres preguntas que la vuelven útil</h2>
+    <p>La etapa 1 puso la puerta, la 2 ordenó los datos de los demás y la 3 enseñó a desconfiar de lo que llega. Esta trata de <strong>las llaves</strong>, y empieza por deshacer la idea más común: un secreto <strong>no es lo que está escondido</strong>, es <strong>lo que da un poder que no debería tener quien lo encuentre</strong>. Hay claves a la vista que no son un descuido y archivos privados que sí lo son. Antes de escribir una clave en cualquier sitio, tres preguntas: <strong>¿esto es un secreto?</strong>, <strong>¿este sitio se sube?</strong> y <strong>¿qué pasa si se filtra?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La señal de alarma de esta etapa:</strong> la frase <strong>«lo pongo aquí un momento para probar»</strong>. Ese momento es exactamente cuando se filtran casi todas las claves del mundo, porque el archivo se guarda, se sube y nadie vuelve a mirarlo. No hay un ataque: hay una prisa.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Las dos llaves del mismo servicio</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🎫 La clave anónima</h4>
+        <p>Está <strong>a la vista en el código</strong> de F.A.R.O, en <code>js/auth.js</code> y en <code>js/chat.js</code>, y eso no es un descuido: <strong>está diseñada para verse</strong>. Sola no puede casi nada, porque quien decide qué ve cada quien son las políticas de seguridad por fila.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>👑 La clave de servicio</h4>
+        <p><strong>Salta todas las políticas.</strong> Con ella se lee y se escribe cualquier fila de cualquier familia. Vive solo en las variables del servicio, la usan las seis funciones de borde del proyecto, y el propio código lo deja escrito: <strong>no se pone jamás en el cliente</strong>.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>La misma dirección, dos llaves, <span class="hl">poderes opuestos</span>. Por eso «hay una clave en el código» no es una respuesta: la pregunta es siempre <span class="hl2">qué puede hacer esa clave concreta</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas de un secreto</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué es, dónde se pierde y cómo está resuelta en este proyecto.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza del secreto.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la clave que se subió sin querer</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces cuando descubres una clave dentro del repositorio.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">⌨️</span><span class="ms-text"><strong>La prisa:</strong> «lo pongo aquí un momento para probar si la función responde».</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">📤</span><span class="ms-text"><strong>El empujón:</strong> funcionó, se guarda y se sube todo junto, con la clave dentro.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🧹</span><span class="ms-text"><strong>El descubrimiento:</strong> tres días después aparece. Se borra la línea y se vuelve a subir.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">📜</span><span class="ms-text"><strong>Lo que nadie miró:</strong> el archivo ya no la tiene, pero el historial sí.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué haces al descubrirla?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🧽 Borro la línea y listo</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🔄 Roto la clave en el servicio</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏠 Dónde vive un secreto</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Un secreto no se guarda «en un lugar seguro»: se guarda en un sitio que <strong>no se sube y no se comparte</strong>. Los cuatro sitios posibles, del peor al bueno:</p>
+    <table class="tres">
+      <tr><th>Dónde</th><th>Qué pasa</th><th>¿Vale?</th></tr>
+      <tr><td>En el código</td><td>Se sube con el primer empujón y queda en el historial para siempre</td><td>Nunca</td></tr>
+      <tr><td>En un archivo aparte del proyecto</td><td>Sirve solo si está en el <code>.gitignore</code>, y una línea de más lo sube</td><td>Con cuidado</td></tr>
+      <tr><td>En el gestor de claves del teléfono o del navegador</td><td>Bien para contraseñas de personas, no para llaves de servicios</td><td>Según</td></tr>
+      <tr><td>En las variables del servicio</td><td>No pasa por el repositorio ni por el navegador. Es donde viven las de aquí</td><td>Sí</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 En este proyecto</span><br>
+      <span>El <code>.gitignore</code> de F.A.R.O tiene <span class="hl">una sola línea</span>. Eso no es un fallo hoy, porque no hay archivos de claves en el proyecto: es <span class="hl2">una decisión que hay que revisar el día que aparezca el primero</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📜 El repositorio recuerda, y esa es la parte que sorprende</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🧽 Borrar no borra</h4>
+        <p>Quitar la clave del archivo y volver a subir deja el archivo limpio y <strong>el historial intacto</strong>. Cualquiera que tenga el repositorio puede ver la versión anterior. Y hay copias: en cada aparato clonado, en el servicio, en los respaldos.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🔄 Rotar sí cierra</h4>
+        <p>Rotar es <strong>cambiar la clave en el servicio</strong>, de modo que la vieja deje de servir. Es lo único que cierra la puerta de verdad, y funciona aunque la clave ya esté copiada en cien sitios: deja de abrir.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 En una línea</span><br>
+      <span>Un secreto que se subió una vez <span class="hl">ya no es un secreto</span>, aunque lo borres. <span class="hl2">Se rota, no se borra</span>, y se rota el mismo día, no el fin de semana.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ Los cuatro pasos antes de escribir una clave</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. Nombrarla y 2. medir su alcance</h4>
+        <p><strong>Nombrarla:</strong> qué servicio abre y para qué se usa. Una llave sin nombre no se puede rotar porque nadie sabe qué se rompe. <strong>Su alcance:</strong> qué puede hacer quien la tenga, en la peor lectura posible, no en la que uno tenía en mente.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. Elegir dónde vive y 4. dar custodio</h4>
+        <p><strong>Dónde vive:</strong> variables del servicio si es de servicio; nunca el código. <strong>Custodio:</strong> quién la tiene y <strong>quién más puede recuperarla</strong>. Una llave con un solo custodio no es más segura: es un punto único de fallo con otro nombre.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas de un secreto</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Preguntas antes de escribir</div><div class="stat-val">3</div></div>
+      <div class="stat-item"><div class="stat-label">Reglas de la casa</div><div class="stat-val">5</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🚪 Privado no es cerrado, y otras confusiones caras</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">F.A.R.O vive en un repositorio privado, y por eso el material de la casa está ahí. Pero <strong>privado significa «no lo ve cualquiera», no «está cifrado»</strong>: lo ve quien tenga acceso, quien tenga un token robado y todo el mundo el día que alguien cambie la visibilidad por error. Un repositorio privado protege del paseante, no del descuido.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🎫 A la vista</div><div class="t-info">Y puede no ser problema</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">👑 De servicio</div><div class="t-info">Salta todas las reglas</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🏠 Entorno</div><div class="t-info">Donde debe vivir</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">📜 Historial</div><div class="t-info">No olvida nunca</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🔄 Rotar</div><div class="t-info">Lo único que cierra</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">👤 Custodio</div><div class="t-info">Y su suplente</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">La regla que sale de aquí: <strong>los secretos casi nunca se filtran por un ataque</strong>. Se filtran por una captura de pantalla, por un archivo de prueba, por un correo reenviado y por la prisa de un martes. La defensa tampoco es técnica: es una costumbre.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El llavero del proyecto</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para saber tratar cualquier llave que aparezca.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Qué es un secreto</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🗝️ Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="secreto" onclick="labShowParte('secreto')">🤫 Qué es un secreto</button>
+        <button class="lab-btn lab-cont-btn" data-parte="alcance" onclick="labShowParte('alcance')">👑 El alcance</button>
+        <button class="lab-btn lab-cont-btn" data-parte="entorno" onclick="labShowParte('entorno')">🏠 El entorno</button>
+        <button class="lab-btn lab-cont-btn" data-parte="rotacion" onclick="labShowParte('rotacion')">🔄 La rotación</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se hace</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se pierde</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En este proyecto</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: qué se hace cuando una clave se filtra</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del secreto se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Dónde va esta llave?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona dónde debe vivir:</p>
+    <div class="neuro-trans-display" id="neuroTrans">La clave de servicio de Supabase</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Filtraciones: ¿por dónde se escapó?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona por dónde se filtró:</p>
+    <div class="neuro-trans-display" id="enferDisease">Se borró la clave del archivo y aun así alguien la usó una semana después</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🤫 Secreto</button>
+        <button class="btn btn-sec" onclick="">👀 Se puede ver</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🗝️ El llavero sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Llaves y secretos · Ruta de la Casa Cerrada</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: llaves y secretos</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El llavero sobre la mesa · Llaves y secretos</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🗝️ El llavero sobre la mesa: qué abre y quién la tiene</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una llave o un secreto en juego. Di qué puede hacer quien la tenga, dónde debería vivir, si hay que rotar y quién la custodia (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🗝️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🗝️ Casos del proyecto: las llaves que ya existen en esta casa</h2>
+    <p>Los seis primeros <strong>están en el repositorio ahora mismo</strong> y se pueden abrir y mirar. Los dos últimos son situaciones que le pueden pasar al proyecto cualquier martes.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Antes de empezar:</strong> ningún caso de aquí trae una clave escrita, ni la traerá nunca. Se nombra <strong>qué llave es, qué abre y dónde vive</strong>, que es justo lo que hay que saber decir sin enseñar el secreto. Esa es también la regla del testamento técnico de la Ruta de la Ingeniería.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎫 Caso 1: la clave anónima que está a la vista</h2>
+    <p>En <code>js/auth.js</code> y en <code>js/chat.js</code> hay una clave de Supabase escrita en el código, que se descarga con la aplicación y se puede leer desde cualquier teléfono.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">✅ Por qué no es un fallo</span><br>
+      <span>Es la clave <span class="hl">anónima</span>, y está diseñada para verse: sin ella el navegador no puede ni pedir la hora. Sola no abre nada, porque quien decide qué ve cada quien son <span class="hl2">las políticas de seguridad por fila</span>, que es lo que se estudió en la etapa 1.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> «hay una clave en el código» no es un diagnóstico. La pregunta correcta es <strong>qué puede hacer esa clave concreta</strong>. Y hay un corolario incómodo: si las políticas estuvieran mal escritas, esta misma clave a la vista abriría la casa entera. La clave es pública <strong>porque</strong> las políticas están puestas.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>👑 Caso 2: la clave de servicio, que sí es un secreto</h2>
+    <p>Las seis funciones de borde del proyecto (las de la Antena y la de los avisos del chat) corren con la clave de servicio.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🚨 Qué puede hacer quien la tenga</span><br>
+      <span><span class="hl">Salta todas las políticas.</span> Lee y escribe cualquier fila de cualquier familia, sin permiso de nadie. El propio código lo deja escrito en el aviso de <code>send-chat-push</code>: <span class="hl2">esa clave no se pone jamás en el cliente</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el mismo servicio da dos llaves con poderes opuestos, y por eso <strong>el nombre de la llave importa más que el servicio</strong>. Vive en las variables del servicio, no en el repositorio, y si alguna vez apareciera en un archivo del proyecto, la respuesta no es borrarla: es rotarla ese mismo día.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📣 Caso 3: los tokens de la Antena</h2>
+    <p>La Antena publica en redes sociales, así que hay funciones de autorización y un token guardado por cada red conectada.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🗣️ Una llave que no abre datos: abre voz</span><br>
+      <span>Quien tenga ese token no lee nada de la familia: <span class="hl">publica en nombre del proyecto</span>. El daño no es una filtración, es una <span class="hl2">suplantación</span>, y se descubre cuando ya lo vio todo el mundo.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> no todas las llaves abren información. Algunas abren <strong>identidad</strong>, y esas se cuentan aparte, porque el daño no se mide en datos perdidos sino en confianza. Se revisan cada cierto tiempo y se revocan las de redes que ya no se usan.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🚪 Caso 4: privado no es cerrado</h2>
+    <p>F.A.R.O vive en un repositorio privado, y por eso el material de la casa está ahí. El plan del proyecto pide comprobarlo antes de subir nada familiar.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🔓 Qué significa «privado» de verdad</span><br>
+      <span>Significa <span class="hl">no lo ve cualquiera</span>, no significa cifrado. Lo ve quien tenga acceso, quien tenga un token robado, y todo el mundo el día que alguien cambie la visibilidad <span class="hl2">con dos clics y sin querer</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> un repositorio privado protege del paseante, no del descuido. Por eso la regla se sostiene igual: <strong>dentro de un repositorio, aunque sea privado, no van secretos</strong>. Lo privado sirve para el contenido de la casa, no para las llaves de la casa.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📜 Caso 5: el historial que no olvida</h2>
+    <p>El <code>.gitignore</code> de este proyecto tiene una sola línea. Hoy no hay archivos de claves, así que no hace falta más.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🕰️ Lo que pasa el día que aparezca el primero</span><br>
+      <span>Si un archivo con una clave se sube una vez, borrarlo después <span class="hl">deja el archivo limpio y el historial intacto</span>. Cualquiera con una copia lo ve. Y hay copias en cada aparato clonado y en cada respaldo: <span class="hl2">la clave está quemada</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el <code>.gitignore</code> se escribe <strong>antes</strong> del primer archivo de claves, no después. Y cuando algo se subió, la única acción que sirve es <strong>rotar</strong>. Reescribir el historial ayuda, pero no alcanza a las copias que ya salieron.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📱 Caso 6: la llave de firma del APK</h2>
+    <p>La aplicación se entrega también como APK a los cuatro teléfonos de la familia, y un APK va firmado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚠️ La llave que no se puede rotar</span><br>
+      <span>Si se pierde, <span class="hl">no hay forma de publicar una actualización</span> de esa misma aplicación: hay que empezar otra y reinstalar en todos los aparatos. Si se filtra, cualquiera firma una aplicación que <span class="hl2">el teléfono acepta como si fuera la tuya</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> casi todas las llaves se arreglan rotando; <strong>unas pocas, no</strong>. Esas cambian de categoría entera: se guardan con copia en otro sitio físico, se anotan en el testamento técnico y se prueba una vez al año que la copia sirve.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📸 Caso 7: la captura de pantalla del martes</h2>
+    <p>Algo no funciona, se abre el panel del servicio y se manda una captura por WhatsApp para pedir ayuda. En la esquina de la imagen se ve un token entero.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">💬 Por donde se escapan de verdad</span><br>
+      <span>No hubo ataque ni fallo de programación: hubo <span class="hl">una imagen en una conversación</span> que se reenvía, se respalda en la nube del teléfono y se queda ahí para siempre. Y el que la mandó <span class="hl2">ni siquiera sabe que mandó una llave</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> los secretos casi nunca se filtran por donde se vigila. La costumbre que lo evita es corta: <strong>antes de mandar una captura, mirar la captura</strong>, y si hay duda, recortar. Y si ya salió, rotar sin discutir si alguien la vio.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>👤 Caso 8: la llave que solo sabe una persona</h2>
+    <p>La cuenta del dominio, la del servicio y la de la tienda están a nombre de una sola persona, y solo esa persona sabe dónde están las claves.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🕳️ Seguridad que en realidad es fragilidad</span><br>
+      <span>Se siente seguro porque nadie más puede filtrarlas. Lo que de verdad significa es que <span class="hl">el proyecto entero cabe en una cabeza</span>: si esa persona falta, el dominio no se renueva y el sitio <span class="hl2">se apaga solo, sin que nadie pueda evitarlo</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> cada llave necesita <strong>custodio y suplente</strong>. No es lo mismo compartir la clave que compartir <strong>cómo se recupera</strong>: basta con que el suplente sepa dónde está guardada y pueda llegar a ella. Esto es exactamente lo que pide el testamento técnico de la asignación 9.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 El inventario de llaves, y las cinco reglas</h2>
+    <p>Toda llave de este proyecto se apunta con las mismas seis columnas, y ninguna columna es la clave:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Nombre:</strong> qué llave es, en palabras de la casa.</li>
+      <li><strong>Qué abre:</strong> el servicio, y qué puede hacer quien la tenga.</li>
+      <li><strong>Dónde vive:</strong> variables del servicio, gestor de claves, papel en un sobre.</li>
+      <li><strong>Custodio y suplente:</strong> quién la tiene y quién más puede llegar a ella.</li>
+      <li><strong>¿Se puede rotar?</strong> Casi siempre sí; la firma del APK, no.</li>
+      <li><strong>Última revisión:</strong> la fecha en que alguien comprobó que todo esto sigue siendo cierto.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas de las llaves</span><br>
+      <span>1. Una llave se juzga por <span class="hl">lo que puede abrir</span>, no por si está a la vista. 2. La clave de servicio no viaja nunca al navegador ni al repositorio: <span class="hl">vive en el entorno</span>. 3. El historial recuerda: lo que se subió una vez <span class="hl">se rota, no se borra</span>. 4. Cada llave tiene custodio <span class="hl">y suplente</span>. 5. Antes de escribir una clave en cualquier sitio: <span class="hl2">¿esto se sube?</span></span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas de un secreto</strong>, la tabla de las dos llaves, el inventario de llaves para llenar a mano, el procedimiento de rotación paso a paso, las ocho llaves de esta casa, seis ejercicios y la pauta completa.</p>
+      <a href="../../fichas/ficha-casa-cerrada-llaves.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con el inventario de llaves del proyecto lleno, con custodio y suplente en cada fila.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../misiones/ruta-casa-cerrada-la-puerta/la-puerta.html">🔐 La puerta de la casa digital</a>: la etapa 1. Ahí están las políticas de seguridad por fila, que son las que hacen que la clave anónima pueda estar a la vista.</li>
+      <li><a href="../../misiones/ruta-casa-cerrada-codigo/codigo.html">🚦 El código que no confía</a>: la etapa 3. El caso de la función que devolvía cero filas se ve aquí desde el otro lado: era la llave equivocada para ese trabajo.</li>
+      <li><a href="../../index.html?view=asignaciones">🗝️ El testamento técnico</a>: la asignación 9 de la Ruta de la Ingeniería pide exactamente este inventario, y con la misma regla: dentro va quién custodia, nunca la clave.</li>
+      <li><a href="../../index.html">🗄️ La Bóveda</a>: donde se guarda el inventario terminado. No se manda por chat ni se sube al repositorio.</li>
+      <li><a href="../../fichas/ficha-casa-cerrada-llaves.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: el inventario en blanco cabe en una página y el procedimiento de rotación en otra.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> abrir el proyecto y <strong>hacer la lista de todas las llaves que existen</strong>, sin escribir ninguna: nombre, qué abre, dónde vive, quién la custodia, quién es el suplente y si se puede rotar. La prueba de que está aprendido es poder decir, sin mirar, <strong>cuál de las llaves de esta casa no se puede rotar y qué se hace en su lugar</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🗝️</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Casa Cerrada · Etapa 4: Llaves y secretos</div>
+    <div class="diploma-mascot" aria-hidden="true">🗝️</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🗝️</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Una llave no se juzga por si está a la vista, sino por lo que puede abrir» 🌱 · 🔐 Ruta de la Casa Cerrada · Etapa 4 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/llaves.js"></script>
+</body>
+</html>

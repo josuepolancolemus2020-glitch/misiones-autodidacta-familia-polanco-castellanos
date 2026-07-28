@@ -54,6 +54,7 @@ const MISSIONS = [
   { id: 20, title: 'Marcos: quien pone el marco gana la conversación', modulo: 'aprendizaje-unido', materia: 'psi', color: 'apr', xp: 45, icon: '🖼️', ruta: 'persuasion', etapa: 3, sello: 'familiar', url: 'misiones/ruta-persuasion-marcos/marcos.html' },
   { id: 21, title: 'La deuda por dentro: interés, plazo y costo total', modulo: 'aprendizaje-unido', materia: 'eco', color: 'apr', xp: 45, icon: '💳', ruta: 'poder', etapa: 3, sello: 'familiar', url: 'misiones/ruta-poder-deuda/deuda.html' },
   { id: 22, title: 'Verificar: nadie firma lo que no leyó', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🔎', ruta: 'maquina', etapa: 3, sello: 'familiar', url: 'misiones/ruta-maquina-verificar/verificar.html' },
+  { id: 23, title: 'Llaves y secretos: claves, entornos y repositorios', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🗝️', ruta: 'casacerrada', etapa: 4, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-llaves/llaves.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -86,7 +87,6 @@ const ETAPAS_PREVISTAS = {
     6: 'Qué se automatiza en M.E.T.A.S y qué no se le delega jamás',
   },
   casacerrada: {
-    4: 'Llaves y secretos: claves, entornos y repositorios',
     5: 'Copias y desastre: perder el teléfono, borrar sin querer',
     6: 'El engaño: phishing e ingeniería social en la familia',
   },

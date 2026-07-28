@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Casa Cerrada, etapa 4</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-casa-cerrada-llaves/llaves.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 4 de la Ruta de la Casa Cerrada: bancos, laboratorio,
+   pruebas impresas con su nombre, las ocho llaves, la ficha y la ruta con
+   CUATRO etapas. Y una comprobación que solo tiene sentido en esta misión:
+   que no haya ninguna clave escrita, ni en la misión ni en la ficha.
+
+   Escrita mirando primero que fallara, que es lo que enseña la etapa 3. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try {
+    appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+    appFrame.contentWindow.localStorage.removeItem('faro_v1');
+  } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Casa Cerrada · Etapa 4 de 6/.test(d.body.textContent), 'se presenta como etapa 4 de 6', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se busca el VOCABULARIO de la etapa 3, no sus palabras
+       compartidas. Esta etapa remite a la anterior a propósito. */
+    ok(!/inyección|validar la entrada|límite de tamaño|fallar en silencio|barrido de huérfanos/i.test(d.body.textContent),
+       'sin restos de la etapa de la que se copió', 'queda el temario de El código que no confía');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('Object.keys(parteData).join(",")') === 'secreto,alcance,entorno,rotacion', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas de un secreto', 'piezas: ' + dentro('timelineData.length'));
+    ok(/faro_cib_llaves/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── NINGUNA CLAVE ESCRITA ──');
+    /* La regla que la misión enseña se aplica a la misión: se nombra qué llave
+       es y qué abre, nunca el secreto. Si algún día alguien pega una clave de
+       ejemplo «para que se entienda», esto se pone en rojo. */
+    const fuente = d.documentElement.innerHTML;
+    ok(!/eyJ[A-Za-z0-9_-]{20,}/.test(fuente), 'no hay ningún token con forma de clave', 'hay algo con forma de token JWT');
+    ok(!/\b(sk|sbp|ghp|gho|glpat)_[A-Za-z0-9]{10,}/.test(fuente), 'no hay claves con prefijo conocido', 'hay algo con forma de clave de servicio');
+
+    log('\n── LA POSTURA ANTE LAS LLAVES ──');
+    const texto = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/lo que puede abrir|qué puede hacer esa clave/i.test(texto), 'juzga la llave por su alcance', 'no explica que la llave se juzga por lo que abre');
+    ok(/clave anónima/i.test(texto) && /clave de servicio/i.test(texto), 'distingue las dos llaves del mismo servicio', 'no distingue anónima de servicio');
+    ok(/políticas de seguridad por fila|políticas por fila/i.test(texto), 'conecta con las políticas de la etapa 1', 'no conecta con la etapa 1');
+    ok(/se rota, no se borra|rotar/i.test(texto), 'enseña a rotar en vez de borrar', 'no aparece la rotación');
+    ok(/historial/i.test(texto), 'avisa de que el historial recuerda', 'no habla del historial');
+    ok(/privado.{0,30}no.{0,20}cifrado|privado no es/i.test(texto), 'aclara que privado no es cifrado', 'no aclara qué significa privado');
+    ok(/suplente/i.test(texto), 'cada llave lleva custodio y suplente', 'no aparece el suplente');
+    ok(/lo pongo aquí un momento/i.test(texto), 'trae la señal de alarma', 'falta la señal de alarma');
+    ok(/no se puede rotar/i.test(texto), 'distingue la llave que no se puede rotar', 'no menciona la llave sin rotación');
+
+    log('\n── LOS HECHOS DEL REPOSITORIO ESTÁN BIEN CONTADOS ──');
+    ok(/js\/auth\.js/.test(texto) && /js\/chat\.js/.test(texto), 'dice dónde está la clave anónima', 'no dice dónde está la clave anónima');
+    ok(/seis funciones/i.test(texto), 'cuenta bien las funciones de borde', 'no dice cuántas funciones de borde hay');
+    ok(/una sola línea/i.test(texto), 'menciona el .gitignore de una línea', 'no habla del .gitignore actual');
+    ok(/cuatro teléfonos/i.test(texto), 'sitúa el APK en los cuatro teléfonos', 'no dice a cuántos aparatos va el APK');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/Qué es un secreto/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el secreto', 'abre en otra pieza');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'el llavero sobre la mesa se genera', 'prueba competencial vacía');
+    const rotulos = d.getElementById('eval-screen-title').textContent + d.getElementById('evalcrit-screen-title').textContent +
+                    d.getElementById('evalOut').textContent + crit + d.querySelectorAll('.eval-print-header')[0].textContent;
+    ok(!/Las seis palancas|Panorama|La puerta de la casa digital|Los datos de los demás|El código que no confía|El fallo que no se oyó|Verificar|El presupuesto real|La deuda por dentro|Pedir bien|la interpelación|Autocapacitación Técnica|Etapa 3 · Ciberseguridad/.test(rotulos),
+       'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+    ok(!/cambio de funcionario|dando por cierto sin comprobar/.test(crit), 'las preguntas III y IV son las de esta etapa', 'quedan preguntas de otra misión');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 llaves más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['clave anónima', 'clave de servicio', 'Antena', 'privado no es cerrado', 'historial', 'firma del APK', 'captura de pantalla', 'solo sabe una persona']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok((txt.match(/Lo que enseña/g) || []).length === 8, 'las ocho llaves cierran con lo que enseñan', 'llaves con lección: ' + (txt.match(/Lo que enseña/g) || []).length);
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      /* No puede repetir los casos de las etapas 1, 2 y 3 de esta misma ruta */
+      ok(!/using \(true\)|cero filas|barrido de huérfanos|tres comprobaciones/i.test(txt), 'no repite casos de las etapas anteriores', 'repite un caso de otra etapa de la ruta');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+      ok(/cinco reglas de las llaves/i.test(txt), 'trae las cinco reglas', 'faltan las cinco reglas');
+      ok(/inventario de llaves/i.test(txt), 'trae el inventario', 'falta el inventario de llaves');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/a la vista|todas las familias|Antena|repositorio privado|firma del APK|captura/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-casa-cerrada-llaves.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/El inventario de llaves, para llenar/i.test(txt), 'la ficha trae el inventario en blanco', 'falta el inventario en blanco');
+    ok(/Un inventario de verdad, ya lleno/i.test(txt), 'y el inventario ya lleno, como ejemplo', 'falta el inventario de ejemplo');
+    ok(/El procedimiento de rotación, paso a paso/i.test(txt), 'la ficha trae el procedimiento de rotación', 'falta el procedimiento');
+    ok(/minuto a minuto/i.test(txt), 'la ficha trae la filtración contada minuto a minuto', 'falta el caso trabajado');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(!/—/.test(txt), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok(!/eyJ[A-Za-z0-9_-]{20,}/.test(txt), 'la ficha tampoco lleva ninguna clave', 'la ficha trae algo con forma de token');
+    ok((txt.match(/<table/g) || []).length === (txt.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-casa-cerrada-llaves"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const cib = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Casa Cerrada/.test(c.textContent));
+    ok(!!cib, 'la Ruta de la Casa Cerrada está en el mapa', 'no aparece la ruta');
+    if (cib) {
+      ok(cib.querySelectorAll('.re-link').length === 4, 'con sus etapas 1 a 4 ya tocables', 'etapas tocables: ' + cib.querySelectorAll('.re-link').length);
+      ok(cib.querySelectorAll('.ruta-etapa-futura').length === 2, 'y 2 etapas por construir con nombre', 'futuras: ' + cib.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/Llaves y secretos/.test(cib.textContent), 'la etapa 4 sale con el título de la misión', 'la etapa 4 sigue saliendo como prevista');
+      ok(/Copias y desastre/i.test(cib.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="cib"]');
+    ok(!!chip, 'la materia Ciberseguridad tiene su chip', 'no hay chip de Ciberseguridad');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length === 4, 'la materia muestra sus cuatro misiones', 'muestra ' + tarjetas.length);
+      const lla = tarjetas.find(t => /llaves/i.test(t.textContent));
+      ok(!!lla && /🔒/.test(lla.textContent), 'la misión de las llaves lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>
