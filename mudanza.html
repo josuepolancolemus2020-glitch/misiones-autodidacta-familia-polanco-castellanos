@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mudanza · F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --pri:#3b3a86; --pri-lt:#5b5ac9; --ok:#0f766e; --mal:#b91c1c; --gris:#64748b; }
+  * { box-sizing: border-box; }
+  body { font-family:'Outfit',system-ui,sans-serif; margin:0; padding:16px; background:#f5f6fb; color:#1b2838; }
+  .caja { max-width:640px; margin:0 auto; }
+  h1 { font-size:1.35rem; margin:0 0 .2rem; }
+  .sub { color:var(--gris); font-size:.92rem; margin:0 0 1.2rem; }
+  .paso { background:#fff; border:1.5px solid #e2e5f0; border-radius:14px; padding:1rem 1.1rem; margin-bottom:1rem; }
+  .paso h2 { font-size:1.05rem; margin:0 0 .5rem; display:flex; align-items:center; gap:.5rem; }
+  .n { background:var(--pri); color:#fff; width:26px; height:26px; border-radius:50%;
+       display:inline-flex; align-items:center; justify-content:center; font-size:.9rem; flex-shrink:0; }
+  p { font-size:.9rem; line-height:1.55; margin:.4rem 0; }
+  button { font-family:inherit; font-size:1rem; font-weight:700; border:0; border-radius:10px;
+           padding:.75rem 1.1rem; cursor:pointer; background:var(--pri); color:#fff; width:100%; margin-top:.6rem; }
+  button.sec { background:#fff; color:var(--pri); border:2px solid var(--pri); }
+  button:disabled { opacity:.5; }
+  textarea { width:100%; min-height:110px; font-family:ui-monospace,monospace; font-size:.72rem;
+             border:1.5px solid #cfd4e4; border-radius:10px; padding:.6rem; margin-top:.6rem; }
+  .msg { margin-top:.6rem; padding:.6rem .8rem; border-radius:9px; font-size:.88rem; display:none; }
+  .msg.ok { background:#e7f6f3; color:var(--ok); display:block; }
+  .msg.mal { background:#fdeaea; color:var(--mal); display:block; }
+  .lista { font-size:.82rem; color:var(--gris); margin-top:.5rem; max-height:150px; overflow:auto; }
+  .aviso { background:#fff8e6; border:1.5px solid #f0dca8; border-radius:12px; padding:.85rem 1rem;
+           font-size:.88rem; line-height:1.5; margin-bottom:1rem; }
+  code { background:#eef0f7; padding:1px 5px; border-radius:4px; font-size:.85em; }
+</style>
+</head>
+<body>
+<div class="caja">
+
+  <h1>🚚 Mudanza de F.A.R.O.</h1>
+  <p class="sub">Llevarse el progreso de las misiones cuando la aplicación cambia de dirección.</p>
+
+  <div class="aviso">
+    <strong>Por qué hace falta esto.</strong> El chat, las finanzas, el inventario, los destellos y los
+    documentos viven en la nube y se mudan solos. Pero el <strong>progreso de las misiones</strong> (el XP,
+    los logros y las secciones terminadas) lo guarda el navegador, y el navegador trata cada dirección
+    como un sitio distinto. Sin esta mudanza, al estrenar dirección todo eso aparecería en cero.
+    <br><br>
+    Cada quien tiene que hacerlo <strong>en su propio aparato</strong>: el progreso de Jael está en el
+    teléfono de Jael y en ningún otro lado.
+  </div>
+
+  <div class="paso">
+    <h2><span class="n">1</span> En la dirección VIEJA: guardar</h2>
+    <p>Toca el botón y se descarga un archivo con todo tu progreso. Si el aparato no deja descargar,
+      usa <em>Copiar</em> y pégalo en una nota o mándatelo por el chat familiar.</p>
+    <button id="btn-exportar">📦 Guardar mi progreso</button>
+    <button class="sec" id="btn-copiar" disabled>📋 Copiar al portapapeles</button>
+    <div class="msg" id="msg-exp"></div>
+    <div class="lista" id="lista-exp"></div>
+  </div>
+
+  <div class="paso">
+    <h2><span class="n">2</span> En la dirección NUEVA: restaurar</h2>
+    <p>Abre esta misma página en la dirección nueva, elige el archivo que guardaste (o pega el texto)
+      y toca restaurar.</p>
+    <input type="file" id="archivo" accept="application/json,.json" style="font-size:.9rem;margin-top:.5rem;">
+    <textarea id="pegado" placeholder="…o pega aquí el texto que copiaste"></textarea>
+    <button id="btn-importar">📥 Restaurar mi progreso</button>
+    <div class="msg" id="msg-imp"></div>
+    <div class="lista" id="lista-imp"></div>
+  </div>
+
+  <div class="paso">
+    <h2><span class="n">3</span> Comprobar</h2>
+    <p>Abre F.A.R.O y mira tu XP y tus misiones terminadas. Si están, la mudanza salió bien y ya
+      puedes borrar el archivo.</p>
+    <button class="sec" onclick="location.href='index.html'">🏠 Ir a F.A.R.O.</button>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+/* Se lleva TODO lo que el navegador guarda para este sitio, en vez de una lista
+   escrita a mano de las dieciséis claves de misión. Una lista a mano se queda
+   corta el día que se añade la misión diecisiete, y nadie se entera hasta que
+   alguien pierde su progreso. Lo que se copia es lo que hay.
+
+   Con dos excepciones, y por buenas razones: las claves de la sesión. Esas son
+   credenciales de una dirección concreta y llevárselas a otra no sirve de nada;
+   en la dirección nueva se entra otra vez con el correo y la contraseña, que es
+   lo correcto. */
+const NO_MUDAR = ['faro_auth', 'faro_session', 'faro_antena'];
+
+let _texto = '';
+
+function msg(id, texto, mal) {
+  const el = document.getElementById(id);
+  el.textContent = texto;
+  el.className = 'msg ' + (mal ? 'mal' : 'ok');
+}
+
+function recoger() {
+  const datos = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || NO_MUDAR.includes(k)) continue;
+    datos[k] = localStorage.getItem(k);
+  }
+  return datos;
+}
+
+function nombreArchivo() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `faro-progreso-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}.json`;
+}
+
+document.getElementById('btn-exportar').addEventListener('click', () => {
+  const datos = recoger();
+  const claves = Object.keys(datos);
+  if (!claves.length) {
+    msg('msg-exp', 'No hay nada guardado en este aparato. ¿Es la dirección correcta y entraste con tu cuenta?', true);
+    return;
+  }
+  _texto = JSON.stringify({ version: 1, origen: location.origin, cuando: new Date().toISOString(), datos }, null, 0);
+
+  try {
+    const blob = new Blob([_texto], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nombreArchivo();
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    msg('msg-exp', `Guardadas ${claves.length} cosas. Busca el archivo en tus descargas.`, false);
+  } catch (e) {
+    msg('msg-exp', 'No se pudo descargar. Usa el botón de copiar.', true);
+  }
+  document.getElementById('btn-copiar').disabled = false;
+  document.getElementById('lista-exp').textContent = 'Incluye: ' + claves.join(', ');
+});
+
+document.getElementById('btn-copiar').addEventListener('click', async () => {
+  if (!_texto) { msg('msg-exp', 'Primero toca «Guardar mi progreso».', true); return; }
+  try {
+    await navigator.clipboard.writeText(_texto);
+    msg('msg-exp', 'Copiado. Pégalo en una nota o mándatelo por el chat familiar.', false);
+  } catch (e) {
+    /* Sin permiso de portapapeles se muestra el texto para copiarlo a mano:
+       peor es quedarse sin salida. */
+    document.getElementById('pegado').value = _texto;
+    msg('msg-exp', 'No se pudo copiar solo. El texto quedó abajo, en el recuadro: cópialo de ahí.', true);
+  }
+});
+
+async function restaurar(texto) {
+  let sobre;
+  try { sobre = JSON.parse(texto); }
+  catch (e) { msg('msg-imp', 'Ese texto no se entiende. ¿Está completo?', true); return; }
+
+  const datos = sobre && sobre.datos ? sobre.datos : null;
+  if (!datos || typeof datos !== 'object') {
+    msg('msg-imp', 'El archivo no tiene el progreso dentro. ¿Es el que guardaste?', true);
+    return;
+  }
+
+  /* No se borra nada de lo que ya haya: si alguien avanzó en la dirección nueva
+     antes de restaurar, machacarlo sin avisar seria perder su trabajo. Se
+     escriben las claves del archivo y se dice cuáles se pisaron. */
+  const escritas = [], pisadas = [];
+  for (const k of Object.keys(datos)) {
+    if (NO_MUDAR.includes(k)) continue;
+    if (localStorage.getItem(k) !== null) pisadas.push(k);
+    try { localStorage.setItem(k, datos[k]); escritas.push(k); } catch (_) {}
+  }
+
+  if (!escritas.length) { msg('msg-imp', 'No se pudo restaurar nada.', true); return; }
+  msg('msg-imp', `Restauradas ${escritas.length} cosas. Abre F.A.R.O y comprueba tu XP.`, false);
+  document.getElementById('lista-imp').textContent =
+    'Restaurado: ' + escritas.join(', ') + (pisadas.length ? ' · Se reemplazó lo que ya había en: ' + pisadas.join(', ') : '');
+}
+
+document.getElementById('btn-importar').addEventListener('click', async () => {
+  const f = document.getElementById('archivo').files[0];
+  const pegado = document.getElementById('pegado').value.trim();
+  if (f) { restaurar(await f.text()); return; }
+  if (pegado) { restaurar(pegado); return; }
+  msg('msg-imp', 'Elige el archivo o pega el texto primero.', true);
+});
+</script>
+</body>
+</html>

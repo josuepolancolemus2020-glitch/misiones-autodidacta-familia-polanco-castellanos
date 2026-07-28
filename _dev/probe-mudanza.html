@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · La mudanza</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:500px;border:0;background:#fff}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/mudanza.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba mudanza.html, que es lo que impide que los cuatro pierdan el
+   progreso de las 16 misiones al cambiar F.A.R.O de direccion.
+
+   Se prueba de verdad: se siembran claves en el localStorage de la pagina, se
+   toca el boton de guardar, se lee lo que produjo, se borra todo, se restaura y
+   se comprueba que volvio lo mismo. Sin eso, la sonda solo diria que los
+   botones existen, que es lo que no sirve. */
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+window.addEventListener('load', async () => {
+  await esperar(1200);
+  const w = f.contentWindow, d = f.contentDocument;
+  try {
+    log('── LA PÁGINA ──');
+    ok(!!d.getElementById('btn-exportar'), 'tiene botón de guardar', 'falta el botón de guardar');
+    ok(!!d.getElementById('btn-importar'), 'tiene botón de restaurar', 'falta el botón de restaurar');
+    ok(!!d.getElementById('archivo') && !!d.getElementById('pegado'),
+       'acepta archivo y texto pegado', 'no acepta las dos formas');
+
+    log('\n── SE LLEVA TODO, NO UNA LISTA A MANO ──');
+    const src = await (await fetch('/mudanza.html')).text();
+    ok(/localStorage\.key\(i\)/.test(src),
+       'recorre el almacén entero (así no se olvida la misión 17)',
+       'usa una lista escrita a mano: se quedaría corta al añadir misiones');
+    ok(/NO_MUDAR/.test(src) && /faro_auth/.test(src),
+       'deja fuera las credenciales de sesión', 'se llevaría la sesión a otra dirección');
+
+    log('\n── LA PRUEBA DE VERDAD: GUARDAR Y RESTAURAR ──');
+    /* Se siembra progreso de mentira, incluidas dos claves de misión reales */
+    const semilla = {
+      'faro_v1': JSON.stringify({ currentMember: 'jael' }),
+      'faro_psi_sesgos_v1': JSON.stringify({ xp: 145, doneSections: ['s-quiz','s-lab'] }),
+      'karl_popper_v1': JSON.stringify({ xp: 30 }),
+      'preferenciaLetra': 'true',
+      'faro_auth': 'ESTO-NO-DEBE-VIAJAR',
+    };
+    w.localStorage.clear();
+    Object.entries(semilla).forEach(([k, v]) => w.localStorage.setItem(k, v));
+
+    /* Se llama a la recogida tal y como la usa el botón */
+    const recogido = w.eval('JSON.stringify(recoger())');
+    const datos = JSON.parse(recogido);
+    ok(Object.keys(datos).length === 4, 'recoge las 4 claves de progreso', 'recoge ' + Object.keys(datos).length);
+    ok(!('faro_auth' in datos), 'NO se lleva la credencial de sesión', 'se estaría llevando la sesión');
+    ok(datos['faro_psi_sesgos_v1'] === semilla['faro_psi_sesgos_v1'], 'el progreso de una misión viaja entero', 'el progreso llegó cambiado');
+
+    /* Se simula la casa nueva: almacén vacío, y se restaura */
+    const sobre = JSON.stringify({ version: 1, datos });
+    w.localStorage.clear();
+    ok(w.localStorage.length === 0, 'la dirección nueva empieza vacía (esto es lo que se perdería)', 'no quedó vacía');
+
+    await w.eval('restaurar(' + JSON.stringify(sobre) + ')');
+    await esperar(150);
+    ok(w.localStorage.getItem('faro_psi_sesgos_v1') === semilla['faro_psi_sesgos_v1'],
+       'el progreso de Sesgos volvió intacto', 'el progreso no volvió igual');
+    ok(w.localStorage.getItem('faro_v1') === semilla['faro_v1'], 'el perfil activo volvió', 'el perfil no volvió');
+    ok(w.localStorage.getItem('karl_popper_v1') === semilla['karl_popper_v1'], 'la misión escolar también', 'faltó la misión escolar');
+    ok(w.localStorage.getItem('faro_auth') === null, 'la credencial NO se restauró, como debe ser', 'restauró la credencial');
+
+    log('\n── NO DESTRUYE LO QUE YA HABÍA ──');
+    /* Si alguien avanzó en la dirección nueva antes de restaurar, se avisa de
+       lo que se pisó en vez de machacarlo en silencio. */
+    ok(/pisadas/.test(src) && /Se reemplazó lo que ya había/.test(src),
+       'avisa de lo que reemplaza', 'machacaría lo que ya había sin decirlo');
+
+    log('\n── NORMAS ──');
+    ok(!/\u2014/.test(src), 'sin guiones largos (norma 1-bis)', 'quedan guiones largos');
+    ok(/\u2014/.test('a\u2014b'), 'y la regla del guion largo sí detecta uno de verdad', 'la regla está rota');
+
+    w.localStorage.clear();
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>
