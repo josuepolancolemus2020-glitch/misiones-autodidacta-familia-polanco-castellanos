@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Máquina que Predice · Etapa 3: Verificar | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/verificar.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Copia y pega 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🔎</div>
+    <div class="hero-text">
+      <h1>Verificar: <span>nadie firma lo que no leyó</span></h1>
+      <p class="sub">La máquina predice texto que suena bien, no texto que sea cierto 🔎</p>
+      <div class="badge">🤖 Ruta de la Máquina que Predice · Etapa 3 de 6 · Inteligencia Artificial</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔎 La frase maestra, y las dos preguntas que la vuelven útil</h2>
+    <p>La etapa 1 explicó qué hace la máquina por dentro: <strong>predecir la palabra siguiente</strong>. La etapa 2 enseñó a pedir bien. Esta trata de lo que pasa después, y es la parte que nadie quiere hacer: <strong>una respuesta que suena bien no es una respuesta comprobada</strong>. El modelo no distingue entre lo que sabe y lo que completa, porque para él las dos cosas son lo mismo: texto probable. Ante cualquier respuesta, dos preguntas: <strong>¿puedo explicar esto con mis palabras?</strong> y <strong>¿qué pasa si está mal?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La señal de alarma de esta etapa:</strong> cuando te descubres <strong>copiando algo que no podrías explicar</strong>. Ahí no leíste: moviste. Y lo que se mueve sin leer llega igual a la ficha impresa, al correo enviado y a la aplicación de la familia, solo que ya con tu nombre debajo.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Los dos errores, y cuál da miedo</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🤪 El disparate</h4>
+        <p>La respuesta absurda, la que se ve de lejos. Da risa, se borra y no llega a ninguna parte. <strong>Este error es inofensivo</strong> precisamente porque se nota.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🎩 El dato falso bien escrito</h4>
+        <p>La cifra verosímil, la cita con autor y año, el artículo de ley con su número. Está redactado con el mismo tono seguro que lo cierto, <strong>porque el tono es estilo, no certeza</strong>. Este es el que llega hasta la imprenta.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>La máquina <span class="hl">no sabe que no sabe</span>. Un dato inventado y uno correcto salen con la misma cara, así que la seguridad con la que algo está escrito <span class="hl2">no dice absolutamente nada</span> sobre si es cierto.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas de una verificación</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué hace, cuánto cuesta saltársela y cómo se aplica en este proyecto.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza de la verificación.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: el artículo que no existe</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces con un dato que suena perfecto.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📝</span><span class="ms-text"><strong>El encargo:</strong> «escribe la introducción de la ficha de Estudios Sociales sobre los derechos del niño».</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">✨</span><span class="ms-text"><strong>La respuesta:</strong> tres párrafos claros, bien escritos, y una cita del artículo 123 de la Constitución con su texto entre comillas.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">👍</span><span class="ms-text"><strong>La sensación:</strong> quedó mejor de lo que habrías escrito tú, y encima trae respaldo legal.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🖨️</span><span class="ms-text"><strong>Lo que viene después:</strong> trescientas copias impresas para tres escuelas, con tu nombre en el pie.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué haces antes de mandarla a imprimir?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🤷 Le pregunto si está seguro</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🌐 Abro el texto oficial y busco el artículo</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🕵️ Los cinco errores que hay que buscar</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. Dato inventado · 2. Fuente inventada · 3. Lógica que no cierra</h4>
+        <p>Una <strong>fecha, una cifra o un nombre</strong> que no existen. Un <strong>enlace, un libro o un artículo de ley</strong> que suenan reales y no lo son. Y un razonamiento que va bien tres pasos y en el cuarto <strong>concluye otra cosa</strong>.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>4. La omisión · 5. La complacencia</h4>
+        <p>Lo que <strong>no dijo</strong>: la excepción, la fecha límite, el requisito. Y el peor de todos: la máquina <strong>tiende a darte la razón</strong>, así que si preguntas «¿verdad que conviene?», suele salir que sí.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🕳️ El más difícil de ver</span><br>
+      <span>Los tres primeros están <span class="hl">en la respuesta</span> y se pueden buscar. La omisión no: para verla hay que saber <span class="hl2">qué tendría que estar y no está</span>, y eso solo lo sabe quien leyó el original.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>⚖️ No todo se verifica igual: la escala de riesgo</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Verificar cuesta tiempo, y el tiempo es el gasto más grande del proyecto. Lo que decide cuánto verificar no es lo raro que suene la respuesta: es <strong>qué pasa si está mal</strong>.</p>
+    <table class="tres">
+      <tr><th>Riesgo</th><th>Ejemplo en este proyecto</th><th>Cuánto se verifica</th></tr>
+      <tr><td>Bajo</td><td>Un título, un emoji, la redacción de un párrafo de adorno</td><td>Se lee entero y basta</td></tr>
+      <tr><td>Medio</td><td>Un texto explicativo de una misión, un correo interno</td><td>Se leen los datos y se comprueba lo que se afirma</td></tr>
+      <tr><td>Alto</td><td>Una cifra, una cita, una ley o un dato en una ficha impresa</td><td>Fuente primaria, una por una</td></tr>
+      <tr><td>Muy alto</td><td>Código que se sube, un compromiso por escrito con alguien de fuera</td><td>Se prueba el caso real y lo revisa una segunda persona</td></tr>
+    </table>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas de la verificación</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Errores que buscar</div><div class="stat-val">5</div></div>
+      <div class="stat-item"><div class="stat-label">Reglas de la casa</div><div class="stat-val">5</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🌐 Verificación de verdad y verificación de mentira</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>✅ De verdad: por fuera</h4>
+        <p>Se abre <strong>otra cosa</strong>: el texto oficial, la página del ministerio, el archivo del proyecto, el código ejecutándose. La comprobación vale porque <strong>no depende de quien hizo la afirmación</strong>.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>❌ De mentira: por dentro</h4>
+        <p>«¿Estás seguro?», «¿puedes confirmarlo?», «dame la fuente». Todo eso produce <strong>más texto probable</strong>, no una comprobación. Si la máquina inventó un artículo, puede inventar igual de bien el enlace que lo respalda.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 En una línea</span><br>
+      <span>Preguntarle a la misma máquina si tiene razón es <span class="hl">pedirle una segunda predicción</span>, no una verificación. Y cuando insistes, muchas veces <span class="hl2">cambia de opinión para complacerte</span>, que es peor todavía.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>✍️ La firma: quien entrega, responde</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Esta es la parte que no es técnica. La máquina no tiene responsabilidad, ni trabajo que perder, ni una maestra enfrente. El que pega el texto en la ficha, sí. <strong>«Lo dijo la IA» no es una defensa</strong>: no lo es ante una maestra, ni ante una institución, ni en la mesa de esta casa.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">📖 Leer</div><div class="t-info">Entero, antes de nada</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🔍 Marcar</div><div class="t-info">Lo que se puede comprobar</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">⚖️ Medir</div><div class="t-info">Qué pasa si está mal</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🌐 Comprobar</div><div class="t-info">Por fuera, no por dentro</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🕳️ Buscar</div><div class="t-info">Lo que falta</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">✍️ Firmar</div><div class="t-info">Y anotar contra qué</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">La regla que sale de aquí: <strong>si no lo puedes explicar, no lo entregas</strong>. No porque esté mal, sino porque no sabes si está bien, y esas dos cosas se parecen mucho hasta el día que alguien pregunta.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El banco de pruebas de una respuesta</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para saber qué hacer con cualquier respuesta antes de usarla.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Leer entero</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🔎 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="leer" onclick="labShowParte('leer')">📖 Leer entero</button>
+        <button class="lab-btn lab-cont-btn" data-parte="riesgo" onclick="labShowParte('riesgo')">⚖️ Medir el riesgo</button>
+        <button class="lab-btn lab-cont-btn" data-parte="fuente" onclick="labShowParte('fuente')">🌐 Comprobar por fuera</button>
+        <button class="lab-btn lab-cont-btn" data-parte="firma" onclick="labShowParte('firma')">✍️ Firmar</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se hace</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Qué pasa si se salta</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En este proyecto</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se verifica una respuesta</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la verificación se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 La respuesta y la comprobación que le toca</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Cómo se comprueba esto por fuera?</p>
+    <div class="neuro-trans-display" id="neuroTrans">«El artículo 123 de la Constitución dice…»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Entregas que salieron mal: ¿qué no se verificó?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué faltó comprobar:</p>
+    <div class="neuro-trans-display" id="enferDisease">La ficha salió con la letra encogida y con un hueco enorme abajo</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🔎 Dato</button>
+        <button class="btn btn-sec" onclick="">💬 Estilo</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">✍️ La firma al pie</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Verificar · Ruta de la Máquina que Predice</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: verificar</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La firma al pie · Verificar</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">✍️ La firma al pie: qué comprobarías antes de entregar</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una entrega a punto de salir. Di qué se puede comprobar, contra qué se comprueba, qué riesgo tiene si está mal y qué firmarías (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🔎</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🔎 Casos del proyecto: ocho cosas que se dieron por buenas</h2>
+    <p>Los cinco primeros <strong>pasaron de verdad en esta casa</strong>, y están escritos en el repositorio: en las normas, en los avisos del código y en el registro del 28 de julio de 2026, el día que se cerró F.A.R.O. Los tres últimos son situaciones que le pueden llegar al proyecto el mes que viene.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Por qué estos y no ejemplos de manual:</strong> en todos, el trabajo estaba bien hecho y aun así salió mal, porque alguien miró la parte que funcionaba y no la que decidía. Un error de manual se olvida; uno que ya costó una tarde de esta casa, no.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📏 Caso 1: los 226 milímetros que nadie midió</h2>
+    <p>Para saber cuánto texto cabe en una hoja carta se calculó el alto útil en vez de medirlo: 279,4 milímetros menos una pulgada por lado, o sea 226.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔎 Lo que falló</span><br>
+      <span>Esa pulgada es <span class="hl">el margen por defecto de Chrome</span>, no el que declara la hoja de F.A.R.O, que son 11 milímetros. El alto real era 252. Se desperdiciaban 26 milímetros por página y se encogió la letra a 9,5 puntos <span class="hl2">para que cupiera algo que ya cabía</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el número salió de un razonamiento correcto sobre un dato equivocado, y por eso sonaba tan bien. <strong>Un cálculo no es una medición.</strong> Costó dos vueltas enteras y quedó escrito en la norma 6 para que no vuelva a pasar.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🏅 Caso 2: la constancia que decía «Etapa 1»</h2>
+    <p>Cada misión se construye copiando la anterior. En el molde había un rótulo que felicitaba al estudiante por completar «la Etapa 1», y viajó de misión en misión.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📋 Lo que falló</span><br>
+      <span>Nadie lo leyó, porque <span class="hl">no era código: era texto de adorno</span>. Con él viajaron otros cinco rótulos, entre ellos una prueba que seguía llamándose como la misión anterior y una pregunta sobre <span class="hl2">un cambio de funcionario</span> en una misión que no hablaba de funcionarios.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> <strong>copiar no es leer</strong>. Lo heredado se revisa entero aunque venga de casa, y las partes que no dan error son justo las que nadie mira: los títulos, los pies, las etiquetas de las pruebas impresas.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🚪 Caso 3: la política que decía «using (true)»</h2>
+    <p>Una regla de seguridad de la base de datos, revisada y aprobada, que parecía cerrar la casa.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🕳️ Lo que falló</span><br>
+      <span>Se leyó <span class="hl">el nombre de la regla</span> y no lo que hacía. La condición decía «verdadero», así que dejaba entrar a cualquiera que se registrara en el proyecto. Tenía la forma de una protección y <span class="hl2">el efecto de una puerta abierta</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> leer no es pasar los ojos por encima: es poder decir <strong>qué hace esto, con mis palabras</strong>. Si la explicación se queda en «es la política de seguridad», todavía no se leyó. Esto se ve por dentro en la etapa 3 de la Ruta de la Casa Cerrada.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>✅ Caso 4: las tres comprobaciones que aprobaban siempre</h2>
+    <p>Tres verificaciones escritas para confirmar que la casa estaba cerrada. Se ejecutaban y salían en verde.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎭 Lo que falló</span><br>
+      <span>Estaban escritas de forma que <span class="hl">avisaban pero nunca detenían nada</span>. Pasaban igual estuviera bien o mal. Y como salían en verde, se usaron como prueba de que todo estaba correcto: <span class="hl2">una verificación que no puede fallar no es una verificación</span>, es un adorno.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> antes de confiar en una comprobación hay que verla <strong>fallar al menos una vez</strong>. Si nunca se ha visto en rojo, no se sabe si funciona. Esa es la razón de que las sondas de este proyecto se escriban mirando primero que fallen.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Caso 5: la herramienta que arreglaba y rompía a la vez</h2>
+    <p>Hay una herramienta que reparte las respuestas correctas del quiz entre las cuatro letras, para que no queden siempre en la misma. Funciona bien.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">💥 Lo que falló</span><br>
+      <span>Se miró <span class="hl">lo que arreglaba</span> y no lo que tocaba: reescribía las veintiuna misiones del proyecto de una pasada, incluidas las que ya estaban bien. El informe salía en verde porque <span class="hl2">solo informaba de lo que había venido a arreglar</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> de una herramienta no se verifica el resultado que promete, sino <strong>el alcance completo de lo que toca</strong>. La comprobación buena aquí no era leer el informe: era mirar la lista de archivos modificados.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📜 Caso 6: el artículo de la Constitución que no existe</h2>
+    <p>Se le pide a la máquina la introducción de una ficha de Estudios Sociales. Devuelve tres párrafos claros y una cita de un artículo, con número y texto entre comillas.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🖨️ Lo que decide</span><br>
+      <span>La ficha va a <span class="hl">trescientas copias en tres escuelas</span>, con el nombre del proyecto en el pie. Riesgo alto: se comprueba <span class="hl2">contra el texto oficial, una por una</span>, y la cita que no aparezca se borra, no se deja «por si acaso».</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> una cita inventada no se distingue de una real por cómo está escrita, porque las dos se escriben igual de bien. Solo se distinguen <strong>abriendo la fuente</strong>. Y hay algo peor que el error: que lo encuentre una maestra delante de sus alumnos.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🕳️ Caso 7: el resumen que se comió la fecha límite</h2>
+    <p>Se le pide resumir el reglamento de un concurso al que M.E.T.A.S quiere presentar el Campeonísimo. El resumen es correcto, ordenado y claro.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📅 Lo que decide</span><br>
+      <span>No dice ni una mentira. Lo que pasa es que <span class="hl">no menciona la fecha de cierre de inscripciones</span>, que estaba en una nota al pie del original. El error no está en lo que dice: está <span class="hl2">en lo que no dice</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la omisión es el error que no se puede buscar en la respuesta, porque no está ahí. Contra un resumen solo hay una defensa: <strong>abrir el original y leer al menos los encabezados y las notas</strong>, buscando lo que tendría que estar.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>✉️ Caso 8: el correo que prometió de más</h2>
+    <p>Se le pide redactar el correo de presentación del proyecto a una Secretaría. Sale un texto excelente, con más seguridad de la que hay.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">✍️ Lo que decide</span><br>
+      <span>Dice que el proyecto «acompaña a los centros durante todo el año escolar». Suena bien y <span class="hl">nadie lo ha decidido</span>. Si ese correo sale, el compromiso es real: lo firma quien lo envía, y <span class="hl2">no se puede alegar que lo escribió una máquina</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> en un texto que va hacia fuera hay que buscar los verbos que <strong>comprometen</strong>: acompañamos, garantizamos, entregamos, capacitamos. Cada uno es una promesa que alguien va a cobrar. Esto se cruza con la etapa 3 de la Ruta del Poder Político.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 El protocolo de cinco pasos, y las cinco reglas</h2>
+    <p>Toda entrega de este proyecto que haya pasado por una máquina se revisa igual:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Leer entero</strong>, hasta el final, antes de decidir nada.</li>
+      <li><strong>Marcar lo comprobable:</strong> cifras, fechas, nombres, citas, enlaces, promesas.</li>
+      <li><strong>Medir el riesgo</strong> de cada marca: qué pasa exactamente si esa está mal.</li>
+      <li><strong>Comprobar por fuera</strong> las de riesgo alto, y buscar además lo que falta.</li>
+      <li><strong>Corregir o borrar</strong>, y firmar anotando contra qué se comprobó y quién responde.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas de la verificación</span><br>
+      <span>1. Quien entrega, <span class="hl">firma</span>: «lo dijo la IA» no es una defensa. 2. El error peligroso no es el disparate: es <span class="hl">el dato falso bien escrito</span>. 3. No se le pregunta a la misma máquina si tiene razón: <span class="hl">se comprueba por fuera</span>. 4. Se verifica según qué pasa si está mal, no según lo raro que suene. 5. Lo que no se puede explicar con palabras propias <span class="hl2">no se entrega</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas de la verificación</strong>, la escala de riesgo, la hoja de verificación para llenar a lápiz, una verificación de verdad hecha paso a paso, los cinco errores que hay que buscar, los ocho casos de esta casa, seis ejercicios y la pauta completa.</p>
+      <a href="../../fichas/ficha-maquina-verificar.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con una entrega real verificada y con la hoja de verificación llena, firmada y guardada.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../misiones/ruta-maquina-pedir-bien/pedir-bien.html">📝 Pedir bien</a>: la etapa 2 de esta ruta. Un encargo con criterio de aceptación deja mucho menos que verificar, porque ya dijo qué era aceptable.</li>
+      <li><a href="../../misiones/ruta-maquina-que-predice/maquina-predice.html">🤖 La máquina que predice</a>: la etapa 1. Ahí está el motivo de todo esto: el modelo predice texto probable, y lo probable se parece muchísimo a lo cierto.</li>
+      <li><a href="../../misiones/ruta-casa-cerrada-codigo/codigo.html">🚦 El código que no confía</a>: la misma idea aplicada al código, con el caso de «using (true)» por dentro.</li>
+      <li><a href="../../index.html">⚡ Destellos</a>: apunta cuánto tarda de verdad verificar una entrega. Sin ese dato, «no hay tiempo para revisar» es una opinión.</li>
+      <li><a href="../../fichas/ficha-maquina-verificar.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja de verificación cabe en una página y sirve para cualquier entrega.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar una respuesta larga de verdad, <strong>marcar en ella todo lo comprobable</strong>, ponerle riesgo a cada marca y comprobar por fuera las de riesgo alto, anotando contra qué. La prueba de que está aprendido es poder explicar la entrega entera <strong>con palabras propias</strong>, sin volver a mirarla, y saber decir qué parte no se comprobó y por qué se aceptó igual.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🔎</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Máquina que Predice · Etapa 3: Verificar</div>
+    <div class="diploma-mascot" aria-hidden="true">🔎</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🔎</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Una respuesta que suena bien no es una respuesta comprobada» 🌱 · 🤖 Ruta de la Máquina que Predice · Etapa 3 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/verificar.js"></script>
+</body>
+</html>

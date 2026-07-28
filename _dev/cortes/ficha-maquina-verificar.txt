@@ -1,0 +1,23 @@
+# Cortes de fichas/ficha-maquina-verificar.html (norma 6: diez páginas y llenas).
+# Cada línea es lo que tiene que QUEDAR ARRIBA de una página. La 1 empieza
+# sola, así que aquí van nueve.
+#
+# Tres cosas aprendidas repaginando las fichas anteriores:
+#   · <div class="caja">, "caja-amb" y <div class="pauta"> se repiten mucho, así
+#     que los bloques que sirven de anclaje llevan clase propia: "metodo",
+#     "reglas", ej1..ej6 y pa1..pa6. Sin eso el corte cae en el primer bloque
+#     parecido y la ficha se parte donde no es.
+#   · un anclaje NUNCA puede caer dentro de un <table>: retrocede() solo
+#     retrocede sobre <div>, así que dejaría la tabla abierta en una hoja y
+#     cerrada en la otra.
+#   · una página no debería terminar en un encabezado suelto. Por eso el rótulo
+#     de la hoja llena lleva su aclaración dentro y no en un párrafo aparte.
+<h2>🧩 Las siete piezas de una verificación</h2>
+<h2>🚩 Señales de alarma dentro del propio texto</h2>
+<h2>⏰ Los tres momentos en que más se falla</h2>
+<div class="caja caja-amb metodo">
+<h2>📗 La misma hoja, llena con la entrega de la página siguiente</h2>
+<h3>Paso 5 · Buscar lo que falta, corregir y firmar</h3>
+<div class="caja caja-amb reglas">
+<div class="caja ej4">
+<div class="pauta pa2">
