@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · El service worker detrás de una puerta</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba el filtro sePuedeGuardar() de sw.js, que es lo que impide que la
+   aplicación se envenene cuando F.A.R.O quede detrás de Cloudflare Access.
+
+   El problema que resuelve: al caducar la sesión de la puerta, el servidor no
+   devuelve js/app.js, devuelve la pantalla de inicio de sesión en HTML y con
+   código 200. El service worker la guardaba como si fuera el archivo bueno, y
+   desde ese momento recargar no arreglaba nada, porque la copia guardada
+   servía la basura. Una avería imposible de arreglar desde un teléfono.
+
+   Aquí se saca la función del propio sw.js y se le enseñan respuestas de
+   mentira, incluidas las tres formas en que se presenta una pantalla de
+   puerta. Sin navegador de verdad no se puede instalar el worker, pero la
+   decisión de guardar o no es esta función, y esta función sí se puede
+   examinar entera. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+
+/* Una respuesta de mentira con lo justo que mira el filtro */
+function resp({ ok = true, redirected = false, tipo = '', type = 'basic' }) {
+  return { ok, redirected, type, headers: { get: () => tipo } };
+}
+function pet(destination) { return { destination }; }
+
+window.addEventListener('load', async () => {
+  try {
+    const src = await (await fetch('/sw.js')).text();
+
+    log('── EL FILTRO EXISTE Y SE USA ──');
+    ok(/function sePuedeGuardar/.test(src), 'sw.js define sePuedeGuardar', 'no existe el filtro');
+    const usos = (src.match(/sePuedeGuardar\(/g) || []).length;
+    ok(usos >= 3, 'se usa al instalar y al servir (' + usos + ' apariciones)', 'se define pero casi no se usa');
+    ok(!/cache\.addAll\(/.test(src), 'ya no usa cache.addAll a ciegas', 'sigue usando addAll, que no mira lo que guarda');
+    ok(/CACHE_NAME = 'faro-app-v4'/.test(src), 'la versión del caché subió, así se tira lo envenenado de antes', 'no subió CACHE_NAME: lo ya guardado seguiría ahí');
+
+    /* Se extrae la función tal cual está escrita en sw.js y se ejecuta */
+    const m = src.match(/function sePuedeGuardar[\s\S]*?\n\}/);
+    ok(!!m, 'se pudo extraer la función para probarla', 'no se pudo extraer');
+    if (!m) throw new Error('sin función');
+    const sePuedeGuardar = new Function('return (' + m[0] + ')')();
+
+    log('\n── LO BUENO SE GUARDA ──');
+    ok(sePuedeGuardar(pet('script'), resp({ tipo: 'text/javascript' })), 'un script de verdad se guarda', 'rechaza un script bueno');
+    ok(sePuedeGuardar(pet('style'),  resp({ tipo: 'text/css' })), 'una hoja de estilo se guarda', 'rechaza un CSS bueno');
+    ok(sePuedeGuardar(pet('document'), resp({ tipo: 'text/html' })), 'una página se guarda', 'rechaza una página buena');
+    ok(sePuedeGuardar(pet(''), resp({ tipo: 'application/json' })), 'una respuesta sin destino declarado se guarda', 'rechaza lo que no declara destino');
+
+    log('\n── LA PANTALLA DE LA PUERTA NO SE GUARDA ──');
+    /* Las tres formas en que Cloudflare Access se mete en medio */
+    ok(!sePuedeGuardar(pet('script'), resp({ tipo: 'text/html' })),
+       'HTML pedido como script: RECHAZADO (este era el veneno)',
+       'guardaría la pantalla de inicio de sesión como si fuera js/app.js');
+    ok(!sePuedeGuardar(pet('script'), resp({ redirected: true, tipo: 'text/javascript' })),
+       'respuesta redirigida: RECHAZADA', 'guardaría lo que venga tras una redirección');
+    ok(!sePuedeGuardar(pet('script'), resp({ type: 'opaqueredirect', tipo: '' })),
+       'redirección opaca: RECHAZADA', 'guardaría una redirección opaca');
+    ok(!sePuedeGuardar(pet('style'), resp({ tipo: 'text/html; charset=utf-8' })),
+       'HTML pedido como hoja de estilo: RECHAZADO', 'guardaría HTML como CSS');
+    ok(!sePuedeGuardar(pet('image'), resp({ tipo: 'text/html' })),
+       'HTML pedido como imagen: RECHAZADO', 'guardaría HTML como imagen');
+    ok(!sePuedeGuardar(pet('script'), resp({ ok: false, tipo: 'text/javascript' })),
+       'una respuesta con error: RECHAZADA', 'guardaría respuestas con error');
+
+    log('\n── LA LIBRERÍA QUE NO PUEDE FALTAR ──');
+    /* Si esta se envenena, no hay cliente de Supabase y no entra nadie nunca */
+    ok(!sePuedeGuardar(pet('script'), resp({ tipo: 'text/html' })),
+       'supabase.min.js no se puede sustituir por una pantalla de acceso',
+       'la librería se podría envenenar y entonces no entra nadie');
+    ok(/STATIC_ASSETS\.map/.test(src) && /sePuedeGuardar\(new Request\(url\), resp\)/.test(src),
+       'el pre-cacheo de la instalación también filtra', 'la instalación guarda sin mirar');
+
+    log('\n── NORMAS ──');
+    /* El guion largo por su punto de código, no literal, para que este archivo
+       no incumpla la norma que comprueba. Ojo con la barra invertida: una sola escapa el punto de codigo y casa
+       con el guion largo; dos casarian con una barra literal seguida de
+       «u2014», o sea una regla que no encuentra nada y aprueba siempre. */
+    ok(!/\u2014/.test(src), 'sw.js sin guiones largos (norma 1-bis)', 'quedan guiones largos');
+    /* Y se comprueba que la comprobación sirve: si el guion largo no se
+       detectara en un texto que sí lo lleva, la regla de arriba seria un
+       adorno. Una comprobación que no puede fallar no comprueba nada. */
+    ok(/\u2014/.test('a\u2014b'), 'la regla del guion largo sí detecta uno de verdad', 'la regla está rota y aprobaría siempre');
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

@@ -1,4 +1,39 @@
-const CACHE_NAME = 'faro-app-v3';
+const CACHE_NAME = 'faro-app-v4';
+
+/* ══════════════════════════════════════════════════════════════════
+   ¿SE PUEDE GUARDAR ESTA RESPUESTA?
+   ──────────────────────────────────────────────────────────────────
+   Esta comprobación existe por F.A.R.O detrás de una puerta con
+   contraseña (Cloudflare Access). Cuando la sesión de la puerta
+   caduca, el servidor NO devuelve el archivo pedido: devuelve la
+   pantalla de inicio de sesión, en HTML y con código 200, que para el
+   navegador es una respuesta perfectamente buena.
+
+   Sin esta comprobación, el service worker guardaba esa pantalla
+   COMO SI FUERA js/app.js. Y a partir de ahí la aplicación quedaba
+   envenenada: recargar no arregla nada, porque la copia guardada
+   sirve la basura una y otra vez. Es la avería más difícil de
+   arreglar para quien solo tiene el teléfono en la mano.
+
+   Tres señales delatan a un intruso, y basta una:
+     · la respuesta no es correcta (no ok);
+     · hubo redirección, que es como se llega a una pantalla de
+       inicio de sesión;
+     · viene HTML cuando se pidió un script, una hoja de estilo, una
+       fuente o una imagen.
+   ══════════════════════════════════════════════════════════════════ */
+function sePuedeGuardar(peticion, respuesta) {
+  if (!respuesta || !respuesta.ok) return false;
+  if (respuesta.redirected) return false;
+  if (respuesta.type === 'opaqueredirect') return false;
+
+  const tipo = respuesta.headers.get('content-type') || '';
+  const esHtml = tipo.includes('text/html');
+  const destino = peticion.destination;
+  if (esHtml && destino && destino !== 'document' && destino !== '') return false;
+
+  return true;
+}
 const STATIC_ASSETS = [
   './img/icon-192.png',
   './img/icon-512.png',
@@ -12,11 +47,22 @@ const STATIC_ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// Al instalar: pre-cachea solo imágenes y recursos externos estáticos
+// Al instalar: pre-cachea imágenes, la librería de Supabase y los externos.
+// Uno por uno y comprobando lo que llega, en vez de cache.addAll: addAll no
+// mira el contenido, así que si la instalación ocurre con la sesión de la
+// puerta caducada guardaría la pantalla de inicio de sesión como si fuera la
+// librería de Supabase, y sin esa librería no entra nadie. Y addAll es todo o
+// nada: un externo caído dejaba la instalación entera sin hacer.
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE_NAME).then(cache => Promise.all(
+      STATIC_ASSETS.map(url =>
+        fetch(url)
+          .then(resp => { if (sePuedeGuardar(new Request(url), resp)) return cache.put(url, resp); })
+          .catch(() => {})
+      )
+    ))
   );
 });
 
@@ -36,12 +82,18 @@ self.addEventListener('fetch', event => {
   const isImage = event.request.destination === 'image';
 
   if (isLocal && !isImage) {
-    // Archivos propios (HTML, CSS, JS): siempre va a la red primero
+    // Archivos propios (HTML, CSS, JS): siempre va a la red primero.
+    // Se devuelve lo que llegue, pero solo se GUARDA lo que pase el filtro:
+    // así, si la puerta contesta con su pantalla de inicio de sesión, el
+    // usuario la ve y entra, pero esa pantalla no se queda guardada ocupando
+    // el sitio del archivo de verdad.
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          if (sePuedeGuardar(event.request, response)) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(event.request))
