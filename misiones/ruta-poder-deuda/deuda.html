@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta del Poder · Etapa 3: La deuda por dentro | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/deuda.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Firma por la cuota 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">💳</div>
+    <div class="hero-text">
+      <h1>La deuda por dentro: <span>interés, plazo y costo total</span></h1>
+      <p class="sub">Nadie firma una deuda por la tasa: la firma por la cuota 💳</p>
+      <div class="badge">💰 Ruta del Poder · Etapa 3 de 6 · Poder Económico</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>💳 La frase maestra, y la pregunta que la vuelve útil</h2>
+    <p>Una deuda no se vende con la tasa: se vende con <strong>la cuota</strong>. Por eso la primera pregunta del que presta casi nunca es «¿para qué lo necesitas?», sino <strong>«¿cuánto puedes pagar al mes?»</strong>. Con esa respuesta se arma un plazo que haga caber la cuota, y el precio del dinero deja de discutirse. La pregunta del que se endeuda es otra y es una sola: <strong>¿cuánto voy a devolver en total, en lempiras?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La señal de alarma de esta etapa:</strong> cuando la conversación gira alrededor de <strong>cuánto cabe en tu mes</strong> y no de cuánto cuesta el dinero, te están vendiendo el plazo, no el préstamo. No hay engaño en eso: la cuota es real y el plazo también. Lo que falta es el número que los ata, y ese número no aparece si no se pide.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Las dos cifras que nunca coinciden</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🧾 La cuota</h4>
+        <p>Lo que se paga cada mes. Es la cifra <strong>cómoda</strong>, la que se compara con el sueldo y la que decide si uno dice que sí. Baja sola con solo alargar el plazo, y por eso es la que se enseña primero.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🧮 El costo total</h4>
+        <p>Cuota por número de cuotas, más comisiones y seguros, menos lo que de verdad llegó a tu mano. Es la cifra <strong>incómoda</strong>, la que sube cuando la cuota baja, y la única que permite comparar dos ofertas.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>Antes de firmar, el número que se dice en voz alta no es la cuota: es <span class="hl">el total en lempiras</span>. Si quien ofrece no lo tiene a mano, <span class="hl2">todavía no hay una oferta que comparar</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas de una deuda</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué mide, dónde engaña y qué número tiene en M.E.T.A.S.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza de la deuda.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la cuota que cabía en el mes</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces cuando te bajan la cuota sin que la hayas pedido.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🙋</span><span class="ms-text"><strong>La pregunta:</strong> «¿cuánto puede pagar al mes, sin apretarse?».</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🧾</span><span class="ms-text"><strong>La respuesta cómoda:</strong> «unos 700, más no».</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">📅</span><span class="ms-text"><strong>La solución instantánea:</strong> «entonces lo dejamos en 24 meses y la cuota queda en 740».</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🕰️</span><span class="ms-text"><strong>Lo que nadie dijo:</strong> el plazo se dobló y los intereses también, de 1.560 a 3.000.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué preguntas antes de firmar?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🤷 Si la cuota cabe, firmo</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🧮 Pido el total de las dos opciones</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚖️ Sobre saldos o sobre el monto: cinco palabras que valen dinero</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>📉 Interés sobre saldos</h4>
+        <p>Cada mes se cobra el porcentaje <strong>sobre lo que todavía debes</strong>. Como el saldo baja, el interés baja con él. Es la forma honesta de cobrar por el dinero: se paga por lo que se tiene prestado, no por lo que ya se devolvió.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>📌 Interés sobre el monto</h4>
+        <p>Se cobra el porcentaje <strong>sobre el préstamo original</strong>, todos los meses, hasta el último. En el mes doce se sigue pagando interés por dinero devuelto hace once meses. Se le llama tasa plana y suena igual de baja.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧮 El mismo 2% mensual, dos precios</span><br>
+      <span>12.000 lempiras a doce meses. Sobre saldos: <span class="hl">1.560 de intereses</span>. Sobre el monto: <span class="hl">2.880</span>. Y lo que hace la trampa perfecta: <span class="hl2">el recibo del primer mes es idéntico en las dos, 1.240</span>. La diferencia solo aparece al final.</span>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;"><strong>La regla del doble:</strong> una tasa cobrada sobre el monto cuesta <strong>casi el doble</strong> que la misma tasa cobrada sobre saldos, y la cuenta exacta es sencilla: multiplica la tasa plana por dos y te quedas corto por poco. Por eso las cinco palabras que hay que decir siempre son <strong>«¿es sobre saldos o sobre el monto?»</strong>.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📅 El plazo no abarata: reparte</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El mismo préstamo de 12.000 al 2% mensual sobre saldos, cambiando solo el plazo. La cuota es la columna que se enseña; el total es la que decide.</p>
+    <table class="tres plazos">
+      <tr><th>Plazo</th><th>Primera cuota</th><th>Intereses</th><th>Total devuelto</th></tr>
+      <tr><td>12 meses</td><td>1.240</td><td>1.560</td><td>13.560</td></tr>
+      <tr><td>24 meses</td><td>740</td><td>3.000</td><td>15.000</td></tr>
+      <tr><td>36 meses</td><td>573</td><td>4.440</td><td>16.440</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Lo que dice la tabla</span><br>
+      <span>Pasar de doce a veinticuatro meses baja la cuota <span class="hl">500 lempiras</span> y sube el total <span class="hl2">1.440</span>. El alivio es real y el precio también: cada año de plazo extra cuesta, en este préstamo, unos 1.440 lempiras.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ Los cuatro pasos antes de firmar</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. Cuánto llega y 2. cuánto se devuelve</h4>
+        <p><strong>Lo que llega:</strong> no el monto aprobado, sino lo que entra a la cuenta después de comisiones, seguro de deuda y gastos. <strong>Lo que se devuelve:</strong> cuota por número de cuotas, sumando todo, en lempiras y escrito en un papel.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. Pedir el cuadro y 4. recalcular el equilibrio</h4>
+        <p><strong>El cuadro de amortización:</strong> mes por mes, cuánto es interés y cuánto capital. Nadie lo niega si se pide. <strong>El equilibrio:</strong> la cuota es un costo fijo nuevo, así que cambia cuántas aulas hacen falta para no perder.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas de una deuda</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Preguntas antes de firmar</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Reglas de la casa</div><div class="stat-val">5</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">6</div></div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔗 El puente con la etapa 2</span><br>
+      <span>Los fijos de M.E.T.A.S son 750 al mes y el equilibrio son ocho aulas. Con una cuota de 1.240, los fijos pasan a 1.990 y el equilibrio salta a <span class="hl">veinte aulas</span>. Una deuda <span class="hl2">se paga con volumen que todavía no existe</span>, y ese es el riesgo entero.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧭 Deuda que produce y deuda que solo pesa</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La etapa 1 enseñó a mirar una cosa y decir si mete o saca dinero. Una deuda saca dinero todos los meses, sin excepción. La pregunta no es si saca, sino <strong>si lo que se compró con ella mete más de lo que el interés saca</strong>, y con margen, no justo.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">💵 Capital</div><div class="t-info">Lo que de verdad llegó</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">📈 Tasa</div><div class="t-info">Y sobre qué se calcula</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">📅 Plazo</div><div class="t-info">Reparte, no abarata</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🧾 Cuota</div><div class="t-info">Un fijo que se firma</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🧮 Costo total</div><div class="t-info">La cifra que compara</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">⏰ Mora</div><div class="t-info">La deuda que crece sola</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">La regla que sale de aquí: <strong>una deuda cambia lo que se puede decidir después</strong>. Mientras dura, el proyecto ya no puede decir que no a un trabajo que no le conviene, porque la cuota vence el día cinco. Endeudarse no es solo pagar intereses: es <strong>vender parte de la libertad de los próximos meses</strong>.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 La calculadora de la deuda</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para saber leer una oferta de crédito completa.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El capital</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🧮 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="capital" onclick="labShowParte('capital')">💵 El capital</button>
+        <button class="lab-btn lab-cont-btn" data-parte="tasa" onclick="labShowParte('tasa')">📈 La tasa</button>
+        <button class="lab-btn lab-cont-btn" data-parte="plazo" onclick="labShowParte('plazo')">📅 El plazo</button>
+        <button class="lab-btn lab-cont-btn" data-parte="total" onclick="labShowParte('total')">🧮 El costo total</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se calcula</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde engaña</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 Los números de M.E.T.A.S</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se lee una oferta de crédito</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la deuda se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 La frase del que presta y la pregunta que la corta</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pregunta hay que hacer ante esta frase?</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Solo 1.150 al mes y se la lleva hoy»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Deudas que salieron mal: ¿qué faltó preguntar?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué faltó preguntar antes de firmar:</p>
+    <div class="neuro-trans-display" id="enferDisease">La cuota era baja y al final se devolvió el doble de lo prestado</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">Capital</button>
+        <button class="btn btn-sec" onclick="">Interés</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">📄 El contrato antes de firmar</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · La deuda por dentro · Ruta del Poder</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: la deuda por dentro</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El contrato antes de firmar · La deuda por dentro</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">📄 El contrato antes de firmar: qué se devuelve de verdad</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una oferta de crédito con números. Di qué falta preguntar, calcula el costo total en lempiras y decide si se firma y con qué condición (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">💳</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>💳 Casos del proyecto: las ocho deudas que le pueden tocar la puerta a M.E.T.A.S</h2>
+    <p>Ocho ofertas que este proyecto puede recibir el mes que viene. En cada una: qué se ve, qué no se ve, cuánto se devuelve de verdad y <strong>la condición con la que sí</strong>.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Aviso sobre los números:</strong> las cifras en lempiras son <strong>realistas pero inventadas</strong>, puestas para que la cuenta se pueda hacer a lápiz. Las tasas y comisiones de verdad se piden por escrito antes de decidir nada. Lo que sí es real es el método, y ese no cambia con los precios.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>💻 Caso 1: la laptop en cuotas «sin intereses»</h2>
+    <p>Una tienda ofrece la laptop de trabajo en 24 cuotas de 1.150 lempiras, «sin intereses». No dice el precio de contado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧮 El total contra el contado</span><br>
+      <span>24 por 1.150 son <span class="hl">27.600 lempiras</span>. La misma laptop al contado cuesta 20.000. El «sin intereses» costó <span class="hl2">7.600, un 38% sobre el precio</span>, y viajaba escondido dentro del precio de lista.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> cuando el interés no se nombra, se cobra por dentro del precio. Sin el <strong>precio de contado</strong> no hay tasa que calcular ni oferta que comparar, y esa es justamente la razón de que no lo pongan en el cartel.</p>
+    <p><strong>La condición con la que sí:</strong> que la tienda escriba el precio de contado al lado del precio a cuotas. Si la diferencia es menor que lo que cobra una cooperativa por el mismo dinero, el plan de la tienda gana; si no, se pide prestado aparte y se compra de contado.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📉 Caso 2: dos ofertas al «2% mensual»</h2>
+    <p>Hacen falta 12.000 lempiras para el equipo de grabación. Dos prestamistas ofrecen 2% mensual a doce meses. Suenan idénticos.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🔎 Sobre saldos contra sobre el monto</span><br>
+      <span>Sobre saldos son <span class="hl">1.560 de intereses</span>; sobre el monto, <span class="hl">2.880</span>. La primera cuota es 1.240 en las dos, así que <span class="hl2">el recibo del primer mes no distingue nada</span>. La diferencia, 1.320 lempiras, se paga entera al final.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> la tasa sola no dice el precio; hace falta saber <strong>sobre qué se aplica</strong>. La regla del doble: una tasa plana cuesta casi el doble que la misma tasa sobre saldos.</p>
+    <p><strong>La condición con la que sí:</strong> que en el contrato diga «sobre saldos» con letras, y que venga el cuadro de amortización mes por mes. Si solo dan la cuota, se responde que se decide mañana y se compara con la otra oferta en frío.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🏦 Caso 3: la cuota es un costo fijo nuevo</h2>
+    <p>Un préstamo de 12.000 a doce meses deja una cuota de 1.240 al mes. Los fijos de M.E.T.A.S hoy son 750 y el margen por aula es de 100.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚖️ El equilibrio se mueve</span><br>
+      <span>Los fijos pasan de 750 a <span class="hl">1.990</span> y el punto de equilibrio, de ocho aulas a <span class="hl2">veinte</span>. Hoy hay seis. La deuda no se paga con lo que el proyecto gana: se paga con aulas que todavía no existen.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> firmar una cuota es <strong>firmar un costo fijo</strong>, y los fijos deciden cuánto volumen hace falta para no perder. El cálculo del equilibrio se rehace <strong>antes</strong> de firmar, nunca después.</p>
+    <p><strong>La condición con la que sí:</strong> que las aulas que faltan ya estén comprometidas por escrito, o que la cuota se pueda cubrir con los fijos actuales aunque no llegue ni un aula más. Si el plan depende de conseguir catorce aulas en doce meses, no es un plan: es una apuesta con fecha de vencimiento.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>✂️ Caso 4: aprobado 20.000, llegan 18.750</h2>
+    <p>Aprueban 20.000 lempiras. Del desembolso descuentan 3% de comisión, 400 de seguro de deuda y 250 de gastos de papelería.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">💸 Lo que entra y lo que se devuelve</span><br>
+      <span>600 más 400 más 250 son 1.250: a la cuenta llegan <span class="hl">18.750</span>. Pero los intereses se calculan sobre 20.000, así que <span class="hl2">se paga por 1.250 lempiras que nunca se tuvieron</span>.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> el monto aprobado es publicidad; el monto <strong>desembolsado</strong> es el préstamo. Toda tasa que se compare hay que compararla contra lo que de verdad entró a la cuenta, no contra lo que dice la carta de aprobación.</p>
+    <p><strong>La condición con la que sí:</strong> que los descuentos vengan sumados en lempiras antes de firmar y que el préstamo se pida por el monto que hace falta más los descuentos, para que lo que llegue alcance. Si el seguro de deuda es obligatorio, se pregunta quién es el beneficiario y qué cubre.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧭 Caso 5: los 15.000 para la laptop y los 15.000 para tapar el mes</h2>
+    <p>Dos préstamos iguales, mismo monto, misma tasa, mismo plazo. Uno compra una laptop que permite producir dos misiones más al mes. El otro cubre un mes en que no alcanzó.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔗 El puente con la etapa 1</span><br>
+      <span>Los dos <span class="hl">sacan lo mismo</span> todos los meses. El primero compra algo que mete; el segundo <span class="hl2">solo mueve el problema tres meses adelante</span>, y vuelve con intereses encima.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> la deuda no se juzga por la tasa, se juzga por <strong>lo que se compra con ella</strong>. Una deuda solo es buena si lo comprado mete más de lo que el interés saca, y con margen: si la cuenta sale justa, cualquier mes flojo la vuelve mala.</p>
+    <p><strong>La condición con la que sí:</strong> que lo comprado tenga un ingreso identificable y ya empezado, no prometido. Para tapar un mes que no alcanzó, la respuesta es recortar o cobrar antes, nunca pedir prestado: eso no arregla el hueco, lo alquila.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>⏰ Caso 6: la cuota que se atrasó tres meses</h2>
+    <p>Un mes malo y la cuota de 1.240 no se paga. El contrato dice: 200 lempiras de recargo por cuota vencida y 5% mensual sobre lo vencido.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📈 La deuda que crece sola</span><br>
+      <span>A los tres meses no se deben 3.720: se deben las tres cuotas, más <span class="hl">600 de recargos</span>, más unos 250 de intereses de mora. Cerca de <span class="hl2">4.570 por tres meses de silencio</span>, y el historial dañado encima.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> la mora no es un castigo proporcional, es <strong>una deuda nueva encima de la vieja</strong> y crece más rápido que la original. Y el costo peor no es el dinero: es que la próxima vez el crédito sale más caro o no sale.</p>
+    <p><strong>La condición con la que sí:</strong> antes de dejar de pagar se llama y se pide reprogramar por escrito. Casi siempre existe la opción y casi nunca la ofrecen: hay que pedirla, y hay que pedirla <strong>antes</strong> del vencimiento, no después.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔄 Caso 7: la refinanciación que «alivia»</h2>
+    <p>A mitad del préstamo ofrecen bajar la cuota de 1.240 a 740 pasando el plazo de doce a veinticuatro meses. «Para que respire.»</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🕰️ El precio del aire</span><br>
+      <span>El alivio es real: <span class="hl">500 lempiras menos cada mes</span>. El precio también: los intereses pasan de 1.560 a 3.000, o sea <span class="hl2">1.440 lempiras por respirar</span>, y doce meses más atado.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> refinanciar es <strong>comprar tiempo</strong>, y el tiempo tiene precio. No es una trampa ni un favor: es otra compra, y como toda compra se decide sabiendo cuánto cuesta.</p>
+    <p><strong>La condición con la que sí:</strong> que el alivio se use para algo que cambie la situación (cerrar las aulas que faltan, terminar lo que produce) y no solo para que el mes se sienta cómodo. Si a los seis meses el proyecto está igual, la refinanciación solo compró calma.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🤝 Caso 8: el adelanto del patrocinador</h2>
+    <p>Un negocio ofrece adelantar 10.000 lempiras hoy, a cambio de que su logo esté en las fichas <strong>dos años</strong> en vez de uno. No hay contrato de préstamo, ni tasa, ni cuota.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧾 Deuda sin llamarse deuda</span><br>
+      <span>Es dinero de hoy que se paga con <span class="hl">trabajo y espacio de marca de mañana</span>. Si el año de logo se cotiza en 8.000, adelantar 10.000 por dos años equivale a recibir 10.000 y devolver 16.000: <span class="hl2">la tasa está ahí, solo que sin nombre</span>.</span>
+    </div>
+    <p><strong>Lo que enseña la cuenta:</strong> todo lo que se recibe hoy y se paga después es deuda, aunque nadie la llame así. Se le calcula el precio igual, y el precio se mide en <strong>lo que se entrega</strong>: horas, portadas, exclusividad o silencio.</p>
+    <p><strong>La condición con la que sí:</strong> que el segundo año se cotice al precio de ese año y no al de hoy, y que quede por escrito qué no incluye el patrocinio (nada de decidir contenido, ninguna exclusividad sobre otros aliados). Con esas dos líneas, el adelanto es un ingreso; sin ellas, es una hipoteca sobre la marca.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 Las siete preguntas antes de firmar, y las cinco reglas</h2>
+    <p>Ninguna deuda de este proyecto se firma sin que estas siete tengan respuesta escrita:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>¿Cuánto llega de verdad a la cuenta,</strong> después de comisiones, seguro y gastos?</li>
+      <li><strong>¿La tasa es sobre saldos o sobre el monto?</strong></li>
+      <li><strong>¿Cuánto se devuelve en total,</strong> en lempiras, sumando todas las cuotas y los gastos?</li>
+      <li><strong>¿Cuál es la cuota y en qué fecha vence</strong> cada mes?</li>
+      <li><strong>¿Qué pasa si un mes no se paga:</strong> recargo, interés de mora, y a partir de qué día?</li>
+      <li><strong>¿Se puede abonar a capital antes de tiempo</strong> sin penalización?</li>
+      <li><strong>¿Cuánto sube el punto de equilibrio</strong> del proyecto con esta cuota dentro?</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 Las cinco reglas de la deuda</span><br>
+      <span>1. Se firma el <span class="hl">total en lempiras</span>, no la cuota. 2. Cinco palabras antes de todo: <span class="hl">«¿sobre saldos o sobre el monto?»</span>. 3. El plazo reparte, no abarata. 4. La cuota es un fijo nuevo: se recalcula el equilibrio antes de firmar. 5. Solo se debe por algo que <span class="hl2">mete más de lo que el interés saca</span>, y con margen.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas de la deuda</strong>, la hoja de las siete preguntas antes de firmar, un cuadro de amortización de verdad mes por mes, el cuadro en blanco para llenar a lápiz, las ocho ofertas de M.E.T.A.S, seis ejercicios con números y la pauta completa.</p>
+      <a href="../../fichas/ficha-poder-deuda.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con un cuadro de amortización llenado a mano y con el punto de equilibrio del proyecto recalculado con una cuota dentro.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../index.html">💵 Finanzas</a>: aquí viven los fijos del mes. Una cuota se anota como fijo el día que se firma, no el día que se paga.</li>
+      <li><a href="../../misiones/ruta-poder-presupuesto/presupuesto.html">🧾 El presupuesto real</a>: la etapa 2 de esta ruta. El punto de equilibrio que se calculó allá es el que hay que rehacer aquí con la cuota dentro.</li>
+      <li><a href="../../misiones/ruta-poder-activos-pasivos/activos-pasivos.html">💰 Activos y Pasivos</a>: la etapa 1. Una deuda es un pasivo con reloj; lo que se compra con ella decide si valió la pena.</li>
+      <li><a href="../../misiones/ruta-persuasion-marcos/marcos.html">🖼️ Marcos</a>: «¿cuánto puede pagar al mes?» es un marco, y de los mejores puestos. Se sale de él ampliando el recorte: «¿cuánto devuelvo en total?».</li>
+      <li><a href="../../fichas/ficha-poder-deuda.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: el cuadro de amortización en blanco cabe en una página y sirve para cualquier préstamo.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar una oferta de crédito real (la de una tienda, una cooperativa o una financiera del pueblo), llenar con ella <strong>las siete preguntas</strong>, y armar el cuadro de amortización mes por mes hasta que el saldo llegue a cero. La prueba de que está aprendido es poder decir, ante cualquier oferta y en voz alta, <strong>cuánto se devuelve en total y cuántas aulas hacen falta para pagarlo</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">💳</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta del Poder · Etapa 3: La deuda por dentro</div>
+    <div class="diploma-mascot" aria-hidden="true">💳</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">💳</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Nadie firma una deuda por la tasa: la firma por la cuota» 🌱 · 💰 Ruta del Poder · Etapa 3 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/deuda.js"></script>
+</body>
+</html>

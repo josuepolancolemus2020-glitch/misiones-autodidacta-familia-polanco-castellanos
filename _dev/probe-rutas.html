@@ -52,10 +52,10 @@ f.onload = async () => {
     w.switchView('view-rutas'); await esperar(300);
     const cards = d.querySelectorAll('.ruta-card');
     ok(cards.length === 9, '9 rutas en el mapa', 'rutas: ' + cards.length);
-    /* El Poder y la Máquina van por la etapa 2; la Persuasión, la Marca, el
+    /* La Máquina va por la etapa 2; la Persuasión, la Marca, el Poder, el
        Poder Político y la Casa Cerrada por la 3. Si alguna se queda corta es
        que la misión nueva no llegó al catálogo. */
-    [['Ruta de la Persuasión', 3], ['Ruta de la Marca', 3], ['Ruta del Poder', 2],
+    [['Ruta de la Persuasión', 3], ['Ruta de la Marca', 3], ['Ruta del Poder', 3],
      ['Ruta de la Máquina que Predice', 2], ['Ruta del Poder Político', 3],
      ['Ruta de la Casa Cerrada', 3]].forEach(([nombre, tocables]) => {
       const r = [...cards].find(c => (c.querySelector('.ruta-nombre') || {}).textContent === nombre);

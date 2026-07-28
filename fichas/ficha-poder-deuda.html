@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Ruta del Poder · Etapa 3: La deuda por dentro</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #7f1d1d; --pri-suave: #fef2f2; --sec: #115e59; --sec-suave: #f0fdfa; }
+  .guion li { margin: 5px 0; }
+  table.tres th:nth-child(1) { width: 26%; }
+  table.tres th:nth-child(2), table.tres th:nth-child(3) { width: 25%; }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .mini { font-size: 12px; color: var(--gris); }
+  table.amort { font-size: 10.5px; }
+  table.amort td, table.amort th { text-align: right; padding: 2px 5px; line-height: 1.25; }
+  table.amort td:first-child, table.amort th:first-child { text-align: center; width: 8%; }
+  table.amort tr:last-child td { font-weight: 800; background: var(--sec-suave); }
+  table.blanco td { height: 14px; }
+  table.ofertas { font-size: 11.5px; }
+  table.ofertas th:nth-child(1) { width: 22%; }
+  table.ofertas th:nth-child(2) { width: 36%; }
+  table.audit td:nth-child(1) { width: 6%; text-align: center; }
+  table.audit td:nth-child(3), table.audit td:nth-child(4) { width: 16%; text-align: center; height: 22px; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/ruta-poder-deuda/deuda.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · La deuda por dentro</div>
+    <div class="f-meta"><b>Ruta:</b> 💰 Ruta del Poder · Etapa 3 de 6 · <b>Materia:</b> Poder Económico</div>
+    <div class="f-meta"><b>Tema:</b> capital, interés sobre saldos y sobre el monto, plazo, cuota, comisiones y mora, con el cuadro de amortización mes por mes y la hoja de las siete preguntas antes de firmar.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Decir, ante cualquier oferta de crédito, <b>cuánto se devuelve en total, en lempiras</b>, y no solo cuánto es la cuota.</li>
+    <li>Distinguir un interés cobrado <b>sobre saldos</b> de uno cobrado <b>sobre el monto</b>, y saber cuánto cuesta la diferencia.</li>
+    <li>Armar y leer un <b>cuadro de amortización</b> mes por mes hasta que el saldo llegue a cero.</li>
+    <li>Recalcular el <b>punto de equilibrio</b> del proyecto con la cuota dentro, antes de firmar.</li>
+    <li>Reconocer las deudas que no se llaman deudas: cuotas «sin intereses», fiado y adelantos.</li>
+  </ol>
+
+  <h2>💳 La frase maestra</h2>
+  <div class="caja">
+    <p><b>Nadie firma una deuda por la tasa: la firma por la cuota.</b> Por eso la primera pregunta del que presta casi nunca es «¿para qué lo necesitas?», sino <b>«¿cuánto puede pagar al mes?»</b>. Con esa respuesta se arma un plazo que haga caber la cuota, y el precio del dinero deja de discutirse.</p>
+    <p class="mini">No hay engaño en eso: la cuota es real y el plazo también. Lo que falta es el número que los ata, y ese número no aparece si no se pide.</p>
+  </div>
+
+  <h2>🚨 La señal de alarma de esta etapa</h2>
+  <div class="caja caja-amb">
+    <p><b>Cuando la conversación gira alrededor de cuánto cabe en tu mes y no de cuánto cuesta el dinero, te están vendiendo el plazo, no el préstamo.</b></p>
+    <p>La salida es devolver la conversación a la cifra que compara: <b>«¿cuánto devuelvo en total?»</b>. Una oferta que no puede responder eso todavía no es una oferta.</p>
+    <p class="mini">Y hay una respuesta educada para la pregunta que la produce: «depende de cuánto me preste y por cuánto tiempo». Devuelve la conversación a su sitio sin discutir con nadie.</p>
+  </div>
+
+  <h2>⚖️ Las dos cifras que nunca coinciden</h2>
+  <p>La <b>cuota</b> es lo que se paga cada mes: la cifra cómoda, la que se compara con el sueldo, la que baja sola con solo alargar el plazo. El <b>costo total</b> es todo lo devuelto menos lo recibido: la cifra incómoda, la que sube cuando la cuota baja, y la única que permite comparar dos ofertas distintas.</p>
+  <p class="mini">Las dos hacen falta. El error no es mirar la cuota: es mirar <b>solo</b> la cuota.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 1 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>🔢 El juego de números de esta ficha</h2>
+  <div class="caja">
+    <ul>
+      <li><b>El préstamo:</b> 12.000 lempiras, 12 meses, abono fijo a capital de 1.000 al mes.</li>
+      <li><b>Sobre saldos al 2% mensual:</b> 1.560 de intereses, total devuelto 13.560.</li>
+      <li><b>Sobre el monto al 2% mensual:</b> 2.880 de intereses, total devuelto 14.880.</li>
+      <li><b>La primera cuota es 1.240 en las dos.</b> Ahí está toda la lección.</li>
+      <li><b>El desembolso:</b> de 20.000 aprobados llegan 18.750, y los intereses corren sobre 20.000.</li>
+      <li><b>Los fijos de M.E.T.A.S:</b> 750 al mes. Margen por aula: 100. Equilibrio: 8 aulas. Aulas de hoy: 6.</li>
+    </ul>
+  </div>
+  <p class="mini">Las cifras en lempiras son realistas pero inventadas, puestas para que la cuenta se pueda hacer a lápiz. Las tasas y comisiones de verdad se piden por escrito antes de decidir nada. Lo que sí es real es el método.</p>
+
+  <h2>🧩 Las siete piezas de una deuda</h2>
+  <table>
+    <tr><th>Pieza</th><th>Qué mide</th><th>Dónde engaña</th></tr>
+    <tr><td><b>1. El capital</b></td><td>El dinero prestado que llegó a la cuenta</td><td>Cuando se toma el monto aprobado por el recibido</td></tr>
+    <tr><td><b>2. La tasa</b></td><td>El precio del dinero por unidad de tiempo</td><td>Cuando no se dice sobre qué monto se aplica</td></tr>
+    <tr><td><b>3. El plazo</b></td><td>Los meses que dura la deuda</td><td>Porque baja la cuota y parece que abarata</td></tr>
+    <tr><td><b>4. La cuota</b></td><td>Capital más interés, cada mes</td><td>Porque es la cifra cómoda y la única que enseñan</td></tr>
+  </table>
+  <table>
+    <tr><th>Pieza</th><th>Qué mide</th><th>Dónde engaña</th></tr>
+    <tr><td><b>5. Comisiones y seguro</b></td><td>Lo que se descuenta antes de recibir</td><td>Porque no aparece en la cuota</td></tr>
+    <tr><td><b>6. El costo total</b></td><td>Todo lo devuelto menos lo recibido</td><td>Cuando nadie lo calcula porque nadie lo pide</td></tr>
+    <tr><td><b>7. La mora</b></td><td>Recargo e interés por pagar tarde</td><td>Porque parece proporcional y crece más rápido</td></tr>
+  </table>
+
+  <div class="caja caja-amb">
+    <p><b>La pieza que ordena a las demás es la sexta.</b> Capital, tasa, plazo, cuota y comisiones son datos; el costo total es <b>la conclusión</b>. Una oferta se compara con otra por la conclusión, nunca por los datos sueltos, porque cada prestamista elige qué dato enseñar.</p>
+  </div>
+
+<h2>📉 Sobre saldos o sobre el monto: cinco palabras que valen dinero</h2>
+  <p>Es la distinción más rentable de toda la etapa y cabe en una pregunta de cinco palabras: <b>«¿sobre saldos o sobre el monto?»</b>.</p>
+
+  <h3>Interés sobre saldos</h3>
+  <p>Cada mes se cobra el porcentaje <b>sobre lo que todavía se debe</b>. Como el saldo baja, el interés baja con él. Es la forma honesta de cobrar por el dinero: se paga por lo que se tiene prestado, no por lo que ya se devolvió.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h3>Interés sobre el monto, o tasa plana</h3>
+  <p>Se cobra el porcentaje <b>sobre el préstamo original todos los meses</b>, hasta el último. En el mes doce se sigue pagando interés por dinero devuelto hace once meses. Suena igual de baja porque el porcentaje es el mismo número.</p>
+
+  <div class="caja">
+    <p><b>La regla del doble.</b> Una tasa cobrada sobre el monto cuesta <b>casi el doble</b> que la misma tasa cobrada sobre saldos. La cuenta exacta es sencilla: multiplica la tasa plana por dos y te quedas corto por poco.</p>
+    <p class="mini">En el préstamo de esta ficha la relación es 2.880 contra 1.560, es decir 1,85 veces. Cuanto más largo el plazo, más se acerca al doble exacto.</p>
+  </div>
+
+  <h2>🎭 Por qué la trampa es tan buena</h2>
+  <p>Porque el primer recibo no distingue nada. Estas son las cuotas del mismo préstamo de 12.000 a doce meses, cobrado de las dos formas:</p>
+  <table class="tres">
+    <tr><th>Mes</th><th>Cuota sobre saldos</th><th>Cuota plana</th></tr>
+    <tr><td>Mes 1</td><td>1.240</td><td>1.240</td></tr>
+    <tr><td>Mes 6</td><td>1.140</td><td>1.240</td></tr>
+    <tr><td>Mes 12</td><td>1.020</td><td>1.240</td></tr>
+    <tr><td><b>Total devuelto</b></td><td><b>13.560</b></td><td><b>14.880</b></td></tr>
+  </table>
+  <div class="caja caja-amb">
+    <p><b>El primer recibo es el mismo. El último dice la verdad.</b> La diferencia son 1.320 lempiras, un 11% del préstamo, y se paga entera por no haber dicho cinco palabras.</p>
+  </div>
+  <p class="mini">Cómo se detecta sin preguntar: si <b>todas</b> las cuotas son iguales hasta el final y el contrato no trae cuadro de amortización, casi siempre es tasa plana. Si las cuotas bajan mes a mes, es sobre saldos.</p>
+
+<h2>📋 Un cuadro de amortización de verdad, mes por mes</h2>
+  <p>Este es el documento que hay que pedir siempre, y que nadie niega cuando se pide. Préstamo de <b>12.000 lempiras</b>, <b>12 meses</b>, <b>2% mensual sobre saldos</b>, con abono fijo a capital de 1.000.</p>
+  <table class="amort">
+    <tr><th>Mes</th><th>Saldo inicial</th><th>Interés (2%)</th><th>Abono a capital</th><th>Cuota</th><th>Saldo final</th></tr>
+    <tr><td>1</td><td>12.000</td><td>240</td><td>1.000</td><td>1.240</td><td>11.000</td></tr>
+    <tr><td>2</td><td>11.000</td><td>220</td><td>1.000</td><td>1.220</td><td>10.000</td></tr>
+    <tr><td>3</td><td>10.000</td><td>200</td><td>1.000</td><td>1.200</td><td>9.000</td></tr>
+    <tr><td>4</td><td>9.000</td><td>180</td><td>1.000</td><td>1.180</td><td>8.000</td></tr>
+    <tr><td>5</td><td>8.000</td><td>160</td><td>1.000</td><td>1.160</td><td>7.000</td></tr>
+    <tr><td>6</td><td>7.000</td><td>140</td><td>1.000</td><td>1.140</td><td>6.000</td></tr>
+    <tr><td>7</td><td>6.000</td><td>120</td><td>1.000</td><td>1.120</td><td>5.000</td></tr>
+    <tr><td>8</td><td>5.000</td><td>100</td><td>1.000</td><td>1.100</td><td>4.000</td></tr>
+    <tr><td>9</td><td>4.000</td><td>80</td><td>1.000</td><td>1.080</td><td>3.000</td></tr>
+    <tr><td>10</td><td>3.000</td><td>60</td><td>1.000</td><td>1.060</td><td>2.000</td></tr>
+    <tr><td>11</td><td>2.000</td><td>40</td><td>1.000</td><td>1.040</td><td>1.000</td></tr>
+    <tr><td>12</td><td>1.000</td><td>20</td><td>1.000</td><td>1.020</td><td>0</td></tr>
+    <tr><td>Σ</td><td>&nbsp;</td><td>1.560</td><td>12.000</td><td>13.560</td><td>&nbsp;</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 3 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <h3>Lo que enseña el cuadro de un vistazo</h3>
+  <ul>
+    <li>La columna que importa es <b>Interés</b>, y su suma es el precio del préstamo: 1.560 lempiras por usar 12.000 durante un año.</li>
+    <li><b>Abonar a capital vale más al principio:</b> un abono en el mes 1 borra once meses de interés; el mismo abono en el mes 11 borra uno.</li>
+    <li>El saldo llega a cero exactamente en el mes 12. Si no llega, la cuenta está mal o hay un cobro que no se declaró.</li>
+  </ul>
+
+  <h2>📐 El cuadro en blanco, para cualquier préstamo</h2>
+  <p class="mini">Se llena con la oferta delante. Interés = saldo inicial × tasa del mes. Cuota = interés + abono. Saldo final = saldo inicial − abono. Si la última fila no deja el saldo en cero, la oferta tiene algo que no se declaró.</p>
+  <table class="amort blanco">
+    <tr><th>Mes</th><th>Saldo inicial</th><th>Interés</th><th>Abono a capital</th><th>Cuota</th><th>Saldo final</th></tr>
+    <tr><td>1</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>2</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>3</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>4</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>5</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>6</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>7</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>8</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>9</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>10</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>11</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>12</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>Σ</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+  </table>
+
+<h2>📅 El plazo reparte, no abarata</h2>
+  <p>El mismo préstamo de 12.000 al 2% mensual sobre saldos, cambiando solo el plazo:</p>
+  <table class="tres plazos">
+    <tr><th>Plazo</th><th>Primera cuota</th><th>Intereses</th><th>Total devuelto</th></tr>
+    <tr><td>12 meses</td><td>1.240</td><td>1.560</td><td>13.560</td></tr>
+    <tr><td>24 meses</td><td>740</td><td>3.000</td><td>15.000</td></tr>
+    <tr><td>36 meses</td><td>573</td><td>4.440</td><td>16.440</td></tr>
+  </table>
+  <div class="caja">
+    <p>Pasar de doce a veinticuatro meses baja la cuota <b>500 lempiras</b> y sube el total <b>1.440</b>. Cada año de plazo extra cuesta, en este préstamo, unos 1.440 lempiras. El alivio es real; el precio también.</p>
+    <p class="mini">Regla práctica: se pide <b>el plazo más corto que el mes aguante</b>, y se comprueba con el total, no con la cuota. Y el plazo nunca dura más que la vida útil de lo que se compró: pagar tres años por un teléfono que dura dos es pagar por algo que ya no existe.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <h2>✂️ Del monto aprobado al monto que llega</h2>
+  <p>Lo que se firma es el monto aprobado. Lo que se recibe es otra cosa:</p>
+  <table class="tres">
+    <tr><th>Concepto</th><th>Lempiras</th><th>Nota</th></tr>
+    <tr><td>Monto aprobado</td><td>20.000</td><td>Es lo que dice la carta</td></tr>
+    <tr><td>Comisión de administración (3%)</td><td>600</td><td>Se descuenta antes</td></tr>
+    <tr><td>Seguro de deuda</td><td>400</td><td>Preguntar quién es el beneficiario</td></tr>
+    <tr><td>Gastos de papelería</td><td>250</td><td>Casi nunca se menciona</td></tr>
+    <tr><td><b>Llega a la cuenta</b></td><td><b>18.750</b></td><td>Y los intereses corren sobre 20.000</td></tr>
+  </table>
+  <p class="mini">Consecuencia práctica: el préstamo se pide por <b>lo que hace falta más los descuentos</b>, para que lo que llegue alcance para comprar lo que se iba a comprar.</p>
+
+  <h2>⏰ La mora no es un castigo proporcional</h2>
+  <div class="caja caja-amb">
+    <p>Con un recargo de 200 por cuota vencida y 5% mensual sobre lo vencido, tres meses de atraso sobre cuotas de 1.240 no dejan una deuda de 3.720: dejan cerca de <b>4.570</b>, y el historial dañado encima.</p>
+    <p><b>Qué se hace en su lugar:</b> se avisa <b>antes</b> del vencimiento y se pide reprogramar por escrito. Casi siempre existe la opción y casi nunca la ofrecen.</p>
+  </div>
+
+  <h2>🔍 El glosario de la letra pequeña</h2>
+  <p class="mini">Los contratos no mienten: usan sus propias palabras. Estas son las que hay que reconocer.</p>
+  <table>
+    <tr><th>Como lo escriben</th><th>Qué significa de verdad</th></tr>
+    <tr><td>Saldo insoluto, capital adeudado</td><td>Lo que todavía se debe: es la base honesta del interés</td></tr>
+    <tr><td>Interés sobre monto original</td><td>Tasa plana: la que cuesta casi el doble</td></tr>
+    <tr><td>Tasa nominal / tasa efectiva anual</td><td>La nominal es el número del cartel; la efectiva es lo que cuesta el año con todo dentro, y es la que compara</td></tr>
+    <tr><td>Seguro de saldo deudor</td><td>Se descuenta antes; hay que preguntar beneficiario y cobertura</td></tr>
+  </table>
+  <table>
+    <tr><th>Como lo escriben</th><th>Qué significa de verdad</th></tr>
+    <tr><td>Penalización por pago anticipado</td><td>Multa por abonar a capital antes de tiempo: cambia toda la cuenta</td></tr>
+    <tr><td>Cláusula de vencimiento anticipado</td><td>Si te atrasas, pueden exigir todo el saldo de una vez</td></tr>
+  </table>
+  <p class="mini">Regla corta para toda la letra pequeña: <b>lo que no se entiende al firmar no mejora después</b>. Si una palabra del contrato no se entiende, se pregunta y se anota la respuesta al margen, con la fecha y el nombre de quien la dio.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <h2>📝 La hoja de las siete preguntas antes de firmar</h2>
+  <p>Se llena con la oferta delante y en frío. Ninguna deuda de esta casa se firma con casillas vacías.</p>
+  <table class="audit">
+    <tr><th>#</th><th>La pregunta</th><th>Respuesta</th><th>¿Por escrito?</th></tr>
+    <tr><td>1</td><td>¿Cuánto llega de verdad a la cuenta, ya descontado todo?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>2</td><td>¿La tasa es sobre saldos o sobre el monto?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>3</td><td>¿Cuánto se devuelve en total, sumando cuotas y gastos?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>4</td><td>¿Cuál es la cuota y qué día vence cada mes?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>5</td><td>¿Qué pasa si un mes no se paga, y desde qué día?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>6</td><td>¿Se puede abonar a capital antes de tiempo sin penalización?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+    <tr><td>7</td><td>¿Cuánto sube el punto de equilibrio con esta cuota dentro?</td><td>&nbsp;</td><td>Sí / No</td></tr>
+  </table>
+  <p class="mini">Las seis primeras las contesta quien presta. La séptima la contestas tú, y es la única que no aparece en ningún contrato.</p>
+
+  <h2>⚖️ La cuota es un costo fijo nuevo</h2>
+  <p>El día que se firma, la cuota entra en los fijos del mes, igual que el dominio. Y los fijos deciden cuánto volumen hace falta para no perder:</p>
+  <table class="tres">
+    <tr><th>&nbsp;</th><th>Sin la deuda</th><th>Con la cuota de 1.240</th></tr>
+    <tr><td>Fijos del mes</td><td>750</td><td>1.990</td></tr>
+    <tr><td>Margen por aula</td><td>100</td><td>100</td></tr>
+    <tr><td><b>Punto de equilibrio</b></td><td><b>8 aulas</b></td><td><b>20 aulas</b></td></tr>
+    <tr><td>Aulas de hoy</td><td>6</td><td>6</td></tr>
+  </table>
+  <div class="caja">
+    <p><b>Una deuda se paga con volumen que todavía no existe</b>, y ese es el riesgo entero. Si el plan depende de conseguir catorce aulas en doce meses, no es un plan: es una apuesta con fecha de vencimiento.</p>
+    <p class="mini">Y hay un costo que no está en la tabla: mientras dura la deuda, el proyecto ya no puede decir que no a un trabajo que no le conviene, porque la cuota vence el día cinco. Endeudarse es también <b>vender parte de la libertad de los próximos meses</b>.</p>
+  </div>
+
+  <h2>🌱 Deuda que produce y deuda que solo pesa</h2>
+  <p>Toda deuda saca dinero todos los meses, sin excepción. Lo que decide si vale la pena son tres preguntas, y hay que poder contestar las tres que sí:</p>
+  <ol>
+    <li>¿Lo que compro <b>mete dinero</b>, y ya empezó a meterlo, o solo está prometido?</li>
+    <li>¿Mete <b>más de lo que el interés saca</b>, y con margen, o la cuenta sale justa?</li>
+    <li>Si ese ingreso se retrasa tres meses, ¿la cuota se puede pagar igual?</li>
+  </ol>
+  <p class="mini">Si alguna respuesta es «no», la deuda no es mala: es <b>prematura</b>. Casi siempre la salida no es dejar de comprar, sino comprar más tarde o más pequeño.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h2>🗣️ El guion: qué decir en el mostrador</h2>
+  <p>Seis frases, en este orden. Ninguna es agresiva y las seis se contestan con datos que ya están en el sistema de quien presta.</p>
+  <ol class="guion">
+    <li>«Antes de la cuota: ¿cuánto llega a mi cuenta y cuánto devuelvo en total?»</li>
+    <li>«¿El interés es sobre saldos o sobre el monto?»</li>
+    <li>«¿Me imprime el cuadro de amortización mes por mes?»</li>
+    <li>«¿Puedo abonar a capital antes de tiempo sin penalización?»</li>
+    <li>«¿Qué pasa si un mes me atraso, y desde qué día empieza a correr?»</li>
+    <li>«Gracias. Lo decido mañana.»</li>
+  </ol>
+  <p class="mini">La sexta es la más importante y la única que no pide información. Si la oferta se cae por esperar un día, la prisa era el producto. Y si alguna de las cinco primeras incomoda, eso también es información: son datos que cualquier prestamista serio tiene a mano.</p>
+
+<h2>💳 Las ocho ofertas que le pueden tocar la puerta a M.E.T.A.S</h2>
+  <p class="mini">En cada una: la cuenta que hay que hacer y la condición con la que sí se aceptaría.</p>
+
+  <table class="ofertas">
+    <tr><th>La oferta</th><th>La cuenta</th><th>La condición con la que sí</th></tr>
+    <tr><td><b>1 ·</b> La laptop en 24 cuotas «sin intereses»</td><td>24 × 1.150 = <b>27.600</b>, y al contado 20.000: <b>7.600 de sobreprecio</b>, un 38% escondido en el precio de lista</td><td>Que la tienda escriba el precio de contado al lado. Si la diferencia supera lo que cobra una cooperativa por el mismo dinero, se compra de contado</td></tr>
+    <tr><td><b>2 ·</b> Dos ofertas al «2% mensual»</td><td><b>1.560</b> sobre saldos contra <b>2.880</b> sobre el monto, y la misma primera cuota de 1.240 en las dos</td><td>Que el contrato diga «sobre saldos» con letras y traiga el cuadro de amortización. Si solo dan la cuota, se decide mañana</td></tr>
+    <tr><td><b>3 ·</b> La cuota que mueve el equilibrio</td><td>Los fijos pasan de 750 a <b>1.990</b> y el equilibrio de ocho aulas a <b>veinte</b>. Hoy hay seis</td><td>Que las aulas que faltan estén comprometidas por escrito, o que la cuota se cubra con los ingresos de hoy sin ellas</td></tr>
+    <tr><td><b>4 ·</b> Aprobado 20.000, llegan 18.750</td><td><b>1.250</b> de comisión, seguro y gastos se descuentan antes, pero los intereses corren sobre 20.000</td><td>Que los descuentos vengan sumados en lempiras antes de firmar, y pedir por lo que hace falta más los descuentos</td></tr>
+  </table>
+
+  <table class="ofertas">
+    <tr><th>La oferta</th><th>La cuenta</th><th>La condición con la que sí</th></tr>
+    <tr><td><b>5 ·</b> 15.000 para la laptop o 15.000 para tapar el mes</td><td>Mismo monto, misma tasa: los dos <b>sacan lo mismo</b>, y solo uno compra algo que mete</td><td>Que lo comprado tenga un ingreso ya empezado, no prometido. Un mes flojo se arregla recortando o cobrando antes</td></tr>
+    <tr><td><b>6 ·</b> La cuota que se atrasó tres meses</td><td>3.720 de cuotas se vuelven cerca de <b>4.570</b> con recargos y mora, más el historial dañado</td><td>Avisar <b>antes</b> del vencimiento y pedir la reprogramación por escrito. Casi siempre existe y casi nunca la ofrecen</td></tr>
+    <tr><td><b>7 ·</b> La refinanciación que «alivia»</td><td>500 lempiras menos al mes cuestan <b>1.440</b> más de intereses y doce meses más atado</td><td>Que el aire comprado sirva para cambiar la situación, no solo para que el mes se sienta cómodo</td></tr>
+    <tr><td><b>8 ·</b> El adelanto del patrocinador</td><td>10.000 hoy por dos años de logo: si el año vale 8.000, es recibir 10.000 y <b>devolver 16.000</b></td><td>Cotizar el segundo año al precio de ese año y escribir qué no incluye: ni decidir contenido, ni exclusividad</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 7 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
+<section class="pagina">
+  <div class="caja caja-amb reglas">
+    <h3>🔑 Las cinco reglas de la deuda</h3>
+    <ol>
+      <li>Se firma <b>el total en lempiras</b>, no la cuota.</li>
+      <li>Cinco palabras antes de todo: <b>«¿sobre saldos o sobre el monto?»</b>.</li>
+      <li>El <b>plazo reparte, no abarata</b>: cada año extra tiene precio.</li>
+      <li>La cuota es un <b>fijo nuevo</b>: se recalcula el equilibrio antes de firmar.</li>
+      <li>Solo se debe por algo que <b>meta más de lo que el interés saca</b>, y con margen.</li>
+    </ol>
+  </div>
+
+  <h2>🧯 Si la deuda ya está firmada: cuatro movimientos</h2>
+  <ol>
+    <li><b>Listarlas todas</b> en una hoja: a quién, cuánto falta, qué tasa y sobre qué se calcula.</li>
+    <li><b>Pagar el mínimo en todas y atacar la más cara</b>, no la más grande ni la del que más presiona.</li>
+    <li><b>Abonar a capital en cuanto sobre</b>, y cuanto antes mejor.</li>
+    <li><b>Antes de refinanciar, escribir qué va a cambiar</b> con el aire que se compra.</li>
+  </ol>
+  <p class="mini">La regla que no se rompe: <b>una deuda no se paga con otra más cara</b>. Eso no es reordenar, es aplazar con recargo, y así empiezan las bolas de nieve que acaban con un proyecto familiar. Y antes de pedir la siguiente, se comprueba que la anterior esté pagada o que las dos juntas quepan en el punto de equilibrio.</p>
+
+<h2>✏️ Ejercicios para hacer a lápiz</h2>
+  <p class="mini">Las respuestas están en la pauta de la página siguiente. Hazlos primero.</p>
+
+  <div class="caja ej1">
+    <h3>Ejercicio 1 · Capital o interés</h3>
+    <p>Marca <b>C</b> si baja la deuda y <b>I</b> si es el precio del dinero:</p>
+    <ol>
+      <li>Los 12.000 que llegaron a la cuenta. ____</li>
+      <li>Los 240 del primer mes. ____</li>
+      <li>El abono de 1.000. ____</li>
+      <li>El recargo por pagar tarde. ____</li>
+    </ol>
+  </div>
+
+  <div class="caja ej2">
+    <h3>Ejercicio 2 · Sobre saldos o sobre el monto</h3>
+    <p>Un préstamo de <b>8.000 lempiras</b> al <b>3% mensual</b> a <b>10 meses</b>, con abono fijo a capital de 800.</p>
+    <ol>
+      <li>¿Cuántos intereses son cobrados sobre saldos? ______</li>
+      <li>¿Y cobrados sobre el monto? ______</li>
+      <li>¿Cuánto vale la diferencia, y cuál es la primera cuota en cada caso? ______</li>
+    </ol>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 8 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <div class="caja ej3">
+    <h3>Ejercicio 3 · El plazo</h3>
+    <p>El mismo préstamo de 8.000 al 3% sobre saldos, ahora a <b>20 meses</b> con abono de 400.</p>
+    <ol>
+      <li>¿Cuál es la primera cuota? ______</li>
+      <li>¿Cuántos intereses se pagan en total? ______</li>
+      <li>¿Cuánto bajó la cuota y cuánto subió el total frente a los 10 meses? ______</li>
+    </ol>
+  </div>
+
+  <div class="caja ej4">
+    <h3>Ejercicio 4 · El desembolso</h3>
+    <p>Aprueban <b>15.000</b>, con 4% de comisión, 300 de seguro y 200 de gastos.</p>
+    <ol>
+      <li>¿Cuánto llega a la cuenta? ______</li>
+      <li>Si hacen falta 15.000 netos, ¿por cuánto hay que pedir el préstamo? ______</li>
+    </ol>
+  </div>
+
+  <div class="caja ej5">
+    <h3>Ejercicio 5 · El equilibrio con la cuota dentro</h3>
+    <p>Fijos de 750, margen por aula de 100, y una cuota nueva de <b>640</b> al mes.</p>
+    <ol>
+      <li>¿Cuáles son los fijos ahora? ______</li>
+      <li>¿Cuál es el punto de equilibrio? ______</li>
+      <li>¿Cuántas aulas más que las ocho de antes? ______</li>
+    </ol>
+  </div>
+
+  <div class="caja ej6">
+    <h3>Ejercicio 6 · La oferta a cuotas</h3>
+    <p>Un proyector en <b>18 cuotas de 900</b>. Al contado cuesta <b>12.500</b>.</p>
+    <ol>
+      <li>¿Cuánto se paga en total? ______</li>
+      <li>¿Cuál es el sobreprecio, en lempiras y en porcentaje? ______</li>
+      <li>¿Qué pregunta hay que hacer antes de decidir? ______</li>
+    </ol>
+  </div>
+
+<h2>✅ Pauta completa de respuestas</h2>
+
+  <div class="pauta pa1">
+    <h3>Ejercicio 1 · Capital o interés</h3>
+    <ol>
+      <li>Los 12.000 que llegaron: <b>C</b>. Es el dinero prestado.</li>
+      <li>Los 240 del primer mes: <b>I</b>. Es el 2% de 12.000 y no baja el saldo.</li>
+      <li>El abono de 1.000: <b>C</b>. Es la única parte de la cuota que reduce la deuda.</li>
+      <li>El recargo por pagar tarde: <b>I</b>. Es precio, no deuda: no baja nada.</li>
+    </ol>
+    <p class="mini">La prueba para dudas: ¿hace que el saldo del mes siguiente sea menor? Si no, es interés.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 9 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <div class="pauta pa2">
+    <h3>Ejercicio 2 · Sobre saldos o sobre el monto</h3>
+    <ol>
+      <li>Sobre saldos: los intereses van bajando de 240 a 24, y suman <b>1.320 lempiras</b>.</li>
+      <li>Sobre el monto: 8.000 × 3% × 10 = <b>2.400 lempiras</b>.</li>
+      <li>La diferencia son <b>1.080</b>, y la primera cuota es <b>1.040 en los dos casos</b>.</li>
+    </ol>
+    <p class="mini">Que la primera cuota vuelva a coincidir no es casualidad: pasa siempre que el abono a capital es fijo.</p>
+  </div>
+
+  <div class="pauta pa3">
+    <h3>Ejercicio 3 · El plazo</h3>
+    <ol>
+      <li>Primera cuota: 400 de capital más 240 de interés = <b>640 lempiras</b>.</li>
+      <li>Intereses totales: <b>2.520 lempiras</b>.</li>
+      <li>La cuota bajó <b>400</b> (de 1.040 a 640) y el total subió <b>1.200</b> (de 9.320 a 10.520).</li>
+    </ol>
+  </div>
+
+  <div class="pauta pa4">
+    <h3>Ejercicio 4 · El desembolso</h3>
+    <ol>
+      <li>Descuentos: 600 de comisión + 300 + 200 = 1.100. Llegan <b>13.900 lempiras</b>.</li>
+      <li>Hay que pedir unos <b>16.150</b>: 16.150 menos 4% (646) menos 500 deja 15.004.</li>
+    </ol>
+    <p class="mini">Se acepta cualquier respuesta entre 16.100 y 16.200: lo que se corrige es que se haya pedido de más a propósito, no el redondeo.</p>
+  </div>
+
+  <div class="pauta pa5">
+    <h3>Ejercicio 5 · El equilibrio con la cuota dentro</h3>
+    <ol>
+      <li>Fijos: 750 + 640 = <b>1.390 lempiras</b>.</li>
+      <li>Equilibrio: 1.390 ÷ 100 = 13,9, que se redondea hacia arriba: <b>14 aulas</b>.</li>
+      <li>Seis aulas más que antes.</li>
+    </ol>
+    <p class="mini">Fíjate en lo que hizo una cuota «pequeña»: 640 lempiras al mes se convirtieron en <b>seis aulas más</b> de trabajo obligatorio durante todo el plazo.</p>
+  </div>
+
+  <div class="pauta pa6">
+    <h3>Ejercicio 6 · La oferta a cuotas</h3>
+    <ol>
+      <li>18 × 900 = <b>16.200 lempiras</b>.</li>
+      <li>16.200 − 12.500 = <b>3.700 de sobreprecio</b>, un <b>29,6%</b> sobre el precio de contado.</li>
+      <li>La pregunta es el precio de contado. Sin él no hay tasa que calcular ni oferta que comparar.</li>
+    </ol>
+    <p class="mini">Y una segunda, que vale para toda la ficha: <b>¿cuánto devuelvo en total?</b> Con esas dos, ninguna de las ocho ofertas puede esconder su precio.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>💰 Ruta del Poder · Etapa 3 · Página 10 de 10</span></div>
+</section>
+
+
+</div>
+</body>
+</html>
