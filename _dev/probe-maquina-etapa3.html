@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Máquina que Predice, etapa 3</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-maquina-verificar/verificar.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 3 de la Ruta de la Máquina que Predice: bancos,
+   laboratorio, pruebas impresas con su nombre, los ocho casos con lo que
+   enseñan, que los cinco reales estén contados con sus cifras, la ficha y la
+   ruta con TRES etapas.
+
+   Y una comprobación que se le debe al tema de esta misión: la sonda se
+   escribió mirando primero que fallara con la misión sin terminar. Una
+   comprobación que nunca se ha visto en rojo no se sabe si funciona. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try { appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Máquina que Predice · Etapa 3 de 6/.test(d.body.textContent), 'se presenta como etapa 3 de 6', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se busca el VOCABULARIO propio de la etapa 2, no la
+       palabra «encargo», que aparece a propósito porque esta etapa se apoya en
+       la anterior. Lo que no puede quedar es su temario. */
+    ok(!/hoja de encargo|siete casillas|petición y el encargo|colección de encargos/i.test(d.body.textContent),
+       'sin restos de la etapa de la que se copió', 'queda el temario de Pedir bien');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('Object.keys(parteData).join(",")') === 'leer,riesgo,fuente,firma', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas de la verificación', 'piezas: ' + dentro('timelineData.length'));
+    ok(/faro_ia_verificar/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LA POSTURA ANTE LA RESPUESTA ──');
+    const texto = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/no sabe que no sabe/i.test(texto), 'explica por qué la máquina no distingue', 'no explica que no sabe que no sabe');
+    ok(/dato falso bien escrito/i.test(texto), 'nombra el error peligroso', 'no distingue el disparate del dato falso');
+    ok(/palabras propias/i.test(texto), 'trae la señal de alarma', 'falta la prueba de las palabras propias');
+    ok(/comprobar por fuera|por fuera/i.test(texto), 'manda comprobar por fuera', 'no aparece la comprobación por fuera');
+    ok(/qué pasa si está mal/i.test(texto), 'la escala de riesgo tiene su criterio', 'no dice qué decide cuánto verificar');
+    ok(/omisión/i.test(texto), 'incluye la omisión entre los errores', 'no habla de la omisión');
+    ok(/complacencia/i.test(texto), 'avisa de la complacencia', 'no avisa de que la máquina te da la razón');
+    ok(/quien entrega/i.test(texto) && /firma/i.test(texto), 'la firma es de quien entrega', 'no deja clara la firma');
+    /* Esta etapa se apoya en las dos anteriores a propósito */
+    ok(/predice|predecir/i.test(texto), 'conecta con la etapa 1 (el modelo predice)', 'no conecta con la etapa 1');
+    ok(/encargo/i.test(texto), 'conecta con la etapa 2 (el encargo)', 'no conecta con la etapa 2');
+
+    log('\n── LOS CASOS REALES ESTÁN CONTADOS CON SUS CIFRAS ──');
+    ok(/226/.test(texto) && /252/.test(texto), 'el caso de los milímetros trae los dos números', 'faltan los 226 o los 252');
+    ok(/9,5/.test(texto), 'y la letra que se encogió', 'no dice a cuánto se encogió la letra');
+    ok(/using \(true\)/.test(texto), 'la política se cita tal como estaba escrita', 'no aparece using (true)');
+    ok(/veintiuna misiones|21 misiones/i.test(texto), 'el alcance de la herramienta está dicho', 'no dice cuántas misiones tocaba');
+    ok(/trescientas copias|300 copias/i.test(texto), 'la ficha de riesgo alto tiene su número', 'no dice cuántas copias');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/Leer entero/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en leer entero', 'abre en otra pieza');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'la firma al pie se genera', 'prueba competencial vacía');
+    const rotulos = d.getElementById('eval-screen-title').textContent + d.getElementById('evalcrit-screen-title').textContent +
+                    d.getElementById('evalOut').textContent + crit + d.querySelectorAll('.eval-print-header')[0].textContent;
+    ok(!/Las seis palancas|Panorama|La puerta de la casa digital|Los datos de los demás|Quién decide de verdad|Para quién y qué le cambia|El presupuesto real|La deuda por dentro|Pedir bien|El encargo que se escribe|La cuenta sobre la mesa|La sala de espejos|la interpelación|Autocapacitación Técnica/.test(rotulos),
+       'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+    ok(!/casillas de la hoja de encargo|volver a usar en la próxima misión/.test(crit), 'las preguntas III y IV son las de esta etapa', 'quedan preguntas de la etapa 2');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['226 milímetros', 'Etapa 1', 'using \\(true\\)', 'aprobaban siempre', 'arreglaba y rompía', 'Constitución', 'fecha límite', 'prometió de más']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok((txt.match(/Lo que enseña/g) || []).length === 8, 'los ocho casos cierran con lo que enseñan', 'casos con lección: ' + (txt.match(/Lo que enseña/g) || []).length);
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      /* No puede repetir los casos de las etapas 1 y 2 de esta misma ruta */
+      ok(!/diecinueve|arréglame|media hoja|conversación llena/i.test(txt), 'no repite casos de las etapas 1 y 2', 'repite un caso de otra etapa de la ruta');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+      ok(/cinco reglas de la verificación/i.test(txt), 'trae las cinco reglas', 'faltan las cinco reglas');
+      ok(/protocolo de cinco pasos/i.test(txt), 'trae el protocolo', 'falta el protocolo de cinco pasos');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/medición|rótulos|verde|alcance|trescientas|reglamento|compromiso/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-maquina-verificar.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/La hoja de verificación, para llenar a lápiz/i.test(txt), 'la ficha trae la hoja de verificación', 'falta la hoja de verificación');
+    ok(/La misma hoja, llena/i.test(txt), 'y la misma hoja ya llena, como ejemplo', 'falta la hoja de ejemplo');
+    ok(/Una verificación de verdad, paso a paso/i.test(txt), 'la ficha trae la verificación trabajada', 'falta el ejemplo trabajado');
+    ok(/Señales de alarma dentro del propio texto/i.test(txt), 'la ficha trae las señales de alarma', 'faltan las señales de alarma');
+    ok(/Pauta completa de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(!/—/.test(txt), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok((txt.match(/<table/g) || []).length === (txt.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar: un corte partió una tabla');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-maquina-verificar"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const ia = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Máquina que Predice/.test(c.textContent));
+    ok(!!ia, 'la Ruta de la Máquina que Predice está en el mapa', 'no aparece la ruta');
+    if (ia) {
+      ok(ia.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + ia.querySelectorAll('.re-link').length);
+      ok(ia.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + ia.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/Verificar/.test(ia.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
+      ok(/La IA que programa/i.test(ia.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="ia"]');
+    ok(!!chip, 'la materia Inteligencia Artificial tiene su chip', 'no hay chip de Inteligencia Artificial');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      const ver = tarjetas.find(t => /verificar/i.test(t.textContent));
+      ok(!!ver && /🔒/.test(ver.textContent), 'la misión de verificar lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+});
+</script>
+</body>
+</html>

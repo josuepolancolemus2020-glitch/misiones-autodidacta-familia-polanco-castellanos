@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Ruta de la Máquina que Predice · Etapa 3: Verificar</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+<style>
+  :root { --pri: #14532d; --pri-suave: #f0fdf4; --sec: #9f1239; --sec-suave: #fff1f2; }
+  .guion li { margin: 5px 0; }
+  table.tres th:nth-child(1) { width: 22%; }
+  .caso { border: 1.5px solid var(--linea); border-left: 5px solid var(--sec);
+          border-radius: 8px; padding: 10px 12px; margin: 10px 0; background: #fff; }
+  .caso h3 { margin-top: 0; }
+  .mini { font-size: 12px; color: var(--gris); }
+  table.casos { font-size: 11.5px; }
+  table.casos th:nth-child(1) { width: 24%; }
+  table.casos th:nth-child(2) { width: 38%; }
+  table.audit td:nth-child(1) { width: 5%; text-align: center; }
+  table.audit td:nth-child(3), table.audit td:nth-child(4) { width: 15%; text-align: center; height: 22px; }
+  table.blanco td { height: 15px; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/ruta-maquina-verificar/verificar.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · Verificar</div>
+    <div class="f-meta"><b>Ruta:</b> 🤖 Ruta de la Máquina que Predice · Etapa 3 de 6 · <b>Materia:</b> Inteligencia Artificial</div>
+    <div class="f-meta"><b>Tema:</b> qué hacer con una respuesta antes de usarla: leerla entera, marcar lo comprobable, medir el riesgo, comprobar por fuera, cazar la omisión y firmar lo que se entrega.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Distinguir el <b>disparate</b> (inofensivo) del <b>dato falso bien escrito</b>, que es el que llega a la imprenta.</li>
+    <li>Comprobar <b>por fuera</b>, con una fuente que no produjo la afirmación, y no preguntándole otra vez a la máquina.</li>
+    <li>Repartir el tiempo de revisión con la <b>escala de riesgo</b>: qué pasa si está mal y a quién le pasa.</li>
+    <li>Cazar la <b>omisión</b>, que es el error que no está escrito en ninguna parte.</li>
+    <li>Firmar solo lo que se puede <b>explicar con palabras propias</b>, y dejar anotado contra qué se comprobó.</li>
+  </ol>
+
+  <h2>🔎 La frase maestra</h2>
+  <div class="caja">
+    <p><b>Una respuesta que suena bien no es una respuesta comprobada.</b> El modelo produce la continuación más probable del texto, y para él un dato que le consta y uno que completó son la misma cosa. No sabe que no sabe.</p>
+  </div>
+
+  <h2>🚨 La señal de alarma de esta etapa</h2>
+  <div class="caja caja-amb">
+    <p><b>Cuando te descubres copiando algo que no podrías explicar con tus palabras.</b> Ahí no leíste: moviste.</p>
+    <p class="mini">Y lo que se mueve sin leer llega igual a la ficha impresa, al correo enviado y a la aplicación de la familia, solo que ya con tu nombre debajo.</p>
+  </div>
+
+  <h2>🎩 Los dos errores, y cuál da miedo</h2>
+  <p>El <b>disparate</b> es la respuesta absurda: se ve de lejos, da risa y se borra. Es inofensivo precisamente porque se nota. El <b>dato falso bien escrito</b> es la cifra verosímil, la cita con autor y año, el artículo de ley con su número. Está redactado con el mismo tono seguro que lo cierto, porque el tono es un rasgo del estilo y no una medida de la certeza. Ese es el que llega hasta la imprenta.</p>
+  <p>Un ejemplo de los dos, sobre el mismo tema. Disparate: «la Constitución de Honduras fue firmada por los estudiantes de tercer grado». Dato falso bien escrito: «el artículo 123 de la Constitución establece que la educación primaria es gratuita y obligatoria». El primero se borra sin pensar; el segundo <b>hay que ir a buscarlo</b>, y si no se va, se imprime.</p>
+  <p class="mini">Nada dentro de la respuesta avisa de cuál es cuál. Por eso la revisión no puede consistir en leerla otra vez con más atención: hay que salir de ella.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 1 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>🧩 Las siete piezas de una verificación</h2>
+  <table>
+    <tr><th>Pieza</th><th>Qué hace</th><th>Qué pasa si se salta</th></tr>
+    <tr><td><b>1. Leer entero</b></td><td>Recorrerlo hasta el final antes de decidir nada</td><td>Se corrigen frases sueltas y se pierde el conjunto</td></tr>
+    <tr><td><b>2. Marcar</b></td><td>Señalar cifras, fechas, nombres, citas, enlaces y promesas</td><td>Se verifica al azar, y casi nunca lo que importa</td></tr>
+    <tr><td><b>3. Medir el riesgo</b></td><td>Qué pasa si esa marca está mal, y a quién le pasa</td><td>Se gasta en lo barato el tiempo que hacía falta en lo caro</td></tr>
+    <tr><td><b>4. Comprobar por fuera</b></td><td>Abrir algo que no produjo la afirmación</td><td>Se confirma un invento con otro invento</td></tr>
+  </table>
+  <table>
+    <tr><th>Pieza</th><th>Qué hace</th><th>Qué pasa si se salta</th></tr>
+    <tr><td><b>5. Buscar lo que falta</b></td><td>Volver al original a ver qué tendría que estar</td><td>Pasa entera la omisión, que no está escrita</td></tr>
+    <tr><td><b>6. Corregir o borrar</b></td><td>Lo que no se pudo comprobar, sale</td><td>Se deja «por si acaso» y acaba impreso</td></tr>
+    <tr><td><b>7. Firmar y registrar</b></td><td>Anotar contra qué se comprobó y quién responde</td><td>Se repite el mismo trabajo dentro de un mes</td></tr>
+  </table>
+
+  <div class="caja caja-amb">
+    <p><b>La pieza que la gente se salta es la tercera, y es la que sostiene todo.</b> Sin escala de riesgo solo hay dos posturas posibles: verificarlo todo igual, que nadie sostiene más de una semana, o no verificar nada, con el argumento de que no hay tiempo. El riesgo es lo que convierte la verificación en algo que se puede hacer siempre.</p>
+  </div>
+
+  <h2>✍️ Y la que no es técnica: la firma</h2>
+  <p>La máquina no tiene responsabilidad, ni trabajo que perder, ni una maestra enfrente. El que pega el texto en la ficha, sí. <b>«Lo dijo la IA» no es una defensa</b>: no lo es ante una maestra, ni ante una institución, ni en la mesa de esta casa.</p>
+
+<h2>🕵️ Los cinco errores que hay que buscar</h2>
+  <table>
+    <tr><th>Error</th><th>Cómo se ve</th><th>Cómo se caza</th></tr>
+    <tr><td><b>1. Dato inventado</b></td><td>Una fecha, una cifra o un nombre que no existen</td><td>Fuente primaria, dato por dato</td></tr>
+    <tr><td><b>2. Fuente inventada</b></td><td>Un enlace, un libro o un artículo que suenan reales</td><td>Buscar la frase textual, no el resumen</td></tr>
+    <tr><td><b>3. Lógica que no cierra</b></td><td>Va bien tres pasos y en el cuarto concluye otra cosa</td><td>Contarla en voz alta con palabras propias</td></tr>
+    <tr><td><b>4. La omisión</b></td><td>No se ve: consiste en lo que no dijo</td><td>Volver al original y leer notas y encabezados</td></tr>
+    <tr><td><b>5. La complacencia</b></td><td>Te da la razón, y si insistes cambia de opinión</td><td>Preguntar en neutro, o no preguntar</td></tr>
+  </table>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 2 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h2>🚩 Señales de alarma dentro del propio texto</h2>
+  <p>No prueban que algo sea falso, pero marcan dónde mirar primero. Casi siempre aparecen justo donde el modelo tuvo que rellenar:</p>
+  <ul>
+    <li><b>«Según algunos estudios», «los expertos coinciden», «se estima que»</b>: una afirmación fuerte sin nadie detrás. Si no hay autor y año, no hay fuente.</li>
+    <li><b>Cifras demasiado redondas o demasiado exactas:</b> un 70% clavado y un 68,4% con decimal sospechan por motivos opuestos, y las dos piden el original.</li>
+    <li><b>Nombres propios sueltos:</b> personas, instituciones o leyes citadas sin referencia. Es donde más barato le sale al modelo inventar.</li>
+    <li><b>Listas que cuadran demasiado:</b> cinco causas, cinco consecuencias, todo simétrico. La realidad casi nunca viene en múltiplos de cinco.</li>
+    <li><b>Un párrafo mejor escrito que el resto:</b> suele ser el que menos se apoya en lo que pediste y más en lo que sonaba bien.</li>
+  </ul>
+
+  <h3>Por qué la omisión es el más caro</h3>
+  <p>Los tres primeros están <b>en la respuesta</b> y se pueden buscar leyendo. La omisión no: para verla hay que saber <b>qué tendría que estar y no está</b>, y eso solo lo sabe quien leyó el original. Es la razón de que un resumen nunca sustituya al documento cuando hay algo que decidir.</p>
+
+  <h3>Y por qué la complacencia engaña tanto</h3>
+  <p>Porque parece colaboración. Si preguntas «¿verdad que conviene?», suele salir que sí; si insistes en que algo está mal, muchas veces se corrige aunque estuviera bien. La consecuencia práctica es incómoda: <b>insistir no acerca a la verdad</b>, solo mueve la respuesta hacia lo que pareces querer oír. Las preguntas se hacen en neutro («¿qué dice exactamente la fuente?») o no se hacen.</p>
+  <p class="mini">Regla corta: si necesitaste tres intentos para que dijera lo que esperabas, lo que tienes no es una respuesta mejor, es una respuesta más parecida a ti.</p>
+
+<h2>⚖️ La escala de riesgo: no todo se verifica igual</h2>
+  <p>Verificar cuesta tiempo, que es el gasto más grande del proyecto. Lo que decide cuánto verificar no es lo raro que suene la respuesta: es <b>qué pasa si está mal y quién lo paga</b>.</p>
+  <table class="tres">
+    <tr><th>Riesgo</th><th>Qué es, en este proyecto</th><th>Cuánto se verifica</th></tr>
+    <tr><td>Bajo</td><td>Un título, un emoji, un párrafo de adorno</td><td>Se lee entero y basta</td></tr>
+    <tr><td>Medio</td><td>Un texto explicativo de una misión, un correo interno</td><td>Se leen los datos y se comprueba lo que se afirma</td></tr>
+    <tr><td>Alto</td><td>Una cifra, una cita o una ley en una ficha impresa</td><td>Fuente primaria, una por una</td></tr>
+    <tr><td>Muy alto</td><td>Código que se sube, un compromiso por escrito con alguien de fuera</td><td>Se prueba el caso real y lo revisa una segunda persona</td></tr>
+  </table>
+  <p class="mini">Verificar todo con el mismo cuidado no es rigor: es gastar en lo barato el tiempo que hacía falta en lo caro. Y quien lo intenta acaba, dos semanas después, no verificando nada.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 3 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <h2>⏰ Los tres momentos en que más se falla</h2>
+  <ol>
+    <li><b>Cuando hay prisa.</b> La prisa no cambia el riesgo, solo la disposición a mirarlo. Si no da tiempo a verificar, lo que se recorta es la entrega, no la comprobación.</li>
+    <li><b>Cuando la respuesta es mejor de lo que habrías escrito tú.</b> Ahí baja la guardia sola, porque uno no discute con algo que le gusta. Es justo cuando más hay que marcar.</li>
+    <li><b>Cuando es la quinta vez que se revisa lo mismo.</b> Se empieza a mirar lo que cambió y se deja de mirar lo que siempre estuvo, que es como viajaron seis rótulos heredados entre misiones.</li>
+  </ol>
+
+  <h2>🌐 Verificación de verdad y verificación de mentira</h2>
+  <div class="caja">
+    <p><b>De verdad, por fuera:</b> se abre otra cosa. El texto oficial, la página del organismo, el archivo del proyecto, el código ejecutándose con el caso real. Vale porque <b>puede desmentir</b>: no depende de quien hizo la afirmación.</p>
+    <p><b>De mentira, por dentro:</b> «¿estás seguro?», «¿puedes confirmarlo?», «dame la fuente». Todo eso produce más texto probable. Si la máquina inventó un artículo, puede inventar igual de bien el enlace que lo respalda, y encima con la misma seguridad.</p>
+  </div>
+  <p class="mini">Lo peor de la verificación falsa no es que no sirva: es que <b>deja la sensación de haber verificado</b>, y con esa sensación se firma.</p>
+
+<h2>🧭 Cómo se comprueba cada cosa</h2>
+  <table class="tres">
+    <tr><th>Qué afirma</th><th>Contra qué se comprueba</th><th>Señal de que va mal</th></tr>
+    <tr><td>Una cita</td><td>La frase textual en la fuente primaria</td><td>Aparece parecida pero no igual</td></tr>
+    <tr><td>Una ley o un artículo</td><td>El texto oficial vigente, no una copia</td><td>El número existe y dice otra cosa</td></tr>
+    <tr><td>Una cifra</td><td>El estudio o informe original, no quien lo cuenta</td><td>Nadie da el año ni el autor</td></tr>
+    <tr><td>Un enlace</td><td>Abrirlo, sin más</td><td>No carga, o lleva a otra cosa</td></tr>
+    <tr><td>Un nombre propio</td><td>Dos fuentes independientes</td><td>Solo aparece en sitios que se copian entre sí</td></tr>
+    <tr><td>Código</td><td>Ejecutarlo con el caso real que importa</td><td>Funciona solo en el caso fácil</td></tr>
+    <tr><td>Un resumen</td><td>Los encabezados y las notas del original</td><td>Todo cuadra y falta una fecha</td></tr>
+    <tr><td>Una promesa</td><td>Quién la decidió y si se puede cumplir hoy</td><td>Suena bien y nadie recuerda haberla acordado</td></tr>
+  </table>
+  <p class="mini">Las ocho filas se resumen en una idea: se comprueba <b>contra el sitio donde el dato tendría que estar si fuera cierto</b>. Si no se sabe cuál es ese sitio, todavía no se puede verificar y hay que empezar por averiguarlo.</p>
+
+  <h2>📣 Los verbos que comprometen</h2>
+  <p>En cualquier texto que salga hacia fuera (un correo, una propuesta, una carta) hay que subrayarlos uno por uno: <b>acompañamos, garantizamos, entregamos, capacitamos, aseguramos, cubrimos</b>. Cada uno es una promesa que alguien va a cobrar, y la firma quien envía.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 4 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <div class="caja caja-amb metodo">
+    <p>El método es corto: leerlo <b>en voz alta</b>, que es donde se oyen las promesas; subrayar esos verbos; comprobar uno por uno si el proyecto puede cumplirlos <b>hoy</b>; quitar los que no; y guardar la versión enviada con la fecha y el nombre de quien la revisó.</p>
+  </div>
+
+  <h2>🔗 Pedir para tener menos que verificar</h2>
+  <p>La etapa 2 de esta ruta enseñó a escribir el encargo. Aquí se ve para qué sirve de verdad: un buen encargo <b>reduce la superficie que hay que comprobar</b>. Tres frases que ahorran media revisión:</p>
+  <ol class="guion">
+    <li>«No cites nada que no puedas señalar en un documento público.»</li>
+    <li>«Marca con un signo de interrogación lo que estés completando sin base.»</li>
+    <li>«Si no tienes el dato, escribe DATO PENDIENTE en vez de aproximar.»</li>
+  </ol>
+  <p class="mini">No convierten a la máquina en fiable: el texto sigue siendo probable y las marcas también se pueden inventar. Lo que hacen es concentrar la duda en menos sitios, y con eso el trabajo de verificar deja de ser interminable.</p>
+
+<h2>📝 La hoja de verificación, para llenar a lápiz</h2>
+  <p>Una fila por cada cosa comprobable de la entrega. Se llena antes de firmar y se guarda con el trabajo.</p>
+  <table class="audit">
+    <tr><th>#</th><th>Qué afirma (copiado literal)</th><th>Riesgo</th><th>¿Comprobado?</th></tr>
+    <tr><td>1</td><td>&nbsp;</td><td>B / M / A</td><td>Sí / No</td></tr>
+    <tr><td>2</td><td>&nbsp;</td><td>B / M / A</td><td>Sí / No</td></tr>
+    <tr><td>3</td><td>&nbsp;</td><td>B / M / A</td><td>Sí / No</td></tr>
+    <tr><td>4</td><td>&nbsp;</td><td>B / M / A</td><td>Sí / No</td></tr>
+    <tr><td>5</td><td>&nbsp;</td><td>B / M / A</td><td>Sí / No</td></tr>
+    <tr><td>6</td><td>&nbsp;</td><td>B / M / A</td><td>Sí / No</td></tr>
+    <tr><td>7</td><td>&nbsp;</td><td>B / M / A</td><td>Sí / No</td></tr>
+    <tr><td>8</td><td>&nbsp;</td><td>B / M / A</td><td>Sí / No</td></tr>
+  </table>
+  <table class="tres blanco">
+    <tr><th>Contra qué se comprobó</th><th>Qué quedó sin comprobar, y por qué se aceptó igual</th></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+    <tr><th>Firma de quien entrega</th><th>Fecha</th></tr>
+    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  </table>
+  <p class="mini">La segunda tabla es la que casi nadie llena y la que más sirve. <b>Una verificación sin registro no existe dentro de un mes</b>: nadie recuerda qué se miró, así que se vuelve a mirar todo o no se mira nada.</p>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 5 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <h2>📗 La misma hoja, llena con la entrega de la página siguiente</h2>
+  <table class="audit">
+    <tr><th>#</th><th>Qué afirma (copiado literal)</th><th>Riesgo</th><th>¿Comprobado?</th></tr>
+    <tr><td>1</td><td>«El artículo 123 de la Constitución establece…»</td><td>A</td><td>Sí</td></tr>
+    <tr><td>2</td><td>«Todo niño tiene derecho a la educación gratuita y obligatoria»</td><td>A</td><td>Sí</td></tr>
+    <tr><td>3</td><td>«Según un estudio de 2019, el 68% de los docentes…»</td><td>A</td><td>No</td></tr>
+  </table>
+  <table class="tres">
+    <tr><th>Contra qué se comprobó</th><th>Qué quedó sin comprobar, y por qué se aceptó igual</th></tr>
+    <tr><td>Texto oficial vigente de la Constitución, buscando el número y la frase textual</td><td>Nada quedó sin comprobar: la cifra del 68% se retiró de la ficha por no encontrar el estudio</td></tr>
+  </table>
+
+<h2>🔬 Una verificación de verdad, paso a paso</h2>
+  <p>Esta es la entrega: la máquina devolvió la introducción de una ficha de Estudios Sociales para tercer grado. Tres párrafos y una cita. Va a <b>trescientas copias en tres escuelas</b>.</p>
+
+  <div class="caja">
+    <p class="mini">El texto que llegó, resumido:</p>
+    <p>«Los derechos de la niñez están protegidos por la ley hondureña. El artículo 123 de la Constitución establece que <i>“todo niño tiene derecho a la educación gratuita y obligatoria”</i>. Según un estudio de 2019, el 68% de los docentes del país considera que ese derecho no se cumple en las zonas rurales.»</p>
+  </div>
+
+  <h3>Paso 1 · Leer entero y contarlo con palabras propias</h3>
+  <p>Sale así: «la ley protege a la niñez, un artículo dice que la educación es gratuita y obligatoria, y una encuesta dice que la mayoría de maestros cree que no se cumple en el campo». Se puede contar, así que se leyó.</p>
+
+  <h3>Paso 2 · Marcar lo comprobable</h3>
+  <p>Quedan <b>tres marcas</b>: el número del artículo (123), la frase entre comillas, y el par cifra-año (68%, 2019). Todo lo demás (que la ley protege a la niñez, el orden de los párrafos, el tono) es contexto o estilo: no se comprueba.</p>
+
+  <h3>Paso 3 · Medir el riesgo</h3>
+  <p>Las tres son <b>riesgo alto</b>: se imprimen, salen de casa y el error lo encuentra una maestra delante de sus alumnos. No hay ninguna de riesgo bajo aquí, así que se comprueban las tres.</p>
+
+  <h3>Paso 4 · Comprobar por fuera, una por una</h3>
+  <ul>
+    <li><b>El artículo:</b> se abre el texto oficial de la Constitución y se busca el 123. Si existe pero dice otra cosa, la cita está mal aunque el número sea real: ese es el caso más frecuente y el más difícil de ver.</li>
+    <li><b>La frase:</b> se busca <b>textual</b>, entre comillas. Una frase «parecida» no vale: si se va a citar, se cita lo que dice; si no, se parafrasea y se quitan las comillas.</li>
+    <li><b>La cifra:</b> hace falta el estudio, con autor y año. Si no aparece por ningún lado, no es que esté mal: es que <b>no se puede sostener</b>, que a efectos de imprimir es lo mismo.</li>
+  </ul>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 6 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <h3>Paso 5 · Buscar lo que falta, corregir y firmar</h3>
+  <p>Lo que falta aquí: la ficha habla de derechos y no menciona <b>de dónde salen</b> ni a quién reclamar. Se corrige el artículo con su número real, se quitan las comillas de la frase parafraseada, <b>se borra la cifra</b> que no se pudo sostener, y en la hoja se anota: comprobado contra el texto oficial, cifra retirada por falta de fuente, con la fecha y el nombre.</p>
+
+<h2>🔎 Ocho cosas que se dieron por buenas</h2>
+  <p class="mini">Las cinco primeras pasaron de verdad en esta casa y están escritas en el repositorio. Las tres últimas son situaciones que le pueden llegar al proyecto el mes que viene.</p>
+  <table class="casos">
+    <tr><th>Qué se dio por bueno</th><th>Qué falló</th><th>Lo que enseña</th></tr>
+    <tr><td><b>1 ·</b> Los 226 mm de alto útil de la hoja</td><td>El número se calculó en vez de medirse, y la pulgada usada era el margen por defecto del navegador, no el de esta hoja. El alto real era 252</td><td>Un cálculo no es una medición. Costó dos vueltas y la letra encogida a 9,5 pt</td></tr>
+    <tr><td><b>2 ·</b> La constancia que decía «Etapa 1»</td><td>Venía en el molde y viajó de misión en misión, con otros cinco rótulos heredados. Nadie los leyó porque no eran código</td><td>Copiar no es leer. Lo que no da error es lo que nadie mira</td></tr>
+    <tr><td><b>3 ·</b> La política que decía «using (true)»</td><td>Se leyó el nombre de la regla y no lo que hacía: dejaba entrar a cualquiera que se registrara</td><td>Leer es poder decir qué hace esto con palabras propias</td></tr>
+    <tr><td><b>4 ·</b> Tres comprobaciones en verde</td><td>Estaban escritas de forma que avisaban pero nunca detenían nada. Pasaban igual estuviera bien o mal</td><td>Una comprobación que no se ha visto fallar no se sabe si funciona</td></tr>
+  </table>
+  <table class="casos">
+    <tr><th>Qué se dio por bueno</th><th>Qué falló</th><th>Lo que enseña</th></tr>
+    <tr><td><b>5 ·</b> Una herramienta que reparte respuestas</td><td>Se miró lo que arreglaba y no lo que tocaba: reescribía las veintiuna misiones de una pasada</td><td>De una herramienta se verifica el alcance, no el resultado que promete</td></tr>
+    <tr><td><b>6 ·</b> Una cita de la Constitución en una ficha</td><td>Riesgo alto: trescientas copias en tres escuelas, con el nombre del proyecto en el pie</td><td>Una cita falsa se escribe igual de bien que una real. Solo se distinguen abriendo la fuente</td></tr>
+    <tr><td><b>7 ·</b> El resumen de un reglamento</td><td>Correcto y claro, y sin la fecha de cierre de inscripciones, que estaba en una nota al pie</td><td>El error de un resumen está en lo que calla</td></tr>
+    <tr><td><b>8 ·</b> El correo a una Secretaría</td><td>Decía que el proyecto «acompaña a los centros todo el año escolar». Nadie lo había decidido</td><td>Los verbos que comprometen se buscan uno por uno antes de enviar</td></tr>
+  </table>
+
+  <h2>🚫 Lo que no se delega jamás</h2>
+  <p>Se le puede pedir un borrador, que ordene ideas ya decididas o que proponga títulos. No se le delega nunca:</p>
+  <ul>
+    <li><b>La firma.</b> Quien entrega responde, y eso no se reparte.</li>
+    <li><b>Decidir qué se promete por escrito</b> a alguien de fuera.</li>
+    <li><b>Comprobar si un dato es cierto:</b> esa es la tarea de la que venimos hablando toda la ficha.</li>
+    <li><b>Qué se le enseña a las niñas</b> y con qué palabras. Ahí la decisión es de la casa, no de una herramienta.</li>
+  </ul>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 7 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
+<section class="pagina">
+  <div class="caja caja-amb reglas">
+    <h3>🔑 Las cinco reglas de la verificación</h3>
+    <ol>
+      <li>Quien entrega, <b>firma</b>: «lo dijo la IA» no es una defensa.</li>
+      <li>El error peligroso no es el disparate: es <b>el dato falso bien escrito</b>.</li>
+      <li>No se le pregunta a la misma máquina si tiene razón: <b>se comprueba por fuera</b>.</li>
+      <li>Se verifica según <b>qué pasa si está mal</b>, no según lo raro que suene.</li>
+      <li>Lo que no se puede explicar con palabras propias <b>no se entrega</b>.</li>
+    </ol>
+  </div>
+
+<h2>✏️ Ejercicios para hacer a lápiz</h2>
+  <p class="mini">Las respuestas están en la pauta de la página siguiente. Hazlos primero.</p>
+
+  <div class="caja ej1">
+    <h3>Ejercicio 1 · Dato o estilo</h3>
+    <p>Marca <b>D</b> si se puede comprobar y <b>E</b> si es estilo u opinión:</p>
+    <ol>
+      <li>«El artículo 123 de la Constitución establece…» ____</li>
+      <li>«Un tema apasionante para los niños de tercer grado.» ____</li>
+      <li>«Las inscripciones cierran el 30 de septiembre.» ____</li>
+      <li>«Conviene empezar la ficha con una pregunta.» ____</li>
+    </ol>
+  </div>
+
+  <div class="caja ej2">
+    <h3>Ejercicio 2 · La escala de riesgo</h3>
+    <p>Pon <b>B</b> (bajo), <b>A</b> (alto) o <b>MA</b> (muy alto):</p>
+    <ol>
+      <li>El emoji del título de una sección. ____</li>
+      <li>Una cifra en una ficha que se imprime para tres escuelas. ____</li>
+      <li>Un compromiso escrito en un correo a una Secretaría. ____</li>
+      <li>La redacción de un párrafo de presentación interno. ____</li>
+    </ol>
+  </div>
+
+  <div class="caja ej3">
+    <h3>Ejercicio 3 · Verificación real o falsa</h3>
+    <p>Marca <b>R</b> o <b>F</b>, y en las falsas escribe qué harías en su lugar:</p>
+    <ol>
+      <li>Preguntarle «¿estás seguro de ese artículo?». ____</li>
+      <li>Abrir el texto oficial y buscar el número. ____</li>
+      <li>Pedirle el enlace que respalda la cifra. ____</li>
+      <li>Ejecutar el código con el caso de la maestra sin internet. ____</li>
+    </ol>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 8 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <div class="caja ej4">
+    <h3>Ejercicio 4 · Caza la omisión</h3>
+    <p>Te entregan este resumen de una convocatoria: <i>«Pueden participar centros públicos de todo el país. Se presenta un proyecto por centro. El jurado valora originalidad, impacto y viabilidad.»</i></p>
+    <p>Escribe <b>tres preguntas</b> que hay que hacerle al documento original antes de usar este resumen para decidir:</p>
+    <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  </div>
+
+  <div class="caja ej5">
+    <h3>Ejercicio 5 · Los verbos que comprometen</h3>
+    <p>Subraya lo que compromete al proyecto: <i>«M.E.T.A.S acompaña a los centros durante todo el año escolar, entrega material impreso cada mes y capacita a los docentes que lo soliciten. Nuestro equipo trabaja con entusiasmo.»</i></p>
+    <p>¿Cuáles se pueden cumplir hoy y cuáles hay que quitar?</p>
+    <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
+  </div>
+
+  <div class="caja ej6">
+    <h3>Ejercicio 6 · La firma</h3>
+    <p>De la entrega del ejercicio 5 no se pudo comprobar si hay presupuesto para el material impreso mensual.</p>
+    <ol>
+      <li>¿Se envía el correo tal cual, se corrige o se detiene? ______</li>
+      <li>¿Qué se anota en la hoja de verificación? ______</li>
+      <li>¿Quién firma el correo, y qué pasaría si el error se descubre dentro de seis meses? ______</li>
+    </ol>
+  </div>
+
+<h2>✅ Pauta completa de respuestas</h2>
+
+  <div class="pauta pa1">
+    <h3>Ejercicio 1 · Dato o estilo</h3>
+    <ol>
+      <li>El artículo: <b>D</b>. Existe o no existe, y dice algo concreto.</li>
+      <li>«Apasionante»: <b>E</b>. Se discute, no se comprueba.</li>
+      <li>La fecha de cierre: <b>D</b>. Está escrita en algún sitio.</li>
+      <li>«Conviene empezar con una pregunta»: <b>E</b>. Es un criterio.</li>
+    </ol>
+    <p class="mini">La prueba para dudas: ¿existe un documento que pueda desmentirlo? Si no existe, no es un dato.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 9 de 10</span></div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <div class="pauta pa2">
+    <h3>Ejercicio 2 · La escala de riesgo</h3>
+    <ol>
+      <li>Emoji: <b>B</b>. No lo paga nadie.</li>
+      <li>Cifra impresa: <b>A</b>. La paga una maestra delante de su clase.</li>
+      <li>Compromiso a una Secretaría: <b>MA</b>. Lo paga el proyecto durante un año.</li>
+      <li>Párrafo interno: <b>B</b>. Se lee entero y basta.</li>
+    </ol>
+  </div>
+
+  <div class="pauta pa3">
+    <h3>Ejercicio 3 · Verificación real o falsa</h3>
+    <ol>
+      <li><b>F</b>. Es pedirle otra predicción. En su lugar: abrir el texto oficial.</li>
+      <li><b>R</b>. Fuente independiente que puede desmentir la afirmación.</li>
+      <li><b>F</b>. Si inventó el artículo puede inventar el enlace. En su lugar: buscar la cifra en el estudio original.</li>
+      <li><b>R</b>. Ejecutar el caso que importa, no el fácil.</li>
+    </ol>
+  </div>
+
+  <div class="pauta pa4">
+    <h3>Ejercicio 4 · Caza la omisión</h3>
+    <p>Se acepta cualquier terna razonable. Las tres que casi siempre faltan:</p>
+    <ol>
+      <li><b>¿Cuándo cierra?</b> Fechas de inscripción y de entrega.</li>
+      <li><b>¿Qué hay que entregar y en qué formato?</b> Requisitos y documentos.</li>
+      <li><b>¿Qué excluye?</b> Quién no puede participar, y qué descalifica.</li>
+    </ol>
+    <p class="mini">Ninguna se puede sacar del resumen: aparecen sabiendo cómo suele ser una convocatoria. La omisión se caza con oficio, no leyendo mejor.</p>
+  </div>
+
+  <div class="pauta pa5">
+    <h3>Ejercicio 5 · Los verbos que comprometen</h3>
+    <p>Comprometen tres: <b>acompaña</b> todo el año, <b>entrega</b> material impreso cada mes y <b>capacita</b> a quien lo solicite. «Trabaja con entusiasmo» no compromete a nada.</p>
+    <p class="mini">La más cara es la segunda, porque tiene periodicidad y costo: material impreso cada mes para un número indefinido de centros. La tercera está abierta a demanda, que es la forma más silenciosa de prometer sin límite.</p>
+  </div>
+
+  <div class="pauta pa6">
+    <h3>Ejercicio 6 · La firma</h3>
+    <ol>
+      <li><b>Se corrige.</b> No hace falta detener el correo entero: se quitan las promesas que no se pueden sostener hoy y se envía lo que sí.</li>
+      <li>Se anota: qué se comprobó y contra qué, que el compromiso de material mensual <b>se retiró por falta de presupuesto confirmado</b>, la fecha y el nombre de quien firma.</li>
+      <li>Lo firma quien lo envía. A los seis meses nadie va a preguntar quién redactó el borrador: van a reclamar el material impreso que se prometió.</li>
+    </ol>
+    <p class="mini">Regla que vale para toda la ficha: lo que no se pudo comprobar no se deja «por si acaso». O se borra, o se marca como no comprobado con nombre y fecha.</p>
+  </div>
+
+  <div class="pie"><span>🏠 Proyecto Educativo F.A.R.O.</span><span>🤖 Ruta de la Máquina · Etapa 3 · Página 10 de 10</span></div>
+</section>
+
+
+</div>
+</body>
+</html>
