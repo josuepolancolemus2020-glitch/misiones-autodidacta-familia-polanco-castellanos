@@ -1,0 +1,15 @@
+# Cortes de la ficha de Poder Político etapa 3 (nueve cortes = diez páginas).
+# Anclajes únicos: el medidor propone «<div class="caso">», «<div class="caja">»,
+# «<div class="pauta">» y «<table class="tres">» a secas, y eso se repite por toda
+# la ficha. Ojo con las tablas: retrocede() solo retrocede sobre <div>, así que un
+# corte anclado dentro de una <table> la parte entre dos hojas y deja el HTML roto
+# sin que nada avise. Por eso la tabla de monedas lleva clase propia.
+<h2>⚖️ Posición e interés</h2>
+<table class="tres monedas">
+<strong>La mesa pública:</strong>
+<h3>2. «Déjelo conmigo, yo lo muevo»</h3>
+<h3>8. El aval a cambio de los datos</h3>
+<h2>📆 Después de la reunión, el mismo día</h2>
+<h3>Ejercicio 5 · El silencio de tres meses</h3>
+<h3>Ejercicio 4 · El piloto</h3>
+<h2>📝 Una minuta de verdad, escrita</h2>
