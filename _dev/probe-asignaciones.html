@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Asignaciones metalingüísticas</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:900px;border:0;background:#fff}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba las asignaciones metalingüísticas (etapas 3 a 10 de la Ruta de la
+   Ingeniería): el catálogo, la vista nueva, el mapa de rutas y el registro de
+   una defensa, que es lo único que otorga XP aquí.
+
+   Escrita mirando primero que fallara: sin js/data/asignaciones.js cargado,
+   las cuatro primeras comprobaciones se ponen en rojo. */
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+f.onload = async () => {
+  const w = f.contentWindow, d = f.contentDocument;
+  if (!sembrado) {
+    sembrado = true;
+    try {
+      w.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+      /* Estado limpio: si una defensa quedó registrada de una pasada anterior,
+         la comprobación del XP mediría otra cosa. La clave es la de app.js
+         (const KEY = 'faro_v1'); con el nombre equivocado esto no limpiaba
+         nada y la sonda pasaba solo porque el navegador arranca en blanco. */
+      w.localStorage.removeItem('faro_v1');
+    } catch (e) {}
+    f.contentWindow.location.reload();
+    return;
+  }
+  await esperar(900);
+  try {
+    log('── EL CATÁLOGO ──');
+    /* ASIGNACIONES se declara con const, así que es una ligadura léxica y NO
+       una propiedad de window: w.ASIGNACIONES da undefined aunque el archivo
+       esté cargado. Se lee con eval dentro del marco, como en las otras sondas. */
+    const cargado = w.eval('typeof ASIGNACIONES') !== 'undefined';
+    ok(cargado, 'js/data/asignaciones.js está cargado', 'la aplicación no carga el catálogo de asignaciones');
+    const A = cargado ? w.eval('ASIGNACIONES') : [];
+    ok(A.length === 8, 'las ocho asignaciones', 'asignaciones: ' + A.length);
+    ok(A.map(a => a.id).join(',') === 'a1,a2,a3,a4,a5,a6,a7,a8', 'con sus identificadores en orden', 'ids: ' + A.map(a => a.id).join(','));
+    ok(A.map(a => a.n).join(',') === '3,4,5,6,7,8,9,10', 'ocupan las etapas 3 a 10', 'etapas: ' + A.map(a => a.n).join(','));
+
+    log('\n── LAS CINCO PARTES DEL MOLDE ──');
+    /* .every() sobre un arreglo vacío devuelve true: sin esta guarda, las cinco
+       comprobaciones de abajo salían en verde con el catálogo sin cargar. */
+    ok(A.length > 0, 'hay catálogo que comprobar', 'no hay nada que comprobar: las cinco de abajo no significan nada');
+    const faltan = A.filter(a => !a.encargo || !a.producto || !a.material || !a.vocabulario || !a.defensa || !a.sello);
+    ok(faltan.length === 0, 'las ocho traen encargo, material, vocabulario, defensa y sello', 'sin las cinco partes: ' + faltan.map(a => a.id).join(','));
+    ok(A.every(a => a.defensa.length === 5), 'cinco preguntas de defensa en cada una', 'alguna no tiene cinco preguntas');
+    ok(A.every(a => a.vocabulario.length >= 8 && a.vocabulario.length <= 21), 'vocabulario obligatorio de entre diez y veinte términos', 'alguna se sale del rango de vocabulario');
+    ok(A.every(a => a.material.length >= 3), 'material con al menos tres fuentes', 'alguna tiene menos de tres fuentes de material');
+    ok(A.every(a => a.material.every(m => m.ruta && m.que)), 'cada fuente dice qué archivo y qué se estudia en él', 'hay material sin ruta o sin explicación');
+    /* Norma de la casa: el testamento dice quién custodia las claves, nunca las claves */
+    const test = A.find(a => a.id === 'a7') || { encargo: '', sello: '' };
+    ok(/nunca las claves|NO van dentro/i.test(test.encargo + test.sello), 'el testamento técnico prohíbe escribir las claves dentro', 'el testamento no avisa de que las claves no van dentro');
+    /* Los dos proyectos, que es lo que se pidió */
+    const todo = JSON.stringify(A);
+    ok(/M\.E\.T\.A\.S/.test(todo) && /F\.A\.R\.O/.test(todo), 'estudian los dos proyectos', 'falta alguno de los dos proyectos');
+
+    log('\n── LA VISTA ──');
+    ok(!!d.getElementById('view-asignaciones'), 'existe la vista de asignaciones', 'falta la vista');
+    ok(!!d.querySelector('.drawer-item[data-view="view-asignaciones"]'), 'está en el menú lateral', 'no está en el menú');
+    ok(!!d.querySelector('.qa-item[data-qa="view-asignaciones"]'), 'está en el Acceso Rápido', 'no está en Acceso Rápido');
+    w.switchView('view-asignaciones'); await esperar(300);
+    const tarjetas = d.querySelectorAll('#asignaciones-container .asig-card');
+    ok(tarjetas.length === 8, 'pinta las ocho tarjetas', 'tarjetas: ' + tarjetas.length);
+    const primera = d.getElementById('asig-a1');
+    ok(primera && /El diccionario del sistema/.test(primera.textContent), 'la primera es el diccionario', 'la primera tarjeta no es la que toca');
+    ok(primera && /Vocabulario obligatorio|VOCABULARIO/i.test(primera.textContent), 'la tarjeta despliega las cinco partes', 'la tarjeta no muestra el molde completo');
+    ok(/0<\/strong> de 8|0 de 8/.test(d.getElementById('asignaciones-container').innerHTML), 'la cuenta arranca en 0 de 8', 'la cuenta no arranca en cero');
+
+    log('\n── EL MAPA DE RUTAS ──');
+    w.switchView('view-rutas'); await esperar(300);
+    const ing = [...d.querySelectorAll('.ruta-card')].find(c => /Ingeniería del Sistema/.test(c.textContent));
+    ok(!!ing, 'la Ruta de la Ingeniería está en el mapa', 'no aparece la ruta');
+    if (ing) {
+      ok(ing.querySelectorAll('.ruta-etapa').length === 10, 'muestra sus 10 etapas', 'etapas: ' + ing.querySelectorAll('.ruta-etapa').length);
+      ok(ing.querySelectorAll('.re-link').length === 10, 'las 10 son tocables (2 misiones y 8 asignaciones)', 'tocables: ' + ing.querySelectorAll('.re-link').length);
+      ok(ing.querySelectorAll('.ruta-etapa-futura').length === 0, 'ya no queda ninguna «por construir»', 'futuras: ' + ing.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/0 de 10 etapas recorridas/.test(ing.textContent), 'la cuenta arranca en 0 de 10', 'cuenta: ' + (ing.querySelector('.ruta-cuenta') || {}).textContent);
+      ok(/El testamento técnico/.test(ing.textContent), 'las asignaciones salen con su nombre', 'las asignaciones no aparecen en el mapa');
+    }
+
+    log('\n── REGISTRAR UNA DEFENSA ──');
+    /* Aquí no hay quiz: el XP lo otorga quien toma la defensa, y una sola vez */
+    const xpAntes = w.memberState(w.load(), null).xp;
+    w.switchView('view-asignaciones'); await esperar(250);
+    const sel = d.getElementById('asig-tomo-a1');
+    ok(!!sel, 'la tarjeta pregunta quién tomó la defensa', 'no hay selector de evaluador');
+    if (sel) {
+      sel.value = 'evelyn';
+      w.marcarAsignacion('a1', 'defendida'); await esperar(250);
+      const ms = w.memberState(w.load(), null);
+      ok(ms.xp === xpAntes + 60, 'la defensa otorga los 60 XP de la asignación', 'XP: ' + xpAntes + ' → ' + ms.xp);
+      ok(w.estadoAsignacion(ms, 'a1').estado === 'defendida', 'queda registrada como defendida', 'no quedó registrada');
+      ok(w.estadoAsignacion(ms, 'a1').tomo === 'evelyn', 'y guarda quién la tomó', 'no guardó al evaluador');
+      ok(/Defendida el .*Evelyn/.test(d.getElementById('asig-a1').textContent), 'la tarjeta muestra el acta', 'no aparece el acta en la tarjeta');
+      w.marcarAsignacion('a1', 'defendida'); await esperar(200);
+      ok(w.memberState(w.load(), null).xp === xpAntes + 60, 'volver a registrarla no vuelve a pagar XP', 'el XP se pagó dos veces');
+      w.switchView('view-rutas'); await esperar(250);
+      const ing2 = [...d.querySelectorAll('.ruta-card')].find(c => /Ingeniería del Sistema/.test(c.textContent));
+      ok(/1 de 10 etapas recorridas/.test(ing2.textContent), 'el mapa cuenta la asignación defendida', 'el mapa no la cuenta: ' + (ing2.querySelector('.ruta-cuenta') || {}).textContent);
+    }
+
+    log('\n── LA FICHA DE LA SERIE ──');
+    const r = await fetch('/fichas/ficha-ingenieria-asignaciones.html');
+    const txt = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txt.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    ok(/Las treinta preguntas/i.test(txt), 'trae las treinta preguntas de la defensa final', 'faltan las treinta preguntas');
+    ok((txt.match(/<table/g) || []).length === (txt.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar');
+    ok(!/—/.test(txt), 'la ficha va sin guiones largos (norma 1-bis)', 'la ficha trae guiones largos');
+
+    /* Se deja el estado como se encontró: esta sonda registra una defensa de
+       verdad, y si se queda puesta, la sonda de rutas ve «1 de 10». */
+    try { w.localStorage.removeItem('faro_v1'); } catch (e) {}
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+};
+</script>
+</body>
+</html>

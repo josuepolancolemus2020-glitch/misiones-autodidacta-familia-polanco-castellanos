@@ -22,7 +22,10 @@ f.onload = async () => {
   const w = f.contentWindow, d = f.contentDocument;
   if (!sembrado) {
     sembrado = true;
-    try { w.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' })); } catch (e) {}
+    try {
+      w.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+      w.localStorage.removeItem('faro_v1');   /* las cuentas se miden desde cero */
+    } catch (e) {}
     f.contentWindow.location.reload();
     return;
   }
@@ -68,11 +71,14 @@ f.onload = async () => {
       const etapas = ing.querySelectorAll('.ruta-etapa');
       const hechas = ing.querySelectorAll('.re-link');
       const futuras = ing.querySelectorAll('.ruta-etapa-futura');
-      ok(etapas.length === 8, 'muestra las 8 etapas del temario', 'etapas: ' + etapas.length);
-      ok(hechas.length === 2, '2 etapas construidas y tocables', 'tocables: ' + hechas.length);
-      ok(futuras.length === 6, '6 etapas marcadas «por construir»', 'futuras: ' + futuras.length);
-      ok(/Seguridad/.test(ing.textContent), 'las etapas futuras traen su nombre del temario', 'las futuras salen sin nombre');
-      ok(/0 de 8 etapas recorridas/.test(ing.textContent), 'la cuenta arranca en 0 de 8', 'cuenta: ' + (ing.querySelector('.ruta-cuenta') || {}).textContent);
+      /* La Ingeniería cambió de formato: 2 misiones normales y, de la etapa 3 a
+         la 10, las asignaciones metalingüísticas de js/data/asignaciones.js.
+         Por eso ya no le quedan etapas «por construir». */
+      ok(etapas.length === 10, 'muestra las 10 etapas', 'etapas: ' + etapas.length);
+      ok(hechas.length === 10, '10 etapas tocables: 2 misiones y 8 asignaciones', 'tocables: ' + hechas.length);
+      ok(futuras.length === 0, 'ninguna queda «por construir»', 'futuras: ' + futuras.length);
+      ok(/El testamento técnico/.test(ing.textContent), 'las asignaciones salen con su nombre', 'las asignaciones no aparecen');
+      ok(/0 de 10 etapas recorridas/.test(ing.textContent), 'la cuenta arranca en 0 de 10', 'cuenta: ' + (ing.querySelector('.ruta-cuenta') || {}).textContent);
     }
     ok(d.querySelector('.qa-item[data-qa="view-rutas"]') && d.querySelector('.drawer-item[data-view="view-rutas"]'),
       'hay entrada en Acceso Rápido y en el menú', 'falta alguna entrada a Mis Rutas');
