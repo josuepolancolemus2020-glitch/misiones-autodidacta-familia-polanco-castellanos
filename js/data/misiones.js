@@ -45,6 +45,7 @@ const MISSIONS = [
   { id: 14, title: 'La oferta: qué se entrega y a qué precio', modulo: 'aprendizaje-unido', materia: 'mkt', color: 'apr', xp: 45, icon: '🏷️', ruta: 'marca', etapa: 2, sello: 'familiar', url: 'misiones/ruta-marca-oferta/oferta.html' },
   { id: 15, title: 'Normas y trámites: qué papel hace falta y quién lo emite', modulo: 'aprendizaje-unido', materia: 'pol', color: 'apr', xp: 45, icon: '📜', ruta: 'politico', etapa: 2, sello: 'familiar', url: 'misiones/ruta-politica-normas-tramites/normas-tramites.html' },
   { id: 16, title: 'Pedir bien: el encargo, el contexto y el ejemplo', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '📝', ruta: 'maquina', etapa: 2, sello: 'familiar', url: 'misiones/ruta-maquina-pedir-bien/pedir-bien.html' },
+  { id: 17, title: 'El código que no confía: validación, límites e inyección', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🚦', ruta: 'casacerrada', etapa: 3, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-codigo/codigo.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -84,7 +85,6 @@ const ETAPAS_PREVISTAS = {
     6: 'Qué se automatiza en M.E.T.A.S y qué no se le delega jamás',
   },
   casacerrada: {
-    3: 'El código que no confía: validación, límites e inyección',
     4: 'Llaves y secretos: claves, entornos y repositorios',
     5: 'Copias y desastre: perder el teléfono, borrar sin querer',
     6: 'El engaño: phishing e ingeniería social en la familia',
