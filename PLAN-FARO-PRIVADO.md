@@ -32,8 +32,8 @@ pierde por el camino.
 
 ## ⏸ PENDIENTE, para retomar
 
-Se pospuso la prueba con las hijas a la noche del 28 de julio, porque no estaban
-conectadas. Lo que queda, **en este orden y sin saltarse ninguno**:
+Se pospuso la prueba con las hijas: primero a la noche del 28 de julio y, al no
+poder conectarse, a la noche del 29. Nada de lo de abajo caduca por esperar. Lo que queda, **en este orden y sin saltarse ninguno**:
 
 **1. Que entren los otros tres.** Evelyn, Jael y Angelly, cada uno en SU aparato,
 en `https://faro-dq7.pages.dev/`. Pasan dos puertas: el código que Cloudflare
@@ -63,6 +63,19 @@ Zone → Make private.
    · Apagar el alta pública de cuentas en Supabase (Authentication → Providers →
      Email). La función es_familia() ya detiene a quien se registre, pero la
      puerta no debería estar abierta.
+
+**5. Un aviso de Supabase que llego tarde, y que hay que confirmar.** El 28 de
+julio entro un correo de Supabase avisando de «Table publicly accessible ·
+rls_disabled_in_public». Esta fechado **«Issues as of 26 Jul 2026»**, o sea que
+describe el estado ANTERIOR al cierre de datos del 28. Casi seguro esta
+resuelto, pero se comprueba en el panel (Advisors) o con la consulta que lista
+todas las tablas con su estado, y no se da por bueno sin mirar.
+
+Se guarda como caso para la etapa 3 de Ciberseguridad, porque enseña tres cosas:
+que el agujero existio de verdad y lo detecto un sistema automatico; que el
+aviso tardo dos dias en llegar, y en esa ventana se esta expuesto; y que si ese
+mismo correo vuelve cuando ya esta arreglado, enseña a ignorar los avisos, que
+es donde empieza el problema siguiente.
 
 **Lo que NO hace falta hacer:** compilar y repartir el APK. Con el sitio privado
 en Cloudflare, la PWA se actualiza con cada `git push` y nadie tiene que
