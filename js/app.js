@@ -830,9 +830,39 @@ document.addEventListener('DOMContentLoaded', () => {
      renuevan. Este botón las borra y recarga, así que un toque basta para
      tener SIEMPRE la última versión, sin desinstalar ni limpiar a mano.
      Va en todos los encabezados para no perder el lugar donde se estaba. */
+  /* La recarga, aparte, para poder examinarla desde una sonda sin que el
+     navegador se lleve la página a mitad de la prueba. */
+  function faroRecargar() { location.reload(); }
+  window.faroRecargar = faroRecargar;
+
   async function faroForzarActualizacion(btn) {
     const ic = btn && btn.querySelector ? (btn.querySelector('i') || btn) : null;
     if (ic) { ic.classList.remove('spin'); void ic.offsetWidth; ic.classList.add('spin'); }
+
+    /* ⚠️ PRIMERO GUARDAR, DESPUÉS RECARGAR.
+       Este botón recarga la página entera, y con el editor de Redacción
+       abierto eso se llevaba lo escrito desde el último guardado. Pasó el 5
+       de agosto con un artículo a medias. Cada herramienta que tenga algo
+       sin guardar se apunta en faroGuardadosPendientes y se le da su turno
+       aquí; si alguna no pudo subir lo suyo, se avisa ANTES de recargar y
+       se puede decir que no. */
+    const avisos = [];
+    for (const guardar of (window.faroGuardadosPendientes || [])) {
+      try {
+        const r = await guardar();
+        if (r && r.ok === false && r.aviso) avisos.push(r.aviso);
+      } catch (_) {}
+    }
+    if (avisos.length) {
+      const seguir = confirm(
+        '⚠️ Hay trabajo sin guardar:\n\n' + avisos.join('\n\n') +
+        '\n\n¿Actualizar de todos modos?');
+      if (!seguir) {
+        if (ic) ic.classList.remove('spin');
+        return;
+      }
+    }
+
     try {
       if ('serviceWorker' in navigator) {
         const regs = await navigator.serviceWorker.getRegistrations();
@@ -844,7 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (_) {}
     toast('🔄 Actualizando…');
-    setTimeout(() => location.reload(), 250);
+    setTimeout(() => window.faroRecargar(), 250);
   }
   window.faroForzarActualizacion = faroForzarActualizacion;
 
