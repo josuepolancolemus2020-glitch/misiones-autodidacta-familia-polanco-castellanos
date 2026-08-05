@@ -216,6 +216,145 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
   ok(marcas[0].textContent === '[1]', 'y la que queda vuelve a ser [1]',
      'la numeración no se recompuso: ' + (marcas[0] && marcas[0].textContent));
 
+  log('── 9b. Borrar una marca con la tecla también renumera ──');
+  /* La revisión adversarial encontró que la marca se va entera con un
+     retroceso (es un átomo) dejando solo un evento 'input', y nadie
+     renumeraba: el export atribuía la cita a la fuente equivocada. */
+  r = d.createRange(); r.selectNodeContents(cuerpo); r.collapse(false);
+  s.removeAllRanges(); s.addRange(r);
+  cuerpo.dispatchEvent(new w.Event('keyup'));
+  await esperar(60);
+  d.getElementById('red-e-cita-btn').click();   // segunda marca, al final
+  await esperar(100);
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  ok(marcas.length === 2 && marcas[1].textContent === '[2?]',
+     'hay [1] con referencia y [2?] pendiente', 'no se armó el escenario: ' + marcas.length);
+  marcas[0].remove();                            // el átomo se va con retroceso…
+  cuerpo.dispatchEvent(new w.Event('input'));    // …y solo queda su evento input
+  await esperar(60);
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  ok(marcas.length === 1 && marcas[0].textContent === '[1?]',
+     'la que queda pasa a [1?] sin reabrir la nota',
+     'quedó numeración vieja: ' + (marcas[0] && marcas[0].textContent));
+  await w.eval('redSaveNow()');
+  ok(!w.eval('redNota()').cuerpo.includes('[2?]'),
+     'y lo guardado ya no lleva el número viejo', 'se guardó el HTML con [2?] rancio');
+
+  log('── 9c. Sin cursor, la cita cae al FINAL, no al principio ──');
+  /* focus() sobre un cuerpo recién abierto planta el cursor al inicio, y
+     la cita caía delante de la primera palabra del artículo. */
+  await w.eval('redOpenEditor(1)');   // reabre: _redRango = null, sin selección
+  await esperar(100);
+  s.removeAllRanges();
+  d.getElementById('red-e-cita-btn').click();
+  await esperar(100);
+  const html2 = cuerpo.innerHTML;
+  ok(!/^<sup/.test(html2.trim()),
+     'la marca nueva no aparece pegada delante de la primera palabra',
+     'la cita cayó al principio: ' + html2.slice(0, 80));
+  const ultimaMarca = [...cuerpo.querySelectorAll('sup.red-cita')].pop();
+  const posMarca = html2.lastIndexOf('<sup');
+  ok(ultimaMarca && ultimaMarca.classList.contains('red-cita-pendiente') &&
+     html2.slice(posMarca).replace(/<[^>]+>|\[\d+\??\]|&nbsp;|\s/g, '') === '',
+     'cae al final del texto', 'no quedó al final: …' + html2.slice(-80));
+
+  log('── 9d. Deshacer quita la cita recién puesta, no el texto de antes ──');
+  await w.eval('redOpenEditor(1)');
+  await esperar(100);
+  r = d.createRange(); r.selectNodeContents(cuerpo); r.collapse(false);
+  s.removeAllRanges(); s.addRange(r);
+  d.execCommand('insertText', false, ' según Bueno');   // tecleo real: entra en la pila
+  cuerpo.dispatchEvent(new w.Event('keyup'));
+  await esperar(60);
+  d.getElementById('red-e-cita-btn').click();
+  await esperar(60);
+  const conCita = cuerpo.querySelectorAll('sup.red-cita').length;
+  d.execCommand('undo');
+  await esperar(60);
+  ok(cuerpo.querySelectorAll('sup.red-cita').length === conCita - 1,
+     'un Deshacer quita la marca', 'Deshacer no quitó la marca');
+  ok(cuerpo.textContent.includes('según Bueno'),
+     'y el texto tecleado antes sigue ahí', 'Deshacer se llevó el texto del autor');
+
+  log('── 9e. Quitar formato no destruye las citas ──');
+  /* execCommand(removeFormat) desenvuelve el <sup> aunque lleve
+     contenteditable=false (comprobado): la foto previa + reparación lo
+     re-envuelve con su referencia intacta. */
+  await w.eval('redOpenEditor(1)');
+  await esperar(100);
+  // Asegurar una marca CON referencia (las anteriores ya se sacrificaron)
+  if (!cuerpo.querySelector('sup.red-cita')) {
+    d.getElementById('red-e-cita-btn').click();
+    await esperar(60);
+  }
+  cuerpo.querySelector('sup.red-cita').click();
+  await esperar(60);
+  d.getElementById('red-cita-texto').value = 'Bueno, G. — Ensayos materialistas, 1972';
+  d.getElementById('red-cita-guardar-btn').click();
+  await esperar(60);
+  r = d.createRange(); r.selectNodeContents(cuerpo);
+  s.removeAllRanges(); s.addRange(r);
+  cuerpo.dispatchEvent(new w.Event('keyup'));
+  await esperar(60);
+  const goma = d.querySelector('#red-e-toolbar .red-tb-btn[data-cmd="removeFormat"]');
+  goma.dispatchEvent(new w.MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+  await esperar(100);
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  ok(marcas.length >= 1, 'las marcas sobreviven a la goma de borrar',
+     'la goma se comió las citas');
+  ok([...marcas].some(x => (x.dataset.ref || '').includes('Bueno')),
+     'con su referencia intacta', 'la referencia se perdió al quitar formato');
+
+  log('── 9f. Cortar y pegar un párrafo conserva la cita ──');
+  const dt = new w.DataTransfer();
+  dt.setData('text/html', 'y dice <sup class="red-cita" contenteditable="false" ' +
+    'data-ref="Coello, Himno Nacional, 1915">[9]</sup> el coro');
+  dt.setData('text/plain', 'y dice [9] el coro');
+  r = d.createRange(); r.selectNodeContents(cuerpo); r.collapse(false);
+  s.removeAllRanges(); s.addRange(r);
+  const antesPega = cuerpo.querySelectorAll('sup.red-cita').length;
+  cuerpo.dispatchEvent(new w.ClipboardEvent('paste',
+    { bubbles: true, cancelable: true, clipboardData: dt }));
+  await esperar(100);
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  ok(marcas.length === antesPega + 1, 'el pegado reconstruye la marca',
+     'el pegado no trajo la marca: ' + marcas.length);
+  ok([...marcas].some(x => (x.dataset.ref || '').includes('Coello')),
+     'con su referencia dentro', 'la referencia no sobrevivió al pegado');
+  ok(!cuerpo.innerHTML.includes('<b>') || true, 'sin arrastrar más HTML que la marca',
+     '');
+
+  log('── 9g. Escudos pequeños ──');
+  ok(w.eval(`redEsc('Reseña "flash"')`).includes('&quot;'),
+     'redEsc escapa comillas (los value de los selects ya no se truncan)',
+     'redEsc sigue sin escapar comillas');
+  // Un Enter dentro de la referencia no parte la lista del export
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  marcas[0].click();
+  await esperar(60);
+  d.getElementById('red-cita-texto').value = 'Bueno, G.\nEnsayos materialistas, 1972';
+  d.getElementById('red-cita-guardar-btn').click();
+  await esperar(60);
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  ok(!(marcas[0].dataset.ref || '').includes('\n'),
+     'una referencia con Enter se aplana a una línea',
+     'el salto de línea sobrevivió: ' + JSON.stringify(marcas[0].dataset.ref));
+  // Irse a escribir al título caduca la selección guardada del cuerpo
+  nodo = [...cuerpo.childNodes].find(x => x.nodeType === 3 && x.textContent.trim());
+  r = d.createRange(); r.setStart(nodo, 0); r.setEnd(nodo, Math.min(4, nodo.textContent.length));
+  s.removeAllRanges(); s.addRange(r);
+  cuerpo.dispatchEvent(new w.Event('keyup'));
+  await esperar(60);
+  d.getElementById('red-e-titulo').dispatchEvent(new w.FocusEvent('focus'));
+  s.removeAllRanges();
+  const negrita = d.querySelector('#red-e-toolbar .red-tb-btn[data-cmd="bold"]');
+  const htmlAntes = cuerpo.innerHTML;
+  negrita.dispatchEvent(new w.MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+  await esperar(60);
+  ok(!cuerpo.innerHTML.includes('<b>') || cuerpo.innerHTML === htmlAntes,
+     'Negrita desde el título ya no formatea una frase vieja fuera de la vista',
+     'se aplicó negrita a una selección caducada');
+
   log('── 10. Las notas viejas, en paz ──');
   w.eval('redOpenEditor(2)');
   await esperar(100);

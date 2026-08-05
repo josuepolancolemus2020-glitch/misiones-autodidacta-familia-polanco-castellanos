@@ -71,7 +71,10 @@ function redMiembro() {
 function redEsc(s) {
   const div = document.createElement('div');
   div.textContent = s || '';
-  return div.innerHTML;
+  // innerHTML escapa & < >, pero NO las comillas: puestas en un atributo
+  // (value="…") una comilla del dato truncaba el value y el siguiente
+  // autoguardado escribía una sección o tipo a medias en la base.
+  return div.innerHTML.replace(/"/g, '&quot;');
 }
 
 function redAutorInfo(id) {
@@ -225,12 +228,21 @@ function redNombreDestino(edicionId) {
    cada toque y cada tecla) y restaurarla justo antes de aplicar el
    formato o insertar una cita. */
 
+/* Un rango solo vale si EMPIEZA Y TERMINA dentro del cuerpo. Un arrastre
+   que entra o sale del editor (empezar en la etiqueta de al lado y soltar
+   sobre el texto) produce un rango con un pie fuera, y usarlo insertaba
+   la cita fuera del editor: invisible para el guardado, perdida al
+   recargar. */
+function redRangoEnCuerpo(cuerpo, r) {
+  return !!(r && cuerpo.contains(r.startContainer) && cuerpo.contains(r.endContainer));
+}
+
 function redGuardarSeleccion() {
   const cuerpo = document.getElementById('red-e-cuerpo');
   const sel = document.getSelection();
   if (!cuerpo || !sel || !sel.rangeCount) return;
   const r = sel.getRangeAt(0);
-  if (cuerpo.contains(r.startContainer)) _redRango = r.cloneRange();
+  if (redRangoEnCuerpo(cuerpo, r)) _redRango = r.cloneRange();
 }
 
 function redRestaurarSeleccion() {
@@ -238,22 +250,26 @@ function redRestaurarSeleccion() {
   if (!cuerpo) return;
   const sel = document.getSelection();
   // Si la selección viva ya está dentro del cuerpo, no hay nada que curar
-  if (sel && sel.rangeCount && cuerpo.contains(sel.getRangeAt(0).startContainer)) return;
+  if (sel && sel.rangeCount && redRangoEnCuerpo(cuerpo, sel.getRangeAt(0))) return;
   cuerpo.focus();
-  if (_redRango && cuerpo.contains(_redRango.startContainer) && sel) {
+  if (redRangoEnCuerpo(cuerpo, _redRango) && sel) {
     sel.removeAllRanges();
     sel.addRange(_redRango);
   }
 }
 
-/* Las citas de una nota, en orden de aparición: [{num, ref}] */
+/* Las citas de una nota, en orden de aparición: [{num, ref}].
+   La referencia se aplana a una sola línea: un salto de línea dentro
+   del textarea rompía la lista del export (una entrada partida parece
+   dos, y una línea que empiece con # o - se vuelve otra cosa en
+   Markdown). */
 function redCitasDe(html) {
   if (!html || !html.includes('red-cita')) return [];
   const div = document.createElement('div');
   div.innerHTML = html;
   return [...div.querySelectorAll('sup.red-cita')].map((s, i) => ({
     num: i + 1,
-    ref: (s.dataset.ref || '').trim(),
+    ref: (s.dataset.ref || '').replace(/\s+/g, ' ').trim(),
   }));
 }
 
@@ -1077,35 +1093,115 @@ function redRenumerarCitas() {
 function redInsertarCita() {
   const cuerpo = document.getElementById('red-e-cuerpo');
   if (!cuerpo) return;
-  redRestaurarSeleccion();
 
+  // El punto de inserción se decide ANTES de enfocar: focus() sobre un
+  // cuerpo recién abierto planta un cursor AL PRINCIPIO del texto, y con
+  // él la cita caía delante de la primera palabra del artículo (y de
+  // paso renumeraba todas las demás). Sin rastro real del cursor, la
+  // cita va al final, que es donde uno la espera.
   const sel = window.getSelection();
-  let rango;
-  if (sel && sel.rangeCount && cuerpo.contains(sel.getRangeAt(0).startContainer)) {
-    rango = sel.getRangeAt(0);
-    rango.collapse(false);           // tras lo seleccionado, como toda cita
-  } else {
-    rango = document.createRange();  // sin rastro de cursor: al final del texto
-    rango.selectNodeContents(cuerpo);
-    rango.collapse(false);
-  }
+  const viva = (sel && sel.rangeCount && redRangoEnCuerpo(cuerpo, sel.getRangeAt(0)))
+    ? sel.getRangeAt(0).cloneRange() : null;
+  const guardada = redRangoEnCuerpo(cuerpo, _redRango) ? _redRango.cloneRange() : null;
 
-  const marca = document.createElement('sup');
-  marca.className = 'red-cita red-cita-pendiente';
-  marca.setAttribute('contenteditable', 'false');
-  marca.textContent = '[?]';
-  // El espacio de después no es cosmético: sin él, en algunos navegadores
-  // el cursor no puede ponerse detrás de la marca y se atasca la escritura.
-  const espacio = document.createTextNode(' ');
-  rango.insertNode(espacio);
-  rango.insertNode(marca);
-  rango.setStartAfter(espacio);
-  rango.collapse(true);
+  cuerpo.focus();
+  let rango = viva || guardada;
+  if (!rango) {
+    rango = document.createRange();
+    rango.selectNodeContents(cuerpo);
+  }
+  rango.collapse(false);             // tras lo seleccionado, como toda cita
   if (sel) { sel.removeAllRanges(); sel.addRange(rango); }
+
+  // insertHTML y no insertNode: así la inserción entra en la pila de
+  // deshacer del navegador y el botón Deshacer la quita, en vez de
+  // ignorarla y llevarse el texto tecleado antes. El espacio de después
+  // tampoco es cosmético: sin él el cursor no puede ponerse detrás de la
+  // marca y se atasca la escritura.
+  const ok = document.execCommand('insertHTML', false,
+    '<sup class="red-cita red-cita-pendiente" contenteditable="false" data-nueva="1">[?]</sup>&nbsp;');
+  let marca = cuerpo.querySelector('sup.red-cita[data-nueva]');
+  if (!ok || !marca) {
+    // Navegador sin insertHTML: a mano, como red de repuesto
+    marca = document.createElement('sup');
+    marca.className = 'red-cita red-cita-pendiente';
+    marca.setAttribute('contenteditable', 'false');
+    marca.textContent = '[?]';
+    const espacio = document.createTextNode(' ');
+    rango.insertNode(espacio);
+    rango.insertNode(marca);
+    rango.setStartAfter(espacio);
+    rango.collapse(true);
+    if (sel) { sel.removeAllRanges(); sel.addRange(rango); }
+  }
+  marca.removeAttribute('data-nueva');
 
   redRenumerarCitas();
   redQueueSave();
   if (typeof toast === 'function') toast('🔖 Cita pendiente · tócala cuando tengas la referencia');
+}
+
+/* ── Blindaje de las marcas frente a los comandos de formato ──
+   execCommand('removeFormat') desenvuelve el <sup> de la cita AUNQUE
+   lleve contenteditable=false (comprobado): quedaba el [1] como texto
+   suelto y la referencia se perdía en el siguiente autoguardado. Antes
+   de cada comando de la barra se toma una foto número→referencia, y
+   después se re-envuelve cualquier [n] que haya quedado huérfano. */
+
+function redFotoCitas() {
+  const cuerpo = document.getElementById('red-e-cuerpo');
+  const mapa = {};
+  if (!cuerpo) return mapa;
+  cuerpo.querySelectorAll('sup.red-cita').forEach(s => {
+    const num = s.textContent.replace(/\D/g, '');
+    if (num) mapa[num] = (s.dataset.ref || '').trim();
+  });
+  return mapa;
+}
+
+function redRepararCitas(mapa) {
+  const cuerpo = document.getElementById('red-e-cuerpo');
+  if (!cuerpo) return;
+
+  // Solo se re-envuelven los números que el comando dejó huérfanos: los
+  // que estaban en la foto y ya no tienen su <sup>. Así un «[3]» escrito
+  // a mano como texto normal no se convierte en cita por accidente.
+  const vivos = new Set([...cuerpo.querySelectorAll('sup.red-cita')]
+    .map(s => s.textContent.replace(/\D/g, '')));
+  const perdidos = new Set(Object.keys(mapa).filter(n => !vivos.has(n)));
+  if (!perdidos.size) return;
+
+  const walker = document.createTreeWalker(cuerpo, NodeFilter.SHOW_TEXT);
+  const textos = [];
+  let t;
+  while ((t = walker.nextNode())) {
+    if (t.parentElement && t.parentElement.closest('sup.red-cita')) continue;
+    if (/\[\d+\??\]/.test(t.textContent)) textos.push(t);
+  }
+  textos.forEach(nodo => {
+    const frag = document.createDocumentFragment();
+    let resto = nodo.textContent, m;
+    while ((m = resto.match(/\[(\d+)\??\]/))) {
+      if (m.index > 0) frag.appendChild(document.createTextNode(resto.slice(0, m.index)));
+      const num = m[1];
+      if (perdidos.has(num)) {
+        const ref = mapa[num];
+        const sup = document.createElement('sup');
+        sup.className = 'red-cita' + (ref ? '' : ' red-cita-pendiente');
+        sup.setAttribute('contenteditable', 'false');
+        if (ref) sup.dataset.ref = ref;
+        sup.textContent = m[0];
+        frag.appendChild(sup);
+        perdidos.delete(num);   // cada número perdido se recupera una sola vez
+      } else {
+        frag.appendChild(document.createTextNode(m[0]));
+      }
+      resto = resto.slice(m.index + m[0].length);
+    }
+    if (resto) frag.appendChild(document.createTextNode(resto));
+    nodo.parentNode.replaceChild(frag, nodo);
+  });
+  redRenumerarCitas();
 }
 
 function redOpenCitaModal(marca) {
@@ -1131,7 +1227,10 @@ function redCloseCitaModal() {
 
 function redGuardarCita() {
   if (!_redCitaEl) return;
-  const texto = document.getElementById('red-cita-texto').value.trim();
+  // A una sola línea: la lista de referencias del export es una entrada
+  // por línea, y un Enter dentro del textarea la partía en dos.
+  const texto = document.getElementById('red-cita-texto').value
+    .replace(/\s+/g, ' ').trim();
   if (texto) _redCitaEl.dataset.ref = texto;
   else delete _redCitaEl.dataset.ref;   // vaciarla la devuelve a pendiente
   redRenumerarCitas();
@@ -1345,7 +1444,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('mousedown', e => {
       e.preventDefault();
       redRestaurarSeleccion();
+      const foto = redFotoCitas();   // por si el comando desenvuelve una marca
       document.execCommand(btn.dataset.cmd, false, null);
+      redRepararCitas(foto);
       redQueueSave();
     });
   });
@@ -1354,13 +1455,28 @@ document.addEventListener('DOMContentLoaded', () => {
     sel?.addEventListener('change', () => {
       if (!sel.value) return;
       redRestaurarSeleccion();   // devuelve al cuerpo lo que estaba marcado
+      const foto = redFotoCitas();
       document.execCommand(cmd, false, sel.value);
+      redRepararCitas(foto);
       sel.value = ''; // el select actúa como menú: vuelve a su etiqueta
       redQueueSave();
     });
   };
   aplicarFormato('red-e-fuente', 'fontName');
   aplicarFormato('red-e-tamano', 'fontSize');
+
+  // Si el usuario se va a escribir al título, la entradilla o los límites,
+  // la selección guardada del cuerpo caduca: sin esto, tocar Negrita desde
+  // el título re-seleccionaba una frase vieja del cuerpo y la formateaba
+  // fuera de la vista (antes del arreglo táctil ese clic era inofensivo).
+  ['red-e-titulo', 'red-e-entradilla', 'red-e-lim-amarillo', 'red-e-lim-rojo'].forEach(id =>
+    document.getElementById(id)?.addEventListener('focus', () => { _redRango = null; }));
+
+  // Borrar una marca con la tecla de retroceso (se va entera, como un
+  // átomo) solo deja un evento 'input': renumerar también aquí, para que
+  // el texto guardado nunca lleve números viejos que el export atribuiría
+  // a la referencia equivocada.
+  cuerpoEl?.addEventListener('input', redRenumerarCitas);
 
   // Citas al pie: el botón deja la marca; tocar una marca abre su referencia
   const citaBtn = document.getElementById('red-e-cita-btn');
@@ -1377,11 +1493,44 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('red-cita-guardar-btn')?.addEventListener('click', redGuardarCita);
   document.getElementById('red-cita-quitar-btn')?.addEventListener('click', redQuitarCita);
 
-  // Pegar siempre como texto plano (evita arrastrar estilos de otras apps)
+  // Pegar siempre como texto plano (evita arrastrar estilos de otras apps),
+  // CON una excepción: si lo copiado trae marcas de cita —reordenar párrafos
+  // propios con cortar y pegar— se reconstruyen texto y marcas, nada más.
+  // Sin esto, mover un párrafo destruía sus citas: el corte se llevaba el
+  // <sup> con su referencia y el pegado devolvía un [2] de texto muerto.
   cuerpoEl?.addEventListener('paste', e => {
     e.preventDefault();
-    const txt = (e.clipboardData || window.clipboardData).getData('text/plain');
-    document.execCommand('insertText', false, txt);
+    const datos = e.clipboardData || window.clipboardData;
+    const htmlClip = datos.getData('text/html') || '';
+
+    if (htmlClip.includes('red-cita')) {
+      const div = document.createElement('div');
+      div.innerHTML = htmlClip;
+      const partes = [];
+      (function anda(nodo) {
+        nodo.childNodes.forEach(ch => {
+          if (ch.nodeType === Node.TEXT_NODE) { partes.push(redEsc(ch.textContent)); return; }
+          if (ch.nodeType !== Node.ELEMENT_NODE) return;
+          if (ch.matches && ch.matches('sup.red-cita')) {
+            const ref = (ch.dataset.ref || '').replace(/\s+/g, ' ').trim();
+            const sup = document.createElement('sup');
+            sup.className = 'red-cita' + (ref ? '' : ' red-cita-pendiente');
+            sup.setAttribute('contenteditable', 'false');
+            if (ref) sup.dataset.ref = ref;
+            sup.textContent = '[?]';
+            partes.push(sup.outerHTML);
+            return;
+          }
+          if (ch.tagName === 'BR') { partes.push('<br>'); return; }
+          anda(ch);
+          if (/^(DIV|P|LI|H[1-6])$/.test(ch.tagName)) partes.push('<br>');
+        });
+      })(div);
+      document.execCommand('insertHTML', false, partes.join(''));
+    } else {
+      document.execCommand('insertText', false, datos.getData('text/plain'));
+    }
+    redRenumerarCitas();
   });
   // Al borrar todo suele quedar un <br> suelto: limpiarlo para que vuelva el placeholder
   cuerpoEl?.addEventListener('input', () => {
