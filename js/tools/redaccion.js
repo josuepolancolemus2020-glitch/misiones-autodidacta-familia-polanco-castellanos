@@ -318,7 +318,17 @@ async function redFlushPending() {
 
     if (pendiente.actualizado_at && enLaNube[id] &&
         pendiente.actualizado_at <= enLaNube[id]) {
-      delete map[id];   // la nube ya tiene esto mismo o algo posterior
+      // La nube ya tiene esto mismo o algo posterior: no se sube. Pero
+      // TAMPOCO se tira: puede ser texto que solo existe aquí. Pasa a la
+      // bitácora, donde se ve y se puede recuperar a mano desde 🕘 Versiones.
+      redBitacoraPush(id, {
+        t: pendiente.actualizado_at,
+        titulo: pendiente.titulo || '',
+        entradilla: pendiente.entradilla || '',
+        cuerpo: pendiente.cuerpo || '',
+        palabras: redPalabras(pendiente.cuerpo || ''),
+      });
+      delete map[id];
       continue;
     }
     const { error: err2 } = await _sb.from(RED_T_NOTAS).update(pendiente).eq('id', id);
@@ -362,6 +372,19 @@ function redBitacoraDe(id) {
   return map[id] || [];
 }
 
+/* Mete una versión en la bitácora de una nota, la más reciente primero.
+   No repite: dos copias idénticas seguidas no aportan nada. */
+function redBitacoraPush(id, version) {
+  const map = redBitacoraLoad();
+  const lista = map[id] || [];
+  if (lista.some(v => v.cuerpo === version.cuerpo && v.titulo === version.titulo &&
+                      v.entradilla === version.entradilla)) return;
+  lista.push(version);
+  lista.sort((a, b) => String(b.t).localeCompare(String(a.t)));
+  map[id] = lista.slice(0, RED_BITACORA_MAX);
+  redBitacoraSave(map);
+}
+
 /* Guarda una versión de la nota abierta. Solo si el texto cambió: no tiene
    sentido llenar la bitácora de copias idénticas. */
 function redBitacoraAhora() {
@@ -371,22 +394,13 @@ function redBitacoraAhora() {
   const cuerpoEl = document.getElementById('red-e-cuerpo');
   if (!cuerpoEl) return;
 
-  const version = {
+  redBitacoraPush(n.id, {
     t: new Date().toISOString(),
     titulo: document.getElementById('red-e-titulo').value.trim(),
     entradilla: document.getElementById('red-e-entradilla').value.trim(),
     cuerpo: redPlano(cuerpoEl.innerHTML).trim() ? cuerpoEl.innerHTML : '',
     palabras: redPalabras(cuerpoEl.innerHTML),
-  };
-
-  const map = redBitacoraLoad();
-  const lista = map[n.id] || [];
-  if (lista[0] && lista[0].cuerpo === version.cuerpo &&
-      lista[0].titulo === version.titulo && lista[0].entradilla === version.entradilla) return;
-
-  lista.unshift(version);
-  map[n.id] = lista.slice(0, RED_BITACORA_MAX);
-  redBitacoraSave(map);
+  });
 }
 
 /* ── Carga de datos ── */
