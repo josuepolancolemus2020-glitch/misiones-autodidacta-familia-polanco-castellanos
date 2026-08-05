@@ -992,6 +992,24 @@
     </header>
     <div class="view-scroll">
 
+      <!-- Aviso: en este aparato hay una copia más nueva que la que bajó -->
+      <div class="red-e-recuperar-aviso" id="red-e-recuperar-aviso" style="display:none;">
+        <div class="red-e-recuperar-txt">
+          <strong>↩️ Hay una copia de este aparato sin subir.</strong>
+          <span id="red-e-recuperar-detalle"></span>
+        </div>
+        <button type="button" class="red-e-recuperar-btn" id="red-e-recuperar-btn">
+          <i class="fa-solid fa-rotate-left"></i> Recuperar
+        </button>
+      </div>
+
+      <!-- Aviso permanente mientras haya texto que no llegó a la nube -->
+      <div class="red-e-sinsubir-aviso" id="red-e-sinsubir-aviso" style="display:none;">
+        ⚠️ <strong>Sin conexión:</strong> lo que escribes se está guardando en este
+        aparato, pero todavía no ha subido. No cierres ni actualices hasta que
+        diga «Guardado ✓»; si pasa algo, el texto está en 🕘 Versiones.
+      </div>
+
       <!-- Aviso: esta nota está en la papelera -->
       <div class="red-e-papelera-aviso" id="red-e-papelera-aviso" style="display:none;">
         <div class="red-e-papelera-txt">
@@ -1087,6 +1105,9 @@
       <div class="red-e-contador" id="red-e-contador">0 palabras · 0 caracteres</div>
 
       <div class="red-e-acciones">
+        <button type="button" class="red-accion-btn" id="red-e-versiones-btn">
+          <i class="fa-solid fa-clock-rotate-left"></i> Versiones
+        </button>
         <button type="button" class="red-accion-btn" id="red-e-copiar-btn">
           <i class="fa-solid fa-copy"></i> Copiar
         </button>
@@ -1537,6 +1558,24 @@
         </button>
       </div>
       <div id="red-mover-list"></div>
+    </div>
+  </div>
+
+  <!-- Modal: versiones guardadas en este aparato (la bitácora local) -->
+  <div id="red-versiones-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="des-modal-title"><i class="fa-solid fa-clock-rotate-left" style="color:#4f46e5;"></i> Versiones de esta nota</div>
+        <button type="button" class="fin-modal-close" id="red-versiones-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <p class="red-cita-ayuda">
+        Copias que este aparato guarda solo, mientras escribes, sin depender de
+        la conexión. Toca una para traerla al editor: lo que haya ahora se
+        guarda antes, así que también podrás volver.
+      </p>
+      <div id="red-versiones-lista"></div>
     </div>
   </div>
 

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Redacción: no perder texto</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda escrita DESPUÉS de perder texto de verdad, el 5 de agosto: se
+   escribía sin conexión, se tocó 🔄 Actualizar y el artículo volvió a una
+   versión anterior. Esta sonda reproduce ese día.
+
+   Los dos caminos por los que se perdía, y que aquí se examinan:
+
+   1. EL PENDIENTE VIEJO QUE RESUCITA. Cuando un guardado falla, la nota se
+      copia a localStorage para reintentarla. Pero un guardado BUENO no
+      borraba esa copia: se quedaba ahí para siempre, y la siguiente recarga
+      la reenviaba a la nube encima de lo que hubiera. Si mientras tanto se
+      había escrito más, ese texto nuevo desaparecía sustituido por el de
+      antes. Se disparaba justo al tocar «Actualizar», que es lo que uno
+      toca cuando algo va mal.
+
+   2. RECARGAR SIN GUARDAR. El botón 🔄 borra las cachés y recarga la
+      página. En el editor eso se lleva por delante lo escrito desde el
+      último guardado, sin preguntar.
+
+   Y la red que ahora debe existir debajo de las dos: una bitácora local que
+   se escribe SOLA mientras se teclea, sin depender de la nube, y de la que
+   se puede sacar el texto aunque todo lo demás haya fallado.
+
+   Como el resto de esta familia: ejecuta el index.html de verdad con una
+   base de mentira a nivel de fetch, y mira lo que quedó en esa base y en
+   localStorage, no lo que la pantalla dice. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* Base de mentira con interruptor de red, para poder «quedarse sin
+   conexión» a mitad de la prueba igual que aquella noche. */
+function nuevaBase(w){
+  const estado = { notas: [], caida: false, llamadas: [] };
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url);
+    if (!u.pathname.startsWith('/rest/v1/')) return new Response('{}', { status: 200 });
+    const metodo = (init && init.method) || 'GET';
+    const cuerpo = (init && init.body) ? JSON.parse(init.body) : null;
+    const params = u.searchParams;
+    estado.llamadas.push({ metodo, ruta: u.search, cuerpo });
+    if (estado.caida) throw new TypeError('Failed to fetch');   // así falla de verdad
+    const cabs = new Headers((init && init.headers) || {});
+    const unSolo = (cabs.get('Accept') || '').includes('pgrst.object');
+    const json = d => new Response(JSON.stringify(d), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    if (!u.pathname.endsWith('redaccion_notas')) return json(unSolo ? null : []);
+
+    const filtra = () => estado.notas.filter(n => {
+      const id = params.get('id');
+      if (id && id.startsWith('eq.')) return String(n.id) === id.slice(3);
+      if (id && id.startsWith('in.')) return id.slice(4, -1).split(',').includes(String(n.id));
+      const el = params.get('eliminada');
+      if (el === 'eq.true') return !!n.eliminada;
+      return true;
+    });
+    if (metodo === 'GET')    return json(unSolo ? (filtra()[0] || null) : filtra());
+    if (metodo === 'PATCH')  { filtra().forEach(n => Object.assign(n, cuerpo)); return json([]); }
+    if (metodo === 'DELETE') { const fuera = new Set(filtra()); estado.notas = estado.notas.filter(n => !fuera.has(n)); return json([]); }
+    return json([]);
+  };
+  return estado;
+}
+
+const NOTA = () => ({
+  id: 7, edicion_id: null, autor: 'josue', titulo: 'La bandera',
+  seccion: 'ACTUALIDAD', tipo: 'Reporte', estado: 'borrador', entradilla: '',
+  cuerpo: 'Primer parrafo del articulo.', en_portada: false,
+  eliminada: false, eliminada_at: null, actualizado_at: '2026-08-05T10:00:00.000Z',
+});
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w = f.contentWindow, d = w.document;
+  if (w.eval('typeof initRedaccion') !== 'function') {
+    log('✘ index.html no cargó js/tools/redaccion.js');
+    log('RESULTADO: SUSPENDE'); document.title = 'SONDA-SUSPENDE'; return;
+  }
+  d.getElementById('login-screen').style.display = 'none';
+  d.getElementById('app-container').style.display = '';
+  w.confirm = () => true;
+
+  const base = nuevaBase(w);
+  const nube = () => base.notas.find(n => n.id === 7);
+  const PEND = 'faro_redaccion_pending_v1';
+  const pendientes = () => { try { return JSON.parse(w.localStorage.getItem(PEND)) || {}; } catch(_) { return {}; } };
+  const cuerpo = () => d.getElementById('red-e-cuerpo');
+  const escribir = txt => { cuerpo().innerHTML = txt; cuerpo().dispatchEvent(new w.Event('input', { bubbles: true })); };
+
+  async function arranca() {
+    w.localStorage.removeItem(PEND);
+    base.notas = [NOTA()];
+    base.caida = false;
+    await w.eval('_redEdicion = null; _redNotaId = null; initRedaccion()');
+    await esperar(250);
+    await w.eval('redOpenEditor(7)');
+    await esperar(120);
+  }
+
+  log('── 1. Un guardado bueno no deja pendientes atrás ──');
+  await arranca();
+  base.caida = true;                          // se cae la conexión
+  escribir('Primer parrafo del articulo. Sin conexion escribo esto.');
+  await esperar(1600);
+  ok(Object.keys(pendientes()).length === 1,
+     'sin conexión, el texto queda apuntado en el aparato',
+     'no se guardó copia local del intento fallido');
+  base.caida = false;                         // vuelve la conexión
+  escribir('Primer parrafo del articulo. Sin conexion escribo esto. Y ya con conexion, mas.');
+  await esperar(1600);
+  ok(nube().cuerpo.includes('Y ya con conexion'),
+     'al volver la conexión el texto sube a la nube',
+     'el texto no llegó a la nube');
+  ok(Object.keys(pendientes()).length === 0,
+     'y el apunte pendiente se borra: ya no hace falta',
+     'el pendiente sobrevivió a un guardado bueno (por aquí se perdía el texto)');
+
+  log('── 2. El pendiente viejo NO pisa lo nuevo al recargar ──');
+  /* El día del fallo: queda un pendiente de un rato antes, después se
+     escribe más (y sí se guarda), y al tocar Actualizar el pendiente viejo
+     se reenvía encima. Reproducido a mano, forzando el pendiente rancio. */
+  await arranca();
+  const rancio = { titulo: 'La bandera', entradilla: '', cuerpo: 'VERSION VIEJA, la de antes.',
+    seccion: 'ACTUALIDAD', tipo: 'Reporte', estado: 'borrador', edicion_id: null,
+    en_portada: false, limite_amarillo: null, limite_rojo: null,
+    actualizado_at: '2026-08-05T09:00:00.000Z' };
+  w.localStorage.setItem(PEND, JSON.stringify({ 7: rancio }));
+  nube().cuerpo = 'VERSION NUEVA, con todo lo que escribi despues.';
+  nube().actualizado_at = '2026-08-05T12:00:00.000Z';
+
+  await w.eval('redFlushPending()');
+  await esperar(300);
+  ok(nube().cuerpo.includes('NUEVA'),
+     'un pendiente más viejo que la nube ya no la sobreescribe',
+     'EL FALLO DEL 5 DE AGOSTO: el pendiente viejo borró el texto nuevo');
+  ok(Object.keys(pendientes()).length === 0,
+     'y se descarta, para que no vuelva a intentarlo en cada recarga',
+     'el pendiente viejo sigue ahí, listo para pisar otra vez');
+
+  log('── 3. Un pendiente MÁS NUEVO sí se sube (la red sigue sirviendo) ──');
+  await arranca();
+  const bueno = Object.assign({}, rancio,
+    { cuerpo: 'Lo que escribi sin conexion y todavia no ha subido.',
+      actualizado_at: '2026-08-05T23:00:00.000Z' });
+  w.localStorage.setItem(PEND, JSON.stringify({ 7: bueno }));
+  await w.eval('redFlushPending()');
+  await esperar(300);
+  ok(nube().cuerpo.includes('todavia no ha subido'),
+     'lo escrito sin conexión sí sube cuando vuelve la red',
+     'el arreglo rompió el reintento: el texto offline no subió');
+
+  log('── 4. La bitácora local: se escribe sola, sin depender de la nube ──');
+  await arranca();
+  base.caida = true;                          // toda la prueba sin conexión
+  escribir('Entrando a los cuarenta anios de vida, no recuerdo otro color.');
+  await esperar(900);
+  escribir('Entrando a los cuarenta anios de vida, no recuerdo otro color que el azul marino.');
+  await esperar(900);
+  const versiones = w.eval('JSON.stringify(redBitacoraDe(7))');
+  const vs = JSON.parse(versiones || '[]');
+  ok(vs.length >= 2, `guarda una versión por cada pausa al escribir (${vs.length})`,
+     'la bitácora no guardó versiones: ' + versiones);
+  ok(vs[0] && vs[0].cuerpo.includes('azul marino'),
+     'la primera de la lista es la más reciente',
+     'la bitácora no ordena por fecha');
+  ok(vs.some(v => v.cuerpo.includes('no recuerdo otro color.')),
+     'y conserva también la versión anterior',
+     'solo guardó la última: no hay a dónde volver');
+  base.caida = false;
+
+  /* Borrar cachés y desregistrar el service worker no es lo que se examina
+     aquí (y en headless se queda colgado), así que se apartan. Lo que
+     importa es el ORDEN: guardar antes, recargar después. */
+  try {
+    w.eval('navigator.serviceWorker.getRegistrations = async () => [];');
+    w.eval('window.caches = { keys: async () => [], delete: async () => true };');
+  } catch (_) {}
+
+  log('── 5. Recargar ya no se lleva lo escrito ──');
+  /* El botón 🔄 pasa por faroRecargar(), y antes corre los guardados
+     pendientes de cada herramienta. Aquí se sustituye la recarga por un
+     testigo para poder mirar qué quedó guardado justo antes. */
+  await arranca();
+  let recargo = false;
+  w.faroRecargar = () => { recargo = true; };
+  escribir('Primer parrafo del articulo. Esto lo escribo y toco actualizar sin esperar.');
+  // sin esperar el autoguardado de 1,2 s: se toca 🔄 en caliente
+  await w.eval('faroForzarActualizacion(document.querySelector("#view-redaccion-editor .refresh-btn"))');
+  await esperar(600);
+  ok(recargo, 'el botón sigue recargando la aplicación', 'el botón dejó de recargar');
+  ok(nube().cuerpo.includes('toco actualizar sin esperar'),
+     'pero antes guarda lo que había a medias',
+     'recargó sin guardar: el texto se perdió (el fallo del 5 de agosto)');
+  ok(w.eval('redBitacoraDe(7)').length >= 1,
+     'y deja además su copia en la bitácora',
+     'no quedó copia local antes de recargar');
+
+  log('── 6. Sin conexión, recargar avisa antes de irse ──');
+  await arranca();
+  base.caida = true;
+  let aviso = '';
+  w.confirm = m => { aviso = m; return false; };     // el usuario dice «mejor no»
+  recargo = false;
+  escribir('Texto sin conexion que no debe perderse por un toque.');
+  await esperar(1600);
+  await w.eval('faroForzarActualizacion(document.querySelector("#view-redaccion-editor .refresh-btn"))');
+  await esperar(600);
+  ok(/sin guardar|no se ha guardado|sin conexión/i.test(aviso),
+     'avisa de que hay texto sin subir', 'recargó sin avisar: ' + JSON.stringify(aviso));
+  ok(!recargo, 'y si se dice que no, NO recarga', 'recargó de todos modos');
+  ok(w.eval('redBitacoraDe(7)').some(v => v.cuerpo.includes('no debe perderse')),
+     'el texto está a salvo en la bitácora', 'no hay copia local de ese texto');
+  w.confirm = () => true;
+  base.caida = false;
+
+  log('── 7. Recuperar: la nota vuelve desde la bitácora ──');
+  /* El caso de aquella noche: la nube tiene una versión vieja y el aparato
+     una copia más nueva. Al abrir la nota hay que decirlo y poder volver. */
+  await arranca();
+  base.caida = true;
+  escribir('Un parrafo largo que se escribio sin conexion y no llego a la nube jamas.');
+  await esperar(1000);
+  base.caida = false;
+  await w.eval('switchView("view-redaccion")');
+  await esperar(100);
+  nube().cuerpo = 'Primer parrafo del articulo.';       // la nube se quedó atrás
+  await w.eval('_redNotaId = null; initRedaccion()');
+  await esperar(300);
+  await w.eval('redOpenEditor(7)');
+  await esperar(200);
+  const avisoEl = d.getElementById('red-e-recuperar-aviso');
+  ok(avisoEl && avisoEl.style.display !== 'none',
+     'al abrirla avisa de que hay una copia local más nueva',
+     'no avisó de la copia local: el texto parecía perdido');
+  d.getElementById('red-e-recuperar-btn').click();
+  await esperar(300);
+  ok(cuerpo().textContent.includes('no llego a la nube jamas'),
+     'y con un toque el texto vuelve al editor',
+     'el botón de recuperar no devolvió el texto');
+  await w.eval('redSaveNow()');
+  ok(nube().cuerpo.includes('no llego a la nube jamas'),
+     'y queda guardado en la nube', 'lo recuperado no se guardó');
+
+  log('── 8. La lista de versiones ──');
+  await w.eval('redOpenVersiones()');
+  await esperar(150);
+  const lista = d.getElementById('red-versiones-lista');
+  ok(d.getElementById('red-versiones-overlay').style.display === 'flex',
+     'el botón 🕘 abre la lista de versiones', 'no se abrió la lista');
+  ok(lista && lista.querySelectorAll('[data-ver]').length >= 2,
+     'con las versiones guardadas de esta nota',
+     'la lista salió vacía');
+  ok(lista.textContent.includes('palabra'),
+     'y cada una dice cuándo fue y cuánto tenía',
+     'la lista no dice el tamaño de cada versión');
+
+  log('── 9. La bitácora aguanta una nota larga sin reventar ──');
+  await arranca();
+  const largo = 'palabra '.repeat(4000);        // ~32 KB por versión
+  for (let i = 0; i < 6; i++) {
+    escribir(largo + ' version ' + i);
+    await esperar(700);
+  }
+  const guardadas = w.eval('redBitacoraDe(7).length');
+  ok(guardadas >= 1, 'con notas grandes sigue guardando algo (' + guardadas + ')',
+     'la bitácora se cayó con una nota larga');
+  ok(w.eval('redBitacoraDe(7)')[0].cuerpo.includes('version 5'),
+     'y lo último escrito siempre está', 'lo último no quedó guardado');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SONDA-SUSPENDE';
+});
+</script>
+</body>
+</html>

@@ -30,6 +30,8 @@ const RED_T_EDICIONES = 'redaccion_ediciones';
 const RED_T_NOTAS     = 'redaccion_notas';
 const RED_T_CONFIG    = 'redaccion_config';
 const RED_PENDING_KEY = 'faro_redaccion_pending_v1';
+const RED_BITACORA_KEY = 'faro_redaccion_bitacora_v1';
+const RED_BITACORA_MAX = 12;   // versiones guardadas por nota
 
 const RED_SECCIONES = [
   'PORTADA', 'EDITORIAL', 'ACTUALIDAD', 'REPORTE INVESTIGATIVO',
@@ -60,6 +62,8 @@ let _redPapelera  = false;   // ¿la base ya tiene las columnas de la papelera?
 let _redEdEditando = null;   // edición abierta en el modal (null = una nueva)
 let _redRango     = null;    // última selección dentro del cuerpo (ver redGuardarSeleccion)
 let _redCitaEl    = null;    // marca de cita abierta en su modal
+let _redBitTimer  = null;    // temporizador de la bitácora local
+let _redSinSubir  = false;   // el último guardado no llegó a la nube
 
 /* ── Helpers ── */
 
@@ -282,16 +286,107 @@ function redPendingSave(map) {
   try { localStorage.setItem(RED_PENDING_KEY, JSON.stringify(map)); } catch (_) {}
 }
 
+/* Reenviar lo que no llegó, SIN pisar lo que ya está más nuevo.
+
+   Así se perdió un artículo el 5 de agosto: un guardado que falló dejó su
+   copia aquí, después se siguió escribiendo con conexión y esa copia vieja
+   se quedó olvidada en el aparato. A la siguiente recarga —la que uno hace
+   justo cuando algo va mal— se reenviaba a la nube encima del texto nuevo.
+   El trabajo de la noche sustituido por el de una hora antes, sin un aviso.
+
+   Ahora se pregunta primero qué hay en la nube y solo sube lo que de verdad
+   sea más reciente. Y si no se puede preguntar, no se toca nada: no subir
+   es recuperable, pisar no lo es. */
 async function redFlushPending() {
   if (!_sb) return;
   const map = redPendingLoad();
   const ids = Object.keys(map);
   if (!ids.length) return;
+
+  const { data, error } = await _sb.from(RED_T_NOTAS)
+    .select('id, actualizado_at').in('id', ids);
+  if (error) return;   // sin poder comparar, mejor quedarse quieto
+
+  const enLaNube = {};
+  (data || []).forEach(r => { enLaNube[r.id] = r.actualizado_at || ''; });
+
   for (const id of ids) {
-    const { error } = await _sb.from(RED_T_NOTAS).update(map[id]).eq('id', id);
-    if (!error) delete map[id];
+    const pendiente = map[id];
+    // La nota no aparece: pudo borrarse, o pudo ser un problema de permisos.
+    // Se deja el pendiente donde está en vez de tirarlo por si acaso.
+    if (!(id in enLaNube)) continue;
+
+    if (pendiente.actualizado_at && enLaNube[id] &&
+        pendiente.actualizado_at <= enLaNube[id]) {
+      delete map[id];   // la nube ya tiene esto mismo o algo posterior
+      continue;
+    }
+    const { error: err2 } = await _sb.from(RED_T_NOTAS).update(pendiente).eq('id', id);
+    if (!err2) delete map[id];
   }
   redPendingSave(map);
+}
+
+/* ── La bitácora: copias locales que no dependen de nadie ──────────
+   Se escribe mientras se teclea, en este aparato, sin preguntarle a la
+   red ni a la sesión. Es la última red debajo de todas las demás: si
+   falla la conexión, si falla el guardado, si alguien recarga sin
+   querer, el texto sigue aquí. No se borra al guardar bien: se guardan
+   las últimas versiones de cada nota, y de ahí se puede volver. */
+
+function redBitacoraLoad() {
+  try { return JSON.parse(localStorage.getItem(RED_BITACORA_KEY)) || {}; } catch (_) { return {}; }
+}
+
+/* Si no cabe, se van soltando las versiones más viejas de todas las notas
+   antes que rendirse: media bitácora sirve, ninguna no. */
+function redBitacoraSave(map) {
+  for (let intento = 0; intento < 8; intento++) {
+    try { localStorage.setItem(RED_BITACORA_KEY, JSON.stringify(map)); return true; }
+    catch (_) {
+      let masVieja = null, suNota = null;
+      Object.keys(map).forEach(id => {
+        const v = map[id][map[id].length - 1];
+        if (v && (!masVieja || v.t < masVieja.t)) { masVieja = v; suNota = id; }
+      });
+      if (!suNota) return false;
+      map[suNota].pop();
+      if (!map[suNota].length) delete map[suNota];
+    }
+  }
+  return false;
+}
+
+function redBitacoraDe(id) {
+  const map = redBitacoraLoad();
+  return map[id] || [];
+}
+
+/* Guarda una versión de la nota abierta. Solo si el texto cambió: no tiene
+   sentido llenar la bitácora de copias idénticas. */
+function redBitacoraAhora() {
+  clearTimeout(_redBitTimer);
+  const n = redNota();
+  if (!n) return;
+  const cuerpoEl = document.getElementById('red-e-cuerpo');
+  if (!cuerpoEl) return;
+
+  const version = {
+    t: new Date().toISOString(),
+    titulo: document.getElementById('red-e-titulo').value.trim(),
+    entradilla: document.getElementById('red-e-entradilla').value.trim(),
+    cuerpo: redPlano(cuerpoEl.innerHTML).trim() ? cuerpoEl.innerHTML : '',
+    palabras: redPalabras(cuerpoEl.innerHTML),
+  };
+
+  const map = redBitacoraLoad();
+  const lista = map[n.id] || [];
+  if (lista[0] && lista[0].cuerpo === version.cuerpo &&
+      lista[0].titulo === version.titulo && lista[0].entradilla === version.entradilla) return;
+
+  lista.unshift(version);
+  map[n.id] = lista.slice(0, RED_BITACORA_MAX);
+  redBitacoraSave(map);
 }
 
 /* ── Carga de datos ── */
@@ -916,6 +1011,8 @@ function redOpenEditor(id) {
   redUpdatePortadaBtn();
 
   redUpdatePapeleraAviso();
+  redUpdateRecuperarAviso();   // ¿hay copia local más nueva que lo que bajó?
+  redUpdateAvisoSinSubir();
   redUpdateContador();
   redSetSaveState('ok');
   switchView('view-redaccion-editor');
@@ -976,6 +1073,103 @@ function redUpdateContador() {
   el.className = `red-e-contador${lim ? ` red-cont-${lim}` : ''}`;
 }
 
+/* ── Recuperar lo que no llegó a la nube ───────────────────────────
+   Al abrir una nota se compara lo que vino de la nube con la última copia
+   local. Si la de aquí es más nueva y distinta, se dice —no se aplica
+   sola: el texto es del autor, la decisión también. */
+
+function redVersionRecuperable() {
+  const n = redNota();
+  if (!n) return null;
+  const v = redBitacoraDe(n.id)[0];
+  if (!v) return null;
+  if ((v.cuerpo || '') === (n.cuerpo || '')) return null;
+  // Solo si la copia local es POSTERIOR a lo que trae la nota
+  if (n.actualizado_at && v.t <= n.actualizado_at) return null;
+  return v;
+}
+
+function redUpdateRecuperarAviso() {
+  const aviso = document.getElementById('red-e-recuperar-aviso');
+  if (!aviso) return;
+  const v = redVersionRecuperable();
+  aviso.style.display = v ? 'flex' : 'none';
+  if (!v) return;
+  const det = document.getElementById('red-e-recuperar-detalle');
+  const n = redNota();
+  const suyas = redPalabras(n ? n.cuerpo : '');
+  if (det) {
+    det.textContent = `La copia de este aparato (${redHaceCuanto(v.t)}, ` +
+      `${v.palabras} palabra${v.palabras === 1 ? '' : 's'}) no coincide con lo que bajó de ` +
+      `la nube (${suyas}). Puedes traerla de vuelta.`;
+  }
+}
+
+function redRecuperarUltima() {
+  const v = redVersionRecuperable();
+  if (!v) return;
+  redAplicarVersion(v);
+  if (typeof toast === 'function') toast('↩️ Texto recuperado · revisa y se guarda solo');
+}
+
+/* Poner una versión de la bitácora en el editor. Antes de pisar nada se
+   guarda lo que hay ahora, para que recuperar tampoco sea irreversible. */
+function redAplicarVersion(v) {
+  redBitacoraAhora();
+  document.getElementById('red-e-titulo').value = v.titulo || '';
+  document.getElementById('red-e-entradilla').value = v.entradilla || '';
+  const cuerpo = document.getElementById('red-e-cuerpo');
+  cuerpo.innerHTML = (v.cuerpo || '').includes('<')
+    ? v.cuerpo
+    : redEsc(v.cuerpo || '').replace(/\n/g, '<br>');
+  _redRango = null;
+  redRenumerarCitas();
+  redUpdateContador();
+  redQueueSave();
+  redUpdateRecuperarAviso();
+}
+
+function redOpenVersiones() {
+  const overlay = document.getElementById('red-versiones-overlay');
+  const lista = document.getElementById('red-versiones-lista');
+  const n = redNota();
+  if (!overlay || !lista || !n) return;
+
+  const versiones = redBitacoraDe(n.id);
+  lista.innerHTML = versiones.length
+    ? versiones.map((v, i) => `
+        <button type="button" class="red-version-item" data-ver="${i}">
+          <span class="red-version-cuando">${i === 0 ? '🕘 La más reciente · ' : ''}${redEsc(redHaceCuanto(v.t))}, ${new Date(v.t).toLocaleTimeString('es', { hour: 'numeric', minute: '2-digit' })}</span>
+          <span class="red-version-tam">${v.palabras} palabra${v.palabras === 1 ? '' : 's'}</span>
+          <span class="red-version-ojo">${redEsc(redPlano(v.cuerpo).slice(0, 90))}…</span>
+        </button>`).join('')
+    : '<div class="fin-empty">Todavía no hay versiones guardadas de esta nota.</div>';
+
+  lista.querySelectorAll('[data-ver]').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const v = versiones[Number(btn.dataset.ver)];
+      if (!v) return;
+      if (!confirm(`¿Traer esta versión (${v.palabras} palabras) al editor?\n\nLo que hay ahora se guarda antes en la bitácora, así que también podrás volver.`)) return;
+      redAplicarVersion(v);
+      redCloseVersiones();
+      if (typeof toast === 'function') toast('↩️ Versión restaurada');
+    }));
+
+  overlay.style.display = 'flex';
+}
+
+function redCloseVersiones() {
+  const overlay = document.getElementById('red-versiones-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+/* Aviso permanente mientras haya texto que no subió: el renglón pequeño
+   del encabezado se pierde de vista justo cuando más importa. */
+function redUpdateAvisoSinSubir() {
+  const el = document.getElementById('red-e-sinsubir-aviso');
+  if (el) el.style.display = _redSinSubir ? 'block' : 'none';
+}
+
 function redSetSaveState(estado) {
   const el = document.getElementById('red-e-save-state');
   if (!el) return;
@@ -1007,6 +1201,10 @@ function redQueueSave() {
   redUpdateContador();
   clearTimeout(_redSaveTimer);
   _redSaveTimer = setTimeout(redSaveNow, 1200);
+  // La copia local va por su cuenta y llega antes: no espera a la red, y
+  // se escribe aunque el guardado de la nube no ocurra nunca.
+  clearTimeout(_redBitTimer);
+  _redBitTimer = setTimeout(redBitacoraAhora, 600);
 }
 
 async function redSaveNow() {
@@ -1015,21 +1213,31 @@ async function redSaveNow() {
   if (!n) return;
   const campos = redCamposEditor();
   Object.assign(n, campos); // reflejo local inmediato
+  redBitacoraAhora();       // pase lo que pase con la red, queda copia aquí
 
   let ok = false;
   if (_sb) {
-    const { error } = await _sb.from(RED_T_NOTAS).update(campos).eq('id', n.id);
-    ok = !error;
+    try {
+      const { error } = await _sb.from(RED_T_NOTAS).update(campos).eq('id', n.id);
+      ok = !error;
+    } catch (_) { ok = false; }   // sin conexión, fetch revienta en vez de contestar
   }
+  const map = redPendingLoad();
   if (!ok) {
     // Guardar el cambio pendiente localmente; se reintenta al reconectar
-    const map = redPendingLoad();
     map[n.id] = campos;
     redPendingSave(map);
+    _redSinSubir = true;
     redSetSaveState('off');
   } else {
+    // Un guardado bueno CANCELA el pendiente de esta nota. Si se quedaba
+    // ahí, la siguiente recarga lo reenviaba encima de este texto: así se
+    // perdió un artículo entero el 5 de agosto.
+    if (map[n.id]) { delete map[n.id]; redPendingSave(map); }
+    _redSinSubir = false;
     redSetSaveState('ok');
   }
+  redUpdateAvisoSinSubir();
 }
 
 /* ── Mover nota a otra edición ── */
@@ -1591,6 +1799,36 @@ document.addEventListener('DOMContentLoaded', () => {
     if (await redRestaurarNota(n.id)) redUpdatePapeleraAviso();
   });
 
+  // Versiones guardadas de la nota abierta
+  document.getElementById('red-e-versiones-btn')?.addEventListener('click', redOpenVersiones);
+  document.getElementById('red-versiones-close')?.addEventListener('click', redCloseVersiones);
+  document.getElementById('red-versiones-overlay')?.addEventListener('click', e => {
+    if (e.target.id === 'red-versiones-overlay') redCloseVersiones();
+  });
+  document.getElementById('red-e-recuperar-btn')?.addEventListener('click', redRecuperarUltima);
+
   // Reintentar guardados pendientes al recuperar conexión
   window.addEventListener('online', redFlushPending);
+
+  /* Antes de que el botón 🔄 recargue, guardar lo que haya a medias.
+     Recargar con el editor abierto se llevaba por delante lo escrito
+     desde el último guardado, sin preguntar. Devuelve si quedó algo sin
+     subir, para que quien recarga pueda decidir con la verdad delante. */
+  (window.faroGuardadosPendientes = window.faroGuardadosPendientes || []).push(async () => {
+    const editorAbierto = document.getElementById('view-redaccion-editor')?.classList.contains('active');
+    if (!editorAbierto || !redNota()) return { ok: true };
+    redBitacoraAhora();          // la copia local, siempre y primero
+    await redSaveNow();
+    return _redSinSubir
+      ? { ok: false, aviso: 'La nota que estás escribiendo no se ha guardado en la nube (sin conexión). Hay copia en este aparato y podrás recuperarla desde 🕘 Versiones.' }
+      : { ok: true };
+  });
+
+  /* Y si se cierra la pestaña o se recarga desde el navegador, al menos
+     dejar la copia local hecha. No siempre da tiempo, pero cuesta nada. */
+  window.addEventListener('beforeunload', () => {
+    if (document.getElementById('view-redaccion-editor')?.classList.contains('active')) {
+      try { redBitacoraAhora(); } catch (_) {}
+    }
+  });
 });
