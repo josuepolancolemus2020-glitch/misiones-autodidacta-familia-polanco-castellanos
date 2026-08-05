@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Redacción: fechas de cierre y papelera</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de los dos arreglos de Redacción:
+
+     1. las fechas de cierre (y el número y el título) de una edición se
+        pueden cambiar después de creada;
+     2. «Eliminar» una nota no la borra: la manda a una papelera de la que
+        vuelve entera.
+
+   Lo segundo es lo que de verdad hay que examinar. Una papelera que se
+   comprueba «leyendo el código y viendo que dice eliminada: true» no
+   comprueba nada: el fallo que arruina la tarde no es que falte la palabra,
+   es que la nota se vaya igual por otro camino (un DELETE que quedó suelto,
+   un autoguardado que llega después y la pisa, un filtro que se olvidó y la
+   deja saliendo en la revista). Eso solo se ve ejecutando.
+
+   Así que aquí no se lee el código: se ejecuta el de verdad, el mismo
+   index.html que usa la familia, y se le pone delante una base de datos de
+   mentira a nivel de fetch. El cliente de Supabase es el auténtico y arma
+   sus consultas de verdad; lo único falso es quién contesta. De cada prueba
+   se mira lo que quedó en esa base, no lo que la pantalla dice que pasó.
+
+   Una lección que esta familia de sondas ya pagó: hay que probar también el
+   caso de la base VIEJA, la que todavía no tiene las columnas nuevas. Si al
+   faltar la columna la herramienta se rompe o —peor— borra de verdad
+   creyendo que hay red debajo, la papelera es una mentira cara. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── La base de datos de mentira ──────────────────────────────────────
+   Contesta como PostgREST a lo justo que usa Redacción: eq, in, order,
+   limit y el Prefer de representación. Guarda además cada consulta, para
+   poder afirmar «esto fue un PATCH, no un DELETE». */
+function nuevaBase(w, opciones){
+  const estado = {
+    tablas: { redaccion_ediciones: [], redaccion_notas: [], redaccion_config: [] },
+    llamadas: [],
+    sinPapelera: !!(opciones && opciones.sinPapelera),
+  };
+  const filtra = (filas, params) => filas.filter(fila =>
+    [...params.entries()].every(([col, val]) => {
+      if (['select','order','limit','offset'].includes(col)) return true;
+      if (val.startsWith('eq.')) {
+        const v = val.slice(3);
+        if (v === 'true')  return fila[col] === true;
+        if (v === 'false') return !fila[col];
+        if (v === 'null')  return fila[col] === null || fila[col] === undefined;
+        return String(fila[col]) === v;
+      }
+      if (val.startsWith('in.')) {
+        const lista = val.slice(4, -1).split(',');
+        return lista.includes(String(fila[col]));
+      }
+      if (val.startsWith('is.')) {
+        const v = val.slice(3);
+        if (v === 'null') return fila[col] === null || fila[col] === undefined;
+      }
+      return true;
+    }));
+
+  let siguienteId = 1000;
+
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url);
+    if (!u.pathname.startsWith('/rest/v1/')) return new Response('{}', { status: 200 });
+
+    const tabla  = u.pathname.replace('/rest/v1/', '');
+    const params = u.searchParams;
+    const metodo = (init && init.method) || 'GET';
+    const cuerpo = (init && init.body) ? JSON.parse(init.body) : null;
+    const cabs   = new Headers((init && init.headers) || {});
+    const unSolo = (cabs.get('Accept') || '').includes('pgrst.object');
+    estado.llamadas.push({ tabla, metodo, params: u.search, cuerpo });
+
+    const json = (dato, status) => new Response(JSON.stringify(dato),
+      { status: status || 200, headers: { 'Content-Type': 'application/json' } });
+
+    /* La base vieja: la columna de la papelera todavía no existe */
+    if (estado.sinPapelera && u.search.includes('eliminada')) {
+      return json({ code: '42703', message: 'column redaccion_notas.eliminada does not exist' }, 400);
+    }
+
+    const filas = estado.tablas[tabla] || [];
+
+    if (metodo === 'GET') {
+      let r = filtra(filas, params);
+      const orden = params.get('order');
+      if (orden) {
+        const [col, dir] = orden.split('.');
+        r = [...r].sort((a, b) => String(a[col]).localeCompare(String(b[col])) * (dir === 'desc' ? -1 : 1));
+      }
+      const lim = params.get('limit');
+      if (lim) r = r.slice(0, Number(lim));
+      return json(unSolo ? (r[0] || null) : r);
+    }
+    if (metodo === 'POST') {
+      const nuevas = (Array.isArray(cuerpo) ? cuerpo : [cuerpo]).map(x =>
+        Object.assign({ id: siguienteId++, creado_at: new Date().toISOString(), archivada: false }, x));
+      estado.tablas[tabla] = filas.concat(nuevas);
+      return json(unSolo ? nuevas[0] : nuevas, 201);
+    }
+    if (metodo === 'PATCH') {
+      filtra(filas, params).forEach(fila => Object.assign(fila, cuerpo));
+      return json(unSolo ? null : []);
+    }
+    if (metodo === 'DELETE') {
+      const fuera = new Set(filtra(filas, params));
+      estado.tablas[tabla] = filas.filter(x => !fuera.has(x));
+      return json([]);
+    }
+    return json([]);
+  };
+  return estado;
+}
+
+const HOY = new Date();
+const enDias = d => {
+  const x = new Date(HOY.getFullYear(), HOY.getMonth(), HOY.getDate() + d);
+  return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
+};
+
+function siembra(base){
+  base.tablas.redaccion_ediciones = [
+    { id: 1, numero: 4, titulo: 'Nº 04 · 1–15 agosto 2026',  fecha_cierre: enDias(11), archivada: false },
+    { id: 2, numero: 3, titulo: 'Nº 03 · 16–31 julio 2026',  fecha_cierre: enDias(-5), archivada: false },
+    { id: 3, numero: 3, titulo: 'Nº 03 (repetida por error)', fecha_cierre: null,      archivada: false },
+  ];
+  const nota = (id, edicion, titulo, extra) => Object.assign({
+    id, edicion_id: edicion, autor: 'josue', titulo, seccion: 'ACTUALIDAD',
+    tipo: 'Artículo', estado: 'borrador', entradilla: '', cuerpo: 'una dos tres',
+    en_portada: false, eliminada: false, eliminada_at: null,
+    actualizado_at: '2026-08-0' + (id % 9 + 1) + 'T10:00:00Z',
+  }, extra || {});
+  base.tablas.redaccion_notas = [
+    nota(10, 1, 'La nota viva de la 04'),
+    nota(11, 1, 'La otra viva de la 04', { estado: 'listo' }),
+    nota(12, null, 'Una idea suelta'),
+    nota(13, 1, 'La que se borró antier', { eliminada: true, eliminada_at: enDias(-2) + 'T09:00:00Z' }),
+    nota(14, 2, 'La que se borró ayer',   { eliminada: true, eliminada_at: enDias(-1) + 'T09:00:00Z' }),
+  ];
+}
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);                 // que arranque el index de verdad
+  const w = f.contentWindow;
+
+  if (typeof w.eval('typeof initRedaccion') !== 'string' ||
+      w.eval('typeof initRedaccion') !== 'function') {
+    log('✘ index.html no cargó js/tools/redaccion.js'); out.textContent = L.join('\n') + '\n\nRESULTADO: SUSPENDE';
+    return;
+  }
+  w.confirm = () => true;              // los avisos se dan por leídos
+  const base = nuevaBase(w, {});
+  siembra(base);
+  const notas = () => base.tablas.redaccion_notas;
+  const buscaNota = id => notas().find(n => n.id === id);
+  const ultimas = n => base.llamadas.slice(-n);
+  const texto = id => (w.document.getElementById(id) || {}).textContent || '';
+
+  log('── 1. La papelera se detecta y se ofrece ──');
+  await w.eval('_redEdicion = null; initRedaccion()');
+  await esperar(150);
+  ok(w.eval('_redPapelera') === true, 'la base tiene las columnas: la papelera se activa',
+     'no detectó las columnas de la papelera');
+  ok(w.document.querySelector('[data-ed="papelera"]'), 'aparece el chip 🗑️ Papelera',
+     'falta el chip de la papelera');
+  ok(w.document.querySelector('[data-ed="papelera"]').textContent.includes('2'),
+     'el chip lleva la cuenta de lo que hay dentro (2)',
+     'el chip no dice cuántas notas esperan');
+
+  log('── 2. Lo eliminado no se cuela en la edición ──');
+  ok(w.eval('_redEdicion') === 1, 'arranca en la edición abierta más reciente',
+     'no arrancó en la edición abierta');
+  ok(w.eval('redNotasDeEdicion().length') === 2,
+     'la Nº 04 muestra 2 notas vivas, no 3', 'una nota de la papelera sigue en la lista');
+  ok(texto('red-ed-meta').includes('1/2 notas listas'),
+     'la cabecera cuenta solo las vivas (1/2)', 'la cabecera cuenta notas borradas: ' + texto('red-ed-meta'));
+  ok(!w.document.getElementById('red-list').textContent.includes('se borró antier'),
+     'la nota borrada no aparece en la lista', 'la nota borrada sigue apareciendo');
+  ok(!w.eval('redEdicionMd()').includes('se borró antier'),
+     'la exportación a Markdown tampoco la lleva', 'la nota borrada se exportaría a la revista');
+
+  log('── 3. Eliminar NO borra: aparta ──');
+  const antes = notas().length;
+  await w.eval('redOpenEditor(10); redEliminarNota()');
+  await esperar(150);
+  ok(notas().length === antes, 'la nota sigue en la base de datos',
+     'la nota desapareció de la base: se borró de verdad');
+  ok(buscaNota(10) && buscaNota(10).eliminada === true,
+     'queda marcada como eliminada', 'no quedó marcada como eliminada');
+  ok(buscaNota(10) && !!buscaNota(10).eliminada_at,
+     'guarda cuándo se borró', 'no guardó la fecha de borrado');
+  ok(!ultimas(3).some(c => c.metodo === 'DELETE'),
+     'no se mandó ningún DELETE', 'se mandó un DELETE: la nota no se puede recuperar');
+  ok(buscaNota(10).cuerpo === 'una dos tres' && buscaNota(10).titulo === 'La nota viva de la 04',
+     'el texto y el título quedan intactos', 'se perdió contenido al eliminar');
+
+  log('── 4. El autoguardado no la resucita ni la pisa ──');
+  await esperar(1500);                 // el autoguardado tarda 1,2 s
+  ok(buscaNota(10).eliminada === true,
+     'pasado el autoguardado, sigue en la papelera',
+     'un guardado tardío la sacó de la papelera');
+
+  log('── 5. Restaurar la devuelve a su sitio ──');
+  await w.eval('_redEdicion = "papelera"; redRender()');
+  const lista = w.document.getElementById('red-list');
+  ok(lista.textContent.includes('La nota viva de la 04'),
+     'la papelera la muestra', 'la papelera no muestra la nota recién borrada');
+  const orden = [...lista.querySelectorAll('[data-restaurar]')].map(b => Number(b.dataset.restaurar));
+  ok(orden[0] === 10, 'lo último que se borró sale primero', 'la papelera no ordena por fecha: ' + orden);
+  ok(lista.textContent.includes('volvería a'), 'dice a dónde volvería cada una',
+     'no dice a dónde volvería');
+
+  await w.eval('redRestaurarNota(10)');
+  await esperar(150);
+  ok(buscaNota(10).eliminada === false, 'restaurar la desmarca', 'restaurar no la desmarcó');
+  ok(buscaNota(10).edicion_id === 1, 'vuelve a su edición de origen (la Nº 04)',
+     'no volvió a su edición');
+  await w.eval('_redEdicion = 1; redRender()');
+  ok(w.eval('redNotasDeEdicion().length') === 2, 'y vuelve a contarse en la Nº 04',
+     'restaurada, pero no reaparece en su edición');
+
+  log('── 6. Borrar de la papelera sí borra ──');
+  const cuantas = notas().length;
+  await w.eval('redBorrarDefinitivo(13, false)');
+  await esperar(150);
+  ok(notas().length === cuantas - 1 && !buscaNota(13),
+     'la nota 13 desaparece de la base', 'el borrado definitivo no borró');
+  ok(base.llamadas.slice(-2).some(c => c.metodo === 'DELETE'),
+     'esta vez sí fue un DELETE', 'no se mandó el DELETE');
+
+  log('── 7. Vaciar la papelera ──');
+  await w.eval('_redEdicion = "papelera"; redRender(); redVaciarPapelera()');
+  await esperar(150);
+  ok(notas().every(n => !n.eliminada), 'la papelera queda vacía',
+     'quedaron notas eliminadas dentro');
+  ok(notas().length === 3, 'y no se llevó por delante ninguna nota viva',
+     'vaciar la papelera borró notas vivas: quedan ' + notas().length);
+
+  log('── 8. La fecha de cierre se edita ──');
+  await w.eval('_redEdicion = 1; redRender(); redOpenEdicionModal(1)');
+  ok(w.document.getElementById('red-ed-nombre').value === 'Nº 04 · 1–15 agosto 2026',
+     'el modal se abre con el título de la edición', 'el modal no cargó el título');
+  ok(w.document.getElementById('red-ed-cierre').value === enDias(11),
+     'y con su fecha de cierre', 'el modal no cargó la fecha');
+  ok(texto('red-ed-modal-title').includes('Editar'), 'y dice «Editar edición»',
+     'el modal sigue diciendo que es nueva');
+  ok(texto('red-ed-cierre-hint').includes('11'),
+     'avisa de cuántos días quedarían', 'no avisa de los días: ' + texto('red-ed-cierre-hint'));
+
+  await w.eval('redMoverCierre(7)');
+  ok(w.document.getElementById('red-ed-cierre').value === enDias(18),
+     '+1 semana mueve la fecha siete días', 'el botón +1 semana no movió bien la fecha');
+  ok(texto('red-ed-cierre-hint').includes('18'), 'y el aviso se recalcula',
+     'el aviso no se actualizó: ' + texto('red-ed-cierre-hint'));
+
+  w.document.getElementById('red-ed-cierre').value = enDias(3);
+  await w.eval('redGuardarEdicion()');
+  await esperar(150);
+  const ed1 = base.tablas.redaccion_ediciones.find(e => e.id === 1);
+  ok(ed1.fecha_cierre === enDias(3), 'guardar deja la fecha nueva en la base',
+     'la fecha no se guardó: ' + ed1.fecha_cierre);
+  ok(texto('red-ed-meta').includes('3 días'),
+     'y la cabecera ya cuenta los días nuevos', 'la cabecera no se refrescó: ' + texto('red-ed-meta'));
+  ok(w.document.getElementById('red-ed-modal-overlay').style.display === 'none',
+     'el modal se cierra al guardar', 'el modal se quedó abierto');
+
+  log('── 8b. La cuenta regresiva dice la verdad ──');
+  /* Se contaba con horas y redondeando hacia arriba, y salía siempre un día
+     de más: «¡Cierra HOY!» no aparecía jamás y una edición vencida ayer se
+     anunciaba como que cerraba hoy. Al poner fechas a mano eso se nota. */
+  ok(w.eval(`redDiasParaCierre("${enDias(0)}")`) === 0, 'hoy es 0 días',
+     'hoy no da 0: da ' + w.eval(`redDiasParaCierre("${enDias(0)}")`));
+  ok(w.eval(`redDiasParaCierre("${enDias(1)}")`) === 1, 'mañana es 1 día',
+     'mañana no da 1: da ' + w.eval(`redDiasParaCierre("${enDias(1)}")`));
+  ok(w.eval(`redDiasParaCierre("${enDias(-1)}")`) === -1, 'ayer es −1 día',
+     'ayer no da −1: da ' + w.eval(`redDiasParaCierre("${enDias(-1)}")`));
+  base.tablas.redaccion_ediciones.find(e => e.id === 1).fecha_cierre = enDias(0);
+  await w.eval('_redEdicion = 1; initRedaccion()');
+  await esperar(200);
+  ok(texto('red-ed-meta').includes('Cierra HOY'), 'el día del cierre lo grita',
+     'el día del cierre no avisa: ' + texto('red-ed-meta'));
+  base.tablas.redaccion_ediciones.find(e => e.id === 1).fecha_cierre = enDias(-2);
+  await w.eval('initRedaccion()');
+  await esperar(200);
+  ok(texto('red-ed-meta').includes('vencido hace 2'), 'y si pasó, dice cuánto hace',
+     'un cierre vencido no se anuncia bien: ' + texto('red-ed-meta'));
+
+  log('── 8c. Atajos de la vista ──');
+  w.document.querySelector('.red-ed-chip[data-ed="1"]').click();
+  await esperar(60);
+  ok(w.document.getElementById('red-ed-modal-overlay').style.display === 'flex',
+     'tocar la edición ya abierta la manda a editar',
+     'tocar el chip activo no abre el editor de la edición');
+  await w.eval('redCloseEdicionModal()');
+  await w.eval('_redEdicion = "papelera"; redRender()');
+  ok(w.document.getElementById('red-nueva-nota-btn').style.display === 'none' &&
+     w.document.getElementById('red-exportar-btn').style.display === 'none',
+     'en la papelera no se ofrece escribir ni exportar',
+     'la papelera deja crear notas o exportar');
+  const antesPap = notas().length;
+  await w.eval('redNuevaNota()');
+  await esperar(150);
+  ok(notas().length === antesPap, 'y si se llama igual, no crea nada suelto',
+     'crear nota desde la papelera dejó una nota rara');
+
+  log('── 8d. El editor avisa de que la nota está borrada ──');
+  await w.eval('redOpenEditor(11); redEliminarNota()');
+  await esperar(150);
+  await w.eval('redOpenEditor(11)');
+  ok(w.document.getElementById('red-e-papelera-aviso').style.display === 'flex',
+     'al abrirla desde la papelera, el editor lo dice', 'el editor no avisa');
+  ok(texto('red-e-eliminar-btn').includes('siempre'),
+     'y su botón de eliminar pasa a ser el definitivo', 'el botón de eliminar no cambió');
+  await w.eval('document.getElementById("red-e-restaurar-btn").click()');
+  await esperar(200);
+  ok(buscaNota(11).eliminada === false, 'restaurar desde el editor funciona',
+     'el botón restaurar del editor no hizo nada');
+  ok(w.document.getElementById('red-e-papelera-aviso').style.display === 'none',
+     'y el aviso desaparece sin salir de la nota', 'el aviso se quedó puesto');
+
+  log('── 9. Archivar y número repetido ──');
+  await w.eval('_redEdicion = 1; redRender()');
+  await w.eval('redOpenEdicionModal(1)');
+  await w.eval('document.getElementById("red-ed-archivar-btn").click(); redGuardarEdicion()');
+  await esperar(150);
+  ok(base.tablas.redaccion_ediciones.find(e => e.id === 1).archivada === true,
+     'la edición se puede archivar desde el mismo modal', 'no se archivó');
+
+  let avisoRepetido = '';
+  w.confirm = m => { avisoRepetido = m; return false; };
+  await w.eval('redOpenEdicionModal(3); document.getElementById("red-ed-num").value = 4; redGuardarEdicion()');
+  await esperar(150);
+  ok(avisoRepetido.includes('Nº 4'), 'avisa si el número ya está usado por otra edición',
+     'dejó repetir el número sin avisar');
+  w.confirm = () => true;
+
+  log('── 10. Eliminar una edición no borra sus notas ──');
+  const vivasAntes = notas().filter(n => !n.eliminada).length;
+  await w.eval('redOpenEdicionModal(1); redEliminarEdicion()');
+  await esperar(200);
+  ok(!base.tablas.redaccion_ediciones.some(e => e.id === 1), 'la edición desaparece',
+     'la edición no se eliminó');
+  ok(notas().filter(n => !n.eliminada).length === vivasAntes,
+     'sus notas siguen todas ahí', 'se perdieron notas al eliminar la edición');
+  ok(notas().filter(n => n.edicion_id === 1).length === 0,
+     'y quedan sueltas, en el banco de ideas', 'quedaron apuntando a una edición que ya no existe');
+  ok(w.eval('_redEdicion') !== 1, 'la vista salta a otra edición', 'la vista se quedó en la eliminada');
+
+  log('── 11. La base vieja, sin las columnas nuevas ──');
+  const vieja = nuevaBase(w, { sinPapelera: true });
+  siembra(vieja);
+  vieja.tablas.redaccion_notas.forEach(n => { delete n.eliminada; delete n.eliminada_at; });
+  await w.eval('_redEdicion = null; initRedaccion()');
+  await esperar(200);
+  ok(w.eval('_redPapelera') === false, 'se da cuenta de que la papelera no existe',
+     'creyó que había papelera donde no la hay');
+  ok(!w.document.querySelector('[data-ed="papelera"]'), 'no ofrece un chip que no funcionaría',
+     'ofrece la papelera sin columnas detrás');
+  ok(w.eval('redNotasDeEdicion().length') === 3,
+     'y las notas se siguen viendo todas', 'la herramienta se rompió con la base vieja');
+
+  let avisoViejo = '';
+  w.confirm = m => { avisoViejo = m; return true; };
+  const cuantasViejas = vieja.tablas.redaccion_notas.length;
+  await w.eval('redOpenEditor(10); redEliminarNota()');
+  await esperar(200);
+  ok(avisoViejo.includes('NO se podrá restaurar'),
+     'al borrar avisa claro de que ahí no hay red', 'borró sin avisar de que no hay papelera');
+  ok(vieja.tablas.redaccion_notas.length === cuantasViejas - 1,
+     'y borra de verdad, como antes', 'ni borró ni apartó: la nota quedó en el limbo');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SONDA-SUSPENDE';
+});
+</script>
+</body>
+</html>

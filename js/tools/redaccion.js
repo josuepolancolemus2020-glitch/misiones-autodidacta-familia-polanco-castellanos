@@ -7,6 +7,14 @@
    → editor con autoguardado → exportar a Markdown
    para maquetar la revista en otro programa.
    Datos compartidos en Supabase (cada nota registra su autor).
+
+   Dos cosas se pueden deshacer aquí, y por eso existen:
+     · las ediciones se editan (número, título y fecha de cierre) y se
+       archivan o se eliminan, porque una fecha mal puesta no debería
+       obligar a empezar la edición de cero;
+     · «Eliminar» una nota NO la borra: la manda a la papelera, de donde
+       vuelve entera. Solo se borra de verdad lo que ya está allí, y
+       diciéndolo dos veces.
 ───────────────────────────────────────────── */
 
 const RED_T_EDICIONES = 'redaccion_ediciones';
@@ -32,12 +40,15 @@ const RED_ESTADOS = [
 ];
 
 let _redEdiciones = [];      // todas las ediciones, recientes primero
-let _redNotas     = [];      // todas las notas
+let _redNotas     = [];      // todas las notas (incluidas las de la papelera)
 let _redConfig    = { secciones: [], tipos: [] };  // personalizados (compartidos)
-let _redEdicion   = null;    // id de la edición seleccionada; 'banco' = sin edición
+let _redEdicion   = null;    // id de la edición seleccionada; 'banco' = sin edición,
+                             // 'papelera' = notas eliminadas
 let _redNotaId    = null;    // nota abierta en el editor
 let _redSaveTimer = null;
 let _redLoaded    = false;
+let _redPapelera  = false;   // ¿la base ya tiene las columnas de la papelera?
+let _redEdEditando = null;   // edición abierta en el modal (null = una nueva)
 
 /* ── Helpers ── */
 
@@ -135,10 +146,52 @@ function redQuincenaActual() {
   return { label: `16–${fin} ${mesNombre} ${y}`, cierre: new Date(y, m, fin) };
 }
 
+/* Fecha → 'AAAA-MM-DD' con la hora local (lo que espera <input type="date">) */
+function redFechaISO(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/* Días que faltan, contados en el calendario y no en horas: 0 es hoy,
+   1 es mañana, −1 fue ayer.
+
+   Antes se restaban las horas hasta el final del día del cierre y se
+   redondeaba hacia arriba, y eso sumaba siempre un día de más: con el
+   cierre a diez días decía once, y el día del cierre decía «1 día» en vez
+   de «¡Cierra HOY!», que así no aparecía nunca. Peor todavía: un cierre de
+   ayer daba −0, que en JavaScript es igual a 0, y una edición vencida se
+   anunciaba como que cerraba hoy. Al poner fechas a mano esto se nota, y
+   una cuenta regresiva en la que no se puede confiar no sirve de nada. */
 function redDiasParaCierre(fechaISO) {
   if (!fechaISO) return null;
-  const cierre = new Date(fechaISO + 'T23:59:59');
-  return Math.ceil((cierre - new Date()) / 86400000);
+  const cierre = new Date(fechaISO + 'T00:00:00');
+  const ahora  = new Date();
+  const hoy    = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
+  // Redondeo, no truncado: un día con cambio de horario dura 23 o 25 horas
+  return Math.round((cierre - hoy) / 86400000);
+}
+
+/* 'AAAA-MM-DD' → «15 de agosto de 2026» */
+function redFechaLarga(fechaISO) {
+  if (!fechaISO) return '';
+  return new Date(fechaISO + 'T12:00:00')
+    .toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/* Hace cuánto se tiró una nota a la papelera */
+function redHaceCuanto(iso) {
+  if (!iso) return 'hace un rato';
+  const dias = Math.floor((new Date() - new Date(iso)) / 86400000);
+  if (dias <= 0) return 'hoy';
+  if (dias === 1) return 'ayer';
+  if (dias < 30)  return `hace ${dias} días`;
+  return `el ${new Date(iso).toLocaleDateString('es')}`;
+}
+
+/* De dónde salió una nota: su edición, o el banco de ideas */
+function redNombreDestino(edicionId) {
+  if (!edicionId) return '🗃️ Banco de ideas';
+  const ed = _redEdiciones.find(e => e.id === edicionId);
+  return ed ? `📰 ${ed.titulo}` : '📰 edición eliminada';
 }
 
 /* ── Reintentos offline: cambios que no llegaron a Supabase ── */
@@ -175,11 +228,16 @@ async function initRedaccion() {
 
   await redFlushPending();
 
-  const [ed, no, cf] = await Promise.all([
+  const [ed, no, cf, pap] = await Promise.all([
     _sb.from(RED_T_EDICIONES).select('*').order('numero', { ascending: false }),
     _sb.from(RED_T_NOTAS).select('*').order('actualizado_at', { ascending: false }),
     _sb.from(RED_T_CONFIG).select('*'),
+    // Sonda: si la columna 'eliminada' no existe todavía, esta consulta falla
+    // y la papelera se queda escondida en vez de romper la herramienta entera.
+    _sb.from(RED_T_NOTAS).select('id').eq('eliminada', true).limit(1),
   ]);
+
+  _redPapelera = !pap.error;
 
   // La config es opcional: si su tabla aún no existe, se sigue sin personalizados
   if (!cf.error && cf.data) {
@@ -203,6 +261,14 @@ async function initRedaccion() {
     const abierta = _redEdiciones.find(e => !e.archivada);
     _redEdicion = abierta ? abierta.id : 'banco';
   }
+  // La edición elegida puede haber desaparecido (la borró otro aparato), y la
+  // papelera puede no existir en esta base: en ambos casos, volver a algo real.
+  if (typeof _redEdicion === 'number' && !_redEdiciones.some(e => e.id === _redEdicion)) {
+    const abierta = _redEdiciones.find(e => !e.archivada);
+    _redEdicion = abierta ? abierta.id : 'banco';
+  }
+  if (_redEdicion === 'papelera' && !_redPapelera) _redEdicion = 'banco';
+
   redRender();
 }
 
@@ -212,16 +278,42 @@ function redEdicionActual() {
   return _redEdiciones.find(e => e.id === _redEdicion) || null;
 }
 
+/* Las notas de la papelera no cuentan para nada más: ni listas, ni
+   contadores, ni exportación. Siguen en la base, pero apartadas. */
+function redNotasVivas() {
+  return _redNotas.filter(n => !n.eliminada);
+}
+
+function redNotasPapelera() {
+  return _redNotas.filter(n => n.eliminada)
+    .sort((a, b) => String(b.eliminada_at || '').localeCompare(String(a.eliminada_at || '')));
+}
+
 function redNotasDeEdicion() {
-  if (_redEdicion === 'banco') return _redNotas.filter(n => !n.edicion_id);
-  return _redNotas.filter(n => n.edicion_id === _redEdicion);
+  if (_redEdicion === 'papelera') return redNotasPapelera();
+  const vivas = redNotasVivas();
+  if (_redEdicion === 'banco') return vivas.filter(n => !n.edicion_id);
+  return vivas.filter(n => n.edicion_id === _redEdicion);
 }
 
 function redRender() {
   redRenderCabecera();
   redRenderChips();
   redRenderPortada();
+  redRenderAcciones();
   redRenderNotas();
+}
+
+/* Los botones de la vista principal cambian dentro de la papelera:
+   ahí no se escriben notas nuevas ni se exporta, se vacía. */
+function redRenderAcciones() {
+  const enPapelera = _redEdicion === 'papelera';
+  const nueva  = document.getElementById('red-nueva-nota-btn');
+  const expo   = document.getElementById('red-exportar-btn');
+  const vaciar = document.getElementById('red-vaciar-papelera-btn');
+  if (nueva)  nueva.style.display  = enPapelera ? 'none' : '';
+  if (expo)   expo.style.display   = enPapelera ? 'none' : '';
+  if (vaciar) vaciar.style.display = (enPapelera && redNotasPapelera().length) ? '' : 'none';
 }
 
 /* Bloque "Titulares de portada" de la edición seleccionada */
@@ -229,7 +321,9 @@ function redRenderPortada() {
   const el = document.getElementById('red-portada-card');
   if (!el) return;
   const notas = redNotasDeEdicion().filter(n => n.en_portada);
-  if (!notas.length || _redEdicion === 'banco') { el.style.display = 'none'; return; }
+  if (!notas.length || _redEdicion === 'banco' || _redEdicion === 'papelera') {
+    el.style.display = 'none'; return;
+  }
   el.style.display = 'block';
   el.innerHTML = '<div class="red-portada-head"><i class="fa-solid fa-star"></i> Titulares de portada</div>' +
     notas.map(n => `
@@ -242,8 +336,20 @@ function redRenderPortada() {
 function redRenderCabecera() {
   const tituloEl = document.getElementById('red-ed-titulo');
   const metaEl   = document.getElementById('red-ed-meta');
+  const editarEl = document.getElementById('red-ed-editar-btn');
   if (!tituloEl) return;
 
+  // El lápiz solo tiene sentido sobre una edición de verdad
+  if (editarEl) editarEl.style.display = (typeof _redEdicion === 'number') ? '' : 'none';
+
+  if (_redEdicion === 'papelera') {
+    const n = redNotasPapelera().length;
+    tituloEl.textContent = '🗑️ Papelera';
+    metaEl.textContent = n
+      ? `${n} nota${n === 1 ? '' : 's'} eliminada${n === 1 ? '' : 's'} · se pueden restaurar`
+      : 'Vacía. Aquí espera lo que borres, por si fue sin querer.';
+    return;
+  }
   if (_redEdicion === 'banco') {
     tituloEl.textContent = '🗃️ Banco de ideas';
     metaEl.textContent = 'Notas sin edición asignada: material para futuras revistas.';
@@ -273,7 +379,18 @@ function redRenderChips() {
     <button type="button" class="red-ed-chip ${_redEdicion === e.id ? 'red-ed-chip-active' : ''}" data-ed="${e.id}">
       Nº ${String(e.numero).padStart(2, '0')}${e.archivada ? ' 📦' : ''}
     </button>`).join('');
-  wrap.innerHTML = chips + `
+
+  // La papelera va DELANTE de todo y solo cuando guarda algo. Esta fila se
+  // desplaza de lado, y al final del todo el chip quedaba fuera de la
+  // pantalla: justo donde no lo encuentra quien acaba de borrar sin querer.
+  // Vacía no estorba, porque no hay nada que recuperar.
+  const cuantas  = redNotasPapelera().length;
+  const papelera = (_redPapelera && (cuantas || _redEdicion === 'papelera')) ? `
+    <button type="button" class="red-ed-chip red-ed-chip-papelera ${_redEdicion === 'papelera' ? 'red-ed-chip-active' : ''}" data-ed="papelera">
+      🗑️ Papelera${cuantas ? ` · ${cuantas}` : ''}
+    </button>` : '';
+
+  wrap.innerHTML = papelera + chips + `
     <button type="button" class="red-ed-chip ${_redEdicion === 'banco' ? 'red-ed-chip-active' : ''}" data-ed="banco">
       🗃️ Banco
     </button>
@@ -281,8 +398,14 @@ function redRenderChips() {
       <i class="fa-solid fa-plus"></i> Edición
     </button>`;
   wrap.querySelectorAll('.red-ed-chip').forEach(btn => btn.addEventListener('click', () => {
-    if (btn.dataset.ed === 'nueva') { redOpenEdicionModal(); return; }
-    _redEdicion = btn.dataset.ed === 'banco' ? 'banco' : Number(btn.dataset.ed);
+    const val = btn.dataset.ed;
+    if (val === 'nueva') { redOpenEdicionModal(); return; }
+    if (val === 'banco' || val === 'papelera') { _redEdicion = val; redRender(); return; }
+    const id = Number(val);
+    // Tocar la edición que ya está abierta la manda a editar: es el atajo
+    // para corregir el número o la fecha sin buscar el lápiz.
+    if (_redEdicion === id) { redOpenEdicionModal(id); return; }
+    _redEdicion = id;
     redRender();
   }));
 }
@@ -291,6 +414,12 @@ function redRenderNotas() {
   const list    = document.getElementById('red-list');
   const emptyEl = document.getElementById('red-empty');
   if (!list) return;
+
+  if (_redEdicion === 'papelera') {
+    if (emptyEl) emptyEl.style.display = 'none';
+    redRenderPapelera(list);
+    return;
+  }
 
   const notas = redNotasDeEdicion();
   if (emptyEl) emptyEl.style.display = notas.length ? 'none' : 'block';
@@ -331,52 +460,310 @@ function redRenderNotas() {
     btn.addEventListener('click', () => redOpenEditor(Number(btn.dataset.nota))));
 }
 
-/* ── Nueva edición ── */
+/* ── Papelera: lo borrado, entero, esperando ── */
 
-function redOpenEdicionModal() {
+function redRenderPapelera(list) {
+  const notas = redNotasPapelera();
+
+  if (!notas.length) {
+    list.innerHTML = `
+      <div class="fin-empty">La papelera está vacía. 🗑️<br>
+      Aquí queda lo que borres, para poder devolverlo a su sitio.</div>`;
+    return;
+  }
+
+  list.innerHTML = `
+    <div class="red-papelera-aviso">
+      Estas notas ya no salen en las ediciones ni en la exportación, pero
+      siguen completas. <strong>Restaurar</strong> las devuelve al sitio del
+      que salieron; <strong>Borrar</strong> las quita para siempre.
+    </div>` +
+    notas.map(n => {
+      const pal = redPalabras(n.cuerpo);
+      return `
+      <div class="red-papelera-nota">
+        <button type="button" class="red-papelera-main" data-nota="${n.id}">
+          <span class="red-nota-titulo">${n.titulo ? redEsc(n.titulo) : '<em class="red-sin-titulo">Sin título</em>'}</span>
+          <div class="red-nota-meta">
+            <span class="red-badge red-badge-tipo">${redEsc(n.tipo)}</span>
+            <span class="red-nota-autor">${redAutorInfo(n.autor)}</span>
+            <span class="red-nota-pal">${pal} palabra${pal === 1 ? '' : 's'}</span>
+          </div>
+          <div class="red-nota-meta">
+            <span class="red-papelera-fecha">🗑️ Borrada ${redHaceCuanto(n.eliminada_at)}</span>
+            <span class="red-nota-autor">volvería a ${redEsc(redNombreDestino(n.edicion_id))}</span>
+          </div>
+        </button>
+        <div class="red-papelera-btns">
+          <button type="button" class="red-papelera-btn red-papelera-restaurar" data-restaurar="${n.id}">
+            <i class="fa-solid fa-rotate-left"></i> Restaurar
+          </button>
+          <button type="button" class="red-papelera-btn red-papelera-borrar" data-borrar="${n.id}">
+            <i class="fa-solid fa-trash"></i> Borrar
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+
+  // Tocar la nota la abre en el editor: para leerla antes de decidir
+  list.querySelectorAll('.red-papelera-main').forEach(btn =>
+    btn.addEventListener('click', () => redOpenEditor(Number(btn.dataset.nota))));
+
+  list.querySelectorAll('[data-restaurar]').forEach(btn =>
+    btn.addEventListener('click', async () => {
+      if (await redRestaurarNota(Number(btn.dataset.restaurar))) redRender();
+    }));
+
+  list.querySelectorAll('[data-borrar]').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const n = _redNotas.find(x => x.id === Number(btn.dataset.borrar));
+      if (!n) return;
+      const nombre = n.titulo || 'Sin título';
+      if (!confirm(`¿Borrar «${nombre}» para siempre?\n\nEsto ya no se puede deshacer: la nota desaparece de la base de datos.`)) return;
+      redBorrarDefinitivo(n.id, false);
+    }));
+}
+
+async function redRestaurarNota(id) {
+  const n = _redNotas.find(x => x.id === id);
+  if (!n || !_sb) return false;
+  const campos = { eliminada: false, eliminada_at: null };
+  const { error } = await _sb.from(RED_T_NOTAS).update(campos).eq('id', id);
+  if (error) {
+    console.error('[Redacción] Error restaurando:', error);
+    if (typeof toast === 'function') toast('No se pudo restaurar');
+    return false;
+  }
+  Object.assign(n, campos);
+  if (typeof toast === 'function') toast(`↩️ Restaurada en ${redNombreDestino(n.edicion_id)}`);
+  return true;
+}
+
+async function redBorrarDefinitivo(id, desdeEditor) {
+  if (!_sb) return false;
+  const { error } = await _sb.from(RED_T_NOTAS).delete().eq('id', id);
+  if (error) {
+    console.error('[Redacción] Error eliminando:', error);
+    if (typeof toast === 'function') toast('No se pudo eliminar');
+    return false;
+  }
+  _redNotas = _redNotas.filter(x => x.id !== id);
+  const map = redPendingLoad();
+  if (map[id]) { delete map[id]; redPendingSave(map); }
+  if (desdeEditor) {
+    _redNotaId = null;
+    switchView('view-redaccion');
+  }
+  redRender();
+  if (typeof toast === 'function') toast('Nota eliminada');
+  return true;
+}
+
+async function redVaciarPapelera() {
+  const notas = redNotasPapelera();
+  if (!notas.length || !_sb) return;
+  if (!confirm(`¿Vaciar la papelera?\n\nSe borran ${notas.length} nota${notas.length === 1 ? '' : 's'} para siempre. Esto no se puede deshacer.`)) return;
+
+  const ids = notas.map(n => n.id);
+  const { error } = await _sb.from(RED_T_NOTAS).delete().in('id', ids);
+  if (error) {
+    console.error('[Redacción] Error vaciando la papelera:', error);
+    if (typeof toast === 'function') toast('No se pudo vaciar la papelera');
+    return;
+  }
+  _redNotas = _redNotas.filter(n => !ids.includes(n.id));
+  const map = redPendingLoad();
+  ids.forEach(id => { delete map[id]; });
+  redPendingSave(map);
+  redRender();
+  if (typeof toast === 'function') toast('🗑️ Papelera vacía');
+}
+
+/* ── Crear y editar ediciones ── */
+
+/* El mismo modal sirve para crear y para editar: con id, edita esa
+   edición; sin id, propone la siguiente de la quincena en curso. */
+function redOpenEdicionModal(id) {
   const overlay = document.getElementById('red-ed-modal-overlay');
   if (!overlay) return;
-  const q   = redQuincenaActual();
-  const num = _redEdiciones.length ? Math.max(..._redEdiciones.map(e => e.numero)) + 1 : 1;
-  document.getElementById('red-ed-num').value    = num;
-  document.getElementById('red-ed-nombre').value = `Nº ${String(num).padStart(2, '0')} · ${q.label}`;
-  const c = q.cierre;
-  document.getElementById('red-ed-cierre').value =
-    `${c.getFullYear()}-${String(c.getMonth() + 1).padStart(2, '0')}-${String(c.getDate()).padStart(2, '0')}`;
+
+  const ed = (id !== undefined && id !== null) ? _redEdiciones.find(e => e.id === id) : null;
+  _redEdEditando = ed ? ed.id : null;
+
+  const tituloEl  = document.getElementById('red-ed-modal-title');
+  const guardarEl = document.getElementById('red-ed-crear-btn');
+  const borrarEl  = document.getElementById('red-ed-eliminar-btn');
+  const archivaEl = document.getElementById('red-ed-archivar-btn');
+
+  if (ed) {
+    tituloEl.innerHTML = '<i class="fa-solid fa-pen" style="color:#4f46e5;"></i> Editar edición';
+    document.getElementById('red-ed-num').value    = ed.numero;
+    document.getElementById('red-ed-nombre').value = ed.titulo || '';
+    document.getElementById('red-ed-cierre').value = ed.fecha_cierre || '';
+    archivaEl.classList.toggle('red-ed-archivada-on', !!ed.archivada);
+    guardarEl.innerHTML = '<i class="fa-solid fa-check"></i> Guardar cambios';
+    borrarEl.style.display  = '';
+    archivaEl.style.display = '';
+  } else {
+    const q   = redQuincenaActual();
+    const num = _redEdiciones.length ? Math.max(..._redEdiciones.map(e => e.numero)) + 1 : 1;
+    tituloEl.innerHTML = '<i class="fa-solid fa-newspaper" style="color:#4f46e5;"></i> Nueva edición';
+    document.getElementById('red-ed-num').value    = num;
+    document.getElementById('red-ed-nombre').value = `Nº ${String(num).padStart(2, '0')} · ${q.label}`;
+    document.getElementById('red-ed-cierre').value = redFechaISO(q.cierre);
+    archivaEl.classList.remove('red-ed-archivada-on');
+    guardarEl.innerHTML = '<i class="fa-solid fa-newspaper"></i> Crear edición';
+    borrarEl.style.display  = 'none';
+    archivaEl.style.display = 'none';
+  }
+
+  redUpdateArchivarBtn();
+  redUpdateCierreHint();
   overlay.style.display = 'flex';
 }
 
 function redCloseEdicionModal() {
   const overlay = document.getElementById('red-ed-modal-overlay');
   if (overlay) overlay.style.display = 'none';
+  _redEdEditando = null;
 }
 
-async function redCrearEdicion() {
+function redUpdateArchivarBtn() {
+  const btn = document.getElementById('red-ed-archivar-btn');
+  if (!btn) return;
+  const on = btn.classList.contains('red-ed-archivada-on');
+  btn.innerHTML = on
+    ? '<i class="fa-solid fa-box-archive"></i> Archivada: cerrada, ya no se trabaja en ella'
+    : '<i class="fa-regular fa-folder-open"></i> Abierta: se sigue trabajando en ella';
+}
+
+/* Debajo de la fecha, en cristiano: cuánto queda o cuánto hace que pasó */
+function redUpdateCierreHint() {
+  const el = document.getElementById('red-ed-cierre-hint');
+  if (!el) return;
+  const valor = document.getElementById('red-ed-cierre').value;
+  if (!valor) {
+    el.textContent = 'Sin fecha: la edición no llevará cuenta regresiva.';
+    el.className = 'red-ed-cierre-hint';
+    return;
+  }
+  const dias = redDiasParaCierre(valor);
+  const fecha = redFechaLarga(valor);
+  if (dias < 0) {
+    el.textContent = `⚠️ El ${fecha} ya pasó, hace ${-dias} día${dias === -1 ? '' : 's'}.`;
+    el.className = 'red-ed-cierre-hint red-cierre-vencido';
+  } else if (dias === 0) {
+    el.textContent = `⏳ Cierra hoy, ${fecha}.`;
+    el.className = 'red-ed-cierre-hint red-cierre-hoy';
+  } else {
+    el.textContent = `⏳ ${fecha}: quedarían ${dias} día${dias === 1 ? '' : 's'}.`;
+    el.className = 'red-ed-cierre-hint';
+  }
+}
+
+/* Los botoncitos ±días mueven la fecha sin pelearse con el calendario.
+   El mediodía evita que un cambio de horario robe o regale un día. */
+function redMoverCierre(dias) {
+  const inp = document.getElementById('red-ed-cierre');
+  if (!inp) return;
+  const base = inp.value ? new Date(inp.value + 'T12:00:00') : new Date();
+  base.setDate(base.getDate() + dias);
+  inp.value = redFechaISO(base);
+  redUpdateCierreHint();
+}
+
+async function redGuardarEdicion() {
   if (!_sb) return;
   const numero = Number(document.getElementById('red-ed-num').value) || 1;
   const titulo = (document.getElementById('red-ed-nombre').value || '').trim() || `Nº ${numero}`;
   const cierre = document.getElementById('red-ed-cierre').value || null;
-  const { data, error } = await _sb.from(RED_T_EDICIONES)
-    .insert({ numero, titulo, fecha_cierre: cierre })
-    .select().single();
-  if (error) {
-    console.error('[Redacción] Error creando edición:', error);
-    if (typeof toast === 'function') toast('No se pudo crear la edición');
+
+  // Dos ediciones con el mismo número se ven idénticas en los chips y
+  // no hay forma de saber cuál es cuál: mejor avisar antes de guardar.
+  const repetida = _redEdiciones.find(e => e.numero === numero && e.id !== _redEdEditando);
+  if (repetida && !confirm(`Ya hay otra edición con el Nº ${numero} («${repetida.titulo}»).\n\n¿Guardar de todos modos?`)) return;
+
+  if (_redEdEditando === null) {
+    const { data, error } = await _sb.from(RED_T_EDICIONES)
+      .insert({ numero, titulo, fecha_cierre: cierre })
+      .select().single();
+    if (error) {
+      console.error('[Redacción] Error creando edición:', error);
+      if (typeof toast === 'function') toast('No se pudo crear la edición');
+      return;
+    }
+    redCloseEdicionModal();
+    _redEdiciones.unshift(data);
+    _redEdiciones.sort((a, b) => b.numero - a.numero);
+    _redEdicion = data.id;
+    redRender();
+    if (typeof toast === 'function') toast(`📰 ${titulo} creada`);
     return;
   }
+
+  const archivada = document.getElementById('red-ed-archivar-btn')
+    .classList.contains('red-ed-archivada-on');
+  const campos = { numero, titulo, fecha_cierre: cierre, archivada };
+  const { error } = await _sb.from(RED_T_EDICIONES).update(campos).eq('id', _redEdEditando);
+  if (error) {
+    console.error('[Redacción] Error guardando la edición:', error);
+    if (typeof toast === 'function') toast('No se pudieron guardar los cambios');
+    return;
+  }
+  const ed = _redEdiciones.find(e => e.id === _redEdEditando);
+  if (ed) Object.assign(ed, campos);
+  _redEdiciones.sort((a, b) => b.numero - a.numero);
   redCloseEdicionModal();
-  _redEdiciones.unshift(data);
-  _redEdicion = data.id;
   redRender();
-  if (typeof toast === 'function') toast(`📰 ${titulo} creada`);
+  if (typeof toast === 'function') toast('✅ Edición actualizada');
+}
+
+async function redEliminarEdicion() {
+  if (_redEdEditando === null || !_sb) return;
+  const ed = _redEdiciones.find(e => e.id === _redEdEditando);
+  if (!ed) return;
+
+  const suyas = _redNotas.filter(n => n.edicion_id === ed.id && !n.eliminada).length;
+  const aviso = suyas
+    ? `\n\nSus ${suyas} nota${suyas === 1 ? '' : 's'} NO se borra${suyas === 1 ? '' : 'n'}: pasa${suyas === 1 ? '' : 'n'} al 🗃️ Banco de ideas.`
+    : '';
+  if (!confirm(`¿Eliminar la edición «${ed.titulo}»?${aviso}`)) return;
+
+  // Las notas se sueltan a mano antes de borrar la edición: así no depende
+  // de cómo esté configurada la llave foránea en esta base.
+  const soltar = await _sb.from(RED_T_NOTAS).update({ edicion_id: null }).eq('edicion_id', ed.id);
+  if (soltar.error) {
+    console.error('[Redacción] Error soltando las notas:', soltar.error);
+    if (typeof toast === 'function') toast('No se pudo eliminar la edición');
+    return;
+  }
+  const { error } = await _sb.from(RED_T_EDICIONES).delete().eq('id', ed.id);
+  if (error) {
+    console.error('[Redacción] Error eliminando la edición:', error);
+    if (typeof toast === 'function') toast('No se pudo eliminar la edición');
+    return;
+  }
+
+  _redEdiciones = _redEdiciones.filter(e => e.id !== ed.id);
+  _redNotas.forEach(n => { if (n.edicion_id === ed.id) n.edicion_id = null; });
+  if (_redEdicion === ed.id) {
+    const abierta = _redEdiciones.find(e => !e.archivada);
+    _redEdicion = abierta ? abierta.id : 'banco';
+  }
+  redCloseEdicionModal();
+  redRender();
+  if (typeof toast === 'function') {
+    toast(suyas ? '🗑️ Edición eliminada · sus notas están en el Banco' : '🗑️ Edición eliminada');
+  }
 }
 
 /* ── Nueva nota ── */
 
 async function redNuevaNota() {
   if (!_sb) return;
+  if (_redEdicion === 'papelera') return;  // en la papelera no se escribe
   const fila = {
-    edicion_id: _redEdicion === 'banco' ? null : _redEdicion,
+    edicion_id: typeof _redEdicion === 'number' ? _redEdicion : null,
     autor: redMiembro(),
     seccion: 'ACTUALIDAD',
     tipo: 'Artículo',
@@ -444,9 +831,31 @@ function redOpenEditor(id) {
   if (pBtn) pBtn.classList.toggle('red-portada-on', !!n.en_portada);
   redUpdatePortadaBtn();
 
+  redUpdatePapeleraAviso();
   redUpdateContador();
   redSetSaveState('ok');
   switchView('view-redaccion-editor');
+}
+
+/* Si la nota abierta está en la papelera se dice claro, y el botón de
+   eliminar deja de ser «a la papelera» para ser el definitivo. */
+function redUpdatePapeleraAviso() {
+  const n = redNota();
+  const aviso   = document.getElementById('red-e-papelera-aviso');
+  const detalle = document.getElementById('red-e-papelera-detalle');
+  const borrar  = document.getElementById('red-e-eliminar-btn');
+  const enPapelera = !!(n && n.eliminada);
+
+  if (aviso) aviso.style.display = enPapelera ? 'flex' : 'none';
+  if (enPapelera && detalle && n) {
+    detalle.textContent = `Se borró ${redHaceCuanto(n.eliminada_at)} y sigue completa. ` +
+      `Al restaurarla vuelve a ${redNombreDestino(n.edicion_id)}.`;
+  }
+  if (borrar) {
+    borrar.innerHTML = enPapelera
+      ? '<i class="fa-solid fa-trash"></i> Borrar para siempre'
+      : '<i class="fa-solid fa-trash"></i> Eliminar';
+  }
 }
 
 function redUpdatePortadaBtn() {
@@ -567,16 +976,43 @@ function redCloseMover() {
   if (overlay) overlay.style.display = 'none';
 }
 
+/* Eliminar ya no borra: manda a la papelera, de donde se puede volver.
+   Solo lo que ya está en la papelera se borra de verdad. */
 async function redEliminarNota() {
   const n = redNota();
   if (!n || !_sb) return;
-  if (!confirm('¿Eliminar esta nota definitivamente?')) return;
-  const { error } = await _sb.from(RED_T_NOTAS).delete().eq('id', n.id);
-  if (error) { if (typeof toast === 'function') toast('No se pudo eliminar'); return; }
-  _redNotas = _redNotas.filter(x => x.id !== n.id);
+
+  if (n.eliminada) {
+    if (!confirm(`¿Borrar «${n.titulo || 'Sin título'}» para siempre?\n\nEsto ya no se puede deshacer.`)) return;
+    clearTimeout(_redSaveTimer);
+    await redBorrarDefinitivo(n.id, true);
+    return;
+  }
+
+  if (!_redPapelera) {
+    // La base todavía no tiene la papelera: se avisa en vez de fingir red de seguridad
+    if (!confirm('¿Eliminar esta nota?\n\n⚠️ La papelera aún no está activada en la base de datos (falta correr redaccion_papelera.sql), así que esta nota NO se podrá restaurar.')) return;
+    clearTimeout(_redSaveTimer);
+    await redBorrarDefinitivo(n.id, true);
+    return;
+  }
+
+  if (!confirm('¿Mandar esta nota a la papelera?\n\nNo se borra: queda guardada y se puede restaurar desde el chip 🗑️ Papelera.')) return;
+
+  // Que un autoguardado pendiente no llegue después y la pise
+  clearTimeout(_redSaveTimer);
+  const campos = { eliminada: true, eliminada_at: new Date().toISOString() };
+  const { error } = await _sb.from(RED_T_NOTAS).update(campos).eq('id', n.id);
+  if (error) {
+    console.error('[Redacción] Error mandando a la papelera:', error);
+    if (typeof toast === 'function') toast('No se pudo eliminar');
+    return;
+  }
+  Object.assign(n, campos);
   _redNotaId = null;
   switchView('view-redaccion');
-  if (typeof toast === 'function') toast('Nota eliminada');
+  redRender();
+  if (typeof toast === 'function') toast('🗑️ En la papelera · se puede restaurar');
 }
 
 /* ── Exportar ── */
@@ -618,7 +1054,7 @@ function redEdicionMd() {
 }
 
 async function redExportar() {
-  if (!_redLoaded) return;
+  if (!_redLoaded || _redEdicion === 'papelera') return;
   const notas = redNotasDeEdicion();
   if (!notas.length) { if (typeof toast === 'function') toast('No hay notas para exportar'); return; }
 
@@ -672,13 +1108,28 @@ document.addEventListener('DOMContentLoaded', () => {
   // Acciones de la vista principal
   document.getElementById('red-nueva-nota-btn')?.addEventListener('click', redNuevaNota);
   document.getElementById('red-exportar-btn')?.addEventListener('click', redExportar);
+  document.getElementById('red-vaciar-papelera-btn')?.addEventListener('click', redVaciarPapelera);
 
-  // Modal nueva edición
+  // Lápiz de la cabecera: edita la edición que se está viendo
+  document.getElementById('red-ed-editar-btn')?.addEventListener('click', () => {
+    if (typeof _redEdicion === 'number') redOpenEdicionModal(_redEdicion);
+  });
+
+  // Modal de edición (crear y editar)
   document.getElementById('red-ed-modal-close')?.addEventListener('click', redCloseEdicionModal);
   document.getElementById('red-ed-modal-overlay')?.addEventListener('click', e => {
     if (e.target.id === 'red-ed-modal-overlay') redCloseEdicionModal();
   });
-  document.getElementById('red-ed-crear-btn')?.addEventListener('click', redCrearEdicion);
+  document.getElementById('red-ed-crear-btn')?.addEventListener('click', redGuardarEdicion);
+  document.getElementById('red-ed-eliminar-btn')?.addEventListener('click', redEliminarEdicion);
+  document.getElementById('red-ed-cierre')?.addEventListener('change', redUpdateCierreHint);
+  document.getElementById('red-ed-cierre')?.addEventListener('input', redUpdateCierreHint);
+  document.querySelectorAll('.red-ed-fecha-chip').forEach(btn =>
+    btn.addEventListener('click', () => redMoverCierre(Number(btn.dataset.dias))));
+  document.getElementById('red-ed-archivar-btn')?.addEventListener('click', () => {
+    document.getElementById('red-ed-archivar-btn').classList.toggle('red-ed-archivada-on');
+    redUpdateArchivarBtn();
+  });
 
   // Editor: autoguardado
   ['red-e-titulo', 'red-e-entradilla', 'red-e-cuerpo',
@@ -767,6 +1218,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('red-e-copiar-btn')?.addEventListener('click', redCopiarNota);
   document.getElementById('red-e-eliminar-btn')?.addEventListener('click', redEliminarNota);
+
+  // Restaurar desde el propio editor, con la nota delante
+  document.getElementById('red-e-restaurar-btn')?.addEventListener('click', async () => {
+    const n = redNota();
+    if (!n) return;
+    if (await redRestaurarNota(n.id)) redUpdatePapeleraAviso();
+  });
 
   // Reintentar guardados pendientes al recuperar conexión
   window.addEventListener('online', redFlushPending);

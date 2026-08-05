@@ -943,8 +943,14 @@
 
       <!-- Cabecera de la edición seleccionada -->
       <div class="red-cabecera">
-        <div class="red-ed-titulo" id="red-ed-titulo"></div>
-        <div class="red-ed-meta" id="red-ed-meta"></div>
+        <div class="red-cabecera-txt">
+          <div class="red-ed-titulo" id="red-ed-titulo"></div>
+          <div class="red-ed-meta" id="red-ed-meta"></div>
+        </div>
+        <button type="button" class="red-ed-editar" id="red-ed-editar-btn"
+          style="display:none;" aria-label="Editar esta edición" title="Editar título, número y fecha de cierre">
+          <i class="fa-solid fa-pen"></i>
+        </button>
       </div>
 
       <!-- Selector de ediciones -->
@@ -960,6 +966,9 @@
         </button>
         <button type="button" class="red-accion-btn" id="red-exportar-btn">
           <i class="fa-solid fa-file-export"></i> Exportar
+        </button>
+        <button type="button" class="red-accion-btn red-accion-peligro" id="red-vaciar-papelera-btn" style="display:none;">
+          <i class="fa-solid fa-trash-can"></i> Vaciar papelera
         </button>
       </div>
 
@@ -982,6 +991,17 @@
       <span class="red-save-state red-save-ok" id="red-e-save-state">Guardado ✓</span>
     </header>
     <div class="view-scroll">
+
+      <!-- Aviso: esta nota está en la papelera -->
+      <div class="red-e-papelera-aviso" id="red-e-papelera-aviso" style="display:none;">
+        <div class="red-e-papelera-txt">
+          <strong>🗑️ Esta nota está en la papelera.</strong>
+          <span id="red-e-papelera-detalle">Sigue completa: puedes leerla, copiarla o devolverla a su edición.</span>
+        </div>
+        <button type="button" class="red-e-restaurar-btn" id="red-e-restaurar-btn">
+          <i class="fa-solid fa-rotate-left"></i> Restaurar
+        </button>
+      </div>
 
       <input type="text" id="red-e-titulo" class="red-e-titulo" maxlength="140"
         placeholder="Título de la nota…">
@@ -1017,6 +1037,11 @@
 
       <!-- Barra de formato del cuerpo -->
       <div class="red-e-toolbar" id="red-e-toolbar">
+        <!-- Deshacer y rehacer: en el teléfono no hay Ctrl+Z, y un borrado
+             accidental mientras se escribe se arregla aquí mismo. -->
+        <button type="button" class="red-tb-btn" data-cmd="undo" title="Deshacer"><i class="fa-solid fa-rotate-left"></i></button>
+        <button type="button" class="red-tb-btn" data-cmd="redo" title="Rehacer"><i class="fa-solid fa-rotate-right"></i></button>
+        <span class="red-tb-sep"></span>
         <button type="button" class="red-tb-btn" data-cmd="bold" title="Negrita"><i class="fa-solid fa-bold"></i></button>
         <button type="button" class="red-tb-btn" data-cmd="italic" title="Cursiva"><i class="fa-solid fa-italic"></i></button>
         <button type="button" class="red-tb-btn" data-cmd="underline" title="Subrayado"><i class="fa-solid fa-underline"></i></button>
@@ -1461,11 +1486,11 @@
     </div>
   </aside>
 
-  <!-- Modal: nueva edición de la revista -->
+  <!-- Modal: crear o editar una edición de la revista -->
   <div id="red-ed-modal-overlay" class="fin-modal-overlay" style="display:none;">
     <div class="fin-modal">
       <div class="fin-modal-head">
-        <div class="des-modal-title"><i class="fa-solid fa-newspaper" style="color:#4f46e5;"></i> Nueva edición</div>
+        <div class="des-modal-title" id="red-ed-modal-title"><i class="fa-solid fa-newspaper" style="color:#4f46e5;"></i> Nueva edición</div>
         <button type="button" class="fin-modal-close" id="red-ed-modal-close" aria-label="Cerrar">
           <i class="fa-solid fa-xmark"></i>
         </button>
@@ -1476,8 +1501,21 @@
       <input type="text" id="red-ed-nombre" class="des-proj-input" maxlength="60">
       <label class="fin-label" for="red-ed-cierre">Fecha de cierre</label>
       <input type="date" id="red-ed-cierre" class="des-proj-input">
+      <div class="red-ed-fechas">
+        <button type="button" class="red-ed-fecha-chip" data-dias="-1">−1 día</button>
+        <button type="button" class="red-ed-fecha-chip" data-dias="1">+1 día</button>
+        <button type="button" class="red-ed-fecha-chip" data-dias="3">+3 días</button>
+        <button type="button" class="red-ed-fecha-chip" data-dias="7">+1 semana</button>
+      </div>
+      <div class="red-ed-cierre-hint" id="red-ed-cierre-hint"></div>
+
+      <button type="button" class="red-ed-archivar" id="red-ed-archivar-btn" style="display:none;"></button>
+
       <button type="button" class="red-crear-btn" id="red-ed-crear-btn">
         <i class="fa-solid fa-newspaper"></i> Crear edición
+      </button>
+      <button type="button" class="red-ed-eliminar" id="red-ed-eliminar-btn" style="display:none;">
+        <i class="fa-solid fa-trash"></i> Eliminar esta edición
       </button>
     </div>
   </div>
