@@ -32,6 +32,86 @@ const RED_T_CONFIG    = 'redaccion_config';
 const RED_PENDING_KEY = 'faro_redaccion_pending_v1';
 const RED_BITACORA_KEY = 'faro_redaccion_bitacora_v1';
 const RED_BITACORA_MAX = 12;   // versiones guardadas por nota
+const RED_ESTILOS_KEY  = 'faro_redaccion_estilos_v1';
+
+/* ── Los estilos de cita, con su edición vigente ──────────────────
+   Referencia rápida para la sala de redacción, no un manual entero:
+   qué estilo pide cada mundo, cómo va la cita dentro del texto, la
+   plantilla de la referencia y qué cambió en la edición al día.
+   El «sistema del subíndice» tiene nombre: notas al pie (Chicago) en
+   humanidades, numérico (Vancouver) en ciencias de la salud. */
+const RED_ESTILOS_CITA = [
+  {
+    id: 'apa', nombre: 'APA 7', sistema: 'autor–año',
+    vigente: '7.ª edición (2020), la vigente',
+    uso: 'La norma más extendida en Latinoamérica y en ciencias sociales: educación, psicología, administración.',
+    enTexto: 'Autor y año entre paréntesis, dentro de la oración: <b>(Bueno, 1972)</b> · «Bueno (1972) sostiene que…» · en cita textual, con página: <b>(Bueno, 1972, p. 44)</b>.',
+    referencias: [
+      { tipo: 'Libro', plantilla: 'Apellido, N. (Año). <i>Título del libro: Solo mayúscula inicial</i>. Editorial.',
+        ejemplo: 'Bueno, G. (1972). <i>Ensayos materialistas</i>. Taurus.' },
+      { tipo: 'Artículo', plantilla: 'Apellido, N. (Año). Título del artículo. <i>Nombre de la Revista, vol</i>(núm), páginas. https://doi.org/…' },
+      { tipo: 'Página web', plantilla: 'Apellido, N. (Año, 5 de agosto). <i>Título de la página</i>. Nombre del sitio. https://…' },
+    ],
+    novedades: 'Ya no se escribe la ciudad de la editorial. El enlace va pelado, sin «Recuperado de». Hasta 20 autores en la lista antes de recortar con puntos suspensivos.',
+    orden: 'alfabetico',
+    faro: 'APA no usa subíndices: la lista final va en orden ALFABÉTICO por apellido. Usa las marcas [n] como recordatorio en el borrador y al maquetar cámbialas por (Autor, año).',
+  },
+  {
+    id: 'chicago', nombre: 'Chicago 18 · notas', sistema: 'subíndice',
+    vigente: '18.ª edición (2024), la vigente',
+    uso: 'Historia, filosofía y humanidades; el clásico de los libros. Es el sistema del número volado: el que ya usas.',
+    enTexto: 'Un número en superíndice tras la frase o la cita textual¹ y la referencia completa en la nota al pie de página (o al final del artículo).',
+    referencias: [
+      { tipo: 'Nota (1.ª vez)', plantilla: 'Nombre Apellido, <i>Título del libro</i> (Editorial, año), 44.',
+        ejemplo: 'Gustavo Bueno, <i>Ensayos materialistas</i> (Taurus, 1972), 44.' },
+      { tipo: 'Nota (siguientes)', plantilla: 'Apellido, <i>Título corto</i>, 51.' },
+      { tipo: 'Bibliografía final', plantilla: 'Apellido, Nombre. <i>Título del libro</i>. Editorial, año.' },
+    ],
+    novedades: 'La 18.ª (2024) ya no exige la ciudad de la editorial y desaconseja el «ibid.»: se repite apellido y título corto.',
+    orden: 'aparicion',
+    faro: 'Encaja tal cual con F.A.R.O.: la marca [n] es tu número volado y la lista de Referencias del export son tus notas, numeradas por orden de aparición.',
+  },
+  {
+    id: 'mla', nombre: 'MLA 9', sistema: 'autor–página',
+    vigente: '9.ª edición (2021), la vigente',
+    uso: 'Literatura, lengua y arte en el mundo anglosajón.',
+    enTexto: 'Apellido y página entre paréntesis, sin año y sin coma: <b>(Bueno 44)</b>. Si el autor ya se nombró en la frase, solo la página: <b>(44)</b>.',
+    referencias: [
+      { tipo: 'Libro', plantilla: 'Apellido, Nombre. <i>Título del libro</i>. Editorial, año.',
+        ejemplo: 'Bueno, Gustavo. <i>Ensayos materialistas</i>. Taurus, 1972.' },
+      { tipo: 'Artículo', plantilla: 'Apellido, Nombre. «Título del artículo». <i>Revista</i>, vol. X, n.º X, año, pp. XX-XX.' },
+    ],
+    novedades: 'La 9.ª mantiene el esquema de «contenedores» (la obra dentro de la revista, la revista dentro de la base de datos) y volvió a traer ejemplos por cada tipo de fuente.',
+    orden: 'alfabetico',
+    faro: 'La lista final («Obras citadas») va alfabética. Las marcas [n] sirven de recordatorio mientras la nota está en borrador.',
+  },
+  {
+    id: 'vancouver', nombre: 'Vancouver', sistema: 'numérico',
+    vigente: 'recomendaciones ICMJE, el estándar de las revistas médicas',
+    uso: 'Medicina, enfermería y ciencias de la salud.',
+    enTexto: 'Números por orden de aparición, en superíndice o entre corchetes: «…lo confirma el estudio.<b>¹²</b>» o <b>[1,2]</b>. Cada fuente conserva su número siempre, aunque se repita.',
+    referencias: [
+      { tipo: 'Artículo', plantilla: 'Apellido AB, Apellido CD. Título del artículo. Rev Abreviada. Año;vol(núm):páginas.' },
+      { tipo: 'Libro', plantilla: 'Apellido AB. Título del libro. 3.ª ed. Editorial; año.' },
+    ],
+    novedades: 'Hasta seis autores se listan todos; con más, los seis primeros y «et al.». El nombre de la revista va abreviado (estilo PubMed).',
+    orden: 'aparicion',
+    faro: 'Como Chicago, encaja con tus marcas [n]: numeración por orden de aparición, igual que el export de F.A.R.O.',
+  },
+  {
+    id: 'harvard', nombre: 'Harvard', sistema: 'autor–año',
+    vigente: 'sin manual único; la guía más citada es Cite Them Right',
+    uso: 'Universidades británicas y australianas; frecuente en economía y negocios.',
+    enTexto: 'Como APA: <b>(Apellido, año)</b> y con página <b>(Apellido, año, p. 44)</b>.',
+    referencias: [
+      { tipo: 'Libro', plantilla: 'Apellido, N. (año) <i>Título del libro</i>. Editorial.',
+        ejemplo: 'Bueno, G. (1972) <i>Ensayos materialistas</i>. Taurus.' },
+    ],
+    novedades: 'No hay edición oficial: cada universidad publica su variante. Si te piden «Harvard», pide la guía exacta de esa institución.',
+    orden: 'alfabetico',
+    faro: 'Lista final alfabética, como APA: las marcas [n] son el recordatorio del borrador.',
+  },
+];
 
 const RED_SECCIONES = [
   'PORTADA', 'EDITORIAL', 'ACTUALIDAD', 'REPORTE INVESTIGATIVO',
@@ -64,6 +144,7 @@ let _redRango     = null;    // última selección dentro del cuerpo (ver redGua
 let _redCitaEl    = null;    // marca de cita abierta en su modal
 let _redBitTimer  = null;    // temporizador de la bitácora local
 let _redSinSubir  = false;   // el último guardado no llegó a la nube
+let _redGuiaAbierta = false; // la guía de citas, ¿desplegada?
 
 /* ── Helpers ── */
 
@@ -1027,6 +1108,7 @@ function redOpenEditor(id) {
   redUpdatePapeleraAviso();
   redUpdateRecuperarAviso();   // ¿hay copia local más nueva que lo que bajó?
   redUpdateAvisoSinSubir();
+  redGuiaRender();             // la guía de citas, con el estilo de ESTA nota
   redUpdateContador();
   redSetSaveState('ok');
   switchView('view-redaccion-editor');
@@ -1085,6 +1167,76 @@ function redUpdateContador() {
   }
   el.textContent = txt;
   el.className = `red-e-contador${lim ? ` red-cont-${lim}` : ''}`;
+}
+
+/* ── Guía de citas: el estilo de cada nota ─────────────────────────
+   La elección se guarda en el aparato (localStorage): es una preferencia
+   de la guía, no un dato de la revista, y perderla no rompe nada. La
+   última elegida queda como propuesta para la siguiente nota. */
+
+function redEstilosLoad() {
+  try { return JSON.parse(localStorage.getItem(RED_ESTILOS_KEY)) || {}; } catch (_) { return {}; }
+}
+function redEstiloDeNota(id) {
+  const m = redEstilosLoad();
+  return m['n' + id] || null;
+}
+function redSetEstilo(id, estilo) {
+  const m = redEstilosLoad();
+  m['n' + id] = estilo;
+  m.ultimo = estilo;
+  try { localStorage.setItem(RED_ESTILOS_KEY, JSON.stringify(m)); } catch (_) {}
+}
+function redEstiloInfo(id) {
+  return RED_ESTILOS_CITA.find(e => e.id === id) || null;
+}
+
+function redGuiaPanelHtml(e) {
+  if (!e) {
+    return `<div class="red-guia-intro">
+      Cada publicación elige <b>un</b> estilo y lo usa en toda la revista.
+      El del subíndice que ya usas tiene nombre: <b>notas al pie</b> (Chicago)
+      en humanidades, o <b>numérico</b> (Vancouver) en ciencias de la salud.
+      En Latinoamérica el más pedido es <b>APA</b>; en artículos anglosajones
+      verás APA, MLA, Chicago y Harvard. Toca uno arriba para ver cómo se usa,
+      según su edición al día.
+    </div>`;
+  }
+  const refs = e.referencias.map(r => `
+    <div class="red-guia-ref">
+      <span class="red-guia-ref-tipo">${r.tipo}</span>
+      <span class="red-guia-plantilla">${r.plantilla}</span>
+      ${r.ejemplo ? `<span class="red-guia-ejemplo">ej.: ${r.ejemplo}</span>` : ''}
+    </div>`).join('');
+  return `
+    <div class="red-guia-vigente"><i class="fa-solid fa-circle-check"></i> ${e.vigente}</div>
+    <div class="red-guia-sec"><span class="red-guia-sec-t">Dónde se usa</span>${e.uso}</div>
+    <div class="red-guia-sec"><span class="red-guia-sec-t">En el texto</span>${e.enTexto}</div>
+    <div class="red-guia-sec"><span class="red-guia-sec-t">La referencia</span>${refs}</div>
+    <div class="red-guia-sec"><span class="red-guia-sec-t">Lo nuevo de esta edición</span>${e.novedades}</div>
+    <div class="red-guia-sec red-guia-faro"><span class="red-guia-sec-t">Con las marcas [n] de F.A.R.O.</span>${e.faro}</div>`;
+}
+
+function redGuiaRender() {
+  const chips = document.getElementById('red-guia-chips');
+  const panel = document.getElementById('red-guia-panel');
+  const badge = document.getElementById('red-guia-badge');
+  if (!chips || !panel || _redNotaId === null) return;
+
+  const activo = redEstiloDeNota(_redNotaId);
+  if (badge) badge.textContent = activo ? (redEstiloInfo(activo) || {}).nombre || '' : '';
+
+  chips.innerHTML = RED_ESTILOS_CITA.map(e => `
+    <button type="button" class="red-guia-chip ${e.id === activo ? 'red-guia-chip-activo' : ''}" data-estilo="${e.id}">
+      ${e.nombre} <span class="red-guia-chip-sis">${e.sistema}</span>
+    </button>`).join('');
+  chips.querySelectorAll('[data-estilo]').forEach(btn =>
+    btn.addEventListener('click', () => {
+      redSetEstilo(_redNotaId, btn.dataset.estilo);
+      redGuiaRender();
+    }));
+
+  panel.innerHTML = redGuiaPanelHtml(redEstiloInfo(activo));
 }
 
 /* ── Recuperar lo que no llegó a la nube ───────────────────────────
@@ -1438,6 +1590,15 @@ function redOpenCitaModal(marca) {
     ? 'Pendiente: la marca amarilla del texto es el recordatorio de buscar la fuente. Escribe aquí la referencia y pasará a número normal.'
     : 'Al exportar, esta referencia sale numerada al final de la nota.';
   document.getElementById('red-cita-texto').value = marca.dataset.ref || '';
+
+  // La plantilla del estilo elegido, justo donde se escribe la referencia
+  const pl = document.getElementById('red-cita-plantilla');
+  if (pl) {
+    const est = redEstiloInfo(redEstiloDeNota(_redNotaId));
+    pl.innerHTML = est
+      ? `✍️ <b>${est.nombre}</b> · ${est.referencias[0].tipo}: ${est.referencias[0].plantilla}`
+      : 'Elige un estilo en 📚 <b>Guía de citas</b> (bajo la nota) y aquí verás su plantilla.';
+  }
   overlay.style.display = 'flex';
 }
 
@@ -1522,8 +1683,15 @@ function redNotaMd(n) {
   // delatada a propósito: mejor un PENDIENTE gritón en el borrador que
   // una revista impresa con una cita muda.
   const citas = redCitasDe(n.cuerpo);
+  // El estilo elegido en la guía viaja como etiqueta, y si es de los
+  // autor–año se recuerda que la lista final va alfabética: quien maqueta
+  // no tiene por qué saberse cada norma de memoria.
+  const estilo = redEstiloInfo(redEstiloDeNota(n.id));
+  const etiqueta = estilo
+    ? ` *(formato ${estilo.nombre}${estilo.orden === 'alfabetico' ? ' — ordénalas alfabéticamente al maquetar' : ''})*`
+    : '';
   const refs = citas.length
-    ? `\n**Referencias**\n` + citas.map(c =>
+    ? `\n**Referencias**${etiqueta}\n` + citas.map(c =>
         `[${c.num}] ${c.ref || '⚠️ PENDIENTE: falta buscar la fuente'}`).join('\n') + '\n'
     : '';
 
@@ -1811,6 +1979,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const n = redNota();
     if (!n) return;
     if (await redRestaurarNota(n.id)) redUpdatePapeleraAviso();
+  });
+
+  // Guía de citas: desplegar y recoger
+  document.getElementById('red-guia-toggle')?.addEventListener('click', () => {
+    _redGuiaAbierta = !_redGuiaAbierta;
+    const cuerpo = document.getElementById('red-guia-cuerpo');
+    const chev   = document.getElementById('red-guia-chev');
+    if (cuerpo) cuerpo.style.display = _redGuiaAbierta ? 'block' : 'none';
+    if (chev) chev.classList.toggle('red-guia-chev-abierta', _redGuiaAbierta);
   });
 
   // Versiones guardadas de la nota abierta

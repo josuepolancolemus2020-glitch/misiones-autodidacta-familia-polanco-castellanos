@@ -1104,6 +1104,19 @@
 
       <div class="red-e-contador" id="red-e-contador">0 palabras · 0 caracteres</div>
 
+      <!-- Guía de citas: el estilo que usa esta nota y cómo se escribe -->
+      <div class="red-guia">
+        <button type="button" class="red-guia-toggle" id="red-guia-toggle">
+          <i class="fa-solid fa-book"></i> Guía de citas
+          <span class="red-guia-badge" id="red-guia-badge"></span>
+          <i class="fa-solid fa-chevron-down red-guia-chev" id="red-guia-chev"></i>
+        </button>
+        <div class="red-guia-cuerpo" id="red-guia-cuerpo" style="display:none;">
+          <div class="red-guia-chips" id="red-guia-chips"></div>
+          <div class="red-guia-panel" id="red-guia-panel"></div>
+        </div>
+      </div>
+
       <div class="red-e-acciones">
         <button type="button" class="red-accion-btn" id="red-e-versiones-btn">
           <i class="fa-solid fa-clock-rotate-left"></i> Versiones
@@ -1592,6 +1605,8 @@
       <label class="fin-label" for="red-cita-texto">Referencia</label>
       <textarea id="red-cita-texto" class="red-e-entradilla" rows="3" maxlength="500"
         placeholder="Autor, obra, año, página… (vacía queda como pendiente)"></textarea>
+      <!-- Plantilla del estilo activo de la nota (📚 Guía de citas) -->
+      <p class="red-cita-plantilla" id="red-cita-plantilla"></p>
       <button type="button" class="red-crear-btn" id="red-cita-guardar-btn">
         <i class="fa-solid fa-check"></i> Guardar
       </button>
