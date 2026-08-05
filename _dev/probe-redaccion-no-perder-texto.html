@@ -149,6 +149,11 @@ const NOTA = () => ({
   ok(Object.keys(pendientes()).length === 0,
      'y se descarta, para que no vuelva a intentarlo en cada recarga',
      'el pendiente viejo sigue ahí, listo para pisar otra vez');
+  /* No subirlo no significa tirarlo: ese texto puede existir SOLO ahí.
+     Se guarda en la bitácora para poder rescatarlo a mano. */
+  ok(w.eval('redBitacoraDe(7)').some(v => v.cuerpo.includes('VERSION VIEJA')),
+     'pero no se pierde: pasa a 🕘 Versiones para poder rescatarlo',
+     'el pendiente viejo se tiró a la basura sin enseñarlo');
 
   log('── 3. Un pendiente MÁS NUEVO sí se sube (la red sigue sirviendo) ──');
   await arranca();
