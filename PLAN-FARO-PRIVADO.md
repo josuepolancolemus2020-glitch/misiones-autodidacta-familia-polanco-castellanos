@@ -56,6 +56,12 @@ Zone → Make private.
 
 **4. Sueltos que no bloquean nada pero siguen ahí:**
 
+   · ⚠️ **Correr `supabase/sql/redaccion_papelera.sql`** en el SQL Editor. Son
+     dos columnas en `redaccion_notas` y nada más: no toca ninguna otra tabla ni
+     la seguridad por fila. Hasta que se corran, «Eliminar» una nota en
+     Redacción sigue borrando de verdad, y la aplicación lo avisa antes de
+     hacerlo en vez de fingir que hay red debajo. Después, borrar solo aparta:
+     la nota espera en la papelera hasta que se restaure.
    · Las notificaciones del chat están rotas y en silencio. Se arregla volviendo
      a desplegar `send-chat-push`, que en el repositorio ya usa la clave de
      servicio. Después, cada quien abre la aplicación una vez para volver a
