@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Redacción: citas al pie y tamaño de letra</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de dos arreglos del editor de Redacción:
+
+     1. cambiar la letra y el tamaño desde la barra NO funcionaba en la
+        tableta: tocar el <select> le roba la selección al editor antes
+        del change, y el formato se aplicaba a nada;
+     2. las citas al pie: marca [n?] pendiente, referencia al tocarla,
+        renumeración automática y lista de referencias en el export.
+
+   El fallo de la letra es un fallo de PANTALLA TÁCTIL, así que la sonda
+   lo reproduce como pasa de verdad: marca un trozo de texto, después
+   VACÍA la selección (eso es lo que hace el toque en el select) y solo
+   entonces dispara el change. Si el arreglo de guardar/restaurar la
+   selección no existe, el formato cae al vacío y la sonda suspende.
+
+   Como las demás de esta familia: ejecuta el index.html de verdad con
+   una base de mentira a nivel de fetch, y de cada prueba mira lo que
+   quedó (en el DOM o en lo que viajó a la base), no lo que la pantalla
+   dice que pasó. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w = f.contentWindow, d = f.contentWindow.document;
+
+  /* La base de mentira: contesta vacío y apunta cada llamada, para poder
+     afirmar «este PATCH llevó la cita dentro del cuerpo». */
+  const llamadas = [];
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url);
+    const metodo = (init && init.method) || 'GET';
+    llamadas.push({ ruta: u.pathname + u.search, metodo, cuerpo: (init && init.body) || null });
+    const cabs = new Headers((init && init.headers) || {});
+    const unSolo = (cabs.get('Accept') || '').includes('pgrst.object');
+    return new Response(unSolo ? 'null' : '[]',
+      { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  w.confirm = () => true;
+
+  if (w.eval('typeof initRedaccion') !== 'function') {
+    log('✘ index.html no cargó js/tools/redaccion.js');
+    out.textContent = L.join('\n') + '\n\nRESULTADO: SUSPENDE';
+    document.title = 'SONDA-SUSPENDE';
+    return;
+  }
+
+  // Pantalla de entrada fuera y estado sembrado a mano
+  d.getElementById('login-screen').style.display = 'none';
+  d.getElementById('app-container').style.display = '';
+  w.eval("switchView('view-redaccion')");
+  await esperar(400);   // initRedaccion habla con el fetch de mentira y termina
+  w.eval(`
+    _redEdiciones = [{ id: 1, numero: 1, titulo: 'Nº 01 · prueba', fecha_cierre: null, archivada: false }];
+    _redNotas = [
+      { id: 1, edicion_id: 1, autor: 'josue', titulo: 'La bandera', seccion: 'ACTUALIDAD',
+        tipo: 'Artículo', estado: 'borrador', entradilla: '', cuerpo: 'Hola mundo azul profundo',
+        en_portada: false, eliminada: false, eliminada_at: null, actualizado_at: '2026-08-05T10:00:00Z' },
+      { id: 2, edicion_id: 1, autor: 'josue', titulo: 'Nota vieja', seccion: 'CULTURA',
+        tipo: 'Artículo', estado: 'idea', entradilla: '', cuerpo: 'texto plano de antes\\nsin html',
+        en_portada: false, eliminada: false, eliminada_at: null, actualizado_at: '2026-08-04T10:00:00Z' },
+    ];
+    _redPapelera = true; _redLoaded = true; _redEdicion = 1;
+    redRender(); redOpenEditor(1);
+  `);
+  await esperar(200);
+
+  const cuerpo = d.getElementById('red-e-cuerpo');
+  const texto = id => (d.getElementById(id) || {}).textContent || '';
+
+  log('── 1. El tamaño de letra, con la selección robada ──');
+  /* Marcar «mundo», guardar (keyup, como una tecla de verdad), y VACIAR
+     la selección: exactamente lo que provoca el toque en el select. */
+  let nodo = cuerpo.firstChild;
+  let r = d.createRange(); r.setStart(nodo, 5); r.setEnd(nodo, 10);
+  let s = w.getSelection(); s.removeAllRanges(); s.addRange(r);
+  cuerpo.dispatchEvent(new w.Event('keyup'));
+  s.removeAllRanges();
+  await esperar(100);
+
+  const tam = d.getElementById('red-e-tamano');
+  tam.value = '6';
+  tam.dispatchEvent(new w.Event('change', { bubbles: true }));
+  await esperar(100);
+  ok(/<font size="6">mundo<\/font>/.test(cuerpo.innerHTML),
+     'con la selección perdida, «Muy grande» agranda la palabra marcada',
+     'el tamaño no se aplicó: ' + cuerpo.innerHTML.slice(0, 120));
+
+  log('── 2. La letra (fuente), igual ──');
+  nodo = [...cuerpo.childNodes].find(x => x.nodeType === 3 && x.textContent.includes('azul'));
+  r = d.createRange();
+  const pos = nodo.textContent.indexOf('azul');
+  r.setStart(nodo, pos); r.setEnd(nodo, pos + 4);
+  s.removeAllRanges(); s.addRange(r);
+  cuerpo.dispatchEvent(new w.Event('keyup'));
+  s.removeAllRanges();
+  await esperar(100);
+  const fue = d.getElementById('red-e-fuente');
+  fue.value = 'Georgia, serif';
+  fue.dispatchEvent(new w.Event('change', { bubbles: true }));
+  await esperar(100);
+  ok(cuerpo.innerHTML.includes('face='),
+     'el cambio de letra también llega a lo marcado',
+     'la fuente no se aplicó: ' + cuerpo.innerHTML.slice(0, 160));
+
+  log('── 3. Marcar una cita pendiente ──');
+  const palabrasAntes = w.eval('redPalabras(document.getElementById("red-e-cuerpo").innerHTML)');
+  // El cursor al final del texto, guardado, y la selección vaciada:
+  // el botón tiene que servir aunque el foco ya no esté en el editor.
+  r = d.createRange(); r.selectNodeContents(cuerpo); r.collapse(false);
+  s.removeAllRanges(); s.addRange(r);
+  cuerpo.dispatchEvent(new w.Event('keyup'));
+  s.removeAllRanges();
+  await esperar(100);
+  d.getElementById('red-e-cita-btn').click();
+  await esperar(100);
+
+  let marcas = cuerpo.querySelectorAll('sup.red-cita');
+  ok(marcas.length === 1, 'aparece la marca en el texto', 'no se insertó la marca');
+  ok(marcas[0] && marcas[0].textContent === '[1?]',
+     'dice [1?]: numerada y con el ? de pendiente', 'la marca dice: ' + (marcas[0] && marcas[0].textContent));
+  ok(marcas[0] && marcas[0].classList.contains('red-cita-pendiente'),
+     'va en amarillo de pendiente', 'no lleva la clase de pendiente');
+  ok(marcas[0] && marcas[0].getAttribute('contenteditable') === 'false',
+     'no se puede escribir dentro de la marca', 'la marca es editable por dentro');
+  const palabrasDespues = w.eval('redPalabras(document.getElementById("red-e-cuerpo").innerHTML)');
+  ok(palabrasAntes === palabrasDespues,
+     `la marca no cuenta como palabra (${palabrasAntes} antes y después)`,
+     `el contador cambió: ${palabrasAntes} → ${palabrasDespues}`);
+  ok(texto('red-e-contador').includes('1 sin referencia'),
+     'el contador avisa: 1 sin referencia', 'el contador no avisa: ' + texto('red-e-contador'));
+
+  log('── 4. Tocar la marca y escribir la referencia ──');
+  marcas[0].click();
+  await esperar(100);
+  ok(d.getElementById('red-cita-overlay').style.display === 'flex',
+     'tocar la marca abre el cuadro de la referencia', 'el cuadro no se abrió');
+  ok(texto('red-cita-ayuda').toLowerCase().includes('pendiente'),
+     'y explica que está pendiente', 'la ayuda no explica el estado');
+  d.getElementById('red-cita-texto').value = 'Bueno, G. — Ensayos materialistas, 1972, p. 44';
+  d.getElementById('red-cita-guardar-btn').click();
+  await esperar(100);
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  ok(marcas[0].dataset.ref && marcas[0].dataset.ref.includes('Bueno'),
+     'la referencia queda guardada en la propia marca', 'no se guardó la referencia');
+  ok(marcas[0].textContent === '[1]' && !marcas[0].classList.contains('red-cita-pendiente'),
+     'la marca pasa a [1] normal, ya sin amarillo', 'la marca sigue como: ' + marcas[0].textContent);
+  ok(d.getElementById('red-cita-overlay').style.display === 'none',
+     'y el cuadro se cierra', 'el cuadro quedó abierto');
+
+  log('── 5. La cita viaja a la base con el autoguardado ──');
+  await esperar(1500);
+  const patches = llamadas.filter(c => c.metodo === 'PATCH' && c.ruta.includes('redaccion_notas'));
+  const ultimo = patches[patches.length - 1];
+  ok(!!ultimo, 'hubo un autoguardado', 'no salió ningún autoguardado');
+  ok(ultimo && ultimo.cuerpo.includes('red-cita') && ultimo.cuerpo.includes('data-ref'),
+     'y llevó la marca con su referencia dentro del cuerpo',
+     'el guardado no llevó la cita: ' + (ultimo ? ultimo.cuerpo.slice(0, 150) : ''));
+
+  log('── 6. Renumeración al insertar delante ──');
+  r = d.createRange(); r.setStart(cuerpo, 0); r.collapse(true);
+  s.removeAllRanges(); s.addRange(r);
+  cuerpo.dispatchEvent(new w.Event('keyup'));
+  await esperar(60);
+  d.getElementById('red-e-cita-btn').click();
+  await esperar(100);
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  ok(marcas.length === 2, 'hay dos citas', 'se esperaban 2 marcas y hay ' + marcas.length);
+  ok(marcas[0].textContent === '[1?]' && marcas[1].textContent === '[2]',
+     'se renumeran solas: la nueva delante es [1?], la resuelta pasa a [2]',
+     `la numeración quedó: ${marcas[0].textContent} y ${marcas[1].textContent}`);
+  ok(marcas[1].dataset.ref && marcas[1].dataset.ref.includes('Bueno'),
+     'y la referencia siguió pegada a SU marca', 'la referencia se soltó de su marca');
+
+  log('── 7. El export lleva las referencias y delata lo pendiente ──');
+  await w.eval('redSaveNow()');   // que el export lea lo que hay, no lo de hace un rato
+  const md = w.eval('redNotaMd(redNota())');
+  ok(md.includes('**Referencias**'), 'el Markdown lleva la sección Referencias',
+     'no hay sección de referencias');
+  ok(md.includes('[2] Bueno, G.'), 'la resuelta sale numerada con su texto',
+     'la referencia resuelta no sale: ' + md.slice(-200));
+  ok(md.includes('[1] ⚠️ PENDIENTE'), 'la pendiente sale delatada, no muda',
+     'la pendiente no se delata: ' + md.slice(-200));
+  ok(md.includes('[1?]'), 'y la marca [1?] queda visible dentro del texto',
+     'la marca no aparece en el cuerpo exportado');
+
+  log('── 8. La lista de notas avisa de lo que falta por citar ──');
+  await esperar(1500);   // que el autoguardado refresque _redNotas
+  w.eval('redRender()');
+  ok(d.getElementById('red-list').innerHTML.includes('1 sin fuente'),
+     'la nota luce su 🔖 1 sin fuente en la lista', 'la lista no avisa de la cita pendiente');
+
+  log('── 9. Quitar una cita ──');
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  marcas[0].click();
+  await esperar(100);
+  d.getElementById('red-cita-quitar-btn').click();
+  await esperar(100);
+  marcas = cuerpo.querySelectorAll('sup.red-cita');
+  ok(marcas.length === 1, 'la marca desaparece del texto', 'la marca sigue ahí');
+  ok(marcas[0].textContent === '[1]', 'y la que queda vuelve a ser [1]',
+     'la numeración no se recompuso: ' + (marcas[0] && marcas[0].textContent));
+
+  log('── 10. Las notas viejas, en paz ──');
+  w.eval('redOpenEditor(2)');
+  await esperar(100);
+  ok(cuerpo.querySelectorAll('sup.red-cita').length === 0,
+     'una nota sin citas no gana marcas de la anterior', 'aparecieron marcas fantasma');
+  ok(w.eval('redPalabras(_redNotas[1].cuerpo)') === 6,
+     'el contador de una nota de texto plano sigue exacto (6)',
+     'el contador de texto plano se rompió: ' + w.eval('redPalabras(_redNotas[1].cuerpo)'));
+  ok(!w.eval('redNotaMd(_redNotas[1])').includes('Referencias'),
+     'y su export no gana una sección de referencias vacía', 'apareció una sección Referencias de más');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SONDA-SUSPENDE';
+});
+</script>
+</body>
+</html>

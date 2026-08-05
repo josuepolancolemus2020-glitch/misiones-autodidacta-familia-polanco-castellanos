@@ -3270,6 +3270,24 @@ body {
   background: var(--border); flex-shrink: 0;
 }
 
+/* ── Citas al pie ── */
+/* La marca vive dentro del texto pero no se edita por dentro
+   (contenteditable=false): se toca entera y se borra entera. */
+.red-e-cuerpo sup.red-cita {
+  color: #4338ca; font-weight: 800; cursor: pointer; padding: 0 2px;
+}
+/* Pendiente de buscar la fuente: amarilla, como los avisos de límite */
+.red-e-cuerpo sup.red-cita-pendiente {
+  color: #b45309; background: #fffbeb;
+  border: 1px dashed #f59e0b; border-radius: 5px;
+}
+.red-tb-cita { color: #b45309; }  /* el botón insta a marcar lo pendiente */
+.red-nota-citas-pend { background: #fffbeb; color: #b45309; }
+.red-cita-ayuda {
+  font-size: 12.5px; color: var(--muted); line-height: 1.55;
+  margin-bottom: 12px;
+}
+
 /* ══════════════════════════════════════════════
    ANTENA 📡 · gestión de redes sociales
 ══════════════════════════════════════════════ */

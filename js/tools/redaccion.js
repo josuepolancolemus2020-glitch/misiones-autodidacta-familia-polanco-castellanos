@@ -15,6 +15,15 @@
      · «Eliminar» una nota NO la borra: la manda a la papelera, de donde
        vuelve entera. Solo se borra de verdad lo que ya está allí, y
        diciéndolo dos veces.
+
+   Citas al pie: el botón 🔖 de la barra deja una marca [n?] en el texto
+   sin cortar la escritura; es el recordatorio de «esta idea no es mía,
+   falta buscar la fuente». Tocar la marca abre su referencia; con ella
+   escrita pasa a [n] normal. La numeración se recalcula sola por orden
+   de aparición, y al exportar cada nota lleva su lista de referencias,
+   con las pendientes delatadas para que ninguna llegue muda a la
+   maquetación. La referencia viaja dentro del HTML de la nota (en un
+   data-ref), así que no hace falta tocar la base de datos.
 ───────────────────────────────────────────── */
 
 const RED_T_EDICIONES = 'redaccion_ediciones';
@@ -49,6 +58,8 @@ let _redSaveTimer = null;
 let _redLoaded    = false;
 let _redPapelera  = false;   // ¿la base ya tiene las columnas de la papelera?
 let _redEdEditando = null;   // edición abierta en el modal (null = una nueva)
+let _redRango     = null;    // última selección dentro del cuerpo (ver redGuardarSeleccion)
+let _redCitaEl    = null;    // marca de cita abierta en su modal
 
 /* ── Helpers ── */
 
@@ -80,8 +91,17 @@ function redPlano(html) {
 }
 
 function redPalabras(txt) {
-  const t = redPlano(txt || '').trim();
-  return t ? t.split(/\s+/).length : 0;
+  let t = txt || '';
+  // Las marcas de cita ([1], [2?]…) no son palabras del artículo:
+  // no cuentan para los límites de los recuadros de Canva.
+  if (t.includes('red-cita')) {
+    const div = document.createElement('div');
+    div.innerHTML = t;
+    div.querySelectorAll('sup.red-cita').forEach(s => s.remove());
+    t = div.innerHTML;
+  }
+  const plano = redPlano(t).trim();
+  return plano ? plano.split(/\s+/).length : 0;
 }
 
 /* HTML del editor → Markdown (negrita/cursiva; el resto queda como texto) */
@@ -192,6 +212,49 @@ function redNombreDestino(edicionId) {
   if (!edicionId) return '🗃️ Banco de ideas';
   const ed = _redEdiciones.find(e => e.id === edicionId);
   return ed ? `📰 ${ed.titulo}` : '📰 edición eliminada';
+}
+
+/* ── La selección del cuerpo, guardada aparte ──────────────────────
+   En el teléfono y la tableta, tocar un <select> de la barra (Letra,
+   Tamaño) le roba el foco al editor y la selección se pierde ANTES de
+   que llegue el change. Con focus() el foco vuelve, pero lo marcado
+   no: el tamaño se aplicaba a nada y el botón parecía muerto. En una
+   computadora con ratón la selección sobrevive y el fallo no se ve,
+   que es por lo que tardó en aparecer.
+   La cura: guardar la última selección hecha dentro del cuerpo (en
+   cada toque y cada tecla) y restaurarla justo antes de aplicar el
+   formato o insertar una cita. */
+
+function redGuardarSeleccion() {
+  const cuerpo = document.getElementById('red-e-cuerpo');
+  const sel = document.getSelection();
+  if (!cuerpo || !sel || !sel.rangeCount) return;
+  const r = sel.getRangeAt(0);
+  if (cuerpo.contains(r.startContainer)) _redRango = r.cloneRange();
+}
+
+function redRestaurarSeleccion() {
+  const cuerpo = document.getElementById('red-e-cuerpo');
+  if (!cuerpo) return;
+  const sel = document.getSelection();
+  // Si la selección viva ya está dentro del cuerpo, no hay nada que curar
+  if (sel && sel.rangeCount && cuerpo.contains(sel.getRangeAt(0).startContainer)) return;
+  cuerpo.focus();
+  if (_redRango && cuerpo.contains(_redRango.startContainer) && sel) {
+    sel.removeAllRanges();
+    sel.addRange(_redRango);
+  }
+}
+
+/* Las citas de una nota, en orden de aparición: [{num, ref}] */
+function redCitasDe(html) {
+  if (!html || !html.includes('red-cita')) return [];
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return [...div.querySelectorAll('sup.red-cita')].map((s, i) => ({
+    num: i + 1,
+    ref: (s.dataset.ref || '').trim(),
+  }));
 }
 
 /* ── Reintentos offline: cambios que no llegaron a Supabase ── */
@@ -435,6 +498,8 @@ function redRenderNotas() {
       const est = redEstadoInfo(n.estado);
       const pal = redPalabras(n.cuerpo);
       const lim = redEstadoLimite(pal, n.limite_amarillo, n.limite_rojo);
+      // Cuántas citas siguen sin fuente: para verlas desde la lista al revisar
+      const sinFuente = redCitasDe(n.cuerpo).filter(c => !c.ref).length;
       return `
       <button type="button" class="red-nota" data-nota="${n.id}">
         <div class="red-nota-main">
@@ -443,6 +508,7 @@ function redRenderNotas() {
             ${n.en_portada ? '<span class="red-badge red-badge-portada">⭐ Portada</span>' : ''}
             <span class="red-badge ${est.cls}">${est.label}</span>
             <span class="red-badge red-badge-tipo">${redEsc(n.tipo)}</span>
+            ${sinFuente ? `<span class="red-badge red-nota-citas-pend">🔖 ${sinFuente} sin fuente</span>` : ''}
             <span class="red-nota-autor">${redAutorInfo(n.autor)}</span>
             <span class="red-nota-pal ${lim ? `red-pal-${lim}` : ''}">${pal} palabra${pal === 1 ? '' : 's'}${lim === 'rojo' ? ' 🔴' : lim === 'amarillo' ? ' 🟡' : ''}</span>
           </div>
@@ -798,6 +864,8 @@ function redOpenEditor(id) {
   document.getElementById('red-e-cuerpo').innerHTML = cuerpo.includes('<')
     ? cuerpo
     : redEsc(cuerpo).replace(/\n/g, '<br>');
+  _redRango = null;      // la selección guardada era de otra nota
+  redRenumerarCitas();   // por si la nota trae citas ya puestas
 
   document.getElementById('red-e-lim-amarillo').value = n.limite_amarillo || '';
   document.getElementById('red-e-lim-rojo').value     = n.limite_rojo || '';
@@ -881,6 +949,13 @@ function redUpdateContador() {
   if (lim === 'rojo')          txt += ` · 🔴 Sobran ${pal - max} (máx. ${max})`;
   else if (lim === 'amarillo') txt += ` · 🟡 Faltan ${min - pal} para el mínimo (${min})`;
   else if (lim === 'ok')       txt += ' · ✅ Dentro del límite';
+
+  const citas = redCitasDe(html);
+  if (citas.length) {
+    const pend = citas.filter(c => !c.ref).length;
+    txt += ` · 🔖 ${citas.length} cita${citas.length === 1 ? '' : 's'}`;
+    if (pend) txt += ` (${pend} sin referencia)`;
+  }
   el.textContent = txt;
   el.className = `red-e-contador${lim ? ` red-cont-${lim}` : ''}`;
 }
@@ -976,6 +1051,105 @@ function redCloseMover() {
   if (overlay) overlay.style.display = 'none';
 }
 
+/* ── Citas al pie ─────────────────────────────────────────────────
+   La marca es un <sup contenteditable="false"> dentro del texto: se
+   toca entera, se borra entera con una sola tecla, y guarda su
+   referencia en data-ref. Sin referencia es una pendiente [n?], en
+   amarillo. La numeración no se escribe a mano nunca: se recalcula
+   por orden de aparición cada vez que algo cambia. */
+
+function redRenumerarCitas() {
+  const cuerpo = document.getElementById('red-e-cuerpo');
+  if (!cuerpo) return;
+  let i = 0;
+  cuerpo.querySelectorAll('sup.red-cita').forEach(s => {
+    i++;
+    const pendiente = !(s.dataset.ref || '').trim();
+    s.classList.toggle('red-cita-pendiente', pendiente);
+    s.setAttribute('contenteditable', 'false');
+    s.textContent = pendiente ? `[${i}?]` : `[${i}]`;
+  });
+}
+
+/* Un toque deja la marca pendiente y se sigue escribiendo: apuntar
+   «esta idea no es mía» no debe costar más que eso. La referencia se
+   escribe después, tocando la marca. */
+function redInsertarCita() {
+  const cuerpo = document.getElementById('red-e-cuerpo');
+  if (!cuerpo) return;
+  redRestaurarSeleccion();
+
+  const sel = window.getSelection();
+  let rango;
+  if (sel && sel.rangeCount && cuerpo.contains(sel.getRangeAt(0).startContainer)) {
+    rango = sel.getRangeAt(0);
+    rango.collapse(false);           // tras lo seleccionado, como toda cita
+  } else {
+    rango = document.createRange();  // sin rastro de cursor: al final del texto
+    rango.selectNodeContents(cuerpo);
+    rango.collapse(false);
+  }
+
+  const marca = document.createElement('sup');
+  marca.className = 'red-cita red-cita-pendiente';
+  marca.setAttribute('contenteditable', 'false');
+  marca.textContent = '[?]';
+  // El espacio de después no es cosmético: sin él, en algunos navegadores
+  // el cursor no puede ponerse detrás de la marca y se atasca la escritura.
+  const espacio = document.createTextNode(' ');
+  rango.insertNode(espacio);
+  rango.insertNode(marca);
+  rango.setStartAfter(espacio);
+  rango.collapse(true);
+  if (sel) { sel.removeAllRanges(); sel.addRange(rango); }
+
+  redRenumerarCitas();
+  redQueueSave();
+  if (typeof toast === 'function') toast('🔖 Cita pendiente · tócala cuando tengas la referencia');
+}
+
+function redOpenCitaModal(marca) {
+  const overlay = document.getElementById('red-cita-overlay');
+  if (!overlay) return;
+  _redCitaEl = marca;
+  const num = marca.textContent.replace(/[^\d]/g, '') || '?';
+  const pendiente = !(marca.dataset.ref || '').trim();
+  document.getElementById('red-cita-titulo').innerHTML =
+    `<i class="fa-solid fa-superscript" style="color:#4f46e5;"></i> Cita al pie [${num}]`;
+  document.getElementById('red-cita-ayuda').textContent = pendiente
+    ? 'Pendiente: la marca amarilla del texto es el recordatorio de buscar la fuente. Escribe aquí la referencia y pasará a número normal.'
+    : 'Al exportar, esta referencia sale numerada al final de la nota.';
+  document.getElementById('red-cita-texto').value = marca.dataset.ref || '';
+  overlay.style.display = 'flex';
+}
+
+function redCloseCitaModal() {
+  const overlay = document.getElementById('red-cita-overlay');
+  if (overlay) overlay.style.display = 'none';
+  _redCitaEl = null;
+}
+
+function redGuardarCita() {
+  if (!_redCitaEl) return;
+  const texto = document.getElementById('red-cita-texto').value.trim();
+  if (texto) _redCitaEl.dataset.ref = texto;
+  else delete _redCitaEl.dataset.ref;   // vaciarla la devuelve a pendiente
+  redRenumerarCitas();
+  redCloseCitaModal();
+  redQueueSave();
+  if (typeof toast === 'function') toast(texto ? '✅ Referencia guardada' : '🔖 Queda pendiente');
+}
+
+function redQuitarCita() {
+  if (!_redCitaEl) return;
+  if (!confirm('¿Quitar esta cita del texto?')) return;
+  _redCitaEl.remove();
+  redRenumerarCitas();
+  redCloseCitaModal();
+  redQueueSave();
+  if (typeof toast === 'function') toast('Cita quitada');
+}
+
 /* Eliminar ya no borra: manda a la papelera, de donde se puede volver.
    Solo lo que ya está en la papelera se borra de verdad. */
 async function redEliminarNota() {
@@ -1020,10 +1194,22 @@ async function redEliminarNota() {
 function redNotaMd(n) {
   const est = redEstadoInfo(n.estado);
   const entradilla = (n.entradilla || '').trim();
+
+  // Las citas al pie, numeradas por orden de aparición. Las marcas [n]
+  // ya viajan dentro del texto (redMdNodo conserva el texto del <sup>);
+  // aquí se les añade su lista de referencias. Una pendiente sale
+  // delatada a propósito: mejor un PENDIENTE gritón en el borrador que
+  // una revista impresa con una cita muda.
+  const citas = redCitasDe(n.cuerpo);
+  const refs = citas.length
+    ? `\n**Referencias**\n` + citas.map(c =>
+        `[${c.num}] ${c.ref || '⚠️ PENDIENTE: falta buscar la fuente'}`).join('\n') + '\n'
+    : '';
+
   return `### ${n.titulo || 'Sin título'}\n` +
     `*${n.tipo} · ${redAutorInfo(n.autor)} · ${est.label} · ${redPalabras(n.cuerpo)} palabras*\n\n` +
     (entradilla ? `**Entradilla:** ${entradilla}\n\n` : '') +
-    `${redMdDesdeHtml(n.cuerpo || '').trim()}\n`;
+    `${redMdDesdeHtml(n.cuerpo || '').trim()}\n` + refs;
 }
 
 function redEdicionMd() {
@@ -1077,7 +1263,14 @@ async function redExportar() {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 
-  if (typeof toast === 'function') toast('📋 Copiado y descargado (.md)');
+  // Si alguna cita sigue sin fuente, se avisa aquí también: el export es
+  // el último control antes de que el texto se vaya a maquetar.
+  const sinFuente = notas.reduce((a2, n) => a2 + redCitasDe(n.cuerpo).filter(c => !c.ref).length, 0);
+  if (typeof toast === 'function') {
+    toast(sinFuente
+      ? `📋 Copiado y descargado · ⚠️ ${sinFuente} cita${sinFuente === 1 ? '' : 's'} sin fuente`
+      : '📋 Copiado y descargado (.md)');
+  }
 }
 
 async function redCopiarNota() {
@@ -1138,12 +1331,20 @@ document.addEventListener('DOMContentLoaded', () => {
   ['red-e-estado', 'red-e-edicion'].forEach(id =>
     document.getElementById(id)?.addEventListener('change', redQueueSave));
 
-  // Barra de formato del cuerpo
+  // Barra de formato del cuerpo.
+  // La selección se guarda en cada toque y cada tecla (redGuardarSeleccion)
+  // porque en pantalla táctil los <select> de la barra la roban antes del
+  // change: sin esto, cambiar la letra o el tamaño no hacía nada.
   const cuerpoEl = document.getElementById('red-e-cuerpo');
-  document.querySelectorAll('#red-e-toolbar .red-tb-btn').forEach(btn => {
+  document.addEventListener('selectionchange', redGuardarSeleccion);
+  ['keyup', 'mouseup', 'touchend'].forEach(ev =>
+    cuerpoEl?.addEventListener(ev, redGuardarSeleccion));
+
+  document.querySelectorAll('#red-e-toolbar .red-tb-btn[data-cmd]').forEach(btn => {
     // mousedown en vez de click: no roba el foco (ni la selección) del editor
     btn.addEventListener('mousedown', e => {
       e.preventDefault();
+      redRestaurarSeleccion();
       document.execCommand(btn.dataset.cmd, false, null);
       redQueueSave();
     });
@@ -1152,7 +1353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sel = document.getElementById(selId);
     sel?.addEventListener('change', () => {
       if (!sel.value) return;
-      cuerpoEl?.focus();
+      redRestaurarSeleccion();   // devuelve al cuerpo lo que estaba marcado
       document.execCommand(cmd, false, sel.value);
       sel.value = ''; // el select actúa como menú: vuelve a su etiqueta
       redQueueSave();
@@ -1160,6 +1361,21 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   aplicarFormato('red-e-fuente', 'fontName');
   aplicarFormato('red-e-tamano', 'fontSize');
+
+  // Citas al pie: el botón deja la marca; tocar una marca abre su referencia
+  const citaBtn = document.getElementById('red-e-cita-btn');
+  citaBtn?.addEventListener('mousedown', e => e.preventDefault()); // no roba el foco
+  citaBtn?.addEventListener('click', redInsertarCita);
+  cuerpoEl?.addEventListener('click', e => {
+    const marca = e.target.closest ? e.target.closest('sup.red-cita') : null;
+    if (marca) redOpenCitaModal(marca);
+  });
+  document.getElementById('red-cita-close')?.addEventListener('click', redCloseCitaModal);
+  document.getElementById('red-cita-overlay')?.addEventListener('click', e => {
+    if (e.target.id === 'red-cita-overlay') redCloseCitaModal();
+  });
+  document.getElementById('red-cita-guardar-btn')?.addEventListener('click', redGuardarCita);
+  document.getElementById('red-cita-quitar-btn')?.addEventListener('click', redQuitarCita);
 
   // Pegar siempre como texto plano (evita arrastrar estilos de otras apps)
   cuerpoEl?.addEventListener('paste', e => {
