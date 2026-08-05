@@ -366,6 +366,81 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
   ok(!w.eval('redNotaMd(_redNotas[1])').includes('Referencias'),
      'y su export no gana una sección de referencias vacía', 'apareció una sección Referencias de más');
 
+  log('── 11. La guía de citas ──');
+  w.localStorage.removeItem('faro_redaccion_estilos_v1');
+  await w.eval('redOpenEditor(1)');
+  await esperar(100);
+  d.getElementById('red-guia-toggle').click();
+  await esperar(60);
+  ok(d.getElementById('red-guia-cuerpo').style.display !== 'none',
+     'el botón 📚 despliega la guía bajo la nota', 'la guía no se despliega');
+  const chips = d.querySelectorAll('#red-guia-chips [data-estilo]');
+  ok(chips.length === 5, 'ofrece los cinco estilos (APA, Chicago, MLA, Vancouver, Harvard)',
+     'faltan estilos: ' + chips.length);
+  ok(texto('red-guia-panel').includes('subíndice') || texto('red-guia-panel').includes('notas al pie'),
+     'sin elegir, explica cómo se llama el sistema del subíndice',
+     'la introducción no orienta: ' + texto('red-guia-panel').slice(0, 80));
+
+  d.querySelector('#red-guia-chips [data-estilo="apa"]').click();
+  await esperar(60);
+  ok(texto('red-guia-panel').includes('7.ª edición (2020)'),
+     'APA se explica con su edición vigente (7.ª, 2020)',
+     'no dice la edición vigente');
+  ok(texto('red-guia-panel').includes('ciudad de la editorial'),
+     'y cuenta lo que cambió en la edición al día',
+     'no explica las novedades');
+  ok(texto('red-guia-panel').includes('alfabético') || texto('red-guia-panel').includes('ALFABÉTICO'),
+     'avisa de que en APA la lista final va alfabética',
+     'no avisa del orden de la lista');
+  ok(texto('red-guia-badge') === 'APA 7',
+     'el estilo elegido queda a la vista junto al botón',
+     'el botón no muestra el estilo: ' + texto('red-guia-badge'));
+
+  // La elección se recuerda por nota
+  await w.eval('redOpenEditor(2)');
+  await esperar(100);
+  ok(texto('red-guia-badge') === '', 'otra nota no hereda el estilo sin pedirlo',
+     'el estilo se contagió a otra nota');
+  await w.eval('redOpenEditor(1)');
+  await esperar(100);
+  ok(texto('red-guia-badge') === 'APA 7', 'y al volver, la nota recuerda su estilo',
+     'la nota olvidó su estilo');
+
+  // La plantilla aparece donde se escribe la referencia
+  let marcaG = cuerpo.querySelector('sup.red-cita');
+  if (!marcaG) {
+    d.getElementById('red-e-cita-btn').click();
+    await esperar(60);
+    marcaG = cuerpo.querySelector('sup.red-cita');
+  }
+  marcaG.click();
+  await esperar(60);
+  ok(texto('red-cita-plantilla').includes('APA 7') && texto('red-cita-plantilla').includes('Apellido'),
+     'el cuadro de la referencia enseña la plantilla del estilo activo',
+     'el cuadro no enseña la plantilla: ' + texto('red-cita-plantilla'));
+  d.getElementById('red-cita-close').click();
+
+  // Y el export la lleva como etiqueta
+  await w.eval('redSaveNow()');
+  const mdG = w.eval('redNotaMd(redNota())');
+  ok(mdG.includes('formato APA 7') && mdG.includes('alfabéticamente'),
+     'el export etiqueta las referencias con el estilo y su orden',
+     'el export no lleva la etiqueta: ' + mdG.slice(-150));
+
+  // Chicago habla del sistema que ya usa la casa
+  d.getElementById('red-guia-toggle').click();   // reabrir (redOpenEditor la recogió)
+  d.querySelector('#red-guia-chips [data-estilo="chicago"]').click();
+  await esperar(60);
+  ok(texto('red-guia-panel').includes('18.ª edición (2024)'),
+     'Chicago se explica con su 18.ª edición (2024)',
+     'no dice la edición de Chicago');
+  ok(texto('red-guia-panel').includes('ibid'),
+     'incluida la novedad del «ibid.» desaconsejado',
+     'no cuenta las novedades de la 18.ª');
+  ok(texto('red-guia-panel').includes('marca [n]'),
+     'y dice cómo encaja con las marcas [n] de la casa',
+     'no conecta con el sistema de F.A.R.O.');
+
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
   document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
