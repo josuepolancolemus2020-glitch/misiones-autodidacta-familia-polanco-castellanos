@@ -1840,20 +1840,62 @@ document.addEventListener('DOMContentLoaded', () => {
       redQueueSave();
     });
   });
-  const aplicarFormato = (selId, cmd) => {
+  /* Letra y Tamaño: aplicación VERIFICADA con plan B.
+     En algunas tabletas execCommand('fontSize') se traga la orden sin
+     hacer nada ni avisar (pasó en casa: el botón parecía muerto). Ahora
+     se comprueba si el HTML cambió; si el navegador ignoró la orden, la
+     envoltura <font> se pone a mano con el mismo resultado. Y si no hay
+     nada marcado, en vez de callar se enseña qué hacer. */
+  const redAplicarFuente = (cmd, attr, valor) => {
+    redRestaurarSeleccion();   // devuelve al cuerpo lo que estaba marcado
+    const sel = window.getSelection();
+    const rangoOk = sel && sel.rangeCount && redRangoEnCuerpo(cuerpoEl, sel.getRangeAt(0));
+    if (!rangoOk || sel.getRangeAt(0).collapsed) {
+      if (typeof toast === 'function') toast('🖐️ Marca primero la palabra o frase (déjala pintada) y luego elige aquí');
+      return;
+    }
+    const rango = sel.getRangeAt(0);
+    // Si la selección muerde una marca de cita, se la traga entera: partirla
+    // duplicaría la marca (y su referencia) al extraer el contenido.
+    const supIni = rango.startContainer.parentElement?.closest('sup.red-cita');
+    if (supIni) rango.setStartBefore(supIni);
+    const supFin = rango.endContainer.parentElement?.closest('sup.red-cita');
+    if (supFin) rango.setEndAfter(supFin);
+
+    const foto = redFotoCitas();
+    const antes = cuerpoEl.innerHTML;
+    document.execCommand(cmd, false, valor);
+    if (cuerpoEl.innerHTML === antes) {
+      // El navegador ignoró la orden: mismo efecto, hecho a mano
+      const envoltura = document.createElement('font');
+      envoltura.setAttribute(attr, valor);
+      try {
+        envoltura.appendChild(rango.extractContents());
+        rango.insertNode(envoltura);
+        const nr = document.createRange();
+        nr.selectNodeContents(envoltura);
+        sel.removeAllRanges();
+        sel.addRange(nr);
+        redGuardarSeleccion();
+      } catch (_) {
+        if (typeof toast === 'function') toast('No se pudo aplicar ahí: prueba marcando un trozo más simple');
+        return;
+      }
+    }
+    redRepararCitas(foto);
+    redQueueSave();
+  };
+  const aplicarFormato = (selId, cmd, attr) => {
     const sel = document.getElementById(selId);
     sel?.addEventListener('change', () => {
       if (!sel.value) return;
-      redRestaurarSeleccion();   // devuelve al cuerpo lo que estaba marcado
-      const foto = redFotoCitas();
-      document.execCommand(cmd, false, sel.value);
-      redRepararCitas(foto);
+      const valor = sel.value;
       sel.value = ''; // el select actúa como menú: vuelve a su etiqueta
-      redQueueSave();
+      redAplicarFuente(cmd, attr, valor);
     });
   };
-  aplicarFormato('red-e-fuente', 'fontName');
-  aplicarFormato('red-e-tamano', 'fontSize');
+  aplicarFormato('red-e-fuente', 'fontName', 'face');
+  aplicarFormato('red-e-tamano', 'fontSize', 'size');
 
   // Si el usuario se va a escribir al título, la entradilla o los límites,
   // la selección guardada del cuerpo caduca: sin esto, tocar Negrita desde
