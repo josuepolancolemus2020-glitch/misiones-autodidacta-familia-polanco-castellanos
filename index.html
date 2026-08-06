@@ -1104,6 +1104,11 @@
 
       <div class="red-e-contador" id="red-e-contador">0 palabras · 0 caracteres</div>
 
+      <!-- El corrector que enseña: revisa y explica el porqué -->
+      <button type="button" class="red-corr-btn" id="red-corr-btn">
+        <i class="fa-solid fa-spell-check"></i> Corregir y aprender
+      </button>
+
       <!-- Guía de citas: el estilo que usa esta nota y cómo se escribe -->
       <div class="red-guia">
         <button type="button" class="red-guia-toggle" id="red-guia-toggle">
@@ -1574,6 +1579,21 @@
     </div>
   </div>
 
+  <!-- Modal: el corrector que enseña -->
+  <div id="cor-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="des-modal-title"><i class="fa-solid fa-spell-check" style="color:#4f46e5;"></i> Corregir y aprender</div>
+        <button type="button" class="fin-modal-close" id="cor-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="cor-resumen" id="cor-resumen"></div>
+      <div class="cor-memoria" id="cor-memoria"></div>
+      <div id="cor-lista"></div>
+    </div>
+  </div>
+
   <!-- Modal: versiones guardadas en este aparato (la bitácora local) -->
   <div id="red-versiones-overlay" class="fin-modal-overlay" style="display:none;">
     <div class="fin-modal">
@@ -1678,6 +1698,7 @@
   <script src="js/inventario.js"></script>
   <script src="js/tools/destellos.js"></script>
   <script src="js/tools/redaccion.js"></script>
+  <script src="js/tools/corrector.js"></script>
   <script src="js/tools/antena.js"></script>
   <!-- Después de chat.js a propósito: de ahí sale el _sb compartido. -->
   <script src="js/tools/boveda.js"></script>
