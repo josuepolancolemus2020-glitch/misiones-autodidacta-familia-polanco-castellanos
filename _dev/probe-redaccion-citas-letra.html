@@ -118,6 +118,61 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
      'el cambio de letra también llega a lo marcado',
      'la fuente no se aplicó: ' + cuerpo.innerHTML.slice(0, 160));
 
+  log('── 2b. El tamaño se VE más grande, no solo existe en el HTML ──');
+  /* La primera versión de esta sonda solo miraba que el <font size>
+     apareciera en el HTML. En la tableta «no funcionaba» y la sonda
+     aprobaba: le faltaba mirar el RESULTADO. Ahora se mide en píxeles. */
+  const fontEl = cuerpo.querySelector('font[size="6"]');
+  const pxGrande = parseFloat(w.getComputedStyle(fontEl).fontSize);
+  const pxBase   = parseFloat(w.getComputedStyle(cuerpo).fontSize);
+  ok(pxGrande > pxBase * 1.4,
+     `la palabra se renderiza mayor de verdad (${pxGrande}px frente a ${pxBase}px)`,
+     `el <font> existe pero NO se ve más grande: ${pxGrande}px vs ${pxBase}px`);
+
+  log('── 2c. Sin nada marcado, enseña en vez de callar ──');
+  s.removeAllRanges();
+  w.eval('_redRango = null');
+  let ultimoToast = '';
+  const toastOrig = w.toast;
+  w.toast = m => { ultimoToast = m; };
+  const htmlQuieto = cuerpo.innerHTML;
+  tam.value = '4';
+  tam.dispatchEvent(new w.Event('change', { bubbles: true }));
+  await esperar(100);
+  ok(cuerpo.innerHTML === htmlQuieto, 'no toca nada del texto',
+     'aplicó formato sin selección');
+  ok(/marca primero/i.test(ultimoToast),
+     'y explica el gesto: «marca primero la palabra o frase»',
+     'no avisó nada: el botón parece muerto · toast: ' + JSON.stringify(ultimoToast));
+  w.toast = toastOrig;
+
+  log('── 2d. Si el navegador ignora la orden, se aplica a mano ──');
+  /* Lo que pasa en algunas tabletas: execCommand devuelve sin hacer nada.
+     Se sabotea a propósito y el plan B tiene que dar el mismo resultado. */
+  w.eval(`window._execOrig = document.execCommand.bind(document);
+    document.execCommand = function(c, u, v) {
+      if (c === 'fontSize' || c === 'fontName') return false;
+      return window._execOrig(c, u, v);
+    };`);
+  nodo = [...cuerpo.childNodes].find(x => x.nodeType === 3 && x.textContent.includes('profundo'));
+  const posP = nodo.textContent.indexOf('profundo');
+  r = d.createRange(); r.setStart(nodo, posP); r.setEnd(nodo, posP + 8);
+  s.removeAllRanges(); s.addRange(r);
+  cuerpo.dispatchEvent(new w.Event('keyup'));
+  s.removeAllRanges();
+  await esperar(100);
+  tam.value = '4';
+  tam.dispatchEvent(new w.Event('change', { bubbles: true }));
+  await esperar(100);
+  const manual = cuerpo.querySelector('font[size="4"]');
+  ok(manual && manual.textContent === 'profundo',
+     'la envoltura manual agranda la palabra igual',
+     'el plan B no aplicó el tamaño');
+  ok(parseFloat(w.getComputedStyle(manual || cuerpo).fontSize) > pxBase,
+     'y también se ve más grande en píxeles',
+     'la envoltura manual no cambia el tamaño visible');
+  w.eval('document.execCommand = window._execOrig');
+
   log('── 3. Marcar una cita pendiente ──');
   const palabrasAntes = w.eval('redPalabras(document.getElementById("red-e-cuerpo").innerHTML)');
   // El cursor al final del texto, guardado, y la selección vaciada:
