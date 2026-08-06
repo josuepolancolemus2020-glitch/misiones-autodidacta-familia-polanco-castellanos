@@ -400,12 +400,13 @@ function corAnalizarTexto(texto, campo) {
     const abre = o.txt.includes('¿'), cierra = o.txt.includes('?');
     if (cierra && !abre) {
       const off = o.ini + (o.txt.match(/^\s*/)[0] || '').length;
-      hallazgos.push({ campo, ini: off, fin: off, original: '', sugerencia: '¿', regla: R_ABRIR_INT });
+      // hlFin: al subrayar se pinta la oración entera, que es lo que está cojo
+      hallazgos.push({ campo, ini: off, fin: off, hlFin: o.fin, original: '', sugerencia: '¿', regla: R_ABRIR_INT });
     }
     const abreE = o.txt.includes('¡'), cierraE = o.txt.includes('!');
     if (cierraE && !abreE) {
       const off = o.ini + (o.txt.match(/^\s*/)[0] || '').length;
-      hallazgos.push({ campo, ini: off, fin: off, original: '', sugerencia: '¡', regla: R_ABRIR_EXC });
+      hallazgos.push({ campo, ini: off, fin: off, hlFin: o.fin, original: '', sugerencia: '¡', regla: R_ABRIR_EXC });
     }
     const m0 = o.txt.match(/^(\s*)([a-záéíóúñ])/u);
     if (m0 && o.ini > 0) {
@@ -484,6 +485,7 @@ function corAnalizarTexto(texto, campo) {
 let _corHallazgos = [];
 let _corMapa = null;
 let _corStatsContadas = false;
+let _corPintado = false;   // ¿hay subrayados puestos sobre el texto?
 
 function corAnalizar() {
   _corMapa = corMapaCuerpo();
@@ -514,6 +516,130 @@ function corStatsContar(hallazgos) {
     st[h.regla.id].titulo = h.regla.titulo;
   });
   try { localStorage.setItem(COR_STATS_KEY, JSON.stringify(st)); } catch (_) {}
+}
+
+/* ── Subrayar los hallazgos SOBRE el propio texto ──────────────────
+   Buscar a ojo «la palabra que hace eco» en un artículo largo es
+   trabajo a medias: el corrector debe señalar el punto exacto. Se usa
+   la API de resaltado del navegador (CSS Custom Highlight): pinta
+   rangos SIN tocar el HTML, así el autoguardado nunca se lleva una
+   marca de color dentro de la nota. Cada categoría con su color, el
+   mismo de su etiqueta en el panel. */
+
+const COR_HL_GRUPOS = { ortografia: 'corr-orto', gramatica: 'corr-gram', estilo: 'corr-estilo', tipografia: 'corr-tipo' };
+const COR_HL_TODOS = ['corr-orto', 'corr-gram', 'corr-estilo', 'corr-tipo', 'corr-activa'];
+
+function corSoportaPintura() {
+  return typeof Highlight !== 'undefined' && window.CSS && CSS.highlights;
+}
+
+/* El rango DOM de un hallazgo del cuerpo (puede cruzar negritas: para
+   subrayar da igual, aunque para corregirse solo necesite un nodo). */
+function corRango(h) {
+  if (h.campo !== 'cuerpo' || !_corMapa) return null;
+  const ini = (h.hlIni !== undefined) ? h.hlIni : h.ini;
+  const fin = (h.hlFin !== undefined) ? h.hlFin : h.fin;
+  const tIni = _corMapa.tramos.find(t => t.ini <= ini && ini <= t.fin);
+  const tFin = _corMapa.tramos.find(t => t.ini <= fin && fin <= t.fin);
+  if (!tIni || !tFin) return null;
+  const r = document.createRange();
+  try {
+    r.setStart(tIni.node, ini - tIni.ini);
+    r.setEnd(tFin.node, fin - tFin.ini);
+  } catch (_) { return null; }
+  return r;
+}
+
+function corDespintar() {
+  if (corSoportaPintura()) COR_HL_TODOS.forEach(k => CSS.highlights.delete(k));
+  _corPintado = false;
+  const pildora = document.getElementById('cor-pildora');
+  if (pildora) pildora.style.display = 'none';
+}
+
+function corPintar() {
+  _corHallazgos.forEach(h => { h._rango = corRango(h); });
+  if (!corSoportaPintura()) return false;
+  COR_HL_TODOS.forEach(k => CSS.highlights.delete(k));
+  const grupos = {};
+  _corHallazgos.forEach(h => {
+    if (!h._rango) return;
+    const g = COR_HL_GRUPOS[h.regla.cat];
+    (grupos[g] = grupos[g] || []).push(h._rango);
+  });
+  let n = 0;
+  Object.entries(grupos).forEach(([g, rangos]) => {
+    CSS.highlights.set(g, new Highlight(...rangos));
+    n += rangos.length;
+  });
+  _corPintado = n > 0;
+  corActualizarPildora();
+  return true;
+}
+
+/* La píldora flotante: con el panel cerrado y el texto subrayado, es el
+   camino de vuelta al corrector sin perder el hilo. */
+function corActualizarPildora() {
+  const pildora = document.getElementById('cor-pildora');
+  if (!pildora) return;
+  const enCuerpo = _corHallazgos.filter(h => h._rango).length;
+  const abierto = document.getElementById('cor-overlay')?.style.display === 'flex';
+  pildora.style.display = (_corPintado && !abierto && enCuerpo) ? 'flex' : 'none';
+  if (enCuerpo) pildora.innerHTML =
+    `<i class="fa-solid fa-spell-check"></i> ${enCuerpo} marcado${enCuerpo === 1 ? '' : 's'} en el texto`;
+}
+
+/* Ir desde una tarjeta hasta su lugar exacto en el texto */
+function corIrAlTexto(i) {
+  const h = _corHallazgos[i];
+  if (!h || !h._rango) return;
+  corCerrar();
+  const rect = h._rango.getBoundingClientRect();
+  const scroll = document.querySelector('#view-redaccion-editor .view-scroll');
+  if (scroll && rect.height) {
+    scroll.scrollBy({ top: rect.top - window.innerHeight * 0.35, behavior: 'smooth' });
+  }
+  if (corSoportaPintura()) {
+    CSS.highlights.set('corr-activa', new Highlight(h._rango));
+  } else {
+    // Sin la API (navegador viejo): se selecciona, que también se ve
+    const sel = window.getSelection();
+    if (sel) { sel.removeAllRanges(); sel.addRange(h._rango); }
+  }
+  corActualizarPildora();
+}
+
+/* Y el camino inverso: tocar lo subrayado abre su tarjeta */
+function corPuntoARango(x, y) {
+  if (document.caretRangeFromPoint) return document.caretRangeFromPoint(x, y);
+  if (document.caretPositionFromPoint) {
+    const p = document.caretPositionFromPoint(x, y);
+    if (!p) return null;
+    const r = document.createRange();
+    r.setStart(p.offsetNode, p.offset);
+    return r;
+  }
+  return null;
+}
+
+function corHallazgoEnPunto(x, y) {
+  const punto = corPuntoARango(x, y);
+  if (!punto) return -1;
+  return _corHallazgos.findIndex(h => {
+    if (!h._rango) return false;
+    try { return h._rango.isPointInRange(punto.startContainer, punto.startOffset); }
+    catch (_) { return false; }
+  });
+}
+
+function corAbrirEn(indice) {
+  corAbrir();
+  const lista = document.getElementById('cor-lista');
+  const carta = lista && lista.children[indice];
+  if (carta) {
+    carta.classList.add('cor-card-activa');
+    carta.scrollIntoView({ block: 'center' });
+  }
 }
 
 /* ── Aplicar una corrección sin romper el HTML ── */
@@ -607,10 +733,14 @@ function corRender() {
         ? `<div class="cor-cambio">${redEsc(h.original || '∅')} <i class="fa-solid fa-arrow-right"></i> <b>${redEsc(h.sugerencia)}</b></div>` : ''}
       <div class="cor-porque">${h.regla.porque} <span class="cor-norma">${redEsc(h.regla.norma)}</span></div>
       ${h.regla.ejemplo ? `<div class="cor-ejemplo">✗ ${redEsc(h.regla.ejemplo.mal)}<br>✓ ${redEsc(h.regla.ejemplo.bien)}</div>` : ''}
-      ${aplicable
-        ? `<button type="button" class="cor-btn-aplicar" data-cor="${i}"><i class="fa-solid fa-check"></i> Corregir</button>`
-        : (h.sugerencia !== null && h.sugerencia !== undefined
-            ? '<div class="cor-mano">Está partido por formato: corrígelo a mano en el texto.</div>' : '')}
+      <div class="cor-card-acciones">
+        ${aplicable
+          ? `<button type="button" class="cor-btn-aplicar" data-cor="${i}"><i class="fa-solid fa-check"></i> Corregir</button>` : ''}
+        ${h._rango
+          ? `<button type="button" class="cor-btn-ver" data-cor-ver="${i}"><i class="fa-solid fa-location-dot"></i> Ver en el texto</button>` : ''}
+      </div>
+      ${!aplicable && h.sugerencia !== null && h.sugerencia !== undefined
+        ? '<div class="cor-mano">Está partido por formato: corrígelo a mano en el texto.</div>' : ''}
     </div>`;
   }).join('');
 
@@ -620,10 +750,14 @@ function corRender() {
       if (h && corAplicar(h)) {
         redQueueSave();
         corAnalizar();
+        corPintar();
         corRender();
         if (typeof toast === 'function') toast('✅ Corregido');
       }
     }));
+
+  lista.querySelectorAll('[data-cor-ver]').forEach(btn =>
+    btn.addEventListener('click', () => corIrAlTexto(Number(btn.dataset.corVer))));
 
   document.getElementById('cor-aplicar-todo')?.addEventListener('click', () => {
     /* De atrás hacia adelante para que los desplazamientos no muevan
@@ -632,6 +766,7 @@ function corRender() {
     [...seguras].sort((a, b) => b.ini - a.ini).forEach(h => { if (corAplicar(h)) n++; });
     redQueueSave();
     corAnalizar();
+    corPintar();
     corRender();
     if (typeof toast === 'function') toast(`✅ ${n} correcciones aplicadas`);
   });
@@ -640,23 +775,46 @@ function corRender() {
 function corAbrir() {
   const overlay = document.getElementById('cor-overlay');
   if (!overlay || typeof redNota !== 'function' || !redNota()) return;
-  _corStatsContadas = false;
   corAnalizar();
   corStatsContar(_corHallazgos);
+  corPintar();          // el texto queda subrayado por categoría, detrás del panel
   corRender();
   overlay.style.display = 'flex';
+  corActualizarPildora();
+}
+
+/* El botón del editor arranca una sesión nueva (cuenta para la memoria);
+   la píldora y los toques sobre el texto reabren SIN volver a contar. */
+function corAbrirNueva() {
+  _corStatsContadas = false;
+  corAbrir();
 }
 
 function corCerrar() {
   const overlay = document.getElementById('cor-overlay');
   if (overlay) overlay.style.display = 'none';
+  corActualizarPildora();   // si quedan subrayados, aparece el camino de vuelta
 }
 
 /* ── Wiring ── */
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('red-corr-btn')?.addEventListener('click', corAbrir);
+  document.getElementById('red-corr-btn')?.addEventListener('click', corAbrirNueva);
   document.getElementById('cor-close')?.addEventListener('click', corCerrar);
   document.getElementById('cor-overlay')?.addEventListener('click', e => {
     if (e.target.id === 'cor-overlay') corCerrar();
   });
+  document.getElementById('cor-pildora')?.addEventListener('click', corAbrir);
+
+  /* Tocar un subrayado en el texto abre su tarjeta. La marca de cita
+     tiene prioridad: su propio modal ya escucha este mismo click. */
+  document.getElementById('red-e-cuerpo')?.addEventListener('click', e => {
+    if (!_corPintado) return;
+    if (e.target.closest && e.target.closest('sup.red-cita')) return;
+    const i = corHallazgoEnPunto(e.clientX, e.clientY);
+    if (i >= 0) corAbrirEn(i);
+  });
+
+  /* Al salir del editor, los subrayados y la píldora se recogen:
+     pertenecen a la nota que se estaba corrigiendo. */
+  document.getElementById('red-editor-back-btn')?.addEventListener('click', corDespintar);
 });

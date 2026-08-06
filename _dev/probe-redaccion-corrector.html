@@ -57,7 +57,8 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
     '<b>Pienso de que</b> habían muchos alumnos enmedio del aula aula. ' +
     'Me di cuenta que el proyecto a tenido éxito ' +
     '<sup class="red-cita" contenteditable="false" data-ref="Bueno, G. (1972)">[1]</sup> ' +
-    'y sólo faltan éstos detalles. Como lo haremos? En base a los datos, todo va bien.';
+    'y sólo faltan éstos detalles. Como lo haremos? En base a los datos, todo va bien. ' +
+    'El impulso del centro fortalece el impulso educativo de la zona.';
 
   w.eval(`
     _redEdiciones = [{ id: 1, numero: 1, titulo: 'Nº 01', fecha_cierre: null, archivada: false }];
@@ -94,6 +95,65 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
      'las normas se ven en las tarjetas', 'las normas no se muestran');
   ok(hs.find(h => h.regla.id === 'monosilabos').regla.ejemplo.bien.includes('Fue'),
      'con su ejemplo de mal → bien', 'faltan los ejemplos');
+
+  log('── 2b. Los hallazgos quedan SUBRAYADOS sobre el propio texto ──');
+  /* Lo que pidió la casa: buscar a ojo «la palabra que hace eco» en un
+     texto largo lleva tiempo; el corrector debe señalar el punto. */
+  ok(w.eval('corSoportaPintura()'),
+     'este navegador soporta la pintura (CSS Custom Highlight)',
+     'sin soporte de pintura: no se puede subrayar');
+  ok(w.CSS.highlights.has('corr-orto') && w.CSS.highlights.has('corr-gram'),
+     'ortografía y gramática pintadas con su color', 'faltan grupos de color');
+  const eco = hs.findIndex(h => h.regla.id === 'eco');
+  ok(eco >= 0 && w.eval(`_corHallazgos[${eco}]._rango && _corHallazgos[${eco}]._rango.toString()`) === 'impulso',
+     'la palabra que hace eco tiene su subrayado exacto («impulso»)',
+     'el eco no quedó marcado en el texto');
+  const abrir = hs.findIndex(h => h.regla.id === 'abrir-pregunta');
+  ok(abrir >= 0 && (w.eval(`_corHallazgos[${abrir}]._rango.toString()`) || '').includes('Como lo haremos'),
+     'la pregunta sin ¿ se pinta entera, no un punto invisible',
+     'la pregunta sin abrir no se subrayó');
+  ok(texto('cor-lista').includes('Ver en el texto'),
+     'las tarjetas llevan su 📍 Ver en el texto', 'falta el botón de saltar al texto');
+  // La pintura no ensucia lo que se guarda
+  await w.eval('redSaveNow()');
+  const guardado = w.eval('redNota()').cuerpo;
+  ok(!/corr-|<mark/i.test(guardado),
+     'y el guardado no se lleva ninguna marca de color',
+     'el subrayado se coló en el HTML guardado');
+
+  log('── 2c. Del panel al texto, y del texto al panel ──');
+  w.eval(`corIrAlTexto(${eco})`);
+  await esperar(200);
+  ok(d.getElementById('cor-overlay').style.display === 'none',
+     '📍 cierra el panel y deja el texto delante', 'el panel no se cerró');
+  ok(w.CSS.highlights.has('corr-activa'),
+     'con el hallazgo activo resaltado en amarillo', 'no hay resaltado activo');
+  const pildora = d.getElementById('cor-pildora');
+  ok(pildora.style.display !== 'none' && pildora.textContent.includes('marcado'),
+     'y la píldora flotante ofrece volver al corrector', 'no apareció la píldora');
+
+  const statsAntes = w.localStorage.getItem('faro_corrector_stats_v1');
+  pildora.click();
+  await esperar(150);
+  ok(d.getElementById('cor-overlay').style.display === 'flex',
+     'la píldora reabre el panel', 'la píldora no reabre');
+  ok(w.localStorage.getItem('faro_corrector_stats_v1') === statsAntes,
+     'sin volver a contar en la memoria (no infla la estadística)',
+     'reabrir infló la memoria del aprendiz');
+  w.eval('corCerrar()');
+  await esperar(100);
+  // La palabra puede haber quedado fuera de pantalla: caretRangeFromPoint
+  // solo ve lo visible, igual que el dedo. Se trae a la vista primero.
+  w.eval(`_corHallazgos[${eco}]._rango.startContainer.parentElement.scrollIntoView({ block: 'center' })`);
+  await esperar(150);
+  const ecoRect = w.eval(`(r => ({x: (r.left+r.right)/2, y: (r.top+r.bottom)/2}))(_corHallazgos[${eco}]._rango.getBoundingClientRect())`);
+  cuerpo.dispatchEvent(new w.MouseEvent('click', { bubbles: true, clientX: ecoRect.x, clientY: ecoRect.y }));
+  await esperar(200);
+  ok(d.getElementById('cor-overlay').style.display === 'flex',
+     'tocar el subrayado en el texto abre el corrector', 'el toque sobre el subrayado no hizo nada');
+  ok(d.querySelector('.cor-card-activa') &&
+     d.querySelector('.cor-card-activa').textContent.includes('eco'),
+     'directo en su tarjeta, ya destacada', 'no llevó a la tarjeta del eco');
 
   log('── 3. El título y la entradilla también se revisan ──');
   ok(hs.some(h => h.campo === 'titulo' && h.regla.id === 'cion'),
