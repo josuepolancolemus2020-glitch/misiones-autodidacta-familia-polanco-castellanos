@@ -3333,6 +3333,7 @@ body {
   font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 6px;
   border-left: 3px solid var(--border); padding-left: 10px;
 }
+.cor-card-acciones { display: flex; gap: 8px; flex-wrap: wrap; }
 .cor-btn-aplicar {
   margin-top: 9px; background: var(--surface); border: 1.5px solid rgba(21,128,61,.35);
   color: #15803d; border-radius: 10px; padding: 8px 14px;
@@ -3340,7 +3341,39 @@ body {
   display: inline-flex; align-items: center; gap: 7px;
 }
 .cor-btn-aplicar:active { transform: scale(.96); }
+.cor-btn-ver {
+  margin-top: 9px; background: var(--surface); border: 1.5px solid rgba(79,70,229,.35);
+  color: #4338ca; border-radius: 10px; padding: 8px 14px;
+  font-size: 12.5px; font-weight: 800; font-family: inherit; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.cor-btn-ver:active { transform: scale(.96); }
 .cor-mano { font-size: 11.5px; color: #b45309; font-weight: 700; margin-top: 8px; }
+.cor-guia-uso {
+  font-size: 11.5px; color: var(--muted); line-height: 1.5; margin-bottom: 10px;
+}
+.cor-card-activa { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,.25); }
+
+/* ── Los subrayados sobre el texto (CSS Custom Highlight) ──
+   Cada familia con el color de su etiqueta del panel: se busca con el
+   ojo, no releyendo. Sin tocar el HTML: el guardado nunca los ve. */
+::highlight(corr-orto)   { background-color: rgba(220,38,38,.16);  text-decoration: underline wavy #dc2626 1px; }
+::highlight(corr-gram)   { background-color: rgba(29,78,216,.14);  text-decoration: underline wavy #1d4ed8 1px; }
+::highlight(corr-estilo) { background-color: rgba(109,40,217,.13); text-decoration: underline wavy #6d28d9 1px; }
+::highlight(corr-tipo)   { background-color: rgba(21,128,61,.15);  text-decoration: underline wavy #15803d 1px; }
+::highlight(corr-activa) { background-color: #fde047; color: #1c1917; }
+
+/* La píldora flotante para volver al corrector */
+.cor-pildora {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(74px + env(safe-area-inset-bottom, 0px)); z-index: 60;
+  background: linear-gradient(135deg, #4f46e5, #6366f1); color: #fff;
+  border: none; border-radius: 22px; padding: 10px 18px;
+  font-size: 13px; font-weight: 800; font-family: inherit; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 6px 18px rgba(79,70,229,.4);
+}
+.cor-pildora:active { transform: translateX(-50%) scale(.96); }
 
 /* ── Guía de citas ── */
 .red-guia {
