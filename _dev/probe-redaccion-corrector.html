@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Redacción: el corrector que enseña</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda del corrector pedagógico de Redacción.
+
+   El texto de prueba está sembrado con errores DE VERDAD: varios salieron
+   de las notas y la revista de la casa (azúl no está en las reglas, pero
+   «educacion», «dió», «habían muchos», «enmedio», la pregunta sin abrir…
+   son de esa familia). Se comprueba que:
+
+     · el análisis los encuentra y cada hallazgo trae su PORQUÉ y su norma,
+       porque el objetivo del corrector es que el escritor aprenda;
+     · aplicar una corrección toca solo el texto: las negritas y las marcas
+       de cita [n] quedan intactas;
+     · «Corregir las seguras» limpia todo lo automático de un golpe;
+     · el título y la entradilla también se revisan;
+     · la memoria del aprendiz cuenta qué reglas se repiten entre notas;
+     · un texto limpio no inventa hallazgos de reglas seguras. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w = f.contentWindow, d = w.document;
+  if (w.eval('typeof corAnalizar') !== 'function') {
+    log('✘ index.html no cargó js/tools/corrector.js');
+    log('RESULTADO: SUSPENDE'); document.title = 'SONDA-SUSPENDE'; return;
+  }
+  d.getElementById('login-screen').style.display = 'none';
+  d.getElementById('app-container').style.display = '';
+  w.fetch = async (u, i) => {
+    const cabs = new Headers((i && i.headers) || {});
+    const unSolo = (cabs.get('Accept') || '').includes('pgrst.object');
+    return new Response(unSolo ? 'null' : '[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  w.confirm = () => true;
+  w.localStorage.removeItem('faro_corrector_stats_v1');
+
+  w.eval("switchView('view-redaccion')");
+  await esperar(400);
+
+  const CUERPO =
+    'Fué un logro para la educacion del pais.  La escuela , dijo el director, dió frutos. ' +
+    '<b>Pienso de que</b> habían muchos alumnos enmedio del aula aula. ' +
+    'Me di cuenta que el proyecto a tenido éxito ' +
+    '<sup class="red-cita" contenteditable="false" data-ref="Bueno, G. (1972)">[1]</sup> ' +
+    'y sólo faltan éstos detalles. Como lo haremos? En base a los datos, todo va bien.';
+
+  w.eval(`
+    _redEdiciones = [{ id: 1, numero: 1, titulo: 'Nº 01', fecha_cierre: null, archivada: false }];
+    _redNotas = [{ id: 1, edicion_id: 1, autor: 'josue', titulo: 'La educacion en Honduras', seccion: 'ACTUALIDAD',
+      tipo: 'Artículo', estado: 'borrador', entradilla: 'Un repaso a la situacion actual.',
+      cuerpo: ${JSON.stringify(CUERPO)}, en_portada: false, eliminada: false }];
+    _redPapelera = true; _redLoaded = true; _redEdicion = 1;
+    redRender(); redOpenEditor(1);
+  `);
+  await esperar(200);
+  const cuerpo = d.getElementById('red-e-cuerpo');
+  const texto = id => (d.getElementById(id) || {}).textContent || '';
+
+  log('── 1. El análisis encuentra lo sembrado ──');
+  d.getElementById('red-corr-btn').click();
+  await esperar(200);
+  ok(d.getElementById('cor-overlay').style.display === 'flex',
+     'el botón «Corregir y aprender» abre el corrector', 'no se abrió el corrector');
+
+  const hs = w.eval('_corHallazgos');
+  const ids = hs.map(h => h.regla.id);
+  const espera = ['monosilabos','cion','dequeismo','queismo','haber-plural','pegadas','duplicada',
+                  'a-ha','solo','demostrativos','abrir-pregunta','en-base-a','doble-espacio','espacio-antes'];
+  espera.forEach(id => ok(ids.includes(id),
+     `caza «${id}»`, `NO cazó «${id}» · encontrados: ${[...new Set(ids)].join(', ')}`));
+
+  log('── 2. Cada hallazgo enseña: porqué + norma + ejemplo ──');
+  ok(hs.every(h => h.regla.porque && h.regla.porque.length > 60),
+     'todos llevan una explicación de verdad, no un rótulo',
+     'hay hallazgos con explicación raquítica');
+  ok(hs.every(h => h.regla.norma),
+     'todos llevan su norma (RAE 2010, DPD, estilo…)', 'hay hallazgos sin norma');
+  ok(texto('cor-lista').includes('RAE') && texto('cor-lista').includes('Ortografía 2010'),
+     'las normas se ven en las tarjetas', 'las normas no se muestran');
+  ok(hs.find(h => h.regla.id === 'monosilabos').regla.ejemplo.bien.includes('Fue'),
+     'con su ejemplo de mal → bien', 'faltan los ejemplos');
+
+  log('── 3. El título y la entradilla también se revisan ──');
+  ok(hs.some(h => h.campo === 'titulo' && h.regla.id === 'cion'),
+     'cazó «educacion» en el título', 'no revisó el título');
+  ok(hs.some(h => h.campo === 'entradilla' && h.regla.id === 'cion'),
+     'y «situacion» en la entradilla', 'no revisó la entradilla');
+
+  log('── 4. Aplicar una corrección no rompe nada ──');
+  const idxMono = hs.findIndex(h => h.regla.id === 'monosilabos');
+  d.querySelector(`[data-cor="${idxMono}"]`).click();
+  await esperar(150);
+  ok(cuerpo.textContent.includes('Fue un logro'),
+     '«Fué» pasó a «Fue» conservando la mayúscula', 'no se aplicó o perdió la mayúscula');
+  ok(cuerpo.querySelector('b') && cuerpo.querySelector('b').textContent.includes('Pienso'),
+     'la negrita sigue en su sitio', 'se perdió la negrita al corregir');
+  ok(cuerpo.querySelector('sup.red-cita') &&
+     cuerpo.querySelector('sup.red-cita').dataset.ref.includes('Bueno'),
+     'la marca de cita [1] y su referencia siguen intactas', 'la corrección dañó la cita');
+  /* El texto trae DOS monosílabos con tilde (Fué y dió): corregido el
+     primero, el re-análisis debe conservar solo el segundo. */
+  const monoRestantes = w.eval('_corHallazgos').filter(h => h.regla.id === 'monosilabos');
+  ok(monoRestantes.length === 1 && monoRestantes[0].original.toLowerCase() === 'dió',
+     'y el corrector re-analiza: queda solo el «dió» pendiente',
+     'el re-análisis no cuadra: ' + monoRestantes.map(h => h.original).join(', '));
+
+  log('── 5. «Corregir las seguras», de un golpe ──');
+  d.getElementById('cor-aplicar-todo').click();
+  await esperar(200);
+  const t = cuerpo.textContent;
+  ok(t.includes('educación del país') || t.includes('educación del pais'),
+     '«educacion» → «educación»', 'quedó sin tilde: ' + t.slice(0, 60));
+  ok(t.includes('en medio del aula'), '«enmedio» → «en medio»', 'no separó «enmedio»');
+  ok(t.includes('ha tenido'), '«a tenido» → «ha tenido»', 'no corrigió «a tenido»');
+  ok(t.includes('había muchos') || t.includes('Había muchos'),
+     '«habían muchos» → «había muchos»', 'no corrigió el haber impersonal');
+  ok(t.includes('Pienso que'), 'el dequeísmo quedó limpio', 'sigue el «pienso de que»');
+  ok(t.includes('cuenta de que'), 'el queísmo ganó su «de»', 'sigue el «me di cuenta que»');
+  ok(t.includes('del aula y') || /aula(?!\s+aula)/.test(t),
+     'la palabra duplicada quedó en una', 'sigue «aula aula»');
+  ok(t.includes('¿Como lo haremos?') || t.includes('¿Cómo lo haremos?'),
+     'la pregunta ganó su ¿ de apertura', 'sigue la pregunta sin abrir');
+  ok(!/ {2}/.test(t), 'sin dobles espacios', 'quedaron dobles espacios');
+  ok(!/ ,/.test(t), 'sin espacio antes de coma', 'quedó « ,»');
+  ok(cuerpo.querySelector('sup.red-cita').dataset.ref.includes('Bueno'),
+     'y la cita sobrevivió a la limpieza entera', 'la limpieza masiva dañó la cita');
+
+  log('── 6. Lo de «revisa» se queda esperando al humano ──');
+  const rest = w.eval('_corHallazgos');
+  ok(rest.some(h => h.regla.id === 'solo'),
+     '«sólo» sigue en la lista (es decisión del autor)', '«sólo» desapareció sin permiso');
+  ok(t.includes('sólo'), 'y el texto no se tocó ahí', 'el corrector cambió «sólo» sin permiso');
+  ok(rest.some(h => h.regla.id === 'en-base-a'),
+     '«en base a» espera decisión', 'se esfumó «en base a»');
+
+  log('── 7. La memoria del aprendiz ──');
+  const st = JSON.parse(w.localStorage.getItem('faro_corrector_stats_v1'));
+  ok(st && st['cion'] && st['cion'].n >= 3,
+     'cuenta las veces de cada regla (tilde -ción: ' + (st && st.cion ? st.cion.n : 0) + ')',
+     'no está contando la memoria');
+  // Una segunda sesión suma, y el panel la enseña
+  w.eval('corCerrar()');
+  d.getElementById('red-corr-btn').click();
+  await esperar(200);
+  ok(texto('cor-memoria').includes('se te repite') || texto('cor-memoria') === '',
+     'el panel de memoria aparece cuando hay reincidencia', 'el panel de memoria falló');
+
+  log('── 8. Un texto limpio no inventa errores seguros ──');
+  w.eval('corCerrar()');
+  cuerpo.innerHTML = 'La educación mejora cuando el maestro pregunta: ¿qué aprendimos hoy? Nada más.';
+  d.getElementById('red-e-titulo').value = 'Una nota limpia';
+  d.getElementById('red-e-entradilla').value = '';
+  d.getElementById('red-corr-btn').click();
+  await esperar(200);
+  const limpios = w.eval('_corHallazgos').filter(h => h.regla.nivel === 'error');
+  ok(limpios.length === 0,
+     'cero hallazgos de nivel seguro en texto correcto',
+     'inventó errores: ' + limpios.map(h => h.regla.id).join(', '));
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SONDA-SUSPENDE';
+});
+</script>
+</body>
+</html>
