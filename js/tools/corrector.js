@@ -364,6 +364,7 @@ function corAnalizarTexto(texto, campo) {
   const oraciones = corOraciones(texto);
   const R_ABRIR_INT = {
     id: 'abrir-pregunta', cat: 'tipografia', nivel: 'error', titulo: 'Pregunta sin abrir',
+    zona: true,
     porque: 'El español abre y cierra: ¿…? El signo de apertura existe porque —a diferencia del inglés— aquí nada al inicio de la frase avisa de que viene una pregunta; sin él, el lector entona mal y relee.',
     norma: 'RAE · Ortografía 2010',
     ejemplo: { mal: 'Qué haremos ahora?', bien: '¿Qué haremos ahora?' },
@@ -379,6 +380,7 @@ function corAnalizarTexto(texto, campo) {
   };
   const R_LARGA = {
     id: 'oracion-larga', cat: 'estilo', nivel: 'revisa', titulo: 'Oración kilométrica',
+    zona: true,   // subraya la oración entera: es señal de fondo, no botón
     porque: 'Más de 45 palabras sin un punto: el lector llega al final sin aire y sin recordar el inicio. Casi siempre hay dos o tres ideas ahí dentro pidiendo su propia oración. El punto es gratis.',
     norma: 'Estilo periodístico',
     ejemplo: null,
@@ -391,6 +393,7 @@ function corAnalizarTexto(texto, campo) {
   };
   const R_MENTE = {
     id: 'mente', cat: 'estilo', nivel: 'revisa', titulo: 'Racimo de adverbios en -mente',
+    zona: true,
     porque: 'Tres o más «-mente» en un mismo párrafo cargan el ritmo (realmente, obviamente, claramente…). Suele bastar uno; los demás se cambian por formas cortas: «con claridad», «de verdad», o nada.',
     norma: 'Estilo periodístico',
     ejemplo: null,
@@ -510,10 +513,14 @@ function corStatsContar(hallazgos) {
   if (_corStatsContadas) return;      // solo la primera pasada de cada sesión
   _corStatsContadas = true;
   const st = corStatsLoad();
-  hallazgos.forEach(h => {
-    st[h.regla.id] = st[h.regla.id] || { n: 0, titulo: h.regla.titulo };
-    st[h.regla.id].n++;
-    st[h.regla.id].titulo = h.regla.titulo;
+  // Se cuenta PRESENCIA por revisión, no cada aparición: una nota con
+  // ocho oraciones largas revisada diez veces marcaba «80 veces» y eso
+  // no mide el hábito, lo infla. «Se te repite en 10 revisiones» sí.
+  new Set(hallazgos.map(h => h.regla.id)).forEach(id => {
+    const regla = hallazgos.find(h => h.regla.id === id).regla;
+    st[id] = st[id] || { n: 0, titulo: regla.titulo };
+    st[id].n++;
+    st[id].titulo = regla.titulo;
   });
   try { localStorage.setItem(COR_STATS_KEY, JSON.stringify(st)); } catch (_) {}
 }
@@ -625,11 +632,21 @@ function corPuntoARango(x, y) {
 function corHallazgoEnPunto(x, y) {
   const punto = corPuntoARango(x, y);
   if (!punto) return -1;
-  return _corHallazgos.findIndex(h => {
-    if (!h._rango) return false;
-    try { return h._rango.isPointInRange(punto.startContainer, punto.startOffset); }
-    catch (_) { return false; }
+  // Las «zonas» (oración kilométrica, pregunta sin abrir…) se subrayan
+  // pero NO responden al toque: tocar dentro de una oración larga para
+  // ponerle su punto reabría el panel una y otra vez, justo cuando se
+  // intentaba obedecerlo. Si varios hallazgos se solapan, gana el más
+  // pequeño: la palabra, no la oración que la envuelve.
+  let mejor = -1, mejorTam = Infinity;
+  _corHallazgos.forEach((h, i) => {
+    if (!h._rango || h.regla.zona) return;
+    try {
+      if (!h._rango.isPointInRange(punto.startContainer, punto.startOffset)) return;
+    } catch (_) { return; }
+    const tam = (h.hlFin !== undefined ? h.hlFin : h.fin) - (h.hlIni !== undefined ? h.hlIni : h.ini);
+    if (tam < mejorTam) { mejor = i; mejorTam = tam; }
   });
+  return mejor;
 }
 
 function corAbrirEn(indice) {
@@ -640,6 +657,54 @@ function corAbrirEn(indice) {
     carta.classList.add('cor-card-activa');
     carta.scrollIntoView({ block: 'center' });
   }
+}
+
+/* ── La burbuja: explicación al toque, sin taparte el texto ────────
+   Tocar una palabra subrayada ya no abre el panel entero (se plantaba
+   delante justo cuando se quería corregir a mano). Sale una burbuja
+   pequeña con el título del hallazgo, «Corregir» si es automático y
+   «¿Por qué?» para quien quiera la lección completa. Se esfuma sola
+   al escribir, al desplazarse o al tocar en otra parte. */
+
+function corOcultarBurbuja() {
+  const b = document.getElementById('cor-burbuja');
+  if (b) b.style.display = 'none';
+}
+
+function corMostrarBurbuja(indice, x, y) {
+  const b = document.getElementById('cor-burbuja');
+  const h = _corHallazgos[indice];
+  if (!b || !h) return;
+  const cat = COR_CATS[h.regla.cat];
+  b.innerHTML = `
+    <div class="cor-burbuja-titulo"><span class="cor-chip ${cat.cls}">${cat.nombre}</span> ${redEsc(h.regla.titulo)}</div>
+    ${h.sugerencia !== null && h.sugerencia !== undefined && h.original !== h.sugerencia
+      ? `<div class="cor-burbuja-cambio">${redEsc(h.original || '∅')} → <b>${redEsc(h.sugerencia)}</b></div>` : ''}
+    <div class="cor-burbuja-btns">
+      ${corEsAplicable(h) ? `<button type="button" class="cor-burbuja-fix" data-bur-fix="${indice}">✓ Corregir</button>` : ''}
+      <button type="button" class="cor-burbuja-por" data-bur-por="${indice}">¿Por qué?</button>
+    </div>`;
+  b.style.display = 'block';
+  // Cerca del dedo pero dentro de la pantalla, y por encima del punto
+  const ancho = Math.min(280, window.innerWidth - 20);
+  b.style.left = Math.max(10, Math.min(x - ancho / 2, window.innerWidth - ancho - 10)) + 'px';
+  const alto = b.offsetHeight || 90;
+  b.style.top = Math.max(8, y - alto - 16) + 'px';
+
+  b.querySelector('[data-bur-fix]')?.addEventListener('click', () => {
+    const hh = _corHallazgos[indice];
+    corOcultarBurbuja();
+    if (hh && corAplicar(hh)) {
+      redQueueSave();
+      corAnalizar();
+      corPintar();
+      if (typeof toast === 'function') toast('✅ Corregido');
+    }
+  });
+  b.querySelector('[data-bur-por]')?.addEventListener('click', () => {
+    corOcultarBurbuja();
+    corAbrirEn(indice);
+  });
 }
 
 /* ── Aplicar una corrección sin romper el HTML ── */
@@ -713,7 +778,7 @@ function corRender() {
   const memoria = document.getElementById('cor-memoria');
   memoria.innerHTML = top.length
     ? '<div class="cor-memoria-t">📈 Lo que más se te repite (todas tus notas)</div>' +
-      top.map(([, v]) => `<div class="cor-memoria-item">${redEsc(v.titulo)} · <b>${v.n} veces</b></div>`).join('') +
+      top.map(([, v]) => `<div class="cor-memoria-item">${redEsc(v.titulo)} · <b>en ${v.n} revisi${v.n === 1 ? 'ón' : 'ones'}</b></div>`).join('') +
       '<div class="cor-memoria-pie">Cuando una de estas deje de aparecer, ya no será un error tuyo: será historia.</div>'
     : '';
 
@@ -805,16 +870,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('cor-pildora')?.addEventListener('click', corAbrir);
 
-  /* Tocar un subrayado en el texto abre su tarjeta. La marca de cita
-     tiene prioridad: su propio modal ya escucha este mismo click. */
-  document.getElementById('red-e-cuerpo')?.addEventListener('click', e => {
+  /* Tocar un subrayado enseña su burbuja SIN estorbar la escritura.
+     La marca de cita tiene prioridad: su propio modal ya escucha este
+     mismo click. El toque nunca se traga: el cursor se coloca igual,
+     así corregir a mano dentro de una oración marcada fluye normal. */
+  const cuerpoCor = document.getElementById('red-e-cuerpo');
+  cuerpoCor?.addEventListener('click', e => {
+    corOcultarBurbuja();
     if (!_corPintado) return;
     if (e.target.closest && e.target.closest('sup.red-cita')) return;
     const i = corHallazgoEnPunto(e.clientX, e.clientY);
-    if (i >= 0) corAbrirEn(i);
+    if (i >= 0) corMostrarBurbuja(i, e.clientX, e.clientY);
   });
+  // La burbuja se esfuma al escribir o al desplazar el texto
+  cuerpoCor?.addEventListener('input', corOcultarBurbuja);
+  document.querySelector('#view-redaccion-editor .view-scroll')
+    ?.addEventListener('scroll', corOcultarBurbuja, { passive: true });
 
-  /* Al salir del editor, los subrayados y la píldora se recogen:
-     pertenecen a la nota que se estaba corrigiendo. */
-  document.getElementById('red-editor-back-btn')?.addEventListener('click', corDespintar);
+  /* Al salir del editor, los subrayados, la burbuja y la píldora se
+     recogen: pertenecen a la nota que se estaba corrigiendo. */
+  document.getElementById('red-editor-back-btn')?.addEventListener('click', () => {
+    corOcultarBurbuja();
+    corDespintar();
+  });
 });

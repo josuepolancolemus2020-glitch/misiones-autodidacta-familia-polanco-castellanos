@@ -3363,6 +3363,35 @@ body {
 ::highlight(corr-tipo)   { background-color: rgba(21,128,61,.15);  text-decoration: underline wavy #15803d 1px; }
 ::highlight(corr-activa) { background-color: #fde047; color: #1c1917; }
 
+/* El encabezado del corrector queda fijo: la X de cerrar no se pierde
+   al bajar por una lista larga de hallazgos. */
+#cor-overlay .fin-modal { padding-top: 0; }
+#cor-overlay .fin-modal-head {
+  position: sticky; top: 0; z-index: 3;
+  background: var(--surface); padding: 16px 0 10px; margin-bottom: 4px;
+}
+
+/* La burbuja al tocar un subrayado: informa sin estorbar */
+.cor-burbuja {
+  position: fixed; z-index: 70; width: min(280px, calc(100vw - 20px));
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(15,23,42,.18);
+  animation: fadeUp .15s ease;
+}
+.cor-burbuja-titulo { font-size: 12.5px; font-weight: 800; color: var(--text); line-height: 1.4; }
+.cor-burbuja-cambio { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+.cor-burbuja-btns { display: flex; gap: 8px; margin-top: 8px; }
+.cor-burbuja-fix {
+  background: #15803d; color: #fff; border: none; border-radius: 8px;
+  padding: 6px 12px; font-size: 12px; font-weight: 800; font-family: inherit; cursor: pointer;
+}
+.cor-burbuja-por {
+  background: var(--bg); color: #4338ca; border: 1.5px solid var(--border);
+  border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 800;
+  font-family: inherit; cursor: pointer;
+}
+
 /* La píldora flotante para volver al corrector */
 .cor-pildora {
   position: fixed; left: 50%; transform: translateX(-50%);

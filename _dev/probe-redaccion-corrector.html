@@ -142,18 +142,84 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
      'reabrir infló la memoria del aprendiz');
   w.eval('corCerrar()');
   await esperar(100);
-  // La palabra puede haber quedado fuera de pantalla: caretRangeFromPoint
-  // solo ve lo visible, igual que el dedo. Se trae a la vista primero.
-  w.eval(`_corHallazgos[${eco}]._rango.startContainer.parentElement.scrollIntoView({ block: 'center' })`);
-  await esperar(150);
-  const ecoRect = w.eval(`(r => ({x: (r.left+r.right)/2, y: (r.top+r.bottom)/2}))(_corHallazgos[${eco}]._rango.getBoundingClientRect())`);
-  cuerpo.dispatchEvent(new w.MouseEvent('click', { bubbles: true, clientX: ecoRect.x, clientY: ecoRect.y }));
+  const toca = (x, y) => cuerpo.dispatchEvent(new w.MouseEvent('click', { bubbles: true, clientX: x, clientY: y }));
+  /* caretRangeFromPoint solo ve lo visible, igual que el dedo: hay que
+     desplazar el PROPIO cuerpo (tiene su scroll interno) además de la
+     vista. Y el punto se toma del primer renglón del rango: el centro
+     de una caja de varias líneas cae entre renglones, sobre otra cosa. */
+  const traerAVista = async i => {
+    w.eval(`(i => {
+      const c = document.getElementById('red-e-cuerpo');
+      const r = _corHallazgos[i]._rango.getBoundingClientRect();
+      c.scrollTop += r.top - c.getBoundingClientRect().top - c.clientHeight / 2;
+      const vs = document.querySelector('#view-redaccion-editor .view-scroll');
+      const r2 = _corHallazgos[i]._rango.getBoundingClientRect();
+      vs.scrollBy(0, r2.top - window.innerHeight / 2);
+    })(${i})`);
+    await esperar(150);
+  };
+  const centroDe = i => w.eval(`(rs => { const r = rs[0] || _corHallazgos[${i}]._rango.getBoundingClientRect();
+    return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 }; })(_corHallazgos[${i}]._rango.getClientRects())`);
+
+  await traerAVista(eco);
+  const ecoRect = centroDe(eco);
+  toca(ecoRect.x, ecoRect.y);
+  await esperar(200);
+  const burbuja = d.getElementById('cor-burbuja');
+  ok(d.getElementById('cor-overlay').style.display !== 'flex',
+     'tocar el subrayado NO planta el panel entero delante',
+     'el panel se abrió encima: así no se puede editar');
+  ok(burbuja.style.display !== 'none' && burbuja.textContent.includes('eco'),
+     'sale una burbuja pequeña con el hallazgo', 'no salió la burbuja');
+  burbuja.querySelector('[data-bur-por]').click();
   await esperar(200);
   ok(d.getElementById('cor-overlay').style.display === 'flex',
-     'tocar el subrayado en el texto abre el corrector', 'el toque sobre el subrayado no hizo nada');
+     '«¿Por qué?» abre la lección completa', 'la burbuja no lleva al panel');
   ok(d.querySelector('.cor-card-activa') &&
      d.querySelector('.cor-card-activa').textContent.includes('eco'),
      'directo en su tarjeta, ya destacada', 'no llevó a la tarjeta del eco');
+
+  log('── 2d. La oración kilométrica se puede editar sin que salte nada ──');
+  /* El fallo real de la casa: al tocar dentro de la oración larga para
+     ponerle su punto, el panel se reabría una y otra vez. Las zonas se
+     subrayan pero no reaccionan al toque. */
+  w.eval('corCerrar()');
+  await esperar(100);
+  const abrirIdx = w.eval(`_corHallazgos.findIndex(h => h.regla.id === 'abrir-pregunta')`);
+  await traerAVista(abrirIdx);
+  const zona = centroDe(abrirIdx);
+  toca(zona.x, zona.y);
+  await esperar(200);
+  ok(d.getElementById('cor-overlay').style.display !== 'flex',
+     'tocar dentro de la zona subrayada no reabre el panel',
+     'EL BUCLE DE LA CASA: el panel se replantó al tocar la oración');
+  ok(burbuja.style.display === 'none',
+     'ni salta burbuja: el toque queda libre para poner el punto',
+     'la burbuja estorba dentro de la zona');
+  // Y la burbuja del eco se esfuma al escribir
+  toca(ecoRect.x, ecoRect.y);
+  await esperar(120);
+  cuerpo.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(60);
+  ok(burbuja.style.display === 'none',
+     'al escribir, la burbuja se aparta sola', 'la burbuja se queda mientras se teclea');
+
+  log('── 2e. Corregir desde la burbuja, sin abrir el panel ──');
+  const cionIdx = w.eval(`_corHallazgos.findIndex(h => h.campo === 'cuerpo' && h.regla.id === 'cion')`);
+  await traerAVista(cionIdx);
+  const cionRect = centroDe(cionIdx);
+  toca(cionRect.x, cionRect.y);
+  await esperar(150);
+  ok(burbuja.style.display !== 'none' && burbuja.textContent.includes('Corregir'),
+     'la burbuja ofrece corregir ahí mismo', 'la burbuja no ofrece corregir');
+  burbuja.querySelector('[data-bur-fix]').click();
+  await esperar(200);
+  ok(cuerpo.textContent.includes('educación'),
+     'y corrige sin plantarte el panel («educación» ya con tilde)',
+     'el arreglo desde la burbuja no se aplicó');
+  ok(d.getElementById('cor-overlay').style.display !== 'flex',
+     'el panel siguió cerrado: el flujo de escritura manda',
+     'corregir desde la burbuja abrió el panel');
 
   log('── 3. El título y la entradilla también se revisan ──');
   ok(hs.some(h => h.campo === 'titulo' && h.regla.id === 'cion'),
@@ -162,7 +228,10 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
      'y «situacion» en la entradilla', 'no revisó la entradilla');
 
   log('── 4. Aplicar una corrección no rompe nada ──');
-  const idxMono = hs.findIndex(h => h.regla.id === 'monosilabos');
+  // El panel se refresca: las correcciones de la burbuja ya movieron los índices
+  w.eval('corAbrir()');
+  await esperar(150);
+  const idxMono = w.eval(`_corHallazgos.findIndex(h => h.regla.id === 'monosilabos')`);
   d.querySelector(`[data-cor="${idxMono}"]`).click();
   await esperar(150);
   ok(cuerpo.textContent.includes('Fue un logro'),
@@ -210,9 +279,12 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
 
   log('── 7. La memoria del aprendiz ──');
   const st = JSON.parse(w.localStorage.getItem('faro_corrector_stats_v1'));
-  ok(st && st['cion'] && st['cion'].n >= 3,
-     'cuenta las veces de cada regla (tilde -ción: ' + (st && st.cion ? st.cion.n : 0) + ')',
+  ok(st && st['cion'] && st['cion'].n >= 1,
+     'cuenta en cuántas revisiones apareció cada regla (tilde -ción: ' + (st && st.cion ? st.cion.n : 0) + ')',
      'no está contando la memoria');
+  ok(st && st['cion'] && st['cion'].n <= 2,
+     'presencia por revisión, no cada aparición: la cuenta no se infla',
+     'la memoria se infla: ' + (st && st.cion ? st.cion.n : 0) + ' con solo abrir un par de veces');
   // Una segunda sesión suma, y el panel la enseña
   w.eval('corCerrar()');
   d.getElementById('red-corr-btn').click();
