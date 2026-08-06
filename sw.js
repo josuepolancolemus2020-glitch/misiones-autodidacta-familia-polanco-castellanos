@@ -1,4 +1,4 @@
-const CACHE_NAME = 'faro-app-v4';
+const CACHE_NAME = 'faro-app-v5';
 
 /* ══════════════════════════════════════════════════════════════════
    ¿SE PUEDE GUARDAR ESTA RESPUESTA?
@@ -43,6 +43,11 @@ const STATIC_ASSETS = [
   // y sin cliente nadie entra ni ve un dato: es lo único externo que, si falta,
   // deja la aplicación inservible en vez de fea.
   './js/supabase.min.js',
+  // El diccionario del corrector: pesa como una foto y con él la caza
+  // de tecleos («conveza» → «convenza») funciona también sin conexión.
+  './js/data/dicc/es_HN.aff',
+  './js/data/dicc/es_HN.dic',
+  './js/data/dicc/es_extra.dic',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];

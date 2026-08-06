@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Redacción: el diccionario del corrector</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda del diccionario del corrector (js/tools/diccionario.js).
+
+   El hueco que destapó todo: «conveza» (por «convenza») pasaba de
+   largo porque el corrector solo tenía reglas de norma, no un
+   diccionario. Ahora lo tiene: 570.000 formas del español (es_HN)
+   expandidas en segundo plano. Se comprueba que:
+
+     · el diccionario carga por trozos y avisa mientras tanto;
+     · al terminar, el corrector RE-analiza solo y los tecleos
+       aparecen con sugerencias («conveza» → «convenza»);
+     · la tilde en sílaba equivocada cae («filósofico» → «filosófico»);
+     · las mayúsculas desconocidas preguntan (¿nombre propio?) en vez
+       de acusar, y «A mi diccionario» las enseña para siempre;
+     · los tecleos NO entran en «Corregir las seguras» (nada de
+       cambiar palabras a ciegas);
+     · siglas, URLs y correos quedan en paz.
+
+   OJO: la sonda del corrector (probe-redaccion-corrector.html) finge
+   un fetch que devuelve basura: ahí se comprueba lo contrario, que
+   un diccionario envenenado se descarta y no acusa a nadie. Aquí el
+   fetch deja pasar las rutas de js/data/dicc/ hacia el servidor real. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w = f.contentWindow, d = w.document;
+  if (w.eval('typeof diccArrancar') !== 'function') {
+    log('✘ index.html no cargó js/tools/diccionario.js');
+    log('RESULTADO: SUSPENDE'); document.title = 'SONDA-SUSPENDE'; return;
+  }
+  d.getElementById('login-screen').style.display = 'none';
+  d.getElementById('app-container').style.display = '';
+  const fetchReal = w.fetch.bind(w);
+  w.fetch = async (u, i) => {
+    if (typeof u === 'string' && u.includes('js/data/dicc/')) return fetchReal(u, i);
+    const cabs = new Headers((i && i.headers) || {});
+    const unSolo = (cabs.get('Accept') || '').includes('pgrst.object');
+    return new Response(unSolo ? 'null' : '[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  w.confirm = () => true;
+  w.localStorage.removeItem('faro_corrector_stats_v1');
+  w.localStorage.removeItem('faro_dicc_personal_v1');
+
+  w.eval("switchView('view-redaccion')");
+  await esperar(400);
+
+  const CUERPO =
+    'Mientras no encuentre otro pensador que me conveza en su lucidez, analizo con su sistema filósofico. ' +
+    'Estuve leyendo a Vorlandia toda la tarde. El ADN de FARO es aprender: visita ejemplo.com y escribe. ' +
+    'Fué un dia normal.';
+
+  w.eval(`
+    _redEdiciones = [{ id: 1, numero: 1, titulo: 'Nº 01', fecha_cierre: null, archivada: false }];
+    _redNotas = [{ id: 1, edicion_id: 1, autor: 'josue', titulo: 'Nota de prueba', seccion: 'ACTUALIDAD',
+      tipo: 'Artículo', estado: 'borrador', entradilla: '',
+      cuerpo: ${JSON.stringify(CUERPO)}, en_portada: false, eliminada: false }];
+    _redPapelera = true; _redLoaded = true; _redEdicion = 1;
+    redRender(); redOpenEditor(1);
+  `);
+  await esperar(200);
+  const cuerpo = d.getElementById('red-e-cuerpo');
+  const texto = id => (d.getElementById(id) || {}).textContent || '';
+
+  log('── 1. La primera revisión no espera al diccionario ──');
+  d.getElementById('red-corr-btn').click();
+  await esperar(250);
+  ok(d.getElementById('cor-overlay').style.display === 'flex',
+     'el corrector abre al instante', 'no abrió el corrector');
+  const estado0 = w.eval('diccEstado()');
+  ok(estado0 === 'cargando' || estado0 === 'listo',
+     'y el diccionario ya está en marcha (' + estado0 + ')',
+     'el diccionario no arrancó: ' + estado0);
+  ok(w.eval("_corHallazgos.some(h => h.regla.id === 'monosilabos')"),
+     'las reglas de norma responden desde el primer segundo («Fué»)',
+     'ni las reglas respondieron');
+  if (estado0 === 'cargando') {
+    ok(texto('cor-resumen').includes('diccionario'),
+       'el panel avisa de que el diccionario grande viene en camino',
+       'no avisó de la carga del diccionario');
+  }
+
+  log('── 2. Al terminar de cargar, los tecleos aparecen SOLOS ──');
+  await new Promise(res => {
+    const espera = setInterval(() => {
+      if (w.eval("diccEstado() === 'listo' || diccEstado() === 'fallo'")) { clearInterval(espera); res(); }
+    }, 200);
+  });
+  await esperar(400);   // el re-análisis y re-render corren tras el aviso
+  ok(w.eval("diccEstado()") === 'listo',
+     'el diccionario cargó entero (570.000 formas)', 'el diccionario no llegó a listo: ' + w.eval('diccEstado()'));
+  const hs = () => w.eval('_corHallazgos');
+  ok(hs().some(h => h.regla.id === 'tecleo' && h.original === 'conveza' && h.sugerencia === 'convenza'),
+     '«conveza» cazada con «convenza» de sugerencia — EL HUECO, CERRADO',
+     'sigue sin cazar «conveza»: ' + hs().filter(h => h.regla.id === 'tecleo').map(h => h.original).join(', '));
+  ok(hs().some(h => h.regla.id === 'tecleo' && h.original === 'filósofico' && h.sugerencia === 'filosófico'),
+     '«filósofico» → «filosófico» (la tilde estaba en la sílaba equivocada)',
+     'no cazó «filósofico»');
+  /* «dia» lo cazan DOS motores: la regla tilde-comun (que enseña el
+     porqué) y el diccionario. El descarte de solapes debe quedarse
+     con la regla, que es la que da la lección. */
+  ok(hs().some(h => h.original === 'dia' && h.sugerencia === 'día'),
+     '«dia» sin tilde cae con «día» de sugerencia', 'no cazó «dia»');
+  ok(hs().find(h => h.original === 'dia').regla.id === 'tilde-comun',
+     'y gana la regla que enseña (tilde-comun), no el diccionario mudo',
+     'el diccionario le pisó el hallazgo a la regla pedagógica');
+  ok(texto('cor-lista').includes('conveza'),
+     'y el panel se refrescó solo, sin volver a pulsar nada',
+     'el panel no se refrescó con los tecleos');
+
+  log('── 3. La mayúscula desconocida pregunta, no acusa ──');
+  const propio = hs().find(h => h.regla.id === 'nombre-propio');
+  ok(propio && propio.original === 'Vorlandia' && propio.regla.nivel === 'revisa',
+     '«Vorlandia» → ¿nombre propio o tecleo? (revísalo tú)',
+     'no marcó «Vorlandia» como posible nombre propio');
+  ok(!hs().some(h => (h.regla.id === 'tecleo' || h.regla.id === 'nombre-propio') &&
+       ['ADN', 'FARO', 'ejemplo', 'com'].includes(h.original)),
+     'siglas y dominios quedan en paz (ADN, FARO, ejemplo.com)',
+     'acusó siglas o URL: ' + hs().filter(h => h.regla.manual).map(h => h.original).join(', '));
+
+  log('── 4. Los tecleos NO entran en «Corregir las seguras» ──');
+  const seguras = d.getElementById('cor-aplicar-todo');
+  const nSeguras = seguras ? Number((seguras.textContent.match(/\d+/) || [0])[0]) : 0;
+  const nTecleos = hs().filter(h => h.regla.manual && h.regla.nivel === 'error').length;
+  const nErrores = hs().filter(h => h.regla.nivel === 'error').length;
+  ok(nTecleos > 0 && nSeguras <= nErrores - nTecleos,
+     `las ${nSeguras} seguras no incluyen los ${nTecleos} tecleos (a esos se va uno por uno)`,
+     'los tecleos se colaron en la corrección en masa');
+
+  log('── 5. Corregir un tecleo desde su tarjeta ──');
+  const iConveza = w.eval("_corHallazgos.findIndex(h => h.original === 'conveza')");
+  d.querySelector(`[data-cor="${iConveza}"]`).click();
+  await esperar(250);
+  ok(cuerpo.textContent.includes('me convenza en su lucidez'),
+     '«conveza» → «convenza» aplicada en el texto',
+     'no se aplicó la corrección del tecleo');
+  ok(!w.eval("_corHallazgos.some(h => h.original === 'conveza')"),
+     'y el re-análisis ya no la encuentra', 'el hallazgo fantasma sigue ahí');
+
+  log('── 6. «A mi diccionario»: la casa le enseña sus palabras ──');
+  const iProp = w.eval("_corHallazgos.findIndex(h => h.regla.id === 'nombre-propio')");
+  const btnApr = d.querySelector(`[data-cor-apr="${iProp}"]`);
+  ok(!!btnApr, 'la tarjeta ofrece «A mi diccionario»', 'no está el botón de aprender');
+  btnApr.click();
+  await esperar(250);
+  ok(!w.eval("_corHallazgos.some(h => h.original === 'Vorlandia')"),
+     '«Vorlandia» aprendida: ya no se marca',
+     'la palabra aprendida se sigue marcando');
+  ok((w.localStorage.getItem('faro_dicc_personal_v1') || '').includes('Vorlandia'),
+     'y quedó guardada en el diccionario personal (localStorage)',
+     'no se guardó en el diccionario personal');
+
+  log('── 7. Un texto limpio sigue limpio con el diccionario puesto ──');
+  w.eval('corCerrar()');
+  cuerpo.innerHTML = 'La educación mejora cuando el maestro pregunta: ¿qué aprendimos hoy? Nada más.';
+  d.getElementById('red-e-titulo').value = 'Una nota limpia';
+  d.getElementById('red-corr-btn').click();
+  await esperar(250);
+  const errores = w.eval('_corHallazgos').filter(h => h.regla.nivel === 'error');
+  ok(errores.length === 0,
+     'cero errores con 570.000 formas cargadas: el diccionario no inventa',
+     'inventó: ' + errores.map(h => h.regla.id + ':' + h.original).join(', '));
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SONDA-SUSPENDE';
+});
+</script>
+</body>
+</html>
