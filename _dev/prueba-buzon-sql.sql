@@ -52,6 +52,9 @@ values (3, 'Nº 03', '2026-08-15', false), (2, 'Nº 02', '2026-07-31', true);
 \i supabase/sql/buzon_lector.sql
 \echo '── Y otra vez, que tiene que ser idempotente ──'
 \i supabase/sql/buzon_lector.sql
+\echo '── Y la corrección del lector ──'
+\i supabase/sql/buzon_editar.sql
+\i supabase/sql/buzon_editar.sql
 
 truncate public.buzon_mensajes cascade;
 
@@ -168,9 +171,103 @@ begin
   perform pg_temp.di('devuelve la edición ABIERTA (la 3), no la archivada', n = 3);
 
   -- ════════════════════════════════════════════════════════════════
-  -- 8. LA PARTE QUE IMPORTA: desde la calle no se lee NADA
+  -- 8. EL LECTOR CORRIGE LO QUE MANDÓ
   -- ════════════════════════════════════════════════════════════════
-  raise notice '── 8. Desde la calle, con la clave publicable (rol anon) ──';
+  raise notice '── 8. El lector corrige lo suyo ──';
+  f1 := public.faro_buzon_enviar('carmen|66667777|el techo del aula gotea desde marzo', 'denuncia',
+    'El techo', 'El techo del aula gotea desde marzo y los cuadernos se mojan.',
+    'Carmen Díaz', '6666-7777', '', 'Siguatepeque', 'Escuela Morazán', 'madre',
+    null, '', '', true, '2026-08', false, jsonb_build_array(foto_ok));
+  select count(*) into n from public.buzon_mensajes where folio = f1;
+  perform pg_temp.di('hay un envío para corregir', n = 1);
+
+  perform pg_temp.di('con el teléfono de otro, no lo deja ni verlo',
+    not exists (select 1 from public.faro_buzon_mio(f1, '9999-0000')));
+  select texto into msg from public.faro_buzon_mio(f1, '66667777');
+  perform pg_temp.di('con su folio y su teléfono, recupera lo que escribió',
+    msg like 'El techo del aula gotea%');
+  perform pg_temp.di('y le dice que todavía lo puede cambiar',
+    (select se_puede from public.faro_buzon_mio(f1, '66667777')) = true);
+
+  -- Lo lee alguien de la redacción
+  update public.buzon_mensajes set estado = 'leido', visto_at = now(), visto_por = 'josue'
+   where folio = f1;
+
+  perform pg_temp.di('corrige, y el servidor dice que ok',
+    'ok' = public.faro_buzon_editar(f1, '6666-7777', 'carmen|66667777|el techo del aula lleva goteando',
+      'denuncia', 'El techo del aula',
+      'El techo del aula lleva goteando desde marzo. Corrijo: son dos aulas, no una.',
+      'Carmen Díaz', '', 'Siguatepeque', 'Escuela Morazán', 'madre',
+      null, '', '', '2026-08', false, false, '[]'::jsonb));
+
+  select count(*) into n from public.buzon_mensajes where tel = '6666-7777';
+  perform pg_temp.di('sigue habiendo UN envío suyo, no dos', n = 1);
+  select texto into msg from public.buzon_mensajes where folio = f1;
+  perform pg_temp.di('y dice lo nuevo', msg like '%son dos aulas%');
+  select estado into msg from public.buzon_mensajes where folio = f1;
+  perform pg_temp.di('vuelve a la cola como SIN LEER, para que se relea', msg = 'nuevo');
+  select ediciones into n from public.buzon_mensajes where folio = f1;
+  perform pg_temp.di('queda anotado que lo corrigió una vez', n = 1);
+  perform pg_temp.di('y cuándo, para que la bandeja lo avise',
+    (select editado_at is not null from public.buzon_mensajes where folio = f1));
+
+  select count(*) into c from public.buzon_fotos bf
+    join public.buzon_mensajes bm on bm.id = bf.mensaje_id where bm.folio = f1;
+  perform pg_temp.di('sin pedirlo, las fotos se quedan donde estaban', c = 1);
+
+  perform pg_temp.di('si pide cambiarlas, se cambian',
+    'ok' = public.faro_buzon_editar(f1, '6666-7777', 'carmen|66667777|el techo del aula lleva goteando',
+      'denuncia', 'El techo del aula',
+      'El techo del aula lleva goteando desde marzo. Corrijo: son dos aulas, no una.',
+      'Carmen Díaz', '', 'Siguatepeque', 'Escuela Morazán', 'madre',
+      null, '', '', '2026-08', true, true, jsonb_build_array(foto_ok, foto_ok)));
+  select count(*) into c from public.buzon_fotos bf
+    join public.buzon_mensajes bm on bm.id = bf.mensaje_id where bm.folio = f1;
+  select fotos into n from public.buzon_mensajes where folio = f1;
+  perform pg_temp.di('y la cuenta se pone al día (2)', c = 2 and n = 2);
+
+  perform pg_temp.di('con un teléfono que no es el suyo, no corrige nada',
+    'no-existe' = public.faro_buzon_editar(f1, '9999-0000', 'x', 'nota', 'Secuestro',
+      'Un texto suficientemente largo escrito por un intruso cualquiera.',
+      'Intruso', '', '', '', '', null, '', '', '2026-08', false, false, '[]'::jsonb));
+  select texto into msg from public.buzon_mensajes where folio = f1;
+  perform pg_temp.di('y el texto sigue siendo el de su dueño', msg like '%son dos aulas%');
+
+  perform pg_temp.di('un texto de cinco letras tampoco pasa por aquí',
+    'corto' = public.faro_buzon_editar(f1, '6666-7777', 'x', 'nota', '', 'corto',
+      'Carmen Díaz', '', '', '', '', null, '', '', '2026-08', false, false, '[]'::jsonb));
+
+  -- ── La puerta que de verdad importa ──
+  raise notice '── 9. Lo ya atendido NO se puede cambiar ──';
+  update public.buzon_mensajes set estado = 'atendido', nota_id = 1 where folio = f1;
+  perform pg_temp.di('el servidor lo para y dice por qué',
+    'atendido' = public.faro_buzon_editar(f1, '6666-7777', 'x', 'nota', 'Otra cosa',
+      'Un texto completamente distinto metido después de que lo aprobaran.',
+      'Carmen Díaz', '', '', '', '', null, '', '', '2026-08', false, false, '[]'::jsonb));
+  select texto into msg from public.buzon_mensajes where folio = f1;
+  perform pg_temp.di('lo verificado y lo que se va a imprimir siguen siendo LO MISMO',
+    msg like '%son dos aulas%');
+  perform pg_temp.di('y a él se lo dice antes de dejarle escribir',
+    (select se_puede from public.faro_buzon_mio(f1, '66667777')) = false);
+
+  update public.buzon_mensajes set estado = 'descartado' where folio = f1;
+  perform pg_temp.di('lo descartado tampoco se toca',
+    'descartado' = public.faro_buzon_editar(f1, '6666-7777', 'x', 'nota', '',
+      'Un texto suficientemente largo para pasar el mínimo de letras.',
+      'Carmen Díaz', '', '', '', '', null, '', '', '2026-08', false, false, '[]'::jsonb));
+
+  update public.buzon_mensajes set estado = 'nuevo', ediciones = 10 where folio = f1;
+  perform pg_temp.di('y a la corrección número once se le pone tope',
+    'tope' = public.faro_buzon_editar(f1, '6666-7777', 'x', 'nota', '',
+      'Un texto suficientemente largo para pasar el mínimo de letras.',
+      'Carmen Díaz', '', '', '', '', null, '', '', '2026-08', false, false, '[]'::jsonb));
+
+  perform public.faro_buzon_retirar(f1, '66667777');
+
+  -- ════════════════════════════════════════════════════════════════
+  -- 10. LA PARTE QUE IMPORTA: desde la calle no se lee NADA
+  -- ════════════════════════════════════════════════════════════════
+  raise notice '── 10. Desde la calle, con la clave publicable (rol anon) ──';
   perform public.faro_buzon_enviar('rls|77778888|una denuncia con nombres dentro', 'denuncia',
     'Secreto', 'Una denuncia con el nombre de una persona dentro.',
     'Testigo', '7777-8888', 'testigo@correo.com', 'Comayagua', 'Escuela X', 'vecino',
@@ -213,7 +310,7 @@ begin
   select count(*) into n from public.buzon_mensajes;
   perform pg_temp.di('y siguen ahí las ' || n || ' filas, intactas', n > 0);
 
-  raise notice '── 9. Y la familia, con su sesión, sí entra ──';
+  raise notice '── 11. Y la familia, con su sesión, sí entra ──';
 end $$;
 
 -- La puerta de la familia, encendida

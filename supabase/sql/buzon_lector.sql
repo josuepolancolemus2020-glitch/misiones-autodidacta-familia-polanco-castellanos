@@ -1,5 +1,10 @@
 -- Ejecutar en Supabase -> SQL Editor. Es IDEMPOTENTE: se puede correr
 -- varias veces sin dañar nada.
+--
+-- ⚠️ VAN DOS ARCHIVOS, Y ESTE ES EL PRIMERO. Después de este hay que
+--    correr `buzon_editar.sql`, que es el que deja al lector corregir
+--    lo que mandó. Sin él el buzón funciona, pero quien se equivoca en
+--    un dato solo puede retirar lo suyo y escribirlo todo otra vez.
 -- ════════════════════════════════════════════════════════════════════
 -- EL BUZÓN DEL LECTOR
 -- ════════════════════════════════════════════════════════════════════

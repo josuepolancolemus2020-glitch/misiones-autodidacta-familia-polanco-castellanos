@@ -44,7 +44,12 @@ sin explicar de quién es. Lo comprueban las dos sondas.
 
 ```
 Supabase → SQL Editor → pegar supabase/sql/buzon_lector.sql → Run
+Supabase → SQL Editor → pegar supabase/sql/buzon_editar.sql → Run
 ```
+
+Son **dos archivos y en ese orden**. El segundo es el que deja al lector
+corregir lo que mandó; sin él el buzón funciona, pero quien se equivoca en
+un dato solo puede retirar lo suyo y escribirlo todo otra vez.
 
 Es idempotente. Mientras no se corra, Redacción funciona igual y el
 chip 📬 Buzón sencillamente no aparece: se comprueba con una sonda que
@@ -81,13 +86,35 @@ la falta de las tablas no rompe nada.
    **no borra**: guarda la razón, por si el lector vuelve a escribir o
    llama preguntando.
 
-5. **Antes de publicar, se llama.** Está escrito dentro del envío, en
+5. **El lector corrige lo suyo, pero no después de que se apruebe.**
+   Con su folio y su teléfono recupera lo que mandó y lo cambia sobre la
+   MISMA fila: mismo folio, un solo envío en la bandeja. Mandarlo de
+   nuevo no servía —la huella lleva dentro el principio del texto, así
+   que al cambiar la primera línea entra como envío nuevo y quedan dos
+   casi iguales.
+
+   Se puede mientras esté en *nuevo* o *leído*. En cuanto pasa a
+   *atendido* ya es una nota: alguien lo leyó, llamó y lo comprobó. Si a
+   partir de ahí el texto pudiera cambiar por debajo, **lo verificado y
+   lo impreso dejarían de ser lo mismo**, y bastaría con mandar algo
+   inofensivo, esperar a que lo aprueben y cambiarlo después. Esa puerta
+   se cierra en el servidor, no en la pantalla.
+
+   Corregir uno ya leído lo **devuelve a la cola como sin leer**, y la
+   bandeja lo marca con ✏️ y avisa si el cambio fue después de que
+   alguien lo leyera: quien lo leyó el lunes tiene los datos viejos en la
+   cabeza y llamaría a preguntar por algo que el texto ya no dice.
+
+   El teléfono no se puede cambiar: es la mitad de la llave con la que el
+   lector demuestra que el envío es suyo.
+
+6. **Antes de publicar, se llama.** Está escrito dentro del envío, en
    naranja, delante de quien decide: confirmar lo que cuenta, y si
    señala a alguien —persona o institución— buscar su versión. No es
    celo periodístico de manual: es lo que el lector leyó y aceptó antes
    de escribir.
 
-6. **Lo que aceptó queda firmado con su versión** (`etica_version`). Si
+7. **Lo que aceptó queda firmado con su versión** (`etica_version`). Si
    mañana cambian los requisitos, la fila sigue diciendo cuáles firmó
    **ese** lector. Un reclamo dentro de un año se resuelve mirando el
    dato en vez de la memoria de alguien.

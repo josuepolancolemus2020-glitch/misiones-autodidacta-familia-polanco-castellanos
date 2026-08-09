@@ -67,7 +67,9 @@ Zone → Make private.
      seguridad por fila cerrada. Hasta que se corra, Redacción funciona igual
      y el chip 📬 Buzón no aparece (está probado que la falta de las tablas no
      rompe nada), pero lo que manda la gente desde el QR de la revista no
-     tiene dónde caer. El porqué de todo, en `BUZON-DEL-LECTOR.md`.
+     tiene dónde caer. **Y detrás, `supabase/sql/buzon_editar.sql`**, que es
+     el que deja al lector corregir lo que mandó sin dejar dos envíos casi
+     iguales en la bandeja. El porqué de todo, en `BUZON-DEL-LECTOR.md`.
    · Las notificaciones del chat están rotas y en silencio. Se arregla volviendo
      a desplegar `send-chat-push`, que en el repositorio ya usa la clave de
      servicio. Después, cada quien abre la aplicación una vez para volver a

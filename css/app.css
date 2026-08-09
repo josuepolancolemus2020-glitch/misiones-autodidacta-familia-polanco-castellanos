@@ -3276,6 +3276,7 @@ body {
 .red-buz-atendido   { background: #dcfce7; color: #15803d; }
 .red-buz-descartado { background: var(--bg); color: var(--muted); }
 .red-buz-fotos      { background: #ccfbf1; color: #0f766e; }
+.red-buz-editado    { background: #fef3c7; color: #92400e; }
 
 .red-buz-vacio {
   text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6;

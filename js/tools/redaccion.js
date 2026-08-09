@@ -527,6 +527,7 @@ async function initRedaccion() {
     _sb.from(RED_T_BUZON).select(
       'id,folio,creado_at,clase,titulo,texto,nombre,tel,correo,lugar,escuela,cargo,' +
       'evento_fecha,evento_hora,evento_lugar,etica_version,permiso_fotos,fotos,' +
+      'editado_at,ediciones,' +
       'estado,nota_id,motivo,visto_por,visto_at'
     ).order('creado_at', { ascending: false }).limit(300),
   ]);
@@ -880,6 +881,7 @@ function redRenderBuzon(list) {
             <span class="red-badge ${est.cls}">${est.label}</span>
             <span class="red-badge red-badge-tipo">${c.t}</span>
             ${m.fotos ? `<span class="red-badge red-buz-fotos">📷 ${m.fotos}</span>` : ''}
+            ${m.editado_at ? '<span class="red-badge red-buz-editado">✏️ Corregido</span>' : ''}
           </div>
           <div class="red-buz-quien">
             ${redEsc(m.nombre || 'Sin nombre')}${m.cargo ? ' · ' + redEsc(m.cargo) : ''}
@@ -958,6 +960,7 @@ function redPintarEnvio(m, fotos) {
       <span class="red-buz-fecha">Recibido el ${redFechaLarga(String(m.creado_at || '').slice(0, 10))}</span>
     </div>
 
+    ${redAvisoCorregido(m)}
     ${m.titulo ? `<div class="red-buz-tit">${redEsc(m.titulo)}</div>` : ''}
     <div class="red-buz-texto">${redEsc(m.texto || '').replace(/\n/g, '<br>')}</div>
 
@@ -1039,6 +1042,23 @@ function redPintarEnvio(m, fotos) {
     redCerrarEnvio();
     redOpenEditor(m.nota_id);
   });
+}
+
+/* El lector puede corregir lo suyo desde su pantalla, con su folio y
+   su teléfono. Cuando lo hace, el envío vuelve a la cola como sin leer
+   —para que quien ya lo hubiera leído lo lea otra vez— pero eso solo
+   no basta: quien lo leyó el lunes tiene los datos viejos en la cabeza
+   y va a llamar a preguntar por algo que el texto ya no dice. Así que
+   se avisa, y con la fecha delante. */
+function redAvisoCorregido(m) {
+  if (!m.editado_at) return '';
+  const veces = Number(m.ediciones) || 1;
+  const despues = m.visto_at && String(m.editado_at) > String(m.visto_at);
+  return `<div class="red-buz-aviso ${despues ? 'red-buz-aviso-tarde' : ''}">
+    ✏️ <b>El lector lo corrigió${veces > 1 ? ` ${veces} veces` : ''}</b>,
+    la última el ${redEsc(redFechaLarga(String(m.editado_at).slice(0, 10)))}.
+    ${despues ? 'Fue <b>después</b> de que alguien lo leyera: lo de arriba es la versión nueva, y puede que no diga lo mismo que la que se leyó.' : ''}
+  </div>`;
 }
 
 function redVerFotoGrande(datos) {
