@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Redacción: el buzón del lector</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda del BUZÓN DEL LECTOR dentro de Redacción.
+
+   Lo que entra en esta bandeja no lo escribió la familia: lo mandó
+   alguien de fuera que dejó su nombre y su teléfono y está esperando
+   una llamada. Eso cambia lo que puede salir mal, y es lo que se
+   comprueba aquí:
+
+   1. QUE EL TELÉFONO NO ACABE IMPRESO. Al lector se le prometió, en la
+      misma pantalla en la que escribió, que su número no se publica.
+      La nota que sale de un envío se exporta a Markdown y se pega
+      entera en el programa de maquetación: si el teléfono viaja dentro
+      del cuerpo, acaba en papel, y de ahí no se quita. Se comprueba
+      sobre la nota GUARDADA y sobre la exportación de verdad, no sobre
+      lo que la pantalla dice.
+
+   2. QUE NADIE SE QUEDE SIN RESPUESTA. Un envío abierto pasa a leído;
+      convertido, a atendido y con su nota apuntada. Si el contador
+      miente, alguien vuelve a abrir lo mismo tres veces y otro se
+      queda esperando para siempre.
+
+   3. QUE LA BANDEJA NO ARRASTRE LAS FOTOS. Son data URL de casi un
+      mega. La lista se pinta cada vez que se abre la herramienta, y en
+      el teléfono del que revisa eso son datos móviles. Se piden al
+      abrir un envío y no antes: se comprueba mirando las consultas.
+
+   4. QUE LA BASE VIEJA SIGA FUNCIONANDO. Mientras no se corra
+      buzon_lector.sql, las tablas no existen. Redacción tiene que
+      seguir entera y el buzón esconderse, no reventar.
+
+   5. QUE NO SE NOMBRE A LA REVISTA en lo que se reparte. Se pidió
+      expreso: el mensaje de WhatsApp y la dirección del QR circulan
+      solos por grupos de gente que no tiene por qué saber de quién es.
+
+   Como en las demás sondas de Redacción: aquí no se lee el código, se
+   ejecuta el index.html de verdad con una base de datos de mentira a
+   nivel de fetch. El cliente de Supabase es el auténtico. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── La base de datos de mentira ────────────────────────────────────
+   Contesta como PostgREST a lo justo que usa Redacción, y guarda cada
+   consulta para poder afirmar «esto fue un PATCH» o «las fotos no se
+   pidieron todavía». */
+function nuevaBase(w, opciones){
+  const estado = {
+    tablas: {
+      redaccion_ediciones: [], redaccion_notas: [], redaccion_config: [],
+      buzon_mensajes: [], buzon_fotos: [],
+    },
+    llamadas: [],
+    sinBuzon: !!(opciones && opciones.sinBuzon),
+  };
+  const filtra = (filas, params) => filas.filter(fila =>
+    [...params.entries()].every(([col, val]) => {
+      if (['select','order','limit','offset'].includes(col)) return true;
+      if (val.startsWith('eq.')) {
+        const v = val.slice(3);
+        if (v === 'true')  return fila[col] === true;
+        if (v === 'false') return !fila[col];
+        if (v === 'null')  return fila[col] === null || fila[col] === undefined;
+        return String(fila[col]) === v;
+      }
+      return true;
+    }));
+
+  let siguienteId = 1000;
+
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url);
+    if (!u.pathname.startsWith('/rest/v1/')) return new Response('{}', { status: 200 });
+
+    const tabla  = u.pathname.replace('/rest/v1/', '');
+    const params = u.searchParams;
+    const metodo = (init && init.method) || 'GET';
+    const cuerpo = (init && init.body) ? JSON.parse(init.body) : null;
+    const cabs   = new Headers((init && init.headers) || {});
+    const unSolo = (cabs.get('Accept') || '').includes('pgrst.object');
+    estado.llamadas.push({ tabla, metodo, params: u.search, cuerpo });
+
+    const json = (dato, status) => new Response(JSON.stringify(dato),
+      { status: status || 200, headers: { 'Content-Type': 'application/json' } });
+
+    /* La base vieja: las tablas del buzón todavía no existen */
+    if (estado.sinBuzon && tabla.startsWith('buzon_')) {
+      return json({ code: '42P01', message: 'relation "public.' + tabla + '" does not exist' }, 404);
+    }
+
+    const filas = estado.tablas[tabla] || [];
+
+    if (metodo === 'GET') {
+      let r = filtra(filas, params);
+      const orden = params.get('order');
+      if (orden) {
+        const [col, dir] = orden.split('.');
+        r = [...r].sort((a, b) => String(a[col]).localeCompare(String(b[col])) * (dir === 'desc' ? -1 : 1));
+      }
+      const lim = params.get('limit');
+      if (lim) r = r.slice(0, Number(lim));
+      return json(unSolo ? (r[0] || null) : r);
+    }
+    if (metodo === 'POST') {
+      const nuevas = (Array.isArray(cuerpo) ? cuerpo : [cuerpo]).map(x =>
+        Object.assign({ id: siguienteId++, creado_at: new Date().toISOString(), archivada: false }, x));
+      estado.tablas[tabla] = filas.concat(nuevas);
+      return json(unSolo ? nuevas[0] : nuevas, 201);
+    }
+    if (metodo === 'PATCH') {
+      filtra(filas, params).forEach(fila => Object.assign(fila, cuerpo));
+      return json(unSolo ? null : []);
+    }
+    if (metodo === 'DELETE') {
+      const fuera = new Set(filtra(filas, params));
+      estado.tablas[tabla] = filas.filter(x => !fuera.has(x));
+      return json([]);
+    }
+    return json([]);
+  };
+  return estado;
+}
+
+const HOY = new Date();
+const enDias = d => {
+  const x = new Date(HOY.getFullYear(), HOY.getMonth(), HOY.getDate() + d);
+  return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
+};
+
+/* Un JPEG diminuto de verdad, para que las fotos del buzón sean fotos */
+const FOTO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsL' +
+  'DBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIy' +
+  'MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAHwAA' +
+  'AQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKB' +
+  'kaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqD' +
+  'hIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3' +
+  '+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJB' +
+  'UQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hp' +
+  'anN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn' +
+  '6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigD//2Q==';
+
+function siembra(base){
+  base.tablas.redaccion_ediciones = [
+    { id: 1, numero: 4, titulo: 'Nº 04 · 1–15 agosto 2026', fecha_cierre: enDias(7), archivada: false },
+  ];
+  base.tablas.redaccion_notas = [];
+  const envio = (id, extra) => Object.assign({
+    id, folio: 'B-000' + id, creado_at: enDias(-1) + 'T10:00:00Z',
+    clase: 'nota', titulo: '', texto: 'Un texto cualquiera del lector, con lo suyo dentro.',
+    nombre: 'Ana López', tel: '9988-7766', correo: 'ana@correo.com',
+    lugar: 'Comayagua', escuela: '', cargo: 'madre',
+    evento_fecha: null, evento_hora: '', evento_lugar: '',
+    etica_version: '2026-08', permiso_fotos: false, fotos: 0,
+    estado: 'nuevo', nota_id: null, motivo: '', visto_por: '', visto_at: null,
+  }, extra || {});
+
+  base.tablas.buzon_mensajes = [
+    envio(1, {
+      clase: 'aulas', titulo: 'Sembramos 120 árboles',
+      texto: 'El viernes sembramos 120 árboles con los alumnos de sexto en el predio de atrás.\nVinieron los papás a ayudar.',
+      nombre: 'Prof. Josué Polanco', tel: '9988-7766', cargo: 'maestro',
+      escuela: 'Escuela Lempira', evento_fecha: enDias(4), evento_hora: '9:00 a. m.',
+      evento_lugar: 'El predio de atrás', permiso_fotos: true, fotos: 2,
+    }),
+    envio(2, {
+      clase: 'denuncia', titulo: 'El muro del patio',
+      texto: 'Se cayó el muro del patio y los niños pasan por ahí todos los días.',
+    }),
+    envio(3, { clase: 'sugerencia', texto: 'Me gustaría leer más sobre los maestros jubilados.',
+               estado: 'atendido', nota_id: null }),
+  ];
+  base.tablas.buzon_fotos = [
+    { id: 91, mensaje_id: 1, orden: 1, datos: FOTO, bytes: FOTO.length },
+    { id: 92, mensaje_id: 1, orden: 2, datos: FOTO, bytes: FOTO.length },
+  ];
+}
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);                 // que arranque el index de verdad
+  const w = f.contentWindow;
+
+  if (w.eval('typeof initRedaccion') !== 'function') {
+    log('✘ index.html no cargó js/tools/redaccion.js');
+    document.title = 'SONDA-SUSPENDE'; return;
+  }
+  w.confirm = () => true;
+  const base = nuevaBase(w, {});
+  siembra(base);
+  const envios = () => base.tablas.buzon_mensajes;
+  const buscaEnvio = id => envios().find(m => m.id === id);
+  const notas = () => base.tablas.redaccion_notas;
+  const texto = id => (w.document.getElementById(id) || {}).textContent || '';
+
+  log('── 1. El buzón se detecta y se anuncia ──');
+  await w.eval('_redEdicion = null; initRedaccion()');
+  await esperar(200);
+  ok(w.eval('_redHayBuzon') === true, 'la base tiene el buzón: se activa', 'no detectó las tablas del buzón');
+  const chip = w.document.querySelector('[data-ed="buzon"]');
+  ok(!!chip, 'aparece el chip 📬 Buzón', 'falta el chip del buzón');
+  ok(chip && chip.textContent.includes('2'),
+     'el chip lleva la cuenta de lo que está SIN ABRIR (2 de 3)',
+     'el chip no cuenta bien lo que está sin abrir: ' + (chip && chip.textContent.trim()));
+  ok(w.document.querySelector('[data-ed="buzon"]') === w.document.querySelector('.red-ed-chip'),
+     'va el primero de la fila, donde se ve sin desplazar',
+     'el chip del buzón no es el primero: si queda fuera de pantalla, nadie lo mira');
+
+  log('── 2. Las fotos NO se arrastran al pintar la lista ──');
+  const pidioFotos = base.llamadas.some(l => l.tabla === 'buzon_fotos');
+  ok(!pidioFotos, 'abrir la herramienta no descarga ni una foto',
+     'la lista se está trayendo las fotos: son casi un mega cada una');
+  const consulta = base.llamadas.filter(l => l.tabla === 'buzon_mensajes' && l.metodo === 'GET').pop();
+  ok(consulta && !/datos/.test(decodeURIComponent(consulta.params)),
+     'y la consulta ni siquiera nombra la columna de las imágenes',
+     'la consulta de la bandeja pide las imágenes');
+
+  log('── 3. La bandeja ordena por lo que falta por hacer ──');
+  await w.eval('_redEdicion = "buzon"; redRender()');
+  await esperar(100);
+  const lista = w.document.getElementById('red-list');
+  ok(lista.textContent.includes('Esperando respuesta'),
+     'separa lo que espera respuesta de lo ya resuelto', 'no separa pendientes de resueltos');
+  const orden = [...lista.querySelectorAll('.red-buz-fila')].map(b => Number(b.dataset.envio));
+  ok(orden.indexOf(3) === orden.length - 1,
+     'lo ya resuelto queda al final', 'un envío resuelto se cuela entre los pendientes: ' + orden);
+  ok(lista.textContent.includes('📷 2'),
+     'dice cuántas fotos trae cada envío, sin haberlas descargado',
+     'no dice cuántas fotos trae');
+  ok(texto('red-ed-meta').includes('2 sin resolver'),
+     'la cabecera cuenta lo que falta por atender', 'la cabecera no cuenta bien: ' + texto('red-ed-meta'));
+
+  log('── 4. Abrir un envío lo marca leído y trae sus fotos ──');
+  await w.eval('redAbrirEnvio(1)');
+  await esperar(250);
+  ok(buscaEnvio(1).estado === 'leido', 'abrirlo lo pasa a leído',
+     'abrirlo no lo marcó: el contador miente y se vuelve a abrir lo mismo');
+  const patch = base.llamadas.filter(l => l.tabla === 'buzon_mensajes' && l.metodo === 'PATCH').pop();
+  ok(!!patch, 'se guardó con un PATCH, no borrando y reescribiendo', 'no se guardó el estado');
+  ok(base.llamadas.some(l => l.tabla === 'buzon_fotos' && l.metodo === 'GET'),
+     'ahora sí pide las fotos, que es cuando se miran', 'no cargó las fotos al abrir el envío');
+  const cuerpoEnvio = w.document.getElementById('red-buzon-cuerpo');
+  ok(cuerpoEnvio.querySelectorAll('.red-buz-galeria img').length === 2,
+     'se ven las dos fotos', 'no se ven las fotos');
+  ok(cuerpoEnvio.textContent.includes('9988-7766'),
+     'el teléfono está a la vista de quien revisa (para llamarlo)', 'no enseña el teléfono');
+  ok(cuerpoEnvio.textContent.includes('2026-08'),
+     'consta qué versión de los requisitos aceptó', 'no consta lo que aceptó');
+  ok(/Faltan 4 d[ií]as/.test(cuerpoEnvio.textContent),
+     'para Aulas en acción avisa de cuánto falta para el evento',
+     'no avisa de cuándo es el evento: ' + cuerpoEnvio.textContent.slice(0, 120));
+
+  log('── 5. Convertir en nota: sí el texto y la firma, NO el teléfono ──');
+  await w.eval('redBuzonANota(_redEnvio, 2)');
+  await esperar(300);
+  const nota = notas()[0];
+  ok(!!nota, 'se creó la nota', 'no se creó ninguna nota');
+  ok(nota && nota.seccion === 'AULAS EN ACCIÓN',
+     'un envío de Aulas en acción cae en su sección', 'cayó en la sección equivocada: ' + (nota && nota.seccion));
+  ok(nota && nota.titulo === 'Sembramos 120 árboles', 'se lleva el título del lector',
+     'no se llevó el título');
+  ok(nota && nota.cuerpo.includes('120 árboles') && nota.cuerpo.includes('Vinieron los papás'),
+     'se lleva el texto ENTERO', 'el texto llegó cortado');
+  ok(nota && nota.cuerpo.includes('Josué Polanco'), 'y la firma, que es lo que se imprime',
+     'la nota no lleva la firma del lector');
+
+  /* El punto que de verdad importa: lo que se exporta a maquetación */
+  const md = w.eval('redEdicionMd()');
+  const filtrados = ['9988-7766', '99887766', 'ana@correo.com'];
+  const colados = filtrados.filter(x => nota.cuerpo.includes(x) || md.includes(x));
+  ok(colados.length === 0,
+     'ni el teléfono ni el correo viajan a la nota NI a la exportación',
+     '⚠️ un dato de contacto acabaría impreso en la revista: ' + colados.join(', '));
+
+  ok(buscaEnvio(1).estado === 'atendido' && buscaEnvio(1).nota_id === nota.id,
+     'el envío queda atendido y apuntado a su nota', 'el envío no quedó enlazado con su nota');
+
+  await w.eval('_redEdicion = 1; redRender()');
+  await esperar(100);
+  ok(w.document.getElementById('red-list').textContent.includes('Del buzón'),
+     'en la lista de la edición, la nota se marca como venida del buzón',
+     'la nota no se distingue de una escrita en casa');
+
+  log('── 6. Descartar deja dicho por qué ──');
+  w.prompt = () => 'No se pudo confirmar con la escuela.';
+  await w.eval('_redEdicion = "buzon"; redRender(); redAbrirEnvio(2)');
+  await esperar(250);
+  await w.eval('redDescartarEnvio(_redEnvio)');
+  await esperar(200);
+  ok(buscaEnvio(2).estado === 'descartado', 'queda descartado', 'no se descartó');
+  ok(/No se pudo confirmar/.test(buscaEnvio(2).motivo), 'y con la razón anotada',
+     'se descartó sin dejar dicho por qué');
+  ok(envios().length === 3, 'descartar NO borra el envío', 'descartar borró la fila');
+
+  log('── 7. El QR y lo que se reparte ──');
+  await w.eval('redAbrirQR()');
+  await esperar(200);
+  const qr = w.document.getElementById('red-qr-cuerpo');
+  const lienzo = w.document.getElementById('red-qr-lienzo');
+  ok(lienzo && lienzo.width > 100, 'el código QR se dibuja', 'no se dibujó el QR');
+  ok(qr.textContent.includes('buzon.html'), 'y enseña la dirección escrita, por si hay que teclearla',
+     'no enseña la dirección');
+  ok(qr.textContent.includes('2,5 cm'), 'dice el tamaño mínimo al que se puede imprimir',
+     'no dice a qué tamaño imprimirlo');
+
+  const invitacion = w.eval('redTextoInvitacion()');
+  const url = w.eval('RED_BUZON_URL');
+  ok(!/\bfaro\b/i.test(invitacion), 'el mensaje que se reparte NO nombra a la revista',
+     'el mensaje de WhatsApp nombra a la revista: ' + invitacion);
+  ok(!/\bfaro\b/i.test(url), 'ni la dirección del buzón', 'la dirección nombra a la revista: ' + url);
+  ok(/Aulas en acci[oó]n/i.test(invitacion), 'y sí dice que se puede pedir cobertura de un evento',
+     'el mensaje no menciona Aulas en acción');
+
+  log('── 8. Una base vieja, sin el SQL corrido ──');
+  const f2 = document.createElement('iframe');
+  f2.src = '/index.html'; f2.style.cssText = 'position:absolute;left:-9999px;width:380px;height:640px';
+  document.body.appendChild(f2);
+  await new Promise(r => f2.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w2 = f2.contentWindow;
+  const vieja = nuevaBase(w2, { sinBuzon: true });
+  vieja.tablas.redaccion_ediciones = [
+    { id: 1, numero: 4, titulo: 'Nº 04', fecha_cierre: enDias(7), archivada: false },
+  ];
+  vieja.tablas.redaccion_notas = [
+    { id: 10, edicion_id: 1, autor: 'josue', titulo: 'Una nota de casa', seccion: 'ACTUALIDAD',
+      tipo: 'Artículo', estado: 'borrador', entradilla: '', cuerpo: 'texto',
+      en_portada: false, eliminada: false, actualizado_at: '2026-08-01T10:00:00Z' },
+  ];
+  await w2.eval('_redEdicion = null; initRedaccion()');
+  await esperar(300);
+  ok(w2.eval('_redHayBuzon') === false, 'sin las tablas, el buzón se da por no instalado',
+     'cree que hay buzón donde no lo hay');
+  ok(!w2.document.querySelector('[data-ed="buzon"]'), 'y su chip no aparece',
+     'enseña un buzón que no existe');
+  ok(w2.document.getElementById('red-list').textContent.includes('Una nota de casa'),
+     'Redacción sigue funcionando entera', 'la falta del buzón rompió Redacción');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SONDA-SUSPENDE';
+});
+</script>
+</body>
+</html>
