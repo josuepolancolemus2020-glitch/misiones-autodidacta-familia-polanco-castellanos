@@ -70,6 +70,24 @@ Zone → Make private.
      tiene dónde caer. **Y detrás, `supabase/sql/buzon_editar.sql`**, que es
      el que deja al lector corregir lo que mandó sin dejar dos envíos casi
      iguales en la bandeja. El porqué de todo, en `BUZON-DEL-LECTOR.md`.
+   · ⚠️ **Ponerle freno a `faro_buzon_retirar` y `faro_buzon_mio`.** Salió al
+     revisar la seguridad del buzón el 8 de agosto de 2026, y está desde el
+     primer archivo. `faro_buzon_enviar` sí tiene freno (cinco al día por
+     teléfono); esas dos no.
+
+     Qué se puede hacer con eso: el folio son cuatro caracteres de un
+     alfabeto de 31, o sea 923.521 combinaciones. Quien ya conozca el
+     teléfono de un lector —que es lo fácil— puede probar folios uno tras
+     otro hasta dar con el suyo, y entonces LEER o BORRAR lo que esa
+     persona mandó. No toca a la familia ni a la revista: la seguridad por
+     fila sigue cerrada y se comprobó. Pero si lo que se borra es una
+     denuncia, y quien la borra es el denunciado, eso es justo lo que el
+     buzón existía para evitar.
+
+     Se tapa con unos pocos intentos fallidos por hora, como el freno del
+     envío. Mientras tanto el riesgo real es casi nulo: el QR todavía no
+     está impreso en ningún número y no hay envíos de verdad que perder.
+
    · Las notificaciones del chat están rotas y en silencio. Se arregla volviendo
      a desplegar `send-chat-push`, que en el repositorio ya usa la clave de
      servicio. Después, cada quien abre la aplicación una vez para volver a
