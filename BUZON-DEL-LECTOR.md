@@ -110,9 +110,16 @@ la falta de las tablas no rompe nada.
 
 6. **Antes de publicar, se llama.** Está escrito dentro del envío, en
    naranja, delante de quien decide: confirmar lo que cuenta, y si
-   señala a alguien —persona o institución— buscar su versión. No es
-   celo periodístico de manual: es lo que el lector leyó y aceptó antes
-   de escribir.
+   señala a alguien —persona o institución— darle la oportunidad de dar
+   su versión. No es celo periodístico de manual: al lector se le dijo,
+   en la misma pantalla en la que escribió, que se le podría contactar
+   para conocer más detalles antes de publicar.
+
+   Ese texto se suavizó a propósito. Decía «se la va a buscar para que
+   dé su versión», y se lee como que van a ir a por alguien: en una
+   pantalla donde la gente está a punto de poner una denuncia con su
+   nombre y su teléfono, esa frase asusta y hace que no la ponga. La
+   obligación de la redacción no cambió; cambió cómo se cuenta.
 
 7. **Lo que aceptó queda firmado con su versión** (`etica_version`). Si
    mañana cambian los requisitos, la fila sigue diciendo cuáles firmó

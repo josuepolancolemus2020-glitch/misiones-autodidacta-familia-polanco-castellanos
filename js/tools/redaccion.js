@@ -1000,9 +1000,11 @@ function redPintarEnvio(m, fotos) {
     </div>
 
     <div class="red-buz-verifica">
-      <b>Antes de publicar:</b> llámalo y confirma lo que cuenta. Si señala a
-      alguien —una persona o una institución— hay que buscar su versión.
-      Se lo prometimos al lector en la misma pantalla en la que escribió esto.
+      <b>Antes de publicar:</b> llama al lector y confirma lo que cuenta. Y si
+      señala a alguien —una persona o una institución— hay que darle la
+      oportunidad de dar su versión: eso es lo que separa una nota de un rumor
+      impreso. Al lector se le dijo, en la misma pantalla en la que escribió
+      esto, que se le podría contactar para conocer más detalles.
     </div>
 
     ${notaHecha ? `
