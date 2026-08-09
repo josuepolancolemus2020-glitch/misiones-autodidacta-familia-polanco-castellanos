@@ -940,8 +940,8 @@ function redPintarEnvio(m, fotos) {
   const notaHecha = m.nota_id ? _redNotas.find(n => n.id === m.nota_id) : null;
 
   // Para «Aulas en acción», lo primero que hay que saber es si da
-  // tiempo: la revista es quincenal y un evento de pasado mañana no
-  // se cubre con la edición que cierra la semana que viene.
+  // tiempo: la revista sale cada quince días o cada mes, y un evento de
+  // pasado mañana no se cubre con la edición que cierra la semana que viene.
   let avisoEvento = '';
   if (m.clase === 'aulas' && m.evento_fecha) {
     const dias = redDiasParaCierre(m.evento_fecha);
@@ -1207,9 +1207,9 @@ function redAbrirQR() {
     </div>
     <div class="red-qr-guia">
       <b>Cómo ponerlo en la revista.</b> Pégalo en un recuadro con un texto que
-      diga para qué es: «<i>¿Pasó algo en su escuela? Cuéntenoslo. Escanee y
-      escriba: una nota, una opinión, una denuncia o una sugerencia. Y si su
-      centro va a hacer algo, pida que se lo cubramos en Aulas en acción.</i>»
+      diga para qué es: «<i>¿Pasó algo que merece contarse? Cuéntenoslo. Escanee
+      y escriba: una nota, una opinión, una denuncia o una sugerencia. Y si en
+      su escuela va a pasar algo, pida que se lo cubramos en Aulas en acción.</i>»
       <br><br>
       No lo hagas más chico de <b>2,5 cm</b> de lado, y déjale un margen blanco
       alrededor: sin ese margen los teléfonos no lo encuentran. El archivo que
@@ -1259,9 +1259,9 @@ function redAbrirQR() {
    sin tener que explicar de quién es. */
 function redTextoInvitacion() {
   return '📬 *Buzón del lector*\n' +
-    '¿Pasó algo en su escuela que merezca contarse? ¿Algo que está mal y debería saberse?\n' +
+    '¿Pasó algo que merece contarse? ¿Algo que está mal y debería saberse?\n' +
     'Mándelo aquí: una nota, una opinión, una denuncia o una sugerencia.\n' +
-    'Y si su centro va a hacer algo, pida que se lo cubran en *Aulas en acción*.\n\n' +
+    'Y si en su escuela va a pasar algo, pida que se lo cubran en *Aulas en acción*.\n\n' +
     'Se escribe desde el teléfono, en un rato, y no hay que registrarse 👇\n' +
     RED_BUZON_URL;
 }
