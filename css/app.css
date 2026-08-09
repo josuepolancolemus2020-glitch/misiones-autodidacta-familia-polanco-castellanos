@@ -3249,6 +3249,122 @@ body {
   border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 14px;
 }
 
+/* ── El buzón del lector ──────────────────────────────────────────
+   Verde y el primero de la fila, distinto de todo lo demás: lo que
+   hay aquí lo mandó gente de fuera y está esperando una respuesta.
+   Una edición se puede dejar para mañana; una denuncia con un
+   teléfono detrás, no. */
+.red-ed-chip-buzon { border-color: #5eead4; color: #0f766e; }
+.red-ed-chip-buzon.red-ed-chip-active {
+  background: #f0fdfa; border-color: #14b8a6; color: #0f766e;
+}
+.red-accion-buzon { color: #0f766e; border-color: rgba(15,118,110,.3); }
+
+.red-buz-fila {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 8px;
+  text-align: left; cursor: pointer; font-family: inherit; color: var(--text);
+}
+.red-buz-fila-nueva { border-left: 3px solid #14b8a6; background: #f0fdfa; }
+.red-buz-ic { font-size: 22px; flex-shrink: 0; width: 28px; text-align: center; }
+.red-buz-main { flex: 1; min-width: 0; }
+.red-buz-titulo { font-size: 14px; font-weight: 700; line-height: 1.35; margin-bottom: 5px; }
+.red-buz-quien { font-size: 11.5px; color: var(--muted); margin-top: 5px; }
+.red-buz-nuevo      { background: #fee2e2; color: #b91c1c; }
+.red-buz-leido      { background: #e0e7ff; color: #3730a3; }
+.red-buz-atendido   { background: #dcfce7; color: #15803d; }
+.red-buz-descartado { background: var(--bg); color: var(--muted); }
+.red-buz-fotos      { background: #ccfbf1; color: #0f766e; }
+
+.red-buz-vacio {
+  text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6;
+  padding: 30px 18px; background: var(--surface);
+  border: 1.5px dashed var(--border); border-radius: var(--r-sm);
+}
+.red-buz-vacio-ic { font-size: 42px; margin-bottom: 10px; }
+.red-buz-vacio p { margin-bottom: 8px; }
+.red-buz-cargando { text-align: center; color: var(--muted); padding: 26px; font-size: 13px; }
+
+/* Un envío abierto */
+.red-buz-folio {
+  font-size: 12px; font-weight: 800; color: #0f766e; background: #ccfbf1;
+  border-radius: 999px; padding: 2px 9px; margin-left: 6px; letter-spacing: 1px;
+}
+.red-buz-cab {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.red-buz-fecha { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+.red-buz-tit { font-size: 16px; font-weight: 800; line-height: 1.35; margin-bottom: 8px; }
+.red-buz-texto {
+  font-size: 14px; line-height: 1.65; white-space: pre-wrap;
+  background: var(--bg); border-radius: var(--r-sm); padding: 14px; margin-bottom: 14px;
+}
+.red-buz-sub {
+  font-size: 11.5px; font-weight: 800; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .4px; margin: 16px 0 8px;
+}
+.red-buz-datos { display: grid; gap: 1px; background: var(--border); border-radius: var(--r-sm); overflow: hidden; }
+.red-buz-datos > div {
+  display: flex; gap: 10px; background: var(--surface); padding: 9px 12px; font-size: 13px;
+}
+.red-buz-datos b { flex: 0 0 82px; color: var(--muted); font-weight: 700; font-size: 12px; }
+.red-buz-datos span { flex: 1; min-width: 0; word-break: break-word; font-weight: 600; }
+
+.red-buz-aviso {
+  font-size: 12.5px; line-height: 1.55; border-radius: var(--r-sm);
+  padding: 11px 13px; margin: 12px 0; background: var(--bg);
+  border: 1.5px solid var(--border);
+}
+.red-buz-aviso-tarde { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+.red-buz-aviso-ok    { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+.red-buz-enlace {
+  background: none; border: 0; padding: 0 0 0 4px; font-family: inherit;
+  font-size: 12.5px; font-weight: 800; color: #0f766e; text-decoration: underline; cursor: pointer;
+}
+
+/* La promesa que se le hizo al lector, delante de quien decide */
+.red-buz-verifica {
+  font-size: 12.5px; line-height: 1.55; color: #7c2d12;
+  background: #fff7ed; border: 1.5px solid #fed7aa;
+  border-radius: var(--r-sm); padding: 12px 14px; margin: 14px 0;
+}
+
+.red-buz-fotos-caja {
+  background: var(--bg); border-radius: var(--r-sm); padding: 12px; margin: 14px 0;
+}
+.red-buz-galeria { display: flex; gap: 8px; flex-wrap: wrap; }
+.red-buz-galeria img {
+  width: 104px; height: 104px; object-fit: cover; border-radius: 10px;
+  border: 1.5px solid var(--border); cursor: pointer; display: block;
+}
+.red-buz-pie-fotos { font-size: 11.5px; color: var(--muted); line-height: 1.5; margin: 9px 0; }
+
+.red-buz-acciones { display: grid; gap: 8px; margin-top: 16px; }
+.red-qr-acciones  { display: grid; gap: 8px; margin-top: 14px; }
+.red-buz-btn {
+  width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 12px; font-size: 13px; font-weight: 700;
+  color: var(--text); cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.red-buz-btn:active { transform: scale(.97); }
+.red-buz-btn-1  { background: #0f766e; border-color: #0f766e; color: #fff; }
+.red-buz-btn-wa { background: #25d366; border-color: #25d366; color: #fff; }
+
+/* El QR */
+.red-qr-caja { text-align: center; padding: 8px 0 4px; }
+.red-qr-caja canvas { border-radius: 8px; }
+.red-qr-url {
+  text-align: center; font-size: 12px; font-weight: 700; color: var(--muted);
+  word-break: break-all; margin-top: 8px;
+}
+.red-qr-guia {
+  font-size: 12.5px; line-height: 1.6; color: var(--muted);
+  background: var(--bg); border-radius: var(--r-sm); padding: 13px; margin-top: 14px;
+}
+.red-qr-guia b { color: var(--text); }
+
 /* Aviso dentro del editor cuando la nota abierta está en la papelera */
 .red-e-papelera-aviso {
   display: flex; align-items: center; gap: 12px; flex-wrap: wrap;

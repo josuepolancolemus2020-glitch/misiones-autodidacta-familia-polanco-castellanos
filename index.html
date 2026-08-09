@@ -970,6 +970,9 @@
         <button type="button" class="red-accion-btn red-accion-peligro" id="red-vaciar-papelera-btn" style="display:none;">
           <i class="fa-solid fa-trash-can"></i> Vaciar papelera
         </button>
+        <button type="button" class="red-accion-btn red-accion-buzon" id="red-qr-btn" style="display:none;">
+          <i class="fa-solid fa-qrcode"></i> QR para la revista
+        </button>
       </div>
 
       <!-- Notas agrupadas por sección -->
@@ -1579,6 +1582,32 @@
     </div>
   </div>
 
+  <!-- Modal: un envío del buzón del lector, abierto -->
+  <div id="red-buzon-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="des-modal-title" id="red-buzon-titulo"><i class="fa-solid fa-envelope-open-text" style="color:#0f766e;"></i> Del buzón</div>
+        <button type="button" class="fin-modal-close" id="red-buzon-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="red-buzon-cuerpo"></div>
+    </div>
+  </div>
+
+  <!-- Modal: el código QR que se pega en la revista -->
+  <div id="red-qr-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="des-modal-title"><i class="fa-solid fa-qrcode" style="color:#0f766e;"></i> El QR del buzón</div>
+        <button type="button" class="fin-modal-close" id="red-qr-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="red-qr-cuerpo"></div>
+    </div>
+  </div>
+
   <!-- Modal: el corrector que enseña -->
   <div id="cor-overlay" class="fin-modal-overlay" style="display:none;">
     <div class="fin-modal">
@@ -1706,6 +1735,9 @@
   <script src="js/finanzas.js"></script>
   <script src="js/inventario.js"></script>
   <script src="js/tools/destellos.js"></script>
+  <!-- El generador de códigos QR va ANTES de Redacción, que es quien lo
+       usa para el buzón del lector. -->
+  <script src="js/qr.js"></script>
   <script src="js/tools/redaccion.js"></script>
   <script src="js/tools/diccionario.js"></script>
   <script src="js/tools/corrector.js"></script>

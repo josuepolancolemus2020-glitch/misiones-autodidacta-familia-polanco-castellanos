@@ -62,6 +62,12 @@ Zone → Make private.
      Redacción sigue borrando de verdad, y la aplicación lo avisa antes de
      hacerlo en vez de fingir que hay red debajo. Después, borrar solo aparta:
      la nota espera en la papelera hasta que se restaure.
+   · ⚠️ **Correr `supabase/sql/buzon_lector.sql`** en el SQL Editor. Crea las
+     dos tablas del Buzón del lector y su única puerta pública, con la
+     seguridad por fila cerrada. Hasta que se corra, Redacción funciona igual
+     y el chip 📬 Buzón no aparece (está probado que la falta de las tablas no
+     rompe nada), pero lo que manda la gente desde el QR de la revista no
+     tiene dónde caer. El porqué de todo, en `BUZON-DEL-LECTOR.md`.
    · Las notificaciones del chat están rotas y en silencio. Se arregla volviendo
      a desplegar `send-chat-push`, que en el repositorio ya usa la clave de
      servicio. Después, cada quien abre la aplicación una vez para volver a

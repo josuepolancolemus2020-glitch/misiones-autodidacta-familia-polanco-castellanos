@@ -29,6 +29,18 @@
 const RED_T_EDICIONES = 'redaccion_ediciones';
 const RED_T_NOTAS     = 'redaccion_notas';
 const RED_T_CONFIG    = 'redaccion_config';
+const RED_T_BUZON     = 'buzon_mensajes';
+const RED_T_BUZON_FOTOS = 'buzon_fotos';
+
+/* La dirección del buzón del lector. Va IMPRESA en la revista como
+   código QR, así que no lleva código ni caduca: es una sola y para
+   siempre. Vive en el sitio público de M.E.T.A.S porque esta
+   aplicación está detrás de una puerta con contraseña y no puede
+   recibir visitas de la calle; la página no nombra a la revista por
+   ninguna parte, que es como se pidió.
+   Si algún día cambia, cambia AQUÍ: de aquí sale el QR, el enlace que
+   se copia y el mensaje que se manda por WhatsApp. */
+const RED_BUZON_URL = 'https://metas.policastsapien.com/buzon.html';
 const RED_PENDING_KEY = 'faro_redaccion_pending_v1';
 const RED_BITACORA_KEY = 'faro_redaccion_bitacora_v1';
 const RED_BITACORA_MAX = 12;   // versiones guardadas por nota
@@ -115,7 +127,7 @@ const RED_ESTILOS_CITA = [
 
 const RED_SECCIONES = [
   'PORTADA', 'EDITORIAL', 'ACTUALIDAD', 'REPORTE INVESTIGATIVO',
-  'TECNOLOGÍA', 'CULTURA', 'FILOSOFÍA Y AULA', 'AVISOS',
+  'TECNOLOGÍA', 'CULTURA', 'FILOSOFÍA Y AULA', 'AULAS EN ACCIÓN', 'AVISOS',
 ];
 const RED_TIPOS = [
   'Artículo', 'Nota de prensa', 'Editorial', 'Aviso',
@@ -145,6 +157,9 @@ let _redCitaEl    = null;    // marca de cita abierta en su modal
 let _redBitTimer  = null;    // temporizador de la bitácora local
 let _redSinSubir  = false;   // el último guardado no llegó a la nube
 let _redGuiaAbierta = false; // la guía de citas, ¿desplegada?
+let _redBuzon     = [];      // los envíos de los lectores (sin las fotos)
+let _redHayBuzon  = false;   // ¿esta base ya tiene las tablas del buzón?
+let _redEnvio     = null;    // el envío abierto en su ventana
 
 /* ── Helpers ── */
 
@@ -497,16 +512,28 @@ async function initRedaccion() {
 
   await redFlushPending();
 
-  const [ed, no, cf, pap] = await Promise.all([
+  const [ed, no, cf, pap, buz] = await Promise.all([
     _sb.from(RED_T_EDICIONES).select('*').order('numero', { ascending: false }),
     _sb.from(RED_T_NOTAS).select('*').order('actualizado_at', { ascending: false }),
     _sb.from(RED_T_CONFIG).select('*'),
     // Sonda: si la columna 'eliminada' no existe todavía, esta consulta falla
     // y la papelera se queda escondida en vez de romper la herramienta entera.
     _sb.from(RED_T_NOTAS).select('id').eq('eliminada', true).limit(1),
+    // El buzón, igual: mientras no se haya corrido buzon_lector.sql su
+    // tabla no existe, y Redacción tiene que seguir funcionando entera.
+    // Las FOTOS no se piden aquí a propósito: son data URL de casi un
+    // mega cada una y esta consulta se hace cada vez que se abre la
+    // herramienta. Se piden al abrir el envío, que es cuando se miran.
+    _sb.from(RED_T_BUZON).select(
+      'id,folio,creado_at,clase,titulo,texto,nombre,tel,correo,lugar,escuela,cargo,' +
+      'evento_fecha,evento_hora,evento_lugar,etica_version,permiso_fotos,fotos,' +
+      'estado,nota_id,motivo,visto_por,visto_at'
+    ).order('creado_at', { ascending: false }).limit(300),
   ]);
 
   _redPapelera = !pap.error;
+  _redHayBuzon = !buz.error;
+  _redBuzon    = buz.error ? [] : (buz.data || []);
 
   // La config es opcional: si su tabla aún no existe, se sigue sin personalizados
   if (!cf.error && cf.data) {
@@ -537,6 +564,7 @@ async function initRedaccion() {
     _redEdicion = abierta ? abierta.id : 'banco';
   }
   if (_redEdicion === 'papelera' && !_redPapelera) _redEdicion = 'banco';
+  if (_redEdicion === 'buzon' && !_redHayBuzon) _redEdicion = 'banco';
 
   redRender();
 }
@@ -577,12 +605,17 @@ function redRender() {
    ahí no se escriben notas nuevas ni se exporta, se vacía. */
 function redRenderAcciones() {
   const enPapelera = _redEdicion === 'papelera';
+  const enBuzon    = _redEdicion === 'buzon';
   const nueva  = document.getElementById('red-nueva-nota-btn');
   const expo   = document.getElementById('red-exportar-btn');
   const vaciar = document.getElementById('red-vaciar-papelera-btn');
-  if (nueva)  nueva.style.display  = enPapelera ? 'none' : '';
-  if (expo)   expo.style.display   = enPapelera ? 'none' : '';
+  const qr     = document.getElementById('red-qr-btn');
+  if (nueva)  nueva.style.display  = (enPapelera || enBuzon) ? 'none' : '';
+  if (expo)   expo.style.display   = (enPapelera || enBuzon) ? 'none' : '';
   if (vaciar) vaciar.style.display = (enPapelera && redNotasPapelera().length) ? '' : 'none';
+  // El QR solo dentro del buzón: es lo que se pega en la revista para
+  // que entren envíos, y fuera de ahí no significa nada.
+  if (qr) qr.style.display = enBuzon ? '' : 'none';
 }
 
 /* Bloque "Titulares de portada" de la edición seleccionada */
@@ -617,6 +650,15 @@ function redRenderCabecera() {
     metaEl.textContent = n
       ? `${n} nota${n === 1 ? '' : 's'} eliminada${n === 1 ? '' : 's'} · se pueden restaurar`
       : 'Vacía. Aquí espera lo que borres, por si fue sin querer.';
+    return;
+  }
+  if (_redEdicion === 'buzon') {
+    const nuevos = redBuzonNuevos().length;
+    const pend = _redBuzon.filter(m => m.estado === 'nuevo' || m.estado === 'leido').length;
+    tituloEl.textContent = '📬 Buzón del lector';
+    metaEl.textContent = _redBuzon.length
+      ? `${pend} sin resolver${nuevos ? ` · ${nuevos} sin abrir` : ''} · ${_redBuzon.length} en total`
+      : 'Vacío. Aquí cae lo que manda la gente desde el QR de la revista.';
     return;
   }
   if (_redEdicion === 'banco') {
@@ -659,7 +701,17 @@ function redRenderChips() {
       🗑️ Papelera${cuantas ? ` · ${cuantas}` : ''}
     </button>` : '';
 
-  wrap.innerHTML = papelera + chips + `
+  // El buzón va el PRIMERO de todos, y con su cuenta a la vista aunque
+  // esté vacío. Lo que hay dentro lo mandó gente de fuera que está
+  // esperando respuesta: si el chip se esconde cuando no hay nada,
+  // nadie se acuerda de mirarlo el día que sí la hay.
+  const sinAbrir = redBuzonNuevos().length;
+  const buzon = _redHayBuzon ? `
+    <button type="button" class="red-ed-chip red-ed-chip-buzon ${_redEdicion === 'buzon' ? 'red-ed-chip-active' : ''}" data-ed="buzon">
+      📬 Buzón${sinAbrir ? ` · ${sinAbrir}` : ''}
+    </button>` : '';
+
+  wrap.innerHTML = buzon + papelera + chips + `
     <button type="button" class="red-ed-chip ${_redEdicion === 'banco' ? 'red-ed-chip-active' : ''}" data-ed="banco">
       🗃️ Banco
     </button>
@@ -669,7 +721,7 @@ function redRenderChips() {
   wrap.querySelectorAll('.red-ed-chip').forEach(btn => btn.addEventListener('click', () => {
     const val = btn.dataset.ed;
     if (val === 'nueva') { redOpenEdicionModal(); return; }
-    if (val === 'banco' || val === 'papelera') { _redEdicion = val; redRender(); return; }
+    if (val === 'banco' || val === 'papelera' || val === 'buzon') { _redEdicion = val; redRender(); return; }
     const id = Number(val);
     // Tocar la edición que ya está abierta la manda a editar: es el atajo
     // para corregir el número o la fecha sin buscar el lápiz.
@@ -689,6 +741,11 @@ function redRenderNotas() {
     redRenderPapelera(list);
     return;
   }
+  if (_redEdicion === 'buzon') {
+    if (emptyEl) emptyEl.style.display = 'none';
+    redRenderBuzon(list);
+    return;
+  }
 
   const notas = redNotasDeEdicion();
   if (emptyEl) emptyEl.style.display = notas.length ? 'none' : 'block';
@@ -696,6 +753,11 @@ function redRenderNotas() {
   // Agrupar por sección, en el orden editorial de la revista
   const orden = redSeccionesAll();
   notas.forEach(n => { if (!orden.includes(n.seccion)) orden.push(n.seccion); });
+
+  // Las que salieron del buzón se marcan: quien las abre tiene que
+  // saber que detrás hay un lector esperando una llamada, no una idea
+  // propia que se puede dejar para el mes que viene.
+  const delBuzon = redNotasDelBuzon();
 
   list.innerHTML = orden.map(sec => {
     const deSec = notas.filter(n => n.seccion === sec);
@@ -712,6 +774,7 @@ function redRenderNotas() {
           <span class="red-nota-titulo">${n.titulo ? redEsc(n.titulo) : '<em class="red-sin-titulo">Sin título</em>'}</span>
           <div class="red-nota-meta">
             ${n.en_portada ? '<span class="red-badge red-badge-portada">⭐ Portada</span>' : ''}
+            ${delBuzon.has(n.id) ? '<span class="red-badge red-buz-fotos">📬 Del buzón</span>' : ''}
             <span class="red-badge ${est.cls}">${est.label}</span>
             <span class="red-badge red-badge-tipo">${redEsc(n.tipo)}</span>
             ${sinFuente ? `<span class="red-badge red-nota-citas-pend">🔖 ${sinFuente} sin fuente</span>` : ''}
@@ -730,6 +793,482 @@ function redRenderNotas() {
 
   list.querySelectorAll('.red-nota').forEach(btn =>
     btn.addEventListener('click', () => redOpenEditor(Number(btn.dataset.nota))));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EL BUZÓN DEL LECTOR 📬
+   ═══════════════════════════════════════════════════════════════
+   La revista la escriben cuatro personas. El buzón es la otra
+   puerta: cualquiera que lea la revista escanea el QR y manda una
+   nota, una opinión, una denuncia, una sugerencia, o pide que le
+   cubran un evento de su escuela en «Aulas en acción».
+
+   Lo que entra aquí NO es una nota todavía: es materia prima con
+   una persona detrás esperando. De ahí las tres cosas que hace
+   esta bandeja y que no hace ninguna otra pantalla:
+
+   · Enseña el TELÉFONO a un toque de WhatsApp, porque el trabajo
+     de verdad empieza llamando a quien lo mandó.
+   · Deja constancia de lo que ese lector ACEPTÓ al mandarlo (qué
+     versión de los requisitos, si declaró permiso de las fotos).
+     Un reclamo dentro de un año se resuelve mirando el dato.
+   · No deja que un envío se quede sin respuesta: mientras esté en
+     «nuevo» o «leído» cuenta como pendiente y el chip lo grita.
+
+   Los datos de contacto NO viajan a la nota. Ver redBuzonANota.
+   ═══════════════════════════════════════════════════════════════ */
+
+const RED_BUZON_CLASES = {
+  nota:       { ic: '📝', t: 'Nota o dato',        sec: 'ACTUALIDAD',            tipo: 'Nota de prensa' },
+  opinion:    { ic: '💬', t: 'Opinión',            sec: 'EDITORIAL',             tipo: 'Artículo' },
+  denuncia:   { ic: '⚠️', t: 'Denuncia',           sec: 'REPORTE INVESTIGATIVO', tipo: 'Reporte' },
+  sugerencia: { ic: '💡', t: 'Sugerencia',         sec: 'AVISOS',                tipo: 'Idea' },
+  aulas:      { ic: '🏫', t: 'Aulas en acción',    sec: 'AULAS EN ACCIÓN',       tipo: 'Reporte' },
+};
+function redClase(id) { return RED_BUZON_CLASES[id] || RED_BUZON_CLASES.nota; }
+
+const RED_BUZON_ESTADOS = {
+  nuevo:      { label: '🔴 Sin abrir',  cls: 'red-buz-nuevo' },
+  leido:      { label: '👁 Leído',      cls: 'red-buz-leido' },
+  atendido:   { label: '✅ Atendido',   cls: 'red-buz-atendido' },
+  descartado: { label: '🚫 Descartado', cls: 'red-buz-descartado' },
+};
+
+function redBuzonNuevos() { return _redBuzon.filter(m => m.estado === 'nuevo'); }
+
+/* Las notas que salieron del buzón, para marcarlas en las listas */
+function redNotasDelBuzon() {
+  return new Set(_redBuzon.filter(m => m.nota_id).map(m => m.nota_id));
+}
+
+function redFechaCorta(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es', { day: 'numeric', month: 'short' });
+}
+
+function redRenderBuzon(list) {
+  if (!_redBuzon.length) {
+    list.innerHTML = `
+      <div class="red-buz-vacio">
+        <div class="red-buz-vacio-ic">📬</div>
+        <p><strong>El buzón está vacío.</strong></p>
+        <p>Aquí cae lo que manda la gente desde el código QR de la revista:
+           notas, opiniones, denuncias, sugerencias y peticiones para
+           <strong>Aulas en acción</strong>.</p>
+        <p>Si todavía no has puesto el QR en ningún número, toca
+           <strong>QR para la revista</strong> aquí arriba.</p>
+      </div>`;
+    return;
+  }
+
+  // Sin resolver primero, y dentro de eso lo más nuevo arriba: la
+  // bandeja se abre para atender, no para leer historia.
+  const pendientes = _redBuzon.filter(m => m.estado === 'nuevo' || m.estado === 'leido');
+  const cerrados   = _redBuzon.filter(m => m.estado === 'atendido' || m.estado === 'descartado');
+
+  const fila = m => {
+    const c = redClase(m.clase);
+    const est = RED_BUZON_ESTADOS[m.estado] || RED_BUZON_ESTADOS.nuevo;
+    const resumen = (m.titulo || redPlano(m.texto) || '').trim();
+    return `
+      <button type="button" class="red-buz-fila ${m.estado === 'nuevo' ? 'red-buz-fila-nueva' : ''}" data-envio="${m.id}">
+        <div class="red-buz-ic">${c.ic}</div>
+        <div class="red-buz-main">
+          <div class="red-buz-titulo">${resumen ? redEsc(resumen.slice(0, 90)) : '<em class="red-sin-titulo">Sin título</em>'}</div>
+          <div class="red-nota-meta">
+            <span class="red-badge ${est.cls}">${est.label}</span>
+            <span class="red-badge red-badge-tipo">${c.t}</span>
+            ${m.fotos ? `<span class="red-badge red-buz-fotos">📷 ${m.fotos}</span>` : ''}
+          </div>
+          <div class="red-buz-quien">
+            ${redEsc(m.nombre || 'Sin nombre')}${m.cargo ? ' · ' + redEsc(m.cargo) : ''}
+            ${m.lugar ? ' · ' + redEsc(m.lugar) : ''} · ${redFechaCorta(m.creado_at)}
+          </div>
+        </div>
+        <i class="fa-solid fa-chevron-right red-nota-arrow"></i>
+      </button>`;
+  };
+
+  list.innerHTML =
+    (pendientes.length ? `<div class="red-seccion">
+      <h3 class="red-seccion-title">Esperando respuesta</h3>${pendientes.map(fila).join('')}</div>` : '') +
+    (cerrados.length ? `<div class="red-seccion">
+      <h3 class="red-seccion-title">Ya resueltos</h3>${cerrados.map(fila).join('')}</div>` : '');
+
+  list.querySelectorAll('.red-buz-fila').forEach(b =>
+    b.addEventListener('click', () => redAbrirEnvio(Number(b.dataset.envio))));
+}
+
+/* ── Un envío, abierto ── */
+
+async function redAbrirEnvio(id) {
+  const m = _redBuzon.find(x => x.id === id);
+  if (!m) return;
+  _redEnvio = m;
+
+  const ov = document.getElementById('red-buzon-overlay');
+  const cu = document.getElementById('red-buzon-cuerpo');
+  if (!ov || !cu) return;
+  const c = redClase(m.clase);
+  document.getElementById('red-buzon-titulo').innerHTML =
+    `${c.ic} ${redEsc(c.t)} <span class="red-buz-folio">${redEsc(m.folio || '')}</span>`;
+  cu.innerHTML = '<div class="red-buz-cargando">Abriendo el envío…</div>';
+  ov.style.display = 'flex';
+
+  // Marcarlo leído en cuanto se abre: si no, el contador del chip
+  // miente y el que revisa vuelve a abrir lo mismo tres veces.
+  if (m.estado === 'nuevo') await redEnvioEstado(m, 'leido', '', false);
+
+  const fotos = await redFotosDe(m.id);
+  redPintarEnvio(m, fotos);
+}
+
+async function redFotosDe(mensajeId) {
+  if (!_sb) return [];
+  const { data, error } = await _sb.from(RED_T_BUZON_FOTOS)
+    .select('*').eq('mensaje_id', mensajeId).order('orden');
+  if (error) { console.error('[Buzón] Error cargando fotos:', error); return []; }
+  return data || [];
+}
+
+function redPintarEnvio(m, fotos) {
+  const cu = document.getElementById('red-buzon-cuerpo');
+  if (!cu) return;
+  const c = redClase(m.clase);
+  const est = RED_BUZON_ESTADOS[m.estado] || RED_BUZON_ESTADOS.nuevo;
+  const notaHecha = m.nota_id ? _redNotas.find(n => n.id === m.nota_id) : null;
+
+  // Para «Aulas en acción», lo primero que hay que saber es si da
+  // tiempo: la revista es quincenal y un evento de pasado mañana no
+  // se cubre con la edición que cierra la semana que viene.
+  let avisoEvento = '';
+  if (m.clase === 'aulas' && m.evento_fecha) {
+    const dias = redDiasParaCierre(m.evento_fecha);
+    avisoEvento = dias < 0
+      ? `<div class="red-buz-aviso red-buz-aviso-tarde">⏳ El evento ya pasó hace ${-dias} día${dias === -1 ? '' : 's'}. Todavía se puede contar, pero como crónica.</div>`
+      : dias <= 2
+        ? `<div class="red-buz-aviso red-buz-aviso-tarde">⚡ ${dias === 0 ? 'Es HOY' : dias === 1 ? 'Es MAÑANA' : 'Faltan 2 días'}. Si se va a cubrir, hay que decidirlo ya.</div>`
+        : `<div class="red-buz-aviso">🗓️ Faltan ${dias} días para el evento.</div>`;
+  }
+
+  cu.innerHTML = `
+    <div class="red-buz-cab">
+      <span class="red-badge ${est.cls}">${est.label}</span>
+      <span class="red-buz-fecha">Recibido el ${redFechaLarga(String(m.creado_at || '').slice(0, 10))}</span>
+    </div>
+
+    ${m.titulo ? `<div class="red-buz-tit">${redEsc(m.titulo)}</div>` : ''}
+    <div class="red-buz-texto">${redEsc(m.texto || '').replace(/\n/g, '<br>')}</div>
+
+    ${avisoEvento}
+    ${m.clase === 'aulas' ? `
+    <div class="red-buz-datos">
+      ${m.escuela ? `<div><b>Centro</b><span>${redEsc(m.escuela)}</span></div>` : ''}
+      ${m.evento_fecha ? `<div><b>Cuándo</b><span>${redEsc(redFechaLarga(m.evento_fecha))}${m.evento_hora ? ' · ' + redEsc(m.evento_hora) : ''}</span></div>` : ''}
+      ${m.evento_lugar ? `<div><b>Dónde</b><span>${redEsc(m.evento_lugar)}</span></div>` : ''}
+    </div>` : ''}
+
+    ${fotos.length ? `
+    <div class="red-buz-fotos-caja">
+      <div class="red-buz-sub">📷 ${fotos.length} foto${fotos.length === 1 ? '' : 's'}</div>
+      <div class="red-buz-galeria">
+        ${fotos.map((f, i) => `<img src="${f.datos}" alt="Foto ${i + 1}" data-foto="${i}">`).join('')}
+      </div>
+      <div class="red-buz-pie-fotos">
+        ${m.permiso_fotos
+          ? '✅ El lector declaró que las tomó él o tiene permiso, y que si sale un menor su familia lo sabe.'
+          : '⚠️ <b>No declaró permiso.</b> No se publican hasta hablar con él.'}
+      </div>
+      <button type="button" class="red-buz-btn" id="red-buz-bajar">
+        <i class="fa-solid fa-download"></i> Descargar las fotos para maquetar
+      </button>
+    </div>` : ''}
+
+    <div class="red-buz-sub">Quién lo manda</div>
+    <div class="red-buz-datos">
+      <div><b>Nombre</b><span>${redEsc(m.nombre || '—')}</span></div>
+      ${m.cargo ? `<div><b>Es</b><span>${redEsc(m.cargo)}</span></div>` : ''}
+      ${m.lugar ? `<div><b>De</b><span>${redEsc(m.lugar)}</span></div>` : ''}
+      ${(m.escuela && m.clase !== 'aulas') ? `<div><b>Centro</b><span>${redEsc(m.escuela)}</span></div>` : ''}
+      <div><b>Teléfono</b><span>${redEsc(m.tel || '—')}</span></div>
+      ${m.correo ? `<div><b>Correo</b><span>${redEsc(m.correo)}</span></div>` : ''}
+      <div><b>Aceptó</b><span>Los requisitos ${redEsc(m.etica_version || '—')}</span></div>
+    </div>
+
+    <div class="red-buz-verifica">
+      <b>Antes de publicar:</b> llámalo y confirma lo que cuenta. Si señala a
+      alguien —una persona o una institución— hay que buscar su versión.
+      Se lo prometimos al lector en la misma pantalla en la que escribió esto.
+    </div>
+
+    ${notaHecha ? `
+    <div class="red-buz-aviso red-buz-aviso-ok">
+      📝 Ya es una nota: «${redEsc(notaHecha.titulo || 'Sin título')}».
+      <button type="button" class="red-buz-enlace" id="red-buz-ir-nota">Abrirla</button>
+    </div>` : ''}
+    ${m.estado === 'descartado' && m.motivo ? `
+    <div class="red-buz-aviso">🚫 Descartado: ${redEsc(m.motivo)}</div>` : ''}
+
+    <div class="red-buz-acciones">
+      <button type="button" class="red-buz-btn red-buz-btn-wa" id="red-buz-wa">
+        <i class="fa-brands fa-whatsapp"></i> Escribirle
+      </button>
+      ${notaHecha ? '' : `
+      <button type="button" class="red-buz-btn red-buz-btn-1" id="red-buz-nota">
+        <i class="fa-solid fa-pen-nib"></i> Convertir en nota
+      </button>`}
+      ${m.estado === 'descartado' ? '' : `
+      <button type="button" class="red-buz-btn" id="red-buz-descartar">
+        <i class="fa-solid fa-ban"></i> Descartar
+      </button>`}
+    </div>`;
+
+  // Tocar una foto la abre a tamaño completo, que es como se decide
+  // si sirve para imprimir.
+  cu.querySelectorAll('[data-foto]').forEach(img =>
+    img.addEventListener('click', () => redVerFotoGrande(fotos[Number(img.dataset.foto)].datos)));
+
+  const bBajar = document.getElementById('red-buz-bajar');
+  if (bBajar) bBajar.addEventListener('click', () => redBajarFotos(m, fotos));
+
+  document.getElementById('red-buz-wa')?.addEventListener('click', () => redEscribirLector(m));
+  document.getElementById('red-buz-nota')?.addEventListener('click', () => redBuzonANota(m, fotos.length));
+  document.getElementById('red-buz-descartar')?.addEventListener('click', () => redDescartarEnvio(m));
+  document.getElementById('red-buz-ir-nota')?.addEventListener('click', () => {
+    redCerrarEnvio();
+    redOpenEditor(m.nota_id);
+  });
+}
+
+function redVerFotoGrande(datos) {
+  const w = window.open('', '_blank');
+  if (!w) return;
+  w.document.write('<title>Foto del buzón</title>' +
+    '<body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh">' +
+    '<img src="' + datos + '" style="max-width:100%;max-height:100vh">');
+  w.document.close();
+}
+
+/* Las fotos se BAJAN, no se pegan en la nota: el programa de
+   maquetación necesita archivos, no texto. El nombre lleva el folio
+   para que en la carpeta de descargas se sepa de quién es cada una. */
+function redBajarFotos(m, fotos) {
+  fotos.forEach((f, i) => {
+    const a = document.createElement('a');
+    a.href = f.datos;
+    a.download = `buzon-${(m.folio || m.id)}-${i + 1}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
+  if (typeof toast === 'function') toast(fotos.length === 1 ? 'Foto descargada' : 'Fotos descargadas');
+}
+
+/* Llamar es el trabajo. El mensaje va escrito para que quien contesta
+   sepa de qué le hablan: un «hola» suelto de un número desconocido no
+   lo contesta nadie. */
+function redEscribirLector(m) {
+  const c = redClase(m.clase);
+  const tel = String(m.tel || '').replace(/\D/g, '');
+  if (!tel) { if (typeof toast === 'function') toast('Este envío no trae teléfono'); return; }
+  const texto =
+    `Buenas${m.nombre ? ', ' + String(m.nombre).split(' ')[0] : ''}. Le escribo de la revista: ` +
+    `recibimos lo que nos mandó por el buzón del lector (folio ${m.folio}), ` +
+    `sobre «${(m.titulo || redPlano(m.texto) || '').trim().slice(0, 60)}». ` +
+    `Quería confirmar unos datos con usted antes de publicarlo.`;
+  const movil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  // Honduras es +504. Un número de ocho dígitos sin código no abre el
+  // chat: WhatsApp lo da por inválido y no dice por qué.
+  const conPais = tel.length === 8 ? '504' + tel : tel;
+  window.open(movil
+    ? 'https://wa.me/' + conPais + '?text=' + encodeURIComponent(texto)
+    : 'https://web.whatsapp.com/send?phone=' + conPais + '&text=' + encodeURIComponent(texto), '_blank');
+}
+
+/* ── De envío a nota ──────────────────────────────────────────────
+   Lo que pasa a la nota es el TEXTO y la FIRMA, que es lo que se
+   imprime. Lo que NO pasa, a propósito, son el teléfono y el correo:
+   la nota se exporta entera a Markdown y se pega en el programa de
+   maquetación, y un teléfono pegado en una revista ya impresa no se
+   despega. Al lector se le prometió que su número no se publica.
+   Los datos de contacto se quedan aquí, a un toque, que es donde
+   hacen falta: para llamarlo. */
+async function redBuzonANota(m, cuantasFotos) {
+  if (!_sb) return;
+  const c = redClase(m.clase);
+
+  // Va a la edición abierta más reciente; si no hay ninguna, al banco
+  // de ideas, que es donde espera lo que todavía no tiene número.
+  const abierta = _redEdiciones.find(e => !e.archivada);
+
+  const firma = [m.nombre, m.cargo, m.lugar].filter(Boolean).join(', ');
+  const cuerpo =
+    redEsc(m.texto || '').replace(/\n/g, '<br>') +
+    (firma ? `<br><br><b>— ${redEsc(firma)}</b>` : '');
+
+  const fila = {
+    edicion_id: abierta ? abierta.id : null,
+    autor: redMiembro(),
+    titulo: (m.titulo || redPlano(m.texto) || '').trim().slice(0, 140),
+    seccion: c.sec,
+    tipo: c.tipo,
+    estado: 'borrador',
+    entradilla: '',
+    cuerpo,
+  };
+
+  const { data, error } = await _sb.from(RED_T_NOTAS).insert(fila).select().single();
+  if (error) {
+    console.error('[Buzón] Error creando la nota:', error);
+    if (typeof toast === 'function') toast('No se pudo crear la nota');
+    return;
+  }
+  _redNotas.unshift(data);
+  await redEnvioEstado(m, 'atendido', '', false, data.id);
+
+  redCerrarEnvio();
+  if (typeof toast === 'function') {
+    toast(cuantasFotos
+      ? `En ${c.sec}. Las ${cuantasFotos} fotos siguen en el buzón`
+      : `En ${c.sec}`);
+  }
+  redOpenEditor(data.id);
+}
+
+async function redDescartarEnvio(m) {
+  const motivo = prompt(
+    '¿Por qué se descarta?\n\nQueda anotado. No se le manda al lector, pero si vuelve a ' +
+    'escribir o llama preguntando, aquí está la razón.', '');
+  if (motivo === null) return;
+  await redEnvioEstado(m, 'descartado', String(motivo || '').slice(0, 300), true);
+  redCerrarEnvio();
+}
+
+/* Guarda el estado del envío. `repintar` es para cuando el cambio
+   tiene que verse ya en la lista de detrás. */
+async function redEnvioEstado(m, estado, motivo, repintar, notaId) {
+  if (!_sb) return false;
+  const cambios = {
+    estado,
+    motivo: motivo || m.motivo || '',
+    visto_por: redMiembro(),
+    visto_at: new Date().toISOString(),
+  };
+  if (notaId) cambios.nota_id = notaId;
+  const { error } = await _sb.from(RED_T_BUZON).update(cambios).eq('id', m.id);
+  if (error) {
+    console.error('[Buzón] Error guardando el estado:', error);
+    if (typeof toast === 'function') toast('No se pudo guardar (¿hay conexión?)');
+    return false;
+  }
+  Object.assign(m, cambios);
+  if (repintar) redRender(); else { redRenderCabecera(); redRenderChips(); }
+  return true;
+}
+
+function redCerrarEnvio() {
+  const ov = document.getElementById('red-buzon-overlay');
+  if (ov) ov.style.display = 'none';
+  _redEnvio = null;
+  redRender();
+}
+
+/* ── El código QR que se pega en la revista ───────────────────────
+   Es la boca del buzón. Sin él, la página existe y nadie la
+   encuentra: quien lee la revista en papel no va a teclear una
+   dirección a mano. */
+function redAbrirQR() {
+  const ov = document.getElementById('red-qr-overlay');
+  const cu = document.getElementById('red-qr-cuerpo');
+  if (!ov || !cu) return;
+
+  if (typeof QR === 'undefined') {
+    cu.innerHTML = '<div class="red-buz-vacio">No se pudo cargar el generador de códigos QR.</div>';
+    ov.style.display = 'flex';
+    return;
+  }
+
+  cu.innerHTML = `
+    <div class="red-qr-caja">
+      <canvas id="red-qr-lienzo"></canvas>
+    </div>
+    <div class="red-qr-url" id="red-qr-url">${redEsc(RED_BUZON_URL)}</div>
+    <div class="red-qr-acciones">
+      <button type="button" class="red-buz-btn red-buz-btn-1" id="red-qr-bajar">
+        <i class="fa-solid fa-download"></i> Descargar para imprimir
+      </button>
+      <button type="button" class="red-buz-btn" id="red-qr-copiar">
+        <i class="fa-solid fa-copy"></i> Copiar el enlace
+      </button>
+      <button type="button" class="red-buz-btn red-buz-btn-wa" id="red-qr-wa">
+        <i class="fa-brands fa-whatsapp"></i> Mandarlo por WhatsApp
+      </button>
+    </div>
+    <div class="red-qr-guia">
+      <b>Cómo ponerlo en la revista.</b> Pégalo en un recuadro con un texto que
+      diga para qué es: «<i>¿Pasó algo en su escuela? Cuéntenoslo. Escanee y
+      escriba: una nota, una opinión, una denuncia o una sugerencia. Y si su
+      centro va a hacer algo, pida que se lo cubramos en Aulas en acción.</i>»
+      <br><br>
+      No lo hagas más chico de <b>2,5 cm</b> de lado, y déjale un margen blanco
+      alrededor: sin ese margen los teléfonos no lo encuentran. El archivo que
+      se descarga ya lo trae.
+      <br><br>
+      <b>El enlace no caduca ni cambia.</b> El número de la revista se guarda en
+      una gaveta un año, y este QR tiene que seguir funcionando cuando alguien
+      lo saque de ahí.
+    </div>`;
+  ov.style.display = 'flex';
+
+  // Corrección alta (Q, aguanta un 25% dañado) porque esto acaba
+  // fotocopiado, doblado y leído con mala luz.
+  const lienzo = document.getElementById('red-qr-lienzo');
+  QR.aCanvas(lienzo, RED_BUZON_URL, { nivel: 'Q', escala: 6, margen: 4 });
+  lienzo.style.width = '100%';
+  lienzo.style.maxWidth = '260px';
+  lienzo.style.height = 'auto';
+  lienzo.style.imageRendering = 'pixelated';   // que no lo desenfoque al escalar
+
+  document.getElementById('red-qr-bajar').addEventListener('click', () => {
+    // Grande de verdad: el que se ve en pantalla no sirve para papel.
+    const a = document.createElement('a');
+    a.href = QR.aPNG(RED_BUZON_URL, { nivel: 'Q', escala: 24, margen: 4 });
+    a.download = 'buzon-del-lector-qr.png';
+    document.body.appendChild(a); a.click(); a.remove();
+    if (typeof toast === 'function') toast('Descargado. Ya se puede pegar en la revista');
+  });
+  document.getElementById('red-qr-copiar').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(RED_BUZON_URL);
+      if (typeof toast === 'function') toast('Enlace copiado');
+    } catch (_) {
+      if (typeof toast === 'function') toast('No se pudo copiar');
+    }
+  });
+  document.getElementById('red-qr-wa').addEventListener('click', () => {
+    const movil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const texto = encodeURIComponent(redTextoInvitacion());
+    window.open(movil ? 'https://wa.me/?text=' + texto
+                      : 'https://web.whatsapp.com/send?text=' + texto, '_blank');
+  });
+}
+
+/* El mensaje con el que se reparte el buzón. NO nombra a la revista:
+   se pidió expreso, y así el mismo mensaje sirve para cualquier grupo
+   sin tener que explicar de quién es. */
+function redTextoInvitacion() {
+  return '📬 *Buzón del lector*\n' +
+    '¿Pasó algo en su escuela que merezca contarse? ¿Algo que está mal y debería saberse?\n' +
+    'Mándelo aquí: una nota, una opinión, una denuncia o una sugerencia.\n' +
+    'Y si su centro va a hacer algo, pida que se lo cubran en *Aulas en acción*.\n\n' +
+    'Se escribe desde el teléfono, en un rato, y no hay que registrarse 👇\n' +
+    RED_BUZON_URL;
+}
+
+function redCerrarQR() {
+  const ov = document.getElementById('red-qr-overlay');
+  if (ov) ov.style.display = 'none';
 }
 
 /* ── Papelera: lo borrado, entero, esperando ── */
@@ -1791,6 +2330,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('red-nueva-nota-btn')?.addEventListener('click', redNuevaNota);
   document.getElementById('red-exportar-btn')?.addEventListener('click', redExportar);
   document.getElementById('red-vaciar-papelera-btn')?.addEventListener('click', redVaciarPapelera);
+
+  // El buzón del lector
+  document.getElementById('red-qr-btn')?.addEventListener('click', redAbrirQR);
+  document.getElementById('red-buzon-close')?.addEventListener('click', redCerrarEnvio);
+  document.getElementById('red-buzon-overlay')?.addEventListener('click', e => {
+    if (e.target.id === 'red-buzon-overlay') redCerrarEnvio();
+  });
+  document.getElementById('red-qr-close')?.addEventListener('click', redCerrarQR);
+  document.getElementById('red-qr-overlay')?.addEventListener('click', e => {
+    if (e.target.id === 'red-qr-overlay') redCerrarQR();
+  });
 
   // Lápiz de la cabecera: edita la edición que se está viendo
   document.getElementById('red-ed-editar-btn')?.addEventListener('click', () => {
