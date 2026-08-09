@@ -129,7 +129,7 @@ begin
   if m.ediciones >= 10       then return 'tope';       end if;
 
   if length(txt) < 20 or length(nom) < 3 then return 'corto'; end if;
-  if cls not in ('nota', 'opinion', 'denuncia', 'sugerencia', 'aulas') then
+  if cls not in ('nota', 'opinion', 'denuncia', 'sugerencia', 'aulas', 'metas') then
     cls := 'nota';
   end if;
 

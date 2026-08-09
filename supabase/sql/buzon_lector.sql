@@ -55,7 +55,13 @@ create table if not exists public.buzon_mensajes (
   folio         text not null unique,     -- B-7K3M: lo que el lector se queda
   creado_at     timestamptz not null default now(),
 
-  -- qué manda: nota | opinion | denuncia | sugerencia | aulas
+  -- qué manda: nota | opinion | denuncia | sugerencia | aulas | metas
+  --
+  -- «metas» es la rara y por eso está anotada: NO es material de la
+  -- revista. Es alguien que leyó el número, vio que ahí se promociona
+  -- la plataforma M.E.T.A.S y quiere usarla o necesita ayuda. Cae por
+  -- la misma puerta porque es la única abierta al público, pero en la
+  -- bandeja no se convierte en nota: se llama y se ayuda.
   clase         text not null default 'nota',
   titulo        text not null default '',
   texto         text not null default '',
@@ -230,7 +236,7 @@ begin
   if hue = '' or length(nom) < 3 or length(tel_n) < 8 then return ''; end if;
   if length(txt) < 20 then return ''; end if;
   if coalesce(p_etica_ok, false) is not true then return ''; end if;
-  if cls not in ('nota', 'opinion', 'denuncia', 'sugerencia', 'aulas') then
+  if cls not in ('nota', 'opinion', 'denuncia', 'sugerencia', 'aulas', 'metas') then
     cls := 'nota';
   end if;
 

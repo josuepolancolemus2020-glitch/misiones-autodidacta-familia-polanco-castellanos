@@ -173,6 +173,17 @@ begin
   -- ════════════════════════════════════════════════════════════════
   -- 8. EL LECTOR CORRIGE LO QUE MANDÓ
   -- ════════════════════════════════════════════════════════════════
+  raise notice '── 7-bis. La puerta de M.E.T.A.S ──';
+  perform pg_temp.di('una petición de ayuda entra',
+    '' <> public.faro_buzon_enviar('maestro|33334444|quiero usar metas con mis alumnos', 'metas', '',
+      'Soy maestro de sexto y quiero usar la plataforma con mis alumnos. ¿Por dónde empiezo?',
+      'Carlos Mejía', '3333-4444', '', 'La Ceiba', 'Escuela Morazán', 'maestro',
+      null, '', '', true, '2026-08', false, '[]'::jsonb));
+  select clase into msg from public.buzon_mensajes where tel = '3333-4444';
+  perform pg_temp.di('y llega marcada como «metas», no revuelta con lo de la revista',
+    msg = 'metas');
+  delete from public.buzon_mensajes where tel = '3333-4444';
+
   raise notice '── 8. El lector corrige lo suyo ──';
   f1 := public.faro_buzon_enviar('carmen|66667777|el techo del aula gotea desde marzo', 'denuncia',
     'El techo', 'El techo del aula gotea desde marzo y los cuadernos se mojan.',

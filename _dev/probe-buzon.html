@@ -180,6 +180,8 @@ function siembra(base){
     }),
     envio(3, { clase: 'sugerencia', texto: 'Me gustaría leer más sobre los maestros jubilados.',
                estado: 'atendido', nota_id: null }),
+    envio(4, { clase: 'metas', texto: 'Soy maestro de sexto y quiero usar la plataforma con mis alumnos. ¿Por dónde empiezo?',
+               nombre: 'Carlos Mejía', tel: '3333-4444', cargo: 'maestro', escuela: 'Escuela Morazán' }),
   ];
   base.tablas.buzon_fotos = [
     { id: 91, mensaje_id: 1, orden: 1, datos: FOTO, bytes: FOTO.length },
@@ -210,8 +212,8 @@ function siembra(base){
   ok(w.eval('_redHayBuzon') === true, 'la base tiene el buzón: se activa', 'no detectó las tablas del buzón');
   const chip = w.document.querySelector('[data-ed="buzon"]');
   ok(!!chip, 'aparece el chip 📬 Buzón', 'falta el chip del buzón');
-  ok(chip && chip.textContent.includes('2'),
-     'el chip lleva la cuenta de lo que está SIN ABRIR (2 de 3)',
+  ok(chip && chip.textContent.includes('3'),
+     'el chip lleva la cuenta de lo que está SIN ABRIR (3 de 4)',
      'el chip no cuenta bien lo que está sin abrir: ' + (chip && chip.textContent.trim()));
   ok(w.document.querySelector('[data-ed="buzon"]') === w.document.querySelector('.red-ed-chip'),
      'va el primero de la fila, donde se ve sin desplazar',
@@ -238,7 +240,7 @@ function siembra(base){
   ok(lista.textContent.includes('📷 2'),
      'dice cuántas fotos trae cada envío, sin haberlas descargado',
      'no dice cuántas fotos trae');
-  ok(texto('red-ed-meta').includes('2 sin resolver'),
+  ok(texto('red-ed-meta').includes('3 sin resolver'),
      'la cabecera cuenta lo que falta por atender', 'la cabecera no cuenta bien: ' + texto('red-ed-meta'));
 
   log('── 4. Abrir un envío lo marca leído y trae sus fotos ──');
@@ -292,6 +294,30 @@ function siembra(base){
      'en la lista de la edición, la nota se marca como venida del buzón',
      'la nota no se distingue de una escrita en casa');
 
+  log('── 5-bis. Una petición de ayuda NO se convierte en nota ──');
+  await w.eval('_redEdicion = "buzon"; redRender(); redAbrirEnvio(4)');
+  await esperar(250);
+  const ayuda = w.document.getElementById('red-buzon-cuerpo');
+  ok(!w.document.getElementById('red-buz-nota'),
+     'no ofrece «Convertir en nota»: publicar la pregunta de alguien que pedía ayuda sería un despropósito',
+     'ofrece convertir en nota una petición de ayuda');
+  ok(!!w.document.getElementById('red-buz-atendido'),
+     'ofrece «Ya le respondí», que es lo que de verdad la cierra',
+     'no hay forma de cerrar una petición de ayuda: se quedaría pendiente para siempre');
+  ok(/no es para la revista/i.test(ayuda.textContent),
+     'y lo dice con todas las letras al que abre el envío',
+     'no avisa de que esto no es material de revista');
+  ok(ayuda.textContent.includes('3333-4444'),
+     'con su teléfono a la vista, que es por donde se le contesta', 'no enseña el teléfono');
+
+  const cuantasNotas = notas().length;
+  await w.eval('redEnvioEstado(_redEnvio, "atendido", "", true)');
+  await esperar(200);
+  ok(buscaEnvio(4).estado === 'atendido' && buscaEnvio(4).nota_id == null,
+     'al responderle queda atendida, y sin nota colgando', 'no quedó cerrada como se esperaba');
+  ok(notas().length === cuantasNotas, 'y no se escribió ninguna nota por el camino',
+     'se coló una nota en la revista');
+
   log('── 6. Descartar deja dicho por qué ──');
   w.prompt = () => 'No se pudo confirmar con la escuela.';
   await w.eval('_redEdicion = "buzon"; redRender(); redAbrirEnvio(2)');
@@ -301,7 +327,7 @@ function siembra(base){
   ok(buscaEnvio(2).estado === 'descartado', 'queda descartado', 'no se descartó');
   ok(/No se pudo confirmar/.test(buscaEnvio(2).motivo), 'y con la razón anotada',
      'se descartó sin dejar dicho por qué');
-  ok(envios().length === 3, 'descartar NO borra el envío', 'descartar borró la fila');
+  ok(envios().length === 4, 'descartar NO borra el envío', 'descartar borró la fila');
 
   log('── 7. El QR y lo que se reparte ──');
   await w.eval('redAbrirQR()');

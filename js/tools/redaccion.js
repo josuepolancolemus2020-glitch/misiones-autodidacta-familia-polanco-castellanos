@@ -825,6 +825,13 @@ const RED_BUZON_CLASES = {
   denuncia:   { ic: '⚠️', t: 'Denuncia',           sec: 'REPORTE INVESTIGATIVO', tipo: 'Reporte' },
   sugerencia: { ic: '💡', t: 'Sugerencia',         sec: 'AVISOS',                tipo: 'Idea' },
   aulas:      { ic: '🏫', t: 'Aulas en acción',    sec: 'AULAS EN ACCIÓN',       tipo: 'Reporte' },
+  // La rara, y por eso lleva `ayuda`: NO es material de la revista. Es
+  // alguien que la leyó, vio que ahí se promociona M.E.T.A.S y quiere
+  // usarla o necesita que le echen una mano. Cae por la misma puerta
+  // porque es la única abierta al público, pero aquí no se convierte en
+  // nota: se le escribe. Convertir esto en una nota sería publicar la
+  // pregunta de alguien que solo quería ayuda.
+  metas:      { ic: '🎓', t: 'Ayuda con M.E.T.A.S', sec: 'AVISOS',               tipo: 'Idea', ayuda: true },
 };
 function redClase(id) { return RED_BUZON_CLASES[id] || RED_BUZON_CLASES.nota; }
 
@@ -960,6 +967,13 @@ function redPintarEnvio(m, fotos) {
       <span class="red-buz-fecha">Recibido el ${redFechaLarga(String(m.creado_at || '').slice(0, 10))}</span>
     </div>
 
+    ${c.ayuda ? `
+    <div class="red-buz-aviso red-buz-aviso-ayuda">
+      🎓 <b>Esto no es para la revista.</b> Es alguien que quiere usar M.E.T.A.S
+      o que necesita ayuda con ella. Lo que hace falta aquí es <b>escribirle</b>,
+      no escribir una nota. La revista lo promociona: si esta persona no recibe
+      respuesta, la promoción no sirvió de nada.
+    </div>` : ''}
     ${redAvisoCorregido(m)}
     ${m.titulo ? `<div class="red-buz-tit">${redEsc(m.titulo)}</div>` : ''}
     <div class="red-buz-texto">${redEsc(m.texto || '').replace(/\n/g, '<br>')}</div>
@@ -1019,10 +1033,14 @@ function redPintarEnvio(m, fotos) {
       <button type="button" class="red-buz-btn red-buz-btn-wa" id="red-buz-wa">
         <i class="fa-brands fa-whatsapp"></i> Escribirle
       </button>
-      ${notaHecha ? '' : `
+      ${(notaHecha || c.ayuda) ? '' : `
       <button type="button" class="red-buz-btn red-buz-btn-1" id="red-buz-nota">
         <i class="fa-solid fa-pen-nib"></i> Convertir en nota
       </button>`}
+      ${(c.ayuda && m.estado !== 'atendido') ? `
+      <button type="button" class="red-buz-btn red-buz-btn-1" id="red-buz-atendido">
+        <i class="fa-solid fa-check"></i> Ya le respondí
+      </button>` : ''}
       ${m.estado === 'descartado' ? '' : `
       <button type="button" class="red-buz-btn" id="red-buz-descartar">
         <i class="fa-solid fa-ban"></i> Descartar
@@ -1040,6 +1058,12 @@ function redPintarEnvio(m, fotos) {
   document.getElementById('red-buz-wa')?.addEventListener('click', () => redEscribirLector(m));
   document.getElementById('red-buz-nota')?.addEventListener('click', () => redBuzonANota(m, fotos.length));
   document.getElementById('red-buz-descartar')?.addEventListener('click', () => redDescartarEnvio(m));
+  document.getElementById('red-buz-atendido')?.addEventListener('click', async () => {
+    // Sin nota de por medio: aquí «atendido» quiere decir «ya le
+    // escribí». Si no existiera este botón, una petición de ayuda
+    // resuelta se quedaría contando como pendiente para siempre.
+    if (await redEnvioEstado(m, 'atendido', '', true)) redCerrarEnvio();
+  });
   document.getElementById('red-buz-ir-nota')?.addEventListener('click', () => {
     redCerrarEnvio();
     redOpenEditor(m.nota_id);
@@ -1094,11 +1118,15 @@ function redEscribirLector(m) {
   const c = redClase(m.clase);
   const tel = String(m.tel || '').replace(/\D/g, '');
   if (!tel) { if (typeof toast === 'function') toast('Este envío no trae teléfono'); return; }
-  const texto =
-    `Buenas${m.nombre ? ', ' + String(m.nombre).split(' ')[0] : ''}. Le escribo de la revista: ` +
-    `recibimos lo que nos mandó por el buzón del lector (folio ${m.folio}), ` +
-    `sobre «${(m.titulo || redPlano(m.texto) || '').trim().slice(0, 60)}». ` +
-    `Quería confirmar unos datos con usted antes de publicarlo.`;
+  const nombre = m.nombre ? ', ' + String(m.nombre).split(' ')[0] : '';
+  const texto = c.ayuda
+    ? `Buenas${nombre}. Le escribo por M.E.T.A.S: nos llegó su mensaje pidiendo ` +
+      `información y aquí estoy para lo que necesite. ¿Le sirve que le cuente por ` +
+      `aquí cómo empezar, o prefiere que hablemos?`
+    : `Buenas${nombre}. Le escribo de la revista: ` +
+      `recibimos lo que nos mandó por el buzón del lector (folio ${m.folio}), ` +
+      `sobre «${(m.titulo || redPlano(m.texto) || '').trim().slice(0, 60)}». ` +
+      `Quería confirmar unos datos con usted antes de publicarlo.`;
   const movil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   // Honduras es +504. Un número de ocho dígitos sin código no abre el
   // chat: WhatsApp lo da por inválido y no dice por qué.

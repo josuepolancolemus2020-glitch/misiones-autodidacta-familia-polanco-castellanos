@@ -15,7 +15,8 @@ lee la revista escanea un **código QR impreso en sus páginas** y manda
 - 💬 una **opinión** — su carta al director, con su nombre;
 - ⚠️ una **denuncia** — algo que está mal y debería saberse;
 - 💡 una **sugerencia** — para que la revista salga mejor;
-- 🏫 una petición de **cobertura** para la sección **Aulas en acción**.
+- 🏫 una petición de **cobertura** para la sección **Aulas en acción**;
+- 🎓 o **ayuda con M.E.T.A.S**, que es la rara y va aparte (ver abajo).
 
 Con una o dos fotos. Lo que manda cae en Redacción, en su propia
 bandeja (📬 Buzón), y desde ahí se convierte en nota de la edición que
@@ -46,6 +47,11 @@ sin explicar de quién es. Lo comprueban las dos sondas.
 Supabase → SQL Editor → pegar supabase/sql/buzon_lector.sql → Run
 Supabase → SQL Editor → pegar supabase/sql/buzon_editar.sql → Run
 ```
+
+⚠️ Si ya se corrieron antes, **hay que volver a correrlos**: la sexta
+puerta (🎓 ayuda con M.E.T.A.S) añadió su clase a las dos funciones.
+Mientras no se re-corran, esas peticiones llegan etiquetadas como
+«nota» y se mezclan con el material de la revista.
 
 Son **dos archivos y en ese orden**. El segundo es el que deja al lector
 corregir lo que mandó; sin él el buzón funciona, pero quien se equivoca en
@@ -125,6 +131,37 @@ la falta de las tablas no rompe nada.
    mañana cambian los requisitos, la fila sigue diciendo cuáles firmó
    **ese** lector. Un reclamo dentro de un año se resuelve mirando el
    dato en vez de la memoria de alguien.
+
+## La sexta puerta: 🎓 ayuda con M.E.T.A.S
+
+**No es material de la revista, y por eso lleva su propio camino
+entero.** La revista promociona la plataforma en sus páginas; hasta
+ahora, el maestro que la veía y se interesaba no tenía dónde tocar. Un
+maestro que quiere usarla con sus alumnos y no encuentra a quién
+preguntarle, no vuelve.
+
+Cae por la misma puerta porque es la única abierta al público, pero se
+comporta distinto en los tres sitios:
+
+- **En la pantalla del lector** no le piden título (no va a publicarse) y
+  no se le enseñan las cinco condiciones de lo que se publica: «sin
+  insultos», «cuidado con los niños»… son normas que no le tocan y que
+  ahí solo asustan. Se le pide lo único que importa: **permiso para
+  contactarle**. Y al terminar se le da el enlace para entrar a mirarla
+  ya mismo, en vez de la fecha de cierre de la revista.
+- **En la bandeja** no aparece el botón de convertir en nota —publicar la
+  pregunta de alguien que pedía ayuda sería un despropósito— y sí uno de
+  **«Ya le respondí»**, que es lo que de verdad la cierra. Sin él, una
+  petición resuelta se quedaría contando como pendiente para siempre.
+- **El mensaje de WhatsApp** que se le manda no habla de folios ni de
+  confirmar datos para publicar: se presenta y se ofrece a ayudar.
+
+En el servidor es una `clase` más (`metas`), y ahí está el detalle que
+puede morder: `faro_buzon_enviar` convierte en `'nota'` cualquier clase
+que no conozca. Si se añade una puerta a la pantalla y **no** se añade
+su clase a las dos funciones del SQL, los envíos llegan en silencio
+etiquetados como material de revista y se mezclan con lo que sí se
+publica.
 
 ## El código QR se genera aquí, sin librerías
 

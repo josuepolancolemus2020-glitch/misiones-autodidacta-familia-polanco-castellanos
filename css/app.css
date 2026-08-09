@@ -3319,6 +3319,7 @@ body {
 }
 .red-buz-aviso-tarde { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
 .red-buz-aviso-ok    { background: #f0fdf4; border-color: #86efac; color: #15803d; }
+.red-buz-aviso-ayuda { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
 .red-buz-enlace {
   background: none; border: 0; padding: 0 0 0 4px; font-family: inherit;
   font-size: 12.5px; font-weight: 800; color: #0f766e; text-decoration: underline; cursor: pointer;
