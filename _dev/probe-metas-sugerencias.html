@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Sugerencias de M.E.T.A.S</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de la bandeja de SUGERENCIAS DE M.E.T.A.S.
+
+   Lo que cae aquí lo escribió un alumno o un maestro dentro de una
+   misión, casi siempre para avisar de que algo está mal. Eso cambia lo
+   que puede salir mal, y es lo que se comprueba:
+
+   1. QUE SE VEA QUE HAY ALGO SIN LEER, SIN ENTRAR. Este botón lleva
+      años existiendo y sus mensajes no los leyó nadie nunca. Si la
+      bandeja hay que recordar abrirla, volvemos al mismo sitio con más
+      código. Por eso la insignia de la portada es una comprobación y no
+      un adorno: se pinta con una consulta que NO baja filas.
+
+   2. QUE SE PUEDA IR A MIRAR EL ERROR. La sugerencia dice «la pregunta
+      3 está mala». Sin el enlace exacto a esa página hay que buscar la
+      misión entre más de sesenta, y eso es justo el paso donde el
+      arreglo se pospone.
+
+   3. QUE NADIE SE QUEDE SIN ATENDER. Abrirla la pasa a leída; atenderla
+      la cierra y apunta qué se hizo. Si el contador miente, se abre tres
+      veces lo mismo y otra se queda esperando para siempre.
+
+   4. QUE LO QUE MANDÓ UN NIÑO SE LEA ENTERO. En la lista va recortado a
+      130 letras; en el detalle, completo. Un mensaje cortado por la
+      mitad es un aviso que no se entiende.
+
+   5. QUE LA BASE VIEJA SIGA FUNCIONANDO. Mientras no se corra
+      metas_sugerencias.sql la tabla no existe. La herramienta tiene que
+      decir qué falta —desde una tableta no se puede averiguar— y la
+      insignia de la portada no puede quedarse enseñando un cero.
+
+   Como en las demás sondas: aquí no se lee el código, se ejecuta el
+   index.html de verdad con una base de datos de mentira a nivel de
+   fetch. El cliente de Supabase es el auténtico. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── La base de datos de mentira ────────────────────────────────────
+   Contesta como PostgREST a lo justo que usa la herramienta, y guarda
+   cada consulta para poder afirmar «esto fue un PATCH» o «esto contó
+   sin bajar filas». */
+function nuevaBase(w, opciones){
+  const estado = {
+    tablas: { metas_sugerencias: [] },
+    llamadas: [],
+    sinTabla: !!(opciones && opciones.sinTabla),
+  };
+  const filtra = (filas, params) => filas.filter(fila =>
+    [...params.entries()].every(([col, val]) => {
+      if (['select','order','limit','offset'].includes(col)) return true;
+      if (val.startsWith('eq.')) return String(fila[col]) === val.slice(3);
+      return true;
+    }));
+
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url);
+    if (!u.pathname.startsWith('/rest/v1/')) return new Response('{}', { status: 200 });
+
+    const tabla  = u.pathname.replace('/rest/v1/', '');
+    const params = u.searchParams;
+    const metodo = (init && init.method) || 'GET';
+    const cuerpo = (init && init.body) ? JSON.parse(init.body) : null;
+    const cabs   = new Headers((init && init.headers) || {});
+    estado.llamadas.push({ tabla, metodo, params: u.search, cuerpo,
+                           prefer: cabs.get('Prefer') || '' });
+
+    const json = (dato, status, cabeceras) => new Response(
+      metodo === 'HEAD' ? null : JSON.stringify(dato),
+      { status: status || 200,
+        headers: Object.assign({ 'Content-Type': 'application/json' }, cabeceras || {}) });
+
+    /* La base vieja: la tabla todavía no existe */
+    if (estado.sinTabla && tabla === 'metas_sugerencias') {
+      return json({ code: '42P01', message: 'relation "public.metas_sugerencias" does not exist' }, 404);
+    }
+
+    const filas = estado.tablas[tabla] || [];
+
+    /* Contar sin bajar filas: es lo que hace la insignia de la portada.
+       PostgREST lo contesta en la cabecera content-range. */
+    if (metodo === 'HEAD') {
+      const n = filtra(filas, params).length;
+      return json(null, 200, { 'content-range': '*/' + n });
+    }
+    if (metodo === 'GET') {
+      let r = filtra(filas, params);
+      const orden = params.get('order');
+      if (orden) {
+        const [col, dir] = orden.split('.');
+        r = [...r].sort((a, b) => String(a[col]).localeCompare(String(b[col])) * (dir === 'desc' ? -1 : 1));
+      }
+      const lim = params.get('limit');
+      if (lim) r = r.slice(0, Number(lim));
+      return json(r);
+    }
+    if (metodo === 'PATCH') {
+      filtra(filas, params).forEach(fila => Object.assign(fila, cuerpo));
+      return json([]);
+    }
+    return json([]);
+  };
+  return estado;
+}
+
+const HOY = new Date();
+const haceHoras = h => new Date(HOY.getTime() - h * 3600000).toISOString();
+const haceDias  = d => new Date(HOY.getTime() - d * 86400000).toISOString();
+
+function siembra(base){
+  const sug = (id, extra) => Object.assign({
+    id, evento_id: 'E-' + id, creado_at: haceHoras(id), escrito_at: haceHoras(id),
+    categoria: 'idea', texto: 'Un mensaje cualquiera desde una misión.',
+    mision: '2y3ciclo-adjetivos', mision_titulo: 'Los Adjetivos', seccion: 'quiz',
+    url: '/misiones/2y3ciclo-adjetivos/adjetivos-II-IIICiclo.html',
+    alumno: '', grado: '', escuela: '', docente: '', codigo_aula: '',
+    dispositivo: 'D-AB12CD', estado: 'nuevo', respuesta: '', visto_por: '', visto_at: null,
+  }, extra || {});
+
+  base.tablas.metas_sugerencias = [
+    sug(1, {
+      categoria: 'error_contenido',
+      texto: 'En la pregunta 3 de la evaluación dice que «rápido» es adjetivo y ahí es adverbio. ' +
+             'Mi maestra dijo que estaba mal y por eso lo escribo, porque a mí me lo puso malo en el examen.',
+      alumno: 'Ana López', grado: '6º-1', escuela: 'Escuela Lempira',
+      docente: 'Prof. Josué', codigo_aula: 'K2M9P', seccion: 'eval',
+    }),
+    sug(2, {
+      categoria: 'error_tecnico', texto: 'El cronómetro de la lectura no se detiene al minuto.',
+      mision: '1ciclo-segundo-grado', mision_titulo: 'Números Grandes', seccion: 'lectura',
+      url: '/misiones/1ciclo-segundo-grado/numeros-hasta-999.html',
+      /* Escrita sin señal hace cinco días y recibida hoy: el que atiende
+         tiene que enterarse de que la errata lleva ahí desde entonces. */
+      escrito_at: haceDias(5), creado_at: haceHoras(2),
+    }),
+    sug(3, { categoria: 'felicitacion', texto: 'Me gustó mucho la misión, gracias.',
+             estado: 'atendido', respuesta: 'Contestado.', visto_por: 'Josué Edmundo' }),
+    sug(4, { categoria: 'idea', texto: 'Estaría bueno que hubiera una misión de fracciones.',
+             estado: 'leido' }),
+  ];
+}
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);                 // que arranque el index de verdad
+  const w = f.contentWindow;
+
+  if (w.eval('typeof initMetasSug') !== 'function') {
+    log('✘ index.html no cargó js/tools/metas-sugerencias.js');
+    document.title = 'SONDA-SUSPENDE'; return;
+  }
+  /* La sonda no pasa por la puerta: llama a la herramienta directamente,
+     como las demás. Pero sí hace falta que haya alguien «dentro», porque
+     quien atiende queda apuntado en la fila. */
+  w.eval('window.verificarSesion = () => ({ user: "josue", nombre: "Josué Edmundo" })');
+
+  const base = nuevaBase(w, {});
+  siembra(base);
+  const fila = id => base.tablas.metas_sugerencias.find(s => s.id === id);
+  const texto = id => (w.document.getElementById(id) || {}).textContent || '';
+
+  log('── 1. La portada avisa de que hay algo sin leer ──');
+  await w.eval('msugContarSinAbrir()');
+  await esperar(200);
+  const ins = w.document.getElementById('msug-badge');
+  ok(!!ins, 'la tarjeta del Acceso Rápido tiene su insignia', 'falta la insignia en la portada');
+  ok(ins && ins.style.display !== 'none' && ins.textContent.trim() === '2',
+     'y dice cuántas están sin abrir (2 de 4)',
+     'la insignia no cuenta bien lo sin abrir: ' + (ins && ins.textContent.trim()));
+  const conteo = base.llamadas.filter(l => l.tabla === 'metas_sugerencias').pop();
+  ok(conteo && conteo.metodo === 'HEAD',
+     'y lo cuenta SIN bajar ni una fila: la portada no arrastra la bandeja',
+     'la portada se está trayendo las sugerencias enteras para pintar un número');
+
+  log('── 2. La bandeja pone delante lo que falta por hacer ──');
+  await w.eval('initMetasSug()');
+  await esperar(250);
+  const lista = w.document.getElementById('msug-list');
+  const orden = [...lista.querySelectorAll('.msug-fila')].map(b => Number(b.dataset.sug));
+  ok(orden.length === 3, 'de entrada solo enseña las que están sin resolver (3 de 4)',
+     'la bandeja abre con lo que no toca: ' + orden);
+  ok(!orden.includes(3), 'lo ya atendido no estorba', 'una atendida se cuela entre las pendientes');
+  ok(texto('msug-count').includes('3 sin resolver'),
+     'la cabecera cuenta lo que falta por atender', 'la cabecera no cuenta bien: ' + texto('msug-count'));
+  ok(lista.querySelectorAll('.msug-fila-nueva').length === 2,
+     'lo que nadie ha abierto se distingue de lo ya leído',
+     'no se ve cuáles están sin abrir');
+  ok(lista.textContent.includes('Los Adjetivos') && lista.textContent.includes('Números Grandes'),
+     'cada fila dice de qué misión habla, sin abrirla',
+     'la lista no dice de qué misión es cada mensaje');
+
+  log('── 3. Se puede ir a mirar el error, de un toque ──');
+  await w.eval('msugAbrir(1)');
+  await esperar(250);
+  const cuerpo = w.document.getElementById('msug-det-cuerpo');
+  const ir = cuerpo.querySelector('.msug-det-ir');
+  ok(!!ir, 'el detalle trae el botón para abrir la misión', 'no hay forma de ir a la misión');
+  ok(ir && ir.getAttribute('href') ===
+      'https://metas.policastsapien.com/misiones/2y3ciclo-adjetivos/adjetivos-II-IIICiclo.html',
+     'y lleva a la PÁGINA exacta, no a la carpeta (las misiones no se llaman index.html)',
+     'el enlace no apunta a la página de la misión: ' + (ir && ir.getAttribute('href')));
+  ok(ir && ir.getAttribute('target') === '_blank',
+     'se abre aparte, para no perder la bandeja a medio revisar', 'el enlace se lleva la bandeja');
+
+  log('── 4. El mensaje se lee entero, y con su contexto ──');
+  ok(cuerpo.textContent.includes('me lo puso malo en el examen'),
+     'el texto va completo, no recortado como en la lista', 'el mensaje sale cortado en el detalle');
+  ok(cuerpo.textContent.includes('Ana López') && cuerpo.textContent.includes('6º-1') &&
+     cuerpo.textContent.includes('Escuela Lempira'),
+     'se ve quién escribió, de qué grado y de qué escuela', 'no se ve quién escribió');
+  ok(cuerpo.textContent.includes('Evaluación'),
+     'y en qué sección de la misión estaba, en palabras y no en clave',
+     'la sección sale como identificador crudo o no sale');
+
+  log('── 5. Abrirla la marca leída ──');
+  ok(fila(1).estado === 'leido', 'abrirla la pasa a leída',
+     'abrirla no la marcó: el contador miente y se vuelve a abrir lo mismo');
+  const patch = base.llamadas.filter(l => l.tabla === 'metas_sugerencias' && l.metodo === 'PATCH').pop();
+  ok(!!patch, 'se guardó con un PATCH, no borrando y reescribiendo', 'no se guardó el estado');
+  ok(w.document.getElementById('msug-badge').textContent.trim() === '1',
+     'y la insignia de la portada baja en el acto', 'la insignia se quedó con el número viejo');
+
+  log('── 6. Un mensaje que tardó días en llegar lo dice ──');
+  await w.eval('msugCerrarDetalle(); msugAbrir(2)');
+  await esperar(250);
+  const cuerpo2 = w.document.getElementById('msug-det-cuerpo');
+  ok(/5 días antes de poder mandarse/.test(cuerpo2.textContent),
+     'avisa de que se escribió cinco días antes, sin internet',
+     'no avisa del desfase: la errata lleva cinco días viva y parece de hoy');
+
+  log('── 7. Atenderla la cierra y deja apuntado qué se hizo ──');
+  w.document.getElementById('msug-det-respuesta').value = 'Corregido el cronómetro y publicado.';
+  cuerpo2.querySelector('[data-accion="atendido"]').click();
+  await esperar(300);
+  ok(fila(2).estado === 'atendido', 'queda atendida', 'no quedó atendida');
+  ok(fila(2).respuesta === 'Corregido el cronómetro y publicado.',
+     'y con qué se hizo apuntado en su fila',
+     'no se guardó lo que se hizo: dentro de un mes nadie se acuerda');
+  ok(fila(2).visto_por === 'Josué Edmundo', 'y quién la atendió',
+     'no consta quién la atendió');
+  ok(w.document.getElementById('msug-overlay').style.display === 'none',
+     'se cierra sola, para seguir con la siguiente', 'se queda abierta después de atender');
+  ok(!texto('msug-list').includes('cronómetro'),
+     'y sale de la lista de pendientes', 'sigue apareciendo entre las pendientes');
+  ok(texto('msug-count').includes('2 sin resolver'),
+     'la cuenta baja a 2', 'la cuenta no bajó: ' + texto('msug-count'));
+
+  log('── 8. Nada de esto se pierde: se puede reabrir ──');
+  w.eval('_msugFiltro = "cerradas"; msugRender()');
+  await esperar(150);
+  ok(texto('msug-list').includes('cronómetro'),
+     'lo resuelto sigue consultable en su pestaña', 'lo atendido desapareció');
+  await w.eval('msugAbrir(2)');
+  await esperar(200);
+  const cuerpo3 = w.document.getElementById('msug-det-cuerpo');
+  ok(!!cuerpo3.querySelector('[data-accion="leido"]'),
+     'y se puede devolver a pendientes si el arreglo no era tal',
+     'una vez atendida no hay vuelta atrás');
+  w.eval('msugCerrarDetalle()');
+
+  log('── 9. Con la base vieja no revienta: dice qué falta ──');
+  const f2 = document.createElement('iframe');
+  f2.src = '/index.html'; f2.style.cssText = 'position:absolute;left:-9999px;width:380px;height:640px';
+  document.body.appendChild(f2);
+  await new Promise(r => f2.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w2 = f2.contentWindow;
+  nuevaBase(w2, { sinTabla: true });
+  await w2.eval('initMetasSug()');
+  await esperar(300);
+  const l2 = w2.document.getElementById('msug-list').textContent;
+  ok(/todav[íi]a no est[áa] instalada/i.test(l2),
+     'la herramienta dice que falta instalarla', 'no explica nada: solo una pantalla en blanco');
+  ok(l2.includes('metas_sugerencias.sql'),
+     'y nombra el archivo que hay que correr (desde una tableta no se adivina)',
+     'no dice qué archivo hay que correr');
+  await w2.eval('msugContarSinAbrir()');
+  await esperar(200);
+  const ins2 = w2.document.getElementById('msug-badge');
+  ok(ins2 && ins2.style.display === 'none',
+     'y la portada no enseña una insignia de una bandeja que no existe',
+     'la portada enseña insignia sin tabla detrás');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SONDA-SUSPENDE';
+});
+</script>
+</body>
+</html>

@@ -37,6 +37,47 @@ Se pega **el archivo completo**, no un trozo. Son idempotentes a
 propósito: correrlos dos veces no rompe nada, y un recorte pegado a
 medias sí.
 
+## Normativa: las Sugerencias de M.E.T.A.S se atienden aquí
+
+Dentro de cada misión de M.E.T.A.S hay un botón **💬 Sugerencias**. Lo
+toca un alumno o un maestro cuando encuentra una errata, algo que no
+funciona o se le ocurre algo. Esos mensajes caen en F.A.R.O y **este es
+el único sitio donde se leen**: la herramienta 💬 **Sugerencias
+M.E.T.A.S** del Acceso Rápido (`js/tools/metas-sugerencias.js`, tabla en
+`supabase/sql/metas_sugerencias.sql`).
+
+Es el mismo reparto que el Buzón del lector: la pantalla pública vive en
+M.E.T.A.S, que es lo que la gente puede abrir, y lo recogido cae en la
+aplicación privada, que es donde se atiende. El otro extremo del cable
+es `js/metas-sugerencias.js`, en el repositorio de M.E.T.A.S.
+
+**Tres reglas, y ninguna es de adorno:**
+
+1. **Va en el Acceso Rápido y con contador a la vista.** Este botón
+   existía desde hacía años y sus mensajes no los leyó nadie nunca: se
+   guardaban en el teléfono de quien escribía. Si ahora la bandeja hay
+   que acordarse de abrirla, volvemos al mismo sitio con más código. La
+   insignia se pinta con una consulta que **no baja ni una fila**, para
+   que la portada no arrastre la bandeja entera al arrancar.
+2. **Desde la bandeja se va a la misión de un toque.** La sugerencia
+   trae la dirección exacta de su página. Sin ese enlace, arreglar una
+   errata empieza por buscar la misión entre más de sesenta.
+3. **Atender deja apuntado qué se hizo, y quién.** Dentro de un mes
+   nadie se acuerda. Y lo atendido se puede devolver a pendientes: a
+   veces el arreglo no era tal.
+
+Quien escribe **no necesita identificarse** y muchas veces no lo hace.
+Está bien: un «la pregunta 3 tiene mala la respuesta» sin firma vale
+exactamente igual, y pedirle credenciales a un niño para avisar de una
+errata mata el aviso.
+
+**Antes de publicar un cambio de la bandeja:**
+
+```
+node _dev/servidor-estatico.js      (en otra terminal)
+_dev/probe-metas-sugerencias.html   (en el navegador)
+```
+
 ## Sellar la versión en cada cambio
 
 El aparato guarda la aplicación en caché y se queda con la versión vieja.
