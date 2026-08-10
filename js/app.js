@@ -201,6 +201,15 @@ function renderHome() {
   // Módulos
   renderModules();
 
+  /* Contador de sugerencias de M.E.T.A.S sin abrir, en su tarjeta del
+     Acceso Rápido. Es una consulta de solo contar, sin bajar ni una
+     fila; si el SQL todavía no se ha corrido, la insignia simplemente
+     no aparece y nadie se entera.
+     Se pinta desde aquí porque renderHome se vuelve a llamar cuando la
+     sesión termina de restaurarse (ver aplicarSesion en auth.js), que
+     es el primer momento en que la base contesta algo. */
+  if (typeof msugContarSinAbrir === 'function') msugContarSinAbrir();
+
   // Misión destacada
   const m    = featuredMission(ms);
   const done = ms.visited.includes(m.id);
@@ -654,6 +663,7 @@ function switchView(id) {
   if (id === 'view-redaccion' && typeof initRedaccion === 'function') initRedaccion();
   if (id === 'view-antena' && typeof initAntena === 'function') initAntena();
   if (id === 'view-boveda' && typeof initBoveda === 'function') initBoveda();
+  if (id === 'view-msug' && typeof initMetasSug === 'function') initMetasSug();
 
   // El FAB de Destellos vive en toda la app, excepto en el Chat
   // (estorbaría sobre la barra de escritura) y el editor de Redacción

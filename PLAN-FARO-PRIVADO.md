@@ -70,6 +70,17 @@ Zone → Make private.
      tiene dónde caer. **Y detrás, `supabase/sql/buzon_editar.sql`**, que es
      el que deja al lector corregir lo que mandó sin dejar dos envíos casi
      iguales en la bandeja. El porqué de todo, en `BUZON-DEL-LECTOR.md`.
+   · ⚠️ **Correr `supabase/sql/metas_sugerencias.sql`** en el SQL Editor. Es un
+     solo archivo, no depende de ningún otro salvo de `es_familia()` —que ya
+     está— y crea la tabla donde caen las sugerencias que la gente escribe
+     dentro de las misiones de M.E.T.A.S, con su única puerta pública, que solo
+     escribe. Hasta que se corra, la herramienta 💬 **Sugerencias M.E.T.A.S**
+     del Acceso Rápido dice que falta instalarla y la insignia de la portada no
+     aparece (está probado que la falta de la tabla no rompe nada), pero **lo
+     que la gente escriba desde las misiones se queda esperando en su teléfono
+     y no llega**. El archivo trae al final las seis comprobaciones para pegar
+     después, y la quinta es la que importa: desde la calle la tabla tiene que
+     devolver **cero filas**.
    · ⚠️ **Ponerle freno a `faro_buzon_retirar` y `faro_buzon_mio`.** Salió al
      revisar la seguridad del buzón el 8 de agosto de 2026, y está desde el
      primer archivo. `faro_buzon_enviar` sí tiene freno (cinco al día por
