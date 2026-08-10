@@ -150,6 +150,20 @@ function siembra(base){
              estado: 'atendido', respuesta: 'Contestado.', visto_por: 'Josué Edmundo' }),
     sug(4, { categoria: 'idea', texto: 'Estaría bueno que hubiera una misión de fracciones.',
              estado: 'leido' }),
+    /* El envío envenenado. NO es un caso rebuscado: la puerta de entrada
+       está abierta a anónimos a propósito y la clave publicable va en el
+       código de M.E.T.A.S, que lee cualquiera, así que mandar esta fila
+       a mano es trivial. Lo que persigue es que el administrador abra la
+       sugerencia —lo único que se puede hacer con ella— y que el
+       JavaScript de otro corra DENTRO de F.A.R.O con la sesión puesta. */
+    sug(5, {
+      categoria: 'error_contenido',
+      texto: 'Hay una errata en la pregunta 2, mira la mision.',
+      mision: 'x" onmouseover="window.__COLADO=1" a="',
+      mision_titulo: '<img src=x onerror="window.__COLADO=1">',
+      url: '/x.html" onmouseover="window.__COLADO=1" z="',
+      alumno: '<b>Nombre con etiquetas</b>',
+    }),
   ];
 }
 
@@ -172,13 +186,21 @@ function siembra(base){
   const fila = id => base.tablas.metas_sugerencias.find(s => s.id === id);
   const texto = id => (w.document.getElementById(id) || {}).textContent || '';
 
+  /* Las cuentas salen de la siembra, no escritas a mano. Con números
+     fijos, añadir un caso nuevo a la siembra hacía fallar media sonda
+     por motivos que no tienen nada que ver con lo que se está
+     comprobando, y eso enseña a ignorar los fallos. */
+  const TODAS    = base.tablas.metas_sugerencias.slice();
+  const NUEVAS   = TODAS.filter(s => s.estado === 'nuevo').length;
+  const ABIERTAS = TODAS.filter(s => s.estado === 'nuevo' || s.estado === 'leido').length;
+
   log('── 1. La portada avisa de que hay algo sin leer ──');
   await w.eval('msugContarSinAbrir()');
   await esperar(200);
   const ins = w.document.getElementById('msug-badge');
   ok(!!ins, 'la tarjeta del Acceso Rápido tiene su insignia', 'falta la insignia en la portada');
-  ok(ins && ins.style.display !== 'none' && ins.textContent.trim() === '2',
-     'y dice cuántas están sin abrir (2 de 4)',
+  ok(ins && ins.style.display !== 'none' && ins.textContent.trim() === String(NUEVAS),
+     `y dice cuántas están sin abrir (${NUEVAS} de ${TODAS.length})`,
      'la insignia no cuenta bien lo sin abrir: ' + (ins && ins.textContent.trim()));
   const conteo = base.llamadas.filter(l => l.tabla === 'metas_sugerencias').pop();
   ok(conteo && conteo.metodo === 'HEAD',
@@ -190,12 +212,13 @@ function siembra(base){
   await esperar(250);
   const lista = w.document.getElementById('msug-list');
   const orden = [...lista.querySelectorAll('.msug-fila')].map(b => Number(b.dataset.sug));
-  ok(orden.length === 3, 'de entrada solo enseña las que están sin resolver (3 de 4)',
+  ok(orden.length === ABIERTAS,
+     `de entrada solo enseña las que están sin resolver (${ABIERTAS} de ${TODAS.length})`,
      'la bandeja abre con lo que no toca: ' + orden);
   ok(!orden.includes(3), 'lo ya atendido no estorba', 'una atendida se cuela entre las pendientes');
-  ok(texto('msug-count').includes('3 sin resolver'),
+  ok(texto('msug-count').includes(`${ABIERTAS} sin resolver`),
      'la cabecera cuenta lo que falta por atender', 'la cabecera no cuenta bien: ' + texto('msug-count'));
-  ok(lista.querySelectorAll('.msug-fila-nueva').length === 2,
+  ok(lista.querySelectorAll('.msug-fila-nueva').length === NUEVAS,
      'lo que nadie ha abierto se distingue de lo ya leído',
      'no se ve cuáles están sin abrir');
   ok(lista.textContent.includes('Los Adjetivos') && lista.textContent.includes('Números Grandes'),
@@ -230,7 +253,7 @@ function siembra(base){
      'abrirla no la marcó: el contador miente y se vuelve a abrir lo mismo');
   const patch = base.llamadas.filter(l => l.tabla === 'metas_sugerencias' && l.metodo === 'PATCH').pop();
   ok(!!patch, 'se guardó con un PATCH, no borrando y reescribiendo', 'no se guardó el estado');
-  ok(w.document.getElementById('msug-badge').textContent.trim() === '1',
+  ok(w.document.getElementById('msug-badge').textContent.trim() === String(NUEVAS - 1),
      'y la insignia de la portada baja en el acto', 'la insignia se quedó con el número viejo');
 
   log('── 6. Un mensaje que tardó días en llegar lo dice ──');
@@ -255,8 +278,8 @@ function siembra(base){
      'se cierra sola, para seguir con la siguiente', 'se queda abierta después de atender');
   ok(!texto('msug-list').includes('cronómetro'),
      'y sale de la lista de pendientes', 'sigue apareciendo entre las pendientes');
-  ok(texto('msug-count').includes('2 sin resolver'),
-     'la cuenta baja a 2', 'la cuenta no bajó: ' + texto('msug-count'));
+  ok(texto('msug-count').includes(`${ABIERTAS - 1} sin resolver`),
+     `la cuenta baja a ${ABIERTAS - 1}`, 'la cuenta no bajó: ' + texto('msug-count'));
 
   log('── 8. Nada de esto se pierde: se puede reabrir ──');
   w.eval('_msugFiltro = "cerradas"; msugRender()');
@@ -271,7 +294,54 @@ function siembra(base){
      'una vez atendida no hay vuelta atrás');
   w.eval('msugCerrarDetalle()');
 
-  log('── 9. Con la base vieja no revienta: dice qué falta ──');
+  log('── 9. Un envío envenenado no ejecuta nada dentro de la casa ──');
+  /* Esto es lo más caro de todo el archivo y por eso va aparte. Lo que
+     cae en esta bandeja lo escribió alguien de la calle. Si su
+     JavaScript llegase a correr aquí, correría con la sesión de la
+     familia puesta: alcanzaría la Bóveda, las finanzas, el chat y los
+     teléfonos del Buzón del lector, que son de gente a la que se le
+     prometió que no se publican. Y bastaría con ABRIR la sugerencia
+     para triarla, que es justo lo que hay que hacer con ella. */
+  w.__COLADO = undefined;
+  w.eval('_msugFiltro = "todas"; _msugCat = ""; msugRender()');
+  await esperar(150);
+  await w.eval('msugAbrir(5)');
+  await esperar(300);
+  const env = w.document.getElementById('msug-det-cuerpo');
+
+  const conAtributoSuelto = [...env.querySelectorAll('*')].filter(el =>
+    [...el.attributes].some(a => /^on/i.test(a.name)));
+  ok(conAtributoSuelto.length === 0,
+     'ningún dato de la sugerencia se convirtió en un atributo del HTML',
+     '⚠️ se coló un manejador de evento: ' +
+       conAtributoSuelto.map(el => el.tagName + '[' +
+         [...el.attributes].map(a => a.name).join(',') + ']').join(' '));
+
+  const irMalo = env.querySelector('.msug-det-ir');
+  ok(!irMalo || !/["']/.test(irMalo.getAttribute('href') || ''),
+     'y la dirección envenenada se descartó en vez de pintarse',
+     'el href lleva comillas dentro: ' + (irMalo && irMalo.getAttribute('href')));
+
+  // Pasar el ratón por encima es exactamente lo que haría quien revisa
+  [...env.querySelectorAll('*')].forEach(el => {
+    try { el.dispatchEvent(new w.MouseEvent('mouseover', { bubbles: true })); } catch (_) {}
+    try { el.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); } catch (_) {}
+  });
+  await esperar(150);
+  ok(w.__COLADO === undefined,
+     'pasar el ratón por encima y tocarlo todo no ejecuta nada de fuera',
+     '⚠️⚠️ CORRIÓ JAVASCRIPT DE UN DESCONOCIDO DENTRO DE F.A.R.O');
+
+  ok(!env.querySelector('img'),
+     'y una etiqueta metida en el título de la misión sale como texto, no como imagen',
+     'el título de la misión se pintó como HTML');
+  ok(env.textContent.includes('<b>Nombre con etiquetas</b>'),
+     'lo mismo con el nombre: se lee tal cual, con sus signos',
+     'el nombre se interpretó como HTML en vez de leerse');
+  w.eval('msugCerrarDetalle(); _msugFiltro = "abiertas"; msugRender()');
+  await esperar(150);
+
+  log('── 10. Con la base vieja no revienta: dice qué falta ──');
   const f2 = document.createElement('iframe');
   f2.src = '/index.html'; f2.style.cssText = 'position:absolute;left:-9999px;width:380px;height:640px';
   document.body.appendChild(f2);

@@ -161,7 +161,9 @@ declare
   cat  text := lower(trim(coalesce(p_categoria, 'idea')));
   txt  text := left(trim(coalesce(p_texto, '')), 500);
   disp text := left(trim(coalesce(p_dispositivo, '')), 40);
-  dia  text;
+  url_l text := left(trim(coalesce(p_url, '')), 300);
+  mis_l text := left(trim(coalesce(p_mision, '')), 120);
+  dia  text := '';   -- vacío = este envío no entra en ningún cupo
   estado_actual text;
 begin
   -- 1. Lo mínimo para que esto sea un mensaje y no un dedo resbalado.
@@ -178,6 +180,36 @@ begin
     cat := 'idea';
   end if;
 
+  -- 1b. La dirección de la página no se enseña como texto: acaba DENTRO
+  --     del href de un enlace, en la bandeja de F.A.R.O. Y ahí una
+  --     comilla no es un carácter raro: cierra el atributo y lo que
+  --     venga detrás se convierte en otro atributo de verdad del
+  --     enlace, un onmouseover por ejemplo. Ese JavaScript correría
+  --     dentro de la aplicación privada y con la sesión de la familia
+  --     puesta, o sea, con acceso a la Bóveda, a las finanzas, al chat
+  --     y a los teléfonos del Buzón del lector, que son de gente a la
+  --     que se le prometió que no se publican.
+  --
+  --     Se comprobó de verdad en un navegador antes de escribir esto:
+  --     la función que escapa el texto en la pantalla NO escapa la
+  --     comilla doble (el navegador solo la escapa al serializar en
+  --     modo atributo), así que el onmouseover entraba.
+  --
+  --     Por eso solo se guarda lo que de verdad es un camino: barra
+  --     inicial y ni comillas, ni espacios, ni ángulos, ni barras
+  --     invertidas. Lo que no lo sea se guarda VACÍO, que es lo que ya
+  --     manda el rescate de las sugerencias viejas, y la bandeja
+  --     entonces arma el enlace con la carpeta de la misión.
+  --
+  --     Y se hace cumplir AQUÍ, no solo en la pantalla, por lo mismo que
+  --     el tope de las fotos del Buzón del lector: la pantalla la
+  --     escribe cualquiera y el servidor no. La puerta está abierta a
+  --     anónimos a propósito y la clave publicable va en el código de
+  --     M.E.T.A.S, que lee cualquiera: mandar una fila a mano es
+  --     trivial. La pantalla comprueba lo mismo, y las dos hacen falta.
+  if url_l !~ '^/[^"''<>\s\\]*$' then url_l := ''; end if;
+  mis_l := regexp_replace(mis_l, '["''<>\\]', '', 'g');
+
   -- 2. El freno. El botón está dentro de una misión abierta a cualquier
   --    aula del país: tarde o temprano un chico se aburre y descubre
   --    que puede mandar cien. Doce por aparato y día es de sobra para
@@ -190,11 +222,26 @@ begin
   --    tope de velocidad, no una cerradura. La cerradura de verdad es
   --    que aquí NO SE PUBLICA NADA: lo que entre lo lee un administrador
   --    y se descarta de un toque.
-  dia := coalesce(nullif(disp, ''), 'sin-aparato') || '|' ||
-         to_char(now() at time zone 'UTC', 'YYYY-MM-DD');
-  if (select count(*) from public.metas_sugerencias
-       where freno_dia = dia and evento_id <> ev) >= 12 then
-    return jsonb_build_object('ok', false, 'motivo', 'freno');
+  --
+  --    SIN identificador NO SE FRENA, y esto hay que dejarlo dicho
+  --    porque la primera versión hacía lo contrario y parecía correcto:
+  --    metía a todos los que llegaran sin aparato en un mismo cubo
+  --    («sin-aparato|la fecha»). El resultado era que doce desconocidos
+  --    gastaban el cupo del decimotercero, y la primera sugerencia de
+  --    una niña rebotaba por culpa de mensajes de gente que no conoce.
+  --    Se comprobó contra una base de verdad: trece envíos sin aparato,
+  --    de trece personas distintas, y el decimotercero devolvía «freno».
+  --
+  --    Y no es un caso raro: por ahí entra justamente el rescate de las
+  --    sugerencias viejas atrapadas en los teléfonos, que son anteriores
+  --    a que se guardara el aparato y llegan con el campo vacío. Habría
+  --    frenado precisamente lo que este archivo vino a rescatar.
+  if disp <> '' then
+    dia := disp || '|' || to_char(now() at time zone 'UTC', 'YYYY-MM-DD');
+    if (select count(*) from public.metas_sugerencias
+         where freno_dia = dia and evento_id <> ev) >= 12 then
+      return jsonb_build_object('ok', false, 'motivo', 'freno');
+    end if;
   end if;
 
   -- 3. Higiene: lo descartado hace medio año ya no le sirve a nadie.
@@ -220,10 +267,10 @@ begin
     alumno, grado, escuela, docente, codigo_aula, dispositivo, freno_dia
   ) values (
     ev, p_escrito_at, cat, txt,
-    left(trim(coalesce(p_mision, '')), 120),
+    mis_l,
     left(trim(coalesce(p_mision_titulo, '')), 140),
     left(trim(coalesce(p_seccion, '')), 40),
-    left(trim(coalesce(p_url, '')), 300),
+    url_l,
     left(trim(coalesce(p_alumno, '')), 60),
     left(trim(coalesce(p_grado, '')), 30),
     left(trim(coalesce(p_escuela, '')), 80),

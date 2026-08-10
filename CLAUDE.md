@@ -51,7 +51,24 @@ M.E.T.A.S, que es lo que la gente puede abrir, y lo recogido cae en la
 aplicación privada, que es donde se atiende. El otro extremo del cable
 es `js/metas-sugerencias.js`, en el repositorio de M.E.T.A.S.
 
-**Tres reglas, y ninguna es de adorno:**
+**Lo que entra aquí lo escribió alguien de la calle.** La puerta está
+abierta a anónimos a propósito, y la clave publicable va en el código de
+M.E.T.A.S, que lee cualquiera: mandar una fila a mano es trivial. Con
+eso a la vista, **ningún dato de esta tabla se interpola dentro de un
+atributo del HTML**. Una comilla en un `href="…"` cierra el atributo y
+lo que siga se convierte en un `onmouseover` de verdad, que correría
+DENTRO de F.A.R.O con la sesión de la familia puesta: la Bóveda, las
+finanzas, el chat y los teléfonos del Buzón del lector. Y bastaría con
+abrir la sugerencia para triarla.
+
+Se para en tres sitios, y los tres hacen falta porque uno solo se
+olvida: `msugEsc` escapa también la comilla (como ya hace `redEsc` en
+Redacción), la dirección se comprueba con `msugEnlace` y se pone con
+`setAttribute`, y **el servidor guarda en `url` solo lo que de verdad es
+un camino**. La pantalla no puede fiarse de la base y la base no puede
+fiarse de la pantalla.
+
+**Tres reglas más, y ninguna es de adorno:**
 
 1. **Va en el Acceso Rápido y con contador a la vista.** Este botón
    existía desde hacía años y sus mensajes no los leyó nadie nunca: se

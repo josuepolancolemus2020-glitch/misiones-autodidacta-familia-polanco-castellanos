@@ -73,10 +73,54 @@ function msugCat(id)  { return MSUG_CATS[id] || MSUG_CATS.idea; }
 function msugEstado(e) { return MSUG_ESTADOS[e] || MSUG_ESTADOS.nuevo; }
 function msugAbierta(s) { return s.estado === 'nuevo' || s.estado === 'leido'; }
 
+/* La comilla del final NO sobra, y es la línea más importante del
+   archivo. Pasar un texto por un <div> y leer su innerHTML escapa &, <,
+   > y el espacio duro, pero NO LA COMILLA DOBLE: el navegador solo la
+   escapa cuando serializa en modo atributo, y un nodo de texto nunca se
+   serializa así. Metida dentro de href="…", una comilla del dato cierra
+   el atributo y lo que venga detrás queda como atributo DE VERDAD del
+   enlace: un onmouseover, por ejemplo.
+
+   Aquí eso no es teórico y se comprobó en un navegador antes de
+   escribir esto. Lo que se pinta en esta bandeja lo escribió alguien de
+   la calle: la puerta de entrada está abierta a anónimos a propósito
+   —para que un niño pueda avisar de una errata sin tener cuenta— y la
+   clave publicable va en el código de M.E.T.A.S, que lee cualquiera, así
+   que mandar una fila a mano es trivial. Si su JavaScript llegara a
+   correr aquí, correría DENTRO de F.A.R.O y con la sesión de la familia
+   puesta: alcanzaría la Bóveda, las finanzas, el chat y los teléfonos
+   del Buzón del lector, que son de gente a la que se le prometió que no
+   se publican. Y bastaría con ABRIR la sugerencia para triarla, que es
+   justo lo único que se puede hacer con ella.
+
+   Es la misma comilla, y por la misma razón, que ya lleva redEsc en
+   js/tools/redaccion.js. Allí se descubrió por las buenas —una comilla
+   en el nombre de una sección truncaba un value=""—; aquí habría sido
+   por las malas.
+
+   Aun con esto, en este archivo NINGÚN dato de la base se interpola
+   dentro de un atributo. El único que lo necesitaba —la dirección de la
+   misión— se comprueba con msugEnlace y se pone con setAttribute.
+   Cinturón y tirantes, porque una sola de las dos cosas se olvida. */
 function msugEsc(s) {
   const div = document.createElement('div');
   div.textContent = s == null ? '' : s;
-  return div.innerHTML;
+  return div.innerHTML.replace(/"/g, '&quot;');
+}
+
+/* La dirección para ir a mirar el error, y solo si es de verdad un
+   camino: empieza por una barra y no trae comillas, espacios, ángulos
+   ni barras invertidas. Lo que no lo sea se descarta entero —se pierde
+   el botón de esa fila y nada más—, porque una dirección rara en una
+   sugerencia no es un despiste: es alguien probando.
+
+   El servidor hace la misma comprobación antes de guardar. Se hace en
+   los dos sitios a propósito: la pantalla no puede fiarse de la base, y
+   la base no puede fiarse de la pantalla. */
+function msugEnlace(s) {
+  const camino = s.url || (s.mision ? '/misiones/' + s.mision + '/' : '');
+  if (!/^\/[^"'<>\s\\]*$/.test(camino)) return '';
+  return MSUG_SITIO + camino;
 }
 
 function msugFecha(iso) {
@@ -294,7 +338,7 @@ function msugPintarDetalle(s) {
     if (dias >= 1) desfase = `<div class="msug-det-desfase">✍️ Se escribió el ${msugFechaLarga(s.escrito_at)}, ${dias} día${dias === 1 ? '' : 's'} antes de poder mandarse (estaba sin internet).</div>`;
   }
 
-  const enlace = s.url ? MSUG_SITIO + s.url : (s.mision ? `${MSUG_SITIO}/misiones/${s.mision}/` : '');
+  const enlace = msugEnlace(s);
   const e = msugEstado(s.estado);
   const cerrada = !msugAbierta(s);
 
@@ -322,7 +366,7 @@ function msugPintarDetalle(s) {
       <div class="msug-det-fila"><span>📱 Aparato</span><strong>${msugEsc(s.dispositivo || '—')}</strong></div>
     </div>
 
-    ${enlace ? `<a class="msug-det-ir" href="${msugEsc(enlace)}" target="_blank" rel="noopener">
+    ${enlace ? `<a class="msug-det-ir" id="msug-det-ir" target="_blank" rel="noopener">
       <i class="fa-solid fa-up-right-from-square"></i> Abrir la misión y mirarlo</a>` : ''}
 
     <label class="msug-det-label" for="msug-det-respuesta">📝 Qué se hizo (queda apuntado aquí)</label>
@@ -335,6 +379,15 @@ function msugPintarDetalle(s) {
         : `<button type="button" class="msug-btn msug-btn-descartar" data-accion="descartado">🚫 Descartar</button>
            <button type="button" class="msug-btn msug-btn-atender" data-accion="atendido">✅ Atendida</button>`}
     </div>`;
+
+  /* El href se pone APARTE, con setAttribute, y no dentro del texto de
+     arriba. Así el valor entra como valor y no como código: aunque
+     algún día se colara una comilla, no hay atributo que cerrar. Ver la
+     nota larga de msugEsc. */
+  if (enlace) {
+    const ir = cu.querySelector('#msug-det-ir');
+    if (ir) ir.setAttribute('href', enlace);
+  }
 
   cu.querySelectorAll('[data-accion]').forEach(b => b.addEventListener('click', () => {
     const nota = document.getElementById('msug-det-respuesta');
