@@ -335,16 +335,26 @@ grant execute on function public.faro_metas_sugerencia_enviar(
 --   select public.faro_metas_sugerencia_enviar(
 --     'E-prueba02','idea','aaa','','','','','','','','','','D-AB12CD', now());
 --
---   -- 5. Y desde la calle no se lee NADA. Tiene que devolver CERO
+--   -- 5. Una dirección con una comilla dentro se guarda VACÍA. Es la
+--   --    que impide que el JavaScript de un desconocido corra dentro
+--   --    de F.A.R.O cuando se abra la sugerencia:
+--   select public.faro_metas_sugerencia_enviar(
+--     'E-prueba03','idea','probando la comilla en la direccion',
+--     'x','X','eval','/x.html" onmouseover="alert(1)" z="',
+--     '','','','','','D-AB12CD', now());
+--   select '['||url||']' from public.metas_sugerencias where evento_id='E-prueba03';
+--                                                    -- [] , NO la comilla
+--
+--   -- 6. Y desde la calle no se lee NADA. Tiene que devolver CERO
 --   --    filas, aunque el paso 1 acaba de meter una:
 --   set role anon;
 --   select count(*) from public.metas_sugerencias;   -- 0
 --   reset role;
 --
---   -- 6. Limpiar la prueba
+--   -- 7. Limpiar la prueba
 --   delete from public.metas_sugerencias where evento_id like 'E-prueba%';
 --
--- El paso 5 es el que de verdad importa, y hay que leerlo bien: no da
+-- El paso 6 es el que de verdad importa, y hay que leerlo bien: no da
 -- «permission denied» sino cero filas, porque Supabase le concede a
 -- anon el permiso de tabla y quien lo para es la seguridad por fila, que
 -- no tiene ninguna regla para él. Cero filas con una fila recién metida
