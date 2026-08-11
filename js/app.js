@@ -26,6 +26,7 @@ const MATERIAS = [
   { id: 'pol',  label: 'Poder Político',      sub: 'Instituciones y negociación',   icon: 'fa-landmark',        color: 'pol' },
   { id: 'cib',  label: 'Ciberseguridad',      sub: 'La casa cerrada: llaves y datos', icon: 'fa-shield-halved', color: 'cib' },
   { id: 'ia',   label: 'Inteligencia Artificial', sub: 'La máquina que predice',      icon: 'fa-robot',         color: 'ia' },
+  { id: 'ley',  label: 'Derecho y Ley',       sub: 'La ley por dentro y sus grietas', icon: 'fa-scale-balanced', color: 'ley' },
 ];
 
 const LEVELS = [
