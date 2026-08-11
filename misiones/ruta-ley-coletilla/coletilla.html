@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Ley y sus Grietas · Etapa 3: Los derechos y la coletilla que los devuelve | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/coletilla.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Cita la primera frase 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🎭</div>
+    <div class="hero-text">
+      <h1>Los derechos y la coletilla: <span>lo que se da con una mano y se condiciona con la otra</span></h1>
+      <p class="sub">La frase que se cita es la primera. La que decide suele ser la última 🎭</p>
+      <div class="badge">🎭 Ruta de la Ley y sus Grietas · Etapa 3 de 12</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🎭 La frase que se cita y la frase que decide</h2>
+    <p>Las contradicciones nebulosas que esta ruta busca casi nunca están entre dos artículos peleando de frente. Están <strong>dentro de un mismo artículo</strong>, entre la primera frase y la última.</p>
+    <p>La primera es la que se cita, la que se recuerda y la que se pone en los carteles. La última es la que contesta el funcionario. Quien lee solo la primera cree que tiene un derecho absoluto, y lo descubre en la ventanilla.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Un ejemplo que cabe en dos líneas.</strong> El artículo 72 dice que es libre la emisión del pensamiento por cualquier medio, <strong>sin previa censura</strong>. Y a continuación: <strong>son responsables ante la ley los que abusen</strong> de este derecho. Las dos frases son del mismo artículo. Citar solo la primera en una reunión es entregarle la segunda al otro.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Reconocer, remitir, condicionar</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🎁 Lo que da</h4>
+        <p>El derecho, enunciado en la primera frase. «Es libre la emisión del pensamiento». «Se garantizan las libertades de asociación y de reunión». «El derecho de defensa es inviolable». Suena rotundo, y lo es <strong>hasta el punto y seguido</strong>.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🎭 La coletilla</h4>
+        <p>Lo que viene después y decide cuánto queda. Tiene tres formas: <strong>condiciona</strong> («siempre que no sean contrarias al orden público»), <strong>remite</strong> («en el plazo legal», «en la forma que señalan las leyes») o <strong>exceptúa</strong> («salvo», «excepto»).</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚠️ Y una advertencia que evita pelear con el aliado</span><br>
+      <span>No todas las coletillas quitan. <span class="hl">Algunas protegen</span>, y hay que saber cuál es cuál antes de atacarlas: quien aprende a verlas sin aprender a leerlas acaba peleando contra <span class="hl2">la única que estaba de su lado</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas de un derecho</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué es, dónde se cae y cómo aparece en este proyecto.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza del derecho.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: el derecho que se invocó a medias</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide cómo llegas a la reunión donde te avisan de que una publicación «puede ser un abuso».</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📣</span><span class="ms-text"><strong>La publicación:</strong> M.E.T.A.S saca una crítica documentada al sistema de evaluación de la Secretaría.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">📞</span><span class="ms-text"><strong>El aviso:</strong> un funcionario llama y dice que eso «puede ser un abuso del derecho de expresión».</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">📖</span><span class="ms-text"><strong>La reunión:</strong> te citan el martes para hablar del tema.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">📄</span><span class="ms-text"><strong>Lo que tienes delante:</strong> el artículo 72, con sus dos frases.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Cómo llegas a la reunión?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">📣 Cito la primera frase</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🔎 Leo el artículo entero antes</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔍 Nueve artículos, leídos en dos columnas</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Todos comprobados contra fuente el 11 de agosto de 2026. A la izquierda, lo que dan. A la derecha, lo que les viene detrás.</p>
+    <table class="tres">
+      <tr><th>Art.</th><th>Lo que da</th><th>Lo que le viene detrás</th></tr>
+      <tr><td>59</td><td>La persona humana es el fin supremo; la dignidad es inviolable</td><td>Nada: cierra él mismo</td></tr>
+      <tr><td>60</td><td>Todos iguales ante la ley; punible la discriminación</td><td>Nada: cierra él mismo</td></tr>
+      <tr><td>72</td><td>Libre emisión del pensamiento, sin previa censura</td><td>Responden los que abusen de este derecho</td></tr>
+      <tr><td>78</td><td>Libertades de asociación y de reunión</td><td>Siempre que no sean contrarias al orden público y a las buenas costumbres</td></tr>
+      <tr><td>80</td><td>Derecho de petición y de pronta respuesta</td><td>En el plazo legal</td></tr>
+      <tr><td>82</td><td>El derecho de defensa es inviolable</td><td>Acceso a los tribunales en la forma que señalan las leyes</td></tr>
+      <tr><td>89</td><td>Toda persona es inocente</td><td>Hasta que se declare su responsabilidad por autoridad competente</td></tr>
+      <tr><td>95</td><td>No hay pena sin ley previa, ni doble juzgamiento</td><td>Nada: cierra él mismo</td></tr>
+      <tr><td>96</td><td>La ley no tiene efecto retroactivo</td><td>Excepto en penal cuando la nueva ley favorezca</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 Lo que se ve al ponerlos en fila</span><br>
+      <span>Los que <span class="hl">cierran</span> son los que declaran principios. Los que <span class="hl">condicionan o remiten</span> son justo los que se usan en la ventanilla: reunirse, publicar, pedir, defenderse. <span class="hl2">No es casualidad.</span></span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>❓ Las palabras que nadie define</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Son la parte más eficaz de una coletilla: condicionan el derecho con un término que el propio texto <strong>no define en ninguna parte</strong>, así que su contenido lo escribe quien lo invoca.</p>
+    <table class="tres">
+      <tr><th>Palabra</th><th>Dónde aparece</th><th>Qué preguntar</th></tr>
+      <tr><td>Orden público</td><td>Art. 78, y en media legislación</td><td>¿Qué hecho concreto lo hace aplicable aquí?</td></tr>
+      <tr><td>Buenas costumbres</td><td>Art. 78</td><td>¿Las de quién, y desde cuándo?</td></tr>
+      <tr><td>Abuso</td><td>Art. 72</td><td>¿Qué parte exacta de lo publicado?</td></tr>
+      <tr><td>Interés social</td><td>Acuerdos y convenios</td><td>¿Quién lo define y con qué criterio?</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎯 La pregunta que sirve, y la que no</span><br>
+      <span>La que no sirve: discutir <span class="hl">qué significa</span> orden público, porque esa discusión la gana quien tiene la firma. La que sirve: <span class="hl2">qué hecho concreto</span> lo hace aplicable, por escrito y con nombre y cargo. Un concepto sin hecho no es motivación: es una respuesta sin fundamento.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ La coletilla que está de tu lado</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>⏪ Artículo 96</h4>
+        <p>La ley no tiene efecto retroactivo, <strong>excepto en materia penal cuando la nueva ley favorezca</strong> al delincuente o procesado. Esa excepción no recorta nada: <strong>amplía a favor</strong> de quien podría ser sancionado. Sirve el día que quieran aplicar hacia atrás una regla nueva y más exigente.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🗣️ La otra mitad del 72</h4>
+        <p>El mismo artículo que responsabiliza a quien abusa responsabiliza también a <strong>quienes por medios directos o indirectos restrinjan o impidan</strong> la comunicación y circulación de ideas y opiniones. La coletilla que parecía solo un freno tiene dentro una protección.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Formas de coletilla</div><div class="stat-val">3</div></div>
+      <div class="stat-item"><div class="stat-label">Artículos en la tabla</div><div class="stat-val">9</div></div>
+      <div class="stat-item"><div class="stat-label">Palabras sin definir</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Pasos para leer un derecho</div><div class="stat-val">4</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📨 La grieta más limpia de la etapa</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El artículo <strong>80</strong> promete dos cosas en la misma frase, y la segunda se come a la primera: derecho a obtener <strong>pronta respuesta</strong>, <strong>en el plazo legal</strong>.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La prontitud está en el escalón más alto. El plazo lo fija una ley, y esa ley la tramita y la aplica <strong>la misma administración que debe responder</strong>. No hace falta mala fe para que esto funcione mal: basta con que nadie fije el plazo, o con que el que hay sea largo.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🎁 Lo que da</div><div class="t-info">La primera frase</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🔗 Condición</div><div class="t-info">Limita desde dentro</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">➡️ Remisión</div><div class="t-info">Manda a otra norma</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🚪 Excepción</div><div class="t-info">Saca un caso</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">❓ Indeterminado</div><div class="t-info">Lo llena quien lo invoca</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🔒 Cierra</div><div class="t-info">Decide él mismo</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Lo práctico que sale de aquí: una petición se entrega <strong>por duplicado y con sello de recibido</strong>, con la fecha, el nombre y el cargo de quien recibe. Sin esa constancia el plazo no empieza a correr de forma demostrable, y el artículo 80 promete prontitud sobre nada.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El cazador de coletillas</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para no volver a citar un derecho a medias.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Lo que da y lo que quita</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">⚖️ Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="daquita" onclick="labShowParte('daquita')">🎭 Lo que da y lo que quita</button>
+        <button class="lab-btn lab-cont-btn" data-parte="indeterminados" onclick="labShowParte('indeterminados')">❓ Los conceptos sin definir</button>
+        <button class="lab-btn lab-cont-btn" data-parte="proteger" onclick="labShowParte('proteger')">🛡️ La que protege</button>
+        <button class="lab-btn lab-cont-btn" data-parte="peticion" onclick="labShowParte('peticion')">📨 La petición y su plazo</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En este proyecto</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: los pasos, de principio a fin</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del derecho se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué tipo de coletilla es?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué hace esa frase:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Son responsables ante la ley los que abusen de este derecho»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">Se cita la primera frase del artículo y en la reunión contestan con la última</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🎁 Da</button>
+        <button class="btn btn-sec" onclick="">🎭 Condiciona</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🎭 El derecho sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Los derechos y la coletilla · Ruta de la Ley y sus Grietas</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: los derechos y la coletilla</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El derecho sobre la mesa · Los derechos y la coletilla</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🎭 El derecho sobre la mesa: qué da y qué le viene detrás</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay un derecho invocado y una coletilla que decide. Di qué da el artículo, qué le viene detrás, si hay alguna palabra que el texto no defina y quién la está llenando, si esa coletilla recorta o protege, y qué pides por escrito (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🎭</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎭 Casos del proyecto: derechos con letra pequeña</h2>
+    <p>Ocho situaciones sobre M.E.T.A.S y su futuro. En todas hay un derecho invocado, y en todas la discusión se decide en <strong>lo que viene después del punto y seguido</strong>.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla de esta ruta, otra vez:</strong> los nueve artículos del Título III que usa esta etapa se comprobaron contra fuente el 11 de agosto de 2026, y por eso van con su número y con su texto. Aquí importa más que nunca: <strong>media coletilla mal citada cambia de bando el argumento entero</strong>.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📣 Caso 1: «eso puede ser un abuso»</h2>
+    <p>M.E.T.A.S publica una crítica documentada al sistema de evaluación de la Secretaría. Un funcionario avisa de que eso «puede ser un abuso del derecho de expresión» y que hay responsabilidad.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎭 Las dos frases del artículo 72</span><br>
+      <span>Da: es libre la emisión del pensamiento por cualquier medio, <span class="hl">sin previa censura</span>. Y detrás: son responsables ante la ley <span class="hl2">los que abusen</span> de este derecho. Las dos son del mismo artículo, y «abuso» no se define en ninguna parte.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la protección es contra el <strong>permiso previo</strong>, no contra la responsabilidad posterior. Se publica sin pedir permiso y se responde de lo publicado. Lo que se pide es el hecho concreto: <strong>qué parte exacta constituye el abuso, en qué norma consta y quién lo firma</strong>. Esa pregunta casi nunca se contesta.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>👥 Caso 2: la reunión y el orden público</h2>
+    <p>La familia convoca a treinta madres y padres en un patio para presentar el proyecto. En la alcaldía dicen que no, porque podría ser contrario al orden público.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">❓ Dos conceptos indeterminados en una línea</span><br>
+      <span>El artículo 78 garantiza asociación y reunión <span class="hl">siempre que no sean contrarias al orden público y a las buenas costumbres</span>. Ninguno de los dos se define ahí, así que su contenido lo escribe <span class="hl2">quien tiene que autorizar</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> discutir qué significa «orden público» es la discusión que se pierde, porque la gana quien tiene la firma. La que se gana es otra: <strong>qué hecho concreto</strong> hace la reunión contraria al orden público, por escrito. Y se ofrece por escrito qué resolvería esa preocupación, que convierte una negativa cerrada en una negociación con constancia.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📨 Caso 3: cuatro meses sin respuesta</h2>
+    <p>Se presenta una petición a la dirección departamental pidiendo autorización para usar las fichas. Pasan cuatro meses sin respuesta y nadie sabe decir cuál era el plazo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⏳ La grieta más limpia de la etapa</span><br>
+      <span>El artículo 80 da derecho a petición y a <span class="hl">pronta respuesta en el plazo legal</span>. La prontitud está en la Constitución; el plazo lo fija una ley, y esa ley <span class="hl2">la tramita y la aplica el mismo obligado a responder</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> no hace falta mala fe para que esto funcione mal, basta con que nadie fije el plazo. Y hay algo que sí depende de la casa: <strong>sin sello de recibido con fecha no hay plazo que reclamar</strong>. La petición se entrega por duplicado, con nombre y cargo de quien recibe, y el plazo se cuenta desde ese sello y no desde la conversación.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ Caso 4: «primero necesita un abogado»</h2>
+    <p>Un maestro quiere reclamar por una ficha reproducida sin crédito y le dicen que antes necesita un abogado para poder entrar a un tribunal.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚖️ Lo que da y lo que remite el artículo 82</span><br>
+      <span><span class="hl">El derecho de defensa es inviolable</span>, y los habitantes tienen libre acceso a los tribunales para ejercitar sus acciones <span class="hl2">en la forma que señalan las leyes</span>. Lo inviolable es el derecho; la puerta la regula otra norma.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la respuesta correcta no es «no necesito abogado» ni «entonces no puedo». Es ir a ver <strong>qué forma señalan las leyes para ese trámite concreto</strong>, porque a veces exigen representación y a veces no. Aquí la coletilla no es un abuso: es la remisión que hay que seguir, que es distinto.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📏 Caso 5: la sanción que no estaba escrita</h2>
+    <p>Un centro anuncia que sancionará a quien use material «no aprobado». La sanción no aparece en ninguna norma anterior.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🚫 Lo que prohíbe el artículo 95</span><br>
+      <span>Ninguna persona será sancionada con penas <span class="hl">no establecidas previamente en la ley</span>. Anunciar hoy una sanción y aplicarla a lo de mañana ya es discutible; aplicarla a lo de ayer <span class="hl2">choca además con el 96</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> este artículo se cita casi solo en lo penal y su lógica alcanza más lejos. Lo que se contesta cabe en una línea: <strong>«¿en qué norma anterior consta esa sanción?»</strong>, que es la pregunta de ventanilla de la etapa 1 aplicada a un derecho concreto.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>⏪ Caso 6: el reglamento aplicado hacia atrás</h2>
+    <p>Cambian el reglamento y una oficina quiere aplicarlo a un trámite de M.E.T.A.S que se presentó tres meses antes.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🛡️ Aquí la coletilla está a tu favor</span><br>
+      <span>El artículo 96 dice que la ley <span class="hl">no tiene efecto retroactivo</span>, y su excepción es <span class="hl2">solo en materia penal y solo cuando favorece</span> al procesado. Aplicar hacia atrás una regla nueva y más exigente es exactamente lo que ese artículo impide.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> esta es la coletilla que hay que <strong>invocar y no pelear</strong>. Quien se acostumbra a ver toda coletilla como un recorte pasa por encima de esta sin verla, y de paso deja pasar el argumento que le resolvía el caso.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🤍 Caso 7: «demuestre que sí lo cumplió»</h2>
+    <p>Se acusa al proyecto de haber incumplido un requisito y le piden que demuestre que sí lo cumplió, sin decir en qué se basa la acusación.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">↔️ Dónde empieza la carga</span><br>
+      <span>El artículo 89 dice que toda persona es <span class="hl">inocente mientras no se haya declarado su responsabilidad</span> por autoridad competente. La inocencia es <span class="hl2">el punto de partida, no el premio final</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> antes de ponerse a probar lo imposible, se pide que <strong>quien afirma diga en qué se basa</strong>. Es la conexión directa con la etapa 8, donde se estudia la carga de la prueba: quien la tiene y no la trabajó antes de la reunión, lleva las de perder.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🌫️ Caso 8: «conforme al interés social»</h2>
+    <p>Un acuerdo dice que el material educativo se usará «conforme al interés social», y nadie sabe decir quién define ese interés social ni con qué criterio.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📄 La misma técnica, ahora en una hoja que vas a firmar</span><br>
+      <span>Es un concepto indeterminado dentro de un contrato: se firma <span class="hl">un contenido que escribirá otro después</span>, y ese otro no es la casa. Funciona igual que en la Constitución, con una diferencia: <span class="hl2">aquí uno todavía puede cambiar el texto</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> lo que no se puede definir, no se firma. Se pide cambiar la frase por <strong>el hecho concreto que se quiere asegurar</strong>. Y si el otro no acepta concretar, eso ya es información sobre lo que pensaba hacer con esa palabra.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La hoja de dos columnas, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier artículo de derechos que le pongan delante a esta casa, se parte en dos columnas antes de opinar:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué da:</strong> el derecho, tal como lo enuncia la primera frase.</li>
+      <li><strong>Qué le viene detrás:</strong> condición, remisión o excepción. Y cuál de las tres es.</li>
+      <li><strong>Qué palabras no define:</strong> orden público, buenas costumbres, abuso, interés social.</li>
+      <li><strong>Quién las llena:</strong> nombre, cargo, y si responde de ello.</li>
+      <li><strong>Recorta o protege:</strong> con esa palabra, porque cambia de bando la discusión.</li>
+      <li><strong>Qué pido por escrito:</strong> el hecho concreto y la norma en que consta.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎭 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">Lee hasta el final del artículo</span>: la frase que decide suele ser la última. 2. Toda palabra que el texto no define <span class="hl">la llena quien la invoca</span>. 3. Ante un concepto indeterminado no se discute la palabra: <span class="hl">se pide el hecho</span>. 4. Nombra si la coletilla <span class="hl">recorta o protege</span> antes de atacarla. 5. Y sin <span class="hl2">sello de recibido con fecha</span> no hay plazo que reclamar.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con los <strong>nueve artículos leídos en dos columnas</strong>, las tres formas de la coletilla, el catálogo de conceptos sin definir, la coletilla que protege, el modelo de petición del artículo 80, los ocho casos del proyecto, la <strong>hoja de dos columnas</strong> para llenar a mano, seis ejercicios, la hoja de fuentes y la pauta completa.</p>
+      <a href="../../fichas/ficha-ley-coletilla.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, y por qué van con su número</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Los nueve artículos del Título III que usa esta misión se comprobaron contra fuente el <strong>11 de agosto de 2026</strong>. En esta etapa el texto exacto importa más que en ninguna otra: <strong>media coletilla mal citada cambia de bando el argumento</strong>.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Art. 59:</strong> la persona humana es el fin supremo de la sociedad y del Estado; la dignidad del ser humano es inviolable. Sin coletilla.</li>
+      <li><strong>Art. 60:</strong> todos iguales ante la ley, no hay clases privilegiadas, y es punible toda discriminación lesiva a la dignidad humana. Sin coletilla.</li>
+      <li><strong>Art. 72:</strong> libre emisión del pensamiento sin previa censura; responden los que abusen y quienes restrinjan o impidan la circulación de ideas.</li>
+      <li><strong>Art. 78:</strong> asociación y reunión, siempre que no sean contrarias al orden público y a las buenas costumbres.</li>
+      <li><strong>Art. 80:</strong> derecho de petición y de pronta respuesta en el plazo legal.</li>
+      <li><strong>Art. 82:</strong> el derecho de defensa es inviolable; acceso a los tribunales en la forma que señalan las leyes.</li>
+      <li><strong>Art. 89:</strong> toda persona es inocente mientras no se declare su responsabilidad por autoridad competente.</li>
+      <li><strong>Art. 95:</strong> no hay pena no establecida previamente en la ley, ni doble juzgamiento por los mismos hechos.</li>
+      <li><strong>Art. 96:</strong> la ley no tiene efecto retroactivo, excepto en materia penal cuando la nueva ley favorezca.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con <strong>un derecho partido en dos columnas</strong>, uno que le importe a esta casa, y con sus conceptos sin definir marcados.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../misiones/ruta-ley-anatomia-constitucion/anatomia-constitucion.html">📜 Anatomía de la Constitución de 1982</a>: la etapa 2. Ahí están las cuatro piezas de un artículo y el mapa de títulos, que es donde viven estos nueve.</li>
+      <li><a href="../../misiones/ruta-ley-fuerza-norma/fuerza-norma.html">🏛️ De dónde saca su fuerza la ley</a>: la etapa 1, con la pirámide y la pregunta que se hace en la ventanilla.</li>
+      <li><a href="../../COMPENDIO-RUTA-LEY.md">⚖️ El compendio de la ruta</a>: las doce etapas y los ocho campos del Registro de Grietas.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 4 enseña a documentar como grieta lo que aquí solo se detecta.</li>
+      <li><a href="../../fichas/ficha-ley-coletilla.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: los nueve artículos en dos columnas caben en una página, y el modelo de petición en otra.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar <strong>un derecho que la casa vaya a invocar de verdad</strong> y partirlo en dos columnas: qué da, qué le viene detrás, qué palabras no define y quién las llena. La prueba de que está aprendido es poder decir, sin mirar, <strong>con qué frase del mismo artículo le van a contestar</strong> cuando lo invoque.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🎭</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Ley y sus Grietas · Etapa 3: Los derechos y la coletilla que los devuelve</div>
+    <div class="diploma-mascot" aria-hidden="true">🎭</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🎭</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«La frase que se cita es la primera; la que decide suele ser la última» 🌱 · 🎭 Ruta de la Ley y sus Grietas · Etapa 3 de 12.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/coletilla.js"></script>
+</body>
+</html>

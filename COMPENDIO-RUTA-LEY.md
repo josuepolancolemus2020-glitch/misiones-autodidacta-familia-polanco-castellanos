@@ -2,10 +2,10 @@
 
 Doce misiones sobre la ley hondureña. Este documento es el plan completo de
 las doce, con lo que enseña cada una, su laboratorio, sus casos y lo que deja
-apuntado. Las etapas 1 y 2 ya están construidas y se pueden abrir en F.A.R.O;
-lo que sigue escrito aquí es el plan de las diez que faltan.
+apuntado. Las etapas 1, 2 y 3 ya están construidas y se pueden abrir en
+F.A.R.O; lo que sigue escrito aquí es el plan de las nueve que faltan.
 
-Fecha: 11 de agosto de 2026. Estado: **etapas 1 y 2 construidas**, las diez
+Fecha: 11 de agosto de 2026. Estado: **etapas 1, 2 y 3 construidas**, las nueve
 restantes planificadas aquí. El catálogo (`js/data/misiones.js`) las declara
 todas, así que el mapa de Mis Rutas enseña el camino entero desde el principio.
 
@@ -266,9 +266,16 @@ frente. Están **dentro de un mismo artículo**, entre la primera frase y la
   igualdad ante la ley (60), la libre emisión del pensamiento sin previa
   censura (72), la asociación y la reunión (78), el derecho de petición con
   pronta respuesta (80), el derecho de defensa como inviolable (82), la
-  presunción de inocencia (89), el juez competente y las formalidades del
-  juicio (90), y la irretroactividad de la ley salvo en penal cuando favorece
-  (96).
+  presunción de inocencia (89), la legalidad de la pena y la prohibición de
+  juzgar dos veces por los mismos hechos (95), y la irretroactividad de la ley
+  salvo en materia penal cuando favorece (96).
+  Son **nueve**, y son los nueve que se comprobaron uno a uno contra el texto
+  oficial antes de construir la etapa. El plan escrito antes de construirla
+  ponía en ese noveno lugar el artículo 90 (juez competente y formalidades del
+  juicio), que es una garantía del proceso más que un derecho con coletilla;
+  al leer el título entero, el 95 resultó el que enseña mejor la técnica, y se
+  cambió. Queda apuntado aquí porque la regla de la ruta vale también para el
+  compendio: lo que cambia, se dice.
   Y la técnica, que se repite tanto que se aprende a leer de un vistazo:
   **reconocer, remitir, condicionar**. Se reconoce el derecho en la primera
   frase, se remite a la ley que lo desarrollará, y se condiciona con un
@@ -276,12 +283,15 @@ frente. Están **dentro de un mismo artículo**, entre la primera frase y la
   costumbres», «interés social», «moral». Esos son los **conceptos jurídicos
   indeterminados**, y la pregunta de la misión es quién los llena de contenido,
   cuándo, y si quien los llena responde ante alguien.
-- **Laboratorio · El cazador de coletillas**: veinte artículos de derechos, y en
-  cada uno hay que marcar con dos colores la parte que da y la parte que
-  condiciona. El laboratorio puntúa y, al final, enseña el porcentaje de
-  artículos del título que traen coletilla. Segundo módulo: los cuatro
-  conceptos indeterminados más usados y tres situaciones para cada uno, donde
-  el usuario decide si caben o no, y luego ve que un juez decidió distinto.
+- **Laboratorio · El cazador de coletillas**: cuatro piezas que se tocan y
+  parten el artículo en la pantalla. **Lo que da y lo que quita** pone los
+  nueve artículos en dos columnas, la de lo que se reconoce y la de lo que se
+  condiciona, y deja ver de un golpe cuántos traen coletilla. **Los conceptos
+  sin definir** toma los cuatro que más aparecen (orden público, buenas
+  costumbres, abuso, interés social) y pregunta quién los llena de contenido.
+  **La que protege** enseña las coletillas que no recortan sino que amparan, y
+  **La petición y su plazo** desarma el artículo 80 hasta dejar la grieta a la
+  vista.
 - **Reto**: reescribir tres artículos quitándoles la coletilla, y escribir
   debajo qué se ganaría y qué se perdería si el texto quedara así. Porque la
   coletilla no siempre es trampa: a veces es lo único que evita que un derecho
@@ -300,9 +310,11 @@ frente. Están **dentro de un mismo artículo**, entre la primera frase y la
 - **Grietas que deja**: el caso 3 completo. Un derecho cuyo plazo lo fija la
   misma administración que debe responder es la grieta más limpia del
   registro, y es la que más veces va a tocar al proyecto.
-- **Ficha** (10 páginas): los veinte artículos impresos para marcar a dos
-  colores, el glosario de los conceptos indeterminados, el ejercicio de
-  reescritura con pauta y la hoja de fuentes.
+- **Ficha** (10 páginas): los nueve artículos en dos columnas, las tres formas
+  de la coletilla, el glosario de los conceptos indeterminados, la ficha de
+  grieta del artículo 80 con un modelo de petición para copiar a mano, ocho
+  ejercicios a lápiz con su pauta y la hoja de fuentes con la fecha en que se
+  comprobó cada una.
 
 ---
 
@@ -740,11 +752,27 @@ Todo lo anterior sirve para llenar esta carpeta.
 ## 16. Las citas ya comprobadas
 
 Esto es la semilla de la hoja de fuentes de las doce fichas. Todo lo de esta
-tabla se comprobó al escribir el compendio, el 11 de agosto de 2026. Lo que no
-está aquí, se comprueba antes de construir la misión que lo use.
+tabla se comprobó contra el texto oficial el 11 de agosto de 2026: unas al
+escribir el compendio y otras al construir las etapas 1, 2 y 3, que es cuando
+tocaba comprobarlas. Lo que no está aquí, se comprueba antes de construir la
+misión que lo use. La tabla crece con cada etapa; nada entra sin haberse leído
+en la fuente.
 
 | Norma | Qué dice, en corto | Dónde se usa |
 |---|---|---|
+| Constitución, art. 16 | Los tratados internacionales, una vez en vigor, forman parte del derecho interno | Etapa 1 |
+| Constitución, art. 18 | En caso de conflicto entre el tratado y la ley, prevalece el tratado | Etapa 1 |
+| Constitución, art. 205 numeral 1 | El Congreso crea, decreta, interpreta, reforma y deroga las leyes | Etapas 1 y 4 |
+| Constitución, art. 321 | Los servidores del Estado no tienen más facultades que las que expresamente les confiere la ley, y lo que ejecuten fuera de ella es nulo e implica responsabilidad | Etapas 1 y 12 |
+| Constitución, art. 59 | La persona humana es el fin supremo de la sociedad y del Estado, y la dignidad del ser humano es inviolable. Sin coletilla | Etapa 3 |
+| Constitución, art. 60 | Todos iguales ante la ley, sin clases privilegiadas, y es punible toda discriminación lesiva a la dignidad humana. Sin coletilla | Etapa 3 |
+| Constitución, art. 72 | Libre emisión del pensamiento sin previa censura. Responden ante la ley los que abusen **y también quienes restrinjan o impidan la circulación de ideas** | Etapas 3 y 4 |
+| Constitución, art. 78 | Asociación y reunión, «siempre que no sean contrarias al orden público y a las buenas costumbres» | Etapa 3 |
+| Constitución, art. 80 | Derecho de petición y de pronta respuesta «en el plazo legal», plazo que la Constitución no fija | Etapas 3, 4 y 12 |
+| Constitución, art. 82 | El derecho de defensa es inviolable, y el acceso a los tribunales es «en la forma que señalan las leyes» | Etapa 3 |
+| Constitución, art. 89 | Toda persona es inocente mientras no se declare su responsabilidad por autoridad competente | Etapa 3 |
+| Constitución, art. 95 | No hay pena no establecida previamente en la ley, ni doble juzgamiento por los mismos hechos | Etapa 3 |
+| Constitución, art. 96 | La ley no tiene efecto retroactivo, excepto en materia penal cuando la nueva ley favorezca al reo. Es la coletilla que protege | Etapa 3 |
 | Constitución, art. 157 | La educación del sistema formal, salvo la superior, la autoriza, organiza, dirige y supervisa «exclusivamente» el Poder Ejecutivo por medio de la Secretaría de Educación | Etapas 5 y 7 |
 | Constitución, art. 320 | Si una norma constitucional y una legal ordinaria son incompatibles, se aplica la constitucional | Etapas 1 y 4 |
 | Constitución, art. 373 | La reforma pide dos tercios del Congreso y ratificación por la legislatura siguiente | Etapas 2 y 6 |
@@ -764,37 +792,59 @@ está aquí, se comprueba antes de construir la misión que lo use.
 
 **Pendientes de comprobar antes de construir**, y quedan escritos como
 pendientes a propósito: la numeración exacta y el texto vigente de los
-artículos 4, 15 a 18, 59, 60, 72, 78, 80, 82, 89, 90, 96, 151, 153, 171, 205
-numeral 1, 313, 316 y 321, cada uno con su decreto de reforma si lo tiene; los
-reglamentos vigentes de la Ley Fundamental de Educación; y la vigencia actual
-de la sentencia de 2015 y de lo que haya venido después.
+artículos 15, 17, 70, 90, 151, 153, 171, 313 y 316, cada uno con su decreto de
+reforma si lo tiene; los reglamentos vigentes de la Ley Fundamental de
+Educación; y la vigencia actual de la sentencia de 2015 y de lo que haya
+venido después.
 
 ---
 
 ## 17. Lo que ya se tocó en el código
 
-Hecho en esta tanda, para que la ruta se vea en el mapa desde hoy:
+Primero, lo que abrió la ruta en el mapa antes de existir ninguna misión:
 
 1. `js/data/misiones.js`: ruta `ley` con sus 12 etapas y los doce títulos en
    `ETAPAS_PREVISTAS`.
 2. `js/app.js`: materia `ley` (Derecho y Ley) en `MATERIAS`.
 3. `css/app.css`: los tokens `--ley`, `--ley-bg` y `--ley-border` (vino de
    toga) y sus cuatro reglas.
-4. `sw.js`: `CACHE_NAME` subido, que si no el aparato sigue enseñando lo viejo.
-5. `_dev/probe-rutas.html`: la sonda cuenta ahora 10 rutas y 13 materias, y
-   comprueba aparte que la ruta de la Ley salga con sus 12 etapas «Por
-   construir». Es la primera ruta del mapa sin una sola misión hecha, así que
-   la sonda tiene que decir que eso está bien y no que está roto.
+4. `index.html` y `_dev/faro-local.html`: el chip ⚖️ del filtro de materias.
+   Los chips están escritos a mano en el HTML y no salen de `MATERIAS`, cosa
+   que descubrió la sonda contando trece donde debía haber catorce.
+5. `sw.js`: `CACHE_NAME` subido, que si no el aparato sigue enseñando lo viejo.
+6. `_dev/probe-rutas.html`: la sonda cuenta 10 rutas y 13 materias, y comprueba
+   aparte la ruta de la Ley: cuántas etapas se pueden tocar, cuántas siguen
+   «Por construir», y que las construidas tomen el título de `MISSIONS` y no de
+   `ETAPAS_PREVISTAS`. Esas cuentas suben con cada etapa que se levanta.
 
-Falta, cuando se construya cada misión: la carpeta con sus tres archivos, la
-ficha de diez páginas, la sonda propia, el reparto de respuestas y el registro
-de la misión en `MISSIONS`.
+Después, cada etapa construida añadió lo suyo: su carpeta con los tres
+archivos, su ficha de diez páginas, su sonda en `_dev/`, su guion de inyección
+de bancos y su registro en `MISSIONS`.
+
+| Etapa | Carpeta y clave | Ficha | Sonda |
+|---|---|---|---|
+| 1 | `ruta-ley-fuerza-norma/` · `faro_ley_fuerza_v1` | `ficha-ley-fuerza-norma.html` | `probe-ley-etapa1.html` |
+| 2 | `ruta-ley-anatomia-constitucion/` · `faro_ley_anatomia_v1` | `ficha-ley-anatomia-constitucion.html` | `probe-ley-etapa2.html` |
+| 3 | `ruta-ley-coletilla/` · `faro_ley_coletilla_v1` | `ficha-ley-coletilla.html` | `probe-ley-etapa3.html` |
+
+Las tres sondas comprueban, además de lo de siempre, **la regla de la ruta**:
+que en la misión no aparezca ningún artículo fuera de la lista de comprobados.
+No es adorno. Esa comprobación ya cazó tres errores de contenido antes de
+publicar, y por eso cada sonda nueva la lleva.
+
+Falta, cuando se construya cada misión que queda: exactamente eso mismo.
 
 ---
 
 ## 18. Orden de construcción que se propone
 
-No es el orden del temario. Es el orden de lo que sirve antes:
+**Lo que pasó de verdad:** se está construyendo por el orden del temario, 1, 2
+y 3, y no por el de urgencia que propone la lista de abajo. Se queda escrita
+porque la razón sigue en pie y porque conviene saber qué se está aplazando: la
+etapa 7 (qué es M.E.T.A.S a los ojos de la ley) es la única con una pregunta
+abierta esperando fuera de casa.
+
+El orden propuesto no es el del temario. Es el orden de lo que sirve antes:
 
 1. **Etapa 7, la ley educativa.** Es la que responde la pregunta que hoy está
    abierta: qué es M.E.T.A.S a los ojos de la ley. Todo lo demás puede esperar;
