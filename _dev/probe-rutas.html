@@ -43,8 +43,8 @@ f.onload = async () => {
 
     log('\n── MATERIAS ──');
     const mats = w.eval('MATERIAS.map(m=>m.id).join(",")');
-    ok(mats === 'esp,mat,cnat,csoc,epis,ing,psi,mkt,eco,pol,cib,ia', '12 materias: 5 escolares y 7 del adulto', 'materias: ' + mats);
-    ok(d.querySelectorAll('#materia-chips .fam-chip').length === 13, '13 chips (Todas + las 12 materias)', 'chips: ' + d.querySelectorAll('#materia-chips .fam-chip').length);
+    ok(mats === 'esp,mat,cnat,csoc,epis,ing,psi,mkt,eco,pol,cib,ia,ley', '13 materias: 5 escolares y 8 del adulto', 'materias: ' + mats);
+    ok(d.querySelectorAll('#materia-chips .fam-chip').length === 14, '14 chips (Todas + las 13 materias)', 'chips: ' + d.querySelectorAll('#materia-chips .fam-chip').length);
     w.switchView('view-misiones'); await esperar(200);
     d.querySelector('.fam-chip[data-materia="ing"]').click(); await esperar(250);
     ok(d.querySelectorAll('#missions-container .mission-card').length === 2,
@@ -54,7 +54,7 @@ f.onload = async () => {
     log('\n── MAPA DE RUTAS ──');
     w.switchView('view-rutas'); await esperar(300);
     const cards = d.querySelectorAll('.ruta-card');
-    ok(cards.length === 9, '9 rutas en el mapa', 'rutas: ' + cards.length);
+    ok(cards.length === 10, '10 rutas en el mapa', 'rutas: ' + cards.length);
     /* Cinco rutas del adulto van por la etapa 3 y la Casa Cerrada por la 4.
        Si alguna se queda corta es que la misión nueva no llegó al catálogo. */
     [['Ruta de la Persuasión', 3], ['Ruta de la Marca', 3], ['Ruta del Poder', 3],
@@ -79,6 +79,19 @@ f.onload = async () => {
       ok(futuras.length === 0, 'ninguna queda «por construir»', 'futuras: ' + futuras.length);
       ok(/El testamento técnico/.test(ing.textContent), 'las asignaciones salen con su nombre', 'las asignaciones no aparecen');
       ok(/0 de 10 etapas recorridas/.test(ing.textContent), 'la cuenta arranca en 0 de 10', 'cuenta: ' + (ing.querySelector('.ruta-cuenta') || {}).textContent);
+    }
+    /* La Ley es la primera ruta del mapa SIN una sola misión construida: las
+       doce etapas salen del compendio. Se comprueba aparte porque una ruta
+       vacía es el caso que puede romper el mapa (barra de progreso en cero,
+       nada que tocar) y aquí es un estado normal, no un error. */
+    const ley = [...cards].find(c => /Ruta de la Ley y sus Grietas/.test(c.textContent));
+    ok(!!ley, 'está la Ruta de la Ley y sus Grietas', 'falta la ruta de la ley');
+    if (ley) {
+      ok(ley.querySelectorAll('.ruta-etapa').length === 12, 'muestra las 12 etapas del compendio', 'etapas: ' + ley.querySelectorAll('.ruta-etapa').length);
+      ok(ley.querySelectorAll('.ruta-etapa-futura').length === 12, 'las 12 van «Por construir»', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length);
+      ok(ley.querySelectorAll('.re-link').length === 0, 'ninguna se puede tocar todavía', 'tocables: ' + ley.querySelectorAll('.re-link').length);
+      ok(/0 de 12 etapas recorridas · 0 construidas/.test(ley.textContent), 'la cuenta dice 0 de 12 y 0 construidas', 'cuenta: ' + (ley.querySelector('.ruta-cuenta') || {}).textContent);
+      ok(!/Etapa por construir/.test(ley.textContent), 'cada etapa sale con su nombre, no con el rótulo genérico', 'alguna etapa no tiene título en ETAPAS_PREVISTAS');
     }
     ok(d.querySelector('.qa-item[data-qa="view-rutas"]') && d.querySelector('.drawer-item[data-view="view-rutas"]'),
       'hay entrada en Acceso Rápido y en el menú', 'falta alguna entrada a Mis Rutas');

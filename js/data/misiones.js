@@ -27,6 +27,12 @@ const RUTAS = {
                 lema: 'Quién decide, quién traba y cómo se firma lo que se acuerda' },
   casacerrada:{ nombre: 'Ruta de la Casa Cerrada',           emoji: '🔐', color: 'cib',  etapas: 6,
                 lema: 'Quién entra, qué se guarda y qué se pierde el día que falle algo' },
+  /* 12 etapas porque el temario no cabe en 6: la Constitución, la ley
+     educativa, la jurisprudencia y las cuatro herramientas con que se lee
+     una ley (argumento, retórica, psicología del poder e historia). El
+     compendio completo está en COMPENDIO-RUTA-LEY.md. */
+  ley:        { nombre: 'Ruta de la Ley y sus Grietas',      emoji: '⚖️', color: 'ley',  etapas: 12,
+                lema: 'Leer la ley por dentro: qué dice, qué calla y dónde se contradice' },
 };
 
 const MISSIONS = [
@@ -94,5 +100,22 @@ const ETAPAS_PREVISTAS = {
     4: 'Del salario al activo: ingresos que no dependen de tus horas',
     5: 'Poder local: municipio, patronato y presupuesto público',
     6: 'Negociación: pedir, ceder y cerrar por escrito',
+  },
+  /* Las doce están sin construir a propósito: primero se aprobó el compendio
+     (COMPENDIO-RUTA-LEY.md) y de ahí salen los títulos de abajo, para que el
+     mapa enseñe el camino entero desde el primer día. */
+  ley: {
+    1:  'De dónde saca su fuerza la ley: jerarquía, validez y coacción',
+    2:  'Anatomía de la Constitución de 1982: qué declara y cómo se reforma',
+    3:  'Los derechos y la coletilla que los devuelve',
+    4:  'La grieta: cómo se caza una contradicción en la ley',
+    5:  'Interpretar: los métodos con que se lee y se estira la letra',
+    6:  'Jurisprudencia: quién dice qué dice la ley, y con qué efecto',
+    7:  'La ley educativa de Honduras, por dentro',
+    8:  'El argumento jurídico: silogismo, prueba y falacias del foro',
+    9:  'Retórica forense: ethos, pathos y logos desde Corax hasta hoy',
+    10: 'La psicología del poder: percepción, autoridad y sesgos del que juzga',
+    11: 'Historia de la ley: qué miedo escribió cada norma',
+    12: 'El expediente propio: escrito, plazo y defensa de la casa',
   },
 };

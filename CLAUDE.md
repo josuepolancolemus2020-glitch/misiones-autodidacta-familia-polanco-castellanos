@@ -9,6 +9,9 @@ Lo largo está en otros documentos y aquí solo se apunta dónde:
 - **`PLAN-FARO-PRIVADO.md`** — el estado de la mudanza a privado y, sobre
   todo, **la lista de SQL que falta correr**.
 - **`BUZON-DEL-LECTOR.md`** — el buzón, el QR y sus reglas.
+- **`COMPENDIO-RUTA-LEY.md`** — las doce misiones de la Ruta de la Ley y sus
+  Grietas, ninguna construida todavía, y **la regla de que en esa ruta no se
+  cita ningún artículo de memoria**.
 
 ## Normativa: el SQL de Supabase se pega en el chat, SIEMPRE
 
