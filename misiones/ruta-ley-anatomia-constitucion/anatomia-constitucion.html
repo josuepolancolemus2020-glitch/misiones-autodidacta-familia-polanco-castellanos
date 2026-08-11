@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Ley y sus Grietas · Etapa 2: Anatomía de la Constitución de 1982 | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/anatomia-constitucion.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Dice «la Constitución dice» 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">📜</div>
+    <div class="hero-text">
+      <h1>Anatomía de la Constitución de 1982: <span>qué declara y cómo se reforma</span></h1>
+      <p class="sub">Un artículo no es un texto: es un texto con fecha, y con piezas por dentro 📜</p>
+      <div class="badge">📜 Ruta de la Ley y sus Grietas · Etapa 2 de 12</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📜 El texto que está encima de todos los demás</h2>
+    <p>La etapa 1 enseñó a colocar cualquier papel en su escalón. Este es <strong>el escalón de arriba</strong>, y conviene conocerlo por dentro antes de discutir nada con él: la Constitución vigente es el <strong>Decreto 131 del 11 de enero de 1982</strong>, publicada en La Gaceta 23,612 del 20 de enero de ese año.</p>
+    <p>Tiene <strong>ocho títulos, cuarenta y tres capítulos y trescientos setenta y ocho artículos</strong>. Nadie se los aprende, y no hace falta: lo que hace falta es saber <strong>en qué título vive cada cosa</strong>, cómo está armado un artículo por dentro y qué hace falta para cambiarlo.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La frase que esta etapa deshace:</strong> «la Constitución dice». Un artículo <strong>no es un texto: es un texto con fecha</strong>. El mismo número puede decir hoy algo distinto de lo que decía hace diez años, porque lo reformaron, y el que cita la versión vieja pierde el punto y, con él, todo lo demás que iba a decir.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 Las dos mitades de la Constitución</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🙋 La parte dogmática · títulos I a IV</h4>
+        <p>El Estado y su territorio, quién es hondureño, las declaraciones y los derechos, y las garantías con que se defienden. Es <strong>la parte que habla de ti</strong>, y es la que todo el mundo cita.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🏛️ La parte orgánica · títulos V y VI</h4>
+        <p>Los poderes del Estado y el régimen económico. Es <strong>la parte que habla de quién manda</strong>, la que casi nadie lee, y la que decide más: ahí está escrito quién puede decir que sí de verdad.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🗺️ Y los dos que cierran</span><br>
+      <span>El <span class="hl">título VII</span> es la reforma y la inviolabilidad: cómo se cambia el texto y qué pasa si alguien lo desconoce por la fuerza. El <span class="hl2">título VIII</span>, las transitorias y la vigencia.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas de la anatomía</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué es, dónde se cae y cómo aparece en este proyecto.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza de la anatomía.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la reforma que se celebró antes de tiempo</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces cuando anuncian una reforma que le conviene al proyecto.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📰</span><span class="ms-text"><strong>El anuncio:</strong> el Congreso aprueba una reforma que haría obligatorio el material de apoyo digital.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🎉</span><span class="ms-text"><strong>La celebración:</strong> salió en la prensa, con dos tercios de los votos y todo.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🔎</span><span class="ms-text"><strong>La comprobación:</strong> lees el artículo 373 y cuentas los pasos que pide.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">⏳</span><span class="ms-text"><strong>Lo que falta:</strong> la ratificación de la subsiguiente legislatura ordinaria.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué haces con el anuncio?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🎉 Lo doy por hecho y planifico</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">⏳ Espero al segundo voto</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🗺️ El mapa de los ocho títulos</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Nadie se aprende 378 artículos. Lo que hay que saber es <strong>dónde buscar</strong>: si el tema no aparece donde uno lo busca, casi siempre está en el título de al lado, y no es que la Constitución no diga nada.</p>
+    <table class="tres">
+      <tr><th>Título</th><th>De qué trata</th><th>Parte</th></tr>
+      <tr><td>I</td><td>De la Organización del Estado</td><td>Dogmática</td></tr>
+      <tr><td>II</td><td>De la Nacionalidad y Ciudadanía</td><td>Dogmática</td></tr>
+      <tr><td>III</td><td>De las Declaraciones, Derechos y Garantías</td><td>Dogmática</td></tr>
+      <tr><td>IV</td><td>De las Garantías Constitucionales</td><td>Dogmática</td></tr>
+      <tr><td>V</td><td>De los Poderes del Estado</td><td>Orgánica</td></tr>
+      <tr><td>VI</td><td>Del Régimen Económico</td><td>Orgánica</td></tr>
+      <tr><td>VII</td><td>De la Reforma y la Inviolabilidad</td><td>Orgánica</td></tr>
+      <tr><td>VIII</td><td>De las Disposiciones Transitorias y la Vigencia</td><td>Orgánica</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 En este proyecto</span><br>
+      <span>Lo educativo toca <span class="hl">dos títulos a la vez</span>: los derechos están en el III y quién los administra, en el V. Y con lo que se defiende algo, en el <span class="hl2">IV</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🧩 Cómo se lee un artículo por dentro</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Casi todos los artículos tienen las mismas cuatro piezas. Separarlas es la diferencia entre leer y creer que se leyó.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué dice</th><th>Cómo se reconoce</th></tr>
+      <tr><td>Supuesto de hecho</td><td>En qué caso se aplica</td><td>«Toda persona que…», «cuando…»</td></tr>
+      <tr><td>Consecuencia</td><td>Qué pasa entonces</td><td>«tendrá derecho a», «será sancionado»</td></tr>
+      <tr><td>Excepción</td><td>El caso que queda fuera</td><td>«salvo», «excepto», «no obstante»</td></tr>
+      <tr><td>Remisión</td><td>A qué otra norma manda</td><td>«conforme lo determine la ley»</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎯 La pregunta que decide</span><br>
+      <span>Antes de discutir nada: <span class="hl">¿mi caso encaja en el supuesto?</span> Si no encaja, ese artículo no habla de mí, por bien que suene la primera frase. Y lo segundo que se busca es <span class="hl2">el «salvo»</span>, que es lo primero que busca quien va a decir que no.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>➡️ La remisión: donde el artículo deja de decidir</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Es la pieza más importante de esta etapa y la que casi nadie mira. Cuando el texto dice «conforme lo determine la ley», el artículo <strong>parece haber decidido y no decidió</strong>: el contenido real lo escribirá otra norma, casi siempre un escalón más abajo, y la dictará quien tenga interés en el asunto.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Ante una remisión hay que preguntar dos cosas, y la segunda sorprende más de lo que debería: <strong>¿a qué norma manda?</strong> y <strong>¿esa norma existe?</strong> Una remisión a una ley que nunca se dictó deja el derecho en el papel y a la administración con las manos libres.</p>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Títulos</div><div class="stat-val">8</div></div>
+      <div class="stat-item"><div class="stat-label">Capítulos</div><div class="stat-val">43</div></div>
+      <div class="stat-item"><div class="stat-label">Artículos</div><div class="stat-val">378</div></div>
+      <div class="stat-item"><div class="stat-label">Piezas de un artículo</div><div class="stat-val">4</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🪨 Cómo se cambia, y qué no se puede cambiar</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🔁 Artículo 373: los dos votos</h4>
+        <p>Se decreta en <strong>sesiones ordinarias</strong>, con <strong>dos tercios de votos de la totalidad de los miembros</strong>, y el decreto señala qué artículo o artículos se reforman. Y después, la pieza que se olvida siempre: debe <strong>ratificarse por la subsiguiente legislatura ordinaria</strong>, por igual número de votos, para entrar en vigencia.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🪨 Artículo 374: el candado</h4>
+        <p>No podrán reformarse <strong>en ningún caso</strong> el artículo anterior, el presente artículo, ni los que se refieren a la forma de gobierno, al territorio nacional, al período presidencial, a la prohibición de ser nuevamente Presidente quien lo haya desempeñado bajo cualquier título, y a quiénes no pueden serlo por el período subsiguiente.</p>
+      </div>
+    </div>
+    <p style="font-size:0.9rem;margin:0.7rem 0;">Nótese lo fino del 374: <strong>se protege a sí mismo y al 373</strong>. Si no lo hiciera, bastaría con reformar primero el candado para poder abrir después todo lo demás. Un candado que se puede quitar no es un candado.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">📜 Decreto 131</div><div class="t-info">De 1982</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🙋 Dogmática</div><div class="t-info">Títulos I a IV</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🏛️ Orgánica</div><div class="t-info">Títulos V y VI</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">➡️ Remisión</div><div class="t-info">Manda a otra norma</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🔁 Art. 373</div><div class="t-info">Dos tercios y ratificación</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🛡️ Art. 375</div><div class="t-info">Resiste el acto de fuerza</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y el <strong>artículo 375</strong> mira al otro lado: la Constitución <strong>no pierde vigencia ni deja de cumplirse por acto de fuerza</strong>, ni cuando fuere supuestamente derogada o modificada por un medio distinto del que ella dispone. Añade además un deber para todo ciudadano, con autoridad o sin ella, de colaborar en el restablecimiento de su vigencia.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El disector de artículos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para poder leer cualquier artículo sin quedarte en la primera frase.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El mapa de los títulos</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">⚖️ Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="mapa" onclick="labShowParte('mapa')">🗺️ El mapa de los títulos</button>
+        <button class="lab-btn lab-cont-btn" data-parte="articulo" onclick="labShowParte('articulo')">🧩 El artículo por dentro</button>
+        <button class="lab-btn lab-cont-btn" data-parte="remision" onclick="labShowParte('remision')">➡️ La remisión</button>
+        <button class="lab-btn lab-cont-btn" data-parte="reforma" onclick="labShowParte('reforma')">🪨 La reforma y el candado</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En este proyecto</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: los pasos, de principio a fin</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la anatomía se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿En qué título vive?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona el título en que vive:</p>
+    <div class="neuro-trans-display" id="neuroTrans">Los derechos individuales y sociales</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">Una reforma se aprobó con dos tercios y nunca entró en vigencia</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🙋 Dogmática</button>
+        <button class="btn btn-sec" onclick="">🏛️ Orgánica</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">📜 El artículo sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Anatomía de la Constitución de 1982 · Ruta de la Ley y sus Grietas</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: anatomía de la Constitución de 1982</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El artículo sobre la mesa · Anatomía de la Constitución de 1982</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">📜 El artículo sobre la mesa: en qué título vive y qué le falta</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay un texto o una reforma de por medio. Di en qué título vive lo que está en juego, si el artículo trae remisión, si la reforma cumple el 373 sin chocar con el 374, y qué comprobarías antes de contestar (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">📜</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📜 Casos del proyecto: la Constitución tocando la puerta</h2>
+    <p>Ocho situaciones sobre M.E.T.A.S y su futuro. En todas hay un texto de por medio, y en casi todas el error no es de opinión: es de <strong>no haber comprobado</strong>, o de haber leído solo la primera frase.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla de esta ruta, otra vez:</strong> los artículos que aparecen aquí se comprobaron contra fuente el 11 de agosto de 2026. Y hay un dato que <strong>no</strong> aparece con número, a propósito: cuántas constituciones ha tenido Honduras. Las fuentes dicen doce, catorce o dieciséis según cómo se cuente, así que esta misión enseña <strong>por qué no cuadra</strong> en vez de elegir el número que suena mejor.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🏗️ Caso 1: «que reformen la Constitución»</h2>
+    <p>Un maestro entusiasmado propone pedir una reforma constitucional para que M.E.T.A.S sea de uso obligatorio en las escuelas del departamento.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⏳ Lo que pide el artículo 373</span><br>
+      <span>Sesiones ordinarias, <span class="hl">dos tercios de la totalidad de los miembros</span>, decreto que señale qué artículos, y <span class="hl2">ratificación por la subsiguiente legislatura ordinaria</span>. Son dos votos en dos legislaturas distintas.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la idea no es mala, es <strong>cara en tiempo</strong>, y conviene saberlo antes de ilusionar a nadie. Y hay una pregunta previa que ahorra todo el camino: para lo que se quiere conseguir, ¿de verdad hace falta tocar la Constitución, o basta con un acuerdo dos escalones más abajo?</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>➡️ Caso 2: «conforme a la reglamentación vigente»</h2>
+    <p>Un convenio que le ofrecen al proyecto dice que el material se usará «conforme a la reglamentación vigente», sin decir cuál es esa reglamentación ni quién la dicta.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🚪 Es una remisión, y en un contrato funciona igual</span><br>
+      <span>Se está firmando <span class="hl">un contenido que escribirá otro después</span>, sin decir quién ni cuándo. La misma técnica de la Constitución, ahora en una hoja que uno va a firmar.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> ante una remisión se piden dos cosas, y ninguna es pelear: <strong>que nombre la norma con su fecha</strong>, y saber si esa norma existe. Cinco palabras más en el convenio y se sabe qué se aceptó.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎪 Caso 3: el diputado en año electoral</h2>
+    <p>Ofrece imprimir cinco mil fichas de M.E.T.A.S con su cara en la portada, y de paso pide que el proyecto lo acompañe a dos actos.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔄 Lo que conviene tener presente</span><br>
+      <span>El artículo <span class="hl">4</span> hace obligatoria la alternabilidad en la Presidencia y llama a su infracción delito de traición a la Patria. En año electoral, todo lo que el proyecto haga <span class="hl2">se lee en clave política</span>, quiera o no.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> casi ninguna oferta se acepta o se rechaza completa. Se separa lo que aporta (la impresión) de lo que compromete (la presencia en actos), y se pone por escrito lo que no se cede: <strong>el nombre del autor y la neutralidad del material</strong> en los centros donde su partido no manda.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🗣️ Caso 4: el artículo citado de memoria</h2>
+    <p>Alguien le asegura a la familia que «la Constitución dice que la educación la autoriza exclusivamente la Secretaría», y cita el artículo 157 sin decir de qué año es el texto que leyó.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📅 Un texto con fecha</span><br>
+      <span>Puede tener toda la razón <span class="hl">y aun así estar citando una versión vieja</span>. Comprobarlo cuesta cinco minutos: texto en fuente oficial, decreto de reforma y desde cuándo rige.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> comprobar no es desconfiar de la persona. Es que <strong>el mismo número puede decir hoy otra cosa</strong>. Y en este caso concreto conviene además leerlo por piezas, porque de ese artículo depende el estatus de M.E.T.A.S y se estudia entero en la etapa 5.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>👻 Caso 5: la ley que nunca se dictó</h2>
+    <p>Un acuerdo de una Secretaría se ampara en la frase «conforme lo determine la ley» de un artículo de derechos. Se busca esa ley y resulta que nunca se dictó.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🕳️ La remisión al vacío</span><br>
+      <span>El derecho queda <span class="hl">reconocido en el papel</span> y sin contenido exigible, y la administración con las manos libres para llenarlo con lo que le convenga. Es de las grietas más limpias que existen.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> preguntar «¿a qué norma manda?» no basta: hay que preguntar también <strong>si esa norma existe</strong>. Cuando no existe, eso va derecho al Registro de Grietas con su ficha, porque es exactamente el tipo de hueco que la etapa 4 enseña a documentar.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🛡️ Caso 6: «esa Constitución ya no aplica»</h2>
+    <p>Después de un cambio de gobierno, en una oficina le dicen al proyecto que hay que esperar a que se ordene todo, porque la Constitución de antes ya no rige.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📜 El artículo 375 dice lo contrario</span><br>
+      <span>La Constitución <span class="hl">no pierde vigencia ni deja de cumplirse por acto de fuerza</span>, ni cuando fuere supuestamente derogada o modificada por un medio distinto del que ella dispone. Y añade el deber de todo ciudadano, <span class="hl2">con autoridad o sin ella</span>, de colaborar en el restablecimiento de su vigencia.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> quien dice esto suele estar pidiendo algo que no podría pedir si la Constitución se aplicara. Se contesta citando el artículo, sin levantar la voz, y <strong>pidiendo la respuesta por escrito</strong>. El argumento no suele volver a aparecer.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎉 Caso 7: la reforma que se celebró</h2>
+    <p>Sale en la prensa que el Congreso aprobó una reforma que beneficiaría al proyecto. Nadie menciona la legislatura siguiente ni la ratificación.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⏳ Falta el segundo voto</span><br>
+      <span>Sin ratificación <span class="hl">no hay vigencia</span>, por mucho que se haya celebrado. Y el caso real está en esta misma Constitución: la reforma que metió el habeas data se intentó por Decreto 381-2005 y <span class="hl2">se cayó exactamente ahí</span>. El que sí prosperó necesitó los dos votos: 237-2012 y 10-2013.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> una promesa de reforma no se planifica hasta el segundo voto. Si el proyecto cambia su plan del año y anuncia a los maestros algo que después no llega, <strong>retirar lo prometido cuesta mucho más que no haberlo prometido</strong>.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📐 Caso 8: el reglamento que reforma una ley</h2>
+    <p>Le presentan al proyecto un «reglamento» que en realidad cambia lo que dice una ley, y lo defienden diciendo que la Constitución permite reglamentar.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🪜 Reglamentar no es ampliar</span><br>
+      <span>El reglamento existe para <span class="hl">poder aplicar</span> una ley, no para ampliarla ni recortarla. Si crea un requisito nuevo se salió de su escalón, y cede en esa parte y <span class="hl2">solo en esa parte</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> es el escalón de la etapa 1 visto desde arriba, ahora con la Constitución encima. La frase que lo resuelve cabe en una línea: <strong>«¿en qué parte de la ley dice eso, y si no lo dice, con qué facultad lo añade el reglamento?»</strong></p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La hoja de lectura, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier artículo que alguien le ponga delante a esta casa, se llenan las mismas seis casillas antes de opinar:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué artículo es:</strong> número, y de qué norma con su decreto.</li>
+      <li><strong>En qué título y capítulo vive:</strong> eso dice de qué trata de verdad.</li>
+      <li><strong>Qué versión es:</strong> decreto de reforma, si lo tiene, y desde cuándo rige.</li>
+      <li><strong>Sus cuatro piezas:</strong> supuesto, consecuencia, excepción y remisión.</li>
+      <li><strong>Sus remisiones:</strong> a qué norma manda, y si esa norma existe.</li>
+      <li><strong>Cuándo se consultó:</strong> la fecha, porque dentro de un año puede no valer.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📜 Las cinco reglas de esta etapa</span><br>
+      <span>1. Un artículo no es un texto: es <span class="hl">un texto con fecha</span>. 2. Antes de buscar, decide <span class="hl">en qué título</span> debería vivir. 3. Léelo por piezas y busca <span class="hl">el «salvo»</span> antes que nadie. 4. Si hay remisión, el contenido real <span class="hl">lo escribe otro</span>: ve a buscarlo. 5. Y ante una reforma anunciada, <span class="hl2">cuenta los dos votos</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con el <strong>mapa de los ocho títulos</strong>, las cuatro piezas de un artículo, el catálogo de remisiones, el procedimiento de reforma paso a paso, los artículos 373, 374 y 375 con su texto, los ocho casos del proyecto, la <strong>hoja de lectura</strong> para llenar a mano, seis ejercicios, la hoja de fuentes y la pauta completa.</p>
+      <a href="../../fichas/ficha-ley-anatomia-constitucion.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, y por qué van con su número</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Todo lo que se cita en esta misión se comprobó contra fuente el <strong>11 de agosto de 2026</strong>. En esta ruta no se cita nada de memoria, y hay un dato que por esa misma regla <strong>no</strong> lleva número: cuántas constituciones ha tenido Honduras.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>La Constitución vigente:</strong> Decreto 131 del 11 de enero de 1982, publicada en La Gaceta 23,612 del 20 de enero de 1982. Ocho títulos, cuarenta y tres capítulos y trescientos setenta y ocho artículos.</li>
+      <li><strong>Art. 373:</strong> la reforma se decreta en sesiones ordinarias con dos tercios de votos de la totalidad de los miembros, el decreto señala qué artículos se reforman, y debe ratificarse por la subsiguiente legislatura ordinaria por igual número de votos.</li>
+      <li><strong>Art. 374:</strong> no podrán reformarse en ningún caso el artículo anterior, el presente artículo, ni los referidos a la forma de gobierno, al territorio nacional, al período presidencial, a la prohibición de ser nuevamente Presidente quien lo haya desempeñado bajo cualquier título, y a quiénes no pueden serlo por el período subsiguiente.</li>
+      <li><strong>Art. 375:</strong> la Constitución no pierde vigencia ni deja de cumplirse por acto de fuerza ni por una derogación hecha por medio distinto del que ella dispone.</li>
+      <li><strong>Art. 4:</strong> la alternabilidad en el ejercicio de la Presidencia es obligatoria, y su infracción constituye delito de traición a la Patria.</li>
+      <li><strong>Art. 182:</strong> habeas corpus y habeas data. La reforma que metió el habeas data se intentó por Decreto 381-2005 y se cayó por falta de ratificación; se volvió a intentar por Decreto 237-2012, se ratificó por Decreto 10-2013 y entró en vigor en marzo de 2013.</li>
+      <li><strong>Cuántas constituciones:</strong> dato discutido. Hay fuentes que dicen doce, otras catorce y otras dieciséis, según si se cuentan los textos del período federal y si una reforma muy grande cuenta como texto nuevo. Queda apuntado como discutido, que es lo que es.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con <strong>un artículo disecado</strong>, de verdad, con sus cuatro piezas marcadas y sus remisiones seguidas hasta el final.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../misiones/ruta-ley-fuerza-norma/fuerza-norma.html">🏛️ De dónde saca su fuerza la ley</a>: la etapa 1. Ahí está la pirámide que coloca a esta Constitución en el escalón de arriba, y la pregunta de ventanilla.</li>
+      <li><a href="../../COMPENDIO-RUTA-LEY.md">⚖️ El compendio de la ruta</a>: las doce etapas, la regla de no citar de memoria y los ocho campos del Registro de Grietas.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 3 son los derechos y su coletilla, que es esta misma técnica de la remisión vista desde el otro lado.</li>
+      <li><a href="../../index.html">🗄️ La Bóveda</a>: donde se guarda la hoja de lectura llena y el Registro de Grietas.</li>
+      <li><a href="../../fichas/ficha-ley-anatomia-constitucion.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: el mapa de títulos cabe en una página y la hoja de lectura en otra.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar <strong>un artículo de verdad</strong>, uno que le importe a esta casa, y disecarlo entero: en qué título vive, qué versión es, sus cuatro piezas marcadas con colores distintos, y cada remisión seguida hasta llegar a la norma que de verdad decide. La prueba de que está aprendido es poder contestar, sin mirar, <strong>qué le falta a una reforma aprobada con dos tercios para estar rigiendo</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">📜</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Ley y sus Grietas · Etapa 2: Anatomía de la Constitución de 1982</div>
+    <div class="diploma-mascot" aria-hidden="true">📜</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">📜</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Un artículo no es un texto: es un texto con fecha» 🌱 · 📜 Ruta de la Ley y sus Grietas · Etapa 2 de 12.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/anatomia-constitucion.js"></script>
+</body>
+</html>

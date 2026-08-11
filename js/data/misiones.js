@@ -62,6 +62,7 @@ const MISSIONS = [
   { id: 22, title: 'Verificar: nadie firma lo que no leyó', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🔎', ruta: 'maquina', etapa: 3, sello: 'familiar', url: 'misiones/ruta-maquina-verificar/verificar.html' },
   { id: 23, title: 'Llaves y secretos: claves, entornos y repositorios', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🗝️', ruta: 'casacerrada', etapa: 4, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-llaves/llaves.html' },
   { id: 24, title: 'De dónde saca su fuerza la ley: jerarquía, validez y coacción', modulo: 'aprendizaje-unido', materia: 'ley', color: 'apr', xp: 45, icon: '🏛️', ruta: 'ley', etapa: 1, sello: 'familiar', url: 'misiones/ruta-ley-fuerza-norma/fuerza-norma.html' },
+  { id: 25, title: 'Anatomía de la Constitución de 1982: qué declara y cómo se reforma', modulo: 'aprendizaje-unido', materia: 'ley', color: 'apr', xp: 45, icon: '📜', ruta: 'ley', etapa: 2, sello: 'familiar', url: 'misiones/ruta-ley-anatomia-constitucion/anatomia-constitucion.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -106,10 +107,9 @@ const ETAPAS_PREVISTAS = {
      (COMPENDIO-RUTA-LEY.md) y de ahí salen los títulos de abajo, para que el
      mapa enseñe el camino entero desde el primer día. */
   ley: {
-    /* La 1 ya está construida (id 24) y por eso no lleva título aquí: el mapa
-       la toma de MISSIONS. Se deja la lista desde la 2 para que se vea que el
-       resto del compendio sigue pendiente. */
-    2:  'Anatomía de la Constitución de 1982: qué declara y cómo se reforma',
+    /* Las etapas 1 y 2 ya están construidas (ids 24 y 25) y por eso no llevan
+       título aquí: el mapa las toma de MISSIONS. Se deja la lista desde la 3
+       para que se vea que el resto del compendio sigue pendiente. */
     3:  'Los derechos y la coletilla que los devuelve',
     4:  'La grieta: cómo se caza una contradicción en la ley',
     5:  'Interpretar: los métodos con que se lee y se estira la letra',

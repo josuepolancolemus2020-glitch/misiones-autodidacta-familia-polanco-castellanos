@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><meta charset="UTF-8"><title>Sonda · Ruta de la Ley y sus Grietas, etapa 1</title>
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Ley y sus Grietas, etapa 2</title>
 <style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
 iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
 pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
 </head>
 <body>
-<iframe id="m" src="/misiones/ruta-ley-fuerza-norma/fuerza-norma.html"></iframe>
+<iframe id="m" src="/misiones/ruta-ley-anatomia-constitucion/anatomia-constitucion.html"></iframe>
 <iframe id="app" src="/index.html"></iframe>
 <pre id="out">midiendo…</pre>
 <script>
-/* Comprueba la etapa 1 de la Ruta de la Ley y sus Grietas: bancos,
+/* Comprueba la etapa 2 de la Ruta de la Ley y sus Grietas: bancos,
    laboratorio, pruebas impresas con su nombre, los ocho casos, la ficha y la
-   ruta empezando a poblarse.
+   ruta con sus dos primeras etapas ya construidas.
 
-   Y una comprobación que NO tiene ninguna otra misión del proyecto: que no se
-   cite ningún artículo fuera de la lista comprobada. Es la regla de la ruta
-   (capítulo 1 del compendio) convertida en prueba, porque una regla que solo
-   está escrita en un documento se salta sola dentro de seis meses. Aquí un
-   artículo inventado pone la sonda en rojo. */
+   Mantiene la comprobación que estrenó la etapa 1: que no se cite ningún
+   artículo fuera de la lista comprobada. Es la regla de la ruta convertida en
+   prueba, porque una regla que solo está escrita en un documento se salta
+   sola dentro de seis meses.
+
+   Y añade una que solo tiene sentido en esta etapa: que el dato de cuántas
+   constituciones ha tenido Honduras NO aparezca afirmado con un número. Las
+   fuentes dan doce, catorce y dieciséis según cómo se cuente, así que la
+   misión enseña la discrepancia. Si algún día alguien "mejora" el texto
+   poniendo una cifra redonda, esto se pone en rojo. */
 const out = document.getElementById('out');
 const L = []; let fallos = 0, sembrado = false;
 function log(s){ L.push(s); out.textContent = L.join('\n'); }
@@ -29,14 +34,19 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
    comprobaron contra fuente el 11 de agosto de 2026 y están apuntados en la
    cabecera de _dev/inyecta-bancos-ley-fuerza.js. Para añadir uno hay que
    comprobarlo primero y luego meterlo aquí, en ese orden. */
-const ARTICULOS_COMPROBADOS = ['16', '17', '18', '70', '157', '205', '320', '321'];
+const ARTICULOS_COMPROBADOS = ['4', '16', '17', '18', '70', '157', '182', '205', '239', '320', '321', '373', '374', '375'];
 
 /* Se lee del HTML con las etiquetas cambiadas por espacios, NO de textContent:
    textContent pega el final de un elemento con el principio del siguiente, y
    «Artículo 18» seguido de un «1.» de la lista de al lado se leía como el
-   artículo 181, que no existe. La sonda daba un fallo que no era. */
+   artículo 181, que no existe. La sonda daba un fallo que no era.
+
+   Y se quita antes la barra de estadísticas, porque ahí «Artículos» es el
+   rótulo de un contador y «378» su valor: pegados parecían la cita del
+   artículo 378. Mismo tipo de falso positivo, otra fuente. */
 function textoSeparado(nodoOHtml) {
-  const html = typeof nodoOHtml === 'string' ? nodoOHtml : nodoOHtml.innerHTML;
+  let html = typeof nodoOHtml === 'string' ? nodoOHtml : nodoOHtml.innerHTML;
+  html = html.replace(/<div class="stat-bar"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/g, ' ');
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 }
 
@@ -69,11 +79,16 @@ window.addEventListener('load', async () => {
   try {
     log('── LA MISIÓN ──');
     ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
-    ok(/Ruta de la Ley y sus Grietas · Etapa 1 de 12/.test(d.body.textContent), 'se presenta como etapa 1 de 12', 'no se presenta como etapa de la ruta');
-    /* Restos del molde: se copió de «Llaves y secretos», y su vocabulario no
-       tiene nada que hacer aquí. */
-    ok(!/clave anónima|clave de servicio|rotar la clave|\.gitignore|custodio|firma del APK|Casa Cerrada/i.test(d.body.textContent),
-       'sin restos de la misión de la que se copió', 'queda el temario de Llaves y secretos');
+    ok(/Ruta de la Ley y sus Grietas · Etapa 2 de 12/.test(d.body.textContent), 'se presenta como etapa 2 de 12', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se copió de la etapa 1, y su vocabulario propio no va
+       aquí. Se mira TODO menos Recursos, porque esa sección enlaza la etapa 1
+       a propósito y la nombra por su tema: ahí «la pregunta de ventanilla» es
+       una referencia, no un resto. La ruta se construye encima de sí misma y
+       la sonda tiene que saber distinguir las dos cosas. */
+    const cuerpoSinRecursos = [...d.querySelectorAll('.sec')]
+      .filter(x => x.id !== 's-recursos').map(x => x.textContent).join(' ');
+    ok(!/pregunta de ventanilla|riesgo dormido|siempre se ha hecho así|coacción, legitimidad|clave anónima|Casa Cerrada/i.test(cuerpoSinRecursos),
+       'sin restos de la misión de la que se copió', 'queda el temario de la etapa 1');
     ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
 
     log('\n── NADA SE CITA DE MEMORIA (la regla de esta ruta) ──');
@@ -82,8 +97,13 @@ window.addEventListener('load', async () => {
     ok(intrusos.length === 0,
        'los ' + citadosMision.length + ' artículos citados están en la lista comprobada',
        'artículos citados sin comprobar: ' + intrusos.join(', '));
-    ok(citadosMision.includes('321') && citadosMision.includes('70'),
-       'cita el par 70 y 321, que es el corazón de la etapa', 'falta el par 70 / 321');
+    ok(citadosMision.includes('373') && citadosMision.includes('374'),
+       'cita el par 373 y 374, que es el corazón de la etapa', 'falta el par 373 / 374');
+    const texto0 = textoSeparado(d.body);
+    ok(!/(doce|catorce|dieciséis|dieciseis|16|12|14)\s+constituciones/i.test(texto0) ||
+       /discutid|no coinciden|según cómo se cuente|seg\u00fan si se cuentan/i.test(texto0),
+       'el dato de cuántas constituciones va como discutido, no como cifra',
+       'la misión afirma un número de constituciones sin comprobar');
     ok(/11 de agosto de 2026/.test(d.body.textContent), 'dice cuándo se comprobaron las fuentes', 'no dice la fecha de comprobación');
 
     log('\n── BANCOS ──');
@@ -97,9 +117,9 @@ window.addEventListener('load', async () => {
        note en pantalla, así que se comprueba aquí. */
     ok(dentro('evalMCBank.every(q => typeof q.a === "number" && q.o[q.a])'),
        'la evaluación final sabe cuál es la respuesta correcta', 'evalMCBank no trae la clave «a»');
-    ok(dentro('Object.keys(parteData).join(",")') === 'norma,escalones,vida,facultad', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
-    ok(dentro('timelineData.length') === 7, 'las 7 piezas de la fuerza de una norma', 'piezas: ' + dentro('timelineData.length'));
-    ok(/faro_ley_fuerza/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    ok(dentro('Object.keys(parteData).join(",")') === 'mapa,articulo,remision,reforma', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'las 7 piezas de la anatomía', 'piezas: ' + dentro('timelineData.length'));
+    ok(/faro_ley_anatomia/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
     let sopaOk = true;
     dentro('sopaSets').forEach(s => s.words.forEach(p => {
       if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
@@ -108,21 +128,26 @@ window.addEventListener('load', async () => {
 
     log('\n── LO QUE LA ETAPA TIENE QUE ENSEÑAR ──');
     const texto = d.body.textContent.replace(/\s+/g, ' ');
-    ok(/en qué norma dice usted que puede exigirme esto/i.test(texto), 'trae la pregunta de ventanilla', 'falta la pregunta de la etapa');
-    ok(/expresamente le confiere la ley|confiere expresamente|le confiere la ley/i.test(texto), 'explica la facultad expresa del art. 321', 'no explica el 321');
-    ok(/no perjudique a otro/i.test(texto), 'explica lo que puede el particular (art. 70)', 'no explica el 70');
-    ok(/validez/i.test(texto) && /vigencia/i.test(texto) && /eficacia/i.test(texto), 'separa validez, vigencia y eficacia', 'no separa las tres');
-    ok(/riesgo dormido/i.test(texto), 'nombra la norma dormida', 'no aparece el riesgo dormido');
-    ok(/prevalece el tratado/i.test(texto), 'coloca el tratado por encima de la ley', 'no explica el lugar del tratado');
-    ok(/coacción/i.test(texto) && /legitimidad/i.test(texto) && /costumbre/i.test(texto), 'las tres patas del cumplimiento', 'faltan patas del cumplimiento');
-    ok(/siempre se ha hecho así/i.test(texto), 'desarma «siempre se ha hecho así»', 'no aparece la costumbre de oficina');
-    ok(/no se publicó|sin publicación|La Gaceta/i.test(texto), 'explica que sin publicación no obliga', 'no habla de la publicación');
-    ok(/circular/i.test(texto), 'distingue el papel que no es norma', 'no aparece la circular');
+    ok(/Decreto 131/.test(texto), 'identifica el texto vigente por su decreto', 'no dice qué decreto es la Constitución');
+    ok(/23,612|20 de enero de 1982/.test(texto), 'y por su publicación', 'no dice cuándo se publicó');
+    ok(/ocho títulos|8 títulos/i.test(texto), 'da el mapa de los ocho títulos', 'no dice cuántos títulos tiene');
+    ok(/dogmática/i.test(texto) && /orgánica/i.test(texto), 'separa la parte dogmática de la orgánica', 'no separa las dos partes');
+    ok(/supuesto de hecho/i.test(texto) && /consecuencia/i.test(texto) && /excepción/i.test(texto) && /remisión/i.test(texto),
+       'enseña las cuatro piezas de un artículo', 'faltan piezas del artículo');
+    ok(/conforme lo determine la ley/i.test(texto), 'trae la fórmula de la remisión', 'no aparece la fórmula de la remisión');
+    ok(/dos tercios/i.test(texto), 'explica los dos tercios del 373', 'no explica los dos tercios');
+    ok(/subsiguiente legislatura/i.test(texto), 'y la ratificación por la legislatura siguiente', 'no aparece la ratificación');
+    ok(/en ningún caso/i.test(texto), 'explica el candado del 374', 'no explica el 374');
+    ok(/acto de fuerza/i.test(texto), 'trae la inviolabilidad del 375', 'no aparece el 375');
+    ok(/habeas data/i.test(texto), 'usa el habeas data como ejemplo real del 373', 'falta el caso del habeas data');
+    ok(/381-2005/.test(texto) && /237-2012/.test(texto) && /10-2013/.test(texto),
+       'con los tres decretos del caso', 'faltan decretos del caso del habeas data');
+    ok(/texto con fecha/i.test(texto), 'insiste en que un artículo es un texto con fecha', 'no aparece la idea del texto con fecha');
 
     log('\n── EN PANTALLA ──');
     w.go('s-lab'); await esperar(150);
-    ok(/Qué es una norma/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en la norma', 'abre en otra pieza');
-    ok(!!d.querySelector('.lab-cont-btn[data-parte="norma"]'), 'el botón de la pieza inicial existe', 'el laboratorio arrastra la pieza del molde');
+    ok(/El mapa de los títulos/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el mapa', 'abre en otra pieza');
+    ok(!!d.querySelector('.lab-cont-btn[data-parte="mapa"]'), 'el botón de la pieza inicial existe', 'el laboratorio arrastra la pieza del molde');
     w.go('s-quiz'); await esperar(150);
     ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
     w.go('s-evaluacion'); await esperar(200);
@@ -130,11 +155,11 @@ window.addEventListener('load', async () => {
     ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
     w.genEvalCrit(); await esperar(300);
     const crit = d.getElementById('evalCritOut').textContent;
-    ok(crit.length > 200, 'el papel sobre la mesa se genera', 'prueba competencial vacía');
+    ok(crit.length > 200, 'el artículo sobre la mesa se genera', 'prueba competencial vacía');
     const rotulos = [d.getElementById('eval-screen-title'), d.getElementById('evalcrit-screen-title'),
                      d.getElementById('evalOut'), d.getElementById('evalCritOut'),
                      d.querySelectorAll('.eval-print-header')[0]].map(textoSeparado).join(' · ');
-    ok(!/Llaves y secretos|El llavero|Las seis palancas|La puerta de la casa digital|El código que no confía|Verificar|El presupuesto real|Pedir bien|Etapa 4 · Ciberseguridad/.test(rotulos),
+    ok(!/De dónde saca su fuerza la ley|El papel sobre la mesa|Llaves y secretos|El llavero|La puerta de la casa digital|Etapa 1 · Derecho y Ley/.test(rotulos),
        'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
     const citadosPruebas = articulosCitados(rotulos).filter(n => !ARTICULOS_COMPROBADOS.includes(n));
     ok(citadosPruebas.length === 0, 'las pruebas tampoco citan artículos sin comprobar', 'en las pruebas: ' + citadosPruebas.join(', '));
@@ -145,32 +170,33 @@ window.addEventListener('load', async () => {
     if (casos) {
       ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
       const txt = casos.textContent;
-      ['circular', 'autoría', 'reglamento', 'siempre se ha hecho así', 'tratado', 'dormida', 'publicó', '157']
+      ['reforma', 'reglamentación vigente', 'electoral', '157', 'nunca se dictó', 'ya no aplica', 'segundo voto', 'reglamento']
         .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
       ok((txt.match(/Lo que enseña/g) || []).length === 8, 'los ocho casos cierran con lo que enseñan', 'casos con lección: ' + (txt.match(/Lo que enseña/g) || []).length);
       ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
-      ok(/hoja de ventanilla/i.test(txt), 'trae la hoja de ventanilla', 'falta la hoja de ventanilla');
+      ok(/hoja de lectura/i.test(txt), 'trae la hoja de lectura', 'falta la hoja de lectura');
       ok(/cinco reglas/i.test(txt), 'trae las cinco reglas de la etapa', 'faltan las cinco reglas');
       ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
     }
     const decisiones = dentro('critDecisionBank.join(" ")');
-    ok(/circular|acuerdo|tratado|instructivo|siempre se ha hecho/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+    ok(/reforma|remisión|reglamentación|electoral|ratifica/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
 
     log('\n── FICHA ──');
-    const r = await fetch('/fichas/ficha-ley-fuerza-norma.html');
+    const r = await fetch('/fichas/ficha-ley-anatomia-constitucion.html');
     const txtF = r.ok ? await r.text() : '';
     ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
     ok((txtF.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txtF.match(/class="pagina"/g) || []).length);
-    ok(/La hoja de ventanilla, para llenar a lápiz/i.test(txtF), 'la ficha trae la hoja en blanco', 'falta la hoja de ventanilla en blanco');
-    ok(/Una hoja de ventanilla ya llena/i.test(txtF), 'y una ya llena, como ejemplo', 'falta el ejemplo lleno');
-    ok(/La pirámide: quién manda sobre quién/i.test(txtF), 'la ficha trae la pirámide', 'falta la pirámide');
+    ok(/La hoja de lectura, para llenar a lápiz/i.test(txtF), 'la ficha trae la hoja en blanco', 'falta la hoja de lectura en blanco');
+    ok(/Una hoja de lectura ya llena/i.test(txtF), 'y una ya llena, como ejemplo', 'falta el ejemplo lleno');
+    ok(/El mapa de los ocho títulos/i.test(txtF), 'la ficha trae el mapa de títulos', 'falta el mapa de títulos');
+    ok(/Un artículo disecado, entero/i.test(txtF), 'y un artículo disecado como ejemplo', 'falta el artículo disecado');
     ok(/Hoja de fuentes/i.test(txtF), 'la ficha trae su hoja de fuentes', 'falta la hoja de fuentes');
     ok(/Pauta completa de respuestas/.test(txtF), 'trae su pauta', 'sin pauta');
     ok(!/—/.test(txtF), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
     ok((txtF.match(/<table/g) || []).length === (txtF.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar');
     const citadosFicha = articulosCitados(textoSeparado(txtF)).filter(n => !ARTICULOS_COMPROBADOS.includes(n));
     ok(citadosFicha.length === 0, 'la ficha tampoco cita artículos sin comprobar', 'en la ficha: ' + citadosFicha.join(', '));
-    ok(!!d.querySelector('#s-recursos a[href*="ficha-ley-fuerza-norma"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-ley-anatomia-constitucion"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
 
     log('\n── EN LA APLICACIÓN ──');
     const da = appFrame.contentDocument, wa = appFrame.contentWindow;
@@ -178,12 +204,9 @@ window.addEventListener('load', async () => {
     const ley = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Ley y sus Grietas/.test(c.textContent));
     ok(!!ley, 'la Ruta de la Ley está en el mapa', 'no aparece la ruta');
     if (ley) {
-      /* Estas dos cuentas suben cada vez que se construye una etapa de la
-         ruta. No es una comprobación frágil: es la que avisa de que la misión
-         nueva llegó al catálogo, así que se actualiza a propósito. */
       ok(ley.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + ley.querySelectorAll('.re-link').length);
       ok(ley.querySelectorAll('.ruta-etapa-futura').length === 10, 'y 10 etapas por construir con nombre', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length);
-      ok(/De dónde saca su fuerza la ley/.test(ley.textContent), 'la etapa 1 sale con el título de la misión', 'la etapa 1 sigue saliendo como prevista');
+      ok(/Anatomía de la Constitución de 1982/.test(ley.textContent), 'la etapa 2 sale con el título de la misión', 'la etapa 2 sigue saliendo como prevista');
       ok(/La grieta/i.test(ley.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
       ok(!/Etapa por construir/.test(ley.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
     }
@@ -194,7 +217,7 @@ window.addEventListener('load', async () => {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
       ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
-      const t = tarjetas.find(x => /fuerza la ley/i.test(x.textContent));
+      const t = tarjetas.find(x => /Anatomía/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
