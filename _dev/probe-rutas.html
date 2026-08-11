@@ -81,7 +81,7 @@ f.onload = async () => {
       ok(/0 de 10 etapas recorridas/.test(ing.textContent), 'la cuenta arranca en 0 de 10', 'cuenta: ' + (ing.querySelector('.ruta-cuenta') || {}).textContent);
     }
     /* La Ley es la ruta más larga del mapa y la que va más atrás: doce etapas
-       salidas del compendio y las dos primeras construidas. Se comprueba
+       salidas del compendio y las tres primeras construidas. Se comprueba
        aparte porque es el caso que mezcla las dos cosas, etapas tocables y
        etapas en gris, y porque el título de las construidas tiene que venir de
        MISSIONS y no de ETAPAS_PREVISTAS. Estas cuentas suben cada vez que se
@@ -90,11 +90,11 @@ f.onload = async () => {
     ok(!!ley, 'está la Ruta de la Ley y sus Grietas', 'falta la ruta de la ley');
     if (ley) {
       ok(ley.querySelectorAll('.ruta-etapa').length === 12, 'muestra las 12 etapas del compendio', 'etapas: ' + ley.querySelectorAll('.ruta-etapa').length);
-      ok(ley.querySelectorAll('.ruta-etapa-futura').length === 10, '10 van «Por construir»', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length);
-      ok(ley.querySelectorAll('.re-link').length === 2, 'las etapas 1 y 2 ya se pueden tocar', 'tocables: ' + ley.querySelectorAll('.re-link').length);
-      ok(/0 de 12 etapas recorridas · 2 construidas/.test(ley.textContent), 'la cuenta dice 0 de 12 y 2 construidas', 'cuenta: ' + (ley.querySelector('.ruta-cuenta') || {}).textContent);
-      ok(/De dónde saca su fuerza la ley/.test(ley.textContent) && /Anatomía de la Constitución de 1982/.test(ley.textContent),
-         'las etapas 1 y 2 salen con el título de su misión', 'alguna etapa construida no toma el título de MISSIONS');
+      ok(ley.querySelectorAll('.ruta-etapa-futura').length === 9, '9 van «Por construir»', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length);
+      ok(ley.querySelectorAll('.re-link').length === 3, 'las etapas 1, 2 y 3 ya se pueden tocar', 'tocables: ' + ley.querySelectorAll('.re-link').length);
+      ok(/0 de 12 etapas recorridas · 3 construidas/.test(ley.textContent), 'la cuenta dice 0 de 12 y 3 construidas', 'cuenta: ' + (ley.querySelector('.ruta-cuenta') || {}).textContent);
+      ok(/De dónde saca su fuerza la ley/.test(ley.textContent) && /Anatomía de la Constitución de 1982/.test(ley.textContent) && /Los derechos y la coletilla/.test(ley.textContent),
+         'las etapas 1, 2 y 3 salen con el título de su misión', 'alguna etapa construida no toma el título de MISSIONS');
       ok(!/Etapa por construir/.test(ley.textContent), 'cada etapa sale con su nombre, no con el rótulo genérico', 'alguna etapa no tiene título en ETAPAS_PREVISTAS');
     }
     ok(d.querySelector('.qa-item[data-qa="view-rutas"]') && d.querySelector('.drawer-item[data-view="view-rutas"]'),

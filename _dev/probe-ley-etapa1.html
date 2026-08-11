@@ -181,8 +181,8 @@ window.addEventListener('load', async () => {
       /* Estas dos cuentas suben cada vez que se construye una etapa de la
          ruta. No es una comprobación frágil: es la que avisa de que la misión
          nueva llegó al catálogo, así que se actualiza a propósito. */
-      ok(ley.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + ley.querySelectorAll('.re-link').length);
-      ok(ley.querySelectorAll('.ruta-etapa-futura').length === 10, 'y 10 etapas por construir con nombre', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length);
+      ok(ley.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + ley.querySelectorAll('.re-link').length);
+      ok(ley.querySelectorAll('.ruta-etapa-futura').length === 9, 'y 9 etapas por construir con nombre', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length);
       ok(/De dónde saca su fuerza la ley/.test(ley.textContent), 'la etapa 1 sale con el título de la misión', 'la etapa 1 sigue saliendo como prevista');
       ok(/La grieta/i.test(ley.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
       ok(!/Etapa por construir/.test(ley.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
@@ -193,7 +193,7 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
       const t = tarjetas.find(x => /fuerza la ley/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
