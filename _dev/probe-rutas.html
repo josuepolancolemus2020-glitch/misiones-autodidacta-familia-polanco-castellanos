@@ -80,17 +80,19 @@ f.onload = async () => {
       ok(/El testamento técnico/.test(ing.textContent), 'las asignaciones salen con su nombre', 'las asignaciones no aparecen');
       ok(/0 de 10 etapas recorridas/.test(ing.textContent), 'la cuenta arranca en 0 de 10', 'cuenta: ' + (ing.querySelector('.ruta-cuenta') || {}).textContent);
     }
-    /* La Ley es la primera ruta del mapa SIN una sola misión construida: las
-       doce etapas salen del compendio. Se comprueba aparte porque una ruta
-       vacía es el caso que puede romper el mapa (barra de progreso en cero,
-       nada que tocar) y aquí es un estado normal, no un error. */
+    /* La Ley es la ruta más larga del mapa y la que va más atrás: doce etapas
+       salidas del compendio y solo la primera construida. Se comprueba aparte
+       porque es el caso que mezcla las dos cosas, una etapa tocable y once en
+       gris, y porque el título de la etapa 1 tiene que venir de MISSIONS y no
+       de ETAPAS_PREVISTAS. */
     const ley = [...cards].find(c => /Ruta de la Ley y sus Grietas/.test(c.textContent));
     ok(!!ley, 'está la Ruta de la Ley y sus Grietas', 'falta la ruta de la ley');
     if (ley) {
       ok(ley.querySelectorAll('.ruta-etapa').length === 12, 'muestra las 12 etapas del compendio', 'etapas: ' + ley.querySelectorAll('.ruta-etapa').length);
-      ok(ley.querySelectorAll('.ruta-etapa-futura').length === 12, 'las 12 van «Por construir»', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length);
-      ok(ley.querySelectorAll('.re-link').length === 0, 'ninguna se puede tocar todavía', 'tocables: ' + ley.querySelectorAll('.re-link').length);
-      ok(/0 de 12 etapas recorridas · 0 construidas/.test(ley.textContent), 'la cuenta dice 0 de 12 y 0 construidas', 'cuenta: ' + (ley.querySelector('.ruta-cuenta') || {}).textContent);
+      ok(ley.querySelectorAll('.ruta-etapa-futura').length === 11, '11 van «Por construir»', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length);
+      ok(ley.querySelectorAll('.re-link').length === 1, 'la etapa 1 ya se puede tocar', 'tocables: ' + ley.querySelectorAll('.re-link').length);
+      ok(/0 de 12 etapas recorridas · 1 construida/.test(ley.textContent), 'la cuenta dice 0 de 12 y 1 construida', 'cuenta: ' + (ley.querySelector('.ruta-cuenta') || {}).textContent);
+      ok(/De dónde saca su fuerza la ley/.test(ley.textContent), 'la etapa 1 sale con el título de su misión', 'la etapa 1 no toma el título de MISSIONS');
       ok(!/Etapa por construir/.test(ley.textContent), 'cada etapa sale con su nombre, no con el rótulo genérico', 'alguna etapa no tiene título en ETAPAS_PREVISTAS');
     }
     ok(d.querySelector('.qa-item[data-qa="view-rutas"]') && d.querySelector('.drawer-item[data-view="view-rutas"]'),

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Ley y sus Grietas · Etapa 1: De dónde saca su fuerza la ley | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/fuerza-norma.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Cumple lo que le digan 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🏛️</div>
+    <div class="hero-text">
+      <h1>De dónde saca su fuerza la ley: <span>jerarquía, validez y coacción</span></h1>
+      <p class="sub">Un papel con sello no manda por el sello: manda por el escalón en que vive ⚖️</p>
+      <div class="badge">⚖️ Ruta de la Ley y sus Grietas · Etapa 1 de 12</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚖️ La pregunta que abre esta ruta entera</h2>
+    <p>Casi ninguna pelea que va a tener esta familia será sobre lo que dice la Constitución. Serán sobre <strong>si el papel que alguien le está enseñando manda o no manda</strong>. Por eso la ruta empieza aquí y no en los derechos: sin saber de dónde saca su fuerza una norma, cualquier hoja con sello parece obligatoria, y casi ninguna lo es.</p>
+    <p>La fuerza de una norma no viene del sello ni del tono de quien la lee en voz alta. Viene de tres cosas que hay que aprender a separar: <strong>quién la dictó</strong> (y si podía), <strong>en qué escalón vive</strong> (y a quién le gana), y <strong>si de verdad está rigiendo hoy</strong>.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La pregunta de esta etapa</strong>, y se aprende de memoria porque se usa de pie y sin apuntes: <strong>«¿en qué norma dice usted que puede exigirme esto?»</strong> No es una pelea ni una insolencia. Es pedir el fundamento que la propia Constitución ya exige, en el artículo 321.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 La asimetría que conviene saber de memoria</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🙋 Tú, particular · artículo 70</h4>
+        <p>Puedes hacer <strong>todo lo que no perjudique a otro</strong>, y nadie está obligado a hacer lo que la ley no manda ni impedido de hacer <strong>lo que la ley no prohíbe</strong>. Por eso la pregunta para un proyecto de la casa no es «qué norma me autoriza»: es <strong>qué norma me lo prohíbe</strong>.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🏢 El funcionario · artículo 321</h4>
+        <p><strong>No tiene más facultades que las que expresamente le confiere la ley</strong>, y todo acto que ejecute fuera de ella es nulo e implica responsabilidad. Lo suyo es al revés que lo tuyo: no puede lo que no está prohibido, solo puede <strong>lo que está escrito que puede</strong>.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚙️ La regla que sirve para todo</span><br>
+      <span>Dos personas frente a frente en una ventanilla y <span class="hl">reglas opuestas</span> para cada una. Quien entiende esa sola frase deja de negociar y empieza a <span class="hl2">pedir el fundamento</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las siete piezas de la fuerza de una norma</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada pieza para ver qué es, dónde se cae y cómo aparece en este proyecto.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una pieza de la fuerza de la norma.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: el requisito que apareció en la ventanilla</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué haces cuando te exigen un papel que nadie sabe de dónde sale.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🧾</span><span class="ms-text"><strong>El trámite:</strong> vas a presentar M.E.T.A.S en un centro y te piden una constancia más.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🗣️</span><span class="ms-text"><strong>La razón:</strong> «es el procedimiento, siempre se ha hecho así».</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🔎</span><span class="ms-text"><strong>La comprobación:</strong> preguntas de qué norma sale y nadie sabe decirlo.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">📄</span><span class="ms-text"><strong>Lo único que aparece:</strong> una circular interna de la propia oficina.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué haces con el requisito?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🧾 Lo cumplo y sigo</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">📝 Pido por escrito en qué norma consta</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏛️ La pirámide: quién manda sobre quién</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Todas las normas no valen lo mismo. Están ordenadas, y <strong>lo de abajo no puede contradecir lo de arriba</strong>: cuando chocan, se cae la de abajo. Del escalón más alto al suelo:</p>
+    <table class="tres">
+      <tr><th>Escalón</th><th>Quién lo dicta</th><th>Qué pasa si choca</th></tr>
+      <tr><td>Constitución</td><td>El poder constituyente</td><td>Gana siempre (art. 320)</td></tr>
+      <tr><td>Tratado en vigor</td><td>Congreso y Ejecutivo</td><td>Gana a la ley (art. 18)</td></tr>
+      <tr><td>Ley</td><td>El Congreso (art. 205)</td><td>Cede ante los dos de arriba</td></tr>
+      <tr><td>Reglamento</td><td>El Ejecutivo</td><td>No pide lo que la ley no pide</td></tr>
+      <tr><td>Acuerdo</td><td>Una Secretaría</td><td>No recorta lo que da una ley</td></tr>
+      <tr><td>Circular o instructivo</td><td>Una oficina</td><td>No es norma: no obliga</td></tr>
+    </table>
+    <p style="font-size:0.86rem;margin:0.5rem 0 0.7rem;color:var(--gray);">El tratado lo aprueba el Congreso y lo ratifica el Ejecutivo. Una Secretaría acuerda solo dentro de lo que la ley le permite. Y el reglamento existe para <strong>poder aplicar</strong> una ley, no para ampliarla: si crea un requisito nuevo, cede en esa parte y solo en esa. La circular, en cambio, organiza a quien ya está obligado y no alcanza al ciudadano.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 En este proyecto</span><br>
+      <span>El artículo <span class="hl">157</span> es Constitución, y por eso pesa tanto en el estatus de M.E.T.A.S. La Ley Fundamental de Educación es ley. Y lo que suele llegar de un distrito es acuerdo o circular: <span class="hl2">dos o tres escalones más abajo</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📅 Válida, vigente y eficaz no son lo mismo</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Son tres cosas distintas y <strong>no se implican entre sí</strong>. Separarlas cambia la respuesta entera, porque cada una se ataca por una vía diferente.</p>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>✅ Validez y 📅 vigencia</h4>
+        <p><strong>Validez:</strong> la norma nació bien, la dictó quien podía y por el camino que correspondía. <strong>Vigencia:</strong> está rigiendo hoy, ya entró y nadie la derogó. Un artículo no es un texto: es <strong>un texto con fecha</strong>, y por eso toda cita lleva su decreto de reforma.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🎯 Eficacia</h4>
+        <p>Que <strong>de verdad se cumple</strong>. Es la única que no se mide en el papel sino en la calle. Una norma puede ser válida, vigente y tener eficacia cero, y eso es lo más frecuente de todo lo que va a encontrar esta familia.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⚠️ La confusión más cara de la etapa</span><br>
+      <span>Dar por muerta una norma <span class="hl">porque nadie la cumple</span>. No está muerta: está dormida. Sigue vigente, y el día que alguien decida aplicarla se aplica, que suele ser <span class="hl2">justo el peor día</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>💪 Por qué se cumple una norma: las tres patas</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>1. Coacción y 2. legitimidad</h4>
+        <p><strong>Coacción:</strong> la consecuencia respaldada por la fuerza del Estado. <strong>Legitimidad:</strong> que se acepte que quien manda tiene derecho a mandar. La segunda es la pata barata: una norma legítima se cumple sin vigilancia, y cuando se pierde hay que sustituirla con coacción, que cuesta muchísimo más.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>3. La costumbre, que no es escalón</h4>
+        <p><strong>Que ya se venía haciendo.</strong> Explica por qué la gente cumple, pero <strong>no convierte en exigible lo que ninguna norma manda</strong>. En una ventanilla, «siempre se ha hecho así» describe un hábito de oficina y no funda ninguna obligación.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas de la fuerza</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Escalones de la pirámide</div><div class="stat-val">6</div></div>
+      <div class="stat-item"><div class="stat-label">Patas del cumplimiento</div><div class="stat-val">3</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de esta ruta</div><div class="stat-val">12</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📰 Publicada o no obliga, y otras confusiones caras</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Una norma que no se publicó <strong>no se le puede exigir a nadie</strong>, porque el país no pudo conocerla. Eso no es un trámite: es la condición para poder obligar, y es la idea más vieja que existe sobre la ley, la de escribirla en la plaza para que cualquiera la lea. En la práctica sirve dos veces: permite comprobar el texto exacto con su fecha, y desarma cualquier requisito que solo viva en un papel de oficina.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">✅ Validez</div><div class="t-info">Nació bien</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">📅 Vigencia</div><div class="t-info">Rige hoy</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🎯 Eficacia</div><div class="t-info">Se cumple de verdad</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🏛️ Jerarquía</div><div class="t-info">Decide quién gana</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🏢 Facultad</div><div class="t-info">La da la ley, no el cargo</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">📰 Publicidad</div><div class="t-info">Sin ella no obliga</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">La regla que sale de aquí: <strong>casi ningún requisito abusivo llega con cara de abuso</strong>. Llega en hoja membretada, con sello, dicho con seguridad y acompañado de «es el procedimiento». La defensa tampoco es jurídica: es una costumbre de tres palabras, pedirlo por escrito.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 La pirámide en la mano</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para saber tratar cualquier papel que le pongan delante.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Qué es una norma</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">⚖️ Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="norma" onclick="labShowParte('norma')">📜 Qué es una norma</button>
+        <button class="lab-btn lab-cont-btn" data-parte="escalones" onclick="labShowParte('escalones')">🏛️ Los escalones</button>
+        <button class="lab-btn lab-cont-btn" data-parte="vida" onclick="labShowParte('vida')">📅 La vida de una norma</button>
+        <button class="lab-btn lab-cont-btn" data-parte="facultad" onclick="labShowParte('facultad')">🏢 La facultad</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En este proyecto</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado está?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un término del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: los pasos, de principio a fin</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la fuerza de la norma se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿En qué escalón vive?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona su escalón en la pirámide:</p>
+    <div class="neuro-trans-display" id="neuroTrans">El artículo 157, sobre quién autoriza la educación formal</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">Exigen un requisito y nadie puede señalar en qué norma consta</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">📜 Es norma</button>
+        <button class="btn btn-sec" onclick="">📄 No es norma</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">⚖️ El papel sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · De dónde saca su fuerza la ley · Ruta de la Ley y sus Grietas</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: de dónde saca su fuerza la ley</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El papel sobre la mesa · De dónde saca su fuerza la ley</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">⚖️ El papel sobre la mesa: en qué escalón vive y con qué facultad</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay un papel que alguien le está enseñando a la familia. Di en qué escalón vive, si quien lo exige tiene facultad expresa, si lo que falla es la validez, la vigencia o la eficacia, y qué contestas por escrito (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">⚖️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>⚖️ Casos del proyecto: papeles que le pueden llegar a esta casa</h2>
+    <p>Ocho situaciones sobre M.E.T.A.S y su futuro. Ninguna es un ejemplo de manual: todas pueden tocar la puerta este año escolar, y en cada una lo que se decide no es si uno tiene razón, sino <strong>qué se pregunta primero</strong>.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Antes de empezar, la regla de esta ruta:</strong> los artículos que aparecen aquí se comprobaron contra fuente el 11 de agosto de 2026, y van con su número porque se pueden buscar. En otra ruta un dato flojo cuesta una corrección; aquí cuesta la reunión entera, porque quien llega citando mal el artículo <strong>pierde también todo lo demás que iba a decir</strong>.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📄 Caso 1: el permiso que solo vive en una circular</h2>
+    <p>Un director condiciona el uso de M.E.T.A.S en su centro a un permiso que solo aparece en una circular interna que él mismo firmó.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🏛️ En qué escalón vive</span><br>
+      <span>En el suelo: una circular <span class="hl">organiza a quien ya está obligado</span> y no crea obligaciones nuevas para el ciudadano. Que venga en hoja membretada y con firma <span class="hl2">no le sube ni un escalón</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> antes de discutir si el permiso es razonable, hay que saber en qué escalón está el papel. Y la respuesta no se pelea, se pide: <strong>«¿en qué norma consta este requisito?»</strong>, por escrito. Si la única respuesta es la circular, el artículo 321 ya contestó.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🏛️ Caso 2: el acuerdo que pide ceder la autoría</h2>
+    <p>La Secretaría ofrece adoptar las misiones para todo un departamento. El acuerdo que traen pide ceder los derechos del material, y la Ley del Derecho de Autor (Decreto 4-99-E) reconoce esos derechos al autor.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚖️ Quién gana el choque</span><br>
+      <span>Un acuerdo de Secretaría está <span class="hl">por debajo de una ley del Congreso</span>. No puede recortar un derecho que la ley reconoce: si choca, <span class="hl2">cede el acuerdo</span>, no la ley.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la oferta puede ser buena y aun así el papel estar mal. Casi ninguna oferta se acepta o se rechaza completa: se acepta <strong>con condiciones</strong>, y aquí la condición se escribe sola, que el crédito del autor y la licencia de uso queden firmados antes. Esta es la etapa 7 de la ruta vista desde el escalón.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📑 Caso 3: el reglamento que pide más que su ley</h2>
+    <p>Un reglamento educativo exige, para el material de apoyo, una aprobación previa que la ley que reglamenta no menciona en ninguna parte.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🪜 Se salió de su escalón</span><br>
+      <span>El reglamento existe para <span class="hl">desarrollar la ley, no para ampliarla</span>. Si crea un requisito nuevo, cede en esa parte, y <span class="hl2">solo en esa parte</span>: el resto del reglamento sigue rigiendo.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el error frecuente es contestar «pero el reglamento es más específico». La especialidad se usa <strong>entre normas del mismo rango</strong>; entre rangos distintos manda la jerarquía. Este caso vuelve en la etapa 4 como ficha de grieta, con sus ocho campos.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🔁 Caso 4: «siempre se ha hecho así»</h2>
+    <p>En la ventanilla del distrito le contestan que el trámite pide una constancia más. Nadie sabe decir de qué norma sale, y la razón que dan es que siempre se ha hecho así.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🚫 La costumbre no es escalón</span><br>
+      <span>Es la tercera pata por la que las normas se cumplen, y explica muy bien <span class="hl">por qué la gente obedece</span>. Pero no convierte en exigible lo que ninguna norma manda: <span class="hl2">describe un hábito, no funda una obligación</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> lo que se contesta cabe en una línea y no lleva enfado: <strong>«¿me lo puede dar por escrito, con la norma en que consta?»</strong>. Casi siempre el requisito se cae solo ahí, sin que nadie tenga que ceder delante de una fila.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🌎 Caso 5: el tratado contra el acuerdo departamental</h2>
+    <p>Un acuerdo departamental obliga a subir fotografías de los estudiantes a una plataforma. Hay un tratado sobre derechos de la niñez en vigor que protege su imagen.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📜 El tratado no es algo de fuera</span><br>
+      <span>Aprobado por el Congreso y una vez en vigor, <span class="hl">forma parte del derecho interno</span> (art. 16). Y en conflicto con una ley, prevalece el tratado (art. 18), <span class="hl2">con más razón sobre un acuerdo</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el escalón de arriba muchas veces está en un sitio donde nadie miró. Conviene saber qué tratados están en vigor <strong>antes</strong> de aceptar un requisito que los contradiga, porque después el dato ya no sirve: las fotos ya se subieron.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>😴 Caso 6: la norma dormida</h2>
+    <p>Existe una norma vigente que obliga a registrar todo material educativo. En la práctica no la cumple nadie, ni nadie la exige, desde hace años.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⚠️ Eficacia cero no es derogación</span><br>
+      <span>Sigue siendo <span class="hl">válida y vigente</span>. Lo único que le falta es eficacia, y eso no la mata: la deja dormida. El día que alguien decida aplicarla, <span class="hl2">se aplica igual</span>, y suele ser el peor día.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> es la confusión más cara de la etapa. Una norma así no se ignora como hacen todos ni se cumple por miedo: <strong>se apunta como riesgo dormido</strong>, con la respuesta ya escrita. Cuando llegue, llega con plazo y sin tiempo de pensar.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📰 Caso 7: el requisito que nunca se publicó</h2>
+    <p>Le exigen a M.E.T.A.S un requisito que consta en un instructivo que nunca salió en La Gaceta. De él solo hay una copia, en la oficina.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🗿 Sin publicación no obliga</span><br>
+      <span>La publicidad no es un trámite: es <span class="hl">la condición para poder obligar</span>, porque nadie puede cumplir lo que no pudo conocer. Es la idea más vieja que existe sobre la ley, <span class="hl2">la de escribirla en la plaza</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> pedir dónde se publicó no es una impertinencia, es la comprobación más básica que existe, y desarma de una vez cualquier requisito que solo viva en un cajón. Con la fecha en la mano se comprueba además si sigue vigente.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔀 Caso 8: dos funcionarios, dos lecturas del 157</h2>
+    <p>Un funcionario nuevo lee el artículo 157 y decide que M.E.T.A.S es sistema formal, así que necesita autorización. El anterior opinaba lo contrario y nunca lo puso por escrito.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔎 Aquí no falla el escalón, falla la lectura</span><br>
+      <span>La norma es la misma y es Constitución. Lo que cambió fue <span class="hl">quién la interpreta</span>. Por eso lo que hay que tener guardado no es una opinión favorable: es <span class="hl2">lo que se pidió y lo que contestaron, por escrito y con fecha</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> es la puerta de la etapa 5, donde se estudian los métodos de interpretación y por qué el método casi nunca se elige antes del resultado. Aquí basta con ver la consecuencia práctica: <strong>una posición que no quedó escrita no existe</strong> cuando cambia el funcionario.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La hoja de ventanilla, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier papel que le pongan delante a esta casa, se llenan las mismas seis casillas antes de contestar nada:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué me exigen:</strong> el requisito, en una frase y con sus palabras.</li>
+      <li><strong>Quién lo exige:</strong> nombre, cargo y oficina. No «el distrito».</li>
+      <li><strong>En qué escalón vive:</strong> Constitución, tratado, ley, reglamento, acuerdo, o papel que no es norma.</li>
+      <li><strong>Con qué facultad:</strong> el artículo que se la da. Si no aparece, ya está la respuesta.</li>
+      <li><strong>Qué falla:</strong> validez, vigencia o eficacia. Con esa palabra, no con «está mal».</li>
+      <li><strong>Qué guardo:</strong> copia sellada de recibido, con fecha y con quién recibió.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⚖️ Las cinco reglas de esta etapa</span><br>
+      <span>1. Un papel manda por <span class="hl">el escalón en que vive</span>, no por su sello. 2. El funcionario solo puede lo que la ley le confiere <span class="hl">expresamente</span>; tú puedes lo que no está prohibido. 3. Validez, vigencia y eficacia son tres cosas: <span class="hl">nómbralas por su nombre</span>. 4. Lo que no se publicó <span class="hl">no obliga</span>. 5. Y antes de contestar nada: <span class="hl2">pídelo por escrito</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las <strong>siete piezas de la fuerza de una norma</strong>, la pirámide con sus seis escalones, la tabla de validez, vigencia y eficacia, los ocho casos del proyecto, la <strong>hoja de ventanilla</strong> para llenar a mano, seis ejercicios, la hoja de fuentes y la pauta completa.</p>
+      <a href="../../fichas/ficha-ley-fuerza-norma.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, y por qué van con su número</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Todo lo que se cita en esta misión se comprobó contra fuente el <strong>11 de agosto de 2026</strong>. Van con su artículo porque se pueden buscar, y porque en esta ruta <strong>no se cita nada de memoria</strong>: un número equivocado no cuesta una corrección, cuesta la reunión entera.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Constitución, art. 70:</strong> el particular puede lo que no perjudique a otro, y nadie está obligado a lo que la ley no manda ni impedido de hacer lo que no prohíbe.</li>
+      <li><strong>Art. 321:</strong> los servidores del Estado no tienen más facultades que las que expresamente les confiere la ley, y lo que ejecuten fuera de ella es nulo e implica responsabilidad.</li>
+      <li><strong>Art. 320:</strong> si una norma constitucional y una legal ordinaria son incompatibles, se aplica la constitucional.</li>
+      <li><strong>Arts. 16, 17 y 18:</strong> los tratados aprobados por el Congreso forman parte del derecho interno al entrar en vigor, y en conflicto con una ley prevalece el tratado.</li>
+      <li><strong>Art. 205 numeral 1:</strong> el Congreso crea, decreta, interpreta, reforma y deroga las leyes.</li>
+      <li><strong>Art. 157:</strong> la educación del sistema formal, salvo la superior, la autoriza, organiza, dirige y supervisa «exclusivamente» el Poder Ejecutivo por medio de la Secretaría de Educación. Es el artículo que decide el estatus de M.E.T.A.S y vuelve en la etapa 5.</li>
+      <li><strong>Ley Fundamental de Educación:</strong> Decreto 262-2011, publicada en La Gaceta 32,754 del 22 de febrero de 2012.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con <strong>una hoja de ventanilla llena</strong>, de un requisito de verdad que le hayan exigido a esta casa o al proyecto.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-RUTA-LEY.md">⚖️ El compendio de la ruta</a>: las doce etapas, la regla de no citar de memoria y los ocho campos del Registro de Grietas.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: dónde encaja esta etapa y qué viene después. La 4 enseña a cazar contradicciones y la 5, a interpretar el artículo 157.</li>
+      <li><a href="../../index.html">🗄️ La Bóveda</a>: donde se guarda la hoja de ventanilla llena y, más adelante, el Registro de Grietas. No se manda por chat.</li>
+      <li><a href="../../misiones/ruta-politica-normas-tramites/normas-tramites.html">📜 Normas y trámites</a>: la etapa 2 de la Ruta del Poder Político, que mira lo mismo desde el lado de qué papel hace falta y quién lo emite.</li>
+      <li><a href="../../fichas/ficha-ley-fuerza-norma.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja de ventanilla en blanco cabe en una página y la pirámide en otra.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar <strong>un requisito real</strong> que alguien le haya exigido a la familia o al proyecto y llenarle las seis casillas de la hoja de ventanilla, hasta poder decir en qué escalón vive y con qué facultad se exige. La prueba de que está aprendido es poder responder, sin mirar y sin subir la voz, <strong>qué se contesta cuando la única razón que dan es «siempre se ha hecho así»</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">⚖️</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Ley y sus Grietas · Etapa 1: De dónde saca su fuerza la ley</div>
+    <div class="diploma-mascot" aria-hidden="true">🏛️</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">⚖️</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Un papel con sello no manda por el sello: manda por el escalón en que vive» 🌱 · ⚖️ Ruta de la Ley y sus Grietas · Etapa 1 de 12.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/fuerza-norma.js"></script>
+</body>
+</html>

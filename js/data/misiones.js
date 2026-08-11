@@ -61,6 +61,7 @@ const MISSIONS = [
   { id: 21, title: 'La deuda por dentro: interés, plazo y costo total', modulo: 'aprendizaje-unido', materia: 'eco', color: 'apr', xp: 45, icon: '💳', ruta: 'poder', etapa: 3, sello: 'familiar', url: 'misiones/ruta-poder-deuda/deuda.html' },
   { id: 22, title: 'Verificar: nadie firma lo que no leyó', modulo: 'aprendizaje-unido', materia: 'ia', color: 'apr', xp: 45, icon: '🔎', ruta: 'maquina', etapa: 3, sello: 'familiar', url: 'misiones/ruta-maquina-verificar/verificar.html' },
   { id: 23, title: 'Llaves y secretos: claves, entornos y repositorios', modulo: 'aprendizaje-unido', materia: 'cib', color: 'apr', xp: 45, icon: '🗝️', ruta: 'casacerrada', etapa: 4, sello: 'familiar', url: 'misiones/ruta-casa-cerrada-llaves/llaves.html' },
+  { id: 24, title: 'De dónde saca su fuerza la ley: jerarquía, validez y coacción', modulo: 'aprendizaje-unido', materia: 'ley', color: 'apr', xp: 45, icon: '🏛️', ruta: 'ley', etapa: 1, sello: 'familiar', url: 'misiones/ruta-ley-fuerza-norma/fuerza-norma.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -105,7 +106,9 @@ const ETAPAS_PREVISTAS = {
      (COMPENDIO-RUTA-LEY.md) y de ahí salen los títulos de abajo, para que el
      mapa enseñe el camino entero desde el primer día. */
   ley: {
-    1:  'De dónde saca su fuerza la ley: jerarquía, validez y coacción',
+    /* La 1 ya está construida (id 24) y por eso no lleva título aquí: el mapa
+       la toma de MISSIONS. Se deja la lista desde la 2 para que se vea que el
+       resto del compendio sigue pendiente. */
     2:  'Anatomía de la Constitución de 1982: qué declara y cómo se reforma',
     3:  'Los derechos y la coletilla que los devuelve',
     4:  'La grieta: cómo se caza una contradicción en la ley',
