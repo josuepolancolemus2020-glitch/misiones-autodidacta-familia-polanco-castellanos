@@ -1,12 +1,13 @@
 # Compendio · Ruta de la Ley y sus Grietas
 
-Doce misiones sobre la ley hondureña, escritas para ser construidas después.
-Aquí no hay ninguna misión hecha: hay el plan completo de las doce, con lo que
-enseña cada una, su laboratorio, sus casos y lo que deja apuntado.
+Doce misiones sobre la ley hondureña. Este documento es el plan completo de
+las doce, con lo que enseña cada una, su laboratorio, sus casos y lo que deja
+apuntado. Las etapas 1 y 2 ya están construidas y se pueden abrir en F.A.R.O;
+lo que sigue escrito aquí es el plan de las diez que faltan.
 
-Fecha: 11 de agosto de 2026. Estado: **compendio aprobado, nada construido**.
-Registro en el catálogo: ya hecho (`js/data/misiones.js`), así que el mapa de
-Mis Rutas enseña las doce etapas en gris desde hoy.
+Fecha: 11 de agosto de 2026. Estado: **etapas 1 y 2 construidas**, las diez
+restantes planificadas aquí. El catálogo (`js/data/misiones.js`) las declara
+todas, así que el mapa de Mis Rutas enseña el camino entero desde el principio.
 
 Materia nueva: `ley` · Derecho y Ley. Ruta: `ley` · **Ruta de la Ley y sus
 Grietas** ⚖️. Lema: «Leer la ley por dentro: qué dice, qué calla y dónde se
@@ -206,11 +207,14 @@ enseñando manda o no manda.
 **Qué declara y cómo se reforma** · `xp: 45` · `icon: 📜`
 Carpeta `misiones/ruta-ley-anatomia-constitucion/`.
 
-- **Aprende**: la Constitución vigente (Decreto 131 de 1982) y el dato que
-  ordena toda la ruta: es **la decimosexta** que ha tenido Honduras. Un país
-  que reescribe su ley fundamental dieciséis veces no está discutiendo
-  redacción, está discutiendo quién manda, y cada texto guarda el resultado de
-  esa discusión.
+- **Aprende**: la Constitución vigente (Decreto 131 del 11 de enero de 1982,
+  publicada en La Gaceta 23,612 del 20 de enero), con sus ocho títulos,
+  cuarenta y tres capítulos y trescientos setenta y ocho artículos.
+  Y un dato que al construir la etapa resultó **no ser un dato**: cuántas
+  constituciones ha tenido Honduras. Las fuentes dan doce, catorce y dieciséis
+  según si se cuentan los textos del período federal y si una reforma muy
+  grande cuenta como texto nuevo. La misión enseña la discrepancia en vez de
+  elegir un número, que es la regla de la ruta funcionando sobre sí misma.
   Cómo está armada: la parte dogmática (el Estado, la nacionalidad, los
   derechos) y la parte orgánica (los poderes y sus competencias). Cómo se lee
   un artículo por piezas: **supuesto de hecho, consecuencia, excepción y
@@ -747,6 +751,10 @@ está aquí, se comprueba antes de construir la misión que lo use.
 | Constitución, art. 374 | No se pueden reformar, entre otros, los artículos sobre forma de gobierno, territorio, período presidencial y la prohibición de repetir en la Presidencia | Etapas 2, 4 y 6 |
 | Constitución, art. 239 | Quien haya ejercido la titularidad del Ejecutivo no puede volver a ser Presidente; quien lo quebrante o proponga su reforma cesa en el cargo y queda inhabilitado diez años | Etapas 6 y 11 |
 | Constitución, art. 182 | Habeas corpus y habeas data. Reforma metida por Decreto 237-2012, ratificada por Decreto 10-2013 y en vigor desde marzo de 2013. Un intento anterior (Decreto 381-2005) se cayó por falta de ratificación | Etapas 2, 6 y 12 |
+| Constitución, art. 4 | La alternabilidad en el ejercicio de la Presidencia es obligatoria, y su infracción es delito de traición a la Patria | Etapas 2 y 6 |
+| Constitución, art. 375 | La Constitución no pierde vigencia ni deja de cumplirse por acto de fuerza ni por una derogación hecha por medio distinto del que ella dispone | Etapa 2 |
+| Estructura del texto | Ocho títulos, cuarenta y tres capítulos y trescientos setenta y ocho artículos. Decreto 131 del 11 de enero de 1982, La Gaceta 23,612 del 20 de enero | Etapa 2 |
+| Cuántas constituciones ha tenido Honduras | **Dato discutido:** las fuentes dan doce, catorce o dieciséis según cómo se cuente. No se elige un número | Etapas 2 y 11 |
 | Sala de lo Constitucional, sentencia del 22 de abril de 2015 | Declaró inaplicable el art. 239 y alcanzó también al último párrafo del art. 4 y a parte del art. 374 | Etapas 4, 6 y 11 |
 | Ley sobre Justicia Constitucional, Decreto 244-2003 | Regula amparo, habeas corpus, habeas data e inconstitucionalidad | Etapas 6 y 12 |
 | Ley Fundamental de Educación, Decreto 262-2011 | Publicada en La Gaceta 32,754 del 22 de febrero de 2012. Organiza el sistema y distingue educación formal, no formal e informal | Etapas 5 y 7 |
