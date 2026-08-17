@@ -161,9 +161,9 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      /* La materia «mayor» creció al construirse los átomos: ahora son dos,
-         igual que las sondas de la Ley subieron a tres con cada etapa. */
-      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      /* La materia «mayor» crece con cada misión del Estudio Mayor: átomos
+         y acero la subieron a tres, igual que las sondas de la Ley. */
+      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
       const t = tarjetas.find(x => /vigía y el timón/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }

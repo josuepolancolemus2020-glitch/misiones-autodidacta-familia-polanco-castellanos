@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta del Expediente Rojo, etapa 1</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-rojo-acero-juicio/acero-juicio.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 1 de la Ruta del Expediente Rojo (Crítica al Marxismo,
+   materia 26 del Estudio Mayor): bancos, laboratorio, pruebas impresas con
+   su nombre, los ocho casos, la ficha, la ruta en el mapa, y LAS DOS
+   SECCIONES NUEVAS de la norma 5: el guion de video con su estructura y
+   las tres lecturas con su etiqueta de ejercicio de estilo.
+
+   La REGLA DEL ESTATUS del compendio rige también aquí: Marx y Engels con
+   sus años y EN RESUMEN DE TRABAJO, Singer como divulgación sólida, la
+   prueba de Turing de Caplan como ejercicio y NO medida validada, Allen
+   2003 como disputa viva y Sen como académico sólido; y el pastiche de las
+   lecturas declarado como pastiche, porque una misión que enseñara el
+   acero citando fuentes infladas sería el error que quiere evitar. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try {
+    appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+    appFrame.contentWindow.localStorage.removeItem('faro_v1');
+  } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 17, '17 secciones (15 del molde + guion + lecturas)', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta del Expediente Rojo · Etapa 1 de 7/.test(d.body.textContent), 'se presenta como etapa 1 de 7', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se copió de la etapa 1 de los átomos. Se excluyen
+       los puntos de Recursos que enlazan a las misiones hermanas a
+       propósito; todo lo demás se mira entero. */
+    const cuerpoSinEnlaces = (() => {
+      const clon = d.body.cloneNode(true);
+      clon.querySelectorAll('a[href*="ruta-atomos-contra-miedo"], a[href*="ruta-espejo-vigia-timon"]').forEach(a => {
+        const li = a.closest('li'); (li || a).remove();
+      });
+      return clon.textContent;
+    })();
+    ok(!/tetrafármaco|clinamen|Epicuro|Lucrecio|Meneceo|eclipse|Átomos y los Ídolos|vigía|timón|metacognición/i.test(cuerpoSinEnlaces),
+       'sin restos de las misiones de las que se copió', 'queda vocabulario de los átomos o del espejo');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── LA REGLA DEL ESTATUS (la regla del Estudio Mayor) ──');
+    const texto0 = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/1848/.test(texto0) && /1867/.test(texto0), 'el Manifiesto y El capital con sus años', 'faltan los años de las fuentes primarias');
+    ok(/resumen de trabajo/i.test(texto0), 'las fuentes primarias entran en resumen de trabajo', 'no se declara el resumen de trabajo');
+    ok(/Singer/.test(texto0) && /divulgación sólida/i.test(texto0), 'Singer con su etiqueta de divulgación sólida', 'falta Singer etiquetado');
+    ok(/Caplan/.test(texto0) && /no.{0,15}medida validada/i.test(texto0), 'la prueba de Turing como ejercicio, no medida validada', 'falta la etiqueta de Caplan');
+    ok(/Allen/.test(texto0) && /2003/.test(texto0) && /disputa viva/i.test(texto0), 'Allen 2003 con su disputa viva', 'falta Allen con etiqueta');
+    ok(/Sen/.test(texto0) && /académico sólido/i.test(texto0), 'Sen como académico sólido', 'falta Sen etiquetado');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('idData.length') === 8 && dentro('cmpData.length') === 8, 'identifica 8 y completa 8', 'identifica/completa incompletos');
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('evalMCBank.every(q => typeof q.a === "number" && q.o[q.a])'),
+       'la evaluación final sabe cuál es la respuesta correcta', 'evalMCBank no trae la clave «a»');
+    ok(dentro('critCaseBank.length') === 8 && dentro('critDecisionBank.length') === 8, 'la prueba competencial trae sus 8 casos y 8 decisiones', 'faltan casos o decisiones de la competencial');
+    ok(dentro('critCompareBank.every(c => c.gr)'), 'las comparaciones traen su cierre (gr) para la pauta', 'critCompareBank sin campo gr');
+    ok(dentro('Object.keys(parteData).join(",")') === 'resumen,turing,fuerza,numeros', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'los 7 momentos del camino del acero', 'momentos: ' + dentro('timelineData.length'));
+    ok(/faro_rojo_acero/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LO QUE LA ETAPA TIENE QUE ENSEÑAR ──');
+    const texto = texto0;
+    ok(/hombre de acero/i.test(texto) && /hombre de paja/i.test(texto), 'el acero contra la paja', 'falta la pareja central');
+    ok(/materialismo histórico/i.test(texto), 'el materialismo histórico', 'falta la primera pieza');
+    ok(/excedente/i.test(texto), 'la teoría de la explotación con su excedente', 'falta la pieza difícil');
+    ok(/sociedad sin clases/i.test(texto), 'la promesa de la sociedad sin clases', 'falta la promesa');
+    ok(/prueba de Turing/i.test(texto), 'la prueba de Turing ideológica', 'falta el ejercicio central');
+    ok(/minas/i.test(texto) && /inspectores/i.test(texto), 'la fuerza moral: las minas con inspectores', 'falta la fuerza moral documentada');
+    ok(/diez minutos/i.test(texto), 'la licencia de los diez minutos', 'falta la licencia');
+    ok(/regla del placer/i.test(texto), 'la regla del placer', 'falta la regla del placer');
+    ok(/dos púlpitos/i.test(texto), 'los dos púlpitos que eximen de estudiar', 'faltan los dos púlpitos');
+    ok(/gemel|báscula pareja|se mide en pares/i.test(texto), 'la báscula pareja con el expediente gemelo', 'falta la báscula pareja');
+
+    log('\n── EL GUION DE VIDEO (norma 5) ──');
+    const guion = d.getElementById('s-guion');
+    ok(!!guion, 'existe la sección de guion', 'falta la sección s-guion');
+    if (guion) {
+      const tg = guion.textContent;
+      ok(guion.querySelectorAll('.card').length >= 8, 'trae sus escenas en tarjetas', 'tarjetas del guion: ' + guion.querySelectorAll('.card').length);
+      ok((tg.match(/VOZ/g) || []).length >= 7, 'cada escena trae su VOZ', 'faltan voces: ' + (tg.match(/VOZ/g) || []).length);
+      ok((tg.match(/IMAGEN/g) || []).length >= 7, 'cada escena trae su IMAGEN', 'faltan imágenes');
+      ok((tg.match(/TEXTO EN PANTALLA/g) || []).length >= 7, 'cada escena trae su TEXTO EN PANTALLA', 'faltan textos en pantalla');
+      ok(/gancho/i.test(tg) && /giro/i.test(tg) && /cierre/i.test(tg), 'la estructura del relato está nombrada (gancho, giro, cierre)', 'falta la estructura de storytelling');
+      ok(/Escena 1/.test(tg) && /Escena 7/.test(tg), 'las escenas van numeradas de la 1 a la 7', 'faltan escenas numeradas');
+      ok(/estructura del guion, desarmada/i.test(tg), 'la estructura queda desarmada para las siguientes misiones', 'falta la tabla normativa de estructura');
+      ok(!!d.querySelector('.nav-t[data-s="s-guion"]'), 'está en la barra de navegación', 'no aparece en la barra');
+    }
+
+    log('\n── LAS TRES LECTURAS (norma 5) ──');
+    const lect = d.getElementById('s-lecturas');
+    ok(!!lect, 'existe la sección de lecturas', 'falta la sección s-lecturas');
+    if (lect) {
+      const tl = lect.textContent;
+      ok(/Borges/.test(tl) && /Cervantes/.test(tl) && /Harari/.test(tl), 'las tres voces están nombradas', 'faltan las voces');
+      ok(/ejercicio(s)? de estilo/i.test(tl) && /No son obra de esos autores/i.test(tl), 'el pastiche va declarado (regla del estatus)', 'el pastiche no se declara');
+      ok(/Los dos ejemplares/.test(tl), 'el cuento a la manera de Borges está', 'falta el cuento');
+      ok(/Donde se cuenta/.test(tl) && /Sancho/.test(tl) && /don Quijote/.test(tl), 'el capítulo cervantino está, con Sancho adentro', 'falta el capítulo cervantino');
+      ok(/setenta mil años/i.test(tl) && /historias/i.test(tl), 'el ensayo a la manera de Harari está', 'falta el ensayo');
+      /* Las tres lecturas deben ENSEÑAR el tema, no solo sonar bonito */
+      ok(/refuta|refutar|refutación/i.test(tl) && /acero/i.test(tl), 'las lecturas explican el tema del acero', 'las lecturas no tocan el tema');
+      ok(/prueba de Turing/i.test(tl) || /versión más fuerte|mejor versión/i.test(tl), 'el concepto central aparece dentro de los textos', 'los textos no cargan el concepto');
+      ok(!!d.querySelector('.nav-t[data-s="s-lecturas"]'), 'está en la barra de navegación', 'no aparece en la barra');
+    }
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/El resumen fuerte/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el resumen fuerte', 'abre en otra pieza');
+    ok(!!d.querySelector('.lab-cont-btn[data-parte="resumen"]'), 'el botón de la pieza inicial existe', 'el laboratorio arrastra la pieza del molde');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'el acero sobre la mesa se genera', 'prueba competencial vacía');
+    ok(!/undefined/.test(crit), 'la competencial no pinta undefined', 'hay un undefined en la prueba competencial');
+    const rotulos = [d.getElementById('eval-screen-title'), d.getElementById('evalcrit-screen-title'),
+                     d.getElementById('evalOut'), d.getElementById('evalCritOut'),
+                     d.querySelectorAll('.eval-print-header')[0]].map(x => x.textContent).join(' · ');
+    ok(/El acero antes del juicio/.test(rotulos) && !/átomos|miedo sobre la mesa|vigía|timón/i.test(rotulos),
+       'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['huelga del 54', '200\\.000', 'video', 'asado', 'Angelly', '3\\.000', 'alegr', 'defensa detenida']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok((txt.match(/Lo que enseña/g) || []).length >= 6, 'los casos cierran con lo que enseñan', 'casos con lección: ' + (txt.match(/Lo que enseña/g) || []).length);
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      ok(/L \d/.test(txt), 'los casos traen números en lempiras', 'los casos no traen lempiras');
+      ok(/hoja del acero/i.test(txt), 'trae la hoja del acero', 'falta la hoja del acero');
+      ok(/cinco reglas/i.test(txt), 'trae las cinco reglas de la etapa', 'faltan las cinco reglas');
+      ok(/test del espejo/i.test(txt), 'trae el test del espejo', 'falta el test del espejo');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/54|200\.000|asado|3\.000|Angelly/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-rojo-acero-juicio.html');
+    const txtF = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txtF.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txtF.match(/class="pagina"/g) || []).length);
+    ok(/La hoja del acero, para llenar a lápiz/i.test(txtF), 'la ficha trae la hoja del acero en blanco', 'falta la hoja del acero');
+    ok(/Una hoja del acero ya llena/i.test(txtF), 'y una ya llena, como ejemplo', 'falta el ejemplo lleno');
+    ok(/doble columna/i.test(txtF), 'la ficha trae el expediente de doble columna', 'falta la doble columna');
+    ok(/prueba de Turing/i.test(txtF) && /regla del placer/i.test(txtF), 'la ficha trae las piezas del temario', 'faltan piezas del temario');
+    ok(/resumen de trabajo/i.test(txtF), 'la ficha declara el resumen de trabajo', 'la ficha no declara el transporte');
+    ok(/Hoja de fuentes/i.test(txtF), 'la ficha trae su hoja de fuentes', 'falta la hoja de fuentes');
+    ok(/Pauta completa de respuestas/.test(txtF), 'trae su pauta', 'sin pauta');
+    ok(!/—/.test(txtF), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok((txtF.match(/<table/g) || []).length === (txtF.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar');
+    ok(/disputa viva/i.test(txtF) && /divulgación sólida/i.test(txtF), 'las fuentes de la ficha llevan etiqueta', 'la ficha cita sin estatus');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-rojo-acero-juicio"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const ruta = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta del Expediente Rojo/.test(c.textContent));
+    ok(!!ruta, 'la Ruta del Expediente Rojo está en el mapa', 'no aparece la ruta');
+    if (ruta) {
+      ok(ruta.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 6, 'y 6 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/El acero antes del juicio/.test(ruta.textContent), 'la etapa 1 sale con el título de la misión', 'la etapa 1 no sale con su título');
+      ok(/La calculadora ciega/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+      ok(!/Etapa por construir/.test(ruta.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="mayor"]');
+    ok(!!chip, 'la materia Estudio Mayor tiene su chip', 'no hay chip del Estudio Mayor');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      const t = tarjetas.find(x => /acero antes del juicio/i.test(x.textContent));
+      ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda rojo etapa 1';
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · Sonda rojo etapa 1'; }
+});
+</script>
+</body>
+</html>

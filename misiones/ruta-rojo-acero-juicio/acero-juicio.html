@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta del Expediente Rojo · Etapa 1: El acero antes del juicio | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/acero-juicio.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Repite panfletos 📰</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">📕</div>
+    <div class="hero-text">
+      <h1>El acero antes del juicio: <span>la mejor versión primero, el veredicto después</span></h1>
+      <p class="sub">Nadie audita lo que no puede enunciar 📕</p>
+      <div class="badge">📕 Ruta del Expediente Rojo · Etapa 1 de 7</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📕 La materia donde el veredicto llega antes que la lectura</h2>
+    <p>Esta es la primera etapa de la Crítica al Marxismo, y arranca con una regla que incomoda a los dos púlpitos: <strong>ninguna crítica empieza sin poner en pie lo que se va a auditar</strong>, y en su mejor versión, no en la caricatura del panfleto. En esta vecindad la palabra «marxismo» es insulto o bandera, y las dos cosas eximen de estudiar; esta casa no se exime.</p>
+    <p>A esa mejor versión se le llama <strong>el hombre de acero</strong>: el resumen que el propio defensor firmaría. Lo contrario del hombre de paja, que se arma flojo para tumbarlo fácil. La regla viene de la materia de Las falacias y aquí se convierte en licencia de entrada: <strong>quien no puede enunciar la doctrina, no tiene todavía derecho a juzgarla</strong>.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La vara de la etapa.</strong> Quien termina sabe exponer el marxismo <strong>diez minutos de pie sin que un marxista lo corrija</strong>. Esa es la licencia para entrar al resto de la materia: la calculadora, el tribunal, los expedientes. Sin licencia no hay juicio, y así se evita ser presa fácil de los dos púlpitos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🛡️ El resumen fuerte: lo que un marxista firmaría</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🛡️ El acero (se estudia aquí)</h4>
+        <p>Cuatro piezas: el <strong>materialismo histórico</strong> como programa de investigación (el modo de producir condiciona instituciones e ideas); la <strong>teoría de la explotación</strong> (el excedente lo produce el trabajo y se lo apropia el dueño); la <strong>tendencia a la crisis</strong>; y la <strong>promesa de la sociedad sin clases</strong>.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>📰 La caricatura (no entra)</h4>
+        <p>«Querían quitarle la casa a todos», «era pura envidia», «prometían un paraíso vago». Frases que <strong>ningún defensor firmaría</strong>: refutarlas es ganar un pleito contra nadie. La caricatura no es crítica: es ahorro de lectura disfrazado de veredicto.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚖️ La fuerza moral, que la crítica perezosa omite</span><br>
+      <span>Marx no vendía un cielo: señalaba <span class="hl">niños en minas con informes de inspectores ingleses en la mano</span>. Esa indignación documentada explica siglo y medio de lealtades, y el acero la pone en pie <span class="hl2">antes de abrir el expediente de críticas</span>: un sistema sin su fuerza moral es otro hombre de paja.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 El camino del acero, en siete momentos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué pasó, qué se toma de ahí y qué cuidado pide.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento del camino.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la defensa detenida</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide cómo expone Jael la pieza difícil ante el tribunal de la mesa.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🍽️</span><span class="ms-text"><strong>La mesa se vuelve tribunal:</strong> Jael ensaya su defensa de diez minutos. La regla está pactada: si suena a caricatura, la familia detiene la defensa y se repite otro día.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🏭</span><span class="ms-text"><strong>El arranque va bien:</strong> el materialismo histórico sale como programa de investigación, sin bandera y sin burla.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">⚖️</span><span class="ms-text"><strong>Llega la pieza difícil:</strong> la teoría de la explotación. Es donde el panfleto siempre gana la boca.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🎭</span><span class="ms-text"><strong>Lo que tienes delante:</strong> dos maneras de decir la misma pieza, y un tribunal que conoce la diferencia.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Cómo se enuncia la pieza difícil?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">📰 «Querían quitarle todo al que trabajara»</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🛡️ El acero: como lo firmaría un marxista</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔍 Las cuatro piezas del resumen fuerte</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Lo largo ya está cursado y no se repite: Economía política enseñó al Marx economista entero y Materialismo Filosófico al filósofo. Aquí solo se trae el resumen que un marxista firmaría, pieza por pieza.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué afirma</th><th>De dónde sale</th></tr>
+      <tr><td>Materialismo histórico</td><td>El modo de producir condiciona instituciones e ideas</td><td>Programa de investigación, no profecía: así se enuncia el acero</td></tr>
+      <tr><td>Teoría de la explotación</td><td>El excedente lo produce el trabajo y se lo apropia el dueño</td><td>El capital, tomo I (1867), en resumen de trabajo</td></tr>
+      <tr><td>Tendencia a la crisis</td><td>El sistema produce sus propias sacudidas periódicas</td><td>La pieza que hasta sus rivales le reconocieron</td></tr>
+      <tr><td>La sociedad sin clases</td><td>La promesa que ordena el resto del edificio</td><td>El manifiesto comunista (1848), en resumen de trabajo</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 Por qué se enuncia así</span><br>
+      <span>Un resumen fuerte no es un elogio: es <span class="hl">la unidad mínima de la honestidad crítica</span>. Si la versión que refutas no la firmaría nadie, no refutaste el sistema: refutaste tu propio muñeco, y el sistema <span class="hl2">sigue intacto y sin auditar</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>❓ La prueba de Turing ideológica</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El ejercicio central de la etapa, propuesto por Bryan Caplan: enunciar la doctrina de modo que <strong>un defensor no distinga al alumno de uno de los suyos</strong>. Se etiqueta como lo que es: concepto de divulgación, útil como ejercicio, <strong>no una medida validada</strong>. La fábrica de esta herramienta vive en Estudio de las Ideologías; aquí se corre como estación primera.</p>
+    <table class="tres">
+      <tr><th>Señal</th><th>Pasa la prueba</th><th>No la pasa</th></tr>
+      <tr><td>El vocabulario</td><td>Usa las palabras que el defensor usa, en su sentido</td><td>Mete burlas o comillas de desprecio a media frase</td></tr>
+      <tr><td>La fuerza moral</td><td>Aparece documentada: las minas, los inspectores</td><td>Se omite, y el sistema queda como capricho sin causa</td></tr>
+      <tr><td>Los números</td><td>Trae el mejor expediente empírico, con su etiqueta de disputa</td><td>Solo trae los números que hunden, o ninguno</td></tr>
+      <tr><td>El cierre</td><td>Un marxista diría «así es, eso sostengo»</td><td>Un marxista diría «eso no lo he dicho nunca»</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎭 La caridad interpretativa no es rendición</span><br>
+      <span>Exponer bien lo que se va a auditar <span class="hl">no obliga a estar de acuerdo</span>: obliga a apuntarle al blanco de verdad. Es la misma primera mano que Teología usa con los credos, y por eso la defensa de esta materia <span class="hl2">se detiene si suena a caricatura</span>: se repite otro día, sin drama.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ El acero también carga números</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>📊 El mejor expediente empírico</h4>
+        <p>El que un marxista presentaría: la industrialización soviética que <strong>Allen defiende con datos</strong> en «Farm to Factory» (2003), los saltos de alfabetización y salud, y el cotejo de <strong>Sen</strong> entre la China maoísta y la India en salud básica antes de la reforma. Se pone en pie aquí, <strong>con su etiqueta de disputa viva</strong>.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>⚖️ Lo que se pesará después</h4>
+        <p>Este módulo <strong>no dicta el veredicto</strong>: pone el acero en pie. El módulo de los tres expedientes pesará estos números contra sus costos, con la regla de la casa: <strong>horquilla, método y fuente</strong>, y ningún número redondo de bandera.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Piezas del resumen</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Minutos de la defensa</div><div class="stat-val">10</div></div>
+      <div class="stat-item"><div class="stat-label">Momentos del camino</div><div class="stat-val">7</div></div>
+      <div class="stat-item"><div class="stat-label">Etapas de la ruta</div><div class="stat-val">7</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📊 La regla del placer y la báscula pareja</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La advertencia epistémica de la materia manda una vigilancia incómoda: <strong>si un dato te alegra porque hunde al bando contrario, paga doble auditoría</strong> antes de entrar al cuaderno. El detector de trampas se afina solo hacia el rival; el remedio de esta casa es de procedimiento, no de voluntad.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Y la báscula es pareja por diseño: esta materia tiene una gemela (la Crítica al Capitalismo, el Expediente Dorado) con el mismo esqueleto módulo a módulo, y <strong>la Bóveda no acepta un expediente sin el otro</strong>. El acero de esta casa se mide en pares.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🛡️ El acero</div><div class="t-info">La versión que su autor firmaría</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">📰 El hombre de paja</div><div class="t-info">El muñeco flojo, fácil de tumbar</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🎭 La prueba de Turing</div><div class="t-info">Que un defensor no te distinga</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">⚖️ La fuerza moral</div><div class="t-info">Las minas, con informes</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">📊 Números con etiqueta</div><div class="t-info">Allen y Sen, con su disputa</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">😊 La regla del placer</div><div class="t-info">El dato que alegra paga doble</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Lo práctico que sale de aquí: <strong>en esta casa nadie responde un argumento sin reconstruir primero su versión más fuerte</strong>, la que su autor firmaría. La regla «primero el acero, después la respuesta» vale en el Congreso, en el grupo de WhatsApp y entre hermanas.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller del acero</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para no volver a juzgar sin licencia.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El resumen fuerte</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">📕 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="resumen" onclick="labShowParte('resumen')">🛡️ El resumen fuerte</button>
+        <button class="lab-btn lab-cont-btn" data-parte="turing" onclick="labShowParte('turing')">🎭 La prueba de Turing</button>
+        <button class="lab-btn lab-cont-btn" data-parte="fuerza" onclick="labShowParte('fuerza')">⚖️ La fuerza moral</button>
+        <button class="lab-btn lab-cont-btn" data-parte="numeros" onclick="labShowParte('numeros')">📊 Los números del acero</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿acero o caricatura?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: del panfleto a la licencia, paso a paso</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la etapa se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué está haciendo esa frase?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es esa frase dentro de la etapa:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«El modo de producir condiciona las ideas»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">Un video «destruye el marxismo» en cinco minutos, sin citar una sola fuente</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🛡️ Acero</button>
+        <button class="btn btn-sec" onclick="">📰 Caricatura</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">📕 El acero sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · El acero antes del juicio · Ruta del Expediente Rojo</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: el acero antes del juicio</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El acero sobre la mesa · El acero antes del juicio</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">📕 El acero sobre la mesa: la mejor versión antes del veredicto</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay un juicio a punto de dictarse en la casa o en M.E.T.A.S. Di qué versión está sobre la mesa (acero o caricatura), qué mete y qué saca la salida fácil con el test del espejo, qué cifra necesita horquilla, método y fuente, y qué condición escrita deja la casa concediendo en voz alta lo que toque (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">📕</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📕 Casos del proyecto: el acero en esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas hay un veredicto queriendo salir antes que la lectura, y en todas la pregunta es la misma: <strong>¿qué versión está sobre la mesa, y quién la firmaría?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también en esta ruta:</strong> ningún estudio, obra o cifra entra sin su etiqueta. Las de esta etapa: Marx y Engels en <strong>resumen de trabajo</strong> (los enteros viven en sus materias dueñas), Singer como <strong>divulgación sólida</strong>, la prueba de Turing de Caplan como <strong>ejercicio y no medida validada</strong>, Allen 2003 como <strong>disputa viva</strong> y Sen como <strong>académico sólido</strong>. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>💬 Caso 1: los dos maestros de la huelga del 54</h2>
+    <p>La misma semana llegan a Sugerencias dos mensajes sobre la misma ficha de estudios sociales: un maestro escribe que «adoctrina comunismo» y otro que «lava a las bananeras». La oferta implícita: reescribirla para calmar a uno.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚖️ La báscula pareja</span><br>
+      <span>Qué mete cada opción: paz con la mitad del público. Qué saca: la confianza de la otra mitad y <span class="hl">la honestidad de la ficha</span>. La pregunta que decide: ¿puede un lector <span class="hl2">deducir el bando del autor</span> leyendo la ficha?</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí se reescribe: solo a doble columna, cada afirmación con fuente y cada disputa con sus dos lados nombrados. Y a los dos maestros se les contesta con el mismo texto, porque la báscula de la casa no cambia de dueño según quién reclame.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>💰 Caso 2: las ofertas espejo</h2>
+    <p>El mismo mes llegan dos ofertas: una cooperación ofrece L 200.000 para misiones de «pensamiento crítico y justicia social» con lista de lecturas incluida, y una fundación ofrece L 180.000 para misiones de «libertad económica» con la suya.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🪞 El test del espejo</span><br>
+      <span>Qué meten: dinero que M.E.T.A.S necesita. Qué sacan: la línea editorial, porque <span class="hl">quien pone la lista pone las gafas</span>. La pregunta que decide: ¿aceptaría la casa la oferta contraria en los mismos términos? <span class="hl2">Si la respuesta es no, no se acepta ninguna.</span></span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: el temario lo escribe la casa, toda lectura de una lista entra con su contracrítica al lado, y la cláusula queda por escrito antes del primer lempira. El acero también se les debe a los patrocinadores: a los dos por igual.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📹 Caso 3: el video viral de Jael</h2>
+    <p>Jael llega de un grupo de estudio con un video: «el marxismo destruyó todo lo que tocó», ocho minutos, música épica, cero fuentes. Pide verlo en la mesa esta noche.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎬 La lucidez que se siente y no se gana</span><br>
+      <span>Qué mete el video: una explicación total que <span class="hl">se siente como lucidez</span>. Qué saca: la diferencia entre juzgar y opinar, que cuesta una materia entera. La pregunta que decide: <span class="hl2">¿qué documento con fecha sostiene cada afirmación?</span></span>
+    </div>
+    <p><strong>Lo que enseña:</strong> se responde una vez y bien, sin sermón y sin celebrar. Y si el video acierta en algo, se le concede en voz alta, porque el acero también se les debe a los videos. La condición: en esta mesa, quien trae un veredicto trae también la mejor versión de lo condenado.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🍖 Caso 4: el tío del asado</h2>
+    <p>En una reunión familiar, un tío sentencia: «Marx era un vago que quería quitarle la casa al que trabajara». Varios asienten. Angelly mira al autor esperando la respuesta.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📰 El muñeco que nadie firma</span><br>
+      <span>La frase es un hombre de paja: <span class="hl">ningún marxista la firmaría</span>, así que tumbarlo no tumba nada. Pero corregir al tío con burla es el mismo vicio al revés: <span class="hl2">un veredicto sin lectura, ahora contra él</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la casa no debate en el asado: modela. «Lo que ese señor decía es otra cosa, y da miedo de verdad cuando se enuncia bien; si quieres, en la casa te lo cuento entero y después lo auditamos.» El acero se ofrece, no se impone, y la sobremesa no es tribunal.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🙋 Caso 5: la pregunta de Angelly</h2>
+    <p>De regreso del asado, Angelly pregunta: «¿por qué vamos a estudiar a los malos? ¿No es peligroso aprender lo que dicen?». No hay oferta ni lempiras: hay una niña con la pregunta más seria de la materia.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🗝️ La licencia, explicada a su edad</span><br>
+      <span>La respuesta de la casa: <span class="hl">nadie audita lo que no puede enunciar</span>. El que solo conoce la caricatura queda a merced del primer predicador que le enseñe el original con música. <span class="hl2">Estudiar el acero no es convertirse: es vacunarse con la cepa completa.</span></span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el miedo de Angelly se toma en serio, porque es el miedo de media vecindad. Y la garantía es el método, no la censura: cada crítica pegada a su contracrítica, cada cifra con su horquilla, y la defensa detenida si suena a bandera de cualquier color.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🎬 Caso 6: el canal que paga por demoler</h2>
+    <p>Un canal educativo ofrece L 3.000 por un video de M.E.T.A.S «destruyendo el marxismo en cinco minutos», con el logo de la plataforma y garantía de miles de vistas.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⏱️ El formato que no carga horquillas</span><br>
+      <span>Mete L 3.000 y alcance. Saca la marca de la casa puesta en <span class="hl">un veredicto sin acero</span>: cinco minutos no cargan la mejor versión, ni las horquillas, ni las contracríticas. <span class="hl2">Sería vender exactamente el vicio que la materia enseña a detectar.</span></span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: un video de quince minutos que arranque con el acero (dos minutos donde un marxista asentiría) y cierre con la crítica pesada y sus fuentes en pantalla. Si el canal no acepta el acero, no acepta a M.E.T.A.S: la marca no firma demoliciones exprés.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>😊 Caso 7: el dato que alegró al autor</h2>
+    <p>Preparando esta misión, el autor encuentra un artículo con una cifra devastadora contra el sistema que audita la materia. La siente perfecta para la ficha y nota la alegría de haberla encontrado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">😊 La alegría como alarma</span><br>
+      <span>La regla del placer manda: <span class="hl">el dato que te alegra porque hunde al bando contrario paga doble auditoría</span>. La alegría no invalida el dato: <span class="hl2">obliga a buscarle horquilla, método, fuente y contracrítica antes de usarlo</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la cifra resultó ser la punta alta de una horquilla en disputa, y entró a la ficha con su horquilla completa y su crítico nombrado. El detector de trampas se afina solo hacia el rival; el remedio es de procedimiento, y el procedimiento no tiene bando.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🏛️ Caso 8: la defensa detenida</h2>
+    <p>Jael ensaya la defensa de diez minutos ante la familia. Al llegar a la explotación dice: «o sea, los patrones roban y ya». El papá levanta la mano: la defensa se detiene, como estaba pactado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">✋ Detener no es reprobar</span><br>
+      <span>La regla de la prueba de dominio: si suena a caricatura, <span class="hl">la familia detiene la defensa y se repite otro día</span>, sin drama y sin nota. Detenerse a tiempo es parte del método: <span class="hl2">la licencia se gana con precisión, no con velocidad</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> esa noche revisan juntos la pieza: «el excedente lo produce el trabajo y se lo apropia el dueño» no es «roban y ya»: es una tesis con definiciones, que justo por eso se puede auditar. A la semana, Jael pasa la pieza completa, y la familia lo dice en voz alta: ahora sí hay juicio, porque hay licencia.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ La hoja del acero, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier doctrina, video u oferta que pida veredicto en esta casa, se contesta por escrito antes de juzgar:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué versión está sobre la mesa:</strong> ¿la firmaría su defensor, o es el muñeco de un panfleto?</li>
+      <li><strong>Qué dice el resumen fuerte:</strong> las piezas enunciadas en el vocabulario de su dueño.</li>
+      <li><strong>Qué fuerza moral y qué números carga:</strong> con su etiqueta de disputa puesta.</li>
+      <li><strong>Qué diría el defensor de tu resumen:</strong> ¿pasaría la prueba de Turing?</li>
+      <li><strong>Qué se concede en voz alta:</strong> y solo entonces, qué se critica y con qué fuente.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📕 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">Primero el acero, después la respuesta</span>, también entre hermanas. 2. Nadie audita lo que no puede enunciar: <span class="hl">la licencia son diez minutos de pie</span>. 3. La fuerza moral y los mejores números del sistema entran al acero, <span class="hl">con su etiqueta</span>. 4. El dato que te alegra paga doble auditoría. 5. Y <span class="hl2">si la defensa suena a caricatura, se detiene y se repite otro día</span>, sin drama.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «El juicio que empezó al revés»</h2>
+    <p>Guion listo para grabar (6 a 8 minutos), con la historia al frente y el concepto escondido adentro, como manda la miel del borde. Cada escena trae su <strong>voz</strong> (lo que se dice), su <strong>imagen</strong> (lo que se ve) y su <strong>texto en pantalla</strong>.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>Regla del guion (norma de la casa desde esta misión):</strong> toda misión lleva su guion de video con historia: un gancho en frío que duela o intrigue, un personaje que quiere algo, un giro que desmonta lo que el público creía, y un cierre que aterriza el concepto en la vida de quien mira. Nada de definiciones antes del minuto dos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «En 1970, un profesor de ajedrez descubrió que su mejor alumno tenía un defecto extraño: ganaba todas las partidas... menos las que importaban. Hoy te cuento qué tenía roto, porque tú y yo tenemos roto lo mismo.»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; aparece un tablero de ajedrez iluminado por una sola lámpara. Una mano tumba al rey contrario con desgano.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Ganaba todas... menos las que importaban.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y su trampa (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «El alumno entrenaba solo. Y cuando entrenas solo, juegas los dos lados del tablero. Sin darse cuenta, movía flojo las piezas del rival: le armaba defensas torpes, ataques tontos, un enemigo cómodo. Contra ese fantasma era invencible. Hasta que enfrente se sentaba alguien de verdad, con las mejores jugadas de verdad, y el alumno descubría que llevaba años ganándole a nadie.»</p>
+    <p><strong>IMAGEN:</strong> el alumno solo en su cuarto, moviendo las negras con dos dedos y sin mirar; corte a un torneo real: la mirada del rival, el reloj, el sudor.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Llevaba años ganándole a nadie.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Ahora cambia el tablero por una sobremesa. Alguien dice: "esa gente quería quitarle la casa al que trabajara". Todos asienten. Acaba de pasar lo mismo que en el cuarto del alumno: alguien movió flojo las piezas del rival y le ganó a un fantasma. Se siente como lucidez. Rinde como nada.»</p>
+    <p><strong>IMAGEN:</strong> un asado familiar; la frase se dice con el tenedor en la mano; sobre la mesa, entre los platos, aparece de golpe el tablero de ajedrez de la escena 1.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Ganarle a un fantasma se siente igual que ganar.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Hace siglo y medio, un señor con barba señaló niños trabajando en minas, con informes de inspectores en la mano, y con esa indignación documentada armó un sistema que movió medio siglo veinte. Puedes pensar que su sistema falló, y hay bibliotecas enteras auditándolo. Pero si lo que refutas es "un vago que odiaba el trabajo", no refutaste su sistema: refutaste tu muñeco. Y su sistema sigue ahí, intacto, esperando a alguien que sí lo haya leído.»</p>
+    <p><strong>IMAGEN:</strong> grabados de minas del siglo diecinueve; páginas de informes; luego un muñeco de paja cayendo con un soplido, y detrás de él, una estantería enorme que no se mueve.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Tumbar el muñeco no tumba la estantería.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:20)</h2>
+    <p><strong>VOZ:</strong> «Los que estudian esto en serio tienen una regla con nombre de herrería: el hombre de acero. Antes de responder un argumento, reconstruyes su versión más fuerte, la que su autor firmaría. Y hay una prueba para saber si lo lograste: exponlo frente a un defensor. Si no distingue si eres de los suyos, tienes licencia para criticar. Si se ríe de tu resumen, todavía no has leído: solo has opinado.»</p>
+    <p><strong>IMAGEN:</strong> un yunque; unas manos forjan una armadura completa y se la ponen al rival de ajedrez de la escena 2, que por fin sonríe; la partida se juega de verdad.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «El acero antes del juicio.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:20 a 6:10)</h2>
+    <p><strong>VOZ:</strong> «"¿Y no es peligroso? ¿Aprender tan bien lo que quiero refutar?" Al revés: el que solo conoce la caricatura queda indefenso ante el primer predicador que le enseñe el original con música épica. La vacuna se hace con la cepa completa. Miedo debería darte lo otro: llevar años ganándole a nadie.»</p>
+    <p><strong>IMAGEN:</strong> un teléfono reproduce un video con música épica y cero fuentes; la mano duda entre compartir o preguntar; sobre el pulgar aparece, pequeña, la pregunta del texto en pantalla.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Qué documento con fecha sostiene esto?»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:10 a 7:00)</h2>
+    <p><strong>VOZ:</strong> «Esta semana vas a escuchar un veredicto fácil: contra una doctrina, contra un partido, contra alguien de tu propia casa. Antes de asentir, hazte una pregunta de herrero: ¿podría yo exponer eso que condenan tan bien que sus defensores me aplaudieran? Si la respuesta es no, todavía no tienes juicio: tienes eco. La licencia se gana, y ganarla es la primera etapa de este expediente.»</p>
+    <p><strong>IMAGEN:</strong> vuelve el tablero de la escena 1; ahora los dos bandos tienen todas sus piezas; la mano ya no tumba al rey: lo endereza, y la partida empieza.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Nadie audita lo que no puede enunciar. · Misión: El acero antes del juicio · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué hace</th><th>Dónde vive aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>El alumno que ganaba todas menos las que importaban</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>El ajedrecista que entrena solo</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>La sobremesa del asado</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>Tumbar el muñeco no tumba la estantería</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>El hombre de acero y la prueba de Turing</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«¿No es peligroso aprenderlo tan bien?»</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>La pregunta del herrero antes de asentir</td></tr>
+    </table>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Tres lecturas: el mismo acero, tres voces</h2>
+    <p>El tema de la etapa contado tres veces: un cuento, un capítulo de caballerías y un ensayo. Tres maneras de que la idea entre por donde el examen no llega.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> estos tres textos son <strong>ejercicios de estilo escritos por esta casa</strong> en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado, que es la única manera honesta de jugar este juego. Leerlos con la voz puesta es parte del ejercicio; confundirlos con originales sería reprobar la materia entera.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🌀 Lectura 1 · «Los dos ejemplares» (cuento, a la manera de Borges)</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la erudición apócrifa, los espejos y la ironía metafísica del Borges de «Ficciones».</p>
+    <p>Debo la noticia de este caso a una nota al pie de la «Historia de la controversia» de Anselm Weiss (Basilea, 1911), libro que ningún catálogo registra y que acaso solo existe en esa nota. En 1889, la Sociedad de Polemistas de Ginebra encargó a dos hombres la refutación definitiva de una doctrina que entonces incendiaba a Europa. El primero, Chartier, era célebre por la velocidad de sus veredictos; el segundo, Muller, por una lentitud que sus enemigos llamaban cobardía.</p>
+    <p>Chartier entregó su refutación en nueve días. Era brillante, era feroz y era inútil: los partidarios de la doctrina la leyeron con alivio, casi con gratitud. Comprendieron que su adversario combatía a un fantasma que ellos no habitaban, y esa refutación equivocada los confirmó en la fe mejor que cualquier apología. Se sabe que el propio Chartier, años después, encontró su libro en el anaquel de un club revolucionario, encuadernado con esmero, entre los textos sagrados de la causa.</p>
+    <p>Muller no entregó nada en nueve años. Los archivos de la Sociedad conservan el registro de sus pedidos: las actas de los congresos de la doctrina, sus catecismos, sus disidencias internas, los informes de los inspectores de minas que la doctrina blandía como otros blanden reliquias. Se hizo amigo epistolar de tres heresiarcas; discutió con ellos, al principio para conocerlos, después porque la discusión lo había vuelto necesario en aquella iglesia sin dios. En 1898 publicó por fin un volumen sin firma: la exposición más perfecta de la doctrina que se hubiera escrito. Los partidarios lo adoptaron como manual. Dos congresos lo declararon canónico.</p>
+    <p>La refutación de Muller apareció un año más tarde, y es la única que la historia recuerda: la doctrina tardó décadas en reponerse de un adversario que la conocía mejor que sus fieles. Weiss anota, sin embargo, la circunstancia que me movió a escribir esta página. En la biblioteca de Muller se hallaron, a su muerte, dos ejemplares idénticos del manual anónimo: uno anotado para demolerlo, otro anotado para defenderlo, y los dos con la misma letra. Sus albaceas no lograron decidir cuál de los dos hombres que convivieron en Muller escribió la refutación, ni cuál la habría firmado.</p>
+    <p>He pensado que la parábola es menos extraña que aritmética. Para refutar una doctrina hay que haberla sostenido, siquiera una hora, con la lealtad de un creyente; el que no ha sido su adversario dentro de sí mismo, no refuta: injuria. Chartier ganó nueve días y perdió el siglo. Muller perdió nueve años y una parte de su alma, que quizá los años no devuelven, y las dos pérdidas fueron el precio exacto de tener razón.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🐎 Lectura 2 · «De la descomunal batalla que don Quijote no quiso dar» (capítulo, a la manera de Cervantes)</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, la venta, los refranes de Sancho y la cortesía razonadora del Quijote.</p>
+    <p>Donde se cuenta la gentil pendencia que en una venta tuvieron dos bachilleres sobre el tuyo y el mío, con otras razones dignas de ser sabidas.</p>
+    <p>Digo, pues, que caminando don Quijote y Sancho por un recuesto abajo, llegaron a una venta que a los ojos del hidalgo, por milagro nuevo, no pareció castillo sino venta, y en ella hallaron a dos bachilleres que sobre una mesa daban tales voces que no parecía sino que reñían por la posesión de un reino. Sostenía el uno, con Platón y con los santos padres por testigos, que todos los bienes habían de ser comunes, pues la naturaleza no puso cercas en los campos ni candados en los ríos; afirmaba el otro que quitar el tuyo y el mío era quitar el trabajo y la hacienda, y que donde todos son dueños, ninguno siembra. Y de las razones vinieron a los denuestos, llamándose el uno ladrón de lo ajeno y el otro verdugo de los pobres, con que la venta toda andaba alborotada.</p>
+    <p>Pidiéronle al cabo a don Quijote, por ser hombre de armas y de letras, que sentenciase la cuestión; y él, con mucho reposo, respondió: «Sentenciaré, señores licenciados, con una condición que en la andante caballería es ley: que ningún caballero acomete a otro que esté desarmado, porque la victoria que así se alcanza no es victoria, sino villanía. Veo que vuesas mercedes llevan una hora acuchillando, no las razones del contrario, sino un muñeco de trapo que cada cual ha vestido con las ropas del otro. Hágase primero cada uno armero de su enemigo: repita el de la comunidad las razones del tuyo y el mío tan bien y tan cumplidamente que su dueño diga "así es, y no de otra manera lo sostengo"; y haga el otro lo mismo con las razones de la comunidad, sin quitarles pieza del arnés; que juramento hago de no sentenciar pleito donde los contendientes no hayan mostrado saber, cada uno, la mejor lanza del otro.»</p>
+    <p>«Por mi ánima (dijo Sancho) que mi señor ha dicho esta vez cosa de provecho, aunque no la entiendo toda; pero sé que en mi tierra dicen que antes de mercar la mula, mírale el diente, y que quien mal oye, mal responde; y a fe que estos señores llevan gran rato respondiendo a lo que el otro no ha dicho, que es como espantar moscas del pan que no se ha amasado.»</p>
+    <p>Riéronse los bachilleres, y en probando cada cual a decir las razones del contrario, hallaron que no las sabían, y de la vergüenza nació la mansedumbre; y cenaron todos juntos aquella noche, quedando concertados de tornar a la disputa cuando cada uno supiese armar al otro caballero de todas armas. Y don Quijote dijo a Sancho, ya recogidos: «Advierte, Sancho amigo, que no hay mayor soberbia que juzgar lo que no se ha oído entero, ni mayor cortesía que dar al enemigo su mejor acero antes de la batalla; que la verdad no teme lanzas enteras, y la mentira ni aun con el rival desarmado está segura.» Con que se durmieron, y el ventero, por una vez, no cobró de más.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🌍 Lectura 3 · «Las historias que juzgamos sin oír» (ensayo, a la manera de Harari)</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie, la frase corta y el zoom de setenta mil años del autor de «Sapiens».</p>
+    <p>Hace setenta mil años, nuestros antepasados aprendieron un truco que ningún otro animal domina: creer juntos en cosas que no existen. Un chimpancé no entrega sus bananas a cambio de una promesa sobre el paraíso, ni marcha a la guerra por una bandera. Nosotros sí. Los dioses, las naciones, el dinero y los derechos humanos son historias compartidas, y esas historias son la tecnología más poderosa que hemos inventado: permiten que millones de extraños cooperen. El marxismo fue una de esas historias. En su mejor momento organizó a un tercio de la humanidad. No se puede entender el siglo veinte, ni juzgarlo, sin entender qué prometía esa historia a quienes la creyeron.</p>
+    <p>Aquí aparece un problema de diseño. El cerebro que juzga historias es el mismo cerebro de la sabana, y en la sabana juzgar rápido era sobrevivir. Por eso venimos de fábrica con un defecto: evaluamos las historias de la tribu contraria en su versión más estúpida. Es eficiente, es placentero y es la razón de que dos vecinos con los mismos datos puedan odiarse durante décadas. Los imperios lo supieron siempre: es más barato caricaturizar la historia del enemigo que refutarla.</p>
+    <p>Durante la mayor parte de la historia, este defecto tuvo un freno natural: conocer la versión fuerte del otro costaba caro. Había que viajar, leer, conversar. Hoy el freno desapareció y el defecto tiene motor: los algoritmos que administran nuestra atención descubrieron que la caricatura del rival es el producto más adictivo jamás fabricado, y nos la sirven en raciones de treinta segundos. Cada día, millones de personas adquieren la sensación de haber refutado doctrinas que jamás han oído enunciar. La sensación es idéntica a la lucidez. La diferencia solo se nota en el examen, y el examen de las sociedades se llama historia.</p>
+    <p>Existe, sin embargo, una contratecnología. Es antigua, artesanal y no escala bien, que es la marca de las cosas valiosas. Consiste en reconstruir la historia del adversario en su mejor versión, la que sus creyentes firmarían, antes de emitir veredicto. Los medievales la practicaban en sus disputas; los científicos serios la practican con las teorías rivales; algunos economistas la llaman la prueba de Turing ideológica: exponer la doctrina ajena hasta que sus fieles no puedan distinguirte. No es un gesto de cortesía. Es control de calidad: el único modo de saber que tu refutación toca la historia real y no el muñeco que tu tribu te vendió.</p>
+    <p>El siglo veintiuno decidirá cosas enormes: qué hacemos con la inteligencia artificial, con el clima, con el trabajo. Las decidiremos comparando historias, porque es lo único que los sapiens sabemos hacer con el futuro. Y una regla separará a las sociedades que decidan bien de las que decidan a ciegas: la capacidad de habitar la historia del otro sin ser poseído por ella. Los antiguos herreros lo habrían dicho más corto: el acero, antes del juicio.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué tres voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento instala la idea como <strong>imagen que no se olvida</strong> (los dos ejemplares con la misma letra), el capítulo la vuelve <strong>escena y refrán</strong> (armar al otro caballero antes de la batalla), y el ensayo la conecta con <strong>la escala del mundo</strong> (los algoritmos que venden caricaturas). Quien lee las tres tiene el concepto por tres puertas, y la ficha y la evaluación lo encuentran ya instalado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión nueva lleva sus tres lecturas sobre el tema de la etapa: <span class="hl">un cuento a la manera de Borges, un capítulo a la manera de Cervantes y un ensayo a la manera de Harari</span>, siempre con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista, porque en el Estudio Mayor ni el homenaje circula sin estatus.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con el resumen fuerte pieza por pieza, la prueba de Turing con sus señales, la fuerza moral y los números con etiqueta, los ocho casos del proyecto, la <strong>hoja del acero</strong> para llenar a mano, seis ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-rojo-acero-juicio.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige en toda la ruta: <strong>ningún estudio, obra o cifra entra sin su etiqueta</strong> (clásico sólido, clásico cuestionado, ciencia en disputa, divulgación con inflado).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Marx y Engels, El manifiesto comunista (1848) y Marx, El capital, tomo I (1867):</strong> aquí entran <strong>en resumen de trabajo</strong>: los enteros ya los cursaron sus materias dueñas (Economía política y Materialismo Filosófico), y esta etapa solo trae el resumen que un marxista firmaría.</li>
+      <li><strong>Peter Singer, Marx: una breve introducción:</strong> divulgación sólida, la escalera corta para armar el resumen fuerte sin caricatura.</li>
+      <li><strong>Bryan Caplan, la prueba de Turing ideológica:</strong> concepto de divulgación, útil como ejercicio, <strong>no una medida validada</strong>. La herramienta se fabrica en Estudio de las Ideologías; aquí se corre como estación primera.</li>
+      <li><strong>Robert Allen, Farm to Factory (2003):</strong> la mejor defensa empírica de la industrialización soviética, <strong>con sus auditores enfrente: disputa viva</strong>, y así se enseña.</li>
+      <li><strong>Amartya Sen, sobre salud comparada China-India:</strong> académico sólido; el cotejo exacto es en salud básica antes de la reforma china.</li>
+      <li><strong>Las tres lecturas de esta misión:</strong> ejercicios de estilo escritos por la casa en homenaje a Borges, Cervantes y Harari. <strong>Pastiche declarado, no obra de esos autores.</strong></li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>de pie, con la defensa de diez minutos</strong> ante la familia, y con la regla pactada de detenerla si suena a caricatura.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: la materia 26 completa, con sus siete módulos y su advertencia epistémica.</li>
+      <li><a href="../../misiones/ruta-atomos-contra-miedo/atomos-miedo.html">⚛️ Átomos contra el miedo</a>: la materia hermana del arco anterior. El Marx filósofo vive allá; aquí solo se resume.</li>
+      <li><a href="../../misiones/ruta-espejo-vigia-timon/vigia-timon.html">🪞 El vigía y el timón</a>: la puerta del Estudio Mayor. La defensa de diez minutos es una comprobación a cuaderno cerrado, y el vigía la vigila.</li>
+      <li><a href="../../misiones/epistemología/karl-popper.html">🦉 Karl Popper y la Epistemología</a>: la falsabilidad como herramienta general. Aquí se aplicará en la etapa 3, cuando el profeta pase al tribunal.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 2 abre la calculadora ciega: Böhm-Bawerk, Mises, Lange y Hayek, con el marcador del siglo.</li>
+      <li><a href="../../fichas/ficha-rojo-acero-juicio.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja del acero y el expediente de doble columna caben en una página cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> armar por escrito el resumen fuerte (las cuatro piezas, la fuerza moral, los números con etiqueta), ensayar la defensa de diez minutos ante la familia, y aceptar sin drama la mano alzada que la detiene. La prueba de que está aprendida es <strong>que un defensor de la doctrina leería tu resumen y diría «así es»</strong>, y que tú, con la licencia ganada, todavía quieras auditarlo.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">📕</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta del Expediente Rojo · Etapa 1: El acero antes del juicio</div>
+    <div class="diploma-mascot" aria-hidden="true">📕</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">📕</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Nadie audita lo que no puede enunciar» 🌱 · 📕 Ruta del Expediente Rojo · Etapa 1 de 7.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/acero-juicio.js"></script>
+</body>
+</html>

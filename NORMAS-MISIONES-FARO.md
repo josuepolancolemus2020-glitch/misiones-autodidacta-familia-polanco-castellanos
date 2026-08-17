@@ -15,7 +15,8 @@ Sin entrada en el catálogo, la misión no existe para la aplicación.
 
 Secciones, en este orden: Aprende, Estructura, Laboratorio, Flashcards, Quiz,
 Clasifica, Identifica, Completa, Widgets, Reto, Sopa, Tareas, Evaluación,
-**Casos del proyecto** (ver norma 3) y Recursos.
+**Casos del proyecto** (ver norma 3), **Guion de video** y **Lecturas**
+(ver norma 5, desde «El acero antes del juicio» en adelante) y Recursos.
 
 Cada misión lleva además:
 
@@ -82,6 +83,45 @@ Reparte con semilla fija, mueve la opción correcta a su nueva posición y
 renumera los prefijos «a) b) c) d)» del texto. No cambia enunciados, ni
 opciones, ni cuál es la respuesta correcta. Al copiar el molde de otra misión
 hay que correrlo, porque el sesgo se hereda con los bancos.
+
+## 5. El guion de video y las tres lecturas
+
+**Norma nueva, pedida por el autor el 17 de agosto de 2026.** Toda misión
+nueva, desde «El acero antes del juicio» (Expediente Rojo, etapa 1), lleva
+dos secciones más entre Casos y Recursos. Las misiones anteriores quedan
+como están.
+
+**El guion de video (🎬 Guion).** Un guion listo para grabar (6 a 8
+minutos) que cuente el concepto de la etapa CON HISTORIA, no con
+definiciones. La estructura obligatoria, que la propia sección enseña
+desarmada en una tabla: gancho en frío antes de todo logo, un personaje
+que quiere algo, el espejo (la historia salta a la vida del público), el
+giro que desmonta lo que el público creía, la herramienta (el concepto,
+ya ganado por la historia), la objeción del público concedida y
+contestada, y el cierre que aterriza en una acción de esta semana con el
+nombre de la misión. Cada escena lleva VOZ, IMAGEN y TEXTO EN PANTALLA.
+Nada de definiciones antes del minuto dos.
+
+**Las tres lecturas (📖 Lecturas).** Tres textos que explican el tema de
+la etapa por tres puertas distintas, escritos por la casa como ejercicios
+de estilo:
+
+1. un **cuento a la manera de Jorge Luis Borges** (la erudición apócrifa,
+   los espejos y dobles, la ironía metafísica del final);
+2. un **capítulo a la manera de Miguel de Cervantes Saavedra** (el
+   «Donde se cuenta...», el periodo largo, la venta, los refranes de
+   Sancho y la cortesía razonadora de don Quijote);
+3. un **ensayo a la manera de Yuval Noah Harari** (la escala de especie,
+   la frase corta, el zoom de setenta mil años y el aterrizaje en los
+   algoritmos del presente).
+
+Los tres deben ENSEÑAR el tema (que quien los lea salga sabiendo el
+concepto, no solo entretenido) y llevar SIEMPRE, a la vista, la etiqueta
+de la regla del estatus: **ejercicio de estilo de la casa, en homenaje;
+no obra de esos autores**. Pastiche sin declarar es exactamente el tipo
+de fuente inflada que el Estudio Mayor enseña a cazar. La sonda de cada
+misión comprueba las dos secciones: 17 paneles en total, el guion con su
+estructura y las tres lecturas con su etiqueta.
 
 ## 6. La ficha va en diez páginas, y llenas
 
