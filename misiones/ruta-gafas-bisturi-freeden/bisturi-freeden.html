@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de las Gafas a la Vista · Etapa 2: El bisturí de Freeden | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/bisturi-freeden.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Lee idearios como listas de opiniones 📋</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🔬</div>
+    <div class="hero-text">
+      <h1>El bisturí de Freeden: <span>núcleo, adyacentes y periferia</span></h1>
+      <p class="sub">Un ideario no es una lista de opiniones: es una estructura que se puede dibujar 🔬</p>
+      <div class="badge">🔬 Ruta de las Gafas a la Vista · Etapa 2 de 7</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔬 El instrumento de la materia entera, el primer día</h2>
+    <p>La etapa 1 dejó la palabra con su expediente completo. Esta entrega la <strong>herramienta</strong>, y es la que sostiene las cinco etapas que faltan: con ella, cualquier ideario (un manifiesto, un plan de gobierno, la misión de una escuela, la página de «quiénes somos» de una empresa) <strong>deja de ser una lista de opiniones y se vuelve una estructura que se puede dibujar</strong>.</p>
+    <p>La universidad guarda esto para el posgrado, y ahí está el cuello de botella que esta ruta suprime: <strong>el instrumento va el primer día</strong>. Sin él, las etapas siguientes serían un desfile de ismos contados por sus enemigos; con él, cada familia se disecciona <strong>sin caricatura y sin bandera</strong>.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La vara de la etapa.</strong> Quien termina toma cualquier ideario y dice tres cosas: <strong>qué concepto descontesta, cómo lo descontesta, y qué queda en el núcleo cuando se le quita el adorno</strong>. Ese gesto es el que las dos Críticas del arco (al Marxismo y al Capitalismo) van a correr a fondo, y el que la etapa 7 va a girar hacia las premisas de esta casa.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>⚖️ La palabra que no se deja cerrar</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🔓 El concepto disputado</h4>
+        <p><strong>W. B. Gallie</strong>, en <strong>«Essentially Contested Concepts» (1956)</strong>, mostró que hay conceptos cuyo significado <strong>nunca queda cerrado</strong>: «libertad», «igualdad», «justicia», «democracia». Y lo más importante: <strong>eso no es un defecto del idioma, es su modo de existir</strong>. La disputa no se puede terminar; se puede entender.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>✂️ El ejemplo mayor, partido en dos</h4>
+        <p><strong>Isaiah Berlin</strong> partió el ejemplo mayor en <strong>1958</strong>, en <strong>«Dos conceptos de libertad»</strong>: <strong>libertad negativa</strong> (que nadie me estorbe) y <strong>libertad positiva</strong> (poder de verdad hacer). <strong>Media pelea política del siglo cabe en cuál de las dos se está nombrando</strong>, y casi nunca se dice cuál.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🚧 Dos vecinos, la misma palabra, dos calles</span><br>
+      <span>Uno pide libertad para su calle y quiere <span class="hl">que le pongan topes, para que sus hijos salgan</span>. El otro pide libertad para la misma calle y quiere <span class="hl2">que nadie le diga a qué velocidad manejar</span>. Firmaron la misma carta y no se hablan. Nadie engañó a nadie: <span class="hl">firmaron la misma palabra con dos mapas distintos adentro</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 El camino del bisturí, en siete momentos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué pasó, qué se toma de ahí y qué cuidado pide.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento del camino.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la página de «quiénes somos»</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide cómo queda escrita la página que M.E.T.A.S publica sobre sí misma.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🖊️</span><span class="ms-text"><strong>La primera versión ya está escrita:</strong> «en M.E.T.A.S creemos en la libertad y en la igualdad de oportunidades». Suena bien, nadie la va a discutir, y eso es justo lo que enciende la alarma.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🔬</span><span class="ms-text"><strong>Entra el bisturí:</strong> «libertad» e «igualdad» son conceptos disputados, y la frase no dice qué significan. Tal como está, cada lector le pone el significado que ya traía.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🪤</span><span class="ms-text"><strong>Llega la tentación:</strong> dejarlo bonito. Es cómodo, se firma rápido, y es exactamente una descontestación sin declarar: fijarle un solo sentido por debajo y venderlo como sentido común.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🎭</span><span class="ms-text"><strong>Lo que tienes delante:</strong> dos maneras de publicar la misma página, y un proyecto que va a ser leído por familias que no piensan igual.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Cómo se publica la página?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🖊️ «Creemos en la libertad y la igualdad»</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🔬 Declarar el cierre y dibujar la morfología</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔍 La morfología: las tres capas de todo ideario</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;"><strong>Michael Freeden</strong>, en <strong>«Ideologies and Political Theory» (1996)</strong>, construyó sobre Gallie y Berlin el instrumento de la materia: una ideología es una <strong>morfología</strong>, es decir un arreglo de conceptos con tres capas. Saber en qué capa está cada cosa es la diferencia entre discutir y diseccionar.</p>
+    <table class="tres">
+      <tr><th>Capa</th><th>Qué es</th><th>Cómo se reconoce</th></tr>
+      <tr><td><strong>Núcleo</strong></td><td>Lo que no se negocia sin dejar de ser esa ideología</td><td>Si se le quita, el ideario cambia de nombre: ya es otra cosa</td></tr>
+      <tr><td><strong>Adyacentes</strong></td><td>Los conceptos que precisan el núcleo, que le dan forma concreta</td><td>Se puede discutir cuál, pero alguno hace falta: el núcleo solo es demasiado vago</td></tr>
+      <tr><td><strong>Periféricos</strong></td><td>Lo que cambia con el lugar y con la década</td><td>Decorado de temporada: se puede cambiar sin que nadie deje de ser lo que era</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 Para qué sirve la diferencia</span><br>
+      <span>Porque casi todas las peleas <span class="hl">se dan en la periferia y se pelean como si fueran el núcleo</span>. Y al revés: cuando alguien negocia tranquilamente algo del núcleo, casi siempre es porque <span class="hl2">no sabía que estaba ahí</span>. El bisturí no dice quién tiene razón: dice de qué se está hablando.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🔒 La descontestación: el movimiento clave</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Es el gesto que hace toda ideología, y el que hay que aprender a ver: <strong>tomar un concepto disputado y fijarle un solo significado como si fuera el único posible</strong>. Y después, el remate: <strong>vender ese cierre como sentido común</strong>.</p>
+    <table class="tres">
+      <tr><th>Familia</th><th>Qué concepto descontesta</th><th>Cómo lo cierra</th></tr>
+      <tr><td>El liberalismo</td><td><strong>Libertad</strong></td><td>Como no interferencia, o bien como autonomía. Cierra en uno de los dos y ya no menciona el otro</td></tr>
+      <tr><td>El socialismo</td><td><strong>Igualdad</strong></td><td>Como algo más que la igualdad ante la ley: la lleva a las condiciones materiales</td></tr>
+      <tr><td>Cualquier ideario</td><td>El concepto de su núcleo</td><td>Lo enuncia sin comillas, sin alternativas y sin fecha, como si nunca hubiera estado en disputa</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔎 La señal que delata una descontestación</span><br>
+      <span>El texto usa el concepto <span class="hl">sin decir en qué sentido</span>, y encima da por hecho que su sentido es el obvio. Prueba de tres segundos: pon el otro significado en la misma frase. Si la frase <span class="hl2">se vuelve absurda o cambia de bando</span>, había un cierre escondido.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>✏️ El ideario, dibujado en una página</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>📋 Cómo se leía antes</h4>
+        <p>Como una <strong>lista de opiniones</strong>: diez frases sueltas, todas al mismo nivel, y el lector eligiendo si le gustan o no. Con eso no se puede comparar dos idearios, ni saber qué le pasaría a uno si se le quita una pieza.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🔬 Cómo se lee con el bisturí</h4>
+        <p>Como una <strong>estructura con centro y órbitas</strong>: qué hay en el centro, qué orbita cerca porque precisa el centro, y qué es decorado de temporada. Eso <strong>se dibuja</strong>, y dos dibujos se pueden poner uno al lado del otro.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Gallie</div><div class="stat-val">1956</div></div>
+      <div class="stat-item"><div class="stat-label">Berlin</div><div class="stat-val">1958</div></div>
+      <div class="stat-item"><div class="stat-label">Freeden</div><div class="stat-val">1996</div></div>
+      <div class="stat-item"><div class="stat-label">Capas</div><div class="stat-val">3</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧪 La práctica del módulo: tres textos que no se parezcan</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El bisturí no se aprende de memoria: se aprende cortando. La práctica pide <strong>tres textos que no se parezcan entre sí</strong>, y una página de dibujo para cada uno:</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">📜 Un plan de gobierno viejo</div><div class="t-info">Histórico, no de nadie vivo</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">⛪ Una declaración de principios</div><div class="t-info">De una iglesia o de una ONG</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🏢 Un «quiénes somos»</div><div class="t-info">De una empresa cualquiera</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🎯 Núcleo</div><div class="t-info">Lo que no se puede quitar</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🛰️ Adyacentes</div><div class="t-info">Lo que precisa el núcleo</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🎈 Periféricos</div><div class="t-info">Lo que cambia con la década</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y la regla de la casa que gobierna la práctica: <strong>los textos son históricos o de fuera</strong>. En esta casa no se le reparte etiqueta a ningún político vivo del país; el instrumento se prueba con documentos que ya no pueden ganar ni perder una elección, y después se gira hacia adentro.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔧 El cuidado que gobierna el arco entero</span><br>
+      <span>En este arco <span class="hl">la regla del acero es la regla madre</span>: cada familia se pone en pie en su mejor versión antes de tocarla. Y el bisturí <span class="hl2">se gira hacia adentro, hacia las premisas de la propia casa</span>, porque un detector que no se prueba en casa no es un instrumento, es un arma.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller del bisturí</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para tener el instrumento completo en la mano.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El concepto disputado</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🔬 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="disputado" onclick="labShowParte('disputado')">🔓 El concepto disputado</button>
+        <button class="lab-btn lab-cont-btn" data-parte="libertad" onclick="labShowParte('libertad')">✂️ Las dos libertades</button>
+        <button class="lab-btn lab-cont-btn" data-parte="morfologia" onclick="labShowParte('morfologia')">🎯 La morfología</button>
+        <button class="lab-btn lab-cont-btn" data-parte="descontesta" onclick="labShowParte('descontesta')">🔒 La descontestación</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿núcleo o periferia?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se disecciona un ideario</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del instrumento se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿En qué capa va esa frase?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es esa frase dentro de la morfología:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Todo niño puede aprender si alguien se sienta con él»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla la disección?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">Una disección lista diez frases del ideario, todas al mismo nivel</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🎯 Núcleo</button>
+        <button class="btn btn-sec" onclick="">🎈 Periferia</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🔬 El ideario en la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · El bisturí de Freeden · Ruta de las Gafas a la Vista</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: el bisturí de Freeden</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El ideario en la mesa · El bisturí de Freeden</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🔬 El ideario en la mesa: núcleo, adyacentes y periferia</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay un ideario esperando el bisturí. Di qué concepto disputado aparece y cómo lo descontesta el texto, dibuja su morfología en tres capas, qué fuente o fecha necesita su etiqueta de estatus, y qué condición escrita deja la casa nombrando también su propia morfología (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🔬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🔬 Casos del proyecto: el bisturí en esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas hay un ideario sobre la mesa (propio o ajeno), y en todas la pregunta es la misma: <strong>qué concepto descontesta, cómo lo descontesta, y qué queda en el núcleo cuando se le quita el adorno.</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también en esta ruta:</strong> ningún estudio, obra o cifra entra sin su etiqueta. Las de esta etapa: Gallie (1956) como <strong>clásico sólido de la filosofía</strong>, Berlin (1958) como <strong>clásico sólido</strong> y fuente canónica del ejemplo central, Freeden con «Ideologies and Political Theory» (1996) como <strong>académico sólido</strong> y base del análisis morfológico, y su «Ideology: A Very Short Introduction» (2003) como <strong>la rampa de entrada, corta y seria, del propio dueño del instrumento</strong>. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🖊️ Caso 1: la página de «quiénes somos» de M.E.T.A.S</h2>
+    <p>La primera versión dice: «en M.E.T.A.S creemos en la libertad y en la <strong>igualdad de oportunidades</strong>». Suena bien y nadie la va a discutir, y eso es justo lo que enciende la alarma.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔬 Dos conceptos disputados en una sola línea</span><br>
+      <span>Qué mete dejarlo así: una frase que <span class="hl">todo el mundo firma</span>. Qué saca: que cada lector le pone el significado que ya traía, y el día del desacuerdo la casa no puede apelar a su propio texto. La pregunta que decide: <span class="hl2">¿qué libertad, y qué igualdad?</span></span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí se publica: el núcleo declarado en prosa llana («todo niño puede aprender si alguien se sienta con él»), los adyacentes nombrados (el acceso gratuito, el temario oficial, la lengua materna) y la periferia dicha como periferia (el formato, la aplicación, los colores). <strong>Declarar el cierre no es debilidad: es lo que permite que alguien discuta con la casa en vez de con su imaginación.</strong></p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>💰 Caso 2: L 75,000 por firmar una declaración de principios</h2>
+    <p>Una red educativa internacional ofrece <strong>L 75,000</strong> anuales si M.E.T.A.S firma su <strong>declaración de principios</strong> de diez puntos. Los diez puntos son bonitos y la casa está de acuerdo con ocho.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎯 El núcleo no es el que anuncia</span><br>
+      <span>Al diseccionarla aparece lo de siempre: <span class="hl">el punto 1 no es el núcleo</span>. El núcleo está en el punto 6, el que dice cómo se decide un desacuerdo, y de él se siguen los otros nueve. Firmar ocho de diez <span class="hl2">no es firmar el ochenta por ciento: es firmar el núcleo o no firmarlo</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: se firma la declaración con la morfología dibujada al margen, diciendo cuál punto la casa toma como núcleo y cuáles considera periféricos, y esa hoja se publica junto a la firma. Si la red no acepta la hoja, <strong>lo que quería no era una aliada: era un núcleo prestado</strong>.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📜 Caso 3: el plan de gobierno viejo que Jael tiene que diseccionar</h2>
+    <p>La práctica del módulo le toca a Jael: tres textos que no se parezcan. El primero es un <strong>plan de gobierno de hace décadas</strong>, sacado de un archivo, y la regla de la casa manda que sea así: <strong>histórico o de fuera, nunca de un político vivo del país</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎈 El decorado de temporada</span><br>
+      <span>Lo que se descubre al dibujarlo: la mitad del documento es <span class="hl">periferia de su década</span> (obras, nombres, tecnologías que ya no existen) y el núcleo cabe en dos frases. La prueba: <span class="hl2">quítale toda la periferia y fíjate si el ideario sigue siendo el mismo</span>. Casi siempre sí, y eso es el hallazgo.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> por qué los textos de entrenamiento son viejos. Un documento que ya no puede ganar ni perder una elección <strong>se deja diseccionar sin que nadie se sienta atacado</strong>, y el que aprende con él llega entrenado al texto de hoy. Cero partidismo hondureño actual no es cobardía: es la condición para que el instrumento no nazca torcido.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🏫 Caso 4: «formamos líderes con valores»</h2>
+    <p>Un colegio del barrio invita a M.E.T.A.S a un acto, y su lema, impreso en la entrada, dice «<strong>formamos líderes con valores</strong>». La familia lo lee de camino y Angelly pregunta qué significa.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔍 La prueba de los tres segundos</span><br>
+      <span>«Valores» y «líderes» son conceptos disputados, y el lema <span class="hl">no dice ni uno solo</span>. Se le corre la prueba: pon el otro significado en la misma frase. ¿Líder es el que manda o el que sirve? ¿Valores son los de quién? <span class="hl2">Si la frase aguanta cualquier respuesta, no afirmaba nada</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el lema no se critica en el acto ni delante de nadie: se disecciona en casa, en una hoja, y se compara con el lema propio. Y aparece lo incómodo: <strong>el lema de M.E.T.A.S aguanta la misma prueba solo porque la casa se la corrió antes</strong>. La diferencia no es ser mejores: es haberlo escrito.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🏢 Caso 5: L 12,000 por la charla en la empresa del mérito</h2>
+    <p>Una empresa local ofrece <strong>L 12,000</strong> por una charla de M.E.T.A.S a sus empleados. Su página de «quiénes somos» dice que creen «en el <strong>mérito</strong> y en la libertad de emprender».</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🪞 El espejo: casi la misma morfología</span><br>
+      <span>Al dibujarla aparece el problema que importa: <span class="hl">es casi la morfología de esta casa</span>. Mismo adyacente (el mérito), misma libertad descontestada como iniciativa propia. Y por eso este caso es el más difícil: <span class="hl2">el bisturí que se afila solo con los idearios que disgustan no corta</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: se acepta la charla, y la casa lleva su propia morfología dibujada y la enseña primero, incluida la parte donde coincide con la empresa y la parte donde no (aquí M.E.T.A.S es gratuita, y eso es núcleo, no periferia). <strong>La regla de pago se cumple con el caso más parecido, no con el más lejano.</strong></p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🙋 Caso 6: Angelly y la palabra «justicia»</h2>
+    <p>De regreso del acto, <strong>Angelly</strong> pregunta lo que Gallie contestó en 1956: «si los dos dicen que quieren justicia, ¿por qué se pelean?». No hay oferta ni lempiras: hay una niña con la pregunta exacta.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔓 Gallie, explicado a su edad</span><br>
+      <span>La respuesta de la casa: <span class="hl">hay palabras que no se dejan cerrar</span>, y «justicia» es una de ellas. No porque nadie se haya puesto de acuerdo todavía, sino porque <span class="hl2">estar en disputa es su modo de existir</span>. Se pelean de verdad, no por confusión: quieren dos cosas distintas con el mismo nombre.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> y se le da el ejemplo de Berlin, que a su edad se entiende con la calle: los dos vecinos que pidieron libertad, uno para que pusieran topes y el otro para que no. Lo práctico que se lleva Angelly: <strong>antes de discutir, preguntar cuál de las dos cosas está pidiendo el otro</strong>. Eso no termina la pelea, pero la vuelve una pelea de verdad.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🛡️ Caso 7: Jael dibuja la familia que peor le cae</h2>
+    <p>La vara del arco: <strong>Jael tiene que dibujar la morfología de la familia política que peor le cae</strong>, tan bien que un militante la firmaría. Sin caricatura, y con su mejor versión en pie antes de tocarla.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📕 La regla del acero, que aquí es la regla madre</span><br>
+      <span>El primer dibujo salió mal, y se supo por una señal clara: <span class="hl">el núcleo que Jael le puso era un defecto</span>, no una convicción. Nadie tiene un defecto en el núcleo de su propio ideario. Cuando el núcleo dibujado <span class="hl2">no lo firmaría nadie de esa familia</span>, lo que hay en la hoja es un muñeco.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> se rehízo con la mejor versión, y entonces pasó lo que tenía que pasar: la crítica de Jael se volvió más difícil y mucho más seria. <strong>El bisturí no absuelve a nadie; solo garantiza que el corte caiga en el cuerpo real.</strong> Esa es la conexión con la etapa 1 del Expediente Rojo, y la razón de que en este arco el acero sea la regla madre.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🖇️ Caso 8: el adyacente que la casa no había visto</h2>
+    <p>Dibujando la morfología de M.E.T.A.S, el autor descubre algo que nunca había escrito: <strong>«mérito» está funcionando como adyacente del núcleo</strong>, y de ahí salen decisiones (a quién se felicita, qué se premia, cómo se cuenta un logro) que nadie había declarado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">💳 La regla de pago, en la propia hoja</span><br>
+      <span>Un adyacente sin declarar <span class="hl">trabaja igual que uno declarado, pero no se puede discutir</span>. Y el hallazgo llegó por el único camino que lo produce: dibujar la morfología propia con el mismo bisturí que la ajena. <span class="hl2">Un desenmascaramiento propio por cada uno ajeno.</span></span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el adyacente quedó escrito en el inventario de gafas, con su renglón de qué lo haría cambiar: un cotejo de resultados que muestre que premiar el esfuerzo comparado desanima más de lo que anima. <strong>Si ese renglón no existiera, el adyacente estaría funcionando como dogma</strong>, y así se anotaría, con fecha.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🔬 La hoja del bisturí, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier ideario que llegue a esta casa, propio o ajeno, se llena antes de opinar:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué concepto disputado aparece:</strong> libertad, igualdad, justicia, mérito, democracia, valores.</li>
+      <li><strong>Cómo lo descontesta:</strong> qué único significado le fija, y con qué palabras lo vende como obvio.</li>
+      <li><strong>Qué hay en el núcleo:</strong> lo que no se puede quitar sin que el ideario deje de ser el que es.</li>
+      <li><strong>Qué es adyacente y qué es periférico:</strong> lo que precisa el núcleo, y el decorado de temporada.</li>
+      <li><strong>Qué morfología propia se parece a esta:</strong> y qué desenmascaramiento propio se paga esta semana.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔬 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">Ningún concepto disputado se usa sin decir en cuál de sus sentidos</span>. 2. La disputa no es un defecto del idioma: <span class="hl">es su modo de existir</span> (Gallie, 1956). 3. Todo ideario se dibuja en tres capas antes de juzgarlo, y en una sola página. 4. El entrenamiento va con textos históricos o de fuera: <span class="hl">cero etiquetas a políticos vivos del país</span>. 5. Y <span class="hl2">si el núcleo que dibujaste no lo firmaría nadie de esa familia, dibujaste un muñeco</span>: se rehace.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «Dos vecinos y la misma palabra»</h2>
+    <p>Guion listo para grabar (6 a 8 minutos), con la historia al frente y el concepto escondido adentro. Cada escena trae su <strong>voz</strong> (lo que se dice), su <strong>imagen</strong> (lo que se ve) y su <strong>texto en pantalla</strong>.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>Regla del guion (norma de la casa):</strong> toda misión lleva su guion de video con historia: un gancho en frío que duela o intrigue, un personaje que quiere algo, un giro que desmonta lo que el público creía, y un cierre que aterriza el concepto en la vida de quien mira. Nada de definiciones antes del minuto dos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «Dos vecinos firmaron la misma carta. Pedían libertad para su calle. Seis meses después no se hablaban, y los dos seguían pidiendo libertad para la misma calle. Nadie los engañó. Nadie cambió de opinión. Y sin embargo pedían cosas contrarias.»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; aparece una carta escrita a mano sobre una mesa, con dos firmas distintas al pie. La cámara se acerca a la palabra «libertad», subrayada dos veces.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «La misma palabra. La misma calle. Cosas contrarias.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quiere (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «La que escribió la carta se llamaba doña Marta, y quería algo muy concreto: que sus hijos pudieran salir a la calle. Los carros bajaban a toda velocidad. Para ella, libertad era poder abrir la puerta sin sostener a un niño del brazo. Así que pidió topes. Y su vecino, que firmó la misma carta con la misma palabra, entendió otra cosa: para él, libertad era que nadie le dijera a qué velocidad manejar en su propio barrio. Cuando llegaron los topes, se sintió traicionado. Y tenía razón: nadie le había explicado qué libertad estaban pidiendo.»</p>
+    <p><strong>IMAGEN:</strong> doña Marta sosteniendo a un niño del brazo en el portón; corte a un carro bajando rápido; corte a la reunión del barrio, las dos manos levantadas al mismo tiempo pidiendo lo contrario.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Los dos pidieron libertad. Los dos la tuvieron. Los dos perdieron.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Ahora cambia la calle por tu casa. Piensa en una palabra que en tu familia nadie discute: respeto. Apoyo. Responsabilidad. Todos de acuerdo, siempre, hasta el momento exacto de aplicarla. Ahí se descubre que respeto para uno era no levantar la voz, y para otro era avisar cuando se va a llegar tarde. Y la pelea no es porque alguien sea hipócrita: es porque la palabra nunca se abrió.»</p>
+    <p><strong>IMAGEN:</strong> una mesa familiar en silencio; sobre el mantel aparece escrita la palabra RESPETO, y se parte en dos mitades que se separan lentamente.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Todos de acuerdo, hasta el momento de aplicarla.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Aquí está el giro, y no es lo que uno espera. Tú creerías que el problema se arregla definiendo bien las palabras, de una vez y para siempre. En 1956, un filósofo llamado W. B. Gallie publicó un trabajo que dice que no: hay conceptos cuyo significado <em>nunca</em> queda cerrado, y los nombró conceptos esencialmente disputados. Libertad. Igualdad. Justicia. Democracia. Y ahora la parte que cambia todo: eso no es un defecto del idioma ni una pereza de los diccionarios. Estar en disputa es <em>su modo de existir</em>. Dos años después, en 1958, Isaiah Berlin partió el ejemplo mayor en dos: libertad negativa, que nadie me estorbe, y libertad positiva, poder de verdad hacer. Doña Marta pedía la positiva. Su vecino, la negativa. Media pelea política del siglo veinte cabe en cuál de las dos se está nombrando, y casi nunca se dice cuál.»</p>
+    <p><strong>IMAGEN:</strong> la palabra LIBERTAD escrita en una pizarra; una tiza la parte por la mitad y escribe debajo «que nadie me estorbe» y «poder de verdad hacer»; al lado, los años 1956 y 1958.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Estar en disputa no es un defecto: es su modo de existir.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:20)</h2>
+    <p><strong>VOZ:</strong> «Y con eso, Michael Freeden armó en 1996 la herramienta que te vas a llevar. Dice así: un ideario no es una lista de opiniones, es una morfología, y tiene tres capas. El núcleo: lo que no se puede quitar sin que deje de ser eso. Los adyacentes: los conceptos que precisan el núcleo, que le dan forma concreta. Y los periféricos: lo que cambia con el lugar y con la década, el decorado de temporada. Con eso en la mano, cualquier ideario se puede dibujar en una página. Y hay un movimiento que aprendes a ver en todos: la descontestación. Es cuando alguien toma un concepto disputado, le fija un solo significado como si fuera el único posible, y después vende ese cierre como sentido común. La carta de la calle descontestaba libertad sin saberlo. Tu casa descontesta respeto todos los días.»</p>
+    <p><strong>IMAGEN:</strong> tres anillos concéntricos dibujándose a mano: en el centro una frase, alrededor tres palabras, en el borde exterior unas cuantas más que se van borrando y cambiando; luego el candado de la descontestación cerrándose sobre una palabra.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Núcleo · Adyacentes · Periferia»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:20 a 6:10)</h2>
+    <p><strong>VOZ:</strong> «"Momento. ¿Esto no es enredar las palabras para no decidir nada?" Al revés: es lo único que permite decidir. La carta de la calle se reescribió, y la versión nueva decía qué libertad estaban pidiendo y a costa de qué. Dejó de tener veinte firmas y pasó a tener nueve. Y con esas nueve, en dos semanas hubo acuerdo, porque por primera vez se sabía qué se estaba negociando. Veinte firmas sobre una palabra sin abrir no eran un acuerdo: eran veinte desacuerdos dormidos.»</p>
+    <p><strong>IMAGEN:</strong> la carta original con veinte firmas, y al lado la versión nueva con nueve y dos párrafos más; una mano pone los topes y otra mano, la del vecino, firma al lado sin enojo.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Veinte firmas sobre una palabra sin abrir son veinte desacuerdos dormidos.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:10 a 7:00)</h2>
+    <p><strong>VOZ:</strong> «Esta semana te va a tocar una de esas palabras: en el trabajo, en la iglesia, en tu propia mesa. Antes de discutir, haz dos preguntas: ¿en cuál de sus sentidos la estás usando tú?, y ¿en cuál la está usando el otro? Y una tarea concreta, para hoy: agarra media hoja y dibuja tres anillos. En el centro escribe la frase que en tu casa no se negocia. Alrededor, las tres o cuatro que la precisan. En el borde, lo que podría cambiar el año que viene sin que nadie deje de ser quien es. Cuando termines vas a saber algo que casi nadie sabe de su propia familia, y lo vas a saber por escrito.»</p>
+    <p><strong>IMAGEN:</strong> vuelve la carta de la escena 1; encima, media hoja con los tres anillos dibujados a lápiz y el centro ya escrito; la mano deja el lápiz.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Un ideario se dibuja, no se opina. · Misión: El bisturí de Freeden · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué hace</th><th>Dónde vive aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>Dos vecinos firmaron lo mismo y pedían cosas contrarias</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>Doña Marta, que solo quería que sus hijos salieran a la calle</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>La palabra «respeto» en la mesa de tu casa</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>La disputa no se arregla definiendo: es su modo de existir</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>Las tres capas de Freeden y la descontestación</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«¿No es enredar para no decidir?»: las nueve firmas</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>Media hoja y tres anillos, con el centro escrito</td></tr>
+    </table>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Tres lecturas: el mismo bisturí, tres voces</h2>
+    <p>El tema de la etapa contado tres veces: un cuento, un capítulo de caballerías y un ensayo. Tres maneras de que la idea entre por donde el examen no llega.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> estos tres textos son <strong>ejercicios de estilo escritos por esta casa</strong> en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado. Y llevan una regla extra de esta casa: <strong>toda obra, fecha y persona que aparece dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre: una hoja suelta con un pastiche sin declarar sería justo la fuente inflada que esta materia enseña a cazar.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-pri" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🌀 Lectura 1 · «La palabra que no se deja cerrar» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas inventadas. Todos los libros, fechas y personas de este cuento son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">Trabajé una vez, hace mucho, corrigiendo pruebas de un diccionario. Era un empleo humilde y lo recuerdo con gratitud, porque me enseñó una cosa que ninguna biblioteca me había enseñado: que las palabras se resisten. El director de la obra, hombre severo y de una honradez que ahora me parece heroica, me encomendó una tarea que él consideraba menor. Debía redactar, en no más de veinte líneas, la definición de la palabra <strong>libertad</strong>.</p>
+    <p class="lect-p">Acepté con la vanidad de los jóvenes. Al cabo de un mes tenía catorce versiones y ninguna me servía. Cada vez que cerraba la definición por un lado, se me abría por otro. Si escribía que la libertad es la ausencia de estorbos, un lector podía usar mi definición para justificar que a nadie se le debe nada, y yo no quería eso. Si escribía que es la posibilidad efectiva de obrar, otro lector podía usarla para justificar que se le obligue a la gente a ser libre, y eso me parecía peor. Comprendí, con una mezcla de humillación y de alivio, que no estaba fracasando por torpeza.</c></p>
+    <p class="lect-p">Busqué consuelo en un antecesor ilustre. En <strong>1755</strong>, <strong>Samuel Johnson</strong> publicó en Londres su <strong>Diccionario de la lengua inglesa</strong>, y en el prefacio confesó algo que a mí me sonó a absolución: había empezado la obra creyendo que podía fijar el idioma, y la terminó sabiendo que esa esperanza era vana, porque ninguna lengua viva se deja embalsamar. Johnson había querido ser legislador y descubrió que solo podía ser testigo. Yo tenía veinte líneas y él había tenido nueve años y dos volúmenes; la proporción no me favorecía, pero el consuelo era el mismo.</p>
+    <p class="lect-p">El nombre exacto de mi fracaso llegó después, y no de un poeta sino de un profesor. En <strong>1956</strong>, <strong>W. B. Gallie</strong> publicó un trabajo titulado <strong>Essentially Contested Concepts</strong>, donde sostuvo que existen conceptos cuyo significado no queda cerrado nunca, y que esa apertura no es un accidente que la filosofía deba remediar: es su manera de existir. Libertad, igualdad, justicia, democracia. Se discuten no porque los hombres sean tontos, sino porque son ese tipo de cosa. Dos años más tarde, en <strong>1958</strong>, <strong>Isaiah Berlin</strong> dictó en Oxford la lección que se llamó <strong>Dos conceptos de libertad</strong> y hizo lo único razonable que quedaba por hacer: en vez de cerrar la palabra, la partió. Libertad negativa, que nadie me estorbe. Libertad positiva, poder de verdad hacer. Mis catorce versiones, comprendí, eran catorce intentos de meter dos cosas en una.</p>
+    <p class="lect-p">La historia tiene un final administrativo y por eso me gusta. Entregué al director dos definiciones numeradas, con una nota que explicaba que la palabra no admitía una sola. Esperaba una reprimenda y recibí un encogimiento de hombros: me dijo que los diccionarios hacen eso desde siempre, que para eso están los números, y que yo había tardado un mes en descubrir la tipografía. Tenía razón, y sin embargo no la tenía del todo. Muchos años después leí a <strong>Michael Freeden</strong>, que en <strong>1996</strong>, en <strong>Ideologies and Political Theory</strong>, convirtió esa impotencia en un instrumento: si un concepto disputado no se puede cerrar, entonces <em>cerrarlo</em> es un acto, y ese acto se puede estudiar. Cada doctrina toma la palabra abierta, le fija un solo sentido como si fuera el único, y vende ese cierre como sentido común. Freeden llamó a eso descontestación, y enseñó a dibujar la estructura que resulta: un núcleo que no se negocia, unos conceptos adyacentes que lo precisan, y una periferia que cambia con la década.</p>
+    <p class="lect-p">De modo que aquellos números que el director despachó como tipografía eran, sin que ninguno de los dos lo supiera, la primera página de una morfología. Pienso a veces que los diccionarios son los libros más modestos y más honrados del mundo: no resuelven las disputas, las numeran. Y que yo, corrigiendo pruebas en un sótano, había tropezado con la única forma de humildad que le queda a un hombre frente a una palabra grande: no cerrarla, y decir en voz alta cuál de sus sentidos está usando.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>🐎 Lectura 2 · «De la libertad que pedían dos, siendo dos libertades» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, el camino, el humor y la reflexión cervantinos. Las dos anclas son reales: don Quijote pronuncia su elogio de la libertad («uno de los más preciosos dones que a los hombres dieron los cielos») en el capítulo cincuenta y ocho de la segunda parte (1615), y libera a los galeotes, que se lo pagan a pedradas, en el capítulo veintidós de la primera parte (1605).</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">Donde se cuenta el pleito que sobre la palabra libertad tuvieron un hidalgo y un labrador, y de cómo don Quijote los hizo dibujar su parecer en el suelo, con lo mucho que Sancho entendió al revés.</p>
+    <p class="lect-p">Sucedió que, yendo por su camino don Quijote y Sancho, hallaron a la puerta de una aldea a dos hombres que voceaban, y ambos a dos alegaban la libertad por su parte, de manera que quien los oyera de lejos juzgaría que estaban de acuerdo, y quien los oyera de cerca, que se querían matar. Decía el hidalgo que libertad era que nadie le entrase en su dehesa ni le dijese cuántas cabras había de tener, ni le pusiese tributo el concejo; y decía el labrador que libertad era poder sacar agua del pozo del hidalgo, que era el único de la comarca, porque sin agua sus hijos no bebían, y que de qué le servía a él una libertad que le dejaba libre para morirse de sed. Y como cada uno tenía la palabra por suya, no disputaban de agua ni de cabras, sino de cuál de los dos hablaba castellano.</p>
+    <p class="lect-p">Llegóse don Quijote y, oídas las partes, dijo con mucho reposo: «De la libertad tengo dicho, y no me desdigo, que es uno de los más preciosos dones que a los hombres dieron los cielos, y que por ella se puede y debe aventurar la vida. Mas advierto, señores, que en este pleito la palabra es una y las cosas son dos, y que en confundirlas se han ido vuesas mercedes la mañana. Porque libertad llama el señor hidalgo a que nadie le estorbe, y libertad llama el labrador a que le sea posible hacer; y aunque el nombre es el mismo, la una se guarda estándose quieto y la otra no se alcanza sin que alguien mueva algo. Yo mismo pagué caro el no advertirlo: que en otro tiempo di libertad a unos hombres que iban en cadenas, teniendo por cierto que les hacía el mayor bien del mundo, y me pagaron con pedradas, porque yo les quitaba el estorbo y ellos querían otra cosa. Por donde saco que quien regala una libertad sin preguntar cuál, hace merced a su propio gusto y no al del prójimo.»</p>
+    <p class="lect-p">Y mandó a los dos que con un palo dibujasen en el suelo tres cercos, uno dentro de otro, y dijo: «Ponga cada uno en el cerco de dentro aquello que, si se le quita, ya no es él ni su casa ni su parecer, sino otro hombre; en el segundo cerco, aquello que hace falta para que lo de dentro se entienda; y en el de fuera, aquello que puede mudarse con el tiempo y con la tierra sin que nadie deje de ser quien es. Y el que no acierte a llenar el cerco de dentro con dos razones, no tiene parecer, sino costumbre.» Hízose así, y halláronse los dos con el cerco de dentro casi vacío, y con el de fuera lleno de agravios de aquel año.</p>
+    <p class="lect-p">Oyendo lo de dar y quitar libertades, se llegó Sancho al labrador y le dijo al oído que si andaban repartiéndose libertades, él le vendería la suya de dormir a mediodía, que la tenía por la mejor de todas y la daba en dos reales y un cántaro de vino, y que mirase que no hay libertad como la del que no tiene nada, porque a quien no tiene nada nadie se lo quita, y que a buen entendedor pocas palabras bastan. «Majadero (dijo don Quijote), que no se venden las libertades como se venden los nabos.» «Pues por mi ánima (respondió Sancho) que más nabos he visto yo vender que libertades repartir, y que en mi tierra la libertad del rico es tener y la del pobre es que le dejen buscar, y con las dos juntas se hace el mundo; y quien mucho abarca poco aprieta, y a la larga el pozo del uno acaba siendo la sed del otro.»</p>
+    <p class="lect-p">Riéronse ambos contendientes, y de la risa nació el concierto: que el labrador sacaría agua a ciertas horas y el hidalgo no pagaría tributo por el pozo, con que cada uno tuvo la libertad que de verdad pedía y perdió la que nunca había querido. Y ya en el camino dijo don Quijote: «Advierte, Sancho, que las palabras grandes son como los caminos anchos: caben en ellas dos que van a partes contrarias, y por eso conviene preguntar a dónde va el que viene con nosotros. Y advierte lo segundo, que es lo que más importa: el que dibuja el cerco del vecino y nunca el suyo, no tiene bisturí, tiene lanza.» «Todo eso será verdad (dijo Sancho), pero yo me atengo a lo de mi tierra: que quien reparte y bien reparte, se queda con la mejor parte; y que del dicho al hecho hay gran trecho, y del cerco al cántaro, más.»</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌍 Lectura 3 · «La palabra que firmaron todos» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie y la frase sencilla del autor de «Sapiens». Todos los datos, obras y fechas citados son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Los seres humanos cooperamos en masa porque creemos juntos en cosas que no se pueden tocar. Ese es nuestro truco de especie. Pero hay un detalle del truco que casi nunca se cuenta, y es el más interesante: <strong>las ficciones que mejor funcionan son las que no están del todo definidas</strong>. Una palabra cerrada une a poca gente. Una palabra abierta une a millones, y cada uno cree que está uniéndose a lo que él entiende.</p>
+    <p class="lect-p">Mírelo en el documento fundador del mundo moderno. En 1789, la Asamblea francesa aprobó la Declaración de los Derechos del Hombre y del Ciudadano, y su artículo primero dice que los hombres nacen y permanecen libres e iguales en derechos. Trece años antes, en 1776, la Declaración de Independencia de los Estados Unidos había hablado de la vida, la libertad y la búsqueda de la felicidad. Son frases magníficas y no dicen qué libertad. Esa imprecisión no fue un descuido de redactores apurados: fue lo que permitió que las firmara gente que quería cosas distintas. Un texto que hubiera especificado exactamente qué libertad no habría tenido mayoría.</p>
+    <p class="lect-p">El caso más medible es de nuestro siglo. El 10 de diciembre de 1948, la Asamblea General de las Naciones Unidas adoptó la Declaración Universal de Derechos Humanos. La votación fue de cuarenta y ocho países a favor, ninguno en contra y ocho abstenciones. Piense un momento en ese resultado: ninguno en contra. En 1948, con el mundo partiéndose en dos bloques que estaban a punto de amenazarse con bombas atómicas durante cuarenta años, nadie votó en contra de la libertad y la igualdad. La explicación no es que el mundo estuviera de acuerdo. Es que la palabra estaba abierta, y cada bloque leyó adentro su propio programa.</p>
+    <p class="lect-p">En 1956, un filósofo llamado W. B. Gallie le puso nombre al fenómeno en un trabajo titulado «Essentially Contested Concepts». Hay conceptos, escribió, cuyo significado no se cierra nunca, y estar en disputa no es un defecto suyo: es su modo de existir. Dos años después, en 1958, Isaiah Berlin dio en Oxford la conferencia «Dos conceptos de libertad» y partió el ejemplo mayor en dos mitades que desde entonces no se han vuelto a pegar. Libertad negativa: que nadie me estorbe. Libertad positiva: poder de verdad hacer. Con esas dos mitades en la mano, media historia del siglo veinte se lee distinto. Los dos bloques de 1948 no discutían sobre si la libertad era buena. Discutían sobre cuál de las dos contaba, y cada uno acusaba al otro de no tener ninguna.</p>
+    <p class="lect-p">Falta una pieza para que esto sea una herramienta y no solo una observación ingeniosa. La puso Michael Freeden en 1996, en «Ideologies and Political Theory», y en 2003 la explicó en corto en «Ideology: A Very Short Introduction», que es la puerta de entrada escrita por el propio dueño del instrumento. Freeden dice: si un concepto disputado no se puede cerrar, entonces cerrarlo es una acción, y toda ideología consiste en hacer esa acción. Toma el concepto abierto, le fija un significado como si fuera el único posible, y presenta ese cierre como puro sentido común. A eso lo llamó descontestación. Y como toda ideología hace lo mismo con conceptos distintos, cada una puede dibujarse: un núcleo que no se negocia sin dejar de ser esa ideología, unos conceptos adyacentes que precisan el núcleo, y una periferia que cambia con el lugar y con la década.</p>
+    <p class="lert-p lect-p">Esta es la parte práctica, y vale para cualquiera. Cuando usted lea el ideario de un partido, la misión de una escuela o la página de «quiénes somos» de una empresa, no discuta punto por punto. Dibuje tres anillos. Casi siempre descubrirá dos cosas incómodas. La primera es que el núcleo no es el punto número uno, sino uno de los del medio, el que dice cómo se resuelve un desacuerdo. La segunda es que la mayoría de las peleas públicas ocurren en la periferia y se pelean como si fueran el núcleo, mientras el núcleo se negocia sin que nadie se dé cuenta.</p>
+    <p class="lect-p">Y queda el uso que casi nadie hace del instrumento, que es el único que de verdad cambia algo. Dibuje los tres anillos de su propia casa. Le va a costar más que los ajenos, y le va a salir un núcleo más pequeño de lo que esperaba y una periferia enorme que había estado defendiendo como si fuera sagrada. En el siglo veintiuno vamos a discutir sobre inteligencia artificial, clima y trabajo con las mismas palabras abiertas de 1789, y quienes puedan decir en qué sentido las usan tendrán una ventaja modesta y decisiva sobre quienes solo puedan levantar la voz.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🧐 Preguntas de las tres lecturas</h2>
+    <p>Leer no es lo mismo que haber leído. Aquí van <strong>quince preguntas de comprensión lectora</strong> (cinco por texto), <strong>diez de completar</strong> y <strong>diez de análisis complejo</strong> con su pauta. Se contestan <strong>con los tres textos delante</strong>: no es un examen de memoria, es un examen de lectura.</p>
+    <div class="tip">
+      <span class="ti">🖨️</span>
+      <div><strong>Todo esto se imprime.</strong> El pliego de preguntas sale con las tres secciones y la <strong>pauta en su propia hoja al final</strong>, para que las respuestas no queden en la misma página que el ejercicio, como manda la casa. Y las tres lecturas se imprimen aparte, cada una con su etiqueta de ejercicio de estilo encima.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego de preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📖 I. Comprensión lectora (15 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +2 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="lcProg" aria-live="polite">Pregunta 1 de 15</p>
+    <div class="qz-q" id="lcQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="lcOpts" role="group" aria-label="Opciones de comprensión lectora"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectC()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectC()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLC" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>✏️ II. Completa la oración (10 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +2 XP por respuesta correcta (primera vez). Escribe la palabra o el año exacto.</p>
+    <p class="id-prog" id="lfProg" aria-live="polite">Oración 1 de 10</p>
+    <div class="cmp-sent" id="lfQ"></div>
+    <div style="margin:0.6rem 0;">
+      <input class="eval-cp-input" id="lfInput" type="text" style="min-width:190px;" placeholder="Escribe tu respuesta..." aria-label="Respuesta de completar" onkeydown="if(event.key==='Enter'){event.preventDefault();checkLectF();}">
+    </div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectF()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectF()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLF" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧠 III. Análisis complejo (10 preguntas)</h2>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Estas no se responden con una palabra ni se corrigen con una letra: se escriben, y después se comparan con la pauta. Van sin XP a propósito, porque una respuesta abierta que se premia sola se contesta a la carrera.</p>
+    <p class="id-prog" id="laProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="laQ" role="heading" aria-level="3"></div>
+    <textarea class="crit-textarea" id="laTA" rows="5" placeholder="Escribe aquí, o en tu cuaderno..." aria-label="Respuesta de análisis"></textarea>
+    <div id="laPauta" class="eval-answer" style="display:none;margin-left:0;font-size:0.85rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-d" onclick="prevLectA()">◀ Anterior</button>
+      <button class="btn btn-pri" onclick="nextLectA()">Siguiente ▶</button>
+      <button class="btn btn-g" id="btnLectAPauta" onclick="toggleLectAPauta()">👁 Ver pauta</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué tres voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento instala la idea como <strong>imagen que no se olvida</strong> (las dos definiciones numeradas que resultaron ser la primera morfología), el capítulo la vuelve <strong>escena, risa y refrán</strong> (los tres cercos dibujados en el suelo, y Sancho vendiendo su libertad de dormir a mediodía), y el ensayo la conecta con <strong>la escala del mundo</strong> (una votación de 48 a 0 sobre una palabra que nadie había cerrado). Quien lee las tres tiene el concepto por tres puertas, y la ficha y la evaluación lo encuentran ya instalado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión nueva lleva sus tres lecturas sobre el tema de la etapa: <span class="hl">un cuento a la manera de Borges, un capítulo a la manera de Cervantes y un ensayo a la manera de Harari</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista y con una regla de fondo: <span class="hl">toda obra, fecha y persona citada dentro de los textos es real y comprobable</span>. El único artificio permitido es la voz; a Borges, en esta casa, se le quita el vicio de las citas inventadas.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con el concepto disputado y las dos libertades, la morfología en tres capas, la descontestación con sus señales, los ocho casos del proyecto, la <strong>hoja del bisturí</strong> y la <strong>plantilla de los tres anillos</strong> para llenar a mano, seis ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-gafas-bisturi-freeden.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige en toda la ruta: <strong>ningún estudio, obra o cifra entra sin su etiqueta</strong> (clásico sólido, clásico cuestionado, ciencia en disputa, divulgación con inflado).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>W. B. Gallie, «Essentially Contested Concepts» (1956):</strong> <strong>clásico sólido de la filosofía</strong>. De aquí sale la pieza que ordena la etapa: la disputa de ciertos conceptos no es un defecto, es su modo de existir.</li>
+      <li><strong>Isaiah Berlin, «Dos conceptos de libertad» (1958):</strong> <strong>clásico sólido</strong>, y la <strong>fuente canónica del ejemplo central</strong> de este módulo: libertad negativa y libertad positiva.</li>
+      <li><strong>Michael Freeden, «Ideologies and Political Theory» (1996):</strong> <strong>académico sólido</strong>, y <strong>la base del análisis morfológico</strong> que esta etapa entrega: núcleo, adyacentes, periféricos y descontestación.</li>
+      <li><strong>Michael Freeden, «Ideology: A Very Short Introduction» (2003):</strong> <strong>la rampa de entrada, corta y seria, del propio dueño del instrumento</strong>. Es por donde conviene empezar si el de 1996 se hace cuesta arriba.</li>
+      <li><strong>Las tres lecturas de esta misión:</strong> ejercicios de estilo escritos por la casa en homenaje a Borges, Cervantes y Harari. <strong>Pastiche declarado, no obra de esos autores</strong>, y con la erudición interna real: el Diccionario de Samuel Johnson (1755) y su prefacio, Gallie (1956), Berlin en Oxford (1958), Freeden (1996 y 2003), el elogio de la libertad del Quijote (segunda parte, 1615, capítulo cincuenta y ocho) y los galeotes (primera parte, 1605, capítulo veintidós), la Declaración de Independencia (1776), la Declaración francesa (1789) y la votación de la Declaración Universal de Derechos Humanos del 10 de diciembre de 1948 (48 a favor, 0 en contra, 8 abstenciones) son todos comprobables.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>con tres idearios diseccionados en una página cada uno</strong>, y uno de los tres tiene que ser de la propia casa.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: la materia 25 completa, con sus siete módulos y su advertencia epistémica.</li>
+      <li><a href="../../misiones/ruta-gafas-palabra-expediente/gafas-expediente.html">👓 La palabra con expediente</a>: la etapa 1 de esta ruta. Sin el expediente de la palabra, el bisturí corta a ciegas.</li>
+      <li><a href="../../misiones/ruta-rojo-acero-juicio/acero-juicio.html">📕 El acero antes del juicio</a>: la regla madre del arco. Si el núcleo que dibujaste no lo firmaría nadie de esa familia, dibujaste un muñeco.</li>
+      <li><a href="../../misiones/ruta-espejo-vigia-timon/vigia-timon.html">🪞 El vigía y el timón</a>: la puerta del Estudio Mayor. Dibujar la morfología propia es trabajo del vigía, no del timón.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 3 recorre el mapa de las familias, cada una entrando por su mejor versión.</li>
+      <li><a href="../../fichas/ficha-gafas-bisturi-freeden.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja del bisturí y la plantilla de los tres anillos caben en una página cada una.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> memorizar las tres capas y las dos libertades, correr la prueba de los tres segundos sobre cinco frases reales de la semana, y dibujar tres idearios que no se parezcan, uno por página. La prueba de que está aprendida es <strong>que ya no se pueda leer un lema sin preguntar qué concepto descontesta</strong>, y que el dibujo de la propia casa exista y esté firmado con fecha.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🔬</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de las Gafas a la Vista · Etapa 2: El bisturí de Freeden</div>
+    <div class="diploma-mascot" aria-hidden="true">🔬</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🔬</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Un ideario no es una lista de opiniones: es una estructura que se puede dibujar» 🌱 · 🔬 Ruta de las Gafas a la Vista · Etapa 2 de 7.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/bisturi-freeden.js"></script>
+</body>
+</html>

@@ -265,7 +265,7 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 4, 'la materia muestra sus cuatro misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length === 5, 'la materia muestra sus cinco misiones', 'muestra ' + tarjetas.length);
       const t = tarjetas.find(x => /acero antes del juicio/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }

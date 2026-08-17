@@ -130,6 +130,52 @@ enseña a cazar. La sonda de cada misión comprueba las dos secciones: 17
 paneles en total, el guion con su estructura y las tres lecturas con su
 etiqueta y sus anclas reales.
 
+## 5-quater. Las lecturas se examinan, y se imprimen
+
+**Norma nueva, pedida por el autor el 17 de agosto de 2026**, desde «La
+palabra con expediente» (Gafas, etapa 1). Leer no es lo mismo que haber
+leído, así que la sección de Lecturas no termina en los tres textos. Cierra
+con tres baterías, **dentro de la misma sección** (los paneles siguen siendo
+17):
+
+- **15 preguntas de comprensión lectora**, de opción múltiple, **cinco por
+  texto**, y cada una dice de qué lectura sale. Se contestan con el texto
+  delante: no es un examen de memoria. Se pintan en orden fijo, así que
+  **les toca la norma 4** y el banco (`lectComprensionBank`) está en la lista
+  de `_dev/reparte-respuestas.js`.
+- **10 de completar**, con entrada de texto y la comprobación tolerante del
+  motor (tildes y mayúsculas no cuentan).
+- **10 de análisis complejo**, abiertas, con su pauta escrita que se tapa y
+  se destapa. **Van sin XP a propósito:** una respuesta abierta que se premia
+  sola se contesta a la carrera.
+
+Y todo se imprime, con hojas propias de la sección:
+
+- **cada lectura por separado**, con su botón dentro de su propia tarjeta;
+- **las tres juntas** en un pliego, cada una arrancando en su hoja;
+- **el pliego de preguntas** con las tres secciones y la **pauta en su propia
+  hoja al final**, porque las respuestas no se imprimen en la misma página
+  que el ejercicio.
+
+**La etiqueta del estatus viaja impresa con el texto, siempre**, en un
+recuadro antes de empezar: ejercicio de estilo de la casa, en homenaje, NO
+obra de ese autor, y toda obra, fecha y persona de dentro es real y
+comprobable. Una hoja suelta se fotocopia y viaja sola, y un pastiche sin
+declarar es exactamente la fuente inflada que el Estudio Mayor enseña a
+cazar.
+
+⚠️ **Esto no toca la norma 6.** Estas hojas no son fichas: no usan
+`fichas/css/ficha.css`, no usan la clase `.pagina`, no viven en `fichas/` y
+no se miden con `_dev/mide-ficha-paginas.html`. Se arman en el momento, en
+una ventana de impresión, con su propia hoja de estilo. La ficha de diez
+páginas sigue siendo lo que la norma 6 dice que es, y se mide igual.
+
+La sonda de cada misión comprueba las tres baterías (tamaño, forma, cinco
+preguntas por voz y pauta en las diez de análisis), que se puedan contestar
+en pantalla, y **la impresión de verdad**: intercepta `window.open`, corre
+los botones y lee el documento que se habría mandado a la impresora,
+exigiendo el texto completo, la etiqueta del pastiche y los saltos de página.
+
 ## 5-bis. El widget de ordenar se arrastra, y la linterna cuesta
 
 **Norma nueva, pedida por el autor el 17 de agosto de 2026**, después de
