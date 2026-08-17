@@ -106,22 +106,29 @@ Nada de definiciones antes del minuto dos.
 la etapa por tres puertas distintas, escritos por la casa como ejercicios
 de estilo:
 
-1. un **cuento a la manera de Jorge Luis Borges** (la erudición apócrifa,
-   los espejos y dobles, la ironía metafísica del final);
+1. un **cuento a la manera de Jorge Luis Borges**, pero SIN su costumbre
+   de las citas apócrifas: la voz, los espejos y la ironía se quedan; la
+   erudición del cuento es real (obras, fechas y personas comprobables).
+   El cuento debe ser atrapante y sencillo, no un laberinto;
 2. un **capítulo a la manera de Miguel de Cervantes Saavedra** (el
    «Donde se cuenta...», el periodo largo, la venta, los refranes de
-   Sancho y la cortesía razonadora de don Quijote);
+   Sancho), con el humor y la reflexión cervantinos al frente: si no
+   hace sonreír al menos una vez, se reescribe;
 3. un **ensayo a la manera de Yuval Noah Harari** (la escala de especie,
-   la frase corta, el zoom de setenta mil años y el aterrizaje en los
-   algoritmos del presente).
+   la frase corta y sencilla, el zoom histórico y el aterrizaje en el
+   presente), con datos reales: estudios, años y cifras verificables.
 
-Los tres deben ENSEÑAR el tema (que quien los lea salga sabiendo el
-concepto, no solo entretenido) y llevar SIEMPRE, a la vista, la etiqueta
-de la regla del estatus: **ejercicio de estilo de la casa, en homenaje;
-no obra de esos autores**. Pastiche sin declarar es exactamente el tipo
-de fuente inflada que el Estudio Mayor enseña a cazar. La sonda de cada
-misión comprueba las dos secciones: 17 paneles en total, el guion con su
-estructura y las tres lecturas con su etiqueta.
+Regla de fondo, pedida por el autor el 17 de agosto de 2026: **toda
+obra, fecha, persona o cifra citada DENTRO de las lecturas debe ser real
+y comprobable; el único artificio permitido es la voz.** Los tres textos
+deben ENSEÑAR el tema (que quien los lea salga sabiendo el concepto, no
+solo entretenido) y llevar SIEMPRE, a la vista, la etiqueta de la regla
+del estatus: **ejercicio de estilo de la casa, en homenaje; no obra de
+esos autores**. Pastiche sin declarar, o pastiche con erudición
+inventada, es exactamente el tipo de fuente inflada que el Estudio Mayor
+enseña a cazar. La sonda de cada misión comprueba las dos secciones: 17
+paneles en total, el guion con su estructura y las tres lecturas con su
+etiqueta y sus anclas reales.
 
 ## 6. La ficha va en diez páginas, y llenas
 

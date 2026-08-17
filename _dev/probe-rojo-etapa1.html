@@ -126,9 +126,19 @@ window.addEventListener('load', async () => {
       const tl = lect.textContent;
       ok(/Borges/.test(tl) && /Cervantes/.test(tl) && /Harari/.test(tl), 'las tres voces están nombradas', 'faltan las voces');
       ok(/ejercicio(s)? de estilo/i.test(tl) && /No son obra de esos autores/i.test(tl), 'el pastiche va declarado (regla del estatus)', 'el pastiche no se declara');
-      ok(/Los dos ejemplares/.test(tl), 'el cuento a la manera de Borges está', 'falta el cuento');
+      ok(/La biblioteca del adversario/.test(tl), 'el cuento a la manera de Borges está', 'falta el cuento');
       ok(/Donde se cuenta/.test(tl) && /Sancho/.test(tl) && /don Quijote/.test(tl), 'el capítulo cervantino está, con Sancho adentro', 'falta el capítulo cervantino');
       ok(/setenta mil años/i.test(tl) && /historias/i.test(tl), 'el ensayo a la manera de Harari está', 'falta el ensayo');
+      /* La regla nueva del autor: la erudición interna es REAL. La sonda
+         exige las anclas comprobables y la declaración de datos reales. */
+      ok(/reales/i.test(tl) && /citas (apócrifas|inventadas)/i.test(tl), 'declara los datos reales y el vicio quitado a Borges', 'no se declara la erudición real');
+      ok(/Aquino/.test(tl) && /1265/.test(tl), 'ancla real: la Suma de Aquino con sus años', 'falta la Suma de Aquino');
+      ok(/Mill/.test(tl) && /1859/.test(tl), 'ancla real: Mill con Sobre la libertad (1859)', 'falta Mill con su año');
+      ok(/Darwin/.test(tl) && /Autobiograf/i.test(tl), 'ancla real: Darwin y su Autobiografía', 'falta Darwin');
+      ok(/Böhm-Bawerk/.test(tl) && /1896/.test(tl) && /Hilferding/.test(tl) && /1904/.test(tl), 'ancla real: el duelo Böhm-Bawerk (1896) e Hilferding (1904)', 'falta el duelo real');
+      ok(/capítulo once|I, 11|capítulo 11/i.test(tl) && /1605/.test(tl), 'ancla real: el discurso de la Edad de Oro (Quijote I, 11, 1605)', 'falta el ancla del Quijote');
+      ok(/2011/.test(tl) && /Caplan/.test(tl), 'ancla real: Caplan y su prueba (2011)', 'falta Caplan con su año');
+      ok(/MIT/.test(tl) && /2018/.test(tl) && /Science/.test(tl), 'ancla real: el estudio del MIT en Science (2018)', 'falta el estudio del MIT');
       /* Las tres lecturas deben ENSEÑAR el tema, no solo sonar bonito */
       ok(/refuta|refutar|refutación/i.test(tl) && /acero/i.test(tl), 'las lecturas explican el tema del acero', 'las lecturas no tocan el tema');
       ok(/prueba de Turing/i.test(tl) || /versión más fuerte|mejor versión/i.test(tl), 'el concepto central aparece dentro de los textos', 'los textos no cargan el concepto');
