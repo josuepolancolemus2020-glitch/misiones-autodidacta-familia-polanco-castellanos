@@ -29,6 +29,11 @@ const BANCOS = [
   { nombre: 'qzData', clave: 'c' },
   { nombre: 'evalMCBank', clave: 'a' },
   { nombre: 'cmpData', clave: 'c' },
+  /* Añadido con las preguntas de comprensión lectora de la sección de
+     Lecturas: también se pintan en orden fijo y también se imprimen, así
+     que les toca la misma norma 4. Las misiones que no tienen el banco se
+     saltan sin ruido. */
+  { nombre: 'lectComprensionBank', clave: 'c' },
 ];
 
 /* Generador con semilla (mulberry32), el mismo criterio de determinismo

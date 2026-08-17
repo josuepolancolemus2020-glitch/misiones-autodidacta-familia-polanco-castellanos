@@ -109,7 +109,23 @@ window.addEventListener('load', async () => {
     ok(dentro('critCompareBank.every(c => c.gr)'), 'las comparaciones traen su cierre (gr) para la pauta', 'critCompareBank sin campo gr');
     ok(dentro('Object.keys(parteData).join(",")') === 'tracy,camara,falsa,mapa', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
     ok(dentro('timelineData.length') === 7, 'los 7 momentos del expediente', 'momentos: ' + dentro('timelineData.length'));
-    ok(dentro('lvls.length') === 7 && dentro('Object.keys(ACHIEVEMENTS).length') === 8, 'los 7 niveles de XP y los 8 logros', 'niveles o logros incompletos');
+    ok(dentro('lvls.length') === 7 && dentro('Object.keys(ACHIEVEMENTS).length') === 9, 'los 7 niveles de XP y los 9 logros', 'niveles o logros incompletos');
+    /* Las tres baterías de preguntas de las lecturas, pedidas por el autor:
+       15 de comprensión lectora (5 por texto), 10 de completar y 10 de
+       análisis complejo, y las diez de análisis con su pauta escrita. */
+    ok(dentro('lectComprensionBank.length') === 15, '15 preguntas de comprensión lectora', 'comprensión: ' + dentro('lectComprensionBank.length'));
+    ok(dentro('lectCompletarBank.length') === 10, '10 preguntas de completar', 'completar: ' + dentro('lectCompletarBank.length'));
+    ok(dentro('lectAnalisisBank.length') === 10, '10 preguntas de análisis complejo', 'análisis: ' + dentro('lectAnalisisBank.length'));
+    ok(dentro('lectComprensionBank.every(q => q.o.length === 4 && typeof q.c === "number" && q.o[q.c] && q.t)'),
+       'cada pregunta de comprensión trae 4 opciones, su clave y de qué texto sale', 'el banco de comprensión está mal formado');
+    ['Borges', 'Cervantes', 'Harari'].forEach(voz => {
+      const n = dentro('lectComprensionBank.filter(q => q.t === "' + voz + '").length');
+      ok(n === 5, 'cinco preguntas del texto de ' + voz, voz + ': ' + n + ' preguntas');
+    });
+    ok(dentro('lectCompletarBank.every(q => q.a && q.q.indexOf("___") >= 0)'),
+       'cada oración de completar trae su hueco y su respuesta', 'el banco de completar está mal formado');
+    ok(dentro('lectAnalisisBank.every(q => q.guia && q.guia.length > 200)'),
+       'cada pregunta de análisis trae su pauta de corrección', 'hay preguntas de análisis sin pauta');
     ok(/faro_gafas_expediente/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
     let sopaOk = true;
     dentro('sopaSets').forEach(s => s.words.forEach(p => {
@@ -184,6 +200,88 @@ window.addEventListener('load', async () => {
       ok(/sentido común/i.test(tl) || /antojos/i.test(tl), 'el uso tramposo aparece dentro de los textos', 'los textos no cargan el concepto');
       ok(!!d.querySelector('.nav-t[data-s="s-lecturas"]'), 'está en la barra de navegación', 'no aparece en la barra');
     }
+
+    log('\n── LAS PREGUNTAS DE LAS LECTURAS, EN PANTALLA ──');
+    w.go('s-lecturas'); await esperar(200);
+    /* I. Comprensión lectora: se pinta, se contesta bien y da XP una vez. */
+    ok(d.getElementById('lcQ').textContent.length > 15, 'la comprensión lectora pinta su primera pregunta', 'comprensión vacía');
+    ok(d.querySelectorAll('#lcOpts .qz-opt').length === 4, 'con sus cuatro opciones', 'opciones: ' + d.querySelectorAll('#lcOpts .qz-opt').length);
+    ok(/Pregunta 1 de 15/.test(d.getElementById('lcProg').textContent), 'y su contador de 15', 'contador: ' + d.getElementById('lcProg').textContent);
+    const xpLc = dentro('xp');
+    d.querySelectorAll('#lcOpts .qz-opt')[dentro('lectComprensionBank[0].c')].click();
+    w.checkLectC(); await esperar(120);
+    ok(dentro('xp') > xpLc, 'la respuesta correcta suma XP', 'la comprensión no dio XP');
+    ok(!!d.querySelector('#lcOpts .qz-opt.correct'), 'y marca la opción acertada', 'no marca la correcta');
+    /* II. Completar: entrada de texto con la comprobación tolerante del motor. */
+    ok(d.getElementById('lfQ').textContent.indexOf('___') >= 0, 'completar pinta su oración con el hueco', 'completar vacía');
+    ok(/Oración 1 de 10/.test(d.getElementById('lfProg').textContent), 'y su contador de 10', 'contador: ' + d.getElementById('lfProg').textContent);
+    const xpLf = dentro('xp');
+    d.getElementById('lfInput').value = dentro('lectCompletarBank[0].a');
+    w.checkLectF(); await esperar(120);
+    ok(dentro('xp') > xpLf, 'la respuesta correcta de completar suma XP', 'completar no dio XP');
+    /* III. Análisis complejo: navega y su pauta se puede tapar y destapar. */
+    ok(d.getElementById('laQ').textContent.length > 40, 'el análisis complejo pinta su primera pregunta', 'análisis vacío');
+    ok(/Pregunta 1 de 10/.test(d.getElementById('laProg').textContent), 'y su contador de 10', 'contador: ' + d.getElementById('laProg').textContent);
+    ok(d.getElementById('laPauta').style.display === 'none', 'la pauta empieza tapada', 'la pauta se ve sin pedirla');
+    w.toggleLectAPauta(); await esperar(80);
+    ok(d.getElementById('laPauta').style.display !== 'none' && /Pauta/.test(d.getElementById('laPauta').textContent),
+       'y se destapa cuando se pide', 'la pauta no se destapa');
+    w.nextLectA(); await esperar(80);
+    ok(/Pregunta 2 de 10/.test(d.getElementById('laProg').textContent), 'el análisis avanza de pregunta', 'el análisis no avanza');
+    w.toggleLectAPauta(); await esperar(80);
+
+    log('\n── IMPRESIÓN DE LAS LECTURAS Y DEL PLIEGO ──');
+    /* Se comprueba de verdad: se intercepta window.open, se corre cada botón
+       de imprimir y se lee el documento que se habría mandado a la
+       impresora. Lo que no puede faltar en ninguna hoja es la etiqueta del
+       estatus: un pastiche impreso sin declarar es la fuente inflada que
+       esta materia enseña a cazar. */
+    const abiertos = [];
+    const openReal = w.open;
+    w.open = function () {
+      const doc = { write(s) { abiertos.push(s); }, close() {} };
+      return { document: doc, print() {}, focus() {}, close() {} };
+    };
+    try {
+      w.imprimirLectura('borges');
+      const hb = abiertos[abiertos.length - 1] || '';
+      ok(/El hombre que miraba sin gafas/.test(hb) && /Conocí, hace muchos años/.test(hb),
+         'el cuento se imprime con su texto completo', 'el cuento no se imprime');
+      ok(/NO es obra de ese autor/i.test(hb) && /ejercicio de estilo de la casa/i.test(hb),
+         'y con la etiqueta del estatus en la hoja', 'la hoja del cuento sale sin declarar el pastiche');
+      ok(/real y comprobable/i.test(hb), 'y con la regla de la erudición real', 'la hoja no trae la regla de los datos reales');
+
+      w.imprimirLectura('cervantes');
+      const hc = abiertos[abiertos.length - 1] || '';
+      ok(/bacía o yelmo/.test(hc) && /Sucedió, pues/.test(hc) && /baciyelmo/.test(hc),
+         'el capítulo cervantino se imprime completo', 'el capítulo no se imprime');
+      ok(/NO es obra de ese autor/i.test(hc), 'y con su etiqueta', 'la hoja del capítulo sale sin etiqueta');
+      ok(!/—/.test(hc), 'y sin guiones largos (norma 1-bis)', 'la hoja del capítulo trae guiones largos');
+
+      w.imprimirLectura('harari');
+      const hh = abiertos[abiertos.length - 1] || '';
+      ok(/Los mapas invisibles/.test(hh) && /Los seres humanos no vemos el mundo/.test(hh),
+         'el ensayo se imprime completo', 'el ensayo no se imprime');
+      ok(/NO es obra de ese autor/i.test(hh), 'y con su etiqueta', 'la hoja del ensayo sale sin etiqueta');
+
+      w.imprimirLasTresLecturas();
+      const h3 = abiertos[abiertos.length - 1] || '';
+      ok(/El hombre que miraba sin gafas/.test(h3) && /bacía o yelmo/.test(h3) && /Los mapas invisibles/.test(h3),
+         'las tres lecturas se imprimen juntas en un solo pliego', 'el pliego de las tres no sale completo');
+      ok((h3.match(/page-break-before/g) || []).length >= 2, 'y cada una arranca en su propia hoja', 'las tres salen pegadas');
+
+      w.imprimirPreguntasLecturas();
+      const hp = abiertos[abiertos.length - 1] || '';
+      ok(/I\. Comprensión lectora \(15 preguntas\)/.test(hp) && /II\. Completa la oración \(10 preguntas\)/.test(hp) && /III\. Análisis complejo \(10 preguntas\)/.test(hp),
+         'el pliego de preguntas trae las tres secciones', 'al pliego de preguntas le falta una sección');
+      ok(/Pauta completa de respuestas/.test(hp) && /class="pauta"/.test(hp),
+         'con su pauta, y en su propia hoja al final', 'la pauta no queda separada del ejercicio');
+      const nOps = (hp.match(/class="op"/g) || []).length;
+      ok(nOps === 60, 'las 15 preguntas salen con sus 60 opciones', 'opciones impresas: ' + nOps);
+      ok((hp.match(/_______________/g) || []).length === 10, 'las 10 de completar salen con su hueco', 'huecos impresos: ' + (hp.match(/_______________/g) || []).length);
+      ok((hp.match(/class="ln-alta"/g) || []).length === 30, 'las 10 de análisis salen con tres renglones cada una', 'renglones: ' + (hp.match(/class="ln-alta"/g) || []).length);
+      ok(!/—/.test(hp), 'y el pliego va sin guiones largos', 'el pliego trae guiones largos');
+    } finally { w.open = openReal; }
 
     log('\n── EN PANTALLA ──');
     w.go('s-lab'); await esperar(150);
