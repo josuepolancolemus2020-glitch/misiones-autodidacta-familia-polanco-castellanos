@@ -54,7 +54,18 @@ f.onload = async () => {
     log('\n── MAPA DE RUTAS ──');
     w.switchView('view-rutas'); await esperar(300);
     const cards = d.querySelectorAll('.ruta-card');
-    ok(cards.length === 11, '11 rutas en el mapa', 'rutas: ' + cards.length);
+    ok(cards.length === 38, '38 rutas en el mapa (10 del adulto, la Ley y las 28 del Estudio Mayor)', 'rutas: ' + cards.length);
+    /* El Estudio Mayor entero se declaró antes de construirse (como la Ley):
+       el mapa tiene que enseñar cada ruta con todas sus etapas tituladas. */
+    const pantalla = [...cards].find(c => /Ruta de la Pantalla Leída/.test(c.textContent));
+    ok(!!pantalla, 'la Ruta de la Pantalla Leída está en el mapa', 'falta la ruta de cine');
+    if (pantalla) {
+      ok(pantalla.querySelectorAll('.ruta-etapa-futura').length === 7, 'con sus 7 etapas por construir', 'futuras: ' + pantalla.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/El cineclub de la casa/.test(pantalla.textContent), 'y las etapas llevan su título del compendio', 'las etapas salen sin título');
+      ok(!/Etapa por construir/.test(pantalla.textContent), 'ninguna queda con el rótulo genérico', 'hay etapas sin título');
+    }
+    const rojo = [...cards].find(c => /Ruta del Expediente Rojo/.test(c.textContent));
+    ok(!!rojo && rojo.querySelectorAll('.ruta-etapa-futura').length === 7, 'el Expediente Rojo declara sus 7 etapas', 'falta el Expediente Rojo completo');
     /* Cinco rutas del adulto van por la etapa 3 y la Casa Cerrada por la 4.
        Si alguna se queda corta es que la misión nueva no llegó al catálogo. */
     [['Ruta de la Persuasión', 3], ['Ruta de la Marca', 3], ['Ruta del Poder', 3],
