@@ -330,11 +330,12 @@
   <div class="card ac-teal">
     <h2>🔗 Ordena: la sesión vigilada, de principio a fin</h2>
     <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
-    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
     <div class="sort-list" id="routeList"></div>
     <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
       <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
       <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
     </div>
     <div id="fbRoute" class="fb" role="alert"></div>
   </div>

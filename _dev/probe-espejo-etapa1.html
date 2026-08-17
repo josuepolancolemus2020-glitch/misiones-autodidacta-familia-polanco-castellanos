@@ -127,6 +127,53 @@ window.addEventListener('load', async () => {
     const decisiones = dentro('critDecisionBank.join(" ")');
     ok(/3,500|entendieron|flashcards|hoja en blanco|registro/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
 
+
+    log('\n── EL WIDGET DE ORDENAR (arrastre y linterna) ──');
+    w.go('s-widgets'); await esperar(200);
+    const lista = d.getElementById('routeList');
+    ok(!!lista && lista.children.length >= 5, 'la lista de pasos se pinta', 'la lista de pasos no se pintó');
+    ok(!!d.querySelector('.sort-grip'), 'cada tarjeta trae su asa para arrastrar', 'falta el asa de arrastre');
+    ok(w.getComputedStyle(lista.children[0]).touchAction === 'none',
+       'arrastrar la tarjeta no arrastra la página (touch-action)', 'sin touch-action: el gesto se lo lleva el navegador');
+    ok(typeof w.routeAgarra === 'function' && typeof w.routeArrastra === 'function' && typeof w.routeSuelta === 'function',
+       'las tres piezas del arrastre existen', 'falta alguna función del arrastre');
+    /* El arrastre de verdad: se toma la primera tarjeta y se suelta tres
+       lugares más abajo, y se comprueba que el banco quedó reordenado.
+       routeItems se declara con let, así que se lee con eval y no por
+       window, igual que el resto de los bancos de esta sonda. */
+    const antesOrden = dentro('routeItems.slice()');
+    const filasW = [...lista.children];
+    const altoW = filasW[1].getBoundingClientRect().top - filasW[0].getBoundingClientRect().top;
+    filasW[0].dispatchEvent(new w.PointerEvent('pointerdown', { pointerId: 7, clientY: 100, bubbles: true, cancelable: true }));
+    filasW[0].dispatchEvent(new w.PointerEvent('pointermove', { pointerId: 7, clientY: 100 + altoW * 3, bubbles: true }));
+    filasW[0].dispatchEvent(new w.PointerEvent('pointerup', { pointerId: 7, clientY: 100 + altoW * 3, bubbles: true }));
+    await esperar(150);
+    const despuesOrden = dentro('routeItems.slice()');
+    ok(despuesOrden[3] === antesOrden[0] && despuesOrden[0] === antesOrden[1],
+       'arrastrar tres lugares mueve el paso a su nuevo sitio', 'el arrastre no reordenó');
+    /* La linterna enseña el número que le toca a cada tarjeta, y cobra su
+       precio: esa secuencia deja de dar XP, y se dice en pantalla. */
+    ok(typeof w.linternaRoute === 'function', 'la linterna existe', 'falta linternaRoute');
+    w.linternaRoute(); await esperar(150);
+    ok(d.querySelectorAll('.sort-luz-chip').length === filasW.length, 'la linterna numera todas las tarjetas', 'la linterna no numeró');
+    ok(!!d.querySelector('.sort-luz-ok, .sort-luz-no'), 'y marca cuáles están en su sitio', 'la linterna no marca aciertos');
+    ok(/Apagar/.test(d.getElementById('btnLinterna').textContent), 'el botón avisa que está encendida', 'el botón no cambia de rótulo');
+    const xpAntes = dentro('xp');
+    dentro('routeItems = routeSets[currentRouteIdx].steps.slice()');
+    w.renderRoute(); w.checkRoute(); await esperar(120);
+    ok(dentro('xp') === xpAntes, 'el orden acertado con linterna no suma XP', 'la linterna regaló XP: ' + xpAntes + ' → ' + dentro('xp'));
+    ok(/no suma XP/i.test(d.getElementById('fbRoute').textContent), 'y lo dice en pantalla, sin trampa', 'no avisa de que no suma');
+    w.linternaRoute(); await esperar(120);
+    ok(!d.querySelector('.sort-luz-chip'), 'la linterna se apaga', 'la linterna no se apaga');
+
+    log('\n── EL ENCABEZADO ES DE ESTA MISIÓN ──');
+    /* La banda de palabras del encabezado vive en un ::before del CSS, así
+       que no aparece en el texto de la página: por eso se arrastró de misión
+       en misión desde la de Popper hasta que el autor la vio en pantalla. */
+    const banda = w.getComputedStyle(d.querySelector('.hero'), '::before').content || '';
+    ok(/METACOGNICI/.test(banda), 'la banda del encabezado es de esta misión', 'banda ajena: ' + banda.slice(0, 60));
+    ok(!/SOCIEDAD ABIERTA|RACIONALISMO CRÍTICO|CISNE NEGRO/.test(banda), 'sin las palabras de la misión de Popper', 'la banda sigue siendo la de Popper');
+
     log('\n── FICHA ──');
     const r = await fetch('/fichas/ficha-espejo-vigia-timon.html');
     const txtF = r.ok ? await r.text() : '';

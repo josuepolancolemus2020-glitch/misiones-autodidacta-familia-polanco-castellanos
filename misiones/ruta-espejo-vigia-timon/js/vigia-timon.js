@@ -72,7 +72,7 @@ function loadProgress(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));i
 
 // ===================== ACHIEVEMENTS =====================
 const ACHIEVEMENTS={"primer_quiz":{"icon":"🧠","label":"Primer quiz de los dos pisos superado"},"flash_master":{"icon":"🃏","label":"Todo el vocabulario del vigía explorado"},"clasif_pro":{"icon":"🗂️","label":"Clasificador de partes y decisiones experto"},"id_master":{"icon":"🔍","label":"Identificador de piezas del estudio maestro"},"reto_hero":{"icon":"🏆","label":"Héroe del reto de los 30 segundos"},"sopa_champ":{"icon":"🔤","label":"Campeón de la sopa del vigía"},"eval_ace":{"icon":"🎓","label":"Evaluación final aprobada con honores"},"full_xp":{"icon":"👑","label":"Etapa 1 de la Ruta de la Máquina que se Mira completada"}};
-function unlockAchievement(id){if(unlockedAch.includes(id))return;unlockedAch.push(id);sfx('ach');showToast(ACHIEVEMENTS[id].icon+' ¡Logro desbloqueado! '+ACHIEVEMENTS[id].label);launchConfetti();renderAchPanel();saveProgress();}
+function unlockAchievement(id){if(!ACHIEVEMENTS[id])return;if(unlockedAch.includes(id))return;unlockedAch.push(id);sfx('ach');showToast(ACHIEVEMENTS[id].icon+' ¡Logro desbloqueado! '+ACHIEVEMENTS[id].label);launchConfetti();renderAchPanel();saveProgress();}
 function renderAchPanel(){const list=document.getElementById('achList');list.innerHTML='';Object.entries(ACHIEVEMENTS).forEach(([id,a])=>{const div=document.createElement('div');div.className='ach-item'+(unlockedAch.includes(id)?'':' locked');div.innerHTML=`<span class="ach-icon">${a.icon}</span><span>${a.label}</span>`;list.appendChild(div);});}
 function toggleAchPanel(){sfx('click');document.getElementById('achPanel').classList.toggle('open');}
 function showToast(msg){let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t);}t.textContent=msg;t.style.display='block';clearTimeout(t._tid);t._tid=setTimeout(()=>t.style.display='none',3200);}
@@ -141,12 +141,77 @@ function resetReto(){sfx('click');clearInterval(retoTimerInt);retoRunning=false;
 // ===================== WIDGETS =====================
 // Widget 1: Ordenar secuencias
 const routeSets=[{"label":"La sesión vigilada, de principio a fin","steps":["Planear la sesión: qué toca y con qué técnica","Apuntar la predicción: cuánto se va a poder reproducir","Estudiar: el nivel objeto hace el trabajo","Pedir el parte del vigía: ¿cómo voy?","Decidir con el timón: seguir, cambiar o parar","Comprobar a cuaderno cerrado y apuntar la brecha"]},{"label":"Qué se hace cuando el vigía dice «ya me lo sé»","steps":["Cerrar el cuaderno sin discutir la sensación","Tomar una hoja en blanco","Reproducir lo estudiado sin mirar","Comparar lo que salió con lo que se predijo","Apuntar la brecha en el registro","Decidir el repaso empezando por lo que falló"]},{"label":"Cómo se localiza dónde mintió el vigía","steps":["Relatar la sesión completa, tal como pasó","Separar qué fue monitoreo y qué fue control","Listar los partes que subió el vigía","Comprobar cada parte contra una prueba cerrada","Marcar el parte que no se sostuvo","Escribir qué pista lo fabricó: fluidez, «me suena», horas"]}];
-let currentRouteIdx=0,routeItems=[];
-function buildRoute(){routeItems=_shuffle([...routeSets[currentRouteIdx].steps]);renderRoute();const fbEl=document.getElementById('fbRoute');if(fbEl)fbEl.classList.remove('show');}
-function renderRoute(){const list=document.getElementById('routeList');if(!list)return;list.innerHTML='';routeItems.forEach((step,i)=>{const div=document.createElement('div');div.className='sort-item';div.innerHTML=`<div class="sort-arrows"><button class="sort-arrow" onclick="routeMove(${i},-1)"${i===0?' disabled':''}>▲</button><button class="sort-arrow" onclick="routeMove(${i},1)"${i===routeItems.length-1?' disabled':''}>▼</button></div><div class="sort-step-num">${i+1}.</div><div class="sort-item-txt">${step}</div>`;list.appendChild(div);});}
+let currentRouteIdx=0,routeItems=[],routeLinternaOn=false,routeConLuz=new Set(),_rDrag=null;
+function buildRoute(){routeItems=_shuffle([...routeSets[currentRouteIdx].steps]);routeLinternaOn=false;_pintaBtnLinterna();renderRoute();const fbEl=document.getElementById('fbRoute');if(fbEl)fbEl.classList.remove('show');}
+function renderRoute(){const list=document.getElementById('routeList');if(!list)return;list.innerHTML='';const correcto=routeSets[currentRouteIdx].steps;routeItems.forEach((step,i)=>{const div=document.createElement('div');div.className='sort-item';div.dataset.idx=i;div.innerHTML=`<span class="sort-grip" aria-hidden="true">⠿</span><div class="sort-arrows"><button class="sort-arrow" onclick="routeMove(${i},-1)"${i===0?' disabled':''} aria-label="Subir un lugar">▲</button><button class="sort-arrow" onclick="routeMove(${i},1)"${i===routeItems.length-1?' disabled':''} aria-label="Bajar un lugar">▼</button></div><div class="sort-step-num">${i+1}.</div><div class="sort-item-txt">${step}</div>`;if(routeLinternaOn){const debe=correcto.indexOf(step)+1;const enSitio=debe===i+1;div.classList.add(enSitio?'sort-luz-ok':'sort-luz-no');const chip=document.createElement('span');chip.className='sort-luz-chip';chip.textContent=(enSitio?'✔ ':'→ ')+debe;div.appendChild(chip);}div.addEventListener('pointerdown',ev=>routeAgarra(ev,i));list.appendChild(div);});}
 function routeMove(idx,dir){sfx('click');const ni=idx+dir;if(ni<0||ni>=routeItems.length)return;[routeItems[idx],routeItems[ni]]=[routeItems[ni],routeItems[idx]];renderRoute();}
-function checkRoute(){const correct=routeSets[currentRouteIdx].steps;const isOk=routeItems.every((s,i)=>s===correct[i]);if(isOk){fb('fbRoute','¡Perfecto! Orden correcto. +4 XP',true);if(!xpTracker.wgt.has('route_'+currentRouteIdx)){xpTracker.wgt.add('route_'+currentRouteIdx);pts(4);}sfx('fan');fin('s-widgets');unlockAchievement('widgets_master');}else{fb('fbRoute','Hay pasos fuera de orden. Revisa el arreglo.',false);sfx('no');}}
+function checkRoute(){const correct=routeSets[currentRouteIdx].steps;const isOk=routeItems.every((s,i)=>s===correct[i]);const conLuz=routeConLuz.has(currentRouteIdx);if(isOk){if(conLuz){fb('fbRoute','¡Orden correcto! Pero salió con la linterna encendida, así que esta secuencia no suma XP. Prueba otra a oscuras.',true);}else{fb('fbRoute','¡Perfecto! Orden correcto. +4 XP',true);if(!xpTracker.wgt.has('route_'+currentRouteIdx)){xpTracker.wgt.add('route_'+currentRouteIdx);pts(4);}}sfx('fan');fin('s-widgets');unlockAchievement('widgets_master');}else{fb('fbRoute','Hay pasos fuera de orden. Arrástralos con el dedo o usa las flechas; si te trabas, enciende la 🔦 linterna.',false);sfx('no');}}
 function nextRoute(){sfx('click');currentRouteIdx=(currentRouteIdx+1)%routeSets.length;buildRoute();showToast('🔄 Secuencia: '+routeSets[currentRouteIdx].label);}
+
+/* Arrastrar para ordenar (dedo o ratón) y linterna que revela el orden.
+   El paso entre filas se MIDE del propio maquetado (dos filas seguidas), en
+   vez de suponerlo: con la letra grande activada las filas crecen y un valor
+   fijo dejaría el hueco donde no es. */
+function routeAgarra(ev,idx){
+  if(ev.target.closest('.sort-arrow'))return;
+  const list=document.getElementById('routeList');if(!list)return;
+  const filas=[...list.children];const fila=filas[idx];if(!fila)return;
+  const paso=filas.length>1?(filas[1].getBoundingClientRect().top-filas[0].getBoundingClientRect().top):(fila.getBoundingClientRect().height+7);
+  _rDrag={idx,y0:ev.clientY,paso,filas,salto:0};
+  fila.classList.add('sort-arrastrando');
+  try{fila.setPointerCapture(ev.pointerId);}catch(e){}
+  fila.addEventListener('pointermove',routeArrastra);
+  fila.addEventListener('pointerup',routeSuelta);
+  fila.addEventListener('pointercancel',routeSuelta);
+  ev.preventDefault();
+  if(typeof sfx==='function')sfx('click');
+}
+function routeArrastra(ev){
+  if(!_rDrag)return;
+  const {idx,y0,paso,filas}=_rDrag;
+  const dy=ev.clientY-y0;
+  let salto=Math.round(dy/paso);
+  salto=Math.max(-idx,Math.min(filas.length-1-idx,salto));
+  _rDrag.salto=salto;
+  filas[idx].style.transform='translateY('+dy+'px)';
+  filas.forEach((f,j)=>{
+    if(j===idx)return;
+    let d=0;
+    if(salto>0&&j>idx&&j<=idx+salto)d=-paso;
+    else if(salto<0&&j<idx&&j>=idx+salto)d=paso;
+    f.style.transform=d?('translateY('+d+'px)'):'';
+    f.classList.toggle('sort-corrido',!!d);
+  });
+}
+function routeSuelta(ev){
+  if(!_rDrag)return;
+  const {idx,salto,filas}=_rDrag;
+  const fila=filas[idx];
+  filas.forEach(f=>{f.style.transform='';f.classList.remove('sort-arrastrando','sort-corrido');});
+  try{fila.releasePointerCapture(ev.pointerId);}catch(e){}
+  fila.removeEventListener('pointermove',routeArrastra);
+  fila.removeEventListener('pointerup',routeSuelta);
+  fila.removeEventListener('pointercancel',routeSuelta);
+  _rDrag=null;
+  if(salto){
+    const [movida]=routeItems.splice(idx,1);
+    routeItems.splice(idx+salto,0,movida);
+    if(typeof sfx==='function')sfx('flip');
+    renderRoute();
+  }
+}
+function _pintaBtnLinterna(){
+  const b=document.getElementById('btnLinterna');
+  if(b)b.textContent=routeLinternaOn?'🔦 Apagar linterna':'🔦 Linterna';
+}
+function linternaRoute(){
+  routeLinternaOn=!routeLinternaOn;
+  if(routeLinternaOn)routeConLuz.add(currentRouteIdx);
+  _pintaBtnLinterna();
+  renderRoute();
+  if(typeof sfx==='function')sfx(routeLinternaOn?'up':'click');
+  if(routeLinternaOn)showToast('🔦 Cada tarjeta enseña el número que le toca. Con la luz encendida, esta secuencia ya no da XP.');
+}
 
 // Widget 2: Identifica el concepto
 const neuronPartes=[{"desc":"Sube información de cómo va el trabajo","ans":"El monitoreo","opts":["El monitoreo","El control","El nivel objeto","La brecha"]},{"desc":"Baja decisiones: seguir, cambiar, abandonar","ans":"El control","opts":["El control","El monitoreo","El metanivel","El registro"]},{"desc":"El piso que lee, resuelve y memoriza","ans":"El nivel objeto","opts":["El nivel objeto","El metanivel","El vigía","El timón"]},{"desc":"El piso que vigila el trabajo y lo administra","ans":"El metanivel","opts":["El metanivel","El nivel objeto","La comprobación","La predicción"]},{"desc":"La predicción sobre el propio saber, apuntada antes de la prueba","ans":"El juicio de aprendizaje","opts":["El juicio de aprendizaje","La brecha","El reconocimiento","La falla habitual"]},{"desc":"La diferencia entre lo predicho y el resultado real","ans":"La brecha","opts":["La brecha","El juicio de aprendizaje","El monitoreo","La regla de parada"]},{"desc":"Decidir bien sobre datos malos","ans":"La falla habitual","opts":["La falla habitual","La lectura fiable","El control","La calibración"]},{"desc":"Producir la respuesta con el material cerrado","ans":"La comprobación","opts":["La comprobación","La relectura","El reconocimiento","El parte del vigía"]}];

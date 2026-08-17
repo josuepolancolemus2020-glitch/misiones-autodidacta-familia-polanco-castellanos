@@ -72,7 +72,7 @@ function loadProgress(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));i
 
 // ===================== ACHIEVEMENTS =====================
 const ACHIEVEMENTS={"primer_quiz":{"icon":"🧠","label":"Primer quiz de los átomos superado"},"flash_master":{"icon":"🃏","label":"Todo el vocabulario del Jardín explorado"},"clasif_pro":{"icon":"🗂️","label":"Clasificador de miedos y deseos experto"},"id_master":{"icon":"🔍","label":"Identificador de piezas del poema maestro"},"reto_hero":{"icon":"🏆","label":"Héroe del reto de los 30 segundos"},"sopa_champ":{"icon":"🔤","label":"Campeón de la sopa de los átomos"},"eval_ace":{"icon":"🎓","label":"Evaluación final aprobada con honores"},"full_xp":{"icon":"👑","label":"Etapa 1 de la Ruta de los Átomos y los Ídolos completada"}};
-function unlockAchievement(id){if(unlockedAch.includes(id))return;unlockedAch.push(id);sfx('ach');showToast(ACHIEVEMENTS[id].icon+' ¡Logro desbloqueado! '+ACHIEVEMENTS[id].label);launchConfetti();renderAchPanel();saveProgress();}
+function unlockAchievement(id){if(!ACHIEVEMENTS[id])return;if(unlockedAch.includes(id))return;unlockedAch.push(id);sfx('ach');showToast(ACHIEVEMENTS[id].icon+' ¡Logro desbloqueado! '+ACHIEVEMENTS[id].label);launchConfetti();renderAchPanel();saveProgress();}
 function renderAchPanel(){const list=document.getElementById('achList');list.innerHTML='';Object.entries(ACHIEVEMENTS).forEach(([id,a])=>{const div=document.createElement('div');div.className='ach-item'+(unlockedAch.includes(id)?'':' locked');div.innerHTML=`<span class="ach-icon">${a.icon}</span><span>${a.label}</span>`;list.appendChild(div);});}
 function toggleAchPanel(){sfx('click');document.getElementById('achPanel').classList.toggle('open');}
 function showToast(msg){let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t);}t.textContent=msg;t.style.display='block';clearTimeout(t._tid);t._tid=setTimeout(()=>t.style.display='none',3200);}
@@ -141,12 +141,77 @@ function resetReto(){sfx('click');clearInterval(retoTimerInt);retoRunning=false;
 // ===================== WIDGETS =====================
 // Widget 1: Ordenar secuencias
 const routeSets=[{"label":"Cómo cura el poema de Lucrecio, paso a paso","steps":["Llega el miedo: el trueno, el eclipse, la muerte","El poema pregunta de qué está hecho eso que asusta","Enseña el mecanismo: átomos y vacío en movimiento","La miel del verso hace pasar la explicación","Visto el mecanismo, el castigo del cielo se queda sin oficio","El miedo pierde a su cobrador y baja de tamaño"]},{"label":"El tetrafármaco aplicado a un miedo propio","steps":["Nombrar el miedo por escrito, sin vergüenza","Preguntar qué mecanismo hay detrás de lo que asusta","Buscar qué frasco del botiquín le corresponde","Separar lo que se puede preparar de lo que solo se teme","Hacer la preparación que sí está en la mano","Apuntar qué quedó del miedo después de verlo entero"]},{"label":"Cómo se audita una oferta que vende miedo o deseo","steps":["Leer la oferta completa, con el precio en lempiras","Preguntar de qué está hecha: qué entrega de verdad","Buscar el mecanismo: ¿enseña cómo funciona o solo amenaza y promete?","Preguntar qué deseo o qué miedo la sostiene","Ver si ese deseo tiene límite o pide sin fin","Decidir con condición escrita, pensada en frío"]}];
-let currentRouteIdx=0,routeItems=[];
-function buildRoute(){routeItems=_shuffle([...routeSets[currentRouteIdx].steps]);renderRoute();const fbEl=document.getElementById('fbRoute');if(fbEl)fbEl.classList.remove('show');}
-function renderRoute(){const list=document.getElementById('routeList');if(!list)return;list.innerHTML='';routeItems.forEach((step,i)=>{const div=document.createElement('div');div.className='sort-item';div.innerHTML=`<div class="sort-arrows"><button class="sort-arrow" onclick="routeMove(${i},-1)"${i===0?' disabled':''}>▲</button><button class="sort-arrow" onclick="routeMove(${i},1)"${i===routeItems.length-1?' disabled':''}>▼</button></div><div class="sort-step-num">${i+1}.</div><div class="sort-item-txt">${step}</div>`;list.appendChild(div);});}
+let currentRouteIdx=0,routeItems=[],routeLinternaOn=false,routeConLuz=new Set(),_rDrag=null;
+function buildRoute(){routeItems=_shuffle([...routeSets[currentRouteIdx].steps]);routeLinternaOn=false;_pintaBtnLinterna();renderRoute();const fbEl=document.getElementById('fbRoute');if(fbEl)fbEl.classList.remove('show');}
+function renderRoute(){const list=document.getElementById('routeList');if(!list)return;list.innerHTML='';const correcto=routeSets[currentRouteIdx].steps;routeItems.forEach((step,i)=>{const div=document.createElement('div');div.className='sort-item';div.dataset.idx=i;div.innerHTML=`<span class="sort-grip" aria-hidden="true">⠿</span><div class="sort-arrows"><button class="sort-arrow" onclick="routeMove(${i},-1)"${i===0?' disabled':''} aria-label="Subir un lugar">▲</button><button class="sort-arrow" onclick="routeMove(${i},1)"${i===routeItems.length-1?' disabled':''} aria-label="Bajar un lugar">▼</button></div><div class="sort-step-num">${i+1}.</div><div class="sort-item-txt">${step}</div>`;if(routeLinternaOn){const debe=correcto.indexOf(step)+1;const enSitio=debe===i+1;div.classList.add(enSitio?'sort-luz-ok':'sort-luz-no');const chip=document.createElement('span');chip.className='sort-luz-chip';chip.textContent=(enSitio?'✔ ':'→ ')+debe;div.appendChild(chip);}div.addEventListener('pointerdown',ev=>routeAgarra(ev,i));list.appendChild(div);});}
 function routeMove(idx,dir){sfx('click');const ni=idx+dir;if(ni<0||ni>=routeItems.length)return;[routeItems[idx],routeItems[ni]]=[routeItems[ni],routeItems[idx]];renderRoute();}
-function checkRoute(){const correct=routeSets[currentRouteIdx].steps;const isOk=routeItems.every((s,i)=>s===correct[i]);if(isOk){fb('fbRoute','¡Perfecto! Orden correcto. +4 XP',true);if(!xpTracker.wgt.has('route_'+currentRouteIdx)){xpTracker.wgt.add('route_'+currentRouteIdx);pts(4);}sfx('fan');fin('s-widgets');unlockAchievement('widgets_master');}else{fb('fbRoute','Hay pasos fuera de orden. Revisa el arreglo.',false);sfx('no');}}
+function checkRoute(){const correct=routeSets[currentRouteIdx].steps;const isOk=routeItems.every((s,i)=>s===correct[i]);const conLuz=routeConLuz.has(currentRouteIdx);if(isOk){if(conLuz){fb('fbRoute','¡Orden correcto! Pero salió con la linterna encendida, así que esta secuencia no suma XP. Prueba otra a oscuras.',true);}else{fb('fbRoute','¡Perfecto! Orden correcto. +4 XP',true);if(!xpTracker.wgt.has('route_'+currentRouteIdx)){xpTracker.wgt.add('route_'+currentRouteIdx);pts(4);}}sfx('fan');fin('s-widgets');unlockAchievement('widgets_master');}else{fb('fbRoute','Hay pasos fuera de orden. Arrástralos con el dedo o usa las flechas; si te trabas, enciende la 🔦 linterna.',false);sfx('no');}}
 function nextRoute(){sfx('click');currentRouteIdx=(currentRouteIdx+1)%routeSets.length;buildRoute();showToast('🔄 Secuencia: '+routeSets[currentRouteIdx].label);}
+
+/* Arrastrar para ordenar (dedo o ratón) y linterna que revela el orden.
+   El paso entre filas se MIDE del propio maquetado (dos filas seguidas), en
+   vez de suponerlo: con la letra grande activada las filas crecen y un valor
+   fijo dejaría el hueco donde no es. */
+function routeAgarra(ev,idx){
+  if(ev.target.closest('.sort-arrow'))return;
+  const list=document.getElementById('routeList');if(!list)return;
+  const filas=[...list.children];const fila=filas[idx];if(!fila)return;
+  const paso=filas.length>1?(filas[1].getBoundingClientRect().top-filas[0].getBoundingClientRect().top):(fila.getBoundingClientRect().height+7);
+  _rDrag={idx,y0:ev.clientY,paso,filas,salto:0};
+  fila.classList.add('sort-arrastrando');
+  try{fila.setPointerCapture(ev.pointerId);}catch(e){}
+  fila.addEventListener('pointermove',routeArrastra);
+  fila.addEventListener('pointerup',routeSuelta);
+  fila.addEventListener('pointercancel',routeSuelta);
+  ev.preventDefault();
+  if(typeof sfx==='function')sfx('click');
+}
+function routeArrastra(ev){
+  if(!_rDrag)return;
+  const {idx,y0,paso,filas}=_rDrag;
+  const dy=ev.clientY-y0;
+  let salto=Math.round(dy/paso);
+  salto=Math.max(-idx,Math.min(filas.length-1-idx,salto));
+  _rDrag.salto=salto;
+  filas[idx].style.transform='translateY('+dy+'px)';
+  filas.forEach((f,j)=>{
+    if(j===idx)return;
+    let d=0;
+    if(salto>0&&j>idx&&j<=idx+salto)d=-paso;
+    else if(salto<0&&j<idx&&j>=idx+salto)d=paso;
+    f.style.transform=d?('translateY('+d+'px)'):'';
+    f.classList.toggle('sort-corrido',!!d);
+  });
+}
+function routeSuelta(ev){
+  if(!_rDrag)return;
+  const {idx,salto,filas}=_rDrag;
+  const fila=filas[idx];
+  filas.forEach(f=>{f.style.transform='';f.classList.remove('sort-arrastrando','sort-corrido');});
+  try{fila.releasePointerCapture(ev.pointerId);}catch(e){}
+  fila.removeEventListener('pointermove',routeArrastra);
+  fila.removeEventListener('pointerup',routeSuelta);
+  fila.removeEventListener('pointercancel',routeSuelta);
+  _rDrag=null;
+  if(salto){
+    const [movida]=routeItems.splice(idx,1);
+    routeItems.splice(idx+salto,0,movida);
+    if(typeof sfx==='function')sfx('flip');
+    renderRoute();
+  }
+}
+function _pintaBtnLinterna(){
+  const b=document.getElementById('btnLinterna');
+  if(b)b.textContent=routeLinternaOn?'🔦 Apagar linterna':'🔦 Linterna';
+}
+function linternaRoute(){
+  routeLinternaOn=!routeLinternaOn;
+  if(routeLinternaOn)routeConLuz.add(currentRouteIdx);
+  _pintaBtnLinterna();
+  renderRoute();
+  if(typeof sfx==='function')sfx(routeLinternaOn?'up':'click');
+  if(routeLinternaOn)showToast('🔦 Cada tarjeta enseña el número que le toca. Con la luz encendida, esta secuencia ya no da XP.');
+}
 
 // Widget 2: Identifica el concepto
 const neuronPartes=[{"desc":"No hay más que esto y vacío, dijeron Leucipo y Demócrito","ans":"Los átomos","opts":["Los átomos","Los dioses","Los deseos","Los versos"]},{"desc":"El remedio de cuatro frascos de la escuela","ans":"El tetrafármaco","opts":["El tetrafármaco","El clinamen","La doxografía","La miel del borde"]},{"desc":"La carta de Epicuro que cabe entera en una tarde","ans":"La Carta a Meneceo","opts":["La Carta a Meneceo","De rerum natura","El libro X","El giro"]},{"desc":"Seis libros de física en verso para curar el miedo","ans":"De rerum natura","opts":["De rerum natura","La Carta a Meneceo","Las Vidas de Laercio","Los fragmentos"]},{"desc":"La desviación mínima del átomo que intenta salvar la libertad","ans":"El clinamen","opts":["El clinamen","El vacío","El tetrafármaco","El mecanismo"]},{"desc":"La imagen del vaso con miel para la medicina amarga","ans":"La miel del borde","opts":["La miel del borde","El anzuelo","El clinamen","El botiquín"]},{"desc":"El deseo que nunca se llena, y por eso es el que más vende","ans":"El deseo sin límite","opts":["El deseo sin límite","El deseo necesario","El miedo con mecanismo","El pan y el queso"]},{"desc":"Copiar y resumir a un autor cuyos libros se perdieron","ans":"La doxografía","opts":["La doxografía","La traducción","La imprenta","La poesía"]}];

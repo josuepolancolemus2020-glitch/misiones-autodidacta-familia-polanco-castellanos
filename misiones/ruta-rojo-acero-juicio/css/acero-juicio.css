@@ -66,7 +66,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 
 /* HERO */
 .hero{position:relative;z-index:10;padding:0.6rem 1.2rem 0.8rem;background:linear-gradient(90deg,#5f0f26 0%,#9f1239 50%,#b8860b 100%);color:white;overflow:hidden;}
-.hero::before{content:'FALSACIÓN · CONJETURA · REFUTACIÓN · SOCIEDAD ABIERTA · RACIONALISMO CRÍTICO · TOLERANCIA · DEMARCACIÓN · FALIBILISMO · CISNE NEGRO · VIENA · LONDRES';position:absolute;top:0;left:-10%;width:120%;height:100%;font-family:'Fredoka',sans-serif;font-size:0.9rem;font-weight:600;letter-spacing:0.06em;color:rgba(255,255,255,0.15);white-space:nowrap;overflow:hidden;display:flex;align-items:center;animation:drift 28s linear infinite;pointer-events:none;}
+.hero::before{content:'EL ACERO · HOMBRE DE PAJA · EXPEDIENTE · MATERIALISMO HISTÓRICO · EXPLOTACIÓN · HORQUILLA · CONTRACRÍTICA · BÁSCULA PAREJA · LICENCIA · DOBLE COLUMNA';position:absolute;top:0;left:-10%;width:120%;height:100%;font-family:'Fredoka',sans-serif;font-size:0.9rem;font-weight:600;letter-spacing:0.06em;color:rgba(255,255,255,0.15);white-space:nowrap;overflow:hidden;display:flex;align-items:center;animation:drift 28s linear infinite;pointer-events:none;}
 @keyframes drift{0%{transform:translateX(0)}100%{transform:translateX(-30%)}}
 .hero::after{display:none;}
 .hero-inner{display:flex;align-items:center;justify-content:center;gap:0.6rem;}
@@ -483,3 +483,16 @@ body.letra-grande li,
 body.letra-grande h2,
 body.letra-grande h3,
 body.letra-grande .sopa-cell{font-size:125%!important;line-height:1.6;}
+
+/* ── Ordenar: arrastre y linterna ──
+   touch-action:none es lo que impide que arrastrar la tarjeta arrastre la
+   página en el teléfono; sin eso el gesto se lo lleva el navegador. */
+.sort-item{position:relative;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;transition:transform 0.18s ease,background 0.2s,box-shadow 0.2s,border-color 0.2s;}
+.sort-grip{font-size:1.15rem;line-height:1;letter-spacing:-3px;color:var(--gray);flex-shrink:0;opacity:0.75;}
+.sort-item.sort-arrastrando{cursor:grabbing;z-index:30;transition:none;border-color:var(--pri);background:var(--pri-gl);box-shadow:0 10px 24px var(--shadow-md);}
+.sort-item.sort-corrido{opacity:0.9;}
+.sort-item.sort-luz-ok{border-color:var(--jade);background:var(--jade-gl);}
+.sort-item.sort-luz-no{border-color:var(--amber);background:var(--amber-gl);}
+.sort-luz-chip{font-family:'Fredoka',sans-serif;font-size:0.8rem;font-weight:700;padding:0.12rem 0.55rem;border-radius:999px;background:var(--card);border:1.5px solid currentColor;flex-shrink:0;}
+.sort-item.sort-luz-ok .sort-luz-chip{color:var(--jade);}
+.sort-item.sort-luz-no .sort-luz-chip{color:var(--amber);}

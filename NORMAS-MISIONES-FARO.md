@@ -130,6 +130,44 @@ enseña a cazar. La sonda de cada misión comprueba las dos secciones: 17
 paneles en total, el guion con su estructura y las tres lecturas con su
 etiqueta y sus anclas reales.
 
+## 5-bis. El widget de ordenar se arrastra, y la linterna cuesta
+
+**Norma nueva, pedida por el autor el 17 de agosto de 2026**, después de
+verlo en el teléfono. En el ejercicio de ordenar pasos, las flechas ▲▼
+solas no bastan: mover un paso del sexto lugar al primero son cinco
+toques y la vista se pierde. Toda misión lleva por tanto:
+
+- **Arrastre con el dedo**, hecho con eventos de puntero (no con el
+  arrastre de HTML5, que en teléfono no responde) y con
+  `touch-action: none` en la tarjeta, que es lo único que impide que el
+  gesto se lo lleve la página. Mientras se arrastra, las demás tarjetas
+  **abren el hueco** para que se vea dónde va a caer. Las flechas se
+  quedan: son la vía accesible y la del ratón.
+- **Linterna 🔦**, que enseña a cada tarjeta el número que le toca y
+  marca en verde las que ya están en su sitio. **Y cuesta:** la
+  secuencia iluminada deja de dar XP, y se avisa en pantalla. Es la
+  misma regla que la casa aplica a todos sus indicadores: un XP ganado
+  con la respuesta delante mide recorrido, no dominio.
+
+Se aplica con `node _dev/mejora-widget-ordenar.js <carpeta>/<base>`, que
+sirve para cualquier misión. La sonda comprueba las dos cosas y además
+**simula el arrastre** (tomar la primera tarjeta y soltarla tres lugares
+más abajo) para que no se rompa en silencio.
+
+## 5-ter. La banda del encabezado es de cada misión
+
+**Descubierto el 17 de agosto de 2026 por el autor, mirando su teléfono.**
+El encabezado lleva una banda de palabras que corre de fondo, y vive en
+un `::before` del CSS: como no está en el texto de la página, **ninguna
+sonda la miraba y se arrastró desde la misión de Popper** hasta tres
+misiones del Estudio Mayor, que anunciaban «SOCIEDAD ABIERTA ·
+RACIONALISMO CRÍTICO» detrás de títulos que no tenían nada que ver.
+
+Cada misión escribe su propia banda con el vocabulario de su etapa, y la
+sonda la lee con `getComputedStyle(hero, '::before')`, que es la única
+manera de verla. Lección general: **lo que no está en el texto también se
+copia**, y lo que ninguna sonda mira, tarde o temprano miente.
+
 ## 6. La ficha va en diez páginas, y llenas
 
 **Norma nueva, pedida por el autor el 26 de julio de 2026.** Toda ficha de

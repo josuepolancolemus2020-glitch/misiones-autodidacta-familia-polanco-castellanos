@@ -72,7 +72,7 @@ function loadProgress(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));i
 
 // ===================== ACHIEVEMENTS =====================
 const ACHIEVEMENTS={"primer_quiz":{"icon":"🧠","label":"Primer quiz del acero superado"},"flash_master":{"icon":"🃏","label":"Todo el vocabulario del expediente explorado"},"clasif_pro":{"icon":"🗂️","label":"Clasificador de aceros y caricaturas experto"},"id_master":{"icon":"🔍","label":"Identificador de piezas del expediente maestro"},"reto_hero":{"icon":"🏆","label":"Héroe del reto de los 30 segundos"},"sopa_champ":{"icon":"🔤","label":"Campeón de la sopa del expediente"},"eval_ace":{"icon":"🎓","label":"Evaluación final aprobada con honores"},"full_xp":{"icon":"👑","label":"Etapa 1 de la Ruta del Expediente Rojo completada"}};
-function unlockAchievement(id){if(unlockedAch.includes(id))return;unlockedAch.push(id);sfx('ach');showToast(ACHIEVEMENTS[id].icon+' ¡Logro desbloqueado! '+ACHIEVEMENTS[id].label);launchConfetti();renderAchPanel();saveProgress();}
+function unlockAchievement(id){if(!ACHIEVEMENTS[id])return;if(unlockedAch.includes(id))return;unlockedAch.push(id);sfx('ach');showToast(ACHIEVEMENTS[id].icon+' ¡Logro desbloqueado! '+ACHIEVEMENTS[id].label);launchConfetti();renderAchPanel();saveProgress();}
 function renderAchPanel(){const list=document.getElementById('achList');list.innerHTML='';Object.entries(ACHIEVEMENTS).forEach(([id,a])=>{const div=document.createElement('div');div.className='ach-item'+(unlockedAch.includes(id)?'':' locked');div.innerHTML=`<span class="ach-icon">${a.icon}</span><span>${a.label}</span>`;list.appendChild(div);});}
 function toggleAchPanel(){sfx('click');document.getElementById('achPanel').classList.toggle('open');}
 function showToast(msg){let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t);}t.textContent=msg;t.style.display='block';clearTimeout(t._tid);t._tid=setTimeout(()=>t.style.display='none',3200);}
@@ -141,12 +141,77 @@ function resetReto(){sfx('click');clearInterval(retoTimerInt);retoRunning=false;
 // ===================== WIDGETS =====================
 // Widget 1: Ordenar secuencias
 const routeSets=[{"label":"Cómo se arma un acero, paso a paso","steps":["Leer la doctrina en sus fuentes, no en sus enemigos","Escribir el resumen que su defensor firmaría","Ponerle su fuerza moral y sus mejores números, con etiqueta","Correr la prueba de Turing: que un defensor asienta","Recién entonces abrir el expediente de críticas","Y conceder en voz alta lo que quede en pie"]},{"label":"La defensa de diez minutos, de principio a fin","steps":["La familia pone la mesa, el reloj y la regla pactada","Se enuncia el materialismo histórico sin caricatura","Se explica la explotación como la firmaría un marxista","Se pone la fuerza moral: los informes y las minas","Se cierran los números del acero con su etiqueta","Si sonó a panfleto, se detiene y se repite otro día"]},{"label":"Qué se hace con un dato que te alegra","steps":["Notar la alegría: el dato hunde al bando que te disgusta","Recordar la regla del placer","Buscarle la horquilla, el método y la fuente","Buscar la contracrítica pegada a la crítica","Pasarlo por la misma báscula que un dato propio","Solo entonces, apuntarlo en el cuaderno"]}];
-let currentRouteIdx=0,routeItems=[];
-function buildRoute(){routeItems=_shuffle([...routeSets[currentRouteIdx].steps]);renderRoute();const fbEl=document.getElementById('fbRoute');if(fbEl)fbEl.classList.remove('show');}
-function renderRoute(){const list=document.getElementById('routeList');if(!list)return;list.innerHTML='';routeItems.forEach((step,i)=>{const div=document.createElement('div');div.className='sort-item';div.innerHTML=`<div class="sort-arrows"><button class="sort-arrow" onclick="routeMove(${i},-1)"${i===0?' disabled':''}>▲</button><button class="sort-arrow" onclick="routeMove(${i},1)"${i===routeItems.length-1?' disabled':''}>▼</button></div><div class="sort-step-num">${i+1}.</div><div class="sort-item-txt">${step}</div>`;list.appendChild(div);});}
+let currentRouteIdx=0,routeItems=[],routeLinternaOn=false,routeConLuz=new Set(),_rDrag=null;
+function buildRoute(){routeItems=_shuffle([...routeSets[currentRouteIdx].steps]);routeLinternaOn=false;_pintaBtnLinterna();renderRoute();const fbEl=document.getElementById('fbRoute');if(fbEl)fbEl.classList.remove('show');}
+function renderRoute(){const list=document.getElementById('routeList');if(!list)return;list.innerHTML='';const correcto=routeSets[currentRouteIdx].steps;routeItems.forEach((step,i)=>{const div=document.createElement('div');div.className='sort-item';div.dataset.idx=i;div.innerHTML=`<span class="sort-grip" aria-hidden="true">⠿</span><div class="sort-arrows"><button class="sort-arrow" onclick="routeMove(${i},-1)"${i===0?' disabled':''} aria-label="Subir un lugar">▲</button><button class="sort-arrow" onclick="routeMove(${i},1)"${i===routeItems.length-1?' disabled':''} aria-label="Bajar un lugar">▼</button></div><div class="sort-step-num">${i+1}.</div><div class="sort-item-txt">${step}</div>`;if(routeLinternaOn){const debe=correcto.indexOf(step)+1;const enSitio=debe===i+1;div.classList.add(enSitio?'sort-luz-ok':'sort-luz-no');const chip=document.createElement('span');chip.className='sort-luz-chip';chip.textContent=(enSitio?'✔ ':'→ ')+debe;div.appendChild(chip);}div.addEventListener('pointerdown',ev=>routeAgarra(ev,i));list.appendChild(div);});}
 function routeMove(idx,dir){sfx('click');const ni=idx+dir;if(ni<0||ni>=routeItems.length)return;[routeItems[idx],routeItems[ni]]=[routeItems[ni],routeItems[idx]];renderRoute();}
-function checkRoute(){const correct=routeSets[currentRouteIdx].steps;const isOk=routeItems.every((s,i)=>s===correct[i]);if(isOk){fb('fbRoute','¡Perfecto! Orden correcto. +4 XP',true);if(!xpTracker.wgt.has('route_'+currentRouteIdx)){xpTracker.wgt.add('route_'+currentRouteIdx);pts(4);}sfx('fan');fin('s-widgets');unlockAchievement('widgets_master');}else{fb('fbRoute','Hay pasos fuera de orden. Revisa el arreglo.',false);sfx('no');}}
+function checkRoute(){const correct=routeSets[currentRouteIdx].steps;const isOk=routeItems.every((s,i)=>s===correct[i]);const conLuz=routeConLuz.has(currentRouteIdx);if(isOk){if(conLuz){fb('fbRoute','¡Orden correcto! Pero salió con la linterna encendida, así que esta secuencia no suma XP. Prueba otra a oscuras.',true);}else{fb('fbRoute','¡Perfecto! Orden correcto. +4 XP',true);if(!xpTracker.wgt.has('route_'+currentRouteIdx)){xpTracker.wgt.add('route_'+currentRouteIdx);pts(4);}}sfx('fan');fin('s-widgets');unlockAchievement('widgets_master');}else{fb('fbRoute','Hay pasos fuera de orden. Arrástralos con el dedo o usa las flechas; si te trabas, enciende la 🔦 linterna.',false);sfx('no');}}
 function nextRoute(){sfx('click');currentRouteIdx=(currentRouteIdx+1)%routeSets.length;buildRoute();showToast('🔄 Secuencia: '+routeSets[currentRouteIdx].label);}
+
+/* Arrastrar para ordenar (dedo o ratón) y linterna que revela el orden.
+   El paso entre filas se MIDE del propio maquetado (dos filas seguidas), en
+   vez de suponerlo: con la letra grande activada las filas crecen y un valor
+   fijo dejaría el hueco donde no es. */
+function routeAgarra(ev,idx){
+  if(ev.target.closest('.sort-arrow'))return;
+  const list=document.getElementById('routeList');if(!list)return;
+  const filas=[...list.children];const fila=filas[idx];if(!fila)return;
+  const paso=filas.length>1?(filas[1].getBoundingClientRect().top-filas[0].getBoundingClientRect().top):(fila.getBoundingClientRect().height+7);
+  _rDrag={idx,y0:ev.clientY,paso,filas,salto:0};
+  fila.classList.add('sort-arrastrando');
+  try{fila.setPointerCapture(ev.pointerId);}catch(e){}
+  fila.addEventListener('pointermove',routeArrastra);
+  fila.addEventListener('pointerup',routeSuelta);
+  fila.addEventListener('pointercancel',routeSuelta);
+  ev.preventDefault();
+  if(typeof sfx==='function')sfx('click');
+}
+function routeArrastra(ev){
+  if(!_rDrag)return;
+  const {idx,y0,paso,filas}=_rDrag;
+  const dy=ev.clientY-y0;
+  let salto=Math.round(dy/paso);
+  salto=Math.max(-idx,Math.min(filas.length-1-idx,salto));
+  _rDrag.salto=salto;
+  filas[idx].style.transform='translateY('+dy+'px)';
+  filas.forEach((f,j)=>{
+    if(j===idx)return;
+    let d=0;
+    if(salto>0&&j>idx&&j<=idx+salto)d=-paso;
+    else if(salto<0&&j<idx&&j>=idx+salto)d=paso;
+    f.style.transform=d?('translateY('+d+'px)'):'';
+    f.classList.toggle('sort-corrido',!!d);
+  });
+}
+function routeSuelta(ev){
+  if(!_rDrag)return;
+  const {idx,salto,filas}=_rDrag;
+  const fila=filas[idx];
+  filas.forEach(f=>{f.style.transform='';f.classList.remove('sort-arrastrando','sort-corrido');});
+  try{fila.releasePointerCapture(ev.pointerId);}catch(e){}
+  fila.removeEventListener('pointermove',routeArrastra);
+  fila.removeEventListener('pointerup',routeSuelta);
+  fila.removeEventListener('pointercancel',routeSuelta);
+  _rDrag=null;
+  if(salto){
+    const [movida]=routeItems.splice(idx,1);
+    routeItems.splice(idx+salto,0,movida);
+    if(typeof sfx==='function')sfx('flip');
+    renderRoute();
+  }
+}
+function _pintaBtnLinterna(){
+  const b=document.getElementById('btnLinterna');
+  if(b)b.textContent=routeLinternaOn?'🔦 Apagar linterna':'🔦 Linterna';
+}
+function linternaRoute(){
+  routeLinternaOn=!routeLinternaOn;
+  if(routeLinternaOn)routeConLuz.add(currentRouteIdx);
+  _pintaBtnLinterna();
+  renderRoute();
+  if(typeof sfx==='function')sfx(routeLinternaOn?'up':'click');
+  if(routeLinternaOn)showToast('🔦 Cada tarjeta enseña el número que le toca. Con la luz encendida, esta secuencia ya no da XP.');
+}
 
 // Widget 2: Identifica el concepto
 const neuronPartes=[{"desc":"La versión más fuerte, la que su autor firmaría","ans":"El hombre de acero","opts":["El hombre de acero","El hombre de paja","La licencia","La horquilla"]},{"desc":"El muñeco flojo que se arma para tumbarlo fácil","ans":"El hombre de paja","opts":["El hombre de paja","El hombre de acero","La caricatura del cine","El tío del asado"]},{"desc":"Exponer la doctrina sin que un defensor te distinga","ans":"La prueba de Turing ideológica","opts":["La prueba de Turing ideológica","La defensa detenida","El resumen de trabajo","La báscula pareja"]},{"desc":"El modo de producir condiciona instituciones e ideas","ans":"El materialismo histórico","opts":["El materialismo histórico","La teoría de la explotación","La sociedad sin clases","La tendencia a la crisis"]},{"desc":"El excedente lo produce el trabajo y se lo apropia el dueño","ans":"La teoría de la explotación","opts":["La teoría de la explotación","El materialismo histórico","La regla del placer","La fuerza moral"]},{"desc":"Niños en minas, con informes de inspectores en la mano","ans":"La fuerza moral documentada","opts":["La fuerza moral documentada","Los números del acero","La caricatura","El panfleto"]},{"desc":"Allen y Sen, con su etiqueta de disputa puesta","ans":"Los números del acero","opts":["Los números del acero","La fuerza moral","La cifra de bandera","El resumen de trabajo"]},{"desc":"Exponer diez minutos de pie sin que un marxista corrija","ans":"La licencia de la etapa","opts":["La licencia de la etapa","La prueba de Turing","La defensa detenida","El veredicto final"]}];
