@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de los Átomos y los Ídolos · Etapa 1: Átomos contra el miedo | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/atomos-miedo.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Le teme al trueno 🌩️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">⚛️</div>
+    <div class="hero-text">
+      <h1>Átomos contra el miedo: <span>la física que quita los dos miedos</span></h1>
+      <p class="sub">Quien conoce el mecanismo deja de pagarle al miedo ⚛️</p>
+      <div class="badge">⚛️ Ruta de los Átomos y los Ídolos · Etapa 1 de 6</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚛️ Donde empezó todo: átomos y vacío</h2>
+    <p>Esta es la primera etapa del Materialismo Filosófico, y empieza donde empezó el programa entero: en el siglo quinto antes de Cristo, <strong>Leucipo y Demócrito</strong> proponen que no hay más que <strong>átomos y vacío</strong>, y que todo lo demás (la piedra, el agua, el cuerpo, el sabor dulce) es arreglo de esas piezas en movimiento.</p>
+    <p>Con esa sola idea fundan una manera de mirar que sigue viva: <strong>lo que existe está hecho de algo</strong>, y lo que pasa tiene mecanismo, no capricho. Demócrito escribió decenas de libros y no nos llegó ninguno entero: se le lee <strong>por fragmentos y por doxografía</strong> (resúmenes de autores posteriores), y así hay que decirlo cada vez que se le cita.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La pregunta operativa de la materia.</strong> Ante cualquier cosa que se presente como venida de fuera del mundo, esta materia pregunta: <strong>¿de qué está hecha y qué la sostiene?</strong> Esta etapa la estrena contra el objeto más viejo del inventario: el miedo.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>💊 Epicuro: la física convertida en medicina</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🌩️ Los dos miedos</h4>
+        <p>Epicuro diagnostica los dos miedos que gobiernan a la gente: <strong>el de los dioses</strong> (el castigo que puede caer del cielo) y <strong>el de la muerte</strong>. Sobre esos dos miedos, dice, se cobra casi todo lo demás.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>💊 La medicina</h4>
+        <p>Su remedio no es un rezo ni una compra: es <strong>estudiar la naturaleza</strong>. Se aprende física para ver el mecanismo, y visto el mecanismo, el miedo pierde a su cobrador. Su <strong>Carta a Meneceo</strong> cabe entera en una tarde.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">💊 El tetrafármaco, el remedio de cuatro frascos</span><br>
+      <span>1. A los dioses no hay que temerles. 2. <span class="hl">La muerte no es nada para nosotros</span>: donde estamos nosotros no está ella, y cuando está ella ya no estamos nosotros. 3. El bien es fácil de conseguir: pan, agua, techo, amigos. 4. El dolor, si es fuerte, es corto, y si es largo, <span class="hl2">se puede sobrellevar</span>. Cuatro frases: el botiquín entero de la escuela.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 La historia del programa, en siete momentos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué pasó, qué aporta y dónde hay que tener cuidado.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento de la historia.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la cadena del eclipse</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué hace la casa con el miedo que llegó por WhatsApp.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📱</span><span class="ms-text"><strong>Llega la cadena:</strong> «el eclipse del viernes trae desgracias; hay que reenviar a diez personas y tener listo el kit de velas (L 350)».</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">😨</span><span class="ms-text"><strong>El miedo hace su trabajo:</strong> Angelly pregunta si es cierto. La amenaza no explica nada, pero asusta completo.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">💰</span><span class="ms-text"><strong>El cobrador aparece:</strong> el que manda la cadena vende el kit. El miedo sin mecanismo siempre tiene una caja registradora cerca.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🌗</span><span class="ms-text"><strong>Lo que tienes delante:</strong> una niña asustada, un teléfono, y la decisión de esta noche.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué se hace con el miedo que llegó?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🕯️ Comprar las velas, por si acaso</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🔬 Enseñar el mecanismo del eclipse</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔍 Los tres maestros, en una tabla</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Tres nombres, tres siglos, un solo programa. Cada uno añade una pieza, y las tres piezas juntas son el temario de esta etapa.</p>
+    <table class="tres">
+      <tr><th>Quién</th><th>Qué puso</th><th>Cómo nos llega</th></tr>
+      <tr><td>Leucipo y Demócrito (siglo V a. C.)</td><td>Átomos y vacío: lo que existe está hecho de algo</td><td>Por fragmentos y doxografía, y así se dice al citarlos</td></tr>
+      <tr><td>Epicuro (341 a 270 a. C.)</td><td>La física como medicina: quitar los dos miedos</td><td>Sus cartas, preservadas por Diógenes Laercio (libro X)</td></tr>
+      <tr><td>Lucrecio (siglo I a. C.)</td><td>El programa en verso: De rerum natura, seis libros</td><td>Un manuscrito casi perdido, recuperado en 1417</td></tr>
+      <tr><td>El programa hoy</td><td>La pregunta operativa: ¿de qué está hecho y qué lo sostiene?</td><td>Es la llave de las cinco etapas que siguen</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 La distinción que la universidad se salta</span><br>
+      <span>El atomismo <span class="hl">como física está superado</span>: el átomo de Demócrito no es el de la tabla periódica, y el «átomo» moderno hasta se parte. Pero <span class="hl2">como programa sigue vivo y ganando</span>: buscarle mecanismo a lo que pasa, en vez de capricho, es la apuesta que la ciencia entera terminó adoptando.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>❓ Los deseos: cuáles tienen límite y cuáles son anzuelo</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Aquí se mata el error de primer día: el materialismo filosófico <strong>no es el materialismo de tienda</strong>. Epicuro vivía de pan y queso, y su escuela clasificaba los deseos con una vara que sigue afilada.</p>
+    <table class="tres">
+      <tr><th>Deseo</th><th>Ejemplos</th><th>¿Tiene límite?</th></tr>
+      <tr><td>Natural y necesario</td><td>Agua, comida del día, techo, amistad</td><td>Sí: se cumple y descansa</td></tr>
+      <tr><td>Natural pero no necesario</td><td>El banquete en vez del pan, la marca en vez del abrigo</td><td>Sí, pero ya cuesta más de lo que da</td></tr>
+      <tr><td>Vano (sin límite)</td><td>Fama, lujo por estatus, más likes que ayer</td><td>No: al cumplirse pide otro, y por eso vende</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎣 La regla que ordena la tabla</span><br>
+      <span>El deseo sin límite <span class="hl">es el anzuelo, no el premio</span>: nunca se llena, y esa hambre perpetua es exactamente lo que la tienda necesita. Quien confunde esta materia con el consumismo la entendió <span class="hl2">al revés</span>: esta escuela enseña dónde se acaba el deseo, no cómo alimentarlo.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ Dos miedos distintos: el que se prepara y el que se paga</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🔬 Miedo con mecanismo</h4>
+        <p>El huracán anunciado, la deuda que crece, el examen sin estudiar. <strong>Se les conoce el mecanismo</strong>, así que el miedo se convierte en preparación: lista, plan, comprobación. Este miedo es un instrumento.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🌩️ Miedo con cobrador</h4>
+        <p>El castigo del eclipse, la desgracia si no se comparte la cadena, la mala suerte sin la compra. <strong>Nadie enseña mecanismo</strong>: solo amenaza y caja. Este miedo es un negocio, y se le corta el cobro enseñando cómo funciona la cosa.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Miedos que quita Epicuro</div><div class="stat-val">2</div></div>
+      <div class="stat-item"><div class="stat-label">Frascos del tetrafármaco</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Libros de De rerum natura</div><div class="stat-val">6</div></div>
+      <div class="stat-item"><div class="stat-label">Momentos del programa</div><div class="stat-val">7</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📜 Lucrecio: el poema que desarma miedos</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Lucrecio puso el programa entero en verso: <strong>De rerum natura</strong>, seis libros de física atomista escritos para curar el miedo. Su imagen más famosa lo dice todo: como el médico que unta <strong>miel en el borde del vaso</strong> para que el niño se tome la medicina amarga, el poema endulza la física para que el lector se cure sin darse cuenta.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Adentro va también el <strong>clinamen</strong>: la desviación mínima e impredecible del átomo, su intento de salvar la libertad dentro de la materia (si todo cayera en línea recta, todo estaría ya decidido). Y va el gesto que es <strong>el corazón de esta misión</strong>: no se combate el miedo con burlas ni con amenazas mayores, sino <strong>enseñando el mecanismo</strong> de lo que asusta.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🏺 Átomos y vacío</div><div class="t-info">Lo único que hay, dijo Demócrito</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">💊 El tetrafármaco</div><div class="t-info">El botiquín de cuatro frascos</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">📜 De rerum natura</div><div class="t-info">Física en verso, seis libros</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🍯 La miel del borde</div><div class="t-info">El verso que hace pasar la física</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🌀 El clinamen</div><div class="t-info">La desviación que salva la libertad</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🎣 El deseo sin límite</div><div class="t-info">El anzuelo, no el premio</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Lo práctico que sale de aquí: <strong>ante cada miedo u oferta que toque la puerta, la casa pregunta primero por el mecanismo</strong>: quién lo enseña, quién lo esconde y quién cobra por mantenerlo escondido. Esa pregunta cuesta un minuto y ahorra lempiras y noches enteras.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller del desmontador</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para no volver a pagarle a un miedo sin auditarlo.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Los átomos y el vacío</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">⚛️ Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="atomos" onclick="labShowParte('atomos')">🏺 Átomos y vacío</button>
+        <button class="lab-btn lab-cont-btn" data-parte="botiquin" onclick="labShowParte('botiquin')">💊 El tetrafármaco</button>
+        <button class="lab-btn lab-cont-btn" data-parte="poema" onclick="labShowParte('poema')">📜 El poema que cura</button>
+        <button class="lab-btn lab-cont-btn" data-parte="limite" onclick="labShowParte('limite')">🍞 El límite del deseo</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿mecanismo o anzuelo?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: del miedo al mecanismo, paso a paso</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del programa se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué está haciendo esa frase?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es esa frase dentro del programa de la etapa:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«¿De qué está hecho y qué lo sostiene?»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">Jael paga L 1.200 por un curso que promete abundancia sin límite</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🔬 Mecanismo</button>
+        <button class="btn btn-sec" onclick="">🌩️ Amenaza</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">⚛️ El miedo sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Átomos contra el miedo · Ruta de los Átomos y los Ídolos</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: átomos contra el miedo</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El miedo sobre la mesa · Átomos contra el miedo</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">⚛️ El miedo sobre la mesa: qué lo sostiene y quién cobra</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay un miedo o un deseo tocando la puerta de la casa. Di qué lo sostiene y si tiene límite, qué mecanismo hay detrás y quién cobra por esconderlo, qué frasco del tetrafármaco o qué distinción de la etapa le toca, y qué condición escrita deja la casa, sin burlarse de nadie (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">⚛️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>⚛️ Casos del proyecto: los átomos en esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas hay un miedo o un deseo trabajando, y en todas la pregunta es la misma: <strong>¿de qué está hecho, qué lo sostiene y quién cobra?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también en esta ruta:</strong> ningún estudio ni obra entra sin su etiqueta. Las que sostienen esta misión (Epicuro con la Carta a Meneceo, Lucrecio con De rerum natura) son <strong>clásicos sólidos</strong>; Demócrito llega <strong>por fragmentos y doxografía</strong>, y así se dice. Las etiquetas de cada fuente van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>💸 Caso 1: el curso de abundancia de Jael</h2>
+    <p>A Jael le llega por WhatsApp un curso de «abundancia y felicidad» a L 1.200: doce videos, un grupo de Telegram y la promesa de que la felicidad es una decisión diaria. Varias amigas ya pagaron.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎣 El anzuelo, visto por dentro</span><br>
+      <span>Qué mete: pertenencia al grupo y la <span class="hl">promesa de un deseo sin límite</span>. Qué saca: L 1.200 de entrada, y la costumbre de comprar la siguiente promesa cuando esta no llene, <span class="hl2">porque un deseo sin tope no se llena nunca</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> se audita sin burlarse. La pregunta que decide: ¿qué sabe hacer quien lo termina que no supiera antes? La condición con que sí: ninguna a ese precio; la versión seria del mismo tema es la Carta a Meneceo, es gratuita y ya está en la biblioteca de la casa.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🌗 Caso 2: la cadena del eclipse</h2>
+    <p>Llega la cadena: «el eclipse del viernes trae desgracias a quien no se prepare», con un kit de velas y sales a L 350 y la orden de reenviar a diez contactos. Angelly pregunta asustada si es cierto.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🌩️ El miedo con caja registradora</span><br>
+      <span>La amenaza <span class="hl">no explica nada</span>: solo asusta y cobra. Es el negocio más viejo del inventario: el mismo que Demócrito y Epicuro salieron a cerrar hace veintitrés siglos, <span class="hl2">con mecanismo en vez de amuleto</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la casa no compra las velas ni regaña a Angelly: abre un video del mecanismo del eclipse y lo miran juntos. Visto el mecanismo, el castigo se queda sin oficio. La pregunta que decide: ¿quién gana si el miedo sigue vivo?</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📱 Caso 3: el teléfono de L 18.000</h2>
+    <p>Jael pide un teléfono de L 18.000 «porque lo necesita para estudiar». El que tiene funciona; el nuevo es el que sale en los videos de sus amigas.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🍞 La tabla de los deseos, aplicada</span><br>
+      <span>Estudiar con un teléfono es deseo <span class="hl">natural: uno de L 4.000 lo cumple y descansa</span>. Los otros L 14.000 no compran estudio: compran estatus, que es <span class="hl2">deseo vano, sin límite</span>: el año que viene pedirá el siguiente.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la clasificación de Epicuro no es contra Jael: es a favor de su dinero. La condición con que sí: la parte del deseo con límite la cubre la casa; la parte sin límite, si la quiere, la ahorra ella y con eso la mide.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🏫 Caso 4: la charla de «mentalidad de abundancia»</h2>
+    <p>Un colegio ofrece L 8.000 por incluir en M.E.T.A.S una misión de «mentalidad de abundancia» con frases de motivación y visualización de riqueza, «al estilo de las que ya tienen».</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚗️ Palabras de estudio, mercancía de tienda</span><br>
+      <span>Mete L 8.000, que pagan servidor. Saca la línea que separa a M.E.T.A.S de los cursos de humo: una misión que enseñe a <span class="hl">desear sin límite</span> dentro de una plataforma que enseña a <span class="hl2">auditar promesas</span> envenena a las dos.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la pregunta que decide: ¿qué mecanismo comprobable enseñaría esa misión? Ninguno: enseña a alimentar el anzuelo. La condición con que sí: una misión de educación financiera con números reales sí se conversa; la de visualización, no, y se explica por qué sin despreciar a nadie.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🌙 Caso 5: la pregunta de Angelly de noche</h2>
+    <p>Después del funeral de un vecino, Angelly no puede dormir y pregunta: «¿a dónde va uno cuando se muere?». No hay oferta ni lempiras: hay una niña despierta a las diez de la noche.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">💊 El segundo frasco, con cuidado</span><br>
+      <span>Epicuro dejó un argumento, no una anestesia: <span class="hl">donde estamos nosotros no está la muerte; cuando está ella, ya no estamos nosotros</span>. Se conversa como argumento, a su edad y en su idioma, y <span class="hl2">sin atropellar lo que la familia cree</span>: el duelo es real y no se desmonta.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el miedo que no se conversa crece de noche. La casa no le vende nada a Angelly ni le prohíbe la pregunta: le presta el frasco de Epicuro como una herramienta más de la mesa, y la conversación la termina la familia, no un filósofo griego.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📻 Caso 6: la cuota de protección</h2>
+    <p>Un programa de radio ofrece una «oración de protección personalizada» por L 500 mensuales, con testimonios de desgracias que les cayeron a los que dejaron de pagar.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔔 El mecanismo de la suscripción al miedo</span><br>
+      <span>La estructura se audita sin tocar la fe de nadie: el producto es la amenaza del testimonio, el precio es mensual <span class="hl">porque el miedo se renueva solo</span>, y dejar de pagar es el único pecado del catálogo. <span class="hl2">Eso no es consuelo: es cobro</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> esta familia también vive dentro de creencias, y por eso la regla es doble: la fe de la casa se respeta, y el cobro por miedo se desmonta, venga con la palabra que venga. La pregunta que decide: ¿qué pasa exactamente si se deja de pagar, y quién lo documenta?</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>⚛️ Caso 7: el curso cuántico de la prosperidad</h2>
+    <p>Un vendedor ofrece al autor un curso de «física cuántica de la prosperidad» a L 2.500: dice que la ciencia demostró que el pensamiento vibra y atrae dinero, y de paso que M.E.T.A.S podría revenderlo a sus usuarios.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔬 Física de decorado</span><br>
+      <span>Usa palabras de ciencia <span class="hl">sin enseñar un solo mecanismo comprobable</span>: la «vibración» nunca se mide y el único flujo documentado son los L 2.500. Es el contrario exacto de Lucrecio: <span class="hl2">esconde el mecanismo para vender; el poema lo enseñaba para curar</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la vara de la etapa sirve de detector: ¿enseña el mecanismo o lo esconde? La condición con que sí: que muestre el experimento que cualquiera pueda repetir. No existe, y la reventa en M.E.T.A.S ni se conversa: la plataforma enseña lo contrario.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🌀 Caso 8: el huracán y las dos listas</h2>
+    <p>Se anuncia un huracán para el fin de semana. En el mismo grupo de WhatsApp llegan dos mensajes: el aviso oficial con la ruta y las recomendaciones, y un video que grita que «esto es castigo y hay que prepararse espiritualmente», monetizado y con enlace de donación.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🌩️ Dos miedos con el mismo nombre</span><br>
+      <span>El primero es <span class="hl">miedo con mecanismo</span>: enseña de qué está hecho el peligro y qué hacer, y se convierte en lista de preparación. El segundo es <span class="hl2">miedo con cobrador</span>: no prepara nada, y el enlace de donación es su tetrafármaco al revés.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el miedo no es el enemigo: el enemigo es el miedo sin mecanismo. La casa hace la lista con el aviso oficial (agua, radio, documentos en alto), y el video se archiva como espécimen para esta misión. Miedo trabajado: cero lempiras; miedo comprado: lo que pida el cobrador.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>💊 El botiquín de la etapa, y las cinco reglas</h2>
+    <p>Ante cualquier miedo u oferta que toque la puerta de esta casa, se contesta por escrito antes de decidir:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué miedo o qué deseo trabaja aquí:</strong> y si tiene límite o pide sin fin.</li>
+      <li><strong>Qué mecanismo hay detrás:</strong> quién lo enseña, quién lo esconde.</li>
+      <li><strong>Quién cobra:</strong> y qué pasa exactamente con quien no paga.</li>
+      <li><strong>Qué frasco del tetrafármaco le toca:</strong> o qué distinción de la etapa lo resuelve.</li>
+      <li><strong>Qué condición escrita deja la casa:</strong> pensada en frío, no con alguien enfrente.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⚛️ Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">Todo lo que actúa está hecho de algo</span>, y se puede preguntar de qué. 2. El miedo que no enseña mecanismo <span class="hl">suele estar cobrando</span>. 3. El deseo sin límite es el anzuelo, no el premio. 4. La física de Demócrito está superada y el programa sigue vivo: <span class="hl">se dice cuál es cuál</span>. 5. Y <span class="hl2">se desmonta el miedo sin burlarse de quien lo vive</span>, porque esta casa también tiene miedos.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con los tres maestros y sus siglos, el tetrafármaco frasco por frasco, la tabla de los deseos, el poema y su miel, los ocho casos del proyecto, la <strong>hoja del desmontador</strong> para llenar a mano, seis ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-atomos-contra-miedo.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige en toda la ruta: <strong>ningún estudio, obra o cifra entra sin su etiqueta</strong> (clásico sólido, clásico cuestionado, ciencia en disputa, divulgación con inflado).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Epicuro, Carta a Meneceo:</strong> la física convertida en medicina, de primera mano. Clásico sólido: se lee entera, y cabe en una tarde.</li>
+      <li><strong>Lucrecio, De rerum natura (siglo I a. C.):</strong> el programa en verso, seis libros. Clásico sólido y además literatura: se lee en selección, libros I y III.</li>
+      <li><strong>Demócrito (siglo V a. C.):</strong> no queda ningún libro entero; se le lee <strong>por fragmentos y doxografía</strong>, y así se dice cada vez que se le cita. Clásico sólido en lo que los fragmentos permiten afirmar.</li>
+      <li><strong>Diógenes Laercio, Vidas de los filósofos ilustres, libro X:</strong> la fuente antigua que preserva las cartas de Epicuro. Se lee como lo que es: un compilador tardío, valioso y de segunda mano.</li>
+      <li><strong>Stephen Greenblatt, El giro:</strong> la historia del hallazgo del manuscrito de Lucrecio en 1417. Divulgación con inflado: el relato del hallazgo es bueno; su caricatura de la Edad Media fue corregida por los medievalistas, y se lee con esa etiqueta puesta.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con <strong>el tetrafármaco aplicado a un miedo propio</strong> por escrito, y con la explicación de cinco minutos de por qué un poema de física quita el miedo.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: la materia 23 completa, con sus seis módulos y su advertencia epistémica.</li>
+      <li><a href="../../misiones/ruta-espejo-vigia-timon/vigia-timon.html">🪞 El vigía y el timón</a>: la puerta del Estudio Mayor. El registro del vigía sirve aquí: el miedo también sube partes falsos.</li>
+      <li><a href="../../misiones/epistemología/karl-popper.html">🦉 Karl Popper y la Epistemología</a>: qué hace comprobable a una afirmación. La vara con que aquí se mide al vendedor cuántico.</li>
+      <li><a href="../../misiones/ruta-persuasion-sesgos/sesgos.html">🧠 Los sesgos de la mente</a>: las palancas con que el miedo y el deseo empujan. Aquí se ve quién las cobra.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 2 muda la pregunta del cuerpo a la sociedad: el hombre máquina y la base material.</li>
+      <li><a href="../../fichas/ficha-atomos-contra-miedo.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: el tetrafármaco y la hoja del desmontador caben en una página cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> leer la Carta a Meneceo entera (una tarde), tomar <strong>un miedo real de esta casa</strong> y pasarlo por el tetrafármaco por escrito: qué lo sostiene, qué mecanismo tiene, qué frasco le toca y qué queda de él después de verlo entero. La prueba de que está aprendida es <strong>corregir con precisión a quien confunda esta materia con el consumismo</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">⚛️</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de los Átomos y los Ídolos · Etapa 1: Átomos contra el miedo</div>
+    <div class="diploma-mascot" aria-hidden="true">⚛️</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">⚛️</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Quien conoce el mecanismo deja de pagarle al miedo» 🌱 · ⚛️ Ruta de los Átomos y los Ídolos · Etapa 1 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/atomos-miedo.js"></script>
+</body>
+</html>

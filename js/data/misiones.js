@@ -130,6 +130,7 @@ const MISSIONS = [
   { id: 25, title: 'Anatomía de la Constitución de 1982: qué declara y cómo se reforma', modulo: 'aprendizaje-unido', materia: 'ley', color: 'apr', xp: 45, icon: '📜', ruta: 'ley', etapa: 2, sello: 'familiar', url: 'misiones/ruta-ley-anatomia-constitucion/anatomia-constitucion.html' },
   { id: 26, title: 'Los derechos y la coletilla que los devuelve', modulo: 'aprendizaje-unido', materia: 'ley', color: 'apr', xp: 50, icon: '🎭', ruta: 'ley', etapa: 3, sello: 'familiar', url: 'misiones/ruta-ley-coletilla/coletilla.html' },
   { id: 27, title: 'El vigía y el timón: el piso que estudia y el piso que vigila', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🪞', ruta: 'espejo', etapa: 1, sello: 'familiar', url: 'misiones/ruta-espejo-vigia-timon/vigia-timon.html' },
+  { id: 28, title: 'Átomos contra el miedo: la física que quita los dos miedos', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '⚛️', ruta: 'atomos', etapa: 1, sello: 'familiar', url: 'misiones/ruta-atomos-contra-miedo/atomos-miedo.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -344,8 +345,9 @@ const ETAPAS_PREVISTAS = {
     5: "El político también cobra",
     6: "Honduras, el laboratorio",
   },
+  /* La etapa 1 ya está construida: su título sale de MISSIONS, no de aquí,
+     igual que se hizo con espejo. */
   atomos: {
-    1: "Átomos contra el miedo",
     2: "El hombre máquina y la base material",
     3: "La frontera de la conciencia",
     4: "Los tres géneros y la symploké",
