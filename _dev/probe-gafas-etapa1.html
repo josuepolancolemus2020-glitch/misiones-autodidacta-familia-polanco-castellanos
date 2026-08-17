@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de las Gafas a la Vista, etapa 1</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-gafas-palabra-expediente/gafas-expediente.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 1 de la Ruta de las Gafas a la Vista (Estudio de las
+   Ideologías, materia 25 del Estudio Mayor): bancos, laboratorio, pruebas
+   impresas con su nombre, los ocho casos, la ficha, la ruta en el mapa, y
+   LAS DOS SECCIONES DE LA NORMA 5: el guion de video con su estructura y
+   las tres lecturas con su etiqueta de ejercicio de estilo.
+
+   La REGLA DEL ESTATUS del compendio rige también aquí: Destutt de Tracy
+   con 1796 y su etiqueta de clásico de historia de las ideas (se cita por
+   el origen del término), «La ideología alemana» escrita en 1845-1846 y
+   PUBLICADA COMPLETA EN 1932, la carta de Engels a Franz Mehring del 14 de
+   julio de 1893 como la fuente REAL de «falsa conciencia» (la frase exacta
+   no está en la obra publicada de Marx, y ese matiz es medio módulo),
+   Mannheim 1929 como clásico sólido con debates vivos, y Geertz 1964 (en
+   «La interpretación de las culturas», 1973) como clásico sólido; y el
+   pastiche de las lecturas declarado como pastiche, porque una misión que
+   enseñara a pedir fuentes citando mal las suyas sería el error que quiere
+   evitar. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try {
+    appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+    appFrame.contentWindow.localStorage.removeItem('faro_v1');
+  } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 17, '17 secciones (15 del molde + guion + lecturas)', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de las Gafas a la Vista · Etapa 1 de 7/.test(d.body.textContent), 'se presenta como etapa 1 de 7', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se copió de la etapa 1 del Expediente Rojo. Se
+       excluyen los puntos de Recursos que enlazan a las misiones hermanas a
+       propósito; todo lo demás se mira entero. */
+    const cuerpoSinEnlaces = (() => {
+      const clon = d.body.cloneNode(true);
+      clon.querySelectorAll('a[href*="ruta-rojo-acero-juicio"], a[href*="ruta-espejo-vigia-timon"], a[href*="ruta-atomos-contra-miedo"]').forEach(a => {
+        const li = a.closest('li'); (li || a).remove();
+      });
+      return clon.textContent;
+    })();
+    ok(!/hombre de acero|hombre de paja|marxista|Caplan|prueba de Turing|Farm to Factory|báscula pareja|horquilla|Expediente Rojo/i.test(cuerpoSinEnlaces),
+       'sin restos de la misión de la que se copió', 'queda vocabulario del acero o del expediente rojo');
+    ok(!/tetrafármaco|Epicuro|Lucrecio|vigía|timón|metacognición/i.test(cuerpoSinEnlaces),
+       'sin restos de las otras misiones del Estudio Mayor', 'queda vocabulario de los átomos o del espejo');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── LA REGLA DEL ESTATUS (la regla del Estudio Mayor) ──');
+    const texto0 = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/1796/.test(texto0) && /Destutt de Tracy/.test(texto0), 'Destutt de Tracy con el año del término (1796)', 'falta el origen de la palabra con su autor');
+    ok(/1801/.test(texto0) && /1815/.test(texto0) && /clásico de historia de las ideas/i.test(texto0),
+       'Elementos de ideología (1801 a 1815) con su etiqueta', 'falta la obra de Tracy etiquetada');
+    ok(/por el origen del término/i.test(texto0) && /no se lee entera?/i.test(texto0),
+       'se declara que Tracy se cita por el origen y no se lee entero', 'no se declara cómo entra Tracy');
+    ok(/1845/.test(texto0) && /1846/.test(texto0) && /1932/.test(texto0),
+       'La ideología alemana con las dos fechas (escrita y publicada completa)', 'faltan las fechas de La ideología alemana');
+    ok(/fuente primaria/i.test(texto0), 'La ideología alemana entra como fuente primaria', 'no se declara la fuente primaria');
+    ok(/Mehring/.test(texto0) && /14 de julio de 1893/.test(texto0),
+       'la carta a Franz Mehring, con su fecha exacta', 'falta la carta de 1893 con fecha');
+    ok(/no est[áa] en la obra publicada de Marx/i.test(texto0),
+       'se dice EXPLÍCITO que «falsa conciencia» no está en la obra publicada de Marx', 'no se dice el matiz que es medio módulo');
+    ok(/Mannheim/.test(texto0) && /1929/.test(texto0) && /clásico sólido/i.test(texto0),
+       'Mannheim (1929) como clásico sólido', 'falta Mannheim etiquetado');
+    ok(/debates vivos/i.test(texto0), 'y con sus debates vivos declarados', 'falta el matiz de los debates vivos');
+    ok(/Geertz/.test(texto0) && /1964/.test(texto0) && /1973/.test(texto0),
+       'Geertz con 1964 y con el libro de 1973', 'falta Geertz con sus dos fechas');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('idData.length') === 8 && dentro('cmpData.length') === 8, 'identifica 8 y completa 8', 'identifica/completa incompletos');
+    ok(dentro('routeSets.length') === 3, '3 secuencias para ordenar', 'secuencias: ' + dentro('routeSets.length'));
+    ok(dentro('neuronPartes.length') === 8 && dentro('neuroPairs.length') === 5 && dentro('enfermedadData.length') === 6,
+       'los tres widgets con sus bancos (8, 5 y 6)', 'bancos de widgets incompletos');
+    ok(dentro('identifyTaskDB.length') === 10 && dentro('classifyTaskDB.length') === 10 && dentro('completeTaskDB.length') === 8 && dentro('explainQuestions.length') === 6,
+       'los cuatro bancos del generador de tareas', 'bancos del generador incompletos');
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('evalMCBank.every(q => typeof q.a === "number" && q.o[q.a])'),
+       'la evaluación final sabe cuál es la respuesta correcta', 'evalMCBank no trae la clave «a»');
+    ok(dentro('critCaseBank.length') === 8 && dentro('critDecisionBank.length') === 8, 'la prueba competencial trae sus 8 casos y 8 decisiones', 'faltan casos o decisiones de la competencial');
+    ok(dentro('critCaseQuestions.length') === 4 && dentro('critCaseGuides.length') === 4 && dentro('critErrorBank.length') === 6 && dentro('critCompareBank.length') === 4 && dentro('critCauseBank.length') === 6 && dentro('critEffectBank.length') === 6,
+       'los ocho bancos de la prueba competencial completos', 'algún banco de la competencial quedó corto');
+    ok(dentro('critCompareBank.every(c => c.gr)'), 'las comparaciones traen su cierre (gr) para la pauta', 'critCompareBank sin campo gr');
+    ok(dentro('Object.keys(parteData).join(",")') === 'tracy,camara,falsa,mapa', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'los 7 momentos del expediente', 'momentos: ' + dentro('timelineData.length'));
+    ok(dentro('lvls.length') === 7 && dentro('Object.keys(ACHIEVEMENTS).length') === 8, 'los 7 niveles de XP y los 8 logros', 'niveles o logros incompletos');
+    ok(/faro_gafas_expediente/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LO QUE LA ETAPA TIENE QUE ENSEÑAR ──');
+    const texto = texto0;
+    ok(/nació ciencia y quedó insulto/i.test(texto), 'nació ciencia y quedó insulto', 'falta la frase que ordena el expediente');
+    ok(/Napole/.test(texto) && /ideólogos/i.test(texto), 'Napoleón y la burla de los «ideólogos»', 'falta la torcedura de la palabra');
+    ok(/cámara oscura/i.test(texto), 'la cámara oscura de Marx y Engels', 'falta la cámara oscura');
+    ok(/clase dominante/i.test(texto), 'las ideas dominantes son las de la clase dominante', 'falta la tesis de las ideas dominantes');
+    ok(/falsa conciencia/i.test(texto), 'la falsa conciencia', 'falta la falsa conciencia');
+    ok(/autoinmuniza/i.test(texto) && /despierto entre dormidos/i.test(texto),
+       'su crítica: se autoinmuniza y el que la usa se declara despierto entre dormidos', 'falta la crítica de la falsa conciencia');
+    ok(/relacionismo/i.test(texto) && /relativismo/i.test(texto), 'el relacionismo, distinguido del relativismo', 'falta la distinción de Mannheim');
+    ok(/no es (una )?patología/i.test(texto) && /mapa/i.test(texto), 'la ideología como mapa y no como patología', 'falta el giro de Geertz');
+    ok(/sentido común/i.test(texto), 'el uso tramposo: «sentido común» para el propio bando', 'falta el uso tramposo');
+    ok(/gafas a la vista/i.test(texto), 'la meta: tener las gafas a la vista', 'falta la meta declarada');
+    ok(/regla de pago/i.test(texto), 'la regla de pago (uno propio por cada ajeno)', 'falta la regla de pago');
+    ok(/no es instrumento, es arma|no es un instrumento, es un arma/i.test(texto),
+       'el detector que no se prueba en casa es arma', 'falta el cuidado central del compendio');
+
+    log('\n── EL GUION DE VIDEO (norma 5) ──');
+    const guion = d.getElementById('s-guion');
+    ok(!!guion, 'existe la sección de guion', 'falta la sección s-guion');
+    if (guion) {
+      const tg = guion.textContent;
+      ok(guion.querySelectorAll('.card').length >= 8, 'trae sus escenas en tarjetas', 'tarjetas del guion: ' + guion.querySelectorAll('.card').length);
+      ok((tg.match(/VOZ/g) || []).length >= 7, 'cada escena trae su VOZ', 'faltan voces: ' + (tg.match(/VOZ/g) || []).length);
+      ok((tg.match(/IMAGEN/g) || []).length >= 7, 'cada escena trae su IMAGEN', 'faltan imágenes');
+      ok((tg.match(/TEXTO EN PANTALLA/g) || []).length >= 7, 'cada escena trae su TEXTO EN PANTALLA', 'faltan textos en pantalla');
+      ok(/gancho/i.test(tg) && /giro/i.test(tg) && /cierre/i.test(tg), 'la estructura del relato está nombrada (gancho, giro, cierre)', 'falta la estructura de storytelling');
+      ok(/espejo/i.test(tg) && /objeción/i.test(tg) && /herramienta/i.test(tg), 'y también el espejo, la herramienta y la objeción', 'falta alguna pieza de la estructura obligatoria');
+      ok(/Escena 1/.test(tg) && /Escena 7/.test(tg), 'las escenas van numeradas de la 1 a la 7', 'faltan escenas numeradas');
+      ok(/estructura del guion, desarmada/i.test(tg), 'la estructura queda desarmada para las siguientes misiones', 'falta la tabla normativa de estructura');
+      /* Nada de definiciones antes del minuto dos: la escena del giro, donde
+         entra la primera fecha, no puede empezar antes de 2:00. */
+      ok(/2:40/.test(tg) && /Escena 4 · El giro/.test(tg), 'el giro con la primera definición llega pasado el minuto dos', 'la definición llega demasiado pronto');
+      ok(!!d.querySelector('.nav-t[data-s="s-guion"]'), 'está en la barra de navegación', 'no aparece en la barra');
+    }
+
+    log('\n── LAS TRES LECTURAS (norma 5) ──');
+    const lect = d.getElementById('s-lecturas');
+    ok(!!lect, 'existe la sección de lecturas', 'falta la sección s-lecturas');
+    if (lect) {
+      const tl = lect.textContent;
+      ok(/Borges/.test(tl) && /Cervantes/.test(tl) && /Harari/.test(tl), 'las tres voces están nombradas', 'faltan las voces');
+      ok(/ejercicio(s)? de estilo/i.test(tl) && /No son obra de esos autores/i.test(tl), 'el pastiche va declarado (regla del estatus)', 'el pastiche no se declara');
+      ok(/El hombre que miraba sin gafas/.test(tl), 'el cuento a la manera de Borges está', 'falta el cuento');
+      ok(/Donde se cuenta/.test(tl) && /Sancho/.test(tl) && /don Quijote/.test(tl), 'el capítulo cervantino está, con Sancho adentro', 'falta el capítulo cervantino');
+      ok(/Los mapas invisibles/.test(tl) && /sapiens/i.test(tl), 'el ensayo a la manera de Harari está', 'falta el ensayo');
+      /* Las rayas de diálogo del capítulo cervantino son guiones largos y
+         violan la norma 1-bis: van en paréntesis. Se comprueba aquí porque
+         es el error que se cazó en la misión anterior. */
+      ok(/\(dijo don Quijote\)|\(respondió Sancho\)/.test(tl), 'los diálogos cervantinos van en paréntesis, no con raya', 'el capítulo usa rayas de diálogo');
+      /* La regla del autor: la erudición interna es REAL. La sonda exige las
+         anclas comprobables y la declaración de datos reales. */
+      ok(/reales/i.test(tl) && /citas (apócrifas|inventadas)/i.test(tl), 'declara los datos reales y el vicio quitado a Borges', 'no se declara la erudición real');
+      ok(/Destutt de Tracy/.test(tl) && /1796/.test(tl), 'ancla real: Destutt de Tracy y 1796', 'falta el origen del término dentro de los textos');
+      ok(/Elementos de ideología/.test(tl) && /1801/.test(tl) && /1815/.test(tl), 'ancla real: Elementos de ideología (1801 a 1815)', 'falta la obra de Tracy');
+      ok(/Napole/.test(tl), 'ancla real: Napoleón y los «ideólogos»', 'falta Napoleón');
+      ok(/Mehring/.test(tl) && /14 de julio de 1893/.test(tl), 'ancla real: la carta de Engels a Mehring (1893)', 'falta la carta con su fecha');
+      ok(/Mannheim/.test(tl) && /1929/.test(tl) && /Ideología y utopía/.test(tl), 'ancla real: Mannheim, Ideología y utopía (1929)', 'falta Mannheim con su obra');
+      ok(/Geertz/.test(tl) && /1964/.test(tl) && /1973/.test(tl), 'ancla real: Geertz (1964) y el libro de 1973', 'falta Geertz con sus fechas');
+      ok(/1932/.test(tl), 'ancla real: la publicación completa de 1932', 'falta la fecha de publicación');
+      ok(/1605/.test(tl) && /(capítulo cuarenta y cuatro|I, 44|capítulo 44)/i.test(tl), 'ancla real: la bacía y el yelmo (Quijote I, 44 a 45, de 1605)', 'falta el ancla del Quijote');
+      ok(/1933/.test(tl), 'ancla real: Mannheim sale de Alemania en 1933', 'falta el dato biográfico comprobable');
+      /* Las tres lecturas deben ENSEÑAR el tema, no solo sonar bonito */
+      ok(/relacionismo/i.test(tl) && /mapa/i.test(tl), 'las lecturas explican el tema de la etapa', 'las lecturas no tocan el tema');
+      ok(/sentido común/i.test(tl) || /antojos/i.test(tl), 'el uso tramposo aparece dentro de los textos', 'los textos no cargan el concepto');
+      ok(!!d.querySelector('.nav-t[data-s="s-lecturas"]'), 'está en la barra de navegación', 'no aparece en la barra');
+    }
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/La palabra que nació ciencia/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en la palabra que nació ciencia', 'abre en otra pieza');
+    ok(!!d.querySelector('.lab-cont-btn[data-parte="tracy"]'), 'el botón de la pieza inicial existe', 'el laboratorio arrastra la pieza del molde');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-tareas'); await esperar(150);
+    w.genTask(); await esperar(200);
+    const tareas = d.getElementById('tgOut').textContent;
+    ok(tareas.length > 200, 'el generador de tareas produce su hoja', 'generador vacío');
+    ok(!/hombre de acero|firmaría/i.test(tareas), 'el ejemplo del generador es de esta misión', 'el generador arrastra el ejemplo del molde');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'las gafas sobre la mesa se generan', 'prueba competencial vacía');
+    ok(!/undefined/.test(crit), 'la competencial no pinta undefined', 'hay un undefined en la prueba competencial');
+    const rotulos = [d.getElementById('eval-screen-title'), d.getElementById('evalcrit-screen-title'),
+                     d.getElementById('evalOut'), d.getElementById('evalCritOut'),
+                     d.querySelectorAll('.eval-print-header')[0]].map(x => x.textContent).join(' · ');
+    ok(/La palabra con expediente/.test(rotulos) && /Las gafas sobre la mesa/.test(rotulos),
+       'los rótulos de prueba llevan el nombre correcto', 'los rótulos no traen el nombre de esta misión');
+    ok(!/acero|Expediente Rojo|átomos|vigía|timón/i.test(rotulos),
+       'y no traen el nombre de la misión anterior', 'las pruebas traen el nombre de otra misión');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['dirigente magisterial', '60,000', 'glosario', 'emprender es el camino', 'grupo de padres', '4,500', 'falsa conciencia', 'Angelly', 'sentido común']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok((txt.match(/Lo que enseña/g) || []).length >= 6, 'los casos cierran con lo que enseñan', 'casos con lección: ' + (txt.match(/Lo que enseña/g) || []).length);
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      ok(/L \d/.test(txt), 'los casos traen números en lempiras', 'los casos no traen lempiras');
+      ok(/hoja de las gafas/i.test(txt), 'trae la hoja de las gafas', 'falta la hoja de las gafas');
+      ok(/cinco reglas/i.test(txt), 'trae las cinco reglas de la etapa', 'faltan las cinco reglas');
+      ok(/regla de pago/i.test(txt), 'trae la regla de pago', 'falta la regla de pago');
+      /* El giro hacia adentro es el cuidado central del compendio: uno de los
+         ocho casos tiene que auditar una premisa de la propia casa. */
+      ok(/describe el mundo o describe a esta casa/i.test(txt) || /premisa, no un dato/i.test(txt),
+         'al menos un caso gira el detector hacia la propia casa', 'ningún caso audita las premisas propias');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/60,000|4,500|Angelly|grupo de mensajes|magisterial/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── EL WIDGET DE ORDENAR (arrastre y linterna) ──');
+    w.go('s-widgets'); await esperar(200);
+    const lista = d.getElementById('routeList');
+    ok(!!lista && lista.children.length >= 5, 'la lista de pasos se pinta', 'la lista de pasos no se pintó');
+    ok(!!d.querySelector('.sort-grip'), 'cada tarjeta trae su asa para arrastrar', 'falta el asa de arrastre');
+    ok(w.getComputedStyle(lista.children[0]).touchAction === 'none',
+       'arrastrar la tarjeta no arrastra la página (touch-action)', 'sin touch-action: el gesto se lo lleva el navegador');
+    ok(typeof w.routeAgarra === 'function' && typeof w.routeArrastra === 'function' && typeof w.routeSuelta === 'function',
+       'las tres piezas del arrastre existen', 'falta alguna función del arrastre');
+    /* El arrastre de verdad: se toma la primera tarjeta y se suelta tres
+       lugares más abajo, y se comprueba que el banco quedó reordenado.
+       routeItems se declara con let, así que se lee con eval y no por
+       window, igual que el resto de los bancos de esta sonda. */
+    const antesOrden = dentro('routeItems.slice()');
+    const filasW = [...lista.children];
+    const altoW = filasW[1].getBoundingClientRect().top - filasW[0].getBoundingClientRect().top;
+    filasW[0].dispatchEvent(new w.PointerEvent('pointerdown', { pointerId: 7, clientY: 100, bubbles: true, cancelable: true }));
+    filasW[0].dispatchEvent(new w.PointerEvent('pointermove', { pointerId: 7, clientY: 100 + altoW * 3, bubbles: true }));
+    filasW[0].dispatchEvent(new w.PointerEvent('pointerup', { pointerId: 7, clientY: 100 + altoW * 3, bubbles: true }));
+    await esperar(150);
+    const despuesOrden = dentro('routeItems.slice()');
+    ok(despuesOrden[3] === antesOrden[0] && despuesOrden[0] === antesOrden[1],
+       'arrastrar tres lugares mueve el paso a su nuevo sitio', 'el arrastre no reordenó');
+    /* La linterna enseña el número que le toca a cada tarjeta, y cobra su
+       precio: esa secuencia deja de dar XP, y se dice en pantalla. */
+    ok(typeof w.linternaRoute === 'function', 'la linterna existe', 'falta linternaRoute');
+    w.linternaRoute(); await esperar(150);
+    ok(d.querySelectorAll('.sort-luz-chip').length === filasW.length, 'la linterna numera todas las tarjetas', 'la linterna no numeró');
+    ok(!!d.querySelector('.sort-luz-ok, .sort-luz-no'), 'y marca cuáles están en su sitio', 'la linterna no marca aciertos');
+    ok(/Apagar/.test(d.getElementById('btnLinterna').textContent), 'el botón avisa que está encendida', 'el botón no cambia de rótulo');
+    const xpAntes = dentro('xp');
+    dentro('routeItems = routeSets[currentRouteIdx].steps.slice()');
+    w.renderRoute(); w.checkRoute(); await esperar(120);
+    ok(dentro('xp') === xpAntes, 'el orden acertado con linterna no suma XP', 'la linterna regaló XP: ' + xpAntes + ' → ' + dentro('xp'));
+    ok(/no suma XP/i.test(d.getElementById('fbRoute').textContent), 'y lo dice en pantalla, sin trampa', 'no avisa de que no suma');
+    w.linternaRoute(); await esperar(120);
+    ok(!d.querySelector('.sort-luz-chip'), 'la linterna se apaga', 'la linterna no se apaga');
+
+    log('\n── EL ENCABEZADO ES DE ESTA MISIÓN (norma 5-ter) ──');
+    /* La banda de palabras del encabezado vive en un ::before del CSS, así
+       que no aparece en el texto de la página: por eso se arrastró de misión
+       en misión desde la de Popper hasta que el autor la vio en pantalla. */
+    const banda = w.getComputedStyle(d.querySelector('.hero'), '::before').content || '';
+    ok(/IDEOLOG/.test(banda) && /GEERTZ|MANNHEIM|MEHRING/.test(banda), 'la banda del encabezado es de esta misión', 'banda ajena: ' + banda.slice(0, 60));
+    ok(!/SOCIEDAD ABIERTA|RACIONALISMO CRÍTICO|CISNE NEGRO/.test(banda), 'sin las palabras de la misión de Popper', 'la banda sigue siendo la de Popper');
+    ok(!/EL ACERO|HOMBRE DE PAJA|BÁSCULA PAREJA/.test(banda), 'sin las palabras de la misión del acero', 'la banda sigue siendo la del acero');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-gafas-palabra-expediente.html');
+    const txtF = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txtF.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txtF.match(/class="pagina"/g) || []).length);
+    ok(/La hoja de las gafas, para llenar a lápiz/i.test(txtF), 'la ficha trae la hoja de las gafas en blanco', 'falta la hoja de las gafas');
+    ok(/Una hoja de las gafas ya llena/i.test(txtF), 'y una ya llena, como ejemplo', 'falta el ejemplo lleno');
+    ok(/inventario de tres columnas/i.test(txtF), 'la ficha trae el inventario de tres columnas', 'falta el inventario de tres columnas');
+    ok(/cámara oscura/i.test(txtF) && /relacionismo/i.test(txtF), 'la ficha trae las piezas del temario', 'faltan piezas del temario');
+    ok(/14 de julio de 1893/.test(txtF) && /no est[áa] en la obra publicada de Marx/i.test(txtF),
+       'la ficha declara la fuente real de «falsa conciencia»', 'la ficha no declara la fuente real');
+    ok(/por el origen del término/i.test(txtF), 'la ficha declara cómo entra Destutt de Tracy', 'la ficha no declara el transporte de Tracy');
+    ok(/Hoja de fuentes/i.test(txtF), 'la ficha trae su hoja de fuentes', 'falta la hoja de fuentes');
+    ok(/Pauta completa de respuestas/.test(txtF), 'trae su pauta', 'sin pauta');
+    ok(!/—/.test(txtF), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok((txtF.match(/<table/g) || []).length === (txtF.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar');
+    ok(/clásico sólido/i.test(txtF) && /fuente primaria/i.test(txtF), 'las fuentes de la ficha llevan etiqueta', 'la ficha cita sin estatus');
+    ok(!/acero|Caplan|Farm to Factory|Expediente Rojo/i.test(txtF), 'la ficha no arrastra el temario del molde', 'la ficha trae restos del acero');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-gafas-palabra-expediente"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const ruta = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de las Gafas a la Vista/.test(c.textContent));
+    ok(!!ruta, 'la Ruta de las Gafas a la Vista está en el mapa', 'no aparece la ruta');
+    if (ruta) {
+      ok(ruta.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 6, 'y 6 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/La palabra con expediente/.test(ruta.textContent), 'la etapa 1 sale con el título de la misión', 'la etapa 1 no sale con su título');
+      ok(/El bisturí de Freeden/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+      ok(!/Etapa por construir/.test(ruta.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="mayor"]');
+    ok(!!chip, 'la materia Estudio Mayor tiene su chip', 'no hay chip del Estudio Mayor');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length === 4, 'la materia muestra sus cuatro misiones', 'muestra ' + tarjetas.length);
+      const t = tarjetas.find(x => /palabra con expediente/i.test(x.textContent));
+      ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda gafas etapa 1';
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · Sonda gafas etapa 1'; }
+});
+</script>
+</body>
+</html>

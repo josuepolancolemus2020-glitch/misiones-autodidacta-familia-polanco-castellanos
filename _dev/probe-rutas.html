@@ -69,6 +69,15 @@ f.onload = async () => {
     const rojo = [...cards].find(c => /Ruta del Expediente Rojo/.test(c.textContent));
     ok(!!rojo && rojo.querySelectorAll('.re-link').length === 1 && rojo.querySelectorAll('.ruta-etapa-futura').length === 6,
        'el Expediente Rojo declara sus 7 etapas (1 construida y 6 previstas)', 'falta el Expediente Rojo completo');
+    /* Las Gafas a la Vista también tienen la etapa 1 construida (La palabra
+       con expediente): 1 tocable y 6 previstas, siempre 7 en total. El título
+       de la construida tiene que venir de MISSIONS, y por eso su clave se
+       borró de ETAPAS_PREVISTAS.gafas. */
+    const gafas = [...cards].find(c => /Ruta de las Gafas a la Vista/.test(c.textContent));
+    ok(!!gafas && gafas.querySelectorAll('.re-link').length === 1 && gafas.querySelectorAll('.ruta-etapa-futura').length === 6,
+       'las Gafas a la Vista declaran sus 7 etapas (1 construida y 6 previstas)', 'falta la ruta de las Gafas completa');
+    if (gafas) ok(/La palabra con expediente/.test(gafas.textContent) && !/Etapa por construir/.test(gafas.textContent),
+       'la etapa 1 de las Gafas toma su título de MISSIONS', 'la etapa 1 de las Gafas no sale con su título');
     /* Cinco rutas del adulto van por la etapa 3 y la Casa Cerrada por la 4.
        Si alguna se queda corta es que la misión nueva no llegó al catálogo. */
     [['Ruta de la Persuasión', 3], ['Ruta de la Marca', 3], ['Ruta del Poder', 3],

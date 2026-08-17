@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de las Gafas a la Vista · Etapa 1: La palabra con expediente | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/gafas-expediente.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Usa la palabra como insulto 🗣️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">👓</div>
+    <div class="hero-text">
+      <h1>La palabra con expediente: <span>nació ciencia y quedó insulto</span></h1>
+      <p class="sub">Nadie mira a ojo desnudo, y el oficio es ver las gafas 👓</p>
+      <div class="badge">👓 Ruta de las Gafas a la Vista · Etapa 1 de 7</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>👓 La palabra que todos usan y casi nadie ha definido</h2>
+    <p>Esta es la primera etapa del Estudio de las Ideologías, y arranca por donde arranca el problema: <strong>«ideología» funciona hoy como un insulto que siempre señala al otro bando</strong>. Nadie dice «mi ideología»; se dice «la ideología de ellos» y «el sentido común de nosotros». Esa asimetría no es un descuido del habla: es el uso tramposo más común de la palabra, y esta etapa lo caza.</p>
+    <p>El remedio no es una definición bonita: es <strong>el expediente completo</strong>, es decir, de dónde salió la palabra, quién la torció, qué significados le fueron añadiendo y qué trampa trae adentro cada uno. Con el expediente en la mano, la palabra deja de ser un arma que se lanza y se vuelve <strong>un objeto de estudio que se puede sostener sin quemarse</strong>.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La vara de la etapa.</strong> Quien termina <strong>maneja la palabra con su expediente completo</strong> (1796, la cámara oscura, la carta de 1893, el relacionismo, el mapa) y detecta el uso tramposo: el que reserva «ideología» para el bando contrario y «sentido común» para el propio. La ruta entera se construye sobre eso; sin la palabra en orden, lo que viene después son etiquetas volando.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>⚗️ Nació ciencia, quedó insulto</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>⚗️ Lo que la palabra quiso ser</h4>
+        <p><strong>Antoine Destutt de Tracy</strong> acuñó «ideología» hacia <strong>1796</strong> como el nombre de una ciencia: el estudio de cómo se forman las ideas. Su obra, <strong>«Elementos de ideología» (1801 a 1815)</strong>, se cita aquí <strong>por el origen del término</strong>, no se lee entera: es un clásico de la historia de las ideas.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🗣️ En qué la convirtieron</h4>
+        <p><strong>Napoleón</strong>, incómodo con esos intelectuales, convirtió «ideólogos» en <strong>burla</strong>: gente de ideas sin realidad. La palabra <strong>nunca se recuperó</strong>. Nació ciencia y quedó insulto, y desde entonces cada bando la usa como la usó el emperador: apuntando al otro.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔎 Por qué el dato de 1796 no es adorno</span><br>
+      <span>Porque cambia quién carga la prueba. Si «ideología» fuera de nacimiento <span class="hl">el nombre del error ajeno</span>, quien la usa no debería explicar nada. Si nació como <span class="hl2">el nombre de una ciencia sobre la formación de las ideas</span>, entonces se aplica a todas las cabezas, empezando por la de quien habla.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 El expediente, en siete momentos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué pasó, qué se toma de ahí y qué cuidado pide.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento del expediente.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la palabra en la mesa</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide cómo contesta la casa cuando a M.E.T.A.S le dicen «eso es ideológico».</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🎒</span><span class="ms-text"><strong>Angelly llega con el recado:</strong> a la maestra le comentaron que las fichas de M.E.T.A.S «son ideológicas». Angelly quiere saber si eso es cierto y qué se contesta.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">📅</span><span class="ms-text"><strong>La mesa abre el expediente:</strong> la palabra nació en 1796 como nombre de una ciencia y Napoleón la volvió burla. Con eso ya se sabe que la frase no describe: acusa.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🪤</span><span class="ms-text"><strong>Llega la tentación:</strong> contestar que nosotros no tenemos ideología, que lo nuestro es sentido común. Es la salida cómoda, y es exactamente la trampa que la etapa enseña a cazar.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🎭</span><span class="ms-text"><strong>Lo que tienes delante:</strong> dos maneras de contestar el mismo recado, y una niña mirando cuál se escoge.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Cómo contesta la casa?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🗣️ «Nosotros no: lo nuestro es sentido común»</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">👓 El expediente: nombrar los dos mapas</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔍 Los cuatro sentidos que la palabra fue acumulando</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La palabra no cambió de significado: los fue apilando, y hoy los cuatro viven a la vez en cualquier discusión. Saber cuál está usando el que habla es media pelea ganada.</p>
+    <table class="tres">
+      <tr><th>Sentido</th><th>Qué afirma</th><th>De dónde sale</th></tr>
+      <tr><td>La ciencia de las ideas</td><td>Estudiar cómo se forman las ideas en cualquier cabeza</td><td>Destutt de Tracy, hacia 1796; «Elementos de ideología» (1801 a 1815)</td></tr>
+      <tr><td>El insulto</td><td>«Ideólogo» es el que vive de ideas y no ve la realidad</td><td>Napoleón, incómodo con esos intelectuales</td></tr>
+      <tr><td>La inversión del mundo</td><td>Las ideas dominantes son las de la clase dominante, y el mundo se ve al revés, como en una cámara oscura</td><td>Marx y Engels, «La ideología alemana» (escrita 1845 a 1846, publicada completa en 1932)</td></tr>
+      <tr><td>El mapa</td><td>No es patología: es el plano con que una sociedad se deja leer</td><td>Geertz, «La ideología como sistema cultural» (1964)</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 Por qué importa el orden</span><br>
+      <span>Porque cada sentido nuevo <span class="hl">no borró al anterior</span>: hoy alguien puede decir «ideología» queriendo decir ciencia, burla, ceguera de clase o mapa, y las cuatro cosas suenan igual. Pedir el sentido antes de discutir <span class="hl2">ahorra la mitad de las peleas y descubre la otra mitad</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📷 La cámara oscura, y el problema que trae adentro</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Marx y Engels le dieron a la palabra su segundo gran sentido en <strong>«La ideología alemana»</strong>: las ideas dominantes de una época son las ideas de la clase dominante, y la ideología <strong>invierte el mundo «como en una cámara oscura»</strong>. La imagen es potente, y por eso mismo hay que mirarla despacio.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Lo que hace bien</th><th>El problema que trae</th></tr>
+      <tr><td>La cámara oscura</td><td>Explica que las ideas tienen dueño y dirección, no caen del cielo</td><td>Supone que hay una posición desde la cual el mundo se ve derecho, y no dice cuál</td></tr>
+      <tr><td>Las ideas de la clase dominante</td><td>Manda a buscar quién gana con que algo parezca obvio</td><td>Si se aplica solo hacia afuera, es una llave que abre todas las puertas menos la propia</td></tr>
+      <tr><td>La publicación en 1932</td><td>Recuerda que la obra durmió ochenta y seis años en un cajón</td><td>Se cita a menudo como si hubiera circulado desde 1846, y no fue así</td></tr>
+      <tr><td>La «falsa conciencia»</td><td>Nombra algo real: creer sinceramente lo que a otro le conviene</td><td>La frase exacta no está en la obra publicada de Marx, y como concepto se autoinmuniza</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">✉️ La nota honesta, que va primero y no al final</span><br>
+      <span>«Falsa conciencia» <span class="hl">no es una frase de la obra publicada de Marx</span>: es de <strong>Engels</strong>, en su <strong>carta a Franz Mehring del 14 de julio de 1893</strong>. Decirlo no es un detalle de erudición: <span class="hl2">es medio módulo</span>, porque el concepto más citado del tema resulta ser una frase de correspondencia privada, escrita casi medio siglo después de la obra a la que se le atribuye.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🪞 La trampa de la falsa conciencia, estudiada el mismo día</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🔍 Lo que el concepto acierta</h4>
+        <p>Existe de verdad: gente que <strong>cree con toda sinceridad</strong> cosas que le hacen daño y le sirven a otro. Nombrar eso es útil, y explica por qué a veces el argumento correcto no mueve a nadie.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>⚠️ Cómo se autoinmuniza</h4>
+        <p>Quien diagnostica falsa conciencia <strong>se declara despierto entre dormidos</strong>: cada desacuerdo pasa a ser síntoma del otro, y ninguna objeción cuenta, porque objetar es más síntoma. <strong>Lo que explica cualquier respuesta no prohíbe ninguna.</strong></p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">La palabra nace</div><div class="stat-val">1796</div></div>
+      <div class="stat-item"><div class="stat-label">Carta a Mehring</div><div class="stat-val">1893</div></div>
+      <div class="stat-item"><div class="stat-label">Mannheim</div><div class="stat-val">1929</div></div>
+      <div class="stat-item"><div class="stat-label">Geertz</div><div class="stat-val">1964</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔭 Mannheim se muerde la cola, y Geertz baja la temperatura</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;"><strong>Karl Mannheim</strong>, en <strong>«Ideología y utopía» (1929)</strong>, generalizó el problema a propósito: si toda posición social produce su punto de vista, <strong>el desenmascarador también desenmascara desde alguno</strong>. En vez de esconder ese filo, le puso nombre: <strong>relacionismo</strong>, para no caer en el relativismo de que todo da igual. Cada mirada viene de un lugar, y aun así unas alumbran más que otras.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;"><strong>Clifford Geertz</strong>, en <strong>«La ideología como sistema cultural» (1964, recogido en «La interpretación de las culturas», 1973)</strong>, bajó la temperatura del debate: <strong>la ideología no es una patología sino un mapa</strong>, y aparece justo donde los mapas heredados dejaron de servir para leer una realidad social que se volvió confusa. Con eso la palabra deja de ser diagnóstico de enfermos y pasa a ser herramienta de lectura.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">⚗️ 1796</div><div class="t-info">La palabra nombra una ciencia</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🗣️ Napoleón</div><div class="t-info">«Ideólogos» se vuelve burla</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">📷 Cámara oscura</div><div class="t-info">El mundo visto al revés</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">✉️ 1893</div><div class="t-info">La carta de Engels a Mehring</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🔭 Relacionismo</div><div class="t-info">Mannheim, y no relativismo</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🗺️ El mapa</div><div class="t-info">Geertz: no patología, plano</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Lo práctico que sale de aquí: <strong>si el mapa es la condición de mirar, la meta no puede ser quitarse las gafas</strong>, que la propia materia demostró imposible. La meta es tenerlas <strong>a la vista</strong>: saber cuál es el mapa propio y poder decirlo en voz alta. El <strong>núcleo</strong> que una casa no negocia y la <strong>periferia</strong> que cambia con la década se dibujan con el instrumento de la etapa 2; aquí basta con dejar de creer que solo el vecino lleva gafas.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔧 El cuidado que gobierna el arco entero</span><br>
+      <span>En este arco <span class="hl">la regla del acero es la regla madre</span>: cada familia se pone en pie en su mejor versión antes de tocarla. Y el detector <span class="hl2">se gira hacia adentro, hacia las premisas de la propia casa</span>, porque un detector que no se prueba en casa no es un instrumento, es un arma.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller del expediente</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para manejar la palabra sin quemarte.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>La palabra que nació ciencia</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">👓 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="tracy" onclick="labShowParte('tracy')">⚗️ La palabra que nació ciencia</button>
+        <button class="lab-btn lab-cont-btn" data-parte="camara" onclick="labShowParte('camara')">📷 La cámara oscura</button>
+        <button class="lab-btn lab-cont-btn" data-parte="falsa" onclick="labShowParte('falsa')">✉️ La falsa conciencia</button>
+        <button class="lab-btn lab-cont-btn" data-parte="mapa" onclick="labShowParte('mapa')">🗺️ Del relacionismo al mapa</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿expediente o insulto?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: del insulto al expediente, paso a paso</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del expediente se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué está haciendo esa frase?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es esa frase dentro de la etapa:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Yo no tengo ideología: yo tengo sentido común»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">Una ficha atribuye «falsa conciencia» a El capital, y ahí lo deja</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">👓 Expediente</button>
+        <button class="btn btn-sec" onclick="">🗣️ Insulto</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">👓 Las gafas sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · La palabra con expediente · Ruta de las Gafas a la Vista</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: la palabra con expediente</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · Las gafas sobre la mesa · La palabra con expediente</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">👓 Las gafas sobre la mesa: la palabra con su expediente</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso alguien usa la palabra «ideología» para nombrar el mapa ajeno. Di en qué sentido la está usando (ciencia, insulto, cámara oscura o mapa), qué mete y qué saca la salida cómoda, qué fuente o fecha necesita su etiqueta de estatus, y qué condición escrita deja la casa nombrando también su propio mapa (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">👓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>👓 Casos del proyecto: la palabra en esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas alguien usa «ideología» para nombrar el mapa del otro, y en todas la pregunta es la misma: <strong>¿qué mapa trae ese texto, y qué mapa traigo yo?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también en esta ruta:</strong> ningún estudio, obra o cifra entra sin su etiqueta. Las de esta etapa: Destutt de Tracy como <strong>clásico de historia de las ideas</strong> (se cita por el origen del término, no se lee entero), «La ideología alemana» como <strong>fuente primaria y clásico</strong> (escrita 1845 a 1846, publicada completa en 1932), la <strong>carta de Engels a Franz Mehring del 14 de julio de 1893</strong> como la fuente <strong>real</strong> de «falsa conciencia», Mannheim como <strong>clásico sólido con debates vivos</strong> y Geertz como <strong>clásico sólido</strong>. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📬 Caso 1: las dos acusaciones contrarias</h2>
+    <p>Con una semana de diferencia y por canales distintos, a M.E.T.A.S le llegan dos acusaciones opuestas: la carta de un <strong>dirigente magisterial</strong> habla de «privatización neoliberal de la educación» (porque la hace una familia emprendedora, fuera del Estado), y un comentario en la radio local habla de «adoctrinamiento estatista» (porque sigue el temario oficial y es gratuita).</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">👓 Qué llama educación pública cada acusación</span><br>
+      <span>Qué mete responder con bandera: el aplauso inmediato del bando que toque. Qué saca: <span class="hl">la mitad de los maestros del país</span>, porque un logo invisible pesa igual que uno impreso. Una acusación entiende «educación pública» como <span class="hl2">estatal</span>; la otra, como <span class="hl2">abierta a todos</span>: M.E.T.A.S es lo segundo sin ser lo primero.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí se responde es una sola vez y bien, con el mapa a la vista (qué hace el proyecto, quién lo paga con cifras, qué temario sigue, qué no pide a cambio) y <strong>sin adoptar una sola palabra del vocabulario de ninguno de los dos marcos</strong>. Y la respuesta pasa por el detector de la casa antes de publicarse.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>💰 Caso 2: el glosario que viene con el cheque</h2>
+    <p>Una organización internacional ofrece <strong>L 60,000</strong> y diseño profesional para que las misiones de ciencias sociales de M.E.T.A.S adopten su <strong>glosario</strong> de términos.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📖 El vocabulario que cierra por debajo</span><br>
+      <span>Qué mete: un año de infraestructura cubierto y materiales bonitos. Qué saca: <span class="hl">cada término del glosario fija un lado de un concepto disputado</span>, y el niño que aprende el término <span class="hl2">aprende el cierre sin ver nunca la disputa</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: los términos que describen sin cerrar entran; los que no, se sustituyen por prosa llana; el financiador aparece con su nombre en lo que financió y el control editorial queda entero en la casa. <strong>Si el glosario es innegociable, la respuesta es no:</strong> las aulas no se alquilan por partes.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🏗️ Caso 3: la gafa propia impresa como si fuera el mundo</h2>
+    <p>El borrador de una misión de M.E.T.A.S sobre el trabajo y el ahorro da por hecho que <strong>«emprender es el camino»</strong> y trata el empleo asalariado como plan de reserva. Nadie lo escribió con mala intención: es la experiencia verdadera de esta casa, que vive de emprender y le va bien así.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🏠 Naturalización, y no deja de serlo por ser nuestra</span><br>
+      <span>Qué saca si pasa sin marcar: <span class="hl">una gafa de la familia impresa como si fuera el mundo</span>, en material para niños cuyas casas viven de salario y de remesas. La pregunta que decide: <span class="hl2">¿esa frase describe el mundo o describe a esta casa?</span></span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: la misión presenta empleo, emprendimiento y migración como caminos con números y costes reales, y si la preferencia de la casa aparece, aparece <strong>declarada como preferencia</strong>. La premisa queda anotada en el inventario de gafas, con su renglón de qué la haría cambiar.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>💬 Caso 4: los dos padres del grupo de mensajes</h2>
+    <p>En el <strong>grupo de padres</strong> del colegio, un papá escribe «por favor no metan ideología en las fichas» y, tres mensajes después, otro escribe «al fin un material sin ideología». Los dos hablan de la misma ficha, y ninguno la leyó completa.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🪞 La misma palabra, dos mapas</span><br>
+      <span>Los dos usan «ideología» exactamente como Napoleón: <span class="hl">para nombrar el mapa del otro</span>. Y los dos usan «sin ideología» para nombrar el propio. La pregunta que decide no es quién tiene razón: es <span class="hl2">qué llamó ideología cada uno, y qué frase de la ficha lo delata</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> no se contesta en el grupo. Se contesta con la ficha misma: se marca en el margen qué afirmación es descripción, cuál es preferencia declarada y cuál se había colado como obvia. Si esa tercera columna aparece, los dos padres tenían algo de razón, <strong>y eso también se dice en voz alta</strong>.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🎬 Caso 5: L 4,500 por el video de las tres frases</h2>
+    <p>Un canal educativo ofrece <strong>L 4,500</strong> por un video de M.E.T.A.S titulado «Cómo detectar a un ideologizado en tres frases», con el logo de la plataforma y garantía de miles de vistas.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⏱️ El formato que solo apunta hacia afuera</span><br>
+      <span>Mete L 4,500 y alcance. Saca la báscula, porque el título <span class="hl">reserva la palabra para el bando contrario</span> antes de que empiece el video. Un detector que solo suena con un bando <span class="hl2">no es un instrumento: es un arma</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: un video que abra con el expediente de la palabra (1796, Napoleón, 1893) y cierre aplicando el detector a <strong>una frase de la propia casa</strong>. Si el canal no acepta el giro hacia adentro, no acepta a M.E.T.A.S: la regla de pago no se negocia por L 4,500.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>✉️ Caso 6: «eso que dijo el tío es pura falsa conciencia»</h2>
+    <p>En la mesa, Jael despacha el comentario político de un tío con una frase que aprendió en un video: «eso es <strong>falsa conciencia</strong>, él no se da cuenta de que defiende a los que lo explotan». Varios asienten y la conversación se cierra ahí.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔒 El concepto que se autoinmuniza</span><br>
+      <span>Dos correcciones, y la primera es de erudición honesta: <span class="hl">la frase exacta no está en la obra publicada de Marx, es de Engels en su carta a Franz Mehring del 14 de julio de 1893</span>. La segunda es de método: quien la diagnostica <span class="hl2">se declara despierto entre dormidos</span>, y con eso convierte cada desacuerdo en síntoma del otro.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la regla de la mesa es que el diagnóstico se paga: quien dice «falsa conciencia» de alguien tiene que decir, esa misma noche, <strong>una creencia propia que le convenga creer</strong>. Jael lo hizo, y la conversación con el tío volvió a abrirse, que era lo único que se había perdido.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🙋 Caso 7: la pregunta de Angelly</h2>
+    <p>Terminada la mesa, <strong>Angelly</strong> pregunta lo que la materia entera contesta: «¿y nosotros tenemos ideología?». No hay oferta ni lempiras: hay una niña con la pregunta más seria del arco.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔭 Mannheim, explicado a su edad</span><br>
+      <span>La respuesta de la casa: <span class="hl">sí, y no se puede no tenerla</span>. Mannheim lo dijo en 1929: el que desenmascara también mira desde algún lado. Por eso la meta no es quitarse las gafas (imposible según la propia materia) sino <span class="hl2">tenerlas a la vista</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> y se le da la versión de Geertz, que a su edad se entiende mejor: <strong>una ideología es un mapa</strong>, y los mapas no son enfermedades, son lo que permite caminar un lugar desconocido. Lo que sí se puede pedir es que el mapa esté sobre la mesa y no escondido en el bolsillo.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🖊️ Caso 8: el «sentido común» que el autor escribió sin darse cuenta</h2>
+    <p>Preparando esta misma ficha, el autor escribe una frase sobre el proyecto: «esto no es ideología, es <strong>sentido común</strong>». La lee otra vez y se detiene, porque acaba de hacer, en su propia página, lo que la etapa enseña a cazar.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">💳 La regla de pago</span><br>
+      <span>Cada desenmascaramiento ajeno <span class="hl">se paga con uno propio</span>, porque quien solo ve gafas en los demás está usando la materia como arma, que es exactamente el uso que Marx inauguró y Mannheim desmontó. Y el detector <span class="hl2">se prueba primero en casa o no es instrumento</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la frase se reescribió declarada: «esta casa da por sentado que el conocimiento libera y que una familia puede hacer lo que el sistema no hizo; eso es una premisa, no un dato». Y en el inventario quedó su renglón de <strong>qué evidencia la haría cambiar</strong>; si ese renglón no existiera, la premisa estaría funcionando como dogma, y así se anotaría, con fecha.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>👓 La hoja de las gafas, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier texto, acusación u oferta que use la palabra en esta casa, se contesta por escrito antes de opinar:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>En qué sentido se está usando la palabra:</strong> ciencia de las ideas, insulto napoleónico, cámara oscura o mapa.</li>
+      <li><strong>Qué mapa trae el texto:</strong> qué da por obvio, qué llama natural, qué no discute nunca.</li>
+      <li><strong>Qué mapa traigo yo:</strong> qué de eso me suena a sentido común solo porque es mío.</li>
+      <li><strong>Qué fuente y qué fecha sostienen lo que voy a citar:</strong> con su etiqueta de estatus puesta.</li>
+      <li><strong>Qué desenmascaramiento propio pago:</strong> uno por cada uno ajeno, esa misma semana.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">👓 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">La palabra siempre con su expediente</span>: 1796, Napoleón, la cámara oscura, 1893, 1929, 1964. 2. «Falsa conciencia» se cita en su fuente real: <span class="hl">Engels a Mehring, 14 de julio de 1893</span>. 3. Nadie mira a ojo desnudo: la meta es tener las gafas a la vista, no quitárselas. 4. Un desenmascaramiento propio por cada ajeno. 5. Y <span class="hl2">un detector que solo suena con un bando está descompuesto</span>: un detector que no se prueba en casa no es un instrumento, es un arma.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «La palabra que nació ciencia»</h2>
+    <p>Guion listo para grabar (6 a 8 minutos), con la historia al frente y el concepto escondido adentro. Cada escena trae su <strong>voz</strong> (lo que se dice), su <strong>imagen</strong> (lo que se ve) y su <strong>texto en pantalla</strong>.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>Regla del guion (norma de la casa):</strong> toda misión lleva su guion de video con historia: un gancho en frío que duela o intrigue, un personaje que quiere algo, un giro que desmonta lo que el público creía, y un cierre que aterriza el concepto en la vida de quien mira. Nada de definiciones antes del minuto dos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «La misma hoja de clase. Dos padres. Uno escribió que era adoctrinamiento de izquierda; el otro, que era propaganda de derecha. La misma semana, la misma hoja. Y los dos usaron exactamente la misma palabra para acusarla.»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; aparece una hoja fotocopiada sobre una mesa, iluminada por una lámpara. Dos manos distintas entran y hacen una marca de lápiz roja en el mismo párrafo.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «La misma hoja. Dos veredictos contrarios. Una sola palabra.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quiere (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «La maestra no quería ganar ninguna discusión. Quería que sus alumnos aprendieran a leer un mapa. Así que hizo lo razonable: corrigió la hoja para calmar al primero. Llegó la queja del segundo. Corrigió otra vez. Llegó la del primero. A la cuarta versión, la hoja seguía teniendo dos páginas y ya no decía nada. Y ella todavía no entendía qué le habían pedido, porque nadie se lo había dicho: los dos habían usado la misma palabra, y ella había creído que significaba lo mismo.»</p>
+    <p><strong>IMAGEN:</strong> la maestra tachando y reescribiendo la hoja, cuatro veces, con la papelera llenándose; en la última versión los párrafos se han vuelto dos líneas huecas.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «A la cuarta versión, la hoja ya no decía nada.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Ahora cambia la escuela por tu grupo de mensajes. Alguien manda una noticia y escribe: "puro sesgo ideológico". Todos asienten, incluido tú. Y ahora una prueba de tres segundos: ¿cuándo fue la última vez que dijiste "mi ideología"? Nunca. Nadie lo dice. La palabra solo se usa apuntando hacia afuera, y eso no es un descuido del habla: es el trabajo que la palabra viene haciendo desde hace dos siglos.»</p>
+    <p><strong>IMAGEN:</strong> un teléfono con un chat corriendo; cada vez que aparece la palabra «ideología», una flecha sale del mensaje y apunta fuera de la pantalla, nunca hacia quien escribe.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Nadie dice "mi ideología". Nadie.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Porque la palabra tiene expediente, y no empieza donde crees. Hacia 1796, un aristócrata francés llamado Antoine Destutt de Tracy la inventó para nombrar una ciencia: el estudio de cómo se forman las ideas en cualquier cabeza. Incluida la de él. Sus libros salieron entre 1801 y 1815. Y entonces Napoleón, harto de esos intelectuales que le discutían con razones, empezó a llamarlos "ideólogos" con desprecio: gente de ideas sin realidad. Funcionó tan bien que la palabra nunca se recuperó. Nació ciencia y quedó insulto. Cada vez que la usas para señalar al otro bando, no estás analizando nada: estás repitiendo el chiste de un emperador molesto.»</p>
+    <p><strong>IMAGEN:</strong> un grabado de Destutt de Tracy junto a los lomos de «Elementos de ideología»; luego la palabra IDEOLOGÍA escrita en pizarra con letra de científico, y una mano imperial que la tacha y la reescribe en tono de burla.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «1796: nace una ciencia. Poco después: nace un insulto.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:20)</h2>
+    <p><strong>VOZ:</strong> «El expediente sigue, y cada capítulo te da una pieza. Marx y Engels, en un libro que escribieron entre 1845 y 1846 y que no se publicó completo hasta 1932, dijeron que la ideología invierte el mundo como en una cámara oscura, porque las ideas de una época son las de quien manda en ella. Pieza uno: pregunta siempre a quién le conviene que algo parezca obvio. Después viene el concepto más citado del tema, "falsa conciencia", y aquí va la nota honesta: esa frase no está en la obra publicada de Marx. Es de Engels, en una carta a Franz Mehring del 14 de julio de 1893. Y trae trampa: quien diagnostica falsa conciencia se declara despierto entre dormidos, y convierte cada desacuerdo en síntoma. Pieza dos: desconfía de la explicación que también explica a quien la objeta. En 1929, Karl Mannheim se atrevió a girar el instrumento hacia sí mismo: si toda posición produce su punto de vista, el que desenmascara también mira desde algún lado. Y en 1964, Clifford Geertz bajó la temperatura con la frase que te vas a llevar: una ideología no es una enfermedad. Es un mapa.»</p>
+    <p><strong>IMAGEN:</strong> cuatro fichas de archivo cayendo una sobre otra con sus fechas (1846, 1893, 1929, 1964); en la última, la ficha se despliega y se convierte en un mapa de papel que unas manos abren sobre la mesa.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «No es una enfermedad. Es un mapa.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:20 a 6:10)</h2>
+    <p><strong>VOZ:</strong> «"Momento. Si todos llevamos mapa, entonces todo vale lo mismo y nada es verdad." No. Eso es relativismo, y Mannheim lo rechazó por su nombre: llamó a su posición relacionismo, que es otra cosa. Cada mapa viene de un lugar, y aun así unos mapas te llevan al río y otros te pierden. Lo que cambia no es que ya no puedas juzgar: es que ahora sabes que juzgas desde algún sitio, y puedes decir cuál. Quitarse las gafas es imposible. Tenerlas sobre la mesa, no.»</p>
+    <p><strong>IMAGEN:</strong> dos mapas del mismo terreno, uno útil y otro inservible, comparados sobre la misma mesa; al lado, unas gafas apoyadas junto a los mapas, a la vista y no puestas.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Relacionismo, no relativismo.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:10 a 7:00)</h2>
+    <p><strong>VOZ:</strong> «Esta semana vas a oír "eso es ideología". Antes de asentir, dos preguntas: ¿qué mapa trae ese texto?, y ¿qué mapa traigo yo? Y una tarea concreta, para hoy: agarra un papel y escribe tres cosas que en tu casa se llaman "sentido común". Solo tres. Ese papel es tu primer inventario de gafas, y el día que puedas enseñárselo a alguien sin encogerte, la palabra dejó de ser un arma que te lanzan y pasó a ser una herramienta que sabes usar. Empezando, como manda esta casa, por ti.»</p>
+    <p><strong>IMAGEN:</strong> vuelve la hoja de la escena 1; ahora tiene tres columnas escritas a lápiz (descripción, preferencia declarada, lo que se había colado como obvio); la mano cierra el cuaderno y deja las gafas encima.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Nadie mira a ojo desnudo. · Misión: La palabra con expediente · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué hace</th><th>Dónde vive aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>La misma hoja acusada por los dos bandos contrarios</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>La maestra que solo quería enseñar a leer un mapa</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>La prueba de tres segundos: nadie dice «mi ideología»</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>1796: la palabra nació ciencia y Napoleón la volvió burla</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>El expediente en cuatro fechas, y el mapa de Geertz</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«¿Entonces todo vale igual?»: relacionismo, no relativismo</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>Escribir tres cosas que en tu casa se llaman sentido común</td></tr>
+    </table>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Tres lecturas: la misma palabra, tres voces</h2>
+    <p>El tema de la etapa contado tres veces: un cuento, un capítulo de caballerías y un ensayo. Tres maneras de que la idea entre por donde el examen no llega.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> estos tres textos son <strong>ejercicios de estilo escritos por esta casa</strong> en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado. Y llevan una regla extra de esta casa: <strong>toda obra, fecha y persona que aparece dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🌀 Lectura 1 · «El hombre que miraba sin gafas» (cuento, a la manera de Borges)</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas inventadas. Todos los libros, fechas y personas de este cuento son reales y comprobables.</p>
+    <p>Conocí, hace muchos años, a un hombre que se jactaba de mirar el mundo sin gafas. No hablaba de sus ojos, que eran excelentes; hablaba de su cabeza. Sostenía que los demás veían la vida pública a través de doctrinas, de simpatías, de rencores heredados, y que él, en cambio, veía los hechos desnudos. Usaba una fórmula que he oído después en muchas bocas y en muchos países: «yo no tengo ideología; yo tengo sentido común». La decía sin soberbia, como quien informa del color de sus ojos.</p>
+    <p>Le pregunté, por curiosidad de bibliotecario, si sabía de dónde venía esa palabra con la que descartaba a los otros. No lo sabía. Se lo dije, y temo que fue una crueldad involuntaria. La palabra <strong>ideología</strong> fue acuñada hacia <strong>1796</strong> por un aristócrata francés, <strong>Antoine Destutt de Tracy</strong>, que publicó entre <strong>1801 y 1815</strong> sus <strong>Elementos de ideología</strong>. No la inventó para insultar a nadie: la inventó para nombrar una ciencia que estudiara cómo se forman las ideas en cualquier cabeza. En cualquiera, insistí. También en la del que la estudia. La palabra nació como un espejo, y no como un dedo.</p>
+    <p>Lo que ocurrió después tiene una simetría casi literaria. A <strong>Napoleón</strong> le estorbaban esos hombres que discutían sus decisiones con razones, y empezó a llamarlos «ideólogos» con desprecio, como se llama soñador a quien objeta. El desprecio prosperó más que la ciencia. Desde entonces la palabra trabaja de insulto, y trabaja siempre en una sola dirección: hacia el otro. Mi conocido, que jamás leyó a Destutt de Tracy ni había oído nombrar al emperador en este asunto, repetía la burla imperial creyendo que ejercía la lucidez.</p>
+    <p>Hay una nota que le debo, porque él me la habría exigido. La frase con que hoy se despacha al adversario, <strong>falsa conciencia</strong>, no está en la obra publicada de <strong>Karl Marx</strong>, aunque a él se le atribuya en todas las sobremesas: aparece en una carta que <strong>Friedrich Engels</strong> escribió a <strong>Franz Mehring</strong> el <strong>14 de julio de 1893</strong>. Y trae adentro una trampa perfecta, de esas que le habrían gustado a Zenón: quien diagnostica falsa conciencia se declara despierto en un cuarto de dormidos, y convierte toda objeción en un ronquido más. Ninguna prueba puede tocar esa doctrina, y por eso no dice nada. <strong>Karl Mannheim</strong> tuvo en <strong>1929</strong>, en <strong>Ideología y utopía</strong>, el coraje raro de girar el instrumento hacia sí mismo: si cada posición produce su modo de ver, el que desenmascara mira también desde algún lugar. Llamó a esa consecuencia <strong>relacionismo</strong>, y se cuidó de aclarar que no era el relativismo de que todo da igual.</p>
+    <p>Yo he escrito alguna vez la fábula de unos cartógrafos que hicieron un mapa del tamaño exacto del imperio, y de cómo aquel mapa inútil terminó deshaciéndose en los desiertos. La moraleja que entonces no vi es sencilla: un mapa sirve porque elige, y elegir es dejar cosas afuera. En <strong>1964</strong>, en un ensayo llamado <strong>La ideología como sistema cultural</strong> que después recogió en <strong>La interpretación de las culturas (1973)</strong>, el antropólogo <strong>Clifford Geertz</strong> dijo eso mismo con otras palabras: una ideología no es una enfermedad, es un mapa, y la gente los dibuja precisamente cuando el territorio se ha vuelto incomprensible. Nadie camina un país desconocido sin mapa; nadie mira la vida pública sin doctrina. Mi conocido llevaba la suya doblada en el bolsillo, y la defendía con tanta fuerza porque no la había visto nunca.</p>
+    <p>Murió convencido de su transparencia. Pienso en él sin burla, porque su error es el mío en los días en que me distraigo. La única superioridad posible, y es modesta, consiste en poner el mapa sobre la mesa antes de discutir, y en decir en voz alta: este es el mío, aquí está lo que deja afuera. No es la vista de Dios. Es apenas la cortesía de un hombre que sabe que lleva gafas.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🐎 Lectura 2 · «De la reñida disputa sobre si era bacía o yelmo» (capítulo, a la manera de Cervantes)</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, la venta, el humor y la reflexión cervantinos. El pleito de la bacía y el yelmo existe de verdad: don Quijote gana la bacía del barbero en el capítulo veintiuno de la primera parte (1605), y en la venta, en el capítulo cuarenta y cuatro y el cuarenta y cinco de esa misma primera parte, los huéspedes votan si aquello es bacía o yelmo, y de ahí sale la palabra «baciyelmo».</p>
+    <p>Donde se cuenta la reñida disputa que sobre la bacía y el yelmo se renovó en una venta, y de los antojos que don Quijote mandó traer, con lo mucho que Sancho entendió al revés.</p>
+    <p>Sucedió, pues, que estando don Quijote y Sancho en una venta del camino, entró un arriero y, viendo sobre la mesa aquella pieza de bronce que el hidalgo traía por yelmo del moro Mambrino, dijo a voces que era bacía de barbero, y que él lo sabía porque su padre lo había sido en Almodóvar. Levantóse a esto un estudiante que allí cenaba y sostuvo que era yelmo, aunque solo fuese por no darle la razón a un arriero; y como en las ventas hay siempre más pareceres que jarros, dividióse la sala en dos bandos, y cada bando dio en decir que su parecer era el llano y natural, y el del contrario, invención de gente con la cabeza llena de humo. Y de tal manera se calentaron, que ya no disputaban de la pieza, sino de quién tenía los ojos limpios; y al que decía bacía llamaban zafio, y al que decía yelmo, soñador.</p>
+    <p>Rogaron al cabo a don Quijote que sentenciase, por ser dueño de la prenda y hombre de armas y de letras; y él, con mucho reposo, mandó al ventero traer unos antojos que en su casa tenía para leer cartas, y puestos sobre la mesa dijo: «Miren vuesas mercedes esta pieza por encima de estos vidrios, y díganme si la ven distinta.» Miraron, y todos dijeron que la veían igual. «Pues sepan (dijo don Quijote) que no es la pieza la que muda, sino el que mira; y que cada uno de vuesas mercedes trae unos antojos que no se ha quitado en su vida, y por eso no los siente. El que ha visto barbas y navajas desde niño ve bacía; el que ha leído libros de caballerías ve yelmo; y ninguno de los dos mira desnudo, aunque los dos lo jurarían. Y adviertan lo que más me admira: que ninguno llama antojos a los suyos, sino verdad, y a los del vecino, antojos. En lo cual se ve que el agravio no está en llevarlos, que eso es forzoso, sino en jurar que no se llevan.»</p>
+    <p>Oyendo lo de los antojos, Sancho se llegó al arriero y le dijo al oído que si andaba buscando antojos, él tenía dos pares en las alforjas, comprados en Toledo, y que se los dejaría en tres reales y la cena, y que aun le añadiría el estuche, porque a quien Dios se la dio, san Pedro se la bendiga, y más vale pájaro en mano que buitre volando. «Majadero (dijo don Quijote), que no hablo yo de antojos de vidrio, sino de los del entendimiento.» «Pues por mi ánima (respondió Sancho) que de esos yo llevo un carro, y todos me los puso mi madre sin cobrarme; y si son como los de vidrio, lo peor no es traerlos sucios, sino andar diciendo que no se traen, que quien se hace el ciego dos veces tropieza, y no es lo mismo no tener sed que jurar que la fuente está seca.»</p>
+    <p>Riéronse todos, y de la risa nació la concordia; y acordaron llamar a la pieza baciyelmo, nombre que a nadie contentó del todo y que por eso mismo sirvió a todos, y quedaron en cenar juntos y en no llamar ciego a nadie por la razón de mirar desde otra parte. Y ya recogidos, dijo don Quijote: «Advierte, Sancho, que la mayor ceguedad no es ver mal, sino creer que se ve sin nada delante de los ojos; que el que sabe qué vidrios lleva puede limpiarlos, y el que jura no llevarlos anda a tientas y muy contento.» «Todo eso será verdad (dijo Sancho), pero yo me atengo a lo de mi tierra: que cada uno cuenta de la feria según le va en ella, y que del dicho al hecho hay gran trecho; y con estos antojos y con la cena no se juega.» Con que se durmieron; y el ventero, que había oído lo de los dos pares de Toledo, madrugó a preguntarle a Sancho el precio, que fue el único negocio verdadero de aquella noche.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🌍 Lectura 3 · «Los mapas invisibles» (ensayo, a la manera de Harari)</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie y la frase sencilla del autor de «Sapiens». Todos los datos, obras y fechas citados son reales y comprobables.</p>
+    <p>Los seres humanos no vemos el mundo. Vemos un relato del mundo. Es una diferencia pequeña y decide casi todo. Un chimpancé que mira una frontera ve pasto. Un humano que mira la misma línea ve una patria, y por esa línea está dispuesto a morir. La línea no está en el suelo: está en la cabeza de millones de personas al mismo tiempo, y por eso funciona. Nuestra especie domina el planeta porque puede coordinar a extraños mediante historias compartidas, y el precio de esa habilidad es que casi nunca distinguimos la historia del paisaje.</p>
+    <p>Durante la mayor parte de nuestra existencia, ese mapa mental no tuvo nombre. Alguien se lo puso muy tarde. Hacia 1796, un aristócrata francés llamado Antoine Destutt de Tracy inventó la palabra «ideología» para bautizar una ciencia nueva: el estudio de cómo se forman las ideas. Publicó sus «Elementos de ideología» entre 1801 y 1815. Su proyecto era optimista y muy propio de su siglo: si entendemos el mecanismo que fabrica creencias, podremos corregirlo, como se corrige un reloj. La palabra duró poco en ese oficio. A Napoleón le molestaban aquellos intelectuales que le objetaban con argumentos, y empezó a llamarlos «ideólogos» con sarcasmo. El sarcasmo ganó. En una generación, la palabra pasó de nombrar una ciencia a nombrar el defecto del adversario, y todavía hoy hace ese trabajo. Es uno de los casos mejor documentados de una palabra que perdió su empleo original y nunca lo recuperó.</p>
+    <p>El segundo capítulo lo escribieron dos alemanes jóvenes. Karl Marx y Friedrich Engels redactaron entre 1845 y 1846 el manuscrito que hoy llamamos «La ideología alemana», y dejaron una imagen que se hizo famosa: la ideología muestra el mundo invertido, como en una cámara oscura, porque las ideas dominantes de una época son las ideas de quien domina en ella. La imagen es útil: enseña a preguntar quién gana con que algo parezca obvio. Y vale la pena saber un detalle que casi nadie sabe: ese manuscrito no se publicó completo hasta 1932. Estuvo ochenta y seis años en un cajón. Media discusión del siglo veinte se hizo con un libro que los protagonistas del siglo diecinueve nunca leyeron.</p>
+    <p>Aquí va un dato que conviene tener a mano, porque corrige un error repetido millones de veces. La expresión «falsa conciencia», que se cita siempre como si fuera de Marx, no aparece en su obra publicada. Está en una carta que Engels escribió a Franz Mehring el 14 de julio de 1893, diez años después de la muerte de su amigo. Es una frase de correspondencia privada convertida en pilar teórico. Además de mal atribuida, es peligrosa. Si yo decido que tu desacuerdo se explica porque tu conciencia es falsa, ya no necesito escuchar tus razones: cada argumento tuyo es un síntoma más. Una teoría que explica cualquier respuesta posible no prohíbe ninguna, y una teoría que no prohíbe nada no informa de nada. Es un arma cómoda y un instrumento inútil.</p>
+    <p>El giro decisivo llegó en 1929, cuando el sociólogo Karl Mannheim publicó «Ideología y utopía» e hizo lo que casi nadie hace: apuntó el instrumento hacia sí mismo. Si toda posición social produce su punto de vista, escribió, entonces también el que desenmascara está mirando desde algún lugar. Podía haber escondido ese problema. En vez de eso lo puso en el centro y llamó a su respuesta «relacionismo», dejando claro que no era relativismo: que todas las miradas tengan lugar de origen no significa que todas valgan igual, del mismo modo que todos los mapas son parciales y algunos, aun así, sirven para llegar al río. Mannheim, que era judío, tuvo que abandonar Alemania en 1933 y siguió enseñando en Inglaterra; su propia vida ilustró bastante bien la tesis de que uno piensa desde donde está.</p>
+    <p>La última pieza es de 1964, y bajó la temperatura de todo el debate. El antropólogo Clifford Geertz publicó ese año el ensayo «La ideología como sistema cultural», recogido después en «La interpretación de las culturas» (1973), y propuso dejar de tratar las ideologías como enfermedades ajenas. Son mapas, dijo. Y la gente dibuja mapas precisamente cuando el territorio se vuelve incomprensible: cuando cambia la economía, cuando se derrumba una costumbre, cuando la vida pública deja de parecerse a lo que enseñaron los abuelos. Vista así, una ideología no es un fallo del cerebro: es lo que hace un cerebro normal frente a un mundo confuso.</p>
+    <p>Esto nos deja en un lugar incómodo y honesto. No hay manera de mirar sin mapa, así que la promesa de «pensar sin ideología» es tan realista como caminar sin apoyar los pies. Lo que sí se puede hacer es sacar el mapa del bolsillo y ponerlo sobre la mesa. Detectar el mapa del vecino lo hace cualquiera; hace falta media hora de coraje para escribir el propio. En el siglo veintiuno vamos a decidir asuntos enormes, sobre inteligencia artificial, clima y trabajo, y los vamos a decidir comparando relatos, porque es lo único que los sapiens sabemos hacer con el futuro. La única ventaja disponible es saber que llevamos gafas. Los que juran no llevarlas son, sin excepción, los que peor ven.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué tres voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento instala la idea como <strong>imagen que no se olvida</strong> (el hombre que llevaba su mapa doblado en el bolsillo y nunca lo había visto), el capítulo la vuelve <strong>escena, risa y refrán</strong> (Sancho vendiendo antojos de Toledo mientras su amo habla de los del entendimiento), y el ensayo la conecta con <strong>la escala del mundo</strong> (de la palabra de 1796 al manuscrito que durmió ochenta y seis años). Quien lee las tres tiene el concepto por tres puertas, y la ficha y la evaluación lo encuentran ya instalado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión nueva lleva sus tres lecturas sobre el tema de la etapa: <span class="hl">un cuento a la manera de Borges, un capítulo a la manera de Cervantes y un ensayo a la manera de Harari</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista y con una regla de fondo: <span class="hl">toda obra, fecha y persona citada dentro de los textos es real y comprobable</span>. El único artificio permitido es la voz; a Borges, en esta casa, se le quita el vicio de las citas inventadas.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con el expediente de la palabra fecha por fecha, la cámara oscura y su problema, la nota honesta de «falsa conciencia», el relacionismo y el mapa, los ocho casos del proyecto, la <strong>hoja de las gafas</strong> para llenar a mano, seis ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-gafas-palabra-expediente.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige en toda la ruta: <strong>ningún estudio, obra o cifra entra sin su etiqueta</strong> (clásico sólido, clásico cuestionado, ciencia en disputa, divulgación con inflado).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Antoine Destutt de Tracy, «Elementos de ideología» (1801 a 1815):</strong> <strong>clásico de historia de las ideas</strong>. Se cita <strong>por el origen del término</strong>, acuñado hacia 1796, y no se lee entero.</li>
+      <li><strong>Marx y Engels, «La ideología alemana» (escrita en 1845 a 1846, publicada completa en 1932):</strong> <strong>fuente primaria, clásico</strong>. De aquí sale la cámara oscura y la tesis de las ideas dominantes.</li>
+      <li><strong>Engels, carta a Franz Mehring del 14 de julio de 1893:</strong> la <strong>fuente real</strong> de «falsa conciencia». La frase exacta <strong>no está en la obra publicada de Marx</strong>, y ese matiz es medio módulo: se dice explícitamente y se estudia con su crítica pegada.</li>
+      <li><strong>Karl Mannheim, «Ideología y utopía» (1929):</strong> <strong>clásico sólido</strong> de la sociología del conocimiento, <strong>con debates vivos</strong>. De aquí sale el relacionismo, que no es relativismo.</li>
+      <li><strong>Clifford Geertz, «La ideología como sistema cultural» (1964, recogido en «La interpretación de las culturas», 1973):</strong> <strong>clásico sólido</strong> de la antropología. La ideología como mapa y no como patología.</li>
+      <li><strong>Las tres lecturas de esta misión:</strong> ejercicios de estilo escritos por la casa en homenaje a Borges, Cervantes y Harari. <strong>Pastiche declarado, no obra de esos autores</strong>, y con la erudición interna real: Destutt de Tracy y 1796, Napoleón y los «ideólogos», la carta a Mehring del 14 de julio de 1893, Mannheim en 1929 y su salida de Alemania en 1933, Geertz en 1964 y 1973, y el pleito de la bacía y el yelmo del Quijote (primera parte, 1605, capítulos veintiuno y cuarenta y cuatro a cuarenta y cinco) son todos comprobables.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>con el papel de las tres frases</strong>, el que dice qué llama «sentido común» esta casa, y con la regla de pago corriendo de verdad.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: la materia 25 completa, con sus siete módulos y su advertencia epistémica.</li>
+      <li><a href="../../misiones/ruta-rojo-acero-juicio/acero-juicio.html">📕 El acero antes del juicio</a>: la regla madre de este arco. Cada familia se pone en pie en su mejor versión antes de tocarla.</li>
+      <li><a href="../../misiones/ruta-espejo-vigia-timon/vigia-timon.html">🪞 El vigía y el timón</a>: la puerta del Estudio Mayor. El papel de las tres frases es exactamente una comprobación del vigía.</li>
+      <li><a href="../../misiones/ruta-atomos-contra-miedo/atomos-miedo.html">⚛️ Átomos contra el miedo</a>: el arco anterior. El Marx filósofo (base y superestructura) vive allá; aquí entra solo el concepto de ideología.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 2 trae el bisturí de Freeden: núcleo, conceptos adyacentes, periféricos y la descontestación.</li>
+      <li><a href="../../fichas/ficha-gafas-palabra-expediente.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja de las gafas y el expediente de fechas caben en una página cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> memorizar el expediente con sus fechas (1796, la cámara oscura, 1893, 1929, 1964), poder decir en una frase por qué «falsa conciencia» se autoinmuniza, y escribir el papel de las tres frases de esta casa. La prueba de que está aprendida es <strong>que la palabra ya no se use nunca en una sola dirección</strong>: quien la aplica al vecino la aplica esa misma semana a su propia mesa.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">👓</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de las Gafas a la Vista · Etapa 1: La palabra con expediente</div>
+    <div class="diploma-mascot" aria-hidden="true">👓</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">👓</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Nadie mira a ojo desnudo: el oficio es ver las gafas, empezando por las propias» 🌱 · 👓 Ruta de las Gafas a la Vista · Etapa 1 de 7.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/gafas-expediente.js"></script>
+</body>
+</html>
