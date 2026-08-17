@@ -27,6 +27,9 @@ const MATERIAS = [
   { id: 'cib',  label: 'Ciberseguridad',      sub: 'La casa cerrada: llaves y datos', icon: 'fa-shield-halved', color: 'cib' },
   { id: 'ia',   label: 'Inteligencia Artificial', sub: 'La máquina que predice',      icon: 'fa-robot',         color: 'ia' },
   { id: 'ley',  label: 'Derecho y Ley',       sub: 'La ley por dentro y sus grietas', icon: 'fa-scale-balanced', color: 'ley' },
+  /* Una sola materia para las veintisiete del Estudio Mayor: si cada una
+     trajera su chip, el filtro de la portada se vuelve inusable. */
+  { id: 'mayor', label: 'Estudio Mayor',      sub: 'Las materias del compendio de la casa', icon: 'fa-book-open-reader', color: 'mayor' },
 ];
 
 const LEVELS = [

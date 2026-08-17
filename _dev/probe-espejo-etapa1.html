@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Máquina que se Mira, etapa 1</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-espejo-vigia-timon/vigia-timon.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 1 de la Ruta de la Máquina que se Mira, que además es la
+   primera misión del Estudio Mayor: bancos, laboratorio, pruebas impresas con
+   su nombre, los ocho casos, la ficha, la materia nueva y la ruta en el mapa.
+
+   La regla de esta ruta no es la de la Ley (artículos comprobados): es la
+   REGLA DEL ESTATUS del compendio: ningún estudio entra sin su etiqueta. La
+   sonda exige que los dos clásicos que sostienen la etapa (Flavell 1979,
+   Nelson y Narens 1990) aparezcan CON año y CON etiqueta, porque una misión
+   que enseñara a auditar partes citando estudios sin estatus sería el error
+   que quiere evitar. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try {
+    appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+    appFrame.contentWindow.localStorage.removeItem('faro_v1');
+  } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 15, '15 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Máquina que se Mira · Etapa 1 de 6/.test(d.body.textContent), 'se presenta como etapa 1 de 6', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se copió de la etapa 3 de la Ley, y su vocabulario no
+       va aquí. Se mira todo, porque esta ruta no tiene motivo para nombrar
+       coletillas ni artículos en ninguna sección. */
+    ok(!/coletilla|orden público|La Gaceta|jurisprudencia|artículo 72|remisión|Casa Cerrada/i.test(d.body.textContent),
+       'sin restos de la misión de la que se copió', 'queda el temario de la etapa de la Ley');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+
+    log('\n── LA REGLA DEL ESTATUS (la regla del Estudio Mayor) ──');
+    const texto0 = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/Flavell/.test(texto0) && /1979/.test(texto0), 'Flavell aparece con su año', 'falta Flavell con 1979');
+    ok(/Nelson y Narens/.test(texto0) && /1990/.test(texto0), 'Nelson y Narens aparecen con su año', 'falta Nelson y Narens con 1990');
+    ok(/clásico sólido/i.test(texto0), 'las fuentes llevan su etiqueta de estatus', 'ninguna fuente lleva etiqueta');
+    ok(/Dunlosky/.test(texto0) && /Koriat/.test(texto0), 'anuncia las fuentes de las etapas siguientes', 'faltan Dunlosky y Koriat en Recursos');
+
+    log('\n── BANCOS ──');
+    ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('qzData.length') === 10, '10 preguntas de quiz', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('classGroups.length') === 4, '4 clasificaciones', 'clasificaciones: ' + dentro('classGroups.length'));
+    ok(dentro('retoPairs.length') === 3, '3 parejas en el reto', 'parejas: ' + dentro('retoPairs.length'));
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    /* El molde llama «a» al índice correcto de evalMCBank y «c» al de qzData.
+       Confundirlos deja la evaluación final calificando al azar. */
+    ok(dentro('evalMCBank.every(q => typeof q.a === "number" && q.o[q.a])'),
+       'la evaluación final sabe cuál es la respuesta correcta', 'evalMCBank no trae la clave «a»');
+    ok(dentro('Object.keys(parteData).join(",")') === 'niveles,vigia,timon,brecha', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'los 7 momentos de la sesión vigilada', 'momentos: ' + dentro('timelineData.length'));
+    ok(/faro_espejo_vigia/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    let sopaOk = true;
+    dentro('sopaSets').forEach(s => s.words.forEach(p => {
+      if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
+    }));
+    ok(sopaOk, 'las palabras se leen en la sopa', 'la sopa no cuadra');
+
+    log('\n── LO QUE LA ETAPA TIENE QUE ENSEÑAR ──');
+    const texto = texto0;
+    ok(/metacognición/i.test(texto), 'nombra la metacognición', 'no aparece la palabra metacognición');
+    ok(/nivel objeto/i.test(texto) && /metanivel/i.test(texto), 'los dos pisos con su nombre técnico', 'faltan nivel objeto y metanivel');
+    ok(/monitoreo/i.test(texto) && /control/i.test(texto), 'monitoreo y control', 'faltan monitoreo y control');
+    ok(/vigía/i.test(texto) && /timón/i.test(texto), 'el vigía y el timón', 'falta la metáfora de la casa');
+    ok(/datos malos/i.test(texto), 'la falla habitual: decidir bien sobre datos malos', 'no aparece la falla habitual');
+    ok(/cuaderno cerrado|material cerrado/i.test(texto), 'la lectura fiable: el material cerrado', 'no aparece el cuaderno cerrado');
+    ok(/Reconocer no es recordar/i.test(texto), 'reconocer no es recordar', 'falta la distinción reconocer/recordar');
+    ok(/brecha/i.test(texto) && /predicción/i.test(texto), 'la predicción y la brecha', 'faltan predicción y brecha');
+    ok(/registro/i.test(texto), 'el registro del vigía', 'no aparece el registro');
+    ok(/seguir|cambiar|abandonar/i.test(texto), 'las decisiones del timón', 'faltan las tres decisiones');
+
+    log('\n── EN PANTALLA ──');
+    w.go('s-lab'); await esperar(150);
+    ok(/Los dos pisos/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en los dos pisos', 'abre en otra pieza');
+    ok(!!d.querySelector('.lab-cont-btn[data-parte="niveles"]'), 'el botón de la pieza inicial existe', 'el laboratorio arrastra la pieza del molde');
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
+    w.go('s-evaluacion'); await esperar(200);
+    w.genEval(); await esperar(300);
+    ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
+    w.genEvalCrit(); await esperar(300);
+    const crit = d.getElementById('evalCritOut').textContent;
+    ok(crit.length > 200, 'la sesión sobre la mesa se genera', 'prueba competencial vacía');
+    const rotulos = [d.getElementById('eval-screen-title'), d.getElementById('evalcrit-screen-title'),
+                     d.getElementById('evalOut'), d.getElementById('evalCritOut'),
+                     d.querySelectorAll('.eval-print-header')[0]].map(x => x.textContent).join(' · ');
+    ok(!/coletilla|Ley y sus Grietas|derecho sobre la mesa|Etapa 3|Derecho y Ley/i.test(rotulos),
+       'los rótulos de prueba llevan el nombre correcto', 'las pruebas traen el nombre de otra misión');
+
+    log('\n── CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos');
+    ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
+    if (casos) {
+      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      const txt = casos.textContent;
+      ['relee|relectura', 'técnica', '3,500', 'entendieron', 'compendio', 'XP', 'fluy', 'registro']
+        .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
+      ok((txt.match(/Lo que enseña/g) || []).length === 8, 'los ocho casos cierran con lo que enseñan', 'casos con lección: ' + (txt.match(/Lo que enseña/g) || []).length);
+      ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
+      ok(/hoja del vigía/i.test(txt), 'trae la hoja del vigía', 'falta la hoja del vigía');
+      ok(/cinco reglas/i.test(txt), 'trae las cinco reglas de la etapa', 'faltan las cinco reglas');
+      ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
+    }
+    const decisiones = dentro('critDecisionBank.join(" ")');
+    ok(/3,500|entendieron|flashcards|hoja en blanco|registro/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+
+    log('\n── FICHA ──');
+    const r = await fetch('/fichas/ficha-espejo-vigia-timon.html');
+    const txtF = r.ok ? await r.text() : '';
+    ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
+    ok((txtF.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txtF.match(/class="pagina"/g) || []).length);
+    ok(/La hoja del vigía, para llenar a lápiz/i.test(txtF), 'la ficha trae la hoja del vigía en blanco', 'falta la hoja del vigía en blanco');
+    ok(/Una hoja del vigía ya llena/i.test(txtF), 'y una ya llena, como ejemplo', 'falta el ejemplo lleno');
+    ok(/El registro del vigía/i.test(txtF), 'la ficha trae el registro de cuatro columnas', 'falta el registro');
+    ok(/nivel objeto/i.test(txtF) && /metanivel/i.test(txtF), 'la ficha trae los dos pisos con su nombre', 'faltan los dos pisos');
+    ok(/Hoja de fuentes/i.test(txtF), 'la ficha trae su hoja de fuentes', 'falta la hoja de fuentes');
+    ok(/Pauta completa de respuestas/.test(txtF), 'trae su pauta', 'sin pauta');
+    ok(!/—/.test(txtF), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok((txtF.match(/<table/g) || []).length === (txtF.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar');
+    ok(/clásico sólido/i.test(txtF), 'las fuentes de la ficha llevan etiqueta', 'la ficha cita sin estatus');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-espejo-vigia-timon"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const ruta = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Máquina que se Mira/.test(c.textContent));
+    ok(!!ruta, 'la Ruta de la Máquina que se Mira está en el mapa', 'no aparece la ruta');
+    if (ruta) {
+      ok(ruta.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 5, 'y 5 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/El vigía y el timón/.test(ruta.textContent), 'la etapa 1 sale con el título de la misión', 'la etapa 1 no sale con su título');
+      ok(/Las trampas del/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+      ok(!/Etapa por construir/.test(ruta.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="mayor"]');
+    ok(!!chip, 'la materia Estudio Mayor tiene su chip', 'no hay chip del Estudio Mayor');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
+      ok(tarjetas.length === 1, 'la materia muestra su misión', 'muestra ' + tarjetas.length);
+      const t = tarjetas.find(x => /vigía y el timón/i.test(x.textContent));
+      ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
+    }
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda espejo etapa 1';
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · Sonda espejo etapa 1'; }
+});
+</script>
+</body>
+</html>

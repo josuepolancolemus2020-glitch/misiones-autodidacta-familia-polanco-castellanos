@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Máquina que se Mira · Etapa 1: El vigía y el timón | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/vigia-timon.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Estudia a ciegas 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🪞</div>
+    <div class="hero-text">
+      <h1>El vigía y el timón: <span>el piso que estudia y el piso que vigila</span></h1>
+      <p class="sub">La gente no decide mal: decide bien sobre datos malos 🪞</p>
+      <div class="badge">🪞 Ruta de la Máquina que se Mira · Etapa 1 de 6</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🪞 La puerta del Estudio Mayor</h2>
+    <p>Esta es la primera misión del Estudio Mayor, y es la primera a propósito: enseña a estudiar el estudio. Quien la termina estudia distinto todo lo demás, porque aprende a separar <strong>el trabajo de aprender</strong> de <strong>la vigilancia de ese trabajo</strong>.</p>
+    <p>El nombre técnico es <strong>metacognición</strong>: Flavell le puso nombre en 1979, y Nelson y Narens lo ordenaron en 1990 en un mapa de dos pisos que es el tema de esta etapa. En el piso de abajo, el <strong>nivel objeto</strong>: el que lee, resuelve y memoriza. En el piso de arriba, el <strong>metanivel</strong>: el que vigila cómo va y decide qué hacer.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La metáfora de la casa.</strong> El piso de arriba tiene dos oficios. El <strong>vigía</strong> mira el trabajo y sube partes: «¿cómo voy?». El <strong>timón</strong> baja órdenes: seguir, cambiar de técnica, abandonar. Son dos oficios distintos, y confundirlos es lo que esta etapa viene a impedir.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 El vigía y el timón, cada uno con lo suyo</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🔭 El vigía (monitoreo)</h4>
+        <p>Sube información del piso de abajo: «esto ya lo domino», «el tema 3 está flojo», «¿cuánto voy a recordar mañana?». Toda predicción sobre el propio saber es un parte del vigía, y ese parte <strong>puede ser falso</strong>.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>⚓ El timón (control)</h4>
+        <p>Baja decisiones al piso de abajo: seguir con esta técnica, cambiar a otra, repasar el tema 3 primero, parar por hoy. El timón casi siempre decide bien; el problema es <strong>con qué datos</strong> decide.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚠️ La falla habitual, que es el corazón de la etapa</span><br>
+      <span>La falla casi nunca está en el timón: está en el vigía. <span class="hl">La gente no decide mal: decide bien sobre datos malos.</span> Jael relee su cuaderno, el texto corre fácil, el vigía sube «ya me lo sé», y el timón decide irse a dormir. La decisión era correcta; <span class="hl2">el parte era falso</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Los siete momentos de una sesión vigilada</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué es, dónde se cae y cómo se hace en esta casa.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento de la sesión.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la noche antes del examen</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué se hace con el «ya me lo sé» de las nueve de la noche.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📖</span><span class="ms-text"><strong>El estudio:</strong> Jael relee el cuaderno de Ciencias tres veces. El texto corre fácil, todo suena conocido.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🔭</span><span class="ms-text"><strong>El parte del vigía:</strong> «ya me lo sé». La sensación es fuerte y sincera.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">⚓</span><span class="ms-text"><strong>La decisión del timón:</strong> con ese parte, lo razonable es irse a dormir tranquila.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">📄</span><span class="ms-text"><strong>Lo que tienes delante:</strong> el cuaderno cerrado y una hoja en blanco.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué se hace con el parte del vigía?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">😴 Confiar en la sensación</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">📝 Comprobar con la hoja en blanco</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔍 Los dos pisos, en una tabla</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El mapa de Nelson y Narens (1990), traducido a esta casa. Todo lo que pasa en una sesión de estudio vive en uno de los dos pisos, y saber en cuál es la mitad de la etapa.</p>
+    <table class="tres">
+      <tr><th>Piso</th><th>Quién trabaja ahí</th><th>Ejemplos de esta casa</th></tr>
+      <tr><td>Metanivel (arriba)</td><td>El vigía sube partes; el timón baja órdenes</td><td>«¿Cuánto voy a recordar mañana?» · «Cambio a tarjetas» · «Paro por hoy»</td></tr>
+      <tr><td>Nivel objeto (abajo)</td><td>El que lee, resuelve, memoriza</td><td>Resolver la división · Leer el capítulo del sistema nervioso · Copiar la tabla</td></tr>
+      <tr><td>Sube (monitoreo)</td><td>Información: cómo va el trabajo</td><td>«Esto ya lo domino» · «El tema 3 está flojo» · «Voy lento»</td></tr>
+      <tr><td>Baja (control)</td><td>Decisiones: qué hacer con el trabajo</td><td>Seguir · Cambiar de técnica · Repasar lo flojo primero · Abandonar</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 Lo que se ve al ponerlos en fila</span><br>
+      <span>El piso de abajo <span class="hl">aprende</span>; el piso de arriba <span class="hl">administra</span>. La nota del examen la produce el de abajo, pero <span class="hl2">cuánto rinde cada hora de estudio lo decide el de arriba</span>. Por eso esta etapa va primero.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>❓ Los partes del vigía: cuáles valen y cuáles no</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El vigía no lee la memoria directamente: <strong>adivina con pistas</strong>. Algunas pistas son buenas y otras fabrican partes falsos. La lista completa de trampas es el tema de la etapa 2; aquí va la vara para medirlas.</p>
+    <table class="tres">
+      <tr><th>Parte del vigía</th><th>De dónde sale</th><th>¿Vale?</th></tr>
+      <tr><td>«Lo reproduje con el cuaderno cerrado»</td><td>De una prueba real de recuperación</td><td>Sí: es la lectura fiable</td></tr>
+      <tr><td>«Me suena»</td><td>De reconocer la página al verla</td><td>No: reconocer no es recordar</td></tr>
+      <tr><td>«Lo leí tres veces»</td><td>Del esfuerzo invertido, no del resultado</td><td>No: mide horas, no saber</td></tr>
+      <tr><td>«Lo expliqué sin mirar y salió»</td><td>De producir la respuesta</td><td>Sí: es recuperación con testigo</td></tr>
+      <tr><td>«El texto corre fácil»</td><td>De la fluidez de la relectura</td><td>No: la facilidad se factura como saber</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎯 La regla que ordena la tabla</span><br>
+      <span>Un parte vale cuando sale de <span class="hl">producir la respuesta con el material cerrado</span>. No vale cuando sale de la <span class="hl2">facilidad de tener el material delante</span>. Con esa sola regla se puede clasificar cualquier «ya me lo sé» de la casa.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ El timón decide bien: dale datos buenos</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🧭 Timón con datos</h4>
+        <p>Repasa el tema 3 <strong>porque falló en la prueba cerrada</strong>. Cambia de técnica <strong>después de medir</strong> que la anterior no rinde. Para <strong>cuando la predicción acertó</strong> dos veces seguidas. Cada decisión tiene un dato comprobado detrás.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🌫️ Timón a ciegas</h4>
+        <p>Repasa lo que <strong>se siente</strong> flojo. Cambia de técnica <strong>por aburrimiento</strong>. Para <strong>cuando se cansa</strong>. Las decisiones parecen razonables, y lo son: sobre datos que nadie comprobó.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Pisos del mapa</div><div class="stat-val">2</div></div>
+      <div class="stat-item"><div class="stat-label">Oficios de arriba</div><div class="stat-val">2</div></div>
+      <div class="stat-item"><div class="stat-label">Decisiones del timón</div><div class="stat-val">3</div></div>
+      <div class="stat-item"><div class="stat-label">Momentos de la sesión</div><div class="stat-val">7</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📝 El registro con que se entrena el vigía</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El vigía no se entrena con avisos: se entrena <strong>con registro</strong>. Antes de cada prueba se apunta la predicción («voy a sacar tanto», «voy a poder reproducir tanto»); después se apunta el resultado; y la diferencia entre los dos es <strong>la brecha</strong>.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La meta no es brecha cero: es <strong>brecha vista</strong>. Un vigía que se sabe optimista en Ciencias y certero en Matemáticas ya vale el doble, porque el timón puede descontar el error. Ese registro es el producto de esta ruta y las cinco etapas que siguen lo van llenando.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🔭 El vigía</div><div class="t-info">Sube partes del trabajo</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">⚓ El timón</div><div class="t-info">Baja decisiones</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🏗️ Nivel objeto</div><div class="t-info">Lee, resuelve, memoriza</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🪞 Metanivel</div><div class="t-info">Vigila y administra</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">📝 La predicción</div><div class="t-info">El parte por escrito</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">📏 La brecha</div><div class="t-info">Predicho contra real</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Lo práctico que sale de aquí: <strong>ninguna sesión de la casa termina sin comprobación a cuaderno cerrado</strong>, y ninguna comprobación se hace sin haber apuntado antes la predicción. Dos líneas en una libreta alcanzan.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El tablero del vigía</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para no volver a confundir el parte con la decisión.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Los dos pisos</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🪞 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="niveles" onclick="labShowParte('niveles')">🏗️ Los dos pisos</button>
+        <button class="lab-btn lab-cont-btn" data-parte="vigia" onclick="labShowParte('vigia')">🔭 El vigía</button>
+        <button class="lab-btn lab-cont-btn" data-parte="timon" onclick="labShowParte('timon')">⚓ El timón</button>
+        <button class="lab-btn lab-cont-btn" data-parte="brecha" onclick="labShowParte('brecha')">📏 La brecha</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué piso es?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: la sesión vigilada, de principio a fin</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Usa las flechas <strong>▲ ▼</strong> para poner los pasos en el orden correcto de principio a fin:</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del estudio vigilado se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué está haciendo esa frase?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es esa frase dentro del mapa de los dos pisos:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«¿Cuánto de esto voy a recordar mañana?»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">Jael relee el cuaderno tres veces, se siente lista, y el examen sale mal</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🔭 Vigía</button>
+        <button class="btn btn-sec" onclick="">⚓ Timón</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🪞 La sesión sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · El vigía y el timón · Ruta de la Máquina que se Mira</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: el vigía y el timón</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La sesión sobre la mesa · El vigía y el timón</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🪞 La sesión sobre la mesa: qué dijo el vigía y qué decidió el timón</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una sesión de estudio de la casa. Di qué parte subió el vigía y con qué dato, qué decidió el timón y si decidió con datos comprobados o con sensación, dónde estaba el parte falso y qué pista lo fabricó, y qué se comprueba a cuaderno cerrado y se apunta en el registro (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🪞</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🪞 Casos del proyecto: el vigía en esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas hay un parte del vigía y una decisión del timón, y en todas la pregunta es la misma: <strong>¿con qué dato se decidió?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, desde la primera etapa:</strong> ningún estudio entra sin su etiqueta. Los dos que sostienen esta misión (Flavell 1979, Nelson y Narens 1990) son <strong>clásicos sólidos</strong>: fundaron el campo y siguen en pie. Las etiquetas de cada fuente van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📖 Caso 1: la relectura triple</h2>
+    <p>La noche antes del examen de Ciencias, Jael relee el cuaderno tres veces. El texto corre fácil, todo suena conocido, y a la tercera vuelta dice «ya me lo sé» y cierra el cuaderno.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔭 El parte y su origen</span><br>
+      <span>El vigía subió «ya me lo sé», pero el dato de origen era <span class="hl">la facilidad de releer</span>, no una prueba. La decisión de dormir era razonable; <span class="hl2">el parte era falso</span> y nadie lo auditó.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el «ya me lo sé» no se discute: <strong>se comprueba</strong>. Cuaderno cerrado, hoja en blanco, reproducir. Si sale, a dormir con el parte confirmado. Si no sale, el repaso siguiente empieza por lo que falló, no por releer todo.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🦋 Caso 2: el timón que no para quieto</h2>
+    <p>Angelly estudia con resumen, a los cinco minutos pasa a tarjetas, a los cinco vuelve al cuaderno, después prueba un video. Al final de la hora dice que ninguna técnica le funciona.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚓ Decisiones sin partes</span><br>
+      <span>Aquí el problema es el contrario al del caso 1: el timón gira sin parar, pero <span class="hl">ningún giro tiene un dato detrás</span>. Cambiar de técnica es una decisión de control, y una decisión de control sin monitoreo <span class="hl2">es un volantazo</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> antes de cambiar de técnica se pide el parte: una comprobación pequeña con el material cerrado. Si la técnica rinde, se queda aunque aburra; si no rinde, se cambia con causa. El timón no está para entretener al vigía.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>💸 Caso 3: el curso de súper aprendizaje</h2>
+    <p>Un vendedor ofrece a la familia un curso de «técnicas de estudio y súper aprendizaje» por L 3,500: subrayado de colores, mapas mentales, relectura guiada, y testimonios de alumnos felices.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">💰 La oferta, leída con esta etapa</span><br>
+      <span>Qué mete: promesa de notas y <span class="hl">sensación de avance</span>. Qué saca: L 3,500 y semanas de práctica en técnicas que se sienten bien precisamente porque <span class="hl2">no obligan a comprobar nada</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la pregunta que decide: <strong>¿en qué minuto del curso el alumno produce la respuesta con el material cerrado?</strong> La condición con que sí: solo si entrena comprobación y registro mejor que el protocolo de la casa. Es decir, casi nunca.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🙋 Caso 4: el «¿entendieron?» del aula</h2>
+    <p>En un aula que usa M.E.T.A.S, la maestra explica, pregunta «¿entendieron?», todos asienten, y el examen de la semana siguiente sale mal. La maestra concluye que los alumnos le mintieron.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔭 Nadie mintió</span><br>
+      <span>El «¿entendieron?» le pide a cada alumno un parte de su vigía, y el vigía de cada alumno contesta con la pista que tiene: <span class="hl">la explicación se dejó seguir</span>. Eso es reconocimiento, no recuerdo. <span class="hl2">Todos dijeron su verdad y todos los partes eran falsos.</span></span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la pregunta útil no es «¿entendieron?» sino una que obligue a producir: «cierren el cuaderno y escríbanme los dos pasos». Las misiones de M.E.T.A.S llevan cuestionario por esa razón: es el parte del vigía hecho con material cerrado.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>⚖️ Caso 5: el papá y el compendio</h2>
+    <p>El autor lee el compendio de la Ruta de la Ley completo en dos tardes. Al cerrar el documento siente que domina la pirámide normativa. Tres días después intenta explicarle a la familia los escalones y se le mezclan dos.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🪞 El vigía no distingue edades</span><br>
+      <span>Esto no le pasa solo a las niñas: la fluidez de una buena lectura <span class="hl">factura igual en un adulto</span>. Leer dos tardes seguidas produce una sensación de dominio idéntica al dominio, y solo la <span class="hl2">explicación sin mirar</span> las separa.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> las materias del Estudio Mayor se estudian con el mismo protocolo que la escuela de las niñas: predicción, material cerrado, brecha apuntada. La defensa en voz alta que piden las pruebas de dominio es exactamente esa comprobación, institucionalizada.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🎮 Caso 6: los XP y el vigía de fuera</h2>
+    <p>En F.A.R.O, las misiones dan XP por sección completada. Alguien de la casa descubre que puede voltear todas las flashcards sin leerlas y el contador sube igual.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📏 El indicador no es el saber</span><br>
+      <span>Los XP son un vigía externo: <span class="hl">un indicador indirecto del estudio</span>. Como todo indicador indirecto, se puede engañar, y quien lo engaña se queda <span class="hl2">con la barra llena y la cabeza vacía</span>: le mintió a su propio vigía.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> el XP mide recorrido, no dominio; el dominio lo mide la evaluación con el material cerrado. Saber qué mide cada indicador de la casa (XP, estrellas, notas) es la misma destreza que auditar los partes del propio vigía.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎵 Caso 7: la sesión que fluyó</h2>
+    <p>Una tarde de estudio sale redonda: con música, sin trabas, los ejercicios corren, la sensación al terminar es de día ganado. La prueba corta del día siguiente sale peor que la de la semana anterior, que se había sentido torpe y cuesta arriba.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🌊 Fluir no es aprender</span><br>
+      <span>La sensación durante el estudio mide <span class="hl">la comodidad del momento</span>, y el aprendizaje se mide después y con el material cerrado. Las dos medidas <span class="hl2">pueden ir al revés</span>, y la etapa 4 de esta ruta explica por qué eso no es un accidente.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la sesión no se califica al terminarla: se califica al día siguiente, con la comprobación. En el registro de la casa, la columna del resultado siempre se llena un día después que la columna de la predicción.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📝 Caso 8: la primera semana del registro</h2>
+    <p>La familia decide arrancar el registro del vigía: cada quien apunta su predicción antes de cada prueba de la semana (la nota que cree que sacará, o cuánto podrá reproducir), y después el resultado real.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📏 Qué se apunta</span><br>
+      <span>Cuatro columnas y nada más: <span class="hl">predicción, fecha, resultado, brecha</span>. La meta de la primera semana no es acertar: es <span class="hl2">descubrir el sesgo propio</span>: quién se pasa de optimista, en qué materia, y por cuánto.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> este registro es el producto de la ruta entera: la etapa 6 lo convierte en termómetro calibrado, y la materia de predicción algorítmica del Estudio Mayor lo hereda con otra escala. Empezarlo cuesta dos líneas por prueba; no empezarlo cuesta seguir estudiando a ciegas.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La hoja del vigía, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier sesión de estudio de esta casa, se contesta por escrito antes de darla por buena:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué hizo el piso de abajo:</strong> qué se leyó, resolvió o memorizó.</li>
+      <li><strong>Qué partes subió el vigía:</strong> los «ya me lo sé» y los «esto está flojo».</li>
+      <li><strong>De dónde salió cada parte:</strong> de producir con el material cerrado, o de la facilidad de tenerlo delante.</li>
+      <li><strong>Qué decidió el timón:</strong> seguir, cambiar o parar, y con qué dato.</li>
+      <li><strong>Qué dijo la comprobación:</strong> y cuánta brecha quedó apuntada.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🪞 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">Saber no se siente: se comprueba</span> con el material cerrado. 2. El vigía y el timón son <span class="hl">dos oficios distintos</span>, y la falla casi siempre es del vigía. 3. Un parte vale por <span class="hl">su origen</span>, no por su fuerza. 4. El timón no decide sin parte comprobado. 5. Y <span class="hl2">sin registro no hay brecha</span>, y sin brecha el vigía nunca aprende.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con el mapa de los dos pisos, el vigía y el timón con sus ejemplos, la tabla de partes fiables y engañosos, la sesión vigilada de principio a fin, los ocho casos del proyecto, la <strong>hoja del vigía</strong> y el registro de cuatro columnas para llenar a mano, seis ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-espejo-vigia-timon.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige desde esta primera etapa: <strong>ningún estudio entra sin su etiqueta</strong> (clásico sólido, clásico cuestionado, ciencia en disputa, divulgación con inflado).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Flavell (1979), «Metacognition and cognitive monitoring»:</strong> el acta de nacimiento del término. Clásico sólido.</li>
+      <li><strong>Nelson y Narens (1990), «Metamemory: a theoretical framework and new findings»:</strong> el mapa de los dos pisos y las dos corrientes (monitoreo sube, control baja). Clásico sólido: es el marco que ordena el campo entero.</li>
+      <li><strong>Dunlosky et al. (2013), «Improving Students' Learning With Effective Learning Techniques»:</strong> la monografía que ordena las técnicas de estudio por su evidencia, y se descarga gratis. Síntesis sólida: es el texto de cabecera de las etapas 4 y 5.</li>
+      <li><strong>Koriat (1997):</strong> los juicios de aprendizaje se fabrican con pistas, y las pistas se pueden falsear. Clásico sólido: es la base de la etapa 2, aquí solo se asoma.</li>
+      <li><strong>Brown, Roediger y McDaniel, «Make It Stick»:</strong> divulgación fiel a la evidencia, rara en este campo. Para leer en familia.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba con <strong>una sesión propia relatada en la hoja del vigía</strong>, separando qué fue monitoreo y qué fue control, y localizando dónde mintió el parte.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: las materias completas, con la Metacognición como puerta y sus seis módulos.</li>
+      <li><a href="../../misiones/epistemología/karl-popper.html">🦉 Karl Popper y la Epistemología</a>: la regla de someter las ideas a prueba. Esta etapa la aplica al propio estudio.</li>
+      <li><a href="../../misiones/misión-base-sistema-nervioso/sistema-nervioso.html">🧠 El Sistema Nervioso</a>: el piso de abajo por dentro. La etapa 2 de esta ruta se apoya ahí.</li>
+      <li><a href="../../misiones/ruta-maquina-verificar/verificar.html">🔎 Verificar: nadie firma lo que no leyó</a>: el mismo músculo aplicado a la máquina que predice. Auditar un parte del vigía y verificar una respuesta de la IA son el mismo gesto.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 2 caza las trampas del «ya me lo sé», una por una y con sus estudios.</li>
+      <li><a href="../../fichas/ficha-espejo-vigia-timon.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja del vigía y el registro de cuatro columnas caben en una página cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar <strong>una sesión de estudio real de esta semana</strong> (propia o de una de las niñas) y relatarla con el vocabulario de los dos pisos: qué hizo el nivel objeto, qué partes subió el vigía, de dónde salió cada parte, qué decidió el timón. La prueba de que está aprendida es <strong>localizar el parte falso y decir qué pista lo fabricó</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🪞</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Máquina que se Mira · Etapa 1: El vigía y el timón</div>
+    <div class="diploma-mascot" aria-hidden="true">🪞</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🪞</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Saber no se siente: se comprueba con el cuaderno cerrado» 🌱 · 🪞 Ruta de la Máquina que se Mira · Etapa 1 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/vigia-timon.js"></script>
+</body>
+</html>

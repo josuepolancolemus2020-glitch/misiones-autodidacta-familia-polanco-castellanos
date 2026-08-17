@@ -33,6 +33,12 @@ const RUTAS = {
      compendio completo está en COMPENDIO-RUTA-LEY.md. */
   ley:        { nombre: 'Ruta de la Ley y sus Grietas',      emoji: '⚖️', color: 'ley',  etapas: 12,
                 lema: 'Leer la ley por dentro: qué dice, qué calla y dónde se contradice' },
+  /* La primera ruta del Estudio Mayor (COMPENDIO-ESTUDIO-MAYOR.md). El
+     compendio trae veintisiete materias; entran al catálogo una por una,
+     cuando se construye su primera misión, y todas bajo la materia 'mayor'
+     para no llenar el filtro de chips (capítulo 30 del compendio). */
+  espejo:     { nombre: 'Ruta de la Máquina que se Mira',    emoji: '🪞', color: 'mayor', etapas: 6,
+                lema: 'Saber no se siente: se comprueba con el cuaderno cerrado' },
 };
 
 const MISSIONS = [
@@ -64,6 +70,7 @@ const MISSIONS = [
   { id: 24, title: 'De dónde saca su fuerza la ley: jerarquía, validez y coacción', modulo: 'aprendizaje-unido', materia: 'ley', color: 'apr', xp: 45, icon: '🏛️', ruta: 'ley', etapa: 1, sello: 'familiar', url: 'misiones/ruta-ley-fuerza-norma/fuerza-norma.html' },
   { id: 25, title: 'Anatomía de la Constitución de 1982: qué declara y cómo se reforma', modulo: 'aprendizaje-unido', materia: 'ley', color: 'apr', xp: 45, icon: '📜', ruta: 'ley', etapa: 2, sello: 'familiar', url: 'misiones/ruta-ley-anatomia-constitucion/anatomia-constitucion.html' },
   { id: 26, title: 'Los derechos y la coletilla que los devuelve', modulo: 'aprendizaje-unido', materia: 'ley', color: 'apr', xp: 50, icon: '🎭', ruta: 'ley', etapa: 3, sello: 'familiar', url: 'misiones/ruta-ley-coletilla/coletilla.html' },
+  { id: 27, title: 'El vigía y el timón: el piso que estudia y el piso que vigila', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🪞', ruta: 'espejo', etapa: 1, sello: 'familiar', url: 'misiones/ruta-espejo-vigia-timon/vigia-timon.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -120,5 +127,15 @@ const ETAPAS_PREVISTAS = {
     10: 'La psicología del poder: percepción, autoridad y sesgos del que juzga',
     11: 'Historia de la ley: qué miedo escribió cada norma',
     12: 'El expediente propio: escrito, plazo y defensa de la casa',
+  },
+  /* Los títulos salen de los seis módulos de la Metacognición en
+     COMPENDIO-ESTUDIO-MAYOR.md, para que el mapa enseñe el camino entero
+     desde el primer día, como se hizo con la Ley. */
+  espejo: {
+    2: 'Las trampas del «ya me lo sé»',
+    3: 'El pleito de Dunning-Kruger',
+    4: 'Lo que sí rinde y por qué duele',
+    5: 'El protocolo de la casa',
+    6: 'El termómetro calibrado',
   },
 };

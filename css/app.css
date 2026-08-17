@@ -28,6 +28,7 @@
      aunque sean vecinos de tono: en el mapa de rutas los dos colores se ven
      seguidos y hay que poder distinguirlos de un vistazo. */
   --ley:  #9f1239; --ley-bg:  #fff1f2; --ley-border: rgba(159,18,57,.2);
+  --mayor: #4338ca; --mayor-bg: #eef2ff; --mayor-border: rgba(67,56,202,.2);
   --inv: #0d9488; --inv-bg: #f0fdfa; --inv-border: rgba(13,148,136,.2);
 
   --bg:      #f0f4f9;
@@ -1330,6 +1331,7 @@ a { text-decoration: none; color: inherit; }
 .mc-icon.cib  { background: var(--cib-bg);  color: var(--cib); }
 .mc-icon.ia   { background: var(--ia-bg);   color: var(--ia); }
 .mc-icon.ley  { background: var(--ley-bg);  color: var(--ley); }
+.mc-icon.mayor { background: var(--mayor-bg); color: var(--mayor); }
 
 .small-icon.apr { background: var(--apr-bg); color: var(--apr); }
 .small-icon.esp  { background: var(--esp-bg);  color: var(--esp); }
@@ -1345,6 +1347,7 @@ a { text-decoration: none; color: inherit; }
 .small-icon.cib  { background: var(--cib-bg);  color: var(--cib); }
 .small-icon.ia   { background: var(--ia-bg);   color: var(--ia); }
 .small-icon.ley  { background: var(--ley-bg);  color: var(--ley); }
+.small-icon.mayor { background: var(--mayor-bg); color: var(--mayor); }
 
 .mc-subj.esp  { background: var(--esp-bg);  color: var(--esp); }
 .mc-subj.mat  { background: var(--mat-bg);  color: var(--mat); }
@@ -1359,6 +1362,7 @@ a { text-decoration: none; color: inherit; }
 .mc-subj.cib  { background: var(--cib-bg);  color: var(--cib); }
 .mc-subj.ia   { background: var(--ia-bg);   color: var(--ia); }
 .mc-subj.ley  { background: var(--ley-bg);  color: var(--ley); }
+.mc-subj.mayor { background: var(--mayor-bg); color: var(--mayor); }
 
 /* ====== EMPTY STATE ====== */
 .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
@@ -2768,6 +2772,7 @@ body {
    con un rosa claro, Derecho y Ley se confundía en la cuadrícula con Ciencias
    Sociales (rojo) y con Marketing y Marca (magenta), que quedan a dos filas. */
 .module-card.ley  { background: linear-gradient(135deg, var(--ley),  #be123c); }
+.module-card.mayor { background: linear-gradient(135deg, var(--mayor), #818cf8); }
 
 /* Sello familiar: material que no se publica, solo vive en F.A.R.O */
 .mc-sello { font-size: 12px; vertical-align: 1px; }

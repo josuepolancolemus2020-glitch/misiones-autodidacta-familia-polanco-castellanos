@@ -43,8 +43,8 @@ f.onload = async () => {
 
     log('\n── MATERIAS ──');
     const mats = w.eval('MATERIAS.map(m=>m.id).join(",")');
-    ok(mats === 'esp,mat,cnat,csoc,epis,ing,psi,mkt,eco,pol,cib,ia,ley', '13 materias: 5 escolares y 8 del adulto', 'materias: ' + mats);
-    ok(d.querySelectorAll('#materia-chips .fam-chip').length === 14, '14 chips (Todas + las 13 materias)', 'chips: ' + d.querySelectorAll('#materia-chips .fam-chip').length);
+    ok(mats === 'esp,mat,cnat,csoc,epis,ing,psi,mkt,eco,pol,cib,ia,ley,mayor', '14 materias: 5 escolares, 8 del adulto y el Estudio Mayor', 'materias: ' + mats);
+    ok(d.querySelectorAll('#materia-chips .fam-chip').length === 15, '15 chips (Todas + las 14 materias)', 'chips: ' + d.querySelectorAll('#materia-chips .fam-chip').length);
     w.switchView('view-misiones'); await esperar(200);
     d.querySelector('.fam-chip[data-materia="ing"]').click(); await esperar(250);
     ok(d.querySelectorAll('#missions-container .mission-card').length === 2,
@@ -54,7 +54,7 @@ f.onload = async () => {
     log('\n── MAPA DE RUTAS ──');
     w.switchView('view-rutas'); await esperar(300);
     const cards = d.querySelectorAll('.ruta-card');
-    ok(cards.length === 10, '10 rutas en el mapa', 'rutas: ' + cards.length);
+    ok(cards.length === 11, '11 rutas en el mapa', 'rutas: ' + cards.length);
     /* Cinco rutas del adulto van por la etapa 3 y la Casa Cerrada por la 4.
        Si alguna se queda corta es que la misión nueva no llegó al catálogo. */
     [['Ruta de la Persuasión', 3], ['Ruta de la Marca', 3], ['Ruta del Poder', 3],
