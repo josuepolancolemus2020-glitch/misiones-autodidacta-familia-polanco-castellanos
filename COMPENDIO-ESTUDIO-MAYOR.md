@@ -1,6 +1,6 @@
 # Compendio · El Estudio Mayor de F.A.R.O
 
-Veintisiete materias en siete arcos. Este documento es el temario completo del
+Veintiocho materias en siete arcos. Este documento es el temario completo del
 Estudio Mayor: qué enseña cada materia, sus módulos, sus fuentes con su
 estatus, su prueba de dominio y sus casos del proyecto. De aquí saldrán las
 misiones, una por orden del autor, igual que el compendio de la Ruta de la Ley
@@ -8,7 +8,7 @@ salió antes que sus doce etapas.
 
 Fecha: 17 de agosto de 2026. Estado: **temario propuesto, nada construido**.
 Ninguna materia toca todavía `js/data/misiones.js`: el catálogo se toca cuando
-construye cada misión, no antes (capítulo 32).
+construye cada misión, no antes (capítulo 33).
 
 El encargo del autor, en sus palabras: conocimiento que haga a la familia
 «verdaderos conocedores para poder entender este mundo antes de partir»,
@@ -104,7 +104,7 @@ exactamente eso.
 
 ---
 
-## 2. El mapa: siete arcos, veintisiete materias
+## 2. El mapa: siete arcos, veintiocho materias
 
 Los arcos van del instrumento hacia afuera: primero la máquina que estudia,
 después el juicio, la palabra, los relatos que gobiernan, el tablero del
@@ -117,7 +117,7 @@ siguiente**.
 | I · El instrumento: la máquina que estudia | Metacognición · Neuroplasticidad · Epigenética · Ciencia de la Procrastinación |
 | II · El juicio: decidir con la cabeza que se tiene | Sesgo cognitivo · Toma de decisiones · Lógica del argumento · Las falacias |
 | III · La palabra: el arte de que te crean | Retórica · Oratoria · Estratagemas en el discurso · La literatura |
-| IV · El relato: las historias que gobiernan | Mitología (la base de Joseph Campbell) · Teología: estudio de las religiones · El Talmud y el judaísmo · Psicología de masas |
+| IV · El relato: las historias que gobiernan | Mitología (la base de Joseph Campbell) · Teología: estudio de las religiones · El Talmud y el judaísmo · Psicología de masas · Semiótica y cine |
 | V · El tablero: cómo se mueve el mundo | Geopolítica · Economía política · Materialismo Filosófico · Educación Financiera |
 | VI · Las gafas: las ideas que se llevan puestas | Estudio de las Ideologías · Crítica al Marxismo · Crítica al Capitalismo |
 | VII · El porvenir: predecir sin bola de cristal | Ciencia de la predicción algorítmica · La singularidad · El futuro de la IA · La tesis y sus negocios |
@@ -125,21 +125,21 @@ siguiente**.
 La última materia del último arco no es una más: **La tesis y sus negocios**
 es el cierre de todo el Estudio Mayor. Su producto final es que cada miembro
 de la familia formule, escriba y defienda una tesis propia. Ahí se comprueba
-si las otras veintiséis hicieron su trabajo.
+si las otras veintisiete hicieron su trabajo.
 
 ---
 
 ## 3. El orden de lectura que se propone
 
 Los arcos agrupan; este orden recorre. Sale de la crítica de arquitectura
-que revisó las veinticuatro primeras juntas (las tres del arco de las gafas entraron el 17 de agosto y pasaron por su propia criba, que las colocó donde se ve): respeta los arcos casi siempre
+que revisó las veinticuatro primeras juntas (las tres del arco de las gafas y Semiótica y cine entraron el 17 de agosto, cada tanda por su propia criba): respeta los arcos casi siempre
 y los rompe exactamente cuatro veces, con la razón escrita en cada línea
 (Procrastinación se adelanta a Epigenética; Materialismo y Educación
 Financiera se adelantan en su arco; Predicción algorítmica se adelanta
 desde el Arco VII porque Geopolítica usa su registro; las gafas entran tras Economía política). Como toda propuesta
 de esta casa, el orden de construcción real lo decide el autor.
 
-1. **Metacognición**: la puerta declarada; su protocolo de estudio lo usan las otras veintiséis.
+1. **Metacognición**: la puerta declarada; su protocolo de estudio lo usan las otras veintisiete.
 2. **Neuroplasticidad**: pegada a la anterior por diseño; pone el sustrato físico de recuperar y espaciar.
 3. **Ciencia de la Procrastinación**: se adelanta a Epigenética; terminar es la habilidad de la que depende el resto y conviene tenerla antes de abrir rutas largas.
 4. **Epigenética**: hermana declarada de la anterior; primer gimnasio de clásico en disputa (Yehuda) con el hábito de estudio ya instalado.
@@ -154,18 +154,19 @@ de esta casa, el orden de construcción real lo decide el autor.
 13. **Estudio de la Mitología**: la radiografía del relato; deja fijado el estatus de Jung y de Eliade que Teología reutiliza.
 14. **Teología**: gasta la lógica del Arco II en los argumentos sobre Dios; deja el mapa del judaísmo y a Durkheim puestos.
 15. **El Talmud y el judaísmo**: abre en profundidad lo que Teología dejó en mapa; desmonta los Protocolos antes de que Masas explique su eficacia.
-16. **Psicología de masas**: cierra el arco del relato heredando efervescencia (Teología), Protocolos (Talmud) y cascada (Toma de decisiones).
-17. **Materialismo Filosófico**: se adelanta en su arco, porque Geopolítica y Economía política auditan con su llave; necesita los datos que Teología ya dejó.
-18. **Educación Financiera**: la defensa doméstica no espera al final del arco; usa el valor esperado de Toma de decisiones y la auditoría de Materialismo.
-19. **Ciencia de la predicción algorítmica**: se adelanta desde el Arco VII, porque Geopolítica declara usar su registro y su Tetlock.
-20. **Geopolítica**: el mapa y los peajes, con el registro de pronósticos ya en marcha.
-21. **Economía política**: las reglas y los repartos sobre el mismo tablero; Honduras como laboratorio cierra el arco.
-22. **Estudio de las Ideologías**: la materia marco del arco de las gafas; fabrica la llave (la morfología, el detector, el acero cruzado y la prueba de Turing ideológica) antes de que las gemelas la usen, por la misma regla con que Materialismo se adelantó en su arco.
-23. **Crítica al Marxismo**: la primera gemela; enseña el test de la fecha, la plantilla de doble columna y la trampa de Popper, que la dorada solo aplica.
-24. **Crítica al Capitalismo**: la gemela dorada; corre la misma plantilla con la misma dureza, y al cerrar habilita la defensa de las dos (ninguna gemela se aprueba sin la otra cursada: la Bóveda no acepta un expediente sin el otro).
-25. **El futuro de la IA**: las curvas y los costes de hoy antes que el umbral; hereda el tablero recién hecho, y ahora también las gafas.
-26. **La singularidad**: la hipótesis extrema con las curvas ya leídas y el registro ya rodado; su moneda al aire exige los dos bandos frescos.
-27. **La tesis y sus negocios**: el cierre declarado; sin tesis defendida no hay Estudio Mayor, y el doble escenario de la materia anterior es la primera candidata.
+16. **Psicología de masas**: hereda efervescencia (Teología), Protocolos (Talmud) y cascada (Toma de decisiones); su marea alimenta la que sigue.
+17. **Semiótica y cine**: cierra el arco del relato con el relato dominante del siglo; usa el narrador de La literatura y el monomito de Mitología ya cursados, y deja la tríada del signo lista para el detector de Ideologías.
+18. **Materialismo Filosófico**: se adelanta en su arco, porque Geopolítica y Economía política auditan con su llave; necesita los datos que Teología ya dejó.
+19. **Educación Financiera**: la defensa doméstica no espera al final del arco; usa el valor esperado de Toma de decisiones y la auditoría de Materialismo.
+20. **Ciencia de la predicción algorítmica**: se adelanta desde el Arco VII, porque Geopolítica declara usar su registro y su Tetlock.
+21. **Geopolítica**: el mapa y los peajes, con el registro de pronósticos ya en marcha.
+22. **Economía política**: las reglas y los repartos sobre el mismo tablero; Honduras como laboratorio cierra el arco.
+23. **Estudio de las Ideologías**: la materia marco del arco de las gafas; fabrica la llave (la morfología, el detector, el acero cruzado y la prueba de Turing ideológica) antes de que las gemelas la usen, por la misma regla con que Materialismo se adelantó en su arco.
+24. **Crítica al Marxismo**: la primera gemela; enseña el test de la fecha, la plantilla de doble columna y la trampa de Popper, que la dorada solo aplica.
+25. **Crítica al Capitalismo**: la gemela dorada; corre la misma plantilla con la misma dureza, y al cerrar habilita la defensa de las dos (ninguna gemela se aprueba sin la otra cursada: la Bóveda no acepta un expediente sin el otro).
+26. **El futuro de la IA**: las curvas y los costes de hoy antes que el umbral; hereda el tablero recién hecho, y ahora también las gafas.
+27. **La singularidad**: la hipótesis extrema con las curvas ya leídas y el registro ya rodado; su moneda al aire exige los dos bandos frescos.
+28. **La tesis y sus negocios**: el cierre declarado; sin tesis defendida no hay Estudio Mayor, y el doble escenario de la materia anterior es la primera candidata.
 
 ---
 
@@ -177,7 +178,7 @@ Antes de estudiar el mundo se estudia la máquina con que se estudia. Las cuatro
 
 Lema: «Saber no se siente: se comprueba con el cuaderno cerrado.»
 
-**Por qué está guardado.** Todo lo que enseña esta materia está publicado y casi todo gratis: la monografía de Dunlosky de 2013 se descarga sin pagar. Lo escaso no es el texto: es el hábito. Casi nadie convierte «hazte preguntas y espacia el repaso» en un protocolo con registro, porque las técnicas que rinden se sienten peor que las que no rinden, y la sensación gana si nadie la audita. Y la escuela nunca entrena el juicio: califica lo que el alumno sabe, jamás lo bien que estima lo que sabe. Quien domina esto estudia las otras veintiséis materias del Estudio Mayor a mitad de precio; por eso es la puerta.
+**Por qué está guardado.** Todo lo que enseña esta materia está publicado y casi todo gratis: la monografía de Dunlosky de 2013 se descarga sin pagar. Lo escaso no es el texto: es el hábito. Casi nadie convierte «hazte preguntas y espacia el repaso» en un protocolo con registro, porque las técnicas que rinden se sienten peor que las que no rinden, y la sensación gana si nadie la audita. Y la escuela nunca entrena el juicio: califica lo que el alumno sabe, jamás lo bien que estima lo que sabe. Quien domina esto estudia las otras veintisiete materias del Estudio Mayor a mitad de precio; por eso es la puerta.
 
 **El cuello de botella que se suprime.** La universidad enseña metacognición como un tema de psicología educativa: se memoriza el nombre de Flavell para un examen de opción múltiple y jamás se registra la calibración propia. Es enseñar natación por diapositivas. La divulgación hace lo contrario: reduce todo al meme de Dunning-Kruger, casi siempre mal contado y sin su disputa estadística. Este temario lo suprime haciendo que cada módulo termine en un ejercicio sobre el estudio real de quien lo cursa: sus predicciones, sus resultados, su brecha. El material de práctica no hay que inventarlo: son las demás materias del Estudio Mayor y la escuela de las niñas.
 
@@ -197,7 +198,7 @@ Lema: «Saber no se siente: se comprueba con el cuaderno cerrado.»
 4. **Lo que sí rinde y por qué duele.** Roediger y Karpicke, 2006: recuperar (cerrar el texto y producirlo) rinde más a una semana que releer, aunque releer gana en la prueba inmediata y en la sensación. Cepeda y colegas juntaron un siglo de datos en 2006: espaciar los repasos rinde más que amontonarlos, y el intervalo óptimo crece con el plazo. Rohrer y Kornell mostraron el intercalado: mezclar tipos de problema rinde más que los bloques puros, y también se siente peor. Dunlosky y colegas ordenaron todo en 2013: práctica de recuperación y espaciado arriba; subrayar y releer, abajo. Bjork le puso nombre a la paradoja: dificultades deseables; el rendimiento durante el estudio y el aprendizaje que queda son medidas distintas y a menudo van al revés. Quien termina este módulo diseña una sesión de estudio para cualquier tema con las tres herramientas y defiende ante un alumno quejoso por qué el camino incómodo es el corto.
    *Fuentes:* Roediger y Karpicke (2006), el efecto de la prueba (sólido y muy replicado; el metaanálisis de Rowland de 2014 lo confirma). Cepeda, Pashler y colegas (2006) sobre espaciado (sólido). Rohrer y Taylor (2007) y Kornell y Bjork (2008) sobre intercalado (sólido, con matices por materia). Dunlosky et al. (2013), la monografía que ordena las técnicas (síntesis sólida y gratuita). Bjork, «dificultades deseables» (marco sólido).
 
-5. **El protocolo de la casa.** Aquí la evidencia se vuelve método fijo. Reaprendizaje sucesivo de Rawson y Dunlosky: recuperar hasta acertar, volver a los días, recuperar de nuevo, varias vueltas; es de lo mejor medido que existe. Pre-test de Kornell, Hays y Bjork: intentar responder antes de estudiar, aun fallando, prepara la memoria para la respuesta. Tarjetas bien hechas: una idea por tarjeta, en palabras propias, y la que se acierta fácil se espacia, no se jubila. Autoexplicación: decir en voz alta por qué el paso sigue del anterior. Con esas piezas se redacta el «Protocolo de estudio de la casa», dos páginas, y se corre una semana entera con él sobre materia real. Quien termina este módulo deja el protocolo escrito y probado: es el documento que las otras veintiséis materias van a usar.
+5. **El protocolo de la casa.** Aquí la evidencia se vuelve método fijo. Reaprendizaje sucesivo de Rawson y Dunlosky: recuperar hasta acertar, volver a los días, recuperar de nuevo, varias vueltas; es de lo mejor medido que existe. Pre-test de Kornell, Hays y Bjork: intentar responder antes de estudiar, aun fallando, prepara la memoria para la respuesta. Tarjetas bien hechas: una idea por tarjeta, en palabras propias, y la que se acierta fácil se espacia, no se jubila. Autoexplicación: decir en voz alta por qué el paso sigue del anterior. Con esas piezas se redacta el «Protocolo de estudio de la casa», dos páginas, y se corre una semana entera con él sobre materia real. Quien termina este módulo deja el protocolo escrito y probado: es el documento que las otras veintisiete materias van a usar.
    *Fuentes:* Rawson y Dunlosky sobre reaprendizaje sucesivo (sólido). Kornell, Hays y Bjork (2009) sobre el efecto del pre-test (sólido, efecto moderado). Dunlosky et al. (2013) como tabla maestra para decidir qué entra al protocolo y qué no.
 
 6. **El termómetro calibrado.** Un juicio de aprendizaje es una predicción: «de esto voy a recordar tanto». Nelson y Dunlosky, 1991: el juicio hecho minutos después de estudiar, sin el material delante, acierta mucho más que el inmediato; solo retrasarlo ya lo mejora. Thiede y colegas mostraron lo mismo en comprensión de lectura: generar palabras clave con retraso afina el monitoreo y mejora lo que se decide repasar. El instrumento de la casa es el registro de calibración: antes de cada prueba se apunta la nota esperada, después la real, y se mira la brecha por semanas. El objetivo no es brecha cero: es que la brecha se vea y encoja, porque el control solo mejora cuando el monitoreo mejora. Quien termina este módulo audita el estudio de otra persona (una hermana, un alumno de M.E.T.A.S) y entrega el hallazgo por escrito con sus números.
@@ -215,7 +216,7 @@ Lema: «Saber no se siente: se comprueba con el cuaderno cerrado.»
 
 3. En M.E.T.A.S se discute si el cuestionario de cada misión debe ir solo al final. Mete comodidad de diseño y costumbre; saca el efecto del pre-test y el repaso espaciado en más de sesenta misiones. La pregunta que decide: ¿el cuestionario solo mide o también enseña? La condición con que sí se rediseña: un pre-test corto al abrir la misión y un repaso a los días, siempre que no alargue la misión más de diez minutos, porque una misión que no se termina no enseña nada.
 
-**Conexiones.** Enlaza con la Ruta del Pensamiento: Popper puso la regla de someter las ideas a prueba; esta materia aplica esa regla al propio estudio y no repite epistemología. Enlaza con la Ruta de la Máquina que Predice: verificar lo que dice un modelo es el mismo músculo que verificar lo que uno cree saber; no se repite el uso de la IA. De la Ruta de la Persuasión toma hecha la vacuna contra el vendedor de cursos, sin repetir las palancas. Dentro del Estudio Mayor es la puerta: Neuroplasticidad pone el sustrato físico de por qué recuperar y espaciar funcionan (las dos materias se estudian pegadas), y las veinticinco restantes son su campo de práctica.
+**Conexiones.** Enlaza con la Ruta del Pensamiento: Popper puso la regla de someter las ideas a prueba; esta materia aplica esa regla al propio estudio y no repite epistemología. Enlaza con la Ruta de la Máquina que Predice: verificar lo que dice un modelo es el mismo músculo que verificar lo que uno cree saber; no se repite el uso de la IA. De la Ruta de la Persuasión toma hecha la vacuna contra el vendedor de cursos, sin repetir las palancas. Dentro del Estudio Mayor es la puerta: Neuroplasticidad pone el sustrato físico de por qué recuperar y espaciar funcionan (las dos materias se estudian pegadas), y las veintiséis restantes son su campo de práctica.
 
 ---
 
@@ -735,7 +736,7 @@ Lema: «Leer por dentro: quién cuenta, cuánto sabe y por qué se le cree.»
 
 ## Arco IV · El relato: las historias que gobiernan
 
-Los relatos que ordenan comunidades enteras: el molde del mito y sus recortes, lo que cree cada templo y por qué, el método de estudio que produjo siglos de erudición, y la corriente que piensa por la multitud cuando nadie la mira.
+Los relatos que ordenan comunidades enteras: el molde del mito y sus recortes, lo que cree cada templo y por qué, el método de estudio que produjo siglos de erudición, la corriente que piensa por la multitud cuando nadie la mira, y la pantalla donde este siglo cuenta los suyos, leída con la gramática del signo.
 
 ### 16. Estudio de la Mitología: la base de Joseph Campbell · Ruta de las Mil Caras 🐉
 
@@ -924,11 +925,58 @@ Lema: «Reconocer la corriente antes de que piense por ti.»
 
 ---
 
+### 20. Semiótica y cine · Ruta de la Pantalla Leída 🎬
+
+Lema: «En la pantalla nada llegó solo: todo lo que se ve fue puesto, y lo que fue puesto se puede leer»
+
+**Por qué está guardado.** Todo el mundo ve cine; casi nadie lo lee. Las películas que esta materia usa de gimnasio se consiguen en cualquier plataforma, y los libros que enseñan a leerlas (Barthes, Eco, el manual de Bordwell) están traducidos y baratos. Lo escaso son tres cosas: el instrumento (la tríada del signo, que convierte «me gustó» en «vi esto, puesto así, por esto»), la disciplina de la segunda vista (una película se ve dos veces o no se leyó), y la regla que separa al lector del cazador de fantasmas: una lectura vale cuando los fotogramas la sostienen. Quien domina esto no puede volver a ver «solo» una película, y de paso queda vacunado contra toda imagen que quiera venderle algo, porque la publicidad, el noticiero y la propaganda usan exactamente la misma gramática con menos escrúpulos.
+
+**El cuello de botella que se suprime.** La universidad parte esta materia en tres pedazos que no se hablan: la semiótica se enseña en posgrados de letras, envuelta en jerga que espanta; las escuelas de cine enseñan a producir, no a leer; y la crítica no se enseña en ninguna parte: se hereda. La divulgación de internet hace lo contrario y peor: los videos de «el final explicado» cazan huevos de pascua sin distinguir una lectura sostenida de una numerología, que es exactamente la enfermedad que Room 237 documentó. Este temario lo suprime al revés: el instrumento primero (el signo, en una tarde y sin jerga), el gimnasio son las películas que esta casa ya ama, y la regla de la evidencia en pantalla se instala desde el primer módulo, para que el poder de leer símbolos no degenere en verlos donde no hay.
+
+**La abstracción central.** «En una película todo fue puesto: cada objeto, corte, color y silencio es una decisión de alguien, y por eso todo puede leerse como signo; y una lectura vale exactamente en la medida en que los fotogramas la sostienen.» Esa doble frase reconstruye la materia entera: la primera mitad abre el juego (si todo es decisión, todo significa: el impermeable amarillo de Dark no es ropa, es señal), y la segunda lo cierra (el límite de Eco: interpretar no es alucinar). Entre las dos mitades cabe el oficio completo, del signo de Peirce a la crítica que se firma.
+
+**Los módulos:**
+
+1. **El signo, la herramienta madre.** Todo lo demás cuelga de una idea: un signo es algo que está en lugar de otra cosa. Saussure la partió en dos caras (significante y significado, con la arbitrariedad del lazo: nada en el sonido «perro» tiene pelo), y Peirce la partió en tres tipos, que es la tríada con que esta casa va a trabajar porque sirve para imágenes: el **icono** significa por parecido (el dibujo del faro), el **índice** por conexión real (el humo significa fuego, la huella significa pie) y el **símbolo** por pura convención (la bandera, la cruz, el semáforo). Barthes añadió el piso que más rinde en la pantalla: sobre la **denotación** (lo que se ve: una mujer con impermeable amarillo) monta la **connotación** (lo que eso carga: infancia, alarma, memoria), y sobre las dos el **mito**: la connotación que una cultura ya no nota porque la tiene por natural. Y Eco puso la definición que gobierna la materia: la semiótica estudia todo lo que puede usarse para mentir; lo que no puede usarse para mentir tampoco puede usarse para decir verdad. Quien termina este módulo clasifica con la tríada diez signos de su día (el uniforme, el sello, el logo, la sirena) y ya no confunde el parecido con la convención.
+   *Fuentes:* Saussure, «Curso de lingüística general» (1916, clásico sólido de la lingüística; póstumo, armado con apuntes de sus alumnos, y ese estatus se dice). Peirce, los escritos sobre el signo (clásico sólido, disperso: se estudia por antologías). Barthes, «Mitologías» (1957, clásico sólido del método: lee la lucha libre, el bistec y un automóvil como esta materia leerá películas). Eco, «Tratado de semiótica general» (1976, la sistematización estándar).
+
+2. **El poder de los símbolos, fuera de la pantalla.** Antes de leer cine se lee el mundo, porque el símbolo trabaja igual en los dos lados: condensa (una bandera carga una historia entera en un trapo), agrupa (quien la jura queda dentro; quien la quema queda fuera) y manda (la toga, el sello y el uniforme hacen obedecer sin argumentar, que es la autoridad de la Ruta de la Persuasión vestida de tela). Se estudia el mecanismo con los casos de la casa y del país: por qué el juez lleva toga y el papel lleva sello (la etapa 1 de la Ley preguntó en qué norma consta; aquí se pregunta por qué el sello convence antes que la norma), qué carga la bandera azul y blanco un quince de septiembre, qué significa el faro de F.A.R.O y qué el candado del sello familiar, y qué connota el uniforme escolar hondureño que una camiseta no. Lo sagrado tiene dueña (Durkheim vive en Teología: el símbolo que agrupa una comunidad moral) y los relatos nacionales también (Anderson y Gellner viven en Estudio de las Ideologías): aquí se pone la mecánica del signo debajo de ambos y se remite el resto. Quien termina hace el inventario de símbolos de M.E.T.A.S y F.A.R.O (nombre, faro, colores, XP, candado, insignias) y dice de cada uno si es icono, índice o símbolo, qué connota y a quién agrupa.
+   *Fuentes:* Barthes, «Mitologías» otra vez (el método de leer lo cotidiano). Durkheim y lo sagrado: remitido a Teología. Anderson y Gellner: remitidos a Estudio de las Ideologías. El inventario propio como fuente primaria, que es la costumbre de la casa.
+
+3. **La gramática de la pantalla.** El cine tiene sintaxis, y quien la conoce ve decisiones donde antes veía historia. El plano: la escala (el primer plano confiesa, el general abandona), el ángulo (desde abajo agranda, desde arriba somete) y el encuadre (lo que quedó fuera también fue puesto fuera). La luz y el color como código: el verde enfermizo de la matriz contra el azul frío del mundo «real» en Matrix, el amarillo que persigue a los niños de Dark, y la regla de que un código de color solo existe si se sostiene película entera. El sonido: la música que ordena qué sentir (y el silencio de 2001, que ordena no saber). Y el montaje, que es la gramática profunda: el efecto Kuleshov (el mismo rostro «cambia de emoción» según el plano que le pegues al lado: el significado no está en el plano sino en el corte), Eisenstein y el choque de imágenes que fabrica una idea que no estaba en ninguna de las dos, y el corte invisible de Hollywood, que es la ideología del montaje: editar tanto que parezca que nadie editó. El corte más famoso del cine (el hueso que un simio lanza al aire y se vuelve satélite, en 2001) salta milenios en un empalme: eso es sintaxis pura. Quien termina puede pausar un fotograma cualquiera y leer en voz alta cinco decisiones: escala, ángulo, luz, color, y qué hizo el corte anterior.
+   *Fuentes:* Bordwell y Thompson, «El arte cinematográfico» (el manual estándar del campo, ediciones continuas: sólido). Eisenstein, «La forma del cine» (clásico sólido del montaje, escrito por su inventor teórico). El efecto Kuleshov: real como fenómeno y replicado moderno, pero el experimento original se semiperdió y sus detalles se cuentan de oídas; se enseña con esa reserva, que es la regla del estatus aplicada al cine.
+
+4. **El relato proyectado: estructuras y laberintos.** Lo que La literatura enseñó del narrador y los dos relojes se corre ahora en pantalla, sin repetirse: la cámara es un narrador con grados de saber (qué ve, qué esconde, cuándo miente), y el guion es tiempo administrado. Las estructuras: los tres actos del manual de la industria (planteamiento, confrontación, resolución, con sus giros de acto), la pistola de Chéjov (lo que se enseña en el acto uno dispara en el tres: setup y payoff como contrato con el espectador), y el giro final con su regla de juego limpio: un buen giro reordena lo ya visto, no lo desmiente. El monomito tiene dueña (Campbell y Vogler viven en Mitología) y aquí solo se corre su caso de manual: Matrix estación por estación, del mundo ordinario a la resurrección, que es la prueba de que Hollywood industrializó el molde. Y el plato fuerte de la casa: el laberinto. Rashomon (el mismo hecho, cuatro narradores, ninguno fiable), y Dark como el nudo mayor de la televisión: la causalidad circular (la paradoja del objeto sin origen: el cuaderno que existe porque existe), tres familias trenzadas en tres tiempos, y la tesis visual de que «el principio es el final». Quien termina desarma una película en sus estructuras: actos, contratos plantados y pagados, narrador y su grado de mentira, y dibuja el nudo temporal de Dark sin ayuda.
+   *Fuentes:* McKee, «El guion» (biblia de la industria: manual con doctrina, no ciencia, y así se etiqueta). Field, «El guion» (el molde de tres actos, mismo estatus). Vogler: remitido a Mitología. Kurosawa, «Rashomon» (1950) y «Dark» (2017-2020) como textos primarios: en esta materia las películas son las fuentes.
+
+5. **El cine que filosofa: las películas de la casa.** La tesis del módulo: una gran película filosófica es un experimento mental con cuerpo, y por eso discute con los filósofos de tú a tú. **Matrix** (1999): la caverna de Platón y el genio maligno de Descartes en versión industrial, la máquina de experiencias de Nozick (¿conectarías tu vida a una simulación placentera?) convertida en píldora, y el caso de honestidad más útil del temario: el libro de Baudrillard sale en pantalla (el escondite ahuecado de los discos), las Wachowski lo citaron como base, y Baudrillard declaró después que la película malinterpretaba su tesis; se enseña con las dos versiones, porque ilustrar un filósofo no es demostrarlo. **La naranja mecánica** (1971, y es de adultos: la lista de la casa lo marca): el condicionamiento de Ludovico contra el libre albedrío, la pregunta del capellán (¿es bueno el bien forzado, o la bondad sin elección deja de ser bondad?), y el pleito textual documentado: Burgess escribió veintiún capítulos, la edición estadounidense cortó el último (donde Alex madura), Kubrick filmó la versión cortada, y Burgess pasó años protestando por el final que le cambiaron. **Dark**: el eterno retorno de Nietzsche tomado en serio (¿qué harías si todo esto volviera, idéntico, infinitas veces?) y el determinismo contra la voluntad: personajes que luchan por cambiar un pasado que su lucha produce. **Cube** (1997, «el cubo»): el experimento mental desnudo por presupuesto: un laberinto letal que nadie diseñó del todo («cada quien hizo su pieza»), que es Kafka sin tribunal y la mejor imagen del mal sin autor que tiene el cine barato; y el grupo que se degrada adentro conecta con la marea de Masas. **2001** (1968): el monolito negro como el símbolo abierto por diseño (Kubrick se negó en vida a explicarlo: un signo cuyo significado es que lo busques), y HAL como la máquina que miente, que la Ruta de la Máquina que Predice ya conoce de cerca. Y los clásicos que completan la mesa: «El séptimo sello» (Bergman: la partida de ajedrez con la muerte y el silencio de Dios, que conversa con Teología), «El show de Truman» (la caverna otra vez, y apta para toda la familia), «Stalker» (Tarkovsky: el deseo como zona peligrosa), «Blade Runner» (qué cuenta como persona). Quien termina expone una de estas películas ante la familia con su pregunta filosófica enunciada en una frase, el experimento mental que la encarna, y el filósofo con quien discute.
+   *Fuentes:* Platón, «República», libro VII (clásico sólido). Descartes, «Meditaciones metafísicas» (clásico sólido). Nozick, «Anarchy, State, and Utopia» (1974: la máquina de experiencias; el mismo libro del pleito con Rawls que vive en Crítica al Capitalismo). Baudrillard, «Simulacros y simulación» (1981, ensayo influyente y oscuro) y su rechazo documentado de la lectura de Matrix (entrevistas de 2003-2004). Burgess, «La naranja mecánica» (1962) y su prólogo de 1986 («A Clockwork Orange Resucked»: la protesta por el capítulo cortado, documento primario). Nietzsche, «La gaya ciencia», §341 (el eterno retorno como prueba, no como cosmología: lectura estándar, con debate). Las películas mismas como texto primario, vistas dos veces.
+
+6. **El oficio del crítico.** La crítica es un género con método, no un gusto con adjetivos. El método en tres operaciones que no se mezclan: **describir** (qué está en pantalla: verificable), **interpretar** (qué significa: argumentable con fotogramas) y **evaluar** (qué tan bien está hecho para lo que intenta: discutible con criterios). La historia del oficio en sus tres peleas: Truffaut y la política de los autores (1954: el director como autor de la obra, contra el cine de guionistas prestigiosos), Sarris importándola a Estados Unidos y Pauline Kael demoliéndola («Circles and Squares», 1963: el pleito canónico de la crítica, y se leen los dos), y Ebert como el modelo de crítica popular honesta: escribir para el lector, no para el gremio, sin mentirle al lector ni destripar la película. El límite del oficio es la regla de Eco: interpretar tiene bordes, y el texto tiene derechos contra su lector; el caso de estudio es «Room 237» (2012), el documental que registra, sin burlarse, las teorías desbocadas sobre «El resplandor»: se ve completo como vacuna, porque enseña cómo una mente afilada sobreinterpreta con total sinceridad. Y el canon como pregunta (herencia declarada de La literatura): la encuesta de Sight & Sound elige «las mejores de la historia» cada década, su resultado de 2022 provocó un pleito público sobre cómo se arma la lista, y la casa lo estudia como lo que es: política del canon, no medición. Quien termina escribe una crítica de dos páginas de una película de la lista, para un lector que no la vio, con las tres operaciones separadas y sin destripar el giro.
+   *Fuentes:* Truffaut, «Una cierta tendencia del cine francés» (Cahiers du Cinéma, 1954, clásico fundacional). Sarris, «Notes on the Auteur Theory» (1962) y Kael, «Circles and Squares» (1963): el pleito completo, con los dos bandos. Ebert, «Las grandes películas» (divulgación magistral, el modelo de prosa). Eco, «Los límites de la interpretación» (1990, la regla del borde). «Room 237» (2012, el documental: la sobreinterpretación filmada). La teoría de la mirada de Mulvey (1975) se nombra con su estatus: ensayo influyente y muy discutido, no ciencia; quien quiera ese barrio entra sabiendo qué es.
+
+7. **El cineclub de la casa.** El módulo que convierte la materia en costumbre. El método de la doble vista: la primera vez como público (la película tiene derecho a su magia) y la segunda como lector, con pausa y libreta; ninguna ficha se escribe con una sola vista. La ficha de lectura de la casa, una página fija: qué símbolos se vieron y con qué evidencia en pantalla (fotograma y minuto, o no cuenta), qué decisiones de gramática cargan el sentido, qué estructura arma el relato, cuál es la pregunta filosófica en una frase, y el veredicto con las tres operaciones separadas. La lista curada de la casa **con su columna de para quién es**, porque esta casa tiene niñas y el cine filosófico no es todo para todos: «El show de Truman», «Doce hombres sin piedad», «El viaje de Chihiro» y «Tiempos modernos» abren el club completo; «Matrix», «Rashomon», «El séptimo sello» y «Dark» entran con los años y con conversación; «La naranja mecánica» y sus vecinas son de adultos, y así se imprime, sin letra pequeña. Y la sesión del club: una película al mes, la ficha antes de la charla, y la charla con la regla del acero de la casa: quien odió la película defiende primero lo mejor que tiene, y quien la amó señala primero dónde cojea. Quien termina deja el cineclub andando, que es la única prueba que este módulo acepta.
+   *Fuentes:* el método es síntesis de la casa sobre Ebert (la honestidad con el lector), Eco (el borde) y la doctrina del acero de Las falacias, remitida. La lista es de la familia y se revisa cada año: fuente primaria propia.
+
+**La prueba de dominio.** Defensa de pie, ante la familia, con tres estaciones. Una: la familia elige una escena de cualquier película de la lista y el defensor lee el fotograma pausado en voz alta: escala, ángulo, luz, color, corte, y qué signos carga, con la tríada bien usada. Dos: exponer una película completa con su pregunta filosófica, su experimento mental y su filósofo, y distinguir en ella una lectura sostenida por fotogramas de una sobreinterpretación, fabricando la sobreinterpretación a propósito para enseñar la diferencia. Tres: el examinador propone una lectura falsa pero seductora («el amarillo de Dark significa traición») y el defensor la refuta con la regla de la evidencia, fotogramas en mano. Producto para la Bóveda: **el expediente del cineclub**: cinco fichas de lectura completas de cinco películas distintas (al menos una clásica anterior a 1970), la crítica propia de dos páginas, y la lista curada de la casa con su columna de edades firmada por los adultos. Se aprueba si el cineclub tuvo al menos tres sesiones reales; una materia de cine que no proyecta nada no está aprobada.
+
+**La advertencia epistémica.** Cinco minas, todas activas. Primera: la sobreinterpretación es el riesgo profesional del oficio entero, no un error de novatos; Room 237 muestra mentes brillantes cayendo con sinceridad, y la única vacuna es la regla de la evidencia aplicada también a las lecturas propias, sobre todo a las que enamoran. Segunda: la semiótica académica tiene barrios de jerga (el psicoanálisis lacaniano aplicado al cine, la teoría de la mirada) que se citan aquí con estatus de ensayo influyente y discutido, nunca de ciencia; entrar a ese barrio está permitido, confundir sus tesis con resultados no. Tercera: el efecto Kuleshov es real como fenómeno y borroso como historia: el material original se perdió y los detalles del experimento se repiten de oídas; se enseña con esa reserva. Cuarta: una película ilustra una tesis filosófica, no la demuestra, y el caso Baudrillard contra Matrix queda de recordatorio permanente: hasta los autores citados en pantalla pueden renegar de la lectura. Quinta: toda lista de «las mejores de la historia» es política del canon; se usan como mapas de exploración, jamás como veredictos.
+
+**Casos del proyecto:**
+
+1. La primera sesión del cineclub con Jael y Angelly: hay que elegir película. La oferta de la comodidad es poner «lo que ya les gusta» y la de la vanidad es empezar por 2001 «para formarlas». Qué mete cada una: cero fricción la primera, cero disfrute la segunda. La pregunta que decide: ¿qué película permite a una niña descubrir sola que algo en pantalla «estaba puesto»? La condición con que sí: se abre con «El viaje de Chihiro» o «El show de Truman», la ficha de lectura se llena con una sola pregunta (¿qué viste que estaba puesto a propósito?) y «Dark» espera a la edad de la lista, aunque sea la favorita del papá.
+2. Un productor local ofrece hacer «el documental de M.E.T.A.S» por L 35,000: tres días de rodaje, dron, música emotiva y entrevistas. Qué mete: alcance y legitimidad audiovisual. Qué saca: L 35,000 y el control del relato, porque quien corta decide (el efecto Kuleshov trabaja para el que edita: las mismas entrevistas, con otra música y otro orden, cuentan otro proyecto). La pregunta que decide: ¿quién aprueba el corte final y qué connotan la música y los planos elegidos? La condición con que sí: revisión del corte final por escrito, los símbolos del proyecto (nombre, faro, voz del autor) no se ceden, y ninguna música que diga lo que las imágenes no prueban.
+3. Circula un video que recorta una clase donde se usa M.E.T.A.S: treinta segundos, música tensa, y un corte que hace parecer que la maestra ignora a un niño. La familia reconoce la jugada porque la estudió: es Kuleshov con mala fe (el significado lo fabricó el corte, no la escena). Qué mete responder con furia: entrar a la marea. La pregunta que decide: ¿es errata o es marea? (la regla vive en Psicología de masas y se aplica tal cual). La condición del oficio nuevo: la respuesta única incluye el video completo sin cortar, con minuto y segundo, porque contra un montaje la evidencia es el plano entero.
+
+**Conexiones.** Esta materia fabrica tres cosas que nadie tenía y las presta: la tríada del signo (que el detector de gafas de Ideologías usa cuando el texto es una imagen, y que la Ruta de la Marca aplica a logos y promesas), la gramática de la pantalla (que Psicología de masas usa para leer propaganda audiovisual sin repetir su mecánica de mareas) y la regla de la evidencia en pantalla (pariente del tenedor de Las falacias, aplicada a imágenes). Todo lo demás lo toma prestado y remite sin repetir: el monomito es de Mitología (aquí solo corre Matrix como caso), el narrador y los dos relojes son de La literatura (aquí se vuelven cámara), lo sagrado es de Teología (Durkheim), los relatos nacionales y la naturalización son de Estudio de las Ideologías, la marea y la regla de la cuenta pública son de Psicología de masas, HAL conversa con la Ruta de la Máquina que Predice, y la máquina de experiencias de Nozick sale del mismo libro que el pleito Rawls-Nozick de Crítica al Capitalismo. Dentro del arco del relato es la cuarta pata de la mesa: el mito ordenó el mundo antiguo, el templo y la página lo ordenaron después, y la pantalla es donde este siglo cuenta sus relatos; leerla es la misma alfabetización, con otra gramática.
+
+---
+
 ## Arco V · El tablero: cómo se mueve el mundo
 
 El precio que pone el mapa, el reparto que esconde cada regla, la llave para desmontar ídolos y la defensa de la caja de la casa. Honduras es el laboratorio de las cuatro.
 
-### 20. Geopolítica · Ruta del Mapa que Cobra 🗺️
+### 21. Geopolítica · Ruta del Mapa que Cobra 🗺️
 
 Lema: «La geografía no decide: pone el precio, y alguien siempre lo paga»
 
@@ -977,7 +1025,7 @@ Lema: «La geografía no decide: pone el precio, y alguien siempre lo paga»
 
 ---
 
-### 21. Economía política · Ruta de la Mano que Reparte 🪙
+### 22. Economía política · Ruta de la Mano que Reparte 🪙
 
 Lema: «Detrás de cada regla hay un reparto: quién gana, quién paga y quién la escribió»
 
@@ -1023,7 +1071,7 @@ Lema: «Detrás de cada regla hay un reparto: quién gana, quién paga y quién 
 
 ---
 
-### 22. Materialismo Filosófico · Ruta de los Átomos y los Ídolos ⚛️
+### 23. Materialismo Filosófico · Ruta de los Átomos y los Ídolos ⚛️
 
 Lema: «De qué está hecho lo que te venden, y quién lo sostiene.»
 
@@ -1069,7 +1117,7 @@ Lema: «De qué está hecho lo que te venden, y quién lo sostiene.»
 
 ---
 
-### 23. Educación Financiera · Ruta de la Semilla y la Polilla 🌱
+### 24. Educación Financiera · Ruta de la Semilla y la Polilla 🌱
 
 Lema: «El interés compuesto no espera: o trabaja para la casa o cobra contra ella.»
 
@@ -1122,7 +1170,7 @@ Lema: «El interés compuesto no espera: o trabaja para la casa o cobra contra e
 
 Añadido el 17 de agosto de 2026, por encargo del autor, entre el tablero y el porvenir: tres materias que enseñan a ver las lentes con que se mira el tablero. La materia marco fabrica el instrumento (la morfología, el detector, el acero cruzado) y las dos gemelas lo corren a fondo sobre los dos sistemas que se pelean el siglo: cada una pone en pie la mejor versión de lo que va a auditar, y las dos deben ser igual de duras, módulo a módulo (el cuadro de pares está en el reparto declarado). La ruta de la materia marco lleva casi el nombre del arco a propósito: es su puerta. Este arco pasó por las mismas dos críticas que los otros seis, más una tercera vara que los otros no necesitaban: el veredicto de simetría, y sus arreglos ya están aplicados en el texto.
 
-### 24. Estudio de las Ideologías · Ruta de las Gafas a la Vista 👓
+### 25. Estudio de las Ideologías · Ruta de las Gafas a la Vista 👓
 
 Lema: ««Nadie mira a ojo desnudo: el oficio es ver las gafas, empezando por las propias.»»
 
@@ -1171,7 +1219,7 @@ Lema: ««Nadie mira a ojo desnudo: el oficio es ver las gafas, empezando por la
 
 ---
 
-### 25. Crítica al Marxismo · Ruta del Expediente Rojo 📕
+### 26. Crítica al Marxismo · Ruta del Expediente Rojo 📕
 
 Lema: «La promesa del mundo sin clases, auditada con el siglo veinte en la mesa.»
 
@@ -1220,7 +1268,7 @@ Lema: «La promesa del mundo sin clases, auditada con el siglo veinte en la mesa
 
 ---
 
-### 26. Crítica al Capitalismo · Ruta del Expediente Dorado 📒
+### 27. Crítica al Capitalismo · Ruta del Expediente Dorado 📒
 
 Lema: «La máquina que sacó al mundo de la pobreza, auditada con sus facturas en la mesa.»
 
@@ -1273,7 +1321,7 @@ Lema: «La máquina que sacó al mundo de la pobreza, auditada con sus facturas 
 
 Predecir se entrena y se mide; la hipótesis extrema se estudia con registro y sin culto; la máquina que viene se lee en curvas y costes; y el Estudio Mayor entero se cierra con una tesis propia defendida de pie.
 
-### 27. Ciencia de la predicción algorítmica · Ruta de la Puntería 🎯
+### 28. Ciencia de la predicción algorítmica · Ruta de la Puntería 🎯
 
 Lema: «Se apunta, se anota y se cuenta dónde dio: predecir se entrena.»
 
@@ -1319,7 +1367,7 @@ Lema: «Se apunta, se anota y se cuenta dónde dio: predecir se entrena.»
 
 ---
 
-### 28. La singularidad · Ruta del Umbral Anunciado 🌅
+### 29. La singularidad · Ruta del Umbral Anunciado 🌅
 
 Lema: «Ni culto ni burla: la hipótesis, sus frenos y un registro con fechas.»
 
@@ -1365,7 +1413,7 @@ Lema: «Ni culto ni burla: la hipótesis, sus frenos y un registro con fechas.»
 
 ---
 
-### 29. El futuro de la IA · Ruta de la Máquina que Viene 🔭
+### 30. El futuro de la IA · Ruta de la Máquina que Viene 🔭
 
 Lema: «Leer las curvas de la máquina, contar sus costes y decidir qué no se le entrega»
 
@@ -1411,7 +1459,7 @@ Lema: «Leer las curvas de la máquina, contar sus costes y decidir qué no se l
 
 ---
 
-### 30. La tesis y sus negocios · Ruta de la Idea en Pie 🎓
+### 31. La tesis y sus negocios · Ruta de la Idea en Pie 🎓
 
 Lema: «Una pregunta precisa, una afirmación que se deja refutar y alguien que la sostiene de pie»
 
@@ -1457,7 +1505,7 @@ Lema: «Una pregunta precisa, una afirmación que se deja refutar y alguien que 
 
 ---
 
-## 31. El reparto declarado: quién es dueña de qué
+## 32. El reparto declarado: quién es dueña de qué
 
 Veinticuatro materias comparten herramientas, y sin reparto cada una la
 enseñaría entera: el estudiante cursaría Bayes tres veces y la Bóveda tendría
@@ -1503,6 +1551,9 @@ texto de los módulos.
 | Honduras económica del presente (maquila, extractivismo, informalidad) | Crítica al Capitalismo | Economía política conserva la cifra país (informalidad, remesas) y el enclave; Geopolítica el tablero exterior; las fichas nuevas reutilizan las series ya levantadas, sin re-levantarlas |
 | La familia de detectores | Cuatro dueñas | El humo (Educación Financiera: la oferta de dinero), los ídolos (Materialismo: la palabra elevada), la sustitución (Crítica al Capitalismo: la palabra gastada), el detector de gafas (Ideologías: la prosa); un objeto no se audita dos veces para dos productos de Bóveda |
 | La plantilla de doble columna y la prueba del bando ciego | Crítica al Marxismo | Crítica al Capitalismo la reutiliza tal cual; los dos expedientes se archivan juntos y la Bóveda no acepta uno sin el otro |
+| El signo y su tríada (Saussure, Peirce, Barthes, Eco) | Semiótica y cine | El detector de gafas de Ideologías la usa cuando el texto es una imagen; la Ruta de la Marca la aplica a logos y promesas; nadie más enseña la tríada |
+| La gramática de la pantalla (plano, luz, color, montaje; Kuleshov con su reserva) | Semiótica y cine | Psicología de masas conserva la mecánica de la marea y lee aquí la propaganda audiovisual; Ideologías conserva el contenido de las gafas |
+| La regla de la evidencia en pantalla (Eco, Room 237) | Semiótica y cine | Pariente declarado del tenedor de Las falacias; el monomito sigue siendo de Mitología (aquí solo corre Matrix como caso) y el narrador de La literatura |
 
 La simetría de las dos Críticas no se jura: se audita. El cuadro de pares,
 para el día en que un módulo se recorte por su cuenta: 1 el acero con el
@@ -1554,7 +1605,7 @@ construya:
     la primera dependencia de archivo entre materias, y está escrita en las
     dos pruebas de dominio, no solo aquí.
 
-## 32. Lo que se toca en el código con cada misión (y lo que pasó con la primera)
+## 33. Lo que se toca en el código con cada misión (y lo que pasó con la primera)
 
 La lista vale para toda misión del Estudio Mayor, y la primera ya la
 recorrió entera: el 17 de agosto de 2026 el autor dio la orden y se
@@ -1577,8 +1628,8 @@ Máquina que se Mira 🪞). Lo que se toca, misión por misión:
    respuestas revisado (`node _dev/reparte-respuestas.js --revisar`).
 5. `sw.js`: subir `CACHE_NAME`, que si no el despliegue existe y nadie lo ve.
 
-Con veintisiete materias no se crean veintisiete colores ni veintisiete
-chips: la decisión del capítulo 33 fue **una sola materia** (`mayor`,
+Con veintiocho materias no se crean veintiocho colores ni veintiocho
+chips: la decisión del capítulo 34 fue **una sola materia** (`mayor`,
 Estudio Mayor) para todo el compendio, con un chip y un color (índigo,
 `--mayor`), y una ruta por materia del compendio. La primera misión dejó
 además el molde completo: carpeta `misiones/ruta-espejo-vigia-timon/`,
@@ -1588,7 +1639,7 @@ máquina), ficha de diez páginas medida con el PDF en la mano, reparto de
 letras corrido, `CACHE_NAME` en v17 y la ruta entera visible en el mapa
 con sus cinco etapas por construir.
 
-## 33. Lo que hace falta decidir
+## 34. Lo que hace falta decidir
 
 1. ~~Por cuál misión se empieza.~~ **Decidido el 17 de agosto de 2026:** el
    autor ordenó Metacognición, y su etapa 1 (El vigía y el timón) ya está
