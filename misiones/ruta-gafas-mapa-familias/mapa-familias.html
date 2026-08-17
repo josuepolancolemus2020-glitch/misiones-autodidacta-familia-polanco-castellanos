@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de las Gafas a la Vista · Etapa 3: El mapa de las familias | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/mapa-familias.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Ve el mapa como un desfile de ismos 🎪</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🧬</div>
+    <div class="hero-text">
+      <h1>El mapa de las familias: <span>cada una por su mejor versión</span></h1>
+      <p class="sub">Siete familias, siete núcleos, y ninguna entra por su caricatura 🧬</p>
+      <div class="badge">🧬 Ruta de las Gafas a la Vista · Etapa 3 de 7</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🧬 El instrumento ya está en la mano: aquí se recorre el mapa</h2>
+    <p>La etapa 2 entregó la herramienta y no hay que volver a explicarla. Esta etapa <strong>la corre</strong>: se toma el mapa político entero y se disecciona familia por familia, <strong>y cada familia entra por su mejor versión</strong>.</p>
+    <p>La universidad enseña esto como <strong>desfile de ismos</strong>: una semana por familia, cada una contada con el resumen que hicieron sus enemigos, y examen de reconocer autores. Aquí se hace lo contrario: <strong>ninguna familia se presenta por su caricatura</strong>, porque una caricatura se refuta todas las tardes sin haber tocado nunca al adversario real.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La vara de la etapa.</strong> Quien termina hace cuatro cosas: <strong>dibuja la morfología de cada familia</strong>, <strong>reconoce de cuál es un texto sin que el texto se declare</strong>, <strong>sabe cuándo «fascista» describe y cuándo solo escupe</strong>, y pasa la prueba dura: <strong>media página de la familia que peor le cae, tan bien escrita que un militante la firmaría</strong>.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>⚖️ Dos maneras de recorrer el mismo mapa</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🎪 El desfile de ismos</h4>
+        <p>Cada familia contada por sus adversarios: el liberalismo es egoísmo, el conservadurismo es miedo, el socialismo es envidia, el nacionalismo es odio, el anarquismo es una bomba. <strong>Se aprende rápido, se aplaude solo y no sirve para nada</strong>: con eso no se reconoce un texto que no se declara, y no se puede discutir con nadie que exista.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🛡️ El mapa por la mejor versión</h4>
+        <p>Cada familia con <strong>el núcleo que sus militantes dirían en voz alta y con orgullo</strong>. Cuesta semanas, no se aplaude y sirve para todo: el texto se reconoce, la crítica se vuelve más difícil y mucho más seria, y la conversación deja de ser un intercambio de nombres.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎭 La señal de que dibujaste un muñeco</span><br>
+      <span>Míralo en un segundo: <span class="hl">¿el núcleo que le pusiste es un defecto?</span> Nadie pone un defecto en el centro de su propio ideario. Si en tu hoja el núcleo del otro es la codicia, el miedo, la envidia o el odio, <span class="hl2">no dibujaste una familia: dibujaste un muñeco</span>, y la hoja se rehace.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 El mapa, en siete momentos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué familia entra, con qué fuente y con qué etiqueta.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento del mapa.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la unidad que describe a una familia</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide cómo queda escrita la página que M.E.T.A.S publica sobre una familia política.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📝</span><span class="ms-text"><strong>El borrador ya está escrito:</strong> la unidad de M.E.T.A.S describe una familia política, y su primer renglón dice que lo que esa gente quiere, en el fondo, es mandar. Se lee redondo y se aprueba sin discusión.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🎭</span><span class="ms-text"><strong>Salta la señal:</strong> el núcleo escrito es un defecto, y nadie pone un defecto en el centro de su propio ideario. Ningún militante de esa familia firmaría ese renglón.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🪤</span><span class="ms-text"><strong>Llega la tentación:</strong> dejarlo. Es cómodo, la mitad del barrio lo aplaude y encima parece valiente. Pero un muñeco se refuta todas las tardes sin haber tocado nunca al adversario real.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">🗺️</span><span class="ms-text"><strong>Lo que tienes delante:</strong> dos maneras de publicar la misma página, y niños que van a leerla en casas donde esa familia se vota.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Cómo se publica la unidad?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🎪 Dejarla con el núcleo que aplaude</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🛡️ Reescribirla en su mejor versión</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🧭 Las siete familias, y qué pone cada una en el núcleo</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El plano general sale del manual de <strong>Andrew Heywood, «Political Ideologies»</strong> (<strong>manual académico con muchas ediciones</strong>: sólido como manual, y por eso sirve de plano y no de sentencia). Cada núcleo está escrito como lo diría alguien de esa familia, no como lo diría su adversario.</p>
+    <table class="tres">
+      <tr><th>Familia</th><th>Qué pone en el núcleo</th><th>Su fuente, con etiqueta</th></tr>
+      <tr><td><strong>Liberalismo</strong></td><td>La <strong>libertad</strong> del individuo, que no se sacrifica a ningún plan colectivo</td><td>Mill, «Sobre la libertad» (1859): clásico sólido, fuente primaria</td></tr>
+      <tr><td><strong>Conservadurismo</strong></td><td>La <strong>desconfianza de los planes perfectos</strong>: el cambio como reparación y no como demolición</td><td>Burke, «Reflexiones sobre la Revolución en Francia» (1790): clásico sólido, fuente primaria</td></tr>
+      <tr><td><strong>Socialismo</strong></td><td>La <strong>igualdad</strong> y la <strong>comunidad</strong>: nadie se salva solo y las condiciones materiales cuentan</td><td>Heywood como plano, y un siglo de variantes internas que pelean entre sí</td></tr>
+      <tr><td><strong>Nacionalismo</strong></td><td>La <strong>nación</strong> como la comunidad que de verdad manda sobre la lealtad</td><td>Anderson y Gellner, los dos de 1983: clásicos sólidos que se discuten entre sí</td></tr>
+      <tr><td><strong>Anarquismo</strong></td><td>El <strong>rechazo de la autoridad que no puede justificarse</strong></td><td>Colin Ward, «Anarchism: A Very Short Introduction» (2004): entrada seria</td></tr>
+      <tr><td><strong>Fascismo</strong></td><td>Aquí no hay acuerdo, y el desacuerdo es el tema: <strong>definición en disputa</strong></td><td>Paxton (2004) y Griffin (1991): académicos sólidos; Eco (1995): ensayo; Sternhell (1983): tesis discutida</td></tr>
+      <tr><td><strong>Populismo</strong></td><td>El <strong>pueblo puro contra la élite corrupta</strong>, y nada más: un núcleo flaco</td><td>Mudde, «The Populist Zeitgeist» (2004): académico sólido</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 Lo que se ve en cuanto la tabla está llena</span><br>
+      <span>Que <span class="hl">ningún núcleo es un defecto</span>, y que por eso las familias se pelean de verdad y no por confusión: quieren cosas distintas, y cada una tiene una razón que la sostiene. Y otra cosa incómoda: <span class="hl2">dos de las siete no tienen un núcleo propio del todo</span>, y en eso está la mitad del temario de esta etapa.</span>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🛡️ Las tres primeras, por su mejor versión</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Las tres familias que la escuela cuenta peor, con el núcleo que un militante firmaría:</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🕊️ Liberalismo · Mill, 1859</div><div class="t-info">Nadie sabe mejor que tú cómo vivir tu vida</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🏛️ Conservadurismo · Burke, 1790</div><div class="t-info">Lo que funciona costó siglos y nadie sabe cómo</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🤝 Socialismo · un siglo de variantes</div><div class="t-info">Nadie se salva solo, y el punto de partida cuenta</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">📖 Mill, «Sobre la libertad»</div><div class="t-info">Clásico sólido, fuente primaria</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">📖 Burke, «Reflexiones»</div><div class="t-info">Clásico sólido, fuente primaria</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">📖 Heywood, «Political Ideologies»</div><div class="t-info">Manual académico, sólido como manual</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;"><strong>El liberalismo</strong> pone la libertad en el núcleo, y <strong>Mill</strong> lo escribió en <strong>1859</strong> con un argumento que no es egoísta: nadie tiene autoridad para decidir por otro adulto lo que le conviene, porque nadie está en su lugar. <strong>El conservadurismo</strong> no es miedo al futuro: es la <strong>desconfianza de los planes perfectos</strong>, y <strong>Burke</strong> lo dijo mirando la <strong>Revolución francesa en 1790</strong>, cuando todavía nadie sabía cómo iba a terminar. <strong>El socialismo</strong> pone la <strong>igualdad</strong> y la <strong>comunidad</strong> en el núcleo, y trae algo que ninguna de las otras dos: <strong>un siglo de variantes internas que pelean entre sí más que con nadie</strong>, y quien no sabe eso confunde a un socialdemócrata con un leninista y no entiende ni a uno ni a otro.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🏛️ Lo que casi nadie sabe de Burke</span><br>
+      <span>El hombre al que la escuela usa como retrato de la reacción <span class="hl">defendió a los colonos americanos</span> y pasó años persiguiendo los abusos de la Compañía de las Indias Orientales en la India. Su desconfianza no era del cambio: era <span class="hl2">del plan que borra todo y empieza de cero</span>. Eso es un núcleo, no un defecto, y por eso se le puede discutir en serio.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🏴 El nacionalismo: la familia que se cuela en todas las demás</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Es la pieza que ordena media etapa: <strong>el nacionalismo casi nunca viene solo</strong>. Se engancha a un liberalismo, a un conservadurismo o a un socialismo y les cambia la frontera de a quién se le debe algo. Y sus dos clásicos son del <strong>mismo año, 1983</strong>, y <strong>se discuten entre sí</strong>.</p>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>📰 Anderson, «Comunidades imaginadas» (1983)</h4>
+        <p><strong>Benedict Anderson</strong>: la nación es una <strong>comunidad imaginada</strong>, porque existe gracias a que <strong>millones de personas que nunca se van a conocer se piensan juntas</strong>. Imaginada no quiere decir falsa: quiere decir que se sostiene en algo compartido que nadie ve, y él le dio un motor concreto, el periódico y el libro impresos en la lengua de todos. Etiqueta: <strong>clásico sólido</strong>.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🏭 Gellner, «Naciones y nacionalismo» (1983)</h4>
+        <p><strong>Ernest Gellner</strong>: la nación no despierta, <strong>se fabrica</strong>, y la fabrica la <strong>industrialización</strong>, que necesita gente móvil, alfabetizada y con una sola lengua de escuela. Su frase es de las más citadas del siglo: <strong>es el nacionalismo el que engendra las naciones, y no al revés</strong>. Etiqueta: <strong>clásico sólido</strong>.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚔️ En qué se pelean los dos, y por qué importa</span><br>
+      <span>Anderson le objetó a Gellner algo muy fino: que confunde <span class="hl">«inventar» con «falsificar»</span>, cuando inventar también quiere decir imaginar y crear. Para Gellner el nacionalismo trabaja con una máscara; para Anderson trabaja con una imaginación verdadera, del mismo tipo con que existen todas las comunidades grandes. <span class="hl2">La disputa se presenta con los dos lados nombrados</span>, porque el compendio lo manda y porque quien elige uno sin conocer al otro no eligió: heredó.</span>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Anderson</div><div class="stat-val">1983</div></div>
+      <div class="stat-item"><div class="stat-label">Gellner</div><div class="stat-val">1983</div></div>
+      <div class="stat-item"><div class="stat-label">Sternhell</div><div class="stat-val">1983</div></div>
+      <div class="stat-item"><div class="stat-label">Se discuten</div><div class="stat-val">Sí</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🕊️ El anarquismo entra completo, y no como caricatura con bomba</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Es la familia peor contada de las siete, y la que se arregla más rápido en cuanto se le pone el núcleo verdadero: <strong>el rechazo de la autoridad que no puede justificarse</strong>. Fíjate en la letra pequeña, porque ahí está todo: no dice «de toda autoridad», dice <strong>de la que no puede justificarse</strong>. La pregunta que hace no es «¿destruimos esto?», es <strong>«¿con qué derecho manda usted aquí?»</strong>, y es una pregunta que cualquiera puede contestar si tiene con qué.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Su entrada seria es <strong>Colin Ward, «Anarchism: A Very Short Introduction» (2004)</strong>, y Ward insistía en algo comprobable: <strong>buena parte de lo que hace funcionar un barrio ya se organiza sin que nadie mande</strong>. La palabra la estrenó como bandera propia <strong>Pierre-Joseph Proudhon</strong> en <strong>«¿Qué es la propiedad?» (1840)</strong>, y la tradición produjo un libro entero sobre la cooperación como fuerza de la naturaleza: <strong>«El apoyo mutuo», de Piotr Kropotkin (1902)</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🤝 Su pregunta ha producido más cooperativas que atentados</span><br>
+      <span>La caricatura se queda con los atentados porque salen en el periódico. Lo que no sale es la cuenta larga: <span class="hl">cajas de ahorro, cooperativas de transporte, mutuales, patronatos, brigadas de barrio</span>. Cuando en esta casa se organiza una faena de calle sin pedirle permiso a nadie, <span class="hl2">se está usando el músculo que esta familia estudió</span>, y conviene saberlo antes de burlarse.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>⚖️ El fascismo: el debate definicional, en serio</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Esta familia entra distinto, y no por delicadeza: <strong>entra con su debate adentro</strong>, porque la palabra se gasta a diario y una palabra gastada no describe nada el día que de verdad hace falta. Las cuatro piezas del debate, cada una con su etiqueta:</p>
+    <table class="tres">
+      <tr><th>Quién</th><th>Cómo lo define</th><th>Etiqueta</th></tr>
+      <tr><td><strong>Paxton, «Anatomía del fascismo» (2004)</strong></td><td>Por lo que <strong>hace</strong> y no por lo que dice: las <strong>etapas</strong> (el movimiento, el arraigo, la toma del poder, el ejercicio) y las <strong>alianzas con las élites</strong> que se lo permiten</td><td><strong>Académico sólido</strong></td></tr>
+      <tr><td><strong>Griffin, «The Nature of Fascism» (1991)</strong></td><td>Por el <strong>mito del renacer nacional</strong>: la nación humillada que va a volver a nacer purificada</td><td><strong>Académico sólido, definición en disputa</strong></td></tr>
+      <tr><td><strong>Eco, «Ur-Fascism» (1995)</strong></td><td>Por una <strong>lista de catorce rasgos</strong> sugerentes, de la que basta que aparezca uno</td><td><strong>Ensayo célebre: estatus de ensayo, no de ciencia</strong></td></tr>
+      <tr><td><strong>Sternhell, «Ni derecha ni izquierda» (1983)</strong></td><td>Lo hace <strong>nacer de un cruce</strong>: nacionalismo más revisión del marxismo, en la Francia de entreguerras</td><td><strong>Tesis discutida</strong></td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📏 Por qué Eco se lee como ensayo y no como ciencia</span><br>
+      <span>Porque el propio texto advierte que <span class="hl">basta que uno de los catorce rasgos esté presente</span> para que la cosa cuaje, y con esa regla la lista da positivo con casi todo: un colegio, un equipo, una iglesia, una familia. <span class="hl2">Una lista que da positivo con casi todo no mide nada</span>. Eso no la vuelve inútil: la vuelve un ensayo brillante para pensar, y no una prueba para acusar.</span>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y la tesis incómoda se queda dentro a propósito: <strong>Sternhell</strong> es <strong>tesis discutida</strong>, hay historiadores serios que la rechazan, y el debate queda <strong>más honesto con ella dentro</strong> que fuera. Guardar la tesis molesta en el cajón es la forma educada de ganar sin discutir.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🪶 El populismo cierra el mapa: una ideología delgada</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;"><strong>Cas Mudde</strong>, en <strong>«The Populist Zeitgeist» (2004)</strong>, lo definió con dos piezas y nada más: <strong>el pueblo puro contra la élite corrupta</strong>. Eso es todo el núcleo, y de ahí sale el nombre: <strong>ideología delgada</strong>. Un núcleo tan flaco no alcanza para gobernar nada, así que <strong>necesita engancharse a una familia anfitriona</strong>, y le sirve cualquiera: de izquierda o de derecha.</p>
+    <table class="tres">
+      <tr><th>Pregunta</th><th>Una ideología gruesa</th><th>El populismo, delgado</th></tr>
+      <tr><td><strong>¿Qué hay en el núcleo?</strong></td><td>Una respuesta sobre el orden entero: libertad, igualdad, comunidad, nación</td><td>Solo quién es puro y quién es corrupto</td></tr>
+      <tr><td><strong>¿Puede andar solo?</strong></td><td>Sí: de su núcleo se deducen posiciones concretas</td><td>No: sin anfitriona no dice qué hacer con nada</td></tr>
+      <tr><td><strong>¿Cómo se reconoce?</strong></td><td>Por lo que afirma del mundo</td><td>Por la línea que traza dentro del país, y por la anfitriona a la que se pegó</td></tr>
+    </table>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">La segunda fuente de la pieza es <strong>Mudde con Cristóbal Rovira Kaltwasser, «Populism: A Very Short Introduction» (2017)</strong>, <strong>académico sólido</strong> y con un detalle que en esta parte del mundo importa: <strong>está escrito a medias desde América Latina</strong>, así que no explica el fenómeno como una rareza que le pasa a los demás.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🚦 La regla de la casa, doble en esta etapa</span><br>
+      <span><span class="hl">Cero partidismo hondureño actual</span>: a ningún político vivo del país se le reparte etiqueta, y el entrenamiento va con textos históricos o de fuera. Aquí el cuidado es <strong>doble</strong>, porque <span class="hl2">«fascista» y «populista» son las dos palabras más gastadas del debate diario</span>: esta etapa enseña cuándo describen y cuándo solo escupen, y no las aplica a nadie vivo del país.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller del mapa</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para tener el mapa completo en la mano.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Las siete familias y su núcleo</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🧭 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="familias" onclick="labShowParte('familias')">🧭 Las siete familias</button>
+        <button class="lab-btn lab-cont-btn" data-parte="nacion" onclick="labShowParte('nacion')">🏴 El nacionalismo que se cuela</button>
+        <button class="lab-btn lab-cont-btn" data-parte="debate" onclick="labShowParte('debate')">⚖️ El debate del fascismo</button>
+        <button class="lab-btn lab-cont-btn" data-parte="delgada" onclick="labShowParte('delgada')">🪶 La ideología delgada</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué familia es?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se levanta la mejor versión de una familia</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🧬 Identifica la familia o la fuente por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del mapa se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿De qué familia es esa frase?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">El texto no se declara. Selecciona de qué familia es:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Nadie sabe mejor que uno mismo lo que le conviene»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla el recorrido del mapa?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">La hoja pone en el núcleo del liberalismo el egoísmo</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🕊️ Liberalismo</button>
+        <button class="btn btn-sec" onclick="">🏛️ Conservadurismo</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🧬 La familia en la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · El mapa de las familias · Ruta de las Gafas a la Vista</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: el mapa de las familias</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La familia en la mesa · El mapa de las familias</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🧬 La familia en la mesa: mejor versión, núcleo y etiqueta</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una familia sobre la mesa. Di de qué familia es el texto y cómo lo supiste sin que se declarara, escribe su núcleo en la versión que un militante firmaría, pon la etiqueta de estatus que le toca a la fuente con que se la describe, y deja la condición escrita de la casa nombrando también la familia propia más parecida (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🧬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧬 Casos del proyecto: el mapa en esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas hay una familia política sobre la mesa, propia o ajena, y en todas la pregunta es la misma: <strong>cuál es su mejor versión, qué pone en el núcleo, y qué etiqueta le toca a la fuente con que se la describe.</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también en esta etapa:</strong> ningún estudio, obra o cifra entra sin su etiqueta. Las de aquí: Heywood como <strong>manual académico sólido</strong>, Mill (1859) y Burke (1790) como <strong>clásicos sólidos y fuentes primarias</strong>, Anderson y Gellner (los dos de 1983) como <strong>clásicos sólidos que se discuten entre sí</strong>, Ward (2004) como <strong>entrada seria</strong>, Paxton (2004) como <strong>académico sólido</strong>, Griffin (1991) como <strong>académico sólido con definición en disputa</strong>, Eco (1995) con <strong>estatus de ensayo, no de ciencia</strong>, Mudde (2004 y 2017) como <strong>académico sólido</strong> y Sternhell (1983) como <strong>tesis discutida</strong>. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📝 Caso 1: el borrador que le puso un defecto en el núcleo</h2>
+    <p>El borrador de la unidad de M.E.T.A.S sobre las familias políticas ya está escrito, y el renglón de una de ellas dice que <strong>lo que esa gente quiere, en el fondo, es mandar</strong>. Se lee redondo y nadie lo objetó.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎭 La señal, y es de un segundo</span><br>
+      <span>Qué mete dejarlo: <span class="hl">el aplauso de la mitad del barrio</span>, y de paso la sensación de valentía. Qué saca: la mitad de las casas donde esa familia se vota, y la posibilidad de que el niño reconozca un texto de verdad. La pregunta que decide: <span class="hl2">¿firmaría ese renglón un militante de esa familia?</span> Si no, es un muñeco.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí se publica: el núcleo reescrito en la versión que un militante firmaría, la crítica de la casa <strong>después</strong> y por separado, y las dos cosas en la misma página para que se vea cuál es cuál. <strong>Poner en pie a alguien no es darle la razón: es asegurarse de que el golpe caiga en el cuerpo real.</strong></p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>💰 Caso 2: L 90,000 por una unidad con glosario incluido</h2>
+    <p>Una fundación extranjera ofrece <strong>L 90,000</strong> para que M.E.T.A.S produzca una unidad de «educación para la democracia». Trae su propio material, y el material <strong>reparte las siete familias en dos grupos</strong>: las compatibles con la democracia y las otras.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🗂️ El reparto que decide antes de enseñar</span><br>
+      <span>Qué mete: dinero que cubre un año, y materiales bonitos. Qué saca: <span class="hl">el niño aprende el reparto sin ver nunca la disputa</span>, y con eso pierde exactamente lo que esta etapa entrega. La pregunta que decide: <span class="hl2">¿cada familia aparece con el núcleo que sus militantes firmarían?</span> Donde no, el material está dibujando muñecos con presupuesto.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: entran las familias que el material describe por su mejor versión; las que entran caricaturizadas se reescriben, y el debate definicional del fascismo entra <strong>con sus cuatro piezas y sus cuatro etiquetas</strong>, no con una sola. El financiador aparece con su nombre en lo que financió y el control editorial queda entero en la casa. <strong>Si el glosario es innegociable, la respuesta es no.</strong></p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>💢 Caso 3: al proyecto le dijeron «comunista» y al autor «fascista»</h2>
+    <p>En la misma semana, por canales distintos: alguien llama <strong>comunista</strong> a M.E.T.A.S porque es gratuita, y alguien llama <strong>fascista</strong> al autor porque exige orden en las tareas. No hay oferta ni lempiras: hay dos palabras usadas como escupitajo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📐 Cuándo describe y cuándo solo escupe</span><br>
+      <span>La prueba es corta: <span class="hl">¿con qué definición, y qué predice?</span> Si «fascista» se usa con Paxton, dice qué hace ese movimiento y con qué élites se alió, y se puede comprobar. Si se usa con Griffin, afirma que hay un mito de renacer nacional, y se puede buscar en el texto. Si no se usa con ninguna, <span class="hl2">no describe nada: solo dice «te odio» con más letras</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la casa no contesta con otra etiqueta, y aquí está la razón práctica y no la moral: <strong>la palabra que se le pone a todo el mundo deja de servir el día en que de verdad haga falta</strong>. Quien gasta «fascista» en el que exige tareas se queda sin palabra para lo que Paxton describe. Y la regla de la casa que no se negocia: <strong>a ningún político vivo del país se le reparte etiqueta</strong>.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🏫 Caso 4: L 25,000 por el taller donde «no se habla de ideologías»</h2>
+    <p>Un colegio del barrio ofrece <strong>L 25,000</strong> por un taller para sus maestros, con una condición escrita: <strong>que no se hable de ideologías, solo de valores</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎈 La condición que ya es una posición</span><br>
+      <span>Qué mete: dinero, la puerta abierta a treinta maestros y una alianza que sirve. Qué saca: <span class="hl">la condición misma es la lección que el taller tendría que desmontar</span>, porque decidir que unas cosas son valores y otras son ideologías <span class="hl2">ya es un reparto, y el que lo hace se guarda el suyo del lado de los valores</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: el taller se da con textos <strong>históricos o de fuera</strong>, ninguna familia se nombra por su caricatura y ninguna etiqueta cae sobre nadie vivo del país. Con eso el colegio tiene lo que quería de verdad, que era paz en la sala, y los maestros salen con el mapa. <strong>La regla que se cumple no es callar: es no repartir etiquetas a los vivos.</strong></p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🛡️ Caso 5: Jael escribe media página de la familia que peor le cae</h2>
+    <p>La prueba dura de la etapa, y es de Jael: <strong>media página de la familia política que peor le cae, tan bien escrita que un militante la firmaría</strong>. Sin caricatura, con el mejor argumento de esa familia y no con el peor.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">✍️ Cómo se sabe si la media página sirve</span><br>
+      <span>Hay una prueba, y no es de opinión: <span class="hl">se le da a leer a alguien de esa familia y se le pregunta si le falta algo</span>. Si contesta que sí falta lo principal, la hoja se rehace. El primer intento de Jael se cayó por la señal de siempre: <span class="hl2">el núcleo que le había puesto era un defecto</span>, y nadie tiene un defecto en el centro de su propio ideario.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> lo que pasó al rehacerla, que es el hallazgo del caso: <strong>la crítica de Jael se volvió más difícil y mucho más seria</strong>, y dos de sus objeciones viejas se cayeron solas porque atacaban cosas que esa familia no sostiene. La regla del acero es la regla madre de este arco, y esto es lo que produce: <strong>menos objeciones, y las que quedan pesan</strong>.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🙋 Caso 6: Angelly y el himno de los que no conoce</h2>
+    <p>En el acto del quince de septiembre, <strong>Angelly</strong> pregunta lo que Anderson contestó en 1983: «¿por qué se me hace un nudo con un himno de gente que no conozco?». No hay oferta ni lempiras: hay una niña con la pregunta exacta.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📰 Anderson, explicado a su edad</span><br>
+      <span>La respuesta de la casa: <span class="hl">la nación es una comunidad imaginada</span>, y eso no quiere decir inventada ni falsa. Quiere decir que existe porque <span class="hl2">millones que nunca se van a conocer se piensan juntos</span>, y que ese pensarse juntos es real y mueve cosas reales. Gellner añade la otra mitad, y no está de acuerdo con él: la nación se fabricó, y la fabricó la escuela y la fábrica.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> que a los dos se les nombra, porque son <strong>clásicos sólidos que se discuten entre sí</strong>, y quedarse con uno solo es heredar en lugar de elegir. Y lo práctico que se lleva Angelly: <strong>el nudo en la garganta no es tonto ni es mentira, y la pregunta que sigue es a quién incluye ese «nosotros» y a quién deja fuera</strong>. Esa es la pregunta que el nacionalismo contesta distinto según a qué familia se pegue.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📵 Caso 7: L 15,000 por «las catorce señales» aplicadas al país</h2>
+    <p>Una página de memes con mucho alcance ofrece <strong>L 15,000</strong> por un material de M.E.T.A.S: <strong>la lista de catorce rasgos de Eco</strong>, bonita, en tarjetas, <strong>aplicada a la política hondureña de este mes</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📏 Dos razones para decir no, y ninguna es de miedo</span><br>
+      <span>La primera es de estatus: <span class="hl">«Ur-Fascism» es un ensayo, no una prueba</span>, y su propio texto advierte que basta un rasgo para que la cosa cuaje, así que <span class="hl2">la lista da positivo con casi todo, y una lista así no mide nada</span>. La segunda es la regla de la casa: cero partidismo hondureño actual, y a nadie vivo del país se le reparte etiqueta.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí habría material, y es distinta: se explica el <strong>debate definicional completo</strong> (Paxton por lo que hace, Griffin por el mito del renacer, Eco con su estatus de ensayo, Sternhell como tesis discutida) con <strong>casos históricos o de fuera</strong>. Vale menos alcance y mucho más. <strong>Lo que se rechaza no es hablar de fascismo: es usar una lista de ensayo como si fuera un termómetro.</strong></p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🪞 Caso 8: la familia propia salió más parecida de lo que la casa decía</h2>
+    <p>Dibujando el mapa completo, el autor llega al último dibujo, que es el de esta casa, y aparece lo incómodo: <strong>el núcleo de M.E.T.A.S se parece más al liberalismo de Mill</strong> (nadie decide por otro lo que le conviene) <strong>que a lo que la familia dice de sí misma</strong> cuando habla de comunidad.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">💳 La regla de pago, con el ideario más parecido</span><br>
+      <span>El hallazgo llegó por el único camino que lo produce: <span class="hl">girar el detector hacia adentro</span>. Y se pagó como manda la regla: un desenmascaramiento propio por cada uno ajeno, y <span class="hl2">el pago se hace con el ideario más parecido al propio, no con el más lejano</span>, porque dibujar al que ya disgusta es el ejercicio cómodo y casi siempre sale un muñeco sin que nadie lo note.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> quedó escrito en el inventario de gafas, con su renglón de qué evidencia lo haría cambiar: un cotejo de resultados que muestre que el estudio decidido en familia rinde menos que el decidido por cada uno. <strong>Si ese renglón no existiera, la premisa estaría funcionando como dogma</strong>, y así se anotaría, con fecha. Un detector que no se prueba en casa no es un instrumento, es un arma.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧬 La hoja del mapa, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier texto de familia que llegue a esta casa, propio o ajeno, se llena antes de opinar:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>De qué familia es, y cómo se supo:</strong> qué afirmación pone en el centro sin argumentarla nunca.</li>
+      <li><strong>Su núcleo en la versión que un militante firmaría:</strong> y si el núcleo escrito es un defecto, se rehace.</li>
+      <li><strong>Qué fuente lo sostiene y con qué etiqueta:</strong> clásico sólido, académico sólido, definición en disputa, tesis discutida, ensayo.</li>
+      <li><strong>Si el nacionalismo viene colado:</strong> a qué familia se pegó, y a quién incluye y excluye ese «nosotros».</li>
+      <li><strong>Qué familia propia se parece a esta:</strong> y qué desenmascaramiento propio se paga esta semana, con la más parecida.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🧬 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">Ninguna familia entra por su caricatura</span>: primero su mejor versión, y en este arco la regla del acero es la regla madre. 2. Si el núcleo que dibujaste no lo firmaría nadie de esa familia, <span class="hl">dibujaste un muñeco</span> y la hoja se rehace. 3. «Fascista» describe cuando viene con una definición que predice algo, y <span class="hl2">solo escupe cuando no viene con ninguna</span>. 4. El entrenamiento va con textos históricos o de fuera: <span class="hl">cero etiquetas a políticos vivos del país</span>. 5. Y el detector se gira hacia adentro: <span class="hl2">un desenmascaramiento propio por cada uno ajeno, con el ideario más parecido</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «La media página que le costó tres semanas»</h2>
+    <p>Guion listo para grabar (6 a 8 minutos), con la historia al frente y el concepto escondido adentro. Cada escena trae su <strong>voz</strong> (lo que se dice), su <strong>imagen</strong> (lo que se ve) y su <strong>texto en pantalla</strong>.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>Regla del guion (norma de la casa):</strong> toda misión lleva su guion de video con historia: un gancho en frío que duela o intrigue, un personaje que quiere algo, un giro que desmonta lo que el público creía, y un cierre que aterriza el concepto en la vida de quien mira. Nada de definiciones antes del minuto dos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «A un hombre le pusieron una tarea de media página. Tenía que defender, con sus mejores palabras, la idea que más odiaba en el mundo. Tardó tres semanas. Y cuando la terminó, había perdido algo: ya no podía volver a discutir como discutía antes.»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; aparece media hoja de cuaderno rayado sobre una mesa, con una sola línea escrita y tachada. Al lado, seis hojas más, todas tachadas.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Media página. Tres semanas. Y perdió algo.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quiere (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «Se llamaba Chelo y quería una cosa muy concreta: ganarle la discusión del domingo a su cuñado. Llevaba once años perdiéndola. Y no perdía por falta de ganas: perdía porque llegaba armado con nombres. Tenía una lista completa de lo que su cuñado era, y ni una sola frase de lo que su cuñado quería. Cada domingo pasaba lo mismo. Chelo decía el nombre, el cuñado se reía, y la mesa se quedaba callada esperando el postre. Once años de eso.»</p>
+    <p><strong>IMAGEN:</strong> mesa de domingo, arroz y plátano; dos hombres frente a frente; la cámara se queda en las manos de Chelo, que aprietan una servilleta; corte a una libreta con una lista de apodos y ningún argumento.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Once años perdiendo, con una lista de nombres.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Ahora hazte una prueba, aquí mismo, y sé honesto porque nadie te está viendo. Piensa en el grupo con el que más discutís. Ya tenés el nombre que le pones, seguro. Ahora decime, en una sola frase, <em>qué quiere</em> esa gente. No qué defecto tiene. Qué quiere. Y que sea una frase que ellos mismos aceptarían como suya. Si no te sale, no es porque no seas inteligente. Es porque nunca lo necesitaste: se puede vivir cincuenta años discutiendo con un dibujo.»</p>
+    <p><strong>IMAGEN:</strong> un espejo pequeño de baño, empañado; una mano escribe un nombre en el vaho, y el nombre se borra solo sin que apareciera nada debajo.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Qué quieren? En una frase. Que ellos la firmen.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Aquí está el giro, y no es el que esperás. Tú creerías que estudiar a los que piensan distinto es para tenerles paciencia. No: es para poder ganarles. Y hay dos casos que lo enseñan mejor que cualquier discurso. En 1790, Edmund Burke publicó sus <em>Reflexiones sobre la Revolución en Francia</em>, el libro con el que la escuela lo pinta como el retrato del que le tiene miedo al futuro. Ese mismo señor había defendido a los colonos americanos, y pasó años persiguiendo los abusos de una compañía imperial en la India. Su desconfianza no era del cambio: era del plan que borra todo y empieza de cero. Ese es un núcleo, no un defecto. Y en 1859, John Stuart Mill publicó <em>Sobre la libertad</em>, que la escuela usa como manual del egoísmo. Su argumento no es que cada uno haga lo que quiera: es que nadie está en el lugar de otro adulto, y por eso nadie tiene autoridad para decidir por él lo que le conviene. Fíjate en lo que acaba de pasar: <em>ninguno de los dos núcleos es un defecto</em>. Y eso no es casualidad, es una regla: nadie pone un defecto en el centro de su propio ideario.»</p>
+    <p><strong>IMAGEN:</strong> dos libros viejos sobre la mesa, con los años 1790 y 1859 escritos a mano en un papelito pegado al lomo; una mano tapa la palabra «reaccionario» escrita en el margen y escribe encima «desconfía de los planes perfectos».</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Nadie pone un defecto en el centro de su propio ideario.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:20)</h2>
+    <p><strong>VOZ:</strong> «Y ahí está la herramienta que te vas a llevar: el mapa de las familias, cada una con su núcleo dicho como lo diría su propia gente. El liberalismo: nadie sabe mejor que uno lo que le conviene. El conservadurismo: lo que funciona costó siglos y casi nadie sabe por qué funciona. El socialismo: nadie se salva solo, y el punto de partida cuenta, y ojo, que sus variantes internas pelean entre sí más que con nadie. El anarquismo, que no es la bomba del dibujo: rechaza la autoridad que <em>no puede justificarse</em>, y esa pregunta ha hecho más cooperativas que atentados. El nacionalismo, que es el más raro de todos porque casi nunca viene solo: se pega a cualquiera de las otras y les cambia a quién se le debe algo; Benedict Anderson, en 1983, lo llamó una comunidad imaginada, porque existe gracias a que millones que nunca se van a conocer se piensan juntos. Y el populismo, que es más flaco todavía: el pueblo puro contra la élite corrupta, y nada más. Cas Mudde lo llamó en 2004 una ideología delgada, y por eso necesita pegarse a una familia anfitriona, de izquierda o de derecha, para poder decir algo de algo.»</p>
+    <p><strong>IMAGEN:</strong> un mapa dibujado a mano en papel de estraza, con siete territorios; en cada uno se escribe una sola línea; el territorio del nacionalismo no tiene borde propio y se derrama sobre los otros seis; el del populismo es una franja delgada que se pega al que le queda al lado.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Siete familias · Siete núcleos · Ninguna caricatura»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:20 a 6:10)</h2>
+    <p><strong>VOZ:</strong> «"Momento. ¿Entonces al fascismo también hay que buscarle su mejor versión? ¿Todo vale igual?" No. Poner en pie no es absolver, y aquí es donde el trabajo se hace fino. Robert Paxton, en 2004, propuso definirlo <em>por lo que hace</em> y no por lo que dice: sus etapas, y con qué élites se alió para llegar. Roger Griffin lo define por el mito del renacer nacional, y su definición sigue en disputa. Y la lista famosa de catorce rasgos de Umberto Eco, de 1995, es un ensayo brillante y no una prueba: el propio texto advierte que basta que uno de los catorce aparezca, y con esa regla la lista da positivo con un colegio, con un equipo de fútbol y con tu propia casa. Una lista que da positivo con casi todo no mide nada. Y ahí está la razón práctica de no gastar la palabra: el que le dice fascista al que le exige puntualidad se queda sin palabra el día que la necesite de verdad.»</p>
+    <p><strong>IMAGEN:</strong> una lista de catorce casillas; una mano va marcando todas, y luego pasa la misma lista por un boletín parroquial y por el reglamento de un colegio, y también salen marcadas; al lado, una ficha distinta con dos columnas: «qué hace» y «con quién se alió».</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Una lista que da positivo con casi todo no mide nada.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:10 a 7:00)</h2>
+    <p><strong>VOZ:</strong> «A Chelo la media página le costó tres semanas, y la discusión del domingo siguiente duró cuatro minutos, porque dijo lo que su cuñado quería antes de que su cuñado lo dijera, y de ahí en adelante ya se hablaba de otra cosa. Esta semana te toca a ti, y es una sola tarea: media página defendiendo la familia que peor te cae, tan bien escrita que uno de ellos la firmaría. Y una regla de pago que no es opcional: por cada ideario ajeno que desarmes, desarma uno propio, y hazlo con el que se te parece más, no con el que te queda más lejos. Cuando termines la media página vas a tener una objeción menos, y va a pesar el doble. Eso es todo lo que promete esta misión, y es bastante.»</p>
+    <p><strong>IMAGEN:</strong> vuelve la mesa del domingo, ahora con las dos manos quietas; la media página doblada al lado del plato; el cuñado la lee y levanta la vista sin reírse.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Media página, y un militante la firmaría. · Misión: El mapa de las familias · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué hace</th><th>Dónde vive aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>Media página que costó tres semanas, y algo que se perdió</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>Chelo, once años perdiendo la discusión del domingo</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>Decir en una frase qué quiere el grupo con el que discutís</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>Burke y Mill: ninguno de los dos núcleos es un defecto</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>El mapa de las siete familias, con el nacionalismo colado</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«¿También el fascismo?»: Paxton, Griffin y la lista de Eco</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>Media página que un militante firmaría, y la regla de pago</td></tr>
+    </table>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Tres lecturas: el mismo mapa, tres voces</h2>
+    <p>El tema de la etapa contado tres veces: un cuento, un capítulo de caballerías y un ensayo. Tres maneras de que la idea entre por donde el examen no llega.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> estos tres textos son <strong>ejercicios de estilo escritos por esta casa</strong> en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado. Y llevan una regla extra de esta casa: <strong>toda obra, fecha y persona que aparece dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre: una hoja suelta con un pastiche sin declarar sería justo la fuente inflada que esta materia enseña a cazar.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-pri" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🌀 Lectura 1 · «El cajón de los siete sin firma» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas inventadas. Todos los libros, fechas y personas de este cuento son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">Fui, durante siete años, el hombre que ponía los rótulos en una biblioteca de provincia. Es un oficio callado y me formó más que cualquier universidad, porque enseña una cosa que nadie declara: que clasificar es opinar, y que el que pone el rótulo decide qué va a encontrar el que venga después.</p>
+    <p class="lect-p">Una viuda nos donó, en dos cajones de madera, la biblioteca política de su marido. En el primero venían los libros, con sus lomos y sus autores, y no dieron trabajo. En el segundo venían ciento cuarenta folletos <strong>sin portada, sin firma y sin fecha</strong>, mordidos por la humedad. El director me encomendó lo que él llamó una tarea menor: repartirlos por familia. Debía decidir, sin ninguna ayuda, a cuál de las siete pertenecía cada uno.</p>
+    <p class="lect-p">Empecé con el método que usa todo el mundo, que consiste en buscar palabras. Fracasé en tres días. Los folletos usaban las mismas palabras, y las usaban todos: pueblo, libertad, patria, justicia, orden. Comprendí entonces que el método correcto era el inverso, y es el hallazgo del que vivo desde entonces: <strong>no hay que buscar la palabra que el folleto repite, sino la que el folleto nunca argumenta</strong>. Cada uno tenía una afirmación que daba por hecha, sin defenderla, como si defenderla fuera una grosería. Esa afirmación era el centro, y el centro era la familia.</p>
+    <p class="lect-p">Los primeros fueron fáciles y me devolvieron la confianza. Un folleto no argumentaba nunca que un adulto sepa mejor que el gobierno lo que le conviene: lo suponía. Lo puse con <strong>John Stuart Mill</strong>, que publicó <strong>Sobre la libertad</strong> en <strong>1859</strong> y lo dedicó a la memoria de su esposa, <strong>Harriet Taylor</strong>, muerta el año anterior en Aviñón. Otro no argumentaba que lo antiguo tenga un valor que sus propios defensores no siempre saben explicar: lo suponía, con una elegancia triste. Lo puse con <strong>Edmund Burke</strong>, que en <strong>1790</strong> publicó las <strong>Reflexiones sobre la Revolución en Francia</strong> y recibió al año siguiente, en <strong>1791</strong>, la respuesta de <strong>Thomas Paine</strong> en los <strong>Derechos del hombre</strong>. Un tercero suponía que nadie se salva solo. Otro suponía que ninguna autoridad merece obediencia si no puede justificarse; lo dejé apartado, porque ese folleto proponía una cooperativa de panaderos y no un incendio, y la caricatura que yo traía en la cabeza no me servía de nada. Después leí a <strong>Colin Ward</strong>, y su <strong>Anarchism: A Very Short Introduction</strong>, de <strong>2004</strong>, me explicó por qué: buena parte de lo que hace funcionar un barrio ya se organiza sin que nadie mande.</p>
+    <p class="lect-p">El cajón se me volvió difícil en dos puntos, y los dos me enseñaron el oficio. El primero fue una pila de folletos que hablaban de la nación y que, sin embargo, no formaban una sola pila: unos suponían el individuo y otros suponían la comunidad, y todos suponían la patria. Tardé en aceptar lo que tenía delante: <strong>el nacionalismo no era un estante, era una humedad que había pasado por todos los estantes</strong>. En mi descargo diré que el asunto es difícil para cualquiera, porque dos libros del <strong>mismo año, 1983</strong>, lo explican de maneras que no se llevan bien. <strong>Benedict Anderson</strong>, en <strong>Comunidades imaginadas</strong>, dice que la nación existe porque millones de personas que nunca se van a conocer se piensan juntas, y que imaginar no es falsificar. <strong>Ernest Gellner</strong>, en <strong>Naciones y nacionalismo</strong>, dice que la nación se fabrica, que la fabrica la industrialización porque necesita gente móvil y alfabetizada, y que es el nacionalismo el que engendra las naciones y no al revés. Anderson le reprochó a Gellner, con una precisión que envidio, que confundiera inventar con falsificar, cuando inventar también quiere decir imaginar y crear. Los dos son clásicos, y no se los puede citar juntos sin decir que discuten.</p>
+    <p class="lect-p">El segundo punto difícil fue un folleto sin firma que hablaba de un país humillado y de su renacimiento. Lo primero que hice fue lo que hace cualquiera, y fue un error: apliqué la lista de <strong>Umberto Eco</strong>, que en <strong>1995</strong> publicó <strong>Ur-Fascism</strong> con catorce rasgos famosos. La lista dio positivo. Por curiosidad, y ya con la mala fe del que empieza a sospechar de sí mismo, la apliqué al boletín parroquial de la ciudad, al reglamento del colegio de mis hijas y a un discurso de premiación de la biblioteca. Dio positivo con los tres. El propio Eco advierte que basta que uno de los catorce esté presente, y esa advertencia, que él escribió con honradez, es la que arruina la lista como instrumento: <strong>una lista que da positivo con casi todo no mide nada</strong>. Es un ensayo espléndido y no es un termómetro. Guardé la lista, entonces, y usé dos instrumentos hechos para medir: <strong>Robert Paxton</strong>, que en <strong>Anatomía del fascismo</strong>, de <strong>2004</strong>, propone definirlo por lo que hace y no por lo que dice, mirando sus etapas y las alianzas con las élites que le abrieron la puerta; y <strong>Roger Griffin</strong>, que en <strong>The Nature of Fascism</strong>, de <strong>1991</strong>, lo define por el mito del renacer nacional, con una definición que sigue en disputa. Añadiré, porque un catálogo debe ser honesto y no cómodo, que <strong>Zeev Sternhell</strong> sostuvo en <strong>Ni derecha ni izquierda</strong>, también de <strong>1983</strong>, que la cosa nació en Francia de un cruce entre el nacionalismo y una revisión del marxismo, y que su tesis es discutida. Anoté la discusión en la ficha. Un catálogo que esconde una disputa miente en silencio.</p>
+    <p class="lect-p">Quedaban once folletos que no encontraban estante, y fueron el hallazgo del inventario. Repetían dos cosas y nada más: que el pueblo es puro y que la élite es corrupta. Fuera de eso no afirmaban nada sobre nada, y sin embargo la mitad pedía nacionalizar y la otra mitad pedía privatizar. Puse los once en un sobre aparte, con un rótulo que me pareció una derrota y que era una definición: <em>demasiado flacos para andar solos</em>. Muchos años después leí <strong>The Populist Zeitgeist</strong>, que <strong>Cas Mudde</strong> publicó en <strong>2004</strong>, y encontré mi rótulo escrito con propiedad: una <strong>ideología delgada</strong>, con un núcleo tan escaso que necesita engancharse a una familia anfitriona, de izquierda o de derecha, para poder decir algo. En <strong>2017</strong>, Mudde escribió con el chileno <strong>Cristóbal Rovira Kaltwasser</strong> una introducción breve al asunto, y me alegró comprobar que la cosa se explica mejor desde este lado del mundo, donde nunca fue una rareza ajena.</p>
+    <p class="lect-p">Falta el último folleto, y por él escribo todo esto. Estaba al fondo del cajón, más limpio que los otros, y no traía firma. Le apliqué mi método: busqué la afirmación que no argumentaba. La encontré en la tercera línea, la reconocí sin ninguna duda, y con la mano firme lo puse en el estante de la familia que yo había despreciado durante veinte años en voz alta y delante de testigos. Solo al cerrar el cajón reconocí el papel, la sangría y la máquina: <strong>el folleto era mío</strong>. Lo había escrito a los veintitrés años, con otra ortografía y con la misma convicción. No lo cambié de estante, y esa es la única virtud que me atribuyo en este relato. Pienso, desde entonces, que un detector que solo se prueba con los folletos de los otros no es un instrumento, es un arma, y que el catálogo más honrado de una biblioteca es aquel donde el bibliotecario aparece fichado con su nombre completo.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>🐎 Lectura 2 · «De cómo cada parecer fue defendido por su contrario» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, la venta, el humor y la reflexión cervantinos. El ancla es real: el cuento del rebuzno, en los capítulos veinticinco y veintisiete de la segunda parte del Quijote (1615), donde dos aldeas llegan a las armas por el apodo de «rebuznadores», y donde Sancho, por rebuznar para demostrar su habilidad, recibe una paliza a estacazos.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">Donde se cuenta el pleito de siete pareceres que en una venta hallaron don Quijote y Sancho, y de cómo el caballero mandó que cada uno fuese defendido por su contrario, con lo mucho que Sancho entendió al revés y lo poco que le duró el silencio.</p>
+    <p class="lect-p">Sucedió que, apretándoles la lluvia, se acogieron don Quijote y Sancho a una venta del camino, donde hallaron siete caminantes que voceaban de tal manera que el ventero había ya escondido los jarros. Y era el caso que cada uno tenía su parecer del buen gobierno del mundo, y que ninguno hablaba del suyo, sino del ajeno, de modo que el primero decía que el segundo no quería sino su provecho, y el segundo que el primero era enemigo de toda novedad por cobardía, y el tercero que ambos aborrecían al pobre, y el cuarto que los tres eran malos hijos de su tierra, y el quinto que los cuatro andaban buscando amo, y el sexto y el séptimo callaban y apuntaban con el dedo, que es la más barata de las razones y la que más ruido hace.</p>
+    <p class="lect-p">Oyó don Quijote un rato y luego, dando con el cuento de la lanza en el suelo, dijo: «Señores míos, en esta venta se ha juntado el mundo entero y nadie ha dicho todavía una palabra suya. Porque cada uno de vuesas mercedes ha pintado al vecino, y ninguno se ha pintado a sí; y el que pinta al vecino con los colores que al vecino no le gustan no ha pintado a nadie, sino un espantajo, y contra un espantajo se vence todas las tardes sin quebrar lanza. Ordeno, pues, y si es menester lo defenderé con las armas, que cada uno diga en dos razones lo que de veras quiere, y que sea razón que él mismo firmara delante de su madre; y que después la repita el que peor le cae, y la repita tan bien que el otro le dé las gracias. Y el que no acierte a decir del contrario lo que el contrario firmaría, no tiene parecer, sino enojo.»</p>
+    <p class="lect-p">Hízose así, con maravilla del ventero, y salieron las dos razones de cada uno. Dijo el primero que ninguno sabe mejor que el propio hombre lo que le conviene, y que por eso no se le ha de gobernar el gusto ni la conciencia. Dijo el segundo que lo que hoy está en pie costó siglos de ponerse y que casi nadie sabe cómo se tiene, y que por eso se remienda con tiento y no se derriba con brío. Dijo el tercero que nadie se salva solo, y que quien nace sin pozo no nace libre, sino sediento; y añadió que entre los de su parecer hay más pleitos que con los de fuera, que es cosa muy sabida en las casas grandes. Dijo el cuarto que su lealtad primera era la de su tierra, porque en ella están los muertos y los que han de nacer. Dijo el quinto que no niega toda obediencia, sino la que no sabe dar razón de sí, y que si el que manda no puede decir con qué derecho manda, no manda: abusa; y añadió, porque le miraban con recelo, que su gente ha levantado más pósitos y cofradías que fuegos. Y los dos últimos, requeridos a hablar, no supieron decir sino que el pueblo es limpio y los mandones sucios, con lo cual el primero les preguntó si eran de moler trigo o de venderlo, y no supieron; y el segundo les preguntó si el pozo ha de ser del concejo o del dueño, y tampoco.</p>
+    <p class="lect-p">«Advertid (dijo don Quijote) lo que aquí se ha visto, que es la lección del día: los cinco primeros traen casa, y estos dos traen solamente una puerta, y una puerta sin casa se cuelga de la pared del vecino. No son por eso menos peligrosos, que a veces la puerta manda más que la casa; mas de suyo no dicen qué se ha de hacer con el trigo ni con el pozo, y por eso se arriman al que pasa.» Y volviéndose a los que apuntaban con el dedo, añadió con más severidad: «Y en cuanto al apodo que vuesas mercedes se tiran, sabed que hay nombres que describen y nombres que solo escupen, y que se conocen por una señal muy fácil: el que describe dice qué hace aquel a quien se pone, y se puede ir a mirar si es verdad; el que escupe no dice nada y solo avisa a los presentes de a quién han de morder. Y guardaos de gastar los nombres graves, que en gastándolos se quedan sin filo, y el día que haga falta uno de veras no habrá con qué. Que ya visteis lo del rebuzno: por un apodo de burlas se juntaron dos aldeas con banderas y pendones, y el mundo estuvo a punto de arder por una voz de asno.»</p>
+    <p class="lect-p">Aquí no pudo Sancho más, y dijo: «Eso del rebuzno, señor, lo sé yo mejor que nadie, que por rebuznar de gracia me molieron las costillas a estacazos, y no hay agravio que se pague más caro que el que se hace con la boca. Y en lo demás, si va de repartir pareceres, yo me quedo con el del pozo y con el del gusto, que las dos me acomodan: que del pozo bebo y del gusto duermo. Y digo más, que a este de los mandones sucios yo le compraría la puerta, si me la diesen sin casa, para ponérsela a mi choza, que buena falta le hace.» «Majadero (dijo don Quijote), que no se escogen los pareceres como se escogen los melones, apretándolos.» «Pues por mi ánima (respondió Sancho) que más melones he acertado yo apretando que razones oyendo; y que quien no sabe lo que el otro quiere, mal le podrá decir que no; y que cada uno habla de la feria según le va en ella, y a burro rebuznado, palo seguro.»</p>
+    <p class="lect-p">Riéronse todos, y de la risa nació el concierto: que cada uno escribiese en media hoja el parecer del que peor le caía, y que no se diese por acabada la hoja hasta que el otro dijese que la firmaría. Duraron en ello hasta que se comió el ventero la vela, y al final quedaron cinco hojas firmadas y dos sin firmar, que fueron las de los del dedo, porque no hallaron qué escribirse. Y ya en el camino dijo don Quijote: «Advierte, Sancho, que ponerle a uno su mejor razón no es darle la razón, sino ponerlo en pie para que el golpe caiga en cuerpo y no en aire; y advierte lo segundo, que es lo que más importa: escribe una hoja tuya por cada hoja ajena, y escríbela del que más se te parece, que del que se te parece es donde duele, y del que te queda lejos cualquiera escribe.» «Todo eso será verdad (dijo Sancho), pero yo me atengo a lo mío: que quien mucho se mira en el vecino se olvida de peinarse; y que del nombre al hecho hay gran trecho, y del dedo a la razón, más.»</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌍 Lectura 3 · «Siete sistemas operativos para una sola especie» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie y la frase sencilla del autor de «Sapiens». Todos los datos, obras y fechas citados son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Somos una especie que necesita saber quién es «nosotros» antes de poder hacer casi nada. Cazar, construir, obedecer, pagar impuestos: todo eso exige antes una respuesta a esa pregunta. Durante casi toda nuestra historia la respuesta la dio la geografía, porque el grupo eran los que uno alcanzaba a conocer. En los últimos dos siglos y medio la responden unas cuantas familias de ideas, y en la práctica funcionan como <strong>sistemas operativos</strong>: no le dicen a nadie qué pensar de cada cosa, le dicen qué preguntas hacer y a quién se le debe algo.</p>
+    <p class="lect-p">Son siete, y conviene aprenderlas por su núcleo y no por sus insultos. Las tres primeras se resumen en una frase cada una, y cada frase tiene un libro con fecha detrás. La primera dice que nadie está en el lugar de otro adulto, y por eso nadie tiene autoridad para decidir por él lo que le conviene: es el liberalismo, y su texto es <strong>Sobre la libertad</strong>, que <strong>John Stuart Mill</strong> publicó en <strong>1859</strong>. La segunda dice que lo que funciona costó siglos y casi nadie sabe explicar por qué funciona, así que se remienda con cuidado y no se demuele: es el conservadurismo, y su texto son las <strong>Reflexiones sobre la Revolución en Francia</strong>, que <strong>Edmund Burke</strong> publicó en <strong>1790</strong>, cuando la Revolución llevaba un año y nadie sabía cómo iba a terminar. La tercera dice que nadie se salva solo y que el punto de partida cuenta: es el socialismo, y su rasgo más útil no es un libro sino un pleito de familia. En <strong>1848</strong>, Marx y Engels publicaron en Londres el <strong>Manifiesto comunista</strong>; en <strong>1959</strong>, el Partido Socialdemócrata alemán aprobó en Bad Godesberg un programa que abandonaba el marxismo como base doctrinal. Los dos textos son socialistas y no se pueden leer juntos sin ver la pelea. Quien no sabe eso confunde a un socialdemócrata con un leninista y no entiende a ninguno de los dos.</p>
+    <p class="lect-p">La cuarta familia es la más extraña, porque casi nunca viene sola. El nacionalismo se pega a cualquiera de las otras y les cambia una sola cosa: a quién se le debe algo. En <strong>1983</strong> se publicaron dos libros que lo explican y que no se llevan bien. <strong>Benedict Anderson</strong>, en <strong>Comunidades imaginadas</strong>, dice que la nación es una comunidad imaginada, porque existe gracias a que millones de personas que nunca se van a conocer se piensan juntas; imaginada no quiere decir falsa. <strong>Ernest Gellner</strong>, en <strong>Naciones y nacionalismo</strong>, dice que la nación se fabricó, que la fabricó la industrialización porque una economía moderna necesita gente móvil, alfabetizada y con una sola lengua de escuela, y que es el nacionalismo el que engendra las naciones y no al revés. Anderson le objetó que confundía inventar con falsificar. La discusión sigue abierta, y hay que citarla abierta. Un dato para medir el tamaño del fenómeno: cuando las Naciones Unidas se fundaron en <strong>1945</strong> tenían <strong>51</strong> miembros; hoy tienen <strong>193</strong>. En ochenta años la especie no creció: se dividió en más «nosotros».</p>
+    <p class="lect-p">La quinta es la que peor fama tiene y la más fácil de arreglar. El anarquismo no dice que se rechace toda autoridad: dice que se rechaza <strong>la autoridad que no puede justificarse</strong>. La palabra la tomó como bandera propia <strong>Pierre-Joseph Proudhon</strong> en <strong>¿Qué es la propiedad?</strong>, de <strong>1840</strong>; <strong>Piotr Kropotkin</strong> escribió en <strong>1902</strong> un libro entero, <strong>El apoyo mutuo</strong>, para mostrar que la cooperación es una fuerza de la naturaleza y no una excepción moral; y <strong>Colin Ward</strong> resumió la tradición en <strong>Anarchism: A Very Short Introduction</strong>, de <strong>2004</strong>, insistiendo en que buena parte de lo que hace funcionar un barrio ya se organiza sin que nadie mande. Y aquí va el dato que desarma la caricatura: la <strong>Alianza Cooperativa Internacional</strong> contabiliza alrededor de <strong>tres millones de cooperativas</strong> en el mundo. Esa pregunta ha producido muchas más cooperativas que atentados, y los atentados salen en el periódico precisamente porque son raros.</p>
+    <p class="lect-p">La sexta obliga a cambiar de método, y es importante entender por qué. El fascismo es la única de las siete cuya definición sigue en disputa entre historiadores serios, y eso no es un problema del lector: es el estado real del asunto. <strong>Robert Paxton</strong>, en <strong>Anatomía del fascismo</strong>, de <strong>2004</strong>, propone definirlo por lo que hace y no por lo que dice, estudiando sus etapas y sobre todo las <strong>alianzas con las élites</strong> que le abren la puerta. El dato le da la razón dos veces: en octubre de <strong>1922</strong> el rey <strong>Víctor Manuel III</strong> encargó gobierno a Mussolini, y el <strong>30 de enero de 1933</strong> el presidente <strong>Hindenburg</strong> nombró canciller a Hitler. Ninguno de los dos casos fue un asalto: fueron nombramientos. <strong>Roger Griffin</strong>, en <strong>The Nature of Fascism</strong>, de <strong>1991</strong>, lo define por el <strong>mito del renacer nacional</strong>, y su definición sigue discutiéndose. <strong>Zeev Sternhell</strong> sostuvo en <strong>Ni derecha ni izquierda</strong>, de <strong>1983</strong>, que nació de un cruce entre nacionalismo y revisión del marxismo en la Francia de entreguerras, y su tesis es discutida. Y luego está la lista más famosa del mundo: <strong>Umberto Eco</strong> publicó <strong>Ur-Fascism</strong> en <strong>1995</strong>, con catorce rasgos. Es un ensayo magnífico y no es un instrumento de medida, y la razón la da el propio Eco: advierte que basta que uno de los catorce esté presente. Con esa regla, la lista da positivo con un colegio, con una liga de fútbol y con la mayoría de las familias. <strong>Una lista que da positivo con casi todo no mide nada.</strong></p>
+    <p class="lect-p">La séptima es la más flaca, y por eso la más contagiosa. <strong>Cas Mudde</strong>, en un artículo de <strong>2004</strong> titulado <strong>The Populist Zeitgeist</strong>, definió el populismo con dos piezas y nada más: <strong>el pueblo puro contra la élite corrupta</strong>. A eso lo llamó una <strong>ideología delgada</strong>, y la consecuencia es exacta: un núcleo así no alcanza para gobernar, así que necesita <strong>engancharse a una familia anfitriona</strong>, y le sirve de izquierda o de derecha. Por eso dos movimientos populistas pueden pedir cosas contrarias sin dejar de ser lo mismo. La palabra viene de un caso real y verificable: el <strong>People's Party</strong> de los Estados Unidos, fundado en <strong>1892</strong>, cuyo programa de Omaha pedía en boca de granjeros cosas que hoy sonarían de izquierda. En <strong>2017</strong>, Mudde escribió con el chileno <strong>Cristóbal Rovira Kaltwasser</strong> una introducción breve al tema, y esa mitad latinoamericana importa: aquí el fenómeno nunca fue una rareza que le pasa a los demás.</p>
+    <p class="lect-p">Termino con la parte práctica, que es una sola. Esta semana usted va a oír dos palabras, «fascista» y «populista», y las va a oír usadas como escupitajos. Hágales una pregunta de cinco segundos: <em>con qué definición, y qué predice</em>. Si viene con Paxton, dice qué hace ese movimiento y con quién se alió, y se puede ir a comprobar. Si viene con Griffin, afirma que hay un mito de renacer nacional, y se puede buscar. Si no viene con ninguna, no está describiendo nada. Y hágase después la pregunta difícil, la que casi nadie se hace: escriba media página defendiendo la familia que peor le cae, tan bien que uno de ellos la firmaría. Le va a costar tres semanas y le va a quedar una objeción menos, que pesará el doble. En el siglo veintiuno vamos a discutir de inteligencia artificial, de clima y de fronteras con estos siete sistemas operativos y no con otros, y la ventaja modesta y decisiva la va a tener quien sepa cuál está corriendo en la cabeza del otro, y cuál está corriendo en la propia.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🧐 Preguntas de las tres lecturas</h2>
+    <p>Leer no es lo mismo que haber leído. Aquí van <strong>quince preguntas de comprensión lectora</strong> (cinco por texto), <strong>diez de completar</strong> y <strong>diez de análisis complejo</strong> con su pauta. Se contestan <strong>con los tres textos delante</strong>: no es un examen de memoria, es un examen de lectura.</p>
+    <div class="tip">
+      <span class="ti">🖨️</span>
+      <div><strong>Todo esto se imprime.</strong> El pliego de preguntas sale con las tres secciones y la <strong>pauta en su propia hoja al final</strong>, para que las respuestas no queden en la misma página que el ejercicio, como manda la casa. Y las tres lecturas se imprimen aparte, cada una con su etiqueta de ejercicio de estilo encima.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego de preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📖 I. Comprensión lectora (15 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +2 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="lcProg" aria-live="polite">Pregunta 1 de 15</p>
+    <div class="qz-q" id="lcQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="lcOpts" role="group" aria-label="Opciones de comprensión lectora"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectC()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectC()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLC" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>✏️ II. Completa la oración (10 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +2 XP por respuesta correcta (primera vez). Escribe la palabra o el año exacto.</p>
+    <p class="id-prog" id="lfProg" aria-live="polite">Oración 1 de 10</p>
+    <div class="cmp-sent" id="lfQ"></div>
+    <div style="margin:0.6rem 0;">
+      <input class="eval-cp-input" id="lfInput" type="text" style="min-width:190px;" placeholder="Escribe tu respuesta..." aria-label="Respuesta de completar" onkeydown="if(event.key==='Enter'){event.preventDefault();checkLectF();}">
+    </div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectF()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectF()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLF" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧠 III. Análisis complejo (10 preguntas)</h2>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Estas no se responden con una palabra ni se corrigen con una letra: se escriben, y después se comparan con la pauta. Van sin XP a propósito, porque una respuesta abierta que se premia sola se contesta a la carrera.</p>
+    <p class="id-prog" id="laProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="laQ" role="heading" aria-level="3"></div>
+    <textarea class="crit-textarea" id="laTA" rows="5" placeholder="Escribe aquí, o en tu cuaderno..." aria-label="Respuesta de análisis"></textarea>
+    <div id="laPauta" class="eval-answer" style="display:none;margin-left:0;font-size:0.85rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-d" onclick="prevLectA()">◀ Anterior</button>
+      <button class="btn btn-pri" onclick="nextLectA()">Siguiente ▶</button>
+      <button class="btn btn-g" id="btnLectAPauta" onclick="toggleLectAPauta()">👁 Ver pauta</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué tres voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento instala el método como <strong>imagen que no se olvida</strong> (buscar la afirmación que el folleto nunca argumenta, y el último folleto que resultó propio), el capítulo lo vuelve <strong>escena, risa y refrán</strong> (cada parecer defendido por su contrario, y Sancho queriendo comprar la puerta sin casa), y el ensayo lo conecta con <strong>la escala del mundo</strong> (siete sistemas operativos, y de 51 miembros de la ONU a 193). Quien lee las tres tiene el mapa por tres puertas, y la ficha y la evaluación lo encuentran ya instalado.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión nueva lleva sus tres lecturas sobre el tema de la etapa: <span class="hl">un cuento a la manera de Borges, un capítulo a la manera de Cervantes y un ensayo a la manera de Harari</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista y con una regla de fondo: <span class="hl">toda obra, fecha y persona citada dentro de los textos es real y comprobable</span>. El único artificio permitido es la voz; a Borges, en esta casa, se le quita el vicio de las citas inventadas.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las siete familias y su núcleo, el nacionalismo que se cuela con el pleito de 1983, el anarquismo completo, el debate definicional del fascismo con sus cuatro etiquetas, el populismo delgado, los ocho casos del proyecto, la <strong>hoja del mapa</strong> y la <strong>plantilla de la media página de acero</strong> para llenar a mano, seis ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-gafas-mapa-familias.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige en toda la ruta: <strong>ningún estudio, obra o cifra entra sin su etiqueta</strong> (clásico sólido, académico sólido, definición en disputa, tesis discutida, ensayo célebre).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Andrew Heywood, «Political Ideologies»:</strong> <strong>manual académico con muchas ediciones</strong>, y <strong>sólido como manual</strong>. Da el plano general de las siete familias, y por eso se usa como plano y no como sentencia.</li>
+      <li><strong>John Stuart Mill, «Sobre la libertad» (1859):</strong> <strong>clásico sólido, fuente primaria</strong>. La libertad en el núcleo del liberalismo, con el argumento que no es egoísta.</li>
+      <li><strong>Edmund Burke, «Reflexiones sobre la Revolución en Francia» (1790):</strong> <strong>clásico sólido, fuente primaria</strong>. La desconfianza de los planes perfectos y el cambio como reparación, escrito mirando la Revolución francesa cuando aún no se sabía cómo iba a terminar.</li>
+      <li><strong>Benedict Anderson, «Comunidades imaginadas» (1983)</strong> y <strong>Ernest Gellner, «Naciones y nacionalismo» (1983):</strong> <strong>clásicos sólidos que se discuten entre sí</strong>. Anderson pone la comunidad imaginada; Gellner ata el nacionalismo a la industrialización. Se citan los dos, y se dice que discuten.</li>
+      <li><strong>Colin Ward, «Anarchism: A Very Short Introduction» (2004):</strong> <strong>entrada seria</strong>. El anarquismo completo y sin caricatura: el rechazo de la autoridad que no puede justificarse.</li>
+      <li><strong>Robert Paxton, «Anatomía del fascismo» (2004):</strong> <strong>académico sólido</strong>. Lo define por lo que hace y no por lo que dice: las etapas y las alianzas con las élites.</li>
+      <li><strong>Roger Griffin, «The Nature of Fascism» (1991):</strong> <strong>académico sólido, definición en disputa</strong>. Lo define por el mito del renacer nacional.</li>
+      <li><strong>Umberto Eco, «Ur-Fascism» (1995):</strong> <strong>ensayo célebre: estatus de ensayo, no de ciencia</strong>. Catorce rasgos sugerentes que calzan demasiado fácil, y una lista que da positivo con casi todo no mide nada.</li>
+      <li><strong>Zeev Sternhell, «Ni derecha ni izquierda» (1983):</strong> <strong>tesis discutida</strong> del debate definicional. Hace nacer el fascismo de un cruce entre nacionalismo y revisión del marxismo en la Francia de entreguerras; el debate queda más honesto con ella dentro.</li>
+      <li><strong>Cas Mudde, «The Populist Zeitgeist» (2004):</strong> <strong>académico sólido</strong>. El populismo como ideología delgada: el pueblo puro contra la élite corrupta.</li>
+      <li><strong>Mudde con Cristóbal Rovira Kaltwasser, «Populism: A Very Short Introduction» (2017):</strong> <strong>académico sólido</strong>, y <strong>escrito a medias desde América Latina</strong>, así que no cuenta el fenómeno como una rareza ajena.</li>
+      <li><strong>Las tres lecturas de esta misión:</strong> ejercicios de estilo escritos por la casa en homenaje a Borges, Cervantes y Harari. <strong>Pastiche declarado, no obra de esos autores</strong>, y con la erudición interna real: Mill (1859) y su dedicatoria a Harriet Taylor, Burke (1790) y la respuesta de Paine (1791), el Manifiesto de 1848 y el programa de Bad Godesberg de 1959, Anderson y Gellner (los dos de 1983) con su disputa, Proudhon (1840), Kropotkin (1902) y Ward (2004), los tres millones de cooperativas que cuenta la Alianza Cooperativa Internacional, Paxton (2004) con los nombramientos de octubre de 1922 y del 30 de enero de 1933, Griffin (1991), Eco (1995), Sternhell (1983), Mudde (2004 y 2017), el People's Party de 1892, el cuento del rebuzno del Quijote (segunda parte, 1615, capítulos veinticinco y veintisiete) y el paso de 51 miembros de la ONU en 1945 a 193 hoy son todos comprobables.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>con las siete familias dibujadas por su mejor versión</strong>, y con <strong>media página de la que peor te cae, tan bien escrita que un militante la firmaría</strong>.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: la materia 25 completa, con sus siete módulos y su advertencia epistémica.</li>
+      <li><a href="../../misiones/ruta-gafas-palabra-expediente/gafas-expediente.html">👓 La palabra con expediente</a>: la etapa 1 de esta ruta, donde «ideología» deja de ser un insulto que siempre señala al otro.</li>
+      <li><a href="../../misiones/ruta-gafas-bisturi-freeden/bisturi-freeden.html">🔬 El bisturí de Freeden</a>: la etapa 2, que entrega el instrumento que esta etapa corre. Aquí no se vuelve a explicar: se usa.</li>
+      <li><a href="../../misiones/ruta-rojo-acero-juicio/acero-juicio.html">📕 El acero antes del juicio</a>: la regla madre de este arco. Si el núcleo que dibujaste no lo firmaría nadie de esa familia, dibujaste un muñeco.</li>
+      <li><a href="../../misiones/ruta-espejo-vigia-timon/vigia-timon.html">🪞 El vigía y el timón</a>: la puerta del Estudio Mayor. Girar el detector hacia adentro es trabajo del vigía, no del timón.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 4 mide el eje izquierda y derecha, y descubre a la gente que no tiene mapa.</li>
+      <li><a href="../../fichas/ficha-gafas-mapa-familias.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja del mapa y la plantilla de la media página de acero caben en una página cada una.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> memorizar los siete núcleos en la versión que sus militantes firmarían, leer cinco textos reales de la semana sin mirar la firma y adivinar de qué familia son, y escribir la media página de acero. La prueba de que está aprendida es <strong>que ya no se pueda usar «fascista» ni «populista» sin decir con qué definición</strong>, y que la media página exista, esté fechada y la haya leído alguien de esa familia sin sentirse mal leído.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🧬</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de las Gafas a la Vista · Etapa 3: El mapa de las familias</div>
+    <div class="diploma-mascot" aria-hidden="true">🧬</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🧬</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Siete familias, siete núcleos, y ninguna entra por su caricatura» 🌱 · 🧬 Ruta de las Gafas a la Vista · Etapa 3 de 7.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/mapa-familias.js"></script>
+</body>
+</html>

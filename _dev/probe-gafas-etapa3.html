@@ -1,37 +1,41 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><meta charset="UTF-8"><title>Sonda · Ruta de las Gafas a la Vista, etapa 2</title>
+<head><meta charset="UTF-8"><title>Sonda · Ruta de las Gafas a la Vista, etapa 3</title>
 <style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
 iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
 pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
 </head>
 <body>
-<iframe id="m" src="/misiones/ruta-gafas-bisturi-freeden/bisturi-freeden.html"></iframe>
+<iframe id="m" src="/misiones/ruta-gafas-mapa-familias/mapa-familias.html"></iframe>
 <iframe id="app" src="/index.html"></iframe>
 <pre id="out">midiendo…</pre>
 <script>
-/* Comprueba la etapa 2 de la Ruta de las Gafas a la Vista (Estudio de las
+/* Comprueba la etapa 3 de la Ruta de las Gafas a la Vista (Estudio de las
    Ideologías, materia 25 del Estudio Mayor): bancos, laboratorio, pruebas
    impresas con su nombre, los ocho casos, la ficha, la ruta en el mapa, las
    dos secciones de la norma 5 (guion de video y tres lecturas) y las TRES
    BATERÍAS de la norma 5-quater (15 de comprensión lectora, 10 de completar
-   y 10 de análisis complejo), con la impresión de cada lectura comprobada
-   de verdad.
+   y 10 de análisis complejo), con la impresión comprobada de verdad.
 
-   La REGLA DEL ESTATUS del compendio rige también aquí: Gallie 1956 como
-   clásico sólido de la filosofía, Berlin 1958 como clásico sólido y fuente
-   canónica del ejemplo central (las dos libertades), Freeden 1996 como
-   académico sólido y base del análisis morfológico, y su introducción de
-   2003 como la rampa de entrada del propio dueño del instrumento; y el
-   pastiche de las lecturas declarado como pastiche, porque una misión que
-   enseñara a cazar cierres escondidos escondiendo el suyo sería el error
-   que quiere evitar.
+   La REGLA DEL ESTATUS del compendio rige también aquí, y esta etapa trae
+   la lista más larga de la ruta, así que se comprueba fuente por fuente:
+   Heywood como manual académico sólido como manual; Mill (1859) y Burke
+   (1790) como clásicos sólidos y fuentes primarias; Anderson y Gellner (los
+   dos de 1983) como clásicos sólidos QUE SE DISCUTEN ENTRE SÍ; Ward (2004)
+   como entrada seria; Paxton (2004) como académico sólido; Griffin (1991)
+   como académico sólido con DEFINICIÓN EN DISPUTA; Eco (1995) con ESTATUS
+   DE ENSAYO Y NO DE CIENCIA (se comprueba explícitamente, porque es la
+   etiqueta que más fácil se pierde); Sternhell (1983) como TESIS DISCUTIDA;
+   y Mudde (2004 y 2017) como académico sólido. Y el pastiche de las
+   lecturas declarado como pastiche.
 
-   Dos cuidados del compendio se comprueban a máquina porque gobiernan la
-   misión: que el entrenamiento vaya con textos históricos o de fuera (cero
-   etiquetas a políticos vivos del país) y que el bisturí se gire hacia
-   adentro, porque un detector que no se prueba en casa no es un
-   instrumento, es un arma. */
+   Tres cuidados del arco se comprueban a máquina porque gobiernan la
+   misión: que la REGLA DEL ACERO sea la regla madre (ninguna familia entra
+   por su caricatura, y el núcleo que es un defecto es un muñeco); que el
+   detector se gire hacia adentro con la regla de pago, y con el ideario MÁS
+   PARECIDO; y el CERO PARTIDISMO HONDUREÑO ACTUAL, que aquí es doble porque
+   «fascista» y «populista» son las dos palabras más gastadas del debate
+   diario. */
 const out = document.getElementById('out');
 const L = []; let fallos = 0, sembrado = false;
 function log(s){ L.push(s); out.textContent = L.join('\n'); }
@@ -57,51 +61,72 @@ window.addEventListener('load', async () => {
   try {
     log('── LA MISIÓN ──');
     ok(d.querySelectorAll('.sec').length === 17, '17 secciones (15 del molde + guion + lecturas)', 'secciones: ' + d.querySelectorAll('.sec').length);
-    ok(/Ruta de las Gafas a la Vista · Etapa 2 de 7/.test(d.body.textContent), 'se presenta como etapa 2 de 7', 'no se presenta como etapa de la ruta');
-    /* Restos del molde: se copió de la etapa 1 del Expediente Rojo. Se
+    ok(/Ruta de las Gafas a la Vista · Etapa 3 de 7/.test(d.body.textContent), 'se presenta como etapa 3 de 7', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se copió de la etapa 2 de esta misma ruta. Se
        excluyen los puntos de Recursos que enlazan a las misiones hermanas a
        propósito; todo lo demás se mira entero. */
     const cuerpoSinEnlaces = (() => {
       const clon = d.body.cloneNode(true);
-      clon.querySelectorAll('a[href*="ruta-gafas-palabra-expediente"], a[href*="ruta-rojo-acero-juicio"], a[href*="ruta-espejo-vigia-timon"], a[href*="ruta-atomos-contra-miedo"]').forEach(a => {
+      clon.querySelectorAll('a[href*="ruta-gafas-bisturi-freeden"], a[href*="ruta-gafas-palabra-expediente"], a[href*="ruta-rojo-acero-juicio"], a[href*="ruta-espejo-vigia-timon"], a[href*="ruta-atomos-contra-miedo"]').forEach(a => {
         const li = a.closest('li'); (li || a).remove();
       });
       return clon.textContent;
     })();
-    /* Se copió de la etapa 1 de esta misma ruta, así que lo que hay que
-       cazar es su temario: Destutt de Tracy, la cámara oscura, la carta de
-       Mehring, el relacionismo y el mapa de Geertz. Los enlaces de Recursos
-       a las misiones hermanas se excluyen porque están a propósito. */
+    /* El temario de la etapa 2 (el bisturí) no se vuelve a explicar aquí:
+       esta etapa lo CORRE. Lo que se caza es que se haya arrastrado la
+       explicación, no el uso. */
+    ok(!/Gallie|Berlin|bisturí|descontestaci|libertad negativa|libertad positiva|concepto (esencialmente )?disputado|tres capas/i.test(cuerpoSinEnlaces),
+       'sin restos del temario de la etapa 2 (el bisturí de Freeden)', 'queda vocabulario de la etapa 2, que aquí no se vuelve a explicar');
+    ok(!/🔬/.test(cuerpoSinEnlaces), 'sin el emoji de la etapa 2', 'queda el 🔬 de la etapa 2 fuera de los enlaces');
     ok(!/Destutt|cámara oscura|falsa conciencia|Mehring|relacionismo|Mannheim/i.test(cuerpoSinEnlaces),
        'sin restos del temario de la etapa 1 de la ruta', 'queda vocabulario de la etapa 1 (la palabra con expediente)');
-    /* Ojo con este: «Expediente Rojo» NO entra en la lista, porque el
-       compendio manda declarar la conexión con la materia hermana y el caso 7
-       la nombra a propósito («la regla del acero es la regla madre de este
-       arco»). Lo que sigue prohibido es su TEMARIO, que es lo que se arrastra
-       sin querer. */
     ok(!/hombre de acero|hombre de paja|Caplan|Farm to Factory|tetrafármaco|Epicuro|vigía|timón/i.test(cuerpoSinEnlaces),
        'sin restos de las otras misiones del Estudio Mayor', 'queda vocabulario de otra misión del arco');
+    /* Y lo que SÍ tiene que quedar: el USO del instrumento, que es de lo que
+       va esta etapa, y los enlaces declarados a las etapas hermanas. */
+    ok(/morfolog/i.test(d.body.textContent), 'el uso del instrumento sigue nombrado (la morfología de cada familia)', 'se perdió el uso del instrumento');
+    ok(!!d.querySelector('#s-recursos a[href*="ruta-gafas-bisturi-freeden"]') && !!d.querySelector('#s-recursos a[href*="ruta-gafas-palabra-expediente"]'),
+       'Recursos declara las dos etapas hermanas de la ruta', 'faltan los enlaces declarados a las etapas 1 y 2');
     ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
 
-    log('\n── LA REGLA DEL ESTATUS (la regla del Estudio Mayor) ──');
+    log('\n── LA REGLA DEL ESTATUS, FUENTE POR FUENTE ──');
     const texto0 = d.body.textContent.replace(/\s+/g, ' ');
-    ok(/Gallie/.test(texto0) && /1956/.test(texto0) && /clásico sólido de la filosofía/i.test(texto0),
-       'Gallie (1956) con su etiqueta de clásico sólido de la filosofía', 'falta Gallie etiquetado');
-    ok(/Essentially Contested Concepts/.test(texto0), 'y con el título exacto de su trabajo', 'falta el título del trabajo de Gallie');
-    ok(/Berlin/.test(texto0) && /1958/.test(texto0) && /Dos conceptos de libertad/.test(texto0),
-       'Berlin con su lección de 1958', 'falta Berlin con su obra y su año');
-    ok(/fuente canónica/i.test(texto0), 'y declarado como la fuente canónica del ejemplo central', 'no se declara que Berlin es la fuente canónica');
-    ok(/Freeden/.test(texto0) && /1996/.test(texto0) && /Ideologies and Political Theory/.test(texto0),
-       'Freeden (1996) con el título de la obra base', 'falta Freeden 1996 con su obra');
-    ok(/académico sólido/i.test(texto0) && /base del análisis morfológico/i.test(texto0),
-       'y su etiqueta: académico sólido, base del análisis morfológico', 'falta la etiqueta de Freeden 1996');
-    ok(/2003/.test(texto0) && /A Very Short Introduction/.test(texto0) && /rampa de entrada/i.test(texto0),
-       'la introducción de 2003 como rampa de entrada', 'falta la rampa de entrada de 2003');
-    ok(/propio dueño del instrumento/i.test(texto0),
-       'y declarada como del propio dueño del instrumento', 'no se declara de quién es la rampa');
-    /* La regla de la casa que no se negocia en este arco. */
+    ok(/Heywood/.test(texto0) && /Political Ideologies/.test(texto0) && /sólido como manual/i.test(texto0),
+       'Heywood con su etiqueta de manual académico sólido como manual', 'falta Heywood etiquetado');
+    ok(/Mill/.test(texto0) && /1859/.test(texto0) && /Sobre la libertad/.test(texto0),
+       'Mill (1859) con el título de su obra', 'falta Mill con su obra y su año');
+    ok(/Burke/.test(texto0) && /1790/.test(texto0) && /Reflexiones sobre la Revolución en Francia/.test(texto0),
+       'Burke (1790) con el título de su obra', 'falta Burke con su obra y su año');
+    ok(/clásico sólido/i.test(texto0) && /fuente primaria/i.test(texto0),
+       'y los dos declarados clásicos sólidos y fuentes primarias', 'falta la etiqueta de Mill y Burke');
+    ok(/Anderson/.test(texto0) && /Comunidades imaginadas/.test(texto0) && /Gellner/.test(texto0) && /Naciones y nacionalismo/.test(texto0) && /1983/.test(texto0),
+       'Anderson y Gellner, los dos de 1983, con sus obras', 'faltan Anderson y Gellner con sus obras');
+    ok(/se discuten entre sí/i.test(texto0), 'y declarados clásicos sólidos QUE SE DISCUTEN ENTRE SÍ', 'no se declara que Anderson y Gellner discuten');
+    ok(/Ward/.test(texto0) && /Anarchism: A Very Short Introduction/.test(texto0) && /2004/.test(texto0) && /entrada seria/i.test(texto0),
+       'Colin Ward (2004) con su etiqueta de entrada seria', 'falta Ward etiquetado');
+    ok(/Paxton/.test(texto0) && /Anatomía del fascismo/.test(texto0) && /académico sólido/i.test(texto0),
+       'Paxton (2004) como académico sólido', 'falta Paxton etiquetado');
+    ok(/Griffin/.test(texto0) && /The Nature of Fascism/.test(texto0) && /1991/.test(texto0),
+       'Griffin (1991) con el título de su obra', 'falta Griffin con su obra');
+    ok(/definición en disputa/i.test(texto0), 'y declarada DEFINICIÓN EN DISPUTA', 'no se declara que la definición de Griffin está en disputa');
+    /* La etiqueta que más fácil se pierde, y la que el compendio subraya. */
+    ok(/Eco/.test(texto0) && /Ur-Fascism/.test(texto0) && /1995/.test(texto0),
+       'Eco (1995) con el título de su ensayo', 'falta Eco con su obra y su año');
+    ok(/estatus de ensayo/i.test(texto0) && /no de ciencia/i.test(texto0),
+       'y con ESTATUS DE ENSAYO, NO DE CIENCIA, dicho con esas palabras', 'a Eco le falta la etiqueta de ensayo y no de ciencia');
+    ok(/catorce rasgos/i.test(texto0) && /no mide nada/i.test(texto0),
+       'y con la razón: catorce rasgos, y una lista que da positivo con casi todo no mide nada', 'falta la razón por la que la lista de Eco no mide');
+    ok(/Sternhell/.test(texto0) && /Ni derecha ni izquierda/.test(texto0) && /1983/.test(texto0) && /tesis discutida/i.test(texto0),
+       'Sternhell (1983) como tesis discutida', 'falta Sternhell etiquetado');
+    ok(/Mudde/.test(texto0) && /The Populist Zeitgeist/.test(texto0) && /2004/.test(texto0),
+       'Mudde (2004) con el título de su artículo', 'falta Mudde con su obra');
+    ok(/Rovira Kaltwasser/.test(texto0) && /2017/.test(texto0) && /América Latina/.test(texto0),
+       'y Mudde con Rovira Kaltwasser (2017), escrito a medias desde América Latina', 'falta la segunda fuente del populismo');
+    /* La regla de la casa, que en esta etapa es doble. */
     ok(/históricos o de fuera/i.test(texto0) && /(pol[íi]ticos? vivos?|pol[íi]tico vivo)/i.test(texto0),
        'el entrenamiento va con textos históricos o de fuera, sin políticos vivos', 'falta la regla del cero partidismo actual');
+    ok(/más gastadas del debate diario/i.test(texto0),
+       'y el cuidado doble: fascista y populista son las palabras más gastadas', 'no se declara el cuidado doble de esta etapa');
 
     log('\n── BANCOS ──');
     ok(dentro('fcData.length') === 16, '16 flashcards', 'flashcards: ' + dentro('fcData.length'));
@@ -114,19 +139,19 @@ window.addEventListener('load', async () => {
        'los tres widgets con sus bancos (8, 5 y 6)', 'bancos de widgets incompletos');
     ok(dentro('identifyTaskDB.length') === 10 && dentro('classifyTaskDB.length') === 10 && dentro('completeTaskDB.length') === 8 && dentro('explainQuestions.length') === 6,
        'los cuatro bancos del generador de tareas', 'bancos del generador incompletos');
-    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15, 'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
+    ok(dentro('evalTFBank.length') === 15 && dentro('evalMCBank.length') === 15 && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15,
+       'los cuatro bancos de la evaluación con 15 cada uno', 'bancos de evaluación incompletos');
     ok(dentro('evalMCBank.every(q => typeof q.a === "number" && q.o[q.a])'),
        'la evaluación final sabe cuál es la respuesta correcta', 'evalMCBank no trae la clave «a»');
     ok(dentro('critCaseBank.length') === 8 && dentro('critDecisionBank.length') === 8, 'la prueba competencial trae sus 8 casos y 8 decisiones', 'faltan casos o decisiones de la competencial');
     ok(dentro('critCaseQuestions.length') === 4 && dentro('critCaseGuides.length') === 4 && dentro('critErrorBank.length') === 6 && dentro('critCompareBank.length') === 4 && dentro('critCauseBank.length') === 6 && dentro('critEffectBank.length') === 6,
        'los ocho bancos de la prueba competencial completos', 'algún banco de la competencial quedó corto');
     ok(dentro('critCompareBank.every(c => c.gr)'), 'las comparaciones traen su cierre (gr) para la pauta', 'critCompareBank sin campo gr');
-    ok(dentro('Object.keys(parteData).join(",")') === 'disputado,libertad,morfologia,descontesta', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
-    ok(dentro('timelineData.length') === 7, 'los 7 momentos del camino del bisturí', 'momentos: ' + dentro('timelineData.length'));
+    ok(dentro('Object.keys(parteData).join(",")') === 'familias,nacion,debate,delgada', 'laboratorio con las 4 piezas', 'piezas: ' + dentro('Object.keys(parteData).join(",")'));
+    ok(dentro('timelineData.length') === 7, 'los 7 momentos del mapa', 'momentos: ' + dentro('timelineData.length'));
     ok(dentro('lvls.length') === 7 && dentro('Object.keys(ACHIEVEMENTS).length') === 9, 'los 7 niveles de XP y los 9 logros', 'niveles o logros incompletos');
-    /* Las tres baterías de preguntas de las lecturas, pedidas por el autor:
-       15 de comprensión lectora (5 por texto), 10 de completar y 10 de
-       análisis complejo, y las diez de análisis con su pauta escrita. */
+    ok(dentro('!!ACHIEVEMENTS.lect_master'), 'y entre ellos el de las lecturas (lect_master)', 'falta el logro lect_master');
+    /* Las tres baterías de preguntas de las lecturas (norma 5-quater). */
     ok(dentro('lectComprensionBank.length') === 15, '15 preguntas de comprensión lectora', 'comprensión: ' + dentro('lectComprensionBank.length'));
     ok(dentro('lectCompletarBank.length') === 10, '10 preguntas de completar', 'completar: ' + dentro('lectCompletarBank.length'));
     ok(dentro('lectAnalisisBank.length') === 10, '10 preguntas de análisis complejo', 'análisis: ' + dentro('lectAnalisisBank.length'));
@@ -140,7 +165,7 @@ window.addEventListener('load', async () => {
        'cada oración de completar trae su hueco y su respuesta', 'el banco de completar está mal formado');
     ok(dentro('lectAnalisisBank.every(q => q.guia && q.guia.length > 200)'),
        'cada pregunta de análisis trae su pauta de corrección', 'hay preguntas de análisis sin pauta');
-    ok(/faro_gafas_bisturi/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
+    ok(/faro_gafas_familias/.test(dentro('SAVE_KEY')), 'clave de progreso propia (' + dentro('SAVE_KEY') + ')', 'clave compartida: ' + dentro('SAVE_KEY'));
     let sopaOk = true;
     dentro('sopaSets').forEach(s => s.words.forEach(p => {
       if (p.cells.map(([r, c]) => s.grid[r][c]).join('') !== p.w) sopaOk = false;
@@ -149,22 +174,36 @@ window.addEventListener('load', async () => {
 
     log('\n── LO QUE LA ETAPA TIENE QUE ENSEÑAR ──');
     const texto = texto0;
-    ok(/esencialmente disputad/i.test(texto), 'los conceptos esencialmente disputados', 'falta el concepto de Gallie');
-    ok(/modo de existir/i.test(texto), 'que la disputa no es un defecto: es su modo de existir', 'falta la pieza que ordena la etapa');
-    ok(/libertad negativa/i.test(texto) && /que nadie me estorbe/i.test(texto), 'la libertad negativa, con su definición', 'falta la libertad negativa');
-    ok(/libertad positiva/i.test(texto) && /poder de verdad hacer/i.test(texto), 'la libertad positiva, con su definición', 'falta la libertad positiva');
-    ok(/morfolog/i.test(texto), 'la morfología como lo que es un ideario', 'falta la morfología');
-    ok(/núcleo/i.test(texto) && /adyacent/i.test(texto) && /perif/i.test(texto), 'las tres capas nombradas', 'faltan las tres capas');
-    ok(/descontestaci/i.test(texto), 'la descontestación', 'falta el movimiento clave');
-    ok(/sentido común/i.test(texto), 'y que el cierre se vende como sentido común', 'no se dice cómo se vende el cierre');
-    ok(/lista de opiniones/i.test(texto), 'el contraste con la lista de opiniones', 'falta el contraste que da sentido al dibujo');
-    ok(/tres textos que no se parezcan/i.test(texto), 'la práctica: tres textos que no se parezcan', 'falta la práctica del módulo');
-    ok(/en una (sola )?página/i.test(texto), 'y el dibujo en una página', 'falta el formato del producto');
-    ok(/regla de pago/i.test(texto), 'la regla de pago (uno propio por cada ajeno)', 'falta la regla de pago');
+    ok(/regla del acero/i.test(texto) && /regla madre/i.test(texto),
+       'la regla del acero declarada como regla madre del arco', 'falta la regla madre del arco');
+    ok(/mejor versión/i.test(texto) && /caricatura/i.test(texto), 'cada familia por su mejor versión, y nunca por su caricatura', 'falta el gesto que ordena la etapa');
+    ok(/muñeco/i.test(texto) && /nadie pone un defecto/i.test(texto),
+       'la señal del muñeco: un defecto en el núcleo', 'falta la señal que delata un muñeco');
+    ok(/liberalismo/i.test(texto) && /conservadurismo/i.test(texto) && /socialismo/i.test(texto) && /nacionalismo/i.test(texto) && /anarquismo/i.test(texto) && /fascismo/i.test(texto) && /populismo/i.test(texto),
+       'las siete familias están nombradas', 'falta alguna de las siete familias');
+    ok(/desconfianza de los planes perfectos/i.test(texto) && /(reparación|reparar)/i.test(texto) && /demolición/i.test(texto),
+       'el conservadurismo con el cambio como reparación y no demolición', 'falta el núcleo del conservadurismo');
+    ok(/variantes internas/i.test(texto) && /pelean entre sí/i.test(texto),
+       'el socialismo con su siglo de variantes internas', 'falta el rasgo propio del socialismo');
+    ok(/comunidades imaginadas/i.test(texto) && /nunca se van a conocer/i.test(texto),
+       'el nacionalismo con la comunidad imaginada de Anderson', 'falta la comunidad imaginada');
+    ok(/industrializaci/i.test(texto), 'y con la industrialización de Gellner', 'falta la tesis de Gellner');
+    ok(/se cuela en (todas|las demás)/i.test(texto), 'el nacionalismo como la familia que se cuela en las demás', 'no se dice que el nacionalismo se cuela');
+    ok(/autoridad que no puede justificarse/i.test(texto), 'el anarquismo con su núcleo verdadero', 'falta el núcleo del anarquismo');
+    ok(/más cooperativas que atentados/i.test(texto), 'y sin la caricatura de la bomba', 'falta la corrección de la caricatura del anarquismo');
+    ok(/por lo que hace/i.test(texto) && /alianzas con las élites/i.test(texto), 'el fascismo de Paxton: por lo que hace, y las alianzas', 'falta la definición de Paxton');
+    ok(/mito del renacer nacional/i.test(texto), 'el fascismo de Griffin: el mito del renacer nacional', 'falta la definición de Griffin');
+    ok(/ideología delgada/i.test(texto) && /pueblo puro/i.test(texto) && /élite corrupta/i.test(texto),
+       'el populismo como ideología delgada', 'falta el núcleo del populismo');
+    ok(/anfitriona/i.test(texto), 'y su necesidad de una familia anfitriona', 'no se dice que el populismo necesita anfitriona');
+    ok(/(cuándo|cuando) .{0,30}describe/i.test(texto) && /escupe/i.test(texto),
+       'cuándo la palabra describe y cuándo solo escupe', 'falta la distinción entre describir y escupir');
+    ok(/media página/i.test(texto) && /militante la firmaría/i.test(texto),
+       'la prueba dura: media página que un militante firmaría', 'falta la prueba dura de la etapa');
+    ok(/regla de pago/i.test(texto) && /más parecid/i.test(texto),
+       'la regla de pago, y con el ideario más parecido', 'falta la regla de pago con el más parecido');
     ok(/no es un instrumento, es un arma/i.test(texto),
        'el detector que no se prueba en casa es arma', 'falta el cuidado central del compendio');
-    ok(/regla del acero/i.test(texto) && /muñeco/i.test(texto),
-       'la regla del acero como regla madre, con la señal del muñeco', 'falta la regla madre del arco');
 
     log('\n── EL GUION DE VIDEO (norma 5) ──');
     const guion = d.getElementById('s-guion');
@@ -182,7 +221,10 @@ window.addEventListener('load', async () => {
       /* Nada de definiciones antes del minuto dos: la escena del giro, donde
          entra la primera fecha, no puede empezar antes de 2:00. */
       ok(/2:40/.test(tg) && /Escena 4 · El giro/.test(tg), 'el giro con la primera definición llega pasado el minuto dos', 'la definición llega demasiado pronto');
-      ok(/1956/.test(tg) && /1958/.test(tg) && /1996/.test(tg), 'el guion trae las tres fechas del instrumento', 'al guion le faltan fechas');
+      const antesDelGiro = tg.slice(0, tg.indexOf('Escena 4 · El giro'));
+      ok(!/\b(1790|1859|1983|1991|1995|2004|2017)\b/.test(antesDelGiro),
+         'y no hay ninguna fecha ni definición antes del giro', 'entra una fecha antes del minuto dos');
+      ok(/1790/.test(tg) && /1859/.test(tg) && /1983/.test(tg) && /2004/.test(tg), 'el guion trae las fechas del mapa', 'al guion le faltan fechas');
       ok(!!d.querySelector('.nav-t[data-s="s-guion"]'), 'está en la barra de navegación', 'no aparece en la barra');
     }
 
@@ -193,9 +235,9 @@ window.addEventListener('load', async () => {
       const tl = lect.textContent;
       ok(/Borges/.test(tl) && /Cervantes/.test(tl) && /Harari/.test(tl), 'las tres voces están nombradas', 'faltan las voces');
       ok(/ejercicio(s)? de estilo/i.test(tl) && /No son obra de esos autores/i.test(tl), 'el pastiche va declarado (regla del estatus)', 'el pastiche no se declara');
-      ok(/La palabra que no se deja cerrar/.test(tl), 'el cuento a la manera de Borges está', 'falta el cuento');
+      ok(/El cajón de los siete sin firma/.test(tl), 'el cuento a la manera de Borges está', 'falta el cuento');
       ok(/Donde se cuenta/.test(tl) && /Sancho/.test(tl) && /don Quijote/.test(tl), 'el capítulo cervantino está, con Sancho adentro', 'falta el capítulo cervantino');
-      ok(/La palabra que firmaron todos/.test(tl) && /sapiens/i.test(tl), 'el ensayo a la manera de Harari está', 'falta el ensayo');
+      ok(/Siete sistemas operativos para una sola especie/.test(tl) && /sapiens/i.test(tl), 'el ensayo a la manera de Harari está', 'falta el ensayo');
       /* Las rayas de diálogo del capítulo cervantino son guiones largos y
          violan la norma 1-bis: van en paréntesis. Se comprueba aquí porque
          es el error que se cazó en una misión anterior. */
@@ -203,18 +245,30 @@ window.addEventListener('load', async () => {
       /* La regla del autor: la erudición interna es REAL. La sonda exige las
          anclas comprobables y la declaración de datos reales. */
       ok(/reales/i.test(tl) && /citas (apócrifas|inventadas)/i.test(tl), 'declara los datos reales y el vicio quitado a Borges', 'no se declara la erudición real');
-      ok(/Samuel Johnson/.test(tl) && /1755/.test(tl), 'ancla real: el diccionario de Samuel Johnson (1755)', 'falta el ancla de Johnson');
-      ok(/Gallie/.test(tl) && /1956/.test(tl) && /Essentially Contested Concepts/.test(tl), 'ancla real: Gallie y su trabajo de 1956', 'falta Gallie dentro de los textos');
-      ok(/Berlin/.test(tl) && /1958/.test(tl) && /Oxford/.test(tl), 'ancla real: Berlin en Oxford, 1958', 'falta Berlin con su año y su lugar');
-      ok(/Freeden/.test(tl) && /1996/.test(tl) && /Ideologies and Political Theory/.test(tl), 'ancla real: Freeden y la obra de 1996', 'falta Freeden dentro de los textos');
-      ok(/2003/.test(tl) && /A Very Short Introduction/.test(tl), 'ancla real: la introducción de 2003', 'falta la rampa de 2003 dentro de los textos');
-      ok(/1615/.test(tl) && /(capítulo cincuenta y ocho|II, 58)/i.test(tl), 'ancla real: el elogio de la libertad (Quijote II, 58, de 1615)', 'falta el ancla del elogio de la libertad');
-      ok(/1605/.test(tl) && /galeotes/i.test(tl) && /(capítulo veintidós|I, 22)/i.test(tl), 'ancla real: los galeotes (Quijote I, 22, de 1605)', 'falta el ancla de los galeotes');
-      ok(/1948/.test(tl) && /Derechos Humanos/.test(tl) && /(cuarenta y ocho|48)/.test(tl), 'ancla real: la votación de la Declaración Universal (1948)', 'falta la votación de 1948');
-      ok(/1789/.test(tl) && /1776/.test(tl), 'anclas reales: las declaraciones de 1776 y 1789', 'faltan las dos declaraciones');
+      ok(/Mill/.test(tl) && /1859/.test(tl) && /Sobre la libertad/.test(tl), 'ancla real: Mill y «Sobre la libertad» (1859)', 'falta Mill dentro de los textos');
+      ok(/Harriet Taylor/.test(tl), 'ancla real: la dedicatoria a Harriet Taylor', 'falta el ancla de Harriet Taylor');
+      ok(/Burke/.test(tl) && /1790/.test(tl) && /Paine/.test(tl) && /1791/.test(tl), 'anclas reales: Burke (1790) y la respuesta de Paine (1791)', 'falta el ancla de Burke y Paine');
+      ok(/Anderson/.test(tl) && /Gellner/.test(tl) && /1983/.test(tl), 'anclas reales: Anderson y Gellner, los dos de 1983', 'faltan Anderson y Gellner dentro de los textos');
+      ok(/Ward/.test(tl) && /2004/.test(tl), 'ancla real: Colin Ward (2004)', 'falta Ward dentro de los textos');
+      ok(/Proudhon/.test(tl) && /1840/.test(tl) && /Kropotkin/.test(tl) && /1902/.test(tl), 'anclas reales: Proudhon (1840) y Kropotkin (1902)', 'faltan Proudhon y Kropotkin');
+      ok(/Eco/.test(tl) && /1995/.test(tl) && /Ur-Fascism/.test(tl), 'ancla real: Eco y «Ur-Fascism» (1995)', 'falta Eco dentro de los textos');
+      ok(/Paxton/.test(tl) && /2004/.test(tl) && /Griffin/.test(tl) && /1991/.test(tl), 'anclas reales: Paxton (2004) y Griffin (1991)', 'faltan Paxton y Griffin dentro de los textos');
+      ok(/Sternhell/.test(tl) && /Ni derecha ni izquierda/.test(tl), 'ancla real: Sternhell y su tesis discutida', 'falta Sternhell dentro de los textos');
+      ok(/Mudde/.test(tl) && /2004/.test(tl) && /Rovira Kaltwasser/.test(tl) && /2017/.test(tl), 'anclas reales: Mudde (2004) y Rovira Kaltwasser (2017)', 'faltan las dos fuentes del populismo');
+      ok(/1848/.test(tl) && /Bad Godesberg/.test(tl) && /1959/.test(tl), 'anclas reales: el Manifiesto de 1848 y Bad Godesberg (1959)', 'falta el pleito interno del socialismo con sus dos textos');
+      ok(/1922/.test(tl) && /1933/.test(tl) && /Hindenburg/.test(tl), 'anclas reales: los nombramientos de 1922 y del 30 de enero de 1933', 'faltan los dos nombramientos que sostienen a Paxton');
+      ok(/1945/.test(tl) && /193/.test(tl) && /51/.test(tl), 'ancla real: de 51 miembros de la ONU en 1945 a 193 hoy', 'falta la cifra de la ONU');
+      ok(/Alianza Cooperativa Internacional/.test(tl) && /tres millones/.test(tl), 'ancla real: los tres millones de cooperativas', 'falta la cifra de las cooperativas');
+      ok(/1892/.test(tl), 'ancla real: el People\'s Party de 1892', 'falta el origen histórico del populismo');
+      ok(/rebuzno/i.test(tl) && /1615/.test(tl) && /(veinticinco|II, 25)/i.test(tl) && /(veintisiete|II, 27)/i.test(tl),
+         'ancla real declarada: el cuento del rebuzno (Quijote II, 25 y 27, de 1615)', 'falta el ancla real del capítulo cervantino');
+      /* Y las anclas de las etapas hermanas NO se repiten. */
+      ok(!/Samuel Johnson|bacía|yelmo|galeotes|Declaración Universal/i.test(tl),
+         'no repite las anclas de las etapas 1 y 2 de la ruta', 'repite un ancla ya usada en esta ruta');
       /* Las tres lecturas deben ENSEÑAR el tema, no solo sonar bonito */
-      ok(/descontestaci/i.test(tl) && /núcleo/i.test(tl) && /perifer/i.test(tl), 'las lecturas explican el instrumento de la etapa', 'las lecturas no tocan el tema');
-      ok(/libertad negativa/i.test(tl) || /que nadie me estorbe/i.test(tl), 'las dos libertades aparecen dentro de los textos', 'los textos no cargan el ejemplo central');
+      ok(/mejor versión|no argumenta|espantajo/i.test(tl) && /ideología delgada/i.test(tl) && /anfitriona/i.test(tl),
+         'las lecturas enseñan el tema de la etapa', 'las lecturas no tocan el tema');
+      ok(/no mide nada/i.test(tl), 'y traen la lección sobre la lista de Eco', 'los textos no cargan la lección del estatus de ensayo');
       ok(!!d.querySelector('.nav-t[data-s="s-lecturas"]'), 'está en la barra de navegación', 'no aparece en la barra');
     }
 
@@ -240,11 +294,13 @@ window.addEventListener('load', async () => {
     ok(d.getElementById('laQ').textContent.length > 40, 'el análisis complejo pinta su primera pregunta', 'análisis vacío');
     ok(/Pregunta 1 de 10/.test(d.getElementById('laProg').textContent), 'y su contador de 10', 'contador: ' + d.getElementById('laProg').textContent);
     ok(d.getElementById('laPauta').style.display === 'none', 'la pauta empieza tapada', 'la pauta se ve sin pedirla');
+    const xpLa = dentro('xp');
     w.toggleLectAPauta(); await esperar(80);
     ok(d.getElementById('laPauta').style.display !== 'none' && /Pauta/.test(d.getElementById('laPauta').textContent),
        'y se destapa cuando se pide', 'la pauta no se destapa');
     w.nextLectA(); await esperar(80);
     ok(/Pregunta 2 de 10/.test(d.getElementById('laProg').textContent), 'el análisis avanza de pregunta', 'el análisis no avanza');
+    ok(dentro('xp') === xpLa, 'y el análisis complejo va sin XP, a propósito', 'el análisis complejo regaló XP');
     w.toggleLectAPauta(); await esperar(80);
 
     log('\n── IMPRESIÓN DE LAS LECTURAS Y DEL PLIEGO ──');
@@ -262,30 +318,33 @@ window.addEventListener('load', async () => {
     try {
       w.imprimirLectura('borges');
       const hb = abiertos[abiertos.length - 1] || '';
-      ok(/La palabra que no se deja cerrar/.test(hb) && /corrigiendo pruebas de un diccionario/.test(hb),
+      ok(/El cajón de los siete sin firma/.test(hb) && /ponía los rótulos en una biblioteca/.test(hb),
          'el cuento se imprime con su texto completo', 'el cuento no se imprime');
+      ok(/el folleto era mío/i.test(hb), 'y hasta su última página', 'la hoja del cuento sale cortada');
       ok(/NO es obra de ese autor/i.test(hb) && /ejercicio de estilo de la casa/i.test(hb),
          'y con la etiqueta del estatus en la hoja', 'la hoja del cuento sale sin declarar el pastiche');
       ok(/real y comprobable/i.test(hb), 'y con la regla de la erudición real', 'la hoja no trae la regla de los datos reales');
 
       w.imprimirLectura('cervantes');
       const hc = abiertos[abiertos.length - 1] || '';
-      ok(/siendo dos libertades/.test(hc) && /Sucedió que/.test(hc) && /tres cercos/.test(hc),
+      ok(/defendido por su contrario/.test(hc) && /Sucedió que/.test(hc) && /espantajo/.test(hc),
          'el capítulo cervantino se imprime completo', 'el capítulo no se imprime');
       ok(/NO es obra de ese autor/i.test(hc), 'y con su etiqueta', 'la hoja del capítulo sale sin etiqueta');
+      ok(/rebuzno/i.test(hc) && /1615/.test(hc), 'y con su ancla real declarada', 'la hoja del capítulo sale sin su ancla');
       ok(!/—/.test(hc), 'y sin guiones largos (norma 1-bis)', 'la hoja del capítulo trae guiones largos');
 
       w.imprimirLectura('harari');
       const hh = abiertos[abiertos.length - 1] || '';
-      ok(/La palabra que firmaron todos/.test(hh) && /cooperamos en masa/.test(hh),
+      ok(/Siete sistemas operativos para una sola especie/.test(hh) && /necesita saber quién es/.test(hh),
          'el ensayo se imprime completo', 'el ensayo no se imprime');
       ok(/NO es obra de ese autor/i.test(hh), 'y con su etiqueta', 'la hoja del ensayo sale sin etiqueta');
 
       w.imprimirLasTresLecturas();
       const h3 = abiertos[abiertos.length - 1] || '';
-      ok(/La palabra que no se deja cerrar/.test(h3) && /siendo dos libertades/.test(h3) && /La palabra que firmaron todos/.test(h3),
+      ok(/El cajón de los siete sin firma/.test(h3) && /defendido por su contrario/.test(h3) && /Siete sistemas operativos/.test(h3),
          'las tres lecturas se imprimen juntas en un solo pliego', 'el pliego de las tres no sale completo');
       ok((h3.match(/page-break-before/g) || []).length >= 2, 'y cada una arranca en su propia hoja', 'las tres salen pegadas');
+      ok(/NO son obra de Jorge Luis Borges/i.test(h3), 'y el pliego declara el pastiche de las tres', 'el pliego de las tres no declara el pastiche');
 
       w.imprimirPreguntasLecturas();
       const hp = abiertos[abiertos.length - 1] || '';
@@ -309,44 +368,53 @@ window.addEventListener('load', async () => {
       w.genEvalCrit(); await esperar(250);
       w.printEval();
       const he = abiertos[abiertos.length - 1] || '';
-      ok(/El bisturí de Freeden/.test(he) && /Etapa 2 · Estudio Mayor/.test(he),
+      ok(/El mapa de las familias/.test(he) && /Etapa 3 · Estudio Mayor/.test(he),
          'la evaluación impresa lleva el nombre y la etapa correctos', 'la evaluación impresa trae el rótulo de otra misión');
-      ok(!/Etapa 1|palabra con expediente|acero antes del juicio/i.test(he),
-         'y no arrastra el rótulo de la etapa anterior', 'la evaluación impresa dice etapa 1');
+      ok(!/Etapa 2|Etapa 1|bisturí de Freeden|palabra con expediente|ideario en la mesa/i.test(he),
+         'y no arrastra el rótulo de las etapas anteriores', 'la evaluación impresa dice etapa 1 o 2');
+      ok(!/undefined/.test(he), 'y no imprime undefined', 'la evaluación impresa trae un undefined');
       w.printEvalCrit();
       const hec = abiertos[abiertos.length - 1] || '';
-      ok(/El ideario en la mesa/.test(hec) && /El bisturí de Freeden/.test(hec),
+      ok(/La familia en la mesa/.test(hec) && /El mapa de las familias/.test(hec),
          'la competencial impresa lleva su nombre propio', 'la competencial impresa trae el rótulo de otra misión');
-      ok(!/Etapa 1|gafas sobre la mesa|palabra con expediente/i.test(hec),
-         'y tampoco arrastra el de la etapa anterior', 'la competencial impresa arrastra el rótulo de la etapa 1');
+      ok(/Etapa 3 · Estudio Mayor/.test(hec), 'y su número de etapa correcto', 'la competencial impresa no dice etapa 3');
+      ok(!/Etapa 2|Etapa 1|ideario en la mesa|gafas sobre la mesa|bisturí de Freeden/i.test(hec),
+         'y tampoco arrastra el de las etapas anteriores', 'la competencial impresa arrastra el rótulo de otra etapa');
       ok(!/undefined/.test(hec), 'y no imprime undefined en ninguna pauta', 'la competencial impresa trae un undefined');
     } finally { w.open = openReal; }
 
     log('\n── EN PANTALLA ──');
     w.go('s-lab'); await esperar(150);
-    ok(/El concepto disputado/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en el concepto disputado', 'abre en otra pieza');
-    ok(!!d.querySelector('.lab-cont-btn[data-parte="disputado"]'), 'el botón de la pieza inicial existe', 'el laboratorio arrastra la pieza del molde');
+    ok(/Las siete familias y su núcleo/.test(d.getElementById('lab-sentence').textContent), 'el laboratorio abre en las siete familias', 'abre en otra pieza');
+    ok(!!d.querySelector('.lab-cont-btn[data-parte="familias"]'), 'el botón de la pieza inicial existe', 'el laboratorio arrastra la pieza del molde');
+    w.labShowParte('debate'); await esperar(150);
+    ok(/ensayo/i.test(d.getElementById('lab-display').textContent) || /Paxton/.test(d.getElementById('lab-display').textContent),
+       'y las demás piezas pintan su contenido', 'el laboratorio no pinta la pieza del fascismo');
     w.go('s-quiz'); await esperar(150);
     ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'quiz vacío');
     w.go('s-tareas'); await esperar(150);
     w.genTask(); await esperar(200);
     const tareas = d.getElementById('tgOut').textContent;
     ok(tareas.length > 200, 'el generador de tareas produce su hoja', 'generador vacío');
-    ok(!/Destutt|1796/i.test(tareas), 'el ejemplo del generador es de esta misión', 'el generador arrastra el ejemplo de la etapa 1');
+    ok(!/Gallie|1956|esencialmente disputad/i.test(tareas), 'el ejemplo del generador es de esta misión', 'el generador arrastra el ejemplo de la etapa 2');
+    w.go('s-aprende'); await esperar(150);
+    w.startMethod(); await esperar(1400);
+    w.resolveMethod(true); await esperar(200);
+    ok(/mejor versión/i.test(d.getElementById('methodResult').textContent), 'la simulación es la de esta etapa (la unidad reescrita en su mejor versión)', 'la simulación arrastra la del molde');
     w.go('s-evaluacion'); await esperar(200);
     w.genEval(); await esperar(300);
     ok(d.getElementById('evalOut').textContent.length > 200, 'la evaluación final se genera', 'evaluación vacía');
     w.genEvalCrit(); await esperar(300);
     const crit = d.getElementById('evalCritOut').textContent;
-    ok(crit.length > 200, 'las gafas sobre la mesa se generan', 'prueba competencial vacía');
+    ok(crit.length > 200, 'la familia en la mesa se genera', 'prueba competencial vacía');
     ok(!/undefined/.test(crit), 'la competencial no pinta undefined', 'hay un undefined en la prueba competencial');
     const rotulos = [d.getElementById('eval-screen-title'), d.getElementById('evalcrit-screen-title'),
                      d.getElementById('evalOut'), d.getElementById('evalCritOut'),
                      d.querySelectorAll('.eval-print-header')[0]].map(x => x.textContent).join(' · ');
-    ok(/El bisturí de Freeden/.test(rotulos) && /El ideario en la mesa/.test(rotulos),
+    ok(/El mapa de las familias/.test(rotulos) && /La familia en la mesa/.test(rotulos),
        'los rótulos de prueba llevan el nombre correcto', 'los rótulos no traen el nombre de esta misión');
-    ok(!/Etapa 1/.test(rotulos), 'y no dicen etapa 1', 'los rótulos de pantalla dicen etapa 1');
-    ok(!/palabra con expediente|gafas sobre la mesa|acero|Expediente Rojo|átomos|vigía/i.test(rotulos),
+    ok(!/Etapa 1|Etapa 2/.test(rotulos), 'y no dicen etapa 1 ni etapa 2', 'los rótulos de pantalla dicen otra etapa');
+    ok(!/bisturí|ideario en la mesa|palabra con expediente|gafas sobre la mesa|acero antes del juicio|Expediente Rojo|átomos|vigía/i.test(rotulos),
        'y no traen el nombre de otra misión', 'las pruebas traen el nombre de otra misión');
 
     log('\n── CASOS DEL PROYECTO (norma 3) ──');
@@ -355,27 +423,28 @@ window.addEventListener('load', async () => {
     if (casos) {
       ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
       const txt = casos.textContent;
-      ['quiénes somos', '75,000', 'declaración de principios', 'plan de gobierno', 'líderes con valores', '12,000', 'mérito', 'Angelly', 'justicia', 'muñeco']
+      ['90,000', '25,000', '15,000', 'borrador', 'comunista', 'fascista', 'media página', 'Angelly', 'himno', 'muñeco']
         .forEach(k => { if (!new RegExp(k, 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });
       ok((txt.match(/Lo que enseña/g) || []).length >= 6, 'los casos cierran con lo que enseñan', 'casos con lección: ' + (txt.match(/Lo que enseña/g) || []).length);
       ok(/M\.E\.T\.A\.S|F\.A\.R\.O/.test(txt), 'los casos son sobre la propia casa', 'los casos no mencionan los proyectos');
       ok(/L \d/.test(txt), 'los casos traen números en lempiras', 'los casos no traen lempiras');
-      ok(/hoja del bisturí/i.test(txt), 'trae la hoja del bisturí', 'falta la hoja del bisturí');
+      ok(/hoja del mapa/i.test(txt), 'trae la hoja del mapa', 'falta la hoja del mapa');
       ok(/cinco reglas/i.test(txt), 'trae las cinco reglas de la etapa', 'faltan las cinco reglas');
       ok(/regla de pago/i.test(txt), 'trae la regla de pago', 'falta la regla de pago');
       /* El giro hacia adentro es el cuidado central del compendio: uno de los
-         ocho casos tiene que diseccionar la morfología de la propia casa, y
-         con el ideario MÁS PARECIDO, que es donde de verdad cuesta. */
-      ok(/adyacente/i.test(txt) && /nunca lo había declarado|sin declarar/i.test(txt),
-         'al menos un caso gira el bisturí hacia la propia casa', 'ningún caso disecciona la morfología propia');
-      ok(/más parecid/i.test(txt), 'y la regla de pago se cumple con el ideario más parecido', 'no se dice que el pago va con el más parecido');
-      /* La regla de la casa: el entrenamiento no toca a políticos vivos. */
-      ok(/históricos o de fuera/i.test(txt) || /nunca de un político vivo/i.test(txt),
+         ocho casos tiene que dibujar la familia de la propia casa, y con el
+         ideario MÁS PARECIDO, que es donde de verdad cuesta. */
+      ok(/más parecid/i.test(txt) && /(propia|esta casa)/i.test(txt),
+         'al menos un caso gira el detector hacia la propia casa, con el más parecido', 'ningún caso dibuja la familia propia');
+      /* La regla de la casa, doble en esta etapa. */
+      ok(/históricos o de fuera/i.test(txt) && /pol[íi]tico vivo/i.test(txt),
          'los casos declaran la regla del cero partidismo actual', 'los casos no declaran de dónde salen los textos');
+      ok(/estatus de ensayo|ensayo, no una prueba/i.test(txt),
+         'y uno de los casos rechaza usar la lista de Eco como termómetro', 'ningún caso defiende el estatus de ensayo');
       ok(!!d.querySelector('.nav-t[data-s="s-casos"]'), 'está en la barra de navegación', 'no aparece en la barra');
     }
     const decisiones = dentro('critDecisionBank.join(" ")');
-    ok(/75,000|12,000|Angelly|quiénes somos|plan de gobierno/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
+    ok(/90,000|25,000|15,000|Angelly|borrador/i.test(decisiones), 'el banco de decisiones usa los casos del proyecto', 'las decisiones siguen siendo genéricas');
 
     log('\n── EL WIDGET DE ORDENAR (arrastre y linterna) ──');
     w.go('s-widgets'); await esperar(200);
@@ -420,31 +489,36 @@ window.addEventListener('load', async () => {
        que no aparece en el texto de la página: por eso se arrastró de misión
        en misión desde la de Popper hasta que el autor la vio en pantalla. */
     const banda = w.getComputedStyle(d.querySelector('.hero'), '::before').content || '';
-    ok(/GALLIE|FREEDEN|DESCONTESTACI/.test(banda), 'la banda del encabezado es de esta misión', 'banda ajena: ' + banda.slice(0, 60));
-    ok(/N[ÚU]CLEO/.test(banda) && /ADYACENTES/.test(banda), 'y trae las capas de la morfología', 'la banda no nombra las capas');
-    ok(!/DESTUTT|MEHRING|C[ÁA]MARA OSCURA/.test(banda), 'sin las palabras de la etapa 1 de la ruta', 'la banda sigue siendo la de la etapa 1');
-    ok(!/SOCIEDAD ABIERTA|RACIONALISMO CRÍTICO|EL ACERO/.test(banda), 'sin las palabras de las misiones viejas', 'la banda viene arrastrada de otra misión');
+    ok(/LIBERALISMO/.test(banda) && /POPULISMO/.test(banda), 'la banda del encabezado es de esta misión', 'banda ajena: ' + banda.slice(0, 60));
+    ok(/MILL|BURKE|ANDERSON|PAXTON|MUDDE/.test(banda), 'y trae los autores del mapa', 'la banda no nombra a los autores');
+    ok(/IDEOLOG[ÍI]A DELGADA/.test(banda), 'y la ideología delgada', 'la banda no nombra la ideología delgada');
+    ok(!/GALLIE|FREEDEN|DESCONTESTACI|N[ÚU]CLEO · ADYACENTES/.test(banda), 'sin las palabras de la etapa 2 de la ruta', 'la banda sigue siendo la de la etapa 2');
+    ok(!/DESTUTT|MEHRING|C[ÁA]MARA OSCURA|SOCIEDAD ABIERTA|RACIONALISMO CRÍTICO|EL ACERO/.test(banda),
+       'sin las palabras de las misiones viejas', 'la banda viene arrastrada de otra misión');
 
     log('\n── FICHA ──');
-    const r = await fetch('/fichas/ficha-gafas-bisturi-freeden.html');
+    const r = await fetch('/fichas/ficha-gafas-mapa-familias.html');
     const txtF = r.ok ? await r.text() : '';
     ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
     ok((txtF.match(/class="pagina"/g) || []).length === 10, '10 páginas para imprimir (norma 6)', 'páginas: ' + (txtF.match(/class="pagina"/g) || []).length);
-    ok(/La hoja del bisturí, para llenar a lápiz/i.test(txtF), 'la ficha trae la hoja del bisturí en blanco', 'falta la hoja del bisturí');
-    ok(/Una hoja del bisturí ya llena/i.test(txtF), 'y una ya llena, como ejemplo', 'falta el ejemplo lleno');
-    ok(/plantilla de los tres anillos/i.test(txtF), 'la ficha trae la plantilla de los tres anillos', 'falta la plantilla de los tres anillos');
+    ok(/La hoja del mapa, para llenar a lápiz/i.test(txtF), 'la ficha trae la hoja del mapa en blanco', 'falta la hoja del mapa');
+    ok(/Una hoja del mapa ya llena/i.test(txtF), 'y una ya llena, como ejemplo', 'falta el ejemplo lleno');
+    ok(/plantilla de la media página de acero/i.test(txtF), 'la ficha trae la plantilla de la media página de acero', 'falta la plantilla de acero');
     ok(/Una plantilla de ejemplo, ya llena/i.test(txtF), 'y una plantilla ya llena', 'falta la plantilla llena');
-    ok(/esencialmente disputad/i.test(txtF) && /descontestaci/i.test(txtF), 'la ficha trae las piezas del temario', 'faltan piezas del temario');
-    ok(/libertad negativa/i.test(txtF) && /libertad positiva/i.test(txtF), 'la ficha trae las dos libertades', 'faltan las dos libertades');
-    ok(/prueba de quitarlo/i.test(txtF), 'la ficha explica cómo se encuentra el núcleo', 'la ficha no explica la prueba del núcleo');
+    ok(/las siete familias/i.test(txtF) && /mejor versión/i.test(txtF), 'la ficha trae las siete familias por su mejor versión', 'faltan piezas del temario');
+    ok(/comunidades imaginadas/i.test(txtF) && /industrializaci/i.test(txtF), 'la ficha trae el pleito de 1983', 'falta el pleito de Anderson y Gellner');
+    ok(/ideología delgada/i.test(txtF) && /anfitriona/i.test(txtF), 'la ficha trae el populismo delgado', 'falta el populismo delgado');
+    ok(/estatus de ensayo/i.test(txtF) && /no de ciencia/i.test(txtF), 'la ficha respeta el estatus de ensayo de Eco', 'la ficha no etiqueta a Eco como ensayo');
+    ok(/muñeco/i.test(txtF), 'la ficha explica la señal del muñeco', 'la ficha no explica el muñeco');
     ok(/históricos o de fuera/i.test(txtF), 'la ficha declara de dónde salen los textos de entrenamiento', 'la ficha no declara la regla del cero partidismo');
     ok(/Hoja de fuentes/i.test(txtF), 'la ficha trae su hoja de fuentes', 'falta la hoja de fuentes');
     ok(/Pauta completa de respuestas/.test(txtF), 'trae su pauta', 'sin pauta');
     ok(!/—/.test(txtF), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
     ok((txtF.match(/<table/g) || []).length === (txtF.match(/<\/table>/g) || []).length, 'ninguna tabla quedó partida entre dos hojas', 'hay tablas abiertas sin cerrar');
-    ok(/clásico sólido/i.test(txtF) && /académico sólido/i.test(txtF), 'las fuentes de la ficha llevan etiqueta', 'la ficha cita sin estatus');
-    ok(!/Caplan|Farm to Factory|Expediente Rojo|Mehring/i.test(txtF), 'la ficha no arrastra el temario del molde', 'la ficha trae restos de otra misión');
-    ok(!!d.querySelector('#s-recursos a[href*="ficha-gafas-bisturi-freeden"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+    ok(/clásico sólido/i.test(txtF) && /académico sólido/i.test(txtF) && /tesis discutida/i.test(txtF), 'las fuentes de la ficha llevan etiqueta', 'la ficha cita sin estatus');
+    ok(!/Gallie|Berlin|bisturí de Freeden|descontestaci/i.test(txtF.replace(/2 · El bisturí de Freeden/g, '')),
+       'la ficha no arrastra el temario del molde', 'la ficha trae restos de la etapa 2');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-gafas-mapa-familias"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
 
     log('\n── EN LA APLICACIÓN ──');
     const da = appFrame.contentDocument, wa = appFrame.contentWindow;
@@ -454,8 +528,8 @@ window.addEventListener('load', async () => {
     if (ruta) {
       ok(ruta.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
       ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
-      ok(/La palabra con expediente/.test(ruta.textContent) && /El bisturí de Freeden/.test(ruta.textContent),
-         'las etapas 1 y 2 salen con el título de su misión', 'alguna etapa construida no toma el título de MISSIONS');
+      ok(/La palabra con expediente/.test(ruta.textContent) && /El bisturí de Freeden/.test(ruta.textContent) && /El mapa de las familias/.test(ruta.textContent),
+         'las etapas 1, 2 y 3 salen con el título de su misión', 'alguna etapa construida no toma el título de MISSIONS');
       ok(/El eje y la gente sin mapa/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
       ok(!/Etapa por construir/.test(ruta.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
     }
@@ -466,13 +540,14 @@ window.addEventListener('load', async () => {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
       ok(tarjetas.length === 6, 'la materia muestra sus seis misiones', 'muestra ' + tarjetas.length);
-      const t = tarjetas.find(x => /bisturí de Freeden/i.test(x.textContent));
+      const t = tarjetas.find(x => /mapa de las familias/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
+      ok(!!t && /🧬/.test(t.textContent), 'y su emoji propio', 'la misión no muestra su emoji');
     }
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda bisturí etapa 2';
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · Sonda bisturí etapa 2'; }
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda mapa de las familias etapa 3';
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · Sonda mapa de las familias etapa 3'; }
 });
 </script>
 </body>

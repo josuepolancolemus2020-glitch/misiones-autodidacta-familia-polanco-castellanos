@@ -69,16 +69,16 @@ f.onload = async () => {
     const rojo = [...cards].find(c => /Ruta del Expediente Rojo/.test(c.textContent));
     ok(!!rojo && rojo.querySelectorAll('.re-link').length === 1 && rojo.querySelectorAll('.ruta-etapa-futura').length === 6,
        'el Expediente Rojo declara sus 7 etapas (1 construida y 6 previstas)', 'falta el Expediente Rojo completo');
-    /* Las Gafas a la Vista van por la etapa 2 (La palabra con expediente y El
-       bisturí de Freeden): 2 tocables y 5 previstas, siempre 7 en total. Los
-       títulos de las construidas tienen que venir de MISSIONS, y por eso sus
-       claves se borraron de ETAPAS_PREVISTAS.gafas. Esta cuenta sube cada vez
-       que se construye una etapa de la ruta. */
+    /* Las Gafas a la Vista van por la etapa 3 (La palabra con expediente, El
+       bisturí de Freeden y El mapa de las familias): 3 tocables y 4 previstas,
+       siempre 7 en total. Los títulos de las construidas tienen que venir de
+       MISSIONS, y por eso sus claves se borraron de ETAPAS_PREVISTAS.gafas.
+       Esta cuenta sube cada vez que se construye una etapa de la ruta. */
     const gafas = [...cards].find(c => /Ruta de las Gafas a la Vista/.test(c.textContent));
-    ok(!!gafas && gafas.querySelectorAll('.re-link').length === 2 && gafas.querySelectorAll('.ruta-etapa-futura').length === 5,
-       'las Gafas a la Vista declaran sus 7 etapas (2 construidas y 5 previstas)', 'falta la ruta de las Gafas completa');
-    if (gafas) ok(/La palabra con expediente/.test(gafas.textContent) && /El bisturí de Freeden/.test(gafas.textContent) && !/Etapa por construir/.test(gafas.textContent),
-       'las etapas 1 y 2 de las Gafas toman su título de MISSIONS', 'alguna etapa construida de las Gafas no sale con su título');
+    ok(!!gafas && gafas.querySelectorAll('.re-link').length === 3 && gafas.querySelectorAll('.ruta-etapa-futura').length === 4,
+       'las Gafas a la Vista declaran sus 7 etapas (3 construidas y 4 previstas)', 'falta la ruta de las Gafas completa');
+    if (gafas) ok(/La palabra con expediente/.test(gafas.textContent) && /El bisturí de Freeden/.test(gafas.textContent) && /El mapa de las familias/.test(gafas.textContent) && !/Etapa por construir/.test(gafas.textContent),
+       'las etapas 1, 2 y 3 de las Gafas toman su título de MISSIONS', 'alguna etapa construida de las Gafas no sale con su título');
     /* Cinco rutas del adulto van por la etapa 3 y la Casa Cerrada por la 4.
        Si alguna se queda corta es que la misión nueva no llegó al catálogo. */
     [['Ruta de la Persuasión', 3], ['Ruta de la Marca', 3], ['Ruta del Poder', 3],

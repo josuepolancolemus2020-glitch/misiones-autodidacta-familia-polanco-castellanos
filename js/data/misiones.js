@@ -134,6 +134,7 @@ const MISSIONS = [
   { id: 29, title: 'El acero antes del juicio: la mejor versión primero, el veredicto después', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '📕', ruta: 'rojo', etapa: 1, sello: 'familiar', url: 'misiones/ruta-rojo-acero-juicio/acero-juicio.html' },
   { id: 30, title: 'La palabra con expediente: nació ciencia y quedó insulto', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '👓', ruta: 'gafas', etapa: 1, sello: 'familiar', url: 'misiones/ruta-gafas-palabra-expediente/gafas-expediente.html' },
   { id: 31, title: 'El bisturí de Freeden: núcleo, adyacentes y periferia', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🔬', ruta: 'gafas', etapa: 2, sello: 'familiar', url: 'misiones/ruta-gafas-bisturi-freeden/bisturi-freeden.html' },
+  { id: 32, title: 'El mapa de las familias: cada una por su mejor versión', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🧬', ruta: 'gafas', etapa: 3, sello: 'familiar', url: 'misiones/ruta-gafas-mapa-familias/mapa-familias.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -366,10 +367,9 @@ const ETAPAS_PREVISTAS = {
     6: "El río de las remesas",
     7: "El humo tiene estructura",
   },
-  /* Las etapas 1 y 2 ya están construidas: sus títulos salen de MISSIONS, no
-     de aquí, igual que espejo, atomos y rojo. */
+  /* Las etapas 1, 2 y 3 ya están construidas: sus títulos salen de MISSIONS,
+     no de aquí, igual que espejo, atomos y rojo. */
   gafas: {
-    3: "El mapa de las familias",
     4: "El eje y la gente sin mapa",
     5: "Las gafas del que jura no llevarlas",
     6: "El detector en el texto",

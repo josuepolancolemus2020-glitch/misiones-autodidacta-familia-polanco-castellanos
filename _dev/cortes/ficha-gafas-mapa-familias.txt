@@ -1,0 +1,13 @@
+# Dónde empieza cada página de la ficha de «El mapa de las familias» (Gafas,
+# etapa 3; norma 6: diez páginas y llenas). Calculados midiendo los bloques con
+# _dev/mide-ficha-paginas.html?f=...&bloques=1 y repartiéndolos en diez hojas de
+# entre 215 y 252 mm, prefiriendo que cada corte caiga en un encabezado.
+<h2>🧭 Las siete familias, y qué pone cada una en el núcleo</h2>
+<h3>🏛️ El conservadurismo, con Burke (1790)</h3>
+<h2>🕊️ El anarquismo entra completo, y no como caricatura con bomba</h2>
+<h2>🪶 El populismo cierra el mapa: una ideología delgada</h2>
+<h2>📋 Los ocho casos del proyecto (5 a 8)</h2>
+<h2>🧾 La hoja del mapa, para llenar a lápiz</h2>
+<h2>🛡️ La plantilla de la media página de acero, para copiar o recortar</h2>
+<h2>✏️ Ejercicios para hacer a lápiz</h2>
+<div class="pauta">
