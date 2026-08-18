@@ -1,0 +1,17 @@
+# Dónde empieza cada página de la ficha de «Lo que el dinero no debe comprar»
+# (Expediente Dorado, etapa 3; norma 6: diez páginas y llenas). Calculados
+# midiendo los bloques con _dev/mide-ficha-paginas.html?f=...&bloques=1 y
+# repartiéndolos en diez hojas de entre 215 y 252 mm, con la condición extra
+# de que ningún encabezado se quede huérfano al pie de una página. Dos de los
+# cortes caen en una tabla, y por eso esas dos llevan una clase propia
+# (criticas param y criticas evidencia): así se pueden anclar sin ambigüedad
+# y sin partir la tabla entre dos hojas.
+<h2>⚖️ Las dos objeciones, que no son la misma</h2>
+<table class="criticas param">
+<table class="criticas evidencia">
+<h2>🚪 Las cuatro salidas, que son más que dos</h2>
+<h2>📚 Hoja de fuentes</h2>
+<h3>🩸 Caso 2 · La sangre que hay que reponer</h3>
+<h3>🪞 Caso 8 · El XP que esta casa le paga a Jael por leer</h3>
+<h2>✅ Una hoja del bien ya llena, como ejemplo</h2>
+<h3>Ejercicio 2 · ¿Se arregla (A) o vale siempre (S)?</h3>

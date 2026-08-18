@@ -210,7 +210,7 @@ window.addEventListener('load', async () => {
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
       /* La materia «mayor» crece con cada misión del Estudio Mayor: átomos
          y acero la subieron a tres, igual que las sondas de la Ley. */
-      ok(tarjetas.length === 9, 'la materia muestra sus nueve misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length === 10, 'la materia muestra sus diez misiones', 'muestra ' + tarjetas.length);
       const t = tarjetas.find(x => /vigía y el timón/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
