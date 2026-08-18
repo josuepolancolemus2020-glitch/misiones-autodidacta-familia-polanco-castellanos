@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta del Expediente Dorado · Etapa 2: Las fallas de la máquina | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/fallas-maquina.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Cree que las ideas caen del cielo ☁️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🔧</div>
+    <div class="hero-text">
+      <h1>Las fallas de la máquina: <span>la auditoría la firman los propios economistas</span></h1>
+      <p class="sub">Cada supuesto que falla es una familia de fallas reales, y todas tienen nombre 🔧</p>
+      <div class="badge">🔧 Ruta del Expediente Dorado · Etapa 2 de 7</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔧 La primera factura la firman los de adentro</h2>
+    <p>La etapa 1 puso el acero: la gran fuga es real y está medida. Ahora llega la primera factura, y esta casa la abre por donde más incomoda a los dos bandos: <strong>la auditoría de los propios economistas</strong>. No la de los enemigos del sistema, sino la de la gente que aceptó todas sus reglas y demostró, con las mismas herramientas, <strong>dónde el juego se rompe solo</strong>.</p>
+    <p>Es la crítica más afilada que existe justamente por eso: no se puede despachar diciendo que viene del otro estante. Casi todos los que aparecen aquí <strong>tienen premio Nobel o lo tuvieron cerca</strong>, y ninguno estaba escribiendo un panfleto.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La vara de la etapa.</strong> Quien termina hace una sola cosa, y es difícil: <strong>pone delante un mercado concreto de aquí y le pone nombre y apellido a su falla</strong>. No «el mercado falla», que no dice nada, sino: esto es una externalidad, esto es monopsonio, esto es información asimétrica, esto es una falla dinámica. Y detrás del nombre, lo que la etapa entera busca: <strong>qué regla la corregiría, y qué costo tendría esa regla</strong>.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📜 La letra pequeña del teorema</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Hay un resultado famoso que dice que un mercado competitivo asigna los recursos de manera eficiente. Es verdad, y es un teorema. Pero como todo teorema, <strong>vale solo si se cumplen sus supuestos</strong>, y esos supuestos están escritos. Aquí está la letra pequeña, y es la mitad de la etapa:</p>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>📄 Lo que el teorema pide</h4>
+        <p>Mercados <strong>completos</strong>, información <strong>perfecta</strong>, <strong>nadie</strong> con poder de mercado, y <strong>nada</strong> que caiga sobre terceros que no firmaron. Cuatro condiciones, escritas por quienes lo demostraron y no por sus críticos.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🔧 Lo que pasa cuando falla una</h4>
+        <p><strong>Cada supuesto que falla es una familia entera de fallas reales</strong>, con nombre propio y con literatura detrás. No son excepciones raras: son el préstamo de la esquina, la clínica privada y el único empleador del pueblo.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧭 La imagen que hay que quedarse</span><br>
+      <span>Una máquina con su manual, y el manual con una página que casi nadie lee: <span class="hl">la de las condiciones de uso</span>. La máquina funciona, y funciona bien, <span class="hl2">cuando se cumplen las cuatro condiciones de esa página</span>. Quien la usa sin leerla no es un entusiasta: es alguien que va a echarle la culpa a la máquina de un problema que estaba escrito desde el principio.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Las cuatro fallas, y la que casi nadie enseña</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué pasó, qué aporta y con qué etiqueta entra.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento del camino.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: el préstamo de la esquina</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué se anota en el cuaderno de la casa.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">💸</span><span class="ms-text"><strong>El hecho está sobre la mesa:</strong> en el barrio prestan dinero a interés diario, sin papeles, y quien presta cobra muchísimo más caro que cualquier banco. La gente igual va, porque el banco no le presta.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">✍️</span><span class="ms-text"><strong>El atajo:</strong> escribir en el cuaderno «el mercado falla y por eso la gente pobre paga más». Es cierto que algo falla, la frase suena justa y en el aula nadie la va a discutir.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🪤</span><span class="ms-text"><strong>La trampa:</strong> así escrito no se puede hacer nada con eso. «El mercado falla» no dice cuál de las cuatro fallas es, y sin el nombre no hay regla que proponer, ni costo que calcular, ni forma de saber si la regla empeoraría las cosas.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">📓</span><span class="ms-text"><strong>Lo que tienes delante:</strong> un hecho verdadero, un cuaderno abierto y dos maneras muy distintas de anotarlo.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué se escribe en el cuaderno?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">📢 «El mercado falla»</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🔧 La falla con nombre, y su regla</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🌊 Falla 1 · Externalidades: el costo que paga quien no firmó</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Es la falla más fácil de ver y la más difícil de arreglar. <strong>Mi taller tira el agua sucia a la quebrada, y el costo lo paga una aldea que no firmó ningún contrato conmigo.</strong> El precio de lo que vendo no incluye ese daño, así que el mercado produce más de lo que produciría si el precio dijera la verdad. Y la etapa exige contar la discusión entera, no medio bando:</p>
+    <table class="tres">
+      <tr><th>Quién</th><th>Qué propone</th><th>Etiqueta</th></tr>
+      <tr><td><strong>Arthur Pigou, «The Economics of Welfare» (1920)</strong></td><td>Que el que causa el daño <strong>lo pague en el precio</strong>, con un impuesto del tamaño del daño</td><td><strong>Clásico sólido</strong></td></tr>
+      <tr><td><strong>Ronald Coase, «The Problem of Social Cost» (1960)</strong></td><td>Que <strong>si los derechos de propiedad están claros, las partes pueden negociar</strong> y llegar solas al resultado eficiente</td><td><strong>Clásico sólido: la contracrítica obligada</strong></td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⚠️ La advertencia que el propio Coase dejó por escrito</span><br>
+      <span>Y aquí está el detalle que casi nadie cuenta, y que esta casa cuenta siempre: <span class="hl">Coase advirtió que su argumento vale donde negociar cuesta poco</span>, que es justamente donde la falla menos importa. Cuando hay cien vecinos, ningún abogado y nadie con tiempo, negociar cuesta carísimo y el resultado no llega solo. <span class="hl2">La versión de manual de su idea la rechazó él mismo por escrito, en «The Firm, the Market and the Law», de 1988.</span> Citar a Coase sin esa advertencia es citar la mitad que conviene.</span>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🏭 Falla 2 · Poder de mercado: el que cobra de más y el que paga de menos</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El teorema pide que nadie tenga poder para mover el precio. Cuando alguien lo tiene, el precio deja de informar y empieza a mandar. Y son <strong>dos casos, no uno</strong>, aunque en la escuela solo se enseñe el primero:</p>
+    <table class="tres">
+      <tr><th>Caso</th><th>Quién manda</th><th>Qué pasa</th></tr>
+      <tr><td><strong>Monopolio</strong></td><td>El único que <strong>vende</strong></td><td>Cobra de más, y vende menos de lo que se vendería con competencia</td></tr>
+      <tr><td><strong>Monopsonio</strong></td><td>El único que <strong>compra</strong>, y casi siempre compra trabajo</td><td><strong>Paga de menos, y sin violar ninguna ley</strong>: no hace falta que nadie sea malo</td></tr>
+    </table>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">El monopsonio es la pieza que esta materia se niega a saltarse, porque explica media vida de aquí: <strong>cuando en un pueblo hay un solo empleador que dé trabajo formal, el salario baja solo</strong>, y no porque el dueño sea peor persona que el de al lado, sino porque el trabajador no tiene a dónde ir a comparar. La referencia académica es <strong>Alan Manning, «Monopsony in Motion» (2003)</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚖️ Y con eso llega una disputa empírica que sigue viva</span><br>
+      <span>Si el que paga tiene poder, subir el salario mínimo <span class="hl">no tiene por qué destruir empleo</span>. <strong>Card y Krueger (1994)</strong> midieron un caso real y no encontraron la caída que la teoría simple predecía; <strong>Neumark y Wascher</strong> los rebatieron con otros datos y otro método. <span class="hl2">La disputa está viva, se enseña viva, y quien la declare resuelta en cualquiera de las dos direcciones está vendiendo bando.</span></span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🍋 Falla 3 · Información asimétrica: uno sabe y el otro no</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">En <strong>1970</strong>, <strong>George Akerlof</strong> publicó <strong>«The Market for Lemons»</strong> y mostró algo que parecía imposible: <strong>un mercado puede deshacerse solo</strong>, sin que nadie haga trampa, únicamente porque el que vende sabe más que el que compra. Etiqueta: <strong>clásico sólido</strong>, y su autor recibió el <strong>Nobel de Economía en 2001</strong>.</p>
+    <table class="tres">
+      <tr><th>Paso</th><th>Qué ocurre</th><th>En un carro usado</th></tr>
+      <tr><td><strong>1. El que compra no puede saber</strong></td><td>No distingue el bueno del malo, así que ofrece un precio promedio</td><td>Ofrece lo mismo por el bueno y por el que tiene el motor cansado</td></tr>
+      <tr><td><strong>2. El bueno se retira</strong></td><td>A ese precio, al dueño del bueno no le conviene vender</td><td>El que tiene el carro sano prefiere quedárselo</td></tr>
+      <tr><td><strong>3. El promedio empeora</strong></td><td>Quedan más malos, el precio baja más, y se van más buenos</td><td>Y así hasta que el mercado se vacía o solo quedan los malos</td></tr>
+    </table>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y el remate teórico, que es el que convierte el ejemplo en resultado general: <strong>Bruce Greenwald y Joseph Stiglitz demostraron en 1986</strong> que <strong>con información imperfecta los mercados no son eficientes por regla</strong>, y no por excepción. Es decir: no es que a veces se rompa; es que la información perfecta era el supuesto, no la realidad.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🩺 Y la versión que toca aquí todos los días</span><br>
+      <span>La consulta médica privada es el caso de libro: <span class="hl">el que paga es exactamente el que menos sabe lo que necesita</span>, y el que sabe es el que cobra por decírselo. Eso no vuelve ladrón a ningún médico, y decirlo así sería el error de la etapa anterior. <span class="hl2">Lo que dice es que ese mercado necesita reglas que otros mercados no necesitan</span>, y que quien pide para él las mismas reglas que para el maíz no entendió la falla.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎈 Falla 4 · La dinámica: la calma que fabrica la tormenta</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Las tres anteriores son fallas de un momento. Esta es de otro tipo y por eso cuesta más verla: <strong>Hyman Minsky</strong> sostuvo que <strong>la estabilidad incuba inestabilidad</strong>. No que el sistema falle cuando algo sale mal, sino que <strong>falla precisamente cuando todo va bien</strong>, porque los años buenos convencen a todo el mundo de que el riesgo bajó.</p>
+    <table class="tres">
+      <tr><th>Escalón</th><th>Quién pide prestado</th><th>Con qué paga</th></tr>
+      <tr><td><strong>1. Prudente</strong></td><td>El que puede pagar intereses y capital</td><td>Con lo que produce el negocio</td></tr>
+      <tr><td><strong>2. Especulativo</strong></td><td>El que solo puede pagar intereses</td><td>Y para el capital, refinancia</td></tr>
+      <tr><td><strong>3. El esquema de pirámide</strong></td><td>El que no puede pagar ni los intereses</td><td>Solo si el precio del activo sigue subiendo</td></tr>
+    </table>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">La calma financia la audacia, y la audacia financia el tercer escalón; cuando el precio deja de subir, el tercer escalón se cae y arrastra a los otros dos. Minsky lo escribió en <strong>«Stabilizing an Unstable Economy» (1986)</strong>, y su etiqueta se dice entera porque es media lección: <strong>heterodoxo en su día, y rehabilitado después de 2008</strong>, cuando media profesión volvió a leerlo de golpe.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🏚️ 2008, con su expediente completo</span><br>
+      <span>Esta materia se queda con la ficha entera de <span class="hl">2008</span>: la burbuja de la vivienda, los derivados que empaquetaban hipotecas malas con etiqueta de buenas (que es Akerlof otra vez, ahora con firma de calificadora), el rescate, y <span class="hl2">quién pagó la cuenta al final</span>. La fuente oficial es el <strong>informe de la Financial Crisis Inquiry Commission (2011)</strong>, y se cita <strong>con sus disidencias incluidas</strong>, porque la comisión no fue unánime y ocultar eso sería el mismo vicio que la materia caza.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🖌️ El modo de fallar de esta etapa: de la falla a la consigna</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El error propio de esta etapa no es negar las fallas: es <strong>usarlas como consigna en vez de como diagnóstico</strong>. Se reconoce por tres señales, y va a ser el primero que cometa esta casa, porque el vocabulario nuevo da gusto:</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">1️⃣ «El mercado falla»</div><div class="t-info">Sin decir cuál de las cuatro</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">2️⃣ Sin la regla</div><div class="t-info">Se nombra el daño y no el arreglo</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">3️⃣ Sin el costo de la regla</div><div class="t-info">Como si arreglar fuera gratis</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">✅ En su lugar: el nombre</div><div class="t-info">Externalidad, monopsonio, asimetría o dinámica</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">✅ En su lugar: la regla</div><div class="t-info">Qué se cambiaría, y quién la aplicaría</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">✅ En su lugar: su factura</div><div class="t-info">Qué cuesta la regla, y a quién</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y va con la regla que impide el error simétrico, el del otro estante: <strong>que un mercado tenga una falla no prueba que el Estado la vaya a arreglar mejor</strong>. Esa comparación se hace igual que todo aquí, <strong>contra la alternativa real y no contra el paraíso</strong>: la falla de mercado se compara con la falla de gobierno concreta, con nombre, y no con un ministerio imaginario que siempre acierta. Quien salta de la falla a la solución sin ese paso no está auditando: está pidiendo un deseo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🧱 Lo que sobrevive a esta etapa, y hay que decirlo</span><br>
+      <span>Cuatro fallas demostradas no derriban el expediente de la etapa 1: <span class="hl">la gran fuga sigue medida y sigue en pie</span>. Lo que la etapa 2 añade es más incómodo y más útil: <span class="hl2">que la máquina funciona bien donde se cumplen sus condiciones, y que donde no se cumplen hace falta diseño y no fe</span>. Las dos frases van juntas, y quien solo pueda sostener una de las dos todavía no terminó el expediente.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller de las cuatro fallas</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para tener la herramienta completa en la mano.</p>
+    <div id="lab-sentence" class="lab-sentence">🔧 Explorando: <strong>Externalidades</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🔧 Falla:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="externalidad" onclick="labShowParte('externalidad')">🌊 Externalidades</button>
+        <button class="lab-btn lab-cont-btn" data-parte="poder" onclick="labShowParte('poder')">🏭 Poder de mercado</button>
+        <button class="lab-btn lab-cont-btn" data-parte="informacion" onclick="labShowParte('informacion')">🍋 Información asimétrica</button>
+        <button class="lab-btn lab-cont-btn" data-parte="dinamica" onclick="labShowParte('dinamica')">🎈 La falla dinámica</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">🔎 Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿qué falla es?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se diagnostica una falla de mercado</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔧 Identifica la falla o la fuente por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la etapa se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué le toca a ese mercado: falla, regla o factura?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es cada cosa dentro de la auditoría:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«El taller tira el agua sucia a la quebrada de la aldea»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla el diagnóstico?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">«El mercado falla», y ahí termina la anotación</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🌊 Externalidad</button>
+        <button class="btn btn-sec" onclick="">🍋 Asimetría</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🔧 La falla sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Las fallas de la máquina · Ruta del Expediente Dorado</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: las fallas de la máquina</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La falla sobre la mesa · Las fallas de la máquina</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🔧 La falla sobre la mesa: cuál es, qué regla la corrige y qué cuesta esa regla</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay un mercado concreto sobre la mesa. Ponle a su falla <strong>nombre y apellido</strong> (externalidad, poder de mercado, información asimétrica o falla dinámica), di <strong>qué supuesto del teorema se rompió</strong>, propón <strong>la regla que la corregiría</strong> y calcula <strong>qué cuesta esa regla y a quién</strong>, compárala con la <strong>alternativa real</strong> y no con un gobierno imaginario, pon la <strong>etiqueta de estatus</strong> a cada fuente, y di qué sigue funcionando bien en ese mercado (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🔧</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🔧 Casos del proyecto: las fallas que tocan esta casa</h2>
+    <p>Ocho mercados de esta ciudad y de M.E.T.A.S. En todos hay una falla real, y en todos la pregunta es la misma: <strong>cuál de las cuatro es, qué supuesto del teorema se rompió, qué regla la corregiría y qué costaría esa regla.</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también en esta etapa:</strong> ningún estudio, obra o cifra entra sin su etiqueta. Las de aquí: Pigou (1920) y Coase (1960), <strong>clásicos sólidos</strong>, y Coase con su propia advertencia de 1988 al lado; Akerlof (1970), <strong>clásico sólido</strong>, Nobel en 2001; Greenwald y Stiglitz (1986), <strong>el resultado general</strong>; Manning (2003), <strong>la referencia académica del monopsonio</strong>; Card y Krueger (1994) contra Neumark y Wascher, <strong>disputa empírica viva</strong>; Minsky (1986), <strong>heterodoxo en su día y rehabilitado tras 2008</strong>; y el informe de la Financial Crisis Inquiry Commission (2011), <strong>oficial y con sus disidencias</strong>. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>💸 Caso 1: el préstamo de la esquina, a interés diario</h2>
+    <p>En el barrio se presta sin papeles y se cobra por día. El interés, puesto en años, es enorme comparado con el de un banco. Y aun así la gente va, porque <strong>al banco no puede ir</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔧 La falla, con nombre</span><br>
+      <span>No es una sola, y por eso el caso abre la etapa. Hay <span class="hl">información asimétrica</span>, porque el que presta no puede saber quién va a pagar y cobra a todos como si fueran el peor; y hay <span class="hl2">poder de mercado local</span>, porque en tres cuadras no hay a quién más pedirle. Y hay una tercera cosa que no es falla del mercado: <strong>que el banco no llegue a esa cuadra es en buena parte una regla, no una maldad</strong>, y las reglas se pueden mirar.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> que el diagnóstico decide el remedio. Si fuera solo asimetría, la regla sería un historial de crédito que se pueda llevar de un lado a otro. Si fuera solo poder de mercado, la regla sería que entre alguien más a competir. <strong>Y prohibir el préstamo sin resolver ninguna de las dos deja a la gente con el problema y sin el préstamo</strong>, que es la falla de gobierno de manual.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🩺 Caso 2: la clínica privada y la consulta de L 600</h2>
+    <p>Una consulta cuesta <strong>L 600</strong>, y el que la paga no tiene manera de saber si necesitaba esos exámenes o no. El médico sí lo sabe. Y el médico cobra por decírselo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🍋 Akerlof, en la sala de espera</span><br>
+      <span>Es <span class="hl">información asimétrica</span> en su forma más pura: <strong>el que paga es exactamente el que menos sabe lo que necesita</strong>. Y hay que decir de inmediato lo que la etapa anterior enseñó: <span class="hl2">esto no vuelve ladrón a ningún médico</span>, y el que salta de la falla a la acusación cometió el error de la etapa pasada. La falla existe aunque todos los médicos sean honrados, porque está en la estructura y no en las personas.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> qué reglas nacen de esa falla, y por qué existen en todos los países: colegios profesionales que certifican, segundas opiniones, listas de precios publicadas, historias clínicas que el paciente se puede llevar. <strong>Y su factura, que también se dice:</strong> cada una de esas reglas cuesta dinero y tiempo, y alguna encarece la consulta que quería abaratar.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🏭 Caso 3: el único empleador formal del pueblo</h2>
+    <p>En muchos pueblos de aquí hay <strong>un solo lugar que da trabajo con planilla</strong>. El resto es informal, o es irse. El salario que paga ese lugar es bajo, y nadie ha violado ninguna ley.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🏭 Monopsonio, y entra como categoría</span><br>
+      <span>Esta es la falla que casi nadie enseña y que aquí se estudia entera: <span class="hl">cuando el que compra trabajo es uno solo, el salario baja sin que nadie sea malo</span>, porque el trabajador no tiene a dónde ir a comparar. El caso entra <span class="hl2">como categoría y no con nombre propio</span>, que es la regla de selección de esta materia: se estudia la estructura, no se señala ninguna empresa con pleito abierto ni a nadie en campaña.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> que aquí la teoría cambia la conclusión. Con competencia perfecta, subir el salario mínimo destruye empleo; <strong>con monopsonio, puede subir el salario sin destruirlo</strong>, y eso es exactamente lo que <strong>Card y Krueger midieron en 1994</strong> y lo que <strong>Neumark y Wascher discutieron</strong>. La casa enseña la disputa, no el bando, y anota la pregunta que la resolvería: cuánto poder de compra tiene de verdad ese empleador.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📶 Caso 4: un solo proveedor de internet en la colonia</h2>
+    <p>La escuela donde estudian las niñas depende del internet, y en esa colonia <strong>hay un solo proveedor</strong>. El servicio se cae, sube de precio, y no hay a quién cambiarse.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🏭 Monopolio, y de los que tienen explicación</span><br>
+      <span>Es <span class="hl">poder de mercado del que vende</span>, y conviene decir por qué se produce: tender cable a una colonia cuesta mucho la primera vez y casi nada la siguiente, así que <span class="hl2">al segundo que llegue no le sale la cuenta</span>. Eso no lo vuelve inocente, pero cambia el remedio: aquí «que entre competencia» no basta como frase, porque la estructura empuja a que no entre.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> las tres reglas que existen para esto y sus tres facturas: regular el precio (y arriesgarse a que nadie invierta), obligar a compartir la red (y discutir a qué precio), o dejarlo libre (y pagarlo en servicio caro y malo). <strong>Ninguna es gratis, y decir cuál cuesta menos exige números que la casa todavía no tiene</strong>, así que eso queda escrito como pendiente y no como opinión.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🌊 Caso 5: el agua sucia del taller y la quebrada</h2>
+    <p>Un taller de la zona lava piezas y tira el agua a la quebrada. Aguas abajo hay una aldea que <strong>no firmó nada con nadie</strong>. El taller cumple con lo que le piden y vende barato.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🌊 Externalidad, con las dos respuestas al lado</span><br>
+      <span>El costo existe y lo paga quien no lo causó: eso es <span class="hl">una externalidad</span>, y el precio de la pieza no la incluye. <strong>Pigou</strong> diría que se le ponga un impuesto del tamaño del daño. <strong>Coase</strong> diría que si los derechos están claros, taller y aldea pueden negociar. <span class="hl2">Y el propio Coase advirtió que eso funciona donde negociar cuesta poco</span>: con una aldea entera, sin abogado y sin tiempo, negociar cuesta carísimo, y por eso el caso está sin resolver desde hace años.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> a no escoger bando antes de medir. La pregunta que decide no es Pigou o Coase, sino <strong>cuánto cuesta negociar en este caso concreto</strong>. Y la regla de selección otra vez: el caso entra por su estructura, y <strong>si alguna vez hay ficha sobre un río con nombre, se escribe con la misma doble columna que todo lo demás</strong>.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>📢 Caso 6: Jael escribe «entonces el mercado no sirve»</h2>
+    <p>Después de aprender las cuatro fallas, <strong>Jael</strong> escribe en su cuaderno la conclusión que a todo el mundo le sale primero: <strong>«entonces el mercado no sirve»</strong>. Aprendió bien; concluyó mal.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🪤 El error propio de esta etapa</span><br>
+      <span>La frase falla en tres sitios a la vez: <span class="hl">no dice cuál de las cuatro fallas está mirando</span>, no propone ninguna regla, y no calcula lo que esa regla costaría. Y falla en un cuarto sitio, el más incómodo: <span class="hl2">de que un mercado falle no se sigue que otro arreglo lo haga mejor</span>. Eso se compara con la alternativa real, con nombre, no con un gobierno imaginario que siempre acierta.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> cómo se reescribe, y la reescritura cabe en tres renglones. «En esta colonia hay un solo proveedor de internet, que es poder de mercado del que vende; la regla que se usa en otros países es obligar a compartir la red; <strong>y su costo es que hay que fijar a qué precio se comparte, lo cual exige un regulador que sepa hacerlo</strong>». Eso sí se puede discutir, y se puede comprobar si funcionó.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🍋 Caso 7: Angelly y el carro usado que estaba muy barato</h2>
+    <p>Alguien ofrece un carro usado a un precio muy bueno, y en la casa todos desconfían sin saber explicar por qué. <strong>Angelly</strong> pregunta lo obvio: <strong>«¿por qué si está barato es sospechoso?»</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🍋 La explicación tiene autor, año y Nobel</span><br>
+      <span>La desconfianza no es prejuicio: es <span class="hl">exactamente lo que Akerlof describió en 1970</span>. Si el que vende sabe más que el que compra, el que compra ofrece un precio de promedio; a ese precio los buenos se retiran, y el promedio empeora. <span class="hl2">Al final, un precio muy bajo es información</span>, y lo que dice no es «qué suerte»: dice «pregunte por qué».</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> lo práctico, que es lo que se lleva Angelly: las cosas que existen para tapar esa falla y que se pueden pedir, <strong>la garantía, el mecánico de confianza que lo revise, y los papeles</strong>. Y el apunte de método: cada una de esas tres cosas cuesta algo, <strong>y ese costo es el precio de vivir con una falla que no se puede eliminar</strong>.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🪞 Caso 8: la falla que tiene M.E.T.A.S por dentro</h2>
+    <p>La auditoría se gira hacia adentro. En una misión educativa gratuita, <strong>¿quién puede juzgar si es buena antes de usarla?</strong> Nadie. Ni la familia que la abre ni el maestro que la recomienda.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🪞 Asimetría, y con el agravante de ser gratis</span><br>
+      <span>Es <span class="hl">información asimétrica</span>, y aquí el precio ni siquiera puede avisar, porque no hay precio. En un mercado normal, un producto caro y malo al menos deja una queja; <span class="hl2">un producto gratis y malo se abandona en silencio y nadie se entera</span>, que es la peor señal posible para quien lo escribe. La falla es de la casa y no de quien la usa.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> qué reglas se puso la casa por eso, y quedaron escritas con fecha: <strong>las fuentes con su etiqueta, la pauta publicada al lado del ejercicio, y las sondas que revisan cada misión antes de publicarla</strong>. Y su renglón de qué la haría cambiar: si tres familias abandonan una misión sin decir por qué, <strong>la señal que falta hay que ir a buscarla, porque la falla es de diseño y no de las familias</strong>.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🔧 La hoja de la falla, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier mercado que se ponga sobre la mesa, propio o ajeno, se llena antes de opinar:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué mercado es, exactamente:</strong> quién vende, quién compra, y qué se intercambia.</li>
+      <li><strong>Qué supuesto se rompió:</strong> mercados completos, información perfecta, nadie con poder, o nada sobre terceros.</li>
+      <li><strong>Cómo se llama la falla:</strong> externalidad, poder de mercado, información asimétrica o falla dinámica.</li>
+      <li><strong>Qué regla la corregiría:</strong> escrita de modo que se sepa quién la aplica y cómo se comprueba.</li>
+      <li><strong>Qué cuesta esa regla y a quién:</strong> y contra qué alternativa real se está comparando.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔧 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">La falla se nombra</span>: «el mercado falla» no es un diagnóstico. 2. <span class="hl">Cada supuesto que falla es una familia de fallas</span>, y son cuatro familias. 3. Toda crítica entra con <span class="hl">su contracrítica al lado</span>: Pigou con Coase, y Coase con su propia advertencia de 1988. 4. <span class="hl2">Ninguna regla es gratis</span>: se dice qué cuesta y a quién. 5. Y la falla de mercado se compara con <span class="hl">la falla de gobierno concreta</span>, no con un gobierno imaginario.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «A don Marcial le pagaban lo mismo por saber más»</h2>
+    <p>Guion listo para grabar (6 a 8 minutos), con la historia al frente y el concepto escondido adentro. Cada escena trae su <strong>voz</strong> (lo que se dice), su <strong>imagen</strong> (lo que se ve) y su <strong>texto en pantalla</strong>.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>Regla del guion (norma de la casa):</strong> toda misión lleva su guion de video con historia: un gancho en frío que duela o intrigue, un personaje que quiere algo, un giro que desmonta lo que el público creía, y un cierre que aterriza el concepto en la vida de quien mira. Nada de definiciones antes del minuto dos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «Don Marcial aprendió a arreglar el motor entero, no solo la parte que le tocaba. Le tomó cuatro años. Y cuando lo logró, le siguieron pagando exactamente lo mismo. No porque el patrón fuera malo. Por otra cosa, y es la que quiero contarles.»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; aparecen unas manos con grasa abriendo una caja de herramientas ordenada, cada llave en su sitio. No se ve la cara.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Aprendió más. Le pagaron igual.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quiere (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «Don Marcial trabaja en el único taller grande del pueblo. El único que da planilla, seguro y constancia de trabajo. Los demás son de dos personas y pagan por día cuando hay. Lo que él quería era simple y creo que todos lo entendemos: quería que su esfuerzo se le notara en el sobre. Estudió los manuales de noche, se sacó un curso, aprendió a diagnosticar por sonido. Un día se armó de valor y pidió aumento. El patrón le dijo que no, sin gritarle y sin humillarlo, y le dijo la verdad: que si él se iba, en dos semanas encontraba a otro; y que si el patrón le subía a él, tenía que subirle a los otros once. Don Marcial se quedó. ¿Y a dónde iba a ir?»</p>
+    <p><strong>IMAGEN:</strong> el taller por dentro, ordenado y con trabajo; después la calle del pueblo, y la cámara recorriendo los negocios pequeños con las cortinas a medio abrir.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Y a dónde iba a ir?»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Una prueba, y contestala en voz baja. Pensá en la última vez que compraste algo donde vos no tenías cómo saber si estaba bueno. La consulta médica, el mecánico, el curso que ibas a pagar, el celular usado. ¿Ya la tenés? Ahora la parte incómoda: ¿qué hiciste? Casi todos hacemos lo mismo, y es preguntarle a alguien conocido. Fijate en eso, porque es importante: <em>no confiaste en el precio</em>. Tuviste que buscar una persona. Guardá esa sensación, que en cinco minutos te digo cómo se llama y por qué le costó un premio Nobel a alguien explicarla.»</p>
+    <p><strong>IMAGEN:</strong> un teléfono con una conversación abierta donde alguien pregunta «¿usted conoce un mecánico bueno?»; después una mano dudando frente a dos productos iguales.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «No confiaste en el precio. Buscaste una persona.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Aquí está el giro. Uno cree que la crítica al mercado la hacen los enemigos del mercado. Y no: las críticas más duras las escribieron los propios economistas, con premio Nobel y todo. Empecemos por el principio. Hay un teorema famoso que dice que un mercado competitivo asigna bien los recursos. Es verdad. Pero como todo teorema, tiene su letra pequeña, y la letra pequeña pide cuatro cosas: que los mercados estén completos, que la información sea perfecta, que nadie tenga poder para mover el precio, y que nada del costo caiga sobre gente que no firmó. Cuatro condiciones. Y aquí viene lo bueno: <em>cada una que falla tiene nombre propio y tiene apellido</em>. Lo de don Marcial, por ejemplo, no es abuso: es la tercera. Se llama monopsonio, y quiere decir que cuando el que compra es uno solo, el precio baja sin que nadie viole ninguna ley. Se estudia poco porque en la escuela solo enseñan el monopolio, que es el que vende. Este es el que compra, y compra trabajo.»</p>
+    <p><strong>IMAGEN:</strong> una hoja con cuatro casillas dibujadas a mano; una mano va tachando la tercera y escribiendo al lado, con letra grande, la palabra MONOPSONIO.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Monopsonio: cuando el que compra es uno solo.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:20)</h2>
+    <p><strong>VOZ:</strong> «Y las otras tres, rapidito, porque las vas a reconocer todas. La externalidad: el taller que tira el agua a la quebrada y el costo lo paga la aldea de abajo, que no firmó nada. Arthur Pigou dijo en 1920 que se le cobre un impuesto del tamaño del daño; Ronald Coase respondió en 1960 que si los derechos están claros, las partes pueden negociar solas. Y ojo con esto, que casi nadie lo cuenta: el propio Coase advirtió que eso vale donde negociar cuesta poco, y con una aldea entera negociar cuesta carísimo. La información asimétrica: eso que sentiste en la prueba de hace un rato. George Akerlof lo explicó en 1970 con los carros usados y le dieron el Nobel en 2001: si el que vende sabe más, el que compra ofrece precio de promedio, los buenos se retiran, y el mercado se echa a perder solo. Y la cuarta, la más rara: Hyman Minsky escribió en 1986 que la estabilidad fabrica la inestabilidad, porque los años buenos convencen a todos de que ya no hay riesgo. Lo trataron de excéntrico mientras duró la calma, y en 2008 medio mundo lo volvió a leer de golpe.»</p>
+    <p><strong>IMAGEN:</strong> cuatro planos cortos y seguidos: una quebrada turbia, un carro usado con el capó abierto, una fila de un solo lugar contratando, y un gráfico que sube y se cae.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Externalidad · Poder de mercado · Asimetría · Falla dinámica»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:20 a 6:10)</h2>
+    <p><strong>VOZ:</strong> «“Entonces el mercado no sirve y hay que regularlo todo.” Alto ahí, que ese es exactamente el error que este video quiere evitar. Que un mercado tenga una falla no prueba que el gobierno la vaya a arreglar mejor; eso hay que demostrarlo aparte, caso por caso, y comparando con la alternativa real y no con un ministerio imaginario que siempre acierta. Cada regla tiene su factura: quién la aplica, cuánto cuesta y a quién se la cobra. Regular el precio del internet suena bien hasta que nadie invierte en cable nuevo. La disciplina de esta casa es una sola y sirve para los dos estantes: <em>nombrá la falla, proponé la regla y calculá su costo</em>. Las tres cosas o ninguna.»</p>
+    <p><strong>IMAGEN:</strong> una balanza de cocina con dos platos; en uno una hoja que dice «falla del mercado» y en el otro una que dice «falla de gobierno»; una mano va poniendo pesitas en los dos lados.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Nombrá la falla. Proponé la regla. Calculá su costo.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:10 a 7:00)</h2>
+    <p><strong>VOZ:</strong> «A don Marcial no le subieron el sueldo. Pero pasó otra cosa: abrieron un segundo taller en la carretera, y a los tres meses su patrón lo llamó a la oficina sin que él pidiera nada. Eso no es una moraleja bonita; es exactamente lo que la teoría decía que iba a pasar cuando el que compra deja de ser uno solo. Esta semana te toca a vos, y es una sola tarea de veinte minutos. Escogé un mercado de tu barrio, uno cualquiera: el internet, la clínica, el préstamo de la esquina, el pasaje. Y contestá tres preguntas por escrito: cuál de las cuatro fallas tiene, qué regla la arreglaría, y a quién le costaría esa regla. Si podés con las tres, ya sabés más de economía que la mitad de los que discuten de esto en voz alta. Y si te quedás en la primera, no pasa nada: <em>nombrar bien la falla ya es la mitad del trabajo</em>.»</p>
+    <p><strong>IMAGEN:</strong> el segundo taller abriendo en la carretera; don Marcial guardando sus llaves una por una; el cuaderno con las tres preguntas escritas a mano.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Cuál es · Qué la arregla · Qué cuesta · Misión: Las fallas de la máquina · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué hace</th><th>Dónde vive aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>Aprendió el motor entero y le siguieron pagando igual</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>Don Marcial, que solo quiere que su esfuerzo se le note en el sobre</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>La última vez que no confiaste en el precio y buscaste a una persona</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>La crítica la firman los propios economistas, y esto se llama monopsonio</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>Las cuatro fallas, con Pigou, Coase, Akerlof y Minsky</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«¿Entonces hay que regularlo todo?»: la factura de cada regla</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>Tres preguntas sobre un mercado del barrio</td></tr>
+    </table>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Tres lecturas: la misma letra pequeña, tres voces</h2>
+    <p>El tema de la etapa contado tres veces: un cuento de manuales viejos, un capítulo de caballerías y un ensayo de escala mundial. Tres maneras de que la idea entre por donde el examen no llega.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> estos tres textos son <strong>ejercicios de estilo escritos por esta casa</strong> en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado. Y llevan una regla extra de esta casa: <strong>toda obra, fecha y persona que aparece dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre: una hoja suelta con un pastiche sin declarar sería justo la fuente inflada que esta materia enseña a cazar.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-pri" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🌀 Lectura 1 · «El catálogo de los cuatro supuestos» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas inventadas. Todos los libros, fechas, cifras y personas de este cuento son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">Mi padre vendía maquinaria agrícola y guardaba, con un cuidado que entonces me pareció excesivo, los manuales de todo lo que había vendido. Cuando murió heredé el depósito y esos manuales, que ocupaban un armario entero y que nadie había vuelto a abrir. Los conservé por pereza y los consulté por accidente, el día en que un comprador me devolvió una bomba de agua alegando que estaba fallada.</p>
+    <p class="lect-p">La bomba no estaba fallada. En la penúltima página de su manual, bajo el título modesto de condiciones de operación, se enumeraban cuatro exigencias: agua limpia, cierta altura máxima, voltaje estable y funcionamiento no continuo. El comprador había violado tres. La máquina no había fallado: había sido usada fuera de su descripción, que es una cosa distinta y que ningún tribunal doméstico acepta como defensa.</p>
+    <p class="lect-p">Adquirí entonces una costumbre y luego una manía. Empecé a buscar, en cada aparato del depósito, esa página; y descubrí que existía siempre, que estaba siempre al final, y que estaba siempre redactada en un tono de disculpa. Los fabricantes prometían maravillas en la portada y confesaban límites en el reverso, con letra menor, como quien deja una nota bajo la puerta. Llegué a pensar, con la vanidad de los que descubren tarde una simetría, que la historia entera de la técnica cabía en la distancia entre esas dos páginas.</p>
+    <p class="lect-p">Lo que sigue lo debo a un sobrino que estudiaba economía y que me oyó exponer mi teoría con más entusiasmo del necesario. Me dijo que la disciplina que él cursaba tenía también su máquina y también su penúltima página. La máquina es un teorema que demuestra que un mercado competitivo asigna los recursos de manera eficiente. La página son sus supuestos, y son cuatro: mercados completos, información perfecta, ningún participante con poder para mover el precio, y ningún costo que recaiga sobre quien no participó. Le pregunté quién había escrito la letra chica, esperando el nombre de algún adversario del comercio. Me contestó que los mismos que habían escrito el teorema, y que a varios de ellos les habían dado el Nobel por señalar dónde su propia máquina se rompía.</p>
+    <p class="lect-p">Pedí ejemplos y los recibí en orden, como quien recita un catálogo. El cuarto supuesto lo estudió <strong>Arthur Pigou</strong> en <strong>The Economics of Welfare</strong>, de <strong>1920</strong>: el humo de la fábrica lo respira quien no compró nada, de modo que el precio miente por omisión, y Pigou propuso corregir la mentira con un impuesto del tamaño del daño. Cuarenta años más tarde, en <strong>1960</strong>, <strong>Ronald Coase</strong> publicó <strong>The Problem of Social Cost</strong> y objetó que, si los derechos están bien definidos, las partes pueden arreglarse entre ellas sin ningún impuesto. Anoté a Coase como refutación y me equivoqué; el propio Coase se encargó de aclarar, y lo dejó por escrito en <strong>The Firm, the Market and the Law</strong>, de <strong>1988</strong>, que su argumento suponía que negociar no costara nada, y que un mundo así no es este. La refutación traía su propia letra chica, lo cual me pareció una elegancia.</p>
+    <p class="lect-p">El segundo supuesto tiene dos infracciones y la escuela solo enseña una. Se enseña el monopolio, que es el que vende solo y cobra de más. No se enseña el monopsonio, que es el que compra solo y paga de menos, y del que <strong>Alan Manning</strong> escribió en <strong>2003</strong> el tratado que se cita, <strong>Monopsony in Motion</strong>. Mi sobrino insistió en que la omisión no es inocente: casi todos los trabajadores del mundo venden su trabajo en mercados con pocos compradores, de modo que la falla que no se enseña es la que más gente padece. Añadió que de ahí sale una discusión que sigue abierta: en <strong>1994</strong>, <strong>David Card</strong> y <strong>Alan Krueger</strong> midieron un caso real de aumento del salario mínimo y no hallaron la pérdida de empleo que el modelo simple predecía; <strong>David Neumark</strong> y <strong>William Wascher</strong> los rebatieron con otros datos. Le pregunté quién tenía razón y me dijo que no se sabía, y que decir que no se sabe también es una respuesta, aunque incomode.</p>
+    <p class="lect-p">El primer supuesto que anoté fue el que más me tocó, porque explicaba mi oficio. En <strong>1970</strong>, <strong>George Akerlof</strong> publicó <strong>The Market for Lemons</strong> y demostró que un mercado puede deshacerse solo, sin fraude y sin culpables, por el mero hecho de que el vendedor sepa lo que el comprador ignora. El comprador, que no distingue, ofrece un precio promedio; el dueño de lo bueno se retira, porque a ese precio no vende; el promedio empeora; se retiran más. Recordé todas las bombas de agua que había vendido baratas por no poder demostrar que eran buenas, y comprendí que llevaba treinta años dentro de un teorema. A Akerlof le dieron el Nobel en <strong>2001</strong>. <strong>Bruce Greenwald</strong> y <strong>Joseph Stiglitz</strong> demostraron en <strong>1986</strong> que el caso no era un caso: con información imperfecta, la ineficiencia es la regla y no la excepción.</p>
+    <p class="lect-p">Quedaba la cuarta falla, que no está en la página de condiciones sino en el uso, y que por eso mismo es la más difícil de creer. <strong>Hyman Minsky</strong> sostuvo, en <strong>Stabilizing an Unstable Economy</strong>, de <strong>1986</strong>, que la estabilidad produce inestabilidad: los años buenos persuaden a todos de que el riesgo ha disminuido, el prudente se vuelve audaz, el audaz se vuelve temerario, y el sistema se rompe en la cima y no en el pozo. Minsky fue tratado como excéntrico mientras duró la calma. En <strong>2008</strong> se lo leyó otra vez, con una atención que él ya no pudo agradecer; la comisión oficial que investigó aquella crisis publicó su informe en <strong>2011</strong>, y hay que decir que no fue unánime, porque incluye disidencias, y omitirlas sería repetir el vicio que el informe examina.</p>
+    <p class="lect-p">Rehíce entonces mi teoría, que era vanidosa, y quedó más pequeña y más útil. No es que la técnica viva en la distancia entre la portada y la penúltima página; es que solo se puede usar bien una máquina cuando se han leído las dos. Vendí el depósito y me quedé con los manuales. A veces los abro por el final, que es donde los fabricantes fueron sinceros, y pienso que una disciplina que publica sus propias condiciones de operación merece más respeto que sus devotos y que sus detractores, que suelen coincidir en no haber llegado nunca a esa página.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>🐎 Lectura 2 · «De lo que sucedió al caballero con un muchacho atado a una encina, y de lo que sobre los amos únicos se platicó después» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, el camino, el humor y la reflexión cervantinos. El ancla es real: la aventura de Andrés, el muchacho a quien su amo Juan Haldudo azota atado a una encina por unas soldadas no pagadas, en el capítulo cuarto de la primera parte del Quijote (1605), donde don Quijote lo hace desatar y prometer el pago, y donde en cuanto el caballero se aleja el amo vuelve a atarlo y lo azota peor.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">Donde se cuenta lo que a don Quijote y a Sancho les sucedió con un mozo de soldada y con el labrador que se las debía, y de la plática que sobre los amos únicos y sobre los remedios que empeoran tuvieron en el camino, con otras cosas de sustancia que Sancho entendió al revés y luego al derecho.</p>
+    <p class="lect-p">Sucedió que, yendo por un encinar, oyeron unas voces delgadas de quien se queja, y llegándose hallaron a un muchacho atado a una encina y a un hombre de bien vestido dándole con una pretina, y a cada golpe le acompañaba con una reprensión y un consejo. El muchacho decía que le debía nueve meses de soldada y el amo que le faltaban zapatos y sangrías, y así estaban en su cuenta cuando llegó el caballero. Hízole desatar don Quijote, tomóle juramento de que pagaría real por real, y siguió su camino muy satisfecho de haber deshecho aquel agravio. Y todos sabemos, porque está escrito, lo que pasó apenas se perdió de vista: que el labrador volvió a atar al muchacho y le dio tantos azotes que lo dejó por muerto.</p>
+    <p class="lect-p">Iba Sancho callado más de lo que solía, y al fin dijo: «Señor, una cosa me da vueltas en la cabeza desde aquel encinar y no la sé decir. Si vuesa merced hubiera pasado de largo, el muchacho llevaba una tunda; y porque vuesa merced se metió, llevó dos. ¿Cómo puede ser que el remedio salga más caro que la enfermedad?» «Bien preguntas (respondió don Quijote), y me pesa que la respuesta sea mía y no de otro. Yo tomé juramento y me fui, que es lo mismo que poner la ley y no dejar quien la mire. La ley que nadie mira no es ley: es un papel que enfurece al que ha de cumplirla y desampara al que había de amparar. Quien manda un remedio ha de quedarse a ver cómo obra, o ha de mandar otro.»</p>
+    <p class="lect-p">«Y con todo (replicó Sancho), yo no acabo de entender por qué aquel hombre le pagaba tan poco al muchacho, siendo que el muchacho guardaba bien las ovejas y todo el mundo lo sabía.» «Repara, Sancho (dijo don Quijote), en una cosa que se ve poco por ser demasiado grande: <em>en aquel valle no había más que un amo</em>. Si hubiera tres labradores ricos, el muchacho, oyéndose maltratar, se pasa al segundo, y el primero, por no quedarse sin quien le guarde el ganado, le sube la soldada antes de que se lo pidan. Mas donde no hay sino uno, el amo no necesita ser malo para pagar poco: le basta con ser el único. Y esto es lo que hace tan difícil el remedio, que no se cura riñendo al amo, sino haciendo que haya otro amo a quien irse.»</p>
+    <p class="lect-p">Sucedió entonces que llegaron a una venta y quiso Sancho comprar un jubón que un buhonero traía y juraba ser de Segovia. Palpólo Sancho, mirólo al trasluz, y al cabo dijo: «Yo no sé si es de Segovia o de la otra vida, y ese es el punto: como no puedo saberlo, no le doy lo que vale un jubón de Segovia, sino lo que vale un jubón que puede que no lo sea; y si el suyo fuese de veras bueno, vuesa merced pierde y no me lo vende.» Oyéndolo don Quijote, se detuvo y dijo con más gravedad de la que el caso pedía: «Sancho, has dicho sin saberlo una razón que valdría un doctorado en Salamanca. Cuando el que vende sabe y el que compra no, el que compra ofrece precio de en medio; y el que tiene la mercancía buena se la lleva a su casa antes que malbaratarla, con lo cual en la plaza solo van quedando las malas, y el precio baja más, y se van más buenas, y viene a suceder que la plaza se despuebla de lo bueno sin que nadie haya hecho trampa.» «Pues remedio hay (dijo Sancho), y es que el buhonero me deje llevar el jubón ocho días, y si sale malo se lo devuelvo.» «Y ese es el remedio de verdad (respondió el caballero), y fíjate en que cuesta: cuesta los ocho días, y cuesta el riesgo del buhonero, y ese costo alguien lo paga en el precio. Que no hay remedio de balde, Sancho, y el que te ofrezca uno sin decirte lo que cuesta, o te engaña o no ha pensado.»</p>
+    <p class="lect-p">«Todo eso entiendo yo muy bien (dijo Sancho), y digo que si el mundo está tan lleno de fallas como vuesa merced dice, mejor sería que un rey muy sabio pusiese los precios a todo y nos quitase de dudas.» «Majadero (dijo don Quijote), que del hecho de que una cosa esté mal no se sigue que otra la haya de componer, sino que hay que ir a mirar si la compone. ¿Y quién le dice al rey muy sabio cuánto vale el trigo en Almodóvar esta semana? Que el mercado, con todas sus fallas, algo sabe, y ese algo es lo primero que se pierde cuando se le manda callar. Compárese remedio con remedio, y no remedio con deseo.» «Pues por mi ánima (respondió Sancho) que en mi tierra se dice que del árbol caído todos hacen leña, y que quien no sabe de mal no sabe de bien, y que más vale un toma que dos te daré; y ahora añado yo una, con perdón: <em>no hay atadura que se deshaga sin quedarse a ver quién la vuelve a atar</em>.» Y don Quijote calló, que era lo que había que hacer, porque el refrán era mejor que la reprensión.</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌍 Lectura 3 · «El manual que nadie lee» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie y la frase sencilla del autor de «Sapiens». Todos los datos, obras, cifras y fechas citados son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Los seres humanos inventamos una máquina extraordinaria para coordinarnos sin conocernos. No tiene director ni plano central: son millones de personas comprando y vendiendo, y de ese ruido sale, casi siempre, que haya pan en la esquina. Ninguna otra especie hizo nada parecido, y ninguna otra forma de organizarnos coordinó a tanta gente tan rápido. Esa es la parte que la etapa anterior de esta ruta puso sobre la mesa, con cifras y con fechas.</p>
+    <p class="lect-p">Pero toda máquina viene con un manual, y el manual tiene una página que casi nadie lee. Es la de las condiciones de operación. El teorema que demuestra que un mercado competitivo asigna bien los recursos pide cuatro cosas: que los mercados estén completos, que la información sea perfecta, que ningún participante tenga poder para mover el precio, y que ningún costo recaiga sobre quien no participó. Es un teorema verdadero. Lo que casi nadie dice es que cada uno de esos cuatro supuestos, cuando falla, produce una familia entera de problemas reales, con nombre propio y con literatura detrás.</p>
+    <p class="lect-p">Lo notable, y esto conviene decirlo despacio porque cambia la conversación, es <em>quién</em> escribió esa página. No fueron los enemigos del mercado. Fueron los propios economistas, trabajando dentro de sus reglas y con sus mismas herramientas, y a varios de ellos les dieron el Nobel precisamente por eso. Cuando alguien despacha estas críticas diciendo que vienen del otro bando, está revelando que no ha leído a ninguno.</p>
+    <p class="lect-p">La primera falla es la más visible. En <strong>1920</strong>, <strong>Arthur Pigou</strong> publicó <strong>The Economics of Welfare</strong> y describió lo que hoy llamamos externalidad: el costo que una actividad le pasa a quien no participó en ella. El humo, el ruido, el río. Pigou propuso que el precio dijera la verdad cobrando un impuesto del tamaño del daño. En <strong>1960</strong>, <strong>Ronald Coase</strong> respondió en <strong>The Problem of Social Cost</strong> que si los derechos de propiedad están claros, las partes pueden negociar entre ellas y llegar solas a un buen resultado. Aquí es donde casi todo el mundo se detiene, y donde hay que seguir: el propio Coase advirtió que su argumento vale allí donde negociar cuesta poco, y en <strong>1988</strong>, en <strong>The Firm, the Market and the Law</strong>, rechazó por escrito la versión de manual de su propia idea. Un autor que corrige el uso que hacen de él es una fuente mejor que sus divulgadores.</p>
+    <p class="lect-p">La segunda falla se enseña a medias. Todo el mundo aprende qué es un monopolio: el único que vende, que cobra de más. Casi nadie aprende su gemelo, el monopsonio: el único que compra, que paga de menos. Y esa asimetría en la enseñanza es curiosa, porque el monopsonio toca a más gente: la mayoría de los seres humanos no vende bienes, vende su tiempo, y lo vende en lugares donde no hay muchos compradores. <strong>Alan Manning</strong> escribió en <strong>2003</strong> el tratado de referencia, <strong>Monopsony in Motion</strong>. La consecuencia práctica es incómoda para los dos bandos: donde hay monopsonio, subir el salario mínimo no tiene por qué destruir empleo, que es lo que <strong>David Card</strong> y <strong>Alan Krueger</strong> midieron en <strong>1994</strong> y lo que <strong>David Neumark</strong> y <strong>William Wascher</strong> discutieron con otros datos. La disputa sigue abierta. Quien la declare cerrada, hacia cualquier lado, está vendiendo una postura.</p>
+    <p class="lect-p">La tercera falla es la que usted ya conoce sin saber su nombre. En <strong>1970</strong>, <strong>George Akerlof</strong> publicó <strong>The Market for Lemons</strong> y explicó por qué desconfiamos del carro usado barato. Si el vendedor sabe y el comprador no, el comprador ofrece un precio de promedio; el dueño del carro bueno prefiere quedárselo; el promedio empeora; se retiran más buenos. El mercado se degrada solo, sin que nadie mienta. A Akerlof le dieron el Nobel en <strong>2001</strong>. Y en <strong>1986</strong>, <strong>Bruce Greenwald</strong> y <strong>Joseph Stiglitz</strong> demostraron que esto no es un caso curioso sino una regla general: con información imperfecta, los mercados no son eficientes. Mire cómo compra usted una consulta médica y verá el teorema funcionando en su propia semana.</p>
+    <p class="lect-p">La cuarta falla es de otro tipo y por eso cuesta creerla. <strong>Hyman Minsky</strong> sostuvo, en <strong>Stabilizing an Unstable Economy</strong>, de <strong>1986</strong>, que la estabilidad genera inestabilidad. Su idea es psicológica antes que financiera: cuando llevamos años sin accidentes, dejamos de creer en el accidente. El que pedía prestado y podía pagar capital e intereses pasa a poder pagar solo intereses, y de ahí al que no puede pagar ni intereses y apuesta a que el precio suba. Minsky fue considerado un excéntrico mientras duró la calma, y en <strong>2008</strong> medio mundo volvió a leerlo de golpe. La comisión oficial que investigó aquella crisis publicó su informe en <strong>2011</strong>, y hay que citarlo con sus disidencias incluidas, porque no fue unánime.</p>
+    <p class="lect-p">Ahora la parte que separa a un lector adulto de un hincha, y funciona en las dos direcciones. Que un mercado tenga una falla demostrada no significa que cualquier intervención la mejore. Esa es una segunda pregunta, y se contesta aparte, caso por caso, comparando con la alternativa real y no con un gobierno imaginario que siempre acierta. Toda regla tiene una factura: quién la aplica, cuánto cuesta y sobre quién cae. Regular el precio del internet suena razonable hasta que nadie tiende cable nuevo. Y al revés: negar la falla porque el remedio es difícil tampoco es rigor, es comodidad.</p>
+    <p class="lect-p">Le propongo entonces un ejercicio de tres preguntas que cabe en una servilleta y que sirve para cualquier mercado del mundo, empezando por el de su cuadra. Primera: cuál de las cuatro fallas tiene, con su nombre. Segunda: qué regla la corregiría, dicha de modo que se sepa quién la aplica. Tercera: cuánto cuesta esa regla y a quién se la cobra. Si puede contestar las tres, ya está discutiendo mejor que la mayoría. Y si solo puede con la primera, tampoco está mal: nombrar bien la falla es la mitad del trabajo, y es la mitad que casi nunca se hace. Nuestra especie construyó una máquina que nos coordina sin conocernos, y escribió con honradez las condiciones en que funciona. El problema nunca fue la máquina. Fue que la página del final no la lee casi nadie.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🧐 Preguntas de las tres lecturas</h2>
+    <p>Leer no es lo mismo que haber leído. Aquí van <strong>quince preguntas de comprensión lectora</strong> (cinco por texto), <strong>diez de completar</strong> y <strong>diez de análisis complejo</strong> con su pauta. Se contestan <strong>con los tres textos delante</strong>: no es un examen de memoria, es un examen de lectura.</p>
+    <div class="tip">
+      <span class="ti">🖨️</span>
+      <div><strong>Todo esto se imprime.</strong> El pliego de preguntas sale con las tres secciones y la <strong>pauta en su propia hoja al final</strong>, para que las respuestas no queden en la misma página que el ejercicio, como manda la casa. Y las tres lecturas se imprimen aparte, cada una con su etiqueta de ejercicio de estilo encima.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego de preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📖 I. Comprensión lectora (15 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +2 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="lcProg" aria-live="polite">Pregunta 1 de 15</p>
+    <div class="qz-q" id="lcQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="lcOpts" role="group" aria-label="Opciones de comprensión lectora"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectC()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectC()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLC" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>✏️ II. Completa la oración (10 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +2 XP por respuesta correcta (primera vez). Escribe la palabra o el año exacto.</p>
+    <p class="id-prog" id="lfProg" aria-live="polite">Oración 1 de 10</p>
+    <div class="cmp-sent" id="lfQ"></div>
+    <div style="margin:0.6rem 0;">
+      <input class="eval-cp-input" id="lfInput" type="text" style="min-width:190px;" placeholder="Escribe tu respuesta..." aria-label="Respuesta de completar" onkeydown="if(event.key==='Enter'){event.preventDefault();checkLectF();}">
+    </div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectF()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectF()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLF" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧠 III. Análisis complejo (10 preguntas)</h2>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Estas no se responden con una palabra ni se corrigen con una letra: se escriben, y después se comparan con la pauta. Van sin XP a propósito, porque una respuesta abierta que se premia sola se contesta a la carrera.</p>
+    <p class="id-prog" id="laProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="laQ" role="heading" aria-level="3"></div>
+    <textarea class="crit-textarea" id="laTA" rows="5" placeholder="Escribe aquí, o en tu cuaderno..." aria-label="Respuesta de análisis"></textarea>
+    <div id="laPauta" class="eval-answer" style="display:none;margin-left:0;font-size:0.85rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-d" onclick="prevLectA()">◀ Anterior</button>
+      <button class="btn btn-pri" onclick="nextLectA()">Siguiente ▶</button>
+      <button class="btn btn-g" id="btnLectAPauta" onclick="toggleLectAPauta()">👁 Ver pauta</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué tres voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento convierte la letra pequeña en <strong>una manía de coleccionista</strong> (la penúltima página de todos los manuales, y el que descubre que llevaba treinta años dentro de un teorema), el capítulo la vuelve <strong>escena, risa y refrán</strong> (el muchacho atado a la encina, el valle con un solo amo, y el jubón que se compra a precio de duda), y el ensayo la pone a <strong>escala de especie y con las cuatro fallas nombradas</strong>. Quien lee las tres sabe diagnosticar y también sabe qué cuesta cada remedio.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión nueva lleva sus tres lecturas sobre el tema de la etapa: <span class="hl">un cuento a la manera de Borges, un capítulo a la manera de Cervantes y un ensayo a la manera de Harari</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista y con una regla de fondo: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>. En esta etapa la regla aprieta doble, porque los textos citan estudios y autores por su nombre y su año, y una atribución inventada aquí sería la fuente inflada que la materia enseña a cazar.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con la letra pequeña del teorema y sus cuatro supuestos, las cuatro fallas una por una (externalidades con Pigou, Coase y la advertencia del propio Coase de 1988; poder de mercado con el monopsonio y la disputa del salario mínimo; información asimétrica con Akerlof y el resultado general de Greenwald y Stiglitz; y la falla dinámica con Minsky y la ficha de 2008), el modo de fallar de la etapa, los ocho casos del proyecto, la <strong>hoja de la falla</strong> para llenar a mano, con sus avisos y un ejemplo ya lleno, seis ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-dorado-fallas-maquina.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige en toda la ruta: <strong>ningún estudio, obra o cifra entra sin su etiqueta</strong> (clásico sólido, contracrítica obligada, resultado general, disputa empírica viva, fuente oficial con sus disidencias).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Arthur Pigou, «The Economics of Welfare» (1920):</strong> <strong>clásico sólido</strong>. De aquí sale la idea de que el que causa el daño lo pague en el precio.</li>
+      <li><strong>Ronald Coase, «The Problem of Social Cost» (1960):</strong> <strong>clásico sólido, y la contracrítica obligada</strong>. Y va siempre con la advertencia del propio autor: su argumento vale donde negociar cuesta poco, y <strong>la versión de manual la rechazó él por escrito en «The Firm, the Market and the Law» (1988)</strong>.</li>
+      <li><strong>George Akerlof, «The Market for Lemons» (1970):</strong> <strong>clásico sólido</strong>, y su autor recibió el <strong>Nobel de Economía en 2001</strong>. Un mercado puede deshacerse solo sin que nadie haga trampa.</li>
+      <li><strong>Bruce Greenwald y Joseph Stiglitz (1986):</strong> <strong>el resultado general</strong>. Con información imperfecta los mercados no son eficientes por regla, y no por excepción.</li>
+      <li><strong>Alan Manning, «Monopsony in Motion» (2003):</strong> <strong>la referencia académica del monopsonio</strong>, que es la falla que casi nadie enseña y la que más gente padece.</li>
+      <li><strong>Card y Krueger (1994) contra Neumark y Wascher:</strong> <strong>disputa empírica viva</strong> sobre el salario mínimo. Se enseña como disputa y no como bando; quien la declare resuelta en cualquier dirección está vendiendo postura.</li>
+      <li><strong>Hyman Minsky, «Stabilizing an Unstable Economy» (1986):</strong> <strong>heterodoxo en su día, rehabilitado tras 2008</strong>. La estabilidad incuba inestabilidad.</li>
+      <li><strong>Informe de la Financial Crisis Inquiry Commission (2011):</strong> <strong>fuente oficial, y se cita con sus disidencias incluidas</strong>, porque la comisión no fue unánime y ocultarlo sería el vicio que el propio informe examina.</li>
+      <li><strong>Las tres lecturas de esta misión:</strong> ejercicios de estilo escritos por la casa en homenaje a Borges, Cervantes y Harari. <strong>Pastiche declarado, no obra de esos autores</strong>, y con la erudición interna real: Pigou (1920), Coase (1960) y su rectificación de 1988, Akerlof (1970) y su Nobel de 2001, Greenwald y Stiglitz (1986), Manning (2003), Card y Krueger (1994) contra Neumark y Wascher, Minsky (1986), el informe de 2011 con sus disidencias, y la aventura de Andrés atado a la encina en el Quijote (primera parte, 1605, capítulo cuarto) son todos comprobables.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>poniendo delante un mercado concreto de aquí y nombrando su falla exacta</strong>, con la regla que la corregiría y con la factura de esa regla.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: la materia 27 completa, con sus siete módulos y su advertencia epistémica.</li>
+      <li><a href="../../misiones/ruta-dorado-gran-fuga/gran-fuga.html">📒 La gran fuga</a>: la etapa 1 de esta ruta, la columna del haber. Sin ese acero, lo de aquí se leería como panfleto, y con él se lee como auditoría.</li>
+      <li><a href="../../misiones/ruta-rojo-acero-juicio/acero-juicio.html">📕 El acero antes del juicio</a>: el expediente gemelo, donde se enseña la regla del acero. Los dos se archivan juntos, y la Bóveda no acepta uno sin el otro.</li>
+      <li><a href="../../misiones/ruta-atomos-hombre-maquina/hombre-maquina.html">⚙️ El hombre máquina y la base material</a>: allá se aprende a auditar de qué vive una institución sin pasarse a la brocha gorda, que es el error hermano del de aquí.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 3 sale de la aritmética y pregunta otra cosa: qué le hace el precio a lo que toca.</li>
+      <li><a href="../../fichas/ficha-dorado-fallas-maquina.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja de la falla cabe en una página, con su ejemplo ya lleno al lado.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">🚧</span>
+      <div><strong>Lo que esta etapa NO estudia, y dónde vive:</strong> la <strong>teoría de precios</strong>, los clásicos leídos enteros, la <strong>elección pública</strong> y las rentas viven en <strong>Economía política</strong>, y aquí se remiten. La <strong>Gran Depresión</strong> tiene dueña allá también, con sus lecturas en pelea (Friedman y Schwartz, de 1963, contra Eichengreen y «Golden Fetters», de 1992), y aquí solo se saluda al pasar. Lo que esta materia se queda entero, porque no lo tenía nadie, es <strong>Hyman Minsky y la ficha completa de 2008</strong>. Y hacia adelante: lo que el precio corrompe en vez de asignar es la <strong>etapa 3</strong>, y la desigualdad y el clima son la <strong>4</strong>.</div>
+    </div>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> aprenderse los <strong>cuatro supuestos</strong> del teorema y poder recitarlos sin mirar, porque de ahí salen las cuatro fallas y no al revés; memorizar <strong>dos parejas</strong>, Pigou con Coase y Akerlof con Greenwald y Stiglitz; y salir a la calle a diagnosticar <strong>tres mercados del barrio, uno por semana</strong>, con la hoja de la falla en la mano. La prueba de que está aprendida es <strong>que ya no se pueda decir «el mercado falla» sin sentir que es una frase vacía</strong>, y que a cada falla nombrada le siga, sin que nadie lo pida, la regla y su factura.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🔧</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta del Expediente Dorado · Etapa 2: Las fallas de la máquina</div>
+    <div class="diploma-mascot" aria-hidden="true">🔧</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🔧</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«La falla no es una consigna: es un problema de diseño, y los problemas de diseño tienen nombre» 🌱 · 🔧 Ruta del Expediente Dorado · Etapa 2 de 7.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/fallas-maquina.js"></script>
+</body>
+</html>

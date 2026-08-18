@@ -137,6 +137,7 @@ const MISSIONS = [
   { id: 32, title: 'El mapa de las familias: cada una por su mejor versión', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🧬', ruta: 'gafas', etapa: 3, sello: 'familiar', url: 'misiones/ruta-gafas-mapa-familias/mapa-familias.html' },
   { id: 33, title: 'El hombre máquina y la base material: condicionar no es determinar', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '⚙️', ruta: 'atomos', etapa: 2, sello: 'familiar', url: 'misiones/ruta-atomos-hombre-maquina/hombre-maquina.html' },
   { id: 34, title: 'La gran fuga: el acero primero, y con números grandes', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '📒', ruta: 'dorado', etapa: 1, sello: 'familiar', url: 'misiones/ruta-dorado-gran-fuga/gran-fuga.html' },
+  { id: 35, title: 'Las fallas de la máquina: la auditoría la firman los propios economistas', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🔧', ruta: 'dorado', etapa: 2, sello: 'familiar', url: 'misiones/ruta-dorado-fallas-maquina/fallas-maquina.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -386,10 +387,9 @@ const ETAPAS_PREVISTAS = {
     6: "El fantasma fabricado",
     7: "La guerra fría en el patio",
   },
-  /* La etapa 1 ya está construida: su título sale de MISSIONS, no de aquí,
-     igual que se hizo con espejo, atomos y rojo. */
+  /* Las etapas 1 y 2 ya están construidas: sus títulos salen de MISSIONS, no
+     de aquí, igual que se hizo con espejo, atomos y rojo. */
   dorado: {
-    2: "Las fallas de la máquina",
     3: "Lo que el dinero no debe comprar",
     4: "Las dos facturas",
     5: "El escocés dorado",

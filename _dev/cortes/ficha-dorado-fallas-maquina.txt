@@ -1,0 +1,16 @@
+# Dónde empieza cada página de la ficha de «Las fallas de la máquina»
+# (Expediente Dorado, etapa 2; norma 6: diez páginas y llenas). Calculados
+# midiendo los bloques con _dev/mide-ficha-paginas.html?f=...&bloques=1 y
+# repartiéndolos en diez hojas de entre 215 y 252 mm, con la condición extra
+# de que ningún encabezado se quede huérfano al pie de una página. El corte
+# de la página 5 cae en la lista de las tres señales, que lleva clase propia
+# para poder anclarla sin partir el <ol> en dos hojas.
+<h2>📜 La letra pequeña del teorema</h2>
+<h2>🌊 Falla 1 · Externalidades</h2>
+<h2>🍋 Falla 3 · Información asimétrica</h2>
+<ol class="senales">
+<h2>🧪 El ejercicio casero: un mercado de tu cuadra</h2>
+<h3>🏭 Caso 3 · El único empleador formal del pueblo</h3>
+<h3>🪞 Caso 8 · La falla que tiene M.E.T.A.S por dentro</h3>
+<h2>✅ Una hoja de la falla ya llena, como ejemplo</h2>
+<h3>Ejercicio 3 · Completa la oración</h3>
