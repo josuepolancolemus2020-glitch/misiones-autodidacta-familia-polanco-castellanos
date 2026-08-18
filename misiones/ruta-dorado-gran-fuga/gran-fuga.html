@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta del Expediente Dorado · Etapa 1: La gran fuga | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/gran-fuga.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Cree que las ideas caen del cielo ☁️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">📒</div>
+    <div class="hero-text">
+      <h1>La gran fuga: <span>el acero primero, y con números grandes</span></h1>
+      <p class="sub">Nadie audita bien lo que no sabe defender con sus mejores cifras 📒</p>
+      <div class="badge">📒 Ruta del Expediente Dorado · Etapa 1 de 7</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📒 Por qué esta etapa empieza defendiendo</h2>
+    <p>Este es el estante gemelo del <strong>Expediente Rojo</strong>, y sigue su misma regla, que allá se enseña y aquí solo se aplica: <strong>la mejor versión primero, el veredicto después</strong>. Auditar el capitalismo sin poder recitar antes lo que produjo no es rigor, es identidad con vocabulario técnico.</p>
+    <p>Así que esta etapa entera es la <strong>columna del haber</strong>. Las facturas existen, son grandes y tienen su sitio declarado: las fallas de la máquina son la etapa 2, lo que el dinero no debe comprar la 3, y la desigualdad, el clima y los expedientes históricos con muertos son la 4. Aquí no se esconden: <strong>se aplazan a propósito</strong>, porque el orden es el método.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La vara de la etapa.</strong> Quien termina hace dos cosas: <strong>hace el caso del sistema con números que Deaton firmaría</strong>, y <strong>dice en la misma respiración cuáles de esos números están en disputa y quién los disputa</strong>. Las dos juntas, o no cuenta. La primera sola es apología; la segunda sola es la excusa del que no quiso estudiar el expediente.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>⚖️ Dos maneras de tener esta conversación</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🎽 Como camiseta: no rinde</h4>
+        <p><strong>«Mercado sí» o «mercado no»</strong>, y la respuesta se sabe antes de mirar el dato. Es el modo más común y el más cómodo, porque no obliga a leer nada: el capitalismo es el agua en la que se nada, y opinar del agua es decir de qué lado se está. <strong>Con esa pregunta no se decide nada</strong>, ni en una casa ni en un país.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🔧 Como diseño: rinde</h4>
+        <p><strong>Qué mercados, con qué reglas y para qué bienes.</strong> Esa pregunta se contesta uno por uno, con números y con documentos, y por eso sí decide cosas. Convierte las fallas en <strong>problemas de diseño</strong> en vez de consignas, y es el idioma en el que una familia puede tomar una decisión el martes por la mañana.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🏃 La imagen que hay que quedarse</span><br>
+      <span>Una fuga: mucha gente saliendo de un sitio muy malo. <span class="hl">La fuga es real y es enorme</span>, y negarla es no haber mirado el expediente. Pero el que escribió el libro puso además la otra mitad en el propio título, y esa mitad casi nadie la cita: <span class="hl2">toda fuga deja gente adentro, y esa es la fábrica de la desigualdad</span>. Las dos cosas son del mismo autor y del mismo libro.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 El camino de la fuga, en siete momentos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué pasó, qué aporta y con qué etiqueta entra.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento del camino.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la cifra que Jael quiere usar el jueves</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide cómo entra el número en el cuaderno de la casa.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📉</span><span class="ms-text"><strong>El dato es bueno y es verdadero:</strong> Jael oye que la pobreza extrema en el mundo pasó de más de un tercio de la humanidad a alrededor de una décima parte, y quiere usarlo el jueves en la exposición. Hasta aquí, todo bien: el dato existe y viene de series serias.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">✍️</span><span class="ms-text"><strong>El atajo:</strong> lo escribe así, tal cual, sin más: «la pobreza en el mundo bajó de un tercio a una décima parte». Suena redondo, cabe en una diapositiva y nadie va a discutírselo en el aula.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🪤</span><span class="ms-text"><strong>La trampa:</strong> así escrito, el número no dice de qué años habla, con qué línea se midió, quién lo publicó ni quién lo discute. Y hay gente seria que discute exactamente esa línea. Una cifra sin esas cuatro cosas no es una prueba: es un adorno.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">📓</span><span class="ms-text"><strong>Lo que tienes delante:</strong> un dato cierto, una exposición el jueves y dos maneras muy distintas de anotarlo.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Cómo entra la cifra al cuaderno?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">📉 Tal cual, que suena bien</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🧾 Con la hoja de la cifra llena</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📖 Definir viene antes que juzgar</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Casi todas las peleas sobre el capitalismo se pelean sin definirlo, y por eso no terminan nunca. Esta casa usa la definición corta de <strong>Jürgen Kocka</strong>, en su <strong>«Historia del capitalismo» (2016 en español)</strong>, una <strong>síntesis académica breve</strong> y de las más manejables que hay. Son cuatro piezas, y hacen falta las cuatro juntas.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué nombra</th><th>Cómo se ve desde aquí</th></tr>
+      <tr><td><strong>Mercados</strong></td><td>Los precios se forman en el intercambio y no los fija una autoridad</td><td>El precio del maíz cambia sin que nadie lo anuncie</td></tr>
+      <tr><td><strong>Propiedad privada de los medios de producción</strong></td><td>La máquina, el local y la tierra tienen dueño particular</td><td>El taller de la esquina es de alguien con nombre</td></tr>
+      <tr><td><strong>Trabajo asalariado</strong></td><td>La mayoría vive de vender su tiempo a cambio de un salario</td><td>La planilla de la maquila, el turno, la quincena</td></tr>
+      <tr><td><strong>Acumulación reinvertida</strong></td><td>La ganancia no se gasta entera: vuelve al negocio para crecer</td><td>La pulpería que compra una segunda refrigeradora</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔤 La palabra en singular ya es una simplificación</span><br>
+      <span>Y esto se declara <span class="hl">el primer día</span>, no al final: el sistema vino en variedades desde el arranque. <span class="hl2">El de Manchester no era el de Bismarck</span>, que montó el seguro de enfermedad obligatorio en <strong>1883</strong> mientras los liberales ingleses discutían si el Estado debía existir; y el nórdico de hoy no es el anglosajón. Quien dice «el capitalismo» a secas está diciendo una palabra que cubre cosas muy distintas, y eso se sabe antes de opinar.</span>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y una frontera declarada, porque esta casa dice dónde termina cada materia: <strong>la teoría de precios, los clásicos leídos enteros, la elección pública, las rentas y el enclave bananero viven en Economía política</strong> y aquí se remiten, no se repiten. Esta materia hace lo que allá no se hace: <strong>poner el sistema entero en el banquillo, con su defensa puesta primero</strong>.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🏃 La gran fuga, con números grandes</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;"><strong>Angus Deaton</strong> llamó <strong>la gran fuga</strong> a la salida masiva de la pobreza y de la muerte temprana ocurrida en dos siglos. Su libro, <strong>«El gran escape: salud, riqueza y los orígenes de la desigualdad» (2013)</strong>, es un <strong>clásico sólido reciente</strong>, y su autor recibió el <strong>Nobel de Economía en 2015</strong>. El título viene de una película de <strong>1963</strong> sobre una evasión, y la segunda mitad de ese título es la que casi nadie cita: <strong>los orígenes de la desigualdad</strong>. Para Deaton las dos cosas son la misma historia, porque <strong>de una fuga siempre se queda gente adentro</strong>.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Los números que hay que poder decir de memoria, cada uno con su fecha:</p>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Pobreza extrema hacia 1990</div><div class="stat-val">+1/3</div></div>
+      <div class="stat-item"><div class="stat-label">Antes de la pandemia</div><div class="stat-val">~1/10</div></div>
+      <div class="stat-item"><div class="stat-label">Mueren antes de los cinco: 1800</div><div class="stat-val">~1/2</div></div>
+      <div class="stat-item"><div class="stat-label">Hoy</div><div class="stat-val">&lt;1/20</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">A eso se suman la <strong>esperanza de vida al nacer en el mundo</strong>, que pasó de rondar los treinta años a comienzos del siglo diecinueve a más de setenta antes de la pandemia, y el cálculo de <strong>Deirdre McCloskey</strong> en <strong>«Bourgeois Dignity» (2010)</strong>: el <strong>gran enriquecimiento</strong>, un factor de alrededor de <strong>treinta</strong> para el habitante común de los países que cursaron el proceso. La etiqueta de McCloskey se dice entera: <strong>sólida en los datos, y con una tesis causal propia</strong> (que lo que cambió fue la dignidad concedida al comerciante y al inventor) <strong>que entra como tesis y no como consenso</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🇭🇳 Y el mismo dato, visto desde aquí</span><br>
+      <span>La fuga no es un cuento de otro continente. <span class="hl">La esperanza de vida en Honduras pasó de rondar los cuarenta años a mediados del siglo veinte a más de setenta hoy</span>, y esa es de las cifras menos discutidas que existen porque se cuenta con actas. <span class="hl2">Quien niega eso no está criticando el sistema: está negando un registro civil</span>, y con esa entrada no se puede auditar nada.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>⚔️ Las disputas son dos, y hay que separarlas</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Aquí está la pieza fina de la etapa, y la que casi nadie separa: sobre la gran fuga hay <strong>dos peleas distintas</strong>, con distintos contendientes y distinta clase de prueba. Mezclarlas es como discutir a la vez cuánto pesa algo y de quién es.</p>
+    <table class="tres">
+      <tr><th>Pelea</th><th>Qué se discute</th><th>Quién está enfrente de quién</th></tr>
+      <tr><td><strong>1. La de la línea</strong></td><td><strong>Cuánto</strong> cayó la pobreza. Depende de dónde se ponga la línea, y de si esa línea es demasiado baja para llamarla vida</td><td><strong>Jason Hickel</strong> contra <strong>Max Roser</strong> y <strong>Steven Pinker</strong>, en el cruce de <strong>2019</strong>: <strong>disputa viva de medición</strong>, y viva se enseña</td></tr>
+      <tr><td><strong>2. La de la atribución</strong></td><td><strong>A qué se debe.</strong> El tramo mayor de la salida desde <strong>1980</strong> ocurrió en <strong>China</strong>, bajo un híbrido de partido y Estado con mercado, y no bajo un mercado de manual</td><td>Hickel usa ese dato contra el «capitalismo» a secas; enfrente se responde que sin la apertura de mercados ese tramo no ocurre</td></tr>
+      <tr><td><strong>El puente entre las dos</strong></td><td>Las <strong>variedades</strong> de Kocka: si el sistema vino en variedades, preguntar por «el capitalismo» a secas es la pregunta mal hecha</td><td>Nadie: es la salida que las dos peleas necesitan para dejar de gritarse</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">✅ La prueba de una línea, para usar hoy mismo</span><br>
+      <span>Delante de cualquier cifra grande, propia o ajena, pregunta: <span class="hl">¿cuánto, según quién, con qué línea, y quién lo disputa?</span> Si las cuatro tienen respuesta, la cifra sirve y se puede discutir. Si falta una sola, <span class="hl2">no tienes una prueba: tienes un adorno con números</span>, y da igual de qué estante venga.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ La mejor defensa moral, dicha entera</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El acero no es solo aritmética: el sistema tiene también una defensa moral, y esta casa la pone en pie antes de tocarla. Son dos piezas, y las dos hay que poder decirlas sin mueca:</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué afirma</th><th>Por qué es fuerte</th></tr>
+      <tr><td><strong>El intercambio voluntario</strong></td><td>Es cooperación entre extraños que no se conocen, no se quieren y no se deben nada</td><td>Ninguna otra cosa conocida coordina a millones de desconocidos sin que nadie mande</td></tr>
+      <tr><td><strong>El resultado, sin adornos</strong></td><td>Ningún otro arreglo conocido sacó a tanta gente de la miseria tan rápido</td><td>No es una promesa ni un modelo: es un registro con fechas, y está en la mesa</td></tr>
+      <tr><td><strong>Lo que la defensa NO dice</strong></td><td>Que el reparto sea justo, que las facturas no existan, ni que no haya alternativas mejores en algún mercado</td><td>Una defensa que dijera eso sería apología, y aquí eso no pasa la puerta</td></tr>
+    </table>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y el reverso, declarado aquí para que nadie confunda esta etapa con una hoja de propaganda: <strong>las facturas están fechadas y tienen su etapa</strong>. Las fallas que los propios economistas demostraron, la etapa 2. Los bienes que el precio corrompe en vez de asignar, la 3. La desigualdad, el clima y los expedientes históricos con muertos, la 4. <strong>Este expediente y el rojo se archivan juntos, y la Bóveda no acepta uno sin el otro.</strong></p>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Deaton</div><div class="stat-val">2013</div></div>
+      <div class="stat-item"><div class="stat-label">Nobel</div><div class="stat-val">2015</div></div>
+      <div class="stat-item"><div class="stat-label">McCloskey</div><div class="stat-val">2010</div></div>
+      <div class="stat-item"><div class="stat-label">Kocka</div><div class="stat-val">2016</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🖌️ El modo de fallar de esta etapa: la cifra suelta</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Cada etapa tiene su error propio, y el de esta no es exagerar: es <strong>soltar un número grande sin sus cuatro datos</strong>. Se reconoce por tres señales, y conviene aprenderlas porque es el error que esta casa va a cometer primero, y con la mejor intención:</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">1️⃣ Sin fecha</div><div class="t-info">«Bajó», pero ¿entre qué años?</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">2️⃣ Sin línea</div><div class="t-info">Pobre, ¿medido con qué umbral?</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">3️⃣ Sin quien la discute</div><div class="t-info">Como si nadie la hubiera peleado</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">✅ En su lugar: la horquilla</div><div class="t-info">Cuánto, y entre qué y qué</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">✅ En su lugar: la firma</div><div class="t-info">Según quién, con obra y año</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">✅ En su lugar: el pleito</div><div class="t-info">Quién lo disputa y qué lo resolvería</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y va con la regla del placer, que en esta materia opera igual que en la gemela y no se negocia: <strong>el dato que confirma lo que ya se creía paga doble auditoría</strong>, venga del estante que venga. Un número que cae justo donde a uno le convenía es exactamente el número que hay que ir a verificar dos veces, y esa incomodidad es el oficio.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🧱 Lo que sobrevive a esta etapa, y hay que decirlo</span><br>
+      <span>Terminada la disputa de la línea y la de la atribución, algo queda en pie y decirlo es parte del trabajo: <span class="hl">nadie discute que la gente vive mucho más y muere mucho menos de niña que hace dos siglos</span>, y ninguna de las dos peleas toca ese registro. <span class="hl2">Lo que se discute es cuánto de la mejora cuenta como salida de la pobreza y a qué arreglo se le apunta</span>, que son preguntas distintas y ninguna de las dos borra a la otra.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller de la gran fuga</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para tener la herramienta completa en la mano.</p>
+    <div id="lab-sentence" class="lab-sentence">📒 Explorando: <strong>La definición de Kocka</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">📒 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="definicion" onclick="labShowParte('definicion')">📖 La definición de Kocka</button>
+        <button class="lab-btn lab-cont-btn" data-parte="fuga" onclick="labShowParte('fuga')">🏃 La gran fuga</button>
+        <button class="lab-btn lab-cont-btn" data-parte="disputas" onclick="labShowParte('disputas')">⚔️ Las dos disputas</button>
+        <button class="lab-btn lab-cont-btn" data-parte="variedades" onclick="labShowParte('variedades')">🧵 Las variedades</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">🔎 Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿acero o adorno?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo entra una cifra grande al expediente</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📒 Identifica la pieza o la fuente por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la etapa se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué es esa frase: dato, disputa o veredicto?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es cada cosa dentro de la auditoría:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«La pobreza extrema pasó de más de un tercio a una décima parte»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla la cifra?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">«La pobreza en el mundo bajó muchísimo», y ahí termina la anotación</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🧾 Acero</button>
+        <button class="btn btn-sec" onclick="">🎈 Adorno</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">📒 La cifra sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · La gran fuga · Ruta del Expediente Dorado</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: la gran fuga</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La cifra sobre la mesa · La gran fuga</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">📒 La cifra sobre la mesa: cuánto, según quién y quién la disputa</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una cifra o una afirmación grande sobre la mesa. Haz primero <strong>el acero</strong> (el mejor caso, con sus números y sin mueca), llena después la <strong>hoja de la cifra</strong> (cuánto, según quién, con qué línea, quién lo disputa y qué resolvería la disputa), separa <strong>la pelea de la línea de la pelea de la atribución</strong>, pon la <strong>etiqueta de estatus</strong> a cada fuente, y di qué queda en pie pase lo que pase con las dos disputas (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">📒</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📒 Casos del proyecto: el acero y la cifra en esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas hay una cifra grande, una oferta con números o una afirmación sobre el sistema, y en todas la pregunta es la misma: <strong>cuánto, según quién, con qué línea, quién lo disputa, y qué se puede decidir con eso el martes por la mañana.</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también en esta etapa:</strong> ningún estudio, obra o cifra entra sin su etiqueta. Las de aquí: Deaton, «El gran escape» (2013), <strong>clásico sólido reciente</strong>; McCloskey, «Bourgeois Dignity» (2010), <strong>sólida en los datos, con una tesis causal propia que entra como tesis</strong>; Kocka, «Historia del capitalismo» (2016), <strong>síntesis académica breve</strong>; las series de pobreza del Banco Mundial y de Our World in Data, <strong>siempre con fecha</strong>; el cruce Hickel contra Roser y Pinker (2019), <strong>disputa viva de medición, que se enseña como disputa</strong>. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🏦 Caso 1: L 300,000 al año del banco, con logo y con misión</h2>
+    <p>Un banco ofrece patrocinar M.E.T.A.S con <strong>L 300,000 anuales</strong>: su logo en la portada de cada misión y una misión de educación financiera donde los ejemplos sean sus productos. El dinero pagaría dos años de servidores y de diseño.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧾 El acero primero, también aquí</span><br>
+      <span>El mejor caso de la oferta se dice completo antes de dudar de ella: <span class="hl">es dinero limpio, de una institución que existe, por un servicio que se presta de verdad</span>, y con él se sostienen dos años de trabajo que hoy salen del bolsillo de la casa. Lo que saca es lo otro: <span class="hl2">la atención de miles de niños vendida sin preguntarles</span>, y el que menos sabe del contrato es justamente el que lo va a mirar en la pantalla.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la pregunta que decide es una y se puede contestar: <strong>¿la misión enseñaría exactamente lo mismo si el patrocinador vendiera otra cosa?</strong> La condición con que sí: logo en créditos y fuera del contenido, <strong>cero productos propios en los ejemplos</strong>, cláusula de salida sin penalidad, y el trato publicado donde cualquier maestro lo pueda leer.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>💵 Caso 2: cobrar L 50 por alumno a los colegios privados</h2>
+    <p>La familia estudia cobrar M.E.T.A.S a los colegios privados, unos <strong>L 50 por alumno al año</strong>, manteniéndolo <strong>gratis para las escuelas públicas</strong>. Sería sostenibilidad sin patrocinadores y sin favores.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🔍 Poner precio es hacer algo, no solo cobrar</span><br>
+      <span>La objeción seria no es que cobrar esté mal: es que <span class="hl">el precio no solo asigna, también cambia lo que toca</span>, y una misión con tarifa puede dejar de ser la misma misión aunque el texto no cambie ni una coma. Esa pregunta tiene dueña y tiene etapa: <span class="hl2">es la etapa 3 de esta ruta, y aquí se nombra y no se contesta</span>. Lo que sí toca aquí es el número y su condición.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la pregunta que decide: <strong>¿el cobro toca en algún escenario, aunque sea de rebote, al alumno de escuela pública?</strong> La condición con que sí: el precio jamás alcanza a la escuela pública ni condiciona qué misiones se escriben, las cuentas del cobro se publican a la vista, y <strong>la opción de abrir el código y sostenerlo en comunidad se evalúa por escrito antes de decidir</strong>, no después.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>⛏️ Caso 3: L 150,000 en tabletas, de la fundación de una extractiva</h2>
+    <p>La fundación de una empresa extractiva ofrece <strong>L 150,000 en tabletas</strong> para escuelas cercanas a su operación, con entrega pública y fotos. Son aparatos que esas aulas no tendrían de otro modo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🤝 Auditar la regla sin despreciar a nadie</span><br>
+      <span>El caso entra <span class="hl">como categoría y no con nombre propio</span>, que es la regla de selección de esta materia: aquí se estudia la estructura (quién exporta, quién interna el costo, quién no firmó nada) y <span class="hl2">no se nombra ninguna operación con pleito abierto ni a nadie en campaña</span>. Y la gente de esas aulas y de esa empresa no es el objeto de la auditoría: la regla lo es.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la pregunta que decide: <strong>¿aceptar condiciona, hoy o mañana, lo que una misión puede decir sobre esa operación?</strong> La condición con que sí: independencia editorial firmada <strong>antes</strong> que las tabletas, la donación publicada con monto y fecha, y el compromiso de que si algún día hay ficha sobre ese río se escribe con la misma doble columna que todo lo demás, la firme quien la firme.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📉 Caso 4: la cifra suelta que escribió Jael</h2>
+    <p>Para su exposición del jueves, <strong>Jael</strong> escribió en la lámina: <strong>«la pobreza en el mundo bajó de un tercio a una décima parte»</strong>. El dato es verdadero. La lámina, no.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧾 Qué le falta, exactamente</span><br>
+      <span>Le faltan cuatro cosas y son siempre las mismas: <span class="hl">de qué años habla, con qué línea se midió, quién publicó la serie y quién la discute</span>. Con las cuatro puestas, la misma frase se vuelve una prueba que se puede defender delante de cualquiera. Sin ellas, <span class="hl2">es un número prestado a favor de una postura</span>, y da igual que la postura sea la correcta.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> cómo se reescribe, y cabe en la lámina: «según las series del Banco Mundial y de Our World in Data, la pobreza extrema pasó de más de un tercio de la humanidad hacia 1990 a alrededor de una décima parte antes de la pandemia; <strong>Jason Hickel discute que esa línea sea demasiado baja, y Max Roser le responde: la disputa está viva</strong>». Sigue siendo el mismo dato y ahora se puede sostener de pie.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📚 Caso 5: dos materiales que se contradicen y fallan igual</h2>
+    <p>Llegan a la casa dos materiales escolares. Uno afirma que <strong>«el libre mercado sacó al mundo de la pobreza»</strong>. El otro, que <strong>«el capitalismo produjo la pobreza del mundo»</strong>. Uno de los dos tiene que estar equivocado, dice Angelly.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎈 Los dos son adorno, y por la misma razón</span><br>
+      <span>La respuesta incómoda es que <span class="hl">los dos fallan en el mismo sitio</span>: ninguno dice qué años, qué línea, qué países ni quién lo discute. Se pueden colocar en cualquier lámina y ganar siempre, que es exactamente la señal. Y hay una prueba corta que los desarma a los dos: <span class="hl2">pedirle a cada uno el dato de China desde 1980</span> y ver qué contesta.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> que la vara es una sola y se aplica a los dos estantes por igual. El material que se puede usar es el que resiste la hoja de la cifra; el que no la resiste <strong>se usa como ejercicio, no como fuente</strong>, y se guarda con esa etiqueta escrita encima para que nadie lo cite después por error.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🙋 Caso 6: Angelly pregunta si entonces el capitalismo es bueno</h2>
+    <p>Después de oír las cifras, <strong>Angelly</strong> hace la pregunta directa, que es la que todo el mundo quiere hacer: <strong>«¿entonces el capitalismo es bueno o es malo?»</strong>. No hay lempiras aquí: hay una niña con la pregunta exacta.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🚧 La respuesta honesta tiene forma de orden</span><br>
+      <span>La primera mitad es un sí sin rodeos a lo que el registro dice: <span class="hl">la fuga ocurrió, es enorme y está medida</span>. La segunda es que la pregunta, así hecha, no se puede contestar, y no por diplomacia: <span class="hl2">la pregunta que sí rinde es qué mercados, con qué reglas y para qué bienes</span>, y se contesta uno por uno. Las facturas vienen en las etapas 2, 3 y 4, y vienen enteras.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> que hay preguntas que se contestan cambiándolas, y que eso no es escaparse si se dice por qué. Y lo práctico que se lleva Angelly: <strong>la próxima vez que alguien le pida escoger bando en una sola palabra, puede pedir el año, la línea y la fuente</strong>, y la conversación cambia de sitio.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🧮 Caso 7: el dato de China, encima de la mesa</h2>
+    <p>Estudiando la fuga aparece el dato que los dos bandos usan y ninguno cuenta entero: <strong>el tramo mayor de la salida de la pobreza desde 1980 ocurrió en China</strong>, bajo un arreglo que no es el mercado de manual ni la planificación de manual.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚔️ Cómo se dice sin regalarle el punto a nadie</span><br>
+      <span>Se dice separando las dos peleas. En la de la línea, el dato no entra: ahí se discute <span class="hl">cuánto</span> cayó. En la de la atribución, el dato es central y corta en las dos direcciones: <span class="hl2">quien apunta la fuga entera al «capitalismo» a secas tiene que explicar el híbrido, y quien la usa contra el mercado tiene que explicar qué cambió en 1978 y 1979</span>. Las variedades de Kocka son el puente, no una salida diplomática.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la disciplina de estudio de la casa: <strong>cuando un dato incomoda a los dos bandos, casi siempre es el dato bueno</strong>, y se apunta con esa nota al margen. Aquí no se usa para ganar una discusión: se usa para volver mejor la pregunta, que es el único uso que esta materia le reconoce a un dato incómodo.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🪞 Caso 8: contra qué se compara M.E.T.A.S</h2>
+    <p>La auditoría se gira hacia adentro, que es donde cuesta. Cuando la casa juzga su propio proyecto, <strong>¿contra qué lo compara?</strong> Es fácil compararlo con la escuela ideal que uno tiene en la cabeza, y salir siempre mal o siempre bien, según el día.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🏁 La abstracción central de la materia, aplicada en casa</span><br>
+      <span>La regla que ordena esta materia entera dice: <span class="hl">no se compara con el paraíso, se compara con las alternativas reales</span>. Para M.E.T.A.S eso significa compararse con lo que de verdad tienen delante estas niñas y las de al lado, no con un ministerio imaginario. <span class="hl2">Y significa también que si aparece una alternativa real y mejor, la casa la dice y se corre a un lado</span>, porque la comparación honesta se acepta en las dos direcciones.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> quedó escrito con su renglón de qué evidencia lo haría cambiar: que exista un material gratuito, en español, de aquí, que enseñe esto mejor y con más alcance. <strong>Sin ese renglón, «esto vale la pena» sería una premisa funcionando como dogma</strong>, y así se anotaría, con fecha, como manda la casa.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📒 La hoja de la cifra, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier número grande que llegue a esta casa, propio o ajeno, del estante que sea, se llena antes de repetirlo:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué afirma exactamente:</strong> una oración con sujeto, verbo y número, sin adjetivos.</li>
+      <li><strong>Cuánto, y entre qué y qué:</strong> la cifra con su horquilla si la tiene, y el hueco declarado si no.</li>
+      <li><strong>Según quién:</strong> obra, autor y año, y la etiqueta de estatus que le toca.</li>
+      <li><strong>Con qué método y con qué línea:</strong> qué se contó, cómo, y dónde se puso el umbral.</li>
+      <li><strong>Quién lo disputa y qué resolvería la disputa:</strong> el nombre del que está enfrente, y el dato que zanjaría el pleito.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📒 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">El acero primero</span>: no se audita lo que no se sabe defender con sus mejores números. 2. <span class="hl">Definir viene antes que juzgar</span>, y la palabra en singular ya es una simplificación. 3. Toda cifra entra con <span class="hl">cuánto, según quién, con qué línea y quién la disputa</span>. 4. <span class="hl2">Las disputas vivas se enseñan vivas</span>: ni la de la línea ni la de la atribución están cerradas. 5. Y no se compara con el paraíso: <span class="hl">se compara con las alternativas reales</span>, mercado por mercado y regla por regla.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «Doña Herminia nunca compró una caja pequeña»</h2>
+    <p>Guion listo para grabar (6 a 8 minutos), con la historia al frente y el concepto escondido adentro. Cada escena trae su <strong>voz</strong> (lo que se dice), su <strong>imagen</strong> (lo que se ve) y su <strong>texto en pantalla</strong>.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>Regla del guion (norma de la casa):</strong> toda misión lleva su guion de video con historia: un gancho en frío que duela o intrigue, un personaje que quiere algo, un giro que desmonta lo que el público creía, y un cierre que aterriza el concepto en la vida de quien mira. Nada de definiciones antes del minuto dos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «Doña Herminia no terminó la escuela y no ha leído una estadística en su vida. Pero le puede dictar una a un economista, y va a salir exacta. La lleva contada con los dedos desde hace sesenta años.»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; aparecen unas manos viejas sobre un hule de mesa, contando despacio. No se ve la cara todavía.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «La lleva contada con los dedos.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quiere (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «La cuenta es esta. Su mamá tuvo nueve hijos y enterró tres. Ella tuvo cuatro y no enterró a ninguno. Su hija tiene dos y los dos están en el colegio. Doña Herminia dice la cuenta sin dramatismo, como quien dice el precio del frijol, y después dice la frase que le molesta a todo el mundo en la casa: “antes era peor”. Y la nieta, que estudia y que lee, le contesta siempre lo mismo: que eso es lo que dicen todos los viejos. Lo que doña Herminia quiere es muy concreto y no lo sabe pedir: quiere que alguien le crea la cuenta.»</p>
+    <p><strong>IMAGEN:</strong> la cocina; un cuaderno escolar abierto en la mesa; la nieta escribiendo con audífonos puestos; la abuela mirándola desde el otro lado.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Nueve y tres. Cuatro y ninguno. Dos, en el colegio.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Una prueba, aquí mismo, y contestala en voz baja porque nadie te está oyendo. Pensá en una cosa de tu vida que hoy está mejor que cuando eras chiquito, pero de verdad mejor, no de nostalgia. El agua, la luz, la vacuna, el que ya no se muere de eso que antes mataba. ¿La tenés? Ahora la segunda parte, que es la que incomoda: ¿cuándo fue la última vez que la nombraste en voz alta? Casi nadie contesta esa. Y no es porque seamos malagradecidos. Es que las cosas que mejoran despacio no hacen ruido, y nosotros solo aprendimos a mirar lo que hace ruido.»</p>
+    <p><strong>IMAGEN:</strong> una llave de agua abierta; una bombilla encendiéndose; una tarjeta de vacunas doblada por el uso. Sin música, planos cortos.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Cuándo fue la última vez que lo nombraste?»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Aquí está el giro, y no es el que esperás. La cuenta de doña Herminia tiene autor, tiene libro y tiene premio. En 2013, un economista escocés llamado Angus Deaton publicó un libro que se llama <em>El gran escape</em>, y en 2015 le dieron el Nobel de Economía. Le puso ese nombre por una película de 1963 sobre una fuga, y lo que sostiene es que en dos siglos la humanidad se fugó de dos cosas a la vez: de la pobreza y de morirse de niño. A comienzos del siglo diecinueve se moría antes de los cinco años cerca de la mitad de los niños del mundo. Hoy, menos de uno de cada veinte. Eso es lo que doña Herminia lleva contado con los dedos. Pero fijate en el título completo, porque la segunda mitad casi nadie la cita: <em>salud, riqueza y los orígenes de la desigualdad</em>. Deaton escribió las dos mitades a propósito, y esta es la que cuesta: de toda fuga se queda gente adentro, y eso también lo tenía él en la cabeza cuando eligió el nombre.»</p>
+    <p><strong>IMAGEN:</strong> la portada del libro sobre una mesa; una gráfica sencilla dibujada a mano en el mismo cuaderno escolar, con dos líneas: una que baja y otra que sube.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «El gran escape: salud, riqueza y los orígenes de la desigualdad.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:20)</h2>
+    <p><strong>VOZ:</strong> «Y aquí viene la herramienta, que es una hoja con cinco renglones y sirve para toda la vida. Cada vez que alguien te suelte un número grande, del bando que sea, le pedís cinco cosas: qué afirma exactamente, cuánto y entre qué y qué, según quién y de qué año, con qué línea se midió, y quién lo está discutiendo. Probémosla con el número más famoso de todos. Se dice que la pobreza extrema en el mundo pasó de más de un tercio de la humanidad, hacia 1990, a alrededor de una décima parte antes de la pandemia. Renglón uno, ya está. Renglón tres: eso sale de las series del Banco Mundial y de Our World in Data. Renglón cuatro: se midió con una línea, y esa línea es un umbral que alguien escogió. Y renglón cinco, el que casi nadie llena: Jason Hickel sostiene que esa línea es demasiado baja para llamarle vida a lo que hay encima, y Max Roser le responde con las series largas. Eso pasó en 2019 y no está resuelto. Un número con sus cinco renglones se puede defender de pie delante de cualquiera. Sin ellos es un adorno, aunque sea verdad.»</p>
+    <p><strong>IMAGEN:</strong> una hoja con cinco renglones numerados, y una mano llenándolos uno por uno con lápiz. Al llegar al quinto, la mano se detiene un momento antes de escribir.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Cuánto · Según quién · Con qué línea · Quién lo disputa»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:20 a 6:10)</h2>
+    <p><strong>VOZ:</strong> «“Momento. ¿Entonces este video es propaganda del capitalismo?” Buena pregunta, y la respuesta es que no, y se puede comprobar. Esto es la primera de siete etapas, y es la columna del haber. Las facturas vienen después y vienen enteras: las fallas que demostraron los propios economistas, los bienes que el precio echa a perder en vez de repartir, la desigualdad, el clima y los expedientes históricos con muertos. La regla de esta casa es incómoda para los dos bandos y es una sola: no se audita lo que no se sabe defender. Y hay una prueba de que va en serio: en el estante de enfrente está el expediente gemelo, el rojo, con la misma dureza y el mismo orden. Los dos se archivan juntos, y aquí no se acepta uno sin el otro.»</p>
+    <p><strong>IMAGEN:</strong> dos carpetas gruesas sobre una mesa, una roja y una dorada, puestas una encima de otra; una mano las alinea para que ninguna sobresalga.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «No se audita lo que no se sabe defender.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:10 a 7:00)</h2>
+    <p><strong>VOZ:</strong> «A doña Herminia la nieta no le pidió perdón. Le hizo algo mejor: le copió la cuenta en el cuaderno, con los años, y le puso arriba de dónde había salido cada dato. Esta semana te toca a vos, y es una sola tarea de veinte minutos. Escogé un número grande que hayas repetido este año, uno que te guste, de esos que usás para ganar una discusión. Y llenale los cinco renglones. Si podés llenar los cinco, felicidades, tenés una prueba. Si te falta el quinto, el de quién lo disputa, no pasa nada: solo que hasta que lo llenés, eso que estabas repitiendo no era un argumento. Era una camiseta con números.»</p>
+    <p><strong>IMAGEN:</strong> el cuaderno escolar, ahora con la cuenta de la abuela copiada y fechada; la abuela lo lee despacio; la nieta le señala un renglón con el dedo.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Llenale los cinco renglones. · Misión: La gran fuga · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué hace</th><th>Dónde vive aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>Una señora sin escuela que le puede dictar una estadística a un economista</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>Doña Herminia, que solo quiere que alguien le crea la cuenta</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>Qué mejoró en tu vida sin que lo nombraras nunca</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>Deaton, el Nobel de 2015, y la segunda mitad del título</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>La hoja de la cifra, probada con el número más famoso de todos</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«¿Esto es propaganda?»: las siete etapas y el expediente gemelo</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>Cinco renglones a un número que ya venías repitiendo</td></tr>
+    </table>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Tres lecturas: la misma fuga, tres voces</h2>
+    <p>El tema de la etapa contado tres veces: un cuento de archivo, un capítulo de caballerías y un ensayo de escala mundial. Tres maneras de que la idea entre por donde el examen no llega.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> estos tres textos son <strong>ejercicios de estilo escritos por esta casa</strong> en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado. Y llevan una regla extra de esta casa: <strong>toda obra, fecha y persona que aparece dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre: una hoja suelta con un pastiche sin declarar sería justo la fuente inflada que esta materia enseña a cazar.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-pri" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🌀 Lectura 1 · «El libro que fue adelgazando» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas inventadas. Todos los libros, fechas, cifras y personas de este cuento son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">Heredé de mi tío, junto con una deuda y un reloj que atrasaba, el encargo de ordenar el archivo de una parroquia de provincia. Debía redactar además, para el aniversario, una breve crónica de la prosperidad del lugar. Acepté sin entusiasmo. Suponía que la prosperidad de un pueblo se documenta como se documenta un pleito: con escrituras, con inventarios, con la enumeración de los techos de teja que van reemplazando a los de palma.</p>
+    <p class="lect-p">Busqué esos papeles y los hallé, y no decían nada. Un techo de teja es una noticia de una familia, no de un pueblo; y los inventarios de las casas ricas se parecen tanto entre sí, de siglo en siglo, que uno acaba sospechando que la riqueza carece de historia y solo tiene aritmética. Estuve seis semanas convencido de que el encargo era imposible y de que la prosperidad no deja huella, lo cual me pareció, por un momento, una frase digna de ser escrita.</p>
+    <p class="lect-p">La huella estaba en el otro libro. El archivo guardaba, además de bautismos y matrimonios, el registro de entierros, y ese registro tenía una peculiaridad material que no había notado nadie: <strong>iba adelgazando</strong>. No en el número de páginas, que era el mismo, sino en la densidad de los renglones dedicados a criaturas. En los tomos antiguos, las anotaciones de párvulos ocupaban a veces media hoja seguida; en los tomos recientes, aparecían de tarde en tarde y con espacio en blanco alrededor. El escribiente del siglo dieciocho había necesitado abreviaturas para que le cupieran; el del siglo veinte tenía sitio para escribirlo todo con letra grande.</p>
+    <p class="lect-p">Comprendí, con la lentitud de los que investigan de veras, que la crónica de la prosperidad no estaba en lo que se había escrito sino en lo que había dejado de escribirse. Y comprendí también que ese es un hallazgo que no se puede narrar sin ayuda, porque una ausencia no impresiona a nadie: para que un blanco signifique algo hay que poder decir cuánto blanco es.</p>
+    <p class="lect-p">Los números los tenía otro. En <strong>2013</strong>, el economista <strong>Angus Deaton</strong> publicó <strong>El gran escape: salud, riqueza y los orígenes de la desigualdad</strong>, y en <strong>2015</strong> recibió el Nobel de Economía. El título se lo tomó de una película de <strong>1963</strong> sobre una evasión, y su tesis es la de mi libro adelgazado: en dos siglos, una parte enorme de la especie se fugó a la vez de la pobreza y de la muerte temprana. A comienzos del siglo diecinueve moría antes de cumplir cinco años cerca de la mitad de los niños del mundo; hoy muere menos de uno de cada veinte. Mi registro de entierros era una copia manuscrita, con nombres propios, de una curva que otros dibujaron con datos.</p>
+    <p class="lect-p">Quise entonces nombrar la causa, y aquí empieza mi error, que es el motivo de este relato. Escribí que la fuga la había producido el capitalismo, y escribí la palabra en singular, con la seguridad de quien nombra a un caballero conocido. Un lector paciente me hizo ver que la palabra cubría cosas que no se parecen: que <strong>Jürgen Kocka</strong>, en su <strong>Historia del capitalismo</strong>, la define con cuatro piezas (mercados, propiedad privada de los medios de producción, trabajo asalariado y ganancia reinvertida) y advierte que el sistema vino en variedades desde el principio. El de Mánchester no era el de Bismarck, que en <strong>1883</strong> montó el seguro obligatorio de enfermedad mientras en Inglaterra se discutía si el Estado debía existir. Yo había usado un nombre propio para una familia numerosa.</p>
+    <p class="lect-p">Corregí el nombre y persistí en la causa, y ahí me esperaba el segundo error, más fino. Cité el gran enriquecimiento que calculó <strong>Deirdre McCloskey</strong> en <strong>Bourgeois Dignity</strong>, de <strong>2010</strong>: un factor de alrededor de treinta para el habitante común de los países que cursaron el proceso. La cifra es sólida. Pero McCloskey añade a la cifra una explicación propia, que la causa fue la dignidad que se le empezó a conceder al comerciante y al inventor, y esa explicación no es un dato: es una tesis, discutida por gente seria. Yo había pegado las dos cosas con la misma cola, como quien encuaderna juntos un plano y una carta de amor.</p>
+    <p class="lect-p">El tercer error fue el que me curó. Escribí, ya con prudencia, que la pobreza extrema había pasado de más de un tercio de la humanidad hacia 1990 a alrededor de una décima parte antes de la pandemia, según las series del Banco Mundial. Un colega me preguntó con qué línea. No supe contestar. Averigüé después que <strong>Jason Hickel</strong> sostiene que esa línea es demasiado baja para llamarle vida a lo que hay por encima, y que <strong>Max Roser</strong> le responde con las series largas; el cruce es de <strong>2019</strong> y sigue abierto. Averigüé también que el tramo mayor de esa salida, desde <strong>1980</strong>, ocurrió en China, bajo un arreglo que no es el mercado de los manuales ni la planificación de los manuales, y que Hickel usa ese dato precisamente contra el nombre en singular que yo había tachado seis semanas antes.</p>
+    <p class="lect-p">Rehíce la crónica y quedó más corta y menos brillante. Cada cifra llevó su año, su fuente y el nombre de quien la discute. La causa quedó sin nombrar del todo, que es lo honrado cuando el pleito está vivo. Y el libro de entierros, adelgazando, quedó al principio, sin cifra y sin nota, porque hay hechos que se sostienen solos: nadie discute que aquel escribiente necesitaba abreviaturas y este tiene sitio de sobra. Pienso ahora que toda fuga se cuenta dos veces, una por los que salieron y otra por los que quedaron adentro, y que un cronista que solo sepa contar la primera no está celebrando: está mirando la mitad de la puerta.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>🐎 Lectura 2 · «De lo que vieron en las bodas del rico, y de la cuenta que sacó Sancho antes de las ollas» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, el camino, el humor y la reflexión cervantinos. El ancla es real: las bodas de Camacho el rico, en los capítulos veinte y veintiuno de la segunda parte del Quijote (1615), con sus ollas, su novillo entero y sus quesos apilados como paredes, donde Sancho dice que solo hay dos linajes en el mundo, el tener y el no tener, y declara que él es del bando de Camacho.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">Donde se cuenta lo que a don Quijote y a Sancho les sucedió mirando el aparejo de unas bodas ricas, y de la plática que sobre la abundancia y sobre los que no fueron convidados tuvieron con un cocinero y con un pastor, con otras cosas de sustancia que Sancho entendió por la mitad y aprovechó por entero.</p>
+    <p class="lect-p">Llegaron amo y escudero, antes del alba, a un prado donde se aparejaban unas bodas de las que se hablaba en tres leguas a la redonda, y lo primero que hallaron fue el olor. Había un novillo entero puesto en un asador de un olmo entero, y ollas tan grandes que cabía en cada una un rastro de carne, y quesos apilados como paredes de albañilería, y pellejos de vino como sacos de lana. Viendo lo cual, se le humedecieron a Sancho las quijadas y se le alegró el alma, y dijo: «Bien haya quien esto ordenó, que en mi tierra dice una agüela mía que solo hay dos linajes en el mundo, que son el tener y el no tener; y yo, mientras dure el olor, soy del bando del que tiene.»</p>
+    <p class="lect-p">«No te reprendo el hambre, Sancho (dijo don Quijote), que es cosa natural y honrada; repréndote la cuenta, que la sacaste con las narices. Mas antes de decirte en qué yerras, quiero que hagas conmigo una diligencia que a los caballeros nos cuesta trabajo y a los escuderos ninguno, y es alabar bien lo que después hemos de examinar. Dime, pues, y sin mentir por adularme ni por contradecirme: ¿es verdad o no es verdad que aquí hay más carne que la que vieron nuestros abuelos en toda una cuaresma?» «Verdad es (respondió Sancho), y aun con dos abuelos más.» «Pues esa verdad se dice primero (replicó don Quijote), y se dice entera y sin mueca, que el que empieza a examinar sin haber alabado lo alabable no examina: regatea.»</p>
+    <p class="lect-p">Hecho lo cual, llamaron al cocinero, que era hombre de muchas ollas y pocas palabras, y preguntóle don Quijote de qué estaba hecha aquella abundancia. Respondió el cocinero que de la hacienda del novio. «Eso ya lo sé (dijo don Quijote), y no es respuesta, que también la hacienda está hecha de algo. Decidme más bien: ¿de dónde vino el trigo, quién lo trajo, por qué camino, quién guarda el grano en el año malo, y quién presta cuando la cosecha se pierde? Porque si esto que huele viniera de un milagro, yo me arrodillo y callo; mas si viene de caminos, de bodegas, de tratos y de gente que madrugó, entonces no es milagro sino máquina, y las máquinas se pueden mirar por dentro, y las que se pueden mirar por dentro se pueden componer cuando fallan.» Y el cocinero, que había puesto muchas bodas, fue nombrando los caminos y los tratos, y aun el año en que no hubo boda ninguna porque se perdió todo, y de nombrar ese año se supo más que de nombrar los otros.</p>
+    <p class="lect-p">Sucedió entonces que pasó por el prado un pastor viejo con dos cabras, y ni se detuvo a mirar las ollas ni fue convidado, y siguió su camino por la orilla. Púsose don Quijote muy grave y dijo: «Sancho, mira aquello y no lo olvides, que aquí se ve en un instante lo que en los libros cuesta cien hojas: <em>la abundancia es verdadera y el que la niega miente; y el que la cuenta sin contar al que va por la orilla, miente también, aunque con mejores modales</em>. Que de toda fiesta hay gente afuera, y el número de los de afuera es parte de la fiesta, aunque no huela.»</p>
+    <p class="lect-p">«Todo eso entiendo yo muy bien (dijo Sancho), y digo que si el pastor no entró fue porque no le convidaron, y que si le convidaran comería como los demás; y también digo que a mí me hace más provecho una olla que cien razones, y que el que quiera saber de qué está hecha la olla que la revuelva, pero que la revuelva después de comer, no sea que se enfríe.» «Majadero (dijo don Quijote), que el que examina después de comer examina siempre a favor del cocinero.» «Pues por mi ánima (respondió Sancho) que yo no sé de exámenes, mas sé que a nadie le amarga un dulce, y que quien parte y reparte se queda con la mejor parte, y que del contar al comer va lo que del ruido a las nueces.»</p>
+    <p class="lect-p">Ya en el camino, y porque Sancho venía diciendo que en estos tiempos se come mejor que nunca y que quien diga lo contrario es un desagradecido, le atajó don Quijote con más severidad de la que solía: «Guárdate, Sancho, de las dos cuentas fáciles, que son hermanas y las dos engañan. La primera dice que todo tiempo pasado fue mejor, y esa la desmiente el libro de los entierros de cualquier parroquia. La segunda dice que porque hoy se come más, ya no hay nada que mirar, y esa la desmiente el pastor de las cabras. Y para saber cuándo te has pasado a una de las dos, ten esta señal: pregúntate cuánto, desde cuándo, quién lo contó y quién lo discute. Si de las cuatro no sabes ninguna, no tienes cuenta: tienes apetito con opinión.» «Eso último apúntemelo vuesa merced (dijo Sancho), que para lo demás ya sé yo que ojos que no ven, corazón que no siente, y que del dicho al hecho hay gran trecho, y del olor a la olla, todo el prado.»</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌍 Lectura 3 · «La especie que se fugó de su propia historia» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie y la frase sencilla del autor de «Sapiens». Todos los datos, obras, cifras y fechas citados son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Durante casi toda la historia de nuestra especie, la vida humana tuvo una forma bastante estable: se nacía pobre, se trabajaba la tierra, se enterraba a varios hijos y se moría antes de los cuarenta. Eso no era una desgracia particular de una época mala. Era la normalidad, en casi todos los continentes, durante casi todos los siglos. Lo raro, lo verdaderamente raro, es lo que pasó en los últimos doscientos años.</p>
+    <p class="lect-p">El economista <strong>Angus Deaton</strong> le puso nombre a ese cambio en <strong>2013</strong>, en un libro llamado <strong>El gran escape: salud, riqueza y los orígenes de la desigualdad</strong>, por el que en <strong>2015</strong> recibió el Nobel de Economía. Tomó el título de una película de <strong>1963</strong> sobre una fuga, y la metáfora es exacta en las dos direcciones. A comienzos del siglo diecinueve moría antes de cumplir cinco años cerca de la mitad de los niños del mundo; hoy muere menos de uno de cada veinte. La esperanza de vida al nacer pasó de rondar los treinta años a superar los setenta antes de la pandemia. En Honduras, sin ir tan lejos, pasó de rondar los cuarenta a mediados del siglo veinte a más de setenta hoy. Estas cifras no son opiniones: se cuentan con actas.</p>
+    <p class="lect-p">La riqueza cuenta una historia parecida. <strong>Deirdre McCloskey</strong>, en <strong>Bourgeois Dignity</strong>, de <strong>2010</strong>, calculó lo que llamó el gran enriquecimiento: un factor de alrededor de treinta en el nivel de vida del habitante común de los países que cursaron el proceso. Conviene separar dos cosas que ella publica juntas, y esta separación es media lección: los datos son sólidos, y la explicación que ella les pone (que lo decisivo fue la dignidad social que se empezó a conceder al comerciante y al inventor) es una tesis suya, discutida por otros historiadores. Un dato y una tesis se citan distinto, aunque vengan en el mismo libro.</p>
+    <p class="lect-p">¿Y qué máquina produjo la fuga? Aquí hay que ir despacio, porque la respuesta corta es la que ha arruinado más conversaciones. <strong>Jürgen Kocka</strong>, en su <strong>Historia del capitalismo</strong>, define el sistema con cuatro piezas: mercados que forman precios, propiedad privada de los medios de producción, trabajo asalariado y ganancia que se reinvierte en lugar de gastarse. Y añade lo que casi siempre se omite: que ese arreglo vino en variedades desde el principio y sigue viniendo. El capitalismo de Mánchester no era el de Bismarck, que en <strong>1883</strong> estableció el seguro obligatorio de enfermedad para los trabajadores; y el modelo nórdico de hoy, que combina mercados muy libres con transferencias muy grandes, no es el anglosajón. Cuando alguien dice «el capitalismo» en singular está usando un apellido para una familia entera.</p>
+    <p class="lect-p">Ahora la parte que separa a un lector adulto de un hincha, y son dos disputas distintas que casi siempre se mezclan. La primera es sobre <strong>cuánto</strong>. Se suele decir que la pobreza extrema pasó de más de un tercio de la humanidad hacia 1990 a alrededor de una décima parte antes de la pandemia, según las series del Banco Mundial y de Our World in Data. <strong>Jason Hickel</strong> sostiene que esa línea de pobreza es demasiado baja, de modo que estar por encima de ella no significa gran cosa; <strong>Max Roser</strong> le responde con las series largas, y <strong>Steven Pinker</strong> ha defendido la lectura optimista. El cruce es de <strong>2019</strong> y no está cerrado. La segunda disputa es sobre <strong>a qué se debe</strong>. El tramo mayor de la salida desde <strong>1980</strong> ocurrió en China, bajo un híbrido de partido y Estado con mercado que no se parece a ningún manual, y ese dato incomoda a los dos bandos por igual: obliga al que celebra a explicar el híbrido, y obliga al que acusa a explicar qué cambió exactamente al final de los años setenta.</p>
+    <p class="lect-p">Yo no voy a resolver ninguna de las dos disputas en un ensayo, y desconfíe de quien lo intente en un párrafo. Lo que sí se puede hacer, y es lo que esta lectura le propone, es adquirir un hábito pequeño y bastante poderoso: cada vez que oiga un número grande, pregúntele cinco cosas. Qué afirma exactamente. Cuánto, y entre qué y qué. Según quién, con obra y con año. Con qué línea o con qué método. Y quién lo está discutiendo ahora mismo. Es un hábito de treinta segundos que convierte una consigna en un argumento, y funciona igual contra los números que le gustan y contra los que le molestan. Sobre todo contra los que le gustan.</p>
+    <p class="lect-p">Y queda una última cosa, que es la que Deaton puso en la segunda mitad de su título y casi nadie cita. Se llamaba <em>los orígenes de la desigualdad</em>, y no era un apéndice: era el argumento. De toda fuga se queda gente adentro, y el hueco entre los que salieron y los que no es exactamente el material del que están hechas las siguientes preguntas de esta ruta. Celebrar la fuga y no mirar el hueco es tan poco serio como negar la fuga para no tener que mirarla. Nuestra especie hizo en dos siglos algo que no había hecho nunca, y lo hizo de manera despareja. Las dos frases son verdaderas, van juntas, y quien solo pueda sostener una de las dos todavía no ha empezado a estudiar el asunto.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🧐 Preguntas de las tres lecturas</h2>
+    <p>Leer no es lo mismo que haber leído. Aquí van <strong>quince preguntas de comprensión lectora</strong> (cinco por texto), <strong>diez de completar</strong> y <strong>diez de análisis complejo</strong> con su pauta. Se contestan <strong>con los tres textos delante</strong>: no es un examen de memoria, es un examen de lectura.</p>
+    <div class="tip">
+      <span class="ti">🖨️</span>
+      <div><strong>Todo esto se imprime.</strong> El pliego de preguntas sale con las tres secciones y la <strong>pauta en su propia hoja al final</strong>, para que las respuestas no queden en la misma página que el ejercicio, como manda la casa. Y las tres lecturas se imprimen aparte, cada una con su etiqueta de ejercicio de estilo encima.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego de preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📖 I. Comprensión lectora (15 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +2 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="lcProg" aria-live="polite">Pregunta 1 de 15</p>
+    <div class="qz-q" id="lcQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="lcOpts" role="group" aria-label="Opciones de comprensión lectora"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectC()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectC()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLC" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>✏️ II. Completa la oración (10 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +2 XP por respuesta correcta (primera vez). Escribe la palabra o el año exacto.</p>
+    <p class="id-prog" id="lfProg" aria-live="polite">Oración 1 de 10</p>
+    <div class="cmp-sent" id="lfQ"></div>
+    <div style="margin:0.6rem 0;">
+      <input class="eval-cp-input" id="lfInput" type="text" style="min-width:190px;" placeholder="Escribe tu respuesta..." aria-label="Respuesta de completar" onkeydown="if(event.key==='Enter'){event.preventDefault();checkLectF();}">
+    </div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectF()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectF()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLF" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧠 III. Análisis complejo (10 preguntas)</h2>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Estas no se responden con una palabra ni se corrigen con una letra: se escriben, y después se comparan con la pauta. Van sin XP a propósito, porque una respuesta abierta que se premia sola se contesta a la carrera.</p>
+    <p class="id-prog" id="laProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="laQ" role="heading" aria-level="3"></div>
+    <textarea class="crit-textarea" id="laTA" rows="5" placeholder="Escribe aquí, o en tu cuaderno..." aria-label="Respuesta de análisis"></textarea>
+    <div id="laPauta" class="eval-answer" style="display:none;margin-left:0;font-size:0.85rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-d" onclick="prevLectA()">◀ Anterior</button>
+      <button class="btn btn-pri" onclick="nextLectA()">Siguiente ▶</button>
+      <button class="btn btn-g" id="btnLectAPauta" onclick="toggleLectAPauta()">👁 Ver pauta</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué tres voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento instala el error como <strong>vergüenza propia</strong> (los tres errores del cronista, cada uno más fino que el anterior), el capítulo lo vuelve <strong>escena, risa y refrán</strong> (el olor de las ollas, y el pastor que pasa por la orilla sin ser convidado), y el ensayo lo pone a <strong>escala de especie y con las dos disputas nombradas</strong> (Hickel contra Roser, y el dato de China desde 1980). Quien lee las tres tiene el acero y también su modo de fallar.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión nueva lleva sus tres lecturas sobre el tema de la etapa: <span class="hl">un cuento a la manera de Borges, un capítulo a la manera de Cervantes y un ensayo a la manera de Harari</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista y con una regla de fondo: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>. En esta materia la regla aprieta más que en ninguna otra, porque aquí la trampa más fácil sería inventar una cifra redonda; el único artificio permitido es la voz.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con la definición de Kocka en sus cuatro piezas, la gran fuga de Deaton con sus cifras fechadas, el gran enriquecimiento de McCloskey y su etiqueta doble, las dos disputas separadas (la de la línea y la de la atribución), las variedades del sistema, la mejor defensa moral dicha entera, el modo de fallar de la etapa, los ocho casos del proyecto, la <strong>hoja de la cifra</strong> para llenar a mano, con sus avisos y un ejemplo ya lleno, seis ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-dorado-gran-fuga.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige en toda la ruta: <strong>ningún estudio, obra o cifra entra sin su etiqueta</strong> (clásico sólido reciente, síntesis académica breve, tesis, serie con fecha, disputa viva de medición).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Angus Deaton, «El gran escape: salud, riqueza y los orígenes de la desigualdad» (2013):</strong> <strong>clásico sólido reciente</strong>, y su autor recibió el <strong>Nobel de Economía en 2015</strong>. La segunda mitad del título es parte del argumento y no un apéndice.</li>
+      <li><strong>Deirdre McCloskey, «Bourgeois Dignity» (2010):</strong> <strong>sólida en los datos</strong> (el gran enriquecimiento, un factor de alrededor de treinta), <strong>y con una tesis causal propia</strong> (la dignidad concedida al comerciante y al inventor) <strong>que entra como tesis y no como consenso</strong>. Las dos etiquetas van juntas.</li>
+      <li><strong>Jürgen Kocka, «Historia del capitalismo» (2016 en español):</strong> <strong>síntesis académica breve</strong>. De aquí sale la definición corta de cuatro piezas y la advertencia de las variedades.</li>
+      <li><strong>Las series de pobreza del Banco Mundial y de Our World in Data:</strong> se citan <strong>siempre con fecha</strong>, y nunca sin decir con qué línea se midió.</li>
+      <li><strong>El cruce de Jason Hickel contra Max Roser y Steven Pinker (2019):</strong> <strong>disputa viva de medición</strong>, y se enseña como disputa y no como bando. Quien diga que está resuelta está vendiendo camiseta.</li>
+      <li><strong>El dato de China desde 1980:</strong> hecho establecido, y <strong>disputa viva de atribución</strong>. Corta en las dos direcciones, y por eso se estudia entero.</li>
+      <li><strong>Las tres lecturas de esta misión:</strong> ejercicios de estilo escritos por la casa en homenaje a Borges, Cervantes y Harari. <strong>Pastiche declarado, no obra de esos autores</strong>, y con la erudición interna real: Deaton (2013) y su Nobel de 2015, la película de 1963 de la que tomó el título, la mortalidad de menores de cinco años (cerca de la mitad a comienzos del siglo diecinueve, menos de uno de cada veinte hoy), la esperanza de vida mundial y la de Honduras, McCloskey (2010) con su factor de treinta y su tesis etiquetada, Kocka y sus cuatro piezas, el seguro obligatorio de enfermedad de Bismarck de 1883, las series del Banco Mundial y de Our World in Data, el cruce Hickel contra Roser y Pinker de 2019, el tramo chino desde 1980 y las bodas de Camacho del Quijote (segunda parte, 1615, capítulos veinte y veintiuno) son todos comprobables.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>haciendo el caso del sistema con los números de la gran fuga tal que Deaton los firmaría</strong>, y diciendo en la misma respiración cuáles de esos números están en disputa y quién los disputa.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: la materia 27 completa, con sus siete módulos y su advertencia epistémica.</li>
+      <li><a href="../../misiones/ruta-rojo-acero-juicio/acero-juicio.html">📕 El acero antes del juicio</a>: el expediente gemelo, donde <strong>se enseña la regla del acero</strong> que aquí solo se aplica. Los dos expedientes se archivan juntos, y la Bóveda no acepta uno sin el otro.</li>
+      <li><a href="../../misiones/ruta-gafas-mapa-familias/mapa-familias.html">🧬 El mapa de las familias</a>: la materia marco del arco puso el instrumento con el que se leen las dos gemelas. Estas son sus dos casos mayores.</li>
+      <li><a href="../../misiones/ruta-atomos-hombre-maquina/hombre-maquina.html">⚙️ El hombre máquina y la base material</a>: allá se aprende a auditar de qué vive una institución sin pasarse a la brocha gorda. Aquí esa auditoría se le hace al sistema entero.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 2 abre las fallas de la máquina, que son la primera factura y la más afilada, porque la firman los propios economistas.</li>
+      <li><a href="../../fichas/ficha-dorado-gran-fuga.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja de la cifra cabe en una página, con su ejemplo ya lleno al lado.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> aprenderse de memoria cuatro cifras con su año (la pobreza extrema hacia 1990 y antes de la pandemia, la mortalidad de menores de cinco a comienzos del siglo diecinueve y hoy); poder recitar la definición de Kocka en sus cuatro piezas sin mirar; y llenar la hoja de la cifra tres veces, con tres números distintos, uno por semana. La prueba de que está aprendida es <strong>que se pueda hacer el caso del sistema delante de alguien que lo detesta sin que suene a propaganda, y la lista de sus disputas delante de alguien que lo adora sin que suene a ataque</strong>, y que el primer número que se audite sea uno de los propios.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">📒</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta del Expediente Dorado · Etapa 1: La gran fuga</div>
+    <div class="diploma-mascot" aria-hidden="true">📒</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">📒</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«No se compara con el paraíso: se compara con las alternativas reales» 🌱 · 📒 Ruta del Expediente Dorado · Etapa 1 de 7.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/gran-fuga.js"></script>
+</body>
+</html>

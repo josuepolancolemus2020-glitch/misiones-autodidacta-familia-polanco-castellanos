@@ -1,0 +1,15 @@
+# Dónde empieza cada página de la ficha de «La gran fuga» (Expediente Dorado,
+# etapa 1; norma 6: diez páginas y llenas). Calculados midiendo los bloques con
+# _dev/mide-ficha-paginas.html?f=...&bloques=1 y repartiéndolos en diez hojas de
+# entre 215 y 252 mm, con dos condiciones extra: que ningún encabezado se quede
+# huérfano al pie de una página y que cada corte caiga donde empieza una
+# sección o una caja entera.
+<h2>📖 Definir viene antes que juzgar</h2>
+<h2>🏃 La gran fuga, con números grandes</h2>
+<h2>🛡️ La mejor defensa moral, dicha entera</h2>
+<h3>🧱 Lo que sobrevive a esta etapa, y hay que decirlo</h3>
+<h3>🔗 Dónde vive lo que aquí no se estudia</h3>
+<h3>📚 Caso 5 · Dos materiales que se contradicen y fallan igual</h3>
+<h2>🧾 La hoja de la cifra, para llenar a lápiz</h2>
+<h3>💡 Cómo estudiar esta etapa</h3>
+<h3>Ejercicio 5 · El acero, en tres renglones</h3>
