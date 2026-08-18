@@ -1,0 +1,15 @@
+# Dónde empieza cada página de la ficha de «El hombre máquina y la base
+# material» (Átomos, etapa 2; norma 6: diez páginas y llenas). Calculados
+# midiendo los bloques con _dev/mide-ficha-paginas.html?f=...&bloques=1 y
+# repartiéndolos en diez hojas de entre 215 y 252 mm, con dos condiciones
+# extra: que ningún encabezado se quede huérfano al pie de una página y que
+# cada corte caiga donde empieza una sección o una caja entera.
+<h2>⚙️ 1747: el cuerpo que explica al que piensa</h2>
+<h2>🏗️ 1859: la misma pregunta, hecha a la sociedad</h2>
+<h3>✅ La prueba de una línea, para usar hoy mismo</h3>
+<h3>🧱 Lo que sobrevive a la auditoría, y hay que decirlo</h3>
+<h3>🔗 Dónde vive lo que aquí no se estudia</h3>
+<h2>📋 Los ocho casos del proyecto (4 a 8)</h2>
+<h2>🧾 La hoja de la base, para llenar a lápiz</h2>
+<h2>🧭 Cómo se usa, en tres reglas</h2>
+<h3>Ejercicio 6 · La base de esta casa</h3>

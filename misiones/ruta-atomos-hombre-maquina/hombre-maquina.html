@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de los Átomos y los Ídolos · Etapa 2: El hombre máquina y la base material | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/hombre-maquina.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Cree que las ideas caen del cielo ☁️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">⚙️</div>
+    <div class="hero-text">
+      <h1>El hombre máquina y la base material: <span>condicionar no es determinar</span></h1>
+      <p class="sub">El agua mueve los mazos, pero no decide qué paño se abatana ⚙️</p>
+      <div class="badge">⚙️ Ruta de los Átomos y los Ídolos · Etapa 2 de 6</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚙️ La misma pregunta, dos escalas más arriba</h2>
+    <p>La etapa 1 estrenó la pregunta de la materia (<strong>¿de qué está hecho y qué lo sostiene?</strong>) contra el miedo. Esta etapa la sube dos escalones y no vuelve a explicarla: primero al <strong>cuerpo</strong>, con La Mettrie en 1747, y después a la <strong>sociedad</strong>, con Marx en 1859. Son el mismo gesto con dos objetos distintos.</p>
+    <p>El primero pregunta de qué está hecho <strong>el que piensa</strong>; el segundo, de qué está hecho <strong>lo que una época piensa</strong>. Y los dos entran aquí con la misma exigencia: <strong>la herramienta se aprende con sus críticas al lado, no en nota al pie</strong>.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La vara de la etapa.</strong> Quien termina hace dos cosas y las hace bien: <strong>distingue condicionar de determinar</strong>, y <strong>usa la herramienta sin volverse su caricatura</strong>. Es decir, puede nombrar la base material que sostiene las ideas de una institución de aquí sin caer en el reduccionismo de brocha gorda, ese que ve dinero detrás de cada frase y con eso deja de ver nada.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>⚖️ Las dos versiones de la misma tesis</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🎯 Como determinismo: apaleada</h4>
+        <p><strong>La base dicta todo</strong>, y de las condiciones materiales se deduce lo que la gente va a creer, cuándo y en qué orden. Esta versión <strong>está apaleada por la historia</strong>: las predicciones fallaron con fechas, y el siglo veinte hizo lo contrario de lo previsto más de una vez. Quien la sostiene tiene que explicar demasiadas excepciones.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🎲 Como condicionamiento: viva</h4>
+        <p><strong>La base carga los dados.</strong> No dice qué número va a salir; dice que unos números salen mucho más seguido que otros, y por qué. Esta versión <strong>sigue siendo una de las herramientas de análisis más potentes que existen</strong>, y es la que esta etapa entrega, con nombre, con fecha y con sus críticas encima.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">💧 La imagen que hay que quedarse</span><br>
+      <span>Un batán: el agua del río mueve los mazos que golpean el paño. <span class="hl">Sin agua no hay golpe</span>, y eso es condicionar de verdad y no de mentira. Pero <span class="hl2">el agua no decide qué paño se pone debajo, ni de qué color, ni para quién</span>. Quien confunde las dos cosas se equivoca en la dirección más cara: cree que sabe el resultado cuando solo sabe la corriente.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 El camino de la tesis, en siete momentos</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué pasó, qué aporta y con qué etiqueta entra.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento del camino.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: por qué el pastor dijo lo que dijo</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué escribe Jael en su cuaderno de auditorías.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📻</span><span class="ms-text"><strong>La observación es buena:</strong> Jael nota que en la radio del barrio hay tres programas que dicen lo mismo sobre el ahorro, y que los tres los paga la misma cooperativa. Eso es ver una relación material, y está bien visto.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">✍️</span><span class="ms-text"><strong>El salto:</strong> escribe en el cuaderno «el locutor dice eso porque le pagan». La frase suena valiente, se lee redonda y explica todo de un plumazo.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🪤</span><span class="ms-text"><strong>La trampa:</strong> esa frase ya no se puede comprobar ni desmentir. Si el locutor argumenta, es porque le pagan; si calla, también. Una explicación que gana siempre ha dejado de explicar.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">📓</span><span class="ms-text"><strong>Lo que tienes delante:</strong> un cuaderno abierto, una observación verdadera, y dos maneras muy distintas de anotarla.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Qué se escribe en el cuaderno?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🖌️ «Lo dice porque le pagan»</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🎲 Escribir el condicionamiento, con su prueba</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>⚙️ 1747: el cuerpo que explica al que piensa</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;"><strong>Julien Offray de La Mettrie</strong> era médico militar, y en <strong>1747</strong> publicó sin firma, en Leiden, <strong>«El hombre máquina»</strong>. Su argumento es de una sola pieza: <strong>si el estado del cuerpo cambia lo que uno piensa, entonces el pensamiento es cosa del cuerpo</strong>, y el alma como sustancia aparte deja de hacer falta para explicar nada. Él mismo contó de dónde le vino la idea: durante una fiebre notó que su cabeza iba más lenta, y le pareció que ese detalle valía más que un tratado.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Europa lo trató como se trataba entonces a quien decía eso: el libro fue condenado, tuvo que salir de Francia, después tuvo que salir de Holanda, y terminó en Berlín bajo la protección de <strong>Federico II de Prusia</strong>, donde murió en <strong>1751</strong>. Su etiqueta es exacta y hay que decirla entera: <strong>clásico sólido como documento de su tiempo</strong>, porque <strong>su fisiología está superada y su gesto no</strong>. La biología de 1747 no sirve; la pregunta que hizo sigue en pie y hoy la contesta media neurología.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🚂 El caso que un siglo después se pudo ver</span><br>
+      <span>En <strong>1848</strong>, en Vermont, una barra de hierro atravesó la cabeza de <strong>Phineas Gage</strong>, capataz de una cuadrilla de ferrocarril. <span class="hl">Sobrevivió</span>, y sus médicos describieron después un cambio en su carácter. Es el caso más citado del asunto, y por eso conviene la etiqueta: <span class="hl2">los relatos más novelescos que circulan han sido corregidos por los historiadores del caso</span>. Lo que queda en pie es lo que importa aquí: <strong>se le tocó el cerebro y cambió la persona</strong>.</span>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y una frontera declarada, porque esta casa dice dónde termina cada etapa: <strong>si el cuerpo explica el pensamiento, ¿qué pasa con lo que se siente por dentro?</strong> Esa pregunta es enorme, tiene gente seria en los dos lados y <strong>no se contesta aquí</strong>: es la etapa 3 de esta ruta, «La frontera de la conciencia». Aquí se nombra y se deja abierta a propósito.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🏗️ 1859: la misma pregunta, hecha a la sociedad</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Un siglo después, <strong>Karl Marx</strong> muda la pregunta del cuerpo a la sociedad, y la deja escrita en un texto corto que es el que se lee en esta etapa: el <strong>«Prólogo a la Contribución a la crítica de la economía política», de 1859</strong>. La idea: <strong>el modo en que una sociedad produce su vida material condiciona su vida social, política e intelectual</strong>. Y en <strong>«La ideología alemana»</strong> (escrita en 1845 y 1846, publicada entera hasta <strong>1932</strong>) está el remate famoso: <strong>las ideas dominantes de una época son las ideas de la clase dominante</strong>.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué nombra</th><th>Ejemplo de andar por casa</th></tr>
+      <tr><td><strong>La base</strong></td><td>Cómo se produce y se reparte lo que hace falta para vivir</td><td>De qué vive de verdad una escuela, una radio, una iglesia, una casa</td></tr>
+      <tr><td><strong>Lo que se levanta encima</strong></td><td>Las leyes, las costumbres, la moral, las ideas y lo que se da por obvio</td><td>Qué se puede decir en esa radio sin perder al que la paga</td></tr>
+      <tr><td><strong>La relación entre las dos</strong></td><td><strong>Condiciona</strong>, que es la palabra del texto de 1859</td><td>La corriente que mueve los mazos, y que no elige el paño</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔤 El detalle del texto que casi nadie mira</span><br>
+      <span>Toda la etapa cabe en el verbo que Marx escribió en 1859: <span class="hl">condiciona</span>. No escribió «dicta» ni «decide». La versión dura de la tesis, la que dice que la base <span class="hl2">determina</span> punto por punto lo que la gente cree, es un endurecimiento posterior, y es justo la versión que la historia apaleó. Leer el prólogo con cuidado ya es media clase.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎲 Condicionar no es determinar, y la diferencia se puede probar</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Esta es la pieza que ordena la etapa entera, y no es un matiz de profesor: cambia lo que se puede afirmar y lo que hay que probar.</p>
+    <table class="tres">
+      <tr><th>Pregunta</th><th>Determinar (la versión apaleada)</th><th>Condicionar (la que sirve)</th></tr>
+      <tr><td><strong>Qué afirma</strong></td><td>De la base se deduce la idea: sabiendo el bolsillo, se sabe la frase</td><td>La base hace mucho más probables unas ideas que otras, y explica por qué</td></tr>
+      <tr><td><strong>Qué habría que ver para desmentirla</strong></td><td>Nada: cualquier resultado se acomoda después</td><td>Casos donde la base es la misma y las ideas no, y al revés</td></tr>
+      <tr><td><strong>Qué predice</strong></td><td>El desenlace, con fecha, y ahí es donde falló</td><td>La dirección en que se inclina la mesa, y qué cuesta caro decir</td></tr>
+      <tr><td><strong>Qué hace con la excepción</strong></td><td>La explica como apariencia o como retraso</td><td>La cuenta, y si son muchas, corrige la tesis</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">✅ La prueba de una línea, para usar hoy mismo</span><br>
+      <span>Delante de cualquier explicación material, pregunta: <span class="hl">¿qué tendría que pasar para que esto fuera falso?</span> Si hay respuesta, estás condicionando y puedes seguir. Si no hay ninguna, <span class="hl2">no estás explicando: estás repartiendo culpas con vocabulario técnico</span>, y eso se llama de otra manera.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ Las críticas van al lado, no en nota al pie</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La regla de la casa en esta materia: una herramienta se entrega con sus objeciones puestas encima, y no escondidas en letra chica al final. Las tres que importan, cada una con su etiqueta:</p>
+    <table class="tres">
+      <tr><th>Quién</th><th>Qué objeta</th><th>Etiqueta</th></tr>
+      <tr><td><strong>Karl Popper, «La miseria del historicismo» (1957)</strong></td><td>Que la tesis, en manos de sus defensores, <strong>se inmuniza</strong>: se reinterpreta cada vez que falla, y así ya no hay nada que pueda desmentirla</td><td><strong>La crítica clásica</strong></td></tr>
+      <tr><td><strong>Las profecías, con sus fechas</strong></td><td>Que la revolución se esperaba en los países más industrializados y llegó en <strong>1917</strong> a uno de los menos industrializados de Europa</td><td><strong>Hecho histórico, no opinión</strong></td></tr>
+      <tr><td><strong>G. A. Cohen, «La teoría de la historia de Karl Marx: una defensa» (1978)</strong></td><td>Nada: <strong>defiende</strong>, y por eso está aquí. Enseñó a sostener la parte defendible con argumentos limpios, y a soltar la que no lo es</td><td><strong>Defensa analítica seria</strong></td></tr>
+    </table>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y hay un documento que zanja la caricatura desde adentro: la <strong>carta de Engels a Joseph Bloch, del 21 de septiembre de 1890</strong>. Ahí escribe que ni él ni Marx afirmaron nunca que lo económico fuera el <strong>único</strong> factor determinante, y añade algo que da gusto leer: que si los jóvenes cargan demasiado el lado económico, <strong>la culpa es en parte de ellos dos</strong>, por haberlo subrayado tanto frente a quienes lo negaban. La objeción más fuerte contra el determinismo la firmó Engels.</p>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">La Mettrie</div><div class="stat-val">1747</div></div>
+      <div class="stat-item"><div class="stat-label">El prólogo</div><div class="stat-val">1859</div></div>
+      <div class="stat-item"><div class="stat-label">Carta a Bloch</div><div class="stat-val">1890</div></div>
+      <div class="stat-item"><div class="stat-label">Cohen</div><div class="stat-val">1978</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🖌️ El modo de fallar tiene nombre: el reduccionismo de brocha gorda</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Es <strong>ver dinero detrás de cada frase</strong>, y con eso creer que ya se entendió algo. Se reconoce por tres señales, y conviene aprenderlas porque es el error que esta casa va a cometer primero:</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">1️⃣ Explica todo</div><div class="t-info">Y por eso ya no explica nada</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">2️⃣ No pide pruebas</div><div class="t-info">La intención se supone, no se muestra</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">3️⃣ Se salta a la persona</div><div class="t-info">Del interés al insulto en una línea</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">✅ En su lugar: la relación</div><div class="t-info">Qué se puede decir sin perder qué</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">✅ En su lugar: la prueba</div><div class="t-info">Qué se vería si fuera falso</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">✅ En su lugar: el resto</div><div class="t-info">Qué sobrevive entero a la auditoría</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y va con una regla de trato que en esta casa no se negocia, porque aquí hay fe y hay negocio y hay escuela: <strong>se audita la institución, no se desprecia a la gente que vive dentro de ella</strong>. Auditar una base material no es acusar a nadie de mentir; es decir qué corriente mueve los mazos. La mitad de las veces, el que habla cree cada palabra que dice, y eso también es un dato del análisis.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🧱 Lo que sobrevive a la auditoría, y hay que decirlo</span><br>
+      <span>Parte del oficio es <span class="hl">saber cuándo el objeto sobrevive entero</span>. Que una escuela viva de mensualidades no vuelve falso el teorema que enseña, y que un pastor cobre no vuelve falso el consuelo que da. <span class="hl2">La auditoría no es un ácido universal</span>: dice de qué está hecho algo y quién lo sostiene, no si es verdad ni si vale la pena, y quien confunde las dos cosas ya no está usando la herramienta.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El taller de la base material</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para tener la herramienta completa en la mano.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El hombre máquina (1747)</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">⚙️ Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="maquina" onclick="labShowParte('maquina')">⚙️ El hombre máquina</button>
+        <button class="lab-btn lab-cont-btn" data-parte="base" onclick="labShowParte('base')">🏗️ La base material</button>
+        <button class="lab-btn lab-cont-btn" data-parte="condiciona" onclick="labShowParte('condiciona')">🎲 Condicionar, no determinar</button>
+        <button class="lab-btn lab-cont-btn" data-parte="criticas" onclick="labShowParte('criticas')">🛡️ Las críticas al lado</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿condiciona o determina?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se audita la base material de una institución</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>⚙️ Identifica la pieza o la fuente por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la etapa se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué es esa frase: base, superestructura o resto?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es cada cosa dentro de la auditoría:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«La radio vive de la pauta de tres anunciantes»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla la auditoría?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">«Lo dice porque le pagan», y ahí termina la anotación</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🎲 Condiciona</button>
+        <button class="btn btn-sec" onclick="">🎯 Determina</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">⚙️ La base sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · El hombre máquina y la base material · Ruta de los Átomos y los Ídolos</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: el hombre máquina y la base material</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La base sobre la mesa · El hombre máquina y la base material</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">⚙️ La base sobre la mesa: qué la sostiene y qué no se puede concluir</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una institución o una afirmación sobre la mesa. Di de qué vive materialmente, qué se puede afirmar como <strong>condicionamiento</strong> y qué sería pasarse a <strong>determinismo</strong>, qué prueba haría falta para sostenerlo y qué se vería si fuera falso, qué etiqueta de estatus le toca a cada fuente, y qué sobrevive entero a la auditoría (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">⚙️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>⚙️ Casos del proyecto: la base material en esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas hay una institución o una afirmación sobre la mesa, y en todas la pregunta es la misma: <strong>de qué vive, qué ideas puede sostener por eso, y hasta dónde llega lo que se puede concluir sin pasarse de la raya.</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también en esta etapa:</strong> ningún estudio, obra o cifra entra sin su etiqueta. Las de aquí: La Mettrie, «El hombre máquina» (1747), <strong>clásico sólido como documento de su tiempo</strong> (su fisiología está superada, su gesto no); Marx, el <strong>prólogo de 1859</strong>, y Marx y Engels, «La ideología alemana», los dos como <strong>clásicos cuestionados</strong> (tesis potente, citada con sus críticas); Popper, «La miseria del historicismo» (1957), <strong>la crítica clásica</strong>; G. A. Cohen (1978), <strong>defensa analítica seria</strong>. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📻 Caso 1: la radio del barrio ofrece media hora los domingos</h2>
+    <p>Una radio local ofrece a M.E.T.A.S <strong>media hora gratis los domingos</strong> para hablar de estudio en casa. No cobran nada, y la oferta es sincera.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🏗️ De qué vive la radio</span><br>
+      <span>La auditoría es de una línea y no es una acusación: la radio <span class="hl">vive de la pauta de un puñado de anunciantes</span>, y uno de ellos es un colegio privado del municipio. Eso no vuelve mala a la radio ni mentiroso al locutor. Lo que dice es otra cosa: <span class="hl2">hay una frase que ahí no se puede decir sin que a alguien le cueste dinero</span>, y conviene saber cuál antes de sentarse al micrófono.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: se acepta la media hora, y la casa escribe antes qué va a decir del estudio en casa aunque incomode al anunciante. Si al llegar el domingo esa parte se cae, la relación material ya no se supone: <strong>se comprobó</strong>. Y eso, no la sospecha, es lo que se anota en el cuaderno.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>💰 Caso 2: L 40,000 al año por el logo y el lema</h2>
+    <p>Una fundación empresarial ofrece <strong>L 40,000 anuales</strong> por poner su logo y su lema dentro de cada misión de M.E.T.A.S. El dinero pagaría dos años de servidor.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🔍 De qué está hecha una fundación</span><br>
+      <span>Está hecha, entre otras cosas, de un <span class="hl">presupuesto de mercadeo</span>, y esa es una relación material, no una maldad. La pregunta que decide no es si son buena gente: es <span class="hl2">qué compra exactamente el logo, visibilidad o influencia sobre el contenido</span>. Son dos cosas con el mismo precio y consecuencias distintas.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: patrocinio visible en una página de créditos, contrato escrito de que el contenido no se toca, y <strong>ni el logo ni el lema dentro de las misiones</strong>, porque una pantalla que abren niños no se alquila por dentro. Y el apunte del método: <strong>aceptar con condiciones es el resultado normal de una auditoría</strong>, no una derrota.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>⛪ Caso 3: el salón de la iglesia, prestado, con una petición</h2>
+    <p>Una iglesia presta gratis su salón para las tardes de estudio. Al mes, quien lo administra pide algo con toda amabilidad: que la unidad de ciencias <strong>no toque el origen del hombre</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🤝 Auditar sin despreciar</span><br>
+      <span>La regla de trato de esta materia se prueba aquí: <span class="hl">se audita la institución, no se desprecia a la gente que vive dentro de ella</span>, y menos cuando esta casa también vive dentro de una. La auditoría dice qué relación material sostiene la petición (el salón, las llaves, la costumbre del favor) <span class="hl2">sin concluir de ahí que nadie crea lo que dice</span>. La mitad de las veces se cree cada palabra, y eso también es dato.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: el salón se agradece y el temario no se toca, y las dos cosas se dicen en la misma conversación y antes de la primera clase. Si el temario es el precio del salón, <strong>el salón se paga con otra cosa o se busca otro salón</strong>. Y se dice el favor recibido en voz alta, que también es una relación material y también hay que declararla.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🏫 Caso 4: L 18,000 por el taller en el colegio del «mejor método»</h2>
+    <p>Un colegio privado ofrece <strong>L 18,000</strong> por un taller para sus maestros. En su publicidad dice tener <strong>el mejor método del país</strong>, y muestra sus resultados.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">📊 De qué está hecho un resultado</span><br>
+      <span>Los resultados son ciertos, y aun así la afirmación no se sostiene todavía: falta preguntar <span class="hl">de qué está hecho ese resultado</span>. Una parte es el método, otra parte es la mensualidad, y otra parte es que <span class="hl2">a ese colegio llegan niños que ya venían leyendo en casa</span>. Separar las tres es la auditoría; suponer que todo es la mensualidad es brocha gorda.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: se da el taller, y en la primera media hora se enseña justamente eso, a separar el método del punto de partida. <strong>Y lo que sobrevive entero también se dice</strong>: en ese colegio hay maestros buenos, y esa parte no la produce ninguna mensualidad.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🖌️ Caso 5: la brocha gorda que escribió Jael</h2>
+    <p>En su cuaderno de auditorías, Jael escribió sobre un locutor local: <strong>«dice eso porque le pagan»</strong>. La observación de origen era buena; la frase escrita, no.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🪤 Cómo se ve que la frase se pasó de la raya</span><br>
+      <span>Con la prueba de una línea: <span class="hl">¿qué tendría que pasar para que fuera falsa?</span> Si el locutor argumenta bien, se dirá que lo hace porque le pagan; si calla, también. <span class="hl2">Una explicación que gana con cualquier resultado ya no explica nada</span>, y encima acusa a una persona de algo que no se comprobó. Popper le puso nombre a ese mecanismo en 1957.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> cómo se reescribe. En vez de la intención, la relación y la prueba: «tres programas de la misma emisora coinciden en X; los tres los paga la misma cooperativa; <strong>la comprobación sería ver qué pasa el día que alguien diga lo contrario en ese micrófono</strong>». Eso sí es auditar, se puede desmentir, y no le pone a nadie una intención en la boca.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🙋 Caso 6: Angelly y la fiebre que le puso lenta la cabeza</h2>
+    <p>Con fiebre y sin tarea hecha, <strong>Angelly</strong> pregunta lo que La Mettrie preguntó en 1747: «si con calentura pienso lento, <strong>¿entonces yo soy mi cuerpo?</strong>». No hay oferta ni lempiras: hay una niña con la pregunta exacta.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🚧 La frontera se dice, no se esquiva</span><br>
+      <span>La respuesta de la casa tiene dos mitades. La primera es un sí sin rodeos: <span class="hl">lo que te pasa en el cuerpo cambia lo que piensas</span>, y eso hoy se ve con lesiones, con fármacos y con escáneres. La segunda es la honesta: <span class="hl2">si con eso queda explicado lo que se siente por dentro, es una pregunta abierta y nadie la ha cerrado</span>, y en esta ruta se estudia completa en la etapa 3.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> que decir «esto no lo sabemos todavía» es parte del método y no un fracaso. Y lo práctico que se lleva Angelly: <strong>la próxima vez que no le salga la tarea con fiebre, no es que sea floja; es que el que hace la tarea está enfermo</strong>. La Mettrie llegó a su libro por ese mismo camino.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📉 Caso 7: L 6,000 por el módulo que da por hecho que el que no emprende no quiere</h2>
+    <p>Una organización ofrece <strong>L 6,000</strong> por un módulo de emprendimiento juvenil. El material que traen da por sentado, sin decirlo, que <strong>quien no emprende es porque no quiso</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎲 Lo que la base explica, y lo que no</span><br>
+      <span>Aquí la herramienta trabaja en las dos direcciones, y por eso el caso es bueno. Contra el material: <span class="hl">sin capital inicial, sin garantía y sin red, la misma decisión tiene un costo distinto</span>, y eso es condicionamiento comprobable. Y contra la tentación contraria: <span class="hl2">decir que la base lo decide todo y que la persona no pinta nada es el mismo error con el signo cambiado</span>. Los dados están cargados; los tira alguien.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la condición con que sí: entra el módulo con una hoja más, la de los <strong>costos reales de arrancar aquí</strong>, con números; y se dice que hay caminos distintos y ninguno es un defecto de carácter. Si esa hoja no puede entrar, la respuesta es no, y no por soberbia: <strong>porque enseñar la mitad de la explicación es enseñar mal</strong>.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🪞 Caso 8: de qué vive M.E.T.A.S, y qué ideas puede sostener por eso</h2>
+    <p>La auditoría se gira hacia adentro, que es donde cuesta: <strong>M.E.T.A.S no vive de una donación ni de una matrícula</strong>. Vive del ingreso de la familia, de las horas de la noche del autor y de un servidor que se paga cada mes.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🏗️ Qué carga esa base, y hacia dónde</span><br>
+      <span>Lo que esa base hace fácil: <span class="hl">decir que no a un patrocinio</span>, porque nadie tiene la llave del contenido. Lo que esa base hace difícil, y es lo incómodo: <span class="hl2">crecer, durar si el autor se enferma, y ver de cerca el problema del que no tiene esas horas</span>. Un proyecto hecho de noches propias tiende a creer que las noches propias alcanzan para todo, y eso es una idea con base material.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> quedó escrito con su renglón de qué evidencia lo haría cambiar: un semestre en que las misiones se detengan por una enfermedad, o tres familias que no puedan seguirlas por falta de datos y de tiempo. <strong>Sin ese renglón sería una premisa funcionando como dogma</strong>, y así se anotaría, con fecha.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>⚙️ La hoja de la base, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier institución o afirmación que llegue a esta casa, propia o ajena, se llena antes de opinar:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>De qué vive, con números si se pueden:</strong> quién paga, cuánto, cada cuánto y por qué.</li>
+      <li><strong>Qué ideas le salen baratas y cuáles le salen caras:</strong> qué frase no puede decir sin perder algo.</li>
+      <li><strong>Qué se afirma como condicionamiento:</strong> escrito de modo que se pueda desmentir, con qué se vería si fuera falso.</li>
+      <li><strong>Qué NO se concluye:</strong> la intención de nadie, la sinceridad de nadie, y la verdad o falsedad de lo que dice.</li>
+      <li><strong>Qué sobrevive entero a la auditoría:</strong> y la base propia de esta casa, con su renglón de qué la haría cambiar.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⚙️ Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">La base condiciona, no determina</span>: el agua mueve los mazos y no elige el paño. 2. Toda explicación material se escribe <span class="hl">de modo que se pueda desmentir</span>, o no se escribe. 3. Las críticas van al lado de la tesis, no en nota al pie: Popper, las profecías y Cohen entran con ella. 4. <span class="hl2">Se audita la institución y no se desprecia a la gente que vive dentro</span>, empezando por la propia. 5. Y se dice en voz alta <span class="hl">qué sobrevive entero</span>, porque la auditoría no es un ácido universal.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «A doña Rosa la convenció un horario»</h2>
+    <p>Guion listo para grabar (6 a 8 minutos), con la historia al frente y el concepto escondido adentro. Cada escena trae su <strong>voz</strong> (lo que se dice), su <strong>imagen</strong> (lo que se ve) y su <strong>texto en pantalla</strong>.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>Regla del guion (norma de la casa):</strong> toda misión lleva su guion de video con historia: un gancho en frío que duela o intrigue, un personaje que quiere algo, un giro que desmonta lo que el público creía, y un cierre que aterriza el concepto en la vida de quien mira. Nada de definiciones antes del minuto dos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «A doña Rosa nunca nadie le ganó una discusión. Cambió de opinión ella sola, en tres meses, y no leyó ni un libro ni habló con nadie. Lo único que había cambiado era el horario de su trabajo.»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; aparece un reloj de pared de cocina, de los de pila, marcando las cuatro y media de la mañana. Se oye una plancha de tortillas calentándose.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Nadie la convenció. Le cambiaron el horario.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quiere (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «Doña Rosa vendía tortillas desde las cinco de la mañana, y tenía una convicción de hierro: el que madruga progresa, y el que no madruga es porque no quiere. Lo decía sin maldad y con toda la razón del mundo, porque a ella le había funcionado. Lo que quería era muy concreto: que su hijo, que trabajaba de noche en una gasolinera, entendiera de una vez esa verdad. Tres años se lo dijo. Tres años el muchacho se quedó callado y siguió durmiendo de día. Y doña Rosa lo quería mucho y lo creía flojo, las dos cosas al mismo tiempo, que es lo peor que le puede pasar a una madre.»</p>
+    <p><strong>IMAGEN:</strong> el puesto de tortillas antes del amanecer; manos que trabajan rápido; corte a un cuarto con la cortina cerrada a mediodía y alguien durmiendo; la cámara se queda en la puerta cerrada.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Lo quería mucho y lo creía flojo. Al mismo tiempo.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Ahora una prueba, aquí mismo, y contéstala en voz baja porque nadie te está oyendo. Pensá en una opinión tuya de esas que siempre has tenido, de las que ni discutís porque te parecen obvias. Ya la tenés. Ahora decime <em>qué tendría que cambiar en tu semana</em> para que dejaras de tenerla. No qué argumento: qué cosa de tu semana. Si no se te ocurre nada, hay dos posibilidades, y solo una es cómoda: o esa idea tuya no tiene nada que ver con tu vida, o nunca la has mirado desde afuera.»</p>
+    <p><strong>IMAGEN:</strong> una ventana de cocina al amanecer, y la misma ventana al mediodía con la cortina cerrada; el mismo cuarto, dos luces distintas.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Qué tendría que cambiar en tu semana?»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Aquí está el giro, y no es el que esperás. Uno cree que las ideas entran por la cabeza. Y hay dos señores que dijeron que no. En 1747, un médico militar francés, Julien Offray de La Mettrie, publicó sin firmar un libro que se llama <em>El hombre máquina</em>, y su argumento le salió de una fiebre: notó que con calentura pensaba más lento, y sacó la conclusión incómoda de que el que piensa es el cuerpo. Lo condenaron, salió huyendo de dos países y terminó protegido por el rey de Prusia. Y un siglo después, en 1859, Karl Marx hizo la misma pregunta pero a la sociedad entera, en un texto corto: el modo en que una sociedad produce su vida material <em>condiciona</em> lo que esa sociedad piensa. Fijate bien en el verbo, porque toda esta misión cabe ahí: escribió <em>condiciona</em>. No escribió decide.»</p>
+    <p><strong>IMAGEN:</strong> un libro viejo sin nombre de autor en la portada, con el año 1747 escrito a mano en un papelito; corte a una página con la palabra CONDICIONA subrayada y, al lado, la palabra DECIDE tachada.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Escribió “condiciona”. No escribió “decide”.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:20)</h2>
+    <p><strong>VOZ:</strong> «Y esa es la herramienta: antes de discutir una idea, preguntá de qué vive el que la sostiene. No para acusarlo: para entender qué le sale barato decir y qué le sale caro. Es un batán, y perdoname la palabra vieja: una máquina de río donde el agua mueve unos mazos que golpean el paño para dejarlo apretado. Sin agua no hay golpe, y eso es de verdad. Pero el agua no elige qué paño se pone debajo, ni de qué color, ni para quién. Eso es condicionar y no determinar, y es toda la diferencia. Con doña Rosa pasó exacto: a ella el mundo la premió por madrugar, y su idea salió de ahí, no de un razonamiento. ¿Y qué le cambió la opinión? Le cambiaron el turno. Un contrato nuevo la puso a hacer tortillas de tres a once de la noche. Al mes ya no podía con el cuerpo, y al tercer mes le dijo a su hijo una frase que él no esperaba: “yo no sabía”.»</p>
+    <p><strong>IMAGEN:</strong> un batán antiguo funcionando, el agua moviendo los mazos; alguien pone un paño debajo y después lo cambia por otro; la corriente sigue igual.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «El agua mueve los mazos. No elige el paño.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:20 a 6:10)</h2>
+    <p><strong>VOZ:</strong> «“Momento. ¿Entonces nadie piensa libre y todo es el bolsillo?” No, y ese es justamente el error que hay que evitar, porque tiene nombre: reduccionismo de brocha gorda, ver dinero detrás de cada frase. Karl Popper le hizo la crítica clásica en 1957: dijo que esa versión se inmuniza, o sea que se arregla sola cada vez que falla, y una explicación que gana siempre ya no explica nada. Y hay un detalle que casi nadie sabe: quien más claro lo negó fue Engels, en una carta del 21 de septiembre de 1890, donde escribe que ni él ni Marx dijeron nunca que lo económico fuera el único factor, y que si los jóvenes cargan tanto ese lado, la culpa es en parte de ellos dos. La objeción más fuerte contra el determinismo la firmó uno de los dos autores.»</p>
+    <p><strong>IMAGEN:</strong> una carta manuscrita con fecha visible, 21 de septiembre de 1890; una mano subraya una línea; al lado, una libreta donde se tacha la frase «lo dice porque le pagan» y se escribe otra más larga.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Una explicación que gana siempre ya no explica nada.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:10 a 7:00)</h2>
+    <p><strong>VOZ:</strong> «Doña Rosa no pidió perdón con esas palabras; le llevó café al muchacho a las once de la noche, que es como se piden perdón las cosas serias. Esta semana te toca a vos, y es una sola tarea, de veinte minutos: escogé una institución de aquí, una sola, la radio que oís, la escuela de tus hijos, la iglesia a la que vas, y escribí en media hoja de qué vive, con números si podés, y qué frase no puede decir ahí adentro sin que a alguien le cueste dinero. Y después escribí la tuya, la de tu propia casa, que es la que cuesta. Dos reglas nada más: no le adivinés la intención a nadie, y escribilo de manera que se pueda desmentir. Si no se puede desmentir, no era una auditoría; era una queja con vocabulario prestado.»</p>
+    <p><strong>IMAGEN:</strong> dos tazas de café en una mesa a las once de la noche; al lado, media hoja escrita a mano con dos columnas; una mano cierra el cuaderno.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «De qué vive, y qué no puede decir. · Misión: El hombre máquina y la base material · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué hace</th><th>Dónde vive aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>Cambió de opinión sola: le cambiaron el horario</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>Doña Rosa, que quiere que su hijo entienda de una vez</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>Qué tendría que cambiar en tu semana para que cambies de idea</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>La Mettrie y la fiebre, y el verbo «condiciona» de 1859</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>El batán: el agua mueve los mazos y no elige el paño</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«¿Todo es el bolsillo?»: Popper y la carta de Engels de 1890</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>Media hoja sobre una institución, y después la propia</td></tr>
+    </table>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Tres lecturas: la misma corriente, tres voces</h2>
+    <p>El tema de la etapa contado tres veces: un cuento, un capítulo de caballerías y un ensayo. Tres maneras de que la idea entre por donde el examen no llega.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> estos tres textos son <strong>ejercicios de estilo escritos por esta casa</strong> en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado. Y llevan una regla extra de esta casa: <strong>toda obra, fecha y persona que aparece dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre: una hoja suelta con un pastiche sin declarar sería justo la fuente inflada que esta materia enseña a cazar.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-pri" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🌀 Lectura 1 · «El silbato de las seis» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas inventadas. Todos los libros, fechas y personas de este cuento son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">Me encargaron, para un volumen conmemorativo que nadie iba a leer, la historia de una virtud. La virtud era la puntualidad. Acepté por vanidad y por hambre, en ese orden, y me pareció un encargo modesto: suponía que bastaba con reunir elogios antiguos y ordenarlos por siglos.</p>
+    <p class="lect-p">Los elogios antiguos no aparecieron. Hallé, en cambio, un silencio: los moralistas de la Antigüedad recomiendan la templanza, la justicia, el valor y la piedad, y no dedican un renglón a llegar a una hora exacta. Comprendí, con la lentitud de los que investigan de veras, que no había silencio sino ausencia, y que la ausencia era el hallazgo: <strong>la puntualidad no era una virtud antigua a la que le hubieran perdido la pista, sino una virtud joven, y por lo tanto fabricada</strong>.</p>
+    <p class="lect-p">Busqué entonces su fábrica, y la encontré. En <strong>1967</strong>, el historiador <strong>E. P. Thompson</strong> publicó un trabajo titulado <strong>Time, Work-Discipline, and Industrial Capitalism</strong>, donde muestra cómo el paso del trabajo por tarea al trabajo por hora reorganizó la conciencia de millones de personas: el reloj de la fábrica, la campana, las multas por llegar tarde, y la lenta conversión de una costumbre de patrón en una cualidad del alma. Antes se trabajaba hasta terminar; después se trabajó hasta que sonara. El silbato no daba una orden: fundaba una moral. Y a los cincuenta años, la moral era tan íntima que los hombres se enorgullecían de ella y educaban en ella a sus hijos, sin recordar que había llegado con una máquina.</p>
+    <p class="lect-p">Este descubrimiento tenía dos siglos y un nombre. En <strong>1859</strong>, en el prólogo a su <strong>Contribución a la crítica de la economía política</strong>, <strong>Karl Marx</strong> había escrito que el modo en que una sociedad produce su vida material <em>condiciona</em> su vida social, política e intelectual; y en <strong>La ideología alemana</strong>, escrita con <strong>Engels</strong> en 1845 y 1846 y publicada entera recién en <strong>1932</strong>, la fórmula célebre de que las ideas dominantes de una época son las ideas de su clase dominante. Un siglo antes que Marx, y en otra escala, <strong>La Mettrie</strong> había publicado sin firma, en 1747, <strong>El hombre máquina</strong>, donde sostuvo que si una fiebre cambia lo que uno piensa, entonces el que piensa es el cuerpo. Lo condenaron, huyó de Francia, huyó de Holanda y murió en Berlín, en <strong>1751</strong>, protegido por <strong>Federico II de Prusia</strong>. Los dos hombres habían hecho la misma pregunta a distinta escala, y yo la estaba haciendo, sin saberlo, a un rasgo de carácter.</p>
+    <p class="lect-p">Aquí cometí el error del que me avergüenzo y por el cual escribo esto. Embriagado, como el que descubre una llave y decide que todas las puertas son cerraduras, me propuse rehacer el volumen entero. Escribí que la honradez del comerciante era el crédito con otro nombre; que la modestia del artesano era la escasez, bien peinada; que el amor conyugal era la herencia protegiéndose. Escribí ochenta páginas en once días y las creí valientes. Se las leí, en la cocina, a mi madre, que fue lavandera cuarenta años y no leyó nunca un libro de filosofía. Me escuchó entera y me hizo dos preguntas. La primera: si yo podía decirle qué tendría que ocurrir en el mundo para que alguna de esas frases mías resultara falsa. La segunda, después de un silencio: si el cariño con que ella me había criado también era el crédito con otro nombre.</p>
+    <p class="lect-p">No supe contestar ninguna de las dos, y eso fue exactamente la respuesta. Comprendí que había construido una máquina que ganaba siempre, y que una máquina que gana siempre no está midiendo nada. Descubrí después que el defecto tenía autor y fecha: <strong>Karl Popper</strong>, en <strong>La miseria del historicismo</strong>, publicada como libro en <strong>1957</strong>, acusó a esa manera de razonar de <em>inmunizarse</em>, es decir de reinterpretarse cada vez que los hechos la contradecían, hasta quedar a salvo de todo y sin decir nada. Yo había hecho eso en once días, con entusiasmo, en la lengua de mi propia madre.</p>
+    <p class="lect-p">Lo que salvó el trabajo fue un documento y un libro. El documento es una carta que <strong>Friedrich Engels</strong> escribió a <strong>Joseph Bloch</strong> el <strong>21 de septiembre de 1890</strong>, donde advierte que ni él ni Marx sostuvieron jamás que lo económico fuera el único factor determinante, y añade, con una honradez que no es frecuente entre fundadores, que si los jóvenes cargan demasiado ese lado, la culpa es en parte de ellos dos, por haberlo subrayado tanto frente a quienes lo negaban. El libro es de <strong>G. A. Cohen</strong>, <strong>La teoría de la historia de Karl Marx: una defensa</strong>, de <strong>1978</strong>, y su virtud es rara: defiende la tesis quitándole las partes que no se pueden defender, que es la única manera de defender algo de verdad.</p>
+    <p class="lect-p">Rehíce el volumen y quedó más corto y menos brillante. La puntualidad conservó su fábrica y su fecha. La honradez del comerciante quedó con una nota que decía qué habría que observar para desmentir la explicación. Y el cariño de mi madre quedó como estaba, sin nota y sin explicar, porque hay cosas que sobreviven enteras a la auditoría y decirlo también es parte del oficio. Pienso ahora que la corriente mueve los mazos del batán y que sin corriente no hay golpe, pero que el paño que se pone debajo lo pone una mano, y que confundir las dos cosas es la manera más elegante de dejar de mirar.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>🐎 Lectura 2 · «De lo que sonaba en la oscuridad, y de quién movía los mazos» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, el camino, el humor y la reflexión cervantinos. El ancla es real: la aventura de los batanes, en el capítulo veinte de la primera parte del Quijote (1605), donde amo y escudero pasan la noche aterrados por un golpeteo espantoso que al amanecer resulta ser seis mazos de batán, y donde Sancho, para que su amo no se fuese, le había atado las patas a Rocinante.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">Donde se cuenta lo que a don Quijote y a Sancho les sucedió con un molino de paños, y de la plática que sobre el precio del maíz tuvieron con el molinero, con otras cosas de sustancia que Sancho entendió por la mitad.</p>
+    <p class="lect-p">Habiendo caminado toda la mañana por unas riberas, oyeron amo y escudero un golpear grande y compasado, como de gigante que majase el mundo en un almirez, con lo cual se le alborotó el ánimo a Sancho y se le alegró a don Quijote, que ya tenía la lanza en el ristre. «Bien conozco yo ese son (dijo Sancho), que no es la primera noche que me quita el sueño, y aun me acuerdo de una en que, por que vuesa merced no fuese a buscarlo, le até a Rocinante las manos, y me costó cara la burla; y al amanecer, seis mazos de batán eran, y no gigantes.» «Advierte, Sancho (respondió don Quijote), que el que ya fue engañado una vez con un ruido no debe temerlo la segunda, sino ir a ver de qué está hecho, que en verlo se acaba el miedo y empieza el saber.»</p>
+    <p class="lect-p">Llegaron, y era un molino de abatanar paños, y salió a recibirlos el molinero, hombre viejo y de buen humor, que les mostró la rueda, la corriente y los mazos. Estúvose don Quijote un buen rato mirando cómo el agua movía la rueda y la rueda alzaba los mazos, y dijo al fin: «Sancho, mira bien esto y no lo olvides, que aquí se ve una cosa que en los libros cuesta cien hojas: <em>el agua mueve los mazos, y sin agua no hay golpe; pero el agua no escoge qué paño se pone debajo, ni de qué color, ni para quién se abatana</em>. Quien dijere que la corriente lo hace todo, mienta; y quien dijere que la corriente no hace nada, mienta también y con más daño, porque ese es el que no repara el canal cuando se seca.»</p>
+    <p class="lect-p">Sucedió que llegó entonces un labrador quejándose de que el maíz había subido de precio, y preguntándole don Quijote quién lo había subido, respondió el labrador que nadie, sino que el mercado lo quiso así. Oyendo esto se puso el caballero muy grave y dijo: «Ese señor Mercado de quien vuesas mercedes hablan, decidme: ¿de qué está hecho, dónde vive y quién le mueve los mazos? Porque si es cosa que viene de fuera del mundo, cállome y me santiguo; mas si está hecho de carretas, de bodegas, de caminos rotos y de tres hombres que compran todo el grano de la comarca, entonces no es señor sino máquina, y las máquinas tienen dueño, y los dueños, nombre.» Y el molinero, que había oído, dijo que en aquello el caballero decía verdad, y nombró los caminos y las bodegas, aunque no quiso nombrar a los hombres, y de no quererlos nombrar se supo más que si los nombrara.</p>
+    <p class="lect-p">«Todo eso entiendo yo muy bien (dijo Sancho), y digo que si el señor Mercado tiene bodegas, yo le pongo pleito, que a mí me debe de tres años a esta parte lo que me ha subido el aceite; y si es máquina como vuesa merced dice, cómprela vuesa merced y póngala en mi casa, y abatanaremos en ella los paños del pueblo y nos haremos ricos.» «Majadero (dijo don Quijote), que el saber de qué está hecha una cosa no da derecho a cobrarla.» «Pues por mi ánima (respondió Sancho) que en mi tierra el que sabe de qué está hecho el queso es el primero que lo prueba; y que a río revuelto, ganancia de pescadores; y que quien tiene el molino tiene la harina, aunque el agua sea de todos.»</p>
+    <p class="lect-p">Ya en el camino, y porque Sancho venía repitiendo que ahora entendía que todo lo que la gente dice lo dice por lo que cobra, le atajó don Quijote con más severidad de la que solía: «Guárdate de esa cuenta tan fácil, Sancho, que es la del holgazán con cara de sabio. Si dices que el ventero alaba su vino porque lo vende, dices algo que se puede mirar; pero si dices que el cura predica porque le pagan, y lo dices sin haberlo mirado, ni has probado nada ni has entendido nada, y de camino has agraviado a un hombre. Y hay una señal para conocer cuándo te has pasado, y es esta: pregúntate qué tendría que suceder para que lo que dices fuese falso. Si no hallas nada, no tienes razón: tienes un martillo, y con un martillo todo el mundo parece clavo.» «Eso último me lo apunte vuesa merced (dijo Sancho), que para lo demás ya sé yo que del dicho al hecho hay gran trecho, y del ruido al gigante, todo el camino.»</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌍 Lectura 3 · «La especie que piensa con lo que tiene en las manos» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie y la frase sencilla del autor de «Sapiens». Todos los datos, obras y fechas citados son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Los seres humanos creemos que nuestras ideas nacen de pensar. Casi siempre nacen de otra cosa: de lo que tenemos en las manos, del horario en que trabajamos y de quién nos paga la comida. Esto no nos hace tontos ni deshonestos. Nos hace animales que viven en un mundo material, que es el único que hay.</p>
+    <p class="lect-p">La versión pequeña de esta idea es sobre el cuerpo. En <strong>1747</strong>, un médico militar llamado <strong>Julien Offray de La Mettrie</strong> publicó sin firma un libro breve, <strong>El hombre máquina</strong>, con un argumento que hoy suena obvio y entonces era delito: si una fiebre cambia lo que piensas, el que piensa es el cuerpo. Su libro fue condenado, tuvo que huir de dos países y murió en <strong>1751</strong> en Berlín, bajo la protección de <strong>Federico II de Prusia</strong>. Un siglo más tarde, en <strong>1848</strong>, una barra de hierro atravesó la cabeza de <strong>Phineas Gage</strong>, capataz de ferrocarril en Vermont; sobrevivió, y sus médicos describieron un cambio en su carácter. Conviene decir que las versiones más novelescas de ese caso han sido corregidas por los historiadores. Lo que queda en pie basta: se tocó el cerebro y cambió la persona.</p>
+    <p class="lect-p">La versión grande es sobre las sociedades, y aquí está la frase que hay que leer con lupa. En <strong>1859</strong>, en el prólogo a la <strong>Contribución a la crítica de la economía política</strong>, <strong>Karl Marx</strong> escribió que el modo en que una sociedad produce su vida material <em>condiciona</em> su vida social, política e intelectual. La palabra es <em>condiciona</em>. No escribió que la decide. Toda la diferencia entre una herramienta y una superstición cabe en ese verbo.</p>
+    <p class="lect-p">Un ejemplo medible, y de los mejores que hay. En <strong>1967</strong>, el historiador <strong>E. P. Thompson</strong> publicó <strong>Time, Work-Discipline, and Industrial Capitalism</strong>, y mostró algo que ninguna teoría había previsto y que los archivos sí guardaban: cuando el trabajo dejó de medirse por tarea y pasó a medirse por hora, la gente cambió de moral. Apareció el reloj de la fábrica, aparecieron las multas por llegar tarde, y en dos generaciones la puntualidad dejó de ser una imposición del patrón para volverse una virtud del carácter, que los padres enseñaban a los hijos con orgullo. Nadie convenció a nadie con un argumento. Cambió la máquina y cambió la conciencia.</p>
+    <p class="lect-p">Ahora el contraejemplo, que es igual de importante, porque una herramienta que solo se ilustra con sus aciertos es propaganda. En <strong>1962</strong>, <strong>Lynn White Jr.</strong> publicó <strong>Medieval Technology and Social Change</strong> y sostuvo que el estribo, al hacer posible el combate a caballo con lanza, explica el nacimiento del feudalismo. La tesis es elegante y sigue siendo <strong>discutida</strong>: otros medievalistas la han rebatido durante décadas, y el debate tiene hasta nombre propio en la profesión. Guárdela con esa etiqueta puesta y compárela con la de Thompson. Verá la diferencia entre decir que una técnica <em>condiciona</em> lo que una sociedad puede hacer, y decir que una técnica <em>determina</em> la forma que esa sociedad va a tomar. La primera se puede comprobar. La segunda casi nunca.</p>
+    <p class="lect-p">La versión dura de la tesis falló en público y con fecha. Marx esperaba la revolución en los países más industrializados; llegó en <strong>1917</strong> a uno de los menos industrializados de Europa. <strong>Karl Popper</strong>, en <strong>La miseria del historicismo</strong>, publicada como libro en <strong>1957</strong>, describió el mecanismo con que esa versión se defendía: cada fallo se reinterpretaba, y así la teoría quedaba a salvo de cualquier hecho, que es otra manera de decir que había dejado de afirmar algo. Y quien lo negó con más claridad fue de la casa: <strong>Friedrich Engels</strong>, en una carta a <strong>Joseph Bloch</strong> del <strong>21 de septiembre de 1890</strong>, escribió que ni él ni Marx habían sostenido nunca que lo económico fuera el único factor determinante, y admitió que la exageración de los jóvenes era en parte culpa de ellos dos. En <strong>1978</strong>, el filósofo <strong>G. A. Cohen</strong> publicó <strong>La teoría de la historia de Karl Marx: una defensa</strong>, y fundó con otros una corriente que se llamó marxismo analítico, cuyo grupo se puso a sí mismo, medio en broma, el nombre de grupo del marxismo sin tonterías. Defendieron la parte defendible y soltaron el resto, que es lo que hace un adulto con una herencia.</p>
+    <p class="lect-p">Termino con lo que esto sirve para usted, esta semana, en el lugar donde vive. Piense en una institución que le toca la vida: la escuela de sus hijos, la radio que oye, la iglesia a la que va. Pregunte de qué vive, con números si puede. Pregunte qué frase no se puede decir ahí adentro sin que a alguien le cueste dinero. Y después haga las dos cosas difíciles. La primera es no adivinarle la intención a nadie: la mayoría de la gente cree lo que dice, y su sinceridad no es lo contrario del condicionamiento, es el modo en que el condicionamiento funciona. La segunda es hacerse la misma pregunta a usted mismo, porque su casa también tiene base material, y las ideas que le salen baratas son sospechosas por la misma razón. En un país donde las remesas de los que se fueron pesan más de la quinta parte del producto interno bruto, según los datos del Banco Mundial, hay ideas sobre el mérito, sobre el viaje y sobre el futuro que no llegaron por un razonamiento: llegaron por un giro mensual. Verlas no las vuelve falsas. Solo las vuelve discutibles, que es todo lo que una persona libre puede pedir.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🧐 Preguntas de las tres lecturas</h2>
+    <p>Leer no es lo mismo que haber leído. Aquí van <strong>quince preguntas de comprensión lectora</strong> (cinco por texto), <strong>diez de completar</strong> y <strong>diez de análisis complejo</strong> con su pauta. Se contestan <strong>con los tres textos delante</strong>: no es un examen de memoria, es un examen de lectura.</p>
+    <div class="tip">
+      <span class="ti">🖨️</span>
+      <div><strong>Todo esto se imprime.</strong> El pliego de preguntas sale con las tres secciones y la <strong>pauta en su propia hoja al final</strong>, para que las respuestas no queden en la misma página que el ejercicio, como manda la casa. Y las tres lecturas se imprimen aparte, cada una con su etiqueta de ejercicio de estilo encima.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego de preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirLasTresLecturas()">🖨️ Imprimir las tres lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📖 I. Comprensión lectora (15 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +2 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="lcProg" aria-live="polite">Pregunta 1 de 15</p>
+    <div class="qz-q" id="lcQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="lcOpts" role="group" aria-label="Opciones de comprensión lectora"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectC()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectC()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLC" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>✏️ II. Completa la oración (10 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +2 XP por respuesta correcta (primera vez). Escribe la palabra o el año exacto.</p>
+    <p class="id-prog" id="lfProg" aria-live="polite">Oración 1 de 10</p>
+    <div class="cmp-sent" id="lfQ"></div>
+    <div style="margin:0.6rem 0;">
+      <input class="eval-cp-input" id="lfInput" type="text" style="min-width:190px;" placeholder="Escribe tu respuesta..." aria-label="Respuesta de completar" onkeydown="if(event.key==='Enter'){event.preventDefault();checkLectF();}">
+    </div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectF()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectF()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLF" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧠 III. Análisis complejo (10 preguntas)</h2>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Estas no se responden con una palabra ni se corrigen con una letra: se escriben, y después se comparan con la pauta. Van sin XP a propósito, porque una respuesta abierta que se premia sola se contesta a la carrera.</p>
+    <p class="id-prog" id="laProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="laQ" role="heading" aria-level="3"></div>
+    <textarea class="crit-textarea" id="laTA" rows="5" placeholder="Escribe aquí, o en tu cuaderno..." aria-label="Respuesta de análisis"></textarea>
+    <div id="laPauta" class="eval-answer" style="display:none;margin-left:0;font-size:0.85rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-d" onclick="prevLectA()">◀ Anterior</button>
+      <button class="btn btn-pri" onclick="nextLectA()">Siguiente ▶</button>
+      <button class="btn btn-g" id="btnLectAPauta" onclick="toggleLectAPauta()">👁 Ver pauta</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué tres voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento instala el error como <strong>vergüenza propia</strong> (las ochenta páginas valientes, y las dos preguntas de la lavandera), el capítulo lo vuelve <strong>escena, risa y refrán</strong> (el ruido que resultó ser una máquina, y Sancho poniéndole pleito al señor Mercado), y el ensayo lo conecta con <strong>la escala del mundo</strong> (Thompson y el reloj de la fábrica contra el estribo discutido de Lynn White). Quien lee las tres tiene la herramienta y también su modo de fallar.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión nueva lleva sus tres lecturas sobre el tema de la etapa: <span class="hl">un cuento a la manera de Borges, un capítulo a la manera de Cervantes y un ensayo a la manera de Harari</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista y con una regla de fondo: <span class="hl">toda obra, fecha y persona citada dentro de los textos es real y comprobable</span>. El único artificio permitido es la voz; a Borges, en esta casa, se le quita el vicio de las citas inventadas.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con La Mettrie y el cuerpo que explica al que piensa, el prólogo de 1859 y la palabra «condiciona», la tabla de condicionar contra determinar, las críticas al lado de la tesis (Popper, las profecías, Cohen y la carta de Engels de 1890), el reduccionismo de brocha gorda con sus tres señales, los ocho casos del proyecto, la <strong>hoja de la base</strong> para llenar a mano, con sus avisos y un ejemplo ya lleno, seis ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-atomos-hombre-maquina.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige en toda la ruta: <strong>ningún estudio, obra o cifra entra sin su etiqueta</strong> (clásico sólido, clásico cuestionado, crítica clásica, defensa analítica seria).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>La Mettrie, «El hombre máquina» (1747):</strong> <strong>clásico sólido como documento de su tiempo</strong>. Y la etiqueta se dice entera, porque es media lección: <strong>su fisiología está superada; su gesto no</strong>.</li>
+      <li><strong>Marx, «Prólogo a la Contribución a la crítica de la economía política» (1859):</strong> <strong>clásico cuestionado</strong>: tesis potente, citada aquí con sus críticas. Es el texto corto donde está el verbo que ordena la etapa, <strong>condiciona</strong>.</li>
+      <li><strong>Marx y Engels, «La ideología alemana»</strong> (escrita en 1845 y 1846, publicada entera en 1932): <strong>clásico cuestionado</strong>. De aquí la fórmula de las ideas dominantes de cada época.</li>
+      <li><strong>Engels, carta a Joseph Bloch del 21 de septiembre de 1890:</strong> el documento que niega el determinismo <strong>desde dentro</strong>, y que reparte la culpa de la exageración entre sus dos autores.</li>
+      <li><strong>Popper, «La miseria del historicismo» (1957):</strong> <strong>la crítica clásica</strong>. El nombre del mecanismo por el que una tesis se inmuniza y deja de afirmar algo.</li>
+      <li><strong>G. A. Cohen, «La teoría de la historia de Karl Marx: una defensa» (1978):</strong> <strong>defensa analítica seria</strong>, para no quedarse con la caricatura de ningún bando. Defiende quitando lo indefendible.</li>
+      <li><strong>Las tres lecturas de esta misión:</strong> ejercicios de estilo escritos por la casa en homenaje a Borges, Cervantes y Harari. <strong>Pastiche declarado, no obra de esos autores</strong>, y con la erudición interna real: La Mettrie (1747) y su muerte en Berlín en 1751 bajo Federico II, Phineas Gage (1848) con la corrección de los historiadores, el prólogo de 1859, «La ideología alemana» (1845 a 1846, publicada en 1932), la carta de Engels a Bloch (21 de septiembre de 1890), Popper (1957), Cohen (1978) y el marxismo analítico, E. P. Thompson y «Time, Work-Discipline, and Industrial Capitalism» (1967), Lynn White Jr. y «Medieval Technology and Social Change» (1962) como tesis discutida, la revolución de 1917 en un país poco industrializado, la aventura de los batanes del Quijote (primera parte, 1605, capítulo veinte) y el peso de las remesas en el producto interno bruto de Honduras según el Banco Mundial son todos comprobables.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>con la base material de una institución de aquí escrita en media página</strong>, de modo que se pueda desmentir, y con la de esta casa al lado.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: la materia 23 completa, con sus seis módulos y su advertencia epistémica.</li>
+      <li><a href="../../misiones/ruta-atomos-contra-miedo/atomos-miedo.html">⚛️ Átomos contra el miedo</a>: la etapa 1 de esta ruta, donde nace la pregunta que aquí se sube dos escalones. Allá el objeto era el miedo; aquí, el cuerpo y la sociedad.</li>
+      <li><a href="../../misiones/ruta-gafas-mapa-familias/mapa-familias.html">🧬 El mapa de las familias</a>: la materia vecina se declaró dueña del concepto de ideología, así que la teoría completa de «las ideas dominantes» se estudia allá y aquí solo se usa.</li>
+      <li><a href="../../misiones/ruta-rojo-acero-juicio/acero-juicio.html">📕 El acero antes del juicio</a>: el tribunal completo a Marx (las profecías, Popper y Cohen a fondo) vive en el Expediente Rojo. Aquí entran solo como las críticas que acompañan a la herramienta.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 3 entra en la frontera de la conciencia, que esta etapa nombra y deja abierta a propósito.</li>
+      <li><a href="../../fichas/ficha-atomos-hombre-maquina.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja de la base cabe en una página, con su ejemplo ya lleno al lado.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> leer el prólogo de 1859, que es corto, y subrayar el verbo; aprenderse de memoria la prueba de una línea (<strong>¿qué tendría que pasar para que esto fuera falso?</strong>); y auditar tres instituciones de aquí, una por semana. La prueba de que está aprendida es <strong>que ya no se pueda escribir «lo dice porque le pagan» sin sentir vergüenza</strong>, y que la hoja de la propia casa exista, esté fechada y tenga su renglón de qué la haría cambiar.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">⚙️</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de los Átomos y los Ídolos · Etapa 2: El hombre máquina y la base material</div>
+    <div class="diploma-mascot" aria-hidden="true">⚙️</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">⚙️</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«El agua mueve los mazos, pero no decide qué paño se abatana» 🌱 · ⚙️ Ruta de los Átomos y los Ídolos · Etapa 2 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/hombre-maquina.js"></script>
+</body>
+</html>

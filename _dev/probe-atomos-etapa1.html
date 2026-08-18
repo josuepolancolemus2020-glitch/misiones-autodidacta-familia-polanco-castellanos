@@ -214,10 +214,10 @@ window.addEventListener('load', async () => {
     const ruta = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de los Átomos y los Ídolos/.test(c.textContent));
     ok(!!ruta, 'la Ruta de los Átomos y los Ídolos está en el mapa', 'no aparece la ruta');
     if (ruta) {
-      ok(ruta.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
-      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 5, 'y 5 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
-      ok(/Átomos contra el miedo/.test(ruta.textContent), 'la etapa 1 sale con el título de la misión', 'la etapa 1 no sale con su título');
-      ok(/El hombre máquina/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+      ok(ruta.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/Átomos contra el miedo/.test(ruta.textContent) && /El hombre máquina/.test(ruta.textContent), 'las etapas 1 y 2 salen con el título de su misión', 'alguna etapa construida no toma el título de MISSIONS');
+      ok(/La frontera de la conciencia/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
       ok(!/Etapa por construir/.test(ruta.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
     }
     wa.switchView('view-misiones'); await esperar(200);
@@ -227,7 +227,7 @@ window.addEventListener('load', async () => {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
       /* La materia «mayor» creció con el Expediente Rojo: ahora son tres. */
-      ok(tarjetas.length === 6, 'la materia muestra sus seis misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length === 7, 'la materia muestra sus siete misiones', 'muestra ' + tarjetas.length);
       const t = tarjetas.find(x => /Átomos contra el miedo/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
