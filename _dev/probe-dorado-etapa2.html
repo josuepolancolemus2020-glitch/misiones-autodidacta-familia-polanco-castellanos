@@ -539,11 +539,11 @@ window.addEventListener('load', async () => {
     const ruta = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta del Expediente Dorado/.test(c.textContent));
     ok(!!ruta, 'la Ruta del Expediente Dorado está en el mapa', 'no aparece la ruta');
     if (ruta) {
-      ok(ruta.querySelectorAll('.re-link').length === 4, 'con sus etapas 1, 2, 3 y 4 ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
-      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      ok(ruta.querySelectorAll('.re-link').length === 5, 'con sus cinco primeras etapas ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 2, 'y 2 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
       ok(/La gran fuga/i.test(ruta.textContent) && /Las fallas de la máquina/i.test(ruta.textContent),
          'las etapas 1 y 2 salen con el título de su misión', 'alguna etapa construida no toma el título de MISSIONS');
-      ok(/El escocés dorado/.test(ruta.textContent) && /Visto desde el patio/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+      ok(/La palabra gastada/.test(ruta.textContent) && /Visto desde el patio/.test(ruta.textContent), 'las dos siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
       ok(!/Etapa por construir/.test(ruta.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
     }
     /* El expediente gemelo tiene que seguir en pie al lado, porque la Bóveda
@@ -556,7 +556,7 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 11, 'la materia muestra sus once misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length === 12, 'la materia muestra sus doce misiones', 'muestra ' + tarjetas.length);
       const t = tarjetas.find(x => /fallas de la máquina/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
       ok(!!t && /🔧/.test(t.textContent), 'y su emoji propio', 'la misión no muestra su emoji');

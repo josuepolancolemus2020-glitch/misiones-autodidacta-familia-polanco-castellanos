@@ -1,0 +1,17 @@
+# Dónde empieza cada página de la ficha de «El escocés dorado» (Expediente
+# Dorado, etapa 5; norma 6: diez páginas y llenas). Calculados midiendo los
+# bloques con _dev/mide-ficha-paginas.html?f=...&bloques=1 y repartiéndolos
+# en diez hojas de entre 215 y 252 mm, con la condición extra de que ningún
+# encabezado se quede huérfano al pie de una página. Tres cortes caen en una
+# caja o en un caso, y por eso esos tres llevan una clase propia (caja
+# acero, caja fronteras, caso pulperias y caso propio): así se pueden anclar
+# sin ambigüedad y sin partir el bloque entre dos hojas.
+<h2>✋ La media frase, y lo que dice el párrafo</h2>
+<h2>📚 Pieza 1 · Dos libros, una sola cabeza</h2>
+<h2>😬 Pieza 3 · El Smith que incomoda a sus devotos</h2>
+<div class="caja acero">
+<div class="caja fronteras">
+<div class="caso pulperias">
+<div class="caso propio">
+<h2>✅ Una hoja de la cita ya llena, como ejemplo</h2>
+<h3>Ejercicio 4 · Verdadero o falso</h3>
