@@ -1,0 +1,17 @@
+# Dónde empieza cada página de la ficha de «Las dos facturas» (Expediente
+# Dorado, etapa 4; norma 6: diez páginas y llenas). Calculados midiendo los
+# bloques con _dev/mide-ficha-paginas.html?f=...&bloques=1 y repartiéndolos
+# en diez hojas de entre 215 y 252 mm, con la condición extra de que ningún
+# encabezado se quede huérfano al pie de una página. Cuatro cortes caen en
+# una tabla o en una caja, y por eso esas cuatro llevan una clase propia
+# (piezas, criticas param, caja acero, caja fronteras y caso propio): así se
+# pueden anclar sin ambigüedad y sin partir el bloque entre dos hojas.
+<table class="piezas">
+<table class="criticas param">
+<h2>🎓 Y dentro de la primera factura, otra: la movilidad</h2>
+<div class="caja acero">
+<div class="caja fronteras">
+<h2>📋 Los ocho casos del proyecto (4 a 6)</h2>
+<div class="caso propio">
+<h2>✅ Una hoja de la factura ya llena, como ejemplo</h2>
+<h3>Ejercicio 3 · Completa la oración</h3>
