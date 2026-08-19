@@ -73,9 +73,21 @@ async function revisa(mision, f) {
   } catch (e) { fallos++; log('  ✘ error: ' + e.message); return null; }
 }
 
+/* Se puede recorrer el catálogo POR TANDAS: ?desde=0&hasta=10.
+   Por qué hace falta: el corredor sin pantalla avanza con un reloj
+   virtual que se detiene mientras haya alguna petición de red sin
+   resolver, y cada misión pide fuentes de fuera que en el banco de
+   pruebas no responden. Con las treinta y ocho seguidas el proceso se
+   queda sin terminar aunque cada misión cargue en milisegundos. Sin
+   parámetros las recorre todas, como siempre. */
+const _p = new URLSearchParams(location.search);
+const DESDE = Number(_p.get('desde') || 0);
+const HASTA = Number(_p.get('hasta') || 0) || Infinity;
+
 window.addEventListener('load', async () => {
-  const MISIONES = await catalogo();
-  log('catálogo: ' + MISIONES.length + ' misiones');
+  const TODAS = await catalogo();
+  const MISIONES = TODAS.slice(DESDE, HASTA === Infinity ? undefined : HASTA);
+  log('catálogo: ' + TODAS.length + ' misiones · esta tanda: ' + MISIONES.length);
   const claves = new Map();
   for (let i = 0; i < MISIONES.length; i += TANDA) {
     const tanda = MISIONES.slice(i, i + TANDA);
@@ -89,8 +101,9 @@ window.addEventListener('load', async () => {
   }
   log('\n── CLAVES DE PROGRESO ──');
   const repes = [...claves.values()].filter((c, i, a) => a.indexOf(c) !== i);
-  ok(!repes.length, 'las ' + claves.size + ' misiones tienen clave propia', 'clave compartida: ' + [...new Set(repes)].join(', '));
+  ok(!repes.length, 'las ' + claves.size + ' misiones de la tanda tienen clave propia', 'clave compartida: ' + [...new Set(repes)].join(', '));
   log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda del quiz de todas';
 });
 </script>
 </body>

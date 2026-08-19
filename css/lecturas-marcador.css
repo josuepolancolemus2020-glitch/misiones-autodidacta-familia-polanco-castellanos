@@ -223,3 +223,11 @@
      verdad se arma en su ventana aparte, como manda la casa. */
   .fm-barra, .fm-modal, .fm-item-btns, .fm-acciones { display: none !important; }
 }
+
+/* El estado de la nube, en el panel. Va a la vista y no escondido en un
+   icono: quien escribe una nota tiene derecho a saber si ya viajó o si
+   todavía vive solo en este aparato. */
+.fm-estado {
+  font-size: 0.78rem; font-weight: 700; color: var(--gray, #64748b);
+  margin: 2px 0 8px;
+}

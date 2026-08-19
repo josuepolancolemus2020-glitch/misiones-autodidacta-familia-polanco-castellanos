@@ -293,6 +293,79 @@ pasó una vez y lo cazó la sonda, no el ojo.
    interceptando `window.open`) **y que las doce misiones lo traigan
    enganchado**.
 
+## 5-septies. El marcador va en TODA misión, y lo marcado viaja
+
+**Norma nueva, pedida por el autor el 19 de agosto de 2026.** El marcador
+de la norma 5-sexies deja de ser cosa del Estudio Mayor: va en **las 38
+misiones del catálogo**, y **lo subrayado y lo anotado se guarda de modo
+que aparezca al cambiar de aparato**.
+
+### Dónde se subraya en una misión sin Lecturas
+
+Las rutas del adulto no tienen sección de Lecturas, pero tienen tanta
+prosa de estudio como ellas. El marcador mira el documento y decide solo,
+sin nada que configurar por misión:
+
+- si hay lecturas, las zonas son las **cinco tarjetas** de lectura;
+- si no, son las secciones de prosa: **Aprende, Estructura, Casos y
+  Guion**.
+
+Y dentro de una zona se puede subrayar la prosa: los párrafos sueltos de
+las tarjetas, el cuerpo de los avisos `.tip` (donde suele estar la regla
+de la etapa dicha en una frase) y las cajas `.ex-box`. **Nunca un trozo
+que lleve dentro un botón, un campo o un elemento con `id`**: al pintar
+una marca se rehace el HTML de ese trozo, y rehacer un trozo con un botón
+lo dejaría sin su manejador, es decir rompería la misión en silencio.
+
+### Lo marcado viaja, y cómo
+
+Esto **cambia la decisión anterior** de la norma 5-sexies, que dejaba las
+notas en el aparato. Ahora se guardan **dos veces**:
+
+1. **En el aparato**, primero y siempre. Es lo que hace que funcione al
+   instante y sin señal. La nube va por encima, nunca en lugar de esto.
+2. **En la nube de la casa**, tabla `lecturas_marcas`
+   (`supabase/sql/lecturas_marcas.sql`), con seguridad por fila. La llave
+   es **el usuario que entró, no el aparato**: los cuatro comparten
+   tabletas y las notas de una hija no tienen por qué salirle al padre.
+
+Cuatro reglas que no son de adorno, y cada una viene de un fallo posible:
+
+- **Borrar deja una lápida, no un hueco.** Si el teléfono borrara la fila
+  sin más, la tableta que aún tiene su copia la volvería a subir y la
+  marca resucitaría sola. La lápida se barre a los 180 días.
+- **Al chocar dos versiones, gana la más reciente; pero si las dos traen
+  NOTA escrita y son distintas, se conservan LAS DOS**, una debajo de la
+  otra. Un subrayado se rehace en dos segundos; lo que alguien escribió
+  con sus palabras, no. El reloj que ordena es el del aparato, que puede
+  estar mal, y por eso lo irremplazable no se descarta nunca.
+- **La nube se carga sola y solo si hace falta.** El marcador trae
+  `supabase.min.js` y `js/auth.js` **únicamente si ya hay sesión guardada
+  en ese navegador**. Cargarlos siempre haría que las 38 misiones pidieran
+  red al abrirse aunque nadie fuera a subrayar. El cliente lo sigue
+  creando `js/auth.js`, que es el ÚNICO de la casa.
+- **El panel dice a la vista si viajó o no**: «☁️ Guardado también en la
+  nube» o «📴 Solo en este aparato». Quien escribe una nota tiene derecho
+  a saberlo sin abrir nada.
+
+### Dónde vive el panel
+
+Antes de las preguntas de las lecturas si las hay; si no, **al final de
+Recursos**, que es la última sección de toda misión. La leyenda del código
+de colores va arriba del todo, en la primera tarjeta de la primera zona:
+hay que conocer el código **antes** de subrayar.
+
+### Verificación
+
+`_dev/probe-lecturas-marcador.html` comprueba, además de lo suyo, que las
+**38 misiones del catálogo** traigan el marcador y su hoja en orden y
+**sin cargar la nube de más**, y prueba la sincronización con un cliente
+falso: que suba, que baje lo de otro aparato, que el borrado viaje como
+lápida y que **al chocar dos notas distintas se conserven las dos**. Las
+38 se miran leyendo su HTML y tres se abren de verdad, una de cada clase:
+abrir treinta y ocho misiones con su motor completo cuelga el banco de
+pruebas antes de la décima.
+
 ## 5-bis. El widget de ordenar se arrastra, y la linterna cuesta
 
 **Norma nueva, pedida por el autor el 17 de agosto de 2026**, después de

@@ -34,9 +34,23 @@ async function catalogo() {
   return new Function(src + '; return MISSIONS;')();
 }
 
+/* Se puede recorrer el catálogo POR TANDAS: ?desde=0&hasta=10.
+   Por qué hace falta: el corredor sin pantalla avanza con un reloj
+   virtual que se detiene mientras haya alguna petición de red sin
+   resolver, y cada misión pide fuentes de fuera que en el banco de
+   pruebas no responden. Con las treinta y ocho seguidas el proceso se
+   queda sin terminar aunque cada misión cargue en milisegundos, así que
+   se corre en cuatro tandas y se suman los veredictos. Sin parámetros
+   las recorre todas, como siempre. */
+const _p = new URLSearchParams(location.search);
+const DESDE = Number(_p.get('desde') || 0);
+const HASTA = Number(_p.get('hasta') || 0) || Infinity;
+
 window.addEventListener('load', async () => {
-  const MIS = await catalogo();
-  log('catálogo: ' + MIS.length + ' misiones\n');
+  const TODAS = await catalogo();
+  const MIS = TODAS.slice(DESDE, HASTA === Infinity ? undefined : HASTA);
+  log('catálogo: ' + TODAS.length + ' misiones · esta tanda: ' + MIS.length
+      + (DESDE || HASTA !== Infinity ? ' (de la ' + DESDE + ' a la ' + Math.min(HASTA, TODAS.length) + ')' : '') + '\n');
   for (const m of MIS) {
     const f = document.createElement('iframe');
     f.src = '/' + m.url.split('/').map(encodeURIComponent).join('/');
@@ -71,6 +85,7 @@ window.addEventListener('load', async () => {
     f.remove();
   }
   log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda de arranque de misiones';
 });
 </script>
 </body>

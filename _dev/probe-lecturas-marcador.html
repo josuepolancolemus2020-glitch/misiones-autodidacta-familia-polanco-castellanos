@@ -195,35 +195,131 @@ f.onload=async()=>{
     const despues=d.querySelector('#lect-borges .lect-p').textContent;
     ok(antes===despues, 'el texto del párrafo queda idéntico tras marcar y desmarcar', 'el texto cambió al marcar y desmarcar');
 
-    log('\n── LAS DOCE MISIONES DEL ESTUDIO MAYOR ──');
-    /* El aparato es compartido: si una misión se queda sin enganchar, sus
-       lecturas se leen sin poder subrayar y nadie se entera hasta que
-       alguien lo intenta. */
-    const MIS=[['ruta-espejo-vigia-timon','vigia-timon'],['ruta-atomos-contra-miedo','atomos-miedo'],
-      ['ruta-atomos-hombre-maquina','hombre-maquina'],['ruta-rojo-acero-juicio','acero-juicio'],
-      ['ruta-gafas-palabra-expediente','gafas-expediente'],['ruta-gafas-bisturi-freeden','bisturi-freeden'],
-      ['ruta-gafas-mapa-familias','mapa-familias'],['ruta-dorado-gran-fuga','gran-fuga'],
-      ['ruta-dorado-fallas-maquina','fallas-maquina'],['ruta-dorado-dinero-no-compra','dinero-no-compra'],
-      ['ruta-dorado-dos-facturas','dos-facturas'],['ruta-dorado-escoces-dorado','escoces-dorado']];
+    log('\n── LA NUBE: QUE VIAJE ENTRE APARATOS ──');
+    /* No hay Supabase en el banco de pruebas, así que se le pone al
+       marcador un cliente FALSO que se comporta como el de verdad. Lo
+       que se está probando no es la red: es la FUSIÓN, que es donde se
+       pierden las notas de la gente si está mal. */
+    const nube = { filas: [] };
+    w.faroSb = {
+      auth: {
+        getSession: async () => ({ data: { session: { user: { id: 'u-prueba' } } } }),
+        onAuthStateChange: () => {},
+      },
+      from: () => ({
+        select: () => ({ eq: () => ({ eq: async () => ({ data: nube.filas.slice(), error: null }) }) }),
+        upsert: async (filas) => {
+          filas.forEach(f => {
+            const k = nube.filas.findIndex(x => x.id === f.id);
+            if (k >= 0) nube.filas[k] = f; else nube.filas.push(f);
+          });
+          return { error: null };
+        },
+      }),
+    };
+    await w.FaroMarcador.sincronizar(true); await esperar(300);
+    ok(w.FaroMarcador.estadoNube()==='al-dia', 'con sesión, el panel dice que está en la nube', 'estado: '+w.FaroMarcador.estadoNube());
+    ok(nube.filas.length>0, 'lo marcado en este aparato sube', 'no subió nada');
+    const subida = nube.filas.find(f=>f.nota && /Comprobar esta fecha/.test(f.nota));
+    ok(!!subida, 'y la nota escrita sube con su marca', 'la nota no viajó');
+    ok(!!subida && subida.user_id==='u-prueba' && subida.mision===w.eval('SAVE_KEY'),
+      'cada fila lleva su dueño y su misión', 'la fila no identifica dueño o misión');
+    ok(nube.filas.some(f=>f.borrada===true), 'el borrado viaja como lápida, no como ausencia',
+      'una marca borrada aquí resucitaría en el otro aparato');
+
+    /* Lo que llega de OTRO aparato tiene que aparecer aquí. */
+    const ajena = { id:'m-de-otro-aparato', user_id:'u-prueba', mision:w.eval('SAVE_KEY'),
+      zona:'harari', parrafo:0, ini:0, fin:40, texto:null, color:'idea', nota:'Escrita en la tableta',
+      borrada:false, actualizado:Date.now(), fecha:'2026-08-19' };
+    const pH=d.querySelector('#lect-harari .lect-p');
+    ajena.texto=pH.textContent.slice(0,40);
+    nube.filas.push(ajena);
+    await w.FaroMarcador.sincronizar(true); await esperar(300);
+    const bajada=w.FaroMarcador.marcas().find(m=>m.id==='m-de-otro-aparato');
+    ok(!!bajada, 'lo marcado en otro aparato baja a este', 'no llegó la marca del otro aparato');
+    ok(!!bajada && bajada.n==='Escrita en la tableta', 'con su nota', 'la nota del otro aparato se perdió');
+    ok(!!d.querySelector('#lect-harari .fm-hl-idea'), 'y se pinta en el texto', 'la marca de fuera no se pintó');
+
+    /* LA PRUEBA QUE MÁS IMPORTA: dos aparatos escriben notas distintas
+       sobre la misma marca. Ninguna de las dos se puede perder. */
+    const local=w.FaroMarcador.marcas().find(m=>m.id==='m-de-otro-aparato');
+    local.n='Y esto lo escribí en el teléfono'; local.u=Date.now()+1000;
+    const enNube=nube.filas.find(f=>f.id==='m-de-otro-aparato');
+    enNube.nota='Nota vieja de la tableta'; enNube.actualizado=Date.now()+2000;
+    await w.FaroMarcador.sincronizar(true); await esperar(300);
+    const fus=w.FaroMarcador.marcas().find(m=>m.id==='m-de-otro-aparato');
+    ok(!!fus && /teléfono/.test(fus.n) && /tableta/.test(fus.n),
+      'al chocar dos notas distintas se conservan LAS DOS', 'se perdió una nota al fusionar: '+(fus?fus.n:'sin marca'));
+
+    log('\n── TODAS LAS MISIONES DEL CATÁLOGO ──');
+    /* El aparato es compartido: si una misión se queda sin enganchar,
+       sus textos se leen sin poder subrayar y nadie se entera hasta que
+       alguien lo intenta. La lista sale del catálogo, así que esta
+       comprobación no hay que actualizarla al construir una misión nueva.
+
+       Las 38 se miran LEYENDO su HTML, no abriéndolas: abrir cada una
+       carga su motor, Supabase y html2canvas, y espera a una red que en
+       el banco de pruebas no existe; el navegador se queda colgado antes
+       de la décima. Lo que hay que comprobar en las 38 es el enganche, y
+       eso está en el texto del documento. Después se abren TRES de
+       verdad, una de cada clase, para ver que el aparato vive. */
+    let urls=[];
+    try{
+      const txt=await (await fetch('/js/data/misiones.js')).text();
+      const f2=new Function('ASIGNACIONES', txt+'; return MISSIONS;');
+      urls=f2([]).map(m=>m.url);
+    }catch(e){ fallos++; log('  ✘ no se pudo leer el catálogo: '+e.message); }
+    ok(urls.length>0, 'el catálogo trae '+urls.length+' misiones', 'no se pudo leer el catálogo');
+    const malas=[];
+    for(const url of urls){
+      let h='';
+      try{ h=await (await fetch('/'+url)).text(); }catch(e){ malas.push(url+'(no carga)'); continue; }
+      const falta=[];
+      if(h.indexOf('lecturas-marcador.css')<0) falta.push('hoja');
+      if(h.indexOf('lecturas-marcador.js')<0) falta.push('marcador');
+      /* El orden importa: el marcador necesita la SAVE_KEY de la misión
+         ya declarada, así que va DESPUÉS del JS de la misión. */
+      const iMis=h.search(/<script src="js\/[a-z0-9-]+\.js"><\/script>/);
+      if(iMis>=0 && iMis>h.indexOf('lecturas-marcador.js')) falta.push('orden');
+      /* Y NO debe traer la nube cargada de antemano: si la trajera, las
+         treinta y ocho misiones pedirían red al abrirse aunque nadie
+         fuera a subrayar. La carga el marcador cuando hay sesión. */
+      if(h.indexOf('../../js/auth.js')>=0 || h.indexOf('../../js/supabase.min.js')>=0) falta.push('nube-ansiosa');
+      if(falta.length) malas.push(url.split('/')[1]+'('+falta.join(',')+')');
+    }
+    ok(malas.length===0, 'las '+urls.length+' misiones traen el marcador y su hoja, en orden y sin cargar la nube de más',
+      'fallan '+malas.length+': '+malas.slice(0,6).join(' · '));
+
+    /* Y tres abiertas de verdad: una del Estudio Mayor (con Lecturas),
+       una de las rutas del adulto (con prosa de Aprende, Estructura y
+       Casos) y una escolar, que es el caso más viejo del catálogo. */
+    const MUESTRA=[
+      ['misiones/ruta-gafas-bisturi-freeden/bisturi-freeden.html','Estudio Mayor','lect'],
+      ['misiones/ruta-poder-deuda/deuda.html','ruta del adulto','prosa'],
+      ['misiones/epistemología/karl-popper.html','escolar','prosa'],
+    ];
     const g=document.createElement('iframe');
     g.style.cssText='width:380px;height:600px;border:0;position:absolute;left:-9999px;';
     document.body.appendChild(g);
-    let bien=0; const malas=[];
-    for(const [carpeta,base] of MIS){
-      await new Promise(res=>{ g.onload=res; g.src='/misiones/'+carpeta+'/'+base+'.html'; });
-      await esperar(700);
+    for(const [url,clase,tipo] of MUESTRA){
+      await new Promise(res=>{ g.onload=res; g.src='/'+encodeURI(url); });
+      await esperar(1500);
       const gw=g.contentWindow, gd=g.contentDocument;
-      const tieneModulo=typeof gw.FaroMarcador==='object';
-      const tieneHoja=!!gd.querySelector('link[href*="lecturas-marcador.css"]');
-      const tienePanel=!!gd.getElementById('fmPanel');
-      const tieneLeyenda=!!gd.querySelector('#s-lecturas .fm-leyenda');
-      const cinco=gd.querySelectorAll('#s-lecturas .card[id^="lect-"]').length===5;
-      if(tieneModulo&&tieneHoja&&tienePanel&&tieneLeyenda&&cinco) bien++;
-      else malas.push(base+'(mod:'+tieneModulo+' hoja:'+tieneHoja+' panel:'+tienePanel+' ley:'+tieneLeyenda+' 5lect:'+cinco+')');
+      const mod=typeof gw.FaroMarcador==='object';
+      const zs=mod?gw.FaroMarcador.zonas():[];
+      const conTexto=zs.filter(z=>z.parrafos>0);
+      ok(mod && !!gd.getElementById('fmPanel') && !!gd.querySelector('.fm-leyenda') && conTexto.length>0,
+        clase+': el marcador vive, con '+conTexto.length+' zonas y '+conTexto.reduce((a,z)=>a+z.parrafos,0)+' trozos marcables',
+        clase+' ('+url+'): mod:'+mod+' panel:'+(mod&&!!gd.getElementById('fmPanel'))+' zonas:'+JSON.stringify(zs));
+      /* La de prosa NO tiene lecturas: sus zonas son las secciones. */
+      if(tipo==='prosa') ok(conTexto.some(z=>z.clave.indexOf('s-')===0),
+        '  y sus zonas son las secciones de prosa', '  no encontró secciones de prosa: '+JSON.stringify(zs));
+      if(tipo==='lect') ok(conTexto.length===5, '  y son sus cinco lecturas', '  zonas: '+conTexto.length);
+      /* Y el motor de la misión sigue entero pese a cargar la puerta. */
+      ok(gw.eval('typeof qzData!=="undefined" && qzData.length>0'),
+        '  el quiz de la misión sigue funcionando', '  cargar la puerta rompió el motor de la misión');
     }
     g.remove();
-    ok(bien===12, 'las doce misiones traen el marcador enganchado y sus cinco lecturas',
-      'fallan: '+malas.join(' · '));
     cerrar();
   }catch(e){ fallos++; log('✘ '+e.message+'\n'+e.stack); cerrar(); }
 };
