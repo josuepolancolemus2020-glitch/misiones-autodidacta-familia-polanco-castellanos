@@ -567,7 +567,12 @@
   let nubePedida = false;
   async function asegurarCliente(forzar) {
     if (window.faroSb) return window.faroSb;
-    if (!forzar && !haySesionGuardada()) return null;
+    /* Sin sesión guardada no hay nada que sincronizar, ni siquiera
+       cuando lo pide el botón: descargar Supabase entero (más de
+       doscientos kilobytes, a veces con datos que se pagan) para acabar
+       diciendo «entra primero» es cobrarle a alguien por una respuesta
+       que ya se sabía. */
+    if (!haySesionGuardada()) return null;
     if (nubePedida) return window.faroSb || null;
     nubePedida = true;
     try {
@@ -752,7 +757,15 @@
       return;
     }
     const u = await usuarioActual();
-    if (!u) { estadoNube = 'sin-sesion'; pintarEstado(); return; }
+    if (!u) {
+      /* Si hay sesión guardada en este navegador y aun así no se pudo
+         leer quién es, el problema es la señal, no la puerta. Decirle a
+         alguien que entre cuando ya está dentro lo manda a pelear con
+         una contraseña que no hacía falta. */
+      estadoNube = haySesionGuardada() ? 'error' : 'sin-sesion';
+      pintarEstado();
+      return;
+    }
     /* Ya se sabe quién es: a partir de aquí se trabaja en SU cajón. */
     if (mudarAlCajonDe(u.id)) { reanclar(); pintarTodo(true); }
     sincronizando = true;

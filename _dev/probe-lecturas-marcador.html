@@ -195,6 +195,21 @@ f.onload=async()=>{
     const despues=d.querySelector('#lect-borges .lect-p').textContent;
     ok(antes===despues, 'el texto del párrafo queda idéntico tras marcar y desmarcar', 'el texto cambió al marcar y desmarcar');
 
+    log('\n── SIN SESIÓN NO SE DESCARGA LA NUBE ──');
+    /* La promesa de la norma 5-septies: abrir una misión no pide red ni
+       descarga Supabase si no hay sesión guardada. Si esto se rompiera,
+       las 38 misiones tardarían más en abrir para nada, y nadie lo
+       notaría hasta estar sin señal. */
+    ok(typeof w.supabase === 'undefined' && !w.faroSb,
+      'al abrir la misión sin sesión no se ha traído Supabase', 'se descargó la nube sin hacer falta');
+    ok(w.FaroMarcador.estadoNube() === 'sin-sesion' || w.FaroMarcador.estadoNube() === 'local',
+      'y el panel dice que lo marcado vive solo en este aparato', 'estado: ' + w.FaroMarcador.estadoNube());
+    const antesBoton = typeof w.supabase;
+    d.getElementById('fmBtnNube').click(); await esperar(700);
+    ok(typeof w.supabase === antesBoton,
+      'ni siquiera al pulsar «Sincronizar ahora», que avisa sin descargar nada',
+      'el botón se descargó Supabase entero para acabar diciendo que hay que entrar');
+
     log('\n── LA NUBE: QUE VIAJE ENTRE APARATOS ──');
     /* No hay Supabase en el banco de pruebas, así que se le pone al
        marcador un cliente FALSO que se comporta como el de verdad. Lo

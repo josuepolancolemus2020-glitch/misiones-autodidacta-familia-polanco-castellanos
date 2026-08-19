@@ -355,6 +355,12 @@ Las reglas, y cada una viene de un fallo que se probó de verdad:
   vuelve con ella en vez de quedar enterrada. El reloj que ordena es el
   del aparato, que puede estar mal, y por eso lo irremplazable no se
   descarta nunca.
+- **Sin sesión no se descarga la nube, ni aunque se pulse el botón.**
+  Traerse Supabase entero para acabar diciendo «entra primero» es cobrarle
+  a alguien datos por una respuesta que ya se sabía. Y al revés: con
+  sesión guardada pero sin señal, el panel dice que falló la nube, nunca
+  que hay que entrar, porque mandar a alguien a pelear con una contraseña
+  que no hacía falta es el peor aviso posible.
 - **El panel nunca miente sobre dónde está lo escrito.** Hay un estado
   para lo que se acaba de marcar y todavía no ha subido; decir «guardado
   también en la nube» con algo sin subir es lo que hace que alguien
