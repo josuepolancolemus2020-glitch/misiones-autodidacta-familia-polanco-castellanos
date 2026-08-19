@@ -13,10 +13,12 @@ pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
 /* Comprueba la etapa 2 de la Ruta de las Gafas a la Vista (Estudio de las
    Ideologías, materia 25 del Estudio Mayor): bancos, laboratorio, pruebas
    impresas con su nombre, los ocho casos, la ficha, la ruta en el mapa, las
-   dos secciones de la norma 5 (guion de video y tres lecturas) y las TRES
-   BATERÍAS de la norma 5-quater (15 de comprensión lectora, 10 de completar
-   y 10 de análisis complejo), con la impresión de cada lectura comprobada
-   de verdad.
+   dos secciones de la norma 5 (guion de video y las lecturas, que desde la
+   norma 5-quinquies son CINCO: las dos entrevistas imaginadas incluidas) y
+   las TRES BATERÍAS de la norma 5-quater (25 de comprensión lectora, 10 de
+   completar y 10 de análisis complejo), con la impresión de cada lectura
+   comprobada de verdad y la etiqueta de la ficción («el encuentro nunca
+   ocurrió») exigida en pantalla y en papel.
 
    La REGLA DEL ESTATUS del compendio rige también aquí: Gallie 1956 como
    clásico sólido de la filosofía, Berlin 1958 como clásico sólido y fuente
@@ -127,12 +129,12 @@ window.addEventListener('load', async () => {
     /* Las tres baterías de preguntas de las lecturas, pedidas por el autor:
        15 de comprensión lectora (5 por texto), 10 de completar y 10 de
        análisis complejo, y las diez de análisis con su pauta escrita. */
-    ok(dentro('lectComprensionBank.length') === 15, '15 preguntas de comprensión lectora', 'comprensión: ' + dentro('lectComprensionBank.length'));
+    ok(dentro('lectComprensionBank.length') === 25, '25 preguntas de comprensión lectora', 'comprensión: ' + dentro('lectComprensionBank.length'));
     ok(dentro('lectCompletarBank.length') === 10, '10 preguntas de completar', 'completar: ' + dentro('lectCompletarBank.length'));
     ok(dentro('lectAnalisisBank.length') === 10, '10 preguntas de análisis complejo', 'análisis: ' + dentro('lectAnalisisBank.length'));
     ok(dentro('lectComprensionBank.every(q => q.o.length === 4 && typeof q.c === "number" && q.o[q.c] && q.t)'),
        'cada pregunta de comprensión trae 4 opciones, su clave y de qué texto sale', 'el banco de comprensión está mal formado');
-    ['Borges', 'Cervantes', 'Harari'].forEach(voz => {
+    ['Borges', 'Cervantes', 'Harari', 'Entrevista', 'Quintero y Gala'].forEach(voz => {
       const n = dentro('lectComprensionBank.filter(q => q.t === "' + voz + '").length');
       ok(n === 5, 'cinco preguntas del texto de ' + voz, voz + ': ' + n + ' preguntas');
     });
@@ -186,7 +188,7 @@ window.addEventListener('load', async () => {
       ok(!!d.querySelector('.nav-t[data-s="s-guion"]'), 'está en la barra de navegación', 'no aparece en la barra');
     }
 
-    log('\n── LAS TRES LECTURAS (norma 5) ──');
+    log('\n── LAS CINCO LECTURAS (normas 5 y 5-quinquies) ──');
     const lect = d.getElementById('s-lecturas');
     ok(!!lect, 'existe la sección de lecturas', 'falta la sección s-lecturas');
     if (lect) {
@@ -215,6 +217,30 @@ window.addEventListener('load', async () => {
       /* Las tres lecturas deben ENSEÑAR el tema, no solo sonar bonito */
       ok(/descontestaci/i.test(tl) && /núcleo/i.test(tl) && /perifer/i.test(tl), 'las lecturas explican el instrumento de la etapa', 'las lecturas no tocan el tema');
       ok(/libertad negativa/i.test(tl) || /que nadie me estorbe/i.test(tl), 'las dos libertades aparecen dentro de los textos', 'los textos no cargan el ejemplo central');
+      /* Las dos entrevistas de la norma 5-quinquies: existen con sus ids
+         fijos, declaran con todas las letras que el encuentro nunca ocurrió,
+         presentan de verdad a las personas reales, dialogan sin raya (nombre
+         en mayúsculas y punto) y ENSEÑAN el temario de la etapa. */
+      const cardEnt = d.getElementById('lect-entrevista'), cardGala = d.getElementById('lect-gala');
+      ok(!!cardEnt, 'la entrevista de la casa está (lect-entrevista)', 'falta la tarjeta lect-entrevista');
+      ok(!!cardGala, 'la conversación del Loco de la Colina está (lect-gala)', 'falta la tarjeta lect-gala');
+      const notaEnt = (d.querySelector('#lect-entrevista .lect-nota') || { textContent: '' }).textContent;
+      const notaGala = (d.querySelector('#lect-gala .lect-nota') || { textContent: '' }).textContent;
+      ok(/nunca ocurrió/i.test(notaEnt), 'la entrevista declara que el encuentro nunca ocurrió', 'la entrevista no declara la ficción');
+      ok(/nunca ocurrió/i.test(notaGala), 'y la conversación también lo declara', 'la conversación no declara la ficción');
+      ok(/Freeden/.test(notaEnt) && /1944/.test(notaEnt) && /Juan Cruz/.test(notaEnt) && /El País/.test(notaEnt) && /1976/.test(notaEnt),
+         'la entrevista presenta de verdad a Freeden (1944) y a Juan Cruz (El País, 1976)', 'faltan las señas reales de la entrevista');
+      ok(/Quintero/.test(notaGala) && /1940/.test(notaGala) && /Gala/.test(notaGala) && /1930/.test(notaGala) && /loco de la colina/i.test(notaGala),
+         'la conversación presenta a Quintero (1940) y a Gala (1930) con sus señas', 'faltan las señas reales de la conversación');
+      ok(cardEnt && /CRUZ\./.test(cardEnt.textContent) && /FREEDEN\./.test(cardEnt.textContent),
+         'la entrevista marca los hablantes en mayúsculas y punto, sin raya', 'la entrevista no usa el formato de teatro');
+      ok(cardGala && /QUINTERO\./.test(cardGala.textContent) && /GALA\./.test(cardGala.textContent),
+         'la conversación también, como manda la norma 1-bis', 'la conversación no usa el formato de teatro');
+      ok(cardGala && /\(Silencio/.test(cardGala.textContent), 'los silencios de Quintero van en acotación', 'faltan los silencios en acotación');
+      ok(cardEnt && /1956/.test(cardEnt.textContent) && /1958/.test(cardEnt.textContent) && /1996/.test(cardEnt.textContent) && /descontestaci/i.test(cardEnt.textContent),
+         'la entrevista carga las fechas del instrumento y el movimiento clave', 'la entrevista no enseña el temario');
+      ok(cardGala && /1956/.test(cardGala.textContent) && /1958/.test(cardGala.textContent) && /1948/.test(cardGala.textContent) && /núcleo/i.test(cardGala.textContent),
+         'los datos exactos entran por la boca de Quintero y el núcleo por la de Gala', 'la conversación no enseña el temario');
       ok(!!d.querySelector('.nav-t[data-s="s-lecturas"]'), 'está en la barra de navegación', 'no aparece en la barra');
     }
 
@@ -223,7 +249,7 @@ window.addEventListener('load', async () => {
     /* I. Comprensión lectora: se pinta, se contesta bien y da XP una vez. */
     ok(d.getElementById('lcQ').textContent.length > 15, 'la comprensión lectora pinta su primera pregunta', 'comprensión vacía');
     ok(d.querySelectorAll('#lcOpts .qz-opt').length === 4, 'con sus cuatro opciones', 'opciones: ' + d.querySelectorAll('#lcOpts .qz-opt').length);
-    ok(/Pregunta 1 de 15/.test(d.getElementById('lcProg').textContent), 'y su contador de 15', 'contador: ' + d.getElementById('lcProg').textContent);
+    ok(/Pregunta 1 de 25/.test(d.getElementById('lcProg').textContent), 'y su contador de 25', 'contador: ' + d.getElementById('lcProg').textContent);
     const xpLc = dentro('xp');
     d.querySelectorAll('#lcOpts .qz-opt')[dentro('lectComprensionBank[0].c')].click();
     w.checkLectC(); await esperar(120);
@@ -281,20 +307,39 @@ window.addEventListener('load', async () => {
          'el ensayo se imprime completo', 'el ensayo no se imprime');
       ok(/NO es obra de ese autor/i.test(hh), 'y con su etiqueta', 'la hoja del ensayo sale sin etiqueta');
 
-      w.imprimirLasTresLecturas();
+      /* Las dos entrevistas se imprimen con la etiqueta que su género exige:
+         el encuentro nunca ocurrió. Una hoja suelta viaja sola, y una
+         entrevista apócrifa sin declarar sería peor que un pastiche. */
+      w.imprimirLectura('entrevista');
+      const hent = abiertos[abiertos.length - 1] || '';
+      ok(/El cartógrafo de las ideologías/.test(hent) && /FREEDEN\./.test(hent) && /CRUZ\./.test(hent),
+         'la entrevista se imprime completa', 'la entrevista no se imprime');
+      ok(/nunca ocurrió/i.test(hent), 'y su hoja declara que el encuentro nunca ocurrió', 'la hoja de la entrevista sale sin la etiqueta de la ficción');
+      w.imprimirLectura('gala');
+      const hg = abiertos[abiertos.length - 1] || '';
+      ok(/La palabra abierta/.test(hg) && /QUINTERO\./.test(hg) && /GALA\./.test(hg),
+         'la conversación se imprime completa', 'la conversación no se imprime');
+      ok(/nunca ocurrió/i.test(hg), 'y su hoja también declara la ficción', 'la hoja de la conversación sale sin etiqueta');
+      ok(!/—/.test(hent) && !/—/.test(hg), 'las dos hojas nuevas van sin guiones largos', 'una hoja nueva trae guiones largos');
+
+      w.imprimirTodasLasLecturas();
       const h3 = abiertos[abiertos.length - 1] || '';
-      ok(/La palabra que no se deja cerrar/.test(h3) && /siendo dos libertades/.test(h3) && /La palabra que firmaron todos/.test(h3),
-         'las tres lecturas se imprimen juntas en un solo pliego', 'el pliego de las tres no sale completo');
-      ok((h3.match(/page-break-before/g) || []).length >= 2, 'y cada una arranca en su propia hoja', 'las tres salen pegadas');
+      ok(/La palabra que no se deja cerrar/.test(h3) && /siendo dos libertades/.test(h3) && /La palabra que firmaron todos/.test(h3)
+         && /El cartógrafo de las ideologías/.test(h3) && /La palabra abierta/.test(h3),
+         'las cinco lecturas se imprimen juntas en un solo pliego', 'el pliego de las cinco no sale completo');
+      ok(/nunca ocurrió/i.test(h3), 'y el pliego declara la ficción de las dos entrevistas', 'el pliego junto no declara la ficción');
+      ok((h3.match(/page-break-before/g) || []).length >= 4, 'y cada una arranca en su propia hoja', 'las cinco salen pegadas');
 
       w.imprimirPreguntasLecturas();
       const hp = abiertos[abiertos.length - 1] || '';
-      ok(/I\. Comprensión lectora \(15 preguntas\)/.test(hp) && /II\. Completa la oración \(10 preguntas\)/.test(hp) && /III\. Análisis complejo \(10 preguntas\)/.test(hp),
+      ok(/I\. Comprensión lectora \(25 preguntas\)/.test(hp) && /II\. Completa la oración \(10 preguntas\)/.test(hp) && /III\. Análisis complejo \(10 preguntas\)/.test(hp),
          'el pliego de preguntas trae las tres secciones', 'al pliego de preguntas le falta una sección');
+      ok(/cinco textos/i.test(hp) && /nunca ocurrió/i.test(hp),
+         'el pliego declara que los textos son cinco y la ficción de las entrevistas', 'el pliego de preguntas no declara los cinco textos');
       ok(/Pauta completa de respuestas/.test(hp) && /class="pauta"/.test(hp),
          'con su pauta, y en su propia hoja al final', 'la pauta no queda separada del ejercicio');
       const nOps = (hp.match(/class="op"/g) || []).length;
-      ok(nOps === 60, 'las 15 preguntas salen con sus 60 opciones', 'opciones impresas: ' + nOps);
+      ok(nOps === 100, 'las 25 preguntas salen con sus 100 opciones', 'opciones impresas: ' + nOps);
       ok((hp.match(/_______________/g) || []).length === 10, 'las 10 de completar salen con su hueco', 'huecos impresos: ' + (hp.match(/_______________/g) || []).length);
       ok((hp.match(/class="ln-alta"/g) || []).length === 30, 'las 10 de análisis salen con tres renglones cada una', 'renglones: ' + (hp.match(/class="ln-alta"/g) || []).length);
       ok(!/—/.test(hp), 'y el pliego va sin guiones largos', 'el pliego trae guiones largos');

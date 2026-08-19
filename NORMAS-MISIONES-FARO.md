@@ -102,7 +102,8 @@ contestada, y el cierre que aterriza en una acción de esta semana con el
 nombre de la misión. Cada escena lleva VOZ, IMAGEN y TEXTO EN PANTALLA.
 Nada de definiciones antes del minuto dos.
 
-**Las tres lecturas (📖 Lecturas).** Tres textos que explican el tema de
+**Las tres lecturas (📖 Lecturas).** (Desde el 19 de agosto de 2026 son
+cinco: ver la norma 5-quinquies.) Tres textos que explican el tema de
 la etapa por tres puertas distintas, escritos por la casa como ejercicios
 de estilo:
 
@@ -138,7 +139,8 @@ leído, así que la sección de Lecturas no termina en los tres textos. Cierra
 con tres baterías, **dentro de la misma sección** (los paneles siguen siendo
 17):
 
-- **15 preguntas de comprensión lectora**, de opción múltiple, **cinco por
+- **15 preguntas de comprensión lectora** (25 desde que las lecturas son
+  cinco: norma 5-quinquies), de opción múltiple, **cinco por
   texto**, y cada una dice de qué lectura sale. Se contestan con el texto
   delante: no es un examen de memoria. Se pintan en orden fijo, así que
   **les toca la norma 4** y el banco (`lectComprensionBank`) está en la lista
@@ -175,6 +177,53 @@ preguntas por voz y pauta en las diez de análisis), que se puedan contestar
 en pantalla, y **la impresión de verdad**: intercepta `window.open`, corre
 los botones y lee el documento que se habría mandado a la impresora,
 exigiendo el texto completo, la etiqueta del pastiche y los saltos de página.
+
+## 5-quinquies. Las lecturas son cinco: llegan las dos entrevistas
+
+**Norma nueva, pedida por el autor el 19 de agosto de 2026.** La sección de
+Lecturas pasa de tres textos a **cinco**. Rige para toda misión nueva y se
+aplicó también, retroactivamente, a las doce misiones del Estudio Mayor que ya
+estaban construidas (las dos que no tenían Guion ni Lecturas los recibieron
+completos con esta misma pasada). Los dos textos nuevos son entrevistas por
+escrito, y el género trae reglas propias:
+
+1. **La entrevista de la casa (lectura 4).** Una entrevista con el personaje
+   central de la etapa: el autor o la autora de la obra que la etapa estudia.
+   La firma un entrevistador elegido entre **los grandes del idioma**: Joaquín
+   Soler Serrano, Eduard Punset, Iñaki Gabilondo, Julio Scherer García, Elena
+   Poniatowska, Rosa Montero, Juan Cruz, Ima Sanchís, Jordi Évole, Carmen
+   Aristegui, entre otros; se escoge el que mejor case con el entrevistado, y
+   la presentación de la pieza dice quién es ese entrevistador DE VERDAD: su
+   programa o su medio, sus años y alguna de sus entrevistas reales. Así la
+   lectura enseña dos cosas a la vez: el tema de la etapa y un pedazo de la
+   historia del periodismo en español. Con los entrevistados muertos, la pieza
+   puede acogerse al viejo género radiofónico de las entrevistas imposibles.
+2. **La conversación del Loco de la Colina (lectura 5).** Jesús Quintero
+   conversa con el poeta Antonio Gala sobre el tema de la etapa. La voz de
+   cada uno se respeta con oficio: las preguntas cortas, susurradas y los
+   silencios de Quintero (los silencios se escriben entre paréntesis, como
+   acotación); el periodo largo, la ironía y la melancolía luminosa de Gala.
+   Los datos de la etapa entran por los dos lados y el lector sale sabiendo
+   el concepto, no solo entretenido.
+3. **La etiqueta crece con el género.** Las dos entrevistas son **ficticias y
+   se declaran**: el encuentro y las palabras son invención de la casa; las
+   personas son reales, y toda obra, fecha y cifra que se les pone en la boca
+   es real y comprobable. La etiqueta lo dice a la vista en pantalla y viaja
+   impresa con cada texto, como manda la norma 5-quater.
+4. **Se examinan igual que las otras.** La comprensión lectora sigue siendo de
+   **cinco preguntas por texto**, así que con cinco textos son **25**. Las
+   etiquetas de voz del banco (`t`) son exactamente: `Borges`, `Cervantes`,
+   `Harari`, `Entrevista` y `Quintero y Gala`. Completar sigue en 10 y
+   análisis complejo en 10, por sección. Al banco ampliado le toca la norma 4.
+5. **Se imprimen igual que las otras.** Cada entrevista con su botón en su
+   propia tarjeta, el pliego junto pasa a ser de las cinco (la función se
+   llama `imprimirTodasLasLecturas`) y el pliego de preguntas declara 25 de
+   comprensión. Las tarjetas nuevas llevan los ids `lect-entrevista` y
+   `lect-gala`, iguales en todas las misiones, para que las sondas los
+   encuentren sin adivinar.
+6. **Sin guion largo ni en el diálogo.** La raya de diálogo está prohibida
+   como todos los guiones largos (norma 1-bis): quien habla se marca con su
+   nombre en mayúsculas y punto, al estilo de los guiones de teatro.
 
 ## 5-bis. El widget de ordenar se arrastra, y la linterna cuesta
 
