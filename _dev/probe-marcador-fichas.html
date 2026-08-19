@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · El marcador en las fichas</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:194mm;height:600px;border:0;background:#fff}pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="about:blank"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* EL MARCADOR EN LAS FICHAS IMPRIMIBLES.
+   Lo que hay que proteger aquí no es el subrayado: es la NORMA 6. Una
+   ficha son diez hojas exactas de 252 mm, y cualquier cosa que añada
+   alto al imprimir parte una hoja y deja once. Así que la comprobación
+   central de esta sonda no es que se pueda marcar (eso es lo fácil),
+   sino que subrayar MUCHO no mueva ni un píxel el alto de ninguna hoja.
+
+   Se mide con las reglas de impresión aplicadas y en el ancho real del
+   papel (194 mm), igual que _dev/mide-ficha-paginas.html, porque en
+   pantalla la hoja lleva otro relleno y otra letra y la medida mentiría.
+
+   Uso:  node _dev/servidor-estatico.js  y abrir esta página             */
+
+const UTIL = 252, FLOJA = 215, PAGS = 10;
+const out=document.getElementById('out'), f=document.getElementById('f');
+const L=[]; let fallos=0;
+function log(s){ L.push(s); out.textContent=L.join('\n'); }
+function ok(c,bien,mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar=ms=>new Promise(r=>setTimeout(r,ms));
+const cerrar=()=>{ log('\n'+(fallos?'✖ '+fallos+' fallos':'✔ todo en orden'));
+  document.title=(fallos?'SUSPENDE':'APRUEBA')+' · Sonda del marcador en las fichas'; };
+
+/* Las mismas reglas que la ficha aplica dentro de @media print, metidas
+   como reglas normales. Copiadas de _dev/mide-ficha-paginas.html: si
+   ficha.css cambia sus reglas de impresión, hay que cambiarlas en los
+   dos sitios o las dos medidas mienten. */
+const REGLAS_PRINT = `
+  body { background:#fff; padding:0; font-size:10pt; line-height:1.38; }
+  .doc { max-width:none; }
+  h2 { margin:12px 0 5px; } h3 { margin:8px 0 3px; }
+  p, li { margin:4px 0; }
+  .caja, .pauta { padding:8px 11px; margin:8px 0; }
+  .caso { padding:7px 10px; margin:7px 0; }
+  .fh { padding:9px 11px; margin-bottom:11px; }
+  .idline { margin-bottom:9px; }
+  table { margin:7px 0; } th, td { padding:4px 7px; }
+  .raya-resp { height:15px; margin:6px 0; }
+  .lineas-4 .raya-resp:last-child { margin-bottom:9px; }
+  .pie { margin-top:11px; padding-top:5px; }
+  /* min-height a CERO, como hace _dev/mide-ficha-paginas.html: con los
+     252 mm puestos toda hoja mide 252 aunque su contenido ocupe 180, y
+     entonces la prueba de «no cambia el alto» no probaría nada. Lo que
+     hay que ver es el alto del CONTENIDO. */
+  .pagina { box-shadow:none; border-radius:0; padding:0; margin:0; min-height:0; }
+  .imprimir-btn, .volver { display:none; }
+  /* Y lo del marcador que manda su hoja al imprimir: */
+  .fm-barra, .fm-modal, .fm-panel-ficha, .fm-leyenda { display:none !important; }
+  .fm-hl { padding:0; border-radius:0; }
+  .fm-hl-fin::after { content:none !important; }
+`;
+
+function alturas(d){
+  return [...d.querySelectorAll('.pagina')].map(p => p.getBoundingClientRect().height);
+}
+const mm = px => px * 25.4 / 96;
+
+async function abrirFicha(nombre){
+  await new Promise(res=>{ f.onload=res; f.src='/fichas/'+nombre; });
+  const w=f.contentWindow, d=f.contentDocument;
+  await esperar(900);
+  const st=d.createElement('style'); st.textContent=REGLAS_PRINT; d.head.appendChild(st);
+  await esperar(250);
+  return { w, d };
+}
+
+/* Subraya de verdad, por la misma puerta que un dedo. */
+async function marcar(w,d,el,nCar,cat){
+  const paseo=d.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+  let n=null;
+  while(paseo.nextNode()){ if(paseo.currentNode.nodeValue.trim().length>25){ n=paseo.currentNode; break; } }
+  if(!n) return false;
+  const antes=w.FaroMarcador.marcas().length;
+  const r=d.createRange(); r.setStart(n,0); r.setEnd(n,Math.min(nCar,n.nodeValue.length));
+  const s=w.getSelection(); s.removeAllRanges(); s.addRange(r);
+  d.dispatchEvent(new w.Event('selectionchange'));
+  await esperar(330);
+  const b=d.querySelector('.fm-color[data-cat="'+cat+'"]'); if(!b) return false;
+  b.click(); await esperar(180);
+  return w.FaroMarcador.marcas().length===antes+1;
+}
+
+(async ()=>{
+ try{
+  const FICHA='ficha-atomos-contra-miedo.html';
+  let { w, d } = await abrirFicha(FICHA);
+  try{ w.localStorage.clear(); }catch(e){}
+  w.confirm=()=>true; w.alert=()=>{};
+  w.FaroMarcador.recargar();
+  await esperar(300);
+
+  log('── EL MARCADOR LLEGA A LA FICHA ──');
+  ok(typeof w.FaroMarcador==='object', 'el módulo está cargado', 'no se cargó el marcador en la ficha');
+  ok(!!d.querySelector('link[href*="lecturas-marcador.css"]'), 'y su hoja de estilo', 'falta la hoja del marcador');
+  const zs=w.FaroMarcador.zonas();
+  ok(zs.length===PAGS, 'cada una de las 10 hojas es una zona', 'zonas: '+zs.length);
+  ok(zs.every(z=>/^Hoja \d+ de \d+$/.test(z.titulo)), 'y se llaman por su número de hoja', 'títulos: '+JSON.stringify(zs.map(z=>z.titulo).slice(0,3)));
+  const trozos=zs.reduce((a,z)=>a+z.parrafos,0);
+  ok(trozos>40, 'hay '+trozos+' trozos marcables repartidos por la ficha', 'solo '+trozos+' trozos marcables');
+  /* La clave sale del nombre del archivo: si no, las 37 fichas
+     compartirían cajón y las marcas de una saldrían en otra. */
+  const clave=w.FaroMarcador.claveLocal();
+  ok(clave.indexOf('ficha-atomos-contra-miedo')>=0, 'guarda con una clave propia de esta ficha', 'clave: '+clave);
+
+  log('\n── EL PANEL NO SE METE DENTRO DE LAS HOJAS ──');
+  const panel=d.getElementById('fmPanel');
+  ok(!!panel, 'el panel está en la ficha', 'no hay panel');
+  ok(panel && !panel.closest('.pagina'), 'y NO está dentro de ninguna hoja', 'el panel se metió dentro de una hoja y la desbordaría');
+  ok(panel && w.getComputedStyle(panel).display==='none', 'y no se imprime', 'el panel saldría impreso');
+
+  log('\n── LA MEDIDA QUE IMPORTA: LAS DIEZ HOJAS ──');
+  /* Hay que esperar a la tipografía: con la de reserva el texto ocupa
+     menos y la medida sale corta, que es el error que ya hizo dar por
+     buena una ficha que al imprimir se partía en dos. */
+  try { await d.fonts.ready; } catch(e) {}
+  await esperar(900);
+  const antes=alturas(d);
+  ok(antes.length===PAGS, 'la ficha tiene sus 10 hojas', 'hojas: '+antes.length);
+  const desbordaAntes=antes.filter(h=>mm(h)>UTIL+0.5).length;
+  ok(desbordaAntes===0, 'ninguna hoja desborda antes de subrayar', desbordaAntes+' hojas ya venían desbordadas');
+  log('    (antes: '+antes.map(h=>mm(h).toFixed(0)).join(', ')+' mm; la más llena: '+Math.max(...antes.map(mm)).toFixed(1)+' de '+UTIL+')');
+
+  /* Se subraya MUCHO y por todas las hojas: es la prueba de esfuerzo. */
+  let puestas=0;
+  for(const sec of [...d.querySelectorAll('.pagina')]){
+    const els=[...sec.querySelectorAll('p, li')].filter(e=>!e.className.trim() && e.textContent.trim().length>40);
+    for(const el of els.slice(0,4)){
+      const cat=['dato','voz','idea','contra','duda'][puestas%5];
+      if(await marcar(w,d,el,90,cat)) puestas++;
+    }
+  }
+  ok(puestas>=25, 'se subrayan '+puestas+' trozos por toda la ficha', 'solo se pudieron marcar '+puestas);
+  ok(d.querySelectorAll('.fm-hl').length>=puestas, 'y se pintan en el texto', 'no se pintaron');
+
+  const despues=alturas(d);
+  const movidas=[];
+  antes.forEach((h,i)=>{ if(Math.abs(h-despues[i])>0.5) movidas.push((i+1)+': '+mm(h).toFixed(1)+'mm → '+mm(despues[i]).toFixed(1)+'mm'); });
+  ok(movidas.length===0,
+    'NINGUNA hoja cambia de alto al subrayar (la norma 6 sigue en pie)',
+    'se movieron '+movidas.length+' hojas: '+movidas.join(' · '));
+  ok(despues.length===PAGS, 'y siguen siendo 10 hojas', 'ahora hay '+despues.length);
+  ok(despues.filter(h=>mm(h)>UTIL+0.5).length===0, 'ninguna hoja desborda los 252 mm', 'alguna hoja desborda');
+  log('    (después: '+despues.map(h=>mm(h).toFixed(0)).join(', ')+' mm; la más llena: '+Math.max(...despues.map(mm)).toFixed(1)+')');
+
+  log('\n── LO MARCADO SÍ SALE EN EL PAPEL ──');
+  const marca=d.querySelector('.fm-hl');
+  const est=w.getComputedStyle(marca);
+  ok(est.backgroundColor && est.backgroundColor!=='rgba(0, 0, 0, 0)', 'la marca conserva su color de fondo al imprimir', 'la marca pierde el color');
+  const trama=(est.borderBottomStyle!=='none') || (est.textDecorationLine!=='none');
+  ok(trama, 'y su trama de subrayado', 'la marca pierde la trama');
+  const inicial=w.getComputedStyle(d.querySelector('.fm-hl-fin'), '::after').content;
+  ok(inicial==='none' || inicial==='normal' || inicial==='""',
+    'la inicial volada se calla en el papel (un carácter más partiría una hoja)', 'la inicial sigue puesta al imprimir: '+inicial);
+
+  log('\n── Y LAS NOTAS, EN SU PROPIA HOJA ──');
+  const m0=w.FaroMarcador.marcas()[0];
+  d.querySelector('[data-fm-id="'+m0.id+'"]').click(); await esperar(220);
+  d.getElementById('fmBtnNota').click(); await esperar(200);
+  d.getElementById('fmModalTA').value='Preguntar esto en la defensa oral.';
+  d.getElementById('fmNotaGuarda').click(); await esperar(300);
+  ok(w.FaroMarcador.marcas().some(m=>/defensa oral/.test(m.n||'')), 'se puede anotar sobre la ficha', 'la nota no se guardó');
+  const trasNota=alturas(d);
+  const movidas2=[];
+  antes.forEach((h,i)=>{ if(Math.abs(h-trasNota[i])>0.5) movidas2.push(i+1); });
+  ok(movidas2.length===0, 'y anotar tampoco mueve ninguna hoja', 'anotar movió las hojas: '+movidas2.join(','));
+  /* La hoja de repaso se arma aparte, con window.open, y por eso las
+     notas no tienen que caber dentro de las diez. */
+  let doc='';
+  const abrirReal=w.open;
+  w.open=function(){ return { document:{ write:s=>{doc+=s;}, close:()=>{} }, print:()=>{}, focus:()=>{} }; };
+  d.getElementById('fmBtnImprimeMarcas').click(); await esperar(300);
+  w.open=abrirReal;
+  ok(/Mis marcas y mis notas/.test(doc) && /defensa oral/.test(doc),
+    'la hoja de repaso sale aparte, con las notas escritas', 'la hoja de repaso no trae las notas');
+  ok(/Código de colores/.test(doc), 'y con la leyenda del código', 'la hoja de repaso va sin leyenda');
+  ok(!/—/.test(doc), 'sin guiones largos (norma 1-bis)', 'la hoja de repaso trae guiones largos');
+
+  log('\n── SE RECUERDA, Y NO SE MEZCLA CON OTRAS FICHAS ──');
+  const cuantas=w.FaroMarcador.marcas().length;
+  ({ w, d } = await abrirFicha(FICHA));
+  await esperar(400);
+  ok(w.FaroMarcador.marcas().length===cuantas, 'al volver a abrir la ficha siguen las '+cuantas+' marcas', 'quedaron '+w.FaroMarcador.marcas().length);
+  ok(!!d.querySelector('.fm-hl'), 'y se repintan en el texto', 'no se repintaron');
+  const otra = await abrirFicha('ficha-atomos-hombre-maquina.html');
+  await esperar(400);
+  ok(otra.w.FaroMarcador.marcas().length===0,
+    'otra ficha distinta arranca limpia, sin heredar las marcas', 'la otra ficha heredó '+otra.w.FaroMarcador.marcas().length+' marcas');
+
+  log('\n── Y NO ROMPE LO QUE LA FICHA YA HACÍA ──');
+  ok(otra.d.querySelectorAll('.pagina').length===PAGS, 'la otra ficha conserva sus 10 hojas', 'hojas: '+otra.d.querySelectorAll('.pagina').length);
+  ok(!!otra.d.querySelector('.volver'), 'y su enlace de volver a la misión', 'se perdió el enlace de volver');
+
+  cerrar();
+ }catch(e){ fallos++; log('✘ '+e.message+'\n'+e.stack); cerrar(); }
+})();
+</script>
+</body>
+</html>

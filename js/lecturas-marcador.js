@@ -106,6 +106,14 @@
      después y por encima, nunca en lugar de esto. */
   function claveDeMision() {
     try { if (typeof SAVE_KEY !== 'undefined' && SAVE_KEY) return SAVE_KEY; } catch (e) {}
+    /* Las fichas no declaran SAVE_KEY (no tienen progreso que guardar),
+       así que la clave sale de su propio nombre de archivo, que ya es
+       único. Sin esto, las treinta y siete fichas compartirían cajón y
+       las marcas de una saldrían en otra. */
+    if (esFicha()) {
+      const archivo = (location.pathname.split('/').pop() || 'ficha').replace(/\.html?$/i, '');
+      return 'faro_' + archivo.replace(/[^a-z0-9_-]/gi, '-');
+    }
     return 'faro_mision';
   }
   function cargar() {
@@ -149,7 +157,24 @@
      nombre estable, que es lo que permite volver a encontrar la marca
      mañana. En las misiones con Lecturas, cada lectura es una zona. En
      las demás, cada sección de prosa. */
+  /* ¿Esto es una ficha imprimible? Se reconoce por sus hojas: diez
+     secciones con clase `pagina`, que es lo que manda la norma 6. */
+  function esFicha() { return !!document.querySelector('.pagina'); }
+
   function zonas() {
+    /* Una ficha no tiene secciones ni tarjetas: tiene hojas. Cada hoja
+       es una zona, y el número de hoja es un ancla estable (si la ficha
+       se repagina, el reanclaje por texto salva la marca igual). */
+    if (esFicha()) {
+      return [...document.querySelectorAll('.pagina')]
+        .map((sec, i) => ({
+          clave: 'hoja-' + (i + 1),
+          titulo: 'Hoja ' + (i + 1) + ' de ' + document.querySelectorAll('.pagina').length,
+          raiz: sec,
+          parrafos: parrafosDe(sec),
+        }))
+        .filter(z => z.parrafos.length);
+    }
     const lecturas = [...document.querySelectorAll('#s-lecturas .card[id^="lect-"]')];
     if (lecturas.length) {
       return lecturas.map(card => ({
@@ -184,6 +209,17 @@
      rompería la misión en silencio. Solo se subraya texto inerte. */
   const CONTROLES = 'button,input,select,textarea,canvas,svg,audio,video,[id],[onclick],[onchange]';
   function parrafosDe(raiz) {
+    /* En una ficha la prosa va suelta, sin tarjetas: párrafos sin clase
+       (también los de dentro de las cajas) y los puntos de las listas,
+       que en estas hojas son los objetivos y los pasos, de lo más
+       subrayable que hay. Las rayas para escribir a mano y los pies
+       chicos se quedan fuera solos, por no ser <p> sin clase. */
+    if (esFicha()) {
+      return [...raiz.querySelectorAll('p, li')]
+        .filter(el => !el.className.trim())
+        .filter(el => el.textContent.trim().length > 40)
+        .filter(el => !el.querySelector(CONTROLES));
+    }
     const cand = [
       ...raiz.querySelectorAll('.card > p'),
       ...raiz.querySelectorAll('.card > .tip > div'),
@@ -881,7 +917,7 @@
 
     /* La leyenda va ARRIBA, en la primera tarjeta de la primera zona: el
        código de colores hay que conocerlo ANTES de subrayar, no después. */
-    const intro = zs[0].raiz.querySelector('.card');
+    const intro = esFicha() ? null : zs[0].raiz.querySelector('.card');
     if (intro && !intro.querySelector('.fm-leyenda')) {
       const caja = document.createElement('div');
       caja.innerHTML =
@@ -900,6 +936,13 @@
     panel.className = 'card ac-teal'; panel.id = 'fmPanel';
     panel.innerHTML =
       '<h2>🖍️ Mis marcas y mis notas</h2>'
+      + (esFicha()
+          ? '<p style="font-size:0.88rem;margin:2px 0 6px;">Se puede subrayar y anotar esta ficha en la pantalla. '
+            + 'Lo marcado <strong>sale impreso con ella</strong> y viaja contigo a cualquier aparato. '
+            + 'Las notas escritas no se meten dentro de la ficha, que tiene que seguir siendo de diez hojas: '
+            + 'salen en su propia hoja de repaso, con el botón de aquí abajo.</p>'
+            + leyendaHTML(false)
+          : '')
       + '<p class="fm-estado" id="fmEstado">' + textoEstado() + '</p>'
       + '<div id="fmPanelCuerpo"></div>'
       + '<div class="fm-acciones" style="margin-top:10px;">'
@@ -910,14 +953,25 @@
 
     /* Dónde vive el panel: antes de las preguntas de las lecturas si las
        hay (que es donde se repasa), y si no, al final de Recursos, que
-       es la última sección de toda misión. */
-    const sec = document.getElementById('s-lecturas');
-    const preguntas = sec ? [...sec.querySelectorAll('.card')].find(c => /Preguntas de las/i.test(c.textContent)) : null;
-    if (preguntas) preguntas.parentNode.insertBefore(panel, preguntas);
-    else {
-      const rec = document.getElementById('s-recursos');
-      if (rec) rec.appendChild(panel);
-      else zs[zs.length - 1].raiz.appendChild(panel);
+       es la última sección de toda misión.
+
+       En una ficha va DESPUÉS de la última hoja, nunca dentro: una ficha
+       son diez hojas de 252 mm y meterle el panel a la décima la
+       desbordaría, con lo que saldrían once al imprimir y se rompería la
+       norma 6. Al imprimir, además, el panel entero se esconde. */
+    if (esFicha()) {
+      panel.classList.add('fm-panel-ficha');
+      const doc = document.querySelector('.doc') || document.body;
+      doc.appendChild(panel);
+    } else {
+      const sec = document.getElementById('s-lecturas');
+      const preguntas = sec ? [...sec.querySelectorAll('.card')].find(c => /Preguntas de las/i.test(c.textContent)) : null;
+      if (preguntas) preguntas.parentNode.insertBefore(panel, preguntas);
+      else {
+        const rec = document.getElementById('s-recursos');
+        if (rec) rec.appendChild(panel);
+        else zs[zs.length - 1].raiz.appendChild(panel);
+      }
     }
 
     document.getElementById('fmBtnVacia').addEventListener('click', () => {

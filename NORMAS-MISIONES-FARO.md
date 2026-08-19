@@ -397,6 +397,61 @@ lápida y que **al chocar dos notas distintas se conserven las dos**. Las
 abrir treinta y ocho misiones con su motor completo cuelga el banco de
 pruebas antes de la décima.
 
+## 5-octies. El marcador también en las fichas, sin tocar las diez hojas
+
+**Norma nueva, pedida por el autor el 19 de agosto de 2026.** Las
+**37 fichas imprimibles** llevan el marcador: se subrayan y se anotan en
+la pantalla, y **lo subrayado sale impreso con la ficha**. Cada hoja de
+la ficha es una zona (`hoja-1`, `hoja-2`...) y se marca la prosa: los
+párrafos sin clase, también los de dentro de las cajas, y los puntos de
+las listas, que en estas hojas son los objetivos y los pasos.
+
+### La regla que manda aquí: la norma 6 no se toca
+
+Una ficha son **diez hojas exactas**, y la hoja más apretada del
+proyecto va a **0,4 mm del corte**. Cualquier cosa que añada alto al
+imprimir parte esa hoja y deja once. De ahí tres decisiones que no son
+negociables:
+
+1. **Al imprimir, el subrayado no añade ni un píxel.** El color de fondo
+   y la trama se dibujan encima del texto y no lo mueven. La **inicial
+   volada se calla en el papel**: es un carácter más, y un carácter
+   puede empujar una línea, y una línea puede partir una hoja. Quedan
+   las otras dos señales, que ya distinguen las cinco categorías hasta
+   fotocopiadas.
+2. **El panel va fuera de las diez hojas**, al final del documento, y no
+   se imprime. Metido dentro de la décima la desbordaría.
+3. **Las notas escritas no se meten en la ficha.** Salen en su propia
+   **hoja de repaso**, que se arma aparte con su botón. Una ficha con
+   notas dentro dejaría de ser una ficha de diez hojas.
+
+### Cada ficha guarda lo suyo
+
+La clave sale del **nombre del archivo** (`ficha-atomos-contra-miedo` →
+`faro_ficha-atomos-contra-miedo`), porque una ficha no declara
+`SAVE_KEY`. Sin eso, las treinta y siete compartirían cajón y las marcas
+de una saldrían en otra. Lo demás es igual que en las misiones: cajón
+por usuario y viaje a la nube por la misma tabla, sin SQL nuevo.
+
+### Cómo se comprueba, y no basta con mirar
+
+`_dev/probe-marcador-fichas.html` mide el alto de las diez hojas **con
+las reglas de impresión puestas y en el ancho real del papel** (194 mm,
+igual que el medidor de la norma 6, y con `min-height: 0`, que es lo que
+deja ver el alto del contenido y no el mínimo forzado). Subraya unos
+cuarenta trozos repartidos por toda la ficha y exige que **ninguna hoja
+cambie de alto**.
+
+Y como manda la norma 6, **el PDF es el único juez**: se imprimió a PDF
+la ficha más apretada, con marcas y sin ellas, y las dos veces salieron
+**diez páginas**. Se hace con un perfil de navegador sembrado:
+
+```
+node _dev/servidor-estatico.js
+chrome --user-data-dir=PERFIL ...   (primero se siembran las marcas)
+chrome --user-data-dir=PERFIL --print-to-pdf=...  fichas/<ficha>.html
+```
+
 ## 5-bis. El widget de ordenar se arrastra, y la linterna cuesta
 
 **Norma nueva, pedida por el autor el 17 de agosto de 2026**, después de

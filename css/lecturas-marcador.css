@@ -218,10 +218,37 @@
   resize: vertical;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   AL IMPRIMIR
+   ══════════════════════════════════════════════════════════════════
+   En las misiones esto casi no importa: su impresión se arma en una
+   ventana aparte. En las FICHAS sí importa, y mucho, porque la ficha se
+   imprime desde su propia página y la norma 6 dice que tiene que salir
+   en DIEZ HOJAS EXACTAS, ni una más.
+
+   De ahí la regla que manda aquí: al imprimir, el subrayado NO PUEDE
+   AÑADIR NI UN PÍXEL DE ALTO. El color de fondo y la trama del
+   subrayado se dibujan encima del texto y no lo mueven; la inicial
+   volada, en cambio, es un carácter más, y un carácter más puede
+   empujar una línea, y una línea puede partir una hoja que iba justa.
+   Así que en el papel la inicial se calla y quedan las otras dos
+   señales, que ya distinguen las cinco categorías hasta fotocopiadas.
+════════════════════════════════════════════════════════════════════ */
 @media print {
-  /* En la propia página no se imprime nada del aparato: la impresión de
-     verdad se arma en su ventana aparte, como manda la casa. */
-  .fm-barra, .fm-modal, .fm-item-btns, .fm-acciones { display: none !important; }
+  /* Nada del aparato se imprime: ni la barra, ni el cuadro de la nota,
+     ni el panel. El panel de una ficha va fuera de las diez hojas, pero
+     aun así se esconde: lo que se lleva a la impresora es la ficha. */
+  .fm-barra, .fm-modal, .fm-item-btns, .fm-acciones,
+  .fm-panel-ficha, .fm-leyenda { display: none !important; }
+
+  /* El subrayado sí viaja al papel, con su color obligado (sin esto el
+     navegador se come los fondos) y sin ocupar espacio. */
+  .fm-hl {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    padding: 0; border-radius: 0;
+  }
+  /* La inicial volada se calla en el papel: ver la nota de arriba. */
+  .fm-hl-fin::after { content: none !important; }
 }
 
 /* El estado de la nube, en el panel. Va a la vista y no escondido en un
