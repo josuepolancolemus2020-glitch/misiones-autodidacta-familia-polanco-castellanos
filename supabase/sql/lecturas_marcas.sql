@@ -96,8 +96,11 @@ create index if not exists lecturas_marcas_idx
 
 -- Cuándo tocó el servidor la fila por última vez. Sirve para la higiene
 -- y para mirar desde el editor qué está pasando; la fusión NO lo usa.
+-- `set search_path` fijo: sin él, un search_path manipulado podría
+-- cambiar a qué apunta lo de dentro de la función. Es la misma
+-- precaución que llevan las demás funciones de la casa.
 create or replace function public.lecturas_marcas_touch()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql set search_path = public as $$
 begin
   new.guardado_at := now();
   return new;
@@ -156,6 +159,13 @@ returns integer language sql security definer set search_path = public as $$
   select count(*)::integer from borradas;
 $$;
 
+-- La higiene corre con los permisos de quien la creó (security definer),
+-- así que NO puede quedar al alcance de cualquiera: con la clave
+-- publicable, que va en el código y la lee todo el mundo, se podría
+-- llamar a mano. Se le cierra la puerta a todos y se deja solo para el
+-- administrador o para una tarea programada.
+revoke execute on function public.lecturas_marcas_higiene() from public, anon, authenticated;
+
 -- ════════════════════════════════════════════════════════════════════
 -- CÓMO SE COMPRUEBA QUE QUEDÓ PUESTO (no basta con el «Success»)
 -- ════════════════════════════════════════════════════════════════════
@@ -179,6 +189,9 @@ $$;
 --      select mision, zona, color, left(texto, 40) as trozo, nota
 --        from public.lecturas_marcas order by creado_at desc limit 5;
 --    Tiene que salir la marca recién hecha. Si sale vacío pero el panel
---    decía que sí, es que la sesión no llegó a la misión: mirar que la
---    misión cargue js/supabase.min.js y js/auth.js antes del marcador.
+--    decía que sí, es que la sesión no llegó a la misión: se entra
+--    primero en F.A.R.O por la puerta y se vuelve a abrir la misión. Las
+--    misiones NO cargan la puerta de antemano a propósito (norma
+--    5-septies): el marcador se trae Supabase solo cuando ya hay sesión
+--    guardada en ese navegador, para que abrir una misión no pida red.
 -- ════════════════════════════════════════════════════════════════════

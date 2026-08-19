@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · El marcador entre dos aparatos</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff}pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="fa" src="about:blank"></iframe>
+<iframe id="fb" src="about:blank"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* LA PRUEBA QUE PIDIÓ EL AUTOR: que lo subrayado y lo anotado esté ahí
+   al cambiar de aparato.
+
+   Aquí NO se finge el cliente de Supabase: se usa la biblioteca de
+   verdad (js/supabase.min.js), con peticiones HTTP de verdad, contra
+   _dev/postgrest-falso.js, que habla el mismo idioma que el endpoint de
+   Supabase y aplica la misma seguridad por fila. Lo único fingido es el
+   otro extremo del cable, porque contra el proyecto de la casa no se
+   puede probar desde el banco de pruebas (la red no sale) y tampoco
+   convendría ensuciar la base con marcas de prueba.
+
+   «Cambiar de aparato» se simula de la única manera fiel: se borra lo
+   que este aparato tenía guardado (su clave <SAVE_KEY>_marcas) y se deja
+   la sesión, que es exactamente la situación de quien abre la misma
+   misión en el teléfono después de haberla leído en la tableta.
+
+   Levantar antes las dos cosas:
+     node _dev/servidor-estatico.js
+     node _dev/postgrest-falso.js 8125                                  */
+
+const NUBE = 'http://localhost:8125';
+const CLAVE_PUB = 'sb_publishable_de_prueba';
+const USUARIO = '11111111-2222-3333-4444-555555555555';
+const OTRO    = '99999999-8888-7777-6666-555555555555';
+
+const out=document.getElementById('out');
+const L=[]; let fallos=0;
+function log(s){ L.push(s); out.textContent=L.join('\n'); }
+function ok(c,bien,mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar=ms=>new Promise(r=>setTimeout(r,ms));
+const cerrar=()=>{ log('\n'+(fallos?'✖ '+fallos+' fallos':'✔ todo en orden'));
+  document.title=(fallos?'SUSPENDE':'APRUEBA')+' · Sonda del marcador entre aparatos'; };
+
+async function nubeEstado(){ return (await (await fetch(NUBE+'/__prueba/estado')).json()); }
+async function nubeReinicia(){ await fetch(NUBE+'/__prueba/reiniciar'); }
+
+/* Los dos aparatos son dos marcos DE VERDAD, vivos a la vez, cada uno
+   con su propia copia de lo guardado. Comparten el almacén del
+   navegador porque son el mismo origen, así que cada aparato guarda su
+   cadena aparte y se instala justo antes de operar con él: eso es
+   exactamente lo que ve el marcador en dos teléfonos distintos.
+
+   El cliente de Supabase es el REAL, apuntando al doble. Se le pone
+   antes de que el marcador sincronice, igual que en producción lo deja
+   js/auth.js en window.faroSb. */
+async function abrirAparato(marco, quien, nombre){
+  const f=document.getElementById(marco);
+  await new Promise(res=>{ f.onload=res; f.src='/misiones/ruta-poder-deuda/deuda.html?a='+nombre; });
+  const w=f.contentWindow, d=f.contentDocument;
+  /* El marcador sincroniza solo a los 1,2 s de cargar la misión. Se
+     espera a que eso pase antes de tocar nada, o la sonda estaría
+     midiendo una carrera en vez de midiendo el marcador. */
+  await esperar(1600);
+  const SAVE=w.eval('SAVE_KEY');
+  if(!w.supabase){
+    await new Promise((res,rej)=>{ const s=d.createElement('script');
+      s.src='/js/supabase.min.js'; s.onload=res; s.onerror=rej; d.head.appendChild(s); });
+  }
+  w.faroSb = w.supabase.createClient(NUBE, CLAVE_PUB, {
+    auth: { persistSession:false, autoRefreshToken:false },
+    global: { headers: { Authorization: 'Bearer prueba:'+quien } },
+  });
+  /* getSession del cliente real devolvería null porque aquí no hay
+     sesión guardada; el marcador solo necesita saber quién entró. */
+  w.faroSb.auth.getSession = async () => ({ data: { session: { user: { id: quien } } } });
+  w.confirm=()=>true; w.alert=()=>{};
+  const ap={ w, d, SAVE, nombre, quien, almacen:null };
+  usar(ap);
+  return ap;
+}
+
+/* El marcador guarda en un cajón POR USUARIO (misión + quién entró),
+   que es lo que impide que en una tableta compartida las marcas de una
+   persona se le aparezcan a otra. La sonda tiene que hablar de ese
+   mismo cajón, o estaría midiendo otra cosa. */
+function cajonDe(ap){ return ap.SAVE+'_marcas_'+ap.quien; }
+/* El cajón que el marcador está usando AHORA: mientras no sabe quién
+   entró es el de sin dueño, y después el de la persona. Se le pregunta
+   a él en vez de adivinarlo. */
+function cajonVivo(ap){ try{ return ap.w.FaroMarcador.claveLocal(); }catch(e){ return ap.SAVE+'_marcas'; } }
+
+/* Instala el almacén de ESE aparato y hace que el marcador lo relea.
+   Todo lo que se haga a partir de aquí es «en ese aparato». */
+function usar(ap){
+  try{
+    /* Hasta que el marcador sabe quién entró guarda en el cajón sin
+       dueño, y a partir de ahí en el de la persona. La sonda pone lo
+       mismo en los dos, para que el aparato encuentre lo suyo esté en
+       la fase que esté; y cuando el aparato es de otra persona, los
+       vacía los dos, que es lo que hace la prueba de la tableta
+       compartida. */
+    if(ap.almacen===null){
+      ap.w.localStorage.removeItem(ap.SAVE+'_marcas');
+      ap.w.localStorage.removeItem(cajonDe(ap));
+    }else{
+      ap.w.localStorage.setItem(ap.SAVE+'_marcas', ap.almacen);
+      ap.w.localStorage.setItem(cajonDe(ap), ap.almacen);
+    }
+  }catch(e){}
+  ap.w.FaroMarcador.recargar();
+}
+/* Guarda lo que ese aparato tenga ahora, para poder volver a él. */
+function guardarAparato(ap){
+  try{ ap.almacen = ap.w.localStorage.getItem(cajonVivo(ap)); }catch(e){}
+}
+/* Sincroniza EN ese aparato, dejando su almacén puesto antes y
+   recogiéndolo después. */
+async function sincronizarEn(ap){
+  usar(ap);
+  await ap.w.FaroMarcador.sincronizar(true);
+  await esperar(400);
+  guardarAparato(ap);
+}
+
+/* Subraya un trozo como lo haría un dedo. Se busca el primer nodo de
+   texto CON CONTENIDO: en las cajas de aviso el primero es el icono y
+   el segundo son saltos de línea, y seleccionar espacios en blanco no
+   es una selección (el marcador la descarta, con razón). Y se devuelve
+   null si la marca no llegó a nacer, para que la sonda no cante un
+   subrayado que no existe. */
+async function marcar(ap,idx,nCar,cat){
+  usar(ap);
+  const w=ap.w, d=ap.d;
+  const ps=[...d.querySelectorAll('#s-aprende .card > p, #s-aprende .card > .tip > div')]
+    .filter(p=>p.textContent.trim().length>40);
+  const p=ps[idx]; if(!p) return null;
+  const paseo=d.createTreeWalker(p, NodeFilter.SHOW_TEXT, null);
+  let n=null;
+  while(paseo.nextNode()){ if(paseo.currentNode.nodeValue.trim().length>20){ n=paseo.currentNode; break; } }
+  if(!n) return null;
+  const antes=w.FaroMarcador.marcas().length;
+  const r=d.createRange(); r.setStart(n,0); r.setEnd(n,Math.min(nCar,n.nodeValue.length));
+  const texto=r.toString();
+  const s=w.getSelection(); s.removeAllRanges(); s.addRange(r);
+  const trasAddRange=String(s).length;
+  d.dispatchEvent(new w.Event('selectionchange'));
+  await esperar(400);
+  if(trasAddRange===0) log('      (diagnóstico '+ap.nombre+': addRange no dejó selección; foco del marco)');
+  const abierta=d.getElementById('fmBarra') && d.getElementById('fmBarra').classList.contains('fm-abierta');
+  const b=d.querySelector('.fm-color[data-cat="'+cat+'"]');
+  if(!b){ log('      (diagnóstico '+ap.nombre+': no hay barra'
+    +' · panel='+!!d.getElementById('fmPanel')
+    +' · zonas='+JSON.stringify(w.FaroMarcador.zonas())
+    +' · marcable='+w.FaroMarcador.esMarcable(n)
+    +' · sel='+JSON.stringify(String(w.getSelection()).slice(0,20))+')'); return null; }
+  b.click(); await esperar(250);
+  if(w.FaroMarcador.marcas().length!==antes+1){
+    log('      (diagnóstico '+ap.nombre+': párrafos='+ps.length+' barra='+abierta
+       +' selección='+JSON.stringify(String(w.getSelection()).slice(0,25))+' marcas='+w.FaroMarcador.marcas().length+')');
+    return null;
+  }
+  guardarAparato(ap);
+  return texto;
+}
+
+/* Escribe una nota en una marca, por la misma puerta que una persona. */
+async function ponerNota(ap,id,texto){
+  usar(ap);
+  ap.d.querySelector('[data-fm-id="'+id+'"]').click(); await esperar(220);
+  ap.d.getElementById('fmBtnNota').click(); await esperar(200);
+  ap.d.getElementById('fmModalTA').value=texto;
+  ap.d.getElementById('fmNotaGuarda').click(); await esperar(320);
+  guardarAparato(ap);
+}
+
+(async ()=>{
+ try{
+  await nubeReinicia();
+
+  log('── APARATO 1: LA TABLETA ──');
+  const A = await abrirAparato('fa', USUARIO, 'tableta');
+  ok(typeof A.w.FaroMarcador==='object', 'el marcador está en la misión del adulto', 'no hay marcador');
+  const t1 = await marcar(A, 0, 70, 'dato');
+  ok(!!t1, 'se subraya un dato en un párrafo', 'no se pudo subrayar el párrafo');
+  /* El aviso 💡 es un div, no un párrafo: se subraya igual, y este es
+     justo el caso que estaba roto y que nadie habría notado. */
+  const t2 = await marcar(A, 1, 60, 'contra');
+  ok(!!t2, 'y una contracita dentro de un aviso, que es un div', 'no se pudo subrayar dentro del aviso');
+  const m0 = A.w.FaroMarcador.marcas()[0];
+  await ponerNota(A, m0.id, 'Pedir el costo total por escrito antes de firmar.');
+  ok(A.w.FaroMarcador.marcas().some(m=>/costo total/.test(m.n||'')), 'y se escribe una nota', 'la nota no se guardó');
+  guardarAparato(A);
+
+  await sincronizarEn(A);
+  ok(A.w.FaroMarcador.estadoNube()==='al-dia', 'la tableta dice que ya está en la nube', 'estado: '+A.w.FaroMarcador.estadoNube());
+  let nube = await nubeEstado();
+  ok(nube.filas.length===2, 'la nube recibió las 2 marcas', 'filas en la nube: '+nube.filas.length);
+  ok(nube.filas.every(x=>x.user_id===USUARIO && x.mision===A.SAVE), 'con su dueño y su misión', 'las filas no llevan bien dueño o misión');
+  ok(nube.filas.some(x=>/costo total/.test(x.nota||'')), 'y la nota escrita viajó entera', 'la nota no llegó a la nube');
+  /* Si el cliente mandara una columna que no existe, el doble habría
+     contestado 400 como PostgREST y aquí no habría nada. */
+  ok(nube.filas.every(x=>x.creado_at && x.guardado_at), 'el servidor puso sus propias fechas', 'faltan las fechas del servidor');
+
+  log('\n── APARATO 2: EL TELÉFONO ──');
+  const B = await abrirAparato('fb', USUARIO, 'telefono');
+  ok(B.w.FaroMarcador.marcas().length===0, 'el teléfono empieza sin nada guardado', 'el teléfono no arrancó limpio');
+  await sincronizarEn(B);
+  const enB = B.w.FaroMarcador.marcas();
+  ok(enB.length===2, 'al sincronizar bajan las 2 marcas de la tableta', 'bajaron '+enB.length);
+  ok(enB.some(m=>/costo total/.test(m.n||'')), 'CON la nota escrita', 'la nota no llegó al otro aparato');
+  ok(!!B.d.querySelector('.fm-hl-dato') && !!B.d.querySelector('.fm-hl-contra'),
+    'y se pintan las dos en el texto, cada una con su color', 'no se pintaron en el otro aparato');
+  ok(/Guardado también en la nube/.test(B.d.getElementById('fmEstado').textContent),
+    'el panel del teléfono lo dice a la vista', 'el panel no informa del estado');
+  ok(enB.some(m=>m.t===t1), 'el trozo subrayado es exactamente el mismo', 'el trozo llegó distinto');
+  ok(enB.some(m=>m.t===t2), 'también el del aviso', 'el trozo del aviso llegó distinto');
+
+  log('\n── BORRAR EN UN APARATO SE NOTA EN EL OTRO ──');
+  const paraBorrar = enB.find(m=>!m.n);
+  ok(!!paraBorrar, 'hay una marca sin nota que borrar', 'no hay marca sin nota');
+  usar(B);
+  B.d.querySelector('[data-fm-id="'+paraBorrar.id+'"]').click(); await esperar(220);
+  B.d.getElementById('fmBtnQuita').click(); await esperar(300);
+  guardarAparato(B);
+  await sincronizarEn(B);
+  nube = await nubeEstado();
+  const lapida = nube.filas.find(x=>x.id===paraBorrar.id);
+  ok(!!lapida && lapida.borrada===true, 'el borrado sube como lápida, no como ausencia',
+     'la fila borrada no quedó marcada como borrada');
+  await sincronizarEn(A);
+  ok(!A.w.FaroMarcador.marcas().some(m=>m.id===paraBorrar.id),
+     'y la tableta la retira al sincronizar', 'la marca borrada resucitó en el otro aparato');
+  ok(!A.d.querySelector('[data-fm-id="'+paraBorrar.id+'"]'), 'también la despinta del texto', 'la marca borrada sigue pintada');
+
+  log('\n── DOS NOTAS A LA VEZ: NO SE PIERDE NINGUNA ──');
+  /* Los dos escriben sobre la misma marca sin haberse sincronizado. */
+  const laDeLaNota = A.w.FaroMarcador.marcas().find(m=>m.n);
+  ok(!!laDeLaNota, 'queda la marca con nota', 'no queda la marca con nota');
+  await ponerNota(A, laDeLaNota.id, 'Lo de la tableta: comparar dos ofertas.');
+  guardarAparato(A);
+  await ponerNota(B, laDeLaNota.id, 'Lo del teléfono: preguntar la comisión.');
+  guardarAparato(B);
+  await sincronizarEn(A);
+  await sincronizarEn(B);
+  await sincronizarEn(A);
+  const finalA = A.w.FaroMarcador.marcas().find(m=>m.id===laDeLaNota.id);
+  const finalB = B.w.FaroMarcador.marcas().find(m=>m.id===laDeLaNota.id);
+  ok(finalA && /tableta/.test(finalA.n) && /teléfono/.test(finalA.n),
+    'la tableta acaba con las dos notas', 'la tableta perdió una: '+(finalA?JSON.stringify(finalA.n):'sin marca'));
+  ok(finalB && /tableta/.test(finalB.n) && /teléfono/.test(finalB.n),
+    'y el teléfono también', 'el teléfono perdió una: '+(finalB?JSON.stringify(finalB.n):'sin marca'));
+  /* Y sincronizar otra vez no las duplica ni las multiplica. */
+  const largoAntes = (finalA.n||'').length;
+  await sincronizarEn(A); await sincronizarEn(B); await sincronizarEn(A);
+  const otraVez = A.w.FaroMarcador.marcas().find(m=>m.id===laDeLaNota.id);
+  ok(otraVez && (otraVez.n||'').length===largoAntes,
+    'sincronizar de nuevo no vuelve a pegar las notas', 'la nota crece en cada sincronización: '+JSON.stringify(otraVez&&otraVez.n));
+
+  log('\n── LO DE CADA QUIEN ES DE CADA QUIEN ──');
+  const C = await abrirAparato('fb', OTRO, 'otro-miembro');
+  await sincronizarEn(C);
+  ok(C.w.FaroMarcador.marcas().length===0,
+    'otro miembro no ve ni una marca ajena', 'se filtraron '+C.w.FaroMarcador.marcas().length+' marcas de otro');
+  const tC = await marcar(C, 0, 50, 'idea');
+  ok(!!tC, 'el otro miembro puede subrayar lo suyo', 'el otro miembro no pudo subrayar');
+  await sincronizarEn(C);
+  nube = await nubeEstado();
+  const suyas = nube.filas.filter(x=>x.user_id===OTRO);
+  ok(suyas.length===1, 'y lo suyo se guarda aparte, en su propia fila',
+     'filas del otro miembro: '+suyas.length+' (total en la nube: '+nube.filas.length+')');
+  await sincronizarEn(A);
+  ok(!A.w.FaroMarcador.marcas().some(m=>m.c==='idea'),
+    'y el primero sigue sin ver lo del otro', 'se coló una marca ajena');
+
+  log('\n── SIN SEÑAL NO SE PIERDE NADA ──');
+  usar(A);
+  const antes = A.w.FaroMarcador.marcas().length;
+  const fromBueno = A.w.faroSb.from.bind(A.w.faroSb);
+  A.w.faroSb.from = () => ({
+    select: () => ({ eq: () => ({ eq: async () => ({ data: null, error: { message: 'sin conexión' } }) }) }),
+    upsert: async () => ({ error: { message: 'sin conexión' } }),
+  });
+  const t3 = await marcar(A, 2, 55, 'duda');
+  ok(!!t3, 'se puede seguir subrayando con la nube caída', 'sin nube no se puede subrayar');
+  guardarAparato(A);
+  await A.w.FaroMarcador.sincronizar(true); await esperar(300);
+  ok(A.w.FaroMarcador.estadoNube()==='error', 'el panel avisa de que la nube no respondió', 'estado: '+A.w.FaroMarcador.estadoNube());
+  ok(A.w.FaroMarcador.marcas().length===antes+1, 'y lo marcado sigue aquí, entero', 'se perdió lo marcado sin señal');
+  A.w.faroSb.from = fromBueno;
+  await sincronizarEn(A);
+  nube = await nubeEstado();
+  ok(nube.filas.some(x=>x.color==='duda' && x.user_id===USUARIO),
+    'cuando vuelve la señal, lo pendiente sube solo', 'lo marcado sin señal no llegó nunca a la nube');
+  ok(A.w.FaroMarcador.estadoNube()==='al-dia', 'y el panel vuelve a decir que está en la nube', 'el panel se quedó en error');
+
+  log('\n── CORREGIR UNA NOTA NO RESUCITA LA VIEJA ──');
+  /* El fallo más fácil de sufrir y el más difícil de ver: basta un
+     aparato. Se escribe, se sincroniza, se corrige y se vuelve a
+     sincronizar; la versión vieja no puede volver pegada debajo. */
+  const F = await abrirAparato('fb', USUARIO, 'correccion');
+  await sincronizarEn(F);
+  const tF = await marcar(F, 3, 60, 'voz');
+  ok(!!tF, 'se subraya algo nuevo', 'no se pudo subrayar');
+  const mF = F.w.FaroMarcador.marcas().find(m=>m.t===tF);
+  await ponerNota(F, mF.id, 'Primera versión de la nota.');
+  await sincronizarEn(F);
+  await ponerNota(F, mF.id, 'Nota corregida, la buena.');
+  await sincronizarEn(F);
+  await sincronizarEn(F);
+  const trasCorregir = F.w.FaroMarcador.marcas().find(m=>m.id===mF.id);
+  ok(trasCorregir && trasCorregir.n==='Nota corregida, la buena.',
+    'la nota corregida queda sola, sin arrastrar la vieja',
+    'quedó: '+JSON.stringify(trasCorregir && trasCorregir.n));
+  nube = await nubeEstado();
+  const enNube = nube.filas.find(x=>x.id===mF.id);
+  ok(enNube && enNube.nota==='Nota corregida, la buena.', 'y en la nube igual', 'en la nube quedó: '+JSON.stringify(enNube && enNube.nota));
+
+  log('\n── LAS TABLETAS SE COMPARTEN ──');
+  /* Dos personas en el MISMO aparato: lo que marca una no puede
+     aparecerle a la otra ni subirse a su cuenta. */
+  const G = await abrirAparato('fa', OTRO, 'compartida');
+  await sincronizarEn(G);
+  const suyasG = G.w.FaroMarcador.marcas();
+  ok(!suyasG.some(m=>m.t===tF),
+    'al entrar otra persona en el mismo aparato no ve lo del anterior',
+    'se le mostraron marcas del otro miembro');
+  nube = await nubeEstado();
+  ok(!nube.filas.some(x=>x.user_id===OTRO && x.texto===tF),
+    'y nada de lo anterior se sube a su cuenta', 'se subieron marcas ajenas a la cuenta del otro');
+
+  log('\n── LA PUERTA, DESDE FUERA ──');
+  /* Sin sesión no se lee ni una fila, que es lo que dicen las cuatro
+     políticas del SQL. Se comprueba contra el doble con la clave
+     publicable y sin Bearer, que es lo que tendría un desconocido. */
+  const r = await fetch(NUBE+'/rest/v1/lecturas_marcas?select=*', { headers:{ apikey: CLAVE_PUB } });
+  const filas = await r.json();
+  ok(Array.isArray(filas) && filas.length===0, 'sin sesión no se lee ni una marca', 'se leyeron '+JSON.stringify(filas).slice(0,80));
+
+  cerrar();
+ }catch(e){ fallos++; log('✘ '+e.message+'\n'+e.stack); cerrar(); }
+})();
+</script>
+</body>
+</html>

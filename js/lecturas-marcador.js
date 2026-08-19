@@ -123,7 +123,17 @@
     catch (e) { aviso('⚠️ No se pudo guardar la marca'); }
   }
   function nuevoId() {
-    return 'm' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
+    /* La llave primaria de la tabla es común a toda la familia, así que
+       dos aparatos que coincidan en el mismo milisegundo con el mismo
+       número al azar dejarían a uno de los dos sin poder subir esa
+       marca nunca más. Con el generador del navegador el choque deja de
+       ser imaginable; si no lo hay, se echa mano de más azar. */
+    try {
+      if (window.crypto && window.crypto.randomUUID) return 'm' + window.crypto.randomUUID();
+    } catch (e) {}
+    return 'm' + Date.now().toString(36)
+      + Math.random().toString(36).slice(2, 12)
+      + Math.random().toString(36).slice(2, 12);
   }
   function ahora() { return Date.now(); }
   function hoy() {
@@ -209,7 +219,17 @@
      etiquetas sueltas, y es la única manera de que no queden restos
      cuando dos marcas se tocan: el estado de la pantalla sale del
      modelo, nunca al revés. */
-  function pintarTodo() {
+  /* Un repintado rehace el HTML de los trozos marcables, y eso BORRA la
+     selección que la persona tenga en la mano. Si llega una
+     sincronización justo mientras alguien arrastra el dedo para
+     subrayar, se le va lo que estaba seleccionando sin que entienda por
+     qué. Así que lo que viene de la nube espera a que la barra se
+     cierre. Lo que hace la propia persona se pinta al instante, como
+     debe ser. Lo cazó la sonda de los dos aparatos. */
+  let repintadoPendiente = false;
+  function pintarTodo(deLaNube) {
+    if (deLaNube && (seleccion || editando)) { repintadoPendiente = true; return; }
+    repintadoPendiente = false;
     renumerarNotas();
     zonas().forEach(z => {
       z.parrafos.forEach((p, i) => {
@@ -315,15 +335,20 @@
     let nodo = r.commonAncestorContainer;
     if (nodo.nodeType === 3) nodo = nodo.parentElement;
     if (!nodo || !nodo.closest) return null;
-    const p = nodo.closest('p');
-    if (!p) return null;
+    /* Se busca el trozo marcable que CONTIENE la selección, preguntando
+       a las zonas. Antes se buscaba el <p> más cercano, y por eso no se
+       podía subrayar dentro de un aviso 💡 ni en una caja de ejemplo,
+       que son <div>: el marcador los ofrecía y al soltar no pasaba nada.
+       Lo cazó la sonda de los dos aparatos, no el ojo. */
     const todas = zonas();
-    let z = null, idx = -1;
+    let z = null, idx = -1, p = null;
     for (const zz of todas) {
-      const k = zz.parrafos.indexOf(p);
-      if (k >= 0) { z = zz; idx = k; break; }
+      for (let k = 0; k < zz.parrafos.length; k++) {
+        if (zz.parrafos[k] === nodo || zz.parrafos[k].contains(nodo)) { z = zz; idx = k; p = zz.parrafos[k]; break; }
+      }
+      if (z) break;
     }
-    if (!z) return null;
+    if (!z || !p) return null;
     /* El desplazamiento se mide sobre el texto del párrafo, no sobre su
        HTML: así una marca sigue valiendo aunque el párrafo ya tenga
        otras marcas pintadas encima, que cambian el HTML pero no el
@@ -419,6 +444,8 @@
     const b = document.getElementById('fmBarra');
     if (b) b.classList.remove('fm-abierta');
     seleccion = null; editando = null;
+    /* Si la nube trajo algo mientras se marcaba, ahora sí se pinta. */
+    if (repintadoPendiente) pintarTodo();
   }
   function limpiarSeleccion() {
     const s = window.getSelection();
@@ -546,7 +573,13 @@
     try {
       if (!window.supabase) await cargarScript(BASE + 'supabase.min.js');
       if (!window.faroSb) await cargarScript(BASE + 'auth.js');
-    } catch (e) { return null; }
+    } catch (e) {
+      /* Se levanta la bandera para poder volver a intentarlo. Antes se
+         quedaba puesta y la nube moría para siempre en esa página,
+         mientras el panel prometía que se reintentaba solo. */
+      nubePedida = false;
+      return null;
+    }
     return window.faroSb || null;
   }
 
@@ -565,6 +598,8 @@
       zona: m.l, parrafo: m.p, ini: m.i, fin: m.f,
       texto: m.t, color: m.c, nota: m.n || '',
       borrada: !!m.del, actualizado: m.u || 0, fecha: m.fecha || null,
+      /* `sync` no va: es la cuenta que lleva ESTE aparato de qué versión
+         dejó arriba, y no significa nada para los demás. */
     };
   }
   function deFila(f) {
@@ -575,32 +610,154 @@
     };
   }
 
+  /* Une dos notas SIN REPETIR LÍNEAS. Es lo que hace que fusionar dos
+     veces dé lo mismo que fusionar una: pegar los textos a secas parecía
+     funcionar y en realidad hacía crecer la nota en cada viaje a la
+     nube, hasta convertirla en una bola de nieve. Lo cazó la sonda de
+     los dos aparatos sincronizando tres veces seguidas. */
+  /* Dos notas son «la misma» si dicen las mismas líneas, aunque estén en
+     otro orden. Hace falta para no dejar a dos aparatos subiéndose el
+     uno al otro la misma nota en distinto orden hasta el fin de los
+     tiempos: el contenido ya es el mismo, así que no hay nada que
+     mandar. */
+  function mismaNota(a, b) {
+    const clave = t => String(t || '').split('\n').map(x => x.trim()).filter(Boolean).sort().join('\u0001');
+    return clave(a) === clave(b);
+  }
+
+  function unirNotas(primera, segunda) {
+    const vistas = new Set(), lineas = [];
+    primera.split('\n').concat(segunda.split('\n')).forEach(l => {
+      const t = l.trim();
+      if (!t || vistas.has(t)) return;
+      vistas.add(t); lineas.push(t);
+    });
+    return lineas.join('\n');
+  }
+
   /* La fusión. Regla general: gana la versión más reciente. Con UNA
      excepción, que es la que de verdad importa: si las dos versiones
      tienen NOTA y son distintas, las dos notas se conservan juntas en
      vez de que la vieja se pierda. El subrayado se vuelve a hacer en dos
-     segundos; lo que alguien escribió con sus palabras, no. */
+     segundos; lo que alguien escribió con sus palabras, no.
+
+     El orden de la unión es «primero lo de la versión que gana, después
+     lo que le falte de la otra», y no es capricho: así el resultado ya
+     contiene a las dos, y volver a fusionarlo con cualquiera de ellas no
+     lo cambia. Con el orden al revés, cada viaje a la nube reordenaba la
+     nota y los dos aparatos se pasaban versiones distintas para siempre. */
   function fusionar(local, remota) {
     if (!local) return remota;
     if (!remota) return local;
-    const nuevo = (local.u || 0) >= (remota.u || 0) ? Object.assign({}, local) : Object.assign({}, remota);
-    const na = (local.n || '').trim(), nb = (remota.n || '').trim();
-    if (na && nb && na !== nb) {
-      nuevo.n = (nuevo.n === na ? na + '\n' + nb : nb + '\n' + na);
-      nuevo.u = Math.max(local.u || 0, remota.u || 0);
+
+    /* Lo primero, y es lo que estaba mal: saber si una de las dos
+       DESCIENDE de la otra. `sync` guarda qué versión dejó este aparato
+       en la nube la última vez.
+         · Si la copia de la nube es justo esa, entonces lo de aquí es
+           una corrección MÍA encima de lo mío: manda lo local y no hay
+           nada que unir. Sin esto, corregir una nota le pegaba debajo su
+           propia versión vieja, y ni siquiera hacía falta un segundo
+           aparato para verlo.
+         · Si aquí no se ha tocado nada desde la última sincronización,
+           lo de la nube es más nuevo y ya contiene lo mío: manda la
+           nube.
+       Solo cuando ninguna desciende de la otra hay conflicto de verdad,
+       y ahí es donde se conservan las dos notas. */
+    const sync = local.sync || 0;
+    if (sync && (remota.u || 0) === sync) return Object.assign({}, local);
+    if (sync && (local.u || 0) <= sync && (remota.u || 0) > sync) return Object.assign({}, remota, { sync: remota.u || 0 });
+
+    const ganaLocal = (local.u || 0) >= (remota.u || 0);
+    const ganador = ganaLocal ? local : remota;
+    const perdedor = ganaLocal ? remota : local;
+    const nuevo = Object.assign({}, ganador);
+    const notaGana = (ganador.n || '').trim(), notaPierde = (perdedor.n || '').trim();
+
+    /* Si el que gana es un borrado y el que pierde trae una nota que el
+       que borró nunca llegó a ver, la marca NO se entierra: la nota
+       vuelve con ella. Quien borró no estaba renunciando a esa nota,
+       porque no sabía que existía; y la regla de la casa es que lo
+       escrito por una persona no se pierde. Borrar sigue funcionando en
+       el caso normal, que es cuando el borrado sí conocía lo que había. */
+    if (nuevo.del && notaPierde && !perdedor.del) {
+      const revive = Object.assign({}, perdedor);
+      revive.u = Math.max(local.u || 0, remota.u || 0) + 1;
+      revive.del = false;
+      return revive;
+    }
+
+    if (notaPierde && !mismaNota(notaGana, notaPierde)) {
+      /* Aquí entra también el caso que se llevaba una nota entera por
+         delante: el ganador NO tiene nota y el perdedor sí. Como
+         ninguno desciende del otro, el ganador nunca llegó a ver esa
+         nota, así que no la borró: no la conocía. Se conserva. */
+      const unida = notaGana ? unirNotas(notaGana, notaPierde) : notaPierde;
+      if (!mismaNota(unida, notaGana)) {
+        nuevo.n = unida;
+        nuevo.u = Math.max(local.u || 0, remota.u || 0);
+      }
     }
     return nuevo;
   }
 
+  /* Un resumen del modelo, para saber si la sincronización cambió algo.
+     Lleva lo que se ve: el color, la nota, dónde está y si vive. */
+  function firma() {
+    return marcas.slice()
+      .sort((a, b) => (a.id < b.id ? -1 : 1))
+      .map(m => [m.id, m.c, m.n, m.l, m.p, m.i, m.f, m.del ? 1 : 0].join('|'))
+      .join('\u0002');
+  }
+
+  /* Cada quien tiene su cajón en el aparato. Las tabletas de esta casa
+     se comparten, y con un solo cajón por misión lo que subrayaba una
+     hija se lo encontraba el padre al entrar, y encima se subía a la
+     cuenta de él. El cajón sin dueño (el de antes de entrar) se muda al
+     del primero que entre: lo que marcaste antes de identificarte es
+     tuyo, pero solo la primera vez. */
+  function mudarAlCajonDe(uid) {
+    const nueva = MISION + '_marcas_' + uid;
+    if (CLAVE === nueva) return false;
+    const anonimo = MISION + '_marcas';
+    let suyas = [];
+    try { const c = JSON.parse(localStorage.getItem(nueva)); if (Array.isArray(c)) suyas = c; } catch (e) {}
+    if (CLAVE === anonimo && !suyas.length && marcas.length) {
+      /* Primera vez que entra alguien en este aparato: lo de nadie pasa
+         a ser suyo, y el cajón sin dueño se cierra para que no lo herede
+         el siguiente. */
+      try { localStorage.setItem(nueva, JSON.stringify(marcas)); localStorage.removeItem(anonimo); } catch (e) {}
+      CLAVE = nueva;
+      return false;
+    }
+    CLAVE = nueva;
+    marcas = suyas;
+    const limite = ahora() - 180 * 86400000;
+    marcas = marcas.filter(m => !m.del || (m.u || 0) > limite);
+    return true;
+  }
+
   let sincronizando = false;
+  let syncPendiente = false;
   async function sincronizar(manual) {
-    if (sincronizando) return;
+    /* Si llega una petición mientras hay otra en vuelo, no se tira: se
+       apunta y se atiende al terminar. Sin esto, lo que alguien marcara
+       durante una sincronización se quedaba sin subir hasta el
+       siguiente cambio, y el panel decía que ya estaba en la nube. */
+    if (sincronizando) { syncPendiente = true; return; }
     const c = await asegurarCliente(!!manual);
-    if (!c) { estadoNube = haySesionGuardada() ? 'error' : 'sin-sesion'; pintarEstado(); return; }
+    if (!c) {
+      estadoNube = haySesionGuardada() ? 'error' : 'sin-sesion';
+      pintarEstado();
+      if (manual && !haySesionGuardada()) aviso('📴 Entra en F.A.R.O para que tus marcas viajen a otros aparatos');
+      return;
+    }
     const u = await usuarioActual();
     if (!u) { estadoNube = 'sin-sesion'; pintarEstado(); return; }
+    /* Ya se sabe quién es: a partir de aquí se trabaja en SU cajón. */
+    if (mudarAlCajonDe(u.id)) { reanclar(); pintarTodo(true); }
     sincronizando = true;
     estadoNube = 'subiendo'; pintarEstado();
+    const firmaAntes = firma();
     try {
       /* 1. Bajar lo que hay en la nube para ESTA misión y ESTE usuario.
             Son decenas de filas: se traen todas y se fusiona en el
@@ -621,7 +778,12 @@
         porId[r.id] = f;
         /* Si lo fusionado no es igual que lo que hay arriba, hay que
            volver a subirlo. */
-        if (!l || (f.u || 0) > (r.u || 0) || (f.n || '') !== (r.n || '')) subir.push(f);
+        /* Si la marca solo estaba en la nube, se acaba de bajar tal
+           cual: no hay nada que devolver. Antes se subía otra vez en
+           cada carga de página, y eso mantenía vivas para siempre las
+           lápidas que ya tocaba barrer. */
+        if (!l) return;
+        if ((f.u || 0) > (r.u || 0) || !mismaNota(f.n, r.n)) subir.push(f);
       });
       /* Lo que solo existe aquí sube entero. */
       Object.keys(porId).forEach(id => {
@@ -635,8 +797,21 @@
         const { error: e2 } = await c.from('lecturas_marcas')
           .upsert(subir.map(m => aFila(m, u.id)), { onConflict: 'id' });
         if (e2) throw e2;
+        /* Queda anotado QUÉ versión de cada marca hay ahora en la nube.
+           Es lo que permite, la próxima vez, saber si lo de arriba es mi
+           propio antepasado o el trabajo de otro aparato. */
+        subir.forEach(m => { m.sync = m.u || 0; });
       }
-      guardar(); pintarTodo();
+      /* Lo que solo estaba en la nube también queda sellado: se acaba de
+         bajar, así que su versión conocida es esa. */
+      remotas.forEach(r => { const m = porId[r.id]; if (m && !m.sync) m.sync = r.u || 0; });
+      /* Solo se repinta si la nube trajo algo distinto. Sin esto, cada
+         viaje a la nube rehacía el texto entero aunque no hubiera
+         cambiado ni una marca, y eso son parpadeos y selecciones
+         perdidas a cambio de nada. */
+      const despues = firma();
+      guardar();
+      if (despues !== firmaAntes) { reanclar(); pintarTodo(true); } else pintarEstado();
       estadoNube = 'al-dia'; ultimaNube = ahora();
       if (manual) aviso('☁️ Marcas sincronizadas');
     } catch (e) {
@@ -645,18 +820,25 @@
     } finally {
       sincronizando = false;
       pintarEstado();
+      if (syncPendiente) { syncPendiente = false; setTimeout(() => sincronizar(false), 60); }
     }
   }
 
   /* Se sincroniza con un respiro después de cada cambio: quien subraya
      tres frases seguidas no debe provocar tres viajes a la nube. */
   function pedirNube() {
+    /* Mientras no haya subido, el panel lo dice. Decir «guardado también
+       en la nube» con algo recién escrito sin subir es la clase de
+       mentira que hace que la gente cierre la aplicación tranquila y
+       pierda su trabajo. */
+    if (estadoNube === 'al-dia' || estadoNube === 'pendiente') { estadoNube = 'pendiente'; pintarEstado(); }
     clearTimeout(temporizadorNube);
     temporizadorNube = setTimeout(() => sincronizar(false), 2500);
   }
 
   function textoEstado() {
     if (estadoNube === 'al-dia')     return '☁️ Guardado también en la nube';
+    if (estadoNube === 'pendiente')  return '✍️ Guardado aquí; subiendo a la nube...';
     if (estadoNube === 'subiendo')   return '☁️ Sincronizando...';
     if (estadoNube === 'sin-sesion') return '📴 Solo en este aparato: entra en F.A.R.O para que viaje';
     if (estadoNube === 'error')      return '⚠️ Guardado aquí; la nube no respondió, se reintenta solo';
@@ -761,16 +943,20 @@
         html += '<h3 style="font-size:0.9rem;margin-top:8px;">📖 ' + esc(titulos[m.l] || m.l) + '</h3>';
       }
       const c = PORID[m.c] || CATS[0];
-      html += '<div class="fm-item fm-item-' + m.c + (m.huerfana ? ' fm-item-huerfana' : '') + '">'
+      /* El color y el identificador se escapan aunque los ponga el
+         propio aparato: pueden llegar de la nube, y la casa tiene dicho
+         que ningún dato guardado se interpola crudo dentro de un
+         atributo (la razón, con su ejemplo, está en CLAUDE.md). */
+      html += '<div class="fm-item fm-item-' + esc(m.c) + (m.huerfana ? ' fm-item-huerfana' : '') + '">'
         + '<div class="fm-item-cab"><span>' + c.ini + ' · ' + c.nombre + (m.num ? ' · nota ' + m.num : '') + '</span>'
         + '<span>' + esc(m.fecha || '') + '</span></div>'
         + '<div class="fm-item-txt">«' + esc(m.t) + '»</div>'
         + (m.n ? '<div class="fm-item-nota">✎ ' + esc(m.n) + '</div>' : '')
         + (m.huerfana ? '<div class="fm-item-aviso">⚠️ Este trozo ya no está en el texto (la misión se corrigió). La nota se conserva aquí.</div>' : '')
         + '<div class="fm-item-btns">'
-        + (m.huerfana ? '' : '<button type="button" class="fm-mini" data-ir="' + m.id + '">📍 Ir</button>')
-        + '<button type="button" class="fm-mini" data-nota="' + m.id + '">✎ ' + (m.n ? 'Editar nota' : 'Añadir nota') + '</button>'
-        + '<button type="button" class="fm-mini" data-quita="' + m.id + '">🗑 Quitar</button>'
+        + (m.huerfana ? '' : '<button type="button" class="fm-mini" data-ir="' + esc(m.id) + '">📍 Ir</button>')
+        + '<button type="button" class="fm-mini" data-nota="' + esc(m.id) + '">✎ ' + (m.n ? 'Editar nota' : 'Añadir nota') + '</button>'
+        + '<button type="button" class="fm-mini" data-quita="' + esc(m.id) + '">🗑 Quitar</button>'
         + '</div></div>';
     });
     html += '</div>';
@@ -784,7 +970,8 @@
   }
 
   function irA(id) {
-    const mk = document.querySelector('[data-fm-id="' + id + '"]');
+    const mk = [...document.querySelectorAll('[data-fm-id]')]
+      .find(x => x.getAttribute('data-fm-id') === id);
     if (!mk) return aviso('Esa marca ya no está en el texto');
     /* En estas misiones cada sección es una pestaña: si la marca está en
        otra, primero hay que cambiar de sección o el desplazamiento no
@@ -999,8 +1186,32 @@
     todas: function () { return marcas.slice(); },
     zonas: function () { return zonas().map(z => ({ clave: z.clave, titulo: z.titulo, parrafos: z.parrafos.length })); },
     estadoNube: function () { return estadoNube; },
+    /* En qué cajón del aparato se está guardando ahora mismo. Cambia
+       cuando se sabe quién entró (de «sin dueño» al de la persona), y
+       las sondas necesitan saberlo para no medir el cajón equivocado. */
+    claveLocal: function () { return CLAVE; },
+    /* Para las sondas: dice si un nodo cae dentro de un trozo marcable.
+       Sin esto, cuando una selección no se puede marcar no hay manera de
+       saber si el problema es la selección o la zona. */
+    esMarcable: function (nodo) {
+      const el = (nodo && nodo.nodeType === 3) ? nodo.parentElement : nodo;
+      if (!el) return false;
+      return zonas().some(z => z.parrafos.some(p => p === el || p.contains(el)));
+    },
+    /* Para las sondas: dice si un nodo cae dentro de un trozo marcable.
+       Sin esto, cuando una selección no se puede marcar no hay manera de
+       saber si el problema es la selección o la zona. */
+    esMarcable: function (nodo) {
+      const el = (nodo && nodo.nodeType === 3) ? nodo.parentElement : nodo;
+      if (!el) return false;
+      return zonas().some(z => z.parrafos.some(p => p === el || p.contains(el)));
+    },
     sincronizar: sincronizar,
     repintar: pintarTodo,
+    /* Vuelve a leer lo guardado y lo repinta. Hace falta cuando el
+       almacén cambió por debajo: otra pestaña de la misma misión, o la
+       sonda simulando que se cambió de aparato. */
+    recargar: function () { cargar(); reanclar(); pintarTodo(); },
     iniciar: iniciar,
   };
 

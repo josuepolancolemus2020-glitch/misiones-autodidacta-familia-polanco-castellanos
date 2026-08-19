@@ -329,16 +329,41 @@ notas en el aparato. Ahora se guardan **dos veces**:
    es **el usuario que entró, no el aparato**: los cuatro comparten
    tabletas y las notas de una hija no tienen por qué salirle al padre.
 
-Cuatro reglas que no son de adorno, y cada una viene de un fallo posible:
+Las reglas, y cada una viene de un fallo que se probó de verdad:
 
+- **Cada quien tiene su cajón en el aparato.** La clave local lleva la
+  misión Y quién entró. En esta casa las tabletas se comparten, y con un
+  solo cajón por misión lo que subrayaba una hija se lo encontraba el
+  padre al entrar, y encima se subía a la cuenta de él. Lo marcado antes
+  de identificarse se muda al primero que entra, y solo una vez.
 - **Borrar deja una lápida, no un hueco.** Si el teléfono borrara la fila
   sin más, la tableta que aún tiene su copia la volvería a subir y la
-  marca resucitaría sola. La lápida se barre a los 180 días.
-- **Al chocar dos versiones, gana la más reciente; pero si las dos traen
-  NOTA escrita y son distintas, se conservan LAS DOS**, una debajo de la
-  otra. Un subrayado se rehace en dos segundos; lo que alguien escribió
-  con sus palabras, no. El reloj que ordena es el del aparato, que puede
-  estar mal, y por eso lo irremplazable no se descarta nunca.
+  marca resucitaría sola. La lápida se barre a los 180 días, y lo que
+  solo vive en la nube no se vuelve a subir: si se subiera, ninguna
+  lápida llegaría nunca a los 180 días.
+- **Antes de fusionar se mira la descendencia.** Cada marca recuerda qué
+  versión suya quedó en la nube. Si lo de arriba es justo eso, lo de aquí
+  es una corrección MÍA y manda sin más: sin esta comprobación, corregir
+  una nota le pegaba debajo su propia versión vieja, y ni siquiera hacía
+  falta un segundo aparato para verlo.
+- **En un choque de verdad no se pierde nada escrito.** Si las dos traen
+  nota, se conservan las dos, unidas por líneas y sin repetir, con las
+  del que gana primero: así fusionar dos veces da lo mismo que fusionar
+  una y la nota no crece en cada viaje. Si solo una trae nota, esa se
+  conserva, porque el otro nunca llegó a verla y por tanto no la borró.
+  Y **una nota que el que borró no conocía gana al borrado**: la marca
+  vuelve con ella en vez de quedar enterrada. El reloj que ordena es el
+  del aparato, que puede estar mal, y por eso lo irremplazable no se
+  descarta nunca.
+- **El panel nunca miente sobre dónde está lo escrito.** Hay un estado
+  para lo que se acaba de marcar y todavía no ha subido; decir «guardado
+  también en la nube» con algo sin subir es lo que hace que alguien
+  cierre tranquilo y pierda su trabajo. Y lo que se marque mientras hay
+  una sincronización en vuelo se apunta y se sube al terminar, en vez de
+  perderse hasta el siguiente cambio.
+- **Un repintado no puede llevarse una selección.** Lo que llega de la
+  nube espera a que se cierre la barra de marcar, y no se repinta nada si
+  la sincronización no trajo ningún cambio.
 - **La nube se carga sola y solo si hace falta.** El marcador trae
   `supabase.min.js` y `js/auth.js` **únicamente si ya hay sesión guardada
   en ese navegador**. Cargarlos siempre haría que las 38 misiones pidieran
