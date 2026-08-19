@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Rutas: materia y plegado</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:900px;border:0;background:#fff}pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba las dos cosas que se le pidieron a la pantalla «Mis Rutas»:
+   1. que cada tarjeta rotule el nombre GENERAL de la materia (y que la Ruta de
+      la Máquina que se Mira diga «Metacognición», que es el caso que pidió el
+      autor), sin que ninguna se quede sin rótulo;
+   2. que la tarjeta se pliegue y se despliegue, que se maneje con teclado y que
+      el estado siga puesto después de recargar.
+   Se recarga DOS veces a propósito: la primera para sembrar la sesión, la
+   segunda para comprobar que lo guardado sobrevive. */
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0, fase = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+const cerrar = () => { log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda rutas: materia y plegado'; };
+
+/* Busca la tarjeta por el nombre EXACTO de la ruta: hay nombres que son prefijo
+   de otros («Ruta del Poder» y «Ruta del Poder Político») y un test de texto
+   suelto agarraría la que no es. */
+function tarjeta(d, nombre) {
+  return [...d.querySelectorAll('.ruta-card')]
+    .find(c => (c.querySelector('.ruta-nombre') || {}).textContent === nombre);
+}
+function rotulo(card) {
+  const el = card && card.querySelector('.ruta-materia');
+  return el ? el.textContent.trim() : '';
+}
+function boton(card) { return card && card.querySelector('.ruta-toggle'); }
+function abierta(card) { return boton(card) && boton(card).getAttribute('aria-expanded') === 'true'; }
+/* «Construidas» sale de la propia cuenta de la tarjeta, que es lo que ve el
+   usuario: así la sonda no depende de cuántas misiones haya en el catálogo hoy
+   y no hay que venir a corregirla cada vez que se construye una etapa. */
+function construidas(card) {
+  const m = /·\s*(\d+)\s*construida/.exec((card.querySelector('.ruta-cuenta') || {}).textContent || '');
+  return m ? Number(m[1]) : -1;
+}
+
+f.onload = async () => {
+  const w = f.contentWindow, d = f.contentDocument;
+  try {
+    if (fase === 0) {
+      fase = 1;
+      w.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+      w.localStorage.removeItem('faro_v1');   /* se mide desde cero, sin plegados heredados */
+      w.location.reload();
+      return;
+    }
+
+    if (fase === 1) {
+      fase = 2;
+      await esperar(900);
+      w.switchView('view-rutas'); await esperar(300);
+      const cards = [...d.querySelectorAll('.ruta-card')];
+
+      log('── NOMBRE DE LA MATERIA EN CADA RUTA ──');
+      ok(cards.length === 38, 'las 38 rutas siguen en el mapa', 'rutas: ' + cards.length);
+      const sinRotulo = cards.filter(c => !rotulo(c));
+      ok(sinRotulo.length === 0, 'las 38 tarjetas traen su nombre de materia',
+        sinRotulo.length + ' sin rótulo: ' + sinRotulo.map(c => (c.querySelector('.ruta-nombre')||{}).textContent).join(', '));
+
+      /* El caso que pidió el autor por su nombre. */
+      const espejo = tarjeta(d, 'Ruta de la Máquina que se Mira');
+      ok(!!espejo, 'está la Ruta de la Máquina que se Mira', 'falta la ruta del espejo');
+      ok(espejo && rotulo(espejo) === 'Metacognición',
+        'y sale rotulada como «Metacognición»', 'dice «' + rotulo(espejo) + '»');
+
+      /* Tres del Estudio Mayor: el rótulo sale del compendio y NO del color,
+         que en las veintiocho es el mismo ('mayor'). */
+      [['Ruta del Barro Vivo', 'Neuroplasticidad'],
+       ['Ruta del Expediente Dorado', 'Crítica al Capitalismo'],
+       ['Ruta de las Mil Caras', 'Estudio de la Mitología: la base de Joseph Campbell']].forEach(([n, esperado]) => {
+        const c = tarjeta(d, n);
+        ok(c && rotulo(c) === esperado, n + ' → ' + esperado, n + ' dice «' + rotulo(c) + '»');
+      });
+      /* Y tres de las otras, donde el rótulo se reutiliza del `label` de
+         MATERIAS por el color. El Pensamiento es el caso torcido: lleva color
+         'bach' y su materia se llama 'epis'. */
+      [['Ruta de la Persuasión', 'Psicología y Persuasión'],
+       ['Ruta de la Ley y sus Grietas', 'Derecho y Ley'],
+       ['Ruta del Pensamiento', 'Epistemología']].forEach(([n, esperado]) => {
+        const c = tarjeta(d, n);
+        ok(c && rotulo(c) === esperado, n + ' → ' + esperado, n + ' dice «' + rotulo(c) + '»');
+      });
+      /* Ninguna ruta del Estudio Mayor puede quedarse con el rótulo compartido:
+         si alguna dice «Estudio Mayor» es que se le olvidó su `materia`. */
+      const genericas = cards.filter(c => rotulo(c) === 'Estudio Mayor');
+      ok(genericas.length === 0, 'ninguna del Estudio Mayor se quedó con el rótulo compartido',
+        genericas.length + ' rutas dicen «Estudio Mayor»');
+      /* El rótulo se AGREGA: el nombre de la ruta no se toca. */
+      ok(espejo && (espejo.querySelector('.ruta-nombre') || {}).textContent === 'Ruta de la Máquina que se Mira',
+        'el nombre de la ruta sigue intacto, el rótulo va aparte', 'el rótulo se metió dentro del nombre');
+
+      log('\n── LA TARJETA SE PLIEGA ──');
+      const conBoton = cards.filter(c => boton(c) && boton(c).tagName === 'BUTTON').length;
+      ok(conBoton === cards.length, 'las 38 llevan un botón de verdad', conBoton + ' de ' + cards.length + ' lo llevan');
+      const bienAtadas = cards.filter(c => {
+        const b = boton(c); if (!b) return false;
+        const panel = d.getElementById(b.getAttribute('aria-controls') || '');
+        return panel && panel.classList.contains('ruta-etapas') && /^(true|false)$/.test(b.getAttribute('aria-expanded') || '');
+      }).length;
+      ok(bienAtadas === cards.length, 'cada botón declara aria-expanded y apunta a su lista con aria-controls',
+        bienAtadas + ' de ' + cards.length + ' bien atadas');
+      /* Se comprueba que sea un <button> de verdad, sin `disabled` y sin sacarlo
+         del orden de tabulación: así el teclado lo alcanza con Tab y lo dispara
+         con Enter y con espacio sin que haya que escribir nada de eso a mano.
+         No se mide el foco de verdad porque en esta sonda el armazón de la
+         aplicación va con display:none (la puerta de sesión no se abre sin red)
+         y un elemento sin pintar no puede tomar foco. */
+      const b0 = boton(cards[0]);
+      ok(b0 && b0.tabIndex === 0 && !b0.disabled && b0.getAttribute('type') === 'button',
+        'el botón queda en el orden de tabulación y no está deshabilitado', 'el botón no es alcanzable con el teclado');
+      /* El anillo de foco no se ve desde getComputedStyle (hace falta el estado
+         :focus-visible), así que se comprueba que la regla esté escrita. */
+      let reglaFoco = false;
+      [...d.styleSheets].forEach(hoja => {
+        try { [...hoja.cssRules].forEach(r => {
+          if (r.selectorText && /\.ruta-toggle:focus-visible/.test(r.selectorText) && /outline/.test(r.style.cssText)) reglaFoco = true;
+        }); } catch (e) {}
+      });
+      ok(reglaFoco, 'hay regla de foco visible para el botón', 'falta el anillo de :focus-visible');
+
+      /* Estado inicial: desplegadas las que ya tienen alguna etapa construida,
+         plegadas las que están enteras por construir. */
+      const malInicio = cards.filter(c => abierta(c) !== (construidas(c) > 0));
+      ok(malInicio.length === 0,
+        'arranca desplegada la ruta con etapas construidas y plegada la que está entera por construir',
+        malInicio.length + ' rutas arrancan al revés');
+
+      /* Plegada NO significa vaciada: las etapas siguen en el documento (y por
+         eso las sondas que las cuentan siguen contando bien) y el enlace de una
+         etapa construida sigue llevando a su misión. */
+      const dorado = tarjeta(d, 'Ruta del Expediente Dorado');
+      const marea  = tarjeta(d, 'Ruta de la Marea');
+      ok(marea && !abierta(marea) && marea.querySelectorAll('.ruta-etapa').length === 6,
+        'la Ruta de la Marea arranca plegada y conserva sus 6 etapas en el documento',
+        'la ruta plegada perdió sus etapas');
+      /* Se mira el atributo Y el `display` que de verdad queda: `hidden` solo no
+         basta, porque una regla con `display: flex` le gana y la lista se sigue
+         viendo con el aria diciendo que está cerrada. Pasó, y por eso está aquí. */
+      const listaMarea = d.getElementById(boton(marea).getAttribute('aria-controls'));
+      ok(marea && listaMarea.hidden === true && w.getComputedStyle(listaMarea).display === 'none',
+        'la lista plegada lleva hidden y no se pinta', 'la lista plegada se sigue viendo');
+      const enlace = dorado && dorado.querySelector('.re-link');
+      ok(enlace && /gran-fuga\.html$/.test(enlace.getAttribute('href') || ''),
+        'el enlace de la etapa construida sigue apuntando a su misión', 'se rompió el enlace de la etapa');
+      ok(dorado && /5 construidas/.test((dorado.querySelector('.ruta-cuenta')||{}).textContent||''),
+        'la cuenta de avance sigue en su sitio', 'cuenta: ' + (dorado ? (dorado.querySelector('.ruta-cuenta')||{}).textContent : '(sin tarjeta)'));
+
+      /* Se pulsan las dos, en los dos sentidos. */
+      boton(marea).click(); await esperar(60);
+      ok(abierta(marea) && listaMarea.hidden === false && w.getComputedStyle(listaMarea).display !== 'none',
+        'al pulsar, la ruta plegada se despliega', 'no se desplegó');
+      const listaEspejo = d.getElementById(boton(espejo).getAttribute('aria-controls'));
+      boton(espejo).click(); await esperar(60);
+      ok(!abierta(espejo) && listaEspejo.hidden === true && w.getComputedStyle(listaEspejo).display === 'none',
+        'al pulsar, la ruta desplegada se pliega', 'no se plegó');
+      /* Y lo esencial se sigue viendo con la tarjeta plegada. Se mira `hidden` y
+         el `display` calculado de cada pieza, no su rectángulo: aquí el armazón
+         de la aplicación va con display:none y nada tiene medidas. */
+      const visible = el => !!el && !el.hidden && w.getComputedStyle(el).display !== 'none';
+      const escondido = ['.ruta-emoji', '.ruta-materia', '.ruta-nombre', '.ruta-lema', '.ruta-barra-wrap', '.ruta-cuenta']
+        .filter(sel => !visible(espejo.querySelector(sel)));
+      ok(escondido.length === 0,
+        'plegada sigue enseñando emoji, materia, nombre, lema, barra y cuenta',
+        'plegada esconde: ' + escondido.join(', '));
+      ok(!visible(espejo.querySelector('.ruta-etapas')), 'y esconde la lista de etapas', 'la lista sigue a la vista');
+
+      log('\n── EL ESTADO SE RECUERDA (recargando) ──');
+      w.location.reload();
+      return;
+    }
+
+    /* fase 2: la misma pantalla, después de recargar. */
+    await esperar(900);
+    w.switchView('view-rutas'); await esperar(300);
+    const espejo2 = tarjeta(d, 'Ruta de la Máquina que se Mira');
+    const marea2  = tarjeta(d, 'Ruta de la Marea');
+    ok(espejo2 && !abierta(espejo2), 'la que se plegó sigue plegada tras recargar', 'volvió a abrirse sola');
+    ok(marea2 && abierta(marea2), 'la que se desplegó sigue desplegada tras recargar', 'volvió a cerrarse sola');
+    const lista2 = marea2 && d.getElementById(boton(marea2).getAttribute('aria-controls'));
+    ok(lista2 && lista2.hidden === false && w.getComputedStyle(lista2).display !== 'none',
+      'y su lista de etapas se ve', 'la lista quedó escondida');
+    const listaEspejo2 = espejo2 && d.getElementById(boton(espejo2).getAttribute('aria-controls'));
+    ok(listaEspejo2 && w.getComputedStyle(listaEspejo2).display === 'none',
+      'y la de la plegada sigue sin pintarse', 'la ruta plegada enseña sus etapas igual');
+    /* Las que no se tocaron siguen su criterio inicial. */
+    const dorado2 = tarjeta(d, 'Ruta del Expediente Dorado');
+    ok(dorado2 && abierta(dorado2), 'la ruta que nadie tocó conserva su estado inicial', 'la ruta sin tocar cambió sola');
+    /* Y se guarda donde se guarda todo lo demás, no en un almacén nuevo. */
+    const guardado = JSON.parse(w.localStorage.getItem('faro_v1') || '{}');
+    ok(guardado.rutasAbiertas && guardado.rutasAbiertas.espejo === false && guardado.rutasAbiertas.marea === true,
+      'el estado vive dentro de faro_v1, con el resto de la aplicación', 'no quedó guardado en faro_v1');
+    ok(Object.keys(w.localStorage).filter(k => /^faro/.test(k)).sort().join(',') === 'faro_session,faro_v1',
+      'no se inventó ninguna clave de almacenamiento nueva',
+      'claves: ' + Object.keys(w.localStorage).filter(k => /^faro/.test(k)).join(','));
+    cerrar();
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); cerrar(); }
+};
+</script>
+</body>
+</html>

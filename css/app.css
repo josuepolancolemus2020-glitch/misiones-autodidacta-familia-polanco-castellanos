@@ -4007,11 +4007,46 @@ body {
   border-radius: 16px; padding: 14px; margin-bottom: 14px;
   box-shadow: 0 1px 3px rgba(15,23,42,.06);
 }
-.ruta-head { display: flex; align-items: flex-start; gap: 10px; }
+/* La cabecera es el botón que pliega y despliega la ruta. Va dentro de un h3
+   (el patrón de acordeón: encabezado por fuera, botón por dentro) para que la
+   pantalla siga teniendo su índice de títulos al recorrerla con lector. */
+.ruta-cabecera { margin: 0; font-size: inherit; font-weight: inherit; }
+.ruta-toggle {
+  width: 100%; display: flex; align-items: flex-start; gap: 10px;
+  background: none; border: 0; padding: 0; margin: 0;
+  text-align: left; color: inherit; cursor: pointer;
+}
+/* Foco visible de verdad: esta tarjeta se maneja con teclado y sin este anillo
+   no se sabe en qué ruta se está parado. */
+.ruta-toggle:focus-visible {
+  outline: 2px solid var(--brand-light, #3b82f6); outline-offset: 3px; border-radius: 12px;
+}
+.ruta-toggle:active { opacity: .75; }
 .ruta-emoji { font-size: 26px; line-height: 1; flex-shrink: 0; }
-.ruta-titulos { min-width: 0; }
-.ruta-nombre { margin: 0; font-size: 16px; font-weight: 800; color: var(--text, #0f172a); }
-.ruta-lema   { margin: 2px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--muted, #64748b); }
+.ruta-titulos { min-width: 0; flex: 1; }
+/* Antetítulo con el nombre general de la materia. Discreto a propósito: dice de
+   qué se estudia sin pelearle el tamaño al nombre de la ruta. Los colores salen
+   todos de las variables del tema, así que si algún día la aplicación estrena
+   modo oscuro, el chip lo sigue sin tocar nada. */
+.ruta-materia {
+  display: block; font-size: 10.5px; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted, #64748b);
+  /* Se parte en varias líneas si hace falta: hay materias de nombre largo
+     («Estudio de la Mitología: la base de Joseph Campbell») y a 380 px no
+     puede empujar el ancho de la tarjeta. */
+  overflow-wrap: anywhere;
+}
+.ruta-nombre { display: block; margin: 1px 0 0; font-size: 16px; font-weight: 800; color: var(--text, #0f172a); }
+.ruta-lema   { margin: 4px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--muted, #64748b); }
+.ruta-chevron {
+  flex-shrink: 0; margin-top: 6px; font-size: 13px; color: var(--faint, #94a3b8);
+  transition: transform .2s ease;
+}
+.ruta-toggle[aria-expanded="true"] .ruta-chevron { transform: rotate(180deg); }
+/* Plegada la tarjeta cierra un poco más abajo: sin lista de etapas, el margen
+   de la cuenta se queda flotando. */
+.ruta-card-plegada .ruta-cuenta { margin-bottom: 0; }
 
 .ruta-barra-wrap {
   height: 8px; border-radius: 999px; background: var(--bg, #f1f5f9);
@@ -4021,6 +4056,12 @@ body {
 .ruta-cuenta { margin: 0 0 10px; font-size: 12px; font-weight: 700; color: var(--muted, #64748b); }
 
 .ruta-etapas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+/* Sin esta línea el plegado NO plegaba nada: el `display: flex` de la regla de
+   arriba le gana al `[hidden] { display: none }` que trae el navegador, así que
+   la lista seguía a la vista con el atributo puesto y el aria diciendo que
+   estaba cerrada. Se descubrió mirando la captura, no la sonda: la sonda
+   preguntaba por el atributo y el atributo sí estaba. */
+.ruta-etapas[hidden] { display: none; }
 .ruta-etapa {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 10px; border-radius: 12px;

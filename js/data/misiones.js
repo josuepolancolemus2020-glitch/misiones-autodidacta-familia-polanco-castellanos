@@ -3,7 +3,15 @@
             cuántas etapas tendrá cuando esté completa, así el mapa muestra
             desde el principio lo que falta por construir.
    MISSIONS = lo que existe hoy. Cada misión dice a qué ruta pertenece y qué
-            etapa ocupa; sin entrada aquí, para la aplicación no existe. */
+            etapa ocupa; sin entrada aquí, para la aplicación no existe.
+
+   El campo `materia` de una ruta es el nombre GENERAL de lo que se estudia en
+   ella (Metacognición, Retórica, Geopolítica…), y es opcional: si falta, el
+   mapa de rutas lo saca del `label` de MATERIAS por el `color`. Se declara a
+   mano solo en las veintiocho rutas del Estudio Mayor, porque todas comparten
+   el color 'mayor' (para no llenar el filtro de chips de la portada) y ese
+   rótulo compartido no dice qué materia es cada una. Los nombres salen tal
+   cual de los encabezados de COMPENDIO-ESTUDIO-MAYOR.md, del 4 al 31. */
 
 const RUTAS = {
   /* 10 etapas: las 2 primeras son misiones normales (Panorama y Frontend) y de
@@ -37,66 +45,66 @@ const RUTAS = {
      compendio trae veintisiete materias; entran al catálogo una por una,
      cuando se construye su primera misión, y todas bajo la materia 'mayor'
      para no llenar el filtro de chips (capítulo 30 del compendio). */
-  espejo:     { nombre: 'Ruta de la Máquina que se Mira',    emoji: '🪞', color: 'mayor', etapas: 6,
+  espejo:     { nombre: 'Ruta de la Máquina que se Mira',    emoji: '🪞', color: 'mayor', materia: 'Metacognición', etapas: 6,
                 lema: 'Saber no se siente: se comprueba con el cuaderno cerrado' },
   /* Las otras veintisiete materias del Estudio Mayor, declaradas enteras
      ANTES de construirse, como se hizo con la Ley: el autor pidió ver el
      mapa completo para ir ordenando misiones desde ahí. Nombres, emojis,
      lemas y títulos de etapa salen de COMPENDIO-ESTUDIO-MAYOR.md; si el
      compendio cambia, esto se regenera, no se edita a mano. */
-  barro: { nombre: "Ruta del Barro Vivo", emoji: "🏺", color: 'mayor', etapas: 6,
+  barro: { nombre: "Ruta del Barro Vivo", emoji: "🏺", color: 'mayor', materia: 'Neuroplasticidad', etapas: 6,
     lema: "El cerebro se vuelve aquello que se le hace repetir" },
-  partitura: { nombre: "Ruta de la Partitura Anotada", emoji: "🎼", color: 'mayor', etapas: 6,
+  partitura: { nombre: "Ruta de la Partitura Anotada", emoji: "🎼", color: 'mayor', materia: 'Epigenética', etapas: 6,
     lema: "La misma partitura, otra música: el ambiente decide qué genes suenan y cuáles callan" },
-  manana: { nombre: "Ruta del Yo de Mañana", emoji: "⏳", color: 'mayor', etapas: 6,
+  manana: { nombre: "Ruta del Yo de Mañana", emoji: "⏳", color: 'mayor', materia: 'Ciencia de la Procrastinación', etapas: 6,
     lema: "No es pereza: es un pleito entre el yo de hoy y el yo de mañana, y se gana con diseño, no con regaños" },
-  brujula: { nombre: "Ruta de la Brújula Torcida", emoji: "🧭", color: 'mayor', etapas: 6,
+  brujula: { nombre: "Ruta de la Brújula Torcida", emoji: "🧭", color: 'mayor', materia: 'Sesgo cognitivo', etapas: 6,
     lema: "El error que cae siempre del mismo lado no se corrige con avisos: se corrige cambiando el procedimiento" },
-  apuesta: { nombre: "Ruta de la Apuesta Medida", emoji: "🎲", color: 'mayor', etapas: 6,
+  apuesta: { nombre: "Ruta de la Apuesta Medida", emoji: "🎲", color: 'mayor', materia: 'Toma de decisiones', etapas: 6,
     lema: "Toda decisión es una apuesta: se juzga por cómo se decidió, no por cómo cayó el dado" },
-  puente: { nombre: "Ruta del Puente que Aguanta", emoji: "🌉", color: 'mayor', etapas: 6,
+  puente: { nombre: "Ruta del Puente que Aguanta", emoji: "🌉", color: 'mayor', materia: 'Lógica del argumento', etapas: 6,
     lema: "Un argumento se revisa dos veces: la forma que lo sostiene y los materiales con que se armó" },
-  trasluz: { nombre: "Ruta del Billete al Trasluz", emoji: "🔍", color: 'mayor', etapas: 6,
+  trasluz: { nombre: "Ruta del Billete al Trasluz", emoji: "🔍", color: 'mayor', materia: 'Las falacias', etapas: 6,
     lema: "Casi ninguna forma es trampa siempre: el billete se mira al trasluz antes de gritar falso" },
-  discurso: { nombre: "Ruta del Discurso por Dentro", emoji: "🎭", color: 'mayor', etapas: 6,
+  discurso: { nombre: "Ruta del Discurso por Dentro", emoji: "🎭", color: 'mayor', materia: 'Retórica', etapas: 6,
     lema: "Desmontar todo lo que intenta convencer, y armar lo propio con las mismas piezas" },
-  piedras: { nombre: "Ruta de las Piedras en la Boca", emoji: "🗣️", color: 'mayor', etapas: 6,
+  piedras: { nombre: "Ruta de las Piedras en la Boca", emoji: "🗣️", color: 'mayor', materia: 'Oratoria', etapas: 6,
     lema: "Hablar de pie se aprende de pie: voz, pausa, cuerpo y miedo, entrenados a propósito" },
-  cartas: { nombre: "Ruta de las Cartas Marcadas", emoji: "🃏", color: 'mayor', etapas: 6,
+  cartas: { nombre: "Ruta de las Cartas Marcadas", emoji: "🃏", color: 'mayor', materia: 'Estratagemas en el discurso', etapas: 6,
     lema: "Ver la trampa antes de que cierre: el catálogo del que discute para ganar" },
-  tinta: { nombre: "Ruta del Espejo de Tinta", emoji: "📖", color: 'mayor', etapas: 6,
+  tinta: { nombre: "Ruta del Espejo de Tinta", emoji: "📖", color: 'mayor', materia: 'La literatura', etapas: 6,
     lema: "Leer por dentro: quién cuenta, cuánto sabe y por qué se le cree" },
-  milcaras: { nombre: "Ruta de las Mil Caras", emoji: "🐉", color: 'mayor', etapas: 6,
+  milcaras: { nombre: "Ruta de las Mil Caras", emoji: "🐉", color: 'mayor', materia: 'Estudio de la Mitología: la base de Joseph Campbell', etapas: 6,
     lema: "Leer los mitos por dentro: qué ordenan, quién los moldea y dónde el molde recorta" },
-  templo: { nombre: "Ruta del Templo por Dentro", emoji: "🕯️", color: 'mayor', etapas: 7,
+  templo: { nombre: "Ruta del Templo por Dentro", emoji: "🕯️", color: 'mayor', materia: 'Teología: estudio de las religiones', etapas: 7,
     lema: "Entrar a cada templo como estudiante: entender la creencia sin profesarla y sin caricaturizarla" },
-  pagina: { nombre: "Ruta de la Página que Discute", emoji: "🕎", color: 'mayor', etapas: 6,
+  pagina: { nombre: "Ruta de la Página que Discute", emoji: "🕎", color: 'mayor', materia: 'El Talmud y el judaísmo', etapas: 6,
     lema: "Siglos de desacuerdo guardados en una sola hoja" },
-  marea: { nombre: "Ruta de la Marea", emoji: "🌊", color: 'mayor', etapas: 6,
+  marea: { nombre: "Ruta de la Marea", emoji: "🌊", color: 'mayor', materia: 'Psicología de masas', etapas: 6,
     lema: "Reconocer la corriente antes de que piense por ti" },
-  pantalla: { nombre: "Ruta de la Pantalla Leída", emoji: "🎬", color: 'mayor', etapas: 7,
+  pantalla: { nombre: "Ruta de la Pantalla Leída", emoji: "🎬", color: 'mayor', materia: 'Semiótica y cine', etapas: 7,
     lema: "En la pantalla nada llegó solo: todo lo que se ve fue puesto, y lo que fue puesto se puede leer" },
-  mapa: { nombre: "Ruta del Mapa que Cobra", emoji: "🗺️", color: 'mayor', etapas: 7,
+  mapa: { nombre: "Ruta del Mapa que Cobra", emoji: "🗺️", color: 'mayor', materia: 'Geopolítica', etapas: 7,
     lema: "La geografía no decide: pone el precio, y alguien siempre lo paga" },
-  mano: { nombre: "Ruta de la Mano que Reparte", emoji: "🪙", color: 'mayor', etapas: 6,
+  mano: { nombre: "Ruta de la Mano que Reparte", emoji: "🪙", color: 'mayor', materia: 'Economía política', etapas: 6,
     lema: "Detrás de cada regla hay un reparto: quién gana, quién paga y quién la escribió" },
-  atomos: { nombre: "Ruta de los Átomos y los Ídolos", emoji: "⚛️", color: 'mayor', etapas: 6,
+  atomos: { nombre: "Ruta de los Átomos y los Ídolos", emoji: "⚛️", color: 'mayor', materia: 'Materialismo Filosófico', etapas: 6,
     lema: "De qué está hecho lo que te venden, y quién lo sostiene" },
-  semilla: { nombre: "Ruta de la Semilla y la Polilla", emoji: "🌱", color: 'mayor', etapas: 7,
+  semilla: { nombre: "Ruta de la Semilla y la Polilla", emoji: "🌱", color: 'mayor', materia: 'Educación Financiera', etapas: 7,
     lema: "El interés compuesto no espera: o trabaja para la casa o cobra contra ella" },
-  gafas: { nombre: "Ruta de las Gafas a la Vista", emoji: "👓", color: 'mayor', etapas: 7,
+  gafas: { nombre: "Ruta de las Gafas a la Vista", emoji: "👓", color: 'mayor', materia: 'Estudio de las Ideologías', etapas: 7,
     lema: "«Nadie mira a ojo desnudo: el oficio es ver las gafas, empezando por las propias" },
-  rojo: { nombre: "Ruta del Expediente Rojo", emoji: "📕", color: 'mayor', etapas: 7,
+  rojo: { nombre: "Ruta del Expediente Rojo", emoji: "📕", color: 'mayor', materia: 'Crítica al Marxismo', etapas: 7,
     lema: "La promesa del mundo sin clases, auditada con el siglo veinte en la mesa" },
-  dorado: { nombre: "Ruta del Expediente Dorado", emoji: "📒", color: 'mayor', etapas: 7,
+  dorado: { nombre: "Ruta del Expediente Dorado", emoji: "📒", color: 'mayor', materia: 'Crítica al Capitalismo', etapas: 7,
     lema: "La máquina que sacó al mundo de la pobreza, auditada con sus facturas en la mesa" },
-  punteria: { nombre: "Ruta de la Puntería", emoji: "🎯", color: 'mayor', etapas: 6,
+  punteria: { nombre: "Ruta de la Puntería", emoji: "🎯", color: 'mayor', materia: 'Ciencia de la predicción algorítmica', etapas: 6,
     lema: "Se apunta, se anota y se cuenta dónde dio: predecir se entrena" },
-  umbral: { nombre: "Ruta del Umbral Anunciado", emoji: "🌅", color: 'mayor', etapas: 6,
+  umbral: { nombre: "Ruta del Umbral Anunciado", emoji: "🌅", color: 'mayor', materia: 'La singularidad', etapas: 6,
     lema: "Ni culto ni burla: la hipótesis, sus frenos y un registro con fechas" },
-  maquinaviene: { nombre: "Ruta de la Máquina que Viene", emoji: "🔭", color: 'mayor', etapas: 6,
+  maquinaviene: { nombre: "Ruta de la Máquina que Viene", emoji: "🔭", color: 'mayor', materia: 'El futuro de la IA', etapas: 6,
     lema: "Leer las curvas de la máquina, contar sus costes y decidir qué no se le entrega" },
-  tesis: { nombre: "Ruta de la Idea en Pie", emoji: "🎓", color: 'mayor', etapas: 8,
+  tesis: { nombre: "Ruta de la Idea en Pie", emoji: "🎓", color: 'mayor', materia: 'La tesis y sus negocios', etapas: 8,
     lema: "Una pregunta precisa, una afirmación que se deja refutar y alguien que la sostiene de pie" },
 };
 

@@ -125,7 +125,10 @@ f.onload = async () => {
       'hay entrada en Acceso Rápido y en el menú', 'falta alguna entrada a Mis Rutas');
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+    /* El veredicto va también en el título, como en las demás sondas: es lo que
+       lee el corredor sin tener que interpretar el texto de la salida. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda de rutas';
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · Sonda de rutas'; }
 };
 </script>
 </body>

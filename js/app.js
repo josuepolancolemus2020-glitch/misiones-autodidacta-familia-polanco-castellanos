@@ -348,6 +348,62 @@ function rutaEtapas(rutaKey) {
   return { ruta, etapas, total, hechas: hechas.length + asigs.length };
 }
 
+/* El nombre GENERAL de la materia de una ruta, para que la tarjeta diga de qué
+   se estudia y no solo cómo se llama el camino. Sale de dos sitios y en este
+   orden: el campo `materia` del catálogo si la ruta lo declara (lo declaran las
+   veintiocho del Estudio Mayor, que comparten el color 'mayor' y por eso no se
+   distinguen por él), y si no, el `label` de MATERIAS que ya existe para ese
+   color. Así el rótulo no se escribe dos veces: donde ya había un nombre bueno,
+   se reutiliza. El `find` mira `id` y también `color` porque hay materias donde
+   los dos no coinciden (Epistemología lleva el color 'bach'). */
+function materiaDeRuta(ruta) {
+  if (ruta.materia) return ruta.materia;
+  const mat = MATERIAS.find(m => m.id === ruta.color) || MATERIAS.find(m => m.color === ruta.color);
+  return mat ? mat.label : '';
+}
+
+/* ── Plegado de las tarjetas de ruta ──
+   Con 38 rutas, muchas de 6 a 12 etapas, la pantalla abierta entera son varios
+   metros de barrido y encontrar una ruta se vuelve trabajo. Plegada, la tarjeta
+   sigue diciendo lo esencial (emoji, materia, nombre, lema, barra y cuenta): lo
+   que se esconde es la lista de etapas.
+
+   El estado vive en el MISMO almacén que todo lo demás (KEY 'faro_v1'), pero
+   fuera de `members`: que una ruta esté plegada es una preferencia de pantalla
+   del aparato, no progreso de nadie, y no tendría sentido que se reiniciara al
+   cambiar de perfil. */
+function rutaAbiertaPorDefecto(hechas) {
+  /* Criterio inicial, y queda dicho aquí a propósito: se despliegan las rutas
+     que ya tienen al menos una etapa construida (las que hoy se pueden
+     recorrer) y se pliegan las que están enteras por construir, que de momento
+     solo son un índice de lo que vendrá. Se guarda solo lo que el usuario
+     TOCA, así que una ruta que estrena su primera misión se abre sola la
+     próxima vez, sin tener que ir a corregir nada guardado. */
+  return hechas > 0;
+}
+
+function rutaAbierta(s, key, hechas) {
+  const guardado = (s && s.rutasAbiertas) || {};
+  return typeof guardado[key] === 'boolean' ? guardado[key] : rutaAbiertaPorDefecto(hechas);
+}
+
+function alternarRuta(key, btn) {
+  if (!btn) return;
+  const abierta = btn.getAttribute('aria-expanded') === 'true';
+  const s = load();
+  s.rutasAbiertas = Object.assign({}, s.rutasAbiertas);
+  s.rutasAbiertas[key] = !abierta;
+  save(s);
+  /* Se toca el DOM en vez de volver a pintar toda la lista: un re-render deja
+     sin foco al botón que se acaba de pulsar y con el teclado se pierde el
+     sitio. */
+  btn.setAttribute('aria-expanded', String(!abierta));
+  const panel = document.getElementById('ruta-etapas-' + key);
+  if (panel) panel.hidden = abierta;
+  const card = btn.closest('.ruta-card');
+  if (card) card.classList.toggle('ruta-card-plegada', abierta);
+}
+
 function renderRutas() {
   const cont = document.getElementById('rutas-container');
   if (!cont) return;
@@ -360,21 +416,29 @@ function renderRutas() {
       ? estadoAsignacion(ms, e.asig.id).estado === 'defendida'
       : ms.visited.includes(e.mision.id))).length;
     const pct = total ? Math.round((visitadas / total) * 100) : 0;
+    const materia = materiaDeRuta(ruta);
+    const abierta = rutaAbierta(s, key, hechas);
+    const panelId = 'ruta-etapas-' + key;
 
     return `
-      <div class="ruta-card">
-        <div class="ruta-head">
-          <span class="ruta-emoji" aria-hidden="true">${ruta.emoji}</span>
-          <div class="ruta-titulos">
-            <h3 class="ruta-nombre">${ruta.nombre}</h3>
-            <p class="ruta-lema">${ruta.lema}</p>
-          </div>
-        </div>
+      <div class="ruta-card ${abierta ? '' : 'ruta-card-plegada'}">
+        <h3 class="ruta-cabecera">
+          <button type="button" class="ruta-toggle" aria-expanded="${abierta}" aria-controls="${panelId}"
+                  onclick="alternarRuta('${key}', this)">
+            <span class="ruta-emoji" aria-hidden="true">${ruta.emoji}</span>
+            <span class="ruta-titulos">
+              <span class="ruta-materia">${materia}</span>
+              <span class="ruta-nombre">${ruta.nombre}</span>
+            </span>
+            <i class="fa-solid fa-chevron-down ruta-chevron" aria-hidden="true"></i>
+          </button>
+        </h3>
+        <p class="ruta-lema">${ruta.lema}</p>
         <div class="ruta-barra-wrap">
           <div class="ruta-barra" style="width:${pct}%; background:var(--${ruta.color});"></div>
         </div>
         <p class="ruta-cuenta">${visitadas} de ${total} etapas recorridas · ${hechas} construida${hechas === 1 ? '' : 's'}</p>
-        <ol class="ruta-etapas">
+        <ol class="ruta-etapas" id="${panelId}"${abierta ? '' : ' hidden'}>
           ${etapas.map(e => {
             if (!e.existe) return `
               <li class="ruta-etapa ruta-etapa-futura">
