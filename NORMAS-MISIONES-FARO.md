@@ -225,6 +225,74 @@ escrito, y el género trae reglas propias:
    como todos los guiones largos (norma 1-bis): quien habla se marca con su
    nombre en mayúsculas y punto, al estilo de los guiones de teatro.
 
+## 5-sexies. Las lecturas se subrayan, se anotan y eso se imprime
+
+**Norma nueva, pedida por el autor el 19 de agosto de 2026.** La sección
+de Lecturas se lee como un libro de verdad: se puede **subrayar con cinco
+colores, escribir notas, y todo eso sale impreso con el texto**. Lo hace
+un aparato compartido, `js/lecturas-marcador.js` con
+`css/lecturas-marcador.css`, que cada misión carga con dos líneas
+después de sus propios archivos.
+
+**Es la segunda excepción de la casa a la norma 1** (tres archivos
+propios por misión), y por la misma razón que `fichas/css/ficha.css`:
+esto no es contenido de una etapa, es un aparato de lectura que tiene
+que comportarse igual en todas. Copiado doce veces, a la tercera
+corrección ya no coincidirían.
+
+### El código de colores, que es el ejercicio
+
+Un subrayado de un solo color dice «esto importa», y al releer eso no
+sirve porque para entonces importa medio texto. Aquí hay que decidir
+**qué** es lo que importa, y esa decisión es el ejercicio:
+
+| Color | Inicial | Categoría | Qué se marca |
+|---|---|---|---|
+| Amarillo | D | **Dato** | cifra, año, capítulo, edición: lo comprobable |
+| Verde | V | **Voz** | quién lo dice: autor, obra, fuente |
+| Rojo | I | **Idea** | la tesis, el mecanismo, el concepto |
+| Azul | C | **Contracita** | la frase que estorba a la tesis, la objeción |
+| Morado | ? | **Duda** | no lo entendí, o hay que verificarlo |
+
+El azul no es un color más: **la contracita es la prueba de lectura del
+Estudio Mayor**, la frase del mismo autor que apunta al lado contrario.
+Con color propio, una lectura sin ninguna marca azul se delata sola.
+
+### Tres señales, no una
+
+Cada marca lleva **color, trama de subrayado e inicial volada**, las tres
+a la vez, y con cualquiera de ellas ya se sabe qué es. Porque estas
+lecturas se imprimen y se **fotocopian**, y en blanco y negro cinco
+colores son cinco grises iguales; y porque quien no distingue bien los
+colores tiene derecho a usar esto. Las cinco tramas han de ser
+**distintas entre sí** y la sonda lo comprueba comparándolas: dos
+subrayados sólidos que solo se diferencian en el grosor no valen, que ya
+pasó una vez y lo cazó la sonda, no el ojo.
+
+### Lo demás que es obligatorio
+
+1. **Se guarda en la clave de progreso de la misión**, con el sufijo
+   `_marcas`. Ni almacén nuevo ni nube: una nota de lectura es lo más
+   privado que escribe un estudiante, y se queda en su aparato.
+2. **Marcar no da XP.** Subrayar no es aprender, y un indicador que se
+   compra pintando mide recorrido y no dominio, que es la regla de la
+   casa para todos sus contadores.
+3. **Nunca se pierde una nota.** Si la misión se corrige y el texto se
+   mueve, la marca se reancla sola por su texto exacto; si no aparece,
+   NO se borra: queda como huérfana, con su nota, y avisa en el panel.
+4. **Al imprimir sale todo**: el subrayado dentro del texto (con la
+   orden `print-color-adjust` para que el navegador no se coma los
+   fondos), la leyenda del código de colores, y una hoja final con las
+   notas numeradas, donde el número es el mismo que va volado en el
+   texto. Hay además una **hoja de repaso** con solo lo marcado.
+5. **La barra de marcar va anclada abajo**, a todo el ancho y con
+   botones de 46 px: en un teléfono de 380 px una barra flotante se sale
+   de la pantalla o la tapa el menú de copiar del sistema.
+6. La sonda `_dev/probe-lecturas-marcador.html` comprueba el aparato
+   entero (marcar, anotar, recordar tras recargar, imprimir de verdad
+   interceptando `window.open`) **y que las doce misiones lo traigan
+   enganchado**.
+
 ## 5-bis. El widget de ordenar se arrastra, y la linterna cuesta
 
 **Norma nueva, pedida por el autor el 17 de agosto de 2026**, después de

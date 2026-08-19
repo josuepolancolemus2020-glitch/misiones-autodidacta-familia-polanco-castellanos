@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Marcador de lecturas</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:900px;border:0;background:#fff}pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/misiones/ruta-dorado-escoces-dorado/escoces-dorado.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba el marcador de lecturas (subrayar, anotar, imprimir):
+   - que el aparato se enganche solo y pinte su leyenda y su panel,
+   - que marcar de verdad deje la marca en el texto y en el guardado,
+   - que la marca sobreviva a una recarga (que es para lo que sirve),
+   - que la nota se escriba, se numere y se vea,
+   - que al imprimir SALGA lo marcado y las notas, con su leyenda,
+   - y que el código de colores lleve las TRES señales (color, trama e
+     inicial), que es lo que hace que la fotocopia se siga entendiendo.
+   Se recarga dos veces: la segunda es la prueba de que se recuerda. */
+const out=document.getElementById('out'), f=document.getElementById('f');
+const L=[]; let fallos=0, fase=0;
+function log(s){ L.push(s); out.textContent=L.join('\n'); }
+function ok(c,bien,mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar=ms=>new Promise(r=>setTimeout(r,ms));
+const cerrar=()=>{ log('\n'+(fallos?'✖ '+fallos+' fallos':'✔ todo en orden'));
+  document.title=(fallos?'SUSPENDE':'APRUEBA')+' · Sonda marcador de lecturas'; };
+
+/* Marca un trozo del primer párrafo de una lectura como lo haría un dedo:
+   se selecciona de verdad con un Range y se pulsa el botón del color. */
+async function marcar(w,d,idLectura,nCar,cat){
+  const p=d.querySelector('#'+idLectura+' .lect-p');
+  const r=d.createRange();
+  const nodo=p.firstChild;
+  r.setStart(nodo,0); r.setEnd(nodo,nCar);
+  const sel=w.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  const texto=r.toString();
+  d.dispatchEvent(new w.Event('selectionchange'));
+  await esperar(420);
+  const abierta=d.getElementById('fmBarra') && d.getElementById('fmBarra').classList.contains('fm-abierta');
+  const btn=d.querySelector('.fm-color[data-cat="'+cat+'"]');
+  if(!btn) return null;
+  btn.click(); await esperar(220);
+  /* El texto se devuelve leído de antes: al marcar se repinta el párrafo
+     entero y el Range se queda apuntando a nodos que ya no existen. */
+  return { texto: texto, abierta: abierta };
+}
+
+f.onload=async()=>{
+  const w=f.contentWindow, d=f.contentDocument;
+  try{
+    /* Los diálogos nativos se responden solos: un confirm() sin
+       contestar deja colgada la página en el navegador sin pantalla, y
+       la sonda se queda esperando hasta que la matan. */
+    w.confirm=()=>true; w.alert=()=>{};
+    if(fase===0){
+      fase=1;
+      try{ w.localStorage.clear(); }catch(e){}
+      w.location.reload(); return;
+    }
+
+    if(fase===1){
+      fase=2;
+      await esperar(900);
+      w.go('s-lecturas'); await esperar(300);
+
+      log('── EL APARATO SE ENGANCHA SOLO ──');
+      ok(typeof w.FaroMarcador==='object', 'el módulo compartido está cargado', 'no se cargó js/lecturas-marcador.js');
+      ok(!!d.querySelector('link[href*="lecturas-marcador.css"]'), 'y su hoja de estilo', 'falta el link a la hoja del marcador');
+      const cats=w.FaroMarcador.categorias.map(c=>c.id).join(',');
+      ok(cats==='dato,voz,idea,contra,duda', 'las cinco categorías del código de la casa', 'categorías: '+cats);
+      ok(!!d.querySelector('#s-lecturas .fm-leyenda'), 'la leyenda se pinta arriba, antes de leer', 'no hay leyenda en la tarjeta de presentación');
+      ok(!!d.getElementById('fmPanel'), 'y el panel de marcas está en la sección', 'falta el panel de marcas');
+      /* El panel va ANTES de las preguntas: se repasa lo marcado y
+         después se contesta, no al revés. */
+      const cards=[...d.querySelectorAll('#s-lecturas .card')];
+      const iPanel=cards.findIndex(c=>c.id==='fmPanel');
+      const iPreg=cards.findIndex(c=>/Preguntas de las/i.test(c.textContent));
+      ok(iPanel>=0 && iPreg>=0 && iPanel<iPreg, 'el panel va antes de las preguntas', 'el panel quedó descolocado');
+
+      log('\n── EL CÓDIGO DE COLORES ──');
+      /* Las tres señales: sin ellas la fotocopia en blanco y negro
+         convierte cinco colores en cinco grises iguales. */
+      let conTrama=0, conInicial=0;
+      w.FaroMarcador.categorias.forEach(c=>{
+        const m=d.createElement('mark');
+        m.className='fm-hl fm-hl-'+c.id+' fm-hl-fin';
+        m.setAttribute('data-ini',c.ini);
+        d.body.appendChild(m);
+        const st=w.getComputedStyle(m);
+        const fondo=st.backgroundColor;
+        /* «Trama» es el borde inferior O el subrayado de texto: una de
+           las cinco va ondulada con text-decoration y no lleva borde. */
+        const tieneTrama=(st.borderBottomStyle && st.borderBottomStyle!=='none')
+          || (st.textDecorationLine && st.textDecorationLine!=='none');
+        if(tieneTrama) conTrama++;
+        const ini=w.getComputedStyle(m,'::after').content;
+        if(ini && ini.indexOf(c.ini)>=0) conInicial++;
+        if(!fondo || fondo==='rgba(0, 0, 0, 0)'){ fallos++; log('  ✘ '+c.id+' sin color de fondo'); }
+        m.remove();
+      });
+      ok(conTrama===5, 'las cinco llevan trama de subrayado propia', 'solo '+conTrama+' llevan trama');
+      ok(conInicial===5, 'y las cinco llevan su inicial volada', 'solo '+conInicial+' llevan inicial');
+      const tramas=w.FaroMarcador.categorias.map(c=>{
+        const m=d.createElement('mark'); m.className='fm-hl fm-hl-'+c.id; d.body.appendChild(m);
+        const st=w.getComputedStyle(m);
+        /* La firma es el borde MÁS el subrayado de texto: una de las
+           cinco va ondulada con text-decoration y no con borde. */
+        const t=st.borderBottomStyle+'/'+st.textDecorationLine+'/'+st.textDecorationStyle;
+        m.remove(); return t; });
+      ok(new Set(tramas).size===5, 'y las cinco tramas son distintas entre sí', 'tramas repetidas: '+tramas.join(' , '));
+
+      log('\n── SUBRAYAR ──');
+      const t1=await marcar(w,d,'lect-borges',60,'dato');
+      ok(!!t1 && t1.abierta, 'la barra de marcar aparece al seleccionar', 'no apareció la barra al seleccionar');
+      const marcasA=w.FaroMarcador.marcas();
+      ok(marcasA.length===1 && marcasA[0].c==='dato', 'queda una marca de tipo Dato', 'marcas: '+JSON.stringify(marcasA.map(m=>m.c)));
+      const pintada=d.querySelector('#lect-borges .fm-hl-dato');
+      ok(!!pintada, 'y el texto sale pintado en el párrafo', 'la marca no se pintó en el texto');
+      ok(pintada && pintada.getAttribute('data-ini')==='D', 'con su inicial D en el atributo', 'la marca no lleva su inicial');
+      /* La marca no puede tragarse el texto ni romper la negrita. */
+      const p0=d.querySelector('#lect-borges .lect-p');
+      ok(p0.textContent.indexOf(t1.texto.slice(0,30))>=0, 'el texto del párrafo sigue entero', 'la marca se comió texto');
+
+      await marcar(w,d,'lect-cervantes',50,'contra');
+      ok(w.FaroMarcador.marcas().length===2, 'se puede marcar en otra lectura', 'la segunda marca no entró');
+      ok(!!d.querySelector('#lect-cervantes .fm-hl-contra'), 'la contracita se pinta en azul', 'no se pintó la contracita');
+
+      log('\n── ANOTAR ──');
+      const marca=w.FaroMarcador.marcas()[0];
+      const mk=d.querySelector('[data-fm-id="'+marca.id+'"]');
+      mk.click(); await esperar(200);
+      ok(d.getElementById('fmBarra').classList.contains('fm-abierta'), 'tocar una marca la abre para editarla', 'la marca no se puede tocar');
+      d.getElementById('fmBtnNota').click(); await esperar(200);
+      ok(d.getElementById('fmModal').classList.contains('fm-abierta'), 'y se puede abrir la nota', 'no abre el cuadro de la nota');
+      d.getElementById('fmModalTA').value='Comprobar esta fecha en la edición de Glasgow.';
+      d.getElementById('fmNotaGuarda').click(); await esperar(250);
+      const conNota=w.FaroMarcador.marcas().filter(m=>m.n);
+      ok(conNota.length===1, 'la nota queda guardada en su marca', 'notas: '+conNota.length);
+      ok(conNota[0].num===1, 'y se numera para poder citarla en el papel', 'la nota no se numeró');
+      ok(!!d.querySelector('#lect-borges .fm-hl-nota'), 'la marca con nota se distingue en el texto', 'la marca con nota no se distingue');
+      ok(/Comprobar esta fecha/.test(d.getElementById('fmPanel').textContent), 'y la nota se ve en el panel', 'la nota no aparece en el panel');
+
+      log('\n── LO QUE SE MANDA A LA IMPRESORA ──');
+      /* Se intercepta window.open y se lee el documento de verdad, que
+         es la única manera de saber qué habría salido en el papel. */
+      let doc='';
+      const abrirReal=w.open;
+      w.open=function(){ return { document:{ write:s=>{doc+=s;}, close:()=>{} }, print:()=>{}, focus:()=>{} }; };
+      w.imprimirLectura('borges'); await esperar(260);
+      ok(/fm-hl-dato/.test(doc), 'el subrayado viaja dentro del texto impreso', 'la impresión va sin los subrayados');
+      ok(/print-color-adjust:exact/.test(doc), 'y con la orden de respetar el color al imprimir', 'los fondos se perderían al imprimir');
+      ok(/Mis marcas y mis notas/.test(doc), 'sale la hoja de marcas y notas', 'no sale el aparato de marcas');
+      ok(/Comprobar esta fecha en la edición de Glasgow/.test(doc), 'con el texto de la nota escrita', 'la nota no se imprime');
+      ok(/Código de colores de la casa/.test(doc), 'y la leyenda del código de colores', 'la hoja impresa va sin leyenda');
+      ok(/Contracita/.test(doc), 'la leyenda nombra las cinco categorías', 'la leyenda impresa está incompleta');
+      /* Imprimir UNA lectura no puede arrastrar lo marcado en otra. No
+         se mira la clase del color, que siempre está porque el CSS
+         impreso define las cinco: se mira el TEXTO marcado en la otra. */
+      const otra=w.FaroMarcador.marcas().find(m=>m.l==='cervantes');
+      ok(!!otra && doc.indexOf(otra.t.slice(0,40))<0,
+         'imprimir una lectura no arrastra lo marcado en otra', 'se coló en el papel una marca de otra lectura');
+      doc='';
+      w.imprimirTodasLasLecturas(); await esperar(260);
+      ok(/fm-hl-dato/.test(doc) && /fm-hl-contra/.test(doc), 'el pliego de las cinco lleva todas las marcas', 'al pliego le faltan marcas');
+      doc='';
+      d.getElementById('fmBtnImprimeMarcas').click(); await esperar(260);
+      ok(/Mis marcas y mis notas/.test(doc) && /Hoja de repaso/.test(doc), 'y existe la hoja de repaso solo con lo marcado', 'no sale la hoja de repaso');
+      ok(!/—/.test(doc), 'sin guiones largos (norma 1-bis)', 'la impresión trae guiones largos');
+      w.open=abrirReal;
+
+      log('\n── SE RECUERDA (recargando) ──');
+      w.location.reload(); return;
+    }
+
+    /* fase 2: la misma misión, después de recargar. */
+    await esperar(1000);
+    w.go('s-lecturas'); await esperar(350);
+    const m2=w.FaroMarcador.marcas();
+    ok(m2.length===2, 'las dos marcas siguen guardadas tras recargar', 'quedaron '+m2.length);
+    ok(!!d.querySelector('#lect-borges .fm-hl-dato'), 'y se repintan solas en el texto', 'no se repintaron');
+    ok(m2.some(m=>/Comprobar esta fecha/.test(m.n||'')), 'la nota escrita sobrevive', 'se perdió la nota');
+    /* Se guarda dentro de la clave de la misión, no en un almacén nuevo. */
+    const claves=Object.keys(w.localStorage).filter(k=>/marcas/.test(k));
+    const suKey=w.eval('SAVE_KEY');
+    ok(claves.length===1 && claves[0]===suKey+'_marcas',
+      'se guarda con la clave de progreso de la misión', 'claves: '+claves.join(',')+' (esperada '+suKey+'_marcas)');
+    /* Quitar deja el texto como estaba: ni restos ni huecos. */
+    const antes=d.querySelector('#lect-borges .lect-p').textContent;
+    const cuantas=w.FaroMarcador.marcas().length;
+    const mk2=d.querySelector('#lect-borges .fm-hl');
+    mk2.click(); await esperar(220);
+    d.getElementById('fmBtnQuita').click(); await esperar(260);
+    ok(w.FaroMarcador.marcas().length===cuantas-1, 'se puede quitar una marca desde el texto', 'la marca no se quitó');
+    ok(!d.querySelector('#lect-borges .fm-hl'), 'y desaparece del párrafo', 'quedó rastro de la marca');
+    const despues=d.querySelector('#lect-borges .lect-p').textContent;
+    ok(antes===despues, 'el texto del párrafo queda idéntico tras marcar y desmarcar', 'el texto cambió al marcar y desmarcar');
+
+    log('\n── LAS DOCE MISIONES DEL ESTUDIO MAYOR ──');
+    /* El aparato es compartido: si una misión se queda sin enganchar, sus
+       lecturas se leen sin poder subrayar y nadie se entera hasta que
+       alguien lo intenta. */
+    const MIS=[['ruta-espejo-vigia-timon','vigia-timon'],['ruta-atomos-contra-miedo','atomos-miedo'],
+      ['ruta-atomos-hombre-maquina','hombre-maquina'],['ruta-rojo-acero-juicio','acero-juicio'],
+      ['ruta-gafas-palabra-expediente','gafas-expediente'],['ruta-gafas-bisturi-freeden','bisturi-freeden'],
+      ['ruta-gafas-mapa-familias','mapa-familias'],['ruta-dorado-gran-fuga','gran-fuga'],
+      ['ruta-dorado-fallas-maquina','fallas-maquina'],['ruta-dorado-dinero-no-compra','dinero-no-compra'],
+      ['ruta-dorado-dos-facturas','dos-facturas'],['ruta-dorado-escoces-dorado','escoces-dorado']];
+    const g=document.createElement('iframe');
+    g.style.cssText='width:380px;height:600px;border:0;position:absolute;left:-9999px;';
+    document.body.appendChild(g);
+    let bien=0; const malas=[];
+    for(const [carpeta,base] of MIS){
+      await new Promise(res=>{ g.onload=res; g.src='/misiones/'+carpeta+'/'+base+'.html'; });
+      await esperar(700);
+      const gw=g.contentWindow, gd=g.contentDocument;
+      const tieneModulo=typeof gw.FaroMarcador==='object';
+      const tieneHoja=!!gd.querySelector('link[href*="lecturas-marcador.css"]');
+      const tienePanel=!!gd.getElementById('fmPanel');
+      const tieneLeyenda=!!gd.querySelector('#s-lecturas .fm-leyenda');
+      const cinco=gd.querySelectorAll('#s-lecturas .card[id^="lect-"]').length===5;
+      if(tieneModulo&&tieneHoja&&tienePanel&&tieneLeyenda&&cinco) bien++;
+      else malas.push(base+'(mod:'+tieneModulo+' hoja:'+tieneHoja+' panel:'+tienePanel+' ley:'+tieneLeyenda+' 5lect:'+cinco+')');
+    }
+    g.remove();
+    ok(bien===12, 'las doce misiones traen el marcador enganchado y sus cinco lecturas',
+      'fallan: '+malas.join(' · '));
+    cerrar();
+  }catch(e){ fallos++; log('✘ '+e.message+'\n'+e.stack); cerrar(); }
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+/* ══════════════════════════════════════════════════════════════════
+   EL MARCADOR DE LECTURAS · subrayar, anotar y que salga impreso
+   ══════════════════════════════════════════════════════════════════
+
+   Hoja COMPARTIDA por las misiones que tienen sección de Lecturas. Es la
+   segunda excepción de la casa a la norma 1 («tres archivos propios por
+   misión»), y por la misma razón que la primera (fichas/css/ficha.css):
+   esto no es contenido de una etapa, es un aparato de lectura que tiene
+   que comportarse IGUAL en todas. Si se copiara en cada misión, el día
+   que un color se vea mal habría que arreglarlo doce veces, y a la
+   tercera ya no coincidirían.
+
+   ── POR QUÉ EL COLOR NO VA SOLO ────────────────────────────────────
+   Las lecturas de esta casa se imprimen y se FOTOCOPIAN, y una
+   fotocopia en blanco y negro convierte cinco colores en cinco grises
+   que nadie distingue. Por eso cada categoría lleva TRES señales a la
+   vez, y con una sola de ellas ya se sabe qué es:
+     1. el color de fondo,
+     2. una trama de subrayado distinta (fina, doble, gruesa, de puntos,
+        de rayas), que sobrevive a la fotocopia,
+     3. una inicial volada al final de la marca (D, V, I, C, ?).
+   Quien marca en la pantalla y quien lee el papel entienden lo mismo.
+   La misma razón vale para quien no distingue bien los colores.
+══════════════════════════════════════════════════════════════════ */
+
+/* ── Los cinco colores del código de la casa ──
+   Se declaran como variables para que el panel, la barra y la leyenda
+   pinten SIEMPRE el mismo tono que la marca del texto: un código de
+   colores en el que la muestra no coincide con lo marcado no es un
+   código, es un adorno. */
+:root {
+  --fm-dato:   #fef08a;  --fm-dato-fw:   #a16207;
+  --fm-voz:    #bbf7d0;  --fm-voz-fw:    #15803d;
+  --fm-idea:   #fecaca;  --fm-idea-fw:   #b91c1c;
+  --fm-contra: #bfdbfe;  --fm-contra-fw: #1d4ed8;
+  --fm-duda:   #e9d5ff;  --fm-duda-fw:   #7e22ce;
+}
+/* En oscuro el mismo color en pastel deslumbra y tapa la letra: se baja
+   a un velo translúcido del mismo tono, que deja leer el texto debajo. */
+[data-theme="dark"] {
+  --fm-dato:   rgba(250,204,21,.32);  --fm-dato-fw:   #fde047;
+  --fm-voz:    rgba(34,197,94,.30);   --fm-voz-fw:    #86efac;
+  --fm-idea:   rgba(248,113,113,.30); --fm-idea-fw:   #fca5a5;
+  --fm-contra: rgba(96,165,250,.30);  --fm-contra-fw: #93c5fd;
+  --fm-duda:   rgba(192,132,252,.32); --fm-duda-fw:   #d8b4fe;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fm-dato:   rgba(250,204,21,.32);  --fm-dato-fw:   #fde047;
+    --fm-voz:    rgba(34,197,94,.30);   --fm-voz-fw:    #86efac;
+    --fm-idea:   rgba(248,113,113,.30); --fm-idea-fw:   #fca5a5;
+    --fm-contra: rgba(96,165,250,.30);  --fm-contra-fw: #93c5fd;
+    --fm-duda:   rgba(192,132,252,.32); --fm-duda-fw:   #d8b4fe;
+  }
+}
+
+/* ── La marca dentro del texto ── */
+.fm-hl {
+  background: transparent; color: inherit;
+  border-radius: 2px; padding: 0 1px;
+  cursor: pointer;
+  /* El texto marcado se lee igual de bien que el resto: la marca señala,
+     no grita. Nada de negritas ni de mayúsculas automáticas. */
+}
+.fm-hl-dato   { background: var(--fm-dato);   border-bottom: 1.5px solid var(--fm-dato-fw); }
+.fm-hl-voz    { background: var(--fm-voz);    border-bottom: 3px double var(--fm-voz-fw); }
+/* Idea va con subrayado ONDULADO y no con una raya gruesa: con raya
+   quedaba igual que Dato en cuanto la hoja pasaba por la fotocopiadora,
+   que es donde estas lecturas acaban. Lo cazó la sonda comparando las
+   cinco tramas entre sí, no el ojo. */
+.fm-hl-idea   { background: var(--fm-idea);   text-decoration: underline wavy var(--fm-idea-fw); text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
+.fm-hl-contra { background: var(--fm-contra); border-bottom: 2px dotted var(--fm-contra-fw); }
+.fm-hl-duda   { background: var(--fm-duda);   border-bottom: 2px dashed var(--fm-duda-fw); }
+
+/* La inicial volada va SOLO en el último trozo de la marca (una marca
+   puede partirse en varios <mark> cuando cruza una negrita), para que no
+   salgan tres iniciales seguidas en mitad de una frase. */
+.fm-hl-fin::after {
+  content: attr(data-ini);
+  font-size: 0.62em; font-weight: 800; vertical-align: super;
+  margin-left: 1px; opacity: .85; letter-spacing: 0;
+}
+.fm-hl-dato.fm-hl-fin::after   { color: var(--fm-dato-fw); }
+.fm-hl-voz.fm-hl-fin::after    { color: var(--fm-voz-fw); }
+.fm-hl-idea.fm-hl-fin::after   { color: var(--fm-idea-fw); }
+.fm-hl-contra.fm-hl-fin::after { color: var(--fm-contra-fw); }
+.fm-hl-duda.fm-hl-fin::after   { color: var(--fm-duda-fw); }
+
+/* Una marca con nota se distingue de una sin nota, o el lápiz no sirve
+   de nada: el número es el mismo que lleva la nota en el papel. */
+.fm-hl-nota.fm-hl-fin::after { content: attr(data-ini) " ✎" attr(data-n); }
+.fm-hl:focus-visible { outline: 3px solid var(--pri, #2563eb); outline-offset: 2px; }
+
+/* ── La barra de marcar ──
+   Va anclada abajo y a todo el ancho, no flotando junto a la selección:
+   en un teléfono de 380 px una barra flotante se sale de la pantalla o
+   la tapa el menú de copiar del propio sistema. Abajo siempre cabe, y
+   el pulgar llega sin recolocar la mano. */
+.fm-barra {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 9000;
+  background: var(--card, #fff); border-top: 2px solid var(--border, #cbd5e1);
+  box-shadow: 0 -6px 24px var(--shadow, rgba(0,0,0,.18));
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+  display: none; flex-direction: column; gap: 7px;
+  animation: fmSube .16s ease-out;
+}
+.fm-barra.fm-abierta { display: flex; }
+@keyframes fmSube { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.fm-barra-txt {
+  font-size: 0.78rem; line-height: 1.35; color: var(--gray, #64748b);
+  max-height: 2.7em; overflow: hidden; font-style: italic;
+}
+.fm-colores { display: flex; gap: 6px; flex-wrap: wrap; }
+/* 44 px de alto mínimo: es el dedo, no el ratón, quien va a usar esto. */
+.fm-color {
+  flex: 1 1 0; min-width: 58px; min-height: 46px;
+  border: 2px solid var(--border, #cbd5e1); border-radius: 11px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px; cursor: pointer; padding: 3px 2px;
+  font-family: inherit; font-size: 0.62rem; font-weight: 800;
+  color: var(--dark, #1b2838); line-height: 1.1; text-align: center;
+}
+.fm-color .fm-ini { font-size: 0.9rem; font-weight: 900; }
+.fm-color-dato   { background: var(--fm-dato); }
+.fm-color-voz    { background: var(--fm-voz); }
+.fm-color-idea   { background: var(--fm-idea); }
+.fm-color-contra { background: var(--fm-contra); }
+.fm-color-duda   { background: var(--fm-duda); }
+.fm-color:active { transform: scale(.94); }
+.fm-color[aria-pressed="true"] { border-color: var(--dark, #1b2838); border-width: 3px; }
+.fm-acciones { display: flex; gap: 6px; flex-wrap: wrap; }
+.fm-acc {
+  flex: 1 1 auto; min-height: 40px; border-radius: 10px; cursor: pointer;
+  border: 2px solid var(--border, #cbd5e1); background: var(--card, #fff);
+  color: var(--dark, #1b2838); font-family: inherit; font-size: 0.78rem; font-weight: 700;
+  padding: 6px 10px;
+}
+.fm-acc:active { transform: scale(.97); }
+.fm-acc-quita { border-color: var(--red, #d63031); color: var(--red, #d63031); }
+
+/* ── El panel de marcas, dentro de la sección de Lecturas ── */
+.fm-leyenda { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
+.fm-ley-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.72rem; font-weight: 700; line-height: 1.25;
+  border: 1px solid var(--border, #cbd5e1); border-radius: 8px; padding: 4px 7px;
+  background: var(--card, #fff); color: var(--dark, #1b2838);
+}
+.fm-ley-muestra {
+  width: 15px; height: 15px; border-radius: 4px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 900; color: var(--dark, #1b2838);
+}
+.fm-ley-dato   .fm-ley-muestra { background: var(--fm-dato);   border-bottom: 1.5px solid var(--fm-dato-fw); }
+.fm-ley-voz    .fm-ley-muestra { background: var(--fm-voz);    border-bottom: 3px double var(--fm-voz-fw); }
+.fm-ley-idea   .fm-ley-muestra { background: var(--fm-idea);   text-decoration: underline wavy var(--fm-idea-fw); }
+.fm-ley-contra .fm-ley-muestra { background: var(--fm-contra); border-bottom: 2px dotted var(--fm-contra-fw); }
+.fm-ley-duda   .fm-ley-muestra { background: var(--fm-duda);   border-bottom: 2px dashed var(--fm-duda-fw); }
+.fm-ley-cuenta { opacity: .7; font-weight: 800; }
+
+.fm-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.fm-item {
+  border: 1px solid var(--border, #cbd5e1); border-left-width: 5px;
+  border-radius: 10px; padding: 8px 10px; background: var(--card, #fff);
+}
+.fm-item-dato   { border-left-color: var(--fm-dato-fw); }
+.fm-item-voz    { border-left-color: var(--fm-voz-fw); }
+.fm-item-idea   { border-left-color: var(--fm-idea-fw); }
+.fm-item-contra { border-left-color: var(--fm-contra-fw); }
+.fm-item-duda   { border-left-color: var(--fm-duda-fw); }
+.fm-item-cab {
+  display: flex; justify-content: space-between; gap: 8px; align-items: baseline;
+  font-size: 0.68rem; font-weight: 800; color: var(--gray, #64748b);
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px;
+}
+.fm-item-txt { font-size: 0.86rem; line-height: 1.45; color: var(--dark, #1b2838); }
+.fm-item-nota {
+  margin-top: 5px; font-size: 0.82rem; line-height: 1.4;
+  color: var(--dark, #1b2838); background: var(--bg, #f1f5f9);
+  border-radius: 7px; padding: 5px 8px; white-space: pre-wrap;
+}
+/* Una marca cuyo texto ya no está en la lectura (porque la misión se
+   corrigió) NO se borra: se avisa. Perder la nota de alguien porque
+   cambió una coma sería el peor error posible de este aparato. */
+.fm-item-huerfana { opacity: .78; border-left-style: dashed; }
+.fm-item-aviso { font-size: 0.72rem; font-weight: 700; color: var(--red, #d63031); margin-top: 4px; }
+.fm-item-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.fm-mini {
+  border: 1px solid var(--border, #cbd5e1); background: transparent;
+  color: var(--gray, #64748b); border-radius: 7px; cursor: pointer;
+  font-family: inherit; font-size: 0.72rem; font-weight: 700;
+  padding: 4px 9px; min-height: 32px;
+}
+.fm-vacio { font-size: 0.85rem; color: var(--gray, #64748b); font-style: italic; }
+
+/* El diálogo de la nota. Sencillo a propósito: un textarea grande y dos
+   botones, que es lo que se puede usar con una mano en el autobús. */
+.fm-modal {
+  position: fixed; inset: 0; z-index: 9500; display: none;
+  align-items: center; justify-content: center; padding: 14px;
+  background: rgba(15,17,23,.62);
+}
+.fm-modal.fm-abierta { display: flex; }
+.fm-modal-caja {
+  background: var(--card, #fff); border-radius: 14px; padding: 14px;
+  width: 100%; max-width: 480px; box-shadow: 0 12px 40px rgba(0,0,0,.4);
+  max-height: 92vh; overflow-y: auto;
+}
+.fm-modal-cita {
+  font-size: 0.82rem; line-height: 1.4; font-style: italic;
+  color: var(--gray, #64748b); border-left: 3px solid var(--border, #cbd5e1);
+  padding-left: 8px; margin: 6px 0 10px; max-height: 7em; overflow-y: auto;
+}
+.fm-modal textarea {
+  width: 100%; min-height: 130px; border-radius: 10px; padding: 9px;
+  border: 2px solid var(--border, #cbd5e1); background: var(--bg, #f1f5f9);
+  color: var(--dark, #1b2838); font-family: inherit; font-size: 0.92rem; line-height: 1.45;
+  resize: vertical;
+}
+
+@media print {
+  /* En la propia página no se imprime nada del aparato: la impresión de
+     verdad se arma en su ventana aparte, como manda la casa. */
+  .fm-barra, .fm-modal, .fm-item-btns, .fm-acciones { display: none !important; }
+}

@@ -479,6 +479,7 @@ h2{font-family:Arial,Helvetica,sans-serif;font-size:11pt;color:#2e1065;margin:4m
 .pauta{page-break-before:always;}
 .pl{font-family:Arial,Helvetica,sans-serif;font-size:9pt;margin-bottom:1.6mm;text-align:justify;}
 .pie{border-top:0.8pt solid #999;margin-top:5mm;padding-top:2mm;font-family:Arial,Helvetica,sans-serif;font-size:8.5pt;color:#555;display:flex;justify-content:space-between;gap:6mm;}
+${FaroMarcador.cssImpresion()}
 </style></head><body>${cuerpo}<div class="pie"><span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span><span>🩸 Lo que el dinero no debe comprar${pieExtra||''}</span></div></body></html>`;
 }
 function _abreImpresion(doc){
@@ -498,7 +499,7 @@ function imprimirLectura(clave){
     +`<div class="idline"><span>Lee:</span><span class="r"></span><span>Fecha:</span><span class="r" style="max-width:35mm"></span></div>`
     +(nota?`<p class="fuente">${nota.textContent}</p>`:'')
     +parrafos;
-  _abreImpresion(_hojaImpresa(meta.titulo,cuerpo,' · '+meta.titulo));
+  _abreImpresion(_hojaImpresa(meta.titulo,cuerpo+FaroMarcador.impresionExtra([clave]),' · '+meta.titulo));
 }
 function imprimirTodasLasLecturas(){
   sfx('click');
@@ -514,7 +515,7 @@ function imprimirTodasLasLecturas(){
       +(nota?`<p class="fuente">${nota.textContent}</p>`:'')
       +[...card.querySelectorAll('.lect-p')].map(p=>'<p class="t">'+p.innerHTML+'</p>').join('');
   });
-  _abreImpresion(_hojaImpresa('Las cinco lecturas',cuerpo,' · Las cinco lecturas'));
+  _abreImpresion(_hojaImpresa('Las cinco lecturas',cuerpo+FaroMarcador.impresionExtra(null),' · Las cinco lecturas'));
 }
 function imprimirPreguntasLecturas(){
   sfx('click');
