@@ -252,7 +252,8 @@ const ETAPAS_PREVISTAS = {
     6: "El telón de la réplica",
   },
   apuesta: {
-    1: "San Petersburgo: lo que vale una apuesta",
+    /* La 1 ya no se anuncia: está construida (ver MISSIONS). En esta lista solo
+       viven las etapas que todavía no existen como misión. */
     2: "El árbol antes del salto",
     3: "Bayes contado con los dedos",
     4: "Puertas de ida y vuelta, y cuánto se apuesta",

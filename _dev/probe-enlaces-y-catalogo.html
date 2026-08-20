@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Enlaces y catálogo</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+<script>
+/* Pide TODOS los archivos que piden todas las páginas del proyecto, uno por
+   uno y de verdad, y comprueba que el catálogo cuadre.
+
+   Existe porque el 20 de agosto de 2026 se publicó una misión que pedía
+   js/html2canvas.min.js sin llevarlo (el diploma se habría quedado sin imagen,
+   en silencio), y el barrido que lo encontró destapó siete infografías que la
+   misión del Sistema Nervioso pedía y que nunca estuvieron. Diecinueve sondas
+   en verde y tres cosas rotas: ninguna miraba si los archivos existen.
+
+   Aquí NO se mira el disco (un navegador no puede, y el servidor de _dev no
+   lista directorios): eso lo hace `node _dev/cuadra-catalogo.js`, que además
+   caza carpetas huérfanas y fichas que nadie enlaza. Las dos se complementan
+   y las dos hacen falta. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const cerrar = () => { log('\n' + (fallos ? '✖ '+fallos+' fallos' : '✔ todo en orden'));
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda enlaces y catálogo'; };
+
+/* Se piden de a poco: cientos de peticiones a la vez ahogan al servidor de
+   _dev y empiezan a fallar por cansancio, no por estar rotas. */
+async function enTandas(items, n, f) {
+  const salida = [];
+  for (let i = 0; i < items.length; i += n) {
+    salida.push(...await Promise.all(items.slice(i, i + n).map(f)));
+  }
+  return salida;
+}
+const existe = async u => {
+  try { const r = await fetch(u, { cache: 'no-store' }); return r.ok ? null : r.status; }
+  catch (e) { return 'no responde'; }
+};
+/* Los enlaces se resuelven contra la URL de SU página, no contra la de la
+   sonda: media misión enlaza con rutas relativas («js/…», «../../img/…»). */
+const internos = (html, base) => [...html.matchAll(/(?:href|src)="([^"#][^"]*)"/g)]
+  .map(m => m[1])
+  .filter(u => !/^(https?:|data:|mailto:|tel:|javascript:)/i.test(u))
+  .map(u => new URL(u, base).href);
+
+(async () => {
+ try {
+  const src = await (await fetch('/js/data/misiones.js')).text();
+  const g = {};
+  new Function('g', 'with(g){' + src + '; g.M=MISSIONS; g.R=RUTAS; '
+    + 'g.P = typeof ETAPAS_PREVISTAS!=="undefined"?ETAPAS_PREVISTAS:{};}')(g);
+  const { M, R, P } = g;
+
+  log('── EL CATÁLOGO CONSIGO MISMO ──');
+  const rep = (arr, f) => Object.entries(arr.reduce((c,x)=>{const k=f(x);(c[k]=c[k]||[]).push(x);return c;},{}))
+    .filter(([,v]) => v.length > 1);
+  ok(M.length > 0, 'el catálogo trae ' + M.length + ' misiones', 'el catálogo vino vacío');
+  ok(rep(M, m=>m.id).length === 0, 'ningún id repetido', 'ids repetidos: ' + rep(M,m=>m.id).map(([k])=>k).join(', '));
+  ok(rep(M, m=>m.url).length === 0, 'ninguna url declarada dos veces', 'urls repetidas: ' + rep(M,m=>m.url).map(([k])=>k).join(', '));
+  const sinRuta = M.filter(m => m.ruta && !R[m.ruta]);
+  ok(sinRuta.length === 0, 'todas cuelgan de una ruta que existe', 'rutas inexistentes: ' + sinRuta.map(m=>m.ruta).join(', '));
+  const choque = rep(M.filter(m=>m.ruta), m => m.ruta + '#' + m.etapa);
+  ok(choque.length === 0, 'ninguna etapa la ocupan dos misiones', 'etapas ocupadas dos veces: ' + choque.map(([k])=>k).join(', '));
+  const pasadas = M.filter(m => m.ruta && R[m.ruta] && m.etapa > R[m.ruta].etapas);
+  ok(pasadas.length === 0, 'ninguna etapa se sale de las que declara su ruta',
+     'se pasan: ' + pasadas.map(m=>m.ruta+' etapa '+m.etapa).join(', '));
+  /* Una etapa construida que sigue anunciada como «por construir» es dato
+     muerto: el mapa se queda con la misión y el anuncio engaña al que lo lea.
+     Pasó al estrenar San Petersburgo. */
+  const zombis = [];
+  Object.entries(P).forEach(([ruta, et]) => Object.keys(et).forEach(n => {
+    const hecha = M.find(m => m.ruta === ruta && String(m.etapa) === String(n));
+    if (hecha) zombis.push(ruta + ' etapa ' + n);
+  }));
+  ok(zombis.length === 0, 'ninguna etapa construida sigue anunciada como por construir',
+     'siguen anunciadas: ' + zombis.join(', '));
+
+  log('\n── CADA MISIÓN RESPONDE ──');
+  const paginas = M.map(m => new URL(m.url, location.origin).href);
+  const malas = (await enTandas(paginas, 8, async u => (await existe(u)) ? u : null)).filter(Boolean);
+  ok(malas.length === 0, 'las ' + paginas.length + ' misiones del catálogo responden',
+     'no responden: ' + malas.map(u=>u.split('/').slice(-1)[0]).join(', '));
+
+  log('\n── LOS ARCHIVOS QUE PIDE CADA PÁGINA ──');
+  /* Lo que faltaba: nadie comprobaba que los <script>, las hojas y las
+     imágenes de cada misión estuvieran de verdad en su carpeta. */
+  const textos = await enTandas(paginas, 8, async u => {
+    try { const r = await fetch(u, { cache:'no-store' }); return r.ok ? { u, html: await r.text() } : null; }
+    catch (e) { return null; }
+  });
+  const fichas = new Set();
+  let pedidos = [];
+  textos.filter(Boolean).forEach(({ u, html }) => {
+    internos(html, u).forEach(x => {
+      pedidos.push({ de: u.split('/').slice(-1)[0], a: x });
+      if (/\/fichas\/[^/]+\.html$/.test(x)) fichas.add(x);
+    });
+  });
+  const rotos = (await enTandas(pedidos, 12, async p => {
+    const e = await existe(p.a);
+    return e ? (p.de + ' pide ' + p.a.split('/').slice(-1)[0] + ' (' + e + ')') : null;
+  })).filter(Boolean);
+  ok(rotos.length === 0, 'los ' + pedidos.length + ' archivos que piden las misiones existen',
+     rotos.length + ' rotos: ' + rotos.slice(0, 6).join(' · '));
+
+  log('\n── LAS FICHAS Y LO QUE ELLAS PIDEN ──');
+  ok(fichas.size > 0, 'las misiones enlazan ' + fichas.size + ' fichas', 'ninguna misión enlaza su ficha');
+  const textosF = await enTandas([...fichas], 8, async u => {
+    try { const r = await fetch(u, { cache:'no-store' }); return r.ok ? { u, html: await r.text() } : null; }
+    catch (e) { return null; }
+  });
+  const pedidosF = [];
+  textosF.filter(Boolean).forEach(({ u, html }) => internos(html, u).forEach(x => pedidosF.push({ de: u.split('/').slice(-1)[0], a: x })));
+  const rotosF = (await enTandas(pedidosF, 12, async p => {
+    const e = await existe(p.a);
+    return e ? (p.de + ' pide ' + p.a.split('/').slice(-1)[0] + ' (' + e + ')') : null;
+  })).filter(Boolean);
+  ok(rotosF.length === 0, 'los ' + pedidosF.length + ' archivos que piden las fichas existen',
+     rotosF.length + ' rotos: ' + rotosF.slice(0, 6).join(' · '));
+
+  log('\n── LA PORTADA ──');
+  const idx = await (await fetch('/index.html', { cache:'no-store' })).text();
+  const pedidosI = internos(idx, location.origin + '/index.html');
+  const rotosI = (await enTandas(pedidosI, 12, async u => (await existe(u)) ? u.split('/').slice(-1)[0] : null)).filter(Boolean);
+  ok(rotosI.length === 0, 'los ' + pedidosI.length + ' archivos que pide la portada existen', 'rotos: ' + rotosI.join(', '));
+
+  cerrar();
+ } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); cerrar(); }
+})();
+</script>
+</body>
+</html>

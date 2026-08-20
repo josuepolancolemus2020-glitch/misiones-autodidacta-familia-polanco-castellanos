@@ -735,9 +735,29 @@ con `_dev/servidor-estatico.js`): secciones completas, bancos con su tamaño,
 laboratorio, las dos pruebas generándose con el nombre correcto, la sopa
 legible, la ficha respondiendo, y la ruta mostrando la etapa en el mapa.
 
-Además, dos comprobaciones que valen para TODAS las misiones a la vez:
+Además, cuatro comprobaciones que valen para TODAS las misiones a la vez:
 
 - `node _dev/reparte-respuestas.js --revisar`: el reparto de las letras.
 - `_dev/probe-quiz-todas.html`: carga las seis misiones y comprueba que el
   quiz funcione, que la opción marcada como correcta sea la del banco y que
   ninguna letra pase del 40%.
+- `node _dev/cuadra-catalogo.js`: que el catálogo cuadre con el disco (ids y
+  urls sin repetir, rutas y etapas que existen y no chocan, ninguna etapa
+  construida siguiendo anunciada como «por construir», ninguna carpeta
+  huérfana, ninguna ficha que nadie enlace, ninguna clave de progreso
+  compartida y ningún archivo pedido que falte).
+- `_dev/probe-enlaces-y-catalogo.html`: pide por HTTP, uno por uno, **los más
+  de setecientos archivos** que piden las misiones, las fichas y la portada.
+
+**Por qué estas dos últimas existen.** El 20 de agosto de 2026 se publicó una
+misión que pedía `js/html2canvas.min.js` sin llevarlo: cada misión guarda su
+propia copia en su carpeta y el andamio copió el motor pero no la librería. El
+diploma se habría quedado sin imagen, en silencio. El barrido que lo encontró
+destapó además siete infografías que la misión del Sistema Nervioso pedía y
+que nunca llegaron al repositorio, y una etapa recién construida que seguía
+anunciada como por construir. **Diecinueve sondas en verde y tres cosas
+rotas**, porque ninguna miraba si los archivos existen ni si el catálogo
+cuadra. Van separadas a propósito: los enlaces se piden por HTTP desde el
+navegador, y lo que hay que leer del disco (carpetas huérfanas, fichas
+sueltas) no puede hacerlo un navegador, porque el servidor de `_dev` no lista
+directorios.
