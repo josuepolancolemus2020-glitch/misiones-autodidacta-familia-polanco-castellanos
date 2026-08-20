@@ -131,25 +131,11 @@ if (s.indexOf('debate:{titulo:') < 0) {
   ok('careo en LECTURAS_IMPR');
 }
 
-/* Su etiqueta, que NO es la del pastiche: el careo no imita a nadie.
-   Hay tres formas distintas de hacer etiquetas en las trece misiones, y
-   las tres salieron del mismo molde en momentos distintos. */
-const ETIQ_CAREO = "'<div class=\"etiqueta\"><strong>⚖️ Careo escrito por la casa sobre una disputa real.</strong> Los turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas: aquí no se le pone a nadie una palabra en la boca. Los investigadores se citan en tercera persona como fuentes, <strong>toda obra, revista, fecha y cifra es real y comprobable</strong>, y cada postura va escrita en su mejor versión, no en la que sería fácil de tumbar.</div>'";
-if (s.indexOf('Careo escrito por la casa') < 0) {
-  let puesta = false;
-  for (const fn of ['_etiquetaImpresa', '_etiquetaLectura']) {
-    const marca = 'function ' + fn + '(meta){';
-    if (s.indexOf(marca) >= 0) {
-      s = s.replace(marca, marca + '\n  if(meta&&meta.careo){ return ' + ETIQ_CAREO + '; }');
-      ok('etiqueta del careo (' + fn + ')'); puesta = true; break;
-    }
-  }
-  if (!puesta && s.indexOf('const LECTURAS_ETIQ={') >= 0) {
-    s = s.replace('const LECTURAS_ETIQ={', 'const LECTURAS_ETIQ={\n  debate:' + ETIQ_CAREO.replace(/^'/, '`').replace(/'$/, '`') + ',');
-    ok('etiqueta del careo (LECTURAS_ETIQ)'); puesta = true;
-  }
-  if (!puesta) ojo('NO se pudo poner la etiqueta del careo: hazlo a mano');
-}
+/* Su etiqueta NO se toca aquí. El careo no imita a nadie, así que no puede
+   salir con la del pastiche, pero las trece misiones arman esa etiqueta de
+   SEIS maneras distintas y parchear seis formas era pedir un fallo por cada
+   una. La cambia el aparato compartido (FaroLecturas.etiquetaCareo), que
+   recibe el cuerpo ya armado y no necesita saber cómo se armó. */
 
 /* Cada lectura se imprime con SUS preguntas y su pauta en hoja aparte. */
 if (s.indexOf('FaroLecturas.preguntasImpresas') < 0) {
@@ -157,9 +143,11 @@ if (s.indexOf('FaroLecturas.preguntasImpresas') < 0) {
   if (s.indexOf(antes) < 0) ojo('NO se pudo enganchar preguntasImpresas: hazlo a mano');
   else {
     s = s.replace(antes,
-      "const preg=(window.FaroLecturas&&FaroLecturas.preguntasImpresas)?FaroLecturas.preguntasImpresas(clave):'';\n"
-      + "  _abreImpresion(_hojaImpresa(meta.titulo,cuerpo+preg+FaroMarcador.impresionExtra([clave]),' · '+meta.titulo));");
-    ok('cada lectura se imprime con sus preguntas');
+      "const _ap=window.FaroLecturas;\n"
+      + "  const preg=(_ap&&_ap.preguntasImpresas)?_ap.preguntasImpresas(clave):'';\n"
+      + "  const _cuerpo=(_ap&&_ap.etiquetaCareo)?_ap.etiquetaCareo(clave,cuerpo):cuerpo;\n"
+      + "  _abreImpresion(_hojaImpresa(meta.titulo,_cuerpo+preg+FaroMarcador.impresionExtra([clave]),' · '+meta.titulo));");
+    ok('cada lectura se imprime con sus preguntas y el careo con su etiqueta');
   }
 }
 

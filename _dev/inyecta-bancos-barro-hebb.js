@@ -740,8 +740,10 @@ for (const [de, a] of impresion) {
    cada voz. */
 src = src.replace(
   "_abreImpresion(_hojaImpresa(meta.titulo,cuerpo+FaroMarcador.impresionExtra([clave]),' · '+meta.titulo));",
-  "const preg=(window.FaroLecturas&&FaroLecturas.preguntasImpresas)?FaroLecturas.preguntasImpresas(clave):'';\n"
-  + "  _abreImpresion(_hojaImpresa(meta.titulo,cuerpo+preg+FaroMarcador.impresionExtra([clave]),' · '+meta.titulo));");
+  "const _ap=window.FaroLecturas;\n"
+  + "  const preg=(_ap&&_ap.preguntasImpresas)?_ap.preguntasImpresas(clave):'';\n"
+  + "  const _cuerpo=(_ap&&_ap.etiquetaCareo)?_ap.etiquetaCareo(clave,cuerpo):cuerpo;\n"
+  + "  _abreImpresion(_hojaImpresa(meta.titulo,_cuerpo+preg+FaroMarcador.impresionExtra([clave]),' · '+meta.titulo));");
 
 
 /* El arranque de la misión llamaba a las tres pantallas viejas. Ya no

@@ -416,6 +416,39 @@
     if (hechas >= total) logro('lect_master');
   }
 
+  /* ─────────────── La etiqueta del careo, en papel ───────────────
+     El careo NO imita a nadie, así que no puede salir impreso con la
+     etiqueta del pastiche («este texto NO es obra de ese autor»): sería
+     mentira, y encima de las caras, porque justo esa etiqueta es la que
+     esta casa usa para declarar lo que no es suyo.
+
+     Vive aquí, en el aparato compartido, y no en cada misión, por una
+     razón que se vio al intentar lo contrario: las trece misiones del
+     Estudio Mayor arman esa etiqueta de SEIS maneras distintas (una
+     función `_etiquetaImpresa`, otra `_etiquetaLectura`, una tabla
+     `LECTURAS_ETIQ`, un ternario con `esEntrevista`, otro con
+     `meta.ficcion`, y dos campos distintos dentro de `meta`). Trece
+     misiones y seis formas de hacer lo mismo es exactamente el motivo
+     por el que este archivo existe. Así que en vez de parchear seis
+     veces, cada misión pasa por aquí el cuerpo ya armado y aquí se le
+     cambia la etiqueta a la del careo, sea cual sea la forma en que la
+     haya construido. */
+  const ETIQ_CAREO = '<div class="etiqueta"><strong>⚖️ Careo escrito por la casa sobre una disputa real.</strong> '
+    + 'Los turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas: '
+    + 'aquí no se le pone a nadie una palabra en la boca. Los investigadores se citan en tercera persona '
+    + 'como fuentes, <strong>toda obra, revista, fecha y cifra es real y comprobable</strong>, y cada postura '
+    + 'va escrita en su mejor versión, no en la que sería fácil de tumbar.</div>';
+  function etiquetaCareo(clave, cuerpo) {
+    if (String(clave).replace(/^lect-/, '') !== 'debate') return cuerpo;
+    const c = String(cuerpo || '');
+    /* Si la misión ya puso la del careo, no se toca. Si puso otra, se
+       sustituye la PRIMERA, que es la del texto (las de más abajo, si
+       las hubiera, son de otra cosa). Y si no puso ninguna, se antepone. */
+    if (c.indexOf('Careo escrito por la casa') >= 0) return c;
+    if (/<div class="etiqueta">/.test(c)) return c.replace(/<div class="etiqueta">[\s\S]*?<\/div>/, ETIQ_CAREO);
+    return ETIQ_CAREO + c;
+  }
+
   /* ─────────────── Las preguntas, en papel ───────────────
      Lo que la misión pega al final de la hoja de UNA lectura. La pauta va
      en su propia hoja (norma 5-quater): las respuestas no se imprimen en
@@ -474,6 +507,7 @@
     abrir: function (clave) { return abrir(String(clave).replace(/^lect-/, ''), true); },
     cerrar: cerrar,
     preguntasImpresas: preguntasImpresas,
+    etiquetaCareo: etiquetaCareo,
     /* Para las sondas: qué voces hay montadas y cuántas preguntas tiene
        cada una. Sin esto, una lectura sin preguntas se publica sin que
        nadie lo note hasta que un alumno abre la tarjeta y no hay nada. */

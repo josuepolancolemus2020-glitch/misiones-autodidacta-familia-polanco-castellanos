@@ -481,8 +481,10 @@ function imprimirLectura(clave){
     +`<div class="idline"><span>Lee:</span><span class="r"></span><span>Fecha:</span><span class="r" style="max-width:35mm"></span></div>`
     +(nota?`<p class="fuente">${nota.textContent}</p>`:'')
     +parrafos;
-  const preg=(window.FaroLecturas&&FaroLecturas.preguntasImpresas)?FaroLecturas.preguntasImpresas(clave):'';
-  _abreImpresion(_hojaImpresa(meta.titulo,cuerpo+preg+FaroMarcador.impresionExtra([clave]),' · '+meta.titulo));
+  const _ap=window.FaroLecturas;
+  const preg=(_ap&&_ap.preguntasImpresas)?_ap.preguntasImpresas(clave):'';
+  const _cuerpo=(_ap&&_ap.etiquetaCareo)?_ap.etiquetaCareo(clave,cuerpo):cuerpo;
+  _abreImpresion(_hojaImpresa(meta.titulo,_cuerpo+preg+FaroMarcador.impresionExtra([clave]),' · '+meta.titulo));
 }
 function imprimirTodasLasLecturas(){
   sfx('click');
