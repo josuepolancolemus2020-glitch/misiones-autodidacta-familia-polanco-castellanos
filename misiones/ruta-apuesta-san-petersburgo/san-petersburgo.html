@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/san-petersburgo.css">
+<link rel="stylesheet" href="../../css/lecturas.css">
+<link rel="stylesheet" href="../../css/lecturas-marcador.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Repite sin orden 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🎲</div>
+    <div class="hero-text">
+      <h1>San Petersburgo: <span>lo que vale una apuesta</span></h1>
+      <p class="sub">Una apuesta que vale infinito y que nadie compra por cien lempiras 🎲</p>
+      <div class="badge">🎲 Ruta de la Apuesta Medida · Etapa 1 de 6</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🎲 Una apuesta que vale infinito, y nadie la compra</h2>
+    <p>Esta es la primera etapa de la Ruta de la Apuesta Medida, la materia de <strong>Toma de decisiones</strong> del Estudio Mayor. Su lema dice que toda decisión es una apuesta y que se juzga por cómo se decidió, no por cómo cayó el dado. La etapa 1 empieza donde empezó la materia de verdad: con un juego que rompió la cuenta.</p>
+    <p><strong>El juego.</strong> Se lanza una moneda honrada hasta que salga cara. Si la cara sale al primer lanzamiento, la banca paga 2 lempiras; si sale al segundo, 4; al tercero, 8; al cuarto, 16, y así, doblando. La pregunta es una sola: <strong>¿cuánto pagarías por entrar?</strong></p>
+    <div class="tip">
+      <span class="ti">🧮</span>
+      <div><strong>La cuenta que no cierra.</strong> Cada rama aporta lo mismo: la de 2 lempiras tiene probabilidad 1/2 y aporta 1; la de 4 tiene 1/4 y aporta 1; la de 8 tiene 1/8 y aporta 1. Un lempira por rama, y las ramas no se acaban nunca. El <strong>valor esperado del juego es infinito</strong>. Y aun así casi nadie paga cien lempiras por jugarlo. <strong>En esa negativa está media materia</strong>, y no porque la gente se equivoque.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 La cuenta y la persona, una al lado de la otra</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🧮 Lo que dice el valor esperado</h4>
+        <p>Pesar cada rama por su probabilidad y sumar. En San Petersburgo la suma <strong>no tiene tope</strong>, así que la cuenta manda pagar <strong>cualquier precio</strong>: mil lempiras, cien mil, la casa entera. Si el valor esperado fuera la última palabra, negarse sería un error.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🙋 Lo que hace cualquiera</h4>
+        <p>Ofrecer veinte o treinta lempiras y no subir. Y tiene su razón: <strong>tres de cada cuatro partidas terminan pagando 2 o 4 lempiras</strong>, el infinito vive en ramas rarísimas, y quien juega una sola vez no se lleva un promedio: se lleva <strong>una rama</strong>.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚠️ El error que esta etapa viene a matar</span><br>
+      <span>El error no es «la gente no sabe multiplicar». Es creer que <span class="hl">el valor esperado es la respuesta a toda pregunta con números</span>. Es la respuesta correcta a <span class="hl2">una</span> pregunta: qué conviene en apuestas que se van a repetir muchas veces y cuyo tamaño no puede hundir la casa. Fuera de ahí, la misma cuenta que ayuda, engaña.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Los siete pasos de una apuesta bien medida</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada paso para ver qué es, dónde se cae y cómo se hace en esta casa.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un paso de la apuesta.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la feria del colegio</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué hacer con una oferta que la cuenta aprueba.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">🎪</span><span class="ms-text"><strong>La oferta:</strong> en la feria del colegio venden una rifa. El boleto cuesta 100 lempiras y el premio es de 900. Se venden 8 boletos.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🧮</span><span class="ms-text"><strong>La cuenta:</strong> una probabilidad de 1 entre 8 de ganar 900 son 112,5 lempiras de valor esperado. Menos los 100 del boleto: <strong>+12,5 a favor</strong>.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">📅</span><span class="ms-text"><strong>El detalle:</strong> la rifa es una sola vez al año. No hay ocho intentos: hay uno.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">💵</span><span class="ms-text"><strong>Lo que hay en casa:</strong> 900 lempiras para el mes. El boleto son 100 de esos.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">La cuenta sale a favor. ¿Se compra el boleto?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🧮 Sí: el valor esperado es positivo</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">⚖️ Depende: primero mirar el tamaño</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔍 El valor esperado, desarmado en cuatro piezas</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La cuenta es de escuela primaria. Lo que casi nunca se enseña son sus condiciones de uso, y una herramienta sin condiciones de uso se acaba usando donde no sirve.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué pide la cuenta</th><th>Qué pasa si falta</th></tr>
+      <tr><td>Las ramas</td><td>Listar <b>todos</b> los resultados posibles</td><td>Se pesa media apuesta y sale a favor la que no lo está</td></tr>
+      <tr><td>Las probabilidades</td><td>Que sumen 1 y se escriban <b>antes</b> de conocer el resultado</td><td>Se ajustan a lo que ya se decidió, y la cuenta solo confirma</td></tr>
+      <tr><td>La repetición</td><td>Que la apuesta se vaya a jugar <b>muchas veces</b></td><td>La media promedia mundos que este jugador no va a vivir</td></tr>
+      <tr><td>El tamaño</td><td>Que perder <b>no saque de la mesa</b></td><td>Una esperanza positiva termina en ruina, y de la ruina no se vuelve</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 Lo que se ve al ponerlas en fila</span><br>
+      <span>Las dos primeras piezas son de <span class="hl">aritmética</span> y casi nadie las falla. Las dos últimas son de <span class="hl2">criterio</span>, no aparecen en la fórmula, y son las que deciden si la fórmula era la herramienta correcta. San Petersburgo rompe la tercera y la cuarta a la vez.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>💰 Por qué diez mil lempiras no valen siempre lo mismo</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La salida la dio Daniel Bernoulli en 1738, en las actas de la Academia de San Petersburgo, y cabe en una frase: lo que se pesa no es el dinero, es <strong>lo que ese dinero añade a lo que ya se tiene</strong>. Cada lempira nuevo vale un poco menos que el anterior.</p>
+    <table class="tres">
+      <tr><th>Lo que hay en la casa</th><th>Llegan 10 000 lempiras</th><th>Qué cambian</th></tr>
+      <tr><td>4 000 lempiras</td><td>El dinero se multiplica por 3,5</td><td>El mes entero: comida, transporte, la deuda chica</td></tr>
+      <tr><td>40 000 lempiras</td><td>Un cuarto más</td><td>Se adelanta algo que estaba en lista</td></tr>
+      <tr><td>400 000 lempiras</td><td>Un 2,5% más</td><td>Casi nada que se note al día siguiente</td></tr>
+      <tr><td>4 000 000 de lempiras</td><td>Un 0,25% más</td><td>Se anota y se olvida</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎯 La regla que ordena la tabla</span><br>
+      <span>Se llama <span class="hl">utilidad marginal decreciente</span>, y con ella San Petersburgo deja de ser una paradoja: las ramas gigantescas pagan cifras enormes, pero <span class="hl2">lo que esas cifras añaden crece mucho más despacio que lo que la probabilidad baja</span>, y la suma se vuelve un número tranquilo. Bernoulli propuso pesar el dinero con logaritmos; el detalle importa menos que la idea.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ Los dos límites del valor esperado</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🎯 La apuesta única grande</h4>
+        <p>La media es lo que sale <strong>a la larga</strong>. Quien juega una vez no recibe una media: recibe <strong>una rama</strong>. Un 60% de probabilidad de ganar es una racha excelente en cien intentos y un volado en uno solo.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>💀 La ruina</h4>
+        <p>Si perder deja a la casa sin poder jugar la vez siguiente, <strong>no hay esperanza positiva que valga</strong>: la serie se corta ahí. La cuenta supone que siempre hay una vez siguiente, y a veces no la hay.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Planteada por Nicolás Bernoulli</div><div class="stat-val">1713</div></div>
+      <div class="stat-item"><div class="stat-label">Resuelta por Daniel Bernoulli</div><div class="stat-val">1738</div></div>
+      <div class="stat-item"><div class="stat-label">Paradoja de Allais</div><div class="stat-val">1953</div></div>
+      <div class="stat-item"><div class="stat-label">Pasos de la apuesta medida</div><div class="stat-val">7</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📝 El vocabulario que esta etapa deja puesto</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Seis palabras que se usan en las cinco etapas siguientes de la ruta. Aquí se ganan; después solo se aplican.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🧮 Valor esperado</div><div class="t-info">Cada rama por su probabilidad</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🎲 San Petersburgo</div><div class="t-info">Esperanza infinita, precio pequeño</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">💰 Utilidad decreciente</div><div class="t-info">El lempira nuevo vale menos</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">💀 Riesgo de ruina</div><div class="t-info">Perder y no poder volver a jugar</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">1️⃣ Apuesta única</div><div class="t-info">La media no consuela al que juega una vez</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">⚖️ Norma y retrato</div><div class="t-info">Cómo se debería decidir, cómo se decide</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Lo práctico que sale de aquí: <strong>ninguna oferta de esta casa se firma sin haber escrito antes las ramas y sus probabilidades</strong>, y ninguna se acepta si la rama mala deja a la familia sin poder jugar el mes siguiente, por buena que sea la cuenta.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El tablero de la apuesta</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para no volver a usar el valor esperado donde no sirve.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El valor esperado</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🎲 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="esperado" onclick="labShowParte('esperado')">🧮 El valor esperado</button>
+        <button class="lab-btn lab-cont-btn" data-parte="paradoja" onclick="labShowParte('paradoja')">🎲 San Petersburgo</button>
+        <button class="lab-btn lab-cont-btn" data-parte="utilidad" onclick="labShowParte('utilidad')">💰 La utilidad</button>
+        <button class="lab-btn lab-cont-btn" data-parte="ruina" onclick="labShowParte('ruina')">💀 La ruina</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado cae?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: cómo se mide una apuesta, de principio a fin</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la apuesta medida se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué está haciendo esa frase?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué está haciendo esa frase dentro de una decisión:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«La cuenta sale a favor, así que hay que entrar»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla esa decisión?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla en esa decisión:</p>
+    <div class="neuro-trans-display" id="enferDisease">Angelly oye el audio de inglés mientras ordena su cuarto y no aprende nada</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">🧮 Cuenta</button>
+        <button class="btn btn-sec" onclick="">📣 Eslogan</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🏺 La práctica sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · San Petersburgo: lo que vale una apuesta · Ruta de la Apuesta Medida</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: San Petersburgo, lo que vale una apuesta</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La apuesta sobre la mesa · San Petersburgo</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🏺 La práctica sobre la mesa: qué se produce, qué se corrige y en qué orden</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una oferta o una decisión de la casa o del proyecto. Escribe las ramas y sus probabilidades, calcula el valor esperado en lempiras, di si la cuenta es aquí la herramienta correcta (repetición y tamaño) y qué condición haría aceptable lo que hoy no lo es (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🏺</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎲 Casos del proyecto: apuestas de esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas hay una apuesta, y en todas las preguntas son las mismas: <strong>¿cuáles son las ramas, qué probabilidad tiene cada una, se va a repetir, y qué pasa si sale la mala?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también aquí:</strong> ningún estudio entra sin su etiqueta. Bernoulli (1738) es un <strong>clásico fundacional</strong>; von Neumann y Morgenstern (1944) es <strong>sólido como norma</strong> y discutido como retrato; Allais (1953) es <strong>sólido</strong> y de los resultados que replican siempre; y «el valor esperado dice lo que hay que hacer» es <strong>media verdad de manual</strong>, porque calla sus dos condiciones de uso. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎪 Caso 1: la rifa de la feria del colegio</h2>
+    <p>Boleto a <strong>L 100</strong>, premio de <strong>L 900</strong>, ocho boletos en total. El valor esperado es <strong>L 112,50</strong>, así que la cuenta sale <strong>a favor por L 12,50</strong>. La rifa es una sola vez al año.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚠️ Por qué la cuenta buena no basta</span><br>
+      <span>La ventaja es real y es <span class="hl">pequeña</span>: doce lempiras y medio sobre cien. Para cobrarla de verdad habría que jugar la rifa muchas veces, y solo hay una. En una sola vez lo que ocurre es que <span class="hl2">siete de cada ocho veces se pierden los cien lempiras enteros</span>. La cuenta no está mal: está contestando una pregunta que aquí nadie hizo.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>💸 Caso 2: el curso que promete duplicar la matrícula</h2>
+    <p>Una consultora ofrece un taller de mercadeo para M.E.T.A.S por <strong>L 18,000</strong>. Dice que a sus clientes «se les duplica la matrícula». Preguntando, resulta que de los últimos 20 clientes, a <strong>3</strong> se les duplicó, a <strong>9</strong> les subió algo y a <strong>8</strong> no les cambió nada.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">💰 La oferta, leída con esta etapa</span><br>
+      <span>Qué mete: un taller y una frase verdadera <span class="hl">contada por su mejor rama</span>. Qué saca: L 18,000 y dos fines de semana. Escribir las tres ramas con sus 3, 9 y 8 casos convierte el eslogan en una cuenta, y la cuenta ya se puede discutir. <span class="hl2">La condición que la haría aceptable</span>: que el pago vaya contra resultado, o que se hable con dos de los ocho a los que no les cambió nada.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🏦 Caso 3: el préstamo para imprimir las fichas</h2>
+    <p>Un conocido presta <strong>L 60,000</strong> para imprimir fichas de M.E.T.A.S y venderlas. Si se venden bien, quedan <strong>L 95,000</strong> (una ganancia de 35,000). Si no, se recupera <strong>L 20,000</strong> en material y queda una deuda de 40,000. La familia calcula que se venden bien <strong>6 de cada 10 veces</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">💀 Aquí la cuenta no es lo que decide</span><br>
+      <span>El valor esperado sale <span class="hl">a favor</span>: 0,6 por 35,000 menos 0,4 por 40,000 son 5,000 lempiras de ventaja. Y aun así la respuesta es no, o no todavía, porque la rama mala <span class="hl2">deja una deuda de 40,000 que la casa no puede pagar</span>: cuatro de cada diez veces esta familia sale de la mesa. Ninguna esperanza positiva compra el derecho a arruinarse.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>✂️ Caso 4: la misma apuesta, partida en pedazos</h2>
+    <p>Mismo negocio del caso 3, pero se imprime <strong>una décima parte</strong>: L 6,000 de tirada, gana 3,500 o pierde 4,000, con las mismas probabilidades. Y se puede repetir cada mes durante un año.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔁 Lo que cambió no fue la cuenta</span><br>
+      <span>La ventaja por intento es la misma en proporción, pero ahora <span class="hl">hay doce intentos y ninguno hunde la casa</span>. Ahí sí la media empieza a ser una promesa y no un consuelo: es exactamente el terreno donde el valor esperado es la herramienta correcta. <span class="hl2">Partir el tamaño convierte una apuesta prohibida en una apuesta razonable</span>, sin cambiar una sola probabilidad.</span>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📱 Caso 5: los anuncios en el APK de M.E.T.A.S</h2>
+    <p>Una red de publicidad ofrece <strong>L 4,500 al mes</strong> por poner anuncios dentro del APK. La familia estima que hay <strong>2 posibilidades de 10</strong> de que los maestros se molesten y la aplicación pierda la mitad de su uso.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⚖️ Qué mete y qué saca</span><br>
+      <span>Qué mete: L 54,000 al año, que no es poco. Qué saca: dos de cada diez veces, <span class="hl">la mitad de la confianza que costó cinco años construir</span>, y esa no se recompra con L 54,000. Aquí la rama mala no se mide en dinero, y por eso <span class="hl2">meterla en la misma columna que los lempiras es hacer trampa a favor del sí</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🎓 Caso 6: la beca que pide dejar el trabajo</h2>
+    <p>Una beca cubre un año de estudios. Hay que dejar un ingreso de <strong>L 12,000 mensuales</strong>. La beca se gana <strong>1 de cada 4 veces</strong> según los que ya la pidieron, y postular cuesta dos semanas de trabajo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🌳 Dos apuestas metidas en una</span><br>
+      <span>Se están pesando juntas dos cosas que se deciden por separado: <span class="hl">postular</span> (barato, se puede repetir, la rama mala solo cuesta dos semanas) y <span class="hl2">aceptar si la dan</span> (cara, una sola vez, la rama mala son doce mil al mes). La primera pasa el filtro con holgura; la segunda pide la cuenta completa. Separarlas es media decisión resuelta.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🖨️ Caso 7: la garantía de la impresora</h2>
+    <p>La impresora de las fichas cuesta <strong>L 9,000</strong>. La garantía extendida cuesta <strong>L 1,500</strong> y cubre un daño que ocurre en <strong>1 de cada 10</strong> impresoras.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧮 La cuenta que casi siempre pierde, y por qué se paga igual</span><br>
+      <span>El valor esperado de la garantía es <span class="hl">L 900</span> (una décima parte de 9,000) y cuesta 1,500: se pierden 600 en promedio, que es como viven las aseguradoras. Y aun así puede ser buena idea, por lo mismo que enseña esta etapa: <span class="hl2">quien no puede reponer los 9,000 de golpe está comprando no salir de la mesa</span>, y eso vale más que su valor esperado. Un seguro es una apuesta con esperanza negativa que se compra a propósito.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Caso 8: el video que puede volverse viral</h2>
+    <p>Grabar el guion de esta etapa cuesta <strong>una tarde</strong>. De cada 50 videos, <strong>1</strong> se vuelve viral y trae mucha matrícula, y los otros 49 traen poco o nada.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔎 La apuesta que sí conviene repetir</span><br>
+      <span>Aquí la rama mala cuesta <span class="hl">una tarde</span> y la buena puede cambiar el año. Es la forma contraria del caso 3: <span class="hl2">pérdida chica y acotada, ganancia grande y poco probable, y se puede jugar cincuenta veces</span>. Cuando la pérdida no saca de la mesa y el intento se repite, el valor esperado vuelve a ser exactamente la herramienta correcta.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La hoja de la apuesta, y las cinco reglas de la etapa</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Antes de firmar cualquiera de estas ofertas, la casa llena esta hoja. Se llena <strong>antes</strong> de conocer el resultado, que es lo único que la vuelve útil después.</p>
+    <ul style="font-size:0.9rem;line-height:1.6;padding-left:1.1rem;margin-bottom:0.8rem;">
+      <li><strong>Las ramas:</strong> qué puede pasar, todas, incluida la aburrida de que no pase nada.</li>
+      <li><strong>La probabilidad de cada una,</strong> escrita en números y con lo que la sostiene.</li>
+      <li><strong>Lo que gana o pierde cada rama,</strong> en lempiras y en lo que no son lempiras.</li>
+      <li><strong>El valor esperado,</strong> que es la suma de cada rama por su probabilidad.</li>
+      <li><strong>Las dos preguntas de criterio:</strong> ¿esto se repite?, ¿la rama mala nos saca de la mesa?</li>
+    </ul>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎲 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">El valor esperado se calcula siempre</span>, aunque después no mande. 2. Las probabilidades se escriben <span class="hl2">antes</span> del resultado. 3. Una decisión se juzga por cómo se decidió, no por cómo cayó. 4. <span class="hl">Ninguna apuesta que pueda hundir la casa se acepta</span>, por buena que sea la cuenta. 5. Cuando la cuenta y el estómago no coinciden, se escribe por qué: casi siempre el estómago está viendo el tamaño o la falta de repetición.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «La apuesta que nadie compra»</h2>
+    <p>Un guion listo para grabar, de seis a siete minutos, que cuenta esta etapa <strong>con historia y no con definiciones</strong>. Nada de fórmulas antes del minuto dos. Cada escena lleva su VOZ, su IMAGEN y su TEXTO EN PANTALLA.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>La regla de la casa para los guiones:</strong> el concepto no se presenta, se gana. Primero alguien quiere algo, después el público se ve retratado, y solo cuando la historia ya duele entra la herramienta. Si la primera frase del video es «hoy vamos a hablar del valor esperado», el video ya se perdió.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «Te ofrezco un juego. Tiro una moneda hasta que salga cara. Si sale a la primera te doy dos lempiras; a la segunda, cuatro; a la tercera, ocho, y así, doblando, sin techo. La cuenta dice que este juego vale infinito. Ahora decime la verdad: ¿cuánto pagarías por jugarlo?»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; después una moneda girando sobre una mesa de madera, en primerísimo plano, y una mano que no termina de soltar un billete.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Vale infinito. Nadie paga cien.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quiere (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «En 1713, un matemático suizo llamado Nicolás Bernoulli le mandó ese problema por carta a un colega francés, Pierre Rémond de Montmort. No era un acertijo de sobremesa: Bernoulli quería saber por qué la mejor herramienta que tenían para valorar apuestas daba un resultado que ninguna persona sensata aceptaba. Estuvo veinticinco años sin respuesta buena. La respuesta llegó de su primo Daniel, y llegó desde muy lejos de casa: desde San Petersburgo, donde Daniel trabajaba en la Academia de Ciencias que había fundado el zar.»</p>
+    <p><strong>IMAGEN:</strong> una carta manuscrita del siglo XVIII; un mapa que va de Basilea a San Petersburgo; la fachada de una academia con nieve.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «1713: la pregunta. 1738: la respuesta.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Vos también dijiste que no, sin saber ninguna fórmula. Y hacés lo mismo todas las semanas. Comprás el seguro de la moto, aunque la aseguradora gane plata con vos, porque si te la roban no tenés otra. No jugás la casa a un negocio que sale bien seis de cada diez veces, aunque la cuenta salga a favor. Y en cambio sí mandás cincuenta veces el mismo correo que casi nunca contestan, porque mandarlo no cuesta nada. Sin haberlo escrito nunca, ya tenés un criterio. Lo que casi nadie tiene es el criterio por escrito, y por eso se cae justo el día que hay alguien enfrente esperando una firma.»</p>
+    <p><strong>IMAGEN:</strong> una moto con candado; una mesa de cocina con una calculadora y un papel; un teléfono con cincuenta correos enviados.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Ya tenés el criterio. No lo tenés escrito.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Y acá está el giro, que tiene dos partes. La primera: negarse a pagar cien lempiras por ese juego <strong>no es un error</strong>. Durante doscientos años se enseñó como si la gente estuviera fallando en una cuenta fácil, y no. Lo que falla es creer que la cuenta manda siempre. La segunda parte es la que resolvió Daniel Bernoulli en 1738: lo que pesa no es el dinero, es lo que ese dinero <strong>añade a lo que ya tenés</strong>. Diez mil lempiras encima de cuatro mil te cambian el mes. Encima de cuatrocientos mil, casi no se notan. Las ramas gigantescas de San Petersburgo pagan cifras enormes, pero lo que esas cifras te cambian la vida crece mucho más despacio de lo que baja su probabilidad. Y entonces la suma deja de ser infinita y se vuelve un número tranquilo, parecido a lo que cualquiera habría ofrecido.»</p>
+    <p><strong>IMAGEN:</strong> dos vasos, uno casi vacío y otro casi lleno, y el mismo chorro de agua cayendo en los dos; una curva que sube y se va aplanando.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «No pesa el dinero. Pesa lo que te cambia.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:30)</h2>
+    <p><strong>VOZ:</strong> «Ahora sí, la herramienta, que es de escuela primaria. Escribís las ramas, le ponés a cada una su probabilidad, multiplicás y sumás. Eso es el valor esperado. Y viene con dos preguntas que no están en la fórmula y que son las que de verdad deciden. Primera: <strong>¿esto se va a repetir?</strong> La media es lo que pasa a la larga; si jugás una sola vez no te llevás una media, te llevás una rama. Segunda: <strong>¿la rama mala me saca de la mesa?</strong> Si perder te deja sin poder jugar la vez siguiente, no hay ventaja que valga, porque la serie se corta ahí. Con esas dos preguntas, la rifa del colegio y el préstamo de sesenta mil lempiras dejan de parecerse, aunque las dos tengan la cuenta a favor.»</p>
+    <p><strong>IMAGEN:</strong> una hoja cuadriculada donde se escriben ramas y probabilidades; después la misma hoja con dos preguntas subrayadas al pie.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Se repite? ¿Me saca de la mesa?»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:30 a 6:20)</h2>
+    <p><strong>VOZ:</strong> «“Yo no sé las probabilidades de mi vida. ¿De dónde saco esos números?” La objeción es justa y hay que concederla: casi nunca los sabés. Pero escribir un número aproximado <strong>y las razones que lo sostienen</strong> ya es mejor que no escribir ninguno, por una razón sencilla: un número escrito antes se puede revisar después. Si dijiste seis de cada diez y salió mal tres veces seguidas, tenés algo que corregir. Si nunca escribiste nada, lo único que te queda es la anécdota, y la anécdota siempre le da la razón al que la cuenta. En 1953 el economista francés Maurice Allais mostró además que ni siquiera decidiendo con cuidado seguimos la norma: la violamos con sistema, y sabiendo dónde se falla se falla menos.»</p>
+    <p><strong>IMAGEN:</strong> un cuaderno con una probabilidad tachada y corregida al lado, con fecha.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Un número flojo escrito vale más que uno perfecto pensado.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:20 a 7:10)</h2>
+    <p><strong>VOZ:</strong> «Esta semana, una sola cosa. Agarrá la decisión que tenés pendiente, la que te da vueltas, y escribila en cuatro renglones: las ramas, la probabilidad de cada una, lo que ganás o perdés en cada una, y las dos preguntas del final. Se repite o no se repite. Me saca o no me saca de la mesa. Cinco minutos. Y guardala con la fecha, aunque todavía no decidas, porque dentro de un año ese papel te va a decir si decidís bien o solo tuviste suerte. Esto es «San Petersburgo: lo que vale una apuesta», la primera etapa de la Ruta de la Apuesta Medida.»</p>
+    <p><strong>IMAGEN:</strong> una hoja doblada guardada en una caja con otras; la cámara se aleja y se ven muchas hojas fechadas.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Ramas · Probabilidades · ¿Se repite? ¿Me saca? · Misión: San Petersburgo, lo que vale una apuesta · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El mismo esqueleto sirve para cualquier etapa. Se copia la columna del medio, no la de la derecha.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué tiene que hacer</th><th>Cómo se hizo aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>Un juego que vale infinito y que el propio espectador no compraría</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>Nicolás Bernoulli, que quiere saber por qué su mejor herramienta da un disparate</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>El seguro de la moto, el negocio que no se acepta, los cincuenta correos</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>Negarse no era el error: el error era creer que la cuenta manda siempre</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>El valor esperado y sus dos preguntas de criterio</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«No sé las probabilidades»: escribir un número flojo y revisarlo después</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>Cuatro renglones, con fecha, sobre la decisión que ya está pendiente</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎬 La regla del minuto dos</span><br>
+      <span>Ninguna definición antes del minuto dos. Hasta ahí manda la historia: <span class="hl">alguien quiere algo y no lo consigue</span>. La fórmula solo entra cuando el público ya <span class="hl2">necesita</span> la respuesta, y entonces se agradece en vez de aburrir.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Seis lecturas: la misma apuesta, seis voces</h2>
+    <p>El tema de la etapa contado seis veces: un cuento de un cuaderno heredado, un capítulo de venta y refranes, un ensayo a escala de especie, una entrevista imaginada con el hombre que resolvió la paradoja, una conversación de madrugada entre Jesús Quintero y Antonio Gala sobre la suerte, y un <strong>careo</strong> donde las dos posturas de una disputa que sigue abierta se leen una al lado de la otra, con sus objeciones y sus réplicas. Seis maneras de que la idea entre por donde el examen no llega.</p>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;"><strong>Cada lectura trae sus propias preguntas debajo</strong>: cinco de comprensión, dos de completar y dos de análisis, del texto que se acaba de leer y de ningún otro. Y las seis empiezan <strong>plegadas</strong>, para poder elegir sin tener que recorrer veinte pantallas.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> los <strong>cinco primeros</strong> son <strong>ejercicios de estilo escritos por esta casa</strong>: los tres primeros en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari, y el cuarto y el quinto son <strong>entrevistas imaginadas</strong>, a la manera del divulgador Eduard Punset la una y del programa de Jesús Quintero con Antonio Gala la otra. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado, y los dos encuentros <strong>nunca ocurrieron</strong>. El <strong>sexto es un careo</strong>, y ese no imita a nadie, así que no lleva la etiqueta del pastiche sino la suya: sus turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas, aquí no se le pone una sola palabra en la boca a ningún investigador, y la disputa que enfrenta la sostiene de verdad gente con nombre y año en la literatura, citada en tercera persona como fuente. Regla extra de esta casa, y en las seis: <strong>toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre: una hoja suelta con un pastiche sin declarar sería justo la cita mal atribuida que esta misión enseña a cazar.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir la entrevista</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir la conversación</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir el careo</button>
+      <button class="btn btn-pri" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🌀 Lectura 1 · «La moneda de Basilea» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas inventadas. Todos los libros, cartas, fechas y personas que este cuento menciona son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">Heredé de mi tío Aureliano una casa con goteras, una deuda que no menciono y un cuaderno de hule negro en cuya primera página había una sola frase, escrita con letra de contador: «El juego que vale infinito y no vale nada.» Debajo, una columna de cifras que se doblaban: dos, cuatro, ocho, dieciséis, y así hasta el borde del papel, donde la última anotación era ilegible por culpa de la humedad o del cansancio.</p>
+    <p class="lect-p">Mi tío había sido cajero de una casa comercial durante treinta y un años y era hombre de una honradez casi ofensiva. Sé que despidió a un sobrino por un error de doce centavos y sé también que ese sobrino era yo. Nunca le oí hablar de azar. Por eso el cuaderno me pareció, al principio, la prueba de una locura tardía y secreta, que es la única forma de locura que respeto.</p>
+    <p class="lect-p">El juego era simple, y su misma simplicidad tenía algo de trampa. Se lanza una moneda hasta que sale cara. Si la cara sale al primer lanzamiento, la banca paga dos monedas; si sale al segundo, cuatro; al tercero, ocho. La probabilidad de cada rama se divide por dos, y el premio de cada rama se multiplica por dos, de manera que cada rama aporta exactamente una moneda al valor del juego, y las ramas no se acaban nunca. El juego vale, por consiguiente, una cantidad que no tiene número. Mi tío había escrito al margen, con una satisfacción que me pareció casi cruel: «Ofrezca usted cien lempiras por él. Nadie se los da.»</p>
+    <p class="lect-p">Debo a la casualidad y a un catálogo de biblioteca el haber sabido que el juego no era invención suya. Lo planteó en 1713 Nicolás Bernoulli, en una carta a Pierre Rémond de Montmort, que la publicó entre las suyas. Es un detalle que me conmueve: la paradoja nació en una correspondencia, es decir en una conversación demorada entre dos hombres que se escribían sobre juegos de azar con la seriedad con que otros escriben testamentos. Nicolás no encontró la salida. La encontró, veinticinco años después, su primo Daniel, que trabajaba entonces muy al norte, en la Academia de Ciencias de San Petersburgo, y que publicó allí, en 1738, un ensayo sobre la medida de la suerte. De aquella ciudad y no de otra le viene al problema el nombre con que hoy se lo conoce, lo cual prueba que a las ideas las bautiza la geografía y no la justicia.</p>
+    <p class="lect-p">La solución de Daniel Bernoulli es de una elegancia que casi ofende. Consiste en negar la pregunta. No hay que preguntarse cuánto dinero paga cada rama, sino cuánto le cambia la vida ese dinero a quien lo recibe. Y la respuesta a esa segunda pregunta es que cada moneda nueva vale un poco menos que la anterior, como cada vaso de agua importa menos que el primero. Las ramas remotas del juego pagan sumas enormes, pero lo que esas sumas añaden a una vida crece mucho más despacio de lo que baja la probabilidad de alcanzarlas. Entonces la suma infinita se aquieta, se vuelve un número modesto, y ese número modesto es, con asombrosa exactitud, lo que cualquiera habría ofrecido sin haber leído una línea de matemáticas.</p>
+    <p class="lect-p">Averigüé también, en una nota al pie que agradezco, que Daniel Bernoulli no reclamó para sí toda la gloria: cita en su propio ensayo a Gabriel Cramer, que le había escrito una idea parecida a Nicolás algunos años antes. Hay algo muy digno en un hombre que resuelve un problema de veinticinco años y dedica un párrafo a decir que otro lo había pensado primero.</p>
+    <p class="lect-p">Volví al cuaderno de mi tío. Después de la columna de cifras había una segunda parte que yo había tomado por cuentas de la casa y que era otra cosa. Eran fechas y decisiones. «14 de marzo: no acepté la sociedad con R. Probabilidad de que saliera bien, seis de diez. Si salía mal, perdíamos la casa. No acepté.» Y más abajo, con otra tinta y otro año: «Salió bien. No me arrepiento.» Leí esa línea tres o cuatro veces. Confieso que la primera vez la tomé por soberbia y que solo después entendí que era lo contrario: un hombre que se negaba a dejarse felicitar por un resultado que no había fabricado.</p>
+    <p class="lect-p">Porque esa es, creo, la moral doble de la moneda de Basilea. La primera mitad la escribió Daniel Bernoulli y dice que el dinero no se pesa en monedas sino en vidas. La segunda no está en ningún ensayo y mi tío la había descubierto solo, con la paciencia de los cajeros: que hay apuestas cuya cuenta es favorable y que aun así no deben aceptarse, porque el que pierde no vuelve a la mesa. La media consuela a quien juega mil veces. Al que juega una sola vez, la media no le dice nada, y decirle lo contrario es una forma cortés de la mentira.</p>
+    <p class="lect-p">Guardo el cuaderno en el cajón donde estaban las cuentas de la casa. A veces lo abro y compruebo, con una emoción que no sé nombrar, que las cifras siguen doblándose hacia el margen. El infinito cabe en un cuaderno de hule negro. Lo que no cabe, y esto lo aprendí tarde y de un hombre que me había despedido por doce centavos, es la casa donde uno duerme.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>🐎 Lectura 2 · «Donde se cuenta la porfía que hubo en la venta entre un estudiante de Salamanca y un arriero sobre cuánto vale una apuesta, y del juicio que dio sobre ello la ventera, que no había estudiado» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, el humor y la reflexión cervantinos. Las anclas son reales: la venta y el camino como escenarios de la primera parte del Quijote (1605), y el molde del bachiller que vuelve de Salamanca, a la manera de Sansón Carrasco, el de la segunda parte (1615). Los refranes son del acervo popular, como los de Sancho.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">Sucedió que en una venta del camino, de las que tienen más nombre de venta que comodidades de ella, se hallaron aquella noche, guarecidos de un aguacero que no llevaba trazas de cansarse, un estudiante que volvía de Salamanca con más latines que blancas, un arriero de los de Arévalo, hombre de pocas letras y muchos caminos, y la ventera, que era mujer entrada en años y en cuentas, y que había enterrado a dos maridos sin perder jamás el gobierno de la despensa.</p>
+    <p class="lect-p">Calentábanse todos al fuego, y el estudiante, que no sabía estar callado porque le parecía que el silencio es una forma de la ignorancia, sacó del zurrón una moneda y propuso un juego. «Yo echaré esta moneda al aire», dijo, «cuantas veces fuere menester hasta que salga cara. Si sale a la primera, os daré dos reales; si a la segunda, cuatro; si a la tercera, ocho, y así doblando, sin poner término ni tasa. Decidme ahora, señor arriero, cuánto me daréis por entrar en este juego.»</p>
+    <p class="lect-p">El arriero, que estaba secándose las calzas, lo miró como se mira a un perro que trae un palo demasiado grande, y respondió que le daría dos reales, y que aun eso por no dejarlo mal delante de la señora. Rióse el estudiante con la risa de los que han estudiado, y díjole que era un ignorante y que aquel juego valía infinito, y que se lo probaría con números, y sacó carbón y comenzó a escribir en la pared, que era donde solían escribir los huéspedes lo que no querían pagar.</p>
+    <p class="lect-p">«Mirad», dijo. «La mitad de las veces sale cara a la primera, y os llevaréis dos reales: la mitad de dos es uno. La cuarta parte de las veces sale a la segunda, y os llevaréis cuatro: la cuarta parte de cuatro es uno. La octava parte de cuatro veces sale a la tercera, y os llevaréis ocho: la octava parte de ocho es uno. Y así hasta el fin del mundo, que no lo tiene. De suerte que este juego vale uno más uno más uno, y quien suma unos sin descanso no llega jamás al cabo. Luego vale infinito, y vos me ofrecéis dos reales, con lo cual quedáis retratado.»</p>
+    <p class="lect-p">Escuchóle el arriero con mucha atención, porque los hombres de camino saben que del que habla mucho se aprende algo aunque sea a desconfiar, y cuando el otro hubo acabado, dijo así: «Señor estudiante, no os niego la cuenta, que no sé hacerla. Niego el negocio. Porque si yo os doy cien reales por vuestro juego, tres de cada cuatro veces me vais a devolver dos o cuatro, y yo me quedo sin cien reales y sin mula, que las mulas se compran con reales y no con infinitos. Vuestros unos serán muchos, pero están todos en el otro mundo, y yo tengo que llegar mañana a Medina.»</p>
+    <p class="lect-p">«Eso es no entender», replicó el estudiante.</p>
+    <p class="lect-p">«Eso es no comer», replicó el arriero.</p>
+    <p class="lect-p">Aquí la ventera, que había estado atizando el fuego y oyéndolo todo, que es como las mujeres de venta oyen mejor, se limpió las manos en el delantal y metió baza sin que nadie se la diera, diciendo: «Señores míos, con perdón, que yo no he estudiado más que en el libro de fiados, pero se me alcanza que los dos tenéis razón y que por eso os estáis peleando. Vuestra merced el estudiante hace la cuenta de un juego que se juega mil veces, y el señor arriero hace la de un juego que se juega una sola, y no son el mismo juego aunque tengan la misma moneda. Que una cosa es lo que pasa a la larga y otra lo que le pasa a uno, y a la larga estamos todos muertos, que ya lo dice el refrán: quien mucho abarca, poco aprieta.»</p>
+    <p class="lect-p">Quedaron los dos algo suspensos, porque no hay cosa que desarme más a un letrado que oír su propia idea dicha en romance y sin latines. Prosiguió la ventera: «Y aun hay otra, que a mí me toca más de cerca. Si vuestra merced me pidiera a mí los cien reales, yo no se los daría aunque el juego valiera lo que dice, y no por avarienta, sino porque esos cien reales son la harina del mes, y quien se queda sin harina no juega la partida siguiente. A la olla que hierve sin tapadera se le va todo el caldo, y a la casa que apuesta lo que no le sobra se le va la casa. Más vale pájaro en mano que ciento volando, y no porque el ciento no exista, que sí existe, sino porque para cobrarlo hay que estar vivo.»</p>
+    <p class="lect-p">Rióse el arriero de muy buena gana, y el estudiante, que a pesar de sus latines no era mal muchacho, se quedó mirando la pared donde había escrito sus unos, y dijo que aquella noche había aprendido dos cosas que en Salamanca no le habían enseñado: que la cuenta no dice cuántas veces se juega, y que la cuenta tampoco sabe cuánta harina hay en la despensa. Y añadió, para no perder del todo la compostura, que había de escribir sobre ello un tratado.</p>
+    <p class="lect-p">«Escríbalo vuestra merced», dijo la ventera, «que aquí hay pared de sobra. Pero páguese la cena, que esa no es apuesta, que es cuenta cierta, y en cuentas ciertas no hay infinito que valga.»</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌍 Lectura 3 · «La especie que aprendió a repartir la mala suerte» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie, la frase corta y el aterrizaje en el presente. Todas las obras, años y cifras citados son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Durante casi toda nuestra historia, el riesgo no se calculaba. Se rezaba.</p>
+    <p class="lect-p">Un cazador del paleolítico salía por la mañana sin ninguna manera de saber si volvería. Un agricultor sembraba y esperaba la lluvia. Ninguno de los dos podía poner un número a lo que temía, porque el número no existía todavía. Lo que existía era el augurio, la ofrenda y el amuleto, que son tecnologías de la incertidumbre bastante razonables cuando no se dispone de ninguna otra.</p>
+    <p class="lect-p">La invención de la probabilidad es sorprendentemente tardía. Los seres humanos jugaban a los dados milenios antes de que a alguien se le ocurriera preguntarse con qué frecuencia sale un seis. La correspondencia entre Blaise Pascal y Pierre de Fermat, en 1654, sobre cómo repartir el dinero de un juego interrumpido, suele señalarse como el momento en que la pregunta se hizo bien. En 1657 Christiaan Huygens publicó el primer tratado impreso sobre el asunto. Y en 1713, en un libro póstumo, Jacob Bernoulli demostró lo que hoy llamamos la ley de los grandes números: cuantas más veces se repita un experimento, más se acerca lo observado a lo esperado.</p>
+    <p class="lect-p">Fíjese el lector en la fecha. 1713. La misma en que su sobrino Nicolás mandó por carta el juego de la moneda que dobla, ese que vale infinito y que nadie compra. La especie tardó milenios en construir la herramienta y tardó exactamente cero años en encontrar el sitio donde la herramienta se rompe.</p>
+    <p class="lect-p">La reparación llegó en 1738, desde San Petersburgo, con Daniel Bernoulli. Su idea es una de las más productivas que ha tenido nuestra especie y cabe en una línea: el valor de una cosa no está en la cosa, está en lo que le hace a quien la recibe. Diez mil lempiras no son diez mil lempiras. Son el mes resuelto para una familia y un renglón olvidable para otra. Hoy llamamos a eso utilidad marginal decreciente y es la base de media economía.</p>
+    <p class="lect-p">Pero la consecuencia más interesante de esa idea no fue teórica. Fue un negocio.</p>
+    <p class="lect-p">Si perder mil lempiras duele más de lo que alegra ganarlas, entonces a mucha gente le conviene pagar por no perderlas. Ese es el seguro, y es una de las máquinas sociales más extrañas que hemos construido: millones de personas entregan voluntariamente un dinero a cambio de, casi siempre, no recibir nada. Visto con la aritmética sola, es un mal negocio para todos los asegurados, porque la aseguradora tiene que ganar. Visto con la idea de Bernoulli, es un negocio excelente: se cambia una pérdida pequeña y segura por la desaparición de una pérdida enorme y rara. No se compra dinero. Se compra seguir en la mesa.</p>
+    <p class="lect-p">La institución tiene domicilio conocido. En 1688 abrió en Londres el café de Edward Lloyd, donde se reunían armadores y comerciantes para repartirse el riesgo de los barcos; de aquel café salió Lloyd's, que sigue existiendo. En 1762 se fundó en Londres la Equitable Life, la primera que calculó las primas de un seguro de vida con tablas de mortalidad en lugar de con intuición. Y en 1693 Edmond Halley, el del cometa, había publicado una tabla de vida a partir de los registros de la ciudad de Breslavia que hizo posible ese cálculo. La especie descubrió que la mala suerte se puede repartir entre muchos, y al repartirla dejó de arruinar a cada uno.</p>
+    <p class="lect-p">El siglo XX puso el andamiaje formal. En 1944, John von Neumann y Oskar Morgenstern publicaron «Theory of Games and Economic Behavior», y con ella un conjunto de axiomas del que se deduce que quien decide de manera coherente se comporta como si maximizara la utilidad esperada. Es un resultado precioso. Y es una norma, no un retrato.</p>
+    <p class="lect-p">La diferencia la enseñó Maurice Allais en 1953, con un experimento tan sencillo que da vergüenza. Presentó a un grupo de personas dos pares de apuestas. En el primer par, casi todos preferían la opción segura. En el segundo, que es el mismo problema con una parte común retirada de los dos lados, casi todos preferían la arriesgada. Las dos preferencias juntas son incompatibles con los axiomas. Y lo notable no es que la gente fallara: es que fallaba en la misma dirección, con sistema, y que muchos seguían prefiriendo lo mismo después de que se les explicara la contradicción. Allais recibió el Nobel de Economía en 1988. En 1979, Daniel Kahneman y Amos Tversky publicaron en «Econometrica» su teoría de las perspectivas, que describe cómo decidimos de verdad; Kahneman recibió el Nobel en 2002.</p>
+    <p class="lect-p">De manera que la especie tiene ahora dos mapas del mismo territorio. Uno dice cómo convendría decidir. El otro dice cómo decidimos. Confundirlos es el error más caro de esta materia, y se comete en las dos direcciones: quien cree que la norma describe a la gente diseña políticas que nadie cumple, y quien cree que el retrato justifica cualquier conducta se queda sin manera de mejorar la suya.</p>
+    <p class="lect-p">Aterrizo. Usted no va a jugar a la moneda que dobla. Pero esta semana va a tomar tres o cuatro decisiones con información incompleta, y en todas ellas la aritmética le va a ofrecer una respuesta. Antes de aceptarla, hágale las dos preguntas que la aritmética no se hace: ¿esto se va a repetir muchas veces, o es una sola? Y si sale mal, ¿queda con qué seguir jugando? La primera pregunta la contestó Jacob Bernoulli en 1713. La segunda no está en ningún teorema, y es la que ha arruinado a más gente.</p>
+  </div>
+
+  <div class="card ac-jade" id="lect-entrevista">
+    <h2>🎙️ Lectura 4 · «El hombre que midió la suerte con logaritmos» (entrevista, a la manera de Eduard Punset)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una entrevista IMAGINADA con Daniel Bernoulli (Groninga, 1700 · Basilea, 1782), el matemático suizo que trabajó en la Academia de Ciencias de San Petersburgo entre 1725 y 1733, publicó allí en 1738 su ensayo sobre la medida de la suerte, y ese mismo año su «Hydrodynamica», de donde viene el principio que lleva su apellido. Preguntada a la manera de Eduard Punset (Barcelona, 1936 · 2019), abogado y economista que fue ministro para las Relaciones con las Comunidades Europeas y que dirigió y presentó en TVE el programa de divulgación científica «Redes» entre 1996 y 2014, autor de libros como «El viaje a la felicidad» (2005) y «El alma está en el cerebro» (2006), y conocido por empezar sus entrevistas confesando su propia ignorancia. El encuentro nunca ocurrió: las personas son reales, toda obra, fecha y cifra citada es real, y lo único inventado es la conversación, al modo del viejo género radiofónico de las entrevistas imposibles que la RAI italiana estrenó en los años setenta con guiones de escritores como Italo Calvino y Umberto Eco. Ese género permite además lo que aquí se hace a la vista: que el entrevistador le cuente al invitado cosas ocurridas después de su muerte.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir esta entrevista</button></div>
+    <p class="lect-p"><strong>PUNSET.</strong> Profesor Bernoulli, voy a empezar como empiezo siempre, confesando lo que no sé. Yo estudié Derecho y Economía, y durante años repetí que la gente decide mal porque no sabe calcular. Usted escribió en 1738 que eso es falso. ¿Me equivoqué yo o se equivocaron mis profesores?</p>
+    <p class="lect-p"><strong>BERNOULLI.</strong> Se equivocaron los dos, pero con elegancia. Yo no dije que la gente calcule bien. Dije que estaba calculando otra cosa. Mis contemporáneos medían el valor de una apuesta en monedas, y yo propuse medirlo en lo que las monedas le hacen a quien las tiene. Son dos reglas distintas y solo una de ellas describe a una persona.</p>
+    <p class="lect-p"><strong>PUNSET.</strong> Póngamelo en el ejemplo que lo hizo famoso.</p>
+    <p class="lect-p"><strong>BERNOULLI.</strong> Es un juego que planteó mi primo Nicolás en una carta de 1713 a Montmort. Se lanza una moneda hasta que sale cara. A la primera se pagan dos ducados; a la segunda, cuatro; a la tercera, ocho, doblando siempre. Cada rama aporta un ducado al valor del juego y las ramas no terminan, de modo que el juego vale una cantidad sin fin. Sin embargo, si usted lo ofrece en una plaza, nadie da veinte ducados por él. Mi primo estuvo veinticinco años molesto con ese resultado. Tenía razón en estar molesto.</p>
+    <p class="lect-p"><strong>PUNSET.</strong> Y su solución fue decir que el segundo ducado vale menos que el primero.</p>
+    <p class="lect-p"><strong>BERNOULLI.</strong> Mi solución fue decir que ningún ducado tiene valor propio. Lo escribí así: el aumento de bienestar que produce un pequeño aumento de riqueza es inversamente proporcional a la riqueza que ya se posee. Si a usted le añaden mil ducados teniendo mil, le cambian la vida. Si se los añaden teniendo cien mil, le cambian la contabilidad. Cuando uno pesa las ramas del juego con esa vara, las ramas remotas dejan de ser gigantescas y la suma se aquieta.</p>
+    <p class="lect-p"><strong>PUNSET.</strong> Le voy a contar algo que ocurrió mucho después de usted. En 1944, un matemático húngaro, John von Neumann, y un economista, Oskar Morgenstern, publicaron un libro donde demostraron que cualquiera que decida de forma coherente se comporta como si maximizara exactamente lo que usted propuso. Su intuición se volvió un teorema.</p>
+    <p class="lect-p"><strong>BERNOULLI.</strong> Me alegra, aunque debo hacerle una advertencia. Un teorema que dice cómo se comporta el que decide coherentemente no dice que alguien decida coherentemente. Son cosas muy distintas y sospecho que se han confundido.</p>
+    <p class="lect-p"><strong>PUNSET.</strong> Se confundieron. En 1953, un economista francés, Maurice Allais, mostró con dos pares de apuestas que la gente prefiere en un orden que contradice esos axiomas, y que lo hace en la misma dirección, todos. Le dieron el Nobel en 1988.</p>
+    <p class="lect-p"><strong>BERNOULLI.</strong> Eso no me sorprende. Yo escribí una norma para decidir, no un retrato de la humanidad. Confundir la norma con el retrato es el defecto de mi oficio; confundir el retrato con la norma es el defecto del suyo, señor economista. Cuando alguien encuentra que la gente viola una regla, quedan dos preguntas: si la regla estaba mal, o si la gente puede aprender a cumplirla. Casi nadie se toma la molestia de separarlas.</p>
+    <p class="lect-p"><strong>PUNSET.</strong> Le hago la pregunta incómoda. Usted resuelve la paradoja diciendo que el dinero vale menos según se acumula. Pero yo puedo diseñar un juego que pague, en vez de ducados, lo que haga falta para que también su cuenta se vuelva infinita.</p>
+    <p class="lect-p"><strong>BERNOULLI.</strong> Puede, y alguien lo hizo. Se lo concedo sin pelear, porque señala lo que de verdad importa. Mi vara arregla el problema para las cantidades con las que vive una persona, y para eso la propuse. Si usted insiste en llevarla al infinito, la vara se rompe otra vez, y lo que eso enseña no es que la vara sea mala: es que ninguna cuenta debería llevarse al infinito, porque en el mundo no hay bancas infinitas ni vidas infinitas para cobrar. La banca de mi juego no podría pagar la rama número cuarenta ni aunque quisiera.</p>
+    <p class="lect-p"><strong>PUNSET.</strong> Eso me lleva a lo que más me interesa. ¿Qué le diría a un padre de familia que tiene delante un negocio con la cuenta a favor y que, si sale mal, pierde la casa?</p>
+    <p class="lect-p"><strong>BERNOULLI.</strong> Le diría que no lo haga, y que no necesita saber matemáticas para entender por qué. Todas mis cuentas suponen que hay una vez siguiente. Están escritas para alguien que sigue sentado a la mesa. Si la rama mala lo levanta de la mesa, mi ensayo no se le aplica, y no porque el ensayo esté mal, sino porque ese hombre ya no está dentro del problema que el ensayo resuelve. En mi ensayo puse un ejemplo de un comerciante que manda mercancía por mar y se pregunta si asegurarla. La respuesta es que le conviene pagar el seguro aunque pierda dinero en promedio. Un seguro es una apuesta con la cuenta en contra que se compra a propósito, y es una de las cosas más sensatas que hace la gente.</p>
+    <p class="lect-p"><strong>PUNSET.</strong> Una última, y es personal. Su padre, Johann, era también un matemático extraordinario, y tengo entendido que la relación no fue fácil.</p>
+    <p class="lect-p"><strong>BERNOULLI.</strong> Publiqué mi «Hydrodynamica» en 1738, el mismo año que el ensayo del que hemos hablado. Mi padre publicó después un libro sobre la misma materia y lo fechó como si fuera anterior al mío. Fue el episodio más amargo de mi vida y no lo voy a adornar. Le diré, ya que estamos hablando de apuestas, lo único que saqué de aquello: que uno decide con la información que tiene y no con la que tendrá después, y que a las personas conviene juzgarlas por eso mismo. También a los padres.</p>
+    <p class="lect-p"><strong>PUNSET.</strong> Profesor, ha sido un lujo. Gracias por venir de tan lejos.</p>
+    <p class="lect-p"><strong>BERNOULLI.</strong> He venido de San Petersburgo. Todo lo demás fue el viaje corto.</p>
+  </div>
+
+  <div class="card ac-purple" id="lect-gala">
+    <h2>🌙 Lectura 5 · «La suerte, que reparte y no explica» (El Loco de la Colina: Jesús Quintero conversa con Antonio Gala)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una conversación IMAGINADA entre Jesús Quintero (San Juan del Puerto, Huelva, 1940 · 2022), el periodista de radio y televisión conocido como El Loco de la Colina, célebre por sus preguntas cortas y por sus silencios, y el escritor Antonio Gala (Brazatortas, Ciudad Real, 1930 · Córdoba, 2023), autor de «El manuscrito carmesí», Premio Planeta en 1990, y de la columna diaria «La tronera». Los dos existieron y de verdad se entrevistaron. El encuentro que aquí se lee no ocurrió: lo único inventado es la conversación, y toda obra, fecha y cifra que se les pone en la boca es real y comprobable. Los silencios van entre paréntesis, como acotación.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir esta conversación</button></div>
+    <p class="lect-p"><strong>QUINTERO.</strong> Antonio. (silencio) ¿Usted ha apostado alguna vez?</p>
+    <p class="lect-p"><strong>GALA.</strong> Todos los días, Jesús, y casi nunca con dinero, que es la forma más barata de apostar y la que menos enseña. Uno apuesta cuando escribe una primera línea sin saber la última. Apuesta cuando quiere a alguien. Apuesta, sobre todo, cuando se levanta, porque levantarse es dar por supuesto que el día va a valer la pena, y eso es una probabilidad, no una certeza.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Le voy a proponer un juego.</p>
+    <p class="lect-p"><strong>GALA.</strong> Adelante.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> Tiro una moneda hasta que salga cara. Si sale a la primera, le doy dos euros. A la segunda, cuatro. A la tercera, ocho. Doblando siempre, sin final. La cuenta dice que ese juego vale infinito. ¿Cuánto me da usted por entrar?</p>
+    <p class="lect-p"><strong>GALA.</strong> (ríe) Le doy una cena, que es lo que vale de verdad una conversación. Y le confieso que no le daría más aunque me jurara usted por su madre que el infinito está ahí dentro. Porque yo sé, sin haber hecho jamás una cuenta, que ese infinito vive en las ramas que no me van a tocar. Es un infinito que existe como existe el fondo del mar: está, y no es mío.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Eso lo resolvió un suizo en 1738.</p>
+    <p class="lect-p"><strong>GALA.</strong> Pues llegó tarde, porque lo tenían resuelto las abuelas. Se llamaba Daniel Bernoulli, si no me traiciona la memoria, y estaba en San Petersburgo, que es un sitio con nieve para pensar despacio. Y lo que dijo, en cristiano, es que el dinero no vale lo que dice el billete: vale lo que le hace a quien lo recibe. Diez mil pesetas en una casa pobre eran un mes. En una casa rica eran una cena. La misma cifra y dos vidas distintas. Eso no es matemática, Jesús, eso es literatura, y de la buena, porque describe a un hombre y no a un número.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) ¿Y por qué entonces la gente juega a la lotería?</p>
+    <p class="lect-p"><strong>GALA.</strong> Porque no está comprando un número, está comprando una semana. Desde que compra el décimo hasta el día del sorteo, ese hombre tiene una casa distinta en la cabeza. Lo que paga son veinte euros por siete noches de imaginación, y eso, mire usted, es barato. El error no es de él. El error es del que le dice que está haciendo una mala inversión, porque no estaba invirtiendo.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> Hay una segunda cosa que dicen los que saben. Que la media no consuela al que juega una sola vez.</p>
+    <p class="lect-p"><strong>GALA.</strong> Ahí sí que le doy toda la razón a los que saben, y con un ejemplo que no tiene nada de alegre. Un cirujano le dice a usted que la operación sale bien en nueve de cada diez casos. Ese nueve es un consuelo estadístico y usted no es una estadística: usted es uno. O sale o no sale. La media es el retrato de una multitud, y en la camilla no cabe una multitud, cabe un señor con miedo. Por eso a mí las cifras me parecen honradas y frías al mismo tiempo: dicen la verdad de todos y no dicen la verdad de nadie.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio largo) ¿Y la ruina?</p>
+    <p class="lect-p"><strong>GALA.</strong> La ruina es la única palabra seria de esta conversación. Todo lo demás son juegos. Un hombre puede perder muchas veces y seguir siendo un hombre que juega. Pero hay una pérdida, una sola, que no es una pérdida más: es la que le quita la silla. De ahí no se vuelve a la mesa, y los que hacen cuentas suelen olvidar que sus cuentas suponen siempre que hay una partida siguiente. Yo he visto gente arruinarse con la razón de su parte, Jesús, y es un espectáculo terrible, porque encima tienen que aguantar que les digan que la decisión era correcta.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Deme una regla, Antonio.</p>
+    <p class="lect-p"><strong>GALA.</strong> Le doy dos, y son de mi abuela y no mías. La primera: no se juega lo que se necesita, se juega lo que sobra, y quien no tiene nada que sobre no debería estar en esa mesa. La segunda es más difícil: cuando salga mal, resista usted la tentación de arrepentirse de la decisión. Arrepiéntase si decidió a la ligera, y solo entonces. Si escribió sus razones antes, guarde el papel y léalo. Es la única defensa que tenemos contra el peor de los jueces, que es el resultado, que llega siempre tarde y siempre sabiéndolo todo.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Se nos acaba la noche.</p>
+    <p class="lect-p"><strong>GALA.</strong> Se nos acaba a los dos, que es la única apuesta que tenemos perdida de antemano y la jugamos igual todas las mañanas. Le dejo una imagen, que es lo mío. El que hace bien las cuentas y pierde se parece a un buen sembrador con mal año: no se le juzga por la cosecha, se le juzga por el surco. Y el que gana sin haber pensado nada se parece al que encuentra una moneda en la calle y sale contando que es rico.</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-debate">
+    <h2>🥊 Lectura 6 · «¿El promedio de muchos mundos, o el camino de este?» (careo, con las dos posturas y sus réplicas)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Careo escrito por la casa sobre una disputa que existe de verdad dentro de la economía y la física, y que sigue abierta. No es una entrevista ni un pastiche: los turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas, precisamente para <strong>no poner palabras inventadas en boca de nadie</strong>. Los investigadores aparecen citados en tercera persona como fuentes, y toda obra, revista, fecha y cifra de dentro es real y comprobable. La defensa del planteamiento clásico se apoya en Daniel Bernoulli (1738), en von Neumann y Morgenstern («Theory of Games and Economic Behavior», Princeton University Press, 1944) y en la respuesta que Jason Doctor, Peter Wakker y Tong Wang publicaron en «Nature Physics» en 2020. La objeción es la de la llamada economía de la ergodicidad, sostenida por Ole Peters en «The ergodicity problem in economics» («Nature Physics», 2019) y, con Murray Gell-Mann, en «Evaluating gambles using dynamics» («Chaos», 2016). La regla de la casa que manda aquí es la del acero antes del juicio: <strong>cada postura se escribe en su mejor versión</strong>, la que firmaría su mejor defensor, y no la que sería cómodo tumbar.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir este careo</button></div>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> La pregunta en disputa, una sola y escrita antes de empezar, porque casi toda esta pelea se pelea sin haberla escrito. Cuando alguien va a aceptar o rechazar una apuesta, <strong>¿qué es exactamente lo que hay que maximizar?</strong> Una postura dice: el valor esperado de la utilidad, es decir el promedio de lo que uno sentiría en todos los mundos posibles, pesado por su probabilidad. La otra dice: la tasa a la que crece el patrimonio de esta persona <strong>a lo largo del tiempo</strong>, en el único camino que va a vivir. Nótese que las dos aceptan que el valor esperado del dinero a secas no sirve. La discusión no es si San Petersburgo se resuelve, sino <strong>por qué</strong>.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> El planteamiento clásico lleva casi tres siglos y hay que decir por qué ha durado. Daniel Bernoulli, en 1738, propuso pesar el dinero por lo que añade a quien lo tiene, y con eso el juego de la moneda deja de valer infinito. En 1944, von Neumann y Morgenstern demostraron algo más fuerte: si las preferencias de una persona cumplen unos pocos requisitos de coherencia, entonces <strong>necesariamente</strong> existe una función de utilidad tal que esa persona se comporta como si maximizara su valor esperado. No es una hipótesis sobre psicología: es un teorema sobre coherencia. Y su alcance es enorme, porque no exige que el problema se repita ni que haya dinero de por medio: sirve para una decisión única, para una operación quirúrgica y para elegir carrera.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> Sobre la objeción del tiempo, la respuesta clásica es que ya está contemplada. Si el patrimonio se multiplica en cada ronda en vez de sumarse, maximizar el crecimiento a largo plazo equivale a maximizar el valor esperado del logaritmo del patrimonio, y eso es exactamente lo que propuso Bernoulli en 1738. Kelly lo dedujo por otro camino en 1956, para un problema de transmisión de información, y su criterio se usa desde entonces para dimensionar apuestas. De modo que el crecimiento en el tiempo no es una alternativa a la utilidad esperada: <strong>es un caso particular de ella</strong>, con una función de utilidad concreta. Presentarlo como una refutación es cambiarle el nombre a un resultado viejo.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> La objeción no niega el teorema de 1944; niega que la pregunta que ese teorema contesta sea la que le importa a una persona. Cuando se calcula un valor esperado se está promediando sobre un conjunto de mundos paralelos, y de esos mundos el que decide va a vivir uno solo. Para ciertos procesos ese promedio coincide con lo que ocurre a lo largo del tiempo, y entonces no hay problema. Para otros no coincide, y el patrimonio es justamente de los que no coinciden, porque las ganancias y las pérdidas se multiplican en vez de sumarse. Perder la mitad y después ganar la mitad no devuelve a uno al punto de partida: deja un veinticinco por ciento menos. El promedio de muchas personas puede subir mientras la persona típica se hunde.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> Y hay una consecuencia que la hace atractiva. La teoría clásica explica que la gente rechace apuestas justas diciendo que la gente es aversa al riesgo, es decir apelando a un rasgo psicológico que se mide ajustando una curva a lo que la gente ya hizo. La economía de la ergodicidad no necesita ese rasgo: rechazar esa apuesta es <strong>óptimo</strong> para quien la juega a lo largo del tiempo, aunque no sienta nada especial ante el riesgo. Cambiar una explicación basada en preferencias inobservables por otra basada en la dinámica del dinero es, como programa científico, un progreso: se sustituye un parámetro libre por una propiedad del proceso.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Las réplicas, empezando por la defensa.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> Dos cosas. La primera: que la aversión al riesgo se mida ajustando una curva no la vuelve inobservable, y hay decisiones sin dinámica alguna donde la gente sigue siendo aversa al riesgo. Elegir entre dos tratamientos médicos no es un proceso multiplicativo repetido, y sin embargo nadie es indiferente. La segunda, y es la de fondo: si el criterio del tiempo coincide matemáticamente con maximizar la utilidad logarítmica, entonces no hay dos teorías, hay una teoría y dos motivaciones. Una motivación puede ser mejor, más limpia o más elegante, pero no se contrasta con datos.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> Se concede que en el caso más citado las dos cuentas coinciden, y se concede que el teorema de 1944 no tiene grieta lógica. La réplica es que la coincidencia es un accidente del ejemplo favorito. En cuanto la dinámica del patrimonio no es exactamente multiplicativa, el criterio del tiempo deja de ser el logaritmo y las dos teorías se separan. Y sobre la motivación: importa más de lo que parece, porque de ella salen las preguntas siguientes. Quien cree que la aversión al riesgo es un rasgo de carácter estudia personalidades; quien cree que es una consecuencia de la dinámica estudia la dinámica. Los dos programas mandan a los investigadores a laboratorios distintos.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> El terreno común, que es más ancho de lo que parece desde fuera. Las dos partes aceptan que el valor esperado del dinero a secas es un criterio malo y que San Petersburgo lo demuestra. Las dos aceptan que la escala importa: que una apuesta pequeña y una apuesta que compromete el patrimonio entero no se juzgan igual. Las dos aceptan que el riesgo de ruina es decisivo y que ninguna cuenta lo puede compensar. Y las dos, puestas a aconsejar a una familia sobre un préstamo de sesenta mil lempiras, darían <strong>el mismo consejo</strong>. La disputa es sobre los cimientos, no sobre el tejado.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Lo que sigue en disputa, dicho sin adornos: si el criterio del crecimiento en el tiempo es una <strong>fundamentación distinta</strong> de la teoría de la decisión o una <strong>deducción conocida dentro</strong> de la teoría de la utilidad esperada. Y qué dato lo resolvería: hace falta una situación donde las dos predicciones se separen y se pueda medir cuál acierta. Eso exige diseñar apuestas cuya dinámica no sea la multiplicativa de manual, y observar si la gente cambia de preferencia cuando cambia la dinámica y no la distribución de resultados. Hay trabajo experimental empezado en esa dirección, publicado por Ole Peters y colegas en 2021, y es donde conviene mirar antes de tomar partido. Mientras tanto, esta casa se queda con lo que las dos partes firman: escribir las ramas, escribir las probabilidades, y no aceptar jamás una apuesta que pueda levantarla de la mesa.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🖨️ Todo esto se imprime</h2>
+    <p>Cada lectura sale con <strong>su texto y sus preguntas</strong>, y la pauta de esas preguntas va en su propia hoja al final, porque en esta casa las respuestas no se imprimen en la misma página que el ejercicio. Y las seis se pueden sacar juntas en un pliego, cada una arrancando en su hoja.</p>
+    <div class="tip">
+      <span class="ti">📖</span>
+      <div><strong>Las preguntas se contestan con el texto delante.</strong> No es un examen de memoria: es un examen de lectura, y por eso viven pegadas a su lectura y no en una batería al final, donde había que ir a buscar cuáles eran las de uno. Las de <strong>análisis complejo van sin XP a propósito</strong>: una respuesta abierta que se premia sola se contesta a la carrera.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego con las 54 preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué seis voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento convierte el concepto en <strong>un cuaderno de hule negro y una columna de cifras que se doblan</strong> (y en un cajero que se niega a dejarse felicitar por un resultado que no fabricó), el capítulo lo vuelve <strong>escena, risa y refrán</strong> (un estudiante con latines, un arriero con mula y una ventera que resuelve la disputa sin haber estudiado), y el ensayo lo pone a <strong>escala de especie</strong>, desde los dados sin probabilidad hasta el café de Lloyd y las tablas de mortalidad. Las dos voces siguientes hacen lo que ni el cuento ni el ensayo pueden: la <strong>entrevista</strong> sienta al personaje real de la etapa, Daniel Bernoulli, frente a preguntas con su biografía delante, incluido el pleito con su padre, y así la etapa se aprende con su historia y con un pedazo de la historia de la divulgación en español; y la <strong>conversación</strong> baja el tema al habla viva, de noche, entre dos andaluces que existieron: la lotería que compra una semana de imaginación, el nueve de cada diez que no cabe en una camilla. Y el <strong>careo</strong> hace lo que ninguna de las otras cinco puede hacer, porque las cinco cuentan <strong>una postura ya decidida</strong>: el cajero tiene razón, la ventera gana la discusión, el ensayo sabe cómo acaba, Bernoulli contesta con tres siglos de ventaja y Gala remata con una imagen. El careo pone <strong>las dos caras de una disputa que sigue abierta</strong>, cada una escrita como la escribiría su mejor defensor, con sus réplicas y lo que cada lado le concede al otro, y termina diciendo <strong>qué dato la resolvería</strong>. Quien lee las seis sabe calcular un valor esperado, sabe cuándo esa cuenta es la herramienta equivocada, y también <strong>en qué punto exacto los que saben todavía no se han puesto de acuerdo</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión del Estudio Mayor lleva sus seis lecturas sobre el tema de la etapa: <span class="hl">cuento a la manera de Borges, capítulo a la manera de Cervantes, ensayo a la manera de Harari, la entrevista de la casa, la conversación del Loco de la Colina y el careo de las dos posturas</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista en los cinco primeros, la declaración de que <span class="hl2">los encuentros de las entrevistas nunca ocurrieron</span>, la etiqueta propia del careo, que no imita a nadie y firma sus turnos con papeles, y la regla de fondo en las seis: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>. En esta etapa la regla pesa doble, porque la materia entera enseña a exigir que los números se escriban antes: una lectura que inventara una cifra para sonar convincente estaría cometiendo el error que la etapa enseña a cazar.</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista, la declaración de que <span class="hl2">los encuentros de las entrevistas nunca ocurrieron</span>, y la regla de fondo: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>. En esta etapa la regla pesa doble, porque la etapa entera trata de una frase que se cita mal: publicar un pastiche sin declarar sería cometer el error que la misión enseña a cazar.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con el juego de San Petersburgo explicado paso a paso, el valor esperado desarmado en cuatro piezas, la tabla de la utilidad decreciente en lempiras, los dos límites de la cuenta (la apuesta única y la ruina), los siete pasos de una apuesta bien medida, los ocho casos del proyecto, la <strong>hoja de la apuesta</strong> y el diario de decisiones para llenar a mano, siete ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-apuesta-san-petersburgo.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige también aquí: <strong>ningún estudio entra sin su etiqueta</strong> (clásico sólido, clásico cuestionado, ciencia en disputa, divulgación con inflado). En esta materia la regla hace más falta que en ninguna, porque casi todo lo famoso está inflado.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Daniel Bernoulli (1738), «Specimen theoriae novae de mensura sortis»:</strong> el ensayo sobre la medida de la suerte, publicado en las actas de la Academia de Ciencias de San Petersburgo. De ahí salen la utilidad marginal decreciente y el ejemplo del comerciante que asegura su mercancía. <strong>Clásico fundacional.</strong> Hay traducción inglesa de Louise Sommer en «Econometrica» (1954), que es por donde suele leerse hoy.</li>
+      <li><strong>Nicolás Bernoulli (1713), carta a Pierre Rémond de Montmort:</strong> donde se plantea el juego por primera vez. Montmort recogió la correspondencia en su «Essay d'analyse sur les jeux de hazard». <strong>Fuente primaria</strong>, y conviene saber que el problema nació en una carta y no en un libro.</li>
+      <li><strong>Jacob Bernoulli (1713), «Ars Conjectandi»:</strong> obra póstuma donde se demuestra la ley de los grandes números, que es la que explica por qué la media solo promete algo a quien repite. <strong>Clásico fundacional.</strong></li>
+      <li><strong>Von Neumann y Morgenstern (1944), «Theory of Games and Economic Behavior», Princeton University Press:</strong> los axiomas de los que se deduce la utilidad esperada. <strong>Sólido como norma de coherencia</strong>, y discutido como retrato de la conducta, que es una distinción que esta etapa insiste en no borrar.</li>
+      <li><strong>Maurice Allais (1953), «Econometrica»:</strong> la paradoja que lleva su nombre, donde las preferencias de la mayoría contradicen esos axiomas. <strong>Sólido</strong>, y de los resultados que replican siempre. Nobel de Economía en 1988.</li>
+      <li><strong>Kahneman y Tversky (1979), «Econometrica»:</strong> la teoría de las perspectivas, que describe cómo se decide de verdad. <strong>Sólido</strong>, con la letra chica de que es un modelo descriptivo y no una norma. Nobel de Kahneman en 2002.</li>
+      <li><strong>Kelly (1956), «Bell System Technical Journal»:</strong> el criterio para dimensionar cuánto se apuesta sin quedarse fuera de la mesa. <strong>Sólido</strong>, muy usado y también muy mal usado: exige conocer las probabilidades de verdad.</li>
+      <li><strong>«El valor esperado dice lo que hay que hacer»:</strong> <strong>media verdad de manual.</strong> Es cierto en apuestas repetidas cuyo tamaño no hunde a nadie, y calla justamente esas dos condiciones. Se cita aquí como ejemplo de lo que el Estudio Mayor enseña a cazar.</li>
+      <li><strong>Las seis lecturas de esta misión:</strong> cinco ejercicios de estilo escritos por la casa (tres en homenaje a Borges, Cervantes y Harari, y dos entrevistas imaginadas: una con Daniel Bernoulli a la manera de Eduard Punset, y una conversación entre Jesús Quintero y Antonio Gala) y un <strong>careo</strong>, «¿El promedio de muchos mundos, o el camino de este?», que no imita a nadie: sus turnos los firman los papeles y las personas reales se citan en tercera persona como fuentes. <strong>Los cinco primeros son pastiche declarado, no obra de esos autores</strong>, y los dos encuentros <strong>nunca ocurrieron</strong>. La erudición interna es real: Nicolás Bernoulli y 1713, Montmort, Daniel Bernoulli y 1738, Gabriel Cramer, la «Hydrodynamica» y el pleito con su padre Johann, Pascal y Fermat en 1654, Huygens en 1657, Halley y su tabla de vida de 1693, el café de Edward Lloyd (1688), la Equitable Life (1762), von Neumann y Morgenstern (1944), Allais (1953), Kahneman y Tversky (1979), y las señas de Eduard Punset, Jesús Quintero y Antonio Gala. Las fuentes propias del careo, que no aparecen en las otras cinco lecturas y por eso se listan aparte: Ole Peters, «The ergodicity problem in economics» («Nature Physics», 2019) y, con Murray Gell-Mann, «Evaluating gambles using dynamics» («Chaos», 2016); y la respuesta de Jason Doctor, Peter Wakker y Tong Wang en «Nature Physics» (2020).</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>escribiendo las ramas de una decisión real de esta semana</strong> con la hoja de la apuesta delante, antes de conocer el resultado.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: las materias completas, con la Toma de decisiones y sus seis módulos.</li>
+      <li><a href="../../misiones/ruta-espejo-vigia-timon/vigia-timon.html">🪞 El vigía y el timón</a>: la Metacognición. Allí se aprende a comprobar si uno de verdad sabe lo que cree saber, que es lo que hace falta para poner una probabilidad honrada.</li>
+      <li><a href="../../misiones/ruta-rojo-acero-juicio/acero-juicio.html">🥊 El acero antes del juicio</a>: de ahí sale la regla que gobierna el careo de esta etapa, la de escribir cada postura en su mejor versión antes de discutirla.</li>
+      <li><a href="../../misiones/epistemología/karl-popper.html">🦉 Karl Popper y la Epistemología</a>: someter las ideas a prueba. Una probabilidad escrita antes es exactamente eso: una predicción que se puede desmentir.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 2, «El árbol antes del salto», enseña a dibujar la decisión entera antes de decidir nada.</li>
+      <li><a href="../../fichas/ficha-apuesta-san-petersburgo.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja de la apuesta y el diario de decisiones, para llenar a lápiz y guardar con fecha.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar <strong>una práctica real de esta semana</strong> (una tarea de las niñas, un oficio propio, un idioma, un instrumento) y contarla con el vocabulario de la etapa: qué produce quien practica, qué solo recibe, quién corrige y cuándo, y en qué orden quedan el intento y su consecuencia. La prueba de que está aprendida es <strong>explicar por qué el eslogan está mal contado y qué cambia el lunes si se cuenta bien</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🏺</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</div>
+    <div class="diploma-mascot" aria-hidden="true">🏺</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🏺</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Se juzga por cómo se decidió, no por cómo cayó el dado» 🌱 · 🎲 Ruta de la Apuesta Medida · Etapa 1 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/san-petersburgo.js"></script>
+  <!-- El aparato de lecturas va ANTES del marcador: pliega los seis textos y les
+       mete sus preguntas dentro, y el marcador necesita el documento ya montado
+       para saber cuáles son sus zonas subrayables. -->
+  <script src="../../js/lecturas.js"></script>
+  <script src="../../js/lecturas-marcador.js"></script>
+</body>
+</html>

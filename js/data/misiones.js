@@ -150,6 +150,7 @@ const MISSIONS = [
   { id: 37, title: 'Las dos facturas: la desigualdad y el clima, con horquilla y con fuente', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🌡️', ruta: 'dorado', etapa: 4, sello: 'familiar', url: 'misiones/ruta-dorado-dos-facturas/dos-facturas.html' },
   { id: 38, title: 'El escocés dorado: leerlo entero, y no la media frase de siempre', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🪶', ruta: 'dorado', etapa: 5, sello: 'familiar', url: 'misiones/ruta-dorado-escoces-dorado/escoces-dorado.html' },
   { id: 39, title: 'La regla de Hebb, bien contada: lo que el eslogan borró', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🏺', ruta: 'barro', etapa: 1, sello: 'familiar', url: 'misiones/ruta-barro-regla-hebb/regla-hebb.html' },
+  { id: 40, title: 'San Petersburgo: lo que vale una apuesta', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🎲', ruta: 'apuesta', etapa: 1, sello: 'familiar', url: 'misiones/ruta-apuesta-san-petersburgo/san-petersburgo.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el

@@ -11,3 +11,4 @@
 {"clave":"mapa-familias","base":"mapa-familias","html":"misiones/ruta-gafas-mapa-familias/mapa-familias.html","js":"misiones/ruta-gafas-mapa-familias/js/mapa-familias.js","sonda":"_dev/probe-gafas-etapa3.html"}
 {"clave":"gafas-expediente","base":"gafas-expediente","html":"misiones/ruta-gafas-palabra-expediente/gafas-expediente.html","js":"misiones/ruta-gafas-palabra-expediente/js/gafas-expediente.js","sonda":"_dev/probe-gafas-etapa1.html"}
 {"clave":"acero-juicio","base":"acero-juicio","html":"misiones/ruta-rojo-acero-juicio/acero-juicio.html","js":"misiones/ruta-rojo-acero-juicio/js/acero-juicio.js","sonda":"_dev/probe-rojo-etapa1.html"}
+{"clave":"san-petersburgo","base":"san-petersburgo","html":"misiones/ruta-apuesta-san-petersburgo/san-petersburgo.html","js":"misiones/ruta-apuesta-san-petersburgo/js/san-petersburgo.js","sonda":"_dev/probe-apuesta-etapa1.html"}
