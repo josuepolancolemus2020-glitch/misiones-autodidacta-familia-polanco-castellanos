@@ -1,0 +1,137 @@
+/* ══════════════════════════════════════════════════════════════════
+   EL APARATO DE LECTURAS · la hoja de js/lecturas.js
+   ══════════════════════════════════════════════════════════════════
+   Va junto al aparato compartido, no dentro del CSS de cada misión, por
+   la misma razón que él: seis textos plegables que se comportan igual en
+   las trece misiones del Estudio Mayor. Los colores salen de las
+   variables de la misión (--pri, --card, --border...), así que cada
+   etapa lo ve en su propio color sin tener que declarar nada.
+══════════════════════════════════════════════════════════════════ */
+
+/* ── El plegado ──
+   `display: none` explícito para [hidden]. No es de adorno: en esta casa
+   ya pasó una vez que un `display: flex` de la tarjeta le ganaba al
+   atributo [hidden] y el plegado se veía abierto igual (las etapas de
+   «Mis Rutas», 19 de agosto de 2026). Lo cazó una foto del teléfono, no
+   la sonda; desde entonces se escribe siempre. */
+.lect-cuerpo[hidden] { display: none !important; }
+.lect-cuerpo { animation: lectAbre .18s ease-out; }
+@keyframes lectAbre { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.lect-h2 { margin: 0 !important; }
+/* El encabezado ENTERO es el botón: en un teléfono, un triangulito de
+   16 px como única zona tocable es una trampa para el pulgar. */
+.lect-toggle {
+  display: flex; align-items: flex-start; gap: 8px; width: 100%;
+  background: none; border: 0; padding: 2px 0; margin: 0;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
+.lect-toggle:focus-visible { outline: 3px solid var(--pri, #2563eb); outline-offset: 3px; border-radius: 8px; }
+.lect-chevron {
+  flex: 0 0 auto; font-size: 0.9rem; line-height: 1.5; color: var(--pri, #2563eb);
+  transition: transform .18s ease;
+}
+.lect-abierta .lect-chevron { transform: rotate(90deg); }
+.lect-tit { flex: 1 1 auto; }
+.lect-meta {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end;
+  gap: 2px; font-family: 'Fredoka', system-ui, sans-serif;
+  font-size: 0.6rem; font-weight: 700; line-height: 1.2; color: var(--gray, #64748b);
+  padding-top: 4px; white-space: nowrap;
+}
+.lect-meta-p { color: var(--pri, #2563eb); }
+
+/* ── El índice de las seis ── */
+.lect-indice { display: flex; flex-direction: column; gap: 6px; }
+.lect-ind-btn {
+  display: grid; grid-template-columns: 26px 1fr; grid-template-rows: auto auto;
+  gap: 0 8px; align-items: center; width: 100%; text-align: left; cursor: pointer;
+  border: 2px solid var(--border, #cbd5e1); border-radius: 12px;
+  background: var(--card, #fff); color: var(--dark, #1b2838);
+  font-family: inherit; padding: 8px 10px; min-height: 46px;
+}
+.lect-ind-btn:active { transform: scale(.985); }
+.lect-ind-activa { border-color: var(--pri, #2563eb); box-shadow: 0 0 0 2px var(--pri-gl, rgba(37,99,235,.18)); }
+.lect-ind-n {
+  grid-row: 1 / 3; align-self: center; justify-self: center;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--pri, #2563eb); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fredoka', system-ui, sans-serif; font-size: 0.75rem; font-weight: 800;
+}
+/* Los títulos cervantinos son de tres renglones («Donde se cuenta lo que
+   sucedió en la fragua a un mozo que...»): en el índice se recortan a dos,
+   o una sola fila se come media pantalla y el índice deja de ser índice. */
+.lect-ind-t {
+  font-size: 0.86rem; font-weight: 800; line-height: 1.25;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.lect-ind-v { font-size: 0.7rem; font-weight: 600; color: var(--gray, #64748b); }
+.lect-ind-pie { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+
+/* ── Las actividades de cada lectura ──
+   Van pegadas al final del texto que examinan, con un borde de color que
+   dice «esto ya no es la lectura, esto es la prueba». */
+.lect-act {
+  margin-top: 14px; padding: 12px; border-radius: 14px;
+  border: 2px dashed var(--border, #cbd5e1);
+  background: var(--pri-gl, rgba(37,99,235,.06));
+}
+.lect-act-tit { font-size: 0.98rem; font-weight: 800; margin: 0 0 2px; }
+.lect-act-sub { font-size: 0.8rem; color: var(--gray, #64748b); margin: 0 0 10px; }
+.lect-bloque {
+  background: var(--card, #fff); border: 1.5px solid var(--border, #cbd5e1);
+  border-radius: 12px; padding: 10px; margin-bottom: 8px;
+}
+.lect-bloque h4 { font-size: 0.86rem; font-weight: 800; margin: 0 0 4px; }
+.lect-prog {
+  font-family: 'Fredoka', system-ui, sans-serif;
+  font-size: 0.72rem; font-weight: 700; color: var(--gray, #64748b); margin: 0 0 6px;
+}
+.lect-enun { font-size: 0.9rem; font-weight: 700; line-height: 1.45; margin-bottom: 8px; }
+.lect-opts { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.lect-opt {
+  text-align: left; width: 100%; cursor: pointer; min-height: 44px;
+  border: 2px solid var(--border, #cbd5e1); border-radius: 10px;
+  background: var(--card, #fff); color: var(--dark, #1b2838);
+  font-family: inherit; font-size: 0.84rem; line-height: 1.35; padding: 8px 10px;
+}
+.lect-opt-sel { border-color: var(--pri, #2563eb); }
+.lect-opt-ok  { border-color: var(--jade, #00b894); background: rgba(0,184,148,.14); font-weight: 800; }
+.lect-opt-no  { border-color: var(--red, #d63031);  background: rgba(214,48,49,.12); }
+.lect-opt-ok::before { content: '✓ '; font-weight: 900; color: var(--jade, #00b894); }
+.lect-opt-no::before { content: '✗ '; font-weight: 900; color: var(--red, #d63031); }
+.lect-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.lect-fb { font-size: 0.82rem; font-weight: 700; margin-top: 6px; min-height: 1.1em; }
+.lect-fb-ok { color: var(--jade, #00b894); }
+.lect-fb-no { color: var(--red, #d63031); }
+.lect-input, .lect-ta {
+  width: 100%; border: 2px solid var(--border, #cbd5e1); border-radius: 10px;
+  background: var(--card, #fff); color: var(--dark, #1b2838);
+  font-family: inherit; font-size: 0.88rem; padding: 9px 10px; min-height: 44px;
+}
+.lect-ta { min-height: 96px; resize: vertical; }
+.lect-pauta {
+  margin-top: 8px; padding: 9px 10px; border-radius: 10px;
+  border-left: 4px solid var(--jade, #00b894);
+  background: rgba(0,184,148,.10);
+  font-size: 0.82rem; line-height: 1.5;
+}
+.lect-pauta[hidden] { display: none !important; }
+.lect-act-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+
+/* En pantallas anchas el índice cabe en dos columnas y se ve entero de
+   una vez, que es de lo que se trata. */
+@media (min-width: 640px) {
+  .lect-indice { display: grid; grid-template-columns: 1fr 1fr; }
+}
+
+/* Nada de esto va al papel: las lecturas se imprimen con sus propios
+   botones, que arman una hoja aparte con su hoja de estilo. */
+@media print {
+  .lect-toggle, .lect-meta, .lect-act, #lectIndice { display: none !important; }
+  /* Y si alguien manda a imprimir la página entera, que al menos salga
+     el texto de las lecturas y no seis tarjetas vacías. */
+  .lect-cuerpo[hidden] { display: block !important; }
+}

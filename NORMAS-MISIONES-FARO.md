@@ -285,9 +285,15 @@ pasó una vez y lo cazó la sonda, no el ojo.
    fondos), la leyenda del código de colores, y una hoja final con las
    notas numeradas, donde el número es el mismo que va volado en el
    texto. Hay además una **hoja de repaso** con solo lo marcado.
-5. **La barra de marcar va anclada abajo**, a todo el ancho y con
-   botones de 46 px: en un teléfono de 380 px una barra flotante se sale
-   de la pantalla o la tapa el menú de copiar del sistema.
+5. ~~**La barra de marcar va anclada abajo**~~ → **la barra se abre
+   pegada a lo que se acaba de seleccionar** (corregido el 20 de agosto
+   de 2026, ver la norma 5-nonies). Los dos motivos de la decisión vieja
+   eran buenos y siguen resueltos, pero resolviéndolos en vez de
+   esquivarlos: la barra se pega al borde antes que salirse, se prueba
+   primero **debajo** de la selección (donde el menú del sistema casi
+   nunca se pone) y, si no cabe ni arriba ni abajo, **vuelve a anclarse
+   al pie**, que es la garantía vieja y sigue estando. Los botones
+   siguen siendo de 46 px, que eso no era el problema.
 6. La sonda `_dev/probe-lecturas-marcador.html` comprueba el aparato
    entero (marcar, anotar, recordar tras recargar, imprimir de verdad
    interceptando `window.open`) **y que las doce misiones lo traigan
@@ -451,6 +457,131 @@ node _dev/servidor-estatico.js
 chrome --user-data-dir=PERFIL ...   (primero se siembran las marcas)
 chrome --user-data-dir=PERFIL --print-to-pdf=...  fichas/<ficha>.html
 ```
+
+## 5-nonies. Seis lecturas, plegadas, y cada una con sus preguntas dentro
+
+**Norma nueva, pedida por el autor el 20 de agosto de 2026**, con cinco
+cambios de una vez sobre la sección de Lecturas. Rige para toda misión
+nueva y se aplica hacia atrás a las trece del Estudio Mayor.
+
+### 1. Llega la sexta lectura: **el careo**
+
+A las cinco de la norma 5-quinquies se le suma un **debate**, para leer
+las dos posturas de una disputa con sus objeciones y sus refutaciones.
+Su tarjeta es `lect-debate` y su etiqueta de banco es `Debate`.
+
+El careo tiene **seis partes obligatorias y siempre en este orden**:
+
+1. **La pregunta en disputa**, una sola y clara.
+2. **La postura A en su mejor versión.**
+3. **La postura B en su mejor versión.**
+4. **Las réplicas**: A contesta a B y B contesta a A.
+5. **El terreno común**: qué aceptan las dos, que casi siempre es más de
+   lo que parece desde fuera.
+6. **Lo que sigue en disputa, y qué dato lo resolvería.**
+
+Y trae **reglas propias que no comparte con las otras cinco**:
+
+- **No imita a nadie**, así que **no lleva la etiqueta de pastiche**:
+  lleva la suya. Los turnos los firman los **papeles** en mayúsculas y
+  con punto (`MODERACIÓN.`, `LA DEFENSA.`, `LA OBJECIÓN.`), y las
+  personas reales se citan **en tercera persona como fuentes, nunca como
+  hablantes**. Las entrevistas de la norma 5-quinquies pueden prestarle
+  voz a un muerto porque lo declaran; ponerle palabras inventadas en la
+  boca a un investigador vivo es otra cosa, y aquí no se hace.
+- **La disputa tiene que existir de verdad**, con dos lados que alguien
+  sostiene en la literatura y sus fuentes citadas por autor y año. Un
+  dilema inventado para la ocasión no es un careo, es un ejercicio de
+  redacción.
+- Manda **la regla del acero antes del juicio** (Expediente Rojo, etapa
+  1): cada postura se escribe como la escribiría su mejor defensor. Un
+  lado redactado para perder invalida la lectura entera.
+- Sigue rigiendo, como en las otras cinco, que **toda obra, fecha, cifra
+  y persona citada dentro es real y comprobable**.
+
+### 2. Las seis se pliegan, y se elige una
+
+Seis textos largos abiertos de golpe son veinte pantallas de alto en un
+teléfono. Al entrar en la sección **las seis están plegadas** y arriba
+hay un **índice** con las seis, su voz y cuántas preguntas trae cada
+una. Abrir una **cierra la anterior** (acordeón): dejar varias abiertas
+devuelve el problema que esto viene a resolver.
+
+### 3. Cada lectura lleva sus preguntas DENTRO
+
+Las tres baterías de la norma 5-quater dejan de vivir juntas al final de
+la sección y pasan a estar **dentro de cada texto**, filtradas por su
+voz. Antes, quien acababa el cuento tenía que bajar hasta el fondo,
+buscar cuáles de las veinticinco preguntas eran las suyas y volver.
+
+El reparto por lectura es **5 de comprensión, 2 de completar y 2 de
+análisis**, así que con seis textos los bancos quedan en **30, 12 y 12**
+(54 preguntas). **Cada pregunta de los tres bancos lleva su etiqueta `t`
+con la voz**, también las de análisis, que antes no la tenían.
+
+Al imprimir, **cada lectura sale con sus preguntas detrás y su pauta en
+hoja aparte**, para que una hoja suelta sirva sola. El pliego con las 54
+juntas se queda como estaba.
+
+### 4. La marca de lectura: dónde se quedó uno
+
+Estos textos son largos y se leen en varias sentadas. El marcador apunta
+**solo** el párrafo que estuvo en la franja central de la pantalla (no el
+último que asomó por el borde: eso es mirar, no leer), lo enseña con una
+cinta **Aquí me quedé** y trae un botón **Seguir donde iba** que abre la
+lectura aunque esté plegada y aterriza ahí.
+
+Es **automática a propósito**, no un botón que hay que acordarse de
+pulsar: la casa ya aprendió con el Buzón que lo que hay que acordarse de
+hacer no se hace. Y **se queda en el aparato**, que es una decisión y no
+un olvido: meterla en la nube obligaría a tocar la tabla
+`lecturas_marcas` y a correr SQL nuevo a mano desde la tableta, para algo
+que casi siempre es distinto en cada aparato (en el teléfono se lee en la
+fila del banco, en la tableta de noche). **El panel lo dice a la vista**,
+porque el resto del marcador sí viaja y callarlo sería el aviso
+deshonesto que la casa tiene prohibido.
+
+La cinta **no puede ocupar sitio**: su rótulo va en `position:absolute` y
+el filete del margen es un `box-shadow`, no un borde, y en el papel
+desaparece entera. Es la misma razón que la inicial volada de la norma
+5-octies: en una ficha, cualquier cosa que añada alto parte una hoja y
+deja once.
+
+### 5. La barra de marcar se abre junto a la selección
+
+Ver la corrección del punto 5 de la norma 5-sexies. En resumen: se abre
+**pegada al trozo**, se pega al borde antes que salirse, prueba primero
+**debajo** de la selección, y si no cabe ni arriba ni abajo vuelve a
+anclarse al pie. Va en **coordenadas del documento** y no de la pantalla,
+para que al desplazar el texto viaje con el trozo al que pertenece en vez
+de quedarse señalando otra cosa.
+
+### Dónde vive todo esto
+
+En **`js/lecturas.js` con `css/lecturas.css`** (el plegado, el índice y
+las preguntas de cada lectura) y en `js/lecturas-marcador.js` (la barra y
+la marca de lectura). Es la **tercera excepción de la casa a la norma 1**
+y por el mismo motivo que las otras dos: esto no es contenido de una
+etapa, es un aparato de lectura que tiene que comportarse igual en las
+trece misiones. Copiado trece veces, a la tercera corrección ya no
+coincidirían.
+
+Cada misión solo pone **sus seis tarjetas** (con `lect-nota` y `lect-p`)
+y **sus tres bancos etiquetados**. El aparato se carga con dos líneas,
+**antes** del marcador, porque el marcador necesita el documento ya
+montado para saber cuáles son sus zonas subrayables.
+
+### Verificación
+
+La sonda de cada misión comprueba las seis lecturas, el careo con sus
+seis partes y sus anclas reales, que las seis empiezan plegadas **con el
+alto calculado y no solo con el atributo** (que ya falló una vez en «Mis
+Rutas»), que abrir una cierra la anterior, que cada lectura trae sus tres
+baterías y suma XP donde debe, que **la barra se abre cerca del trozo y
+sin salirse en 380 px**, y que la marca de lectura se pone sola, se
+guarda y devuelve a su sitio.
+
+---
 
 ## 5-bis. El widget de ordenar se arrastra, y la linterna cuesta
 

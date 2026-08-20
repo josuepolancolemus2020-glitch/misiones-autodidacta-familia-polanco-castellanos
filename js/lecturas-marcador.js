@@ -98,6 +98,10 @@
   let estadoNube = 'local';         /* local | subiendo | al-dia | sin-sesion | error */
   let ultimaNube = 0;
   let temporizadorNube = null;
+  let anclaRect = null;             /* dónde estaba lo seleccionado, para colocar la barra */
+  let CLAVE_LUGAR = 'faro_lugar';   /* la marca de lectura, en este aparato */
+  let lugar = null;                 /* { l: zona, p: índice, t: texto, u: fecha } */
+  let guardaLugar = null;
 
   /* ─────────────── Guardado en el aparato ───────────────
      Se usa la MISMA clave de progreso de la misión con un sufijo, que es
@@ -220,11 +224,18 @@
         .filter(el => el.textContent.trim().length > 40)
         .filter(el => !el.querySelector(CONTROLES));
     }
-    const cand = [
+    /* Desde que las lecturas se pliegan (js/lecturas.js), su prosa ya no
+       cuelga de la tarjeta sino de `.lect-cuerpo`. Se añade ese caso en
+       vez de cambiar el de antes, porque las misiones de las rutas del
+       adulto siguen teniendo la suya en `.card > p` y las dos formas
+       tienen que convivir. El Set quita el duplicado del párrafo que
+       encaje en las dos. */
+    const cand = [...new Set([
       ...raiz.querySelectorAll('.card > p'),
+      ...raiz.querySelectorAll('.card > .lect-cuerpo > p'),
       ...raiz.querySelectorAll('.card > .tip > div'),
       ...raiz.querySelectorAll('.card > .ex-box'),
-    ];
+    ])];
     return cand
       .filter(el => el.tagName !== 'P' || el.classList.contains('lect-p') || !el.className.trim())
       .filter(el => el.textContent.trim().length > 40)   /* los pies de dos palabras no se subrayan */
@@ -267,6 +278,7 @@
     if (deLaNube && (seleccion || editando)) { repintadoPendiente = true; return; }
     repintadoPendiente = false;
     renumerarNotas();
+    setTimeout(pintarLugar, 0);
     zonas().forEach(z => {
       z.parrafos.forEach((p, i) => {
         if (!ORIG.has(p)) ORIG.set(p, p.innerHTML);
@@ -395,7 +407,12 @@
     const ini = antes.toString().length;
     const texto = r.toString();
     if (!texto.trim()) return null;
-    return { l: z.clave, p: idx, i: ini, f: ini + texto.length, t: texto };
+    /* El rectángulo de lo seleccionado viaja con la selección: es lo que
+       permite abrir la barra pegada al trozo y no al pie de la pantalla.
+       Una selección de varias líneas da un rectángulo que las abarca
+       todas, que es exactamente lo que hay que esquivar al colocarla. */
+    const caja = r.getBoundingClientRect();
+    return { l: z.clave, p: idx, i: ini, f: ini + texto.length, t: texto, caja: caja };
   }
 
   /* ─────────────── Crear, cambiar, borrar ─────────────── */
@@ -467,18 +484,68 @@
     document.getElementById('fmBtnCierra').addEventListener('click', () => { cerrarBarra(); limpiarSeleccion(); });
   }
 
-  function abrirBarra(texto, catActual, hayMarca) {
+  function abrirBarra(texto, catActual, hayMarca, rect) {
     construirBarra();
     const b = document.getElementById('fmBarra');
-    document.getElementById('fmBarraTxt').textContent = '«' + texto.slice(0, 160) + (texto.length > 160 ? '…»' : '»');
+    document.getElementById('fmBarraTxt').textContent = '«' + texto.slice(0, 90) + (texto.length > 90 ? '…»' : '»');
     b.querySelectorAll('.fm-color').forEach(btn =>
       btn.setAttribute('aria-pressed', String(btn.dataset.cat === catActual)));
     document.getElementById('fmBtnQuita').style.display = hayMarca ? '' : 'none';
     b.classList.add('fm-abierta');
+    anclaRect = rect || null;
+    colocarBarra();
+  }
+
+  /* ── DÓNDE SE ABRE LA BARRA ──────────────────────────────────────
+     Pedido por el autor el 20 de agosto de 2026, y cambia una decisión
+     anterior de este mismo archivo. Antes la barra iba SIEMPRE anclada
+     abajo y a todo el ancho; el motivo era bueno (en un teléfono de
+     380 px una barra flotante se sale de la pantalla, o la tapa el menú
+     de copiar del sistema), pero el precio se pagaba en cada subrayado:
+     seleccionar arriba y tener que ir a buscar los colores al pie de la
+     pantalla, con el texto y la mano en sitios distintos.
+
+     Ahora se abre PEGADA a lo que se acaba de seleccionar, y los dos
+     motivos viejos se resuelven en vez de esquivarse:
+       · que se salga: se mide y se pega al borde, nunca fuera;
+       · que la tape el menú del sistema: se prueba PRIMERO debajo de la
+         selección, que es donde ese menú casi nunca se pone, y solo si
+         no cabe se pone encima;
+       · y si no cabe ni arriba ni abajo (una selección que ocupa la
+         pantalla entera), vuelve a anclarse abajo, que es la garantía
+         vieja y sigue estando.
+     Va en coordenadas del documento, no de la pantalla, para que al
+     desplazar el texto la barra viaje con el trozo al que pertenece. */
+  function colocarBarra() {
+    const b = document.getElementById('fmBarra');
+    if (!b || !b.classList.contains('fm-abierta')) return;
+    b.classList.remove('fm-barra-abajo', 'fm-arriba', 'fm-abajo');
+    if (!anclaRect || !anclaRect.height) { b.classList.add('fm-barra-abajo'); return; }
+    const M = 8;                                  /* margen con el borde */
+    const anchoMax = Math.min(360, window.innerWidth - 2 * M);
+    b.style.maxWidth = anchoMax + 'px';
+    /* Se mide con la barra ya visible pero fuera de cuadro: medir en
+       display:none da cero y la barra acabaría siempre en la esquina. */
+    b.style.left = '-9999px'; b.style.top = '0px';
+    const w = b.offsetWidth, h = b.offsetHeight;
+    const cabeAbajo = window.innerHeight - anclaRect.bottom >= h + 12;
+    const cabeArriba = anclaRect.top >= h + 12;
+    if (!cabeAbajo && !cabeArriba) { b.style.left = ''; b.style.top = ''; b.classList.add('fm-barra-abajo'); return; }
+    const arriba = !cabeAbajo;
+    const top = arriba ? anclaRect.top - h - 10 : anclaRect.bottom + 10;
+    let left = anclaRect.left + anclaRect.width / 2 - w / 2;
+    left = Math.max(M, Math.min(left, window.innerWidth - w - M));
+    b.classList.add(arriba ? 'fm-arriba' : 'fm-abajo');
+    b.style.left = (left + window.scrollX) + 'px';
+    b.style.top = (top + window.scrollY) + 'px';
+    /* La flecha apunta al trozo, aunque la barra se haya pegado al borde. */
+    const centro = anclaRect.left + anclaRect.width / 2 - left;
+    b.style.setProperty('--fm-flecha', Math.max(14, Math.min(centro, w - 14)) + 'px');
   }
   function cerrarBarra() {
     const b = document.getElementById('fmBarra');
-    if (b) b.classList.remove('fm-abierta');
+    if (b) { b.classList.remove('fm-abierta', 'fm-arriba', 'fm-abajo'); b.style.left = ''; b.style.top = ''; }
+    anclaRect = null;
     seleccion = null; editando = null;
     /* Si la nube trajo algo mientras se marcaba, ahora sí se pinta. */
     if (repintadoPendiente) pintarTodo();
@@ -896,6 +963,117 @@
   function pintarEstado() {
     const e = document.getElementById('fmEstado');
     if (e) e.textContent = textoEstado();
+    const l = document.getElementById('fmLugarTxt');
+    if (!l) return;
+    if (!lugar) { l.textContent = '🔖 Todavía no hay marca de lectura: se pone sola al leer.'; return; }
+    const z = zonaDe(lugar.l);
+    /* Se dice a la vista que esta marca NO viaja, porque el resto del
+       aparato sí lo hace y callarlo sería justo el aviso deshonesto que
+       la casa tiene prohibido: quien lee esto tiene derecho a saber
+       dónde está su cosa antes de cerrar el teléfono. */
+    l.textContent = '🔖 Te quedaste en «' + (z ? z.titulo : lugar.l) + '», párrafo '
+      + (lugar.p + 1) + '. La marca de lectura se queda en este aparato.';
+  }
+
+
+  /* ─────────────── La marca de lectura ───────────────
+     Pedida por el autor el 20 de agosto de 2026: «que haya un marcador o
+     marca que muestre dónde se deja la lectura». Es lo que hace cualquier
+     lector de libros y lo que faltaba aquí: estos textos son largos, se
+     leen en varias sentadas y en dos aparatos distintos, y volver
+     significaba buscar a ojo por dónde iba uno.
+
+     Es AUTOMÁTICA a propósito, no un botón que hay que acordarse de
+     pulsar: la casa ya aprendió con el Buzón que lo que hay que
+     acordarse de hacer no se hace. Se apunta el párrafo que estuvo en la
+     franja central de la pantalla, que es lo que de verdad se estaba
+     leyendo, y no el último que asomó por abajo.
+
+     SE QUEDA EN ESTE APARATO, y esto es una decisión, no un olvido: la
+     tabla `lecturas_marcas` de la nube guarda subrayados y notas, y
+     meter aquí la posición de lectura obligaría a cambiar su restricción
+     de colores, es decir a correr SQL nuevo a mano desde la tableta para
+     algo que casi siempre es distinto en cada aparato (en el teléfono se
+     lee en la fila del banco, en la tableta de noche). El panel lo dice
+     a la vista para que nadie se lleve la sorpresa. */
+  function cargarLugar() {
+    try {
+      const crudo = localStorage.getItem(CLAVE_LUGAR);
+      lugar = crudo ? JSON.parse(crudo) : null;
+    } catch (e) { lugar = null; }
+  }
+  function guardarLugar() {
+    try { localStorage.setItem(CLAVE_LUGAR, JSON.stringify(lugar)); } catch (e) {}
+  }
+
+  /* La franja central: -45% arriba y -45% abajo deja viva una banda del
+     10% en mitad de la pantalla. Un párrafo cuenta como «lo que estoy
+     leyendo» cuando entra ahí, no cuando asoma por el borde. */
+  function seguirLaLectura() {
+    if (!('IntersectionObserver' in window)) return;
+    const porElem = new Map();
+    zonas().forEach(z => z.parrafos.forEach((p, i) => porElem.set(p, { l: z.clave, p: i })));
+    if (!porElem.size) return;
+    const obs = new IntersectionObserver(entradas => {
+      let mejor = null;
+      entradas.forEach(e => { if (e.isIntersecting) mejor = e.target; });
+      if (!mejor) return;
+      const donde = porElem.get(mejor);
+      if (!donde) return;
+      if (lugar && lugar.l === donde.l && lugar.p === donde.p) return;
+      lugar = { l: donde.l, p: donde.p, t: (mejor.textContent || '').trim().slice(0, 90), u: ahora() };
+      pintarLugar();
+      /* Se escribe con retraso: al desplazar rápido pasan veinte párrafos
+         por la franja y no hace falta tocar el almacén veinte veces. */
+      clearTimeout(guardaLugar);
+      guardaLugar = setTimeout(() => { guardarLugar(); pintarEstado(); }, 900);
+    }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+    porElem.forEach((_, el) => obs.observe(el));
+  }
+
+  /* La cinta va como CLASE del párrafo, no dentro de él: pintarTodo()
+     rehace el innerHTML de los trozos marcables, y una cinta metida
+     dentro se borraría en cada repintado. El rótulo se dibuja con un
+     ::before colocado por fuera, para que no añada ni un píxel de alto:
+     en una ficha, un carácter de más parte una hoja y deja once
+     (norma 5-octies). */
+  function pintarLugar() {
+    document.querySelectorAll('.fm-aqui').forEach(el => {
+      el.classList.remove('fm-aqui');
+      el.removeAttribute('data-fm-aqui');
+      el.removeAttribute('title');
+    });
+    if (!lugar) return;
+    const z = zonaDe(lugar.l);
+    const p = z && z.parrafos[lugar.p];
+    if (!p) return;
+    p.classList.add('fm-aqui');
+    p.setAttribute('data-fm-aqui', 'Aquí me quedé');
+    /* El texto también en el title: quien pase el ratón o use lector de
+       pantalla lo oye, sin que ocupe un renglón en la página. */
+    p.setAttribute('title', 'Aquí me quedé');
+  }
+
+  function irAlLugar() {
+    if (!lugar) return aviso('Todavía no hay marca de lectura');
+    const z = zonaDe(lugar.l);
+    const p = z && z.parrafos[lugar.p];
+    if (!p) return aviso('El texto cambió y la marca se perdió');
+    /* Cada sección es una pestaña y cada lectura puede estar plegada, así
+       que primero se abre el sitio y después se va. Sin esto el
+       desplazamiento cae en un elemento con alto cero y no lleva a nada. */
+    const sec = p.closest('.sec');
+    if (sec && !sec.classList.contains('active') && typeof go === 'function') {
+      try { go(sec.id); } catch (e) {}
+    }
+    if (window.FaroLecturas && FaroLecturas.abrir) {
+      try { FaroLecturas.abrir(lugar.l); } catch (e) {}
+    }
+    setTimeout(() => {
+      p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      p.classList.add('fm-aqui-late');
+      setTimeout(() => p.classList.remove('fm-aqui-late'), 1800);
+    }, 160);
   }
 
   /* ─────────────── El panel ─────────────── */
@@ -917,7 +1095,18 @@
 
     /* La leyenda va ARRIBA, en la primera tarjeta de la primera zona: el
        código de colores hay que conocerlo ANTES de subrayar, no después. */
-    const intro = esFicha() ? null : zs[0].raiz.querySelector('.card');
+    /* Dónde va la leyenda del código de colores: arriba del todo, antes
+       de subrayar nada (norma 5-septies). En una misión con lecturas la
+       primera zona ES una tarjeta, así que preguntarle por una tarjeta
+       de dentro devolvía null y la leyenda no aparecía en ninguna de las
+       trece misiones del Estudio Mayor. Ahora se cuelga del índice de
+       las lecturas, que es lo primero que se ve al entrar. */
+    const secLect = document.getElementById('s-lecturas');
+    const intro = esFicha() ? null
+      : (document.getElementById('lectIndice')
+         || zs[0].raiz.querySelector('.card')
+         || (secLect && secLect.querySelector('.card'))
+         || null);
     if (intro && !intro.querySelector('.fm-leyenda')) {
       const caja = document.createElement('div');
       caja.innerHTML =
@@ -944,8 +1133,10 @@
             + leyendaHTML(false)
           : '')
       + '<p class="fm-estado" id="fmEstado">' + textoEstado() + '</p>'
+      + '<p class="fm-estado fm-estado-lugar" id="fmLugarTxt"></p>'
       + '<div id="fmPanelCuerpo"></div>'
       + '<div class="fm-acciones" style="margin-top:10px;">'
+      + '<button type="button" class="fm-acc fm-acc-lugar" id="fmBtnLugar">🔖 Seguir donde iba</button>'
       + '<button type="button" class="fm-acc" id="fmBtnImprimeMarcas">🖨️ Imprimir solo mis marcas</button>'
       + '<button type="button" class="fm-acc" id="fmBtnNube">☁️ Sincronizar ahora</button>'
       + '<button type="button" class="fm-acc fm-acc-quita" id="fmBtnVacia">🗑 Borrar todas</button>'
@@ -967,7 +1158,13 @@
       const sec = document.getElementById('s-lecturas');
       const preguntas = sec ? [...sec.querySelectorAll('.card')].find(c => /Preguntas de las/i.test(c.textContent)) : null;
       if (preguntas) preguntas.parentNode.insertBefore(panel, preguntas);
-      else {
+      else if (sec) {
+        /* Desde que cada lectura lleva sus propias preguntas dentro, ya
+           no hay tarjeta de baterías al final: el panel se pone al cierre
+           de la sección, antes del botón de pasar a Recursos. */
+        const siguiente = sec.querySelector('.next-sec-btn');
+        if (siguiente) sec.insertBefore(panel, siguiente); else sec.appendChild(panel);
+      } else {
         const rec = document.getElementById('s-recursos');
         if (rec) rec.appendChild(panel);
         else zs[zs.length - 1].raiz.appendChild(panel);
@@ -981,6 +1178,7 @@
       vivas().forEach(m => { m.del = true; m.u = ahora(); });
       guardar(); pintarTodo(); pedirNube(); aviso('Marcas borradas');
     });
+    document.getElementById('fmBtnLugar').addEventListener('click', irAlLugar);
     document.getElementById('fmBtnImprimeMarcas').addEventListener('click', imprimirSoloMarcas);
     document.getElementById('fmBtnNube').addEventListener('click', () => sincronizar(true));
   }
@@ -1182,10 +1380,13 @@
     arrancado = true;
     MISION = claveDeMision();
     CLAVE = MISION + '_marcas';
+    CLAVE_LUGAR = MISION + '_lugar';
     cargar();
+    cargarLugar();
     construirPanel();
     reanclar();
     pintarTodo();
+    seguirLaLectura();
 
     /* La nube, en cuanto se pueda. La sesión de Supabase se restaura de
        forma asíncrona, así que el primer intento va con un respiro y, si
@@ -1203,6 +1404,12 @@
     /* Al volver la señal se sube lo que quedó pendiente. */
     window.addEventListener('online', () => sincronizar(false));
 
+    /* La barra va en coordenadas del documento, así que al desplazar el
+       texto viaja sola. Al cambiar de tamaño o girar el teléfono, no:
+       ahí hay que volver a medir o se queda colgada fuera de cuadro. */
+    window.addEventListener('resize', colocarBarra);
+    window.addEventListener('orientationchange', colocarBarra);
+
     /* La barra se abre al soltar la selección. Se usa selectionchange
        con un respiro porque en el teléfono la selección se ajusta varias
        veces mientras se arrastran los tiradores, y abrir la barra en
@@ -1213,7 +1420,7 @@
       temporizador = setTimeout(() => {
         if (editando) return;
         const s = leerSeleccion();
-        if (s) { seleccion = s; abrirBarra(s.t, null, false); }
+        if (s) { seleccion = s; abrirBarra(s.t, null, false, s.caja); }
         else if (!editando && seleccion) { seleccion = null; cerrarBarra(); }
       }, 260);
     });
@@ -1227,7 +1434,7 @@
         const m = marcas.find(x => x.id === mk.getAttribute('data-fm-id'));
         if (!m) return;
         seleccion = null; editando = m.id;
-        abrirBarra(m.t, m.c, true);
+        abrirBarra(m.t, m.c, true, mk.getBoundingClientRect());
         return;
       }
       /* Tocar fuera cierra, salvo que se esté tocando la propia barra. */
@@ -1265,14 +1472,10 @@
       if (!el) return false;
       return zonas().some(z => z.parrafos.some(p => p === el || p.contains(el)));
     },
-    /* Para las sondas: dice si un nodo cae dentro de un trozo marcable.
-       Sin esto, cuando una selección no se puede marcar no hay manera de
-       saber si el problema es la selección o la zona. */
-    esMarcable: function (nodo) {
-      const el = (nodo && nodo.nodeType === 3) ? nodo.parentElement : nodo;
-      if (!el) return false;
-      return zonas().some(z => z.parrafos.some(p => p === el || p.contains(el)));
-    },
+    /* La marca de lectura: dónde se quedó y cómo volver ahí. */
+    lugar: function () { return lugar ? Object.assign({}, lugar) : null; },
+    irAlLugar: irAlLugar,
+    colocarBarra: colocarBarra,
     sincronizar: sincronizar,
     repintar: pintarTodo,
     /* Vuelve a leer lo guardado y lo repinta. Hace falta cuando el

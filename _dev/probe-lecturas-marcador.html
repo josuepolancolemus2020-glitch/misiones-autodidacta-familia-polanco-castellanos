@@ -300,6 +300,19 @@ f.onload=async()=>{
          treinta y ocho misiones pedirían red al abrirse aunque nadie
          fuera a subrayar. La carga el marcador cuando hay sesión. */
       if(h.indexOf('../../js/auth.js')>=0 || h.indexOf('../../js/supabase.min.js')>=0) falta.push('nube-ansiosa');
+      /* Y la misión que tiene Lecturas tiene que traer TAMBIÉN el aparato
+         de lecturas (norma 5-nonies), y cargado ANTES del marcador: si se
+         queda atrás, sus seis textos salen abiertos de golpe y sin sus
+         preguntas dentro, que es justo lo que el encargo vino a arreglar.
+         Se mira por la tarjeta del careo, que es lo que distingue a una
+         misión ya pasada a seis lecturas de una que se quedó en cinco. */
+      if(h.indexOf('id="lect-debate"')>=0){
+        if(h.indexOf('css/lecturas.css')<0) falta.push('hoja-lecturas');
+        const iAp=h.indexOf('js/lecturas.js');
+        if(iAp<0) falta.push('aparato-lecturas');
+        else if(iAp>h.indexOf('js/lecturas-marcador.js')) falta.push('orden-aparato');
+        if(h.indexOf('id="lcProg"')>=0) falta.push('bateria-vieja');
+      }
       if(falta.length) malas.push(url.split('/')[1]+'('+falta.join(',')+')');
     }
     ok(malas.length===0, 'las '+urls.length+' misiones traen el marcador y su hoja, en orden y sin cargar la nube de más',

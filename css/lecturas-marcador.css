@@ -34,6 +34,7 @@
   --fm-idea:   #fecaca;  --fm-idea-fw:   #b91c1c;
   --fm-contra: #bfdbfe;  --fm-contra-fw: #1d4ed8;
   --fm-duda:   #e9d5ff;  --fm-duda-fw:   #7e22ce;
+  --fm-lugar:  #d97706;  --fm-lugar-gl:  rgba(217,119,6,.18);
 }
 /* En oscuro el mismo color en pastel deslumbra y tapa la letra: se baja
    a un velo translúcido del mismo tono, que deja leer el texto debajo. */
@@ -43,6 +44,7 @@
   --fm-idea:   rgba(248,113,113,.30); --fm-idea-fw:   #fca5a5;
   --fm-contra: rgba(96,165,250,.30);  --fm-contra-fw: #93c5fd;
   --fm-duda:   rgba(192,132,252,.32); --fm-duda-fw:   #d8b4fe;
+  --fm-lugar:  #fbbf24;  --fm-lugar-gl:  rgba(251,191,36,.20);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -51,6 +53,7 @@
     --fm-idea:   rgba(248,113,113,.30); --fm-idea-fw:   #fca5a5;
     --fm-contra: rgba(96,165,250,.30);  --fm-contra-fw: #93c5fd;
     --fm-duda:   rgba(192,132,252,.32); --fm-duda-fw:   #d8b4fe;
+    --fm-lugar:  #fbbf24;  --fm-lugar-gl:  rgba(251,191,36,.20);
   }
 }
 
@@ -92,19 +95,54 @@
 .fm-hl:focus-visible { outline: 3px solid var(--pri, #2563eb); outline-offset: 2px; }
 
 /* ── La barra de marcar ──
-   Va anclada abajo y a todo el ancho, no flotando junto a la selección:
-   en un teléfono de 380 px una barra flotante se sale de la pantalla o
-   la tapa el menú de copiar del propio sistema. Abajo siempre cabe, y
-   el pulgar llega sin recolocar la mano. */
+   Se abre PEGADA a lo que se acaba de seleccionar (pedido del autor, 20
+   de agosto de 2026). Antes iba siempre anclada abajo y a todo el ancho,
+   por dos motivos buenos: en un teléfono de 380 px una barra flotante se
+   sale de la pantalla, y el menú de copiar del sistema la tapa. Los dos
+   siguen resueltos, pero ahora resolviéndolos y no esquivándolos: el
+   colocador la pega al borde antes que dejarla salir, la prueba primero
+   DEBAJO de la selección (que es donde el menú del sistema casi nunca se
+   pone) y, si no cabe ni arriba ni abajo, vuelve a anclarse al pie, que
+   es la garantía vieja y sigue estando (.fm-barra-abajo).
+   Va en position:absolute y en coordenadas del documento, no fixed: así
+   al desplazar el texto la barra viaja con el trozo al que pertenece, en
+   vez de quedarse quieta señalando a otra cosa. */
 .fm-barra {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 9000;
-  background: var(--card, #fff); border-top: 2px solid var(--border, #cbd5e1);
-  box-shadow: 0 -6px 24px var(--shadow, rgba(0,0,0,.18));
-  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+  position: absolute; z-index: 9000; width: max-content; max-width: 360px;
+  background: var(--card, #fff); border: 2px solid var(--border, #cbd5e1);
+  border-radius: 14px;
+  box-shadow: 0 8px 28px var(--shadow-md, rgba(0,0,0,.28));
+  padding: 8px 10px;
   display: none; flex-direction: column; gap: 7px;
-  animation: fmSube .16s ease-out;
+  animation: fmAsoma .14s ease-out;
 }
 .fm-barra.fm-abierta { display: flex; }
+@keyframes fmAsoma { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+
+/* La flecha que apunta al trozo marcado. Su posición horizontal la pone
+   el colocador en --fm-flecha, porque cuando la barra se pega al borde
+   de la pantalla su centro ya no coincide con el del texto. */
+.fm-barra.fm-arriba::after, .fm-barra.fm-abajo::after {
+  content: ''; position: absolute; left: var(--fm-flecha, 50%);
+  margin-left: -8px; width: 0; height: 0;
+  border-left: 8px solid transparent; border-right: 8px solid transparent;
+}
+.fm-barra.fm-abajo::after {
+  top: -9px; border-bottom: 9px solid var(--border, #cbd5e1);
+}
+.fm-barra.fm-arriba::after {
+  bottom: -9px; border-top: 9px solid var(--border, #cbd5e1);
+}
+/* El respaldo de siempre: si no cabe ni encima ni debajo, al pie. */
+.fm-barra.fm-barra-abajo {
+  position: fixed; left: 0; right: 0; bottom: 0; top: auto;
+  width: auto; max-width: none; border-radius: 0;
+  border: 0; border-top: 2px solid var(--border, #cbd5e1);
+  box-shadow: 0 -6px 24px var(--shadow, rgba(0,0,0,.18));
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+  animation: fmSube .16s ease-out;
+}
+.fm-barra.fm-barra-abajo::after { content: none; }
 @keyframes fmSube { from { transform: translateY(100%); } to { transform: translateY(0); } }
 .fm-barra-txt {
   font-size: 0.78rem; line-height: 1.35; color: var(--gray, #64748b);
@@ -241,6 +279,12 @@
   .fm-barra, .fm-modal, .fm-item-btns, .fm-acciones,
   .fm-panel-ficha, .fm-leyenda { display: none !important; }
 
+  /* La marca de lectura es cosa de la pantalla: en el papel no pinta
+     nada, y sobre todo no puede añadir ni un píxel de alto a una ficha
+     que va a 0,4 mm del corte. */
+  .fm-aqui { box-shadow: none !important; }
+  .fm-aqui::before { content: none !important; }
+
   /* El subrayado sí viaja al papel, con su color obligado (sin esto el
      navegador se come los fondos) y sin ocupar espacio. */
   .fm-hl {
@@ -250,6 +294,35 @@
   /* La inicial volada se calla en el papel: ver la nota de arriba. */
   .fm-hl-fin::after { content: none !important; }
 }
+
+/* ── La marca de lectura ──
+   La cinta del margen y su rótulo NO ocupan sitio: el rótulo va en
+   position:absolute y la cinta es un box-shadow, no un borde. Es la
+   misma razón que la inicial volada de las marcas (norma 5-octies): en
+   una ficha, cualquier cosa que añada alto parte una hoja y deja once. */
+.fm-aqui { position: relative; box-shadow: -6px 0 0 -2px var(--fm-lugar, #f59e0b); }
+/* El separador va en el MARGEN, no encima del párrafo anterior. La primera
+   versión ponía el rótulo «Aquí me quedé» a -1.15em, es decir tapando el
+   último renglón del párrafo de arriba, y en un texto apretado eso se come
+   una línea entera. Lo cazó una foto del teléfono, como casi siempre.
+   Aquí no hay palabras: hay un separador en el margen, y las palabras
+   («te quedaste en tal lectura, párrafo tal») viven en el panel, que es
+   donde se leen sin estorbar. Sigue sin ocupar sitio, que es lo que la
+   norma 5-octies exige para que una ficha no pase de diez hojas. */
+.fm-aqui::before {
+  content: '🔖';
+  position: absolute; left: -1.35em; top: 0;
+  font-size: 0.8rem; line-height: 1.5; pointer-events: none;
+}
+/* Al volver con «Seguir donde iba», el párrafo late una vez: sin eso uno
+   aterriza en mitad del texto sin saber si el salto ocurrió. */
+.fm-aqui-late { animation: fmLate 1.6s ease-out; }
+@keyframes fmLate {
+  0%, 100% { background: transparent; }
+  20%      { background: var(--fm-lugar-gl, rgba(245,158,11,.22)); }
+}
+.fm-acc-lugar { border-color: var(--fm-lugar, #f59e0b); color: var(--fm-lugar, #f59e0b); }
+.fm-estado-lugar { margin-top: -4px; font-weight: 600; opacity: .9; }
 
 /* El estado de la nube, en el panel. Va a la vista y no escondido en un
    icono: quien escribe una nota tiene derecho a saber si ya viajó o si

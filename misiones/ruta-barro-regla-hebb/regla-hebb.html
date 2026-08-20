@@ -6,6 +6,7 @@
 <title>Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada | F.A.R.O.</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/regla-hebb.css">
+<link rel="stylesheet" href="../../css/lecturas.css">
 <link rel="stylesheet" href="../../css/lecturas-marcador.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -710,11 +711,12 @@
 <!-- ===== LECTURAS ===== -->
 <div class="sec" id="s-lecturas" role="tabpanel">
   <div class="card ac-gold">
-    <h2>📖 Cinco lecturas: la misma regla, cinco voces</h2>
-    <p>El tema de la etapa contado cinco veces: un cuento de un metrónomo heredado, un capítulo de herrería y refranes, un ensayo a escala de especie, una entrevista imaginada con el hombre que escribió el postulado, y una conversación de madrugada entre Jesús Quintero y Antonio Gala sobre la costumbre. Cinco maneras de que la idea entre por donde el examen no llega.</p>
+    <h2>📖 Seis lecturas: la misma regla, seis voces</h2>
+    <p>El tema de la etapa contado seis veces: un cuento de un metrónomo heredado, un capítulo de herrería y refranes, un ensayo a escala de especie, una entrevista imaginada con el hombre que escribió el postulado, una conversación de madrugada entre Jesús Quintero y Antonio Gala sobre la costumbre, y un <strong>careo</strong> donde las dos posturas de una disputa que sigue abierta se leen una al lado de la otra, con sus objeciones y sus réplicas. Seis maneras de que la idea entre por donde el examen no llega.</p>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;"><strong>Cada lectura trae sus propias preguntas debajo</strong>: cinco de comprensión, dos de completar y dos de análisis, del texto que se acaba de leer y de ningún otro. Y las seis empiezan <strong>plegadas</strong>, para poder elegir sin tener que recorrer veinte pantallas.</p>
     <div class="tip">
       <span class="ti">⚠️</span>
-      <div><strong>La etiqueta, primero (regla del estatus):</strong> estos cinco textos son <strong>ejercicios de estilo escritos por esta casa</strong>: los tres primeros en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari, y los dos últimos son <strong>entrevistas imaginadas</strong>, a la manera de Joaquín Soler Serrano la una y del programa de Jesús Quintero la otra. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado. Los encuentros de las dos entrevistas <strong>nunca ocurrieron</strong>: las personas son reales, sus obras y fechas son reales, y lo inventado es la conversación que la casa les presta. Y rige la regla extra de siempre: <strong>toda obra, fecha, cifra y persona que aparece dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> los cinco primeros son <strong>ejercicios de estilo escritos por esta casa</strong>: los tres primeros en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari, y el cuarto y el quinto son <strong>entrevistas imaginadas</strong>, a la manera de Joaquín Soler Serrano la una y del programa de Jesús Quintero la otra. El sexto, el <strong>careo</strong>, no imita a nadie: sus turnos los firman los papeles y no personas, y las dos posturas que enfrenta las sostiene de verdad alguien en la literatura. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado. Los encuentros de las dos entrevistas <strong>nunca ocurrieron</strong>: las personas son reales, sus obras y fechas son reales, y lo inventado es la conversación que la casa les presta. Y rige la regla extra de siempre: <strong>toda obra, fecha, cifra y persona que aparece dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
     </div>
     <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre: una hoja suelta con un pastiche sin declarar sería justo la cita mal atribuida que esta misión enseña a cazar.</p>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
@@ -723,7 +725,8 @@
       <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
       <button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir la entrevista</button>
       <button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir la conversación</button>
-      <button class="btn btn-pri" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las cinco</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir el careo</button>
+      <button class="btn btn-pri" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis</button>
     </div>
   </div>
 
@@ -823,67 +826,45 @@
     <p class="lect-p"><em>(Quintero no dice nada. Deja que el silencio cierre el programa, como quien apaga una lámpara y se queda un momento a oscuras a propósito.)</em></p>
   </div>
 
+
+  <div class="card ac-amber" id="lect-debate">
+    <h2>🥊 Lectura 6 · «¿Basta la regla de Hebb?» (careo, con las dos posturas y sus réplicas)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Careo escrito por la casa sobre una disputa que existe de verdad dentro de la neurociencia, y que sigue abierta. No es una entrevista ni un pastiche: los turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas, precisamente para <strong>no poner palabras inventadas en boca de nadie</strong>. Los investigadores aparecen citados en tercera persona como fuentes, y toda obra, revista, fecha y cifra de dentro es real y comprobable. La regla de la casa que manda aquí es la del acero antes del juicio: <strong>cada postura se escribe en su mejor versión</strong>, no en la que sería fácil de tumbar.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir este careo</button></div>
+    <p class="lect-p"><strong>MODERACIÓN.</strong> La pregunta en disputa es una sola y conviene decirla sin adornos: <strong>¿la regla de Hebb, con su orden de disparo, es el mecanismo del aprendizaje, o solamente una pieza de un mecanismo mayor?</strong> Nadie discute aquí que la regla exista. Se discute si alcanza. Y no es una discusión de sobremesa: hay dos programas de investigación grandes, con literatura de sesenta años, que dan respuestas distintas. Cada lado hablará primero en su mejor versión, después se replicarán, y al final se dirá qué aceptan los dos y qué queda de verdad sin resolver.</p>
+    <p class="lect-p"><strong>LA DEFENSA.</strong> La regla no es una conjetura huérfana: es la conjetura que más veces se ha confirmado en el sitio donde se podía confirmar. Bliss y Lømo publicaron en 1973, en el Journal of Physiology, que estimular una vía del hipocampo de un conejo dejaba esa vía potenciada durante horas: la potenciación a largo plazo, el fenómeno que Hebb había supuesto sin poder verlo. Después apareció el detector de coincidencias que la regla necesitaba: el receptor NMDA, que en 1984, en Nature, Nowak y sus colegas mostraron que está tapado por un ion de magnesio y solo se destapa cuando la célula receptora ya está despolarizada. Léase despacio lo que eso significa: ese receptor no se abre si llega la señal de A, ni se abre si se activa B, sino solamente si llegan las dos y en el orden bueno. Es el postulado de 1949 escrito en la química de una proteína.</p>
+    <p class="lect-p"><strong>LA DEFENSA.</strong> Y hay más que anatomía. En 1986, en Nature, Morris y sus colegas bloquearon ese receptor con un fármaco en ratas y las ratas dejaron de aprender dónde estaba la plataforma escondida de una piscina, aunque nadaban igual de bien. Se bloquea el detector de coincidencias y se cae el aprendizaje, no el movimiento. Después Markram y sus colegas en 1997, en Science, y Bi y Poo en 1998, en el Journal of Neuroscience, midieron el reloj: unas decenas de milisegundos deciden si la conexión se refuerza o se debilita, según quién dispare primero. Si a esto no se le llama el mecanismo del aprendizaje, habrá que explicar qué más se le puede pedir a una hipótesis.</p>
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> Concedido todo lo anterior, y sin regatear: la potenciación existe, el receptor NMDA hace de detector de coincidencias y el orden importa. La objeción no es que la regla sea falsa. La objeción es que <strong>una regla puramente hebbiana, dejada sola, no puede funcionar</strong>, y esto no lo dice un enemigo del campo: lo dijo el propio campo en cuanto se puso a hacer las cuentas. Si cada vez que A ayuda a encender a B la conexión se hace más fuerte, entonces la próxima vez A la enciende más fácil, y la conexión se hace más fuerte todavía. Eso es una realimentación positiva sin freno: en el papel, la red se satura y se queda encendida; en un cerebro, eso tiene nombre clínico. Una regla que se dispara sola no explica un sistema que lleva ochenta años estable.</p>
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> La solución no vino de fuera, vino de dentro, y son dos. La primera es teórica: en 1982, en el Journal of Neuroscience, Bienenstock, Cooper y Munro propusieron que el umbral que separa reforzar de debilitar no es fijo, sino que <strong>se mueve según lo activa que haya estado la célula</strong>: una neurona que lleva rato disparando mucho se vuelve más difícil de potenciar y más fácil de deprimir. La segunda es experimental: en 1998, en Nature, Turrigiano y sus colegas mostraron que una neurona a la que se le sube o se le baja la actividad durante días <strong>reescala todas sus sinapsis a la vez</strong>, hacia arriba o hacia abajo, conservando las proporciones entre ellas. A eso se le llama plasticidad homeostática, y no es un detalle de ingeniería: es la mano que impide que la regla de Hebb se devore a sí misma.</p>
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> Y falta la parte que más pesa para quien estudia. La coincidencia dice <em>qué va con qué</em>, pero no dice <strong>qué merece la pena aprenderse</strong>. Un cerebro que reforzara toda coincidencia con orden aprendería con el mismo entusiasmo el nombre de la capital y el ruido de la moto que pasó por la ventana. Hace falta una tercera señal que diga «esto importa», y esa señal existe: en 1997, en Science, Schultz, Dayan y Montague mostraron que las neuronas de dopamina no responden al premio, sino a la <strong>diferencia entre el premio esperado y el que llegó</strong>. Por eso hoy se habla de reglas de tres factores: A, B, y algo que autorice el cambio. La regla de Hebb tiene dos.</p>
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Queda planteado. Réplicas, y por favor a lo concreto: no a lo que el otro no dijo.</p>
+    <p class="lect-p"><strong>LA DEFENSA.</strong> Ninguna de esas tres cosas contradice la regla: las tres la <strong>completan</strong>, y las tres se escribieron para salvarla, no para sustituirla. El umbral móvil de 1982 es una regla hebbiana con un termostato; el reescalado de Turrigiano toca todas las sinapsis por igual y por eso no puede almacenar nada por sí solo, es el fondo sobre el que la regla escribe; y el tercer factor de la dopamina decide cuándo se aplica la regla, no la reemplaza. Quitar la regla de Hebb de ese cuadro y ver qué queda: queda un termostato sin nada que regular. Lo que hay no es una teoría rival: es la misma teoría con sus condiciones de contorno puestas.</p>
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> De acuerdo en que la completan, y sin embargo la palabra «completar» hace mucho trabajo en esa frase. Si el orden refuerza o deprime según un umbral que se mueve, según lo que la neurona lleve haciendo esta semana y según si hubo dopamina, entonces <strong>saber que A disparó antes que B no permite predecir nada</strong> sin saber las otras tres cosas. Y aquí está la objeción que más incomoda: la ventana de milisegundos está medida sobre todo en rodajas de tejido y en cultivos, con estímulos limpios que el laboratorio elige. En un animal despierto, con sus ráfagas y su ruido, la cosa es mucho más turbia. No lo decimos nosotros: Lisman y Spruston lo escribieron como crítica explícita en Nature Neuroscience en 2005, y Feldman lo revisó en Neuron en 2012 con la lista de lo que encaja y lo que no.</p>
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Antes de terminar, lo que las dos posturas aceptan, que es bastante más de lo que parece desde fuera. Aceptan que la potenciación y la depresión a largo plazo existen y están bien medidas. Aceptan que el receptor NMDA funciona como detector de coincidencias. Aceptan que <strong>el orden de los disparos importa y que invertirlo cambia el signo del cambio</strong>. Aceptan que hace falta algún mecanismo que estabilice el sistema. Y aceptan lo que a esta casa le importa el lunes por la mañana: que <strong>la actividad coincidente y dirigida cambia las conexiones, y la mera compañía no</strong>. Ninguno de los dos lados defiende el eslogan de 1992.</p>
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Y lo que sigue en disputa, dicho sin maquillaje: <strong>si la regla del orden de disparo, tal como se mide en el laboratorio, es la regla que de verdad opera cuando un animal aprende algo en su vida</strong>. Un lado dice que sí, con sus condiciones de contorno. El otro dice que es un caso de laboratorio del que todavía no sabemos cuánto se traslada. No es una disputa de palabras: si gana el segundo, los modelos de aprendizaje construidos sobre la ventana de milisegundos habrá que rehacerlos.</p>
+    <p class="lect-p"><strong>MODERACIÓN.</strong> ¿Qué dato lo resolvería? El que las dos partes aceptarían: <strong>medir el cambio de sinapsis concretas en un animal despierto que está aprendiendo algo suyo</strong>, con sus patrones de disparo naturales y sin estímulos de laboratorio, y comprobar si el signo del cambio se predice con el orden y la ventana. Mientras ese dato no exista, la honradez obliga a citar la regla con su condición puesta. Y para quien estudia, que es de lo que va esta casa, el careo deja un premio que no depende de quién gane: <strong>los dos lados exigen que el alumno produzca y que la consecuencia llegue pegada al intento</strong>. Sobre eso no hay pleito, y es exactamente lo que se puede hacer esta tarde.</p>
+  </div>
+
   <div class="card ac-gold">
-    <h2>🧐 Preguntas de las cinco lecturas</h2>
-    <p>Leer no es lo mismo que haber leído, y en esta misión eso no es un refrán: es el temario. Aquí van <strong>veinticinco preguntas de comprensión lectora</strong> (cinco por texto), <strong>diez de completar</strong> y <strong>diez de análisis complejo</strong> con su pauta. Se contestan <strong>con los cinco textos delante</strong>: no es un examen de memoria, es un examen de lectura.</p>
+    <h2>🖨️ Todo esto se imprime</h2>
+    <p>Cada lectura sale con <strong>su texto y sus preguntas</strong>, y la pauta de esas preguntas va en su propia hoja al final, porque en esta casa las respuestas no se imprimen en la misma página que el ejercicio. Y las seis se pueden sacar juntas en un pliego, cada una arrancando en su hoja.</p>
     <div class="tip">
-      <span class="ti">🖨️</span>
-      <div><strong>Todo esto se imprime.</strong> El pliego de preguntas sale con las tres secciones y la <strong>pauta en su propia hoja al final</strong>, para que las respuestas no queden en la misma página que el ejercicio, como manda la casa. Y las cinco lecturas se imprimen aparte, cada una con su etiqueta de ejercicio de estilo encima.</div>
+      <span class="ti">📖</span>
+      <div><strong>Las preguntas se contestan con el texto delante.</strong> No es un examen de memoria: es un examen de lectura, y por eso viven pegadas a su lectura y no en una batería al final, donde había que ir a buscar cuáles eran las de uno. Las de <strong>análisis complejo van sin XP a propósito</strong>: una respuesta abierta que se premia sola se contesta a la carrera.</div>
     </div>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego de preguntas</button>
-      <button class="btn btn-amber" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las cinco lecturas</button>
-    </div>
-  </div>
-
-  <div class="card ac-teal">
-    <h2>📖 I. Comprensión lectora (25 preguntas)</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +2 XP por respuesta correcta (primera vez por pregunta)</p>
-    <p class="id-prog" id="lcProg" aria-live="polite">Pregunta 1 de 25</p>
-    <div class="qz-q" id="lcQ" role="heading" aria-level="3"></div>
-    <div class="qz-opts" id="lcOpts" role="group" aria-label="Opciones de comprensión lectora"></div>
-    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
-      <button class="btn btn-g" onclick="checkLectC()">✔ Verificar</button>
-      <button class="btn btn-d" onclick="resetLectC()">🔄 Reiniciar</button>
-    </div>
-    <div id="fbLC" class="fb" role="alert"></div>
-  </div>
-
-  <div class="card ac-amber">
-    <h2>✏️ II. Completa la oración (10 preguntas)</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +2 XP por respuesta correcta (primera vez). Escribe la palabra o el año exacto.</p>
-    <p class="id-prog" id="lfProg" aria-live="polite">Oración 1 de 10</p>
-    <div class="cmp-sent" id="lfQ"></div>
-    <div style="margin:0.6rem 0;">
-      <input class="eval-cp-input" id="lfInput" type="text" style="min-width:190px;" placeholder="Escribe tu respuesta..." aria-label="Respuesta de completar" onkeydown="if(event.key==='Enter'){event.preventDefault();checkLectF();}">
-    </div>
-    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
-      <button class="btn btn-g" onclick="checkLectF()">✔ Verificar</button>
-      <button class="btn btn-d" onclick="resetLectF()">🔄 Reiniciar</button>
-    </div>
-    <div id="fbLF" class="fb" role="alert"></div>
-  </div>
-
-  <div class="card ac-purple">
-    <h2>🧠 III. Análisis complejo (10 preguntas)</h2>
-    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Estas no se responden con una palabra ni se corrigen con una letra: se escriben, y después se comparan con la pauta. Van sin XP a propósito, porque una respuesta abierta que se premia sola se contesta a la carrera, y esta misión enseña exactamente lo contrario.</p>
-    <p class="id-prog" id="laProg" aria-live="polite">Pregunta 1 de 10</p>
-    <div class="qz-q" id="laQ" role="heading" aria-level="3"></div>
-    <textarea class="crit-textarea" id="laTA" rows="5" placeholder="Escribe aquí, o en tu cuaderno..." aria-label="Respuesta de análisis"></textarea>
-    <div id="laPauta" class="eval-answer" style="display:none;margin-left:0;font-size:0.85rem;"></div>
-    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
-      <button class="btn btn-d" onclick="prevLectA()">◀ Anterior</button>
-      <button class="btn btn-pri" onclick="nextLectA()">Siguiente ▶</button>
-      <button class="btn btn-g" id="btnLectAPauta" onclick="toggleLectAPauta()">👁 Ver pauta</button>
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego con las 54 preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis lecturas</button>
     </div>
   </div>
 
   <div class="card ac-jade">
-    <h2>📐 Por qué cinco voces (la norma, para las siguientes misiones)</h2>
-    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento convierte el concepto en <strong>un metrónomo heredado y una nota de tres palabras</strong> (y en la vergüenza de un narrador que tardó cuarenta años en entender a su maestro), el capítulo lo vuelve <strong>escena, risa y refrán</strong> (sesenta golpes que enseñan sesenta veces a torcer el hierro), y el ensayo lo pone a <strong>escala de especie</strong>, con los estudios en fila y sus años. Las dos voces nuevas hacen lo que ni el cuento ni el ensayo pueden: la <strong>entrevista</strong> sienta al personaje real de la etapa, Donald Hebb, frente a preguntas con su biografía delante, y así la etapa se aprende con su historia y con un pedazo de la historia del periodismo en español; y la <strong>conversación</strong> baja el tema al habla viva, de noche, entre dos andaluces que existieron: los números exactos entran por la boca de Quintero y vuelven convertidos en imagen por la de Gala (el camino de la alameda, el actor que suelta el papel). Quien lee las cinco sabe qué dice el postulado, quién escribió el eslogan y qué cambia en la práctica cuando se cuenta bien.</p>
+    <h2>📐 Por qué seis voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento convierte el concepto en <strong>un metrónomo heredado y una nota de tres palabras</strong> (y en la vergüenza de un narrador que tardó cuarenta años en entender a su maestro), el capítulo lo vuelve <strong>escena, risa y refrán</strong> (sesenta golpes que enseñan sesenta veces a torcer el hierro), y el ensayo lo pone a <strong>escala de especie</strong>, con los estudios en fila y sus años. Las dos voces nuevas hacen lo que ni el cuento ni el ensayo pueden: la <strong>entrevista</strong> sienta al personaje real de la etapa, Donald Hebb, frente a preguntas con su biografía delante, y así la etapa se aprende con su historia y con un pedazo de la historia del periodismo en español; y la <strong>conversación</strong> baja el tema al habla viva, de noche, entre dos andaluces que existieron: los números exactos entran por la boca de Quintero y vuelven convertidos en imagen por la de Gala (el camino de la alameda, el actor que suelta el papel). Y el <strong>careo</strong> hace lo que ninguna de las otras cinco puede hacer, porque las cinco cuentan una postura ya decidida: pone <strong>las dos caras de una disputa que sigue abierta</strong>, cada una en su mejor versión, con sus objeciones y sus réplicas, y termina diciendo qué dato la resolvería. Quien lee las seis sabe qué dice el postulado, quién escribió el eslogan, qué cambia en la práctica cuando se cuenta bien, y <strong>en qué punto exacto los que saben todavía no se han puesto de acuerdo</strong>.</p>
     <div class="ex-box">
       <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
-      <span>Toda misión del Estudio Mayor lleva sus cinco lecturas sobre el tema de la etapa: <span class="hl">cuento a la manera de Borges, capítulo a la manera de Cervantes, ensayo a la manera de Harari, la entrevista de la casa y la conversación del Loco de la Colina</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista, la declaración de que <span class="hl2">los encuentros de las entrevistas nunca ocurrieron</span>, y la regla de fondo: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>. En esta etapa la regla pesa doble, porque la etapa entera trata de una frase que se cita mal: publicar un pastiche sin declarar sería cometer el error que la misión enseña a cazar.</span>
+      <span>Toda misión del Estudio Mayor lleva sus cinco lecturas sobre el tema de la etapa: <span class="hl">cuento a la manera de Borges, capítulo a la manera de Cervantes, ensayo a la manera de Harari, la entrevista de la casa, la conversación del Loco de la Colina y el careo de las dos posturas</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista, la declaración de que <span class="hl2">los encuentros de las entrevistas nunca ocurrieron</span>, y la regla de fondo: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>. En esta etapa la regla pesa doble, porque la etapa entera trata de una frase que se cita mal: publicar un pastiche sin declarar sería cometer el error que la misión enseña a cazar.</span>
     </div>
   </div>
 
@@ -1013,6 +994,10 @@
 
   <script src="js/html2canvas.min.js"></script>
   <script src="js/regla-hebb.js"></script>
+  <!-- El aparato de lecturas va ANTES del marcador: pliega los seis textos y les
+       mete sus preguntas dentro, y el marcador necesita el documento ya montado
+       para saber cuáles son sus zonas subrayables. -->
+  <script src="../../js/lecturas.js"></script>
   <script src="../../js/lecturas-marcador.js"></script>
 </body>
 </html>
