@@ -149,6 +149,7 @@ const MISSIONS = [
   { id: 36, title: 'Lo que el dinero no debe comprar: dos objeciones, y la factura de cada una', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🩸', ruta: 'dorado', etapa: 3, sello: 'familiar', url: 'misiones/ruta-dorado-dinero-no-compra/dinero-no-compra.html' },
   { id: 37, title: 'Las dos facturas: la desigualdad y el clima, con horquilla y con fuente', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🌡️', ruta: 'dorado', etapa: 4, sello: 'familiar', url: 'misiones/ruta-dorado-dos-facturas/dos-facturas.html' },
   { id: 38, title: 'El escocés dorado: leerlo entero, y no la media frase de siempre', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🪶', ruta: 'dorado', etapa: 5, sello: 'familiar', url: 'misiones/ruta-dorado-escoces-dorado/escoces-dorado.html' },
+  { id: 39, title: 'La regla de Hebb, bien contada: lo que el eslogan borró', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🏺', ruta: 'barro', etapa: 1, sello: 'familiar', url: 'misiones/ruta-barro-regla-hebb/regla-hebb.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -217,7 +218,8 @@ const ETAPAS_PREVISTAS = {
     6: 'El termómetro calibrado',
   },
   barro: {
-    1: "La regla de Hebb, bien contada",
+    /* La etapa 1 ya está construida (misión 39), así que sale de aquí: lo
+       previsto y lo hecho no pueden anunciarse dos veces en el mismo mapa. */
     2: "La sinapsis que aprende",
     3: "Ventanas que se entornan",
     4: "El oficio esculpe, con recibo",

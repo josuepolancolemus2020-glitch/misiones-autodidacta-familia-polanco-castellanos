@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/regla-hebb.css">
+<link rel="stylesheet" href="../../css/lecturas-marcador.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Repite sin orden 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🏺</div>
+    <div class="hero-text">
+      <h1>La regla de Hebb, bien contada: <span>lo que el eslogan borró</span></h1>
+      <p class="sub">No es disparar juntas: es que una ayude a disparar a la otra 🏺</p>
+      <div class="badge">🏺 Ruta del Barro Vivo · Etapa 1 de 6</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏺 El barro que se vuelve lo que se repite</h2>
+    <p>Esta es la primera etapa de la Ruta del Barro Vivo, la materia de <strong>Neuroplasticidad</strong> del Estudio Mayor. Su lema dice que el cerebro se vuelve aquello que se le hace repetir, y la etapa 1 sirve para corregir de entrada la frase que casi todo el mundo repite mal.</p>
+    <p>En 1949, el psicólogo canadiense <strong>Donald O. Hebb</strong> publicó «The Organization of Behavior» y dejó escrito, en el capítulo 4, lo que él mismo llamó su <strong>postulado neurofisiológico</strong>: cuando el axón de una célula A está lo bastante cerca de una célula B para excitarla, y <strong>participa de forma repetida o persistente en hacerla disparar</strong>, ocurre algún cambio de crecimiento o metabólico en una de las dos células, o en las dos, de manera que <strong>la eficacia de A para disparar a B aumenta</strong>.</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Las dos palabras que casi nunca se citan.</strong> «Participa» y «en hacerla disparar». Hebb no dijo que dos neuronas activas a la vez se unan: dijo que <strong>una tiene que contribuir a encender a la otra</strong>. Ahí hay causa, y hay orden: A antes que B, y A colaborando. Todo lo que enseña esta etapa cabe en esa diferencia.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 El postulado y el eslogan, uno al lado del otro</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>📕 Lo que Hebb escribió (1949)</h4>
+        <p>«Si A <strong>participa repetidamente en hacer disparar</strong> a B, crece la eficacia de A para disparar a B.» Hay <strong>causalidad</strong> (A contribuye) y hay <strong>orden</strong> (A antes que B). Es una conjetura teórica, y Hebb lo dijo así: no traía experimento debajo.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>📣 Lo que se repite (1992 en adelante)</h4>
+        <p>«Lo que dispara junto se cablea junto.» Suena mejor, rima y se pega. Pero <strong>no es de Hebb</strong>: la formulación se la debemos a Löwel y Singer, en Science, en 1992, y la rima que se hizo famosa a Carla Shatz, ese mismo año. Y borra justo lo que importa: <strong>«junto» no es «una ayudó a la otra»</strong>.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚠️ Por qué la diferencia no es una quisquillosidad</span><br>
+      <span>Si basta con disparar junto, entonces <span class="hl">poner un video de inglés de fondo mientras se hace otra cosa</span> ya cablea, porque el sonido y la tarde ocurren a la vez. Si hace falta que A contribuya a encender a B, entonces lo que cablea es <span class="hl2">producir, fallar y ser corregido</span>, que es exactamente lo contrario de tener algo puesto de fondo.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Los siete momentos de una práctica que sí cablea</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada momento para ver qué es, dónde se cae y cómo se hace en esta casa.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un momento de la práctica.</div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: la tarde de la tabla del siete</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide cómo se practica la tabla que se le atraganta a Angelly.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📖</span><span class="ms-text"><strong>Lo que hay:</strong> Angelly se sabe la tabla del siete cantada, de corrido, y de corrido no se equivoca nunca.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">❓</span><span class="ms-text"><strong>Lo que pasa:</strong> le preguntan siete por ocho suelto y tarda, porque para llegar tiene que cantar desde el principio.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🔗</span><span class="ms-text"><strong>Qué se cableó:</strong> la cadena entera en un solo orden. Cada eslabón ayuda a disparar al siguiente, y a ningún otro.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">⏱️</span><span class="ms-text"><strong>Lo que tienes delante:</strong> veinte minutos de práctica y dos maneras de gastarlos.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">¿Cómo se gastan los veinte minutos?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🔁 Cantarla veinte veces más</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🎯 Preguntar suelto y corregir al instante</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔍 El postulado, desarmado en cuatro piezas</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La frase de Hebb de 1949 no es un eslogan: es un mecanismo con condiciones. Quitarle una condición no la simplifica, la cambia de significado.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué dice Hebb</th><th>Qué pasa si se quita</th></tr>
+      <tr><td>Cercanía</td><td>A está lo bastante cerca para excitar a B</td><td>Se cree que cualquier par de ideas se asocia sola</td></tr>
+      <tr><td>Participación</td><td>A <b>toma parte</b> en hacer disparar a B</td><td>Queda «disparar junto»: basta la coincidencia</td></tr>
+      <tr><td>Repetición</td><td>De forma repetida o persistente</td><td>Se espera cambio con una sola pasada</td></tr>
+      <tr><td>Dirección</td><td>Crece la eficacia <b>de A para disparar a B</b></td><td>Se cree que el refuerzo es mutuo y simétrico</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 Lo que se ve al ponerlas en fila</span><br>
+      <span>La regla premia <span class="hl">una relación con dirección</span>, no una compañía. Por eso la exposición pasiva junta estímulos y la práctica activa <span class="hl2">encadena causa y efecto</span>, que es lo único que la regla recompensa.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>⏱️ Los milisegundos que deciden si se refuerza o se debilita</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Cuarenta y ocho años después, la fisiología le dio la razón al original y le añadió un reloj. Markram y sus colegas lo publicaron en Science en 1997, y Bi y Poo lo midieron célula a célula en 1998, en el Journal of Neuroscience, con neuronas de hipocampo en cultivo.</p>
+    <table class="tres">
+      <tr><th>Orden de los disparos</th><th>Qué le pasa a la conexión</th><th>Nombre</th></tr>
+      <tr><td>A dispara <b>antes</b> que B (unas decenas de milisegundos)</td><td>Se refuerza</td><td>Potenciación</td></tr>
+      <tr><td>A dispara <b>después</b> que B</td><td>Se debilita</td><td>Depresión</td></tr>
+      <tr><td>A y B disparan muy separadas en el tiempo</td><td>Casi no cambia nada</td><td>Fuera de ventana</td></tr>
+      <tr><td>A y B disparan a la vez, sin que A contribuya</td><td>No es el caso que la regla premia</td><td>Coincidencia</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎯 La regla que ordena la tabla</span><br>
+      <span>El nombre técnico es <span class="hl">plasticidad dependiente del orden de disparo</span>. Y su titular cabe en una línea: <span class="hl2">invertir el orden no deja las cosas igual, las deja al revés</span>. Con el eslogan «lo que dispara junto se cablea junto» esta tabla entera es invisible, porque «junto» no distingue antes de después.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🛡️ Práctica que encadena y exposición que solo acompaña</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🎯 Práctica activa</h4>
+        <p>Se <strong>produce</strong> la respuesta (se dice, se escribe, se toca, se resuelve), aparece el <strong>resultado</strong> y llega la <strong>corrección enseguida</strong>. Hay dirección y hay orden: el intento contribuye a lo que viene detrás.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>📺 Exposición pasiva</h4>
+        <p>El material <strong>pasa por delante</strong>: video de fondo, audio en el bus, subrayar mientras se lee. Los estímulos coinciden en el tiempo, y nada más. Se siente productivo, y por eso se vende tan bien.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Año del postulado</div><div class="stat-val">1949</div></div>
+      <div class="stat-item"><div class="stat-label">Año del eslogan</div><div class="stat-val">1992</div></div>
+      <div class="stat-item"><div class="stat-label">Piezas del postulado</div><div class="stat-val">4</div></div>
+      <div class="stat-item"><div class="stat-label">Momentos de la práctica</div><div class="stat-val">7</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📝 El vocabulario que esta etapa deja puesto</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Seis palabras que se usan en las cinco etapas siguientes de la ruta. Aquí se ganan; después solo se aplican.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">📕 Postulado de Hebb</div><div class="t-info">A participa en disparar a B</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">📣 El eslogan</div><div class="t-info">Löwel y Singer, 1992</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">⏱️ Orden de disparo</div><div class="t-info">Antes refuerza, después debilita</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🧱 Asamblea de células</div><div class="t-info">El grupo que se enciende junto</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🎯 Práctica activa</div><div class="t-info">Producir, fallar, corregir</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">📐 Especificidad</div><div class="t-info">Se gana lo practicado, no más</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Lo práctico que sale de aquí: <strong>ninguna práctica de esta casa se da por buena si no produce y no corrige</strong>. Repetir sin producir es tener el material puesto de fondo; producir sin corregir es cablear el error con el mismo cuidado que el acierto.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 El tablero de la regla</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para no volver a confundir el postulado con el eslogan.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El postulado de 1949</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🏺 Pieza:</span>
+        <button class="lab-btn lab-cont-btn" data-parte="postulado" onclick="labShowParte('postulado')">📕 El postulado</button>
+        <button class="lab-btn lab-cont-btn" data-parte="orden" onclick="labShowParte('orden')">⏱️ El orden de disparo</button>
+        <button class="lab-btn lab-cont-btn" data-parte="eslogan" onclick="labShowParte('eslogan')">📣 El eslogan</button>
+        <button class="lab-btn lab-cont-btn" data-parte="practica" onclick="labShowParte('practica')">🎯 La práctica activa</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado cae?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: la práctica que sí cablea, de principio a fin</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la regla de Hebb se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué está haciendo esa frase?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es esa frase dentro de la regla bien contada:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Lo que dispara junto se cablea junto»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla esa práctica?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
+    <div class="neuro-trans-display" id="enferDisease">Angelly oye el audio de inglés mientras ordena su cuarto y no aprende nada</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <button class="btn btn-pri" onclick="">📕 Hebb</button>
+        <button class="btn btn-sec" onclick="">📣 Eslogan</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🏺 La práctica sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · La regla de Hebb, bien contada · Ruta del Barro Vivo</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: la regla de Hebb, bien contada</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · La práctica sobre la mesa · La regla de Hebb</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🏺 La práctica sobre la mesa: qué se produce, qué se corrige y en qué orden</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una práctica de la casa o del proyecto. Di qué se produce y qué solo se recibe, si hay corrección y cuándo llega, en qué orden quedan el intento y su resultado, y qué se rediseña para que la regla de Hebb trabaje a favor (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🏺</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🏺 Casos del proyecto: la regla de Hebb en esta casa</h2>
+    <p>Ocho situaciones de esta familia y de M.E.T.A.S. En todas hay una práctica, y en todas la pregunta es la misma: <strong>¿algo produce y algo corrige, y en qué orden?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también aquí:</strong> ningún estudio entra sin su etiqueta. Hebb (1949) es un <strong>clásico sólido</strong> aunque su postulado fuera una conjetura teórica; Markram (1997) y Bi y Poo (1998) son <strong>sólidos</strong> en preparación de laboratorio; y «lo que dispara junto se cablea junto» es <strong>divulgación con inflado</strong>, empezando por su atribución. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📺 Caso 1: el video de inglés de fondo</h2>
+    <p>Angelly pone videos de inglés mientras ordena su cuarto. Son dos horas al día durante un mes: sesenta horas de exposición. Al mes siguiente sigue sin poder pedir un vaso de agua en inglés, y concluye que no tiene oído.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">⚠️ Qué se cableó de verdad</span><br>
+      <span>Sesenta horas de <span class="hl">coincidencia</span>: el sonido del inglés y el ruido de acomodar cosas ocurrieron a la vez, sin que uno contribuyera a disparar al otro. Eso es exactamente el «junto» del eslogan, y el postulado de Hebb <span class="hl2">no premia el «junto»: premia la participación</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la exposición pasiva no es una versión floja de la práctica: es otra cosa. Para que esas horas cuenten hace falta que Angelly <strong>produzca</strong> (repetir en voz alta, contestar, escribir) y que alguien o algo le diga enseguida si salió bien. Diez minutos así valen más que dos horas de fondo, y no es una frase de autoayuda: es la única de las dos que cumple la condición del postulado.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>💸 Caso 2: la app que vende el eslogan</h2>
+    <p>Una aplicación de «entrenamiento cerebral» ofrece suscripción familiar por <strong>L 250 al mes</strong>, es decir L 3,000 al año. En su publicidad aparece, con letras grandes, «lo que dispara junto se cablea junto», atribuido a Donald Hebb.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">💰 La oferta, leída con esta etapa</span><br>
+      <span>Qué mete: juegos vistosos y una <span class="hl">frase con bata de científico</span>. Qué saca: L 3,000 al año y horas de práctica en tareas que nadie usa fuera de la aplicación. Y la cita está mal desde el nombre: <span class="hl2">esa frase no es de Hebb</span>, y lo que Hebb sí escribió no promete nada parecido.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la pregunta que decide es doble. Primero, <strong>¿la frase que citan es de quien dicen?</strong> Segundo, y más importante, <strong>¿el juego mejora la vida o mejora el juego?</strong> La cláusula de especificidad de esta materia contesta sola: se gana lo practicado. La condición con que sí se pagaría: nunca para «entrenar el cerebro»; ese mismo dinero sí se paga por practicar la tarea real (mecanografía, inglés, ajedrez), porque el cambio es específico de lo que se practica.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📬 Caso 3: la corrección que llega el lunes</h2>
+    <p>Una maestra que usa M.E.T.A.S recoge las tareas el viernes y las devuelve corregidas el lunes siguiente. Los alumnos miran la nota, guardan la hoja, y repiten el mismo error a la semana siguiente.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⏱️ El orden roto</span><br>
+      <span>La regla premia el orden y la cercanía: el intento y su consecuencia tienen que <span class="hl">encadenarse</span>. Ocho días después, el alumno ya no tiene delante lo que hizo ni por qué lo hizo, así que la corrección <span class="hl2">no se engancha con nada</span>: llega sola, como un dato suelto.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> no hace falta corregir más, hace falta corregir antes. Cinco preguntas contestadas y comprobadas en el momento enseñan más que veinte devueltas el lunes. Por eso las misiones de M.E.T.A.S dicen si acertaste en el mismo toque, y por eso el cuestionario está dentro de la misión y no al final del trimestre.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🔢 Caso 4: la tabla del siete, cantada</h2>
+    <p>Jael se sabe la tabla del siete de corrido y no falla ni una. Le preguntan siete por ocho suelto, en la fila del mercado, y tarda cinco segundos porque tiene que cantar desde siete por uno.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🔗 Una cadena en un solo sentido</span><br>
+      <span>Cantar la tabla cablea justo lo que se practicó: <span class="hl">cada eslabón ayudando a disparar al siguiente</span>, y a ningún otro. La conexión «siete por ocho» hacia «cincuenta y seis» apenas existe, porque nunca se practicó sola. No es que Jael no sepa: es que <span class="hl2">lo que sabe tiene una sola puerta de entrada</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la práctica se parece a lo que se va a pedir, o no sirve para eso. Si en la vida las preguntas llegan sueltas y en desorden, así hay que practicarlas: pares al azar, respuesta producida, corrección inmediata. Es el mismo motivo por el que las flashcards de F.A.R.O se barajan.</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>⌨️ Caso 5: los dos dedos del papá</h2>
+    <p>El autor lleva más de veinte años escribiendo a computadora, muchas horas al día, con dos dedos y mirando el teclado. Escribe rápido para lo que hace, y no ha mejorado nada en la última década.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🔁 Repetir no es lo mismo que practicar</span><br>
+      <span>Veinte años son repetición de sobra, y el postulado se cumplió al pie de la letra: lo que se repitió <span class="hl">se cableó firmísimo</span>. Lo que no hubo nunca fue un intento distinto con su corrección detrás, así que lo que quedó reforzado fue <span class="hl2">exactamente el método viejo</span>, error incluido.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la regla no distingue entre lo bueno y lo malo: refuerza lo que se practica. Por eso practicar sin corrección es la forma más segura de volverse muy bueno en algo que se hace mal. Y por eso mejorar duele: hay que ir más lento que la costumbre para que quepa la corrección.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📣 Caso 6: el lema para la guía de maestro</h2>
+    <p>Alguien propone poner «lo que dispara junto se cablea junto» como lema en la portada de las guías de maestro de M.E.T.A.S: es corto, suena a ciencia y todo el mundo lo reconoce.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">⚖️ Qué mete y qué saca</span><br>
+      <span>Qué mete: <span class="hl">autoridad prestada y una frase que se pega</span>. Qué saca: la atribución falsa (no es de Hebb, es de Löwel y Singer, en Science, en 1992, con la rima de Carla Shatz), y peor: le enseña al maestro que <span class="hl2">basta con poner las cosas juntas</span>, que es lo contrario de lo que la evidencia sostiene.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la pregunta que decide es qué hará el maestro el lunes con esa frase en la cabeza. Con el eslogan, poner el mapa al lado del texto y dar por hecho que se asocian. Con el postulado, hacer que el alumno produzca y corregirlo enseguida. La condición con que sí se usa el eslogan: solo citado como ejemplo de cita mal atribuida, que es el uso honesto que le queda.</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎮 Caso 7: dónde va el cuestionario de la misión</h2>
+    <p>En M.E.T.A.S se discute si el cuestionario de cada misión debe ir todo al final, como examen, o repartido: unas preguntas al abrir y otras después de cada bloque.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🧪 La discusión, con la regla delante</span><br>
+      <span>Un examen al final mide. Preguntas repartidas <span class="hl">enseñan mientras miden</span>, porque cada respuesta producida trae su corrección pegada detrás, en el orden que la regla premia. Sesenta misiones multiplican esa diferencia por sesenta, y por eso no es un detalle de maquetación: <span class="hl2">es una decisión de diseño con efecto acumulado</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> las decisiones de producto de esta casa se pueden defender con evidencia y no con gusto. La condición con que sí se rediseña: que las preguntas repartidas no alarguen la misión más de diez minutos, porque una misión que no se termina no enseña nada.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🏫 Caso 8: la academia de inglés de L 1,200</h2>
+    <p>Una academia ofrece clases de inglés para las dos niñas por <strong>L 1,200 al mes</strong>. Alguien de la familia extendida dice que es tirar el dinero. La familia decide mirarla con la regla en la mano antes de opinar.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔎 La visita de observación</span><br>
+      <span>No se pregunta por el método ni por los años de la academia: se va a mirar una clase y se cuenta <span class="hl">cuántos minutos habla cada alumno y cuántas veces lo corrigen</span>. Si la hora es de copiar listas y escuchar, se está pagando exposición. Si la hora es de producir y ser corregido, se está pagando <span class="hl2">exactamente lo que la regla premia</span>.</span>
+    </div>
+    <p><strong>Lo que enseña:</strong> la pregunta que decide no es cuánto cuesta, sino cuántas veces el alumno produce y recibe corrección por hora pagada. La condición con que sí se paga: que hablen, escriban y sean corregidos en el momento. Si solo hacen copiar, el protocolo de la casa con material gratuito rinde más por L 0, y ese es el dato que cierra la discusión familiar sin pelea.</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La hoja de la práctica, y las cinco reglas de la etapa</h2>
+    <p>Ante cualquier práctica de esta casa (estudio, oficio, instrumento o idioma), se contesta por escrito antes de darla por buena:</p>
+    <ol style="font-size:0.95rem;line-height:1.75;padding-left:1.2rem;">
+      <li><strong>Qué produce el que practica:</strong> qué dice, escribe, toca o resuelve por su cuenta.</li>
+      <li><strong>Qué solo recibe:</strong> qué le pasa por delante sin que tenga que producir nada.</li>
+      <li><strong>Quién corrige y cuándo:</strong> en el mismo minuto, al final de la sesión, o el lunes siguiente.</li>
+      <li><strong>En qué orden quedan intento y resultado:</strong> el intento primero y su consecuencia pegada detrás, o al revés.</li>
+      <li><strong>Qué se cableará si esto se repite un mes:</strong> el acierto, el error, o solamente la costumbre de estar presente.</li>
+    </ol>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🏺 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">No es «junto»: es que una ayude a disparar a la otra</span>. 2. El orden manda: <span class="hl">antes refuerza, después debilita</span>. 3. La regla no distingue acierto de error: <span class="hl">refuerza lo que se repite</span>. 4. La corrección vale por su <span class="hl">cercanía en el tiempo</span>, no por su severidad. 5. Y <span class="hl2">se gana lo practicado y nada más</span>, que es la cláusula con la que caen todos los mitos de esta materia.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «Quince años mirando el torno»</h2>
+    <p>Guion listo para grabar (6 a 8 minutos), con la historia al frente y el concepto escondido adentro. Cada escena trae su <strong>voz</strong> (lo que se dice), su <strong>imagen</strong> (lo que se ve) y su <strong>texto en pantalla</strong>.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>Regla del guion (norma de la casa):</strong> toda misión lleva su guion de video con historia: un gancho en frío que duela o intrigue, un personaje que quiere algo, un giro que desmonta lo que el público creía, y un cierre que aterriza el concepto en la vida de quien mira. Nada de definiciones antes del minuto dos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «Wílmer vio a su abuelo hacer ollas de barro todos los días durante quince años. El día que puso las manos en el torno no le salió ni una. Y a los tres meses hacía doce diarias. Lo que cambió no fue el barro.»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; después unas manos viejas cerrándose sobre un montón de barro que gira, y al lado unas manos jóvenes cubiertas de barro y quietas.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Quince años mirando. Cero ollas.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quiere (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «Don Anselmo tiene un taller de alfarería en Ojojona, de esos donde el horno se enciende de madrugada. Wílmer es su nieto, y creció ahí: hacía los mandados, barría el polvo de barro seco, y sobre todo miraba. Miraba al abuelo centrar, abrir, subir la pared, cortar el pie. Se sabía los pasos de memoria, en orden, y hasta los decía en voz alta mientras el viejo trabajaba. Cuando cumplió veinte años, don Anselmo le dijo que se sentara al torno. Wílmer se sentó con toda la confianza del mundo, porque había visto aquello miles de veces. El barro se le fue de lado a los diez segundos. Lo intentó ocho veces esa mañana y las ocho terminaron igual: un montón torcido, girando solo. Se levantó furioso y dijo la frase que dice todo el mundo: que él no había nacido para esto.»</p>
+    <p><strong>IMAGEN:</strong> el taller con el horno humeando; el niño barriendo y mirando; el mismo, ya grande, sentándose al torno con una sonrisa; ocho montones de barro torcido en fila sobre una tabla.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Se sabía los pasos. No le salió ninguno.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Antes de compadecer a Wílmer, una prueba, y contestala en voz baja. Pensá en algo que hayas visto hacer un montón de veces: manejar, cocinar un plato de la casa, hablar otro idioma, tocar una canción. ¿Ya lo tenés? Ahora la pregunta: ¿cuántas veces lo has hecho vos, con las manos, hasta que salió mal y alguien te dijo por qué? Y la segunda, que es peor: ¿cuántas horas has pasado con un video puesto, un audio en el bus, un tutorial de fondo, sintiendo que estabas aprendiendo? Sumá las dos y mirá cuál es más grande. Si la segunda le gana a la primera, estás exactamente donde estaba Wílmer, y no es culpa tuya: es que nos contaron mal cómo se aprende.»</p>
+    <p><strong>IMAGEN:</strong> una pantalla de teléfono reproduciendo un tutorial encima de una mesa de cocina; al lado, una sartén fría; después, unas manos de espectador que no se mueven.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Horas mirando o veces intentando?»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Aquí está el giro, y tiene dos partes. La primera: mirar sí cablea. Wílmer se volvió buenísimo en algo. Se volvió buenísimo en reconocer una olla bien centrada, y eso no es poco. Lo que no practicó ni una sola vez fue mover las manos, así que eso no se cableó. La segunda parte es la frase que casi todo el mundo repite mal. Habrás oído que las neuronas que disparan juntas se cablean juntas. Esa frase no es de quien creés. Quien escribió el postulado de verdad fue un psicólogo canadiense, Donald Hebb, en un libro de 1949, y lo que dijo fue bastante más exigente: que si una célula A participa repetidamente en hacer disparar a otra célula B, entonces crece la eficacia de A para disparar a B. Fijate en lo que ahí no se dice: no dice que basta con estar activas a la vez. Dice que una tiene que ayudar a encender a la otra. Hay causa, y hay orden. La rima famosa la escribieron dos investigadores, Löwel y Singer, en 1992, y la popularizó Carla Shatz ese mismo año, y le borró justo eso. Wílmer y su abuelo dispararon juntos quince años, sentados en el mismo cuarto. Nunca hubo una vez en que la mano de Wílmer ayudara a levantar una pared de barro.»</p>
+    <p><strong>IMAGEN:</strong> el ojo del muchacho siguiendo el torno, con una línea que se ilumina; sus manos quietas, sin línea; después la portada de un libro viejo y dos flechas: una de A hacia B, marcada, y dos círculos sueltos que solo brillan a la vez.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «No es 'junto': es 'una ayudó a la otra'.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:30)</h2>
+    <p><strong>VOZ:</strong> «Y ahora la parte que sirve para cualquier cosa que quieras aprender. La regla tiene cuatro piezas y las cuatro hacen falta: que estén cerca, que una participe en encender a la otra, que se repita, y que el refuerzo tenga dirección, de A hacia B. Cuarenta y ocho años después de Hebb, la fisiología le puso un reloj a eso. Markram y sus colegas lo publicaron en Science en 1997, y Bi y Poo lo midieron célula a célula en 1998: si A dispara unas decenas de milisegundos antes que B, la conexión se refuerza; si dispara después, la misma conexión se debilita. El mismo par de células, el mismo número de repeticiones, y el resultado contrario según el orden. Traducido a la vida: intentá primero y averiguá enseguida si salió. Ese es el orden que la regla premia. Don Anselmo lo hacía sin saber una palabra de esto: le ponía las manos encima a las de Wílmer, lo dejaba equivocarse, y le corregía el pulgar en el mismo segundo, no al final del día.»</p>
+    <p><strong>IMAGEN:</strong> dos círculos con una flecha entre ellos, y un cronómetro al lado; la flecha se invierte y la conexión se apaga; después las manos del abuelo encima de las del nieto, corrigiendo un pulgar.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Producir · Fallar · Corregir enseguida»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:30 a 6:20)</h2>
+    <p><strong>VOZ:</strong> «“Muy bonito, pero yo no tengo un abuelo alfarero detrás para corregirme.” La objeción es justa y hay que concederla: casi nadie lo tiene. Pero mirá lo que sí tenés. La corrección no necesita ser una persona: necesita ser rápida. Una respuesta tapada con el dedo es corrección. Grabarte hablando y volver a oírlo es corrección. Un ejercicio con su solución al lado, que se mira después de intentarlo y no antes, es corrección. En 1993, Ericsson y sus colegas describieron esto con nombre propio, la práctica deliberada, y una de sus dos patas es exactamente esa: retroalimentación inmediata. La otra es trabajar al borde de lo que uno puede. Ninguna de las dos cuesta dinero. Lo caro es lo otro: sesenta horas de video de fondo que no cablean nada.»</p>
+    <p><strong>IMAGEN:</strong> una hoja de ejercicios doblada por la mitad, con las respuestas escondidas en el pliegue; un teléfono grabando a alguien que habla; una balanza donde el pliegue pesa más que una pila de tutoriales.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «La corrección no cuesta: solo tiene que llegar rápido.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:20 a 7:10)</h2>
+    <p><strong>VOZ:</strong> «Don Anselmo murió y el taller de Ojojona lo lleva Wílmer. Dice que lo único que le enseñó el abuelo fue a equivocarse rápido y muchas veces seguidas. Esta semana te toca a vos, y es una sola tarea. Elegí una cosa que estés “aprendiendo” mirando, la que sea, y cambiala por veinte minutos donde vos producís: decilo, escribilo, tocalo, resolvelo, y comprobá enseguida si salió. Anotá cuántos intentos hiciste y cuántos corregiste. Con eso ya sabés más de tu propio aprendizaje que con todos los cursos que has mirado, y ya podés contar bien la frase que todo el mundo cuenta mal: no es lo que dispara junto, es lo que ayuda a disparar. Y el barro se vuelve exactamente aquello que las manos le hacen repetir.»</p>
+    <p><strong>IMAGEN:</strong> el taller al amanecer con el horno encendido y doce ollas en fila; unas manos jóvenes, ya seguras, cerrándose sobre el barro; un cuaderno con dos columnas: intentos y correcciones.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Intentos · Correcciones · Misión: La regla de Hebb, bien contada · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué hace</th><th>Dónde vive aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>Quince años mirando y cero ollas; tres meses tocando y doce diarias</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>Wílmer, que solo quiere sentarse al torno de su abuelo y hacer una olla</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>Las horas de tutorial de fondo contra las veces que uno lo intentó de verdad</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>Mirar sí cablea, pero cablea mirar; y la frase famosa no es de Hebb</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>Las cuatro piezas del postulado y el reloj del orden de disparo</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«No tengo quien me corrija»: la hoja doblada, la grabación, la práctica deliberada</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>Veinte minutos produciendo, y las dos columnas de intentos y correcciones</td></tr>
+    </table>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Cinco lecturas: la misma regla, cinco voces</h2>
+    <p>El tema de la etapa contado cinco veces: un cuento de un metrónomo heredado, un capítulo de herrería y refranes, un ensayo a escala de especie, una entrevista imaginada con el hombre que escribió el postulado, y una conversación de madrugada entre Jesús Quintero y Antonio Gala sobre la costumbre. Cinco maneras de que la idea entre por donde el examen no llega.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> estos cinco textos son <strong>ejercicios de estilo escritos por esta casa</strong>: los tres primeros en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari, y los dos últimos son <strong>entrevistas imaginadas</strong>, a la manera de Joaquín Soler Serrano la una y del programa de Jesús Quintero la otra. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado. Los encuentros de las dos entrevistas <strong>nunca ocurrieron</strong>: las personas son reales, sus obras y fechas son reales, y lo inventado es la conversación que la casa les presta. Y rige la regla extra de siempre: <strong>toda obra, fecha, cifra y persona que aparece dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre: una hoja suelta con un pastiche sin declarar sería justo la cita mal atribuida que esta misión enseña a cazar.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir la entrevista</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir la conversación</button>
+      <button class="btn btn-pri" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las cinco</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🌀 Lectura 1 · «El metrónomo de don Aciar» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas inventadas. Todos los libros, estudios, fechas y personas que este cuento menciona son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">Nadie se acuerda hoy de don Aciar, que enseñó guitarra durante cuarenta años en un pueblo del sur que prefiero no nombrar, y que tuvo la desdicha de ser considerado un maestro lento. Los padres lo decían con esa piedad que humilla más que el desprecio: que don Aciar era muy bueno, sí, pero que iba despacio. Sus alumnos tardaban en tocar una pieza entera lo que otros tardaban en tocar tres. Lo curioso, y es lo único que justifica este recuerdo, es que a los diez años ninguno de los alumnos de los otros maestros tocaba, y casi todos los de don Aciar seguían tocando.</p>
+    <p class="lect-p">Yo fui alumno suyo un año y medio, con esa vanidad tenaz de los adolescentes que creen que el talento es una forma de la impaciencia. Su método me pareció entonces una manía de viejo y hoy me parece una teoría. Don Aciar no dejaba repetir. Esa es la frase que hay que entender, porque suena absurda en boca de un profesor de instrumento, y era literal: prohibía repetir un pasaje si no se sabía, antes de empezarlo, qué iba a salir mal, y no dejaba pasar al compás siguiente si el error no se había nombrado en voz alta en el mismo instante en que ocurría.</p>
+    <p class="lect-p">Tenía sobre el atril un metrónomo alemán de cuerda, con la pirámide de madera oscura y la aguja de latón, y no lo usaba para marcar el tiempo, o no solamente. Lo ponía muy lento y decía una cosa que a mí me irritaba: que había que ir tan despacio que la corrección alcanzara a llegar. La imagen era suya y era buena. Un error, decía, es un caballo que sale al galope; si uno lo alcanza en el primer tranco, lo devuelve al corral; si lo alcanza a la vuelta del pueblo, ya no es un caballo, es una costumbre.</p>
+    <p class="lect-p">Los otros maestros mandaban repetir cien veces. Don Aciar preguntaba, con una malignidad tranquila, cien veces qué. Sostenía que la repetición no es un mérito sino un multiplicador, y que multiplica lo que encuentra: si encuentra el pulgar torcido, multiplica el pulgar torcido con la misma diligencia con que multiplicaría el acierto. A un condiscípulo mío, que tocaba muy rápido y muy mal, le dijo delante de todos que había practicado su error con una constancia admirable, y que tardaría el doble en aprender que quien no sabía nada. Cuarenta años después he verificado esa profecía en mí mismo y en otros oficios menos armoniosos que la guitarra.</p>
+    <p class="lect-p">Había además una regla que a mí me parecía supersticiosa y que era, ahora lo sé, la más exacta de todas. Don Aciar no permitía oír el disco antes de intentar el pasaje. Primero las manos, después el modelo. Al que llegaba diciendo que había escuchado la grabación veinte veces le contestaba que entonces sabía escuchar veinte veces esa pieza, que era una destreza respetable y que no se examinaba en su clase. La sospecha de que oír no era tocar no me pareció profunda hasta que descubrí que el orden importaba: intentar y después comprobar no era lo mismo que comprobar y después intentar, aunque las dos cosas ocurrieran en la misma tarde y con la misma pieza.</p>
+    <p class="lect-p">Debo a la casualidad y a un catálogo de biblioteca el haber encontrado, muchos años más tarde, la explicación de aquella pedagogía en un lugar que don Aciar no visitó nunca. En 1949, un psicólogo canadiense llamado Donald Hebb publicó «The Organization of Behavior», y en el capítulo cuarto dejó escrito lo que él mismo llamó, con una modestia que ya no se estila, un postulado neurofisiológico: cuando el axón de una célula A está lo bastante cerca de una célula B para excitarla, y participa de manera repetida o persistente en hacerla disparar, crece la eficacia de A para disparar a B. Leí la frase de pie, entre dos estantes, y me pareció que estaba oyendo al viejo. No dice que dos células activas a la vez se asocien. Dice que una tiene que ayudar a encender a la otra. Hay una causa, y hay un antes y un después.</p>
+    <p class="lect-p">La posteridad, que es perezosa y necesita rimas, resumió aquello en una fórmula que todo el mundo repite: lo que dispara junto se cablea junto. La fórmula no es de Hebb. La escribieron Siegrid Löwel y Wolf Singer en un artículo de Science de 1992, y ese mismo año Carla Shatz le dio la versión rimada que corrió por el mundo. Es una simplificación brillante y es, exactamente, la simplificación que suprime el punto: la palabra «junto» no distingue el antes del después, y todo el asunto estaba en esa distinción. Hay una ironía que a don Aciar le habría gustado: la frase que se pegó a la memoria de la especie es la que borra la condición para pegarse a la memoria.</p>
+    <p class="lect-p">Los laboratorios, que llegan tarde y con instrumentos, le dieron la razón al original. Henry Markram y sus colegas lo publicaron en Science en 1997, y Guo-qiang Bi y Mu-ming Poo lo midieron célula a célula en 1998, en el Journal of Neuroscience, con neuronas de hipocampo cultivadas en un vidrio: si A dispara unas decenas de milisegundos antes que B, la conexión se refuerza; si dispara después, la misma conexión se debilita. Las mismas dos células, el mismo número de repeticiones, y el resultado contrario según cuál llegó primero. Confieso que la simetría me conmovió más de lo que conviene a un lector prudente: en el fondo de la materia hay un tiempo, y en ese tiempo hay un orden, y el orden invertido no deja las cosas iguales sino al revés.</p>
+    <p class="lect-p">De Hebb averigüé después un detalle doméstico que lo hace más creíble que sus fórmulas. En 1947 publicó que unas ratas de laboratorio que se había llevado a su casa, para que sus hijas las tuvieran de mascotas, resolvían después los problemas mejor que las que se habían quedado en las jaulas. El hombre que iba a explicar cómo se organiza la conducta empezó dejando que unos animales anduvieran sueltos por una sala con niñas. También eso lo entendía don Aciar, que nunca leyó una página de psicología y que me dejó, cuando murió, el metrónomo alemán con una nota de tres palabras: «despacio, para corregir». Lo tengo sobre una repisa y no le doy cuerda, porque el mecanismo está gastado y porque no me hace falta: cada vez que me sorprendo repitiendo algo con entusiasmo y sin mirar, oigo la aguja de latón preguntándome, con la voz cansada del viejo, cien veces qué.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>🐎 Lectura 2 · «Donde se cuenta lo que sucedió en la fragua a un mozo que quería aprender el oficio en tres días, y de la doctrina que le dio un herrero viejo sobre el orden con que se aprende» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, el humor y la reflexión cervantinos. Las anclas son reales: la venta y el camino como escenarios de la primera parte del Quijote (1605), y el molde del bachiller que vuelve de Salamanca, a la manera de Sansón Carrasco, el de la segunda parte (1615). Los refranes son del acervo popular, como los de Sancho.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">Donde se cuenta lo que sucedió en la fragua de un lugar del camino a un mozo que quería sacar el oficio de herrero en tres días, y de la doctrina que le dio un maestro viejo sobre el orden con que se aprende, con otras razones de mucho gusto y provecho para quien enseña.</p>
+    <p class="lect-p">Habíase acogido a una venta, huyendo de un aguacero, un mozo de hasta veinte años, hijo de un labrador acomodado, el cual traía por toda hacienda un caballo prestado y un propósito muy firme: aprender el oficio de herrero en tres días, que ni uno más le daba su padre de licencia. Estaba junto a la venta la fragua de un maestro anciano llamado Cebrián, y allí se fue el mozo en escampando, y díjole con mucha crianza que él era hombre de buen entendimiento y que en tres días lo sacaría, porque llevaba dos años viendo herrar en su pueblo, y que quien mucho ve, mucho sabe.</p>
+    <p class="lect-p">Miróle el viejo de arriba abajo, y sin dejar el fuelle le respondió: «Mirad, hijo, que ver herrar y herrar son dos oficios distintos, y el uno no paga el jornal del otro; que también yo he visto llover cuarenta años y no por eso hago llover.» Rieron los que estaban, y el mozo, picado, tomó el martillo y dio sobre el hierro caliente treinta golpes seguidos, muy sonoros y muy alegres, y a la trigésima el hierro quedó torcido como cuerno de cabra, y los que estaban rieron otra vez, que en las fraguas y en las ventas la risa es de balde.</p>
+    <p class="lect-p">Quiso el mozo enmendarlo dando otros treinta, con más brío, y peor le fue, y el viejo entonces le quitó el martillo de la mano, no con enojo sino con lástima, y le dijo estas razones, que el mozo escribió después y por eso las tenemos: «Habéis dado sesenta golpes y habéis aprendido sesenta veces a torcer el hierro, que no es poco saber, aunque no sea el que buscabais. Que la mano no aprende del número de los golpes, sino de lo que ve entre golpe y golpe; y si no mirasteis lo que hizo el primero, el segundo va tan a ciegas como él, y el tercero peor, que ya lleva dos maestros malos.»</p>
+    <p class="lect-p">«Pues ¿cómo se ha de hacer, señor maestro?», dijo el mozo, ya sin humos; y respondió Cebrián: «Un golpe, y mirar. Y decir en voz alta lo que salió, que la lengua despierta al ojo. Y el golpe siguiente ha de nacer de lo que dijo el ojo, y no de la gana que tenéis de acabar. Que del dicho al hecho hay gran trecho, y del hecho al hecho bien mirado, otro tanto. Y no me repitáis nunca lo que no habéis mirado, que machacando se aprende el oficio, sí, pero se aprende el que se machaca, y hay quien a fuerza de machacar ha llegado a maestro consumado de sus propios yerros.»</p>
+    <p class="lect-p">Replicó el mozo que él tenía prisa, y que su padre le daba tres días; y el viejo, atizando la lumbre: «No se ganó Zamora en una hora, hijo, ni se ganó mirando cómo la ganaban otros. Vuestro padre os da tres días para el oficio; yo os doy tres días para una sola cosa, que es aprender a mirar entre golpe y golpe, y con esa sola cosa sacaréis el oficio en tres meses. Y si no la aprendéis, en tres años estaréis donde hoy, pero con el brazo más grueso y el hierro más torcido; que quien mucho abarca poco aprieta, y obras son amores, que no buenas razones.»</p>
+    <p class="lect-p">Estuvo el mozo aquella tarde dando un golpe y callando, y otro y callando, y al principio le pareció aquello cosa de tullidos, y a la caída del sol vio que de doce golpes le habían salido cuatro derechos, que en la mañana no le había salido ninguno de sesenta. Y como los mozos son agradecidos cuando les sale bien, quiso pagarle al viejo la doctrina, y el viejo no tomó dinero, sino que le hizo escribir con carbón en la pared de la fragua, para los que viniesen: <em>Aquí no se repite lo que no se ha mirado; que el hierro no sabe de intenciones, y aprende igual el yerro que el acierto, y con la misma paciencia.</em></p>
+    <p class="lect-p">Y dicen los del lugar que el mozo volvió al año siguiente hecho oficial, y que trajo a su padre para que viese la pared, y que el padre leyó despacio y dijo que aquello no era doctrina de herreros sino de todo el mundo, y que ojalá se la hubieran escrito a él a los veinte años; a lo que Cebrián, sin levantar la vista del yunque, respondió que a los veinte nadie la lee, y que por eso la escribió en la pared y no en un papel, que el papel se pierde y la pared espera. Y con esto se acaba el capítulo, y quien quisiere sacar la moraleja, dele un solo golpe y mire lo que le sale, antes de dar el segundo.</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌍 Lectura 3 · «La especie que se cablea a sí misma» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie, la frase corta y el aterrizaje en el presente. Todos los estudios, años y cifras citados son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Somos la única especie que dedica veinte años a prepararse para vivir. Un potro camina el día que nace. Un ternero pasta a la semana. Un niño necesita dos décadas para hacer lo que hacen los adultos de su tribu, y la evolución pagó ese precio enorme a cambio de una sola ventaja: un cerebro que se termina de fabricar por fuera, con lo que le pasa. La pregunta interesante no es si el cerebro cambia. Cambia. La pregunta es qué exactamente le hace cambiar, porque de esa respuesta depende cómo criamos a nuestros hijos y en qué gastamos nuestras tardes.</p>
+    <p class="lect-p">Durante casi toda la historia la respuesta fue una sola palabra: aprendiz. En Mesopotamia, hace más de cinco mil años, la escritura cuneiforme se enseñaba copiando tablillas y recibiendo la corrección del escriba mayor en el mismo barro húmedo. En los gremios medievales de Europa, un muchacho pasaba años haciendo piezas malas junto a un maestro que las rompía delante de él. En Ojojona, en Honduras, un nieto se sienta al torno del abuelo. Ninguna de esas culturas conocía una sola neurona. Todas habían descubierto por prueba y error lo mismo: que hacer y ser corregido enseña, y que mirar, por sí solo, no.</p>
+    <p class="lect-p">La razón física de eso se escribió en 1949, en Montreal. Donald Hebb, psicólogo canadiense de la Universidad McGill, publicó «The Organization of Behavior» y propuso en su capítulo cuarto una conjetura sobre cómo aprende la materia: si una célula A participa de forma repetida en hacer disparar a otra célula B, aumenta la eficacia de A para disparar a B. Léalo despacio, porque la frase es más exigente de lo que parece. No dice que dos células activas al mismo tiempo se junten. Dice que una debe contribuir a encender a la otra. Exige causa. Exige dirección. Exige, sobre todo, un antes y un después.</p>
+    <p class="lect-p">La humanidad, que memoriza rimas mucho mejor que matices, se quedó con otra versión. «Lo que dispara junto se cablea junto» es hoy la frase más citada de la neurociencia popular, aparece en anuncios de aplicaciones y en cursos de mil dólares, y no es de Hebb. La formulación es de Siegrid Löwel y Wolf Singer, en Science, en 1992; la rima que se hizo famosa es de Carla Shatz, ese mismo año. Es una simplificación excelente para recordar y pésima para decidir, porque la palabra «junto» borra precisamente la parte que sirve.</p>
+    <p class="lect-p">Sabemos que borra algo importante porque la parte borrada se puede medir. Henry Markram y sus colegas lo publicaron en Science en 1997, y Guo-qiang Bi y Mu-ming Poo lo cuantificaron en 1998, en el Journal of Neuroscience, con neuronas de hipocampo en cultivo: cuando A dispara unas decenas de milisegundos antes que B, la conexión se refuerza; cuando dispara después, la misma conexión se debilita. Las mismas células, el mismo número de repeticiones, resultados opuestos según el orden. En el fondo de nuestra biología hay un cronómetro, y ese cronómetro decide si lo que hicimos hoy nos hace más capaces o menos. Conviene decir también lo que todavía se discute: esto está medido con enorme solidez en rodajas de tejido y en cultivos, y su peso exacto en un animal despierto, aprendiendo cosas de la vida real, sigue siendo materia de debate.</p>
+    <p class="lect-p">La idea de Hebb salió de la biología y fundó una industria. Cuando Frank Rosenblatt construyó el perceptrón en 1958, y cuando Rumelhart, Hinton y Williams publicaron en Nature, en 1986, el algoritmo que hizo posible entrenar redes profundas, estaban haciendo lo mismo que hace un aprendiz de herrero: producir una respuesta, comparar con el resultado deseado y ajustar la fuerza de las conexiones según el error. Los sistemas que hoy nos escriben correos aprenden con una regla nieta de la de 1949. Ninguno de ellos aprende mirando. Todos aprenden fallando y siendo corregidos, millones de veces por minuto.</p>
+    <p class="lect-p">Los humanos también, y hay números. Anders Ericsson y sus colegas describieron en 1993 lo que llamaron práctica deliberada: trabajar al borde de la propia capacidad con retroalimentación inmediata, que es la traducción psicológica exacta del postulado. Conviene, eso sí, no comprarlo entero: en 2014, Macnamara, Hambrick y Oswald revisaron el conjunto de la evidencia y encontraron que la práctica explica alrededor del doce por ciento de la variación entre personas, menos en educación y en profesiones. La práctica deliberada es el mejor método de entrenamiento conocido, y no es una garantía ni un igualador. Las diez mil horas como promesa no vienen de la ciencia: vienen de un libro de divulgación de 2008, y el propio Ericsson pasó años desmintiéndolas.</p>
+    <p class="lect-p">Lo que sí queda en pie es la cláusula que ordena esta materia entera: el cambio es específico de lo que se practicó. En 2000, Eleanor Maguire y su equipo encontraron que los taxistas de Londres tenían más grande la parte del hipocampo que maneja mapas, y no un cerebro genéricamente mejor. Los taxistas ganaron Londres. Un jugador de un juego de entrenamiento cerebral gana el juego. Y el nieto que mira quince años se vuelve excelente en reconocer una olla bien hecha, que es exactamente lo que practicó.</p>
+    <p class="lect-p">Y aquí aterriza todo esto, en el aparato que usted tiene en la mano. Nunca en la historia una especie tuvo tanta facilidad para poner cosas juntas y tan poca ocasión de encadenarlas. Un video que corre mientras cocinamos, un audio en el autobús, una clase grabada que avanza sola: son horas de coincidencia perfecta y de causalidad cero. Cumplen el eslogan y no cumplen el postulado. La consecuencia práctica no es dejar las pantallas: es cambiar veinte minutos de las que solo pasan por delante por veinte minutos donde uno produce algo y averigua enseguida si salió. Somos la especie que se cablea a sí misma. La pregunta no es si vamos a cablearnos, porque eso ocurre igual. La pregunta es si lo que estamos repitiendo cada tarde es lo que queríamos llegar a ser.</p>
+  </div>
+
+  <div class="card ac-jade" id="lect-entrevista">
+    <h2>🎙️ Lectura 4 · «El hombre que escribió una conjetura y le salió una industria» (entrevista, a la manera de Joaquín Soler Serrano)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una entrevista IMAGINADA con Donald Olding Hebb (Chester, Nueva Escocia, 1904 · 1985), el psicólogo canadiense que enseñó en la Universidad McGill, se doctoró con Karl Lashley, trabajó con el neurocirujano Wilder Penfield en el Instituto Neurológico de Montreal, publicó «The Organization of Behavior» en 1949 y presidió la Asociación Estadounidense de Psicología en 1960. Preguntada a la manera de Joaquín Soler Serrano (Valencia, 1919 · Barcelona, 2010), maestro de la entrevista larga en español, que dirigió y presentó en TVE el programa «A fondo» entre 1976 y 1981, y por cuyo estudio pasaron de verdad, entre otros, Jorge Luis Borges, Julio Cortázar, Salvador Dalí y Juan Rulfo. El encuentro nunca ocurrió: las personas son reales, toda obra, fecha y cifra citada es real, y lo único inventado es la conversación, al modo del viejo género radiofónico de las entrevistas imposibles que la RAI italiana estrenó en los años setenta con guiones de escritores como Italo Calvino y Umberto Eco. Ese género permite además lo que aquí se hace a la vista: que el entrevistador le cuente al invitado cosas ocurridas después de su muerte.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir esta entrevista</button></div>
+    <p class="lect-p">Hay hombres que escriben un libro y hay libros que escriben un siglo. Mi invitado de esta noche publicó en 1949 un volumen de apariencia modesta, con un título que no promete milagros, «La organización de la conducta», y dentro dejó cuatro líneas que hoy se citan en todas las universidades del mundo y, lo que es peor, en casi todos los anuncios. Es canadiense, de una aldea de pescadores de Nueva Escocia, hijo de dos médicos, y quiso ser novelista antes que científico. Profesor Hebb, bienvenido a esta casa.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Profesor, permítame empezar por donde nadie empieza. Usted quería ser escritor. ¿Qué hace un aspirante a novelista escribiendo postulados sobre sinapsis?</p>
+    <p class="lect-p"><strong>HEBB.</strong> Escribir novelas y escribir teoría se parecen más de lo que se dice, señor Soler. En las dos cosas uno tiene que inventar un mecanismo que explique por qué un personaje hace lo que hace. La diferencia es que al novelista no le piden pruebas. A mí me dieron un puesto de maestro de escuela primero, y allí descubrí que los niños no aprendían por acumulación de horas, y de ahí a preguntarse qué está pasando dentro hay un solo paso. Después llegó Karl Lashley, que fue mi maestro y que se había pasado la vida buscando el lugar de la memoria en el cerebro sin encontrarlo, y llegaron los pacientes de Wilder Penfield en Montreal, a quienes se les quitaban trozos grandes de cerebro y seguían siendo, asombrosamente, ellos mismos. Con esos dos hechos delante uno ya no puede creer que la memoria sea una cosa guardada en un cajón.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Vamos entonces a esas cuatro líneas de 1949, que le pido que me diga usted mismo, porque en este oficio uno aprende que las frases hay que oírlas en la voz de quien las escribió.</p>
+    <p class="lect-p"><strong>HEBB.</strong> Con mucho gusto, y con una advertencia previa. Yo las llamé postulado, no ley, no hallazgo: postulado. Es una palabra que significa «esto lo doy por supuesto para poder seguir razonando, y alguien tendrá que comprobarlo». Dicho eso: cuando el axón de una célula A está lo bastante cerca de una célula B para excitarla, y participa de forma repetida o persistente en hacerla disparar, ocurre algún proceso de crecimiento o cambio metabólico en una de las dos células, o en las dos, de modo que aumenta la eficacia de A como una de las células que hacen disparar a B.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Yo quisiera detenerme, con su permiso, en un verbo. Usted dice «participa». No dice «coincide». Y me da la impresión de que ahí está escondido todo.</p>
+    <p class="lect-p"><strong>HEBB.</strong> Ahí está todo, y le agradezco que lo haya visto, porque es lo primero que se pierde cuando la frase viaja. Que dos células estén activas a la vez no significa nada por sí solo: en un cerebro despierto hay millones de células activas a la vez en cualquier instante. Lo que yo propuse es que la conexión se fortalece cuando una toma parte en el disparo de la otra. Eso implica dirección, de A hacia B y no al revés, e implica orden en el tiempo, porque para tomar parte en encender algo hay que llegar antes. Si usted borra el verbo, se queda con un mundo en el que todo lo simultáneo se asocia, y ese mundo no existe.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Le voy a dar una noticia que va a oír con paciencia. Cuarenta y tres años después de su libro, dos investigadores, Löwel y Singer, resumieron esto en Science, en 1992, con una frase que rima en inglés y que dice, más o menos, que lo que dispara junto se cablea junto. Carla Shatz la puso en circulación ese mismo año. Hoy esa frase se le atribuye a usted en carteles publicitarios.</p>
+    <p class="lect-p"><strong>HEBB.</strong> No me sorprende, y no me enfada tanto como usted espera. Las ideas se abrevian para poder viajar, igual que el equipaje. Lo que me preocupa no es la propiedad de la frase, que me da bastante igual; me preocupa lo que hace la frase cuando llega. Si un maestro cree que basta con poner dos cosas juntas, dejará el mapa colgado al lado del texto y esperará. Si entiende el postulado, hará que el alumno produzca algo y le dirá enseguida si estaba bien. Son dos escuelas distintas, y la diferencia entera está en un verbo que se cayó por el camino.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Tengo otra noticia, y esta le va a gustar más. En 1997, en Science, Markram y sus colegas, y en 1998, en el Journal of Neuroscience, Bi y Poo, midieron lo que usted supuso. Y encontraron un reloj: si A dispara unas decenas de milisegundos antes que B, la conexión se refuerza; si dispara después, se debilita.</p>
+    <p class="lect-p"><strong>HEBB.</strong> <em>(Se ríe.)</em> Eso, señor Soler, es lo más parecido a la felicidad que puede sentir un teórico, y le confieso que es una felicidad rara, porque uno pasa la vida sabiendo que lo más probable es que le den la razón a medias o ninguna. Que el orden importe, y que invertirlo no deje la conexión igual sino más débil, es exactamente lo que un postulado con dirección predice. Ahora bien, no permita usted que nadie diga que eso me da la razón en todo. Lo midieron en tejido y en cultivos, que es donde se puede medir bien, y de ahí al aprendizaje de un animal despierto en su vida diaria hay un trecho que todavía se discute. Yo insistí toda mi vida en distinguir lo que uno propone de lo que uno ha probado, y no voy a dejar de hacerlo ahora que estoy muerto.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Le he oído decir, y me interesa mucho, que la idea general no era suya.</p>
+    <p class="lect-p"><strong>HEBB.</strong> Y lo repito. La idea de que la actividad repetida asocia elementos es antigua: en el siglo XIX, Tanzi y el propio Ramón y Cajal habían conjeturado que el uso fortalece las conexiones, y los filósofos asociacionistas llevaban dos siglos diciéndolo con otras palabras. Lo que yo aporté, si aporté algo, fue ponerle una condición concreta y añadirle lo que vino después en el libro: la asamblea de células, un grupo que se enciende en conjunto y acaba funcionando como una unidad, y la secuencia de fases, que es cómo esas asambleas se encadenan unas con otras para producir un pensamiento. La conexión sola no explica nada; lo que explica algo es el grupo que se forma con ella.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Hay una historia doméstica suya que me conmueve, y con ella quisiera ir cerrando. Unas ratas y unas hijas.</p>
+    <p class="lect-p"><strong>HEBB.</strong> Me llevé a casa unas ratas del laboratorio para que mis hijas jugaran con ellas. Anduvieron sueltas por la casa, subieron escaleras, se metieron donde no debían. Cuando volvieron al laboratorio resolvían los problemas mejor que las que se habían quedado en la jaula, y lo publiqué en 1947. Aquello no lo diseñé como experimento: fue una travesura que resultó ser un dato. Y viene al caso de lo que hablábamos, porque las ratas de la jaula también veían pasar el mundo por delante de los barrotes. Las de mi casa lo tocaban, se caían de los sitios y se levantaban. La diferencia no fue el estímulo. Fue quién producía el movimiento.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Una última pregunta, profesor, de las que uno hace cuando ya se apagan las luces. Si a esta hora lo estuviera oyendo un muchacho que quiere aprender algo, cualquier cosa, ¿qué le diría en una sola frase?</p>
+    <p class="lect-p"><strong>HEBB.</strong> Le diría que no confunda estar presente con estar participando, porque su cerebro no los distingue por buena voluntad sino por causalidad. Que haga la cosa, que la haga mal, y que averigüe en el mismo minuto en qué la hizo mal, porque la corrección que llega tarde llega sola y no se engancha con nada. Y le diría una última cosa, que es la que me habría gustado escribir en la portada del libro en vez del postulado: usted no se está preparando para practicar. Usted ya está siendo hecho por lo que practica, incluso ahora, incluso mirando.</p>
+  </div>
+
+  <div class="card ac-purple" id="lect-gala">
+    <h2>🌙 Lectura 5 · «La costumbre, que es un escultor lento» (El Loco de la Colina: Jesús Quintero conversa con Antonio Gala)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una conversación IMAGINADA entre Jesús Quintero (San Juan del Puerto, Huelva, 1940 · Ubrique, 2022), el susurro de «El loco de la colina» en la radio de los años ochenta y de «El perro verde» en TVE (1988), y Antonio Gala (Brazatortas, Ciudad Real, 1930 · Córdoba, 2023), el poeta y dramaturgo criado en Córdoba, autor de «Anillos para una dama» (1973) y de «Charlas con Troylo» (1981), Premio Planeta 1990 por «El manuscrito carmesí» y fundador en 2002, en Córdoba, de la Fundación Antonio Gala para Jóvenes Creadores. Los dos existieron y se entrevistaron de verdad varias veces. Esta charla nunca ocurrió: las voces se imitan en homenaje y todo dato citado dentro es real y comprobable.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir esta conversación</button></div>
+    <p class="lect-p"><em>(Estudio en penumbra. Una lámpara baja, un cenicero limpio, dos vasos de agua que nadie toca. Quintero deja correr el silencio como quien deja correr un río.)</em></p>
+    <p class="lect-p"><strong>QUINTERO.</strong> Maestro... ¿usted es lo que quiso ser, o es lo que repitió?</p>
+    <p class="lect-p"><em>(Silencio largo.)</em></p>
+    <p class="lect-p"><strong>GALA.</strong> Qué manera de empezar, Jesús, con el cuchillo por delante. Soy lo que repetí, sin ninguna duda, y lo que quise ser está en un cajón con otros papeles que no llegué a escribir. Uno cree que se hace con las decisiones grandes, esas que se cuentan en las entrevistas, y se hace en realidad con las pequeñitas: la hora a la que se sienta, la mano con que coge la pluma, la costumbre de no levantarse hasta la página tres. Los latinos decían que la costumbre es una segunda naturaleza, y se quedaron cortos: es la primera, y la otra es la que nos contamos.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> Los que estudian el cerebro le pusieron nombre a eso, ¿sabe usted? Lo escribió un canadiense, Donald Hebb, en un libro de 1949, en el capítulo cuarto. <em>(Pausa.)</em> Y no dijo lo que todo el mundo repite.</p>
+    <p class="lect-p"><strong>GALA.</strong> Ah, pero eso es lo de siempre. A los sabios les pasa como a los poetas: de veinte años de trabajo la gente se queda con un verso, y casi nunca con el bueno. ¿Y qué dijo el canadiense, si se puede saber sin diploma?</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> Dijo que si una célula participa, repetidamente, en hacer disparar a otra, se refuerza el camino de la primera hacia la segunda. <em>(Baja la voz.)</em> Participar, don Antonio. No estar delante. Participar.</p>
+    <p class="lect-p"><strong>GALA.</strong> Pues es una definición preciosa de casi todo, y no solamente del cerebro. Yo he estado delante de muchas cosas en mi vida: delante de la Mezquita de Córdoba, delante de gente que sufría, delante de mi propia obra. Y estar delante no me hizo nada. Lo que me hizo fueron las veces en que puse la mano y salió mal. En los ensayos de «Anillos para una dama», en el setenta y tres, yo veía a los actores repetir la escena con el papel en la mano, tarde tras tarde, y aquello sonaba divinamente y no era nada. La función empezaba la noche en que soltaban el papel y se equivocaban delante de uno. Ahí aprendían. Con el papel en la mano solo estaban acompañando al texto.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> La frase que se hizo famosa dice que lo que dispara junto se cablea junto. La escribieron dos investigadores, Löwel y Singer, en el año noventa y dos, y otra investigadora, Carla Shatz, le puso la rima. <em>(Silencio.)</em> No es de Hebb, y le quita justo lo que usted acaba de decir.</p>
+    <p class="lect-p"><strong>GALA.</strong> Claro que se lo quita: le quita el verbo, que es donde vive la moral de las frases. «Junto» es una palabra de vecindario y «participar» es una palabra de compromiso. Yo he vivido junto a mucha gente sin participar de nada, y he participado a distancia en cosas que me cambiaron entero. Si el cerebro fuese un vecindario, seríamos la suma de lo que nos ha pasado cerca, y entonces la televisión nos habría hecho sabios a todos, cosa que usted y yo sabemos que no ha ocurrido.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> Hay más, maestro, y esto es lo que a mí me quita el sueño. En el año noventa y ocho, dos investigadores, Bi y Poo, lo midieron con un cronómetro. Si la primera célula dispara unas decenas de milisegundos antes que la segunda, el camino se refuerza. <em>(Pausa muy larga.)</em> Si dispara después, el mismo camino se debilita.</p>
+    <p class="lect-p"><strong>GALA.</strong> Es decir que el orden no adorna: el orden decide. Eso, Jesús, es la ley del teatro dicha por un microscopio. En escena, la misma frase dicha antes o después del gesto es dos obras distintas, y los actores buenos lo saben con el cuerpo aunque no lo sepan explicar. Y es también la ley de la vida, que es más triste: llegar tarde a consolar a alguien no consuela la mitad, consuela cero, y a veces menos que cero. Nos han educado en la cantidad, en cuántas veces, y resulta que la naturaleza lleva contabilidad de milésimas y de quién fue primero.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> <em>(Casi un susurro.)</em> Entonces el que se equivoca mucho y nadie lo corrige...</p>
+    <p class="lect-p"><strong>GALA.</strong> Se está haciendo maestro de su error, con una dedicación conmovedora. Mire, en la alameda de mi infancia había un camino que no dibujó ningún ingeniero: lo dibujaron los pies, pasando por donde era más cómodo, y al año había un surco, y al surco ya no se le discute. Nadie decidió aquel camino y todos lo obedecíamos. Así es la costumbre: un escultor lento que trabaja mientras uno mira para otro lado. Y no distingue, que es lo terrible. Talla con la misma paciencia la virtud y el vicio, la buena caligrafía y la mala, el pulgar torcido del alfarero y el derecho. Lo único que le importa es que uno vuelva a pasar por ahí.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> A los muchachos de su Fundación, en Córdoba, desde el año dos mil dos, ¿qué les dice usted el primer día?</p>
+    <p class="lect-p"><strong>GALA.</strong> Les digo que no me traigan lo que han leído, que me traigan lo que han escrito, aunque sea malo, y que me lo traigan pronto para que sea malo delante de mí y no a solas. Un joven que escribe mal y lo enseña el martes está salvado. Un joven que lee a los maestros durante tres años y no enseña nada está perdido y encima cree que va ganando, porque el que lee siente que avanza y el que escribe siente que no puede. La sensación va al revés que el provecho, y esa es la mayor trampa de este oficio y creo que de todos.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> Hebb tenía unas ratas, don Antonio, y se las llevó a su casa para que jugaran sus hijas. Lo contó en el cuarenta y siete. <em>(Pausa.)</em> Las que anduvieron sueltas por la casa aprendían después mejor que las que se quedaron en la jaula mirando.</p>
+    <p class="lect-p"><strong>GALA.</strong> Qué historia tan hermosa, y qué poco científica en apariencia y qué exacta por dentro. Yo tuve un perro, Troylo, que me sacó un libro entero de conversaciones, y le debo más que a muchos catedráticos: me miraba escribir con una falta de admiración tan sana que era imposible ponerse solemne delante de él. Pero fíjese en lo que me dice de las ratas, porque es lo mismo: las de la jaula también tenían mundo delante, tenían todo el laboratorio para mirar. Lo que no tenían era la posibilidad de tropezar con él. Y sin tropiezo no hay biografía, ni de rata ni de poeta.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> <em>(Silencio muy largo. Gala mira el vaso de agua sin tocarlo.)</em> Maestro, si esta noche hubiera que dejarle una sola frase a la gente que está aprendiendo algo...</p>
+    <p class="lect-p"><strong>GALA.</strong> Que no confundan asistir con hacer, que es la confusión de nuestro tiempo y la más cara. Uno no se vuelve lo que admira: se vuelve lo que repite, y se vuelve exactamente eso, ni una pizca más. De modo que elijan bien lo que van a repetir mañana, porque el barro no discute con las manos: obedece. Y que se dejen corregir enseguida, en caliente, mientras el error todavía es un error y no ha tenido tiempo de hacerse camino en la alameda. Después ya no se corrige: después se desmonta, que es una obra mucho más cara y con andamios.</p>
+    <p class="lect-p"><em>(Quintero no dice nada. Deja que el silencio cierre el programa, como quien apaga una lámpara y se queda un momento a oscuras a propósito.)</em></p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🧐 Preguntas de las cinco lecturas</h2>
+    <p>Leer no es lo mismo que haber leído, y en esta misión eso no es un refrán: es el temario. Aquí van <strong>veinticinco preguntas de comprensión lectora</strong> (cinco por texto), <strong>diez de completar</strong> y <strong>diez de análisis complejo</strong> con su pauta. Se contestan <strong>con los cinco textos delante</strong>: no es un examen de memoria, es un examen de lectura.</p>
+    <div class="tip">
+      <span class="ti">🖨️</span>
+      <div><strong>Todo esto se imprime.</strong> El pliego de preguntas sale con las tres secciones y la <strong>pauta en su propia hoja al final</strong>, para que las respuestas no queden en la misma página que el ejercicio, como manda la casa. Y las cinco lecturas se imprimen aparte, cada una con su etiqueta de ejercicio de estilo encima.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego de preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las cinco lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📖 I. Comprensión lectora (25 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +2 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="lcProg" aria-live="polite">Pregunta 1 de 25</p>
+    <div class="qz-q" id="lcQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="lcOpts" role="group" aria-label="Opciones de comprensión lectora"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectC()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectC()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLC" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>✏️ II. Completa la oración (10 preguntas)</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +2 XP por respuesta correcta (primera vez). Escribe la palabra o el año exacto.</p>
+    <p class="id-prog" id="lfProg" aria-live="polite">Oración 1 de 10</p>
+    <div class="cmp-sent" id="lfQ"></div>
+    <div style="margin:0.6rem 0;">
+      <input class="eval-cp-input" id="lfInput" type="text" style="min-width:190px;" placeholder="Escribe tu respuesta..." aria-label="Respuesta de completar" onkeydown="if(event.key==='Enter'){event.preventDefault();checkLectF();}">
+    </div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkLectF()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetLectF()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbLF" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧠 III. Análisis complejo (10 preguntas)</h2>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Estas no se responden con una palabra ni se corrigen con una letra: se escriben, y después se comparan con la pauta. Van sin XP a propósito, porque una respuesta abierta que se premia sola se contesta a la carrera, y esta misión enseña exactamente lo contrario.</p>
+    <p class="id-prog" id="laProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="laQ" role="heading" aria-level="3"></div>
+    <textarea class="crit-textarea" id="laTA" rows="5" placeholder="Escribe aquí, o en tu cuaderno..." aria-label="Respuesta de análisis"></textarea>
+    <div id="laPauta" class="eval-answer" style="display:none;margin-left:0;font-size:0.85rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-d" onclick="prevLectA()">◀ Anterior</button>
+      <button class="btn btn-pri" onclick="nextLectA()">Siguiente ▶</button>
+      <button class="btn btn-g" id="btnLectAPauta" onclick="toggleLectAPauta()">👁 Ver pauta</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué cinco voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento convierte el concepto en <strong>un metrónomo heredado y una nota de tres palabras</strong> (y en la vergüenza de un narrador que tardó cuarenta años en entender a su maestro), el capítulo lo vuelve <strong>escena, risa y refrán</strong> (sesenta golpes que enseñan sesenta veces a torcer el hierro), y el ensayo lo pone a <strong>escala de especie</strong>, con los estudios en fila y sus años. Las dos voces nuevas hacen lo que ni el cuento ni el ensayo pueden: la <strong>entrevista</strong> sienta al personaje real de la etapa, Donald Hebb, frente a preguntas con su biografía delante, y así la etapa se aprende con su historia y con un pedazo de la historia del periodismo en español; y la <strong>conversación</strong> baja el tema al habla viva, de noche, entre dos andaluces que existieron: los números exactos entran por la boca de Quintero y vuelven convertidos en imagen por la de Gala (el camino de la alameda, el actor que suelta el papel). Quien lee las cinco sabe qué dice el postulado, quién escribió el eslogan y qué cambia en la práctica cuando se cuenta bien.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión del Estudio Mayor lleva sus cinco lecturas sobre el tema de la etapa: <span class="hl">cuento a la manera de Borges, capítulo a la manera de Cervantes, ensayo a la manera de Harari, la entrevista de la casa y la conversación del Loco de la Colina</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista, la declaración de que <span class="hl2">los encuentros de las entrevistas nunca ocurrieron</span>, y la regla de fondo: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>. En esta etapa la regla pesa doble, porque la etapa entera trata de una frase que se cita mal: publicar un pastiche sin declarar sería cometer el error que la misión enseña a cazar.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con el postulado de 1949 desarmado en cuatro piezas, la historia del eslogan y quién lo escribió de verdad, la tabla del orden de disparo, los siete momentos de una práctica que sí cablea, los ocho casos del proyecto, la <strong>hoja de la práctica</strong> y el registro de intentos y correcciones para llenar a mano, siete ejercicios, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-barro-regla-hebb.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige también aquí: <strong>ningún estudio entra sin su etiqueta</strong> (clásico sólido, clásico cuestionado, ciencia en disputa, divulgación con inflado). En esta materia la regla hace más falta que en ninguna, porque casi todo lo famoso está inflado.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Hebb (1949), «The Organization of Behavior»:</strong> el postulado neurofisiológico del capítulo 4, más la asamblea de células y la secuencia de fases. El libro está digitalizado y circula completo. Clásico sólido, con la letra chica que el propio Hebb puso: era una conjetura teórica, no un experimento.</li>
+      <li><strong>Löwel y Singer (1992), Science, «Selection of intrinsic horizontal connections in the visual cortex by correlated neuronal activity»:</strong> de aquí sale la frase que todo el mundo le atribuye a Hebb. Sólido como estudio; <strong>divulgación con inflado</strong> como eslogan, empezando por la atribución.</li>
+      <li><strong>Markram, Lübke, Frotscher y Sakmann (1997), Science:</strong> la coincidencia con orden regula la eficacia sináptica. Sólido.</li>
+      <li><strong>Bi y Poo (1998), Journal of Neuroscience:</strong> la ventana de milisegundos, medida célula a célula en hipocampo cultivado. Sólido, con su limitación declarada: es cultivo, no animal despierto.</li>
+      <li><strong>Hebb (1947), «The effects of early experience on problem solving at maturity»:</strong> las ratas que anduvieron sueltas por su casa resolvían mejor. Clásico sólido, y el origen de toda la literatura del ambiente enriquecido.</li>
+      <li><strong>Ericsson, Krampe y Tesch-Römer (1993), Psychological Review:</strong> la práctica deliberada, con su retroalimentación inmediata. Clásico cuestionado en el tamaño de su efecto: ver la crítica de Macnamara, Hambrick y Oswald (2014), que la deja en torno al doce por ciento de la varianza. Se estudia entero en la etapa 4 de esta ruta.</li>
+      <li><strong>Las cinco lecturas de esta misión:</strong> ejercicios de estilo escritos por la casa en homenaje a Borges, Cervantes y Harari, más dos entrevistas imaginadas (con Donald Hebb a la manera de Joaquín Soler Serrano, y entre Jesús Quintero y Antonio Gala). <strong>Pastiche declarado, no obra de esos autores</strong>, y los encuentros de las entrevistas <strong>nunca ocurrieron</strong>. La erudición interna es real: Hebb (1947 y 1949), Löwel y Singer (1992), Shatz (1992), Markram y colegas (1997), Bi y Poo (1998), Rosenblatt (1958), Rumelhart, Hinton y Williams (1986), Ericsson y colegas (1993), Maguire y colegas (2000), Macnamara y colegas (2014), y las señas de Soler Serrano, Quintero y Gala son todas comprobables.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>desmontando una práctica real de esta semana</strong> con la hoja de la práctica, diciendo qué se produce, quién corrige, cuándo llega la corrección y qué se cableará si eso se repite un mes.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: las materias completas, con la Neuroplasticidad y sus seis módulos.</li>
+      <li><a href="../../misiones/misión-base-sistema-nervioso/sistema-nervioso.html">🧠 El Sistema Nervioso</a>: neurona, sinapsis y potencial de acción. Aquí no se repiten: se usan. Es el único prerrequisito de esta ruta.</li>
+      <li><a href="../../misiones/ruta-espejo-vigia-timon/vigia-timon.html">🪞 El vigía y el timón</a>: la Metacognición, que se estudia pegada a esta materia. Allí se aprende a comprobar; aquí, por qué comprobar cablea.</li>
+      <li><a href="../../misiones/epistemología/karl-popper.html">🦉 Karl Popper y la Epistemología</a>: la regla de someter las ideas a prueba, que es lo que la etapa 6 de esta ruta hará mito por mito.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene. La etapa 2 baja al mecanismo molecular: la potenciación a largo plazo de Bliss y Lømo, y el receptor NMDA como detector de coincidencias.</li>
+      <li><a href="../../fichas/ficha-barro-regla-hebb.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja de la práctica y el registro de intentos y correcciones caben en una página cada uno.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar <strong>una práctica real de esta semana</strong> (una tarea de las niñas, un oficio propio, un idioma, un instrumento) y contarla con el vocabulario de la etapa: qué produce quien practica, qué solo recibe, quién corrige y cuándo, y en qué orden quedan el intento y su consecuencia. La prueba de que está aprendida es <strong>explicar por qué el eslogan está mal contado y qué cambia el lunes si se cuenta bien</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🏺</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</div>
+    <div class="diploma-mascot" aria-hidden="true">🏺</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🏺</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«No es lo que dispara junto: es lo que ayuda a disparar» 🌱 · 🏺 Ruta del Barro Vivo · Etapa 1 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/regla-hebb.js"></script>
+  <script src="../../js/lecturas-marcador.js"></script>
+</body>
+</html>

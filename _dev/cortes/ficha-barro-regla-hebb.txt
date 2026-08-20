@@ -1,0 +1,14 @@
+# Nueve cortes para diez páginas (norma 6). Cada línea es el trozo literal
+# que debe QUEDAR AL INICIO de una página. Los anclajes llevan clase propia
+# (voces vocab / expediente / decir, casos c1..c4, pauta pa/pb) porque el
+# repaginador busca literales en orden y cuatro tablas iguales lo mandarían
+# a cortar donde no es, sin avisar.
+<table class="piezas">
+<table class="voces expediente">
+<p>El nombre técnico es <b>plasticidad dependiente del orden de disparo</b>
+<div class="caja">
+<table class="casos c2">
+<div class="caja caja-amb">
+<h2>📏 El registro de intentos y correcciones</h2>
+<h3 class="ej4">Ejercicio 4 · Clasifica seis escenas</h3>
+<div class="pauta pb">

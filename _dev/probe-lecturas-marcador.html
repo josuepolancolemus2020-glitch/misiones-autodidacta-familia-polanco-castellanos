@@ -198,7 +198,7 @@ f.onload=async()=>{
     log('\n── SIN SESIÓN NO SE DESCARGA LA NUBE ──');
     /* La promesa de la norma 5-septies: abrir una misión no pide red ni
        descarga Supabase si no hay sesión guardada. Si esto se rompiera,
-       las 38 misiones tardarían más en abrir para nada, y nadie lo
+       las 39 misiones tardarían más en abrir para nada, y nadie lo
        notaría hasta estar sin señal. */
     ok(typeof w.supabase === 'undefined' && !w.faroSb,
       'al abrir la misión sin sesión no se ha traído Supabase', 'se descargó la nube sin hacer falta');
@@ -272,10 +272,10 @@ f.onload=async()=>{
        alguien lo intenta. La lista sale del catálogo, así que esta
        comprobación no hay que actualizarla al construir una misión nueva.
 
-       Las 38 se miran LEYENDO su HTML, no abriéndolas: abrir cada una
+       Las 39 se miran LEYENDO su HTML, no abriéndolas: abrir cada una
        carga su motor, Supabase y html2canvas, y espera a una red que en
        el banco de pruebas no existe; el navegador se queda colgado antes
-       de la décima. Lo que hay que comprobar en las 38 es el enganche, y
+       de la décima. Lo que hay que comprobar en las 39 es el enganche, y
        eso está en el texto del documento. Después se abren TRES de
        verdad, una de cada clase, para ver que el aparato vive. */
     let urls=[];

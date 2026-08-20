@@ -106,7 +106,7 @@ async function marcar(w,d,el,nCar,cat){
   ok(zs.every(z=>/^Hoja \d+ de \d+$/.test(z.titulo)), 'y se llaman por su número de hoja', 'títulos: '+JSON.stringify(zs.map(z=>z.titulo).slice(0,3)));
   const trozos=zs.reduce((a,z)=>a+z.parrafos,0);
   ok(trozos>40, 'hay '+trozos+' trozos marcables repartidos por la ficha', 'solo '+trozos+' trozos marcables');
-  /* La clave sale del nombre del archivo: si no, las 37 fichas
+  /* La clave sale del nombre del archivo: si no, las 38 fichas
      compartirían cajón y las marcas de una saldrían en otra. */
   const clave=w.FaroMarcador.claveLocal();
   ok(clave.indexOf('ficha-atomos-contra-miedo')>=0, 'guarda con una clave propia de esta ficha', 'clave: '+clave);

@@ -48,7 +48,12 @@ const moldePie = mPie[0].replace(/Página[^<]*/, 'Página {N} de {M}');
 
 /* ── 2. Contenido corrido: se quitan pies, aperturas y cierres de sección y
       los comentarios de página. Lo que queda es la ficha sin paginar ── */
-const mDoc = html.match(/(<div class="doc">\s*)([\s\S]*?)(\s*<\/div>\s*<\/body>)/);
+/* El cierre del <div class="doc"> ya no pega con </body>: desde la norma
+   5-octies toda ficha carga después el marcador (js/lecturas-marcador.js),
+   así que entre los dos hay etiquetas <script>. Con el patrón viejo esta
+   herramienta dejó de encontrar el cuerpo de CUALQUIER ficha y fallaba con
+   un «No encuentro el <div class="doc">» que no decía por qué. */
+const mDoc = html.match(/(<div class="doc">\s*)([\s\S]*?)(\s*<\/div>\s*(?:<script\b[^>]*>\s*<\/script>\s*)*<\/body>)/);
 if (!mDoc) { console.error('No encuentro el <div class="doc"> de la ficha.'); process.exit(2); }
 const cuerpo = mDoc[2]
   .replace(/<div class="pie">[\s\S]*?<\/div>\s*/g, '')
