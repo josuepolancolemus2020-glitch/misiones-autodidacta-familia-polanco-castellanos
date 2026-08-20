@@ -8,12 +8,18 @@ iframe{width:380px;height:900px;border:0;background:#fff}pre{background:#111;col
 <iframe id="f" src="/index.html"></iframe>
 <pre id="out">midiendo…</pre>
 <script>
-/* Comprueba las dos cosas que se le pidieron a la pantalla «Mis Rutas»:
+/* Comprueba lo que se le ha pedido a la pantalla «Mis Rutas»:
    1. que cada tarjeta rotule el nombre GENERAL de la materia (y que la Ruta de
       la Máquina que se Mira diga «Metacognición», que es el caso que pidió el
       autor), sin que ninguna se quede sin rótulo;
-   2. que la tarjeta se pliegue y se despliegue, que se maneje con teclado y que
-      el estado siga puesto después de recargar.
+   2. que las 38 rutas estén AGRUPADAS POR MATERIA y que todo arranque plegado,
+      que es lo que el autor pidió el 20 de agosto de 2026 para dejar de barrer
+      metros de pantalla;
+   3. que una materia de UNA SOLA ruta abra directo sus etapas, sin cobrar un
+      toque por un nivel que ahí no separa nada;
+   4. que el buscador encuentre por materia, por ruta y por etapa;
+   5. que se pliegue y se despliegue, que se maneje con teclado y que el estado
+      siga puesto después de recargar.
    Se recarga DOS veces a propósito: la primera para sembrar la sesión, la
    segunda para comprobar que lo guardado sobrevive. */
 const out = document.getElementById('out'), f = document.getElementById('f');
@@ -37,6 +43,17 @@ function rotulo(card) {
 }
 function boton(card) { return card && card.querySelector('.ruta-toggle'); }
 function abierta(card) { return boton(card) && boton(card).getAttribute('aria-expanded') === 'true'; }
+/* El grupo de materia: la caja nueva que envuelve a las rutas. */
+function grupo(d, nombre) {
+  return [...d.querySelectorAll('.materia-grupo')]
+    .find(g => (g.querySelector('.materia-nombre') || {}).textContent === nombre);
+}
+function botonMat(g) { return g && g.querySelector('.materia-toggle'); }
+function abiertaMat(g) { return botonMat(g) && botonMat(g).getAttribute('aria-expanded') === 'true'; }
+function escribir(d, t) {
+  const i = d.getElementById('rutas-buscar');
+  i.value = t; i.dispatchEvent(new Event('input', { bubbles: true }));
+}
 /* «Construidas» sale de la propia cuenta de la tarjeta, que es lo que ve el
    usuario: así la sonda no depende de cuántas misiones haya en el catálogo hoy
    y no hay que venir a corregirla cada vez que se construye una etapa. */
@@ -100,6 +117,60 @@ f.onload = async () => {
       ok(espejo && (espejo.querySelector('.ruta-nombre') || {}).textContent === 'Ruta de la Máquina que se Mira',
         'el nombre de la ruta sigue intacto, el rótulo va aparte', 'el rótulo se metió dentro del nombre');
 
+      log('\n── AGRUPADAS POR MATERIA, Y TODO PLEGADO ──');
+      /* Once materias en vez de 38 tarjetas sueltas: eso es lo que hace que la
+         pantalla entre en pantalla y media en vez de varios metros. */
+      const grupos = [...d.querySelectorAll('.materia-grupo')];
+      ok(grupos.length === 11, 'las 38 rutas caen en 11 materias', 'grupos: ' + grupos.length);
+      const abiertos = grupos.filter(abiertaMat);
+      ok(abiertos.length === 0, 'y TODAS arrancan plegadas, que es lo que se pidió',
+        abiertos.length + ' materias arrancan abiertas: ' + abiertos.map(g => (g.querySelector('.materia-nombre')||{}).textContent).join(', '));
+      const sinCuenta = grupos.filter(g => !/\d+ de \d+ etapas/.test((g.querySelector('.materia-cuenta')||{}).textContent || ''));
+      ok(sinCuenta.length === 0, 'cada materia dice cuántas etapas trae y cuántas van, sin abrirla',
+        sinCuenta.length + ' materias sin cuenta');
+      const mayor = grupo(d, 'Estudio Mayor');
+      ok(mayor && /28 rutas/.test((mayor.querySelector('.materia-cuenta')||{}).textContent||''),
+        'y el Estudio Mayor avisa de que trae 28 rutas', 'el Estudio Mayor no dice cuántas rutas trae');
+
+      /* PLEGADO NO ES VACIADO. Hay 38 sondas que buscan las tarjetas de ruta en
+         el documento para contar sus etapas: si el contenido naciera al abrir
+         la materia, dejarían de encontrar nada sin que nadie hubiera roto la
+         pantalla. Por eso se pinta todo y se esconde con `hidden`. */
+      ok(cards.length === 38, 'las 38 tarjetas siguen en el documento aunque no se vean', 'tarjetas: ' + cards.length);
+      const marea = tarjeta(d, 'Ruta de la Marea');
+      ok(marea && marea.querySelectorAll('.ruta-etapa').length === 6,
+        'y una ruta plegada conserva sus 6 etapas', 'la ruta plegada perdió sus etapas');
+      const dorado = tarjeta(d, 'Ruta del Expediente Dorado');
+      const enlace = dorado && dorado.querySelector('.re-link');
+      ok(enlace && /gran-fuga\.html$/.test(enlace.getAttribute('href') || ''),
+        'el enlace de la etapa construida sigue apuntando a su misión', 'se rompió el enlace de la etapa');
+      ok(dorado && /5 construidas/.test((dorado.querySelector('.ruta-cuenta')||{}).textContent||''),
+        'la cuenta de avance sigue en su sitio', 'cuenta: ' + (dorado ? (dorado.querySelector('.ruta-cuenta')||{}).textContent : '(sin tarjeta)'));
+
+      log('\n── UNA MATERIA DE UNA SOLA RUTA ABRE DIRECTO SUS ETAPAS ──');
+      /* Diez de las once materias traen exactamente una ruta. Obligarlas a dos
+         toques sería cobrar peaje por un nivel que ahí no separa nada: el nivel
+         intermedio solo lo necesita el Estudio Mayor, con sus 28. */
+      const epis = grupo(d, 'Epistemología');
+      ok(!!epis, 'está la materia Epistemología', 'falta la materia Epistemología');
+      botonMat(epis).click(); await esperar(80);
+      ok(abiertaMat(epis), 'al tocarla se abre', 'la materia no se abrió');
+      const panelEpis = d.getElementById(botonMat(epis).getAttribute('aria-controls'));
+      ok(panelEpis && !panelEpis.hidden && w.getComputedStyle(panelEpis).display !== 'none',
+        'y su lista de rutas se pinta', 'la lista de rutas quedó escondida');
+      const pensamiento = tarjeta(d, 'Ruta del Pensamiento');
+      const listaPens = pensamiento && d.getElementById(boton(pensamiento).getAttribute('aria-controls'));
+      ok(abierta(pensamiento) && listaPens && !listaPens.hidden,
+        'y con ella las etapas, en un solo toque', 'hizo falta un segundo toque para llegar a las etapas');
+
+      /* El Estudio Mayor SÍ necesita el nivel de en medio: 28 rutas abiertas de
+         golpe devolverían el problema que esto viene a resolver. */
+      botonMat(mayor).click(); await esperar(80);
+      const cardsMayor = [...mayor.querySelectorAll('.ruta-card')];
+      ok(cardsMayor.length === 28, 'el Estudio Mayor enseña sus 28 rutas', 'rutas: ' + cardsMayor.length);
+      const abiertasMayor = cardsMayor.filter(abierta).length;
+      ok(abiertasMayor === 0, 'y las 28 salen plegadas, no volcadas de golpe', abiertasMayor + ' salen abiertas');
+
       log('\n── LA TARJETA SE PLIEGA ──');
       const conBoton = cards.filter(c => boton(c) && boton(c).tagName === 'BUTTON').length;
       ok(conBoton === cards.length, 'las 38 llevan un botón de verdad', conBoton + ' de ' + cards.length + ' lo llevan');
@@ -110,6 +181,13 @@ f.onload = async () => {
       }).length;
       ok(bienAtadas === cards.length, 'cada botón declara aria-expanded y apunta a su lista con aria-controls',
         bienAtadas + ' de ' + cards.length + ' bien atadas');
+      /* Lo mismo para el nivel de materia, que es un acordeón igual. */
+      const matAtadas = grupos.filter(g => {
+        const b = botonMat(g); if (!b) return false;
+        const panel = d.getElementById(b.getAttribute('aria-controls') || '');
+        return panel && panel.classList.contains('materia-rutas') && /^(true|false)$/.test(b.getAttribute('aria-expanded') || '');
+      }).length;
+      ok(matAtadas === grupos.length, 'y las 11 materias también', matAtadas + ' de ' + grupos.length + ' bien atadas');
       /* Se comprueba que sea un <button> de verdad, sin `disabled` y sin sacarlo
          del orden de tabulación: así el teclado lo alcanza con Tab y lo dispara
          con Enter y con espacio sin que haya que escribir nada de eso a mano.
@@ -121,59 +199,83 @@ f.onload = async () => {
         'el botón queda en el orden de tabulación y no está deshabilitado', 'el botón no es alcanzable con el teclado');
       /* El anillo de foco no se ve desde getComputedStyle (hace falta el estado
          :focus-visible), así que se comprueba que la regla esté escrita. */
-      let reglaFoco = false;
+      let reglaFoco = false, reglaFocoMat = false;
       [...d.styleSheets].forEach(hoja => {
         try { [...hoja.cssRules].forEach(r => {
-          if (r.selectorText && /\.ruta-toggle:focus-visible/.test(r.selectorText) && /outline/.test(r.style.cssText)) reglaFoco = true;
+          if (!r.selectorText || !/outline/.test(r.style.cssText)) return;
+          if (/\.ruta-toggle:focus-visible/.test(r.selectorText)) reglaFoco = true;
+          if (/\.materia-toggle:focus-visible/.test(r.selectorText)) reglaFocoMat = true;
         }); } catch (e) {}
       });
-      ok(reglaFoco, 'hay regla de foco visible para el botón', 'falta el anillo de :focus-visible');
+      ok(reglaFoco, 'hay regla de foco visible para el botón de ruta', 'falta el anillo de :focus-visible');
+      ok(reglaFocoMat, 'y para el de materia', 'falta el anillo de :focus-visible de la materia');
 
-      /* Estado inicial: desplegadas las que ya tienen alguna etapa construida,
-         plegadas las que están enteras por construir. */
-      const malInicio = cards.filter(c => abierta(c) !== (construidas(c) > 0));
-      ok(malInicio.length === 0,
-        'arranca desplegada la ruta con etapas construidas y plegada la que está entera por construir',
-        malInicio.length + ' rutas arrancan al revés');
-
-      /* Plegada NO significa vaciada: las etapas siguen en el documento (y por
-         eso las sondas que las cuentan siguen contando bien) y el enlace de una
-         etapa construida sigue llevando a su misión. */
-      const dorado = tarjeta(d, 'Ruta del Expediente Dorado');
-      const marea  = tarjeta(d, 'Ruta de la Marea');
-      ok(marea && !abierta(marea) && marea.querySelectorAll('.ruta-etapa').length === 6,
-        'la Ruta de la Marea arranca plegada y conserva sus 6 etapas en el documento',
-        'la ruta plegada perdió sus etapas');
-      /* Se mira el atributo Y el `display` que de verdad queda: `hidden` solo no
-         basta, porque una regla con `display: flex` le gana y la lista se sigue
-         viendo con el aria diciendo que está cerrada. Pasó, y por eso está aquí. */
-      const listaMarea = d.getElementById(boton(marea).getAttribute('aria-controls'));
-      ok(marea && listaMarea.hidden === true && w.getComputedStyle(listaMarea).display === 'none',
-        'la lista plegada lleva hidden y no se pinta', 'la lista plegada se sigue viendo');
-      const enlace = dorado && dorado.querySelector('.re-link');
-      ok(enlace && /gran-fuga\.html$/.test(enlace.getAttribute('href') || ''),
-        'el enlace de la etapa construida sigue apuntando a su misión', 'se rompió el enlace de la etapa');
-      ok(dorado && /5 construidas/.test((dorado.querySelector('.ruta-cuenta')||{}).textContent||''),
-        'la cuenta de avance sigue en su sitio', 'cuenta: ' + (dorado ? (dorado.querySelector('.ruta-cuenta')||{}).textContent : '(sin tarjeta)'));
-
-      /* Se pulsan las dos, en los dos sentidos. */
-      boton(marea).click(); await esperar(60);
-      ok(abierta(marea) && listaMarea.hidden === false && w.getComputedStyle(listaMarea).display !== 'none',
-        'al pulsar, la ruta plegada se despliega', 'no se desplegó');
-      const listaEspejo = d.getElementById(boton(espejo).getAttribute('aria-controls'));
-      boton(espejo).click(); await esperar(60);
-      ok(!abierta(espejo) && listaEspejo.hidden === true && w.getComputedStyle(listaEspejo).display === 'none',
+      /* Se pulsan las dos, en los dos sentidos. Se mira el atributo Y el
+         `display` que de verdad queda: `hidden` solo no basta, porque una regla
+         con `display: flex` le gana y la lista se sigue viendo con el aria
+         diciendo que está cerrada. Pasó, y por eso está aquí. */
+      const listaPens2 = d.getElementById(boton(pensamiento).getAttribute('aria-controls'));
+      boton(pensamiento).click(); await esperar(60);
+      ok(!abierta(pensamiento) && listaPens2.hidden === true && w.getComputedStyle(listaPens2).display === 'none',
         'al pulsar, la ruta desplegada se pliega', 'no se plegó');
-      /* Y lo esencial se sigue viendo con la tarjeta plegada. Se mira `hidden` y
-         el `display` calculado de cada pieza, no su rectángulo: aquí el armazón
-         de la aplicación va con display:none y nada tiene medidas. */
+      boton(pensamiento).click(); await esperar(60);
+      ok(abierta(pensamiento) && listaPens2.hidden === false && w.getComputedStyle(listaPens2).display !== 'none',
+        'y al volver a pulsar se despliega', 'no se desplegó');
+      /* Y lo esencial se sigue viendo con la tarjeta plegada. */
+      const espejoCard = tarjeta(d, 'Ruta de la Máquina que se Mira');
       const visible = el => !!el && !el.hidden && w.getComputedStyle(el).display !== 'none';
       const escondido = ['.ruta-emoji', '.ruta-materia', '.ruta-nombre', '.ruta-lema', '.ruta-barra-wrap', '.ruta-cuenta']
-        .filter(sel => !visible(espejo.querySelector(sel)));
+        .filter(sel => !visible(espejoCard.querySelector(sel)));
       ok(escondido.length === 0,
         'plegada sigue enseñando emoji, materia, nombre, lema, barra y cuenta',
         'plegada esconde: ' + escondido.join(', '));
-      ok(!visible(espejo.querySelector('.ruta-etapas')), 'y esconde la lista de etapas', 'la lista sigue a la vista');
+      ok(!visible(espejoCard.querySelector('.ruta-etapas')), 'y esconde la lista de etapas', 'la lista sigue a la vista');
+
+      log('\n── EL BUSCADOR ──');
+      /* Es lo que de verdad mata el barrido cuando ya se sabe qué se quiere:
+         se escribe y se llega, sin ir abriendo cajones. */
+      ok(!!d.getElementById('rutas-buscar'), 'la pantalla trae buscador', 'no hay buscador');
+      escribir(d, 'hebb'); await esperar(120);
+      const visiblesTrasBuscar = [...d.querySelectorAll('.ruta-card')].filter(c => !c.hidden);
+      ok(visiblesTrasBuscar.length === 1 &&
+         (visiblesTrasBuscar[0].querySelector('.ruta-nombre')||{}).textContent === 'Ruta del Barro Vivo',
+        'buscar por el nombre de una ETAPA lleva a su ruta',
+        'rutas visibles: ' + visiblesTrasBuscar.map(c => (c.querySelector('.ruta-nombre')||{}).textContent).join(', '));
+      ok(/La regla de Hebb/.test((d.querySelector('.ruta-etapa-hallada .re-txt')||{}).textContent || ''),
+        'y resalta la etapa que coincide, no solo la ruta', 'no se resaltó la etapa');
+      ok([...d.querySelectorAll('.materia-grupo')].filter(g => !g.hidden).length === 1,
+        'y esconde las materias que no vienen al caso', 'quedan materias de más a la vista');
+      escribir(d, 'metacogn'); await esperar(120);
+      const porMateria = [...d.querySelectorAll('.ruta-card')].filter(c => !c.hidden);
+      ok(porMateria.length === 1 &&
+         (porMateria[0].querySelector('.ruta-nombre')||{}).textContent === 'Ruta de la Máquina que se Mira',
+        'buscar por MATERIA también encuentra, y sin tilde',
+        'rutas: ' + porMateria.map(c => (c.querySelector('.ruta-nombre')||{}).textContent).join(', '));
+      escribir(d, 'zzzz'); await esperar(120);
+      ok([...d.querySelectorAll('.materia-grupo')].filter(g => !g.hidden).length === 0
+         && /Nada con/.test((d.getElementById('rutas-resultado')||{}).textContent || ''),
+        'y cuando no hay nada lo dice, en vez de dejar la pantalla en blanco', 'no avisa de que no hay resultados');
+      escribir(d, ''); await esperar(120);
+      ok([...d.querySelectorAll('.ruta-card')].filter(c => !c.hidden).length === 38,
+        'al borrar la búsqueda vuelven las 38', 'no volvieron todas');
+
+      log('\n── PLEGAR TODO ──');
+      /* Sin esto, quien abrió el Estudio Mayor para mirar una cosa se queda con
+         28 rutas desplegadas para siempre, porque el estado se recuerda. */
+      const espejo3 = tarjeta(d, 'Ruta de la Máquina que se Mira');
+      boton(espejo3).click(); await esperar(60);
+      w.plegarTodasLasRutas(); await esperar(150);
+      ok([...d.querySelectorAll('.materia-grupo')].filter(abiertaMat).length === 0,
+        'un toque deja las 11 materias plegadas otra vez', 'quedaron materias abiertas');
+      ok(d.getElementById('rutas-buscar').value === '', 'y limpia el buscador', 'el buscador se quedó escrito');
+      const tras = JSON.parse(w.localStorage.getItem('faro_v1') || '{}');
+      ok(Object.keys(tras.materiasAbiertas || {}).length === 0 && Object.keys(tras.rutasAbiertas || {}).length === 0,
+        'y lo olvida también en el almacén, no solo en pantalla', 'quedó estado guardado tras plegar todo');
+
+      /* Se deja algo abierto a propósito, para comprobar en la fase 2 que se
+         recuerda: la materia del espejo abierta y su ruta plegada. */
+      const mayor2 = grupo(d, 'Estudio Mayor');
+      botonMat(mayor2).click(); await esperar(60);
 
       log('\n── EL ESTADO SE RECUERDA (recargando) ──');
       w.location.reload();
@@ -183,23 +285,24 @@ f.onload = async () => {
     /* fase 2: la misma pantalla, después de recargar. */
     await esperar(900);
     w.switchView('view-rutas'); await esperar(300);
-    const espejo2 = tarjeta(d, 'Ruta de la Máquina que se Mira');
-    const marea2  = tarjeta(d, 'Ruta de la Marea');
-    ok(espejo2 && !abierta(espejo2), 'la que se plegó sigue plegada tras recargar', 'volvió a abrirse sola');
-    ok(marea2 && abierta(marea2), 'la que se desplegó sigue desplegada tras recargar', 'volvió a cerrarse sola');
-    const lista2 = marea2 && d.getElementById(boton(marea2).getAttribute('aria-controls'));
-    ok(lista2 && lista2.hidden === false && w.getComputedStyle(lista2).display !== 'none',
-      'y su lista de etapas se ve', 'la lista quedó escondida');
-    const listaEspejo2 = espejo2 && d.getElementById(boton(espejo2).getAttribute('aria-controls'));
-    ok(listaEspejo2 && w.getComputedStyle(listaEspejo2).display === 'none',
-      'y la de la plegada sigue sin pintarse', 'la ruta plegada enseña sus etapas igual');
-    /* Las que no se tocaron siguen su criterio inicial. */
-    const dorado2 = tarjeta(d, 'Ruta del Expediente Dorado');
-    ok(dorado2 && abierta(dorado2), 'la ruta que nadie tocó conserva su estado inicial', 'la ruta sin tocar cambió sola');
+    const mayor3 = grupo(d, 'Estudio Mayor');
+    ok(mayor3 && abiertaMat(mayor3), 'la materia que se abrió sigue abierta tras recargar', 'la materia volvió a cerrarse sola');
+    const panelMayor = mayor3 && d.getElementById(botonMat(mayor3).getAttribute('aria-controls'));
+    ok(panelMayor && panelMayor.hidden === false && w.getComputedStyle(panelMayor).display !== 'none',
+      'y sus rutas se ven', 'la lista de rutas quedó escondida');
+    const otras = [...d.querySelectorAll('.materia-grupo')].filter(g => g !== mayor3 && abiertaMat(g));
+    ok(otras.length === 0, 'y las que nadie tocó siguen plegadas',
+      otras.length + ' materias se abrieron solas');
+    /* La ruta que se plegó a mano dentro de esa materia sigue plegada: el
+       estado de la ruta y el de la materia se guardan por separado. */
+    const espejo4 = tarjeta(d, 'Ruta de la Máquina que se Mira');
+    const listaEspejo4 = espejo4 && d.getElementById(boton(espejo4).getAttribute('aria-controls'));
+    ok(espejo4 && !abierta(espejo4) && listaEspejo4 && w.getComputedStyle(listaEspejo4).display === 'none',
+      'la ruta plegada dentro de ella sigue plegada', 'la ruta volvió a abrirse sola');
     /* Y se guarda donde se guarda todo lo demás, no en un almacén nuevo. */
     const guardado = JSON.parse(w.localStorage.getItem('faro_v1') || '{}');
-    ok(guardado.rutasAbiertas && guardado.rutasAbiertas.espejo === false && guardado.rutasAbiertas.marea === true,
-      'el estado vive dentro de faro_v1, con el resto de la aplicación', 'no quedó guardado en faro_v1');
+    ok(guardado.materiasAbiertas && guardado.materiasAbiertas.mayor === true,
+      'el estado de la materia vive dentro de faro_v1, con el resto', 'no quedó guardado en faro_v1');
     ok(Object.keys(w.localStorage).filter(k => /^faro/.test(k)).sort().join(',') === 'faro_session,faro_v1',
       'no se inventó ninguna clave de almacenamiento nueva',
       'claves: ' + Object.keys(w.localStorage).filter(k => /^faro/.test(k)).join(','));

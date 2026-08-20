@@ -4000,8 +4000,79 @@ body {
 .qa-rutas { background: linear-gradient(135deg, #0f766e, #2dd4bf); }
 
 .rutas-intro {
-  margin: 0 0 14px; font-size: 13.5px; line-height: 1.5; color: var(--muted, #64748b);
+  margin: 0 0 12px; font-size: 13.5px; line-height: 1.5; color: var(--muted, #64748b);
 }
+
+/* ── El buscador y el «plegar todo» ──
+   Van en la misma fila y el buscador se come el sitio que sobra: en 380 px el
+   botón cabe con su rótulo y no hay que adivinar qué hace un icono suelto. */
+.rutas-herramientas { display: flex; gap: 8px; align-items: stretch; margin-bottom: 10px; }
+.rutas-buscador { flex: 1; min-width: 0; margin: 0 !important; }
+.rutas-plegar {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 12px; border-radius: 12px; cursor: pointer;
+  background: var(--surface, #fff); border: 1px solid var(--border, #e2e8f0);
+  color: var(--muted, #64748b); font-size: 12.5px; font-weight: 700;
+}
+.rutas-plegar:active { opacity: .75; }
+.rutas-plegar:focus-visible { outline: 2px solid var(--brand-light, #3b82f6); outline-offset: 2px; }
+.rutas-resultado {
+  margin: 0 0 12px; font-size: 12.5px; font-weight: 700; color: var(--muted, #64748b);
+}
+
+/* ══ EL NIVEL DE MATERIA ══
+   38 rutas en lista plana son varios metros de barrido aunque estén plegadas.
+   Agrupadas por materia son once cabeceras que caben en pantalla y media. La
+   cabecera dice lo justo para elegir sin abrir: nombre, cuántas rutas trae,
+   cuántas etapas hay y cuántas se han recorrido. */
+.materia-grupo {
+  border: 1px solid var(--border, #e2e8f0); border-radius: 16px;
+  background: var(--surface, #fff); margin-bottom: 10px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15,23,42,.06);
+}
+.materia-cabecera { margin: 0; font-size: inherit; font-weight: inherit; }
+.materia-toggle {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  background: none; border: 0; padding: 13px 14px; margin: 0;
+  text-align: left; color: inherit; cursor: pointer;
+}
+.materia-toggle:focus-visible { outline: 2px solid var(--brand-light, #3b82f6); outline-offset: -2px; }
+.materia-toggle:active { opacity: .75; }
+/* Un punto del color de la materia en vez de un emoji: las 28 del Estudio Mayor
+   traen emojis distintos por ruta, y ponerle uno al grupo sugeriría que
+   representa a todas. */
+.materia-punto { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.materia-titulos { min-width: 0; flex: 1; }
+.materia-nombre { display: block; font-size: 15px; font-weight: 800; color: var(--text, #0f172a); }
+.materia-cuenta { display: block; margin-top: 2px; font-size: 11.5px; font-weight: 700; color: var(--muted, #64748b); }
+/* La barra de avance de la materia va en la propia cabecera, pequeña y a la
+   derecha: se ve cuánto llevas sin abrir el cajón. */
+.materia-barra-wrap {
+  flex-shrink: 0; width: 46px; height: 6px; border-radius: 999px;
+  background: var(--bg, #f1f5f9); overflow: hidden;
+}
+.materia-barra { display: block; height: 100%; border-radius: 999px; }
+.materia-chevron {
+  flex-shrink: 0; font-size: 13px; color: var(--faint, #94a3b8);
+  transition: transform .2s ease;
+}
+.materia-toggle[aria-expanded="true"] .materia-chevron { transform: rotate(180deg); }
+/* La lista de rutas de una materia. El `display` explícito en el plegado es
+   obligatorio y no adorno: el `[hidden]` del navegador lo pierde contra
+   cualquier regla de `display`, y eso ya dejó una vez esta misma pantalla
+   desplegada con el aria diciendo que estaba cerrada. */
+.materia-rutas { padding: 0 10px 10px; }
+.materia-rutas[hidden] { display: none !important; }
+/* Dentro del grupo las tarjetas no repiten sombra ni borde grueso: el marco lo
+   pone la materia y dos marcos anidados ensucian la pantalla. */
+.materia-rutas .ruta-card { box-shadow: none; margin-bottom: 8px; }
+.materia-rutas .ruta-card:last-child { margin-bottom: 0; }
+
+/* Buscando: la etapa que coincide se resalta y las demás de su ruta se apagan
+   en vez de esconderse, para no romper la numeración de la serie. */
+.ruta-etapa-apagada { opacity: .38; }
+.ruta-etapa-hallada .re-txt { font-weight: 800; }
+
 .ruta-card {
   background: var(--surface, #fff); border: 1px solid var(--border, #e2e8f0);
   border-radius: 16px; padding: 14px; margin-bottom: 14px;

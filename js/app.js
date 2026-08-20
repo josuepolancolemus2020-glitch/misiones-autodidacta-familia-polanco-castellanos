@@ -362,29 +362,105 @@ function materiaDeRuta(ruta) {
   return mat ? mat.label : '';
 }
 
-/* ── Plegado de las tarjetas de ruta ──
-   Con 38 rutas, muchas de 6 a 12 etapas, la pantalla abierta entera son varios
-   metros de barrido y encontrar una ruta se vuelve trabajo. Plegada, la tarjeta
-   sigue diciendo lo esencial (emoji, materia, nombre, lema, barra y cuenta): lo
-   que se esconde es la lista de etapas.
+/* ── Cómo se explora esto sin perderse ──
+   Pedido del autor el 20 de agosto de 2026, con el mapa abierto en la tableta:
+   «que permanezcan acopladas, que sea el usuario que decida desplegar la
+   materia, y que no haga tanto scroll, que serán muchas materias».
+
+   Hoy son 38 rutas y 39 misiones, y esto solo crece. Una lista plana de 38
+   tarjetas son varios metros de barrido aunque cada una esté plegada, así que
+   la pantalla gana un nivel por encima: LA MATERIA. Once materias plegadas
+   caben en pantalla y media, y de ahí se baja a lo que se busca.
+
+   Tres decisiones, y las tres tienen su porqué:
+
+   1. TODO ARRANCA PLEGADO. El criterio anterior (abrir sola la ruta que ya
+      tuviera una etapa construida) se pensó cuando había cuatro rutas; con 38
+      significa abrir casi todo y devolver el problema.
+
+   2. UNA MATERIA CON UNA SOLA RUTA ABRE DIRECTO SUS ETAPAS. Diez de las once
+      materias tienen exactamente una ruta, y obligarlas a dos toques sería
+      cobrar un peaje por un nivel que ahí no separa nada. El nivel intermedio
+      solo lo necesita el Estudio Mayor, que trae 28.
+
+   3. TODO SE PINTA Y SE ESCONDE CON `hidden`, nunca se crea al abrir. Además de
+      ser más simple, hay 38 sondas que buscan las tarjetas de ruta en el
+      documento para comprobar sus etapas: si el contenido naciera al desplegar,
+      dejarían de encontrar nada sin que nadie hubiera roto la pantalla.
 
    El estado vive en el MISMO almacén que todo lo demás (KEY 'faro_v1'), pero
-   fuera de `members`: que una ruta esté plegada es una preferencia de pantalla
-   del aparato, no progreso de nadie, y no tendría sentido que se reiniciara al
+   fuera de `members`: que algo esté plegado es una preferencia de pantalla del
+   aparato, no progreso de nadie, y no tendría sentido que se reiniciara al
    cambiar de perfil. */
-function rutaAbiertaPorDefecto(hechas) {
-  /* Criterio inicial, y queda dicho aquí a propósito: se despliegan las rutas
-     que ya tienen al menos una etapa construida (las que hoy se pueden
-     recorrer) y se pliegan las que están enteras por construir, que de momento
-     solo son un índice de lo que vendrá. Se guarda solo lo que el usuario
-     TOCA, así que una ruta que estrena su primera misión se abre sola la
-     próxima vez, sin tener que ir a corregir nada guardado. */
-  return hechas > 0;
+
+/* Las materias, en el orden en que se enseñan, con las rutas que cuelgan de
+   cada una. La clave de agrupación es el `color` de la ruta, que es lo que ya
+   la ata a su materia en MATERIAS; las 28 del Estudio Mayor comparten el color
+   'mayor' y por eso caen juntas, que es justo lo que se quiere. */
+function materiasConRutas() {
+  const porColor = {};
+  Object.keys(RUTAS).forEach(key => {
+    const c = RUTAS[key].color;
+    (porColor[c] = porColor[c] || []).push(key);
+  });
+  const grupos = [];
+  MATERIAS.forEach(m => {
+    const claves = porColor[m.color] || porColor[m.id] || [];
+    if (claves.length) grupos.push({ id: m.id, label: m.label, sub: m.sub, color: m.color, rutas: claves });
+    delete porColor[m.color]; delete porColor[m.id];
+  });
+  /* Una ruta con un color que no está en MATERIAS no puede desaparecer del
+     mapa en silencio: cae en su propio grupo con el color por nombre, feo y
+     visible, que es como se arregla. */
+  Object.keys(porColor).forEach(c => {
+    grupos.push({ id: c, label: c, sub: '', color: c, rutas: porColor[c] });
+  });
+  return grupos;
 }
 
-function rutaAbierta(s, key, hechas) {
+function rutaAbiertaPorDefecto(rutasEnLaMateria) {
+  /* Ver la decisión 2 de arriba: si la materia trae una sola ruta, abrir la
+     materia ya es abrir la ruta. */
+  return rutasEnLaMateria === 1;
+}
+
+function rutaAbierta(s, key, rutasEnLaMateria) {
   const guardado = (s && s.rutasAbiertas) || {};
-  return typeof guardado[key] === 'boolean' ? guardado[key] : rutaAbiertaPorDefecto(hechas);
+  return typeof guardado[key] === 'boolean' ? guardado[key] : rutaAbiertaPorDefecto(rutasEnLaMateria);
+}
+
+function materiaAbierta(s, id) {
+  const guardado = (s && s.materiasAbiertas) || {};
+  return guardado[id] === true;
+}
+
+function alternarMateria(id, btn) {
+  if (!btn) return;
+  const abierta = btn.getAttribute('aria-expanded') === 'true';
+  const s = load();
+  s.materiasAbiertas = Object.assign({}, s.materiasAbiertas);
+  s.materiasAbiertas[id] = !abierta;
+  save(s);
+  btn.setAttribute('aria-expanded', String(!abierta));
+  const panel = document.getElementById('materia-rutas-' + id);
+  if (panel) panel.hidden = abierta;
+  const grupo = btn.closest('.materia-grupo');
+  if (grupo) grupo.classList.toggle('materia-grupo-plegado', abierta);
+}
+
+/* Volver a la vista compacta de un toque. Sin esto, quien abrió el Estudio
+   Mayor para mirar una cosa se queda con 28 rutas desplegadas para siempre,
+   porque el estado se recuerda a propósito. */
+function plegarTodasLasRutas() {
+  const s = load();
+  s.materiasAbiertas = {};
+  s.rutasAbiertas = {};
+  save(s);
+  const buscador = document.getElementById('rutas-buscar');
+  if (buscador) buscador.value = '';
+  renderRutas();
+  const cont = document.getElementById('rutas-container');
+  if (cont && cont.scrollIntoView) cont.scrollIntoView({ block: 'start' });
 }
 
 function alternarRuta(key, btn) {
@@ -404,26 +480,73 @@ function alternarRuta(key, btn) {
   if (card) card.classList.toggle('ruta-card-plegada', abierta);
 }
 
+/* Texto plano para buscar: sin tildes y en minúsculas, porque nadie escribe
+   «metacognición» con la tilde puesta cuando busca a toda prisa. */
+function rutasPelar(t) {
+  return String(t == null ? '' : t).toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+/* Lo que el buscador mira de una ruta: su materia, su nombre, su lema y el
+   título de TODAS sus etapas, construidas o no. Buscar «hebb» tiene que llevar
+   a la etapa, que es lo que uno quiere estudiar, y no obligar a saberse de
+   memoria en qué ruta cae. */
+function rutaCoincide(consulta, materiaLabel, ruta, etapas) {
+  if (!consulta) return { ruta: true, etapas: null };
+  const q = rutasPelar(consulta);
+  const enCabecera = [materiaLabel, ruta.nombre, ruta.lema, materiaDeRuta(ruta)]
+    .some(t => rutasPelar(t).includes(q));
+  const etapasQueCoinciden = etapas.filter(e => rutasPelar(e.titulo).includes(q)).map(e => e.n);
+  return {
+    ruta: enCabecera || etapasQueCoinciden.length > 0,
+    /* Si la ruta coincide por su cabecera se enseñan TODAS sus etapas: quien
+       buscó la ruta la quiere entera. Si coincide solo por una etapa, se
+       resaltan esas y las demás se quedan apagadas, no escondidas, para no
+       romper la numeración de la serie. */
+    etapas: enCabecera ? null : etapasQueCoinciden,
+  };
+}
+
 function renderRutas() {
   const cont = document.getElementById('rutas-container');
   if (!cont) return;
   const s  = load();
   const ms = memberState(s, s.currentMember);
+  const buscador = document.getElementById('rutas-buscar');
+  const consulta = buscador ? buscador.value.trim() : '';
 
-  cont.innerHTML = Object.keys(RUTAS).map(key => {
-    const { ruta, etapas, total, hechas } = rutaEtapas(key);
-    const visitadas = etapas.filter(e => e.existe && (e.asig
-      ? estadoAsignacion(ms, e.asig.id).estado === 'defendida'
-      : ms.visited.includes(e.mision.id))).length;
-    const pct = total ? Math.round((visitadas / total) * 100) : 0;
-    const materia = materiaDeRuta(ruta);
-    const abierta = rutaAbierta(s, key, hechas);
-    const panelId = 'ruta-etapas-' + key;
+  let rutasVisibles = 0, etapasVisibles = 0;
 
-    return `
-      <div class="ruta-card ${abierta ? '' : 'ruta-card-plegada'}">
-        <h3 class="ruta-cabecera">
-          <button type="button" class="ruta-toggle" aria-expanded="${abierta}" aria-controls="${panelId}"
+  const html = materiasConRutas().map(grupo => {
+    const nRutas = grupo.rutas.length;
+    /* Buscando, los grupos se abren solos para que el resultado se vea sin
+       tener que ir abriendo cajones. Eso NO se guarda: es el efecto de la
+       búsqueda, no una decisión del usuario. */
+    const abiertaMateria = consulta ? true : materiaAbierta(s, grupo.id);
+    const panelId = 'materia-rutas-' + grupo.id;
+
+    let construidasMateria = 0, totalMateria = 0, visitadasMateria = 0;
+    let algunaVisible = false;
+
+    const tarjetas = grupo.rutas.map(key => {
+      const { ruta, etapas, total, hechas } = rutaEtapas(key);
+      const visitadas = etapas.filter(e => e.existe && (e.asig
+        ? estadoAsignacion(ms, e.asig.id).estado === 'defendida'
+        : ms.visited.includes(e.mision.id))).length;
+      construidasMateria += hechas; totalMateria += total; visitadasMateria += visitadas;
+
+      const pct = total ? Math.round((visitadas / total) * 100) : 0;
+      const materia = materiaDeRuta(ruta);
+      const coincide = rutaCoincide(consulta, grupo.label, ruta, etapas);
+      if (coincide.ruta) { algunaVisible = true; rutasVisibles++; }
+      /* Buscando, la ruta que coincide se abre para enseñar dónde cayó. */
+      const abierta = consulta ? true : rutaAbierta(s, key, nRutas);
+      const listaId = 'ruta-etapas-' + key;
+
+      return `
+      <div class="ruta-card ${abierta ? '' : 'ruta-card-plegada'}"${coincide.ruta ? '' : ' hidden'}>
+        <h4 class="ruta-cabecera">
+          <button type="button" class="ruta-toggle" aria-expanded="${abierta}" aria-controls="${listaId}"
                   onclick="alternarRuta('${key}', this)">
             <span class="ruta-emoji" aria-hidden="true">${ruta.emoji}</span>
             <span class="ruta-titulos">
@@ -432,16 +555,19 @@ function renderRutas() {
             </span>
             <i class="fa-solid fa-chevron-down ruta-chevron" aria-hidden="true"></i>
           </button>
-        </h3>
+        </h4>
         <p class="ruta-lema">${ruta.lema}</p>
         <div class="ruta-barra-wrap">
           <div class="ruta-barra" style="width:${pct}%; background:var(--${ruta.color});"></div>
         </div>
         <p class="ruta-cuenta">${visitadas} de ${total} etapas recorridas · ${hechas} construida${hechas === 1 ? '' : 's'}</p>
-        <ol class="ruta-etapas" id="${panelId}"${abierta ? '' : ' hidden'}>
+        <ol class="ruta-etapas" id="${listaId}"${abierta ? '' : ' hidden'}>
           ${etapas.map(e => {
+            const suelta = coincide.etapas && coincide.etapas.indexOf(e.n) < 0 ? ' ruta-etapa-apagada' : '';
+            const hallada = coincide.etapas && coincide.etapas.indexOf(e.n) >= 0 ? ' ruta-etapa-hallada' : '';
+            if (coincide.ruta && !suelta) etapasVisibles++;
             if (!e.existe) return `
-              <li class="ruta-etapa ruta-etapa-futura">
+              <li class="ruta-etapa ruta-etapa-futura${suelta}${hallada}">
                 <span class="re-num">${e.n}</span>
                 <span class="re-txt">${e.titulo}</span>
                 <span class="re-estado">Por construir</span>
@@ -449,7 +575,7 @@ function renderRutas() {
             if (e.asig) {
               const est = estadoAsignacion(ms, e.asig.id);
               return `
-              <li class="ruta-etapa ${est.estado === 'defendida' ? 'ruta-etapa-hecha' : ''}">
+              <li class="ruta-etapa ${est.estado === 'defendida' ? 'ruta-etapa-hecha' : ''}${suelta}${hallada}">
                 <span class="re-num" style="background:var(--${ruta.color});">${e.n}</span>
                 <a class="re-txt re-link" href="#" onclick="abrirAsignacion('${e.asig.id}'); return false;">${e.asig.icon} ${e.titulo}</a>
                 <span class="re-estado">${est.estado === 'defendida' ? '✔ Defendida' : est.estado === 'curso' ? '✎ En curso' : '+' + e.asig.xp + ' XP'}</span>
@@ -457,7 +583,7 @@ function renderRutas() {
             }
             const visitada = ms.visited.includes(e.mision.id);
             return `
-              <li class="ruta-etapa ${visitada ? 'ruta-etapa-hecha' : ''}">
+              <li class="ruta-etapa ${visitada ? 'ruta-etapa-hecha' : ''}${suelta}${hallada}">
                 <span class="re-num" style="background:var(--${ruta.color});">${e.n}</span>
                 <a class="re-txt re-link" href="${e.mision.url}" onclick="visitMission(${e.mision.id}); return false;">${e.mision.icon} ${e.titulo}</a>
                 <span class="re-estado">${visitada ? '✔ Recorrida' : '+' + e.mision.xp + ' XP'}</span>
@@ -465,7 +591,45 @@ function renderRutas() {
           }).join('')}
         </ol>
       </div>`;
+    }).join('');
+
+    const pctMateria = totalMateria ? Math.round((visitadasMateria / totalMateria) * 100) : 0;
+    const cuenta = nRutas === 1
+      ? `${visitadasMateria} de ${totalMateria} etapas · ${construidasMateria} construida${construidasMateria === 1 ? '' : 's'}`
+      : `${nRutas} rutas · ${visitadasMateria} de ${totalMateria} etapas · ${construidasMateria} construida${construidasMateria === 1 ? '' : 's'}`;
+
+    return `
+      <section class="materia-grupo ${abiertaMateria ? '' : 'materia-grupo-plegado'}"${algunaVisible ? '' : ' hidden'}>
+        <h3 class="materia-cabecera">
+          <button type="button" class="materia-toggle" aria-expanded="${abiertaMateria}" aria-controls="${panelId}"
+                  onclick="alternarMateria('${grupo.id}', this)">
+            <span class="materia-punto" aria-hidden="true" style="background:var(--${grupo.color});"></span>
+            <span class="materia-titulos">
+              <span class="materia-nombre">${grupo.label}</span>
+              <span class="materia-cuenta">${cuenta}</span>
+            </span>
+            <span class="materia-barra-wrap" aria-hidden="true">
+              <span class="materia-barra" style="width:${pctMateria}%; background:var(--${grupo.color});"></span>
+            </span>
+            <i class="fa-solid fa-chevron-down materia-chevron" aria-hidden="true"></i>
+          </button>
+        </h3>
+        <div class="materia-rutas" id="${panelId}"${abiertaMateria ? '' : ' hidden'}>${tarjetas}</div>
+      </section>`;
   }).join('');
+
+  cont.innerHTML = html;
+
+  const aviso = document.getElementById('rutas-resultado');
+  if (aviso) {
+    if (!consulta) { aviso.hidden = true; aviso.textContent = ''; }
+    else {
+      aviso.hidden = false;
+      aviso.textContent = rutasVisibles
+        ? `${rutasVisibles} ruta${rutasVisibles === 1 ? '' : 's'} con «${consulta}»`
+        : `Nada con «${consulta}». Prueba con el nombre de una materia, de una ruta o de una etapa.`;
+    }
+  }
 }
 
 /* ─────────────────────────────────────────────
@@ -889,6 +1053,12 @@ document.addEventListener('DOMContentLoaded', () => {
       renderMissions(currentQuery);
     });
   }
+
+  /* El buscador del mapa de rutas. Repinta entero en cada tecla, que con 38
+     rutas cuesta menos de un cuadro y evita tener que llevar la cuenta de qué
+     estaba escondido. */
+  const buscarRutas = document.getElementById('rutas-buscar');
+  if (buscarRutas) buscarRutas.addEventListener('input', () => renderRutas());
 
   // Notificaciones
   document.getElementById('notif-btn').addEventListener('click', () => {

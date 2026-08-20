@@ -98,6 +98,46 @@ node _dev/servidor-estatico.js      (en otra terminal)
 _dev/probe-metas-sugerencias.html   (en el navegador)
 ```
 
+## El mapa de rutas se explora por materia, no en lista
+
+«Mis Rutas» agrupa las rutas **por materia**, y todo arranca **plegado**. Es
+una decisión de escala, no de gusto: hoy son 38 rutas y 39 misiones y esto
+solo crece; una lista plana de 38 tarjetas son varios metros de barrido
+aunque cada una esté cerrada. Once materias plegadas caben en pantalla y
+media.
+
+Tres reglas que hay que respetar al tocar esa pantalla:
+
+1. **Nada se abre solo.** El criterio viejo (abrir la ruta que ya tuviera una
+   etapa construida) se pensó con cuatro rutas; con 38 significa abrir casi
+   todo y devolver el problema.
+2. **Una materia de una sola ruta abre directo sus etapas.** Diez de las once
+   la tienen, y cobrarles un toque por un nivel que ahí no separa nada es
+   peor que no agrupar. El nivel de en medio solo lo necesita el Estudio
+   Mayor, con sus 28.
+3. **Todo se pinta en el DOM y se esconde con `hidden`**, nunca se crea al
+   abrir. Hay **38 sondas** que buscan las tarjetas de ruta en el documento
+   para contar sus etapas: si el contenido naciera al desplegar, dejarían de
+   encontrar nada sin que nadie hubiera roto la pantalla.
+
+Y el buscador de esa pantalla mira materia, nombre de ruta, lema **y título
+de cada etapa**: quien quiere estudiar algo se sabe el nombre del tema, no en
+qué ruta cayó.
+
+## Las sondas declaran su veredicto en el título
+
+Cada sonda termina poniendo **APRUEBA** o **SUSPENDE** en `document.title`.
+No es decoración: es lo que se lee al correrlas en tanda. Once sondas
+antiguas no lo hacían (decían «todo en orden» en su cuerpo y dejaban la
+pestaña con el título de siempre), así que salían como no aprobadas sin
+tener un solo fallo, y eso enseña a desconfiar del resultado en vez de del
+código.
+
+Y las cuentas que dependen del catálogo **se sacan del catálogo**, no se
+escriben a mano. Tres sondas de la Casa Cerrada esperaban una, dos y tres
+etapas construidas; la ruta creció a cuatro y las tres suspendían sin que
+hubiera nada roto.
+
 ## Sellar la versión en cada cambio
 
 El aparato guarda la aplicación en caché y se queda con la versión vieja.

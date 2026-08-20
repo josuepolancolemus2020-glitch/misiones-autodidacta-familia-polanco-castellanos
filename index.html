@@ -244,7 +244,17 @@
       <div></div>
     </header>
     <div class="view-scroll">
-      <p class="rutas-intro">Cada ruta es una serie ordenada: las etapas se recorren en orden y el mapa muestra también lo que falta por construir. Toca el nombre de una ruta para abrir o cerrar su lista de etapas.</p>
+      <p class="rutas-intro">El mapa se abre <strong>plegado por materias</strong>: toca una materia para ver sus rutas, y una ruta para ver sus etapas. Cada ruta es una serie ordenada, y también se muestra lo que falta por construir. Si ya sabes qué buscas, escríbelo aquí arriba.</p>
+      <div class="rutas-herramientas">
+        <div class="search-box rutas-buscador">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="rutas-buscar" type="search" placeholder="Buscar materia, ruta o etapa…" autocomplete="off">
+        </div>
+        <button type="button" class="rutas-plegar" id="rutas-plegar-todo" onclick="plegarTodasLasRutas()">
+          <i class="fa-solid fa-layer-group" aria-hidden="true"></i> Plegar todo
+        </button>
+      </div>
+      <p class="rutas-resultado" id="rutas-resultado" role="status" hidden></p>
       <div id="rutas-container"></div>
     </div>
   </div>
