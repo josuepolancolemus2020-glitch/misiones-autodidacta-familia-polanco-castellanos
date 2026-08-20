@@ -557,7 +557,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   showEnfer();
   updateLabDisplay();
   /* Las baterías de cada lectura las monta js/lecturas.js al cargar. */
-  document.querySelector('[data-parte="postulado"]')?.classList.add('active-pri');
+  document.querySelector('[data-parte="esperado"]')?.classList.add('active-pri');
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });

@@ -97,7 +97,24 @@ M.forEach(m => {
 Object.entries(claves).filter(([, v]) => v.length > 1)
   .forEach(([k, v]) => nota(`la clave de progreso ${k} la comparten ${v.length} misiones: ${v.join(' | ')}`));
 
-/* ── 6. Los archivos que pide cada página ── */
+/* ── 6. La pieza con la que abre el laboratorio ──
+   La norma 1 avisa de esto desde julio y aun así volvió a pasar el 20 de
+   agosto de 2026 con San Petersburgo: la misión abría en su pieza («esperado»)
+   pero seguía resaltando la de la misión molde («postulado»). No revienta,
+   porque el resalte va con `?.`, así que el laboratorio arranca con todas las
+   pestañas apagadas y nadie ve por qué. Se compara lo que declara `labParte`
+   con lo que resalta el arranque: si no coinciden, algo se quedó del molde. */
+M.forEach(m => {
+  const js = R(m.url.replace(/([^/]+)\.html$/, 'js/$1.js'));
+  if (!fs.existsSync(js)) return;
+  const t = fs.readFileSync(js, 'utf8');
+  const abre = /let labParte='([^']+)'/.exec(t);
+  const resalta = /querySelector\('\[data-parte="([^"]+)"\]'\)\?\.classList\.add\('active-pri'\)/.exec(t);
+  if (abre && resalta && abre[1] !== resalta[1])
+    nota(`${m.url} abre el laboratorio en «${abre[1]}» y resalta «${resalta[1]}»: resto de la misión molde`);
+});
+
+/* ── 7. Los archivos que pide cada página ── */
 M.filter(m => fs.existsSync(R(m.url))).forEach(m => {
   const base = path.dirname(R(m.url));
   const html = fs.readFileSync(R(m.url), 'utf8');
