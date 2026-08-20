@@ -1,0 +1,13 @@
+{"clave":"atomos-miedo","base":"atomos-miedo","html":"misiones/ruta-atomos-contra-miedo/atomos-miedo.html","js":"misiones/ruta-atomos-contra-miedo/js/atomos-miedo.js","sonda":"_dev/probe-atomos-etapa1.html"}
+{"clave":"hombre-maquina","base":"hombre-maquina","html":"misiones/ruta-atomos-hombre-maquina/hombre-maquina.html","js":"misiones/ruta-atomos-hombre-maquina/js/hombre-maquina.js","sonda":"_dev/probe-atomos-etapa2.html"}
+{"clave":"regla-hebb","base":"regla-hebb","html":"misiones/ruta-barro-regla-hebb/regla-hebb.html","js":"misiones/ruta-barro-regla-hebb/js/regla-hebb.js","sonda":"_dev/probe-barro-etapa1.html"}
+{"clave":"dinero-no-compra","base":"dinero-no-compra","html":"misiones/ruta-dorado-dinero-no-compra/dinero-no-compra.html","js":"misiones/ruta-dorado-dinero-no-compra/js/dinero-no-compra.js","sonda":"_dev/probe-dorado-etapa3.html"}
+{"clave":"dos-facturas","base":"dos-facturas","html":"misiones/ruta-dorado-dos-facturas/dos-facturas.html","js":"misiones/ruta-dorado-dos-facturas/js/dos-facturas.js","sonda":"_dev/probe-dorado-etapa4.html"}
+{"clave":"escoces-dorado","base":"escoces-dorado","html":"misiones/ruta-dorado-escoces-dorado/escoces-dorado.html","js":"misiones/ruta-dorado-escoces-dorado/js/escoces-dorado.js","sonda":"_dev/probe-dorado-etapa5.html"}
+{"clave":"fallas-maquina","base":"fallas-maquina","html":"misiones/ruta-dorado-fallas-maquina/fallas-maquina.html","js":"misiones/ruta-dorado-fallas-maquina/js/fallas-maquina.js","sonda":"_dev/probe-dorado-etapa2.html"}
+{"clave":"gran-fuga","base":"gran-fuga","html":"misiones/ruta-dorado-gran-fuga/gran-fuga.html","js":"misiones/ruta-dorado-gran-fuga/js/gran-fuga.js","sonda":"_dev/probe-dorado-etapa1.html"}
+{"clave":"vigia-timon","base":"vigia-timon","html":"misiones/ruta-espejo-vigia-timon/vigia-timon.html","js":"misiones/ruta-espejo-vigia-timon/js/vigia-timon.js","sonda":"_dev/probe-espejo-etapa1.html"}
+{"clave":"bisturi-freeden","base":"bisturi-freeden","html":"misiones/ruta-gafas-bisturi-freeden/bisturi-freeden.html","js":"misiones/ruta-gafas-bisturi-freeden/js/bisturi-freeden.js","sonda":"_dev/probe-gafas-etapa2.html"}
+{"clave":"mapa-familias","base":"mapa-familias","html":"misiones/ruta-gafas-mapa-familias/mapa-familias.html","js":"misiones/ruta-gafas-mapa-familias/js/mapa-familias.js","sonda":"_dev/probe-gafas-etapa3.html"}
+{"clave":"gafas-expediente","base":"gafas-expediente","html":"misiones/ruta-gafas-palabra-expediente/gafas-expediente.html","js":"misiones/ruta-gafas-palabra-expediente/js/gafas-expediente.js","sonda":"_dev/probe-gafas-etapa1.html"}
+{"clave":"acero-juicio","base":"acero-juicio","html":"misiones/ruta-rojo-acero-juicio/acero-juicio.html","js":"misiones/ruta-rojo-acero-juicio/js/acero-juicio.js","sonda":"_dev/probe-rojo-etapa1.html"}

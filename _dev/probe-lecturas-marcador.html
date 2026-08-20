@@ -70,12 +70,18 @@ f.onload=async()=>{
       ok(cats==='dato,voz,idea,contra,duda', 'las cinco categorías del código de la casa', 'categorías: '+cats);
       ok(!!d.querySelector('#s-lecturas .fm-leyenda'), 'la leyenda se pinta arriba, antes de leer', 'no hay leyenda en la tarjeta de presentación');
       ok(!!d.getElementById('fmPanel'), 'y el panel de marcas está en la sección', 'falta el panel de marcas');
-      /* El panel va ANTES de las preguntas: se repasa lo marcado y
-         después se contesta, no al revés. */
+      /* Desde que cada lectura lleva sus preguntas dentro, ya no hay
+         tarjeta de baterías al final: el panel cierra la sección, después
+         de las seis lecturas y antes del botón de pasar a Recursos. Si
+         volviera a aparecer una batería suelta, esto lo caza. */
       const cards=[...d.querySelectorAll('#s-lecturas .card')];
       const iPanel=cards.findIndex(c=>c.id==='fmPanel');
-      const iPreg=cards.findIndex(c=>/Preguntas de las/i.test(c.textContent));
-      ok(iPanel>=0 && iPreg>=0 && iPanel<iPreg, 'el panel va antes de las preguntas', 'el panel quedó descolocado');
+      const iDebate=cards.findIndex(c=>c.id==='lect-debate');
+      ok(iDebate>=0 && iPanel>iDebate, 'el panel va después de las seis lecturas', 'el panel quedó descolocado');
+      ok(iPanel===cards.length-1, 'y cierra la sección', 'el panel no es la última tarjeta de Lecturas');
+      ok(!cards.some(c=>/Preguntas de las/i.test(c.textContent)), 'y ya no hay batería suelta al final', 'sigue la tarjeta de preguntas del final');
+      const btnSig=d.querySelector('#s-lecturas .next-sec-btn');
+      ok(!!btnSig && !!(d.getElementById('fmPanel').compareDocumentPosition(btnSig) & Node.DOCUMENT_POSITION_FOLLOWING), 'y el botón de seguir queda por debajo', 'el panel se coló por debajo del botón de seguir');
 
       log('\n── EL CÓDIGO DE COLORES ──');
       /* Las tres señales: sin ellas la fotocopia en blanco y negro
@@ -376,7 +382,7 @@ f.onload=async()=>{
       /* La de prosa NO tiene lecturas: sus zonas son las secciones. */
       if(tipo==='prosa') ok(conTexto.some(z=>z.clave.indexOf('s-')===0),
         '  y sus zonas son las secciones de prosa', '  no encontró secciones de prosa: '+JSON.stringify(zs));
-      if(tipo==='lect') ok(conTexto.length===5, '  y son sus cinco lecturas', '  zonas: '+conTexto.length);
+      if(tipo==='lect') ok(conTexto.length===6, '  y son sus seis lecturas, careo incluido', '  zonas: '+conTexto.length);
       /* Y el motor de la misión sigue entero pese a cargar la puerta. */
       ok(gw.eval('typeof qzData!=="undefined" && qzData.length>0'),
         '  el quiz de la misión sigue funcionando', '  cargar la puerta rompió el motor de la misión');
