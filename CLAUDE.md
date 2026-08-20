@@ -104,6 +104,44 @@ El aparato guarda la aplicación en caché y se queda con la versión vieja.
 En **todo** cambio de HTML, CSS o JS hay que subir `CACHE_NAME` en
 `sw.js`. Si no se sella, el despliegue existe y nadie lo ve.
 
+## Empujar no es publicar: se comprueba el despliegue
+
+`git push` dice que el commit llegó al repositorio. **No dice que el
+sitio lo esté sirviendo.** El 20 de agosto de 2026 se dio por publicado
+un cambio que nadie podía ver: el push había ido bien y la construcción
+de GitHub Pages para ese commit había fallado con un **500 del propio
+GitHub** («Server error, is githubstatus.com reporting a Pages outage?
+Please re-run the deployment at a later time»). El sitio siguió sirviendo
+el commit anterior durante una hora, y el fallo lo encontró el autor
+mirando el teléfono, no quien hizo el cambio.
+
+La aplicación se sirve desde **GitHub Pages, rama `main` y raíz**, sin
+archivo de flujo de trabajo propio: Pages construye sola en cada push.
+Así que antes de decir que algo está publicado hay que mirar cómo quedó
+esa construcción:
+
+```
+https://api.github.com/repos/<usuario>/<repo>/actions/runs
+```
+
+y comprobar que la ejecución llamada **`pages build and deployment`** con
+el `head_sha` del commit está en `completed / success`. Sirve sin
+credenciales porque el repositorio es público.
+
+Cuando falle:
+
+1. **Relanzarla** (`rerun_failed_jobs`). Un 500 de Pages suele ser
+   pasajero.
+2. Si el relanzamiento **se queda en cola sin arrancar**, está muerto: no
+   se puede cancelar («Cannot cancel a workflow re-run that has not yet
+   queued») y no va a arrancar solo. La salida es **empujar un commit
+   nuevo**, que arranca una construcción limpia.
+
+Y un aviso para quien lo compruebe desde una sesión de Claude Code: el
+proxy de esas sesiones **bloquea `github.io` y `githubstatus.com`**, así
+que el sitio en vivo no se puede pedir con `curl` desde ahí. `api.github.com`
+sí responde, y por eso la comprobación va por la API.
+
 ## Comentarios en el código
 
 En español, y explicando **por qué** está así, no qué hace la línea. Casi
