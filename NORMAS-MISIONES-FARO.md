@@ -26,9 +26,16 @@ Cada misión lleva además:
 - **sección de Recursos** que enlaza su ficha y sus fuentes reales;
 - **color propio** en `--pri` y `--sec` de su CSS.
 
-Al copiar el molde de otra misión hay que revisar tres cosas que se arrastran:
-los rótulos de las pruebas impresas (traen el nombre de la misión anterior),
-los guiones largos del motor, y la pieza inicial del laboratorio.
+Al copiar el molde de otra misión hay que revisar **cuatro** cosas: los
+rótulos de las pruebas impresas (traen el nombre de la misión anterior), los
+guiones largos del motor, la pieza inicial del laboratorio, y **que estén
+todos los archivos que la página pide**. La cuarta se añadió el 20 de agosto
+de 2026, después de publicar una misión sin `js/html2canvas.min.js`: cada
+misión lleva su propia copia de esa librería en su carpeta, el andamio copió
+el motor y no la librería, y el diploma se habría quedado sin imagen sin que
+nadie se enterara. **Ninguna sonda miraba los enlaces internos**, así que la
+sonda de cada misión nueva comprueba ahora que todo `src` y `href` propio
+responda de verdad.
 
 ## 2. Norma 1-bis: sin guiones largos
 

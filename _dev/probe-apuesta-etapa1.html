@@ -353,6 +353,23 @@ window.addEventListener('load', async () => {
     ok(!!d.getElementById('fmPanel'), 'y pintó su panel de marcas', 'el marcador no pintó su panel');
     ok(!!d.querySelector('#lectIndice .fm-leyenda'), 'con la leyenda del código de colores en el índice', 'no hay leyenda de colores');
 
+    /* Que TODO lo que la página pide exista de verdad. Esto se pone porque
+       faltó: al levantar la misión desde el molde se copió el js propio y no
+       la librería html2canvas, que cada misión lleva en su carpeta, y el
+       diploma se habría quedado sin imagen sin que nadie se enterara. Ninguna
+       sonda miraba los enlaces internos. */
+    const pedidos = [...d.querySelectorAll('script[src], link[href]')]
+      .map(el => el.getAttribute('src') || el.getAttribute('href'))
+      .filter(u => u && !/^(https?:|data:|mailto:)/.test(u));
+    const faltan = [];
+    for (const u of pedidos) {
+      try {
+        const r = await fetch(new URL(u, d.baseURI).href, { method: 'GET' });
+        if (!r.ok) faltan.push(u + ' (' + r.status + ')');
+      } catch (e) { faltan.push(u + ' (no se pudo pedir)'); }
+    }
+    ok(faltan.length === 0, 'los ' + pedidos.length + ' archivos que pide la página existen', 'faltan: ' + faltan.join(', '));
+
     log('\n── LA FICHA (norma 6) ──');
     const fr = document.createElement('iframe');
     fr.style.cssText = 'width:900px;height:600px;border:0;position:absolute;left:-9999px;';
