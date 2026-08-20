@@ -428,6 +428,18 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .neuro-trans-display{font-family:'Fredoka',sans-serif;font-size:1.5rem;font-weight:700;color:var(--dark);background:var(--pri-gl);border:2px solid var(--pri);border-radius:12px;padding:0.8rem 1.2rem;text-align:center;margin:0.5rem 0;min-height:3rem;display:flex;align-items:center;justify-content:center;}
 
 /* IMÁGENES VISUALES */
+/* Las siete infografías de esta misión nunca llegaron al repositorio: la
+   página las pedía y el navegador enseñaba siete huecos. Se quitaron las
+   referencias el 20 de agosto de 2026 y se conservó el pie de cada una, que
+   era lo único que de verdad enseñaba algo. Queda como nota de texto: si algún
+   día se dibujan las infografías, vuelven aquí con su <figure> y su pie.
+   Los estilos de imagen se quedan porque el molde los usa en otras misiones. */
+.nota-visual{
+  font-size:0.82rem;color:var(--gray);font-style:italic;text-align:left;
+  margin:0.9rem 0;padding:0.6rem 0.8rem;border-left:3px solid var(--border);
+  border-radius:0 8px 8px 0;background:var(--card-bg,transparent);
+}
+.nota-visual-par{display:grid;grid-template-columns:1fr;gap:0.4rem;margin:1rem 0;}
 .img-visual-wrap{margin:1rem 0;text-align:center;}
 .img-visual{width:100%;max-width:480px;height:auto;border-radius:12px;box-shadow:0 4px 16px var(--shadow);display:block;margin:0 auto;}
 .img-visual-wide{width:100%;max-width:640px;height:auto;border-radius:12px;box-shadow:0 4px 16px var(--shadow);display:block;margin:0 auto;}
