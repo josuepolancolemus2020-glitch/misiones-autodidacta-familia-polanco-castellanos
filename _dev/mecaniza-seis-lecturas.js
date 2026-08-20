@@ -98,8 +98,11 @@ if (h.indexOf('id="lcProg"') >= 0) {
   ok('baterías del final retiradas');
 }
 
-/* Los botones de imprimir de la tarjeta de entrada. */
-if (h.indexOf("imprimirLectura('debate')") >= 0 && h.indexOf('🖨️ Imprimir las seis') < 0) {
+/* Los botones de imprimir de la tarjeta de entrada. El guardián mira el
+   rótulo VIEJO y no el nuevo: la tarjeta que sustituye a las baterías ya
+   trae un «Imprimir las seis lecturas», así que buscar el nuevo daba
+   siempre por hecho que esto ya estaba hecho y se saltaba el cambio. */
+if (h.indexOf('>🖨️ Imprimir las cinco</button>') >= 0) {
   h = h.replace(/<button class="btn btn-pri" onclick="imprimirTodasLasLecturas\(\)">🖨️ Imprimir las cinco<\/button>/,
     '<button class="btn btn-amber" onclick="imprimirLectura(\'debate\')">🖨️ Imprimir el careo</button>\n'
     + '      <button class="btn btn-pri" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis</button>');
