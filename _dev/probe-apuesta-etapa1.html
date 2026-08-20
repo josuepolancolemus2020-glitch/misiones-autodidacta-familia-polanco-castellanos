@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta de la Apuesta Medida, etapa 1</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-apuesta-san-petersburgo/san-petersburgo.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 1 de la Ruta de la Apuesta Medida (Toma de decisiones):
+   bancos, laboratorio, pruebas impresas con su nombre, los ocho casos, el
+   guion, las seis lecturas con sus preguntas dentro, el marcador, la ficha y
+   la ruta en el mapa.
+
+   La regla que esta sonda vigila con más saña es la de la propia etapa. La
+   misión enseña que el valor esperado tiene DOS condiciones de uso que no
+   están escritas en la fórmula (que la apuesta se repita y que la rama mala
+   no saque de la mesa), y una misión que enseñara eso y luego presentara la
+   cuenta como respuesta universal sería el chiste más caro del proyecto. Por
+   eso aquí se exige, en el texto de la página, que las dos condiciones
+   aparezcan nombradas, que los casos incluyan al menos uno con la cuenta a
+   favor que se RECHAZA y uno con la cuenta en contra que se ACEPTA, y que las
+   fechas y las personas de la historia estén con su año.                  */
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try {
+    appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+    appFrame.contentWindow.localStorage.removeItem('faro_v1');
+  } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+/* Selecciona por posición GLOBAL del párrafo: al pintar marcas el texto queda
+   repartido en varios nodos y firstChild ya no vale. */
+function seleccionar(d, w, parr, a, b) {
+  const paseo = d.createTreeWalker(parr, NodeFilter.SHOW_TEXT, null);
+  let off = 0, ini = null, fin = null;
+  while (paseo.nextNode()) {
+    const n = paseo.currentNode, len = n.nodeValue.length;
+    if (!ini && a >= off && a <= off + len) ini = [n, a - off];
+    if (!fin && b >= off && b <= off + len) fin = [n, b - off];
+    off += len;
+  }
+  if (!ini || !fin) return false;
+  const r = d.createRange();
+  r.setStart(ini[0], ini[1]); r.setEnd(fin[0], fin[1]);
+  const s = w.getSelection(); s.removeAllRanges(); s.addRange(r);
+  d.dispatchEvent(new w.Event('selectionchange'));
+  return true;
+}
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  const cerrar = () => { log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda apuesta etapa 1'; };
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 17, '17 secciones (15 del molde + guion + lecturas)', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta de la Apuesta Medida · Etapa 1 de 6/.test(d.body.textContent), 'se presenta como etapa 1 de 6', 'no se presenta como etapa de la ruta');
+    /* Restos del molde: se copió de la etapa 1 del Barro Vivo, y su vocabulario
+       (Hebb, el eslogan, las neuronas) no pinta nada aquí. */
+    ok(!/Hebb|cablea|Löwel|Singer|Shatz|Markram|sinapsis|neurona|metrónomo/i.test(d.body.textContent),
+       'sin restos de la misión de la que se copió', 'queda el temario de la etapa del barro');
+    ok(!/—/.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(/—/g) || []).length + ' guiones largos');
+    /* La banda del encabezado vive en un ::before y ninguna sonda la miraba:
+       por eso se arrastró una vez de misión en misión (norma 5-ter). */
+    const banda = w.getComputedStyle(d.querySelector('.hero'), '::before').content;
+    ok(/SAN PETERSBURGO/.test(banda) && /VALOR ESPERADO/.test(banda),
+       'la banda del encabezado es de esta etapa', 'la banda dice: ' + banda.slice(0, 70));
+
+    log('\n── LA REGLA DEL ESTATUS (la regla del Estudio Mayor) ──');
+    const t0 = d.body.textContent.replace(/\s+/g, ' ');
+    ok(/Nicol[áa]s Bernoulli/.test(t0) && /1713/.test(t0), 'Nicolás Bernoulli aparece con su año', 'falta Nicolás Bernoulli con 1713');
+    ok(/Montmort/.test(t0), 'y el destinatario de la carta', 'falta Montmort');
+    ok(/Daniel Bernoulli/.test(t0) && /1738/.test(t0), 'Daniel Bernoulli con 1738', 'falta Daniel Bernoulli con su año');
+    ok(/Jacob Bernoulli/.test(t0) && /Ars Conjectandi/.test(t0), 'Jacob Bernoulli y la ley de los grandes números', 'falta Ars Conjectandi');
+    ok(/von Neumann|Von Neumann/.test(t0) && /Morgenstern/.test(t0) && /1944/.test(t0),
+       'von Neumann y Morgenstern con 1944', 'faltan los axiomas de 1944');
+    ok(/Allais/.test(t0) && /1953/.test(t0) && /1988/.test(t0), 'Allais con su paradoja y su Nobel', 'falta Allais con sus años');
+    ok(/Kahneman/.test(t0) && /Tversky/.test(t0) && /1979/.test(t0), 'Kahneman y Tversky con 1979', 'falta la teoría de las perspectivas');
+    ok(/cl[áa]sico fundacional/i.test(t0), 'las fuentes llevan su etiqueta de estatus', 'ninguna fuente lleva etiqueta');
+    ok(/media verdad de manual/i.test(t0), 'y la media verdad lleva la suya', '«el valor esperado dice lo que hay que hacer» no queda etiquetado');
+
+    log('\n── EL CONCEPTO, BIEN CONTADO ──');
+    ok(/valor esperado/i.test(t0), 'el valor esperado se nombra', 'no aparece el valor esperado');
+    ok(/infinito/i.test(t0), 'y la esperanza infinita del juego', 'no se dice que el valor esperado sea infinito');
+    ok(/utilidad marginal decreciente/i.test(t0), 'la utilidad marginal decreciente, que es la salida de 1738', 'falta la utilidad marginal decreciente');
+    /* Las DOS condiciones de uso, que es lo que la etapa deja puesto para las
+       cinco siguientes. Si faltara una, la misión enseñaría media herramienta. */
+    ok(/apuesta [úu]nica/i.test(t0), 'el primer límite: la apuesta única', 'falta el límite de la apuesta única');
+    ok(/ruina/i.test(t0), 'el segundo límite: el riesgo de ruina', 'falta el riesgo de ruina');
+    ok(/norma/i.test(t0) && /retrato/i.test(t0), 'y la distinción entre norma y retrato', 'falta la distinción norma / retrato');
+    ok(/lempira/i.test(t0), 'los números van en lempiras (norma 3)', 'no hay cifras en lempiras');
+
+    log('\n── LOS OCHO CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos').textContent.replace(/\s+/g, ' ');
+    ok((casos.match(/Caso \d/g) || []).length === 8, 'los ocho casos están', 'casos: ' + (casos.match(/Caso \d/g) || []).length);
+    ok(/M\.E\.T\.A\.S/.test(casos), 'y salen de este proyecto', 'los casos no hablan del proyecto');
+    /* El corazón de la etapa: el signo de la cuenta NO basta para decidir, y
+       eso solo se enseña con los dos casos cruzados. Si los dos no están, la
+       misión enseña «calcula y obedece», que es lo contrario. */
+    ok(/112,50/.test(casos), 'la rifa con la cuenta a favor que se rechaza', 'falta el caso de la apuesta única');
+    ok(/L 900/.test(casos) && /garant[íi]a/i.test(casos), 'y la garantía con la cuenta en contra que se acepta', 'falta el caso del seguro');
+    ok(/60,000|60 000/.test(casos) && /40,000|40 000/.test(casos), 'el préstamo cuya rama mala hunde la casa', 'falta el caso de la ruina');
+    ok(/d[ée]cima parte/i.test(casos), 'y la misma apuesta partida en pedazos', 'falta el caso de partir la apuesta');
+    ok(/confianza/i.test(casos), 'un caso donde lo que se arriesga no son lempiras', 'todos los casos se miden en dinero');
+    ok(/condicion/i.test(casos), 'y la regla de que se acepta con condiciones', 'no aparece la regla de las condiciones');
+
+    log('\n── EL GUION DE VIDEO (norma 5) ──');
+    const g = d.getElementById('s-guion').textContent.replace(/\s+/g, ' ');
+    ok((g.match(/Escena \d/g) || []).length === 7, 'las siete escenas', 'escenas: ' + (g.match(/Escena \d/g) || []).length);
+    ok(/VOZ:/.test(g) && /IMAGEN:/.test(g) && /TEXTO EN PANTALLA:/.test(g), 'cada escena lleva VOZ, IMAGEN y TEXTO', 'faltan las tres pistas');
+    ok(/gancho en fr[íi]o/i.test(g), 'el gancho en frío', 'falta el gancho');
+    ok(/objeci[óo]n del p[úu]blico/i.test(g), 'la objeción del público, concedida y contestada', 'falta la objeción');
+    ok(/San Petersburgo: lo que vale una apuesta/.test(g), 'y el cierre nombra la misión', 'el cierre no nombra la misión');
+
+    log('\n── LAS SEIS LECTURAS (normas 5-quinquies y 5-nonies) ──');
+    const lect = d.getElementById('s-lecturas');
+    const tl = lect.textContent.replace(/\s+/g, ' ');
+    const claves = ['borges', 'cervantes', 'harari', 'entrevista', 'gala', 'debate'];
+    ok(claves.every(k => !!d.getElementById('lect-' + k)), 'las seis tarjetas están, con sus ids',
+       'faltan: ' + claves.filter(k => !d.getElementById('lect-' + k)).join(', '));
+    ok(lect.querySelectorAll('.card[id^="lect-"]').length === 6, 'y no hay ninguna de más',
+       'tarjetas: ' + lect.querySelectorAll('.card[id^="lect-"]').length);
+    ok(/Seis lecturas/i.test(tl) && /seis voces/i.test(tl), 'la tarjeta de entrada anuncia seis', 'la entrada sigue anunciando cinco');
+    ok(/Cada lectura trae sus propias preguntas/i.test(tl) && /plegadas/i.test(tl),
+       'y avisa de las preguntas de cada lectura y del plegado', 'la entrada no explica las preguntas ni el plegado');
+    ok(/ejercicio(s)? de estilo/i.test(tl) && /No son obra de esos autores/i.test(tl),
+       'el pastiche va declarado (regla del estatus)', 'el pastiche no se declara');
+    /* La etiqueta tiene que separar los dos estatus: los cinco primeros son
+       pastiche y el sexto es un careo que no imita a nadie. */
+    ok(/cinco primeros/i.test(tl), 'la etiqueta distingue a los cinco primeros', 'la etiqueta mete las seis en el mismo saco');
+    ok(/sexto/i.test(tl) && /careo/i.test(tl), 'y nombra el sexto como careo', 'la etiqueta no nombra el careo');
+    ok(/papeles/i.test(tl) && /no personas/i.test(tl), 'y dice que el careo firma con papeles', 'la etiqueta no dice cómo firma sus turnos el careo');
+    ok(/nunca ocurrieron/i.test(tl), 'y que los encuentros de las entrevistas nunca ocurrieron', 'falta la declaración de ficción');
+    ok(/La moneda de Basilea/.test(tl), 'el cuento a la manera de Borges', 'falta el cuento');
+    ok(/ventera/.test(tl) && /arriero/.test(tl), 'el capítulo cervantino, con su venta', 'falta el capítulo');
+    ok(/repartir la mala suerte/i.test(tl), 'el ensayo a la manera de Harari', 'falta el ensayo');
+    ok(/Punset/.test(tl) && /Redes/.test(tl), 'la entrevista, con las señas reales del entrevistador', 'la entrevista no declara quién es Punset');
+    ok(/Quintero/.test(tl) && /Gala/.test(tl) && /Loco de la Colina/i.test(tl), 'la conversación del Loco de la Colina', 'falta la conversación');
+
+    log('\n── EL CAREO, LA SEXTA LECTURA (norma 5-nonies) ──');
+    const careo = d.getElementById('lect-debate');
+    const tc = careo.textContent.replace(/\s+/g, ' ');
+    const nota = (careo.querySelector('.lect-nota') || {}).textContent || '';
+    /* Los turnos los firman los PAPELES en mayúscula: es lo que permite que el
+       careo enfrente a gente viva sin ponerle una palabra en la boca a nadie. */
+    ok(/MODERACI[ÓO]N\./.test(tc), 'los turnos de moderación firman en mayúscula', 'no hay turnos de MODERACIÓN');
+    ok(/LA DEFENSA\./.test(tc) && /LA OBJECI[ÓO]N\./.test(tc), 'y los de la defensa y la objeción', 'faltan los papeles de defensa y objeción');
+    ok(!/Ejercicio de estilo de la casa/i.test(nota), 'el careo NO lleva la etiqueta del pastiche', 'al careo le pusieron etiqueta de pastiche');
+    ok(/palabras inventadas en boca de nadie|no se le pone/i.test(nota), 'y su nota declara que no se le pone palabra a nadie', 'la nota del careo no lo declara');
+    ok(/mejor versi[óo]n/i.test(nota), 'y que cada postura va en su mejor versión (regla del acero)', 'la nota no declara la regla del acero');
+    /* Las seis partes obligatorias, en orden. */
+    ok(/pregunta en disputa/i.test(tc), '1. la pregunta en disputa', 'falta la pregunta en disputa');
+    ok(/terreno com[úu]n/i.test(tc), '5. el terreno común', 'falta el terreno común');
+    ok(/qu[ée] dato lo resolver[íi]a/i.test(tc), '6. y qué dato lo resolvería', 'el careo no dice qué dato lo resolvería');
+    ok(tc.indexOf('pregunta en disputa') < tc.indexOf('terreno común'), 'y las partes van en orden', 'las partes del careo están desordenadas');
+    /* Las anclas reales de ESTE careo: la disputa existe y tiene nombres. */
+    ok(/Peters/.test(tc) && /Nature Physics/.test(tc), 'la objeción se cita con su autor y su revista', 'la objeción no lleva fuente');
+    ok(/Gell-Mann/.test(tc) && /Chaos/.test(tc), 'con su segundo trabajo', 'falta el trabajo con Gell-Mann');
+    ok(/Wakker/.test(tc), 'y la defensa con la suya', 'la defensa no lleva fuente');
+    ok(/ergodicidad/i.test(tc), 'la postura se nombra por su nombre', 'no se nombra la economía de la ergodicidad');
+    ok(/mismo consejo/i.test(tc), 'y el terreno común llega hasta la recomendación práctica', 'el careo no dice en qué coinciden al aconsejar');
+
+    log('\n── LOS TRES BANCOS DE LAS LECTURAS ──');
+    ok(dentro('lectComprensionBank.length') === 30, '30 preguntas de comprensión lectora', 'comprensión: ' + dentro('lectComprensionBank.length'));
+    ok(dentro('lectCompletarBank.length') === 12, '12 de completar', 'completar: ' + dentro('lectCompletarBank.length'));
+    ok(dentro('lectAnalisisBank.length') === 12, '12 de análisis complejo', 'análisis: ' + dentro('lectAnalisisBank.length'));
+    const voces = ['Borges', 'Cervantes', 'Harari', 'Entrevista', 'Quintero y Gala', 'Debate'];
+    voces.forEach(v => {
+      const c = dentro('lectComprensionBank.filter(q=>q.t===' + JSON.stringify(v) + ').length');
+      const f = dentro('lectCompletarBank.filter(q=>q.t===' + JSON.stringify(v) + ').length');
+      const a = dentro('lectAnalisisBank.filter(q=>q.t===' + JSON.stringify(v) + ').length');
+      ok(c === 5 && f === 2 && a === 2, '  ' + v + ': 5 de comprensión, 2 de completar y 2 de análisis',
+         '  ' + v + ': ' + c + '/' + f + '/' + a);
+    });
+    ok(dentro('lectAnalisisBank.every(q=>q.guia&&q.guia.length>250)'), 'cada análisis trae su pauta escrita', 'algún análisis va sin pauta');
+    ok(dentro('lectAnalisisBank.every(q=>!/^\\\\s*\\\\d+[.)]\\\\s/.test(q.q))'), 'y ningún enunciado arrastra el número del banco viejo', 'algún análisis sale numerado');
+
+    log('\n── EL PLEGADO Y EL ÍNDICE ──');
+    ok(!!d.getElementById('lectIndice'), 'hay índice de las seis arriba', 'falta el índice de lecturas');
+    ok(d.querySelectorAll('#lectIndice .lect-ind-btn').length === 6, 'con un botón por lectura', 'botones: ' + d.querySelectorAll('#lectIndice .lect-ind-btn').length);
+    const cuerpos = [...d.querySelectorAll('#s-lecturas .lect-cuerpo')];
+    ok(cuerpos.length === 6 && cuerpos.every(c => c.hidden), 'las seis empiezan plegadas', 'alguna empieza abierta');
+    /* No basta el atributo: una regla de display puede ganarle a [hidden] y
+       dejar la lectura a la vista con el aria diciendo que está cerrada. */
+    ok(cuerpos.every(c => w.getComputedStyle(c).display === 'none'), 'y plegadas de verdad, no solo con el atributo', 'alguna se sigue pintando');
+
+    log('\n── ABRIR UNA LECTURA, Y SUS PROPIAS PREGUNTAS ──');
+    w.FaroLecturas.abrir('borges');
+    await esperar(300);
+    const cardB = d.getElementById('lect-borges');
+    ok(cardB.classList.contains('lect-abierta'), 'abrir una lectura la despliega', 'no se desplegó');
+    ok(!cardB.querySelector('.lect-cuerpo').hidden, 'y su cuerpo se ve', 'el cuerpo sigue escondido');
+    w.FaroLecturas.abrir('debate');
+    await esperar(300);
+    ok(!cardB.classList.contains('lect-abierta'), 'y abrir otra cierra la anterior', 'quedan dos abiertas a la vez');
+    const bloques = d.getElementById('lect-debate').querySelectorAll('.lect-bloque');
+    ok(bloques.length === 3, 'cada lectura trae sus tres baterías dentro', 'baterías del careo: ' + bloques.length);
+    ok(!d.querySelector('#lcQ, #lfQ, #laQ'), 'y ya no hay una batería suelta al final de la sección', 'sigue la batería vieja al final');
+
+    /* Contestar de verdad, en la lectura de Borges, y que pague XP. */
+    w.FaroLecturas.abrir('borges'); await esperar(250);
+    const bC = cardB.querySelector('.lect-bloque[data-b="c"]');
+    ok(/Pregunta 1 de 5/.test(bC.querySelector('.lect-prog').textContent), 'la comprensión de la lectura cuenta 5', 'contador: ' + bC.querySelector('.lect-prog').textContent);
+    ok(bC.querySelectorAll('.lect-opt').length === 4, 'con sus cuatro opciones', 'opciones: ' + bC.querySelectorAll('.lect-opt').length);
+    const xp0 = dentro('xp');
+    bC.querySelectorAll('.lect-opt')[dentro('lectComprensionBank.filter(q=>q.t==="Borges")[0].c')].click();
+    bC.querySelector('.lect-verifica').click();
+    await esperar(300);
+    ok(dentro('xp') > xp0, 'la respuesta correcta suma XP', 'la comprensión no dio XP');
+    const bF = cardB.querySelector('.lect-bloque[data-b="f"]');
+    ok(bF.querySelector('.lect-enun').textContent.indexOf('___') >= 0, 'completar pinta su hueco', 'completar sin hueco');
+    const xp1 = dentro('xp');
+    bF.querySelector('.lect-input').value = dentro('lectCompletarBank.filter(q=>q.t==="Borges")[0].a');
+    bF.querySelector('.lect-verifica').click();
+    await esperar(300);
+    ok(dentro('xp') > xp1, 'completar suma XP con la respuesta buena', 'completar no dio XP');
+    const bA = cardB.querySelector('.lect-bloque[data-b="a"]');
+    ok(/sin XP/.test(bA.querySelector('.lect-prog').textContent), 'el análisis avisa de que no da XP', 'el análisis no avisa');
+    ok(bA.querySelector('.lect-pauta').hidden, 'y su pauta empieza tapada', 'la pauta se ve sin pedirla');
+    const xp2 = dentro('xp');
+    bA.querySelector('.lect-vp').click(); await esperar(200);
+    ok(!bA.querySelector('.lect-pauta').hidden, 'se destapa cuando se pide', 'la pauta no se destapa');
+    ok(dentro('xp') === xp2, 'y el análisis complejo no regala XP', 'el análisis regaló XP');
+
+    log('\n── LA BARRA SE ABRE JUNTO A LO SELECCIONADO (norma 5-sexies) ──');
+    const parr = d.querySelector('#lect-borges .lect-cuerpo p.lect-p');
+    parr.scrollIntoView({ block: 'center' });
+    await esperar(200);
+    seleccionar(d, w, parr, 5, 70);
+    await esperar(420);
+    const barra = d.getElementById('fmBarra');
+    ok(!!barra && barra.classList.contains('fm-abierta'), 'seleccionar abre la barra de marcar', 'la barra no se abrió');
+    ok(w.getComputedStyle(barra).position === 'absolute' || barra.classList.contains('fm-barra-abajo'),
+       'y se coloca pegada al trozo, no siempre al pie', 'la barra sigue anclada abajo a la fuerza');
+    const caja = barra.getBoundingClientRect();
+    ok(caja.left >= -1 && caja.right <= 381, 'sin salirse en 380 px', 'la barra se sale: ' + Math.round(caja.left) + ' a ' + Math.round(caja.right));
+
+    log('\n── LA MARCA DE LECTURA, QUE LA PONE EL LECTOR (norma 5-nonies) ──');
+    ok(typeof w.FaroMarcador.lugar === 'function', 'el marcador sabe dónde se quedó uno', 'falta FaroMarcador.lugar');
+    /* PRIMERO: que NO se ponga sola. La versión anterior la ponía un observador
+       y el autor la mandó quitar porque distrae mientras se lee. */
+    w.localStorage.removeItem(dentro('SAVE_KEY') + '_lugar');
+    const ps = [...d.querySelectorAll('#lect-borges .lect-cuerpo p.lect-p')];
+    ps[Math.min(4, ps.length - 1)].scrollIntoView({ block: 'center' });
+    await esperar(1500);
+    ok(!w.FaroMarcador.lugar(), 'leer no pone ninguna marca por su cuenta', 'la marca volvió a ponerse sola');
+    ok(!d.querySelector('[data-fm-aqui]'), 'y la cinta vieja del margen ya no existe', 'sigue la cinta del margen izquierdo');
+    const altoAntes = ps[0].getBoundingClientRect().height;
+    seleccionar(d, w, ps[0], 10, 26);
+    await esperar(420);
+    const btnAqui = d.getElementById('fmBtnAqui');
+    ok(!!btnAqui && btnAqui.style.display !== 'none', 'la barra de marcar trae «Aquí me quedé»', 'no está el botón de la marca de lectura');
+    btnAqui.click(); await esperar(400);
+    const aqui = d.querySelectorAll('#lect-borges .fm-aqui');
+    ok(aqui.length >= 1, 'y marca justo lo seleccionado', 'no se pintó la marca de lectura');
+    ok(d.querySelectorAll('#lect-borges .fm-aqui-fin').length === 1, 'con un solo 🔖', 'salió más de un marcador');
+    ok(!!w.FaroMarcador.lugar(), 'el marcador la apunta', 'no quedó apuntada');
+    ok(Math.abs(ps[0].getBoundingClientRect().height - altoAntes) < 1.5, 'y no le añade alto al párrafo', 'la marca empujó el texto');
+    aqui[0].click(); await esperar(400);
+    ok(!d.querySelector('#lect-borges .fm-aqui'), 'tocarla la quita, sin preguntar nada', 'la marca sigue puesta después de tocarla');
+
+    log('\n── EL RESTO DE LOS BANCOS ──');
+    ok(dentro('qzData.length') === 10, 'el quiz trae 10 preguntas', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('fcData.length') === 16, '16 flashcards de vocabulario', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('evalMCBank.length') === 15 && dentro('evalTFBank.length') === 15
+       && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15,
+       'la evaluación final trae sus cuatro bancos de 15', 'algún banco de la evaluación no llega a 15');
+    ok(dentro('critCaseBank.length') === 8, 'la evaluación competencial trae ocho casos', 'casos competenciales: ' + dentro('critCaseBank.length'));
+    ok(dentro('timelineData.length') === 7, 'los siete pasos de la apuesta medida', 'pasos: ' + dentro('timelineData.length'));
+    ok(dentro('Object.keys(parteData).length') === 4, 'el laboratorio tiene sus cuatro piezas', 'piezas del laboratorio: ' + dentro('Object.keys(parteData).length'));
+    /* La pieza inicial del laboratorio se arrastra al copiar el molde y deja la
+       pantalla rota en silencio (norma 1). */
+    ok(dentro('typeof parteData[labParte] !== "undefined"'), 'y la pieza inicial existe de verdad', 'el laboratorio arranca apuntando a una pieza que no existe');
+    ok(dentro('sopaSets[0].words.length') === 10, 'la sopa trae diez palabras', 'palabras de la sopa: ' + dentro('sopaSets[0].words.length'));
+    ok(dentro('sopaSets[0].words.every(p=>p.cells.every(([r,c])=>sopaSets[0].grid[r][c]===p.w[p.cells.indexOf(p.cells.find(x=>x[0]===r&&x[1]===c))]))') !== false,
+       'y todas se leen de verdad en la rejilla', 'alguna palabra no está en la rejilla');
+    ok(dentro('routeSets.length') === 3, 'el widget de ordenar trae tres secuencias', 'secuencias: ' + dentro('routeSets.length'));
+    ok(dentro('routeSets.every(s=>s.steps.length===7)'), 'de siete pasos cada una', 'alguna secuencia no tiene siete pasos');
+
+    log('\n── EL WIDGET DE ORDENAR (norma 5-bis) ──');
+    w.go('s-widgets'); await esperar(300);
+    const tarjetas = d.querySelectorAll('#routeList .sort-item');
+    ok(tarjetas.length > 0, 'la lista de pasos se pinta', 'no se pintó la lista de ordenar');
+    ok(!!d.querySelector('#routeList .sort-grip'), 'cada tarjeta trae su asa para arrastrar', 'no hay asa de arrastre');
+    ok(/touch-action/.test(d.querySelector('#routeList').innerHTML + [...d.styleSheets].map(h => { try { return [...h.cssRules].map(r => r.cssText).join(' '); } catch (e) { return ''; } }).join(' ')),
+       'arrastrar la tarjeta no arrastra la página (touch-action)', 'falta touch-action en las tarjetas');
+    ok(/linterna/i.test(d.getElementById('s-widgets').textContent), 'y la linterna está, con su aviso de que cuesta XP', 'falta la linterna');
+
+    log('\n── IMPRESIÓN DE LAS LECTURAS Y DEL PLIEGO ──');
+    /* Se comprueba de verdad: se intercepta window.open, se corre cada botón de
+       imprimir y se lee el documento que se habría mandado a la impresora.
+       Antes de esto la sonda ha subrayado, y lo subrayado SALE IMPRESO, así que
+       las comprobaciones de PROSA miran la hoja sin etiquetas. */
+    const prosa = h => h.replace(/<[^>]+>/g, '');
+    const abiertos = [];
+    w.open = function () { return { document: { write(s) { abiertos.push(s); }, close() {} }, print() {}, focus() {}, close() {} }; };
+    w.imprimirLectura('borges');
+    const hb = abiertos[abiertos.length - 1] || '';
+    ok(/La moneda de Basilea/.test(hb) && /cuaderno de hule negro/.test(prosa(hb)), 'el cuento se imprime con su texto completo', 'el cuento no se imprime');
+    ok(/la casa donde uno duerme/.test(prosa(hb)), 'y hasta su última línea', 'la hoja del cuento sale cortada');
+    ok(/NO es obra de ese autor/i.test(hb) && /ejercicio de estilo de la casa/i.test(hb), 'con la etiqueta del estatus en la hoja', 'la hoja sale sin declarar el pastiche');
+    ok(/Pregunta/i.test(hb) || /preguntas/i.test(hb), 'y con sus propias preguntas detrás', 'la hoja sale sin sus preguntas');
+
+    w.imprimirLectura('entrevista');
+    const he = abiertos[abiertos.length - 1] || '';
+    ok(/Punset/.test(he) && /Bernoulli/.test(he), 'la entrevista se imprime entera', 'la entrevista no se imprime');
+    ok(/nunca ocurri/i.test(he), 'y su hoja declara que el encuentro nunca ocurrió', 'la entrevista impresa no declara la ficción');
+
+    w.imprimirLectura('debate');
+    const hd = abiertos[abiertos.length - 1] || '';
+    ok(/MODERACI[ÓO]N/.test(hd) && /LA OBJECI[ÓO]N/.test(hd), 'el careo se imprime completo', 'el careo no se imprime');
+    ok(/Careo escrito por la casa/i.test(hd), 'con su etiqueta propia, la del careo', 'el careo sale sin su etiqueta');
+    ok(!/NO es obra de ese autor/i.test(hd), 'y NO con la del pastiche, porque no imita a nadie', 'al careo impreso le pusieron la etiqueta del pastiche');
+    ok(!/—/.test(hd), 'y sin guiones largos', 'el careo impreso trae guiones largos');
+
+    w.imprimirTodasLasLecturas();
+    const ht = abiertos[abiertos.length - 1] || '';
+    ok(/La moneda de Basilea/.test(ht) && /ventera/.test(ht) && /repartir la mala suerte/.test(ht)
+       && /Punset/.test(ht) && /Quintero/.test(ht) && /MODERACI[ÓO]N/.test(ht),
+       'las seis lecturas se imprimen juntas en un solo pliego', 'el pliego de las seis no las trae todas');
+    ok((ht.match(/page-break-before|break-before/g) || []).length >= 4, 'y cada una arranca en su propia hoja', 'las seis salen pegadas');
+
+    w.imprimirPreguntasLecturas();
+    const hp = abiertos[abiertos.length - 1] || '';
+    ok(/30 de comprensi[óo]n/.test(hp), 'el pliego de preguntas declara 30 de comprensión', 'el pliego no dice 30');
+    ok((hp.match(/class="op"/g) || []).length === 120, 'las 30 preguntas salen con sus 120 opciones', 'opciones: ' + (hp.match(/class="op"/g) || []).length);
+    ok((hp.match(/_______________/g) || []).length === 12, 'las 12 de completar salen con su hueco', 'huecos: ' + (hp.match(/_______________/g) || []).length);
+    ok(/PAUTA|Pauta completa/i.test(hp), 'con su pauta al final', 'el pliego sale sin pauta');
+    ok(!/—/.test(hp), 'y el pliego va sin guiones largos', 'el pliego trae guiones largos');
+
+    log('\n── EL MARCADOR (normas 5-sexies y 5-septies) ──');
+    ok(!!d.querySelector('link[href*="lecturas.css"]'), 'la misión carga la hoja del aparato de lecturas', 'falta css/lecturas.css');
+    ok(!!d.querySelector('script[src*="lecturas.js"]'), 'y el aparato de lecturas', 'falta js/lecturas.js');
+    ok(!!d.querySelector('link[href*="lecturas-marcador.css"]'), 'la misión carga la hoja del marcador', 'falta css/lecturas-marcador.css');
+    ok(!!d.querySelector('script[src*="lecturas-marcador.js"]'), 'y el aparato del marcador', 'falta js/lecturas-marcador.js');
+    ok(!!w.FaroMarcador, 'el marcador arrancó en la misión', 'FaroMarcador no existe');
+    ok(!!d.getElementById('fmPanel'), 'y pintó su panel de marcas', 'el marcador no pintó su panel');
+    ok(!!d.querySelector('#lectIndice .fm-leyenda'), 'con la leyenda del código de colores en el índice', 'no hay leyenda de colores');
+
+    log('\n── LA FICHA (norma 6) ──');
+    const fr = document.createElement('iframe');
+    fr.style.cssText = 'width:900px;height:600px;border:0;position:absolute;left:-9999px;';
+    fr.src = '/fichas/ficha-apuesta-san-petersburgo.html';
+    document.body.appendChild(fr);
+    await new Promise(r => { fr.onload = r; });
+    await esperar(700);
+    const fd = fr.contentDocument;
+    const txtF = fd.body.textContent.replace(/\s+/g, ' ');
+    ok(fd.querySelectorAll('.pagina').length === 10, 'la ficha tiene sus diez páginas', 'páginas: ' + fd.querySelectorAll('.pagina').length);
+    ok(/San Petersburgo/.test(txtF) && /Apuesta Medida/.test(txtF), 'y es la de esta etapa', 'la ficha no es de esta misión');
+    ok(!/Hebb|cablea|neurona/i.test(txtF), 'sin restos de la ficha de la que se copió', 'la ficha arrastra el temario del molde');
+    ok(!/—/.test(txtF), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok(/Pauta de los ejercicios/i.test(txtF), 'con la pauta de los ejercicios', 'la ficha no trae pauta');
+    ok(/hoja de la apuesta/i.test(txtF), 'la hoja de la apuesta para llenar', 'falta la hoja de la apuesta');
+    ok(/diario de decisiones/i.test(txtF), 'y el diario de decisiones', 'falta el diario de decisiones');
+    ok(/cl[áa]sico fundacional/i.test(txtF), 'las fuentes de la ficha llevan etiqueta', 'las fuentes de la ficha van sin etiqueta');
+    ok(/lecturas-marcador\.js/.test(fd.documentElement.innerHTML), 'la ficha trae el marcador (norma 5-octies)', 'la ficha no trae el marcador');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-apuesta-san-petersburgo"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+    fr.remove();
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const ruta = [...da.querySelectorAll('.ruta-card')].find(c => (c.querySelector('.ruta-nombre') || {}).textContent === 'Ruta de la Apuesta Medida');
+    ok(!!ruta, 'la Ruta de la Apuesta Medida está en el mapa', 'no aparece la ruta');
+    if (ruta) {
+      ok(/Toma de decisiones/.test(ruta.textContent), 'con su materia a la vista', 'la tarjeta no dice la materia');
+      ok(ruta.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 5, 'y 5 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      ok(/San Petersburgo: lo que vale una apuesta/.test(ruta.textContent), 'la etapa 1 sale con el título de la misión', 'la etapa 1 no sale con su título');
+      ok(/El árbol antes del salto/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
+      ok(!/Etapa por construir/.test(ruta.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
+    }
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="mayor"]');
+    ok(!!chip, 'la materia Estudio Mayor tiene su chip', 'no hay chip del Estudio Mayor');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const cards = [...da.querySelectorAll('#missions-container .mission-card')];
+      /* La cuenta sale del CATÁLOGO y no escrita a mano (norma 7). */
+      const delMayor = wa.eval('MISSIONS.filter(m=>m.materia==="mayor").length');
+      ok(cards.length === delMayor, 'la materia muestra sus ' + delMayor + ' misiones', 'muestra ' + cards.length + ' de ' + delMayor);
+      const mia = cards.find(c => /San Petersburgo/.test(c.textContent));
+      ok(!!mia, 'y la nueva está entre ellas', 'la misión nueva no sale en la portada');
+      ok(mia && /🎲/.test(mia.textContent), 'con su emoji propio', 'la misión sale sin su emoji');
+    }
+    cerrar();
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); cerrar(); }
+});
+</script>
+</body>
+</html>

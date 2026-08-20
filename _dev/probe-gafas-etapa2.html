@@ -787,7 +787,11 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 13, 'la materia muestra sus trece misiones', 'muestra ' + tarjetas.length);
+      /* La cuenta sale del CATÁLOGO y no escrita a mano: con trece escritas,
+         la sonda suspendía en cuanto se construía una misión más, sin que
+         hubiera nada roto (norma 7). */
+      const delMayor = wa.eval('MISSIONS.filter(m=>m.materia==="mayor").length');
+      ok(tarjetas.length === delMayor, 'la materia muestra sus ' + delMayor + ' misiones', 'muestra ' + tarjetas.length + ' de ' + delMayor);
       const t = tarjetas.find(x => /bisturí de Freeden/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }

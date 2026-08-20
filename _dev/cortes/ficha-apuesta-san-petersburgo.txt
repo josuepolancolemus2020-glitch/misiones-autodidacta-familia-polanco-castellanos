@@ -1,0 +1,14 @@
+# Nueve cortes para diez páginas (norma 6). Cada línea es el trozo literal que
+# debe QUEDAR AL INICIO de una página. Los anclajes repetidos llevan clase
+# propia (pasos p2, casos c58, caja titular, hoja ej2) porque el repaginador
+# busca literales en orden y cuatro tablas iguales lo mandarían a cortar donde
+# no es, sin avisar.
+<h2>🧩 El valor esperado, desarmado en cuatro piezas</h2>
+<h2>🪙 Las ocho primeras ramas del juego, en una tabla</h2>
+<h2>🧱 Lo que la solución de 1738 no resuelve, y por qué importa</h2>
+<h2>🎯 Cuándo el valor esperado SÍ es la herramienta correcta</h2>
+<table class="pasos p2">
+<table class="casos c58">
+<div class="caja titular">
+<table class="hoja ej2">
+<h2>📚 Las fuentes, con su etiqueta</h2>

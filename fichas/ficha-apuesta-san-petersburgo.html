@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ficha de estudio · Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</title>
+<title>Ficha de estudio · Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/ficha.css">
 <link rel="stylesheet" href="../css/lecturas-marcador.css">
 <style>
-  :root { --pri: #9a3412; --pri-suave: #fff7ed; --sec: #57534e; --sec-suave: #fafaf9; }
+  :root { --pri: #0f5132; --pri-suave: #f0fdf4; --sec: #92400e; --sec-suave: #fffbeb; }
   .mini { font-size: 12px; color: var(--gris); }
   table.piezas th:nth-child(1) { width: 20%; }
-  table.orden { font-size: 11.5px; }
-  table.orden th:nth-child(1) { width: 38%; }
+  table.utilidad { font-size: 11.5px; }
+  table.utilidad th:nth-child(1) { width: 30%; }
   table.voces { font-size: 11.5px; }
   table.voces th:nth-child(1) { width: 26%; }
-  table.momentos { font-size: 11.5px; }
-  table.momentos th:nth-child(1) { width: 6%; text-align: center; }
-  table.momentos th:nth-child(2) { width: 22%; }
+  table.pasos { font-size: 11.5px; }
+  table.pasos th:nth-child(1) { width: 6%; text-align: center; }
+  table.pasos th:nth-child(2) { width: 22%; }
   table.casos { font-size: 11.5px; }
   table.casos th:nth-child(1) { width: 6%; text-align: center; }
   table.casos th:nth-child(2) { width: 30%; }
@@ -37,415 +37,438 @@
 <div class="doc">
 
 
+
+
+
+
 <!-- ═══════════ PÁGINA 1 ═══════════ -->
 <section class="pagina">
-  <a class="volver" href="../misiones/ruta-barro-regla-hebb/regla-hebb.html">← Volver a la misión</a>
+  <a class="volver" href="../misiones/ruta-apuesta-san-petersburgo/san-petersburgo.html">← Volver a la misión</a>
   <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
 
   <div class="fh">
-    <div class="f-badge">📄 Ficha de estudio · La regla de Hebb, bien contada</div>
-    <div class="f-meta"><b>Ruta:</b> 🏺 Ruta del Barro Vivo · Etapa 1 de 6 · <b>Materia:</b> Estudio Mayor (Neuroplasticidad)</div>
-    <div class="f-meta"><b>Tema:</b> qué escribió Hebb en 1949 y qué le borró el eslogan de 1992, por qué el orden de los disparos decide si una conexión se refuerza o se debilita, y qué cambia el lunes cuando la regla se cuenta bien.</div>
+    <div class="f-badge">📄 Ficha de estudio · San Petersburgo: lo que vale una apuesta</div>
+    <div class="f-meta"><b>Ruta:</b> 🎲 Ruta de la Apuesta Medida · Etapa 1 de 6 · <b>Materia:</b> Estudio Mayor (Toma de decisiones)</div>
+    <div class="f-meta"><b>Tema:</b> por qué un juego que vale infinito no se compra por cien lempiras, qué resolvió Daniel Bernoulli en 1738, y cuáles son las dos condiciones de uso que el valor esperado no lleva escritas.</div>
   </div>
 
   <h2>🎯 Objetivos</h2>
   <ol>
-    <li>Citar el <b>postulado de Hebb</b> entero, con su año, y nombrar sus cuatro piezas.</li>
-    <li>Decir <b>quién escribió</b> «lo que dispara junto se cablea junto», y qué le quita al postulado.</li>
-    <li>Explicar el <b>orden de disparo</b>: antes refuerza, después debilita, y en qué se midió.</li>
-    <li>Separar <b>práctica activa</b> de <b>exposición pasiva</b> en cualquier escena de la casa.</li>
-    <li>Rediseñar una práctica real cambiando <b>una sola cosa</b>, y volver a medirla a la semana.</li>
+    <li>Calcular el <b>valor esperado</b> de una oferta real, en lempiras, escribiendo antes sus ramas.</li>
+    <li>Explicar la <b>apuesta de San Petersburgo</b> y por qué su valor esperado es infinito.</li>
+    <li>Decir qué resolvió <b>Daniel Bernoulli en 1738</b> y con qué idea lo resolvió.</li>
+    <li>Nombrar los <b>dos límites</b> del valor esperado y reconocerlos en una oferta concreta.</li>
+    <li>Separar la <b>norma</b> (cómo convendría decidir) del <b>retrato</b> (cómo se decide de verdad).</li>
   </ol>
 
-  <h2>🏺 La puerta de la Neuroplasticidad</h2>
-  <p>Esta es la primera etapa de la materia que estudia <b>cómo cambia el cerebro con lo que se le hace repetir</b>, y va primero porque casi todo el mundo llega a ella con una frase ya aprendida que está mal contada. Corregirla no es manía de precisión: cambia lo que uno hace el lunes con veinte minutos. El único prerrequisito es la misión del <b>Sistema Nervioso</b> que la casa ya hizo: neurona, sinapsis y potencial de acción no se explican aquí, se usan.</p>
+  <h2>🎲 La puerta de la Toma de decisiones</h2>
+  <p>Esta es la primera etapa de la materia que estudia <b>cómo se decide con información incompleta</b>, y empieza donde empezó la materia: con un juego que rompió la mejor herramienta que había. La aritmética es de escuela primaria. Lo escaso no es la cuenta: es <b>hacerla sobre las ofertas propias, con las probabilidades escritas antes de conocer el resultado</b>.</p>
 
   <div class="caja">
-    <h3>📕 El postulado, tal como se publicó</h3>
-    <p>En 1949, Donald O. Hebb publicó «The Organization of Behavior» y dejó escrito en el capítulo 4 lo que él mismo llamó su <b>postulado neurofisiológico</b>: cuando el axón de una célula A está lo bastante cerca de una célula B para excitarla, y <b>participa de forma repetida o persistente en hacerla disparar</b>, ocurre algún proceso de crecimiento o cambio metabólico en una de las dos células, o en las dos, de modo que <b>aumenta la eficacia de A como una de las células que hacen disparar a B</b>.</p>
-    <p class="mini">Nótese la palabra «postulado». No dijo ley ni hallazgo: dijo que lo daba por supuesto para poder razonar, y que alguien tendría que comprobarlo. Esa declaración de estatus es del propio autor, y por eso viaja siempre con la cita.</p>
+    <h3>🪙 El juego, tal como se planteó</h3>
+    <p>Se lanza una moneda honrada hasta que salga cara. Si la cara sale al primer lanzamiento, la banca paga <b>2</b> lempiras; si sale al segundo, <b>4</b>; al tercero, <b>8</b>; al cuarto, <b>16</b>, y así, doblando siempre, sin techo. La pregunta es una sola: <b>¿cuánto pagarías por entrar?</b></p>
+    <p class="mini">Lo planteó Nicolás Bernoulli en 1713, en una carta a Pierre Rémond de Montmort. Nació en una correspondencia y no en un libro, que es un detalle que conviene recordar cuando alguien exige que las ideas lleguen ya terminadas.</p>
   </div>
 
-  <h2>🗺️ El camino de la ruta, visto desde aquí</h2>
-  <p>Esta etapa pone el mecanismo y el vocabulario; las cinco siguientes bajan al detalle o derriban mitos: <b>2</b>, la potenciación a largo plazo y el receptor NMDA; <b>3</b>, periodo crítico contra periodo sensible; <b>4</b>, qué compra la práctica deliberada y qué no, con la crítica al lado; <b>5</b>, el sueño como archivador; y <b>6</b>, el derribo mito por mito, con la mejor versión de cada uno primero.</p>
+  <h2>🧮 Por qué la cuenta no cierra</h2>
+  <p>Cada rama aporta lo mismo. La de 2 lempiras tiene probabilidad 1/2 y aporta 1; la de 4 tiene 1/4 y aporta 1. La probabilidad se divide por dos y el premio se multiplica por dos, así que el producto es siempre uno. Y las ramas <b>no se acaban nunca</b>: el valor esperado es <b>infinito</b>. Si esa cuenta fuera la última palabra, negarse a pagar cien mil lempiras sería un error.</p>
 
-<h2>🧩 El postulado, desarmado en cuatro piezas</h2>
-  <p>La frase de 1949 no es un eslogan: es un mecanismo con condiciones. Quitarle una condición no la simplifica, la cambia de significado, y por eso conviene tenerlas separadas.</p>
+  <h2>🗺️ El camino de la ruta, visto desde aquí</h2>
+  <p>Esta etapa pone la herramienta y sus condiciones de uso; las cinco siguientes construyen encima: <b>2</b>, el árbol de decisión antes del salto; <b>3</b>, Bayes contado con los dedos y no con fórmulas; <b>4</b>, puertas de ida y vuelta y cuánto se apuesta; <b>5</b>, el premortem, que entierra el proyecto antes de empezarlo; y <b>6</b>, decidir juntos, explorar y parar.</p>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 <!-- ═══════════ PÁGINA 2 ═══════════ -->
 <section class="pagina">
+  <h2>🧩 El valor esperado, desarmado en cuatro piezas</h2>
+  <p>La fórmula es corta y sus condiciones de uso no están dentro de ella. Las dos primeras piezas son de aritmética y casi nadie las falla; las dos últimas son de criterio, y son las que deciden si la fórmula era la herramienta correcta.</p>
+
   <table class="piezas">
-    <tr><th>Pieza</th><th>Qué dice Hebb</th><th>Qué pasa si se quita</th></tr>
-    <tr><td><b>Cercanía</b></td><td>A está lo bastante cerca de B para excitarla</td><td>Se cree que cualquier par de ideas se asocia sola, sin conexión que lo sostenga</td></tr>
-    <tr><td><b>Participación</b></td><td>A <b>toma parte</b> en hacer disparar a B</td><td>Queda «disparar junto»: basta la coincidencia, y con eso todo lo simultáneo asociaría</td></tr>
-    <tr><td><b>Repetición</b></td><td>De forma repetida o persistente</td><td>Se espera cambio duradero con una sola pasada, y después se culpa a la memoria</td></tr>
-    <tr><td><b>Dirección</b></td><td>Crece la eficacia <b>de A para disparar a B</b></td><td>Se cree que el refuerzo es mutuo y simétrico, y desaparece el orden temporal</td></tr>
+    <tr><th>Pieza</th><th>Qué pide la cuenta</th><th>Qué pasa si falta</th></tr>
+    <tr><td><b>Las ramas</b></td><td>Listar <b>todos</b> los resultados posibles</td><td>Se pesa media apuesta, y la rama que falta suele ser la más probable: la de que no pase nada</td></tr>
+    <tr><td><b>Las probabilidades</b></td><td>Que sumen 1 y se escriban <b>antes</b> del resultado</td><td>Se ajustan a lo que ya se decidió, y la cuenta deja de decidir: solo confirma</td></tr>
+  </table>
+
+  <table class="piezas">
+    <tr><th>Pieza</th><th>Qué pide la cuenta</th><th>Qué pasa si falta</th></tr>
+    <tr><td><b>La repetición</b></td><td>Que la apuesta se vaya a jugar <b>muchas veces</b></td><td>La media promedia mundos que este jugador no va a vivir</td></tr>
+    <tr><td><b>El tamaño</b></td><td>Que perder <b>no saque de la mesa</b></td><td>Una esperanza positiva termina en ruina, y de la ruina no se vuelve a apostar</td></tr>
   </table>
 
   <div class="caja">
-    <h3>🔑 La palabra que sostiene todo</h3>
-    <p><b>Participa.</b> Que dos células estén activas a la vez no significa nada por sí solo: en un cerebro despierto hay millones activas en cualquier instante. Lo que el postulado exige es que una <b>contribuya a encender</b> a la otra. Eso trae dos cosas que la simultaneidad no trae: una <b>causa</b> y un <b>orden</b>, porque para ayudar a encender algo hay que llegar antes.</p>
+    <h3>🔑 La frase que sostiene la materia entera</h3>
+    <p><b>Una decisión es una apuesta con información incompleta: se evalúa por el proceso y por lo que se sabía al decidir, nunca por el resultado.</b> Todo lo demás son consecuencias suyas. Quien acepta la frase puede reconstruir cada herramienta de la ruta; quien no la acepta usará las herramientas y las abandonará con la primera racha mala.</p>
+    <p class="mini">Tiene un costo emocional que casi nadie paga: obliga a aceptar que <b>se puede decidir bien y perder</b>, y que se puede decidir pésimo y ganar. El mundo entero califica al revés.</p>
   </div>
 
-  <h2>🧱 Lo otro que hay en el mismo libro</h2>
-  <p>El postulado es la frase famosa, pero no es la idea principal del libro: Hebb lo usó como ladrillo para construir dos conceptos mayores. La <b>asamblea de células</b> es un grupo de neuronas que se enciende en conjunto, gracias a esas conexiones reforzadas, y acaba funcionando como una sola unidad, que es lo que permite activar un concepto entero con un fragmento. La <b>secuencia de fases</b> es el encadenado de unas asambleas con otras, con el que Hebb intentaba explicar cómo un pensamiento lleva al siguiente, que era el problema que de verdad quería resolver.</p>
-  <p class="mini">Quien cita solo el postulado se queda con el ladrillo y se pierde la pared. En la defensa oral de esta etapa se pide nombrar las dos.</p>
-
   <h2>📖 El vocabulario de la etapa</h2>
-  <table class="voces vocab">
+  <table class="voces">
     <tr><th>Palabra</th><th>Qué significa aquí</th></tr>
-    <tr><td>Postulado de Hebb</td><td>Si A participa repetidamente en hacer disparar a B, crece la eficacia de A hacia B (1949)</td></tr>
-    <tr><td>Coincidencia</td><td>Dos elementos activos a la vez, sin que ninguno participe en encender al otro</td></tr>
-    <tr><td>Orden de disparo</td><td>Quién dispara primero: antes refuerza (potenciación), después debilita (depresión)</td></tr>
-    <tr><td>Asamblea de células</td><td>El grupo que se enciende junto y funciona como unidad</td></tr>
-    <tr><td>Práctica activa</td><td>Producir la respuesta, ver el resultado y corregir enseguida</td></tr>
-    <tr><td>Exposición pasiva</td><td>El material pasa por delante y no se produce nada. Y <b>especificidad</b>: se gana lo practicado y nada más</td></tr>
+    <tr><td><b>Valor esperado</b></td><td>Cada rama por su probabilidad, sumadas. La respuesta correcta a una pregunta concreta: qué conviene a la larga</td></tr>
+    <tr><td><b>Utilidad marginal decreciente</b></td><td>Cada lempira nuevo vale un poco menos que el anterior</td></tr>
+    <tr><td><b>Riesgo de ruina</b></td><td>La pérdida que impide jugar la vez siguiente, y por eso corta la serie</td></tr>
+    <tr><td><b>Norma y retrato</b></td><td>Cómo convendría decidir, frente a cómo se decide de verdad</td></tr>
   </table>
 
-<h2>📣 El expediente del eslogan</h2>
-  <p>«Lo que dispara junto se cablea junto» es probablemente la frase más citada de la neurociencia popular en español y en inglés. Aparece en anuncios de aplicaciones, en cursos, en guías de maestro y en portadas de libros de autoayuda, casi siempre firmada por Hebb. <b>No es suya.</b></p>
+<div class="caja">
+    <h3>🧮 La cuenta entera, hecha una vez</h3>
+    <p>Un puesto vende una rifa de <b>L 50</b> el boleto. El premio es de <b>L 300</b> y se venden <b>10</b> boletos. Las ramas son dos y sus probabilidades suman 1.</p>
+    <p><b>Gano</b> (1 de 10, es decir 0,1): me quedan L 300 menos los 50 del boleto, o sea <b>+L 250</b>. <b>Pierdo</b> (9 de 10, es decir 0,9): <b>−L 50</b>.</p>
+    <p>Valor esperado = 0,1 × 250 + 0,9 × (−50) = 25 − 45 = <b>−L 20</b>. La cuenta sale <b>en contra</b> por veinte lempiras por boleto, y eso es lo que gana el puesto en promedio con cada uno.</p>
+    <p class="mini">Obsérvese que la cuenta se hace igual aunque la respuesta ya se intuyera. Se calcula siempre: el número da algo que discutir y algo que revisar dentro de un año, que es lo que la intuición no deja.</p>
+  </div>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 <!-- ═══════════ PÁGINA 3 ═══════════ -->
 <section class="pagina">
-  <table class="voces expediente">
-    <tr><th>Quién</th><th>Qué hizo, y cuándo</th></tr>
-    <tr><td>Donald Hebb</td><td>Escribió el postulado en <b>1949</b>, con participación, dirección y repetición. Nunca escribió la rima.</td></tr>
-    <tr><td>Siegrid Löwel y Wolf Singer</td><td>Formularon la frase corta en un artículo de <b>Science</b>, en <b>1992</b>, sobre conexiones horizontales en la corteza visual.</td></tr>
-    <tr><td>Carla Shatz</td><td>Puso en circulación, ese mismo año, la <b>versión rimada</b> que se hizo famosa en inglés y que se tradujo a medio mundo.</td></tr>
+  <h2>🪙 Las ocho primeras ramas del juego, en una tabla</h2>
+  <p>La columna de la derecha es la que sorprende: <b>todas aportan lo mismo</b>, y por eso la suma no se detiene.</p>
+  <table class="utilidad">
+    <tr><th>Sale cara en el lanzamiento</th><th>Probabilidad</th><th>Paga</th><th>Aporta al valor</th></tr>
+    <tr><td>1.º</td><td>1/2</td><td>L 2</td><td>L 1</td></tr>
+    <tr><td>2.º</td><td>1/4</td><td>L 4</td><td>L 1</td></tr>
+    <tr><td>3.º</td><td>1/8</td><td>L 8</td><td>L 1</td></tr>
+    <tr><td>20.º</td><td>1 en 1 048 576</td><td>L 1 048 576</td><td>L 1</td></tr>
+  </table>
+  <p class="mini">Tres de cada cuatro partidas terminan en los dos primeros lanzamientos, pagando L 2 o L 4. El infinito vive en ramas que casi nadie va a ver, y por eso la negativa a pagar cien lempiras no es un error de cálculo: es haber mirado dónde está la probabilidad.</p>
+
+<h2>💰 La salida de 1738: no pesa el dinero, pesa lo que cambia</h2>
+  <p>Daniel Bernoulli publicó la solución en las actas de la Academia de Ciencias de San Petersburgo, donde trabajaba. De esa ciudad, y no de donde se planteó el problema, le viene el nombre. Su idea <b>niega la pregunta</b>: no importa cuánto paga cada rama, sino <b>cuánto le cambia la vida ese dinero a quien lo recibe</b>.</p>
+
+  <table class="utilidad">
+    <tr><th>Lo que hay en la casa</th><th>Llegan 10 000 lempiras</th><th>Qué cambian de verdad</th></tr>
+    <tr><td>4 000 lempiras</td><td>El dinero se multiplica por 3,5</td><td>El mes entero: comida, transporte y la deuda chica</td></tr>
+    <tr><td>40 000 lempiras</td><td>Un cuarto más</td><td>Se adelanta algo que ya estaba en la lista</td></tr>
+    <tr><td>400 000 lempiras</td><td>Un 2,5% más</td><td>Casi nada que se note al día siguiente</td></tr>
+    <tr><td>4 000 000 de lempiras</td><td>Un 0,25% más</td><td>Se anota y se olvida</td></tr>
   </table>
 
-  <div class="caja caja-amb">
-    <h3>⚠️ Lo que el eslogan borra, y por qué importa el lunes</h3>
-    <p>La palabra <b>«junto»</b> no distingue quién ayudó a quién ni quién llegó primero. Con el eslogan en la cabeza, un maestro pone el mapa al lado del texto y espera; un padre deja el video de inglés puesto y espera; una aplicación cobra por juntar estímulos vistosos. Con el postulado en la cabeza, los tres hacen lo mismo y distinto: <b>que el alumno produzca algo y decirle enseguida si salió</b>.</p>
+  <div class="caja">
+    <h3>🧮 Por qué eso deshace la paradoja</h3>
+    <p>Las ramas remotas del juego pagan sumas enormes, pero <b>lo que esas sumas añaden a una vida crece mucho más despacio de lo que baja su probabilidad</b>. Entonces la suma infinita se aquieta y se vuelve un número modesto, parecido a lo que cualquiera habría ofrecido sin haber leído una línea de matemáticas.</p>
+    <p class="mini">Bernoulli propuso pesar el dinero con logaritmos. El detalle técnico importa menos que la idea, y él mismo cita en su ensayo a Gabriel Cramer, que había escrito algo parecido unos años antes.</p>
   </div>
 
-  <h2>🎈 Cómo se etiqueta una cita inflada</h2>
-  <p>El eslogan sirve de caso de estudio para toda la materia, porque reúne los tres inflados típicos de un golpe. <b>Atribución falsa:</b> se le pone el nombre de un clásico a una frase que no escribió, y se comprueba abriendo el libro citado. <b>Ascenso de estatus:</b> lo que el autor declaró conjetura se cita como ley demostrada, y la palabra «postulado» estaba ahí para impedirlo. <b>Salto de dominio:</b> un resultado de laboratorio se convierte en promesa sobre la vida diaria de cualquiera, sin pasar por la evidencia intermedia.</p>
-  <p class="mini">La regla del Estudio Mayor se aplica aquí sin excepción: ningún estudio entra sin su etiqueta, y la etiqueta la pone quien cita, no quien vende.</p>
-
-  <h2>🗣️ Cómo se corrige a alguien sin pelear</h2>
-  <p>Casi todo el que repite el eslogan lo hace de buena fe, así que la corrección no es una victoria: es un dato. Tres frases, en este orden: que la frase es de Löwel y Singer, de 1992, con la rima de Carla Shatz; que lo que Hebb escribió en 1949 pide además que una célula <b>participe</b> en encender a la otra; y que eso cambia lo que se hace el lunes, porque en vez de poner cosas juntas se hace producir y se corrige enseguida. La tercera es la que convierte la corrección en algo útil: sin ella uno solo ha ganado una discusión de citas.</p>
-
-<h2>⏱️ El orden de disparo, que es el reloj de la regla</h2>
-  <p>Cuarenta y ocho años después del libro, la fisiología le dio la razón al original y le añadió un cronómetro. Markram, Lübke, Frotscher y Sakmann lo publicaron en <b>Science</b> en <b>1997</b>; Bi y Poo lo midieron célula a célula en <b>1998</b>, en el <b>Journal of Neuroscience</b>, con neuronas de hipocampo en cultivo.</p>
-  <table class="orden">
-    <tr><th>Orden de los disparos</th><th>Qué le pasa a la conexión</th><th>Nombre</th></tr>
-    <tr><td>A dispara <b>antes</b> que B, dentro de unas decenas de milisegundos</td><td>Se refuerza</td><td>Potenciación</td></tr>
-    <tr><td>A dispara <b>después</b> que B, dentro de esa misma ventana</td><td>Se debilita</td><td>Depresión</td></tr>
-    <tr><td>A y B disparan muy separadas en el tiempo</td><td>Casi no cambia nada</td><td>Fuera de ventana</td></tr>
-    <tr><td>A y B disparan a la vez, sin que A contribuya</td><td>No es el caso que la regla premia</td><td>Coincidencia</td></tr>
-  </table>
+  <h2>🛡️ La consecuencia práctica: el seguro</h2>
+  <p>Si perder mil lempiras duele más de lo que alegra ganarlas, conviene <b>pagar por no perderlas</b>. Con la aritmética sola, un seguro es mal negocio para todo asegurado, porque la aseguradora tiene que ganar. Con la idea de Bernoulli es excelente: se cambia una pérdida pequeña y segura por la desaparición de una enorme y rara. <b>No se compra dinero: se compra seguir en la mesa.</b> En el ensayo de 1738 hay un ejemplo de un comerciante que asegura mercancía por mar.</p>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 <!-- ═══════════ PÁGINA 4 ═══════════ -->
 <section class="pagina">
-  <p>El nombre técnico es <b>plasticidad dependiente del orden de disparo</b>, y su titular cabe en una línea: <b>invertir el orden no deja las cosas igual, las deja al revés</b>. Con el eslogan de 1992 esta tabla entera es invisible, porque «junto» no distingue antes de después.</p>
-
-  <div class="caja caja-amb">
-    <h3>🔬 La letra chica, que también se cita</h3>
-    <p>Estos resultados están medidos con enorme solidez <b>en rodajas de tejido y en cultivos</b>, que es donde se puede medir bien. Su peso exacto en un animal despierto, aprendiendo cosas de la vida real, <b>sigue siendo materia de discusión</b>. Decirlo no debilita el argumento: lo hace defendible. Quien cita a Bi y Poo prometiendo resultados de vida diaria está haciendo el mismo salto de dominio que hace el eslogan.</p>
+  <h2>🧱 Lo que la solución de 1738 no resuelve, y por qué importa</h2>
+  <p>Se puede replicar: si el problema era que el premio crecía sin tope, se puede diseñar otro juego cuyos premios crezcan lo bastante rápido como para que también la cuenta de Bernoulli se vuelva infinita. La réplica es correcta y está hecha desde hace tiempo. Lo que enseña es algo más útil: <b>ninguna cuenta debería llevarse al infinito</b>, porque no hay bancas ni vidas infinitas para cobrar. La banca del juego no podría pagar la rama cuarenta ni queriendo.</p>
+  <div class="caja">
+    <h3>📌 La lección de método, que vale para toda la ruta</h3>
+    <p>Una herramienta se vuelve más fiable, no menos, cuando <b>declara su alcance</b>. Bernoulli propuso su vara para las cantidades con las que vive una persona, y para eso funciona. La casa aplica la misma regla al valor esperado: se usa, y se dice para qué sirve y para qué no. Lo contrario, una herramienta que se presenta como buena para todo, es exactamente lo que el Estudio Mayor enseña a desconfiar.</p>
   </div>
 
-  <h2>🔁 Del laboratorio a la mesa de la casa</h2>
-  <p>La traducción no es automática, y por eso se escribe con cuidado. Lo que sí se sostiene: que el orden decide el signo, así que <b>intentar y después comprobar</b> no es lo mismo que ver la respuesta y luego copiarla; que la ventana es estrecha, así que la corrección vale por su <b>cercanía en el tiempo</b> y no por su severidad; que la repetición es una condición y no el mecanismo entero, así que <b>repetir sin corrección multiplica lo que haya</b>, error incluido; y que el cambio ocurre en conexiones concretas, así que <b>se gana lo practicado y nada más</b>.</p>
+<h2>1️⃣ Primer límite: la apuesta única</h2>
+  <p>La media es lo que sale <b>a la larga</b>. Quien juega una vez recibe <b>una rama</b>, no una media: un 60% es una racha excelente en cien intentos y un volado en uno. Lo dice la <b>ley de los grandes números</b>, que Jacob Bernoulli demostró en «Ars Conjectandi» (1713, póstuma): lo observado se acerca a lo esperado <b>cuantas más veces se repita</b>, y no promete nada a quien no repite.</p>
 
-  <h2>🐀 Las ratas de 1947, que son la mitad del argumento</h2>
-  <p>Antes del libro, Hebb informó en <b>1947</b> de algo ocurrido en su casa: se llevó ratas del laboratorio para que sus hijas las tuvieran de mascotas, anduvieron sueltas y al volver <b>resolvían mejor los problemas</b> que las de la jaula. El detalle que importa aquí: las de la jaula <b>también tenían el mundo delante</b>, a través de los barrotes; lo que no tenían era la posibilidad de tropezar con él. La diferencia no fue el estímulo: fue <b>quién producía el movimiento</b>.</p>
+  <div class="caja">
+    <h3>🎪 El caso que lo enseña en una línea</h3>
+    <p>La rifa del colegio: boleto a <b>L 100</b>, premio de <b>L 900</b>, ocho boletos. El valor esperado es <b>L 112,50</b>, así que la cuenta sale a favor por <b>L 12,50</b>. Y la rifa es una vez al año. Para cobrar esa ventaja habría que jugarla muchas veces; en una sola, lo que ocurre es que <b>siete de cada ocho veces se pierden los cien lempiras enteros</b>. La cuenta no está mal: está contestando una pregunta que aquí nadie hizo.</p>
+  </div>
 
-<h2>🧭 Los siete momentos de una práctica que sí cablea</h2>
-  <p>Así se ve una práctica con la regla trabajando a favor. No añade horas: cambia dónde se ponen. Casi siempre <b>reduce</b> el tiempo total y sube el número de intentos.</p>
-  <table class="momentos">
-    <tr><th>#</th><th>Momento</th><th>Qué es, y dónde se cae</th></tr>
-    <tr><td>1</td><td><b>La tarea</b></td><td>Se elige <b>qué se va a producir</b>, no qué se va a mirar, y tiene que parecerse a lo que después se pedirá. Se cae eligiendo material («ver este curso») en vez de conducta («decir diez frases»).</td></tr>
-    <tr><td>2</td><td><b>La velocidad</b></td><td>Se baja hasta que <b>quepa la corrección</b>. Un error alcanzado en el primer intento vuelve al corral; a la décima ya es costumbre. Se cae con la prisa.</td></tr>
-    <tr><td>3</td><td><b>El intento</b></td><td>Se <b>produce sin mirar el modelo</b>: se dice, se escribe, se toca, se resuelve. Sin esto no hay nada que la regla pueda premiar, por muchas horas que haya.</td></tr>
-    <tr><td>4</td><td><b>La comprobación</b></td><td>Enseguida, en el <b>mismo minuto</b>. Se cae dejándola para el final de la sesión, que ya es tarde, o para el lunes, que es tardísimo.</td></tr>
-    <tr><td>5</td><td><b>El nombre del fallo</b></td><td>Se dice <b>en voz alta</b> qué salió mal antes del intento siguiente, para que ese intento nazca de lo que vio el ojo y no de la gana de acabar.</td></tr>
-    <tr><td>6</td><td><b>La repetición dirigida</b></td><td>Ahora sí se repite, <b>con la corrección puesta</b>: la repetición es un multiplicador y conviene arreglar antes lo que se va a multiplicar.</td></tr>
-    <tr><td>7</td><td><b>El recuento</b></td><td>Se apunta <b>cuántos intentos y cuántas correcciones</b>, no cuántos minutos. Es el registro que esta ruta va llenando.</td></tr>
-  </table>
+  <h2>💀 Segundo límite: la ruina</h2>
+  <p>Si perder deja a la casa sin poder jugar la vez siguiente, <b>no hay esperanza positiva que valga</b>: la serie se corta ahí. Toda cuenta de promedio supone que hay una vez siguiente, y a veces no la hay. Este límite no aparece en ninguna fórmula y es el que ha arruinado a más gente.</p>
+
+  <div class="caja">
+    <h3>🏦 El caso que lo enseña, y su arreglo</h3>
+    <p>Un conocido presta <b>L 60 000</b> para imprimir fichas. Si se venden bien quedan <b>L 95 000</b>; si no, se recuperan <b>L 20 000</b> en material y queda una deuda de <b>L 40 000</b>. Se venden bien <b>6 de cada 10 veces</b>. El valor esperado sale a favor: 0,6 × 35 000 menos 0,4 × 40 000 son <b>L 5 000</b> de ventaja. Y aun así la respuesta es no, porque cuatro de cada diez veces esta familia sale de la mesa.</p>
+    <p><b>El arreglo:</b> imprimir una décima parte. L 6 000 de tirada, se ganan 3 500 o se pierden 4 000, con las mismas probabilidades, doce veces al año. La ventaja por intento es la misma en proporción, pero ahora <b>hay doce intentos y ninguno hunde la casa</b>. Partir el tamaño convierte una apuesta prohibida en una razonable <b>sin cambiar una sola probabilidad</b>.</p>
+  </div>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 <!-- ═══════════ PÁGINA 5 ═══════════ -->
 <section class="pagina">
+  <h2>🎯 Cuándo el valor esperado SÍ es la herramienta correcta</h2>
+  <p>Esta etapa no viene a desconfiar de la cuenta: viene a ponerla donde sirve.</p>
+  <table class="utilidad">
+    <tr><th>Condición</th><th>Cómo se comprueba</th><th>Ejemplo de la casa</th></tr>
+    <tr><td><b>Se repite muchas veces</b></td><td>¿Cuántas veces se va a jugar este año?</td><td>Grabar un video por semana, mandar correos, tiradas chicas mensuales</td></tr>
+    <tr><td><b>La pérdida es acotada</b></td><td>¿Cuánto es lo máximo que se pierde en una jugada?</td><td>Una tarde de trabajo, L 6 000 de tirada</td></tr>
+    <tr><td><b>La pérdida no saca de la mesa</b></td><td>¿Se puede jugar la vez siguiente después de perder?</td><td>Sí: al mes siguiente hay otra tirada</td></tr>
+  </table>
+  <p class="mini">Cuando las cuatro se cumplen, hacer la cuenta y seguirla es lo más rentable que puede hacer una familia, porque casi nadie la hace. Cuando falla una de las dos últimas, la misma cuenta que ayudaba empieza a estorbar.</p>
+
+<h2>⚖️ La norma y el retrato, que no se pueden confundir</h2>
+  <p>En 1944, John von Neumann y Oskar Morgenstern publicaron «Theory of Games and Economic Behavior» y demostraron algo fuerte: si las preferencias de una persona cumplen unos pocos requisitos de coherencia, entonces <b>necesariamente</b> existe una función de utilidad tal que esa persona se comporta como si maximizara su valor esperado. No es una hipótesis sobre psicología: es un <b>teorema sobre coherencia</b>, y por eso sirve también para decisiones únicas y sin dinero de por medio.</p>
+  <p>Nueve años después, en 1953, el economista francés <b>Maurice Allais</b> presentó a un grupo de personas dos pares de apuestas. En el primero, casi todos preferían la opción segura; en el segundo, que es el mismo problema con una parte común retirada de los dos lados, casi todos preferían la arriesgada. Las dos preferencias juntas son incompatibles con esos axiomas. Lo notable no es que la gente fallara: es que <b>fallaba en la misma dirección, con sistema</b>, y que muchos seguían prefiriendo lo mismo después de que se les explicara la contradicción. Allais recibió el Nobel de Economía en 1988.</p>
+
   <div class="caja">
-    <h3>🎯 La prueba de bolsillo, para cualquier escena</h3>
-    <p>Dos preguntas y se sabe si una práctica va a cablear algo: <b>¿qué sale de las manos o de la boca de quien practica?</b> y <b>¿cuánto tarda en llegar la corrección desde ese momento?</b> Si la primera respuesta es «nada» o la segunda es «días», no hace falta seguir mirando.</p>
+    <h3>🪞 Los dos errores, uno en cada dirección</h3>
+    <p>Quien toma la <b>norma por retrato</b> diseña reglas, incentivos y políticas suponiendo que la gente decide coherentemente, y luego se extraña de que nadie las cumpla. Quien toma el <b>retrato por norma</b> concluye que, como la gente decide así, así está bien decidir, y se queda sin ninguna manera de mejorar. En 1979, Daniel Kahneman y Amos Tversky publicaron en «Econometrica» su teoría de las perspectivas, que describe cómo decidimos de verdad; Kahneman recibió el Nobel en 2002.</p>
   </div>
 
-  <h2>🗣️ Qué decir, con las palabras de la etapa</h2>
-  <table class="voces decir">
-    <tr><th>En vez de decir</th><th>Se dice</th></tr>
-    <tr><td>«Repítelo cien veces»</td><td>«Cien veces qué. Hazlo una vez, mira qué salió, y dímelo antes de la siguiente»</td></tr>
-    <tr><td>«Ponte el video para que vayas aprendiendo»</td><td>«Ponte veinte minutos a decirlo en voz alta y a comprobar cada frase»</td></tr>
-    <tr><td>«Te lo corrijo el lunes con calma»</td><td>«Te corrijo cinco ahora, aquí, mientras te acuerdas de por qué las pusiste así»</td></tr>
-    <tr><td>«Como dijo Hebb, lo que dispara junto se cablea junto»</td><td>«Esa frase es de Löwel y Singer, de 1992. Hebb pidió que una participe en encender a la otra»</td></tr>
-  </table>
-
-  <h2>🎮 La regla dentro de una misión de F.A.R.O</h2>
-  <p>Las misiones de esta casa están construidas con esta regla puesta: el quiz y las flashcards piden producir y contestan en el mismo toque; las flashcards <b>se barajan</b>, para que cada par tenga su propia puerta y no una cadena en un solo orden; la evaluación competencial pide escribir y no reconocer, con la pauta tapada hasta que se pide; y la parte abierta de las lecturas va <b>sin XP</b>, porque una respuesta abierta que se premia sola se contesta a la carrera y deja de ser un intento.</p>
-
-<h2>📋 Los ocho casos del proyecto (1 a 4)</h2>
-  <p>Situaciones reales de esta familia y de M.E.T.A.S. En todas hay una práctica, y en todas la pregunta es la misma: <b>¿algo produce y algo corrige, y en qué orden?</b></p>
-  <table class="casos c1">
-    <tr><th>#</th><th>El caso</th><th>Lo que enseña</th></tr>
-    <tr>
-      <td>1</td>
-      <td><b>El video de fondo.</b> Angelly pone videos de inglés mientras ordena su cuarto: dos horas al día durante un mes, sesenta horas. Al mes siguiente no puede pedir un vaso de agua en inglés y concluye que no tiene oído.</td>
-      <td>Sesenta horas de <b>coincidencia</b>: el sonido y la tarea ocurrieron a la vez sin que ninguna participara en encender a la otra. La exposición pasiva no es una versión floja de la práctica: es otra cosa. Diez minutos produciendo valen más que dos horas de fondo.</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td><b>La app que vende el eslogan.</b> Una aplicación de entrenamiento cerebral ofrece suscripción familiar por <b>L 250 al mes</b> (L 3,000 al año) y anuncia «lo que dispara junto se cablea junto», atribuido a Donald Hebb.</td>
-      <td>Dos preguntas la descartan: la de fuente (la cita no es de quien dicen) y la de especificidad (se gana lo practicado, así que el juego mejora el juego). Condición con que sí: nunca para «entrenar el cerebro»; ese dinero sí se paga por la tarea real.</td>
-    </tr>
+  <h2>🧭 Los siete pasos de una apuesta bien medida</h2>
+  <table class="pasos">
+    <tr><th>#</th><th>Paso</th><th>Dónde se cae</th></tr>
+    <tr><td>1</td><td><b>Las ramas</b></td><td>Listar solo la buena y la catastrófica, y dejar fuera la más probable</td></tr>
+    <tr><td>2</td><td><b>Las probabilidades</b></td><td>Escribirlas después de decidir, con lo cual la cuenta ya no decide</td></tr>
+    <tr><td>3</td><td><b>Lo que gana o pierde cada rama</b></td><td>Meter en la columna de lempiras algo que no se cambia por dinero</td></tr>
+    <tr><td>4</td><td><b>El valor esperado</b></td><td>Creer que aquí termina la decisión. Aquí termina la aritmética</td></tr>
   </table>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 <!-- ═══════════ PÁGINA 6 ═══════════ -->
 <section class="pagina">
-  <table class="casos c2">
-    <tr><th>#</th><th>El caso</th><th>Lo que enseña</th></tr>
-    <tr>
-      <td>3</td>
-      <td><b>La corrección que llega el lunes.</b> Una maestra que usa M.E.T.A.S recoge las tareas el viernes y las devuelve corregidas el lunes. Los alumnos miran la nota, guardan la hoja y repiten el mismo error a la semana.</td>
-      <td>El orden está roto: a los ocho días el alumno ya no tiene delante lo que hizo, y la corrección llega sola. No hace falta corregir más: hace falta corregir antes. Cinco preguntas comprobadas en el momento enseñan más que veinte devueltas el lunes.</td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td><b>La tabla del siete, cantada.</b> Jael se sabe la tabla de corrido y no falla ninguna, pero tarda cinco segundos con siete por ocho suelto, porque tiene que cantar desde el principio.</td>
-      <td>Se cableó justo lo practicado: una cadena en un solo orden, cada eslabón disparando al siguiente y a ningún otro. La práctica se parece a lo que se va a pedir o no sirve para eso: si las preguntas llegan sueltas, se practican sueltas.</td>
-    </tr>
+  <table class="pasos p2">
+    <tr><th>#</th><th>Paso</th><th>Dónde se cae</th></tr>
+    <tr><td>5</td><td><b>¿Esto se repite?</b></td><td>Usar el promedio para una apuesta que ocurre una sola vez</td></tr>
+    <tr><td>6</td><td><b>¿La rama mala nos saca de la mesa?</b></td><td>Medir la pérdida en lempiras y no en «¿seguimos jugando?»</td></tr>
+    <tr><td>7</td><td><b>Se escribe y se fecha</b></td><td>No escribir nada, y quedarse con la anécdota</td></tr>
   </table>
 
+  <h2>🗣️ Qué decir, con las palabras de la etapa</h2>
+  <p class="mini">Para cuando hay alguien enfrente esperando una firma. No son para ganar la discusión: son para ganar tiempo y pasar la oferta por la hoja.</p>
+  <p><b>«La cuenta sale a favor»:</b> de acuerdo, y la cuenta es el primer paso; faltan dos preguntas, si esto lo vamos a hacer muchas veces y qué pasa si sale la rama mala. <b>«A mis clientes se les duplica»:</b> ¿de cuántos clientes, y a los demás qué les pasó? <b>«Es una oportunidad única»:</b> justo por eso hay que mirarla dos veces, porque en lo que pasa una sola vez el promedio no protege a nadie. <b>«Si sale mal, ya veremos»:</b> prefiero verlo ahora, ¿con qué pagamos y seguimos pudiendo trabajar el mes siguiente? <b>«Vos siempre desconfiás»:</b> no es desconfianza, es tamaño; con la décima parte entro hoy mismo.</p>
+
+<h2>📋 Los ocho casos del proyecto (1 a 4)</h2>
+  <p>Ocho situaciones de esta familia y de M.E.T.A.S, con números en lempiras. En todas la pregunta es la misma: ramas, probabilidades, ¿se repite?, ¿qué pasa si sale la mala?</p>
+
+  <table class="casos">
+    <tr><th>#</th><th>La oferta</th><th>Lo que enseña</th></tr>
+    <tr><td>1</td><td><b>La rifa de la feria.</b> Boleto L 100, premio L 900, ocho boletos, una vez al año</td><td>Valor esperado a favor (L 112,50) que <b>no basta</b>: la ventaja es real y pequeña, y solo se cobra repitiendo</td></tr>
+    <tr><td>2</td><td><b>El curso que duplica la matrícula.</b> L 18 000. De 20 clientes, a 3 se les duplicó, a 9 les subió algo y a 8 nada</td><td>Un dato verdadero contado <b>por su mejor rama</b>. Escribir las tres ramas convierte el eslogan en una cuenta discutible</td></tr>
+  </table>
+
+  <table class="casos">
+    <tr><th>#</th><th>La oferta</th><th>Lo que enseña</th></tr>
+    <tr><td>3</td><td><b>El préstamo de L 60 000.</b> Gana 35 000 o deja una deuda de 40 000, con 6 de cada 10 a favor</td><td>Cuenta a favor por L 5 000 y aun así <b>no</b>: cuatro de cada diez veces la casa sale de la mesa</td></tr>
+    <tr><td>4</td><td><b>La misma apuesta, partida.</b> L 6 000 por tirada, doce veces al año</td><td>Lo que cambió no fue la cuenta: <b>ahora hay vez siguiente</b>, y la media pasa de consuelo a promesa</td></tr>
+  </table>
+
+  <div class="caja">
+    <h3>💡 La regla de fondo que sale de los casos</h3>
+    <p>Casi ninguna oferta se acepta o se rechaza completa: se acepta <b>con condiciones</b>, y las condiciones se piensan en frío, no con alguien enfrente esperando una firma. Condiciones que sirven: partir la apuesta en pedazos que se puedan perder, pagar contra resultado, hablar antes con dos de los que no obtuvieron lo prometido, y fijar de antemano cuándo se para.</p>
+  </div>
+
 <h2>📋 Los ocho casos del proyecto (5 a 8)</h2>
-  <table class="casos c3">
-    <tr><th>#</th><th>El caso</th><th>Lo que enseña</th></tr>
-    <tr>
-      <td>5</td>
-      <td><b>Los dos dedos del papá.</b> El autor lleva más de veinte años escribiendo a computadora con dos dedos y mirando el teclado, muchas horas al día, y no ha mejorado nada en la última década.</td>
-      <td>La regla se cumplió al pie de la letra: lo repetido quedó firmemente cableado, error incluido. Nunca hubo un intento distinto con su corrección detrás. Practicar sin corrección es la manera más segura de volverse muy bueno en algo que se hace mal.</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td><b>El lema para la guía de maestro.</b> Alguien propone poner «lo que dispara junto se cablea junto» en la portada de las guías de maestro de M.E.T.A.S: es corto y suena a ciencia.</td>
-      <td>La pregunta que decide es qué hará el maestro el lunes con esa frase en la cabeza: con el eslogan, poner cosas juntas y esperar; con el postulado, hacer producir y corregir. Condición con que sí: solo como ejemplo de cita mal atribuida.</td>
-    </tr>
-  </table>
-  <table class="casos c4">
-    <tr><th>#</th><th>El caso</th><th>Lo que enseña</th></tr>
-    <tr>
-      <td>7</td>
-      <td><b>Dónde va el cuestionario.</b> En M.E.T.A.S se discute si el cuestionario de cada misión debe ir todo al final, como examen, o repartido: unas preguntas al abrir y otras después de cada bloque.</td>
-      <td>Un examen al final mide; las preguntas repartidas enseñan mientras miden, porque cada respuesta producida trae su corrección pegada detrás. Por más de sesenta misiones, no es maquetación: es diseño acumulado. Condición: no alargar más de diez minutos.</td>
-    </tr>
-    <tr>
-      <td>8</td>
-      <td><b>La academia de L 1,200.</b> Una academia ofrece inglés para las dos niñas por L 1,200 al mes. Alguien de la familia extendida dice que es tirar el dinero. La familia va a mirar una clase antes de opinar.</td>
-      <td>No se pregunta por el método ni por los años: se cuentan dos números, minutos que habla cada alumno y veces que lo corrigen por hora. Condición con que sí: que hablen, escriban y sean corregidos en el momento. Si solo copian, el protocolo de la casa rinde más por L 0.</td>
-    </tr>
-  </table>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 <!-- ═══════════ PÁGINA 7 ═══════════ -->
 <section class="pagina">
-  <div class="caja caja-amb">
-    <h3>🏺 Las cinco reglas de esta etapa</h3>
+  <table class="casos c58">
+    <tr><th>#</th><th>La oferta</th><th>Lo que enseña</th></tr>
+    <tr><td>5</td><td><b>Anuncios en el APK.</b> L 4 500 al mes. 2 de 10 posibilidades de que los maestros se molesten y la aplicación pierda la mitad de su uso</td><td>La rama mala <b>no se mide en dinero</b>. Meter la confianza en la columna de lempiras es hacer trampa a favor del sí</td></tr>
+    <tr><td>6</td><td><b>La beca.</b> Cubre un año y obliga a dejar L 12 000 mensuales. Se gana 1 de cada 4. Postular cuesta dos semanas</td><td>Son <b>dos apuestas metidas en una</b>: postular (barata, repetible) y aceptar (cara, única). Separarlas es media decisión resuelta</td></tr>
+  </table>
+
+  <table class="casos">
+    <tr><th>#</th><th>La oferta</th><th>Lo que enseña</th></tr>
+    <tr><td>7</td><td><b>La garantía de la impresora.</b> Cuesta L 1 500 y cubre un daño que ocurre en 1 de cada 10. La impresora vale L 9 000</td><td>Valor esperado <b>en contra</b> (L 900 contra 1 500) y aun así conviene: quien no repone los 9 000 de golpe compra no salir de la mesa</td></tr>
+    <tr><td>8</td><td><b>El video que puede volverse viral.</b> Cuesta una tarde. De cada 50, uno funciona</td><td>Pérdida chica y acotada, ganancia grande y rara, y cincuenta intentos: <b>aquí el valor esperado sí manda</b></td></tr>
+  </table>
+
+  <div class="caja">
+    <h3>🎲 Las cinco reglas de esta etapa</h3>
     <ol>
-      <li>No es «junto»: es que <b>una ayude a disparar a la otra</b>.</li>
-      <li>El orden manda: <b>antes refuerza, después debilita</b>.</li>
-      <li>La regla no distingue acierto de error: <b>refuerza lo que se repite</b>.</li>
-      <li>La corrección vale por su <b>cercanía en el tiempo</b>, no por su severidad.</li>
-      <li>Y <b>se gana lo practicado y nada más</b>: es la cláusula con la que caerán, en la etapa 6, todos los mitos de esta materia.</li>
+      <li>El <b>valor esperado se calcula siempre</b>, aunque después no mande.</li>
+      <li>Las probabilidades se escriben <b>antes</b> de conocer el resultado.</li>
+      <li>Una decisión se juzga por <b>cómo se decidió</b>, no por cómo cayó el dado.</li>
     </ol>
   </div>
 
-<h2>🧾 La hoja de la práctica, para llenar a lápiz</h2>
-  <p>Se llena antes de dar por buena cualquier práctica de la casa: una tarea de las niñas, un oficio propio, un idioma, un instrumento. Cinco casillas, y ninguna se contesta con intenciones.</p>
-  <table class="hoja hoja-blanca">
-    <tr><th>Qué se pregunta</th><th>Lo que hay hoy</th></tr>
-    <tr><td><b>1. Qué produce</b> quien practica (contado en veces, no en minutos)</td><td></td></tr>
-    <tr><td><b>2. Qué solo recibe</b> sin producir nada</td><td></td></tr>
-    <tr><td><b>3. Quién corrige y cuánto tarda</b> desde el intento</td><td></td></tr>
-    <tr><td><b>4. En qué orden</b> quedan el intento y su consecuencia</td><td></td></tr>
-    <tr><td><b>5. Qué quedará cableado</b> si esto se repite un mes</td><td></td></tr>
-  </table>
-  <p class="mini">Al pie se escribe <b>una sola cosa</b> que se va a cambiar, la más barata, y la fecha en que se vuelve a medir. Una decisión sin segunda medición es una opinión con fecha.</p>
-  <div class="lineas-4">
-    <div class="raya-resp"></div>
-    <div class="raya-resp"></div>
+  <div class="caja">
+    <ol start="4">
+      <li><b>Ninguna apuesta que pueda hundir la casa se acepta</b>, por buena que sea la cuenta.</li>
+      <li>Cuando la cuenta y el estómago no coinciden, <b>se escribe por qué</b>: casi siempre el estómago está viendo el tamaño o la falta de repetición.</li>
+    </ol>
   </div>
 
-  <h2>✅ Una hoja de la práctica ya llena, como ejemplo</h2>
-  <table class="hoja">
-    <tr><th>Qué se pregunta</th><th>El caso de Angelly y el inglés</th></tr>
-    <tr><td>1. Qué produce</td><td>Nada. En un mes no dijo ni escribió una sola frase en inglés por su cuenta.</td></tr>
-    <tr><td>2. Qué solo recibe</td><td>Dos horas diarias de video que avanza solo mientras ordena el cuarto: unas 60 horas.</td></tr>
-    <tr><td>3. Quién corrige y cuándo</td><td>Nadie. No hay momento en que algo diga si salió bien, porque no sale nada.</td></tr>
-    <tr><td>4. En qué orden</td><td>No hay orden que mirar porque no hay intento: solo coincidencia entre el sonido y la tarde.</td></tr>
-    <tr><td>5. Qué quedará cableado</td><td>La costumbre de tener inglés de fondo, y la conclusión falsa de que ella «no tiene oído».</td></tr>
-    <tr><td><b>El cambio, uno solo</b></td><td>Veinte de esos ciento veinte minutos pasan a decir en voz alta y comprobar frase por frase. Se mide el sábado, contando frases dichas sin mirar.</td></tr>
+  <h2>⚖️ Los cuatro casos que se contradicen entre sí, y por qué no</h2>
+  <p>Parecen dar reglas opuestas. Dan la misma regla vista por sus cuatro esquinas.</p>
+  <table class="casos">
+    <tr><th>Caso</th><th>Signo de la cuenta</th><th>Decisión</th><th>Qué lo decide</th></tr>
+    <tr><td>1. La rifa anual</td><td>A favor (+L 12,50)</td><td><b>No</b></td><td>No se repite</td></tr>
+    <tr><td>7. La garantía</td><td>En contra (−L 600)</td><td><b>Sí</b></td><td>Evita una pérdida que saca de la mesa</td></tr>
+    <tr><td>3. El préstamo</td><td>A favor (+L 5 000)</td><td><b>No</b></td><td>La rama mala saca de la mesa</td></tr>
+    <tr><td>8. El video</td><td>A favor</td><td><b>Sí</b></td><td>Se repite y la pérdida es una tarde</td></tr>
   </table>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 <!-- ═══════════ PÁGINA 8 ═══════════ -->
 <section class="pagina">
-  <h2>📏 El registro de intentos y correcciones</h2>
-  <p>Cuatro columnas, dos líneas por sesión. No mide minutos a propósito: los minutos suben con la comodidad y bajan con el provecho, y por eso engañan.</p>
-  <table class="registro">
-    <tr><th>Fecha</th><th>Qué se practicó</th><th>Intentos</th><th>Corregidos</th></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td></td><td></td><td></td></tr>
+  <div class="caja titular">
+    <h3>🔑 El titular de la ficha</h3>
+    <p><b>El signo de la cuenta no basta para decidir, ni a favor ni en contra.</b> Hay apuestas favorables que se rechazan y apuestas desfavorables que se compran. Lo que decide son las dos preguntas de criterio, que no están dentro de la fórmula y que hay que acordarse de hacer.</p>
+  </div>
+
+<h2>🧾 La hoja de la apuesta, para llenar a lápiz</h2>
+  <p>Se llena <b>antes</b> de conocer el resultado. Una copia por oferta, guardada con la fecha.</p>
+
+  <table class="hoja">
+    <tr><th>La oferta, en una línea</th><td colspan="3"></td></tr>
+    <tr><th>Fecha en que se escribe</th><td></td><th>Quién decide</th><td></td></tr>
+  </table>
+
+  <table class="hoja hoja-blanca">
+    <tr><th>Rama</th><th>Probabilidad</th><th>Qué la sostiene</th><th>Gana o pierde (L)</th></tr>
     <tr><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td></tr>
     <tr><td></td><td></td><td></td><td></td></tr>
   </table>
 
-<h2>📅 Cómo se lee el registro</h2>
-  <p>Una semana de ejemplo, con pares sueltos de la tabla del siete: lunes 20 intentos y 6 corregidos, martes 24 y 4, viernes 30 y 3, y el sábado la prueba cronometrada, 20 intentos y 1 corregido. No se mira una columna sola: se mira que los <b>intentos suban</b> y los <b>corregidos bajen</b> con la misma tarea. Si no bajan en dos semanas, la tarea es demasiado difícil y se parte en dos.</p>
+  <table class="hoja">
+    <tr><th>Valor esperado (L)</th><td colspan="3"></td></tr>
+    <tr><th>¿Esto se repite?</th><td colspan="3"></td></tr>
+    <tr><th>¿La rama mala nos saca de la mesa?</th><td colspan="3"></td></tr>
+  </table>
 
-  <h2>✏️ Ejercicios para hacer a lápiz</h2>
+  <table class="hoja">
+    <tr><th>Lo que se arriesga y no son lempiras</th><td colspan="3"></td></tr>
+    <tr><th>Decisión</th><td colspan="3"></td></tr>
+    <tr><th>Condición con la que sí</th><td colspan="3"></td></tr>
+    <tr><th>Qué me haría cambiar de opinión</th><td colspan="3"></td></tr>
+  </table>
 
-  <div class="caja">
-    <h3>Ejercicio 1 · Cita completa</h3>
-    <p>Escribe el postulado de Hebb con tus palabras y subraya las <b>cuatro piezas</b>. Después escribe el eslogan de 1992 y tacha en el postulado lo que el eslogan borra.</p>
-    <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  </div>
-
-  <div class="caja">
-    <h3>Ejercicio 2 · El expediente del eslogan</h3>
-    <p>Nombra a quién se le atribuye la frase, quién la formuló de verdad, en qué revista y en qué año, y quién puso en circulación la versión rimada.</p>
-    <div class="lineas-4"><div class="raya-resp"></div></div>
-  </div>
-
-  <div class="caja">
-    <h3>Ejercicio 3 · El orden</h3>
-    <p>Completa: si A dispara antes que B, la conexión se ______________; si dispara después, se ______________. ¿En qué se midió eso, quiénes y en qué años? ¿Qué limitación hay que declarar al citarlo?</p>
-    <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  </div>
+<h2>✅ Una hoja de la apuesta ya llena, como ejemplo</h2>
+  <table class="hoja">
+    <tr><th>La oferta</th><td colspan="3">Préstamo de L 60 000 para imprimir fichas de M.E.T.A.S y venderlas</td></tr>
+    <tr><th>Fecha</th><td>14 de marzo</td><th>Quién decide</th><td>La familia, en la mesa de la cocina</td></tr>
+  </table>
+  <table class="hoja">
+    <tr><th>Rama</th><th>Prob.</th><th>Qué la sostiene</th><th>Gana o pierde</th></tr>
+    <tr><td>Se venden bien</td><td>0,6</td><td>Se agotaron las dos tiradas anteriores, más chicas</td><td>+L 35 000</td></tr>
+    <tr><td>No se venden</td><td>0,4</td><td>Nunca se ha vendido una tirada de este tamaño</td><td>−L 40 000</td></tr>
+  </table>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 <!-- ═══════════ PÁGINA 9 ═══════════ -->
 <section class="pagina">
-  <div class="caja">
-    <h3 class="ej4">Ejercicio 4 · Clasifica seis escenas</h3>
-    <p>Marca cada una como <b>práctica activa (A)</b> o <b>exposición pasiva (P)</b>, y di por qué: (1) oír el audio en el bus; (2) escribir la frase y que la tachen; (3) ver el tutorial mientras se cocina; (4) resolver el ejercicio y comprobar; (5) subrayar releyendo; (6) grabarse hablando y volver a oírse.</p>
-    <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  </div>
+  <table class="hoja ej2">
+    <tr><th>Valor esperado</th><td colspan="3">0,6 × 35 000 − 0,4 × 40 000 = <b>+L 5 000</b>. La cuenta sale a favor</td></tr>
+    <tr><th>¿Se repite?</th><td colspan="3">No. Es una tirada y hay que pagar el préstamo antes de pensar en otra</td></tr>
+    <tr><th>¿Nos saca de la mesa?</th><td colspan="3"><b>Sí.</b> La deuda de 40 000 no se puede pagar con lo que entra al mes</td></tr>
+  </table>
+  <table class="hoja">
+    <tr><th>Lo que no son lempiras</th><td colspan="3">La relación con quien presta, que es de la familia</td></tr>
+    <tr><th>Decisión</th><td colspan="3"><b>No, así no.</b> La cuenta favorable no compra el derecho a arruinarse</td></tr>
+    <tr><th>Condición con la que sí</th><td colspan="3">Tirada de L 6 000, repetida cada mes. Misma proporción, y la rama mala se aguanta</td></tr>
+    <tr><th>Qué me haría cambiar</th><td colspan="3">Tres tiradas chicas vendidas seguidas, o un comprador que pague por adelantado la mitad</td></tr>
+  </table>
 
-  <div class="caja">
-    <h3>Ejercicio 5 · Diagnóstico</h3>
-    <p>El papá lleva veinte años escribiendo con dos dedos y no mejora. Explica por qué, usando la regla, y di qué hay que aceptar durante las primeras semanas si quiere cambiar.</p>
-    <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  </div>
+  <h2>📅 El diario de decisiones</h2>
+  <p class="mini">Una línea por decisión. Es lo que convierte la experiencia en datos en vez de en anécdotas, y la diferencia entre veinte años de experiencia y un año de experiencia repetido veinte veces.</p>
+  <table class="registro">
+    <tr><th>Fecha</th><th>Decisión</th><th>Prob. que escribí</th><th>Qué pasó</th><th>¿Buen proceso?</th></tr>
+  </table>
+  <p class="mini"><b>Cómo se lee:</b> la última columna no pregunta si salió bien, pregunta si las ramas y las probabilidades eran razonables <b>con lo que se sabía entonces</b>. Si se acumulan muchas decisiones con buen proceso y mal resultado, hay mala suerte; si las probabilidades escritas se apartan siempre de lo ocurrido en la misma dirección, hay algo que corregir.</p>
 
-  <div class="caja">
-    <h3>Ejercicio 6 · Rediseño</h3>
-    <p>Toma una práctica real de tu semana, llénale la hoja de la página 8 y escribe <b>un solo cambio</b> con la fecha en que lo vuelves a medir.</p>
-    <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  </div>
+  <table class="registro">
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
 
-  <div class="caja">
-    <h3>Ejercicio 7 · Defensa oral, de pie y sin leer</h3>
-    <p>Ante la familia, en dos minutos: cita el postulado entero, di quién escribió el eslogan y en qué año, explica qué pasa si se invierte el orden de los disparos, y cierra con la cláusula de especificidad. Quien escucha marca aquí lo que faltó.</p>
-    <div class="lineas-4"><div class="raya-resp"></div><div class="raya-resp"></div></div>
-  </div>
-
-<h2>✅ Pauta completa de respuestas</h2>
-  <div class="pauta pa">
-    <p><b>Ejercicio 1.</b> Cuando el axón de A está lo bastante cerca de B para excitarla y participa de forma repetida o persistente en hacerla disparar, ocurre un cambio de crecimiento o metabólico que aumenta la eficacia de A para disparar a B. Las cuatro piezas: <b>cercanía</b>, <b>participación</b>, <b>repetición</b> y <b>dirección</b>. El eslogan borra la participación, y con ella la causa y el orden; también borra la dirección, porque «junto» es simétrico.</p>
-    <p><b>Ejercicio 2.</b> Se le atribuye a <b>Donald Hebb</b>, y no es suya. La formulación es de <b>Siegrid Löwel y Wolf Singer</b>, en <b>Science</b>, en <b>1992</b>. La versión rimada que se hizo famosa la puso en circulación <b>Carla Shatz</b> ese mismo año. El postulado de Hebb es de <b>1949</b>, capítulo 4 de «The Organization of Behavior».</p>
-    <p><b>Ejercicio 3.</b> Antes: <b>se refuerza</b> (potenciación). Después: <b>se debilita</b> (depresión). Se midió en <b>Markram y colegas (Science, 1997)</b> y en <b>Bi y Poo (Journal of Neuroscience, 1998)</b>, con hipocampo en cultivo y una ventana de decenas de milisegundos. Limitación que se declara: es <b>tejido y cultivo</b>, y su peso en un animal despierto sigue discutiéndose.</p>
-  </div>
+<h2>✏️ Ejercicios para hacer a lápiz</h2>
+  <ol>
+    <li><b>La cuenta.</b> Un puesto cobra L 50 por tirar un dado: si sale seis paga L 250, y si no, nada. Calcula el valor esperado y di si conviene jugar una vez, y si conviene jugar cien veces.</li>
+    <li><b>La rama que falta.</b> Alguien presenta una oferta con dos ramas: «sale muy bien» y «es un desastre». Escribe la tercera que casi siempre falta y explica por qué su ausencia inclina la cuenta.</li>
+    <li><b>El tamaño.</b> Toma el caso 3 y calcula qué fracción del préstamo haría que la rama mala se pudiera absorber con lo que entra en un mes. Escribe la cifra.</li>
+    <li><b>El seguro.</b> Explica por qué conviene pagar L 1 500 por una garantía cuyo valor esperado es L 900, y di en qué caso dejaría de convenir.</li>
+  </ol>
+  <ol start="5">
+    <li><b>Norma y retrato.</b> Escribe con tus palabras el error de tomar la norma por retrato, y el error contrario, con un ejemplo de cada uno.</li>
+    <li><b>La hoja.</b> Llena la hoja de la apuesta de la página 8 con una decisión real que tengas pendiente esta semana. Guárdala con la fecha sin decidir todavía.</li>
+    <li><b>El juicio.</b> Busca una decisión de hace un año que salió mal. Di si el proceso fue bueno o malo, y sostén la respuesta con lo que se sabía entonces y no con lo que pasó.</li>
+  </ol>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 <!-- ═══════════ PÁGINA 10 ═══════════ -->
 <section class="pagina">
-  <div class="pauta pb">
-    <p><b>Ejercicio 4.</b> (1) P: el audio avanza solo y nada del oyente participa. (2) A: se produce una frase y llega corrección. (3) P: coincidencia entre el video y la cocina. (4) A: se produce y se comprueba enseguida. (5) P: subrayar no produce la respuesta. (6) A: la grabación es corrección y llega poco después del intento.</p>
-    <p><b>Ejercicio 5.</b> Porque la regla refuerza lo que se repite y no distingue acierto de error: veinte años dejaron firmemente cableado el método viejo, y nunca hubo un intento distinto con su corrección detrás. Para cambiar hay que aceptar <b>escribir más lento durante unas semanas</b>, que es lo que cuesta que quepa la corrección, con algo que avise del fallo en la misma tecla.</p>
-    <p><b>Ejercicio 6.</b> Se valora que la práctica sea real, que las cinco casillas se contesten con hechos (veces, no intenciones), que la corrección tenga un retraso medido y que el cambio sea <b>uno solo y barato</b>: casi siempre, convertir un rato de recepción en uno de producción con comprobación inmediata. Con fecha de segunda medición.</p>
+  <h2>📚 Las fuentes, con su etiqueta</h2>
+  <table class="fuentes">
+    <tr><th>Fuente</th><th>Etiqueta y para qué sirve aquí</th></tr>
+    <tr><td><b>Daniel Bernoulli (1738)</b>, «Specimen theoriae novae de mensura sortis»</td><td><b>Clásico fundacional.</b> La utilidad marginal decreciente y el ejemplo del comerciante que asegura. Hay traducción inglesa de Louise Sommer en «Econometrica» (1954)</td></tr>
+    <tr><td><b>Nicolás Bernoulli (1713)</b>, carta a Montmort</td><td><b>Fuente primaria.</b> Donde se plantea el juego. Conviene saber que nació en una carta y no en un libro</td></tr>
+    <tr><td><b>Jacob Bernoulli (1713)</b>, «Ars Conjectandi»</td><td><b>Clásico fundacional.</b> La ley de los grandes números, que es lo que da sentido a la palabra promedio</td></tr>
+  </table>
+
+  <table class="fuentes">
+    <tr><th>Fuente</th><th>Etiqueta y para qué sirve aquí</th></tr>
+    <tr><td><b>Von Neumann y Morgenstern (1944)</b></td><td><b>Sólido como norma</b> de coherencia, y discutido como retrato de la conducta</td></tr>
+    <tr><td><b>Maurice Allais (1953)</b>, «Econometrica»</td><td><b>Sólido</b>, y de los resultados que replican siempre. Nobel en 1988</td></tr>
+    <tr><td><b>Kahneman y Tversky (1979)</b>, «Econometrica»</td><td><b>Sólido</b> como modelo descriptivo, con la letra chica de que no es una norma. Nobel de Kahneman en 2002</td></tr>
+    <tr><td>«El valor esperado dice lo que hay que hacer»</td><td><b>Media verdad de manual.</b> Cierto en apuestas repetidas que no hunden a nadie, y calla justamente esas dos condiciones</td></tr>
+  </table>
+
+  <div class="caja">
+    <h3>✅ Pauta de los ejercicios (1 a 3)</h3>
+    <p><b>1.</b> Valor esperado = 250 ÷ 6 = L 41,67, menos los 50 del boleto: <b>sale en contra por L 8,33</b>. No conviene ni una vez ni cien: la cuenta es desfavorable, y repetir solo hace más segura la pérdida.</p>
+    <p><b>2.</b> Falta la rama de que salga <b>regular</b>, que suele ser la más probable. Sin ella la cuenta se calcula solo entre los dos extremos y se inclina hacia el que más impresione a quien decide.</p>
+    <p><b>3.</b> Con un ingreso que permita absorber unos L 4 000, la fracción es una décima parte: tirada de <b>L 6 000</b>, con pérdida máxima de 4 000.</p>
   </div>
 
-  <div class="pauta pc">
-    <p><b>Ejercicio 7.</b> Se aprueba si salen las cuatro cosas sin leer: el postulado con la <b>participación</b> y la <b>dirección</b> dentro (no vale «lo que dispara junto»); que la frase corta es de <b>Löwel y Singer, en Science, en 1992</b>, con la rima de Carla Shatz; que invertir el orden <b>debilita</b> la conexión en vez de dejarla igual, medido por Markram (1997) y Bi y Poo (1998) en tejido y cultivo; y que <b>se gana lo practicado y nada más</b>. Se penaliza citar a Hebb como ley demostrada: él lo llamó postulado.</p>
+  <div class="caja">
+    <h3>✅ Pauta de los ejercicios (4 a 5)</h3>
+    <p><b>4.</b> Conviene porque los 9 000 no se pueden reponer de golpe y quedarse sin la impresora corta el trabajo. Dejaría de convenir si la casa pudiera reponerla sin esfuerzo, o si la garantía costara más que la propia impresora.</p>
+    <p><b>5.</b> Norma por retrato: diseñar reglas o incentivos suponiendo que la gente decide coherentemente, y extrañarse de que no los cumpla. Retrato por norma: concluir que como se decide así, así está bien, con lo cual desaparece toda posibilidad de mejorar.</p>
   </div>
 
-  <h2>📚 Hoja de fuentes</h2>
-  <p class="mini">Regla del Estudio Mayor: ningún estudio entra sin su etiqueta, y la etiqueta la pone quien cita.</p>
-  <table class="fuentes fa">
-    <tr><th>Fuente</th><th>Qué aporta</th><th>Estatus</th></tr>
-    <tr><td>Hebb (1949), «The Organization of Behavior», cap. 4</td><td>El postulado, la asamblea de células y la secuencia de fases</td><td><b>Clásico sólido</b>, con la letra chica del autor: era conjetura</td></tr>
-    <tr><td>Hebb (1947), sobre la experiencia temprana</td><td>Las ratas criadas sueltas resolvían mejor los problemas</td><td><b>Clásico sólido</b>: origen de la literatura del ambiente enriquecido</td></tr>
-    <tr><td>Löwel y Singer (1992), Science</td><td>La formulación corta de la que sale el eslogan</td><td>Estudio <b>sólido</b>; el eslogan derivado es <b>divulgación con inflado</b>, empezando por la atribución</td></tr>
-  </table>
-  <table class="fuentes fb">
-    <tr><th>Fuente</th><th>Qué aporta</th><th>Estatus</th></tr>
-    <tr><td>Markram, Lübke, Frotscher y Sakmann (1997), Science</td><td>La eficacia se regula por coincidencia con orden</td><td><b>Sólido</b>, en preparación de laboratorio</td></tr>
-    <tr><td>Bi y Poo (1998), Journal of Neuroscience</td><td>La ventana de decenas de milisegundos, célula a célula</td><td><b>Sólido</b>, con su limitación declarada: cultivo, no animal despierto</td></tr>
-    <tr><td>Ericsson, Krampe y Tesch-Römer (1993)</td><td>La práctica deliberada, con retroalimentación inmediata</td><td><b>Clásico cuestionado</b> en el tamaño de su efecto</td></tr>
-    <tr><td>Macnamara, Hambrick y Oswald (2014)</td><td>La práctica explica en torno al doce por ciento de la variación</td><td><b>Crítica sólida</b>: se cita siempre junto a Ericsson</td></tr>
-    <tr><td>Maguire y colegas (2000)</td><td>Los taxistas de Londres y el hipocampo posterior</td><td><b>Sólido con limitaciones</b>: se estudia entero en la etapa 4</td></tr>
-    <tr><td>Las cinco lecturas de la misión</td><td>Cuento, capítulo, ensayo y dos entrevistas imaginadas</td><td><b>Pastiche declarado</b>: no son obra de esos autores, los encuentros nunca ocurrieron y la erudición interna es real</td></tr>
-  </table>
+  <div class="caja">
+    <h3>✅ Pauta de los ejercicios (6 a 7)</h3>
+    <p><b>6.</b> Se valora que estén las cuatro columnas de ramas, las dos preguntas de criterio contestadas con el caso delante, y una condición concreta.</p>
+    <p><b>7.</b> Se valora que la respuesta <b>no use ningún dato posterior a la decisión</b>: si las probabilidades escritas eran razonables entonces, el proceso fue bueno aunque el resultado fuera malo.</p>
+  </div>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🏺 Ruta del Barro Vivo · Etapa 1: La regla de Hebb, bien contada</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 1: San Petersburgo, lo que vale una apuesta</span>
   </div>
 </section>
 
 
-</div>
 
+</div>
 <script src="../js/lecturas-marcador.js"></script>
 </body>
 </html>
