@@ -72,6 +72,11 @@ f.onload = async () => {
     ok(/m2/.test(clave || ''), 'clave de progreso propia (' + clave + ')', 'comparte la clave con el Módulo 1: ' + clave);
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    /* Estas dos sondas son anteriores a la norma del título y nunca lo ponían:
+       decían «todo en orden» en su cuerpo y dejaban la pestaña sin APRUEBA, así
+       que quien las corre en tanda las veía como no aprobadas sin tener ningún
+       fallo. La casa las lee por el título (CLAUDE.md), así que lo ponen. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda módulo 2';
   } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
 };
 </script>

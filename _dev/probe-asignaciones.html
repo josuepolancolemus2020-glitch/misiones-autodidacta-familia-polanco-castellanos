@@ -125,6 +125,11 @@ f.onload = async () => {
     try { w.localStorage.removeItem('faro_v1'); } catch (e) {}
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    /* Estas dos sondas son anteriores a la norma del título y nunca lo ponían:
+       decían «todo en orden» en su cuerpo y dejaban la pestaña sin APRUEBA, así
+       que quien las corre en tanda las veía como no aprobadas sin tener ningún
+       fallo. La casa las lee por el título (CLAUDE.md), así que lo ponen. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda asignaciones';
   } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
 };
 </script>

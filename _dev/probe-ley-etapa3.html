@@ -224,6 +224,11 @@ window.addEventListener('load', async () => {
     }
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    /* Estas sondas son anteriores a la norma del título y no lo ponían: decían
+       «todo en orden» en su cuerpo y dejaban la pestaña sin APRUEBA, así que en
+       tanda salían como no aprobadas sin tener un solo fallo. La casa las lee
+       por el título (CLAUDE.md). */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda ley etapa 3';
   } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
 });
 </script>

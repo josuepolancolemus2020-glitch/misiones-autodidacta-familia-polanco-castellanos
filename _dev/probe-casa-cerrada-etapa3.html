@@ -120,11 +120,18 @@ window.addEventListener('load', async () => {
     log('\n── EN LA APLICACIÓN ──');
     const da = appFrame.contentDocument, wa = appFrame.contentWindow;
     wa.switchView('view-rutas'); await esperar(400);
+    /* Estas cuentas se sacan del CATÁLOGO y no se escriben a mano. Escritas a
+       mano ya se quedaron viejas una vez: la ruta creció a cuatro etapas
+       construidas y estas tres sondas seguían esperando una, dos y tres, así
+       que suspendían sin que hubiera nada roto. Atadas al catálogo, la próxima
+       etapa que se construya no las rompe. */
+    const construidasCasa = wa.eval('MISSIONS.filter(m => m.ruta === "casacerrada").length');
+    const totalCasa = wa.eval('RUTAS.casacerrada.etapas');
     const casa = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Casa Cerrada/.test(c.textContent));
     ok(!!casa, 'la Ruta de la Casa Cerrada está en el mapa', 'no aparece la ruta');
     if (casa) {
-      ok(casa.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + casa.querySelectorAll('.re-link').length);
-      ok(casa.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + casa.querySelectorAll('.ruta-etapa-futura').length);
+      ok(casa.querySelectorAll('.re-link').length === construidasCasa, 'con sus ' + construidasCasa + ' etapas construidas ya tocables', 'etapas tocables: ' + casa.querySelectorAll('.re-link').length + ', construidas: ' + construidasCasa);
+      ok(casa.querySelectorAll('.ruta-etapa-futura').length === totalCasa - construidasCasa, 'y el resto por construir, con nombre', 'futuras: ' + casa.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCasa - construidasCasa));
       ok(/El código que no confía/.test(casa.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
       ok(/Llaves y secretos/i.test(casa.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -134,12 +141,17 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length === construidasCasa, 'la materia muestra sus ' + construidasCasa + ' misiones', 'muestra ' + tarjetas.length);
       const cod = tarjetas.find(t => /código que no confía/i.test(t.textContent));
       ok(!!cod && /🔒/.test(cod.textContent), 'la misión del código lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    /* Estas sondas son anteriores a la norma del título y no lo ponían: decían
+       «todo en orden» en su cuerpo y dejaban la pestaña sin APRUEBA, así que en
+       tanda salían como no aprobadas sin tener un solo fallo. La casa las lee
+       por el título (CLAUDE.md). */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda casa cerrada etapa 3';
   } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
 });
 </script>
