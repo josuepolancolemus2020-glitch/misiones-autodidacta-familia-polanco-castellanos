@@ -345,36 +345,29 @@ f.onload=async()=>{
       ok(mod && !!gd.getElementById('fmPanel') && !!gd.querySelector('.fm-leyenda') && conTexto.length>0,
         clase+': el marcador vive, con '+conTexto.length+' zonas y '+conTexto.reduce((a,z)=>a+z.parrafos,0)+' trozos marcables',
         clase+' ('+url+'): mod:'+mod+' panel:'+(mod&&!!gd.getElementById('fmPanel'))+' zonas:'+JSON.stringify(zs));
-      /* LA CINTA DE LECTURA NO PUEDE ROBARSE EL PÁRRAFO. En la prosa de
-         las rutas del adulto (y en las fichas) lo marcable se reconoce
-         por NO tener clase, así que si la cinta se pusiera con una clase,
-         el párrafo que uno está leyendo dejaría de poder subrayarse justo
-         por estar leyéndolo. Pasó de verdad el 20 de agosto de 2026 y no
-         lo cazó ninguna sonda: se seleccionaba y la barra no salía. */
-      /* Solo en las de PROSA: ahí lo marcable se reconoce por no tener
-         clase, que es donde la trampa muerde. En las del Estudio Mayor
-         los párrafos de lectura llevan `lect-p` y nunca estuvieron en
-         riesgo; eso lo comprueba la sonda de su misión. */
-      if(mod && tipo==='prosa'){
-        const cand=[...gd.querySelectorAll('#s-aprende .card > p, #s-estructura .card > p')]
-          .filter(x=>!x.className && x.textContent.length>120);
+      /* LA MARCA DE LECTURA NO SE PONE SOLA, y aquí se comprueba en las
+         tres formas de misión a la vez. La primera versión la ponía un
+         observador según qué párrafo cruzara la franja central de la
+         pantalla; el autor la mandó quitar el 20 de agosto de 2026 porque
+         una raya que se mueve al lado del texto desconcentra justo
+         mientras se lee. Si alguien devuelve el observador, esto lo caza
+         en las treinta y nueve misiones de una pasada.
+
+         El marco de esta sonda vive fuera de cuadro (a -9999px), y eso
+         por sí solo ya impediría que un IntersectionObserver marcara
+         nada: su raíz implícita es la ventana de ARRIBA. Así que se trae
+         a la vista para la comprobación, o no probaría nada. */
+      if(mod){
+        const cand=[...gd.querySelectorAll('p')].filter(x=>x.textContent.length>120);
         if(cand.length){
-          /* El marco de trabajo de esta sonda vive fuera de cuadro a
-             propósito (a -9999px), para no dar saltos mientras abre tres
-             misiones. Pero la cinta la pone un IntersectionObserver, y su
-             raíz implícita es la ventana de ARRIBA: fuera de cuadro no
-             interseca nada y la cinta no se pondría nunca. Así que se trae
-             el marco a la vista solo para esta comprobación. */
           g.style.cssText='width:380px;height:600px;border:0;position:fixed;left:0;top:0;z-index:-1;';
           cand[Math.min(1,cand.length-1)].scrollIntoView({block:'center'});
           await esperar(1600);
-          const cinta=gd.querySelector('[data-fm-aqui]');
-          ok(!!cinta, clase+': la cinta de lectura se pone sola al leer', clase+': no se puso ninguna cinta');
-          if(cinta){
-            ok(!cinta.className.trim(), clase+': y sin añadirle clase al párrafo', clase+': le puso la clase «'+cinta.className+'»');
-            ok(gw.FaroMarcador.esMarcable(cinta), clase+': así que ese párrafo se sigue pudiendo subrayar',
-              clase+': el párrafo con la cinta quedó fuera del marcador');
-          }
+          ok(!gd.querySelector('.fm-aqui, [data-fm-aqui]'),
+            clase+': leer no pone ninguna marca de lectura por su cuenta',
+            clase+': volvió a aparecer la marca sola al desplazar');
+          ok(!gw.FaroMarcador.lugar(), clase+': y el marcador no apunta nada',
+            clase+': el marcador apuntó un sitio que nadie marcó');
           g.style.cssText='width:380px;height:600px;border:0;position:absolute;left:-9999px;';
         }
       }

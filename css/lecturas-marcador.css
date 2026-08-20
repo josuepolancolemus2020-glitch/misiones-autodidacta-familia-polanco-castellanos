@@ -281,9 +281,10 @@
 
   /* La marca de lectura es cosa de la pantalla: en el papel no pinta
      nada, y sobre todo no puede añadir ni un píxel de alto a una ficha
-     que va a 0,4 mm del corte. */
-  [data-fm-aqui] { box-shadow: none !important; }
-  [data-fm-aqui]::before { content: none !important; }
+     que va a 0,4 mm del corte. El texto sigue saliendo; lo que se calla
+     es el fondo y el 🔖. */
+  .fm-aqui { background: none !important; box-shadow: none !important; }
+  .fm-aqui-fin::after { content: none !important; }
 
   /* El subrayado sí viaja al papel, con su color obligado (sin esto el
      navegador se come los fondos) y sin ocupar espacio. */
@@ -296,30 +297,61 @@
 }
 
 /* ── La marca de lectura ──
-   La cinta del margen y su rótulo NO ocupan sitio: el rótulo va en
-   position:absolute y la cinta es un box-shadow, no un borde. Es la
-   misma razón que la inicial volada de las marcas (norma 5-octies): en
-   una ficha, cualquier cosa que añada alto parte una hoja y deja once. */
-[data-fm-aqui] { position: relative; box-shadow: -6px 0 0 -2px var(--fm-lugar, #f59e0b); }
-/* El separador va en el MARGEN, no encima del párrafo anterior. La primera
-   versión ponía el rótulo «Aquí me quedé» a -1.15em, es decir tapando el
-   último renglón del párrafo de arriba, y en un texto apretado eso se come
-   una línea entera. Lo cazó una foto del teléfono, como casi siempre.
-   Aquí no hay palabras: hay un separador en el margen, y las palabras
-   («te quedaste en tal lectura, párrafo tal») viven en el panel, que es
-   donde se leen sin estorbar. Sigue sin ocupar sitio, que es lo que la
-   norma 5-octies exige para que una ficha no pase de diez hojas. */
-[data-fm-aqui]::before {
-  content: '🔖';
-  position: absolute; left: -1.35em; top: 0;
-  font-size: 0.8rem; line-height: 1.5; pointer-events: none;
+   La primera versión ponía una cinta de alto completo en el margen
+   izquierdo del párrafo que uno estuviera leyendo, y la ponía sola. Se
+   quitó: una raya naranja que se mueve al lado del texto desconcentra
+   justo mientras se lee, que es cuando menos falta hace, y encima
+   señalaba párrafos que uno solo estaba cruzando.
+
+   Ahora va PEGADA A LAS PALABRAS que el lector eligió, como un punto de
+   libro puesto a mano. Es discreta a propósito: un fondo tenue y un 🔖
+   al final, nada de bordes ni de rayas. Y se toca para quitarla, así que
+   pide dedo (cursor y área de toque) sin pedir instrucciones. */
+.fm-aqui {
+  position: relative;      /* para colgar de aquí el 🔖 sin que ocupe sitio */
+  background: var(--fm-lugar-gl, rgba(245,158,11,.20));
+  color: inherit;
+  border-radius: 3px;
+  /* Ni un píxel de relleno horizontal: en un párrafo con la última línea
+     casi llena, dos píxeles bastan para que una palabra salte de renglón,
+     y en una ficha un renglón de más es una hoja de más. El fondo y el
+     filete se ven igual sin él. */
+  padding: 0;
+  cursor: pointer;
+  box-shadow: inset 0 -2px 0 0 var(--fm-lugar, #f59e0b);
 }
-/* Al volver con «Seguir donde iba», el párrafo late una vez: sin eso uno
+/* El emoji solo en el último trozo: una selección que cruza una negrita
+   se envuelve en varios <mark>, y sin esto saldrían tres marcadores
+   seguidos.
+
+   Y va FUERA DEL FLUJO, colgado del final de la marca. Se midió tres
+   veces y las dos primeras estaban mal:
+     · volado (`vertical-align: super`), como la inicial de los
+       subrayados, empujaba el párrafo 2,33 px: un emoji trae la caja más
+       alta que una letra;
+     · en caja de alto cero ya no empujaba a lo alto, pero seguía
+       ocupando ANCHO, y en un párrafo con la última línea casi llena eso
+       hacía saltar una palabra de renglón: 18 px, una línea entera.
+   En una ficha, que va a 0,4 mm del corte, un renglón de más parte una
+   hoja y deja once (norma 5-octies). Absoluto mide 0,00 en las dos
+   direcciones. Va un poco alzado para caer sobre el espacio que sigue a
+   la marca y no encima de una letra. */
+.fm-aqui-fin::after {
+  content: '🔖';
+  position: absolute;
+  left: 100%;
+  top: -0.25em;
+  font-size: 0.7em;
+  line-height: 1;
+  pointer-events: none;
+}
+.fm-aqui:focus-visible { outline: 2px solid var(--fm-lugar, #f59e0b); outline-offset: 1px; }
+/* Al volver con «Seguir donde iba», la marca late una vez: sin eso uno
    aterriza en mitad del texto sin saber si el salto ocurrió. */
 [data-fm-late] { animation: fmLate 1.6s ease-out; }
 @keyframes fmLate {
-  0%, 100% { background: transparent; }
-  20%      { background: var(--fm-lugar-gl, rgba(245,158,11,.22)); }
+  0%, 100% { background: var(--fm-lugar-gl, rgba(245,158,11,.20)); }
+  40%      { background: var(--fm-lugar, #f59e0b); }
 }
 .fm-acc-lugar { border-color: var(--fm-lugar, #f59e0b); color: var(--fm-lugar, #f59e0b); }
 .fm-estado-lugar { margin-top: -4px; font-weight: 600; opacity: .9; }

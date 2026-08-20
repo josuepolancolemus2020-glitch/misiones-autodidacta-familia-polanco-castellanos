@@ -100,8 +100,7 @@
   let temporizadorNube = null;
   let anclaRect = null;             /* dónde estaba lo seleccionado, para colocar la barra */
   let CLAVE_LUGAR = 'faro_lugar';   /* la marca de lectura, en este aparato */
-  let lugar = null;                 /* { l: zona, p: índice, t: texto, u: fecha } */
-  let guardaLugar = null;
+  let lugar = null;                 /* { l, p, i, f, t, u }: como una marca, pero una sola */
 
   /* ─────────────── Guardado en el aparato ───────────────
      Se usa la MISMA clave de progreso de la misión con un sufijo, que es
@@ -278,7 +277,6 @@
     if (deLaNube && (seleccion || editando)) { repintadoPendiente = true; return; }
     repintadoPendiente = false;
     renumerarNotas();
-    setTimeout(pintarLugar, 0);
     zonas().forEach(z => {
       z.parrafos.forEach((p, i) => {
         if (!ORIG.has(p)) ORIG.set(p, p.innerHTML);
@@ -291,6 +289,13 @@
           if (texto.slice(m.i, m.f) !== m.t) return;   /* desanclada: la caza reanclar() */
           envolver(p, m);
         });
+        /* La marca de lectura va DESPUÉS de los subrayados y dentro de
+           este mismo repintado. Fuera de aquí no sobreviviría: cada
+           repintado rehace el innerHTML del párrafo desde el original. */
+        if (lugar && lugar.l === z.clave && lugar.p === i
+            && texto.slice(lugar.i, lugar.f) === lugar.t) {
+          envolverLugar(p, lugar);
+        }
       });
     });
     pintarPanel();
@@ -302,15 +307,58 @@
      envuelve trozo a trozo y todos comparten el mismo identificador. La
      inicial volada se pone solo en el último trozo, o una frase con dos
      negritas saldría con tres iniciales seguidas. */
-  function envolver(p, m) {
+  /* Los trozos de texto que caen dentro de [i, f). Lo usan las dos
+     marcas que se pintan dentro de un párrafo (el subrayado de color y
+     la de lectura), y por eso vive suelto: son las mismas cuentas y
+     duplicarlas es garantizar que un día se corrija solo una. */
+  function trozosDe(p, i, f) {
     const paseo = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null);
     let off = 0; const trozos = [];
     while (paseo.nextNode()) {
       const n = paseo.currentNode, len = n.nodeValue.length;
-      const a = Math.max(m.i, off), b = Math.min(m.f, off + len);
+      const a = Math.max(i, off), b = Math.min(f, off + len);
       if (a < b) trozos.push({ n: n, desde: a - off, hasta: b - off });
       off += len;
     }
+    return trozos;
+  }
+
+  /* Envuelve unos trozos en el elemento que devuelva `hacer`, y devuelve
+     los elementos puestos. El corte se hace de atrás hacia adelante
+     dentro de cada nodo para que el primer splitText no invalide el
+     desplazamiento del segundo. */
+  function envolverTrozos(trozos, hacer) {
+    return trozos.map((t, k) => {
+      let nodo = t.n;
+      if (t.hasta < nodo.nodeValue.length) nodo.splitText(t.hasta);
+      if (t.desde > 0) nodo = nodo.splitText(t.desde);
+      const el = hacer(k, trozos.length);
+      nodo.parentNode.replaceChild(el, nodo);
+      el.appendChild(nodo);
+      return el;
+    });
+  }
+
+  /* La marca de lectura: un 🔖 pegado a las palabras donde uno lo dejó.
+     Es un <mark> como los subrayados para que herede su comportamiento
+     (se puede tocar, se lee con teclado) y para que el repintado la trate
+     igual. El emoji va en el ÚLTIMO trozo y por ::after, para que no
+     ocupe sitio en el papel ni salga tres veces cuando la selección
+     cruza una negrita. */
+  function envolverLugar(p, lug) {
+    envolverTrozos(trozosDe(p, lug.i, lug.f), (k, total) => {
+      const mk = document.createElement('mark');
+      mk.className = 'fm-aqui' + (k === total - 1 ? ' fm-aqui-fin' : '');
+      mk.setAttribute('tabindex', '0');
+      mk.setAttribute('role', 'button');
+      mk.setAttribute('title', 'Aquí me quedé. Tócalo para quitarlo.');
+      mk.setAttribute('aria-label', 'Aquí me quedé: ' + lug.t.slice(0, 60) + '. Tócalo para quitarlo.');
+      return mk;
+    });
+  }
+
+  function envolver(p, m) {
+    const trozos = trozosDe(p, m.i, m.f);
     trozos.forEach((t, k) => {
       let nodo = t.n;
       if (t.hasta < nodo.nodeValue.length) nodo.splitText(t.hasta);
@@ -471,6 +519,10 @@
       + '</div>'
       + '<div class="fm-acciones">'
       + '<button type="button" class="fm-acc" id="fmBtnNota">✎ Nota</button>'
+      /* La marca de lectura vive aquí, con los colores, porque es el mismo
+         gesto: se selecciona y se decide qué se hace con lo seleccionado.
+         En un botón aparte habría que soltar el texto, buscarlo y volver. */
+      + '<button type="button" class="fm-acc fm-acc-lugar" id="fmBtnAqui">🔖 Aquí me quedé</button>'
       + '<button type="button" class="fm-acc fm-acc-quita" id="fmBtnQuita">🗑 Quitar</button>'
       + '<button type="button" class="fm-acc" id="fmBtnCierra">✕ Cerrar</button>'
       + '</div>';
@@ -478,6 +530,7 @@
     b.querySelectorAll('.fm-color').forEach(btn =>
       btn.addEventListener('click', () => marcarCon(btn.dataset.cat)));
     document.getElementById('fmBtnNota').addEventListener('click', abrirNota);
+    document.getElementById('fmBtnAqui').addEventListener('click', ponerLugar);
     document.getElementById('fmBtnQuita').addEventListener('click', () => {
       if (editando) quitarMarca(editando); else cerrarBarra();
     });
@@ -491,6 +544,10 @@
     b.querySelectorAll('.fm-color').forEach(btn =>
       btn.setAttribute('aria-pressed', String(btn.dataset.cat === catActual)));
     document.getElementById('fmBtnQuita').style.display = hayMarca ? '' : 'none';
+    /* Sobre una marca ya puesta se está EDITANDO, no seleccionando: no hay
+       trozo nuevo al que llevar la marca de lectura, así que el botón se
+       calla en vez de mentir. */
+    document.getElementById('fmBtnAqui').style.display = hayMarca ? 'none' : '';
     b.classList.add('fm-abierta');
     anclaRect = rect || null;
     colocarBarra();
@@ -965,14 +1022,19 @@
     if (e) e.textContent = textoEstado();
     const l = document.getElementById('fmLugarTxt');
     if (!l) return;
-    if (!lugar) { l.textContent = '🔖 Todavía no hay marca de lectura: se pone sola al leer.'; return; }
+    if (!lugar) {
+      l.textContent = '🔖 Sin marca de lectura. Cuando dejes de leer, selecciona la palabra '
+        + 'donde te quedaste y pulsa «Aquí me quedé».';
+      return;
+    }
     const z = zonaDe(lugar.l);
     /* Se dice a la vista que esta marca NO viaja, porque el resto del
        aparato sí lo hace y callarlo sería justo el aviso deshonesto que
        la casa tiene prohibido: quien lee esto tiene derecho a saber
        dónde está su cosa antes de cerrar el teléfono. */
-    l.textContent = '🔖 Te quedaste en «' + (z ? z.titulo : lugar.l) + '», párrafo '
-      + (lugar.p + 1) + '. La marca de lectura se queda en este aparato.';
+    l.textContent = '🔖 Te quedaste en «' + (z ? z.titulo : lugar.l) + '», en «'
+      + lugar.t.slice(0, 40) + (lugar.t.length > 40 ? '…' : '') + '». '
+      + 'Tócala en el texto para quitarla. Se queda en este aparato.';
   }
 
 
@@ -1006,62 +1068,50 @@
     try { localStorage.setItem(CLAVE_LUGAR, JSON.stringify(lugar)); } catch (e) {}
   }
 
-  /* La franja central: -45% arriba y -45% abajo deja viva una banda del
-     10% en mitad de la pantalla. Un párrafo cuenta como «lo que estoy
-     leyendo» cuando entra ahí, no cuando asoma por el borde. */
-  function seguirLaLectura() {
-    if (!('IntersectionObserver' in window)) return;
-    const porElem = new Map();
-    zonas().forEach(z => z.parrafos.forEach((p, i) => porElem.set(p, { l: z.clave, p: i })));
-    if (!porElem.size) return;
-    const obs = new IntersectionObserver(entradas => {
-      let mejor = null;
-      entradas.forEach(e => { if (e.isIntersecting) mejor = e.target; });
-      if (!mejor) return;
-      const donde = porElem.get(mejor);
-      if (!donde) return;
-      if (lugar && lugar.l === donde.l && lugar.p === donde.p) return;
-      lugar = { l: donde.l, p: donde.p, t: (mejor.textContent || '').trim().slice(0, 90), u: ahora() };
-      pintarLugar();
-      /* Se escribe con retraso: al desplazar rápido pasan veinte párrafos
-         por la franja y no hace falta tocar el almacén veinte veces. */
-      clearTimeout(guardaLugar);
-      guardaLugar = setTimeout(() => { guardarLugar(); pintarEstado(); }, 900);
-    }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
-    porElem.forEach((_, el) => obs.observe(el));
+  /* ── DÓNDE ME QUEDÉ ──────────────────────────────────────────────
+     Pedido por el autor el 20 de agosto de 2026, y cambia la primera
+     versión de esta misma semana.
+
+     Antes la marca se ponía SOLA: un observador miraba qué párrafo
+     estaba en la franja central de la pantalla y le pegaba una cinta en
+     el margen izquierdo. La idea era buena (lo que hay que acordarse de
+     pulsar no se pulsa) y el resultado, malo: la cinta se movía sin que
+     nadie la tocara, aparecía en un párrafo que uno solo estaba
+     cruzando, y una raya naranja de alto completo al lado del texto
+     desconcentra justo mientras se lee, que es cuando menos falta hace.
+     Lo cazó una foto del teléfono.
+
+     Ahora la pone el lector, en la misma barra con la que subraya, y va
+     PEGADA A LAS PALABRAS donde se quedó y no al párrafo entero. Volver
+     a leer es entonces una sola cosa: se ve el 🔖 en la palabra exacta,
+     se toca, y desaparece. Sin menús y sin buscar el botón. */
+
+  /* Vuelve la marca de lectura al trozo que está seleccionado ahora
+     mismo. Solo hay una por misión: poner otra mueve la de antes, que es
+     lo que uno espera de un punto de libro. */
+  function ponerLugar() {
+    if (!seleccion) return;
+    const s = seleccion;
+    lugar = { l: s.l, p: s.p, i: s.i, f: s.f, t: s.t, u: ahora() };
+    guardarLugar();
+    pintarTodo(); cerrarBarra(); limpiarSeleccion();
+    sonido('ok');
+    aviso('🔖 Aquí me quedé. Tócalo para quitarlo.');
   }
 
-  /* La cinta va como CLASE del párrafo, no dentro de él: pintarTodo()
-     rehace el innerHTML de los trozos marcables, y una cinta metida
-     dentro se borraría en cada repintado. El rótulo se dibuja con un
-     ::before colocado por fuera, para que no añada ni un píxel de alto:
-     en una ficha, un carácter de más parte una hoja y deja once
-     (norma 5-octies). */
-  /* La cinta se pone con un ATRIBUTO y no con una clase, y esto no es
-     estilo: es un fallo que costó media hora encontrar. Los párrafos
-     marcables de una ficha (y los de la prosa de las rutas del adulto)
-     se reconocen por NO tener clase, así que en cuanto la cinta le
-     ponía una al párrafo, ese párrafo dejaba de ser marcable: se leía
-     un rato, la cinta caía encima, y a partir de ahí no se podía
-     subrayar justo el párrafo que uno estaba leyendo. Con un atributo,
-     `className` sigue vacío y todo sigue en su sitio. */
-  function pintarLugar() {
-    document.querySelectorAll('[data-fm-aqui]').forEach(el => {
-      el.removeAttribute('data-fm-aqui');
-      el.removeAttribute('title');
-    });
+  /* Quitarla es tocarla, y no pregunta: es una marca sin contenido, y
+     volver a ponerla cuesta un gesto. Preguntar aquí sería cobrar por
+     algo que no vale nada perder. */
+  function quitarLugar(callado) {
     if (!lugar) return;
-    const z = zonaDe(lugar.l);
-    const p = z && z.parrafos[lugar.p];
-    if (!p) return;
-    p.setAttribute('data-fm-aqui', 'Aquí me quedé');
-    /* El texto también en el title: quien pase el ratón o use lector de
-       pantalla lo oye, sin que ocupe un renglón en la página. */
-    p.setAttribute('title', 'Aquí me quedé');
+    lugar = null;
+    guardarLugar();
+    pintarTodo();
+    if (!callado) { sonido('click'); aviso('Marca de lectura quitada'); }
   }
 
   function irAlLugar() {
-    if (!lugar) return aviso('Todavía no hay marca de lectura');
+    if (!lugar) return aviso('Todavía no has puesto la marca de lectura');
     const z = zonaDe(lugar.l);
     const p = z && z.parrafos[lugar.p];
     if (!p) return aviso('El texto cambió y la marca se perdió');
@@ -1076,9 +1126,15 @@
       try { FaroLecturas.abrir(lugar.l); } catch (e) {}
     }
     setTimeout(() => {
-      p.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      p.setAttribute('data-fm-late', '1');
-      setTimeout(() => p.removeAttribute('data-fm-late'), 1800);
+      /* Se aterriza en las PALABRAS marcadas si están pintadas, y en el
+         párrafo solo si no lo están: en un párrafo largo, centrar el
+         párrafo puede dejar la marca fuera de la pantalla, que es
+         justamente lo que este botón viene a evitar. */
+      const marca = p.querySelector('.fm-aqui');
+      const destino = marca || p;
+      destino.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      destino.setAttribute('data-fm-late', '1');
+      setTimeout(() => destino.removeAttribute('data-fm-late'), 1800);
     }, 160);
   }
 
@@ -1392,7 +1448,6 @@
     construirPanel();
     reanclar();
     pintarTodo();
-    seguirLaLectura();
 
     /* La nube, en cuanto se pueda. La sesión de Supabase se restaura de
        forma asíncrona, así que el primer intento va con un respiro y, si
@@ -1434,6 +1489,11 @@
     /* Tocar una marca ya puesta la abre para cambiarle el color, ponerle
        nota o quitarla. */
     document.addEventListener('click', e => {
+      /* Se mira ANTES que el subrayado a propósito: la marca de lectura
+         puede quedar dentro de un trozo ya subrayado, y ahí lo que el
+         dedo quiere decir es «ya volví», no «edítame el color». */
+      const aqui = e.target.closest ? e.target.closest('.fm-aqui') : null;
+      if (aqui) { e.preventDefault(); quitarLugar(); return; }
       const mk = e.target.closest ? e.target.closest('.fm-hl') : null;
       if (mk) {
         e.preventDefault();
@@ -1451,7 +1511,8 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') { cerrarNota(); cerrarBarra(); }
       /* Con teclado, una marca se abre con Enter igual que con el dedo. */
-      if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('fm-hl')) {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.classList
+          && (e.target.classList.contains('fm-hl') || e.target.classList.contains('fm-aqui'))) {
         e.preventDefault(); e.target.click();
       }
     });

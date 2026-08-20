@@ -195,22 +195,52 @@ async function marcar(w,d,el,nCar,cat){
   ok(otra.w.FaroMarcador.marcas().length===0,
     'otra ficha distinta arranca limpia, sin heredar las marcas', 'la otra ficha heredó '+otra.w.FaroMarcador.marcas().length+' marcas');
 
-  log('\n── LA MARCA DE LECTURA NO SE COME EL PÁRRAFO ──');
-  /* En una ficha lo marcable se reconoce por NO tener clase, así que la
-     cinta de lectura NO puede ponerse con una clase: si lo hiciera, el
-     párrafo que uno está leyendo dejaría de poder subrayarse justo por
-     estar leyéndolo. Pasó de verdad el 20 de agosto de 2026 y no lo vio
-     ninguna sonda: se selecciona y no se abría la barra, sin más. */
+  log('\n── LA MARCA DE LECTURA, EN UNA FICHA DE DIEZ HOJAS ──');
+  /* Dos cosas se juegan aquí y las dos son de fichas.
+
+     La primera: que NO se ponga sola. La versión de esta misma semana la
+     ponía un observador según lo que cruzara la franja central de la
+     pantalla, y el autor la mandó quitar porque distrae mientras se lee.
+
+     La segunda, y es la cara: una ficha son diez hojas de 252 mm y va a
+     menos de un milímetro del corte. Cualquier cosa que añada alto parte
+     una hoja y deja once (norma 5-octies). El 🔖 se dibuja en una caja de
+     alto cero justo por esto, y aquí se comprueba contando las hojas con
+     la marca puesta, que es la única prueba que vale. */
   {
     const pp = [...otra.d.querySelectorAll('.pagina p')].filter(x=>!x.className && x.textContent.length>120)[2];
     pp.scrollIntoView({ block:'center' });
     await esperar(1600);
-    const conCinta = otra.d.querySelector('[data-fm-aqui]');
-    ok(!!conCinta, 'la cinta de lectura se pone sola al leer una ficha', 'no se puso ninguna cinta');
-    if (conCinta) {
-      ok(!conCinta.className.trim(), 'y no le añade ninguna clase al párrafo', 'le puso la clase «'+conCinta.className+'»');
-      ok(otra.w.FaroMarcador.esMarcable(conCinta), 'así que ese párrafo se sigue pudiendo subrayar',
-        'el párrafo con la cinta se quedó fuera del marcador');
+    ok(!otra.d.querySelector('.fm-aqui, [data-fm-aqui]'), 'leer no pone ninguna marca por su cuenta', 'la marca se puso sola al desplazar');
+    ok(!otra.d.querySelector('[data-fm-aqui]'), 'y la cinta vieja del margen ya no existe', 'sigue la cinta del margen izquierdo');
+
+    const altoAntes = pp.getBoundingClientRect().height;
+    const paseo = otra.d.createTreeWalker(pp, NodeFilter.SHOW_TEXT, null);
+    let n = null;
+    while (paseo.nextNode()) { if (paseo.currentNode.nodeValue.trim().length > 25) { n = paseo.currentNode; break; } }
+    const r = otra.d.createRange(); r.setStart(n, 0); r.setEnd(n, Math.min(24, n.nodeValue.length));
+    const sel = otra.w.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    otra.d.dispatchEvent(new otra.w.Event('selectionchange'));
+    await esperar(400);
+    const btn = otra.d.getElementById('fmBtnAqui');
+    ok(!!btn && btn.style.display !== 'none', 'la barra de marcar trae «Aquí me quedé»', 'no está el botón de la marca de lectura');
+    if (btn) { btn.click(); await esperar(400); }
+    const marca = otra.d.querySelector('.fm-aqui');
+    ok(!!marca, 'y marca justo lo seleccionado', 'no se pintó la marca de lectura');
+    ok(otra.d.querySelectorAll('.pagina').length === PAGS, 'la ficha SIGUE en 10 hojas con la marca puesta',
+      'la marca desbordó la ficha: ' + otra.d.querySelectorAll('.pagina').length + ' hojas');
+    ok(Math.abs(pp.getBoundingClientRect().height - altoAntes) < 1.5, 'y no le añade alto al párrafo',
+      'la marca empujó el texto: ' + altoAntes + ' → ' + pp.getBoundingClientRect().height);
+    /* Y lo que costó media hora encontrar la primera vez: el párrafo
+       marcado tiene que seguir siendo marcable. En una ficha lo marcable
+       se reconoce por NO tener clase, así que la marca no puede
+       ponerle una. */
+    ok(!pp.className.trim(), 'y no le añade ninguna clase al párrafo', 'le puso la clase «' + pp.className + '»');
+    ok(otra.w.FaroMarcador.esMarcable(pp), 'así que ese párrafo se sigue pudiendo subrayar',
+      'el párrafo marcado se quedó fuera del marcador');
+    if (marca) {
+      marca.click(); await esperar(400);
+      ok(!otra.d.querySelector('.fm-aqui'), 'y tocarla la quita, sin preguntar nada', 'la marca sigue puesta después de tocarla');
     }
   }
 

@@ -525,27 +525,45 @@ juntas se queda como estaba.
 
 ### 4. La marca de lectura: dónde se quedó uno
 
-Estos textos son largos y se leen en varias sentadas. El marcador apunta
-**solo** el párrafo que estuvo en la franja central de la pantalla (no el
-último que asomó por el borde: eso es mirar, no leer), lo enseña con una
-cinta **Aquí me quedé** y trae un botón **Seguir donde iba** que abre la
-lectura aunque esté plegada y aterriza ahí.
+Estos textos son largos y se leen en varias sentadas, así que hace falta
+un punto de libro. **Lo pone el lector**, no el aparato: se selecciona la
+palabra donde uno lo deja y se pulsa **🔖 Aquí me quedé** en la misma
+barra con la que se subraya. Al volver, la marca está pegada a esas
+palabras, y **se quita tocándola**: un dedo encima y ya, sin menús y sin
+confirmar nada. Volver a leer es entonces un solo gesto.
 
-Es **automática a propósito**, no un botón que hay que acordarse de
-pulsar: la casa ya aprendió con el Buzón que lo que hay que acordarse de
-hacer no se hace. Y **se queda en el aparato**, que es una decisión y no
-un olvido: meterla en la nube obligaría a tocar la tabla
-`lecturas_marcas` y a correr SQL nuevo a mano desde la tableta, para algo
-que casi siempre es distinto en cada aparato (en el teléfono se lee en la
-fila del banco, en la tableta de noche). **El panel lo dice a la vista**,
-porque el resto del marcador sí viaja y callarlo sería el aviso
-deshonesto que la casa tiene prohibido.
+Va en la barra de marcar, y no en un botón aparte, porque es el mismo
+gesto que subrayar: se elige un trozo y se decide qué hacer con él. Un
+botón en otro sitio obligaría a soltar el texto, buscarlo y volver.
 
-La cinta **no puede ocupar sitio**: su rótulo va en `position:absolute` y
-el filete del margen es un `box-shadow`, no un borde, y en el papel
-desaparece entera. Es la misma razón que la inicial volada de la norma
-5-octies: en una ficha, cualquier cosa que añada alto parte una hoja y
-deja once.
+**La primera versión la ponía sola** (un observador miraba qué párrafo
+estaba en la franja central de la pantalla y le pegaba una cinta en el
+margen izquierdo) y el autor la mandó quitar el mismo día que se
+publicó. El razonamiento para automatizarla era el de siempre en esta
+casa (lo que hay que acordarse de pulsar no se pulsa, como enseñó el
+Buzón), y aun así estaba mal: **una raya que se mueve al lado del texto
+desconcentra justo mientras se lee**, que es cuando menos falta hace, y
+encima señalaba párrafos que uno solo estaba cruzando. La lección que
+queda es que la regla del Buzón vale para lo que hay que **recoger**, no
+para lo que hay que **decidir**: dónde se dejó de leer lo sabe el lector
+y nadie más.
+
+**Se queda en el aparato**, que es una decisión y no un olvido: meterla
+en la nube obligaría a tocar la tabla `lecturas_marcas` y a correr SQL
+nuevo a mano desde la tableta, para algo que casi siempre es distinto en
+cada aparato (en el teléfono se lee en la fila del banco, en la tableta
+de noche). **El panel lo dice a la vista**, porque el resto del marcador
+sí viaja y callarlo sería el aviso deshonesto que la casa tiene
+prohibido.
+
+Y **no puede ocupar ni un píxel**, ni de alto ni de ancho. Esto se midió
+tres veces y las dos primeras estaban mal: el 🔖 volado como la inicial
+de los subrayados empujaba el párrafo 2,33 px (un emoji trae la caja más
+alta que una letra), y en caja de alto cero seguía ocupando **ancho**,
+con lo que en un párrafo de última línea casi llena hacía saltar una
+palabra de renglón: 18 px, una línea entera. Va **fuera del flujo**,
+colgado del final de la marca. En una ficha de diez hojas a 0,4 mm del
+corte, un renglón de más es una hoja de más (norma 5-octies).
 
 ### 5. La barra de marcar se abre junto a la selección
 
@@ -578,8 +596,10 @@ seis partes y sus anclas reales, que las seis empiezan plegadas **con el
 alto calculado y no solo con el atributo** (que ya falló una vez en «Mis
 Rutas»), que abrir una cierra la anterior, que cada lectura trae sus tres
 baterías y suma XP donde debe, que **la barra se abre cerca del trozo y
-sin salirse en 380 px**, y que la marca de lectura se pone sola, se
-guarda y devuelve a su sitio.
+sin salirse en 380 px**, y que la marca de lectura **no se pone sola**,
+se pone desde la barra, se guarda, se quita al tocarla y devuelve a su
+sitio. La de la ficha cuenta además **las diez hojas con la marca
+puesta**, que es la única prueba que vale de que no ocupa sitio.
 
 ### Cuatro trampas de esta norma, que ya costaron una tarde
 

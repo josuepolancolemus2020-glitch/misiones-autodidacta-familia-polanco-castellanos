@@ -549,31 +549,81 @@ window.addEventListener('load', async () => {
     ok(w.FaroMarcador.marcas().length === marcasAntes + 1, 'y marcar desde ella funciona', 'no se creó la marca');
     ok(!!d.querySelector('#lect-borges .fm-hl-idea'), 'y el subrayado se pinta en el texto', 'no se pintó el subrayado');
 
-    log('\n── LA MARCA DE LECTURA (norma 5-nonies) ──');
+    /* Selecciona por posición GLOBAL del párrafo: al pintar marcas el
+       texto queda repartido en varios nodos y firstChild ya no vale. */
+    function seleccionar(parr, a, b) {
+      const paseo = d.createTreeWalker(parr, NodeFilter.SHOW_TEXT, null);
+      let off = 0, ini = null, fin = null;
+      while (paseo.nextNode()) {
+        const n = paseo.currentNode, len = n.nodeValue.length;
+        if (!ini && a >= off && a <= off + len) ini = [n, a - off];
+        if (!fin && b >= off && b <= off + len) fin = [n, b - off];
+        off += len;
+      }
+      if (!ini || !fin) return false;
+      const r = d.createRange();
+      r.setStart(ini[0], ini[1]); r.setEnd(fin[0], fin[1]);
+      const s = w.getSelection(); s.removeAllRanges(); s.addRange(r);
+      d.dispatchEvent(new w.Event('selectionchange'));
+      return true;
+    }
+
+    log('\n── LA MARCA DE LECTURA, QUE LA PONE EL LECTOR (norma 5-nonies) ──');
     ok(typeof w.FaroMarcador.lugar === 'function', 'el marcador sabe dónde se quedó uno', 'falta FaroMarcador.lugar');
-    const ps = [...d.querySelectorAll('#lect-borges .lect-cuerpo p.lect-p')];
-    ps[Math.min(4, ps.length - 1)].scrollIntoView({ block: 'center' });
+    /* PRIMERO: que NO se ponga sola. La versión anterior la ponía un
+       observador según qué párrafo cruzara la franja central de la
+       pantalla, y el autor la mandó quitar porque una raya que se mueve
+       al lado del texto desconcentra justo mientras se lee. Si alguien la
+       devuelve, esto lo caza: aquí se recorre la lectura entera y no
+       puede quedar marca ninguna. */
+    w.localStorage.removeItem(dentro('SAVE_KEY') + '_lugar');
+    const psL = [...d.querySelectorAll('#lect-borges .lect-cuerpo p.lect-p')];
+    psL[Math.min(4, psL.length - 1)].scrollIntoView({ block: 'center' });
     await esperar(1500);
+    ok(!w.FaroMarcador.lugar(), 'leer no pone ninguna marca por su cuenta', 'la marca volvió a ponerse sola al desplazar');
+    ok(!d.querySelector('.fm-aqui'), 'y no aparece nada pintado en el texto', 'apareció una marca sin que nadie la pusiera');
+    ok(!d.querySelector('[data-fm-aqui]'), 'y la cinta vieja del margen ya no existe', 'sigue la cinta del margen izquierdo');
+
+    /* LA PONE EL LECTOR, desde la misma barra con la que subraya, y va
+       pegada a LAS PALABRAS elegidas, no al párrafo entero. */
+    const parrL = psL[0];
+    const altoAntes = parrL.getBoundingClientRect().height;
+    seleccionar(parrL, 10, 26);
+    await esperar(420);
+    const btnAqui = d.getElementById('fmBtnAqui');
+    ok(!!btnAqui && btnAqui.style.display !== 'none', 'la barra de marcar trae «Aquí me quedé»', 'no está el botón de la marca de lectura');
+    btnAqui.click();
+    await esperar(400);
+    const aqui = d.querySelectorAll('#lect-borges .fm-aqui');
+    ok(aqui.length >= 1, 'y marca justo lo seleccionado', 'no se pintó la marca de lectura');
+    ok(aqui.length && aqui[0].textContent.length > 0 && parrL.textContent.indexOf(aqui[0].textContent) >= 0,
+       'sobre las palabras del texto, no sobre el párrafo entero', 'la marca no cayó dentro del párrafo');
+    ok(d.querySelectorAll('#lect-borges .fm-aqui-fin').length === 1, 'con un solo 🔖, aunque cruce una negrita', 'salió más de un marcador');
     const lug = w.FaroMarcador.lugar();
-    ok(!!lug && lug.l === 'borges', 'apunta sola la lectura y el párrafo donde se iba', 'no apuntó nada: ' + JSON.stringify(lug));
-    ok(!!w.localStorage.getItem(dentro('SAVE_KEY') + '_lugar'), 'y lo guarda en este aparato', 'no quedó guardado');
-    ok(!!d.querySelector('#lect-borges [data-fm-aqui]'), 'la cinta «Aquí me quedé» se ve en el texto', 'no hay cinta en el texto');
-    const cinta = d.querySelector('[data-fm-aqui]');
-    /* Y lo que costó media hora encontrar: el párrafo que lleva la cinta
-       TIENE QUE SEGUIR SIENDO MARCABLE. Cuando la cinta se ponía con una
-       clase, el párrafo que uno estaba leyendo dejaba de poder subrayarse
-       justo por estar leyéndolo. */
-    ok(w.FaroMarcador.esMarcable(cinta), 'y el párrafo con la cinta se sigue pudiendo subrayar',
-       'la cinta deja el párrafo fuera del marcador');
-    /* La cinta no puede ocupar sitio: en una ficha, un carácter de más
-       parte una hoja y deja once (norma 5-octies). */
-    const antesDe = w.getComputedStyle(cinta, '::before');
-    ok(antesDe.position === 'absolute', 'y su separador va por fuera, sin añadir alto', 'el separador de la cinta empuja el texto');
-    /* Y va en el MARGEN, no encima del párrafo de arriba: la primera versión
-       ponía el rótulo a -1.15em y se comía el último renglón del anterior. */
-    ok(parseFloat(antesDe.left) < 0, 'y en el margen, sin taparle un renglón al párrafo de arriba',
-       'el separador cae encima del texto: left=' + antesDe.left);
+    ok(!!lug && lug.l === 'borges', 'el marcador la apunta', 'no apuntó nada: ' + JSON.stringify(lug));
+    ok(!!w.localStorage.getItem(dentro('SAVE_KEY') + '_lugar'), 'y la guarda en este aparato', 'no quedó guardada');
+    /* No puede añadir alto: en una ficha, un renglón de más parte una
+       hoja y deja once (norma 5-octies). */
+    ok(Math.abs(parrL.getBoundingClientRect().height - altoAntes) < 1.5,
+       'y no le añade alto al párrafo', 'la marca empujó el texto: ' + altoAntes + ' → ' + parrL.getBoundingClientRect().height);
+    /* Y lo que costó media hora encontrar la primera vez: el párrafo
+       marcado TIENE QUE SEGUIR SIENDO MARCABLE. En las fichas y en la
+       prosa de las rutas del adulto lo marcable se reconoce por NO tener
+       clase, así que la marca no puede ponerle una. */
+    ok(w.FaroMarcador.esMarcable(parrL), 'y el párrafo se sigue pudiendo subrayar', 'la marca deja el párrafo fuera del marcador');
+
+    /* SE QUITA TOCÁNDOLA, que es lo que pidió el autor: al volver a
+       leer, un dedo encima de la palabra y ya. Sin menús. */
+    aqui[0].click();
+    await esperar(400);
+    ok(!d.querySelector('#lect-borges .fm-aqui'), 'tocarla la quita, sin preguntar nada', 'la marca sigue puesta después de tocarla');
+    ok(!w.FaroMarcador.lugar(), 'y el marcador se entera', 'el marcador la sigue apuntando');
+
     /* Volver: tiene que abrir la lectura plegada y aterrizar ahí. */
+    seleccionar(parrL, 10, 26);
+    await esperar(420);
+    d.getElementById('fmBtnAqui').click();
+    await esperar(400);
     w.FaroLecturas.cerrar('borges');
     w.scrollTo(0, 0);
     await esperar(300);
@@ -581,6 +631,7 @@ window.addEventListener('load', async () => {
     await esperar(900);
     ok(d.getElementById('lect-borges').classList.contains('lect-abierta'),
        '«Seguir donde iba» abre la lectura aunque estuviera plegada', 'no abrió la lectura');
+    ok(!!d.querySelector('#lect-borges .fm-aqui[data-fm-late]'), 'y late en la marca misma, no en el párrafo', 'el salto no señaló la marca');
     ok(!!d.getElementById('lectBtnLugar'), 'y el botón está en el índice, a la vista', 'falta el botón de seguir donde iba');
 
     log('\n── IMPRESIÓN DE LAS LECTURAS Y DEL PLIEGO ──');
