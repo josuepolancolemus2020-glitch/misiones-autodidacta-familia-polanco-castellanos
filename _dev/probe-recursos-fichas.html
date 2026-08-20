@@ -10,13 +10,47 @@ iframe{width:380px;height:400px;border:0;background:#fff;margin-right:8px}</styl
 <iframe id="m2" src="/misiones/autocapacitacion-metas/modulo-2-frontend.html"></iframe>
 <pre id="out">midiendo…</pre>
 <script>
-/* Comprueba que los dos módulos tengan su sección de Recursos con la ficha
-   enlazada, y que las fichas existan y traigan su pauta. */
+/* Comprueba que las misiones enlacen su ficha y que las fichas estén
+   como manda la norma 6.
+
+   ── POR QUÉ SE REESCRIBIÓ (19 de agosto de 2026) ──────────────────
+   Esta sonda nació cuando las fichas eran de TRES páginas y su pauta se
+   llamaba «Pauta de respuestas». Después la norma 6 puso las fichas en
+   DIEZ páginas y la pauta pasó a llamarse «Pauta completa de
+   respuestas», y la sonda se quedó en SUSPENDE, dando el mismo fallo un
+   día tras otro. Una sonda que lleva meses en rojo no avisa de nada:
+   se mira, se dice «ah, esa siempre falla» y se pasa de largo, que es
+   exactamente lo que le pasó.
+
+   Y ya que se tocaba: vigilaba DOS fichas de treinta y siete. Ahora las
+   mira todas, que es barato (se leen como texto) y es lo que hace que
+   sirva de algo.
+
+   ── LO QUE ESTA SONDA NO HACE ─────────────────────────────────────
+   No mide milímetros. Aquí se comprueba lo que está ESCRITO en el
+   documento (que declare sus diez hojas, que traiga su pauta, que use
+   la hoja común). Que esas diez hojas quepan de verdad en el papel lo
+   dice `_dev/mide-ficha-paginas.html`, y el juez último es el PDF.
+   Son tres comprobaciones distintas y hacen falta las tres.
+
+   Uso:  node _dev/servidor-estatico.js  y abrir esta página            */
+
+const PAGS = 10;   /* norma 6: toda ficha de F.A.R.O va en diez páginas */
+
+/* La única ficha que NO lleva pauta de respuestas, y con razón: las
+   asignaciones metalingüísticas no se aprueban en pantalla sino
+   defendiéndolas en voz alta, así que en vez de pauta trae su hoja de
+   registro de defensas. La excepción se declara aquí para que se vea, en
+   vez de rebajar la comprobación para todas. */
+const SIN_PAUTA = { 'ficha-ingenieria-asignaciones.html': 'Hoja de registro de defensas' };
+
 const out = document.getElementById('out');
 const L = []; let fallos = 0;
 function log(s){ L.push(s); out.textContent = L.join('\n'); }
 function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
 const esperar = ms => new Promise(r => setTimeout(r, ms));
+const cerrar = () => { log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda de recursos y fichas'; };
 
 async function revisaModulo(id, nombre, fichaEsperada) {
   const d = document.getElementById(id).contentDocument;
@@ -30,14 +64,27 @@ async function revisaModulo(id, nombre, fichaEsperada) {
   ok(ficha && ficha.getAttribute('href').includes(fichaEsperada), 'enlaza su ficha (' + fichaEsperada + ')', 'no enlaza la ficha correcta');
   const fuentes = sec.querySelectorAll('ul a[href^="http"]');
   ok(fuentes.length >= 4, fuentes.length + ' fuentes verificables enlazadas', 'solo ' + fuentes.length + ' fuentes');
-  /* La ficha debe existir de verdad, no solo estar enlazada */
-  const url = new URL(ficha.getAttribute('href'), document.getElementById(id).src).pathname;
-  const r = await fetch(url);
-  const txt = r.ok ? await r.text() : '';
-  ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
-  ok(/Pauta de respuestas/.test(txt), 'la ficha trae su pauta de respuestas', 'la ficha no trae pauta');
-  ok(/css\/ficha\.css/.test(txt), 'la ficha usa la hoja común de fichas', 'la ficha no enlaza la hoja común');
-  ok((txt.match(/class="pagina"/g) || []).length === 3, 'la ficha tiene 3 páginas para imprimir', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+}
+
+/* Cada ficha, leída como texto: es rápido y basta para lo que se mira. */
+async function revisaFicha(nombre) {
+  const r = await fetch('/fichas/' + nombre);
+  if (!r.ok) return { nombre, mal: ['no responde (' + r.status + ')'] };
+  const txt = await r.text();
+  const mal = [];
+  const pags = (txt.match(/class="pagina"/g) || []).length;
+  if (pags !== PAGS) mal.push(pags + ' páginas y la norma 6 pide ' + PAGS);
+  if (!/css\/ficha\.css/.test(txt)) mal.push('no usa la hoja común');
+  const esperaPauta = !SIN_PAUTA[nombre];
+  if (esperaPauta && !/Pauta/.test(txt)) mal.push('sin pauta de respuestas');
+  if (!esperaPauta && txt.indexOf(SIN_PAUTA[nombre]) < 0) mal.push('sin su «' + SIN_PAUTA[nombre] + '»');
+  /* Desde el 19 de agosto de 2026 toda ficha lleva el marcador, para
+     poder subrayarla y anotarla (norma 5-octies). */
+  if (!/lecturas-marcador\.js/.test(txt)) mal.push('sin el marcador');
+  if (!/lecturas-marcador\.css/.test(txt)) mal.push('sin la hoja del marcador');
+  /* Norma 1-bis: ni un guion largo en texto publicable. */
+  if (/—/.test(txt)) mal.push('trae guiones largos');
+  return { nombre, mal };
 }
 
 window.addEventListener('load', async () => {
@@ -45,13 +92,62 @@ window.addEventListener('load', async () => {
   try {
     await revisaModulo('m1', 'Módulo 1 · Panorama', 'ficha-autocap-modulo-1.html');
     await revisaModulo('m2', 'Módulo 2 · El frontend', 'ficha-autocap-modulo-2.html');
-    const hoja = await fetch('/fichas/css/ficha.css');
+
+    log('\n── LAS FICHAS, TODAS ──');
+    /* La lista sale del catálogo y de los enlaces de las misiones, no
+       de una lista escrita a mano: así no hay que venir a actualizar
+       esta sonda cada vez que se construye una ficha nueva. */
+    const src = await (await fetch('/js/data/misiones.js')).text();
+    const MISSIONS = new Function('ASIGNACIONES', src + '; return MISSIONS;')([]);
+    const fichas = new Set(), sinFicha = [];
+    for (const m of MISSIONS) {
+      const h = await (await fetch('/' + m.url.split('/').map(encodeURIComponent).join('/'))).text();
+      const enlaces = [...h.matchAll(/\.\.\/\.\.\/fichas\/([a-z0-9-]+\.html)/g)].map(x => x[1]);
+      if (!enlaces.length) { sinFicha.push(m.title.slice(0, 34)); continue; }
+      enlaces.forEach(f => fichas.add(f));
+    }
+    ok(fichas.size >= 30, 'las misiones enlazan ' + fichas.size + ' fichas distintas', 'solo ' + fichas.size + ' fichas enlazadas');
+    /* Las dos misiones más viejas del catálogo no tienen ficha, y no es
+       un fallo: son anteriores a la norma 6. Se cuentan a la vista para
+       que el día que se les haga una, esto lo diga. */
+    log('    (sin ficha, por ser anteriores a la norma 6: ' + (sinFicha.length ? sinFicha.join(' · ') : 'ninguna') + ')');
+
+    const revisadas = [];
+    for (const f of [...fichas].sort()) revisadas.push(await revisaFicha(f));
+    const malas = revisadas.filter(r => r.mal.length);
+    ok(malas.length === 0,
+      'las ' + revisadas.length + ' fichas enlazadas: sus 10 páginas, su pauta, la hoja común y el marcador',
+      malas.length + ' con problemas → ' + malas.map(r => r.nombre + ' (' + r.mal.join('; ') + ')').join(' · '));
+
+    /* Hay una ficha que NO cuelga de ninguna misión: la de las
+       asignaciones metalingüísticas, que cuelga de js/data/asignaciones.js
+       porque las asignaciones no son misiones (no tienen quiz ni XP
+       automático). Se revisa igual, y su nombre se saca de ese catálogo
+       en vez de escribirlo aquí, para que siga valiendo si cambia.
+       El directorio de fichas no se puede listar (el servidor devuelve
+       404 a /fichas/), así que esta es la única manera de llegar a ella
+       sin escribir una lista a mano que envejecería igual que la vieja. */
+    const asigs = await (await fetch('/js/data/asignaciones.js')).text();
+    const deAsignaciones = [...new Set([...asigs.matchAll(/fichas\/([a-z0-9-]+\.html)/g)].map(x => x[1]))]
+      .filter(f => !fichas.has(f));
+    for (const f of deAsignaciones) {
+      const r = await revisaFicha(f);
+      ok(r.mal.length === 0, 'la ficha de las asignaciones (' + f + ') está en orden',
+        f + ': ' + r.mal.join('; '));
+    }
+
     log('\n── HOJA DE FICHAS ──');
+    const hoja = await fetch('/fichas/css/ficha.css');
     ok(hoja.ok, 'css/ficha.css responde (' + hoja.status + ')', 'la hoja común no responde');
     const css = hoja.ok ? await hoja.text() : '';
     ok(/@page \{ size: letter/.test(css), 'está configurada para papel carta', 'no fija el tamaño carta');
-    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message); }
+    /* Los 252 mm son el número que costó dos vueltas (ver la norma 6):
+       con 257 cada hoja salía partida en dos. Si alguien lo cambia sin
+       medir, que salte aquí. */
+    ok(/min-height:\s*252mm/.test(css), 'y cada hoja reserva sus 252 mm de alto útil', 'el alto útil de la hoja ya no es 252 mm');
+
+    cerrar();
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); cerrar(); }
 });
 </script>
 </body>
