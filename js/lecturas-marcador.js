@@ -1037,9 +1037,16 @@
      ::before colocado por fuera, para que no añada ni un píxel de alto:
      en una ficha, un carácter de más parte una hoja y deja once
      (norma 5-octies). */
+  /* La cinta se pone con un ATRIBUTO y no con una clase, y esto no es
+     estilo: es un fallo que costó media hora encontrar. Los párrafos
+     marcables de una ficha (y los de la prosa de las rutas del adulto)
+     se reconocen por NO tener clase, así que en cuanto la cinta le
+     ponía una al párrafo, ese párrafo dejaba de ser marcable: se leía
+     un rato, la cinta caía encima, y a partir de ahí no se podía
+     subrayar justo el párrafo que uno estaba leyendo. Con un atributo,
+     `className` sigue vacío y todo sigue en su sitio. */
   function pintarLugar() {
-    document.querySelectorAll('.fm-aqui').forEach(el => {
-      el.classList.remove('fm-aqui');
+    document.querySelectorAll('[data-fm-aqui]').forEach(el => {
       el.removeAttribute('data-fm-aqui');
       el.removeAttribute('title');
     });
@@ -1047,7 +1054,6 @@
     const z = zonaDe(lugar.l);
     const p = z && z.parrafos[lugar.p];
     if (!p) return;
-    p.classList.add('fm-aqui');
     p.setAttribute('data-fm-aqui', 'Aquí me quedé');
     /* El texto también en el title: quien pase el ratón o use lector de
        pantalla lo oye, sin que ocupe un renglón en la página. */
@@ -1071,8 +1077,8 @@
     }
     setTimeout(() => {
       p.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      p.classList.add('fm-aqui-late');
-      setTimeout(() => p.classList.remove('fm-aqui-late'), 1800);
+      p.setAttribute('data-fm-late', '1');
+      setTimeout(() => p.removeAttribute('data-fm-late'), 1800);
     }, 160);
   }
 

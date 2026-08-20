@@ -396,10 +396,18 @@ window.addEventListener('load', async () => {
     const lug = w.FaroMarcador.lugar();
     ok(!!lug && lug.l === 'borges', 'apunta sola la lectura y el párrafo donde se iba', 'no apuntó nada: ' + JSON.stringify(lug));
     ok(!!w.localStorage.getItem(dentro('SAVE_KEY') + '_lugar'), 'y lo guarda en este aparato', 'no quedó guardado');
-    ok(!!d.querySelector('#lect-borges .fm-aqui'), 'la cinta «Aquí me quedé» se ve en el texto', 'no hay cinta en el texto');
+    ok(!!d.querySelector('#lect-borges [data-fm-aqui]'), 'la cinta «Aquí me quedé» se ve en el texto', 'no hay cinta en el texto');
     /* La cinta no puede ocupar sitio: en una ficha, un carácter de más
        parte una hoja y deja once (norma 5-octies). */
-    const cinta = d.querySelector('.fm-aqui');
+    const cinta = d.querySelector('[data-fm-aqui]');
+    /* Y lo que costó media hora encontrar: el párrafo que lleva la cinta
+       TIENE QUE SEGUIR SIENDO MARCABLE. Cuando la cinta se ponía con una
+       clase, en las fichas y en la prosa de las rutas del adulto (donde
+       lo marcable se reconoce por NO tener clase) el párrafo que uno
+       estaba leyendo dejaba de poder subrayarse justo por estar
+       leyéndolo. */
+    ok(w.FaroMarcador.esMarcable(cinta), 'y el párrafo con la cinta se sigue pudiendo subrayar',
+       'la cinta deja el párrafo fuera del marcador');
     const antesDe = w.getComputedStyle(cinta, '::before');
     ok(antesDe.position === 'absolute', 'y su separador va por fuera, sin añadir alto', 'el separador de la cinta empuja el texto');
     /* Y va en el MARGEN, no encima del párrafo de arriba: la primera versión

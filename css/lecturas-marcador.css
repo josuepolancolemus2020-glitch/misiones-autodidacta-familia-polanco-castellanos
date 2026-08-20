@@ -282,8 +282,8 @@
   /* La marca de lectura es cosa de la pantalla: en el papel no pinta
      nada, y sobre todo no puede añadir ni un píxel de alto a una ficha
      que va a 0,4 mm del corte. */
-  .fm-aqui { box-shadow: none !important; }
-  .fm-aqui::before { content: none !important; }
+  [data-fm-aqui] { box-shadow: none !important; }
+  [data-fm-aqui]::before { content: none !important; }
 
   /* El subrayado sí viaja al papel, con su color obligado (sin esto el
      navegador se come los fondos) y sin ocupar espacio. */
@@ -300,7 +300,7 @@
    position:absolute y la cinta es un box-shadow, no un borde. Es la
    misma razón que la inicial volada de las marcas (norma 5-octies): en
    una ficha, cualquier cosa que añada alto parte una hoja y deja once. */
-.fm-aqui { position: relative; box-shadow: -6px 0 0 -2px var(--fm-lugar, #f59e0b); }
+[data-fm-aqui] { position: relative; box-shadow: -6px 0 0 -2px var(--fm-lugar, #f59e0b); }
 /* El separador va en el MARGEN, no encima del párrafo anterior. La primera
    versión ponía el rótulo «Aquí me quedé» a -1.15em, es decir tapando el
    último renglón del párrafo de arriba, y en un texto apretado eso se come
@@ -309,14 +309,14 @@
    («te quedaste en tal lectura, párrafo tal») viven en el panel, que es
    donde se leen sin estorbar. Sigue sin ocupar sitio, que es lo que la
    norma 5-octies exige para que una ficha no pase de diez hojas. */
-.fm-aqui::before {
+[data-fm-aqui]::before {
   content: '🔖';
   position: absolute; left: -1.35em; top: 0;
   font-size: 0.8rem; line-height: 1.5; pointer-events: none;
 }
 /* Al volver con «Seguir donde iba», el párrafo late una vez: sin eso uno
    aterriza en mitad del texto sin saber si el salto ocurrió. */
-.fm-aqui-late { animation: fmLate 1.6s ease-out; }
+[data-fm-late] { animation: fmLate 1.6s ease-out; }
 @keyframes fmLate {
   0%, 100% { background: transparent; }
   20%      { background: var(--fm-lugar-gl, rgba(245,158,11,.22)); }
