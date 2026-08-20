@@ -581,6 +581,38 @@ baterías y suma XP donde debe, que **la barra se abre cerca del trozo y
 sin salirse en 380 px**, y que la marca de lectura se pone sola, se
 guarda y devuelve a su sitio.
 
+### Cuatro trampas de esta norma, que ya costaron una tarde
+
+Las cuatro salen de meter las preguntas dentro de cada lectura, y
+ninguna se ve leyendo el código: se ven cuando una sonda suspende sin
+que haya nada roto.
+
+1. **El texto de los bancos ahora está en la página.** Antes las
+   baterías se pintaban al pulsar un botón; ahora el aparato las monta al
+   cargar, así que `document.body.textContent` incluye las 54 preguntas
+   con sus opciones y sus guías. Toda comprobación que barra la página
+   entera (la de **cero partidismo hondureño actual**, la del temario de
+   la misión molde, la del guion largo) empieza a contar palabras que
+   viven en el banco. Cuando salte, la salida sana casi siempre es
+   **cambiar la palabra del banco**, no ablandar el guardián: una guía
+   que dice «la regla candidata» se escribe «la regla que se propone» y
+   el guardián sigue sirviendo para lo que se puso.
+2. **La hoja impresa lleva lo subrayado.** Si la sonda marca un trozo
+   antes de imprimir (y lo hace, porque hay que comprobar la barra), el
+   `<mark>` parte la frase por dentro: «biblio</mark>teca». Una sonda que
+   busque prosa en la hoja tiene que mirarla **sin etiquetas**; las
+   comprobaciones de estructura siguen mirando el HTML tal cual.
+3. **`[id^="lect-"]` cuenta doce, no seis.** El aparato envuelve el
+   cuerpo de cada tarjeta en un `div` con `id="lect-cuerpo-…"` para poder
+   plegarlo. Para contar tarjetas se cuenta **`.card[id^="lect-"]`**.
+4. **Los enunciados de análisis no llevan número de cabeza.** El número
+   era el del banco global de veinticinco; con dos preguntas por lectura
+   ya no dice nada, y en el pliego de las 54 sale **dos veces**
+   («1. 1. Don Aciar…»), porque la hoja antepone su propio contador. En
+   pantalla no se nota, porque el aparato lo quita al pintar: es un
+   defecto que **solo aparece en el papel**, que es donde nadie mira
+   hasta que ya se fotocopió.
+
 ---
 
 ## 5-bis. El widget de ordenar se arrastra, y la linterna cuesta
