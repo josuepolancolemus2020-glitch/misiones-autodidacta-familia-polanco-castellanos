@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de estudio · Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ficha.css">
+<link rel="stylesheet" href="../css/lecturas-marcador.css">
+<style>
+  :root { --pri: #4d7c0f; --pri-suave: #f7fee7; --sec: #92400e; --sec-suave: #fffbeb; }
+  .mini { font-size: 12px; color: var(--gris); }
+  table.piezas th:nth-child(1) { width: 20%; }
+  table.utilidad { font-size: 11.5px; }
+  table.utilidad th:nth-child(1) { width: 30%; }
+  table.voces { font-size: 11.5px; }
+  table.voces th:nth-child(1) { width: 26%; }
+  table.pasos { font-size: 11.5px; }
+  table.pasos th:nth-child(1) { width: 6%; text-align: center; }
+  table.pasos th:nth-child(2) { width: 22%; }
+  table.hoja { font-size: 11.5px; }
+  table.hoja td { height: 22px; }
+  table.hoja-blanca td { height: 42px; }
+  table.hoja th:nth-child(1) { width: 34%; }
+  table.fuentes { font-size: 11.5px; }
+  table.fuentes th:nth-child(1) { width: 30%; }
+  /* El árbol se dibuja en monoespaciada: con la letra de texto las ramas no
+     quedan una debajo de otra y el dibujo deja de ser un dibujo. El tamaño va
+     fijo en píxeles para que mida lo mismo en pantalla y al imprimir: esta
+     ficha se mide al milímetro (norma 6) y una letra que cambia de tamaño
+     entre los dos mundos hace mentir al medidor. */
+  pre.arbol { font-family: 'Fira Code', ui-monospace, monospace; font-size: 10.5px;
+    line-height: 1.4; margin: 7px 0; padding: 8px 11px; background: #f8fafc;
+    border: 1.5px solid #cbd5e1; border-radius: 8px; white-space: pre; overflow: hidden; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir la ficha</button>
+
+<div class="doc">
+
+
+
+
+
+<!-- ═══════════ PÁGINA 1 ═══════════ -->
+<section class="pagina">
+  <a class="volver" href="../misiones/ruta-apuesta-arbol-salto/arbol-salto.html">← Volver a la misión</a>
+  <div class="idline"><span>Estudia:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="fh">
+    <div class="f-badge">📄 Ficha de estudio · El árbol antes del salto</div>
+    <div class="f-meta"><b>Ruta:</b> 🎲 Ruta de la Apuesta Medida · Etapa 2 de 6 · <b>Materia:</b> Estudio Mayor (Toma de decisiones)</div>
+    <div class="f-meta"><b>Tema:</b> cómo se pone una oferta en el papel con nodos cuadrados y redondos, cómo se resuelve de las hojas al tronco, en qué probabilidad la decisión cambia de lado, y cuánto vale saber antes de firmar.</div>
+  </div>
+
+  <h2>🎯 Objetivos</h2>
+  <ol>
+    <li>Dibujar el <b>árbol de decisión</b> de una oferta real en una sola página, con sus tres piezas bien repartidas.</li>
+    <li>Resolverlo <b>hacia atrás</b>, de las hojas al tronco, con la cuenta escrita en cada nodo.</li>
+    <li>Encontrar la <b>probabilidad de cruce</b>: el punto donde la decisión cambia de lado.</li>
+    <li>Calcular el <b>valor de la información</b> y decir si se puede comprar barato en vez de adivinar caro.</li>
+    <li>Aplicar la <b>regla de la única página</b> y podar las ramas que no cambian nada.</li>
+  </ol>
+
+  <h2>🌳 El árbol es la oferta puesta en el papel</h2>
+  <p>La etapa 1 enseñó a pesar <b>una</b> apuesta: sus ramas, sus probabilidades y su valor esperado. Pero las ofertas de verdad casi nunca vienen solas: traen decisiones adentro de decisiones. Si imprimo y se vende bien, ¿imprimo más? Si postulo y me aceptan, ¿acepto? La hoja de la apuesta se queda corta en cuanto hay <b>una segunda decisión esperando detrás de la primera</b>. Para eso existe el árbol: un dibujo donde cada decisión, cada golpe de azar y cada resultado final tienen su sitio, y donde la cuenta de la etapa 1 se hace tantas veces como haga falta, en orden. No pide más matemática que la de la etapa anterior: pide disciplina de dibujo, que es más rara.</p>
+
+  <div class="caja c-regla">
+    <h3>🔑 La regla que ordena todo el dibujo</h3>
+    <p><b>Nodo cuadrado donde decide la familia; nodo redondo donde decide el azar; y al final de cada rama, un número.</b> No hay más piezas. Todo el método de la etapa consiste en no confundir las dos primeras: en el cuadrado se elige la mejor rama, en el redondo no se elige nada, se promedia. Quien trata un redondo como si fuera cuadrado cree que puede elegir que le vaya bien; quien trata un cuadrado como redondo se cuenta a sí mismo que no había nada que hacer. Los dos errores se pagan caro, y los dos se ven de inmediato en un dibujo bien hecho.</p>
+  </div>
+
+  <h2>🗺️ El camino de la ruta, visto desde aquí</h2>
+  <p>La etapa 1 puso la herramienta de pesar una apuesta y sus dos condiciones de uso. Esta la pone en el papel y la encadena. Las que siguen: <b>3</b>, Bayes contado con los dedos, para corregir las probabilidades cuando llega un dato; <b>4</b>, puertas de ida y vuelta y cuánto se apuesta; <b>5</b>, el premortem, que entierra el proyecto antes de empezarlo; y <b>6</b>, decidir juntos, explorar y parar. Todas las etapas que vienen trabajan sobre árboles dibujados aquí: quien no aprenda a ponerlos en el papel va a cargar las herramientas siguientes en la cabeza, que es donde no caben.</p>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 2 ═══════════ -->
+<section class="pagina">
+  <h2>🧩 Las tres piezas del árbol</h2>
+  <p>El dibujo entero se arma con tres piezas, y cada una tiene un dueño distinto. Saber de quién es cada nodo es la mitad del ejercicio.</p>
+
+  <table class="piezas">
+    <tr><th>Pieza</th><th>Quién manda ahí</th><th>Qué se hace con ella al resolver</th></tr>
+    <tr><td><b>■ Nodo cuadrado</b></td><td><b>La familia.</b> Es una decisión: imprimir o no, aceptar o no, abrir el segundo grupo o no</td><td>Se mira el valor de cada rama que sale de él y <b>se elige la mejor</b>. Las demás se tachan</td></tr>
+    <tr><td><b>● Nodo redondo</b></td><td><b>El azar.</b> Nadie de la casa elige: cuántos se inscriben, si llueve el día de la feria, si el cliente paga</td><td>Cada rama lleva su probabilidad, escrita antes de conocer el resultado, y <b>se promedia</b>: la cuenta de la etapa 1</td></tr>
+    <tr><td><b>Hoja</b></td><td><b>El final del cuento.</b> Ahí ya no pasa nada más</td><td>Lleva <b>un número en lempiras</b>: lo que se gana o se pierde si el camino termina ahí, con todos los costos ya restados</td></tr>
+  </table>
+
+  <div class="caja c-dibujo">
+    <h3>✏️ Las reglas del dibujo, antes de la primera cuenta</h3>
+    <p><b>El tiempo corre de izquierda a derecha:</b> lo que se decide primero va antes que lo que el azar contesta después, y una decisión que se toma sabiendo algo va a la derecha de ese algo. <b>Las ramas de un redondo suman 1</b>, con la rama de «no pasa nada» incluida, que es la que siempre se olvida. Y <b>cada hoja carga sus costos</b>: si entrar costó L 2 000, esa resta ya está hecha en el número de la hoja o anotada en la rama, pero nunca en los dos lados, que es la manera clásica de cobrarse un costo dos veces.</p>
+  </div>
+
+  <h2>📖 El vocabulario de la etapa</h2>
+  <table class="voces">
+    <tr><th>Palabra</th><th>Qué significa aquí</th></tr>
+    <tr><td><b>Árbol de decisión</b></td><td>La oferta puesta en el papel: cuadrados, redondos y hojas con número, en una página</td></tr>
+    <tr><td><b>Resolver hacia atrás</b></td><td>Empezar por las hojas y venir hacia el tronco: promediar en cada redondo, elegir en cada cuadrado</td></tr>
+    <tr><td><b>Podar</b></td><td>Quitar del dibujo toda rama que no puede cambiar la decisión, para que quepa en una página</td></tr>
+    <tr><td><b>Probabilidad de cruce</b></td><td>El valor de la probabilidad en el que la decisión cambia de lado</td></tr>
+    <tr><td><b>Valor de la información</b></td><td>Cuánto mejora la decisión saber algo antes de firmar; es el techo de lo que se paga por averiguarlo</td></tr>
+  </table>
+
+  <div class="caja c-papel">
+    <h3>🪞 Por qué en papel y no en la cabeza</h3>
+    <p>Una decisión con dos nodos ya tiene más caminos de los que la memoria sostiene a la vez, y la cabeza resuelve el apuro eligiendo dos o tres caminos vívidos, casi siempre el mejor y el peor. El papel obliga a que <b>aparezca la rama del medio</b>, que suele ser la más probable, y deja la cuenta a la vista para discutirla en familia y revisarla dentro de un año. Un árbol dibujado se puede corregir; una corazonada solo se puede defender.</p>
+  </div>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
+  <h2>🌱 El ejemplo entero: el taller de vacaciones</h2>
+  <p>La familia puede dar en vacaciones un taller de refuerzo apoyado en M.E.T.A.S. Prepararlo (material, copias, aula) cuesta <b>L 2 000</b>. Nadie sabe cuántos se inscriben: la experiencia de otros años dice que la mitad de las veces la inscripción es alta (20 alumnos a L 300, ingreso <b>L 6 000</b>) y la mitad baja (6 alumnos, ingreso <b>L 1 800</b>). Y si la inscripción es alta hay una segunda decisión: abrir un segundo grupo por la tarde, que cuesta <b>L 1 500</b> más y que se llena 6 de cada 10 veces (ingreso extra <b>L 4 500</b>); si queda a medias, deja solo <b>L 1 500</b> extra.</p>
+
+  <pre class="arbol">■ ¿Damos el taller de vacaciones?
+├─ No darlo ················································· L 0
+└─ Darlo (preparar: −L 2 000)
+   ● ¿Cómo viene la inscripción?
+   ├─ Alta (0,5) · ingreso L 6 000
+   │  ■ ¿Abrimos un segundo grupo? (−L 1 500)
+   │  ├─ No abrirlo ·········································· L 6 000
+   │  └─ Abrirlo
+   │     ● ¿Se llena el grupo de la tarde?
+   │     ├─ Se llena (0,6) ······················· L 6 000 + L 4 500
+   │     └─ Queda a medias (0,4) ················· L 6 000 + L 1 500
+   └─ Baja (0,5) ············································ L 1 800</pre>
+
+  <p class="mini">Obsérvese el orden del tiempo: la decisión del segundo grupo está <b>a la derecha</b> del nodo de inscripción, porque se toma ya sabiendo que la inscripción vino alta. Ponerla antes sería decidir con información que todavía no existe, que es el error de dibujo más común y el más caro.</p>
+
+  <h2>🔙 Se resuelve hacia atrás, de las hojas al tronco</h2>
+  <p>Hacia adelante no se puede: para saber si conviene dar el taller hay que saber cuánto vale la rama alta, y la rama alta vale según lo que se decida del segundo grupo. Así que se empieza por el nodo <b>más a la derecha</b> y se viene caminando al tronco. Howard Raiffa bautizó el método en 1968 con un nombre que es una instrucción: <b>promediar y replegar</b>. En cada redondo se promedia; en cada cuadrado se elige y se repliega la rama perdedora.</p>
+
+  <table class="pasos replegar">
+    <tr><th>#</th><th>Nodo</th><th>La cuenta, escrita entera</th></tr>
+    <tr><td>1</td><td><b>● ¿Se llena la tarde?</b></td><td>0,6 × 4 500 + 0,4 × 1 500 = 2 700 + 600 = <b>L 3 300</b> de ingreso extra esperado</td></tr>
+    <tr><td>2</td><td><b>■ ¿Segundo grupo?</b></td><td>Abrirlo vale 3 300 − 1 500 = <b>+1 800</b>; no abrirlo vale 0. <b>Se elige abrirlo</b> y el nodo vale +1 800</td></tr>
+    <tr><td>3</td><td><b>Rama alta</b></td><td>6 000 de ingreso + 1 800 del nodo anterior = <b>L 7 800</b></td></tr>
+    <tr><td>4</td><td><b>● ¿Inscripción?</b></td><td>0,5 × 7 800 + 0,5 × 1 800 = 3 900 + 900 = <b>L 4 800</b></td></tr>
+    <tr><td>5</td><td><b>■ ¿Damos el taller?</b></td><td>Darlo vale 4 800 − 2 000 = <b>+2 800</b>; no darlo vale 0. <b>Se da el taller</b></td></tr>
+  </table>
+
+<div class="caja c-regala">
+    <h3>🎁 Lo que el árbol regala y la corazonada no</h3>
+    <p>El árbol resuelto no dice solo «sí, den el taller». Dice <b>qué hacer en cada esquina del futuro</b>: den el taller, y si la inscripción viene alta, abran el segundo grupo. Es un plan completo, con las decisiones de mañana ya pensadas hoy, en frío. La corazonada da un empujón; el árbol deja instrucciones.</p>
+    <p class="mini">Y deja algo más: los números intermedios. Que la rama alta valga L 7 800 y la baja L 1 800 dice cuánto se juega en la inscripción, y eso apunta directo a la pregunta del valor de la información: ¿se puede saber algo de la inscripción <b>antes</b> de pagar los L 2 000?</p>
+  </div>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 4 ═══════════ -->
+<section class="pagina">
+  <h2>📄 La regla de la única página</h2>
+  <p>Un árbol que no cabe en una página no es un árbol más completo: es <b>una forma de no decidir</b>. Con veinte nodos, nadie de la mesa puede seguir la cuenta, así que nadie puede discutirla, así que la decisión vuelve a tomarla la corazonada, ahora disfrazada de análisis. Y el árbol de tres páginas tiene otra trampa peor: como todo cupo, nadie tuvo que preguntarse qué importa, y esa pregunta era el ejercicio.</p>
+
+  <table class="utilidad poda">
+    <tr><th>Qué se poda</th><th>Por qué se puede quitar</th><th>Ejemplo</th></tr>
+    <tr><td><b>La rama que no cambia nada</b></td><td>Si con ella y sin ella se decide igual, es adorno</td><td>Que la feria caiga en sábado o domingo, si se venderá los dos días</td></tr>
+    <tr><td><b>El detalle fino de un número grueso</b></td><td>Distinguir L 4 400 de L 4 600 cuando la otra rama vale L 900 no mueve ningún cruce</td><td>Tres escenarios de ingreso casi iguales se funden en uno</td></tr>
+    <tr><td><b>La decisión que se puede tomar después</b></td><td>Si mañana se decidirá sabiendo más, hoy no gasta página</td><td>El precio exacto del boleto se afina la semana de la feria</td></tr>
+  </table>
+
+  <p class="mini">La prueba de poda es siempre la misma: se quita la rama, se vuelve a resolver, y si la decisión del tronco no cambió, la rama no vuelve. Lo que sí cambia la decisión se queda, aunque estorbe.</p>
+
+  <div class="caja c-errores">
+    <h3>🧨 Los tres errores de dibujo que más cuestan</h3>
+    <p><b>El redondo disfrazado de cuadrado:</b> «si nos esforzamos, se vende». El esfuerzo mejora la probabilidad, pero no la fija: la demanda sigue siendo del azar, y dibujarla como decisión propia borra del papel justamente la rama mala. <b>El cuadrado disfrazado de redondo:</b> «el mercado dirá qué precio aguanta». El precio lo pone la familia; delegárselo al azar es renunciar al único nodo que era nuestro. <b>Y la decisión fuera de su tiempo:</b> dibujar a la izquierda una decisión que en la vida real se tomará sabiendo más. Es el error más caro porque regala la mejor propiedad del árbol: poder esperar a que el azar hable antes de comprometerse.</p>
+  </div>
+
+  <div class="caja c-limites">
+    <h3>⚠️ El árbol hereda los dos límites de la etapa 1</h3>
+    <p>Cada nodo redondo es un valor esperado, así que arrastra las condiciones de uso de la etapa 1: el promedio consuela poco a quien juega <b>una sola vez</b>, y ninguna rama puede tener permitido <b>sacar a la casa de la mesa</b>, por buena que sea la cuenta del tronco. El árbol ordena la decisión; no la vuelve inmune. Antes de firmar lo que el árbol recomiende, las dos preguntas de la etapa 1 se hacen igual: ¿esto se repite?, ¿la rama mala nos hunde?</p>
+  </div>
+
+  <h2>🧮 De dónde salen las probabilidades del dibujo</h2>
+  <p>De lo mismo que en la etapa 1: de datos propios cuando los hay (dos de las últimas cuatro inscripciones fueron altas), de la base de casos parecidos cuando no, y <b>siempre escritas antes de conocer el resultado</b>, con una línea al lado que diga qué las sostiene. Un árbol con probabilidades puestas al gusto no es una herramienta: es la corazonada con disfraz de matemática, y es más peligrosa que la corazonada a secas porque parece objetiva. La etapa siguiente, Bayes, enseña a corregirlas cuando llegue un dato nuevo; esta solo pide que estén escritas y fechadas.</p>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <h2>⚖️ La probabilidad de cruce: dónde la decisión cambia de lado</h2>
+  <p>Toda probabilidad del árbol es una estimación, y la pregunta honesta no es «¿está bien el 60%?» sino <b>«¿en qué número cambiaría mi decisión?»</b>. Ese número es la probabilidad de cruce, y encontrarla es una cuenta de igualar a cero, no un acto de fe.</p>
+
+  <div class="caja c-cruce1">
+    <h3>🧮 La cuenta del cruce, hecha una vez</h3>
+    <p>La tirada de fichas de la etapa 1, ya partida al tamaño sano: imprimir cuesta <b>L 6 000</b>; si se vende bien quedan <b>+L 3 500</b>, si no, <b>−L 4 000</b>. La estimación de la casa es que se vende bien 6 de cada 10 veces. Llamemos <b>p</b> a esa probabilidad y busquemos dónde la cuenta vale cero:</p>
+    <p><b>3 500 × p − 4 000 × (1 − p) = 0</b>, o sea 7 500p = 4 000, o sea <b>p = 0,53</b>.</p>
+    <p>Con p arriba de 53% se imprime; abajo, no. La estimación era 60%. <b>El cruce está a siete puntos de la estimación</b>: la decisión se sostiene sobre una diferencia que cualquier mes malo se come. Aquí está todo el trabajo de afinar.</p>
+  </div>
+
+  <div class="caja c-cruce2">
+    <h3>🧮 Y la misma cuenta donde no hace falta afinar</h3>
+    <p>El taller de la página 3: darlo vale p × 7 800 + (1 − p) × 1 800 − 2 000, que es cero cuando 6 000p = 200, o sea <b>p = 0,033</b>. Bastaría que la inscripción alta tuviera poco más de un 3% de probabilidad para que el taller convenga. La estimación era 50%. <b>Da igual que el 50 fuera en realidad 30 o 70: la decisión no se mueve.</b> Discutir esa probabilidad una tarde entera es trabajar en el nodo equivocado.</p>
+  </div>
+
+  <table class="utilidad lect-cruce">
+    <tr><th>Dónde cayó el cruce</th><th>Qué dice de la decisión</th><th>Qué se hace</th></tr>
+    <tr><td><b>Lejos de la estimación</b> (cruce 3%, estimación 50%)</td><td>Robusta: la decisión es la misma con 30 que con 70</td><td>Se firma y no se gasta ni una hora en afinar ese número</td></tr>
+    <tr><td><b>Cerca de la estimación</b> (cruce 53%, estimación 60%)</td><td>Frágil: la decisión cuelga de la calidad de esa estimación</td><td>Ahí va todo el trabajo: buscar datos, o comprar información barata</td></tr>
+    <tr><td><b>Encima de la estimación</b> (cruce 55%, estimación 55%)</td><td>La cuenta no decide: cualquier lado se defiende</td><td>Deciden las otras columnas: tamaño, repetición, lo que no son lempiras</td></tr>
+  </table>
+
+  <p class="mini">El cruce también protege la paz de la mesa. Dos personas pueden pelearse por si la probabilidad es 40 o 60; si el cruce está en 15, la pelea es innecesaria, y si está en 50, esa pelea es exactamente la conversación que había que tener, con datos y no con voces.</p>
+
+<h2>💡 El valor de la información: cuánto vale saber antes de firmar</h2>
+  <p>Si la decisión cuelga de una estimación frágil, la pregunta siguiente se cae de madura: <b>¿cuánto pagaría por saberlo antes de decidir?</b> Esa pregunta tiene respuesta exacta, y la da el propio árbol: se compara lo que vale decidir <b>sabiendo</b> con lo que vale decidir <b>adivinando</b>.</p>
+
+  <table class="pasos evpi">
+    <tr><th>#</th><th>Paso</th><th>Con la tirada de fichas</th></tr>
+    <tr><td>1</td><td><b>Decidir adivinando</b></td><td>Es el árbol normal: 0,6 × 3 500 + 0,4 × (−4 000) = 2 100 − 1 600 = <b>+L 500</b></td></tr>
+    <tr><td>2</td><td><b>Decidir sabiendo</b></td><td>Un oráculo dice antes cómo saldrá. Si dirá «bien» (6 de cada 10 veces) se imprime y quedan +3 500; si dirá «mal» (4 de cada 10) <b>no se imprime</b> y quedan 0. Vale 0,6 × 3 500 + 0,4 × 0 = <b>+L 2 100</b></td></tr>
+    <tr><td>3</td><td><b>Restar</b></td><td>2 100 − 500 = <b>L 1 600</b>. Eso es lo máximo que vale la información perfecta: ni un lempira más</td></tr>
+  </table>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 6 ═══════════ -->
+<section class="pagina">
+  <p class="mini">La ganancia no viene de que el oráculo mejore las ventas: viene de que permite <b>esquivar la rama mala</b>, no imprimiendo esas 4 de cada 10 veces. La información vale porque cambia decisiones; si no cambia ninguna, vale exactamente cero, aunque sea interesantísima.</p>
+
+  <div class="caja c-piloto">
+    <h3>🛒 El piloto barato: comprar información en vez de adivinar</h3>
+    <p>Oráculos no hay, pero hay <b>información imperfecta y barata</b>, que vale menos que los L 1 600 del techo y cuesta mucho menos. Para la tirada: imprimir primero <b>20 fichas por L 600</b> y ponerlas a la venta un fin de semana en la feria del colegio. Si se van todas, la probabilidad de que la tirada grande se venda ya no se estima a ciegas; si sobran quince, la casa acaba de ahorrarse una pérdida de L 4 000 <b>pagando L 600 por enterarse a tiempo</b>. El piloto no adivina el futuro: mueve la estimación hacia el lado correcto del cruce antes de apostar en grande.</p>
+    <p class="mini">La regla del bolsillo: la información conviene cuando <b>cuesta menos que su techo y puede cruzar la decisión</b>. Un piloto de L 600 contra un techo de L 1 600, con el cruce a siete puntos, es compra obligada; un estudio de mercado de L 5 000 sería pagar por saber más de lo que saber puede rendir.</p>
+  </div>
+
+  <table class="utilidad info-barata">
+    <tr><th>Información barata</th><th>Qué averigua</th><th>Qué costaría</th></tr>
+    <tr><td><b>Un piloto</b></td><td>20 fichas a la venta antes de la tirada de 200</td><td>L 600 y un fin de semana</td></tr>
+    <tr><td><b>Una llamada</b></td><td>Preguntar a dos maestros si usarían el taller de vacaciones, antes de alquilar el aula</td><td>Media hora y nada de dinero</td></tr>
+    <tr><td><b>Un mes de datos</b></td><td>Mirar en M.E.T.A.S cuántos alumnos abren las misiones de la materia antes de imprimir su ficha</td><td>Esperar treinta días con la decisión quieta</td></tr>
+  </table>
+
+  <p class="mini">Las tres compras tienen la misma forma: <b>una versión chica y reversible de la apuesta grande</b>, hecha antes de firmar. Y las tres tienen fecha de caducidad: la información vale mientras la decisión siga abierta. Averiguar después de firmar no es información, es autopsia.</p>
+
+<h2>📚 Tres casos de estudio, con su fuente real</h2>
+
+  <div class="caja c-raiffa">
+    <h3>1 · El libro que fijó el lenguaje: Raiffa, 1968</h3>
+    <p>Howard Raiffa, profesor de Harvard, publicó en 1968 «Decision Analysis: Introductory Lectures on Choices under Uncertainty» (Addison-Wesley), el libro que convirtió estas cuentas en un método enseñable. De ahí vienen las convenciones que usa esta ficha: <b>cuadrados para las decisiones, círculos para el azar</b>, el árbol resuelto <b>promediando y replegando</b> (averaging out and folding back, su nombre para resolver hacia atrás) y la pregunta de <b>cuánto vale la información perfecta</b> antes de decidir. Raiffa arma el método con ejemplos deliberadamente humildes, urnas con pelotas de dos colores, porque su tesis es que el valor está en la disciplina del procedimiento y no en la sofisticación del ejemplo.</p>
+  </div>
+
+  <div class="caja c-smart">
+    <h3>2 · El mismo método sin fórmulas: Smart Choices, 1999</h3>
+    <p>Treinta y un años después, John S. Hammond, Ralph L. Keeney y el propio Raiffa publicaron «Smart Choices: A Practical Guide to Making Better Decisions» (Harvard Business School Press, 1999): el método completo contado para gente sin matemáticas, con ocho elementos que van del problema y los objetivos hasta la incertidumbre, la tolerancia al riesgo y las decisiones encadenadas. Su herramienta para la incertidumbre es el <b>perfil de riesgo</b>: qué puede pasar, con qué probabilidad y con qué consecuencia, guardando en el papel <b>solo lo capaz de cambiar la decisión</b>. Es la regla de la única página dicha por sus autores: simplificar no es el atajo del método, es el método.</p>
+  </div>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
+  <div class="caja c-green">
+    <h3>3 · El árbol chico que ganó en un hospital: Green y Mehr, 1997</h3>
+    <p>Lee Green y David Mehr publicaron en The Journal of Family Practice (1997) su trabajo en un hospital rural de Míchigan donde los médicos, por miedo a equivocarse, mandaban a la unidad coronaria a <b>cerca de nueve de cada diez</b> pacientes con dolor de pecho, saturando las camas de cuidado intensivo con gente que no las necesitaba. Los investigadores probaron una herramienta estadística fina (una regla de regresión con tabla y calculadora) y también <b>un árbol simple de tres preguntas de sí o no</b> sobre el electrocardiograma y los síntomas. El árbol chico decidió <b>tan bien o mejor</b> que el instrumento complejo, y con una ventaja que ninguna fórmula compensa: los médicos podían usarlo de memoria, en el pasillo, a las tres de la mañana.</p>
+    <p class="mini">Es la mejor defensa impresa de la regla de la única página: la herramienta que se usa gana a la herramienta perfecta que se queda en la gaveta.</p>
+  </div>
+
+  <div class="caja c-reglas">
+    <h3>🎲 Las cinco reglas de esta etapa</h3>
+    <ol>
+      <li><b>Cuadrado donde decide la familia, redondo donde decide el azar</b>, y no se confunden nunca.</li>
+      <li>El árbol <b>se resuelve hacia atrás</b>, con la cuenta escrita en cada nodo, no de memoria.</li>
+      <li><b>Una página.</b> Lo que no cabe se poda, y la prueba de poda es que la decisión no cambie.</li>
+      <li>De toda estimación discutida se busca <b>el cruce</b>: lejos, se firma; cerca, ahí va el trabajo.</li>
+      <li>Antes de afinar adivinando se pregunta <b>qué información barata cruzaría la decisión</b>, y cuánto cuesta.</li>
+    </ol>
+  </div>
+
+<div class="caja titular">
+    <h3>🔑 El titular de la ficha</h3>
+    <p><b>El árbol no decide por nadie: enseña dónde está el trabajo.</b> Si la decisión es la misma con 30 que con 70 por ciento, se firma y no se afina nada. Si cruza en 55, todo el trabajo vive en esa estimación, y casi siempre se puede comprar barato (un piloto, una llamada, un mes de datos) lo que sale carísimo adivinar.</p>
+  </div>
+
+  <h2>🧾 La hoja del árbol, para llenar a lápiz</h2>
+  <p>Se llena <b>antes</b> de decidir, una copia por oferta, y el dibujo va en el reverso de esta misma hoja: esa es la página única.</p>
+
+  <table class="hoja h-cab">
+    <tr><th>La decisión, en una línea</th><td colspan="3"></td></tr>
+    <tr><th>Fecha en que se escribe</th><td></td><th>Quién decide</th><td></td></tr>
+  </table>
+
+  <table class="hoja hoja-blanca">
+    <tr><th>Nodos cuadrados (decidimos nosotros)</th><th>Nodos redondos (decide el azar)</th><th>Probabilidad y qué la sostiene</th><th>Hoja: gana o pierde (L)</th></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 8 ═══════════ -->
+<section class="pagina">
+  <table class="hoja h-cruce">
+    <tr><th>Valor del tronco, resuelto hacia atrás (L)</th><td colspan="3"></td></tr>
+    <tr><th>Probabilidad de cruce, y de qué estimación</th><td colspan="3"></td></tr>
+    <tr><th>¿La estimación queda cerca o lejos del cruce?</th><td colspan="3"></td></tr>
+  </table>
+
+  <table class="hoja h-info">
+    <tr><th>Qué información movería la decisión</th><td colspan="3"></td></tr>
+    <tr><th>Cuánto costaría conseguirla, y su techo</th><td colspan="3"></td></tr>
+    <tr><th>Qué se poda del dibujo, y por qué se puede</th><td colspan="3"></td></tr>
+    <tr><th>Decisión, y qué haremos en cada rama</th><td colspan="3"></td></tr>
+  </table>
+
+  <h2>✅ Una hoja del árbol ya llena, como ejemplo</h2>
+  <table class="hoja h-ej1a">
+    <tr><th>La decisión</th><td colspan="3">Imprimir la tirada mensual de fichas de M.E.T.A.S (L 6 000) o no imprimirla</td></tr>
+    <tr><th>Fecha</th><td>2 de junio</td><th>Quién decide</th><td>La familia, en la mesa de la cocina</td></tr>
+  </table>
+  <table class="hoja h-ej1b">
+    <tr><th>Cuadrados</th><td colspan="3">Imprimir o no; y si el piloto se agota, imprimir la tirada completa</td></tr>
+    <tr><th>Redondos</th><td colspan="3">¿Se vende bien? 0,6 (se agotaron las dos tiradas chicas anteriores) / 0,4 no</td></tr>
+    <tr><th>Hojas</th><td colspan="3">Bien: +L 3 500 · mal: −L 4 000 · no imprimir: L 0</td></tr>
+  </table>
+
+<table class="hoja ej2">
+    <tr><th>Valor del tronco</th><td colspan="3">0,6 × 3 500 − 0,4 × 4 000 = <b>+L 500</b>. Sale a favor, por poco</td></tr>
+    <tr><th>Cruce</th><td colspan="3">7 500p = 4 000 → <b>p = 0,53</b>, a siete puntos de la estimación: <b>frágil</b></td></tr>
+    <tr><th>Información</th><td colspan="3">Piloto de 20 fichas por L 600 en la feria. Techo de la información: L 1 600</td></tr>
+    <tr><th>Decisión</th><td colspan="3"><b>Piloto primero.</b> Si se agota, tirada completa; si sobra la mitad, no se imprime este mes</td></tr>
+  </table>
+
+  <h2>🗣️ Qué decir al explicar el árbol, con alguien enfrente</h2>
+  <p class="mini">Para la mesa de la cocina o para quien trae la oferta. No son frases para ganar: son para que la conversación pase por el papel.</p>
+  <p><b>«Dibujémoslo antes de decidir»:</b> son diez minutos; cuadrado donde elegimos, redondo donde no, y un número al final de cada rama. <b>«Eso es mucha matemática»:</b> es multiplicar y sumar, lo difícil no es la cuenta sino escribir las ramas, y eso lo hacemos juntos. <b>«Esos números son inventados»:</b> por eso mismo buscamos el cruce; si la decisión es la misma con 30 que con 70, tus dudas y las mías dan igual, y si cruza cerca, tenés razón y vamos a averiguar antes de firmar. <b>«La vida no es un árbol»:</b> cierto, el árbol es la parte de la vida que cabe en la página, y lo que no son lempiras se escribe aparte y pesa aparte. <b>«Hay que decidir ya»:</b> el piloto decide más rápido que la discusión: en un fin de semana tenemos el dato que llevamos un mes adivinando.</p>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 9 ═══════════ -->
+<section class="pagina">
+  <h2>✏️ Ejercicios para hacer a lápiz</h2>
+  <ol>
+    <li><b>El árbol simple.</b> Un puesto de jugos para el día del partido cuesta L 800. Si hace sol (0,7) se venden L 2 000; si llueve (0,3), L 500. Dibuja el árbol con sus nodos bien repartidos y resuélvelo hacia atrás. ¿Se pone el puesto?</li>
+    <li><b>El árbol de dos pisos.</b> Postular a la feria departamental cuesta L 300 de inscripción, que se pierde si no aceptan (aceptan 0,5). Si aceptan hay que elegir puesto: el grande cuesta L 1 200 y vende L 3 000 (0,5) o L 800 (0,5); el chico cuesta L 500 y vende L 900 seguro. Resuelve hacia atrás y di el plan completo.</li>
+    <li><b>El cruce.</b> Una impresora usada cuesta L 3 000. Si sale buena (estimación: 0,8) ahorra L 5 000 de fotocopias en el año (quedan +2 000); si sale mala, se pierde todo (−3 000). Calcula el valor del árbol y la probabilidad de cruce, y di si la decisión es robusta o frágil.</li>
+  </ol>
+  <ol start="4">
+    <li><b>El valor de saber.</b> Para la impresora del ejercicio 3, calcula cuánto vale la información perfecta, y di si conviene una prueba que cueste un viaje de L 200: pedir imprimir cien hojas antes de pagar.</li>
+    <li><b>Cuadrado o redondo.</b> Clasifica: (a) subir el precio del boleto; (b) que llueva el día de la feria; (c) aceptar el préstamo del conocido; (d) cuántos alumnos se inscriben; (e) que el cliente pague a tiempo. Una de las cinco es tramposa: di cuál y por qué.</li>
+    <li><b>La poda.</b> Toma el árbol del taller (página 3) y agrégale mentalmente una rama: que el aula salga con gotera (1 de cada 20 veces, cuesta L 200 arreglarla). Aplica la prueba de poda y di si la rama se queda o se va.</li>
+    <li><b>El árbol propio.</b> Dibuja en una página el árbol de una decisión real del proyecto que esté abierta esta semana. Encuentra su cruce, di qué información lo movería y cuánto costaría conseguirla. Guárdalo con la fecha, sin decidir todavía.</li>
+    <li><b>Explicarlo en diez minutos.</b> Toma el árbol del taller de la página 3 y explícaselo a alguien de la casa que no haya leído esta ficha, dibujándolo de nuevo mientras hablas. Cronometra. Si al final la otra persona no puede decir qué se hace en cada esquina del futuro, o si pasaste de los diez minutos, anota qué sobraba o qué faltaba.</li>
+  </ol>
+
+<h2>📚 Las fuentes, con su etiqueta</h2>
+  <table class="fuentes">
+    <tr><th>Fuente</th><th>Etiqueta y para qué sirve aquí</th></tr>
+    <tr><td><b>Howard Raiffa (1968)</b>, «Decision Analysis: Introductory Lectures on Choices under Uncertainty», Addison-Wesley</td><td><b>Clásico fundacional.</b> Los nodos cuadrados y redondos, el promediar y replegar, y el valor de la información perfecta</td></tr>
+    <tr><td><b>Hammond, Keeney y Raiffa (1999)</b>, «Smart Choices», Harvard Business School Press</td><td><b>Sólido y práctico.</b> El método sin fórmulas, los perfiles de riesgo y la defensa de simplificar como parte del método</td></tr>
+    <tr><td><b>Green y Mehr (1997)</b>, The Journal of Family Practice</td><td><b>Estudio con datos reales.</b> El árbol de tres preguntas que decidió tan bien o mejor que el instrumento complejo en un hospital de Míchigan</td></tr>
+    <tr><td>«Con el árbol, la decisión sale sola»</td><td><b>Media verdad de manual.</b> El árbol ordena la cuenta; las probabilidades, la poda y lo que no son lempiras siguen siendo juicio de quien decide</td></tr>
+  </table>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
+<section class="pagina">
+  <div class="caja c-p12">
+    <h3>✅ Pauta de los ejercicios (1 a 2)</h3>
+    <p><b>1.</b> Cuadrado: poner el puesto o no. Redondo: el clima. Hojas netas: sol +1 200, lluvia −300. Nodo redondo: 0,7 × 2 000 + 0,3 × 500 = L 1 550; menos los 800 del puesto, <b>+L 750</b>. No ponerlo vale 0: <b>se pone el puesto</b>.</p>
+    <p><b>2.</b> Hacia atrás. Puesto grande: 0,5 × 3 000 + 0,5 × 800 = 1 900, menos 1 200 = <b>+700</b>. Puesto chico: 900 − 500 = +400. En el cuadrado se elige el grande (700). Nodo de aceptación: 0,5 × 700 + 0,5 × 0 = 350, menos 300 de inscripción = <b>+L 50</b>. El plan completo: <b>postular, y si aceptan, llevar el puesto grande</b>. Gana por muy poco: buena candidata a buscar su cruce, que con el puesto ya resuelto en 700 es p × 700 = 300, o sea <b>p = 0,43</b>; con la aceptación estimada en 0,5, decisión <b>frágil</b>.</p>
+  </div>
+
+  <div class="caja c-p35">
+    <h3>✅ Pauta de los ejercicios (3 a 5)</h3>
+    <p><b>3.</b> Valor: 0,8 × 2 000 − 0,2 × 3 000 = 1 600 − 600 = <b>+L 1 000</b>. Cruce: 2 000p − 3 000(1 − p) = 0 da 5 000p = 3 000, <b>p = 0,6</b>. La estimación (0,8) queda a veinte puntos: <b>moderadamente robusta</b>, y aun así la prueba barata del ejercicio 4 conviene.</p>
+    <p><b>4.</b> Sabiendo: 0,8 × 2 000 + 0,2 × 0 = 1 600. Adivinando: 1 000. Techo de la información: <b>L 600</b>. La prueba de cien hojas cuesta L 200, menos que el techo, y puede cruzar la decisión si la impresora falla: <b>se hace la prueba antes de pagar</b>.</p>
+    <p><b>5.</b> Cuadrados: a, c. Redondos: b, d. La tramposa es la <b>e</b>: desde esta mesa es un redondo (no elegimos que pague), pero tiene un cuadrado escondido antes: elegir <b>a qué clientes</b> se les fía y con qué adelanto. Muchos redondos cargan un cuadrado previo que sí es nuestro, y encontrarlo es encontrar el margen de maniobra.</p>
+  </div>
+
+  <div class="caja c-p68">
+    <h3>✅ Pauta de los ejercicios (6 a 8)</h3>
+    <p><b>6.</b> La rama cuesta 0,05 × 200 = L 10 esperados contra un tronco de +2 800. Se quita, se vuelve a resolver, la decisión no se mueve ni de lejos: <b>se poda</b>. Guardarla sería gastar página en un adorno.</p>
+    <p><b>7.</b> Se valora que el árbol quepa en una página con las tres piezas bien repartidas, que el cruce venga con su cuenta escrita y no a ojo, que la información propuesta sea <b>chica, barata y anterior a la firma</b> (un piloto, una llamada, un mes de datos), y que la hoja quede fechada antes de conocer el resultado, que es lo que la vuelve revisable dentro de un año.</p>
+    <p><b>8.</b> Se valora que la explicación empiece por la pregunta y no por el método, que los nodos se nombren por su dueño («aquí decidimos nosotros, aquí decide la inscripción») y que el plan completo quede dicho: taller sí, y segundo grupo solo si la inscripción viene alta. Si no cupo en diez minutos, casi siempre sobraba árbol: la poda también se aplica a las explicaciones.</p>
+  </div>
+
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🎲 Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</span>
+  </div>
+</section>
+
+
+
+
+</div>
+<script src="../js/lecturas-marcador.js"></script>
+</body>
+</html>

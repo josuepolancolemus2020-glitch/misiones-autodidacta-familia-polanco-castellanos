@@ -1,0 +1,18 @@
+# Nueve cortes para diez páginas (norma 6). Cada línea es el trozo literal que
+# debe QUEDAR AL INICIO de una página. Las cajas y tablas que abren página
+# llevan una segunda clase propia (c-green, h-cruce, c-p12) porque el
+# repaginador busca literales en orden y los anclajes repetidos lo mandarían a
+# cortar donde no es, sin avisar. El corte de la página 6 cae en el párrafo
+# que sigue a la tabla del valor de la información: con los bloques que hay no
+# existe reparto que deje las diez hojas entre 215 y 252 mm cortando solo en
+# títulos, y ese párrafo es nota de la tabla, así que empieza página sin
+# quedar huérfano de sentido.
+<h2>🧩 Las tres piezas del árbol</h2>
+<h2>🌱 El ejemplo entero: el taller de vacaciones</h2>
+<h2>📄 La regla de la única página</h2>
+<h2>⚖️ La probabilidad de cruce: dónde la decisión cambia de lado</h2>
+<p class="mini">La ganancia no viene
+<div class="caja c-green">
+<table class="hoja h-cruce">
+<h2>✏️ Ejercicios para hacer a lápiz</h2>
+<div class="caja c-p12">

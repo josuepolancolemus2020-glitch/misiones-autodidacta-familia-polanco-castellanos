@@ -151,6 +151,7 @@ const MISSIONS = [
   { id: 38, title: 'El escocés dorado: leerlo entero, y no la media frase de siempre', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🪶', ruta: 'dorado', etapa: 5, sello: 'familiar', url: 'misiones/ruta-dorado-escoces-dorado/escoces-dorado.html' },
   { id: 39, title: 'La regla de Hebb, bien contada: lo que el eslogan borró', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🏺', ruta: 'barro', etapa: 1, sello: 'familiar', url: 'misiones/ruta-barro-regla-hebb/regla-hebb.html' },
   { id: 40, title: 'San Petersburgo: lo que vale una apuesta', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🎲', ruta: 'apuesta', etapa: 1, sello: 'familiar', url: 'misiones/ruta-apuesta-san-petersburgo/san-petersburgo.html' },
+  { id: 41, title: 'El árbol antes del salto: la oferta puesta en el papel', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🌳', ruta: 'apuesta', etapa: 2, sello: 'familiar', url: 'misiones/ruta-apuesta-arbol-salto/arbol-salto.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -252,9 +253,8 @@ const ETAPAS_PREVISTAS = {
     6: "El telón de la réplica",
   },
   apuesta: {
-    /* La 1 ya no se anuncia: está construida (ver MISSIONS). En esta lista solo
-       viven las etapas que todavía no existen como misión. */
-    2: "El árbol antes del salto",
+    /* La 1 y la 2 ya no se anuncian: están construidas (ver MISSIONS). En esta
+       lista solo viven las etapas que todavía no existen como misión. */
     3: "Bayes contado con los dedos",
     4: "Puertas de ida y vuelta, y cuánto se apuesta",
     5: "El entierro antes del viaje",
