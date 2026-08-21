@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta de la Brújula Torcida · Etapa 1: Tres atajos generan el zoológico | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tres-atajos.css">
+<link rel="stylesheet" href="../../css/lecturas.css">
+<link rel="stylesheet" href="../../css/lecturas-marcador.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">Decide sin dibujar 🌫️</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🌳</div>
+    <div class="hero-text">
+      <h1>El árbol <span>antes del salto</span></h1>
+      <p class="sub">La oferta puesta en el papel: cuadrados donde decide la familia, redondos donde decide el azar 🌳</p>
+      <div class="badge">🌳 Ruta de la Apuesta Medida · Etapa 2 de 6</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🌳 La oferta puesta en el papel</h2>
+    <p>Esta es la segunda etapa de la Ruta de la Apuesta Medida, la materia de <strong>Toma de decisiones</strong> del Estudio Mayor. La etapa anterior dejó la cuenta y sus dos preguntas de criterio; esta deja <strong>el dibujo</strong>: el árbol de decisión, que es la oferta entera puesta en una hoja, con cada camino posible y un número al final.</p>
+    <p><strong>Dos figuras nada más.</strong> Los nodos <strong>cuadrados</strong> son los puntos donde decide la familia: firmar o no, esperar, pedir una prueba. Los nodos <strong>redondos</strong> son los puntos donde decide el azar: que la venta vaya bien, que llueva, que la máquina salga buena; cada rama de un redondo lleva su probabilidad, y las de un mismo nodo suman uno. Al final de cada camino hay una <strong>hoja</strong> con su cifra en lempiras. Así lo enseñó Howard Raiffa en «Decision Analysis» (1968), y así se dibuja en esta casa.</p>
+    <div class="tip">
+      <span class="ti">📄</span>
+      <div><strong>La regla de la única página.</strong> El árbol entero cabe en <strong>una página</strong>, o no sirve. Un árbol de tres páginas no es más serio: es <strong>una forma de no decidir</strong>, porque nadie lo resuelve ni lo discute. Lo que no cambia la decisión se poda: los caminos rarísimos que pagan casi lo mismo, los detalles que dan igual por todas las ramas. El detalle que decide se queda; el que adorna se va.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔙 Resolver hacia atrás: de las hojas al tronco</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>⚪ En lo redondo se promedia</h4>
+        <p>Donde decide el azar, nadie elige: se multiplica cada hoja por su probabilidad, se suma, y ese promedio <strong>se escribe sobre el nodo</strong>. Elegir ahí la rama que más paga es perseguir la hoja más gorda por improbable que sea.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>🔲 En lo cuadrado se elige</h4>
+        <p>Donde decide la familia, se comparan las ramas con los promedios ya puestos y <strong>se tacha la perdedora</strong>. Al llegar al tronco queda un solo número y un solo camino sin tachar: esa es la decisión, ya tomada.</p>
+      </div>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🧮 La cuenta entera, con lempiras de esta casa</span><br>
+      <span>Una editorial ofrece <span class="hl">L 25,000 seguros</span> por la exclusiva de las fichas; venderlas por cuenta propia deja L 60,000 si la venta va bien y L 10,000 si va mal, y la familia estima que va bien 4 de cada 10 veces. Primero el redondo: 0,4 × 60,000 son 24,000; 0,6 × 10,000 son 6,000; la suma, <span class="hl2">L 30,000</span>, se escribe sobre el nodo. Después el cuadrado: 30,000 contra 25,000, y se tacha la exclusiva. <span class="hl">Queda vender solos, por L 5,000 de ventaja</span>. Raiffa llamó a esta dirección «promediar y replegar»: es la única en la que los números están listos cuando se necesitan.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Los siete pasos del árbol, de la pregunta a la firma</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada paso para ver qué se hace y dónde se cae.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona un paso del árbol.</div>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>⚖️ La probabilidad de cruce: dónde cambia de lado la decisión</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">La herramienta fina de esta etapa. Se toma la probabilidad estimada y <strong>se mueve en el papel</strong> hasta que las dos ramas del cuadrado valen exactamente lo mismo: ese punto es el <strong>cruce</strong>. Por debajo conviene una rama; por encima, la otra. En el caso de la editorial, vender solos vale 10,000 más 50,000 por la probabilidad de venta buena, y empata con los 25,000 de la exclusiva cuando esa probabilidad vale <strong>30 de 100</strong>: ese es su cruce.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎚️ La regla del 30 y el 70</span><br>
+      <span>Si la decisión es la misma con 30 que con 70 por ciento, <span class="hl">no vale la pena afinar la estimación</span>: ningún estudio sobre ese número puede cambiar nada, cueste lo que cueste. Y si cruza en 55 cuando la familia estima 60, <span class="hl2">ahí está todo el trabajo</span>: un error de cinco puntos voltea la decisión, y ese es exactamente el número que hay que trabajar antes de firmar.</span>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">💡 El valor de la información, y el piloto barato</span><br>
+      <span>De ahí sale cuánto vale <span class="hl">saber antes de firmar</span>: se resuelve el árbol con el dato y sin él, y la diferencia es lo máximo que conviene pagar por conseguirlo. Tiene techo (lo que valdría un informante que nunca falla: en el caso de la editorial, L 9,000) y casi siempre se puede comprar barato: <span class="hl2">un piloto, una llamada, un mes de datos</span>, en vez de adivinar caro. Dos condiciones: que caiga cerca del cruce, y que llegue <span class="hl">antes</span> del día de decidir, porque el dato que llega después de la firma vale cero.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: el estudio de L 12,000</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué hacer cuando la estimación da miedo y alguien vende certeza.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📦</span><span class="ms-text"><strong>La oferta:</strong> un distribuidor propone llevar las fichas de M.E.T.A.S a otra ciudad. Si la plaza responde, deja unas L 9,000 al año; si no, se pierden las L 1,000 del envío de muestras.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🌳</span><span class="ms-text"><strong>El árbol:</strong> cabe en media página. Un cuadrado (entrar o no), un redondo (la plaza responde o no) y dos hojas: +9,000 y −1,000. La familia estima que responde 5 de cada 10 veces.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">💼</span><span class="ms-text"><strong>El vendedor de certeza:</strong> una consultora ofrece un estudio de mercado por L 12,000, «para conocer la probabilidad de verdad y no decidir a ciegas».</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">😰</span><span class="ms-text"><strong>La duda:</strong> el «5 de cada 10» es una estimación gruesa, mitad dato y mitad corazonada. Decidir con un número así da miedo, y el miedo tiene precio puesto.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">La estimación es gruesa y el estudio está a la venta. ¿Qué se hace primero?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">💸 Pagar el estudio: saber más siempre ayuda</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">⚖️ Buscar en el árbol la probabilidad de cruce</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔍 El árbol, desarmado en cuatro piezas</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Dibujar bien es la mitad del análisis: la rama que falta y la hoja sin número se descubren dibujando, no discutiendo. Cada pieza pide algo, y cada falta tiene su factura.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué pide</th><th>Qué pasa si falta</th></tr>
+      <tr><td>La pregunta</td><td>Escribirse en una línea, y <b>una sola</b> decisión por árbol</td><td>Se mezclan dos decisiones y el árbol crece a tres páginas</td></tr>
+      <tr><td>Los cuadrados</td><td>Todas las opciones de la familia, <b>incluida la de esperar</b></td><td>La mejor rama ni compite: queda un «sí o no» a secas</td></tr>
+      <tr><td>Los redondos</td><td>Probabilidades que <b>suman uno</b>, con su respaldo escrito al lado</td><td>Números de ningún lado, que nadie podrá revisar dentro de un año</td></tr>
+      <tr><td>Las hojas</td><td>Un número en lempiras al final de <b>cada</b> camino</td><td>No hay nada que promediar: el árbol es un dibujo, no una herramienta</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">📌 Lo que no son lempiras</span><br>
+      <span>Las horas recurrentes, el espacio de marca y la confianza <span class="hl">se nombran fuera de la cuenta</span>, nunca disfrazados de número. Meterlos en la misma columna que los lempiras es hacer trampa a favor del sí. Y el árbol se fecha <span class="hl2">antes</span> de conocer ningún resultado: es lo único que lo vuelve revisable después.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🔙 El método, movimiento por movimiento</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Resolver el árbol es mecánico a propósito: dos personas con el mismo dibujo llegan a la misma decisión, y por eso el árbol se puede discutir en familia sin que gane el que habla más fuerte.</p>
+    <table class="tres">
+      <tr><th>Movimiento</th><th>Qué se hace</th><th>Dónde se cae</th></tr>
+      <tr><td>Empezar por el final</td><td>Ir a los nodos que solo tienen hojas colgando</td><td>Arrancar por el tronco, donde los números todavía no existen</td></tr>
+      <tr><td>Promediar en lo redondo</td><td>Cada hoja por su probabilidad, sumado, y el número sobre el nodo</td><td>Elegir ahí la rama que más paga, donde nadie elige</td></tr>
+      <tr><td>Elegir en lo cuadrado</td><td>Comparar los promedios y tachar la rama perdedora</td><td>Dejar vivas todas las ramas «por si acaso», y no concluir nada</td></tr>
+      <tr><td>Repetir hasta el tronco</td><td>Queda un solo número y un solo camino sin tachar</td><td>Parar a medias y rematar «a ojo» lo que faltaba</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎯 La señal del error</span><br>
+      <span>Si el resultado <span class="hl">cambia según el orden en que se miren las ramas</span>, ya no se está resolviendo el árbol: se está eligiendo en los redondos. La dirección correcta es una sola: <span class="hl2">de las hojas al tronco</span>, promediando donde decide el azar y eligiendo donde decide la familia.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎚️ Dónde gastar el esfuerzo de estimar</h2>
+    <div class="vs-grid">
+      <div class="vs-box vs-a">
+        <h4>🛌 Lo que no cruza, se queda grueso</h4>
+        <p>Si la decisión sale igual con 30 que con 70 por ciento, esa estimación <strong>no se afina</strong>: ningún dato sobre ella puede mover nada, y pagarlo es tirar el dinero. Se decide ya, con el número grueso que hay.</p>
+      </div>
+      <div class="vs-box vs-b">
+        <h4>⚖️ Lo que cruza cerca, se trabaja</h4>
+        <p>Si cruza en 55 y la familia estima 60, <strong>un error de cinco puntos voltea la decisión</strong>. Ahí se busca el dato más barato que llegue a tiempo: un piloto, una llamada, un mes de datos, con la información perfecta como techo del precio.</p>
+      </div>
+    </div>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">«Decision Analysis», de Raiffa</div><div class="stat-val">1968</div></div>
+      <div class="stat-item"><div class="stat-label">«Smart Choices», con Hammond y Keeney</div><div class="stat-val">1999</div></div>
+      <div class="stat-item"><div class="stat-label">Páginas por árbol</div><div class="stat-val">1</div></div>
+      <div class="stat-item"><div class="stat-label">Pasos, de la pregunta a la firma</div><div class="stat-val">7</div></div>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📝 El vocabulario que esta etapa deja puesto</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Seis palabras que se usan en las cuatro etapas siguientes de la ruta. Aquí se ganan; después solo se aplican.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🔲 Nodo de decisión</div><div class="t-info">Cuadrado: ahí decide la familia</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">⚪ Nodo de azar</div><div class="t-info">Redondo: ahí decide el azar</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🍃 La hoja</div><div class="t-info">El número donde termina cada camino</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">⚖️ Probabilidad de cruce</div><div class="t-info">Donde la decisión cambia de lado</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">💡 Valor de la información</div><div class="t-info">Lo máximo que se paga por saber</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🧪 El piloto barato</div><div class="t-info">Comprar el dato en chiquito</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Lo práctico que sale de aquí: <strong>ninguna oferta de esta casa se contesta sin su árbol de una página, fechado antes del resultado</strong>, y ningún estudio se paga sin haber buscado primero la probabilidad de cruce.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 Las piezas del árbol</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para aprender a dibujar el árbol, resolverlo hacia atrás y ponerle precio al saber antes de firmar.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>El árbol en una página</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🌳 Pieza:</span>
+        <!-- Las llaves de data-parte (esperado, paradoja, utilidad, ruina) se heredan
+             del molde a propósito y NO coinciden con los nombres visibles: el motor y
+             sus llamadas labShowParte() las usan tal cual, y renombrarlas solo aquí
+             rompería el laboratorio en silencio. El nombre que se lee sale del texto
+             del botón y de parteData, nunca de la llave. -->
+        <button class="lab-btn lab-cont-btn" data-parte="esperado" onclick="labShowParte('esperado')">🌳 El árbol en una página</button>
+        <button class="lab-btn lab-cont-btn" data-parte="paradoja" onclick="labShowParte('paradoja')">🔙 Resolver hacia atrás</button>
+        <button class="lab-btn lab-cont-btn" data-parte="utilidad" onclick="labShowParte('utilidad')">⚖️ La probabilidad de cruce</button>
+        <button class="lab-btn lab-cont-btn" data-parte="ruina" onclick="labShowParte('ruina')">💡 El valor de la información</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se reconoce</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado cae?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la pieza</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: el árbol, del dibujo a la decisión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la pieza por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza del árbol de decisión se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué dice de verdad esa frase?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué dice de verdad esa frase dentro de una decisión con árbol:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«El árbol me quedó de tres páginas: así se ve más serio»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿por dónde falla ese árbol?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla en ese árbol o en esa decisión:</p>
+    <div class="neuro-trans-display" id="enferDisease">El árbol de la oferta ocupa tres páginas y nadie lo ha resuelto</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <!-- Los rótulos y el onclick los pone updateRetoButtons() al cargar, con la
+             pareja activa de retoPairs; estos dos son solo el estado antes del motor. -->
+        <button class="btn btn-pri" onclick="">🔲 Cuadrado</button>
+        <button class="btn btn-sec" onclick="">⚪ Redondo</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🧠 El árbol sobre la mesa</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · El árbol antes del salto · Ruta de la Apuesta Medida</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: El árbol antes del salto</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El árbol sobre la mesa · El árbol antes del salto</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🧠 El árbol sobre la mesa: la oferta dibujada, resuelta y con precio al saber</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay una oferta real con sus números en lempiras. Dibuja su árbol en una sola página (cuadrados donde decide la familia, redondos donde decide el azar, y la rama de esperar incluida), resuélvelo hacia atrás, encuentra la probabilidad de cruce y di qué información movería la decisión y cuánto costaría conseguirla a tiempo (en pantalla o en tu cuaderno). Compara con la <strong>Pauta</strong> y anótate el puntaje. <strong>Genera una nueva prueba cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🏺</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🌳 Casos del proyecto: ocho ofertas, ocho árboles</h2>
+    <p>Ocho situaciones hipotéticas de esta familia y de M.E.T.A.S. En todas se hace lo mismo: el árbol <strong>en una página</strong>, resuelto hacia atrás, y después las tres preguntas de la etapa: <strong>¿dónde cruza la decisión, qué dato barato la movería, y con qué condición sí se firmaría?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla del Estudio Mayor, también aquí:</strong> ningún estudio entra sin su etiqueta. Raiffa, «Decision Analysis» (1968), es el <strong>clásico fundacional</strong> del árbol y del valor de la información; Hammond, Keeney y Raiffa, «Smart Choices» (1999), es <strong>sólido</strong> y de divulgación, escrito por los mismos que hicieron la teoría; y «saber más siempre ayuda» es <strong>media verdad de manual</strong>: solo mueve la decisión el dato que cae cerca del cruce y llega antes de la firma. Las etiquetas completas van en Recursos.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📚 Caso 1: la exclusiva de la editorial</h2>
+    <p>Una editorial de Tegucigalpa ofrece <strong>L 25,000</strong>, pagados a la firma, por la exclusiva de imprimir y vender las fichas de M.E.T.A.S durante dos años. Venderlas por cuenta propia dejaría en ese plazo unos <strong>L 60,000</strong> si la venta va bien y unos <strong>L 10,000</strong> si va mal, y la familia estima que va bien <strong>4 de cada 10 veces</strong>. La oferta vence el viernes. Qué mete: dinero seguro hoy y una imprenta que distribuye. Qué saca: dos años del canal propio, y el precio de las fichas decidido fuera de casa.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🌳 El árbol y su cruce</span><br>
+      <span>Un cuadrado con tres ramas (firmar, vender solos, pedir plazo) y un redondo colgando de la de vender solos. Hacia atrás: 0,4 × 60,000 más 0,6 × 10,000 son <span class="hl">L 30,000 contra los 25,000 de la exclusiva</span>. El cruce está en <span class="hl2">30 de 100</span>: por debajo gana la editorial, y la familia estima 40, a diez puntos apenas. La pregunta que decide: ¿de qué lado del 30 está la venta de verdad? La condición: una llamada de L 30 en saldo a quien ya firmó con esa editorial, antes del viernes; y si no dan ni esa semana de plazo, la prisa también es un dato.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🏫 Caso 2: el local frente al instituto</h2>
+    <p>Un local frente a un instituto se alquila en <strong>L 6,000 al mes</strong>, con contrato obligatorio de un año (L 72,000). Con tutorías presenciales dejaría unos <strong>L 10,000 al mes</strong> si se llena, cosa que la familia estima en <strong>6 de cada 10</strong>, y unos <strong>L 3,000</strong> si no. El dueño acepta también alquilar el salón <strong>por horas, a L 250</strong>, sin contrato. Qué mete: presencia física y matrícula presencial. Qué saca: L 72,000 comprometidos y un año entero de atadura.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🌳 El árbol y su cruce</span><br>
+      <span>Cuadrado con tres ramas: firmar el año, no entrar, alquilar por horas. El redondo del contrato paga <span class="hl">+48,000 al año si se llena y −36,000 si no</span>; con 6 de 10, el promedio da +14,400. El cruce está en <span class="hl2">43 de 100</span>: por debajo, el contrato pierde. La estimación (60) queda a diecisiete puntos, pero es corazonada sin un solo dato. La pregunta que decide: ¿se llena de verdad 6 de cada 10? La condición: dos fines de semana por horas (unas L 2,000 en total) antes de hablar del año: responden la misma pregunta que el contrato, a una fracción del precio y sin atadura.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🖨️ Caso 3: la impresora usada</h2>
+    <p>Una impresora industrial usada cuesta <strong>L 40,000</strong>. Hoy la imprenta cobra <strong>L 3,500 por tirada</strong> y se hacen diez al año; con máquina propia la tirada costaría <strong>L 800</strong> en insumos: un ahorro de L 27,000 al año. Quien la vende admite que <strong>2 de cada 10</strong> máquinas usadas de ese modelo salen con fallas, y la reparación ronda <strong>L 15,000</strong>. En el mercado hay más usadas de ese modelo, a precio parecido. Un técnico cobra <strong>L 600</strong> por revisarla antes de comprar. Qué mete: la tirada a L 800 y el calendario de impresión en casa. Qué saca: L 40,000 de un golpe y el mantenimiento a cuenta propia.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🌳 Aquí el cruce enseña otra cosa</span><br>
+      <span>A dos años, la compra gana L 14,000 con máquina buena y pierde apenas L 1,000 con la mala (el ahorro paga casi entera la reparación): el cruce de la falla queda en <span class="hl">93 de 100</span>, lejísimos del 2 de 10, así que la decisión de comprar sale igual con 2 que con 7 de cada 10 y afinar ese promedio no vale nada. Lo que sí decide es <span class="hl2">esta máquina en concreto</span>, y la cuenta del técnico se hace con el árbol, no de oído. Si esta fuera la única máquina que existe, decir no a la mala solo evitaría esa pérdida neta de 1,000, la revisión valdría L 200 y pagar 600 por ella sería justo lo que esta etapa enseña a no hacer. Pero hay más usadas al mismo precio: descartada la mala se revisa otra, así que el no a tiempo cambia un −1,000 por un +14,000, y esa diferencia de 15,000, 2 de cada 10 veces, vale hasta L 3,000. La pregunta que decide: ¿está buena la que tengo delante? La condición: sin revisión no hay compra; y si el vendedor no deja revisar, esa negativa es el dato.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Caso 4: los veinte guiones del canal</h2>
+    <p>Un canal educativo ofrece <strong>L 30,000</strong> por veinte guiones de video, a L 1,500 cada uno, entregados en tres meses. Ese tiempo saldría de construir misiones nuevas: la familia calcula que son <strong>dos etapas</strong> que ese trimestre no se construirían. El canal acepta también un encargo de prueba de <strong>cinco guiones por L 7,500</strong>. Qué mete: dinero y vitrina. Qué saca: el trimestre de la obra propia.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🌳 El cruce que no es una probabilidad</span><br>
+      <span>Cuadrado con tres ramas: los veinte, ninguno, la prueba de cinco. El número que cruza aquí es <span class="hl">el tiempo por guion</span>: con una tarde cada uno, los veinte caben sin comerse las etapas; con tres días, se comen el trimestre entero. En medio hay un punto donde la decisión cambia de lado, y nadie sabe de qué lado se cae, porque nunca se ha escrito un guion por encargo. La pregunta que decide: ¿cuánto cuesta de verdad un guion nuestro? La condición: <span class="hl2">la prueba de cinco por L 7,500, midiendo las horas de cada uno</span>, y contestar por los quince restantes con ese dato en la mano.</span>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎓 Caso 5: los doce sábados del instituto</h2>
+    <p>Un instituto privado ofrece <strong>L 18,000 al año</strong> por capacitar a sus maestros un sábado al mes. Son doce sábados de la familia, y cada sábado ocupado es una mañana que no se dedica a M.E.T.A.S. El instituto quiere respuesta este mes, pero aceptaría empezar con <strong>un solo taller pagado a L 1,500</strong>, para conocerse. Qué mete: ingreso recurrente y legitimidad ante maestros. Qué saca: doce mañanas al año de la obra propia.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🌳 El cruce que no está en lempiras</span><br>
+      <span>Cuadrado con tres ramas: firmar el año, decir no, el taller único. Las hojas fáciles son los L 1,500 por sábado; la difícil no se escribe en lempiras: <span class="hl">cuánto avance del proyecto cuesta una mañana recurrente</span>, y esa se nombra fuera de la cuenta, no disfrazada de número. El cruce está ahí: si un sábado de la familia vale más de L 1,500 de obra propia, el contrato pierde de entrada. La pregunta que decide: ¿qué cuesta de verdad un sábado, medido y no supuesto? La condición: <span class="hl2">el taller de L 1,500 primero</span>, apuntando cuánto agotó y qué puertas abrió, y el año entero solo con ese sábado ya vivido.</span>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>⛺ Caso 6: el puesto de la feria del libro</h2>
+    <p>El puesto cuesta <strong>L 2,500</strong> por el fin de semana. Si no llueve, vende unas <strong>L 6,000</strong> en fichas (quedan +3,500); si llueve, unas <strong>L 500</strong> (quedan −2,000). El histórico de la zona dice que ese mes llueve <strong>3 de cada 10</strong> fines de semana. Un pronóstico pagado, de los que aciertan casi siempre, cuesta <strong>L 400</strong>. Qué mete: ventas de fichas y cara a cara con los lectores. Qué saca: L 2,500 pagados por adelantado y un fin de semana entero de la familia.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🌳 Un cruce lejos, y un dato que igual se compra</span><br>
+      <span>Hacia atrás: 0,7 × 3,500 menos 0,3 × 2,000 da <span class="hl">+1,850: se va a la feria</span>. El cruce de la lluvia queda en 64 de 100, lejísimos del histórico de 30, así que afinar el «3 de cada 10» no vale un lempira. Y aun así el pronóstico puede valer: no afina el promedio, <span class="hl2">dice qué hará este fin de semana en concreto</span>, y evitar la pérdida de 2,000 tres de cada diez veces vale hasta L 600. Cuesta 400. La pregunta que decide: ¿llega el pronóstico antes de pagar el puesto? La condición: se compra solo si la reserva puede esperarlo; el dato que llega después de pagar vale cero.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎨 Caso 7: el rediseño de las diez fichas</h2>
+    <p>Un diagramador cobra <strong>L 8,000</strong> por rediseñar las diez fichas más vendidas. La familia estima que un rediseño que guste puede dejar unos <strong>L 20,000 más al año</strong>, y que gusta <strong>5 de cada 10 veces</strong>; si no gusta, las ventas quedan igual. El diagramador acepta rediseñar <strong>una sola ficha por L 800</strong>. Qué mete: una cara nueva para lo que más se vende. Qué saca: L 8,000 sin garantía de que el público la prefiera.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🌳 El árbol y su cruce</span><br>
+      <span>El redondo del rediseño promedia 0,5 × 20,000 = 10,000 contra los 8,000 del precio: <span class="hl">+2,000 de ventaja con la corazonada puesta</span>. El cruce está en <span class="hl2">40 de 100</span>: si «gusta» baja de 4 de 10, el encargo pierde. La estimación (50) queda a diez puntos del cruce y no la sostiene ningún dato. La pregunta que decide: ¿de qué lado del 40 está el gusto real? La condición: la ficha de L 800 primero (la más vendida), y las nueve restantes solo si la rediseñada vende más que su versión vieja en un plazo pactado por escrito.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🌐 Caso 8: la traducción al inglés</h2>
+    <p>Traducir M.E.T.A.S al inglés costaría unos <strong>L 20,000</strong> en tiempo de trabajo. Si hubiera demanda fuera del país, dejaría unos <strong>L 50,000</strong> en dos años; si no, unos <strong>L 5,000</strong>. La familia no tiene ningún dato: su <strong>5 de cada 10</strong> es pura corazonada. Publicar una página de muestra en inglés y medir visitas un mes costaría unos <strong>L 500</strong>. Qué mete: un público nuevo fuera del país. Qué saca: L 20,000 de tiempo de trabajo que saldría de construir misiones.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🌳 Donde la información vale más</span><br>
+      <span>Hacia atrás: 0,5 × 50,000 más 0,5 × 5,000, menos los 20,000, da +7,500 con la corazonada puesta. El cruce está en <span class="hl">33 de 100</span>: por debajo, la traducción pierde. Una estimación sin ningún respaldo, a diecisiete puntos de su cruce, es exactamente el terreno donde la información vale más: <span class="hl2">saberlo todo valdría hasta L 7,500, y el mes de datos cuesta L 500</span>. La pregunta que decide: ¿hay alguien del otro lado? La condición: la página de muestra este mes, con el número de visitas que haría entrar escrito hoy y no después, y las L 20,000 solo si ese número se cumple.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 La hoja del árbol, y las cinco reglas de la etapa</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Antes de contestar cualquiera de estas ofertas, la casa dibuja esta hoja. Se dibuja <strong>antes</strong> de conocer el resultado, que es lo único que la vuelve revisable después.</p>
+    <ul style="font-size:0.9rem;line-height:1.6;padding-left:1.1rem;margin-bottom:0.8rem;">
+      <li><strong>La pregunta en una línea,</strong> y una sola decisión por árbol.</li>
+      <li><strong>Los cuadrados</strong> con todas las opciones de la familia, incluida la de esperar.</li>
+      <li><strong>Los redondos</strong> con probabilidades que suman uno, y al lado lo que las sostiene.</li>
+      <li><strong>Las hojas en lempiras,</strong> y lo que no son lempiras nombrado aparte.</li>
+      <li><strong>El cruce y el precio del dato:</strong> ¿dónde cambia de lado la decisión, y cuánto cuesta saberlo a tiempo?</li>
+    </ul>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🌳 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">Toda oferta de verdad se dibuja antes de contestarse</span>, y con fecha. 2. El árbol cabe en <span class="hl2">una página</span>, o se poda. 3. Se resuelve hacia atrás: promediar en lo redondo, elegir en lo cuadrado. 4. <span class="hl">Ningún dato se paga sin haber buscado el cruce</span>: lo que no cruza no se afina. 5. La información se compra barata y a tiempo (un piloto, una llamada, un mes de datos), porque la que llega después de la firma vale cero.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «El árbol antes del salto»</h2>
+    <p>Un guion listo para grabar, de seis a siete minutos, que cuenta esta etapa <strong>con historia y no con definiciones</strong>. Nada de cuadrados ni redondos antes del minuto dos. Cada escena lleva su VOZ, su IMAGEN y su TEXTO EN PANTALLA.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>La regla de la casa para los guiones:</strong> el concepto no se presenta, se gana. Primero alguien quiere algo, después el público se ve retratado, y solo cuando la historia ya duele entra la herramienta. Si la primera frase del video es «hoy vamos a hablar del árbol de decisión», el video ya se perdió.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «Te ofrecen veinticinco mil lempiras, hoy, por firmar un papel. Si no firmás, podés ganar sesenta mil el año que viene, o quedarte con diez mil. Nadie sabe cuál de las dos. La oferta vence el viernes, y el que la trajo está esperando en la sala. Decime: ¿qué hacés? Porque hay una manera de ver la respuesta. Dibujada.»</p>
+    <p><strong>IMAGEN:</strong> pantalla negra; después un contrato sobre la mesa, un lapicero encima, y una silla vacía al otro lado que alguien acaba de dejar.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Vence el viernes. ¿Firmás?»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quiere (0:25 a 1:30)</h2>
+    <p><strong>VOZ:</strong> «Howard Raiffa era un matemático estadounidense que daba clases en Harvard, y quería una cosa rara para un profesor: que decidir a ciegas dejara de ser un talento y pasara a ser un oficio, algo que se pudiera enseñar como se enseña a dividir. En 1957 ya había escrito con Duncan Luce un libro sobre juegos y decisiones. Pero lo que lo hizo maestro de maestros llegó en 1968: «Decision Analysis», unas lecciones donde las decisiones no se discutían. Se dibujaban. Años después le encargaron algo más difícil que un aula: fue el primer director de un instituto fundado en 1972, cerca de Viena, donde científicos de los dos lados de la Guerra Fría trabajaban juntos. Ahí las decisiones no eran ejercicios de libro, y el dibujo seguía sirviendo.»</p>
+    <p><strong>IMAGEN:</strong> fotografías de aulas de los años sesenta; una pizarra que se va llenando de líneas que se ramifican; un mapa de Europa partido en dos colores.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «1968: las decisiones se dibujan.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:30 a 2:40)</h2>
+    <p><strong>VOZ:</strong> «Ahora mirá tu mesa. Cuando en tu casa hay una decisión grande, ¿qué pasa? Se habla en círculos. Alguien dice que sí, alguien dice que no, y a la media hora los dos están repitiendo lo mismo, más fuerte. La reunión la gana el que más aguanta, no el que tiene razón. Y la oferta, mientras tanto, se decide sola: el viernes llega igual, con acuerdo o sin él. Lo que falta en esa mesa no es inteligencia. Sobra inteligencia. Lo que falta es un papel donde las opciones estén todas a la vista, con sus números, para discutir sobre algo que los dos puedan señalar con el dedo.»</p>
+    <p><strong>IMAGEN:</strong> una mesa de cocina de noche, dos tazas de café frías, dos manos que gesticulan; un calendario con el viernes marcado en rojo.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Gana el que más aguanta. No el que tiene razón.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:40 a 4:00)</h2>
+    <p><strong>VOZ:</strong> «Y acá está el giro, que tiene dos partes. La primera: dibujar la decisión no es adornarla. Son dos figuras nada más: un cuadrado donde decidís vos, un redondo donde decide el azar, y al final de cada camino, un número. La oferta de la sala cabe en media página: firmar son veinticinco mil seguros; no firmar es un redondo con dos ramas, sesenta mil si la venta va bien, que estimás cuatro de cada diez, y diez mil si va mal. Multiplicás y sumás: treinta mil. Contra veinticinco. El dibujo ya decidió, y decidió al revés de lo que el miedo pedía. La segunda parte del giro es la que casi nadie espera: en ese dibujo, la mayoría de los números <strong>no importan</strong>. Podés equivocarte en casi todos sin que la decisión se mueva. El trabajo no es afinarlos todos: es descubrir cuál es el único que manda.»</p>
+    <p><strong>IMAGEN:</strong> una mano dibuja el árbol en tiempo real sobre papel cuadriculado: cuadrado, redondo, dos ramas, números; después casi todos los números se difuminan y uno solo queda nítido.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Casi ningún número importa. Uno sí.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:00 a 5:30)</h2>
+    <p><strong>VOZ:</strong> «Ese número se encuentra con la herramienta fina de hoy: la probabilidad de cruce. Agarrás la probabilidad en el papel y la movés, para arriba y para abajo, hasta que las dos opciones valen exactamente lo mismo. Ese punto es el cruce: de un lado conviene firmar, del otro no. En la oferta de la sala cruza en treinta de cien: si la venta buena vale menos de eso, ganan los veinticinco mil seguros. Y ahora mirá lo que eso te regala. Si tu decisión sale igual con treinta que con setenta por ciento, no afinés nada: ningún estudio puede cambiarla, cueste lo que cueste. Pero si cruza en cincuenta y cinco y vos estimás sesenta, ahí está todo el trabajo, porque un error de cinco puntos la voltea. Y saber, casi siempre, se compra barato: una llamada al que ya firmó, un piloto de un mes, una tirada chica. Eso vale más que adivinar caro, con una condición: que llegue antes del viernes. El dato que llega después de la firma vale cero.»</p>
+    <p><strong>IMAGEN:</strong> un dedo desliza una probabilidad sobre el papel como una perilla; las dos ramas se balancean como una balanza hasta quedar niveladas; después un teléfono marcando.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Con 30 igual que con 70? No afinés. ¿Cruza en 55? Ahí está el trabajo.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:30 a 6:20)</h2>
+    <p><strong>VOZ:</strong> «“Mis probabilidades son inventadas. ¿De qué me sirve un árbol hecho de corazonadas?” La objeción es justa y hay que concederla: tus números son gruesos, y van a seguir siéndolo. Pero el cruce sirve exactamente para eso: te dice cuáles corazonadas pueden quedarse gruesas para siempre, porque no mueven nada, y cuál es la única que hay que trabajar. Un número grueso lejos del cruce vale tanto como uno fino. Y hay algo más. Treinta años después de sus lecciones, Raiffa volvió al tema con Hammond y Keeney en «Smart Choices», en 1999, y la lección de ese libro es humilde: la mayoría de las malas decisiones no fallan en la cuenta. Fallan antes: en cómo se planteó el problema y en las alternativas que nunca se pusieron sobre la mesa. Por eso el cuadrado exige todas las opciones. La rama de esperar, la del piloto, la de negociar el plazo: esa rama que no dibujaste suele ser la que ganaba.»</p>
+    <p><strong>IMAGEN:</strong> un árbol con un número borroso que se queda borroso y la decisión no se mueve; después una mano añade al cuadrado una tercera rama que no estaba.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «La rama que no dibujaste suele ser la que ganaba.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:20 a 7:10)</h2>
+    <p><strong>VOZ:</strong> «Esta semana, una sola cosa. Agarrá la decisión que tenés pendiente, la que te da vueltas, y dibujala en una página: cuadrados donde decidís vos, con la rama de esperar incluida; redondos donde decide el azar, con sus probabilidades; un número al final de cada camino. Resolvela hacia atrás: promediá en lo redondo, elegí en lo cuadrado. Después buscá el cruce y contestate dos preguntas: ¿mi estimación queda cerca o lejos?, y si queda cerca, ¿cuál es el dato más barato que la movería, y llega a tiempo? Una página, una tarde, y la fecha abajo. Dentro de un año ese papel va a saber más que tu memoria. Esto es «El árbol antes del salto», la segunda etapa de la Ruta de la Apuesta Medida.»</p>
+    <p><strong>IMAGEN:</strong> una mano dibuja el árbol completo en una sola hoja, lo fecha y lo guarda en una caja donde ya hay otras hojas fechadas.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Una página · Hacia atrás · El cruce · El dato barato · Misión: El árbol antes del salto · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El mismo esqueleto sirve para cualquier etapa. Se copia la columna del medio, no la de la derecha.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué tiene que hacer</th><th>Cómo se hizo aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>Una oferta que vence el viernes, y la promesa de ver la respuesta dibujada</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien en quien el público se reconoce sin saberlo</td><td>Raiffa, que quiere que decidir a ciegas deje de ser talento y sea oficio</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>La mesa de la cocina donde la reunión la gana el que más aguanta</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>El dibujo decide, y casi ningún número del dibujo importa: uno solo manda</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>La probabilidad de cruce, y el dato que se compra barato y a tiempo</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«Mis números son inventados»: el cruce dice cuál corazonada trabajar</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>El árbol de la decisión pendiente, en una página y con fecha</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎬 La regla del minuto dos</span><br>
+      <span>Ninguna definición antes del minuto dos. Hasta ahí manda la historia: <span class="hl">alguien quiere algo y no lo consigue</span>. El cuadrado y el redondo solo entran cuando el público ya <span class="hl2">necesita</span> el dibujo, y entonces se agradecen en vez de aburrir.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Seis lecturas: el mismo árbol, seis voces</h2>
+    <p>El tema de la etapa contado seis veces: un cuento sobre un agrimensor que pensaba en una hoja doblada en cuatro, un capítulo de venta con una mula, una feria y un árbol pintado con carbón, un ensayo a escala de especie sobre los mapas del porvenir, una entrevista imaginada con el profesor que enseñó a dibujar decisiones, una conversación de madrugada entre Jesús Quintero y Antonio Gala sobre decidir con el árbol delante, y un <strong>careo</strong> donde el árbol completo y la regla simple se disputan la misma mesa, con sus objeciones y sus réplicas. Seis maneras de que la idea entre por donde el examen no llega.</p>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;"><strong>Cada lectura trae sus propias preguntas debajo</strong>: cinco de comprensión, dos de completar y dos de análisis, del texto que se acaba de leer y de ningún otro. Y las seis empiezan <strong>plegadas</strong>, para poder elegir sin tener que recorrer veinte pantallas.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> los <strong>cinco primeros</strong> son <strong>ejercicios de estilo escritos por esta casa</strong>: los tres primeros en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari, y el cuarto y el quinto son <strong>entrevistas imaginadas</strong>, a la manera del periodista Joaquín Soler Serrano la una y del programa de Jesús Quintero con Antonio Gala la otra. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado, y los dos encuentros <strong>nunca ocurrieron</strong>. El <strong>sexto es un careo</strong>, y ese no imita a nadie, así que no lleva la etiqueta del pastiche sino la suya: sus turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas, aquí no se le pone una sola palabra en la boca a ningún investigador, y la disputa que enfrenta la sostiene de verdad gente con nombre y año en la literatura, citada en tercera persona como fuente. Regla extra de esta casa, y en las seis: <strong>toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</strong>. A la voz de Borges se le quita a propósito su costumbre de inventar citas apócrifas: aquí la erudición es verdadera; el único artificio permitido es la voz.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre: una hoja suelta con un pastiche sin declarar sería justo la fuente inflada que el Estudio Mayor enseña a cazar.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir la entrevista</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir la conversación</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir el careo</button>
+      <button class="btn btn-pri" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🌀 Lectura 1 · «El árbol de una sola página» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas inventadas. Todos los libros, fechas y personas de la historia real que este cuento menciona son reales y comprobables; el agrimensor y el narrador son invención declarada.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">Lo conocí en una oficina de registros donde yo trabajaba por las tardes y él parecía haber trabajado desde siempre. Se llamaba Elías Osorio, era agrimensor jubilado y llevaba en el bolsillo del saco, doblada en cuatro, una hoja de papel cuadriculado. Tardé meses en entender que esa hoja era su manera de pensar, y años en sospechar que era también su manera de ser valiente.</p>
+    <p class="lect-p">Su método cabía en dos figuras. Cuando una decisión lo rondaba, dibujaba un cuadrado pequeño a la izquierda de la hoja y desde él trazaba una rama por cada cosa que él podía hacer. Donde el mundo contestaba, dibujaba un círculo, y del círculo salían las contestaciones posibles del mundo, cada una con su probabilidad escrita al lado, en números que él mismo confesaba imperfectos. Al final de cada rama, en la hoja del árbol, un número: lo que esa historia completa le dejaba o le quitaba. «El cuadrado es mío», me dijo la única vez que le pregunté. «El círculo no fue mío nunca. Casi todas las desgracias que he visto vienen de confundir esas dos figuras.»</p>
+    <p class="lect-p">Lo asombroso no era el dibujo sino la dirección en que lo leía. No avanzaba del tronco hacia las hojas, como quien vive; retrocedía de las hojas hacia el tronco, como quien recuerda. En cada círculo pesaba las contestaciones del mundo por su probabilidad y las reducía a un solo número; en cada cuadrado tachaba sin misericordia las ramas peores y dejaba una. Cuando el retroceso llegaba al primer cuadrado, la decisión ya estaba tomada, o mejor: ya estaba encontrada, como si hubiera estado siempre en la hoja esperando que alguien la leyera al revés.</p>
+    <p class="lect-p">Tenía dos supersticiones, si esa palabra no lo calumnia. La primera era el tamaño: el árbol debía caber en una página. Le vi rechazar con suavidad el expediente de un colega que había ramificado tres pliegos. «Un árbol de tres páginas no es una decisión», dijo, «es una manera de no decidir. El que lo dibuja ya no busca ver: busca demorar.» La segunda superstición era una tinta roja que usaba una sola vez por árbol: para escribir el número donde su decisión cambiaba de lado.</p>
+    <p class="lect-p">Ese número rojo me costó entenderlo. Osorio no creía en sus probabilidades; las escribía porque eran mejores que no escribir nada. Pero antes de fiarse de ellas hacía una prueba que llamaba, con sorna de topógrafo, «mover el mojón»: repetía el retroceso suponiendo la probabilidad más baja que un hombre honrado pudiera defender, y después la más alta. Si la decisión era la misma con treinta que con setenta, guardaba la hoja y dormía: afinar la estimación habría sido un lujo inútil. Si la decisión cruzaba de lado en cincuenta y cinco, no dormía, y tampoco decidía: ahí, decía, estaba todo el trabajo.</p>
+    <p class="lect-p">Porque su tercera regla, que no me confesó y que deduje de sus hojas, era que la ignorancia tiene precio y que ese precio conviene averiguarlo antes de pagarlo. Cuando el número rojo quedaba cerca, Osorio no adivinaba: compraba. Una carta a un colega de otro departamento, un viaje de dos días, un mes de mediciones antes de firmar un deslinde. Al pie de una de sus hojas encontré esta cuenta escueta: «Saberlo, ochenta lempiras y una semana. Equivocarme, la mitad de lo que tengo. No sé por qué los hombres pagan tan caro por adivinar lo que pueden saber tan barato.»</p>
+    <p class="lect-p">Muchos años después, en una biblioteca, supe que el método de Osorio existía y tenía nombre y bibliografía. En 1966 Ronald Howard lo bautizó «análisis de decisión» en un congreso de investigación operativa; en 1968 Howard Raiffa, profesor en Harvard, publicó unas lecciones tituladas «Decision Analysis», con los cuadrados, los círculos y el retroceso de las hojas al tronco, que él llamaba promediar y plegar hacia atrás. No creo que Osorio los haya leído; los agrimensores de su tiempo no leían a Harvard. Prefiero pensar que ciertas ideas son como los ríos, que no necesitan conocerse para coincidir en la desembocadura.</p>
+    <p class="lect-p">Osorio murió sin que yo me enterara a tiempo, que es la forma en que mueren los hombres discretos. Su hija me dejó revisar las hojas dobladas en cuatro, que eran ciento tantas y que abarcaban cuarenta años de cuadrados y de círculos: una mudanza, un pleito que no inició, un terreno que no compró y que después valió una fortuna. En el margen de esa última hoja, otra mano, acaso la mía, habría escrito una queja; la de Osorio decía: «La decisión fue buena. El círculo dijo que no.»</p>
+    <p class="lect-p">La última hoja es la única que no he podido olvidar. Tenía un solo cuadrado y dos ramas, y en las hojas del árbol no había números; había dos palabras que no voy a copiar. Comprendí entonces que el método de Osorio no prometía lo que ningún método puede prometer. La página no abole el azar, como la brújula no abole la tormenta. Hace algo más modesto y quizá más raro: dibuja la frontera exacta entre lo que era nuestro y lo que no lo fue nunca, para que el coraje se gaste entero en los cuadrados y no se desperdicie en discutir con los círculos.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>🐎 Lectura 2 · «Donde se cuenta el pleito que un labrador traía consigo mismo sobre si vender su mula al chalán o llevarla a la feria, y del árbol que un bachiller le pintó con un carbón en la pared de la venta» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, el humor y la reflexión cervantinos. Las anclas son reales: la venta y el camino como escenarios de la primera parte del Quijote (1605), el molde del bachiller a la manera de Sansón Carrasco, el de la segunda parte (1615), y la feria de Medina del Campo, que fue de las grandes de Castilla. Los refranes son del acervo popular, como los de Sancho.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">Sucedió que en una venta del camino de Medina, de las que tienen más humo que lumbre, se juntaron una noche de octubre un labrador llamado Pascual, que traía una mula parda y una congoja; un bachiller que volvía de Alcalá con la sotana raída y la cabeza llena de figuras; un arriero que llegaba de la feria con las mulas descargadas y las noticias frescas; y la ventera, mujer que había enterrado dos maridos sin descuidar una sola cuenta, y que gobernaba la venta y las conversaciones.</p>
+    <p class="lect-p">La congoja de Pascual era esta: aquella misma tarde un chalán le había ofrecido por la mula trescientos reales contantes, y la feria de Medina empezaba en tres días, y en la feria las mulas como la suya se habían pagado otros años a cuatrocientos, cuando la feria venía buena, y a duras doscientos cincuenta, cuando venía ruin, sin que nadie supiera de antemano de qué pie iba a cojear. «Y así estoy», dijo, «como burro entre dos pesebres, que por mirar a los dos no come de ninguno, y llevo dos noches sin dormir y la mula tan lucida como siempre, que a ella no le quita el sueño su precio.»</p>
+    <p class="lect-p">El bachiller, que no sabía estar callado porque le parecía que el silencio es hacienda desaprovechada, se levantó, tomó un carbón del fogón y dijo: «Ese pleito, señor labrador, no se pelea en la cabeza, que es aposento oscuro, sino en la pared, que es aposento claro.» Y pintó en la pared un cuadrado pequeño. «Este cuadrado sois vos, porque aquí mandáis vos: o vendéis al chalán, o camináis a la feria. Del cuadrado salen dos ramas, mirad. La del chalán se acaba pronto: trescientos reales, y a dormir. La de la feria no se acaba en vos, sino en esto otro», y pintó un círculo, «que es redondo porque rueda, y rueda porque en él no decide nadie de esta venta: decide el cielo, que hace la feria buena o ruin. Donde decidís vos, cuadrado; donde decide lo que no sois vos, redondel; y al cabo de cada rama, un número, que es lo que esa historia os deja en la faltriquera.»</p>
+    <p class="lect-p">«Pues ponga vuestra merced los números», dijo Pascual, «que carbón hay.» Y el bachiller los puso: feria buena, cuatrocientos, menos veinte del camino, de la posada y del portazgo, trescientos ochenta; feria ruin, doscientos cincuenta menos los mismos veinte, doscientos treinta; y la rama del chalán, trescientos justos y sin polvo. «Y ahora», dijo, «viene el secreto del oficio, que es leer el árbol al revés de como se pinta: no del tronco a las hojas, sino de las hojas al tronco, que las decisiones se resuelven hacia atrás, como se desanda un camino errado. Decidme: de cada diez ferias, ¿cuántas vienen buenas?» «Unas seis», dijo el arriero desde su rincón, «y no me lo agradezca nadie, que yo las he visto todas.» «Pues seis de diez veces trescientos ochenta, y cuatro de diez veces doscientos treinta, montan trescientos veinte. Ese redondel, bien pesado, vale trescientos veinte, que es más que los trescientos del chalán: luego a la feria.»</p>
+    <p class="lect-p">«Despacio», dijo la ventera, que atizaba el fuego y las razones, «que vuestra merced ha decidido con el número del arriero, y el arriero ha dicho unas seis, que no es lo mismo que seis. ¿Y si son cinco? ¿Y si son siete?» El bachiller, en vez de enojarse, hizo con el carbón otra cuenta, y dijo: «Pregunta la señora lo mejor que se ha preguntado esta noche. Vamos a buscar el número donde el pleito cambia de acera. Si de diez ferias fuesen buenas menos de cinco, poco menos de la mitad, el redondel valdría menos que el chalán, y sería mejor vender; de ahí para arriba, mejor la feria. Ese es el número que manda, y miren qué desdicha: cae justo donde estamos dudando. Si el arriero hubiera dicho nueve, o hubiera dicho dos, yo dormiría tranquilo con su unas más o su unas menos, que cuando la decisión es la misma con tres que con siete, afinar el número es contar los pelos a la mula. Pero ha dicho seis, y el cruce anda en cinco, y con el cruce tan vecino no se adivina: se pregunta.»</p>
+    <p class="lect-p">«¿Y a quién, si el cielo no responde?», dijo Pascual. «Al que viene de allá», dijo la ventera señalando al arriero con el cucharón, «que lleva la feria puesta en las botas y nadie le ha preguntado más que por las mulas.» Y el arriero, pagado de verse consultado como oráculo, contó por el precio de un cuartillo de vino lo que valía un tesoro: que venían genoveses con dineros, que el año había sido bueno de cebada, que los chalanes andaban comprando por los caminos justamente porque en la feria esperaban pagar caro, «que el lobo no ronda el corral donde no hay ovejas».</p>
+    <p class="lect-p">«Ahí lo tenéis», dijo el bachiller, «y notad, señor Pascual, lo que habéis pagado por saber: un cuartillo. Y lo que os ahorráis por no adivinar: acaso ochenta reales. Que hay dos maneras de tratar con lo que no se sabe, comprarlo barato o pagarlo caro, y el mundo anda lleno de discretos que regatean un cuartillo y apuestan la mula.» Y borró con la manga media pared, dejando solo el cuadrado, el redondel y los números, «que árbol que no cabe en una pared no es árbol, es zarza, y en las zarzas no se ven las ramas: se enredan. Quien pinta tres paredes no está decidiendo: está huyendo con mucho aparato.»</p>
+    <p class="lect-p">Vendió o no vendió Pascual, no lo dice la historia, porque la historia no es de la mula sino de la pared; dícese que fue a la feria, y que le fue como quiso el redondel, que para eso es redondo. Lo que sí consta es que al despedirse dijo que aquella noche había dormido como hacía dos no dormía, «que no me quitó el sueño la feria, sino no saber qué era mío y qué era del cielo, y eso ya lo sé: mío es el cuadrado, y con el cuadrado bien jugado, lo que traiga el redondel que venga como viniere».</p>
+    <p class="lect-p">«Pues vaya vuestra merced con Dios», dijo la ventera recogiendo los jarros, «y déjeme el árbol en la pared, que a esta venta entra cada noche un pleito como el suyo, y sale más barato enseñar un carbón que escuchar dos horas de suspiros. Pero páguese la cena, que la cena no tiene ramas: es cuenta cierta, y las cuentas ciertas se pagan antes de filosofar.»</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌍 Lectura 3 · «La especie que dibujó el porvenir» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie, la frase corta y el aterrizaje en el presente. Todas las obras, años y cifras citados son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Nuestra especie dibujó mapas de la tierra durante miles de años. Mapas del futuro, en cambio, empezó a dibujarlos anteayer.</p>
+    <p class="lect-p">El futuro se consultaba, no se dibujaba. Los reyes de Mesopotamia leían el hígado de un carnero antes de una campaña. Los griegos caminaban hasta Delfos. Los romanos miraban el vuelo de los pájaros. Conviene no burlarse demasiado: eran tecnologías de la decisión, y hacían algo que todavía cuesta hacer, obligar a detenerse antes de actuar. Lo que no hacían era separar dos cosas que nuestro cerebro mezcla desde entonces: lo que depende de uno y lo que no.</p>
+    <p class="lect-p">El primer gesto moderno llegó por un juego. En 1913, el matemático Ernst Zermelo publicó un trabajo sobre el ajedrez donde hizo algo extraño: en lugar de mirar el tablero desde la apertura hacia adelante, lo miró desde los finales hacia atrás, preguntándose qué posiciones estaban ya ganadas aunque faltaran muchas jugadas. Leer el porvenir al revés, desde sus desenlaces hacia el presente, resultó ser una idea con futuro.</p>
+    <p class="lect-p">El siglo XX la sacó del tablero. En 1944, John von Neumann y Oskar Morgenstern publicaron «Theory of Games and Economic Behavior» y convirtieron la decisión en objeto matemático. En 1961, Howard Raiffa y Robert Schlaifer publicaron «Applied Statistical Decision Theory», donde se calcula algo que suena a paradoja: cuánto vale una información que todavía no se tiene. En 1966, Ronald Howard bautizó la disciplina entera, «decision analysis», en un congreso internacional de investigación operativa. Y en 1968 Raiffa publicó «Decision Analysis», las lecciones que fijaron el dibujo que esta etapa enseña: un cuadrado donde decide la persona, un círculo donde decide el azar, un número al final de cada rama, y la resolución hacia atrás, de las hojas al tronco, promediando en los círculos y eligiendo en los cuadrados.</p>
+    <p class="lect-p">Piense el lector en lo que ese dibujo hace, porque es más raro de lo que parece. Toma el porvenir, que era territorio de dioses, y lo reparte en dos montones: los cuadrados, que son nuestros, y los círculos, que no lo serán nunca. Cuarenta mil años de augurios intentaron adivinar los círculos. Una hoja cuadriculada hace algo más humilde y más útil: concentra todo el esfuerzo en los cuadrados y les pone a los círculos, en vez de una plegaria, una probabilidad.</p>
+    <p class="lect-p">La herramienta salió del papel rápido. En 1980, Milton Weinstein y Harvey Fineberg publicaron «Clinical Decision Analysis», y desde entonces hay hospitales donde operar o esperar, pedir una prueba o no pedirla, se dibuja antes de decidirse. En 1999, John Hammond, Ralph Keeney y el propio Raiffa escribieron «Smart Choices» para sacar el método de las universidades y ponerlo en la mesa de una cocina, que es donde se decide la mayoría de las vidas.</p>
+    <p class="lect-p">Pero el dibujo, solo, no basta. La parte fina del oficio está en dos preguntas que casi nadie hace.</p>
+    <p class="lect-p">La primera: ¿con qué probabilidad cambia de lado la decisión? Quien dibuja un árbol escribe probabilidades que no sabe de verdad, y ahí se abren dos caminos honrados. Se repite la cuenta con la estimación más baja defendible y con la más alta. Si la decisión es la misma con treinta que con setenta por ciento, la estimación no merece más trabajo: decida y duerma. Si la decisión cruza de lado en cincuenta y cinco, todo el trabajo está ahí, en ese cruce, y no repartido por el árbol.</p>
+    <p class="lect-p">La segunda: ¿cuánto vale saber antes de firmar? Si el cruce queda cerca, adivinar es caro y saber suele ser barato. Un piloto de un mes, una llamada a quien ya recorrió ese camino, treinta días de datos antes de comprometer un año. La especie que pagaba con carneros por conocer el futuro puede ahora comprar pedazos de futuro por el precio de una llamada, y sin embargo sigue prefiriendo adivinar, porque adivinar no duele hoy y saber cuesta hoy.</p>
+    <p class="lect-p">Aterrizo. Esta semana alguien va a poner sobre la mesa de su casa una oferta con azar dentro: un trato, un gasto grande, un cambio de rumbo para un proyecto como M.E.T.A.S. La tradición de la especie es discutirla con adjetivos. La alternativa tiene medio siglo de bibliografía y cabe en una página: cuadrados para lo que deciden ustedes, círculos para lo que no, un número al final de cada rama, y la lectura hacia atrás. Después, las dos preguntas finas: dónde cruza, y cuánto costaría saberlo. Una página, porque un árbol de tres páginas es una forma de no decidir.</p>
+    <p class="lect-p">El futuro sigue sin estar escrito. Pero desde hace medio siglo se puede dibujar, y una especie que dibuja lo que teme discute mejor que una especie que solo lo adivina.</p>
+  </div>
+
+  <div class="card ac-jade" id="lect-entrevista">
+    <h2>🎙️ Lectura 4 · «El hombre que dibujaba el porvenir en una página» (entrevista, a la manera de Joaquín Soler Serrano)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una entrevista IMAGINADA con Howard Raiffa (Nueva York, 1924 · Oregón, 2016), matemático del Bronx, doctor por la Universidad de Míchigan y profesor de la Universidad de Harvard, autor de «Decision Analysis: Introductory Lectures on Choices under Uncertainty» (1968), coautor con R. Duncan Luce de «Games and Decisions» (1957) y con Robert Schlaifer de «Applied Statistical Decision Theory» (1961), autor de «The Art and Science of Negotiation» (1982), coautor con John S. Hammond y Ralph L. Keeney de «Smart Choices» (1999), y primer director del IIASA, el instituto internacional de análisis de sistemas fundado en 1972 cerca de Viena. Preguntada a la manera de Joaquín Soler Serrano (Murcia, 1919 · Barcelona, 2010), el entrevistador de «A fondo», el programa de TVE que entre 1976 y 1981 sentó ante la cámara, entre muchos otros, a Jorge Luis Borges, a Julio Cortázar y a Juan Rulfo. El encuentro nunca ocurrió: el programa terminó en 1981 y Raiffa murió en 2016, así que la pieza se acoge al viejo género radiofónico de las entrevistas imposibles, el que la RAI italiana estrenó en los años setenta con guiones de escritores como Italo Calvino y Umberto Eco. Las personas son reales, toda obra, fecha y cifra citada es real; lo único inventado es la conversación.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir esta entrevista</button></div>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Señoras, señores, muy buenas noches. Nuestro invitado de esta noche enseñó una cosa aparentemente humilde: a dibujar una decisión antes de tomarla. Profesor de Harvard, matemático, negociador, autor de libros que han cambiado la manera de decidir en empresas, hospitales y gobiernos. Profesor Raiffa, bienvenido a este programa, y permítame empezar por donde empezamos siempre: por el principio. Usted nace en Nueva York, en el Bronx, en 1924. ¿Qué niño fue Howard Raiffa?</p>
+    <p class="lect-p"><strong>RAIFFA.</strong> Un niño de la Depresión, que es una escuela que no le deseo a nadie y que sin embargo enseña. En casa se hablaba de dinero porque faltaba, y cuando el dinero falta, cada decisión pesa: se ve a los padres elegir entre dos cosas necesarias. Yo creo que mi oficio empezó ahí, mucho antes que en Míchigan, viendo que decidir mal no era una abstracción, era un mes malo.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Luego viene la guerra, que interrumpe tantas biografías de su generación, y después la universidad. Doctor en Matemáticas por la Universidad de Míchigan en 1951, y en 1957, con Duncan Luce, un libro que se volvió clásico, «Games and Decisions». Pero yo quiero llevarle a 1968, al libro por el que está usted esta noche aquí. «Decision Analysis». Cuénteselo a quien no lo ha leído como se lo contaría a su vecino.</p>
+    <p class="lect-p"><strong>RAIFFA.</strong> Es un libro sobre cómo pensar despacio una decisión que tiene azar dentro, y su herramienta central cabe en una servilleta. Se dibuja un cuadrado donde decide usted, y de ese cuadrado sale una rama por cada opción de verdad disponible. Donde el mundo responde, se dibuja un círculo, y de ese círculo salen las respuestas posibles del mundo, cada una con su probabilidad. Al final de cada rama se escribe un número: qué le deja a usted esa historia completa. Y luego viene lo que importa, que es la dirección de la lectura: el árbol se dibuja hacia adelante y se resuelve hacia atrás, desde las hojas hasta el tronco. En los círculos se promedia; en los cuadrados se elige lo mejor y se tacha el resto. Yo lo llamaba promediar y plegar hacia atrás. Cuando el plegado llega al primer cuadrado, la decisión está delante de usted, escrita con su propia letra.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Hay algo casi confesional en eso que describe: obligarse a escribir lo que uno cree antes de saber cómo termina.</p>
+    <p class="lect-p"><strong>RAIFFA.</strong> Esa es exactamente la palabra. El árbol no es una máquina de acertar, es una máquina de sincerarse. Sin el dibujo, uno cree lo que le conviene creer, y lo cree con más fuerza a medida que se acerca la firma. Con el dibujo, sus creencias quedan en el papel, con números, donde su esposa, su socio o su hijo pueden señalarlas y decirle: aquí estás soñando. Un árbol se discute; una corazonada solo se obedece.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Le confieso una desconfianza, profesor, y se la debo a este oficio mío de preguntar: esas probabilidades que usted escribe en los círculos, ¿de dónde salen? Porque nadie sabe de verdad si la feria viene buena seis de cada diez veces.</p>
+    <p class="lect-p"><strong>RAIFFA.</strong> Nadie lo sabe, y le agradezco la desconfianza, porque la respuesta es la parte más fina del método. Primero: un número imperfecto escrito vale más que una niebla sin escribir, porque el número se puede discutir y la niebla no. Y segundo, y esto es lo que enseño a hacer antes que nada: pregúntele al árbol cuánto importa ese número. Repita la cuenta con la estimación más pesimista que un hombre honrado defendería, y con la más optimista. Si la decisión es la misma con treinta que con setenta por ciento, deje de afinar: su decisión no depende de esa niebla, y afinar sería un pasatiempo. Pero si la decisión cambia de lado en cincuenta y cinco, entonces ha encontrado usted el punto exacto donde su ignorancia es cara, y todo el trabajo que le quede debe gastarse ahí y no en otra parte.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> ¿Y qué se hace con ese punto? Porque saber dónde duele no es todavía curarlo.</p>
+    <p class="lect-p"><strong>RAIFFA.</strong> Se compra información, y se compra como se compra todo: mirando el precio. Con Robert Schlaifer publicamos en 1961 un libro donde esa pregunta se calcula: cuánto vale saber algo antes de decidir. La idea de fondo se la digo sin fórmulas. Si conocer mejor ese número puede cambiar su decisión, saber vale dinero, y suele venderse barato: un ensayo pequeño antes del compromiso grande, una llamada a quien ya pasó por ahí, un mes de datos antes de firmar un año. Y si conocerlo mejor no cambiaría su decisión, entonces esa información vale exactamente cero, aunque se la vendan con el nombre de estudio. La gente paga fortunas por informes que no moverían su decisión y le regatea una semana al piloto que sí la movería.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Permítame una ingenuidad de profano. Si el árbol es tan buena herramienta, ¿no será mejor un árbol enorme, de ramas y más ramas, que no se deje nada fuera?</p>
+    <p class="lect-p"><strong>RAIFFA.</strong> Es la tentación natural, y hay que resistirla. Un árbol debe caber en una página. No es una regla estética, es una regla moral: el árbol de una página lo dibuja alguien que quiere decidir, y el de tres páginas lo dibuja alguien que quiere aplazar con elegancia. La frondosidad casi nunca añade luz; añade escondites. Las ramas que importan en una decisión real son dos o tres, y el valor del método está en obligarse a encontrarlas, no en dibujarlas todas.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Hablemos del Raiffa negociador, que es media vida suya. En 1982 publica «The Art and Science of Negotiation», y en 1972 le encargan dirigir, en plena guerra fría, un instituto fundado a medias por Washington y Moscú, el IIASA, cerca de Viena. ¿Qué hace un profesor de árboles de decisión sentando a rusos y americanos en la misma mesa?</p>
+    <p class="lect-p"><strong>RAIFFA.</strong> Más árboles, aunque no se los enseñara a nadie. Una negociación es una decisión con círculos especialmente tercos, porque dentro del círculo hay otra persona que también está dibujando. Lo que el método me dio para Viena fue una disciplina: separar lo que dependía de nosotros, que era escuchar, proponer y ceder, de lo que no dependía, que era casi todo lo demás, y no gastar ni una hora en discutir con lo que no dependía de nosotros. Le sorprendería cuánta diplomacia consiste en no confundir el cuadrado con el círculo.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> En 1999, ya en la última parte de su carrera, escribe con John Hammond y Ralph Keeney «Smart Choices», un libro deliberadamente sencillo, para todo el mundo. Después de medio siglo en Harvard, ¿qué quedaba por decir que cupiera en un libro de bolsillo?</p>
+    <p class="lect-p"><strong>RAIFFA.</strong> Quedaba lo más difícil: decirlo simple. Las decisiones que más duelen no se toman en las empresas, se toman en las cocinas, de noche, con las cifras de la casa delante. Quisimos que una familia sin matemáticas pudiera hacer lo esencial: escribir el problema verdadero, escribir sus opciones verdaderas, dibujar dónde decide ella y dónde decide el azar, y mirar la decisión en el papel antes de vivirla. Todo lo demás del método es refinamiento; eso es el corazón.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Última pregunta, profesor, la que le hago a todos mis invitados de una u otra manera. Después de toda una vida enseñando a decidir, ¿qué es decidir bien?</p>
+    <p class="lect-p"><strong>RAIFFA.</strong> Es haber merecido el resultado, aunque no llegue. El azar firma la última línea de casi todo lo que hacemos, y por eso mismo hay que escribir las líneas anteriores con el mayor cuidado posible: las ramas completas, las probabilidades honradas, el cruce localizado, la información comprada a su precio. Quien hizo eso y perdió, decidió bien, y tiene derecho a repetirlo sin vergüenza. Quien no lo hizo y ganó, que no se felicite mucho: la moneda no sabe su nombre y la próxima vez no se va a acordar de él.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Profesor Raiffa, ha sido un honor. Señoras y señores, les emplazamos para el próximo programa. Muy buenas noches.</p>
+  </div>
+
+  <div class="card ac-purple" id="lect-gala">
+    <h2>🌙 Lectura 5 · «El árbol que se dibuja de noche» (El Loco de la Colina: Jesús Quintero conversa con Antonio Gala)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una conversación IMAGINADA entre Jesús Quintero (San Juan del Puerto, Huelva, 1940 · 2022), el periodista de radio y televisión conocido como El Loco de la Colina, célebre por sus preguntas cortas y por sus silencios, y el escritor Antonio Gala (Brazatortas, Ciudad Real, 1930 · Córdoba, 2023), licenciado en Derecho por la Universidad de Sevilla, autor de «El manuscrito carmesí», Premio Planeta en 1990, y de la columna diaria «La tronera». Los dos existieron y de verdad se entrevistaron. El encuentro que aquí se lee no ocurrió: lo único inventado es la conversación, y toda obra, fecha y cifra que se les pone en la boca es real y comprobable. Los silencios van entre paréntesis, como acotación.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir esta conversación</button></div>
+    <p class="lect-p"><strong>QUINTERO.</strong> Antonio. (silencio) ¿Usted ha decidido alguna vez algo grande con un papel delante?</p>
+    <p class="lect-p"><strong>GALA.</strong> Una sola vez, y era la más grande de todas, y el papel no era mío: era el título de Derecho que saqué en Sevilla para sosiego de mi casa. Lo tuve delante una noche entera, Jesús, con la carrera de leyes esperándome a un lado como una novia formal, y al otro lado la literatura, que no promete nada y no ha cumplido a nadie. Decidí contra el papel y a pecho descubierto, sin dibujo ninguno, y pagué el precio muchos años. No me arrepiento de la decisión; me arrepiento de lo a ciegas que la tomé, que son dos arrepentimientos distintos y la gente los confunde.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Le traigo un dibujo, precisamente. Un profesor de Harvard, Howard Raiffa, publicó en 1968 un libro que enseña a dibujar las decisiones. Un cuadrado donde decide uno. Un círculo donde decide el azar. Y al final de cada rama, un número.</p>
+    <p class="lect-p"><strong>GALA.</strong> (silencio) Pues mire usted por dónde, Harvard ha llegado a donde estaba mi abuela. Porque eso lo decía ella sin cuadrados, con el rosario en la mano: hijo, separa lo que está en tu mano de lo que no lo está, y lo que no lo está, suéltalo. Lo que pasa es que la abuela lo decía y el profesor lo dibuja, y dibujarlo tiene una ventaja que la abuela no tenía: que el dibujo se queda quieto y le deja a uno verse. El cuadrado es del hombre, Jesús. El círculo es de Dios, o del azar, que para el caso del dibujo son el mismo caballero. Y la mitad de las desdichas que yo he visto vienen de gente arrodillada ante su círculo y con su cuadrado sin barrer.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Dicen que el árbol se resuelve al revés. De las hojas al tronco.</p>
+    <p class="lect-p"><strong>GALA.</strong> Como los poemas, que se escriben desde el último verso aunque nadie lo confiese. Y como la vejez, que es la única edad que lee la vida en esa dirección y por eso es la única que la entiende. Fíjese qué cosa tan poco natural le piden a uno: pararse en los finales, en todos los finales posibles, ponerle a cada uno su número, y venirse andando de vuelta, promediando donde manda el azar y eligiendo donde manda uno, hasta llegar al presente con la decisión ya hecha. Es antinatural, sí. También es antinatural lavarse las manos antes de operar, y conviene.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> ¿Y por qué una sola página, Antonio? Los que saben insisten: el árbol, en una página. Un árbol de tres páginas es una forma de no decidir.</p>
+    <p class="lect-p"><strong>GALA.</strong> Porque la frondosidad es un miedo con hojas. El que ramifica tres pliegos no está pensando: está construyéndose una espesura donde no se le vea no decidir, que es lo que de verdad quiere. Yo eso lo conozco del oficio, que en la prosa pasa igual: el que no sabe qué decir lo dice larguísimo. Una decisión de verdad tiene dos o tres ramas que importan, como una vida tiene dos o tres tardes que importan, y el trabajo honrado es encontrarlas y podar lo demás. La página única no es una comodidad, Jesús: es un examen de sinceridad.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Hay un número que llaman la probabilidad de cruce. El punto donde la decisión cambia de acera.</p>
+    <p class="lect-p"><strong>GALA.</strong> Explíquemelo usted, que lo trae estudiado.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> Si la decisión es la misma con treinta por ciento que con setenta, no vale la pena afinar la estimación. Si cruza en cincuenta y cinco, ahí está todo el trabajo.</p>
+    <p class="lect-p"><strong>GALA.</strong> (silencio) Eso es sabiduría de la fina, y se lo voy a decir con mi lengua. Hay dudas que no cambian nada: dude usted lo que quiera, que hará lo mismo con niebla que sin ella; a esas dudas no se les da ni un cuarto de hora, se decide y a dormir. Y hay una duda, a lo mejor una sola en todo el asunto, de la que cuelga la decisión entera. El dibujo sirve para eso: para saber cuál es cuál. Y cuando uno la encuentra, la regla es de pobre y por eso es buena: no se adivina lo que se puede preguntar. Una llamada al que ya recorrió ese camino. Un mes de prueba antes de firmar el año. Saber es baratísimo, Jesús, y adivinar es carísimo, y este país lleva siglos pagando la tarifa cara con mucho señorío.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio largo) ¿Y si el árbol dice una cosa y el corazón dice otra?</p>
+    <p class="lect-p"><strong>GALA.</strong> Entonces el árbol ya ha cumplido, porque le ha dicho a usted exactamente qué está comprando su corazón y a qué precio. Óigame bien esto, que es lo más serio que voy a decir esta noche: se puede decidir contra el árbol. Yo decidí contra el papel aquella noche de Sevilla y volvería a hacerlo. Lo que no se puede es decidir sin mirar el árbol, porque eso no es valentía, es ceguera con buena prensa. El día que me dieron el Planeta, en el noventa, por «El manuscrito carmesí», hubo quien dijo: qué suerte. Y yo pensé: la suerte firmó la última página, de acuerdo; las seiscientas anteriores las firmé yo, una por una, contra toda cuenta razonable y sabiendo lo que apostaba.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Se nos acaba la noche, Antonio.</p>
+    <p class="lect-p"><strong>GALA.</strong> Se nos acaba, y le dejo la imagen, que es lo mío. En mi jardín los árboles deciden solos: echan la rama hacia la luz sin consultarlo con nadie, y no se equivocan nunca porque no deciden nada. El nuestro es el único árbol que hay que dibujar, y hay que dibujarlo de noche, antes del salto, cuando todavía es de papel. Dibuje usted el suyo en una página, Jesús: cuadrados para lo que es suyo, círculos para lo que no lo fue nunca. Y cuando el círculo diga lo que quiera decir, que a usted lo encuentre con el cuadrado bien jugado, que es lo único que un hombre puede prometerse.</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-debate">
+    <h2>🥊 Lectura 6 · «¿El árbol entero o la regla simple?» (careo, con las dos posturas y sus réplicas)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Careo escrito por la casa sobre una disputa que existe de verdad dentro de las ciencias de la decisión, y que sigue abierta. No es una entrevista ni un pastiche: los turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas, precisamente para <strong>no poner palabras inventadas en boca de nadie</strong>. Los investigadores aparecen citados en tercera persona como fuentes, y toda obra, revista, fecha y cifra de dentro es real y comprobable. La defensa del árbol completo se apoya en Ronald Howard, que bautizó la disciplina («decision analysis», 1966), en Howard Raiffa («Decision Analysis», 1968) y en Hammond, Keeney y Raiffa («Smart Choices», 1999). La objeción es la del programa de las heurísticas rápidas y frugales de Gerd Gigerenzer: Green y Mehr («Journal of Family Practice», 1997), Wübben y Wangenheim («Journal of Marketing», 2008) y Gigerenzer y Brighton («Homo heuristicus», «Topics in Cognitive Science», 2009). El terreno común tiene su propio documento, escrito a cuatro manos por dos tradiciones rivales: Kahneman y Klein, «Conditions for Intuitive Expertise: A Failure to Disagree» («American Psychologist», 2009). La regla de la casa que manda aquí es la del acero antes del juicio: <strong>cada postura se escribe en su mejor versión</strong>, la que firmaría su mejor defensor, y no la que sería cómodo tumbar.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir este careo</button></div>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> La pregunta en disputa, una sola y escrita antes de empezar. Una familia tiene delante una decisión con azar dentro: firmar o no firmar, comprar o esperar, cambiar de rumbo o seguir. <strong>¿Decide mejor quien dibuja el árbol completo, con sus nodos, sus probabilidades estimadas y sus números en las hojas, o quien aplica una regla simple de dos o tres preguntas, sin estimar ninguna probabilidad?</strong> Nótese lo que no está en disputa: ninguna de las dos posturas defiende decidir por corazonada, por consigna o por miedo. Las dos exigen un procedimiento explícito, escrito antes del resultado. La pelea es sobre cuánto procedimiento.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> El árbol completo tiene medio siglo de oficio y hay que decir qué compra. Desde que Ronald Howard bautizó la disciplina en 1966 y Howard Raiffa publicó sus lecciones en 1968, el método hace tres cosas que ninguna regla simple hace. Primera: obliga a poner las creencias sobre la mesa. Las probabilidades del árbol serán imperfectas, pero están escritas, y lo escrito se puede discutir, corregir y auditar después; la regla simple también tiene supuestos, solo que los lleva escondidos dentro. Segunda: el árbol dice dónde importa el error, con la probabilidad de cruce. Si la decisión no cambia entre treinta y setenta por ciento, la imperfección de la estimación es inofensiva y se decide sin más trabajo; si cruza en cincuenta y cinco, el árbol señala con el dedo el único número que merece esfuerzo. Una regla simple no puede decir nada de eso, porque no tiene dónde mirarlo. Y tercera: del árbol sale el valor de la información, cuánto pagar por un piloto, una llamada o un mes de datos antes de comprometerse. Esa cuenta, que decide si conviene saber antes de firmar, no existe en el mundo de las reglas rápidas.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> Y el terreno donde el árbol es insustituible es exactamente el que más importa a una familia: la decisión grande que se toma una sola vez. Para validar una regla simple hacen falta muchos casos parecidos donde probarla; la venta de la casa, el préstamo grande, el giro del proyecto, no tienen muchos casos parecidos: tienen uno. Ahí no hay historial del que destilar una regla, y lo único disponible es pensar la estructura del problema: qué opciones hay de verdad, qué puede responder el mundo, qué deja cada historia completa. Eso es el árbol. Hammond, Keeney y Raiffa escribieron «Smart Choices» en 1999 precisamente para demostrar que ese trabajo cabe en una mesa de cocina, sin más matemática que multiplicar y comparar, y en una sola página.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> El programa de las heurísticas rápidas y frugales no opone la pereza al análisis: opone datos a datos. En 1997, Lee Green y David Mehr estudiaron un hospital rural de Míchigan donde los médicos, por miedo a equivocarse, mandaban a la unidad coronaria a casi todo paciente con dolor de pecho, con camas caras ocupadas por gente que no las necesitaba. La alternativa sofisticada era un instrumento estadístico con múltiples variables ponderadas. La alternativa frugal fue un árbol de tres preguntas, sin una sola probabilidad que estimar, y clasificó mejor que los médicos y compitió con el instrumento completo usando una fracción de la información. En 2008, Markus Wübben y Florian von Wangenheim mostraron en «Journal of Marketing» que los gerentes que clasifican clientes con la heurística del hiato, una sola pregunta, cuántos meses lleva este cliente sin comprar, igualan o superan a modelos estocásticos elaborados que las empresas pagan caros. No son anécdotas: son la regla en cierto tipo de mundo.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> Y hay teoría de por qué, que es lo que vuelve serio el programa. Gigerenzer y Brighton la resumieron en 2009 en «Homo heuristicus»: cuando los datos son pocos y el mundo es inestable, el modelo grande no aprende la señal, aprende el ruido, y el modelo pequeño, justamente por rígido, generaliza mejor. Menos puede ser más, no como consuelo sino como matemática. Ahora aplíquese al árbol de la familia: esas probabilidades de los círculos, ¿de dónde salieron? De la misma cabeza esperanzada que quiere firmar. Un árbol con probabilidades inventadas no es prudencia, es la corazonada de siempre disfrazada con decimales, y el disfraz es peligroso porque da confianza sin dar puntería. La regla simple, comprobada donde se pudo comprobar, es más honrada sobre lo que no se sabe: no lo estima, lo esquiva.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Las réplicas, cruzadas, empezando por la defensa.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> Tres cosas sobre esas victorias, que son reales. Primera: las dos son decisiones repetidas, miles de pacientes, miles de clientes, con historial abundante donde una regla se puede destilar y verificar; la decisión única y grande, que es donde el árbol se defiende, no aparece en esos estudios ni puede aparecer, porque no hay población de casos. Segunda: mírese lo que ganó en Míchigan: un árbol. Tres preguntas en orden, con sus ramas. La objeción no ha abandonado el dibujo, ha abandonado las probabilidades, y eso concede la mitad del pleito: pensar la estructura antes de decidir. Y tercera: la acusación de los números inventados tiene respuesta dentro del método, no fuera. La probabilidad de cruce existe precisamente porque las estimaciones son imperfectas: cuando la decisión no depende del número, el número imperfecto no daña; cuando depende, el método no manda estimar con más fe, manda <strong>comprar información</strong>, que es lo contrario de la arrogancia. El árbol bien usado es la herramienta más desconfiada de sí misma que hay en este oficio.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> Se concede que el árbol de Míchigan es un árbol, y la concesión corre en las dos direcciones: la regla de la única página, que la defensa predica, es el instinto frugal trabajando dentro del campo clásico; cuando la defensa poda ramas, está admitiendo que menos es más. Lo que no se concede es la frontera cómoda de que lo repetido es de las heurísticas y lo único es del árbol. En la decisión única y grande es donde las probabilidades están más inventadas que nunca, porque no hay historial ni para estimarlas, y el análisis hereda entera esa invención con apariencia de rigor. Para esa decisión también hay preguntas frugales escribibles de antemano: si sale mal, ¿la casa sigue en la mesa?; ¿esta oferta sobrevive a esperar treinta días?; ¿qué diría el que ya recorrió este camino? Un procedimiento así también se escribe antes, también se audita después, y no fabrica la falsa precisión que la defensa llama transparencia y que muchas veces es decoración.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> El terreno común, que es más ancho de lo que la pelea deja ver, y que en este caso tiene documento propio. En 2009, Daniel Kahneman, de la tradición que desconfía del juicio rápido, y Gary Klein, de la tradición que lo defiende, escribieron juntos «Conditions for Intuitive Expertise», con subtítulo confesado: «a failure to disagree», un fracaso en el intento de estar en desacuerdo. Su acuerdo sirve aquí casi entero: el juicio simple y rápido es confiable donde el entorno es estable y da retroalimentación pronta y clara, y deja de serlo donde el entorno es nuevo, cambiante o de resultado lejano. Trasladado a esta mesa: las dos posturas aceptan que la decisión se escribe antes del resultado; las dos aceptan que un árbol de tres páginas es una forma de no decidir, la una porque poda, la otra porque nunca dibujó tanto; las dos aceptan que la rama de la ruina manda sobre cualquier promedio; y las dos repartirían el trabajo de forma parecida: reglas simples y comprobadas para lo que se repite cada semana, estructura pensada despacio para lo que se firma una vez.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Lo que sigue en disputa, dicho sin adornos: en la decisión grande y única, con datos escasos, ¿añaden algo las probabilidades estimadas y su árbol completo sobre un procedimiento frugal bien elegido, o restan, por la confianza indebida que fabrican? Los estudios que cada lado exhibe no lo responden, porque miden decisiones repetidas con historial. Y el dato que lo resolvería: un cuerpo de decisiones únicas y grandes documentadas antes del resultado por los dos procedimientos a la vez, el árbol con sus números y la regla frugal con sus preguntas, seguidas después durante años, para ver no solo quién acertó más, sino quién se equivocó con menos estrago. Mientras ese cuerpo no exista, esta casa hace lo que las dos posturas firmarían: la regla simple para lo que se repite, el árbol de una página para lo que se firma una vez, y en los dos casos el papel escrito antes, que es el único juez que no llega tarde.</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🖨️ Todo esto se imprime</h2>
+    <p>Cada lectura sale con <strong>su texto y sus preguntas</strong>, y la pauta de esas preguntas va en su propia hoja al final, porque en esta casa las respuestas no se imprimen en la misma página que el ejercicio. Y las seis se pueden sacar juntas en un pliego, cada una arrancando en su hoja.</p>
+    <div class="tip">
+      <span class="ti">📖</span>
+      <div><strong>Las preguntas se contestan con el texto delante.</strong> No es un examen de memoria: es un examen de lectura, y por eso viven pegadas a su lectura y no en una batería al final, donde había que ir a buscar cuáles eran las de uno. Las de <strong>análisis complejo van sin XP a propósito</strong>: una respuesta abierta que se premia sola se contesta a la carrera.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego con las 54 preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📐 Por qué seis voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento convierte el concepto en <strong>una hoja doblada en cuatro y una tinta roja que se usa una sola vez</strong> (y en un agrimensor que gasta el coraje en los cuadrados y no discute con los círculos), el capítulo lo vuelve <strong>escena, risa y refrán</strong> (una mula, un chalán, una feria incierta y un árbol de carbón que la ventera manda dejar en la pared), y el ensayo lo pone a <strong>escala de especie</strong>, desde los hígados de carnero y el vuelo de los pájaros hasta el ajedrez leído al revés y los árboles de los hospitales. Las dos voces siguientes hacen lo que ni el cuento ni el ensayo pueden: la <strong>entrevista</strong> sienta al personaje real de la etapa, Howard Raiffa, frente a preguntas con su biografía delante, del Bronx de la Depresión al instituto de Viena, y así la etapa se aprende con su historia y con un pedazo de la historia de la televisión en español; y la <strong>conversación</strong> baja el tema al habla viva, de noche, entre dos andaluces que existieron: la noche de Sevilla en que Gala decidió contra el papel, la frondosidad que es un miedo con hojas. Y el <strong>careo</strong> hace lo que ninguna de las otras cinco puede hacer, porque las cinco cuentan <strong>una postura ya decidida</strong>: el agrimensor tiene razón, el bachiller gana la pared, el ensayo sabe cómo acaba, Raiffa contesta con su método delante y Gala remata con una imagen. El careo pone <strong>las dos caras de una disputa que sigue abierta</strong>, el árbol completo contra la regla simple, cada una escrita como la escribiría su mejor defensor, con sus réplicas y lo que cada lado le concede al otro, y termina diciendo <strong>qué dato la resolvería</strong>. Quien lee las seis sabe dibujar un árbol y resolverlo hacia atrás, sabe buscar su probabilidad de cruce y ponerle precio a la información, y también <strong>en qué punto exacto los que saben todavía no se han puesto de acuerdo</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión del Estudio Mayor lleva sus seis lecturas sobre el tema de la etapa: <span class="hl">cuento a la manera de Borges, capítulo a la manera de Cervantes, ensayo a la manera de Harari, la entrevista de la casa, la conversación del Loco de la Colina y el careo de las dos posturas</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista en los cinco primeros, la declaración de que <span class="hl2">los encuentros de las entrevistas nunca ocurrieron</span>, la etiqueta propia del careo, que no imita a nadie y firma sus turnos con papeles, y la regla de fondo en las seis: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>. En esta etapa la regla pesa doble, porque el árbol entero se sostiene sobre números escritos con honradez antes del resultado: una lectura que inventara una cifra para sonar convincente estaría haciendo exactamente lo que la etapa enseña a no hacer con las probabilidades de los círculos.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con el árbol de decisión explicado paso a paso: los nodos cuadrados donde decide la familia y los redondos donde decide el azar, la resolución hacia atrás de las hojas al tronco, la regla de la única página, la probabilidad de cruce y el valor de la información, los casos del proyecto, la <strong>hoja del árbol</strong> para dibujar decisiones a mano, ejercicios para lápiz, la hoja de fuentes con su etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-brujula-tres-atajos.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla del Estudio Mayor rige también aquí: <strong>ningún estudio entra sin su etiqueta</strong> (clásico sólido, clásico cuestionado, ciencia en disputa, divulgación con inflado). En esta materia la regla hace más falta que en ninguna, porque casi todo lo famoso está inflado.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Howard Raiffa (1968), «Decision Analysis: Introductory Lectures on Choices under Uncertainty», Addison-Wesley:</strong> las lecciones que fijaron el método de esta etapa: los nodos cuadrados y redondos, el número en cada hoja y la resolución hacia atrás, que Raiffa llamaba promediar y plegar. <strong>Clásico fundacional.</strong></li>
+      <li><strong>Hammond, Keeney y Raiffa (1999), «Smart Choices: A Practical Guide to Making Better Decisions», Harvard Business School Press:</strong> el mismo oficio contado para la mesa de una cocina, sin más matemática que multiplicar y comparar. <strong>Sólido y práctico</strong>, y la segunda fuente del compendio para esta etapa.</li>
+      <li><strong>Ronald Howard (1966), «Decision Analysis: Applied Decision Theory»:</strong> la ponencia de un congreso internacional de investigación operativa que le puso nombre a la disciplina entera. <strong>Fuente primaria del nombre</strong>, y conviene saber que la materia se bautizó en una ponencia y no en un libro.</li>
+      <li><strong>Raiffa y Schlaifer (1961), «Applied Statistical Decision Theory»:</strong> donde se calcula cuánto vale una información que todavía no se tiene, que es la cuenta detrás del piloto barato y de la llamada antes de firmar. <strong>Clásico</strong>, árido de leer; su idea central viaja en esta etapa sin fórmulas.</li>
+      <li><strong>Green y Mehr (1997), «Journal of Family Practice»:</strong> el hospital rural de Míchigan donde un árbol de tres preguntas, sin una sola probabilidad estimada, decidió el ingreso a la unidad coronaria compitiendo con un instrumento estadístico completo. <strong>Sólido</strong>, y la bandera del bando frugal del careo.</li>
+      <li><strong>Wübben y Wangenheim (2008), «Journal of Marketing»:</strong> la heurística del hiato: una sola pregunta iguala o supera a modelos elaborados al clasificar clientes activos. <strong>Sólido</strong>, del mismo bando.</li>
+      <li><strong>Gigerenzer y Brighton (2009), «Homo heuristicus», «Topics in Cognitive Science»:</strong> la teoría de por qué menos puede ser más cuando los datos son pocos y el mundo inestable. <strong>Ciencia en disputa</strong>: seria, publicada y discutida, y esa disputa es exactamente el careo de esta etapa.</li>
+      <li><strong>Kahneman y Klein (2009), «Conditions for Intuitive Expertise: A Failure to Disagree», «American Psychologist»:</strong> dos tradiciones rivales escribiendo juntas en qué entornos se puede confiar en el juicio simple y en cuáles no. <strong>Sólido</strong>, y el modelo de terreno común que el careo toma prestado.</li>
+      <li><strong>«El árbol da la respuesta correcta»:</strong> <strong>media verdad de manual.</strong> El árbol da la respuesta correcta a los números que se le escribieron; si la probabilidad de cruce queda cerca de la estimación, la respuesta vale lo que valga esa estimación, y eso el árbol no lo advierte solo. Se cita aquí como ejemplo de lo que el Estudio Mayor enseña a cazar.</li>
+      <li><strong>Las seis lecturas de esta misión:</strong> cinco ejercicios de estilo escritos por la casa (tres en homenaje a Borges, Cervantes y Harari, y dos entrevistas imaginadas: una con Howard Raiffa a la manera de Joaquín Soler Serrano, y una conversación entre Jesús Quintero y Antonio Gala) y un <strong>careo</strong>, «¿El árbol entero o la regla simple?», que no imita a nadie: sus turnos los firman los papeles y las personas reales se citan en tercera persona como fuentes. <strong>Los cinco primeros son pastiche declarado, no obra de esos autores</strong>, y los dos encuentros <strong>nunca ocurrieron</strong>. La erudición interna es real: Zermelo y el ajedrez leído al revés (1913), von Neumann y Morgenstern (1944), Raiffa y Schlaifer (1961), Ronald Howard y el bautizo de 1966, el «Decision Analysis» de 1968, Weinstein y Fineberg y el «Clinical Decision Analysis» (1980), el «Smart Choices» de 1999, la feria de Medina del Campo, y las señas de Howard Raiffa, Joaquín Soler Serrano y su «A fondo» (1976 a 1981), Jesús Quintero y Antonio Gala. Las fuentes propias del careo, que no aparecen en las otras cinco lecturas y por eso se listan aparte: Green y Mehr (1997), Wübben y Wangenheim (2008), Gigerenzer y Brighton (2009) y el terreno común de Kahneman y Klein (2009).</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba leyendo: se aprueba <strong>dibujando el árbol de una decisión real del proyecto en una sola página</strong>, antes de conocer el resultado.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-ESTUDIO-MAYOR.md">🎓 El compendio del Estudio Mayor</a>: las materias completas, con la Toma de decisiones y sus seis módulos.</li>
+      <li><a href="../../misiones/ruta-apuesta-san-petersburgo/san-petersburgo.html">🎲 San Petersburgo: lo que vale una apuesta</a>: la etapa 1 de esta ruta. De ahí vienen el valor esperado, sus dos límites y la regla de la ruina, que en el árbol se vuelven la cuenta de los círculos.</li>
+      <li><a href="../../misiones/ruta-espejo-vigia-timon/vigia-timon.html">🪞 El vigía y el timón</a>: la Metacognición. Allí se aprende a comprobar si uno de verdad sabe lo que cree saber, que es lo que hace falta para escribir una probabilidad honrada en un círculo.</li>
+      <li><a href="../../misiones/ruta-rojo-acero-juicio/acero-juicio.html">🥊 El acero antes del juicio</a>: de ahí sale la regla que gobierna el careo de esta etapa, la de escribir cada postura en su mejor versión antes de discutirla.</li>
+      <li><a href="../../misiones/epistemología/karl-popper.html">🦉 Karl Popper y la Epistemología</a>: someter las ideas a prueba. Un árbol dibujado antes es exactamente eso: un conjunto de predicciones que se pueden desmentir.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene en la Ruta de la Apuesta Medida, con sus seis etapas.</li>
+      <li><a href="../../fichas/ficha-brujula-tres-atajos.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la hoja del árbol, para dibujar a lápiz y guardar con fecha.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar <strong>una decisión real del proyecto</strong> (una oferta, un gasto grande, un cambio de rumbo de M.E.T.A.S) y dibujarla en una página: cuadrados donde decide la familia, círculos donde decide el azar, un número en lempiras al final de cada rama, y la resolución hacia atrás, de las hojas al tronco. La prueba de que está aprendida es <strong>encontrar la probabilidad de cruce de ese árbol y decir qué información la movería y cuánto costaría conseguirla</strong>.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🏺</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta de la Apuesta Medida · Etapa 2: El árbol antes del salto</div>
+    <div class="diploma-mascot" aria-hidden="true">🏺</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🏺</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Se juzga por cómo se decidió, no por cómo cayó el dado» 🌱 · 🌳 Ruta de la Apuesta Medida · Etapa 2 de 6.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/tres-atajos.js"></script>
+  <!-- El aparato de lecturas va ANTES del marcador: pliega los seis textos y les
+       mete sus preguntas dentro, y el marcador necesita el documento ya montado
+       para saber cuáles son sus zonas subrayables. -->
+  <script src="../../js/lecturas.js"></script>
+  <script src="../../js/lecturas-marcador.js"></script>
+</body>
+</html>

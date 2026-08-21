@@ -142,6 +142,34 @@ escriben a mano. Tres sondas de la Casa Cerrada esperaban una, dos y tres
 etapas construidas; la ruta creció a cuatro y las tres suspendían sin que
 hubiera nada roto.
 
+## Qué misión se construye después: se nivela, no se profundiza
+
+**Acordado con el autor el 20 de agosto de 2026.** El Estudio Mayor son 28
+rutas y 177 etapas, y va muy desigual: cuando se fijó esta regla había 15
+construidas, cinco de ellas en una sola ruta, y **21 de las 28 rutas en cero**.
+
+La regla es: **la siguiente misión es la etapa 1 de una ruta que esté en cero**,
+hasta que ninguna quede muerta en el mapa. Profundizar la ruta que ya va por la
+quinta etapa cuesta lo mismo y deja el mapa igual de desequilibrado; abrir una
+ruta nueva convierte una materia inexistente en una materia empezada.
+
+Las cuentas **se sacan del catálogo**, nunca de memoria:
+
+```
+node -e "const fs=require('fs');const s=fs.readFileSync('js/data/misiones.js','utf8');
+const g={};new Function('g','with(g){'+s+'; g.M=MISSIONS; g.R=RUTAS;}')(g);
+Object.entries(g.R).filter(([k,r])=>r.color==='mayor')
+  .map(([k,r])=>({k,m:r.materia,n:g.M.filter(x=>x.ruta===k).length,t:r.etapas}))
+  .sort((a,b)=>a.n-b.n).forEach(f=>console.log(f.n+'/'+f.t, f.m, '|', f.k));"
+```
+
+Y **quien construya recomienda la siguiente** al terminar, con esa cuenta
+delante y agrupando por afinidad: entre las que están en cero se prefiere la
+que se apoya en lo ya construido (las falacias y la lógica del argumento se
+sostienen sobre la toma de decisiones; la geopolítica y la economía política
+dialogan con la crítica al capitalismo). Nivelar no es repartir al azar: es
+abrir puertas que la casa ya puede cruzar.
+
 ## Sellar la versión en cada cambio
 
 El aparato guarda la aplicación en caché y se queda con la versión vieja.

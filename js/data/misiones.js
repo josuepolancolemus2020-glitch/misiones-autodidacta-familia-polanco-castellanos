@@ -152,6 +152,7 @@ const MISSIONS = [
   { id: 39, title: 'La regla de Hebb, bien contada: lo que el eslogan borró', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🏺', ruta: 'barro', etapa: 1, sello: 'familiar', url: 'misiones/ruta-barro-regla-hebb/regla-hebb.html' },
   { id: 40, title: 'San Petersburgo: lo que vale una apuesta', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🎲', ruta: 'apuesta', etapa: 1, sello: 'familiar', url: 'misiones/ruta-apuesta-san-petersburgo/san-petersburgo.html' },
   { id: 41, title: 'El árbol antes del salto: la oferta puesta en el papel', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🌳', ruta: 'apuesta', etapa: 2, sello: 'familiar', url: 'misiones/ruta-apuesta-arbol-salto/arbol-salto.html' },
+  { id: 42, title: 'Tres atajos generan el zoológico: de dónde salen los doscientos sesgos', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🧭', ruta: 'brujula', etapa: 1, sello: 'familiar', url: 'misiones/ruta-brujula-tres-atajos/tres-atajos.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -245,7 +246,7 @@ const ETAPAS_PREVISTAS = {
     6: "El músculo que no existía",
   },
   brujula: {
-    1: "Tres atajos generan el zoológico",
+    /* La 1 ya no se anuncia: está construida (ver MISSIONS). */
     2: "Dos velocidades: metáfora, no anatomía",
     3: "El abogado del ambiente",
     4: "Ruido: el error que nadie mira",
