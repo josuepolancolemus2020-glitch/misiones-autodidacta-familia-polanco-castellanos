@@ -59,7 +59,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 
 /* HERO */
 .hero{position:relative;z-index:10;padding:0.6rem 1.2rem 0.8rem;background:linear-gradient(90deg,#2b2a66 0%,#3b3a86 50%,#b8860b 100%);color:white;overflow:hidden;}
-.hero::before{content:'FALSACIÓN · CONJETURA · REFUTACIÓN · SOCIEDAD ABIERTA · RACIONALISMO CRÍTICO · TOLERANCIA · DEMARCACIÓN · FALIBILISMO · CISNE NEGRO · VIENA · LONDRES';position:absolute;top:0;left:-10%;width:120%;height:100%;font-family:'Fredoka',sans-serif;font-size:0.9rem;font-weight:600;letter-spacing:0.06em;color:rgba(255,255,255,0.15);white-space:nowrap;overflow:hidden;display:flex;align-items:center;animation:drift 28s linear infinite;pointer-events:none;}
+.hero::before{content:'QUÉ PAPEL HACE FALTA · QUIÉN LO EMITE · HASTA CUÁNDO VALE · VIGENCIA · AVAL DEL DISTRITO · OFICINA EMISORA · RECOMENDAR NO ES EMITIR · PRIMERO PREGUNTAR · SIN CITAR ARTÍCULOS · EL TALLER SIN PAPEL';position:absolute;top:0;left:-10%;width:120%;height:100%;font-family:'Fredoka',sans-serif;font-size:0.9rem;font-weight:600;letter-spacing:0.06em;color:rgba(255,255,255,0.15);white-space:nowrap;overflow:hidden;display:flex;align-items:center;animation:drift 28s linear infinite;pointer-events:none;}
 @keyframes drift{0%{transform:translateX(0)}100%{transform:translateX(-30%)}}
 .hero::after{display:none;}
 .hero-inner{display:flex;align-items:center;justify-content:center;gap:0.6rem;}

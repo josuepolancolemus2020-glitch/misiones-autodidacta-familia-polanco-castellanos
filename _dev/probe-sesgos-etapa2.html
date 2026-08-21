@@ -105,8 +105,13 @@ window.addEventListener('load', async () => {
     const casa = cards.find(c => /Ruta de la Persuasión/.test(c.textContent));
     ok(!!casa, 'la Ruta de la Persuasión está en el mapa', 'no aparece la ruta');
     if (casa) {
-      ok(casa.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + casa.querySelectorAll('.re-link').length);
-      ok(casa.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + casa.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que hubiera
+         nada roto. Salió a la luz el día que estrenó veredicto en el título. */
+      const construidasR = wa.eval('MISSIONS.filter(m => m.ruta === "persuasion").length');
+      const totalR = wa.eval('RUTAS.persuasion.etapas');
+      ok(casa.querySelectorAll('.re-link').length === construidasR, 'con sus ' + construidasR + ' etapas construidas ya tocables', 'etapas tocables: ' + casa.querySelectorAll('.re-link').length + ', construidas: ' + construidasR);
+      ok(casa.querySelectorAll('.ruta-etapa-futura').length === totalR - construidasR, 'y el resto por construir, con nombre', 'futuras: ' + casa.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalR - construidasR));
       ok(/Sesgos: los atajos que deciden por ti/.test(casa.textContent), 'la etapa 2 sale con el título de la misión', 'la etapa 2 sigue saliendo como prevista');
       ok(/Marcos: quien pone el marco/i.test(casa.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -116,13 +121,17 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      const enMateria = wa.eval('MISSIONS.filter(m => m.materia === "psi").length');
+      ok(tarjetas.length === enMateria, 'la materia muestra sus ' + enMateria + ' misiones', 'muestra ' + tarjetas.length);
       const sesgos = tarjetas.find(t => /Sesgos/.test(t.textContent));
       ok(!!sesgos && /🔒/.test(sesgos.textContent), 'la misión de sesgos lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); }
+  /* El veredicto va en el título porque es lo que se lee al correr las sondas
+     en tanda: un cuerpo verde con la pestaña de siempre sale como no aprobada. */
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Persuasión etapa 2';
 });
 </script>
 </body>

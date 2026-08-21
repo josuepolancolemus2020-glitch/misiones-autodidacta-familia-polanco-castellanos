@@ -87,7 +87,7 @@ const NOTA = () => ({
   const w = f.contentWindow, d = w.document;
   if (w.eval('typeof initRedaccion') !== 'function') {
     log('✘ index.html no cargó js/tools/redaccion.js');
-    log('RESULTADO: SUSPENDE'); document.title = 'SONDA-SUSPENDE'; return;
+    log('RESULTADO: SUSPENDE'); document.title = 'SUSPENDE · redacción: no perder texto'; return;
   }
   d.getElementById('login-screen').style.display = 'none';
   d.getElementById('app-container').style.display = '';
@@ -287,11 +287,11 @@ const NOTA = () => ({
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
-  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+  document.title = fallos === 0 ? 'APRUEBA · redacción: no perder texto' : 'SUSPENDE · redacción: no perder texto';
 })().catch(e => {
   log('✘ la sonda reventó: ' + (e && e.message));
   log('RESULTADO: SUSPENDE');
-  document.title = 'SONDA-SUSPENDE';
+  document.title = 'SUSPENDE · redacción: no perder texto';
 });
 </script>
 </body>

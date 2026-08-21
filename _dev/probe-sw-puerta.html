@@ -41,7 +41,12 @@ window.addEventListener('load', async () => {
     const usos = (src.match(/sePuedeGuardar\(/g) || []).length;
     ok(usos >= 3, 'se usa al instalar y al servir (' + usos + ' apariciones)', 'se define pero casi no se usa');
     ok(!/cache\.addAll\(/.test(src), 'ya no usa cache.addAll a ciegas', 'sigue usando addAll, que no mira lo que guarda');
-    ok(/CACHE_NAME = 'faro-app-v4'/.test(src), 'la versión del caché subió, así se tira lo envenenado de antes', 'no subió CACHE_NAME: lo ya guardado seguiría ahí');
+    /* El número no se escribe a mano: esta comprobación exigía la v4 literal
+       (la versión del día del arreglo) y suspendía desde la v40 sin que nada
+       estuviera roto. Lo que importa es que la versión sea POSTERIOR al
+       envenenamiento, que se arregló en la v4. */
+    const mVer = src.match(/CACHE_NAME = 'faro-app-v(\d+)'/);
+    ok(!!mVer && Number(mVer[1]) >= 4, 'la versión del caché (' + (mVer ? 'v' + mVer[1] : 'sin versión') + ') es posterior al arreglo del envenenamiento (v4)', 'no subió CACHE_NAME: lo ya guardado seguiría ahí');
 
     /* Se extrae la función tal cual está escrita en sw.js y se ejecuta */
     const m = src.match(/function sePuedeGuardar[\s\S]*?\n\}/);
@@ -91,7 +96,9 @@ window.addEventListener('load', async () => {
     ok(/\u2014/.test('a\u2014b'), 'la regla del guion largo sí detecta uno de verdad', 'la regla está rota y aprobaría siempre');
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+    /* El veredicto va en el título: en tanda solo se lee la pestaña. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · sw puerta';
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · sw puerta'; }
 });
 </script>
 </body>

@@ -86,6 +86,8 @@ window.addEventListener('load', async () => {
 
   log('');
   log(fallos ? `✖ ${fallos} fallo(s)` : '✅ TODO EN VERDE: las 30 formas funcionan en el navegador.');
+  /* El veredicto va al título: es lo que se lee al correr las sondas en tanda. */
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · palancas evaluación';
 });
 </script>
 </body>

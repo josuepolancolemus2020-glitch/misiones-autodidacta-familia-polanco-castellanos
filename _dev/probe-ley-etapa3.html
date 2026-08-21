@@ -206,8 +206,13 @@ window.addEventListener('load', async () => {
     const ley = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Ley y sus Grietas/.test(c.textContent));
     ok(!!ley, 'la Ruta de la Ley está en el mapa', 'no aparece la ruta');
     if (ley) {
-      ok(ley.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + ley.querySelectorAll('.re-link').length);
-      ok(ley.querySelectorAll('.ruta-etapa-futura').length === 9, 'y 9 etapas por construir con nombre', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que
+         hubiera nada roto (la lección de la Casa Cerrada, en CLAUDE.md). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "ley").length');
+      const totalCat = wa.eval('RUTAS.ley.etapas');
+      ok(ley.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + ley.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(ley.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + ley.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/Los derechos y la coletilla/.test(ley.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
       ok(/La grieta/i.test(ley.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
       ok(!/Etapa por construir/.test(ley.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');
@@ -218,7 +223,8 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      const enMateriaCat = wa.eval('MISSIONS.filter(m => m.materia === "ley").length');
+      ok(tarjetas.length === enMateriaCat, 'la materia muestra sus ' + enMateriaCat + ' misiones', 'muestra ' + tarjetas.length);
       const t = tarjetas.find(x => /coletilla/i.test(x.textContent));
       ok(!!t && /🔒/.test(t.textContent), 'la misión lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }

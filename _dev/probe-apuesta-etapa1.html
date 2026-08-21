@@ -398,8 +398,11 @@ window.addEventListener('load', async () => {
     ok(!!ruta, 'la Ruta de la Apuesta Medida está en el mapa', 'no aparece la ruta');
     if (ruta) {
       ok(/Toma de decisiones/.test(ruta.textContent), 'con su materia a la vista', 'la tarjeta no dice la materia');
-      ok(ruta.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
-      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 5, 'y 5 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas del CATÁLOGO, no a mano (la lección de la Casa Cerrada). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "apuesta").length');
+      const totalCat = wa.eval('RUTAS.apuesta.etapas');
+      ok(ruta.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/San Petersburgo: lo que vale una apuesta/.test(ruta.textContent), 'la etapa 1 sale con el título de la misión', 'la etapa 1 no sale con su título');
       ok(/El árbol antes del salto/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
       ok(!/Etapa por construir/.test(ruta.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');

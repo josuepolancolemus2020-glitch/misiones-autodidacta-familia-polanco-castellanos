@@ -54,7 +54,8 @@ f.onload = async () => {
     log('\n── MAPA DE RUTAS ──');
     w.switchView('view-rutas'); await esperar(300);
     const cards = d.querySelectorAll('.ruta-card');
-    ok(cards.length === 38, '38 rutas en el mapa (10 del adulto, la Ley y las 28 del Estudio Mayor)', 'rutas: ' + cards.length);
+    const totalRutas = w.eval('Object.keys(RUTAS).length');
+    ok(cards.length === totalRutas, 'las ' + totalRutas + ' rutas del catálogo están en el mapa', 'rutas: ' + cards.length + ' de ' + totalRutas);
     /* El Estudio Mayor entero se declaró antes de construirse (como la Ley):
        el mapa tiene que enseñar cada ruta con todas sus etapas tituladas. */
     const pantalla = [...cards].find(c => /Ruta de la Pantalla Leída/.test(c.textContent));

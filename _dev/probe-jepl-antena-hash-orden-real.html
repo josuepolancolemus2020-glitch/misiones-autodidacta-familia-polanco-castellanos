@@ -126,6 +126,33 @@ window.addEventListener('load', async () => {
         + ' | _sb: ' + (b.data.session ? b.data.session.user.email : 'ninguna'));
   } catch (e) { log('  error: ' + e.message); }
 
+  /* Veredicto en el titulo: en tanda solo se lee la pestaña. Los registros de
+     arriba no se tocan; aqui se juzga lo que la sonda existe para vigilar:
+     un solo cliente, que un correo de FUERA de la casa no abra la aplicacion
+     aunque traiga un token valido, y que cerrar sesion cierre tambien el
+     cliente de datos. */
+  let fallos = 0;
+  const ok = (c, bien, mal) => { if (c) log('  ✔ ' + bien); else { fallos++; log('  ✘ ' + mal); } };
+  log('');
+  log('── veredicto ──');
+  let mismo = false;
+  try { mismo = eval('typeof _sb !== "undefined" && _sb === window.faroSb'); } catch (e) {}
+  ok(mismo, 'un solo cliente para toda la casa', 'hay dos clientes o chat.js no cargo');
+  ok(document.getElementById('app-container').style.display === 'none',
+     'el correo de fuera no abrio la aplicacion', 'la aplicacion se abrio con un correo de fuera de la casa');
+  /* Si _mapearSesion no esta expuesta no se puede juzgar; expuesta, el ajeno
+     tiene que dar null. */
+  ok(!window._mapearSesion || window._mapearSesion({ user: { email: 'ajeno@gmail.com' } }) === null,
+     'un correo ajeno no mapea a nadie de la familia', 'un correo ajeno mapea a alguien de la familia');
+  let cerrado = false;
+  try {
+    const a2 = await window.faroSb.auth.getSession();
+    const b2 = await eval('_sb').auth.getSession();
+    cerrado = !a2.data.session && !b2.data.session;
+  } catch (e) {}
+  ok(cerrado, 'tras cerrarSesion no queda sesion en ningun cliente', 'quedo una sesion viva tras cerrarSesion');
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · orden real';
+
   out.textContent = window.__L.join('\n');
 });
 </script>

@@ -126,12 +126,16 @@ qué ruta cayó.
 
 ## Las sondas declaran su veredicto en el título
 
-Cada sonda termina poniendo **APRUEBA** o **SUSPENDE** en `document.title`.
+Cada sonda termina poniendo **APRUEBA** o **SUSPENDE** en `document.title`,
+con el veredicto DELANTE (el rótulo viejo «SONDA-APRUEBA» ya se retiró).
 No es decoración: es lo que se lee al correrlas en tanda. Once sondas
-antiguas no lo hacían (decían «todo en orden» en su cuerpo y dejaban la
-pestaña con el título de siempre), así que salían como no aprobadas sin
-tener un solo fallo, y eso enseña a desconfiar del resultado en vez de del
-código.
+antiguas no lo hacían, y en la auditoría del 20 de agosto de 2026
+aparecieron **veintinueve más**; hoy lo hacen las sesenta y ocho. La
+única excepción es `probe-alto-util.html`, que no es una sonda sino un
+instrumento de medida y se titula INSTRUMENTO. Dos sondas
+(`probe-tiempos-push-sesion` y `probe-verif-dosclientes-reales`) hablan
+con el Supabase real y por eso SUSPENDEN en las sesiones de Claude Code,
+donde el proxy bloquea `supabase.co`: en el aparato del autor aprueban.
 
 Y las cuentas que dependen del catálogo **se sacan del catálogo**, no se
 escriben a mano. Tres sondas de la Casa Cerrada esperaban una, dos y tres

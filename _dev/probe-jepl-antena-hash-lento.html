@@ -56,6 +56,19 @@ window.addEventListener('load', async () => {
   log('sesion del cliente de datos (_sb): ' + ses);
   log('claves en localStorage: ' + Object.keys(localStorage).join(', '));
   log('verificarSesion(): ' + JSON.stringify(window.verificarSesion()));
+
+  /* Veredicto en el titulo: en tanda solo se lee la pestaña. Lo que esta
+     sonda vigila es el caso pesimista del revisor: que el cliente de datos,
+     aun cargando MUCHO despues de que auth.js recogiera el token del hash,
+     siga viendo esa misma sesion. Los registros de arriba no se tocan; aqui
+     solo se cuentan. */
+  let fallos = 0;
+  const ok = (c, bien, mal) => { if (c) log('  ✔ ' + bien); else { fallos++; log('  ✘ ' + mal); } };
+  log('');
+  log('── veredicto ──');
+  ok(window.__userCalls >= 1, 'auth.js recogio el token del enlace magico', 'nadie recogio el token del hash');
+  ok(ses === 'josue@gmail.com', 'el cliente de datos ve la sesion aunque llegue tarde', 'el cliente de datos no ve la sesion: ' + ses);
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · cliente de datos tardio';
   document.getElementById('out').textContent = window.__L.join('\n');
 });
 </script>

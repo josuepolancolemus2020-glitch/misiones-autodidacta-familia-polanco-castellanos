@@ -66,6 +66,17 @@ function log(s){ L.push(s); out.textContent = L.join('\n'); }
       ? '>>> push llega ANTES que la sesion: _pushCurrentMember() ve verificarSesion()=null'
       : '>>> la sesion llega ANTES que push: _pushCurrentMember() ve la sesion buena');
   log('margen = ' + Math.abs(tPush - tSesion).toFixed(1) + ' ms');
+
+  /* El veredicto va al título: es lo que se lee al correr las sondas en tanda.
+     Quién llega antes es la MEDIDA, no un fallo: suspende solo lo que impide
+     medir (librería sin cargar, ramas sin resolver o sesión sembrada perdida). */
+  let fallos = 0;
+  if (!(window.supabase && window.supabase.createClient)) fallos++;
+  if (tSesion === null || tPush === null) fallos++;
+  if (quienSesion !== 'jael') fallos++;
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · tiempos push y sesion';
+  log('');
+  log(fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden');
 })();
 </script>
 </body></html>

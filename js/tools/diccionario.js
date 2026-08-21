@@ -5,7 +5,7 @@
 
    El corrector de reglas caza errores de norma (tildes con historia,
    dequeísmo, «haber» impersonal…), pero un error de tecleo cualquiera
-   —«conveza» por «convenza», «filosfía» por «filosofía»— no es de
+   («conveza» por «convenza», «filosfía» por «filosofía») no es de
    norma: es una palabra que NO EXISTE. Para cazarlo hace falta saber
    qué palabras existen. Eso es este módulo.
 

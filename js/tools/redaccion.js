@@ -386,8 +386,8 @@ function redPendingSave(map) {
 
    Así se perdió un artículo el 5 de agosto: un guardado que falló dejó su
    copia aquí, después se siguió escribiendo con conexión y esa copia vieja
-   se quedó olvidada en el aparato. A la siguiente recarga —la que uno hace
-   justo cuando algo va mal— se reenviaba a la nube encima del texto nuevo.
+   se quedó olvidada en el aparato. A la siguiente recarga (la que uno hace
+   justo cuando algo va mal) se reenviaba a la nube encima del texto nuevo.
    El trabajo de la noche sustituido por el de una hora antes, sin un aviso.
 
    Ahora se pregunta primero qué hay en la nube y solo sube lo que de verdad
@@ -1004,18 +1004,18 @@ function redPintarEnvio(m, fotos) {
 
     <div class="red-buz-sub">Quién lo manda</div>
     <div class="red-buz-datos">
-      <div><b>Nombre</b><span>${redEsc(m.nombre || '—')}</span></div>
+      <div><b>Nombre</b><span>${redEsc(m.nombre || '·')}</span></div>
       ${m.cargo ? `<div><b>Es</b><span>${redEsc(m.cargo)}</span></div>` : ''}
       ${m.lugar ? `<div><b>De</b><span>${redEsc(m.lugar)}</span></div>` : ''}
       ${(m.escuela && m.clase !== 'aulas') ? `<div><b>Centro</b><span>${redEsc(m.escuela)}</span></div>` : ''}
-      <div><b>Teléfono</b><span>${redEsc(m.tel || '—')}</span></div>
+      <div><b>Teléfono</b><span>${redEsc(m.tel || '·')}</span></div>
       ${m.correo ? `<div><b>Correo</b><span>${redEsc(m.correo)}</span></div>` : ''}
-      <div><b>Aceptó</b><span>Los requisitos ${redEsc(m.etica_version || '—')}</span></div>
+      <div><b>Aceptó</b><span>Los requisitos ${redEsc(m.etica_version || '·')}</span></div>
     </div>
 
     <div class="red-buz-verifica">
       <b>Antes de publicar:</b> llama al lector y confirma lo que cuenta. Y si
-      señala a alguien —una persona o una institución— hay que darle la
+      señala a alguien (una persona o una institución) hay que darle la
       oportunidad de dar su versión: eso es lo que separa una nota de un rumor
       impreso. Al lector se le dijo, en la misma pantalla en la que escribió
       esto, que se le podría contactar para conocer más detalles.
@@ -1072,7 +1072,7 @@ function redPintarEnvio(m, fotos) {
 
 /* El lector puede corregir lo suyo desde su pantalla, con su folio y
    su teléfono. Cuando lo hace, el envío vuelve a la cola como sin leer
-   —para que quien ya lo hubiera leído lo lea otra vez— pero eso solo
+   (para que quien ya lo hubiera leído lo lea otra vez) pero eso solo
    no basta: quien lo leyó el lunes tiene los datos viejos en la cabeza
    y va a llamar a preguntar por algo que el texto ya no dice. Así que
    se avisa, y con la fecha delante. */
@@ -1155,7 +1155,7 @@ async function redBuzonANota(m, cuantasFotos) {
   const firma = [m.nombre, m.cargo, m.lugar].filter(Boolean).join(', ');
   const cuerpo =
     redEsc(m.texto || '').replace(/\n/g, '<br>') +
-    (firma ? `<br><br><b>— ${redEsc(firma)}</b>` : '');
+    (firma ? `<br><br><b>· ${redEsc(firma)}</b>` : '');
 
   const fila = {
     edicion_id: abierta ? abierta.id : null,
@@ -1830,7 +1830,7 @@ function redGuiaRender() {
 
 /* ── Recuperar lo que no llegó a la nube ───────────────────────────
    Al abrir una nota se compara lo que vino de la nube con la última copia
-   local. Si la de aquí es más nueva y distinta, se dice —no se aplica
+   local. Si la de aquí es más nueva y distinta, se dice, no se aplica
    sola: el texto es del autor, la decisión también. */
 
 function redVersionRecuperable() {
@@ -2277,7 +2277,7 @@ function redNotaMd(n) {
   // no tiene por qué saberse cada norma de memoria.
   const estilo = redEstiloInfo(redEstiloDeNota(n.id));
   const etiqueta = estilo
-    ? ` *(formato ${estilo.nombre}${estilo.orden === 'alfabetico' ? ' — ordénalas alfabéticamente al maquetar' : ''})*`
+    ? ` *(formato ${estilo.nombre}${estilo.orden === 'alfabetico' ? ': ordénalas alfabéticamente al maquetar' : ''})*`
     : '';
   const refs = citas.length
     ? `\n**Referencias**${etiqueta}\n` + citas.map(c =>
@@ -2526,8 +2526,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('red-cita-quitar-btn')?.addEventListener('click', redQuitarCita);
 
   // Pegar siempre como texto plano (evita arrastrar estilos de otras apps),
-  // CON una excepción: si lo copiado trae marcas de cita —reordenar párrafos
-  // propios con cortar y pegar— se reconstruyen texto y marcas, nada más.
+  // CON una excepción: si lo copiado trae marcas de cita (reordenar párrafos
+  // propios con cortar y pegar) se reconstruyen texto y marcas, nada más.
   // Sin esto, mover un párrafo destruía sus citas: el corte se llevaba el
   // <sup> con su referencia y el pegado devolvía un [2] de texto muerto.
   cuerpoEl?.addEventListener('paste', e => {

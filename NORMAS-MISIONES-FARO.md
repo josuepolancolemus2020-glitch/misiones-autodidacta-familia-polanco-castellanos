@@ -680,6 +680,14 @@ sonda la lee con `getComputedStyle(hero, '::before')`, que es la única
 manera de verla. Lección general: **lo que no está en el texto también se
 copia**, y lo que ninguna sonda mira, tarde o temprano miente.
 
+**Segunda vuelta, 20 de agosto de 2026.** La banda de Popper no estaba en
+tres misiones: estaba en **veinticuatro más**, todas las rutas del adulto
+y los dos módulos de autocapacitación, porque el molde viajó de misión en
+misión con la banda dentro. Cada una lleva ya la suya, y la sonda de
+enlaces y catálogo lee ahora la banda de las cuarenta de una pasada y
+**suspende si dos misiones comparten banda**: el duplicado, que es la
+huella del arrastre, ya no puede volver a pasar inadvertido.
+
 ## 6. La ficha va en diez páginas, y llenas
 
 **Norma nueva, pedida por el autor el 26 de julio de 2026.** Toda ficha de

@@ -75,6 +75,10 @@ window.addEventListener('load', async () => {
 
   log('');
   log(fallos ? `✖ ${fallos} fallo(s)` : '✅ TODO EN VERDE: palancas y colores arreglados.');
+  /* El veredicto va en el título porque las sondas se corren en tanda y ahí
+     solo se lee la pestaña: un cuerpo verde con el título de siempre cuenta
+     como no aprobada. */
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · arreglos 26-jul';
 });
 </script>
 </body>

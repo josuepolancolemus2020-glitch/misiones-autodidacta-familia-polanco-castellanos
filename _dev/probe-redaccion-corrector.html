@@ -37,7 +37,7 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
   const w = f.contentWindow, d = w.document;
   if (w.eval('typeof corAnalizar') !== 'function') {
     log('✘ index.html no cargó js/tools/corrector.js');
-    log('RESULTADO: SUSPENDE'); document.title = 'SONDA-SUSPENDE'; return;
+    log('RESULTADO: SUSPENDE'); document.title = 'SUSPENDE · redacción: corrector'; return;
   }
   d.getElementById('login-screen').style.display = 'none';
   d.getElementById('app-container').style.display = '';
@@ -306,11 +306,11 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
-  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+  document.title = fallos === 0 ? 'APRUEBA · redacción: corrector' : 'SUSPENDE · redacción: corrector';
 })().catch(e => {
   log('✘ la sonda reventó: ' + (e && e.message));
   log('RESULTADO: SUSPENDE');
-  document.title = 'SONDA-SUSPENDE';
+  document.title = 'SUSPENDE · redacción: corrector';
 });
 </script>
 </body>

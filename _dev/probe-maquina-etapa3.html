@@ -140,8 +140,13 @@ window.addEventListener('load', async () => {
     const ia = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Máquina que Predice/.test(c.textContent));
     ok(!!ia, 'la Ruta de la Máquina que Predice está en el mapa', 'no aparece la ruta');
     if (ia) {
-      ok(ia.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + ia.querySelectorAll('.re-link').length);
-      ok(ia.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + ia.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que
+         hubiera nada roto (la lección de la Casa Cerrada, en CLAUDE.md). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "maquina").length');
+      const totalCat = wa.eval('RUTAS.maquina.etapas');
+      ok(ia.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + ia.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(ia.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + ia.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/Verificar/.test(ia.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
       ok(/La IA que programa/i.test(ia.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -151,13 +156,16 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      const enMateriaCat = wa.eval('MISSIONS.filter(m => m.materia === "ia").length');
+      ok(tarjetas.length === enMateriaCat, 'la materia muestra sus ' + enMateriaCat + ' misiones', 'muestra ' + tarjetas.length);
       const ver = tarjetas.find(t => /verificar/i.test(t.textContent));
       ok(!!ver && /🔒/.test(ver.textContent), 'la misión de verificar lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
+    /* El veredicto va al título: es lo que se lee al correr las sondas en tanda. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · máquina etapa 3';
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+  } catch (e) { document.title = 'SUSPENDE · máquina etapa 3'; log('✘ ' + e.message + '\n' + e.stack); }
 });
 </script>
 </body>

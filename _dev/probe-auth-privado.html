@@ -165,7 +165,10 @@ window.addEventListener('load', async () => {
     ok(!/PIN incorrecto/i.test(err ? err.textContent : ''), 'ya no habla de PIN', 'el mensaje sigue hablando del PIN');
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+    /* El veredicto va en el título: al correr las sondas en tanda solo se lee
+       la pestaña, y una que no lo declara sale como no aprobada sin fallar. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · auth privado';
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · auth privado'; }
 });
 </script>
 </body>

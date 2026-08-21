@@ -82,34 +82,47 @@ window.toast = function(m){ log('    toast(): «' + m + '»'); };
 
 <script>
 window.addEventListener('load', async () => {
+  /* Contador de veredicto: cada condición que ya se imprimía suma aquí si
+     falla, sin cambiar lo que se comprueba ni lo que se escribe en el cuerpo. */
+  let fallos = 0;
+  if (!(window.supabase && window.supabase.createClient)) fallos++;
   log('supabase-js real: ' + !!(window.supabase && window.supabase.createClient));
   log('');
   log('══ 1 · ¿son el mismo cliente? ══');
   log('  window.faroSb (auth.js) === _sb (chat.js): ' + (window.faroSb === _sb));
+  if (window.faroSb !== _sb) fallos++;
   log('');
 
   log('══ 2 · entrar de verdad por iniciarSesion() de auth.js ══');
   const ok = await iniciarSesion('jael', 'contrasena-correcta');
   log('  iniciarSesion → ' + ok);
+  if (!ok) fallos++;
   const s = verificarSesion();
   log('  verificarSesion() → ' + JSON.stringify(s));
+  if (!s) fallos++;
   log('  claves en localStorage: ' + JSON.stringify(Object.keys(localStorage)));
   const a1 = await window.faroSb.auth.getSession();
   const a2 = await _sb.auth.getSession();
   log('  cliente de AUTH  ve sesion: ' + (a1.data.session ? 'SI · '+a1.data.session.user.email : 'NO'));
   log('  cliente de DATOS ve sesion: ' + (a2.data.session ? 'SI · '+a2.data.session.user.email : 'NO'));
+  if (!a1.data.session) fallos++;
+  if (!a2.data.session) fallos++;
   log('');
 
   log('══ 3 · la aplicacion trabajando, con la sesion iniciada ══');
   await chatSendMessage('hola familia');           // js/chat.js, funcion real
   const inv = await _sb.from('inventario').select('*').order('nombre');
   log('  inventario: filas=' + ((inv.data||[]).length) + '  error=' + (inv.error ? inv.error.code : 'ninguno'));
+  if (inv.error) fallos++;
   const des = await _sb.from('destellos').select('*');
   log('  destellos:  filas=' + ((des.data||[]).length) + '  error=' + (des.error ? des.error.code : 'ninguno'));
+  if (des.error) fallos++;
   const notas = await _sb.from('redaccion_notas').select('*');
   log('  redaccion:  filas=' + ((notas.data||[]).length) + '  error=' + (notas.error ? notas.error.code : 'ninguno'));
+  if (notas.error) fallos++;
   const push = await _sb.from('push_subscriptions').upsert({ endpoint:'x' });
   log('  push upsert: error=' + (push.error ? push.error.code : 'ninguno'));
+  if (push.error) fallos++;
   log('');
   log('══ 4 · registro de peticiones vistas por el servidor ══');
   REG.forEach(r => log('  ' + r));
@@ -118,8 +131,12 @@ window.addEventListener('load', async () => {
   const inv2 = await window.faroSb.from('inventario').select('*');
   log('  ' + REG[REG.length-1]);
   log('  error=' + (inv2.error ? inv2.error.code : 'ninguno'));
+  if (inv2.error) fallos++;
   log('');
-  log('FIN');
+  log('FIN' + (fallos ? ' · ' + fallos + ' fallos' : ''));
+  /* El veredicto va en el título porque es lo que se lee al correr las sondas
+     en tanda: un cuerpo verde con la pestaña de siempre sale como no aprobada. */
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · dos clientes reales';
 });
 </script>
 </body>

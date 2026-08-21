@@ -196,7 +196,7 @@ function siembra(base){
 
   if (w.eval('typeof initRedaccion') !== 'function') {
     log('✘ index.html no cargó js/tools/redaccion.js');
-    document.title = 'SONDA-SUSPENDE'; return;
+    document.title = 'SUSPENDE · buzón del lector'; return;
   }
   w.confirm = () => true;
   const base = nuevaBase(w, {});
@@ -375,11 +375,11 @@ function siembra(base){
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
-  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+  document.title = fallos === 0 ? 'APRUEBA · buzón del lector' : 'SUSPENDE · buzón del lector';
 })().catch(e => {
   log('✘ la sonda reventó: ' + (e && e.message));
   log('RESULTADO: SUSPENDE');
-  document.title = 'SONDA-SUSPENDE';
+  document.title = 'SUSPENDE · buzón del lector';
 });
 </script>
 </body>

@@ -146,8 +146,13 @@ window.addEventListener('load', async () => {
     const cib = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Casa Cerrada/.test(c.textContent));
     ok(!!cib, 'la Ruta de la Casa Cerrada está en el mapa', 'no aparece la ruta');
     if (cib) {
-      ok(cib.querySelectorAll('.re-link').length === 4, 'con sus etapas 1 a 4 ya tocables', 'etapas tocables: ' + cib.querySelectorAll('.re-link').length);
-      ok(cib.querySelectorAll('.ruta-etapa-futura').length === 2, 'y 2 etapas por construir con nombre', 'futuras: ' + cib.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que
+         hubiera nada roto (la lección de la Casa Cerrada, en CLAUDE.md). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "casacerrada").length');
+      const totalCat = wa.eval('RUTAS.casacerrada.etapas');
+      ok(cib.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + cib.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(cib.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + cib.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/Llaves y secretos/.test(cib.textContent), 'la etapa 4 sale con el título de la misión', 'la etapa 4 sigue saliendo como prevista');
       ok(/Copias y desastre/i.test(cib.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -157,7 +162,8 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 4, 'la materia muestra sus cuatro misiones', 'muestra ' + tarjetas.length);
+      const enMateriaCat = wa.eval('MISSIONS.filter(m => m.materia === "cib").length');
+      ok(tarjetas.length === enMateriaCat, 'la materia muestra sus ' + enMateriaCat + ' misiones', 'muestra ' + tarjetas.length);
       const lla = tarjetas.find(t => /llaves/i.test(t.textContent));
       ok(!!lla && /🔒/.test(lla.textContent), 'la misión de las llaves lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }

@@ -124,8 +124,13 @@ window.addEventListener('load', async () => {
     const marca = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Marca/.test(c.textContent));
     ok(!!marca, 'la Ruta de la Marca está en el mapa', 'no aparece la ruta');
     if (marca) {
-      ok(marca.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + marca.querySelectorAll('.re-link').length);
-      ok(marca.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + marca.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que hubiera
+         nada roto. Salió a la luz el día que estrenó veredicto en el título. */
+      const construidasR = wa.eval('MISSIONS.filter(m => m.ruta === "marca").length');
+      const totalR = wa.eval('RUTAS.marca.etapas');
+      ok(marca.querySelectorAll('.re-link').length === construidasR, 'con sus ' + construidasR + ' etapas construidas ya tocables', 'etapas tocables: ' + marca.querySelectorAll('.re-link').length + ', construidas: ' + construidasR);
+      ok(marca.querySelectorAll('.ruta-etapa-futura').length === totalR - construidasR, 'y el resto por construir, con nombre', 'futuras: ' + marca.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalR - construidasR));
       ok(/La oferta: qué se entrega y a qué precio/.test(marca.textContent), 'la etapa 2 sale con el título de la misión', 'la etapa 2 sigue saliendo como prevista');
       ok(/El relato: contar el proyecto sin inflarlo/i.test(marca.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -135,13 +140,16 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      const enMateria = wa.eval('MISSIONS.filter(m => m.materia === "mkt").length');
+      ok(tarjetas.length === enMateria, 'la materia muestra sus ' + enMateria + ' misiones', 'muestra ' + tarjetas.length);
       const of = tarjetas.find(t => /qué se entrega y a qué precio/i.test(t.textContent));
       ok(!!of && /🔒/.test(of.textContent), 'la misión de la oferta lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
+    /* El veredicto va al título: es lo que se lee al correr las sondas en tanda. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · marca etapa 2';
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+  } catch (e) { document.title = 'SUSPENDE · marca etapa 2'; log('✘ ' + e.message + '\n' + e.stack); }
 });
 </script>
 </body>

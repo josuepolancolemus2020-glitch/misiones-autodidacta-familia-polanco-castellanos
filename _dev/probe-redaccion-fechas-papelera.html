@@ -386,11 +386,11 @@ function siembra(base){
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
-  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+  document.title = fallos === 0 ? 'APRUEBA · redacción: fechas y papelera' : 'SUSPENDE · redacción: fechas y papelera';
 })().catch(e => {
   log('✘ la sonda reventó: ' + (e && e.message));
   log('RESULTADO: SUSPENDE');
-  document.title = 'SONDA-SUSPENDE';
+  document.title = 'SUSPENDE · redacción: fechas y papelera';
 });
 </script>
 </body>

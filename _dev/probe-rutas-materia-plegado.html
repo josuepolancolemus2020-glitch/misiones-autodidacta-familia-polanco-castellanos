@@ -80,9 +80,10 @@ f.onload = async () => {
       const cards = [...d.querySelectorAll('.ruta-card')];
 
       log('── NOMBRE DE LA MATERIA EN CADA RUTA ──');
-      ok(cards.length === 38, 'las 38 rutas siguen en el mapa', 'rutas: ' + cards.length);
+      const totalRutas = w.eval('Object.keys(RUTAS).length');
+      ok(cards.length === totalRutas, 'las ' + totalRutas + ' rutas del catálogo siguen en el mapa', 'rutas: ' + cards.length + ' de ' + totalRutas);
       const sinRotulo = cards.filter(c => !rotulo(c));
-      ok(sinRotulo.length === 0, 'las 38 tarjetas traen su nombre de materia',
+      ok(sinRotulo.length === 0, 'todas las tarjetas traen su nombre de materia',
         sinRotulo.length + ' sin rótulo: ' + sinRotulo.map(c => (c.querySelector('.ruta-nombre')||{}).textContent).join(', '));
 
       /* El caso que pidió el autor por su nombre. */

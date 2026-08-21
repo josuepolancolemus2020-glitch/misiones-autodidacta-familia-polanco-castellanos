@@ -31,14 +31,14 @@ function loadProgress(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));i
 
 // ===================== ACHIEVEMENTS =====================
 const ACHIEVEMENTS={
-  primer_quiz:{icon:'🧠',label:'Primer quiz del panorama superado'},
+  primer_quiz:{icon:'🧠',label:'Primer quiz del frontend superado'},
   flash_master:{icon:'🃏',label:'Todos los términos técnicos explorados'},
   clasif_pro:{icon:'🗂️',label:'Clasificador de capas del sistema experto'},
   id_master:{icon:'🔍',label:'Identificador de piezas maestro'},
-  reto_hero:{icon:'🏆',label:'Héroe del reto rápido local vs nube'},
+  reto_hero:{icon:'🏆',label:'Héroe del reto rápido index vs satélite'},
   nivel3:{icon:'🔨',label:'¡Constructor! Nivel 3'},
   nivel5:{icon:'⚙️',label:'¡Ingeniero del Sistema! Nivel 6'},
-  widgets_master:{icon:'🧩',label:'Widgets del panorama dominados'}
+  widgets_master:{icon:'🧩',label:'Widgets del frontend dominados'}
 };
 function unlockAchievement(id){if(unlockedAch.includes(id))return;unlockedAch.push(id);sfx('ach');showToast(ACHIEVEMENTS[id].icon+' ¡Logro desbloqueado! '+ACHIEVEMENTS[id].label);launchConfetti();renderAchPanel();saveProgress();}
 function renderAchPanel(){const list=document.getElementById('achList');list.innerHTML='';Object.entries(ACHIEVEMENTS).forEach(([id,a])=>{const div=document.createElement('div');div.className='ach-item'+(unlockedAch.includes(id)?'':' locked');div.innerHTML=`<span class="ach-icon">${a.icon}</span><span>${a.label}</span>`;list.appendChild(div);});}
@@ -307,10 +307,10 @@ function updateLabDisplay(){const data=parteData[labParte];const asp=data[labAsp
 
 // ===================== DIPLOMA =====================
 function _diplPct(){return xp>=MXP?100:Math.round((xp/MXP)*100);}
-function openDiploma(){sfx('fan');const pct=_diplPct();document.getElementById('diplPct').textContent=pct+'%';document.getElementById('diplBar').style.width=pct+'%';document.getElementById('diplDate').textContent='Fecha: '+new Date().toLocaleDateString('es-HN',{year:'numeric',month:'long',day:'numeric'});const msgs=['¡Sigue estudiando tu sistema!','¡Muy buen trabajo!','¡Excelente arquitecto en formación!','¡Dominas el panorama de M.E.T.A.S!','¡Maestro del Panorama Técnico!'];document.getElementById('diplMsg').textContent=msgs[Math.min(Math.floor(pct/25),4)];const stars=['⭐','⭐⭐','⭐⭐⭐'];document.getElementById('diplStars').textContent=stars[Math.min(Math.floor(pct/40),2)];const achTxt=unlockedAch.map(id=>ACHIEVEMENTS[id].icon+' '+ACHIEVEMENTS[id].label).join(' · ');document.getElementById('diplAch').textContent=achTxt||'Sigue completando secciones para desbloquear logros';document.getElementById('diplomaOverlay').classList.add('open');launchConfetti();}
+function openDiploma(){sfx('fan');const pct=_diplPct();document.getElementById('diplPct').textContent=pct+'%';document.getElementById('diplBar').style.width=pct+'%';document.getElementById('diplDate').textContent='Fecha: '+new Date().toLocaleDateString('es-HN',{year:'numeric',month:'long',day:'numeric'});const msgs=['¡Sigue estudiando tu sistema!','¡Muy buen trabajo!','¡Excelente arquitecto en formación!','¡Dominas el frontend de M.E.T.A.S!','¡Maestro del Frontend!'];document.getElementById('diplMsg').textContent=msgs[Math.min(Math.floor(pct/25),4)];const stars=['⭐','⭐⭐','⭐⭐⭐'];document.getElementById('diplStars').textContent=stars[Math.min(Math.floor(pct/40),2)];const achTxt=unlockedAch.map(id=>ACHIEVEMENTS[id].icon+' '+ACHIEVEMENTS[id].label).join(' · ');document.getElementById('diplAch').textContent=achTxt||'Sigue completando secciones para desbloquear logros';document.getElementById('diplomaOverlay').classList.add('open');launchConfetti();}
 function closeDiploma(){document.getElementById('diplomaOverlay').classList.remove('open');}
 function updateDiplomaName(v){document.getElementById('diplName').textContent=v||'Estudiante';}
-function shareWA(){const name=document.getElementById('diplName').textContent||'Estudiante';const pct=_diplPct();const msg='🏗️ ¡'+name+' completó el Módulo 1 de Autocapacitación M.E.T.A.S (Panorama técnico)! 🏅 Progreso: '+pct+'% · ⚙️ policastsapien.com';window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');}
+function shareWA(){const name=document.getElementById('diplName').textContent||'Estudiante';const pct=_diplPct();const msg='🏗️ ¡'+name+' completó el Módulo 2 de Autocapacitación M.E.T.A.S (El frontend)! 🏅 Progreso: '+pct+'% · ⚙️ policastsapien.com';window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');}
 async function captureDiploma(){if(typeof html2canvas==='undefined'){showToast('⚠️ Cargando... intenta de nuevo');return;}sfx('click');const card=document.querySelector('.diploma-card');const btn=document.querySelector('.diploma-actions .btn-pri');const toHide=[card.querySelector('.diploma-input'),card.querySelector('.diploma-actions'),card.querySelector('hr')];if(btn){btn.disabled=true;btn.textContent='⏳ Capturando...';}toHide.forEach(el=>{if(el)el.style.display='none';});let dataUrl='';try{const canvas=await html2canvas(card,{scale:2,useCORS:true,backgroundColor:'#ffffff'});toHide.forEach(el=>{if(el)el.style.display='';});dataUrl=canvas.toDataURL('image/png');const name=(document.getElementById('diplName').textContent||'Estudiante').replace(/\s+/g,'-');const fileName='constancia-'+name+'.png';const cap=window.Capacitor;if(cap&&cap.isNativePlatform&&cap.isNativePlatform()&&cap.Plugins?.Filesystem&&cap.Plugins?.Share){const base64Data=dataUrl.split(',')[1];const result=await cap.Plugins.Filesystem.writeFile({path:fileName,data:base64Data,directory:'CACHE'});await cap.Plugins.Share.share({url:result.uri,dialogTitle:'Guardar / Compartir Constancia'});}else{const a=document.createElement('a');a.href=dataUrl;a.download=fileName;a.click();}}catch(e){toHide.forEach(el=>{if(el)el.style.display='';});if(e.name!=='AbortError')showToast('⚠️ No se pudo guardar la constancia');}finally{if(btn){btn.disabled=false;btn.textContent='📷 Guardar foto';}}}
 
 // ===================== INIT =====================

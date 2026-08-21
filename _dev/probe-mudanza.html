@@ -84,7 +84,9 @@ window.addEventListener('load', async () => {
 
     w.localStorage.clear();
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+    /* El veredicto va en el título: en tanda solo se lee la pestaña. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · mudanza';
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · mudanza'; }
 });
 </script>
 </body>

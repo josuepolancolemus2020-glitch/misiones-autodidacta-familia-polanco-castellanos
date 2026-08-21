@@ -139,8 +139,11 @@ window.addEventListener('load', async () => {
     const eco = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta del Poder$/m.test((c.querySelector('.ruta-nombre') || {}).textContent || ''));
     ok(!!eco, 'la Ruta del Poder está en el mapa', 'no aparece la ruta');
     if (eco) {
-      ok(eco.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + eco.querySelectorAll('.re-link').length);
-      ok(eco.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + eco.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas del CATÁLOGO, no a mano (la lección de la Casa Cerrada). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "poder").length');
+      const totalCat = wa.eval('RUTAS.poder.etapas');
+      ok(eco.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + eco.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(eco.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + eco.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/La deuda por dentro/.test(eco.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
       ok(/Del salario al activo/i.test(eco.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -156,7 +159,10 @@ window.addEventListener('load', async () => {
     }
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); }
+  /* El veredicto va en el título porque es lo que se lee al correr las sondas
+     en tanda: un cuerpo verde con la pestaña de siempre sale como no aprobada. */
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Poder etapa 3';
 });
 </script>
 </body>

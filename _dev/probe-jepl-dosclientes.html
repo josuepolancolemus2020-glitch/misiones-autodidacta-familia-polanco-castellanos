@@ -17,7 +17,7 @@ window.fetch = async (input, init) => {
 };
 
 (async () => {
-  if (!window.supabase || !window.supabase.createClient) { log('NO cargo supabase-js'); return; }
+  if (!window.supabase || !window.supabase.createClient) { log('NO cargo supabase-js'); document.title = 'SUSPENDE · dos clientes'; return; }
   log('supabase-js cargado');
 
   // igual que js/auth.js
@@ -56,6 +56,19 @@ window.fetch = async (input, init) => {
     const quien = c.auth === 'Bearer '+jwt ? 'JWT DE SESION' : (c.auth === 'Bearer '+KEY ? 'CLAVE PUBLICABLE (rol anon)' : c.auth);
     log('peticion ' + c.url.split('/rest/')[1] + '  Authorization=' + quien);
   }
+  /* Veredicto en el titulo: en tanda solo se lee la pestaña. Esta sonda es un
+     experimento: APRUEBA cuando REPRODUCE el fallo que justifica la regla del
+     cliente unico (dos clientes creados por separado no comparten sesion y el
+     de datos sale con la clave publicable, o sea como rol anon). Si eso deja
+     de reproducirse, o la sonda quedo rota o supabase-js cambio de conducta,
+     y en ambos casos hay que mirarla. */
+  let fallos = 0;
+  if (authSb === sb) fallos++;
+  if (!(a.data.session && !b.data.session)) fallos++;
+  const rest = capturado.filter(c => (c.url || '').includes('/rest/'));
+  if (!rest.some(c => c.auth === 'Bearer ' + KEY)) fallos++;
+  if (!rest.some(c => c.auth === 'Bearer ' + jwt)) fallos++;
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · dos clientes';
   log('FIN');
-})().catch(e=>log('EXCEPCION '+e));
+})().catch(e=>{ log('EXCEPCION '+e); document.title = 'SUSPENDE · dos clientes'; });
 </script>

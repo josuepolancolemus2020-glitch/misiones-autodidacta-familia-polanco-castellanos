@@ -1,4 +1,4 @@
-function compartirMision(){const url=window.location.href;const texto='📈 *Ruta de la Marca · Etapa 2* 📈\n\nQué se entrega, qué no se incluye y a qué precio, con los ocho casos del proyecto. 🏷️\n\n_Incluye evaluación conceptual y el relato que se sostiene._ ✍️\n\n🔗 *Enlace:* '+url;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
+function compartirMision(){const url=window.location.href;const texto='📈 *Ruta de la Marca · Etapa 3* 📈\n\nContar el proyecto sin inflarlo: hecho comprobable contra frase inflada, con los ocho casos del proyecto. 📣\n\n_Incluye evaluación conceptual y el relato que se sostiene._ ✍️\n\n🔗 *Enlace:* '+url;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
 function toggleLetra(){document.body.classList.toggle('letra-grande');if(typeof sfx==='function')sfx('click');localStorage.setItem('preferenciaLetra',document.body.classList.contains('letra-grande'));}
 window.addEventListener('DOMContentLoaded',()=>{if(localStorage.getItem('preferenciaLetra')==='true')document.body.classList.add('letra-grande');});
 

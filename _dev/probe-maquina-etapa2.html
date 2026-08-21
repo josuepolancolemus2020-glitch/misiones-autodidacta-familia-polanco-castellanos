@@ -130,11 +130,17 @@ window.addEventListener('load', async () => {
     log('\n── EN LA APLICACIÓN ──');
     const da = appFrame.contentDocument, wa = appFrame.contentWindow;
     wa.switchView('view-rutas'); await esperar(400);
+    /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano ya se
+       quedaron viejas una vez (esperaban dos construidas y la ruta creció a
+       tres) y esta sonda suspendía sin que hubiera nada roto. Salió a la luz
+       el día que estrenó veredicto en el título. */
+    const construidasMaq = wa.eval('MISSIONS.filter(m => m.ruta === "maquina").length');
+    const totalMaq = wa.eval('RUTAS.maquina.etapas');
     const maq = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Máquina que Predice/.test(c.textContent));
     ok(!!maq, 'la Ruta de la Máquina que Predice está en el mapa', 'no aparece la ruta');
     if (maq) {
-      ok(maq.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + maq.querySelectorAll('.re-link').length);
-      ok(maq.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + maq.querySelectorAll('.ruta-etapa-futura').length);
+      ok(maq.querySelectorAll('.re-link').length === construidasMaq, 'con sus ' + construidasMaq + ' etapas construidas ya tocables', 'etapas tocables: ' + maq.querySelectorAll('.re-link').length + ', construidas: ' + construidasMaq);
+      ok(maq.querySelectorAll('.ruta-etapa-futura').length === totalMaq - construidasMaq, 'y el resto por construir, con nombre', 'futuras: ' + maq.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalMaq - construidasMaq));
       ok(/Pedir bien: el encargo, el contexto y el ejemplo/.test(maq.textContent), 'la etapa 2 sale con el título de la misión', 'la etapa 2 sigue saliendo como prevista');
       ok(/Verificar: nadie firma lo que no leyó/i.test(maq.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -144,13 +150,15 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      ok(tarjetas.length === construidasMaq, 'la materia muestra sus ' + construidasMaq + ' misiones', 'muestra ' + tarjetas.length);
       const pb = tarjetas.find(t => /el encargo, el contexto y el ejemplo/i.test(t.textContent));
       ok(!!pb && /🔒/.test(pb.textContent), 'la misión de pedir bien lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
+    /* El veredicto va al título: es lo que se lee al correr las sondas en tanda. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · máquina etapa 2';
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+  } catch (e) { document.title = 'SUSPENDE · máquina etapa 2'; log('✘ ' + e.message + '\n' + e.stack); }
 });
 </script>
 </body>

@@ -19,6 +19,8 @@
    Uso:  /_dev/probe-alto-util.html?h=257   y contar las páginas del PDF. */
 const h = new URLSearchParams(location.search).get('h') || '257';
 document.write(`<div class="bloque" style="height:${h}mm">bloque de ${h} mm</div>`);
+/* No aprueba ni suspende: es un instrumento de medida, el veredicto lo da quien cuenta las páginas del PDF. */
+document.title = 'INSTRUMENTO · alto útil de una carta';
 </script>
 </body>
 </html>

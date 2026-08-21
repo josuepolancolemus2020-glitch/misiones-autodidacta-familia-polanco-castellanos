@@ -52,6 +52,11 @@ setTimeout(() => {
   log('VEREDICTO: ' + (datos === auth
     ? 'un solo cliente: la sesion viaja en todas las consultas'
     : 'DOS clientes distintos y con distinta llave de sesion; el de datos nunca ve la sesion de Supabase Auth -> todas sus consultas van como rol anon'));
+  /* El veredicto tambien va en el titulo: en tanda solo se lee la pestaña.
+     Aprueba solo si hay UN cliente y de verdad existe, que es lo unico que
+     esta sonda mide; si auth.js no llego a crear ninguno, tampoco vale. */
+  const fallos = (auth && datos === auth) ? 0 : 1;
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · cliente de datos';
 }, 300);
 </script>
 </body></html>

@@ -84,7 +84,7 @@ function msugAbierta(s) { return s.estado === 'nuevo' || s.estado === 'leido'; }
    Aquí eso no es teórico y se comprobó en un navegador antes de
    escribir esto. Lo que se pinta en esta bandeja lo escribió alguien de
    la calle: la puerta de entrada está abierta a anónimos a propósito
-   —para que un niño pueda avisar de una errata sin tener cuenta— y la
+   (para que un niño pueda avisar de una errata sin tener cuenta) y la
    clave publicable va en el código de M.E.T.A.S, que lee cualquiera, así
    que mandar una fila a mano es trivial. Si su JavaScript llegara a
    correr aquí, correría DENTRO de F.A.R.O y con la sesión de la familia
@@ -94,13 +94,13 @@ function msugAbierta(s) { return s.estado === 'nuevo' || s.estado === 'leido'; }
    justo lo único que se puede hacer con ella.
 
    Es la misma comilla, y por la misma razón, que ya lleva redEsc en
-   js/tools/redaccion.js. Allí se descubrió por las buenas —una comilla
-   en el nombre de una sección truncaba un value=""—; aquí habría sido
+   js/tools/redaccion.js. Allí se descubrió por las buenas (una comilla
+   en el nombre de una sección truncaba un value=""); aquí habría sido
    por las malas.
 
    Aun con esto, en este archivo NINGÚN dato de la base se interpola
-   dentro de un atributo. El único que lo necesitaba —la dirección de la
-   misión— se comprueba con msugEnlace y se pone con setAttribute.
+   dentro de un atributo. El único que lo necesitaba (la dirección de la
+   misión) se comprueba con msugEnlace y se pone con setAttribute.
    Cinturón y tirantes, porque una sola de las dos cosas se olvida. */
 function msugEsc(s) {
   const div = document.createElement('div');
@@ -110,8 +110,8 @@ function msugEsc(s) {
 
 /* La dirección para ir a mirar el error, y solo si es de verdad un
    camino: empieza por una barra y no trae comillas, espacios, ángulos
-   ni barras invertidas. Lo que no lo sea se descarta entero —se pierde
-   el botón de esa fila y nada más—, porque una dirección rara en una
+   ni barras invertidas. Lo que no lo sea se descarta entero (se pierde
+   el botón de esa fila y nada más), porque una dirección rara en una
    sugerencia no es un despiste: es alguien probando.
 
    El servidor hace la misma comprobación antes de guardar. Se hace en
@@ -352,7 +352,7 @@ function msugPintarDetalle(s) {
     ${desfase}
 
     <div class="msug-det-bloque">
-      <div class="msug-det-fila"><span>🚀 Misión</span><strong>${msugEsc(s.mision_titulo || s.mision || '—')}</strong></div>
+      <div class="msug-det-fila"><span>🚀 Misión</span><strong>${msugEsc(s.mision_titulo || s.mision || '·')}</strong></div>
       ${s.seccion ? `<div class="msug-det-fila"><span>📍 Sección</span><strong>${msugEsc(MSUG_SECCIONES[s.seccion] || s.seccion)}</strong></div>` : ''}
       <div class="msug-det-fila"><span>📅 Llegó</span><strong>${msugFechaLarga(s.creado_at)}</strong></div>
     </div>
@@ -363,7 +363,7 @@ function msugPintarDetalle(s) {
       ${s.escuela ? `<div class="msug-det-fila"><span>🏫 Escuela</span><strong>${msugEsc(s.escuela)}</strong></div>` : ''}
       ${s.docente ? `<div class="msug-det-fila"><span>🧑‍🏫 Maestro</span><strong>${msugEsc(s.docente)}</strong></div>` : ''}
       ${s.codigo_aula ? `<div class="msug-det-fila"><span>🔑 Aula</span><strong>${msugEsc(s.codigo_aula)}</strong></div>` : ''}
-      <div class="msug-det-fila"><span>📱 Aparato</span><strong>${msugEsc(s.dispositivo || '—')}</strong></div>
+      <div class="msug-det-fila"><span>📱 Aparato</span><strong>${msugEsc(s.dispositivo || '·')}</strong></div>
     </div>
 
     ${enlace ? `<a class="msug-det-ir" id="msug-det-ir" target="_blank" rel="noopener">
@@ -434,7 +434,7 @@ function msugCerrarDetalle() {
 }
 
 /* El contador de la portada, sin abrir la herramienta. Es una consulta
-   de solo contar —no se baja ni una fila— para que la portada no
+   de solo contar (no se baja ni una fila) para que la portada no
    arrastre la bandeja entera cada vez que se abre la aplicación. */
 async function msugContarSinAbrir() {
   const b = document.getElementById('msug-badge');

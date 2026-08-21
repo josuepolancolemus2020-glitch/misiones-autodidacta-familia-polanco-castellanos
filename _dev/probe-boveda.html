@@ -348,7 +348,11 @@ window.addEventListener('load', async () => {
         + (avisos ? '  ·  ' + avisos + ' avisos' : '')
         + (sinJuzgar ? '  ·  ' + sinJuzgar + ' sin juzgar (falta el archivo)' : '')
         + (saltados ? '  ·  ' + saltados + ' saltados' : ''));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+    /* El veredicto va en el título: solo los fallos suspenden. Avisos, saltados
+       y sin juzgar se leen en el cuerpo, pero en tanda lo que cuenta es la
+       pestaña. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · bóveda';
+  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); document.title = 'SUSPENDE · bóveda'; }
 });
 </script>
 </body>

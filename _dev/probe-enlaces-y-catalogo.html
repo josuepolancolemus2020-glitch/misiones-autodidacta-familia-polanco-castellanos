@@ -122,6 +122,35 @@ const internos = (html, base) => [...html.matchAll(/(?:href|src)="([^"#][^"]*)"/
   ok(rotosF.length === 0, 'los ' + pedidosF.length + ' archivos que piden las fichas existen',
      rotosF.length + ' rotos: ' + rotosF.slice(0, 6).join(' · '));
 
+  log('\n── LA BANDA DEL ENCABEZADO ES DE CADA MISIÓN (norma 5-ter) ──');
+  /* La banda vive en un ::before del CSS: no está en el texto de la página y
+     por eso ninguna sonda la vio arrastrarse. Primero desde Popper a tres
+     misiones del Estudio Mayor, y el 20 de agosto de 2026 salió que estaba
+     además en VEINTICUATRO misiones de las rutas del adulto. Esta comprobación
+     lee el css de las cuarenta y caza el duplicado para siempre: si dos
+     misiones comparten banda, una la copió sin escribir la suya. */
+  /* `paginas` trae la URL completa (con origen), así que el css se deriva
+     sobre ella misma y no se re-codifica: la carpeta con tilde ya viene
+     codificada de new URL(). */
+  const cssMision = u => u.replace(/([^/]+)\.html$/, (t, base) => 'css/' + base + '.css');
+  const bandas = await enTandas(paginas, 8, async u => {
+    const nombre = decodeURIComponent(u.split('/').slice(-2)[0]);
+    try {
+      const r = await fetch(cssMision(u), { cache: 'no-store' });
+      if (!r.ok) return { nombre, banda: null };
+      const css = await r.text();
+      const m = css.match(/\.hero::before\s*\{\s*content:\s*'([^']+)'/);
+      return { nombre, banda: m ? m[1] : null };
+    } catch (e) { return { nombre, banda: null }; }
+  });
+  const sinBanda = bandas.filter(b => !b.banda).map(b => b.nombre);
+  ok(sinBanda.length === 0, 'las ' + bandas.length + ' misiones traen su banda en el hero', 'sin banda: ' + sinBanda.join(', '));
+  const porBanda = {};
+  bandas.filter(b => b.banda).forEach(b => { (porBanda[b.banda] = porBanda[b.banda] || []).push(b.nombre); });
+  const repetidas = Object.entries(porBanda).filter(([k, v]) => v.length > 1);
+  ok(repetidas.length === 0, 'ninguna banda está repetida entre misiones',
+    repetidas.map(([k, v]) => v.join(' y ') + ' comparten «' + k.slice(0, 40) + '…»').join(' · '));
+
   log('\n── LA PORTADA ──');
   const idx = await (await fetch('/index.html', { cache:'no-store' })).text();
   const pedidosI = internos(idx, location.origin + '/index.html');

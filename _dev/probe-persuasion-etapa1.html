@@ -87,10 +87,12 @@ window.addEventListener('load', async () => {
     const r = await fetch('/fichas/ficha-persuasion-palancas.html');
     const txt = r.ok ? await r.text() : '';
     ok(r.ok, 'la ficha responde (' + r.status + ')', 'la ficha no responde: ' + r.status);
-    ok((txt.match(/class="pagina"/g) || []).length === 3, '3 páginas para imprimir', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
+    /* La ficha creció a diez hojas con la norma 6 (26 de julio de 2026); la
+       sonda es anterior y esperaba tres. El número correcto es el de la norma. */
+    ok((txt.match(/class="pagina"/g) || []).length === 10, 'las 10 páginas de la norma 6', 'páginas: ' + (txt.match(/class="pagina"/g) || []).length);
     ok(/El caso del proyecto/.test(txt), 'la ficha trae el caso del proyecto con su pauta', 'la ficha no trae caso del proyecto');
     ok(/La tabla de las seis palancas/.test(txt), 'trae la tabla de palancas para llenar', 'no trae la tabla de palancas');
-    ok(/Pauta de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
+    ok(/Pauta (completa )?de respuestas/.test(txt), 'trae su pauta', 'sin pauta');
     const rec = d.querySelector('#s-recursos a[href*="ficha-persuasion"]');
     ok(!!rec, 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
 
@@ -101,16 +103,24 @@ window.addEventListener('load', async () => {
     const poder = cards.find(c => /Ruta de la Persuasión/.test(c.textContent));
     ok(!!poder, 'la Ruta de la Persuasión está en el mapa', 'no aparece la ruta');
     if (poder) {
-      ok(poder.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + poder.querySelectorAll('.re-link').length);
-      ok(poder.querySelectorAll('.ruta-etapa-futura').length === 5, 'y 5 etapas por construir con nombre', 'futuras: ' + poder.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que hubiera
+         nada roto. Salió a la luz el día que estrenó veredicto en el título. */
+      const construidasR = wa.eval('MISSIONS.filter(m => m.ruta === "persuasion").length');
+      const totalR = wa.eval('RUTAS.persuasion.etapas');
+      ok(poder.querySelectorAll('.re-link').length === construidasR, 'con sus ' + construidasR + ' etapas construidas ya tocables', 'etapas tocables: ' + poder.querySelectorAll('.re-link').length + ', construidas: ' + construidasR);
+      ok(poder.querySelectorAll('.ruta-etapa-futura').length === totalR - construidasR, 'y el resto por construir, con nombre', 'futuras: ' + poder.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalR - construidasR));
       ok(/Sesgos/.test(poder.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
     wa.switchView('view-misiones'); await esperar(200);
     da.querySelector('.fam-chip[data-materia="psi"]').click(); await esperar(250);
-    ok(da.querySelectorAll('#missions-container .mission-card').length === 1, 'la materia Psicología y Persuasión muestra su misión', 'muestra ' + da.querySelectorAll('#missions-container .mission-card').length);
+    const enMateria = wa.eval('MISSIONS.filter(m => m.materia === "psi").length');
+    ok(da.querySelectorAll('#missions-container .mission-card').length === enMateria, 'la materia Psicología y Persuasión muestra sus ' + enMateria + ' misiones', 'muestra ' + da.querySelectorAll('#missions-container .mission-card').length);
 
+    /* El veredicto va al título: es lo que se lee al correr las sondas en tanda. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · persuasión etapa 1';
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+  } catch (e) { document.title = 'SUSPENDE · persuasión etapa 1'; log('✘ ' + e.message + '\n' + e.stack); }
 });
 </script>
 </body>

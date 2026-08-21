@@ -125,8 +125,13 @@ window.addEventListener('load', async () => {
     const psi = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de la Persuasión/.test(c.textContent));
     ok(!!psi, 'la Ruta de la Persuasión está en el mapa', 'no aparece la ruta');
     if (psi) {
-      ok(psi.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + psi.querySelectorAll('.re-link').length);
-      ok(psi.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + psi.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que
+         hubiera nada roto (la lección de la Casa Cerrada, en CLAUDE.md). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "persuasion").length');
+      const totalCat = wa.eval('RUTAS.persuasion.etapas');
+      ok(psi.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + psi.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(psi.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + psi.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/Marcos/.test(psi.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
       ok(/Tácticas de presión/i.test(psi.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -136,13 +141,16 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      const enMateriaCat = wa.eval('MISSIONS.filter(m => m.materia === "psi").length');
+      ok(tarjetas.length === enMateriaCat, 'la materia muestra sus ' + enMateriaCat + ' misiones', 'muestra ' + tarjetas.length);
       const mar = tarjetas.find(t => /marcos/i.test(t.textContent));
       ok(!!mar && /🔒/.test(mar.textContent), 'la misión de los marcos lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
+    /* El veredicto va al título: es lo que se lee al correr las sondas en tanda. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · persuasión etapa 3';
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+  } catch (e) { document.title = 'SUSPENDE · persuasión etapa 3'; log('✘ ' + e.message + '\n' + e.stack); }
 });
 </script>
 </body>

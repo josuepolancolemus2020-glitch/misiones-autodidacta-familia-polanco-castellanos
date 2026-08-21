@@ -56,7 +56,7 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
   if (w.eval('typeof initRedaccion') !== 'function') {
     log('✘ index.html no cargó js/tools/redaccion.js');
     out.textContent = L.join('\n') + '\n\nRESULTADO: SUSPENDE';
-    document.title = 'SONDA-SUSPENDE';
+    document.title = 'SUSPENDE · redacción: citas y letra';
     return;
   }
 
@@ -498,11 +498,11 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
-  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+  document.title = fallos === 0 ? 'APRUEBA · redacción: citas y letra' : 'SUSPENDE · redacción: citas y letra';
 })().catch(e => {
   log('✘ la sonda reventó: ' + (e && e.message));
   log('RESULTADO: SUSPENDE');
-  document.title = 'SONDA-SUSPENDE';
+  document.title = 'SUSPENDE · redacción: citas y letra';
 });
 </script>
 </body>

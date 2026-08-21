@@ -908,8 +908,13 @@ window.addEventListener('load', async () => {
     const ruta = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta de los Átomos y los Ídolos/.test(c.textContent));
     ok(!!ruta, 'la Ruta de los Átomos y los Ídolos está en el mapa', 'no aparece la ruta');
     if (ruta) {
-      ok(ruta.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
-      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que
+         hubiera nada roto (la lección de la Casa Cerrada, en CLAUDE.md). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "atomos").length');
+      const totalCat = wa.eval('RUTAS.atomos.etapas');
+      ok(ruta.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/Átomos contra el miedo/i.test(ruta.textContent) && /El hombre máquina y la base material/i.test(ruta.textContent),
          'las etapas 1 y 2 salen con el título de su misión', 'alguna etapa construida no toma el título de MISSIONS');
       ok(/La frontera de la conciencia/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');

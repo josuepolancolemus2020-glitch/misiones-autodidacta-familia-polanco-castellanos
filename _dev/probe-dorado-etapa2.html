@@ -910,8 +910,13 @@ window.addEventListener('load', async () => {
     const ruta = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta del Expediente Dorado/.test(c.textContent));
     ok(!!ruta, 'la Ruta del Expediente Dorado está en el mapa', 'no aparece la ruta');
     if (ruta) {
-      ok(ruta.querySelectorAll('.re-link').length === 5, 'con sus cinco primeras etapas ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
-      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 2, 'y 2 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que
+         hubiera nada roto (la lección de la Casa Cerrada, en CLAUDE.md). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "dorado").length');
+      const totalCat = wa.eval('RUTAS.dorado.etapas');
+      ok(ruta.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/La gran fuga/i.test(ruta.textContent) && /Las fallas de la máquina/i.test(ruta.textContent),
          'las etapas 1 y 2 salen con el título de su misión', 'alguna etapa construida no toma el título de MISSIONS');
       ok(/La palabra gastada/.test(ruta.textContent) && /Visto desde el patio/.test(ruta.textContent), 'las dos siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Sistema nervioso</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:900px;border:0;background:#fff}pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<!-- La carpeta de la misión lleva tilde: si la ruta va cruda, algún navegador
+     la pide mal y la sonda mide un 404 en vez de la misión. Se codifica cada
+     tramo por separado, igual que hace probe-arranque-misiones.html. -->
+<iframe id="f"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+f.onload = async () => {
+  const w = f.contentWindow, d = f.contentDocument;
+  const errores = [];
+  w.addEventListener('error', e => errores.push(e.message));
+  await esperar(1200);
+  try {
+    /* Los bancos son const de módulo, no propiedades de window:
+       solo se alcanzan evaluando dentro de la página. */
+    const dentro = expr => w.eval(expr);
+
+    log('── CARGA ──');
+    ok(errores.length === 0, 'sin errores de JavaScript', 'errores: ' + errores.join(' | '));
+    /* El panel de logros lo pinta renderAchPanel() al arrancar. Si #achList
+       queda vacío es que el arranque murió a medias: esta misión vivió meses
+       rota sin que nadie lo viera, precisamente porque no tenía sonda. */
+    const logros = d.querySelectorAll('#achList .ach-item').length;
+    const logrosCatalogo = dentro('Object.keys(ACHIEVEMENTS).length');
+    ok(logros > 0, 'el panel de logros #achList pinta hijos (' + logros + ')', '#achList quedó vacío: la página no arrancó entera');
+    /* La cuenta se saca del propio catálogo de la página, no se escribe a
+       mano: así la sonda no suspende cuando alguien añade un logro (CLAUDE.md). */
+    ok(logros === logrosCatalogo, 'los ' + logrosCatalogo + ' logros del catálogo están pintados', 'pintados ' + logros + ' de ' + logrosCatalogo + ' logros');
+
+    log('\n── SECCIONES ──');
+    /* La lista de secciones se lee de la barra de navegación, que es el
+       catálogo real de la página: cada pestaña debe tener su panel .sec. */
+    const pestanas = [...d.querySelectorAll('.nav-t[data-s]')].map(b => b.dataset.s);
+    const sinPanel = pestanas.filter(id => { const s = d.getElementById(id); return !s || !s.classList.contains('sec'); });
+    ok(pestanas.length > 0 && sinPanel.length === 0, 'las ' + pestanas.length + ' pestañas de la nav tienen su panel .sec', 'pestañas sin panel: ' + sinPanel.join(', '));
+    /* Molde viejo: sin guion de video ni lecturas, pero con estas cuatro. */
+    const clave = ['s-quiz', 's-flash', 's-evaluacion', 's-lab'].filter(id => !d.getElementById(id));
+    ok(clave.length === 0, 'quiz, flashcards, evaluación y laboratorio presentes', 'faltan secciones: ' + clave.join(', '));
+
+    log('\n── BANCO DEL QUIZ ──');
+    const qz = dentro('qzData');
+    ok(Array.isArray(qz) && qz.length > 0, 'el quiz trae banco: ' + qz.length + ' preguntas', 'el banco del quiz está vacío');
+    /* Cada pregunta: cuatro opciones y un índice de correcta que apunte
+       dentro de ellas. Un banco torcido no revienta al cargar, revienta
+       cuando un alumno llega a esa pregunta. */
+    const malas = qz.map((p, i) => (!Array.isArray(p.o) || p.o.length !== 4
+      || !Number.isInteger(p.c) || p.c < 0 || p.c >= p.o.length) ? i + 1 : 0).filter(Boolean);
+    ok(malas.length === 0, 'cada pregunta tiene 4 opciones e índice correcto válido', 'preguntas mal formadas: ' + malas.join(', '));
+    w.go('s-quiz'); await esperar(150);
+    ok(d.getElementById('qzQ').textContent.length > 10, 'el quiz pinta su primera pregunta', 'el quiz salió vacío en pantalla');
+
+    log('\n── NOTAS VISUALES ──');
+    /* Siete notas de texto sustituyeron a las siete infografías que nunca
+       existieron. El siete va fijo a propósito: esta sonda existe para cazar
+       que alguien las borre o las vacíe, así que no puede leer la cuenta de
+       la propia página. Si un día se añade una octava, se sube aquí. */
+    const notas = [...d.querySelectorAll('.nota-visual')];
+    ok(notas.length === 7, 'las SIETE notas .nota-visual existen', 'hay ' + notas.length + ' notas .nota-visual y deben ser 7');
+    const vacias = notas.filter(n => n.textContent.trim().length === 0).length;
+    ok(vacias === 0, 'ninguna nota está vacía', vacias + ' notas vacías');
+
+    log('\n── RECURSOS PROPIOS (fetch) ──');
+    /* Herencia directa del problema que parió esta sonda: la página pedía
+       siete img/*.webp que no existían. Se pide con fetch cada src y href
+       propio (mismo origen) y se exige respuesta ok. Lo externo (fuentes,
+       cdnjs, Drive) se salta: no es de esta casa y el proxy lo puede cortar. */
+    const propios = new Set();
+    d.querySelectorAll('[src], [href]').forEach(el => {
+      const attr = el.getAttribute('src') || el.getAttribute('href');
+      if (!attr || attr.startsWith('#') || /^(mailto|javascript|data):/.test(attr)) return;
+      const u = new URL(attr, el.baseURI);
+      if (u.origin === location.origin) propios.add(u.href);
+    });
+    ok(propios.size > 0, propios.size + ' recursos propios que comprobar', 'no se encontró ningún recurso propio: la sonda está midiendo mal');
+    const rotos = [];
+    for (const url of propios) {
+      try { const r = await fetch(url); if (!r.ok) rotos.push(url + ' (' + r.status + ')'); }
+      catch (e) { rotos.push(url + ' (' + e.message + ')'); }
+    }
+    ok(rotos.length === 0, 'todos responden ok (ningún webp ni ruta rota)', 'referencias rotas:\n    ' + rotos.join('\n    '));
+
+    log('\n── MARCADOR COMPARTIDO ──');
+    /* El HTML carga ../../js/lecturas-marcador.js y su CSS: si el objeto que
+       ese archivo expone no está, la misión se quedó sin marcador aunque la
+       etiqueta del script siga puesta. */
+    ok(w.FaroMarcador && typeof w.FaroMarcador.marcas === 'function', 'FaroMarcador cargado y con marcas()', 'FaroMarcador no está: el marcador compartido no cargó');
+    ok(!!d.querySelector('link[href$="lecturas-marcador.css"]'), 'la hoja del marcador está enlazada', 'falta el enlace a lecturas-marcador.css');
+
+    log('\n── GUIONES LARGOS ──');
+    /* Norma 1-bis de la casa: ni una raya (U+2014) en el texto. La raya va
+       escapada para que ni esta sonda contenga el carácter prohibido. */
+    ok(!/\u2014/.test(d.body.textContent), 'sin guiones largos en el texto de la página', 'hay guiones largos (U+2014) en el texto');
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    /* El veredicto va en el título porque es lo que se lee al correr las
+       sondas en tanda (CLAUDE.md): «todo en orden» en el cuerpo no cuenta. */
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda sistema nervioso';
+  } catch (e) {
+    log('✘ ' + e.message + '\n' + e.stack);
+    /* Una sonda que muere a medio vuelo también debe declararse en el
+       título: si la pestaña queda con el título de siempre, en tanda parece
+       no corrida en vez de suspendida, que es el fallo viejo de las once. */
+    document.title = 'SUSPENDE · Sonda sistema nervioso';
+  }
+};
+f.src = '/' + ['misiones', 'misión-base-sistema-nervioso', 'sistema-nervioso.html'].map(encodeURIComponent).join('/');
+</script>
+</body>
+</html>

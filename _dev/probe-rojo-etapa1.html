@@ -740,8 +740,13 @@ window.addEventListener('load', async () => {
     const ruta = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta del Expediente Rojo/.test(c.textContent));
     ok(!!ruta, 'la Ruta del Expediente Rojo está en el mapa', 'no aparece la ruta');
     if (ruta) {
-      ok(ruta.querySelectorAll('.re-link').length === 1, 'con su etapa 1 ya tocable', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length);
-      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === 6, 'y 6 etapas por construir con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que
+         hubiera nada roto (la lección de la Casa Cerrada, en CLAUDE.md). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "rojo").length');
+      const totalCat = wa.eval('RUTAS.rojo.etapas');
+      ok(ruta.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/El acero antes del juicio/.test(ruta.textContent), 'la etapa 1 sale con el título de la misión', 'la etapa 1 no sale con su título');
       ok(/La calculadora ciega/.test(ruta.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
       ok(!/Etapa por construir/.test(ruta.textContent), 'ninguna queda con el rótulo genérico', 'alguna etapa no tiene título');

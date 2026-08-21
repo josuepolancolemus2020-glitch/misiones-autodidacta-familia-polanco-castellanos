@@ -124,8 +124,13 @@ window.addEventListener('load', async () => {
     const pol = [...da.querySelectorAll('.ruta-card')].find(c => /Ruta del Poder Político/.test(c.textContent));
     ok(!!pol, 'la Ruta del Poder Político está en el mapa', 'no aparece la ruta');
     if (pol) {
-      ok(pol.querySelectorAll('.re-link').length === 3, 'con sus etapas 1, 2 y 3 ya tocables', 'etapas tocables: ' + pol.querySelectorAll('.re-link').length);
-      ok(pol.querySelectorAll('.ruta-etapa-futura').length === 3, 'y 3 etapas por construir con nombre', 'futuras: ' + pol.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas sacadas del CATÁLOGO, no escritas a mano: las de a mano se
+         quedaron viejas al crecer la ruta y la sonda suspendía sin que
+         hubiera nada roto (la lección de la Casa Cerrada, en CLAUDE.md). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "politico").length');
+      const totalCat = wa.eval('RUTAS.politico.etapas');
+      ok(pol.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + pol.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(pol.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + pol.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/La mesa/.test(pol.textContent), 'la etapa 3 sale con el título de la misión', 'la etapa 3 sigue saliendo como prevista');
       ok(/Alianzas, patronato/i.test(pol.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -135,13 +140,17 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 3, 'la materia muestra sus tres misiones', 'muestra ' + tarjetas.length);
+      const enMateriaCat = wa.eval('MISSIONS.filter(m => m.materia === "pol").length');
+      ok(tarjetas.length === enMateriaCat, 'la materia muestra sus ' + enMateriaCat + ' misiones', 'muestra ' + tarjetas.length);
       const mesa = tarjetas.find(t => /la mesa/i.test(t.textContent));
       ok(!!mesa && /🔒/.test(mesa.textContent), 'la misión de la mesa lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); }
+  /* El veredicto va en el título porque es lo que se lee al correr las sondas
+     en tanda: un cuerpo verde con la pestaña de siempre sale como no aprobada. */
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Política etapa 3';
 });
 </script>
 </body>

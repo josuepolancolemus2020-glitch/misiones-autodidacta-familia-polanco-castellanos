@@ -1,4 +1,4 @@
-function compartirMision(){const url=window.location.href;const texto='🖼️ *Ruta de la Persuasión · Etapa 3* 🖼️\n\nLos ocho sesgos que deciden por ti antes de que llegue nadie, y la hoja para decidir en frío. 🪞\n\n_Incluye evaluación conceptual y quién puso el marco._ ✍️\n\n🔗 *Enlace:* '+url;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
+function compartirMision(){const url=window.location.href;const texto='🖼️ *Ruta de la Persuasión · Etapa 3* 🖼️\n\nQuien pone el marco gana la conversación: nombrar el marco, reencuadrarlo y responder, con los ocho marcos que le llegan a M.E.T.A.S. 🖼️\n\n_Incluye evaluación conceptual y quién puso el marco._ ✍️\n\n🔗 *Enlace:* '+url;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
 function toggleLetra(){document.body.classList.toggle('letra-grande');if(typeof sfx==='function')sfx('click');localStorage.setItem('preferenciaLetra',document.body.classList.contains('letra-grande'));}
 window.addEventListener('DOMContentLoaded',()=>{if(localStorage.getItem('preferenciaLetra')==='true')document.body.classList.add('letra-grande');});
 

@@ -43,8 +43,8 @@
      las tablas de la norma ISO/IEC 18004: no se deducen, se COPIAN, y
      por eso las comprueba _dev/verifica-qr.js una por una contra la
      tabla oficial.
-     No es celo de más: una sola cifra mal —un 5 donde iba un 6, en la
-     versión 8 con corrección alta— daba un código perfectamente
+     No es celo de más: una sola cifra mal (un 5 donde iba un 6, en la
+     versión 8 con corrección alta) daba un código perfectamente
      dibujado que ningún lector conseguía leer. A ojo no se ve, y solo
      falla en las versiones que usan esa casilla. */
   const EC_POR_BLOQUE = [

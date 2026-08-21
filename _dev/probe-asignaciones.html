@@ -38,6 +38,8 @@ f.onload = async () => {
   }
   await esperar(900);
   try {
+    ok(!!d.querySelector('#view-asignaciones a[href="fichas/ficha-ingenieria-asignaciones.html"]'),
+      'la vista enlaza la ficha imprimible de las asignaciones', 'la ficha de asignaciones no se puede alcanzar desde la vista');
     log('── EL CATÁLOGO ──');
     /* ASIGNACIONES se declara con const, así que es una ligadura léxica y NO
        una propiedad de window: w.ASIGNACIONES da undefined aunque el archivo

@@ -1,4 +1,4 @@
-function compartirMision(){const url=window.location.href;const texto='🤝 *Ruta del Poder Político · Etapa 3* 🤝\n\nQué papel hace falta, quién lo emite, qué pide y hasta cuándo vale, con los ocho trámites del proyecto. 📜\n\n_Incluye evaluación conceptual y la mesa que se cierra._ ✍️\n\n🔗 *Enlace:* '+url;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
+function compartirMision(){const url=window.location.href;const texto='🤝 *Ruta del Poder Político · Etapa 3* 🤝\n\nNegociar con una institución: posición, interés y la moneda que no es dinero, con las ocho mesas que le esperan a M.E.T.A.S. 🤝\n\n_Incluye evaluación conceptual y la mesa que se cierra._ ✍️\n\n🔗 *Enlace:* '+url;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
 function toggleLetra(){document.body.classList.toggle('letra-grande');if(typeof sfx==='function')sfx('click');localStorage.setItem('preferenciaLetra',document.body.classList.contains('letra-grande'));}
 window.addEventListener('DOMContentLoaded',()=>{if(localStorage.getItem('preferenciaLetra')==='true')document.body.classList.add('letra-grande');});
 

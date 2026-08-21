@@ -1,4 +1,4 @@
-function compartirMision(){const url=window.location.href;const texto='🗝️ *Ruta de la Casa Cerrada · Etapa 4* 🗝️\n\nValidar lo que llega, ponerle límite y no dejar que un fallo pase callando, con los ocho fallos reales del 28 de julio de 2026. 🚦\n\n_Incluye evaluación conceptual y el llavero sobre la mesa._ ✍️\n\n🔗 *Enlace:* '+url;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
+function compartirMision(){const url=window.location.href;const texto='🗝️ *Ruta de la Casa Cerrada · Etapa 4* 🗝️\n\nDónde viven las claves del proyecto, por qué el repositorio las recuerda y qué se hace el día que una se filtra. 🗝️\n\n_Incluye evaluación conceptual y el llavero sobre la mesa._ ✍️\n\n🔗 *Enlace:* '+url;window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank');}
 function toggleLetra(){document.body.classList.toggle('letra-grande');if(typeof sfx==='function')sfx('click');localStorage.setItem('preferenciaLetra',document.body.classList.contains('letra-grande'));}
 window.addEventListener('DOMContentLoaded',()=>{if(localStorage.getItem('preferenciaLetra')==='true')document.body.classList.add('letra-grande');});
 

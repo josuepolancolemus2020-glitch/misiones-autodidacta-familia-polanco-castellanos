@@ -174,7 +174,7 @@ function siembra(base){
 
   if (w.eval('typeof initMetasSug') !== 'function') {
     log('✘ index.html no cargó js/tools/metas-sugerencias.js');
-    document.title = 'SONDA-SUSPENDE'; return;
+    document.title = 'SUSPENDE · sugerencias M.E.T.A.S'; return;
   }
   /* La sonda no pasa por la puerta: llama a la herramienta directamente,
      como las demás. Pero sí hace falta que haya alguien «dentro», porque
@@ -366,11 +366,11 @@ function siembra(base){
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
-  document.title = fallos === 0 ? 'SONDA-APRUEBA' : 'SONDA-SUSPENDE';
+  document.title = fallos === 0 ? 'APRUEBA · sugerencias M.E.T.A.S' : 'SUSPENDE · sugerencias M.E.T.A.S';
 })().catch(e => {
   log('✘ la sonda reventó: ' + (e && e.message));
   log('RESULTADO: SUSPENDE');
-  document.title = 'SONDA-SUSPENDE';
+  document.title = 'SUSPENDE · sugerencias M.E.T.A.S';
 });
 </script>
 </body>

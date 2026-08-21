@@ -118,8 +118,11 @@ window.addEventListener('load', async () => {
     const casa = cards.find(c => /Ruta del Poder$|Ruta del Poder\b/.test(c.querySelector('.ruta-nombre').textContent));
     ok(!!casa, 'la Ruta del Poder está en el mapa', 'no aparece la ruta');
     if (casa) {
-      ok(casa.querySelectorAll('.re-link').length === 2, 'con sus etapas 1 y 2 ya tocables', 'etapas tocables: ' + casa.querySelectorAll('.re-link').length);
-      ok(casa.querySelectorAll('.ruta-etapa-futura').length === 4, 'y 4 etapas por construir con nombre', 'futuras: ' + casa.querySelectorAll('.ruta-etapa-futura').length);
+      /* Cuentas del CATÁLOGO, no a mano (la lección de la Casa Cerrada). */
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "poder").length');
+      const totalCat = wa.eval('RUTAS.poder.etapas');
+      ok(casa.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + casa.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(casa.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + casa.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok(/El presupuesto real/.test(casa.textContent), 'la etapa 2 sale con el título de la misión', 'la etapa 2 sigue saliendo como prevista');
       ok(/La deuda por dentro/i.test(casa.textContent), 'las siguientes etapas ya tienen nombre', 'las futuras salen sin nombre');
     }
@@ -129,13 +132,17 @@ window.addEventListener('load', async () => {
     if (chip) {
       chip.click(); await esperar(250);
       const tarjetas = [...da.querySelectorAll('#missions-container .mission-card')];
-      ok(tarjetas.length === 2, 'la materia muestra sus dos misiones', 'muestra ' + tarjetas.length);
+      const enMateriaCat = wa.eval('MISSIONS.filter(m => m.materia === "eco").length');
+      ok(tarjetas.length === enMateriaCat, 'la materia muestra sus ' + enMateriaCat + ' misiones', 'muestra ' + tarjetas.length);
       const pres = tarjetas.find(t => /presupuesto real/i.test(t.textContent));
       ok(!!pres && /🔒/.test(pres.textContent), 'la misión del presupuesto lleva el sello familiar (candado)', 'la misión no muestra el candado');
     }
 
     log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
-  } catch (e) { log('✘ ' + e.message + '\n' + e.stack); }
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); }
+  /* El veredicto va en el título porque es lo que se lee al correr las sondas
+     en tanda: un cuerpo verde con la pestaña de siempre sale como no aprobada. */
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Poder etapa 2';
 });
 </script>
 </body>

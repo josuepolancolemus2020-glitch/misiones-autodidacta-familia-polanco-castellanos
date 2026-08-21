@@ -27,8 +27,9 @@ const R = f => path.join(RAIZ, f);
 const FICHAS_SIN_MISION = {
   'fichas/ficha-ingenieria-asignaciones.html':
     'la generan las asignaciones metalingüísticas (js/data/asignaciones.js), que NO son misiones. '
-    + 'Aviso: hoy la aplicación tampoco la enlaza desde ningún sitio, así que nadie puede llegar a ella.',
+    + 'Se llega a ella desde la vista de Asignaciones (enlazada el 20 de agosto de 2026).',
 };
+
 
 const datos = fs.readFileSync(R('js/data/misiones.js'), 'utf8');
 const g = {};
@@ -38,6 +39,13 @@ const { M, R: RUTAS, P } = g;
 
 const pegas = [];
 const nota = t => pegas.push(t);
+
+/* La excepción de la ficha de asignaciones dejó de avisar «nadie puede llegar
+   a ella» el día que la vista la enlazó, y este guardián es quien lo sostiene:
+   si alguien quita el enlace, esto vuelve a avisar. */
+if (!fs.readFileSync(R('index.html'), 'utf8').includes('href="fichas/ficha-ingenieria-asignaciones.html"')) {
+  nota('la ficha de asignaciones perdió su enlace en la vista de Asignaciones (index.html)');
+}
 const agrupa = (arr, f) => arr.reduce((c, x) => { const k = f(x); (c[k] = c[k] || []).push(x); return c; }, {});
 const repetidos = (arr, f) => Object.entries(agrupa(arr, f)).filter(([, v]) => v.length > 1);
 
