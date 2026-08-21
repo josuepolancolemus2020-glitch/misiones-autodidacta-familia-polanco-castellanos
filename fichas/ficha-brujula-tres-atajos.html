@@ -16,10 +16,10 @@
   table.pasos th:nth-child(1) { width: 6%; text-align: center; }
   table.pasos th:nth-child(2) { width: 24%; }
   table.deriva { font-size: 11.5px; }
-  table.deriva th:nth-child(1) { width: 26%; }
+  table.deriva th:nth-child(1) { width: 27%; }
   table.deriva th:nth-child(2) { width: 20%; }
   table.fuentes { font-size: 11.5px; }
-  table.fuentes th:nth-child(1) { width: 34%; }
+  table.fuentes th:nth-child(1) { width: 36%; }
   /* La tabla de notas es de números y se lee en columna: centrada y estrecha se
      abarca de un vistazo, que es justo lo que el ejemplo pide (ver dos promedios
      moverse). Alineada a la izquierda, como el resto de las tablas de la hoja,
@@ -42,31 +42,35 @@
   <div class="fh">
     <div class="f-badge">📄 Ficha de estudio · Tres atajos generan el zoológico</div>
     <div class="f-meta"><b>Ruta:</b> 🧭 Ruta de la Brújula Torcida · Etapa 1 de 6 · <b>Materia:</b> Estudio Mayor (Sesgo cognitivo)</div>
-    <div class="f-meta"><b>Tema:</b> las tres heurísticas del artículo de 1974 con su gatillo, su ambiente y su modo de fallo; y la operación de tomar cualquier sesgo con nombre propio y derivarlo de su heurística madre.</div>
+    <div class="f-meta"><b>Tema:</b> las tres heurísticas del artículo de 1974 con su gatillo, su ambiente y su modo de fallo; y la operación de derivar cualquier sesgo con nombre propio hasta su heurística madre.</div>
   </div>
 
   <h2>🎯 Objetivos</h2>
   <ol>
     <li>Explicar las <b>tres heurísticas</b> por su mecanismo, no por la lista de sus hijos.</li>
-    <li>Resolver a mano, en <b>frecuencias naturales</b>, los problemas de tasa base que esta ficha trabaja paso a paso.</li>
-    <li><b>Derivar</b> un sesgo con nombre propio hasta su madre, y decir cuándo el nombre es redundante.</li>
+    <li>Resolver a mano, en <b>frecuencias naturales</b>, los problemas de tasa base de esta ficha.</li>
+    <li><b>Derivar</b> un sesgo con nombre propio hasta su madre, o declararlo redundante.</li>
     <li>Reconocer la <b>regresión a la media</b> y demostrar con números que el elogio no dañó nada.</li>
-    <li>Citar cada estudio <b>con su etiqueta de estatus</b>, incluido el que esta ficha usa y está cuestionado.</li>
+    <li>Citar cada estudio <b>con su etiqueta de estatus</b>, incluido el que aquí se usa y está cuestionado.</li>
   </ol>
 
   <h2>🐘 El zoológico tiene fábrica</h2>
-  <p>La lista de sesgos que circula por internet pasa de los doscientos nombres, y esa lista es la manera exacta de no aprender nada: doscientas etiquetas no caben en ninguna cabeza y se evaporan en un mes. La noticia buena es que el zoológico <b>tiene fábrica</b>: casi todos esos animales salen de tres máquinas descritas en un solo artículo de 1974. Quien conoce las tres puede olvidar la lista y regenerar el animal que necesite. Ese cambio, de coleccionar nombres a conocer generadores, es lo único que sobrevive al examen de dentro de cinco años.</p>
+  <p>La lista de sesgos que circula por internet pasa de los doscientos nombres, y es la manera exacta de no aprender nada: doscientas etiquetas no caben en ninguna cabeza y se evaporan en un mes. La noticia buena es que el zoológico <b>tiene fábrica</b>: casi todos esos animales salen de tres máquinas descritas en un artículo de 1974, y quien conoce las tres puede olvidar la lista.</p>
 
   <div class="caja c-regla">
     <h3>🔑 La regla que ordena toda la etapa</h3>
-    <p><b>Un sesgo es el error sistemático de un atajo que en su ambiente acierta.</b> «Atajo» quiere decir que la mente no está averiada: cambia una pregunta difícil por una fácil, y eso es rápido y barato. «En su ambiente acierta» quiere decir que hay un terreno donde el atajo da buenas respuestas, y hay que saber cuál es. «Error sistemático» quiere decir que cuando falla <b>falla siempre para el mismo lado</b>: por eso se puede predecir, y por eso no se corrige con voluntad sino cambiando el procedimiento.</p>
+    <p><b>Un sesgo es el error sistemático de un atajo que en su ambiente acierta.</b> «Atajo»: la mente no está averiada, cambia una pregunta difícil por una fácil. «En su ambiente acierta»: hay un terreno donde el atajo da buenas respuestas y hay que saber cuál es. «Error sistemático»: cuando falla, <b>falla siempre para el mismo lado</b>; por eso se puede predecir, y por eso no se corrige con voluntad sino cambiando el procedimiento.</p>
   </div>
-
-  <h2>🗺️ El camino de la ruta, visto desde aquí</h2>
-  <p>Esta etapa pone la fábrica. Las que siguen: <b>2</b>, las dos velocidades, metáfora útil y no anatomía; <b>3</b>, el abogado del ambiente, donde Gigerenzer contesta que las heurísticas aciertan en el terreno para el que están calibradas; <b>4</b>, el ruido, que es el otro error, el que nadie mira; <b>5</b>, la mala noticia de que avisar no cura; y <b>6</b>, el telón de la réplica, donde se aprende a etiquetar cada estudio. Todas discuten sobre estas tres máquinas.</p>
 
   <h2>⚙️ Las tres máquinas, en una tabla</h2>
   <p>Amos Tversky y Daniel Kahneman publicaron en Science, en 1974, «Judgment under Uncertainty: Heuristics and Biases». Cabe en ocho páginas y describe tres atajos. Cada uno se estudia con las mismas tres columnas, y esas columnas son el molde de la ficha entera.</p>
+
+  <table class="heur">
+    <tr><th>Heurística</th><th>El gatillo (qué pregunta la dispara)</th><th>El ambiente donde acierta</th><th>El modo de fallo</th></tr>
+    <tr><td><b>Representatividad</b><br><span class="mini">juzgar por parecido</span></td><td>«¿De qué clase es esto?» o «¿qué va a pasar aquí?». La mente contesta mirando <b>a qué se parece</b> el caso</td><td>Cuando el parecido de verdad predice la clase: una fruta podrida, un motor que suena mal, un texto copiado</td><td>Se olvida <b>cuántos hay de cada clase</b> (la tasa base), cuántos casos se miraron, y que un detalle de más nunca hace más probable</td></tr>
+    <tr><td><b>Disponibilidad</b><br><span class="mini">juzgar por lo que viene fácil</span></td><td>«¿Con qué frecuencia pasa esto?». La mente contesta con <b>cuántos ejemplos le vienen</b> a la memoria y con qué facilidad</td><td>Cuando lo frecuente de verdad se recuerda más: qué comida cae mal, qué calle se inunda, qué error repite un alumno</td><td>Lo vívido, lo reciente y lo que salió en las noticias vienen fácil <b>aunque sean raros</b>, y lo que no dejó testigos no viene nunca</td></tr>
+    <tr><td><b>Anclaje y ajuste</b><br><span class="mini">partir de una cifra y moverse poco</span></td><td>«¿Cuánto vale esto?». La mente toma <b>la primera cifra que tiene delante</b> y se mueve desde ahí</td><td>Cuando la primera cifra es información de verdad: el precio del año pasado, el costo conocido, la medida anterior</td><td>El ajuste <b>siempre se queda corto</b>, y el ancla funciona aunque sea absurda y aunque quien la oyó sepa que lo es</td></tr>
+  </table>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
@@ -76,36 +80,21 @@
 
 <!-- ═══════════ PÁGINA 2 ═══════════ -->
 <section class="pagina">
-  <table class="heur">
-    <tr><th>Heurística</th><th>El gatillo (qué pregunta la dispara)</th><th>El ambiente donde acierta</th><th>El modo de fallo</th></tr>
-    <tr><td><b>Representatividad</b><br><span class="mini">juzgar por parecido</span></td><td>«¿De qué clase es esto?» o «¿qué va a pasar aquí?». La mente contesta mirando <b>a qué se parece</b> el caso</td><td>Cuando el parecido de verdad predice la clase: una fruta podrida, un motor que suena mal, un texto copiado</td><td>Se olvida <b>cuántos hay de cada clase</b> (la tasa base), cuántos casos se miraron, y que un detalle de más nunca hace más probable</td></tr>
-    <tr><td><b>Disponibilidad</b><br><span class="mini">juzgar por lo que viene fácil</span></td><td>«¿Con qué frecuencia pasa esto?». La mente contesta con <b>cuántos ejemplos le vienen</b> a la memoria y con qué facilidad</td><td>Cuando lo frecuente de verdad se recuerda más: qué comida cae mal, qué calle se inunda, qué error repite un alumno</td><td>Lo vívido, lo reciente y lo que salió en las noticias vienen fácil <b>aunque sean raros</b>, y lo que no dejó testigos no viene nunca</td></tr>
-    <tr><td><b>Anclaje y ajuste</b><br><span class="mini">partir de una cifra y moverse poco</span></td><td>«¿Cuánto vale esto?». La mente toma <b>la primera cifra que tiene delante</b> y se mueve desde ahí</td><td>Cuando la primera cifra es información de verdad: el precio del año pasado, el costo conocido, la medida anterior</td><td>El ajuste <b>siempre se queda corto</b>, y el ancla funciona aunque sea absurda y aunque quien la oyó sepa que lo es</td></tr>
-  </table>
-
   <div class="caja c-atajo">
     <h3>🧰 El atajo no es un defecto de fábrica</h3>
-    <p>Es tentador leer esa tabla como una lista de averías, y es la lectura equivocada: quien salga de aquí creyendo que la mente está rota va a desconfiar de sí mismo sin mejorar ni una decisión. Los tres atajos existen porque <b>funcionan la mayoría de las veces y cuestan casi nada</b>: nadie calcula probabilidades para saber si el pan está bueno. La pregunta útil no es «¿la mente se equivoca?», sino <b>«¿en qué ambiente estoy, y este atajo está calibrado para él?»</b>. Un sesgo, entonces, no es una tara: es un atajo trabajando fuera de su terreno.</p>
+    <p>Es tentador leer esa tabla como una lista de averías, y es la lectura equivocada: quien salga creyendo que la mente está rota va a desconfiar de sí mismo sin mejorar ni una decisión. Los tres atajos existen porque <b>funcionan casi siempre y cuestan casi nada</b>. La pregunta útil es <b>«¿en qué ambiente estoy, y este atajo está calibrado para él?»</b>.</p>
   </div>
 
   <h2>🪞 Máquina 1: representatividad, o juzgar por parecido</h2>
-  <p>Es la más productiva de las tres: de ella sale casi la mitad del zoológico. La pregunta de verdad («¿qué tan probable es que esto sea de tal clase?») es cara, porque pide saber cuántos hay de cada clase y qué tan bien el indicio las separa. La mente la cambia por otra que cuesta un segundo: <b>«¿qué tanto se parece esto al retrato típico de esa clase?»</b>. El parecido es rápido y a veces bueno, pero <b>no sabe contar</b>, y todos los fallos de esta máquina son fallos de conteo.</p>
+  <p>Es la más productiva: de ella sale casi la mitad del zoológico. La pregunta de verdad («¿qué tan probable es que esto sea de tal clase?») es cara, porque pide saber cuántos hay de cada clase. La mente la cambia por otra que cuesta un segundo: <b>«¿a qué se parece esto?»</b>. El parecido es rápido y a veces bueno, pero <b>no sabe contar</b>, y todos los fallos de esta máquina son fallos de conteo.</p>
 
   <div class="caja c-hijos1">
     <h3>👶 Lo que esta máquina produce</h3>
-    <p><b>Ceguera a la tasa base:</b> el retrato tapa el conteo. <b>La falacia de conjunción (Linda):</b> añadir un detalle que encaja hace parecer más probable, y añadir detalles nunca puede hacerlo. <b>Insensibilidad al tamaño de la muestra:</b> cuatro casos parecen decir lo mismo que cuarenta, porque los dos «se parecen» a la población. <b>La falacia del jugador:</b> tras cinco caras «ya toca» cruz, porque una racha corta debería parecerse al total. Los cuatro son el mismo error con cuatro trajes.</p>
+    <p><b>Ceguera a la tasa base:</b> el retrato tapa el conteo. <b>La falacia de conjunción (Linda):</b> añadir un detalle que encaja hace parecer más probable, y añadir detalles nunca puede hacerlo. <b>Insensibilidad al tamaño de la muestra</b> y <b>falacia del jugador:</b> cuatro casos parecen decir lo mismo que cuarenta, y tras cinco caras «ya toca» cruz, porque una racha corta debería parecerse al total.</p>
   </div>
 
-  <div class="pie">
-    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🧭 Ruta de la Brújula Torcida · Etapa 1: Tres atajos generan el zoológico</span>
-  </div>
-</section>
-
-<!-- ═══════════ PÁGINA 3 ═══════════ -->
-<section class="pagina">
   <h2>🧮 Paso a paso: el retrato contra el conteo</h2>
-  <p>En la base de M.E.T.A.S hay <b>1 000 personas registradas</b>: <b>50 maestros</b> y <b>950 alumnos</b>. Se describe a la cuenta anónima que dejó una sugerencia: «ordenada, escribe sin faltas, pide una guía imprimible y firma con el nombre completo». El retrato grita «maestro». Ahora se cuenta, en frecuencias naturales, que es como esta casa hace estas cuentas siempre.</p>
+  <p>En la base de M.E.T.A.S hay <b>1 000 personas registradas</b>: <b>50 maestros</b> y <b>950 alumnos</b>. Se describe a la cuenta anónima que dejó una sugerencia: «ordenada, escribe sin faltas, pide una guía imprimible y firma con el nombre completo». El retrato grita «maestro». Ahora se cuenta, en frecuencias naturales.</p>
 
   <table class="pasos p-retrato">
     <tr><th>#</th><th>Paso</th><th>La cuenta, escrita entera</th></tr>
@@ -115,11 +104,19 @@
     <tr><td>4</td><td><b>La respuesta</b></td><td>De esas 135 son maestros 40: <b>40 / 135 = 0,30</b>. Tres de cada diez. Lo más probable es que sea una alumna</td></tr>
   </table>
 
-  <p class="mini">El retrato acierta: 80% contra 10% es una diferencia enorme. Y aun así <b>pierde contra el conteo</b>, porque los alumnos son diecinueve veces más. La representatividad no se equivocó al ver el parecido: se equivocó al no mirar cuántos hay.</p>
+  <p class="mini">El retrato acierta: 80% contra 10% es una diferencia enorme. Y aun así <b>pierde contra el conteo</b>, porque los alumnos son diecinueve veces más. La representatividad no falló al ver el parecido: falló al no mirar cuántos hay.</p>
 
   <h2>🧮 El mismo error donde cuesta caro: el detector de copia</h2>
   <p>M.E.T.A.S estrena un detector de tareas copiadas y un maestro pregunta qué significa una alerta. De cada <b>1 000 tareas</b>, <b>20 están copiadas</b>. El detector <b>caza 18 de esas 20</b> (nueve de cada diez, que suena excelente) y además <b>marca por error al 5%</b> de las 980 honradas.</p>
 
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🧭 Ruta de la Brújula Torcida · Etapa 1: Tres atajos generan el zoológico</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 3 ═══════════ -->
+<section class="pagina">
   <table class="pasos p-detector">
     <tr><th>#</th><th>Paso</th><th>La cuenta, escrita entera</th></tr>
     <tr><td>1</td><td><b>Copiadas marcadas</b></td><td>De las 20 copiadas, el detector marca <b>18</b></td></tr>
@@ -128,10 +125,19 @@
     <tr><td>4</td><td><b>Qué significa una alerta</b></td><td>18 de 67 son copias de verdad: <b>27%</b>. Casi tres de cada cuatro alertas caen sobre alguien que no copió</td></tr>
   </table>
 
-  <p class="mini">La regla que sale de aquí vale para cualquier prueba: cuando <b>lo que se busca es raro</b>, hasta una prueba muy buena produce más falsas alarmas que hallazgos. Una alerta no es una sentencia: es una invitación a mirar la tarea.</p>
+  <p class="mini">La regla vale para cualquier prueba: cuando <b>lo que se busca es raro</b>, hasta una prueba muy buena produce más falsas alarmas que hallazgos. Una alerta no es una sentencia: es una invitación a mirar la tarea.</p>
 
   <h2>🧷 El problema de Linda, y por qué se cita con casco</h2>
-  <p>En 1983 Tversky y Kahneman publicaron el experimento más famoso de la materia. Se describe a Linda: treinta y un años, soltera, franca, muy brillante; de estudiante se ocupó de la discriminación y la justicia social. ¿Qué es más probable: <b>(a)</b> que sea cajera de banco, o <b>(b)</b> que sea cajera de banco <b>y</b> activista feminista? La mayoría elige (b), y es imposible: todas las cajeras feministas están dentro del grupo de las cajeras, así que (b) nunca puede ser más grande que (a). Añadir un detalle solo quita gente. Es la falacia de conjunción, y la explicación es de manual: el detalle feminista <b>encaja con el retrato</b>, y el parecido contesta en lugar de la probabilidad.</p>
+  <p>En 1983 Tversky y Kahneman publicaron el experimento más famoso de la materia. Se describe a Linda: treinta y un años, soltera, franca, muy brillante; de estudiante se ocupó de la discriminación y la justicia social. ¿Qué es más probable: <b>(a)</b> que sea cajera de banco, o <b>(b)</b> que sea cajera de banco <b>y</b> activista feminista? La mayoría elige (b), y es imposible: las cajeras feministas están dentro del grupo de las cajeras, así que (b) nunca puede ser más grande que (a). Es la falacia de conjunción: el detalle feminista <b>encaja con el retrato</b>, y el parecido contesta en lugar de la probabilidad.</p>
+
+  <div class="caja c-linda caja-amb">
+    <h3>⚠️ La etiqueta, que viaja con la cita para siempre</h3>
+    <p><b>Clásico cuestionado en su interpretación.</b> Ralph Hertwig y Gerd Gigerenzer publicaron en 1999 («The conjunction fallacy revisited», Journal of Behavioral Decision Making) una objeción que hay que decir entera: la palabra <b>«probable»</b>, en el habla corriente, no significa solo lo que significa en la teoría de la probabilidad; también quiere decir «plausible», «creíble», «lo que encaja con lo que me contaste». Quien entienda esa segunda cosa no comete ningún error de lógica: contesta la pregunta que oyó. Y lo mostraron cambiando el enunciado: preguntado en frecuencias («de cada 100 personas como Linda, ¿cuántas son cajeras?, ¿cuántas son cajeras y feministas?»), el número de respuestas que violan la regla <b>se desploma</b>.</p>
+    <p class="mini"><b>Queda en pie</b> que el parecido con el retrato empuja el juicio, y eso no lo discute ninguna de las dos partes. <b>No queda</b> la lectura popular de que el experimento prueba que la gente es incapaz de lógica elemental. Y queda la lección de método: <b>gran parte del efecto vivía en cómo estaba formulada la pregunta</b>.</p>
+  </div>
+
+  <h2>🔢 Insensibilidad al tamaño de la muestra, con la cuenta hecha</h2>
+  <p>La misma máquina produce otro hijo, y este cuesta dinero. Dos grupos de M.E.T.A.S: el grande tiene <b>40 alumnos</b> y el chico <b>4</b>. En los dos, la mitad termina la misión del día. ¿Cuál va a registrar <b>más días en los que más del 60% termine</b>? La intuición dice «los dos igual, porque los dos tienen la misma mitad»: representatividad pura.</p>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
@@ -141,15 +147,6 @@
 
 <!-- ═══════════ PÁGINA 4 ═══════════ -->
 <section class="pagina">
-  <div class="caja c-linda caja-amb">
-    <h3>⚠️ La etiqueta, que viaja con la cita para siempre</h3>
-    <p><b>Clásico cuestionado en su interpretación.</b> Ralph Hertwig y Gerd Gigerenzer publicaron en 1999 («The conjunction fallacy revisited», Journal of Behavioral Decision Making) una objeción que hay que decir entera: la palabra <b>«probable»</b>, en el habla corriente, no significa solo lo que significa en la teoría de la probabilidad; también quiere decir «plausible», «creíble», «lo que encaja con lo que me contaste». Quien entienda esa segunda cosa no está cometiendo ningún error de lógica: contesta la pregunta que oyó. Y lo mostraron cambiando el enunciado: al preguntar en frecuencias («de cada 100 personas como Linda, ¿cuántas son cajeras?, ¿cuántas son cajeras y feministas?»), las respuestas que violan la regla <b>se desploman</b>.</p>
-    <p class="mini"><b>Queda en pie</b> que el parecido con el retrato empuja el juicio, y eso es la representatividad, que ninguna de las dos partes discute. <b>No queda</b> la lectura fuerte y popular de que el experimento demuestra que la gente es incapaz de lógica elemental. Y queda una lección de método que vale más que el experimento: <b>gran parte del efecto vivía en cómo estaba formulada la pregunta</b>. Por eso aquí las probabilidades se dicen contando casos.</p>
-  </div>
-
-  <h2>🔢 Insensibilidad al tamaño de la muestra, con la cuenta hecha</h2>
-  <p>La misma máquina produce otro hijo, y este cuesta dinero. Dos grupos de M.E.T.A.S: el grande tiene <b>40 alumnos</b> y el chico <b>4</b>. En los dos, la mitad de los alumnos termina la misión del día. ¿Cuál va a registrar <b>más días en los que más del 60% termine</b>? La intuición dice «los dos igual, porque los dos tienen la misma mitad»: eso es representatividad pura, la muestra chica debería parecerse a la población tanto como la grande.</p>
-
   <table class="pasos p-muestra">
     <tr><th>#</th><th>Grupo</th><th>La cuenta, escrita entera</th></tr>
     <tr><td>1</td><td><b>El chico (4)</b></td><td>Más del 60% de 4 son 3 o 4 alumnos. Con la moneda al aire hay 4 maneras de que terminen 3 y 1 de que terminen los 4, sobre 16 combinaciones: 5/16 = <b>31%</b> de los días</td></tr>
@@ -157,26 +154,13 @@
     <tr><td>3</td><td><b>Se comparan</b></td><td>31% contra 8%: el grupo chico tiene esos días buenos <b>cuatro veces más seguido</b>, sin que sus alumnos sean mejores en nada</td></tr>
   </table>
 
-  <p class="mini">La consecuencia es dura: los grupos chicos ocupan casi siempre <b>los dos extremos</b> de cualquier tabla, los mejores y los peores, y no por serlo. Quien premie al grupo del mes sin mirar su tamaño va a premiar el azar con una regularidad admirable, y va a explicarlo con teorías pedagógicas cada vez.</p>
+  <p class="mini">La consecuencia es dura: los grupos chicos ocupan casi siempre <b>los dos extremos</b> de cualquier tabla, y no por serlo. Quien premie al grupo del mes sin mirar su tamaño va a premiar el azar con una regularidad admirable, y va a explicarlo con teorías pedagógicas cada vez.</p>
 
   <h2>💡 Máquina 2: disponibilidad, o juzgar por lo que viene fácil</h2>
-  <p>La pregunta cara es «¿con qué frecuencia pasa esto?», y contestarla exige un registro: casos contados, sobre oportunidades, en un periodo. La mente la cambia por <b>«¿cuántos casos me vienen a la memoria, y con qué facilidad?»</b>. En un mundo sin periódicos el atajo es excelente, porque lo que pasa seguido deja más huellas. Con noticias, con redes y con una conversación de pasillo se descalibra: la memoria no guarda por frecuencia, guarda por <b>lo reciente, lo vívido, lo que dio miedo y lo que le pasó a un conocido</b>.</p>
-
-  <div class="pie">
-    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🧭 Ruta de la Brújula Torcida · Etapa 1: Tres atajos generan el zoológico</span>
-  </div>
-</section>
-
-<!-- ═══════════ PÁGINA 5 ═══════════ -->
-<section class="pagina">
-  <div class="caja c-hijos2">
-    <h3>👶 Lo que esta máquina produce</h3>
-    <p><b>El miedo tras la noticia:</b> un accidente en el telediario reordena el mapa de riesgos de un país durante meses. <b>El sesgo del superviviente:</b> solo se recuerdan los casos que llegaron a contarlo. <b>La ilusión de frecuencia:</b> se compra un carro rojo y el mundo se llena de carros rojos. <b>El sesgo de lo reciente:</b> el último caso pesa más que los treinta anteriores. Los cuatro son la misma máquina midiendo memoria y llamándolo frecuencia.</p>
-  </div>
+  <p>La pregunta cara es «¿con qué frecuencia pasa esto?», y contestarla exige un registro: casos contados, sobre oportunidades, en un periodo. La mente la cambia por <b>«¿cuántos casos me vienen a la memoria, y con qué facilidad?»</b>. En un mundo sin periódicos el atajo es excelente, porque lo que pasa seguido deja más huellas. Con noticias y con una conversación de pasillo se descalibra: la memoria no guarda por frecuencia, guarda por <b>lo reciente, lo vívido, lo que dio miedo y lo que le pasó a un conocido</b>. De ahí salen sus hijos: <b>el miedo tras la noticia</b>, que reordena el mapa de riesgos de un país durante meses; <b>el sesgo del superviviente</b>, que solo recuerda a los que llegaron a contarlo; y <b>el sesgo de lo reciente</b>, que le da al último caso más peso que a los treinta anteriores.</p>
 
   <h2>🧮 Paso a paso: el teléfono robado</h2>
-  <p>Le roban el teléfono a una maestra a la salida de clases: vívido, reciente y cercano, los tres botones de la disponibilidad a la vez. Esa semana se propone en la mesa suspender el programa del APK sin conexión porque «los teléfonos en la calle son un peligro». Antes de decidir nada se cuenta.</p>
+  <p>Le roban el teléfono a una maestra a la salida de clases: vívido, reciente y cercano, los tres botones a la vez. Esa semana se propone en la mesa suspender el programa del APK sin conexión porque «los teléfonos en la calle son un peligro». Antes de decidir nada se cuenta.</p>
 
   <table class="pasos p-telefono">
     <tr><th>#</th><th>Paso</th><th>La cuenta, escrita entera</th></tr>
@@ -186,16 +170,32 @@
     <tr><td>4</td><td><b>En frecuencias naturales</b></td><td><b>Menos de 4 de cada 100 aulas</b> tendrían un incidente en un año entero. El susto decía «esto pasa siempre»</td></tr>
   </table>
 
-  <p class="mini">Y la decisión que sale de la cuenta no es «no hacer nada»: es hacer <b>lo que corresponde a esa tasa</b>. Una guía de una página sobre el cuidado del teléfono cuesta una tarde y sirve; suspender el programa de cuarenta aulas por un caso en ocho meses es pagar un precio enorme por un sobresalto. La disponibilidad no mintió sobre el robo. Mintió sobre <b>cuántos</b>.</p>
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🧭 Ruta de la Brújula Torcida · Etapa 1: Tres atajos generan el zoológico</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 5 ═══════════ -->
+<section class="pagina">
+  <p class="mini">Y la decisión que sale de la cuenta no es «no hacer nada»: es hacer <b>lo que corresponde a esa tasa</b>. Una guía de una página sobre el cuidado del teléfono cuesta una tarde y sirve; suspender el programa de cuarenta aulas por un caso en ocho meses es pagar carísimo un sobresalto. La disponibilidad no mintió sobre el robo: mintió sobre <b>cuántos</b>.</p>
 
   <div class="caja c-avion">
     <h3>✈️ Caso real: los muertos que la carretera cobró después de 2001</h3>
-    <p>Gerd Gigerenzer publicó en Risk Analysis (2006) el cálculo más citado sobre este atajo. Tras los atentados de septiembre de 2001, muchos estadounidenses dejaron de volar y se fueron por carretera, que por kilómetro es bastante más peligrosa. Comparando los muertos en carretera de los doce meses siguientes con la tendencia previa, estimó <b>alrededor de 1 595 muertos de más</b>: seis veces los pasajeros que murieron en los cuatro aviones. <b>Etiqueta: estudio serio con estimación discutida</b>, porque la cifra depende de qué tendencia se tome como base. La dirección no la discute nadie: el miedo movió gente del transporte seguro al peligroso, y lo movió la disponibilidad de unas imágenes, no una tasa.</p>
+    <p>Gerd Gigerenzer publicó en Risk Analysis (2006) el cálculo más citado sobre este atajo. Tras los atentados de septiembre de 2001 muchos estadounidenses dejaron de volar y se fueron por carretera, que por kilómetro es más peligrosa. Comparando los muertos en carretera de los doce meses siguientes con la tendencia previa, estimó <b>alrededor de 1 595 muertos de más</b>: seis veces los pasajeros de los cuatro aviones. <b>Etiqueta: estudio serio con estimación discutida</b>, porque la cifra depende de qué tendencia se tome como base. La dirección no la discute nadie: el miedo movió gente del transporte seguro al peligroso, y lo movieron unas imágenes.</p>
   </div>
 
   <div class="caja c-wald">
     <h3>🛩️ Caso real: Wald y los aviones que volvieron</h3>
-    <p>Abraham Wald trabajó durante la Segunda Guerra Mundial en el Statistical Research Group de la Universidad de Columbia, y en 1943 escribió unos memorandos sobre dónde blindar los bombarderos (reeditados en 1980 por el Center for Naval Analyses). Su material era el mapa de impactos de los aviones <b>que regresaron</b>. La respuesta intuitiva es blindar donde hay más agujeros; la de Wald fue la contraria: blindar <b>donde los que volvieron no tienen agujeros</b>, porque los que recibieron impactos ahí no volvieron a contarlo. <b>Etiqueta: episodio histórico documentado</b>, aunque la versión que circula en internet, con el dibujo del avión punteado, es un adorno posterior.</p>
+    <p>Abraham Wald trabajó en la Segunda Guerra Mundial en el Statistical Research Group de la Universidad de Columbia, y en 1943 escribió unos memorandos sobre dónde blindar los bombarderos (reeditados en 1980 por el Center for Naval Analyses). Su material era el mapa de impactos de los aviones <b>que regresaron</b>. Lo intuitivo es blindar donde hay más agujeros; Wald dijo lo contrario: blindar <b>donde los que volvieron no tienen agujeros</b>, porque los que recibieron impactos ahí no volvieron a contarlo. <b>Etiqueta: episodio histórico documentado</b>; el dibujo del avión punteado que circula por internet es adorno posterior.</p>
+  </div>
+
+  <h2>⚓ Máquina 3: anclaje con ajuste insuficiente</h2>
+  <p>La tercera es la más simple de describir y la más difícil de esquivar. Ante una cantidad desconocida, la mente <b>parte de la primera cifra que tiene delante</b> y se mueve desde ahí. Ese movimiento es el ajuste, y el hallazgo de 1974 fue que <b>se detiene demasiado pronto</b>: la respuesta queda pegada al ancla. Y funciona <b>aunque el ancla sea absurda y aunque quien la oyó sepa que lo es</b>: no es un problema de credulidad.</p>
+
+  <div class="caja c-ruleta">
+    <h3>🎡 El experimento de la ruleta, tal como está publicado</h3>
+    <p>En el artículo de 1974 se hacía girar delante de la persona una rueda de la fortuna trucada para detenerse en <b>10</b> o en <b>65</b>. Después se le preguntaba qué porcentaje de los países de las Naciones Unidas eran africanos. Quienes vieron el 10 respondieron con una mediana de <b>25</b>; quienes vieron el 65, con una mediana de <b>45</b>. <b>Etiqueta: clásico sólido, y de los pocos que salieron reforzados de la crisis de replicación</b>: el anclaje replicó con fuerza en los proyectos Many Labs (Klein y otros, 2014). Cuando alguien pregunte qué aguantó de todo esto, el anclaje es la respuesta corta.</p>
   </div>
 
   <div class="pie">
@@ -206,14 +206,6 @@
 
 <!-- ═══════════ PÁGINA 6 ═══════════ -->
 <section class="pagina">
-  <h2>⚓ Máquina 3: anclaje con ajuste insuficiente</h2>
-  <p>La tercera es la más simple de describir y la más difícil de esquivar. Ante una cantidad desconocida, la mente <b>parte de la primera cifra que tiene delante</b> y se mueve desde ahí. Ese movimiento es el ajuste, y el hallazgo de 1974 fue que <b>se detiene demasiado pronto</b>: la respuesta queda pegada al ancla. Lo que convierte esto en algo serio, y no en una curiosidad, es que el ancla funciona <b>aunque sea irrelevante, aunque sea absurda y aunque quien la oyó sepa que lo es</b>. No es un problema de credulidad.</p>
-
-  <div class="caja c-ruleta">
-    <h3>🎡 El experimento de la ruleta, tal como está publicado</h3>
-    <p>En el artículo de 1974 se hacía girar delante de la persona una rueda de la fortuna trucada para detenerse en <b>10</b> o en <b>65</b>. Después se le preguntaba qué porcentaje de los países de las Naciones Unidas eran africanos. Quienes vieron el 10 respondieron con una mediana de <b>25</b>; quienes vieron el 65, con una mediana de <b>45</b>. Una rueda a la vista, un número que todos sabían que era azar, y veinte puntos de diferencia. <b>Etiqueta: clásico sólido, y de los pocos que salieron reforzados de la crisis de replicación</b>: el anclaje replicó con fuerza en los proyectos Many Labs (Klein y otros, 2014). Cuando alguien pregunte qué aguantó de todo esto, el anclaje es la respuesta corta.</p>
-  </div>
-
   <h2>🧮 Paso a paso: el ancla del director</h2>
   <p>Un director quiere pagar por M.E.T.A.S y abre la reunión así: «otras plataformas cobran 900 lempiras al mes por aula; yo puedo dar 300». En una frase hay <b>dos anclas</b>, y las dos son suyas. La segunda parece modesta al lado de la primera, que es exactamente para lo que se puso la primera.</p>
 
@@ -225,18 +217,10 @@
     <tr><td>4</td><td><b>La diferencia</b></td><td>480 − 350 = <b>L 130 por aula y por mes</b>. Con 40 aulas: L 5 200 al mes, L 62 400 al año. Eso costó no llevar la cifra escrita</td></tr>
   </table>
 
-  <p class="mini">El procedimiento que compensa esta máquina cabe en una línea y no depende de estar atento: <b>a ninguna reunión donde vaya a decirse una cifra se entra sin la cifra propia escrita y fechada antes</b>. No hay que resistir el ancla, que no se puede: hay que llegar anclado a lo propio. Es el modelo de todo lo que esta ruta propone: contra un sesgo, un procedimiento; nunca una promesa de vigilancia.</p>
+  <p class="mini">El procedimiento que compensa esta máquina cabe en una línea y no depende de estar atento: <b>a ninguna reunión donde vaya a decirse una cifra se entra sin la cifra propia escrita y fechada antes</b>. No hay que resistir el ancla, que no se puede: hay que llegar anclado a lo propio.</p>
 
-  <div class="pie">
-    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🧭 Ruta de la Brújula Torcida · Etapa 1: Tres atajos generan el zoológico</span>
-  </div>
-</section>
-
-<!-- ═══════════ PÁGINA 7 ═══════════ -->
-<section class="pagina">
   <h2>📉 La regresión a la media: el error más caro de todos</h2>
-  <p>De las mismas páginas sale un cuarto habitante del zoológico, hijo de todas las máquinas a la vez. La idea, sola, no la discute nadie: cuando una medida tiene una parte de habilidad y otra de suerte, después de un valor extremo viene otro <b>más cercano al promedio</b>, porque la suerte no se repite. Quien sacó 94 necesitó ser bueno <b>y</b> tener un buen día, y el buen día no vuelve a pedido. Lo peligroso es que la mente no acepta un «no pasó nada»: la representatividad exige una causa que se parezca al efecto, y siempre hay una a mano. El elogio de ayer. El regaño de ayer. La camisa.</p>
+  <p>De las mismas páginas sale un cuarto habitante del zoológico. La idea, sola, no la discute nadie: cuando una medida tiene una parte de habilidad y otra de suerte, después de un valor extremo viene otro <b>más cercano al promedio</b>, porque la suerte no se repite. Quien sacó 94 necesitó ser bueno <b>y</b> tener un buen día, y el buen día no vuelve a pedido. Lo peligroso es que la mente no acepta un «no pasó nada»: la representatividad exige una causa que se parezca al efecto, y siempre hay una a mano.</p>
 
   <h2>🧮 Paso a paso: el elogio, el regaño y el grupo del medio</h2>
   <p>Doce alumnos, dos exámenes de la misma materia con dos semanas de diferencia, y nada distinto en el aula. Tras el primero, la maestra <b>elogió en público</b> a los cuatro mejores y <b>regañó</b> a los cuatro últimos. A los cuatro del medio no les dijo nada, y ese detalle es el que resuelve el caso.</p>
@@ -249,6 +233,14 @@
     <tr><td><b>La clase entera</b></td><td>doce notas</td><td><b>70</b></td><td>doce notas</td><td><b>70</b></td></tr>
   </table>
 
+  <div class="pie">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span>🧭 Ruta de la Brújula Torcida · Etapa 1: Tres atajos generan el zoológico</span>
+  </div>
+</section>
+
+<!-- ═══════════ PÁGINA 7 ═══════════ -->
+<section class="pagina">
   <table class="pasos p-regre">
     <tr><th>#</th><th>Lectura</th><th>Qué dicen los números</th></tr>
     <tr><td>1</td><td><b>La del elogio</b></td><td>Los elogiados bajaron 8 puntos (88 → 80). «El elogio los relajó»</td></tr>
@@ -257,11 +249,19 @@
     <tr><td>4</td><td><b>El veredicto</b></td><td>Nadie mejoró y nadie empeoró: <b>los extremos se acercaron al promedio</b>. El elogio y el regaño no hicieron nada</td></tr>
   </table>
 
-  <p class="mini">Mírese además que dentro del grupo elogiado uno <b>subió</b> (86 → 90) y dentro del regañado uno <b>bajó</b> (60 → 54). Por eso cuesta tanto ver la regresión: no es una ley que se cumpla caso por caso, es un movimiento de promedios, y quien la busque alumno por alumno encontrará contraejemplos y concluirá que no existe.</p>
+  <p class="mini">Mírese además que dentro del grupo elogiado uno <b>subió</b> (86 → 90) y dentro del regañado uno <b>bajó</b> (60 → 54). Por eso cuesta tanto ver la regresión: es un movimiento de promedios, no una ley caso por caso, y quien la busque alumno por alumno encontrará contraejemplos y concluirá que no existe.</p>
 
   <div class="caja c-instructores">
     <h3>🪂 Caso real: los instructores de vuelo israelíes</h3>
-    <p>Kahneman contó muchas veces (quedó impreso en «Thinking, Fast and Slow», 2011, apoyado en su trabajo con Tversky de 1973 sobre la psicología de la predicción) que al explicar a unos instructores de la fuerza aérea israelí que el refuerzo positivo funciona mejor que el castigo, uno lo contradijo con su experiencia: cuando felicitaba a un cadete por una maniobra excelente, la siguiente le salía peor; cuando le gritaba por una pésima, la siguiente mejoraba. Había observado bien y concluido mal: con años de vuelo detrás, había aprendido de la realidad la lección contraria a la que la realidad enseñaba. <b>Etiqueta: anécdota de primera mano del autor, no experimento</b>; la estadística que la explica sí es firme, y es de Galton, siglo XIX.</p>
+    <p>Kahneman lo contó muchas veces (quedó impreso en «Thinking, Fast and Slow», 2011, apoyado en su trabajo con Tversky de 1973): al explicar a unos instructores de la fuerza aérea israelí que el refuerzo positivo funciona mejor que el castigo, uno lo contradijo con su experiencia. Cuando felicitaba a un cadete por una maniobra excelente, la siguiente le salía peor; cuando le gritaba por una pésima, la siguiente mejoraba. Había observado bien y concluido mal: con años de vuelo detrás, había aprendido de la realidad la lección contraria a la que la realidad enseñaba. <b>Etiqueta: anécdota de primera mano del autor, no experimento</b>; la estadística que la explica sí es firme, y es de Galton, siglo XIX.</p>
+  </div>
+
+  <h2>🔧 La operación de la etapa: derivar un sesgo hasta su madre</h2>
+  <p>Aquí está el examen de esta etapa, y no es de memoria. Se dice un sesgo con nombre propio, cualquiera de los doscientos, y hay que llevarlo a uno de cuatro veredictos con el mecanismo dicho en voz alta. No vale contestar «ese es de disponibilidad»: hay que decir <b>qué pregunta difícil se cambió por cuál fácil</b>.</p>
+
+  <div class="caja c-veredictos">
+    <h3>⚖️ Los cuatro veredictos posibles</h3>
+    <p><b>1 · Hija limpia.</b> Sale de una de las tres y se dice el cambio de pregunta. <b>2 · Hija de dos.</b> Necesita dos máquinas, y se nombran las dos. <b>3 · Nombre redundante.</b> Es otro nombre para algo que ya lo tenía: se dice cuál y se descarta. <b>4 · Madre propia.</b> No sale de las tres, y hay que decir de dónde sale sin forzarlo: distingue a quien entendió de quien repite «todo es representatividad».</p>
   </div>
 
   <div class="pie">
@@ -272,27 +272,25 @@
 
 <!-- ═══════════ PÁGINA 8 ═══════════ -->
 <section class="pagina">
-  <h2>🔧 La operación de la etapa: derivar un sesgo hasta su madre</h2>
-  <p>Aquí está el examen de esta etapa, y no es de memoria. Se dice un sesgo con nombre propio, cualquiera de los doscientos, y hay que llevarlo a uno de cuatro veredictos con el mecanismo dicho en voz alta. No vale contestar «ese es de disponibilidad»: hay que decir <b>qué pregunta difícil se cambió por cuál fácil</b>.</p>
-
-  <div class="caja c-veredictos">
-    <h3>⚖️ Los cuatro veredictos posibles</h3>
-    <p><b>1 · Hija limpia.</b> Sale de una de las tres y se puede decir el cambio de pregunta. <b>2 · Hija de dos.</b> Necesita dos máquinas a la vez, y hay que nombrar las dos. <b>3 · Nombre redundante.</b> Es otro nombre para algo que ya lo tenía; se dice cuál y se descarta. Abundan: el zoológico creció porque cada artículo bautizaba lo suyo. <b>4 · Madre propia.</b> No sale de las tres, y entonces hay que decir de dónde sale de verdad y no forzarlo. Este cuarto veredicto distingue a quien entendió de quien aprendió a repetir «todo es representatividad».</p>
-  </div>
-
   <table class="deriva">
     <tr><th>Sesgo con nombre propio</th><th>Veredicto</th><th>El mecanismo, dicho entero</th></tr>
     <tr><td><b>Ceguera a la tasa base</b></td><td>Hija limpia de <b>representatividad</b></td><td>«¿De qué clase es?» se cambia por «¿a qué se parece?», y el parecido no cuenta cuántos hay de cada clase</td></tr>
-    <tr><td><b>Falacia del jugador</b></td><td>Hija limpia de <b>representatividad</b></td><td>Se espera que una racha corta se parezca a la población entera: la ley de los números pequeños que Tversky y Kahneman describieron en 1971</td></tr>
+    <tr><td><b>Falacia del jugador</b></td><td>Hija limpia de <b>representatividad</b></td><td>Se espera que una racha corta se parezca a la población entera: la ley de los números pequeños, Tversky y Kahneman, 1971</td></tr>
     <tr><td><b>Sesgo del superviviente</b></td><td>Hija limpia de <b>disponibilidad</b></td><td>«¿Qué proporción lo logra?» se cambia por «¿cuántos casos recuerdo?», y los que no lo lograron no dejaron caso que recordar</td></tr>
-    <tr><td><b>Efecto halo</b></td><td>Hija de <b>representatividad</b>, con ayuda</td><td>Un rasgo bueno hace que el conjunto se parezca al retrato de «persona buena», y los demás rasgos se rellenan con ese retrato en vez de mirarse</td></tr>
+    <tr><td><b>Efecto halo</b></td><td>Hija de <b>representatividad</b>, con ayuda</td><td>Un rasgo bueno hace que el conjunto se parezca al retrato de «persona buena», y los demás rasgos se rellenan con ese retrato</td></tr>
     <tr><td><b>Primera oferta en una negociación</b></td><td>Hija limpia de <b>anclaje</b></td><td>«¿Cuánto vale?» se contesta partiendo de la cifra que hay delante, y el ajuste se queda corto</td></tr>
-    <tr><td><b>Ilusión de frecuencia</b> · <b>«sesgo del titular»</b> · <b>«sesgo del último caso»</b></td><td><b>Nombres redundantes</b></td><td>Los tres son disponibilidad con otro traje: lo que se nota, lo reciente y lo vívido vienen fácil. Bautizarlos aparte infla la lista y no añade mecanismo</td></tr>
+    <tr><td><b>«Sesgo del titular»</b> · <b>«sesgo del último caso»</b></td><td><b>Nombres redundantes</b></td><td>Los dos son disponibilidad con otro traje: lo reciente y lo vívido vienen fácil. Bautizarlos aparte infla la lista y no añade mecanismo</td></tr>
     <tr><td><b>Costo hundido</b></td><td><b>Madre propia</b></td><td>No sale de las tres: vive en la contabilidad mental y la aversión a la pérdida. Duele cerrar una cuenta en rojo, así que se sigue pagando</td></tr>
     <tr><td><b>Sesgo retrospectivo</b> <span class="mini">(«yo ya lo sabía»)</span></td><td><b>Madre propia</b></td><td>Es reconstrucción de la memoria: al conocer el desenlace se reescribe lo que uno creía antes. Fischhoff lo midió en 1975</td></tr>
   </table>
 
   <p class="mini">Hay que decir la incomodidad de esta tabla, porque callarla sería inflar: <b>los veredictos no siempre son limpios</b>, y hay sesgos que dos manuales serios colocan en madres distintas. La operación vale igual, porque obliga a nombrar el mecanismo; pero quien la presente como una clasificación cerrada está vendiendo más de lo que la materia tiene.</p>
+
+  <div class="caja c-inmune caja-amb">
+    <h3>💉 La advertencia que casi nadie cuenta: saber esto no inmuniza</h3>
+    <p>La divulgación de esta materia vende una promesa que la evidencia no sostiene: que conocer los sesgos protege de ellos. No protege, o protege poquísimo. Emily Pronin, Daniel Lin y Lee Ross midieron en 2002 el <b>punto ciego del sesgo</b>: la gente reconoce que los demás están sesgados y no se ve sesgada a sí misma (sólido y replicado). Y hay algo peor, medido por West, Meserve y Stanovich en 2012: <b>la sofisticación cognitiva no reduce ese punto ciego</b>. Quien más sabe de sesgos no se ve más sesgado; a veces se ve menos. Terminar esta ficha puede, si se lee mal, empeorar el problema.</p>
+    <p class="mini">Por eso la etapa termina en procedimientos y no en avisos. <b>La cifra escrita antes de la reunión. Las probabilidades contadas en frecuencias naturales. La pregunta por el cementerio</b> (¿a quiénes no estoy viendo?). <b>El grupo de control.</b> Ninguno depende de estar atento, y por eso funcionan los días de cansancio, que son los días en que todo esto pasa.</p>
+  </div>
 
   <div class="pie">
     <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
@@ -302,51 +300,30 @@
 
 <!-- ═══════════ PÁGINA 9 ═══════════ -->
 <section class="pagina">
-  <div class="caja c-inmune caja-amb">
-    <h3>💉 La advertencia que casi nadie cuenta: saber esto no inmuniza</h3>
-    <p>La divulgación de esta materia vende una promesa que la evidencia no sostiene: que conocer los sesgos protege de ellos. No protege, o protege poquísimo. Emily Pronin, Daniel Lin y Lee Ross midieron en 2002 el <b>punto ciego del sesgo</b>: la gente reconoce sin problema que los demás están sesgados y no se ve sesgada a sí misma (sólido y replicado). Y hay algo peor, medido por West, Meserve y Stanovich en 2012: <b>la sofisticación cognitiva no reduce ese punto ciego</b>. Quien más sabe de sesgos no se ve más sesgado; a veces se ve menos. Es decir que terminar esta ficha puede, si se lee mal, empeorar el problema.</p>
-    <p class="mini">Por eso la etapa termina en procedimientos y no en avisos. <b>La cifra escrita antes de la reunión. Las probabilidades contadas en frecuencias naturales, en papel. La pregunta por el cementerio</b> (¿a quiénes no estoy viendo?) antes de sacar conclusiones de una lista de éxitos. <b>El grupo de control</b>, aunque sea el grupo del medio a quien no se le dijo nada. Ninguno depende de estar atento, y por eso funcionan los días de cansancio, que son los días en que todo esto pasa.</p>
-  </div>
-
   <h2>🗣️ Qué decir al explicarlo, con alguien enfrente</h2>
   <p class="mini">Para la mesa de la cocina o para el aula. No son frases para ganar una discusión: son para que la conversación pase por el conteo.</p>
-  <p><b>«Contémoslo antes de decidirlo»:</b> no es desconfiar de nadie, es que la memoria mide facilidad y nosotros necesitamos frecuencia; con un papel y dos minutos tenemos el número. <b>«Eso es mucha estadística»:</b> son sumas, y lo decimos como «de cada mil, veinte», que se entiende sin fórmulas. <b>«A mí no me pasa, yo estoy atento»:</b> está medido que estar atento casi no protege, y que cuanto más sabe uno del tema menos sesgado se cree; por eso no lo peleamos con voluntad sino con un procedimiento escrito. <b>«Pero esa historia es real»:</b> claro que es real; la pregunta no es si pasó, sino cuántas veces sobre cuántas oportunidades. <b>«Entonces nunca hay que confiar en la intuición»:</b> al contrario, la intuición acierta en el ambiente para el que está calibrada, y la etapa 3 se dedica entera a decir en cuál. <b>«¿Y el famoso experimento de Linda?»:</b> lo usamos, y con su etiqueta: parte del efecto era la palabra «probable», y esa es justamente la lección que nos importa.</p>
+  <p><b>«Contémoslo antes de decidirlo»:</b> no es desconfiar de nadie, es que la memoria mide facilidad y nosotros necesitamos frecuencia; con un papel y dos minutos tenemos el número. <b>«Eso es mucha estadística»:</b> son sumas, y lo decimos como «de cada mil, veinte». <b>«A mí no me pasa, yo estoy atento»:</b> está medido que estar atento casi no protege, y que cuanto más sabe uno menos sesgado se cree; por eso no lo peleamos con voluntad sino con un procedimiento escrito. <b>«Pero esa historia es real»:</b> claro que lo es; la pregunta no es si pasó, sino cuántas veces sobre cuántas oportunidades. <b>«Entonces nunca hay que confiar en la intuición»:</b> al contrario, acierta en el ambiente para el que está calibrada. <b>«¿Y el experimento de Linda?»:</b> lo usamos con su etiqueta, porque parte del efecto era la palabra «probable», y esa es la lección que nos importa.</p>
 
   <div class="caja c-reglas">
     <h3>🧭 Las cinco reglas de esta etapa</h3>
     <ol>
-      <li><b>Tres máquinas, no doscientos nombres</b>, cada una con gatillo, ambiente y modo de fallo.</li>
-      <li><b>El atajo no es una avería:</b> es una herramienta fuera de su terreno. La pregunta es en qué ambiente estamos.</li>
-      <li><b>Las probabilidades se cuentan</b>, en frecuencias naturales y en papel: «de cada mil, veinte».</li>
-      <li><b>Todo sesgo se deriva</b> hasta su madre, o se declara redundante, o se le reconoce madre propia.</li>
-      <li><b>Contra un sesgo va un procedimiento escrito</b>, nunca la promesa de estar atento: eso está medido y no funciona.</li>
+      <li><b>Tres máquinas, no doscientos nombres</b>, con gatillo, ambiente y modo de fallo.</li>
+      <li><b>El atajo no es una avería:</b> es una herramienta fuera de su terreno.</li>
+      <li><b>Las probabilidades se cuentan:</b> «de cada mil, veinte», y en papel.</li>
+      <li><b>Todo sesgo se deriva</b> hasta su madre, o se declara redundante.</li>
+      <li><b>Contra un sesgo va un procedimiento escrito</b>, nunca la promesa de estar atento.</li>
     </ol>
-  </div>
-
-  <div class="pie">
-    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
-    <span>🧭 Ruta de la Brújula Torcida · Etapa 1: Tres atajos generan el zoológico</span>
-  </div>
-</section>
-
-<!-- ═══════════ PÁGINA 10 ═══════════ -->
-<section class="pagina">
-  <div class="caja titular">
-    <h3>🔑 El titular de la ficha</h3>
-    <p><b>Quien conoce las tres máquinas puede olvidar la lista.</b> El zoológico no se estudia animal por animal: se estudia la fábrica, y después cualquier animal se regenera cuando haga falta. Y quien crea que por conocerlas ya está a salvo se acaba de convertir en el hallazgo de Pronin: el que ve el sesgo en todos menos en él.</p>
   </div>
 
   <h2>📚 Las fuentes, con su etiqueta</h2>
   <table class="fuentes">
     <tr><th>Fuente</th><th>Etiqueta y para qué sirve aquí</th></tr>
-    <tr><td><b>Tversky y Kahneman (1974)</b>, «Judgment under Uncertainty: Heuristics and Biases», Science, vol. 185</td><td><b>Clásico sólido y fundacional.</b> Las tres heurísticas, el experimento de la ruleta y el armazón entero de esta etapa</td></tr>
-    <tr><td><b>Tversky y Kahneman (1983)</b>, «Extensional versus Intuitive Reasoning» (el problema de Linda)</td><td><b>Clásico CUESTIONADO en su interpretación.</b> El efecto existe; la lectura fuerte de que prueba incapacidad lógica, no. Se cita siempre con la objeción al lado</td></tr>
-    <tr><td><b>Hertwig y Gigerenzer (1999)</b>, «The conjunction fallacy revisited», Journal of Behavioral Decision Making</td><td><b>Objeción seria y publicada.</b> Parte del efecto de Linda es la ambigüedad de «probable»; preguntado en frecuencias, se desploma</td></tr>
-    <tr><td><b>Tversky y Kahneman (1971)</b>, «Belief in the law of small numbers»</td><td><b>Clásico sólido.</b> De aquí salen la insensibilidad al tamaño de la muestra y la falacia del jugador</td></tr>
-    <tr><td><b>Klein y otros (2014)</b>, proyecto Many Labs</td><td><b>Réplica sólida.</b> El anclaje salió reforzado de la crisis de replicación: es el efecto más firme de la ficha</td></tr>
-    <tr><td><b>Gigerenzer (2006)</b>, Risk Analysis</td><td><b>Estudio serio con estimación discutida.</b> Los muertos de más en carretera tras 2001: la dirección no se discute, la cifra exacta sí</td></tr>
-    <tr><td><b>Wald (1943)</b>, memorandos del Statistical Research Group, Columbia</td><td><b>Episodio histórico documentado.</b> El sesgo del superviviente; el dibujo del avión punteado es adorno posterior</td></tr>
-    <tr><td><b>Pronin, Lin y Ross (2002)</b> · <b>West, Meserve y Stanovich (2012)</b></td><td><b>Sólidos y replicados.</b> El punto ciego del sesgo, y que saber más no lo reduce: son la advertencia epistémica de la etapa</td></tr>
+    <tr><td><b>Tversky y Kahneman (1974)</b>, «Judgment under Uncertainty», Science, vol. 185</td><td><b>Clásico sólido y fundacional.</b> Las tres heurísticas, la ruleta y el armazón entero de la etapa</td></tr>
+    <tr><td><b>Tversky y Kahneman (1983)</b>, «Extensional versus Intuitive Reasoning» (Linda)</td><td><b>Clásico CUESTIONADO en su interpretación.</b> El efecto existe; la lectura fuerte de que prueba incapacidad lógica, no. Se cita con la objeción al lado</td></tr>
+    <tr><td><b>Hertwig y Gigerenzer (1999)</b>, J. of Behavioral Decision Making</td><td><b>Objeción seria y publicada.</b> Parte del efecto de Linda es la ambigüedad de «probable»; en frecuencias, se desploma</td></tr>
+    <tr><td><b>Tversky y Kahneman (1971)</b>, «Belief in the law of small numbers» · <b>Klein y otros (2014)</b>, Many Labs</td><td><b>Clásico sólido</b> el primero (de ahí salen el tamaño de la muestra y la falacia del jugador); <b>réplica sólida</b> el segundo: el anclaje salió reforzado de la crisis</td></tr>
+    <tr><td><b>Gigerenzer (2006)</b>, Risk Analysis · <b>Wald (1943)</b>, memorandos de Columbia</td><td><b>Estimación discutida</b> el primero; <b>episodio histórico documentado</b> el segundo. Los dos casos de disponibilidad</td></tr>
+    <tr><td><b>Pronin, Lin y Ross (2002)</b> · <b>West, Meserve y Stanovich (2012)</b></td><td><b>Sólidos y replicados.</b> El punto ciego del sesgo, y que saber más no lo reduce</td></tr>
     <tr><td>«Conocer los sesgos te protege de ellos»</td><td><b>Divulgación inflada.</b> Lo desmiente la evidencia de esta misma tabla. Lo que protege es cambiar el procedimiento</td></tr>
   </table>
 
@@ -356,20 +333,20 @@
   </div>
 </section>
 
-<!-- ═══════════ PÁGINA 11 ═══════════ -->
+<!-- ═══════════ PÁGINA 10 ═══════════ -->
 <section class="pagina">
   <h2>✏️ Ejercicios para hacer a lápiz</h2>
   <ol>
-    <li><b>Las tres columnas.</b> Escribe de memoria, sin mirar la página 2, las tres heurísticas con su gatillo, su ambiente y su modo de fallo. Nueve casillas. Después compara y marca cuáles fallaron.</li>
+    <li><b>Las tres columnas.</b> Escribe de memoria, sin mirar la página 1, las tres heurísticas con su gatillo, su ambiente y su modo de fallo. Nueve casillas; después compara y marca cuáles fallaron.</li>
     <li><b>La tasa base, con otros números.</b> En un pueblo de 1 000 adultos hay 20 albañiles y 980 que no lo son. Una descripción encaja con el 90% de los albañiles y con el 8% de los demás. ¿Qué probabilidad hay de que la persona descrita sea albañil? Haz los cuatro pasos.</li>
     <li><b>La alerta del detector.</b> Repite la cuenta del detector con una falta más rara: de cada 1 000 tareas hay <b>5</b> copiadas, el detector caza 4 y sigue marcando por error al 5% de las honradas. ¿Qué significa ahora una alerta?</li>
     <li><b>El grupo chico.</b> Explica en cuatro líneas, y sin fórmulas, por qué el aula de 4 alumnos aparece más veces en los extremos de la tabla que la de 40. Después di qué regla debería tener la casa antes de premiar al grupo del mes.</li>
   </ol>
   <ol start="5">
-    <li><b>Derivar cinco.</b> Deriva estos cinco con su veredicto y su mecanismo escrito: (a) el efecto de la primera impresión en una entrevista; (b) creer que los aviones se caen seguido; (c) «este mes ya me tocó suerte»; (d) seguir pagando un curso que no sirve porque ya se pagó medio año; (e) leer una lista de diez negocios que triunfaron y sacar la receta del éxito.</li>
+    <li><b>Derivar cinco.</b> Deriva con su veredicto y su mecanismo escrito: (a) el efecto de la primera impresión en una entrevista; (b) creer que los aviones se caen seguido; (c) «este mes ya me tocó suerte»; (d) seguir pagando un curso que no sirve porque ya se pagó medio año; (e) leer una lista de diez negocios que triunfaron y sacar la receta del éxito.</li>
     <li><b>El ancla propia.</b> Toma una decisión de dinero que la casa tenga abierta esta semana. Escribe la cifra propia con su cuenta, ponle fecha y guárdala <b>antes</b> de cualquier conversación. Después anota qué cifras oíste y en cuánto se cerró.</li>
-    <li><b>La regresión en casa.</b> Busca dos rondas de una misma medida (dos exámenes, dos meses de descargas, dos semanas de tareas entregadas). Toma el grupo más alto de la primera ronda y míralo en la segunda. Escribe qué explicación causal se te ocurrió primero, y solo entonces mira el grupo del medio.</li>
-    <li><b>El estudio con casco.</b> Elige un estudio de esta ficha y escríbele su etiqueta con tus palabras: qué parte está firme, qué parte está discutida y quién la discute. Luego explica por qué la etiqueta viaja con la cita para siempre.</li>
+    <li><b>La regresión en casa.</b> Busca dos rondas de una misma medida (dos exámenes, dos meses de descargas, dos semanas de tareas). Toma el grupo más alto de la primera ronda y míralo en la segunda. Escribe qué explicación causal se te ocurrió primero, y solo entonces mira el grupo del medio.</li>
+    <li><b>El estudio con casco.</b> Elige un estudio de esta ficha y escríbele su etiqueta con tus palabras: qué parte está firme, qué parte discutida y quién la discute. Luego explica por qué la etiqueta viaja con la cita para siempre.</li>
   </ol>
 
   <div class="pie">
@@ -378,30 +355,30 @@
   </div>
 </section>
 
-<!-- ═══════════ PÁGINA 12 ═══════════ -->
+<!-- ═══════════ PÁGINA 11 ═══════════ -->
 <section class="pagina">
   <div class="caja c-p12">
     <h3>✅ Pauta de los ejercicios (1 a 2)</h3>
-    <p><b>1.</b> Las nueve casillas se corrigen contra la tabla de la página 2. Se valora sobre todo la columna del medio, el <b>ambiente donde acierta</b>, que es la que casi todos olvidan: quien solo escriba gatillo y fallo aprendió la lista de averías, que es justo lo que esta etapa vino a evitar.</p>
+    <p><b>1.</b> Las nueve casillas se corrigen contra la tabla de la página 1. Se valora sobre todo la columna del medio, el <b>ambiente donde acierta</b>, que es la que casi todos olvidan: quien solo escriba gatillo y fallo aprendió la lista de averías, que es justo lo que esta etapa vino a evitar.</p>
     <p><b>2.</b> Paso 1: 20 albañiles y 980 no albañiles. Paso 2: 0,90 × 20 = <b>18</b> albañiles encajan; 0,08 × 980 = 78,4, digamos <b>78</b> no albañiles. Paso 3: 18 + 78 = <b>96</b> personas encajan. Paso 4: 18 / 96 = <b>0,19</b>, menos de dos de cada diez. La descripción acierta once veces más entre albañiles y aun así lo más probable es que no lo sea, porque hay cuarenta y nueve veces más de los otros.</p>
   </div>
 
   <div class="caja c-p34">
     <h3>✅ Pauta de los ejercicios (3 a 4)</h3>
     <p><b>3.</b> Copiadas marcadas: <b>4</b>. Honradas marcadas: 0,05 × 995 = 49,75, redondeando <b>50</b>. Total de alertas: 54. Son copias de verdad 4 / 54 = <b>7%</b>. Con la falta más rara la misma prueba empeora: <b>trece de cada catorce alertas caen sobre alguien inocente</b>. Es la regla general de la página 3: cuanto más raro es lo que se busca, menos vale una alerta, aunque la prueba no haya cambiado nada.</p>
-    <p><b>4.</b> Se valora que aparezca la idea y no la palabra «varianza»: con pocos casos cada caso pesa muchísimo, así que un solo alumno con un buen día mueve el porcentaje del aula chica veinticinco puntos y en la grande no mueve ni tres. Por eso las aulas chicas ocupan los dos extremos de cualquier tabla. La regla para la casa: <b>ningún premio se da por porcentaje sin mirar el tamaño del grupo</b>; o se comparan grupos de tamaño parecido, o se premia por número de alumnos y no por proporción.</p>
+    <p><b>4.</b> Se valora que aparezca la idea y no la palabra «varianza»: con pocos casos cada caso pesa muchísimo, así que un solo alumno con un buen día mueve el porcentaje del aula chica veinticinco puntos y en la grande no mueve ni tres. La regla para la casa: <b>ningún premio se da por porcentaje sin mirar el tamaño del grupo</b>; o se comparan grupos parecidos, o se premia por número de alumnos.</p>
   </div>
 
   <div class="caja c-p5">
     <h3>✅ Pauta del ejercicio 5</h3>
-    <p><b>(a) Primera impresión en una entrevista:</b> hija de <b>anclaje</b>, con ayuda del halo; el primer dato hace de cifra de partida y lo que viene después se ajusta poco desde ahí. <b>(b) Creer que los aviones se caen seguido:</b> hija limpia de <b>disponibilidad</b>; cada accidente sale en todos los noticieros y los millones de vuelos que aterrizan bien no salen en ninguno. <b>(c) «Este mes ya me tocó suerte»:</b> hija limpia de <b>representatividad</b>, la falacia del jugador: se espera que un mes se parezca a la población entera. <b>(d) Seguir pagando el curso:</b> <b>madre propia</b>, costo hundido; vive en la contabilidad mental y la aversión a la pérdida, no en las tres. <b>(e) La receta de los diez negocios:</b> hija limpia de <b>disponibilidad</b> en su forma de superviviente; falta el cementerio, es decir los negocios que hicieron lo mismo y cerraron, y sin ellos la receta no se puede evaluar.</p>
+    <p><b>(a) Primera impresión en una entrevista:</b> hija de <b>anclaje</b>, con ayuda del halo; el primer dato hace de cifra de partida y lo que viene después se ajusta poco desde ahí. <b>(b) Creer que los aviones se caen seguido:</b> hija limpia de <b>disponibilidad</b>; cada accidente sale en todos los noticieros y los millones de vuelos que aterrizan bien no salen en ninguno. <b>(c) «Este mes ya me tocó suerte»:</b> hija limpia de <b>representatividad</b>, la falacia del jugador: se espera que un mes se parezca a la población entera. <b>(d) Seguir pagando el curso:</b> <b>madre propia</b>, costo hundido; vive en la contabilidad mental y la aversión a la pérdida. <b>(e) La receta de los diez negocios:</b> hija limpia de <b>disponibilidad</b> en su forma de superviviente; falta el cementerio, es decir los negocios que hicieron lo mismo y cerraron.</p>
   </div>
 
   <div class="caja c-p68">
     <h3>✅ Pauta de los ejercicios (6 a 8)</h3>
     <p><b>6.</b> Se valora que la cifra esté <b>escrita, fechada y guardada antes</b> de la conversación, con la cuenta que la produjo al lado, y que después se anote qué anclas se oyeron y en cuánto se cerró. Si el cierre quedó pegado a la cifra ajena y no a la propia, el ejercicio no falló: acaba de documentar el anclaje en vivo, que vale más que acertar. Y si no hubo cifra propia escrita, eso es el hallazgo.</p>
     <p><b>7.</b> Se valora que el grupo más alto de la primera ronda haya bajado en la segunda (lo normal), que la explicación causal que apareció primero esté <b>escrita antes</b> de mirar el grupo del medio, y que ese grupo se use como control: si los del medio no se movieron y los extremos se acercaron al promedio, no pasó nada y no hay que explicar nada. La trampa que hay que cazarse a uno mismo es haber encontrado una causa convincente en menos de diez segundos.</p>
-    <p><b>8.</b> Se valora que la etiqueta diga <b>las dos cosas</b>: qué parte está firme y qué parte discutida, con el nombre de quien la discute. Ejemplo aceptable con Linda: firme, que el parecido con el retrato empuja el juicio; discutido, que eso demuestre incapacidad lógica, y lo discuten Hertwig y Gigerenzer desde 1999 mostrando que en frecuencias el efecto se desploma. Y viaja para siempre porque quien recibe la cita no va a ir a buscar el estatus: una cita sin etiqueta se convierte en el próximo dato inflado que alguien repita durante veinte años.</p>
+    <p><b>8.</b> Se valora que la etiqueta diga <b>las dos cosas</b>: qué parte está firme y qué parte discutida, con el nombre de quien la discute. Ejemplo aceptable con Linda: firme, que el parecido con el retrato empuja el juicio; discutido, que eso demuestre incapacidad lógica, y lo discuten Hertwig y Gigerenzer desde 1999. Y viaja para siempre porque quien recibe la cita no va a ir a buscar el estatus: una cita sin etiqueta se convierte en el próximo dato inflado que alguien repita veinte años.</p>
   </div>
 
   <div class="pie">
