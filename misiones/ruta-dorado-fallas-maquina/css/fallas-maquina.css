@@ -516,3 +516,17 @@ body.letra-grande .sopa-cell{font-size:125%!important;line-height:1.6;}
 .sort-luz-chip{font-family:'Fredoka',sans-serif;font-size:0.8rem;font-weight:700;padding:0.12rem 0.55rem;border-radius:999px;background:var(--card);border:1.5px solid currentColor;flex-shrink:0;}
 .sort-item.sort-luz-ok .sort-luz-chip{color:var(--jade);}
 .sort-item.sort-luz-no .sort-luz-chip{color:var(--amber);}
+
+/* RECURSOS · EL KIT DE ESCRITURA A MANO
+   Estas cinco clases viajan CON el bloque cuando el kit se lleve a otra
+   misión: son quince líneas y van en el CSS de cada misión a propósito,
+   porque la hoja compartida del kit (css/kit-mano.css) es de PAPEL y no
+   se carga en la pantalla de la misión. Meterlas allí obligaría a que
+   cada misión cargara una hoja de impresión para pintar cuatro botones. */
+.recurso-bloque{border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);}
+.recurso-bloque h3{font-family:'Fredoka',sans-serif;font-size:1rem;font-weight:800;margin:0 0 0.4rem;color:var(--dark);}
+.recurso-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0.8rem;margin:0.9rem 0;}
+.recurso-grupo h4{font-family:'Fredoka',sans-serif;font-size:0.82rem;margin:0 0 0.4rem;color:var(--gray);text-transform:uppercase;letter-spacing:0.04em;}
+.btn-recurso{display:block;text-decoration:none;font-size:0.82rem;line-height:1.3;color:var(--dark);background:var(--card);border:2px solid var(--border);border-radius:10px;padding:0.4rem 0.6rem;margin-bottom:0.4rem;transition:all 0.18s;}
+.btn-recurso:hover{border-color:var(--pri);transform:translateY(-1px);box-shadow:0 3px 10px var(--shadow);}
+.recurso-nota{font-size:0.82rem;color:var(--gray);line-height:1.5;margin:0;}

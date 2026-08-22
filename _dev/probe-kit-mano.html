@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · El kit de escritura a mano</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:703px;height:400px;border:0;background:#fff;margin:0 0 8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+<iframe id="m" src="/misiones/ruta-dorado-fallas-maquina/fallas-maquina.html"></iframe>
+<iframe id="h"></iframe>
+<script>
+/* Comprueba EL KIT DE ESCRITURA A MANO: los ocho imprimibles de la etapa
+   2 del Expediente Dorado y su hoja compartida `css/kit-mano.css`.
+
+   Estas hojas NO son fichas y la norma 6 no las toca (es el mismo
+   permiso que tienen las hojas sueltas de las lecturas), así que no se
+   miden con `_dev/mide-ficha-paginas.html` y tienen su propio medidor,
+   que es este. Lo que se comprueba, y por qué cada cosa:
+
+   1. QUE LOS RENGLONES SE DIBUJEN. Se pintan con degradados repetidos y
+      su alto sale de una variable CSS. Un error de plantilla dejó una
+      vez `--n: undefined` en las cuatro preguntas de las cuatro hojas,
+      y el resultado eran preguntas sin ningún sitio donde contestar:
+      en pantalla no se nota nada, porque un renglón vacío y un renglón
+      inexistente se ven igual de blancos.
+   2. QUE LA HOJA NO SALGA EN BLANCO AL IMPRIMIRLA. Los renglones son
+      FONDOS, y los navegadores quitan los fondos al imprimir salvo que
+      se pida lo contrario. Sin `print-color-adjust: exact` este kit se
+      imprime como un montón de preguntas sin renglones.
+   3. QUE CADA HOJA QUEPA EN UNA HOJA. El alto útil de una carta con
+      15 mm de margen es 249,4 mm, y el margen del primer bloque se suma
+      POR FUERA (la trampa que ya está escrita en fichas/css/ficha.css).
+      La sonda mide con LAS REGLAS DE IMPRESIÓN DE VERDAD: las saca del
+      propio kit-mano.css y las inyecta, en vez de llevar una copia que
+      se desincroniza sola.
+   4. QUE LA MISIÓN ANUNCIE EL NÚMERO DE HOJAS QUE CADA ARCHIVO TIENE.
+      El bloque de Recursos dice «3 hojas», «4 hojas»: si alguien parte
+      una hoja en dos y no toca el rótulo, la misión miente.
+   5. Y LA NORMA 1-BIS: ni un guion largo. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+const BASE = '/misiones/ruta-dorado-fallas-maquina/imprimibles/';
+
+/* El número de hojas que debe tener cada archivo. Es lo único escrito a
+   mano de esta sonda, y a propósito: es la declaración de intenciones
+   contra la que se mide todo lo demás. */
+const KIT = [
+  { f: 'cuaderno-caligrafia-taller.html',      hojas: 3 },
+  { f: 'cierres-cuaderno-active-recall.html',  hojas: 4 },
+  { f: 'tarjetas-diagnostico-portatiles.html', hojas: 1 },
+  { f: 'registro-huecos-protocolo-321.html',   hojas: 3 },
+  { f: 'cornell-notes-fallas.html',            hojas: 4 },
+  { f: 'mapeo-visual-dual-coding.html',        hojas: 1 },
+  { f: 'no-verbatim-reformulacion.html',       hojas: 1 },
+  { f: 'conexiones-reales-elaborative.html',   hojas: 1 },
+];
+const ALTO_UTIL = 249.4;   /* carta (279,4) menos los 15 mm de margen de arriba y abajo */
+
+function cargar(marco, url) {
+  return new Promise(r => { marco.addEventListener('load', r, { once: true }); marco.src = url; });
+}
+
+window.addEventListener('load', async () => {
+  try {
+    log('── LA HOJA COMPARTIDA ──');
+    const css = await (await fetch('/css/kit-mano.css')).text();
+    ok(css.length > 3000, 'css/kit-mano.css responde (' + css.length + ' bytes)', 'no está la hoja compartida del kit');
+    ok(/print-color-adjust:\s*exact/.test(css),
+       'pide print-color-adjust: exact (si no, el kit se imprime SIN renglones)',
+       'FALTA print-color-adjust: los renglones no se imprimen y las hojas salen en blanco');
+    ok(/@page\s*\{[^}]*size:\s*letter/.test(css), 'y declara la hoja carta', 'no declara el tamaño de hoja');
+    ok(css.indexOf('—') === -1, 'y va sin guiones largos (norma 1-bis)', 'la hoja compartida trae guiones largos');
+
+    /* Las reglas de impresión se sacan del propio archivo y se inyectan
+       tal cual: así la sonda no lleva una copia que se queda vieja en
+       cuanto alguien cambia el margen de la hoja. */
+    const bloque = css.match(/@media print\s*\{([\s\S]*)\}\s*$/);
+    ok(!!bloque, 'y su bloque de impresión se puede leer para medir con él', 'no se pudo aislar el @media print');
+    const reglasImpresion = bloque ? bloque[1].replace(/@page[^}]*\}/, '') : '';
+
+    log('\n── LOS OCHO IMPRIMIBLES ──');
+    const marco = document.getElementById('h');
+    let hojasTotales = 0;
+    for (const item of KIT) {
+      await cargar(marco, BASE + item.f);
+      await esperar(220);
+      const d = marco.contentDocument;
+      const w = marco.contentWindow;
+      log('\n  · ' + item.f);
+      const hojas = [...d.querySelectorAll('.hoja')];
+      ok(hojas.length === item.hojas, item.hojas + (item.hojas === 1 ? ' hoja' : ' hojas') + ', como anuncia la misión', 'trae ' + hojas.length + ' y la misión anuncia ' + item.hojas);
+      hojasTotales += hojas.length;
+      ok(!!d.querySelector('link[href$="kit-mano.css"]'), 'usa la hoja compartida', 'lleva el CSS dentro en vez de compartirlo');
+      ok(d.body.textContent.indexOf('—') === -1, 'sin guiones largos', 'trae guiones largos (norma 1-bis)');
+      ok(!!d.querySelector('.imprimir-btn') && !!d.querySelector('.volver'), 'con su botón de imprimir y su vuelta a la misión', 'le falta el botón de imprimir o la vuelta');
+
+      /* Sitio donde escribir, del tipo que sea: la hoja de tarjetas no
+         lleva renglones largos sino rayas cortas dentro de cada tarjeta,
+         y la del mapa lleva además un recuadro libre para dibujar. Lo que
+         no puede faltar es que HAYA dónde escribir. */
+      const renglones = [...d.querySelectorAll('.renglones')];
+      const sitios = renglones.length + d.querySelectorAll('.tj-campo .raya, .linea-celda, .libre-espacio, .idline .raya').length;
+      ok(sitios > 0, sitios + ' sitios donde escribir', 'no hay ni un sitio donde escribir');
+      const sinAlto = renglones.filter(r => r.getBoundingClientRect().height < 5);
+      ok(sinAlto.length === 0, 'y los ' + renglones.length + ' bloques de renglones con alto de verdad', sinAlto.length + ' bloques de renglones con alto cero: hay preguntas sin dónde contestar');
+      const sinFondo = renglones.filter(r => !/gradient/.test(w.getComputedStyle(r).backgroundImage));
+      ok(sinFondo.length === 0, 'y todos con su raya dibujada', sinFondo.length + ' bloques sin raya: son huecos en blanco, no renglones');
+
+      /* Y que cada hoja quepa en una hoja, con las reglas de impresión
+         de verdad puestas y el suelo del min-height quitado. */
+      const est = d.createElement('style');
+      est.textContent = reglasImpresion + '\n.hoja{min-height:0 !important;page-break-after:auto !important;}\n.doc{max-width:186mm !important;}';
+      d.head.appendChild(est);
+      await esperar(120);
+      const mm = px => px / (96 / 25.4);
+      const altos = hojas.map(h => mm(h.getBoundingClientRect().height));
+      const pasadas = altos.map((a, i) => ({ i: i + 1, a: a })).filter(x => x.a > ALTO_UTIL);
+      ok(pasadas.length === 0,
+         'y cada hoja cabe en su hoja (la más alta, ' + Math.max(...altos).toFixed(0) + ' mm de ' + ALTO_UTIL + ')',
+         'se pasan de la hoja: ' + pasadas.map(x => 'la ' + x.i + ' con ' + x.a.toFixed(0) + ' mm').join(', '));
+      est.remove();
+    }
+    log('\n  ' + hojasTotales + ' hojas de papel en total');
+
+    log('\n── LA MISIÓN LOS ENLAZA ──');
+    const dm = document.getElementById('m').contentDocument;
+    const bloqueKit = dm.querySelector('.recurso-bloque');
+    ok(!!bloqueKit, 'el bloque del kit está en Recursos', 'no hay bloque del kit en la misión');
+    if (bloqueKit) {
+      const enlaces = [...bloqueKit.querySelectorAll('a.btn-recurso')];
+      ok(enlaces.length === 8, 'con sus ocho enlaces', 'hay ' + enlaces.length + ' enlaces');
+      const archivos = KIT.map(k => k.f);
+      const faltan = archivos.filter(f => !enlaces.some(a => a.getAttribute('href') === 'imprimibles/' + f));
+      ok(faltan.length === 0, 'y los ocho apuntan a un archivo del kit', 'no se enlazan: ' + faltan.join(', '));
+      ok(enlaces.every(a => a.target === '_blank' && /noopener/.test(a.rel || '')),
+         'todos se abren en pestaña aparte y con rel seguro', 'algún enlace abre encima de la misión o sin rel="noopener"');
+      /* El rótulo de hojas de cada enlace tiene que decir la verdad. */
+      const mienten = KIT.filter(k => {
+        const a = enlaces.find(x => x.getAttribute('href') === 'imprimibles/' + k.f);
+        if (!a) return true;
+        const m = a.textContent.match(/(\d+)\s*hoja/);
+        return !m || Number(m[1]) !== k.hojas;
+      });
+      ok(mienten.length === 0, 'y cada uno anuncia las hojas que de verdad trae', 'rótulo mentiroso en: ' + mienten.map(k => k.f).join(', '));
+      ok(dm.querySelectorAll('.recurso-grupo').length === 4, 'repartidos en los cuatro grupos del flujo', 'los grupos no son cuatro');
+    }
+    /* Y que las clases del bloque estén de verdad estiladas: sin ellas
+       los botones se ven como una lista de enlaces sueltos. */
+    const btn = dm.querySelector('.btn-recurso');
+    ok(!!btn && document.getElementById('m').contentWindow.getComputedStyle(btn).borderStyle.indexOf('solid') === 0,
+       'y el CSS de la misión los pinta como botones', 'las clases del bloque no están estiladas en el CSS de la misión');
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda del kit de escritura a mano';
+  } catch (e) {
+    log('✘ ' + e.message + '\n' + e.stack);
+    document.title = 'SUSPENDE · Sonda del kit de escritura a mano';
+  }
+});
+</script>
+</body>
+</html>

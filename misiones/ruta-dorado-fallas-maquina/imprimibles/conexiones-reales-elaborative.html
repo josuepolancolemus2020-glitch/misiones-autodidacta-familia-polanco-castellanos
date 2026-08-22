@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conexiones Reales · Elaborative Encoding · Las fallas de la máquina</title>
+<link rel="stylesheet" href="../../../css/kit-mano.css">
+<style>
+  .hoja { --renglon: 7mm; }
+  .bloque-conexion {
+    border: 1px solid var(--borde-suave); border-left: 5px solid var(--col);
+    padding: 5px 9px 6px; margin-bottom: 5px;
+  }
+  .bloque-conexion .cab {
+    font-weight: bold; font-size: 11.5px; color: var(--col); margin: 0 0 1px;
+  }
+  .bloque-conexion .cab .gris { color: var(--gris); font-weight: normal; font-size: 10.5px; }
+  .bloque-conexion .preg { font-size: 11.5px; font-weight: bold; margin: 0 0 3px; }
+  .bloque-conexion .ej {
+    font-size: 10px; line-height: 1.4; margin: 3px 0 0;
+    background: var(--verde-suave); border-left: 3px solid var(--verde);
+    padding: 3px 7px;
+  }
+  .cierre-negro {
+    background: var(--tinta); color: #fff; border: 2px solid var(--oro);
+    padding: 7px 10px; margin-top: 7px;
+  }
+  .cierre-negro .tit { font-weight: bold; font-size: 12.5px; color: var(--oro); margin: 0 0 4px; }
+  .cierre-negro .renglones {
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--renglon) - 1px), rgba(255,255,255,0.45) calc(var(--renglon) - 1px), rgba(255,255,255,0.45) var(--renglon));
+  }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir</button>
+
+<div class="doc">
+
+<div class="solo-pantalla">
+  <strong>🔗 La hoja que amarra la etapa a tu semana.</strong> Es la última del kit y la que más aguanta: lo demás se recuerda mientras se estudia, y esto se recuerda porque ya está enganchado a algo que te pasó.
+  <br><br>
+  <strong>La ciencia:</strong> <b>Craik y Lockhart (1972)</b> propusieron que lo que decide cuánto dura un recuerdo no es cuántas veces lo repasaste, sino <b>a qué profundidad lo procesaste</b>. Repetir una definición es procesamiento superficial. Conectarla con algo que ya sabes, y sobre todo con algo que te pasó a ti, es procesamiento profundo, y eso deja un ancla que no se suelta.
+  <br><br>
+  <strong>Y la honradez de la casa:</strong> a este marco se le ha objetado que es algo circular (se llama «profundo» a lo que se recuerda mejor, y se explica que se recuerde mejor porque es profundo). La objeción es justa. Lo que sí está bien medido, y es lo que usa esta hoja, es que <b>elaborar</b> un contenido (explicarlo, ejemplificarlo, ligarlo a lo propio) deja más memoria que repetirlo tal cual.
+</div>
+
+<section class="hoja">
+  <a class="volver" href="../fallas-maquina.html">← Volver a la misión</a>
+  <div class="idline"><span>Escribe:</span><span class="raya"></span><span>Semana del:</span><span class="raya corta"></span></div>
+
+  <div class="kh">
+    <h1>🔗 Conexiones Reales <span style="color:var(--oro)">· lo que te toca a ti</span></h1>
+    <p class="meta">🏠 F.A.R.O. · Estudio Mayor · 🔧 Expediente Dorado · Etapa 2</p>
+  </div>
+
+  <div class="aviso-negro" style="padding:7px 10px;margin-bottom:6px">
+    <strong>La pregunta de esta hoja, y es una sola: ¿cuál de las cuatro fallas te toca a ti, esta semana, en tu vida de verdad?</strong> No un ejemplo de manual ni uno del noticiero: uno donde tú seas el que paga, el que no sabe, o el que no tiene a dónde ir. Una falla que te haya costado dinero, tiempo o sueño ya no se te olvida, y es la que vas a saber explicar dentro de un año.
+  </div>
+
+  <div class="bloque-conexion" style="--col:#4a90d9">
+    <p class="cab">🌊 Externalidad <span class="gris">· el costo lo paga quien no firmó</span></p>
+    <p class="preg">¿Dónde viste esta semana un costo que cayó sobre alguien que no estaba en el trato?</p>
+    <div class="renglones" style="--n:2"></div>
+    <p class="ej"><b>Uno de la casa:</b> el vecino que pone música hasta las dos de la mañana. Él disfruta, tú pagas el sueño, y nadie te preguntó.</p>
+  </div>
+
+  <div class="bloque-conexion" style="--col:#e74c3c">
+    <p class="cab">🏭 Poder de mercado <span class="gris">· no había a dónde ir</span></p>
+    <p class="preg">¿Dónde tuviste que aceptar un precio porque no había otro sitio al que ir?</p>
+    <div class="renglones" style="--n:2"></div>
+    <p class="ej"><b>Uno de la casa:</b> el único banco del pueblo, o la única pulpería abierta un domingo. El precio no lo pone la maldad: lo pone que no hay competencia.</p>
+  </div>
+
+  <div class="bloque-conexion" style="--col:#f39c12">
+    <p class="cab">🍋 Información asimétrica <span class="gris">· el que paga es el que menos sabe</span></p>
+    <p class="preg">¿Dónde pagaste algo sin poder comprobar si de verdad hacía falta?</p>
+    <div class="renglones" style="--n:2"></div>
+    <p class="ej"><b>Uno de la casa:</b> el mecánico que dice que hay que cambiar tres piezas. Capaz que sí. Tú no tienes cómo saberlo, y él cobra por decírtelo.</p>
+  </div>
+
+  <div class="bloque-conexion" style="--col:#27ae60">
+    <p class="cab">🎈 Falla dinámica <span class="gris">· la calma incuba la crisis</span></p>
+    <p class="preg">¿Dónde dejaste de cuidarte de algo justamente porque venía saliendo bien?</p>
+    <div class="renglones" style="--n:2"></div>
+    <p class="ej"><b>Uno de la casa:</b> tres meses sin repasar matemática porque el examen anterior salió en noventa. Los años buenos convencen de que ya no hay riesgo.</p>
+  </div>
+
+  <div class="cierre-negro">
+    <p class="tit">🔧 Cierre: la falla que me toca a mí</p>
+    <p style="font-size:10.5px;line-height:1.4;margin:0 0 3px">Cuál de las cuatro te pega más fuerte, y <b>qué regla concreta te pones tú</b>, con quién la aplica y cómo se comprueba. Ninguna regla es gratis: escribe también qué te va a costar.</p>
+    <div class="renglones" style="--n:3"></div>
+  </div>
+
+  <div class="pie-kit">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span class="frase">Lo que te costó dinero o sueño ya no se te olvida</span>
+  </div>
+</section>
+</div>
+</body>
+</html>

@@ -1,0 +1,443 @@
+/* ══════════════════════════════════════════════════════════════════
+   EL KIT DE ESCRITURA A MANO · hoja compartida de los imprimibles
+   ══════════════════════════════════════════════════════════════════
+
+   Pedido por el autor el 22 de agosto de 2026, después del taller de la
+   memoria: el mismo aparato, pero en papel, para quien estudia delante
+   de la computadora y quiere escribir a mano mientras lee.
+
+   ── POR QUÉ ESTO NO ES UNA FICHA ──
+   La norma 6 manda que una ficha sean diez hojas exactas, viva en
+   `fichas/`, use `fichas/css/ficha.css` y se mida con
+   `_dev/mide-ficha-paginas.html`. Estas ocho hojas NO son fichas y la
+   norma no las toca: es el mismo permiso que ya tienen las hojas
+   sueltas de las lecturas (norma 5-nonies, el aviso del final). Tienen
+   su propia hoja de estilo, que es esta, y su propio medidor.
+
+   ── POR QUÉ COMPARTEN HOJA Y NO LA LLEVAN DENTRO ──
+   Ocho archivos con el CSS pegado dentro son ocho sitios donde arreglar
+   la misma geometría de página. Y la geometría de página de esta casa
+   ya costó cara una vez: está escrito en `fichas/css/ficha.css` que el
+   margen del primer bloque se suma POR FUERA de la sección, así que un
+   `min-height` calculado a ojo parte cada hoja en dos. Aquí el número
+   está medido llevando los ocho archivos a PDF y contando las hojas, y
+   vive en UN sitio. Con la intención declarada de llevar el kit a las
+   cuarenta y dos misiones, ocho por cuarenta y dos son trescientas
+   treinta y seis copias del mismo error.
+
+   ── LA PALETA, Y POR QUÉ NO ES LA DE LA MISIÓN ──
+   La misión se ve en pantalla y lleva el azul de plano y el rojo de
+   aviso de su etapa. Esto se ve en PAPEL, y casi siempre en una
+   impresora de casa: tinta negra sobre crema, con el dorado del
+   expediente como único color. El dorado #c9a227 sale gris medio en
+   blanco y negro y sigue leyéndose como jerarquía, que es lo que un
+   color tiene que hacer cuando la impresora no tiene color.
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tinta: #1a1a2e;      /* acero, negro azulado */
+  --oro: #c9a227;        /* el dorado del expediente */
+  --oro-claro: #e8d99a;
+  --papel: #fdf6e3;      /* el papel del cuaderno */
+  --crema: #fffef5;      /* el fondo de la hoja */
+  --gris: #6b6b6b;
+  --linea: #b9b9b9;      /* el renglón donde se escribe */
+  --concepto: #f8f9fa;
+  --borde-suave: #dddddd;
+  --verde: #2f7d32;      /* solo para los ejemplos que sí valen */
+  --verde-suave: #e8f5e9;
+  --aviso: #fff8e1;
+
+  /* El alto del renglón. Ocho milímetros es lo que necesita una mano
+     adulta con bolígrafo: con seis se escribe encogido y con diez se
+     gasta la hoja. Cada archivo puede subirlo donde haga falta. */
+  --renglon: 8mm;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 20px 12px 70px;
+  background: #e9e4d4;
+  font-family: Georgia, 'Times New Roman', 'Nimbus Roman', serif;
+  color: var(--tinta);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.doc { max-width: 200mm; margin: 0 auto; }
+
+/* Cada .hoja es UNA hoja de papel. El min-height está medido, no
+   supuesto: ver la nota del bloque @media print. */
+.hoja {
+  background: var(--crema);
+  padding: 14mm 13mm;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px rgba(26,26,46,0.16);
+  border-radius: 4px;
+}
+
+/* ═════════ ENCABEZADO ═════════ */
+.kh {
+  border-top: 4px double var(--oro);
+  border-bottom: 4px double var(--oro);
+  padding: 9px 0 8px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.kh h1 {
+  font-size: 19px; font-weight: bold; margin: 0 0 3px;
+  letter-spacing: 0.01em;
+}
+.kh .sub { font-size: 12.5px; color: var(--gris); font-style: italic; margin: 0 0 5px; }
+.kh .meta {
+  font-size: 10px; color: var(--gris); letter-spacing: 0.08em; text-transform: uppercase;
+  border-top: 1px solid var(--borde-suave); padding-top: 4px; margin: 0;
+}
+.kh .ciencia { font-size: 10.5px; color: var(--gris); font-style: italic; margin: 4px 0 0; }
+
+/* La línea de identificación, igual que en las fichas: quien escribe
+   pone su nombre, porque estas hojas se archivan. */
+.idline {
+  display: flex; align-items: flex-end; gap: 8px;
+  font-size: 11px; font-weight: bold; color: var(--gris); margin-bottom: 10px;
+}
+.idline .raya { flex: 1; border-bottom: 1px solid var(--linea); height: 13px; }
+.idline .corta { flex: 0 0 64px; }
+
+/* ═════════ CAJAS ═════════ */
+.caja-instr {
+  background: var(--papel);
+  border-left: 5px solid var(--oro);
+  border-top: 1px solid var(--borde-suave);
+  border-right: 1px solid var(--borde-suave);
+  border-bottom: 1px solid var(--borde-suave);
+  padding: 8px 11px; margin-bottom: 11px;
+  font-size: 12px; line-height: 1.5;
+}
+.caja-instr strong { color: var(--tinta); }
+
+/* El aviso negro: lo que no se puede negociar. Va en negro porque en
+   una hoja de papel no hay manera de subir la voz. */
+.aviso-negro {
+  background: var(--tinta); color: #fff;
+  padding: 8px 11px; margin-bottom: 11px;
+  font-size: 11.5px; line-height: 1.5;
+}
+.aviso-negro strong { color: var(--oro-claro); }
+
+.caja-recordatorio {
+  background: var(--aviso);
+  border-left: 4px solid var(--oro);
+  padding: 7px 10px; margin-bottom: 10px;
+  font-size: 11px; line-height: 1.45; color: var(--gris);
+}
+.caja-recordatorio strong { color: var(--tinta); }
+
+.concepto {
+  background: var(--concepto);
+  border: 1px solid var(--borde-suave);
+  padding: 6px 9px; margin-bottom: 4px;
+  font-size: 11.5px; line-height: 1.4;
+}
+.concepto .titulo { font-weight: bold; font-size: 12.5px; }
+
+.caja-ejemplo {
+  background: var(--verde-suave);
+  border: 1px dashed var(--verde);
+  padding: 6px 9px; margin: 6px 0;
+  font-size: 11px; line-height: 1.45;
+}
+.caja-ejemplo .rot { font-weight: bold; color: var(--verde); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* La caja del hueco. Va con borde de puntos porque es lo único de la
+   hoja que no se rellena por obligación sino por honradez. */
+.caja-hueco {
+  border: 2px dashed var(--oro);
+  background: #fffdf5;
+  padding: 8px 11px; margin-top: 10px;
+}
+.caja-hueco .titulo { font-weight: bold; font-size: 12.5px; margin-bottom: 5px; }
+
+.caja-cierre {
+  background: var(--crema);
+  border: 3px solid var(--tinta);
+  padding: 10px 12px; margin-top: 12px;
+}
+.caja-cierre .titulo {
+  font-weight: bold; font-size: 13.5px; margin-bottom: 6px;
+  border-bottom: 1px solid var(--borde-suave); padding-bottom: 4px;
+}
+
+/* ═════════ NUMERACIÓN ═════════ */
+.num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 19px; height: 19px; border-radius: 50%;
+  background: var(--tinta); color: var(--oro);
+  font-size: 11.5px; font-weight: bold; font-family: Georgia, serif;
+  margin-right: 6px; flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.bloque-preg { margin-bottom: 9px; }
+.bloque-preg .preg { font-weight: bold; font-size: 12.5px; margin-bottom: 1px; }
+.bloque-preg .sub { font-size: 10.5px; font-style: italic; color: var(--gris); margin-bottom: 3px; }
+
+/* ═════════ LOS RENGLONES ═════════
+   Se dibujan con degradados repetidos y no con divs, por dos motivos:
+   un renglón por div son cinco elementos por bloque y ciento y pico por
+   hoja, y sobre todo porque un degradado se puede cortar a la altura
+   exacta que haga falta sin que sobre medio renglón al final.
+   OJO: son FONDOS. Sin `print-color-adjust: exact` el navegador los
+   quita al imprimir y la hoja sale en blanco, que es justo lo contrario
+   de lo que hace falta aquí. Va puesto en el bloque de impresión. */
+.renglones {
+  height: calc(var(--n, 4) * var(--renglon));
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--renglon) - 1px),
+    var(--linea) calc(var(--renglon) - 1px),
+    var(--linea) var(--renglon)
+  );
+}
+
+/* La guía de caligrafía: renglón base sólido y línea media dorada, que
+   es donde se apoya la altura de la letra minúscula. Es el renglón de
+   los cuadernos de primaria, y está aquí a propósito: escribir despacio
+   y con la letra apoyada es la mitad del ejercicio. */
+.renglones.guia {
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--renglon) / 2 - 0.5px),
+      var(--oro-claro) calc(var(--renglon) / 2 - 0.5px),
+      var(--oro-claro) calc(var(--renglon) / 2 + 0.5px),
+      transparent calc(var(--renglon) / 2 + 0.5px),
+      transparent var(--renglon)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--renglon) - 1px),
+      var(--linea) calc(var(--renglon) - 1px),
+      var(--linea) var(--renglon)
+    );
+}
+
+/* Grupo de tres: la primera y la tercera grises, la de en medio dorada.
+   Sirve para contar sin contar: tres renglones son una respuesta. */
+.renglones.tercia {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--renglon) - 1px),
+    var(--linea) calc(var(--renglon) - 1px),
+    var(--linea) var(--renglon),
+    transparent var(--renglon),
+    transparent calc(var(--renglon) * 2 - 1px),
+    var(--oro) calc(var(--renglon) * 2 - 1px),
+    var(--oro) calc(var(--renglon) * 2),
+    transparent calc(var(--renglon) * 2),
+    transparent calc(var(--renglon) * 3 - 1px),
+    var(--linea) calc(var(--renglon) * 3 - 1px),
+    var(--linea) calc(var(--renglon) * 3)
+  );
+}
+
+/* ═════════ EL RELOJ IMPRESO ═════════
+   Un cronómetro dibujado en la hoja y no en la pantalla: el cierre de
+   cuaderno se hace CON LA PANTALLA APAGADA, así que un temporizador que
+   viva en la pantalla es exactamente el que no se puede usar. Aquí solo
+   recuerda cuánto dura el ejercicio; el reloj lo pone quien escribe. */
+.crono-caja {
+  float: right;
+  border: 2px solid var(--tinta);
+  padding: 4px 10px;
+  text-align: center;
+  margin: 0 0 6px 10px;
+}
+.crono-caja .rot {
+  display: block; font-size: 8.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--gris);
+}
+.crono-caja .val {
+  display: block; font-family: 'Courier New', ui-monospace, monospace;
+  font-size: 19px; font-weight: bold; line-height: 1.1;
+}
+
+/* ═════════ TABLAS ═════════ */
+table.kit { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 11.5px; }
+table.kit th, table.kit td { border: 1px solid var(--tinta); padding: 4px 6px; text-align: left; vertical-align: top; }
+table.kit th { background: var(--papel); font-weight: bold; font-size: 11px; }
+table.kit td.linea-celda {
+  height: 36px; padding: 0;
+  background-image: repeating-linear-gradient(
+    to bottom, transparent 0, transparent 17px, var(--linea) 17px, var(--linea) 18px);
+}
+table.kit.oscura th { background: var(--tinta); color: var(--oro-claro); border-color: var(--tinta); }
+table.kit.oscura td { height: 26px; }
+
+/* ═════════ LA REJILLA CORNELL ═════════
+   La columna de pistas mide 2,5 pulgadas porque es la medida del método
+   de Walter Pauk y porque es la que obliga a que la pista quepa en una
+   pregunta corta: una columna ancha se llena de resumen, y entonces ya
+   no hay nada que recuperar al taparla. */
+.cornell {
+  display: grid;
+  grid-template-columns: 63.5mm 1fr;
+  border: 2px solid var(--tinta);
+}
+.cornell .col-pistas {
+  background: var(--aviso);
+  border-right: 2px solid var(--oro);
+  padding: 6px 8px;
+}
+.cornell .col-notas { padding: 6px 8px; background: #fff; }
+.cornell .rot-col {
+  font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--borde-suave); padding-bottom: 3px; margin-bottom: 5px;
+}
+.cornell .pista {
+  font-size: 10.5px; line-height: 1.35; margin-bottom: 7px;
+  padding-left: 9px; border-left: 2px solid var(--oro);
+}
+.cornell .instr-pistas {
+  font-size: 9.5px; font-style: italic; color: var(--gris);
+  border-top: 1px dashed var(--linea); padding-top: 4px; margin-top: 6px;
+}
+.cornell .fila-resumen {
+  grid-column: 1 / -1;
+  background: var(--papel);
+  border-top: 3px solid var(--tinta);
+  padding: 6px 8px;
+}
+
+/* ═════════ TARJETAS PARA RECORTAR ═════════
+   Ocho tarjetas en dos columnas por cuatro filas. El alto de cada una
+   está atado al ancho de la carta y no se elige: dos columnas de 108 mm
+   por cuatro filas es lo que cabe, y por eso la tarjeta es alargada y no
+   cuadrada. Las instrucciones de uso van en `.solo-pantalla` y NO se
+   imprimen: en una hoja que se va a recortar, cada milímetro de texto
+   que no se recorta es una tarjeta menos. */
+.tarjetas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px dashed var(--gris);
+  border-left: 1px dashed var(--gris);
+}
+.tarjeta {
+  border-right: 1px dashed var(--gris);
+  border-bottom: 1px dashed var(--gris);
+  display: flex; flex-direction: column;
+  /* 57 mm: es lo que deja la hoja llena (235 de los 240 medidos) con las
+     cuatro filas. Con 52 sobraban 25 mm, que en el dorso de una tarjeta
+     son tres renglones donde escribir el diagnóstico. */
+  min-height: 57mm;
+}
+.tj-frente {
+  background: var(--tinta); color: #fff;
+  padding: 5px 8px 4px; text-align: center;
+  flex: 0 0 auto;
+}
+.tj-icono { font-size: 15px; display: block; line-height: 1.1; }
+.tj-caso { font-size: 10px; line-height: 1.35; margin: 2px 0 3px; }
+.tj-rot {
+  display: block; font-size: 7.5px; color: var(--oro);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.tj-dorso {
+  background: var(--crema);
+  border-top: 1px dashed var(--oro);
+  padding: 4px 8px 5px;
+  flex: 1 1 auto;
+  display: flex; flex-direction: column; justify-content: space-around;
+}
+.tj-campo { font-size: 9px; font-weight: bold; display: flex; align-items: flex-end; gap: 4px; }
+.tj-campo .raya { flex: 1; border-bottom: 1px solid var(--linea); height: 11px; }
+.tj-blanca .tj-frente { background: var(--crema); color: var(--tinta); border-bottom: 1px solid var(--borde-suave); }
+.tj-blanca .tj-rot { color: var(--gris); }
+.tj-blanca .tj-caso .raya-libre {
+  display: block; height: 24px;
+  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 11px, var(--linea) 11px, var(--linea) 12px);
+}
+
+.corte {
+  text-align: center; font-size: 9.5px; color: var(--gris);
+  border-top: 1px dashed var(--gris); margin-top: 6px; padding-top: 4px;
+}
+
+/* ═════════ PIE ═════════ */
+.pie-kit {
+  margin-top: 11px; padding-top: 6px;
+  border-top: 2px solid var(--oro);
+  font-size: 10px; color: var(--gris);
+  display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+}
+.pie-kit .frase { font-style: italic; }
+
+/* ═════════ MANDOS DE PANTALLA (no se imprimen) ═════════ */
+.imprimir-btn {
+  position: fixed; right: 14px; bottom: 14px; z-index: 10;
+  background: var(--tinta); color: var(--oro);
+  border: 2px solid var(--oro); border-radius: 999px;
+  padding: 11px 18px; font-size: 14px; font-weight: bold; cursor: pointer;
+  font-family: Georgia, serif; box-shadow: 0 4px 14px rgba(26,26,46,0.35);
+}
+.volver {
+  display: inline-block; margin-bottom: 10px;
+  font-size: 12px; font-weight: bold; color: var(--tinta); text-decoration: none;
+  border-bottom: 2px solid var(--oro);
+}
+.solo-pantalla {
+  background: var(--papel); border: 1px dashed var(--oro);
+  padding: 8px 11px; margin-bottom: 11px; font-size: 11.5px; line-height: 1.5;
+}
+
+/* ═════════ IMPRESIÓN ═════════ */
+@media print {
+  @page { size: letter; margin: 1.5cm; }
+
+  body { background: #fff; padding: 0; font-size: 10.5pt; line-height: 1.45; }
+  .doc { max-width: none; }
+
+  .hoja {
+    box-shadow: none; border-radius: 0; padding: 0; margin: 0;
+    background: #fff;
+    /* 240 mm, MEDIDO llevando los ocho archivos a PDF y contando hojas,
+       no calculado. La carta mide 279,4 de alto y este documento declara
+       15 mm de margen arriba y abajo, así que el papel deja 249,4; pero
+       el margen del primer bloque de la sección se suma POR FUERA (la
+       misma trampa que está escrita en fichas/css/ficha.css), y con 249
+       cada hoja salía partida en dos. Se comprueba con
+       `_dev/probe-kit-mano.html` o llevando el archivo a PDF y contando.
+       Si alguien cambia el margen del @page, este número cambia con él. */
+    page-break-after: always;
+    min-height: 240mm;
+  }
+  .hoja:last-child { page-break-after: auto; }
+
+  /* Sin esto la hoja sale SIN RENGLONES, que es una hoja en blanco con
+     preguntas. Los renglones son fondos, y los fondos se quitan al
+     imprimir salvo que se pida lo contrario. */
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  .imprimir-btn, .volver, .solo-pantalla, .no-imprime { display: none !important; }
+
+  .kh { padding: 7px 0 6px; margin-bottom: 9px; }
+  .kh h1 { font-size: 16pt; }
+  .caja-instr, .aviso-negro { padding: 6px 9px; margin-bottom: 8px; }
+  .concepto { padding: 5px 8px; }
+  .bloque-preg { margin-bottom: 7px; }
+  .pie-kit { margin-top: 9px; padding-top: 5px; }
+  table.kit { margin: 6px 0; }
+
+  /* Nada de lo que se escribe a mano puede partirse entre dos hojas: un
+     renglón cortado por la mitad no se puede usar. */
+  .renglones, .bloque-preg, .concepto, .caja-hueco, .caja-cierre,
+  .caja-ejemplo, .tarjeta, .cornell, .caja-mapa, .bloque-verbatim {
+    page-break-inside: avoid; break-inside: avoid;
+  }
+}

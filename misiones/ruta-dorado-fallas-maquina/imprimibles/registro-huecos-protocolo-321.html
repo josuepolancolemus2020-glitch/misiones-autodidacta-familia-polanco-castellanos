@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Huecos · Protocolo 3-2-1 · Hoja de la Falla</title>
+<link rel="stylesheet" href="../../../css/kit-mano.css">
+<style>
+  /* Las tres fases del protocolo. Viven aquí y no en la hoja compartida
+     porque no las usa ningún otro archivo del kit. */
+  .fase {
+    display: grid; grid-template-columns: 30mm 1fr;
+    border: 1px solid var(--borde-suave);
+    border-left: 5px solid var(--oro);
+    margin-bottom: 8px;
+  }
+  .fase-num {
+    background: var(--papel); padding: 8px 6px; text-align: center;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .fase-num .cifra { font-size: 26px; font-weight: bold; color: var(--oro); line-height: 1; }
+  .fase-num .uni { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gris); }
+  .fase-cuerpo { padding: 7px 10px; }
+  .fase-cuerpo .tit { font-weight: bold; font-size: 12.5px; margin-bottom: 2px; }
+  .fase-cuerpo .desc { font-size: 11px; line-height: 1.45; margin-bottom: 4px; }
+  .fase-cuerpo .accion {
+    font-size: 11px; background: var(--concepto); border: 1px solid var(--borde-suave);
+    padding: 4px 7px;
+  }
+  .fase-cuerpo .accion b { color: var(--tinta); }
+  /* La hoja de la falla: los cinco campos a la izquierda y el ejemplo ya
+     lleno abajo. Al lado en columna estrecha la letra salía a cinco
+     palabras por renglón y no se podía escribir. */
+  .campo-hoja { margin-bottom: 7px; }
+  .campo-hoja .rot {
+    font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+    display: flex; align-items: center;
+  }
+  .campo-hoja .ayuda { font-size: 10px; font-style: italic; color: var(--gris); margin: 1px 0 2px 25px; }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir las tres</button>
+
+<div class="doc">
+
+<!-- ═══════════ HOJA 1 · EL REGISTRO DE HUECOS ═══════════ -->
+<section class="hoja">
+  <a class="volver" href="../fallas-maquina.html">← Volver a la misión</a>
+  <div class="idline"><span>Escribe:</span><span class="raya"></span><span>Semana del:</span><span class="raya corta"></span></div>
+
+  <div class="kh">
+    <h1>🕳️ Registro de Huecos</h1>
+    <p class="sub">Lo que no salió, escrito el día que no salió</p>
+    <p class="meta">🏠 F.A.R.O. · Estudio Mayor · 🔧 Expediente Dorado · Etapa 2 · Hoja 1 de 3</p>
+  </div>
+
+  <div class="aviso-negro">
+    <strong>El hueco se escribe en el momento o no se escribe.</strong> Ahora mismo sabes perfectamente qué entendiste y qué pasaste de largo. Tu «yo» de mañana no lo va a saber: va a recordar que leyó la etapa y va a dar por hecho que la entendió. Esa información existe una sola vez.
+  </div>
+
+  <table class="kit">
+    <tr>
+      <th style="width:16%">Fecha</th>
+      <th style="width:28%">¿Dónde me atascaba?</th>
+      <th style="width:28%">¿Qué intenté y no salió?</th>
+      <th style="width:28%">¿Cómo lo arreglé?</th>
+    </tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+    <tr><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td><td class="linea-celda"></td></tr>
+  </table>
+
+  <div class="caja-recordatorio">
+    <strong>La columna que casi nadie llena es la tercera</strong>, y es la que vale. «No me salió» no dice nada; «intenté deducir el supuesto desde el nombre de la falla y me salió al revés» dice exactamente dónde está el cable suelto. Y la cuarta se llena días después, no el mismo día: si se llena el mismo día, es que no había hueco.
+  </div>
+
+  <div class="pie-kit">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span class="frase">El hueco es el mapa</span>
+  </div>
+</section>
+
+<!-- ═══════════ HOJA 2 · EL PROTOCOLO 3-2-1 ═══════════ -->
+<section class="hoja">
+  <div class="idline"><span>Escribe:</span><span class="raya"></span><span>Tema:</span><span class="raya"></span></div>
+
+  <div class="kh">
+    <h1>⏰ El Protocolo 3-2-1</h1>
+    <p class="sub">Tres citas puestas el mismo día que se estudia, no cuando haga falta</p>
+    <p class="meta">🏠 F.A.R.O. · Estudio Mayor · 🔧 Expediente Dorado · Etapa 2 · Hoja 2 de 3</p>
+    <p class="ciencia">Lo que se aprende hoy se olvida rápido al principio y despacio después. Volver justo cuando cuesta recordar, y no antes, es lo que aplana esa curva: recuperar con esfuerzo fortalece la huella mucho más que releerla cómoda (Bjork, sobre las dificultades deseables).</p>
+  </div>
+
+  <div class="fase">
+    <div class="fase-num"><span class="cifra">3</span><span class="uni">días</span></div>
+    <div class="fase-cuerpo">
+      <p class="tit">🔧 Recordar con la caja cerrada</p>
+      <p class="desc">Es la cita más importante y la que más se salta, porque a los tres días todavía «se siente sabido». Esa sensación es justamente la trampa: se reconoce el tema, no se recuerda.</p>
+      <p class="accion"><b>Acción:</b> saca la hoja del <b>Cierre de Cuaderno</b> de la falla que estudiaste y llénala entera, con la pantalla apagada. <b>Tres minutos.</b> Lo que no salga, al Registro de Huecos.</p>
+    </div>
+  </div>
+
+  <div class="fase">
+    <div class="fase-num"><span class="cifra">2</span><span class="uni">semanas</span></div>
+    <div class="fase-cuerpo">
+      <p class="tit">🃏 Repaso espaciado, y barajado</p>
+      <p class="desc">A las dos semanas ya se olvidó lo suficiente como para que reconstruirlo cueste. Que cueste es el punto: si sale sin esfuerzo, la cita llegó demasiado pronto y no sirvió de nada.</p>
+      <p class="accion"><b>Acción:</b> el <b>mazo de tarjetas</b>, barajado y sin agrupar por falla. <b>Diez minutos.</b> La que falles vuelve adelante.</p>
+    </div>
+  </div>
+
+  <div class="fase">
+    <div class="fase-num"><span class="cifra">1</span><span class="uni">mes</span></div>
+    <div class="fase-cuerpo">
+      <p class="tit">🔀 Práctica mezclada, con casos nuevos</p>
+      <p class="desc">Al mes ya no basta con recordar: hay que aplicar a un mercado que no habías visto. Eso es lo que de verdad se va a pedir fuera de la misión.</p>
+      <p class="accion"><b>Acción:</b> <b>El Taller Mezclado</b> de la misión, o tres mercados nuevos del barrio con la Hoja de la Falla en la mano. <b>Quince minutos.</b></p>
+    </div>
+  </div>
+
+  <p style="font-size:12px;font-weight:bold;margin:10px 0 4px;">📅 Mis citas, con fecha escrita</p>
+  <table class="kit oscura">
+    <tr><th style="width:34%">Tema / falla</th><th>1.° estudio</th><th>3 días</th><th>2 semanas</th><th>1 mes</th></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  </table>
+
+  <div class="pie-kit">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span class="frase">Una cita sin fecha escrita es una intención</span>
+  </div>
+</section>
+
+<!-- ═══════════ HOJA 3 · LA HOJA DE LA FALLA ═══════════ -->
+<section class="hoja">
+  <div class="idline"><span>Escribe:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="kh">
+    <h1>📋 Diagnóstico de mercado</h1>
+    <p class="meta">🏠 F.A.R.O. · Estudio Mayor · 🔧 Expediente Dorado · Etapa 2 · Hoja 3 de 3</p>
+  </div>
+
+  <div class="caja-instr">
+    Escoge <strong>un mercado de verdad</strong> (de esta ciudad, de tu colonia, o de tu casa) y llénala entera. Fotocopia esta hoja antes de usarla: la etapa se aprueba con tres mercados diagnosticados, uno por semana, y no con uno.
+  </div>
+
+  <div class="caja-cierre">
+    <div class="campo-hoja">
+      <p class="rot"><span class="num">1</span>Qué mercado es, exactamente</p>
+      <p class="ayuda">Quién vende, quién compra, y qué se intercambia. «La gente» no es ninguna de las tres.</p>
+      <div class="renglones" style="--n:2"></div>
+    </div>
+    <div class="campo-hoja">
+      <p class="rot"><span class="num">2</span>Qué supuesto se rompió</p>
+      <p class="ayuda">Mercados completos, información perfecta, nadie con poder, o nada sobre terceros.</p>
+      <div class="renglones" style="--n:2"></div>
+    </div>
+    <div class="campo-hoja">
+      <p class="rot"><span class="num">3</span>Cómo se llama la falla</p>
+      <div class="renglones" style="--n:2"></div>
+    </div>
+    <div class="campo-hoja">
+      <p class="rot"><span class="num">4</span>Qué regla la corregiría</p>
+      <p class="ayuda">Escrita de modo que se sepa quién la aplica y cómo se comprueba. Si no se puede comprobar, todavía no es una regla.</p>
+      <div class="renglones" style="--n:2"></div>
+    </div>
+    <div class="campo-hoja">
+      <p class="rot"><span class="num">5</span>Qué cuesta esa regla y a quién</p>
+      <p class="ayuda">Y contra qué alternativa real la comparas: la falla de gobierno concreta, con nombre, no un ministerio imaginario que siempre acierta.</p>
+      <div class="renglones" style="--n:2"></div>
+    </div>
+  </div>
+
+  <div class="caja-ejemplo">
+    <span class="rot">Un ejemplo ya lleno, para ver la vara</span>
+    <p style="margin:3px 0 0"><b>1.</b> El internet de la colonia: vende una sola empresa, compran las casas del sector, se intercambia servicio mensual. <b>2.</b> Se rompe «nadie con poder de mercado». <b>3.</b> Poder de mercado del que vende, y de los que tienen explicación: tender el cable cuesta mucho la primera vez y casi nada la segunda, así que al segundo que llegue no le sale la cuenta. <b>4.</b> Obligar a compartir la red, como se hace en otros países; lo aplicaría el regulador de telecomunicaciones y se comprobaría con el precio mayorista publicado. <b>5.</b> Cuesta fijar a qué precio se comparte, y eso exige un regulador que sepa y al que no capturen; si se fija mal, nadie invierte. Comparado con dejarlo como está, que es la alternativa real.</p>
+  </div>
+
+  <div class="pie-kit">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span class="frase">Ninguna regla es gratis, y la que no dice su costo todavía no es una regla</span>
+  </div>
+</section>
+
+</div>
+</body>
+</html>

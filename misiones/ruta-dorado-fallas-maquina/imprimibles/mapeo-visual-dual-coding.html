@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapeo Visual · Dual Coding · Las fallas de la máquina</title>
+<link rel="stylesheet" href="../../../css/kit-mano.css">
+<style>
+  .hoja { --renglon: 7mm; }
+  .rejilla-mapa { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm 6mm; margin-top: 9mm; }
+  /* El emoji sale medio fuera de la caja a propósito: en un mapa que se
+     dibuja a mano, lo primero que el ojo tiene que encontrar es de qué
+     falla es cada cuadro, y un título dentro se pierde entre los trazos. */
+  .caja-mapa { border: 2px solid var(--col); padding: 7px 9px 6px; position: relative; }
+  .caja-mapa .icono {
+    position: absolute; top: -12px; left: 9px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--crema); border: 2px solid var(--col);
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
+  }
+  .caja-mapa .tit {
+    font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--col); margin: 4px 0 4px 30px;
+  }
+  .zona { border: 1px dashed var(--gris); background: #f8f9fa; padding: 7px 9px; margin-top: 8px; }
+  .zona.libre { border-color: var(--oro); background: #fffdf5; }
+  .zona .tit { font-weight: bold; font-size: 12px; margin-bottom: 4px; }
+  .zona .libre-espacio { height: 32mm; border: 1px dotted var(--linea); }
+</style>
+</head>
+<body>
+<button class="imprimir-btn" onclick="window.print()">🖨️ Imprimir</button>
+
+<div class="doc">
+<section class="hoja">
+  <a class="volver" href="../fallas-maquina.html">← Volver a la misión</a>
+  <div class="idline"><span>Dibuja:</span><span class="raya"></span><span>Fecha:</span><span class="raya corta"></span></div>
+
+  <div class="kh">
+    <h1>🗺️ Mapeo Visual <span style="color:var(--oro)">· Dual Coding</span></h1>
+    <p class="meta">🏠 F.A.R.O. · Estudio Mayor · 🔧 Expediente Dorado · Etapa 2</p>
+    <p class="ciencia">Allan Paivio (1971) sostuvo que la memoria guarda por dos vías, la verbal y la de la imagen, y que lo que entra por las dos se recupera mejor que lo que entra por una. Richard Mayer (2009) lo llevó al material de estudio: palabra e imagen juntas enseñan más que cualquiera de las dos sola.</p>
+  </div>
+
+  <div class="aviso-negro" style="padding:6px 9px;margin-bottom:6px">
+    <strong>Aquí no se escriben párrafos: se dibuja.</strong> Flechas, cajas, muñecos de palo, un río, una balanza. Da igual que dibujes mal: lo que hace el trabajo es que <strong>para dibujar algo hay que decidir qué es lo esencial</strong>. Ten la hoja al lado mientras lees, y cada vez que entiendas una falla, <strong>tápala y dibújala</strong>. Si no puedes, no la entendiste: vuelve a esa parte y no a la de al lado.
+  </div>
+
+  <div class="rejilla-mapa">
+    <div class="caja-mapa" style="--col:#4a90d9">
+      <span class="icono">🌊</span>
+      <p class="tit">Externalidad</p>
+      <div class="renglones" style="--n:4"></div>
+    </div>
+    <div class="caja-mapa" style="--col:#e74c3c">
+      <span class="icono">🏭</span>
+      <p class="tit">Poder de mercado</p>
+      <div class="renglones" style="--n:4"></div>
+    </div>
+    <div class="caja-mapa" style="--col:#f39c12">
+      <span class="icono">🍋</span>
+      <p class="tit">Información asimétrica</p>
+      <div class="renglones" style="--n:4"></div>
+    </div>
+    <div class="caja-mapa" style="--col:#27ae60">
+      <span class="icono">🎈</span>
+      <p class="tit">Falla dinámica</p>
+      <div class="renglones" style="--n:4"></div>
+    </div>
+  </div>
+
+  <div class="zona">
+    <p class="tit">🔗 Conexiones entre las fallas</p>
+    <p style="font-size:10px;font-style:italic;color:var(--gris);margin:0 0 3px">Flechas: cuáles aparecen juntas en un mismo mercado, cuál explica a otra. El préstamo de la esquina tiene dos a la vez, y esa es la pista.</p>
+    <div class="renglones" style="--n:3"></div>
+  </div>
+
+  <div class="zona libre">
+    <p class="tit">✏️ Mi versión visual: las cuatro en un solo dibujo</p>
+    <div class="libre-espacio"></div>
+  </div>
+
+  <div class="pie-kit">
+    <span>🏠 Proyecto Educativo F.A.R.O. · Estudio Mayor</span>
+    <span class="frase">Lo que no se puede dibujar todavía no se entendió</span>
+  </div>
+</section>
+</div>
+</body>
+</html>

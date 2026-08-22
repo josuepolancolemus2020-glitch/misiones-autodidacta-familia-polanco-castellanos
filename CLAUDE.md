@@ -221,6 +221,35 @@ cuarenta y dos misiones, que es lo contrario de lo que esta casa escribe.
 de siempre y el XP vuelve a ser fijo. Se comprueba con
 `_dev/probe-taller-neuro.html`.
 
+## El kit de escritura a mano: papel, y se mide en hojas
+
+**Pedido por el autor el 22 de agosto de 2026**, después del taller de la
+memoria: lo mismo, pero en papel, para quien estudia delante de la
+computadora y quiere escribir a mano mientras lee. Son **ocho archivos** en
+`misiones/…/imprimibles/` y una hoja compartida, `css/kit-mano.css`.
+
+**No son fichas y la norma 6 no las toca.** Es el mismo permiso que ya
+tienen las hojas sueltas de las lecturas: no viven en `fichas/`, no usan
+`fichas/css/ficha.css`, no usan la clase `.pagina` y no se miden con
+`_dev/mide-ficha-paginas.html`. Usan `.hoja` y su propio medidor.
+
+**Y las hojas se MIDEN, no se calculan.** El alto útil de una carta con
+15 mm de margen es 249,4 mm, pero el margen del primer bloque se suma **por
+fuera** (la misma trampa que ya está escrita en `fichas/css/ficha.css`), así
+que una hoja calculada a ojo sale partida en dos sin que nadie lo note hasta
+que la imprime. Se comprueba con `_dev/probe-kit-mano.html`, que saca las
+reglas de impresión **del propio `kit-mano.css`** y mide con ellas, en vez de
+llevar una copia que se queda vieja.
+
+Dos cosas que parecen detalle y no lo son:
+
+1. **`print-color-adjust: exact` es obligatorio.** Los renglones se dibujan
+   con degradados, o sea con fondos, y los navegadores quitan los fondos al
+   imprimir. Sin esa línea el kit entero sale como preguntas sin renglones.
+2. **El rótulo de hojas del bloque de Recursos tiene que decir la verdad.**
+   La misión anuncia «3 hojas», «4 hojas»: si alguien parte una hoja y no
+   toca el rótulo, la misión miente, y la sonda lo caza.
+
 ## Sellar la versión en cada cambio
 
 El aparato guarda la aplicación en caché y se queda con la versión vieja.
