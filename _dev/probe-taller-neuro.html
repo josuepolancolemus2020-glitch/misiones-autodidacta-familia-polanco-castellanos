@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · El taller de la memoria</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-dorado-fallas-maquina/fallas-maquina.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba EL TALLER DE LA MEMORIA (`js/taller-neuro.js` y
+   `css/taller-neuro.css`), el aparato compartido que le puso a las
+   misiones el XP variable, el cierre de cuaderno, el repaso espaciado,
+   el taller mezclado, el modo Feynman, la dificultad deseable y el
+   panel de medidas. Se corre sobre la etapa 2 del Expediente Dorado,
+   que es donde se estrenó; cuando el aparato se lleve a otra misión,
+   basta con cambiar el src del iframe y la clave de la misión.
+
+   Lo que se comprueba y por qué cada cosa está en la lista:
+
+   1. EL REPARTO DE LA RULETA, con veinte mil tiradas. Es la mitad del
+      aparato: si el premio deja de ser variable, deja de haber error de
+      predicción y el sistema entero se convierte en un sueldo. Un
+      70/20/8/2 mal escrito no rompe nada visible y por eso hay que
+      medirlo a máquina.
+   2. QUE EL XP NO SE SUME ANTES DE TIEMPO. El segundo de espera es el
+      mecanismo, no la animación: sumar primero y animar después deja el
+      aparato bonito y sin efecto.
+   3. QUE LAS PAUTAS EMPIECEN TAPADAS. Un cierre de cuaderno con la
+      respuesta a la vista es una lectura más.
+   4. QUE EL RELOJ DEL REPASO ARRANQUE AL CERRAR y avise a los 3 días,
+      no antes. El reloj se adelanta con FaroTaller.adelantarReloj, que
+      mueve las fechas guardadas y no la hora del aparato: es la única
+      manera de probar a máquina algo cuyo primer hito son tres días.
+   5. QUE LOS CASOS DEL TALLER MEZCLADO SALGAN BARAJADOS y repartidos
+      por familia. Si se pintaran en orden de catálogo quedarían
+      agrupados por tipo, que es exactamente la práctica por bloques que
+      el modo existe para evitar.
+   6. QUE EL CAZADOR DE JERGA NO EJECUTE LO QUE LEE. El texto lo escribe
+      una persona y vuelve de localStorage: es la misma regla del Buzón
+      del lector y de las Sugerencias de M.E.T.A.S, y aquí se comprueba
+      con una etiqueta de verdad.
+   7. QUE LA DIFICULTAD DESEABLE SE APAGUE ENTERA. Un modo que deja
+      restos al apagarse es peor que no tenerlo.
+   8. Y QUE NO SE ROMPIÓ NADA DE LO QUE YA HABÍA: las seis lecturas con
+      sus 54 preguntas, el marcador, los ocho casos y el guion. */
+const out = document.getElementById('out');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* La misión se recarga a propósito con el almacén vacío: la sonda mide
+   un taller recién estrenado, y con los cierres y el XP de una sesión
+   anterior dentro mediría otra cosa. Se espera al evento `load` del
+   marco y no a un temporizador: tras la recarga, contentWindow es otro,
+   y leerlo antes de tiempo devuelve el documento en blanco de en medio
+   (que es exactamente lo que hacía suspender a esta sonda cuando estaba
+   escrita con un setTimeout). */
+function cargaDelMarco(marco) {
+  return new Promise(r => marco.addEventListener('load', r, { once: true }));
+}
+
+window.addEventListener('load', async () => {
+  const marco = document.getElementById('m');
+  if (marco.contentDocument.readyState !== 'complete') await cargaDelMarco(marco);
+  await esperar(400);
+  try { marco.contentWindow.localStorage.clear(); } catch (e) {}
+  const recargado = cargaDelMarco(marco);
+  marco.contentWindow.location.reload();
+  await recargado;
+  await esperar(700);
+  const doc = marco.contentDocument;
+  const win = marco.contentWindow;
+
+  try {
+    log('── EL APARATO SE MONTÓ ──');
+    ok(typeof win.FaroTaller === 'object', 'FaroTaller está en pie', 'no cargó js/taller-neuro.js');
+    ok(typeof win.ptsVar === 'function', 'ptsVar es la puerta del XP', 'no hay ptsVar');
+    ok(!!doc.querySelector('.tn-medidor'), 'el medidor de la máquina está abajo', 'no hay medidor');
+    ok(doc.body.classList.contains('tn-con-medidor'), 'y el cuerpo le hizo sitio (si no, tapa el pie)', 'el medidor va a tapar el pie de la página');
+    ok(getComputedStyle(doc.querySelector('.tn-medidor')).position === 'fixed', 'y va fijo, no arrastrado por el desplazamiento', 'el medidor no está fijo: falta css/taller-neuro.css');
+
+    log('\n── 1 · EL REPARTO DE LA RULETA (20 000 tiradas) ──');
+    const c = {};
+    for (let i = 0; i < 20000; i++) { const t = win.FaroTaller.tirada().mult; c[t] = (c[t] || 0) + 1; }
+    const pct = k => (c[k] || 0) / 20000;
+    ok(Math.abs(pct(1) - 0.70) < 0.025, 'normal ≈ 70 % (' + (pct(1)*100).toFixed(1) + ' %)', 'x1 en ' + (pct(1)*100).toFixed(1) + ' %');
+    ok(Math.abs(pct(2) - 0.20) < 0.025, 'doble ≈ 20 % (' + (pct(2)*100).toFixed(1) + ' %)', 'x2 en ' + (pct(2)*100).toFixed(1) + ' %');
+    ok(Math.abs(pct(3) - 0.08) < 0.02, 'triple ≈ 8 % (' + (pct(3)*100).toFixed(1) + ' %)', 'x3 en ' + (pct(3)*100).toFixed(1) + ' %');
+    ok(Math.abs(pct(5) - 0.02) < 0.015, 'golpe de suerte ≈ 2 % (' + (pct(5)*100).toFixed(1) + ' %)', 'x5 en ' + (pct(5)*100).toFixed(1) + ' %');
+
+    log('\n── 2 · EL SUSPENSE ES EL MECANISMO ──');
+    const antes = win.FaroTaller.estado().forja.total;
+    win.FaroTaller.premia(5, 'sonda');
+    await esperar(250);
+    const ruleta = doc.querySelector('.tn-ruleta');
+    ok(!!ruleta && ruleta.classList.contains('tn-girando'), 'la ruleta gira mientras se decide', 'la ruleta no gira');
+    ok(win.FaroTaller.estado().forja.total === antes, 'y el XP todavía NO está sumado', 'el XP se sumó sin esperar: no hay apuesta');
+    await esperar(1200);
+    const ganado = win.FaroTaller.estado().forja.total - antes;
+    ok([5,10,15,25].indexOf(ganado) !== -1, 'un segundo después suma ' + ganado + ' XP', 'sumó ' + ganado + ', que no es 5, 10, 15 ni 25');
+    ok(/\+\d+ XP/.test(doc.querySelector('.tn-ruleta-txt').textContent), 'y lo dice con su rótulo', 'la ruleta no dice cuánto pagó');
+    const forjado = JSON.parse(win.localStorage.getItem('metas_xp_fallas') || '{}');
+    ok(forjado.total === ganado, 'queda guardado en metas_xp_fallas', 'metas_xp_fallas no se escribió');
+
+    /* La ráfaga: en el reto de treinta segundos se acierta varias veces por
+       segundo, y la primera versión cancelaba la tirada anterior al empezar
+       la siguiente, así que de veinte aciertos se pagaba uno. Se comprueba
+       aquí porque desde la pantalla no se ve: el XP simplemente no sube y
+       nadie sabe que le faltaba. */
+    const antesRafaga = win.FaroTaller.estado().forja.total;
+    let esperado = 0;
+    for (let i = 0; i < 20; i++) { esperado += win.FaroTaller.premia(1, 'rafaga'); await esperar(60); }
+    await esperar(1400);
+    const cobrado = win.FaroTaller.estado().forja.total - antesRafaga;
+    ok(cobrado === esperado, 'veinte aciertos en ráfaga se pagan los veinte (' + cobrado + ' de ' + esperado + ' XP)',
+       'se comió ' + (esperado - cobrado) + ' XP de la ráfaga');
+    ok(/⭐ \d/.test(doc.getElementById('xpPts').textContent), 'y la barra de XP de la misión también subió', 'la barra de arriba no se enteró');
+
+    log('\n── 3 · EL CIERRE DE CUADERNO ──');
+    const cierres = doc.querySelectorAll('.cierre-cuaderno');
+    ok(cierres.length === 5, 'cinco cuadernos: uno por falla y la hoja de la falla', 'hay ' + cierres.length);
+    ok([...cierres].every(x => x.dataset.tnMontado === '1'), 'los cinco montados por el aparato', 'alguno se quedó sin montar');
+    const cc = doc.querySelector('.cierre-cuaderno[data-tema="externalidad"]');
+    ok(cc.querySelectorAll('.cc-pauta').length === 3, 'la falla 1 trae sus tres pautas', 'faltan pautas en la falla 1');
+    ok([...cc.querySelectorAll('.cc-pauta')].every(x => x.hidden), 'y las tres empiezan TAPADAS', 'la pauta se lee sin pedirla: el ejercicio no existe');
+    const bPauta = [...cc.querySelectorAll('.cc-btn')].find(b => /Revelar pauta/.test(b.textContent));
+    bPauta.click();
+    ok(!cc.querySelector('.cc-pauta').hidden, 'el botón las revela', 'no se revelan');
+    bPauta.click();
+    ok(cc.querySelector('.cc-pauta').hidden, 'y las vuelve a tapar', 'no se vuelven a tapar');
+    const leido = doc.getElementById('tn-leido-externalidad');
+    const bTapa = [...cc.querySelectorAll('.cc-btn')].find(b => /Tapar lo leído/.test(b.textContent));
+    bTapa.click();
+    ok(!!leido && leido.hidden, '«tapar lo leído» esconde la explicación de encima', 'no se puede cerrar la caja');
+    bTapa.click();
+
+    const bCerrar = [...cc.querySelectorAll('.cc-btn')].find(b => /Cerrar el cuaderno/.test(b.textContent));
+    bCerrar.click();
+    ok(/Sin nada escrito/.test(cc.querySelector('.cc-hechos').textContent), 'cerrar en blanco no cuenta', 'dejó cerrar sin escribir nada');
+    doc.getElementById('cc-ext-1').value = 'externalidad';
+    doc.getElementById('cc-hueco-externalidad').value = 'el aviso de Coase de 1988';
+    bCerrar.click();
+    await esperar(1400);
+    let est = win.FaroTaller.estado();
+    ok(est.cierres === 1, 'con algo escrito sí cierra', 'no contó el cierre');
+    ok(est.huecos === 1, 'y el hueco queda apuntado con su fecha', 'el hueco se perdió');
+
+    log('\n── 4 · EL REPASO ESPACIADO ──');
+    ok(est.agenda.length === 1 && est.agenda[0].preguntas.length === 3,
+       'cerrar el cuaderno pone el reloj, con las tres preguntas guardadas dentro',
+       'el repaso no quedó registrado con sus preguntas');
+    ok(!doc.querySelector('.tn-aviso-repaso'), 'el mismo día no avisa de nada', 'avisa el mismo día que se estudió');
+    win.FaroTaller.adelantarReloj(4);
+    await esperar(200);
+    const aviso = doc.querySelector('.tn-aviso-repaso');
+    ok(!!aviso, 'a los cuatro días aparece el aviso', 'a los cuatro días no avisa');
+    ok(!!aviso && /Hace 4 días/.test(aviso.textContent), 'y dice cuántos días hace', 'el aviso no dice los días');
+    [...aviso.querySelectorAll('button')].find(b => /Reconstruir/.test(b.textContent)).click();
+    await esperar(200);
+    const modal = doc.querySelector('.tn-modal');
+    ok(!!modal && modal.querySelectorAll('.cc-preguntas > li').length === 3, 'y abre la reconstrucción con sus tres preguntas', 'la reconstrucción no trae las preguntas');
+    [...modal.querySelectorAll('.cc-btn')].find(b => /Ver la pauta/.test(b.textContent)).click();
+    [...modal.querySelectorAll('.tn-marca')].filter(b => /Me salió/.test(b.textContent)).forEach(b => b.click());
+    [...modal.querySelectorAll('.cc-btn')].find(b => /Listo/.test(b.textContent)).click();
+    await esperar(1400);
+    est = win.FaroTaller.estado();
+    ok(est.agenda[0].hitos.d3 === true, 'reconstruido entero, el hito de 3 días queda marcado', 'el hito no se marcó y el aviso volvería en cada carga');
+    ok(!doc.querySelector('.tn-aviso-repaso'), 'y el aviso se retira', 'el aviso se queda pegado');
+    win.FaroTaller.adelantarReloj(11);
+    await esperar(200);
+    ok(!!doc.querySelector('.tn-aviso-repaso'), 'a las dos semanas vuelve a avisar', 'el segundo hito no avisa');
+
+    log('\n── 5 · EL TALLER MEZCLADO ──');
+    const cfg = win.TALLER_NEURO;
+    ok(cfg.mezcla.length === 12, 'doce casos', 'hay ' + cfg.mezcla.length);
+    const reparto = {};
+    cfg.mezcla.forEach(m => reparto[m.falla] = (reparto[m.falla] || 0) + 1);
+    ok(Object.keys(reparto).length === 4 && Object.values(reparto).every(v => v === 3),
+       'tres por familia: ' + JSON.stringify(reparto), 'reparto desigual: ' + JSON.stringify(reparto));
+    const par = { externalidad:'terceros', poder:'nadie', informacion:'perfecta', dinamica:'completos' };
+    ok(cfg.mezcla.every(m => par[m.falla] === m.supuesto), 'y cada falla con el supuesto que de verdad le toca', 'hay un caso con el supuesto cambiado');
+    ok(cfg.mezcla.every(m => m.desc && m.porque && m.regla), 'los doce con descripción, explicación y regla', 'algún caso viene a medias');
+    ok(cfg.mezcla.every(m => /costo|cuesta|factura|Su factura/i.test(m.regla)), 'y las doce reglas traen SU FACTURA, que es la vara de la etapa', 'alguna regla se entrega gratis');
+    const primeros = new Set();
+    const bRe = [...doc.querySelectorAll('#tnMezcla .tn-btn')].find(b => /Volver a mezclar/.test(b.textContent));
+    for (let i = 0; i < 8; i++) { bRe.click(); primeros.add(doc.querySelector('#tnMezcla .tn-caso-desc').textContent.slice(0, 30)); }
+    ok(primeros.size > 1, 'y salen barajados: ocho mezclas dieron ' + primeros.size + ' primeros distintos', 'siempre sale el mismo primero: no se está barajando');
+    ok(doc.querySelectorAll('#tnMezcla .tn-ops').length === 2, 'cada caso pide la falla Y el supuesto', 'falta uno de los dos grupos de opciones');
+    ok(!!doc.querySelector('#tnMezcla .tn-nota-casa'), 'y la nota de la casa avisa de que cuesta más a propósito', 'falta la nota metacognitiva');
+
+    log('\n── 6 · EL MODO FEYNMAN, Y LO QUE NO PUEDE EJECUTAR ──');
+    ok(doc.querySelectorAll('.tn-feynman[data-tn-montado]').length === 8, 'los ocho casos tienen su modo Feynman', 'no están los ocho');
+    ok(doc.querySelectorAll('.tn-fey-modelo').length === 8, 'y los ocho traen ejemplo de la casa', 'falta algún ejemplo');
+    ok(win.FaroTaller.cazaJerga('La externalidad del monopsonio rompe el equilibrio') >= 3,
+       'el cazador de jerga encuentra las palabras grandes', 'el cazador no encuentra jerga evidente');
+    ok(win.FaroTaller.cazaJerga('externalidades') === 1 && win.FaroTaller.cazaJerga('EXTERNALIDAD') === 1 && win.FaroTaller.cazaJerga('asimetria') === 1,
+       'en plural, en mayúsculas y sin tilde también (los niños escriben así)', 'solo caza la forma exacta');
+    ok(win.FaroTaller.cazaJerga('la casa de externalidades') === 1 && win.FaroTaller.cazaJerga('supuestamente') === 0,
+       'y no se come palabras que solo empiezan igual', 'marca dentro de otra palabra');
+    const fey = doc.querySelector('.tn-feynman[data-caso="c1-prestamo"]');
+    [...fey.querySelectorAll('button')].find(b => /Modo Feynman/.test(b.textContent)).click();
+    fey.querySelector('textarea').value = 'hola <img src=x onerror="window.__roto=1"> y <b>negrita</b>';
+    [...fey.querySelectorAll('.tn-fey-barra button')].find(b => /Revisar mi jerga/.test(b.textContent)).click();
+    await esperar(150);
+    const rev = fey.querySelector('.tn-fey-revision');
+    ok(rev.querySelectorAll('img,b').length === 0 && !win.__roto && rev.textContent.indexOf('<img') !== -1,
+       'y lo escrito se pinta ESCAPADO: ni una etiqueta se ejecuta',
+       'SE COLÓ HTML EN LA REVISIÓN: la regla del Buzón está rota aquí');
+
+    log('\n── 7 · LA DIFICULTAD DESEABLE ──');
+    const bDif = doc.querySelector('[data-tn-dificultad]');
+    const barajaAntes = doc.getElementById('fcCtr').textContent;
+    bDif.click();
+    await esperar(200);
+    ok(doc.body.classList.contains('tn-dificultad') && bDif.getAttribute('aria-pressed') === 'true', 'se enciende', 'no se enciende');
+    ok(win.tallerSegundosReto() === 20, 'el reto baja a veinte segundos', 'el reto sigue en ' + win.tallerSegundosReto());
+    /* Los segundos están escritos en TRES sitios: el título, el reloj parado
+       y el cronómetro. Un título que sigue prometiendo treinta mientras la
+       partida dura veinte es la clase de detalle que hace desconfiar del
+       resto del aparato. */
+    ok(doc.getElementById('retoSegundosRotulo').textContent === '20' && doc.getElementById('retoTimer').textContent === '⏱ 20',
+       'y lo dicen también el título del reto y su reloj', 'el título o el reloj del reto siguen diciendo 30');
+    ok(!doc.querySelector('.tn-med-dif').hidden,
+       'y el medidor avisa de que el modo está encendido (el interruptor queda en otra pantalla)',
+       'el modo se enciende y desde otra pantalla no hay manera de saberlo');
+    ok(doc.getElementById('fcCtr').textContent !== barajaAntes, 'la baraja crece con las tarjetas de la etapa 1 (' + barajaAntes + ' → ' + doc.getElementById('fcCtr').textContent + ')', 'la baraja no se intercaló');
+    ok(doc.querySelectorAll('#s-estructura .oculta-clave').length > 0, 'y las palabras clave de la explicación quedan tapadas', 'no tapó ninguna palabra');
+    ok(doc.querySelectorAll('.tn-desafio .oculta-clave, .cierre-cuaderno .oculta-clave').length === 0,
+       'sin tapar el aviso del propio modo ni las pautas del cuaderno', 'tapó justo el texto que hay que poder leer');
+    bDif.click();
+    await esperar(200);
+    ok(win.tallerSegundosReto() === 30 && doc.getElementById('fcCtr').textContent === barajaAntes && doc.querySelectorAll('.oculta-clave').length === 0
+       && doc.getElementById('retoSegundosRotulo').textContent === '30' && doc.querySelector('.tn-med-dif').hidden,
+       'y apagarlo lo devuelve TODO a su sitio', 'apagarlo deja restos');
+
+    log('\n── 8 · LAS PANTALLAS QUE YA EXISTÍAN ──');
+    ok(!!doc.querySelector('.tn-honestidad'), 'las flashcards preguntan si salió o se adivinó', 'falta la pregunta de honestidad');
+    ok(doc.querySelector('.tn-honestidad').hidden, 'y solo lo preguntan con la tarjeta volteada', 'lo pregunta antes de voltear');
+    ok(!!doc.querySelector('.tn-ciego-caja'), 'el quiz tiene su modo ciego', 'falta el quiz ciego');
+    ok(doc.querySelectorAll('.tn-espejo-caso').length === 4, 'el espejo aplica las cuatro fallas al propio estudio', 'el espejo no tiene las cuatro');
+    ok([...doc.querySelectorAll('[data-tn-despliega]')].every(b => doc.getElementById(b.dataset.tnDespliega).hidden),
+       'y sus cuatro reglas empiezan tapadas', 'las reglas del espejo se ven sin pedirlas');
+    ok(!!doc.querySelector('.tn-panel') && !!doc.querySelector('.tn-curva'), 'Mi Taller está montado, con su curva del olvido dibujada a mano', 'falta el panel o la curva');
+    ok(doc.querySelectorAll('.tn-panel .tn-bloque').length >= 6, 'y sus ' + doc.querySelectorAll('.tn-panel .tn-bloque').length + ' medidas', 'faltan medidas en el panel');
+
+    log('\n── 9 · NO SE ROMPIÓ NADA DE LO QUE YA HABÍA ──');
+    ok(win.FaroLecturas.voces().length === 6, 'las seis lecturas siguen', 'hay ' + win.FaroLecturas.voces().length);
+    const preg = win.FaroLecturas.voces().reduce((a, v) => a + v.comprension + v.completar + v.analisis, 0);
+    ok(preg === 54, 'con sus 54 preguntas repartidas', 'hay ' + preg + ' preguntas');
+    ok(typeof win.FaroMarcador === 'object', 'el marcador de subrayado sigue montado', 'el marcador se cayó');
+    ok([...doc.querySelectorAll('#s-casos .card h2')].filter(h => /Caso \d/.test(h.textContent)).length === 8, 'los ocho casos del proyecto siguen', 'faltan casos');
+    ok(doc.querySelectorAll('#s-guion .card').length >= 8, 'y el guion de video entero', 'el guion se rompió');
+    ok(typeof win.buildSopa === 'function' && typeof win.openDiploma === 'function', 'sopa de letras y constancia en pie', 'se cayó sopa o constancia');
+
+    log('\n── 10 · TECLADO Y LECTOR DE PANTALLA ──');
+    /* Un aparato que solo funciona con el dedo deja fuera a quien navega
+       con teclado, y en esta casa lo que no se comprueba se rompe. */
+    const controles = doc.querySelectorAll('.tn-btn, .cc-btn, .tn-op, .tn-marca, .tn-med-btn, .tn-panel-x');
+    ok([...controles].every(e => e.tagName === 'BUTTON'), 'los ' + controles.length + ' controles nuevos son <button> de verdad', 'hay controles que no son botones y no se alcanzan con el tabulador');
+    ok([...doc.querySelectorAll('.tn-btn, .cc-btn, .tn-op, .tn-marca')].every(e => e.getAttribute('type') === 'button'),
+       'y todos con type="button"', 'falta algún type="button"');
+    ok([...doc.querySelectorAll('.cierre-cuaderno textarea, .tn-feynman textarea')].every(t => t.getAttribute('aria-label') || doc.querySelector('label[for="' + t.id + '"]')),
+       'cada campo de escribir tiene su etiqueta', 'hay campos sin etiqueta');
+    ok([...doc.querySelectorAll('[data-tn-despliega], .tn-feynman > button')].every(b => b.getAttribute('aria-expanded') !== null),
+       'y los desplegables declaran aria-expanded', 'hay desplegables sin aria-expanded');
+    ok(doc.querySelector('.tn-medidor').getAttribute('role') === 'status' && doc.querySelector('.tn-ruleta').getAttribute('aria-live') === 'polite',
+       'el medidor y la ruleta se anuncian al lector de pantalla', 'el medidor o la ruleta no se anuncian');
+    doc.querySelector('[data-tn-panel]').click();
+    await esperar(400);
+    ok(doc.querySelector('.tn-panel').getAttribute('aria-hidden') === 'false' && doc.activeElement && doc.activeElement.classList.contains('tn-panel-x'),
+       'al abrir Mi Taller el foco entra en el panel', 'el foco se queda fuera del panel');
+    win.FaroTaller.cerrarPanel();
+    await esperar(300);
+    ok(doc.querySelector('.tn-panel').getAttribute('aria-hidden') === 'true', 'y al cerrarlo vuelve a quedar oculto para el lector', 'el panel cerrado sigue anunciándose');
+
+    log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda del taller de la memoria';
+  } catch (e) {
+    log('✘ ' + e.message + '\n' + e.stack);
+    document.title = 'SUSPENDE · Sonda del taller de la memoria';
+  }
+});
+</script>
+</body>
+</html>

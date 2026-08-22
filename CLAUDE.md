@@ -170,6 +170,57 @@ sostienen sobre la toma de decisiones; la geopolítica y la economía política
 dialogan con la crítica al capitalismo). Nivelar no es repartir al azar: es
 abrir puertas que la casa ya puede cruzar.
 
+## El taller de la memoria: aparato compartido, no copiado
+
+**Pedido por el autor el 22 de agosto de 2026**, sobre la etapa 2 de la Ruta
+del Expediente Dorado y con la intención dicha en voz alta de llevarlo
+después a las cuarenta y dos misiones. Por eso vive en `js/taller-neuro.js`
+y `css/taller-neuro.css`, y **no dentro de la misión**: es la cuarta
+excepción de la casa a la norma 1 (tres archivos propios por misión), por el
+mismo motivo que `js/lecturas.js`, el marcador y `fichas/css/ficha.css`. Un
+aparato copiado a cuarenta misiones se arregla en una y se queda roto en
+treinta y nueve.
+
+Lo que pone: **XP variable** (la ruleta tarda un segundo a propósito: sin esa
+espera no hay predicción que fallar, y sin predicción fallada no hay
+dopamina), **cierre de cuaderno** (recordar con la caja cerrada, no releer),
+**repaso espaciado** a 3 días, 2 semanas y 1 mes, **taller mezclado**
+(práctica intercalada), **modo Feynman** con cazador de jerga, **espejo**
+metacognitivo, **dificultad deseable** y el panel **Mi Taller**.
+
+### Cómo se monta en una misión nueva
+
+Tres cosas, y ninguna toca el aparato:
+
+1. En el HTML, **después** del CSS de la misión (se tiñe del `--pri` y del
+   `--sec` que la misión acaba de declarar, así que el orden importa):
+   `<link rel="stylesheet" href="../../css/taller-neuro.css">`, y al final,
+   **después** del JS de la misión y del marcador:
+   `<script src="../../js/taller-neuro.js"></script>`.
+2. Al final del JS de la misión, `window.TALLER_NEURO` con lo suyo: la clave
+   de la misión, la jerga que hay que cazar, los doce casos del taller
+   mezclado, las tarjetas de la etapa anterior que se intercalan y los
+   párrafos que se tapan en modo difícil.
+3. En el HTML, los bloques declarativos: `.cierre-cuaderno` con sus pautas
+   en `data-pauta`, `.tn-feynman` con su ejemplo de la casa, los botones con
+   `data-tn-despliega`, `data-tn-dificultad` y `data-tn-panel`, y un
+   `<div id="tnMezcla">` donde se pinte el taller mezclado.
+
+Y en el JS de la misión, cuatro ganchos: `ptsVar(base, motivo)` en cada sitio
+donde antes se llamaba a `pts(base)`, la llamada a
+`FaroTaller.alVoltearFlash` al voltear una tarjeta, la llamada a
+`FaroTaller.alPintarQuiz` al pintar una pregunta, y
+`tallerSegundosReto()` en vez del 30 escrito a mano del reto.
+
+**El contenido no vive en el aparato.** Las pautas, los casos y los ejemplos
+de la casa se escriben en cada misión y con su voz; el aparato solo les pone
+el comportamiento. Un aparato con textos dentro sería el mismo texto en
+cuarenta y dos misiones, que es lo contrario de lo que esta casa escribe.
+
+**Y si el aparato no está, la misión sigue entera:** `ptsVar` cae en el `pts`
+de siempre y el XP vuelve a ser fijo. Se comprueba con
+`_dev/probe-taller-neuro.html`.
+
 ## Sellar la versión en cada cambio
 
 El aparato guarda la aplicación en caché y se queda con la versión vieja.

@@ -1,0 +1,423 @@
+/* ══════════════════════════════════════════════════════════════════
+   EL TALLER DE LA MEMORIA · aparato compartido de las misiones
+   ══════════════════════════════════════════════════════════════════
+
+   Pedido por el autor el 22 de agosto de 2026, sobre la etapa 2 de la
+   Ruta del Expediente Dorado y con la intención declarada de llevarlo
+   después a todas las misiones. Por eso NO vive en
+   `misiones/…/css/fallas-maquina.css`: es la cuarta excepción de la
+   casa a la norma 1 (tres archivos propios por misión), por el mismo
+   motivo que `css/lecturas.css` y el marcador. Copiar mil líneas a
+   cuarenta misiones significa que el arreglo número cuarenta y uno se
+   hace en un archivo y se olvida en treinta y nueve.
+
+   ── POR QUÉ NO TRAE COLORES PROPIOS ──
+   Cada misión tiene su color de etapa en --pri y --sec, y ese par es
+   lo único que la distingue de las otras cuarenta al abrirla. Si este
+   aparato pintara con un dorado suyo, las cuarenta misiones se verían
+   iguales por abajo y distintas por arriba. Así que aquí NO se escribe
+   ni un color literal salvo el papel del cuaderno: todo sale de las
+   variables que ya declara la misión, y el aparato se tiñe solo del
+   color de la etapa en la que se cargue.
+
+   La única excepción es el papel del cuaderno (--tn-papel), que es
+   crema a propósito: el cierre de cuaderno tiene que parecer papel y
+   no pantalla, porque lo que se le pide ahí a quien estudia es
+   exactamente lo contrario de leer.
+   ══════════════════════════════════════════════════════════════════ */
+
+:root{
+  --tn-papel:#fdf6e3;
+  --tn-papel-linea:#d8c9a3;
+  --tn-papel-tinta:#3b3524;
+  --tn-espejo:#f5f5f5;
+}
+[data-theme="dark"]{
+  /* El crema a pantalla completa de noche ciega. Se conserva el TONO
+     (papel viejo, más cálido que la tarjeta) bajándole la luz. */
+  --tn-papel:#241f16;
+  --tn-papel-linea:#4a4030;
+  --tn-papel-tinta:#e8dcc0;
+  --tn-espejo:#171a24;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --tn-papel:#241f16;
+    --tn-papel-linea:#4a4030;
+    --tn-papel-tinta:#e8dcc0;
+    --tn-espejo:#171a24;
+  }
+}
+
+/* El medidor va fijo abajo y tapa el pie de la página si nadie le hace
+   sitio. Esto es lo que se lo hace. */
+body.tn-con-medidor{padding-bottom:76px;}
+
+/* ═════════ 1 · EL MEDIDOR DE LA MÁQUINA (barra inferior) ═════════ */
+.tn-medidor{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;
+  background:var(--xp-bg,#1b2838);
+  border-top:2px solid var(--pri);
+  padding:0.4rem 0.7rem;
+  display:flex;align-items:center;gap:0.6rem;
+  box-shadow:0 -4px 18px rgba(0,0,0,0.25);
+  font-family:'Fredoka',sans-serif;
+}
+.tn-med-icono{font-size:1.15rem;flex-shrink:0;}
+.tn-med-centro{flex:1;min-width:0;}
+.tn-med-fila{display:flex;align-items:baseline;gap:0.4rem;}
+.tn-med-nivel{color:var(--yellow-br,#ffeaa7);font-size:0.74rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tn-med-total{color:#fff;font-size:0.72rem;opacity:0.85;white-space:nowrap;margin-left:auto;}
+.tn-med-track{height:7px;background:rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;margin-top:0.22rem;}
+.tn-med-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--pri-lt,#a5f3fc),var(--sec-lt,#fecaca));border-radius:10px;transition:width 0.7s cubic-bezier(0.34,1.56,0.64,1);}
+.tn-med-dif{
+  flex-shrink:0;font-size:0.95rem;line-height:1;cursor:pointer;
+  background:var(--sec);border:1px solid rgba(255,255,255,0.35);
+  border-radius:50%;padding:0.24rem 0.32rem;
+  /* Late TRES veces y para. Un aviso que parpadea sin fin en una barra
+     fija deja de leerse a los diez segundos y molesta el resto de la
+     sesión; tres latidos bastan para que el ojo lo encuentre. */
+  animation:tn-late 1.8s ease-in-out 3;
+}
+.tn-med-dif[hidden]{display:none;}
+@keyframes tn-late{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+@media (prefers-reduced-motion: reduce){.tn-med-dif{animation:none;}}
+.tn-med-btn{
+  flex-shrink:0;font-family:'Fredoka',sans-serif;font-size:0.72rem;
+  background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);
+  border-radius:14px;padding:0.28rem 0.6rem;cursor:pointer;transition:background 0.2s,transform 0.15s;
+}
+.tn-med-btn:hover{background:rgba(255,255,255,0.22);}
+.tn-med-btn:active{transform:scale(0.94);}
+.tn-medidor.tn-asciende{animation:tn-asciende 1.1s ease;}
+@keyframes tn-asciende{
+  0%{box-shadow:0 -4px 18px rgba(0,0,0,0.25);}
+  30%{box-shadow:0 -4px 34px var(--pri);}
+  100%{box-shadow:0 -4px 18px rgba(0,0,0,0.25);}
+}
+
+/* ═════════ 2 · LA RULETA DEL XP ═════════
+   El segundo de espera no es adorno: es el punto entero del sistema.
+   Ver el número ANTES de que se decida es lo que convierte el premio
+   en una apuesta, y una apuesta se recuerda; un sueldo, no. */
+.tn-ruleta{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:86px;z-index:70;
+  background:var(--card,#fff);color:var(--dark,#1b2838);
+  border:2px solid var(--pri);border-radius:14px;
+  padding:0.5rem 0.9rem;
+  font-family:'Fredoka',sans-serif;font-size:0.95rem;font-weight:600;
+  box-shadow:0 8px 26px var(--shadow-md,rgba(0,0,0,0.25));
+  display:flex;align-items:center;gap:0.45rem;
+  max-width:min(92vw,420px);text-align:center;line-height:1.25;
+  opacity:0;pointer-events:none;transition:opacity 0.25s,transform 0.25s;
+}
+.tn-ruleta.tn-visible{opacity:1;transform:translateX(-50%) translateY(-6px);}
+.tn-ruleta-num{font-variant-numeric:tabular-nums;min-width:2.4em;text-align:center;}
+.tn-ruleta.tn-girando .tn-ruleta-num{animation:tn-gira 0.12s steps(1) infinite;}
+@keyframes tn-gira{0%{opacity:1}50%{opacity:0.45}100%{opacity:1}}
+.tn-ruleta.tn-r2{border-color:var(--jade,#00b894);}
+.tn-ruleta.tn-r3{border-color:var(--amber,#b8860b);}
+.tn-ruleta.tn-r5{border-color:var(--sec);animation:tn-golpe 0.9s ease;}
+@keyframes tn-golpe{
+  0%{transform:translateX(-50%) translateY(-6px) scale(1);}
+  25%{transform:translateX(-50%) translateY(-14px) scale(1.12) rotate(-2deg);}
+  55%{transform:translateX(-50%) translateY(-6px) scale(1.02) rotate(1.5deg);}
+  100%{transform:translateX(-50%) translateY(-6px) scale(1) rotate(0);}
+}
+.tn-chispa{
+  position:fixed;z-index:69;width:8px;height:8px;border-radius:50%;
+  pointer-events:none;animation:tn-chispa 0.9s ease-out forwards;
+}
+@keyframes tn-chispa{
+  0%{opacity:1;transform:translate(0,0) scale(1);}
+  100%{opacity:0;transform:translate(var(--tn-dx),var(--tn-dy)) scale(0.3);}
+}
+@media (prefers-reduced-motion: reduce){
+  .tn-ruleta,.tn-ruleta.tn-r5,.tn-medidor.tn-asciende{animation:none!important;}
+  .tn-ruleta.tn-girando .tn-ruleta-num{animation:none;}
+  .tn-chispa{display:none;}
+}
+
+/* ═════════ 3 · EL CIERRE DE CUADERNO ═════════ */
+.cierre-cuaderno{
+  background:var(--tn-papel);
+  color:var(--tn-papel-tinta);
+  border:2px dashed var(--tn-papel-linea);
+  border-radius:14px;
+  padding:1.1rem 1.1rem 1.2rem;
+  margin:0 0 1.2rem;
+  font-family:'Fira Code',ui-monospace,monospace;
+  box-shadow:0 3px 14px var(--shadow,rgba(0,0,0,0.1));
+}
+.cierre-cuaderno h3{
+  font-family:'Fira Code',ui-monospace,monospace;
+  font-size:0.98rem;font-weight:600;margin:0 0 0.4rem;color:var(--tn-papel-tinta);
+  display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;
+}
+.cierre-cuaderno .cc-lead{font-size:0.82rem;line-height:1.6;margin:0 0 0.8rem;color:var(--tn-papel-tinta);opacity:0.88;}
+.cierre-cuaderno .cc-preguntas{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.85rem;}
+.cierre-cuaderno .cc-preguntas>li{border-left:3px solid var(--tn-papel-linea);padding-left:0.7rem;}
+.cierre-cuaderno label{display:block;font-size:0.8rem;font-weight:600;margin-bottom:0.25rem;}
+.cierre-cuaderno textarea{
+  width:100%;min-height:2.6rem;resize:vertical;
+  font-family:'Fira Code',ui-monospace,monospace;font-size:0.82rem;line-height:1.5;
+  background:transparent;color:var(--tn-papel-tinta);
+  border:0;border-bottom:2px solid var(--tn-papel-linea);
+  padding:0.3rem 0.2rem;
+}
+.cierre-cuaderno textarea:focus{outline:none;border-bottom-color:var(--pri);background:rgba(127,127,127,0.06);}
+.cc-doble{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;}
+@media(max-width:520px){.cc-doble{grid-template-columns:1fr;}}
+.cc-barra{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-top:1rem;}
+.cc-btn{
+  font-family:'Fira Code',ui-monospace,monospace;font-size:0.78rem;font-weight:600;
+  border:2px solid var(--tn-papel-tinta);background:transparent;color:var(--tn-papel-tinta);
+  border-radius:9px;padding:0.35rem 0.7rem;cursor:pointer;transition:all 0.18s;
+}
+.cc-btn:hover{background:var(--tn-papel-tinta);color:var(--tn-papel);}
+.cc-btn.cc-btn-pri{background:var(--pri);border-color:var(--pri);color:#fff;}
+.cc-btn.cc-btn-pri:hover{filter:brightness(1.15);background:var(--pri);color:#fff;}
+.cc-crono{font-size:0.85rem;font-weight:600;font-variant-numeric:tabular-nums;margin-left:auto;padding:0.2rem 0.5rem;border-radius:8px;border:2px solid var(--tn-papel-linea);}
+.cc-crono.cc-poco{border-color:var(--sec);color:var(--sec);}
+.cc-pauta{
+  margin-top:0.5rem;padding:0.5rem 0.65rem;border-radius:8px;
+  background:rgba(127,127,127,0.10);border-left:4px solid var(--pri);
+  font-size:0.8rem;line-height:1.55;
+}
+.cc-pauta::before{content:'PAUTA · ';font-weight:700;letter-spacing:0.06em;color:var(--pri);}
+/* El papel del cuaderno es oscuro de noche, y el rótulo con el --pri de
+   la etapa se perdía dentro. */
+[data-theme="dark"] .cc-pauta::before,
+[data-theme="dark"] .cc-pauta{border-left-color:var(--pri-lt);}
+[data-theme="dark"] .cc-pauta::before{color:var(--pri-lt);}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .cc-pauta{border-left-color:var(--pri-lt);}
+  :root:not([data-theme="light"]) .cc-pauta::before{color:var(--pri-lt);}
+}
+.cc-hueco{margin-top:1rem;border-top:1px dashed var(--tn-papel-linea);padding-top:0.8rem;}
+.cc-hueco label{font-size:0.82rem;}
+.cc-hechos{font-size:0.76rem;margin-top:0.6rem;opacity:0.85;}
+
+/* ═════════ 4 · EL AVISO DE REPASO ESPACIADO ═════════ */
+.tn-aviso-repaso{
+  position:relative;z-index:11;
+  background:linear-gradient(135deg,var(--pri),var(--sec));
+  color:#fff;padding:0.75rem 1rem;
+  display:flex;align-items:flex-start;gap:0.7rem;flex-wrap:wrap;
+  font-size:0.86rem;line-height:1.5;
+}
+.tn-aviso-repaso strong{color:var(--yellow-br,#ffeaa7);}
+.tn-aviso-cuerpo{flex:1;min-width:220px;}
+.tn-aviso-repaso .tn-btn{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.4);color:#fff;}
+.tn-aviso-repaso .tn-btn:hover{background:rgba(255,255,255,0.3);}
+
+/* ═════════ BOTÓN GENÉRICO DEL APARATO ═════════ */
+.tn-btn{
+  font-family:'Fredoka',sans-serif;font-size:0.8rem;
+  border:2px solid var(--pri);background:var(--pri);color:#fff;
+  border-radius:10px;padding:0.38rem 0.75rem;cursor:pointer;
+  transition:transform 0.15s,filter 0.2s;line-height:1.25;
+}
+.tn-btn:hover{filter:brightness(1.12);}
+.tn-btn:active{transform:scale(0.95);}
+.tn-btn.tn-btn-hueco{background:transparent;color:var(--pri);}
+.tn-btn.tn-btn-hueco:hover{background:var(--pri-gl);}
+/* De noche, --pri es un azul de plano casi negro y el botón hueco quedaba
+   escrito en tinta invisible sobre la tarjeta oscura. Se pasa al tono
+   claro del par, igual que ya hacía la insignia de la racha. */
+[data-theme="dark"] .tn-btn.tn-btn-hueco{color:var(--pri-lt);border-color:var(--pri-lt);}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .tn-btn.tn-btn-hueco{color:var(--pri-lt);border-color:var(--pri-lt);}
+}
+.tn-btn[aria-pressed="true"]{background:var(--sec);border-color:var(--sec);color:#fff;}
+
+/* ═════════ 5 · EL TALLER MEZCLADO ═════════ */
+.tn-mezcla-cab{display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center;margin-bottom:0.8rem;}
+.tn-racha{
+  font-family:'Fredoka',sans-serif;font-size:0.82rem;font-weight:600;
+  background:var(--pri-gl);color:var(--pri);border:2px solid var(--pri);
+  border-radius:20px;padding:0.22rem 0.7rem;
+}
+[data-theme="dark"] .tn-racha{color:var(--pri-lt);}
+.tn-racha.tn-racha-viva{background:var(--sec-gl);color:var(--sec);border-color:var(--sec);}
+.tn-caso{
+  border:2px solid var(--border);border-radius:14px;padding:1rem;
+  background:var(--card);margin-bottom:0.9rem;
+}
+.tn-caso-num{font-family:'Fredoka',sans-serif;font-size:0.72rem;color:var(--gray);letter-spacing:0.08em;text-transform:uppercase;}
+.tn-caso-desc{font-size:0.92rem;line-height:1.6;margin:0.3rem 0 0.9rem;color:var(--dark);}
+.tn-campo{margin-bottom:0.8rem;}
+.tn-campo>span.tn-lbl{display:block;font-size:0.8rem;font-weight:700;margin-bottom:0.35rem;color:var(--dark);}
+.tn-ops{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.tn-op{
+  font-family:'Nunito',sans-serif;font-size:0.78rem;
+  border:2px solid var(--border);background:var(--card);color:var(--dark);
+  border-radius:10px;padding:0.32rem 0.6rem;cursor:pointer;transition:all 0.18s;
+}
+.tn-op:hover{border-color:var(--pri);}
+.tn-op[aria-pressed="true"]{background:var(--pri);border-color:var(--pri);color:#fff;}
+.tn-op.tn-ok{background:var(--green);border-color:var(--green);color:#fff;}
+.tn-op.tn-mal{background:var(--red);border-color:var(--red);color:#fff;}
+.tn-caso textarea{
+  width:100%;min-height:3rem;resize:vertical;font-family:'Nunito',sans-serif;font-size:0.85rem;
+  border:2px solid var(--border);border-radius:10px;padding:0.45rem 0.55rem;
+  background:var(--card);color:var(--dark);
+}
+.tn-caso textarea:focus{outline:none;border-color:var(--pri);}
+.tn-veredicto{
+  margin-top:0.8rem;padding:0.7rem 0.8rem;border-radius:10px;font-size:0.86rem;line-height:1.6;
+  border-left:5px solid var(--pri);background:var(--pri-gl);color:var(--dark);
+}
+.tn-veredicto.tn-v-mal{border-left-color:var(--sec);background:var(--sec-gl);}
+.tn-nota-casa{
+  margin-top:1rem;padding:0.8rem 0.9rem;border-radius:12px;
+  background:var(--tn-espejo);border:2px dashed var(--border);
+  font-size:0.85rem;line-height:1.6;color:var(--dark);
+}
+
+/* ═════════ 6 · MODO FEYNMAN ═════════ */
+.tn-feynman{margin-top:0.9rem;}
+.tn-fey-panel{
+  margin-top:0.7rem;border:2px solid var(--border);border-radius:12px;padding:0.9rem;
+  background:var(--tn-espejo);
+}
+.tn-fey-prompt{font-size:0.86rem;line-height:1.55;margin-bottom:0.6rem;color:var(--dark);}
+.tn-feynman textarea{
+  width:100%;min-height:6rem;resize:vertical;font-family:'Nunito',sans-serif;font-size:0.9rem;line-height:1.5;
+  border:2px solid var(--border);border-radius:10px;padding:0.5rem 0.6rem;
+  background:var(--card);color:var(--dark);
+}
+.tn-feynman textarea:focus{outline:none;border-color:var(--pri);}
+.tn-fey-barra{display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.6rem;}
+.tn-fey-revision{
+  margin-top:0.7rem;padding:0.7rem 0.8rem;border-radius:10px;
+  background:var(--card);border:2px solid var(--border);
+  font-size:0.9rem;line-height:1.7;color:var(--dark);white-space:pre-wrap;
+}
+.tn-jerga{
+  background:var(--red-gl,rgba(214,48,49,0.14));color:var(--red);
+  border-bottom:2px solid var(--red);border-radius:3px;padding:0 2px;font-weight:700;cursor:help;
+}
+.tn-fey-modelo{
+  margin-top:0.7rem;padding:0.7rem 0.8rem;border-radius:10px;
+  border-left:5px solid var(--jade);background:var(--jade-gl);
+  font-size:0.9rem;line-height:1.65;color:var(--dark);font-style:italic;
+}
+.tn-guardado{font-size:0.76rem;color:var(--gray);margin-top:0.4rem;}
+
+/* ═════════ 7 · EL ESPEJO (metacognición) ═════════ */
+.tn-espejo-caso{
+  background:var(--tn-espejo);border:2px solid var(--border);border-radius:12px;
+  padding:0.85rem 0.95rem;margin-bottom:0.75rem;
+}
+.tn-espejo-caso h4{font-family:'Fredoka',sans-serif;font-size:0.95rem;margin:0 0 0.35rem;color:var(--dark);}
+.tn-espejo-caso p{font-size:0.88rem;line-height:1.6;margin:0 0 0.6rem;color:var(--dark);}
+.tn-regla{
+  margin-top:0.6rem;padding:0.6rem 0.75rem;border-radius:10px;
+  border-left:5px solid var(--amber);background:var(--amber-gl);
+  font-size:0.88rem;line-height:1.6;color:var(--dark);
+}
+.tn-regla::before{content:'LA REGLA · ';font-family:'Fredoka',sans-serif;font-weight:700;color:var(--amber);}
+
+/* ═════════ 8 · MI TALLER (panel lateral) ═════════ */
+.tn-panel{
+  position:fixed;top:0;right:0;bottom:0;width:min(420px,92vw);z-index:80;
+  background:var(--card);border-left:3px solid var(--pri);
+  box-shadow:-8px 0 30px rgba(0,0,0,0.3);
+  transform:translateX(102%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  display:flex;flex-direction:column;
+}
+.tn-panel.tn-abierto{transform:none;}
+.tn-panel-cab{
+  display:flex;align-items:center;gap:0.5rem;padding:0.8rem 1rem;
+  background:linear-gradient(135deg,var(--pri),var(--sec));color:#fff;flex-shrink:0;
+}
+.tn-panel-cab h2{font-family:'Fredoka',sans-serif;font-size:1.05rem;margin:0;flex:1;color:#fff;}
+.tn-panel-x{background:rgba(255,255,255,0.18);border:0;color:#fff;font-size:1.1rem;line-height:1;border-radius:8px;padding:0.25rem 0.55rem;cursor:pointer;}
+.tn-panel-cuerpo{flex:1;overflow-y:auto;padding:1rem;}
+.tn-bloque{margin-bottom:1.15rem;}
+.tn-bloque h3{
+  font-family:'Fredoka',sans-serif;font-size:0.9rem;margin:0 0 0.45rem;color:var(--dark);
+  display:flex;align-items:center;gap:0.35rem;
+}
+.tn-cifra{font-family:'Fredoka',sans-serif;font-size:1.5rem;color:var(--pri);line-height:1.1;}
+[data-theme="dark"] .tn-cifra{color:var(--pri-lt);}
+.tn-pie{font-size:0.78rem;color:var(--gray);line-height:1.5;}
+.tn-barra-nivel{height:10px;background:var(--border);border-radius:10px;overflow:hidden;margin:0.4rem 0 0.3rem;}
+.tn-barra-nivel>div{height:100%;background:linear-gradient(90deg,var(--pri),var(--sec));border-radius:10px;transition:width 0.7s cubic-bezier(0.34,1.56,0.64,1);}
+.tn-curva{width:100%;height:120px;display:block;}
+.tn-lista-huecos{list-style:none;margin:0;padding:0;max-height:210px;overflow-y:auto;}
+.tn-lista-huecos li{
+  border-left:3px solid var(--sec);padding:0.35rem 0 0.35rem 0.55rem;margin-bottom:0.4rem;
+  font-size:0.82rem;line-height:1.5;color:var(--dark);
+}
+.tn-lista-huecos .tn-fecha{display:block;font-size:0.7rem;color:var(--gray);}
+.tn-panel-fondo{
+  position:fixed;inset:0;z-index:79;background:rgba(0,0,0,0.45);
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.tn-panel-fondo.tn-abierto{opacity:1;pointer-events:auto;}
+
+/* ═════════ 9 · DIFICULTAD DESEABLE ═════════ */
+.tn-desafio{
+  border:2px solid var(--sec);border-radius:12px;padding:0.85rem 0.95rem;margin-top:0.9rem;
+  background:var(--sec-gl);
+}
+.tn-desafio h4{font-family:'Fredoka',sans-serif;font-size:0.98rem;margin:0 0 0.35rem;color:var(--dark);}
+.tn-desafio p{font-size:0.87rem;line-height:1.6;margin:0 0 0.6rem;color:var(--dark);}
+.tn-desafio ul{font-size:0.85rem;line-height:1.6;margin:0.4rem 0 0.7rem 1.1rem;color:var(--dark);}
+body.tn-dificultad .oculta-clave,
+.oculta-clave.tn-tapada{
+  background:currentColor;border-radius:3px;cursor:pointer;
+  transition:color 0.15s;
+}
+body.tn-dificultad .oculta-clave.tn-revelada{background:transparent;}
+body.tn-dificultad .oculta-clave:focus-visible{outline:3px solid var(--sec);}
+
+/* ═════════ 10 · MEJORAS DE FLASHCARDS Y QUIZ ═════════ */
+.tn-honestidad{
+  display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;
+  margin-top:0.8rem;padding:0.6rem 0.7rem;border-radius:10px;
+  background:var(--tn-espejo);border:2px dashed var(--border);
+}
+.tn-honestidad .tn-lbl{font-size:0.82rem;font-weight:700;color:var(--dark);flex:1;min-width:180px;}
+.tn-honestidad[hidden]{display:none;}
+body.tn-quiz-ciego #qzOpts{display:none;}
+body.tn-quiz-ciego #qzOpts.tn-destapado{display:flex;}
+.tn-ciego-caja{margin:0.6rem 0;}
+.tn-ciego-caja textarea{
+  width:100%;min-height:3.4rem;resize:vertical;font-family:'Nunito',sans-serif;font-size:0.88rem;
+  border:2px solid var(--border);border-radius:10px;padding:0.45rem 0.55rem;background:var(--card);color:var(--dark);
+}
+.tn-ciego-caja textarea:focus{outline:none;border-color:var(--pri);}
+
+/* ═════════ 11 · EL REPASO RECONSTRUIDO (ventana) ═════════ */
+.tn-modal-fondo{
+  position:fixed;inset:0;z-index:95;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:1rem;
+}
+.tn-modal-fondo[hidden]{display:none;}
+.tn-modal{
+  background:var(--tn-papel);color:var(--tn-papel-tinta);
+  border:2px dashed var(--tn-papel-linea);border-radius:14px;
+  padding:1.1rem;max-width:min(560px,94vw);max-height:88vh;overflow-y:auto;
+  font-family:'Fira Code',ui-monospace,monospace;
+  box-shadow:0 14px 40px rgba(0,0,0,0.4);
+}
+.tn-modal h3{font-family:'Fira Code',ui-monospace,monospace;font-size:1rem;margin:0 0 0.5rem;color:var(--tn-papel-tinta);}
+.tn-modal .cc-preguntas>li{border-left-color:var(--tn-papel-linea);}
+.tn-marca-fila{display:flex;gap:0.4rem;margin-top:0.4rem;flex-wrap:wrap;}
+.tn-marca{
+  font-family:'Fira Code',ui-monospace,monospace;font-size:0.74rem;font-weight:600;
+  border:2px solid var(--tn-papel-tinta);background:transparent;color:var(--tn-papel-tinta);
+  border-radius:8px;padding:0.2rem 0.5rem;cursor:pointer;
+}
+.tn-marca[aria-pressed="true"]{background:var(--tn-papel-tinta);color:var(--tn-papel);}
+
+/* Impreso, nada de esto existe: la ficha se imprime aparte y estos
+   aparatos son de pantalla. */
+@media print{
+  .tn-medidor,.tn-ruleta,.tn-panel,.tn-panel-fondo,.tn-aviso-repaso,.tn-modal-fondo{display:none!important;}
+  body.tn-con-medidor{padding-bottom:0;}
+}

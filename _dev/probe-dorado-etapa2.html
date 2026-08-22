@@ -78,7 +78,17 @@ window.addEventListener('load', async () => {
   const dentro = e => w.eval(e);
   try {
     log('── LA MISIÓN ──');
-    ok(d.querySelectorAll('.sec').length === 17, '17 secciones (15 del molde + guion + lecturas)', 'secciones: ' + d.querySelectorAll('.sec').length);
+    /* La cuenta de secciones sale de la NAVEGACIÓN y ya no escrita a mano:
+       cuando el 22 de agosto de 2026 se añadió el Taller Mezclado, esta
+       comprobación suspendía sin que hubiera nada roto, que es el fallo
+       que la norma 7 manda evitar. Lo que de verdad importa aquí es que
+       no haya una sección sin su pestaña ni una pestaña sin su sección. */
+    const pestanas = d.querySelectorAll('.nav-t[data-s]').length;
+    ok(d.querySelectorAll('.sec').length === pestanas,
+       'las ' + pestanas + ' secciones tienen su pestaña, y al revés',
+       'secciones: ' + d.querySelectorAll('.sec').length + ' contra ' + pestanas + ' pestañas');
+    ok([...d.querySelectorAll('.nav-t[data-s]')].every(b => d.getElementById(b.dataset.s)),
+       'y cada pestaña apunta a una sección que existe', 'hay una pestaña que no lleva a ningún sitio');
     ok(/Ruta del Expediente Dorado · Etapa 2 de 7/.test(d.body.textContent), 'se presenta como etapa 2 de 7', 'no se presenta como etapa de la ruta');
     /* Restos del molde: se copió de la etapa 1 de esta misma ruta. Se
        excluyen los puntos de Recursos que enlazan a las misiones hermanas a
@@ -798,8 +808,11 @@ window.addEventListener('load', async () => {
     const casos = d.getElementById('s-casos');
     ok(!!casos, 'existe la sección de casos', 'falta la sección de casos');
     if (casos) {
-      ok(casos.querySelectorAll('.card').length === 10, '8 casos más la introducción y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
-      ok(casos.querySelectorAll('.ex-box').length === 9, 'y cada caso trae su caja de diagnóstico', 'cajas de diagnóstico: ' + casos.querySelectorAll('.ex-box').length);
+      /* Once tarjetas y no diez desde el 22 de agosto de 2026: entre el caso
+         8 y la hoja de la falla entró EL ESPEJO, que gira la auditoría hacia
+         quien estudia. Y con él, su décima caja de diagnóstico. */
+      ok(casos.querySelectorAll('.card').length === 11, '8 casos más la introducción, el espejo y el cierre', 'tarjetas: ' + casos.querySelectorAll('.card').length);
+      ok(casos.querySelectorAll('.ex-box').length === 10, 'y cada caso trae su caja de diagnóstico', 'cajas de diagnóstico: ' + casos.querySelectorAll('.ex-box').length);
       const txt = casos.textContent;
       ['préstamo', 'L 600', 'empleador', 'internet', 'quebrada', 'Jael', 'Angelly', 'M.E.T.A.S']
         .forEach(k => { if (!new RegExp(k.replace(/\./g, '\\.'), 'i').test(txt)) { fallos++; log('  ✘ falta el caso de ' + k); } });

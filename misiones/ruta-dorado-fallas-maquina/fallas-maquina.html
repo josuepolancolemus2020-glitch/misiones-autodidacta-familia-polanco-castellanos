@@ -6,6 +6,10 @@
 <title>Ruta del Expediente Dorado · Etapa 2: Las fallas de la máquina | F.A.R.O.</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/fallas-maquina.css">
+<!-- El taller de la memoria: aparato COMPARTIDO por las misiones. No trae
+     colores propios; se tiñe del --pri y del --sec que acaba de declarar la
+     misión, así que tiene que ir DESPUÉS de esta línea. -->
+<link rel="stylesheet" href="../../css/taller-neuro.css">
 <link rel="stylesheet" href="../../css/lecturas.css">
 <link rel="stylesheet" href="../../css/lecturas-marcador.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -126,6 +130,36 @@
     </div>
   </div>
 
+  <!-- El cierre de cuaderno de la falla 1. El aparato (js/taller-neuro.js)
+       le pone el reloj, el botón de tapar lo leído, la pauta y el renglón
+       del hueco; el TEXTO es de esta etapa y por eso vive aquí. -->
+  <section class="cierre-cuaderno" data-tema="externalidad" data-nombre="Externalidades" aria-label="Cierre de cuaderno: externalidades">
+    <h3>🔧 Cierre de cuaderno: sin mirar atrás</h3>
+    <p class="cc-lead">La máquina no se arregla leyendo el manual otra vez. Se arregla cuando recuerdas cómo funciona con la caja cerrada. Escribe lo que quedó, sin mirar. Si no sale, ahí está el hueco. Y el hueco es el mapa.</p>
+    <ol class="cc-preguntas">
+      <li data-pauta="Externalidad: un costo (o un beneficio) que cae sobre quien no firmó el trato.">
+        <label for="cc-ext-1">Esta falla se llama:</label>
+        <textarea id="cc-ext-1" rows="1"></textarea>
+      </li>
+      <li data-pauta="El de que nada del trato cae sobre terceros. Los que pagan el daño no estaban en la mesa.">
+        <label for="cc-ext-2">El supuesto del teorema que se rompe es:</label>
+        <textarea id="cc-ext-2" rows="1"></textarea>
+      </li>
+      <li data-pauta="Regla: el impuesto de Pigou (1920), del tamaño del daño; o dejar negociar con derechos claros, que es Coase (1960). Costo: el impuesto exige medir el daño y a alguien que lo cobre bien; y la negociación de Coase solo funciona donde negociar cuesta poco, que es su propia advertencia de 1988.">
+        <div class="cc-doble">
+          <div>
+            <label for="cc-ext-3a">Una regla que la corregiría es:</label>
+            <textarea id="cc-ext-3a" rows="2"></textarea>
+          </div>
+          <div>
+            <label for="cc-ext-3b">…y costaría:</label>
+            <textarea id="cc-ext-3b" rows="2"></textarea>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
   <div class="card ac-gold">
     <h2>🏭 Falla 2 · Poder de mercado: el que cobra de más y el que paga de menos</h2>
     <p style="font-size:0.9rem;margin-bottom:0.7rem;">El teorema pide que nadie tenga poder para mover el precio. Cuando alguien lo tiene, el precio deja de informar y empieza a mandar. Y son <strong>dos casos, no uno</strong>, aunque en la escuela solo se enseñe el primero:</p>
@@ -140,6 +174,33 @@
       <span>Si el que paga tiene poder, subir el salario mínimo <span class="hl">no tiene por qué destruir empleo</span>. <strong>Card y Krueger (1994)</strong> midieron un caso real y no encontraron la caída que la teoría simple predecía; <strong>Neumark y Wascher</strong> los rebatieron con otros datos y otro método. <span class="hl2">La disputa está viva, se enseña viva, y quien la declare resuelta en cualquiera de las dos direcciones está vendiendo bando.</span></span>
     </div>
   </div>
+
+  <section class="cierre-cuaderno" data-tema="poder" data-nombre="Poder de mercado" aria-label="Cierre de cuaderno: poder de mercado">
+    <h3>🔧 Cierre de cuaderno: sin mirar atrás</h3>
+    <p class="cc-lead">Otra vez con la caja cerrada. Y ojo con esta: es la falla que casi nadie enseña, así que es también la que más se escapa cuando se contesta de memoria del aula y no de la cabeza.</p>
+    <ol class="cc-preguntas">
+      <li data-pauta="Poder de mercado. Con dos caras: monopolio si el que manda es el que vende, monopsonio si es el que compra.">
+        <label for="cc-pod-1">Esta falla se llama:</label>
+        <textarea id="cc-pod-1" rows="1"></textarea>
+      </li>
+      <li data-pauta="El de que nadie tiene poder de mercado: que ningún vendedor ni ningún comprador puede mover el precio él solo.">
+        <label for="cc-pod-2">El supuesto del teorema que se rompe es:</label>
+        <textarea id="cc-pod-2" rows="1"></textarea>
+      </li>
+      <li data-pauta="Regla: que entre competencia; o regular el precio; o, en el mercado de trabajo con un solo comprador, un salario mínimo, que con monopsonio puede subir el salario sin destruir empleo (Card y Krueger, 1994, contra Neumark y Wascher: disputa empírica viva). Costo: regular exige un regulador que sepa y que no lo capturen; y si el poder de compra era menor de lo que se creía, el mínimo sí destruye empleo.">
+        <div class="cc-doble">
+          <div>
+            <label for="cc-pod-3a">Una regla que la corregiría es:</label>
+            <textarea id="cc-pod-3a" rows="2"></textarea>
+          </div>
+          <div>
+            <label for="cc-pod-3b">…y costaría:</label>
+            <textarea id="cc-pod-3b" rows="2"></textarea>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </section>
 
   <div class="card ac-amber">
     <h2>🍋 Falla 3 · Información asimétrica: uno sabe y el otro no</h2>
@@ -157,6 +218,33 @@
     </div>
   </div>
 
+  <section class="cierre-cuaderno" data-tema="informacion" data-nombre="Información asimétrica" aria-label="Cierre de cuaderno: información asimétrica">
+    <h3>🔧 Cierre de cuaderno: sin mirar atrás</h3>
+    <p class="cc-lead">La caja se cierra otra vez. Y aquí el renglón del hueco importa doble: esta falla se entiende leyéndola y se olvida al día siguiente, porque el ejemplo se recuerda y el mecanismo no.</p>
+    <ol class="cc-preguntas">
+      <li data-pauta="Información asimétrica: uno de los dos lados del trato sabe algo que el otro no puede comprobar.">
+        <label for="cc-inf-1">Esta falla se llama:</label>
+        <textarea id="cc-inf-1" rows="1"></textarea>
+      </li>
+      <li data-pauta="El de información perfecta: que los dos lados saben lo mismo sobre lo que se está intercambiando.">
+        <label for="cc-inf-2">El supuesto del teorema que se rompe es:</label>
+        <textarea id="cc-inf-2" rows="1"></textarea>
+      </li>
+      <li data-pauta="Regla: garantías, certificaciones, historiales que la persona se pueda llevar, precios publicados. Costo: cada una cuesta dinero y tiempo, alguna encarece justo lo que quería abaratar, y un certificador capturado es peor que ninguno.">
+        <div class="cc-doble">
+          <div>
+            <label for="cc-inf-3a">Una regla que la corregiría es:</label>
+            <textarea id="cc-inf-3a" rows="2"></textarea>
+          </div>
+          <div>
+            <label for="cc-inf-3b">…y costaría:</label>
+            <textarea id="cc-inf-3b" rows="2"></textarea>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
   <div class="card ac-jade">
     <h2>🎈 Falla 4 · La dinámica: la calma que fabrica la tormenta</h2>
     <p style="font-size:0.9rem;margin-bottom:0.7rem;">Las tres anteriores son fallas de un momento. Esta es de otro tipo y por eso cuesta más verla: <strong>Hyman Minsky</strong> sostuvo que <strong>la estabilidad incuba inestabilidad</strong>. No que el sistema falle cuando algo sale mal, sino que <strong>falla precisamente cuando todo va bien</strong>, porque los años buenos convencen a todo el mundo de que el riesgo bajó.</p>
@@ -173,6 +261,33 @@
     </div>
   </div>
 
+  <section class="cierre-cuaderno" data-tema="dinamica" data-nombre="La falla dinámica" aria-label="Cierre de cuaderno: la falla dinámica">
+    <h3>🔧 Cierre de cuaderno: sin mirar atrás</h3>
+    <p class="cc-lead">La última, y la más difícil de reconstruir sin mirar: las otras tres se ven en una foto y esta solo se ve en una película. Si el renglón se queda a medias, el hueco está en el mecanismo, no en el nombre.</p>
+    <ol class="cc-preguntas">
+      <li data-pauta="Falla dinámica: la estabilidad incuba inestabilidad. El sistema falla precisamente cuando todo va bien (Minsky, 1986).">
+        <label for="cc-din-1">Esta falla se llama:</label>
+        <textarea id="cc-din-1" rows="1"></textarea>
+      </li>
+      <li data-pauta="El de mercados completos: no existe ningún mercado donde comprar seguro contra el mal año que viene, así que el riesgo futuro no tiene precio y nadie lo paga hoy.">
+        <label for="cc-din-2">El supuesto del teorema que se rompe es:</label>
+        <textarea id="cc-din-2" rows="1"></textarea>
+      </li>
+      <li data-pauta="Regla: colchones obligatorios en los años buenos, y calcular la deuda contra el peor año y no contra el promedio de los últimos tres. Costo: se crece más despacio justo cuando todo va bien, y el que no guardó colchón va por delante durante años, que es exactamente por lo que la regla se afloja siempre.">
+        <div class="cc-doble">
+          <div>
+            <label for="cc-din-3a">Una regla que la corregiría es:</label>
+            <textarea id="cc-din-3a" rows="2"></textarea>
+          </div>
+          <div>
+            <label for="cc-din-3b">…y costaría:</label>
+            <textarea id="cc-din-3b" rows="2"></textarea>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
   <div class="card ac-purple">
     <h2>🖌️ El modo de fallar de esta etapa: de la falla a la consigna</h2>
     <p style="font-size:0.9rem;margin-bottom:0.7rem;">El error propio de esta etapa no es negar las fallas: es <strong>usarlas como consigna en vez de como diagnóstico</strong>. Se reconoce por tres señales, y va a ser el primero que cometa esta casa, porque el vocabulario nuevo da gusto:</p>
@@ -180,6 +295,7 @@
       <div class="type-chip tc-teal"><div class="t-art">1️⃣ «El mercado falla»</div><div class="t-info">Sin decir cuál de las cuatro</div></div>
       <div class="type-chip tc-gold"><div class="t-art">2️⃣ Sin la regla</div><div class="t-info">Se nombra el daño y no el arreglo</div></div>
       <div class="type-chip tc-jade"><div class="t-art">3️⃣ Sin el costo de la regla</div><div class="t-info">Como si arreglar fuera gratis</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">4️⃣ «Ya lo dominé»</div><div class="t-info">La trampa de la fluidez</div></div>
       <div class="type-chip tc-amber"><div class="t-art">✅ En su lugar: el nombre</div><div class="t-info">Externalidad, monopsonio, asimetría o dinámica</div></div>
       <div class="type-chip tc-purple"><div class="t-art">✅ En su lugar: la regla</div><div class="t-info">Qué se cambiaría, y quién la aplicaría</div></div>
       <div class="type-chip tc-blue"><div class="t-art">✅ En su lugar: su factura</div><div class="t-info">Qué cuesta la regla, y a quién</div></div>
@@ -188,6 +304,17 @@
     <div class="ex-box">
       <span class="ex-tag ex-d">🧱 Lo que sobrevive a esta etapa, y hay que decirlo</span><br>
       <span>Cuatro fallas demostradas no derriban el expediente de la etapa 1: <span class="hl">la gran fuga sigue medida y sigue en pie</span>. Lo que la etapa 2 añade es más incómodo y más útil: <span class="hl2">que la máquina funciona bien donde se cumplen sus condiciones, y que donde no se cumplen hace falta diseño y no fe</span>. Las dos frases van juntas, y quien solo pueda sostener una de las dos todavía no terminó el expediente.</span>
+    </div>
+    <div class="tn-desafio">
+      <h4>🔥 El Desafío de la Dificultad Deseable</h4>
+      <p>Contra el cuarto error hay un modo, y hace exactamente lo contrario de lo que apetece: <strong>aprieta tres tuercas a la vez</strong>.</p>
+      <ul>
+        <li><strong>Las flashcards se mezclan con las de la etapa 1</strong>, la gran fuga, para que el contexto no conteste por ti.</li>
+        <li><strong>El reto final baja de treinta segundos a veinte.</strong></li>
+        <li><strong>Las palabras clave de la explicación se tapan</strong> hasta que las tocas: releer la etapa deja de ir regalando la respuesta.</li>
+      </ul>
+      <button class="tn-btn" data-tn-dificultad type="button" aria-pressed="false">🔥 Encender el modo difícil</button>
+      <p style="margin-top:0.6rem;font-size:0.85rem;"><strong>Y el aviso, porque si no se dice el modo se apaga a los dos minutos:</strong> esto se va a sentir peor. Se va a fallar más, se va a ir más lento, y va a dar la impresión de que se sabe menos que ayer. Es al revés: <strong>la casa no te pide comodidad, te pide memoria</strong>. Este modo cuesta más ahora, y eso es la señal de que está funcionando.</p>
     </div>
   </div>
 
@@ -235,7 +362,7 @@
 <div class="sec" id="s-flash" role="tabpanel">
   <div class="card ac-teal">
     <h2>🃏 Flashcards: toca para voltear</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ La máquina paga variable: +1 XP de base por tarjeta nueva, y a veces mucho más</p>
     <div class="fc-wrap">
       <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
         <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
@@ -259,7 +386,7 @@
 <div class="sec" id="s-quiz" role="tabpanel">
   <div class="card ac-gold">
     <h2>🧠 Quiz de Comprensión</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ La máquina paga variable: +5 XP de base por acierto nuevo, y a veces el doble, el triple o cinco veces</p>
     <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
     <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
     <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
@@ -280,7 +407,7 @@
   <div class="card ac-jade">
     <h2>🗂️ Clasifica: ¿qué falla es?</h2>
     <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ La máquina paga variable: +5 XP de base al completar el grupo, y a veces mucho más</p>
     <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
     <div class="word-bank" id="clsBank" role="list"></div>
     <div class="drop-cols">
@@ -304,7 +431,7 @@
 <div class="sec" id="s-identifica" role="tabpanel">
   <div class="card ac-purple">
     <h2>🔍 Identifica la pieza</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ La máquina paga variable: +5 XP de base por acierto nuevo, y a veces el doble, el triple o cinco veces</p>
     <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
     <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
     <div class="id-sent" id="idSent" role="group"></div>
@@ -325,7 +452,7 @@
 <div class="sec" id="s-completa" role="tabpanel">
   <div class="card ac-amber">
     <h2>✏️ Completa la oración</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ La máquina paga variable: +5 XP de base por acierto nuevo, y a veces mucho más</p>
     <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
     <div class="cmp-sent" id="cmpSent"></div>
     <div class="cmp-opts" id="cmpOpts" role="group"></div>
@@ -343,7 +470,7 @@
 
   <div class="card ac-teal">
     <h2>🔗 Ordena: cómo se diagnostica una falla de mercado</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ La máquina paga variable: +4 XP de base por secuencia nueva, y a veces mucho más</p>
     <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden de principio a fin. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada una, y esa secuencia deja de dar XP.</p>
     <div class="sort-list" id="routeList"></div>
     <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
@@ -356,7 +483,7 @@
 
   <div class="card ac-gold">
     <h2>🔧 Identifica la falla o la fuente por su descripción</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ La máquina paga variable: +3 XP de base por acierto nuevo, y a veces mucho más</p>
     <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
     <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué pieza de la etapa se describe?</p>
     <div class="neuron-desc" id="neuronDesc">Cargando...</div>
@@ -370,7 +497,7 @@
 
   <div class="card ac-jade">
     <h2>📚 ¿Qué le toca a ese mercado: falla, regla o factura?</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ La máquina paga variable: +3 XP de base por acierto nuevo, y a veces mucho más</p>
     <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
     <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es cada cosa dentro de la auditoría:</p>
     <div class="neuro-trans-display" id="neuroTrans">«El taller tira el agua sucia a la quebrada de la aldea»</div>
@@ -383,7 +510,7 @@
 
   <div class="card ac-purple">
     <h2>🧐 Diagnóstico: ¿por dónde falla el diagnóstico?</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ La máquina paga variable: +3 XP de base por acierto nuevo, y a veces mucho más</p>
     <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
     <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla:</p>
     <div class="neuro-trans-display" id="enferDisease">«El mercado falla», y ahí termina la anotación</div>
@@ -403,9 +530,9 @@
 <!-- ===== RETO ===== -->
 <div class="sec" id="s-reto" role="tabpanel">
   <div class="card ac-teal">
-    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <h2>🏆 Reto Final: ¡<span id="retoSegundosRotulo">30</span> segundos!</h2>
     <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible.</p>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ La máquina paga variable: +1 XP de base por acierto | ❌ -1 XP incorrecto (solo primera partida)</p>
     <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
     <div class="game" aria-live="polite">
       <div class="reto-timer" id="retoTimer">⏱ 30</div>
@@ -433,7 +560,7 @@
 <div class="sec" id="s-sopa" role="tabpanel">
   <div class="card ac-teal">
     <h2>🔤 Sopa de Letras</h2>
-    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ La máquina paga variable: +1 XP de base por palabra nueva, y a veces mucho más</p>
     <div class="sopa-words" id="sopaWords"></div>
     <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
     <div class="sopa-container">
@@ -471,6 +598,23 @@
       <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
     </div>
     <div id="tgOut"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-mezclado')">
+    <span class="nsb-icon">🔀</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EL TALLER MEZCLADO ===== -->
+<div class="sec" id="s-mezclado" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔀 El Taller Mezclado</h2>
+    <p>Doce casos, uno detrás de otro y <strong>nunca agrupados por familia</strong>. En las otras pantallas cada juego avisa de qué falla se está hablando; aquí no avisa nadie. Delante de cada caso hay que hacer las tres preguntas enteras: <strong>cuál de las cuatro es, qué supuesto se rompió, y qué regla lo corregiría y a costa de qué.</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Por qué mezclados y no por tipo.</strong> Practicar «ahora todas las de externalidad, ahora todas las de monopsonio» se siente mucho mejor y enseña mucho menos: <strong>quien ya sabe de qué familia toca no está diagnosticando, está rellenando</strong>. El orden cambia cada vez que se vuelve a mezclar, y ese orden nuevo es medio ejercicio.</div>
+    </div>
+    <div id="tnMezcla"><!-- Lo monta js/taller-neuro.js con los casos de window.TALLER_NEURO.mezcla --></div>
   </div>
   <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
     <span class="nsb-icon">🎓</span>
@@ -548,6 +692,9 @@
       <span>No es una sola, y por eso el caso abre la etapa. Hay <span class="hl">información asimétrica</span>, porque el que presta no puede saber quién va a pagar y cobra a todos como si fueran el peor; y hay <span class="hl2">poder de mercado local</span>, porque en tres cuadras no hay a quién más pedirle. Y hay una tercera cosa que no es falla del mercado: <strong>que el banco no llegue a esa cuadra es en buena parte una regla, no una maldad</strong>, y las reglas se pueden mirar.</span>
     </div>
     <p><strong>Lo que enseña:</strong> que el diagnóstico decide el remedio. Si fuera solo asimetría, la regla sería un historial de crédito que se pueda llevar de un lado a otro. Si fuera solo poder de mercado, la regla sería que entre alguien más a competir. <strong>Y prohibir el préstamo sin resolver ninguna de las dos deja a la gente con el problema y sin el préstamo</strong>, que es la falla de gobierno de manual.</p>
+    <div class="tn-feynman" data-caso="c1-prestamo">
+      <p class="tn-fey-modelo">Imagínate que en tu colonia solo hay una tienda que presta plata. Y cobra mucho. La gente va porque no hay otra. Si abrieran otra tienda que preste, el precio bajaría solo. Pero como no hay, el que presta puede poner el precio que quiere. Y hay otra cosa: como él no sabe quién le va a pagar y quién no, les cobra caro a todos, hasta a los que sí iban a pagar. Eso no es que sea malo: es que es el único, y está adivinando.</p>
+    </div>
   </div>
 
   <div class="card ac-amber">
@@ -558,6 +705,9 @@
       <span>Es <span class="hl">información asimétrica</span> en su forma más pura: <strong>el que paga es exactamente el que menos sabe lo que necesita</strong>. Y hay que decir de inmediato lo que la etapa anterior enseñó: <span class="hl2">esto no vuelve ladrón a ningún médico</span>, y el que salta de la falla a la acusación cometió el error de la etapa pasada. La falla existe aunque todos los médicos sean honrados, porque está en la estructura y no en las personas.</span>
     </div>
     <p><strong>Lo que enseña:</strong> qué reglas nacen de esa falla, y por qué existen en todos los países: colegios profesionales que certifican, segundas opiniones, listas de precios publicadas, historias clínicas que el paciente se puede llevar. <strong>Y su factura, que también se dice:</strong> cada una de esas reglas cuesta dinero y tiempo, y alguna encarece la consulta que quería abaratar.</p>
+    <div class="tn-feynman" data-caso="c2-clinica">
+      <p class="tn-fey-modelo">Cuando vas al doctor, el que sabe si de verdad necesitas esos exámenes es él. Tú no. Y le estás pagando justamente para que te lo diga. Es como llevar el carro con un mecánico y que te diga que hay que cambiar una pieza que tú nunca has visto: capaz que sí hace falta, pero tú no tienes cómo revisarlo. Casi todos los doctores son honrados; el problema sigue ahí igual, porque el problema no son ellos, es que solo uno de los dos sabe.</p>
+    </div>
   </div>
 
   <div class="card ac-purple">
@@ -568,6 +718,9 @@
       <span>Esta es la falla que casi nadie enseña y que aquí se estudia entera: <span class="hl">cuando el que compra trabajo es uno solo, el salario baja sin que nadie sea malo</span>, porque el trabajador no tiene a dónde ir a comparar. El caso entra <span class="hl2">como categoría y no con nombre propio</span>, que es la regla de selección de esta materia: se estudia la estructura, no se señala ninguna empresa con pleito abierto ni a nadie en campaña.</span>
     </div>
     <p><strong>Lo que enseña:</strong> que aquí la teoría cambia la conclusión. Con competencia perfecta, subir el salario mínimo destruye empleo; <strong>con monopsonio, puede subir el salario sin destruirlo</strong>, y eso es exactamente lo que <strong>Card y Krueger midieron en 1994</strong> y lo que <strong>Neumark y Wascher discutieron</strong>. La casa enseña la disputa, no el bando, y anota la pregunta que la resolvería: cuánto poder de compra tiene de verdad ese empleador.</p>
+    <div class="tn-feynman" data-caso="c3-empleador">
+      <p class="tn-fey-modelo">En un pueblo hay un solo lugar donde te dan trabajo con papeles. Los demás trabajos son sin papeles, o te toca irte. Si a ti te pagan poco ahí, ¿a dónde vas a ir a que te paguen mejor? A ningún lado. Y como no hay a dónde ir, el que da el trabajo no tiene que subir el pago para que la gente se quede: la gente se queda igual. No es que el dueño sea malvado. Es que él es el único que está comprando.</p>
+    </div>
   </div>
 
   <div class="card ac-jade">
@@ -578,6 +731,9 @@
       <span>Es <span class="hl">poder de mercado del que vende</span>, y conviene decir por qué se produce: tender cable a una colonia cuesta mucho la primera vez y casi nada la siguiente, así que <span class="hl2">al segundo que llegue no le sale la cuenta</span>. Eso no lo vuelve inocente, pero cambia el remedio: aquí «que entre competencia» no basta como frase, porque la estructura empuja a que no entre.</span>
     </div>
     <p><strong>Lo que enseña:</strong> las tres reglas que existen para esto y sus tres facturas: regular el precio (y arriesgarse a que nadie invierta), obligar a compartir la red (y discutir a qué precio), o dejarlo libre (y pagarlo en servicio caro y malo). <strong>Ninguna es gratis, y decir cuál cuesta menos exige números que la casa todavía no tiene</strong>, así que eso queda escrito como pendiente y no como opinión.</p>
+    <div class="tn-feynman" data-caso="c4-internet">
+      <p class="tn-fey-modelo">Poner el cable del internet en la colonia la primera vez cuesta un montón de plata. Ponerlo la segunda vez, cuando ya está el hoyo hecho y el poste puesto, cuesta poquito. Entonces el que llegó primero se queda solo, porque al segundo no le sale la cuenta de gastar todo eso otra vez. Y como se queda solo, aunque se caiga el servicio y suba el precio, tú no te puedes cambiar. Decir «que venga otra empresa» suena bien, pero a la otra empresa no le conviene venir.</p>
+    </div>
   </div>
 
   <div class="card ac-gold">
@@ -588,6 +744,9 @@
       <span>El costo existe y lo paga quien no lo causó: eso es <span class="hl">una externalidad</span>, y el precio de la pieza no la incluye. <strong>Pigou</strong> diría que se le ponga un impuesto del tamaño del daño. <strong>Coase</strong> diría que si los derechos están claros, taller y aldea pueden negociar. <span class="hl2">Y el propio Coase advirtió que eso funciona donde negociar cuesta poco</span>: con una aldea entera, sin abogado y sin tiempo, negociar cuesta carísimo, y por eso el caso está sin resolver desde hace años.</span>
     </div>
     <p><strong>Lo que enseña:</strong> a no escoger bando antes de medir. La pregunta que decide no es Pigou o Coase, sino <strong>cuánto cuesta negociar en este caso concreto</strong>. Y la regla de selección otra vez: el caso entra por su estructura, y <strong>si alguna vez hay ficha sobre un río con nombre, se escribe con la misma doble columna que todo lo demás</strong>.</p>
+    <div class="tn-feynman" data-caso="c5-quebrada">
+      <p class="tn-fey-modelo">El taller lava piezas y el agua sucia se va por la quebrada. Abajo hay una aldea. Esa gente no le compró nada al taller, no le vendió nada, no habló nunca con él: pero el agua sucia les llega igual. Cuando tú compras una pieza barata en ese taller, el precio no incluye lo que le pasa a la aldea. Alguien está pagando parte de esa pieza, y no eres tú ni el taller: son ellos, y sin haber pedido nada.</p>
+    </div>
   </div>
 
   <div class="card ac-amber">
@@ -598,6 +757,9 @@
       <span>La frase falla en tres sitios a la vez: <span class="hl">no dice cuál de las cuatro fallas está mirando</span>, no propone ninguna regla, y no calcula lo que esa regla costaría. Y falla en un cuarto sitio, el más incómodo: <span class="hl2">de que un mercado falle no se sigue que otro arreglo lo haga mejor</span>. Eso se compara con la alternativa real, con nombre, no con un gobierno imaginario que siempre acierta.</span>
     </div>
     <p><strong>Lo que enseña:</strong> cómo se reescribe, y la reescritura cabe en tres renglones. «En esta colonia hay un solo proveedor de internet, que es poder de mercado del que vende; la regla que se usa en otros países es obligar a compartir la red; <strong>y su costo es que hay que fijar a qué precio se comparte, lo cual exige un regulador que sepa hacerlo</strong>». Eso sí se puede discutir, y se puede comprobar si funcionó.</p>
+    <div class="tn-feynman" data-caso="c6-jael">
+      <p class="tn-fey-modelo">Decir «el mercado no sirve» es como decir «el carro no sirve» porque se le ponchó una llanta. ¿Cuál llanta? ¿La de adelante o la de atrás? ¿Y con qué la vas a arreglar? ¿Y cuánto cuesta el parche? Si no dices cuál se ponchó, nadie puede ir a comprar el repuesto. Lo que sí se puede decir es: «en esta colonia hay una sola empresa de internet, por eso el precio no baja; en otros países las obligan a prestar el cable; y eso cuesta, porque alguien tiene que decidir a qué precio se presta». Eso ya se puede discutir, y se puede ver después si funcionó.</p>
+    </div>
   </div>
 
   <div class="card ac-teal">
@@ -608,6 +770,9 @@
       <span>La desconfianza no es prejuicio: es <span class="hl">exactamente lo que Akerlof describió en 1970</span>. Si el que vende sabe más que el que compra, el que compra ofrece un precio de promedio; a ese precio los buenos se retiran, y el promedio empeora. <span class="hl2">Al final, un precio muy bajo es información</span>, y lo que dice no es «qué suerte»: dice «pregunte por qué».</span>
     </div>
     <p><strong>Lo que enseña:</strong> lo práctico, que es lo que se lleva Angelly: las cosas que existen para tapar esa falla y que se pueden pedir, <strong>la garantía, el mecánico de confianza que lo revise, y los papeles</strong>. Y el apunte de método: cada una de esas tres cosas cuesta algo, <strong>y ese costo es el precio de vivir con una falla que no se puede eliminar</strong>.</p>
+    <div class="tn-feynman" data-caso="c7-carro">
+      <p class="tn-fey-modelo">Cuando alguien te vende algo bueno y barato, casi siempre es porque él sabe algo del aparato que tú no sabes. Piénsalo al revés: si el carro estuviera perfecto, ¿por qué lo daría regalado? Entonces, como los compradores desconfían y ofrecen poquito, los que tienen carros buenos ya ni los sacan a vender, y en el mercado van quedando los malos. Por eso desconfiar no es ser malpensado: el precio bajito te está diciendo algo. Lo que hay que hacer no es huir, es preguntar por qué, pedir los papeles y llevarlo con un mecánico.</p>
+    </div>
   </div>
 
   <div class="card ac-purple">
@@ -618,6 +783,48 @@
       <span>Es <span class="hl">información asimétrica</span>, y aquí el precio ni siquiera puede avisar, porque no hay precio. En un mercado normal, un producto caro y malo al menos deja una queja; <span class="hl2">un producto gratis y malo se abandona en silencio y nadie se entera</span>, que es la peor señal posible para quien lo escribe. La falla es de la casa y no de quien la usa.</span>
     </div>
     <p><strong>Lo que enseña:</strong> qué reglas se puso la casa por eso, y quedaron escritas con fecha: <strong>las fuentes con su etiqueta, la pauta publicada al lado del ejercicio, y las sondas que revisan cada misión antes de publicarla</strong>. Y su renglón de qué la haría cambiar: si tres familias abandonan una misión sin decir por qué, <strong>la señal que falta hay que ir a buscarla, porque la falla es de diseño y no de las familias</strong>.</p>
+    <div class="tn-feynman" data-caso="c8-metas">
+      <p class="tn-fey-modelo">Cuando compras algo caro y sale malo, reclamas. Cuando algo es gratis y sale malo, no reclamas: solo lo cierras y no vuelves. Y el que lo hizo nunca se entera de que estaba malo, porque nadie le dijo nada. Con estas misiones pasa igual: nadie puede saber si una misión sirve hasta que ya la usó, y si no sirve, la familia simplemente la cierra. Por eso aquí la casa se puso reglas ella misma, y por eso hay un botón para avisar: la falla es del que la escribe, no del que la abre.</p>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🪞 La falla que tiene el estudio por dentro</h2>
+    <p>El caso 8 giró el espejo hacia la casa. Este lo gira una vuelta más y lo pone donde más incomoda: <strong>hacia quien está estudiando ahora mismo</strong>. Las cuatro fallas no son solo del mercado del barrio; el rato de estudio también es un trato, con sus partes y su letra pequeña, y <strong>se rompe por los mismos cuatro sitios</strong>.</p>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Cada una trae una regla concreta. No una intención: una regla, con quien la aplica y cómo se comprueba, que es lo que esta etapa pide para todo lo demás.</p>
+
+    <div class="tn-espejo-caso">
+      <h4>🌊 Externalidad · el que paga la cuenta no firmó</h4>
+      <p>Cuando estudias mal hoy, el costo no lo pagas hoy: lo paga <strong>tu «yo» del mes que viene</strong>, el que va a necesitar esto en la evaluación o delante de alguien. Ese «yo» no estuvo en la mesa cuando se decidió leer por encima, y no firmó nada.</p>
+      <button class="tn-btn tn-btn-hueco" type="button" data-tn-despliega="regla-espejo-1" data-tn-abierto="🌊 Tapar la regla">¿Qué regla me pongo?</button>
+      <div class="tn-regla" id="regla-espejo-1">programar los repasos <strong>el mismo día que se estudia</strong>, a 3 días, 2 semanas y 1 mes, y no cuando haga falta. Su factura: hay tres ratos futuros ya comprometidos. Quien no la paga, se la cobra el «yo» que no firmó.</div>
+    </div>
+
+    <div class="tn-espejo-caso">
+      <h4>🏭 Poder de mercado · una sola fuente y ningún precio que avise</h4>
+      <p>Si esto es lo único que lees sobre el asunto, <strong>no tienes con qué comparar</strong>. ¿Está bien esta misión? No hay otro proveedor, no hay precio y no hay competencia: exactamente la estructura del caso 4. Y quien la escribe está en la posición del único proveedor de la colonia, aunque escriba de buena fe.</p>
+      <button class="tn-btn tn-btn-hueco" type="button" data-tn-despliega="regla-espejo-2" data-tn-abierto="🏭 Tapar la regla">¿Qué regla me pongo?</button>
+      <div class="tn-regla" id="regla-espejo-2">cruzar cada etapa con <strong>al menos una fuente de fuera</strong>: un libro, un video, una persona que sepa. Y si la de fuera dice otra cosa, anotarlo en el cuaderno en vez de escoger la que gusta más. Su factura: cuesta tiempo, y a veces deja la etapa con una contradicción sin resolver.</div>
+    </div>
+
+    <div class="tn-espejo-caso">
+      <h4>🍋 Información asimétrica · el único que sabe dónde está el hueco eres tú, ahora</h4>
+      <p>En este minuto sabes perfectamente qué entendiste y qué pasaste de largo. <strong>Tu «yo» de mañana no lo va a saber</strong>: va a recordar que leyó la etapa y va a dar por hecho que la entendió. Esa información existe una sola vez y se pierde sola.</p>
+      <button class="tn-btn tn-btn-hueco" type="button" data-tn-despliega="regla-espejo-3" data-tn-abierto="🍋 Tapar la regla">¿Qué regla me pongo?</button>
+      <div class="tn-regla" id="regla-espejo-3">escribir el hueco <strong>en el momento</strong>, en el renglón «me atascaba en» del cierre de cuaderno, aunque salga feo y aunque parezca una tontería. Su factura: interrumpe la lectura justo cuando iba fluyendo. Interrumpirla es el punto.</div>
+    </div>
+
+    <div class="tn-espejo-caso">
+      <h4>🎈 Dinámica · los años buenos de estudio incuban el olvido</h4>
+      <p>Tres pantallas seguidas contestadas bien convencen de que ya no hace falta repasar. Es la calma de Minsky, en pequeño: <strong>la fluidez de hoy financia la confianza de mañana, y la confianza es la que decide no repasar</strong>. Y cuando se nota el olvido ya no hay tiempo de arreglarlo, igual que en el tercer escalón.</p>
+      <button class="tn-btn tn-btn-hueco" type="button" data-tn-despliega="regla-espejo-4" data-tn-abierto="🎈 Tapar la regla">¿Qué regla me pongo?</button>
+      <div class="tn-regla" id="regla-espejo-4">meter dificultades a propósito cuando todo va bien: <strong>mezclar los casos, espaciar los repasos y autoexaminarse antes de sentirse listo</strong>. Su factura: bajan los aciertos y baja la sensación de saber. Las dos cosas bajan mientras sube lo único que importa, que es lo que va a quedar dentro de un mes.</div>
+    </div>
+
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🪞 Y la regla que corta en las dos direcciones, también aquí</span><br>
+      <span>Igual que una falla de mercado no prueba que el Estado la arregle mejor, <span class="hl">un hueco en el estudio no prueba que otro método lo arregle</span>. La comparación se hace contra <span class="hl2">la alternativa real y no contra el estudiante imaginario que sí se concentra</span>: contra lo que de verdad harías el martes por la noche, cansado y con el teléfono al lado.</span>
+    </div>
   </div>
 
   <div class="card ac-jade">
@@ -635,6 +842,37 @@
       <span>1. <span class="hl">La falla se nombra</span>: «el mercado falla» no es un diagnóstico. 2. <span class="hl">Cada supuesto que falla es una familia de fallas</span>, y son cuatro familias. 3. Toda crítica entra con <span class="hl">su contracrítica al lado</span>: Pigou con Coase, y Coase con su propia advertencia de 1988. 4. <span class="hl2">Ninguna regla es gratis</span>: se dice qué cuesta y a quién. 5. Y la falla de mercado se compara con <span class="hl">la falla de gobierno concreta</span>, no con un gobierno imaginario.</span>
     </div>
   </div>
+
+  <!-- La hoja de la falla, para llenarla de verdad. Es un cierre de
+       cuaderno con cinco renglones en vez de tres, y por eso usa el
+       mismo bloque: cerrarla es lo que pone en marcha el reloj del
+       repaso espaciado de la etapa entera. -->
+  <section class="cierre-cuaderno" data-tema="hoja" data-nombre="La hoja de la falla" aria-label="La hoja de la falla, para llenar">
+    <h3>🔧 La hoja de la falla, llenada a mano</h3>
+    <p class="cc-lead">Escoge un mercado de verdad (de esta ciudad, de tu colonia, o de tu casa) y llénala entera antes de opinar. Las pautas de aquí no traen la respuesta: traen <strong>lo que tiene que aparecer</strong> en la tuya, que es lo que se puede comprobar.</p>
+    <ol class="cc-preguntas">
+      <li data-pauta="Tiene que aparecer quién vende, quién compra y qué se intercambia exactamente. «La gente» no es ninguna de las tres.">
+        <label for="cc-hoja-1">1 · Qué mercado es, exactamente:</label>
+        <textarea id="cc-hoja-1" rows="2"></textarea>
+      </li>
+      <li data-pauta="Uno de los cuatro, escrito con esas palabras: mercados completos, información perfecta, nadie con poder, o nada sobre terceros.">
+        <label for="cc-hoja-2">2 · Qué supuesto se rompió:</label>
+        <textarea id="cc-hoja-2" rows="2"></textarea>
+      </li>
+      <li data-pauta="Una de las cuatro familias, con su nombre: externalidad, poder de mercado (monopolio o monopsonio), información asimétrica o falla dinámica. «El mercado falla» no es un diagnóstico.">
+        <label for="cc-hoja-3">3 · Cómo se llama la falla:</label>
+        <textarea id="cc-hoja-3" rows="2"></textarea>
+      </li>
+      <li data-pauta="Escrita de modo que se sepa QUIÉN la aplica y CÓMO se comprueba que se cumplió. Si no se puede comprobar, todavía no es una regla.">
+        <label for="cc-hoja-4">4 · Qué regla la corregiría:</label>
+        <textarea id="cc-hoja-4" rows="2"></textarea>
+      </li>
+      <li data-pauta="Qué cuesta, a quién le cuesta, y contra qué alternativa real se está comparando: la falla de gobierno concreta, con nombre, y no un ministerio imaginario que siempre acierta. Ninguna regla es gratis.">
+        <label for="cc-hoja-5">5 · Qué cuesta esa regla y a quién:</label>
+        <textarea id="cc-hoja-5" rows="2"></textarea>
+      </li>
+    </ol>
+  </section>
 
   <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
     <span class="nsb-icon">🎬</span>
@@ -1001,11 +1239,13 @@
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-mezclado" data-s="s-mezclado" onclick="go('s-mezclado')"><span class="ico">🔀</span> Mezclado</button>
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🔧</span> Casos</button>
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
   <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" data-tn-panel type="button" style="border-color:var(--amber);" aria-haspopup="dialog"><span class="ico">📊</span> Mi Taller</button>
   <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
 </nav>
 
@@ -1033,5 +1273,9 @@
        para saber cuáles son sus zonas subrayables. -->
   <script src="../../js/lecturas.js"></script>
   <script src="../../js/lecturas-marcador.js"></script>
+  <!-- El taller de la memoria va EL ÚLTIMO: sustituye ptsVar por el XP
+       variable, lee el window.TALLER_NEURO que declara el JS de la misión y
+       monta sus bloques sobre un documento ya completo. -->
+  <script src="../../js/taller-neuro.js"></script>
 </body>
 </html>
