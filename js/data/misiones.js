@@ -41,15 +41,34 @@ const RUTAS = {
      compendio completo está en COMPENDIO-RUTA-LEY.md. */
   ley:        { nombre: 'Ruta de la Ley y sus Grietas',      emoji: '⚖️', color: 'ley',  etapas: 12,
                 lema: 'Leer la ley por dentro: qué dice, qué calla y dónde se contradice' },
-  /* 12 etapas, como la Ley y por el mismo motivo: el temario no cabe en 6. Un
-     curso de storytelling de seis etapas se queda en «gancho, conflicto y
-     cierre», que es justo el nivel de taller de fin de semana que esta ruta
-     viene a superar. El compendio completo esta en COMPENDIO-STORYTELLING.md.
-     Materia declarada a mano aunque el color ya la ata, porque el nombre del
-     chip («Storytelling») y el nombre de lo que se estudia coinciden y asi la
-     tarjeta no depende de que nadie renombre el chip. */
-  hilo:       { nombre: 'Ruta del Hilo que Tira',            emoji: '🧵', color: 'story', materia: 'Storytelling', etapas: 12,
+  /* Storytelling es un OFICIO con varios oficios dentro, así que su materia se
+     abre en OCHO rutas, declaradas enteras por adelantado como se hizo con el
+     Estudio Mayor y con la Ley: el autor pidió ver el mapa completo para saber
+     qué misión sigue e ir ordenando desde ahí. Todas comparten el color 'story'
+     (por eso caen juntas bajo el chip «Storytelling») y cada una declara su
+     `materia` con el nombre del DOMINIO que enseña, no con el nombre del chip,
+     que si no todas las tarjetas dirían lo mismo. El compendio completo, con las
+     ocho rutas y sus etapas, está en COMPENDIO-STORYTELLING.md.
+     La 1 es la de fundamentos: la gramática del relato, sobre la que se apoyan
+     las otras siete. 12 etapas, como la Ley, porque el temario no cabe en 6: un
+     curso de seis se queda en «gancho, conflicto y cierre», el taller de fin de
+     semana que esta ruta viene a superar. */
+  hilo:       { nombre: 'Ruta del Hilo que Tira',            emoji: '🧵', color: 'story', materia: 'Fundamentos del relato', etapas: 12,
                 lema: 'Nadie se queda por lo que ya sabe: se queda por el hueco que le falta' },
+  pluma:      { nombre: 'Ruta de la Pluma Afilada',          emoji: '✍️', color: 'story', materia: 'La prosa y la voz', etapas: 7,
+                lema: 'La arquitectura aguanta la casa; la prosa es dónde se vive' },
+  papel:      { nombre: 'Ruta de las Personas de Papel',     emoji: '🎭', color: 'story', materia: 'Personaje y diálogo', etapas: 7,
+                lema: 'Un personaje no es quien es: es lo que quiere y lo que le falta para conseguirlo' },
+  camara:     { nombre: 'Ruta de la Cámara que Cuenta',      emoji: '🎬', color: 'story', materia: 'Narrativa audiovisual y guion', etapas: 7,
+                lema: 'En la pantalla no se cuenta: se muestra, y el montaje decide qué significa' },
+  expediente: { nombre: 'Ruta del Expediente Real',          emoji: '🎙️', color: 'story', materia: 'No ficción narrativa', etapas: 8,
+                lema: 'Reordenar es oficio; inventar es otra cosa, y se llama distinto' },
+  anzuelo:    { nombre: 'Ruta del Anzuelo Honrado',          emoji: '🪝', color: 'story', materia: 'Relato que persuade', etapas: 7,
+                lema: 'La historia se cuenta para que el dato se entienda, nunca para que no se pida' },
+  mundo:      { nombre: 'Ruta del Mundo que Aguanta',        emoji: '🗺️', color: 'story', materia: 'Relato largo y serialidad', etapas: 7,
+                lema: 'Lo difícil no es empezar una historia larga: es no perder al lector en el medio' },
+  taller:     { nombre: 'Ruta del Taller Mayor',             emoji: '🛠️', color: 'story', materia: 'Revisión, oficio y maestría', etapas: 8,
+                lema: 'Nadie escribe bien: se reescribe bien, y eso se aprende con método' },
   /* La primera ruta del Estudio Mayor (COMPENDIO-ESTUDIO-MAYOR.md). El
      compendio trae veintisiete materias; entran al catálogo una por una,
      cuando se construye su primera misión, y todas bajo la materia 'mayor'
@@ -236,6 +255,75 @@ const ETAPAS_PREVISTAS = {
     10: 'La historia de verdad: narrativa de no ficción',
     11: 'Contar de pie y contar en imagen',
     12: 'El taller: revisión con método y prueba de dominio',
+  },
+  /* Las siete rutas de especialización de Storytelling, todas en cero. Sus
+     títulos salen de COMPENDIO-STORYTELLING.md y ninguna se cita de memoria:
+     cada estructura que se nombra lleva su autor y su año, que es la regla de
+     oro de esta materia. */
+  pluma: {
+    1: 'La frase que respira: el ritmo se oye, no se explica',
+    2: 'El verbo que trabaja: contra el adverbio y la pasiva (Orwell, 1946)',
+    3: 'El detalle que vale por mil: la concreción de Chéjov',
+    4: 'Matar a tus amados: el corte, bien atribuido (Quiller-Couch, 1914)',
+    5: 'El párrafo y el blanco: puntuación, aliento y silencio en la página',
+    6: 'La distancia psíquica: de la cámara al pensamiento (Gardner, 1984)',
+    7: 'Reescribir es escribir: el borrador cero y las pasadas (Lamott, 1994)',
+  },
+  papel: {
+    1: 'Querer y necesitar: el motor de dos tiempos',
+    2: 'La herida y la máscara: la contradicción que mueve',
+    3: 'Redondos y planos: cuándo cada uno (Forster, 1927)',
+    4: 'El antagonista con razón: el acero antes del juicio',
+    5: 'El diálogo que no explica: subtexto y oblicuidad',
+    6: 'La acotación y el gesto: el cuerpo y lo no dicho',
+    7: 'El elenco: coro, contraste y el personaje que falta',
+  },
+  camara: {
+    1: 'La imagen que sustituye a la frase: mostrar en pantalla',
+    2: 'El montaje significa: el efecto Kuleshov (años veinte)',
+    3: 'La escena de cine: entrar tarde y salir temprano',
+    4: 'El guion técnico: escaleta, secuencia y plano',
+    5: 'El sonido, la mitad que nadie estudia',
+    6: 'El video de siete minutos: el guion de F.A.R.O por dentro',
+    7: 'El corte final: el ritmo del montaje y el descarte',
+  },
+  expediente: {
+    1: 'Reordenar sí, inventar no: el borde exacto del oficio',
+    2: 'La entrevista que saca la historia: qué preguntar, y qué no',
+    3: 'El compuesto declarado y el nombre cambiado con aviso',
+    4: 'La escena reconstruida: decir que es reconstrucción',
+    5: 'El caso frente al dato: la muestra de tamaño uno',
+    6: 'La víctima identificable y su factura (Small y colegas, 2007)',
+    7: 'El periodista y el asesino: Janet Malcolm (1990) y la deuda',
+    8: 'El expediente de la casa: M.E.T.A.S contado con honradez',
+  },
+  anzuelo: {
+    1: 'El transporte narrativo: por qué baja la guardia (Green y Brock, 2000)',
+    2: 'El pitch de tres frases: quién, qué cambia y la brecha',
+    3: 'La historia de marca, sin inflarla',
+    4: 'Datos y relato en la misma página: el freno de la casa',
+    5: 'La convocatoria: contar para pedir, con honradez',
+    6: 'La objeción como aliada: conceder y contestar',
+    7: 'El anzuelo que no engaña: la línea que no se cruza',
+  },
+  mundo: {
+    1: 'La promesa del comienzo: el contrato del final (Kermode, 1967)',
+    2: 'La subtrama que sostiene: tejer varios hilos',
+    3: 'El mundo con reglas: coherencia que no se contradice',
+    4: 'La serie: el episodio cerrado y el arco abierto',
+    5: 'Sembrar y cosechar: la escopeta de Chéjov a distancia',
+    6: 'El medio: cómo no perder al lector en el pantano',
+    7: 'El final que la historia se ganó: cerrar los huecos abiertos',
+  },
+  taller: {
+    1: 'El diagnóstico de escena: la cuenta de valor a todo el borrador',
+    2: 'Los lectores de prueba, y las cuatro preguntas que sí informan',
+    3: 'El cuaderno de robos honrados: qué le tomaste a quién',
+    4: 'Matar la escena que amas: el corte que duele y por qué',
+    5: 'La sala de escritores: dar y recibir crítica con método',
+    6: 'Enseñar a contar: cómo se transmite el oficio',
+    7: 'El portafolio del maestro: la obra que te representa',
+    8: 'La prueba de dominio: la misma historia en 30 segundos, 3 minutos y 30 minutos',
   },
   /* Los títulos salen de los seis módulos de la Metacognición en
      COMPENDIO-ESTUDIO-MAYOR.md, para que el mapa enseñe el camino entero

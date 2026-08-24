@@ -1,420 +1,351 @@
-# Compendio · Storytelling · Ruta del Hilo que Tira
+# Compendio · Storytelling
 
-Doce misiones sobre cómo se cuenta algo para que se entienda, se recuerde y se
-use. Este documento es el plan completo de las doce: lo que enseña cada una, con
-qué se prueba, qué deja apuntado y de qué obra real sale cada pieza.
+El plan completo de la materia de **Storytelling** de F.A.R.O: ocho rutas y
+sesenta y tres etapas que, recorridas, llevan de «sé lo que es un gancho» a
+contar cualquier cosa (un video, un informe, una convocatoria, una vida) de
+modo que se entienda y se recuerde.
 
-Fecha: 24 de agosto de 2026. Estado: **etapa 1 construida**, las once restantes
-planificadas aquí. El catálogo (`js/data/misiones.js`) las declara todas, así que
-el mapa de Mis Rutas enseña el camino entero desde el primer día, como se hizo
-con la Ley y con el Estudio Mayor.
+Fecha: 24 de agosto de 2026. Estado: **una etapa construida** (la 1 de la Ruta
+del Hilo que Tira), las sesenta y dos restantes planificadas aquí. El catálogo
+(`js/data/misiones.js`) declara las ocho rutas enteras, así que el mapa de Mis
+Rutas enseña el camino a experto desde el primer día, como se hizo con la Ley
+y con el Estudio Mayor.
 
-Materia nueva: `story` · **Storytelling** (Narrativa: contar para que se entienda
-y se recuerde). Ruta: `hilo` · **Ruta del Hilo que Tira** 🧵. Lema: «Nadie se
-queda por lo que ya sabe: se queda por el hueco que le falta».
-
----
-
-## 0. Por qué esta materia entra con chip propio y no dentro del Estudio Mayor
-
-El Estudio Mayor son veintiocho materias de auditoría: se estudian para
-**desmontar** lo que alguien ya escribió. El storytelling no es eso. Es un
-**oficio**, y encima es el oficio que esta casa ya está usando en todas partes
-sin haberlo estudiado nunca:
-
-- cada misión de F.A.R.O lleva desde el 17 de agosto de 2026 un **guion de
-  video** con siete escenas obligatorias (norma 5), y ese guion es un producto
-  de storytelling puro;
-- las **seis lecturas** de cada misión (norma 5-nonies) son seis géneros
-  narrativos distintos, escritos a mano, y hasta hoy se escribían por imitación
-  y no por método;
-- la **Ruta de la Marca** tiene una etapa entera llamada «El relato: contar el
-  proyecto sin inflarlo», y su etapa 6 pendiente se llama «Narrativa: contar el
-  proyecto para que otros quieran entrar»;
-- la **Ruta de la Idea en Pie** (la tesis) termina en «La defensa de pie», que
-  es una historia contada delante de un tribunal;
-- y las **piedras en la boca** (Oratoria) no se sostienen sin material que
-  contar.
-
-Una materia que doce rutas usan de prestado tiene que poder encontrarse por su
-nombre en el filtro de la portada. De ahí el chip propio, con color de tinta y
-cuero (`--story: #78350f`), que en el mapa de rutas queda entre el vino de la Ley
-y el índigo del Estudio Mayor sin confundirse con ninguno de los dos.
-
-**Sello familiar.** Como el resto de las rutas del adulto, va con
-`sello: 'familiar'`.
+Materia: `story` · **Storytelling** (Narrativa: contar para que se entienda y
+se recuerde). Color de tinta y cuero (`--story: #78350f`). **Sello familiar**
+en todas sus misiones: no salen al sitio público ni a la revista.
 
 ---
 
-## 1. La regla de oro de esta ruta: ninguna estructura sin autor, año y crítica
+## 0. Por qué ocho rutas y no una
 
-**Es la norma más importante de las doce misiones, y es el equivalente exacto de
-la regla de la Ruta de la Ley** («nada se cita de memoria»). Aquí el peligro no
-es citar mal un artículo: es citar como ley de la naturaleza lo que es la
-plantilla comercial de alguien.
+Un curso de storytelling de una sola línea se queda en «gancho, conflicto y
+cierre», que es el taller de fin de semana. **Experto** quiere decir otra cosa:
+la persona que domina la prosa no es la misma que domina el guion de cine, ni
+la que sabe levantar una historia verdadera sin inventar una escena, ni la que
+mueve una decisión con un relato sin cruzar la línea de la manipulación. Son
+oficios distintos que comparten una gramática.
 
-El storytelling es la materia con más pseudorreglas huérfanas por metro
-cuadrado. «Toda historia tiene tres actos.» «El héroe cruza el umbral en la
-página 25.» «Muestra, no cuentes.» «El cerebro segrega oxitocina con las
-historias.» Ninguna de esas cuatro frases es falsa del todo, y **ninguna es
-verdadera como se dice**. Se repiten porque suenan a técnica y no piden fuente.
+Por eso la materia se abre igual que el Estudio Mayor: **una gramática común y
+siete especializaciones**. La ruta 1 (el Hilo que Tira) enseña las piezas con
+que se construye cualquier historia; las otras siete cruzan enteras las puertas
+que la 1 solo abre. Las etapas 9, 10 y 11 del Hilo, por ejemplo, presentan la
+persuasión, la no ficción y lo audiovisual en una etapa cada una; las rutas del
+Anzuelo, el Expediente y la Cámara las recorren en seis o siete.
 
-El protocolo, que va copiado en el encabezado de cada misión de la ruta:
+Todas las rutas comparten el chip **🧵 Storytelling** en la portada (por el
+color `story`) y cada una lleva en su tarjeta el nombre de su **dominio**
+(«La prosa y la voz», «Personaje y diálogo»…), no el nombre del chip, que si no
+las ocho dirían lo mismo.
+
+---
+
+## 1. La regla de oro de la materia: ninguna estructura sin autor, año y crítica
+
+**Es la norma más importante de las sesenta y tres etapas**, y es el
+equivalente exacto de la regla de la Ruta de la Ley («nada se cita de
+memoria»). El storytelling es la disciplina con más **pseudorreglas huérfanas**
+por metro cuadrado: «toda historia tiene tres actos», «el héroe cruza el umbral
+en la página 25», «muestra, no cuentes», «el cerebro segrega oxitocina con las
+historias». Ninguna de esas cuatro frases es falsa del todo, y **ninguna es
+verdadera como se dice**.
+
+El protocolo, copiado en el encabezado de cada misión de la materia:
 
 1. **Toda estructura se enseña con su autor y su año.** La pirámide es de Gustav
-   Freytag, «Die Technik des Dramas», 1863. Los tres actos como paradigma con
-   puntos de giro numerados son de Syd Field, «Screenplay», 1979. Los quince
-   golpes son de Blake Snyder, «Save the Cat!», 2005. El monomito es de Joseph
-   Campbell, «El héroe de las mil caras», 1949. Sin la fecha, una plantilla de
-   1979 pasa por una ley de Aristóteles.
-2. **Toda estructura se enseña con su crítica seria.** Del monomito de Campbell
-   se enseña también que el folclorista Alan Dundes lo criticó con dureza por no
-   ser trabajo comprobable de folclorista. Del modelo de conflicto se enseña la
-   objeción de Ursula K. Le Guin («The Carrier Bag Theory of Fiction», 1986) y la
-   de Jane Alison («Meander, Spiral, Explode», 2019). Una estructura sin su
-   objeción es dogma.
-3. **Todo hallazgo de laboratorio lleva etiqueta de estatus**, como en el Estudio
-   Mayor: clásico sólido, hallazgo replicado, hallazgo con réplica fallida,
-   hallazgo inflado en prensa. El caso de la casa es Kidd y Castano (2013), que
-   publicaron en «Science» que leer ficción literaria mejora la teoría de la
-   mente, y Panero y colegas (2016), que intentaron replicarlo y no pudieron. Las
-   dos cosas se enseñan juntas, siempre.
+   Freytag, 1863. Los tres actos con puntos de giro numerados son de Syd Field,
+   1979. Los quince golpes son de Blake Snyder, 2005. El monomito es de Joseph
+   Campbell, 1949. Sin la fecha, una plantilla de 1979 pasa por ley de
+   Aristóteles.
+2. **Toda estructura se enseña con su crítica seria.** Del monomito se enseña
+   la objeción del folclorista Alan Dundes; del modelo de conflicto, las de
+   Ursula K. Le Guin (1986) y Jane Alison (2019). Una estructura sin su objeción
+   es dogma.
+3. **Todo hallazgo lleva etiqueta de estatus:** clásico sólido, hallazgo
+   replicado, hallazgo con réplica fallida, divulgación inflada. El caso de la
+   casa es Kidd y Castano (2013) contra Panero y colegas (2016): se enseñan
+   juntos, siempre.
 4. **Las plantillas comerciales se pueden usar, pero se declaran.** «Save the
-   Cat!» es una herramienta útil para un guion de tres minutos. Lo que no se hace
-   es venderla como el descubrimiento de una estructura universal.
-5. **Si no se pudo comprobar, no entra.** Queda en la lista de pendientes de la
-   misión, escrita como pendiente y a la vista.
+   Cat!» sirve para un guion de tres minutos; lo que no se hace es venderla como
+   el descubrimiento de una estructura universal.
+5. **Si no se pudo comprobar, no entra.** Queda como pendiente, a la vista.
 
 ---
 
-## 2. El producto que atraviesa las doce: el Cuaderno de Hilos
+## 2. El producto que atraviesa las ocho rutas: el Cuaderno de Hilos
 
-Igual que la Ruta de la Ley alimenta un Registro de Grietas, esta alimenta un
-**Cuaderno de Hilos**: la libreta donde la casa guarda las historias que puede
-contar sobre su propio proyecto, listas para usar cuando haga falta.
+Igual que la Ruta de la Ley alimenta un Registro de Grietas, la materia entera
+alimenta un **Cuaderno de Hilos**: la libreta donde la casa guarda las
+historias que puede contar sobre su propio proyecto, listas para usar cuando
+haga falta. Vive en la Bóveda de F.A.R.O, no dentro de una misión.
 
-La **ficha de hilo** tiene siempre las mismas cinco casillas, y son cinco para
-que una historia de verdad se distinga de una anécdota:
-
-| Casilla | Qué se anota |
-|---|---|
-| 1. Quién | Una persona, con nombre y con algo que perder |
-| 2. Qué quiere | Concreto y comprobable: se tiene que poder ver si lo consigue |
-| 3. Qué se lo impide | La fuerza que se opone. No vale «la vida», ni «el sistema» |
-| 4. Qué hace y qué le sale | La acción, y el resultado que **no** era el esperado |
-| 5. Qué se sabe al final | Lo que el que escucha no sabía al empezar y ya sabe |
-
-La casilla 4 es la que hace útil la ficha: si el resultado era el esperado, no
-hay historia, hay informe. La casilla 3 es la que evita el cuaderno basura: un
-obstáculo abstracto no genera escena, y un cuaderno lleno de falsos hilos no lo
-abre nadie a los seis meses.
-
-El cuaderno vive en la Bóveda de F.A.R.O, no dentro de una misión, porque crece
-con las doce etapas y con el proyecto.
+La **ficha de hilo** tiene siempre las mismas cinco casillas: **quién** (una
+persona con algo que perder), **qué quiere** (concreto, que se pueda ver si lo
+consigue), **qué se lo impide** (con cara, no «la vida»), **qué hace y qué le
+sale** (la brecha: el resultado que no era el esperado) y **qué se sabe al
+final** (el hueco, cerrado). Una casilla vacía es un defecto con nombre, y se
+escribe como vacía.
 
 ---
 
-## 3. Lo que esta ruta no hace
+## 3. El mapa: las ocho rutas de un vistazo
 
-No enseña a escribir bonito, y lo dice de frente. La prosa es la etapa 5, y va
-después de cuatro etapas de arquitectura, porque una frase preciosa en una
-historia sin obstáculo sigue siendo una lista con adjetivos.
+| # | Ruta | Dominio | Etapas | Estado |
+|---|---|---|---|---|
+| 1 | 🧵 Hilo que Tira | Fundamentos del relato | 12 | **1 construida** |
+| 2 | ✍️ Pluma Afilada | La prosa y la voz | 7 | 0 |
+| 3 | 🎭 Personas de Papel | Personaje y diálogo | 7 | 0 |
+| 4 | 🎬 Cámara que Cuenta | Narrativa audiovisual y guion | 7 | 0 |
+| 5 | 🎙️ Expediente Real | No ficción narrativa | 8 | 0 |
+| 6 | 🪝 Anzuelo Honrado | Relato que persuade | 7 | 0 |
+| 7 | 🗺️ Mundo que Aguanta | Relato largo y serialidad | 7 | 0 |
+| 8 | 🛠️ Taller Mayor | Revisión, oficio y maestría | 8 | 0 |
 
-No enseña marketing. Convencer es la etapa 9, y llega con el freno puesto: las
-mismas cuatro páginas que explican por qué una historia baja la guardia del que
-escucha explican por qué eso es un arma y cuándo no se usa.
-
-Y no promete que el método sustituya al material. Una historia se cuenta sobre
-algo que pasó y le importó a alguien. Quien no tiene material no tiene historia,
-tiene técnica, que es lo que suena a anuncio.
-
----
-
-## 4. Etapa 1 · La cadena y el hueco: por qué «y entonces» no es una historia
-
-**Construida.** `misiones/ruta-hilo-cadena-hueco/cadena-hueco.html`
-
-La etapa fundacional, y por eso no habla de personajes ni de actos: habla de las
-**dos piezas que convierten una lista de hechos en una historia**, y de cómo se
-comprueba que están.
-
-**Lo que enseña.**
-
-- **La cadena (la causa).** E. M. Forster, «Aspects of the Novel», 1927: «el rey
-  murió y luego murió la reina» es un relato; «el rey murió y luego murió la
-  reina de pena» es una trama. Las tres palabras que se añaden no son adorno: son
-  la causa, y la causa es lo que obliga a leer la segunda frase para entender la
-  primera. Trabasso y van den Broek (1985) midieron el efecto: los sucesos con
-  más conexiones causales se recuerdan mejor que los que solo van seguidos.
-- **La prueba del conector.** Trey Parker y Matt Stone, en una clase en la
-  Universidad de Nueva York (2011), dieron la herramienta más barata de esta
-  materia: escribe los golpes de tu historia y únelos. Si entre dos golpes cabe
-  «y entonces», el eslabón está roto. Si lo que cabe es «pero» o «por eso», la
-  cadena aguanta.
-- **El hueco (la falta).** George Loewenstein, «The psychology of curiosity»,
-  «Psychological Bulletin», 1994: la curiosidad no la enciende la información,
-  la enciende **el hueco** entre lo que se sabe y lo que se querría saber. De ahí
-  el lema de la ruta. Y Meir Sternberg («Telling in Time», «Poetics Today», 1990
-  y 1992) reparte el hueco en tres, que es el reparto que la etapa usa: hueco de
-  pasado (curiosidad), hueco de futuro (suspenso) y hueco escondido (sorpresa).
-- **La brecha entre lo esperado y lo que sale.** Robert McKee, «Story», 1997: el
-  personaje actúa esperando una cosa, el mundo le devuelve otra, y en esa grieta
-  cabe todo lo demás. Es la casilla 4 de la ficha de hilo.
-- **Por qué se recuerda.** Bower y Clark (1969) hicieron que un grupo memorizara
-  listas de palabras y otro las encadenara en una historia: el segundo recordó
-  una fracción enorme más. Stephens, Silbert y Hasson (PNAS, 2010) midieron que
-  el cerebro del que escucha se acopla al del que habla cuando la narración
-  funciona. Con su etiqueta de estatus cada uno.
-- **Y la etiqueta incómoda.** Kidd y Castano (2013) contra Panero y colegas
-  (2016): la primera es el titular que todo el mundo repite, la segunda es la
-  réplica que no pudo confirmarlo. La misión enseña las dos.
-
-**Laboratorio.** Se toma una lista de sucesos y se convierte en cadena
-cambiando los conectores, viendo qué eslabón se cae. Y se declara el hueco de
-apertura de tres maneras (pasado, futuro, escondido) sobre el mismo material.
-
-**Deja apuntado.** La ficha de hilo de cinco casillas, la prueba del conector y
-el hueco declarado. Las tres viajan a las once etapas siguientes y al guion de
-video de cualquier misión de la casa.
-
-**Careo (lectura 6).** ¿Necesita toda historia conflicto, o es esa una
-convención convertida en ley? Con Le Guin y Alison de un lado y el modelo de
-deseo y obstáculo del otro, y el dato que resolvería la disputa nombrado al
-final.
+Las tres primeras rutas son el **cómo se hace** (arquitectura, prosa,
+personaje); las tres del medio, los **medios** (pantalla, no ficción,
+persuasión); las dos últimas, la **escala y el oficio** (el relato largo y la
+maestría). No hace falta recorrerlas en ese orden salvo la 1, que es la
+gramática de todas.
 
 ---
 
-## 5. Etapa 2 · El deseo y el obstáculo: qué quiere y quién se lo niega
+## 4. Ruta 1 · 🧵 Hilo que Tira · Fundamentos del relato (12 etapas)
 
-De la cadena al motor. Una cadena causal sin nadie que quiera nada es un informe
-bien redactado.
+La gramática. Enseña las piezas con que se construye cualquier historia, y sin
+ella las otras siete no tienen sobre qué apoyarse.
 
-- **El objetivo concreto.** Qué quiere, dicho de forma que se pueda ver si lo
-  consigue. «Ser feliz» no es objetivo; «que la Secretaría firme el convenio
-  antes de que empiece el año escolar» sí.
-- **La apuesta.** Qué pierde si no lo consigue. Sin apuesta no hay atención, y la
-  apuesta se escribe, no se insinúa.
-- **El obstáculo como fuerza, no como villano.** Aristóteles, «Poética»: la
-  unidad de la acción. El obstáculo puede ser otra persona, la propia
-  contradicción del que quiere, o el mundo tal como está hecho.
-- **Querer y necesitar.** La contradicción interna: el personaje pide una cosa y
-  le hace falta otra. Es donde nace el cambio, y donde una historia deja de ser
-  un trámite con emoción.
-- **Vladimir Propp, «Morfología del cuento», 1928**, y sus treinta y una
-  funciones: la prueba de que los papeles se repiten y de que un papel no es una
-  persona.
-
-**Casos del proyecto.** Los ocho de esta etapa son las ocho cosas que M.E.T.A.S
-querría de verdad, con su obstáculo real escrito al lado.
-
----
-
-## 6. Etapa 3 · La forma de las formas: estructuras con autor, año y crítica
-
-La etapa donde se aplica a fondo la regla de oro del capítulo 1. Se ponen las
-estructuras en la mesa, una por una, con su fecha y su objeción:
-
-| Estructura | Autor y año | Qué aporta | Su objeción |
-|---|---|---|---|
-| Poética | Aristóteles, s. IV a. C. | Todo, medio y fin; peripecia y reconocimiento | Describe la tragedia griega, no toda narración |
-| Pirámide | Freytag, 1863 | El clímax como pieza medible | Sacada del drama de cinco actos alemán |
-| Morfología | Propp, 1928 | Funciones que se repiten | Corpus de cuentos rusos |
-| Monomito | Campbell, 1949 | Un patrón grande y fértil | Alan Dundes: selección a conveniencia |
-| Paradigma | Syd Field, 1979 | Puntos de giro con página | Es una convención de industria |
-| Siete tramas | Booker, 2004 | Catálogo útil | Clasificación, no hallazgo |
-| Quince golpes | Snyder, 2005 | Plantilla que funciona | Plantilla comercial, y se declara |
-| Seis formas | Reagan y colegas, 2016 | Medición real de 1.327 obras | Corpus del Proyecto Gutenberg, casi todo en inglés |
-
-La joya de la etapa es el estudio de **Reagan, Mitchell, Kiley, Danforth y Dodds,
-«The emotional arcs of stories are dominated by six basic shapes», EPJ Data
-Science, 2016**: en vez de proponer una estructura, midieron el arco emocional de
-1.327 obras y encontraron seis formas. Es lo más cerca de dato duro que hay en
-esta materia, y trae escrito su propio límite: el corpus.
-
-Y el contrapeso de **Kurt Vonnegut**, cuya tesis de maestría sobre las formas de
-las historias fue rechazada por la Universidad de Chicago y que las dibujó luego
-en sus charlas y en «A Man Without a Country» (2005). Cuarenta años antes, a
-mano, y salió parecido.
+1. **La cadena y el hueco**: *construida.* Por qué «y entonces» no es una
+   historia: la causa que ata los hechos (Forster, 1927) y la falta que tira del
+   que escucha (Loewenstein, 1994), más la brecha entre lo esperado y lo que
+   sale (McKee, 1997). La prueba del conector (Parker y Stone, 2011) y la ficha
+   de hilo.
+2. **El deseo y el obstáculo**: qué quiere alguien y quién se lo niega; querer
+   contra necesitar; Propp (1928) y sus funciones.
+3. **La forma de las formas**: las estructuras con su autor, su año y su
+   crítica, hasta las seis formas medidas de Reagan y colegas (2016).
+4. **La escena**: la unidad de trabajo y su giro de valor: entra tarde, sal
+   temprano.
+5. **Mostrar, contar y cuándo cada uno**: Chéjov y el vidrio de botella (1886);
+   por qué «muestra, no cuentes» está mal citado.
+6. **La voz y el punto de vista**: quién cuenta y cuánto sabe: focalización
+   (Genette, 1972), narrador no fiable (Booth, 1961).
+7. **El tiempo del relato**: orden, elipsis y suspenso; la bomba de Hitchcock
+   (Truffaut, 1966).
+8. **Emoción sin chantaje**: conmover no es manipular; el transporte narrativo
+   (Green y Brock, 2000) y la sentimentalidad como fallo técnico.
+9. **La historia que persuade, y el freno ético**: por qué funciona y cuándo
+   no se usa. *Puerta a la ruta 6.*
+10. **La historia de verdad**: narrativa de no ficción y su ética. *Puerta a la
+    ruta 5.*
+11. **Contar de pie y contar en imagen**: la historia de siete minutos y la
+    imagen que sustituye a la frase. *Puerta a la ruta 4.*
+12. **El taller**: revisión con método y la prueba de dominio (la misma
+    historia en tres duraciones). *Puerta a la ruta 8.*
 
 ---
 
-## 7. Etapa 4 · La escena: la unidad de trabajo y su giro de valor
+## 5. Ruta 2 · ✍️ Pluma Afilada · La prosa y la voz (7 etapas)
 
-Nadie escribe una historia: se escriben escenas. La etapa da la unidad de trabajo
-y su control de calidad.
+Lo que el Hilo solo introduce en la etapa 5. La arquitectura aguanta la casa;
+la prosa es dónde se vive.
 
-- **Qué es una escena:** un trozo continuo donde alguien quiere algo, se le niega
-  y **algo cambia de valor** al final. Si al terminar todo está como al empezar,
-  la escena no es una escena, es una conversación.
-- **Entrar tarde y salir temprano.** El corte como herramienta, no como ahorro.
-- **El subtexto.** Lo que se dice no es lo que se quiere. El conflicto oblicuo.
-- **La cuenta de la escena:** valor al entrar, valor al salir, y en una línea qué
-  lo movió. Es la herramienta de revisión de la etapa 12.
-
----
-
-## 8. Etapa 5 · Mostrar, contar y cuándo cada uno
-
-La etapa que desmonta el eslogan más repetido de la materia.
-
-- **De dónde viene.** Chéjov, carta a su hermano Aleksandr (1886): no digas que
-  la luna brilla, cuenta que en la presa del molino relumbraba un vidrio roto de
-  botella. Eso no es «no cuentes nunca»: es «elige el detalle que hace el
-  trabajo».
-- **El detalle concreto contra el adjetivo.** John Gardner, «The Art of Fiction»
-  (1984), y el sueño de ficción que un adjetivo abstracto interrumpe.
-- **Y el resumen también es oficio.** Mostrarlo todo es la manera más segura de
-  aburrir: una historia bien contada resume tres años en media frase para poder
-  detenerse ocho párrafos en un minuto.
-- **La escopeta de Chéjov**, en su formulación real (cartas de 1889): lo que se
-  cuelga en la pared del primer capítulo tiene que disparar. Es una regla de
-  economía, no de suspense.
+1. **La frase que respira**: el ritmo se oye, no se explica: longitud, cadencia,
+   la frase corta después de tres largas.
+2. **El verbo que trabaja**: contra el adverbio y la voz pasiva; Orwell,
+   «Politics and the English Language» (1946).
+3. **El detalle que vale por mil**: la concreción sensorial de Chéjov; Gardner
+   y el sueño de ficción que un adjetivo abstracto interrumpe (1984).
+4. **Matar a tus amados**: el corte y la concisión, con la atribución bien
+   hecha: la frase es de Arthur Quiller-Couch (1914), no de Faulkner.
+5. **El párrafo y el blanco**: puntuación, aliento y silencio en la página; el
+   punto y aparte como respiración.
+6. **La distancia psíquica**: de la cámara al pensamiento, los cinco escalones
+   de Gardner (1984), y qué se paga en cada uno.
+7. **Reescribir es escribir**: el borrador cero (Anne Lamott, 1994) y las
+   pasadas: cada una arregla una sola cosa.
 
 ---
 
-## 9. Etapa 6 · La voz y el punto de vista: quién cuenta y cuánto sabe
+## 6. Ruta 3 · 🎭 Personas de Papel · Personaje y diálogo (7 etapas)
 
-- **Focalización.** Gérard Genette, «Figures III» (1972): quién ve no es quién
-  habla, y confundirlos es el error más común del que empieza.
-- **El narrador no fiable.** Wayne C. Booth, «The Rhetoric of Fiction» (1961),
-  que acuñó el término. Cómo se construye, y cómo se le avisa al lector sin
-  decírselo.
-- **La distancia psíquica** de Gardner: de la cámara al pensamiento, con sus
-  cinco escalones, y qué se paga en cada uno.
-- **Primera y tercera persona con su factura.** Lo que cada una regala y lo que
-  cada una prohíbe.
+Lo que el Hilo toca en las etapas 2 y 6. Un personaje no es quien es: es lo que
+quiere y lo que le falta para conseguirlo.
 
-Esta etapa dialoga con la Ruta del Espejo de Tinta del Estudio Mayor («Leer por
-dentro: quién cuenta, cuánto sabe y por qué se le cree»): allí se lee, aquí se
-escribe.
-
----
-
-## 10. Etapa 7 · El tiempo del relato: orden, elipsis y suspense
-
-- **Las tres categorías de Genette:** orden (analepsis y prolepsis), duración
-  (escena, sumario, elipsis, pausa) y frecuencia.
-- **Suspense contra sorpresa.** Hitchcock, en «El cine según Hitchcock»
-  (Truffaut, 1966): la bomba bajo la mesa. Contarle al público lo que el
-  personaje no sabe multiplica quince minutos de tensión; escondérselo compra
-  quince segundos de sobresalto.
-- **La promesa del comienzo.** Frank Kermode, «The Sense of an Ending» (1967): un
-  comienzo firma un contrato sobre qué clase de final se va a dar. Romperlo tiene
-  precio.
-- **La elipsis como respeto.** Lo que se salta y el lector completa es lo que lo
-  vuelve cómplice.
+1. **Querer y necesitar**: el motor de dos tiempos: lo que pide en voz alta y
+   lo que de verdad le hace falta.
+2. **La herida y la máscara**: la contradicción interna que mueve, y de dónde
+   sale el cambio.
+3. **Redondos y planos**: cuándo cada uno; los personajes redondos y planos de
+   Forster (1927) y por qué un plano bien puesto no es un defecto.
+4. **El antagonista con razón**: el otro lado escrito en su mejor versión, con
+   la regla del acero antes del juicio (Expediente Rojo, etapa 1).
+5. **El diálogo que no explica**: subtexto y oblicuidad: lo que se dice no es
+   lo que se quiere.
+6. **La acotación y el gesto**: el cuerpo, el silencio y lo no dicho; la pausa
+   que llena un actor.
+7. **El elenco**: coro, contraste y el personaje que falta: quién no está en la
+   escena y por qué se nota.
 
 ---
 
-## 11. Etapa 8 · Emoción sin chantaje: conmover no es manipular
+## 7. Ruta 4 · 🎬 Cámara que Cuenta · Narrativa audiovisual y guion (7 etapas)
 
-- **Transporte narrativo.** Green y Brock, «The role of transportation in the
-  persuasiveness of public narratives», JPSP, 2000: cuando alguien se mete en un
-  relato, deja de discutirlo. Medido, con escala y con etiqueta de estatus.
-- **Simulación social.** Mar y Oatley (2008): la ficción como simulador de
-  experiencia social. Y otra vez Kidd y Castano contra Panero: lo que se puede
-  decir y lo que no.
-- **La sentimentalidad como fallo técnico.** Pedir la emoción en vez de
-  producirla. El detalle que duele contra el adjetivo que ordena doler.
-- **El límite.** Una historia que emociona sin material es un anuncio, y esta
-  casa tiene prohibido escribirlos.
+Lo que el Hilo abre en la etapa 11. En la pantalla no se cuenta: se muestra, y
+el montaje decide qué significa. (Distinta de la Ruta de la Pantalla Leída del
+Estudio Mayor: allí se **lee** cine, aquí se **escribe** para pantalla.)
 
----
-
-## 12. Etapa 9 · La historia que persuade, y el freno ético
-
-- **Por qué funciona.** Slater y Rouner (2002): el relato reduce la
-  contraargumentación porque el que escucha no está en modo de discutir. Es el
-  mecanismo, y es exactamente por lo que hay que tener cuidado.
-- **La víctima identificable.** Small, Loewenstein y Slovic (2007): una persona
-  con nombre recauda más que una estadística, incluso cuando la estadística es
-  peor. El dato que más se usa en la industria de la donación, y el que más se
-  usa mal.
-- **El caso frente al dato.** Cuándo una historia informa y cuándo tapa: una
-  historia es una muestra de tamaño uno, y esta ruta lo dice en voz alta porque
-  la Ruta de la Brújula Torcida ya enseñó por qué eso engaña (disponibilidad).
-- **La regla de la casa:** una historia se cuenta para que se entienda un dato,
-  nunca para que no se pida. Si la historia no aguanta que después se enseñe la
-  tabla, no se cuenta.
+1. **La imagen que sustituye a la frase**: mostrar en pantalla lo que en papel
+   se diría.
+2. **El montaje significa**: el efecto Kuleshov (años veinte): dos planos
+   juntos dicen lo que ninguno dice solo.
+3. **La escena de cine**: entrar tarde y salir temprano; el corte como
+   herramienta, no como ahorro.
+4. **El guion técnico**: escaleta, secuencia y plano: del qué pasa al cómo se
+   ve.
+5. **El sonido**: la mitad que nadie estudia: la voz, el ambiente, el silencio.
+6. **El video de siete minutos**: el guion de F.A.R.O por dentro, con sus siete
+   escenas obligatorias desarmadas y su porqué.
+7. **El corte final**: el ritmo del montaje y el descarte: qué se cae en la
+   sala de edición.
 
 ---
 
-## 13. Etapa 10 · La historia de verdad: narrativa de no ficción
+## 8. Ruta 5 · 🎙️ Expediente Real · No ficción narrativa (8 etapas)
 
-La etapa más delicada de la ruta, porque es la que la casa usa de verdad: cuando
-M.E.T.A.S cuenta lo que le pasó a un alumno, eso es no ficción.
+Lo que el Hilo abre en la etapa 10, y la ruta más delicada, porque es la que la
+casa usa de verdad: cuando M.E.T.A.S cuenta lo que le pasó a un alumno, eso es
+no ficción. Reordenar es oficio; inventar es otra cosa, y se llama distinto.
 
-- **Qué se puede reordenar y qué no.** Reordenar el relato es oficio; inventar
-  una escena es otra cosa, y se llama distinto.
-- **Los dos expedientes clásicos.** Truman Capote y «A sangre fría» (1966), con
-  las escenas discutidas que se le documentaron; y Ryszard Kapuściński, con lo
-  que su biógrafo Artur Domosławski dejó por escrito en 2010. Ninguno se cuenta
-  como escándalo: se cuentan como el borde exacto del oficio.
-- **Janet Malcolm, «El periodista y el asesino» (1990)**, y la frase incómoda con
-  la que empieza: el que cuenta la historia de otro siempre le está sacando algo.
-- **El protocolo de la casa:** el compuesto se declara, el nombre se cambia con
-  aviso, la reconstrucción dice que es reconstrucción, y la cita textual es
-  textual. Es la misma etiqueta de estatus de las lecturas de F.A.R.O, aplicada
-  al material propio.
-
----
-
-## 14. Etapa 11 · Contar de pie y contar en imagen
-
-- **De pie:** la historia de siete minutos, que es la que pide el guion de video
-  de las misiones de esta casa. Estructura, respiración, y las tres primeras
-  frases.
-- **En imagen:** la imagen que sustituye a la frase. El efecto Kuleshov (años
-  veinte) como prueba de que el montaje no ilustra, significa.
-- **El sonido**, que es la mitad que nadie estudia.
-- **El guion de video de F.A.R.O, desarmado.** Las siete escenas obligatorias de
-  la norma 5 se explican aquí por dentro, con su porqué. Al terminar esta etapa,
-  cualquiera de la casa puede escribir el guion de una misión nueva sin copiarlo
-  de otra.
+1. **Reordenar sí, inventar no**: el borde exacto del oficio: qué se puede
+   mover y qué no.
+2. **La entrevista que saca la historia**: qué preguntar y qué no («¿te
+   gustó?» no informa); ir al trozo que la versión oficial se salta.
+3. **El compuesto declarado y el nombre cambiado**: cómo se hace y cómo se
+   avisa.
+4. **La escena reconstruida**: decir que es reconstrucción, siempre.
+5. **El caso frente al dato**: la historia es una muestra de tamaño uno, y esta
+   ruta lo dice en voz alta (dialoga con la Brújula Torcida).
+6. **La víctima identificable y su factura**: Small, Loewenstein y Slovic
+   (2007): una persona con nombre recauda más que una estadística peor, y ese es
+   el dato más usado y peor usado de la industria de la donación.
+7. **El periodista y el asesino**: Janet Malcolm (1990) y la deuda del que
+   cuenta la historia de otro; los expedientes de Capote y Kapuściński.
+8. **El expediente de la casa**: M.E.T.A.S contado con honradez: el protocolo
+   propio, con permiso por escrito cuando la historia es de otra persona.
 
 ---
 
-## 15. Etapa 12 · El taller: revisión con método y prueba de dominio
+## 9. Ruta 6 · 🪝 Anzuelo Honrado · Relato que persuade (7 etapas)
 
-- **El diagnóstico de escena:** pasar la cuenta de la etapa 4 a todo lo escrito y
-  marcar las escenas donde nada cambia de valor.
-- **La prueba del conector**, otra vez, sobre el borrador propio.
-- **Lectores de prueba, y qué preguntarles.** No «¿te gustó?», que no informa.
-  Sino: dónde te perdiste, dónde te aburriste, qué creías que iba a pasar, y qué
-  no entendiste. Cuatro preguntas y ninguna pide opinión.
-- **El cuaderno de robos honrados:** qué estructura se le tomó a quién, con
-  fecha, para no reinventar mal lo que ya está resuelto.
-- **La prueba de dominio de la ruta:** contar la misma historia en treinta
-  segundos, en tres minutos y en treinta minutos, y que las tres versiones sean
-  la misma historia. Quien lo consigue sabe cuál era el hilo. Quien no, tenía
-  material y no historia.
+Lo que el Hilo abre en la etapa 9, y la que la familia más necesita para el
+proyecto. La historia se cuenta para que el dato se entienda, nunca para que no
+se pida.
 
----
-
-## 16. Cómo se recorre
-
-Las doce en orden, porque la ruta está construida como una escalera y no como un
-menú: las etapas 1 a 4 son la arquitectura, la 5 a la 7 la ejecución, la 8 y la 9
-el efecto y su freno, la 10 la honradez, y la 11 y la 12 el oficio de entregar y
-revisar.
-
-Con una excepción declarada: quien tenga que escribir **ya** el guion de video de
-una misión puede saltar de la etapa 1 a la 11 y volver. La etapa 1 sola ya deja
-las tres herramientas con las que ese guion deja de ser una lista.
+1. **El transporte narrativo**: por qué baja la guardia; Slater y Rouner (2002)
+   y Green y Brock (2000). Es el mecanismo, y por eso hay que tener cuidado.
+2. **El pitch de tres frases**: quién, qué cambia y la brecha, en el tiempo de
+   un ascensor.
+3. **La historia de marca, sin inflarla**: el relato del proyecto que aguanta
+   que después se enseñe la tabla.
+4. **Datos y relato en la misma página**: el freno de la casa: la historia
+   arriba y las cifras completas debajo, nunca en un anexo.
+5. **La convocatoria**: contar para pedir dinero con honradez, con permiso y
+   sin sustituir el dato por el caso.
+6. **La objeción como aliada**: conceder la duda del público y contestarla, no
+   esquivarla.
+7. **El anzuelo que no engaña**: la línea que no se cruza: si la historia no
+   aguanta que se pida el dato, no se cuenta.
 
 ---
 
-## 17. Lo que falta y está apuntado como pendiente
+## 10. Ruta 7 · 🗺️ Mundo que Aguanta · Relato largo y serialidad (7 etapas)
 
-- **El taller de la memoria** (`js/taller-neuro.js`) no está montado en la etapa
-  1. El aparato pide, entre otras cosas, las tarjetas de la etapa anterior para
-  el taller mezclado, y en una etapa 1 no hay etapa anterior. Entra en la etapa
-  2, que es donde por primera vez tiene material que intercalar.
-- **El kit de escritura a mano** (`css/kit-mano.css`) encaja aquí mejor que en
-  ninguna otra ruta, porque esta materia se practica escribiendo. Queda apuntado
-  para la etapa 4, que es la primera con un ejercicio de lápiz que se repite
-  (la cuenta de la escena).
-- **Las fuentes por comprobar** de las etapas 2 a 12 se comprueban al construir
-  cada una, contra la obra y no contra un resumen. Lo que no se pueda comprobar
-  no entra, y se queda escrito como pendiente en su misión, como manda el
-  capítulo 1.
+Lo que el Hilo no toca: sostener una historia larga. Lo difícil no es empezar,
+es no perder al lector en el medio.
+
+1. **La promesa del comienzo**: el contrato del final; Kermode, «The Sense of
+   an Ending» (1967).
+2. **La subtrama que sostiene**: tejer varios hilos sin que se enreden.
+3. **El mundo con reglas**: coherencia que no se contradice: worldbuilding que
+   no se olvida de lo que dijo en la página diez.
+4. **La serie**: el episodio cerrado y el arco abierto: cada capítulo termina y
+   la historia sigue.
+5. **Sembrar y cosechar**: la escopeta de Chéjov a larga distancia: lo que se
+   cuelga en la pared del primer capítulo dispara en el último.
+6. **El medio**: cómo no perder al lector en el pantano del segundo tercio, que
+   es donde se abandonan los libros.
+7. **El final que la historia se ganó**: cerrar los huecos abiertos sin
+   trampas ni deus ex machina.
+
+---
+
+## 11. Ruta 8 · 🛠️ Taller Mayor · Revisión, oficio y maestría (8 etapas)
+
+Lo que el Hilo comprime en su etapa 12. Nadie escribe bien: se reescribe bien,
+y eso se aprende con método.
+
+1. **El diagnóstico de escena**: pasar la cuenta de valor a todo el borrador y
+   marcar las escenas donde nada cambia.
+2. **Los lectores de prueba**: las cuatro preguntas que sí informan (dónde te
+   perdiste, dónde te aburriste, qué creías que iba a pasar, qué no entendiste),
+   ninguna de opinión.
+3. **El cuaderno de robos honrados**: qué estructura le tomaste a quién, con
+   fecha, para no reinventar mal lo ya resuelto.
+4. **Matar la escena que amas**: el corte que duele y por qué casi siempre es
+   el correcto.
+5. **La sala de escritores**: dar y recibir crítica con método, sin herir ni
+   adular.
+6. **Enseñar a contar**: cómo se transmite el oficio: la lección que este
+   compendio querría ser.
+7. **El portafolio del maestro**: la obra que te representa, elegida y pulida.
+8. **La prueba de dominio**: la misma historia en treinta segundos, tres
+   minutos y treinta minutos, y que las tres sean la misma historia.
+
+---
+
+## 12. Qué misión sigue: el orden recomendado
+
+**Se construye la gramática antes que las especializaciones.** No se puede
+afilar la prosa (ruta 2) ni levantar un guion de cine (ruta 4) sin las piezas
+que enseña el Hilo, así que la recomendación es terminar primero la Ruta del
+Hilo que Tira y solo después abrir las especializaciones.
+
+**La siguiente misión, hoy, es la etapa 2 del Hilo: «El deseo y el obstáculo».**
+Es el paso natural desde «La cadena y el hueco»: de las piezas que hacen que una
+lista sea historia, al motor que la echa a andar (alguien que quiere algo y
+alguien que se lo niega).
+
+Después, dos criterios, en este orden:
+
+1. **Completar el Hilo** hasta la etapa 12, porque es la base de todo lo demás.
+2. **Abrir la especialización que la casa más use**, que es la del **Anzuelo
+   Honrado** (relato que persuade): es la que toca directamente el proyecto, los
+   videos, las convocatorias y el trato con instituciones. La del **Expediente
+   Real** va justo detrás, porque contar lo que le pasó a un alumno con honradez
+   es lo que la casa hace cada semana.
+
+Y quien construya recomienda la siguiente al terminar, con la cuenta del
+catálogo delante:
+
+```
+node -e "const fs=require('fs');const s=fs.readFileSync('js/data/misiones.js','utf8');
+const g={};new Function('g','with(g){'+s+'; g.M=MISSIONS; g.R=RUTAS;}')(g);
+Object.entries(g.R).filter(([k,r])=>r.color==='story')
+  .map(([k,r])=>({k,m:r.materia,n:g.M.filter(x=>x.ruta===k).length,t:r.etapas}))
+  .sort((a,b)=>a.n-b.n).forEach(f=>console.log(f.n+'/'+f.t, f.m, '|', f.k));"
+```
+
+---
+
+## 13. Lo que falta y está apuntado como pendiente
+
+- **El taller de la memoria** (`js/taller-neuro.js`) no está montado en la
+  etapa 1 del Hilo, porque una etapa 1 no tiene etapa anterior de la que
+  intercalar tarjetas. Entra en la etapa 2, que es la primera con material que
+  mezclar.
+- **El kit de escritura a mano** (`css/kit-mano.css`) encaja en esta materia
+  mejor que en ninguna otra, porque se practica escribiendo. Queda apuntado para
+  las rutas de la Pluma Afilada y las Personas de Papel, que son de lápiz.
+- **Las fuentes por comprobar** de cada etapa se verifican al construirla,
+  contra la obra y no contra un resumen. Lo que no se pueda comprobar no entra,
+  y se queda escrito como pendiente en su misión, como manda el capítulo 1.

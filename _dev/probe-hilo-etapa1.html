@@ -554,7 +554,7 @@ window.addEventListener('load', async () => {
     const ruta = [...da.querySelectorAll('.ruta-card')].find(c => (c.querySelector('.ruta-nombre') || {}).textContent === 'Ruta del Hilo que Tira');
     ok(!!ruta, 'la Ruta del Hilo que Tira está en el mapa', 'no aparece la ruta');
     if (ruta) {
-      ok(/Storytelling/.test(ruta.textContent), 'con su materia a la vista', 'la tarjeta no dice la materia');
+      ok(/Fundamentos del relato/.test(ruta.textContent), 'con su dominio a la vista (Fundamentos del relato)', 'la tarjeta no dice su dominio');
       /* Cuentas del CATÁLOGO, no a mano (la lección de la Casa Cerrada: tres
          sondas suspendieron porque su ruta creció y ellas seguían esperando el
          número viejo). */
@@ -572,15 +572,29 @@ window.addEventListener('load', async () => {
        nombre, que es feo a propósito pero pasa inadvertido en una sonda. */
     const grupo = [...da.querySelectorAll('.materia-grupo')].find(x => (x.querySelector('.materia-nombre') || {}).textContent === 'Storytelling');
     ok(!!grupo, 'la materia Storytelling tiene su grupo en el mapa de rutas', 'no hay grupo de Storytelling');
-    ok(grupo && grupo.querySelectorAll('.ruta-card').length === 1, 'con una sola ruta dentro', 'el grupo de Storytelling no trae exactamente una ruta');
-    /* Una materia de una sola ruta abre directo sus etapas: es la decisión 2
-       de la pantalla de rutas, y aquí se comprueba en la materia nueva. */
+    /* Storytelling ya no es de una sola ruta: es un currículo de varias, y la
+       cuenta sale del catálogo. Escrita a mano, la novena ruta la suspendería
+       sin que hubiera nada roto (la lección de la Casa Cerrada). */
+    const nRutasStory = wa.eval('Object.values(RUTAS).filter(r=>r.color==="story").length');
+    ok(nRutasStory >= 2, 'con sus varias rutas de especialización (' + nRutasStory + ')', 'Storytelling volvió a tener una sola ruta');
+    ok(grupo && grupo.querySelectorAll('.ruta-card').length === nRutasStory,
+       'y el grupo las pinta todas', 'el grupo pinta ' + (grupo ? grupo.querySelectorAll('.ruta-card').length : 0) + ' de ' + nRutasStory);
+    /* Una materia MULTI-ruta necesita el nivel de en medio (decisión 2 de la
+       pantalla): al abrir el grupo se ven las rutas, y arrancan PLEGADAS; de
+       ahí se baja a las etapas del Hilo con un segundo toque. */
     if (grupo) {
       const bMat = grupo.querySelector('.materia-toggle');
-      bMat.click(); await esperar(120);
-      const listaR = da.getElementById(ruta.querySelector('.ruta-toggle').getAttribute('aria-controls'));
-      ok(ruta.querySelector('.ruta-toggle').getAttribute('aria-expanded') === 'true' && listaR && !listaR.hidden,
-         'y al abrirla se llega a las etapas en un solo toque', 'hizo falta un segundo toque para ver las etapas');
+      if (bMat.getAttribute('aria-expanded') !== 'true') { bMat.click(); await esperar(120); }
+      const panelMat = da.getElementById(bMat.getAttribute('aria-controls'));
+      ok(panelMat && !panelMat.hidden, 'al abrir el grupo se ven sus rutas', 'las rutas del grupo no se ven');
+      const cardsStory = [...grupo.querySelectorAll('.ruta-card')];
+      ok(cardsStory.every(c => c.querySelector('.ruta-toggle').getAttribute('aria-expanded') === 'false'),
+         'y las rutas arrancan plegadas, no volcadas de golpe', 'alguna ruta de Storytelling arranca abierta');
+      const tHilo = ruta.querySelector('.ruta-toggle');
+      tHilo.click(); await esperar(120);
+      const listaR = da.getElementById(tHilo.getAttribute('aria-controls'));
+      ok(tHilo.getAttribute('aria-expanded') === 'true' && listaR && !listaR.hidden,
+         'y al abrir la ruta del Hilo se ven sus doce etapas', 'la ruta del Hilo no abrió sus etapas');
     }
     const colorStory = wa.getComputedStyle(da.documentElement).getPropertyValue('--story').trim();
     ok(/^#|rgb/.test(colorStory), 'la materia trae su color propio en app.css (--story: ' + colorStory + ')', 'la materia no tiene color declarado');
