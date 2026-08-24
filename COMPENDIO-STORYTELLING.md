@@ -5,8 +5,8 @@ sesenta y tres etapas que, recorridas, llevan de «sé lo que es un gancho» a
 contar cualquier cosa (un video, un informe, una convocatoria, una vida) de
 modo que se entienda y se recuerde.
 
-Fecha: 24 de agosto de 2026. Estado: **una etapa construida** (la 1 de la Ruta
-del Hilo que Tira), las sesenta y dos restantes planificadas aquí. El catálogo
+Fecha: 24 de agosto de 2026. Estado: **tres etapas construidas** (las 1, 2 y 3 de la Ruta
+del Hilo que Tira), las sesenta restantes planificadas aquí. El catálogo
 (`js/data/misiones.js`) declara las ocho rutas enteras, así que el mapa de Mis
 Rutas enseña el camino a experto desde el primer día, como se hizo con la Ley
 y con el Estudio Mayor.
@@ -92,7 +92,7 @@ escribe como vacía.
 
 | # | Ruta | Dominio | Etapas | Estado |
 |---|---|---|---|---|
-| 1 | 🧵 Hilo que Tira | Fundamentos del relato | 12 | **1 construida** |
+| 1 | 🧵 Hilo que Tira | Fundamentos del relato | 12 | **3 construidas** |
 | 2 | ✍️ Pluma Afilada | La prosa y la voz | 7 | 0 |
 | 3 | 🎭 Personas de Papel | Personaje y diálogo | 7 | 0 |
 | 4 | 🎬 Cámara que Cuenta | Narrativa audiovisual y guion | 7 | 0 |
@@ -119,9 +119,9 @@ ella las otras siete no tienen sobre qué apoyarse.
    que escucha (Loewenstein, 1994), más la brecha entre lo esperado y lo que
    sale (McKee, 1997). La prueba del conector (Parker y Stone, 2011) y la ficha
    de hilo.
-2. **El deseo y el obstáculo**: qué quiere alguien y quién se lo niega; querer
+2. **El deseo y el obstáculo**: *construida.* qué quiere alguien y quién se lo niega; querer
    contra necesitar; Propp (1928) y sus funciones.
-3. **La forma de las formas**: las estructuras con su autor, su año y su
+3. **La forma de las formas**: *construida.* las estructuras con su autor, su año y su
    crítica, hasta las seis formas medidas de Reagan y colegas (2016).
 4. **La escena**: la unidad de trabajo y su giro de valor: entra tarde, sal
    temprano.
