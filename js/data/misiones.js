@@ -41,6 +41,15 @@ const RUTAS = {
      compendio completo está en COMPENDIO-RUTA-LEY.md. */
   ley:        { nombre: 'Ruta de la Ley y sus Grietas',      emoji: '⚖️', color: 'ley',  etapas: 12,
                 lema: 'Leer la ley por dentro: qué dice, qué calla y dónde se contradice' },
+  /* 12 etapas, como la Ley y por el mismo motivo: el temario no cabe en 6. Un
+     curso de storytelling de seis etapas se queda en «gancho, conflicto y
+     cierre», que es justo el nivel de taller de fin de semana que esta ruta
+     viene a superar. El compendio completo esta en COMPENDIO-STORYTELLING.md.
+     Materia declarada a mano aunque el color ya la ata, porque el nombre del
+     chip («Storytelling») y el nombre de lo que se estudia coinciden y asi la
+     tarjeta no depende de que nadie renombre el chip. */
+  hilo:       { nombre: 'Ruta del Hilo que Tira',            emoji: '🧵', color: 'story', materia: 'Storytelling', etapas: 12,
+                lema: 'Nadie se queda por lo que ya sabe: se queda por el hueco que le falta' },
   /* La primera ruta del Estudio Mayor (COMPENDIO-ESTUDIO-MAYOR.md). El
      compendio trae veintisiete materias; entran al catálogo una por una,
      cuando se construye su primera misión, y todas bajo la materia 'mayor'
@@ -153,6 +162,7 @@ const MISSIONS = [
   { id: 40, title: 'San Petersburgo: lo que vale una apuesta', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🎲', ruta: 'apuesta', etapa: 1, sello: 'familiar', url: 'misiones/ruta-apuesta-san-petersburgo/san-petersburgo.html' },
   { id: 41, title: 'El árbol antes del salto: la oferta puesta en el papel', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🌳', ruta: 'apuesta', etapa: 2, sello: 'familiar', url: 'misiones/ruta-apuesta-arbol-salto/arbol-salto.html' },
   { id: 42, title: 'Tres atajos generan el zoológico: de dónde salen los doscientos sesgos', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🧭', ruta: 'brujula', etapa: 1, sello: 'familiar', url: 'misiones/ruta-brujula-tres-atajos/tres-atajos.html' },
+  { id: 43, title: 'La cadena y el hueco: por qué «y entonces» no es una historia', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🧵', ruta: 'hilo', etapa: 1, sello: 'familiar', url: 'misiones/ruta-hilo-cadena-hueco/cadena-hueco.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -209,6 +219,23 @@ const ETAPAS_PREVISTAS = {
     10: 'La psicología del poder: percepción, autoridad y sesgos del que juzga',
     11: 'Historia de la ley: qué miedo escribió cada norma',
     12: 'El expediente propio: escrito, plazo y defensa de la casa',
+  },
+  /* Las once que faltan de la Ruta del Hilo que Tira. La etapa 1 ya esta
+     construida y su titulo sale de MISSIONS, no de aqui: lo previsto y lo
+     hecho no pueden anunciarse dos veces en el mismo mapa. Los titulos salen
+     de COMPENDIO-STORYTELLING.md, capitulos 5 al 15. */
+  hilo: {
+    2:  'El deseo y el obstáculo: qué quiere y quién se lo niega',
+    3:  'La forma de las formas: estructuras con autor, año y crítica',
+    4:  'La escena: la unidad de trabajo y su giro de valor',
+    5:  'Mostrar, contar y cuándo cada uno',
+    6:  'La voz y el punto de vista: quién cuenta y cuánto sabe',
+    7:  'El tiempo del relato: orden, elipsis y suspense',
+    8:  'Emoción sin chantaje: conmover no es manipular',
+    9:  'La historia que persuade, y el freno ético',
+    10: 'La historia de verdad: narrativa de no ficción',
+    11: 'Contar de pie y contar en imagen',
+    12: 'El taller: revisión con método y prueba de dominio',
   },
   /* Los títulos salen de los seis módulos de la Metacognición en
      COMPENDIO-ESTUDIO-MAYOR.md, para que el mapa enseñe el camino entero

@@ -12,7 +12,8 @@ iframe{width:380px;height:900px;border:0;background:#fff}pre{background:#111;col
    1. que cada tarjeta rotule el nombre GENERAL de la materia (y que la Ruta de
       la Máquina que se Mira diga «Metacognición», que es el caso que pidió el
       autor), sin que ninguna se quede sin rótulo;
-   2. que las 38 rutas estén AGRUPADAS POR MATERIA y que todo arranque plegado,
+   2. que TODAS las rutas del catálogo estén AGRUPADAS POR MATERIA y que todo
+      arranque plegado,
       que es lo que el autor pidió el 20 de agosto de 2026 para dejar de barrer
       metros de pantalla;
    3. que una materia de UNA SOLA ruta abra directo sus etapas, sin cobrar un
@@ -119,10 +120,14 @@ f.onload = async () => {
         'el nombre de la ruta sigue intacto, el rótulo va aparte', 'el rótulo se metió dentro del nombre');
 
       log('\n── AGRUPADAS POR MATERIA, Y TODO PLEGADO ──');
-      /* Once materias en vez de 38 tarjetas sueltas: eso es lo que hace que la
-         pantalla entre en pantalla y media en vez de varios metros. */
+      /* Un puñado de materias plegadas en vez de decenas de tarjetas sueltas:
+         eso es lo que hace que la pantalla entre en pantalla y media en vez de
+         varios metros. La cuenta sale del CATÁLOGO y no escrita a mano: con el
+         número clavado, añadir una materia suspendía la sonda sin que hubiera
+         nada roto, que es el fallo que ya costó tres sondas en la Casa Cerrada. */
       const grupos = [...d.querySelectorAll('.materia-grupo')];
-      ok(grupos.length === 11, 'las 38 rutas caen en 11 materias', 'grupos: ' + grupos.length);
+      const totalMaterias = w.eval('materiasConRutas().length');
+      ok(grupos.length === totalMaterias, 'las ' + totalRutas + ' rutas caen en ' + totalMaterias + ' materias', 'grupos: ' + grupos.length + ' de ' + totalMaterias);
       const abiertos = grupos.filter(abiertaMat);
       ok(abiertos.length === 0, 'y TODAS arrancan plegadas, que es lo que se pidió',
         abiertos.length + ' materias arrancan abiertas: ' + abiertos.map(g => (g.querySelector('.materia-nombre')||{}).textContent).join(', '));
@@ -133,11 +138,11 @@ f.onload = async () => {
       ok(mayor && /28 rutas/.test((mayor.querySelector('.materia-cuenta')||{}).textContent||''),
         'y el Estudio Mayor avisa de que trae 28 rutas', 'el Estudio Mayor no dice cuántas rutas trae');
 
-      /* PLEGADO NO ES VACIADO. Hay 38 sondas que buscan las tarjetas de ruta en
-         el documento para contar sus etapas: si el contenido naciera al abrir
-         la materia, dejarían de encontrar nada sin que nadie hubiera roto la
-         pantalla. Por eso se pinta todo y se esconde con `hidden`. */
-      ok(cards.length === 38, 'las 38 tarjetas siguen en el documento aunque no se vean', 'tarjetas: ' + cards.length);
+      /* PLEGADO NO ES VACIADO. Hay decenas de sondas que buscan las tarjetas de
+         ruta en el documento para contar sus etapas: si el contenido naciera al
+         abrir la materia, dejarían de encontrar nada sin que nadie hubiera roto
+         la pantalla. Por eso se pinta todo y se esconde con `hidden`. */
+      ok(cards.length === totalRutas, 'las ' + totalRutas + ' tarjetas siguen en el documento aunque no se vean', 'tarjetas: ' + cards.length);
       const marea = tarjeta(d, 'Ruta de la Marea');
       ok(marea && marea.querySelectorAll('.ruta-etapa').length === 6,
         'y una ruta plegada conserva sus 6 etapas', 'la ruta plegada perdió sus etapas');
@@ -149,7 +154,7 @@ f.onload = async () => {
         'la cuenta de avance sigue en su sitio', 'cuenta: ' + (dorado ? (dorado.querySelector('.ruta-cuenta')||{}).textContent : '(sin tarjeta)'));
 
       log('\n── UNA MATERIA DE UNA SOLA RUTA ABRE DIRECTO SUS ETAPAS ──');
-      /* Diez de las once materias traen exactamente una ruta. Obligarlas a dos
+      /* Casi todas las materias traen exactamente una ruta. Obligarlas a dos
          toques sería cobrar peaje por un nivel que ahí no separa nada: el nivel
          intermedio solo lo necesita el Estudio Mayor, con sus 28. */
       const epis = grupo(d, 'Epistemología');
@@ -174,7 +179,7 @@ f.onload = async () => {
 
       log('\n── LA TARJETA SE PLIEGA ──');
       const conBoton = cards.filter(c => boton(c) && boton(c).tagName === 'BUTTON').length;
-      ok(conBoton === cards.length, 'las 38 llevan un botón de verdad', conBoton + ' de ' + cards.length + ' lo llevan');
+      ok(conBoton === cards.length, 'las ' + cards.length + ' llevan un botón de verdad', conBoton + ' de ' + cards.length + ' lo llevan');
       const bienAtadas = cards.filter(c => {
         const b = boton(c); if (!b) return false;
         const panel = d.getElementById(b.getAttribute('aria-controls') || '');
@@ -188,7 +193,7 @@ f.onload = async () => {
         const panel = d.getElementById(b.getAttribute('aria-controls') || '');
         return panel && panel.classList.contains('materia-rutas') && /^(true|false)$/.test(b.getAttribute('aria-expanded') || '');
       }).length;
-      ok(matAtadas === grupos.length, 'y las 11 materias también', matAtadas + ' de ' + grupos.length + ' bien atadas');
+      ok(matAtadas === grupos.length, 'y las ' + grupos.length + ' materias también', matAtadas + ' de ' + grupos.length + ' bien atadas');
       /* Se comprueba que sea un <button> de verdad, sin `disabled` y sin sacarlo
          del orden de tabulación: así el teclado lo alcanza con Tab y lo dispara
          con Enter y con espacio sin que haya que escribir nada de eso a mano.
@@ -257,8 +262,8 @@ f.onload = async () => {
          && /Nada con/.test((d.getElementById('rutas-resultado')||{}).textContent || ''),
         'y cuando no hay nada lo dice, en vez de dejar la pantalla en blanco', 'no avisa de que no hay resultados');
       escribir(d, ''); await esperar(120);
-      ok([...d.querySelectorAll('.ruta-card')].filter(c => !c.hidden).length === 38,
-        'al borrar la búsqueda vuelven las 38', 'no volvieron todas');
+      ok([...d.querySelectorAll('.ruta-card')].filter(c => !c.hidden).length === totalRutas,
+        'al borrar la búsqueda vuelven las ' + totalRutas, 'no volvieron todas');
 
       log('\n── PLEGAR TODO ──');
       /* Sin esto, quien abrió el Estudio Mayor para mirar una cosa se queda con
@@ -267,7 +272,7 @@ f.onload = async () => {
       boton(espejo3).click(); await esperar(60);
       w.plegarTodasLasRutas(); await esperar(150);
       ok([...d.querySelectorAll('.materia-grupo')].filter(abiertaMat).length === 0,
-        'un toque deja las 11 materias plegadas otra vez', 'quedaron materias abiertas');
+        'un toque deja las ' + grupos.length + ' materias plegadas otra vez', 'quedaron materias abiertas');
       ok(d.getElementById('rutas-buscar').value === '', 'y limpia el buscador', 'el buscador se quedó escrito');
       const tras = JSON.parse(w.localStorage.getItem('faro_v1') || '{}');
       ok(Object.keys(tras.materiasAbiertas || {}).length === 0 && Object.keys(tras.rutasAbiertas || {}).length === 0,

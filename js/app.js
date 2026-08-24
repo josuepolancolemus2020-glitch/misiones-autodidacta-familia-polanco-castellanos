@@ -27,6 +27,12 @@ const MATERIAS = [
   { id: 'cib',  label: 'Ciberseguridad',      sub: 'La casa cerrada: llaves y datos', icon: 'fa-shield-halved', color: 'cib' },
   { id: 'ia',   label: 'Inteligencia Artificial', sub: 'La máquina que predice',      icon: 'fa-robot',         color: 'ia' },
   { id: 'ley',  label: 'Derecho y Ley',       sub: 'La ley por dentro y sus grietas', icon: 'fa-scale-balanced', color: 'ley' },
+  /* Storytelling entra con chip propio y no dentro del Estudio Mayor porque no
+     es una materia de auditoría: es un OFICIO que atraviesa a casi todas las
+     demás (el relato de la Marca, el guion de video de cada misión, la defensa
+     de la tesis, el careo de las Lecturas). Una materia que se usa desde otras
+     doce tiene que poder encontrarse por su nombre en el filtro. */
+  { id: 'story', label: 'Storytelling',       sub: 'Narrativa: contar para que se entienda y se recuerde', icon: 'fa-feather-pointed', color: 'story' },
   /* Una sola materia para las veintisiete del Estudio Mayor: si cada una
      trajera su chip, el filtro de la portada se vuelve inusable. */
   { id: 'mayor', label: 'Estudio Mayor',      sub: 'Las materias del compendio de la casa', icon: 'fa-book-open-reader', color: 'mayor' },

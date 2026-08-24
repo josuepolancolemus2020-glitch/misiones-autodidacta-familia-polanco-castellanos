@@ -28,6 +28,11 @@
      aunque sean vecinos de tono: en el mapa de rutas los dos colores se ven
      seguidos y hay que poder distinguirlos de un vistazo. */
   --ley:  #9f1239; --ley-bg:  #fff1f2; --ley-border: rgba(159,18,57,.2);
+  /* Tinta y cuero para Storytelling. Marrón oscuro a propósito: en el mapa de
+     rutas esta materia se ve pegada al vino de la Ley (--ley) y al índigo del
+     Estudio Mayor (--mayor), y un rojo mas se confundiria con el vino de un
+     vistazo. El marron no lo usa ninguna otra materia. */
+  --story: #78350f; --story-bg: #fdf6ec; --story-border: rgba(120,53,15,.2);
   --mayor: #4338ca; --mayor-bg: #eef2ff; --mayor-border: rgba(67,56,202,.2);
   --inv: #0d9488; --inv-bg: #f0fdfa; --inv-border: rgba(13,148,136,.2);
 
@@ -1331,6 +1336,7 @@ a { text-decoration: none; color: inherit; }
 .mc-icon.cib  { background: var(--cib-bg);  color: var(--cib); }
 .mc-icon.ia   { background: var(--ia-bg);   color: var(--ia); }
 .mc-icon.ley  { background: var(--ley-bg);  color: var(--ley); }
+.mc-icon.story { background: var(--story-bg); color: var(--story); }
 .mc-icon.mayor { background: var(--mayor-bg); color: var(--mayor); }
 
 .small-icon.apr { background: var(--apr-bg); color: var(--apr); }
@@ -1347,6 +1353,7 @@ a { text-decoration: none; color: inherit; }
 .small-icon.cib  { background: var(--cib-bg);  color: var(--cib); }
 .small-icon.ia   { background: var(--ia-bg);   color: var(--ia); }
 .small-icon.ley  { background: var(--ley-bg);  color: var(--ley); }
+.small-icon.story { background: var(--story-bg); color: var(--story); }
 .small-icon.mayor { background: var(--mayor-bg); color: var(--mayor); }
 
 .mc-subj.esp  { background: var(--esp-bg);  color: var(--esp); }
@@ -1362,6 +1369,7 @@ a { text-decoration: none; color: inherit; }
 .mc-subj.cib  { background: var(--cib-bg);  color: var(--cib); }
 .mc-subj.ia   { background: var(--ia-bg);   color: var(--ia); }
 .mc-subj.ley  { background: var(--ley-bg);  color: var(--ley); }
+.mc-subj.story { background: var(--story-bg); color: var(--story); }
 .mc-subj.mayor { background: var(--mayor-bg); color: var(--mayor); }
 
 /* ====== EMPTY STATE ====== */
@@ -2772,6 +2780,7 @@ body {
    con un rosa claro, Derecho y Ley se confundía en la cuadrícula con Ciencias
    Sociales (rojo) y con Marketing y Marca (magenta), que quedan a dos filas. */
 .module-card.ley  { background: linear-gradient(135deg, var(--ley),  #be123c); }
+.module-card.story { background: linear-gradient(135deg, var(--story), #b45309); }
 .module-card.mayor { background: linear-gradient(135deg, var(--mayor), #818cf8); }
 
 /* Sello familiar: material que no se publica, solo vive en F.A.R.O */
