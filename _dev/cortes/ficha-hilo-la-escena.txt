@@ -1,0 +1,9 @@
+<h2>🔑 El protocolo: cinco movimientos, en una tabla</h2>
+<div class="caja c-peri">
+<div class="caja c-vago">
+<h2>🎬 Cómo se usa esta primera mitad de la tabla</h2>
+<h2>🧮 La cuenta de la escena, a fondo</h2>
+<h2>🗣️ Qué decir al explicarlo, con alguien enfrente</h2>
+<h2>📚 Más fuentes, con su etiqueta</h2>
+<h2>✏️ Ejercicios para hacer a lápiz <span class="mini">(las pautas van en la última página, nunca al lado del ejercicio)</span></h2>
+<div class="caja c-p12">
