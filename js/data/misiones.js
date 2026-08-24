@@ -182,6 +182,7 @@ const MISSIONS = [
   { id: 41, title: 'El árbol antes del salto: la oferta puesta en el papel', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🌳', ruta: 'apuesta', etapa: 2, sello: 'familiar', url: 'misiones/ruta-apuesta-arbol-salto/arbol-salto.html' },
   { id: 42, title: 'Tres atajos generan el zoológico: de dónde salen los doscientos sesgos', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🧭', ruta: 'brujula', etapa: 1, sello: 'familiar', url: 'misiones/ruta-brujula-tres-atajos/tres-atajos.html' },
   { id: 43, title: 'La cadena y el hueco: por qué «y entonces» no es una historia', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🧵', ruta: 'hilo', etapa: 1, sello: 'familiar', url: 'misiones/ruta-hilo-cadena-hueco/cadena-hueco.html' },
+  { id: 44, title: 'El deseo y el obstáculo: qué quiere y quién se lo niega', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🎯', ruta: 'hilo', etapa: 2, sello: 'familiar', url: 'misiones/ruta-hilo-deseo-obstaculo/deseo-obstaculo.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -244,7 +245,6 @@ const ETAPAS_PREVISTAS = {
      hecho no pueden anunciarse dos veces en el mismo mapa. Los titulos salen
      de COMPENDIO-STORYTELLING.md, capitulos 5 al 15. */
   hilo: {
-    2:  'El deseo y el obstáculo: qué quiere y quién se lo niega',
     3:  'La forma de las formas: estructuras con autor, año y crítica',
     4:  'La escena: la unidad de trabajo y su giro de valor',
     5:  'Mostrar, contar y cuándo cada uno',
