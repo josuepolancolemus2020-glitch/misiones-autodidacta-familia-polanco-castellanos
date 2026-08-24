@@ -183,6 +183,7 @@ const MISSIONS = [
   { id: 42, title: 'Tres atajos generan el zoológico: de dónde salen los doscientos sesgos', modulo: 'aprendizaje-unido', materia: 'mayor', color: 'apr', xp: 45, icon: '🧭', ruta: 'brujula', etapa: 1, sello: 'familiar', url: 'misiones/ruta-brujula-tres-atajos/tres-atajos.html' },
   { id: 43, title: 'La cadena y el hueco: por qué «y entonces» no es una historia', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🧵', ruta: 'hilo', etapa: 1, sello: 'familiar', url: 'misiones/ruta-hilo-cadena-hueco/cadena-hueco.html' },
   { id: 44, title: 'El deseo y el obstáculo: qué quiere y quién se lo niega', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🎯', ruta: 'hilo', etapa: 2, sello: 'familiar', url: 'misiones/ruta-hilo-deseo-obstaculo/deseo-obstaculo.html' },
+  { id: 45, title: 'La forma de las formas: estructuras con autor, año y crítica', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '📐', ruta: 'hilo', etapa: 3, sello: 'familiar', url: 'misiones/ruta-hilo-forma-formas/forma-formas.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -240,12 +241,11 @@ const ETAPAS_PREVISTAS = {
     11: 'Historia de la ley: qué miedo escribió cada norma',
     12: 'El expediente propio: escrito, plazo y defensa de la casa',
   },
-  /* Las once que faltan de la Ruta del Hilo que Tira. La etapa 1 ya esta
-     construida y su titulo sale de MISSIONS, no de aqui: lo previsto y lo
-     hecho no pueden anunciarse dos veces en el mismo mapa. Los titulos salen
-     de COMPENDIO-STORYTELLING.md, capitulos 5 al 15. */
+  /* Las nueve que faltan de la Ruta del Hilo que Tira. Las etapas 1, 2 y 3 ya
+     estan construidas y sus titulos salen de MISSIONS, no de aqui: lo
+     previsto y lo hecho no pueden anunciarse dos veces en el mismo mapa. Los
+     titulos salen de COMPENDIO-STORYTELLING.md, capitulos 5 al 15. */
   hilo: {
-    3:  'La forma de las formas: estructuras con autor, año y crítica',
     4:  'La escena: la unidad de trabajo y su giro de valor',
     5:  'Mostrar, contar y cuándo cada uno',
     6:  'La voz y el punto de vista: quién cuenta y cuánto sabe',
