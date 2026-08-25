@@ -187,6 +187,7 @@ const MISSIONS = [
   { id: 46, title: 'La escena: la unidad de trabajo y su giro de valor', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🎭', ruta: 'hilo', etapa: 4, sello: 'familiar', url: 'misiones/ruta-hilo-la-escena/la-escena.html' },
   { id: 47, title: 'Mostrar, contar y cuándo cada uno: por qué «muestra, no cuentes» está mal citado', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🪞', ruta: 'hilo', etapa: 5, sello: 'familiar', url: 'misiones/ruta-hilo-mostrar-contar/mostrar-contar.html' },
   { id: 48, title: 'La voz y el punto de vista: quién cuenta y cuánto sabe', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '👁️', ruta: 'hilo', etapa: 6, sello: 'familiar', url: 'misiones/ruta-hilo-voz-punto-vista/voz-punto-vista.html' },
+  { id: 49, title: 'El tiempo del relato: orden, elipsis y suspense', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '⏳', ruta: 'hilo', etapa: 7, sello: 'familiar', url: 'misiones/ruta-hilo-tiempo-relato/tiempo-relato.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -249,7 +250,6 @@ const ETAPAS_PREVISTAS = {
      previsto y lo hecho no pueden anunciarse dos veces en el mismo mapa. Los
      titulos salen de COMPENDIO-STORYTELLING.md, capitulos 5 al 15. */
   hilo: {
-    7:  'El tiempo del relato: orden, elipsis y suspense',
     8:  'Emoción sin chantaje: conmover no es manipular',
     9:  'La historia que persuade, y el freno ético',
     10: 'La historia de verdad: narrativa de no ficción',
