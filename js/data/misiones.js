@@ -185,6 +185,7 @@ const MISSIONS = [
   { id: 44, title: 'El deseo y el obstáculo: qué quiere y quién se lo niega', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🎯', ruta: 'hilo', etapa: 2, sello: 'familiar', url: 'misiones/ruta-hilo-deseo-obstaculo/deseo-obstaculo.html' },
   { id: 45, title: 'La forma de las formas: estructuras con autor, año y crítica', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '📐', ruta: 'hilo', etapa: 3, sello: 'familiar', url: 'misiones/ruta-hilo-forma-formas/forma-formas.html' },
   { id: 46, title: 'La escena: la unidad de trabajo y su giro de valor', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🎭', ruta: 'hilo', etapa: 4, sello: 'familiar', url: 'misiones/ruta-hilo-la-escena/la-escena.html' },
+  { id: 47, title: 'Mostrar, contar y cuándo cada uno: por qué «muestra, no cuentes» está mal citado', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🪞', ruta: 'hilo', etapa: 5, sello: 'familiar', url: 'misiones/ruta-hilo-mostrar-contar/mostrar-contar.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -242,12 +243,11 @@ const ETAPAS_PREVISTAS = {
     11: 'Historia de la ley: qué miedo escribió cada norma',
     12: 'El expediente propio: escrito, plazo y defensa de la casa',
   },
-  /* Las ocho que faltan de la Ruta del Hilo que Tira. Las etapas 1, 2, 3 y 4
-     ya estan construidas y sus titulos salen de MISSIONS, no de aqui: lo
+  /* Las siete que faltan de la Ruta del Hilo que Tira. Las etapas 1, 2, 3, 4
+     y 5 ya estan construidas y sus titulos salen de MISSIONS, no de aqui: lo
      previsto y lo hecho no pueden anunciarse dos veces en el mismo mapa. Los
      titulos salen de COMPENDIO-STORYTELLING.md, capitulos 5 al 15. */
   hilo: {
-    5:  'Mostrar, contar y cuándo cada uno',
     6:  'La voz y el punto de vista: quién cuenta y cuánto sabe',
     7:  'El tiempo del relato: orden, elipsis y suspense',
     8:  'Emoción sin chantaje: conmover no es manipular',

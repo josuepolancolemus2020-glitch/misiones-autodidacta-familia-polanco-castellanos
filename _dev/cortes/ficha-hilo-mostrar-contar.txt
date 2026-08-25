@@ -1,0 +1,13 @@
+Encabezados que abren cada una de las 10 páginas impresas de
+fichas/ficha-hilo-mostrar-contar.html (best-effort, no es gating).
+
+Página 1: 🎯 Objetivos (con la ficha de identificación y el badge arriba)
+Página 2: 🔑 El protocolo: cinco movimientos, en una tabla
+Página 3: 📌 La prueba de la cita fantasma
+Página 4: 📌 La regla que sale de aquí
+Página 5: 🎬 Cómo se usa esta primera mitad de la tabla
+Página 6: 🎛️ El dial de mostrar y contar, a fondo
+Página 7: 🗣️ Qué decir al explicarlo, con alguien enfrente
+Página 8: 📚 Más fuentes, con su etiqueta
+Página 9: ✏️ Ejercicios para hacer a lápiz
+Página 10: ✅ Pauta del ejercicio 1 (y el resto de las pautas)

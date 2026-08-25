@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta del Hilo que Tira · Etapa 5: Mostrar, contar y cuándo cada uno | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/mostrar-contar.css">
+<link rel="stylesheet" href="../../css/lecturas.css">
+<link rel="stylesheet" href="../../css/lecturas-marcador.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">¿Se muestra o se cuenta? 🪞</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🪞</div>
+    <div class="hero-text">
+      <h1>Mostrar, contar <span>y cuándo cada uno</span></h1>
+      <p class="sub">«Muestra, no cuentes» está mal citada: aprende cuándo mostrar, cuándo contar, y el detalle que carga el significado 🪞</p>
+      <div class="badge">🧵 Ruta del Hilo que Tira · Etapa 5 de 12</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🪞 La máxima que todos citan, y que nadie escribió así</h2>
+    <p>La etapa 1 ató los hechos en historia; la etapa 2 encendió el motor del deseo; la etapa 3 enseñó a fechar y criticar cualquier estructura; la etapa 4 bajó hasta la unidad mínima, la escena, y su giro de valor. Esta etapa baja un peldaño más: dentro de cada escena, ¿qué se pone frente al lector, en tiempo real y con detalle, y qué se resume para no gastarle el tiempo en lo que no gira? Esa es la pregunta de fondo detrás de la máxima más citada, y peor citada, de todo el oficio: <strong>«muestra, no cuentes»</strong>.</p>
+    <p>La frase que casi siempre acompaña ese mandamiento es esta: <strong>«No me digas que la luna brilla; muéstrame el destello de la luz en un vidrio roto»</strong>. Se la atribuye a Antón Chéjov en manuales, charlas y publicaciones de todo tipo. <strong>Chéjov nunca escribió esas palabras.</strong> Es una paráfrasis del siglo XX, popularizada en talleres de escritura, sin autor localizable. Lo real es otra cosa, más pequeña y más precisa: una carta de Chéjov a su hermano Aleksandr, del <strong>10 de mayo de 1886</strong>, donde le da un consejo distinto: para dar una noche de luna, no la nombres; di que en la presa del molino brilló, como una estrellita, un trozo de vidrio de una botella rota, y que la sombra negra de un perro o de un lobo rodó como una bola. El <strong>consejo</strong> es de Chéjov, real y fechado; la <strong>frase famosa</strong> no son sus palabras. Esa es la cita mal hecha que esta etapa desarma, entera.</p>
+    <div class="tip">
+      <span class="ti">🪞</span>
+      <div><strong>La pregunta que abre esta etapa, y se hace siempre antes de escribir:</strong> lo que estoy por poner en la página, ¿GIRA (es la decisión, la revelación, el beat), o solo CONECTA un giro con el siguiente (el paso de los días, el trayecto, lo repetido)? La respuesta decide si eso se muestra o se cuenta.</div>
+    </div>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La trampa que va por delante:</strong> tomar «muestra, no cuentes» como ley sin excepción. O se dramatiza el relleno que no gira, y la prosa engorda; o no se resume nunca, y el lector se ahoga en detalle sin digerir. Wayne Booth (1961) lo dijo primero: el autor nunca desaparece del todo, y contar también es legítimo.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 La tabla madre: seis herramientas, cada una con su autor, su año y su límite</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Esta es la tabla que sostiene la etapa entera. Cada fila es una herramienta real, con su fuente exacta, lo que aporta y el límite que hay que decir en voz alta antes de usarla.</p>
+    <table class="tres">
+      <tr><th>Herramienta</th><th>Autor y año</th><th>Qué aporta</th><th>Su crítica o límite</th></tr>
+      <tr><td>Mostrar y contar (escena y panorama)</td><td>Percy Lubbock, «The Craft of Fiction», 1921</td><td>Nombra la distinción: la escena (scene) dramatiza en tiempo real, el panorama (picture) resume</td><td>Lubbock prefería la escena, pero describía el oficio, no dictó «nunca cuentes»; su preferencia es de autor, no ley universal</td></tr>
+      <tr><td>«Dramatizar, dramatizar»</td><td>Henry James, prefacios de la New York Edition, 1907-1909</td><td>La práctica de poner en escena en vez de resumir</td><td>Consejo de un novelista sobre su propia obra; el propio James resume cuando le conviene</td></tr>
+      <tr><td>El detalle concreto que muestra (el vidrio de botella)</td><td>Antón Chéjov, carta a su hermano Aleksandr, 10 de mayo de 1886</td><td>Mostrar es elegir el detalle significativo, no describirlo todo</td><td><strong>Mal citado:</strong> la frase «no me digas que la luna brilla; muéstrame el destello en un vidrio roto» no son palabras de Chéjov, es paráfrasis del siglo XX; lo real es el consejo de esta carta</td></tr>
+      <tr><td>La crítica al dogma: contar es legítimo</td><td>Wayne Booth, «The Rhetoric of Fiction», 1961</td><td>El autor nunca desaparece; mostrar no es siempre superior a contar</td><td>Es teoría crítica, un argumento razonado, no una medición</td></tr>
+      <tr><td>La regla mal usada en el taller</td><td>Ursula K. Le Guin, «Steering the Craft», 1998</td><td>Tomada como ley absoluta, «show don't tell» mata el resumen necesario y engorda la prosa</td><td>Manual de taller con voz de autora, no una medición</td></tr>
+      <tr><td>La distancia narrativa: un dial, no una ley</td><td>John Gardner, «The Art of Fiction», 1984</td><td>El «sueño vívido y continuo»; la distancia psíquica va del resumen lejano al detalle inmediato, se gradúa</td><td>Manual de oficio de autor, con su estética propia</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🕊️ La fila más cerca de un caso real, comprobable</span><br>
+      <span>Ninguna de las seis filas es una medición con corpus, pero hay un caso real y documentado que sirve de prueba: <span class="hl">la carta de Chéjov de 1886</span>. Existe, está fechada, y dice exactamente lo del vidrio de botella. Frente a ella, <span class="hl2">la frase de la luna y el vidrio roto</span> no tiene autor, ni fecha, ni carta que la respalde: es la comparación entre una fuente real y una fantasma, hecha con el mismo tema.</span>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">👻 La fila que arrastra una cita fantasma</span><br>
+      <span>La fila de Chéjov es la única de las seis que hay que citar con cuidado doble: primero el <span class="hl">consejo real</span> (la carta de 1886), y después, aparte, la aclaración de que <span class="hl2">la frase famosa no son sus palabras</span>. Omitir la segunda parte es exactamente el error que esta etapa enseña a no cometer.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Siete fechas: de la carta de Chéjov a Le Guin</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada fecha para ver qué se propuso y por qué importa en esta etapa.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una fecha de la línea.</div>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🧬 Armar: fechar y declarar una herramienta antes de usarla</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Esta es la operación que la etapa evalúa. Alguien trae una frase suelta sobre «cómo se muestra o se cuenta», y hay que devolverla con tres cosas puestas: <strong>su autor y su año</strong>, <strong>su límite</strong>, y <strong>su etiqueta de estatus</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🌙 Trabajado: la cita de la luna, sin fecha</span><br>
+      <span><span class="hl">Huérfana:</span> «No me digas que la luna brilla; muéstrame el destello en un vidrio roto, así lo dijo Chéjov.» Suena a ley, y no lo es: Chéjov no la firmó. <span class="hl">Fechada:</span> «El consejo real es de <span class="hl2">Antón Chéjov, carta a su hermano Aleksandr, 10 de mayo de 1886</span>: no nombres la luna, mostrá el vidrio de botella en la presa del molino. La frase de "muéstrame el destello" es una paráfrasis del siglo XX, sin autor.» El material (elegir el detalle concreto) es el mismo; lo que cambió es que ahora carga su fecha real.</span>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚠️ Trabajado: la regla de Le Guin vuelta ley absoluta</span><br>
+      <span><span class="hl">Sin cuidado:</span> «Hay que mostrarlo todo siempre, nunca contar nada.» <span class="hl">Con cuidado:</span> «Es la advertencia de <span class="hl2">Ursula K. Le Guin, «Steering the Craft», 1998</span>, contra el ABUSO de "show don't tell", no una orden de mostrarlo todo: la propia Le Guin avisa de que no se puede mostrar todo, porque eso engorda la prosa.» La regla: <span class="hl">ninguna cita se usa fuera del terreno que de verdad cubre</span>.</span>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎯 Trabajado: la objeción de Booth vendida como opinión suelta</span><br>
+      <span><span class="hl">Sin etiqueta:</span> «Contar también está bien, dicen por ahí.» <span class="hl">Con etiqueta:</span> «Es la tesis de <span class="hl2">Wayne Booth, «The Rhetoric of Fiction» (1961)</span>: el autor nunca desaparece del todo, así que contar es legítimo e inevitable. Es teoría crítica, un argumento razonado, no una medición con corpus.» Una tesis con nombre pesa distinto que un «dicen por ahí».</span>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;">Y la última prueba: <strong>nombrar la etiqueta de estatus</strong>. No «así se muestra siempre», sino «consejo real mal citado, o tesis crítica, o manual de taller con voz de autora, o práctica declarada de un autor sobre su obra».</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎛️ El dial de mostrar y contar: la herramienta de esta etapa</h2>
+    <p>Todo lo anterior se junta en una sola herramienta práctica, que esta etapa deja puesta para el resto de la ruta: hasta la etapa 12, cada pasaje real de esta casa se mide con las mismas <strong>tres casillas</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎛️ Las tres casillas, siempre en este orden</span><br>
+      <span><strong>1. Qué se muestra:</strong> lo que <strong>gira</strong> aquí (una decisión, una revelación, el beat) se MUESTRA, en tiempo real, con detalle concreto. <strong>2. Qué se cuenta:</strong> lo que solo <strong>conecta</strong> un giro con el siguiente (el paso de los días, el trayecto, lo repetido) se CUENTA en resumen, para no gastar el tiempo del lector en lo que no gira. <strong>3. El detalle que muestra:</strong> cuando toca mostrar, un <strong>solo detalle concreto elegido</strong> (el vidrio de botella de Chéjov, 1886) dice más que un adjetivo abstracto («una noche hermosa»).</span>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🏫 El dial aplicado a un caso real de la casa</span><br>
+      <span>Un video de una beca de <span class="hl">L 80,000</span> quería contar cómo se sintió el alumno al recibirla. <span class="hl">Qué se muestra:</span> el momento en que abre el sobre, porque ahí gira su valor (de la duda a la certeza). <span class="hl">Qué se cuenta:</span> los tres meses de espera desde que aplicó, porque solo conectan, en resumen, sin gastar el video entero. <span class="hl2">El detalle:</span> no «estaba muy feliz» (abstracto), sino la mano que le tiembla al romper el sobre azul: un solo detalle concreto, elegido, que carga el significado.</span>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.6rem;">Este dial no se guarda para el examen: se aplica a los ocho casos del proyecto, a la evaluación bajo presión, y al propio guion de video de esta misión.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: piden explicarlo todo, «para que quede clarísimo»</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué se hace cuando alguien confunde explicarlo todo con contarlo bien.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📥</span><span class="ms-text"><strong>Llega el pedido:</strong> «Explicá a cámara todo lo que sentiste al recibir la beca, así queda clarísimo.» Nadie pregunta si eso gira o solo se cuenta.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🔍</span><span class="ms-text"><strong>Se mide el material:</strong> hay un momento real, filmable, donde el alumno abre el sobre azul y le tiembla la mano; el resto son tres meses de espera sin nada que mostrar.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🎛️</span><span class="ms-text"><strong>Se aplica el dial:</strong> el momento del sobre GIRA, así que se muestra con su detalle; los tres meses solo CONECTAN, así que se cuentan en una frase.</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">✂️</span><span class="ms-text"><strong>Se compara con el pedido original:</strong> «explicá todo a cámara» habría contado justo lo único que merecía mostrarse.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">Hay noventa segundos de cámara y un solo momento que gira. ¿Qué se hace?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">🗣️ Dejar la explicación completa a cámara, «para que quede clarísimo»</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🎬 Mostrar el momento del sobre, y contar el resto en una frase</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔑 El protocolo: cinco movimientos para sacar el dial de cualquier pasaje</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Esta tabla es el mecanismo que la etapa entera pone a trabajar: cinco pasos que se aplican a cualquier pasaje real, de un video de la casa a un párrafo de un informe.</p>
+    <table class="tres">
+      <tr><th>Movimiento</th><th>Qué se hace</th><th>Dónde se cae</th></tr>
+      <tr><td>1. Preguntar si gira</td><td>¿Esto es la decisión, la revelación, el beat, o solo conecta dos giros?</td><td>Dar por hecho que todo el pasaje merece el mismo trato</td></tr>
+      <tr><td>2. Decidir mostrar o contar</td><td>Si gira, se muestra (Lubbock, 1921); si solo conecta, se cuenta</td><td>Mostrar el trámite y contar el giro, al revés de lo que hace falta</td></tr>
+      <tr><td>3. Elegir el detalle, si toca mostrar</td><td>Un solo detalle concreto que cargue el significado (Chéjov, 1886)</td><td>Describirlo todo, en vez de elegir uno</td></tr>
+      <tr><td>4. Dramatizar de verdad</td><td>Poner en escena, no explicar a cámara (James, 1907-1909)</td><td>Explicar lo que se sintió en vez de mostrarlo pasando</td></tr>
+      <tr><td>5. Comprobar el reparto</td><td>¿Sobrevivió algo de contar (Booth, 1961), o se dramatizó todo (Le Guin, 1998)?</td><td>Vender la regla como ley sin excepción, en cualquiera de los dos sentidos</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 La señal de que el protocolo no se corrió</span><br>
+      <span>Si alguien dice «esto ya está bien mostrado» y no puede contestar <span class="hl">qué de todo eso gira de verdad</span>, el protocolo se saltó el primer paso, y da igual cuánto detalle sensorial tenga. Un pasaje bien revisado suena distinto: <span class="hl2">«esto gira, se muestra con este detalle; esto solo conecta, se cuenta en una línea»</span>, no <span class="hl">«tiene mucha atmósfera»</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🏷️ Las etiquetas de estatus, y la prueba que pide cada una</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">No todas las herramientas de esta etapa son del mismo tipo, y tratarlas igual es el error de fondo.</p>
+    <table class="tres">
+      <tr><th>Categoría</th><th>Qué se reconoce en esta etapa</th><th>La prueba que la desarma</th></tr>
+      <tr><td>Manual/crítica de oficio con autor y año</td><td>Lubbock (1921), Gardner (1984)</td><td>¿Se declara como manual de oficio, o se vende como ley universal?</td></tr>
+      <tr><td>Práctica declarada de un autor sobre su obra</td><td>Henry James (1907-1909)</td><td>¿Se admite que el propio James resumía cuando le convenía?</td></tr>
+      <tr><td>Consejo real, pero mal citado como aforismo</td><td>Chéjov, carta de 1886, contra la frase fantasma</td><td>¿Se cita la carta real, o se repite la frase sin autor localizable?</td></tr>
+      <tr><td>Tesis crítica / argumento teórico</td><td>Booth (1961)</td><td>¿Se cita como un argumento razonado, o como una medición que no es?</td></tr>
+      <tr><td>Manual de taller con voz de autora</td><td>Le Guin (1998)</td><td>¿Se reconoce que es una advertencia de oficio, con voz propia, no un hallazgo?</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🏷️ Por qué la etiqueta cambia lo que se hace después</span><br>
+      <span>Con un <span class="hl">manual de oficio</span> se pregunta para qué se pensó. Con una <span class="hl2">práctica declarada</span> se busca si el propio autor la cumplía siempre. Con un <span class="hl">consejo mal citado</span> se busca la fuente real antes de repetir la frase. Con una <span class="hl2">tesis crítica</span> se cita como argumento, no como medición. Cinco etiquetas, cinco preguntas distintas.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📊 Seis piezas, en números</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Lo que esta etapa reparte, contado.</p>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Herramientas con autor y año, en la tabla madre</div><div class="stat-val">6</div></div>
+      <div class="stat-item"><div class="stat-label">Casillas del dial de mostrar y contar</div><div class="stat-val">3</div></div>
+      <div class="stat-item"><div class="stat-label">Categorías de estatus que reparte esta etapa</div><div class="stat-val">5</div></div>
+      <div class="stat-item"><div class="stat-label">Piezas del laboratorio</div><div class="stat-val">4</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.6rem;">El número que más pesa de esta tabla es el <strong>tres</strong>: las tres casillas del dial, la única herramienta de toda esta etapa que se va a volver a usar, sin cambiarle una coma, hasta la etapa 12.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📝 El vocabulario que esta etapa deja puesto</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Seis palabras que se usan en las siete etapas siguientes de la ruta, cada vez que haga falta decidir si algo se muestra o se cuenta.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🎭 Mostrar</div><div class="t-info">Poner en escena, en tiempo real, lo que gira</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">📜 Contar</div><div class="t-info">Resumir, en panorama, lo que solo conecta</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🎬 Escena</div><div class="t-info">La unidad que dramatiza en tiempo real (Lubbock)</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">📖 Panorama o resumen</div><div class="t-info">La unidad que resume, sin dramatizar (Lubbock)</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🥃 El detalle concreto</div><div class="t-info">Lo que elige y carga el significado (Chéjov)</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">🎛️ El dial de mostrar y contar</div><div class="t-info">Qué se muestra, qué se cuenta, cuál es el detalle</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;"><strong>Ninguna escena de esta casa se muestra o se cuenta sin pasar por el dial</strong>, y <strong>ninguna herramienta que se use para decidirlo se cita sin su autor y su año</strong>.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 Las cuatro piezas del laboratorio</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para quedarte con las cuatro fichas completas.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Mostrar</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🪞 Pieza:</span>
+        <!-- Las llaves de data-parte (esperado, paradoja, utilidad, ruina) se heredan
+             del molde a propósito y NO coinciden con los nombres visibles: el motor y
+             sus llamadas labShowParte() las usan tal cual. En esta etapa el reparto es:
+             esperado = Mostrar, paradoja = Contar, utilidad = el detalle que muestra,
+             ruina = la regla mal usada. -->
+        <button class="lab-btn lab-cont-btn" data-parte="esperado" onclick="labShowParte('esperado')">🎭 Mostrar</button>
+        <button class="lab-btn lab-cont-btn" data-parte="paradoja" onclick="labShowParte('paradoja')">📜 Contar</button>
+        <button class="lab-btn lab-cont-btn" data-parte="utilidad" onclick="labShowParte('utilidad')">🥃 El detalle que muestra</button>
+        <button class="lab-btn lab-cont-btn" data-parte="ruina" onclick="labShowParte('ruina')">⚠️ La regla mal usada</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se comprueba</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado cae?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la palabra clave</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: los tres procedimientos de esta etapa</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden. Hay <strong>tres secuencias</strong> y se cambia con <strong>Nueva secuencia</strong>. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada tarjeta, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la herramienta por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué herramienta o pieza del vocabulario de esta etapa se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué le pasa de verdad a esa afirmación?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que de verdad pasa con esa frase:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Muestra, no cuentes» es una ley que escribió Chéjov</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿qué le falta a esa cita?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla en esa manera de citar una herramienta:</p>
+    <div class="neuro-trans-display" id="enferDisease">«Muestra, no cuentes, así se ha dicho siempre»</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible: si trae su año o es huérfano, si es algo que se muestra o se cuenta, o si es un detalle concreto o algo abstracto.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <!-- Los rótulos y el onclick los pone updateRetoButtons() al cargar. -->
+        <button class="btn btn-pri" onclick="">📅 Con año</button>
+        <button class="btn btn-sec" onclick="">🌫️ Huérfana</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>✏️ Tres encargos de lápiz de esta etapa</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Estos tres no los genera la máquina: se hacen en el cuaderno, con material de verdad de esta casa, y se guardan fechados.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:0.8rem;">
+      <li><strong>1. Sacar el dial de un pasaje real de esta semana.</strong> Elige un texto o un video que hayas visto o escrito de verdad. Escribe sus tres casillas: qué se muestra, qué se cuenta, y cuál es el detalle. Si alguna casilla no se puede llenar, escribe eso también.</li>
+      <li><strong>2. Fechar una frase huérfana sobre mostrar y contar.</strong> Busca una frase suelta sobre «así se muestra» o «así se cuenta» que alguien haya dicho este mes. Escríbela primero tal como la dijeron, y después con su <strong>autor y su año</strong> puestos al lado, o con la nota honesta de que no se pudo comprobar.</li>
+      <li><strong>3. Rastrear la cita fantasma con tus propias palabras.</strong> Elige una frase que se atribuya a alguien famoso sin fuente clara (no tiene que ser la de la luna). Busca si de verdad existe un libro, una carta o un discurso que la contenga, y escribe lo que encontraste.</li>
+    </ul>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📌 La pauta de los tres</span><br>
+      <span>El primero está bien hecho si <span class="hl">las tres casillas quedan llenas con algo concreto, o con la nota honesta de que faltó un dato</span>. El segundo está bien hecho si la frase queda <span class="hl2">con su autor y su año reales, o con la nota de que no se pudo comprobar</span>. El tercero está bien hecho si <span class="hl2">se dice con claridad si la fuente existe o no</span>, sin dar la costumbre por comprobación.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🎛️ El dial de mostrar y contar bajo presión</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Mostrar, contar y cuándo cada uno · Ruta del Hilo que Tira</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: Mostrar, contar y cuándo cada uno</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · El dial de mostrar y contar bajo presión · Mostrar, contar y cuándo cada uno</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🎛️ El dial de mostrar y contar bajo presión: qué se muestra, qué se cuenta, con el reloj corriendo</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay un material de verdad de esta casa, con sus cifras en lempiras. Escribe <strong>qué se muestra y qué se cuenta</strong>, propón <strong>el detalle</strong>, aplica <strong>una herramienta con su autor y su año</strong>, y decide <strong>la pregunta que decide</strong>. Compara con la <strong>Pauta</strong> y anótate el puntaje.</p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🪞</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🪞 Casos del proyecto: ocho pasajes que M.E.T.A.S tuvo que revisar</h2>
+    <p>Ocho situaciones hipotéticas de esta familia y de M.E.T.A.S, todas con cifras en lempiras, y todas con lo mismo dentro: un pasaje real que hay que <strong>diagnosticar con el dial de mostrar y contar</strong>. En los ocho se hace la misma operación: se decide <strong>qué se muestra</strong>, <strong>qué se cuenta</strong> y <strong>cuál es el detalle</strong>, y se termina en las dos preguntas de la casa: <strong>¿cuál es la pregunta que decide, y con qué condición sí?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla de oro de esta ruta, también aquí:</strong> ninguna herramienta se aplica sin autor, año y límite. La distinción es de <strong>Percy Lubbock (1921)</strong>; dramatizar, de <strong>Henry James (1907-1909)</strong>; el detalle concreto, de la carta real de <strong>Antón Chéjov (1886)</strong>; y las dos objeciones, de <strong>Wayne Booth (1961)</strong> y <strong>Ursula K. Le Guin (1998)</strong>.</div>
+    </div>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>Y la regla que gobierna los ocho:</strong> ninguno se cierra con «esto ya se entiende». Un caso está resuelto cuando queda escrito <strong>qué se muestra, qué se cuenta y cuál es el detalle</strong>, aunque una de las tres sea «no se puede llenar con lo que hay».</div>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Caso 1: el video que explica en vez de mostrar</h2>
+    <p>Un video de una beca de <strong>L 80,000</strong> hace que un alumno le explique a cámara, durante <strong>noventa segundos</strong>, cómo se sintió al recibirla, en vez de mostrar la escena donde abrió el sobre.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎛️ El dial, fechado y criticado</span><br>
+      <span><span class="hl">Qué se muestra:</span> el momento exacto en que el alumno abre el sobre, porque ahí gira su valor. <span class="hl">Qué se cuenta, si se dejara así:</span> todo, con una explicación abstracta que no muestra nada. <span class="hl2">Henry James (1907-1909)</span> lo llamaría no dramatizar: contar lo que se podía poner en escena. <strong>La pregunta que decide:</strong> ¿existe el momento filmable del sobre, o ya pasó y no se puede recrear? <strong>La condición:</strong> si existe, se regraba mostrándolo, con el detalle de la mano que tiembla; si no existe, se cuenta en un plano corto, sin fingir una escena que no hubo.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📄 Caso 2: el informe que quiere mostrar cada minuto</h2>
+    <p>Un informe de un patrocinio de <strong>L 500,000</strong>, para un proyecto de <strong>dos años</strong>, intenta describir cada reunión y cada semana, en vez de resumir lo que solo conecta un giro con el siguiente.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎛️ El dial, fechado y criticado</span><br>
+      <span><span class="hl">Qué se cuenta:</span> los meses sin novedad, en una línea cada uno. <span class="hl">Qué se muestra:</span> solo las tres o cuatro semanas donde de verdad cambió algo. <span class="hl2">Ursula K. Le Guin (1998)</span> lo advierte: no se puede mostrar todo, y el intento engorda el informe sin ayudar a nadie. <strong>La pregunta que decide:</strong> ¿cuántos momentos de esos dos años tienen un giro real? <strong>La condición:</strong> se cuenta el resto en una frase cada uno, y se muestra solo lo que gira.</span>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🌙 Caso 3: la frase sin detalle</h2>
+    <p>Un boletín para los patrocinadores dice que <strong>«la escuela mejoró muchísimo»</strong> este año, sin un solo detalle concreto que lo muestre, en un texto de media página.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎛️ El dial, fechado y criticado</span><br>
+      <span><span class="hl">Lo que hay:</span> una afirmación abstracta, sin signo verificable. <span class="hl2">Antón Chéjov, carta de 1886</span>, pediría exactamente lo contrario: no digas que mejoró, mostrá el vidrio de botella, el detalle concreto que lo prueba. <strong>La pregunta que decide:</strong> ¿qué dato concreto (una cifra, una escena, un nombre) se puede señalar como prueba de esa mejora? <strong>La condición:</strong> se reemplaza el adjetivo por el detalle, o si de verdad no hay ninguno a mano, se baja el tono de la frase a lo que sí se puede sostener.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>👻 Caso 4: el taller que cita a Chéjov como ley</h2>
+    <p>Un taller para maestros de M.E.T.A.S enseña «muestra, no cuentes» como si fuera una regla de Chéjov, con la frase de la luna y el vidrio roto en la primera diapositiva.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎛️ El dial, fechado y criticado</span><br>
+      <span>La diapositiva repite <span class="hl">la cita fantasma</span>, sin autor localizable. Lo real es la carta de Chéjov de <span class="hl2">1886</span>, con el vidrio de botella, y el linaje crítico del mandamiento, que viene de <span class="hl2">Percy Lubbock (1921)</span>, sobre la práctica de James. <strong>La pregunta que decide:</strong> ¿de dónde sale de verdad la frase que se está por proyectar? <strong>La condición:</strong> se corrige la diapositiva con la carta real y su fecha, y se aclara, aparte, que la frase famosa no es de Chéjov.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📢 Caso 5: la convocatoria que se ahoga en detalle</h2>
+    <p>Una convocatoria de una feria de M.E.T.A.S describe el aroma del café y el color de las sillas durante <strong>tres párrafos</strong>, y llega al final sin decir la fecha ni el lugar.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎛️ El dial, fechado y criticado</span><br>
+      <span>El texto <span class="hl">muestra</span> lo que en realidad solo debía <span class="hl2">contarse</span>: los detalles sensoriales no giran nada, y el dato que sí gira (la fecha) se pierde en el camino. <strong>La pregunta que decide:</strong> ¿qué de esta convocatoria es información que el lector necesita para actuar, y qué es ambiente que se puede recortar? <strong>La condición:</strong> se cuenta el ambiente en una línea, y se muestra, en letra grande, la fecha y el lugar.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎙️ Caso 6: el testimonio que hay que resumir con honradez</h2>
+    <p>Una madre cuenta, en una llamada de <strong>veinte minutos</strong>, su experiencia con el programa; el boletín tiene que resumirla en un párrafo, sin inventarle diálogo ni escena que ella no vivió.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎛️ El dial, fechado y criticado</span><br>
+      <span>Aquí el dial pide <span class="hl">contar</span>, con honradez, y NO mostrar: dramatizar una escena que no ocurrió, con palabras que la madre nunca dijo, sería inventar, no mostrar. <span class="hl2">Wayne Booth (1961)</span> respalda esta decisión: contar también es legítimo. <strong>La pregunta que decide:</strong> ¿el resumen conserva sus palabras y su sentido real? <strong>La condición:</strong> se resume en sus propias palabras, citadas, y se le pide su permiso antes de publicar.</span>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>📆 Caso 7: los tres meses sin giro</h2>
+    <p>Entre la primera y la segunda entrega de materiales de M.E.T.A.S pasaron <strong>tres meses</strong> sin ningún giro que contar; el informe duda entre dramatizar ese tramo o resumirlo en una línea.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎛️ El dial, fechado y criticado</span><br>
+      <span><span class="hl">Qué se cuenta:</span> los tres meses, en una sola línea, porque solo conectan una entrega con la siguiente. <span class="hl2">Percy Lubbock (1921)</span> llamaría a esto panorama, sin que haga falta disculparse por resumir. <strong>La pregunta que decide:</strong> ¿hubo, dentro de esos tres meses, algún momento que sí giró? <strong>La condición:</strong> si no lo hay, se cuenta en una línea; si lo hay, se muestra solo ese momento, y el resto se sigue contando.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📷 Caso 8: la foto que sustituye tres párrafos</h2>
+    <p>Un reporte para un donante de <strong>L 120,000</strong> dedica tres párrafos a explicar cómo quedó reparado un techo de aula, cuando una sola foto del techo terminado diría lo mismo en un segundo.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎛️ El dial, fechado y criticado</span><br>
+      <span>La foto es <span class="hl">el detalle que muestra</span>: un plano concreto que reemplaza la explicación entera. <span class="hl2">Chéjov (1886)</span>: mostrar no es describirlo todo, es elegir lo que carga el significado. <strong>La pregunta que decide:</strong> ¿la foto existe y se ve con claridad el techo terminado? <strong>La condición:</strong> se deja la foto, y se cuenta en una sola línea el costo y la fecha, que la foto no puede mostrar por sí sola.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📝 La hoja del dial, y las cinco reglas de la etapa</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Antes de dar por bueno cualquiera de estos pasajes, la casa llena esta hoja. Se llena <strong>antes</strong> de escribir la primera línea, que es lo único que la vuelve útil.</p>
+    <ul style="font-size:0.9rem;line-height:1.6;padding-left:1.1rem;margin-bottom:0.8rem;">
+      <li><strong>Qué se muestra, en una línea:</strong> lo que gira, con qué detalle concreto se muestra.</li>
+      <li><strong>Qué se cuenta, en una línea:</strong> lo que solo conecta, resumido sin dramatizar.</li>
+      <li><strong>El detalle elegido:</strong> uno solo, concreto, o la nota honesta de que todavía no se ha encontrado.</li>
+      <li><strong>La herramienta que se aplica, con su autor y su año:</strong> Lubbock (1921) para la distinción, James (1907-1909) para dramatizar, Chéjov (1886) para el detalle, Booth (1961) o Le Guin (1998) para el límite.</li>
+      <li><strong>Si no se puede verificar algo, se deja pendiente:</strong> a la vista, sin inventar el dato que falta.</li>
+    </ul>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🪞 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">Ningún pasaje se da por bueno sin sus tres casillas</span>: qué se muestra, qué se cuenta, cuál es el detalle. 2. <span class="hl2">Ninguna herramienta se aplica sin su autor y su año</span>: sin ellos, es una costumbre, no una técnica. 3. La <span class="hl">cita de la luna</span> nunca se repite sin aclarar que no es de Chéjov. 4. <span class="hl2">No se puede mostrar todo</span> (Le Guin, 1998), ni <span class="hl2">contar sin nunca mostrar nada</span> (Booth, 1961). 5. Lo que no se pudo comprobar <span class="hl2">se queda pendiente</span>, a la vista.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «Mostrar, contar y cuándo cada uno»</h2>
+    <p>Un guion listo para grabar, de seis a siete minutos y medio, que cuenta esta etapa <strong>con historia y no con definiciones</strong>. Nada de «dial de mostrar y contar» ni de «etiqueta de estatus» antes del minuto dos. Cada escena lleva su VOZ, su IMAGEN y su TEXTO EN PANTALLA.</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>La regla de la casa para los guiones, y esta etapa la cumple consigo misma:</strong> su escena central muestra con un detalle concreto y real (el vidrio de botella de la carta de 1886), y no se queda solo explicando la teoría.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:25)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «"No me digas que la luna brilla; muéstrame el destello de la luz en un vidrio roto." Miles de talleres de escritura citan esta frase como si fuera un mandamiento. Se la atribuyen a un escritor ruso llamado Antón Chéjov. Chéjov nunca la escribió.»</p>
+    <p><strong>IMAGEN:</strong> una cita enmarcada, casi como un cuadro, colgada en la pared de un taller de escritura; el marco se agrieta lentamente.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Se la atribuyen a Chéjov. Chéjov nunca la escribió.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quería (0:25 a 1:40)</h2>
+    <p><strong>VOZ:</strong> «Antón Chéjov fue médico y escritor, y atendió pacientes gratis casi toda su vida. El 10 de mayo de 1886 le escribió una carta a su hermano Aleksandr, que también quería escribir. No le dijo "muestra, no cuentes". Le dijo algo más pequeño y más preciso: para dar una noche de luna, no la nombres; decí que en la presa del molino brilló, como una estrellita, un trozo de vidrio de una botella rota, y que la sombra negra de un perro o de un lobo rodó como una bola.»</p>
+    <p><strong>IMAGEN:</strong> una carta manuscrita, con una fecha en la esquina; un molino de noche; un trozo de vidrio brillando en el agua.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «10 de mayo de 1886. La carta real.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:40 a 2:50)</h2>
+    <p><strong>VOZ:</strong> «Ahora mirá los videos y los informes de esta casa. El que explica a cámara, minuto y medio, lo que debía mostrar en la propia escena. El informe que intenta describir cada semana de un proyecto de dos años, hasta ahogarse en su propio detalle. El boletín que dice "la escuela mejoró muchísimo" y no dice con qué se ve eso. Tres maneras de fallar la misma pregunta: ¿esto que estoy contando gira, o solo conecta?»</p>
+    <p><strong>IMAGEN:</strong> un video congelado en una explicación aburrida; un informe de doce páginas cerrándose de golpe; un boletín con una frase subrayada y un signo de interrogación al lado.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Ni todo mostrado. Ni todo contado.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:50 a 4:10)</h2>
+    <p><strong>VOZ:</strong> «Y acá el giro tiene dos partes. La primera: el mandamiento "muestra, no cuentes" no nace de Chéjov. Nace de Percy Lubbock, en un libro de 1921 llamado "The Craft of Fiction", que le puso nombre a algo que ya hacía Henry James: dramatizar en vez de resumir, en los prefacios que escribió entre 1907 y 1909. La segunda parte del giro es la que más cuesta aceptar: ni Lubbock ni James dijeron "nunca cuentes". Wayne Booth, en 1961, lo dejó escrito: el autor nunca desaparece del todo, y contar es legítimo e inevitable. No es mostrar contra contar. Es mostrar Y contar, cada uno donde le toca.»</p>
+    <p><strong>IMAGEN:</strong> dos libros abriéndose en pantalla partida, uno de 1921 y otro de 1961; una balanza que se equilibra en vez de inclinarse.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «No es una ley. Es un reparto.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:10 a 5:40)</h2>
+    <p><strong>VOZ:</strong> «La herramienta de hoy tiene tres casillas. Uno: ¿qué gira acá, la decisión, la revelación, el beat? Eso se MUESTRA, en tiempo real, con un detalle concreto. Dos: ¿qué solo conecta un giro con el siguiente, el paso de los días, el trayecto? Eso se CUENTA, en resumen. Tres, la que casi nadie elige bien: cuando toca mostrar, ¿cuál es el UN detalle que carga el significado? Te lo hago con un caso de esta casa. Un video de una beca de ochenta mil lempiras tenía a un alumno explicando a cámara cómo se sintió. Con el dial: eso gira, así que se muestra; y el detalle no es "estaba feliz", es la mano que tiembla al abrir el sobre azul.»</p>
+    <p><strong>IMAGEN:</strong> tres casillas dibujadas a mano en una pizarra, llenándose una por una; un sobre azul abriéndose en cámara lenta.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Qué se muestra? · ¿Qué se cuenta? · ¿Cuál es el detalle?»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:40 a 6:40)</h2>
+    <p><strong>VOZ:</strong> «"Bueno, pero entonces hay que mostrarlo todo, con su detalle y todo." Hay que concederla, porque suena lógico. Pero Ursula K. Le Guin, en 1998, avisa de lo que pasa si se hace caso: no se puede mostrar todo. Una historia que dramatiza cada trámite, cada saludo, cada minuto que no gira, se vuelve más larga y no más clara. El arte no es mostrar más: es elegir mejor qué se muestra y qué se cuenta.»</p>
+    <p><strong>IMAGEN:</strong> un borrador larguísimo, tachado hasta quedar en una página; una lupa sobre un solo detalle elegido.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «No es mostrar más. Es elegir mejor.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:40 a 7:30)</h2>
+    <p><strong>VOZ:</strong> «Esta semana, tres cosas cortas. Primera: la próxima vez que cites "muestra, no cuentes", decí de dónde sale de verdad: Lubbock, 1921, sobre James, 1907 a 1909, no de Chéjov. Segunda: buscá, en algo que estés por escribir, qué gira y qué solo conecta, y tratalos distinto. Tercera: cuando toque mostrar, elegí UN detalle, como el vidrio de botella de la carta de 1886, y confiá en que alcanza. "No me digas que la luna brilla" no lo escribió Chéjov, pero el vidrio de la botella sí. Esto es "Mostrar, contar y cuándo cada uno", quinta etapa de la Ruta del Hilo que Tira.»</p>
+    <p><strong>IMAGEN:</strong> el dial de tres casillas escrito a mano en un cuaderno; corte final a la carta real de 1886, con el vidrio dibujado al lado.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Qué se muestra · Qué se cuenta · El detalle que muestra · Misión: Mostrar, contar y cuándo cada uno · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🪞 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El mismo esqueleto sirve para cualquier etapa. Y aquí, además, el esqueleto es el propio tema: este guion es un ejemplo de lo que la etapa enseña, porque su propia escena central muestra con un detalle real y fechado, en vez de explicarlo.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué tiene que hacer</th><th>Cómo se hizo aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>La cita de la luna, atribuida a Chéjov, y la promesa de saber por qué está mal</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien con un deseo concreto</td><td>Chéjov, médico y escritor, que le escribe a su hermano un consejo pequeño y preciso</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>El video que explica, el informe que se ahoga en detalle, el boletín sin dato</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>El mandamiento no es de Chéjov, es de Lubbock (1921) sobre James (1907-1909); y contar también es legítimo (Booth, 1961)</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>El dial de tres casillas, aplicado al caso real del video de la beca</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«Hay que mostrarlo todo»: concedida, y contestada con Le Guin (1998), no se puede mostrar todo</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>El dial escrito a mano, y la carta de 1886 como prueba de que el detalle real existe</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎬 La regla del minuto dos</span><br>
+      <span>Ninguna definición antes del minuto dos. Hasta ahí manda la historia: <span class="hl">una frase famosa, mal atribuida</span>. Las palabras «dial», «detalle concreto» y «etiqueta de estatus» entran cuando el público ya <span class="hl2">necesita</span> un nombre para lo que acaba de reconocer en su propio informe que se ahoga en detalle. Y el guion pasa su propia prueba: su escena central (la carta de 1886) tiene un detalle real y fechado, no una definición.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Seis lecturas: mostrar, contar y la cita mal hecha, seis voces</h2>
+    <p>El tema de la etapa contado seis veces: un cuento sobre un hombre que colecciona las fuentes verdaderas de las frases célebres, un capítulo de venta donde quien todo lo explica pierde frente a quien muestra un solo detalle, un ensayo a escala de especie sobre por qué la mente recuerda lo concreto, una entrevista imaginada con Antón Chéjov, una conversación entre Jesús Quintero y Miguel Delibes sobre el detalle exacto, y un <strong>careo</strong> donde se disputa si «muestra, no cuentes» es una buena regla o una superstición del taller. Seis maneras de que la idea entre por donde el examen no llega.</p>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;"><strong>Cada lectura trae sus propias preguntas debajo</strong>: cinco de comprensión, dos de completar y dos de análisis, del texto que se acaba de leer y de ningún otro. Y las seis empiezan <strong>plegadas</strong>, para poder elegir sin tener que recorrer veinte pantallas.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> los <strong>cinco primeros</strong> son <strong>ejercicios de estilo escritos por esta casa</strong>: los tres primeros en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari, y el cuarto y el quinto son <strong>entrevistas imaginadas</strong>, a la manera de Joaquín Soler Serrano la una y del programa de Jesús Quintero con Miguel Delibes la otra. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado, y los dos encuentros <strong>nunca ocurrieron</strong>. El <strong>sexto es un careo</strong>, y ese no imita a nadie: sus turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas. Regla extra de esta casa, y en las seis: <strong>toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</strong>. El único artificio permitido es la voz.</div>
+    </div>
+    <div class="tip">
+      <span class="ti">🪞</span>
+      <div><strong>Aviso propio de esta etapa, y las seis lecturas lo respetan:</strong> el tema mismo es la cita mal hecha, así que las seis distinguen lo real de lo apócrifo. La carta de Chéjov (10 de mayo de <strong>1886</strong>) aparece más de una vez, siempre con su fecha exacta. Ninguna de las seis presenta una herramienta <strong>sin su autor y su año</strong>: Lubbock (1921) entra siempre cerca de James (1907-1909), cuando hablan del linaje del dogma.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir la entrevista</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir la conversación</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir el careo</button>
+      <button class="btn btn-pri" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🗂️ Lectura 1 · «La luna que Chéjov no escribió» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges sin su costumbre de las citas apócrifas. Las obras, fechas y personas que el cuento menciona son reales y comprobables (la carta de Chéjov del 10 de mayo de 1886; Percy Lubbock, «The Craft of Fiction», 1921). Aurelio Zaldúa es invención declarada.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">A Aurelio Zaldúa lo conocí en la sala de un archivo municipal, donde pasaba las tardes con un cuaderno de tapa dura en el que anotaba, junto a cada frase célebre que alguien le repetía como si fuera evangelio, una sola pregunta: ¿quién la escribió, y dónde? No coleccionaba frases, decía; coleccionaba fuentes, que es una colección mucho más pequeña y mucho más difícil de completar, porque casi ninguna frase famosa resiste que le pidan sus papeles.</p>
+    <p class="lect-p">Había encontrado, con los años, fuentes verdaderas para docenas de máximas que el mundo repetía sin firma: el libro exacto, la página, el año. Sabía, por ejemplo, que Robert McKee había escrito en 1997, en un libro llamado «Story», que una escena tiene que girar una carga de valor; sabía que Percy Lubbock había publicado en 1921 un libro, «The Craft of Fiction», donde nombraba por primera vez la distinción entre la escena que dramatiza y el panorama que resume. Esas dos las tenía fichadas, con su cita completa, en la primera página del cuaderno.</p>
+    <p class="lect-p">La frase que lo obsesionaba desde hacía años era otra: «No me digas que la luna brilla; muéstrame el destello de la luz en un vidrio roto.» La había visto atribuida a Antón Chéjov en manuales de guion, en carteles de talleres de escritura, en la contratapa de al menos tres libros distintos sobre el oficio de narrar. Nunca, en ninguna de esas apariciones, venía con una referencia: ni título de libro, ni carta, ni año. «Una frase que todos citan y que nadie fecha», me dijo una tarde, «es la peor especie de mi colección, porque parece más verdadera cuanto más se repite, y la repetición no es una fuente.»</p>
+    <p class="lect-p">Zaldúa pasó, según me contó, casi dos años detrás de esa frase. Escribió a bibliotecas, pidió ediciones completas de la correspondencia de Chéjov, aprendió lo suficiente de ruso para desconfiar de las traducciones apresuradas. Lo que encontró no fue la frase de la luna. Fue otra cosa, más pequeña y más real: una carta que Chéjov le había escrito a su hermano Aleksandr el 10 de mayo de 1886, donde le daba un consejo de escritura muy distinto al que el mundo le atribuía. Para dar una noche de luna, decía la carta, no hace falta nombrarla: basta con decir que en la presa de un molino brilló, como una estrellita, un pedazo de vidrio de una botella rota, y que la sombra negra de un perro o de un lobo rodó como una bola.</p>
+    <p class="lect-p">«El consejo es real», me dijo Zaldúa, mostrándome la fotocopia de la carta con la fecha subrayada tres veces, «pero la frase que todos citan no está en ninguna parte de la obra de Chéjov. Alguien, en algún momento del siglo veinte, resumió el consejo del vidrio de botella en una frase más corta y más fácil de repetir, y con el tiempo la frase resumida se volvió más famosa que la carta que la originó, y terminó firmada por el hombre equivocado.» Lo dijo sin indignación, casi con ternura, como quien encuentra, al fin, el rostro verdadero detrás de un retrato que llevaba años mal etiquetado.</p>
+    <p class="lect-p">No volví a ver a Zaldúa después de esa tarde. Supe, por un conocido en común, que había donado su cuaderno de fuentes al mismo archivo donde lo conocí, con una nota pegada en la primera página que decía, más o menos, esto: que una cita sin fuente no es mentira todavía, es solo una promesa que nadie ha cobrado; y que quien la repite sin comprobarla no miente, pero le presta su voz a alguien que quizás nunca dijo eso. Quien tenga la paciencia de perseguir alguna vez una frase célebre hasta su origen descubrirá lo que Zaldúa descubrió antes que nadie se lo enseñara con una fecha impresa: que casi siempre hay una carta real, más pequeña y más precisa que la leyenda, esperando que alguien la lea entera.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>🎭 Lectura 2 · «Donde se cuenta cómo Hilario Pantoja lo explicó todo, y un solo hilo desteñido lo mostró mejor» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, el humor y los refranes de un mozo a la manera de Sancho. Los personajes de la venta, sus nombres y sus hazañas son invención declarada, al modo de los episodios de venta del propio Cervantes.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">En una venta que está, para quien la busque, a mitad de camino entre ninguna parte y el pueblo siguiente, sucedió, en tiempos que ya se van olvidando, que llegó, ya caída la tarde, un hidalgo menor llamado Hilario Pantoja, con la ropa polvorienta y la lengua todavía más suelta que el polvo, jurando a quien quisiera oírlo que venía de librar, él solo, una escaramuza contra tres bandoleros en el vado del río, de la que había salido, según sus propias palabras, «valentísimo, nobilísimo, y el más temido varón de toda la comarca».</p>
+    <p class="lect-p">Sentose Pantoja a la mesa con el ánimo de quien ya se cree hazaña completa antes de contarla entera, y empezó, ventero y parroquianos de por medio, a explicar con gran despliegue de adjetivos cómo había sido su valor, cómo su nobleza, cómo su temple ante el peligro, sin bajar jamás de la superlativa a lo concreto: ni un nombre de bandolero, ni un golpe descrito, ni una herida que mostrar, solo la palabra «valentísimo» repetida de tantas maneras que a la tercera vuelta ya sonaba a disculpa de sí misma.</p>
+    <p class="lect-p">Servía a Pantoja un mozo llamado Toribio, tan aficionado a los refranes como poco impresionado por las palabras grandes, que escuchaba el relato con la ceja levantada y las manos ocupadas en quitarle el polvo a las botas de su amo, hasta que dio, sin querer, con algo que el discurso entero de Pantoja no había mencionado: en la manga derecha del jubón, un solo hilo desteñido, de un vino claro y viejo, justo a la altura donde un brazo se apoya en el mostrador de otra venta, y ni rastro de sangre, de barro de vado, ni de la lucha que la boca contaba con tanto brío.</p>
+    <p class="lect-p">No dijo Toribio una palabra sobre la mancha. Se limitó a colgar el jubón, con la manga bien a la vista de todos, en el respaldo de la silla donde Pantoja seguía explicando su valentísima hazaña, y a servir el vino con la parsimonia de quien no tiene prisa por que la verdad se vea sola. Y se vio sola: el ventero, que había servido vino claro toda la tarde en la venta de al lado antes de que Pantoja llegara, reconoció el color exacto de la mancha, y sonrió sin decir nada, que es la manera más antigua de reírse de alguien sin faltarle el respeto.</p>
+    <p class="lect-p">Cayó Pantoja de su discurso con más ruido que si lo hubieran empujado, porque no hay superlativo que resista a un hilo bien colocado a la vista de todos. Quiso todavía enredar la lengua en más «valentísimos», pero ya nadie lo escuchaba: todos miraban la manga. Fue entonces Toribio, sin abandonar su oficio de servir la mesa, quien remató la escena con el único comentario que se permitió en toda la noche: «Más vale una mancha bien mirada, señor, que cien palabras bien dichas; que la verdad, cuando quiere mostrarse, no necesita que nadie la explique.»</p>
+    <p class="lect-p">Cenaron esa noche en la venta, Pantoja incluido, porque tampoco es la costumbre de esta casa dejar a nadie sin cena por embustero, y el hidalgo, ya sin adjetivos, contó al fin lo que de verdad le había pasado esa tarde: que se había quedado dormido bajo un árbol y había llegado tarde a la venta vecina, donde, avergonzado de admitirlo, se inventó sobre la marcha la escaramuza del vado. Y quedó, entre los parroquianos, la lección de Toribio, repetida esa noche y muchas otras: quien todo lo explica con adjetivos grandes suele estar tapando la falta de un detalle pequeño; y quien tiene el detalle, no necesita el adjetivo.</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌐 Lectura 3 · «La especie que confunde la luna con el vidrio» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie, la frase corta y el aterrizaje en el presente. Todas las obras, autores, años y cifras citados son reales y comprobables, y cada estudio va con su año, como manda esta casa.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Decile a alguien que «la escuela mejoró muchísimo» y, un mes después, no se acordará de la frase. Mostrale, en cambio, a un solo alumno que antes no levantaba la mano y ahora pregunta sin que se lo pidan, y esa imagen le va a durar años. No es cuestión de gusto: es cuestión de cómo está hecha la memoria de nuestra especie, y hay más de medio siglo de estudios que lo confirman.</p>
+    <p class="lect-p">En 1971, el psicólogo canadiense Allan Paivio propuso una teoría que hoy sigue citándose en los manuales de psicología cognitiva: la teoría de la doble codificación. Según Paivio, las palabras concretas e imaginables (vidrio, botella, mano, sobre) se procesan por dos vías a la vez, la verbal y la visual, mientras que las palabras abstractas (mejora, impacto, calidad) solo tienen la vía verbal. Dos vías guardan mejor un recuerdo que una sola, y por eso lo concreto se recuerda con más fuerza y durante más tiempo que lo abstracto.</p>
+    <p class="lect-p">El hallazgo no se quedó en el laboratorio de Paivio. En 1993, los investigadores Mark Sadoski, Ernest Goetz y Suzanne Fritz publicaron un estudio sobre el impacto de lo concreto en la comprensión, el interés y el recuerdo de un texto, y encontraron lo mismo que Paivio veinte años antes: los pasajes con detalles concretos se comprenden mejor, interesan más y se recuerdan con más precisión que los pasajes escritos en abstracciones. Es lo que hoy se conoce como el efecto de concreción, un hallazgo replicado, no una moda de un solo estudio.</p>
+    <p class="lect-p">¿Por qué habría de ser así? Aquí conviene bajar a la utilidad de recordar. Una especie que necesitara guardar cada frase abstracta que alguien le dijo se quedaría sin memoria útil en una semana; lo que le sirve es guardar la imagen concreta que puede reconocer la próxima vez: el vidrio, el sobre, la mano que tiembla. Un adjetivo como «hermosa» no le da a la mente nada que archivar; un detalle como «brilló como una estrellita un vidrio de botella» sí, porque se puede ver.</p>
+    <p class="lect-p">Y aquí aparece el peligro que esta etapa entera viene a señalar: si la mente recuerda mejor lo concreto, también recuerda mejor una cita concreta y falsa que una carta real y abstracta en su fama. La frase de la luna y el vidrio roto, corta, visual, fácil de repetir, se volvió más memorable que la carta de 1886 que en realidad la inspiró, y por eso terminó desplazando a su fuente. Lo concreto gana la memoria, tenga o no autor comprobado.</p>
+    <p class="lect-p">Pero la especie que recuerda por lo concreto también necesita resumir: un relato, un informe, una vida entera hecha solo de detalles concretos desbordaría cualquier memoria en minutos. Por eso la misma mente que retiene mejor el vidrio de botella también necesita, para no ahogarse, que alguien le cuente en una línea los meses en que no pasó nada. Mostrar y contar no son enemigos: son las dos herramientas que la misma memoria necesita, una para lo que gira, y otra para lo que solo conecta.</p>
+  </div>
+
+  <div class="card ac-jade" id="lect-entrevista">
+    <h2>🎙️ Lectura 4 · «El consejo que no era una ley» (entrevista, a la manera de Joaquín Soler Serrano)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una entrevista IMAGINADA con Antón Chéjov (Taganrog, 1860 · Badenweiler, Alemania, 1904), médico y escritor, autor de «La Gaviota» (1896), «La dama del perrito» (1899) y «El jardín de los cerezos» (1904), y de la carta a su hermano Aleksandr del 10 de mayo de 1886. La firma <strong>Joaquín Soler Serrano</strong> (Murcia, 1919 · Barcelona, 2010), el periodista de «A fondo» (Televisión Española, 1976 a 1981). <strong>El encuentro nunca ocurrió</strong>: Chéjov murió en 1904, quince años antes de que naciera Soler Serrano, y esta pieza se acoge, como en la etapa anterior de esta ruta, al género de las entrevistas imposibles. Las palabras que se le atribuyen a Chéjov son invención de la casa; su biografía, sus obras y sus fechas son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir esta entrevista</button></div>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Buenas noches. A nuestro invitado le atribuyen, desde hace un siglo, una frase que dice así: «No me digas que la luna brilla; muéstrame el destello de la luz en un vidrio roto.» Antón Pávlovich, ¿la escribió usted?</p>
+    <p class="lect-p"><strong>CHÉJOV.</strong> No, nunca la escribí; a mi hermano, en 1886, le escribí otra cosa. Le dije que para dar una noche de luna no hacía falta nombrarla: bastaba con decir que en la presa de un molino brilló, como una estrellita, un pedazo de vidrio de una botella rota. Es un consejo más pequeño que esa frase, y más mío.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> ¿Le molesta que se la atribuyan?</p>
+    <p class="lect-p"><strong>CHÉJOV.</strong> Me molesta menos la frase que la manera en que se usa. La frase, tomada sola, suena a mandamiento: nunca cuentes, siempre muestra. Yo no dije eso. Dije que un detalle bien elegido dice más que una palabra grande y vacía, que no es lo mismo.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Usted era médico además de escritor.</p>
+    <p class="lect-p"><strong>CHÉJOV.</strong> Sí, y creo que el oficio de médico me enseñó a desconfiar de los síntomas descritos con adjetivos. Un paciente que dice «me duele mucho» me dice menos que uno que dice «me duele aquí, cuando respiro hondo». Lo mismo pasa en un cuento: «una noche hermosa» no me dice nada; un vidrio que brilla en la presa de un molino, sí.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> ¿Entonces nunca resumía nada, nunca contaba?</p>
+    <p class="lect-p"><strong>CHÉJOV.</strong> Al contrario: contaba casi todo el tiempo. Un cuento no puede detenerse a mostrar cada minuto de la vida de un personaje; sería insoportable, y aburriría más que cualquier resumen. Yo elegía el momento que giraba, lo mostraba con un detalle, y el resto lo contaba en una frase, para no gastarle al lector el tiempo en lo que no cambiaba nada.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Hay críticos, ya en el siglo veinte, que insistieron mucho en esa distinción entre mostrar y contar.</p>
+    <p class="lect-p"><strong>CHÉJOV.</strong> Lo sé, y no fui yo quien la puso en esos términos. Un inglés, Percy Lubbock, escribió un libro en 1921 donde le puso nombre a la diferencia entre la escena y el panorama; y antes que él, Henry James ya lo practicaba, en los prefacios que escribió entre 1907 y 1909, cuando pedía dramatizar en vez de resumir. Yo estaba muerto para entonces: no pude firmar nada de eso, aunque el consejo de mi carta se le parezca.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> ¿Y qué le diría usted a quien cita la frase de la luna como si fuera suya?</p>
+    <p class="lect-p"><strong>CHÉJOV.</strong> Que busque la carta, no la frase. La carta tiene fecha, tiene destinatario, tiene un vidrio de botella real. La frase no tiene nada de eso, y una cita sin fecha ni destinatario es, como mucho, un rumor con buena reputación.</p>
+  </div>
+
+  <div class="card ac-purple" id="lect-gala" data-voz="Quintero y Delibes">
+    <h2>🌾 Lectura 5 · «El detalle que no necesitó explicación» (El Loco de la Colina: Jesús Quintero conversa con Miguel Delibes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una conversación IMAGINADA entre Jesús Quintero (San Juan del Puerto, Huelva, 1940 · 2022), periodista de radio y televisión conocido como El Loco de la Colina, y el escritor Miguel Delibes (Valladolid, 1920 · 2010), novelista del detalle concreto castellano, autor de «El camino» (1950), «Los santos inocentes» (1981) y «El hereje» (1998), cazador y naturalista. <strong>El encuentro nunca ocurrió</strong> y las palabras que se les atribuyen son invención de la casa; las obras, fechas y datos de los dos son reales y comprobables. Los silencios van entre paréntesis, como acotación, y nadie lleva raya de diálogo.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir esta conversación</button></div>
+    <p class="lect-p"><strong>QUINTERO.</strong> Miguel. (silencio) Cazador, naturalista, escritor de campo abierto.</p>
+    <p class="lect-p"><strong>DELIBES.</strong> Y de campo cerrado también, Jesús, que en «Los santos inocentes» hay más aire libre del que parece encerrado entre las tapas de un libro.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio largo) Cuentan que usted nunca explicaba una emoción. Que la dejaba en un gesto.</p>
+    <p class="lect-p"><strong>DELIBES.</strong> Procuraba, al menos. Explicar que un hombre está desesperado es fácil y no convence a nadie; mostrar que ese hombre, sin decir palabra, se queda mirando un nido vacío, convence más que cualquier explicación, si el nido está bien puesto en su sitio.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) ¿Y cómo se elige el nido, entre todos los detalles posibles de una escena?</p>
+    <p class="lect-p"><strong>DELIBES.</strong> Se elige el que ya estaba cargado de sentido antes de que uno lo pusiera ahí. El campo me lo enseñó antes que la literatura: un cazador no describe el bosque entero, aprende a mirar solo lo que se mueve distinto. En una página pasa igual: no se muestra todo, se muestra lo que ya está a punto de moverse.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Hay quien dice que «muestra, no cuentes» es casi una religión en los talleres de hoy.</p>
+    <p class="lect-p"><strong>DELIBES.</strong> Y a mí esa frase, dicha así, sin matices, me suena a receta de cocina más que a consejo de escritor. Yo conté muchísimo, Jesús. Conté los años enteros que le llevó a Azarías aprender a querer a la grajilla, en un párrafo, porque nadie necesita ver cada uno de esos días para creerlo.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) ¿Entonces la regla es falsa?</p>
+    <p class="lect-p"><strong>DELIBES.</strong> La regla, dicha como ley, es una simplificación. Lo que es verdad es más modesto: hay momentos que piden mostrarse, con un detalle que uno elige, y hay tramos enteros que solo piden contarse, sin adorno, para que el lector llegue descansado al momento que sí importa.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Un último gesto, Miguel, antes de irnos.</p>
+    <p class="lect-p"><strong>DELIBES.</strong> (silencio) Le doy uno de verdad, aunque no esté en ningún libro mío: la última vez que salí al campo, con la escopeta ya guardada más por costumbre que por caza, me quedé mirando cómo un perro viejo olfateaba un rastro que ya no iba a seguir. No hace falta que le explique lo que sentí. El perro ya lo dijo todo.</p>
+  </div>
+
+  <div class="card ac-jade" id="lect-debate">
+    <h2>🥊 Lectura 6 · «¿"Muestra, no cuentes" es una buena regla, o una superstición del taller?» (careo, con las dos posturas y sus réplicas)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Careo escrito por la casa sobre una disputa real del oficio, que sigue viva. No es una entrevista ni un pastiche: los turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas, precisamente para <strong>no poner palabras inventadas en boca de nadie</strong>. Las personas reales aparecen citadas en tercera persona como fuentes, con autor, obra y año, y todo lo que se les atribuye está publicado. Manda además la regla del acero: cada postura va en su <strong>mejor versión</strong>, escrita como la escribiría su mejor defensor.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir este careo</button></div>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> La pregunta en disputa, una sola y escrita antes de empezar. La máxima «muestra, no cuentes», popularizada en los talleres de escritura del siglo veinte a partir de la distinción de Percy Lubbock («The Craft of Fiction», 1921) sobre la práctica de Henry James (prefacios de la New York Edition, 1907-1909), y sostenida con una carta de Antón Chéjov (10 de mayo de 1886) que en realidad dice algo más modesto, ¿es una buena regla, un correctivo útil, o una superstición del taller que se volvió dogma? No se discute aquí si el detalle concreto ayuda: Wayne Booth (1961) y Ursula K. Le Guin (1998) aceptan los dos que sí. Se discute si conviene enseñarla como regla o si hace más daño que bien.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> La postura que defiende la regla, en su mejor versión. El principiante casi siempre sobre-explica: cuenta lo que el lector ya intuye, resume la emoción en vez de dejar que un detalle la produzca, y satura el texto de adjetivos abstractos («una noche hermosa», «una escuela mejor») que no se pueden verificar ni recordar. «Muestra, no cuentes» funciona, en ese momento del aprendizaje, como un correctivo de choque: exagera hacia el otro lado para curar un vicio real. Y hay una razón que no es solo de oficio: Allan Paivio (1971) y el efecto de concreción de Sadoski, Goetz y Fritz (1993) muestran que lo concreto se recuerda y convence más que lo abstracto. Un taller que insiste en mostrar no está inventando una moda: está entrenando la única forma de prosa que la memoria del lector de verdad retiene.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> La postura que defiende que es una superstición mal aplicada, en su mejor versión. Wayne Booth, en «The Rhetoric of Fiction» (1961), mostró algo que la regla, dicha sin matices, esconde: el autor nunca desaparece del todo, incluso en la prosa más «mostrada», y contar es una herramienta legítima e inevitable, no una muleta de principiante. Ursula K. Le Guin, en «Steering the Craft» (1998), fue todavía más lejos: advirtió que tomar «show don't tell» como ley absoluta produce el vicio contrario al que se quería curar, una prosa hinchada de escenas que dramatizan hasta el trámite más insignificante, porque no se puede mostrar todo. Y la propia carta de Chéjov, mal citada durante un siglo, es la prueba de cuánto daño hace un dogma sin fuente: se volvió más fuerte que la fuente real que lo originó.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Las réplicas, cruzadas, empezando por la defensa.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> Se concede que la regla, enseñada sin límite, produce el vicio que Le Guin señala: nadie defiende una prosa que dramatice cada trámite. Pero eso no invalida su uso como correctivo temporal: un principiante que sobre-cuenta necesita, primero, aprender a mostrar, y solo después aprender cuándo no hacerlo. Enseñar el límite desde el primer día, antes de que el hábito de mostrar esté afianzado, suele producir el vicio original otra vez: un texto que ni muestra ni cuenta bien, por miedo a equivocarse de lado.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> Y la réplica de este lado no es que mostrar esté mal enseñado como técnica, sino que enseñarlo como «regla» y no como «herramienta con límite» tiene un costo que dura más allá del aprendizaje: quien la aprendió como ley absoluta la repite toda la vida, y encima la firma con el nombre equivocado. El costo de enseñar bien el límite desde el principio (Booth, 1961) es menor que el costo de tener que desaprender un dogma después, con una cita fantasma incluida.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> El terreno común, que casi siempre es más grande de lo que parece desde fuera.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Las dos partes aceptan tres cosas. Primera: el principiante sobre-cuenta, y el detalle concreto elegido se recuerda y convence más que lo abstracto; ni Booth ni Le Guin niegan eso. Segunda: no se puede mostrar todo, porque el texto se ahogaría en su propio detalle; ninguna de las dos posturas defiende dramatizar cada trámite. Tercera: la frase «no me digas que la luna brilla» no es de Chéjov, y citarla como si lo fuera es, en cualquiera de las dos posturas, un error que hay que corregir.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Lo que sigue en disputa, dicho sin adornos: si el eslogan «muestra, no cuentes» hace más bien como correctivo de un vicio real que mal como ley mal citada. El dato que acercaría la disputa es el que ninguno de los dos bandos tiene todavía en la mano: una comparación, con lectores reales, del mismo pasaje contado mostrado y contado resumido, midiendo cuál se entiende mejor y cuál se recuerda más. Hasta que ese dato exista, esta casa enseña el dial de mostrar y contar con su autor y su año al lado, y enseña también que la pregunta que de verdad decide no es «¿mostrar o contar?», sino «¿qué necesita este pasaje para que su giro se sienta?».</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🖨️ Todo esto se imprime</h2>
+    <p>Cada lectura sale con <strong>su texto y sus preguntas</strong>, y la pauta de esas preguntas va en su propia hoja al final. Y las seis se pueden sacar juntas en un pliego, cada una arrancando en su hoja.</p>
+    <div class="tip">
+      <span class="ti">📖</span>
+      <div><strong>Las preguntas se contestan con el texto delante.</strong> No es un examen de memoria: es un examen de lectura, y por eso viven pegadas a su lectura y no en una batería al final. Las de <strong>análisis complejo van sin XP a propósito</strong>.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego con las 54 preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🪞 Por qué seis voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento vuelve el tema <strong>un hombre que persigue una cita hasta su fuente real</strong>; el capítulo lo pone en <strong>escena, risa y refrán</strong>, con un hidalgo que explica y un mozo que muestra un solo hilo; y el ensayo lo lleva a <strong>escala de especie</strong>, de Paivio al efecto de concreción. Las dos voces siguientes hacen lo que ni el cuento ni el ensayo pueden: la <strong>entrevista</strong> sienta al propio Chéjov y le hace corregir el mito en voz alta; y la <strong>conversación</strong> baja el tema al habla viva, con Delibes y el nido vacío que no necesitó explicación. Y el <strong>careo</strong> pone <strong>las dos caras de una disputa abierta de verdad</strong>, si el eslogan hace más bien como correctivo que mal como ley, cada una en su mejor versión, con sus réplicas y su terreno común, y termina diciendo <strong>qué dato la acercaría</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión nueva lleva sus seis lecturas sobre el tema de la etapa: <span class="hl">cuento a la manera de Borges, capítulo a la manera de Cervantes, ensayo a la manera de Harari, la entrevista de la casa, la conversación del Loco de la Colina y el careo de las dos posturas</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista en los cinco primeros, la declaración de que <span class="hl2">los encuentros de las entrevistas nunca ocurrieron</span>, la etiqueta propia del careo, y la regla de fondo en las seis: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con la tabla madre de las seis herramientas, la cita mal hecha explicada a fondo, el dial de tres casillas, las cinco etiquetas de estatus, los casos, la hoja de fuentes con la etiqueta de cada obra y la pauta completa.</p>
+      <a href="../../fichas/ficha-hilo-mostrar-contar.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla de oro de esta ruta rige aquí entera: <strong>ninguna herramienta se cita sin autor, año y límite</strong>, y <strong>ningún pasaje se da por bueno sin sus tres casillas</strong> (qué se muestra, qué se cuenta, cuál es el detalle).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Percy Lubbock, «The Craft of Fiction» (1921):</strong> la distinción entre la escena que dramatiza y el panorama que resume. <strong>Manual de oficio con autor y año.</strong></li>
+      <li><strong>Henry James, prefacios de la New York Edition (1907-1909):</strong> «dramatizar, dramatizar», la práctica de poner en escena en vez de resumir. <strong>Práctica declarada de un autor sobre su obra.</strong></li>
+      <li><strong>Antón Chéjov, carta a su hermano Aleksandr (10 de mayo de 1886):</strong> el vidrio de botella en la presa del molino, el detalle concreto real. <strong>Consejo real, pero mal citado como aforismo</strong> en la frase «no me digas que la luna brilla».</li>
+      <li><strong>Wayne Booth, «The Rhetoric of Fiction» (1961):</strong> el autor nunca desaparece; contar es legítimo e inevitable. <strong>Tesis crítica / argumento teórico.</strong></li>
+      <li><strong>Ursula K. Le Guin, «Steering the Craft» (1998):</strong> «show don't tell» tomada como ley mata el resumen necesario y engorda la prosa. <strong>Manual de taller con voz de autora.</strong></li>
+      <li><strong>John Gardner, «The Art of Fiction» (1984):</strong> el sueño vívido y continuo; la distancia narrativa como un dial que se gradúa. <strong>Manual/crítica de oficio con autor y año.</strong></li>
+      <li><strong>Allan Paivio, teoría de la doble codificación (1971):</strong> lo concreto e imaginable se recuerda mejor que lo abstracto. <strong>Hallazgo replicado en psicología cognitiva.</strong></li>
+      <li><strong>Sadoski, Goetz y Fritz, sobre el impacto de lo concreto en la comprensión y el recuerdo de un texto (1993):</strong> el efecto de concreción. <strong>Hallazgo replicado, citado en el ensayo de esta etapa.</strong></li>
+      <li><strong>Las seis lecturas de esta misión:</strong> cinco ejercicios de estilo escritos por la casa (tres en homenaje a Borges, Cervantes y Harari, y dos entrevistas imaginadas: una con Antón Chéjov a la manera de Joaquín Soler Serrano, y una conversación entre Jesús Quintero y Miguel Delibes) y un <strong>careo</strong>, «¿"Muestra, no cuentes" es una buena regla, o una superstición del taller?», que no imita a nadie: sus turnos los firman los papeles y las personas reales se citan en tercera persona como fuentes. <strong>Los cinco primeros son pastiche declarado, no obra de esos autores</strong>, y los dos encuentros <strong>nunca ocurrieron</strong>. Las señas de Joaquín Soler Serrano y su programa «A fondo» (1976 a 1981); y las de Jesús Quintero y Miguel Delibes, con «El camino» (1950) y «Los santos inocentes» (1981). <strong>Un aviso que la entrevista lleva escrito</strong>: Chéjov murió en 1904, quince años antes de que naciera Soler Serrano, así que la pieza se acoge al género de las entrevistas imposibles y todo lo que se le hace decir es invención de la casa.</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba sabiendo qué es la doble codificación de Paivio: se aprueba <strong>tomando un pasaje real y sacándole las tres casillas del dial</strong>. Si alguna no se puede llenar, se queda pendiente, a la vista.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-STORYTELLING.md">🧵 El compendio de Storytelling</a>: las doce etapas de esta ruta, con lo que enseña cada una, la regla de oro de la materia y el Cuaderno de Hilos.</li>
+      <li><a href="../../misiones/ruta-hilo-la-escena/la-escena.html">🎭 La escena (etapa 4)</a>: la unidad de trabajo y su giro de valor, de la que esta etapa hereda la pregunta de qué gira.</li>
+      <li><a href="../../misiones/ruta-hilo-forma-formas/forma-formas.html">📐 La forma de las formas (etapa 3)</a>: el protocolo de fechar y criticar cualquier estructura, del que esta etapa hereda el vocabulario.</li>
+      <li><a href="../../misiones/ruta-hilo-deseo-obstaculo/deseo-obstaculo.html">🎯 El deseo y el obstáculo (etapa 2)</a>: el motor que ahora se decide, pasaje a pasaje, mostrar o contar.</li>
+      <li><a href="../../misiones/ruta-hilo-cadena-hueco/cadena-hueco.html">🧵 La cadena y el hueco (etapa 1)</a>: la brecha entre lo esperado y lo que sale, que esta etapa localiza dentro de cada pasaje.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene en la Ruta del Hilo que Tira, con sus doce etapas.</li>
+      <li><a href="../../fichas/ficha-hilo-mostrar-contar.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la tabla madre y el dial, para trabajar a lápiz y guardar con fecha.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar <strong>un pasaje real que hayas escrito o leído esta semana</strong> y aplicarle el dial: qué gira y merece mostrarse, qué solo conecta y merece contarse, y cuál sería el único detalle concreto elegido. La prueba de que está aprendida es que se pueda decir de dónde sale de verdad la regla, y que la carta de Chéjov de 1886 se cite completa, sin la frase fantasma pegada encima.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🪞</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta del Hilo que Tira · Etapa 5: Mostrar, contar y cuándo cada uno</div>
+    <div class="diploma-mascot" aria-hidden="true">🪞</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🪞</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«El vidrio de la botella es de Chéjov; la frase de la luna, de nadie» 🪞 · 🧵 Ruta del Hilo que Tira · Etapa 5 de 12.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/mostrar-contar.js"></script>
+  <!-- El aparato de lecturas va ANTES del marcador: pliega los seis textos y les
+       mete sus preguntas dentro, y el marcador necesita el documento ya montado
+       para saber cuáles son sus zonas subrayables. -->
+  <script src="../../js/lecturas.js"></script>
+  <script src="../../js/lecturas-marcador.js"></script>
+</body>
+</html>
