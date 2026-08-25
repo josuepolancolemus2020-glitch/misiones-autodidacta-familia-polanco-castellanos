@@ -189,6 +189,7 @@ const MISSIONS = [
   { id: 48, title: 'La voz y el punto de vista: quién cuenta y cuánto sabe', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '👁️', ruta: 'hilo', etapa: 6, sello: 'familiar', url: 'misiones/ruta-hilo-voz-punto-vista/voz-punto-vista.html' },
   { id: 49, title: 'El tiempo del relato: orden, elipsis y suspense', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '⏳', ruta: 'hilo', etapa: 7, sello: 'familiar', url: 'misiones/ruta-hilo-tiempo-relato/tiempo-relato.html' },
   { id: 50, title: 'Emoción sin chantaje: conmover no es manipular', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '💧', ruta: 'hilo', etapa: 8, sello: 'familiar', url: 'misiones/ruta-hilo-emocion-sin-chantaje/emocion-sin-chantaje.html' },
+  { id: 51, title: 'La historia que persuade, y el freno ético', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '⚖️', ruta: 'hilo', etapa: 9, sello: 'familiar', url: 'misiones/ruta-hilo-historia-persuade/historia-persuade.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -246,12 +247,11 @@ const ETAPAS_PREVISTAS = {
     11: 'Historia de la ley: qué miedo escribió cada norma',
     12: 'El expediente propio: escrito, plazo y defensa de la casa',
   },
-  /* Las cuatro que faltan de la Ruta del Hilo que Tira. Las etapas 1 a 8 ya
+  /* Las tres que faltan de la Ruta del Hilo que Tira. Las etapas 1 a 9 ya
      estan construidas y sus titulos salen de MISSIONS, no de aqui: lo
      previsto y lo hecho no pueden anunciarse dos veces en el mismo mapa. Los
      titulos salen de COMPENDIO-STORYTELLING.md, capitulos 5 al 15. */
   hilo: {
-    9:  'La historia que persuade, y el freno ético',
     10: 'La historia de verdad: narrativa de no ficción',
     11: 'Contar de pie y contar en imagen',
     12: 'El taller: revisión con método y prueba de dominio',
