@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Ruta del Hilo que Tira, etapa 10</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-hilo-historia-de-verdad/historia-de-verdad.html"></iframe>
+<iframe id="app" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba la etapa 10 de la Ruta del Hilo que Tira (Storytelling): la
+   historia de verdad, narrativa de no ficción. Bancos, laboratorio, los ocho
+   casos, el guion, las seis lecturas con sus preguntas dentro, el marcador,
+   la impresión, la ficha, la materia y la ruta en el mapa.
+
+   Las reglas propias de la materia que aquí se vigilan con más saña:
+     1. NINGUNA HERRAMIENTA SIN AUTOR Y AÑO. Cada herramienta o caso que la
+        etapa menciona (Wolfe 1973, Capote 1966, Lejeune 1975, Malcolm 1990,
+        Cooke 1980-1981, Frey 2003/2006) va con su año, en las cinco
+        secciones de prosa. Esta etapa no tiene fuente antes de Cristo, así
+        que el regex de años del molde vale tal cual, sin la excepción de
+        a.C. que sí necesitó la etapa 9.
+     2. LA GRIETA A LA VISTA: reordenar (oficio, lícito) no es inventar (otra
+        cosa, con otro nombre), y «es una buena historia, un detalle
+        inventado no importa» es la trampa que esta etapa desarma.
+     3. LA FICHA DE LA NO FICCIÓN (tres casillas) es la herramienta
+        reutilizable de la etapa, y NO se confunde con el freno ético del
+        relato de la etapa 9, que aquí no se repite como tema propio.
+     4. LA PUERTA A LA RUTA DEL EXPEDIENTE REAL tiene que estar declarada a
+        la vista, porque esta etapa es justo eso: una puerta.
+     5. CUIDADO ESPECIAL CON CAPOTE: las dudas sobre «A sangre fría» son
+        cuestionamientos documentados, no una sentencia de que mintió en
+        todo el libro; y la entrevista imaginada es con Capote, nunca con
+        Kapuściński.
+
+   La comprobación de herramientas mira las cinco secciones de PROSA
+   (Aprende, Estructura, Casos, Guion y Lecturas), no la página entera: los
+   bancos pintan rótulos que son fichas de juego (es la trampa 1 de la
+   norma 5-nonies).
+
+   El guion largo se busca con su escape de código (u2014), nunca con el
+   caracter puesto directo en este archivo: una sonda que lo llevara dentro
+   se suspenderia sola, siendo ella misma la primera en incumplir la regla
+   que revisa.
+
+   El resto de la etapa 9 (Bernays, Unamuno, Sunstein, Brehm, Slater,
+   Rouner, Fisher, reactancia, freno ético, ethos, pathos, logos, Anzuelo) se
+   busca con límites de palabra que no disparen con palabras legítimas de
+   esta etapa: «logos» usa un lookbehind, porque «diálogos» y «catálogos» lo
+   contienen sin ser el resto de nadie.   */
+const RAYA = new RegExp('\\u2014');
+const RAYAS_G = new RegExp('\\u2014', 'g');
+const RE_ANY_YEAR = /\b(1[5-9]\d\d|19\d\d|20[0-2]\d)\b/;
+const RE_RESTOS_9 = /\bBernays\b|\bUnamuno\b|\bSunstein\b|\bBrehm\b|\bSlater\b|\bRouner\b|\bFisher\b|\breactancia\b|\bfreno [ée]tico\b|\bethos\b|\bpathos\b|(?<![a-záéíóúñA-ZÁÉÍÓÚÑ])logos\b|\bAnzuelo\b/i;
+const out = document.getElementById('out');
+const L = []; let fallos = 0, sembrado = false;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+const appFrame = document.getElementById('app');
+appFrame.onload = () => {
+  if (sembrado) return;
+  sembrado = true;
+  try {
+    appFrame.contentWindow.localStorage.setItem('faro_session', JSON.stringify({ user: 'josue', nombre: 'Josué Edmundo' }));
+    appFrame.contentWindow.localStorage.removeItem('faro_v1');
+  } catch (e) {}
+  appFrame.contentWindow.location.reload();
+};
+
+function seleccionar(d, w, parr, a, b) {
+  const paseo = d.createTreeWalker(parr, NodeFilter.SHOW_TEXT, null);
+  let off = 0, ini = null, fin = null;
+  while (paseo.nextNode()) {
+    const n = paseo.currentNode, len = n.nodeValue.length;
+    if (!ini && a >= off && a <= off + len) ini = [n, a - off];
+    if (!fin && b >= off && b <= off + len) fin = [n, b - off];
+    off += len;
+  }
+  if (!ini || !fin) return false;
+  const r = d.createRange();
+  r.setStart(ini[0], ini[1]); r.setEnd(fin[0], fin[1]);
+  const s = w.getSelection(); s.removeAllRanges(); s.addRange(r);
+  d.dispatchEvent(new w.Event('selectionchange'));
+  return true;
+}
+
+window.addEventListener('load', async () => {
+  await esperar(1600);
+  const d = document.getElementById('m').contentDocument;
+  const w = document.getElementById('m').contentWindow;
+  const dentro = e => w.eval(e);
+  const cerrar = () => { log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+    document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda hilo etapa 10'; };
+  try {
+    log('── LA MISIÓN ──');
+    ok(d.querySelectorAll('.sec').length === 17, '17 secciones', 'secciones: ' + d.querySelectorAll('.sec').length);
+    ok(/Ruta del Hilo que Tira · Etapa 10 de 12/.test(d.body.textContent), 'se presenta como etapa 10 de 12', 'no se presenta como etapa 10 de la ruta');
+    const cuerpo = d.body.textContent.replace(/\s+/g, ' ');
+    ok(!RE_RESTOS_9.test(cuerpo), 'sin restos de temario de la etapa 9 (Bernays, Unamuno, Sunstein, Brehm, Slater, Rouner, Fisher, reactancia, freno ético, ethos, pathos, logos, Anzuelo)', 'queda temario de la etapa 9 en la página');
+    ok(!/focalizaci[óo]n|narrador no fiable|autor impl[íi]cito|\bBooth\b|\bBal\b|\bStanzel\b|\bBally\b|Cide Hamete|Mart[íi]n Gaite|Lubbock|Le Guin|Gardner|Paivio|Ch[ée]jov|Delibes|mostrar,? no cuentes|vidrio de botella|el dial de mostrar y contar|Mamet|Bazin|Goldman|no-acontecimiento|escena francesa|plano secuencia|Freytag|Vonnegut|kish[oō]tenketsu|Ar[áa]uz|Bracamonte|Campbell|monomito|Todorov|Hitchcock|Truffaut|Baldwin|O'Connor|Sontag|catarsis|sentimentalismo|oxitocina|S[áa]nchez Ferlosio|la cuenta de la emoci[óo]n/i.test(cuerpo),
+       'sin restos de temario de otras rutas o etapas más viejas', 'queda temario de otra misión en la página');
+    ok(!RAYA.test(d.body.textContent), 'sin guiones largos (norma 1-bis)', 'quedan ' + (d.body.textContent.match(RAYAS_G) || []).length + ' guiones largos');
+    const banda = w.getComputedStyle(d.querySelector('.hero'), '::before').content;
+    ok(/LA HISTORIA DE VERDAD/.test(banda) && /WOLFE/i.test(banda) && /CAPOTE/i.test(banda) && !/SUNSTEIN/i.test(banda) && !/LA HISTORIA QUE PERSUADE/.test(banda) && !/EMOCI[ÓO]N SIN CHANTAJE/.test(banda) && !/TIEMPO DEL RELATO/.test(banda) && !/VOZ Y EL PUNTO DE VISTA/.test(banda) && !/MOSTRAR/.test(banda) && !/LA ESCENA/.test(banda) && !/FORMA DE LAS FORMAS/.test(banda) && !/EL DESEO/.test(banda) && !/LA CADENA/.test(banda),
+       'la banda del encabezado es de esta etapa (LA HISTORIA DE VERDAD, WOLFE y CAPOTE, sin restos de otras etapas)', 'la banda dice: ' + banda.slice(0, 70));
+    const logrosCat = dentro('Object.keys(ACHIEVEMENTS).length');
+    ok(logrosCat > 0 && d.querySelectorAll('#achList .ach-item').length === logrosCat,
+       'el panel de logros arrancó pintado, con sus ' + logrosCat + ' logros', 'logros pintados: ' + d.querySelectorAll('#achList .ach-item').length + ' de ' + logrosCat);
+    ok(d.querySelectorAll('#timelineTrack .tl-node').length === dentro('timelineData.length'),
+       'y la línea de tiempo arrancó con sus ' + dentro('timelineData.length') + ' fechas', 'hitos pintados: ' + d.querySelectorAll('#timelineTrack .tl-node').length);
+    ok((d.getElementById('lab-display').textContent || '').trim().length > 40, 'el laboratorio arrancó con una ficha puesta', 'el laboratorio arrancó vacío');
+
+    log('\n── LA REGLA DE ORO: NINGUNA HERRAMIENTA SIN AUTOR Y AÑO ──');
+    const prosa10 = ['s-aprende', 's-estructura', 's-casos', 's-guion', 's-lecturas']
+      .map(id => (d.getElementById(id) || {}).textContent || '').join(' ').replace(/\s+/g, ' ');
+    const bloquesProsa = [...d.querySelectorAll('#s-aprende .card, #s-estructura .card, #s-casos .card, #s-guion .card, #s-lecturas .card')]
+      .filter(c => !c.querySelector('#timelineTrack') && !c.querySelector('.type-grid') && !c.querySelector('.stat-bar'));
+    let huerfanas = 0, herramientas = 0, ejemplo = '';
+    const reHer = /el nuevo periodismo|la novela de no ficci[óo]n|el pacto (con el lector|autobiogr[áa]fico)|la deuda del (que cuenta la historia de otro|periodista)|jimmy'?s world|el memoir inventado/gi;
+    bloquesProsa.forEach(card => {
+      const txt = card.textContent.replace(/\s+/g, ' ');
+      if (reHer.test(txt)) {
+        reHer.lastIndex = 0;
+        herramientas++;
+        if (!RE_ANY_YEAR.test(txt)) { huerfanas++; if (!ejemplo) ejemplo = (card.querySelector('h2') || {}).textContent || txt.slice(0, 80); }
+      }
+    });
+    ok(huerfanas === 0, 'toda herramienta que asoma (en ' + herramientas + ' bloque(s)) lleva su año en ese mismo bloque', 'hay ' + huerfanas + ' bloque(s) con herramienta huérfana: ' + ejemplo);
+    ok(/Wolfe/.test(prosa10) && /1973/.test(prosa10), 'el Nuevo Periodismo a Wolfe (1973)', 'falta Wolfe (1973)');
+    ok(/Capote/.test(prosa10) && /1966/.test(prosa10), 'la novela de no ficción a Capote (1966)', 'falta Capote (1966)');
+    ok(/Lejeune/.test(prosa10) && /1975/.test(prosa10), 'el pacto con el lector a Lejeune (1975)', 'falta Lejeune (1975)');
+    ok(/Malcolm/.test(prosa10) && /1990/.test(prosa10), 'la deuda del periodista a Malcolm (1990)', 'falta Malcolm (1990)');
+    ok(/Cooke/.test(prosa10) && /(1980|1981)/.test(prosa10), 'el caso del compuesto a Cooke (1980-1981)', 'falta Cooke (1980-1981)');
+    ok(/Frey/.test(prosa10) && /(2003|2006)/.test(prosa10), 'el memoir inventado a Frey (2003/2006)', 'falta Frey (2003/2006)');
+    ok(/Johnson/.test(prosa10) && /1993/.test(prosa10), 'el ensayo cita a Johnson y colegas (1993)', 'falta Johnson y colegas (1993) en el ensayo');
+    ok(/(Garry|Loftus)/.test(prosa10) && /1996/.test(prosa10), 'y a Garry o Loftus y colegas (1996)', 'falta Garry/Loftus y colegas (1996) en el ensayo');
+    ok(/ninguna herramienta se cita sin autor|autor, a[ñn]o y l[íi]mite|con su autor y su a[ñn]o|autor y (su )?año/i.test(cuerpo),
+       'la regla de oro está escrita a la vista', 'la regla de oro de la ruta no aparece');
+
+    log('\n── LA GRIETA A LA VISTA ──');
+    ok(/\breordenar\b/i.test(cuerpo) && /\binventar\b/i.test(cuerpo), 'se declara reordenar, contra inventar', 'no se declara la grieta reordenar/inventar');
+    ok(/reordenar s[íi],? inventar no/i.test(cuerpo), 'con la fórmula «reordenar sí, inventar no» a la vista', 'falta la fórmula reordenar sí, inventar no');
+    ok(/es una buena historia.{0,40}(no importa|inventado)/i.test(cuerpo) || /un detalle inventado no importa/i.test(cuerpo),
+       'la trampa «es una buena historia, un detalle inventado no importa» se nombra y se desarma', 'no se nombra la trampa de esta etapa');
+    ok(/t[ée]cnicas? de la ficci[óo]n/i.test(cuerpo) && /sin fabricar/i.test(cuerpo), 'y se declara que usar la técnica no autoriza a fabricar el hecho', 'no se distingue usar la técnica de fabricar el hecho');
+
+    log('\n── LA PUERTA AL EXPEDIENTE REAL ──');
+    ok(/Expediente Real/i.test(cuerpo), 'la etapa se declara puerta a la Ruta del Expediente Real', 'no se menciona la Ruta del Expediente Real');
+    ok(/puerta/i.test(cuerpo), 'con la palabra «puerta» a la vista', 'no se usa la palabra puerta');
+
+    log('\n── EL CONCEPTO DE LA ETAPA ──');
+    ok(/ocurri[óo],? y c[óo]mo lo s[ée]/i.test(cuerpo) && /qu[ée] reorden[ée]/i.test(cuerpo) && /(tengo el permiso|permiso.{0,20}respet)/i.test(cuerpo),
+       'la ficha de la no ficción (¿ocurrió?, ¿qué reordené?, ¿tengo el permiso?)', 'falta la ficha de la no ficción');
+    ok(/la ficha de la no ficci[óo]n/i.test(cuerpo), 'y se nombra como herramienta reutilizable', 'no se nombra la ficha de la no ficción como herramienta');
+    ok(/compuesto declarado|compuesto.{0,20}declar/i.test(cuerpo), 'el compuesto declarado', 'falta el compuesto declarado');
+    ok(/escena reconstruida/i.test(cuerpo), 'la escena reconstruida', 'falta la escena reconstruida');
+    ok(/lempira/i.test(cuerpo) || /L \d/.test(cuerpo), 'los números van en lempiras (norma 3)', 'no hay cifras en lempiras');
+    ok(/cuestion(ado|amiento)/i.test(cuerpo) && /cementerio/i.test(cuerpo), 'el cuestionamiento documentado sobre el cierre en el cementerio de Capote', 'falta el cuidado con la duda sobre Capote');
+    ok(!/Kapu[śs]ci[ńn]ski/i.test(cuerpo), 'y no se confunde a Capote con Kapuściński', 'aparece Kapuściński, confundido con Capote');
+
+    log('\n── LOS OCHO CASOS DEL PROYECTO (norma 3) ──');
+    const casos = d.getElementById('s-casos').textContent.replace(/\s+/g, ' ');
+    ok((casos.match(/Caso \d/g) || []).length === 8, 'los ocho casos están', 'casos: ' + (casos.match(/Caso \d/g) || []).length);
+    ok(/M\.E\.T\.A\.S/.test(casos), 'y salen de este proyecto', 'los casos no hablan del proyecto');
+    ok(/L \d|lempira/i.test(casos), 'con sus cifras en lempiras', 'los casos van sin lempiras');
+    ok(/ocurri[óo]|reorden/i.test(casos), 'cada caso aplica la ficha de la no ficción', 'los casos no aplican la ficha');
+    ok(/la pregunta que decide/i.test(casos) && /la condici[óo]n/i.test(casos), 'cada caso termina en la pregunta que decide y su condición', 'los casos no cierran como manda la norma 3');
+
+    log('\n── EL GUION DE VIDEO (norma 5) ──');
+    const g = d.getElementById('s-guion').textContent.replace(/\s+/g, ' ');
+    ok((g.match(/Escena \d/g) || []).length === 7, 'las siete escenas', 'escenas: ' + (g.match(/Escena \d/g) || []).length);
+    ok(/VOZ/.test(g) && /IMAGEN:/.test(g) && /TEXTO EN PANTALLA:/.test(g), 'cada escena lleva VOZ, IMAGEN y TEXTO', 'faltan las tres pistas');
+    ok(/gancho en fr[íi]o/i.test(g), 'el gancho en frío', 'falta el gancho');
+    ok(/Jimmy/.test(g) && /Pulitzer/.test(g), 'con el gancho de Jimmy\'s World y el Pulitzer', 'falta el gancho de Jimmy\'s World');
+    ok(/objeci[óo]n del p[úu]blico/i.test(g), 'la objeción del público, concedida y contestada', 'falta la objeción');
+    ok(/La historia de verdad/i.test(g) && /Ruta del Hilo que Tira/.test(g), 'y el cierre nombra la misión', 'el cierre no nombra la misión');
+    ok(/Expediente Real/i.test(g), 'y el cierre nombra la puerta al Expediente Real', 'el cierre no nombra la puerta');
+    ok(/Cooke/.test(g) && /1981/.test(g), 'y el guion trae, fechado, el ejemplo de Cooke, 1981', 'falta el ejemplo fechado de Cooke, 1981');
+
+    log('\n── LAS SEIS LECTURAS (normas 5-quinquies y 5-nonies) ──');
+    const lect = d.getElementById('s-lecturas');
+    const tl = lect.textContent.replace(/\s+/g, ' ');
+    const claves = ['borges', 'cervantes', 'harari', 'entrevista', 'gala', 'debate'];
+    ok(claves.every(k => !!d.getElementById('lect-' + k)), 'las seis tarjetas están, con sus ids',
+       'faltan: ' + claves.filter(k => !d.getElementById('lect-' + k)).join(', '));
+    ok(lect.querySelectorAll('.card[id^="lect-"]').length === 6, 'y no hay ninguna de más',
+       'tarjetas: ' + lect.querySelectorAll('.card[id^="lect-"]').length);
+    ok(claves.every(k => !!d.querySelector('#lect-' + k + ' .lect-nota')), 'cada una con su nota de estatus', 'alguna tarjeta va sin lect-nota');
+    ok(/Seis lecturas/i.test(tl) && /seis voces/i.test(tl), 'la tarjeta de entrada anuncia seis', 'la entrada no anuncia las seis voces');
+    ok(/Cada lectura trae sus propias preguntas/i.test(tl) && /plegadas/i.test(tl),
+       'y avisa de las preguntas de cada lectura y del plegado', 'la entrada no explica las preguntas ni el plegado');
+    ok(/ejercicios? de estilo/i.test(tl) && /No son obra de esos autores/i.test(tl),
+       'el pastiche va declarado (regla del estatus)', 'el pastiche no se declara');
+    ok(/cinco primeros/i.test(tl), 'la etiqueta distingue a los cinco primeros', 'la etiqueta mete las seis en el mismo saco');
+    ok(/sexto/i.test(tl) && /careo/i.test(tl), 'y nombra el sexto como careo', 'la etiqueta no nombra el careo');
+    ok(/papeles/i.test(tl) && /no personas/i.test(tl), 'y dice que el careo firma con papeles', 'la etiqueta no dice cómo firma sus turnos el careo');
+    ok(/nunca ocurrieron/i.test(tl), 'y que los encuentros de las entrevistas nunca ocurrieron', 'falta la declaración de ficción');
+    ok((/Wolfe/.test(tl) && /1973/.test(tl)) || (/Capote/.test(tl) && /1966/.test(tl)), 'la sección repite el aviso de la materia con su ejemplo', 'la sección de lecturas no repite el aviso de la materia');
+    ok(/El cronista que mejor[óo] la verdad/.test(tl), 'el cuento a la manera de Borges', 'falta el cuento');
+    ok(/Restituto Balmaseda/.test(tl) && /(Membrillar|Pascasio)/.test(tl), 'el capítulo cervantino, con sus personajes de posada', 'falta el capítulo');
+    ok(/La especie que no distingue lo vivido de lo imaginado/.test(tl), 'el ensayo a la manera de Harari', 'falta el ensayo');
+    ok(/Soler Serrano/.test(tl) && /A fondo/.test(tl), 'la entrevista, con las señas reales del entrevistador', 'la entrevista no declara quién es Soler Serrano');
+    ok(/Quintero/.test(tl) && /Chaves Nogales/.test(tl) && /Loco de la Colina/i.test(tl), 'la conversación del Loco de la Colina', 'falta la conversación');
+
+    log('\n── LA ENTREVISTA IMAGINADA CON CAPOTE, Y SU CONCESIÓN ──');
+    const entr = d.getElementById('lect-entrevista');
+    const nEntr = (entr.querySelector('.lect-nota') || {}).textContent || '';
+    ok(/IMAGINADA/.test(nEntr), 'la entrevista se declara IMAGINADA, en mayúsculas y a la vista', 'la entrevista no se declara imaginada');
+    ok(/nunca ocurri/i.test(nEntr) && /1924/.test(nEntr) && /1984/.test(nEntr),
+       'y da las fechas reales de Capote (1924 · 1984)', 'no da las fechas reales de Capote');
+    ok(/invenci[óo]n de la casa/i.test(nEntr), 'y declara que las palabras atribuidas son invención de la casa', 'no declara como invención lo que se le hace decir');
+    ok(/reales y comprobables/i.test(nEntr) && /1966/.test(nEntr), 'mientras las obras y las fechas son reales y comprobables', 'la nota no separa lo inventado de lo comprobable');
+    ok(/SOLER SERRANO\./.test(entr.textContent) && /CAPOTE\./.test(entr.textContent), 'los turnos se firman con el nombre en mayúsculas y punto (sin raya de diálogo)', 'los turnos de la entrevista no se firman al estilo de la casa');
+    ok(/cementerio/i.test(entr.textContent) && /cuestionado/i.test(entr.textContent), 'y Capote CONCEDE la tensión documentada sobre el cierre en el cementerio', 'la entrevista no incluye la concesión de Capote sobre el cementerio');
+    ok(!/juro que minti[óo]|mint[íi] en todo/i.test(entr.textContent), 'presentada como duda, no como confesión de haber mentido en todo', 'la entrevista convierte la duda en una confesión total');
+    const nGala = (d.querySelector('#lect-gala .lect-nota') || {}).textContent || '';
+    ok(/nunca ocurri/i.test(nGala), 'la conversación de Quintero y Chaves Nogales también se declara imaginada', 'la conversación no se declara imaginada');
+    ok(/1897/.test(nGala) && /1944/.test(nGala), 'y la nota da las fechas reales de Chaves Nogales (1897 · 1944)', 'la nota no da las fechas reales de Chaves Nogales');
+    ok(/\(silencio/.test(d.getElementById('lect-gala').textContent), 'y los silencios de Quintero van escritos como acotación', 'la conversación va sin los silencios');
+    ok(d.getElementById('lect-gala').dataset.voz === 'Quintero y Chaves Nogales' || /data-voz="Quintero y Chaves Nogales"/.test(d.getElementById('lect-gala').outerHTML),
+       'y la tarjeta declara su voz propia (Quintero y Chaves Nogales) para los bancos', 'falta el data-voz de Quintero y Chaves Nogales en la tarjeta');
+    ok(/A sangre y fuego/i.test(d.getElementById('lect-gala').textContent), 'y la obra real de Chaves Nogales aparece en el propio texto', 'falta la obra real dentro de la conversación');
+
+    log('\n── EL CAREO, LA SEXTA LECTURA (norma 5-nonies) ──');
+    const careo = d.getElementById('lect-debate');
+    const tc = careo.textContent.replace(/\s+/g, ' ');
+    const nota = (careo.querySelector('.lect-nota') || {}).textContent || '';
+    ok(/MODERACI[ÓO]N\./.test(tc), 'los turnos de moderación firman en mayúscula', 'no hay turnos de MODERACIÓN');
+    ok(/LA DEFENSA\./.test(tc) && /LA OBJECI[ÓO]N\./.test(tc), 'y los de la defensa y la objeción', 'faltan los papeles de defensa y objeción');
+    ok(!/Ejercicio de estilo de la casa/i.test(nota), 'el careo NO lleva la etiqueta del pastiche', 'al careo le pusieron etiqueta de pastiche');
+    ok(/palabras inventadas en boca de nadie/i.test(nota), 'y su nota declara que no se le pone palabra a nadie', 'la nota del careo no lo declara');
+    ok(/mejor versi[óo]n/i.test(nota), 'y que cada postura va en su mejor versión (regla del acero)', 'la nota no declara la regla del acero');
+    ok(/La pregunta en disputa, una sola/.test(tc), '1. la pregunta en disputa', 'falta la pregunta en disputa');
+    ok(/Las r[ée]plicas, cruzadas/.test(tc), '4. las réplicas cruzadas', 'faltan las réplicas');
+    ok(/El terreno com[úu]n, que casi siempre/.test(tc), '5. el terreno común', 'falta el terreno común');
+    ok(/Lo que sigue en disputa/.test(tc), '6. y qué dato lo resolvería', 'el careo no dice qué dato lo resolvería');
+    const i1 = tc.indexOf('La pregunta en disputa, una sola');
+    const i2 = tc.indexOf('LA DEFENSA.');
+    const i3 = tc.indexOf('LA OBJECIÓN.');
+    const i4 = tc.indexOf('Las réplicas, cruzadas');
+    const i5 = tc.indexOf('El terreno común, que casi siempre');
+    const i6 = tc.indexOf('Lo que sigue en disputa');
+    ok(i1 >= 0 && i1 < i2 && i2 < i3 && i3 < i4 && i4 < i5 && i5 < i6,
+       'y las seis partes van en orden: pregunta, postura A, postura B, réplicas, terreno común y lo que sigue', 'las partes del careo están desordenadas');
+    ok(/Wolfe/.test(tc) && /1973/.test(tc), 'la pregunta trae el Nuevo Periodismo de Wolfe (1973)', 'falta Wolfe en la pregunta del careo');
+    ok(/Capote/.test(tc) && /1966/.test(tc), 'la defensa se apoya en Capote (1966)', 'falta Capote (1966) en el careo');
+    ok(/Cooke/.test(tc) && /(1980|1981)/.test(tc), 'y la objeción cita a Cooke (1980-1981)', 'falta Cooke (1980-1981) en el careo');
+    ok(/se concede/i.test(tc), 'las réplicas conceden de verdad, no de boquilla', 'ninguna réplica concede nada');
+    ok(!RAYA.test(tc), 'y el careo va sin guiones largos, tampoco en los turnos', 'el careo trae guiones largos');
+
+    log('\n── LOS TRES BANCOS DE LAS LECTURAS ──');
+    ok(dentro('lectComprensionBank.length') === 30, '30 preguntas de comprensión lectora', 'comprensión: ' + dentro('lectComprensionBank.length'));
+    ok(dentro('lectCompletarBank.length') === 12, '12 de completar', 'completar: ' + dentro('lectCompletarBank.length'));
+    ok(dentro('lectAnalisisBank.length') === 12, '12 de análisis complejo', 'análisis: ' + dentro('lectAnalisisBank.length'));
+    ok(dentro('lectComprensionBank.every(q=>q.o.length===4)'), 'y las 30 de comprensión traen sus cuatro opciones', 'alguna de comprensión no tiene cuatro opciones');
+    const voces = ['Borges', 'Cervantes', 'Harari', 'Entrevista', 'Quintero y Chaves Nogales', 'Debate'];
+    voces.forEach(v => {
+      const c = dentro('lectComprensionBank.filter(q=>q.t===' + JSON.stringify(v) + ').length');
+      const f = dentro('lectCompletarBank.filter(q=>q.t===' + JSON.stringify(v) + ').length');
+      const a = dentro('lectAnalisisBank.filter(q=>q.t===' + JSON.stringify(v) + ').length');
+      ok(c === 5 && f === 2 && a === 2, '  ' + v + ': 5 de comprensión, 2 de completar y 2 de análisis',
+         '  ' + v + ': ' + c + '/' + f + '/' + a);
+    });
+    ok(dentro('lectAnalisisBank.every(q=>q.guia&&q.guia.length>250)'), 'cada análisis trae su pauta escrita', 'algún análisis va sin pauta');
+    ok(dentro('lectAnalisisBank.every(q=>!/^\\s*\\d+[.)]\\s/.test(q.q))'), 'y ningún enunciado arrastra el número del banco viejo', 'algún análisis sale numerado');
+
+    log('\n── EL PLEGADO Y EL ÍNDICE ──');
+    ok(!!d.getElementById('lectIndice'), 'hay índice de las seis arriba', 'falta el índice de lecturas');
+    ok(d.querySelectorAll('#lectIndice .lect-ind-btn').length === 6, 'con un botón por lectura', 'botones: ' + d.querySelectorAll('#lectIndice .lect-ind-btn').length);
+    const cuerpos = [...d.querySelectorAll('#s-lecturas .lect-cuerpo')];
+    ok(cuerpos.length === 6 && cuerpos.every(c => c.hidden), 'las seis empiezan plegadas', 'alguna empieza abierta');
+    ok(cuerpos.every(c => w.getComputedStyle(c).display === 'none'), 'y plegadas de verdad, no solo con el atributo', 'alguna se sigue pintando');
+
+    log('\n── ABRIR UNA LECTURA, Y SUS PROPIAS PREGUNTAS ──');
+    w.FaroLecturas.abrir('borges');
+    await esperar(300);
+    const cardB = d.getElementById('lect-borges');
+    ok(cardB.classList.contains('lect-abierta'), 'abrir una lectura la despliega', 'no se desplegó');
+    ok(!cardB.querySelector('.lect-cuerpo').hidden, 'y su cuerpo se ve', 'el cuerpo sigue escondido');
+    w.FaroLecturas.abrir('debate');
+    await esperar(300);
+    ok(!cardB.classList.contains('lect-abierta'), 'y abrir otra cierra la anterior', 'quedan dos abiertas a la vez');
+    const bloques = d.getElementById('lect-debate').querySelectorAll('.lect-bloque');
+    ok(bloques.length === 3, 'cada lectura trae sus tres baterías dentro', 'baterías del careo: ' + bloques.length);
+    ok(!d.querySelector('#lcQ, #lfQ, #laQ'), 'y ya no hay una batería suelta al final de la sección', 'sigue la batería vieja al final');
+
+    w.FaroLecturas.abrir('borges'); await esperar(250);
+    const bC = cardB.querySelector('.lect-bloque[data-b="c"]');
+    ok(/Pregunta 1 de 5/.test(bC.querySelector('.lect-prog').textContent), 'la comprensión de la lectura cuenta 5', 'contador: ' + bC.querySelector('.lect-prog').textContent);
+    ok(bC.querySelectorAll('.lect-opt').length === 4, 'con sus cuatro opciones', 'opciones: ' + bC.querySelectorAll('.lect-opt').length);
+    const xp0 = dentro('xp');
+    bC.querySelectorAll('.lect-opt')[dentro('lectComprensionBank.filter(q=>q.t==="Borges")[0].c')].click();
+    bC.querySelector('.lect-verifica').click();
+    await esperar(300);
+    ok(dentro('xp') > xp0, 'la respuesta correcta suma XP', 'la comprensión no dio XP');
+    const bF = cardB.querySelector('.lect-bloque[data-b="f"]');
+    ok(bF.querySelector('.lect-enun').textContent.indexOf('___') >= 0, 'completar pinta su hueco', 'completar sin hueco');
+    const xp1 = dentro('xp');
+    bF.querySelector('.lect-input').value = dentro('lectCompletarBank.filter(q=>q.t==="Borges")[0].a');
+    bF.querySelector('.lect-verifica').click();
+    await esperar(300);
+    ok(dentro('xp') > xp1, 'completar suma XP con la respuesta buena', 'completar no dio XP');
+    const bA = cardB.querySelector('.lect-bloque[data-b="a"]');
+    ok(/sin XP/.test(bA.querySelector('.lect-prog').textContent), 'el análisis avisa de que no da XP', 'el análisis no avisa');
+    ok(bA.querySelector('.lect-pauta').hidden, 'y su pauta empieza tapada', 'la pauta se ve sin pedirla');
+    const xp2 = dentro('xp');
+    bA.querySelector('.lect-vp').click(); await esperar(200);
+    ok(!bA.querySelector('.lect-pauta').hidden, 'se destapa cuando se pide', 'la pauta no se destapa');
+    ok(dentro('xp') === xp2, 'y el análisis complejo no regala XP', 'el análisis regaló XP');
+
+    log('\n── LA BARRA SE ABRE JUNTO A LO SELECCIONADO ──');
+    const parr = d.querySelector('#lect-borges .lect-cuerpo p.lect-p');
+    parr.scrollIntoView({ block: 'center' });
+    await esperar(200);
+    seleccionar(d, w, parr, 5, 70);
+    await esperar(420);
+    const barra = d.getElementById('fmBarra');
+    ok(!!barra && barra.classList.contains('fm-abierta'), 'seleccionar abre la barra de marcar', 'la barra no se abrió');
+    ok(w.getComputedStyle(barra).position === 'absolute' || barra.classList.contains('fm-barra-abajo'),
+       'y se coloca pegada al trozo, no siempre al pie', 'la barra sigue anclada abajo a la fuerza');
+    const caja = barra.getBoundingClientRect();
+    ok(caja.left >= -1 && caja.right <= 381, 'sin salirse en 380 px', 'la barra se sale: ' + Math.round(caja.left) + ' a ' + Math.round(caja.right));
+
+    log('\n── LA MARCA DE LECTURA, QUE LA PONE EL LECTOR (norma 5-nonies) ──');
+    ok(typeof w.FaroMarcador.lugar === 'function', 'el marcador sabe dónde se quedó uno', 'falta FaroMarcador.lugar');
+    w.localStorage.removeItem(dentro('SAVE_KEY') + '_lugar');
+    const ps = [...d.querySelectorAll('#lect-borges .lect-cuerpo p.lect-p')];
+    ps[Math.min(4, ps.length - 1)].scrollIntoView({ block: 'center' });
+    await esperar(1500);
+    ok(!w.FaroMarcador.lugar(), 'leer no pone ninguna marca por su cuenta', 'la marca volvió a ponerse sola');
+    ok(!d.querySelector('[data-fm-aqui]'), 'y la cinta vieja del margen ya no existe', 'sigue la cinta del margen izquierdo');
+    const altoAntes = ps[0].getBoundingClientRect().height;
+    seleccionar(d, w, ps[0], 10, 26);
+    await esperar(420);
+    const btnAqui = d.getElementById('fmBtnAqui');
+    ok(!!btnAqui && btnAqui.style.display !== 'none', 'la barra de marcar trae «Aquí me quedé»', 'no está el botón de la marca de lectura');
+    btnAqui.click(); await esperar(400);
+    const aqui = d.querySelectorAll('#lect-borges .fm-aqui');
+    ok(aqui.length >= 1, 'y marca justo lo seleccionado', 'no se pintó la marca de lectura');
+    ok(d.querySelectorAll('#lect-borges .fm-aqui-fin').length === 1, 'con un solo 🔖', 'salió más de un marcador');
+    ok(!!w.FaroMarcador.lugar(), 'el marcador la apunta', 'no quedó apuntada');
+    ok(Math.abs(ps[0].getBoundingClientRect().height - altoAntes) < 1.5, 'y no le añade alto al párrafo', 'la marca empujó el texto');
+    aqui[0].click(); await esperar(400);
+    ok(!d.querySelector('#lect-borges .fm-aqui'), 'tocarla la quita, sin preguntar nada', 'la marca sigue puesta después de tocarla');
+
+    log('\n── EL RESTO DE LOS BANCOS ──');
+    ok(dentro('qzData.length') === 10, 'el quiz trae 10 preguntas', 'quiz: ' + dentro('qzData.length'));
+    ok(dentro('fcData.length') === 16, '16 flashcards de vocabulario', 'flashcards: ' + dentro('fcData.length'));
+    ok(dentro('cmpData.length') === 8, 'completar la oración trae 8', 'completar: ' + dentro('cmpData.length'));
+    ok(dentro('evalMCBank.length') === 15 && dentro('evalTFBank.length') === 15
+       && dentro('evalCPBank.length') === 15 && dentro('evalPRBank.length') === 15,
+       'la evaluación final trae sus cuatro bancos de 15', 'algún banco de la evaluación no llega a 15');
+    ok(dentro('critCaseBank.length') === 8, 'la evaluación competencial trae ocho casos', 'casos competenciales: ' + dentro('critCaseBank.length'));
+    ok(dentro('timelineData.length') === 7, 'las siete fechas, de Capote a Frey', 'fechas: ' + dentro('timelineData.length'));
+    ok(dentro('sopaSets[0].words.length') === 10, 'la sopa trae diez palabras', 'palabras de la sopa: ' + dentro('sopaSets[0].words.length'));
+    ok(dentro('sopaSets[0].words.every(p=>p.cells.map(c=>sopaSets[0].grid[c[0]][c[1]]).join("")===p.w)'),
+       'y todas se leen de verdad en la rejilla', 'alguna palabra no está en la rejilla');
+    ok(dentro('routeSets.length') === 3, 'el widget de ordenar trae tres secuencias', 'secuencias: ' + dentro('routeSets.length'));
+    ok(dentro('routeSets.every(s=>s.steps.length>=5)'), 'de cinco pasos o más cada una', 'alguna secuencia se quedó corta');
+
+    log('\n── EL LABORATORIO: LAS CUATRO PIEZAS ──');
+    ok(dentro('Object.keys(parteData).length') === 4, 'el laboratorio tiene sus cuatro piezas', 'piezas del laboratorio: ' + dentro('Object.keys(parteData).length'));
+    ok(dentro('typeof parteData[labParte] !== "undefined"'), 'y la pieza inicial existe de verdad', 'el laboratorio arranca apuntando a una pieza que no existe');
+    const pares = [['esperado', /Reordenar/i], ['paradoja', /El pacto con el lector/i],
+                   ['utilidad', /La ficha de la no ficci[óo]n/i], ['ruina', /Inventar/i]];
+    pares.forEach(([llave, rotulo]) => {
+      const btn = d.querySelector('.lab-cont-btn[data-parte="' + llave + '"]');
+      const nombre = dentro('parteData[' + JSON.stringify(llave) + '].nombre');
+      ok(!!btn && rotulo.test(btn.textContent) && rotulo.test(nombre),
+         '  la llave «' + llave + '» dice ' + (btn ? btn.textContent.trim() : '?') + ' en el botón y en parteData',
+         '  la llave «' + llave + '» no casa con su rótulo: botón «' + (btn ? btn.textContent.trim() : 'no está') + '», parteData «' + nombre + '»');
+    });
+    ok(dentro('["esperado","paradoja","utilidad","ruina"].every(k=>k in parteData)'), 'las cuatro llaves heredadas siguen siendo las que el motor llama', 'alguna llave del laboratorio se renombró a medias');
+    const frase = d.getElementById('lab-sentence').textContent.replace(/\s+/g, ' ');
+    ok(frase.indexOf(dentro('parteData[labParte].nombre')) >= 0,
+       'y la frase inicial concuerda con parteData[labParte].nombre', 'la frase inicial dice: ' + frase);
+    w.labShowParte('ruina'); await esperar(200);
+    ok(/Inventar/i.test(d.getElementById('lab-display').textContent), 'tocar la cuarta pieza enseña inventar y llamarlo verdad', 'la cuarta pieza no pinta lo suyo');
+    w.labShowParte('esperado'); await esperar(200);
+
+    log('\n── EL WIDGET DE ORDENAR (norma 5-bis) ──');
+    w.go('s-widgets'); await esperar(300);
+    const tarjetas = d.querySelectorAll('#routeList .sort-item');
+    ok(tarjetas.length > 0, 'la lista de pasos se pinta', 'no se pintó la lista de ordenar');
+    ok(!!d.querySelector('#routeList .sort-grip'), 'cada tarjeta trae su asa para arrastrar', 'no hay asa de arrastre');
+    ok(/touch-action/.test(d.querySelector('#routeList').innerHTML + [...d.styleSheets].map(h => { try { return [...h.cssRules].map(r => r.cssText).join(' '); } catch (e) { return ''; } }).join(' ')),
+       'arrastrar la tarjeta no arrastra la página (touch-action)', 'falta touch-action en las tarjetas');
+    ok(/linterna/i.test(d.getElementById('s-widgets').textContent), 'y la linterna está, con su aviso de que cuesta XP', 'falta la linterna');
+
+    log('\n── IMPRESIÓN DE LAS LECTURAS Y DEL PLIEGO ──');
+    const prosa = h => h.replace(/<[^>]+>/g, '');
+    const abiertos = [];
+    w.open = function () { return { document: { write(s) { abiertos.push(s); }, close() {} }, print() {}, focus() {}, close() {} }; };
+    w.imprimirLectura('borges');
+    const hb = abiertos[abiertos.length - 1] || '';
+    ok(/El cronista que mejor[óo] la verdad/.test(hb) && /Fabi[áa]n Escurra/.test(prosa(hb)), 'el cuento se imprime con su texto completo', 'el cuento no se imprime');
+    ok(/una vela encendida se defiende sola/.test(prosa(hb)), 'y hasta cerca de su última línea', 'la hoja del cuento sale cortada');
+    ok(/NO es obra de ese autor/i.test(hb) && /ejercicio de estilo de la casa/i.test(hb), 'con la etiqueta del estatus en la hoja', 'la hoja sale sin declarar el pastiche');
+    ok(/Pregunta/i.test(hb) || /preguntas/i.test(hb), 'y con sus propias preguntas detrás', 'la hoja sale sin sus preguntas');
+    ok(/Pauta de esta lectura/i.test(hb) && /class="pauta"/.test(hb) && /\.pauta\{page-break-before:always/.test(hb),
+       'y su pauta en hoja aparte, que es donde van las respuestas', 'la pauta de la lectura sale pegada a las preguntas');
+
+    w.imprimirLectura('cervantes');
+    const hc = abiertos[abiertos.length - 1] || '';
+    ok(/Restituto Balmaseda/.test(prosa(hc)) && /Membrillar/.test(prosa(hc)), 'el capítulo cervantino se imprime entero', 'el capítulo no se imprime');
+    ok(/capit[áa]n inventado/.test(prosa(hc)), 'y hasta su última línea', 'la hoja del capítulo sale cortada');
+
+    w.imprimirLectura('harari');
+    const hh = abiertos[abiertos.length - 1] || '';
+    ok(/La especie que no distingue lo vivido de lo imaginado/.test(hh) && /pas[óo] tal como lo contamos/.test(prosa(hh)), 'el ensayo se imprime hasta su última línea', 'el ensayo no se imprime completo');
+
+    w.imprimirLectura('entrevista');
+    const he = abiertos[abiertos.length - 1] || '';
+    ok(/SOLER SERRANO/.test(he) && /CAPOTE/.test(he), 'la entrevista se imprime entera', 'la entrevista no se imprime');
+    ok(/nunca ocurri/i.test(he), 'y su hoja declara que el encuentro nunca ocurrió', 'la entrevista impresa no declara la ficción');
+    ok(/invenci[óo]n de la casa/i.test(prosa(he)), 'y que las palabras atribuidas a Capote son invención de la casa', 'la hoja de la entrevista no declara la invención');
+
+    w.imprimirLectura('gala');
+    const hg = abiertos[abiertos.length - 1] || '';
+    ok(/QUINTERO/.test(hg) && /CHAVES NOGALES/.test(hg), 'la conversación se imprime con sus dos voces', 'la conversación no se imprime');
+
+    w.imprimirLectura('debate');
+    const hd = abiertos[abiertos.length - 1] || '';
+    ok(/MODERACI[ÓO]N/.test(hd) && /LA OBJECI[ÓO]N/.test(hd), 'el careo se imprime completo', 'el careo no se imprime');
+    ok(/Careo escrito por la casa/i.test(hd), 'con su etiqueta propia, la del careo', 'el careo sale sin su etiqueta');
+    ok(!/NO es obra de ese autor/i.test(hd), 'y NO con la del pastiche, porque no imita a nadie', 'al careo impreso le pusieron la etiqueta del pastiche');
+    ok(!RAYA.test(hd), 'y sin guiones largos', 'el careo impreso trae guiones largos');
+
+    w.imprimirTodasLasLecturas();
+    const ht = abiertos[abiertos.length - 1] || '';
+    ok(/El cronista que mejor[óo] la verdad/.test(ht) && /Restituto Balmaseda/.test(ht) && /La especie que no distingue lo vivido de lo imaginado/.test(ht)
+       && /SOLER SERRANO/.test(ht) && /QUINTERO/.test(ht) && /MODERACI[ÓO]N/.test(ht),
+       'las seis lecturas se imprimen juntas en un solo pliego', 'el pliego de las seis no las trae todas');
+    ok((ht.match(/page-break-before|break-before/g) || []).length >= 5, 'y cada una arranca en su propia hoja', 'las seis salen pegadas');
+
+    w.imprimirPreguntasLecturas();
+    const hp = abiertos[abiertos.length - 1] || '';
+    ok(/54 preguntas/.test(tl), 'la misión anuncia el pliego de 54', 'la misión no anuncia las 54 preguntas');
+    ok(/30 de comprensi[óo]n/.test(hp), 'el pliego declara 30 de comprensión', 'el pliego no dice 30');
+    ok((hp.match(/class="op"/g) || []).length === 120, 'las 30 preguntas salen con sus 120 opciones', 'opciones: ' + (hp.match(/class="op"/g) || []).length);
+    ok((hp.match(/_______________/g) || []).length === 12, 'las 12 de completar salen con su hueco', 'huecos: ' + (hp.match(/_______________/g) || []).length);
+    ok((hp.match(/class="ln-alta"/g) || []).length === 36, 'y las 12 de análisis con sus 36 renglones', 'renglones: ' + (hp.match(/class="ln-alta"/g) || []).length);
+    ok(/PAUTA|Pauta completa/i.test(hp), 'con su pauta al final', 'el pliego sale sin pauta');
+    ok(/class="pauta"/.test(hp) && /\.pauta\{page-break-before:always/.test(hp),
+       'y la pauta arranca en hoja aparte, para no regalar respuestas', 'la pauta sale pegada a las preguntas');
+    ok(!RAYA.test(hp), 'y el pliego va sin guiones largos', 'el pliego trae guiones largos');
+
+    log('\n── EL MARCADOR (normas 5-sexies y 5-septies) ──');
+    ok(!!d.querySelector('link[href*="lecturas.css"]'), 'la misión carga la hoja del aparato de lecturas', 'falta css/lecturas.css');
+    ok(!!d.querySelector('script[src*="lecturas.js"]'), 'y el aparato de lecturas', 'falta js/lecturas.js');
+    ok(!!d.querySelector('link[href*="lecturas-marcador.css"]'), 'la misión carga la hoja del marcador', 'falta css/lecturas-marcador.css');
+    ok(!!d.querySelector('script[src*="lecturas-marcador.js"]'), 'y el aparato del marcador', 'falta js/lecturas-marcador.js');
+    ok(!!w.FaroMarcador, 'el marcador arrancó en la misión', 'FaroMarcador no existe');
+    ok(!!d.getElementById('fmPanel'), 'y pintó su panel de marcas', 'el marcador no pintó su panel');
+    ok(!!d.querySelector('#lectIndice .fm-leyenda'), 'con la leyenda del código de colores en el índice', 'no hay leyenda de colores');
+    ok(!w.FaroTaller, 'y NO monta el taller de la memoria (no corresponde a esta etapa)', 'el taller de la memoria se coló en esta misión');
+
+    const pedidos = [...d.querySelectorAll('script[src], link[href]')]
+      .map(el => el.getAttribute('src') || el.getAttribute('href'))
+      .filter(u => u && !/^(https?:|data:|mailto:)/.test(u));
+    const faltan = [];
+    for (const u of pedidos) {
+      try {
+        const r = await fetch(new URL(u, d.baseURI).href, { method: 'GET' });
+        if (!r.ok) faltan.push(u + ' (' + r.status + ')');
+      } catch (e) { faltan.push(u + ' (no se pudo pedir)'); }
+    }
+    ok(faltan.length === 0, 'los ' + pedidos.length + ' archivos que pide la página existen', 'faltan: ' + faltan.join(', '));
+
+    log('\n── LA FICHA (normas 6 y 5-octies) ──');
+    let fichaOk = false;
+    try { const rf = await fetch('/fichas/ficha-hilo-historia-de-verdad.html'); fichaOk = rf.ok; } catch (e) {}
+    ok(fichaOk, 'la ficha responde', 'la ficha no responde por HTTP');
+    const fr = document.createElement('iframe');
+    fr.style.cssText = 'width:900px;height:600px;border:0;position:absolute;left:-9999px;';
+    fr.src = '/fichas/ficha-hilo-historia-de-verdad.html';
+    document.body.appendChild(fr);
+    await new Promise(r => { fr.onload = r; });
+    await esperar(700);
+    const fd = fr.contentDocument;
+    const txtF = fd.body.textContent.replace(/\s+/g, ' ');
+    ok(fd.querySelectorAll('.pagina').length === 10, 'la ficha tiene sus diez páginas', 'páginas: ' + fd.querySelectorAll('.pagina').length);
+    ok(/La historia de verdad/.test(txtF) && /Hilo que Tira/.test(txtF), 'y es la de esta etapa', 'la ficha no es de esta misión');
+    ok(!RE_RESTOS_9.test(txtF), 'sin restos de la etapa 9', 'la ficha arrastra temario de la etapa 9');
+    ok(!/focalizaci[óo]n|narrador no fiable|autor impl[íi]cito|\bBooth\b|\bBal\b|\bStanzel\b|\bBally\b|Cide Hamete|Mart[íi]n Gaite|Lubbock|Le Guin|Gardner|Paivio|Ch[ée]jov|Delibes|mostrar,? no cuentes|vidrio de botella|Mamet|Bazin|Goldman|no-acontecimiento|escena francesa|Freytag|Vonnegut|kish[oō]tenketsu|Ar[áa]uz|monomito/i.test(txtF), 'ni de otras rutas o etapas viejas', 'la ficha arrastra temario de otra misión');
+    ok(!RAYA.test(txtF), 'la ficha va sin guiones largos', 'la ficha trae guiones largos');
+    ok(/Pauta del ejercicio/i.test(txtF), 'con la pauta de los ejercicios', 'la ficha no trae pauta');
+    ok(/protocolo/i.test(txtF) && /autor/i.test(txtF) && /l[íi]mite/i.test(txtF), 'el protocolo trabaja también en el papel', 'la ficha no enseña el protocolo de la etapa');
+    ok(/1966/.test(txtF), 'y Capote viaja impreso con su año', 'la ficha calla el año de Capote');
+    ok(/1973/.test(txtF), 'con Wolfe, fechado', 'la ficha cita a Wolfe sin su año');
+    ok(/1990/.test(txtF), 'y Malcolm, con su año', 'la ficha no trae a Malcolm con su año');
+    ok(/Expediente Real/.test(txtF), 'y la ficha declara la puerta al Expediente Real', 'la ficha no menciona el Expediente Real');
+    ok(/lecturas-marcador\.js/.test(fd.documentElement.innerHTML), 'la ficha trae el marcador (norma 5-octies)', 'la ficha no trae el marcador');
+    ok(!!d.querySelector('#s-recursos a[href*="ficha-hilo-historia-de-verdad"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
+    fr.remove();
+
+    log('\n── EN LA APLICACIÓN ──');
+    const da = appFrame.contentDocument, wa = appFrame.contentWindow;
+    wa.switchView('view-rutas'); await esperar(400);
+    const ruta = [...da.querySelectorAll('.ruta-card')].find(c => (c.querySelector('.ruta-nombre') || {}).textContent === 'Ruta del Hilo que Tira');
+    ok(!!ruta, 'la Ruta del Hilo que Tira está en el mapa', 'no aparece la ruta');
+    if (ruta) {
+      ok(/Fundamentos del relato/.test(ruta.textContent), 'con su dominio a la vista (Fundamentos del relato)', 'la tarjeta no dice su dominio');
+      const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "hilo").length');
+      const totalCat = wa.eval('RUTAS.hilo.etapas');
+      ok(construidasCat === 10, 'el catálogo cuenta diez etapas construidas en el Hilo', 'construidas en el catálogo: ' + construidasCat);
+      ok(ruta.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length + ' de ' + construidasCat);
+      ok(ruta.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
+      ok([...ruta.querySelectorAll('.re-link')].some(a => /La historia de verdad/.test(a.textContent)),
+         'la etapa 10 ya es tocable, con el título de la misión', 'la etapa 10 no sale tocable con su título');
+      ok([...ruta.querySelectorAll('.re-link')].some(a => /La historia que persuade/.test(a.textContent)),
+         'y la etapa 9 sigue tocable', 'la etapa 9 desapareció del mapa');
+      ok(!ruta.querySelector('.ruta-etapa-futura')?.textContent.match(/la historia de verdad/i),
+         'y la etapa 10 ya no queda anunciada como «por construir»', 'la etapa 10 sigue anunciada como pendiente además de construida');
+    }
+    const grupo = [...da.querySelectorAll('.materia-grupo')].find(x => (x.querySelector('.materia-nombre') || {}).textContent === 'Storytelling');
+    ok(!!grupo, 'la materia Storytelling tiene su grupo en el mapa de rutas', 'no hay grupo de Storytelling');
+    wa.switchView('view-misiones'); await esperar(200);
+    const chip = da.querySelector('.fam-chip[data-materia="story"]');
+    ok(!!chip, 'la materia Storytelling tiene su chip en la portada', 'no hay chip de Storytelling');
+    if (chip) {
+      chip.click(); await esperar(250);
+      const cards = [...da.querySelectorAll('#missions-container .mission-card')];
+      const delStory = wa.eval('MISSIONS.filter(m=>m.materia==="story").length');
+      ok(cards.length === delStory, 'la materia muestra sus ' + delStory + ' misiones', 'muestra ' + cards.length + ' de ' + delStory);
+      const mia = cards.find(c => /La historia de verdad/.test(c.textContent));
+      ok(!!mia, 'y la nueva está entre ellas', 'la misión nueva no sale en la portada');
+      ok(mia && /📰/.test(mia.textContent), 'con su emoji propio', 'la misión sale sin su emoji');
+      ok(wa.eval('MISSIONS.find(m=>m.ruta==="hilo"&&m.etapa===10).sello') === 'familiar',
+         'el catálogo la marca con el sello familiar', 'la etapa 10 no lleva sello familiar en el catálogo');
+      ok(mia && !!mia.querySelector('.mc-sello'), 'y el candado del sello sale pintado en su tarjeta', 'la tarjeta no pinta el candado del sello');
+    }
+    cerrar();
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); cerrar(); }
+});
+</script>
+</body>
+</html>
