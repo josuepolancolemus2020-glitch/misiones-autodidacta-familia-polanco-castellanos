@@ -5,8 +5,9 @@ sesenta y tres etapas que, recorridas, llevan de «sé lo que es un gancho» a
 contar cualquier cosa (un video, un informe, una convocatoria, una vida) de
 modo que se entienda y se recuerde.
 
-Fecha: 24 de agosto de 2026. Estado: **tres etapas construidas** (las 1, 2 y 3 de la Ruta
-del Hilo que Tira), las sesenta restantes planificadas aquí. El catálogo
+Fecha: 26 de agosto de 2026. Estado: **la Ruta del Hilo que Tira está completa,
+sus doce etapas construidas**; las cincuenta y una restantes (las siete rutas de
+especialización) planificadas aquí. El catálogo
 (`js/data/misiones.js`) declara las ocho rutas enteras, así que el mapa de Mis
 Rutas enseña el camino a experto desde el primer día, como se hizo con la Ley
 y con el Estudio Mayor.
@@ -92,7 +93,7 @@ escribe como vacía.
 
 | # | Ruta | Dominio | Etapas | Estado |
 |---|---|---|---|---|
-| 1 | 🧵 Hilo que Tira | Fundamentos del relato | 12 | **3 construidas** |
+| 1 | 🧵 Hilo que Tira | Fundamentos del relato | 12 | **completa (12/12)** |
 | 2 | ✍️ Pluma Afilada | La prosa y la voz | 7 | 0 |
 | 3 | 🎭 Personas de Papel | Personaje y diálogo | 7 | 0 |
 | 4 | 🎬 Cámara que Cuenta | Narrativa audiovisual y guion | 7 | 0 |
@@ -123,24 +124,24 @@ ella las otras siete no tienen sobre qué apoyarse.
    contra necesitar; Propp (1928) y sus funciones.
 3. **La forma de las formas**: *construida.* las estructuras con su autor, su año y su
    crítica, hasta las seis formas medidas de Reagan y colegas (2016).
-4. **La escena**: la unidad de trabajo y su giro de valor: entra tarde, sal
-   temprano.
-5. **Mostrar, contar y cuándo cada uno**: Chéjov y el vidrio de botella (1886);
-   por qué «muestra, no cuentes» está mal citado.
-6. **La voz y el punto de vista**: quién cuenta y cuánto sabe: focalización
-   (Genette, 1972), narrador no fiable (Booth, 1961).
-7. **El tiempo del relato**: orden, elipsis y suspenso; la bomba de Hitchcock
-   (Truffaut, 1966).
-8. **Emoción sin chantaje**: conmover no es manipular; el transporte narrativo
-   (Green y Brock, 2000) y la sentimentalidad como fallo técnico.
-9. **La historia que persuade, y el freno ético**: por qué funciona y cuándo
-   no se usa. *Puerta a la ruta 6.*
-10. **La historia de verdad**: narrativa de no ficción y su ética. *Puerta a la
-    ruta 5.*
-11. **Contar de pie y contar en imagen**: la historia de siete minutos y la
-    imagen que sustituye a la frase. *Puerta a la ruta 4.*
-12. **El taller**: revisión con método y la prueba de dominio (la misma
-    historia en tres duraciones). *Puerta a la ruta 8.*
+4. **La escena**: *construida.* la unidad de trabajo y su giro de valor: entra
+   tarde, sal temprano.
+5. **Mostrar, contar y cuándo cada uno**: *construida.* Chéjov y el vidrio de
+   botella (1886); por qué «muestra, no cuentes» está mal citado.
+6. **La voz y el punto de vista**: *construida.* quién cuenta y cuánto sabe:
+   focalización (Genette, 1972), narrador no fiable (Booth, 1961).
+7. **El tiempo del relato**: *construida.* orden, elipsis y suspense; la bomba
+   de Hitchcock (Truffaut, 1966).
+8. **Emoción sin chantaje**: *construida.* conmover no es manipular; el
+   transporte narrativo (Green y Brock, 2000) y la sentimentalidad como fallo técnico.
+9. **La historia que persuade, y el freno ético**: *construida.* por qué
+   funciona y cuándo no se usa. *Puerta a la ruta 6.*
+10. **La historia de verdad**: *construida.* narrativa de no ficción y su ética.
+    *Puerta a la ruta 5.*
+11. **Contar de pie y contar en imagen**: *construida.* la historia de siete
+    minutos y la imagen que sustituye a la frase. *Puerta a la ruta 4.*
+12. **El taller**: *construida.* revisión con método y la prueba de dominio (la
+    misma historia en tres duraciones). *Puerta a la ruta 8.*
 
 ---
 
@@ -310,19 +311,22 @@ afilar la prosa (ruta 2) ni levantar un guion de cine (ruta 4) sin las piezas
 que enseña el Hilo, así que la recomendación es terminar primero la Ruta del
 Hilo que Tira y solo después abrir las especializaciones.
 
-**La siguiente misión, hoy, es la etapa 2 del Hilo: «El deseo y el obstáculo».**
-Es el paso natural desde «La cadena y el hueco»: de las piezas que hacen que una
-lista sea historia, al motor que la echa a andar (alguien que quiere algo y
-alguien que se lo niega).
+**El Hilo ya está completo: sus doce etapas construidas y publicadas.** La
+gramática entera está puesta, así que ahora sí se pueden abrir las
+especializaciones, que se apoyan en ella.
 
-Después, dos criterios, en este orden:
+**La siguiente misión, hoy, es la etapa 1 de la Ruta del Anzuelo Honrado**
+(relato que persuade): es la especialización que la casa más usa, la que toca
+directamente el proyecto, los videos, las convocatorias y el trato con
+instituciones, y la puerta que abrió la etapa 9 del Hilo. La del **Expediente
+Real** (no ficción narrativa) va justo detrás, porque contar lo que le pasó a un
+alumno con honradez es lo que la casa hace cada semana, y es lo que abrió la
+etapa 10 del Hilo.
 
-1. **Completar el Hilo** hasta la etapa 12, porque es la base de todo lo demás.
-2. **Abrir la especialización que la casa más use**, que es la del **Anzuelo
-   Honrado** (relato que persuade): es la que toca directamente el proyecto, los
-   videos, las convocatorias y el trato con instituciones. La del **Expediente
-   Real** va justo detrás, porque contar lo que le pasó a un alumno con honradez
-   es lo que la casa hace cada semana.
+Criterio para el resto: **abrir la especialización que la casa más use antes que
+la que menos**, y dentro de cada ruta, la etapa 1 antes de profundizar, para que
+ninguna materia se quede muerta en el mapa (el mismo criterio de nivelar que rige
+el Estudio Mayor).
 
 Y quien construya recomienda la siguiente al terminar, con la cuenta del
 catálogo delante:

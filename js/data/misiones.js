@@ -192,6 +192,7 @@ const MISSIONS = [
   { id: 51, title: 'La historia que persuade, y el freno ético', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '⚖️', ruta: 'hilo', etapa: 9, sello: 'familiar', url: 'misiones/ruta-hilo-historia-persuade/historia-persuade.html' },
   { id: 52, title: 'La historia de verdad: narrativa de no ficción', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '📰', ruta: 'hilo', etapa: 10, sello: 'familiar', url: 'misiones/ruta-hilo-historia-de-verdad/historia-de-verdad.html' },
   { id: 53, title: 'Contar de pie y contar en imagen', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '🎥', ruta: 'hilo', etapa: 11, sello: 'familiar', url: 'misiones/ruta-hilo-de-pie-en-imagen/de-pie-en-imagen.html' },
+  { id: 54, title: 'El taller: revisión con método y la prueba de dominio', modulo: 'aprendizaje-unido', materia: 'story', color: 'apr', xp: 45, icon: '✂️', ruta: 'hilo', etapa: 12, sello: 'familiar', url: 'misiones/ruta-hilo-el-taller/el-taller.html' },
 ];
 
 /* Nombre de cada etapa aún no construida, para que el mapa de rutas enseñe el
@@ -249,13 +250,12 @@ const ETAPAS_PREVISTAS = {
     11: 'Historia de la ley: qué miedo escribió cada norma',
     12: 'El expediente propio: escrito, plazo y defensa de la casa',
   },
-  /* Las dos que faltan de la Ruta del Hilo que Tira. Las etapas 1 a 10 ya
-     estan construidas y sus titulos salen de MISSIONS, no de aqui: lo
-     previsto y lo hecho no pueden anunciarse dos veces en el mismo mapa. Los
-     titulos salen de COMPENDIO-STORYTELLING.md, capitulos 5 al 15. */
-  hilo: {
-    12: 'El taller: revisión con método y prueba de dominio',
-  },
+  /* La Ruta del Hilo que Tira ya está completa: sus doce etapas (ids 24, 25,
+     26, 43 a 54) están construidas y no queda ninguna por anunciar aquí. Se
+     deja el objeto vacío, a propósito, en vez de borrar la clave: `app.js`
+     lo maneja con `|| {}`, y un mapa sin ninguna «etapa futura» del Hilo es
+     justo la señal de que la ruta cerró. */
+  hilo: {},
   /* Las siete rutas de especialización de Storytelling, todas en cero. Sus
      títulos salen de COMPENDIO-STORYTELLING.md y ninguna se cita de memoria:
      cada estructura que se nombra lleva su autor y su año, que es la regla de
