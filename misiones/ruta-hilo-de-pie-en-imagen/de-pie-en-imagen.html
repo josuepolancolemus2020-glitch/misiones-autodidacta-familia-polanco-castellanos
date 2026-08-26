@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruta del Hilo que Tira · Etapa 11: Contar de pie y contar en imagen | F.A.R.O.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/de-pie-en-imagen.css">
+<link rel="stylesheet" href="../../css/lecturas.css">
+<link rel="stylesheet" href="../../css/lecturas-marcador.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="xp-bar" role="status" aria-label="Barra de progreso XP">
+  <a href="../../index.html?view=misiones" class="xp-back-btn" title="Regresar a Aprendizaje Unido">
+    <i class="fa-solid fa-arrow-left xp-back-arrow"></i>
+  </a>
+  <span class="xp-lbl">🎮 XP</span>
+  <div class="xp-track" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
+  <a href="#" class="xp-share-wa" onclick="compartirMision(); return false;" title="Compartir misión por WhatsApp" aria-label="Compartir misión por WhatsApp">
+    <img src="../../img/comparte_whatsapp.webp" alt="WhatsApp" class="xp-share-icon">
+  </a>
+  <span class="xp-pts" id="xpPts">⭐ 0</span>
+  <span class="xp-lvl" id="xpLvl">¿De pie, o en imagen? 🎥</span>
+</div>
+
+<header class="hero" role="banner">
+  <div class="hero-inner">
+    <div class="hero-mascot" aria-hidden="true">🎥</div>
+    <div class="hero-text">
+      <h1>Contar de pie <span>y contar en imagen</span></h1>
+      <p class="sub">Leer no es contar de pie; filmar la frase no es contar en imagen 🎥</p>
+      <div class="badge">🧵 Ruta del Hilo que Tira · Etapa 11 de 12</div>
+    </div>
+  </div>
+</header>
+
+<main class="main" id="main-content">
+
+<!-- ===== APRENDE ===== -->
+<div class="sec active" id="s-aprende" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🎥 La confusión que desarma esta etapa, y que no es una sola cosa</h2>
+    <p>La etapa anterior enseñó a distinguir un hecho real de uno fabricado. Esta etapa entra en un terreno distinto: qué pasa cuando una historia sale de la página, y tiene que sostenerse de pie, con la voz y el cuerpo, o convertirse en imagen, con el plano y el corte. Es la <strong>tercera y última puerta</strong> de la Ruta del Hilo que Tira: abre la <strong>Ruta de la Cámara que Cuenta</strong>, y conecta con el video de siete minutos que la casa ya usa cada semana.</p>
+    <p><strong>Se confunden dos cosas</strong>, y confundirlas es el error de fondo de esta etapa: <strong>(a) creer que contar de pie es leer un texto en voz alta</strong> (no lo es: la voz, la pausa, el cuerpo y la presencia cuentan distinto; el que cuenta de pie compone en vivo, no recita) y <strong>(b) creer que contar en imagen es filmar lo que dirías</strong> (no lo es: la imagen no ilustra la frase, la sustituye, y el significado nace del corte entre dos planos, no del plano solo).</p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La pregunta que abre esta etapa, y se hace siempre antes de grabar algo:</strong> ¿qué gana esta parte si se cuenta en vivo, sin leer? ¿qué frase se puede tirar porque un plano concreto la muestra? ¿qué de lo escrito habría que REHACER, en vez de trasladarlo tal cual? Tres preguntas, no una, y en ese orden.</div>
+    </div>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La trampa que va por delante:</strong> cada medio tiene su propia gramática. Lo que funciona en la página se REHACE, no se copia. Leer un texto en voz alta y llamarlo contar de pie; filmar una imagen que solo repite lo que la voz en off ya dijo: las dos son la misma trampa, dos veces.</div>
+    </div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>📊 La tabla madre: seis herramientas, cada una con su autor, su año y su límite</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Esta es la tabla que sostiene la etapa entera. Tres herramientas hablan de contar de pie, y tres hablan de contar en imagen.</p>
+    <table class="tres">
+      <tr><th>Herramienta</th><th>Autor y año</th><th>Qué aporta</th><th>Su crítica o límite</th></tr>
+      <tr><td>La ejecución: la voz y el gesto que hacen vivir las palabras (actio)</td><td>Quintiliano, «Institutio oratoria» (hacia el año 95 d.C.)</td><td>La quinta parte de la retórica, la actio o pronuntiatio, la ejecución de pie: la misma frase dicha con la voz y el gesto justos convence, y dicha sin ellos se cae</td><td>Es un tratado clásico de oratoria, pensado para el orador, no para todo relato</td></tr>
+      <tr><td>Contar de pie es componer, no recitar</td><td>Milman Parry y Albert Lord, «The Singer of Tales», 1960</td><td>La teoría oral-formulaica: el poeta oral (el aedo, el guslar) no memoriza un texto fijo, lo compone en vivo con fórmulas, cada vez distinto</td><td>Es una teoría sobre la épica oral tradicional; su extensión a todo relato oral se discute</td></tr>
+      <tr><td>La oralidad tiene su propia lógica, no es escritura hablada</td><td>Walter Ong, «Oralidad y escritura» (Orality and Literacy), 1982</td><td>El pensamiento oral es distinto del escrito (más aditivo, más cercano a la vida, más cargado de fórmulas y de presencia); contar de pie usa esa lógica, no la de la página</td><td>Es una tesis fuerte, criticada por separar demasiado lo oral de lo escrito</td></tr>
+      <tr><td>El montaje significa: el efecto Kuleshov</td><td>Lev Kuleshov, el experimento Kuleshov (hacia 1918-1920)</td><td>El mismo plano de un rostro inexpresivo, montado junto a un plato de sopa, un ataúd o una mujer, se lee como hambre, dolor o deseo: el significado nace del corte</td><td>El metraje original se perdió y algunas versiones son reconstrucciones; el principio, sin embargo, se ha estudiado después</td></tr>
+      <tr><td>El montaje como choque (la dialéctica del cine)</td><td>Serguéi Eisenstein, sus escritos sobre el montaje (hacia 1929), tras «El acorazado Potemkin» (1925)</td><td>Montar no es solo unir, es CHOCAR dos planos para producir un concepto nuevo que ninguno contiene (el montaje intelectual)</td><td>Es la teoría de un autor, en polémica con Bazin (visto en la etapa 4); su montaje intelectual puro pocas veces se logró</td></tr>
+      <tr><td>La imagen dice lo que la palabra no: el primer plano</td><td>Béla Balázs, «El hombre visible» (Der sichtbare Mensch), 1924</td><td>El cine devuelve una cultura visual; el primer plano de un rostro revela una microfisonomía, algo que ninguna palabra alcanza a decir</td><td>Es teoría temprana y algo utópica del cine mudo, escrita antes del sonoro</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎥 La fila que fecha la fuente más antigua de la ruta</span><br>
+      <span>La <span class="hl">actio de Quintiliano (hacia el 95 d.C.)</span> es la fila más vieja de toda la Ruta del Hilo que Tira: casi dos mil años antes que cualquier otra herramienta citada en esta casa. Y sin embargo, la ejecución de pie que describe es la misma que hoy sostiene un video de siete minutos: la voz y el gesto justos convencen, y sin ellos la misma frase se cae.</span>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🔀 La fila que formaliza la advertencia de la fila de al lado</span><br>
+      <span>El <span class="hl">efecto Kuleshov (hacia 1920)</span> muestra que el corte entre dos planos crea significado, pero no explica hasta dónde llega ese poder. El <span class="hl2">montaje de choque de Eisenstein (hacia 1929)</span> es lo que completa esa idea: no basta con unir, hay que CHOCAR dos planos para producir un concepto nuevo. Citar a Kuleshov sin Eisenstein es dejar el efecto sin su teoría más ambiciosa.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🧩 Siete fechas: de Quintiliano a Rubin</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Toca cada fecha para ver qué se propuso y por qué importa en esta etapa.</p>
+    <div class="timeline-wrap">
+      <div class="timeline-track" id="timelineTrack"></div>
+    </div>
+    <div class="svg-info" id="tlInfo" style="display:none;background:var(--card);border:2px solid var(--pri);border-radius:12px;padding:1rem;margin-top:0.8rem;box-shadow:0 4px 16px var(--shadow);align-items:flex-start;gap:0.6rem;">
+      <span class="si-icon" id="tlInfoIcon" style="font-size:1.6rem;flex-shrink:0;">🧩</span>
+      <div class="si-text" id="tlInfoText" style="flex:1;font-size:0.9rem;line-height:1.5;color:var(--dark);">Selecciona una fecha de la línea.</div>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🧬 Armar: fechar y declarar una herramienta antes de usarla</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Esta es la operación que la etapa evalúa. Alguien trae una afirmación suelta sobre contar de pie o en imagen, y hay que devolverla con tres cosas puestas: <strong>su autor y su año</strong>, <strong>su límite</strong>, y <strong>su etiqueta de estatus</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎤 Trabajado: «leer más fuerte ya es contar de pie»</span><br>
+      <span><span class="hl">Sin cuidado:</span> «Si leo el guion con buena voz y pausas, ya estoy contando de pie.» <span class="hl">Con cuidado:</span> «Leer no es contar de pie: contar de pie es componer en vivo, con la voz y el gesto justos (<span class="hl2">Quintiliano, hacia el 95 d.C.; Parry y Lord, 1960</span>), no recitar un texto fijo por bien leído que esté.» Leer puede sonar bien y seguir siendo lectura disfrazada.</span>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">⚠️ Trabajado: «filmar la frase ya es contar en imagen»</span><br>
+      <span><span class="hl">Sin cuidado:</span> «Si la imagen muestra lo mismo que dice la voz, la escena ya está resuelta.» <span class="hl">Con cuidado:</span> «Es una confusión, no una regla: <span class="hl2">Balázs («El hombre visible», 1924)</span> defiende que la imagen no ilustra la frase, la sustituye.» La regla: <span class="hl">si el plano solo repite lo que la voz dijo, no se contó en imagen, se leyó dos veces</span>.</span>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎯 Trabajado: «el efecto Kuleshov está comprobado sin ninguna duda»</span><br>
+      <span><span class="hl">Sin etiqueta:</span> «El corte siempre crea el significado que uno quiera, está demostrado.» <span class="hl">Con etiqueta:</span> «Es una exageración: la réplica de <span class="hl2">Prince y Hensley (1992)</span> encontró un efecto más débil que la leyenda, aunque <span class="hl2">Mobbs y colegas (2006)</span> hallaron apoyo neural parcial.» Se enseña con sus réplicas, no como una certeza cerrada.</span>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;"><strong>Y la última prueba: nombrar la etiqueta de estatus.</strong> No «así es siempre el cine», sino «tratado clásico de oratoria, o teoría de la épica oral con trabajo de campo, o tesis fuerte de un estudioso, o experimento clásico del cine con metraje perdido, o teoría de autor del cine».</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎥 Contar sin la página: la herramienta de esta etapa</h2>
+    <p>Todo lo anterior se junta en una sola herramienta práctica, que esta etapa deja puesta para el resto de la ruta: hasta la etapa 12, cada historia que sale de la página se mide con las mismas <strong>tres casillas</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎥 Las tres casillas, siempre en este orden</span><br>
+      <span><strong>1. De pie (la voz y el cuerpo):</strong> ¿qué gana esta parte si se cuenta en vivo, sin leer, con la pausa y el gesto? La historia de siete minutos que se sostiene sin papel (Quintiliano; Parry y Lord). <strong>2. En imagen (el plano y el corte):</strong> ¿qué frase se puede tirar porque un plano concreto la muestra, y qué significan dos planos juntos que ninguno dice solo? (Kuleshov; Eisenstein). <strong>3. Lo que NO se copia del texto:</strong> ¿qué de lo escrito habría que REHACER para el oído o el ojo, en vez de trasladarlo tal cual? Ni leer en voz alta, ni ilustrar la frase con un plano.</span>
+    </div>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🏫 La herramienta aplicada a un caso real de la casa</span><br>
+      <span>El video insignia de siete minutos de M.E.T.A.S, de <span class="hl">L 45,000</span> en producción, estaba listo para grabarse con una voz en off leyendo el guion completo. <span class="hl">¿Qué de pie?</span> La charla del maestro se armó de pie, con fichas, no leída. <span class="hl">¿Qué en imagen?</span> La mitad de las frases se cambiaron por planos que las sustituían. <span class="hl2">¿Qué no se copia?</span> Casi todo el guion original, rehecho para la voz y la cámara.</span>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.6rem;">Esta herramienta no se guarda para el examen: se aplica a los ocho casos del proyecto, al guion de video de esta misión, y a la evaluación bajo presión.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🔁 Simulación: el video con voz en off que lee, y la imagen que solo repite</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.6rem;">Presiona <strong>Iniciar</strong> y decide qué se hace cuando un guion está disfrazado de discurso y de cine a la vez.</p>
+    <div class="method-sim" id="methodSim">
+      <div class="method-steps" id="methodSteps">
+        <div class="method-step" id="ms1"><span class="ms-num">1</span><span class="ms-icon">📥</span><span class="ms-text"><strong>Llega el video:</strong> la voz en off lee un párrafo entero mientras la imagen, plano a plano, muestra exactamente lo que la voz ya dijo. Nadie se pregunta si la imagen sustituye algo, o si la charla se podría contar de pie.</span></div>
+        <div class="method-arrow" id="ma1">⬇️</div>
+        <div class="method-step" id="ms2"><span class="ms-num">2</span><span class="ms-icon">🔍</span><span class="ms-text"><strong>Se mide el material:</strong> un maestro de M.E.T.A.S iba a leer su charla de siete minutos de un papel, y el editor iba a filmar cada frase tal como se dice, sin cortar a nada distinto.</span></div>
+        <div class="method-arrow" id="ma2">⬇️</div>
+        <div class="method-step" id="ms3"><span class="ms-num">3</span><span class="ms-icon">🎥</span><span class="ms-text"><strong>Se aplica contar sin la página:</strong> ¿qué gana esta parte si se cuenta en vivo? (la charla puede componerse de pie, con pausas), ¿qué frase se puede tirar porque un plano la muestra? (varias, si se buscan los planos correctos), ¿qué NO se copia del texto? (casi todo, si se rehace para la voz y la cámara).</span></div>
+        <div class="method-arrow" id="ma3">⬇️</div>
+        <div class="method-step" id="ms4"><span class="ms-num">4</span><span class="ms-icon">✂️</span><span class="ms-text"><strong>Se compara con el material original:</strong> leer el guion y filmar la frase no habían garantizado nada; solo hacían más difícil notar que la charla y el video estaban disfrazados de discurso y de cine.</span></div>
+      </div>
+      <div class="method-branch" id="methodBranch">
+        <p style="width:100%;font-size:0.88rem;font-weight:700;color:var(--dark);">La grabación ya está programada para mañana. ¿Qué se hace?</p>
+        <button class="btn btn-d" onclick="resolveMethod(false)">📖 Grabar tal cual, leyendo el guion y filmando cada frase</button>
+        <button class="btn btn-pri" onclick="resolveMethod(true)">🎥 Aplicar contar sin la página antes de grabar, y rehacer lo que haga falta</button>
+      </div>
+      <div class="method-result" id="methodResult"></div>
+      <button class="btn btn-pri" onclick="startMethod()" id="methodBtn" style="margin-top:0.8rem;">🚀 Iniciar simulación</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-estructura')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== ESTRUCTURA ===== -->
+<div class="sec" id="s-estructura" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔑 El protocolo: cinco movimientos para sacar contar sin la página de cualquier pasaje</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Esta tabla es el mecanismo que la etapa entera pone a trabajar: cinco pasos que se aplican a cualquier historia que salga de la página, de una charla de M.E.T.A.S a un guion de siete minutos.</p>
+    <table class="tres">
+      <tr><th>Movimiento</th><th>Qué se hace</th><th>Dónde se cae</th></tr>
+      <tr><td>1. Preguntar si esto se sostiene de pie, sin leer</td><td>¿La voz, la pausa y el gesto sostienen la historia sin papel? (Quintiliano)</td><td>Confundir leer en voz alta con contar de pie</td></tr>
+      <tr><td>2. Preguntar si compone en vivo o recita fijo</td><td>¿Cada vez sale distinto, con fórmulas, o es un texto memorizado palabra por palabra? (Parry y Lord, 1960)</td><td>Tratar la oralidad como un guion escrito que se recita</td></tr>
+      <tr><td>3. Preguntar si la imagen sustituye a la frase, o solo la ilustra</td><td>¿El plano reemplaza lo que se diría, o solo repite lo que la voz ya dijo? (Balázs, 1924)</td><td>Filmar una imagen que solo ilustra la frase, no la sustituye</td></tr>
+      <tr><td>4. Comprobar qué dicen dos planos juntos que ninguno dice solo</td><td>¿El corte entre dos planos crea un significado nuevo? (Kuleshov, hacia 1920)</td><td>Pegar planos sin que el corte signifique nada</td></tr>
+      <tr><td>5. Comprobar si el montaje choca conceptos o solo une planos</td><td>¿El montaje produce un concepto nuevo, o solo pega escenas en orden? (Eisenstein, hacia 1929)</td><td>Confundir editar (unir) con montar (chocar)</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🔑 La señal de que el protocolo no se corrió</span><br>
+      <span>Si alguien dice «se entiende bien así» y no puede contestar <span class="hl">si se sostiene de pie, si la imagen sustituye, y si el corte significa algo</span>, el protocolo se saltó los tres primeros pasos. Un guion bien revisado suena distinto: <span class="hl2">«esto lo sostiene el corte, y aquello lo sostiene la voz de pie»</span>, no <span class="hl">«ya se entiende, para qué cambiarlo»</span>.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🏷️ Las etiquetas de estatus, y la prueba que pide cada una</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">No todas las herramientas de esta etapa son del mismo tipo, y tratarlas igual es el error de fondo.</p>
+    <table class="tres">
+      <tr><th>Categoría</th><th>Qué se reconoce en esta etapa</th><th>La prueba que la desarma</th></tr>
+      <tr><td>Tratado clásico de oratoria</td><td>Quintiliano (hacia el 95 d.C.)</td><td>¿Se cita como fuente de la antigüedad, con su fecha aproximada, o se le atribuye una fecha moderna?</td></tr>
+      <tr><td>Teoría de la épica oral, con trabajo de campo</td><td>Parry y Lord (1960)</td><td>¿Se admite que es una teoría sobre la épica tradicional, cuya extensión a todo relato se discute?</td></tr>
+      <tr><td>Tesis fuerte de un estudioso</td><td>Ong (1982)</td><td>¿Se admite que es una tesis criticada por separar demasiado lo oral de lo escrito?</td></tr>
+      <tr><td>Experimento clásico del cine (con metraje perdido)</td><td>Kuleshov (hacia 1920)</td><td>¿Se admite que el metraje original se perdió, y que algunas versiones son reconstrucciones?</td></tr>
+      <tr><td>Teoría de autor del cine</td><td>Eisenstein (hacia 1929), Balázs (1924)</td><td>¿Se admite que son teorías de un autor, en polémica con otros (como Bazin), y no leyes del cine?</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🏷️ Por qué la etiqueta cambia lo que se hace después</span><br>
+      <span>Con un <span class="hl">tratado clásico</span> se pregunta si se cita con su fecha aproximada. Con una <span class="hl2">teoría de la épica oral</span> se busca si se admite que su extensión se discute. Con una <span class="hl">tesis fuerte</span> se pregunta si se admite la crítica que recibió. Con un <span class="hl2">experimento con metraje perdido</span> se pregunta si se cita con esa duda a la vista. Con una <span class="hl">teoría de autor</span> se pregunta si se admite que está en polémica. Cinco etiquetas, cinco preguntas distintas.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📊 Seis piezas, en números</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.6rem;">Lo que esta etapa reparte, contado.</p>
+    <div class="stat-bar">
+      <div class="stat-item"><div class="stat-label">Herramientas con autor y año, en la tabla madre</div><div class="stat-val">6</div></div>
+      <div class="stat-item"><div class="stat-label">Casillas de contar sin la página</div><div class="stat-val">3</div></div>
+      <div class="stat-item"><div class="stat-label">Etiquetas de estatus que reparte esta etapa</div><div class="stat-val">5</div></div>
+      <div class="stat-item"><div class="stat-label">Piezas del laboratorio</div><div class="stat-val">4</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.6rem;">El número que más pesa de esta tabla es el <strong>tres</strong>: las tres casillas de contar sin la página, la única herramienta de toda esta etapa que se va a volver a usar, sin cambiarle una coma, hasta la etapa 12.</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📝 El vocabulario que esta etapa deja puesto</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Seis palabras que se usan en la etapa siguiente de la ruta, y en toda la Ruta de la Cámara que Cuenta, cada vez que haga falta decidir si algo se cuenta de pie, en imagen, o se copia tal cual.</p>
+    <div class="type-grid">
+      <div class="type-chip tc-teal"><div class="t-art">🎭 La actio</div><div class="t-info">La voz y el gesto que hacen vivir las palabras (Quintiliano, hacia 95 d.C.)</div></div>
+      <div class="type-chip tc-gold"><div class="t-art">🎤 La composición oral</div><div class="t-info">Componer en vivo con fórmulas, no recitar un texto fijo (Parry y Lord, 1960)</div></div>
+      <div class="type-chip tc-jade"><div class="t-art">🎬 El efecto Kuleshov</div><div class="t-info">Dos planos juntos dicen lo que ninguno dice solo (hacia 1920)</div></div>
+      <div class="type-chip tc-amber"><div class="t-art">🎞️ El montaje de choque</div><div class="t-info">Chocar dos planos para producir un concepto nuevo (Eisenstein, hacia 1929)</div></div>
+      <div class="type-chip tc-blue"><div class="t-art">🎥 El primer plano</div><div class="t-info">El rostro revela una microfisonomía que ninguna palabra alcanza a decir (Balázs, 1924)</div></div>
+      <div class="type-chip tc-purple"><div class="t-art">📋 Contar sin la página</div><div class="t-info">¿Qué de pie?, ¿qué en imagen?, ¿qué NO se copia del texto?</div></div>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;"><strong>Ninguna historia de esta casa se cuenta de pie o en imagen sin haber pasado esta herramienta</strong>, y <strong>ninguna herramienta que se use para decidirlo se cita sin su autor y su año</strong>.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lab')">
+    <span class="nsb-icon">🧪</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LAB ===== -->
+<div class="sec" id="s-lab" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🧪 Las cuatro piezas del laboratorio</h2>
+    <p style="font-size:0.85rem;color:var(--gray);margin-bottom:0.8rem;">Selecciona una pieza y un aspecto. Combínalas todas para quedarte con las cuatro fichas completas.</p>
+    <div id="lab-sentence" class="lab-sentence">⚙️ Explorando: <strong>Contar de pie (la voz y el cuerpo)</strong> → <strong>Qué es</strong></div>
+    <div class="lab-stage">
+      <div id="lab-display" class="lab-display-box">
+        <!-- Rellenado por JS -->
+      </div>
+    </div>
+    <div class="lab-controls">
+      <div class="lab-group">
+        <span class="lab-group-label">🎥 Pieza:</span>
+        <!-- Las llaves de data-parte (esperado, paradoja, utilidad, ruina) se heredan
+             del molde a propósito y NO coinciden con los nombres visibles: el motor y
+             sus llamadas labShowParte() las usan tal cual. En esta etapa el reparto es:
+             esperado = Contar de pie (la voz y el cuerpo), paradoja = Contar en imagen
+             (el plano y el corte), utilidad = Contar sin la página, ruina = Leer en
+             voz alta o ilustrar la frase. -->
+        <button class="lab-btn lab-cont-btn" data-parte="esperado" onclick="labShowParte('esperado')">🧍 Contar de pie (la voz y el cuerpo)</button>
+        <button class="lab-btn lab-cont-btn" data-parte="paradoja" onclick="labShowParte('paradoja')">🎬 Contar en imagen (el plano y el corte)</button>
+        <button class="lab-btn lab-cont-btn" data-parte="utilidad" onclick="labShowParte('utilidad')">📋 Contar sin la página</button>
+        <button class="lab-btn lab-cont-btn" data-parte="ruina" onclick="labShowParte('ruina')">🚫 Leer en voz alta o ilustrar la frase</button>
+      </div>
+      <div class="lab-group">
+        <span class="lab-group-label">📌 Aspecto:</span>
+        <button class="lab-btn lab-asp-btn" data-aspecto="estructura" onclick="labShowAspecto('estructura')">📖 Qué es</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="funcion" onclick="labShowAspecto('funcion')">⚙️ Cómo se comprueba</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="enfermedades" onclick="labShowAspecto('enfermedades')">🔎 Dónde se cae</button>
+        <button class="lab-btn lab-asp-btn" data-aspecto="cuidados" onclick="labShowAspecto('cuidados')">💡 En esta casa</button>
+      </div>
+    </div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-flash')">
+    <span class="nsb-icon">🃏</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div class="sec" id="s-flash" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🃏 Flashcards: toca para voltear</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +1 XP por cada tarjeta volteada (primera vez)</p>
+    <div class="fc-wrap">
+      <div class="fc-inner" id="fcInner" onclick="flipCard()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard();}" tabindex="0" role="button" aria-label="Tarjeta de estudio. Presiona Enter para voltear">
+        <div class="fc-front"><div class="fw" id="fcW"></div><div class="fhint">🃏 Toca · Enter para voltear</div></div>
+        <div class="fc-back"><div class="fca" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-d" onclick="prevFC()">◀ Anterior</button>
+      <span class="fc-ctr" id="fcCtr" aria-live="polite">1 / 16</span>
+      <button class="btn btn-pri" onclick="nextFC()">Siguiente ▶</button>
+    </div>
+    <div id="fbFlash" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-quiz')">
+    <span class="nsb-icon">🧠</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="sec" id="s-quiz" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🧠 Quiz de Comprensión</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="qz-prog" id="qzProg" aria-live="polite">Pregunta 1 de 10</p>
+    <div class="qz-q" id="qzQ" role="heading" aria-level="3"></div>
+    <div class="qz-opts" id="qzOpts" role="group" aria-label="Opciones"></div>
+    <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkQz()">✔ Verificar</button>
+      <button class="btn btn-d" onclick="resetQz()">🔄 Reiniciar Quiz</button>
+    </div>
+    <div id="fbQz" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-clasifica')">
+    <span class="nsb-icon">🗂️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CLASIFICA ===== -->
+<div class="sec" id="s-clasifica" role="tabpanel">
+  <div class="card ac-jade">
+    <h2>🗂️ Clasifica: ¿de qué lado cae?</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Selecciona un elemento del banco y toca la columna donde pertenece.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +5 XP al completar el grupo (primera vez)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: ¡Usa el botón "Variar grupo" varias veces! Hay 4 clasificaciones distintas.</p>
+    <div class="word-bank" id="clsBank" role="list"></div>
+    <div class="drop-cols">
+      <div class="drop-col" id="col-left" role="list" aria-label="Columna izquierda"><h4 id="col-left-head">Columna A</h4><div id="items-left"></div></div>
+      <div class="drop-col" id="col-right" role="list" aria-label="Columna derecha"><h4 id="col-right-head">Columna B</h4><div id="items-right"></div></div>
+    </div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkClass()">✔ Verificar</button>
+      <button class="btn btn-pri" onclick="nextClassGroup()">🔄 Variar grupo</button>
+      <button class="btn btn-d" onclick="resetClass()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbCls" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-identifica')">
+    <span class="nsb-icon">🔍</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== IDENTIFICA ===== -->
+<div class="sec" id="s-identifica" role="tabpanel">
+  <div class="card ac-purple">
+    <h2>🔍 Identifica la palabra clave</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez por pregunta)</p>
+    <p class="id-prog" id="idProg" aria-live="polite">Oración 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;">Toca la palabra clave solicitada:</p>
+    <div class="id-sent" id="idSent" role="group"></div>
+    <div class="id-info" id="idInfo" role="status" aria-live="polite" style="font-size:0.82rem;color:var(--gray);font-style:italic;margin-top:0.4rem;"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextId()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetId()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbId" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-completa')">
+    <span class="nsb-icon">✏️</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== COMPLETA ===== -->
+<div class="sec" id="s-completa" role="tabpanel">
+  <div class="card ac-amber">
+    <h2>✏️ Completa la oración</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +5 XP por respuesta correcta (primera vez)</p>
+    <p style="font-family:'Fredoka',sans-serif;font-size:0.82rem;color:var(--gray);margin-bottom:0.6rem;" id="cmpProg" aria-live="polite">Oración 1 de 8</p>
+    <div class="cmp-sent" id="cmpSent"></div>
+    <div class="cmp-opts" id="cmpOpts" role="group"></div>
+    <button class="btn btn-g" onclick="checkCmp()">✔ Verificar</button>
+    <div id="fbCmp" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-widgets')">
+    <span class="nsb-icon">🧩</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== WIDGETS ===== -->
+<div class="sec" id="s-widgets" role="tabpanel">
+
+  <div class="card ac-teal">
+    <h2>🔗 Ordena: los tres procedimientos de esta etapa</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +4 XP por orden correcto (primera vez por secuencia)</p>
+    <p style="font-size:0.85rem;margin-bottom:0.8rem;"><strong>Arrastra las tarjetas</strong> con el dedo (o usa las flechas <strong>▲ ▼</strong>) para ponerlas en orden. Hay <strong>tres secuencias</strong> y se cambia con <strong>Nueva secuencia</strong>. Si te trabas, enciende la <strong>🔦 linterna</strong>: enseña el número que le toca a cada tarjeta, y esa secuencia deja de dar XP.</p>
+    <div class="sort-list" id="routeList"></div>
+    <div style="display:flex;gap:0.6rem;margin-top:0.8rem;flex-wrap:wrap;">
+      <button class="btn btn-g" onclick="checkRoute()">✅ Verificar orden</button>
+      <button class="btn btn-pri" onclick="nextRoute()">🔄 Nueva secuencia</button>
+      <button class="btn btn-d" id="btnLinterna" onclick="linternaRoute()">🔦 Linterna</button>
+    </div>
+    <div id="fbRoute" class="fb" role="alert"></div>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🔬 Identifica la herramienta por su descripción</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuronProg" aria-live="polite">Pieza 1 de 8</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">¿Qué herramienta o pieza del vocabulario de esta etapa se describe?</p>
+    <div class="neuron-desc" id="neuronDesc">Cargando...</div>
+    <div class="cmp-opts" id="neuronOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuron" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;display:flex;gap:0.6rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextNeuron()">▶ Siguiente</button>
+      <button class="btn btn-d" onclick="resetNeuron()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📚 ¿Qué le pasa de verdad a esa afirmación?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="neuroProg" aria-live="polite">1 de 5</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que de verdad pasa con esa frase:</p>
+    <div class="neuro-trans-display" id="neuroTrans">«Leer un texto en voz alta ya es contar de pie»</div>
+    <div class="qz-opts" id="neuroOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbNeuro" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetNeuro()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🧐 Diagnóstico: ¿qué le falta a esa cita?</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.6rem;">⭐ +3 XP por respuesta correcta (primera vez)</p>
+    <p class="id-prog" id="enferProg" aria-live="polite">1 de 6</p>
+    <p style="font-size:0.85rem;margin-bottom:0.6rem;">Selecciona qué es lo que falla en esa manera de citar una herramienta:</p>
+    <div class="neuro-trans-display" id="enferDisease">«Leer el guion más fuerte y con pausas largas ya es contar de pie»</div>
+    <div class="qz-opts" id="enferOpts" role="group" style="margin-top:0.8rem;"></div>
+    <div id="fbEnfer" class="fb" role="alert"></div>
+    <div style="margin-top:0.8rem;">
+      <button class="btn btn-d" onclick="resetEnfer()">🔄 Reiniciar</button>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-reto')">
+    <span class="nsb-icon">🏆</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RETO ===== -->
+<div class="sec" id="s-reto" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🏆 Reto Final: ¡30 segundos!</h2>
+    <p style="font-size:0.88rem;margin-bottom:0.8rem;">Clasifica cada elemento lo más rápido posible: si trae su año o es huérfano, si es de pie o en imagen, o si rehace o copia tal cual.</p>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.8rem;">⭐ +1 XP correcto | ❌ -1 XP incorrecto (solo primera partida)</p>
+    <p style="font-size:0.82rem;color:var(--pri);font-weight:600;margin-bottom:1rem;">💡 Consejo: usa "Variar pareja" para jugar con las 3 categorías disponibles.</p>
+    <div class="game" aria-live="polite">
+      <div class="reto-timer" id="retoTimer">⏱ 30</div>
+      <div class="reto-word" id="retoWord" aria-live="assertive">¡Prepárate!</div>
+      <div class="reto-btns">
+        <!-- Los rótulos y el onclick los pone updateRetoButtons() al cargar. -->
+        <button class="btn btn-pri" onclick="">📅 Con año</button>
+        <button class="btn btn-sec" onclick="">🌫️ Huérfana</button>
+      </div>
+      <div class="reto-score" id="retoScore" aria-live="polite">✅ 0 correctas | ❌ 0 errores</div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="startReto()">🚀 ¡Iniciar!</button>
+      <button class="btn btn-g" onclick="nextRetoPair()">🔄 Variar pareja</button>
+      <button class="btn btn-d" onclick="resetReto()">🔄 Reiniciar</button>
+    </div>
+    <div id="fbReto" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-sopa')">
+    <span class="nsb-icon">🔤</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== SOPA ===== -->
+<div class="sec" id="s-sopa" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>🔤 Sopa de Letras</h2>
+    <p style="font-size:0.78rem;color:var(--gray);margin-bottom:0.4rem;">⭐ +1 XP por palabra encontrada (primera vez)</p>
+    <div class="sopa-words" id="sopaWords"></div>
+    <p class="sopa-hint" id="sopaHint">🖱️ Arrastra o haz clic en la primera letra, luego en la última</p>
+    <div class="sopa-container">
+      <div class="sopa-grid" id="sopaGrid"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="nextSopaSet()">🔄 Variar sopa</button>
+    </div>
+    <div id="fbSopa" class="fb" role="alert"></div>
+  </div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-tareas')">
+    <span class="nsb-icon">📋</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== TAREAS ===== -->
+<div class="sec" id="s-tareas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📋 Generador de Tareas</h2>
+    <div class="tg-controls">
+      <select class="tg-sel" id="tgType">
+        <option value="identify">🔍 Identificar</option>
+        <option value="classify">🗂️ Clasificar</option>
+        <option value="complete">✏️ Completar oraciones</option>
+        <option value="explain">💡 Explicar</option>
+      </select>
+      <select class="tg-sel" id="tgCount">
+        <option value="5">5 tareas</option>
+        <option value="8" selected>8 tareas</option>
+        <option value="10">10 tareas</option>
+        <option value="15">15 tareas</option>
+      </select>
+      <button class="btn btn-pri" onclick="genTask()">⚡ Generar</button>
+      <button class="btn btn-d" onclick="toggleAns()">👁 Respuestas</button>
+    </div>
+    <div id="tgOut"></div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>✏️ Tres encargos de lápiz de esta etapa</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Estos tres no los genera la máquina: se hacen en el cuaderno, con material de verdad de esta casa, y se guardan fechados.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:0.8rem;">
+      <li><strong>1. Sacar contar sin la página de un pasaje real de esta semana.</strong> Elige un video, una presentación o una escena que hayas visto o hecho de verdad. Escribe sus tres casillas: ¿qué de pie?, ¿qué en imagen?, ¿qué NO se copia del texto? Si alguna casilla no se puede llenar, escribe eso también.</li>
+      <li><strong>2. Fechar una afirmación huérfana sobre contar de pie o en imagen.</strong> Busca una frase suelta como «leer más fuerte ya es contar de pie» o «el efecto Kuleshov está comprobado sin duda» que alguien haya dicho este mes. Escríbela primero tal como la dijeron, y después con su <strong>autor y su año</strong> puestos al lado, o con la nota honesta de que no se pudo comprobar.</li>
+      <li><strong>3. Encontrar un corte que signifique, al estilo de Kuleshov.</strong> Busca, en un video real, dos planos que montados juntos digan algo que ninguno dice solo. Escribe qué significan juntos, y si el montaje choca dos ideas (Eisenstein) o solo las une.</li>
+    </ul>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📌 La pauta de los tres</span><br>
+      <span>El primero está bien hecho si <span class="hl">las tres casillas quedan llenas con algo concreto, o con la nota honesta de que faltó un dato</span>. El segundo está bien hecho si la frase queda <span class="hl2">con su autor y su año reales, o con la nota de que no se pudo comprobar</span>. El tercero está bien hecho si <span class="hl2">queda claro qué dicen los dos planos juntos, y si el montaje choca o solo une</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-evaluacion')">
+    <span class="nsb-icon">🎓</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== EVALUACIÓN ===== -->
+<div class="sec" id="s-evaluacion" role="tabpanel">
+  <div class="eval-mode-toggle" role="tablist" aria-label="Tipo de evaluación">
+    <button class="eval-mode-btn active" id="evalModeBtnConcept" role="tab" aria-selected="true" onclick="evalSwitchMode('concept')">🎓 Evaluación Conceptual</button>
+    <button class="eval-mode-btn" id="evalModeBtnCrit" role="tab" aria-selected="false" onclick="evalSwitchMode('crit')">🎥 Contar sin la página bajo presión</button>
+  </div>
+  <div id="evalConceptWrap">
+  <div class="card ac-purple">
+    <div class="eval-print-header">
+      <h2>Evaluación Final · Contar de pie y contar en imagen · Ruta del Hilo que Tira</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · Cada respuesta vale 5 puntos</p>
+    </div>
+    <h2 id="eval-screen-title">🎓 Evaluación Final: Contar de pie y contar en imagen</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">Responde en pantalla o copia el examen en tu cuaderno. Selecciona <strong>Ver Pauta</strong> para autoevaluarte o <strong>Calificar prueba</strong> para una corrección automática en pantalla. <strong>Genera nuevas preguntas cuando quieras.</strong></p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEval()">🔄 Nueva Evaluación</button>
+      <button class="btn btn-d" onclick="toggleEvalAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="gradeEval()">🧮 Calificar prueba</button>
+      <button class="btn btn-amber" onclick="printEval()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+  </div>
+  <div id="evalCritWrap" style="display:none;">
+  <div class="card ac-amber">
+    <div class="eval-print-header">
+      <h2>Evaluación Competencial · Contar sin la página bajo presión · Contar de pie y contar en imagen</h2>
+      <div class="eval-ph-nombre"><strong>Nombre:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Fecha:</strong><span class="eval-ph-line-fecha">&nbsp;</span></div>
+      <div class="eval-ph-nombre"><strong>Proyecto:</strong><span class="eval-ph-line-full">&nbsp;</span><strong>Módulo:</strong><span class="eval-ph-line-xs">&nbsp;</span><strong>Intento:</strong><span class="eval-ph-line-xs">&nbsp;</span></div>
+      <p style="font-size:0.72rem;margin-top:0.2rem;text-align:center;">Valor total: 100 puntos · 5 secciones de 20 puntos</p>
+    </div>
+    <h2 id="evalcrit-screen-title">🎥 Contar sin la página bajo presión: qué de pie, qué en imagen y qué no se copia, con el reloj corriendo</h2>
+    <p class="eval-desc" style="font-size:0.9rem;margin-bottom:0.8rem;">La prueba central de la etapa: en cada caso hay un video o una charla real de esta casa, con sus cifras en lempiras. Escribe <strong>qué gana esta parte si se cuenta en vivo</strong>, decide <strong>qué frase se puede tirar por un plano</strong>, aplica <strong>una herramienta con su autor y su año</strong>, y decide <strong>la pregunta que decide</strong>. Compara con la <strong>Pauta</strong> y anótate el puntaje.</p>
+    <div class="eval-controls">
+      <button class="btn btn-purple" onclick="genEvalCrit()">🔄 Nueva Prueba</button>
+      <button class="btn btn-d" onclick="toggleEvalCritAns()">👁 Ver Pauta</button>
+      <button class="btn btn-g" onclick="calcCritTotal()">🧮 Calcular Total</button>
+      <button class="btn btn-amber" onclick="printEvalCrit()">🖨️ Imprimir</button>
+    </div>
+    <div id="evalCritOut"></div>
+  </div>
+  </div>
+  <div id="eval-pauta-sheet"></div>
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-casos')">
+    <span class="nsb-icon">🎥</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== CASOS DEL PROYECTO ===== -->
+<div class="sec" id="s-casos" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎥 Casos del proyecto: ocho situaciones que M.E.T.A.S tuvo que revisar con contar sin la página</h2>
+    <p>Ocho situaciones hipotéticas de esta familia y de M.E.T.A.S, todas con cifras en lempiras, y todas con lo mismo dentro: una historia que tiene que salir de la página, y a la que hay que aplicarle <strong>contar sin la página</strong>. En los ocho se hace la misma operación: se decide <strong>qué gana esta parte si se cuenta en vivo, sin leer</strong>, <strong>qué frase se puede tirar porque un plano la muestra, y qué dicen dos planos juntos</strong>, y <strong>qué de lo escrito habría que REHACER</strong>, y se termina en las dos preguntas de la casa: <strong>¿cuál es la pregunta que decide, y con qué condición sí?</strong></p>
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>La regla de oro de esta ruta, también aquí:</strong> ninguna herramienta se aplica sin autor, año y límite. La actio es de <strong>Quintiliano (hacia el 95 d.C.)</strong>; la composición oral, de <strong>Parry y Lord (1960)</strong>; la oralidad, de <strong>Ong (1982)</strong>; el efecto Kuleshov, de <strong>Lev Kuleshov (hacia 1920)</strong>; el montaje de choque, de <strong>Eisenstein (hacia 1929)</strong>; y el primer plano, de <strong>Béla Balázs (1924)</strong>.</div>
+    </div>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>Y la regla que gobierna los ocho:</strong> ninguno se cierra con «ya se entiende, para qué cambiarlo». Un caso está resuelto cuando quedan escritas las <strong>tres casillas</strong> de la herramienta, aunque una de las tres sea «no se puede llenar con lo que hay».</div>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎙️ Caso 1: el video con voz en off que lee, y la imagen que solo repite</h2>
+    <p>Un video de M.E.T.A.S de <strong>L 40,000</strong> pone una voz en off leyendo un párrafo entero, mientras la imagen muestra, plano a plano, exactamente lo que la voz ya va diciendo, sin aportar nada que la voz no haya dicho.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎥 Contar sin la página, fechado y criticado</span><br>
+      <span><span class="hl">¿Qué de pie?</span> Nada, porque no se cuenta de pie: se lee. <span class="hl">¿Qué en imagen?</span> Casi todas las frases se pueden tirar, si se buscan planos que sustituyan en vez de ilustrar. <span class="hl2">¿Qué no se copia?</span> El guion entero debería rehacerse para la imagen, no leerse encima de ella (<strong>Balázs, 1924</strong>). <strong>La pregunta que decide:</strong> ¿se puede sustituir la mitad de las frases por planos que las reemplacen? <strong>La condición:</strong> se sustituyen, y la voz en off se deja solo para lo que ningún plano puede mostrar.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📋 Caso 2: la charla de siete minutos que un maestro piensa leer</h2>
+    <p>Un maestro de M.E.T.A.S prepara una charla de <strong>L 15,000</strong> en materiales, y piensa leerla completa de sus notas frente a los alumnos, palabra por palabra.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎥 Contar sin la página, fechado y criticado</span><br>
+      <span><span class="hl">¿Qué de pie?</span> Mucho: la actio (<strong>Quintiliano, hacia 95 d.C.</strong>) sostiene una charla con voz, pausa y gesto, sin papel. <span class="hl">¿Qué en imagen?</span> Ninguna todavía, el problema es de composición oral (<strong>Parry y Lord, 1960</strong>). <span class="hl2">¿Qué no se copia?</span> El texto escrito no se lee tal cual: se rehace en fichas con las ideas, no con las frases completas. <strong>La pregunta que decide:</strong> ¿se convierte la charla en fichas para contarla de pie? <strong>La condición:</strong> se convierte, y se ensaya de pie, sin leer, al menos dos veces antes de grabar.</span>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Caso 3: dos planos que, montados juntos, dicen algo que ninguno dice solo</h2>
+    <p>Un documental de <strong>L 90,000</strong> tiene un plano de un alumno mirando un examen, y otro de una carta de aceptación a una beca; el editor duda si montarlos juntos o separarlos con una escena intermedia.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎥 Contar sin la página, fechado y criticado</span><br>
+      <span><span class="hl">¿Qué de pie?</span> No aplica, es material filmado. <span class="hl">¿Qué en imagen?</span> Toda explicación de que «el examen decidió su futuro»: el corte entre los dos planos ya lo dice (<strong>Kuleshov, hacia 1920</strong>). <span class="hl2">¿Qué no se copia?</span> La tentación de explicar con una voz en off lo que el montaje ya cuenta solo. <strong>La pregunta que decide:</strong> ¿el corte entre los dos planos produce, por sí solo, la idea de que uno llevó al otro? <strong>La condición:</strong> si el corte funciona sin ayuda, se monta directo; si no, se agrega solo el mínimo texto necesario.</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎥 Caso 4: el testimonio que alguien quiere leer de un guion</h2>
+    <p>Un alumno de M.E.T.A.S grabará un testimonio de <strong>L 20,000</strong> en producción, y su primer borrador es un texto que piensa leer completo frente a la cámara, sin apartar la vista del papel.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎥 Contar sin la página, fechado y criticado</span><br>
+      <span><span class="hl">¿Qué de pie?</span> La presencia y la pausa que solo da contar de pie, sin leer (<strong>Quintiliano; Parry y Lord, 1960</strong>). <span class="hl">¿Qué en imagen?</span> Ninguna todavía, el problema es de voz, no de imagen. <span class="hl2">¿Qué no se copia?</span> El guion escrito no se lee tal cual frente a la cámara: se aprenden las ideas, no las palabras exactas. <strong>La pregunta que decide:</strong> ¿se puede grabar el testimonio contado de pie, con las ideas del guion pero sin leerlo? <strong>La condición:</strong> se graba así, ensayado sin papel, aunque salga distinto cada vez que se practica.</span>
+    </div>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎞️ Caso 5: la escena en un solo plano frente a la misma cortada</h2>
+    <p>Una escena de <strong>L 70,000</strong> en filmación se puede resolver en un solo plano largo, sin cortes, o cortada en varios planos que se monten después.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎥 Contar sin la página, fechado y criticado</span><br>
+      <span><span class="hl">¿Qué de pie?</span> No aplica, es material filmado. <span class="hl">¿Qué en imagen?</span> Depende: si el plano largo ya cuenta todo lo necesario, no hace falta cortar para explicar nada más. <span class="hl2">¿Qué no se copia?</span> La costumbre de cortar «porque siempre se corta», sin que el corte produzca un concepto nuevo (<strong>Eisenstein, hacia 1929</strong>). <strong>La pregunta que decide:</strong> ¿el corte agregaría un significado que el plano largo no tiene solo? <strong>La condición:</strong> se corta solo si el montaje choca dos ideas nuevas; si no, se deja el plano largo.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>👁️ Caso 6: el primer plano que dice más que un párrafo de explicación</h2>
+    <p>Un video de <strong>L 18,000</strong> sobre un logro de un alumno de M.E.T.A.S tiene un párrafo entero de voz en off explicando lo que sintió, cuando ya existe un primer plano de su rostro en el momento exacto.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-f">🎥 Contar sin la página, fechado y criticado</span><br>
+      <span><span class="hl">¿Qué de pie?</span> No aplica aquí, el problema es de imagen. <span class="hl">¿Qué en imagen?</span> Todo el párrafo explicativo: el primer plano ya revela la microfisonomía del momento (<strong>Balázs, 1924</strong>). <span class="hl2">¿Qué no se copia?</span> La costumbre de explicar con palabras lo que un rostro ya está diciendo solo. <strong>La pregunta que decide:</strong> ¿el primer plano, sin ninguna voz encima, sostiene el momento por sí solo? <strong>La condición:</strong> se deja el primer plano solo, y se quita el párrafo explicativo.</span>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎤 Caso 7: el cuento de la abuela, distinto cada vez</h2>
+    <p>La familia de un alumno quiere transcribir, por <strong>L 10,000</strong> en horas de trabajo, un cuento que la abuela contaba de memoria, distinto cada vez, para «dejarlo fijo para siempre».</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-d">🎥 Contar sin la página, fechado y criticado</span><br>
+      <span><span class="hl">¿Qué de pie?</span> Todo: la composición oral (<strong>Parry y Lord, 1960</strong>) es justo lo que se pierde al fijar una sola versión. <span class="hl">¿Qué en imagen?</span> No aplica, el problema es de voz, no de imagen. <span class="hl2">¿Qué no se copia?</span> La idea de que «fijar por escrito» es lo mismo que «conservar»: conservar la composición viva exige grabar varias versiones, no transcribir una sola. <strong>La pregunta que decide:</strong> ¿se pueden grabar varias sesiones, en audio y video, en vez de transcribir una sola vez? <strong>La condición:</strong> se graban varias, y se guardan todas, sin elegir una «versión oficial».</span>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>📝 Caso 8: el video de siete minutos, repasado antes de grabar</h2>
+    <p>El guion del video insignia de M.E.T.A.S, de <strong>L 45,000</strong> en producción, está listo para grabarse, pero nadie lo ha repasado todavía con la herramienta de esta etapa.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎥 Contar sin la página, fechado y criticado</span><br>
+      <span><span class="hl">¿Qué de pie?</span> Se decide caso por caso, aplicando la primera casilla a cada escena del guion. <span class="hl">¿Qué en imagen?</span> Se decide aplicando la segunda casilla, escena por escena. <span class="hl2">¿Qué no se copia?</span> Todo lo que un narrador estuviera por leer en voz alta sin haberlo compuesto de pie. <strong>La pregunta que decide:</strong> ¿se aplican las tres casillas antes de grabar, o se graba con el guion tal cual está? <strong>La condición:</strong> se repasa entero con contar sin la página; lo que no pase las tres casillas se rehace antes de encender la cámara.</span>
+    </div>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>📝 La hoja de contar sin la página, y las cinco reglas de la etapa</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">Antes de dar por buena cualquiera de estas historias, la casa llena esta hoja. Se llena <strong>antes</strong> de grabar una sola escena, que es lo único que la vuelve útil.</p>
+    <ul style="font-size:0.9rem;line-height:1.6;padding-left:1.1rem;margin-bottom:0.8rem;">
+      <li><strong>¿Qué de pie?, en una línea:</strong> si la voz, la pausa y el gesto sostienen la parte sin papel, o si hay que dejarla leída.</li>
+      <li><strong>¿Qué en imagen?, en una línea:</strong> qué frase se puede tirar porque un plano la muestra, y qué dicen dos planos juntos que ninguno dice solo.</li>
+      <li><strong>¿Qué NO se copia del texto?:</strong> qué de lo escrito hay que rehacer para el oído o el ojo, en vez de trasladarlo tal cual.</li>
+      <li><strong>La herramienta que se aplica, con su autor y su año:</strong> Quintiliano (hacia 95 d.C.) para la actio; Parry y Lord (1960) para la composición oral; Ong (1982) para la oralidad; Kuleshov (hacia 1920) para el corte; Eisenstein (hacia 1929) para el montaje de choque; Balázs (1924) para el primer plano.</li>
+      <li><strong>Si una historia no aguanta las tres casillas, se rehace o se retira:</strong> a la vista, sin fingir que ya está contada de pie o en imagen sin serlo.</li>
+    </ul>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎥 Las cinco reglas de esta etapa</span><br>
+      <span>1. <span class="hl">Ninguna historia se da por buena sin sus tres casillas</span>: qué de pie, qué en imagen, qué no se copia. 2. <span class="hl2">Ninguna herramienta se aplica sin su autor y su año</span>: sin ellos, es una moda, no una técnica. 3. <span class="hl">«Se entiende» nunca se confunde con «se contó de pie o en imagen»</span>. 4. <span class="hl2">Sustituir</span> no es lo mismo que <span class="hl2">ilustrar</span>, aunque las dos usen un plano. 5. Todo lo que se saque de la página <span class="hl2">se rehace, siempre</span>, no importa cuánto se parezca a lo escrito.</span>
+    </div>
+    <p style="font-size:0.9rem;margin-top:0.8rem;"><strong>Esta etapa es la tercera y última puerta:</strong> lo que aquí se aprende, contar sin la página, es justo lo que la <strong>Ruta de la Cámara que Cuenta</strong> (Ruta 4) recorre entera, en siete etapas, desde la imagen que sustituye a la frase hasta el corte final.</p>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-guion')">
+    <span class="nsb-icon">🎬</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== GUION DE VIDEO ===== -->
+<div class="sec" id="s-guion" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>🎬 Guion de video: «Contar de pie y contar en imagen»</h2>
+    <p>Un guion listo para grabar, de seis a siete minutos y medio, que cuenta esta etapa <strong>con historia y no con definiciones</strong>. Nada de «contar sin la página» ni de «de pie, no leer» antes del minuto dos. Cada escena lleva su VOZ, su IMAGEN y su TEXTO EN PANTALLA. Protagonista: el efecto Kuleshov (Lev Kuleshov, hacia 1920), con un guiño a contar de pie (Quintiliano).</p>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>La regla de la casa para los guiones, y esta etapa la cumple consigo misma:</strong> este mismo guion se somete a su propia herramienta. El gancho no explica nada con palabras: es puro montaje, una cara y lo que va al lado.</div>
+    </div>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 1 · El gancho en frío (0:00 a 0:20)</h2>
+    <p><strong>VOZ (sin música, en negro):</strong> «Te muestro la cara de un hombre. No expresa nada. La misma cara, después de un plato de sopa: tiene hambre. La misma cara, después de un ataúd: está de duelo. La misma cara, después de una mujer: la desea. La cara no cambió nunca. Cambió lo que puse al lado.»</p>
+    <p><strong>IMAGEN:</strong> un mismo primer plano de un rostro neutro, repetido cuatro veces, cada vez junto a una imagen distinta: un plato de sopa, un ataúd, una mujer.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «La cara no cambió. Cambió lo que pusimos al lado.»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 2 · El personaje y lo que quería (0:20 a 1:40)</h2>
+    <p><strong>VOZ:</strong> «Eso que acabas de ver tiene nombre y tiene fecha. Hacia 1920, en Moscú, un cineasta llamado Lev Kuleshov hizo ese experimento con un actor y tres imágenes distintas, y descubrió algo que cambió el cine para siempre: en pantalla no se cuenta con lo que hay en cada plano, se cuenta con lo que va entre dos planos, con el corte. Y siglos antes, en Roma, otro hombre había descubierto algo parecido pero con la voz: Quintiliano, hacia el año 95 después de Cristo, escribió que un discurso no vive en las palabras escritas, vive en la voz y el gesto de quien lo dice de pie, sin leer.»</p>
+    <p><strong>IMAGEN:</strong> un boceto del rostro y las tres imágenes del experimento Kuleshov, dibujado a mano; al lado, un orador romano de pie, sin ningún papel en las manos.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Hacia 1920: el corte cuenta. Hacia el 95 d.C.: la voz de pie cuenta.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 3 · El espejo incómodo (1:40 a 2:50)</h2>
+    <p><strong>VOZ:</strong> «Ahora mirá los videos de esta casa. El que tiene una voz en off leyendo un párrafo entero, mientras la imagen muestra, plano a plano, exactamente lo que la voz va diciendo. El maestro que prepara su charla de siete minutos para leerla de un papel, sin levantar la vista. Ni de pie, ni en imagen: es texto disfrazado, dos veces.»</p>
+    <p><strong>IMAGEN:</strong> pantalla dividida: a la izquierda, un guion impreso con cada frase subrayada; a la derecha, el mismo guion pero ahora con planos tachados uno por uno porque solo repiten lo dicho.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «Leer no es contar de pie. Ilustrar no es contar en imagen.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎬 Escena 4 · El giro (2:50 a 4:10)</h2>
+    <p><strong>VOZ:</strong> «Y acá el giro tiene dos partes. En 1924, el teórico húngaro Béla Balázs escribió «El hombre visible»: el cine devuelve una cultura visual, y el primer plano de un rostro revela algo que ninguna palabra alcanza a decir. La imagen no ilustra la frase: la sustituye. Y del otro lado, en 1960, Milman Parry y Albert Lord publicaron «The Singer of Tales»: el poeta oral no memoriza un texto fijo, lo compone en vivo, con fórmulas, cada vez distinto. Contar de pie es componer, no recitar. Y en 1982, Walter Ong lo explicó de otra manera: el pensamiento oral tiene su propia lógica, más cercana a la vida que la de la página.»</p>
+    <p><strong>IMAGEN:</strong> el mismo primer plano de la escena uno, ahora con la palabra «SUSTITUYE» sobreimpresa; un orador de pie, sin papel, con la palabra «COMPONE» sobreimpresa.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «La imagen sustituye. La voz de pie compone.»</p>
+  </div>
+
+  <div class="card ac-teal">
+    <h2>🎬 Escena 5 · La herramienta (4:10 a 5:40)</h2>
+    <p><strong>VOZ:</strong> «La herramienta de hoy tiene tres casillas. Uno: ¿qué gana esta parte si se cuenta en vivo, sin leer? Dos: ¿qué frase se puede tirar porque un plano concreto la muestra, y qué dicen dos planos juntos que ninguno dice solo? Tres, la que casi nadie se pregunta: ¿qué de lo escrito habría que rehacer, en vez de copiarlo tal cual? Te lo hago con un caso de esta casa. Un video insignia de siete minutos, de cuarenta y cinco mil lempiras en producción, estaba listo para grabarse con voz en off leyendo el guion completo. Con la herramienta: la mitad de las frases se cambiaron por planos que las sustituían, y la charla del maestro se armó de pie, con fichas, no leída.»</p>
+    <p><strong>IMAGEN:</strong> tres casillas dibujadas a mano, llenándose una por una; el mismo guion, ahora con la mitad tachada y flechas hacia dibujos de planos.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Qué de pie? · ¿Qué en imagen? · ¿Qué no se copia?»</p>
+  </div>
+
+  <div class="card ac-amber">
+    <h2>🎬 Escena 6 · La objeción del público (5:40 a 6:40)</h2>
+    <p><strong>VOZ:</strong> «"¿Entonces la palabra ya no sirve para nada?" Hay que concederla, porque suena que esta etapa dice que la imagen y la voz de pie ganan siempre. No es así. La palabra, dicha o escrita, hace algo que ningún plano puede hacer: encadenar una causa, una negación, una idea abstracta, tal como describe Walter Ong (1982). La diferencia no es "imagen sí, palabra no": es usar cada una para lo que sirve, y no disfrazar de discurso una lectura, ni de cine un plano que solo repite lo dicho.»</p>
+    <p><strong>IMAGEN:</strong> una balanza con un primer plano de un lado y un párrafo de texto del otro, en equilibrio.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «No es prohibido leer. Es prohibido disfrazar de contar lo que en realidad es leer.»</p>
+  </div>
+
+  <div class="card ac-purple">
+    <h2>🎬 Escena 7 · El cierre que aterriza (6:40 a 7:30)</h2>
+    <p><strong>VOZ:</strong> «Esta semana, tres cosas cortas. Primera: la próxima vez que tengas que contar algo de pie, dejá el papel, y probá con fichas y con pausas, como enseñaba Quintiliano hace casi dos mil años. Segunda: la próxima vez que filmes algo, buscá un plano que sustituya una frase entera, no que la ilustre: Balázs, en 1924, ya lo sabía. Tercera: si vas a montar dos planos, preguntate qué dicen juntos que ninguno dice solo, porque ahí, desde 1920, vive el efecto Kuleshov. Esto es "Contar de pie y contar en imagen", undécima etapa de la Ruta del Hilo que Tira, y la puerta a la Ruta de la Cámara que Cuenta.»</p>
+    <p><strong>IMAGEN:</strong> la hoja de contar sin la página, completa, escrita a mano; corte final al primer plano de la escena uno, ahora con las cuatro imágenes que estuvieron a su lado, en fila.</p>
+    <p><strong>TEXTO EN PANTALLA:</strong> «¿Qué de pie? · ¿Qué en imagen? · ¿Qué no se copia? · Misión: Contar de pie y contar en imagen · F.A.R.O.»</p>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎥 La estructura del guion, desarmada (para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.7rem;">El mismo esqueleto sirve para cualquier etapa. Y aquí, además, el esqueleto es el propio tema: este guion cumple su propia herramienta, con un gancho que es puro montaje.</p>
+    <table class="tres">
+      <tr><th>Pieza</th><th>Qué tiene que hacer</th><th>Cómo se hizo aquí</th></tr>
+      <tr><td>Gancho en frío</td><td>Una promesa concreta con misterio, antes de todo logo</td><td>La misma cara, con cuatro imágenes distintas al lado (puro montaje)</td></tr>
+      <tr><td>Personaje que quiere algo</td><td>Alguien con un deseo concreto</td><td>Kuleshov queriendo demostrar que el corte cuenta; Quintiliano defendiendo la voz de pie</td></tr>
+      <tr><td>El espejo</td><td>La historia salta a la vida del público</td><td>El video con voz en off leyendo y la imagen que solo repite</td></tr>
+      <tr><td>El giro</td><td>Desmonta lo que el público creía saber</td><td>La imagen sustituye (Balázs, 1924); la voz de pie compone (Parry y Lord, 1960; Ong, 1982)</td></tr>
+      <tr><td>La herramienta</td><td>El concepto de la misión, ya ganado por la historia</td><td>Contar sin la página, aplicada al video insignia de siete minutos</td></tr>
+      <tr><td>La objeción</td><td>Se le concede la duda al público y se contesta</td><td>«¿Entonces la palabra ya no sirve?»: concedida, y contestada</td></tr>
+      <tr><td>Cierre que aterriza</td><td>Una acción posible esta semana, y el nombre de la misión</td><td>Tres cosas cortas, y nombra la misión y la puerta a la Cámara que Cuenta</td></tr>
+    </table>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">🎬 La regla del minuto dos</span><br>
+      <span>Ninguna definición antes del minuto dos. Hasta ahí manda la historia: <span class="hl">una cara neutra y cuatro imágenes que la cambian todo</span>. Las palabras «contar sin la página», «de pie» y «en imagen» entran cuando el público ya <span class="hl2">necesita</span> un nombre para lo que acaba de ver en su propia pantalla. Y el guion pasa su propia prueba: su gancho es puro montaje, sin una sola definición dicha en voz alta.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-lecturas')">
+    <span class="nsb-icon">📖</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== LECTURAS ===== -->
+<div class="sec" id="s-lecturas" role="tabpanel">
+  <div class="card ac-gold">
+    <h2>📖 Seis lecturas: contar de pie y en imagen, contado seis veces</h2>
+    <p>El tema de la etapa contado seis veces: un cuento donde un narrador ciego compone la misma historia distinta cada noche, y cuando por fin la escriben, la historia se vuelve un fósil; un capítulo de posada donde un contador de casos convence de pie junto al fuego, mientras el mismo caso, leído de un pliego por un escribano, no mueve a nadie, hasta que un mozo con refranes nombra la diferencia; un ensayo a escala de especie sobre las dos memorias que la humanidad usó antes de escribir, la oral y la visual; una entrevista imaginada con Serguéi Eisenstein sobre el montaje que choca, y su propia concesión; una conversación entre Jesús Quintero y Fernando Fernán Gómez sobre la función que solo existe una vez; y un <strong>careo</strong> donde se disputa si la imagen cuenta mejor que la palabra, o solo distinto. Seis maneras de que la idea entre por donde el examen no llega.</p>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;"><strong>Cada lectura trae sus propias preguntas debajo</strong>: cinco de comprensión, dos de completar y dos de análisis, del texto que se acaba de leer y de ningún otro. Y las seis empiezan <strong>plegadas</strong>, para poder elegir sin tener que recorrer veinte pantallas.</p>
+    <div class="tip">
+      <span class="ti">⚠️</span>
+      <div><strong>La etiqueta, primero (regla del estatus):</strong> los <strong>cinco primeros</strong> son <strong>ejercicios de estilo escritos por esta casa</strong>: los tres primeros en homenaje a la voz de Jorge Luis Borges, a la de Miguel de Cervantes Saavedra y a la de Yuval Noah Harari, y el cuarto y el quinto son <strong>entrevistas imaginadas</strong>, a la manera de Joaquín Soler Serrano la una y del programa de Jesús Quintero la otra. <strong>No son obra de esos autores</strong> ni se citan como tal: son pastiche declarado, y los dos encuentros <strong>nunca ocurrieron</strong>. El <strong>sexto es un careo</strong>, y ese no imita a nadie: sus turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas. Regla extra de esta casa, y en las seis: <strong>toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</strong>. El único artificio permitido es la voz.</div>
+    </div>
+    <div class="tip">
+      <span class="ti">🎥</span>
+      <div><strong>Aviso propio de esta etapa, y las seis lecturas lo respetan:</strong> el tema mismo es la línea entre contar de pie o en imagen, y leer o ilustrar, así que las seis juegan con esa idea cada vez que hace falta. El efecto Kuleshov de <strong>Kuleshov (hacia 1920)</strong> aparece más de una vez, y también el primer plano de <strong>Balázs (1924)</strong>, siempre con su fecha exacta. Ninguna de las seis presenta una herramienta <strong>sin su autor y su año</strong>.</div>
+    </div>
+    <p style="font-size:0.88rem;margin-bottom:0.5rem;">Cada lectura se puede <strong>imprimir por separado</strong>, para leerla en papel y marcarla a lápiz. La etiqueta de arriba viaja impresa con el texto, siempre.</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir el cuento</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir el capítulo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir el ensayo</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir la entrevista</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir la conversación</button>
+      <button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir el careo</button>
+      <button class="btn btn-pri" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis</button>
+    </div>
+  </div>
+
+  <div class="card ac-purple" id="lect-borges">
+    <h2>🎭 Lectura 1 · «El que solo sabía la historia al contarla» (cuento, a la manera de Borges)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la voz de Borges puesta al servicio de un narrador oral, quizá ciego a la manera del propio Borges pero personaje aparte, que compone la misma historia distinta cada noche. Las obras y años que el cuento menciona son reales y comprobables (Milman Parry y Albert Lord, «The Singer of Tales», 1960; Walter Ong, «Oralidad y escritura», 1982). Hermógenes Lastra, Práxedes Bilbao y el pueblo de Los Cerros Quebrados son invención declarada.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('borges')">🖨️ Imprimir este cuento</button></div>
+    <p class="lect-p">Me llamo Hermógenes Lastra, y desde que perdí la vista, hace ya veintidós inviernos, en Los Cerros Quebrados no hay noche de fiesta que no termine con alguien pidiéndome la historia del jinete que cruzó la Quebrada del Ahorcado con la crecida al lomo del caballo. La cuento desde que tenía uso de razón, y la sigo contando, y en veintidós años no la he contado dos veces igual, y esa es, quiero dejarlo escrito antes de que la memoria de otros la borre por mí, la única razón de que siga viva.</p>
+    <p class="lect-p">Mi padre, que también era ciego y también la contaba, me enseñó la historia sin enseñarme nunca una sola frase fija. Me dio el jinete, me dio la Quebrada, me dio la crecida, y me dio unas cuantas fórmulas para nombrar el miedo del caballo y el ruido del agua, y con esas piezas sueltas, no con un texto aprendido, tuve que armar la historia cada vez que alguien me la pedía. Tardé años en entender que eso era el oficio entero, no una carencia: no había una historia que memorizar, había una historia que componer, otra vez, cada noche.</p>
+    <p class="lect-p">Cuentan que en una ciudad lejana, hace pocos años, dos estudiosos llamados Milman Parry y Albert Lord publicaron, en 1960, un libro titulado «The Singer of Tales», donde explicaban, con otros cantores y otras guerras, exactamente lo que yo hacía sin saber que tenía nombre: que el poeta oral no memoriza un texto fijo, lo compone en vivo, con fórmulas, cada vez distinto. Me lo leyó mi nieta, Práxedes Bilbao, palabra por palabra, y me quedé callado un buen rato, porque después de tantos años de creer que era el único que hacía eso, resultaba que era una manera antigua y ancha de contar, con nombre y con año.</p>
+    <p class="lect-p">La historia del jinete cambia con el clima de la noche, con quién está sentado más cerca del fuego, con si hay niños o solo adultos, con si acabo de discutir con alguien o vengo de una buena cena. Unas noches el caballo relincha tres veces antes de saltar; otras, cinco. Unas noches la crecida se lleva un sombrero; otras, un candil. Lo que no cambia nunca, y esto lo aprendí sin que nadie me lo dijera, es lo que la historia tiene que dejar sintiendo a quien la escucha: que el miedo del jinete era de verdad, y que cruzó de todos modos.</p>
+    <p class="lect-p">Práxedes, que estudia en la capital, un día me trajo otro libro, de un norteamericano llamado Walter Ong, publicado en 1982 y llamado «Oralidad y escritura», donde se explicaba que el pensamiento de quien cuenta de viva voz es distinto del pensamiento de quien escribe: más pegado a la vida, más cargado de fórmulas, más dispuesto a repetir lo que hace falta repetir para que el oyente no se pierda. Le dije que ese hombre nunca había estado en Los Cerros Quebrados y sin embargo parecía haberme escuchado contar la historia del jinete cien veces.</p>
+    <p class="lect-p">Y entonces Práxedes, con la mejor intención del mundo, me propuso escribirla. Grabar mi voz, pasarla a un cuaderno, dejarla fija, para que cuando yo me muera la historia no se muera conmigo. Acepté, porque la quiero y porque el miedo de que la historia se pierda es más grande que cualquier otro miedo que yo tenga a estas alturas. Se sentó una tarde entera conmigo y anotó, palabra por palabra, la versión que le conté ese día: el jinete, la Quebrada, la crecida, el caballo que relinchó cuatro veces, el sombrero que se llevó el agua.</p>
+    <p class="lect-p">Leyó lo escrito en voz alta, para que yo la escuchara, y era la misma historia, y sin embargo no era la misma historia. Faltaba el silencio antes del salto, que yo alargo o acorto según quién está escuchando. Faltaba la voz que se me quiebra un poco cuando digo que el jinete no miró atrás. Faltaba, sobre todo, la posibilidad de que mañana, contándola otra vez, el caballo relinche cinco veces en vez de cuatro, porque mañana habrá llovido distinto y yo estaré de otro humor. Lo que quedó en el papel era un fósil, hermoso quizás, pero un fósil de una cosa que solo estaba viva cuando yo la componía de nuevo, cada vez, en voz alta, de pie junto al fuego.</p>
+    <p class="lect-p">No le pedí a Práxedes que rompiera el cuaderno. Que se quede, para el día en que ya no pueda contarla yo. Pero le pedí una cosa más, que espero que cumpla: que mientras yo viva, cada vez que alguien pida la historia del jinete, ella me deje contarla a mí, distinta, en voz alta, y que guarde el cuaderno cerrado. Porque he entendido, tarde y con el miedo todavía encima, que una historia contada de pie no es el borrador de una historia escrita. Es otra cosa, y se muere si se la trata como si fuera la misma.</p>
+  </div>
+
+  <div class="card ac-teal" id="lect-cervantes">
+    <h2>📜 Lectura 2 · «El caso que solo convenció de pie» (capítulo, a la manera de Cervantes)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: el periodo largo, el humor y los refranes de un mozo, puestos al servicio de contar de pie frente a leer. Personajes de posada, invención declarada, con nombres nuevos (no reutilizados de otras etapas, y sin el recurso del cronista árabe que ya se usó en la etapa 6); ningún dato real se cita, salvo lo propio del género literario del capítulo de posada.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('cervantes')">🖨️ Imprimir este capítulo</button></div>
+    <p class="lect-p">Cuenta la crónica de la venta del Cardal, que se asienta a la vera del camino de los carreteros, entre dos alamedas que ya nadie recuerda quién plantó, que llegó una noche de octubre un hombre de capa parda y voz de trueno manso, que dijo llamarse Onofre Salviati, contador de casos de oficio, que traía, además de un morral flaco, la fama de haber presenciado, con sus propios ojos, el ahogo y el rescate de un arriero en el vado del Recodo, cosa que en aquella comarca todavía se comentaba con el respeto que se les da a las cosas que de verdad pasaron.</p>
+    <p class="lect-p">Y esa misma noche, apenas cenado, Onofre Salviati se puso de pie junto al fuego, sin papel ni vela que lo alumbrara más que las brasas, y contó el caso del arriero con tal fuerza en la voz y tal quietud en las pausas, que hasta el ventero, que ya lo había oído dos veces antes, se quedó con la cuchara a medio camino de la boca, y una moza que fregaba loza en el fondo se acercó, sin que nadie se lo pidiera, a escuchar el final de pie, apoyada en el marco de la puerta.</p>
+    <p class="lect-p">Ocurrió, empero, que en la misma venta paraba aquella noche un escribano de nombre Hilario Pumariega, hombre de mucha letra y poca voz, que había oído el mismo caso de labios del propio arriero rescatado, y que lo llevaba puntualmente copiado en un pliego, con fecha y todo, por afición a dejar constancia de las cosas notables. Y viendo el efecto que había hecho el relato de Onofre, se ofreció, no sin cierta vanidad de letrado, a leer su propio pliego en voz alta, para que los presentes comprobasen que el suyo era, palabra por palabra, el caso tal como había ocurrido.</p>
+    <p class="lect-p">Leyó Hilario Pumariega su pliego de cabo a rabo, con buena dicción y sin saltarse coma, y cuando terminó, la sala, que un rato antes había estado en vilo con el mismo caso contado de pie, se había repartido ya en dos conversaciones distintas sobre la cosecha y en un bostezo mal disimulado del ventero. El escribano, ofendido, alegó que su versión era más exacta, pues venía del propio arriero y llevaba fecha cierta, mientras que la de Onofre, según él, se habría ido puliendo con los años como se pulen las piedras de río.</p>
+    <p class="lect-p">Fue entonces Toribio Escamilla, mozo de la venta desde niño y criado a refranes como quien se cría a caldo de gallina, el que se atrevió a poner la lengua donde nadie más se atrevía. «Con perdón de su merced el escribano», dijo, «que el caso sea el mismo y la letra sea exacta no quita que unas veces entre por el oído y otras se quede fuera de la puerta, como se quedó la fregona hasta que Onofre alzó la voz. Que quien lee, lee lo que pasó; y quien cuenta de pie, con la pausa y el ademán en su sitio, hace que uno lo esté viendo pasar otra vez, delante de sus propios ojos.»</p>
+    <p class="lect-p">Rió el escribano, no de gusto sino de picado, y preguntó al mozo si acaso pretendía que la exactitud de un pliego valiera menos que la labia de un contador de casos que a saber cuánto habría exagerado con los años. Y Toribio, que no era hombre de callarse una vez soltada la lengua, respondió que no defendía que se exagerase ni una coma del caso, sino que una cosa era que lo contado fuese cierto, y otra muy distinta era cómo se lo hacía llegar a quien escuchaba, y que las dos cosas, la verdad del caso y la manera de contarlo de pie, no tenían por qué pelearse entre sí.</p>
+    <p class="lect-p">Y para probarlo, propuso Toribio Escamilla algo que ninguno de los dos rechazó por no quedar mal delante de la sala: que Onofre Salviati contara el caso una vez más, esa misma noche, pero ciñéndose estrictamente a los hechos del pliego del escribano, sin añadir ni una crecida de más ni un relincho que Hilario no hubiese apuntado. Y así lo hizo Onofre, de pie, con la misma voz y la misma pausa de antes, pero con los hechos exactos del escribano, y la sala volvió a quedarse en vilo, tanto o más que la primera vez.</p>
+    <p class="lect-p">Con lo cual quedó probado en la venta del Cardal, y así lo dejó apuntado el propio Hilario Pumariega al pie de su pliego, con más humildad de la que había mostrado esa noche, que el caso exacto y el caso contado de pie no eran enemigos, sino dos oficios distintos que bien podían ir juntos; y que un escribano hace bien en guardar la verdad en su pliego, pero que un contador de casos, cuando se pone de pie junto al fuego, hace algo que ningún pliego, por exacto que sea, alcanza a hacer por sí solo. Y remató Toribio, con el refrán ya listo en la boca, que «letra que no se levanta del papel, letra que se queda dormida en el papel».</p>
+  </div>
+
+  <div class="card ac-amber" id="lect-harari">
+    <h2>🌐 Lectura 3 · «La especie que contó de pie antes de escribir» (ensayo, a la manera de Harari)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">Ejercicio de estilo de la casa: la escala de especie, la frase corta y el aterrizaje en el presente. Todas las obras, autores, años y hallazgos citados son reales y comprobables, y cada estudio va con su año, como manda esta casa.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('harari')">🖨️ Imprimir este ensayo</button></div>
+    <p class="lect-p">Durante más del noventa por ciento del tiempo que el género Homo lleva contando historias, nadie las escribió. Se contaron de pie, junto al fuego, con la voz y el gesto, y se sostuvieron así, sin una sola letra, durante decenas de miles de años. La escritura, comparada con esa historia, es un invento de anteayer. Y sin embargo, cuando hoy se piensa en cómo se debe contar algo, casi siempre se piensa primero en la página, como si la voz de pie fuera un sustituto pobre de la letra, y no al revés.</p>
+    <p class="lect-p">El psicólogo David Rubin dedicó buena parte de su carrera a preguntarse cómo era posible que un poema tan largo como la Odisea sobreviviera generaciones enteras sin que nadie lo escribiera. En «Memory in Oral Traditions» (1995), Rubin muestra que la respuesta no está en una memoria humana excepcionalmente poderosa, sino en un conjunto de muletas: el ritmo, la rima, las fórmulas repetidas, y la imagen concreta que un verso deja en la mente. Quitá cualquiera de esas muletas, y el poema se cae. Ponelas todas juntas, y un poema de miles de versos puede cruzar generaciones intacto, o casi.</p>
+    <p class="lect-p">Esto tiene una consecuencia incómoda para cualquiera que piense que la memoria humana funciona mejor con texto que con voz: no es así. La memoria humana funciona mejor con estructura, y la estructura oral, la de Rubin, se construyó durante milenios exactamente para eso. La página no mejoró la memoria; le dio otro soporte, uno que no dependía de que alguien la recitara de pie.</p>
+    <p class="lect-p">Hay una segunda memoria que la especie desarrolló en paralelo, y que tiene menos que ver con el oído que con el ojo. En 1973, los psicólogos Allan Paivio y Kalman Csapo midieron algo que hoy se llama el efecto de superioridad de la imagen: lo que se ve se recuerda mejor, en general, que lo que se lee. No es una diferencia menor: es la razón por la que un primer plano bien elegido se queda en la memoria de una manera que un párrafo entero de descripción casi nunca logra.</p>
+    <p class="lect-p">Y aquí conviene ser preciso, porque la especie que mejor recuerda imágenes es también la especie que más rápido se deja convencer por ellas, incluso cuando la imagen está manipulada. El llamado efecto Kuleshov, el experimento del cineasta ruso que hacia 1920 mostró que el mismo rostro, montado junto a distintas imágenes, se leía de distinta manera, ilustra bien ese poder. Pero es un poder que hay que citar con cuidado: al intentar replicarlo en laboratorio, Prince y Hensley (1992) encontraron un efecto más débil de lo que la leyenda del cine contaba, aunque estudios posteriores con resonancia magnética, como el de Mobbs y colegas (2006), sí hallaron apoyo neural para que el contexto cambie cómo se interpreta un rostro. La honestidad exige enseñar el hallazgo con sus réplicas, no solo con su fama.</p>
+    <p class="lect-p">La especie, entonces, no tiene una sola memoria, tiene dos, y las dos son reales: la oral, que sobrevive con ritmo y fórmula, y sostuvo la Odisea sin una sola letra; y la visual, que recuerda mejor una imagen que un texto, y que por eso mismo puede ser manipulada por un montaje tan simple como el de Kuleshov. Ninguna de las dos es una versión inferior de la escritura. Las dos son más viejas que la escritura, y las dos siguen operando por debajo de cualquier página que alguien escriba hoy.</p>
+    <p class="lect-p">La lección que se saca de todo esto no es que haya que dejar de escribir. Es que quien cuenta algo, hoy, tiene a su disposición dos tecnologías de la memoria mucho más antiguas y mucho más poderosas que el texto: la voz de pie, con su ritmo y su fórmula, y la imagen montada, con su corte que dice lo que ninguna frase sola alcanza a decir. Ignorarlas, y confiar solo en la página, es desperdiciar casi todo lo que la especie aprendió antes de aprender a escribir.</p>
+  </div>
+
+  <div class="card ac-jade" id="lect-entrevista">
+    <h2>🎙️ Lectura 4 · «El corte que produce una idea» (entrevista, a la manera de Joaquín Soler Serrano)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una entrevista IMAGINADA con Serguéi Eisenstein (Riga, 1898 · Moscú, 1948), cineasta y teórico soviético del montaje, autor de «El acorazado Potemkin» (1925, con la escena de la escalera de Odesa) y de «Octubre» (1928). La firma <strong>Joaquín Soler Serrano</strong> (Murcia, 1919 · Barcelona, 2010), el periodista de «A fondo» (Televisión Española, 1976 a 1981). <strong>El encuentro nunca ocurrió</strong>: Eisenstein murió en 1948, casi treinta años antes de que el programa empezara a emitirse. Es una entrevista imaginada, invención de esta casa. Las palabras que se le atribuyen a Eisenstein son invención de la casa; su biografía, su obra y sus fechas son reales y comprobables.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('entrevista')">🖨️ Imprimir esta entrevista</button></div>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Buenas noches. Usted escribió que el montaje no es solo unir dos planos, sino chocarlos, para producir algo que ninguno de los dos contiene por separado. ¿Puede explicarme eso con algo más sencillo que la teoría?</p>
+    <p class="lect-p"><strong>EISENSTEIN.</strong> Con mucho gusto, señor Soler Serrano. Imagine un plano de un puño cerrado, y después un plano de un rostro. Unidos en cierto orden, con cierto ritmo de corte, el espectador no ve dos imágenes: ve una idea, la de la amenaza, que no estaba en el puño solo ni en el rostro solo. Esa idea nace exactamente en el corte, en el instante en que un plano termina y empieza el otro. A eso llamo montaje intelectual: el choque de dos planos produce un concepto.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Y sin embargo usted mismo ha reconocido, en sus escritos, que ese montaje intelectual puro casi nunca se logró del todo, ni siquiera en su propio cine.</p>
+    <p class="lect-p"><strong>EISENSTEIN.</strong> Se lo reconozco a usted esta noche con la misma franqueza. La teoría pedía que un espectador, con solo dos planos bien elegidos, construyera un concepto abstracto, casi como quien resuelve una ecuación. En la práctica, el público construye significados más simples, más cercanos a la emoción que a la idea pura. La escalera de Odesa, en «El acorazado Potemkin» (1925), es el ejemplo que la gente recuerda, y produce horror e indignación, que ya es mucho, pero no es exactamente el concepto abstracto que mi teoría prometía.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Hubo, si no me equivoco, un crítico francés que le opuso una objeción seria a esta manera de montar.</p>
+    <p class="lect-p"><strong>EISENSTEIN.</strong> André Bazin, sí, aunque no llegué a conocerlo en vida. Defendió que el plano largo, sin cortar, respeta mejor la ambigüedad de la realidad, porque deja que el espectador decida qué mirar dentro del cuadro, en vez de decidírselo el montador con cada corte. Es una objeción seria, y la sostengo con usted esta noche: mi montaje elige por el espectador; el plano largo de Bazin le deja elegir a él. Las dos son maneras legítimas de contar, y no tengo por qué fingir que la mía no tiene ese costo.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Usted trabajó también sobre «Octubre» (1928), donde llevó esa idea del montaje intelectual todavía más lejos.</p>
+    <p class="lect-p"><strong>EISENSTEIN.</strong> Así es. Ahí intenté montar conceptos políticos completos, no solo emociones: la imagen de un ícono religioso junto a la imagen de una estatua, para producir una idea sobre el poder, sin una sola palabra que la explicara. Fue mi experimento más ambicioso, y también el que menos entendió el público general en su momento. Ahí aprendí que el montaje intelectual puro exige demasiado del espectador; funciona mejor cuando choca con algo más simple, más humano, como el puño y el rostro de hace un momento.</p>
+    <p class="lect-p"><strong>SOLER SERRANO.</strong> Una última pregunta. Si tuviera que resumir, para quien nunca ha pisado una sala de montaje, qué es lo único que no se debe olvidar de su teoría, ¿qué le diría?</p>
+    <p class="lect-p"><strong>EISENSTEIN.</strong> Le diría esto: un plano solo dice una cosa. Dos planos, bien montados, dicen otra cosa, distinta de las dos por separado. Si alguien filma sin pensar en ese corte, está desperdiciando la mitad del lenguaje del cine. Y le diría también, para que quede completo, que el corte no lo es todo: hay historias que un plano largo cuenta mejor que cualquier choque mío, y reconocer eso no me quita razón, solo me la hace más pequeña de lo que yo mismo creí en su momento.</p>
+  </div>
+
+  <div class="card ac-purple" id="lect-gala" data-voz="Quintero y Fernán Gómez">
+    <h2>🌾 Lectura 5 · «La función que solo existe una vez» (El Loco de la Colina: Jesús Quintero conversa con Fernando Fernán Gómez)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Ejercicio de estilo de la casa: una conversación IMAGINADA entre Jesús Quintero (San Juan del Puerto, Huelva, 1940 · 2022), periodista de radio y televisión conocido como El Loco de la Colina, y Fernando Fernán Gómez (Lima, Perú, 1921 · Madrid, 2007), actor, director y escritor, autor de la novela «El viaje a ninguna parte» (1985, llevada al cine en 1986, sobre cómicos ambulantes que actuaban de pueblo en pueblo) y de la obra teatral «Las bicicletas son para el verano» (1977). <strong>El encuentro nunca ocurrió</strong> y las palabras que se le atribuyen son invención de la casa; las obras, fechas y datos de las dos personas son reales y comprobables. Los silencios de Quintero van entre paréntesis, como acotación, y nadie lleva raya de diálogo.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('gala')">🖨️ Imprimir esta conversación</button></div>
+    <p class="lect-p"><strong>QUINTERO.</strong> Don Fernando. (silencio) Usted escribió sobre cómicos que iban de pueblo en pueblo, actuando de pie, sin más escenario que una plaza. ¿Por qué esa vida, y no otra, para una novela?</p>
+    <p class="lect-p"><strong>FERNÁN GÓMEZ.</strong> Porque yo mismo vengo de ese mundo, Jesús. «El viaje a ninguna parte», que publiqué en 1985 y llevé al cine al año siguiente, cuenta la historia de una compañía de cómicos ambulantes, gente que no tenía teatro fijo ni telón que bajar, y que sin embargo, cada noche, en cada plaza distinta, hacía que el público se olvidara de que estaba de pie, con frío, escuchando a unos actores sin decorado.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio largo) ¿Y qué tenía esa función, sin decorado y sin telón, que no tuviera la misma obra en un teatro con todas las luces?</p>
+    <p class="lect-p"><strong>FERNÁN GÓMEZ.</strong> Tenía la presencia, Jesús. Un actor en una plaza no puede esconderse detrás de un decorado bien hecho: está ahí, con su cuerpo entero, y si esa noche la voz le falla o el gesto no llega, no hay ninguna luz que lo disimule. Y si esa noche todo sale bien, esa función no se repite nunca, exactamente igual, en ningún otro sitio. Es lo que más echo de menos de aquellos años: que la función, buena o mala, solo existía esa vez.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Usted escribió también «Las bicicletas son para el verano», en 1977, una obra de teatro sobre una familia durante la guerra. ¿Cambia algo, para un actor, saber que lo que está contando se sostiene de pie, delante de la gente, sin poder cortar y repetir la toma?</p>
+    <p class="lect-p"><strong>FERNÁN GÓMEZ.</strong> Cambia todo, Jesús. En el teatro no hay montaje que arregle un mal gesto al día siguiente. Lo que el público ve esa noche es lo único que existe de esa función. Por eso un actor de teatro aprende, tarde o temprano, que la presencia vale más que la perfección: es mejor una función viva, con sus fallos, que una función perfecta pero apagada, como quien lee su papel en vez de habitarlo.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) ¿Y no le parece que el cine, con sus cortes, con su montaje, hace algo que el teatro nunca podría hacer?</p>
+    <p class="lect-p"><strong>FERNÁN GÓMEZ.</strong> Hace otra cosa, no necesariamente algo mejor. El cine puede montar dos planos y producir una idea que ninguno de los dos tenía solo; el teatro no tiene ese recurso, pero tiene el cuerpo entero de un actor respirando en el mismo aire que el público, sin ningún corte de por medio. Cuando llevé «El viaje a ninguna parte» al cine, en 1986, tuve que aceptar que perdía una cosa y ganaba otra: perdía la función irrepetible, y ganaba el montaje, que es un lenguaje distinto, no inferior.</p>
+    <p class="lect-p"><strong>QUINTERO.</strong> (silencio) Cuénteme, antes de irnos, qué se siente al final de una función de pueblo, cuando ya no queda plaza ni público.</p>
+    <p class="lect-p"><strong>FERNÁN GÓMEZ.</strong> (silencio) Se siente que uno acaba de gastar algo que no se puede guardar para después. Un libro se puede releer; una película se puede volver a proyectar igual, cuadro por cuadro. Una función de pie, en una plaza, con la voz y el cuerpo puestos ahí esa noche, se gasta entera al terminar, y no vuelve. Y sin embargo, o quizás por eso mismo, es lo que con más fuerza recuerdan los que estuvieron ahí. Yo, por lo menos, no he olvidado ni una sola de esas plazas.</p>
+  </div>
+
+  <div class="card ac-jade" id="lect-debate">
+    <h2>🥊 Lectura 6 · «¿La imagen cuenta mejor que la palabra, o solo distinto?» (careo, con las dos posturas y sus réplicas)</h2>
+    <p class="lect-nota" style="font-size:0.85rem;color:var(--gray);margin-bottom:0.7rem;">
+      Careo escrito por la casa sobre una disputa real del oficio, que sigue viva. No es una entrevista ni un pastiche: los turnos los firman los <strong>papeles</strong> (moderación, defensa, objeción) y no personas, precisamente para <strong>no poner palabras inventadas en boca de nadie</strong>. Las personas reales aparecen citadas en tercera persona como fuentes, con autor, obra y año, y todo lo que se les atribuye está publicado. Manda además la regla del acero: cada postura va en su <strong>mejor versión</strong>, escrita como la escribiría su mejor defensor.</p>
+    <div style="margin-bottom:0.7rem;"><button class="btn btn-amber" onclick="imprimirLectura('debate')">🖨️ Imprimir este careo</button></div>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> La pregunta en disputa, una sola y escrita antes de empezar. Que la imagen puede sustituir a la frase es algo que esta misma etapa ya aceptó, con Béla Balázs («El hombre visible», 1924) y con el efecto Kuleshov (hacia 1920). No se discute aquí si la imagen tiene poder: se discute si, en general, la imagen cuenta mejor que la palabra, o si simplemente cuenta distinto, cada una con su propio terreno.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> La postura que defiende que la imagen cuenta mejor, en su mejor versión. Un primer plano muestra en un instante lo que a la palabra le costaría un párrafo entero describir: una microfisonomía completa, según Balázs (1924), en el tiempo que dura un parpadeo. Y el montaje agrega algo que ninguna frase sola puede hacer: dos planos juntos, según el efecto Kuleshov (hacia 1920) y el montaje de choque de Eisenstein (hacia 1929), producen un significado que ninguno de los dos contiene por separado. El cine, con eso, devolvió a la humanidad una cultura visual que la letra había dejado dormida durante siglos.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> La postura que defiende que la imagen no cuenta mejor, sino distinto, en su mejor versión. La imagen es poderosa para lo concreto y torpe para lo abstracto: no hay plano que muestre, sin ayuda de ninguna palabra, una causa, una negación, o una condición hipotética. Walter Ong (1982) describe con precisión lo que la palabra, dicha o escrita, hace y la imagen no: encadenar ideas abstractas con la lógica que ni el corte más inteligente reemplaza. Y hay un riesgo que la defensa no puede negar del todo: la imagen manipula más rápido que la palabra, porque convence antes de que el espectador tenga tiempo de dudar.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Las réplicas, cruzadas, empezando por la defensa.</p>
+
+    <p class="lect-p"><strong>LA DEFENSA.</strong> Se concede que la imagen es torpe para lo abstracto, tal como advierte la objeción: ningún montaje sustituye una frase que dice «si esto no hubiera pasado, aquello tampoco». Pero eso no prueba que la imagen cuente peor en general, solo que cuenta mal una cosa concreta: lo abstracto. Para lo demás, para el rostro, el gesto, el instante, sigue contando con una fuerza que la palabra no alcanza, y ahí no hay objeción que lo desmienta.</p>
+
+    <p class="lect-p"><strong>LA OBJECIÓN.</strong> Y la réplica de este lado no es que la imagen no tenga fuerza, sino que esa misma fuerza es la que la vuelve peligrosa: convence antes de que se pueda pensar, y el propio efecto Kuleshov, con su estatus mixto (Prince y Hensley, 1992, hallaron un efecto más débil que la leyenda; Mobbs y colegas, 2006, encontraron apoyo neural parcial), muestra que ni siquiera los que estudian la imagen se ponen de acuerdo en cuánto puede torcer una lectura con solo cambiar lo que hay al lado. Esa incertidumbre, la defensa la usa para su favor, pero también podría leerse en contra: si ni la ciencia sabe con certeza cuánto manipula un corte, menos lo sabe el espectador común.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> El terreno común, que casi siempre es más grande de lo que parece desde fuera.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Las dos partes aceptan tres cosas. Primera: la imagen y la palabra hacen trabajos distintos, y ninguna de las dos sustituye del todo a la otra; ni la defensa ni la objeción sostienen que una deba desaparecer. Segunda: el maestro que sabe contar usa cada una para lo suyo, la imagen para el instante y el rostro, la palabra para la causa y lo abstracto, según describe Ong (1982). Tercera: el efecto Kuleshov, con su estatus mixto, se enseña con sus réplicas, no como una certeza cerrada, algo que ninguna de las dos posturas niega.</p>
+
+    <p class="lect-p"><strong>MODERACIÓN.</strong> Lo que sigue en disputa, dicho sin adornos: si, en el balance general, la imagen convence con una fuerza que la palabra no alcanza a igualar, o si esa fuerza aparente se debe solo a que se ha estudiado menos cuánto engaña. El dato que acercaría la disputa es el que ninguno de los dos bandos tiene todavía en la mano: estudios de comprensión que comparen el mismo contenido presentado como texto, como palabra dicha en voz alta (Quintiliano, con la actio, hacia el 95 d.C.; Parry y Lord, 1960, con la composición oral) y como imagen montada, midiendo qué se entiende mejor, qué se recuerda más, y qué se distorsiona con más facilidad. Hasta que ese dato exista, esta casa enseña contar sin la página con sus tres casillas, y enseña también que la pregunta que de verdad decide no es «¿cuál cuenta mejor?», sino «¿qué necesita esta parte: la voz de pie, o el plano que la sustituya?».</p>
+  </div>
+
+  <div class="card ac-gold">
+    <h2>🖨️ Todo esto se imprime</h2>
+    <p>Cada lectura sale con <strong>su texto y sus preguntas</strong>, y la pauta de esas preguntas va en su propia hoja al final. Y las seis se pueden sacar juntas en un pliego, cada una arrancando en su hoja.</p>
+    <div class="tip">
+      <span class="ti">📖</span>
+      <div><strong>Las preguntas se contestan con el texto delante.</strong> No es un examen de memoria: es un examen de lectura, y por eso viven pegadas a su lectura y no en una batería al final. Las de <strong>análisis complejo van sin XP a propósito</strong>.</div>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+      <button class="btn btn-pri" onclick="imprimirPreguntasLecturas()">🖨️ Imprimir el pliego con las 54 preguntas</button>
+      <button class="btn btn-amber" onclick="imprimirTodasLasLecturas()">🖨️ Imprimir las seis lecturas</button>
+    </div>
+  </div>
+
+  <div class="card ac-jade">
+    <h2>🎥 Por qué seis voces (la norma, para las siguientes misiones)</h2>
+    <p style="font-size:0.9rem;margin-bottom:0.6rem;">Cada voz hace un trabajo que las otras no pueden: el cuento vuelve el tema <strong>un narrador que compone distinto cada noche, y lo que se pierde al fijarlo por escrito</strong>; el capítulo lo pone en <strong>escena, humor y refrán</strong>, con un mozo que desarma a un escribano con una sola pregunta directa; y el ensayo lo lleva a <strong>escala de especie</strong>, de la memoria oral de Rubin a la memoria visual de Paivio y Csapo. Las dos voces siguientes hacen lo que ni el cuento ni el ensayo pueden: la <strong>entrevista</strong> sienta al propio Eisenstein y le hace conceder en voz alta la tensión de su propia teoría; y la <strong>conversación</strong> baja el tema a la presencia irrepetible del que actúa de pie, con Fernán Gómez y sus cómicos ambulantes. Y el <strong>careo</strong> pone <strong>las dos caras de una disputa abierta de verdad</strong>, si la imagen cuenta mejor que la palabra o solo distinto, cada una en su mejor versión, con sus réplicas y su terreno común, y termina diciendo <strong>qué dato la acercaría</strong>.</p>
+    <div class="ex-box">
+      <span class="ex-tag ex-m">📖 La regla de las lecturas</span><br>
+      <span>Toda misión nueva lleva sus seis lecturas sobre el tema de la etapa: <span class="hl">cuento a la manera de Borges, capítulo a la manera de Cervantes, ensayo a la manera de Harari, la entrevista de la casa, la conversación del Loco de la Colina y el careo de las dos posturas</span>, con la etiqueta de <span class="hl2">ejercicio de estilo de la casa</span> a la vista en los cinco primeros, la declaración de que <span class="hl2">los encuentros de las entrevistas nunca ocurrieron</span>, la etiqueta propia del careo, y la regla de fondo en las seis: <span class="hl">toda obra, fecha, cifra y persona citada dentro de los textos es real y comprobable</span>.</span>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" aria-label="Ir a la siguiente sección" onclick="go('s-recursos')">
+    <span class="nsb-icon">📁</span>
+    <span class="nsb-arrow">→</span>
+  </button>
+</div>
+
+<!-- ===== RECURSOS ===== -->
+<div class="sec" id="s-recursos" role="tabpanel">
+  <div class="card ac-teal">
+    <h2>📁 Recursos del módulo</h2>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con la tabla madre de las seis herramientas, la grieta entre de pie y leer, y entre en imagen e ilustrar, contar sin la página a fondo, las cinco etiquetas de estatus, los casos, la hoja de fuentes con etiqueta y la pauta completa.</p>
+      <a href="../../fichas/ficha-hilo-de-pie-en-imagen.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
+    </div>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">La regla de oro de esta ruta rige aquí entera: <strong>ninguna herramienta se cita sin autor, año y límite</strong>, y <strong>ninguna historia se da por buena sin sus tres casillas</strong> (¿qué de pie?, ¿qué en imagen?, ¿qué no se copia?).</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><strong>Quintiliano, «Institutio oratoria» (hacia el año 95 d.C.):</strong> la actio, la ejecución de pie con la voz y el gesto justos. <strong>Tratado clásico de oratoria.</strong></li>
+      <li><strong>Milman Parry y Albert Lord, «The Singer of Tales» (1960):</strong> el poeta oral compone en vivo con fórmulas, no memoriza un texto fijo. <strong>Teoría de la épica oral, con trabajo de campo.</strong></li>
+      <li><strong>Walter Ong, «Oralidad y escritura» (Orality and Literacy, 1982):</strong> el pensamiento oral tiene su propia lógica, distinta de la escrita. <strong>Tesis fuerte de un estudioso.</strong></li>
+      <li><strong>Lev Kuleshov, el experimento Kuleshov (hacia 1918-1920):</strong> el mismo plano, montado junto a distintas imágenes, se lee de distinta manera; el significado nace del corte. <strong>Experimento clásico del cine, con metraje perdido.</strong></li>
+      <li><strong>Serguéi Eisenstein, sus escritos sobre el montaje (hacia 1929), tras «El acorazado Potemkin» (1925):</strong> el montaje como choque, para producir un concepto nuevo. <strong>Teoría de autor del cine.</strong></li>
+      <li><strong>Béla Balázs, «El hombre visible» (Der sichtbare Mensch, 1924):</strong> el primer plano revela una microfisonomía que ninguna palabra alcanza a decir. <strong>Teoría de autor del cine.</strong></li>
+      <li><strong>David Rubin, «Memory in Oral Traditions» (1995):</strong> el ritmo, la rima, las fórmulas y la imagen sostuvieron la Odisea sin escritura. <strong>Obra de referencia de la psicología de la memoria.</strong></li>
+      <li><strong>Paivio y Csapo (1973):</strong> el efecto de superioridad de la imagen, lo que se ve se recuerda mejor que lo que se lee. <strong>Hallazgo replicado.</strong></li>
+      <li><strong>Prince y Hensley (1992); Mobbs y colegas (2006):</strong> la réplica del efecto Kuleshov halló un efecto más débil que la leyenda, aunque el apoyo neural posterior fue parcial. <strong>Hallazgo con réplica discutida.</strong></li>
+      <li><strong>Las seis lecturas de esta misión:</strong> cinco ejercicios de estilo escritos por la casa (tres en homenaje a Borges, Cervantes y Harari, y dos entrevistas imaginadas: una con Serguéi Eisenstein a la manera de Joaquín Soler Serrano, y una conversación entre Jesús Quintero y Fernando Fernán Gómez) y un <strong>careo</strong>, «¿La imagen cuenta mejor que la palabra, o solo distinto?», que no imita a nadie: sus turnos los firman los papeles y las personas reales se citan en tercera persona como fuentes. <strong>Los cinco primeros son pastiche declarado, no obra de esos autores</strong>, y los dos encuentros <strong>nunca ocurrieron</strong>. Las señas de Serguéi Eisenstein (Riga, 1898 · Moscú, 1948) y de Joaquín Soler Serrano y su programa «A fondo» (1976 a 1981); y las de Jesús Quintero (San Juan del Puerto, 1940 · 2022) y Fernando Fernán Gómez (Lima, 1921 · Madrid, 2007), con «El viaje a ninguna parte» (1985, cine 1986) y «Las bicicletas son para el verano» (1977).</li>
+    </ul>
+
+    <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">🧰 Hazlo con tus herramientas</h3>
+    <p style="font-size:0.86rem;margin-bottom:0.7rem;">Esta etapa no se aprueba sabiendo en qué año escribió Balázs: se aprueba <strong>tomando una historia real y sacándole las tres casillas de contar sin la página</strong>. Si alguna no se puede llenar, se queda pendiente, a la vista.</p>
+    <ul style="font-size:0.9rem;line-height:1.7;padding-left:1.1rem;margin-bottom:1rem;">
+      <li><a href="../../COMPENDIO-STORYTELLING.md">🧵 El compendio de Storytelling</a>: las doce etapas de esta ruta, con lo que enseña cada una, la regla de oro de la materia y el Cuaderno de Hilos.</li>
+      <li><a href="../../misiones/ruta-hilo-historia-de-verdad/historia-de-verdad.html">📰 La historia de verdad (etapa 10)</a>: la herramienta hermana de tres casillas de la etapa anterior, sobre contar hechos reales sin fabricar nada.</li>
+      <li><a href="../../misiones/ruta-hilo-historia-persuade/historia-persuade.html">⚖️ La historia que persuade (etapa 9)</a>: la primera puerta de la ruta, sobre convencer sin manipular.</li>
+      <li><a href="../../misiones/ruta-hilo-emocion-sin-chantaje/emocion-sin-chantaje.html">💧 Emoción sin chantaje (etapa 8)</a>: la primera herramienta de tres casillas de la familia.</li>
+      <li><a href="../../misiones/ruta-hilo-tiempo-relato/tiempo-relato.html">⏳ El tiempo del relato (etapa 7)</a>: la herramienta de tres casillas de esa etapa, la raíz de la familia.</li>
+      <li><a href="../../misiones/ruta-hilo-voz-punto-vista/voz-punto-vista.html">👁️ La voz y el punto de vista (etapa 6)</a>: la ficha del narrador, la base de quién cuenta lo que aquí se lleva a la voz y a la imagen.</li>
+      <li><a href="../../misiones/ruta-hilo-mostrar-contar/mostrar-contar.html">🪞 Mostrar, contar y cuándo cada uno (etapa 5)</a>: el dial de tres casillas, la raíz de esta familia de herramientas.</li>
+      <li><a href="../../misiones/ruta-hilo-la-escena/la-escena.html">🎭 La escena (etapa 4)</a>: la unidad de trabajo que el plano y el corte de esta etapa también usan.</li>
+      <li><a href="../../misiones/ruta-hilo-forma-formas/forma-formas.html">📐 La forma de las formas (etapa 3)</a>: el protocolo de fechar y criticar cualquier estructura, del que esta etapa hereda el vocabulario.</li>
+      <li><a href="../../misiones/ruta-hilo-deseo-obstaculo/deseo-obstaculo.html">🎯 El deseo y el obstáculo (etapa 2)</a>: el motor que una historia de pie o en imagen también tiene que dejar ver.</li>
+      <li><a href="../../misiones/ruta-hilo-cadena-hueco/cadena-hueco.html">🧵 La cadena y el hueco (etapa 1)</a>: la brecha entre lo esperado y lo que sale, la que también cierra una historia contada de pie o en imagen.</li>
+      <li><a href="../../index.html?view=rutas">🗺️ Mis Rutas</a>: lo que viene en la Ruta del Hilo que Tira, con sus doce etapas, y la Ruta de la Cámara que Cuenta, que esta etapa abre.</li>
+      <li><a href="../../fichas/ficha-hilo-de-pie-en-imagen.html" target="_blank" rel="noopener noreferrer">La ficha impresa</a>: la tabla madre y contar sin la página, para trabajar a lápiz y guardar con fecha.</li>
+    </ul>
+
+    <div class="tip">
+      <span class="ti">💡</span>
+      <div><strong>Cómo estudiar esta etapa:</strong> tomar <strong>un video, una presentación o una escena real que hayas visto esta semana</strong> y aplicarle contar sin la página: ¿qué gana esta parte si se cuenta en vivo, sin leer?, ¿qué frase se puede tirar porque un plano la muestra?, ¿qué de lo escrito habría que rehacer? La prueba de que está aprendida es que se pueda decir, sin dudar, por qué «leer» y «contar de pie» no son la misma cosa, ni «ilustrar» y «sustituir», y que la puerta a la Ruta de la Cámara que Cuenta quede clara.</div>
+    </div>
+  </div>
+
+  <button class="next-sec-btn" onclick="openDiploma()" style="background:linear-gradient(135deg,var(--pri),var(--sec));">
+    <span class="nsb-icon">🏅</span>
+    <span class="nsb-label"><span class="nsb-hint">¡Módulo completado!</span><span class="nsb-name">Ver mi Constancia</span></span>
+    <span class="nsb-arrow">🎥</span>
+  </button>
+</div>
+
+</main>
+
+<!-- DIPLOMA -->
+<div class="diploma-overlay" id="diplomaOverlay" role="dialog" aria-modal="true">
+  <div class="diploma-card">
+    <div class="diploma-stars" id="diplStars">⭐⭐⭐</div>
+    <div class="diploma-title">CONSTANCIA DE LOGRO</div>
+    <div class="diploma-sub">Ruta del Hilo que Tira · Etapa 11: Contar de pie y contar en imagen</div>
+    <div class="diploma-mascot" aria-hidden="true">🎥</div>
+    <div class="diploma-name" id="diplName">Estudiante</div>
+    <div class="diploma-pct" id="diplPct" style="color:var(--jade)">0%</div>
+    <div class="diploma-bar-wrap"><div class="diploma-bar" id="diplBar" style="width:0%"></div></div>
+    <div class="diploma-msg" id="diplMsg">¡Sigue adelante!</div>
+    <div class="diploma-date" id="diplDate"></div>
+    <div class="diploma-ach" id="diplAch"></div>
+    <div class="diploma-fam">🏠 Proyecto Educativo F.A.R.O.</div>
+    <hr style="margin:0.8rem 0;border-color:var(--border);">
+    <input class="diploma-input" type="text" placeholder="Escribe tu nombre aquí..." oninput="updateDiplomaName(this.value)">
+    <div class="diploma-actions">
+      <button class="btn btn-wa" onclick="shareWA()">📲 WhatsApp</button>
+      <button class="btn btn-pri" onclick="captureDiploma()">📷 Guardar foto</button>
+      <button class="btn btn-d" onclick="closeDiploma()">✖ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGROS -->
+<div class="ach-panel" id="achPanel" role="region" aria-label="Logros desbloqueados">
+  <h4>🏅 Mis Logros</h4>
+  <div id="achList"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" role="tablist" aria-label="Secciones de la misión">
+  <button class="nav-t active" role="tab" aria-selected="true" aria-controls="s-aprende" data-s="s-aprende" onclick="go('s-aprende')"><span class="ico">📖</span> Aprende</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-estructura" data-s="s-estructura" onclick="go('s-estructura')"><span class="ico">🧩</span> Estructura</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lab" data-s="s-lab" onclick="go('s-lab')"><span class="ico">🧪</span> Lab</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-flash" data-s="s-flash" onclick="go('s-flash')"><span class="ico">🃏</span> Flashcards</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-quiz" data-s="s-quiz" onclick="go('s-quiz')"><span class="ico">🧠</span> Quiz</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-clasifica" data-s="s-clasifica" onclick="go('s-clasifica')"><span class="ico">🗂️</span> Clasifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-identifica" data-s="s-identifica" onclick="go('s-identifica')"><span class="ico">🔍</span> Identifica</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-completa" data-s="s-completa" onclick="go('s-completa')"><span class="ico">✏️</span> Completa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-widgets" data-s="s-widgets" onclick="go('s-widgets')"><span class="ico">🧩</span> Widgets</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-reto" data-s="s-reto" onclick="go('s-reto')"><span class="ico">🏆</span> Reto</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-sopa" data-s="s-sopa" onclick="go('s-sopa')"><span class="ico">🔤</span> Sopa</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-tareas" data-s="s-tareas" onclick="go('s-tareas')"><span class="ico">📋</span> Tareas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-evaluacion" data-s="s-evaluacion" onclick="go('s-evaluacion')"><span class="ico">🎓</span> Evaluación</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-casos" data-s="s-casos" onclick="go('s-casos')"><span class="ico">🎥</span> Casos</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-guion" data-s="s-guion" onclick="go('s-guion')"><span class="ico">🎬</span> Guion</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-lecturas" data-s="s-lecturas" onclick="go('s-lecturas')"><span class="ico">📖</span> Lecturas</button>
+  <button class="nav-t" role="tab" aria-selected="false" aria-controls="s-recursos" data-s="s-recursos" onclick="go('s-recursos')"><span class="ico">📁</span> Recursos</button>
+  <button class="nav-t" role="button" onclick="openDiploma()" style="border-color:var(--purple);" aria-haspopup="dialog"><span class="ico">🏅</span> Constancia</button>
+</nav>
+
+<footer class="credits">
+  <p class="fam">🏠 Proyecto Educativo F.A.R.O.</p>
+  <p class="ppl">Desarrolladores: Josué E. Polanco_Evelyn Castellanos_Jael &amp; Angelly Polanco</p>
+  <div class="mot">«Leer no es contar de pie; filmar la frase no es contar en imagen.» 🎥 · 🧵 Ruta del Hilo que Tira · Etapa 11 de 12.</div>
+  <div class="cred-contact">
+    <span>💬 <a href="mailto:josuepolancolemus2020@gmail.com">📧 josuepolancolemus2020@gmail.com</a></span>
+    <span>🌐 <a href="https://policastsapien.com/" target="_blank">🔗 policastsapien.com</a></span>
+  </div>
+  <div class="cred-tools">
+    <button class="cred-btn" id="sndBtn" onclick="toggleSnd()">🔊 Sonido</button>
+    <button class="cred-btn" id="themeBtn" onclick="toggleTheme()">🌙 Tema</button>
+    <button class="cred-btn" id="achBtn" onclick="toggleAchPanel()">🏅 Logros</button>
+    <button class="cred-btn" onclick="toggleLetra()">🔤 Letra</button>
+    <button class="cred-btn" onclick="resetXP()">🔄 Reiniciar XP</button>
+  </div>
+</footer>
+
+  <script src="js/html2canvas.min.js"></script>
+  <script src="js/de-pie-en-imagen.js"></script>
+  <!-- El aparato de lecturas va ANTES del marcador: pliega los seis textos y les
+       mete sus preguntas dentro, y el marcador necesita el documento ya montado
+       para saber cuáles son sus zonas subrayables. -->
+  <script src="../../js/lecturas.js"></script>
+  <script src="../../js/lecturas-marcador.js"></script>
+</body>
+</html>
