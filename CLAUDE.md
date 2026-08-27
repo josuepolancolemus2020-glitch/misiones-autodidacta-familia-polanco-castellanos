@@ -130,9 +130,12 @@ Cada sonda termina poniendo **APRUEBA** o **SUSPENDE** en `document.title`,
 con el veredicto DELANTE (el rótulo viejo «SONDA-APRUEBA» ya se retiró).
 No es decoración: es lo que se lee al correrlas en tanda. Once sondas
 antiguas no lo hacían, y en la auditoría del 20 de agosto de 2026
-aparecieron **veintinueve más**; hoy lo hacen las sesenta y ocho. La
+aparecieron **veintinueve más**; hoy lo hacen las ochenta y cinco. La
 única excepción es `probe-alto-util.html`, que no es una sonda sino un
-instrumento de medida y se titula INSTRUMENTO. Dos sondas
+instrumento de medida y se titula INSTRUMENTO. La cuenta no se escribe de
+memoria (esta línea ya se quedó vieja una vez): sale de
+`grep -L APRUEBA _dev/probe-*.html`, que tiene que devolver solo el
+instrumento. Dos sondas
 (`probe-tiempos-push-sesion` y `probe-verif-dosclientes-reales`) hablan
 con el Supabase real y por eso SUSPENDEN en las sesiones de Claude Code,
 donde el proxy bloquea `supabase.co`: en el aparato del autor aprueban.
@@ -220,6 +223,53 @@ cuarenta y dos misiones, que es lo contrario de lo que esta casa escribe.
 **Y si el aparato no está, la misión sigue entera:** `ptsVar` cae en el `pts`
 de siempre y el XP vuelve a ser fijo. Se comprueba con
 `_dev/probe-taller-neuro.html`.
+
+## La repisa de enlaces: lo que hace la máquina va etiquetado
+
+**Pedido por el autor el 27 de agosto de 2026**, como piloto en la etapa 1 de
+la Ruta del Hilo que Tira («La cadena y el hueco») y con la intención dicha de
+replicarlo después. Vive en `js/recursos-enlaces.js` y `css/recursos-enlaces.css`:
+es la **quinta excepción de la casa a la norma 1**, por el mismo motivo que
+`js/lecturas.js`, el marcador, `fichas/css/ficha.css` y el taller de la
+memoria.
+
+Qué resuelve: el autor le da una misión entera a NotebookLM y la máquina le
+devuelve resúmenes en audio, videos, mapas mentales y guías. Eso vivía en el
+teléfono de quien lo generó, o sea que no existía para nadie más. Ahora vive
+en la sección de Recursos de la misión que resume.
+
+Cómo se monta y el formato completo de cada enlace están en la **norma 6-bis**
+de `NORMAS-MISIONES-FARO.md`. Lo que hay que saber para no romperlo:
+
+1. **La etiqueta de máquina no se apaga.** Es la regla de oro del Estudio
+   Mayor: ninguna fuente entra sin su etiqueta. Un resumen automático es
+   material de **repaso**, no una fuente, y puede equivocarse en un dato con
+   el mismo tono seguro con el que dice los buenos. Colgarlo al lado de
+   Forster sin distinguirlo, en una ruta que enseña a cazar fuentes infladas,
+   sería el chiste malo.
+2. **La dirección va dentro de un `href` de la misión, y la misión vive en el
+   dominio de la Bóveda.** Por eso aquí no se arma HTML con datos, punto:
+   todo con `createElement` y `textContent`, y la dirección comprobada con
+   `URL()` (no con un grep: `java\tscript:` y `JavaScript:` pasan un grep
+   ingenuo y el navegador los ejecuta igual). Solo `http` y `https`.
+3. **Lo que se añade desde la pantalla se queda en ese aparato.** El
+   formulario es para pegar un enlace desde la tableta, verlo puesto y
+   decidir. Para que lo vea toda la casa hay que llevarlo al catálogo, y el
+   botón 📋 de cada tarjeta escupe el bloque listo para pegar **en el chat**.
+   Es exactamente el mismo reparto que el SQL de Supabase, y por la misma
+   razón: el autor trabaja desde el teléfono, sin el repositorio delante.
+4. **Las tres tarjetas de muestra se van solas** al entrar el primer enlace
+   real. Si hubiera que acordarse de borrarlas, alguna misión se publicaría
+   con tres tarjetas de mentira dentro.
+5. **La clave del almacén es de cada misión.** Al copiar el molde se hereda, y
+   dos misiones acabarían compartiendo repisa. La sonda de la misión lo mira.
+
+**Antes de publicar un cambio de la repisa:**
+
+```
+node _dev/servidor-estatico.js      (en otra terminal)
+_dev/probe-recursos-enlaces.html    (en el navegador)
+```
 
 ## El kit de escritura a mano: papel, y se mide en hojas
 

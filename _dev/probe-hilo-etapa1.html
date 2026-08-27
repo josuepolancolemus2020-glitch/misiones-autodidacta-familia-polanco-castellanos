@@ -548,6 +548,32 @@ window.addEventListener('load', async () => {
     ok(!!d.querySelector('#s-recursos a[href*="ficha-hilo-cadena-hueco"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
     fr.remove();
 
+    /* ── LA REPISA DE ENLACES ──
+       El aparato compartido `js/recursos-enlaces.js` se estrenó en esta
+       etapa (piloto del 27 de agosto de 2026). Lo hondo se mide en
+       `_dev/probe-recursos-enlaces.html`; aquí solo se comprueba que la
+       misión lo lleve puesto de verdad y que su catálogo sea el suyo,
+       porque al copiar el molde a otra etapa la clave del almacén se
+       hereda y dos misiones acabarían compartiendo repisa. */
+    log('\n── LA REPISA DE ENLACES (norma 8) ──');
+    const repisa = d.querySelector('[data-re-repisa]');
+    ok(!!repisa, 'Recursos trae la repisa de herramientas de estudio', 'no hay repisa en Recursos');
+    ok(!!w.FaroRepisa, 'con su aparato compartido cargado', 'el aparato de la repisa no se cargó');
+    ok(w.RECURSOS_ENLACES && w.RECURSOS_ENLACES.mision === 'hilo-cadena-hueco',
+       'y la clave del almacén es la de ESTA misión', 'la repisa usa la clave de otra misión (se heredó del molde)');
+    ok(repisa && repisa.querySelectorAll('.re-card').length > 0, 'y pinta sus tarjetas', 'la repisa no pinta ninguna tarjeta');
+    /* La etiqueta de estatus de la repisa NO es opcional: es la regla de oro
+       de esta ruta aplicada a lo que hizo una máquina. Sin ella, la misión
+       que enseña a cazar fuentes infladas estaría colgando resúmenes
+       automáticos al lado de Forster sin distinguirlos. */
+    ok(repisa && /repaso/.test(repisa.textContent) && /máquina/.test(repisa.textContent),
+       'la repisa dice a la vista que eso lo hizo una máquina y es material de repaso', 'la repisa cuelga material de máquina sin su etiqueta');
+    /* Toda tarjeta con enlace lo lleva comprobado: ni un javascript: dentro
+       de un href de la misión, que vive en el dominio de la Bóveda. */
+    const conEnlace = repisa ? [...repisa.querySelectorAll('a.re-card')] : [];
+    ok(conEnlace.every(a => /^https?:\/\//.test(a.getAttribute('href') || '')),
+       'las tarjetas que enlazan lo hacen solo por http o https', 'hay una tarjeta con un enlace que no es http');
+
     log('\n── EN LA APLICACIÓN ──');
     const da = appFrame.contentDocument, wa = appFrame.contentWindow;
     wa.switchView('view-rutas'); await esperar(400);

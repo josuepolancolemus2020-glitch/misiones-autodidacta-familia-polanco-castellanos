@@ -563,3 +563,57 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js` (piloto
+// pedido por el autor el 27 de agosto de 2026). El aparato pone el
+// comportamiento; lo que se lee es de esta misión y se escribe con su voz.
+//
+// EL FORMATO de cada enlace, campo por campo:
+//
+//   tipo    audio · video · mapa · guia · informe · preguntas · linea ·
+//           tarjetas · web   (decide el icono y el color de la tarjeta)
+//   titulo  lo que se lee grande. Que diga QUÉ es y DE QUÉ, no «Resumen 1»
+//   url     https://…  (sin esto la tarjeta sale como ejemplo, sin enlazar)
+//   desc    dos líneas: QUÉ TRAE y QUÉ NO. Es el campo que decide si la
+//           repisa sirve: «resumen del tema» obliga a abrir los seis enlaces
+//           para saber cuál era; «los dos conceptos con ejemplos de cine, sin
+//           la prueba del conector» ahorra cinco
+//   fuente  quién lo hizo (NotebookLM, Gemini, la casa…). Sale en el pie
+//   origen  'maquina' (por defecto) o 'casa'. La etiqueta de estatus
+//   dura    «14 min», «6 páginas». Opcional, pero decide si se abre ahora
+//
+// LAS TRES DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo, sin que
+// nadie tenga que acordarse de borrarlas. Aun así, al pegar los de verdad se
+// borran de aquí.
+window.RECURSOS_ENLACES = {
+  mision: 'hilo-cadena-hueco',
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: 'audio',
+      titulo: 'Resumen en audio: la cadena y el hueco',
+      desc: 'Los dos conceptos conversados, para oír en el camino. Trae la diferencia entre relato y trama con los ejemplos de la sección Aprende; no trae la prueba del conector ni los ocho casos del proyecto.',
+      fuente: 'NotebookLM',
+      dura: '14 min'
+    },
+    {
+      ejemplo: true,
+      tipo: 'video',
+      titulo: 'Video corto: por qué «y entonces» no es una historia',
+      desc: 'La prueba del conector explicada con una escena, en pantalla y con rótulos. Sirve para repasar antes del quiz; se queda corto en el hueco de información, que aquí es el requisito y no el adorno.',
+      fuente: 'NotebookLM',
+      dura: '6 min'
+    },
+    {
+      ejemplo: true,
+      tipo: 'mapa',
+      titulo: 'Mapa mental de las tres piezas',
+      desc: 'Cadena, hueco y brecha en un solo golpe de vista, con sus tres formas del hueco colgando (curiosidad, suspenso y sorpresa). Para mirar con la ficha al lado, no en vez de ella.',
+      fuente: 'NotebookLM',
+      dura: '1 lámina'
+    }
+  ]
+};

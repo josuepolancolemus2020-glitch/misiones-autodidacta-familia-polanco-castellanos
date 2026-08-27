@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · La repisa de enlaces</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:420px;height:560px;border:0;background:#fff;margin-right:8px}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="m" src="/misiones/ruta-hilo-cadena-hueco/cadena-hueco.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Comprueba LA REPISA DE ENLACES (`js/recursos-enlaces.js` y
+   `css/recursos-enlaces.css`), el aparato compartido que le puso a la
+   sección de Recursos un sitio para las herramientas de estudio hechas
+   con máquina. Se corre sobre la etapa 1 de la Ruta del Hilo que Tira,
+   que es donde se estrenó; cuando la repisa se lleve a otra misión,
+   basta con cambiar el src del iframe.
+
+   Lo que se mide y por qué cada cosa está en la lista:
+
+   1. LA DEFENSA, PRIMERO. La dirección de un recurso acaba dentro de un
+      href, y la misión vive en el mismo dominio que la Bóveda, las
+      finanzas y el chat. Un `javascript:` pegado desde un mensaje que
+      alguien reenvió correría con la sesión de la familia puesta. Aquí
+      se prueban las formas que pasan un grep ingenuo y el navegador
+      ejecuta igual: mayúsculas, tabuladores dentro del esquema,
+      espacios delante y `data:`.
+   2. QUE EL TEXTO NO SE EJECUTE. Se siembra un título con una etiqueta
+      de verdad dentro, con su `onerror`, y se comprueba que llegue
+      pintado como texto y que no haya corrido nada. Es la misma regla
+      de las Sugerencias de M.E.T.A.S, y la razón por la que aquí se
+      pinta con createElement en vez de armar HTML.
+   3. QUE LOS EJEMPLOS SE VAYAN SOLOS. Las tarjetas de muestra están
+      para ver cómo queda la repisa antes de tener enlaces. Si hubiera
+      que acordarse de borrarlas, alguna misión se publicaría con tres
+      tarjetas de mentira dentro.
+   4. QUE LA TARJETA DIGA A DÓNDE LLEVA ANTES DE TOCARLA: el dominio en
+      el pie y la etiqueta de quién lo hizo. Es la regla de oro de la
+      casa aplicada a la repisa.
+   5. QUE EL BLOQUE DE CÓDIGO SE PUEDA PEGAR. Es el puente entre lo que
+      se prueba en el aparato y lo que queda en el repositorio (el mismo
+      reparto que el SQL de Supabase), y un apóstrofo en un título lo
+      rompería en silencio.
+   6. QUE EL FORMULARIO EXPLIQUE EL RECHAZO. Quien lo rellena está en una
+      tableta y no va a ir a buscar cuál de los cinco campos era.
+   7. QUE SIN CATÁLOGO NO PASE NADA. El aparato se carga en misiones que
+      todavía no declaran `window.RECURSOS_ENLACES`.
+   8. Y QUE NO SE ROMPIÓ NADA DE LO QUE YA HABÍA en la sección de
+      Recursos: la ficha, las fuentes con su etiqueta y el sin guiones
+      largos de la norma 1-bis.
+
+   El guion largo se busca con su escape (\u2014) y no con el carácter
+   puesto: una sonda que llevara el carácter dentro se suspendería sola. */
+const RAYA = new RegExp('\\u2014');
+const out = document.getElementById('out');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+const cerrar = () => { log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda repisa de enlaces'; };
+
+const marco = document.getElementById('m');
+const CLAVE = 'faro_repisa_hilo-cadena-hueco';
+
+/* La repisa se mide RECIÉN ESTRENADA: con enlaces de una sesión anterior
+   dentro se estaría midiendo otra cosa. Se espera al evento `load` y no a
+   un temporizador porque tras la recarga contentWindow es otro, y leerlo
+   antes de tiempo devuelve el documento en blanco de en medio. */
+function recarga() {
+  return new Promise(r => {
+    marco.addEventListener('load', function una() { marco.removeEventListener('load', una); r(); });
+    marco.contentWindow.location.reload();
+  });
+}
+
+marco.addEventListener('load', async function primera() {
+  marco.removeEventListener('load', primera);
+  try {
+    try { marco.contentWindow.localStorage.removeItem(CLAVE); } catch (e) {}
+    await recarga();
+    await esperar(400);
+
+    let d = marco.contentDocument, w = marco.contentWindow;
+    const caja = () => d.querySelector('[data-re-repisa]');
+    const tarjetas = () => [...caja().querySelectorAll('.re-card')];
+    const R = () => w.FaroRepisa;
+
+    log('── EL APARATO ESTÁ PUESTO ──');
+    ok(!!caja(), 'la sección de Recursos tiene su repisa', 'no hay repisa en Recursos');
+    ok(!!R(), 'el aparato compartido se cargó (window.FaroRepisa)', 'no se cargó js/recursos-enlaces.js');
+    ok(!!w.RECURSOS_ENLACES && w.RECURSOS_ENLACES.mision === 'hilo-cadena-hueco',
+       'y la misión declara su catálogo con clave propia', 'la misión no declara window.RECURSOS_ENLACES con su clave');
+    /* La hoja va DESPUÉS de la de la misión: se tiñe de su --pri. Puesta
+       antes saldría del color de la misión de la que se copió el molde. */
+    const hojas = [...d.querySelectorAll('link[rel="stylesheet"]')].map(l => l.getAttribute('href'));
+    const iCss = hojas.findIndex(h => /recursos-enlaces\.css$/.test(h));
+    const iMis = hojas.findIndex(h => /css\/cadena-hueco\.css$/.test(h));
+    ok(iCss > iMis && iMis >= 0, 'su hoja va después de la de la misión (se tiñe del color de la etapa)', 'la hoja de la repisa va antes que la de la misión');
+    const guiones = [...d.querySelectorAll('script[src]')].map(s => s.getAttribute('src'));
+    ok(guiones.findIndex(s => /recursos-enlaces\.js$/.test(s)) > guiones.findIndex(s => /js\/cadena-hueco\.js$/.test(s)),
+       'y su guion después del de la misión (lee el catálogo que ella declara)', 'el aparato se carga antes que el catálogo');
+
+    log('\n── LA DEFENSA (lo primero, porque esto va dentro de un href) ──');
+    const malas = [
+      'javascript:alert(1)',
+      'JavaScript:alert(1)',
+      '  javascript:alert(1)',
+      'java\tscript:alert(1)',
+      'data:text/html,<script>alert(1)</scr' + 'ipt>',
+      'https://x.com/" onmouseover="alert(1)',
+      "https://x.com/' onmouseover='alert(1)",
+      'https://x.com/<img>',
+      'vbscript:msgbox(1)',
+      ''
+    ];
+    const coladas = malas.filter(u => R().enlaceValido(u) !== '');
+    ok(coladas.length === 0, 'las ' + malas.length + ' direcciones tramposas se rechazan enteras', 'se colaron: ' + coladas.join(' | '));
+    const buenas = ['https://youtu.be/abc123', 'http://ejemplo.hn/a.pdf', 'https://notebooklm.google.com/notebook/xyz'];
+    const tumbadas = buenas.filter(u => R().enlaceValido(u) === '');
+    ok(tumbadas.length === 0, 'y las direcciones buenas pasan', 'se tumbaron direcciones buenas: ' + tumbadas.join(' | '));
+
+    log('\n── LOS EJEMPLOS ──');
+    ok(tarjetas().length === 3, 'la repisa arranca con las tres tarjetas de muestra', 'arranca con ' + tarjetas().length + ' tarjetas');
+    ok(tarjetas().every(t => t.tagName === 'DIV'), 'ninguna es un enlace: detrás no hay nada que abrir', 'alguna tarjeta de muestra enlaza a alguna parte');
+    ok(tarjetas().every(t => /ejemplo/.test(t.textContent)), 'y las tres lo dicen a la vista', 'alguna tarjeta de muestra no se declara ejemplo');
+    ok(/repaso/.test(caja().textContent) && /máquina/.test(caja().textContent),
+       'la repisa lleva puesta la etiqueta de estatus (material de repaso hecho con máquina)', 'la repisa no dice que esto lo hizo una máquina');
+
+    log('\n── UN ENLACE DE VERDAD ──');
+    R().guardarPropios([{
+      tipo: 'video',
+      titulo: 'Video de prueba',
+      url: 'https://www.youtube.com/watch?v=abc123',
+      desc: 'Un enlace sembrado por la sonda.',
+      fuente: 'NotebookLM',
+      dura: '9 min'
+    }]);
+    await esperar(150);
+    ok(tarjetas().length === 1, 'al llegar el primer enlace real, las tres muestras se van solas', 'quedan ' + tarjetas().length + ' tarjetas');
+    const t1 = tarjetas()[0];
+    ok(t1 && t1.tagName === 'A' && t1.getAttribute('href') === 'https://www.youtube.com/watch?v=abc123',
+       'la tarjeta entera es el enlace (blanco de toque grande en el teléfono)', 'la tarjeta no es un enlace con su dirección');
+    ok(t1 && t1.getAttribute('target') === '_blank' && /noopener/.test(t1.getAttribute('rel') || ''),
+       'abre en otra pestaña y con noopener', 'la tarjeta abre sin noopener');
+    ok(t1 && /YouTube/.test(t1.textContent), 'el pie dice a dónde lleva ANTES de tocarla (YouTube)', 'la tarjeta no dice su destino');
+    ok(t1 && /NotebookLM/.test(t1.textContent) && /🤖/.test(t1.textContent),
+       'y quién la hizo, con su etiqueta de máquina', 'la tarjeta no dice quién la hizo');
+    ok(t1 && /Video/i.test(t1.textContent) && /9 min/.test(t1.textContent), 'con su tipo y su duración a la vista', 'la tarjeta no muestra tipo y duración');
+    const envoltura = caja().querySelector('.re-tarjeta-envoltura');
+    ok(!!envoltura && envoltura.querySelectorAll('.re-herr button').length === 2,
+       'un enlace propio trae sus dos botones (copiar y quitar), fuera del <a>', 'el enlace propio no trae sus botones fuera del enlace');
+    ok(t1 && !t1.querySelector('button'), 'y ningún botón queda dentro del enlace', 'hay un botón dentro del <a>');
+
+    log('\n── QUE EL TEXTO NO SE EJECUTE ──');
+    w.__sondaCorrio = false;
+    const veneno = '"><img src=x onerror="window.__sondaCorrio=true">';
+    R().guardarPropios([{
+      tipo: 'web',
+      titulo: veneno,
+      url: 'https://ejemplo.hn/a',
+      desc: veneno,
+      fuente: veneno
+    }]);
+    await esperar(250);
+    ok(w.__sondaCorrio === false, 'un título con una etiqueta dentro no ejecuta nada', 'SE EJECUTÓ código venido del almacén');
+    ok(caja().querySelectorAll('img').length === 0, 'y no nació ninguna etiqueta de las que traía', 'el texto se convirtió en etiquetas de verdad');
+    const th = caja().querySelector('.re-card h4');
+    ok(th && th.textContent === veneno, 'el título llega pintado como texto, entero', 'el título no llegó literal');
+    const av = tarjetas()[0];
+    ok(av && av.getAttribute('href') === 'https://ejemplo.hn/a', 'y la dirección buena de esa misma tarjeta sigue puesta', 'la tarjeta envenenada perdió su dirección');
+
+    log('\n── UNA DIRECCIÓN QUE NO VALE NO ENLAZA ──');
+    R().guardarPropios([{ tipo: 'web', titulo: 'Trampa', url: 'javascript:window.__sondaCorrio=true', desc: 'x' }]);
+    await esperar(200);
+    const tt = tarjetas()[0];
+    ok(tt && tt.tagName === 'DIV' && !tt.getAttribute('href'),
+       'una tarjeta con dirección tramposa se pinta sin enlace, no se rompe la repisa', 'la dirección tramposa acabó en un href');
+    ok(w.__sondaCorrio === false, 'y sigue sin ejecutarse nada', 'SE EJECUTÓ la dirección tramposa');
+
+    log('\n── EL BLOQUE DE CÓDIGO (el puente al repositorio) ──');
+    const bloque = R().bloqueDeCodigo([{
+      tipo: 'audio', titulo: "El hueco de 'Loewenstein' con \"comillas\"",
+      url: 'https://ejemplo.hn/a', desc: 'Con apóstrofo y comillas dentro.', fuente: 'NotebookLM', origen: 'maquina', dura: '3 min'
+    }]);
+    ok(/RECURSOS_ENLACES/.test(bloque), 'el bloque dice dónde se pega', 'el bloque no dice dónde se pega');
+    let bloqueVale = false;
+    try { bloqueVale = Array.isArray(new Function('return [' + bloque.replace(/^\/\/.*\n/, '') + ']')()); } catch (e) {}
+    ok(bloqueVale, 'y es código válido aunque el título traiga apóstrofos y comillas', 'el bloque no se puede pegar: lo rompe una comilla');
+
+    log('\n── EL FORMULARIO EXPLICA EL RECHAZO ──');
+    ok(/título/i.test(R().validar({ titulo: '', url: 'https://a.hn', desc: 'x' })), 'sin título, lo dice con una frase', 'el rechazo por título no se explica');
+    ok(/https/i.test(R().validar({ titulo: 'a', url: 'javascript:1', desc: 'x' })), 'con dirección mala, dice cómo tiene que ser', 'el rechazo por dirección no se explica');
+    ok(/descripción/i.test(R().validar({ titulo: 'a', url: 'https://a.hn', desc: '' })), 'sin descripción, dice por qué hace falta', 'el rechazo por descripción no se explica');
+    ok(R().validar({ titulo: 'a', url: 'https://a.hn', desc: 'x' }) === '', 'y con todo puesto, no se queja', 'se queja de un enlace correcto');
+    const sel = caja().querySelector('[data-re-campo="tipo"]');
+    ok(sel && sel.options.length === Object.keys(R().TIPOS).length,
+       'el desplegable de tipos se llena desde el aparato (' + (sel ? sel.options.length : 0) + ' tipos)', 'el desplegable de tipos no cuadra con el aparato');
+    /* El nombre corto (`nc`) no es un lujo: es el que va en la tarjeta,
+       donde comparte fila con el icono y con la insignia. Sin él, cuatro
+       de los nueve tipos salen recortados con puntos suspensivos. */
+    ok(Object.values(R().TIPOS).every(t => /^#/.test(t.c) && t.ic && t.n && t.nc && t.nc.length <= 10),
+       'y los ' + Object.keys(R().TIPOS).length + ' tipos traen icono, color, nombre entero y nombre corto', 'algún tipo va sin icono, color o nombre corto');
+
+    log('\n── QUITAR, Y VOLVER AL PRINCIPIO ──');
+    caja().querySelector('.re-herr button[aria-label^="Quitar"]').click();
+    await esperar(200);
+    ok(R().leerPropios().length === 0, 'el botón de quitar borra el enlace del aparato', 'el enlace no se borró');
+    ok(tarjetas().length === 3 && tarjetas().every(t => t.tagName === 'DIV'),
+       'y al quedarse vacía la repisa vuelven las tres muestras', 'la repisa vacía no vuelve a sus muestras');
+
+    log('\n── SIN CATÁLOGO NO PASA NADA ──');
+    /* El aparato se va a cargar en misiones que todavía no declaran su
+       catálogo. Tiene que quedarse callado, no reventar el resto del JS. */
+    const suelto = document.createElement('iframe');
+    suelto.style.cssText = 'width:10px;height:10px;border:0;position:absolute;left:-9999px;';
+    suelto.srcdoc = '<!DOCTYPE html><html><body><scr' + 'ipt src="/js/recursos-enlaces.js"></scr' + 'ipt><scr' + 'ipt>window.__vivo = true;</scr' + 'ipt></body></html>';
+    document.body.appendChild(suelto);
+    await new Promise(r => { suelto.onload = r; });
+    await esperar(200);
+    ok(suelto.contentWindow.__vivo === true, 'sin window.RECURSOS_ENLACES el aparato se carga y calla', 'el aparato revienta si no hay catálogo');
+    ok(suelto.contentWindow.FaroRepisa === undefined, 'y no deja nada colgado', 'el aparato deja FaroRepisa puesto sin catálogo');
+    suelto.remove();
+
+    log('\n── LO QUE YA HABÍA EN RECURSOS SIGUE ──');
+    const rec = d.getElementById('s-recursos');
+    ok(!!rec.querySelector('a[href*="ficha-hilo-cadena-hueco"]'), 'la ficha imprimible sigue enlazada', 'se perdió el enlace a la ficha');
+    ok(/Las fuentes, con su etiqueta/.test(rec.textContent), 'la lista de fuentes sigue en su sitio', 'se perdió la lista de fuentes');
+    ok(/Forster/.test(rec.textContent) && /1927/.test(rec.textContent), 'con su autor y su año', 'las fuentes perdieron autor y año');
+    ok(!RAYA.test(d.body.textContent), 'y la misión sigue sin guiones largos (norma 1-bis)', 'la repisa metió guiones largos en la misión');
+
+    try { marco.contentWindow.localStorage.removeItem(CLAVE); } catch (e) {}
+    cerrar();
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); cerrar(); }
+});
+</script>
+</body>
+</html>

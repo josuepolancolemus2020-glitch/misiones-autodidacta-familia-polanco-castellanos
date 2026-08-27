@@ -23,7 +23,9 @@ Cada misión lleva además:
 - **clave de progreso propia** en `SAVE_KEY` (nunca compartida con otra misión);
 - **ficha imprimible** en `fichas/`, con la hoja común `fichas/css/ficha.css`,
   **diez páginas** y pauta completa (ver norma 6);
-- **sección de Recursos** que enlaza su ficha y sus fuentes reales;
+- **sección de Recursos** que enlaza su ficha y sus fuentes reales, y que
+  lleva la **repisa de enlaces** con las herramientas de estudio hechas con
+  máquina (ver norma 6-bis);
 - **color propio** en `--pri` y `--sec` de su CSS.
 
 Al copiar el molde de otra misión hay que revisar **cuatro** cosas: los
@@ -735,6 +737,105 @@ definición), **casos de estudio reales** con su fuente, un guion de qué decir,
 ejercicios para lápiz y la **pauta completa**, sin dejar ninguno a medias. Las
 respuestas de un ejercicio nunca se imprimen en la misma página que el
 ejercicio: van en la pauta del final.
+
+## 6-bis. La repisa de enlaces: las herramientas de estudio de máquina
+
+**Norma nueva, pedida por el autor el 27 de agosto de 2026**, estrenada como
+piloto en «La cadena y el hueco» (Hilo que Tira, etapa 1) y pensada desde el
+primer día para llevarse a las demás misiones.
+
+El autor le da una misión entera a NotebookLM y la máquina le devuelve
+material de repaso: un resumen en audio, un video, un mapa mental, una guía,
+una línea de tiempo. Ese material vivía en el teléfono de quien lo generó, o
+sea que no existía para nadie más. La **repisa** le da sitio dentro de la
+sección de Recursos de la misión que resume, que es el único lugar donde
+alguien lo va a buscar.
+
+Es un **aparato compartido**, `js/recursos-enlaces.js` con
+`css/recursos-enlaces.css`, y por tanto **la quinta excepción a la norma 1**
+(tres archivos propios por misión), por el mismo motivo que `js/lecturas.js`,
+el marcador, `fichas/css/ficha.css` y el taller de la memoria: un aparato
+copiado a cuarenta misiones se arregla en una y se queda roto en treinta y
+nueve.
+
+### Cómo se monta en una misión
+
+Tres cosas, y ninguna toca el aparato:
+
+1. En el HTML, **después** del CSS de la misión (se tiñe de su `--pri`):
+   `<link rel="stylesheet" href="../../css/recursos-enlaces.css">`, y al
+   final, **después** del JS de la misión:
+   `<script src="../../js/recursos-enlaces.js"></script>`.
+2. En el HTML, dentro de Recursos, el bloque declarativo `.re-caja` con
+   `data-re-repisa`: el rótulo, el párrafo de presentación, el recuadro
+   `.re-aviso`, el `<div class="re-rejilla">` donde se pintan las tarjetas, el
+   formulario y sus dos botones. **Los textos son de cada misión y se
+   escriben con su voz**; el aparato solo les pone el comportamiento.
+3. Al final del JS de la misión, `window.RECURSOS_ENLACES` con su `mision`
+   (clave de almacén **propia**, nunca heredada del molde) y sus `enlaces`.
+
+### El formato de cada enlace
+
+| Campo | Qué es |
+|---|---|
+| `tipo` | `audio`, `video`, `mapa`, `guia`, `informe`, `preguntas`, `linea`, `tarjetas` o `web`. Decide el icono y el color |
+| `titulo` | lo que se lee grande. Que diga QUÉ es y DE QUÉ, no «Resumen 1» |
+| `url` | `http` o `https`. Sin esto la tarjeta sale de muestra, sin enlazar |
+| `desc` | dos líneas: **qué trae y qué NO** |
+| `fuente` | quién lo hizo (NotebookLM, Gemini, la casa). Sale en el pie |
+| `origen` | `maquina` (por defecto) o `casa`. Es la etiqueta de estatus |
+| `dura` | «14 min», «6 páginas». Opcional |
+
+**La descripción es el campo que decide si la repisa sirve**, y por eso el
+formulario la exige. «Resumen del tema» no dice nada y obliga a abrir los seis
+enlaces para saber cuál era; «los dos conceptos con ejemplos de cine, sin la
+prueba del conector» ahorra cinco. Es la misma regla con la que se escriben
+las fuentes de la misión, aplicada a lo que hizo una máquina.
+
+### Las cuatro reglas de la repisa, y ninguna es de adorno
+
+1. **Lo que hizo una máquina lo dice.** Es la regla de oro del Estudio Mayor:
+   ninguna fuente entra sin su etiqueta. Un resumen automático es material de
+   **repaso** de lo que ya está en la misión, no una fuente: puede equivocarse
+   en un dato y lo dice con el mismo tono seguro con el que dice los buenos.
+   El recuadro va a la vista, siempre, y no se puede apagar desde la misión.
+   Colgar resúmenes automáticos al lado de Forster sin distinguirlos, en una
+   ruta que enseña a cazar fuentes infladas, sería el chiste malo.
+2. **Toda tarjeta dice a dónde lleva antes de tocarla.** El dominio va escrito
+   en el pie, y el origen también.
+3. **Ningún dato se interpola dentro de un atributo.** Aquí se va más lejos
+   que en las Sugerencias de M.E.T.A.S: no se arma HTML con datos, punto.
+   Todo con `createElement` y `textContent`, y la dirección comprobada con
+   `reEnlace` antes de ponerla con `setAttribute`. Solo `http` y `https`, y la
+   comprobación es con `URL()` y no con una expresión sobre el texto pelado,
+   porque `java\tscript:` y `JavaScript:` pasan un grep ingenuo y el navegador
+   los ejecuta igual. La misión vive en el mismo dominio que la Bóveda, las
+   finanzas y el chat.
+4. **Lo que se añade desde la pantalla se queda en ese aparato.** El
+   formulario existe para pegar un enlace desde la tableta, verlo puesto y
+   decidir; no sube nada a Supabase y la tarjeta lo dice con su insignia. Para
+   que un enlace lo vea toda la casa hay que llevarlo al catálogo, y de eso se
+   encarga el botón 📋 de cada tarjeta, que escupe el bloque de código listo
+   para pegar en el chat. Es el mismo reparto que el SQL de Supabase.
+
+### Las tarjetas de muestra se van solas
+
+Una misión recién montada trae en su catálogo tres enlaces con `ejemplo: true`
+y sin `url`: se ven enteros, para saber cómo queda la repisa, y no enlazan a
+ninguna parte. **El aparato deja de pintarlos en cuanto entra el primer enlace
+real**, propio o de catálogo. Si hubiera que acordarse de borrarlos, alguna
+misión se publicaría con tres tarjetas de mentira dentro.
+
+### Antes de publicar un cambio de la repisa
+
+```
+node _dev/servidor-estatico.js      (en otra terminal)
+_dev/probe-recursos-enlaces.html    (en el navegador)
+```
+
+Y la sonda de la propia misión comprueba que la lleve puesta, que la clave del
+almacén sea la suya (al copiar el molde se hereda, y dos misiones acabarían
+compartiendo repisa) y que la etiqueta de máquina esté a la vista.
 
 ## 7. Verificación antes de publicar
 
