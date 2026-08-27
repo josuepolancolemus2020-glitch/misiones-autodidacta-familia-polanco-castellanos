@@ -596,3 +596,55 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-mostrar-contar",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: el dial de mostrar y contar",
+      desc: "Las tres casillas conversadas, con el resumen defendido como lo que es, una herramienta. Trae los ejemplos de la sección Aprende; no entra en la cita mal hecha, que es el corazón de la etapa.",
+      fuente: "NotebookLM",
+      dura: "13 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Debate en audio: ¿está mal citado Chéjov?",
+      desc: "Las dos posturas sobre la carta de 1886 y el vidrio de botella, discutidas. Útil para el careo; conviene tener la carta delante, porque el debate la parafrasea y no la lee.",
+      fuente: "NotebookLM",
+      dura: "9 min",
+      ops: {"formato":"Debate","duracion":"Corto"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: el dial en tres casillas",
+      desc: "Mostrar, contar y resumir, con qué pide cada casilla y cuándo se usa. Para tener al lado al revisar; no lleva los años ni los autores, y esta ruta no acepta una regla huérfana.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Vertical","estilo":"Editorial"}
+    },
+    {
+      ejemplo: true,
+      tipo: "informe",
+      titulo: "Informe: qué dijo Chéjov de verdad, en 1886",
+      desc: "La carta a Alexander, lo que dice y lo que la industria le hizo decir. Es el material que necesita el careo; se lee con la etiqueta puesta, porque una máquina resumiendo una cita mal citada es justo donde conviene desconfiar.",
+      fuente: "NotebookLM",
+      dura: "4 páginas",
+      ops: {"formato":"Resumen","sugerido":"Auditoría narrativa"}
+    }
+  ]
+};

@@ -598,3 +598,54 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-la-escena",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: la escena y su giro de valor",
+      desc: "La unidad de trabajo conversada: qué valor entra y qué valor sale. Trae el giro de McKee con ejemplos; no trae la cuenta de la escena a fondo, que es donde esta etapa se aprueba.",
+      fuente: "NotebookLM",
+      dura: "12 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "video",
+      titulo: "Video: entra tarde, sal temprano",
+      desc: "La regla del corte con dos versiones de la misma escena, una con el saludo y otra sin él. Sirve para verlo de un golpe; no dice de quién es la regla ni de qué año, y aquí eso no se salta.",
+      fuente: "NotebookLM",
+      dura: "5 min",
+      ops: {"formato":"Breve","estilo":"Clásico"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: las seis herramientas de la escena",
+      desc: "La tabla madre en una lámina, con el protocolo de cinco movimientos al lado. Buena para tener delante mientras se revisa; las etiquetas de estatus van solo en la ficha.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Horizontal","estilo":"Instructivo"}
+    },
+    {
+      ejemplo: true,
+      tipo: "preguntas",
+      titulo: "Preguntas de repaso: ¿esto es una escena?",
+      desc: "Doce fragmentos para decidir si hay giro de valor o solo hay conversación. Para antes del quiz; las respuestas vienen sin explicar por qué, que es la mitad que importa.",
+      fuente: "NotebookLM",
+      dura: "12 preguntas"
+    }
+  ]
+};
