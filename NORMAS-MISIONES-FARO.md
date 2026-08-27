@@ -938,6 +938,35 @@ ninguna parte. **El aparato deja de pintarlos en cuanto entra el primer enlace
 real**, propio o de catálogo. Si hubiera que acordarse de borrarlos, alguna
 misión se publicaría con tres tarjetas de mentira dentro.
 
+### Cómo se monta en las demás misiones
+
+**La Ruta del Hilo que Tira la lleva entera desde el 27 de agosto de 2026**,
+sus doce etapas. Se montó con dos herramientas, y con ellas se monta en las que
+falten:
+
+```
+node _dev/monta-repisa.js <carpeta-de-la-mision> <contenido.json>
+node _dev/monta-repisa-sonda.js <su-sonda.html> <clave-de-la-mision>
+```
+
+La primera hace las cuatro cosas mecánicas (la hoja, el guion, el bloque y el
+catálogo) y **saca el molde del piloto**, no de una copia guardada dentro: con
+una copia habría dos verdades y la de la herramienta sería la vieja. Comprueba
+los cuatro anclajes ANTES de escribir nada, porque media repisa montada es peor
+que ninguna, y es idempotente.
+
+La segunda le pone a la sonda de esa misión las seis medidas de esta norma, con
+**la clave del almacén al frente**: es lo único que de verdad se rompe al
+replicar, porque la clave se hereda con el molde y dos misiones compartiendo
+repisa no se ve roto por ninguna otra parte.
+
+**Lo que NO hacen las herramientas es el texto**, y es a propósito: el párrafo
+de presentación y las tarjetas de muestra entran por un JSON aparte y se
+escriben con la voz de la misión. Un párrafo genérico repetido en cuarenta
+misiones es exactamente lo contrario de lo que esta casa escribe. Y las
+descripciones de las muestras dicen **qué NO trae** cada cosa, que es la mitad
+que ahorra abrir seis enlaces.
+
 ### Antes de publicar un cambio de la repisa
 
 ```

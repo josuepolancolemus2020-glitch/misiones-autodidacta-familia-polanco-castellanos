@@ -594,3 +594,54 @@ function imprimirPreguntasLecturas(){
   cuerpo+='</div>';
   _abreImpresion(_hojaImpresa('Preguntas de las lecturas',cuerpo,' · Preguntas de las lecturas'));
 }
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-el-taller",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: revisar es pasar varias veces, no leer otra vez",
+      desc: "Las pasadas conversadas, una por vez y con lo que se busca en cada una. Trae a Lamott y el primer borrador; no trae la lista maestra de las once, que es lo que se usa con el texto delante.",
+      fuente: "NotebookLM",
+      dura: "16 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: la lista maestra de las once herramientas",
+      desc: "Las once etapas anteriores en una sola lámina, con la pregunta que le hace cada una a un borrador. Es la que conviene tener impresa al lado del teclado; para eso está también la ficha, que la trae con sus autores.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Vertical","estilo":"Instructivo"}
+    },
+    {
+      ejemplo: true,
+      tipo: "informe",
+      titulo: "Guía práctica: una pasada por herramienta",
+      desc: "El orden de las pasadas y qué NO mirar en cada una, que es lo que hace que una revisión avance en vez de dar vueltas. Ojo con seguirla al pie de la letra: la etapa dice que el orden se ajusta al texto, y una guía automática tiende a dar el suyo como si fuera el único.",
+      fuente: "NotebookLM",
+      dura: "8 páginas",
+      ops: {"formato":"Guía de estudio","sugerido":"Guía práctica de Construcción"}
+    },
+    {
+      ejemplo: true,
+      tipo: "preguntas",
+      titulo: "Preguntas: la prueba de dominio, en seco",
+      desc: "Las preguntas de la prueba sin el texto propio delante, para ver cuáles se contestan de memoria. Sirve de calentamiento y nada más: la prueba de verdad es sobre algo escrito por uno, y eso ninguna máquina lo puede hacer por nadie.",
+      fuente: "NotebookLM",
+      dura: "15 preguntas"
+    }
+  ]
+};
