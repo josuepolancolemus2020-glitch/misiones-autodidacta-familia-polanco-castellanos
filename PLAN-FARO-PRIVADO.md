@@ -94,7 +94,13 @@ Zone → Make private.
      casa que se VE entera entre los cuatro y se ESCRIBE solo por quien puso
      cada fila, así que la comprobación 3 del archivo importa más que de
      costumbre: el `select` tiene que ser la única política sin `auth.uid()`.
-     El archivo trae al final las cinco comprobaciones para pegar después, y la
+     El archivo **se para solo** si falta `es_familia()`, con una frase que dice
+     qué hacer: sin ese guardia, el fallo llegaba disfrazado de «la tabla no
+     existe», porque el editor deshace el pegado entero cuando una línea falla.
+     Y **termina con un `select` que devuelve una fila** diciendo si quedó
+     puesto: si al correrlo no sale `✅ recursos_enlaces puesta` con 15
+     columnas y 4 políticas, no quedó, por mucho que ponga «Success».
+     El archivo trae además las cinco comprobaciones para pegar después, y la
      cuarta es la que de verdad prueba la defensa: un `insert` con
      `javascript:` en la dirección TIENE que fallar.
    · ⚠️ **Confirmar si `supabase/sql/lecturas_marcas.sql` se corrió.** No consta

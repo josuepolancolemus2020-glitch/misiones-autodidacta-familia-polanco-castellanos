@@ -40,6 +40,35 @@ Se pega **el archivo completo**, no un trozo. Son idempotentes a
 propósito: correrlos dos veces no rompe nada, y un recorte pegado a
 medias sí.
 
+**Y la trampa que costó una tarde el 27 de agosto de 2026:** el editor
+corre TODO el pegado dentro de **una sola transacción**. Si falla una
+línea, se deshace el pegado entero, la tabla no se crea, y lo único que
+se ve es el error de la línea que falló, que puede hablar de otra cosa.
+El rastro que quedó fue «relation ... does not exist» al comprobar, que
+es el síntoma más lejano posible de la causa (faltaba una función de la
+que dependían las políticas).
+
+Por eso, desde `recursos_enlaces.sql`, todo archivo nuevo hace dos cosas
+más:
+
+- **empieza comprobando sus dependencias** con un `do $$ ... raise
+  exception ... $$` que dice en una frase qué falta y qué hacer. Ocho
+  líneas que ahorran la tarde;
+- **termina con un `select` que devuelve una fila** diciendo si quedó
+  puesto (columnas, políticas, seguridad por fila). Va el último porque
+  el editor enseña el resultado de la última sentencia: así, en vez de un
+  «Success. No rows returned» que no distingue entre «quedó» y «se pegó
+  a medias», sale escrito qué hay.
+
+**Y el SQL se prueba antes de mandarlo.** En la sesión hay PostgreSQL:
+se levanta un servidor con `initdb`, se le pone un Supabase mínimo
+(`auth.users`, `auth.uid()`, `familia_miembros`, `es_familia()`, los
+roles `anon` y `authenticated`) y se corre el archivo con
+`psql -v ON_ERROR_STOP=1 --single-transaction`, que es como lo corre el
+editor. Ahí se ve si el archivo falla, si es idempotente de verdad y si
+sus `check` muerden. Mandar SQL sin correrlo es mandarle a alguien con
+una tableta a depurar por ti.
+
 ## Normativa: las Sugerencias de M.E.T.A.S se atienden aquí
 
 Dentro de cada misión de M.E.T.A.S hay un botón **💬 Sugerencias**. Lo

@@ -67,6 +67,29 @@
 --   enterrado hace más de 180 días se barre solo, abajo.
 -- ════════════════════════════════════════════════════════════════════
 
+-- ════════════════════════════════════════════════════════════════════
+-- LO PRIMERO: COMPROBAR LA DEPENDENCIA, Y DECIRLO EN CRISTIANO
+-- ════════════════════════════════════════════════════════════════════
+-- El editor de Supabase corre TODO el pegado dentro de UNA transacción.
+-- Si falla una sola línea, se deshace el pegado entero: la tabla NO se
+-- crea, y lo único que se ve es el error de la línea que falló, que
+-- puede ser la 77 y hablar de otra cosa. El 27 de agosto de 2026 pasó
+-- exactamente eso y el rastro que quedó fue «relation
+-- public.recursos_enlaces does not exist» al comprobar, o sea el
+-- síntoma más lejano posible de la causa.
+--
+-- Por eso este archivo empieza mirando lo que necesita y parando con
+-- una frase que dice qué hacer. Cuesta ocho líneas y ahorra una tarde.
+do $guardia$
+begin
+  if to_regproc('public.es_familia') is null then
+    raise exception E'FALTA public.es_familia(), y sin ella las cuatro politicas de esta tabla no se pueden crear.\n'
+      'Como el editor corre todo el pegado en una sola transaccion, eso deshace TAMBIEN el create table, y despues parece que el archivo no hizo nada.\n'
+      'Que hacer: correr antes supabase/sql/seguridad_familia_1_puerta.sql, y volver a pegar este.';
+  end if;
+end
+$guardia$;
+
 -- ── El enlace ───────────────────────────────────────────────────────
 create table if not exists public.recursos_enlaces (
   -- El identificador NACE EN EL APARATO, no aquí. Hace falta porque la
@@ -265,3 +288,23 @@ revoke execute on function public.recursos_enlaces_higiene() from public, anon, 
 --    5-septies): la repisa se trae Supabase solo cuando ya hay sesión
 --    guardada en ese navegador, para que abrir una misión no pida red.
 -- ════════════════════════════════════════════════════════════════════
+
+-- ════════════════════════════════════════════════════════════════════
+-- Y LA MISMA COMPROBACIÓN, VIVA: esta consulta corre y DEVUELVE UNA
+-- FILA. Va la última a propósito, porque el editor enseña el resultado
+-- de la última sentencia: así, en vez de un «Success. No rows
+-- returned» que no distingue entre «quedó puesto» y «se pegó a medias»,
+-- sale escrito qué hay. Si esta fila no aparece, el pegado no llegó
+-- hasta aquí.
+-- ════════════════════════════════════════════════════════════════════
+select
+  case when to_regclass('public.recursos_enlaces') is null
+       then '❌ LA TABLA NO SE CREO'
+       else '✅ recursos_enlaces puesta' end                              as resultado,
+  (select count(*) from information_schema.columns
+    where table_schema = 'public' and table_name = 'recursos_enlaces')   as columnas_han_de_ser_15,
+  (select count(*) from pg_policies
+    where schemaname = 'public' and tablename = 'recursos_enlaces')      as politicas_han_de_ser_4,
+  (select relrowsecurity from pg_class
+    where oid = to_regclass('public.recursos_enlaces'))                  as seguridad_por_fila_ha_de_ser_true,
+  (to_regproc('public.recursos_enlaces_higiene') is not null)            as higiene_puesta;
