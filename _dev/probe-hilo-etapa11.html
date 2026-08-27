@@ -507,7 +507,15 @@ window.addEventListener('load', async () => {
       ok(/Fundamentos del relato/.test(ruta.textContent), 'con su dominio a la vista (Fundamentos del relato)', 'la tarjeta no dice su dominio');
       const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "hilo").length');
       const totalCat = wa.eval('RUTAS.hilo.etapas');
-      ok(construidasCat === 11, 'el catálogo cuenta once etapas construidas en el Hilo', 'construidas en el catálogo: ' + construidasCat);
+      /* La cuenta sale del CATÁLOGO, no escrita a mano. Escrita a
+         mano («construidasCat === 11») esta línea suspendía sola en
+         cuanto la ruta crecía, sin que hubiera nada roto: es la
+         lección de la Casa Cerrada, y la arrastraban las diez sondas
+         del Hilo a la vez. Lo que hay que comprobar es que ESTA
+         etapa conste construida, no cuántas había el día que se
+         escribió la sonda. */
+      ok(wa.eval('MISSIONS.some(m => m.ruta === "hilo" && m.etapa === 11)'),
+         'el catálogo trae construida la etapa 11 (de ' + construidasCat + ' del Hilo)', 'la etapa 11 no consta construida en el catálogo');
       ok(ruta.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length + ' de ' + construidasCat);
       ok(ruta.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok([...ruta.querySelectorAll('.re-link')].some(a => /Contar de pie y contar en imagen/.test(a.textContent)),

@@ -470,6 +470,32 @@ window.addEventListener('load', async () => {
     ok(!!d.querySelector('#s-recursos a[href*="ficha-hilo-deseo-obstaculo"]'), 'la misión enlaza su ficha', 'la misión no enlaza la ficha');
     fr.remove();
 
+    /* ── LA REPISA DE ENLACES (norma 6-bis) ──
+       Lo hondo se mide en `_dev/probe-recursos-enlaces.html`; aquí solo
+       lo que se rompe AL COPIAR EL MOLDE. */
+    log('\n── LA REPISA DE ENLACES (norma 6-bis) ──');
+    const repisa = d.querySelector('[data-re-repisa]');
+    ok(!!repisa, 'Recursos trae la repisa de herramientas de estudio', 'no hay repisa en Recursos');
+    ok(!!w.FaroRepisa, 'con su aparato compartido cargado', 'el aparato de la repisa no se cargó');
+    /* La que de verdad importa al replicar: la clave se hereda con el
+       molde, y dos misiones compartiendo repisa no se ve roto. */
+    ok(w.RECURSOS_ENLACES && w.RECURSOS_ENLACES.mision === "hilo-deseo-obstaculo",
+       'y la clave del almacén es la de ESTA misión', 'la repisa usa la clave de otra misión (se heredó del molde): ' + (w.RECURSOS_ENLACES && w.RECURSOS_ENLACES.mision));
+    /* La cuenta sale del catálogo, no escrita a mano. */
+    ok(repisa && repisa.querySelectorAll('.re-card').length === w.RECURSOS_ENLACES.enlaces.length,
+       'y pinta sus ' + w.RECURSOS_ENLACES.enlaces.length + ' tarjetas', 'la repisa no pinta todas sus tarjetas');
+    ok(repisa && repisa.querySelectorAll('[data-re-asa]').length === w.RECURSOS_ENLACES.enlaces.length,
+       'cada una con su asa para moverla', 'alguna tarjeta se quedó sin asa');
+    /* La etiqueta de estatus no es opcional: es la regla de oro de esta
+       ruta aplicada a lo que hizo una máquina. */
+    ok(repisa && /repaso/.test(repisa.textContent) && /máquina/.test(repisa.textContent),
+       'la repisa dice a la vista que eso lo hizo una máquina y es material de repaso', 'la repisa cuelga material de máquina sin su etiqueta');
+    ok([...(repisa ? repisa.querySelectorAll('a.re-card') : [])].every(a => /^https?:\/\//.test(a.getAttribute('href') || '')),
+       'las tarjetas que enlazan lo hacen solo por http o https', 'hay una tarjeta con un enlace que no es http');
+    const fichaP = [...d.querySelectorAll('#s-recursos p')].find(x => /Ficha de estudio imprimible/.test(x.textContent));
+    ok(!!repisa && !!fichaP && (repisa.compareDocumentPosition(fichaP) & Node.DOCUMENT_POSITION_FOLLOWING) > 0,
+       'y va la primera de Recursos, antes de la ficha', 'la repisa no va primero');
+
     log('\n── EN LA APLICACIÓN ──');
     const da = appFrame.contentDocument, wa = appFrame.contentWindow;
     wa.switchView('view-rutas'); await esperar(400);
@@ -479,7 +505,15 @@ window.addEventListener('load', async () => {
       ok(/Fundamentos del relato/.test(ruta.textContent), 'con su dominio a la vista (Fundamentos del relato)', 'la tarjeta no dice su dominio');
       const construidasCat = wa.eval('MISSIONS.filter(m => m.ruta === "hilo").length');
       const totalCat = wa.eval('RUTAS.hilo.etapas');
-      ok(construidasCat === 2, 'el catálogo cuenta dos etapas construidas en el Hilo', 'construidas en el catálogo: ' + construidasCat);
+      /* La cuenta sale del CATÁLOGO, no escrita a mano. Escrita a
+         mano («construidasCat === 2») esta línea suspendía sola en
+         cuanto la ruta crecía, sin que hubiera nada roto: es la
+         lección de la Casa Cerrada, y la arrastraban las diez sondas
+         del Hilo a la vez. Lo que hay que comprobar es que ESTA
+         etapa conste construida, no cuántas había el día que se
+         escribió la sonda. */
+      ok(wa.eval('MISSIONS.some(m => m.ruta === "hilo" && m.etapa === 2)'),
+         'el catálogo trae construida la etapa 2 (de ' + construidasCat + ' del Hilo)', 'la etapa 2 no consta construida en el catálogo');
       ok(ruta.querySelectorAll('.re-link').length === construidasCat, 'con sus ' + construidasCat + ' etapas construidas ya tocables', 'etapas tocables: ' + ruta.querySelectorAll('.re-link').length + ' de ' + construidasCat);
       ok(ruta.querySelectorAll('.ruta-etapa-futura').length === totalCat - construidasCat, 'y el resto por construir, con nombre', 'futuras: ' + ruta.querySelectorAll('.ruta-etapa-futura').length + ', se esperaban ' + (totalCat - construidasCat));
       ok([...ruta.querySelectorAll('.re-link')].some(a => /El deseo y el obst[áa]culo/.test(a.textContent)),

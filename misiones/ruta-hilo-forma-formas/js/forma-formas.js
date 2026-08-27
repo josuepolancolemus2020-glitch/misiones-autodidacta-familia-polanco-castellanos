@@ -554,3 +554,54 @@ window.addEventListener('DOMContentLoaded',()=>{
   renderAchPanel();
 });
 
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-forma-formas",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: las estructuras, con quién las firmó",
+      desc: "La tabla madre conversada, de Aristóteles a Reagan y colegas (2016). Trae los autores y los años; no trae las críticas, y esta etapa no acepta una estructura sin ellas.",
+      fuente: "NotebookLM",
+      dura: "16 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "diapositiva",
+      titulo: "Diapositivas: una estructura por lámina, con su ficha",
+      desc: "Las catorce, cada una con su autor, su año y para qué sirve. Para proyectar mientras se explica; hay que decir en voz alta la etiqueta de estatus, que las láminas no llevan.",
+      fuente: "NotebookLM",
+      dura: "14 láminas",
+      ops: {"formato":"Presentación detallada","duracion":"Largo"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: las seis formas medidas de Reagan (2016)",
+      desc: "Los seis arcos emocionales de las 1.327 obras del Proyecto Gutenberg, en una lámina. Con el límite escrito: el corpus es casi todo literatura occidental en inglés.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Horizontal","estilo":"Científico"}
+    },
+    {
+      ejemplo: true,
+      tipo: "informe",
+      titulo: "Guía de estudio: lo que NO es un arco",
+      desc: "Le Guin, Alison y el kishōtenketsu puestos en fila, que es el otro lado de la etapa. Útil para el careo; no sustituye a leer a Le Guin, que son doce páginas.",
+      fuente: "NotebookLM",
+      dura: "6 páginas",
+      ops: {"formato":"Guía de estudio","sugerido":"Guía de Conceptos Fundamentales"}
+    }
+  ]
+};

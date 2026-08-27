@@ -556,3 +556,54 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-deseo-obstaculo",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: qué quiere y quién se lo niega",
+      desc: "El motor conversado: el deseo concreto, la apuesta y el obstáculo con cara. Trae el querer contra el necesitar de Truby; no entra en las siete esferas de Propp ni en los casos del proyecto.",
+      fuente: "NotebookLM",
+      dura: "13 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: las siete esferas de acción de Propp",
+      desc: "Las siete funciones en una lámina, con un ejemplo por esfera. Buena para el cuaderno; no dice el año (1928) ni la crítica, que es justo lo que esta ruta no deja saltarse.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Vertical","estilo":"Editorial"}
+    },
+    {
+      ejemplo: true,
+      tipo: "video",
+      titulo: "Video: querer no es lo mismo que necesitar",
+      desc: "La distinción de Truby con dos escenas puestas una al lado de la otra. Sirve para repasar antes del quiz; se queda corto en la apuesta, que es lo que hace que un deseo importe.",
+      fuente: "NotebookLM",
+      dura: "7 min",
+      ops: {"formato":"Explicativo","estilo":"Pizarra"}
+    },
+    {
+      ejemplo: true,
+      tipo: "mapa",
+      titulo: "Mapa mental del motor de la etapa",
+      desc: "Deseo, apuesta y obstáculo colgando de la misma raíz, con el objeto de deseo de McKee al lado. Para mirar con la ficha delante, no en vez de ella.",
+      fuente: "NotebookLM",
+      dura: "1 lámina"
+    }
+  ]
+};
