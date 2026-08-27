@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · La repisa entre dos aparatos</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:520px;border:0;background:#fff}pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="fa" src="about:blank"></iframe>
+<iframe id="fb" src="about:blank"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* LA PRUEBA QUE PIDIÓ EL AUTOR EL 27 DE AGOSTO DE 2026: que un enlace
+   pegado en la repisa de una misión esté ahí al abrir la misma misión
+   en otro aparato.
+
+   Aquí NO se finge el cliente de Supabase: se usa la biblioteca de
+   verdad (js/supabase.min.js), con peticiones HTTP de verdad, contra
+   _dev/postgrest-falso.js, que habla el mismo idioma que el endpoint de
+   Supabase y aplica las MISMAS políticas de la tabla. Lo único fingido
+   es el otro extremo del cable, porque contra el proyecto de la casa no
+   se puede probar desde el banco de pruebas (la red no sale) y tampoco
+   convendría ensuciar la base con enlaces de prueba.
+
+   «Cambiar de aparato» se simula de la única manera fiel: se borra lo
+   que ese aparato tenía guardado (su clave faro_repisa_<misión>) y se
+   deja la sesión, que es exactamente la situación de quien abre la
+   misma misión en el teléfono después de haberla tocado en la tableta.
+
+   Lo que se mide, y por qué cada cosa está en la lista:
+
+   1. QUE EL ENLACE VIAJE. Es lo que se pidió, y va primero.
+   2. QUE EL BORRADO TAMBIÉN VIAJE. Sin lápida, el aparato que todavía
+      tiene su copia vuelve a subirla en la siguiente sincronización y
+      el enlace resucita solo. Es el fallo que parece funcionar durante
+      una semana.
+   3. QUE SINCRONIZAR DOS VECES NO DUPLIQUE NADA. El upsert va por el
+      identificador que nació en el aparato; si eso estuviera mal, cada
+      viaje a la nube dejaría un gemelo, y con tres viajes ya no se sabe
+      cuál es cuál.
+   4. QUE LA REPISA SEA DE LA CASA Y LA ESCRITURA NO. Un enlace puesto
+      por otra persona se VE (esa es la decisión del 27 de agosto), pero
+      no se puede quitar ni corregir: la tabla lo rechaza, y la pantalla
+      ni siquiera ofrece el botón. Las dos mitades se miden, porque una
+      sin la otra no protege nada.
+   5. QUE NO SE RESUCITE LO AJENO. Un enlace de otro que ya no está
+      arriba es uno que su dueño quitó: subirlo de vuelta sería devolver
+      a la vida lo que alguien borró, y encima con un rechazo por cada
+      viaje.
+   6. QUE LA DIRECCIÓN LA COMPRUEBEN LOS DOS LADOS. La pantalla ya la
+      mira; aquí se comprueba que la BASE también muerda, que es la
+      mitad que nadie ve fallar hasta que alguien se salta la pantalla.
+   7. QUE EL RÓTULO DIGA LA VERDAD en cada momento, incluido el «sin
+      sesión»: prometer que algo está en la nube cuando no lo está es lo
+      que hace que alguien cierre la aplicación tranquilo.
+
+   Levantar antes las dos cosas:
+     node _dev/servidor-estatico.js
+     node _dev/postgrest-falso.js 8125                                  */
+
+const NUBE = 'http://localhost:8125';
+const CLAVE_PUB = 'sb_publishable_de_prueba';
+const YO   = '11111111-2222-3333-4444-555555555555';   /* josué */
+const OTRA = '99999999-8888-7777-6666-555555555555';   /* jael */
+const MISION = 'hilo-cadena-hueco';
+const CAJON = 'faro_repisa_' + MISION;
+
+const out = document.getElementById('out');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+const cerrar = () => { log('\n' + (fallos ? '✖ ' + fallos + ' fallos' : '✔ todo en orden'));
+  document.title = (fallos ? 'SUSPENDE' : 'APRUEBA') + ' · Sonda repisa entre aparatos'; };
+
+async function estado(){ return await (await fetch(NUBE + '/__prueba/estado')).json(); }
+async function reinicia(){ await fetch(NUBE + '/__prueba/reiniciar'); }
+async function sembrar(tabla, filas){
+  await fetch(NUBE + '/__prueba/sembrar', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tabla, filas }),
+  });
+}
+const enlacesNube = async () => (await estado()).tablas.recursos_enlaces;
+
+/* Los dos aparatos son dos marcos DE VERDAD, vivos a la vez. Comparten
+   el almacén del navegador porque son el mismo origen, así que la clave
+   de la repisa se limpia justo antes de abrir cada uno: eso es
+   exactamente lo que ve la repisa en dos teléfonos distintos.
+
+   El cliente de Supabase es el REAL, apuntando al doble. Se le pone
+   antes de que la repisa sincronice, igual que en producción lo deja
+   js/auth.js en window.faroSb. */
+async function abrirAparato(marco, quien, nombre) {
+  try { localStorage.removeItem(CAJON); } catch (e) {}
+  const f = document.getElementById(marco);
+  await new Promise(res => { f.onload = res; f.src = '/misiones/ruta-hilo-cadena-hueco/cadena-hueco.html?a=' + nombre; });
+  const w = f.contentWindow, d = f.contentDocument;
+  if (!w.supabase) {
+    await new Promise((res, rej) => { const s = d.createElement('script');
+      s.src = '/js/supabase.min.js'; s.onload = res; s.onerror = rej; d.head.appendChild(s); });
+  }
+  w.faroSb = w.supabase.createClient(NUBE, CLAVE_PUB, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { headers: { Authorization: 'Bearer prueba:' + quien } },
+  });
+  /* getSession del cliente real devolvería null porque aquí no hay
+     sesión guardada; la repisa solo necesita saber quién entró. El
+     nombre corto sí sale de familia_miembros de verdad, contra el
+     doble, que es donde se comprueba que esa consulta funciona. */
+  w.faroSb.auth.getSession = async () => ({ data: { session: { user: { id: quien } } } });
+  return { w, d, quien, nombre, R: () => w.FaroRepisa };
+}
+
+/* Cada aparato tiene su propia copia; como comparten almacén, se
+   instala la del aparato con el que se va a operar justo antes. */
+function usar(ap) {
+  try { localStorage.setItem(CAJON, JSON.stringify(ap.almacen || [])); } catch (e) {}
+}
+function recoger(ap) { ap.almacen = ap.R().todos(); }
+
+(async () => {
+  try {
+    await reinicia();
+    /* Los dos de la casa tienen su fila: sin ella, es_familia() sería
+       falso y la puerta estaría cerrada para los dos. */
+    await sembrar('familia_miembros', [
+      { user_id: YO, miembro: 'josue' },
+      { user_id: OTRA, miembro: 'jael' },
+    ]);
+
+    log('── APARATO A: se pega un enlace ──');
+    const A = await abrirAparato('fa', YO, 'A');
+    A.R().guardarPropios([{
+      tipo: 'audio',
+      titulo: 'Resumen en audio de la etapa 1',
+      url: 'https://notebooklm.google.com/notebook/prueba-uno',
+      desc: 'Sembrado por la sonda.',
+      fuente: 'NotebookLM',
+      dura: '14 min'
+    }]);
+    await A.R().sincronizar(true);
+    let arriba = await enlacesNube();
+    ok(arriba.length === 1, 'el enlace sube a la nube', 'subieron ' + arriba.length + ' enlaces');
+    ok(arriba[0] && arriba[0].mision === MISION, 'con la clave de SU misión', 'el enlace no lleva la misión');
+    ok(arriba[0] && arriba[0].anadido_por === YO, 'y a nombre de quien entró', 'el enlace no queda a nombre del usuario');
+    ok(arriba[0] && arriba[0].miembro === 'josue', 'con su nombre corto, sacado de familia_miembros', 'el enlace subió sin nombre: la consulta a familia_miembros no funcionó');
+    ok(arriba[0] && arriba[0].descripcion === 'Sembrado por la sonda.', 'y la descripción viaja en su columna', 'la descripción no llegó');
+    ok(A.R().estadoNube() === 'al-dia', 'y el rótulo dice que está en la nube', 'el rótulo dice ' + A.R().estadoNube());
+    const idUno = arriba[0].id;
+    ok(/^re-/.test(idUno), 'el identificador nació en el aparato', 'el identificador no lo puso el aparato: ' + idUno);
+    recoger(A);
+
+    log('\n── APARATO B: la misma misión, otro aparato ──');
+    /* Sin nada guardado: es quien abre la misión por primera vez en el
+       teléfono, con la sesión de la casa puesta. */
+    const B = await abrirAparato('fb', YO, 'B');
+    ok(B.R().leerPropios().length === 0, 'el aparato B arranca vacío, como un teléfono nuevo', 'el aparato B arrancó con enlaces dentro');
+    await B.R().sincronizar(true);
+    const enB = B.R().leerPropios();
+    ok(enB.length === 1, 'EL ENLACE ESTÁ EN EL OTRO APARATO', 'el enlace no viajó: ' + enB.length + ' enlaces en B');
+    ok(enB[0] && enB[0].titulo === 'Resumen en audio de la etapa 1', 'con su título', 'llegó sin título');
+    ok(enB[0] && enB[0].url === 'https://notebooklm.google.com/notebook/prueba-uno', 'su dirección', 'llegó sin dirección');
+    ok(enB[0] && enB[0].desc === 'Sembrado por la sonda.', 'y su descripción', 'llegó sin descripción');
+    ok(enB[0] && enB[0].tipo === 'audio', 'y su tipo, que es lo que le pone icono y color', 'llegó sin tipo');
+    /* Y pintado, no solo en el almacén: un enlace que viaja y no se ve
+       no ha viajado para quien lo mira. */
+    const pintadas = B.d.querySelectorAll('[data-re-repisa] .re-card');
+    ok(pintadas.length === 1 && /Resumen en audio de la etapa 1/.test(pintadas[0].textContent),
+       'y sale pintado en la repisa, en lugar de las tarjetas de muestra', 'el enlace bajado no se pintó');
+
+    log('\n── SINCRONIZAR DOS VECES NO DUPLICA ──');
+    await B.R().sincronizar(true);
+    await B.R().sincronizar(true);
+    arriba = await enlacesNube();
+    ok(arriba.length === 1, 'tres viajes a la nube dejan UN enlace', 'quedaron ' + arriba.length + ' enlaces: el upsert duplica');
+    ok(B.R().leerPropios().length === 1, 'y uno en el aparato', 'el aparato acabó con ' + B.R().leerPropios().length);
+    recoger(B);
+
+    log('\n── EL BORRADO TAMBIÉN VIAJA ──');
+    usar(B);
+    await B.R().sincronizar(false);
+    const vB = B.R().todos().find(e => e.id === idUno);
+    vB.del = true; vB.u = Date.now() + 10;
+    B.R().guardarPropios(B.R().todos());
+    await B.R().sincronizar(true);
+    arriba = await enlacesNube();
+    ok(arriba.length === 1 && arriba[0].borrado === true, 'el borrado sube como lápida, no como fila que desaparece', 'el borrado no subió como lápida');
+    recoger(B);
+
+    usar(A);
+    await A.R().sincronizar(true);
+    ok(A.R().leerPropios().length === 0, 'y el aparato A se entera: el enlace ya no está', 'el enlace no se borró en el aparato A');
+    /* La prueba de que la lápida hacía falta: si A hubiera borrado la
+       fila en vez de enterrarla, este segundo viaje la resucitaría. */
+    await A.R().sincronizar(true);
+    arriba = await enlacesNube();
+    ok(arriba.filter(e => !e.borrado).length === 0, 'y no resucita al volver a sincronizar', 'el enlace borrado resucitó solo');
+    recoger(A);
+
+    log('\n── LA REPISA ES DE LA CASA; LA ESCRITURA, NO ──');
+    await reinicia();
+    await sembrar('familia_miembros', [
+      { user_id: YO, miembro: 'josue' },
+      { user_id: OTRA, miembro: 'jael' },
+    ]);
+    /* Un enlace puesto por Jael, sembrado con el rol de servicio como si
+       lo hubiera subido su tableta. */
+    await sembrar('recursos_enlaces', [{
+      id: 're-de-jael', mision: MISION, tipo: 'video',
+      titulo: 'El video que puso Jael', url: 'https://www.youtube.com/watch?v=jael',
+      descripcion: 'Puesto por otra persona de la casa.', fuente: 'NotebookLM',
+      origen: 'maquina', dura: '5 min', anadido_por: OTRA, miembro: 'jael',
+      borrado: false, actualizado: Date.now(),
+    }]);
+    const C = await abrirAparato('fa', YO, 'C');
+    await C.R().sincronizar(true);
+    const vistos = C.R().leerPropios();
+    ok(vistos.length === 1 && vistos[0].id === 're-de-jael', 'el enlace de otra persona de la casa SE VE', 'no se ve el enlace de otra persona');
+    ok(vistos[0] && vistos[0].quien === 'jael', 'y la tarjeta sabe de quién es', 'el enlace ajeno llegó sin dueño');
+    const tarjetaAjena = [...C.d.querySelectorAll('[data-re-repisa] .re-tarjeta-envoltura')][0];
+    ok(!!tarjetaAjena && /Jael/i.test(tarjetaAjena.textContent), 'la insignia enseña quién lo puso', 'la tarjeta no dice quién puso el enlace');
+    ok(!!tarjetaAjena && !tarjetaAjena.querySelector('button[aria-label^="Quitar"]'),
+       'y NO se ofrece el botón de quitar en lo ajeno', 'se ofrece quitar un enlace de otra persona');
+    ok(!!tarjetaAjena && !!tarjetaAjena.querySelector('button[aria-label^="Copiar"]'),
+       'aunque sí se puede copiar para el código', 'no se puede copiar un enlace ajeno');
+
+    /* La otra mitad: aunque alguien se salte la pantalla, la BASE lo
+       rechaza. Sin esta comprobación, la única defensa sería no pintar
+       un botón, que es no tener defensa. */
+    const rechazo = await C.w.faroSb.from('recursos_enlaces')
+      .upsert([{ id: 're-de-jael', mision: MISION, titulo: 'Secuestrado', url: 'https://x.hn/a', anadido_por: OTRA }], { onConflict: 'id' });
+    ok(!!rechazo.error, 'y la tabla rechaza escribir a nombre de otro', 'LA TABLA DEJÓ ESCRIBIR A NOMBRE DE OTRA PERSONA');
+    const rechazo2 = await C.w.faroSb.from('recursos_enlaces')
+      .upsert([{ id: 're-de-jael', mision: MISION, titulo: 'Secuestrado', url: 'https://x.hn/a', anadido_por: YO }], { onConflict: 'id' });
+    ok(!!rechazo2.error, 'ni apropiarse de una fila ajena poniéndole el nombre propio', 'SE PUDO SECUESTRAR LA FILA DE OTRA PERSONA');
+
+    log('\n── LO AJENO NO SE RESUCITA ──');
+    recoger(C);
+    /* Jael quita el suyo desde su tableta: la fila se marca borrada. */
+    await sembrar('recursos_enlaces', [{
+      id: 're-de-jael', mision: MISION, tipo: 'video',
+      titulo: 'El video que puso Jael', url: 'https://www.youtube.com/watch?v=jael',
+      descripcion: 'Puesto por otra persona de la casa.', fuente: 'NotebookLM',
+      origen: 'maquina', dura: '5 min', anadido_por: OTRA, miembro: 'jael',
+      borrado: true, actualizado: Date.now() + 1000,
+    }]);
+    usar(C);
+    await C.R().sincronizar(true);
+    ok(C.R().leerPropios().length === 0, 'cuando su dueña lo quita, desaparece de mi aparato', 'el enlace ajeno borrado sigue viéndose');
+    /* Las dos medidas van PEGADAS a la sincronización: cualquier cosa
+       que la sonda pida en medio (mirar el estado, leer las filas) suma
+       al contador y estaría midiendo a la sonda, no al aparato. Ese
+       error ya hizo suspender esta línea una vez.
+       Lo que tiene que salir: UNA petición del aparato (bajar los
+       enlaces de la misión) más la del propio estado. El nombre del
+       miembro ya está recordado desde el primer viaje, y sobre todo NO
+       tiene que haber ningún intento de volver a subir lo ajeno, que la
+       tabla rechazaría uno por uno. */
+    /* Se cuentan las peticiones DEL APARATO (`peticionesApp`), que deja
+       fuera los OPTIONS del preflight de CORS y las de la propia sonda.
+       Contando todo, esta línea acusaba a la repisa de un gasto que era
+       del navegador, y ya hizo suspender la sonda una vez.
+       Lo que tiene que salir: UNA, la de bajar los enlaces de la misión.
+       El nombre del miembro ya está recordado desde el primer viaje, y
+       sobre todo NO puede haber ningún POST intentando devolver a la
+       vida lo que otra persona borró. */
+    const antesPeticiones = (await estado()).peticionesApp;
+    await C.R().sincronizar(true);
+    const est = await estado();
+    const gasto = est.peticionesApp - antesPeticiones;
+    arriba = est.tablas.recursos_enlaces;
+    ok(arriba.length === 1 && arriba[0].borrado === true, 'y mi aparato no intenta devolverlo a la vida', 'el aparato resucitó un enlace ajeno');
+    ok(gasto === 1, 'y le cuesta UNA petición: baja y calla', 'el aparato gasta ' + gasto + ' peticiones por viaje: ' + JSON.stringify(est.ultimas.slice(-4)));
+
+    log('\n── LA DIRECCIÓN LA MUERDEN LOS DOS LADOS ──');
+    const malas = [
+      ['javascript:alert(1)', 'javascript:'],
+      ['https://a.hn/" onmouseover="x', 'una comilla'],
+      ['https://a.hn/con espacio', 'un espacio'],
+      ['ftp://a.hn/x', 'otro esquema'],
+    ];
+    let mordidas = 0;
+    for (const [u, que] of malas) {
+      const r = await C.w.faroSb.from('recursos_enlaces')
+        .upsert([{ id: 're-mala-' + mordidas, mision: MISION, titulo: 'Trampa', url: u, anadido_por: YO }], { onConflict: 'id' });
+      if (r.error) mordidas++; else log('    ↳ pasó ' + que + ': ' + u);
+    }
+    ok(mordidas === malas.length, 'la base rechaza las ' + malas.length + ' direcciones tramposas', 'la base dejó pasar ' + (malas.length - mordidas));
+    /* Y la pantalla las rechaza antes, que es la otra mitad. */
+    ok(malas.every(([u]) => C.R().enlaceValido(u) === ''), 'y la pantalla ya las había rechazado antes', 'la pantalla deja pasar alguna dirección tramposa');
+
+    log('\n── SIN SESIÓN, EL RÓTULO NO MIENTE ──');
+    const D = await abrirAparato('fb', YO, 'D');
+    delete D.w.faroSb;               /* como quien nunca entró por la puerta */
+    D.R().guardarPropios([{ tipo: 'web', titulo: 'Suelto', url: 'https://a.hn/x', desc: 'x' }]);
+    await D.R().sincronizar(true);
+    ok(D.R().estadoNube() === 'sin-sesion', 'dice «solo en este aparato», no que está en la nube', 'el rótulo dice ' + D.R().estadoNube());
+    const rot = D.d.querySelector('[data-re-estado]');
+    ok(rot && !rot.hidden && /Solo en este aparato/i.test(rot.textContent), 'y se ve escrito en la repisa', 'el rótulo no se pinta');
+    ok(D.R().leerPropios().length === 1, 'y el enlace no se pierde: sigue guardado aquí', 'el enlace se perdió al no haber nube');
+    const insig = D.d.querySelector('[data-re-repisa] .re-marca');
+    ok(!!insig && /solo aquí/i.test(insig.textContent), 'la tarjeta avisa de que ese enlace todavía no viajó', 'la tarjeta no avisa de que no ha subido');
+
+    try { localStorage.removeItem(CAJON); } catch (e) {}
+    cerrar();
+  } catch (e) { fallos++; log('✘ ' + e.message + '\n' + e.stack); cerrar(); }
+})();
+</script>
+</body>
+</html>

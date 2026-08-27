@@ -977,7 +977,7 @@
          la cabecera del aparato. -->
     <div class="re-caja" data-re-repisa>
       <p class="re-caja-tit">🧰 Herramientas de estudio de esta etapa</p>
-      <p class="re-caja-sub">Lo que sale cuando se le da esta misión entera a una máquina de estudio: el resumen en audio para oír mientras se va en el camino, el mapa mental de las tres piezas, el video corto, la guía de repaso. Viven aquí, pegadas a la etapa que resumen, y no sueltas en el teléfono de quien las generó, que es donde nadie más las encuentra.</p>
+      <p class="re-caja-sub">Lo que sale cuando se le da esta misión entera a una máquina de estudio: el resumen en audio para oír mientras se va en el camino, el mapa mental de las tres piezas, el video corto, la guía de repaso. Viven aquí, pegadas a la etapa que resumen, y no sueltas en el teléfono de quien las generó, que es donde nadie más las encuentra. Lo que se pega en la repisa <strong>viaja</strong>: se ve en todos los aparatos de la casa donde esté F.A.R.O, y lo ven los cuatro. Quitar o corregir un enlace es de quien lo puso.</p>
 
       <div class="re-aviso">
         <span aria-hidden="true">🤖</span>
@@ -988,8 +988,14 @@
 
       <p class="re-vacio" hidden>Todavía no hay nada en la repisa. Con «Añadir un enlace» se pega uno y se ve al momento cómo queda.</p>
 
+      <!-- El rótulo de la nube. Sale vacío mientras no haya nada propio que
+           sincronizar: decir «guardado también en la nube» de una repisa que
+           solo tiene lo del catálogo es ruido, y el ruido enseña a no leer. -->
+      <p class="re-estado" data-re-estado hidden></p>
+
       <div class="re-acciones">
         <button class="re-btn re-btn-pri" type="button" data-re-abrir>➕ Añadir un enlace</button>
+        <button class="re-btn" type="button" data-re-sync>☁️ Sincronizar</button>
         <button class="re-btn" type="button" data-re-copia-todo>📋 Copiar los míos para el código</button>
       </div>
 

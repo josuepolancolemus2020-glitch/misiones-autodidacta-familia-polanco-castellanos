@@ -252,24 +252,43 @@ de `NORMAS-MISIONES-FARO.md`. Lo que hay que saber para no romperlo:
    todo con `createElement` y `textContent`, y la dirección comprobada con
    `URL()` (no con un grep: `java\tscript:` y `JavaScript:` pasan un grep
    ingenuo y el navegador los ejecuta igual). Solo `http` y `https`.
-3. **Lo que se añade desde la pantalla se queda en ese aparato.** El
-   formulario es para pegar un enlace desde la tableta, verlo puesto y
-   decidir. Para que lo vea toda la casa hay que llevarlo al catálogo, y el
-   botón 📋 de cada tarjeta escupe el bloque listo para pegar **en el chat**.
-   Es exactamente el mismo reparto que el SQL de Supabase, y por la misma
+3. **La repisa VIAJA, y es de la casa.** Ampliación del mismo día: lo que se
+   pega sube a `recursos_enlaces` y está en todos los aparatos donde haya
+   F.A.R.O. Los cuatro ven todos los enlaces de una misión; quitar o corregir
+   es solo de quien lo puso, y eso lo hace cumplir la seguridad por fila, no
+   la pantalla. **El SQL hay que correrlo a mano**
+   (`supabase/sql/recursos_enlaces.sql`, apuntado en `PLAN-FARO-PRIVADO.md`):
+   hasta entonces la repisa funciona igual y **dice a la vista que no viaja**
+   («📴 Solo en este aparato»), que es lo contrario de fingir que sí.
+   El cliente es el único de la casa (`window.faroSb`) y se trae perezosamente,
+   solo con sesión ya guardada, por lo mismo que el marcador.
+4. **Y lo permanente sigue yendo al catálogo.** La nube lo pone en los
+   aparatos de la casa hoy; el catálogo lo deja escrito en el repositorio y
+   visible también para quien no entró por la puerta. El botón 📋 de cada
+   tarjeta escupe el bloque listo para pegar **en el chat**, que es como se
+   hace ese ascenso. Mismo reparto que el SQL de Supabase, y por la misma
    razón: el autor trabaja desde el teléfono, sin el repositorio delante.
-4. **Las tres tarjetas de muestra se van solas** al entrar el primer enlace
+5. **Las tres tarjetas de muestra se van solas** al entrar el primer enlace
    real. Si hubiera que acordarse de borrarlas, alguna misión se publicaría
    con tres tarjetas de mentira dentro.
-5. **La clave del almacén es de cada misión.** Al copiar el molde se hereda, y
+6. **La clave del almacén es de cada misión.** Al copiar el molde se hereda, y
    dos misiones acabarían compartiendo repisa. La sonda de la misión lo mira.
+7. **Se borra con lápida.** Si el aparato borrara la fila, la tableta que
+   todavía tiene su copia la subiría otra vez y el enlace resucitaría solo.
 
 **Antes de publicar un cambio de la repisa:**
 
 ```
-node _dev/servidor-estatico.js      (en otra terminal)
-_dev/probe-recursos-enlaces.html    (en el navegador)
+node _dev/servidor-estatico.js         (en una terminal)
+node _dev/postgrest-falso.js 8125      (en otra)
+_dev/probe-recursos-enlaces.html       (la repisa, sin nube)
+_dev/probe-recursos-enlaces-nube.html  (la repisa entre dos aparatos)
 ```
+
+`_dev/postgrest-falso.js` sirve ahora DOS tablas (`lecturas_marcas` y
+`recursos_enlaces`) y aplica las políticas de cada una, que no son las mismas:
+las marcas son de cada quien y la repisa es de la casa. Un doble que las
+tratara igual dejaría pasar justo el error que importa.
 
 ## El kit de escritura a mano: papel, y se mide en hojas
 

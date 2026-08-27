@@ -28,6 +28,7 @@ pierde por el camino.
 | Apagar Pages y poner el repositorio en privado | ⛔ el último paso |
 | La clave de servicio en la función de notificaciones | ⚠️ los avisos siguen rotos |
 | Apagar el alta pública de cuentas en Supabase | ⛔ pendiente |
+| `recursos_enlaces` (la repisa de enlaces de las misiones) | ⏳ pendiente de correr el SQL |
 | Compilar y repartir el APK | ⛔ **ya no hace falta**: la PWA se actualiza sola |
 
 ## ⏸ PENDIENTE, para retomar
@@ -81,6 +82,26 @@ Zone → Make private.
      y no llega**. El archivo trae al final las seis comprobaciones para pegar
      después, y la quinta es la que importa: desde la calle la tabla tiene que
      devolver **cero filas**.
+   · ⚠️ **Correr `supabase/sql/recursos_enlaces.sql`** en el SQL Editor. Es un
+     solo archivo y no depende de ningún otro salvo de `es_familia()`, que ya
+     está. Crea la tabla de la repisa de enlaces de las misiones: las
+     herramientas de estudio que salen de NotebookLM (el resumen en audio, el
+     video, el mapa mental) para que estén en TODOS los aparatos de la casa y
+     no solo en el que las pegó. Pedido por el autor el 27 de agosto de 2026.
+     Hasta que se corra, la repisa funciona igual pero **los enlaces se quedan
+     en el aparato donde se pegaron**, y la propia repisa lo dice a la vista
+     («📴 Solo en este aparato»): no finge que viajan. Es la única tabla de la
+     casa que se VE entera entre los cuatro y se ESCRIBE solo por quien puso
+     cada fila, así que la comprobación 3 del archivo importa más que de
+     costumbre: el `select` tiene que ser la única política sin `auth.uid()`.
+     El archivo trae al final las cinco comprobaciones para pegar después, y la
+     cuarta es la que de verdad prueba la defensa: un `insert` con
+     `javascript:` en la dirección TIENE que fallar.
+   · ⚠️ **Confirmar si `supabase/sql/lecturas_marcas.sql` se corrió.** No consta
+     en esta lista (se instaló sin apuntarlo aquí), así que no se sabe. Es la
+     tabla de lo que cada quien subraya y anota en las misiones. Se comprueba
+     en un minuto: `select count(*) from public.lecturas_marcas;` responde si
+     existe, y falla si no.
    · ⚠️ **Ponerle freno a `faro_buzon_retirar` y `faro_buzon_mio`.** Salió al
      revisar la seguridad del buzón el 8 de agosto de 2026, y está desde el
      primer archivo. `faro_buzon_enviar` sí tiene freno (cinco al día por

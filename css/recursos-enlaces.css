@@ -163,6 +163,25 @@ a.re-card:active { transform: translateY(-1px); }
 .re-card.re-ejemplo { border-style: dashed; opacity: 0.85; box-shadow: none; }
 .re-card.re-ejemplo .re-abrir { color: var(--gray); }
 
+/* ─────────── El rótulo de la nube ───────────
+   Dice la verdad en cada momento y por eso tiene cinco estados y no dos.
+   El caro es «pendiente»: decir «guardado también en la nube» con algo
+   recién pegado y sin subir es la clase de mentira que hace que alguien
+   cierre la aplicación tranquilo y pierda su trabajo. */
+.re-estado {
+  font-size: 0.78rem; font-weight: 700; line-height: 1.4;
+  margin-top: 0.8rem; padding: 0.45rem 0.7rem;
+  border-radius: 9px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--gray);
+}
+.re-estado[hidden] { display: none; }
+.re-estado-al-dia    { color: var(--jade);  border-color: var(--jade); }
+.re-estado-pendiente,
+.re-estado-subiendo  { color: var(--sky);   border-color: var(--sky); }
+.re-estado-error     { color: var(--red);   border-color: var(--red); }
+.re-estado-sin-sesion{ color: var(--amber); border-color: var(--amber); }
+
 /* ─────────── El formulario ─────────── */
 .re-acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; }
 .re-btn {

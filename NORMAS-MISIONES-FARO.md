@@ -811,12 +811,55 @@ las fuentes de la misión, aplicada a lo que hizo una máquina.
    porque `java\tscript:` y `JavaScript:` pasan un grep ingenuo y el navegador
    los ejecuta igual. La misión vive en el mismo dominio que la Bóveda, las
    finanzas y el chat.
-4. **Lo que se añade desde la pantalla se queda en ese aparato.** El
-   formulario existe para pegar un enlace desde la tableta, verlo puesto y
-   decidir; no sube nada a Supabase y la tarjeta lo dice con su insignia. Para
-   que un enlace lo vea toda la casa hay que llevarlo al catálogo, y de eso se
-   encarga el botón 📋 de cada tarjeta, que escupe el bloque de código listo
-   para pegar en el chat. Es el mismo reparto que el SQL de Supabase.
+4. **Lo que se añade desde la pantalla sube a la nube, y lo permanente sigue
+   yendo al catálogo.** Son dos cosas distintas y las dos hacen falta: la nube
+   lo pone en todos los aparatos de la casa hoy; el catálogo lo deja escrito en
+   el repositorio, versionado, y visible también para quien no ha entrado por
+   la puerta. El botón 📋 de cada tarjeta escupe el bloque de código listo para
+   pegar en el chat, que es como se hace ese ascenso. Mientras el enlace no ha
+   subido, la tarjeta lo dice con su insignia «solo aquí».
+
+### La repisa viaja: los tres sitios donde vive un enlace
+
+**Ampliación pedida por el autor el 27 de agosto de 2026**, el mismo día: los
+enlaces tienen que estar en todos los aparatos donde esté F.A.R.O. Un enlace
+vive en tres sitios y hacen falta los tres:
+
+| Dónde | Qué es | Quién lo ve |
+|---|---|---|
+| **El catálogo** (`window.RECURSOS_ENLACES`, en el JS de la misión) | lo permanente y versionado | todo el mundo, con o sin sesión |
+| **La nube** (tabla `recursos_enlaces`) | lo que la casa añade desde la pantalla | los cuatro, en cualquier aparato |
+| **El aparato** (localStorage) | la copia inmediata | ese aparato |
+
+**Nunca se espera a la nube para pintar ni para guardar.** Sin señal la repisa
+funciona igual y sube cuando la haya. Es la misma regla del marcador de
+lecturas, y por las mismas razones.
+
+**De quién es la repisa: de la casa.** Los cuatro ven todos los enlaces de una
+misión; cualquiera puede poner; quitar o corregir es solo de quien lo puso.
+Esto es distinto de las marcas de lectura A PROPÓSITO: lo que subraya una hija
+no tiene por qué verlo el padre, pero el resumen en audio de una etapa le sirve
+a cualquiera que estudie esa etapa. Lo hace cumplir la seguridad por fila de la
+tabla; la pantalla solo evita ofrecer botones que la base va a rechazar, y las
+dos mitades se miden por separado en la sonda.
+
+**El cliente de Supabase es el único de la casa** (`window.faroSb`, de
+`js/auth.js`) y se trae **perezosamente**, solo si ya hay sesión guardada en
+ese navegador. Si cada misión cargara la puerta al abrirse, las cuarenta
+pedirían red nada más entrar aunque nadie fuera a tocar la repisa.
+
+**El SQL es `supabase/sql/recursos_enlaces.sql`** y hay que correrlo a mano en
+el editor de Supabase (ver `PLAN-FARO-PRIVADO.md`). Hasta que se corra la
+repisa funciona igual, pero los enlaces se quedan en su aparato **y la repisa
+lo dice a la vista**: «📴 Solo en este aparato». El rótulo tiene cinco estados y
+no dos justamente por eso: decir «guardado también en la nube» de algo que no
+subió es lo que hace que alguien cierre la aplicación tranquilo y pierda su
+trabajo.
+
+**Se borra con lápida, no de verdad.** Si el aparato borrara la fila, la
+tableta que todavía tiene su copia la volvería a subir en la siguiente
+sincronización y el enlace resucitaría solo. Con la lápida, el borrado también
+viaja. A los 180 días se barre, en los dos lados.
 
 ### Las tarjetas de muestra se van solas
 
@@ -829,9 +872,17 @@ misión se publicaría con tres tarjetas de mentira dentro.
 ### Antes de publicar un cambio de la repisa
 
 ```
-node _dev/servidor-estatico.js      (en otra terminal)
-_dev/probe-recursos-enlaces.html    (en el navegador)
+node _dev/servidor-estatico.js         (en una terminal)
+node _dev/postgrest-falso.js 8125      (en otra)
+_dev/probe-recursos-enlaces.html       (la repisa, sin nube)
+_dev/probe-recursos-enlaces-nube.html  (la repisa entre dos aparatos)
 ```
+
+La segunda sonda usa la biblioteca de Supabase **de verdad**, con peticiones
+HTTP de verdad, contra `_dev/postgrest-falso.js`, que aplica las mismas
+políticas de la tabla. Lo único fingido es el otro extremo del cable: contra
+el proyecto de la casa no se puede probar desde el banco de pruebas (la red no
+sale) ni conviene ensuciar la base con enlaces de prueba.
 
 Y la sonda de la propia misión comprueba que la lleve puesta, que la clave del
 almacén sea la suya (al copiar el molde se hereda, y dos misiones acabarían
