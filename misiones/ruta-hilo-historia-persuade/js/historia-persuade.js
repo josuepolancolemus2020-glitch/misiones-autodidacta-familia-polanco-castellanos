@@ -594,3 +594,55 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-historia-persuade",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: por qué persuade, y cuándo no se usa",
+      desc: "El mecanismo conversado: el transporte baja la contraargumentación, y por eso la herramienta corta hacia los dos lados. Trae Green y Brock (2000); el freno ético se despacha al final y en esta etapa es la mitad principal.",
+      fuente: "NotebookLM",
+      dura: "14 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Debate en audio: ¿es legítimo contar para convencer?",
+      desc: "Las dos posturas discutidas, con casos de campaña sanitaria y de campaña política. Buen material para el careo; el debate no cierra, y no debe: esta etapa tampoco cierra esa pregunta.",
+      fuente: "NotebookLM",
+      dura: "11 min",
+      ops: {"formato":"Debate","duracion":"Corto"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: el freno ético, en cuatro preguntas",
+      desc: "Las cuatro que hay que contestar antes de usar una historia para mover a alguien. Para tenerla a la vista al escribir; no lleva los casos, que son los que enseñan a contestarlas.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Vertical","estilo":"Profesional"}
+    },
+    {
+      ejemplo: true,
+      tipo: "informe",
+      titulo: "Auditoría: tres relatos persuasivos, desarmados",
+      desc: "Tres piezas reales pasadas por el freno, con lo que cada una hace bien y lo que esconde. Es el mejor entrenamiento de la etapa; conviene comprobar los datos que cita, porque una auditoría automática también infla.",
+      fuente: "NotebookLM",
+      dura: "7 páginas",
+      ops: {"formato":"Propia creación","sugerido":"Auditoría narrativa"}
+    }
+  ]
+};

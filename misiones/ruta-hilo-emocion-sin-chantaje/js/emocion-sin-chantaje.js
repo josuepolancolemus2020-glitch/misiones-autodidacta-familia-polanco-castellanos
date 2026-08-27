@@ -597,3 +597,55 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-emocion-sin-chantaje",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: conmover no es manipular",
+      desc: "La grieta conversada, con la sentimentalidad tratada como lo que esta etapa dice que es: un fallo técnico, no un pecado. Trae a Baldwin y a Sontag; no trae la cuenta de la emoción a fondo, que es donde se aprueba.",
+      fuente: "NotebookLM",
+      dura: "15 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Crítica en audio: ¿esto conmueve o cobra?",
+      desc: "El formato de crítica aplicado a tres campañas conocidas. Sirve para afinar el oído; hay que oírlo con la ficha delante, porque una máquina entusiasta describiendo emoción es exactamente el tono que esta etapa enseña a mirar de reojo.",
+      fuente: "NotebookLM",
+      dura: "10 min",
+      ops: {"formato":"Crítica","duracion":"Corto"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: la víctima identificable (Slovic)",
+      desc: "Por qué una cara mueve más que una cifra, y por qué eso es un problema y no un truco. Con el nombre y el año; sin el límite del hallazgo, que la ficha sí escribe.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Vertical","estilo":"Científico"}
+    },
+    {
+      ejemplo: true,
+      tipo: "informe",
+      titulo: "Guía de estudio: el transporte narrativo, y su factura",
+      desc: "Green y Brock (2000) explicados: quien se mete en un relato deja de discutirlo. Es el hallazgo que sostiene la etapa 9; aquí se estudia sabiendo que la parte incómoda es que funciona también cuando el relato miente.",
+      fuente: "NotebookLM",
+      dura: "5 páginas",
+      ops: {"formato":"Guía de estudio","sugerido":"Marco de estilo y ética"}
+    }
+  ]
+};
