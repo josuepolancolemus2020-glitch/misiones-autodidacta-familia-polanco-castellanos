@@ -594,3 +594,55 @@ function imprimirPreguntasLecturas(){
   cuerpo+='</div>';
   _abreImpresion(_hojaImpresa('Preguntas de las lecturas',cuerpo,' · Preguntas de las lecturas'));
 }
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-de-pie-en-imagen",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: contar de pie no es leer en voz alta",
+      desc: "La grieta conversada, con la historia de siete minutos desarmada. Es el formato que mejor le cae a esta etapa, porque se oye caminando, que es como se ensaya; no trae la parte de imagen, que va aparte.",
+      fuente: "NotebookLM",
+      dura: "12 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "video",
+      titulo: "Video: la imagen que sustituye a la frase",
+      desc: "Cuándo una imagen dice lo que la frase estaba diciendo, y cuándo solo la repite (que es ilustrar, y esta etapa lo separa). Se ve en pantalla, que es lo suyo; se queda corto en composición.",
+      fuente: "NotebookLM",
+      dura: "8 min",
+      ops: {"formato":"Explicativo","estilo":"Clásico"}
+    },
+    {
+      ejemplo: true,
+      tipo: "diapositiva",
+      titulo: "Diapositivas: los siete minutos, minuto a minuto",
+      desc: "El reparto del tiempo de una historia contada de pie, con lo que toca en cada tramo. Para ensayar con el reloj al lado; una lámina no sustituye a decirlo en voz alta, que es la única prueba que cuenta aquí.",
+      fuente: "NotebookLM",
+      dura: "9 láminas",
+      ops: {"formato":"Diapositiva del presentador","duracion":"Corto"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: de pie, en imagen o en la página",
+      desc: "Qué pide cada soporte y qué se pierde al mudar una historia de uno a otro. Buena para decidir antes de escribir; no trae los casos, que son los que enseñan a decidir de verdad.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Cuadrado","estilo":"Instructivo"}
+    }
+  ]
+};

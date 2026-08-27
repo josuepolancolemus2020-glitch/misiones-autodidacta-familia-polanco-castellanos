@@ -594,3 +594,55 @@ function imprimirPreguntasLecturas(){
   cuerpo+='</div>';
   _abreImpresion(_hojaImpresa('Preguntas de las lecturas',cuerpo,' · Preguntas de las lecturas'));
 }
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-historia-de-verdad",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: reordenar no es inventar",
+      desc: "La grieta conversada, que es la línea entera de esta etapa: se puede elegir por dónde empezar, no se puede poner una frase en una boca que no la dijo. Trae los casos de Capote y de Malcolm; no trae la ficha de la no ficción, que es la herramienta.",
+      fuente: "NotebookLM",
+      dura: "15 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Debate en audio: ¿dónde queda «A sangre fría»?",
+      desc: "Las dos posturas sobre lo que Capote hizo y lo que dijo que hacía. Sirve para el careo; conviene contrastar los datos con la ficha, porque de este caso circula mucho dato repetido y poco comprobado, que es justo lo que la etapa enseña a separar.",
+      fuente: "NotebookLM",
+      dura: "12 min",
+      ops: {"formato":"Debate","duracion":"Corto"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: qué se puede tocar y qué no",
+      desc: "Las operaciones permitidas y las prohibidas, en dos columnas, con un ejemplo cada una. Para tener al lado al escribir; las zonas grises no caben en una lámina y son la mitad del oficio.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Horizontal","estilo":"Editorial"}
+    },
+    {
+      ejemplo: true,
+      tipo: "informe",
+      titulo: "Guía práctica: cómo se verifica antes de publicar",
+      desc: "El orden de comprobación de una pieza de no ficción, paso por paso. Es la parte aburrida y la que sostiene todo lo demás; lo que trae hay que cotejarlo, porque una guía de verificación sin verificar es un chiste.",
+      fuente: "NotebookLM",
+      dura: "6 páginas",
+      ops: {"formato":"Guía de estudio","sugerido":"Guía práctica de Construcción"}
+    }
+  ]
+};
