@@ -597,3 +597,54 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-tiempo-relato",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: orden, elipsis y suspense",
+      desc: "El reloj del relato conversado: en qué orden pasó y en qué orden se cuenta. Trae la elipsis con ejemplos; no trae la frecuencia, que es la casilla que casi nadie usa y esta etapa sí.",
+      fuente: "NotebookLM",
+      dura: "15 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "video",
+      titulo: "Video: la bomba debajo de la mesa",
+      desc: "El ejemplo que Hitchcock le contó a Truffaut en 1966, con la escena montada de las dos maneras. Es la mejor entrada al suspense; hay que decir de dónde sale, porque el video lo cuenta sin fecha.",
+      fuente: "NotebookLM",
+      dura: "6 min",
+      ops: {"formato":"Breve","estilo":"Clásico"}
+    },
+    {
+      ejemplo: true,
+      tipo: "linea",
+      titulo: "Línea de tiempo: fábula contra trama, en dos filas",
+      desc: "Los mismos sucesos en el orden en que ocurrieron y en el orden en que se cuentan, uno debajo del otro. Es lo que hace ver la analepsis de un golpe; para el cuaderno, no para el examen.",
+      fuente: "NotebookLM",
+      dura: "1 lámina"
+    },
+    {
+      ejemplo: true,
+      tipo: "diapositiva",
+      titulo: "Diapositivas: el reloj del relato, casilla por casilla",
+      desc: "Orden, duración y frecuencia, cada una con su ejemplo y su autor. Para proyectar mientras se explica; la grieta entre fábula y trama se despacha en una lámina y merece más.",
+      fuente: "NotebookLM",
+      dura: "10 láminas",
+      ops: {"formato":"Presentación detallada","duracion":"Predeterminado"}
+    }
+  ]
+};

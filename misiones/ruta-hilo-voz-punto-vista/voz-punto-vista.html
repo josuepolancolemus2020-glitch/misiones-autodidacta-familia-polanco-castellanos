@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/voz-punto-vista.css">
 <link rel="stylesheet" href="../../css/lecturas.css">
 <link rel="stylesheet" href="../../css/lecturas-marcador.css">
+<link rel="stylesheet" href="../../css/recursos-enlaces.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -920,6 +921,84 @@
   <div class="card ac-teal">
     <h2>📁 Recursos del módulo</h2>
 
+    <!-- ══════════ LA REPISA DE ENLACES ══════════
+         Piloto del aparato compartido `js/recursos-enlaces.js`, pedido por el
+         autor el 27 de agosto de 2026 para las herramientas de estudio que le
+         genera NotebookLM. El bloque es DECLARATIVO a propósito: los textos
+         son de esta misión y se escriben con su voz; el aparato solo les pone
+         el comportamiento, y los enlaces viven en `window.RECURSOS_ENLACES`,
+         al final de js/cadena-hueco.js. Cómo se monta en otra misión está en
+         la cabecera del aparato. -->
+    <div class="re-caja" data-re-repisa>
+      <p class="re-caja-tit">🧰 Herramientas de estudio de esta etapa</p>
+      <p class="re-caja-sub">Lo que sale cuando se le da esta etapa entera a una máquina de estudio: el resumen en audio de la grieta entre voz y focalización, las láminas de los tres grados de Genette, el video del narrador no fiable. Viven aquí, pegadas a la etapa que resumen, y no sueltas en el teléfono de quien las generó, que es donde nadie más las encuentra. Lo que se pega en la repisa <strong>viaja</strong>: se ve en todos los aparatos de la casa donde esté F.A.R.O, y lo ven los cuatro. Quitar o corregir un enlace es de quien lo puso. Las tarjetas <strong>se mueven</strong> con el asa ⠿ (arrastrando, o con las flechas del teclado) para dejarlas en el orden que a cada quien le sirva.</p>
+
+      <div class="re-aviso">
+        <span aria-hidden="true">🤖</span>
+        <div><b>Lo que hizo una máquina lo dice, como toda fuente de esta casa.</b> Esto es material de <b>repaso</b> de lo que ya está en la misión, no una fuente: un resumen automático puede equivocarse en un dato y lo dice con el mismo tono seguro con el que dice los buenos. Las fuentes reales, con su autor, su año y su crítica, son las de la lista de aquí abajo. Y esta ruta enseña justo eso: ninguna estructura sin autor y año, ningún estudio sin su etiqueta.</div>
+      </div>
+
+      <div class="re-rejilla"></div>
+
+      <p class="re-vacio" hidden>Todavía no hay nada en la repisa. Con «Añadir un enlace» se pega uno y se ve al momento cómo queda.</p>
+
+      <!-- El rótulo de la nube. Sale vacío mientras no haya nada propio que
+           sincronizar: decir «guardado también en la nube» de una repisa que
+           solo tiene lo del catálogo es ruido, y el ruido enseña a no leer. -->
+      <p class="re-estado" data-re-estado hidden></p>
+
+      <div class="re-acciones">
+        <button class="re-btn re-btn-pri" type="button" data-re-abrir>➕ Añadir un enlace</button>
+        <button class="re-btn" type="button" data-re-sync>☁️ Sincronizar</button>
+        <button class="re-btn" type="button" data-re-copia-todo>📋 Copiar los míos para el código</button>
+      </div>
+
+      <!-- Lo que se añade aquí se guarda en ESTE aparato y en ninguno más: es
+           para pegar el enlace, verlo puesto y decidir. Para que lo vea toda
+           la casa hay que llevarlo al catálogo, y de eso se encarga el botón
+           📋 de cada tarjeta, que escupe el bloque listo para pegar en el
+           chat. Es el mismo reparto que el SQL de Supabase. -->
+      <div class="re-form" hidden>
+        <p class="re-form-titulo" data-re-form-titulo>➕ Un enlace nuevo</p>
+        <div class="re-fila">
+          <label for="reUrl">Dirección del recurso</label>
+          <input id="reUrl" data-re-campo="url" type="url" inputmode="url" placeholder="https://..." autocomplete="off">
+        </div>
+        <div class="re-dos">
+          <div class="re-fila">
+            <label for="reTipo">Qué es</label>
+            <select id="reTipo" data-re-campo="tipo"></select>
+          </div>
+          <div class="re-fila">
+            <label for="reDura">Cuánto dura de verdad <span style="font-weight:600;">(opcional)</span></label>
+            <input id="reDura" data-re-campo="dura" type="text" placeholder="14 min" autocomplete="off">
+          </div>
+        </div>
+
+        <!-- Las opciones con las que la máquina lo generó. Las pinta el
+             aparato según el tipo elegido: un audio y una infografía no
+             preguntan lo mismo, y la lista vive en js/recursos-enlaces.js
+             para que añadir un estilo sea una línea en un sitio. -->
+        <div class="re-facetas" data-re-facetas hidden></div>
+        <div class="re-fila">
+          <label for="reTitulo">Título que se lee en la tarjeta</label>
+          <input id="reTitulo" data-re-campo="titulo" type="text" placeholder="Resumen en audio: la cadena y el hueco" autocomplete="off">
+        </div>
+        <div class="re-fila">
+          <label for="reDesc">Descripción: qué trae, y qué NO</label>
+          <textarea id="reDesc" data-re-campo="desc" placeholder="Los dos conceptos con ejemplos de cine; no trae la prueba del conector ni los ocho casos."></textarea>
+        </div>
+        <div class="re-fila">
+          <label for="reFuente">Quién lo hizo</label>
+          <input id="reFuente" data-re-campo="fuente" type="text" value="NotebookLM" autocomplete="off">
+        </div>
+        <p class="re-error" hidden></p>
+        <div class="re-acciones" style="margin-top:0;">
+          <button class="re-btn re-btn-pri" type="button" data-re-guarda>💾 Guardar en este aparato</button>
+        </div>
+      </div>
+    </div>
+
     <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
       <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
       <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con la tabla madre de las seis herramientas, la grieta entre voz y focalización explicada a fondo, la ficha del narrador a fondo, las cinco etiquetas de estatus, los casos, la hoja de fuentes con etiqueta y la pauta completa.</p>
@@ -1045,5 +1124,8 @@
        para saber cuáles son sus zonas subrayables. -->
   <script src="../../js/lecturas.js"></script>
   <script src="../../js/lecturas-marcador.js"></script>
+  <!-- La repisa de enlaces va DESPUÉS del JS de la misión: lee window.RECURSOS_ENLACES,
+       que la misión declara al final del suyo. -->
+  <script src="../../js/recursos-enlaces.js"></script>
 </body>
 </html>

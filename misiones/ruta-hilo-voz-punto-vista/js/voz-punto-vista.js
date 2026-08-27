@@ -596,3 +596,54 @@ window.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('[data-aspecto="estructura"]')?.classList.add('active-sec');
   renderAchPanel();
 });
+
+// ═══════════════════ LA REPISA DE ENLACES ═══════════════════
+// El contenido propio del aparato compartido `js/recursos-enlaces.js`
+// (norma 6-bis). El aparato pone el comportamiento; lo que se lee es de
+// esta misión y se escribe con su voz. El formato de cada campo, y la
+// lista de ajustes que la pantalla conoce, están en la cabecera del
+// aparato y en la norma.
+//
+// LAS DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
+// entre el primer enlace real, el aparato deja de pintarlas solo.
+window.RECURSOS_ENLACES = {
+  mision: "hilo-voz-punto-vista",
+  enlaces: [
+    {
+      ejemplo: true,
+      tipo: "audio",
+      titulo: "Resumen en audio: quién cuenta y cuánto sabe",
+      desc: "Las dos preguntas separadas, que es donde casi todo el mundo las junta: quién habla no es lo mismo que quién ve. Trae los tres grados de focalización de Genette (1972); no entra en la ficha del narrador a fondo.",
+      fuente: "NotebookLM",
+      dura: "14 min",
+      ops: {"formato":"Detallado","duracion":"Predeterminado"}
+    },
+    {
+      ejemplo: true,
+      tipo: "infografia",
+      titulo: "Infografía: los tres grados de focalización",
+      desc: "Cero, interna y externa en una lámina, con un párrafo de ejemplo por grado. Con Genette y su año escritos; sin la crítica, que en esta ruta no se cita sin ella.",
+      fuente: "NotebookLM",
+      dura: "1 lámina",
+      ops: {"orientacion":"Horizontal","estilo":"Editorial"}
+    },
+    {
+      ejemplo: true,
+      tipo: "video",
+      titulo: "Video: el narrador no fiable, y cómo se nota",
+      desc: "La idea de Booth (1961) con dos fragmentos donde el lector sabe más que quien cuenta. Buen recordatorio; se queda corto en cómo se construye, que es lo que pide el laboratorio.",
+      fuente: "NotebookLM",
+      dura: "7 min",
+      ops: {"formato":"Explicativo","estilo":"Clásico"}
+    },
+    {
+      ejemplo: true,
+      tipo: "tarjetas",
+      titulo: "Tarjetas: voz o focalización, una por una",
+      desc: "Veinte fragmentos para decidir cuál de las dos preguntas responde cada uno. Para repasar en cinco minutos; no sustituye a las flashcards de la misión, que llevan la explicación detrás.",
+      fuente: "NotebookLM",
+      dura: "20 tarjetas"
+    }
+  ]
+};
