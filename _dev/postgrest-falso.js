@@ -86,6 +86,9 @@ const TABLAS = {
       descripcion: 'text', fuente: 'text', origen: 'text', dura: 'text',
       anadido_por: 'uuid', miembro: 'text', borrado: 'bool',
       actualizado: 'bigint', creado_at: 'ts', guardado_at: 'ts',
+      /* Las dos del 27 de agosto por la tarde: con qué ajustes se
+         generó cada cosa, y dónde la colocó su dueño. */
+      opciones: 'jsonb', orden: 'int',
     },
     obligatorias: ['id', 'mision', 'titulo', 'url', 'anadido_por'],
     valida(f) {
@@ -110,6 +113,18 @@ const TABLAS = {
       }
       if (f.actualizado !== undefined && typeof f.actualizado !== 'number') return 'la columna «actualizado» tiene que ser un número';
       if (f.borrado !== undefined && typeof f.borrado !== 'boolean') return 'la columna «borrado» tiene que ser booleana';
+      /* El mismo check que el SQL: un OBJETO, no una lista ni un texto.
+         Sin esto, el doble aceptaría lo que la tabla rechaza, que es la
+         única manera de que una sonda apruebe y la casa falle. */
+      if (f.opciones !== undefined) {
+        if (f.opciones === null || typeof f.opciones !== 'object' || Array.isArray(f.opciones)) {
+          return 'la columna «opciones» tiene que ser un objeto (jsonb_typeof = object)';
+        }
+        if (JSON.stringify(f.opciones).length > 2000) return 'la columna «opciones» pasa de 2000 caracteres';
+      }
+      if (f.orden !== undefined && (typeof f.orden !== 'number' || !isFinite(f.orden))) {
+        return 'la columna «orden» tiene que ser un entero';
+      }
       return null;
     },
   },

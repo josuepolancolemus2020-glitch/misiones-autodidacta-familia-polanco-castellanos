@@ -52,6 +52,10 @@ iframe{width:380px;height:520px;border:0;background:#fff}pre{background:#111;col
    7. QUE EL RÓTULO DIGA LA VERDAD en cada momento, incluido el «sin
       sesión»: prometer que algo está en la nube cuando no lo está es lo
       que hace que alguien cierre la aplicación tranquilo.
+   8. QUE VIAJEN LAS OPCIONES Y EL ORDEN (27 de agosto, por la tarde).
+      Las opciones son lo que distingue dos audios de la misma misión,
+      uno detallado y otro breve: sin ellas, al teléfono llegan dos
+      tarjetas iguales. Y el orden es lo que se pidió poder tocar.
 
    Levantar antes las dos cosas:
      node _dev/servidor-estatico.js
@@ -136,7 +140,9 @@ function recoger(ap) { ap.almacen = ap.R().todos(); }
       url: 'https://notebooklm.google.com/notebook/prueba-uno',
       desc: 'Sembrado por la sonda.',
       fuente: 'NotebookLM',
-      dura: '14 min'
+      dura: '14 min',
+      ops: { formato: 'Crítica', duracion: 'Corto' },
+      orden: 7
     }]);
     await A.R().sincronizar(true);
     let arriba = await enlacesNube();
@@ -145,6 +151,13 @@ function recoger(ap) { ap.almacen = ap.R().todos(); }
     ok(arriba[0] && arriba[0].anadido_por === YO, 'y a nombre de quien entró', 'el enlace no queda a nombre del usuario');
     ok(arriba[0] && arriba[0].miembro === 'josue', 'con su nombre corto, sacado de familia_miembros', 'el enlace subió sin nombre: la consulta a familia_miembros no funcionó');
     ok(arriba[0] && arriba[0].descripcion === 'Sembrado por la sonda.', 'y la descripción viaja en su columna', 'la descripción no llegó');
+    /* Lo pedido el 27 de agosto por la tarde: con qué ajustes se generó
+       y dónde lo colocó su dueño. Si esto se quedara en el aparato, dos
+       audios de la misma misión llegarían al teléfono indistinguibles y
+       en cualquier orden. */
+    ok(arriba[0] && arriba[0].opciones && arriba[0].opciones.formato === 'Crítica' && arriba[0].opciones.duracion === 'Corto',
+       'las opciones con las que se generó suben en su columna', 'las opciones no subieron: ' + JSON.stringify(arriba[0] && arriba[0].opciones));
+    ok(arriba[0] && arriba[0].orden === 7, 'y el sitio que le dio su dueño', 'el orden no subió: ' + (arriba[0] && arriba[0].orden));
     ok(A.R().estadoNube() === 'al-dia', 'y el rótulo dice que está en la nube', 'el rótulo dice ' + A.R().estadoNube());
     const idUno = arriba[0].id;
     ok(/^re-/.test(idUno), 'el identificador nació en el aparato', 'el identificador no lo puso el aparato: ' + idUno);
@@ -162,6 +175,13 @@ function recoger(ap) { ap.almacen = ap.R().todos(); }
     ok(enB[0] && enB[0].url === 'https://notebooklm.google.com/notebook/prueba-uno', 'su dirección', 'llegó sin dirección');
     ok(enB[0] && enB[0].desc === 'Sembrado por la sonda.', 'y su descripción', 'llegó sin descripción');
     ok(enB[0] && enB[0].tipo === 'audio', 'y su tipo, que es lo que le pone icono y color', 'llegó sin tipo');
+    ok(enB[0] && enB[0].ops && enB[0].ops.formato === 'Crítica' && enB[0].ops.duracion === 'Corto',
+       'sus opciones, que es lo que distingue dos audios de la misma misión', 'las opciones no llegaron al otro aparato');
+    ok(enB[0] && enB[0].orden === 7, 'y su sitio en la repisa', 'el orden no llegó al otro aparato');
+    /* Y pintadas, no solo en el almacén: unas opciones que viajan y no
+       se ven no han viajado para quien mira la tarjeta. */
+    const pastB = [...B.d.querySelectorAll('[data-re-repisa] .re-op')].map(x => x.textContent);
+    ok(pastB.join(',') === 'Crítica,Corto', 'y salen pintadas en la tarjeta del otro aparato', 'en el otro aparato salen: ' + pastB.join(','));
     /* Y pintado, no solo en el almacén: un enlace que viaja y no se ve
        no ha viajado para quien lo mira. */
     const pintadas = B.d.querySelectorAll('[data-re-repisa] .re-card');

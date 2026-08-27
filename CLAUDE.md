@@ -304,6 +304,20 @@ de `NORMAS-MISIONES-FARO.md`. Lo que hay que saber para no romperlo:
    dos misiones acabarían compartiendo repisa. La sonda de la misión lo mira.
 7. **Se borra con lápida.** Si el aparato borrara la fila, la tableta que
    todavía tiene su copia la subiría otra vez y el enlace resucitaría solo.
+8. **Las opciones de cada tipo viven en el aparato, no en la base.** La
+   columna es un objeto libre (`opciones`, jsonb) y la lista de ajustes está
+   en `RE_FACETAS`. Añadir un estilo tiene que ser una línea en un archivo, no
+   una migración que alguien pega desde una tableta.
+9. **El orden es de cada quien.** La seguridad por fila solo deja escribir la
+   fila propia, así que un orden común de la casa es imposible sin poder
+   escribir las filas ajenas. Lo tuyo viaja por la columna `orden`; lo que
+   coloques de los demás se queda en ese aparato. Fingir lo contrario sería un
+   arrastre que parece guardarse y no se guarda.
+10. **El arrastre va con punteros, no con `draggable`**, que no funciona en el
+    navegador de casi ningún teléfono. Y el asa mueve también con las flechas:
+    en una tableta el arrastre de precisión falla lo bastante como para que
+    una función que solo se puede usar arrastrando sea una función que a veces
+    no existe.
 
 **Antes de publicar un cambio de la repisa:**
 

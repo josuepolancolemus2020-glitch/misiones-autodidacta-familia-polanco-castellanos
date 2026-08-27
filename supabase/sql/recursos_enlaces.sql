@@ -159,6 +159,42 @@ create table if not exists public.recursos_enlaces (
   guardado_at   timestamptz not null default now()
 );
 
+-- ── Las dos columnas del 27 de agosto de 2026, por la tarde ─────────
+-- Van con `add column if not exists` y NO dentro del create table de
+-- arriba, para que quien ya tuviera la tabla puesta no tenga que
+-- borrarla: se corre este mismo archivo otra vez y quedan añadidas.
+--
+-- `opciones` es UN OBJETO LIBRE y no una columna por ajuste, y esa es
+--   la decisión que importa. Guarda con qué ajustes se generó cada
+--   cosa: el formato y la duración de un audio, la orientación y el
+--   estilo de una infografía, el estilo visual de un video. Podrían
+--   ser diez columnas con su check; serían diez migraciones que alguien
+--   tiene que pegar desde una tableta el día que NotebookLM añada un
+--   estilo. Es la misma razón por la que `tipo` no lleva check, y la
+--   misma factura que ya se pagó con la sexta clase del Buzón.
+--   La lista de ajustes que la pantalla conoce vive en
+--   js/recursos-enlaces.js (RE_FACETAS); lo que esta tabla exige es
+--   solo que sea un objeto y que no crezca sin freno.
+--
+-- `orden` es el sitio de la tarjeta en la repisa. Es de CADA QUIEN, no
+--   de la casa, y no por gusto: la seguridad por fila solo deja
+--   escribir la fila propia, así que un orden común exigiría poder
+--   escribir las filas de los demás. Cada quien coloca las suyas y ese
+--   orden viaja a sus otros aparatos; lo que coloque de los demás se
+--   queda en el aparato donde lo colocó. Es la única combinación
+--   honesta que permite la puerta.
+alter table public.recursos_enlaces
+  add column if not exists opciones jsonb   not null default '{}'::jsonb,
+  add column if not exists orden    integer not null default 0;
+
+-- Un objeto, no una lista ni un número suelto; y con tope, porque esto
+-- lo escribe un aparato y un aparato puede equivocarse en bucle.
+alter table public.recursos_enlaces
+  drop constraint if exists recursos_enlaces_opciones_ok;
+alter table public.recursos_enlaces
+  add constraint recursos_enlaces_opciones_ok
+  check (jsonb_typeof(opciones) = 'object' and length(opciones::text) <= 2000);
+
 -- La consulta que hace la repisa es siempre la misma: los enlaces de
 -- ESTA misión, de toda la casa.
 create index if not exists recursos_enlaces_idx
@@ -247,7 +283,7 @@ revoke execute on function public.recursos_enlaces_higiene() from public, anon, 
 -- ════════════════════════════════════════════════════════════════════
 -- CÓMO SE COMPRUEBA QUE QUEDÓ PUESTO (no basta con el «Success»)
 -- ════════════════════════════════════════════════════════════════════
--- 1) La tabla existe y tiene sus quince columnas:
+-- 1) La tabla existe y tiene sus diecisiete columnas:
 --      select column_name, data_type
 --        from information_schema.columns
 --       where table_name = 'recursos_enlaces'
@@ -302,9 +338,12 @@ select
        then '❌ LA TABLA NO SE CREO'
        else '✅ recursos_enlaces puesta' end                              as resultado,
   (select count(*) from information_schema.columns
-    where table_schema = 'public' and table_name = 'recursos_enlaces')   as columnas_han_de_ser_15,
+    where table_schema = 'public' and table_name = 'recursos_enlaces')   as columnas_han_de_ser_17,
   (select count(*) from pg_policies
     where schemaname = 'public' and tablename = 'recursos_enlaces')      as politicas_han_de_ser_4,
   (select relrowsecurity from pg_class
     where oid = to_regclass('public.recursos_enlaces'))                  as seguridad_por_fila_ha_de_ser_true,
-  (to_regproc('public.recursos_enlaces_higiene') is not null)            as higiene_puesta;
+  (to_regproc('public.recursos_enlaces_higiene') is not null)            as higiene_puesta,
+  (select count(*) from information_schema.columns
+    where table_schema = 'public' and table_name = 'recursos_enlaces'
+      and column_name in ('opciones', 'orden'))                          as opciones_y_orden_han_de_ser_2;

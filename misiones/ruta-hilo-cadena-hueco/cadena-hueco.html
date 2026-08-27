@@ -961,12 +961,6 @@
   <div class="card ac-teal">
     <h2>📁 Recursos del módulo</h2>
 
-    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
-      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
-      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las tres piezas explicadas una por una: la cadena y la prueba del conector, el hueco con sus tres formas (curiosidad, suspenso y sorpresa) y la brecha entre lo esperado y lo que sale; la ficha de hilo de cinco casillas, los casos del proyecto, los ejercicios para lápiz, la hoja de fuentes con la etiqueta de estatus de cada obra y la pauta completa.</p>
-      <a href="../../fichas/ficha-hilo-cadena-hueco.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
-    </div>
-
     <!-- ══════════ LA REPISA DE ENLACES ══════════
          Piloto del aparato compartido `js/recursos-enlaces.js`, pedido por el
          autor el 27 de agosto de 2026 para las herramientas de estudio que le
@@ -977,7 +971,7 @@
          la cabecera del aparato. -->
     <div class="re-caja" data-re-repisa>
       <p class="re-caja-tit">🧰 Herramientas de estudio de esta etapa</p>
-      <p class="re-caja-sub">Lo que sale cuando se le da esta misión entera a una máquina de estudio: el resumen en audio para oír mientras se va en el camino, el mapa mental de las tres piezas, el video corto, la guía de repaso. Viven aquí, pegadas a la etapa que resumen, y no sueltas en el teléfono de quien las generó, que es donde nadie más las encuentra. Lo que se pega en la repisa <strong>viaja</strong>: se ve en todos los aparatos de la casa donde esté F.A.R.O, y lo ven los cuatro. Quitar o corregir un enlace es de quien lo puso.</p>
+      <p class="re-caja-sub">Lo que sale cuando se le da esta misión entera a una máquina de estudio: el resumen en audio para oír mientras se va en el camino, el mapa mental de las tres piezas, el video corto, la guía de repaso. Viven aquí, pegadas a la etapa que resumen, y no sueltas en el teléfono de quien las generó, que es donde nadie más las encuentra. Lo que se pega en la repisa <strong>viaja</strong>: se ve en todos los aparatos de la casa donde esté F.A.R.O, y lo ven los cuatro. Quitar o corregir un enlace es de quien lo puso. Las tarjetas <strong>se mueven</strong> con el asa ⠿ (arrastrando, o con las flechas del teclado) para dejarlas en el orden que a cada quien le sirva.</p>
 
       <div class="re-aviso">
         <span aria-hidden="true">🤖</span>
@@ -1005,6 +999,7 @@
            📋 de cada tarjeta, que escupe el bloque listo para pegar en el
            chat. Es el mismo reparto que el SQL de Supabase. -->
       <div class="re-form" hidden>
+        <p class="re-form-titulo" data-re-form-titulo>➕ Un enlace nuevo</p>
         <div class="re-fila">
           <label for="reUrl">Dirección del recurso</label>
           <input id="reUrl" data-re-campo="url" type="url" inputmode="url" placeholder="https://..." autocomplete="off">
@@ -1015,10 +1010,16 @@
             <select id="reTipo" data-re-campo="tipo"></select>
           </div>
           <div class="re-fila">
-            <label for="reDura">Cuánto dura <span style="font-weight:600;">(opcional)</span></label>
+            <label for="reDura">Cuánto dura de verdad <span style="font-weight:600;">(opcional)</span></label>
             <input id="reDura" data-re-campo="dura" type="text" placeholder="14 min" autocomplete="off">
           </div>
         </div>
+
+        <!-- Las opciones con las que la máquina lo generó. Las pinta el
+             aparato según el tipo elegido: un audio y una infografía no
+             preguntan lo mismo, y la lista vive en js/recursos-enlaces.js
+             para que añadir un estilo sea una línea en un sitio. -->
+        <div class="re-facetas" data-re-facetas hidden></div>
         <div class="re-fila">
           <label for="reTitulo">Título que se lee en la tarjeta</label>
           <input id="reTitulo" data-re-campo="titulo" type="text" placeholder="Resumen en audio: la cadena y el hueco" autocomplete="off">
@@ -1036,6 +1037,12 @@
           <button class="re-btn re-btn-pri" type="button" data-re-guarda>💾 Guardar en este aparato</button>
         </div>
       </div>
+    </div>
+
+    <div style="border:1.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.2rem;background:rgba(0,0,0,0.02);">
+      <p style="font-size:0.98rem;font-weight:800;margin-bottom:0.4rem;">📄 Ficha de estudio imprimible</p>
+      <p style="font-size:0.86rem;margin-bottom:0.85rem;">Diez páginas tamaño carta con las tres piezas explicadas una por una: la cadena y la prueba del conector, el hueco con sus tres formas (curiosidad, suspenso y sorpresa) y la brecha entre lo esperado y lo que sale; la ficha de hilo de cinco casillas, los casos del proyecto, los ejercicios para lápiz, la hoja de fuentes con la etiqueta de estatus de cada obra y la pauta completa.</p>
+      <a href="../../fichas/ficha-hilo-cadena-hueco.html" target="_blank" rel="noopener noreferrer" class="btn btn-pri" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;font-size:1rem;padding:0.7rem 1.4rem;">📄 Abrir / Imprimir la ficha</a>
     </div>
 
     <h3 style="font-size:1rem;font-weight:800;margin:0 0 0.5rem;">📚 Las fuentes, con su etiqueta</h3>

@@ -141,16 +141,75 @@
      «RESUMEN EN AUDIO» salía recortado a «RESUMEN...», que es peor que
      una palabra sola. El icono ya dice la mitad. */
   const RE_TIPOS = {
-    audio:     { ic: '🎧', n: 'Resumen en audio', nc: 'Audio',     c: '#0984e3', t: 'rgba(9,132,227,0.14)' },
-    video:     { ic: '🎥', n: 'Video',            nc: 'Video',     c: '#d63031', t: 'rgba(214,48,49,0.13)' },
-    mapa:      { ic: '🗺️', n: 'Mapa mental',      nc: 'Mapa',      c: '#6c5ce7', t: 'rgba(108,92,231,0.14)' },
-    guia:      { ic: '🧭', n: 'Guía de estudio',  nc: 'Guía',      c: '#00b894', t: 'rgba(0,184,148,0.14)' },
-    informe:   { ic: '📄', n: 'Informe',          nc: 'Informe',   c: '#b8860b', t: 'rgba(184,134,11,0.16)' },
-    preguntas: { ic: '❓', n: 'Preguntas',        nc: 'Preguntas', c: '#e84393', t: 'rgba(232,67,147,0.14)' },
-    linea:     { ic: '🕰️', n: 'Línea de tiempo',  nc: 'Línea',     c: '#00838f', t: 'rgba(0,131,143,0.14)' },
-    tarjetas:  { ic: '🃏', n: 'Tarjetas',         nc: 'Tarjetas',  c: '#ff6b35', t: 'rgba(255,107,53,0.14)' },
-    web:       { ic: '🔗', n: 'Enlace',           nc: 'Enlace',    c: '#636e72', t: 'rgba(99,110,114,0.14)' }
+    audio:       { ic: '🎧', n: 'Resumen en audio', nc: 'Audio',       c: '#0984e3', t: 'rgba(9,132,227,0.14)' },
+    video:       { ic: '🎥', n: 'Video',            nc: 'Video',       c: '#d63031', t: 'rgba(214,48,49,0.13)' },
+    diapositiva: { ic: '📊', n: 'Diapositivas',     nc: 'Diapos',      c: '#c2410c', t: 'rgba(194,65,12,0.14)' },
+    infografia:  { ic: '📈', n: 'Infografía',       nc: 'Infografía',  c: '#0f766e', t: 'rgba(15,118,110,0.14)' },
+    mapa:        { ic: '🗺️', n: 'Mapa mental',      nc: 'Mapa',        c: '#6c5ce7', t: 'rgba(108,92,231,0.14)' },
+    guia:        { ic: '🧭', n: 'Guía de estudio',  nc: 'Guía',        c: '#00b894', t: 'rgba(0,184,148,0.14)' },
+    informe:     { ic: '📄', n: 'Informe',          nc: 'Informe',     c: '#b8860b', t: 'rgba(184,134,11,0.16)' },
+    preguntas:   { ic: '❓', n: 'Preguntas',        nc: 'Preguntas',   c: '#e84393', t: 'rgba(232,67,147,0.14)' },
+    linea:       { ic: '🕰️', n: 'Línea de tiempo',  nc: 'Línea',       c: '#00838f', t: 'rgba(0,131,143,0.14)' },
+    tarjetas:    { ic: '🃏', n: 'Tarjetas',         nc: 'Tarjetas',    c: '#ff6b35', t: 'rgba(255,107,53,0.14)' },
+    web:         { ic: '🔗', n: 'Enlace',           nc: 'Enlace',      c: '#636e72', t: 'rgba(99,110,114,0.14)' }
   };
+
+  /* ─────────── CÓMO SE GENERÓ, tipo por tipo ───────────
+     Pedido por el autor el 27 de agosto de 2026. Son los ajustes que
+     NotebookLM ofrece al generar cada cosa: no adornan la tarjeta,
+     dicen QUÉ pediste. Dos resúmenes en audio de la misma misión, uno
+     «Detallado» y otro «Breve», son dos recursos distintos, y sin esto
+     en la repisa se distinguen abriéndolos.
+
+     Vive aquí, en el aparato, y NO en la base de datos, por la misma
+     razón que `tipo` no lleva check en el SQL: el día que NotebookLM
+     añada un estilo, esto es una línea en un archivo, no una migración
+     que alguien tiene que pegar desde una tableta. Lo que la base
+     guarda es un objeto libre (`opciones`), y lo que no reconozca esta
+     lista se sigue viendo tal cual en su pastilla.
+
+     Ninguna es obligatoria: la mayoría de los enlaces no traerán
+     ninguna, y una tarjeta sin pastillas está bien. */
+  const RE_FACETAS = {
+    audio: [
+      { k: 'formato',  n: 'Formato',       ops: ['Detallado', 'Breve', 'Crítica', 'Debate'] },
+      { k: 'duracion', n: 'Duración',      ops: ['Corto', 'Predeterminado'] }
+    ],
+    diapositiva: [
+      { k: 'formato',  n: 'Formato',       ops: ['Presentación detallada', 'Diapositiva del presentador'] },
+      { k: 'duracion', n: 'Duración',      ops: ['Corto', 'Predeterminado', 'Largo'] }
+    ],
+    video: [
+      { k: 'formato',  n: 'Formato',       ops: ['Explicativo', 'Breve'] },
+      { k: 'estilo',   n: 'Estilo visual', ops: ['Automático', 'Personalizado', 'Clásico', 'Pizarra', 'Kawaii', 'Anime', 'Acuarela', 'Dibujo retro', 'Legado', 'Papiroflexia'] }
+    ],
+    infografia: [
+      { k: 'orientacion', n: 'Orientación',   ops: ['Horizontal', 'Vertical', 'Cuadrado'] },
+      { k: 'estilo',      n: 'Estilo visual', ops: ['Automático', 'Kawaii', 'Arcilla', 'Boceto', 'Anime', 'Editorial', 'Instructivo', 'Cuadrícula bento', 'Ladrillos', 'Científico', 'Profesional'] }
+    ],
+    informe: [
+      { k: 'formato',  n: 'Formato',          ops: ['Propia creación', 'Resumen', 'Guía de estudio', 'Entrada de blog'] },
+      { k: 'sugerido', n: 'Formato sugerido', ops: ['Auditoría narrativa', 'Marco de estilo y ética', 'Guía de Conceptos Fundamentales', 'Guía práctica de Construcción'] }
+    ]
+  };
+  const facetasDe = k => RE_FACETAS[k] || [];
+
+  /* Las pastillas de una tarjeta, en el orden en que se declararon las
+     facetas de su tipo. Se leen las que la lista conoce y, después, las
+     que no: así una opción guardada por una versión más nueva del
+     aparato no desaparece de la vista al abrirla con esta. */
+  function opsDe(e) {
+    const o = (e && e.ops && typeof e.ops === 'object') ? e.ops : {};
+    const salida = [];
+    const vistas = {};
+    facetasDe(e.tipo).forEach(f => {
+      if (o[f.k]) { salida.push(String(o[f.k])); vistas[f.k] = true; }
+    });
+    Object.keys(o).forEach(k => {
+      if (!vistas[k] && o[k]) salida.push(String(o[k]));
+    });
+    return salida;
+  }
   const tipoDe = k => RE_TIPOS[k] || RE_TIPOS.web;
 
   /* ─────────── El almacén, siempre entre paños ───────────
@@ -188,6 +247,9 @@
     n.uid = n.uid || '';
     n.quien = n.quien || '';
     n.origen = n.origen || 'maquina';
+    /* Un objeto, no una lista de columnas: ver la nota de RE_FACETAS. */
+    if (!n.ops || typeof n.ops !== 'object' || Array.isArray(n.ops)) n.ops = {};
+    if (typeof n.orden !== 'number') n.orden = 0;
     return n;
   }
 
@@ -286,6 +348,89 @@
     return n;
   };
 
+  /* ══════════════════ EL ORDEN DE LA REPISA ══════════════════
+     Pedido por el autor el 27 de agosto de 2026: poder mover las
+     tarjetas y dejarlas como uno quiera.
+
+     Y aquí hay una piedra que conviene ver antes de tropezar: la repisa
+     es de la casa, pero la seguridad por fila solo deja escribir la
+     fila propia. O sea que NO se puede guardar un orden común en la
+     nube: mover la tarjeta de otra persona exigiría escribir su fila, y
+     la tabla lo rechaza (con razón).
+
+     Así que el orden es de cada quien, y se guarda en dos sitios:
+
+       · en el APARATO, un mapa de clave a posición. Vale para TODAS las
+         tarjetas, también las del catálogo y las de otras personas;
+       · y además, para las tarjetas PROPIAS, en su columna `orden` de
+         la nube. Eso es lo que hace que el orden que pusiste en la
+         tableta aparezca en el teléfono.
+
+     Con lo cual: tu orden viaja entre TUS aparatos para lo tuyo, y lo
+     que colocaste de los demás se queda en el aparato donde lo
+     colocaste. Es la única combinación honesta que permite la puerta;
+     fingir un orden común sería un arrastre que parece guardarse y no
+     se guarda. */
+  const K_ORD = 'faro_repisa_orden_' + MIS;
+
+  function leerOrden() {
+    try {
+      const v = JSON.parse(localStorage.getItem(K_ORD) || '{}');
+      return (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+    } catch (e) { return {}; }
+  }
+  function guardarOrden(m) {
+    try { localStorage.setItem(K_ORD, JSON.stringify(m)); } catch (e) {}
+  }
+
+  /* La clave de una tarjeta. Las del catálogo no tienen identificador
+     (viven en el código, no en la base), así que se les hace uno con su
+     dirección o su título: si el catálogo cambia, esa tarjeta es otra y
+     vuelve a su sitio natural, que es lo correcto. */
+  function claveDe(e) {
+    if (e.id) return e.id;
+    return 'cat:' + (e.url || e.titulo || '');
+  }
+
+  /* Ordena la lista que se va a pintar. Manda el mapa del aparato;
+     después la columna de la nube; y lo que no tenga ninguno se queda
+     donde estaba, detrás. El índice natural desempata para que dos
+     tarjetas sin posición no se cambien de sitio solas en cada
+     pintado. */
+  function ordenar(lista) {
+    const mapa = leerOrden();
+    return lista
+      .map((e, i) => {
+        const c = claveDe(e);
+        let pos;
+        if (typeof mapa[c] === 'number') pos = mapa[c];
+        else if (e.orden) pos = e.orden;
+        else pos = 100000 + i;
+        return { e: e, i: i, pos: pos };
+      })
+      .sort((a, b) => (a.pos - b.pos) || (a.i - b.i))
+      .map(x => x.e);
+  }
+
+  /* Guarda el orden que dejó el arrastre. Renumera de uno en uno todo
+     lo que se ve, para no acabar con posiciones repetidas que
+     dependerían del desempate. */
+  function fijarOrden(claves) {
+    const mapa = {};
+    claves.forEach((c, i) => { mapa[c] = i + 1; });
+    guardarOrden(mapa);
+    /* Y en lo propio, también arriba: es lo que lo lleva al otro
+       aparato. Solo se toca la fila cuya posición cambió de verdad,
+       para no reescribir la repisa entera en cada arrastre. */
+    let hayCambio = false;
+    cargar().forEach(x => {
+      const nueva = mapa[x.id];
+      if (!nueva || !esMio(x) || x.orden === nueva) return;
+      x.orden = nueva; x.u = Date.now(); hayCambio = true;
+    });
+    if (hayCambio) { guardar(); pedirNube(); }
+  }
+
   /* El pie: quién lo hizo y a dónde lleva, en una línea. Cuando las dos
      cosas son la misma casa (un cuaderno de NotebookLM hecho con
      NotebookLM) se dice una vez: «NotebookLM · NotebookLM» no informa de
@@ -348,6 +493,17 @@
     card.appendChild(top);
 
     card.appendChild(el('h4', null, e.titulo || 'Sin título'));
+
+    /* Cómo se generó, en pastillas. Van ARRIBA de la descripción a
+       propósito: es lo que distingue dos audios de la misma misión, y
+       leerlo después de tres líneas de texto llega tarde. */
+    const ops = opsDe(e);
+    if (ops.length) {
+      const fila = el('div', 're-ops');
+      ops.forEach(v => fila.appendChild(el('span', 're-op', v)));
+      card.appendChild(fila);
+    }
+
     card.appendChild(el('p', 're-desc', e.desc || ''));
 
     const pie = el('div', 're-pie');
@@ -369,19 +525,45 @@
      base va a negar. */
   function esMio(e) { return !e.uid || (!!miUid && e.uid === miUid); }
 
-  function envuelta(e) {
+  /* Toda tarjeta va envuelta, también las del catálogo: la envoltura es
+     la que lleva la clave y el asa, y sin ellas esa tarjeta no se
+     podría mover. Los botones van FUERA del <a>, porque un <button>
+     dentro de un enlace no es HTML válido y en el teléfono se acaba
+     tocando el enlace en vez del botón. */
+  function envuelta(e, propia) {
     const w = el('div', 're-tarjeta-envoltura');
-    w.appendChild(tarjeta(e, true));
+    w.setAttribute('data-re-clave', claveDe(e));
+    w.appendChild(tarjeta(e, propia));
     const herr = el('div', 're-herr');
 
-    const bCopia = el('button', null, '📋');
-    bCopia.type = 'button';
-    bCopia.title = 'Copiar el bloque de código de este enlace';
-    bCopia.setAttribute('aria-label', 'Copiar el bloque de código de ' + (e.titulo || 'este enlace'));
-    bCopia.addEventListener('click', () => copiar(bloqueDeCodigo([e])));
-    herr.appendChild(bCopia);
+    /* El asa. Es un botón de verdad y no un icono decorativo para que
+       también se pueda mover con el teclado: en una tableta el arrastre
+       falla más de lo que parece, y una función que solo se puede usar
+       arrastrando es una función que a veces no existe. */
+    const asa = el('button', 're-asa', '⠿');
+    asa.type = 'button';
+    asa.setAttribute('data-re-asa', '');
+    asa.title = 'Mover esta tarjeta (arrastra, o usa las flechas)';
+    asa.setAttribute('aria-label', 'Mover ' + (e.titulo || 'esta tarjeta') + '. Arrastra, o con las flechas del teclado.');
+    herr.appendChild(asa);
 
-    if (esMio(e)) {
+    if (propia) {
+      const bCopia = el('button', null, '📋');
+      bCopia.type = 'button';
+      bCopia.title = 'Copiar el bloque de código de este enlace';
+      bCopia.setAttribute('aria-label', 'Copiar el bloque de código de ' + (e.titulo || 'este enlace'));
+      bCopia.addEventListener('click', () => copiar(bloqueDeCodigo([e])));
+      herr.appendChild(bCopia);
+    }
+
+    if (propia && esMio(e)) {
+      const bEdita = el('button', null, '✏️');
+      bEdita.type = 'button';
+      bEdita.title = 'Corregir este enlace';
+      bEdita.setAttribute('aria-label', 'Corregir ' + (e.titulo || 'este enlace'));
+      bEdita.addEventListener('click', () => abrirEdicion(e.id));
+      herr.appendChild(bEdita);
+
       const bBorra = el('button', null, '🗑️');
       bBorra.type = 'button';
       bBorra.title = 'Quitar este enlace';
@@ -422,11 +604,117 @@
     const muestraEjemplos = reales.length === 0 && propios.length === 0;
     const delCatalogo = muestraEjemplos ? catalogo : reales;
 
-    delCatalogo.forEach(e => rejilla.appendChild(tarjeta(e, false)));
-    propios.forEach(e => rejilla.appendChild(envuelta(e)));
+    /* Catálogo y repisa se pintan en UNA sola lista ordenada: si el
+       catálogo fuera siempre primero, la mitad de las tarjetas no se
+       podrían mover y el arrastre sería una función a medias. */
+    const todas = delCatalogo.map(e => ({ e: e, propia: false }))
+      .concat(propios.map(e => ({ e: e, propia: true })));
+    ordenar(todas.map(x => x.e)).forEach(en => {
+      const x = todas.find(y => y.e === en);
+      rejilla.appendChild(envuelta(en, x ? x.propia : false));
+    });
 
-    if (vacio) vacio.hidden = (delCatalogo.length + propios.length) > 0;
+    if (vacio) vacio.hidden = todas.length > 0;
     pintarEstado();
+  }
+
+  /* ══════════════════ MOVER LAS TARJETAS ══════════════════
+     Con PUNTEROS y no con el arrastre de HTML: `draggable` no funciona
+     en el navegador de casi ningún teléfono ni tableta, y esta repisa
+     se toca sobre todo desde una tableta. Con `pointerdown` y compañía
+     el mismo código sirve para el dedo, el ratón y el lápiz.
+
+     Y con TECLADO además: el asa es un botón, y con las flechas mueve
+     la tarjeta un puesto. No es solo accesibilidad; es que un arrastre
+     de precisión con el dedo, entre tarjetas de un dedo de ancho, falla
+     lo suficiente como para que haga falta la otra manera.
+
+     Durante el arrastre se mueve el NODO en el documento, no la lista:
+     repintar en cada movimiento del dedo destruiría la tarjeta que se
+     está arrastrando. La lista se guarda al soltar. */
+  function montarArrastre(rejilla) {
+    let nodo = null, idPuntero = null;
+
+    const claves = () => [...rejilla.children]
+      .map(n => n.getAttribute('data-re-clave'))
+      .filter(Boolean);
+
+    function soltar() {
+      if (!nodo) return;
+      nodo.classList.remove('re-arrastrando');
+      rejilla.classList.remove('re-moviendo');
+      nodo = null; idPuntero = null;
+      fijarOrden(claves());
+      /* Se repinta para que las insignias y el estado vuelvan a cuadrar
+         con la lista, ahora que el documento manda. */
+      pintar();
+      aviso('↕️ Orden guardado');
+    }
+
+    rejilla.addEventListener('pointerdown', ev => {
+      const asa = ev.target.closest('[data-re-asa]');
+      if (!asa) return;
+      const w = asa.closest('[data-re-clave]');
+      if (!w || w.parentNode !== rejilla) return;
+      /* Sin esto, el navegador empieza a seleccionar texto o a
+         desplazar la página en cuanto el dedo se mueve. */
+      ev.preventDefault();
+      nodo = w; idPuntero = ev.pointerId;
+      nodo.classList.add('re-arrastrando');
+      rejilla.classList.add('re-moviendo');
+      try { asa.setPointerCapture(ev.pointerId); } catch (e) {}
+    });
+
+    rejilla.addEventListener('pointermove', ev => {
+      if (!nodo || ev.pointerId !== idPuntero) return;
+      ev.preventDefault();
+      /* La tarjeta que se arrastra tiene pointer-events en none por CSS
+         mientras dura, así que esto devuelve lo que hay DEBAJO. */
+      const bajo = document.elementFromPoint(ev.clientX, ev.clientY);
+      const destino = bajo && bajo.closest ? bajo.closest('[data-re-clave]') : null;
+      if (!destino || destino === nodo || destino.parentNode !== rejilla) return;
+      const caja = destino.getBoundingClientRect();
+      /* Qué mitad de la tarjeta hay que cruzar para colocarse delante.
+         En varias columnas es la IZQUIERDA; en una sola, la de ARRIBA.
+
+         Y el número de columnas se le pregunta a la rejilla, no se
+         deduce de la forma de la tarjeta: esa fue la primera versión, y
+         con tarjetas más anchas que altas (que es lo normal cuando la
+         descripción es corta) elegía el eje vertical estando en tres
+         columnas, así que arrastrar de derecha a izquierda no movía
+         nada. Se vio arrastrando con el ratón, no leyendo el código. */
+      const columnas = (getComputedStyle(rejilla).gridTemplateColumns || '').split(' ').filter(Boolean).length || 1;
+      const antes = (columnas > 1)
+        ? (ev.clientX < caja.left + caja.width / 2)
+        : (ev.clientY < caja.top + caja.height / 2);
+      rejilla.insertBefore(nodo, antes ? destino : destino.nextSibling);
+    });
+
+    rejilla.addEventListener('pointerup', soltar);
+    rejilla.addEventListener('pointercancel', soltar);
+
+    /* El teclado: flechas mueven un puesto, y el foco se queda en el
+       asa de la tarjeta movida para poder encadenar varios saltos. */
+    rejilla.addEventListener('keydown', ev => {
+      const asa = ev.target.closest ? ev.target.closest('[data-re-asa]') : null;
+      if (!asa) return;
+      const dir = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[ev.key];
+      if (!dir) return;
+      ev.preventDefault();
+      const w = asa.closest('[data-re-clave]');
+      const hermanos = [...rejilla.children];
+      const i = hermanos.indexOf(w);
+      const j = i + dir;
+      if (j < 0 || j >= hermanos.length) return;
+      rejilla.insertBefore(dir < 0 ? w : hermanos[j], dir < 0 ? hermanos[j] : w);
+      const orden = claves();
+      fijarOrden(orden);
+      pintar();
+      /* Tras repintar, el asa es otro nodo: se vuelve a buscar por la
+         clave para que el foco no se pierda a mitad de un movimiento. */
+      const nueva = rejilla.querySelector('[data-re-clave="' + CSS.escape(w.getAttribute('data-re-clave')) + '"] [data-re-asa]');
+      if (nueva) nueva.focus();
+    });
   }
 
   /* ─────────── El bloque de código ───────────
@@ -440,6 +728,10 @@
       const partes = campos
         .filter(k => e[k])
         .map(k => '    ' + k + ': ' + JSON.stringify(e[k]));
+      /* Las opciones van al catálogo también: son lo que distingue dos
+         audios de la misma misión, así que subirlas al repositorio sin
+         ellas sería ascender media tarjeta. */
+      if (e.ops && Object.keys(e.ops).length) partes.push('    ops: ' + JSON.stringify(e.ops));
       return '  {\n' + partes.join(',\n') + '\n  }';
     });
     return '// Pegar dentro de window.RECURSOS_ENLACES.enlaces\n' + filas.join(',\n') + ',';
@@ -474,22 +766,124 @@
     else console.log(txt);
   }
 
-  /* ─────────── El formulario ─────────── */
+  /* ─────────── El formulario ───────────
+     Sirve para dos cosas, añadir y corregir, y es el mismo a propósito:
+     un segundo formulario de edición sería la misma pantalla escrita
+     dos veces, y a la tercera corrección ya no coincidirían. Cuál de
+     las dos está haciendo lo dice `form.dataset.editando`. */
+  let _caja = null, _form = null, _abrir = null;
+
+  function campoDe(k) { return _form ? _form.querySelector('[data-re-campo="' + k + '"]') : null; }
+
+  /* Las opciones del tipo elegido, en pastillas que se marcan. Se
+     repintan al cambiar el tipo, porque un audio y una infografía no
+     preguntan lo mismo. Marcar la que ya estaba la desmarca: no hay
+     ninguna obligatoria, y sin poder quitarla habría que recargar la
+     página para deshacer un toque. */
+  function pintarFacetas(tipo, valores) {
+    const zona = _form ? _form.querySelector('[data-re-facetas]') : null;
+    if (!zona) return;
+    zona.textContent = '';
+    const fs = facetasDe(tipo);
+    zona.hidden = fs.length === 0;
+    fs.forEach(f => {
+      const fila = el('div', 're-faceta');
+      fila.appendChild(el('span', 're-faceta-n', f.n));
+      const grupo = el('div', 're-chips');
+      grupo.setAttribute('role', 'group');
+      grupo.setAttribute('aria-label', f.n);
+      grupo.setAttribute('data-re-faceta', f.k);
+      f.ops.forEach(op => {
+        const b = el('button', 're-chip', op);
+        b.type = 'button';
+        b.setAttribute('data-re-valor', op);
+        const puesto = (valores && valores[f.k] === op);
+        b.classList.toggle('on', puesto);
+        b.setAttribute('aria-pressed', puesto ? 'true' : 'false');
+        b.addEventListener('click', () => {
+          const ya = b.classList.contains('on');
+          [...grupo.querySelectorAll('.re-chip')].forEach(o => {
+            o.classList.remove('on'); o.setAttribute('aria-pressed', 'false');
+          });
+          if (!ya) { b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); }
+        });
+        grupo.appendChild(b);
+      });
+      fila.appendChild(grupo);
+      zona.appendChild(fila);
+    });
+  }
+
+  function leerFacetas() {
+    const zona = _form ? _form.querySelector('[data-re-facetas]') : null;
+    const out = {};
+    if (!zona) return out;
+    [...zona.querySelectorAll('[data-re-faceta]')].forEach(g => {
+      const marcado = g.querySelector('.re-chip.on');
+      if (marcado) out[g.getAttribute('data-re-faceta')] = marcado.getAttribute('data-re-valor');
+    });
+    return out;
+  }
+
+  function limpiarFormulario() {
+    ['titulo', 'url', 'desc', 'dura'].forEach(k => { const c = campoDe(k); if (c) c.value = ''; });
+    const f = campoDe('fuente'); if (f) f.value = 'NotebookLM';
+    pintarFacetas(campoDe('tipo') ? campoDe('tipo').value : 'audio', {});
+  }
+
+  function tituloDelFormulario() {
+    const t = _form ? _form.querySelector('[data-re-form-titulo]') : null;
+    const editando = _form && _form.dataset.editando;
+    if (t) t.textContent = editando ? '✏️ Corregir este enlace' : '➕ Un enlace nuevo';
+    const g = _form ? _form.querySelector('[data-re-guarda]') : null;
+    if (g) g.textContent = editando ? '💾 Guardar los cambios' : '💾 Guardar en la repisa';
+    if (_abrir) _abrir.textContent = (_form && !_form.hidden) ? '✖ Cerrar' : '➕ Añadir un enlace';
+  }
+
+  function abrirEdicion(id) {
+    const e = cargar().find(x => x.id === id);
+    if (!e || !_form) return;
+    _form.dataset.editando = id;
+    _form.hidden = false;
+    campoDe('url').value = e.url || '';
+    campoDe('tipo').value = RE_TIPOS[e.tipo] ? e.tipo : 'web';
+    campoDe('dura').value = e.dura || '';
+    campoDe('titulo').value = e.titulo || '';
+    campoDe('desc').value = e.desc || '';
+    campoDe('fuente').value = e.fuente || '';
+    pintarFacetas(campoDe('tipo').value, e.ops || {});
+    tituloDelFormulario();
+    _form.scrollIntoView({ block: 'nearest' });
+    campoDe('titulo').focus();
+  }
+
   function montarFormulario(caja) {
-    const form = caja.querySelector('.re-form');
-    const abrir = caja.querySelector('[data-re-abrir]');
+    _caja = caja;
+    _form = caja.querySelector('.re-form');
+    _abrir = caja.querySelector('[data-re-abrir]');
+    const form = _form, abrir = _abrir;
     if (!form || !abrir) return;
 
     abrir.addEventListener('click', () => {
       form.hidden = !form.hidden;
-      abrir.textContent = form.hidden ? '➕ Añadir un enlace' : '✖ Cerrar';
+      /* Cerrar cancela también la corrección: si no, el siguiente
+         «Añadir» seguiría corrigiendo el de antes en silencio, y eso se
+         descubre cuando ya se machacó un enlace bueno. */
+      if (form.hidden) { delete form.dataset.editando; limpiarFormulario(); }
+      tituloDelFormulario();
       if (!form.hidden) form.querySelector('[data-re-campo="url"]').focus();
     });
 
     const err = form.querySelector('.re-error');
-    const campo = k => form.querySelector('[data-re-campo="' + k + '"]');
+    const campo = campoDe;
+
+    /* Las opciones dependen del tipo, así que se repintan al cambiarlo.
+       Lo marcado se pierde al cambiar de tipo, y está bien: las
+       opciones de un audio no significan nada en una infografía. */
+    campo('tipo').addEventListener('change', () => pintarFacetas(campo('tipo').value, {}));
 
     form.querySelector('[data-re-guarda]').addEventListener('click', () => {
+      const editando = form.dataset.editando || '';
       const e = {
         tipo:   campo('tipo').value,
         titulo: campo('titulo').value.trim(),
@@ -497,18 +891,33 @@
         desc:   campo('desc').value.trim(),
         fuente: campo('fuente').value.trim() || 'NotebookLM',
         origen: 'maquina',
-        dura:   campo('dura').value.trim()
+        dura:   campo('dura').value.trim(),
+        ops:    leerFacetas()
       };
       const falla = validar(e);
       if (falla) { err.textContent = falla; err.hidden = false; return; }
       err.hidden = true;
 
-      cargar().push(normaliza(e));
+      if (editando) {
+        const v = cargar().find(x => x.id === editando);
+        if (!v) { err.textContent = 'Ese enlace ya no está en la repisa.'; err.hidden = false; return; }
+        /* Se copian los campos que se escriben y NADA más: el
+           identificador, quién lo puso y su sitio en el orden no se
+           tocan al corregir un título. */
+        ['tipo', 'titulo', 'url', 'desc', 'fuente', 'dura', 'ops'].forEach(k => { v[k] = e[k]; });
+        v.u = Date.now();
+      } else {
+        cargar().push(normaliza(e));
+      }
+
       if (!guardar()) { err.textContent = 'Este aparato no deja guardar (modo privado). El enlace no se perdió: cópialo y pégalo en el chat.'; err.hidden = false; return; }
-      ['titulo', 'url', 'desc', 'dura'].forEach(k => { campo(k).value = ''; });
+      delete form.dataset.editando;
+      limpiarFormulario();
+      tituloDelFormulario();
       pintar();
       pedirNube();
-      aviso(haySesionGuardada() ? '✅ Enlace añadido, subiendo a la nube...' : '✅ Enlace añadido a este aparato');
+      if (editando) aviso('✏️ Enlace corregido');
+      else aviso(haySesionGuardada() ? '✅ Enlace añadido, subiendo a la nube...' : '✅ Enlace añadido a este aparato');
     });
 
     /* Este botón vive FUERA del formulario (está junto al de abrir), así que
@@ -641,7 +1050,11 @@
       anadido_por: uid,
       miembro: String(e.quien || miembro || '').slice(0, 40),
       borrado: !!e.del,
-      actualizado: e.u || 0
+      actualizado: e.u || 0,
+      /* Un objeto libre, no una columna por opción: el día que
+         NotebookLM añada un estilo, esto no es una migración. */
+      opciones: (e.ops && typeof e.ops === 'object') ? e.ops : {},
+      orden: e.orden || 0
     };
   }
 
@@ -658,7 +1071,9 @@
       quien: f.miembro || '',
       uid: f.anadido_por || '',
       u: Number(f.actualizado) || 0,
-      del: !!f.borrado
+      del: !!f.borrado,
+      ops: (f.opciones && typeof f.opciones === 'object' && !Array.isArray(f.opciones)) ? f.opciones : {},
+      orden: Number(f.orden) || 0
     };
   }
 
@@ -785,7 +1200,8 @@
   function firmaLocal() {
     return cargar().slice()
       .sort((a, b) => (a.id < b.id ? -1 : 1))
-      .map(e => [e.id, e.tipo, e.titulo, e.url, e.desc, e.quien, e.del ? 1 : 0].join('|'))
+      .map(e => [e.id, e.tipo, e.titulo, e.url, e.desc, e.quien, e.del ? 1 : 0,
+                 e.orden || 0, JSON.stringify(e.ops || {})].join('|'))
       .join('/');
   }
 
@@ -852,6 +1268,16 @@
     const bSync = caja.querySelector('[data-re-sync]');
     if (bSync) bSync.addEventListener('click', () => sincronizar(true));
 
+    /* El arrastre se engancha a la REJILLA y no a cada tarjeta: las
+       tarjetas nacen y mueren en cada pintado, y un oyente por tarjeta
+       habría que volver a poner cada vez (y quitar, o se acumulan). */
+    const rejilla = caja.querySelector('.re-rejilla');
+    if (rejilla) montarArrastre(rejilla);
+
+    /* Las opciones del tipo que sale por defecto, para que el
+       formulario no se abra con el hueco vacío la primera vez. */
+    pintarFacetas(sel ? sel.value : 'audio', {});
+
     pintar();
 
     /* Se baja lo que haya arriba nada más abrir, pero solo si ya hay
@@ -859,6 +1285,11 @@
        Con un respiro, para no pelearse con el pintado de la misión, que
        es lo que la persona está mirando. */
     if (haySesionGuardada()) setTimeout(() => sincronizar(false), 500);
+    /* Y si no la hay, se dice YA, sin esperar a que alguien toque
+       «Sincronizar». Con enlaces dentro y el rótulo en blanco, la
+       repisa parecía estar al día cuando en realidad no había subido
+       nada: el silencio, aquí, se lee como un sí. */
+    else if (cargar().some(e => !e.del)) { estadoNube = 'sin-sesion'; pintarEstado(); }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arranca);
@@ -889,7 +1320,18 @@
     deFila: deFila,
     /* Para poder medir la fusión sin montar dos aparatos enteros. */
     fusionar: fusionar,
-    quienSoy: function () { return miUid; }
+    quienSoy: function () { return miUid; },
+    /* El orden y las opciones, que es lo que se pidió el 27 de agosto
+       por la tarde. `ordenar` se expone para poder comprobar que la
+       lista sale colocada sin tener que leer el documento. */
+    FACETAS: RE_FACETAS,
+    facetasDe: facetasDe,
+    opsDe: opsDe,
+    ordenar: ordenar,
+    claveDe: claveDe,
+    leerOrden: leerOrden,
+    fijarOrden: fijarOrden,
+    abrirEdicion: abrirEdicion
   };
 
 })();

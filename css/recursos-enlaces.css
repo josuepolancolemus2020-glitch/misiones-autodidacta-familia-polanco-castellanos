@@ -163,6 +163,76 @@ a.re-card:active { transform: translateY(-1px); }
 .re-card.re-ejemplo { border-style: dashed; opacity: 0.85; box-shadow: none; }
 .re-card.re-ejemplo .re-abrir { color: var(--gray); }
 
+/* ─────────── Cómo se generó: las pastillas ───────────
+   Van sobre la descripción porque son lo que distingue dos audios de la
+   misma misión, y leerlas después de tres líneas de texto llega tarde. */
+.re-ops { display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0 0.9rem; margin-bottom: 0.45rem; }
+.re-op {
+  font-size: 0.66rem; font-weight: 700; line-height: 1.3;
+  padding: 0.12rem 0.42rem; border-radius: 20px;
+  background: var(--re-tinte, var(--pri-gl));
+  border: 1px solid var(--re-color, var(--pri));
+  color: var(--dark);
+}
+
+/* ─────────── El asa, para mover la tarjeta ───────────
+   Es un botón de verdad (se puede enfocar y mover con las flechas)
+   porque en una tableta el arrastre de precisión falla lo bastante como
+   para que haga falta la otra manera. `touch-action: none` es
+   obligatorio: sin él, el navegador se queda el gesto para desplazar la
+   página y el arrastre no llega a empezar. */
+.re-asa {
+  cursor: grab;
+  touch-action: none;
+  font-size: 0.85rem;
+  letter-spacing: -0.06em;
+  color: var(--gray);
+}
+.re-asa:active { cursor: grabbing; }
+
+/* Mientras se arrastra, la tarjeta no puede recibir el puntero: es lo
+   que deja que elementFromPoint vea la de DEBAJO, que es como se sabe
+   dónde soltarla. */
+/* El `pointer-events: none` va en la ENVOLTURA entera, no solo en la
+   tarjeta. Puesto solo en la tarjeta, elementFromPoint seguía chocando
+   con el borde de la envoltura y devolvía la que se estaba arrastrando:
+   el movimiento se descartaba («destino === nodo») y la tarjeta se
+   quedaba a medio camino. Lo cazó el arrastre de tres tarjetas con
+   ratón de verdad, no la lectura del código.
+   No deja al asa sin eventos: el puntero está capturado por ella desde
+   el pointerdown, así que los recibe igual. */
+.re-tarjeta-envoltura.re-arrastrando { opacity: 0.55; transform: scale(0.97); pointer-events: none; }
+.re-rejilla.re-moviendo { cursor: grabbing; }
+.re-rejilla.re-moviendo .re-card { transition: none; }
+.re-tarjeta-envoltura { transition: transform 0.15s; }
+
+/* ─────────── Las opciones, en el formulario ─────────── */
+.re-facetas { margin-bottom: 0.6rem; }
+.re-facetas[hidden] { display: none; }
+.re-faceta { margin-bottom: 0.5rem; }
+.re-faceta-n { display: block; font-size: 0.75rem; font-weight: 800; color: var(--gray); margin-bottom: 0.22rem; }
+.re-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+/* Pastillas y no un desplegable: con once estilos visuales, un
+   desplegable en un teléfono esconde diez de ellos detrás de un toque, y
+   lo que no se ve no se elige. */
+.re-chip {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.76rem; font-weight: 700;
+  border: 1.5px solid var(--border); border-radius: 20px;
+  padding: 0.28rem 0.6rem;
+  background: var(--bg); color: var(--dark);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.re-chip:hover { border-color: var(--pri); }
+.re-chip.on { background: var(--pri); border-color: var(--pri); color: #fff; }
+
+.re-form-titulo {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.92rem; font-weight: 700;
+  margin-bottom: 0.6rem; color: var(--dark);
+}
+
 /* ─────────── El rótulo de la nube ───────────
    Dice la verdad en cada momento y por eso tiene cinco estados y no dos.
    El caro es «pendiente»: decir «guardado también en la nube» con algo
@@ -226,6 +296,9 @@ a.re-card:active { transform: translateY(-1px); }
 .re-tarjeta-envoltura { display: flex; flex-direction: column; }
 .re-tarjeta-envoltura > .re-card { flex: 1 1 auto; }
 .re-herr { display: flex; gap: 0.3rem; justify-content: flex-end; padding: 0.35rem 0.1rem 0; }
+/* El asa se va al otro extremo: separada de borrar, que es el vecino
+   con el que no conviene equivocarse. */
+.re-herr .re-asa { margin-right: auto; }
 .re-herr button {
   border: 1px solid var(--border); background: var(--card); color: var(--dark);
   border-radius: 8px; width: 26px; height: 26px; font-size: 0.72rem;

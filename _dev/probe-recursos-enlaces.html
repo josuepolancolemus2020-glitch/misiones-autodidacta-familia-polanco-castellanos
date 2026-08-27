@@ -82,6 +82,7 @@ marco.addEventListener('load', async function primera() {
     await esperar(400);
 
     let d = marco.contentDocument, w = marco.contentWindow;
+    const RE_T = () => w.FaroRepisa.TIPOS;
     const caja = () => d.querySelector('[data-re-repisa]');
     const tarjetas = () => [...caja().querySelectorAll('.re-card')];
     const R = () => w.FaroRepisa;
@@ -121,7 +122,11 @@ marco.addEventListener('load', async function primera() {
     ok(tumbadas.length === 0, 'y las direcciones buenas pasan', 'se tumbaron direcciones buenas: ' + tumbadas.join(' | '));
 
     log('\n── LOS EJEMPLOS ──');
-    ok(tarjetas().length === 3, 'la repisa arranca con las tres tarjetas de muestra', 'arranca con ' + tarjetas().length + ' tarjetas');
+    /* La cuenta sale del CATÁLOGO y no escrita a mano: es la lección de
+       la Casa Cerrada. Escrita a mano, esta línea suspendió el día que
+       las muestras pasaron de tres a cinco, sin que hubiera nada roto. */
+    const nEjemplos = w.RECURSOS_ENLACES.enlaces.length;
+    ok(tarjetas().length === nEjemplos, 'la repisa arranca con sus ' + nEjemplos + ' tarjetas de muestra', 'arranca con ' + tarjetas().length + ' de ' + nEjemplos);
     ok(tarjetas().every(t => t.tagName === 'DIV'), 'ninguna es un enlace: detrás no hay nada que abrir', 'alguna tarjeta de muestra enlaza a alguna parte');
     ok(tarjetas().every(t => /ejemplo/.test(t.textContent)), 'y las tres lo dicen a la vista', 'alguna tarjeta de muestra no se declara ejemplo');
     ok(/repaso/.test(caja().textContent) && /máquina/.test(caja().textContent),
@@ -148,8 +153,11 @@ marco.addEventListener('load', async function primera() {
        'y quién la hizo, con su etiqueta de máquina', 'la tarjeta no dice quién la hizo');
     ok(t1 && /Video/i.test(t1.textContent) && /9 min/.test(t1.textContent), 'con su tipo y su duración a la vista', 'la tarjeta no muestra tipo y duración');
     const envoltura = caja().querySelector('.re-tarjeta-envoltura');
-    ok(!!envoltura && envoltura.querySelectorAll('.re-herr button').length === 2,
-       'un enlace propio trae sus dos botones (copiar y quitar), fuera del <a>', 'el enlace propio no trae sus botones fuera del enlace');
+    const botones = envoltura ? [...envoltura.querySelectorAll('.re-herr button')] : [];
+    ok(botones.length === 4,
+       'un enlace propio trae sus cuatro botones (mover, copiar, corregir y quitar), fuera del <a>', 'el enlace propio trae ' + botones.length + ' botones');
+    ok(!!envoltura && !!envoltura.querySelector('[data-re-asa]'), 'con su asa para moverlo', 'el enlace propio no trae asa');
+    ok(botones.some(b => /^Corregir/.test(b.getAttribute('aria-label') || '')), 'y el de corregir entre ellos', 'no se puede corregir un enlace propio');
     ok(t1 && !t1.querySelector('button'), 'y ningún botón queda dentro del enlace', 'hay un botón dentro del <a>');
 
     log('\n── QUE EL TEXTO NO SE EJECUTE ──');
@@ -202,12 +210,168 @@ marco.addEventListener('load', async function primera() {
     ok(Object.values(R().TIPOS).every(t => /^#/.test(t.c) && t.ic && t.n && t.nc && t.nc.length <= 10),
        'y los ' + Object.keys(R().TIPOS).length + ' tipos traen icono, color, nombre entero y nombre corto', 'algún tipo va sin icono, color o nombre corto');
 
+    log('\n── LAS OPCIONES DE CADA TIPO (lo pedido el 27 de agosto por la tarde) ──');
+    /* Lo que se comprueba aquí no es que existan pastillas: es que cada
+       tipo pregunte EXACTAMENTE lo que se pidió. Una lista de opciones
+       a medias no rompe nada visible y por eso hay que mirarla entera. */
+    const ESPERADO = {
+      audio:       { formato: ['Detallado', 'Breve', 'Crítica', 'Debate'], duracion: ['Corto', 'Predeterminado'] },
+      diapositiva: { formato: ['Presentación detallada', 'Diapositiva del presentador'], duracion: ['Corto', 'Predeterminado', 'Largo'] },
+      video:       { formato: ['Explicativo', 'Breve'], estilo: ['Automático', 'Personalizado', 'Clásico', 'Pizarra', 'Kawaii', 'Anime', 'Acuarela', 'Dibujo retro', 'Legado', 'Papiroflexia'] },
+      infografia:  { orientacion: ['Horizontal', 'Vertical', 'Cuadrado'], estilo: ['Automático', 'Kawaii', 'Arcilla', 'Boceto', 'Anime', 'Editorial', 'Instructivo', 'Cuadrícula bento', 'Ladrillos', 'Científico', 'Profesional'] },
+      informe:     { formato: ['Propia creación', 'Resumen', 'Guía de estudio', 'Entrada de blog'], sugerido: ['Auditoría narrativa', 'Marco de estilo y ética', 'Guía de Conceptos Fundamentales', 'Guía práctica de Construcción'] }
+    };
+    const desajustes = [];
+    Object.keys(ESPERADO).forEach(t => {
+      const suyas = {};
+      R().facetasDe(t).forEach(f => { suyas[f.k] = f.ops; });
+      Object.keys(ESPERADO[t]).forEach(k => {
+        if (JSON.stringify(suyas[k]) !== JSON.stringify(ESPERADO[t][k])) {
+          desajustes.push(t + '.' + k + ' = ' + JSON.stringify(suyas[k] || null));
+        }
+      });
+      if (Object.keys(suyas).length !== Object.keys(ESPERADO[t]).length) desajustes.push(t + ' tiene ' + Object.keys(suyas).length + ' grupos');
+    });
+    ok(desajustes.length === 0, 'los cinco tipos con opciones preguntan exactamente lo pedido', 'no cuadran: ' + desajustes.join(' | '));
+    ok(!!RE_T().diapositiva && !!RE_T().infografia, 'los dos tipos nuevos (Diapositiva e Infografía) están en la lista', 'faltan los tipos nuevos');
+    /* Y que se pinten de verdad en el formulario al elegir el tipo, que
+       es otra cosa distinta de que la lista exista. */
+    const selT = caja().querySelector('[data-re-campo="tipo"]');
+    selT.value = 'infografia';
+    selT.dispatchEvent(new w.Event('change'));
+    await esperar(120);
+    const chips = [...caja().querySelectorAll('[data-re-facetas] .re-chip')].map(c => c.textContent);
+    ok(chips.length === 14, 'al elegir Infografía salen sus 14 pastillas', 'salen ' + chips.length + ' pastillas');
+    ok(chips.indexOf('Cuadrícula bento') >= 0, 'con los estilos raros escritos enteros', 'falta algún estilo');
+    /* Marcar y desmarcar: sin poder quitar una opción habría que
+       recargar la página para deshacer un toque. */
+    const chip = [...caja().querySelectorAll('[data-re-facetas] .re-chip')].find(c => c.textContent === 'Vertical');
+    chip.click(); await esperar(60);
+    ok(chip.classList.contains('on') && chip.getAttribute('aria-pressed') === 'true', 'una opción se marca', 'la opción no se marca');
+    chip.click(); await esperar(60);
+    ok(!chip.classList.contains('on'), 'y se desmarca al volver a tocarla', 'la opción no se puede desmarcar');
+    /* Y las pastillas llegan a la tarjeta. */
+    R().guardarPropios([{ tipo: 'audio', titulo: 'Con opciones', url: 'https://a.hn/x', desc: 'x',
+                          ops: { formato: 'Crítica', duracion: 'Corto' } }]);
+    await esperar(150);
+    const pastillas = [...caja().querySelectorAll('.re-op')].map(x => x.textContent);
+    ok(pastillas.join(',') === 'Crítica,Corto', 'y salen pintadas en la tarjeta, en el orden en que se declararon', 'en la tarjeta salen: ' + pastillas.join(','));
+    ok(R().bloqueDeCodigo(R().leerPropios()).indexOf('"formato":"Crítica"') >= 0, 'y viajan también en el bloque para el código', 'el bloque de código pierde las opciones');
+
+    log('\n── CORREGIR UN ENLACE ──');
+    const idEd = R().leerPropios()[0].id;
+    R().abrirEdicion(idEd);
+    await esperar(150);
+    const formEd = caja().querySelector('.re-form');
+    ok(!formEd.hidden && formEd.dataset.editando === idEd, 'el botón de corregir abre el formulario sobre ESE enlace', 'la corrección no abre el formulario');
+    ok(caja().querySelector('[data-re-campo="titulo"]').value === 'Con opciones', 'con sus datos ya puestos', 'el formulario de corrección sale vacío');
+    const marcada = [...caja().querySelectorAll('[data-re-facetas] .re-chip.on')].map(c => c.textContent);
+    ok(marcada.join(',') === 'Crítica,Corto', 'y sus opciones marcadas', 'las opciones no vuelven marcadas: salen ' + marcada.join(','));
+    caja().querySelector('[data-re-campo="titulo"]').value = 'Corregido a mano';
+    caja().querySelector('[data-re-guarda]').click();
+    await esperar(200);
+    const tras = R().leerPropios();
+    ok(tras.length === 1, 'guardar la corrección NO crea un enlace nuevo', 'la corrección duplicó: hay ' + tras.length);
+    ok(tras[0].titulo === 'Corregido a mano' && tras[0].id === idEd, 'cambia el que era, y le respeta el identificador', 'la corrección no se guardó bien');
+    ok(!formEd.dataset.editando, 'y el formulario deja de estar corrigiendo', 'el formulario se queda corrigiendo para siempre');
+
+    log('\n── MOVER LAS TARJETAS ──');
+    R().guardarPropios([
+      { id: 'r-uno', tipo: 'audio', titulo: 'Uno', url: 'https://a.hn/1', desc: 'x' },
+      { id: 'r-dos', tipo: 'video', titulo: 'Dos', url: 'https://a.hn/2', desc: 'x' },
+      { id: 'r-tres', tipo: 'mapa', titulo: 'Tres', url: 'https://a.hn/3', desc: 'x' }
+    ]);
+    await esperar(150);
+    const claves = () => [...caja().querySelectorAll('[data-re-clave]')].map(n => n.getAttribute('data-re-clave'));
+    ok(claves().join(',') === 'r-uno,r-dos,r-tres', 'arrancan en el orden en que se pusieron', 'arrancan como: ' + claves().join(','));
+    ok(claves().length === 3 && caja().querySelectorAll('[data-re-asa]').length === 3,
+       'y cada una trae su asa', 'no todas las tarjetas traen asa');
+    /* Con el TECLADO, que es la manera que no falla en una tableta. */
+    const asa3 = caja().querySelectorAll('[data-re-clave]')[2].querySelector('[data-re-asa]');
+    asa3.focus();
+    asa3.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    await esperar(150);
+    ok(claves().join(',') === 'r-uno,r-tres,r-dos', 'la flecha izquierda sube una tarjeta un puesto', 'quedó: ' + claves().join(','));
+    ok(R().leerOrden()['r-tres'] === 2, 'y el sitio queda apuntado en el aparato', 'el orden no se apuntó');
+    /* Y que sobreviva a recargar, que es lo que de verdad se pidió. */
+    await recarga();
+    await esperar(400);
+    d = marco.contentDocument; w = marco.contentWindow;
+    ok(claves().join(',') === 'r-uno,r-tres,r-dos', 'y el orden sigue ahí al volver a abrir la misión', 'al recargar quedó: ' + claves().join(','));
+    /* La otra punta: que el orden llegue a la columna que viaja. */
+    ok(R().leerPropios().find(e => e.id === 'r-tres').orden === 2,
+       'y en la columna que viaja a los otros aparatos', 'el orden no llegó a la fila que sube');
+
+    /* Y con el PUNTERO, que es la manera que se usa de verdad y la que
+       se rompió dos veces mientras se escribía esto:
+         · la envoltura seguía recibiendo el puntero, así que
+           elementFromPoint devolvía la tarjeta que se arrastraba y el
+           movimiento se descartaba solo;
+         · y el eje se elegía por la forma de la tarjeta en vez de por
+           el número de columnas, así que en tres columnas arrastrar de
+           derecha a izquierda no movía nada.
+       Ninguna de las dos se ve leyendo el código. */
+    /* El marco se agranda para el arrastre, y no por comodidad:
+       elementFromPoint SOLO ve lo que cae dentro de la ventana. Con el
+       marco de 560 px las tarjetas quedan por debajo del borde, el
+       puntero apunta a la nada y la sonda suspende un arrastre que en
+       una pantalla de verdad funciona. */
+    const altoAntes = marco.style.height;
+    marco.style.height = '1400px';
+    /* Y la sección de Recursos tiene que estar ABIERTA. Las secciones de
+       una misión son pestañas: la que no está activa lleva display:none,
+       y entonces getBoundingClientRect devuelve ceros y elementFromPoint
+       no encuentra nada. Todo lo demás de esta sonda funciona con la
+       sección cerrada (leer el documento no necesita verlo), así que la
+       trampa solo aparece al medir el arrastre. */
+    w.go('s-recursos');
+    await esperar(250);
+    caja().querySelector('.re-rejilla').scrollIntoView({ block: 'center' });
+    await esperar(200);
+    const primera = caja().querySelectorAll('[data-re-clave]')[0];
+    const ultima = caja().querySelectorAll('[data-re-clave]')[2];
+    const asaU = ultima.querySelector('[data-re-asa]');
+    const cajaP = primera.getBoundingClientRect();
+    const cajaU = asaU.getBoundingClientRect();
+    const columnas = (w.getComputedStyle(caja().querySelector('.re-rejilla')).gridTemplateColumns || '').split(' ').filter(Boolean).length;
+    /* Se apunta a la mitad de la primera tarjeta que hay que cruzar para
+       colocarse DELANTE: la izquierda en varias columnas, la de arriba
+       en una sola. Aquí está la diferencia entre medir el arrastre y
+       medir la suerte. */
+    const destinoX = columnas > 1 ? cajaP.left + 6 : cajaP.left + cajaP.width / 2;
+    const destinoY = columnas > 1 ? cajaP.top + cajaP.height / 2 : cajaP.top + 6;
+    const evPunt = (tipo, x, y) => new w.PointerEvent(tipo, {
+      bubbles: true, cancelable: true, pointerId: 7, clientX: x, clientY: y
+    });
+    asaU.dispatchEvent(evPunt('pointerdown', cajaU.left + 5, cajaU.top + 5));
+    await esperar(40);
+    asaU.dispatchEvent(evPunt('pointermove', destinoX, destinoY));
+    await esperar(40);
+    asaU.dispatchEvent(evPunt('pointerup', destinoX, destinoY));
+    await esperar(250);
+    ok(claves()[0] === 'r-dos', 'arrastrar con el puntero la última tarjeta al principio la pone la primera', 'tras arrastrar quedó: ' + claves().join(','));
+    ok(R().leerOrden()['r-dos'] === 1, 'y el arrastre también deja el sitio apuntado', 'el arrastre no guardó el orden');
+    marco.style.height = altoAntes;
+    await esperar(150);
+
+    log('\n── LA REPISA VA PRIMERO EN RECURSOS ──');
+    const secRec = d.getElementById('s-recursos');
+    const repisa = secRec.querySelector('[data-re-repisa]');
+    const ficha = [...secRec.querySelectorAll('p')].find(x => /Ficha de estudio imprimible/.test(x.textContent));
+    ok(!!repisa && !!ficha && (repisa.compareDocumentPosition(ficha) & Node.DOCUMENT_POSITION_FOLLOWING) > 0,
+       'las herramientas de estudio salen antes que la ficha', 'la repisa no va primero');
+    const fuentes = [...secRec.querySelectorAll('h3')].find(x => /Las fuentes/.test(x.textContent));
+    ok(!!fuentes && (repisa.compareDocumentPosition(fuentes) & Node.DOCUMENT_POSITION_FOLLOWING) > 0,
+       'y antes que la lista de fuentes', 'la repisa no va antes que las fuentes');
+
     log('\n── QUITAR, Y VOLVER AL PRINCIPIO ──');
+    R().guardarPropios([{ tipo: 'video', titulo: 'Para quitar', url: 'https://a.hn/q', desc: 'x' }]);
+    await esperar(150);
     caja().querySelector('.re-herr button[aria-label^="Quitar"]').click();
     await esperar(200);
     ok(R().leerPropios().length === 0, 'el botón de quitar borra el enlace del aparato', 'el enlace no se borró');
-    ok(tarjetas().length === 3 && tarjetas().every(t => t.tagName === 'DIV'),
-       'y al quedarse vacía la repisa vuelven las tres muestras', 'la repisa vacía no vuelve a sus muestras');
+    ok(tarjetas().length === nEjemplos && tarjetas().every(t => t.tagName === 'DIV'),
+       'y al quedarse vacía la repisa vuelve a sus ' + nEjemplos + ' muestras', 'la repisa vacía no vuelve a sus muestras: quedan ' + tarjetas().length);
 
     log('\n── SIN CATÁLOGO NO PASA NADA ──');
     /* El aparato se va a cargar en misiones que todavía no declaran su

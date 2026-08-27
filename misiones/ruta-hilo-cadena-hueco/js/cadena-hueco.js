@@ -571,8 +571,9 @@ window.addEventListener('DOMContentLoaded',()=>{
 //
 // EL FORMATO de cada enlace, campo por campo:
 //
-//   tipo    audio · video · mapa · guia · informe · preguntas · linea ·
-//           tarjetas · web   (decide el icono y el color de la tarjeta)
+//   tipo    audio · video · diapositiva · infografia · mapa · guia ·
+//           informe · preguntas · linea · tarjetas · web
+//           (decide el icono y el color de la tarjeta)
 //   titulo  lo que se lee grande. Que diga QUÉ es y DE QUÉ, no «Resumen 1»
 //   url     https://…  (sin esto la tarjeta sale como ejemplo, sin enlazar)
 //   desc    dos líneas: QUÉ TRAE y QUÉ NO. Es el campo que decide si la
@@ -582,8 +583,16 @@ window.addEventListener('DOMContentLoaded',()=>{
 //   fuente  quién lo hizo (NotebookLM, Gemini, la casa…). Sale en el pie
 //   origen  'maquina' (por defecto) o 'casa'. La etiqueta de estatus
 //   dura    «14 min», «6 páginas». Opcional, pero decide si se abre ahora
+//   ops     con qué ajustes lo generó la máquina, si se sabe: para un
+//           audio { formato, duracion }; para un video { formato,
+//           estilo }; para una infografía { orientacion, estilo }; para
+//           unas diapositivas { formato, duracion }; para un informe
+//           { formato, sugerido }. La lista de valores que la pantalla
+//           conoce está en RE_FACETAS, en js/recursos-enlaces.js. Es lo
+//           que distingue dos audios de la misma misión, uno detallado
+//           y otro breve, sin abrirlos
 //
-// LAS TRES DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
+// LAS CINCO DE ABAJO SON EJEMPLOS y no enlazan a ninguna parte: están para ver
 // cómo queda una tarjeta antes de tener los enlaces de verdad. En cuanto
 // entre el primer enlace real, el aparato deja de pintarlas solo, sin que
 // nadie tenga que acordarse de borrarlas. Aun así, al pegar los de verdad se
@@ -597,7 +606,8 @@ window.RECURSOS_ENLACES = {
       titulo: 'Resumen en audio: la cadena y el hueco',
       desc: 'Los dos conceptos conversados, para oír en el camino. Trae la diferencia entre relato y trama con los ejemplos de la sección Aprende; no trae la prueba del conector ni los ocho casos del proyecto.',
       fuente: 'NotebookLM',
-      dura: '14 min'
+      dura: '14 min',
+      ops: { formato: 'Detallado', duracion: 'Predeterminado' }
     },
     {
       ejemplo: true,
@@ -605,7 +615,26 @@ window.RECURSOS_ENLACES = {
       titulo: 'Video corto: por qué «y entonces» no es una historia',
       desc: 'La prueba del conector explicada con una escena, en pantalla y con rótulos. Sirve para repasar antes del quiz; se queda corto en el hueco de información, que aquí es el requisito y no el adorno.',
       fuente: 'NotebookLM',
-      dura: '6 min'
+      dura: '6 min',
+      ops: { formato: 'Breve', estilo: 'Pizarra' }
+    },
+    {
+      ejemplo: true,
+      tipo: 'diapositiva',
+      titulo: 'Diapositivas: las tres piezas, una por lámina',
+      desc: 'Para proyectar mientras se explica: cadena, hueco y brecha, cada una con su ejemplo. No lleva las fuentes con su etiqueta, que es justo lo que esta ruta no deja saltarse.',
+      fuente: 'NotebookLM',
+      dura: '12 láminas',
+      ops: { formato: 'Diapositiva del presentador', duracion: 'Predeterminado' }
+    },
+    {
+      ejemplo: true,
+      tipo: 'infografia',
+      titulo: 'Infografía: las tres formas del hueco',
+      desc: 'Curiosidad, suspenso y sorpresa en una sola lámina, con el reparto de Sternberg. Buena para el cuaderno; no sustituye a la ficha, que es donde se trabaja a lápiz.',
+      fuente: 'NotebookLM',
+      dura: '1 lámina',
+      ops: { orientacion: 'Vertical', estilo: 'Editorial' }
     },
     {
       ejemplo: true,

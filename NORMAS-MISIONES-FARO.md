@@ -778,19 +778,88 @@ Tres cosas, y ninguna toca el aparato:
 
 | Campo | Qué es |
 |---|---|
-| `tipo` | `audio`, `video`, `mapa`, `guia`, `informe`, `preguntas`, `linea`, `tarjetas` o `web`. Decide el icono y el color |
+| `tipo` | `audio`, `video`, `diapositiva`, `infografia`, `mapa`, `guia`, `informe`, `preguntas`, `linea`, `tarjetas` o `web`. Decide el icono y el color |
 | `titulo` | lo que se lee grande. Que diga QUÉ es y DE QUÉ, no «Resumen 1» |
 | `url` | `http` o `https`. Sin esto la tarjeta sale de muestra, sin enlazar |
 | `desc` | dos líneas: **qué trae y qué NO** |
 | `fuente` | quién lo hizo (NotebookLM, Gemini, la casa). Sale en el pie |
 | `origen` | `maquina` (por defecto) o `casa`. Es la etiqueta de estatus |
-| `dura` | «14 min», «6 páginas». Opcional |
+| `dura` | «14 min», «6 páginas». Cuánto dura DE VERDAD. Opcional |
+| `ops` | con qué ajustes lo generó la máquina. Ver «Cómo se generó» |
+| `orden` | el sitio de la tarjeta. Lo pone el arrastre, no se escribe a mano |
 
 **La descripción es el campo que decide si la repisa sirve**, y por eso el
 formulario la exige. «Resumen del tema» no dice nada y obliga a abrir los seis
 enlaces para saber cuál era; «los dos conceptos con ejemplos de cine, sin la
 prueba del conector» ahorra cinco. Es la misma regla con la que se escriben
 las fuentes de la misión, aplicada a lo que hizo una máquina.
+
+### Cómo se generó: las opciones de cada tipo
+
+**Ampliación pedida por el autor el 27 de agosto de 2026, por la tarde.** Los
+tipos que NotebookLM genera con ajustes los preguntan al añadir el enlace, y
+salen en pastillas sobre la descripción de la tarjeta:
+
+| Tipo | Grupos |
+|---|---|
+| **Audio** | Formato (Detallado, Breve, Crítica, Debate) · Duración (Corto, Predeterminado) |
+| **Diapositiva** | Formato (Presentación detallada, Diapositiva del presentador) · Duración (Corto, Predeterminado, Largo) |
+| **Video** | Formato (Explicativo, Breve) · Estilo visual (Automático, Personalizado, Clásico, Pizarra, Kawaii, Anime, Acuarela, Dibujo retro, Legado, Papiroflexia) |
+| **Infografía** | Orientación (Horizontal, Vertical, Cuadrado) · Estilo visual (Automático, Kawaii, Arcilla, Boceto, Anime, Editorial, Instructivo, Cuadrícula bento, Ladrillos, Científico, Profesional) |
+| **Informe** | Formato (Propia creación, Resumen, Guía de estudio, Entrada de blog) · Formato sugerido (Auditoría narrativa, Marco de estilo y ética, Guía de Conceptos Fundamentales, Guía práctica de Construcción) |
+
+**Por qué esto importa y no es adorno:** dos resúmenes en audio de la misma
+misión, uno «Detallado» y otro «Breve», son dos recursos distintos. Sin las
+pastillas, en la repisa se distinguen abriéndolos.
+
+Tres decisiones de fondo:
+
+1. **La lista vive en el aparato** (`RE_FACETAS`, en `js/recursos-enlaces.js`),
+   no en la base de datos. La columna es **un objeto libre** (`opciones`,
+   jsonb). El día que NotebookLM añada un estilo, eso es una línea en un
+   archivo y no una migración que alguien tiene que pegar desde una tableta.
+   Es la misma razón por la que `tipo` no lleva `check`.
+2. **Ninguna es obligatoria**, y marcar la que ya estaba la desmarca. Sin poder
+   quitarla habría que recargar la página para deshacer un toque.
+3. **Pastillas y no un desplegable.** Con once estilos visuales, un desplegable
+   en un teléfono esconde diez detrás de un toque, y lo que no se ve no se
+   elige.
+
+### Se mueven y se corrigen
+
+**Pedido el mismo día.** Cada tarjeta trae su asa **⠿** y, si es tuya, su
+botón **✏️** para corregirla.
+
+- **El asa es un botón de verdad**, no un icono: además de arrastrar, mueve la
+  tarjeta con las flechas del teclado. No es solo accesibilidad. En una tableta
+  el arrastre de precisión entre tarjetas de un dedo de ancho falla lo
+  suficiente como para que haga falta la otra manera.
+- **El arrastre va con punteros**, no con `draggable` de HTML, que no funciona
+  en el navegador de casi ningún teléfono. Tres cosas que lo rompieron al
+  escribirlo, y que están comentadas donde ocurrieron: `touch-action: none` en
+  el asa (sin él el navegador se queda el gesto para desplazar la página);
+  `pointer-events: none` en la **envoltura entera** mientras se arrastra (solo
+  en la tarjeta, `elementFromPoint` seguía devolviendo la que se arrastra); y
+  el eje se decide por el **número de columnas de la rejilla**, no por la forma
+  de la tarjeta.
+- **El orden es de cada quien, no de la casa**, y no por gusto: la seguridad
+  por fila solo deja escribir la fila propia, así que un orden común exigiría
+  poder escribir las filas de los demás. Cada quien coloca las suyas, ese orden
+  viaja a sus otros aparatos por la columna `orden`, y lo que coloque de los
+  demás se queda en el aparato donde lo colocó (en el mapa local). Es la única
+  combinación honesta que permite la puerta; fingir un orden común sería un
+  arrastre que parece guardarse y no se guarda.
+- **Corregir usa el MISMO formulario que añadir.** Uno aparte sería la misma
+  pantalla escrita dos veces, y a la tercera corrección ya no coincidirían.
+  Cerrar cancela la corrección: si no, el siguiente «Añadir» seguiría
+  corrigiendo el de antes en silencio.
+
+### Y van primero
+
+**Pedido el mismo día:** dentro de Recursos, las herramientas de estudio van
+**antes** que la ficha imprimible y que la lista de fuentes. Son lo que se
+consulta a diario; la ficha y las fuentes, cuando toca. La sonda de la misión
+lo comprueba con `compareDocumentPosition`, no leyendo el archivo.
 
 ### Las cuatro reglas de la repisa, y ninguna es de adorno
 

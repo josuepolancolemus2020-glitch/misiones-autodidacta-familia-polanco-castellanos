@@ -84,7 +84,12 @@ Zone → Make private.
      devolver **cero filas**.
    · ⚠️ **Correr `supabase/sql/recursos_enlaces.sql`** en el SQL Editor. Es un
      solo archivo y no depende de ningún otro salvo de `es_familia()`, que ya
-     está. Crea la tabla de la repisa de enlaces de las misiones: las
+     está. **Si ya se corrió antes del 27 de agosto por la tarde, HAY QUE
+     VOLVER A CORRERLO**: el archivo creció con dos columnas (`opciones` y
+     `orden`) y las añade con `add column if not exists`, así que correrlo otra
+     vez no borra nada y deja la tabla al día. Sin ellas, las opciones con las
+     que se generó cada recurso y el orden de las tarjetas se quedan en el
+     aparato y no viajan. Crea la tabla de la repisa de enlaces de las misiones: las
      herramientas de estudio que salen de NotebookLM (el resumen en audio, el
      video, el mapa mental) para que estén en TODOS los aparatos de la casa y
      no solo en el que las pegó. Pedido por el autor el 27 de agosto de 2026.
