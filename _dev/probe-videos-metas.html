@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Videos de M.E.T.A.S</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de la herramienta 🎬 VIDEOS DE M.E.T.A.S.
+
+   Esta herramienta es el extremo de F.A.R.O de un cable cuyo otro
+   extremo es la pantalla de un niño de sexto. Lo que se guarda aquí se
+   pinta allá DENTRO DEL `src` DE UN IFRAME, así que lo que puede salir
+   mal no es «se ve feo»:
+
+   1. QUE POR LA BASE NO PASE NUNCA UNA DIRECCIÓN. Se guarda el
+      identificador de once caracteres y nada más. En [A-Za-z0-9_-] no
+      hay comillas ni dos puntos: `javascript:` no se puede ni escribir.
+      Se le tiran nueve enlaces envenenados y ninguno puede guardarse.
+
+   2. QUE PEGAR UN ENLACE FUNCIONE DE VERDAD, en las cinco formas en
+      que YouTube reparte enlaces (watch, youtu.be, shorts, embed,
+      live) y con los segundos del `&t=` en sus tres notaciones. Si
+      esto falla, el administrador tiene que escribir el identificador a
+      mano mirando otra pestaña, que es exactamente el paso donde el
+      trabajo se abandona.
+
+   3. QUE UN VIDEO NUEVO NAZCA SIN PUBLICAR. Se guarda, se mira con
+      👁 Comprobar y se publica después. Si naciera publicado, un alumno
+      se lo encontraría a medio revisar.
+
+   4. QUE RETIRAR NO BORRE LA FILA. Si el video está también escrito en
+      el catálogo del repositorio de M.E.T.A.S, borrar aquí lo dejaría
+      vivo allá y seguiría en la pantalla del alumno. Se marca 'oculto',
+      que es la lápida que la misión sabe leer.
+
+   5. QUE EL REPRODUCTOR DE COMPROBAR SEA EL MISMO QUE EL DE LA MISIÓN.
+      Un ensayo con otro reproductor no prueba nada, y lo que se está
+      probando es justo lo que no se puede saber de otra forma: si el
+      dueño del video permite incrustarlo.
+
+   6. QUE CERRAR COMPROBAR APAGUE EL VIDEO. Si solo se esconde el panel,
+      el video sigue sonando detrás.
+
+   7. QUE LA BASE VIEJA SIGA FUNCIONANDO. Mientras no se corra
+      metas_videos.sql la tabla no existe: la herramienta tiene que
+      decir qué archivo falta —desde una tableta no se adivina— y dejar
+      claro que las misiones siguen funcionando con su catálogo.
+
+   Como en las demás sondas: aquí no se lee el código, se ejecuta el
+   index.html de verdad con una base de mentira a nivel de fetch. El
+   cliente de Supabase es el auténtico. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── La base de datos de mentira ────────────────────────────────── */
+function nuevaBase(w, opciones){
+  const estado = {
+    tablas: { metas_videos: [] },
+    llamadas: [],
+    sinTabla: !!(opciones && opciones.sinTabla),
+    proxId: 100,
+  };
+  const filtra = (filas, params) => filas.filter(fila =>
+    [...params.entries()].every(([col, val]) => {
+      if (['select','order','limit','offset'].includes(col)) return true;
+      if (val.startsWith('eq.')) return String(fila[col]) === val.slice(3);
+      return true;
+    }));
+
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url, location.origin);
+
+    /* El catálogo público de M.E.T.A.S, que la herramienta trae para
+       llenar el desplegable de misiones. Aquí se contesta uno mínimo:
+       la sonda corre sin internet. */
+    if (/misiones\.js$/.test(u.pathname)) {
+      return new Response(
+        'const MISSIONS=[{id:23,title:"Las Fracciones",url:"misiones/2y3ciclo-fracciones/fracciones.html"},' +
+        '{id:62,title:"Multiplicación y División de Fracciones",url:"misiones/2ciclo-fracciones-multiplicar-dividir/f.html"}];',
+        { status: 200, headers: { 'Content-Type': 'application/javascript' } });
+    }
+    if (!u.pathname.startsWith('/rest/v1/')) return new Response('{}', { status: 200 });
+
+    const tabla  = u.pathname.replace('/rest/v1/', '');
+    const params = u.searchParams;
+    const metodo = (init && init.method) || 'GET';
+    const cuerpo = (init && init.body) ? JSON.parse(init.body) : null;
+    estado.llamadas.push({ tabla, metodo, params: u.search, cuerpo });
+
+    const json = (d, s) => new Response(metodo === 'HEAD' ? null : JSON.stringify(d),
+      { status: s || 200, headers: { 'Content-Type': 'application/json' } });
+
+    if (estado.sinTabla && tabla === 'metas_videos') {
+      return json({ code: '42P01', message: 'relation "public.metas_videos" does not exist' }, 404);
+    }
+
+    const filas = estado.tablas[tabla] || [];
+
+    if (metodo === 'GET') {
+      let r = filtra(filas, params);
+      const orden = params.get('order');
+      if (orden) {
+        const [col, dir] = orden.split('.');
+        r = [...r].sort((a,b) => (a[col] > b[col] ? 1 : a[col] < b[col] ? -1 : 0) * (dir === 'desc' ? -1 : 1));
+      }
+      return json(r);
+    }
+    if (metodo === 'POST') {
+      /* Como la columna de verdad: el identificador de once o nada.
+         Que la base de mentira MUERDA es la mitad de la comprobación 1;
+         una que aceptara cualquier cosa haría pasar la sonda con un
+         código que en la base de verdad reventaría. */
+      const nuevas = (Array.isArray(cuerpo) ? cuerpo : [cuerpo]);
+      for (const n of nuevas) {
+        if (!/^[A-Za-z0-9_-]{11}$/.test(String(n.yt_id || ''))) {
+          return json({ code: '23514', message: 'new row violates check constraint "metas_videos_yt_id_check"' }, 400);
+        }
+        estado.tablas[tabla].push(Object.assign(
+          { id: estado.proxId++, estado: 'borrador', orden: 0, ini: 0, fin: 0,
+            titulo: '', nota: '', dura: '', canal: '' }, n));
+      }
+      return json([]);
+    }
+    if (metodo === 'PATCH') {
+      filtra(filas, params).forEach(fila => Object.assign(fila, cuerpo));
+      return json([]);
+    }
+    return json([]);
+  };
+  return estado;
+}
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);                 // que arranque el index de verdad
+  const w = f.contentWindow;
+
+  if (w.eval('typeof initMetasVideos') !== 'function') {
+    log('✘ index.html no cargó js/tools/metas-videos.js');
+    document.title = 'SUSPENDE · videos de M.E.T.A.S'; return;
+  }
+  w.eval('window.verificarSesion = () => ({ user: "josue", nombre: "Josué Edmundo" })');
+
+  const base = nuevaBase(w, {});
+  const V = w.FaroMetasVideos;
+  const g = id => w.document.getElementById(id);
+
+  /* ═══ 1. El identificador de once caracteres ═══ */
+  log('── 1. Por la base no pasa nunca una dirección ──');
+  const venenos = [
+    'javascript:alert(1)',
+    'https://evil.com/a" onload="alert(1)',
+    'https://www.youtube.com/watch?v=aaaa"aaaaaa',
+    'https://www.youtube.com/watch?v=corto',
+    'https://www.youtube.com/watch?v=aaaaaaaaaaaaaaaa',
+    'java\tscript:alert(1)',
+    'JavaScript:alert(1)',
+    'data:text/html,<script>alert(1)</scr' + 'ipt>',
+    'https://vimeo.com/12345678'
+  ];
+  ok(venenos.every(v => V.deEnlace(v).yt === ''),
+     'los nueve enlaces envenenados no dan identificador',
+     'ALGUNO de los enlaces envenenados pasó: ' +
+       venenos.filter(v => V.deEnlace(v).yt !== '').join(' | '));
+  ok(V.id('aaaaa"aaaaa') === '' && V.id('aaaaa aaaaa') === '' && V.id('javascript:') === '',
+     'y mvidId() rebota comillas, espacios y esquemas',
+     'mvidId() dejó pasar algo que no son once caracteres del alfabeto bueno');
+
+  /* Y lo que de verdad importa: que la base tampoco lo acepte */
+  const antes = base.tablas.metas_videos.length;
+  await w.eval('_mvidMision = "2y3ciclo-fracciones"');
+  const r = await w.eval(`(async () => {
+    const { error } = await _sb.from('metas_videos').insert({
+      mision: '2y3ciclo-fracciones', vid: 'v-malo',
+      yt_id: 'https://x.com/a" onload="alert(1)'
+    });
+    return !!error;
+  })()`);
+  ok(r === true && base.tablas.metas_videos.length === antes,
+     'y si alguien lo intentara por debajo, la columna lo rebota',
+     'la base ACEPTÓ una dirección en la columna del identificador');
+
+  /* ═══ 2. Pegar un enlace ═══ */
+  log('');
+  log('── 2. Pegar un enlace, en las cinco formas de YouTube ──');
+  const ID = 'dQw4w9WgXcQ';
+  const formas = {
+    'watch':      'https://www.youtube.com/watch?v=' + ID,
+    'youtu.be':   'https://youtu.be/' + ID,
+    'shorts':     'https://www.youtube.com/shorts/' + ID,
+    'embed':      'https://www.youtube-nocookie.com/embed/' + ID,
+    'móvil':      'https://m.youtube.com/watch?v=' + ID + '&feature=share',
+    'el id solo': ID,
+  };
+  Object.entries(formas).forEach(([nombre, u]) =>
+    ok(V.deEnlace(u).yt === ID, 'reconoce la forma «' + nombre + '»',
+       'NO reconoce la forma «' + nombre + '»: ' + u));
+
+  ok(V.deEnlace('https://www.youtube.com/watch?v=' + ID + '&t=90').ini === 90 &&
+     V.deEnlace('https://www.youtube.com/watch?v=' + ID + '&t=90s').ini === 90 &&
+     V.deEnlace('https://www.youtube.com/watch?v=' + ID + '&t=1m30s').ini === 90,
+     'y saca los segundos del &t= en sus tres notaciones (90, 90s, 1m30s)',
+     'los segundos del &t= no se leen bien');
+  ok(V.segundos('999999') === 0 && V.segundos('-5') === 0,
+     'los segundos absurdos se descartan (el mismo tope que el check)',
+     'un segundo absurdo pasaría a la columna');
+
+  /* ═══ 3. Un video nuevo nace SIN publicar ═══ */
+  log('');
+  log('── 3. Un video nuevo nace sin publicar ──');
+  await w.eval('initMetasVideos()');
+  await esperar(400);
+  w.eval('_mvidMision = "2y3ciclo-fracciones"; mvidAbrirForm(null)');
+  g('mvid-f-enlace').value = 'https://www.youtube.com/watch?v=' + ID + '&t=45';
+  g('mvid-f-titulo').value = '¿Qué es una fracción?';
+  g('mvid-f-nota').value = 'Míralo antes del Quiz.';
+  await w.eval('mvidGuardar()');
+  await esperar(400);
+
+  const guardado = base.tablas.metas_videos[base.tablas.metas_videos.length - 1];
+  ok(!!guardado, 'el video se guardó', 'el video NO se guardó');
+  if (guardado) {
+    ok(guardado.yt_id === ID, 'con el identificador de once sacado del enlace',
+       'guardó otra cosa en yt_id: ' + guardado.yt_id);
+    ok(!/^https?:/.test(guardado.yt_id), 'y NO la dirección',
+       'guardó una dirección entera');
+    ok(guardado.estado === 'borrador',
+       'y nace SIN publicar: ningún alumno se lo encuentra a medio revisar',
+       'nació publicado: estado = ' + guardado.estado);
+    ok(guardado.ini === 45, 'los segundos del enlace llegaron al recorte',
+       'los segundos del enlace se perdieron');
+    ok(!!guardado.vid, 'y lleva su propio identificador, que es la llave con el catálogo',
+       'no lleva vid: no se podría corregir desde la nube un video del repositorio');
+  }
+
+  /* ═══ 4. Retirar NO borra ═══ */
+  log('');
+  log('── 4. Retirar no borra la fila ──');
+  const n0 = base.tablas.metas_videos.length;
+  await w.eval('initMetasVideos()'); await esperar(300);
+  await w.eval(`mvidPublicar(_mvidCache.find(v => v.mision === '2y3ciclo-fracciones'), 'publicado')`);
+  await esperar(300);
+  ok(base.tablas.metas_videos.some(v => v.estado === 'publicado'),
+     'publicar lo pone visible', 'publicar no cambió el estado');
+  await w.eval('initMetasVideos()'); await esperar(300);
+  await w.eval(`mvidPublicar(_mvidCache.find(v => v.mision === '2y3ciclo-fracciones'), 'oculto')`);
+  await esperar(300);
+  ok(base.tablas.metas_videos.length === n0,
+     'retirar NO borra la fila: se queda como lápida',
+     'retirar borró la fila; un video escrito en el catálogo resucitaría en la pantalla del alumno');
+  ok(base.tablas.metas_videos.some(v => v.estado === 'oculto'),
+     'y queda marcada como retirada, que es lo que la misión sabe leer',
+     'la fila no quedó marcada como oculta');
+  const borrados = base.llamadas.filter(l => l.metodo === 'DELETE');
+  ok(borrados.length === 0, 'y en toda la sesión no se mandó ni un DELETE',
+     'se mandó un DELETE: ' + borrados.length);
+
+  /* ═══ 5 y 6. Comprobar ═══ */
+  log('');
+  log('── 5. Comprobar usa el mismo reproductor que la misión ──');
+  await w.eval('initMetasVideos()'); await esperar(300);
+  await w.eval(`mvidComprobar(_mvidCache.find(v => v.mision === '2y3ciclo-fracciones'))`);
+  await esperar(300);
+  const marco = g('mvid-ver-caja');
+  const iframe = marco && marco.querySelector('iframe');
+  ok(!!iframe, 'se abre un reproductor', 'no se abrió ningún reproductor');
+  if (iframe) {
+    const src = iframe.getAttribute('src');
+    ok(src.startsWith('https://www.youtube-nocookie.com/embed/' + ID),
+       'con el dominio sin cookies y el identificador comprobado detrás',
+       'el src no es el esperado: ' + src);
+    ok(/[?&]rel=0(&|$)/.test(src) && /[?&]playsinline=1(&|$)/.test(src),
+       'y con los mismos parámetros que usa la misión',
+       'los parámetros no coinciden con los de la misión');
+    ok(!/["'<>\s\\]/.test(src),
+       'y en el src no hay ni una comilla, espacio ni ángulo',
+       'el src trae caracteres que pueden cerrar el atributo');
+  }
+  const pie = w.document.querySelector('.mvid-ver-pie');
+  ok(pie && /no deja incrustarlo|Ver en YouTube/i.test(pie.textContent),
+     'y explica qué mirar: si sale «Ver en YouTube», ese video no sirve',
+     'no explica para qué sirve comprobar');
+
+  log('');
+  log('── 6. Cerrar comprobar apaga el video ──');
+  await w.eval('mvidCerrarVer()');
+  await esperar(200);
+  ok(g('mvid-ver-caja').querySelectorAll('iframe').length === 0,
+     'el reproductor se vacía: no se queda sonando detrás',
+     'el video sigue puesto detrás del panel cerrado');
+  ok(g('mvid-ver-overlay').style.display === 'none', 'y el panel se cierra', 'el panel no se cerró');
+
+  /* ═══ 7. El desplegable de misiones ═══ */
+  log('');
+  log('── 7. Las misiones salen del catálogo, no escritas a mano ──');
+  const sel = g('mvid-mision');
+  const claves = [...sel.options].map(o => o.value).filter(Boolean);
+  ok(claves.includes('2y3ciclo-fracciones'),
+     'el desplegable trae la carpeta de la misión, sacada del catálogo público',
+     'el desplegable no trae las misiones');
+  ok(claves.length >= 2, 'y las demás también', 'solo trajo una');
+
+  /* ═══ 8. La base vieja ═══ */
+  log('');
+  log('── 8. Sin haber corrido el SQL, se dice qué falta ──');
+  const f2 = w.document.createElement('iframe');
+  f2.style.display = 'none';
+  f2.src = '/index.html';
+  w.document.body.appendChild(f2);
+  await new Promise(r => f2.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w2 = f2.contentWindow;
+  nuevaBase(w2, { sinTabla: true });
+  w2.eval('window.verificarSesion = () => ({ user: "josue" })');
+  await w2.eval('initMetasVideos()');
+  await esperar(400);
+  const t2 = w2.document.getElementById('mvid-list').textContent;
+  ok(/todav[íi]a no est[áa]n instalados/i.test(t2),
+     'la herramienta dice que falta instalarla',
+     'no explica nada: solo una pantalla en blanco');
+  ok(t2.includes('metas_videos.sql'),
+     'y nombra el archivo que hay que correr (desde una tableta no se adivina)',
+     'no dice qué archivo hay que correr');
+  ok(/cat[áa]logo/i.test(t2),
+     'y deja claro que mientras tanto las misiones siguen funcionando con su catálogo',
+     'no dice que las misiones siguen funcionando: parece que todo está roto');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'APRUEBA · videos de M.E.T.A.S' : 'SUSPENDE · videos de M.E.T.A.S';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SUSPENDE · videos de M.E.T.A.S';
+});
+</script>
+</body>
+</html>

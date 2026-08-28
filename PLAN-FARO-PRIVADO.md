@@ -108,6 +108,37 @@ Zone → Make private.
      El archivo trae además las cinco comprobaciones para pegar después, y la
      cuarta es la que de verdad prueba la defensa: un `insert` con
      `javascript:` en la dirección TIENE que fallar.
+   · ⚠️ **Correr `supabase/sql/metas_videos.sql`** en el SQL Editor. Es un solo
+     archivo y no depende de ningún otro salvo de `es_familia()`, que ya está.
+     Crea la tabla de los **videos de las misiones de M.E.T.A.S**: los que el
+     alumno ve dentro de la misión, en su pestaña 🎬 Videos. Pedido por el autor
+     el 28 de agosto de 2026, estrenado en «Las Fracciones».
+     Es el **espejo de `metas_sugerencias.sql`**: allí M.E.T.A.S escribe y
+     F.A.R.O lee; aquí F.A.R.O escribe y M.E.T.A.S lee. Por eso la puerta
+     pública de este —`metas_videos_publicos(mision)`— **solo lee, y solo lo
+     publicado**: es lo que impide que un alumno meta videos en su propia
+     misión, y no se sostiene en una comprobación de pantalla (esas se saltan
+     con la consola) sino en que no existe una puerta de escritura que cerrar.
+     Hasta que se corra, la sección 🎬 Videos **funciona igual** con los videos
+     escritos en el catálogo del repositorio de M.E.T.A.S
+     (`js/data/videos-misiones.js`), y la propia sección dice a la vista de
+     dónde salió lo que enseña («📚 Videos incluidos con la misión»): no finge
+     que hay nube. Lo que no se puede hasta entonces es **añadir un video desde
+     la tableta**: la herramienta 🎬 Videos M.E.T.A.S del Acceso Rápido dice qué
+     archivo falta y que las misiones siguen funcionando mientras tanto.
+     El archivo **se para solo** si falta `es_familia()`, con una frase que dice
+     qué hacer —está probado: sin ese guardia el fallo llega disfrazado de «la
+     tabla no existe», porque el editor deshace el pegado entero cuando una
+     línea falla—, y **termina con un `select` que devuelve una fila** diciendo
+     si quedó puesto: tiene que salir `columnas=15`, `politicas=1`,
+     `seguridad_por_fila=t` y `puerta_publica=t`. Si no, no quedó, por mucho que
+     ponga «Success».
+     ⚠️ La comprobación que de verdad importa es la del `check` de `yt_id`: solo
+     entran ONCE caracteres de `[A-Za-z0-9_-]`. Ese dato acaba dentro del `src`
+     de un `<iframe>` en la pantalla de un niño, y en ese alfabeto no hay
+     comillas ni dos puntos: `javascript:` no se puede ni escribir. Está probado
+     contra un PostgreSQL de verdad en `_dev/prueba-videos-sql.sql`, con nueve
+     formas de dirección envenenada.
    · ⚠️ **Confirmar si `supabase/sql/lecturas_marcas.sql` se corrió.** No consta
      en esta lista (se instaló sin apuntarlo aquí), así que no se sabe. Es la
      tabla de lo que cada quien subraya y anota en las misiones. Se comprueba

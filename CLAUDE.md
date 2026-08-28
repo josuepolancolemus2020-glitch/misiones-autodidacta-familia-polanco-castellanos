@@ -127,6 +127,90 @@ node _dev/servidor-estatico.js      (en otra terminal)
 _dev/probe-metas-sugerencias.html   (en el navegador)
 ```
 
+## Normativa: los videos de las misiones de M.E.T.A.S se ponen aquí
+
+**Pedido por el autor el 28 de agosto de 2026**, estrenado en «Las
+Fracciones» y con la intención dicha de llevarlo a las demás misiones.
+
+Cada misión de M.E.T.A.S tiene una pestaña **🎬 Videos**. Lo que se ve
+ahí sale de F.A.R.O: la herramienta 🎬 **Videos M.E.T.A.S** del Acceso
+Rápido (`js/tools/metas-videos.js`, tabla en
+`supabase/sql/metas_videos.sql`).
+
+Es el **espejo exacto de las Sugerencias**, y por eso está pegada a
+ellas en el Acceso Rápido: allí M.E.T.A.S escribe y aquí se lee; aquí se
+escribe y M.E.T.A.S lee. Y no es solo simetría —una sugerencia que dice
+«no entiendo esta parte» se contesta pegando un video, y tenerlas a un
+toque una de otra cierra ese círculo.
+
+**El alumno no puede poner videos, y eso NO lo decide una pantalla.**
+Una comprobación en el navegador se salta con la consola en diez
+segundos. Lo que lo sostiene es que con la clave publicable que va en el
+código de M.E.T.A.S **no existe una puerta de escritura**: lo único que
+se puede llamar es `metas_videos_publicos(mision)`, que lee lo
+publicado. Escribir requiere sesión de la familia, aquí, y lo hace
+cumplir la seguridad por fila.
+
+**Ocho reglas, y ninguna es de adorno:**
+
+1. ⚠️ **Por la base no viaja NUNCA una dirección: viajan once
+   caracteres.** Ese dato acaba dentro del `src` de un `<iframe>` en la
+   pantalla de un niño, que es el peor sitio del HTML donde puede acabar
+   algo escrito por una persona. En vez de escapar mejor, se le quita al
+   dato la capacidad de hacer daño: en `[A-Za-z0-9_-]` no hay comillas,
+   ni espacios, ni dos puntos, ni barras, así que **`javascript:` no se
+   puede ni escribir**. Lo comprueban tres sitios y los tres hacen falta:
+   `mvidId()` aquí, el `check` de la columna `yt_id` allá, y `vmId()` en
+   la pantalla de la misión.
+2. **Un video nuevo nace SIN publicar.** Se guarda, se mira con
+   👁 Comprobar y se publica después. Si naciera publicado, un alumno se
+   lo encontraría a medio revisar.
+3. **👁 Comprobar abre el MISMO reproductor que usará la misión**, con
+   los mismos parámetros. Un ensayo con otro reproductor no prueba nada,
+   y lo que se está probando es lo único que no se puede saber de otra
+   forma: **si el dueño del video permite incrustarlo**. Un video que no
+   se deja incrustar sale en la misión como un cuadro negro con «Ver en
+   YouTube», que es exactamente lo que esa sección existe para evitar.
+4. **Retirar NO borra la fila: la marca `oculto`.** Si el video está
+   también escrito en el catálogo del repositorio de M.E.T.A.S, borrar
+   la fila aquí lo dejaría vivo allá y seguiría en la pantalla del
+   alumno. Con `oculto`, la puerta pública devuelve una lápida y la
+   misión lo quita. Es la misma razón por la que la repisa de enlaces
+   borra con lápida.
+5. **Lo permanente sigue yendo al catálogo.** La nube pone los videos en
+   los aparatos hoy; el catálogo (`js/data/videos-misiones.js`, en
+   M.E.T.A.S) los deja escritos en el repositorio, con su historial y
+   sin depender de que Supabase siga en pie. El botón 📋 escupe el bloque
+   listo para pegar **en el chat**. Mismo reparto que el SQL, y por lo
+   mismo: el autor trabaja desde la tableta.
+6. **Las misiones salen del catálogo público de M.E.T.A.S, traído por
+   la red, no de una lista escrita aquí.** Hoy son 57 y siguen entrando:
+   una copia en este archivo estaría equivocada la semana que viene. Si
+   no llega, se usa la guardada y, si tampoco, se escribe a mano.
+7. **Recortar el video (`ini`/`fin`) es la defensa más barata contra los
+   anuncios** y contra los minutos de careta del canal. Los anuncios NO
+   se pueden quitar —no existe un parámetro de YouTube que lo haga— y la
+   pantalla del alumno no lo finge: avisa de Brave, que es un **navegador**
+   (no un buscador) que sí los bloquea.
+8. **El `vid` nace en el aparato, no en la base.** El guardado se
+   reintenta y sin un identificador propio el segundo intento dejaría un
+   gemelo; y es la llave con la que la nube pisa al catálogo.
+
+**Antes de publicar un cambio de los videos:**
+
+```
+node _dev/servidor-estatico.js      (en otra terminal)
+_dev/probe-videos-metas.html        (en el navegador)
+```
+
+Y el SQL, contra un PostgreSQL de verdad, que es donde se ve si el
+`check` muerde:
+
+```
+createdb videostest
+psql -v ON_ERROR_STOP=1 -d videostest -f _dev/prueba-videos-sql.sql
+```
+
 ## El mapa de rutas se explora por materia, no en lista
 
 «Mis Rutas» agrupa las rutas **por materia**, y todo arranca **plegado**. Es
