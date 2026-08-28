@@ -632,6 +632,162 @@ function nuevaBase(w, opciones){
      'y que mientras tanto la carpeta se puede escribir a mano',
      'no dice qué hacer mientras tanto');
 
+  /* ═══ 14. El orden se cambia arrastrando la tarjeta ═══
+     Aquí había dos flechas ↑ ↓ y el autor las pidió quitar el 28 de
+     agosto de 2026: con diez videos, poner el sexto en primer lugar eran
+     cinco toques, cinco repintados, y volver a buscar la fila con la
+     vista entre uno y otro.
+
+     Se prueba con EVENTOS DE PUNTERO DE VERDAD, no llamando por dentro a
+     la función: lo que puede fallar aquí es de pantalla —un asa que el
+     dedo no alcanza, un `touch-action` que le regala el gesto al
+     desplazamiento de la página, una fila que tapa a la de debajo y no
+     deja ver dónde soltar—, y nada de eso se ve llamando funciones. Es
+     la misma lección que la sonda de la barra de grupos de M.E.T.A.S. */
+  log('');
+  log('── 14. El orden se cambia arrastrando, no con flechas ──');
+  const MIS = '2y3ciclo-la-celula';
+  base.tablas.metas_videos.push(
+    { id: 9001, mision: MIS, vid: 'a', yt_id: 'aaaaaaaaaaa', titulo: 'Primero',
+      estado: 'publicado', orden: 1, ini: 0, fin: 0, nota: '', dura: '', canal: '' },
+    { id: 9002, mision: MIS, vid: 'b', yt_id: 'bbbbbbbbbbb', titulo: 'Segundo',
+      estado: 'publicado', orden: 2, ini: 0, fin: 0, nota: '', dura: '', canal: '' },
+    { id: 9003, mision: MIS, vid: 'c', yt_id: 'ccccccccccc', titulo: 'Tercero',
+      estado: 'publicado', orden: 3, ini: 0, fin: 0, nota: '', dura: '', canal: '' });
+  /* La vista se ABRE de verdad, no se llama a `initMetasVideos()` a
+     secas: hasta que no está activa, sus tarjetas miden 0×0 y un
+     arrastre es un gesto entre dos puntos de la PANTALLA. Con el panel
+     escondido, `elementFromPoint` no encuentra nada y la sonda aprobaría
+     un arrastre que en la tableta no funciona.
+
+     Y la ventana se agranda para esta prueba: los 640 px del marco no
+     dan para las tres tarjetas a la vez, y hay que poder tocar la de
+     abajo y soltarla sobre la de arriba. Se devuelve al acabar. */
+  const altoMarco = f.style.height;
+  f.style.height = '1100px';
+  /* La aplicación arranca con `#app-container` escondido hasta que entra
+     la sesión; aquí la sesión es de mentira, así que se enseña a mano,
+     como hacen las demás sondas que necesitan medir la pantalla. */
+  w.document.getElementById('app-container').style.display = '';
+  w.eval('_mvidMateria = ""; _mvidBusca = ""; _mvidMision = "' + MIS + '"');
+  w.eval('switchView("view-mvid")');
+  await esperar(600);
+
+  const lista = g('mvid-list');
+  const titulos = () => [...lista.querySelectorAll('.mvid-card .mvid-tit')].map(n => n.textContent);
+  ok(titulos().join(',') === 'Primero,Segundo,Tercero',
+     'los tres videos salen en su orden', 'no salieron los tres: ' + titulos().join(','));
+
+  /* Las flechas se fueron */
+  const flechas = [...lista.querySelectorAll('button')].filter(b => /^[↑↓]$/.test(b.textContent.trim()));
+  ok(flechas.length === 0, 'ya no hay flechas ↑ ↓ que tocar cinco veces',
+     'siguen las flechas: ' + flechas.length);
+
+  const asas = lista.querySelectorAll('[data-mvid-asa]');
+  ok(asas.length === 3, 'cada tarjeta lleva su asa para arrastrarla',
+     'faltan asas: ' + asas.length);
+
+  /* Y se dice con palabras. Las flechas ↑ ↓ se explicaban solas; un asa
+     con puntos, no —y lo que se ordena tampoco es evidente: es la fila
+     en que el alumno los ve dentro de la misión—. */
+  const nota = lista.querySelector('.mvid-orden-nota');
+  ok(nota && /alumno/i.test(nota.textContent) && /rrastra/.test(nota.textContent),
+     'y encima se explica qué es el orden y cómo se cambia',
+     'no se explica el orden: un asa con puntos no se descubre sola');
+
+  /* ⚠️ `touch-action: none` es obligatorio: sin él el navegador se queda
+     el gesto para desplazar la página y el arrastre no llega a empezar
+     —justo en la tableta, que es donde se usa esto—. */
+  ok(asas[0] && w.getComputedStyle(asas[0]).touchAction === 'none',
+     'y el asa tiene touch-action:none, sin el cual el dedo desplaza la página en vez de arrastrar',
+     'al asa le falta touch-action:none: en una tableta el arrastre no arrancaría');
+
+  /* Y que se pueda AGARRAR: 44 px es lo que un dedo acierta sin mirar. */
+  const cajaAsa = asas[0] && asas[0].getBoundingClientRect();
+  ok(cajaAsa && cajaAsa.width >= 30 && cajaAsa.height >= 44,
+     'y es una franja alta, no un botón de un milímetro (' +
+       Math.round(cajaAsa.width) + '×' + Math.round(cajaAsa.height) + ' px)',
+     'el asa es demasiado pequeña para el dedo: ' +
+       (cajaAsa ? Math.round(cajaAsa.width) + '×' + Math.round(cajaAsa.height) : 'no está'));
+
+  /* ── Arrastrar el TERCERO hasta arriba, con el dedo ── */
+  const arrastra = (desdeAsa, hastaTarjeta) => {
+    const a = desdeAsa.getBoundingClientRect();
+    const b = hastaTarjeta.getBoundingClientRect();
+    const ev = (t, x, y) => new w.PointerEvent(t, {
+      bubbles: true, cancelable: true, pointerId: 7, pointerType: 'touch',
+      clientX: x, clientY: y
+    });
+    desdeAsa.dispatchEvent(ev('pointerdown', a.left + a.width / 2, a.top + a.height / 2));
+    /* Dos pasos: el primero fuera de la tarjeta de destino y el segundo
+       cruzando su mitad de arriba, que es la línea que decide dónde
+       cae. */
+    desdeAsa.dispatchEvent(ev('pointermove', b.left + b.width / 2, b.top + b.height - 2));
+    desdeAsa.dispatchEvent(ev('pointermove', b.left + b.width / 2, b.top + 2));
+    desdeAsa.dispatchEvent(ev('pointerup', b.left + b.width / 2, b.top + 2));
+  };
+
+  const tarjetas = () => [...lista.querySelectorAll('.mvid-card')];
+  const antesDeArrastrar = tarjetas();
+  antesDeArrastrar[0].scrollIntoView();
+  await esperar(120);
+  arrastra(antesDeArrastrar[2].querySelector('[data-mvid-asa]'), tarjetas()[0]);
+  await esperar(400);
+
+  ok(titulos().join(',') === 'Tercero,Primero,Segundo',
+     'arrastrando el tercero hasta arriba, la lista queda en su orden nuevo',
+     'el arrastre no movió nada: ' + titulos().join(','));
+
+  /* Y que se GUARDE. Enseñar un orden que no está guardado es peor que
+     perder el movimiento: el que lo hizo se va convencido. */
+  const orden = () => base.tablas.metas_videos
+    .filter(v => v.mision === MIS)
+    .sort((a, b) => a.orden - b.orden).map(v => v.titulo).join(',');
+  ok(orden() === 'Tercero,Primero,Segundo',
+     'y el orden nuevo queda guardado en la nube',
+     'la nube se quedó con el orden viejo: ' + orden());
+
+  /* Solo se escriben las filas que cambiaron: cada escritura es un viaje
+     a la nube y esto se usa con la señal de una tableta. */
+  const escrituras = base.llamadas.filter(l =>
+    l.metodo === 'PATCH' && l.cuerpo && 'orden' in l.cuerpo).length;
+  ok(escrituras === 3, 'con una escritura por fila movida y ninguna de más (' + escrituras + ')',
+     'se escribieron ' + escrituras + ' filas: se están reescribiendo las que no cambiaron');
+
+  /* ⚠️ Y AL SOLTAR NO SE REPINTA. Es la lección de la barra de grupos de
+     M.E.T.A.S: repintar justo al soltar le arranca de debajo del dedo el
+     elemento que iba a recibir el toque siguiente. Se comprueba mirando
+     que las tarjetas sigan siendo LOS MISMOS NODOS de antes. */
+  ok(tarjetas().every(n => antesDeArrastrar.indexOf(n) >= 0),
+     'y al soltar no se repinta: la lista no salta de debajo del dedo',
+     'la lista se repintó al soltar; el toque siguiente cae en otra fila');
+
+  /* ── Y con el teclado, que es la otra manera ──
+     El arrastre de precisión en una tableta falla lo bastante como para
+     que una función que solo se pueda usar arrastrando sea una función
+     que a veces no existe. Misma regla que el asa de la repisa. */
+  const asaPrimera = tarjetas()[0].querySelector('[data-mvid-asa]');
+  asaPrimera.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+  await esperar(350);
+  ok(titulos().join(',') === 'Primero,Tercero,Segundo',
+     'y las flechas del teclado mueven un puesto, para el que no acierte arrastrando',
+     'el teclado no mueve: ' + titulos().join(','));
+  ok(orden() === 'Primero,Tercero,Segundo',
+     'y eso también se guarda',
+     'lo del teclado no se guardó: ' + orden());
+
+  /* Y la nota que hay dentro de la lista no cuenta como una tarjeta: la
+     primera fila con «arriba» no puede colarse por encima de ella. */
+  const escrituras0 = base.llamadas.length;
+  tarjetas()[0].querySelector('[data-mvid-asa]')
+    .dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+  await esperar(250);
+  ok(titulos().join(',') === 'Primero,Tercero,Segundo' &&
+     base.llamadas.length === escrituras0,
+     'y la primera con «arriba» no se mueve ni escribe de balde',
+     'la nota del orden se cuenta como una tarjeta: ' + titulos().join(','));
+  f.style.height = altoMarco;
+
   /* ═══ 13. El service worker no puede servir el JS viejo ═══
      Esto no se ve desde el navegador —la sonda corre sin service
      worker—, así que se lee el archivo. Y hace falta: el 28 de agosto

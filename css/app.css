@@ -4497,6 +4497,68 @@ textarea.mvid-in { min-height: 60px; resize: vertical; }
 .mvid-btns { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
 .mvid-btns .mvid-b { font-size: 0.78rem; padding: 0.4rem 0.6rem; min-height: 40px; }
 
+/* ── El asa, para mover la tarjeta con el dedo ──
+   Aquí había dos flechas ↑ ↓ dentro de la barra de botones, y el autor
+   las pidió quitar el 28 de agosto de 2026: con diez videos, poner el
+   sexto en primer lugar eran cinco toques y cinco repintados, y entre
+   toque y toque había que volver a buscar la fila con la vista porque la
+   lista se había movido debajo.
+
+   Es una franja alta de lado a lado del alto de la tarjeta: se agarra
+   sin apuntar —que es como se toca una tableta— y no compite con
+   «Comprobar», «Editar» y «Retirar», que están a un dedo.
+
+   `touch-action: none` es obligatorio: sin él, el navegador se queda el
+   gesto para desplazar la página y el arrastre no llega a empezar. Es la
+   misma línea, por la misma razón, que en el asa de la repisa de
+   enlaces y en el `#lienzo` de los juegos 3D. */
+.mvid-asa {
+  flex: 0 0 auto;
+  align-self: stretch;
+  min-width: 38px;            /* la franja entera es el blanco de toque */
+  padding: 0;
+  /* El borde punteado no es adorno: un asa sin marca se lee como un
+     hueco vacío y nadie prueba a arrastrarla. Las flechas que estaban
+     aquí se explicaban solas; un puñado de puntos, no. */
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 1.35rem;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+}
+.mvid-asa:active { cursor: grabbing; }
+.mvid-asa:focus-visible { outline: 2px solid #b91c1c; outline-offset: 2px; }
+
+/* Y se dice con palabras, encima de la lista: qué significa el orden
+   —lo que ve el alumno— y cómo se cambia. Solo con dos videos o más:
+   con uno, ordenar no quiere decir nada. */
+.mvid-orden-nota {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 0.45rem 0.6rem;
+  margin-bottom: 0.6rem;
+}
+.mvid-orden-nota b { color: var(--text); }
+
+/* Mientras se arrastra, la fila no puede recibir el puntero: es lo que
+   deja que elementFromPoint vea la de DEBAJO, que es como se sabe dónde
+   soltarla. El asa sigue recibiendo eventos igual, porque capturó el
+   puntero en el pointerdown. */
+.mvid-card.mvid-arrastrando { opacity: 0.55; transform: scale(0.98); pointer-events: none; }
+#mvid-list.mvid-moviendo { cursor: grabbing; }
+
 /* ── Comprobar ── */
 .mvid-ver-caja {
   position: relative;

@@ -509,7 +509,114 @@ function mvidRender() {
   }
 
   list.innerHTML = '';
+
+  /* Qué significa el orden y cómo se cambia, escrito. Las flechas ↑ ↓
+     que había antes se explicaban solas; un asa con puntos, no —y lo
+     que se está ordenando tampoco es evidente: es la fila en que el
+     alumno los ve dentro de la misión—. Solo con dos o más: con un
+     video, ordenar no quiere decir nada. */
+  if (videos.length > 1) {
+    const nota = document.createElement('div');
+    nota.className = 'mvid-orden-nota';
+    nota.appendChild(Object.assign(document.createElement('span'), { textContent: '↕️' }));
+    const t = document.createElement('div');
+    t.appendChild(Object.assign(document.createElement('b'),
+      { textContent: 'Este es el orden en que el alumno los ve. ' }));
+    t.appendChild(document.createTextNode('Arrastra el ⠿ de la derecha para cambiarlo.'));
+    nota.appendChild(t);
+    list.appendChild(nota);
+  }
+
   videos.forEach((v, i) => list.appendChild(mvidFila(v, i, videos.length)));
+  mvidMontarArrastre(list);
+}
+
+/* ══════════════ MOVER LOS VIDEOS CON EL DEDO ══════════════
+   Con PUNTEROS y no con el `draggable` del navegador: ese es de ratón y
+   en el navegador de casi ninguna tableta existe —y esta herramienta se
+   usa desde la tableta—. Con `pointerdown` y compañía el mismo código
+   sirve para el dedo, el ratón y el lápiz. Es el mismo aparato que
+   mueve las tarjetas de la repisa de enlaces, y por las mismas razones.
+
+   Durante el arrastre se mueve el NODO en el documento, no la lista:
+   repintar en cada movimiento del dedo destruiría la tarjeta que se
+   está arrastrando. Lo que hay en pantalla se guarda al soltar.
+
+   ⚠️ Y AL SOLTAR NO SE REPINTA. La barra de grupos de M.E.T.A.S ya tiene
+   escrita esta lección: repintar justo al soltar le arranca de debajo
+   del dedo el elemento que iba a recibir el toque siguiente. La lista ya
+   está en el orden bueno; lo único que falta es guardarlo. */
+function mvidMontarArrastre(lista) {
+  if (lista.dataset.mvidArrastre) return;   // los oyentes van una vez
+  lista.dataset.mvidArrastre = '1';
+
+  let nodo = null, idPuntero = null;
+
+  /* Solo las FILAS: dentro de la lista vive también la nota que explica
+     el orden, y contarla como una tarjeta más descolocaría el movimiento
+     con el teclado en un puesto. */
+  const filas = () => [...lista.querySelectorAll(':scope > [data-mvid-id]')];
+  const enOrden = () => filas().map(n => n.getAttribute('data-mvid-id'));
+
+  function soltar() {
+    if (!nodo) return;
+    nodo.classList.remove('mvid-arrastrando');
+    lista.classList.remove('mvid-moviendo');
+    nodo = null; idPuntero = null;
+    mvidGuardarOrden(enOrden());
+  }
+
+  lista.addEventListener('pointerdown', ev => {
+    const asa = ev.target.closest('[data-mvid-asa]');
+    if (!asa) return;
+    const fila = asa.closest('[data-mvid-id]');
+    if (!fila || fila.parentNode !== lista) return;
+    /* Sin esto el navegador empieza a seleccionar texto o a desplazar la
+       página en cuanto el dedo se mueve, y el arrastre no llega a
+       empezar. */
+    ev.preventDefault();
+    nodo = fila; idPuntero = ev.pointerId;
+    nodo.classList.add('mvid-arrastrando');
+    lista.classList.add('mvid-moviendo');
+    try { asa.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+
+  lista.addEventListener('pointermove', ev => {
+    if (!nodo || ev.pointerId !== idPuntero) return;
+    ev.preventDefault();
+    /* La fila que se arrastra tiene `pointer-events: none` por CSS
+       mientras dura, así que esto devuelve la que hay DEBAJO. */
+    const bajo = document.elementFromPoint(ev.clientX, ev.clientY);
+    const destino = bajo && bajo.closest ? bajo.closest('[data-mvid-id]') : null;
+    if (!destino || destino === nodo || destino.parentNode !== lista) return;
+    /* Una columna, así que la mitad que hay que cruzar es la de ARRIBA.
+       (En la repisa se le pregunta a la rejilla cuántas columnas tiene;
+       aquí las filas son de ancho completo siempre.) */
+    const caja = destino.getBoundingClientRect();
+    const antes = ev.clientY < caja.top + caja.height / 2;
+    lista.insertBefore(nodo, antes ? destino : destino.nextSibling);
+  });
+
+  lista.addEventListener('pointerup', soltar);
+  lista.addEventListener('pointercancel', soltar);
+
+  /* El teclado: las flechas mueven un puesto. El foco se queda en el asa
+     de la fila movida para poder encadenar varios saltos. */
+  lista.addEventListener('keydown', ev => {
+    const asa = ev.target.closest ? ev.target.closest('[data-mvid-asa]') : null;
+    if (!asa) return;
+    const dir = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[ev.key];
+    if (!dir) return;
+    ev.preventDefault();
+    const fila = asa.closest('[data-mvid-id]');
+    const hermanas = filas();
+    const i = hermanas.indexOf(fila);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= hermanas.length) return;
+    lista.insertBefore(dir < 0 ? fila : hermanas[j], dir < 0 ? hermanas[j] : fila);
+    asa.focus();
+    mvidGuardarOrden(enOrden());
+  });
 }
 
 /* Una fila. Todo con createElement y textContent: ni una plantilla con
@@ -519,6 +626,10 @@ function mvidFila(v, i, total) {
   const yt = mvidId(v.yt_id);
   const card = document.createElement('div');
   card.className = 'mvid-card';
+  /* La llave con la que el arrastre reconoce esta fila en el documento.
+     Se guarda el id de la fila, no su posición: durante el arrastre el
+     orden cambia bajo los pies. */
+  card.setAttribute('data-mvid-id', String(v.id));
 
   const mini = document.createElement('img');
   mini.className = 'mvid-mini';
@@ -573,20 +684,38 @@ function mvidFila(v, i, total) {
     v.estado === 'publicado' ? '🚫 Retirar' : '✅ Publicar', 'mvid-b mvid-b-pri',
     () => mvidPublicar(v, v.estado === 'publicado' ? 'oculto' : 'publicado')));
 
-  /* Subir y bajar, con botones. El arrastre en una tableta falla lo
-     bastante como para que una función que solo se pueda usar
-     arrastrando sea una función que a veces no existe: es la misma
-     lección del asa de la repisa de enlaces. Con dos o tres videos por
-     misión, dos flechas bastan y no hay que explicarlas. */
-  const arr = mvidBoton('↑', 'mvid-b mvid-b-min', () => mvidMover(v, -1));
-  arr.disabled = i === 0;
-  const aba = mvidBoton('↓', 'mvid-b mvid-b-min', () => mvidMover(v, 1));
-  aba.disabled = i === total - 1;
-  btns.appendChild(arr);
-  btns.appendChild(aba);
-
   cuerpo.appendChild(btns);
   card.appendChild(cuerpo);
+
+  /* ── El asa, para mover la tarjeta con el dedo ──
+     Aquí había dos flechas ↑ ↓, y el autor las pidió quitar el 28 de
+     agosto de 2026: con diez videos en una misión, poner el sexto en
+     primer lugar son cinco toques y cinco repintados, y entre toque y
+     toque hay que volver a buscar la fila con la vista porque la lista
+     se movió debajo. Arrastrar la tarjeta es UN gesto y se ve a dónde
+     va mientras se hace.
+
+     Va al final de la fila y no dentro de la barra de botones a
+     propósito: es una franja alta de lado a lado del alto de la
+     tarjeta, así que se agarra sin apuntar —que es como se toca una
+     tableta— y no compite con «Comprobar», «Editar» y «Retirar», que
+     están a un dedo de distancia.
+
+     Y sigue siendo un BOTÓN de verdad, con las flechas del teclado: el
+     arrastre de precisión en una tableta falla lo bastante como para
+     que una función que solo se pueda usar arrastrando sea una función
+     que a veces no existe. Es la misma lección, y el mismo asa, de la
+     repisa de enlaces. */
+  const asa = document.createElement('button');
+  asa.type = 'button';
+  asa.className = 'mvid-asa';
+  asa.textContent = '⠿';
+  asa.setAttribute('data-mvid-asa', '');
+  asa.setAttribute('aria-label', 'Mover «' + (v.titulo || 'este video') +
+    '» · ' + (i + 1) + ' de ' + total + '. Arrástralo, o usa las flechas.');
+  asa.title = 'Arrástralo para cambiarlo de orden';
+  card.appendChild(asa);
+
   return card;
 }
 
@@ -1224,7 +1353,7 @@ async function mvidGuardar() {
   await initMetasVideos();
 }
 
-/* ── Publicar / retirar / mover ──────────────────────────────────── */
+/* ── Publicar / retirar / ordenar ────────────────────────────────── */
 
 async function mvidPublicar(v, estado) {
   /* Retirar NO borra la fila, y esto es lo que no se puede improvisar:
@@ -1238,19 +1367,41 @@ async function mvidPublicar(v, estado) {
   await initMetasVideos();
 }
 
-async function mvidMover(v, paso) {
-  const lista = mvidDeLaMision();
-  const i = lista.findIndex(x => x.id === v.id);
-  const j = i + paso;
-  if (i < 0 || j < 0 || j >= lista.length) return;
-  const otro = lista[j];
-  /* Se intercambian los dos órdenes. Reescribir la lista entera sería
-     una escritura por video y, a media conexión, dejaría el orden a
-     medias: dos filas es lo mínimo que puede quedar mal. */
-  const a = await _sb.from(MVID_TABLE).update({ orden: otro.orden }).eq('id', v.id);
-  const b = await _sb.from(MVID_TABLE).update({ orden: v.orden }).eq('id', otro.id);
-  if (a.error || b.error) { alert('No se pudo mover.'); }
-  await initMetasVideos();
+/* Guardar el orden que quedó en pantalla.
+
+   Se numera 1, 2, 3… y SOLO se escriben las filas cuyo número cambió:
+   arrastrar una tarjeta tres puestos mueve cuatro filas, no las diez.
+   Cada escritura es un viaje a la nube y esto se usa con la señal de una
+   tableta.
+
+   Y la caché se actualiza a mano en vez de volver a traer la lista: un
+   `initMetasVideos()` aquí repintaría la pantalla justo cuando el dedo
+   acaba de soltar, que es la lección de la barra de grupos de M.E.T.A.S
+   —el elemento que iba a recibir el toque siguiente se va de debajo del
+   dedo—. Lo que hay en pantalla ya es lo correcto. */
+async function mvidGuardarOrden(ids) {
+  const cambios = [];
+  ids.forEach((id, i) => {
+    const fila = _mvidCache.find(v => String(v.id) === String(id));
+    if (!fila) return;
+    const nuevo = i + 1;
+    if (fila.orden !== nuevo) { fila.orden = nuevo; cambios.push({ id: fila.id, orden: nuevo }); }
+  });
+  if (!cambios.length) return;
+
+  const res = await Promise.all(cambios.map(c =>
+    _sb.from(MVID_TABLE).update({ orden: c.orden }).eq('id', c.id)));
+
+  /* Si alguna no entró, el orden de la nube y el de la pantalla dejan de
+     coincidir. Se dice y se vuelve a traer: enseñar un orden guardado
+     que no lo está es peor que perder el movimiento, porque el que lo
+     hizo se va convencido. */
+  if (res.some(r => r.error)) {
+    alert('No se pudo guardar el orden. Se vuelve a traer el de la nube.');
+    await initMetasVideos();
+    return;
+  }
+  if (typeof toast === 'function') toast('↕️ Orden guardado');
 }
 
 /* ── 📋 Al catálogo del repositorio ──────────────────────────────

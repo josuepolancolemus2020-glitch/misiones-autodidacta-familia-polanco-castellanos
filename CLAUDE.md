@@ -195,6 +195,34 @@ cumplir la seguridad por fila.
 8. **El `vid` nace en el aparato, no en la base.** El guardado se
    reintenta y sin un identificador propio el segundo intento dejaría un
    gemelo; y es la llave con la que la nube pisa al catálogo.
+
+   ⚠️ **El orden se cambia ARRASTRANDO la tarjeta, no con flechas.**
+   Pedido por el autor el 28 de agosto de 2026. Había dos flechas ↑ ↓ en
+   cada fila y con diez videos en una misión poner el sexto en primer
+   lugar eran **cinco toques y cinco repintados**, con la fila
+   moviéndose bajo la vista entre uno y otro. Ahora es un gesto y se ve
+   a dónde va mientras se hace.
+
+   Con PUNTEROS, nunca con el `draggable` del navegador: ese es de ratón
+   y en el navegador de casi ninguna tableta existe —y esto se usa desde
+   la tableta—. Es el mismo aparato que mueve las tarjetas de la repisa
+   de enlaces, con las mismas cuatro reglas:
+
+   - **el asa sigue siendo un botón, y las flechas del teclado la
+     mueven**: el arrastre de precisión en una tableta falla lo bastante
+     como para que una función que solo se pueda usar arrastrando sea
+     una función que a veces no existe;
+   - **`touch-action: none` en el asa**, sin el cual el navegador se
+     queda el gesto para desplazar la página y el arrastre no arranca;
+   - **al soltar NO se repinta** (es la lección de la barra de grupos de
+     M.E.T.A.S: repintar le arranca de debajo del dedo el elemento que
+     iba a recibir el toque siguiente). Se numera 1, 2, 3… y **solo se
+     escriben las filas cuyo número cambió**: cada escritura es un viaje
+     a la nube y la señal es la de una tableta;
+   - **se explica con palabras encima de la lista.** Las flechas se
+     explicaban solas; un asa con puntos, no —y lo que se ordena tampoco
+     es evidente: es la fila en que el alumno los ve dentro de la
+     misión—.
 9. **Las misiones se buscan por MATERIA, no en una lista plana.** Hoy son
    66 en 8 materias y siguen entrando: un desplegable plano son varios
    metros de barrido en una tableta. Van chips de materia con su cuenta
@@ -274,6 +302,16 @@ cumplir la seguridad por fila.
 node _dev/servidor-estatico.js      (en otra terminal)
 _dev/probe-videos-metas.html        (en el navegador)
 ```
+
+La comprobación **14** mueve una tarjeta **con eventos de puntero de
+verdad**, no llamando por dentro a la función: lo que puede fallar ahí es
+de pantalla —un asa que el dedo no alcanza, un `touch-action` que le
+regala el gesto al desplazamiento, una fila que tapa a la de debajo—, y
+nada de eso se ve llamando funciones. Es la misma lección que la sonda de
+la barra de grupos de M.E.T.A.S. Para medir, abre la vista de verdad
+(`switchView`) y enseña `#app-container`: con el panel escondido las
+tarjetas miden 0×0 y la sonda aprobaría un arrastre que en la tableta no
+funciona.
 
 Y el SQL, contra un PostgreSQL de verdad, que es donde se ve si el
 `check` muerde:
