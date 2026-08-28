@@ -83,8 +83,11 @@ function nuevaBase(w, opciones){
        la sonda corre sin internet. */
     if (/misiones\.js$/.test(u.pathname)) {
       return new Response(
-        'const MISSIONS=[{id:23,title:"Las Fracciones",url:"misiones/2y3ciclo-fracciones/fracciones.html"},' +
-        '{id:62,title:"Multiplicación y División de Fracciones",url:"misiones/2ciclo-fracciones-multiplicar-dividir/f.html"}];',
+        'const MISSIONS=[' +
+        '{id:23,title:"Las Fracciones",subject:"matemáticas",icon:"🍕",grade:"II y III Ciclo",url:"misiones/2y3ciclo-fracciones/fracciones.html"},' +
+        '{id:62,title:"Multiplicación y División",subject:"matemáticas",icon:"🍕",grade:"6º grado",url:"misiones/2ciclo-fracciones-multiplicar-dividir/f.html"},' +
+        '{id:1,title:"Los Adjetivos",subject:"español",icon:"📝",grade:"II y III Ciclo",url:"misiones/2y3ciclo-adjetivos/a.html"},' +
+        '{id:9,title:"La Célula",subject:"naturales",icon:"🔬",grade:"III Ciclo",url:"misiones/2y3ciclo-la-celula/c.html"}];',
         { status: 200, headers: { 'Content-Type': 'application/javascript' } });
     }
     if (!u.pathname.startsWith('/rest/v1/')) return new Response('{}', { status: 200 });
@@ -332,6 +335,110 @@ function nuevaBase(w, opciones){
   ok(/cat[áa]logo/i.test(t2),
      'y deja claro que mientras tanto las misiones siguen funcionando con su catálogo',
      'no dice que las misiones siguen funcionando: parece que todo está roto');
+
+  /* ═══ 9. Las misiones, organizadas por materia ═══ */
+  log('');
+  log('── 9. Con 66 misiones, se busca por materia ──');
+  await w.eval('initMetasVideos()');
+  await esperar(500);
+  const chips = [...w.document.querySelectorAll('#mvid-chips .mvid-chip-f')].map(b => b.textContent);
+  ok(chips.length >= 4, 'hay un chip por materia, sacado del catálogo',
+     'no se pintaron los chips de materia: ' + chips.length);
+  ok(chips.some(c => /Matemáticas/.test(c)) && chips.some(c => /Español/.test(c)),
+     'y las materias salen con su nombre e icono',
+     'las materias no salen bien: ' + chips.join(' | '));
+  ok(chips[0] && /Todas/.test(chips[0]), 'con «Todas» primero para volver atrás',
+     'falta el chip de «Todas»');
+  ok(chips.some(c => /·\s*2/.test(c)), 'y cada chip lleva su cuenta de misiones',
+     'los chips no llevan la cuenta');
+
+  const grupos = [...g('mvid-mision').querySelectorAll('optgroup')].map(o => o.label);
+  ok(grupos.length >= 3, 'el desplegable va agrupado por materia (optgroup)',
+     'el desplegable sigue siendo una lista plana: ' + grupos.length + ' grupos');
+
+  /* Filtrar por materia deja solo las suyas.
+
+     ⚠️ Se suelta la misión elegida ANTES de medir, y no es un apaño:
+     cuando hay una elegida, el desplegable la conserva a propósito con
+     su etiqueta «(fuera del filtro)» —si no, diría una cosa y la lista
+     de abajo enseñaría otra—. Medir el filtro con una elegida cuenta
+     esa opción de escape como si fuera un fallo del filtro. Lo que se
+     está probando aquí es el filtro; que la elegida no se pierda tiene
+     su propia comprobación, más abajo. */
+  w.eval('_mvidMision = ""; _mvidMateria = "español"; mvidPintarSelector()');
+  await esperar(200);
+  const soloEsp = [...g('mvid-mision').querySelectorAll('option')].map(o => o.value).filter(Boolean);
+  ok(soloEsp.length === 1 && soloEsp[0].indexOf('adjetivos') >= 0,
+     'tocar una materia deja solo sus misiones',
+     'el filtro de materia no estrecha la lista: ' + soloEsp.join(','));
+
+  /* El buscador mira título, carpeta, materia Y grado */
+  w.eval('_mvidMision = ""; _mvidMateria = ""; _mvidBusca = "sexto"; mvidPintarSelector()');
+  await esperar(200);
+  let hallado = [...g('mvid-mision').querySelectorAll('option')].map(o => o.value).filter(Boolean);
+  ok(hallado.length === 1, 'el buscador encuentra por GRADO («sexto» → 6º grado)',
+     'buscar por grado no encontró lo suyo: ' + hallado.join(','));
+  w.eval('_mvidMision = ""; _mvidBusca = "célula"; mvidPintarSelector()');
+  await esperar(200);
+  hallado = [...g('mvid-mision').querySelectorAll('option')].map(o => o.value).filter(Boolean);
+  ok(hallado.length === 1 && hallado[0].indexOf('celula') >= 0,
+     'y por título, aunque no se sepa en qué materia cayó',
+     'buscar por título falló: ' + hallado.join(','));
+  w.eval('_mvidBusca = ""; mvidPintarSelector()');
+
+  /* La misión elegida no se pierde al filtrar */
+  w.eval('_mvidMision = "2y3ciclo-fracciones"; _mvidMateria = "naturales"; mvidPintarSelector()');
+  await esperar(200);
+  ok(g('mvid-mision').value === '2y3ciclo-fracciones',
+     'y la misión elegida NO se pierde al cambiar de materia',
+     'el filtro dejó el desplegable diciendo una cosa y la lista otra');
+  w.eval('_mvidMateria = ""; _mvidMision = "2y3ciclo-fracciones"; mvidPintarSelector(); mvidRender()');
+
+  /* ═══ 10. El quiz del propio video ═══ */
+  log('');
+  log('── 10. El quiz del propio video ──');
+  await w.eval('mvidAbrirForm(null)');
+  await esperar(200);
+  ok(!!g('mvid-f-preguntas'), 'el formulario tiene su sitio para preguntas',
+     'no hay dónde escribir preguntas');
+  ok(w.document.querySelectorAll('.mvid-preg .mvid-preg-opt').length === 3,
+     'con tres opciones por pregunta',
+     'las opciones no salen');
+  ok(w.document.querySelectorAll('.mvid-preg input[type=radio]').length === 3,
+     'y el círculo de la correcta PEGADO a cada opción',
+     'la correcta se elige en otro sitio, no junto a su opción');
+
+  /* Una pregunta a medias NO se guarda, y se avisa */
+  g('mvid-f-enlace').value = 'https://youtu.be/' + ID;
+  g('mvid-f-titulo').value = 'Con quiz';
+  w.document.querySelector('.mvid-preg .mvid-preg-txt').value = '¿Cuál es el denominador?';
+  await w.eval('mvidGuardar()');
+  await esperar(300);
+  ok(/al menos dos opciones/i.test(g('mvid-f-aviso').textContent),
+     'una pregunta sin opciones NO se guarda en silencio: se dice',
+     'se guardó una pregunta que el alumno no podría contestar');
+
+  /* Ahora bien escrita */
+  const opts = w.document.querySelectorAll('.mvid-preg .mvid-preg-opt');
+  opts[0].value = 'El de abajo';
+  opts[1].value = 'El de arriba';
+  await w.eval('mvidGuardar()');
+  await esperar(400);
+  const conQuiz = base.tablas.metas_videos.find(v => v.titulo === 'Con quiz');
+  ok(conQuiz && Array.isArray(conQuiz.preguntas) && conQuiz.preguntas.length === 1,
+     'la pregunta completa sí se guarda',
+     'la pregunta buena no se guardó');
+  if (conQuiz && conQuiz.preguntas[0]) {
+    const q = conQuiz.preguntas[0];
+    ok(q.ops.length === 2, 'con solo las opciones escritas, sin las vacías',
+       'se guardaron opciones vacías: ' + JSON.stringify(q.ops));
+    ok(q.ok === 0 && q.ops[q.ok] === 'El de abajo',
+       'y `ok` es el ÍNDICE de la correcta, apuntando a la que se marcó',
+       'la correcta quedó mal: ok=' + q.ok + ' ops=' + JSON.stringify(q.ops));
+    ok(typeof q.ok === 'number',
+       'un número, nunca el texto: corregirle una tilde a la opción no puede dejar la pregunta sin respuesta',
+       '`ok` no es un número');
+  }
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);

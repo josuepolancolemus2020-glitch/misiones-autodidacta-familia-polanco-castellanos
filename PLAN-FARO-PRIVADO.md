@@ -110,6 +110,16 @@ Zone → Make private.
      `javascript:` en la dirección TIENE que fallar.
    · ⚠️ **Correr `supabase/sql/metas_videos.sql`** en el SQL Editor. Es un solo
      archivo y no depende de ningún otro salvo de `es_familia()`, que ya está.
+     ⚠️ **SI YA SE CORRIÓ, HAY QUE VOLVER A CORRERLO** (28 de agosto de 2026
+     por la tarde): creció con la columna `preguntas` —el quiz del propio
+     video— y con la puerta pública devolviéndola. La columna entra con
+     `add column if not exists`, así que **no se borra ni un video**;
+     está probado contra un PostgreSQL de verdad, re-corriendo encima de
+     la versión vieja con `--single-transaction`. Y lleva un
+     `drop function` delante que no se puede saltar: PostgreSQL no deja
+     cambiarle el tipo devuelto a una función con `create or replace`, y
+     como el editor corre todo el pegado en una transacción, ese error
+     deshace el archivo entero y el mensaje habla de otra cosa.
      Crea la tabla de los **videos de las misiones de M.E.T.A.S**: los que el
      alumno ve dentro de la misión, en su pestaña 🎬 Videos. Pedido por el autor
      el 28 de agosto de 2026, estrenado en «Las Fracciones».

@@ -195,6 +195,22 @@ cumplir la seguridad por fila.
 8. **El `vid` nace en el aparato, no en la base.** El guardado se
    reintenta y sin un identificador propio el segundo intento dejaría un
    gemelo; y es la llave con la que la nube pisa al catálogo.
+9. **Las misiones se buscan por MATERIA, no en una lista plana.** Hoy son
+   66 en 8 materias y siguen entrando: un desplegable plano son varios
+   metros de barrido en una tableta. Van chips de materia con su cuenta
+   —y un punto verde con cuántas ya tienen video, que es lo que enseña
+   por dónde va el trabajo—, buscador, y el desplegable agrupado con
+   `optgroup`. Las materias salen del catálogo, nunca de una lista
+   escrita aquí. **El buscador entiende «sexto» además de «6º»**: en un
+   teclado de tableta el símbolo de ordinal está escondido, y obligar a
+   escribirlo es cerrarle el buscador a quien lo va a usar.
+10. **El quiz del propio video.** Hasta tres preguntas por video, con sus
+   opciones y el círculo de la correcta PEGADO a cada una —un
+   desplegable aparte de «cuál es la buena» se rellena mirando arriba y
+   abajo, y ahí es donde se marca la que no era—. `ok` es el ÍNDICE,
+   nunca el texto. Una pregunta a medias **no se guarda en silencio**: la
+   pantalla lo dice, porque guardar lo que se acaba de tirar es la forma
+   más rápida de que alguien crea que puso un quiz y no lo puso.
 
 **Antes de publicar un cambio de los videos:**
 

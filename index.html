@@ -1055,6 +1055,17 @@
         </div>
       </div>
 
+      <!-- Con 66 misiones en 8 materias, un desplegable plano son varios
+           metros de barrido en una tableta. Se filtra primero por materia
+           —que es como se piensa en ellas— y el punto verde de cada chip
+           dice cuántas de esa materia ya tienen video. -->
+      <label class="mvid-lbl">Materia</label>
+      <div class="mvid-chips" id="mvid-chips"></div>
+
+      <label class="mvid-lbl" for="mvid-buscar">Buscar</label>
+      <input type="search" id="mvid-buscar" class="mvid-in"
+             placeholder="fracciones, sexto, robots…" autocomplete="off">
+
       <label class="mvid-lbl" for="mvid-mision">Misión</label>
       <select id="mvid-mision" class="mvid-sel"></select>
 
@@ -1132,6 +1143,16 @@
             <input type="number" id="mvid-f-fin" class="mvid-in" min="0" max="86400" placeholder="final">
           </div>
         </div>
+
+        <!-- El quiz del propio video. Al terminar, en vez de saltar al
+             Quiz de la misión —que pregunta por el tema entero y se lleva
+             al alumno de la sección—, salen estas preguntas sobre lo que
+             acaba de ver. Son opcionales. -->
+        <p class="mvid-ayuda" style="margin-top:1rem;"><strong>🧠 Preguntas sobre este video</strong> (opcional).
+          Salen al terminarlo, en vez de mandarlo al Quiz de la misión.
+          Marca el círculo de la respuesta correcta.</p>
+        <div id="mvid-f-preguntas"></div>
+        <button type="button" class="mvid-b" id="mvid-f-preg-mas">➕ Otra pregunta</button>
 
         <button type="button" class="mvid-b mvid-b-pri mvid-b-ancho" id="mvid-f-guardar">Guardar</button>
         <p class="mvid-ayuda">Se guarda <strong>sin publicar</strong>. Míralo con 👁 Comprobar

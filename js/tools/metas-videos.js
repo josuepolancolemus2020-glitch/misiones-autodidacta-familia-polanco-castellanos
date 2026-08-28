@@ -49,6 +49,26 @@ let _mvidHay = true;        // ¿ya se corrió el SQL en esta base?
 let _mvidMision = '';       // la misión que se está mirando
 let _mvidMisiones = [];     // [{clave, titulo}] del catálogo de M.E.T.A.S
 let _mvidEditando = null;   // la fila abierta en el formulario
+let _mvidMateria = '';      // '' = todas las materias
+let _mvidBusca = '';        // lo escrito en el buscador
+
+/* Las materias del catálogo de M.E.T.A.S, con su icono. NO es la lista
+   de las que existen —eso lo dice el catálogo— sino cómo se pintan las
+   que salgan. Una materia nueva sale igual, con su nombre tal cual y
+   sin icono: es preferible una fila sin adorno a una misión escondida. */
+const MVID_MATERIAS = {
+  'matemáticas':  { ic: '🔢', n: 'Matemáticas' },
+  'español':      { ic: '📝', n: 'Español' },
+  'naturales':    { ic: '🌱', n: 'Ciencias Naturales' },
+  'sociales':     { ic: '🌎', n: 'Ciencias Sociales' },
+  'programación': { ic: '💻', n: 'Programación' },
+  'robótica':     { ic: '🤖', n: 'Robótica' },
+  'inglés':       { ic: '🌐', n: 'Inglés' },
+  'repaso':       { ic: '🎯', n: 'Repaso General' },
+};
+function mvidMateria(k) {
+  return MVID_MATERIAS[k] || { ic: '📚', n: k || 'Sin materia' };
+}
 
 const MVID_ESTADOS = {
   borrador:  { label: '📝 Sin publicar', cls: 'mvid-est-bor' },
@@ -177,7 +197,17 @@ async function mvidCargarMisiones() {
          carpeta, que es la clave con la que se guardan los videos y la
          misma que usan las Sugerencias. */
       const p = String(m.url || '').split('/');
-      return { clave: p.length > 1 ? p[1] : '', titulo: String(m.title || '') };
+      return {
+        clave: p.length > 1 ? p[1] : '',
+        titulo: String(m.title || ''),
+        /* La materia y el grado vienen del catálogo por lo mismo que
+           los títulos: hoy son 66 misiones en 8 materias y siguen
+           entrando. Una lista escrita aquí estaría equivocada la semana
+           que viene. */
+        materia: String(m.subject || ''),
+        icono: String(m.icon || ''),
+        grado: String(m.grade || '')
+      };
     }).filter(x => x.clave);
     if (lista.length) {
       _mvidMisiones = lista;
@@ -199,7 +229,6 @@ async function initMetasVideos() {
 
   list.innerHTML = '<div class="fin-empty">Abriendo…</div>';
   await mvidCargarMisiones();
-  mvidPintarSelector();
 
   /* Mientras no se haya corrido metas_videos.sql la tabla no existe.
      En vez de reventar, se dice qué falta: el que abre esto desde la
@@ -223,35 +252,168 @@ async function initMetasVideos() {
         <p>Mientras tanto, la sección 🎬 Videos de las misiones funciona igual
            con los que estén escritos en el catálogo del repositorio.</p>
       </div>`;
+    mvidPintarChips();
+    mvidPintarSelector();
     return;
   }
 
   _mvidHay = true;
   _mvidCache = data || [];
   if (!_mvidMision && _mvidCache.length) _mvidMision = _mvidCache[0].mision;
+  /* Los chips y el desplegable se pintan DESPUÉS de tener los videos:
+     los dos enseñan cuántos hay por misión, y con la lista vacía
+     dirían que no hay ninguno en ningún sitio. */
+  mvidPintarChips();
+  mvidPintarSelector();
   mvidRender();
 }
 
 /* ── El selector de misión ───────────────────────────────────────── */
 
+/* Cuántos videos tiene cada misión, sacado de lo que ya está cargado.
+   Es lo que convierte una lista de 66 nombres en una lista donde se ve
+   de un vistazo dónde falta trabajo. */
+function mvidCuentaPorMision() {
+  const n = {};
+  _mvidCache.forEach(v => { n[v.mision] = (n[v.mision] || 0) + 1; });
+  return n;
+}
+
+/* ── Los chips de materia ──
+   Con 66 misiones y subiendo, un desplegable plano es varios metros de
+   barrido en una tableta. Se filtra primero por materia —que es como el
+   administrador piensa en ellas— y después se elige.
+
+   Las materias salen del CATÁLOGO, no de una lista escrita aquí: es la
+   misma regla que ya rige los títulos. El chip lleva su cuenta de
+   misiones para que se vea el tamaño de cada una antes de tocarla. */
+function mvidPintarChips() {
+  const cont = document.getElementById('mvid-chips');
+  if (!cont) return;
+  cont.innerHTML = '';
+
+  const conVideo = mvidCuentaPorMision();
+  const porMateria = {};
+  _mvidMisiones.forEach(m => {
+    if (!porMateria[m.materia]) porMateria[m.materia] = { n: 0, videos: 0 };
+    porMateria[m.materia].n++;
+    if (conVideo[m.clave]) porMateria[m.materia].videos++;
+  });
+
+  const chip = (clave, texto, activo) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mvid-chip-f' + (activo ? ' mvid-chip-on' : '');
+    b.textContent = texto;
+    b.addEventListener('click', () => {
+      _mvidMateria = clave;
+      mvidPintarChips();
+      mvidPintarSelector();
+      mvidRender();
+    });
+    return b;
+  };
+
+  cont.appendChild(chip('', 'Todas · ' + _mvidMisiones.length, _mvidMateria === ''));
+  Object.keys(porMateria).sort((a, b) => porMateria[b].n - porMateria[a].n).forEach(k => {
+    const m = mvidMateria(k);
+    /* El punto verde dice cuántas de esa materia YA tienen video. Sin
+       él hay que abrir materia por materia para saber por dónde se va. */
+    const marca = porMateria[k].videos ? '  ●' + porMateria[k].videos : '';
+    cont.appendChild(chip(k, m.ic + ' ' + m.n + ' · ' + porMateria[k].n + marca, _mvidMateria === k));
+  });
+}
+
+/* Los grados se escriben con cifra en el catálogo («6º grado») y se
+   dicen con letra («sexto»). Quien busca teclea lo que dice.
+
+   Esto salió de la sonda: la comprobación afirmaba que buscar «sexto»
+   encontraba 6º y no era verdad —la afirmación estaba mal, y el
+   arreglo honesto era que fuera verdad, no bajar la comprobación—. En
+   una herramienta en español, obligar a escribir «6º» (con el símbolo
+   de ordinal, que en un teclado de tableta está escondido) es cerrarle
+   el buscador a quien lo va a usar.
+
+   Va en los dos sentidos: quien escriba «6» encuentra sexto, y quien
+   escriba «sexto» encuentra 6º. */
+const MVID_ORDINALES = {
+  primero: '1', primer: '1', segundo: '2', tercero: '3', tercer: '3',
+  cuarto: '4', quinto: '5', sexto: '6', septimo: '7', 'séptimo': '7',
+  octavo: '8', noveno: '9'
+};
+
+/* Sin tildes y en minúsculas, para que «séptimo» y «septimo» busquen
+   igual: en una tableta la tilde se escapa la mitad de las veces. */
+function mvidSinTildes(t) {
+  return String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+/* Las misiones que pasan el filtro de materia y el buscador. El
+   buscador mira título, carpeta, materia Y grado: quien busca «sexto»
+   o «fracciones» tiene que encontrarla sin saber en qué materia cayó.
+   Es la misma regla del buscador del mapa de rutas de F.A.R.O. */
+function mvidMisionesFiltradas() {
+  const q = mvidSinTildes(_mvidBusca.trim());
+  /* «sexto» busca también por «6». Se añade como término alternativo en
+     vez de reemplazar: así «sexto grado» sigue encontrando lo que trae
+     la palabra «grado» escrita. */
+  const alt = MVID_ORDINALES[q] || '';
+  return _mvidMisiones.filter(m => {
+    if (_mvidMateria && m.materia !== _mvidMateria) return false;
+    if (!q) return true;
+    const heno = mvidSinTildes(m.titulo + ' ' + m.clave + ' ' + m.materia + ' ' + m.grado);
+    return heno.includes(q) || (alt && heno.includes(alt));
+  });
+}
+
 function mvidPintarSelector() {
   const sel = document.getElementById('mvid-mision');
   if (!sel) return;
   sel.innerHTML = '';
+
   const vacio = document.createElement('option');
   vacio.value = '';
-  vacio.textContent = _mvidMisiones.length
-    ? '— Elige la misión —'
-    : '— Sin catálogo: escríbela abajo —';
+  const lista = mvidMisionesFiltradas();
+  vacio.textContent = !_mvidMisiones.length
+    ? '— Sin catálogo: escribe la carpeta abajo —'
+    : (lista.length ? '— Elige la misión (' + lista.length + ') —' : '— Ninguna con ese nombre —');
   sel.appendChild(vacio);
-  _mvidMisiones.forEach(m => {
-    const o = document.createElement('option');
-    o.value = m.clave;
-    /* textContent, no innerHTML: el título sale de un archivo traído
-       por la red. */
-    o.textContent = m.titulo + '  ·  ' + m.clave;
-    sel.appendChild(o);
+
+  /* Agrupadas por materia con <optgroup>: el desplegable nativo del
+     teléfono las enseña con su encabezado y ya no es una lista plana de
+     sesenta y seis. */
+  const conVideo = mvidCuentaPorMision();
+  const grupos = {};
+  lista.forEach(m => { (grupos[m.materia] = grupos[m.materia] || []).push(m); });
+
+  Object.keys(grupos).sort().forEach(k => {
+    const mat = mvidMateria(k);
+    const g = document.createElement('optgroup');
+    g.label = mat.ic + ' ' + mat.n;
+    grupos[k]
+      .sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'))
+      .forEach(m => {
+        const o = document.createElement('option');
+        o.value = m.clave;
+        const n = conVideo[m.clave] || 0;
+        /* textContent, no innerHTML: el título sale de un archivo
+           traído por la red. */
+        o.textContent = (n ? '● ' : '○ ') + m.titulo + (n ? '  ·  ' + n + ' video' + (n === 1 ? '' : 's') : '');
+        g.appendChild(o);
+      });
+    sel.appendChild(g);
   });
+
+  /* La misión elegida puede haberse quedado fuera del filtro. Se le
+     añade su propia opción en vez de perderla en silencio: si no, el
+     desplegable diría una cosa y la lista de abajo enseñaría otra. */
+  if (_mvidMision && !lista.some(m => m.clave === _mvidMision)) {
+    const suelta = document.createElement('option');
+    suelta.value = _mvidMision;
+    const yo = _mvidMisiones.find(m => m.clave === _mvidMision);
+    suelta.textContent = (yo ? yo.titulo : _mvidMision) + '  (fuera del filtro)';
+    sel.appendChild(suelta);
+  }
   sel.value = _mvidMision || '';
 }
 
@@ -338,6 +500,11 @@ function mvidFila(v, i, total) {
   if (v.ini || v.fin) {
     meta.appendChild(mvidChip('✂️ ' + mvidReloj(v.ini) + ' → ' + (v.fin ? mvidReloj(v.fin) : 'final')));
   }
+  /* Cuántas preguntas trae, a la vista en la lista. Sin esto hay que
+     abrir el formulario de cada video para saber cuáles ya tienen quiz
+     y cuáles no, que es justo el paso donde se deja de poner. */
+  const nPreg = Array.isArray(v.preguntas) ? v.preguntas.length : 0;
+  meta.appendChild(mvidChip(nPreg ? '🧠 ' + nPreg + ' pregunta' + (nPreg === 1 ? '' : 's') : '🧠 sin quiz'));
   cuerpo.appendChild(meta);
 
   if (v.nota) {
@@ -431,6 +598,128 @@ function mvidCerrarVer() {
   if (ov) ov.style.display = 'none';
 }
 
+/* ── EL QUIZ DEL PROPIO VIDEO ─────────────────────────────────────
+   Al terminar un video, la primera versión mandaba al alumno al Quiz de
+   la misión. Eso es un salto raro: el Quiz pregunta por el tema entero
+   y no por lo que acaba de ver, y además se lo lleva de la sección sin
+   comprobar nada.
+
+   Estas preguntas son SOBRE ESE VIDEO y las escribe quien lo eligió,
+   que es el único que sabe qué dice. Son opcionales: un video sin
+   preguntas sigue funcionando, y la tapa del final ofrece lo de siempre.
+
+   TRES REGLAS:
+   1. `ok` es el ÍNDICE de la correcta, nunca su texto. Si fuera el
+      texto, corregirle una tilde a la opción dejaría la pregunta sin
+      respuesta buena y nadie se enteraría hasta que un niño la fallara.
+   2. Una pregunta a medias NO se guarda. Sin texto, o con menos de dos
+      opciones, es una pregunta que el alumno no puede contestar; se
+      descarta al guardar y la pantalla lo dice.
+   3. El tope son tres. Al acabar un video de cinco minutos, tres
+      preguntas se contestan; ocho se abandonan, y una comprobación
+      abandonada no comprueba nada. */
+const MVID_MAX_PREG = 3;
+const MVID_MAX_OPS = 3;
+
+function mvidPintarPreguntas(preguntas) {
+  const caja = document.getElementById('mvid-f-preguntas');
+  if (!caja) return;
+  caja.innerHTML = '';
+
+  const lista = Array.isArray(preguntas) ? preguntas.slice(0, MVID_MAX_PREG) : [];
+  if (!lista.length) lista.push({ p: '', ops: [], ok: 0 });
+
+  lista.forEach((q, i) => {
+    const bloque = document.createElement('div');
+    bloque.className = 'mvid-preg';
+
+    const cab = document.createElement('div');
+    cab.className = 'mvid-preg-cab';
+    cab.appendChild(Object.assign(document.createElement('span'),
+      { className: 'mvid-preg-n', textContent: 'Pregunta ' + (i + 1) }));
+    if (lista.length > 1) {
+      const quita = document.createElement('button');
+      quita.type = 'button';
+      quita.className = 'mvid-b mvid-b-min';
+      quita.textContent = '✕';
+      quita.setAttribute('aria-label', 'Quitar la pregunta ' + (i + 1));
+      quita.addEventListener('click', () => {
+        const ahora = mvidLeerPreguntas(true);
+        ahora.splice(i, 1);
+        mvidPintarPreguntas(ahora);
+      });
+      cab.appendChild(quita);
+    }
+    bloque.appendChild(cab);
+
+    const texto = document.createElement('input');
+    texto.type = 'text';
+    texto.className = 'mvid-in mvid-preg-txt';
+    texto.maxLength = 200;
+    texto.placeholder = '¿Qué explicó el video?';
+    texto.value = String(q.p || '');
+    bloque.appendChild(texto);
+
+    /* El radio dice cuál es la correcta, y va PEGADO a su opción. Un
+       desplegable aparte de «cuál es la buena» se rellena mirando arriba
+       y abajo, y ahí es donde se marca la que no era. */
+    const ops = Array.isArray(q.ops) ? q.ops : [];
+    for (let j = 0; j < MVID_MAX_OPS; j++) {
+      const fila = document.createElement('label');
+      fila.className = 'mvid-preg-op';
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'mvid-ok-' + i;
+      radio.value = String(j);
+      radio.checked = (Number(q.ok) || 0) === j;
+      fila.appendChild(radio);
+
+      const campo = document.createElement('input');
+      campo.type = 'text';
+      campo.className = 'mvid-in mvid-preg-opt';
+      campo.maxLength = 120;
+      campo.placeholder = j === 0 ? 'La respuesta correcta' : 'Otra opción';
+      campo.value = String(ops[j] || '');
+      fila.appendChild(campo);
+
+      bloque.appendChild(fila);
+    }
+    caja.appendChild(bloque);
+  });
+
+  const pie = document.getElementById('mvid-f-preg-mas');
+  if (pie) pie.style.display = lista.length >= MVID_MAX_PREG ? 'none' : '';
+}
+
+/* Lee lo escrito. Con `crudo` devuelve TODO tal cual (lo usa el botón
+   de quitar, que tiene que conservar lo que hay a medio escribir);
+   sin él, solo las preguntas que de verdad se pueden contestar. */
+function mvidLeerPreguntas(crudo) {
+  const caja = document.getElementById('mvid-f-preguntas');
+  if (!caja) return [];
+  const salida = [];
+  caja.querySelectorAll('.mvid-preg').forEach(bloque => {
+    const p = bloque.querySelector('.mvid-preg-txt').value.trim().slice(0, 200);
+    const ops = [...bloque.querySelectorAll('.mvid-preg-opt')].map(i => i.value.trim().slice(0, 120));
+    const marcado = bloque.querySelector('input[type=radio]:checked');
+    const ok = marcado ? Number(marcado.value) : 0;
+    if (crudo) { salida.push({ p, ops, ok }); return; }
+
+    /* Solo lo que un alumno puede contestar. Se quitan las opciones
+       vacías del final, pero el índice de la correcta se recalcula
+       ANTES de recortarlas: si no, quitar una opción de en medio
+       movería la respuesta buena a otra fila sin avisar. */
+    const buena = ops[ok];
+    const limpias = ops.filter(o => o !== '');
+    if (!p || limpias.length < 2) return;
+    const okLimpio = limpias.indexOf(buena);
+    if (okLimpio < 0) return;          // la marcada estaba vacía
+    salida.push({ p, ops: limpias, ok: okLimpio });
+  });
+  return salida.slice(0, MVID_MAX_PREG);
+}
+
 /* ── El formulario ───────────────────────────────────────────────── */
 
 function mvidAbrirForm(v) {
@@ -445,6 +734,7 @@ function mvidAbrirForm(v) {
   g('mvid-f-fin').value    = v && v.fin ? v.fin : '';
   g('mvid-f-titulo-ventana').textContent = v ? 'Editar el video' : 'Añadir un video';
   g('mvid-f-aviso').textContent = '';
+  mvidPintarPreguntas(v ? v.preguntas : []);
   g('mvid-form-overlay').style.display = 'flex';
 }
 function mvidCerrarForm() {
@@ -483,7 +773,17 @@ async function mvidGuardar() {
     dura:   g('mvid-f-dura').value.trim().slice(0, 12),
     canal:  g('mvid-f-canal').value.trim().slice(0, 80),
     ini, fin,
+    preguntas: mvidLeerPreguntas(),
   };
+
+  /* Si se escribió algo pero no llegó a ser una pregunta contestable,
+     se dice. Guardar en silencio lo que se acaba de tirar es la forma
+     más rápida de que alguien crea que puso un quiz y no lo puso. */
+  const crudas = mvidLeerPreguntas(true).filter(q => q.p || q.ops.some(o => o));
+  if (crudas.length > fila.preguntas.length) {
+    aviso.textContent = 'Una pregunta necesita su texto y al menos dos opciones, con la correcta marcada. Las incompletas no se guardan.';
+    return;
+  }
 
   let error;
   if (_mvidEditando) {
@@ -549,7 +849,9 @@ function mvidAlCatalogo() {
     '      titulo: ' + j(v.titulo || '') + ',\n' +
     '      nota:   ' + j(v.nota || '') + ',\n' +
     '      dura: ' + j(v.dura || '') + ', canal: ' + j(v.canal || '') +
-    ', ini: ' + (v.ini || 0) + ', fin: ' + (v.fin || 0) + ' }'
+    ', ini: ' + (v.ini || 0) + ', fin: ' + (v.fin || 0) +
+    ((v.preguntas && v.preguntas.length)
+      ? ',\n      preguntas: ' + j(v.preguntas) : '') + ' }'
   ).join(',\n');
 
   const texto =
@@ -590,11 +892,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('mvid-cat-btn')?.addEventListener('click', mvidAlCatalogo);
   document.getElementById('mvid-f-cerrar')?.addEventListener('click', mvidCerrarForm);
   document.getElementById('mvid-f-guardar')?.addEventListener('click', mvidGuardar);
+  document.getElementById('mvid-f-preg-mas')?.addEventListener('click', () => {
+    const ahora = mvidLeerPreguntas(true);
+    ahora.push({ p: '', ops: [], ok: 0 });
+    mvidPintarPreguntas(ahora);
+  });
   document.getElementById('mvid-ver-cerrar')?.addEventListener('click', mvidCerrarVer);
 
   document.getElementById('mvid-mision')?.addEventListener('change', e => {
     _mvidMision = e.target.value;
     mvidRender();
+  });
+
+  /* El buscador NO repinta los chips: sus cuentas son de la materia
+     entera y cambiarlas al teclear haría bailar los números debajo del
+     dedo. Solo se estrecha el desplegable. */
+  document.getElementById('mvid-buscar')?.addEventListener('input', e => {
+    _mvidBusca = e.target.value;
+    mvidPintarSelector();
   });
 
   /* Pegar el enlace rellena lo que se puede deducir. Es lo que quita el

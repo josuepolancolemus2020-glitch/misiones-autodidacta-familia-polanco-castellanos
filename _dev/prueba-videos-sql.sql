@@ -56,6 +56,47 @@ create or replace function public.es_familia() returns boolean
 truncate public.metas_videos;
 
 -- ════════════════════════════════════════════════════════════════════
+-- 0. LA RE-CORRIDA SOBRE UNA BASE QUE YA TENÍA LA VERSIÓN VIEJA
+-- ════════════════════════════════════════════════════════════════════
+-- Es el caso REAL: la primera versión ya está corrida en la base del
+-- autor. Lo que se prueba aquí es que volver a pegar el archivo (a) no
+-- borre los videos que ya hay y (b) no reviente al cambiarle el tipo
+-- que devuelve a la puerta pública — que es justo lo que PostgreSQL NO
+-- deja hacer con `create or replace` y por lo que el archivo lleva un
+-- `drop function` delante.
+\echo ''
+\echo '── 0. Re-correr encima de la versión vieja ──'
+insert into public.metas_videos (mision, vid, yt_id, titulo, estado)
+  values ('re-corrida', 'v-viejo', 'aaaaaaaaaaa', 'Estaba antes', 'publicado');
+
+-- Se simula la puerta VIEJA, la de nueve columnas, para que el archivo
+-- se encuentre exactamente lo que se va a encontrar en la base real.
+drop function if exists public.metas_videos_publicos(text);
+create function public.metas_videos_publicos(p_mision text)
+returns table (id text, yt text, titulo text, nota text, dura text,
+               canal text, ini int, fin int, del boolean)
+language sql stable as $$ select null::text, null::text, null::text, null::text,
+  null::text, null::text, null::int, null::int, null::boolean where false $$;
+
+\i supabase/sql/metas_videos.sql
+
+do $$
+declare n int; c int;
+begin
+  select count(*) into n from public.metas_videos where vid = 'v-viejo';
+  if n <> 1 then raise exception 'la re-corrida BORRÓ un video que ya estaba'; end if;
+  select count(*) into c from information_schema.columns
+    where table_schema='public' and table_name='metas_videos' and column_name='preguntas';
+  if c <> 1 then raise exception 'la columna preguntas no se añadió'; end if;
+  -- Y la puerta nueva devuelve diez columnas, no nueve
+  select count(*) into c from public.metas_videos_publicos('re-corrida');
+  if c <> 1 then raise exception 'la puerta nueva no devolvió el video'; end if;
+  raise notice 're-correr no borra nada, añade la columna y cambia la puerta';
+end $$;
+
+truncate public.metas_videos;
+
+-- ════════════════════════════════════════════════════════════════════
 -- 1. EL CHECK DEL IDENTIFICADOR DE ONCE
 -- ════════════════════════════════════════════════════════════════════
 \echo ''
@@ -237,6 +278,64 @@ begin
   select titulo into t from public.metas_videos where mision='2y3ciclo-fracciones' and vid='v-01';
   if t <> 'Título corregido' then raise exception 'el reintento no corrigió: %', t; end if;
   raise notice 'un reintento corrige y no duplica';
+end $$;
+
+-- ════════════════════════════════════════════════════════════════════
+-- 6. EL QUIZ DEL PROPIO VIDEO
+-- ════════════════════════════════════════════════════════════════════
+\echo ''
+\echo '── 6. Las preguntas del video ──'
+do $$
+declare entro boolean;
+begin
+  -- Lo que no es una lista NO entra: la pantalla del alumno recorre
+  -- esto con un bucle.
+  foreach entro in array array[true] loop end loop;
+  entro := true;
+  begin
+    insert into public.metas_videos (mision, vid, yt_id, preguntas)
+      values ('q','v-obj','aaaaaaaaaaa','{"p":"no soy lista"}'::jsonb);
+  exception when check_violation then entro := false; end;
+  if entro then raise exception 'entró un objeto donde tiene que haber una lista'; end if;
+
+  entro := true;
+  begin
+    insert into public.metas_videos (mision, vid, yt_id, preguntas)
+      values ('q','v-seis','aaaaaaaaaaa',
+        '[{"p":"1"},{"p":"2"},{"p":"3"},{"p":"4"},{"p":"5"},{"p":"6"}]'::jsonb);
+  exception when check_violation then entro := false; end;
+  if entro then raise exception 'entraron seis preguntas donde el tope son cinco'; end if;
+  raise notice 'lo que no es una lista rebota, y seis preguntas también';
+end $$;
+
+-- Un video sin preguntas nace con lista vacía, no con nulo: la pantalla
+-- del alumno hace `.length` sobre esto sin preguntar.
+insert into public.metas_videos (mision, vid, yt_id, titulo, estado)
+  values ('q', 'v-sin', 'bbbbbbbbbbb', 'sin preguntas', 'publicado');
+insert into public.metas_videos (mision, vid, yt_id, titulo, estado, preguntas)
+  values ('q', 'v-con', 'ccccccccccc', 'con preguntas', 'publicado',
+    '[{"p":"¿Cuál es el denominador?","ops":["El de abajo","El de arriba","La raya"],"ok":0}]'::jsonb);
+
+do $$
+declare j jsonb;
+begin
+  select preguntas into j from public.metas_videos_publicos('q') where id = 'v-sin';
+  if j <> '[]'::jsonb then raise exception 'el video sin preguntas no devolvió lista vacía: %', j; end if;
+
+  select preguntas into j from public.metas_videos_publicos('q') where id = 'v-con';
+  if jsonb_array_length(j) <> 1 then raise exception 'las preguntas no viajaron'; end if;
+  if (j->0->>'p') is null then raise exception 'la pregunta llegó sin texto'; end if;
+  raise notice 'las preguntas viajan por la puerta, y sin ellas viaja una lista vacía';
+end $$;
+
+-- Y una lápida no se lleva las preguntas
+update public.metas_videos set estado = 'oculto' where vid = 'v-con';
+do $$
+declare j jsonb;
+begin
+  select preguntas into j from public.metas_videos_publicos('q') where id = 'v-con';
+  if j <> '[]'::jsonb then raise exception 'la lápida se llevó las preguntas: %', j; end if;
+  raise notice 'y una lápida no se lleva nada, tampoco las preguntas';
 end $$;
 
 -- ════════════════════════════════════════════════════════════════════

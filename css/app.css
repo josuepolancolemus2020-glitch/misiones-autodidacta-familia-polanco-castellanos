@@ -4519,3 +4519,61 @@ textarea.mvid-in { min-height: 60px; resize: vertical; }
    campos de 150 px en un teléfono no se pueden ni tocar ni leer. */
 .mvid-dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
 @media (max-width: 380px) { .mvid-dos { grid-template-columns: 1fr; } }
+
+/* Los chips de materia del selector de misión. Mismo aire que los chips
+   de categoría de la bandeja de Sugerencias, a propósito: es la misma
+   forma de filtrar y no hay que aprender otra. */
+.mvid-chips {
+  display: flex;
+  flex-wrap: wrap;      /* salirse por la derecha no tiene arreglo */
+  gap: 0.35rem;
+  margin-bottom: 0.2rem;
+}
+.mvid-chip-f {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  /* 36 px y no 44: son un filtro y van muchos en fila; el blanco de
+     toque de 44 se reserva para lo que cuesta caro equivocarse. */
+  min-height: 36px;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+/* El activo va RELLENO, no solo con el borde de otro color: es la misma
+   lección de la barra de grupos de M.E.T.A.S — en una pantalla al sol un
+   borde de milímetro y medio no se distingue. */
+.mvid-chip-on { background: #b91c1c; color: #fff; border-color: transparent; }
+
+/* El desplegable agrupado por materia. `optgroup` lo pinta el navegador
+   con su propio encabezado; lo único que hace falta aquí es que no se
+   quede en gris ilegible en modo oscuro. */
+.mvid-sel optgroup { color: var(--text); font-weight: 700; }
+.mvid-sel option   { color: var(--text); font-weight: 400; }
+
+/* El editor de preguntas del video. */
+.mvid-preg {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.6rem;
+  margin-bottom: 0.6rem;
+  background: var(--bg);
+}
+.mvid-preg-cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+.mvid-preg-n { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+.mvid-preg-txt { margin-bottom: 0.4rem; }
+/* El radio va PEGADO a su opción, no en un desplegable aparte de «cuál
+   es la buena»: ese se rellena mirando arriba y abajo, y ahí es donde se
+   marca la que no era. */
+.mvid-preg-op { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
+.mvid-preg-op input[type=radio] { width: 22px; height: 22px; flex: 0 0 auto; accent-color: #16a34a; }
+.mvid-preg-opt { flex: 1 1 auto; min-width: 0; }

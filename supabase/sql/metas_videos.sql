@@ -1,6 +1,19 @@
 -- Ejecutar en Supabase -> SQL Editor. Es IDEMPOTENTE: se puede correr
 -- varias veces sin dañar nada.
 --
+-- ⚠️ SI YA SE CORRIÓ ANTES DEL 28 DE AGOSTO DE 2026 POR LA TARDE, HAY
+--    QUE VOLVER A CORRERLO. El archivo creció con la columna
+--    `preguntas` (el quiz del propio video) y con la puerta pública
+--    devolviéndola. La columna se añade con `add column if not exists`,
+--    así que correrlo otra vez NO BORRA NI UN VIDEO.
+--
+--    Y hay una línea que no se puede saltar: el `drop function` de más
+--    abajo. PostgreSQL NO deja cambiarle a una función el tipo que
+--    devuelve con `create or replace` —contesta «cannot change return
+--    type of existing function»—, y la puerta pública ahora devuelve
+--    una columna más. Sin ese drop, el pegado entero se deshace y
+--    parece que el archivo no hizo nada.
+--
 -- VA UN SOLO ARCHIVO, este. Depende de `seguridad_familia_1_puerta.sql`,
 -- que es quien crea es_familia() y ya está corrido desde la mudanza a
 -- privado. Si no lo estuviera, la primera instrucción de aquí lo dice
@@ -139,6 +152,49 @@ create table if not exists public.metas_videos (
   -- guardado y no sabe si el primero entró.
   unique (mision, vid)
 );
+-- ── El quiz del propio video ────────────────────────────────────────
+-- Va con `add column if not exists` y NO dentro del create table de
+-- arriba: quien ya corrió este archivo tiene la tabla creada, y un
+-- create table nuevo no le añadiría nada.
+--
+-- POR QUÉ EXISTE: al terminar un video, la primera versión mandaba al
+-- alumno al Quiz de la misión. Eso es un salto raro —el Quiz pregunta
+-- por el tema entero, no por lo que acaba de ver— y además se lleva al
+-- niño de la sección sin comprobar nada. Con esto, al acabar salen dos
+-- o tres preguntas SOBRE ESE VIDEO, escritas por quien lo eligió.
+--
+-- POR QUÉ jsonb Y NO UNA TABLA APARTE: las preguntas no existen sin su
+-- video, no se consultan por separado y no pasan de tres. Una tabla
+-- hija obligaría a un segundo viaje a la base desde el teléfono del
+-- alumno, y esa es la conexión de un pueblo. La forma:
+--
+--   [ { "p": "¿Qué es el denominador?",
+--       "ops": ["El de abajo", "El de arriba", "La raya"],
+--       "ok": 0 } ]
+--
+-- `ok` es el ÍNDICE de la correcta, no su texto: si fuera el texto,
+-- corregirle una tilde a la opción dejaría la pregunta sin respuesta
+-- buena y nadie se enteraría hasta que un niño la fallara.
+--
+-- El check es a propósito de andar por casa —que sea una lista y no
+-- pase de cinco—: la forma de dentro la hace cumplir la pantalla, que
+-- es donde se puede explicar el error a quien lo está escribiendo. Lo
+-- que NO puede pasar es que aquí entre algo que no sea una lista,
+-- porque la pantalla del alumno recorre esto con un bucle.
+alter table public.metas_videos
+  add column if not exists preguntas jsonb not null default '[]'::jsonb;
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint
+                  where conname = 'metas_videos_preguntas_lista') then
+    alter table public.metas_videos
+      add constraint metas_videos_preguntas_lista
+      check (jsonb_typeof(preguntas) = 'array' and jsonb_array_length(preguntas) <= 5);
+  end if;
+end
+$$;
+
 alter table public.metas_videos enable row level security;
 
 -- Lo que la puerta pública pregunta en cada visita de un alumno: los de
@@ -198,17 +254,27 @@ $$;
 -- Lo que está en 'borrador' NO SALE. Es lo que permite pegar un video,
 -- mirarlo con calma y publicarlo mañana, sin que un alumno se lo
 -- encuentre a medio revisar.
+-- ⚠️ EL DROP NO ES OPCIONAL, y es la línea que más caro cuesta olvidar.
+-- PostgreSQL no deja cambiarle a una función el tipo que devuelve con
+-- `create or replace`: contesta «cannot change return type of existing
+-- function». Y como el editor corre TODO el pegado en una sola
+-- transacción, ese error deshace el archivo entero —la columna nueva
+-- incluida— y lo único que se ve es un mensaje que habla de otra cosa.
+-- Quien ya corrió la versión anterior necesita este drop.
+drop function if exists public.metas_videos_publicos(text);
+
 create or replace function public.metas_videos_publicos(p_mision text)
 returns table (
-  id     text,
-  yt     text,
-  titulo text,
-  nota   text,
-  dura   text,
-  canal  text,
-  ini    int,
-  fin    int,
-  del    boolean
+  id        text,
+  yt        text,
+  titulo    text,
+  nota      text,
+  dura      text,
+  canal     text,
+  ini       int,
+  fin       int,
+  del       boolean,
+  preguntas jsonb
 )
 language sql
 security definer
@@ -224,7 +290,10 @@ as $$
     case when v.estado = 'publicado' then v.canal  else ''  end,
     case when v.estado = 'publicado' then v.ini    else 0   end,
     case when v.estado = 'publicado' then v.fin    else 0   end,
-    (v.estado = 'oculto')
+    (v.estado = 'oculto'),
+    -- Las preguntas solo viajan con el video publicado. Una lápida no
+    -- se lleva nada, ni siquiera esto.
+    case when v.estado = 'publicado' then v.preguntas else '[]'::jsonb end
   from public.metas_videos v
   where v.mision = left(btrim(coalesce(p_mision, '')), 120)
     and v.estado in ('publicado', 'oculto')
@@ -251,4 +320,4 @@ select
                                                                              as seguridad_por_fila,
   (to_regprocedure('public.metas_videos_publicos(text)') is not null)         as puerta_publica,
   (select count(*) from public.metas_videos)                                 as videos_guardados,
-  'Si columnas=15, politicas=1, seguridad_por_fila=t y puerta_publica=t, quedó puesto.' as lectura;
+  'Si columnas=16, politicas=1, seguridad_por_fila=t y puerta_publica=t, quedó puesto.' as lectura;
