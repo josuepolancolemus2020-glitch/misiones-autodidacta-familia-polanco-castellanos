@@ -1,4 +1,4 @@
-const CACHE_NAME = 'faro-app-v77';
+const CACHE_NAME = 'faro-app-v78';
 
 /* ══════════════════════════════════════════════════════════════════
    ¿SE PUEDE GUARDAR ESTA RESPUESTA?
@@ -92,8 +92,24 @@ self.addEventListener('fetch', event => {
     // así, si la puerta contesta con su pantalla de inicio de sesión, el
     // usuario la ve y entra, pero esa pantalla no se queda guardada ocupando
     // el sitio del archivo de verdad.
+    //
+    // ⚠️ Y REVALIDANDO CONTRA EL SERVIDOR (`cache: 'no-cache'` → ETag/304).
+    // Sin eso, «ir a la red primero» no basta: la petición la sigue
+    // atendiendo la CACHÉ HTTP DEL NAVEGADOR, que guarda hasta diez
+    // minutos, y el service worker ni se entera. El resultado es el peor
+    // de los posibles porque no parece un fallo de caché: llega el HTML
+    // NUEVO con el CSS y el JS VIEJOS, así que la pantalla enseña los
+    // huecos de lo nuevo y el código que los llena es el de antes.
+    //
+    // Pasó el 28 de agosto de 2026 con el filtro por materia de los
+    // videos: el rótulo MATERIA salía y debajo no había ni un chip,
+    // porque el HTML era del despliegue nuevo y `metas-videos.js` del
+    // anterior. Se delató por el texto del desplegable, que era el de la
+    // versión vieja.
+    //
+    // M.E.T.A.S ya tenía esta línea, con esta misma nota. Aquí faltaba.
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: 'no-cache' })
         .then(response => {
           if (sePuedeGuardar(event.request, response)) {
             const clone = response.clone();

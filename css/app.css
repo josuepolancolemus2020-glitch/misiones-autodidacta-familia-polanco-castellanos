@@ -4523,11 +4523,61 @@ textarea.mvid-in { min-height: 60px; resize: vertical; }
 /* Los chips de materia del selector de misión. Mismo aire que los chips
    de categoría de la bandeja de Sugerencias, a propósito: es la misma
    forma de filtrar y no hay que aprender otra. */
+/* ⚠️ AQUÍ LOS CHIPS NO BAJAN DE LÍNEA: SE DESLIZAN.
+   Es la excepción a la regla del `flex-wrap`, y tiene su motivo. Con
+   ocho materias más «Todas» y «Sin video», envueltos ocupaban TRES
+   renglones y empujaban el desplegable de la misión fuera de la
+   pantalla: para elegir misión había que deslizar la página entera.
+
+   Deslizándose ocupan uno solo y siempre se ve dónde está el
+   desplegable. El riesgo de una fila que se desliza —que no se note que
+   hay más a la derecha— se tapa con el degradado del borde, y el chip
+   que se toca se trae a la vista solo (`scrollIntoView`).
+
+   No contradice la regla de los juegos 3D: allí lo que se salía eran
+   BOTONES DE RESPONDER, que si no se ven no se puede seguir. Un filtro
+   que se desliza sigue siendo alcanzable con el dedo. */
 .mvid-chips {
   display: flex;
-  flex-wrap: wrap;      /* salirse por la derecha no tiene arreglo */
+  flex-wrap: nowrap;
   gap: 0.35rem;
   margin-bottom: 0.2rem;
+  overflow-x: auto;
+  /* Sin esto, el chip de la punta queda pegado al borde y no se ve que
+     hay más. */
+  padding: 0.15rem 1.2rem 0.4rem 0;
+  scroll-padding-inline: 1.2rem;
+  -webkit-overflow-scrolling: touch;
+  /* La barra de deslizamiento gruesa se come el alto de los chips en
+     escritorio y no aporta nada: la fila se desliza con el dedo. */
+  scrollbar-width: thin;
+  /* El degradado del borde derecho dice «hay más» sin ocupar sitio. */
+  mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.6rem), transparent 100%);
+}
+.mvid-chips::-webkit-scrollbar { height: 4px; }
+.mvid-chips::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* «Sin video» va en ámbar: es un aviso de trabajo pendiente, no una
+   materia. El mismo ámbar del abono a medias de la convocatoria. */
+.mvid-chip-falta { border-color: #d97706; color: #b45309; }
+.mvid-chip-falta.mvid-chip-on { background: #d97706; color: #fff; border-color: transparent; }
+
+/* Cuando el catálogo de M.E.T.A.S no llega. Antes aquí no salía NADA y
+   el desplegable se quedaba vacío sin decir por qué: parecía la
+   herramienta rota. */
+.mvid-sincat {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--muted);
+  background: rgba(217, 119, 6, 0.10);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
 }
 .mvid-chip-f {
   font-family: inherit;

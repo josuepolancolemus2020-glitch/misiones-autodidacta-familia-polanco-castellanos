@@ -204,6 +204,26 @@ cumplir la seguridad por fila.
    escrita aquí. **El buscador entiende «sexto» además de «6º»**: en un
    teclado de tableta el símbolo de ordinal está escondido, y obligar a
    escribirlo es cerrarle el buscador a quien lo va a usar.
+
+   Tres cosas de esa fila, y las tres salieron de usarla:
+
+   - ⚠️ **«Sin video» es el segundo chip, y es el que de verdad se usa.**
+     El trabajo del administrador no es «ver las de matemáticas»: es
+     saber CUÁLES LE FALTAN. Sin ese filtro hay que abrir materia por
+     materia contando puntos verdes.
+   - ⚠️ **Los chips NO bajan de línea: se deslizan** (`flex-wrap:nowrap`
+     y `overflow-x:auto`). Es la excepción a la regla del `flex-wrap`, y
+     tiene motivo: con ocho materias más «Todas» y «Sin video»,
+     envueltos ocupaban TRES renglones y empujaban el desplegable de la
+     misión fuera de la pantalla, así que para elegir misión había que
+     deslizar la página entera. No contradice la regla 8 de los juegos
+     3D: allí lo que se salía eran botones de RESPONDER, que si no se
+     ven no se puede seguir. El degradado del borde dice que hay más, y
+     el chip tocado se trae a la vista solo.
+   - **Si el catálogo no llega, se DICE**, con su botón de reintentar.
+     Se trae por la red del sitio público de M.E.T.A.S y puede fallar;
+     antes, en ese caso, no salía nada y el desplegable se quedaba vacío
+     sin explicar por qué: parecía la herramienta rota.
 10. **El quiz del propio video.** Hasta tres preguntas por video, con sus
    opciones y el círculo de la correcta PEGADO a cada una —un
    desplegable aparte de «cuál es la buena» se rellena mirando arriba y
@@ -491,6 +511,19 @@ https://api.github.com/repos/<usuario>/<repo>/actions/runs
 y comprobar que la ejecución llamada **`pages build and deployment`** con
 el `head_sha` del commit está en `completed / success`. Sirve sin
 credenciales porque el repositorio es público.
+
+⚠️ **Y el service worker tiene que REVALIDAR, no solo «ir a la red
+primero».** El 28 de agosto de 2026 F.A.R.O sirvió el HTML nuevo con el
+JavaScript viejo: el rótulo MATERIA del filtro de videos salía y debajo
+no había ni un chip. La rama de archivos propios de `sw.js` hacía
+`fetch(event.request)` sin `{ cache: 'no-cache' }`, así que la petición
+la seguía atendiendo la **caché HTTP del navegador** —hasta diez
+minutos— y el service worker ni se enteraba.
+
+Es el peor fallo de caché porque no lo parece: la pantalla enseña los
+huecos de lo nuevo y el código que los llena es el de antes. M.E.T.A.S ya
+tenía la línea con esta misma nota; aquí faltaba. Se delató por el texto
+de un desplegable, que era el de la versión anterior.
 
 ⚠️ **Y hay que buscar el `head_sha`, no mirar la primera fila.** El 28
 de agosto de 2026 el listado por omisión enseñaba `completed / success`

@@ -292,29 +292,71 @@ function mvidPintarChips() {
   if (!cont) return;
   cont.innerHTML = '';
 
+  /* ── SI EL CATÁLOGO NO LLEGÓ, SE DICE ──
+     Se trae por la red del sitio público de M.E.T.A.S, así que puede
+     fallar: sin señal, con el sitio caído, o si el navegador corta la
+     petición entre dominios. Antes, en ese caso, aquí no salía NADA y el
+     desplegable se quedaba vacío sin explicar por qué: parecía que la
+     herramienta estaba rota. Ahora lo dice y ofrece reintentar. */
+  if (!_mvidMisiones.length) {
+    const aviso = document.createElement('div');
+    aviso.className = 'mvid-sincat';
+    aviso.appendChild(Object.assign(document.createElement('span'),
+      { textContent: '📴 No llegó la lista de misiones de M.E.T.A.S. ' +
+                     'Puedes escribir la carpeta a mano abajo, o reintentar.' }));
+    const rb = document.createElement('button');
+    rb.type = 'button';
+    rb.className = 'mvid-b';
+    rb.textContent = '↻ Reintentar';
+    rb.addEventListener('click', async () => {
+      rb.disabled = true; rb.textContent = 'Trayendo…';
+      await mvidCargarMisiones();
+      mvidPintarChips(); mvidPintarSelector();
+    });
+    aviso.appendChild(rb);
+    cont.appendChild(aviso);
+    return;
+  }
+
   const conVideo = mvidCuentaPorMision();
   const porMateria = {};
+  let sinVideo = 0;
   _mvidMisiones.forEach(m => {
     if (!porMateria[m.materia]) porMateria[m.materia] = { n: 0, videos: 0 };
     porMateria[m.materia].n++;
-    if (conVideo[m.clave]) porMateria[m.materia].videos++;
+    if (conVideo[m.clave]) porMateria[m.materia].videos++; else sinVideo++;
   });
 
-  const chip = (clave, texto, activo) => {
+  const chip = (clave, texto, activo, extra) => {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'mvid-chip-f' + (activo ? ' mvid-chip-on' : '');
+    b.className = 'mvid-chip-f' + (activo ? ' mvid-chip-on' : '') + (extra ? ' ' + extra : '');
     b.textContent = texto;
     b.addEventListener('click', () => {
       _mvidMateria = clave;
       mvidPintarChips();
       mvidPintarSelector();
       mvidRender();
+      /* El chip elegido se trae a la vista: en una fila que se desliza,
+         tocar el último de la derecha y que se quede medio fuera hace
+         dudar de si se tocó. */
+      try { b.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) {}
     });
     return b;
   };
 
   cont.appendChild(chip('', 'Todas · ' + _mvidMisiones.length, _mvidMateria === ''));
+
+  /* ⚠️ «SIN VIDEO» VA EL SEGUNDO, y es el chip que de verdad se usa.
+     El trabajo del administrador no es «ver las de matemáticas»: es
+     saber CUÁLES LE FALTAN. Sin este filtro hay que abrir materia por
+     materia contando puntos verdes, que con 66 misiones —y subiendo—
+     es justo el paso donde se deja de poner videos. */
+  if (sinVideo) {
+    cont.appendChild(chip('__sinvideo', '⚠️ Sin video · ' + sinVideo,
+      _mvidMateria === '__sinvideo', 'mvid-chip-falta'));
+  }
+
   Object.keys(porMateria).sort((a, b) => porMateria[b].n - porMateria[a].n).forEach(k => {
     const m = mvidMateria(k);
     /* El punto verde dice cuántas de esa materia YA tienen video. Sin
@@ -358,8 +400,14 @@ function mvidMisionesFiltradas() {
      vez de reemplazar: así «sexto grado» sigue encontrando lo que trae
      la palabra «grado» escrita. */
   const alt = MVID_ORDINALES[q] || '';
+  const conVideo = mvidCuentaPorMision();
   return _mvidMisiones.filter(m => {
-    if (_mvidMateria && m.materia !== _mvidMateria) return false;
+    /* `__sinvideo` no es una materia: es «las que me faltan». Va por el
+       mismo camino que las materias porque para quien la usa es un
+       filtro más, y meterle un control aparte sería una casilla más que
+       aprender. */
+    if (_mvidMateria === '__sinvideo') { if (conVideo[m.clave]) return false; }
+    else if (_mvidMateria && m.materia !== _mvidMateria) return false;
     if (!q) return true;
     const heno = mvidSinTildes(m.titulo + ' ' + m.clave + ' ' + m.materia + ' ' + m.grado);
     return heno.includes(q) || (alt && heno.includes(alt));

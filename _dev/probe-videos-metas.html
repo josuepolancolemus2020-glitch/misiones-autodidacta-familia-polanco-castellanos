@@ -349,6 +349,26 @@ function nuevaBase(w, opciones){
      'las materias no salen bien: ' + chips.join(' | '));
   ok(chips[0] && /Todas/.test(chips[0]), 'con «Todas» primero para volver atrás',
      'falta el chip de «Todas»');
+  ok(chips[1] && /Sin video/.test(chips[1]),
+     'y «Sin video» EL SEGUNDO: es el filtro que de verdad se usa, saber cuáles faltan',
+     '«Sin video» no está donde se busca: ' + chips.slice(0,3).join(' | '));
+
+  /* Que el filtro «sin video» haga lo que dice */
+  w.eval('_mvidMision = ""; _mvidBusca = ""; _mvidMateria = "__sinvideo"; mvidPintarSelector()');
+  await esperar(200);
+  const faltan = [...g('mvid-mision').querySelectorAll('option')].map(o => o.value).filter(Boolean);
+  ok(faltan.length && faltan.indexOf('2y3ciclo-fracciones') < 0,
+     '«Sin video» deja SOLO las misiones que todavía no tienen ninguno',
+     'el filtro de las que faltan no quita la que ya tiene video: ' + faltan.join(','));
+
+  /* La fila de chips NO baja de línea: se desliza. Con ocho materias
+     envuelta ocupaba tres renglones y empujaba el desplegable de la
+     misión fuera de la pantalla. */
+  const filaChips = w.getComputedStyle(w.document.getElementById('mvid-chips'));
+  ok(filaChips.flexWrap === 'nowrap' && /auto|scroll/.test(filaChips.overflowX),
+     'la fila de materias se desliza en vez de ocupar tres renglones',
+     'la fila de materias se envuelve: empuja el desplegable fuera de la pantalla');
+  w.eval('_mvidMateria = ""; mvidPintarSelector()');
   ok(chips.some(c => /·\s*2/.test(c)), 'y cada chip lleva su cuenta de misiones',
      'los chips no llevan la cuenta');
 
@@ -439,6 +459,33 @@ function nuevaBase(w, opciones){
        'un número, nunca el texto: corregirle una tilde a la opción no puede dejar la pregunta sin respuesta',
        '`ok` no es un número');
   }
+
+  /* ═══ 11. Sin catálogo, la herramienta lo DICE ═══ */
+  log('');
+  log('── 11. Si el catálogo de M.E.T.A.S no llega, se dice ──');
+  await w.eval('_mvidMisiones = []; mvidPintarChips(); mvidPintarSelector()');
+  await esperar(200);
+  const sc = g('mvid-chips').textContent;
+  ok(/No lleg[oó] la lista/i.test(sc),
+     'se explica que no llegó la lista de misiones',
+     'no sale NADA: parece la herramienta rota. ' + JSON.stringify(sc.slice(0,60)));
+  ok(/Reintentar/.test(sc), 'y se ofrece reintentar', 'no hay forma de reintentar');
+  ok(/mano/i.test(sc + g('mvid-mision').textContent),
+     'y que mientras tanto la carpeta se puede escribir a mano',
+     'no dice qué hacer mientras tanto');
+
+  /* ═══ 12. El service worker no puede servir el JS viejo ═══
+     Esto no se ve desde el navegador —la sonda corre sin service
+     worker—, así que se lee el archivo. Y hace falta: el 28 de agosto
+     de 2026 F.A.R.O sirvió el HTML nuevo con el JS viejo, así que el
+     rótulo MATERIA salía y debajo no había ni un chip. */
+  log('');
+  log('── 12. El service worker revalida contra el servidor ──');
+  const sw = await (await fetch('/sw.js', { cache: 'no-store' })).text();
+  const ramaPropia = sw.split('} else {')[0];
+  ok(/cache:\s*'no-cache'/.test(ramaPropia),
+     'los archivos propios se piden con `cache: no-cache`',
+     'sin eso la caché HTTP del navegador sirve el JS viejo con el HTML nuevo, y no parece un fallo de caché');
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
