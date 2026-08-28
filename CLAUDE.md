@@ -492,6 +492,26 @@ y comprobar que la ejecución llamada **`pages build and deployment`** con
 el `head_sha` del commit está en `completed / success`. Sirve sin
 credenciales porque el repositorio es público.
 
+⚠️ **Y hay que buscar el `head_sha`, no mirar la primera fila.** El 28
+de agosto de 2026 el listado por omisión enseñaba `completed / success`
+arriba del todo… del commit ANTERIOR. El nuevo no tenía ejecución
+ninguna: Pages no la había encolado siquiera, quince minutos después del
+push. Mirar la primera fila habría dado el cambio por publicado.
+
+Y en la cola hay **zombis**: ejecuciones paradas del 3 de julio y del 6
+de agosto en M.E.T.A.S, y la del 20 de agosto en F.A.R.O que cuenta el
+párrafo de arriba. No estorban a las nuevas —no es que la cola esté
+ocupada—, pero `?status=queued` las devuelve y confunden al que mire por
+ahí buscando la suya.
+
+La comprobación buena es esta, y devuelve algo solo si existe:
+
+```
+https://api.github.com/repos/<usuario>/<repo>/actions/runs?per_page=20
+```
+y buscar el `head_sha` del commit propio. Si no está, **no hay
+construcción**, que no es lo mismo que una construcción fallida.
+
 Cuando falle:
 
 1. **Relanzarla** (`rerun_failed_jobs`). Un 500 de Pages suele ser
