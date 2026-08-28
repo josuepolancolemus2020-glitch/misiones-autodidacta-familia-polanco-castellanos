@@ -108,6 +108,16 @@ Zone → Make private.
      El archivo trae además las cinco comprobaciones para pegar después, y la
      cuarta es la que de verdad prueba la defensa: un `insert` con
      `javascript:` en la dirección TIENE que fallar.
+   · ⏳ **FALTA** — `supabase/sql/metas_videos_tope_10.sql`. Sube de cinco
+     a diez el tope de preguntas por video, que el autor pidió el 28 de
+     agosto de 2026. Es lo mismo que volver a pegar `metas_videos.sql`
+     entero —el tope también subió allí—, pero son treinta líneas en vez
+     de trescientas. Hasta que se corra, F.A.R.O admite escribir hasta
+     diez y **la base rechaza a partir de la sexta**; no se pierde nada
+     y la pantalla lo dice con palabras, nombrando el archivo. El tope
+     se tira y se vuelve a poner a propósito: con un «si no existe»,
+     re-correrlo diría «Success» y dejaría el número viejo. La
+     comprobación del final tiene que decir `tope_preguntas = 10`.
    · ✅ **CORRIDO** — `supabase/sql/metas_videos.sql`, el 28 de agosto de
      2026, con la columna `preguntas` incluida (se corrió dos veces: la
      primera versión y después la ampliada, y la re-corrida no borró el
