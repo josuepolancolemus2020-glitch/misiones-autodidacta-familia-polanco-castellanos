@@ -231,6 +231,29 @@ cumplir la seguridad por fila.
    nunca el texto. Una pregunta a medias **no se guarda en silencio**: la
    pantalla lo dice, porque guardar lo que se acaba de tirar es la forma
    más rápida de que alguien crea que puso un quiz y no lo puso.
+11. **Las preguntas se PEGAN de golpe, no se escriben campo por campo.**
+   Tres preguntas con sus cuatro opciones son quince campos tocados de
+   uno en uno en una tableta, y el texto casi nunca se inventa aquí: ya
+   viene escrito con la forma de siempre («1.» la pregunta, «A) B) C) D)»
+   las opciones). Se pega tal como venga —numeradas o no, con letra o con
+   viñeta, con las rayas «---» de en medio— y el lector lo reparte.
+
+   ⚠️ **Y si el texto no dice cuál es la correcta, NO se marca ninguna.**
+   Es la regla que no se negocia. Dar por buena la A acierta una de cada
+   cuatro veces, y un quiz publicado con la respuesta cambiada no lo
+   descubre nadie hasta que un niño acierta y la pantalla le dice que
+   falló. Sin marcar, la pregunta se ve en **ámbar**, lo dice con
+   palabras y **el guardado se para** nombrando cuál falta. Si el texto
+   sí lo dice —✅, negrita, «(correcta)», «Respuesta: C» o una lista
+   final «Respuestas: 1-C, 2-A»— se marca sola.
+
+   Dos cosas más que salieron de pegar de verdad: las opciones son
+   **cuatro y no tres** (el A) B) C) D) es la forma en que viene
+   cualquier prueba, y con tres se perdía la D —que es la correcta una de
+   cada cuatro veces—; la pantalla del alumno ya pintaba hasta cuatro),
+   y el enunciado y las opciones son **recuadros que crecen**, porque lo
+   siguiente que hay que hacer es leerlas para marcar la buena y dos
+   opciones cortadas a los treinta caracteres se distinguen mal.
 
 **Antes de publicar un cambio de los videos:**
 

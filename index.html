@@ -1151,6 +1151,29 @@
         <p class="mvid-ayuda" style="margin-top:1rem;"><strong>🧠 Preguntas sobre este video</strong> (opcional).
           Salen al terminarlo, en vez de mandarlo al Quiz de la misión.
           Marca el círculo de la respuesta correcta.</p>
+        <!-- Pegar de golpe. Escribir tres preguntas con sus cuatro
+             opciones son quince campos tocados de uno en uno en una
+             tableta, y el texto casi siempre ya viene escrito de otro
+             sitio. Se lee tal como venga; lo que no se inventa nunca es
+             cuál es la correcta. -->
+        <button type="button" class="mvid-b" id="mvid-f-preg-pegar">📋 Pegar preguntas de golpe</button>
+        <div id="mvid-f-pegar-caja" class="mvid-pegar-caja" style="display:none;">
+          <textarea id="mvid-f-pegar-txt" class="mvid-in mvid-pegar-txt" rows="8"
+                    placeholder="1. ¿Qué es el volumen?&#10;A) La cantidad de cubos que tiene una figura&#10;B) La capacidad de un objeto para contener líquidos&#10;C) La cantidad de espacio que ocupa un cuerpo ✅&#10;D) El área de todas las caras de un objeto&#10;&#10;---&#10;&#10;2. ¿En qué unidades se mide el volumen?&#10;A) Unidades cuadradas&#10;B) Unidades lineales&#10;C) Unidades cúbicas&#10;D) Unidades circulares&#10;&#10;Respuestas: 1-C, 2-C"></textarea>
+          <div class="mvid-pegar-btns">
+            <button type="button" class="mvid-b mvid-b-pri" id="mvid-f-pegar-leer">Leer las preguntas</button>
+            <button type="button" class="mvid-b" id="mvid-f-pegar-portapapeles" style="display:none;">📥 Del portapapeles</button>
+            <button type="button" class="mvid-b" id="mvid-f-pegar-cerrar">Cancelar</button>
+          </div>
+          <p class="mvid-aviso" id="mvid-f-pegar-aviso"></p>
+          <p class="mvid-ayuda">Se lee tal como venga: «1.» o «1)» la pregunta, «A)» «B.» «(C)» o viñetas
+            las opciones, y las rayas «---» se saltan. La correcta se marca sola si el texto lo dice
+            (✅, negrita, «(correcta)», «Respuesta: C» o una lista final «Respuestas: 1-C, 2-A»);
+            <strong>si no lo dice, la pregunta queda sin marcar</strong> —en ámbar— y no se guarda hasta
+            que la toques. Nunca se da por buena la A.</p>
+        </div>
+
+        <p class="mvid-aviso" id="mvid-f-preg-aviso"></p>
         <div id="mvid-f-preguntas"></div>
         <button type="button" class="mvid-b" id="mvid-f-preg-mas">➕ Otra pregunta</button>
 

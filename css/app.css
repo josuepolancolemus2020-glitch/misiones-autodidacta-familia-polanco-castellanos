@@ -4620,6 +4620,17 @@ textarea.mvid-in { min-height: 60px; resize: vertical; }
   margin-bottom: 0.35rem;
 }
 .mvid-preg-n { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+/* El enunciado y las opciones son recuadros que CRECEN con su texto, no
+   campos de una línea: lo pegado de un examen no cabe en una, y elegir
+   la correcta entre cuatro opciones cortadas por la mitad es marcar la
+   que no era. El alto lo pone mvidCrecer(); aquí se les quitan el mínimo
+   y el asa de estirar que traen los demás textarea de la herramienta. */
+textarea.mvid-preg-txt, textarea.mvid-preg-opt {
+  min-height: 0;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.35;
+}
 .mvid-preg-txt { margin-bottom: 0.4rem; }
 /* El radio va PEGADO a su opción, no en un desplegable aparte de «cuál
    es la buena»: ese se rellena mirando arriba y abajo, y ahí es donde se
@@ -4627,3 +4638,35 @@ textarea.mvid-in { min-height: 60px; resize: vertical; }
 .mvid-preg-op { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
 .mvid-preg-op input[type=radio] { width: 22px; height: 22px; flex: 0 0 auto; accent-color: #16a34a; }
 .mvid-preg-opt { flex: 1 1 auto; min-width: 0; }
+
+/* La pregunta pegada cuya correcta no venía dicha en el texto. Se ve en
+   ÁMBAR y sin ningún círculo marcado: dar por buena la A acertaría una
+   de cada cuatro veces, y el niño que acertara leería que falló. */
+.mvid-preg-falta {
+  border-color: #d97706;
+  background: rgba(217, 119, 6, 0.07);
+}
+.mvid-preg-marca {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #b45309;
+  text-transform: uppercase;
+}
+
+/* 📋 Pegar las preguntas de golpe. */
+.mvid-pegar-caja {
+  border: 1.5px dashed var(--border);
+  border-radius: 10px;
+  padding: 0.6rem;
+  margin: 0.5rem 0 0.6rem;
+}
+/* De ancho fijo y pequeña a propósito: aquí se pega un bloque de veinte
+   renglones y lo que hace falta es verlo entero para saber si entró
+   todo, no leerlo cómodo. */
+.mvid-pegar-txt {
+  min-height: 160px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+.mvid-pegar-btns { display: flex; flex-wrap: wrap; gap: 0.4rem; }

@@ -667,7 +667,18 @@ function mvidCerrarVer() {
       preguntas se contestan; ocho se abandonan, y una comprobación
       abandonada no comprueba nada. */
 const MVID_MAX_PREG = 3;
-const MVID_MAX_OPS = 3;
+/* CUATRO opciones, no tres, y no es un capricho: el A) B) C) D) es la
+   forma en que viene escrita cualquier prueba de selección múltiple, así
+   que es lo que se va a pegar aquí. Con tres, pegar un bloque de cuatro
+   perdía la D —y una de cada cuatro veces la D es la correcta—. La
+   pantalla del alumno ya pintaba hasta cuatro (`vmPreguntas`, en
+   M.E.T.A.S), o sea que el tope corto estaba solo aquí. */
+const MVID_MAX_OPS = 4;
+
+function mvidCrecer(t) {
+  t.style.height = 'auto';
+  t.style.height = (t.scrollHeight + 2) + 'px';
+}
 
 function mvidPintarPreguntas(preguntas) {
   const caja = document.getElementById('mvid-f-preguntas');
@@ -700,13 +711,35 @@ function mvidPintarPreguntas(preguntas) {
     }
     bloque.appendChild(cab);
 
-    const texto = document.createElement('input');
-    texto.type = 'text';
+    /* Recuadros que CRECEN, no campos de una línea. Escribiendo a mano
+       una pregunta cabe; pegada de un examen no («¿Cuál es la fórmula
+       para hallar el volumen de un ortoedro (prisma rectangular)?»), y
+       lo siguiente que hay que hacer es leer las cuatro opciones para
+       marcar la buena. Dos opciones cortadas a los treinta caracteres
+       —«La cantidad de cubos que tiene una…» y «La cantidad de espacio
+       que ocupa u…»— se distinguen mal, y ahí es donde se marca la que
+       no era. */
+    const texto = document.createElement('textarea');
+    texto.rows = 1;
     texto.className = 'mvid-in mvid-preg-txt';
     texto.maxLength = 200;
     texto.placeholder = '¿Qué explicó el video?';
     texto.value = String(q.p || '');
     bloque.appendChild(texto);
+
+    /* `ok` negativo = «no se sabe cuál es la correcta». Solo llega así de
+       pegar un bloque que no lo decía: escribiendo a mano, la primera
+       viene marcada. NO se rellena con la A —acertaría una de cada
+       cuatro veces—: se deja sin marcar, en ámbar, y el guardado se para
+       hasta que alguien la toque. */
+    const ok = Number(q.ok);
+    const falta = !(isFinite(ok) && ok >= 0);
+    if (falta) {
+      bloque.classList.add('mvid-preg-falta');
+      cab.insertBefore(Object.assign(document.createElement('span'),
+        { className: 'mvid-preg-marca', textContent: '⚠️ marca la correcta' }),
+        cab.firstChild.nextSibling);
+    }
 
     /* El radio dice cuál es la correcta, y va PEGADO a su opción. Un
        desplegable aparte de «cuál es la buena» se rellena mirando arriba
@@ -720,11 +753,17 @@ function mvidPintarPreguntas(preguntas) {
       radio.type = 'radio';
       radio.name = 'mvid-ok-' + i;
       radio.value = String(j);
-      radio.checked = (Number(q.ok) || 0) === j;
+      radio.checked = !falta && ok === j;
+      /* Al tocarla se apaga el ámbar en el sitio. Repintar el bloque
+         entero movería el dedo de sitio a media revisión. */
+      radio.addEventListener('change', () => {
+        bloque.classList.remove('mvid-preg-falta');
+        bloque.querySelector('.mvid-preg-marca')?.remove();
+      });
       fila.appendChild(radio);
 
-      const campo = document.createElement('input');
-      campo.type = 'text';
+      const campo = document.createElement('textarea');
+      campo.rows = 1;
       campo.className = 'mvid-in mvid-preg-opt';
       campo.maxLength = 120;
       campo.placeholder = j === 0 ? 'La respuesta correcta' : 'Otra opción';
@@ -734,6 +773,14 @@ function mvidPintarPreguntas(preguntas) {
       bloque.appendChild(fila);
     }
     caja.appendChild(bloque);
+  });
+
+  /* El alto se ajusta CON LOS RECUADROS YA PUESTOS en la página: fuera
+     de ella `scrollHeight` es cero y saldrían todos aplastados. Por eso
+     el formulario se enseña antes de pintar las preguntas. */
+  caja.querySelectorAll('textarea').forEach(t => {
+    mvidCrecer(t);
+    t.addEventListener('input', () => mvidCrecer(t));
   });
 
   const pie = document.getElementById('mvid-f-preg-mas');
@@ -748,17 +795,23 @@ function mvidLeerPreguntas(crudo) {
   if (!caja) return [];
   const salida = [];
   caja.querySelectorAll('.mvid-preg').forEach(bloque => {
-    const p = bloque.querySelector('.mvid-preg-txt').value.trim().slice(0, 200);
-    const ops = [...bloque.querySelectorAll('.mvid-preg-opt')].map(i => i.value.trim().slice(0, 120));
+    /* Los saltos de línea se aplastan: el recuadro crece solo, pero un
+       Enter de más dentro de una opción viajaría hasta la pantalla del
+       alumno. */
+    const uno = t => String(t).replace(/\s+/g, ' ').trim();
+    const p = uno(bloque.querySelector('.mvid-preg-txt').value).slice(0, 200);
+    const ops = [...bloque.querySelectorAll('.mvid-preg-opt')].map(i => uno(i.value).slice(0, 120));
+    /* Sin marcar es -1, NUNCA 0. Devolver cero aquí sería decir que la
+       correcta es la A en una pregunta que nadie ha revisado. */
     const marcado = bloque.querySelector('input[type=radio]:checked');
-    const ok = marcado ? Number(marcado.value) : 0;
+    const ok = marcado ? Number(marcado.value) : -1;
     if (crudo) { salida.push({ p, ops, ok }); return; }
 
     /* Solo lo que un alumno puede contestar. Se quitan las opciones
        vacías del final, pero el índice de la correcta se recalcula
        ANTES de recortarlas: si no, quitar una opción de en medio
        movería la respuesta buena a otra fila sin avisar. */
-    const buena = ops[ok];
+    const buena = ok >= 0 ? ops[ok] : '';
     const limpias = ops.filter(o => o !== '');
     if (!p || limpias.length < 2) return;
     const okLimpio = limpias.indexOf(buena);
@@ -766,6 +819,268 @@ function mvidLeerPreguntas(crudo) {
     salida.push({ p, ops: limpias, ok: okLimpio });
   });
   return salida.slice(0, MVID_MAX_PREG);
+}
+
+/* ── 📋 PEGAR LAS PREGUNTAS DE GOLPE ──────────────────────────────
+   Escribir tres preguntas con sus cuatro opciones son quince campos
+   tocados de uno en uno, en una tableta y con el teclado tapando media
+   pantalla. Y el texto casi nunca se inventa aquí: ya viene escrito en
+   otro sitio, con la forma de siempre —«1.» la pregunta, «A) B) C) D)»
+   las opciones—. Copiarlo campo por campo es justo el paso donde el
+   trabajo se abandona, que es la misma razón por la que pegar el enlace
+   de YouTube rellena solo lo que se puede deducir de él.
+
+   Se lee el texto TAL COMO VENGA, sin pedirle a nadie que lo reescriba
+   para que le guste a esta pantalla:
+
+   - la pregunta, numerada o no («1.», «1)», «Pregunta 2:», o suelta);
+   - las opciones con letra («A)», «B.», «(C)», «d -») o con viñeta;
+   - las rayas de separación («---»), que se saltan;
+   - y cuál es la correcta, si viene dicha de cualquiera de las formas
+     en que se dice: ✅ ✔, negrita, un asterisco pegado, «(correcta)»,
+     «[x]», una línea «Respuesta: C» o una lista al final
+     «Respuestas: 1-C, 2-A».
+
+   ⚠️ Y SI NO VIENE DICHA, LA PREGUNTA QUEDA SIN MARCAR. No se da por
+   buena la A: la A acierta una de cada cuatro veces, y un quiz
+   publicado con la respuesta equivocada no lo descubre nadie hasta que
+   un niño acierta y la pantalla le dice que falló. Sin marcar, la
+   pregunta se ve en ámbar y el guardado se para. */
+
+/* Las marcas de «esta es la correcta», que se quitan del texto de la
+   opción. Van por alternativas y no por clase de caracteres porque los
+   emojis son pares de códigos: dentro de unos corchetes se partirían en
+   dos mitades que no significan nada. */
+function mvidQuitarMarca(txt) {
+  let t = String(txt == null ? '' : txt);
+  let marcada = false;
+  const cae = re => { if (re.test(t)) { marcada = true; t = t.replace(re, ' '); } };
+  cae(/(?:✅|✔️|✔|✓|☑️|☑|🟢|👈|👉|⭐)/g);
+  cae(/\(\s*(?:respuesta\s+)?correct[ao]s?\s*\)/gi);
+  cae(/\[\s*[xX✓]\s*\]/g);
+  cae(/(?:←|<--|<-)\s*(?:correct[ao]|respuesta)?\s*$/i);
+  cae(/^\*(?=\S)/);          // «*La cantidad…»: pegado es marca…
+  cae(/\s*\*\s*$/);          // …y detrás también. Con espacio es viñeta.
+  return { txt: t.replace(/\s{2,}/g, ' ').trim(), marcada };
+}
+
+/* ¿Esta línea es una opción? Devuelve su texto limpio, su letra (que es
+   la que empareja con la lista de respuestas del final) y si venía
+   marcada como la buena. */
+function mvidOpcionDe(linea) {
+  let t = String(linea);
+  let negrita = false;
+  if (t.indexOf('**') >= 0) { negrita = true; t = t.replace(/\*\*/g, ''); }
+
+  /* La viñeta lleva espacio detrás; el asterisco pegado al texto no es
+     viñeta sino marca de correcta, y lo recoge mvidQuitarMarca. */
+  const pelada = t.replace(/^\s*(?:[-–—•·▪◦+]|\*)\s+/, '');
+  const hayVineta = pelada !== t;
+  t = pelada.trim();
+
+  const m = t.match(/^\(?\s*([a-zA-Z])\s*[).:\-–]\s*(.+)$/);
+  let letra = '', texto = '';
+  if (m) { letra = m[1].toUpperCase(); texto = m[2]; }
+  else if (hayVineta) { texto = t; }
+  else return null;
+
+  const lim = mvidQuitarMarca(texto);
+  if (!lim.txt) return null;
+  return { t: lim.txt.slice(0, 120), letra, marcada: lim.marcada || negrita };
+}
+
+/* La lista de respuestas del final: «Respuestas: 1-C, 2-A» o una por
+   línea debajo. Vale para toda la tanda, así que se guarda aparte y se
+   reparte cuando ya están todas las preguntas leídas. */
+function mvidLeerClave(txt, clave) {
+  let hubo = false;
+  String(txt).replace(/(\d{1,2})\s*[).:\-–=]?\s*([a-zA-Z])(?![a-zA-Z])/g, (todo, n, letra) => {
+    clave[Number(n)] = letra.toUpperCase(); hubo = true; return '';
+  });
+  return hubo;
+}
+
+/* La letra de una respuesta, llevada a la posición de su opción. Se
+   busca por la LETRA que traía cada opción y no por contar: si el texto
+   pegado se saltó la B, la «C» de la clave sigue siendo la tercera de
+   ellos y la segunda de la lista. */
+function mvidPorLetra(letra, ops) {
+  const i = ops.findIndex(o => o.letra === letra);
+  if (i >= 0) return i;
+  const pos = letra.charCodeAt(0) - 65;
+  return (pos >= 0 && pos < ops.length) ? pos : -1;
+}
+
+/* «Respuesta: C», «Respuesta correcta: C) La cantidad…» o directamente
+   el texto de la buena. */
+function mvidDondeCae(resp, ops) {
+  const t = mvidQuitarMarca(resp).txt;
+  let letra = '', texto = t;
+  const sola = t.match(/^\(?\s*([a-zA-Z])\s*\)?\.?$/);
+  const conTexto = t.match(/^\(?\s*([a-zA-Z])\s*[).:\-–]\s+(.+)$/);
+  if (sola) { letra = sola[1]; texto = ''; }
+  else if (conTexto) { letra = conTexto[1]; texto = conTexto[2]; }
+  if (letra) {
+    const i = mvidPorLetra(letra.toUpperCase(), ops);
+    if (i >= 0) return i;
+  }
+  if (texto) {
+    const n = s => String(s).toLowerCase().replace(/[.,;:!¡¿?"'’]/g, '').replace(/\s+/g, ' ').trim();
+    const i = ops.findIndex(o => n(o.t) === n(texto));
+    if (i >= 0) return i;
+  }
+  return -1;
+}
+
+/* El lector. Devuelve las preguntas listas para pintar y lo que haya
+   que contarle al que pegó: nada se recorta ni se descarta en silencio. */
+function mvidParsearPreguntas(texto) {
+  const avisos = [];
+  const brutas = [];
+  const clave = {};
+  let actual = null, enClave = false;
+
+  String(texto == null ? '' : texto).replace(/\r/g, '').split('\n').forEach(cruda => {
+    const l = cruda.trim();
+    if (!l) return;
+    if (/^[-=_~#*]{3,}$/.test(l)) return;                       // ---, ***, ═══
+    if (/^(?:explicaci[óo]n|justificaci[óo]n|pista|nota|feedback)\b.{0,30}[:\-–]/i.test(l)) return;
+
+    const mc = l.match(/^(?:respuestas|clave|soluciones|answers)\b\s*[:\-–]?\s*(.*)$/i);
+    if (mc) { enClave = true; mvidLeerClave(mc[1], clave); return; }
+    if (enClave) {
+      if (mvidLeerClave(l, clave)) return;
+      enClave = false;                       // se acabó la clave: esto es otra cosa
+    }
+
+    const mr = l.match(/^(?:respuesta|correcta|correcto|soluci[óo]n)\b[^:\-–]{0,24}[:\-–]\s*(.+)$/i);
+    if (mr && actual) { actual.resp = mr[1]; return; }
+
+    const op = mvidOpcionDe(l);
+    if (op) { if (actual) actual.ops.push(op); return; }
+
+    /* Todo lo demás abre una pregunta. El número, si lo trae, se guarda:
+       es con el que empareja la lista de respuestas del final. */
+    let t = l.replace(/\*\*/g, '').replace(/^#+\s*/, '').trim();
+    let num = 0;
+    const mn = t.match(/^(?:pregunta|preg\.?)?\s*(\d{1,2})\s*[).:\-–]?\s+(.+)$/i);
+    if (mn) { num = Number(mn[1]); t = mn[2]; }
+    else t = t.replace(/^(?:pregunta|preg\.?)\s*[:.)\-–]?\s*/i, '');
+    t = mvidQuitarMarca(t).txt;
+    if (!t) return;
+    actual = { p: t.slice(0, 200), num: num || (brutas.length + 1), ops: [], resp: '' };
+    brutas.push(actual);
+  });
+
+  let preguntas = [], recortadas = 0;
+  brutas.forEach(q => {
+    const ops = q.ops.filter(o => o.t);
+    if (!q.p || ops.length < 2) return;
+
+    /* Cuál es la correcta, de lo más específico a lo más general. Y si
+       vienen marcadas TODAS, no viene marcada ninguna: una lista con
+       viñetas de asterisco las marca todas sin querer, y dar por buena
+       la primera sería inventarse la respuesta. */
+    let ok = -1;
+    const marcadas = ops.filter(o => o.marcada);
+    if (marcadas.length === 1) ok = ops.indexOf(marcadas[0]);
+    if (ok < 0 && q.resp) ok = mvidDondeCae(q.resp, ops);
+    if (ok < 0 && clave[q.num]) ok = mvidPorLetra(clave[q.num], ops);
+
+    let lista = ops.map(o => o.t);
+    if (lista.length > MVID_MAX_OPS) {
+      /* Se quedan las primeras, PERO la correcta no se cae por el
+         borde: una pregunta cuya respuesta buena no está entre las
+         opciones no la puede acertar nadie. */
+      const buena = ok >= 0 ? lista[ok] : '';
+      lista = lista.slice(0, MVID_MAX_OPS);
+      if (buena && lista.indexOf(buena) < 0) lista[MVID_MAX_OPS - 1] = buena;
+      ok = buena ? lista.indexOf(buena) : -1;
+      recortadas++;
+    }
+    preguntas.push({ p: q.p, ops: lista, ok });
+  });
+
+  const descartadas = brutas.length - preguntas.length;
+  if (descartadas > 0) {
+    avisos.push('Se saltaron ' + descartadas + (descartadas === 1 ? ' línea que no llegaba' : ' líneas que no llegaban') +
+                ' a pregunta: hacen falta el enunciado y al menos dos opciones.');
+  }
+  if (recortadas > 0) {
+    avisos.push(recortadas === 1 ? 'Una pregunta traía más de ' + MVID_MAX_OPS + ' opciones: se quedan ' + MVID_MAX_OPS + ', con la correcta dentro.'
+                                 : recortadas + ' preguntas traían más de ' + MVID_MAX_OPS + ' opciones: se quedan ' + MVID_MAX_OPS + ', con la correcta dentro.');
+  }
+  if (preguntas.length > MVID_MAX_PREG) {
+    avisos.push('Venían ' + preguntas.length + ' preguntas: se quedan las ' + MVID_MAX_PREG +
+                ' primeras, que es el tope por video.');
+    preguntas = preguntas.slice(0, MVID_MAX_PREG);
+  }
+
+  return { preguntas, avisos, sinMarcar: preguntas.filter(q => q.ok < 0).length };
+}
+
+/* ── El recuadro de pegar ────────────────────────────────────────── */
+
+function mvidPegarAbrir(abrir) {
+  const caja = document.getElementById('mvid-f-pegar-caja');
+  if (!caja) return;
+  caja.style.display = abrir ? '' : 'none';
+  if (abrir) document.getElementById('mvid-f-pegar-txt')?.focus();
+}
+
+function mvidPegarLeer() {
+  const ta = document.getElementById('mvid-f-pegar-txt');
+  const avCaja = document.getElementById('mvid-f-pegar-aviso');
+  const avPreg = document.getElementById('mvid-f-preg-aviso');
+  if (!ta || !avCaja || !avPreg) return;
+
+  const r = mvidParsearPreguntas(ta.value);
+  if (!r.preguntas.length) {
+    /* El recuadro se queda abierto: lo que hay que arreglar está ahí. */
+    avCaja.textContent = '⚠️ No se reconoció ninguna pregunta. Cada pregunta va en su línea y debajo sus opciones, empezando por «A)» «B)» «C)».';
+    return;
+  }
+
+  /* Se AÑADEN a lo que ya hubiera escrito: quien pega la segunda tanda
+     no espera que le borre la primera. Los huecos vacíos sí se van. */
+  const antes = mvidLeerPreguntas(true).filter(q => q.p || q.ops.some(o => o));
+  const juntas = antes.concat(r.preguntas);
+  const avisos = r.avisos.slice();
+  if (juntas.length > MVID_MAX_PREG) {
+    avisos.push('Con las que ya había son ' + juntas.length + ': se quedan las ' + MVID_MAX_PREG + ' primeras.');
+  }
+  mvidPintarPreguntas(juntas.slice(0, MVID_MAX_PREG));
+
+  const n = r.preguntas.length;
+  const pl = n === 1 ? 'pregunta' : 'preguntas';
+  const faltan = mvidLeerPreguntas(true).filter(q => !(q.ok >= 0)).length;
+  const msg = faltan
+    ? '⚠️ Se leyeron ' + n + ' ' + pl + ', pero ' +
+      (faltan === 1 ? 'una se quedó' : faltan + ' se quedaron') +
+      ' sin la correcta: tócala en las que salen en ámbar. Aquí no se da por buena la A.'
+    : '✅ Se ' + (n === 1 ? 'leyó' : 'leyeron') + ' ' + n + ' ' + pl + ', con su respuesta marcada. Repásalas antes de guardar.';
+  avPreg.textContent = msg + (avisos.length ? ' ' + avisos.join(' ') : '');
+  avCaja.textContent = '';
+  ta.value = '';
+  mvidPegarAbrir(false);
+}
+
+/* Un toque menos: en una tableta, entrar al recuadro y mantener tocado
+   para «Pegar» son tres gestos finos. Si el navegador no deja leer el
+   portapapeles, el botón ni aparece y se pega a mano de siempre. */
+async function mvidPegarDelPortapapeles() {
+  const ta = document.getElementById('mvid-f-pegar-txt');
+  const av = document.getElementById('mvid-f-pegar-aviso');
+  if (!ta || !av) return;
+  try {
+    const t = await navigator.clipboard.readText();
+    if (!t || !t.trim()) { av.textContent = 'El portapapeles está vacío: copia primero las preguntas.'; return; }
+    ta.value = t;
+    av.textContent = '';
+    mvidPegarLeer();
+  } catch (e) {
+    av.textContent = 'El navegador no dejó leer el portapapeles: mantén tocado el recuadro y dale a «Pegar».';
+  }
 }
 
 /* ── El formulario ───────────────────────────────────────────────── */
@@ -782,8 +1097,20 @@ function mvidAbrirForm(v) {
   g('mvid-f-fin').value    = v && v.fin ? v.fin : '';
   g('mvid-f-titulo-ventana').textContent = v ? 'Editar el video' : 'Añadir un video';
   g('mvid-f-aviso').textContent = '';
-  mvidPintarPreguntas(v ? v.preguntas : []);
+  /* El recuadro de pegar arranca limpio en cada video: un resumen del
+     video anterior («se leyeron 3 preguntas») leído sobre este sería
+     una mentira con toda la pinta de verdad. */
+  const pegaTxt = g('mvid-f-pegar-txt');
+  if (pegaTxt) pegaTxt.value = '';
+  const pegaAv = g('mvid-f-pegar-aviso');
+  if (pegaAv) pegaAv.textContent = '';
+  const pregAv = g('mvid-f-preg-aviso');
+  if (pregAv) pregAv.textContent = '';
+  mvidPegarAbrir(false);
+  /* El formulario se enseña ANTES de pintar las preguntas: los recuadros
+     que crecen no saben cuánto miden mientras están escondidos. */
   g('mvid-form-overlay').style.display = 'flex';
+  mvidPintarPreguntas(v ? v.preguntas : []);
 }
 function mvidCerrarForm() {
   _mvidEditando = null;
@@ -828,6 +1155,22 @@ async function mvidGuardar() {
      se dice. Guardar en silencio lo que se acaba de tirar es la forma
      más rápida de que alguien crea que puso un quiz y no lo puso. */
   const crudas = mvidLeerPreguntas(true).filter(q => q.p || q.ops.some(o => o));
+
+  /* Y una pregunta entera a la que solo le falta MARCAR la correcta no
+     se descarta: se para el guardado y se dice cuál es. Es lo que puede
+     llegar de pegar un bloque que no decía la respuesta, y descartarla
+     con las demás dejaría al administrador creyendo que puso un quiz de
+     tres preguntas y publicando uno de una. */
+  const sinMarcar = crudas.findIndex(q => q.p && q.ops.filter(o => o).length >= 2 && !(q.ok >= 0));
+  if (sinMarcar >= 0) {
+    const falta = '⚠️ Falta marcar cuál es la respuesta correcta en la pregunta ' +
+                  (sinMarcar + 1) + '. Tócala y vuelve a guardar.';
+    aviso.textContent = falta;
+    const pregAv = g('mvid-f-preg-aviso');
+    if (pregAv) pregAv.textContent = falta;
+    return;
+  }
+
   if (crudas.length > fila.preguntas.length) {
     aviso.textContent = 'Una pregunta necesita su texto y al menos dos opciones, con la correcta marcada. Las incompletas no se guardan.';
     return;
@@ -940,6 +1283,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('mvid-cat-btn')?.addEventListener('click', mvidAlCatalogo);
   document.getElementById('mvid-f-cerrar')?.addEventListener('click', mvidCerrarForm);
   document.getElementById('mvid-f-guardar')?.addEventListener('click', mvidGuardar);
+  document.getElementById('mvid-f-preg-pegar')?.addEventListener('click', () => mvidPegarAbrir(true));
+  document.getElementById('mvid-f-pegar-cerrar')?.addEventListener('click', () => mvidPegarAbrir(false));
+  document.getElementById('mvid-f-pegar-leer')?.addEventListener('click', mvidPegarLeer);
+  const btnPortapapeles = document.getElementById('mvid-f-pegar-portapapeles');
+  if (btnPortapapeles && navigator.clipboard && navigator.clipboard.readText) {
+    btnPortapapeles.style.display = '';
+    btnPortapapeles.addEventListener('click', mvidPegarDelPortapapeles);
+  }
   document.getElementById('mvid-f-preg-mas')?.addEventListener('click', () => {
     const ahora = mvidLeerPreguntas(true);
     ahora.push({ p: '', ops: [], ok: 0 });
@@ -985,4 +1336,5 @@ window.FaroMetasVideos = {
   deEnlace: mvidDeEnlace,
   segundos: mvidSegundos,
   embed: mvidEmbed,
+  parsear: mvidParsearPreguntas,
 };

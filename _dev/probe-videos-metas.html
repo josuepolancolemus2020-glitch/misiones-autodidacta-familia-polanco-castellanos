@@ -421,10 +421,10 @@ function nuevaBase(w, opciones){
   await esperar(200);
   ok(!!g('mvid-f-preguntas'), 'el formulario tiene su sitio para preguntas',
      'no hay dónde escribir preguntas');
-  ok(w.document.querySelectorAll('.mvid-preg .mvid-preg-opt').length === 3,
-     'con tres opciones por pregunta',
-     'las opciones no salen');
-  ok(w.document.querySelectorAll('.mvid-preg input[type=radio]').length === 3,
+  ok(w.document.querySelectorAll('.mvid-preg .mvid-preg-opt').length === 4,
+     'con CUATRO opciones por pregunta (el A) B) C) D) de cualquier prueba)',
+     'las opciones no salen de cuatro: pegar un bloque de cuatro perdería la D');
+  ok(w.document.querySelectorAll('.mvid-preg input[type=radio]').length === 4,
      'y el círculo de la correcta PEGADO a cada opción',
      'la correcta se elige en otro sitio, no junto a su opción');
 
@@ -460,9 +460,141 @@ function nuevaBase(w, opciones){
        '`ok` no es un número');
   }
 
-  /* ═══ 11. Sin catálogo, la herramienta lo DICE ═══ */
+  /* ═══ 11. Pegar las preguntas de golpe ═══
+     Escribirlas campo por campo en una tableta es el paso donde el
+     trabajo se abandona. Lo que se vigila aquí es lo que cuesta caro:
+     que se lea el bloque TAL COMO VIENE (que es como lo da cualquier
+     prueba de selección múltiple: «1.» y «A) B) C) D)»), que no se
+     pierda la D, y sobre todo que la respuesta correcta NO SE INVENTE.
+     Un quiz publicado con la buena en la A no lo descubre nadie hasta
+     que un niño acierta y la pantalla le dice que falló. */
   log('');
-  log('── 11. Si el catálogo de M.E.T.A.S no llega, se dice ──');
+  log('── 11. Pegar las preguntas de golpe ──');
+  const BLOQUE =
+    '1. ¿Qué es el volumen?\n' +
+    'A) La cantidad de cubos que tiene una figura\n' +
+    'B) La capacidad de un objeto para contener líquidos\n' +
+    'C) La cantidad de espacio que ocupa un cuerpo\n' +
+    'D) El área de todas las caras de un objeto\n\n' +
+    '---\n\n' +
+    '2. ¿En qué unidades se mide el volumen?\n' +
+    'A) Unidades cuadradas\n' +
+    'B) Unidades lineales\n' +
+    'C) Unidades cúbicas\n' +
+    'D) Unidades circulares\n\n' +
+    '---\n\n' +
+    '3. ¿Cuál es la fórmula del volumen de un ortoedro?\n' +
+    'A) Largo + ancho + altura\n' +
+    'B) Largo × ancho\n' +
+    'C) Largo × ancho × altura\n' +
+    'D) (Largo × ancho) ÷ altura';
+
+  await w.eval('mvidAbrirForm(null)');
+  await esperar(200);
+  g('mvid-f-preg-pegar').click();
+  await esperar(100);
+  ok(g('mvid-f-pegar-caja').style.display !== 'none',
+     'el botón de pegar abre su recuadro', 'no hay dónde pegar el bloque');
+
+  g('mvid-f-pegar-txt').value = BLOQUE;
+  g('mvid-f-pegar-leer').click();
+  await esperar(200);
+
+  const bloques = [...w.document.querySelectorAll('.mvid-preg')];
+  ok(bloques.length === 3, 'de un bloque pegado salen las tres preguntas',
+     'salieron ' + bloques.length + ' preguntas del bloque');
+  const txts = bloques.map(b => b.querySelector('.mvid-preg-txt').value);
+  ok(txts[0] === '¿Qué es el volumen?', 'con el enunciado sin el «1.» delante',
+     'el enunciado quedó: ' + JSON.stringify(txts[0]));
+  const ops1 = [...bloques[0].querySelectorAll('.mvid-preg-opt')].map(i => i.value).filter(Boolean);
+  ok(ops1.length === 4 && ops1[3] === 'El área de todas las caras de un objeto',
+     'y sus CUATRO opciones, sin perder la D',
+     'las opciones quedaron: ' + JSON.stringify(ops1));
+
+  /* Lo que de verdad no puede fallar: el bloque no decía cuál era la
+     correcta, así que NINGUNA queda marcada. */
+  ok(!w.document.querySelector('.mvid-preg input[type=radio]:checked'),
+     'el bloque no decía la correcta: no se marca ninguna sola',
+     'se dio por buena una respuesta que nadie eligió');
+  ok(w.document.querySelectorAll('.mvid-preg-falta').length === 3,
+     'las tres se ven en ámbar, pidiendo que se marque',
+     'no se ve que falte marcar la correcta');
+  ok(/sin la correcta|sin marcar/i.test(g('mvid-f-preg-aviso').textContent),
+     'y se dice con palabras, al lado de las preguntas',
+     'no se avisa de que falta la correcta: ' + JSON.stringify(g('mvid-f-preg-aviso').textContent));
+
+  /* Y el guardado SE PARA: no se guarda un quiz de tres preguntas
+     dejándolo en cero ni marcando la A por su cuenta. */
+  g('mvid-f-enlace').value = 'https://youtu.be/' + ID;
+  g('mvid-f-titulo').value = 'Pegado';
+  const antesDePegar = base.tablas.metas_videos.length;
+  await w.eval('mvidGuardar()');
+  await esperar(300);
+  ok(base.tablas.metas_videos.length === antesDePegar,
+     'sin marcar la correcta NO se guarda',
+     'se guardó un quiz con la respuesta sin revisar');
+  ok(/correcta/i.test(g('mvid-f-aviso').textContent) && /pregunta 1/i.test(g('mvid-f-aviso').textContent),
+     'y se dice CUÁL pregunta es la que falta',
+     'el aviso no dice qué hay que tocar: ' + JSON.stringify(g('mvid-f-aviso').textContent));
+
+  /* Se marca la C de las tres, como haría el administrador. */
+  bloques.forEach(b => b.querySelectorAll('input[type=radio]')[2].click());
+  await esperar(100);
+  ok(w.document.querySelectorAll('.mvid-preg-falta').length === 0,
+     'al tocarla se apaga el ámbar en el sitio',
+     'el ámbar sigue puesto después de marcar');
+  await w.eval('mvidGuardar()');
+  await esperar(400);
+  const pegado = base.tablas.metas_videos.find(v => v.titulo === 'Pegado');
+  ok(pegado && pegado.preguntas.length === 3, 'ya marcadas, se guardan las tres',
+     'no se guardaron las preguntas pegadas');
+  if (pegado && pegado.preguntas[0]) {
+    const q = pegado.preguntas[0];
+    ok(q.ops.length === 4 && q.ok === 2 && q.ops[q.ok] === 'La cantidad de espacio que ocupa un cuerpo',
+       'con sus cuatro opciones y `ok` apuntando a la que se marcó',
+       'quedó mal: ' + JSON.stringify(q));
+  }
+
+  /* Si el texto SÍ dice cuál es la correcta, se marca sola: es el caso
+     normal cuando las preguntas vienen con su clave debajo. */
+  await w.eval('mvidAbrirForm(null)');
+  await esperar(200);
+  g('mvid-f-preg-pegar').click();
+  g('mvid-f-pegar-txt').value = BLOQUE + '\n\nRespuestas: 1-C, 2-C, 3-C';
+  g('mvid-f-pegar-leer').click();
+  await esperar(200);
+  const marcadas = [...w.document.querySelectorAll('.mvid-preg')]
+    .map(b => [...b.querySelectorAll('input[type=radio]')].findIndex(r => r.checked));
+  ok(marcadas.join() === '2,2,2', 'la lista «Respuestas: 1-C, 2-C, 3-C» marca sola las tres',
+     'la clave del final no se aplicó: ' + JSON.stringify(marcadas));
+  ok(w.document.querySelectorAll('.mvid-preg-falta').length === 0,
+     'y entonces no queda nada en ámbar', 'sigue pidiendo marcar lo que ya venía dicho');
+  await w.eval('mvidCerrarForm()');
+
+  /* Y el lector, en seco: las formas en que un texto dice cuál es la
+     buena, y los topes, que no pueden recortar en silencio. */
+  const P = w.FaroMetasVideos.parsear;
+  const conVisto = P('¿Qué es?\nA) Uno\nB) Dos ✅\nC) Tres').preguntas[0];
+  ok(conVisto.ok === 1 && conVisto.ops[1] === 'Dos',
+     'el ✅ marca la correcta y no se queda dentro del texto', JSON.stringify(conVisto));
+  const negrita = P('¿Qué es?\nA) Uno\n**B) Dos**\nC) Tres').preguntas[0];
+  ok(negrita.ok === 1, 'la negrita también', JSON.stringify(negrita));
+  const asteriscos = P('¿Qué es?\n* Uno\n* Dos\n* Tres').preguntas[0];
+  ok(asteriscos.ops.length === 3 && asteriscos.ok === -1,
+     'pero una lista de asteriscos son VIÑETAS, no tres correctas', JSON.stringify(asteriscos));
+  const cinco = P([1,2,3,4,5].map(n => n + '. ¿P' + n + '?\nA) Uno\nB) Dos ✅').join('\n\n'));
+  ok(cinco.preguntas.length === 3 && /Ven[íi]an 5/.test(cinco.avisos.join(' ')),
+     'de cinco preguntas se quedan tres, y se dice', JSON.stringify(cinco.avisos));
+  const cincoOps = P('¿Qué es?\nA) Uno\nB) Dos\nC) Tres\nD) Cuatro\nE) Cinco ✅').preguntas[0];
+  ok(cincoOps.ops.length === 4 && cincoOps.ops[cincoOps.ok] === 'Cinco',
+     'y de cinco opciones se quedan cuatro, con la correcta DENTRO',
+     'la correcta se cayó por el borde: ' + JSON.stringify(cincoOps));
+  ok(P('hola qué tal\notra línea suelta').preguntas.length === 0,
+     'un texto cualquiera no se inventa preguntas', 'salieron preguntas de un texto que no las tenía');
+
+  /* ═══ 12. Sin catálogo, la herramienta lo DICE ═══ */
+  log('');
+  log('── 12. Si el catálogo de M.E.T.A.S no llega, se dice ──');
   await w.eval('_mvidMisiones = []; mvidPintarChips(); mvidPintarSelector()');
   await esperar(200);
   const sc = g('mvid-chips').textContent;
@@ -474,13 +606,13 @@ function nuevaBase(w, opciones){
      'y que mientras tanto la carpeta se puede escribir a mano',
      'no dice qué hacer mientras tanto');
 
-  /* ═══ 12. El service worker no puede servir el JS viejo ═══
+  /* ═══ 13. El service worker no puede servir el JS viejo ═══
      Esto no se ve desde el navegador —la sonda corre sin service
      worker—, así que se lee el archivo. Y hace falta: el 28 de agosto
      de 2026 F.A.R.O sirvió el HTML nuevo con el JS viejo, así que el
      rótulo MATERIA salía y debajo no había ni un chip. */
   log('');
-  log('── 12. El service worker revalida contra el servidor ──');
+  log('── 13. El service worker revalida contra el servidor ──');
   const sw = await (await fetch('/sw.js', { cache: 'no-store' })).text();
   const ramaPropia = sw.split('} else {')[0];
   ok(/cache:\s*'no-cache'/.test(ramaPropia),
