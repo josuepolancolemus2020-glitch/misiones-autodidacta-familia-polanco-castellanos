@@ -663,10 +663,21 @@ function mvidCerrarVer() {
    2. Una pregunta a medias NO se guarda. Sin texto, o con menos de dos
       opciones, es una pregunta que el alumno no puede contestar; se
       descarta al guardar y la pantalla lo dice.
-   3. El tope son tres. Al acabar un video de cinco minutos, tres
-      preguntas se contestan; ocho se abandonan, y una comprobación
-      abandonada no comprueba nada. */
-const MVID_MAX_PREG = 3;
+   3. El tope son DIEZ. Era tres —«al acabar un video de cinco minutos,
+      tres preguntas se contestan; ocho se abandonan»— y el autor lo
+      subió el 28 de agosto de 2026: un video largo, o el que repasa un
+      tema entero, pide más, y quien lo eligió es quien sabe cuántas
+      aguanta. El consejo de poner pocas al final de un video corto
+      sigue siendo bueno; lo que cambia es que ahora se aconseja en la
+      pantalla en vez de imponerse.
+
+      ⚠️ Este número vive en TRES sitios y los tres tienen que decir lo
+      mismo: aquí, el `check` de la base (`metas_videos.sql`) y el tope
+      de la pantalla del alumno (`vmPreguntas`, en M.E.T.A.S). Si uno se
+      queda corto, las preguntas de más no dan un error: se pierden por
+      el camino, y el administrador se entera —si se entera— mirando la
+      pantalla de un niño. */
+const MVID_MAX_PREG = 10;
 /* CUATRO opciones, no tres, y no es un capricho: el A) B) C) D) es la
    forma en que viene escrita cualquier prueba de selección múltiple, así
    que es lo que se va a pegar aquí. Con tres, pegar un bloque de cuatro
@@ -783,8 +794,13 @@ function mvidPintarPreguntas(preguntas) {
     t.addEventListener('input', () => mvidCrecer(t));
   });
 
+  /* Con diez posibles el formulario es largo, así que el pie dice por
+     cuántas va: si no, hay que subir contando recuadros. */
   const pie = document.getElementById('mvid-f-preg-mas');
-  if (pie) pie.style.display = lista.length >= MVID_MAX_PREG ? 'none' : '';
+  if (pie) {
+    pie.style.display = lista.length >= MVID_MAX_PREG ? 'none' : '';
+    pie.textContent = '➕ Otra pregunta (' + lista.length + ' de ' + MVID_MAX_PREG + ')';
+  }
 }
 
 /* Lee lo escrito. Con `crudo` devuelve TODO tal cual (lo usa el botón
@@ -1190,7 +1206,20 @@ async function mvidGuardar() {
     ({ error } = await _sb.from(MVID_TABLE).insert(fila));
   }
 
-  if (error) { aviso.textContent = 'No se pudo guardar: ' + error.message; return; }
+  if (error) {
+    /* El tope de preguntas subió a diez el 28 de agosto de 2026, y el de
+       la base solo sube pegando el SQL a mano. Mientras no se pegue, la
+       sexta pregunta rebota con un mensaje de PostgreSQL que habla de un
+       `check` y no dice qué hacer. Aquí se traduce: el que está delante
+       de la pantalla está en una tableta, sin el repositorio. */
+    const viejo = /metas_videos_preguntas_lista|check constraint/i.test(error.message || '');
+    aviso.textContent = viejo
+      ? 'La base todavía tiene el tope viejo de preguntas por video. Hay que volver a correr ' +
+        'supabase/sql/metas_videos.sql en el editor SQL de Supabase (se puede correr dos veces ' +
+        'sin dañar nada); mientras tanto, deja el video con menos preguntas y no se pierde lo escrito.'
+      : 'No se pudo guardar: ' + error.message;
+    return;
+  }
   mvidCerrarForm();
   await initMetasVideos();
 }

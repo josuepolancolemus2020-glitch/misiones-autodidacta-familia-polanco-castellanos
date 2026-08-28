@@ -78,6 +78,14 @@ returns table (id text, yt text, titulo text, nota text, dura text,
 language sql stable as $$ select null::text, null::text, null::text, null::text,
   null::text, null::text, null::int, null::int, null::boolean where false $$;
 
+-- Y se le pone el TOPE VIEJO de cinco preguntas, que es lo que hay hoy
+-- en la base del autor. Es el caso que se escapa sin ruido: un archivo
+-- que añadiera el tope solo «si no existe» dejaría este puesto, diría
+-- «Success», y el fallo saldría en F.A.R.O al guardar la sexta.
+alter table public.metas_videos drop constraint if exists metas_videos_preguntas_lista;
+alter table public.metas_videos add constraint metas_videos_preguntas_lista
+  check (jsonb_typeof(preguntas) = 'array' and jsonb_array_length(preguntas) <= 5);
+
 \i supabase/sql/metas_videos.sql
 
 do $$
@@ -91,7 +99,11 @@ begin
   -- Y la puerta nueva devuelve diez columnas, no nueve
   select count(*) into c from public.metas_videos_publicos('re-corrida');
   if c <> 1 then raise exception 'la puerta nueva no devolvió el video'; end if;
-  raise notice 're-correr no borra nada, añade la columna y cambia la puerta';
+  -- Y el tope viejo de cinco quedó SUSTITUIDO, no conservado.
+  select substring(pg_get_constraintdef(oid) from '<= ([0-9]+)')::int into c
+    from pg_constraint where conname = 'metas_videos_preguntas_lista';
+  if c <> 10 then raise exception 'la re-corrida dejó el tope viejo de preguntas: %', c; end if;
+  raise notice 're-correr no borra nada, añade la columna, cambia la puerta y sube el tope a diez';
 end $$;
 
 truncate public.metas_videos;
@@ -298,14 +310,23 @@ begin
   exception when check_violation then entro := false; end;
   if entro then raise exception 'entró un objeto donde tiene que haber una lista'; end if;
 
+  -- Diez SÍ entran. Es lo que se comprueba al subir el tope: un archivo
+  -- re-corrido que dejara el `check` viejo en cinco no daría ningún
+  -- error aquí arriba, y el fallo aparecería en F.A.R.O al guardar el
+  -- sexto video con preguntas.
+  insert into public.metas_videos (mision, vid, yt_id, preguntas)
+    values ('q','v-diez','aaaaaaaaaaa',
+      (select jsonb_agg(jsonb_build_object('p', n::text)) from generate_series(1,10) n));
+  raise notice 'diez preguntas entran, que es el tope de hoy';
+
   entro := true;
   begin
     insert into public.metas_videos (mision, vid, yt_id, preguntas)
-      values ('q','v-seis','aaaaaaaaaaa',
-        '[{"p":"1"},{"p":"2"},{"p":"3"},{"p":"4"},{"p":"5"},{"p":"6"}]'::jsonb);
+      values ('q','v-once','aaaaaaaaaaa',
+        (select jsonb_agg(jsonb_build_object('p', n::text)) from generate_series(1,11) n));
   exception when check_violation then entro := false; end;
-  if entro then raise exception 'entraron seis preguntas donde el tope son cinco'; end if;
-  raise notice 'lo que no es una lista rebota, y seis preguntas también';
+  if entro then raise exception 'entraron once preguntas donde el tope son diez'; end if;
+  raise notice 'lo que no es una lista rebota, y once preguntas también';
 end $$;
 
 -- Un video sin preguntas nace con lista vacía, no con nulo: la pantalla

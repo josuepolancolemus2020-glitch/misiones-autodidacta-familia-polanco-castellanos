@@ -164,7 +164,7 @@ create table if not exists public.metas_videos (
 -- o tres preguntas SOBRE ESE VIDEO, escritas por quien lo eligió.
 --
 -- POR QUÉ jsonb Y NO UNA TABLA APARTE: las preguntas no existen sin su
--- video, no se consultan por separado y no pasan de tres. Una tabla
+-- video, no se consultan por separado y no pasan de diez. Una tabla
 -- hija obligaría a un segundo viaje a la base desde el teléfono del
 -- alumno, y esa es la conexión de un pueblo. La forma:
 --
@@ -177,23 +177,26 @@ create table if not exists public.metas_videos (
 -- buena y nadie se enteraría hasta que un niño la fallara.
 --
 -- El check es a propósito de andar por casa —que sea una lista y no
--- pase de cinco—: la forma de dentro la hace cumplir la pantalla, que
+-- pase de diez—: la forma de dentro la hace cumplir la pantalla, que
 -- es donde se puede explicar el error a quien lo está escribiendo. Lo
 -- que NO puede pasar es que aquí entre algo que no sea una lista,
 -- porque la pantalla del alumno recorre esto con un bucle.
 alter table public.metas_videos
   add column if not exists preguntas jsonb not null default '[]'::jsonb;
 
-do $$
-begin
-  if not exists (select 1 from pg_constraint
-                  where conname = 'metas_videos_preguntas_lista') then
-    alter table public.metas_videos
-      add constraint metas_videos_preguntas_lista
-      check (jsonb_typeof(preguntas) = 'array' and jsonb_array_length(preguntas) <= 5);
-  end if;
-end
-$$;
+-- ⚠️ El tope se TIRA Y SE VUELVE A PONER, no se añade «si no existe».
+-- Nació en cinco y el 28 de agosto de 2026 subió a diez; con un
+-- `if not exists` el que ya lo tenía puesto habría re-corrido el
+-- archivo entero, habría leído «Success» y habría seguido con el tope
+-- viejo — y el fallo no se vería aquí, sino en F.A.R.O al guardar el
+-- sexto, con un error de la base que no dice de dónde sale. Así el
+-- archivo acaba SIEMPRE en el número que está escrito abajo, se corra
+-- las veces que se corra.
+alter table public.metas_videos
+  drop constraint if exists metas_videos_preguntas_lista;
+alter table public.metas_videos
+  add constraint metas_videos_preguntas_lista
+  check (jsonb_typeof(preguntas) = 'array' and jsonb_array_length(preguntas) <= 10);
 
 alter table public.metas_videos enable row level security;
 
@@ -320,4 +323,8 @@ select
                                                                              as seguridad_por_fila,
   (to_regprocedure('public.metas_videos_publicos(text)') is not null)         as puerta_publica,
   (select count(*) from public.metas_videos)                                 as videos_guardados,
-  'Si columnas=16, politicas=1, seguridad_por_fila=t y puerta_publica=t, quedó puesto.' as lectura;
+  -- El tope de preguntas se lee del propio check: es el número que hay
+  -- que mirar cuando se re-corre el archivo para subirlo.
+  (select substring(pg_get_constraintdef(oid) from '<= ([0-9]+)')
+     from pg_constraint where conname = 'metas_videos_preguntas_lista')      as tope_preguntas,
+  'Si columnas=16, politicas=1, seguridad_por_fila=t, puerta_publica=t y tope_preguntas=10, quedó puesto.' as lectura;

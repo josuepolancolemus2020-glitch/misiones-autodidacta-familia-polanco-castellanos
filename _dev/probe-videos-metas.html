@@ -582,15 +582,41 @@ function nuevaBase(w, opciones){
   const asteriscos = P('¿Qué es?\n* Uno\n* Dos\n* Tres').preguntas[0];
   ok(asteriscos.ops.length === 3 && asteriscos.ok === -1,
      'pero una lista de asteriscos son VIÑETAS, no tres correctas', JSON.stringify(asteriscos));
-  const cinco = P([1,2,3,4,5].map(n => n + '. ¿P' + n + '?\nA) Uno\nB) Dos ✅').join('\n\n'));
-  ok(cinco.preguntas.length === 3 && /Ven[íi]an 5/.test(cinco.avisos.join(' ')),
-     'de cinco preguntas se quedan tres, y se dice', JSON.stringify(cinco.avisos));
+  const doce = P([...Array(12)].map((_, n) => (n + 1) + '. ¿P' + n + '?\nA) Uno\nB) Dos ✅').join('\n\n'));
+  ok(doce.preguntas.length === 10 && /Ven[íi]an 12/.test(doce.avisos.join(' ')),
+     'de doce preguntas se quedan diez —el tope—, y se dice', JSON.stringify(doce.avisos));
   const cincoOps = P('¿Qué es?\nA) Uno\nB) Dos\nC) Tres\nD) Cuatro\nE) Cinco ✅').preguntas[0];
   ok(cincoOps.ops.length === 4 && cincoOps.ops[cincoOps.ok] === 'Cinco',
      'y de cinco opciones se quedan cuatro, con la correcta DENTRO',
      'la correcta se cayó por el borde: ' + JSON.stringify(cincoOps));
   ok(P('hola qué tal\notra línea suelta').preguntas.length === 0,
      'un texto cualquiera no se inventa preguntas', 'salieron preguntas de un texto que no las tenía');
+
+  /* Y el tope de verdad: diez preguntas tienen que llegar hasta la
+     base. El número vive en tres sitios —aquí, el `check` de
+     metas_videos.sql y el `vmPreguntas` de M.E.T.A.S— y si uno se queda
+     corto las de más no dan error: se pierden por el camino. */
+  await w.eval('mvidAbrirForm(null)');
+  await esperar(200);
+  g('mvid-f-preg-pegar').click();
+  g('mvid-f-pegar-txt').value = [...Array(10)].map((_, n) =>
+    (n + 1) + '. ¿Pregunta ' + (n + 1) + '?\nA) Uno\nB) Dos ✅\nC) Tres').join('\n\n');
+  g('mvid-f-pegar-leer').click();
+  await esperar(300);
+  ok(w.document.querySelectorAll('.mvid-preg').length === 10,
+     'diez preguntas pegadas salen las diez',
+     'el formulario no admite diez: salieron ' + w.document.querySelectorAll('.mvid-preg').length);
+  ok(g('mvid-f-preg-mas').style.display === 'none',
+     'y en el tope se retira el botón de añadir otra',
+     'se puede seguir añadiendo por encima del tope');
+  g('mvid-f-enlace').value = 'https://youtu.be/' + ID;
+  g('mvid-f-titulo').value = 'Diez preguntas';
+  await w.eval('mvidGuardar()');
+  await esperar(400);
+  const diez = base.tablas.metas_videos.find(v => v.titulo === 'Diez preguntas');
+  ok(diez && diez.preguntas.length === 10,
+     'y las diez llegan enteras a la base',
+     'no se guardaron las diez: ' + (diez ? diez.preguntas.length : 'no se guardó'));
 
   /* ═══ 12. Sin catálogo, la herramienta lo DICE ═══ */
   log('');

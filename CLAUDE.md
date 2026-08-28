@@ -224,8 +224,9 @@ cumplir la seguridad por fila.
      Se trae por la red del sitio público de M.E.T.A.S y puede fallar;
      antes, en ese caso, no salía nada y el desplegable se quedaba vacío
      sin explicar por qué: parecía la herramienta rota.
-10. **El quiz del propio video.** Hasta tres preguntas por video, con sus
-   opciones y el círculo de la correcta PEGADO a cada una —un
+10. **El quiz del propio video.** Hasta **diez** preguntas por video
+   (eran tres hasta el 28 de agosto de 2026), con sus opciones y el
+   círculo de la correcta PEGADO a cada una —un
    desplegable aparte de «cuál es la buena» se rellena mirando arriba y
    abajo, y ahí es donde se marca la que no era—. `ok` es el ÍNDICE,
    nunca el texto. Una pregunta a medias **no se guarda en silencio**: la
@@ -246,6 +247,18 @@ cumplir la seguridad por fila.
    palabras y **el guardado se para** nombrando cuál falta. Si el texto
    sí lo dice —✅, negrita, «(correcta)», «Respuesta: C» o una lista
    final «Respuestas: 1-C, 2-A»— se marca sola.
+
+   ⚠️ **El tope de preguntas vive en TRES sitios y los tres tienen que
+   decir lo mismo:** `MVID_MAX_PREG` aquí, el `check` de
+   `supabase/sql/metas_videos.sql` y el tope de `vmPreguntas` en
+   M.E.T.A.S. Si uno se queda corto no salta ningún error: las de más se
+   pierden por el camino —o rebotan con un mensaje de PostgreSQL que
+   habla de un `check`— y se descubre mirando la pantalla de un niño.
+   Subirlo obliga a **volver a correr el SQL a mano**, y por eso el
+   archivo tira el tope y lo vuelve a poner en vez de añadirlo «si no
+   existe»: con `if not exists`, re-correrlo diría «Success» y dejaría
+   el número viejo. La comprobación del final del archivo lo enseña
+   (`tope_preguntas`).
 
    Dos cosas más que salieron de pegar de verdad: las opciones son
    **cuatro y no tres** (el A) B) C) D) es la forma en que viene
