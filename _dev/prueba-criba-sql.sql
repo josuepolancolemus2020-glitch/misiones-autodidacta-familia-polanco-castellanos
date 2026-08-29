@@ -474,6 +474,51 @@ begin
 end $$;
 \echo 'ok 13 · ⚠️ la CNBS entra sin tema (es de volcado); OpenAlex sin tema NO'
 
+
+-- ════════════════════════════════════════════════════════════════════
+-- 10. UN TEMA NO SE COME LA EDICIÓN · criba_afina2.sql
+-- ════════════════════════════════════════════════════════════════════
+\echo '── Corriendo supabase/sql/criba_afina2.sql ──'
+\i supabase/sql/criba_afina2.sql
+
+-- ⚠️ «Psicología de masas» puso 8 de 25 con el tope solo por fuente:
+-- salieron todos de la misma fuente Y del mismo término, así que aquel
+-- tope no los paró. Un término desafortunado convertía la edición en un
+-- monográfico sobre peatones.
+do $$
+declare mayor integer; materias integer;
+begin
+  delete from public.criba_items;
+  -- Un tema glotón con veinte, repartidos entre las tres fuentes de
+  -- consulta para que el tope por FUENTE no sea el que lo pare.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select (array['openalex','semanticscholar','europepmc'])[1 + (g % 3)],
+         'gloton-' || g, 'Del tema gloton ' || g, 'https://a.test/g' || g, 'masas',
+         now() - (g || ' minutes')::interval
+    from generate_series(1, 20) g;
+  -- Y otros tres temas con material de sobra.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'openalex', t || '-' || g, 'De ' || t || ' ' || g, 'https://a.test/' || t || g, t,
+         now() - (g || ' minutes')::interval
+    from generate_series(1, 6) g, unnest(array['sesgo','decisiones','ecopolitica']) t;
+
+  perform public.criba_arma_edicion(current_date, 25);
+
+  select coalesce(max(n), 0) into mayor from (
+    select count(*) as n from public.criba_items
+     where edicion = current_date and tema_id is not null group by tema_id) x;
+  select count(distinct tema_id) into materias from public.criba_items
+   where edicion = current_date and tema_id is not null;
+
+  if mayor > 4 then
+    raise exception 'FALLA: un tema puso % en la edición (tope 4)', mayor;
+  end if;
+  if materias < 4 then
+    raise exception 'FALLA: la edición solo trae % materias distintas', materias;
+  end if;
+end $$;
+\echo 'ok 14 · ⚠️ ningún TEMA pasa de 4: un término desafortunado ya no se come el número'
+
 \echo ''
 \echo '════════════════════════════════════════════════'
 \echo 'RESULTADO: APRUEBA'
