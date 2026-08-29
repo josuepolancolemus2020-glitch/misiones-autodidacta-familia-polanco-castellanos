@@ -171,6 +171,10 @@ const RUTAS = {
   ok(S.traeDoi(RSS) === true, 'encuentra el DOI de Cochrane en el RSS');
   ok(S.traeDoi(JSON_API) === true, 'encuentra los DOI del JSON');
   ok(S.traeDoi(ATOM) === false, 'no inventa un DOI donde no lo hay');
+  // Crossref manda los DOI con la barra escapada. Sin deshacerla, la mayor
+  // base de DOI del mundo salía marcada como «no trae DOI».
+  ok(S.traeDoi('{"DOI":"10.5860\\/choice.195204"}') === true,
+     '⚠️ encuentra el DOI aunque venga con la barra escapada en JSON');
 
   console.log('\n── Idioma ──');
   ok(S.idiomaDe(ATOM, 'atom') === 'es', 'lee el xml:lang="es" declarado');

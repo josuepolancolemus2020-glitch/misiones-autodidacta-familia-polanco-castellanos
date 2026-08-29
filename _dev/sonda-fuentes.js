@@ -119,7 +119,12 @@ function traeResumen(cuerpo, formato) {
 /* ── ¿Trae DOI? ──
    Sin DOI no se puede aplicar la regla 2 (la nota de prensa no es el
    artículo) ni cruzar con la base de retractaciones. */
-const traeDoi = cuerpo => /10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+/.test(cuerpo);
+/* ⚠️ Se deshacen las barras escapadas ANTES de buscar. En JSON un DOI viaja
+   muchas veces como `10.5860\\/choice`, y exigir la barra literal justo detrás
+   de los dígitos hacía que no se encontrara ninguno: en la sonda del 29 de
+   agosto de 2026 eso dejó a Crossref -que es una base de DOI- marcada como
+   «dudoso» por no traer DOI. */
+const traeDoi = cuerpo => /10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+/.test(cuerpo.replace(/\\\//g, '/'));
 
 /* ── ¿En qué idioma? ──
    ⚠️ Se comparan las DOS cosas —lo que el canal declara y lo que se ve— y si
