@@ -102,10 +102,13 @@ begin
        orden es el arreglo: antes se recortaba por fuente primero y las
        materias que no estaban entre las mejores de su fuente no se
        asomaban nunca. */
-    select *, row_number() over (
-             partition by coalesce(tema_id, 'volcado:' || fuente_id)
-             order by cuando desc) as n_tema
-      from con_peso
+    select cp.*,
+           coalesce(y.n, 0) + row_number() over (
+             partition by coalesce(cp.tema_id, 'volcado:' || cp.fuente_id)
+             order by cp.cuando desc) as n_tema
+      from con_peso cp
+      left join ya_por_tema y
+             on y.grupo = coalesce(cp.tema_id, 'volcado:' || cp.fuente_id)
   ), recorta_fuente as (
     -- Y solo AHORA se mira de qué fuente viene lo que sobrevivió.
     select *, row_number() over (

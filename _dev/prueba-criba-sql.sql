@@ -596,6 +596,34 @@ begin
 end $$;
 \echo 'ok 16 · ⚠️ Honduras tiene plaza reservada, y no se come la variedad'
 
+-- ⚠️ LO QUE YA ESTÁ EN LA EDICIÓN CUENTA PARA EL TOPE. Al rehacer un
+-- número solo se despublica lo no leído y no guardado; lo ya tocado se
+-- queda. Si el reparto cuenta desde cero, una materia con dos leídas de
+-- antes acaba con cuatro.
+do $$
+declare mayor integer;
+begin
+  delete from public.criba_items;
+  -- Dos de la misma materia, YA en la edición y ya leídas.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado, edicion, orden, leido_at)
+  values ('openalex','vieja-1','Ya leida uno','https://a.test/v1','sesgo', now(), current_date, 1, now()),
+         ('openalex','vieja-2','Ya leida dos','https://a.test/v2','sesgo', now(), current_date, 2, now());
+  -- Y cinco más sin publicar de esa MISMA materia.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'openalex', 'nueva-' || g, 'Nueva ' || g, 'https://a.test/n' || g, 'sesgo',
+         now() - (g || ' minutes')::interval
+    from generate_series(1, 5) g;
+
+  perform public.criba_arma_edicion(current_date, 25);
+
+  select count(*) into mayor from public.criba_items
+   where edicion = current_date and tema_id = 'sesgo';
+  if mayor > 2 then
+    raise exception 'FALLA: la materia quedó con % (dos ya estaban leídas; el tope es 2)', mayor;
+  end if;
+end $$;
+\echo 'ok 17 · ⚠️ lo ya leído en la edición cuenta para el tope de su materia'
+
 \echo ''
 \echo '════════════════════════════════════════════════'
 \echo 'RESULTADO: APRUEBA'
