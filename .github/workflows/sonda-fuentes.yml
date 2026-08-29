@@ -1,0 +1,85 @@
+# ─────────────────────────────────────────────
+# SONDA DE FUENTES · La Criba 🪶
+#
+# POR QUÉ EXISTE ESTE ARCHIVO, en un repositorio que no tenía ninguno:
+# la sonda necesita salir a internet, y desde una sesión de Claude Code no se
+# puede —el proxy solo deja pasar GitHub y los repositorios de paquetes—.
+# Aquí sí hay red. Y, sobre todo, se dispara con UN TOQUE desde el teléfono o
+# la tableta (pestaña Actions → Sonda de fuentes → Run workflow), que es como
+# trabaja el autor. Un script que hubiera que correr con el repositorio
+# delante es un script que no se corre.
+#
+# ⚠️ Esto NO toca la publicación del sitio. GitHub Pages sigue construyendo
+# sola en cada push a main, como está escrito en CLAUDE.md; añadir un flujo de
+# trabajo propio no la desactiva.
+#
+# Escribe SONDA-FUENTES.md y _dev/sonda-fuentes-resultado.json y los deja
+# confirmados en la misma rama donde se corrió.
+# ─────────────────────────────────────────────
+name: Sonda de fuentes (La Criba)
+
+on:
+  workflow_dispatch:
+    inputs:
+      fase:
+        description: 'Qué fase sondar (1, 2, o vacío para todas)'
+        required: false
+        default: ''
+      ids:
+        description: 'Solo estas fuentes, separadas por coma (ej: bch,cnbs,ine-hn)'
+        required: false
+        default: ''
+  # Una vez al mes: es la regla 6 de la puerta —«lo que no llega, se dice»—.
+  # Una fuente que cambia su canal se queda muda sin avisar, y sin volver a
+  # preguntar nadie se entera hasta que la edición sale a medias.
+  schedule:
+    - cron: '0 9 1 * *'
+
+permissions:
+  contents: write
+
+jobs:
+  sondar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Preguntar a cada fuente
+        id: sonda
+        # No se detiene si suspende: cuando NINGUNA fuente responde es cuando
+        # más falta hace tener el informe escrito para poder mirarlo.
+        continue-on-error: true
+        env:
+          # Opcional. La cola educada de Crossref y OpenAlex pide un correo.
+          # Si el secreto no está, se pregunta igual y el informe lo dice.
+          CRIBA_MAILTO: ${{ secrets.CRIBA_MAILTO }}
+        run: |
+          ARGS=""
+          [ -n "${{ inputs.fase }}" ] && ARGS="$ARGS --fase ${{ inputs.fase }}"
+          [ -n "${{ inputs.ids }}"  ] && ARGS="$ARGS --id ${{ inputs.ids }}"
+          node _dev/sonda-fuentes.js $ARGS
+
+      - name: Dejarlo escrito en la rama
+        run: |
+          git config user.name  "sonda-de-fuentes"
+          git config user.email "noreply@github.com"
+          git add SONDA-FUENTES.md _dev/sonda-fuentes-resultado.json
+          if git diff --staged --quiet; then
+            echo "Nada cambió desde la última vez."
+          else
+            git commit -m "Sonda de fuentes: lo que devolvieron de verdad ($(date -u +%Y-%m-%d))"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: El informe, aquí mismo
+        run: cat SONDA-FUENTES.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Suspender si ninguna respondió
+        if: steps.sonda.outcome == 'failure'
+        run: |
+          echo "::error::Ninguna fuente respondió. El informe está en SONDA-FUENTES.md."
+          exit 1

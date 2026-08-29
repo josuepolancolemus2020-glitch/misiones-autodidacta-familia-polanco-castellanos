@@ -1,0 +1,124 @@
+{
+  "_nota": "Fuentes candidatas de La Criba. Se sondan con _dev/sonda-fuentes.js.",
+  "_por_que_candidatos": "Cada fuente lleva VARIAS direcciones candidatas porque nadie sabe de memoria cuál es el canal bueno de una institución. La sonda las prueba en orden y se queda con la primera que devuelva algo utilizable. Así la duda la resuelve la máquina y no queda escrita a mano en un documento que envejece.",
+  "_como_anadir": "Una entrada más en `fuentes`. No hay que tocar el código de la sonda.",
+  "fuentes": [
+    { "id": "conversation-es", "nombre": "The Conversation (español)", "racimo": "A·C·G", "fase": 1,
+      "candidatos": ["https://theconversation.com/es/articles.atom",
+                     "https://theconversation.com/es/articles.rss",
+                     "https://theconversation.com/es/topics.atom"] },
+
+    { "id": "sinc", "nombre": "Agencia SINC", "racimo": "A·G", "fase": 1,
+      "candidatos": ["https://www.agenciasinc.es/rss",
+                     "https://www.agenciasinc.es/rss/Noticias",
+                     "https://www.agenciasinc.es/feed"] },
+
+    { "id": "nadaesgratis", "nombre": "Nada es Gratis (FEDEA)", "racimo": "C", "fase": 1,
+      "candidatos": ["https://nadaesgratis.es/feed",
+                     "https://nadaesgratis.es/feed/atom",
+                     "https://nadaesgratis.es/rss"] },
+
+    { "id": "scielo", "nombre": "SciELO", "racimo": "A·C", "fase": 1,
+      "candidatos": ["https://search.scielo.org/?q=*&lang=es&output=rss",
+                     "https://www.scielo.org/oai/scielo-oai.php?verb=Identify",
+                     "https://articlemeta.scielo.org/api/v1/collection/identifiers/"] },
+
+    { "id": "redalyc", "nombre": "Redalyc", "racimo": "A·C", "fase": 1,
+      "candidatos": ["https://www.redalyc.org/oai?verb=Identify",
+                     "https://www.redalyc.org/rss.oa",
+                     "https://www.redalyc.org/"] },
+
+    { "id": "dialnet", "nombre": "Dialnet", "racimo": "A·C·G", "fase": 1,
+      "candidatos": ["https://dialnet.unirioja.es/oai/OAIHandler?verb=Identify",
+                     "https://dialnet.unirioja.es/rss/",
+                     "https://dialnet.unirioja.es/"] },
+
+    { "id": "cepal", "nombre": "CEPAL", "racimo": "C", "fase": 1,
+      "candidatos": ["https://repositorio.cepal.org/oai/request?verb=Identify",
+                     "https://www.cepal.org/es/rss.xml",
+                     "https://www.cepal.org/es/publicaciones/rss",
+                     "https://www.cepal.org/es"] },
+
+    { "id": "bid", "nombre": "BID · Banco Interamericano de Desarrollo", "racimo": "C", "fase": 1,
+      "candidatos": ["https://blogs.iadb.org/feed/",
+                     "https://publications.iadb.org/es/rss",
+                     "https://publications.iadb.org/oai/request?verb=Identify"] },
+
+    { "id": "sieca", "nombre": "SIECA", "racimo": "C", "fase": 1,
+      "candidatos": ["https://www.sieca.int/feed/",
+                     "https://www.sieca.int/rss",
+                     "https://www.sieca.int/"] },
+
+    { "id": "bch", "nombre": "Banco Central de Honduras", "racimo": "C·HN", "fase": 1,
+      "candidatos": ["https://www.bch.hn/rss",
+                     "https://www.bch.hn/feed",
+                     "https://www.bch.hn/estadisticas-y-publicaciones-economicas",
+                     "https://www.bch.hn/"] },
+
+    { "id": "cnbs", "nombre": "CNBS · Comisión Nacional de Bancos y Seguros", "racimo": "C·HN", "fase": 1,
+      "candidatos": ["https://www.cnbs.gob.hn/feed/",
+                     "https://www.cnbs.gob.hn/rss",
+                     "https://www.cnbs.gob.hn/"] },
+
+    { "id": "ine-hn", "nombre": "INE Honduras", "racimo": "C·HN", "fase": 1,
+      "candidatos": ["https://www.ine.gob.hn/feed/",
+                     "https://ine.gob.hn/feed/",
+                     "https://www.ine.gob.hn/"] },
+
+    { "id": "cohep", "nombre": "COHEP", "racimo": "C·HN", "fase": 1,
+      "candidatos": ["https://cohep.com/feed/", "https://cohep.com/rss", "https://cohep.com/"] },
+
+    { "id": "fosdeh", "nombre": "FOSDEH", "racimo": "C·HN", "fase": 1,
+      "candidatos": ["https://fosdeh.com/feed/", "https://www.fosdeh.com/feed/", "https://fosdeh.com/"] },
+
+    { "id": "bcv-hn", "nombre": "Bolsa Centroamericana de Valores", "racimo": "C·HN", "fase": 1,
+      "candidatos": ["https://www.bcv.hn/feed/", "https://bcv.hn/", "https://www.bcv.hn/"] },
+
+    { "id": "openalex", "nombre": "OpenAlex", "racimo": "todos", "fase": 2,
+      "candidatos": ["https://api.openalex.org/works?per-page=5&sort=publication_date:desc"] },
+
+    { "id": "crossref", "nombre": "Crossref", "racimo": "todos", "fase": 2,
+      "candidatos": ["https://api.crossref.org/works?rows=5&sort=published&order=desc"] },
+
+    { "id": "semanticscholar", "nombre": "Semantic Scholar", "racimo": "todos", "fase": 2,
+      "candidatos": ["https://api.semanticscholar.org/graph/v1/paper/search?query=decision%20making&limit=5&fields=title,abstract,externalIds,year,publicationDate"] },
+
+    { "id": "europepmc", "nombre": "Europe PMC", "racimo": "A·D", "fase": 2,
+      "candidatos": ["https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=neuroplasticity&format=json&pageSize=5&resultType=core"] },
+
+    { "id": "cochrane", "nombre": "Cochrane Library", "racimo": "A", "fase": 2,
+      "candidatos": ["https://www.cochranelibrary.com/rss/cdsr/reviews",
+                     "https://www.cochranelibrary.com/en/rss",
+                     "https://www.cochranelibrary.com/"] },
+
+    { "id": "nature-humanbehav", "nombre": "Nature Human Behaviour", "racimo": "A", "fase": 2,
+      "candidatos": ["https://www.nature.com/nathumbehav.rss"] },
+
+    { "id": "nep", "nombre": "NEP · New Economics Papers", "racimo": "C", "fase": 2,
+      "candidatos": ["https://nep.repec.org/rss/nep-dev.xml",
+                     "https://nep.repec.org/rss/nep-pol.xml",
+                     "https://nep.repec.org/"] },
+
+    { "id": "nber", "nombre": "NBER Working Papers", "racimo": "C", "fase": 2,
+      "candidatos": ["https://back.nber.org/rss/new.xml", "https://www.nber.org/rss/new.xml"] },
+
+    { "id": "retractionwatch", "nombre": "Retraction Watch", "racimo": "G", "fase": 2,
+      "candidatos": ["https://retractionwatch.com/feed/",
+                     "https://api.labs.crossref.org/data/retractionwatch"] },
+
+    { "id": "datacolada", "nombre": "Data Colada", "racimo": "G", "fase": 2,
+      "candidatos": ["https://datacolada.org/feed", "https://datacolada.org/feed/"] },
+
+    { "id": "rsos", "nombre": "Royal Society Open Science", "racimo": "G", "fase": 2,
+      "candidatos": ["https://royalsocietypublishing.org/action/showFeed?ui=0&mi=0&ai=2b4&jc=rsos&type=etoc&feed=rss",
+                     "https://royalsocietypublishing.org/rss/rsos.xml"] },
+
+    { "id": "wid", "nombre": "World Inequality Lab", "racimo": "C", "fase": 2,
+      "candidatos": ["https://wid.world/feed/", "https://wid.world/news/feed/", "https://wid.world/"] },
+
+    { "id": "jdm", "nombre": "Judgment and Decision Making", "racimo": "A", "fase": 2,
+      "candidatos": ["https://www.cambridge.org/core/rss/product/id/8B0BBF4B9D4C4A2B3B2F0D4E4B9D4C4A",
+                     "https://journal.sjdm.org/rss.xml",
+                     "https://journal.sjdm.org/"] }
+  ]
+}
