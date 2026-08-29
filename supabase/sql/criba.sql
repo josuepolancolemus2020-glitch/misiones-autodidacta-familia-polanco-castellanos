@@ -267,6 +267,16 @@ declare
   huecos  integer;
   puestos integer;
 begin
+  -- ⚠️ UN `null` EXPLÍCITO NO USA EL VALOR POR OMISIÓN. Pasarlo hacía
+  -- que `edicion = dia` no encontrara nunca nada y que el update pusiera
+  -- `edicion = NULL`: la edición no se armaba, y esas filas volvían a
+  -- elegirse cada noche para siempre. Se descubrió el 29 de agosto de
+  -- 2026, mirando por qué el recolector llamaba con `dia: null`.
+  -- Se arregla AQUÍ y no solo en quien llama, porque una función que
+  -- depende de que la llamen bien es una función que un día falla en
+  -- silencio — y aquí el silencio es una pantalla vacía sin explicación.
+  dia := coalesce(dia, current_date);
+
   select count(*) into ya from public.criba_items where edicion = dia;
   huecos := greatest(tope - ya, 0);
   if huecos = 0 then return 0; end if;

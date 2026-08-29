@@ -215,6 +215,32 @@ begin
 end $$;
 \echo 'ok 4c · pesa más una fuente buena de hace dos días que una floja de hoy'
 
+-- ⚠️ Llamarla con `null` tiene que armar la edición de HOY igual.
+-- En PostgreSQL un null explícito NO usa el valor por omisión, y el
+-- recolector la llamaba así: ponía `edicion = NULL` en 25 filas, o sea
+-- que la edición no se armaba y esas filas volvían a elegirse cada
+-- noche. Una pantalla vacía sin ninguna explicación.
+do $$
+declare hoy integer; nulas integer;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, publicado)
+  select 'cnbs', 'nul-' || g, 'T' || g, 'https://a.hn/n' || g, now() - (g || ' hours')::interval
+    from generate_series(1, 8) g;
+
+  perform public.criba_arma_edicion(null, 5);
+
+  select count(*) into hoy   from public.criba_items where edicion = current_date;
+  select count(*) into nulas from public.criba_items where edicion is null and orden is not null;
+  if hoy <> 5 then
+    raise exception 'FALLA: con dia=null la edición de hoy tiene % filas, tenía que tener 5', hoy;
+  end if;
+  if nulas > 0 then
+    raise exception 'FALLA: % filas quedaron con orden pero sin edición (el fallo del null)', nulas;
+  end if;
+end $$;
+\echo 'ok 4d · ⚠️ llamarla con null arma la edición de HOY, no una edición nula'
+
 -- ════════════════════════════════════════════════════════════════════
 -- 5. LA HIGIENE NO SE LLEVA LO QUE IMPORTA
 -- ════════════════════════════════════════════════════════════════════

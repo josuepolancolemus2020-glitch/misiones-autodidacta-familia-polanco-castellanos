@@ -130,7 +130,11 @@ Deno.serve(async (req) => {
   }
 
   // Armar la edición del día, con su fondo. Lo que no entre sale mañana.
-  const { data: puestos } = await svc.rpc("criba_arma_edicion", { dia: null, tope: TOPE_EDICION });
+  // ⚠️ Se OMITE `dia` en vez de pasar null: en PostgreSQL un null
+  // explícito no usa el valor por omisión, así que `{ dia: null }` armaba
+  // la edición con fecha NULL, o sea no la armaba. La función ya se
+  // defiende con un coalesce, pero llamarla bien no cuesta nada.
+  const { data: puestos } = await svc.rpc("criba_arma_edicion", { tope: TOPE_EDICION });
   await svc.rpc("criba_higiene");
 
   return json({
