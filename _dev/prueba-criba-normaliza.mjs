@@ -12,6 +12,10 @@
    las fuentes que la sonda comprobó el 29 de agosto de 2026.
 ───────────────────────────────────────────── */
 import * as N from '../supabase/functions/criba-cosecha/normaliza.ts';
+import { readFileSync, existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+const AQUI = dirname(fileURLToPath(import.meta.url));
 
 let pasan = 0, fallos = 0;
 const ok = (c, q) => { c ? (pasan++, console.log('  ✅ ' + q)) : (fallos++, console.log('  ❌ ' + q)); };
@@ -159,6 +163,30 @@ ok(N.limpia('&Aacute;lvarez y &aacute;lvarez') === 'Álvarez y álvarez',
    'respetando mayúsculas: &Aacute; no es &aacute;');
 ok(N.limpia('&noexiste; queda igual') === '&noexiste; queda igual',
    'una entidad desconocida se deja como estaba, no se borra el texto');
+
+console.log('\n── El cosido de un archivo dice lo mismo que lo probado ──');
+/* ⚠️ Esto es lo que impide desplegar un cosido viejo. La función se
+   despliega desde el panel pegando PEGAR-EN-EL-PANEL.ts, que lo genera
+   _dev/arma-criba-cosecha.js. Si alguien arregla normaliza.ts y no
+   vuelve a coserlo, el fallo sigue vivo en lo que corre de verdad — y
+   las pruebas de arriba seguirían en verde, que es lo peor. */
+{
+  const dir = join(AQUI, '..', 'supabase', 'functions', 'criba-cosecha');
+  const cosido = join(dir, 'PEGAR-EN-EL-PANEL.ts');
+  if (!existsSync(cosido)) {
+    ok(false, 'falta PEGAR-EN-EL-PANEL.ts · corre: node _dev/arma-criba-cosecha.js');
+  } else {
+    const hecho = readFileSync(cosido, 'utf8');
+    const mod = readFileSync(join(dir, 'normaliza.ts'), 'utf8')
+      .replace(/^export (function|interface|type|const) /gm, '$1 ').trim();
+    ok(hecho.includes(mod),
+       '⚠️ el cosido lleva EXACTAMENTE el intérprete probado (si falla: node _dev/arma-criba-cosecha.js)');
+    const idx = readFileSync(join(dir, 'index.ts'), 'utf8')
+      .replace(/^import \{[^}]*\} from "\.\/normaliza\.ts";\s*$/m, '').trim();
+    ok(hecho.includes(idx), 'y el recolector, igual de exacto');
+    ok(!/^export /m.test(hecho), 'sin un `export` suelto, que en Deno sería un error de sintaxis');
+  }
+}
 
 console.log('\n' + '─'.repeat(56));
 console.log(`  ${pasan} pasan, ${fallos} fallan`);
