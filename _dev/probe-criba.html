@@ -12,6 +12,8 @@ pre{background:#0f172a;color:#7f7;padding:12px;font-size:12px;white-space:pre-wr
      aplicación entera porque La Criba pide sesión de la casa, y lo que
      esta sonda mide es la PANTALLA, no la puerta. -->
 <div id="escenario">
+  <div class="crb-intro"><div class="crb-intro-ic">🪶</div><div>
+    <div class="crb-intro-t" id="crb-cual">La edición</div></div></div>
   <div id="crb-salud"></div>
   <div id="crb-chips" class="crb-chips"></div>
   <div id="crb-lista"></div>
@@ -52,8 +54,8 @@ const ok = (c, q) => { c ? L.push('  OK   ' + q) : (fallos++, L.push('  FALLA ' 
    nadie: lo que se mide aquí es la pantalla, no la red. */
 function faroSbFalso(items, fuentes) {
   const thenable = (data) => ({
-    select() { return this; }, order() { return this; },
-    eq() { return this; },     is() { return this; },
+    select() { return this; }, order() { return this; }, limit() { return this; },
+    eq() { return this; },     is() { return this; },    not() { return this; },
     then(res) { return Promise.resolve({ data, error: null, count: data.length }).then(res); },
   });
   return {
@@ -70,7 +72,15 @@ const FUENTES = [
     ultimo_error: 'el canal respondió pero no trajo ningún ítem utilizable' },
 ];
 
-const hoy = (() => { const d = new Date();
+/* ⚠️ LA EDICIÓN ES DE AYER, Y ESO ES LA PRUEBA.
+   La primera versión de la pantalla calculaba «hoy» con el reloj del
+   aparato y se lo pedía al servidor. El aparato está en Honduras (UTC−6)
+   y el servidor en UTC: entre las seis de la tarde y medianoche el
+   servidor ya está en el día siguiente, y la pantalla decía «hoy no hay
+   edición» seis horas cada tarde teniéndola delante. Con la edición
+   fechada AYER, una pantalla que calcule fechas no pinta nada y esta
+   sonda suspende. */
+const hoy = (() => { const d = new Date(Date.now() - 86400000);
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
 
 /* ⚠️ EL ÍTEM HOSTIL. Es lo que llegaría si una fuente se pusiera a
@@ -126,6 +136,14 @@ window.faroSb = faroSbFalso(ITEMS, FUENTES);
   ok([...lista.querySelectorAll('a[target="_blank"]')]
        .every(a => (a.getAttribute('rel') || '').includes('noopener')),
      'los enlaces que abren pestaña llevan rel="noopener"');
+
+  L.push('── 1-bis. La edición que se enseña, sin calcular fechas ──');
+  ok(lista.querySelectorAll('.crb-card').length > 0,
+     '⚠️ una edición de AYER se enseña igual: no se calcula «hoy» con el reloj del aparato');
+  ok((document.getElementById('crb-cual') || {}).textContent === 'Edición de ayer',
+     'y se DICE de qué día es, para no creer que es de hoy');
+  ok(lista.querySelector('.crb-fin').textContent.includes('ayer'),
+     'el pie también lo dice, que es donde se acaba de leer');
 
   L.push('── 2. Las reglas de la puerta en la pantalla ──');
   const retractCard = () => {
