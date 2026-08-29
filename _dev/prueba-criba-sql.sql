@@ -413,6 +413,217 @@ begin
 end $$;
 \echo 'ok 11 · Dialnet queda apagada, no borrada: el rastro de por qué se queda'
 
+
+-- ════════════════════════════════════════════════════════════════════
+-- 9. LO AFINADO · supabase/sql/criba_afina.sql
+-- ════════════════════════════════════════════════════════════════════
+\echo '── Corriendo supabase/sql/criba_afina.sql ──'
+\i supabase/sql/criba_afina.sql
+\echo '── Y otra vez, que tiene que ser idempotente ──'
+\i supabase/sql/criba_afina.sql
+
+-- ⚠️ UN TÍTULO, UNA VEZ. El mismo trabajo llega con el DOI del preprint
+-- y con el del publicado, y la llave por DOI no los junta: en la primera
+-- edición con malla salieron dos títulos repetidos.
+do $$
+declare cuantos integer;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, doi, publicado) values
+    ('openalex', 'doi:10.1000/pre', 'Human vs machine judgment in logistics',
+     'https://a.test/1', 'decisiones', '10.1000/pre', now()),
+    ('openalex', 'doi:10.2000/pub', 'Human vs Machine Judgment in Logistics!',
+     'https://a.test/2', 'decisiones', '10.2000/pub', now()),
+    ('openalex', 'doi:10.3000/otro', 'Otro trabajo distinto',
+     'https://a.test/3', 'decisiones', '10.3000/otro', now());
+
+  perform public.criba_arma_edicion(current_date, 25);
+  select count(*) into cuantos from public.criba_items where edicion = current_date;
+  if cuantos <> 2 then
+    raise exception 'FALLA: entraron % (el mismo título con dos DOI cuenta como uno: han de ser 2)', cuantos;
+  end if;
+end $$;
+\echo 'ok 12 · ⚠️ el mismo título con dos DOI distintos entra UNA vez'
+
+-- ⚠️ LAS FUENTES DE VOLCADO ENTRAN AUNQUE NO TENGAN TEMA. A la CNBS no
+-- se le pregunta nada -es un canal pequeño y ya temático-, así que sus
+-- filas llegan sin tema. Con «sin tema no entra» a secas, el registro de
+-- la CNBS no podía aparecer nunca.
+do $$
+declare de_volcado integer;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  values ('cnbs', 'aviso-cnbs-1', 'Advertencia sobre entidades no autorizadas',
+          'https://www.cnbs.gob.hn/aviso', null, now());
+  -- Y una de fuente de CONSULTA sin tema, que esa SÍ tiene que quedarse fuera.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  values ('openalex', 'huerfano-consulta', 'Sin tema y de fuente que se pregunta',
+          'https://a.test/x', null, now());
+
+  perform public.criba_arma_edicion(current_date, 25);
+  select count(*) into de_volcado from public.criba_items
+   where edicion = current_date and fuente_id = 'cnbs';
+  if de_volcado <> 1 then
+    raise exception 'FALLA: la CNBS no entró en la edición (es de volcado, es su propio tema)';
+  end if;
+  if exists (select 1 from public.criba_items
+              where edicion = current_date and fuente_id = 'openalex') then
+    raise exception 'FALLA: entró una fila SIN TEMA de una fuente a la que sí se le pregunta';
+  end if;
+end $$;
+\echo 'ok 13 · ⚠️ la CNBS entra sin tema (es de volcado); OpenAlex sin tema NO'
+
+
+-- ════════════════════════════════════════════════════════════════════
+-- 10. UN TEMA NO SE COME LA EDICIÓN · criba_afina2.sql
+-- ════════════════════════════════════════════════════════════════════
+\echo '── Corriendo supabase/sql/criba_afina2.sql ──'
+\i supabase/sql/criba_afina2.sql
+
+-- ⚠️ «Psicología de masas» puso 8 de 25 con el tope solo por fuente:
+-- salieron todos de la misma fuente Y del mismo término, así que aquel
+-- tope no los paró. Un término desafortunado convertía la edición en un
+-- monográfico sobre peatones.
+do $$
+declare mayor integer; materias integer;
+begin
+  delete from public.criba_items;
+  -- Un tema glotón con veinte, repartidos entre las tres fuentes de
+  -- consulta para que el tope por FUENTE no sea el que lo pare.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select (array['openalex','semanticscholar','europepmc'])[1 + (g % 3)],
+         'gloton-' || g, 'Del tema gloton ' || g, 'https://a.test/g' || g, 'masas',
+         now() - (g || ' minutes')::interval
+    from generate_series(1, 20) g;
+  -- Y otros tres temas con material de sobra.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'openalex', t || '-' || g, 'De ' || t || ' ' || g, 'https://a.test/' || t || g, t,
+         now() - (g || ' minutes')::interval
+    from generate_series(1, 6) g, unnest(array['sesgo','decisiones','ecopolitica']) t;
+
+  perform public.criba_arma_edicion(current_date, 25);
+
+  select coalesce(max(n), 0) into mayor from (
+    select count(*) as n from public.criba_items
+     where edicion = current_date and tema_id is not null group by tema_id) x;
+  select count(distinct tema_id) into materias from public.criba_items
+   where edicion = current_date and tema_id is not null;
+
+  if mayor > 4 then
+    raise exception 'FALLA: un tema puso % en la edición (tope 4)', mayor;
+  end if;
+  if materias < 4 then
+    raise exception 'FALLA: la edición solo trae % materias distintas', materias;
+  end if;
+end $$;
+\echo 'ok 14 · ⚠️ ningún TEMA pasa de 4: un término desafortunado ya no se come el número'
+
+
+-- ════════════════════════════════════════════════════════════════════
+-- 11. LOS DOS TOPES NO SE PISAN · criba_afina4.sql
+-- ════════════════════════════════════════════════════════════════════
+\echo '── Corriendo supabase/sql/criba_afina4.sql ──'
+\i supabase/sql/criba_afina4.sql
+
+-- ⚠️ El caso real: los 18 temas con material de sobra, repartidos entre
+-- las tres fuentes de consulta. Con el orden viejo -recortar por fuente
+-- primero- salían TRES materias, porque los ocho mejores de cada fuente
+-- eran todos de los dos temas de más peso.
+do $$
+declare materias integer; mayor integer;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select (array['openalex','semanticscholar','europepmc'])[1 + ((g + i) % 3)],
+         t.id || '-' || g || '-' || i, t.id || ' articulo ' || g || i,
+         'https://a.test/' || t.id || g || i, t.id,
+         now() - ((g * 10 + i) || ' minutes')::interval
+    from public.criba_temas t, generate_series(1, 4) g, generate_series(1, 2) i
+   where t.activo;
+
+  perform public.criba_arma_edicion(current_date, 25);
+
+  select count(distinct tema_id) into materias from public.criba_items
+   where edicion = current_date and tema_id is not null;
+  select coalesce(max(n), 0) into mayor from (
+    select count(*) as n from public.criba_items
+     where edicion = current_date and tema_id is not null group by tema_id) x;
+
+  if materias < 10 then
+    raise exception 'FALLA: la edición trae solo % materias de 18 (los topes se pisan)', materias;
+  end if;
+  if mayor > 2 then
+    raise exception 'FALLA: una materia puso % (tope 2)', mayor;
+  end if;
+end $$;
+\echo 'ok 15 · ⚠️ con 18 temas con material, la edición trae 10 materias o más'
+
+-- ⚠️ Y LA CAPA DE HONDURAS NO PUEDE DESAPARECER. Al quitar el tope por
+-- fuente, los artículos académicos -que pesan más- se comieron las 25
+-- plazas y la CNBS, SIECA y la Bolsa se quedaron en cero. Justo el
+-- registro con el que se comprueba si alguien puede recibir dinero.
+do $$
+declare locales integer; materias integer;
+begin
+  delete from public.criba_items;
+  -- Los 18 temas con material de sobra y peso alto...
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'openalex', t.id || '-' || g, t.id || ' articulo ' || g,
+         'https://a.test/' || t.id || g, t.id, now() - (g || ' minutes')::interval
+    from public.criba_temas t, generate_series(1, 5) g where t.activo;
+  -- ...y las tres de Honduras, que pesan menos que casi todos.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select f.id, f.id || '-' || g, 'Aviso de ' || f.nombre || ' ' || g,
+         'https://a.hn/' || f.id || g, null, now() - (g || ' minutes')::interval
+    from public.criba_fuentes f, generate_series(1, 5) g
+   where f.plantilla is null and f.activa;
+
+  perform public.criba_arma_edicion(current_date, 25);
+
+  select count(*) into locales from public.criba_items i
+    join public.criba_fuentes f on f.id = i.fuente_id
+   where i.edicion = current_date and f.plantilla is null;
+  select count(distinct tema_id) into materias from public.criba_items
+   where edicion = current_date and tema_id is not null;
+
+  if locales = 0 then
+    raise exception 'FALLA: la capa de Honduras desapareció de la edición';
+  end if;
+  if materias < 8 then
+    raise exception 'FALLA: reservar plaza a Honduras se comió la variedad (% materias)', materias;
+  end if;
+end $$;
+\echo 'ok 16 · ⚠️ Honduras tiene plaza reservada, y no se come la variedad'
+
+-- ⚠️ LO QUE YA ESTÁ EN LA EDICIÓN CUENTA PARA EL TOPE. Al rehacer un
+-- número solo se despublica lo no leído y no guardado; lo ya tocado se
+-- queda. Si el reparto cuenta desde cero, una materia con dos leídas de
+-- antes acaba con cuatro.
+do $$
+declare mayor integer;
+begin
+  delete from public.criba_items;
+  -- Dos de la misma materia, YA en la edición y ya leídas.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado, edicion, orden, leido_at)
+  values ('openalex','vieja-1','Ya leida uno','https://a.test/v1','sesgo', now(), current_date, 1, now()),
+         ('openalex','vieja-2','Ya leida dos','https://a.test/v2','sesgo', now(), current_date, 2, now());
+  -- Y cinco más sin publicar de esa MISMA materia.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'openalex', 'nueva-' || g, 'Nueva ' || g, 'https://a.test/n' || g, 'sesgo',
+         now() - (g || ' minutes')::interval
+    from generate_series(1, 5) g;
+
+  perform public.criba_arma_edicion(current_date, 25);
+
+  select count(*) into mayor from public.criba_items
+   where edicion = current_date and tema_id = 'sesgo';
+  if mayor > 2 then
+    raise exception 'FALLA: la materia quedó con % (dos ya estaban leídas; el tope es 2)', mayor;
+  end if;
+end $$;
+\echo 'ok 17 · ⚠️ lo ya leído en la edición cuenta para el tope de su materia'
+
 \echo ''
 \echo '════════════════════════════════════════════════'
 \echo 'RESULTADO: APRUEBA'
