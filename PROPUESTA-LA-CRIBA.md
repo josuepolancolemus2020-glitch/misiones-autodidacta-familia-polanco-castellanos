@@ -308,9 +308,97 @@ Lo de arriba es una lista candidata razonada, **no una lista verificada**.
 
 ---
 
-## 10. Lo siguiente
+## 10. Fase 1 · La sonda: lo que pasó de verdad
 
-La Fase 0 está cerrada. La Fase 1 empieza por la sonda de fuentes, no por el
-código. Y cuando toque escribir SQL, va **entero en el chat**, idempotente,
-con su comprobación de dependencias arriba y su fila de verificación al
-final — y probado antes contra un PostgreSQL de verdad en la sesión.
+**29 de agosto de 2026.** Se intentó sondar las fuentes desde la sesión y
+**no se pudo**. No es un fallo pasajero: es la política de salida a internet
+de estas sesiones.
+
+```
+curl  → api.openalex.org   connect_rejected · policy denial
+curl  → www.scielo.org     connect_rejected · policy denial
+curl  → api.crossref.org   connect_rejected · policy denial
+WebFetch → OpenAlex, The Conversation   EGRESS_BLOCKED
+```
+
+Solo pasan GitHub, PyPI, npm, jsr, crates y las APIs de Anthropic. El propio
+`/root/.ccr/README.md` lo dice: *«403 / 407 — the destination host is not
+allowed by your organization's egress policy. Do not retry or route around
+it — report the blocked host.»*
+
+**Y con eso a la vista, lo que NO se hizo:** escribir la tabla de todas
+formas. Con búsquedas web se podía haber armado algo que *pareciera* una
+sonda —direcciones plausibles, formatos supuestos, ritmos inventados— y
+habría sido peor que no tener nada, porque el recolector de la Fase 1 se
+construiría contra direcciones que nadie comprobó. Es exactamente lo mismo
+que mandar SQL sin correrlo.
+
+### Lo que sí se hizo: la sonda, para donde sí hay red
+
+| Archivo | Qué es |
+|---|---|
+| `_dev/fuentes-criba.json` | Las 28 fuentes como **datos**, con **72 direcciones candidatas** |
+| `_dev/sonda-fuentes.js` | La sonda. Sin dependencias, solo Node |
+| `_dev/prueba-sonda-fuentes.js` | Su prueba: **36 comprobaciones, APRUEBA** |
+| `.github/workflows/sonda-fuentes.yml` | El disparador de un toque desde la tableta |
+
+**Cada fuente lleva varias direcciones candidatas** porque nadie sabe de
+memoria si el Banco Central de Honduras publica en `/feed`, en `/rss` o en
+ningún sitio. La sonda las prueba en orden y se queda con la primera que
+sirva: así la duda la resuelve la máquina una vez, en vez de quedar escrita a
+mano en un documento que envejece.
+
+De cada fuente apunta lo que devolvió: formato, cuántos ítems, si trae
+resumen, si trae DOI, en qué idioma y **a qué ritmo publica** —que es lo que
+dice si cabe en una edición diaria o la ahoga—.
+
+⚠️ **Y distingue «sin canal» de «no responde».** No es lo mismo: una
+institución viva que no publica un canal legible es trabajo para la Fase 2
+(leerla de otra forma); una que no contesta es una fuente muerta. Confundir
+las dos borraría media capa Honduras de un plumazo. La prueba lo comprueba
+con una portada de mentira.
+
+### Cómo se corre
+
+**Desde la tableta, un toque** — pestaña **Actions** → *Sonda de fuentes* →
+**Run workflow**. Escribe el informe y lo deja confirmado en la rama.
+
+⚠️ **Pero antes tiene que estar en `main`:** GitHub solo enseña el botón
+*Run workflow* si el archivo existe en la rama principal. Mientras viva solo
+en la rama de trabajo, no hay botón.
+
+**Con el repositorio delante:**
+
+```
+node _dev/sonda-fuentes.js              # todas
+node _dev/sonda-fuentes.js --fase 1     # solo las de la Fase 1
+node _dev/sonda-fuentes.js --id bch,cnbs,ine-hn
+node _dev/prueba-sonda-fuentes.js       # comprobar la sonda misma
+```
+
+El resultado sale en **`SONDA-FUENTES.md`** —para leer desde el teléfono— y
+en `_dev/sonda-fuentes-resultado.json`, que es lo que leerá el recolector.
+
+**El correo no va escrito en el código.** Crossref y OpenAlex dan mejor cola
+a quien se identifica con un correo, pero eso es mandar el correo del autor a
+un servicio ajeno: va en la variable `CRIBA_MAILTO` (o en un secreto del
+repositorio con ese nombre) y, si no está, se pregunta igual y el informe lo
+dice.
+
+Además queda programada **una vez al mes**. Es la regla 6: una fuente que
+cambia su canal se queda muda sin avisar, y sin volver a preguntar nadie se
+entera hasta que la edición sale a medias.
+
+---
+
+## 11. Lo siguiente
+
+1. **Correr la sonda.** Hasta que corra, la lista de fuentes sigue sin
+   verificar y el recolector no se escribe.
+2. Con el informe delante: tirar las fuentes que no sirven, buscar otra
+   dirección para las que quedaron «sin canal», y **recalcular si el ritmo
+   diario aguanta** las que sí.
+3. Recién entonces, la tabla `criba_ediciones` y la Edge Function. Y cuando
+   toque el SQL, va **entero en el chat**, idempotente, con su comprobación
+   de dependencias arriba y su fila de verificación al final — y probado
+   antes contra un PostgreSQL de verdad en la sesión.
