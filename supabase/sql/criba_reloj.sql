@@ -1,12 +1,14 @@
 -- Ejecutar en Supabase -> SQL Editor, DESPUÉS de supabase/sql/criba.sql
 -- y de haber desplegado la Edge Function `criba-cosecha`.
 --
--- ⚠️ ANTES DE EJECUTAR: reemplaza las DOS cosas marcadas:
+-- ⚠️ ANTES DE EJECUTAR: reemplaza UNA sola cosa, y está marcada:
 --   · PEGA_AQUI_TU_CRIBA_CRON_SECRET  → el mismo valor del secreto
 --     CRIBA_CRON_SECRET de las Edge Functions
 --     (Dashboard → Edge Functions → Secrets).
---   · PEGA_AQUI_TU_PROYECTO → el subdominio de tu proyecto, el mismo
---     que ya aparece en supabase/sql/antena_fase4.sql.
+--
+-- La dirección del proyecto ya va puesta: es la misma que lleva
+-- supabase/sql/antena_fase4.sql desde hace meses. Cada cosa que hay que
+-- escribir a mano es una que se puede escribir mal desde una tableta.
 --
 -- VA EN ARCHIVO APARTE de criba.sql a propósito: este es el único que
 -- pide escribir algo a mano antes de pegarlo, y mezclarlo con el otro
@@ -42,7 +44,7 @@ select cron.schedule(
   '10 5 * * *',
   $$
   select net.http_post(
-    url     := 'https://PEGA_AQUI_TU_PROYECTO.supabase.co/functions/v1/criba-cosecha',
+    url     := 'https://bzrnjvalpwlcnpszvwim.supabase.co/functions/v1/criba-cosecha',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'x-criba-cron', 'PEGA_AQUI_TU_CRIBA_CRON_SECRET'

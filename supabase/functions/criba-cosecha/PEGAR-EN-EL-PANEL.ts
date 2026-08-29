@@ -1,13 +1,20 @@
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  ⛔ ESTO NO ES SQL. NO LO PEGUES EN EL EDITOR SQL.            ║
+// ║                                                              ║
+// ║  Va en:  Supabase → Edge Functions → Deploy a new function   ║
+// ║          Nómbrala exactamente:  criba-cosecha                ║
+// ║          Y en sus ajustes: «Enforce JWT Verification» = OFF   ║
+// ╚══════════════════════════════════════════════════════════════╝
+//
 // ⚠️ ARCHIVO GENERADO — NO SE EDITA A MANO.
 //
 // Lo cose `node _dev/arma-criba-cosecha.js` a partir de normaliza.ts e
 // index.ts, que son los que se prueban:
 //   node --experimental-strip-types _dev/prueba-criba-normaliza.mjs
 //
-// Existe solo para poder desplegar desde el panel de Supabase sin la
-// CLI —o sea, desde la tableta—. Si editas AQUÍ, el arreglo se pierde
-// la próxima vez que se cosa, y peor: dejará de coincidir con lo que
-// dicen las pruebas.
+// Existe solo para poder desplegar desde el panel sin la CLI —o sea,
+// desde la tableta—. Si editas AQUÍ, el arreglo se pierde la próxima vez
+// que se cosa, y peor: dejará de coincidir con lo que dicen las pruebas.
 //
 // Cosido el 2026-08-29.
 
