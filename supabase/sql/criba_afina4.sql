@@ -55,11 +55,21 @@ declare
   ya      integer;
   huecos  integer;
   puestos integer;
-  -- Generoso a propósito: quien reparte de verdad es el tope por tema.
-  -- Un tope de fuente apretado vuelve a producir el fallo de antes.
-  por_fuente constant integer := 12;
-  -- ⚠️ DOS, no cuatro. Con 25 huecos, cuatro por tema dan seis materias
-  -- y dos dan doce o trece. Una edición diaria vale por la variedad.
+  /* ⚠️ EL TOPE POR FUENTE SE RETIRA, y hay una prueba de que sobra: la
+     fila «avisos de Honduras» daba 6, o sea 2 por cada fuente de
+     volcado. Eso lo hace el tope por TEMA solo, porque cada fuente sin
+     plantilla cuenta como su propio tema. El de fuente existía para
+     parar la manguera de Dialnet, que ya está apagada; lo único que
+     hacía era recortar a OpenAlex y dejar la edición en ocho materias.
+     Un límite que ya no protege de nada solo quita. */
+  por_fuente constant integer := 1000;
+
+  /* ⚠️ ESTE ES EL MANDO. Cuántos artículos aporta cada materia.
+       1 → salen las 18 materias, una cosa de cada una. Máxima variedad.
+       2 → salen unas diez, con dos de cada una.
+       3 → salen unas siete, con tres.
+     Se cambia este número, se vuelve a pegar el archivo, y la edición
+     se rehace sola. No hay nada más que tocar. */
   por_tema   constant integer := 2;
 begin
   dia := coalesce(dia, current_date);
