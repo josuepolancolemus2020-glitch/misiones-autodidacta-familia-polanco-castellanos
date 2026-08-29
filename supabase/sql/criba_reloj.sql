@@ -57,6 +57,21 @@ select cron.schedule(
 -- ════════════════════════════════════════════════════════════════════
 -- CÓMO SE COMPRUEBA QUE EL RELOJ QUEDÓ PUESTO
 -- ════════════════════════════════════════════════════════════════════
+-- ⚠️ NO SE COMPRUEBA MIRANDO net._http_response. Esa tabla es el buzón
+-- COMPARTIDO de todo el proyecto, y en esta casa `antena-publicar` corre
+-- con el reloj '* * * * *' —cada minuto—, así que recibe una fila nueva
+-- cada sesenta segundos. Un `order by id desc limit 1` devuelve casi
+-- siempre la respuesta de la Antena, no la tuya. Pasó el 29 de agosto de
+-- 2026: salió {"publicadas":0}, que es lo que devuelve antena-publicar,
+-- y parecía que la cosecha había ido mal.
+--
+-- Si hace falta mirar ahí, se filtra por el contenido propio:
+--   select id, status_code, created, left(content, 1500)
+--     from net._http_response where content ilike '%fuente%'
+--    order by id desc limit 3;
+--
+-- Pero lo que de verdad importa no es la respuesta: es el EFECTO. Y el
+-- efecto se mira en las tablas, que es lo de abajo.
 -- Mañana por la mañana:
 --   select f.nombre, f.ultimo_exito_at, f.fallos_seguidos, f.ultimo_error
 --     from public.criba_fuentes f order by f.nombre;
