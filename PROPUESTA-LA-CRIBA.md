@@ -409,15 +409,45 @@ primero adelantó la máquina de la Fase 3 a la Fase 2; después obligó a
 rehacer la Fase 1 con fuentes nativas; y ahora resulta que esas fuentes son
 cuatro. **La Fase 2 no es un lujo: es lo que abre el resto.**
 
-### Lo siguiente, en este orden
+### Lo construido
 
-1. La tabla `criba_ediciones` con su seguridad por fila, y el recolector
-   (Edge Function) para esas cuatro fuentes. El SQL va **entero en el chat**,
-   idempotente, con su comprobación de dependencias arriba y su fila de
-   verificación al final — y probado antes contra un PostgreSQL de verdad.
-2. La vista en el Acceso Rápido, con las reglas de la puerta puestas desde el
-   principio: nivel de evidencia a la vista, nada dentro de un atributo del
-   HTML, y la edición con fondo.
-3. Pendiente, sin bloquear: buscarle a The Conversation su dirección en
-   español, otra puerta para CEPAL y SciELO, y comprobar si FOSDEH sigue
-   existiendo.
+1. ✅ **La tabla** (`supabase/sql/criba.sql`), con `criba_fuentes` para que la
+   regla 6 sea posible, la edición como fecha para que la 8 tenga fondo, y el
+   `check` de la dirección igual de duro que el de la repisa. **14
+   comprobaciones contra PostgreSQL de verdad.**
+2. ✅ **El recolector** (`criba-cosecha`), con el intérprete en su propio
+   archivo para poder probarlo sin Deno. **46 comprobaciones.** Corrió de
+   verdad el 29 de agosto de 2026: las cuatro fuentes sin un solo fallo, 90
+   ítems —Dialnet 60, las otras tres 10 cada una—.
+3. ✅ **La pantalla** (`js/tools/criba.js`, `css/criba.css`), en el Acceso
+   Rápido con su contador. **22 comprobaciones en navegador de verdad**
+   (`_dev/probe-criba.html`).
+
+⚠️ **La pantalla NO arma HTML con datos.** Ni una plantilla, ni un `innerHTML`
+con texto de la base: `createElement` y `textContent`, direcciones comprobadas
+con `URL()` y puestas con `setAttribute`. Es la regla de la repisa de enlaces,
+y aquí pesa más porque el 100 % del contenido es ajeno. La sonda le da de
+comer un ítem hostil de verdad —comillas que cierran atributos, una etiqueta
+`<script>`, una dirección `javascript:`— y comprueba que no nace ni un
+elemento vivo.
+
+### Tres fallos que solo salieron al probarlo
+
+1. **La edición no se armaba.** El recolector llamaba
+   `criba_arma_edicion(null, 25)`, y en PostgreSQL **un `null` explícito no
+   usa el valor por omisión**: ponía `edicion = NULL` en 25 filas. La pantalla
+   habría salido vacía sin ninguna explicación.
+2. **La regla 4 no funcionaba.** Con el filtro «Sin leer» por omisión, un
+   trabajo retractado que ya se había leído quedaba escondido — y ese es
+   justamente el único caso que importa: de nada sirve avisar de una
+   retractación a quien no llegó a leer el trabajo. Ahora lo retractado se
+   salta ese filtro y va **primero**.
+3. **El intérprete no deshacía `&aacute;` ni `&ntilde;`.** Con cuatro fuentes
+   en español, un canal con las entidades sin deshacer es un canal ilegible.
+
+### Lo siguiente
+
+- Buscarle a The Conversation su dirección en español, otra puerta para CEPAL
+  y SciELO, y comprobar si FOSDEH sigue existiendo.
+- La **Fase 2**: la máquina traduce y resume, marcado, y con ella entran
+  OpenAlex, Cochrane, NEP y Retraction Watch.

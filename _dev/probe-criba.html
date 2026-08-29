@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · La Criba</title>
+<link rel="stylesheet" href="/css/criba.css">
+<style>body{font-family:system-ui;background:#f1f5f9;margin:0;padding:12px}
+pre{background:#0f172a;color:#7f7;padding:12px;font-size:12px;white-space:pre-wrap;border-radius:8px}
+#escenario{max-width:460px;background:#fff;border-radius:12px;padding:10px;margin-bottom:12px}</style>
+</head>
+<body>
+
+<!-- Los mismos huecos que index.html. Se recrean aquí en vez de cargar la
+     aplicación entera porque La Criba pide sesión de la casa, y lo que
+     esta sonda mide es la PANTALLA, no la puerta. -->
+<div id="escenario">
+  <div id="crb-salud"></div>
+  <div id="crb-chips" class="crb-chips"></div>
+  <div id="crb-lista"></div>
+</div>
+<span id="crb-badge" style="display:none">0</span>
+<pre id="out">midiendo…</pre>
+
+<script>
+/* ─────────────────────────────────────────────
+   SONDA DE LA CRIBA
+
+   Mide lo que solo se puede ver en una pantalla de verdad y que ninguna
+   prueba de servidor alcanza:
+
+   1. LA DEFENSA, PRIMERO Y ANTES QUE NADA. Todo lo que pinta esta
+      pantalla lo escribió un desconocido de la internet abierta, y se
+      pinta DENTRO de F.A.R.O, que es el mismo dominio que la Bóveda,
+      las finanzas, el chat y los teléfonos del Buzón. Se le da de comer
+      un ítem hostil de verdad —comillas que cierran atributos, una
+      etiqueta <script>, una dirección javascript:— y se comprueba que
+      no nace ni un elemento vivo y que la dirección mala no llega a
+      ningún href.
+
+   2. Las reglas de la puerta que viven en la pantalla: el nivel de
+      evidencia SIEMPRE visible (regla 1), lo retractado avisando ARRIBA
+      del título (regla 4), el peso de la fuente a la vista (regla 5),
+      las fuentes mudas dichas (regla 6) y la edición con FONDO (regla 8).
+
+   3. Que los chips NO bajen de línea, y que «Sin leer» sea el segundo:
+      es la lección del filtro de materias de Videos M.E.T.A.S, y con
+      tres filtros más los racimos, envueltos empujan la primera tarjeta
+      fuera de la pantalla.
+───────────────────────────────────────────── */
+const L = []; let fallos = 0;
+const ok = (c, q) => { c ? L.push('  OK   ' + q) : (fallos++, L.push('  FALLA ' + q)); };
+
+/* Un doble de Supabase. Devuelve lo que le pongamos y NO habla con
+   nadie: lo que se mide aquí es la pantalla, no la red. */
+function faroSbFalso(items, fuentes) {
+  const thenable = (data) => ({
+    select() { return this; }, order() { return this; },
+    eq() { return this; },     is() { return this; },
+    then(res) { return Promise.resolve({ data, error: null, count: data.length }).then(res); },
+  });
+  return {
+    from(t) { return thenable(t === 'criba_fuentes' ? fuentes : items); },
+    _upd: [],
+  };
+}
+
+const FUENTES = [
+  { id: 'dialnet', nombre: 'Dialnet', racimo: 'A·C·G', peso: 70, activa: true,
+    ultimo_exito_at: new Date().toISOString(), ultimo_error: null },
+  { id: 'muda', nombre: 'Fuente Muda', racimo: 'C', peso: 30, activa: true,
+    ultimo_exito_at: new Date(Date.now() - 9 * 86400000).toISOString(),
+    ultimo_error: 'el canal respondió pero no trajo ningún ítem utilizable' },
+];
+
+const hoy = (() => { const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
+
+/* ⚠️ EL ÍTEM HOSTIL. Es lo que llegaría si una fuente se pusiera a
+   escribir con mala fe, y es exactamente lo que la base ya rechaza —pero
+   la pantalla no puede fiarse de la base, igual que la base no se fía de
+   la pantalla. */
+const HOSTIL = {
+  id: 1, fuente_id: 'dialnet', edicion: hoy, orden: 1,
+  titulo: '<img src=x onerror="window.__COLADO=1">Título con "comillas"',
+  resumen: "Resumen con <script>window.__COLADO2=1<\/script> y ' comilla simple",
+  url: 'javascript:window.__COLADO3=1',
+  evidencia: 'preprint', idioma: 'en', publicado: new Date().toISOString(),
+  leido_at: null, guardado: false, retractado_at: null, doi: null,
+};
+
+const ITEMS = [
+  HOSTIL,
+  { id: 2, fuente_id: 'dialnet', edicion: hoy, orden: 2, titulo: 'Un trabajo revisado',
+    resumen: 'Con su resumen.', url: 'https://dialnet.unirioja.es/x',
+    evidencia: 'revisado', idioma: 'es', publicado: new Date().toISOString(),
+    leido_at: null, guardado: false, retractado_at: null, doi: '10.1/a' },
+  { id: 3, fuente_id: 'muda', edicion: hoy, orden: 3, titulo: 'Este se retractó',
+    resumen: 'Ya no vale.', url: 'https://ejemplo.test/r',
+    evidencia: 'revisado', idioma: 'es', publicado: new Date().toISOString(),
+    leido_at: new Date().toISOString(), guardado: true,
+    retractado_at: new Date().toISOString(), doi: '10.1/b' },
+];
+
+window.faroSb = faroSbFalso(ITEMS, FUENTES);
+</script>
+<script src="/js/tools/criba.js"></script>
+<script>
+(async () => {
+  await initCriba();
+  await new Promise(r => setTimeout(r, 120));
+
+  const lista = document.getElementById('crb-lista');
+  const chips = document.getElementById('crb-chips');
+  const salud = document.getElementById('crb-salud');
+
+  L.push('── 1. La defensa, antes que nada ──');
+  ok(!window.__COLADO && !window.__COLADO2 && !window.__COLADO3,
+     'nada del ítem hostil llegó a ejecutarse');
+  ok(lista.querySelectorAll('img, script, iframe').length === 0,
+     'no nació ni un <img>, <script> ni <iframe> de los datos');
+  const hrefs = [...lista.querySelectorAll('a[href]')].map(a => a.getAttribute('href'));
+  ok(hrefs.every(h => /^https?:\/\//.test(h)),
+     'todos los href son http o https; el javascript: no llegó a ninguno');
+  ok(!hrefs.some(h => h.includes('javascript')), 'la dirección hostil no se pintó');
+  const txt = lista.textContent;
+  ok(txt.includes('<img src=x onerror='),
+     'el título hostil se ve COMO TEXTO, que es la prueba de que fue textContent');
+  ok([...lista.querySelectorAll('a[target="_blank"]')]
+       .every(a => (a.getAttribute('rel') || '').includes('noopener')),
+     'los enlaces que abren pestaña llevan rel="noopener"');
+
+  L.push('── 2. Las reglas de la puerta en la pantalla ──');
+  const retractCard = () => {
+    const r = lista.querySelector('.crb-retractado');
+    return r && r.closest('.crb-card');
+  };
+  const cards = lista.querySelectorAll('.crb-card');
+  ok(cards.length === 3, 'se pintaron las tres tarjetas');
+  ok(lista.querySelector('.crb-card') === (retractCard()),
+     'regla 4 · lo retractado va PRIMERO, no enterrado en la edición');
+  ok([...cards].every(c => c.querySelector('.crb-ev')),
+     'regla 1 · TODAS llevan su nivel de evidencia, sin excepción');
+  ok([...lista.querySelectorAll('.crb-ev')].every(e => e.textContent.trim().length > 4),
+     'regla 1 · el nivel va con RÓTULO, no solo con color');
+  const retract = lista.querySelector('.crb-retractado');
+  ok(!!retract, 'regla 4 · lo retractado avisa');
+  const tarjetaR = retract && retract.closest('.crb-card');
+  ok(tarjetaR && (retract.compareDocumentPosition(tarjetaR.querySelector('.crb-tit'))
+       & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+     'regla 4 · y el aviso va ARRIBA del título, no al pie');
+  ok(lista.querySelectorAll('.crb-peso').length === cards.length,
+     'regla 5 · el peso de la fuente se ve en todas');
+  ok(salud.textContent.includes('Fuente Muda'),
+     'regla 6 · la fuente que lleva nueve días sin traer nada se DICE');
+  ok(salud.textContent.includes('no trajo ningún ítem'),
+     'regla 6 · y se dice qué le pasa, no solo que falla');
+  ok(!!lista.querySelector('.crb-fin'),
+     'regla 8 · la edición se acaba y lo dice');
+  ok(lista.querySelector('.crb-fin').textContent.includes('mañana'),
+     'regla 8 · y dice que lo que sobró sale mañana');
+
+  L.push('── 3. Los chips, que es donde se trabaja ──');
+  ok(getComputedStyle(chips).flexWrap === 'nowrap',
+     'no bajan de línea: se deslizan');
+  const cs = [...chips.querySelectorAll('.crb-chip')];
+  ok(cs.length >= 3, 'hay al menos los tres filtros');
+  ok(cs[1] && cs[1].textContent.includes('Sin leer'),
+     '⚠️ «Sin leer» es el SEGUNDO, que es el que de verdad se usa');
+  ok(cs.some(c => c.textContent.includes('A·C·G')),
+     'los racimos salen de las fuentes que hay, no de una lista escrita a mano');
+
+  L.push('── 4. El filtro hace algo ──');
+  cs[1].click();
+  await new Promise(r => setTimeout(r, 60));
+  const tras = [...document.querySelectorAll('#crb-lista .crb-card')];
+  ok(tras.length === 3,
+     'con «Sin leer» salen las dos sin leer MÁS la retractada');
+  ok(!!document.querySelector('#crb-lista .crb-retractado'),
+     '⚠️ la RETRACTADA sigue ahí aunque esté leída: de nada sirve avisar a quien no lo leyó');
+  ok(!tras.some(c => !c.querySelector('.crb-retractado') && c.classList.contains('crb-leido')),
+     'y ninguna OTRA leída se coló: el filtro sigue filtrando');
+
+  const v = fallos ? 'SUSPENDE' : 'APRUEBA';
+  document.title = v + ' · Sonda · La Criba';
+  document.getElementById('out').textContent =
+    L.join('\n') + '\n\n' + (fallos ? fallos + ' FALLOS' : 'sin fallos') + '\nVEREDICTO: ' + v;
+})();
+</script>
+</body>
+</html>

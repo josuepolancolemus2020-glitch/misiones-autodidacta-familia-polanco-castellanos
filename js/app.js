@@ -219,6 +219,7 @@ function renderHome() {
      sesión termina de restaurarse (ver aplicarSesion en auth.js), que
      es el primer momento en que la base contesta algo. */
   if (typeof msugContarSinAbrir === 'function') msugContarSinAbrir();
+  if (typeof crbContarSinLeer === 'function') crbContarSinLeer();
 
   // Misión destacada
   const m    = featuredMission(ms);
@@ -903,6 +904,7 @@ function switchView(id) {
   if (id === 'view-boveda' && typeof initBoveda === 'function') initBoveda();
   if (id === 'view-msug' && typeof initMetasSug === 'function') initMetasSug();
   if (id === 'view-mvid' && typeof initMetasVideos === 'function') initMetasVideos();
+  if (id === 'view-criba' && typeof initCriba === 'function') initCriba();
 
   // El FAB de Destellos vive en toda la app, excepto en el Chat
   // (estorbaría sobre la barra de escritura) y el editor de Redacción

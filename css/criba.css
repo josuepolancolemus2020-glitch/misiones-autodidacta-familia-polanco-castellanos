@@ -1,0 +1,133 @@
+/* ─────────────────────────────────────────────
+   LA CRIBA 🪶 · la edición del día
+
+   La escala de evidencia se pinta con COLOR Y CON RÓTULO, nunca solo
+   con color: es la regla 1 de la puerta y tiene que leerse aunque
+   alguien no distinga los tonos. El color ordena de un vistazo; las
+   palabras son las que dicen qué es.
+───────────────────────────────────────────── */
+
+.crb-wrap { padding: 0 14px 90px; }
+
+/* ── Regla 6: lo que no llega, se dice ── */
+.crb-aviso {
+  background: #fff7ed; border: 1px solid rgba(234,88,12,.28);
+  border-left: 3px solid #ea580c; border-radius: 10px;
+  padding: 12px 14px; margin: 0 0 14px; font-size: 13.5px; color: #7c2d12;
+}
+.crb-aviso-t   { font-weight: 700; margin-bottom: 6px; }
+.crb-aviso-fila{ display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; margin: 3px 0; }
+.crb-aviso-err { font-style: normal; opacity: .75; font-size: 12px; width: 100%; }
+.crb-aviso-pie { margin-top: 8px; font-size: 12.5px; opacity: .8; }
+
+/* ── Chips ──
+   ⚠️ NO bajan de línea: se deslizan. Es la misma excepción al flex-wrap
+   que el filtro de materias de Videos M.E.T.A.S, y por lo mismo: con
+   tres filtros más los racimos, envueltos ocupan tres renglones y
+   empujan la primera tarjeta fuera de la pantalla. */
+.crb-chips {
+  display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px;
+  padding: 2px 0 10px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.crb-chips::-webkit-scrollbar { display: none; }
+.crb-chip {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid #d5dae1; background: #fff; color: #334155;
+  border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
+}
+.crb-chip-on  { background: var(--brand); border-color: var(--brand); color: #fff; }
+.crb-chip-n   { background: rgba(0,0,0,.08); border-radius: 999px; padding: 1px 7px; font-size: 11.5px; }
+.crb-chip-on .crb-chip-n { background: rgba(255,255,255,.22); }
+.crb-chip-rac { font-weight: 500; }
+
+/* ── Tarjeta ── */
+.crb-card {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 13px;
+  padding: 13px 14px 11px; margin: 0 0 11px;
+  box-shadow: 0 1px 2px rgba(15,23,42,.04);
+}
+.crb-leido { opacity: .62; }
+
+/* Regla 4: va ARRIBA del título. Si fuera una etiqueta al pie, se leería
+   el titular y se creería antes de llegar a ella. */
+.crb-retractado {
+  background: #fef2f2; color: #991b1b; border: 1px solid rgba(220,38,38,.3);
+  border-radius: 8px; padding: 7px 10px; margin: -2px 0 9px;
+  font-size: 12.5px; font-weight: 700; letter-spacing: .01em;
+}
+
+.crb-tira { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+
+/* Regla 1: color Y rótulo. El color solo no vale. */
+.crb-ev {
+  font-size: 11.5px; font-weight: 700; border-radius: 6px; padding: 3px 8px;
+  border: 1px solid transparent; white-space: nowrap;
+}
+.crb-ev-1 { background: #f0fdf4; color: #15803d; border-color: rgba(22,163,74,.28); }
+.crb-ev-2 { background: #eff6ff; color: #1d4ed8; border-color: rgba(37,99,235,.28); }
+.crb-ev-3 { background: #fefce8; color: #a16207; border-color: rgba(202,138,4,.32); }
+.crb-ev-4 { background: #f5f3ff; color: #6d28d9; border-color: rgba(124,58,237,.24); }
+.crb-ev-5 { background: #fff7ed; color: #c2410c; border-color: rgba(234,88,12,.28); }
+.crb-ev-6 { background: #f1f5f9; color: #475569; border-color: rgba(51,65,85,.2); }
+
+/* Regla 5: el peso se ve. No se esconde dentro del orden. */
+.crb-fuente {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; color: #475569; background: #f8fafc;
+  border: 1px solid #e2e8f0; border-radius: 6px; padding: 3px 8px;
+}
+.crb-peso  { font-size: 10.5px; color: #64748b; background: #eef2f7; border-radius: 4px; padding: 1px 5px; }
+.crb-idioma{ font-size: 10.5px; font-weight: 700; color: #7c2d12; background: #fff7ed;
+             border: 1px solid rgba(234,88,12,.25); border-radius: 5px; padding: 2px 6px; }
+
+.crb-tit { font-size: 15.5px; font-weight: 700; line-height: 1.35; margin: 0 0 6px; color: #0f172a; }
+.crb-res { font-size: 13.5px; line-height: 1.5; color: #475569; margin: 0 0 9px;
+           display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+
+.crb-pie { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center;
+           font-size: 12px; color: #64748b; margin-bottom: 9px; }
+.crb-abrir { color: var(--brand-mid); font-weight: 600; text-decoration: none; }
+.crb-abrir:hover, .crb-abrir:focus-visible { text-decoration: underline; }
+
+.crb-bots { display: flex; gap: 8px; }
+.crb-bot {
+  flex: 1; border: 1px solid #dbe1e8; background: #f8fafc; color: #334155;
+  border-radius: 9px; padding: 8px 10px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+}
+.crb-bot:active { transform: scale(.985); }
+.crb-bot-on { background: #eff6ff; border-color: rgba(37,99,235,.35); color: #1d4ed8; }
+
+/* ── Regla 8: la edición tiene fondo, y se ve que se acabó ── */
+.crb-fin { text-align: center; padding: 22px 10px 6px; color: #64748b; }
+.crb-fin-l { letter-spacing: .5em; opacity: .45; margin-bottom: 8px; }
+.crb-fin-t { font-weight: 700; font-size: 14px; color: #334155; }
+.crb-fin-s { font-size: 12.5px; margin-top: 3px; }
+
+.crb-vacio { text-align: center; padding: 46px 18px; color: #64748b; }
+.crb-vacio-ic { font-size: 40px; margin-bottom: 10px; }
+.crb-vacio-t  { font-weight: 700; color: #334155; font-size: 15px; }
+.crb-vacio-s  { font-size: 13px; margin-top: 5px; line-height: 1.5; }
+.crb-vacio-err{ display: block; margin-top: 10px; font-size: 11px; color: #991b1b;
+                background: #fef2f2; border-radius: 6px; padding: 6px 8px; word-break: break-word; }
+.crb-cargando { text-align: center; padding: 34px; color: #94a3b8; font-size: 13.5px; }
+
+.crb-intro { display: flex; gap: 12px; align-items: flex-start;
+             background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+             padding: 12px 14px; margin: 0 0 13px; }
+.crb-intro-ic { font-size: 22px; line-height: 1; }
+.crb-intro-t  { font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 2px; }
+.crb-intro-s  { font-size: 12.5px; color: #64748b; line-height: 1.5; }
+
+@media (prefers-color-scheme: dark) {
+  .crb-card   { background: #172033; border-color: #263349; }
+  .crb-tit    { color: #e6edf6; }
+  .crb-res    { color: #a5b3c6; }
+  .crb-fuente { background: #131c2c; border-color: #263349; color: #a5b3c6; }
+  .crb-peso   { background: #1c2740; color: #8ea1ba; }
+  .crb-chip   { background: #172033; border-color: #2b3a52; color: #cbd5e1; }
+  .crb-bot    { background: #131c2c; border-color: #2b3a52; color: #cbd5e1; }
+  .crb-intro  { background: #131c2c; border-color: #263349; }
+  .crb-intro-t{ color: #e6edf6; }
+  .crb-fin-t  { color: #cbd5e1; }
+}

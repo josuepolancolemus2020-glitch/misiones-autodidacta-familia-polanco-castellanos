@@ -4403,6 +4403,10 @@ body {
    y esto no reproduce nada, administra. */
 .qa-mvid { background: linear-gradient(135deg, #b91c1c, #f87171); }
 
+/* La Criba. `position: relative` hace falta para que la insignia del
+   contador se coloque encima del icono, igual que en Sugerencias. */
+.qa-crb { background: linear-gradient(135deg, #175e63, #4db6ac); position: relative; }
+
 .mvid-lbl {
   display: block;
   font-size: 0.78rem;
