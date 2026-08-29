@@ -308,97 +308,116 @@ Lo de arriba es una lista candidata razonada, **no una lista verificada**.
 
 ---
 
-## 10. Fase 1 · La sonda: lo que pasó de verdad
+## 10. Fase 1 · La sonda, corrida. Lo que devolvieron de verdad
 
-**29 de agosto de 2026.** Se intentó sondar las fuentes desde la sesión y
-**no se pudo**. No es un fallo pasajero: es la política de salida a internet
-de estas sesiones.
+**29 de agosto de 2026.** No se pudo sondar desde la sesión —la política de
+salida devuelve `connect_rejected` para todo lo que no sea GitHub y los
+repositorios de paquetes, y `WebFetch` cae en el mismo sitio—, así que la
+sonda se escribió para correr en GitHub Actions, donde sí hay red. **Corrió
+dos veces.** Esto es lo que devolvieron 28 fuentes contra 78 direcciones.
+
+### Lo que funciona en español: cuatro
+
+| Fuente | Formato | Ítems | Resumen | Idioma | Ritmo |
+|---|---|---|---|---|---|
+| **Dialnet** | `oai-pmh` | **100** | ✅ | es | — |
+| **SIECA** | `rss` | 10 | ✅ | es | 0,9/día |
+| **CNBS** | `rss` | 10 | ✅ | es | 0,1/día |
+| **Bolsa Centroamericana de Valores** | `rss` | 10 | ✅ | en⚠es | 1,1/día |
+
+**Dialnet es el hallazgo bueno:** 100 registros con resumen, en español, y
+cubre los tres racimos elegidos a la vez. Y la **CNBS** —el registro con el
+que se comprueba si alguien está autorizado a recibir dinero, que es la pieza
+central del capítulo 5— tiene canal, en español, con resumen, y a un ítem
+cada diez días: entra en la edición diaria sin ahogarla.
+
+### ⚠️ The Conversation en español no está en español
+
+`theconversation.com/es/articles.atom` responde perfecto —32 entradas, con
+DOI, 17 al día— pero **se declara `en` y se lee `en`**. Era la fuente número
+uno de la Fase 1, la que cubría A·C·G de un tirón. **No sirve para lo que se
+pidió**, y hay que buscarle otra dirección.
+
+### Lo demás
+
+- **Seis rechazan recolectores** (403), vivas y cerradas a propósito: SciELO,
+  BID, INE Honduras, COHEP, Royal Society Open Science y Judgment and
+  Decision Making. **No se reintentan disfrazándose de navegador:** es su
+  decisión, y lo que hace falta saber es que hay que entrar por otra puerta.
+- **Sin canal:** CEPAL (el OAI existe y rechaza los parámetros, 400), Redalyc
+  (404), Agencia SINC (un RSS de cero ítems) y el **BCH**, confirmado.
+- **Mudas:** FOSDEH (falla el DNS en cuatro dominios: puede que el sitio ya no
+  exista), Cochrane (412, bloqueo de bot) y **Nada es Gratis, que funcionó en
+  la primera corrida y falló en la segunda** con las mismas direcciones:
+  intermitente, o bloquea la IP del runner.
+- **Del núcleo (Fase 2) ya funcionan:** OpenAlex, Crossref, Europe PMC,
+  Nature Human Behaviour, NBER, Retraction Watch y Data Colada. Semantic
+  Scholar devolvió 429: hay cola, no está muerta.
+
+### Los cuatro fallos que la sonda tenía, y que solo salieron al correrla
+
+Ninguno se habría visto sin datos reales. Los cuatro tienen ahora su prueba:
+
+1. **`traeResumen` medía la descripción del CANAL, no la del ítem.** En un RSS
+   la primera del documento es la del canal, que es corta: Nada es Gratis,
+   NBER, Retraction Watch y Data Colada salieron «sin resumen» trayéndolo.
+2. **El idioma se fiaba de la etiqueta.** Un canal puede declararse en un
+   idioma y publicar en otro. Ahora se comparan lo declarado y lo que se lee,
+   y si no coinciden se dice (`en⚠es`) — así se vio que la Bolsa publica en
+   español declarándose en inglés, y que The Conversation no.
+3. **«Sirve» no miraba QUÉ eran los ítems.** SciELO ganó con una dirección que
+   devuelve las 36 **colecciones** de SciELO. Ahora, sin fecha ni DOI ni
+   resumen, el veredicto es `dudoso` — y sin fecha no hay edición diaria.
+4. **Crossref salía «sin DOI» siendo una base de DOI:** los manda con la barra
+   escapada (`10.5860\/choice`) y la expresión exigía la barra literal.
+
+Y el arreglo más caro de la lista de fuentes era un error de la propuesta:
+**`verb=Identify` nunca devuelve registros**, describe el repositorio. Por eso
+Dialnet y CEPAL salieron «sin canal» teniendo un OAI vivo. Dialnet, con el
+verbo correcto, es hoy la mejor fuente de la Fase 1.
+
+### Cómo se vuelve a correr
+
+**Desde la tableta, un toque:** pestaña **Actions** → *Sonda de fuentes* →
+**Run workflow**. Ya está registrado en `main`. Escribe `SONDA-FUENTES.md` y
+lo deja confirmado en la rama.
 
 ```
-curl  → api.openalex.org   connect_rejected · policy denial
-curl  → www.scielo.org     connect_rejected · policy denial
-curl  → api.crossref.org   connect_rejected · policy denial
-WebFetch → OpenAlex, The Conversation   EGRESS_BLOCKED
-```
-
-Solo pasan GitHub, PyPI, npm, jsr, crates y las APIs de Anthropic. El propio
-`/root/.ccr/README.md` lo dice: *«403 / 407 — the destination host is not
-allowed by your organization's egress policy. Do not retry or route around
-it — report the blocked host.»*
-
-**Y con eso a la vista, lo que NO se hizo:** escribir la tabla de todas
-formas. Con búsquedas web se podía haber armado algo que *pareciera* una
-sonda —direcciones plausibles, formatos supuestos, ritmos inventados— y
-habría sido peor que no tener nada, porque el recolector de la Fase 1 se
-construiría contra direcciones que nadie comprobó. Es exactamente lo mismo
-que mandar SQL sin correrlo.
-
-### Lo que sí se hizo: la sonda, para donde sí hay red
-
-| Archivo | Qué es |
-|---|---|
-| `_dev/fuentes-criba.json` | Las 28 fuentes como **datos**, con **72 direcciones candidatas** |
-| `_dev/sonda-fuentes.js` | La sonda. Sin dependencias, solo Node |
-| `_dev/prueba-sonda-fuentes.js` | Su prueba: **36 comprobaciones, APRUEBA** |
-| `.github/workflows/sonda-fuentes.yml` | El disparador de un toque desde la tableta |
-
-**Cada fuente lleva varias direcciones candidatas** porque nadie sabe de
-memoria si el Banco Central de Honduras publica en `/feed`, en `/rss` o en
-ningún sitio. La sonda las prueba en orden y se queda con la primera que
-sirva: así la duda la resuelve la máquina una vez, en vez de quedar escrita a
-mano en un documento que envejece.
-
-De cada fuente apunta lo que devolvió: formato, cuántos ítems, si trae
-resumen, si trae DOI, en qué idioma y **a qué ritmo publica** —que es lo que
-dice si cabe en una edición diaria o la ahoga—.
-
-⚠️ **Y distingue «sin canal» de «no responde».** No es lo mismo: una
-institución viva que no publica un canal legible es trabajo para la Fase 2
-(leerla de otra forma); una que no contesta es una fuente muerta. Confundir
-las dos borraría media capa Honduras de un plumazo. La prueba lo comprueba
-con una portada de mentira.
-
-### Cómo se corre
-
-**Desde la tableta, un toque** — pestaña **Actions** → *Sonda de fuentes* →
-**Run workflow**. Escribe el informe y lo deja confirmado en la rama.
-
-⚠️ **Pero antes tiene que estar en `main`:** GitHub solo enseña el botón
-*Run workflow* si el archivo existe en la rama principal. Mientras viva solo
-en la rama de trabajo, no hay botón.
-
-**Con el repositorio delante:**
-
-```
-node _dev/sonda-fuentes.js              # todas
-node _dev/sonda-fuentes.js --fase 1     # solo las de la Fase 1
+node _dev/sonda-fuentes.js --fase 1
 node _dev/sonda-fuentes.js --id bch,cnbs,ine-hn
-node _dev/prueba-sonda-fuentes.js       # comprobar la sonda misma
+node _dev/prueba-sonda-fuentes.js       # 44 comprobaciones
 ```
 
-El resultado sale en **`SONDA-FUENTES.md`** —para leer desde el teléfono— y
-en `_dev/sonda-fuentes-resultado.json`, que es lo que leerá el recolector.
-
-**El correo no va escrito en el código.** Crossref y OpenAlex dan mejor cola
-a quien se identifica con un correo, pero eso es mandar el correo del autor a
-un servicio ajeno: va en la variable `CRIBA_MAILTO` (o en un secreto del
-repositorio con ese nombre) y, si no está, se pregunta igual y el informe lo
-dice.
-
-Además queda programada **una vez al mes**. Es la regla 6: una fuente que
-cambia su canal se queda muda sin avisar, y sin volver a preguntar nadie se
-entera hasta que la edición sale a medias.
+Queda programada **una vez al mes** por la regla 6: una fuente que cambia su
+canal se queda muda sin avisar. Y **el correo no va en el código**: va en
+`CRIBA_MAILTO` y, si no está, el informe lo dice.
 
 ---
 
-## 11. Lo siguiente
+## 11. La decisión: se arranca con las cuatro
 
-1. **Correr la sonda.** Hasta que corra, la lista de fuentes sigue sin
-   verificar y el recolector no se escribe.
-2. Con el informe delante: tirar las fuentes que no sirven, buscar otra
-   dirección para las que quedaron «sin canal», y **recalcular si el ritmo
-   diario aguanta** las que sí.
-3. Recién entonces, la tabla `criba_ediciones` y la Edge Function. Y cuando
-   toque el SQL, va **entero en el chat**, idempotente, con su comprobación
-   de dependencias arriba y su fila de verificación al final — y probado
-   antes contra un PostgreSQL de verdad en la sesión.
+**Acordado con el autor el 29 de agosto de 2026**, con el informe delante.
+
+De las 15 fuentes en español funcionan 4. Se arranca con esas 4 igual, y por
+un motivo: **Dialnet solo ya da 100 registros con resumen y cubre A·C·G**, y
+con SIECA, CNBS y la Bolsa hay edición diaria de verdad — gratis, sin clave y
+sin máquina. Ver la Criba andando antes de gastar un centavo vale más que
+esperar a tenerla completa.
+
+Es la tercera vez que el español mueve el plan, y conviene tenerlo escrito:
+primero adelantó la máquina de la Fase 3 a la Fase 2; después obligó a
+rehacer la Fase 1 con fuentes nativas; y ahora resulta que esas fuentes son
+cuatro. **La Fase 2 no es un lujo: es lo que abre el resto.**
+
+### Lo siguiente, en este orden
+
+1. La tabla `criba_ediciones` con su seguridad por fila, y el recolector
+   (Edge Function) para esas cuatro fuentes. El SQL va **entero en el chat**,
+   idempotente, con su comprobación de dependencias arriba y su fila de
+   verificación al final — y probado antes contra un PostgreSQL de verdad.
+2. La vista en el Acceso Rápido, con las reglas de la puerta puestas desde el
+   principio: nivel de evidencia a la vista, nada dentro de un atributo del
+   HTML, y la edición con fondo.
+3. Pendiente, sin bloquear: buscarle a The Conversation su dirección en
+   español, otra puerta para CEPAL y SciELO, y comprobar si FOSDEH sigue
+   existiendo.
