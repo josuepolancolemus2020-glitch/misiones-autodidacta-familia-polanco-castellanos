@@ -41,6 +41,9 @@ export interface Item {
   idioma: string;
   evidencia: string;
   publicado: string | null;
+  /* Qué tema lo trajo. Lo pone el recolector, no este módulo: aquí no se
+     sabe por qué se preguntó. Nulo en las fuentes de volcado. */
+  tema_id?: string | null;
 }
 
 /* ── El mismo check que la columna `url`, y a propósito ──

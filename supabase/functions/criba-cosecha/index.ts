@@ -42,6 +42,10 @@ const TOPE_EDICION = 25;
 // puede- no debe llenar la edición ella sola ni tardar diez minutos.
 const TOPE_POR_FUENTE = 60;
 
+/* Cuántos días atrás se pregunta. Más no sirve: la edición es diaria y
+   lo de hace tres meses no es novedad, es archivo. */
+const DIAS_ATRAS = 21;
+
 const TIEMPO_MAX = 25000;
 const UA = "FARO-LaCriba/1.0 (+https://github.com/josuepolancolemus2020-glitch/misiones-autodidacta-familia-polanco-castellanos)";
 
@@ -76,33 +80,75 @@ Deno.serve(async (req) => {
     .from("criba_fuentes").select("*").eq("activa", true).order("peso", { ascending: false });
   if (eF) return json({ error: "No se pudo leer el registro de fuentes: " + eF.message }, 500);
 
+  /* ⚠️ LOS TEMAS. Sin ellos esto vuelve a ser una manguera.
+     La primera edición salió llena de veterinaria porque a Dialnet se le
+     pidió su volcado entero y nadie preguntó por ningún interés. Ahora a
+     cada fuente de consulta se le pregunta TEMA POR TEMA, y lo que llega
+     entra sabiendo qué lo trajo. */
+  const { data: temas } = await svc
+    .from("criba_temas").select("*").eq("activo", true).order("peso", { ascending: false });
+  const losTemas = temas ?? [];
+
+  const desde = new Date(Date.now() - DIAS_ATRAS * 86400000).toISOString().slice(0, 10);
   const parte: Record<string, unknown>[] = [];
 
   for (const f of fuentes ?? []) {
     const ahora = new Date().toISOString();
     let nuevos = 0, leidos = 0, fallo: string | null = null;
 
-    try {
-      const res = await fetch(f.url, {
-        redirect: "follow",
-        signal: AbortSignal.timeout(TIEMPO_MAX),
-        headers: { "User-Agent": UA, "Accept": "application/atom+xml, application/rss+xml, application/json, text/xml;q=0.9, */*;q=0.5" },
-      });
-      if (!res.ok) throw new Error(`respondió ${res.status}`);
+    /* Una fuente de CONSULTA se pregunta una vez por tema; una de
+       volcado (un canal pequeño y ya temático, como la CNBS) se pide
+       tal cual y sus artículos no llevan tema. */
+    const vueltas = f.plantilla
+      ? losTemas.map((t: any) => ({
+          tema: t,
+          url: String(f.plantilla)
+                 .replace("{q}", encodeURIComponent(t.termino))
+                 .replace("{desde}", desde),
+        }))
+      : [{ tema: null, url: f.url }];
 
-      const cuerpo = await res.text();
-      const items: Item[] = normaliza(cuerpo, f as unknown as Fuente).slice(0, TOPE_POR_FUENTE);
+    const acumulado: Item[] = [];
+    const fallos: string[] = [];
+
+    for (const v of vueltas) {
+      try {
+        const res = await fetch(v.url, {
+          redirect: "follow",
+          signal: AbortSignal.timeout(TIEMPO_MAX),
+          headers: { "User-Agent": UA, "Accept": "application/atom+xml, application/rss+xml, application/json, text/xml;q=0.9, */*;q=0.5" },
+        });
+        if (!res.ok) throw new Error(`${v.tema ? v.tema.id + ": " : ""}respondió ${res.status}`);
+        const cuerpo = await res.text();
+        const items = normaliza(cuerpo, f as unknown as Fuente);
+        for (const it of items) {
+          acumulado.push(v.tema ? { ...it, tema_id: v.tema.id } as Item : it);
+        }
+      } catch (e) {
+        fallos.push(String((e as Error).message ?? e).slice(0, 120));
+      }
+      /* Se pregunta con educación: estas APIs son gratis y de todos. */
+      if (vueltas.length > 1) await new Promise((r) => setTimeout(r, 350));
+    }
+
+    try {
+      /* Sin gemelos entre temas: el mismo trabajo sale buscando «sesgo
+         cognitivo» y «toma de decisiones», y se queda con el primero. */
+      const vistas = new Set<string>();
+      const items = acumulado
+        .filter((i) => (vistas.has(i.clave) ? false : (vistas.add(i.clave), true)))
+        .slice(0, TOPE_POR_FUENTE);
       leidos = items.length;
 
-      // Si el canal contesta pero no trae nada, ES un fallo: es la
-      // regla 6 -«lo que no llega, se dice»-. Un canal vacío durante
-      // semanas es exactamente lo que hay que ver a tiempo, y sin esto
-      // se vería como una fuente sana que casualmente no publica.
-      if (leidos === 0) throw new Error("el canal respondió pero no trajo ningún ítem utilizable");
+      /* Que TODAS las vueltas fallen es un fallo de la fuente. Que
+         fallen algunas no: un tema sin resultados es información, no
+         avería. */
+      if (leidos === 0) {
+        throw new Error(fallos.length
+          ? "ninguna consulta trajo nada · " + fallos[0]
+          : "respondió pero no trajo ningún ítem utilizable");
+      }
 
-      // `ignoreDuplicates`: el `unique` de `clave` es quien de verdad
-      // impide los gemelos, aquí y entre fuentes distintas. Reinsertar
-      // lo que ya estaba NO puede pisar lo leído ni lo guardado.
       const { error: eI, count } = await svc
         .from("criba_items")
         .upsert(items, { onConflict: "clave", ignoreDuplicates: true, count: "exact" });
@@ -111,13 +157,11 @@ Deno.serve(async (req) => {
 
       await svc.from("criba_fuentes").update({
         ultimo_intento_at: ahora, ultimo_exito_at: ahora,
-        ultimo_error: null, fallos_seguidos: 0,
+        ultimo_error: fallos.length ? `${fallos.length} de ${vueltas.length} consultas fallaron` : null,
+        fallos_seguidos: 0,
       }).eq("id", f.id);
 
     } catch (e) {
-      // Una fuente caída NO tumba la cosecha: se apunta y se sigue con
-      // la siguiente. Lo contrario significaría que la fuente número
-      // tres deja sin edición a las que van detrás.
       fallo = String((e as Error).message ?? e).slice(0, 500);
       await svc.from("criba_fuentes").update({
         ultimo_intento_at: ahora,
@@ -126,7 +170,7 @@ Deno.serve(async (req) => {
       }).eq("id", f.id);
     }
 
-    parte.push({ fuente: f.id, leidos, nuevos, fallo });
+    parte.push({ fuente: f.id, consultas: vueltas.length, leidos, nuevos, fallo });
   }
 
   // Armar la edición del día, con su fondo. Lo que no entre sale mañana.
