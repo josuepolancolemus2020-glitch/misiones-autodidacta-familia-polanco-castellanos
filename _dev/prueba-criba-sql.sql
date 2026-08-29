@@ -519,6 +519,46 @@ begin
 end $$;
 \echo 'ok 14 · ⚠️ ningún TEMA pasa de 4: un término desafortunado ya no se come el número'
 
+
+-- ════════════════════════════════════════════════════════════════════
+-- 11. LOS DOS TOPES NO SE PISAN · criba_afina4.sql
+-- ════════════════════════════════════════════════════════════════════
+\echo '── Corriendo supabase/sql/criba_afina4.sql ──'
+\i supabase/sql/criba_afina4.sql
+
+-- ⚠️ El caso real: los 18 temas con material de sobra, repartidos entre
+-- las tres fuentes de consulta. Con el orden viejo -recortar por fuente
+-- primero- salían TRES materias, porque los ocho mejores de cada fuente
+-- eran todos de los dos temas de más peso.
+do $$
+declare materias integer; mayor integer;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select (array['openalex','semanticscholar','europepmc'])[1 + ((g + i) % 3)],
+         t.id || '-' || g || '-' || i, t.id || ' articulo ' || g || i,
+         'https://a.test/' || t.id || g || i, t.id,
+         now() - ((g * 10 + i) || ' minutes')::interval
+    from public.criba_temas t, generate_series(1, 4) g, generate_series(1, 2) i
+   where t.activo;
+
+  perform public.criba_arma_edicion(current_date, 25);
+
+  select count(distinct tema_id) into materias from public.criba_items
+   where edicion = current_date and tema_id is not null;
+  select coalesce(max(n), 0) into mayor from (
+    select count(*) as n from public.criba_items
+     where edicion = current_date and tema_id is not null group by tema_id) x;
+
+  if materias < 10 then
+    raise exception 'FALLA: la edición trae solo % materias de 18 (los topes se pisan)', materias;
+  end if;
+  if mayor > 2 then
+    raise exception 'FALLA: una materia puso % (tope 2)', mayor;
+  end if;
+end $$;
+\echo 'ok 15 · ⚠️ con 18 temas con material, la edición trae 10 materias o más'
+
 \echo ''
 \echo '════════════════════════════════════════════════'
 \echo 'RESULTADO: APRUEBA'
