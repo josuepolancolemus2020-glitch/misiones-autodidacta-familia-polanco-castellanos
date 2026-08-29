@@ -275,3 +275,22 @@ export function normaliza(cuerpo: string, f: Fuente): Item[] {
   const vistas = new Set<string>();
   return brutos.filter((i) => (vistas.has(i.clave) ? false : (vistas.add(i.clave), true)));
 }
+
+/* ── Cuánto se queda de una fuente ──
+   ⚠️ ESTE RECORTE MATABA TEMAS EN SILENCIO. La primera versión juntaba
+   lo de TODOS los temas en una lista y cortaba a 60. Como los temas se
+   consultan en orden de peso y cada uno trae hasta 8, el corte caía tras
+   el séptimo: todo lo que pesara menos de 75 no llegaba nunca a la base,
+   y en la tabla de diagnóstico salía como «trae 0» —o sea, parecía que
+   no había artículos de «political ideology», cuando lo que pasaba es
+   que se tiraban después de traerlos—.
+
+   Ahora el tope de una fuente de CONSULTA sale de sus propios temas:
+   cada consulta ya viene limitada a 8 por la dirección, así que el
+   número de temas es el tope natural. Un tope global encima de eso solo
+   sirve para castigar a los últimos de la fila. Las de VOLCADO sí
+   llevan tope fijo: ahí no hay temas que repartir y un canal enorme
+   podría llenar la base él solo. */
+export function topeDeFuente(esDeConsulta: boolean, nTemas: number, porTema = 8): number {
+  return esDeConsulta ? Math.max(nTemas, 1) * porTema : 60;
+}

@@ -164,6 +164,31 @@ ok(N.limpia('&Aacute;lvarez y &aacute;lvarez') === 'Álvarez y álvarez',
 ok(N.limpia('&noexiste; queda igual') === '&noexiste; queda igual',
    'una entidad desconocida se deja como estaba, no se borra el texto');
 
+console.log('\n── El recorte por fuente no puede matar temas ──');
+/* ⚠️ La primera versión juntaba lo de todos los temas y cortaba a 60.
+   Con 18 temas a 8 cada uno, el corte caía tras el séptimo: los temas de
+   menos peso NO llegaban nunca a la base y en el diagnóstico salían como
+   «trae 0», o sea, parecía que no existían artículos de «political
+   ideology» cuando lo que pasaba es que se tiraban tras traerlos. */
+{
+  const N_TEMAS = 18, POR = 8;
+  ok(N.topeDeFuente(true, N_TEMAS, POR) === N_TEMAS * POR,
+     '⚠️ una fuente de consulta cabe entera: 18 temas × 8 = 144, no 60');
+  ok(N.topeDeFuente(false, N_TEMAS, POR) === 60,
+     'una de volcado sí lleva tope fijo: ahí no hay temas que repartir');
+  ok(N.topeDeFuente(true, 0, POR) === POR, 'sin temas no devuelve cero (no se anularía la fuente)');
+
+  // El caso de verdad: 18 temas con 8 cada uno, ninguno puede desaparecer.
+  const lote = [];
+  for (let t = 0; t < N_TEMAS; t++)
+    for (let i = 0; i < POR; i++) lote.push({ tema_id: 't' + t, clave: 'c' + t + '-' + i });
+  const recortado = lote.slice(0, N.topeDeFuente(true, N_TEMAS, POR));
+  const vivos = new Set(recortado.map(x => x.tema_id));
+  ok(vivos.size === N_TEMAS,
+     `⚠️ los ${N_TEMAS} temas sobreviven al recorte (con el 60 de antes sobrevivían ${
+       new Set(lote.slice(0, 60).map(x => x.tema_id)).size})`);
+}
+
 console.log('\n── El cosido de un archivo dice lo mismo que lo probado ──');
 /* ⚠️ Esto es lo que impide desplegar un cosido viejo. La función se
    despliega desde el panel pegando PEGAR-EN-EL-PANEL.ts, que lo genera

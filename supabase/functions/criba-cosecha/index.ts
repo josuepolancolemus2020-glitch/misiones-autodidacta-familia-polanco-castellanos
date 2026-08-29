@@ -28,7 +28,7 @@
 // ════════════════════════════════════════════════════════════════════
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { normaliza, type Fuente, type Item } from "./normaliza.ts";
+import { normaliza, topeDeFuente, type Fuente, type Item } from "./normaliza.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -40,7 +40,10 @@ const TOPE_EDICION = 25;
 
 // Por fuente y por vuelta. Una fuente que devuelva mil registros -Dialnet
 // puede- no debe llenar la edición ella sola ni tardar diez minutos.
-const TOPE_POR_FUENTE = 60;
+/* Cuántos resultados pide cada consulta. Va en las plantillas
+   (`per-page=8`, `limit=8`, `pageSize=8`) y aquí para poder calcular el
+   tope de una fuente sin adivinarlo. */
+const POR_CONSULTA = 8;
 
 /* Cuántos días atrás se pregunta. Más no sirve: la edición es diaria y
    lo de hace tres meses no es novedad, es archivo. */
@@ -137,7 +140,7 @@ Deno.serve(async (req) => {
       const vistas = new Set<string>();
       const items = acumulado
         .filter((i) => (vistas.has(i.clave) ? false : (vistas.add(i.clave), true)))
-        .slice(0, TOPE_POR_FUENTE);
+        .slice(0, topeDeFuente(!!f.plantilla, losTemas.length, POR_CONSULTA));
       leidos = items.length;
 
       /* Que TODAS las vueltas fallen es un fallo de la fuente. Que
