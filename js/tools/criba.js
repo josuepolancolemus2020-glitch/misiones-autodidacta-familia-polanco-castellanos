@@ -57,7 +57,7 @@ let _crbItems   = [];
 let _crbFuentes = {};
 let _crbFiltro  = 'sinleer';  // 'todas' | 'sinleer' | 'guardadas'
 let _crbRacimo  = '';         // '' = todos
-let _crbDia     = null;       // null = la edición de hoy
+let _crbEdicion = null;       // la fecha de la edición que se está enseñando
 let _crbHay     = true;       // ¿se corrió ya el SQL en esta base?
 
 /* ── Defensa ─────────────────────────────────────────────────────── */
@@ -124,26 +124,59 @@ async function initCriba() {
   (fs || []).forEach(f => { _crbFuentes[f.id] = f; });
 
   await crbTraerEdicion();
+  const rot = document.getElementById('crb-cual');
+  if (rot) rot.textContent = crbRotuloEdicion() || 'Sin ediciones todavía';
   crbPintarSalud();
   crbPintarChips();
   crbPintar();
 }
 
-/* La edición de un día. Con FONDO: lo que hay es lo que hay. */
+/* La edición que se enseña. Con FONDO: lo que hay es lo que hay.
+
+   ⚠️ SE PIDE LA ÚLTIMA QUE EXISTA, NO LA DE «HOY».
+   La primera versión calculaba la fecha de hoy con el reloj del aparato
+   y se la pedía al servidor. Dos cosas mal, y la segunda es peor:
+
+     · El aparato está en Honduras (UTC−6) y el servidor en UTC. Entre
+       las seis de la tarde y medianoche, el servidor ya está en el día
+       siguiente: la edición del día existía y la pantalla decía «hoy no
+       hay edición» durante seis horas cada tarde.
+     · Y si una madrugada el recolector no corre —se cayó una fuente, se
+       quedó sin red—, pedir «la de hoy» devuelve nada. Pedir la última
+       devuelve la de ayer, que es lo que una persona quiere leer.
+
+   Así que no se calcula ninguna fecha: se pide lo último que haya y se
+   dice de qué día es. Un aparato no tiene por qué saber en qué día vive
+   el servidor. */
 async function crbTraerEdicion() {
   const sb = await crbCliente();
   if (!sb) return;
-  let q = sb.from(CRIBA_ITEMS)
+  const { data, error } = await sb.from(CRIBA_ITEMS)
     .select('id,fuente_id,titulo,resumen,url,doi,idioma,evidencia,publicado,edicion,orden,leido_at,guardado,retractado_at')
-    .order('orden', { ascending: true });
-  q = _crbDia ? q.eq('edicion', _crbDia) : q.eq('edicion', crbHoy());
-  const { data, error } = await q;
-  _crbItems = error ? [] : (data || []);
+    .not('edicion', 'is', null)
+    .order('edicion', { ascending: false })
+    .order('orden',   { ascending: true })
+    .limit(80);
+  if (error) { _crbItems = []; return; }
+
+  /* De lo que vino, solo la edición más reciente: mezclar dos días
+     rompería el fondo, que es lo que hace que esto se acabe. */
+  const filas = data || [];
+  _crbEdicion = filas.length ? filas[0].edicion : null;
+  _crbItems = filas.filter(i => i.edicion === _crbEdicion);
 }
 
-function crbHoy() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+/* De qué día es lo que se está enseñando. Se pinta a la vista: si el
+   recolector no corrió anoche, hay que verlo, no adivinarlo. */
+function crbRotuloEdicion() {
+  if (!_crbEdicion) return '';
+  const [a, m, d] = _crbEdicion.split('-').map(Number);
+  const f = new Date(a, m - 1, d);
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const dias = Math.round((hoy - f) / 86400000);
+  if (dias <= 0) return 'Edición de hoy';
+  if (dias === 1) return 'Edición de ayer';
+  return 'Edición del ' + f.toLocaleDateString('es-HN', { day: 'numeric', month: 'long' });
 }
 
 /* ── Regla 6: lo que no llega, SE DICE ────────────────────────────── */
@@ -271,7 +304,8 @@ function crbPintar() {
      que separa esto de la cosa que se intenta dejar de leer. */
   const fin = crbEl('div', 'crb-fin');
   fin.appendChild(crbEl('div', 'crb-fin-l', '· · ·'));
-  fin.appendChild(crbEl('div', 'crb-fin-t', 'Hasta aquí la edición de hoy.'));
+  fin.appendChild(crbEl('div', 'crb-fin-t',
+    'Hasta aquí ' + (crbRotuloEdicion() || 'la edición').toLowerCase() + '.'));
   fin.appendChild(crbEl('div', 'crb-fin-s',
     'Lo que sobró no se perdió: sale mañana.'));
   cont.appendChild(fin);
@@ -288,9 +322,11 @@ function crbVacio() {
     v.appendChild(crbEl('div', 'crb-vacio-t', 'Todavía no has guardado nada.'));
   } else {
     v.appendChild(crbEl('div', 'crb-vacio-ic', '🪶'));
-    v.appendChild(crbEl('div', 'crb-vacio-t', 'Hoy no hay edición.'));
+    v.appendChild(crbEl('div', 'crb-vacio-t', 'Todavía no hay ninguna edición.'));
     v.appendChild(crbEl('div', 'crb-vacio-s',
-      'El recolector corre de madrugada. Si lleva días así, mira el aviso de arriba.'));
+      'Hay ítems recogidos, pero nadie los ha repartido en una edición. '
+      + 'Se arma sola cada madrugada; para verla ya, corre en Supabase: '
+      + 'select public.criba_arma_edicion();'));
   }
   return v;
 }
@@ -429,9 +465,17 @@ async function crbContarSinLeer() {
   if (!b) return;
   const sb = window.faroSb;
   if (!sb) { b.style.display = 'none'; return; }
+  /* Sobre la ÚLTIMA edición, no sobre «hoy»: por la misma zona horaria
+     que arriba, y para que el contador no se ponga a cero seis horas
+     cada tarde. Se pide la fecha con una consulta que trae UNA fila. */
+  const { data: ult } = await sb.from(CRIBA_ITEMS)
+    .select('edicion').not('edicion', 'is', null)
+    .order('edicion', { ascending: false }).limit(1);
+  const dia = ult && ult[0] ? ult[0].edicion : null;
+  if (!dia) { b.style.display = 'none'; return; }
   const { count, error } = await sb.from(CRIBA_ITEMS)
     .select('id', { count: 'exact', head: true })
-    .eq('edicion', crbHoy())
+    .eq('edicion', dia)
     .is('leido_at', null);
   if (error) { b.style.display = 'none'; return; }   // sin instalar: ni se menciona
   b.textContent = (count || 0) > 99 ? '99+' : String(count || 0);
