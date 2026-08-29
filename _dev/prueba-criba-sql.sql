@@ -413,6 +413,67 @@ begin
 end $$;
 \echo 'ok 11 · Dialnet queda apagada, no borrada: el rastro de por qué se queda'
 
+
+-- ════════════════════════════════════════════════════════════════════
+-- 9. LO AFINADO · supabase/sql/criba_afina.sql
+-- ════════════════════════════════════════════════════════════════════
+\echo '── Corriendo supabase/sql/criba_afina.sql ──'
+\i supabase/sql/criba_afina.sql
+\echo '── Y otra vez, que tiene que ser idempotente ──'
+\i supabase/sql/criba_afina.sql
+
+-- ⚠️ UN TÍTULO, UNA VEZ. El mismo trabajo llega con el DOI del preprint
+-- y con el del publicado, y la llave por DOI no los junta: en la primera
+-- edición con malla salieron dos títulos repetidos.
+do $$
+declare cuantos integer;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, doi, publicado) values
+    ('openalex', 'doi:10.1000/pre', 'Human vs machine judgment in logistics',
+     'https://a.test/1', 'decisiones', '10.1000/pre', now()),
+    ('openalex', 'doi:10.2000/pub', 'Human vs Machine Judgment in Logistics!',
+     'https://a.test/2', 'decisiones', '10.2000/pub', now()),
+    ('openalex', 'doi:10.3000/otro', 'Otro trabajo distinto',
+     'https://a.test/3', 'decisiones', '10.3000/otro', now());
+
+  perform public.criba_arma_edicion(current_date, 25);
+  select count(*) into cuantos from public.criba_items where edicion = current_date;
+  if cuantos <> 2 then
+    raise exception 'FALLA: entraron % (el mismo título con dos DOI cuenta como uno: han de ser 2)', cuantos;
+  end if;
+end $$;
+\echo 'ok 12 · ⚠️ el mismo título con dos DOI distintos entra UNA vez'
+
+-- ⚠️ LAS FUENTES DE VOLCADO ENTRAN AUNQUE NO TENGAN TEMA. A la CNBS no
+-- se le pregunta nada -es un canal pequeño y ya temático-, así que sus
+-- filas llegan sin tema. Con «sin tema no entra» a secas, el registro de
+-- la CNBS no podía aparecer nunca.
+do $$
+declare de_volcado integer;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  values ('cnbs', 'aviso-cnbs-1', 'Advertencia sobre entidades no autorizadas',
+          'https://www.cnbs.gob.hn/aviso', null, now());
+  -- Y una de fuente de CONSULTA sin tema, que esa SÍ tiene que quedarse fuera.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  values ('openalex', 'huerfano-consulta', 'Sin tema y de fuente que se pregunta',
+          'https://a.test/x', null, now());
+
+  perform public.criba_arma_edicion(current_date, 25);
+  select count(*) into de_volcado from public.criba_items
+   where edicion = current_date and fuente_id = 'cnbs';
+  if de_volcado <> 1 then
+    raise exception 'FALLA: la CNBS no entró en la edición (es de volcado, es su propio tema)';
+  end if;
+  if exists (select 1 from public.criba_items
+              where edicion = current_date and fuente_id = 'openalex') then
+    raise exception 'FALLA: entró una fila SIN TEMA de una fuente a la que sí se le pregunta';
+  end if;
+end $$;
+\echo 'ok 13 · ⚠️ la CNBS entra sin tema (es de volcado); OpenAlex sin tema NO'
+
 \echo ''
 \echo '════════════════════════════════════════════════'
 \echo 'RESULTADO: APRUEBA'
