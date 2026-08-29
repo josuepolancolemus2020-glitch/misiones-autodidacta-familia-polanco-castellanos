@@ -96,6 +96,19 @@ begin
      -- El tema es obligatorio para las fuentes a las que SE PREGUNTA.
      -- Una de volcado es su propio tema.
      where u.tema_id is not null or f.plantilla is null
+  ), ya_por_tema as (
+    /* ⚠️ LO QUE YA ESTÁ EN LA EDICIÓN CUENTA PARA EL TOPE.
+       Al rehacer un número solo se despublica lo NO leído y NO guardado:
+       lo que ya se tocó se queda dentro, y con razón. Pero el reparto
+       contaba desde cero, así que una materia con dos leídas de antes
+       acababa con cuatro. Lo cazó la fila de comprobación del propio
+       archivo —«ninguna materia pasa de 2: NO»—, que es justo para lo
+       que estaba puesta. */
+    select coalesce(i2.tema_id, 'volcado:' || i2.fuente_id) as grupo,
+           count(*) as n
+      from public.criba_items i2
+     where i2.edicion = dia
+     group by 1
   ), reparte_tema as (
     /* ⚠️ PRIMERO EL TEMA. Cada materia aporta como mucho `por_tema`,
        sobre TODO lo que hay y sin importar de qué fuente venga. Este
