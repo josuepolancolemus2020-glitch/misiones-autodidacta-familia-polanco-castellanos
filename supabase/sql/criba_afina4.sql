@@ -112,11 +112,29 @@ begin
              partition by fuente_id order by peso desc, cuando desc) as n_fuente
       from reparte_tema
      where n_tema <= por_tema
-  ), elegidos as (
-    select id, row_number() over (order by peso desc, cuando desc) + ya as n
+  ), reservado as (
+    /* ⚠️ LA CAPA DE HONDURAS TIENE PLAZA RESERVADA.
+       Al quitar el tope por fuente, los artículos académicos -que pesan
+       de 50 a 85- se comieron las 25 plazas y la CNBS (60), SIECA (45) y
+       la Bolsa (40) desaparecieron de la edición. Justo el registro con
+       el que se comprueba si alguien está autorizado a recibir dinero.
+       No se arregla recortando a los demás -eso ya se probó y dejó la
+       edición en ocho materias-: se arregla reservando. Como cada fuente
+       de volcado ya está limitada a `por_tema` por el reparto de arriba,
+       la reserva cuesta como mucho seis plazas de veinticinco. */
+    select *, (n_tema is not null and tema_id is null) as es_local
       from recorta_fuente
      where n_fuente <= por_fuente
-     limit huecos
+  ), elegidos as (
+    select id,
+           /* Dos ordenaciones distintas a propósito: una para ELEGIR
+              quién entra -lo local primero, que si no se queda fuera- y
+              otra para el ORDEN en que se lee, que sigue siendo por peso.
+              Reservar plaza no es poner la CNBS siempre en cabeza. */
+           row_number() over (order by peso desc, cuando desc) + ya as n
+      from (select * from reservado
+             order by es_local desc, peso desc, cuando desc
+             limit huecos) elegidos_por_reserva
   )
   update public.criba_items i
      set edicion = dia, orden = e.n

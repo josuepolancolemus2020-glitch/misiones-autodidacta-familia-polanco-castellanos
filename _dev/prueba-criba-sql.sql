@@ -559,6 +559,43 @@ begin
 end $$;
 \echo 'ok 15 · ⚠️ con 18 temas con material, la edición trae 10 materias o más'
 
+-- ⚠️ Y LA CAPA DE HONDURAS NO PUEDE DESAPARECER. Al quitar el tope por
+-- fuente, los artículos académicos -que pesan más- se comieron las 25
+-- plazas y la CNBS, SIECA y la Bolsa se quedaron en cero. Justo el
+-- registro con el que se comprueba si alguien puede recibir dinero.
+do $$
+declare locales integer; materias integer;
+begin
+  delete from public.criba_items;
+  -- Los 18 temas con material de sobra y peso alto...
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'openalex', t.id || '-' || g, t.id || ' articulo ' || g,
+         'https://a.test/' || t.id || g, t.id, now() - (g || ' minutes')::interval
+    from public.criba_temas t, generate_series(1, 5) g where t.activo;
+  -- ...y las tres de Honduras, que pesan menos que casi todos.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select f.id, f.id || '-' || g, 'Aviso de ' || f.nombre || ' ' || g,
+         'https://a.hn/' || f.id || g, null, now() - (g || ' minutes')::interval
+    from public.criba_fuentes f, generate_series(1, 5) g
+   where f.plantilla is null and f.activa;
+
+  perform public.criba_arma_edicion(current_date, 25);
+
+  select count(*) into locales from public.criba_items i
+    join public.criba_fuentes f on f.id = i.fuente_id
+   where i.edicion = current_date and f.plantilla is null;
+  select count(distinct tema_id) into materias from public.criba_items
+   where edicion = current_date and tema_id is not null;
+
+  if locales = 0 then
+    raise exception 'FALLA: la capa de Honduras desapareció de la edición';
+  end if;
+  if materias < 8 then
+    raise exception 'FALLA: reservar plaza a Honduras se comió la variedad (% materias)', materias;
+  end if;
+end $$;
+\echo 'ok 16 · ⚠️ Honduras tiene plaza reservada, y no se come la variedad'
+
 \echo ''
 \echo '════════════════════════════════════════════════'
 \echo 'RESULTADO: APRUEBA'
