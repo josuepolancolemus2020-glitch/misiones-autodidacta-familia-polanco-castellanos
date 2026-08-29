@@ -327,6 +327,92 @@ begin
 end $$;
 \echo 'ok 7 · los números que promete la fila final del archivo son los de verdad'
 
+
+-- ════════════════════════════════════════════════════════════════════
+-- 8. LA MALLA · supabase/sql/criba_temas.sql
+-- ════════════════════════════════════════════════════════════════════
+\echo '── Corriendo supabase/sql/criba_temas.sql ──'
+\i supabase/sql/criba_temas.sql
+\echo '── Y otra vez, que tiene que ser idempotente ──'
+\i supabase/sql/criba_temas.sql
+
+-- ⚠️ SIN TEMA NO ENTRA. Es la regla que faltaba y por la que la primera
+-- edición salió llena de veterinaria: nadie preguntó por ningún interés
+-- y todo lo que llegaba se repartía igual.
+do $$
+declare hoy integer;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'cnbs', 'huerfano-' || g, 'Sin tema ' || g, 'https://a.hn/h' || g, null,
+         now() - (g || ' hours')::interval
+    from generate_series(1, 30) g;
+
+  perform public.criba_arma_edicion(current_date, 25);
+  select count(*) into hoy from public.criba_items where edicion = current_date;
+  if hoy <> 0 then
+    raise exception 'FALLA: entraron % items SIN TEMA en la edición', hoy;
+  end if;
+end $$;
+\echo 'ok 8 · ⚠️ lo que no casó con ningún tema NO entra en la edición'
+
+-- ⚠️ Y NINGUNA FUENTE SE COME EL NÚMERO. Dialnet puso 60 de 90 y dejó
+-- la edición en veterinaria: el tope por fuente es lo que lo impide.
+do $$
+declare de_una integer; total integer;
+begin
+  delete from public.criba_items;
+  -- Una fuente glotona con cuarenta artículos, todos con tema.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'cnbs', 'glotona-' || g, 'De la glotona ' || g, 'https://a.hn/g' || g, 'sesgo',
+         now() - (g || ' minutes')::interval
+    from generate_series(1, 40) g;
+  -- Y otra con pocos.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'sieca', 'modesta-' || g, 'De la modesta ' || g, 'https://a.hn/m' || g, 'sesgo',
+         now() - (g || ' minutes')::interval
+    from generate_series(1, 5) g;
+
+  perform public.criba_arma_edicion(current_date, 25);
+  select count(*) into de_una from public.criba_items
+   where edicion = current_date and fuente_id = 'cnbs';
+  select count(*) into total from public.criba_items where edicion = current_date;
+
+  if de_una > 8 then
+    raise exception 'FALLA: una sola fuente puso % de la edición (tope 8)', de_una;
+  end if;
+  if total < 13 then
+    raise exception 'FALLA: con el tope, la edición se quedó en % (había de sobra)', total;
+  end if;
+end $$;
+\echo 'ok 9 · ⚠️ ninguna fuente aporta más de 8: no se puede comer el número'
+
+-- Y el peso del TEMA manda, no el de la fuente.
+do $$
+declare primera text;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado) values
+    ('cnbs',  'tema-flojo',  'De un tema que pesa 50', 'https://a.hn/f', 'marxismo',     now()),
+    ('cnbs',  'tema-fuerte', 'De un tema que pesa 85', 'https://a.hn/u', 'replicacion',  now() - interval '2 days');
+  perform public.criba_arma_edicion(current_date, 2);
+  select titulo into primera from public.criba_items where edicion = current_date order by orden limit 1;
+  if primera <> 'De un tema que pesa 85' then
+    raise exception 'FALLA: manda el peso de la fuente y no el del TEMA (salió: %)', primera;
+  end if;
+end $$;
+\echo 'ok 10 · manda el peso del TEMA, no el de la fuente'
+
+-- Dialnet apagada, y la fila conservada para saber por qué.
+do $$
+declare a boolean;
+begin
+  select activa into a from public.criba_fuentes where id = 'dialnet';
+  if a is null then raise exception 'FALLA: se BORRÓ la fila de Dialnet en vez de apagarla'; end if;
+  if a then raise exception 'FALLA: Dialnet sigue activa, y su OAI no admite consulta'; end if;
+end $$;
+\echo 'ok 11 · Dialnet queda apagada, no borrada: el rastro de por qué se queda'
+
 \echo ''
 \echo '════════════════════════════════════════════════'
 \echo 'RESULTADO: APRUEBA'
