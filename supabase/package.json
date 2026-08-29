@@ -1,0 +1,5 @@
+{
+  "_por_que_existe": "El package.json de la raíz dice type:commonjs, y con eso Node trata los .ts de las Edge Functions como CommonJS y no los puede cargar. Este marcador solo dice que lo de supabase/ son módulos, y sirve para poder probar normaliza.ts desde Node con --experimental-strip-types, sin Deno. Deno no lo lee: las Edge Functions siguen igual.",
+  "type": "module",
+  "private": true
+}

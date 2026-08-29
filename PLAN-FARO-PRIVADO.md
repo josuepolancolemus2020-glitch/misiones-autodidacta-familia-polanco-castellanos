@@ -29,6 +29,8 @@ pierde por el camino.
 | La clave de servicio en la función de notificaciones | ⚠️ los avisos siguen rotos |
 | Apagar el alta pública de cuentas en Supabase | ⛔ pendiente |
 | `recursos_enlaces` (la repisa de enlaces de las misiones) | ⏳ pendiente de correr el SQL |
+| `criba.sql` (La Criba: la tabla y las cuatro fuentes) | ⏳ pendiente de correr el SQL |
+| `criba_reloj.sql` (el reloj diario de La Criba) | ⏳ pendiente, y va DESPUÉS de `criba.sql` y de desplegar la función |
 | Compilar y repartir el APK | ⛔ **ya no hace falta**: la PWA se actualiza sola |
 
 ## ⏸ PENDIENTE, para retomar

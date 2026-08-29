@@ -60,6 +60,31 @@ más:
   «Success. No rows returned» que no distingue entre «quedó» y «se pegó
   a medias», sale escrito qué hay.
 
+⚠️ **Y esa comprobación va EN VERTICAL, una fila por cosa comprobada.**
+El 29 de agosto de 2026 la de `criba.sql` devolvía una fila de ocho
+columnas y en la tableta del autor solo se veían **cuatro**: las otras
+cuatro —entre ellas las que dicen si la seguridad por fila y las
+funciones quedaron puestas— caían fuera de pantalla. Una tabla se
+desliza hacia abajo sola; hacia los lados, no. Una comprobación que no
+se ve entera es media comprobación, y la mitad que se pierde es siempre
+la del final.
+
+⚠️ **Y ojo con contar filas de una tabla que puede no existir:**
+PostgreSQL planifica la consulta ENTERA antes de ejecutarla, así que un
+`select count(*) from public.lo_que_sea` revienta con «relation does not
+exist» **aunque esté dentro de una rama del `case` que nunca se
+ejecutaría**. O sea que la comprobación falla justo en el único caso
+para el que existe, y deja el error que más despista. Se cuenta con
+`query_to_xml('select count(*) …', false, true, '')`, que recibe la
+consulta como TEXTO y solo la mira si se llega a ella. Hay un ejemplo
+entero en `supabase/sql/criba_comprueba.sql`.
+
+**Y conviene dejar la comprobación en su propio archivo**, aparte del
+que crea las cosas: la fila del final sale una sola vez, al pegar, y si
+se cierra el editor sin leerla no hay forma de saber si quedó. Volver a
+pegar cuatrocientas líneas desde una tableta para leer una fila es una
+factura absurda; veinte líneas que solo miran dicen lo mismo.
+
 **Y el SQL se prueba antes de mandarlo.** En la sesión hay PostgreSQL:
 se levanta un servidor con `initdb`, se le pone un Supabase mínimo
 (`auth.users`, `auth.uid()`, `familia_miembros`, `es_familia()`, los
