@@ -1,0 +1,1472 @@
+{
+  "meta": {
+    "fecha": "2026-08-29",
+    "candidatos": 78
+  },
+  "resultados": [
+    {
+      "id": "conversation-es",
+      "nombre": "The Conversation (español)",
+      "racimo": "A·C·G",
+      "fase": 1,
+      "candidatos": [
+        "https://theconversation.com/es/articles.atom",
+        "https://theconversation.com/es/articles.rss",
+        "https://theconversation.com/es/topics.atom"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://theconversation.com/es/articles.atom",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 286,
+        "formato": "atom",
+        "items": 32,
+        "resumen": false,
+        "doi": true,
+        "idioma": "en",
+        "reciente": "2026-08-28",
+        "ritmo": 17.1,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://theconversation.com/es/articles.atom",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 286,
+          "formato": "atom",
+          "items": 32,
+          "resumen": false,
+          "doi": true,
+          "idioma": "en",
+          "reciente": "2026-08-28",
+          "ritmo": 17.1,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "sinc",
+      "nombre": "Agencia SINC",
+      "racimo": "A·G",
+      "fase": 1,
+      "candidatos": [
+        "https://www.agenciasinc.es/rss/todas",
+        "https://www.agenciasinc.es/rss/Noticias/",
+        "https://www.agenciasinc.es/feed",
+        "https://www.agenciasinc.es/"
+      ],
+      "veredicto": "sin canal",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://www.agenciasinc.es/rss/todas",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 979,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.agenciasinc.es/rss/Noticias/",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 438,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.agenciasinc.es/feed",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 279,
+          "formato": "rss",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.agenciasinc.es/",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 430,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "nadaesgratis",
+      "nombre": "Nada es Gratis (FEDEA)",
+      "racimo": "C",
+      "fase": 1,
+      "candidatos": [
+        "https://nadaesgratis.es/feed",
+        "https://nadaesgratis.es/feed/atom",
+        "https://nadaesgratis.es/rss"
+      ],
+      "veredicto": "no responde",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://nadaesgratis.es/feed",
+          "error": "fetch failed"
+        },
+        {
+          "url": "https://nadaesgratis.es/feed/atom",
+          "error": "fetch failed"
+        },
+        {
+          "url": "https://nadaesgratis.es/rss",
+          "error": "fetch failed"
+        }
+      ]
+    },
+    {
+      "id": "scielo",
+      "nombre": "SciELO",
+      "racimo": "A·C",
+      "fase": 1,
+      "candidatos": [
+        "https://search.scielo.org/?q=*&lang=es&output=rss",
+        "https://www.scielo.org/php/index.php?lang=es&format=rss",
+        "https://blog.scielo.org/es/feed/",
+        "https://articlemeta.scielo.org/api/v1/article/identifiers/?collection=scl&limit=10"
+      ],
+      "veredicto": "rechaza",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://search.scielo.org/?q=*&lang=es&output=rss",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 76,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://www.scielo.org/php/index.php?lang=es&format=rss",
+          "urlFinal": "https://www.scielo.org/pt-br/",
+          "estado": 200,
+          "ms": 1949,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://blog.scielo.org/es/feed/",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 197,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://articlemeta.scielo.org/api/v1/article/identifiers/?collection=scl&limit=10",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 1111,
+          "formato": "json",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "redalyc",
+      "nombre": "Redalyc",
+      "racimo": "A·C",
+      "fase": 1,
+      "candidatos": [
+        "https://www.redalyc.org/oai?verb=ListRecords&metadataPrefix=oai_dc",
+        "https://www.redalyc.org/oai/?verb=ListRecords&metadataPrefix=oai_dc",
+        "https://www.redalyc.org/"
+      ],
+      "veredicto": "sin canal",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://www.redalyc.org/oai?verb=ListRecords&metadataPrefix=oai_dc",
+          "urlFinal": "https://www.redalyc.org/oai/?verb=ListRecords&metadataPrefix=oai_dc",
+          "estado": 404,
+          "ms": 722,
+          "formato": "text/html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.redalyc.org/oai/?verb=ListRecords&metadataPrefix=oai_dc",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 58,
+          "formato": "text/html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.redalyc.org/",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 364,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "dialnet",
+      "nombre": "Dialnet",
+      "racimo": "A·C·G",
+      "fase": 1,
+      "candidatos": [
+        "https://dialnet.unirioja.es/oai/OAIHandler?verb=ListRecords&metadataPrefix=oai_dc",
+        "https://dialnet.unirioja.es/oai/OAIHandler?verb=ListSets",
+        "https://dialnet.unirioja.es/"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://dialnet.unirioja.es/oai/OAIHandler?verb=ListRecords&metadataPrefix=oai_dc",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 1914,
+        "formato": "oai-pmh",
+        "items": 100,
+        "resumen": true,
+        "doi": false,
+        "idioma": "es~",
+        "reciente": null,
+        "ritmo": null,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://dialnet.unirioja.es/oai/OAIHandler?verb=ListRecords&metadataPrefix=oai_dc",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 1914,
+          "formato": "oai-pmh",
+          "items": 100,
+          "resumen": true,
+          "doi": false,
+          "idioma": "es~",
+          "reciente": null,
+          "ritmo": null,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "cepal",
+      "nombre": "CEPAL",
+      "racimo": "C",
+      "fase": 1,
+      "candidatos": [
+        "https://repositorio.cepal.org/oai/request?verb=ListRecords&metadataPrefix=oai_dc",
+        "https://repositorio.cepal.org/oai/request?verb=Identify",
+        "https://www.cepal.org/es/rss/publicaciones",
+        "https://www.cepal.org/es"
+      ],
+      "veredicto": "sin canal",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://repositorio.cepal.org/oai/request?verb=ListRecords&metadataPrefix=oai_dc",
+          "urlFinal": "https://repositorio.cepal.org/server/oai/?verb=ListRecords&metadataPrefix=oai_dc",
+          "estado": 400,
+          "ms": 1502,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://repositorio.cepal.org/oai/request?verb=Identify",
+          "urlFinal": "https://repositorio.cepal.org/server/oai/?verb=Identify",
+          "estado": 400,
+          "ms": 252,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.cepal.org/es/rss/publicaciones",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 1404,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.cepal.org/es",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 10,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "bid",
+      "nombre": "BID · Banco Interamericano de Desarrollo",
+      "racimo": "C",
+      "fase": 1,
+      "candidatos": [
+        "https://blogs.iadb.org/es/feed/",
+        "https://blogs.iadb.org/feed/",
+        "https://publications.iadb.org/es/rss"
+      ],
+      "veredicto": "rechaza",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://blogs.iadb.org/es/feed/",
+          "urlFinal": "https://www.iadb.org/es/blog-del-bid",
+          "estado": 403,
+          "ms": 306,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://blogs.iadb.org/feed/",
+          "urlFinal": "https://www.iadb.org/en/idb-blog",
+          "estado": 403,
+          "ms": 23,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://publications.iadb.org/es/rss",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 32,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        }
+      ]
+    },
+    {
+      "id": "sieca",
+      "nombre": "SIECA",
+      "racimo": "C",
+      "fase": 1,
+      "candidatos": [
+        "https://www.sieca.int/feed/",
+        "https://www.sieca.int/rss",
+        "https://www.sieca.int/"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://www.sieca.int/feed/",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 565,
+        "formato": "rss",
+        "items": 10,
+        "resumen": true,
+        "doi": false,
+        "idioma": "es",
+        "reciente": "2026-08-28",
+        "ritmo": 0.9,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://www.sieca.int/feed/",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 565,
+          "formato": "rss",
+          "items": 10,
+          "resumen": true,
+          "doi": false,
+          "idioma": "es",
+          "reciente": "2026-08-28",
+          "ritmo": 0.9,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "bch",
+      "nombre": "Banco Central de Honduras",
+      "racimo": "C·HN",
+      "fase": 1,
+      "candidatos": [
+        "https://www.bch.hn/rss",
+        "https://www.bch.hn/feed",
+        "https://www.bch.hn/?feed=rss2",
+        "https://www.bch.hn/publicaciones-y-estadisticas",
+        "https://www.bch.hn/"
+      ],
+      "veredicto": "sin canal",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://www.bch.hn/rss",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 618,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.bch.hn/feed",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 101,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.bch.hn/?feed=rss2",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 1226,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.bch.hn/publicaciones-y-estadisticas",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 97,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.bch.hn/",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 828,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "cnbs",
+      "nombre": "CNBS · Comisión Nacional de Bancos y Seguros",
+      "racimo": "C·HN",
+      "fase": 1,
+      "candidatos": [
+        "https://www.cnbs.gob.hn/feed/",
+        "https://www.cnbs.gob.hn/rss",
+        "https://www.cnbs.gob.hn/"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://www.cnbs.gob.hn/feed/",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 6204,
+        "formato": "rss",
+        "items": 10,
+        "resumen": true,
+        "doi": false,
+        "idioma": "es",
+        "reciente": "2026-08-05",
+        "ritmo": 0.1,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://www.cnbs.gob.hn/feed/",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 6204,
+          "formato": "rss",
+          "items": 10,
+          "resumen": true,
+          "doi": false,
+          "idioma": "es",
+          "reciente": "2026-08-05",
+          "ritmo": 0.1,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "ine-hn",
+      "nombre": "INE Honduras",
+      "racimo": "C·HN",
+      "fase": 1,
+      "candidatos": [
+        "https://www.ine.gob.hn/?feed=rss2",
+        "https://www.ine.gob.hn/feed/",
+        "https://ine.gob.hn/feed/",
+        "https://www.ine.gob.hn/"
+      ],
+      "veredicto": "rechaza",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://www.ine.gob.hn/?feed=rss2",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 294,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://www.ine.gob.hn/feed/",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 5,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://ine.gob.hn/feed/",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 124,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://www.ine.gob.hn/",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 5,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        }
+      ]
+    },
+    {
+      "id": "cohep",
+      "nombre": "COHEP",
+      "racimo": "C·HN",
+      "fase": 1,
+      "candidatos": [
+        "https://cohep.com/?feed=rss2",
+        "https://cohep.com/feed/",
+        "https://cohep.com/"
+      ],
+      "veredicto": "rechaza",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://cohep.com/?feed=rss2",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 365,
+          "formato": "json",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://cohep.com/feed/",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 256,
+          "formato": "json",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://cohep.com/",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 255,
+          "formato": "json",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        }
+      ]
+    },
+    {
+      "id": "fosdeh",
+      "nombre": "FOSDEH",
+      "racimo": "C·HN",
+      "fase": 1,
+      "candidatos": [
+        "https://fosdeh.net/feed/",
+        "https://www.fosdeh.net/feed/",
+        "https://fosdeh.com/feed/",
+        "https://fosdeh.org/feed/"
+      ],
+      "veredicto": "no responde",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://fosdeh.net/feed/",
+          "error": "fetch failed"
+        },
+        {
+          "url": "https://www.fosdeh.net/feed/",
+          "error": "fetch failed"
+        },
+        {
+          "url": "https://fosdeh.com/feed/",
+          "error": "fetch failed"
+        },
+        {
+          "url": "https://fosdeh.org/feed/",
+          "error": "fetch failed"
+        }
+      ]
+    },
+    {
+      "id": "bcv-hn",
+      "nombre": "Bolsa Centroamericana de Valores",
+      "racimo": "C·HN",
+      "fase": 1,
+      "candidatos": [
+        "https://www.bcv.hn/feed/",
+        "https://bcv.hn/",
+        "https://www.bcv.hn/"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://www.bcv.hn/feed/",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 1200,
+        "formato": "rss",
+        "items": 10,
+        "resumen": true,
+        "doi": false,
+        "idioma": "en⚠es",
+        "reciente": "2026-08-28",
+        "ritmo": 1.1,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://www.bcv.hn/feed/",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 1200,
+          "formato": "rss",
+          "items": 10,
+          "resumen": true,
+          "doi": false,
+          "idioma": "en⚠es",
+          "reciente": "2026-08-28",
+          "ritmo": 1.1,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "openalex",
+      "nombre": "OpenAlex",
+      "racimo": "todos",
+      "fase": 2,
+      "candidatos": [
+        "https://api.openalex.org/works?per-page=5&sort=publication_date:desc"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://api.openalex.org/works?per-page=5&sort=publication_date:desc",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 794,
+        "formato": "json",
+        "items": 5,
+        "resumen": true,
+        "doi": true,
+        "idioma": "en",
+        "reciente": null,
+        "ritmo": null,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://api.openalex.org/works?per-page=5&sort=publication_date:desc",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 794,
+          "formato": "json",
+          "items": 5,
+          "resumen": true,
+          "doi": true,
+          "idioma": "en",
+          "reciente": null,
+          "ritmo": null,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "crossref",
+      "nombre": "Crossref",
+      "racimo": "todos",
+      "fase": 2,
+      "candidatos": [
+        "https://api.crossref.org/works?rows=5&sort=published&order=desc"
+      ],
+      "veredicto": "dudoso",
+      "elegido": {
+        "url": "https://api.crossref.org/works?rows=5&sort=published&order=desc",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 1295,
+        "formato": "json",
+        "items": 5,
+        "resumen": false,
+        "doi": false,
+        "idioma": "es~",
+        "reciente": null,
+        "ritmo": null,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://api.crossref.org/works?rows=5&sort=published&order=desc",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 1295,
+          "formato": "json",
+          "items": 5,
+          "resumen": false,
+          "doi": false,
+          "idioma": "es~",
+          "reciente": null,
+          "ritmo": null,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "semanticscholar",
+      "nombre": "Semantic Scholar",
+      "racimo": "todos",
+      "fase": 2,
+      "candidatos": [
+        "https://api.semanticscholar.org/graph/v1/paper/search?query=decision%20making&limit=5&fields=title,abstract,externalIds,year,publicationDate"
+      ],
+      "veredicto": "limitada",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://api.semanticscholar.org/graph/v1/paper/search?query=decision%20making&limit=5&fields=title,abstract,externalIds,year,publicationDate",
+          "urlFinal": null,
+          "estado": 429,
+          "ms": 167,
+          "formato": "json",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "europepmc",
+      "nombre": "Europe PMC",
+      "racimo": "A·D",
+      "fase": 2,
+      "candidatos": [
+        "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=neuroplasticity&format=json&pageSize=5&resultType=core"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=neuroplasticity&format=json&pageSize=5&resultType=core",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 1742,
+        "formato": "json",
+        "items": 5,
+        "resumen": true,
+        "doi": true,
+        "idioma": "en",
+        "reciente": null,
+        "ritmo": null,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=neuroplasticity&format=json&pageSize=5&resultType=core",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 1742,
+          "formato": "json",
+          "items": 5,
+          "resumen": true,
+          "doi": true,
+          "idioma": "en",
+          "reciente": null,
+          "ritmo": null,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "cochrane",
+      "nombre": "Cochrane Library",
+      "racimo": "A",
+      "fase": 2,
+      "candidatos": [
+        "https://www.cochranelibrary.com/rss/cdsr/reviews",
+        "https://www.cochranelibrary.com/en/rss",
+        "https://www.cochranelibrary.com/"
+      ],
+      "veredicto": "no responde",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://www.cochranelibrary.com/rss/cdsr/reviews",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 120,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.cochranelibrary.com/en/rss",
+          "urlFinal": "https://www.cochranelibrary.com/en/rss?cookiesEnabled",
+          "estado": 412,
+          "ms": 55,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://www.cochranelibrary.com/",
+          "urlFinal": "https://www.cochranelibrary.com/?cookiesEnabled",
+          "estado": 412,
+          "ms": 33,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "nature-humanbehav",
+      "nombre": "Nature Human Behaviour",
+      "racimo": "A",
+      "fase": 2,
+      "candidatos": [
+        "https://www.nature.com/nathumbehav.rss"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://www.nature.com/nathumbehav.rss",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 222,
+        "formato": "rss1",
+        "items": 8,
+        "resumen": true,
+        "doi": true,
+        "idioma": "en~",
+        "reciente": "2026-08-28",
+        "ritmo": 2,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://www.nature.com/nathumbehav.rss",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 222,
+          "formato": "rss1",
+          "items": 8,
+          "resumen": true,
+          "doi": true,
+          "idioma": "en~",
+          "reciente": "2026-08-28",
+          "ritmo": 2,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "nep",
+      "nombre": "NEP · New Economics Papers",
+      "racimo": "C",
+      "fase": 2,
+      "candidatos": [
+        "https://nep.repec.org/rss/nep-dev.rss",
+        "https://nep.repec.org/rss/nep-dev.xml",
+        "https://nep.repec.org/nep-dev.html",
+        "https://nep.repec.org/"
+      ],
+      "veredicto": "sin canal",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://nep.repec.org/rss/nep-dev.rss",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 478,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://nep.repec.org/rss/nep-dev.xml",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 118,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://nep.repec.org/nep-dev.html",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 119,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://nep.repec.org/",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 236,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "nber",
+      "nombre": "NBER Working Papers",
+      "racimo": "C",
+      "fase": 2,
+      "candidatos": [
+        "https://back.nber.org/rss/new.xml",
+        "https://www.nber.org/rss/new.xml"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://back.nber.org/rss/new.xml",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 187,
+        "formato": "rss",
+        "items": 26,
+        "resumen": true,
+        "doi": false,
+        "idioma": "en~",
+        "reciente": null,
+        "ritmo": null,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://back.nber.org/rss/new.xml",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 187,
+          "formato": "rss",
+          "items": 26,
+          "resumen": true,
+          "doi": false,
+          "idioma": "en~",
+          "reciente": null,
+          "ritmo": null,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "retractionwatch",
+      "nombre": "Retraction Watch",
+      "racimo": "G",
+      "fase": 2,
+      "candidatos": [
+        "https://retractionwatch.com/feed/",
+        "https://api.labs.crossref.org/data/retractionwatch"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://retractionwatch.com/feed/",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 127,
+        "formato": "rss",
+        "items": 10,
+        "resumen": true,
+        "doi": true,
+        "idioma": "en",
+        "reciente": "2026-08-28",
+        "ritmo": 0.9,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://retractionwatch.com/feed/",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 127,
+          "formato": "rss",
+          "items": 10,
+          "resumen": true,
+          "doi": true,
+          "idioma": "en",
+          "reciente": "2026-08-28",
+          "ritmo": 0.9,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "datacolada",
+      "nombre": "Data Colada",
+      "racimo": "G",
+      "fase": 2,
+      "candidatos": [
+        "https://datacolada.org/feed",
+        "https://datacolada.org/feed/"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://datacolada.org/feed",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 686,
+        "formato": "rss",
+        "items": 50,
+        "resumen": true,
+        "doi": false,
+        "idioma": "en",
+        "reciente": "2026-08-11",
+        "ritmo": 0,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://datacolada.org/feed",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 686,
+          "formato": "rss",
+          "items": 50,
+          "resumen": true,
+          "doi": false,
+          "idioma": "en",
+          "reciente": "2026-08-11",
+          "ritmo": 0,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "rsos",
+      "nombre": "Royal Society Open Science",
+      "racimo": "G",
+      "fase": 2,
+      "candidatos": [
+        "https://royalsocietypublishing.org/action/showFeed?ui=0&mi=0&ai=2b4&jc=rsos&type=etoc&feed=rss",
+        "https://royalsocietypublishing.org/rss/rsos.xml"
+      ],
+      "veredicto": "rechaza",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://royalsocietypublishing.org/action/showFeed?ui=0&mi=0&ai=2b4&jc=rsos&type=etoc&feed=rss",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 209,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://royalsocietypublishing.org/rss/rsos.xml",
+          "urlFinal": null,
+          "estado": 404,
+          "ms": 497,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "wid",
+      "nombre": "World Inequality Lab",
+      "racimo": "C",
+      "fase": 2,
+      "candidatos": [
+        "https://wid.world/feed/",
+        "https://wid.world/news/feed/",
+        "https://wid.world/"
+      ],
+      "veredicto": "sirve",
+      "elegido": {
+        "url": "https://wid.world/feed/",
+        "urlFinal": null,
+        "estado": 200,
+        "ms": 93,
+        "formato": "rss",
+        "items": 1,
+        "resumen": false,
+        "doi": false,
+        "idioma": "en",
+        "reciente": "2024-08-23",
+        "ritmo": null,
+        "util": true,
+        "clave": false
+      },
+      "intentos": [
+        {
+          "url": "https://wid.world/feed/",
+          "urlFinal": null,
+          "estado": 200,
+          "ms": 93,
+          "formato": "rss",
+          "items": 1,
+          "resumen": false,
+          "doi": false,
+          "idioma": "en",
+          "reciente": "2024-08-23",
+          "ritmo": null,
+          "util": true,
+          "clave": false
+        }
+      ]
+    },
+    {
+      "id": "jdm",
+      "nombre": "Judgment and Decision Making",
+      "racimo": "A",
+      "fase": 2,
+      "candidatos": [
+        "https://www.cambridge.org/core/rss/product/id/8B0BBF4B9D4C4A2B3B2F0D4E4B9D4C4A",
+        "https://journal.sjdm.org/rss.xml",
+        "https://journal.sjdm.org/"
+      ],
+      "veredicto": "rechaza",
+      "elegido": null,
+      "intentos": [
+        {
+          "url": "https://www.cambridge.org/core/rss/product/id/8B0BBF4B9D4C4A2B3B2F0D4E4B9D4C4A",
+          "urlFinal": null,
+          "estado": 403,
+          "ms": 151,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": true
+        },
+        {
+          "url": "https://journal.sjdm.org/rss.xml",
+          "urlFinal": "https://jbaron.org/journal/rss.xml",
+          "estado": 404,
+          "ms": 431,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        },
+        {
+          "url": "https://journal.sjdm.org/",
+          "urlFinal": "https://jbaron.org/journal/",
+          "estado": 200,
+          "ms": 27,
+          "formato": "html",
+          "items": 0,
+          "resumen": false,
+          "doi": false,
+          "idioma": null,
+          "reciente": null,
+          "ritmo": null,
+          "util": false,
+          "clave": false
+        }
+      ]
+    }
+  ]
+}
