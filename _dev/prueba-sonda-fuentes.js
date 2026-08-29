@@ -80,7 +80,47 @@ const OAI = `<?xml version="1.0"?>
 const HTML_PORTADA = `<!doctype html><html lang="es"><head><title>Banco Central</title></head>
 <body><h1>Bienvenido</h1><p>Aquí no hay ningún canal, solo la página de siempre con sus noticias en una tabla.</p></body></html>`;
 
+/* Los cuatro de abajo salieron de la primera corrida de verdad. Cada uno
+   reproduce un caso en que la sonda mintió, y por eso llevan comentario. */
+
+// El canal se describe corto y el ÍTEM trae el resumen largo. La sonda medía
+// el del canal y decía «no trae resumen» de Nada es Gratis, NBER, Retraction
+// Watch y Data Colada, que sí lo traen.
+const RSS_RESUMEN_EN_EL_ITEM = `<?xml version="1.0"?>
+<rss version="2.0"><channel><title>Blog</title><description>Economía</description><language>es</language>
+  <item><title>El presupuesto real</title>
+    <description>Cuando se compara lo que el presupuesto aprobado dice que se va a gastar con lo que al final del año se ejecutó de verdad, aparecen diferencias que nadie discutió en su momento y que explican bastante de lo que pasó después.</description>
+    <pubDate>${hoy.toUTCString()}</pubDate></item>
+</channel></rss>`;
+
+// Al revés: el canal se describe largo y los ítems van pelados. No debe
+// contar como «trae resumen».
+const RSS_RESUMEN_SOLO_EN_EL_CANAL = `<?xml version="1.0"?>
+<rss version="2.0"><channel><title>Boletín</title>
+  <description>Este boletín recoge cada semana las publicaciones más relevantes del sector y las comenta con detalle para quien no pueda seguirlas todas por su cuenta.</description>
+  <item><title>Un titular pelado</title><pubDate>${hoy.toUTCString()}</pubDate></item>
+</channel></rss>`;
+
+// Se declara en inglés y publica en español: es lo que hizo
+// theconversation.com/es/articles.atom, la fuente más importante de la Fase 1.
+const DICE_EN_PARECE_ES = `<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><title>Diario</title>
+  <entry><title>La deuda que no se ve</title>
+    <summary>Los datos de la encuesta muestran que la mayor parte de los hogares que se endeudan para cubrir el gasto corriente no lo declaran como deuda cuando se les pregunta por ella de forma directa.</summary>
+    <updated>${iso(0)}</updated></entry>
+</feed>`;
+
+// Ítems sin fecha, sin DOI y sin resumen: es lo que devolvió la dirección de
+// SciELO que ganó —las 36 COLECCIONES, no artículos— y la sonda la aprobó.
+const JSON_SIN_SENALES = JSON.stringify([
+  { acron: 'scl', code: 'chl', name: 'Chile', status: 'certified' },
+  { acron: 'mex', code: 'mex', name: 'México', status: 'certified' } ]);
+
 const RUTAS = {
+  '/rss-item': [200, 'application/rss+xml', RSS_RESUMEN_EN_EL_ITEM],
+  '/rss-canal': [200, 'application/rss+xml', RSS_RESUMEN_SOLO_EN_EL_CANAL],
+  '/sin-senales': [200, 'application/json', JSON_SIN_SENALES],
+  '/429': [429, 'application/json', '{"error":"too many requests"}'],
   '/atom': [200, 'application/atom+xml', ATOM],
   '/rss': [200, 'application/rss+xml', RSS],
   '/json': [200, 'application/json', JSON_API],
@@ -122,11 +162,19 @@ const RUTAS = {
   ok(S.traeResumen(OAI, 'oai-pmh') === true, 've la dc:description del OAI');
   const SOLO_TITULO = '<feed xmlns="http://www.w3.org/2005/Atom"><entry><title>Solo el titular</title><summary>corto</summary></entry></feed>';
   ok(S.traeResumen(SOLO_TITULO, 'atom') === false, 'un resumen de tres palabras NO cuenta como resumen');
+  ok(S.traeResumen(RSS_RESUMEN_EN_EL_ITEM, 'rss') === true,
+     '⚠️ mide la <description> del ÍTEM, no la corta del canal');
+  ok(S.traeResumen(RSS_RESUMEN_SOLO_EN_EL_CANAL, 'rss') === false,
+     '⚠️ y no se deja engañar por un canal que se describe largo con ítems pelados');
 
   console.log('\n── DOI: sin él no se puede aplicar la regla 2 ──');
   ok(S.traeDoi(RSS) === true, 'encuentra el DOI de Cochrane en el RSS');
   ok(S.traeDoi(JSON_API) === true, 'encuentra los DOI del JSON');
   ok(S.traeDoi(ATOM) === false, 'no inventa un DOI donde no lo hay');
+  // Crossref manda los DOI con la barra escapada. Sin deshacerla, la mayor
+  // base de DOI del mundo salía marcada como «no trae DOI».
+  ok(S.traeDoi('{"DOI":"10.5860\\/choice.195204"}') === true,
+     '⚠️ encuentra el DOI aunque venga con la barra escapada en JSON');
 
   console.log('\n── Idioma ──');
   ok(S.idiomaDe(ATOM, 'atom') === 'es', 'lee el xml:lang="es" declarado');
@@ -136,6 +184,8 @@ const RUTAS = {
     'was smaller than the authors of the original paper had expected from the pilot data.' +
     '</summary></entry></feed>';
   ok(S.idiomaDe(EN_SIN_DECLARAR, 'atom') === 'en~', 'adivina el inglés cuando el canal no lo declara, y lo marca con ~');
+  ok(S.idiomaDe(DICE_EN_PARECE_ES, 'atom') === 'en\u26a0es',
+     '⚠️ avisa cuando el canal se declara en un idioma y publica en otro');
 
   console.log('\n── Fechas y ritmo ──');
   const f = S.fechas(ATOM);
@@ -161,8 +211,21 @@ const RUTAS = {
   const r5 = await S.sondar({ id: 't5', nombre: 'Canal vacío', racimo: 'X', fase: 1, candidatos: [B + '/vacio'] });
   ok(r5.veredicto === 'sin canal', '⚠️ un RSS bien formado pero SIN ítems no se da por bueno');
 
-  const r6 = await S.sondar({ id: 't6', nombre: 'Pide clave', racimo: 'X', fase: 1, candidatos: [B + '/403'] });
-  ok(r6.intentos[0].clave === true, 'un 403 queda marcado como «pide clave»');
+  const r6 = await S.sondar({ id: 't6', nombre: 'Rechaza', racimo: 'X', fase: 1, candidatos: [B + '/403'] });
+  ok(r6.veredicto === 'rechaza', 'un 403 da «rechaza recolectores», no «no responde»');
+  ok(r6.intentos[0].clave === true, 'y queda marcado como que pide clave');
+
+  const r7 = await S.sondar({ id: 't7', nombre: 'Con cola', racimo: 'X', fase: 1, candidatos: [B + '/429'] });
+  ok(r7.veredicto === 'limitada', 'un 429 da «limitada»: hay cola, no es una fuente muerta');
+
+  const r8 = await S.sondar({ id: 't8', nombre: 'No son artículos', racimo: 'X', fase: 1, candidatos: [B + '/sin-senales'] });
+  ok(r8.veredicto === 'dudoso',
+     '⚠️ ítems sin fecha, sin DOI y sin resumen dan «dudoso», NO «sirve» (el caso SciELO)');
+
+  const r9 = await S.sondar({ id: 't9', nombre: 'Dudoso primero, bueno después', racimo: 'X', fase: 1,
+                              candidatos: [B + '/sin-senales', B + '/rss-item'] });
+  ok(r9.veredicto === 'sirve' && r9.elegido.url.endsWith('/rss-item'),
+     'un «dudoso» no detiene la búsqueda: sigue hasta encontrar uno de verdad');
 
   console.log('\n── De punta a punta: que escriba el informe ──');
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'criba-'));
@@ -175,7 +238,7 @@ const RUTAS = {
     '--fuentes', path.join(tmp, 'f.json'), '--json', path.join(tmp, 'r.json'), '--md', md]);
   const texto = fs.readFileSync(md, 'utf8');
   ok(/✅ Sirven \| \*\*2\*\*/.test(texto), 'el informe cuenta 2 que sirven');
-  ok(/⚠️ Responden pero sin canal \| \*\*1\*\*/.test(texto), 'y 1 sin canal');
+  ok(/⚠️ Sin canal \| \*\*1\*\*/.test(texto), 'y 1 sin canal');
   ok(/### Fase 1/.test(texto) && /### Fase 2/.test(texto), 'separa Fase 1 de Fase 2');
   ok(/Sin canal.*sin canal/s.test(texto), 'nombra a la que se quedó sin canal, para que no se pierda');
   ok(JSON.parse(fs.readFileSync(path.join(tmp, 'r.json'), 'utf8')).resultados.length === 3, 'y deja el JSON para el recolector');

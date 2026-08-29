@@ -1,0 +1,5 @@
+# Los escribe _dev/sonda-fuentes.js, nunca una persona. Cuando dos corridas
+# chocan (una en main y otra en una rama), el conflicto NO se resuelve
+# editando: gana la corrida más nueva, o se vuelve a correr la sonda.
+SONDA-FUENTES.md              -merge -diff linguist-generated
+_dev/sonda-fuentes-resultado.json -merge -diff linguist-generated

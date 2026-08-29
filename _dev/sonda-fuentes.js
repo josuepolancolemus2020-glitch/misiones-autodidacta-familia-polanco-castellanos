@@ -85,13 +85,28 @@ function contarItems(cuerpo, formato) {
   return 0;
 }
 
+/* ── El primer ítem, aislado ──
+   ⚠️ Hace falta porque en un RSS el primer <description> del documento es el
+   del CANAL («Blog de economía»), no el del ítem. Medir ese decía «no trae
+   resumen» de canales que sí lo traen: la sonda del 29 de agosto de 2026
+   suspendió a Nada es Gratis, NBER, Retraction Watch y Data Colada por esto.
+   Lo mismo vale para el idioma: la portada del canal está llena de texto de
+   plantilla que no es lo que se va a leer. */
+function primerItem(cuerpo, formato) {
+  const et = formato === 'atom' ? 'entry' : (formato === 'oai-pmh' ? 'record' : 'item');
+  const m = cuerpo.match(new RegExp('<' + et + '[\\s>][\\s\\S]*?</' + et + '>', 'i'));
+  return m ? m[0] : '';
+}
+
 /* ── ¿Trae resumen, o solo titular? ──
    Importa mucho: sin resumen no se puede cribar sin abrir cada cosa, y la
    Fase 2 tendría que traducir a ciegas. */
 function traeResumen(cuerpo, formato) {
+  const dentro = primerItem(cuerpo, formato) || cuerpo;
   const largo = t => {
-    const m = cuerpo.match(new RegExp('<' + t + '[^>]*>([\\s\\S]{0,3000}?)</' + t + '>', 'i'));
-    return m ? m[1].replace(/<[^>]+>/g, '').trim().length : 0;
+    const m = dentro.match(new RegExp('<' + t + '[^>]*>([\\s\\S]{0,4000}?)</' + t + '>', 'i'));
+    if (!m) return 0;
+    return m[1].replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]+>/g, ' ').trim().length;
   };
   if (formato === 'atom') return Math.max(largo('summary'), largo('content')) > 120;
   if (formato === 'rss' || formato === 'rss1') return Math.max(largo('description'), largo('content:encoded')) > 120;
@@ -104,22 +119,38 @@ function traeResumen(cuerpo, formato) {
 /* ── ¿Trae DOI? ──
    Sin DOI no se puede aplicar la regla 2 (la nota de prensa no es el
    artículo) ni cruzar con la base de retractaciones. */
-const traeDoi = cuerpo => /10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+/.test(cuerpo);
+/* ⚠️ Se deshacen las barras escapadas ANTES de buscar. En JSON un DOI viaja
+   muchas veces como `10.5860\\/choice`, y exigir la barra literal justo detrás
+   de los dígitos hacía que no se encontrara ninguno: en la sonda del 29 de
+   agosto de 2026 eso dejó a Crossref -que es una base de DOI- marcada como
+   «dudoso» por no traer DOI. */
+const traeDoi = cuerpo => /10\.\d{4,9}\/[-._;()/:A-Za-z0-9]+/.test(cuerpo.replace(/\\\//g, '/'));
 
 /* ── ¿En qué idioma? ──
-   Primero lo que declare el canal; si no declara nada, se cuenta a ojo.
-   Se apunta como HEURÍSTICA a propósito: es una pista, no un dato. */
+   ⚠️ Se comparan las DOS cosas —lo que el canal declara y lo que se ve— y si
+   no coinciden se dice. Un canal puede declararse en un idioma y publicar en
+   otro: `theconversation.com/es/articles.atom` se declaró `en` en la sonda del
+   29 de agosto de 2026, y fiarse de lo declarado habría descartado la fuente
+   más importante de la Fase 1 —o peor, habría metido inglés en una edición
+   que se pidió en español—. Lo que decide es lo que se lee, no la etiqueta. */
 function idiomaDe(cuerpo, formato) {
   const dec = cuerpo.match(/<language>\s*([a-z]{2})/i)
            || cuerpo.match(/xml:lang=["']([a-z]{2})/i)
            || cuerpo.match(/"lang(uage)?"\s*:\s*"([a-z]{2})/i);
-  if (dec) return (dec[2] || dec[1]).toLowerCase();
-  const txt = ' ' + cuerpo.replace(/<[^>]+>/g, ' ').toLowerCase().slice(0, 60000) + ' ';
+  const declarado = dec ? (dec[2] || dec[1]).toLowerCase() : null;
+
+  /* Se mira DENTRO del ítem: la portada del canal trae menús y pies de página
+     que no son el texto que se va a leer. */
+  const base = primerItem(cuerpo, formato) || cuerpo;
+  const txt = ' ' + base.replace(/<[^>]+>/g, ' ').toLowerCase().slice(0, 60000) + ' ';
   const cuenta = ws => ws.reduce((a, w) => a + (txt.split(' ' + w + ' ').length - 1), 0);
-  const es = cuenta(['de', 'la', 'que', 'los', 'para', 'con', 'una', 'del', 'por']);
-  const en = cuenta(['the', 'of', 'and', 'for', 'with', 'that', 'from', 'this']);
-  if (es === 0 && en === 0) return '?';
-  return es > en * 1.2 ? 'es~' : (en > es * 1.2 ? 'en~' : '?');
+  const es = cuenta(['de', 'la', 'que', 'los', 'para', 'con', 'una', 'del', 'por', 'se']);
+  const en = cuenta(['the', 'of', 'and', 'for', 'with', 'that', 'from', 'this', 'are']);
+  const visto = (es === 0 && en === 0) ? null : (es > en * 1.2 ? 'es' : (en > es * 1.2 ? 'en' : null));
+
+  if (declarado && visto && declarado !== visto) return declarado + '\u26a0' + visto; // dice una, parece otra
+  if (declarado) return declarado;
+  return visto ? visto + '~' : '?';
 }
 
 /* ── ¿De cuándo es lo más nuevo, y a qué ritmo publica? ── */
@@ -151,9 +182,29 @@ async function pedir(url) {
   return { res, cuerpo, ms: Date.now() - t0, urlFinal: res.url || u };
 }
 
-/* ── Una fuente: se prueban sus candidatos hasta que uno sirva ── */
+/* ── Una fuente: se prueban sus candidatos hasta que uno sirva ──
+
+   Seis veredictos, y cada uno salió de un caso real de la sonda del 29 de
+   agosto de 2026. Meterlos todos en «no sirve» habría borrado la diferencia
+   entre trabajo pendiente y fuente muerta, que es justo lo que hay que saber:
+
+     sirve        · hay canal y trae artículos
+     dudoso       · responde con ítems, pero sin fecha, sin DOI y sin resumen.
+                    Casi seguro NO son artículos. Lo destapó SciELO, cuya
+                    dirección devolvía las 36 COLECCIONES de SciELO y la sonda
+                    la daba por buena. Y sin fecha no hay edición diaria posible
+     sin canal    · la institución está en pie y no publica canal legible
+     rechaza      · 403: rechaza recolectores a propósito. NO se reintenta
+                    disfrazándose de navegador: es una decisión del sitio, y lo
+                    que hace falta saber es que hay que entrar por otra puerta
+     limitada     · 429: hay cola. Se puede, yendo más despacio o con clave
+     no responde  · muda
+*/
 async function sondar(f) {
   const intentos = [];
+  let reserva = null;             // un «dudoso» guardado por si no aparece nada mejor
+  let rechazo = false, limite = false;
+
   for (const url of f.candidatos) {
     try {
       const { res, cuerpo, ms, urlFinal } = await pedir(url);
@@ -161,6 +212,9 @@ async function sondar(f) {
       const items   = contarItems(cuerpo, formato);
       const util    = res.ok && items > 0 && formato !== 'html';
       const { reciente, ritmo } = fechas(cuerpo);
+      if (res.status === 403) rechazo = true;
+      if (res.status === 429) limite  = true;
+
       const intento = {
         url, urlFinal: urlFinal !== url ? urlFinal : null,
         estado: res.status, ms, formato, items,
@@ -172,15 +226,23 @@ async function sondar(f) {
         clave: res.status === 401 || res.status === 403,
       };
       intentos.push(intento);
-      if (util) return { ...f, veredicto: 'sirve', elegido: intento, intentos };
+
+      if (util) {
+        /* Fecha, DOI o resumen: con ninguna de las tres, lo que devolvió no
+           parece un artículo —y sin fecha no cabe en una edición diaria—. */
+        const señales = (intento.resumen ? 1 : 0) + (intento.doi ? 1 : 0) + (intento.reciente ? 1 : 0);
+        if (señales > 0) return { ...f, veredicto: 'sirve', elegido: intento, intentos };
+        if (!reserva) reserva = intento;   // se guarda, pero se sigue buscando
+      }
     } catch (e) {
       intentos.push({ url, error: String(e.message || e).slice(0, 160) });
     }
     await dormir(250);
   }
-  /* Respondió pero sin canal utilizable ≠ la fuente no existe. Esa
-     diferencia importa: «sin canal» es trabajo para la Fase 2 (leer la
-     página), «no responde» es una fuente muerta. */
+
+  if (reserva) return { ...f, veredicto: 'dudoso', elegido: reserva, intentos };
+  if (limite)  return { ...f, veredicto: 'limitada', elegido: null, intentos };
+  if (rechazo) return { ...f, veredicto: 'rechaza', elegido: null, intentos };
   const respondio = intentos.some(i => i.estado && i.estado < 400);
   return { ...f, veredicto: respondio ? 'sin canal' : 'no responde', elegido: null, intentos };
 }
@@ -190,8 +252,11 @@ function informe(rs, meta) {
   const sí = c => c ? '✅' : '·';
   const filas = rs.map(r => {
     const e = r.elegido;
-    if (!e) return `| ${r.nombre} | ${r.racimo} | **${r.veredicto === 'sin canal' ? '⚠️ sin canal' : '❌ no responde'}** | · | · | · | · | · |`;
-    return `| ${r.nombre} | ${r.racimo} | \`${e.formato}\` | ${e.items} | ${sí(e.resumen)} | ${sí(e.doi)} | ${e.idioma || '?'} | ${e.ritmo != null ? e.ritmo + '/día' : (e.reciente || '?')} |`;
+    const ETIQ = { 'sin canal': '⚠️ sin canal', 'rechaza': '🚫 rechaza recolectores',
+                   'limitada': '⏳ limitada (429)', 'no responde': '❌ no responde' };
+    if (!e) return `| ${r.nombre} | ${r.racimo} | **${ETIQ[r.veredicto]}** | · | · | · | · | · |`;
+    const marca = r.veredicto === 'dudoso' ? ' ⁉️' : '';
+    return `| ${r.nombre}${marca} | ${r.racimo} | \`${e.formato}\`${marca} | ${e.items} | ${sí(e.resumen)} | ${sí(e.doi)} | ${e.idioma || '?'} | ${e.ritmo != null ? e.ritmo + '/día' : (e.reciente || '?')} |`;
   });
   const bloque = fase => {
     const sub = rs.filter(r => r.fase === fase);
@@ -200,9 +265,8 @@ function informe(rs, meta) {
     return `\n### Fase ${fase}\n\n| Fuente | Racimo | Formato | Ítems | Resumen | DOI | Idioma | Ritmo |\n|---|---|---|---|---|---|---|---|\n`
       + sub.map(r => filas[idx(r)]).join('\n') + '\n';
   };
-  const sirven = rs.filter(r => r.veredicto === 'sirve');
-  const sinc   = rs.filter(r => r.veredicto === 'sin canal');
-  const muerta = rs.filter(r => r.veredicto === 'no responde');
+  const cuenta = v => rs.filter(r => r.veredicto === v);
+  const sirven = cuenta('sirve'), sinc = cuenta('sin canal');
 
   const detalle = rs.filter(r => r.veredicto !== 'sirve').map(r =>
     `- **${r.nombre}** — ${r.veredicto}\n` + r.intentos.map(i =>
@@ -219,16 +283,18 @@ lo que se esperaba de ellas.
 
 ## Veredicto
 
-| | |
-|---|---|
-| ✅ Sirven | **${sirven.length}** |
-| ⚠️ Responden pero sin canal | **${sinc.length}** |
-| ❌ No responden | **${muerta.length}** |
+| | | Qué significa |
+|---|---|---|
+| ✅ Sirven | **${sirven.length}** | Hay canal y trae artículos |
+| ⁉️ Dudosas | **${cuenta('dudoso').length}** | Responden con ítems, pero sin fecha, sin DOI y sin resumen: casi seguro **no son artículos** |
+| ⚠️ Sin canal | **${sinc.length}** | La institución está en pie y no publica canal legible |
+| 🚫 Rechazan | **${cuenta('rechaza').length}** | 403: rechazan recolectores a propósito |
+| ⏳ Limitadas | **${cuenta('limitada').length}** | 429: hay cola. Se puede, más despacio o con clave |
+| ❌ Mudas | **${cuenta('no responde').length}** | No contestan |
 
-${sinc.length ? `«Sin canal» **no** es «no existe»: la institución está en pie pero no
-publica un RSS/Atom/API que se pueda leer. Eso no las descarta — las manda a
-la lista de las que hay que leer de otra forma, y eso es trabajo, no un
-descarte.\n` : ''}
+Ninguna de las cinco últimas es «no existe», y la diferencia es lo que importa:
+**«sin canal» y «rechaza» son trabajo pendiente; «muda» es una fuente muerta.**
+
 ## Lo que devolvió cada una
 ${bloque(1)}${bloque(2)}
 **Ritmo** es ítems por día, calculado del propio canal. Es lo que dice si una
