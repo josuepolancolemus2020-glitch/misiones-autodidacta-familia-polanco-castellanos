@@ -43,30 +43,27 @@ const principal = index
   .replace(/^import \{[^}]*\} from "\.\/normaliza\.ts";\s*$/m, '')
   .trim();
 
-/* ⚠️ EL AVISO DE ARRIBA NO ES DECORACIÓN.
-   El 29 de agosto de 2026 este archivo se pegó en el EDITOR SQL, que es
-   donde va todo lo demás de este proyecto. PostgreSQL lo rechazó en la
-   línea 1 y no pasó nada, pero el paso se perdió. Es un error fácil y
-   además razonable: en esta casa TODO se pega en el editor SQL, y esto
-   es lo primero que no. Así que el archivo lo dice en su primera línea,
-   antes que ninguna otra cosa. */
-const AVISO = `// ╔══════════════════════════════════════════════════════════════╗
-// ║  ⛔ ESTO NO ES SQL. NO LO PEGUES EN EL EDITOR SQL.            ║
-// ║                                                              ║
-// ║  Va en:  Supabase → Edge Functions → Deploy a new function   ║
-// ║          Nómbrala exactamente:  criba-cosecha                ║
-// ║          Y en sus ajustes: «Enforce JWT Verification» = OFF   ║
-// ╚══════════════════════════════════════════════════════════════╝
+/* ⚠️ LA CABECERA VA EN ASCII PURO, CORTA, Y NO ES UNA MANÍA.
+   Primero se pegó este archivo en el editor SQL (29 ago 2026), así que
+   se le puso un aviso arriba. El aviso se dibujó con un cuadro de
+   caracteres dobles -las cajas de ╔═║- y el editor del panel de
+   Supabase SE ATRAGANTÓ con él: se comió las 21 líneas del cuadro y
+   dejó un trozo suelto en la línea 1, con lo que Deno rechazó el
+   despliegue entero por «Unexpected character '=' at index.ts:1:1».
+   Un aviso que impide desplegar el archivo es peor que no ponerlo.
+   Cinco líneas de ASCII dicen lo mismo y siempre se pegan bien. */
+const AVISO = `// !!! ESTO NO ES SQL. NO LO PEGUES EN EL EDITOR SQL. !!!
 //
-// ⚠️ ARCHIVO GENERADO — NO SE EDITA A MANO.
+// Va en: Supabase -> Edge Functions -> Deploy a new function
+//        Nombre exacto: criba-cosecha
+//        Y en sus ajustes: "Enforce JWT Verification" = OFF
 //
-// Lo cose \`node _dev/arma-criba-cosecha.js\` a partir de normaliza.ts e
-// index.ts, que son los que se prueban:
+// ARCHIVO GENERADO - NO SE EDITA A MANO. Lo cose
+// node _dev/arma-criba-cosecha.js  a partir de normaliza.ts e index.ts,
+// que son los que se prueban:
 //   node --experimental-strip-types _dev/prueba-criba-normaliza.mjs
-//
-// Existe solo para poder desplegar desde el panel sin la CLI —o sea,
-// desde la tableta—. Si editas AQUÍ, el arreglo se pierde la próxima vez
-// que se cosa, y peor: dejará de coincidir con lo que dicen las pruebas.
+// Si editas AQUI, el arreglo se pierde al volver a coser, y dejara de
+// coincidir con lo que dicen las pruebas.
 //
 // Cosido el ${new Date().toISOString().slice(0, 10)}.
 `;
@@ -83,6 +80,20 @@ const faltan = ['function normaliza(', 'function urlBuena(', 'function evidencia
                 'Deno.serve(', 'criba_arma_edicion'].filter(t => !hecho.includes(t));
 if (faltan.length) { console.error('❌ al cosido le falta:', faltan.join(', ')); process.exit(1); }
 if (/^export /m.test(hecho))       { console.error('❌ quedó un `export` suelto'); process.exit(1); }
+
+/* ⚠️ Las primeras líneas, en ASCII puro. Un carácter raro ahí arriba se
+   lo comió el editor del panel una vez y tumbó el despliegue entero. El
+   resto del archivo sí lleva acentos y símbolos: eso Deno lo parsea sin
+   problema, y quitarlos costaría los comentarios en español. Lo que no
+   puede llevar rarezas es la cabecera, que es lo primero que toca el
+   pegado. */
+const cabecera = hecho.split('\n').slice(0, 15).join('\n');
+const raros = [...cabecera].filter(c => c.codePointAt(0) > 126);
+if (raros.length) {
+  console.error('❌ la cabecera lleva caracteres no ASCII:', [...new Set(raros)].join(' '));
+  console.error('   Un editor web se los puede comer y tumbar el despliegue. Déjala en ASCII.');
+  process.exit(1);
+}
 if (hecho.includes('./normaliza.ts')) { console.error('❌ quedó el import del módulo'); process.exit(1); }
 
 console.log('✅ cosido:', path.relative(path.resolve(__dirname, '..'), SALIDA));
