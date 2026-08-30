@@ -63,20 +63,40 @@ with e as (
     from public.criba_items i
     join public.criba_fuentes f on f.id = i.fuente_id
    where i.edicion = (select dia from e)
+), secciones as (
+  /* Las tres secciones y su cupo, en una tabla en vez de repetidas tres
+     veces a mano: así el rotulillo del relleno se escribe una sola vez. */
+  select * from (values
+    (3, '🔬 Ciencia',   'consulta', 18),
+    (4, '📰 Prensa',    'prensa',    9),
+    (5, '🇭🇳 Honduras', 'local',     3)
+  ) as s(n, etiqueta, clase, cupo)
 )
 select * from (
   select 1 as n, 'edición del' as que,
          coalesce(to_char((select dia from e), 'DD/MM/YYYY'), '— NO HAY —') as valor
+
   union all select 2, 'en la edición',
          (select count(*) from x)::text || ' de 30'
-  union all select 3, '🔬 Ciencia',
-         (select count(*) from x where clase = 'consulta')::text || ' (cupo 18)'
-  union all select 4, '📰 Prensa',
-         (select count(*) from x where clase = 'prensa')::text || ' (cupo 9)'
-  union all select 5, '🇭🇳 Honduras',
-         (select count(*) from x where clase = 'local')::text || ' (cupo 3)'
+
+  /* ⚠️ EL CUPO ES UN OBJETIVO, NO UN MURO, y el rótulo tiene que
+     decirlo. Si una sección viene seca, su sitio no se queda vacío: lo
+     llenan las otras. Un rótulo que pusiera «10 (cupo 9)» a secas
+     parece un fallo -y así se leyó el 30 de agosto de 2026-, cuando es
+     la edición completándose. Por eso el relleno se nombra. */
+  union all
+  select s.n, s.etiqueta,
+         v.cuantos::text || ' (cupo ' || s.cupo::text ||
+         case when v.cuantos > s.cupo
+                then ' · +' || (v.cuantos - s.cupo)::text || ' de relleno'
+              when v.cuantos < s.cupo then ' · faltó material'
+              else '' end || ')'
+    from secciones s
+    cross join lateral (select count(*) as cuantos from x where x.clase = s.clase) v
+
   union all select 6, 'materias distintas',
          (select count(distinct tema_id) from x where tema_id is not null)::text || ' de 18'
+
   union all select 7, 'en la despensa (sin usar)',
          (select count(*) from public.criba_items where edicion is null)::text
 ) t order by n;

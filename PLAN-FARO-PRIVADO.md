@@ -32,7 +32,8 @@ pierde por el camino.
 | `criba.sql` (La Criba: la tabla y las cuatro fuentes) | ✅ corrido |
 | La cadena de afinado: `criba_temas` → `criba_afina` 1-4 → `criba_prensa` | ✅ corrida entera, en ese orden |
 | `criba_reloj.sql` (el reloj diario de La Criba) | ✅ corrido y funcionando: cosecha sola a las **05:10 UTC** |
-| `criba_prensa2.sql` (las palabras de prensa, anchas) | ⏳ pendiente, y **exige redesplegar la función después** |
+| `criba_prensa2.sql` (las palabras de prensa, anchas) | ✅ corrido, y la función redesplegada |
+| `criba_cupos.sql` (que los cupos se cumplan al armar dos veces) | ⏳ pendiente, **sin redespliegue**: solo cambia la función |
 | `criba_cosecha_ahora.sql` (disparar la cosecha a mano) | 🚀 se corre cuando se quiera: le pide el secreto prestado al reloj |
 | `criba_mira_edicion.sql` (cómo quedó la edición de hoy) | 👁 solo mira, no cambia nada: se corre cuando se quiera |
 | Compilar y repartir el APK | ⛔ **ya no hace falta**: la PWA se actualiza sola |
