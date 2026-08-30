@@ -304,7 +304,166 @@
         "https://journal.sjdm.org/rss.xml",
         "https://journal.sjdm.org/"
       ]
+    },
+    {
+      "id": "prensa-conversation-es",
+      "nombre": "The Conversation (edición en español)",
+      "racimo": "A·C·G",
+      "fase": 3,
+      "candidatos": [
+        "https://theconversation.com/es/articulos.atom",
+        "https://theconversation.com/es/articles.atom?lang=es",
+        "https://theconversation.com/es/rss",
+        "https://theconversation.com/es.atom"
+      ]
+    },
+    {
+      "id": "prensa-nuevasociedad",
+      "nombre": "Nueva Sociedad",
+      "racimo": "C",
+      "fase": 3,
+      "candidatos": [
+        "https://nuso.org/rss/",
+        "https://nuso.org/feed/",
+        "https://nuso.org/rss.xml"
+      ]
+    },
+    {
+      "id": "prensa-letraslibres",
+      "nombre": "Letras Libres",
+      "racimo": "F·C",
+      "fase": 3,
+      "candidatos": [
+        "https://letraslibres.com/feed/",
+        "https://www.letraslibres.com/feed",
+        "https://letraslibres.com/rss"
+      ]
+    },
+    {
+      "id": "prensa-ctxt",
+      "nombre": "CTXT · Contexto y Acción",
+      "racimo": "C",
+      "fase": 3,
+      "candidatos": [
+        "https://ctxt.es/rss/",
+        "https://ctxt.es/es/rss",
+        "https://ctxt.es/feed"
+      ]
+    },
+    {
+      "id": "prensa-jotdown",
+      "nombre": "Jot Down",
+      "racimo": "F",
+      "fase": 3,
+      "candidatos": [
+        "https://www.jotdown.es/feed/",
+        "https://jotdown.es/feed/"
+      ]
+    },
+    {
+      "id": "prensa-ethic",
+      "nombre": "Ethic",
+      "racimo": "A·C",
+      "fase": 3,
+      "candidatos": [
+        "https://ethic.es/feed/",
+        "https://www.ethic.es/feed/"
+      ]
+    },
+    {
+      "id": "prensa-filco",
+      "nombre": "Filosofía&co",
+      "racimo": "B·F",
+      "fase": 3,
+      "candidatos": [
+        "https://www.filco.es/feed/",
+        "https://filco.es/feed/"
+      ]
+    },
+    {
+      "id": "prensa-sinc",
+      "nombre": "Agencia SINC",
+      "racimo": "A·G",
+      "fase": 3,
+      "candidatos": [
+        "https://www.agenciasinc.es/rss",
+        "https://www.agenciasinc.es/rss/todas",
+        "https://www.agenciasinc.es/rss/noticias",
+        "https://www.agenciasinc.es/feed"
+      ]
+    },
+    {
+      "id": "prensa-nadaesgratis",
+      "nombre": "Nada es Gratis",
+      "racimo": "C",
+      "fase": 3,
+      "candidatos": [
+        "https://nadaesgratis.es/feed",
+        "https://nadaesgratis.es/feed/",
+        "https://nadaesgratis.es/?feed=rss2"
+      ]
+    },
+    {
+      "id": "prensa-elpais-ciencia",
+      "nombre": "El País · Ciencia",
+      "racimo": "A·G",
+      "fase": 3,
+      "candidatos": [
+        "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/ciencia/portada",
+        "https://elpais.com/rss/elpais/portada_ciencia.xml"
+      ]
+    },
+    {
+      "id": "prensa-bbc-mundo",
+      "nombre": "BBC News Mundo",
+      "racimo": "C·G",
+      "fase": 3,
+      "candidatos": [
+        "https://feeds.bbci.co.uk/mundo/rss.xml",
+        "https://www.bbc.com/mundo/index.xml"
+      ]
+    },
+    {
+      "id": "prensa-aeon",
+      "nombre": "Aeon",
+      "racimo": "A·B·F",
+      "fase": 3,
+      "candidatos": [
+        "https://aeon.co/feed.rss",
+        "https://aeon.co/feed"
+      ]
+    },
+    {
+      "id": "prensa-jstordaily",
+      "nombre": "JSTOR Daily",
+      "racimo": "F·G",
+      "fase": 3,
+      "candidatos": [
+        "https://daily.jstor.org/feed/",
+        "https://daily.jstor.org/rss"
+      ]
+    },
+    {
+      "id": "prensa-quanta",
+      "nombre": "Quanta Magazine",
+      "racimo": "G",
+      "fase": 3,
+      "candidatos": [
+        "https://www.quantamagazine.org/feed/",
+        "https://api.quantamagazine.org/feed/"
+      ]
+    },
+    {
+      "id": "prensa-nautilus",
+      "nombre": "Nautilus",
+      "racimo": "A·G",
+      "fase": 3,
+      "candidatos": [
+        "https://nautil.us/feed/",
+        "https://nautil.us/rss/all"
+      ]
     }
   ],
-  "_corrida_1": "29 ago 2026: primera corrida real. De ella salieron estos arreglos. El más caro fue mío: 'verb=Identify' nunca devuelve registros -describe el repositorio-, así que Dialnet y CEPAL salieron 'sin canal' teniendo un OAI vivo."
+  "_corrida_1": "29 ago 2026: primera corrida real. De ella salieron estos arreglos. El más caro fue mío: 'verb=Identify' nunca devuelve registros -describe el repositorio-, así que Dialnet y CEPAL salieron 'sin canal' teniendo un OAI vivo.",
+  "_prensa": "30 ago 2026: candidatas de PRENSA -periodismo cultural y cientifico-. Van a la sonda ANTES de sembrarse: sembrar sin comprobar fue el pecado original de esta criba, y salio una edicion de veterinaria."
 }
