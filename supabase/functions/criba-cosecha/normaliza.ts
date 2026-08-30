@@ -294,3 +294,57 @@ export function normaliza(cuerpo: string, f: Fuente): Item[] {
 export function topeDeFuente(esDeConsulta: boolean, nTemas: number, porTema = 8): number {
   return esDeConsulta ? Math.max(nTemas, 1) * porTema : 60;
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   LA PRENSA · decidir si un artículo de periódico interesa
+   ════════════════════════════════════════════════════════════════════
+   Una revista o un periódico NO se pueden consultar por tema: su canal
+   trae lo que publicaron hoy, de todo. Y a diferencia de la CNBS —que
+   es pequeña y ya temática— aquí la mayoría no interesa: Jot Down
+   publica sobre fútbol y sobre Bourdieu el mismo día.
+
+   Así que se filtra DESPUÉS de traerlo, con las palabras en español de
+   cada tema. Y se filtra en serio: lo que no case con ninguna NO ENTRA.
+   Un canal de prensa sin filtro es exactamente la manguera de Dialnet
+   otra vez, y esa lección ya se pagó.
+
+   ⚠️ POR QUÉ LAS PALABRAS SON DISTINTAS DE LAS DE LA BÚSQUEDA:
+   a OpenAlex se le pregunta `"cognitive bias"` porque indexa en inglés
+   y con comillas. A un periódico en español no se le pregunta nada: se
+   le lee el titular, y ahí lo que aparece es «sesgo cognitivo» o
+   «heurística». Son dos oficios distintos y por eso son dos columnas.
+   ════════════════════════════════════════════════════════════════════ */
+
+export interface TemaPrensa { id: string; termino_es: string; peso?: number }
+
+/* Sin tildes y en minúsculas, para que «metacognición» case con
+   «metacognicion». En un titular de periódico las tildes se ponen bien,
+   pero en el resumen que viaja por el canal no siempre. */
+export function sinTildes(s: string): string {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+/* ¿Qué tema trae este artículo de prensa? El de la coincidencia MÁS
+   LARGA, no el primero de la lista: «psicología de masas» es mejor
+   señal que «masas», y si se devolviera el primero que casa, el orden
+   de la tabla decidiría el tema, que es una forma tonta de equivocarse.
+   Devuelve null si no casa con ninguno, y entonces el artículo no entra. */
+export function temaDePrensa(titulo: string, resumen: string,
+                             temas: TemaPrensa[]): string | null {
+  const texto = sinTildes(titulo + ' ' + (resumen || ''));
+  let mejorId: string | null = null;
+  let mejorLargo = 0;
+  for (const t of temas) {
+    for (const bruto of String(t.termino_es || '').split('|')) {
+      const term = sinTildes(bruto).trim();
+      /* Tres letras es el mínimo: con menos, «ia» casa dentro de
+         cualquier palabra y todo el canal entraría. */
+      if (term.length < 3) continue;
+      if (texto.includes(term) && term.length > mejorLargo) {
+        mejorLargo = term.length;
+        mejorId = t.id;
+      }
+    }
+  }
+  return mejorId;
+}

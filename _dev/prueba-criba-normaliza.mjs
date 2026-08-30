@@ -164,6 +164,41 @@ ok(N.limpia('&Aacute;lvarez y &aacute;lvarez') === 'Álvarez y álvarez',
 ok(N.limpia('&noexiste; queda igual') === '&noexiste; queda igual',
    'una entidad desconocida se deja como estaba, no se borra el texto');
 
+console.log('\n── La prensa: qué entra y qué no ──');
+{
+  const TEMAS = [
+    { id: 'sesgo',  termino_es: 'sesgo cognitivo|heuristica|sesgos' },
+    { id: 'masas',  termino_es: 'psicologia de masas|comportamiento colectivo|multitud' },
+    { id: 'capital',termino_es: 'capitalismo|financiarizacion|neoliberalismo' },
+  ];
+  const t = (ti, re = '') => N.temaDePrensa(ti, re, TEMAS);
+
+  ok(t('Los sesgos cognitivos que arruinan tus decisiones') === 'sesgo',
+     'un titular con «sesgo cognitivo» entra en su materia');
+  ok(t('La metacognición del pulpo') === null,
+     '⚠️ lo que no casa con NINGÚN tema NO entra: un canal de prensa sin filtro es la manguera otra vez');
+  ok(t('El Real Madrid ficha a un delantero') === null,
+     'el fútbol de Jot Down se queda fuera');
+  ok(t('Un ensayo sobre la financiarización de la vivienda') === 'capital',
+     'y lo que sí interesa del mismo canal, entra');
+
+  // ⚠️ La coincidencia MÁS LARGA, no la primera de la lista.
+  ok(t('Psicología de masas y comportamiento en la multitud') === 'masas',
+     '⚠️ gana el término más largo, no el primero: si no, el orden de la tabla decide el tema');
+  ok(N.temaDePrensa('Sobre el capitalismo tardío', '', [
+       { id: 'corto', termino_es: 'ismo' },
+       { id: 'largo', termino_es: 'capitalismo' }]) === 'largo',
+     'y eso vale aunque el corto esté antes en la lista');
+
+  ok(t('LOS SESGOS COGNITIVOS EN MAYÚSCULAS') === 'sesgo', 'no importan las mayúsculas');
+  ok(t('La heurística de disponibilidad') === 'sesgo', '⚠️ ni las tildes: «heurística» casa con «heuristica»');
+  ok(t('Nada', 'el resumen habla de capitalismo') === 'capital',
+     'también mira el resumen, no solo el titular');
+  ok(N.temaDePrensa('Cualquier cosa', '', [{ id: 'x', termino_es: 'ia' }]) === null,
+     '⚠️ un término de dos letras se ignora: «ia» casa dentro de cualquier palabra');
+  ok(N.temaDePrensa('Titulo', '', []) === null, 'sin temas configurados no entra nada');
+}
+
 console.log('\n── El recorte por fuente no puede matar temas ──');
 /* ⚠️ La primera versión juntaba lo de todos los temas y cortaba a 60.
    Con 18 temas a 8 cada uno, el corte caía tras el séptimo: los temas de

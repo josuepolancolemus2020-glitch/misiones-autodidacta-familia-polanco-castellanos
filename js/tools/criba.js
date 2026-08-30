@@ -52,10 +52,21 @@ const CRIBA_EVIDENCIA = {
    ya es raro en todas las que hay. */
 const CRIBA_DIAS_MUDA = 3;
 
+/* Las tres secciones. No son un adorno: cada una se recoge de una forma
+   distinta y se lee con otra cabeza. Un ensayo de Aeon y un artículo
+   revisado por pares no se juzgan igual, y mezclarlos sin decir cuál es
+   cuál sería lo contrario de lo que hace esta pantalla. */
+const CRIBA_SECCIONES = {
+  consulta: { t: 'Ciencia',  ic: '🔬' },
+  prensa:   { t: 'Prensa',   ic: '📰' },
+  local:    { t: 'Honduras', ic: '🇭🇳' },
+};
+
 let _crbSb      = null;
 let _crbItems   = [];
 let _crbFuentes = {};
 let _crbFiltro  = 'sinleer';  // 'todas' | 'sinleer' | 'guardadas'
+let _crbSeccion = '';         // '' = todas | 'consulta' | 'prensa' | 'local'
 let _crbRacimo  = '';         // '' = todos
 let _crbEdicion = null;       // la fecha de la edición que se está enseñando
 let _crbHay     = true;       // ¿se corrió ya el SQL en esta base?
@@ -152,7 +163,7 @@ async function crbTraerEdicion() {
   const sb = await crbCliente();
   if (!sb) return;
   const { data, error } = await sb.from(CRIBA_ITEMS)
-    .select('id,fuente_id,titulo,resumen,url,doi,idioma,evidencia,publicado,edicion,orden,leido_at,guardado,retractado_at')
+    .select('id,fuente_id,titulo,resumen,url,doi,idioma,evidencia,publicado,edicion,orden,leido_at,guardado,retractado_at,tema_id')
     .not('edicion', 'is', null)
     .order('edicion', { ascending: false })
     .order('orden',   { ascending: true })
@@ -239,6 +250,29 @@ function crbPintarChips() {
     zona.appendChild(b);
   });
 
+  /* Las secciones, con su cuenta. Van antes que los racimos porque es
+     la división que el autor pidió por su nombre: «una sección de
+     artículos de periódicos y revistas». */
+  const porSeccion = {};
+  _crbItems.forEach(i => {
+    const f = _crbFuentes[i.fuente_id] || {};
+    const c = f.clase || 'local';
+    porSeccion[c] = (porSeccion[c] || 0) + 1;
+  });
+  Object.keys(CRIBA_SECCIONES).forEach(c => {
+    if (!porSeccion[c]) return;
+    const s = CRIBA_SECCIONES[c];
+    const b = crbEl('button', 'crb-chip crb-chip-sec' + (_crbSeccion === c ? ' crb-chip-on' : ''));
+    b.type = 'button';
+    b.appendChild(crbEl('span', null, s.ic + ' ' + s.t));
+    b.appendChild(crbEl('span', 'crb-chip-n', String(porSeccion[c])));
+    b.addEventListener('click', () => {
+      _crbSeccion = (_crbSeccion === c) ? '' : c;
+      crbPintarChips(); crbPintar();
+    });
+    zona.appendChild(b);
+  });
+
   // Los racimos salen de las fuentes que hay, nunca de una lista escrita
   // aquí: si mañana entra una fuente de otro racimo, aparece sola.
   const racimos = [...new Set(_crbItems
@@ -267,6 +301,10 @@ function crbVisibles() {
        importa. De nada sirve avisar de una retractación a quien no llegó
        a leer el trabajo; hay que avisar a quien se lo creyó. */
     if (i.retractado_at && _crbFiltro !== 'guardadas') {
+      if (_crbSeccion) {
+        const f = _crbFuentes[i.fuente_id];
+        if (!f || (f.clase || 'local') !== _crbSeccion) return false;
+      }
       if (_crbRacimo) {
         const f = _crbFuentes[i.fuente_id];
         if (!f || f.racimo !== _crbRacimo) return false;
@@ -275,6 +313,10 @@ function crbVisibles() {
     }
     if (_crbFiltro === 'sinleer'   && i.leido_at) return false;
     if (_crbFiltro === 'guardadas' && !i.guardado) return false;
+    if (_crbSeccion) {
+      const f = _crbFuentes[i.fuente_id];
+      if (!f || (f.clase || 'local') !== _crbSeccion) return false;
+    }
     if (_crbRacimo) {
       const f = _crbFuentes[i.fuente_id];
       if (!f || f.racimo !== _crbRacimo) return false;
@@ -351,6 +393,9 @@ function crbTarjeta(i) {
   tira.appendChild(chipEv);
 
   // Regla 5: el peso de la fuente, a la vista.
+  const sec = CRIBA_SECCIONES[f.clase || 'local'];
+  if (sec) tira.appendChild(crbEl('span', 'crb-sec', sec.ic + ' ' + sec.t));
+
   const chipF = crbEl('span', 'crb-fuente');
   chipF.appendChild(crbEl('span', null, f.nombre || i.fuente_id));
   if (typeof f.peso === 'number') chipF.appendChild(crbEl('span', 'crb-peso', 'peso ' + f.peso));

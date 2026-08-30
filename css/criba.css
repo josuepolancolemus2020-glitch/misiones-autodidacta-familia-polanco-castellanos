@@ -131,3 +131,15 @@
   .crb-intro-t{ color: #e6edf6; }
   .crb-fin-t  { color: #cbd5e1; }
 }
+
+/* La sección de cada tarjeta. Va en la misma tira que el nivel de
+   evidencia porque las dos dicen CON QUÉ CABEZA se lee esto: un ensayo
+   de Aeon y un artículo revisado por pares no se juzgan igual. */
+.crb-sec {
+  font-size: 11px; font-weight: 700; border-radius: 6px; padding: 3px 8px;
+  background: #eef2f7; color: #475569; border: 1px solid #dbe1e8; white-space: nowrap;
+}
+.crb-chip-sec { font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .crb-sec { background: #1c2740; color: #a5b3c6; border-color: #2b3a52; }
+}

@@ -65,11 +65,15 @@ function faroSbFalso(items, fuentes) {
 }
 
 const FUENTES = [
-  { id: 'dialnet', nombre: 'Dialnet', racimo: 'A·C·G', peso: 70, activa: true,
+  { id: 'dialnet', nombre: 'OpenAlex', racimo: 'A·C·G', peso: 70, activa: true, clase: 'consulta',
     ultimo_exito_at: new Date().toISOString(), ultimo_error: null },
-  { id: 'muda', nombre: 'Fuente Muda', racimo: 'C', peso: 30, activa: true,
+  { id: 'muda', nombre: 'Fuente Muda', racimo: 'C', peso: 30, activa: true, clase: 'consulta',
     ultimo_exito_at: new Date(Date.now() - 9 * 86400000).toISOString(),
     ultimo_error: 'el canal respondió pero no trajo ningún ítem utilizable' },
+  { id: 'aeon', nombre: 'Aeon', racimo: 'A·B·F', peso: 65, activa: true, clase: 'prensa',
+    ultimo_exito_at: new Date().toISOString(), ultimo_error: null },
+  { id: 'cnbs', nombre: 'CNBS', racimo: 'C·HN', peso: 60, activa: true, clase: 'local',
+    ultimo_exito_at: new Date().toISOString(), ultimo_error: null },
 ];
 
 /* ⚠️ LA EDICIÓN ES DE AYER, Y ESO ES LA PRUEBA.
@@ -107,6 +111,14 @@ const ITEMS = [
     evidencia: 'revisado', idioma: 'es', publicado: new Date().toISOString(),
     leido_at: new Date().toISOString(), guardado: true,
     retractado_at: new Date().toISOString(), doi: '10.1/b' },
+  { id: 4, fuente_id: 'aeon', edicion: hoy, orden: 4, titulo: 'Un ensayo de Aeon',
+    resumen: 'Periodismo cultural.', url: 'https://aeon.co/essays/x',
+    evidencia: 'comentario', idioma: 'en', publicado: new Date().toISOString(),
+    leido_at: null, guardado: false, retractado_at: null, doi: null },
+  { id: 5, fuente_id: 'cnbs', edicion: hoy, orden: 5, titulo: 'CIRCULAR CNBS No.007/2026',
+    resumen: 'Aviso del regulador.', url: 'https://www.cnbs.gob.hn/c7',
+    evidencia: 'trabajo', idioma: 'es', publicado: new Date().toISOString(),
+    leido_at: null, guardado: false, retractado_at: null, doi: null },
 ];
 
 window.faroSb = faroSbFalso(ITEMS, FUENTES);
@@ -151,7 +163,7 @@ window.faroSb = faroSbFalso(ITEMS, FUENTES);
     return r && r.closest('.crb-card');
   };
   const cards = lista.querySelectorAll('.crb-card');
-  ok(cards.length === 3, 'se pintaron las tres tarjetas');
+  ok(cards.length === 5, 'se pintaron las cinco tarjetas');
   ok(lista.querySelector('.crb-card') === (retractCard()),
      'regla 4 · lo retractado va PRIMERO, no enterrado en la edición');
   ok([...cards].every(c => c.querySelector('.crb-ev')),
@@ -175,6 +187,24 @@ window.faroSb = faroSbFalso(ITEMS, FUENTES);
   ok(lista.querySelector('.crb-fin').textContent.includes('mañana'),
      'regla 8 · y dice que lo que sobró sale mañana');
 
+  L.push('── 2-bis. Las tres secciones ──');
+  const chipsTxt = chips.textContent;
+  ok(chipsTxt.includes('Ciencia') && chipsTxt.includes('Prensa') && chipsTxt.includes('Honduras'),
+     '⚠️ las tres secciones tienen su chip: Ciencia, Prensa y Honduras');
+  ok([...lista.querySelectorAll('.crb-card')].every(c => c.querySelector('.crb-sec')),
+     'y cada tarjeta dice de qué sección es');
+  const chipPrensa = [...chips.querySelectorAll('.crb-chip')]
+    .find(c => c.textContent.includes('Prensa'));
+  chipPrensa.click();
+  await new Promise(r => setTimeout(r, 60));
+  const solas = [...document.querySelectorAll('#crb-lista .crb-card')];
+  ok(solas.length === 1 && solas[0].textContent.includes('Aeon'),
+     '⚠️ tocando «Prensa» queda SOLO la prensa: eso es la sección que se pidió');
+  chipPrensa.click();
+  await new Promise(r => setTimeout(r, 60));
+  ok(document.querySelectorAll('#crb-lista .crb-card').length === 5,
+     'y volviéndolo a tocar, vuelven todas');
+
   L.push('── 3. Los chips, que es donde se trabaja ──');
   ok(getComputedStyle(chips).flexWrap === 'nowrap',
      'no bajan de línea: se deslizan');
@@ -189,8 +219,8 @@ window.faroSb = faroSbFalso(ITEMS, FUENTES);
   cs[1].click();
   await new Promise(r => setTimeout(r, 60));
   const tras = [...document.querySelectorAll('#crb-lista .crb-card')];
-  ok(tras.length === 3,
-     'con «Sin leer» salen las dos sin leer MÁS la retractada');
+  ok(tras.length === 5,
+     'con «Sin leer» salen las cuatro sin leer MÁS la retractada');
   ok(!!document.querySelector('#crb-lista .crb-retractado'),
      '⚠️ la RETRACTADA sigue ahí aunque esté leída: de nada sirve avisar a quien no lo leyó');
   ok(!tras.some(c => !c.querySelector('.crb-retractado') && c.classList.contains('crb-leido')),

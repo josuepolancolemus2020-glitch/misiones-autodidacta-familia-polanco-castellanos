@@ -28,7 +28,7 @@
 // ════════════════════════════════════════════════════════════════════
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { normaliza, topeDeFuente, type Fuente, type Item } from "./normaliza.ts";
+import { normaliza, topeDeFuente, temaDePrensa, type Fuente, type Item } from "./normaliza.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -113,6 +113,7 @@ Deno.serve(async (req) => {
 
     const acumulado: Item[] = [];
     const fallos: string[] = [];
+    let descartados = 0;   // de prensa, por no casar con ningún tema
 
     for (const v of vueltas) {
       try {
@@ -125,7 +126,18 @@ Deno.serve(async (req) => {
         const cuerpo = await res.text();
         const items = normaliza(cuerpo, f as unknown as Fuente);
         for (const it of items) {
-          acumulado.push(v.tema ? { ...it, tema_id: v.tema.id } as Item : it);
+          if (f.clase === "prensa") {
+            /* ⚠️ LA PRENSA SE FILTRA DESPUÉS DE TRAERLA. No se le puede
+               preguntar por tema y no es temática: Jot Down publica
+               sobre fútbol y sobre Bourdieu el mismo día. Lo que no case
+               con ninguna materia NO ENTRA — un canal de prensa sin
+               filtro es la manguera de Dialnet otra vez. */
+            const tema = temaDePrensa(it.titulo, it.resumen, losTemas as any);
+            if (!tema) { descartados++; continue; }
+            acumulado.push({ ...it, tema_id: tema } as Item);
+          } else {
+            acumulado.push(v.tema ? { ...it, tema_id: v.tema.id } as Item : it);
+          }
         }
       } catch (e) {
         fallos.push(String((e as Error).message ?? e).slice(0, 120));
@@ -147,9 +159,15 @@ Deno.serve(async (req) => {
          fallen algunas no: un tema sin resultados es información, no
          avería. */
       if (leidos === 0) {
-        throw new Error(fallos.length
-          ? "ninguna consulta trajo nada · " + fallos[0]
-          : "respondió pero no trajo ningún ítem utilizable");
+        /* Que un canal de prensa traiga cosas y ninguna interese NO es
+           una avería: es la criba haciendo su trabajo. Se apunta con esas
+           palabras para no ir a buscar un fallo que no existe. */
+        throw new Error(
+          descartados > 0
+            ? `trajo ${descartados} y ninguno casó con las materias (no es una avería)`
+            : fallos.length
+              ? "ninguna consulta trajo nada · " + fallos[0]
+              : "respondió pero no trajo ningún ítem utilizable");
       }
 
       const { error: eI, count } = await svc
@@ -173,7 +191,8 @@ Deno.serve(async (req) => {
       }).eq("id", f.id);
     }
 
-    parte.push({ fuente: f.id, consultas: vueltas.length, leidos, nuevos, fallo });
+    parte.push({ fuente: f.id, clase: f.clase ?? 'local',
+                 consultas: vueltas.length, leidos, nuevos, descartados, fallo });
   }
 
   // Armar la edición del día, con su fondo. Lo que no entre sale mañana.
