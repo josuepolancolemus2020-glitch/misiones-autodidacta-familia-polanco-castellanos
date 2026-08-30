@@ -31,20 +31,29 @@ select coalesce(f.clase, '?')                     as clase,
  group by 1
  order by 1;
 
--- ── 2. Qué dijo cada fuente en la última cosecha ────────────────────
+-- ── 2. Qué dijo cada canal de prensa ────────────────────────────────
 -- Va el ÚLTIMO porque el editor solo enseña el resultado de la última
 -- sentencia, y este es el parte que nombra la causa.
-with cruda as (
-  select content from net._http_response
-   where content like '%edicion_de_hoy%'
-   order by created desc limit 1
-)
-select coalesce(e->>'clase', '⚠️ CÓDIGO VIEJO') as clase,
-       e->>'fuente' as fuente,
-       coalesce(nullif(e->>'fallo', ''),
-                'ok · ' || coalesce(e->>'nuevos','0') || ' nuevos' ||
-                case when coalesce(e->>'descartados','0') <> '0'
-                     then ' · ' || (e->>'descartados') || ' descartados'
-                     else '' end) as que_paso
-  from cruda, jsonb_array_elements(content::jsonb->'fuentes') e
- order by 1, 2;
+--
+-- ⚠️ SE PREGUNTA A `criba_fuentes`, NO al buzón de pg_net. El
+--    recolector apunta el resultado de cada fuente en su propia fila
+--    (`ultimo_error`, `ultimo_intento_at`), y eso se queda escrito. El
+--    buzón `net._http_response` lo comparte todo pg_net y antena-publicar
+--    escribe ahí cada minuto: mirar allí es fiar el diagnóstico a que
+--    nadie haya pasado por delante. Aquí no hace falta.
+--
+-- CÓMO SE LEE:
+--   «trajo N y ninguno casó…»  → contestaron y las palabras son
+--                                 demasiado estrechas. No es avería.
+--   403 / 429 / timeout         → el canal no dejó entrar.
+--   `intento` en blanco         → el recolector ni lo intentó: o está
+--                                 apagada, o corre código anterior.
+select id,
+       to_char(ultimo_intento_at, 'HH24:MI') as intento,
+       coalesce(ultimo_error,
+                case when not activa then '⏸ apagada a propósito'
+                     else '✅ sin error' end) as que_dijo
+  from public.criba_fuentes
+ where clase = 'prensa'
+ -- Los que fallaron primero: son los que hay que leer.
+ order by (ultimo_error is null), id;
