@@ -332,7 +332,13 @@ function topeDeFuente(esDeConsulta: boolean, nTemas: number, porTema = 8): numbe
    «heurística». Son dos oficios distintos y por eso son dos columnas.
    ════════════════════════════════════════════════════════════════════ */
 
-interface TemaPrensa { id: string; termino_es: string; peso?: number }
+/* ⚠️ El campo se llama `palabras` y NO `termino`, igual que la columna
+   de la tabla. Estuvieron a punto de llamarse distinto -el SQL decía
+   `palabras` y esto decía `termino_es`- y el efecto habría sido el peor
+   posible: `t.palabras` sería undefined, ninguna noticia casaría con
+   nada, toda la prensa se caería EN SILENCIO y en el informe saldría
+   como «trajo N y ninguno casó», que suena a criba trabajando bien. */
+interface TemaPrensa { id: string; palabras: string; peso?: number }
 
 /* Sin tildes y en minúsculas, para que «metacognición» case con
    «metacognicion». En un titular de periódico las tildes se ponen bien,
@@ -352,7 +358,7 @@ function temaDePrensa(titulo: string, resumen: string,
   let mejorId: string | null = null;
   let mejorLargo = 0;
   for (const t of temas) {
-    for (const bruto of String(t.termino_es || '').split('|')) {
+    for (const bruto of String(t.palabras || '').split('|')) {
       const term = sinTildes(bruto).trim();
       /* Tres letras es el mínimo: con menos, «ia» casa dentro de
          cualquier palabra y todo el canal entraría. */

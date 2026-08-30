@@ -167,9 +167,9 @@ ok(N.limpia('&noexiste; queda igual') === '&noexiste; queda igual',
 console.log('\n── La prensa: qué entra y qué no ──');
 {
   const TEMAS = [
-    { id: 'sesgo',  termino_es: 'sesgo cognitivo|heuristica|sesgos' },
-    { id: 'masas',  termino_es: 'psicologia de masas|comportamiento colectivo|multitud' },
-    { id: 'capital',termino_es: 'capitalismo|financiarizacion|neoliberalismo' },
+    { id: 'sesgo',  palabras: 'sesgo cognitivo|heuristica|sesgos' },
+    { id: 'masas',  palabras: 'psicologia de masas|comportamiento colectivo|multitud' },
+    { id: 'capital',palabras: 'capitalismo|financiarizacion|neoliberalismo' },
   ];
   const t = (ti, re = '') => N.temaDePrensa(ti, re, TEMAS);
 
@@ -186,17 +186,31 @@ console.log('\n── La prensa: qué entra y qué no ──');
   ok(t('Psicología de masas y comportamiento en la multitud') === 'masas',
      '⚠️ gana el término más largo, no el primero: si no, el orden de la tabla decide el tema');
   ok(N.temaDePrensa('Sobre el capitalismo tardío', '', [
-       { id: 'corto', termino_es: 'ismo' },
-       { id: 'largo', termino_es: 'capitalismo' }]) === 'largo',
+       { id: 'corto', palabras: 'ismo' },
+       { id: 'largo', palabras: 'capitalismo' }]) === 'largo',
      'y eso vale aunque el corto esté antes en la lista');
 
   ok(t('LOS SESGOS COGNITIVOS EN MAYÚSCULAS') === 'sesgo', 'no importan las mayúsculas');
   ok(t('La heurística de disponibilidad') === 'sesgo', '⚠️ ni las tildes: «heurística» casa con «heuristica»');
   ok(t('Nada', 'el resumen habla de capitalismo') === 'capital',
      'también mira el resumen, no solo el titular');
-  ok(N.temaDePrensa('Cualquier cosa', '', [{ id: 'x', termino_es: 'ia' }]) === null,
+  ok(N.temaDePrensa('Cualquier cosa', '', [{ id: 'x', palabras: 'ia' }]) === null,
      '⚠️ un término de dos letras se ignora: «ia» casa dentro de cualquier palabra');
   ok(N.temaDePrensa('Titulo', '', []) === null, 'sin temas configurados no entra nada');
+
+  /* ⚠️ EL NOMBRE DEL CAMPO TIENE QUE SER EL DE LA COLUMNA. Estuvieron a
+     punto de no serlo -el SQL decía `palabras` y el código `termino_es`-
+     y el fallo habría sido invisible: undefined, cero coincidencias,
+     toda la prensa fuera, y en el informe «trajo N y ninguno casó», que
+     suena exactamente a la criba trabajando bien. */
+  const sql = readFileSync(join(AQUI, '..', 'supabase', 'sql', 'criba_prensa.sql'), 'utf8');
+  // Sobre criba_temas en concreto: el archivo añade varias columnas y
+  // la primera es `clase`, que es de otra tabla.
+  const col = (sql.match(/criba_temas add column if not exists (\w+) text/) || [])[1];
+  ok(col === 'palabras',
+     '⚠️ la columna del SQL se llama `palabras`, igual que el campo que lee el código');
+  ok(N.temaDePrensa('sobre el capitalismo', '', [{ id: 'x', palabras: 'capitalismo' }]) === 'x',
+     'y el código lee ESE campo, no otro');
 }
 
 console.log('\n── El recorte por fuente no puede matar temas ──');
