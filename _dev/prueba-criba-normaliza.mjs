@@ -164,6 +164,133 @@ ok(N.limpia('&Aacute;lvarez y &aacute;lvarez') === 'Álvarez y álvarez',
 ok(N.limpia('&noexiste; queda igual') === '&noexiste; queda igual',
    'una entidad desconocida se deja como estaba, no se borra el texto');
 
+console.log('\n── La prensa: qué entra y qué no ──');
+{
+  const TEMAS = [
+    { id: 'sesgo',  palabras: 'sesgo cognitivo|heuristica|sesgos' },
+    { id: 'masas',  palabras: 'psicologia de masas|comportamiento colectivo|multitud' },
+    { id: 'capital',palabras: 'capitalismo|financiarizacion|neoliberalismo' },
+  ];
+  const t = (ti, re = '') => N.temaDePrensa(ti, re, TEMAS);
+
+  ok(t('Los sesgos cognitivos que arruinan tus decisiones') === 'sesgo',
+     'un titular con «sesgo cognitivo» entra en su materia');
+  ok(t('La metacognición del pulpo') === null,
+     '⚠️ lo que no casa con NINGÚN tema NO entra: un canal de prensa sin filtro es la manguera otra vez');
+  ok(t('El Real Madrid ficha a un delantero') === null,
+     'el fútbol de Jot Down se queda fuera');
+  ok(t('Un ensayo sobre la financiarización de la vivienda') === 'capital',
+     'y lo que sí interesa del mismo canal, entra');
+
+  // ⚠️ La coincidencia MÁS LARGA, no la primera de la lista.
+  ok(t('Psicología de masas y comportamiento en la multitud') === 'masas',
+     '⚠️ gana el término más largo, no el primero: si no, el orden de la tabla decide el tema');
+  ok(N.temaDePrensa('Sobre el capitalismo tardío', '', [
+       { id: 'corto', palabras: 'ismo' },
+       { id: 'largo', palabras: 'capitalismo' }]) === 'largo',
+     'y eso vale aunque el corto esté antes en la lista');
+
+  ok(t('LOS SESGOS COGNITIVOS EN MAYÚSCULAS') === 'sesgo', 'no importan las mayúsculas');
+  ok(t('La heurística de disponibilidad') === 'sesgo', '⚠️ ni las tildes: «heurística» casa con «heuristica»');
+  ok(t('Nada', 'el resumen habla de capitalismo') === 'capital',
+     'también mira el resumen, no solo el titular');
+  ok(N.temaDePrensa('Cualquier cosa', '', [{ id: 'x', palabras: 'ia' }]) === null,
+     '⚠️ un término de dos letras se ignora: «ia» casa dentro de cualquier palabra');
+  ok(N.temaDePrensa('Titulo', '', []) === null, 'sin temas configurados no entra nada');
+
+  /* ⚠️ EL NOMBRE DEL CAMPO TIENE QUE SER EL DE LA COLUMNA. Estuvieron a
+     punto de no serlo -el SQL decía `palabras` y el código `termino_es`-
+     y el fallo habría sido invisible: undefined, cero coincidencias,
+     toda la prensa fuera, y en el informe «trajo N y ninguno casó», que
+     suena exactamente a la criba trabajando bien. */
+  const sql = readFileSync(join(AQUI, '..', 'supabase', 'sql', 'criba_prensa.sql'), 'utf8');
+  // Sobre criba_temas en concreto: el archivo añade varias columnas y
+  // la primera es `clase`, que es de otra tabla.
+  const col = (sql.match(/criba_temas add column if not exists (\w+) text/) || [])[1];
+  ok(col === 'palabras',
+     '⚠️ la columna del SQL se llama `palabras`, igual que el campo que lee el código');
+  ok(N.temaDePrensa('sobre el capitalismo', '', [{ id: 'x', palabras: 'capitalismo' }]) === 'x',
+     'y el código lee ESE campo, no otro');
+}
+
+console.log('\n── Las palabras casan al PRINCIPIO de una palabra ──');
+/* ⚠️ Sin esta regla, las listas anchas de `criba_prensa2.sql` serían
+   veneno: «arte» dentro de «parte», «ciencia» dentro de «conciencia».
+   Y con ella salen gratis los plurales, que es lo que permite escribir
+   «desigualdad» y que case «desigualdades» sin listar las dos. */
+{
+  const t = (ti, pal) => N.temaDePrensa(ti, '', [{ id: 'x', palabras: pal }]);
+
+  ok(t('La cuarta parte del martes', 'arte') === null,
+     '⚠️ «arte» NO casa dentro de «parte» ni de «martes»');
+  ok(t('Una muestra de arte contemporáneo', 'arte') === 'x',
+     'pero sí como palabra, y también en «artes» por ser principio');
+  ok(t('El problema de la conciencia', 'ciencia') === null,
+     '⚠️ «ciencia» NO casa dentro de «conciencia»: es el caso que obligó a la regla');
+  ok(t('La ciencia que viene', 'ciencia') === 'x', 'y sí cuando es la palabra');
+  ok(t('Es incapaz de hacerlo', 'paz') === null, '«paz» no casa dentro de «incapaz»');
+
+  ok(t('Las desigualdades del siglo', 'desigualdad') === 'x',
+     '⚠️ los plurales salen gratis: no se pide final de palabra');
+  ok(t('Sesgos cognitivos en el aula', 'cognitiv') === 'x',
+     'y las flexiones: «cognitiv» casa con «cognitivos»');
+  ok(t('Economía sumergida', 'economia') === 'x', 'la primera palabra del titular también');
+}
+
+console.log('\n── El vocabulario de verdad, leído del SQL ──');
+/* ⚠️ Estas palabras NO se copian aquí: se leen de `criba_prensa2.sql`.
+   Una copia se queda vieja el día que alguien afine una lista, y el
+   fallo sería invisible: la prueba seguiría aprobando mientras la base
+   dice otra cosa. */
+{
+  const sql2 = readFileSync(join(AQUI, '..', 'supabase', 'sql', 'criba_prensa2.sql'), 'utf8');
+  // Solo el bloque `values (...) as v(id, p)`, y sin comentarios: dentro
+  // de los comentarios hay palabras entrecomilladas que no son términos.
+  const bloque = sql2.slice(sql2.indexOf('update public.criba_temas set palabras'),
+                            sql2.indexOf(') as v(id, p)'))
+                     .replace(/--[^\n]*/g, '');
+  const TEMAS = [...bloque.matchAll(/\(\s*'([a-z]+)'\s*,\s*((?:'[^']*'\s*)+)\)/g)]
+    .map(([, id, trozos]) => ({
+      id,
+      // Los textos largos van partidos en varias cadenas seguidas, que
+      // PostgreSQL concatena solas. Aquí se hace lo mismo.
+      palabras: [...trozos.matchAll(/'([^']*)'/g)].map((m) => m[1]).join(''),
+    }));
+
+  ok(TEMAS.length === 18, `se leyeron las 18 materias del SQL (salieron ${TEMAS.length})`);
+
+  /* Los ids tienen que existir en criba_temas.sql. Un id mal escrito no
+     da error: el `where ... id = v.id` no casa, no actualiza esa fila y
+     esa materia se queda con sus palabras estrechas de antes. */
+  const semilla = readFileSync(join(AQUI, '..', 'supabase', 'sql', 'criba_temas.sql'), 'utf8');
+  const huerfanos = TEMAS.filter((t) => !semilla.includes(`'${t.id}'`)).map((t) => t.id);
+  ok(huerfanos.length === 0,
+     `⚠️ ningún id inventado (un id mal escrito no actualiza nada y no avisa)${huerfanos.length ? ': ' + huerfanos : ''}`);
+
+  const cortas = TEMAS.flatMap((t) => t.palabras.split('|').map((w) => w.trim()))
+                      .filter((w) => w.length < 3);
+  ok(cortas.length === 0,
+     `⚠️ ninguna palabra de menos de 3 letras (el código las salta en silencio)${cortas.length ? ': ' + cortas : ''}`);
+
+  const t = (ti, re = '') => N.temaDePrensa(ti, re, TEMAS);
+
+  // Titulares reales del estilo de los doce canales sembrados.
+  ok(t('La crisis de replicación llega a la economía') === 'replicacion',
+     'un titular de metaciencia va a su materia');
+  ok(t('Por qué la desigualdad crece incluso cuando crece el PIB') === 'desigualdad',
+     'y uno de desigualdad a la suya');
+  ok(t('El cerebro adolescente y el sueño') === 'neuroplast', 'y uno de neurociencia');
+  ok(t('Cómo empezar a invertir con poco dinero') === 'finanzas', 'y uno de finanzas');
+  ok(t('Las remesas sostienen la economía de Honduras') !== null,
+     '⚠️ y lo de Honduras casa: es la mitad del encargo');
+
+  /* ⚠️ Lo que NO tiene que entrar. La calidad la ponen las doce fuentes;
+     estas palabras solo tienen que echar lo que no viene a cuento. */
+  ok(t('El Barcelona gana la liga en el último minuto') === null, 'el fútbol se queda fuera');
+  ok(t('La boda de la actriz y el cantante') === null, 'y los famosos');
+  ok(t('Diez recetas de otoño con calabaza') === null, 'y la cocina');
+}
+
 console.log('\n── El recorte por fuente no puede matar temas ──');
 /* ⚠️ La primera versión juntaba lo de todos los temas y cortaba a 60.
    Con 18 temas a 8 cada uno, el corte caía tras el séptimo: los temas de

@@ -11,7 +11,7 @@
 // Si editas AQUI, el arreglo se pierde al volver a coser, y dejara de
 // coincidir con lo que dicen las pruebas.
 //
-// Cosido el 2026-08-29.
+// Cosido el 2026-08-30.
 
 // ══════════ 1 de 2 · normaliza.ts ══════════
 
@@ -312,6 +312,87 @@ function topeDeFuente(esDeConsulta: boolean, nTemas: number, porTema = 8): numbe
   return esDeConsulta ? Math.max(nTemas, 1) * porTema : 60;
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   LA PRENSA · decidir si un artículo de periódico interesa
+   ════════════════════════════════════════════════════════════════════
+   Una revista o un periódico NO se pueden consultar por tema: su canal
+   trae lo que publicaron hoy, de todo. Y a diferencia de la CNBS —que
+   es pequeña y ya temática— aquí la mayoría no interesa: Jot Down
+   publica sobre fútbol y sobre Bourdieu el mismo día.
+
+   Así que se filtra DESPUÉS de traerlo, con las palabras en español de
+   cada tema. Y se filtra en serio: lo que no case con ninguna NO ENTRA.
+   Un canal de prensa sin filtro es exactamente la manguera de Dialnet
+   otra vez, y esa lección ya se pagó.
+
+   ⚠️ POR QUÉ LAS PALABRAS SON DISTINTAS DE LAS DE LA BÚSQUEDA:
+   a OpenAlex se le pregunta `"cognitive bias"` porque indexa en inglés
+   y con comillas. A un periódico en español no se le pregunta nada: se
+   le lee el titular, y ahí lo que aparece es «sesgo cognitivo» o
+   «heurística». Son dos oficios distintos y por eso son dos columnas.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ⚠️ El campo se llama `palabras` y NO `termino`, igual que la columna
+   de la tabla. Estuvieron a punto de llamarse distinto -el SQL decía
+   `palabras` y esto decía `termino_es`- y el efecto habría sido el peor
+   posible: `t.palabras` sería undefined, ninguna noticia casaría con
+   nada, toda la prensa se caería EN SILENCIO y en el informe saldría
+   como «trajo N y ninguno casó», que suena a criba trabajando bien. */
+interface TemaPrensa { id: string; palabras: string; peso?: number }
+
+/* Sin tildes y en minúsculas, para que «metacognición» case con
+   «metacognicion». En un titular de periódico las tildes se ponen bien,
+   pero en el resumen que viaja por el canal no siempre. */
+function sinTildes(s: string): string {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+/* ⚠️ LAS PALABRAS CASAN AL PRINCIPIO DE UNA PALABRA, NO EN CUALQUIER SITIO.
+   La primera versión hacía `texto.includes(term)` a secas, y eso obliga
+   a que las listas sean largas y raras: «arte» casaba dentro de «parte»
+   y de «martes», «paz» dentro de «incapaz», «ciencia» dentro de
+   «conciencia». Para no meter basura había que renunciar a las palabras
+   cortas, que son justo las que usa un titular.
+   Casando al principio de palabra se puede escribir «arte» sin miedo, y
+   además salen gratis los plurales y las flexiones: «desigualdad» casa
+   con «desigualdades», «cognitiv» con «cognitiva» y «cognitivos». Por
+   eso NO se pide también final de palabra. */
+function empiezaPalabra(texto: string, term: string): boolean {
+  let i = texto.indexOf(term);
+  while (i !== -1) {
+    /* El principio del texto cuenta como principio de palabra. */
+    const antes = i === 0 ? ' ' : texto[i - 1];
+    if (!/[a-z0-9]/.test(antes)) return true;
+    i = texto.indexOf(term, i + 1);
+  }
+  return false;
+}
+
+/* ¿Qué tema trae este artículo de prensa? El de la coincidencia MÁS
+   LARGA, no el primero de la lista: «psicología de masas» es mejor
+   señal que «masas», y si se devolviera el primero que casa, el orden
+   de la tabla decidiría el tema, que es una forma tonta de equivocarse.
+   Devuelve null si no casa con ninguno, y entonces el artículo no entra. */
+function temaDePrensa(titulo: string, resumen: string,
+                             temas: TemaPrensa[]): string | null {
+  const texto = sinTildes(titulo + ' ' + (resumen || ''));
+  let mejorId: string | null = null;
+  let mejorLargo = 0;
+  for (const t of temas) {
+    for (const bruto of String(t.palabras || '').split('|')) {
+      const term = sinTildes(bruto).trim();
+      /* Tres letras es el mínimo: con menos, «ia» casa dentro de
+         cualquier palabra y todo el canal entraría. */
+      if (term.length < 3) continue;
+      if (term.length > mejorLargo && empiezaPalabra(texto, term)) {
+        mejorLargo = term.length;
+        mejorId = t.id;
+      }
+    }
+  }
+  return mejorId;
+}
+
 // ══════════ 2 de 2 · index.ts ══════════
 
 // ════════════════════════════════════════════════════════════════════
@@ -349,9 +430,17 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const CRON_SECRET  = Deno.env.get("CRIBA_CRON_SECRET") ?? "";
 
-// El tope de la edición del día. La regla 8 de la puerta: un número
-// finito que se acaba. Lo que no entra hoy sale mañana, no se pierde.
-const TOPE_EDICION = 25;
+/* El tope de la edición del día. La regla 8 de la puerta: un número
+   finito que se acaba. Lo que no entra hoy sale mañana, no se pierde.
+
+   ⚠️ TIENE QUE SUMAR LO MISMO QUE LOS CUPOS DE `criba_arma_edicion`:
+   18 de ciencia + 9 de prensa + 3 de Honduras = 30. Estuvo en 25
+   mientras los cupos ya sumaban 30, y el fallo no da la cara: la
+   función reparte bien y luego el `limit huecos` corta cinco por el
+   orden general, que empieza por la ciencia. O sea que lo que se
+   perdía era siempre la cola -prensa y Honduras-, y la edición parecía
+   correcta salvo por unas secciones flacas que nadie sabría explicar. */
+const TOPE_EDICION = 30;
 
 // Por fuente y por vuelta. Una fuente que devuelva mil registros -Dialnet
 // puede- no debe llenar la edición ella sola ni tardar diez minutos.
@@ -428,6 +517,7 @@ Deno.serve(async (req) => {
 
     const acumulado: Item[] = [];
     const fallos: string[] = [];
+    let descartados = 0;   // de prensa, por no casar con ningún tema
 
     for (const v of vueltas) {
       try {
@@ -440,7 +530,18 @@ Deno.serve(async (req) => {
         const cuerpo = await res.text();
         const items = normaliza(cuerpo, f as unknown as Fuente);
         for (const it of items) {
-          acumulado.push(v.tema ? { ...it, tema_id: v.tema.id } as Item : it);
+          if (f.clase === "prensa") {
+            /* ⚠️ LA PRENSA SE FILTRA DESPUÉS DE TRAERLA. No se le puede
+               preguntar por tema y no es temática: Jot Down publica
+               sobre fútbol y sobre Bourdieu el mismo día. Lo que no case
+               con ninguna materia NO ENTRA — un canal de prensa sin
+               filtro es la manguera de Dialnet otra vez. */
+            const tema = temaDePrensa(it.titulo, it.resumen, losTemas as any);
+            if (!tema) { descartados++; continue; }
+            acumulado.push({ ...it, tema_id: tema } as Item);
+          } else {
+            acumulado.push(v.tema ? { ...it, tema_id: v.tema.id } as Item : it);
+          }
         }
       } catch (e) {
         fallos.push(String((e as Error).message ?? e).slice(0, 120));
@@ -462,9 +563,15 @@ Deno.serve(async (req) => {
          fallen algunas no: un tema sin resultados es información, no
          avería. */
       if (leidos === 0) {
-        throw new Error(fallos.length
-          ? "ninguna consulta trajo nada · " + fallos[0]
-          : "respondió pero no trajo ningún ítem utilizable");
+        /* Que un canal de prensa traiga cosas y ninguna interese NO es
+           una avería: es la criba haciendo su trabajo. Se apunta con esas
+           palabras para no ir a buscar un fallo que no existe. */
+        throw new Error(
+          descartados > 0
+            ? `trajo ${descartados} y ninguno casó con las materias (no es una avería)`
+            : fallos.length
+              ? "ninguna consulta trajo nada · " + fallos[0]
+              : "respondió pero no trajo ningún ítem utilizable");
       }
 
       const { error: eI, count } = await svc
@@ -488,7 +595,8 @@ Deno.serve(async (req) => {
       }).eq("id", f.id);
     }
 
-    parte.push({ fuente: f.id, consultas: vueltas.length, leidos, nuevos, fallo });
+    parte.push({ fuente: f.id, clase: f.clase ?? 'local',
+                 consultas: vueltas.length, leidos, nuevos, descartados, fallo });
   }
 
   // Armar la edición del día, con su fondo. Lo que no entre sale mañana.

@@ -624,6 +624,86 @@ begin
 end $$;
 \echo 'ok 17 · ⚠️ lo ya leído en la edición cuenta para el tope de su materia'
 
+
+-- ════════════════════════════════════════════════════════════════════
+-- 12. LA SECCIÓN DE PRENSA · criba_prensa.sql
+-- ════════════════════════════════════════════════════════════════════
+\echo '── Corriendo supabase/sql/criba_prensa.sql ──'
+\i supabase/sql/criba_prensa.sql
+\echo '── Y otra vez, que tiene que ser idempotente ──'
+\i supabase/sql/criba_prensa.sql
+
+-- ⚠️ LAS TRES SECCIONES CONVIVEN, Y ESA ES LA GRACIA. Con el tope por
+-- tema a secas, un artículo de prensa y uno académico del MISMO tema
+-- competirían y la academia -que pesa más- ganaría siempre: la sección
+-- de prensa no existiría.
+do $$
+declare ciencia integer; prensa integer; local_ integer; materias integer; mayor integer;
+begin
+  delete from public.criba_items;
+  -- Los 18 temas por las tres vías, todos con material.
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'openalex', 'ci-' || t.id || g, 'Paper de ' || t.id || ' ' || g,
+         'https://a.test/ci' || t.id || g, t.id, now() - (g || ' minutes')::interval
+    from public.criba_temas t, generate_series(1, 3) g where t.activo;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'prensa-aeon', 'pr-' || t.id || g, 'Ensayo de ' || t.id || ' ' || g,
+         'https://a.test/pr' || t.id || g, t.id, now() - (g || ' minutes')::interval
+    from public.criba_temas t, generate_series(1, 3) g where t.activo;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado)
+  select 'cnbs', 'lo-' || g, 'Circular ' || g, 'https://a.hn/' || g, null,
+         now() - (g || ' minutes')::interval from generate_series(1, 6) g;
+
+  perform public.criba_arma_edicion(current_date, 30);
+
+  select count(*) into ciencia from public.criba_items i join public.criba_fuentes f on f.id=i.fuente_id
+   where i.edicion=current_date and f.clase='consulta';
+  select count(*) into prensa  from public.criba_items i join public.criba_fuentes f on f.id=i.fuente_id
+   where i.edicion=current_date and f.clase='prensa';
+  select count(*) into local_  from public.criba_items i join public.criba_fuentes f on f.id=i.fuente_id
+   where i.edicion=current_date and f.clase='local';
+  select count(distinct tema_id) into materias from public.criba_items
+   where edicion=current_date and tema_id is not null;
+
+  if prensa = 0 then
+    raise exception 'FALLA: la sección de prensa no existe (la academia se lo comió todo)';
+  end if;
+  if ciencia = 0 then raise exception 'FALLA: no entró nada de ciencia'; end if;
+  if local_ = 0 then raise exception 'FALLA: Honduras desapareció otra vez'; end if;
+  if prensa > 9 then raise exception 'FALLA: la prensa pasó su cupo (% de 9)', prensa; end if;
+  if ciencia > 18 then raise exception 'FALLA: la ciencia pasó su cupo (% de 18)', ciencia; end if;
+  if materias < 15 then raise exception 'FALLA: solo % materias distintas', materias; end if;
+end $$;
+\echo 'ok 18 · ⚠️ ciencia, prensa y Honduras conviven, cada una con su cupo'
+
+-- ⚠️ Y CIENCIA Y PRENSA DEL MISMO TEMA NO SE ESTORBAN. Con el mando en
+-- 1, cada materia da UN artículo académico y UNO de prensa: si el tope
+-- fuera común, solo saldría el académico, que pesa más.
+do $$
+declare n integer;
+begin
+  delete from public.criba_items;
+  insert into public.criba_items (fuente_id, clave, titulo, url, tema_id, publicado) values
+    ('openalex',    'mismo-ci', 'Paper sobre sesgo',  'https://a.test/1', 'sesgo', now()),
+    ('prensa-aeon', 'mismo-pr', 'Ensayo sobre sesgo', 'https://a.test/2', 'sesgo', now());
+  perform public.criba_arma_edicion(current_date, 30);
+  select count(*) into n from public.criba_items where edicion = current_date and tema_id = 'sesgo';
+  if n <> 2 then
+    raise exception 'FALLA: del mismo tema entró % (han de entrar el académico Y el de prensa)', n;
+  end if;
+end $$;
+\echo 'ok 19 · ⚠️ del mismo tema entran el artículo académico Y el de prensa'
+
+-- The Conversation queda apagada, con su rastro.
+do $$
+declare a boolean;
+begin
+  select activa into a from public.criba_fuentes where id = 'prensa-conversation-es';
+  if a is null then raise exception 'FALLA: no está la fila de The Conversation'; end if;
+  if a then raise exception 'FALLA: The Conversation activa, y publica en inglés sin resumen'; end if;
+end $$;
+\echo 'ok 20 · The Conversation queda apagada: se probó tres veces y sale en inglés'
+
 \echo ''
 \echo '════════════════════════════════════════════════'
 \echo 'RESULTADO: APRUEBA'
