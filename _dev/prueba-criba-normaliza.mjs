@@ -213,6 +213,84 @@ console.log('\n── La prensa: qué entra y qué no ──');
      'y el código lee ESE campo, no otro');
 }
 
+console.log('\n── Las palabras casan al PRINCIPIO de una palabra ──');
+/* ⚠️ Sin esta regla, las listas anchas de `criba_prensa2.sql` serían
+   veneno: «arte» dentro de «parte», «ciencia» dentro de «conciencia».
+   Y con ella salen gratis los plurales, que es lo que permite escribir
+   «desigualdad» y que case «desigualdades» sin listar las dos. */
+{
+  const t = (ti, pal) => N.temaDePrensa(ti, '', [{ id: 'x', palabras: pal }]);
+
+  ok(t('La cuarta parte del martes', 'arte') === null,
+     '⚠️ «arte» NO casa dentro de «parte» ni de «martes»');
+  ok(t('Una muestra de arte contemporáneo', 'arte') === 'x',
+     'pero sí como palabra, y también en «artes» por ser principio');
+  ok(t('El problema de la conciencia', 'ciencia') === null,
+     '⚠️ «ciencia» NO casa dentro de «conciencia»: es el caso que obligó a la regla');
+  ok(t('La ciencia que viene', 'ciencia') === 'x', 'y sí cuando es la palabra');
+  ok(t('Es incapaz de hacerlo', 'paz') === null, '«paz» no casa dentro de «incapaz»');
+
+  ok(t('Las desigualdades del siglo', 'desigualdad') === 'x',
+     '⚠️ los plurales salen gratis: no se pide final de palabra');
+  ok(t('Sesgos cognitivos en el aula', 'cognitiv') === 'x',
+     'y las flexiones: «cognitiv» casa con «cognitivos»');
+  ok(t('Economía sumergida', 'economia') === 'x', 'la primera palabra del titular también');
+}
+
+console.log('\n── El vocabulario de verdad, leído del SQL ──');
+/* ⚠️ Estas palabras NO se copian aquí: se leen de `criba_prensa2.sql`.
+   Una copia se queda vieja el día que alguien afine una lista, y el
+   fallo sería invisible: la prueba seguiría aprobando mientras la base
+   dice otra cosa. */
+{
+  const sql2 = readFileSync(join(AQUI, '..', 'supabase', 'sql', 'criba_prensa2.sql'), 'utf8');
+  // Solo el bloque `values (...) as v(id, p)`, y sin comentarios: dentro
+  // de los comentarios hay palabras entrecomilladas que no son términos.
+  const bloque = sql2.slice(sql2.indexOf('update public.criba_temas set palabras'),
+                            sql2.indexOf(') as v(id, p)'))
+                     .replace(/--[^\n]*/g, '');
+  const TEMAS = [...bloque.matchAll(/\(\s*'([a-z]+)'\s*,\s*((?:'[^']*'\s*)+)\)/g)]
+    .map(([, id, trozos]) => ({
+      id,
+      // Los textos largos van partidos en varias cadenas seguidas, que
+      // PostgreSQL concatena solas. Aquí se hace lo mismo.
+      palabras: [...trozos.matchAll(/'([^']*)'/g)].map((m) => m[1]).join(''),
+    }));
+
+  ok(TEMAS.length === 18, `se leyeron las 18 materias del SQL (salieron ${TEMAS.length})`);
+
+  /* Los ids tienen que existir en criba_temas.sql. Un id mal escrito no
+     da error: el `where ... id = v.id` no casa, no actualiza esa fila y
+     esa materia se queda con sus palabras estrechas de antes. */
+  const semilla = readFileSync(join(AQUI, '..', 'supabase', 'sql', 'criba_temas.sql'), 'utf8');
+  const huerfanos = TEMAS.filter((t) => !semilla.includes(`'${t.id}'`)).map((t) => t.id);
+  ok(huerfanos.length === 0,
+     `⚠️ ningún id inventado (un id mal escrito no actualiza nada y no avisa)${huerfanos.length ? ': ' + huerfanos : ''}`);
+
+  const cortas = TEMAS.flatMap((t) => t.palabras.split('|').map((w) => w.trim()))
+                      .filter((w) => w.length < 3);
+  ok(cortas.length === 0,
+     `⚠️ ninguna palabra de menos de 3 letras (el código las salta en silencio)${cortas.length ? ': ' + cortas : ''}`);
+
+  const t = (ti, re = '') => N.temaDePrensa(ti, re, TEMAS);
+
+  // Titulares reales del estilo de los doce canales sembrados.
+  ok(t('La crisis de replicación llega a la economía') === 'replicacion',
+     'un titular de metaciencia va a su materia');
+  ok(t('Por qué la desigualdad crece incluso cuando crece el PIB') === 'desigualdad',
+     'y uno de desigualdad a la suya');
+  ok(t('El cerebro adolescente y el sueño') === 'neuroplast', 'y uno de neurociencia');
+  ok(t('Cómo empezar a invertir con poco dinero') === 'finanzas', 'y uno de finanzas');
+  ok(t('Las remesas sostienen la economía de Honduras') !== null,
+     '⚠️ y lo de Honduras casa: es la mitad del encargo');
+
+  /* ⚠️ Lo que NO tiene que entrar. La calidad la ponen las doce fuentes;
+     estas palabras solo tienen que echar lo que no viene a cuento. */
+  ok(t('El Barcelona gana la liga en el último minuto') === null, 'el fútbol se queda fuera');
+  ok(t('La boda de la actriz y el cantante') === null, 'y los famosos');
+  ok(t('Diez recetas de otoño con calabaza') === null, 'y la cocina');
+}
+
 console.log('\n── El recorte por fuente no puede matar temas ──');
 /* ⚠️ La primera versión juntaba lo de todos los temas y cortaba a 60.
    Con 18 temas a 8 cada uno, el corte caía tras el séptimo: los temas de

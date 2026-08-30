@@ -330,6 +330,27 @@ export function sinTildes(s: string): string {
   return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
+/* ⚠️ LAS PALABRAS CASAN AL PRINCIPIO DE UNA PALABRA, NO EN CUALQUIER SITIO.
+   La primera versión hacía `texto.includes(term)` a secas, y eso obliga
+   a que las listas sean largas y raras: «arte» casaba dentro de «parte»
+   y de «martes», «paz» dentro de «incapaz», «ciencia» dentro de
+   «conciencia». Para no meter basura había que renunciar a las palabras
+   cortas, que son justo las que usa un titular.
+   Casando al principio de palabra se puede escribir «arte» sin miedo, y
+   además salen gratis los plurales y las flexiones: «desigualdad» casa
+   con «desigualdades», «cognitiv» con «cognitiva» y «cognitivos». Por
+   eso NO se pide también final de palabra. */
+function empiezaPalabra(texto: string, term: string): boolean {
+  let i = texto.indexOf(term);
+  while (i !== -1) {
+    /* El principio del texto cuenta como principio de palabra. */
+    const antes = i === 0 ? ' ' : texto[i - 1];
+    if (!/[a-z0-9]/.test(antes)) return true;
+    i = texto.indexOf(term, i + 1);
+  }
+  return false;
+}
+
 /* ¿Qué tema trae este artículo de prensa? El de la coincidencia MÁS
    LARGA, no el primero de la lista: «psicología de masas» es mejor
    señal que «masas», y si se devolviera el primero que casa, el orden
@@ -346,7 +367,7 @@ export function temaDePrensa(titulo: string, resumen: string,
       /* Tres letras es el mínimo: con menos, «ia» casa dentro de
          cualquier palabra y todo el canal entraría. */
       if (term.length < 3) continue;
-      if (texto.includes(term) && term.length > mejorLargo) {
+      if (term.length > mejorLargo && empiezaPalabra(texto, term)) {
         mejorLargo = term.length;
         mejorId = t.id;
       }

@@ -34,9 +34,17 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const CRON_SECRET  = Deno.env.get("CRIBA_CRON_SECRET") ?? "";
 
-// El tope de la edición del día. La regla 8 de la puerta: un número
-// finito que se acaba. Lo que no entra hoy sale mañana, no se pierde.
-const TOPE_EDICION = 25;
+/* El tope de la edición del día. La regla 8 de la puerta: un número
+   finito que se acaba. Lo que no entra hoy sale mañana, no se pierde.
+
+   ⚠️ TIENE QUE SUMAR LO MISMO QUE LOS CUPOS DE `criba_arma_edicion`:
+   18 de ciencia + 9 de prensa + 3 de Honduras = 30. Estuvo en 25
+   mientras los cupos ya sumaban 30, y el fallo no da la cara: la
+   función reparte bien y luego el `limit huecos` corta cinco por el
+   orden general, que empieza por la ciencia. O sea que lo que se
+   perdía era siempre la cola -prensa y Honduras-, y la edición parecía
+   correcta salvo por unas secciones flacas que nadie sabría explicar. */
+const TOPE_EDICION = 30;
 
 // Por fuente y por vuelta. Una fuente que devuelva mil registros -Dialnet
 // puede- no debe llenar la edición ella sola ni tardar diez minutos.
