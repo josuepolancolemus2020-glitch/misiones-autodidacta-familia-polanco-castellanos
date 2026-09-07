@@ -291,6 +291,46 @@ function nuevaBase(w, opciones){
      'y una palabra con dos puntos que no se reconoce se queda en el guion, no en otro campo',
      'una directiva desconocida acabó en un campo que no le toca');
 
+  /* ═══ 5-bis. LA PROSA NO SE DESCUARTIZA ═══
+     El fallo más caro que tuvo el lector, y el que no se ve: cualquier
+     línea del guion que empezara por una palabra que nombra una clase
+     —«veo», «yo», «texto», «escena», «clip», «toma», «música»…, o sea
+     media lengua— abría un bloque NUEVO. Un párrafo de seis líneas entraba
+     como seis bloques vacíos con el texto convertido en títulos. El guion
+     no se perdía: se descuartizaba, que es peor, porque parece que
+     funcionó. */
+  log('');
+  log('── 5-bis. La prosa no se descuartiza y las directivas sin «>» valen ──');
+  const prosa = R.leerGuion(
+    '[CÁMARA 0:40] El cierre\n' +
+    'Veo la ciudad desde arriba y pienso en lo que viene.\n' +
+    'Texto tras texto, la misma promesa.\n' +
+    'Escena a escena, el futuro ya nos dolió.\n' +
+    'Yo no sé si esto es intuición o miedo.\n' +
+    'Música para el alma, decía mi abuela.\n' +
+    'Clip a clip se fue montando.\n' +
+    'Toma nota de esto.');
+  ok(prosa.bloques.length === 1,
+     '⚠️ siete líneas que empiezan por «Veo», «Texto», «Escena», «Yo», «Música», «Clip» y «Toma» siguen siendo UN bloque',
+     'el guion se descuartizó en ' + prosa.bloques.length + ' bloques: cada palabra de clase abre uno');
+  ok(prosa.bloques[0].guion.split('\n').length === 7,
+     'y las siete se quedan en el guion, ninguna acaba de título',
+     'se perdieron líneas del guion: ' + prosa.bloques[0].guion.split('\n').length + ' de 7');
+
+  const dirs = R.leerGuion('[CÁMARA 0:30] Hola\nMúsica: entra de fondo\nRótulo: Fuente X\nNota: grabar dos veces\nVisual: plano cerrado');
+  ok(dirs.bloques.length === 1,
+     'y «Música:», «Rótulo:», «Nota:» y «Visual:» sin el «>» delante no abren bloque',
+     '«Música: entra de fondo» abrió un bloque nuevo en vez de poner la música');
+  ok(dirs.bloques[0].musica.acc === 'entra' && dirs.bloques[0].rotulo === 'Fuente X' &&
+     dirs.bloques[0].notas === 'grabar dos veces' && dirs.bloques[0].visual === 'plano cerrado',
+     'sino que rellenan su campo, que es lo que quería quien las escribió',
+     'las directivas sin «>» no rellenaron su campo');
+
+  const cabMus = R.leerGuion('[CÁMARA 0:20] A\ntexto\nMÚSICA 0:30 Respiro\n> musica: sigue');
+  ok(cabMus.bloques.length === 2 && cabMus.bloques[1].clase === 'musica',
+     'y una cabecera de clase música DE VERDAD («MÚSICA 0:30 Respiro») sigue abriendo su bloque',
+     'se rompió la cabecera de clase música al arreglar lo anterior');
+
   /* ═══ 6. LA HERRAMIENTA CON LAS TABLAS PUESTAS ═══ */
   log('');
   log('── 6. Un video de principio a fin ──');
@@ -457,6 +497,19 @@ function nuevaBase(w, opciones){
      'y al soltar no se repinta: la lista no salta de debajo del dedo',
      'la lista se repintó al soltar; el toque siguiente cae en otra fila');
 
+  /* ⚠️ Y LOS RELOJES SE REESCRIBEN AUNQUE LA LISTA NO SE REPINTE.
+     No se puede repintar al soltar —le arranca de debajo del dedo el
+     elemento que va a recibir el toque siguiente—, pero sin tocar nada la
+     columna de relojes se queda con los minutos del orden VIEJO. Y esa
+     columna es lo único que se mira para saber dónde cae cada cosa: una
+     tarjeta que dice 3:10 cuando ya empieza en 0:00 es exactamente el
+     fallo que esta herramienta existe para impedir. */
+  const relojes = () => [...lista.querySelectorAll('.rod-card .rod-reloj b')].map(n => n.textContent);
+  ok(relojes().join(',') === '0:00,1:10,2:10',
+     '⚠️ y la columna de relojes se reescribe con el orden nuevo, sin repintar la lista',
+     'los relojes se quedaron en el orden viejo: ' + relojes().join(',') +
+     ' (se esperaba 0:00,1:10,2:10)');
+
   /* ⚠️ Y ESTO ES LO QUE JUSTIFICA LA DECISIÓN 2: el golpe de sonido del
      bloque movido tiene que sonar AHORA en su sitio nuevo, sin haber
      tocado nada. Si los efectos colgaran del reloj, seguiría en 3:10. */
@@ -591,6 +644,12 @@ function nuevaBase(w, opciones){
   /* ═══ 11. LAS EXPORTACIONES ═══ */
   log('');
   log('── 11. Lo que sale por el chat ──');
+  /* Se deja una fuente sin verificar a propósito: es el estado en el que
+     de verdad se exporta —siempre queda algo por comprobar— y es el que
+     hace que la comprobación de abajo signifique algo. */
+  base.tablas.rodaje_fuentes.find(f => f.fid === 'f-mus').verificada = false;
+  await w.eval('rodCargarProyecto()');
+  await esperar(400);
   const bib = R.exportar.bibliografia();
   ok(/INTELIGENCIA ARTIFICIAL/.test(bib) && /Google MusicFX/.test(bib) && /melancholic piano/.test(bib),
      'la descripción de YouTube separa lo generado por una máquina, con su herramienta y su prompt',
@@ -598,6 +657,21 @@ function nuevaBase(w, opciones){
   ok(/Aparece en/.test(bib),
      'y dice en qué minutos aparece cada fuente, sacado de los bloques',
      'la bibliografía no dice en qué minutos aparece cada fuente');
+  /* ⚠️ Y LOS AVISOS INTERNOS NO SE VAN CON ELLA. Este texto tiene un solo
+     destino: la descripción PÚBLICA de un video. Un «SIN VERIFICAR EN EL
+     ORIGINAL» al lado de una fuente es una nota para el autor, y pegada
+     ahí la lee cualquiera. Van encima de una raya, y lo que se copia es lo
+     de debajo. */
+  const corte = bib.indexOf('copia de aquí para abajo');
+  ok(corte >= 0, 'y trae una raya que separa las notas del autor de lo publicable',
+     'no hay raya: los avisos internos se pegan con la descripción');
+  const publicable = bib.slice(corte);
+  ok(!/SIN VERIFICAR|SIN DETERMINAR|antes de publicar/i.test(publicable),
+     '⚠️ y de la raya para abajo no queda ni un aviso interno que pegar en público',
+     'la parte publicable lleva avisos internos dentro: se pegarían en la descripción del video');
+  ok(/sin verificar/i.test(bib.slice(0, corte)),
+     'aunque arriba sí se ven, que para eso están',
+     'los avisos no se ven en ninguna parte: se perderían');
   const rot = R.exportar.rotulos();
   ok(/Google MusicFX/.test(rot) || /rótulo/.test(rot),
      'los rótulos de pantalla salen con su minuto delante',

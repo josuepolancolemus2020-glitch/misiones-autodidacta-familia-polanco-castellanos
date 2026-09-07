@@ -493,6 +493,7 @@ returns trigger language plpgsql as $$
 declare
   v_sin_fuente text;
   v_sin_rotulo text;
+  v_cuantos    int;
 begin
   -- Solo al ENTRAR en publicado. Corregir una errata de un proyecto ya
   -- publicado no puede quedar bloqueado por esto: sería castigar la
@@ -524,13 +525,31 @@ begin
                  from jsonb_array_elements_text(b.fids) e
                  join public.rodaje_fuentes f
                    on f.pid = b.pid and f.fid = e.value)
+       -- ⚠️ EN ORDEN, y no los doce que salgan. Sin el `order by`,
+       -- PostgreSQL escoge doce cualesquiera: el autor arregla esos, vuelve
+       -- a publicar, y le salen otros doce distintos. Con el orden de la
+       -- secuencia va de arriba abajo y sabe por dónde va.
+       order by b.orden, b.id
        limit 12
     ) x;
 
+  -- Cuántos son en total, para no decir doce cuando son veinte: quien lo
+  -- lee arregla los doce, vuelve a darle a publicar y se lleva la misma
+  -- pared otra vez sin entender por qué.
+  select count(*) into v_cuantos
+    from public.rodaje_bloques b
+   where b.pid = new.pid
+     and b.clase in ('pelicula','ia','archivo','musica')
+     and not exists (
+           select 1
+             from jsonb_array_elements_text(b.fids) e
+             join public.rodaje_fuentes f
+               on f.pid = b.pid and f.fid = e.value);
+
   if v_sin_fuente is not null then
     raise exception
-      'No se puede publicar: hay material ajeno sin fuente declarada. Bloques: %. Ábrelos en F.A.R.O › El Rodaje › Secuencia y ponles su cita.',
-      v_sin_fuente;
+      'No se puede publicar: % bloque(s) con material ajeno sin fuente declarada. Los primeros: %. Ábrelos en F.A.R.O › El Rodaje › Secuencia y ponles su cita.',
+      v_cuantos, v_sin_fuente;
   end if;
 
   select string_agg(f.fid || ' (' || f.clase || ')', ', ' order by f.fid)

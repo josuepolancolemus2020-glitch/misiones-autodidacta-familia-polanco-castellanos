@@ -439,6 +439,22 @@ buena memoria de nadie.
    doscientos toques; además el texto casi nunca se inventa aquí. Se lee tal
    como venga —`[CÁMARA 0:30] Título`, `CLIP 3:45 — Título`,
    `## TOMA 1 (0:15) Título`— con las líneas `>` para lo demás.
+
+   ⚠️ **Y una cabecera SIN corchetes necesita su duración.** Es la
+   condición que separa una cabecera de la prosa, y sin ella el lector se
+   comía el guion: cualquier línea que empezara por una de las palabras que
+   nombran una clase —«veo», «yo», «texto», «escena», «clip», «toma»,
+   «música»…, o sea media lengua— abría un bloque nuevo. Un párrafo de seis
+   líneas entraba como **seis bloques vacíos con el texto convertido en
+   títulos**: el guion no se perdía, se descuartizaba, que es peor porque
+   parece que funcionó. La forma con corchetes es inequívoca y no necesita
+   nada; una pelada, sí.
+
+   ⚠️ **Y las directivas se reconocen ANTES que las cabeceras.** Al revés,
+   «Música: entra de fondo» —que es como se escribe sin acordarse del `>`—
+   caía en la rama de la cabecera, porque «música» nombra una clase: en vez
+   de poner la música del bloque abría un bloque nuevo titulado «entra de
+   fondo». Lo mismo con `Rótulo:`, `Toma:` y `Texto:`.
    ⚠️ **Y lo que NO se entiende se queda como guion, nunca se coloca a la
    fuerza en otro campo**: ahí no se ve que está mal. Las citas escritas a
    mano en el texto se crean como fuentes SIN VERIFICAR en vez de perderse:
@@ -453,8 +469,26 @@ buena memoria de nadie.
    ninguna: mover un bloque cambia los minutos de todos los de abajo. Las
    mismas cuatro reglas: el asa sigue siendo un botón y **las flechas del
    teclado la mueven**; `touch-action: none` en el asa; **al soltar NO se
-   repinta** la lista (sí el panel de arriba, porque los minutos ya son
-   otros); y solo se escriben las filas cuyo número cambió.
+   repinta** la lista; y solo se escriben las filas cuyo número cambió.
+
+   Y aquí hacen falta tres cosas más que en las otras dos, porque aquí la
+   lista es de treinta y no de diez:
+
+   - ⚠️ **Los relojes se REESCRIBEN aunque la lista no se repinte**
+     (`rodRefrescarRelojes`, cambiando el texto de los nodos que ya
+     existen). Sin eso, la columna de minutos se queda con el orden viejo,
+     y esa columna es lo único que se mira para saber dónde cae cada cosa:
+     una tarjeta que dice 3:10 cuando ya empieza en 0:15 es exactamente el
+     fallo que toda la herramienta existe para impedir.
+   - ⚠️ **La lista se desplaza sola en los bordes.** Sin eso, un bloque solo
+     se puede mover lo que quepa en la pantalla: dos o tres puestos. La
+     función existía y no servía para el caso para el que se hizo, que es
+     peor que no tenerla —uno lo intenta, no funciona, y no vuelve a
+     intentarlo—.
+   - **El botón flotante de Destellos deja de recibir el puntero mientras
+     dura el arrastre.** Vive en la esquina de abajo a la derecha, que es
+     por donde pasa el dedo al llevar un bloque hacia el final, y se comía
+     el gesto sin que se viera por qué.
    **Y la nota que lo explica va FUERA del contenedor que arrastra**, no
    dentro como en los videos de M.E.T.A.S: allí era un hijo que no era una
    fila y el aparato tuvo que aprender a saltárselo. Sacándola, esa clase de
@@ -505,6 +539,20 @@ buena memoria de nadie.
     una secuencia que solo puede tocar quien la abrió convierte «arréglame
     esa frase» en «pásame tu sesión».
 
+⚠️ **Y la descripción de YouTube no lleva dentro las notas del autor.**
+Van encima de una raya (`copia de aquí para abajo`) y el botón copia solo
+lo de debajo. Ese texto tiene un único destino —la descripción PÚBLICA de
+un video— y un «⚠️ SIN VERIFICAR EN EL ORIGINAL» pegado al lado de una
+fuente lo lee cualquiera: sería el propio autor declarando en público que
+no comprobó sus fuentes.
+
+⚠️ **Y la duración escrita se devuelve entendida, en voz alta.** En el
+teclado de una tableta los dos puntos están escondidos, así que lo que se
+escribe es «3» — y «3» son tres SEGUNDOS. No se adivina cuál de las dos
+quería decir: debajo del campo sale «Se entiende 0:03 (3 segundos)».
+Adivinar acierta la mitad de las veces y falla en silencio; enseñar
+acierta siempre.
+
 **Lo permanente sale por el chat**, igual que el SQL y que el catálogo de
 los videos de M.E.T.A.S, y por lo mismo —el autor trabaja desde la tableta,
 sin el repositorio ni el editor de video delante—. Son cuatro
@@ -522,6 +570,11 @@ reels**.
 node _dev/servidor-estatico.js      (en otra terminal)
 _dev/probe-rodaje.html              (en el navegador)
 ```
+
+La comprobación **5-bis** le pega un párrafo entero de prosa que empieza
+por siete palabras de clase distintas, y exige que salga UN bloque con sus
+siete líneas dentro: es el fallo más caro que tuvo el lector y el que menos
+se ve, porque descuartizar un guion parece haber funcionado.
 
 La comprobación **8** mueve un bloque **con eventos de puntero de verdad**,
 no llamando por dentro a la función: lo que puede fallar ahí es de pantalla

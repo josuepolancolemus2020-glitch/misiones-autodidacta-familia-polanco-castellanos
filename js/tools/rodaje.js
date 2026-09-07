@@ -416,9 +416,20 @@ async function initRodaje() {
     .limit(200);
 
   if (error) {
-    _rodHay = false;
-    _rodPro = [];
-    rodSinTabla();
+    /* ⚠️ UN FALLO DE RED NO ES UNA TABLA QUE FALTA, y decir lo segundo
+       cuando pasa lo primero manda al autor a pegar quinientas líneas de
+       SQL en una base que ya las tiene. PostgREST distingue las dos cosas:
+       42P01 es «la relación no existe» y lo demás es lo demás. */
+    if (error.code === '42P01' || /does not exist/i.test(error.message || '')) {
+      _rodHay = false;
+      _rodPro = [];
+      rodSinTabla();
+    } else {
+      cuerpo.textContent = '';
+      cuerpo.appendChild(rodVacio('📡', 'No se pudo hablar con la nube.',
+        'Puede ser la señal. Las tablas están puestas; lo que no llegó fue la petición. ' +
+        'Vuelve a entrar en un momento. (' + (error.message || 'sin detalle') + ')'));
+    }
     return;
   }
 
@@ -517,7 +528,11 @@ function rodUsos(fid) {
       if (x.fid === fid) usos.push({ b, t: b.ini + (Number(x.t) || 0), via: 'sonido' });
     });
   });
-  return usos.sort((a, b) => a.t - b.t);
+  usos.sort((a, b) => a.t - b.t);
+  /* Un bloque que acredita la película Y además arranca su música daba dos
+     apariciones en el mismo segundo: en la ficha se leía «suena en 2
+     momentos: 0:15, 0:15», que es un número que no significa nada. */
+  return usos.filter((u, i) => i === 0 || u.t !== usos[i - 1].t);
 }
 
 /* ══════════════ LA CABECERA ══════════════ */
@@ -741,6 +756,14 @@ function rodRevisar() {
     (Array.isArray(b.sfx) ? b.sfx : []).forEach(s => {
       if (!String(s.que || '').trim()) {
         av.push({ para: false, txt: 'Hay un efecto de sonido sin describir en «' + (b.titulo || 'sin título') + '».' });
+      }
+      /* Un golpe puesto más allá del final de su bloque no da ningún error:
+         suena encima del bloque SIGUIENTE, y al reordenar se va con el
+         bloque equivocado. Es el único caso en que la decisión de colgar
+         las señales del bloque se puede volver en contra, así que se dice. */
+      if (Number(s.t) > Number(b.dur)) {
+        av.push({ para: false, txt: 'En «' + (b.titulo || 'sin título') + '» hay un efecto a los ' +
+          rodReloj(s.t) + ' y el bloque solo dura ' + rodReloj(b.dur) + ': sonaría sobre el siguiente.' });
       }
     });
   });
@@ -1043,14 +1066,41 @@ function rodMontarArrastre(lista) {
   if (lista.dataset.rodArrastre) return;
   lista.dataset.rodArrastre = '1';
 
-  let nodo = null, idPuntero = null;
+  let nodo = null, idPuntero = null, autoId = null, autoDir = 0;
   const filas = () => [...lista.querySelectorAll(':scope > [data-rod-bid]')];
   const enOrden = () => filas().map(n => n.getAttribute('data-rod-bid'));
 
+  /* ⚠️ EL DESPLAZAMIENTO AUTOMÁTICO EN LOS BORDES.
+     Sin esto, un bloque solo se puede mover lo que quepa en la pantalla:
+     dos o tres puestos. Y esta herramienta se pensó para secuencias de
+     treinta bloques, o sea que la función existía y no servía para el
+     caso para el que se hizo — que es peor que no tenerla, porque uno lo
+     intenta, no funciona, y no vuelve a intentarlo.
+
+     Se mueve el contenedor que de verdad desplaza, que es `.view-scroll` de
+     la vista y no la lista: la lista no tiene desbordamiento propio. */
+  const marco = () => lista.closest('.view-scroll');
+
+  function autoParar() {
+    if (autoId) { clearInterval(autoId); autoId = null; }
+    autoDir = 0;
+  }
+  function autoEmpezar(dir) {
+    if (autoDir === dir) return;
+    autoParar();
+    if (!dir) return;
+    autoDir = dir;
+    const m = marco();
+    if (!m) return;
+    autoId = setInterval(() => { m.scrollTop += dir * 14; }, 16);
+  }
+
   function soltar() {
+    autoParar();
     if (!nodo) return;
     nodo.classList.remove('rod-arrastrando');
     lista.classList.remove('rod-moviendo');
+    document.body.classList.remove('rod-arrastrando-body');
     nodo = null; idPuntero = null;
     rodGuardarOrden(enOrden());
   }
@@ -1068,12 +1118,27 @@ function rodMontarArrastre(lista) {
     nodo = fila; idPuntero = ev.pointerId;
     nodo.classList.add('rod-arrastrando');
     lista.classList.add('rod-moviendo');
+    /* Mientras dura el arrastre, el botón flotante de Destellos deja de
+       recibir el puntero: vive justo en la esquina de abajo a la derecha,
+       que es por donde pasa el dedo al llevar un bloque hacia el final, y
+       se comía el gesto sin que se viera por qué. */
+    document.body.classList.add('rod-arrastrando-body');
     try { asa.setPointerCapture(ev.pointerId); } catch (e) {}
   });
 
   lista.addEventListener('pointermove', ev => {
     if (!nodo || ev.pointerId !== idPuntero) return;
     ev.preventDefault();
+
+    /* Cerca de un borde, la lista se mueve sola. La franja son 90 px: menos
+       no se acierta con el dedo, y más se dispara sin querer al arrastrar
+       entre dos vecinos. */
+    const m = marco();
+    if (m) {
+      const c = m.getBoundingClientRect();
+      const F = 90;
+      autoEmpezar(ev.clientY < c.top + F ? -1 : ev.clientY > c.bottom - F ? 1 : 0);
+    }
     /* La fila que se arrastra tiene `pointer-events: none` por CSS
        mientras dura, así que esto devuelve la que hay DEBAJO. */
     const bajo = document.elementFromPoint(ev.clientX, ev.clientY);
@@ -1107,6 +1172,48 @@ function rodMontarArrastre(lista) {
   });
 }
 
+/* ⚠️ LOS RELOJES SE REESCRIBEN, PERO LA LISTA NO SE REPINTA.
+   Al soltar un bloque no se puede repintar —repintar le arranca de debajo
+   del dedo el elemento que va a recibir el toque siguiente, que es la
+   lección de la barra de grupos de M.E.T.A.S—; pero si no se toca nada, la
+   columna de relojes se queda con los minutos del orden VIEJO. Y esa
+   columna es lo único que se mira para saber dónde cae cada cosa: una
+   tarjeta que dice 3:10 cuando ya empieza en 0:15 es exactamente el fallo
+   que toda esta herramienta existe para impedir.
+
+   La salida es no crear ni destruir un solo nodo: se le cambia el TEXTO a
+   los dos que llevan el reloj, y el DOM sigue siendo el mismo de antes. */
+function rodRefrescarRelojes() {
+  const lista = document.getElementById('rod-lista');
+  if (!lista) return;
+  const pro = rodProyecto();
+  const topeBloque = pro ? Number(pro.cam_bloque) : 45;
+  let acc = 0;
+  [...lista.querySelectorAll(':scope > [data-rod-bid]')].forEach(nodo => {
+    const b = _rodBlo.find(x => x.bid === nodo.getAttribute('data-rod-bid'));
+    if (!b) return;
+    const ini = nodo.querySelector('.rod-reloj b');
+    const dur = nodo.querySelector('.rod-reloj-dur');
+    if (ini) ini.textContent = rodReloj(acc);
+    if (dur) {
+      dur.textContent = '+' + rodReloj(b.dur);
+      dur.classList.toggle('rod-reloj-largo',
+        b.clase === 'camara' && Number(b.dur) > topeBloque);
+    }
+    /* Y los minutos absolutos de las señales de audio, por lo mismo: son
+       los que se leen al montar. */
+    let n = 0;
+    nodo.querySelectorAll('.rod-sub-sfx').forEach(el => {
+      const sx = (Array.isArray(b.sfx) ? b.sfx : [])[n++];
+      if (!sx) return;
+      el.textContent = '💥 ' + rodReloj(acc + (Number(sx.t) || 0)) + ' · ' +
+        (sx.que || '⚠️ sin describir') +
+        (sx.fid && rodFuente(sx.fid) ? ' · ' + (rodFuente(sx.fid).titulo || sx.fid) : '');
+    });
+    acc += Math.max(0, Number(b.dur) || 0);
+  });
+}
+
 async function rodGuardarOrden(bids) {
   const sb = rodSb();
   if (!sb) return;
@@ -1124,6 +1231,7 @@ async function rodGuardarOrden(bids) {
      mismo, y si la escritura falla se vuelve a traer todo de la nube. */
   _rodBlo = nuevos;
   rodPintarPanel();
+  rodRefrescarRelojes();
 
   if (!cambios.length) return;
   const res = await Promise.all(cambios.map(c =>
@@ -1254,7 +1362,12 @@ function rodSenales() {
       /* Un «sigue igual» seguido de otro «sigue igual» con la misma pista
          no es una señal: es que no pasa nada. Enseñarlo cuarenta veces
          llenaría la lista de ruido y escondería las que sí importan. */
-      const firma = mus.acc + '|' + (mus.fid || '');
+      /* La firma lleva TAMBIÉN el nivel y el trozo. Con solo la acción y la
+         pista, un «sigue» que además baja la música o salta a otro trozo
+         se leía como «no pasa nada» y desaparecía de la lista: justo el
+         cambio que había que ver. */
+      const firma = mus.acc + '|' + (mus.fid || '') + '|' + (mus.niv || '') +
+                    '|' + (mus.ini || 0) + '|' + (mus.fin || 0);
       if (!(mus.acc === 'sigue' && firma === ultimaMus)) {
         senales.push({ t: b.ini, tipo: 'mus', b, mus });
       }
@@ -1780,6 +1893,13 @@ function rodBloqueAbrir(b, claseSugerida) {
   if (t) t.textContent = b ? 'Bloque de la secuencia' : 'Bloque nuevo';
   const av = document.getElementById('rod-b-aviso');
   if (av) av.textContent = '';
+  const eco = document.getElementById('rod-b-eco');
+  if (eco) {
+    const seg = b ? Number(b.dur) : 30;
+    const est = b ? rodDurGuion(b.guion) : 0;
+    eco.textContent = '⏱ Se entiende ' + rodReloj(seg) + (seg < 60 ? ' (' + seg + ' segundos)' : '') +
+      (est ? '  ·  lo escrito son ≈ ' + rodReloj(est) + ' hablando' : '');
+  }
   rodOverlay('rod-b-overlay', true);
 }
 
@@ -2318,6 +2438,19 @@ const ROD_PALABRAS_CLASE = {
   musica:   ['musica', 'música', 'respiro', 'interludio', 'bgm'],
   titulo:   ['titulo', 'título', 'carton', 'cartón', 'texto', 'rotulo', 'rótulo', 'placa'],
 };
+/* Las palabras que abren una directiva. Viven aquí arriba y no dentro del
+   lector porque hacen falta DOS veces: para decidir que una línea es una
+   directiva y no una cabecera —«Música: entra de fondo» es lo primero—, y
+   para repartirla después. Dos listas separadas se habrían desincronizado
+   a la tercera palabra que alguien añadiera. */
+const ROD_DIRECTIVAS = [
+  'visual', 'imagen', 'plano', 'video', 'toma',
+  'nota', 'notas', 'rotulo', 'cintillo', 'lower',
+  'fuente', 'cita', 'credito', 'creditos', 'ref', 'referencia',
+  'sfx', 'fx', 'efecto', 'sonido', 'golpe',
+  'musica', 'bgm', 'pista', 'cancion',
+];
+
 function rodClaseDe(palabra) {
   const p = String(palabra || '').toLowerCase().replace(/[^a-záéíóúñ-]/g, '');
   if (!p) return '';
@@ -2358,9 +2491,24 @@ function rodLeerGuion(texto) {
     if (!l) return;
     if (/^[-=_~#*·—–]{3,}$/.test(l)) return;          // ---, ***, ═══, ———
 
+    /* ── ¿Es una DIRECTIVA? ──
+       ⚠️ VA ANTES QUE LA CABECERA, y esto costó encontrarlo. Al revés,
+       una línea como «Música: entra de fondo» —que es como se escribe sin
+       acordarse del «>»— caía en la rama de la cabecera, porque «música»
+       es una de las palabras que nombran una clase de bloque: en vez de
+       poner la música del bloque abría un bloque NUEVO titulado «entra de
+       fondo». Lo mismo con «Rótulo:», «Toma:» y «Texto:». */
+    const dirAntes = l.match(/^[>\-•*·]?\s*([a-zA-Záéíóúñ]{2,12})\s*[:：]\s*(.*)$/) ||
+                     l.match(/^[>\-•*·]\s*(sfx|fx|efecto|sonido|golpe)\b\s*(.*)$/i);
+    const claveAntes = dirAntes
+      ? dirAntes[1].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      : '';
+    const esDirectiva = actual && ROD_DIRECTIVAS.indexOf(claveAntes) >= 0;
+
     /* ── ¿Es una cabecera de bloque? ── */
     let cab = null;
-    const conCorchetes = l.match(/^[[(【]\s*([^\]\)】]{1,60})\s*[\])】]\s*[-–—:.]?\s*(.*)$/);
+    const conCorchetes = esDirectiva ? null
+      : l.match(/^[[(【]\s*([^\]\)】]{1,60})\s*[\])】]\s*[-–—:.]?\s*(.*)$/);
     if (conCorchetes) {
       const dentro = rodSacaTiempo(conCorchetes[1]);
       const clase = rodClaseDe(dentro.resto.split(/\s+/)[0]) ||
@@ -2369,7 +2517,8 @@ function rodLeerGuion(texto) {
         cab = { clase: clase || 'camara', dur: dentro.seg, titulo: conCorchetes[2].trim() };
       }
     }
-    if (!cab) {
+    if (!cab && !esDirectiva) {
+      const conAlmohadilla = /^#{1,4}\s+/.test(l);
       const limpio = l.replace(/^#+\s*/, '').replace(/\*\*/g, '');
       const prim = limpio.split(/\s+/)[0];
       const clase = rodClaseDe(prim);
@@ -2383,24 +2532,35 @@ function rodLeerGuion(texto) {
            Y el quitanúmeros exige un separador o un espacio detrás, para
            que un título como «1968: el año que...» no se quede en «68». */
         const t = rodSacaTiempo(limpio.slice(prim.length));
-        const titulo = t.resto
-          .replace(/^\s*\d{1,2}(?:\s*[.:)\-–—]\s*|\s+)/, '')
-          .replace(/^[-–—:.]\s*/, '').trim();
-        cab = { clase, dur: t.seg, titulo };
+        /* ⚠️ SIN DURACIÓN NO ES UNA CABECERA: ES PROSA, Y ESTO COSTÓ CARO.
+           Sin esta condición, cualquier línea del guion que empezara por
+           una de las palabras que nombran una clase abría un bloque nuevo
+           —y las palabras son «veo», «yo», «texto», «escena», «clip»,
+           «toma», «música»…, o sea media lengua—. Un párrafo de seis
+           líneas entraba como seis bloques vacíos con el texto convertido
+           en títulos: el guion no se perdía, se descuartizaba, que es
+           peor, porque parece que funcionó.
+           La forma con corchetes es inequívoca y no necesita esto; una
+           cabecera pelada necesita su tiempo, o al menos un «##». */
+        if (t.seg || conAlmohadilla) {
+          const titulo = t.resto
+            .replace(/^\s*\d{1,2}(?:\s*[.:)\-–—]\s*|\s+)/, '')
+            .replace(/^[-–—:.]\s*/, '').trim();
+          cab = { clase, dur: t.seg, titulo };
+        }
       }
     }
     if (cab) { nuevo(cab.clase, cab.titulo, cab.dur); return; }
 
-    /* ── ¿Es una directiva? ── */
-    const dir = l.match(/^[>\-•*·]?\s*([a-zA-Záéíóúñ]{2,12})\s*[:：]\s*(.*)$/) ||
-                l.match(/^[>\-•*·]\s*(sfx|fx|efecto|sonido|golpe)\b\s*(.*)$/i);
+    /* ── La directiva, ya reconocida arriba ── */
+    const dir = dirAntes;
     if (dir && actual) {
       /* Sin tildes para comparar: nadie escribe «música» y «musica» igual
          dos veces seguidas, y el guion viene pegado de otro sitio. Los
          acentos se quitan con el rango de marcas combinantes escrito con
          escapes: en claro son caracteres invisibles que cualquier editor
          se come al copiar el archivo. */
-      const clave = dir[1].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const clave = claveAntes;
       const valor = (dir[2] || '').trim();
       if (['visual', 'imagen', 'plano', 'video', 'toma'].indexOf(clave) >= 0) { actual.visual = valor; return; }
       if (['nota', 'notas'].indexOf(clave) >= 0) { actual.notas = valor; return; }
@@ -2581,11 +2741,21 @@ async function rodPegarMeter() {
   if (nuevas.length) {
     const { error: eF } = await sb.from(ROD_T_FUE).insert(nuevas);
     if (eF) {
-      if (btn) btn.textContent = '➕ Añadir';
+      /* ⚠️ Y SE VUELVE A ENCENDER EL BOTÓN. Sin esto, un fallo de red
+         dejaba la ventana con el guion escrito, el botón apagado y un
+         mensaje que pide reintentar algo que ya no se puede tocar: el
+         único camino era cerrar y volver a pegar los treinta bloques. */
+      if (btn) { btn.disabled = false; btn.textContent = '➕ Añadir'; }
       if (av) av.textContent = '⚠️ No se pudieron crear las fuentes: ' + (eF.message || '') +
-                               ' No se añadió nada; vuelve a intentarlo.';
+                               ' No se añadió nada; vuelve a darle a Añadir.';
       return;
     }
+    /* ⚠️ Y LA COPIA EN MEMORIA SE ENTERA, aquí y no al final. Si no, un
+       fallo en los bloques de abajo dejaba `_rodFue` sin las fuentes recién
+       creadas, y al reintentar el «¿ya existe una con este título?» decía
+       que no y las creaba OTRA VEZ — justo lo contrario de lo que promete
+       el mensaje de error. */
+    _rodFue = _rodFue.concat(nuevas);
   }
 
   let orden = (_rodBlo.length ? Math.max(..._rodBlo.map(b => Number(b.orden) || 0)) : 0);
@@ -2593,7 +2763,12 @@ async function rodPegarMeter() {
     orden++;
     return {
       pid: _rodPid, bid: rodId('b'), orden,
-      clase: b.clase, titulo: b.titulo, dur: b.dur,
+      clase: b.clase, titulo: b.titulo,
+      /* Acotada al mismo tope que el `check` de la columna. Una cabecera
+         con «2:00:00» daba 7200 y la base rebotaba el insert ENTERO con un
+         error que habla de una restricción: treinta bloques perdidos y las
+         fuentes ya creadas, por un cero de más en una línea. */
+      dur: Math.max(0, Math.min(3600, Number(b.dur) || 0)),
       guion: b.guion, visual: b.visual, notas: b.notas, rotulo: b.rotulo,
       sfx: b.sfx, musica: b.musica || {},
       fids: b.citas.map(t => porTexto[t]).filter(Boolean),
@@ -2618,16 +2793,20 @@ async function rodPegarMeter() {
 }
 
 /* ══════════════ EL TELEPROMPTER ══════════════
-   Solo las tomas a cámara y solo su guion: lo demás no se dice en voz
-   alta. Pasa a la velocidad que se le ponga, y el reloj de arriba corre
-   para poder comparar lo que se tarda con lo que estaba presupuestado —que
-   es la única forma de descubrir que una toma de «45 segundos» son en
-   realidad dos minutos—.
+   TODO lo que se dice en voz alta: las tomas a cámara y la voz en off, que
+   en un video-ensayo es la mitad del texto. Cada bloque dice cuál es cuál.
+   Lo que no lleva es lo que no se dice: un bloque sin guion no aparece, y
+   las indicaciones de plano van en letra chica, no en el texto que se lee.
+
+   Pasa a la velocidad que se le ponga, y el reloj de arriba corre para
+   poder comparar lo que se tarda con lo que estaba presupuestado —que es la
+   única forma de descubrir que una toma de «45 segundos» son en realidad
+   dos minutos—.
 
    El espejo es para quien lea sobre un cristal delante del objetivo, que
    es como se mira a la cámara mientras se lee. Sin él hay que aprenderse
    el texto o mirar a un lado, y las dos cosas se notan. */
-let _rodPromInt = null, _rodPromReloj = null, _rodPromSeg = 0, _rodPromVel = 2;
+let _rodPromInt = null, _rodPromReloj = null, _rodPromSeg = 0, _rodPromVel = 2, _rodPromLuz = null;
 
 function rodPrompterAbrir(bid) {
   const caja = document.getElementById('rod-prompter-txt');
@@ -2705,12 +2884,27 @@ function rodPrompterAbrir(bid) {
     const r = document.getElementById('rod-prom-reloj');
     if (r) r.textContent = rodReloj(_rodPromSeg);
   }, 1000);
+
+  /* ⚠️ Y LA PANTALLA NO SE APAGA MIENTRAS SE ENSAYA.
+     Una tableta se apaga sola al minuto y medio sin que la toquen, y
+     leyendo un guion no se la toca: se apaga justo en mitad de la toma, y
+     hay que desbloquearla con las manos ocupadas y la cámara grabando.
+     El permiso puede no existir o negarse; si falla, no pasa nada más que
+     lo de antes, así que no se avisa de ello. */
+  if (navigator.wakeLock && navigator.wakeLock.request) {
+    navigator.wakeLock.request('screen')
+      .then(w => { _rodPromLuz = w; })
+      .catch(() => {});
+  }
 }
 
 function rodPrompterCerrar() {
   rodOverlay('rod-prompter', false);
   rodPrompterPasar(false);
   if (_rodPromReloj) { clearInterval(_rodPromReloj); _rodPromReloj = null; }
+  /* Se suelta el permiso de pantalla encendida: dejarlo puesto se come la
+     batería de la tableta el resto del día sin que nada lo diga. */
+  if (_rodPromLuz) { try { _rodPromLuz.release(); } catch (e) {} _rodPromLuz = null; }
 }
 
 function rodPrompterPasar(encender) {
@@ -2806,9 +3000,37 @@ function rodExportarRotulos() {
    en su propio apartado y el primero, con su herramienta y su prompt. Es
    lo que el autor pidió: que se distinga lo que hizo una IA de lo que hizo
    una persona, y que se distinga sin tener que buscarlo. */
+const ROD_CORTE = '──────── copia de aquí para abajo ────────';
+
 function rodExportarBibliografia() {
   const pro = rodProyecto();
   const L = [];
+
+  /* ⚠️ LOS AVISOS VAN ARRIBA DEL CORTE, NUNCA DENTRO DEL TEXTO.
+     La primera versión metía «⚠️ SIN VERIFICAR EN EL ORIGINAL» al lado de
+     cada fuente que lo estuviera. Eso es una nota para el autor metida
+     dentro de un texto cuyo único destino es pegarse en la descripción
+     PÚBLICA de un video: la nota se iba con él, y lo que leía cualquiera
+     era una lista de fuentes que el propio autor declaraba sin comprobar.
+     Ahora van agrupadas encima de una raya, y el botón de copiar copia
+     solo lo que hay debajo. */
+  const pendientes = [];
+  _rodFue.forEach(f => {
+    const q = f.titulo || f.fid;
+    if (!f.verificada) pendientes.push('· «' + q + '» sin verificar en el original.');
+    if (f.licencia === 'desconocida') pendientes.push('· «' + q + '» sin licencia determinada.');
+    if (rodFuenteClase(f.clase).ia && !String(f.prompt || '').trim()) {
+      pendientes.push('· «' + q + '» es generada y no guarda su prompt.');
+    }
+  });
+  if (pendientes.length) {
+    L.push('⚠️ ANTES DE PUBLICAR — esto NO se pega, es para ti:');
+    pendientes.forEach(x => L.push(x));
+    L.push('');
+  }
+  L.push(ROD_CORTE);
+  L.push('');
+
   L.push('FUENTES Y CRÉDITOS' + (pro && pro.titulo ? ' · ' + pro.titulo : ''));
   L.push('');
   L.push('Todo lo que se ve y se oye en este video está identificado abajo.');
@@ -2846,11 +3068,9 @@ function rodExportarBibliografia() {
       if (lic && f.licencia !== 'generado_ia' && f.licencia !== 'desconocida') {
         L.push('  Licencia: ' + lic.n);
       }
-      if (f.licencia === 'desconocida') L.push('  ⚠️ LICENCIA SIN DETERMINAR — resolver antes de publicar');
       const href = rodEnlace(f.url);
       if (href) L.push('  ' + href);
       if (minutos[f.fid]) L.push('  Aparece en: ' + [...new Set(minutos[f.fid])].join(', '));
-      if (!f.verificada) L.push('  ⚠️ SIN VERIFICAR EN EL ORIGINAL — comprobar antes de publicar');
     });
   });
 
@@ -2903,6 +3123,26 @@ document.addEventListener('DOMContentLoaded', () => {
   clic('rod-p-guardar', rodProyectoGuardar);
   clic('rod-p-borrar', rodProyectoBorrar);
 
+  /* ⚠️ LA DURACIÓN SE DEVUELVE ENTENDIDA, EN VOZ ALTA.
+     En el teclado de una tableta los dos puntos están escondidos, así que
+     lo que se escribe es «3» — y «3» son tres SEGUNDOS, no tres minutos.
+     No se adivina cuál de las dos quería decir: se le enseña al momento en
+     qué se ha convertido, con el equivalente hablado al lado. Adivinar
+     acierta la mitad de las veces y falla en silencio; enseñar acierta
+     siempre. */
+  const ecoDur = () => {
+    const eco = document.getElementById('rod-b-eco');
+    if (!eco) return;
+    const seg = rodSegs(rodVal('rod-b-dur'));
+    const est = rodDurGuion(rodVal('rod-b-guion'));
+    if (!seg) { eco.textContent = rodVal('rod-b-dur') ? '⚠️ No se entiende esa duración. Escribe «0:45», «45s» o «1m30s».' : ''; return; }
+    eco.textContent = '⏱ Se entiende ' + rodReloj(seg) +
+      (seg < 60 ? ' (' + seg + ' segundos)' : '') +
+      (est ? '  ·  lo escrito son ≈ ' + rodReloj(est) + ' hablando' : '');
+  };
+  escribe('rod-b-dur', ecoDur);
+  escribe('rod-b-guion', ecoDur);
+
   clic('rod-b-cerrar', () => rodOverlay('rod-b-overlay', false));
   clic('rod-b-guardar', rodBloqueGuardar);
   clic('rod-b-sfx-mas', () => { _rodSfxTmp.push({ t: 0, que: '', fid: '' }); rodPintarSfx(); });
@@ -2944,7 +3184,12 @@ document.addEventListener('DOMContentLoaded', () => {
   clic('rod-texto-cerrar', () => rodOverlay('rod-texto-overlay', false));
   clic('rod-texto-copiar', () => {
     const ta = document.getElementById('rod-texto-caja');
-    if (ta) { ta.select(); rodCopiar(ta.value); }
+    if (!ta) return;
+    /* Si el texto trae la raya, se copia SOLO lo de debajo: lo de encima
+       son notas para el autor, y este texto va a la descripción pública de
+       un video. Verlas en pantalla sirve; pegarlas, no. */
+    const i = ta.value.indexOf(ROD_CORTE);
+    rodCopiar(i >= 0 ? ta.value.slice(i + ROD_CORTE.length).replace(/^\n+/, '') : ta.value);
   });
 
   clic('rod-prom-cerrar', rodPrompterCerrar);

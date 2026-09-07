@@ -53,10 +53,12 @@
   width: 100%; padding: .6rem .7rem;
   border: 1.5px solid var(--border); border-radius: 10px;
   background: var(--surface); color: var(--text);
-  font-size: .95rem; font-family: inherit;
-  /* 16px reales en el campo: por debajo, Safari de iPhone hace zoom al
-     enfocar y deja la ventana torcida. Es la misma línea que en el
-     formulario de los videos de M.E.T.A.S. */
+  /* ⚠️ 1rem = 16 px REALES, no 0.95rem. El comentario decía «16 px» y el
+     valor eran 15,2: por debajo de 16, Safari de iPhone hace zoom al
+     enfocar el campo y deja la ventana torcida, y hay que pellizcar para
+     volver. Un comentario que promete lo que el valor no cumple es peor
+     que no tenerlo, porque el siguiente que pase se fía. */
+  font-size: 1rem; font-family: inherit;
   min-height: 44px;
 }
 textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
@@ -437,3 +439,9 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
    es cuál mientras pasa el texto. */
 .rod-prom-off .rod-prom-rot { border-color: #06b6d4; color: #06b6d4; }
 .rod-prom-off .rod-prom-p   { color: #cbd5e1; font-weight: 600; }
+
+/* Mientras se arrastra un bloque, el botón flotante de Destellos deja de
+   recibir el puntero. Vive en la esquina de abajo a la derecha, que es
+   justo por donde pasa el dedo al llevar un bloque hacia el final de la
+   secuencia, y se comía el gesto sin que se viera por qué. */
+body.rod-arrastrando-body #destello-fab { pointer-events: none; }
