@@ -4,7 +4,29 @@
    Hoja propia, como la de La Criba, y por lo mismo: es una herramienta
    con su propio vocabulario visual —el reloj de cada bloque, la barra de
    la mezcla, el marco vertical del reel— y meterlo en app.css sería
-   añadirle doscientas líneas que solo se usan en una pantalla.
+   añadirle novecientas líneas que solo se usan en una pantalla.
+
+   ⚠️ ESTA PANTALLA ES OSCURA, Y NO ES UNA MANÍA DE ESTILO.
+   Aquí se juzgan IMÁGENES: un fotograma de película, un rótulo blanco
+   sobre el video, un cartel de reel, el encuadre de la propia cara en la
+   cámara. Sobre un fondo blanco todo eso se ve más claro de lo que es y
+   los rótulos parecen apagados; sobre negro se ve lo que se va a ver. Es
+   el mismo motivo por el que un programa de montaje es oscuro, y no hay
+   ninguno que no lo sea. Además se trabaja de noche y con la luz apagada
+   para grabar, y una pantalla blanca a esa hora deslumbra y se refleja
+   en las gafas dentro de la propia toma.
+
+   ⚠️ Y SE OSCURECE CON LOS TOKENS DE LA APLICACIÓN, REDEFINIDOS AQUÍ
+   DENTRO. `--surface`, `--bg`, `--border`, `--text`… se vuelven a
+   declarar en `#view-rodaje` y en las seis ventanas de la herramienta,
+   así que todo lo que hereda de app.css —`.fin-modal`, `.msug-vacio`,
+   `.msug-det-head`— se pone oscuro solo y SIN TOCAR app.css. Si se
+   hubiera hecho copiando reglas, cada arreglo de app.css habría que
+   repetirlo aquí y esta pantalla se iría quedando vieja sola.
+
+   ⚠️ Y NO SE TOCA NADA FUERA DE `#view-rodaje` NI DE ESOS SEIS `id`.
+   El resto de F.A.R.O es claro y sigue siéndolo. Un token redefinido en
+   `:root` habría teñido la casa entera.
 
    ⚠️ LOS COLORES DE CLASE SE LEEN CON RÓTULO, NUNCA SOLO CON COLOR.
    Cada bloque lleva su emoji y su nombre escrito además de la franja de
@@ -13,46 +35,119 @@
    ocho tonos seguidos no los distingue nadie, con o sin daltonismo—.
 ───────────────────────────────────────────── */
 
-/* El color de la herramienta. Violeta de sala de cine: no lo usa ninguna
-   otra pantalla de la casa, que es lo único que se le pide a un color de
-   herramienta. */
-#view-rodaje { --rod: #6d28d9; --rod-suave: #f5f3ff; }
+/* ═══════════════ LOS COLORES DE LA SALA ═══════════════
+   Van en los seis `id` de las ventanas además de en la vista porque las
+   ventanas viven FUERA de `#view-rodaje`, colgando del `body`: sin
+   nombrarlas una por una, se abrirían blancas encima de la sala oscura y
+   deslumbrarían justo al escribir. */
+#view-rodaje,
+#rod-p-overlay, #rod-b-overlay, #rod-f-overlay, #rod-r-overlay,
+#rod-pegar-overlay, #rod-texto-overlay, #rod-prompter {
+  /* El violeta de sala de cine. No lo usa ninguna otra pantalla de la
+     casa, que es lo único que se le pide a un color de herramienta. */
+  --rod:       #8b5cf6;
+  --rod-luz:   #a78bfa;
+  --rod-suave: rgba(139,92,246,.12);
+  --rod-rec:   #f43f5e;   /* el rojo de grabación, y solo para eso */
 
+  /* Los tokens de la aplicación, en oscuro. Redefinidos, no copiados. */
+  --bg:      #0a0e17;
+  --surface: #141a26;
+  --border:  #26303f;
+  --text:    #e9eef7;
+  --muted:   #97a3b6;
+  --faint:   #6b7788;
+  --brand:   #a78bfa;
+  --accent:  #f59e0b;
+  --shadow:    0 2px 12px rgba(0,0,0,.45);
+  --shadow-md: 0 10px 34px rgba(0,0,0,.55);
+
+  /* ⚠️ Números en tipografía de máquina, y del SISTEMA, no de la red.
+     Los relojes, los porcentajes y los códigos de tiempo se leen en
+     columna y comparándolos entre sí; con la tipografía del texto los
+     dígitos bailan de ancho y la columna deja de ser columna. Y se usa
+     la del aparato en vez de traer una de Google porque esto es una
+     aplicación con service worker que tiene que servir para grabar sin
+     señal: una tipografía que no llega dejaría los códigos de tiempo en
+     la de repuesto justo el día que se está en el campo. */
+  --rod-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Roboto Mono',
+              Menlo, Consolas, monospace;
+}
+
+/* ⚠️ LA BARRA DE ABAJO VIVE FUERA DE LA VISTA, así que hay que ir a
+   buscarla. `switchView` le pone `rod-sala` al `body` al entrar y se la
+   quita al salir; sin esto, una franja blanca de setenta píxeles corta la
+   sala justo por donde está el mando del monitor, que es lo primero que se
+   mira. Y se apaga sola en cuanto se sale: no hay ningún otro sitio de la
+   casa que quiera esto. */
+body.rod-sala { background: #080b12; }
+body.rod-sala .bottom-nav {
+  background: rgba(12,17,28,.94); border-top-color: #26303f;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  box-shadow: 0 -4px 20px rgba(0,0,0,.5);
+}
+body.rod-sala .nav-item { color: #7c8798; }
+body.rod-sala .nav-item.active { color: #a78bfa; }
+
+/* La sala. El degradado no es adorno: separa la cabecera del cuerpo sin
+   una línea más, y la vista es larga. */
+#view-rodaje {
+  /* El color liso va aparte del degradado a propósito: un degradado que
+     el navegador no entienda deja el `background-image` en nada, y «nada»
+     es TRANSPARENTE — o sea, la sala oscura con el blanco de la casa
+     detrás y el texto claro encima, ilegible. Es la misma trampa del
+     `var(--card)` de Videos M.E.T.A.S: no da error y no lo caza ninguna
+     sonda que mire el HTML. */
+  background-color: #0a0e17;
+  background-image:
+    radial-gradient(1100px 520px at 50% -12%, rgba(139,92,246,.16), transparent 65%),
+    linear-gradient(180deg, #0c1120 0%, #0a0e17 46%, #080b12 100%);
+  color: var(--text);
+}
+#view-rodaje .app-header {
+  background: rgba(10,14,23,.86);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+#view-rodaje .view-title {
+  color: #f1f5f9; letter-spacing: .01em;
+}
+#view-rodaje .back-icon-btn { color: var(--muted); }
+
+/* El icono del Acceso Rápido vive FUERA de la sala, en la portada clara.
+   Se queda como está. */
 .qa-rod { background: linear-gradient(135deg, #4c1d95, #a78bfa); }
 
-/* ── Los ocho colores de clase ──
-   Se escriben una vez y se usan en la franja de la tarjeta, en la píldora
-   y en la barra de la mezcla: si en los tres sitios no fuera el mismo,
-   la barra no se podría leer mirando las tarjetas. */
-.rod-c-cam { background: #b45309; } .rod-p-cam { background: rgba(180,83,9,.14);   color: #92400e; }
-.rod-c-pel { background: #0891b2; } .rod-p-pel { background: rgba(8,145,178,.14);  color: #0e7490; }
-.rod-c-ia  { background: #7c3aed; } .rod-p-ia  { background: rgba(124,58,237,.14); color: #6d28d9; }
-.rod-c-gra { background: #059669; } .rod-p-gra { background: rgba(5,150,105,.14);  color: #047857; }
-.rod-c-arc { background: #475569; } .rod-p-arc { background: rgba(71,85,105,.14);  color: #334155; }
-.rod-c-pan { background: #2563eb; } .rod-p-pan { background: rgba(37,99,235,.14);  color: #1d4ed8; }
-.rod-c-mus { background: #db2777; } .rod-p-mus { background: rgba(219,39,119,.14); color: #be185d; }
-.rod-c-tit { background: #64748b; } .rod-p-tit { background: rgba(100,116,139,.14); color: #475569; }
+/* ── Los ocho colores de clase, en su versión de pantalla oscura ──
+   Se escriben una vez y se usan en la franja de la tarjeta, en la
+   píldora, en la barra de la mezcla y en la pista del monitor: si en los
+   cuatro sitios no fuera el mismo, la pista no se podría leer mirando
+   las tarjetas. Son más claros que los de la versión clara a propósito:
+   un #b45309 sobre negro es un borrón marrón. */
+.rod-c-cam { background: #f59e0b; } .rod-p-cam { background: rgba(245,158,11,.16);  color: #fbbf24; }
+.rod-c-pel { background: #22d3ee; } .rod-p-pel { background: rgba(34,211,238,.16);  color: #67e8f9; }
+.rod-c-ia  { background: #a78bfa; } .rod-p-ia  { background: rgba(167,139,250,.18); color: #c4b5fd; }
+.rod-c-gra { background: #34d399; } .rod-p-gra { background: rgba(52,211,153,.16);  color: #6ee7b7; }
+.rod-c-arc { background: #94a3b8; } .rod-p-arc { background: rgba(148,163,184,.16); color: #cbd5e1; }
+.rod-c-pan { background: #60a5fa; } .rod-p-pan { background: rgba(96,165,250,.16);  color: #93c5fd; }
+.rod-c-mus { background: #f472b6; } .rod-p-mus { background: rgba(244,114,182,.16); color: #f9a8d4; }
+.rod-c-tit { background: #cbd5e1; } .rod-p-tit { background: rgba(203,213,225,.14); color: #e2e8f0; }
 
-.rod-borde-cam { border-left-color: #b45309; } .rod-borde-pel { border-left-color: #0891b2; }
-.rod-borde-ia  { border-left-color: #7c3aed; } .rod-borde-gra { border-left-color: #059669; }
-.rod-borde-arc { border-left-color: #475569; } .rod-borde-pan { border-left-color: #2563eb; }
-.rod-borde-mus { border-left-color: #db2777; } .rod-borde-tit { border-left-color: #64748b; }
-
-.rod-p-ok  { background: rgba(22,163,74,.15);  color: #15803d; }
-.rod-p-bor { background: rgba(234,179,8,.18);  color: #a16207; }
-.rod-p-mal { background: rgba(220,38,38,.14);  color: #b91c1c; }
+.rod-p-ok  { background: rgba(34,197,94,.16);  color: #86efac; }
+.rod-p-bor { background: rgba(234,179,8,.18);  color: #fde047; }
+.rod-p-mal { background: rgba(244,63,94,.16);  color: #fda4af; }
 
 /* ── La cabecera fija de la vista ── */
 .rod-cab { padding: 0 14px; }
 
 .rod-lbl {
-  display: block; font-size: .78rem; font-weight: 700; color: var(--muted);
-  margin: .8rem 0 .25rem; text-transform: uppercase; letter-spacing: .03em;
+  display: block; font-size: .7rem; font-weight: 700; color: var(--faint);
+  margin: .9rem 0 .3rem; text-transform: uppercase; letter-spacing: .09em;
 }
 .rod-sel, .rod-in {
   width: 100%; padding: .6rem .7rem;
-  border: 1.5px solid var(--border); border-radius: 10px;
-  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px;
+  background: #0e131e; color: var(--text);
   /* ⚠️ 1rem = 16 px REALES, no 0.95rem. El comentario decía «16 px» y el
      valor eran 15,2: por debajo de 16, Safari de iPhone hace zoom al
      enfocar el campo y deja la ventana torcida, y hay que pellizcar para
@@ -61,20 +156,45 @@
   font-size: 1rem; font-family: inherit;
   min-height: 44px;
 }
-textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
+.rod-sel:focus, .rod-in:focus {
+  outline: none; border-color: var(--rod);
+  box-shadow: 0 0 0 3px rgba(139,92,246,.22);
+}
+.rod-in::placeholder { color: #55617a; }
+/* El desplegable del sistema pinta su lista con el color del `select`, y
+   en Windows y Android hereda el fondo: sin esto la lista salía blanca
+   sobre blanco en unos aparatos y negra sobre negro en otros. */
+.rod-sel option { background: #141a26; color: var(--text); }
+textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.55; }
 .rod-in-corto { max-width: 108px; min-height: 44px; }
+/* Lo que se copia y se pega —el plan, los rótulos, la descripción— se
+   lee en tipografía de máquina: son listas alineadas con códigos de
+   tiempo, y con la proporcional se desalinean y parecen otra cosa. */
+#rod-texto-caja { font-family: var(--rod-mono); font-size: .82rem; line-height: 1.6; }
 
 .rod-b {
   font-family: inherit; font-size: .85rem; font-weight: 600;
   min-height: 44px;                    /* lo que un dedo acierta sin mirar */
   padding: .5rem .85rem; border-radius: 10px;
-  border: 1.5px solid var(--border); background: var(--bg); color: var(--text);
-  cursor: pointer;
+  border: 1px solid var(--border);
+  background: #1a2130; color: var(--text);
+  cursor: pointer; transition: background .13s, border-color .13s;
 }
-.rod-b:disabled { opacity: .35; cursor: default; }
-.rod-b-pri { background: #6d28d9; color: #fff; border-color: transparent; }
+.rod-b:hover { background: #222b3d; border-color: #364256; }
+.rod-b:active { transform: translateY(1px); }
+.rod-b:disabled { opacity: .32; cursor: default; }
+.rod-b:disabled:hover { background: #1a2130; border-color: var(--border); }
+/* El botón principal lleva luz propia: en una pantalla oscura, un botón
+   plano del mismo tono que el panel no se distingue de una etiqueta. */
+.rod-b-pri {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: #fff; border-color: transparent;
+  box-shadow: 0 3px 14px rgba(124,58,237,.38);
+}
+.rod-b-pri:hover { background: linear-gradient(135deg, #8b5cf6, #b9a2ff); border-color: transparent; }
 .rod-b-min { min-width: 44px; padding: .5rem .6rem; }
 .rod-b-ancho { width: 100%; margin-top: .9rem; }
+.rod-b:focus-visible { outline: 2px solid var(--rod-luz); outline-offset: 2px; }
 .rod-barra {
   display: flex; flex-wrap: wrap;       /* salirse por la derecha no tiene arreglo */
   gap: .5rem; margin: .9rem 0 .6rem;
@@ -85,55 +205,88 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
    solo saliera en su pestaña sería un número que llega cuando ya se
    grabó. */
 .rod-kpis {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: .55rem; margin: .2rem 0 .7rem;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: .5rem; margin: .3rem 0 .7rem;
 }
+/* Cristal: el panel deja ver un poco del degradado de la sala. Es lo que
+   hace que la cabecera se lea como un instrumento encima de la mesa y no
+   como una tabla. */
 .rod-kpi {
-  background: var(--surface); border: 1px solid var(--border);
-  border-top: 3px solid var(--border);
-  border-radius: 12px; padding: .6rem .7rem;
+  position: relative; overflow: hidden;
+  background: linear-gradient(180deg, rgba(30,39,56,.72), rgba(18,24,37,.72));
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: .6rem .7rem .65rem;
 }
-.rod-kpi-bien { border-top-color: #16a34a; }
-.rod-kpi-ojo  { border-top-color: #eab308; }
-.rod-kpi-mal  { border-top-color: #dc2626; background: #fef2f2; }
-.rod-kpi-rot  { font-size: .66rem; font-weight: 700; letter-spacing: .05em; color: var(--muted); }
-.rod-kpi-val  { font-size: 1.5rem; font-weight: 800; line-height: 1.1; margin: .1rem 0; }
-.rod-kpi-mal .rod-kpi-val { color: #b91c1c; }
-.rod-kpi-pie  { font-size: .7rem; color: var(--muted); line-height: 1.3; }
+/* La barra de color va ARRIBA y pegada al borde, como el led de un
+   aparato: un borde de 3 px alrededor entero se confunde con el marco. */
+.rod-kpi::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 3px;
+  background: var(--border);
+}
+.rod-kpi-bien::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.rod-kpi-ojo::before  { background: linear-gradient(90deg, #eab308, #fde047); }
+.rod-kpi-mal::before  { background: linear-gradient(90deg, #e11d48, #fb7185); }
+.rod-kpi-mal {
+  border-color: rgba(244,63,94,.42);
+  background: linear-gradient(180deg, rgba(76,20,35,.66), rgba(28,16,24,.72));
+}
+.rod-kpi-rot  {
+  font-size: .62rem; font-weight: 700; letter-spacing: .11em; color: var(--faint);
+  text-transform: uppercase;
+}
+.rod-kpi-val  {
+  font-family: var(--rod-mono);
+  font-size: 1.55rem; font-weight: 700; line-height: 1.15; margin: .12rem 0 .1rem;
+  color: #f8fafc; letter-spacing: -.02em;
+}
+.rod-kpi-bien .rod-kpi-val { color: #86efac; }
+.rod-kpi-ojo  .rod-kpi-val { color: #fde047; }
+.rod-kpi-mal  .rod-kpi-val { color: #fda4af; }
+.rod-kpi-pie  { font-size: .68rem; color: var(--muted); line-height: 1.35; }
 
 /* La barra de la mezcla. Un porcentaje de cámara solo no dice si el resto
    son clips o cartones de texto; esto sí, y sin números. */
 .rod-mezcla {
-  display: flex; height: 12px; border-radius: 999px; overflow: hidden;
-  background: var(--bg); border: 1px solid var(--border); margin-bottom: .4rem;
+  display: flex; height: 10px; border-radius: 999px; overflow: hidden;
+  background: #0b101a; border: 1px solid var(--border); margin-bottom: .45rem;
 }
 .rod-mezcla-t { display: block; height: 100%; }
-.rod-leyenda { display: flex; flex-wrap: wrap; gap: .3rem .8rem; margin-bottom: .6rem; }
-.rod-ley-i { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; color: var(--muted); }
-.rod-ley-p { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+.rod-leyenda { display: flex; flex-wrap: wrap; gap: .25rem .8rem; margin-bottom: .6rem; }
+.rod-ley-i { display: inline-flex; align-items: center; gap: .3rem; font-size: .7rem; color: var(--muted); }
+.rod-ley-p { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
 
 /* La revisión de antes de publicar. Lo que PARA va en rojo y primero: son
    las dos cosas que el disparador de la base no deja saltar, y verlas
    aquí es verlas antes de chocarse con un error de PostgreSQL. */
 .rod-revision {
-  background: #fff7ed; border: 1px solid rgba(234,88,12,.28);
-  border-left: 3px solid #ea580c; border-radius: 10px;
-  padding: .7rem .8rem; margin: 0 0 .8rem; font-size: .82rem; color: #7c2d12;
+  background: linear-gradient(180deg, rgba(69,26,3,.5), rgba(30,17,8,.5));
+  border: 1px solid rgba(234,88,12,.34);
+  border-left: 3px solid #f97316; border-radius: 12px;
+  padding: .7rem .8rem; margin: 0 0 .8rem; font-size: .82rem; color: #fed7aa;
 }
-.rod-revision-t   { font-weight: 700; margin-bottom: .35rem; }
-.rod-revision-l   { margin: 0; padding-left: .2rem; list-style: none; line-height: 1.45; }
+.rod-revision-t   { font-weight: 700; margin-bottom: .35rem; color: #ffedd5; }
+/* ⚠️ LA LISTA NO EMPUJA LA HERRAMIENTA FUERA DE LA PANTALLA.
+   Salen TODAS las que paran —esa regla no se toca— pero dentro de un
+   recuadro que se desliza. Con doce avisos el panel medía dos pantallas y
+   las pestañas quedaban por debajo del borde: para llegar al trabajo
+   había que barrer la lista entera cada vez que se entraba. Esconder un
+   bloqueador detrás de «y 4 más» sería peor; esconder la herramienta
+   entera detrás de los bloqueadores, también. */
+.rod-revision-l   { margin: 0; padding-left: .2rem; list-style: none; line-height: 1.5;
+                    max-height: 32vh; overflow-y: auto; }
 .rod-revision-l li { margin: .18rem 0; }
-.rod-rev-para     { font-weight: 700; color: #991b1b; }
-.rod-revision-mas { margin-top: .3rem; opacity: .75; }
+.rod-rev-para     { font-weight: 700; color: #fda4af; }
+.rod-revision-mas { margin-top: .3rem; opacity: .7; }
 
 /* ── Las pestañas ──
    ⚠️ NO bajan de línea: se deslizan. Es la misma excepción al flex-wrap
    que los chips de materia de Videos M.E.T.A.S y los de La Criba, y por
-   lo mismo: con cinco pestañas envueltas ocupaban dos renglones y
+   lo mismo: con siete pestañas envueltas ocupaban dos renglones y
    empujaban la primera tarjeta fuera de la pantalla. El degradado del
    borde dice que hay más. */
 .rod-pestanas {
-  display: flex; flex-wrap: nowrap; overflow-x: auto; gap: .4rem;
+  display: flex; flex-wrap: nowrap; overflow-x: auto; gap: .35rem;
   padding: .2rem 0 .7rem; scrollbar-width: none; -webkit-overflow-scrolling: touch;
   /* El degradado del final: sin él, con la última pestaña cortada limpia
      parece que no hay nada más a la derecha. */
@@ -143,15 +296,21 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
 .rod-pestanas::-webkit-scrollbar { display: none; }
 .rod-pest {
   flex: 0 0 auto; display: inline-flex; align-items: center; gap: .35rem;
-  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); background: rgba(26,33,48,.7); color: var(--muted);
   border-radius: 999px; padding: .5rem .8rem; min-height: 44px;
-  font-family: inherit; font-size: .82rem; font-weight: 600;
-  white-space: nowrap; cursor: pointer;
+  font-family: inherit; font-size: .8rem; font-weight: 600;
+  white-space: nowrap; cursor: pointer; transition: color .13s, background .13s;
 }
-.rod-pest-on { background: #6d28d9; border-color: #6d28d9; color: #fff; }
+.rod-pest:hover { color: var(--text); background: #222b3d; }
+.rod-pest-on {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  border-color: transparent; color: #fff;
+  box-shadow: 0 3px 14px rgba(124,58,237,.35);
+}
 .rod-pest-n {
-  background: rgba(0,0,0,.09); border-radius: 999px;
-  padding: 0 .4rem; font-size: .72rem; font-weight: 700;
+  background: rgba(255,255,255,.09); border-radius: 999px;
+  padding: 0 .4rem; font-size: .7rem; font-weight: 700;
+  font-family: var(--rod-mono);
 }
 .rod-pest-on .rod-pest-n { background: rgba(255,255,255,.24); }
 
@@ -159,62 +318,74 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
 .rod-cuerpo { padding-bottom: 90px; }
 
 .rod-intro {
-  background: var(--rod-suave, #f5f3ff); border: 1px solid rgba(109,40,217,.2);
-  border-left: 3px solid #6d28d9; border-radius: 10px;
+  background: var(--rod-suave); border: 1px solid rgba(139,92,246,.28);
+  border-left: 3px solid var(--rod); border-radius: 12px;
   padding: .7rem .8rem; margin: .2rem 0 .3rem;
 }
-.rod-intro-mal { background: #fef2f2; border-color: rgba(220,38,38,.3); border-left-color: #dc2626; }
-.rod-intro-t { font-weight: 700; font-size: .92rem; }
-.rod-intro-p { font-size: .8rem; color: var(--muted); line-height: 1.45; margin: .3rem 0 0; }
+.rod-intro-mal {
+  background: rgba(76,20,35,.45); border-color: rgba(244,63,94,.36);
+  border-left-color: #f43f5e;
+}
+.rod-intro-t { font-weight: 700; font-size: .92rem; color: #f1f5f9; }
+.rod-intro-p { font-size: .8rem; color: var(--muted); line-height: 1.5; margin: .3rem 0 0; }
 
 .rod-grupo {
-  font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
-  color: var(--muted); margin: 1.1rem 0 .45rem;
+  font-size: .7rem; font-weight: 700; letter-spacing: .11em; text-transform: uppercase;
+  color: var(--faint); margin: 1.2rem 0 .5rem;
+  display: flex; align-items: center; gap: .6rem;
+}
+/* La rayita que sigue al rótulo del grupo: separa sin gastar un renglón
+   entero, que en una vista de treinta bloques es media pantalla. */
+.rod-grupo::after {
+  content: ''; flex: 1 1 auto; height: 1px; background: var(--border);
 }
 
 .rod-orden-nota {
   display: flex; align-items: center; gap: .45rem;
-  font-size: .78rem; line-height: 1.4; color: var(--muted);
-  background: var(--bg); border: 1px dashed var(--border); border-radius: 10px;
-  padding: .45rem .6rem; margin-bottom: .6rem;
+  font-size: .78rem; line-height: 1.45; color: var(--muted);
+  background: rgba(139,92,246,.07); border: 1px dashed rgba(139,92,246,.3);
+  border-radius: 10px; padding: .5rem .6rem; margin-bottom: .6rem;
 }
-.rod-orden-nota b { color: var(--text); }
+.rod-orden-nota b { color: #e2e8f0; }
 
 /* ── Una tarjeta de la secuencia ── */
 .rod-lista { display: block; }
 .rod-card {
   display: flex; gap: .6rem; align-items: stretch;
-  background: var(--surface); border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(28,36,52,.62), rgba(18,24,37,.62));
+  border: 1px solid var(--border);
   border-left: 4px solid var(--border);
-  border-radius: 12px; padding: .6rem; margin-bottom: .6rem;
+  border-radius: 12px; padding: .6rem; margin-bottom: .5rem;
+  transition: border-color .13s, background .13s;
 }
+.rod-card:hover { background: linear-gradient(180deg, rgba(34,43,61,.72), rgba(22,29,44,.72)); }
 /* El reloj a la izquierda y en tipografía de números: es la columna que
    se recorre con la vista para encontrar un momento, y con la fuente
    normal los dígitos bailan de ancho y la columna deja de ser columna. */
 .rod-reloj {
   flex: 0 0 auto; width: 62px; text-align: right;
-  font-variant-numeric: tabular-nums; padding-top: .1rem;
+  font-family: var(--rod-mono); padding-top: .15rem;
 }
-.rod-reloj b { display: block; font-size: .95rem; font-weight: 800; }
-.rod-reloj-dur { display: block; font-size: .72rem; color: var(--muted); }
-.rod-reloj-largo { color: #b91c1c; font-weight: 700; }
+.rod-reloj b { display: block; font-size: .92rem; font-weight: 700; color: #f8fafc; }
+.rod-reloj-dur { display: block; font-size: .7rem; color: var(--faint); margin-top: .1rem; }
+.rod-reloj-largo { color: #fda4af; font-weight: 700; }
 
 .rod-cuerpo-card { flex: 1 1 auto; min-width: 0; }
 .rod-tira { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .3rem; }
 .rod-chip {
-  font-size: .72rem; font-weight: 600; padding: 2px 7px; border-radius: 999px;
-  background: var(--bg); color: var(--muted); white-space: nowrap;
+  font-size: .7rem; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+  background: rgba(148,163,184,.12); color: var(--muted); white-space: nowrap;
 }
-.rod-tit { font-weight: 700; font-size: .95rem; line-height: 1.3; color: var(--text); }
+.rod-tit { font-weight: 700; font-size: .95rem; line-height: 1.3; color: #f1f5f9; }
 .rod-guion {
-  font-size: .84rem; color: var(--text); line-height: 1.45; margin-top: .3rem;
-  font-style: italic; opacity: .9;
+  font-size: .84rem; color: #cbd5e1; line-height: 1.5; margin-top: .3rem;
+  font-style: italic;
 }
-.rod-sub { font-size: .76rem; color: var(--muted); line-height: 1.4; margin-top: .25rem; }
-.rod-sub-mus { color: #be185d; }
-.rod-sub-sfx { color: #92400e; }
-.rod-sub-cit { color: #047857; }
-.rod-sub-falta { color: #b91c1c; font-weight: 600; }
+.rod-sub { font-size: .75rem; color: var(--muted); line-height: 1.45; margin-top: .25rem; }
+.rod-sub-mus { color: #f9a8d4; }
+.rod-sub-sfx { color: #fbbf24; }
+.rod-sub-cit { color: #6ee7b7; }
+.rod-sub-falta { color: #fda4af; font-weight: 600; }
 .rod-btns { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .5rem; }
 .rod-btns .rod-b { font-size: .76rem; padding: .35rem .55rem; min-height: 40px; }
 
@@ -232,34 +403,433 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
    vacío y nadie prueba a arrastrarla. */
 .rod-asa {
   flex: 0 0 auto; align-self: stretch; min-width: 38px; padding: 0;
-  border: 1px dashed var(--border); border-radius: 8px;
-  background: var(--bg); color: var(--muted);
+  border: 1px dashed #3a465c; border-radius: 8px;
+  background: rgba(148,163,184,.06); color: var(--faint);
   font-family: inherit; font-size: 1.35rem; letter-spacing: -.06em; line-height: 1;
   cursor: grab; touch-action: none;
 }
+.rod-asa:hover { color: var(--text); border-color: var(--rod); }
 .rod-asa:active { cursor: grabbing; }
-.rod-asa:focus-visible { outline: 2px solid #6d28d9; outline-offset: 2px; }
+.rod-asa:focus-visible { outline: 2px solid var(--rod-luz); outline-offset: 2px; }
 
 /* Mientras se arrastra, la fila no puede recibir el puntero: es lo que
    deja que elementFromPoint vea la de DEBAJO, que es como se sabe dónde
    soltarla. El asa sigue recibiendo eventos, porque capturó el puntero. */
-.rod-card.rod-arrastrando { opacity: .55; transform: scale(.98); pointer-events: none; }
+.rod-card.rod-arrastrando {
+  opacity: .6; transform: scale(.98); pointer-events: none;
+  border-color: var(--rod); box-shadow: 0 8px 26px rgba(0,0,0,.6);
+}
 .rod-lista.rod-moviendo { cursor: grabbing; }
+
+/* ═══════════════ 🖥️ EL MONITOR ═══════════════
+   El video antes de existir. Recorre la secuencia en tiempo real y
+   enseña, en un 16:9 de verdad, lo que habrá en pantalla en cada
+   segundo: qué bloque es, qué se dice, qué crédito sale y cuándo entra
+   un golpe de sonido.
+
+   ⚠️ NO ES UN ADORNO Y NO REPRODUCE NADA. Aquí no hay ni un fotograma
+   grabado: es el guion CORRIENDO. Sirve para una cosa que ninguna lista
+   puede hacer —oír la duración—: un cartón de tres segundos leyéndose
+   entero, o una parrafada de cámara de dos minutos y medio, se juzgan
+   sintiéndolos pasar, no leyendo «2:30» en una tabla. Es lo que dice si
+   el video se sostiene antes de gastar un día grabando.
+
+   Y por eso el marco es 16:9 exacto y no «más o menos»: un rótulo que
+   aquí cabe y allá no, no sirve para decidir nada. */
+.rod-mon {
+  margin: .2rem 0 .8rem;
+}
+.rod-mon-marco {
+  width: 100%; aspect-ratio: 16 / 9;
+  background: #000; border-radius: 14px; overflow: hidden;
+  border: 1px solid #2b3646;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.03);
+  /* ⚠️ EL CONTENIDO VA EN COLUMNA, NO SUELTO EN `absolute`.
+     En una tableta de 430 px un 16:9 mide 242 px de alto, y ahí dentro
+     tienen que caber el estado, el título, el rótulo de la fuente y la
+     frase que se está diciendo. Con cada pieza colocada por su cuenta se
+     pisaban en cuanto una crecía —y crecen: un crédito de película son
+     tres renglones—, y lo que quedaba ilegible eran justo las dos cosas
+     que se venía a juzgar. En columna, lo que sobra se recorta por abajo
+     y nada tapa a nada. Las tres capas de imagen (fondo, cámara y
+     rejilla) SÍ van en `absolute`: son fondo, no contenido. */
+  display: flex; flex-direction: column;
+  /* Se queda pegado arriba al bajar por la lista de saltos: elegir un
+     bloque mirando el monitor es el gesto entero de esta pestaña, y con
+     el marco fuera de vista hay que subir y bajar por cada salto. */
+  position: sticky; top: 0; z-index: 6;
+}
+/* El fondo se tiñe del color de la clase que está sonando. Es la única
+   señal que se ve de reojo mientras se lee el texto de abajo, y es la
+   que dice «ahora mismo estás mirando material ajeno». */
+.rod-mon-fondo {
+  position: absolute; inset: 0;
+  background: radial-gradient(120% 90% at 50% 0%, rgba(148,163,184,.2), transparent 70%);
+  transition: background .35s ease;
+}
+.rod-mon-cam {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; background: #000;
+  /* ⚠️ ESPEJADA. Uno se coloca mirándose, y con la imagen sin espejar
+     mover el hombro derecho se ve moverse al izquierdo: se acaba
+     encuadrando al revés. Es como se ve uno en un espejo de verdad, que
+     es lo que esto es. */
+  transform: scaleX(-1);
+}
+/* La rejilla de tercios, encima de la cámara. Es la única regla de
+   encuadre que se usa de verdad al colocarse solo: los ojos van en la
+   línea de arriba. */
+.rod-mon-tercios {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(to right,  transparent calc(33.333% - .5px), rgba(255,255,255,.22) calc(33.333% - .5px), rgba(255,255,255,.22) calc(33.333% + .5px), transparent calc(33.333% + .5px)),
+    linear-gradient(to right,  transparent calc(66.666% - .5px), rgba(255,255,255,.22) calc(66.666% - .5px), rgba(255,255,255,.22) calc(66.666% + .5px), transparent calc(66.666% + .5px)),
+    linear-gradient(to bottom, transparent calc(33.333% - .5px), rgba(255,255,255,.22) calc(33.333% - .5px), rgba(255,255,255,.22) calc(33.333% + .5px), transparent calc(33.333% + .5px)),
+    linear-gradient(to bottom, transparent calc(66.666% - .5px), rgba(255,255,255,.22) calc(66.666% - .5px), rgba(255,255,255,.22) calc(66.666% + .5px), transparent calc(66.666% + .5px));
+}
+
+/* La fila de arriba del monitor: el estado y el código de tiempo. Va
+   dentro del 16:9 y no encima porque es lo que se ve en el visor de una
+   cámara, y ahí es donde se busca. */
+.rod-mon-hud {
+  position: relative; z-index: 3; flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+  padding: .5rem .65rem;
+  background: linear-gradient(180deg, rgba(0,0,0,.62), transparent);
+  font-family: var(--rod-mono); font-size: .7rem; letter-spacing: .04em;
+}
+.rod-mon-est {
+  display: inline-flex; align-items: center; gap: .35rem;
+  color: #cbd5e1; text-transform: uppercase; font-weight: 700;
+}
+.rod-mon-punto {
+  width: 8px; height: 8px; border-radius: 50%; background: #64748b;
+  display: inline-block; flex: 0 0 auto;
+}
+/* El punto late solo mientras corre. Un punto rojo fijo se lee como
+   «grabando» y aquí no se graba nada: late para decir «esto va». */
+.rod-mon-corriendo .rod-mon-punto { background: var(--rod-rec); animation: rodLate 1.1s infinite; }
+@keyframes rodLate { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .rod-mon-corriendo .rod-mon-punto { animation: none; } }
+.rod-mon-tc {
+  color: #f8fafc; font-size: .86rem; font-weight: 700;
+  background: rgba(0,0,0,.45); border-radius: 6px; padding: .1rem .4rem;
+}
+.rod-mon-tc-fin { color: var(--faint); font-weight: 400; }
+
+/* El centro: qué es este bloque. Grande, porque es lo que se mira de
+   reojo mientras pasa. */
+.rod-mon-centro {
+  position: relative; z-index: 2; flex: 1 1 auto; min-height: 0; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: .3rem 1.1rem .5rem; gap: .28rem;
+  pointer-events: none;
+}
+.rod-mon-clase {
+  font-size: .66rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(255,255,255,.72);
+  border: 1px solid rgba(255,255,255,.24); border-radius: 999px;
+  padding: .22rem .7rem; background: rgba(0,0,0,.32);
+}
+.rod-mon-titulo {
+  font-size: clamp(1.05rem, 4.4vw, 1.9rem); font-weight: 800; line-height: 1.2;
+  color: #fff; text-wrap: balance; text-shadow: 0 2px 18px rgba(0,0,0,.8);
+}
+/* Se recortan a lo que cabe: en un 16:9 de tableta no hay sitio para una
+   indicación de plano de cinco renglones, y estirar el marco dejaría de
+   ser un 16:9 — que es lo único que hace que lo de aquí valga para
+   decidir lo de allá. */
+.rod-mon-visual {
+  font-size: .74rem; color: rgba(255,255,255,.66); line-height: 1.4;
+  max-width: 36ch; font-style: italic;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+/* Con la cámara puesta, el texto del centro se aparta: taparse la propia
+   cara con un rótulo es lo contrario de mirarse el encuadre. */
+.rod-mon-con-cam .rod-mon-centro { justify-content: flex-start; }
+.rod-mon-con-cam .rod-mon-titulo { font-size: 1rem; }
+.rod-mon-con-cam .rod-mon-visual { display: none; }
+
+/* ⚠️ EL RÓTULO Y EL TEXTO SE APILAN, NO SE PISAN.
+   Los dos van abajo del 16:9 —que es donde van en el video— y con los dos
+   sueltos en `position:absolute` se solapaban: un crédito de película de
+   tres renglones se comía la frase que se está diciendo, y las dos cosas
+   que había que juzgar quedaban ilegibles a la vez. Van dentro de una
+   misma columna, que es lo único que garantiza que nunca se toquen por
+   larga que salga una de las dos. */
+.rod-mon-pie {
+  position: relative; z-index: 4; flex: 0 0 auto;
+  display: flex; flex-direction: column; align-items: flex-start; gap: .3rem;
+  padding: .5rem 0;
+  background: linear-gradient(0deg, rgba(0,0,0,.92), rgba(0,0,0,.6) 70%, transparent);
+  max-height: 58%; overflow: hidden;
+}
+.rod-mon-pie:empty { display: none; }
+
+/* El rótulo, con la pinta que va a tener encima del video. Es el único
+   momento del proceso en que se puede ver si el crédito de una película
+   cabe en una línea antes de montarlo: corregirlo aquí son diez segundos
+   y en el editor de video, media hora. */
+.rod-mon-tercio {
+  flex: 0 0 auto; max-width: 92%;
+  background: linear-gradient(90deg, rgba(2,6,14,.92), rgba(2,6,14,.66));
+  border-left: 3px solid #22d3ee;
+  padding: .38rem .7rem .4rem .55rem;
+  border-radius: 0 8px 8px 0;
+  color: #f8fafc; font-size: .74rem; line-height: 1.35;
+  animation: rodTercio .3s ease;
+}
+@keyframes rodTercio { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .rod-mon-tercio { animation: none; } }
+/* El recorte va en el TEXTO del rótulo y no en la caja: la caja lleva
+   dentro el nombre de la fila («FUENTE», «Generado con IA») y recortarla
+   entera cortaba un renglón por la mitad, que se lee como un fallo de
+   pintado. Y tres renglones son ya el aviso: un crédito que no cabe en
+   tres a este tamaño no cabe encima del video. */
+.rod-mon-tercio-r {
+  font-weight: 600;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+}
+.rod-mon-tercio-n {
+  display: block; font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+  color: #67e8f9; margin-bottom: .1rem;
+}
+/* Lo generado por una máquina se declara EN PANTALLA y con otro color:
+   es la regla de oro del Estudio Mayor traída al video —ninguna fuente
+   sin etiqueta—, y un rótulo violeta se distingue del cian de las demás
+   sin leerlo. */
+.rod-mon-tercio-ia { border-left-color: var(--rod-luz); }
+.rod-mon-tercio-ia .rod-mon-tercio-n { color: var(--rod-luz); }
+/* Y la falta se enseña EN EL SITIO DEL RÓTULO, en rojo. Un bloque de
+   película sin fuente no se puede publicar —lo para el disparador de la
+   base—, y el sitio donde eso se entiende no es una lista de avisos: es
+   el hueco donde debería estar el crédito y no hay nada. */
+.rod-mon-tercio-falta { border-left-color: var(--rod-rec); background: linear-gradient(90deg, rgba(76,5,25,.94), rgba(30,4,12,.7)); }
+.rod-mon-tercio-falta .rod-mon-tercio-n { color: #fda4af; }
+
+/* El mini-teleprompter: lo que se dice mientras dura este bloque. Va
+   dentro del marco y abajo del todo, encima de una sombra, que es donde
+   irían los subtítulos: leerlo ahí es leerlo donde va a estar. */
+.rod-mon-sub {
+  flex: 0 1 auto; width: 100%; padding: 0 .8rem;
+  text-align: center;
+  font-size: clamp(.74rem, 2.7vw, .92rem); line-height: 1.4;
+  color: #e2e8f0;
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+}
+.rod-mon-sub:empty { display: none; }
+.rod-mon-sub-off { color: #a5b4c6; font-style: italic; }
+
+/* El destello del golpe de sonido. Dura poco a propósito: es una señal
+   de que ALGO suena en este segundo, no una etiqueta que se queda. */
+.rod-mon-golpe {
+  position: absolute; top: 2.4rem; right: .6rem; z-index: 5;
+  background: rgba(245,158,11,.92); color: #1c1207;
+  font-weight: 800; font-size: .72rem; border-radius: 8px;
+  padding: .28rem .55rem; box-shadow: 0 4px 18px rgba(245,158,11,.45);
+  animation: rodGolpe 1.1s ease forwards;
+}
+.rod-mon-golpe-mus { background: rgba(244,114,182,.94); color: #2a0715; }
+@keyframes rodGolpe {
+  0%   { opacity: 0; transform: scale(.8); }
+  14%  { opacity: 1; transform: scale(1.05); }
+  30%  { transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .rod-mon-golpe { animation: none; } }
+
+/* El monitor vacío: sin secuencia no hay nada que correr. */
+.rod-mon-nada {
+  position: relative; z-index: 2; flex: 1 1 auto;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  color: var(--faint); font-size: .84rem; padding: 1.2rem;
+}
+
+/* ⚠️ EN UN TELÉFONO, EL 16:9 MIDE 164 px DE ALTO Y NO CABE TODO.
+   Y el marco NO se estira: si dejara de ser 16:9, lo que se juzgue aquí
+   dejaría de valer para el video, que es lo único que hace útil esta
+   pantalla. Así que lo que se recorta es el CONTENIDO, y en este orden:
+   primero la indicación de plano —que es una nota para el rodaje y se lee
+   entera en 🎞️ Secuencia—, después los renglones del rótulo y del texto.
+   Lo que no se toca nunca es el título del bloque: es lo que dice qué se
+   está mirando. */
+@media (max-width: 400px) {
+  .rod-mon-visual { display: none; }
+  .rod-mon-clase { font-size: .58rem; padding: .15rem .55rem; letter-spacing: .12em; }
+  .rod-mon-tercio { font-size: .68rem; }
+  .rod-mon-tercio-r { -webkit-line-clamp: 2; }
+  .rod-mon-sub { -webkit-line-clamp: 2; }
+  .rod-mon-pie { max-height: 52%; padding: .4rem 0; }
+}
+
+/* ── La pista: el video entero de un vistazo ──
+   Cada tramo es un bloque, con el color de su clase y su anchura
+   proporcional a lo que dura. Es el mapa que dice, sin leer nada, si el
+   video son cuatro parrafadas o veinte piezas cortas. */
+.rod-mon-barra { margin: .6rem 0 .1rem; }
+.rod-mon-pista {
+  position: relative; display: flex; height: 30px;
+  border-radius: 8px; overflow: hidden;
+  background: #0b101a; border: 1px solid var(--border);
+  cursor: pointer; touch-action: none;   /* el gesto es arrastrar el cabezal, no desplazar */
+}
+.rod-mon-tramo {
+  display: block; height: 100%; opacity: .55;
+  border-right: 1px solid rgba(0,0,0,.5);
+  transition: opacity .15s;
+}
+.rod-mon-tramo-on { opacity: 1; }
+/* Las señales de sonido, como muescas sobre la pista. Es la lectura que
+   el autor pidió —«la lógica de en qué momento los efectos del
+   sonido»— vista de una vez, y aquí se ve si hay ocho golpes seguidos en
+   veinte segundos. */
+.rod-mon-tick {
+  position: absolute; top: 0; width: 2px; height: 8px;
+  background: #fbbf24; border-radius: 0 0 2px 2px; pointer-events: none;
+}
+.rod-mon-tick-mus { background: #f472b6; height: 100%; opacity: .5; width: 1px; }
+.rod-mon-cabeza {
+  position: absolute; top: -3px; bottom: -3px; width: 2px;
+  background: #fff; box-shadow: 0 0 8px rgba(255,255,255,.8);
+  pointer-events: none; transform: translateX(-1px);
+}
+.rod-mon-cabeza::before {
+  content: ''; position: absolute; top: -4px; left: -4px;
+  width: 10px; height: 10px; border-radius: 50%; background: #fff;
+  box-shadow: 0 0 8px rgba(255,255,255,.8);
+}
+.rod-mon-regla {
+  display: flex; justify-content: space-between;
+  font-family: var(--rod-mono); font-size: .65rem; color: var(--faint);
+  margin-top: .25rem;
+}
+
+/* El mando. ⚠️ NO baja de línea, por lo mismo que el del banco de
+   cortes: envuelto, el último botón caía en un segundo renglón y justo
+   debajo del botón flotante de Destellos, que se lo comía. */
+/* ⚠️ EL TRANSPORTE Y LA VELOCIDAD VAN EN DOS RENGLONES, A PROPÓSITO.
+   En un teléfono de 320 px los siete mandos en una fila salían a 25 px
+   cada uno: por debajo de los 44 px que un dedo acierta sin mirar, y el
+   dedo que falla aquí es el que le da a ▶️ o a ⏭ mientras se está
+   mirando el monitor —o sea, sin mirar el botón—. En dos renglones los
+   cuatro de arriba pasan de los 60 px hasta en el teléfono más estrecho.
+   Y la velocidad va DEBAJO y a la izquierda: es lo que menos se toca, y
+   en la esquina de abajo a la derecha está el botón flotante de
+   Destellos, que se come lo que caiga ahí. */
+.rod-mon-mando {
+  display: flex; flex-wrap: nowrap; gap: .3rem; align-items: stretch;
+  margin: .6rem 0 .35rem;
+}
+.rod-mon-mando .rod-b { flex: 1 1 0; min-width: 44px; padding: .5rem .25rem; font-size: .9rem; }
+.rod-mon-mando .rod-mon-play { flex: 1.6 1 0; }
+.rod-mon-vels {
+  display: flex; align-items: center; gap: .5rem;
+  margin-bottom: .5rem; font-size: .68rem; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--faint); font-weight: 700;
+}
+.rod-mon-vel {
+  display: flex; gap: .2rem; flex: 0 0 auto;
+  background: #0e131e; border: 1px solid var(--border); border-radius: 10px; padding: 2px;
+}
+.rod-mon-vel .rod-b {
+  min-height: 40px; min-width: 46px; flex: 0 0 auto; padding: .3rem .4rem;
+  font-family: var(--rod-mono); font-size: .78rem;
+  background: transparent; border-color: transparent; color: var(--muted);
+}
+.rod-mon-vel .rod-b:hover { background: rgba(148,163,184,.1); border-color: transparent; }
+.rod-mon-vel-on { background: var(--rod) !important; color: #fff !important; }
+
+/* Los saltos: una fila por bloque, para ir a un momento sin arrastrar el
+   cabezal a ojo. Con treinta bloques, buscar «la toma del cierre»
+   arrastrando es imposible; por nombre es un toque. */
+.rod-mon-saltos { display: block; margin-top: .3rem; }
+.rod-mon-salto {
+  display: flex; width: 100%; align-items: center; gap: .55rem; text-align: left;
+  background: rgba(20,26,38,.6); border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 10px; padding: .45rem .6rem; margin-bottom: .3rem;
+  min-height: 44px; font-family: inherit; color: var(--text); cursor: pointer;
+}
+.rod-mon-salto:hover { background: #222b3d; }
+.rod-mon-salto-on { border-color: var(--rod); background: rgba(139,92,246,.14); }
+.rod-mon-salto-t {
+  flex: 0 0 auto; width: 46px; text-align: right;
+  font-family: var(--rod-mono); font-size: .78rem; color: var(--faint);
+}
+.rod-mon-salto-on .rod-mon-salto-t { color: var(--rod-luz); }
+.rod-mon-salto-n {
+  flex: 1 1 auto; min-width: 0; font-size: .82rem; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rod-mon-salto-d { flex: 0 0 auto; font-family: var(--rod-mono); font-size: .7rem; color: var(--faint); }
+
+/* ═══════════════ 🎥 LA CÁMARA ═══════════════
+   Un espejo, y nada más que un espejo.
+
+   ⚠️ NO GRABA, NO SUBE NADA Y NO GUARDA NADA, Y LA PANTALLA LO DICE.
+   Es la misma regla que el banco de cortes y por el mismo motivo: a
+   nadie se le ocurre por su cuenta que una página que enciende la cámara
+   no esté haciendo algo con la imagen. Aquí la imagen ni siquiera sale
+   del elemento `<video>`: no hay grabador, no hay lienzo y no hay
+   petición de red.
+
+   Para qué: colocarse. En el monitor, para ver el encuadre con la
+   rejilla de tercios y el rótulo encima; en el teleprompter, para no
+   grabar cinco minutos mirando dos dedos por encima del objetivo, que se
+   nota y no tiene arreglo en el montaje. */
+.rod-cam-nota {
+  font-size: .78rem; line-height: 1.5; color: #86efac;
+  background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.22);
+  border-radius: 10px; padding: .45rem .6rem; margin: .5rem 0 .2rem;
+}
+.rod-cam-no {
+  color: #fbbf24; background: rgba(234,179,8,.08); border-color: rgba(234,179,8,.26);
+}
+
+/* El espejo del teleprompter. Va arriba y CENTRADO, no en una esquina:
+   se mira mientras se lee, y una ventanita en la esquina hace mirar a la
+   esquina, que es exactamente el defecto que viene a arreglar. */
+.rod-cam-espejo {
+  position: absolute; z-index: 320;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: min(38vw, 190px); aspect-ratio: 16 / 9;
+  background: #000; border-radius: 12px; overflow: hidden;
+  border: 1px solid #334155; box-shadow: 0 10px 34px rgba(0,0,0,.7);
+}
+.rod-cam-espejo-grande { width: min(74vw, 420px); }
+.rod-cam-v {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+  transform: scaleX(-1);   /* espejo de verdad: mover la derecha mueve la derecha */
+}
+/* La marca del centro. Colocarse solo delante de una tableta es apuntar
+   a ciegas; una cruz en el medio dice si la cara está centrada sin tener
+   que adivinarlo. */
+.rod-cam-cruz {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(to right,  transparent calc(50% - .5px), rgba(255,255,255,.28) calc(50% - .5px), rgba(255,255,255,.28) calc(50% + .5px), transparent calc(50% + .5px)),
+    linear-gradient(to bottom, transparent calc(33.333% - .5px), rgba(255,255,255,.2) calc(33.333% - .5px), rgba(255,255,255,.2) calc(33.333% + .5px), transparent calc(33.333% + .5px));
+}
 
 /* ── Pestaña Cámara ── */
 .rod-toma {
-  background: var(--surface); border: 1px solid var(--border);
-  border-left: 4px solid #b45309; border-radius: 12px;
+  background: linear-gradient(180deg, rgba(28,36,52,.62), rgba(18,24,37,.62));
+  border: 1px solid var(--border);
+  border-left: 3px solid #f59e0b; border-radius: 12px;
   padding: .8rem; margin-bottom: .7rem;
 }
-.rod-toma-larga { border-color: rgba(220,38,38,.35); border-left-color: #dc2626; background: #fffafa; }
+.rod-toma-larga {
+  border-color: rgba(244,63,94,.4); border-left-color: #f43f5e;
+  background: linear-gradient(180deg, rgba(76,20,35,.44), rgba(24,14,20,.6));
+}
 .rod-toma-cab { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .4rem; }
 /* El guion de la toma se lee entero y grande: es lo que hay que
    aprenderse, no un resumen. */
 .rod-toma-guion {
-  font-size: 1rem; line-height: 1.6; margin: .5rem 0;
-  padding: .6rem .7rem; background: var(--bg);
-  border-left: 3px solid rgba(180,83,9,.35); border-radius: 0 8px 8px 0;
+  font-size: 1rem; line-height: 1.65; margin: .5rem 0; color: #e9eef7;
+  padding: .6rem .75rem; background: rgba(0,0,0,.28);
+  border-left: 3px solid rgba(245,158,11,.5); border-radius: 0 8px 8px 0;
   white-space: pre-wrap;
 }
 
@@ -267,51 +837,52 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
 .rod-senales { display: block; margin-top: .5rem; }
 .rod-senal {
   display: flex; gap: .6rem; align-items: flex-start;
-  background: var(--surface); border: 1px solid var(--border);
+  background: rgba(20,26,38,.62); border: 1px solid var(--border);
   border-left: 3px solid var(--border);
   border-radius: 10px; padding: .55rem .6rem; margin-bottom: .4rem;
 }
-.rod-senal-mus { border-left-color: #db2777; }
-.rod-senal-sfx { border-left-color: #b45309; }
+.rod-senal-mus { border-left-color: #f472b6; }
+.rod-senal-sfx { border-left-color: #f59e0b; }
 .rod-senal-t {
   flex: 0 0 auto; width: 54px; text-align: right;
-  font-variant-numeric: tabular-nums; font-weight: 800; font-size: .9rem;
+  font-family: var(--rod-mono); font-weight: 700; font-size: .86rem; color: #f8fafc;
 }
 .rod-senal-c { flex: 1 1 auto; min-width: 0; }
-.rod-senal-q { font-weight: 600; font-size: .88rem; }
+.rod-senal-q { font-weight: 600; font-size: .88rem; color: #f1f5f9; }
 .rod-senal-d { font-size: .76rem; color: var(--muted); margin-top: .1rem; }
 .rod-senal-b { font-size: .72rem; color: var(--faint); margin-top: .15rem; }
 .rod-senal-choque {
-  font-size: .76rem; color: #b91c1c; background: #fef2f2;
-  border: 1px solid rgba(220,38,38,.25); border-radius: 8px;
+  font-size: .76rem; color: #fda4af; background: rgba(244,63,94,.1);
+  border: 1px solid rgba(244,63,94,.3); border-radius: 8px;
   padding: .35rem .55rem; margin: -.15rem 0 .5rem 54px;
 }
 
 /* ── Pestaña Citas ── */
 .rod-fuente {
-  background: var(--surface); border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(28,36,52,.62), rgba(18,24,37,.62));
+  border: 1px solid var(--border);
   border-radius: 12px; padding: .7rem; margin-bottom: .6rem;
 }
-.rod-fuente-ojo { border-color: rgba(234,179,8,.45); }
+.rod-fuente-ojo { border-color: rgba(234,179,8,.42); }
 /* El rótulo se enseña con la pinta que va a tener encima del video: fondo
    oscuro y una barra de color a la izquierda. Verlo así es lo que hace
    que se corrija antes de montarlo, y no después. */
 .rod-rotulo {
-  background: #0f172a; color: #f8fafc;
-  border-left: 4px solid #06b6d4; border-radius: 0 8px 8px 0;
+  background: #02060e; color: #f8fafc;
+  border-left: 3px solid #22d3ee; border-radius: 0 8px 8px 0;
   padding: .5rem .6rem; margin: .45rem 0;
   font-size: .82rem; line-height: 1.4;
 }
-.rod-rotulo-falta { background: #7f1d1d; border-left-color: #fca5a5; }
+.rod-rotulo-falta { background: rgba(76,20,35,.7); border-left-color: #fda4af; color: #fecdd3; }
 .rod-prompt {
-  font-size: .76rem; color: var(--muted); line-height: 1.45;
-  background: var(--bg); border-radius: 8px; padding: .4rem .55rem; margin-top: .3rem;
+  font-size: .76rem; color: var(--muted); line-height: 1.5;
+  background: rgba(0,0,0,.24); border-radius: 8px; padding: .4rem .55rem; margin-top: .3rem;
   font-style: italic;
 }
-.rod-prompt-falta { color: #92400e; background: #fffbeb; font-style: normal; }
-.rod-url { display: block; font-size: .76rem; color: #1d4ed8; margin-top: .3rem; word-break: break-all; }
+.rod-prompt-falta { color: #fbbf24; background: rgba(234,179,8,.08); font-style: normal; }
+.rod-url { display: block; font-size: .76rem; color: #7dd3fc; margin-top: .3rem; word-break: break-all; }
 .rod-vista {
-  background: #0f172a; color: #f8fafc; border-left: 4px solid #06b6d4;
+  background: #02060e; color: #f8fafc; border-left: 3px solid #22d3ee;
   border-radius: 0 8px 8px 0; padding: .5rem .6rem; font-size: .82rem; line-height: 1.4;
   margin: .3rem 0 0;
 }
@@ -320,14 +891,15 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
 .rod-check {
   display: flex; align-items: center; gap: .5rem;
   padding: .45rem .3rem; min-height: 44px;
-  font-size: .85rem; line-height: 1.3; cursor: pointer;
+  font-size: .85rem; line-height: 1.35; cursor: pointer; color: var(--text);
   border-bottom: 1px solid var(--border);
 }
 .rod-check:last-child { border-bottom: 0; }
-.rod-check input { width: 20px; height: 20px; flex: 0 0 auto; }
+.rod-check input { width: 20px; height: 20px; flex: 0 0 auto; accent-color: var(--rod); }
 .rod-caja-checks {
   max-height: 210px; overflow-y: auto;
-  border: 1.5px solid var(--border); border-radius: 10px; padding: 0 .5rem;
+  border: 1px solid var(--border); border-radius: 10px; padding: 0 .5rem;
+  background: #0e131e;
 }
 
 .rod-sfx-fila { display: flex; gap: .35rem; align-items: center; margin-bottom: .4rem; }
@@ -338,8 +910,13 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
    leer, así que por debajo de 400 px bajan a uno por renglón. */
 @media (max-width: 400px) { .rod-tres, .rod-dos { grid-template-columns: 1fr; } }
 
-.rod-ayuda { font-size: .78rem; color: var(--muted); line-height: 1.45; margin: .5rem 0 0; }
-.rod-aviso { font-size: .8rem; margin: .35rem 0 0; min-height: 1.1em; color: #92400e; line-height: 1.4; }
+.rod-ayuda { font-size: .78rem; color: var(--muted); line-height: 1.5; margin: .5rem 0 0; }
+.rod-ayuda strong { color: #cbd5e1; }
+.rod-ayuda code {
+  background: rgba(148,163,184,.12); border-radius: 5px; padding: 1px 5px;
+  font-family: var(--rod-mono); font-size: .74rem; color: #c4b5fd;
+}
+.rod-aviso { font-size: .8rem; margin: .35rem 0 0; min-height: 1.1em; color: #fbbf24; line-height: 1.45; }
 .rod-form { padding: 0 .2rem .4rem; }
 
 /* ── Pestaña Reels ──
@@ -347,20 +924,22 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
    cartel dentro de esa proporción es lo que dice si el texto cabe. */
 .rod-reel {
   display: flex; gap: .7rem; align-items: flex-start;
-  background: var(--surface); border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(28,36,52,.62), rgba(18,24,37,.62));
+  border: 1px solid var(--border);
   border-radius: 12px; padding: .7rem; margin-bottom: .7rem;
 }
 .rod-reel-marco {
   flex: 0 0 auto; width: 104px; aspect-ratio: 9 / 16;
-  background: linear-gradient(160deg, #1e1b4b, #0f172a 60%, #4c1d95);
+  background: linear-gradient(160deg, #1e1b4b, #0b1020 60%, #4c1d95);
   border-radius: 10px; padding: .5rem;
+  border: 1px solid rgba(255,255,255,.08);
   display: flex; flex-direction: column; justify-content: space-between;
   overflow: hidden;
 }
 .rod-reel-cab { display: flex; justify-content: space-between; align-items: center; }
 .rod-reel-n   { font-size: .55rem; font-weight: 800; color: #fff; background: #e11d48;
                 border-radius: 4px; padding: 1px 4px; letter-spacing: .04em; }
-.rod-reel-dur { font-size: .58rem; color: rgba(255,255,255,.72); font-variant-numeric: tabular-nums; }
+.rod-reel-dur { font-size: .58rem; color: rgba(255,255,255,.72); font-family: var(--rod-mono); }
 .rod-reel-cartel {
   color: #fbbf24; font-size: .68rem; font-weight: 800; line-height: 1.25;
   text-align: center; text-transform: uppercase;
@@ -373,22 +952,24 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
 }
 .rod-reel-der { flex: 1 1 auto; min-width: 0; }
 .rod-reel-gancho {
-  font-size: .86rem; font-weight: 700; color: #92400e;
-  background: #fffbeb; border-radius: 8px; padding: .35rem .5rem; margin-top: .35rem;
-  line-height: 1.35;
+  font-size: .86rem; font-weight: 700; color: #fcd34d;
+  background: rgba(234,179,8,.1); border: 1px solid rgba(234,179,8,.2);
+  border-radius: 8px; padding: .35rem .5rem; margin-top: .35rem;
+  line-height: 1.4;
 }
 @media (max-width: 420px) {
   .rod-reel { flex-direction: column; }
   .rod-reel-marco { width: 100%; max-width: 190px; align-self: center; }
 }
 
-.rod-pegar-res { font-weight: 700; font-size: .88rem; margin-bottom: .4rem; }
+.rod-pegar-res { font-weight: 700; font-size: .88rem; margin-bottom: .4rem; color: #f1f5f9; }
 .rod-pegar-fila {
-  font-size: .82rem; line-height: 1.4; padding: .3rem 0;
+  font-size: .82rem; line-height: 1.45; padding: .3rem 0;
   border-bottom: 1px solid var(--border);
 }
 .rod-pegar-extras { font-size: .74rem; color: var(--muted); padding-left: .8rem; }
 .rod-pegar-vista { max-height: 260px; overflow-y: auto; margin: .5rem 0; }
+#rod-pegar-txt { font-family: var(--rod-mono); font-size: .84rem; line-height: 1.55; }
 
 /* ── El teleprompter ──
    Pantalla entera y negra: cualquier cosa que no sea el texto es algo que
@@ -398,29 +979,75 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
   background: #000; color: #fff;
   display: none; flex-direction: column;
 }
+/* ⚠️ LA CABECERA PUEDE BAJAR DE LÍNEA, y por eso el espejo no se coloca
+   con una medida fija: en un teléfono de 320 px, siete mandos no caben en
+   un renglón y sin `wrap` se salían noventa píxeles por la derecha — o
+   sea que el botón de cerrar quedaba fuera de la pantalla, con el
+   teleprompter a pantalla completa y sin otra salida—. */
 .rod-prom-cab {
-  display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+  display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: .35rem .5rem;
   padding: .6rem .8rem calc(.6rem);
   padding-top: calc(.6rem + env(safe-area-inset-top, 0px));
-  border-bottom: 1px solid #1e293b; flex: 0 0 auto;
+  border-bottom: 1px solid #1b2433; flex: 0 0 auto;
+  /* Por encima del espejo de la cámara: los botones tienen que poder
+     tocarse aunque la ventanita quede debajo. */
+  position: relative; z-index: 330;
+  background: #000;
 }
-.rod-prom-reloj { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.rod-prom-reloj { font-size: 1.3rem; font-weight: 700; font-family: var(--rod-mono); }
+/* ⚠️ Siete mandos en la cabecera y un teléfono de 320 px: sin `nowrap`,
+   «▶️ Pasar» partía el rótulo en dos renglones y estiraba la fila entera.
+   Y los 44 px de ancho no se negocian aunque la cabecera baje de línea:
+   estos botones se tocan MIENTRAS SE LEE EL GUION —o sea, sin mirarlos—,
+   y uno de 34 px se falla. Que haya dos renglones es barato; que se falle
+   el ⏸ con la cámara grabando, no. */
 .rod-prom-cab .rod-b {
-  background: #1e293b; color: #f8fafc; border-color: #334155;
-  font-size: .8rem; padding: .4rem .6rem;
+  background: #161f2e; color: #f8fafc; border-color: #2b3646;
+  font-size: .78rem; padding: .4rem .5rem;
+  white-space: nowrap; min-width: 44px;
 }
-.rod-prom-cab .rod-b-pri { background: #6d28d9; border-color: #6d28d9; }
-.rod-prom-vel { font-variant-numeric: tabular-nums; min-width: 1.2em; text-align: center; font-weight: 700; }
+.rod-prom-cab .rod-b-min { min-width: 44px; padding: .4rem .35rem; }
+/* El grupo de la derecha también envuelve, y se pega a la derecha: con
+   los botones repartidos, el de cerrar cambiaba de sitio según la
+   anchura. */
+.rod-prom-cab > div { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .35rem; }
+/* ⚠️ Y en un teléfono el grupo DESAPARECE como caja (`display: contents`)
+   y sus botones pasan a repartirse la cabecera ellos mismos. Con la caja
+   puesta, los ocho mandos no cabían en dos renglones porque el grupo se
+   envolvía por dentro: salían tres, y el tercero era la ✕ ella sola,
+   cruzando la pantalla entera. Sin la caja, se acomodan en dos llenos. */
+@media (max-width: 420px) {
+  .rod-prom-cab { justify-content: center; }
+  .rod-prom-cab > div { display: contents; }
+  /* Y la palabra «Pasar» se va: el icono de un reproductor lo entiende
+     todo el mundo, y con la palabra puesta la ✕ se quedaba en un tercer
+     renglón ella sola. */
+  .rod-prom-pasar-txt { display: none; }
+}
+.rod-prom-cab .rod-b:hover { background: #1f2a3d; }
+.rod-prom-cab .rod-b-pri { background: linear-gradient(135deg,#7c3aed,#a78bfa); border-color: transparent; }
+/* El botón de la cámara, encendido, se ve encendido. */
+.rod-prom-cab .rod-b-on { background: #b45309; border-color: #f59e0b; color: #fff; }
+.rod-prom-vel { font-family: var(--rod-mono); min-width: 1.2em; text-align: center; font-weight: 700; }
 .rod-prom-area {
   flex: 1 1 auto; overflow-y: auto;
   padding: 8vh 6vw 60vh;      /* el hueco de abajo deja leer la última línea a la altura de los ojos */
   scroll-behavior: auto;
 }
+/* La escena: el texto y, encima, el espejo. Se coloca respecto a ella
+   para quedar siempre justo debajo de la cabecera, mida esta lo que
+   mida. */
+.rod-prom-escena { position: relative; flex: 1 1 auto; min-height: 0; display: flex; }
+.rod-prom-escena > .rod-prom-area { flex: 1 1 auto; }
+/* Con el espejo puesto, el texto empieza más abajo: si no, la primera
+   frase nace debajo de la ventanita y no se lee. */
+.rod-prom-con-cam .rod-prom-area { padding-top: calc(8vh + min(38vw, 190px) * .5625 + 24px); }
 .rod-prom-toma { margin-bottom: 12vh; text-align: center; }
 .rod-prom-rot {
   display: inline-block; border: 1px solid #f59e0b; color: #f59e0b;
   border-radius: 999px; padding: .2rem .8rem; font-size: .85rem; margin-bottom: 1rem;
-  font-variant-numeric: tabular-nums;
+  font-family: var(--rod-mono);
 }
 /* Grande de verdad: se lee a la distancia a la que se pone una tableta
    para grabarse, que es un brazo largo. */
@@ -437,7 +1064,7 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
    gritar: leer en off una frase escrita para mirar al lente sale forzado,
    y al revés se nota todavía más, así que hay que ver de un vistazo cuál
    es cuál mientras pasa el texto. */
-.rod-prom-off .rod-prom-rot { border-color: #06b6d4; color: #06b6d4; }
+.rod-prom-off .rod-prom-rot { border-color: #22d3ee; color: #22d3ee; }
 .rod-prom-off .rod-prom-p   { color: #cbd5e1; font-weight: 600; }
 
 /* Mientras se arrastra un bloque, el botón flotante de Destellos deja de
@@ -459,8 +1086,8 @@ body.rod-arrastrando-body #destello-fab { pointer-events: none; }
    al ver un botón que pide un archivo, y nadie da por hecho que un sitio
    web NO lo sube. */
 .rod-cor-privado {
-  color: #15803d; font-weight: 600;
-  background: rgba(22,163,74,.08); border-radius: 8px;
+  color: #86efac; font-weight: 600;
+  background: rgba(34,197,94,.1); border-radius: 8px;
   padding: .4rem .55rem; margin-top: .45rem;
 }
 
@@ -468,21 +1095,24 @@ body.rod-arrastrando-body #destello-fab { pointer-events: none; }
    está roto, es que ese aparato no llega—, y lo que falta va con ⛔ y en
    palabras, no con un icono a secas. */
 .rod-cor-cap {
-  background: rgba(22,163,74,.07); border: 1px solid rgba(22,163,74,.25);
-  border-left: 3px solid #16a34a; border-radius: 10px;
-  padding: .55rem .7rem; margin: .5rem 0 .2rem; font-size: .8rem; line-height: 1.45;
+  background: rgba(34,197,94,.07); border: 1px solid rgba(34,197,94,.24);
+  border-left: 3px solid #22c55e; border-radius: 10px;
+  padding: .55rem .7rem; margin: .5rem 0 .2rem; font-size: .8rem; line-height: 1.5;
+  color: #d1fae5;
 }
 .rod-cor-cap-medio {
-  background: #fffbeb; border-color: rgba(234,179,8,.4); border-left-color: #eab308;
+  background: rgba(234,179,8,.08); border-color: rgba(234,179,8,.32);
+  border-left-color: #eab308; color: #fef3c7;
 }
 
 .rod-cor-ficha {
-  background: var(--surface); border: 1px solid var(--border);
+  background: rgba(20,26,38,.7); border: 1px solid var(--border);
   border-radius: 10px; padding: .55rem .7rem; margin: .6rem 0 .5rem;
 }
 
 .rod-cor-caja {
   background: #000; border-radius: 12px; overflow: hidden;
+  border: 1px solid #2b3646;
   /* Se queda pegado arriba al desplazar la lista de tomas: marcar una
      entrada mirando el reproductor y la fila a la vez es el gesto entero
      de esta pantalla, y con el video fuera de vista hay que subir y bajar
@@ -496,9 +1126,9 @@ audio.rod-cor-medio { max-height: none; }
    marcar, y con la tipografía normal los dígitos bailan y la última cifra
    no se puede seguir. */
 .rod-cor-reloj {
-  font-variant-numeric: tabular-nums; font-weight: 800;
+  font-family: var(--rod-mono); font-weight: 700;
   font-size: 1.35rem; text-align: center; padding: .35rem 0 .2rem;
-  color: var(--text); letter-spacing: .01em;
+  color: #f8fafc; letter-spacing: .01em;
 }
 
 /* El mando. Los saltos de una décima existen porque cortar en el segundo
@@ -518,34 +1148,35 @@ audio.rod-cor-medio { max-height: none; }
 }
 
 .rod-cor-fila {
-  background: var(--surface); border: 1px solid var(--border);
+  background: rgba(20,26,38,.62); border: 1px solid var(--border);
   border-left: 3px solid var(--border);
   border-radius: 10px; padding: .6rem; margin-bottom: .5rem;
 }
 /* Una toma ya marcada se ve de un vistazo: con treinta bloques, saber
    cuáles quedan es la única pregunta que uno se hace al volver. */
-.rod-cor-fila-lista { border-left-color: #16a34a; background: rgba(22,163,74,.04); }
+.rod-cor-fila-lista { border-left-color: #22c55e; background: rgba(34,197,94,.07); }
 
 .rod-cor-marcas {
   display: flex; align-items: center; flex-wrap: wrap; gap: .4rem;
-  margin: .4rem 0 .1rem; font-variant-numeric: tabular-nums;
+  margin: .4rem 0 .1rem; font-family: var(--rod-mono);
 }
 .rod-cor-m {
-  font-weight: 700; font-size: .9rem; color: var(--faint);
-  background: var(--bg); border-radius: 7px; padding: .15rem .45rem;
+  font-weight: 700; font-size: .88rem; color: var(--faint);
+  background: rgba(148,163,184,.1); border-radius: 7px; padding: .15rem .45rem;
 }
-.rod-cor-m-si { color: #15803d; background: rgba(22,163,74,.12); }
+.rod-cor-m-si { color: #86efac; background: rgba(34,197,94,.14); }
 .rod-cor-flecha { color: var(--faint); }
 .rod-cor-dif { font-size: .76rem; color: var(--muted); }
-.rod-cor-dif-ojo { color: #b45309; font-weight: 600; }
+.rod-cor-dif-ojo { color: #fbbf24; font-weight: 600; }
 
 /* El renglón de avisos vive al final y fuera del pintado del banco: así un
    repintado no se lo lleva por delante mientras se está cortando, que es
    justo cuando se está mirando. */
 .rod-cor-aviso {
   position: sticky; bottom: 0;
-  font-size: .82rem; line-height: 1.4; min-height: 1.2em;
-  color: var(--text); background: var(--bg);
+  font-size: .82rem; line-height: 1.45; min-height: 1.2em;
+  color: var(--text); background: rgba(10,14,23,.94);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
   padding: .5rem .2rem calc(.5rem + env(safe-area-inset-bottom, 0px));
   margin: .6rem 0 0;
 }
@@ -559,3 +1190,51 @@ audio.rod-cor-medio { max-height: none; }
 @media (max-width: 400px) {
   .rod-cor-salto5 { display: none; }
 }
+
+/* ═══════════ LAS VENTANAS ═══════════
+   Cuelgan del `body`, fuera de `#view-rodaje`: sus tokens ya están
+   redefinidos arriba, y aquí solo va lo que no sale de un token. */
+#rod-p-overlay, #rod-b-overlay, #rod-f-overlay, #rod-r-overlay,
+#rod-pegar-overlay, #rod-texto-overlay {
+  /* Más oscuro que el velo claro de la casa: encima de una sala oscura,
+     un velo al 50 % deja ver la pantalla de detrás y las dos compiten. */
+  background: rgba(2,6,14,.72);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+#rod-p-overlay .fin-modal, #rod-b-overlay .fin-modal, #rod-f-overlay .fin-modal,
+#rod-r-overlay .fin-modal, #rod-pegar-overlay .fin-modal, #rod-texto-overlay .fin-modal {
+  background: #121826;
+  border: 1px solid var(--border); border-bottom: 0;
+  box-shadow: 0 -14px 50px rgba(0,0,0,.7);
+  color: var(--text);
+}
+#rod-p-overlay .msug-det-titulo, #rod-b-overlay .msug-det-titulo,
+#rod-f-overlay .msug-det-titulo, #rod-r-overlay .msug-det-titulo,
+#rod-pegar-overlay .msug-det-titulo, #rod-texto-overlay .msug-det-titulo { color: #f1f5f9; }
+#rod-p-overlay .msug-det-cerrar, #rod-b-overlay .msug-det-cerrar,
+#rod-f-overlay .msug-det-cerrar, #rod-r-overlay .msug-det-cerrar,
+#rod-pegar-overlay .msug-det-cerrar, #rod-texto-overlay .msug-det-cerrar {
+  background: rgba(148,163,184,.12); color: var(--muted);
+}
+
+/* ═══════════ LA FRANJA DE CLASE, LA ÚLTIMA DEL ARCHIVO ═══════════
+
+   ⚠️ TIENE QUE IR AQUÍ ABAJO, Y NO ARRIBA CON LOS DEMÁS COLORES.
+   `.rod-card` y `.rod-mon-salto` declaran `border-left: 3px solid
+   var(--border)` — el atajo, que incluye el COLOR—, y pesan lo mismo que
+   `.rod-borde-cam` (una clase cada uno). A igualdad de peso gana la que
+   vaya después en el archivo, así que con estas reglas arriba la franja
+   de color se pintaba gris SIEMPRE: la secuencia era un muro de treinta
+   tarjetas idénticas y no había forma de encontrar los clips de un
+   vistazo, que es para lo que existe la franja.
+
+   Y no daba ningún error, no rompía la página y el HTML estaba bien: es
+   exactamente el fallo del `var(--card)` de Videos M.E.T.A.S, y se caza
+   igual, mirando el color CALCULADO. La sonda lo mira (comprobación 15).
+
+   Si algún día se añade otra tarjeta con franja, su regla va ENCIMA de
+   este bloque. */
+.rod-borde-cam { border-left-color: #f59e0b; } .rod-borde-pel { border-left-color: #22d3ee; }
+.rod-borde-ia  { border-left-color: #a78bfa; } .rod-borde-gra { border-left-color: #34d399; }
+.rod-borde-arc { border-left-color: #94a3b8; } .rod-borde-pan { border-left-color: #60a5fa; }
+.rod-borde-mus { border-left-color: #f472b6; } .rod-borde-tit { border-left-color: #cbd5e1; }

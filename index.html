@@ -1668,11 +1668,35 @@ placeholder="[CÁMARA 0:30] La flecha rota
         <button type="button" class="rod-b rod-b-min" id="rod-prom-mas" aria-label="Más rápido">+</button>
         <button type="button" class="rod-b rod-b-pri" id="rod-prom-pasar">▶️ Pasar</button>
         <button type="button" class="rod-b rod-b-min" id="rod-prom-espejo" title="Espejo, para leer sobre un cristal">🪞</button>
+        <!-- El espejo de la CÁMARA, que no es el mismo botón que el de
+             arriba: aquel voltea el TEXTO para leerlo sobre un cristal
+             delante del objetivo; este enciende la cámara para verse la
+             cara mientras se lee. Sin él se graban cinco minutos mirando
+             dos dedos por encima del lente, que se nota en el resultado y
+             no tiene arreglo en el montaje. -->
+        <button type="button" class="rod-b rod-b-min" id="rod-prom-camara" title="Verte mientras lees">🎥</button>
         <button type="button" class="rod-b rod-b-min" id="rod-prom-cerrar" aria-label="Cerrar">✕</button>
       </div>
     </div>
-    <div class="rod-prom-area" id="rod-prompter-area">
-      <div id="rod-prompter-txt"></div>
+    <!-- La escena: el texto y el espejo, uno encima del otro. El espejo
+         se coloca respecto a ESTA caja y no respecto a la ventana, para
+         que quede siempre justo debajo de la cabecera — que en una
+         tableta estrecha ocupa dos renglones y en una ancha uno—. Con una
+         medida fija en píxeles, en el teléfono se metía debajo de los
+         botones. -->
+    <div class="rod-prom-escena">
+      <div class="rod-prom-area" id="rod-prompter-area">
+        <div id="rod-prompter-txt"></div>
+      </div>
+      <!-- El espejo. Va ARRIBA Y CENTRADO, no en una esquina: se mira
+           mientras se lee, y una ventanita en la esquina hace mirar a la
+           esquina — que es exactamente el defecto que viene a arreglar.
+           La imagen no sale de este elemento: no se graba, no se sube y
+           no se guarda; tampoco se pide el micrófono. -->
+      <div class="rod-cam-espejo" id="rod-cam-espejo" style="display:none;">
+        <video id="rod-cam-video" class="rod-cam-v" autoplay playsinline muted></video>
+        <div class="rod-cam-cruz"></div>
+      </div>
     </div>
   </div>
 

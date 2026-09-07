@@ -826,6 +826,10 @@ function rodRevisar() {
 
 const ROD_PESTANAS = [
   { k: 'secuencia', n: '🎞️ Secuencia' },
+  /* El monitor va PEGADO a la secuencia y no al final: se escribe un
+     bloque, se corre, y se ve si cabe. Al final sería una pantalla de
+     revisar, y lo que hace falta es una de decidir. */
+  { k: 'monitor',   n: '🖥️ Monitor' },
   { k: 'camara',    n: '🎤 Cámara' },
   { k: 'sonido',    n: '🔊 Sonido' },
   { k: 'citas',     n: '📚 Citas' },
@@ -852,6 +856,11 @@ function rodPintarPestanas() {
        tiene trabajo dentro: una pestaña «Citas» sin número no distingue
        «ninguna fuente» de «no la he abierto». */
     const n = { secuencia: _rodBlo.length,
+                /* El monitor no lleva cuenta: lo que enseña es UNA cosa
+                   —el video entero— y un número al lado invitaría a
+                   leerlo como «cuántos te faltan», que aquí no significa
+                   nada. */
+                monitor: 0,
                 camara: _rodBlo.filter(x => x.clase === 'camara').length,
                 sonido: rodSenales().length,
                 citas: _rodFue.length,
@@ -919,6 +928,7 @@ function rodRender() {
   }
 
   ({ secuencia: rodRenderSecuencia,
+     monitor:   rodRenderMonitor,
      camara:    rodRenderCamara,
      sonido:    rodRenderSonido,
      citas:     rodRenderCitas,
@@ -967,6 +977,625 @@ function rodRenderCortes(cuerpo) {
   av.id = 'rod-cor-aviso';
   av.className = 'rod-cor-aviso';
   cuerpo.appendChild(av);
+}
+
+/* ══════════════ 🎥 LA CÁMARA ══════════════
+
+   ⚠️ UN ESPEJO, Y NADA MÁS QUE UN ESPEJO.
+   No graba, no sube nada y no guarda nada. La imagen no sale del elemento
+   `<video>`: no hay grabador, no hay lienzo del que sacar un fotograma y
+   no hay ninguna petición de red que la lleve a ningún sitio. Se dice a la
+   vista y sin que nadie lo pregunte, por la misma razón que en el banco de
+   cortes: a nadie se le ocurre por su cuenta que una página que enciende
+   la cámara no esté haciendo algo con la imagen.
+
+   ⚠️ Y SIN MICRÓFONO (`audio: false`). Para colocarse no hace falta, y
+   pedirlo cambia lo que el navegador enseña en la barra —de «esta página
+   usa la cámara» a «esta página usa la cámara y el micrófono»—, que es
+   exactamente la frase que hace a alguien decir que no.
+
+   Para qué sirve: colocarse. En el monitor, para ver el encuadre con la
+   rejilla de tercios y el rótulo encima; en el teleprompter, para no
+   grabar cinco minutos leyendo dos dedos por encima del objetivo, que se
+   nota en el resultado y no tiene arreglo en el montaje.
+
+   Y es UNA SOLA para toda la herramienta: el monitor y el teleprompter
+   cuelgan sus dos `<video>` del mismo `MediaStream`. Con dos peticiones,
+   el segundo aparato se encontraría la cámara ocupada por el primero en
+   la mitad de los navegadores. */
+
+let _rodCamStream = null;
+let _rodCamPidiendo = false;
+
+function rodCamPuede() {
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+}
+
+function rodCamEncendida() { return !!_rodCamStream; }
+
+async function rodCamEncender() {
+  if (_rodCamStream) return _rodCamStream;
+  if (!rodCamPuede()) throw new Error('Este navegador no deja abrir la cámara desde una página.');
+  if (_rodCamPidiendo) throw new Error('Ya se está pidiendo permiso para la cámara.');
+  _rodCamPidiendo = true;
+  try {
+    _rodCamStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 1280 } },
+      audio: false,
+    });
+    return _rodCamStream;
+  } finally {
+    _rodCamPidiendo = false;
+  }
+}
+
+/* ⚠️ APAGARLA APAGA LA LUZ DE VERDAD.
+   Soltar el elemento `<video>` no para la cámara: la luz del aparato se
+   queda encendida y el navegador sigue diciendo que esta página la está
+   usando. Hay que parar las PISTAS una por una. */
+function rodCamApagar() {
+  if (_rodCamStream) {
+    try { _rodCamStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+    _rodCamStream = null;
+  }
+  document.querySelectorAll('.rod-cam-v, .rod-mon-cam').forEach(v => { v.srcObject = null; });
+  _rodMonCam = false;
+  const esp = document.getElementById('rod-cam-espejo');
+  if (esp) esp.style.display = 'none';
+  const pr = document.getElementById('rod-prompter');
+  if (pr) pr.classList.remove('rod-prom-con-cam');
+  const bt = document.getElementById('rod-prom-camara');
+  if (bt) bt.classList.remove('rod-b-on');
+}
+
+function rodCamColgar(video) {
+  if (!video || !_rodCamStream) return;
+  video.srcObject = _rodCamStream;
+  video.muted = true;                     /* sin esto, `play()` rebota en Safari */
+  const p = video.play();
+  if (p && p.catch) p.catch(() => {});
+}
+
+/* Si ya no la mira nadie, se apaga. Se llama al salir del monitor, al
+   cerrar el teleprompter y al salir de la vista: una cámara que se queda
+   encendida detrás de otra pantalla es lo que hace que alguien no vuelva
+   a dar permiso nunca más. */
+function rodCamSiSobra() {
+  const mon = document.getElementById('rod-mon-cam');
+  const esp = document.getElementById('rod-cam-espejo');
+  const laVeElMonitor = !!(mon && mon.isConnected && _rodMonCam);
+  const laVeElPrompter = !!(esp && esp.style.display !== 'none');
+  if (!laVeElMonitor && !laVeElPrompter) rodCamApagar();
+}
+
+/* ══════════════ PESTAÑA: 🖥️ EL MONITOR ══════════════
+
+   ⚠️ EL VIDEO ANTES DE EXISTIR, Y NO REPRODUCE NADA.
+   Aquí no hay ni un fotograma grabado: es el GUION CORRIENDO en tiempo
+   real. Recorre la secuencia y enseña, en un 16:9 de verdad, qué habrá en
+   pantalla en cada segundo —qué bloque es, qué se dice, qué crédito sale y
+   cuándo entra un golpe de sonido—.
+
+   Para qué sirve, que no lo hace ninguna lista: OÍR LA DURACIÓN. Un cartón
+   de tres segundos que no da tiempo a leer, o una parrafada de cámara de
+   dos minutos y medio en el arranque, se juzgan sintiéndolos pasar; en una
+   tabla son «0:03» y «2:30» y los dos parecen razonables. Es lo que dice
+   si el video se sostiene ANTES de gastar un día grabando, que es cuando
+   todavía sale gratis cambiarlo.
+
+   Y el marco es 16:9 exacto, no «más o menos»: un rótulo que aquí cabe y
+   en el video no, no sirve para decidir nada. */
+
+let _rodMonT = 0;          /* el segundo en que está el cabezal */
+let _rodMonCorre = false;
+let _rodMonVel = 1;
+let _rodMonRaf = null;
+let _rodMonUlt = -1;       /* el bloque que se pintó la última vez */
+let _rodMonUltP = -1;      /* y el párrafo del guion que se pintó */
+let _rodMonCam = false;
+
+const ROD_MON_VELS = [1, 2, 5];
+
+/* Los colores de clase, otra vez, para el degradado del fondo. Se escriben
+   aquí porque un degradado no se puede armar con una clase de CSS: son los
+   MISMOS de `css/rodaje.css`, y si un día cambian allí hay que cambiarlos
+   aquí — por eso están juntos y con este aviso. */
+const ROD_MON_COLOR = {
+  cam: '#f59e0b', pel: '#22d3ee', ia: '#a78bfa', gra: '#34d399',
+  arc: '#94a3b8', pan: '#60a5fa', mus: '#f472b6', tit: '#cbd5e1',
+};
+
+let _rodMonPrevT = 0;
+
+function rodMonBloques() { return rodTiempos(_rodBlo); }
+
+/* En qué bloque cae un segundo. El último se queda hasta el final: al
+   llegar al borde, «ninguno» dejaría el monitor en negro justo en el
+   fotograma que se estaba mirando. */
+function rodMonEn(blo, t) {
+  for (let i = blo.length - 1; i >= 0; i--) {
+    if (t >= blo[i].ini) return i;
+  }
+  return blo.length ? 0 : -1;
+}
+
+/* Las muescas de la pista: cada golpe y cada cambio de música, en el
+   segundo del video entero en que suenan. Es la lectura que el autor pidió
+   —«la lógica de en qué momento los efectos del sonido»— vista de una vez:
+   aquí se ve si hay ocho golpes seguidos en veinte segundos, que leyendo
+   la lista bloque a bloque no se ve.
+
+   ⚠️ Se le pregunta a `rodSenales()`, la MISMA que pinta la pestaña
+   🔊 Sonido. Con una lista propia, las muescas de la pista y la lista del
+   sonido podrían acabar diciendo cosas distintas del mismo video, y la
+   equivocada sería siempre la que menos se mira. */
+function rodMonSenales() {
+  return rodSenales().map(s => {
+    if (s.tipo !== 'mus') {
+      return { t: s.t, mus: false, que: String(s.sfx.que || '').trim() || 'golpe' };
+    }
+    const acc = ROD_ACC[s.mus.acc] || { n: s.mus.acc || 'cambia' };
+    const f = s.mus.fid ? rodFuente(s.mus.fid) : null;
+    return { t: s.t, mus: true, que: acc.n + (f && f.titulo ? ': ' + f.titulo : ' la música') };
+  });
+}
+
+/* El rótulo que se ve encima del video en este bloque. Es el que está
+   marcado para salir EN PANTALLA; si el bloque necesita cita y no tiene
+   ninguna viva, se enseña la falta en el mismo sitio y en rojo, que es
+   donde de verdad se nota. */
+function rodMonTercio(b) {
+  const vivas = (Array.isArray(b.fids) ? b.fids : []).map(x => rodFuente(x)).filter(Boolean);
+  const enPantalla = vivas.find(f => f.pantalla);
+  if (enPantalla) {
+    return {
+      falta: false,
+      ia: rodFuenteClase(enPantalla.clase).ia,
+      nombre: rodFuenteClase(enPantalla.clase).ia ? 'Generado con IA' : 'Fuente',
+      txt: String(enPantalla.rotulo || '').trim() || rodRotulo(enPantalla),
+    };
+  }
+  if (rodClase(b.clase).cita && !vivas.length) {
+    return { falta: true, ia: false, nombre: 'Sin fuente', txt: 'Este bloque no se puede publicar sin cita.' };
+  }
+  return null;
+}
+
+function rodRenderMonitor(cuerpo) {
+  const blo = rodMonBloques();
+  const total = rodTotal(_rodBlo);
+
+  const intro = document.createElement('div');
+  intro.className = 'rod-intro';
+  intro.appendChild(Object.assign(document.createElement('div'),
+    { className: 'rod-intro-t', textContent: '🖥️ El video antes de existir' }));
+  intro.appendChild(Object.assign(document.createElement('div'), {
+    className: 'rod-intro-p',
+    textContent: 'Aquí no se reproduce nada: corre el guion. Sirve para oír la duración, que es ' +
+      'lo único que una lista no puede dar.',
+  }));
+  cuerpo.appendChild(intro);
+
+  const caja = document.createElement('div');
+  caja.className = 'rod-mon';
+  cuerpo.appendChild(caja);
+
+  const marco = document.createElement('div');
+  marco.className = 'rod-mon-marco';
+  marco.id = 'rod-mon-marco';
+  caja.appendChild(marco);
+
+  marco.appendChild(Object.assign(document.createElement('div'),
+    { className: 'rod-mon-fondo', id: 'rod-mon-fondo' }));
+
+  /* La cámara vive dentro del marco y se enseña sola en los bloques de
+     cámara: verse a uno mismo donde va a ir uno mismo es toda la gracia. */
+  const vid = document.createElement('video');
+  vid.className = 'rod-mon-cam';
+  vid.id = 'rod-mon-cam';
+  vid.autoplay = true; vid.playsInline = true; vid.muted = true;
+  vid.setAttribute('playsinline', '');
+  vid.style.display = 'none';
+  marco.appendChild(vid);
+  marco.appendChild(Object.assign(document.createElement('div'),
+    { className: 'rod-mon-tercios', id: 'rod-mon-tercios', style: 'display:none' }));
+
+  const hud = document.createElement('div');
+  hud.className = 'rod-mon-hud';
+  const est = document.createElement('div');
+  est.className = 'rod-mon-est';
+  est.appendChild(Object.assign(document.createElement('i'), { className: 'rod-mon-punto' }));
+  est.appendChild(Object.assign(document.createElement('span'),
+    { id: 'rod-mon-est-txt', textContent: 'EN PAUSA' }));
+  hud.appendChild(est);
+  const tc = document.createElement('div');
+  tc.className = 'rod-mon-tc';
+  tc.id = 'rod-mon-tc';
+  hud.appendChild(tc);
+  marco.appendChild(hud);
+
+  const centro = document.createElement('div');
+  centro.className = 'rod-mon-centro';
+  centro.appendChild(Object.assign(document.createElement('div'),
+    { className: 'rod-mon-clase', id: 'rod-mon-clase' }));
+  centro.appendChild(Object.assign(document.createElement('div'),
+    { className: 'rod-mon-titulo', id: 'rod-mon-titulo' }));
+  centro.appendChild(Object.assign(document.createElement('div'),
+    { className: 'rod-mon-visual', id: 'rod-mon-visual' }));
+  marco.appendChild(centro);
+
+  /* El pie: el rótulo encima del texto, apilados en una columna. Los dos
+     van abajo porque es donde van en el video, y en una columna porque
+     sueltos se pisaban —un crédito de tres renglones tapaba la frase—. */
+  const pie = document.createElement('div');
+  pie.className = 'rod-mon-pie';
+  pie.id = 'rod-mon-pie';
+  const sub = document.createElement('div');
+  sub.className = 'rod-mon-sub';
+  sub.id = 'rod-mon-sub';
+  pie.appendChild(sub);
+  marco.appendChild(pie);
+
+  if (!blo.length) {
+    /* Antes del pie, que en el marco en columna es el último: si no, el
+       aviso saldría por debajo del hueco del rótulo. */
+    marco.insertBefore(Object.assign(document.createElement('div'), {
+      className: 'rod-mon-nada',
+      textContent: 'La secuencia está vacía: no hay nada que correr. Escríbela en 🎞️ Secuencia.',
+    }), pie);
+    return;
+  }
+
+  /* ── La pista ── */
+  const barra = document.createElement('div');
+  barra.className = 'rod-mon-barra';
+  const pista = document.createElement('div');
+  pista.className = 'rod-mon-pista';
+  pista.id = 'rod-mon-pista';
+  blo.forEach((b, i) => {
+    const t = document.createElement('span');
+    t.className = 'rod-mon-tramo rod-c-' + rodClase(b.clase).col;
+    t.dataset.i = String(i);
+    t.style.width = (total ? (Math.max(0, Number(b.dur) || 0) / total) * 100 : 0) + '%';
+    t.title = rodReloj(b.ini) + '  ' + (b.titulo || rodClase(b.clase).n);
+    pista.appendChild(t);
+  });
+  rodMonSenales().forEach(s => {
+    const i = document.createElement('i');
+    i.className = 'rod-mon-tick' + (s.mus ? ' rod-mon-tick-mus' : '');
+    i.style.left = (total ? (s.t / total) * 100 : 0) + '%';
+    pista.appendChild(i);
+  });
+  pista.appendChild(Object.assign(document.createElement('i'),
+    { className: 'rod-mon-cabeza', id: 'rod-mon-cabeza' }));
+  barra.appendChild(pista);
+  const regla = document.createElement('div');
+  regla.className = 'rod-mon-regla';
+  regla.appendChild(Object.assign(document.createElement('span'), { textContent: '0:00' }));
+  regla.appendChild(Object.assign(document.createElement('span'), { textContent: rodReloj(total) }));
+  barra.appendChild(regla);
+  caja.appendChild(barra);
+
+  rodMonMontarPista(pista, total);
+
+  /* ── El mando ── */
+  const mando = document.createElement('div');
+  mando.className = 'rod-mon-mando';
+  mando.appendChild(rodBoton('⏮', () => rodMonSaltar(-1), 'rod-b-min'));
+  const play = rodBoton(_rodMonCorre ? '⏸' : '▶️', () => rodMonCorrer(!_rodMonCorre), 'rod-b-pri rod-mon-play');
+  play.id = 'rod-mon-play';
+  mando.appendChild(play);
+  mando.appendChild(rodBoton('⏭', () => rodMonSaltar(1), 'rod-b-min'));
+
+  if (rodCamPuede()) {
+    const bc = rodBoton('🎥', rodMonCamara, 'rod-b-min');
+    bc.id = 'rod-mon-cam-btn';
+    bc.title = 'Encender la cámara para colocarte';
+    if (_rodMonCam) bc.classList.add('rod-mon-vel-on');
+    mando.appendChild(bc);
+  }
+  caja.appendChild(mando);
+
+  /* La velocidad, en su propio renglón. En el mismo que el transporte, en
+     un teléfono estrecho, los siete botones salían a 25 px: por debajo de
+     lo que un dedo acierta, y aquí se toca sin mirar el botón porque se
+     está mirando el monitor. */
+  const fila = document.createElement('div');
+  fila.className = 'rod-mon-vels';
+  fila.appendChild(Object.assign(document.createElement('span'), { textContent: 'Velocidad' }));
+  const vels = document.createElement('div');
+  vels.className = 'rod-mon-vel';
+  ROD_MON_VELS.forEach(v => {
+    const b = rodBoton(v + '×', () => {
+      _rodMonVel = v;
+      vels.querySelectorAll('.rod-b').forEach(x => x.classList.remove('rod-mon-vel-on'));
+      b.classList.add('rod-mon-vel-on');
+    });
+    if (v === _rodMonVel) b.classList.add('rod-mon-vel-on');
+    vels.appendChild(b);
+  });
+  fila.appendChild(vels);
+  caja.appendChild(fila);
+
+  const nota = document.createElement('p');
+  nota.className = 'rod-cam-nota' + (rodCamPuede() ? '' : ' rod-cam-no');
+  nota.id = 'rod-mon-cam-nota';
+  nota.textContent = rodCamPuede()
+    ? '🎥 La cámara es un espejo para colocarte: no graba, no se sube a ninguna parte y no se ' +
+      'guarda nada. Tampoco se pide el micrófono. Se apaga sola al salir de esta pestaña.'
+    : '🎥 Este navegador no deja abrir la cámara desde una página (hace falta https o un permiso ' +
+      'que aquí no existe). Todo lo demás del monitor funciona igual.';
+  caja.appendChild(nota);
+
+  /* ── Los saltos ──
+     Con treinta bloques, buscar «la toma del cierre» arrastrando el
+     cabezal a ojo es imposible; por nombre es un toque. */
+  const saltos = document.createElement('div');
+  saltos.className = 'rod-mon-saltos';
+  saltos.id = 'rod-mon-saltos';
+  blo.forEach((b, i) => {
+    const s = document.createElement('button');
+    s.type = 'button';
+    s.className = 'rod-mon-salto rod-borde-' + rodClase(b.clase).col;
+    s.dataset.i = String(i);
+    s.appendChild(Object.assign(document.createElement('span'),
+      { className: 'rod-mon-salto-t', textContent: rodReloj(b.ini) }));
+    s.appendChild(Object.assign(document.createElement('span'), {
+      className: 'rod-mon-salto-n',
+      textContent: rodClase(b.clase).ic + ' ' + (b.titulo || rodClase(b.clase).n),
+    }));
+    s.appendChild(Object.assign(document.createElement('span'),
+      { className: 'rod-mon-salto-d', textContent: rodReloj(b.dur) }));
+    s.addEventListener('click', () => { _rodMonT = b.ini; _rodMonUlt = -1; rodMonPintar(true); });
+    saltos.appendChild(s);
+  });
+  caja.appendChild(saltos);
+
+  if (_rodMonT > total) _rodMonT = 0;
+  _rodMonUlt = -1; _rodMonUltP = -1;
+  rodMonPintar(true);
+  if (_rodMonCam && rodCamEncendida()) rodCamColgar(vid);
+  rodMonBucle();
+}
+
+/* Arrastrar el cabezal. Con PUNTEROS, como todo lo que se toca en esta
+   casa: `draggable` no existe en el navegador de casi ninguna tableta, y
+   esto se usa desde la tableta. */
+function rodMonMontarPista(pista, total) {
+  const aTiempo = ev => {
+    const r = pista.getBoundingClientRect();
+    const x = Math.min(Math.max(ev.clientX - r.left, 0), r.width);
+    return r.width ? (x / r.width) * total : 0;
+  };
+  let arrastrando = false;
+  pista.addEventListener('pointerdown', ev => {
+    arrastrando = true;
+    try { pista.setPointerCapture(ev.pointerId); } catch (e) {}
+    _rodMonT = aTiempo(ev); _rodMonUlt = -1; rodMonPintar(true);
+    ev.preventDefault();
+  });
+  pista.addEventListener('pointermove', ev => {
+    if (!arrastrando) return;
+    _rodMonT = aTiempo(ev); rodMonPintar(true);
+  });
+  const soltar = () => { arrastrando = false; };
+  pista.addEventListener('pointerup', soltar);
+  pista.addEventListener('pointercancel', soltar);
+}
+
+function rodMonSaltar(dir) {
+  const blo = rodMonBloques();
+  if (!blo.length) return;
+  const i = rodMonEn(blo, _rodMonT);
+  /* ⏮ vuelve al principio de ESTE bloque si ya se avanzó dentro de él, y
+     al anterior si se acaba de entrar. Es como se comporta el botón de
+     una pletina, y es lo que la mano espera. */
+  let d = i;
+  if (dir < 0) d = (_rodMonT - blo[i].ini > 1.2) ? i : Math.max(0, i - 1);
+  else d = Math.min(blo.length - 1, i + 1);
+  _rodMonT = blo[d].ini;
+  _rodMonUlt = -1;
+  rodMonPintar(true);
+}
+
+function rodMonCorrer(encender) {
+  _rodMonCorre = !!encender;
+  const b = document.getElementById('rod-mon-play');
+  if (b) b.textContent = _rodMonCorre ? '⏸' : '▶️';
+  const m = document.getElementById('rod-mon-marco');
+  if (m) m.classList.toggle('rod-mon-corriendo', _rodMonCorre);
+  const t = document.getElementById('rod-mon-est-txt');
+  if (t) t.textContent = _rodMonCorre ? 'CORRIENDO' : 'EN PAUSA';
+}
+
+async function rodMonCamara() {
+  const vid = document.getElementById('rod-mon-cam');
+  const btn = document.getElementById('rod-mon-cam-btn');
+  const nota = document.getElementById('rod-mon-cam-nota');
+  if (_rodMonCam) {
+    _rodMonCam = false;
+    if (btn) btn.classList.remove('rod-mon-vel-on');
+    if (vid) vid.style.display = 'none';
+    rodCamSiSobra();
+    _rodMonUlt = -1; rodMonPintar(true);
+    return;
+  }
+  try {
+    await rodCamEncender();
+    _rodMonCam = true;
+    if (btn) btn.classList.add('rod-mon-vel-on');
+    if (vid) rodCamColgar(vid);
+    _rodMonUlt = -1; rodMonPintar(true);
+  } catch (e) {
+    /* ⚠️ EL «NO» SE EXPLICA, NO SE TRAGA. Un botón que se toca y no hace
+       nada se toca tres veces más. Y el motivo casi siempre es uno de dos
+       —se dijo que no al permiso, o la cámara la tiene otra aplicación— y
+       los dos se arreglan de maneras distintas. */
+    _rodMonCam = false;
+    if (nota) {
+      nota.className = 'rod-cam-nota rod-cam-no';
+      nota.textContent = '🎥 No se pudo abrir la cámara: ' + (e && e.message ? e.message : 'permiso denegado') +
+        '. Suele ser que se dijo que no al permiso —se cambia en el candado de la barra de direcciones— ' +
+        'o que la está usando otra aplicación.';
+    }
+  }
+}
+
+/* ⚠️ EL BUCLE SE PARA SOLO CUANDO SU MARCO YA NO ESTÁ.
+   Cambiar de pestaña vacía `#rod-cuerpo`, así que el marco desaparece sin
+   que nadie avise. Un bucle que siguiera corriendo escribiría en nodos
+   sueltos para siempre y dejaría la cámara encendida detrás de otra
+   pantalla. */
+function rodMonBucle() {
+  if (_rodMonRaf) cancelAnimationFrame(_rodMonRaf);
+  let ultimo = performance.now();
+  const paso = ahora => {
+    const marco = document.getElementById('rod-mon-marco');
+    if (!marco || !marco.isConnected) {
+      _rodMonRaf = null;
+      _rodMonCorre = false;
+      rodCamSiSobra();
+      return;
+    }
+    const dt = Math.min(0.25, (ahora - ultimo) / 1000);
+    ultimo = ahora;
+    if (_rodMonCorre) {
+      const total = rodTotal(_rodBlo);
+      _rodMonT += dt * _rodMonVel;
+      if (_rodMonT >= total) { _rodMonT = total; rodMonCorrer(false); }
+      rodMonPintar(false);
+    }
+    _rodMonRaf = requestAnimationFrame(paso);
+  };
+  _rodMonRaf = requestAnimationFrame(paso);
+}
+
+/* Pinta el fotograma del segundo en que está el cabezal.
+
+   ⚠️ Solo se REESCRIBE lo que cambió. El reloj y el cabezal cambian sesenta
+   veces por segundo; el título, el rótulo y el color de fondo solo al
+   cambiar de bloque. Reescribirlo todo en cada cuadro hace parpadear las
+   animaciones del rótulo y del golpe de sonido —vuelven a empezar—, que es
+   justo lo que había que ver. */
+function rodMonPintar(forzar) {
+  const blo = rodMonBloques();
+  const total = rodTotal(_rodBlo);
+  const marco = document.getElementById('rod-mon-marco');
+  if (!marco) return;
+  const t = Math.min(Math.max(0, _rodMonT), total);
+
+  const tc = document.getElementById('rod-mon-tc');
+  if (tc) {
+    tc.textContent = '';
+    tc.appendChild(document.createTextNode(rodReloj(Math.floor(t))));
+    tc.appendChild(Object.assign(document.createElement('span'),
+      { className: 'rod-mon-tc-fin', textContent: ' / ' + rodReloj(total) }));
+  }
+  const cab = document.getElementById('rod-mon-cabeza');
+  if (cab) cab.style.left = (total ? (t / total) * 100 : 0) + '%';
+
+  if (!blo.length) return;
+  const i = rodMonEn(blo, t);
+  const b = blo[i];
+  const c = rodClase(b.clase);
+  const dentro = t - b.ini;
+  const dur = Math.max(1, Number(b.dur) || 0);
+
+  /* El golpe de sonido, cuando el cabezal lo cruza. Se busca en la
+     ventana que se acaba de recorrer y no en «el segundo actual»: a 5× se
+     saltan segundos enteros entre un cuadro y el siguiente, y los golpes
+     de esos segundos no sonarían nunca. */
+  if (_rodMonCorre && !forzar) {
+    const desde = _rodMonPrevT, hasta = t;
+    if (hasta > desde) {
+      rodMonSenales().forEach(s => {
+        if (s.t > desde && s.t <= hasta) rodMonGolpe(s);
+      });
+    }
+  }
+  _rodMonPrevT = t;
+
+  const trozos = document.querySelectorAll('.rod-mon-tramo');
+  const saltos = document.querySelectorAll('.rod-mon-salto');
+
+  /* Los párrafos del guion se pasan como los pasaría un teleprompter: uno
+     por tramo del bloque. Ver el texto avanzar es lo que dice si cabe. */
+  const parr = String(b.guion || '').split(/\n+/).map(x => x.trim()).filter(Boolean);
+  const ip = parr.length ? Math.min(parr.length - 1, Math.floor((dentro / dur) * parr.length)) : -1;
+
+  if (!forzar && i === _rodMonUlt && ip === _rodMonUltP) return;
+  const cambioBloque = i !== _rodMonUlt;
+  _rodMonUlt = i; _rodMonUltP = ip;
+
+  const sub = document.getElementById('rod-mon-sub');
+  if (sub) {
+    sub.textContent = ip >= 0 ? parr[ip] : '';
+    sub.classList.toggle('rod-mon-sub-off', b.clase !== 'camara');
+  }
+  if (!cambioBloque) return;
+
+  trozos.forEach(x => x.classList.toggle('rod-mon-tramo-on', Number(x.dataset.i) === i));
+  saltos.forEach(x => {
+    const puesto = Number(x.dataset.i) === i;
+    x.classList.toggle('rod-mon-salto-on', puesto);
+    if (puesto) { try { x.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
+  });
+
+  /* El fondo se tiñe del color de la clase. Es la señal que se ve de reojo
+     mientras se lee el texto de abajo, y la que dice «ahora mismo estás
+     mirando material ajeno». */
+  const fondo = document.getElementById('rod-mon-fondo');
+  if (fondo) {
+    const col = ROD_MON_COLOR[c.col] || ROD_MON_COLOR.gra;
+    fondo.style.background =
+      'radial-gradient(120% 90% at 50% 0%, ' + col + '38, transparent 70%), ' +
+      'linear-gradient(180deg, ' + col + '1c, #000 78%)';
+  }
+
+  const esCam = b.clase === 'camara' && _rodMonCam && rodCamEncendida();
+  const vid = document.getElementById('rod-mon-cam');
+  const rej = document.getElementById('rod-mon-tercios');
+  if (vid) vid.style.display = esCam ? '' : 'none';
+  if (rej) rej.style.display = esCam ? '' : 'none';
+  marco.classList.toggle('rod-mon-con-cam', esCam);
+
+  const cl = document.getElementById('rod-mon-clase');
+  if (cl) cl.textContent = c.ic + ' ' + c.n + ' · ' + rodReloj(b.dur);
+  const ti = document.getElementById('rod-mon-titulo');
+  if (ti) ti.textContent = b.titulo || '(sin título)';
+  const vi = document.getElementById('rod-mon-visual');
+  if (vi) vi.textContent = b.visual || '';
+
+  /* El rótulo, en su sitio y con su pinta. Es el único momento del proceso
+     en que se puede ver si el crédito de una película cabe en una línea
+     antes de montarlo; corregirlo aquí son diez segundos, y en el editor
+     de video, media hora. */
+  const pie = document.getElementById('rod-mon-pie');
+  const viejo = pie && pie.querySelector('.rod-mon-tercio');
+  if (viejo) viejo.remove();
+  const ter = rodMonTercio(b);
+  if (ter && pie) {
+    const d = document.createElement('div');
+    d.className = 'rod-mon-tercio' + (ter.ia ? ' rod-mon-tercio-ia' : '') +
+      (ter.falta ? ' rod-mon-tercio-falta' : '');
+    d.appendChild(Object.assign(document.createElement('span'),
+      { className: 'rod-mon-tercio-n', textContent: ter.nombre }));
+    d.appendChild(Object.assign(document.createElement('span'),
+      { className: 'rod-mon-tercio-r', textContent: ter.txt }));
+    /* Encima del texto que se está diciendo, que es el orden en que se
+       leen: primero de quién es lo que se ve, después qué se dice. */
+    pie.insertBefore(d, pie.firstChild);
+  }
+}
+
+function rodMonGolpe(s) {
+  const marco = document.getElementById('rod-mon-marco');
+  if (!marco) return;
+  const d = document.createElement('div');
+  d.className = 'rod-mon-golpe' + (s.mus ? ' rod-mon-golpe-mus' : '');
+  d.textContent = (s.mus ? '🎵 ' : '🔊 ') + s.que;
+  marco.appendChild(d);
+  setTimeout(() => { d.remove(); }, 1200);
 }
 
 /* ══════════════ PESTAÑA: LA SECUENCIA ══════════════ */
@@ -3045,9 +3674,61 @@ function rodPrompterAbrir(bid) {
   }
 }
 
+/* ⚠️ EL ESPEJO DE LA CÁMARA, QUE NO ES EL ESPEJO DEL TEXTO.
+   El botón 🪞 voltea el TEXTO, para quien lee sobre un cristal delante del
+   objetivo. Este enciende la cámara para VERSE mientras se lee, que es
+   otra cosa y hace falta igual: sin ella se graban cinco minutos mirando
+   dos dedos por encima del lente —o con la cabeza cortada por arriba—, y
+   eso no se descubre hasta volcar el archivo, cuando ya se desmontó todo.
+   No graba, no sube nada y no guarda nada. */
+async function rodPrompterCamara() {
+  const caja = document.getElementById('rod-cam-espejo');
+  const btn  = document.getElementById('rod-prom-camara');
+  const pr   = document.getElementById('rod-prompter');
+  if (!caja) return;
+  if (caja.style.display !== 'none') {
+    caja.style.display = 'none';
+    if (btn) btn.classList.remove('rod-b-on');
+    if (pr) pr.classList.remove('rod-prom-con-cam');
+    rodCamSiSobra();
+    return;
+  }
+  if (!rodCamPuede()) {
+    if (btn) btn.textContent = '🚫';
+    /* Se dice en el rótulo del propio botón porque el teleprompter no
+       tiene dónde escribir un aviso: es una pantalla negra con el guion, y
+       meterle una línea de texto de sistema encima sería taparlo justo
+       cuando se está leyendo. */
+    if (btn) btn.title = 'Este navegador no deja abrir la cámara desde una página.';
+    return;
+  }
+  try {
+    await rodCamEncender();
+    caja.style.display = '';
+    if (btn) btn.classList.add('rod-b-on');
+    if (pr) pr.classList.add('rod-prom-con-cam');
+    rodCamColgar(document.getElementById('rod-cam-video'));
+  } catch (e) {
+    if (btn) {
+      btn.textContent = '🚫';
+      btn.title = 'No se pudo abrir la cámara: ' + (e && e.message ? e.message : 'permiso denegado');
+    }
+  }
+}
+
 function rodPrompterCerrar() {
   rodOverlay('rod-prompter', false);
   rodPrompterPasar(false);
+  /* La cámara se apaga al cerrar si no la mira nadie más. Dejarla
+     encendida detrás de otra pantalla es lo que hace que alguien no
+     vuelva a dar el permiso nunca. */
+  const esp = document.getElementById('rod-cam-espejo');
+  if (esp) esp.style.display = 'none';
+  const btn = document.getElementById('rod-prom-camara');
+  if (btn) btn.classList.remove('rod-b-on');
+  const pr = document.getElementById('rod-prompter');
+  if (pr) pr.classList.remove('rod-prom-con-cam');
+  rodCamSiSobra();
   if (_rodPromReloj) { clearInterval(_rodPromReloj); _rodPromReloj = null; }
   /* Se suelta el permiso de pantalla encendida: dejarlo puesto se come la
      batería de la tableta el resto del día sin que nada lo diga. */
@@ -3061,7 +3742,17 @@ function rodPrompterPasar(encender) {
   if (encender && area) {
     _rodPromInt = setInterval(() => { area.scrollTop += _rodPromVel; }, 50);
   }
-  if (btn) btn.textContent = _rodPromInt ? '⏸️ Parar' : '▶️ Pasar';
+  if (btn) {
+    /* La palabra va en su propio `span` para que en un teléfono se pueda
+       esconder y quede solo el icono: con ella, los ocho mandos de la
+       cabecera no cabían en dos renglones y la ✕ se quedaba sola en un
+       tercero, cruzando la pantalla entera. El icono solo se entiende —es
+       el de cualquier reproductor— y el botón sigue midiendo lo que mide
+       un dedo. */
+    btn.textContent = _rodPromInt ? '⏸️' : '▶️';
+    btn.appendChild(Object.assign(document.createElement('span'),
+      { className: 'rod-prom-pasar-txt', textContent: _rodPromInt ? ' Parar' : ' Pasar' }));
+  }
 }
 
 /* ══════════════ LO QUE SALE POR EL CHAT ══════════════
@@ -3260,7 +3951,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const cambia = (id, fn) => { const e = document.getElementById(id); if (e) e.addEventListener('change', fn); };
   const escribe = (id, fn) => { const e = document.getElementById(id); if (e) e.addEventListener('input', fn); };
 
-  clic('rod-back-btn', () => { if (typeof switchView === 'function') switchView('view-inicio'); });
+  clic('rod-back-btn', () => {
+    /* Salir de la vista apaga la cámara. Sin esto se queda encendida
+       —con la luz puesta y el aviso del navegador— detrás de las
+       finanzas o del chat, que es la peor manera de enterarse. */
+    rodCamApagar();
+    if (typeof switchView === 'function') switchView('view-inicio');
+  });
 
   cambia('rod-proyecto', async e => { _rodPid = e.target.value; await rodCargarProyecto(); });
   clic('rod-nuevo-btn', () => rodProyectoAbrir(null));
@@ -3347,6 +4044,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const c = document.getElementById('rod-prompter-txt');
     if (c) c.classList.toggle('rod-prom-espejo');
   });
+  clic('rod-prom-camara', rodPrompterCamara);
+  /* Y el espejo se hace grande al tocarlo: para colocarse hace falta ver
+     la cara, y para leer estorba. Un tamaño fijo obliga a elegir. */
+  clic('rod-cam-espejo', () => {
+    const c = document.getElementById('rod-cam-espejo');
+    if (c) c.classList.toggle('rod-cam-espejo-grande');
+  });
 });
 
 function rodPromVelPintar() {
@@ -3371,6 +4075,17 @@ window.FaroRodaje = {
   leerMusica: rodLeerMusica,
   senales: rodSenales,
   revisar: rodRevisar,
+  monitor: {
+    en: rodMonEn,
+    senales: rodMonSenales,
+    tercio: rodMonTercio,
+    color: ROD_MON_COLOR,
+  },
+  camara: {
+    puede: rodCamPuede,
+    encendida: rodCamEncendida,
+    apagar: rodCamApagar,
+  },
   clases: ROD_CLASES,
   fuentes: ROD_FUENTES,
   licencias: ROD_LICENCIAS,

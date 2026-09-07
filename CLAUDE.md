@@ -371,7 +371,7 @@ ser mentira; y se publica con una canción, un clip y tres imágenes sin
 decir de dónde salieron—. Las tres las impide la forma de los datos, no la
 buena memoria de nadie.
 
-**Quince reglas, y ninguna es de adorno:**
+**Dieciocho reglas, y ninguna es de adorno:**
 
 1. ⚠️ **NO SE GUARDA NUNCA EL MINUTO EN QUE EMPIEZA UN BLOQUE.** Se guarda
    cuánto DURA; el minuto de entrada lo suma `rodTiempos()` cada vez que se
@@ -552,6 +552,91 @@ buena memoria de nadie.
     Y es **de la casa**, no de cada quien: un video se hace entre varios, y
     una secuencia que solo puede tocar quien la abrió convierte «arréglame
     esa frase» en «pásame tu sesión».
+
+16. ⚠️ **ESTA PANTALLA ES OSCURA, Y NO ES UNA MANÍA DE ESTILO.**
+    Rehecha el 7 de septiembre de 2026 porque el autor lo dijo con todas
+    las letras: «la interfaz de lo que has realizado es sumamente
+    horrible». Y tenía razón por un motivo que se puede escribir: aquí se
+    juzgan **imágenes** —un fotograma de película, un rótulo blanco encima
+    del video, un cartel de reel, el encuadre de la propia cara—, y sobre
+    fondo blanco todo eso se ve más claro de lo que es y los rótulos
+    parecen apagados. Es la razón por la que no existe un programa de
+    montaje claro. Y se trabaja de noche con la luz apagada para grabar:
+    una pantalla blanca a esa hora deslumbra y se refleja en las gafas
+    dentro de la propia toma.
+
+    ⚠️ **Se oscurece REDEFINIENDO LOS TOKENS de la aplicación dentro de
+    `#view-rodaje`** y de los seis `id` de sus ventanas —que cuelgan del
+    `body` y hay que nombrar una por una—, no copiando reglas. Así todo lo
+    que hereda de `app.css` (`.fin-modal`, `.msug-vacio`, `.msug-det-head`)
+    se pone oscuro solo, y cada arreglo futuro de `app.css` sigue
+    llegando aquí. Copiando reglas, esta pantalla se iría quedando vieja
+    sola. Y **no se toca ni un token de `:root`**: el resto de F.A.R.O es
+    claro y sigue siéndolo. La barra de abajo vive fuera de la vista, así
+    que `switchView` le pone `rod-sala` al `body` y se la quita al salir.
+
+    ⚠️ **Y las franjas de color de clase (`.rod-borde-*`) van AL FINAL del
+    archivo.** `.rod-card` y `.rod-mon-salto` declaran `border-left: … solid
+    var(--border)` —el atajo, que incluye el color— y pesan lo mismo: a
+    igualdad de peso gana la que vaya después. Con las franjas arriba, la
+    secuencia entera se pintaba gris y llevaba así desde el primer día. No
+    daba error, no rompía nada y el HTML estaba bien: es el mismo fallo del
+    `var(--card)` de Videos M.E.T.A.S, y se caza igual —mirando el color
+    **calculado**, comprobación 15—.
+
+17. ⚠️ **EL MONITOR CORRE EL GUION; NO REPRODUCE NADA.**
+    Pestaña 🖥️, pegada a la secuencia. Un 16:9 de verdad que recorre la
+    secuencia en tiempo real y enseña qué habrá en pantalla en cada
+    segundo: el bloque, la frase que se dice, el rótulo de la fuente en el
+    sitio donde va a estar y un destello cuando cruza un golpe de sonido.
+    Sirve para lo único que una lista no puede hacer: **oír la duración**.
+    Un cartón de tres segundos que no da tiempo a leer, o una parrafada de
+    cámara de dos minutos y medio en el arranque, se juzgan sintiéndolos
+    pasar; en una tabla son «0:03» y «2:30» y los dos parecen razonables.
+
+    - **El marco es 16:9 EXACTO y no se estira.** Un rótulo que aquí cabe
+      y en el video no, no sirve para decidir nada. Lo que se recorta en un
+      teléfono es el CONTENIDO, y por orden: la indicación de plano —que se
+      lee entera en 🎞️ Secuencia—, después los renglones del rótulo y del
+      texto. El título del bloque no se toca nunca.
+    - **El rótulo y la frase se APILAN en una columna.** Sueltos se
+      pisaban, y lo que quedaba ilegible eran justo las dos cosas que se
+      venía a juzgar.
+    - **Un bloque que necesita cita y no la tiene lo dice EN EL HUECO DEL
+      RÓTULO, en rojo.** Es lo mismo que el disparador de la base no deja
+      publicar, enseñado donde de verdad se nota.
+    - **Las muescas de la pista salen de `rodSenales()`**, la misma
+      función que pinta 🔊 Sonido. Con dos listas, una estaría mal algún
+      día y sería la que menos se mira.
+    - ⚠️ **Correrlo NO escribe `ini` en ninguna fila.** Es la regla 1
+      vista desde otro sitio, y la sonda la vigila aquí también.
+    - **El transporte y la velocidad van en DOS renglones.** En un
+      teléfono de 320 px los siete mandos en una fila salían a 25 px, y
+      estos se tocan mirando el monitor, no el botón.
+
+18. ⚠️ **LA CÁMARA ES UN ESPEJO, Y NADA MÁS.**
+    Pedida el 7 de septiembre de 2026 («ponle el espejo de la cámara en el
+    teleprompter»). Está en el monitor —para ver el encuadre con la rejilla
+    de tercios y el rótulo encima— y en el teleprompter, arriba y
+    **centrada**: una ventanita en la esquina hace mirar a la esquina, que
+    es el defecto que viene a arreglar.
+
+    - **No graba, no sube nada y no guarda nada, y la pantalla lo dice** en
+      verde y sin que nadie lo pregunte. Misma regla que el banco de
+      cortes: a nadie se le ocurre por su cuenta que una página que
+      enciende la cámara no esté haciendo algo con la imagen.
+    - ⚠️ **Se pide `audio: false`.** Pedir el micrófono cambia lo que el
+      navegador enseña al dar permiso, y esa frase es la que hace decir
+      que no.
+    - **Es UNA sola para toda la herramienta.** El monitor y el
+      teleprompter cuelgan sus dos `<video>` del mismo flujo; con dos
+      peticiones, el segundo se encuentra la cámara ocupada por el primero.
+    - ⚠️ **Apagarla PARA LAS PISTAS.** Soltar el `<video>` no apaga nada:
+      la luz del aparato se queda encendida detrás del chat o de las
+      finanzas, y eso es lo que hace que alguien no vuelva a dar el permiso
+      nunca. Se apaga al salir de la vista y en cuanto no la mira nadie.
+    - **Va espejada.** Sin espejar, mover el hombro derecho se ve moverse
+      al izquierdo y se acaba encuadrando al revés.
 
 ⚠️ **Y la descripción de YouTube no lleva dentro las notas del autor.**
 Van encima de una raya (`copia de aquí para abajo`) y el botón copia solo
@@ -1038,6 +1123,23 @@ la comprobación aprobaría sola—.
 Si se copia una regla del mundo de las misiones, se le cambia el token al
 copiarla. Y si se quiere un respaldo, se escribe: `var(--card, #fff)`,
 como ya hacen las reglas de Asignaciones.
+
+⚠️ **Y hay una tercera pantalla, que es la excepción: El Rodaje.**
+`css/rodaje.css` **redefine** `--bg`, `--surface`, `--border`, `--text`,
+`--muted`, `--faint`, `--brand` y `--accent` en oscuro, pero **solo dentro
+de `#view-rodaje` y de los seis `id` de sus ventanas**. No es un tercer
+mundo de tokens: son los mismos nombres con otros valores, así que todo lo
+que hereda de `app.css` se oscurece solo y los arreglos de `app.css`
+siguen llegando. Lo que no se puede hacer nunca es redefinirlos en
+`:root`: eso teñiría la casa entera.
+
+⚠️ **Y el mismo cuidado con los ATAJOS.** `background: linear-gradient(…)`
+deja el `background-color` en transparente, y `border-left: 3px solid
+var(--border)` pisa el color que otra clase pusiera antes. Los dos fallan
+igual que el `var(--card)`: sin error, sin romper la página y sin que
+ninguna sonda que mire el HTML se entere. Se miran con el color
+**calculado**, y en `#view-rodaje` el color liso va escrito aparte del
+degradado por eso mismo.
 
 ## Detalles del repositorio
 

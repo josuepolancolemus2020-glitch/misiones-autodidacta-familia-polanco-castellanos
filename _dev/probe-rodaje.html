@@ -733,6 +733,24 @@ function nuevaBase(w, opciones){
   const tam = parr ? parseFloat(w.getComputedStyle(parr).fontSize) : 0;
   ok(tam >= 24, 'y la letra es de ' + Math.round(tam) + ' px, legible a un brazo de distancia',
      'la letra del teleprompter es de ' + Math.round(tam) + ' px: no se lee desde donde se graba');
+
+  /* ⚠️ Y LOS OCHO MANDOS DE LA CABECERA CABEN Y SE PUEDEN TOCAR.
+     Aquí se toca MIENTRAS SE LEE EL GUION —o sea, sin mirar el botón— y
+     con la cámara grabando: un mando de 34 px se falla, y uno que se sale
+     por la derecha de la pantalla no existe. Que la fila baje de línea es
+     barato; las otras dos cosas no tienen arreglo en el montaje. */
+  const cabP = w.document.querySelector('.rod-prom-cab');
+  ok(cabP && cabP.scrollWidth <= cabP.clientWidth + 1,
+     'y la cabecera no se sale por la derecha: la ✕ está siempre en pantalla',
+     'la cabecera del teleprompter se sale ' + (cabP ? cabP.scrollWidth - cabP.clientWidth : '?') +
+     ' px: a pantalla completa, quedarse sin la ✕ no tiene salida');
+  const mandos = ['rod-prom-menos', 'rod-prom-mas', 'rod-prom-pasar',
+                  'rod-prom-espejo', 'rod-prom-camara', 'rod-prom-cerrar']
+    .map(i => g(i)).filter(Boolean).map(n => n.getBoundingClientRect());
+  const chico = Math.min(...mandos.map(r => Math.min(r.width, r.height)));
+  ok(mandos.length === 6 && chico >= 44,
+     'y los seis mandos miden ' + Math.round(chico) + ' px o más, que es lo que un dedo acierta sin mirar',
+     'hay un mando del teleprompter de ' + Math.round(chico) + ' px: se falla tocándolo a ciegas');
   w.eval('rodPrompterCerrar()');
   await esperar(200);
   ok(g('rod-prompter').style.display === 'none' && w.eval('_rodPromInt') === null,
@@ -801,6 +819,336 @@ function nuevaBase(w, opciones){
   ok(/faro-app-v(\d+)/.test(sw) && parseInt(sw.match(/faro-app-v(\d+)/)[1], 10) >= 85,
      'y la versión está sellada por encima de la v84, que es la de antes de esta herramienta',
      'falta sellar CACHE_NAME en sw.js: el despliegue existiría y nadie lo vería');
+
+  /* ═══ 15. LA SALA ES OSCURA, Y SE MIRA EL COLOR CALCULADO ═══
+     No basta con leer el CSS: el fallo que esto caza no se ve en el
+     archivo. `.rod-card` declara `border-left: 4px solid var(--border)`
+     —el atajo, que incluye el COLOR— y pesa lo mismo que `.rod-borde-cam`;
+     a igualdad de peso gana la que vaya después. Con las franjas
+     declaradas arriba, la secuencia entera se pintaba gris y no había
+     forma de distinguir un clip de una toma de un vistazo. Ni el HTML ni
+     el JS estaban mal, así que ninguna sonda que mirase el documento lo
+     habría visto: es el mismo fallo del `var(--card)` de Videos M.E.T.A.S
+     y se caza igual, midiendo el color que el navegador CALCULA. */
+  log('');
+  log('── 15. La sala es oscura y la franja de clase se ve ──');
+
+  /* La comprobación 13 dejó la base sin tablas a propósito. Se vuelve a
+     poner una buena con las mismas filas: lo que viene mira la pantalla
+     pintada, y sin datos no hay pantalla que mirar. */
+  const base3 = nuevaBase(w);
+  /* Filas PROPIAS, no las de antes. Las comprobaciones anteriores borran
+     una fuente a propósito, reordenan la secuencia y dejan bloques sin
+     cita —todo correcto—, así que reutilizarlas haría que lo que viene
+     dependiera del orden en que corren las demás: el día que se añada una
+     comprobación en medio, esto suspendería sin que hubiera nada roto. Y
+     hacen falta las dos cosas a la vez: un bloque CON su cita y otro que
+     la necesita y no la tiene. */
+  base3.tablas.rodaje_proyectos.push({
+    id: 90, pid: 'p-sala', titulo: 'La sala', tesis: 'Probar la pantalla',
+    estado: 'guion', dur_obj: 600, cam_pct: 30, cam_bloque: 45, url: '', notas: '' });
+  base3.tablas.rodaje_fuentes.push({
+    id: 91, pid: 'p-sala', fid: 'f-sal', clase: 'pelicula', titulo: 'Arrival',
+    autoria: 'Denis Villeneuve', anio: '2016', editor: 'Paramount Pictures',
+    licencia: 'uso_justo', rotulo: 'Clip: «Arrival» (Denis Villeneuve, 2016)',
+    pantalla: true, verificada: true, herramienta: '', prompt: '', obra: '', url: '', notas: '' });
+  base3.tablas.rodaje_bloques.push(
+    { id: 92, pid:'p-sala', bid:'s-1', orden:1, clase:'camara', titulo:'La flecha rota', dur:60,
+      guion:'¿Alguna vez has tenido un déjà vu?', visual:'Plano medio', notas:'', rotulo:'',
+      listo:false, fids:[], sfx:[{t:4,que:'golpe grave',fid:''}],
+      musica:{acc:'entra',fid:'f-sal',ini:0,fin:64,niv:'fondo'} },
+    { id: 93, pid:'p-sala', bid:'s-2', orden:2, clase:'pelicula', titulo:'La Llegada', dur:120,
+      guion:'', visual:'Clips de tinta', notas:'', rotulo:'', listo:true,
+      fids:['f-sal'], sfx:[], musica:{} },          // CON su cita
+    { id: 94, pid:'p-sala', bid:'s-3', orden:3, clase:'ia', titulo:'Microtúbulos', dur:70,
+      guion:'', visual:'Zoom a una neurona', notas:'', rotulo:'', listo:false,
+      fids:[], sfx:[{t:10,que:'zumbido'}], musica:{} });   // SIN cita: tiene que verse
+  w.eval('_rodPid = "p-sala"');
+  f.style.height = '1400px';
+  w.document.getElementById('app-container').style.display = '';
+  w.eval('_rodPestana = "secuencia"');
+  await w.eval('initRodaje()');
+  await esperar(800);
+
+  /* Un color se lee «oscuro» por su luminancia, no por su nombre: así la
+     comprobación sigue valiendo si mañana se cambia el tono exacto. Y un
+     color transparente devuelve −1, porque «transparente» no es oscuro:
+     es el fallo del `var(--card)`, que no se ve y no da error. */
+  const luz = c => {
+    const m = String(c || '').match(/[\d.]+/g);
+    if (!m || m.length < 3) return -1;
+    if (m.length > 3 && parseFloat(m[3]) < 0.5) return -1;
+    return (0.2126 * +m[0] + 0.7152 * +m[1] + 0.0722 * +m[2]) / 255;
+  };
+
+  const vista = w.document.getElementById('view-rodaje');
+  const fondoVista = w.getComputedStyle(vista).backgroundColor;
+  ok(luz(fondoVista) >= 0 && luz(fondoVista) < 0.25,
+     'la vista tiene fondo propio y es oscuro: aquí se juzgan imágenes y rótulos',
+     'el fondo de la vista no es oscuro ni opaco: ' + fondoVista);
+
+  const carta = w.document.querySelector('#rod-lista .rod-card');
+  ok(carta && luz(w.getComputedStyle(carta).backgroundColor) < 0.3,
+     'y las tarjetas de la secuencia también, sin quedarse transparentes',
+     'la tarjeta de la secuencia no tiene fondo oscuro: ' +
+       (carta ? w.getComputedStyle(carta).backgroundColor : 'sin tarjeta'));
+
+  const colorTit = carta && carta.querySelector('.rod-tit')
+    ? w.getComputedStyle(carta.querySelector('.rod-tit')).color : '';
+  ok(luz(colorTit) > 0.6,
+     'y su texto es claro: un token del mundo claro aquí se leería negro sobre negro',
+     'el texto de la tarjeta no es claro: ' + colorTit);
+
+  /* La franja de clase. No se da por supuesto CUÁL es —la comprobación 8
+     reordena la secuencia—: se mira que la tarjeta pida una y que el
+     borde izquierdo se pinte distinto del resto del marco. */
+  const pideFranja = carta ? /rod-borde-(\w+)/.exec(carta.className) : null;
+  ok(!!pideFranja, 'la tarjeta pide su franja de clase',
+     'la tarjeta no lleva clase de franja: ' + (carta ? carta.className : 'sin tarjeta'));
+  const franja = carta ? w.getComputedStyle(carta).borderLeftColor : '';
+  const marcoCol = carta ? w.getComputedStyle(carta).borderTopColor : '';
+  ok(franja && marcoCol && franja !== marcoCol,
+     '⚠️ y la franja se pinta de SU color (' + franja + '), no del gris del marco',
+     'la franja de clase sale igual que el marco (' + franja + '): la secuencia es un muro de ' +
+     'tarjetas idénticas. Las reglas .rod-borde-* tienen que ir DESPUÉS de .rod-card en el CSS');
+
+  const nav = w.document.getElementById('bottom-nav');
+  ok(w.document.body.classList.contains('rod-sala'),
+     'y el `body` lleva `rod-sala` mientras se está dentro',
+     'falta la clase `rod-sala` en el body: la barra de abajo se queda blanca');
+  ok(nav && luz(w.getComputedStyle(nav).backgroundColor) < 0.3,
+     'así que la barra de abajo se oscurece en vez de cortar la sala con una franja blanca',
+     'la barra de abajo sigue clara dentro de El Rodaje: ' +
+       (nav ? w.getComputedStyle(nav).backgroundColor : 'sin barra'));
+
+  /* ⚠️ Y NADA DE ESTO SALE DE LA VISTA. El resto de F.A.R.O es claro y
+     tiene que seguir siéndolo: un token redefinido en `:root` habría
+     teñido la casa entera sin que nadie lo pidiera. */
+  w.eval('switchView("view-inicio")');
+  await esperar(300);
+  ok(!w.document.body.classList.contains('rod-sala'),
+     '⚠️ y al salir se apaga: el resto de la casa es claro y sigue siéndolo',
+     'la clase `rod-sala` se queda puesta al salir: la casa entera se oscurece');
+  ok(nav && luz(w.getComputedStyle(nav).backgroundColor) > 0.7,
+     'la barra de abajo vuelve a ser blanca fuera de El Rodaje',
+     'la barra de abajo se quedó oscura fuera de El Rodaje');
+  w.eval('switchView("view-rodaje")');
+  await esperar(500);
+
+  /* ═══ 16. EL MONITOR CORRE EL GUION ═══ */
+  log('');
+  log('── 16. El monitor: el video antes de existir ──');
+  w.eval('_rodPestana = "monitor"; rodPintarPestanas(); rodRender();');
+  await esperar(500);
+
+  const cuadro = g('rod-mon-marco');
+  ok(!!cuadro, 'la pestaña pinta el marco del monitor', 'no se pintó el monitor');
+  const caja16 = cuadro ? cuadro.getBoundingClientRect() : { width: 0, height: 0 };
+  const razon = caja16.height ? caja16.width / caja16.height : 0;
+  ok(Math.abs(razon - 16 / 9) < 0.06,
+     '⚠️ y es 16:9 de verdad (' + razon.toFixed(2) + '): un rótulo que aquí cabe y allá no, no decide nada',
+     'el marco del monitor no es 16:9, es ' + razon.toFixed(2) + ': lo que se juzgue aquí no vale para el video');
+
+  /* ⚠️ Y LO DE DENTRO CABE. El marco no se estira —dejaría de ser 16:9 y
+     lo que se juzgue aquí dejaría de valer para el video—, así que lo que
+     se recorta es el contenido; lo que no puede pasar es que se recorte a
+     media línea, que se lee como un fallo de pintado. */
+  const centro = cuadro && cuadro.querySelector('.rod-mon-centro');
+  ok(centro && centro.scrollHeight <= centro.clientHeight + 2,
+     'y lo que va dentro del marco cabe dentro del marco, sin cortarse a media línea',
+     'el contenido del monitor se sale del 16:9: ' +
+       (centro ? centro.scrollHeight + ' px en ' + centro.clientHeight : 'sin centro'));
+
+  /* Los bloques se buscan por lo que SON, no por la posición: la
+     comprobación 8 reordena la secuencia y una sonda que contara puestos
+     suspendería sin que hubiera nada roto. */
+  const bls = R.tiempos(w.eval('JSON.parse(JSON.stringify(_rodBlo))'));
+  const conCita = bls.find(b => (b.fids || []).length);
+  const sinCita = bls.find(b => !(b.fids || []).length && R.clases[b.clase] && R.clases[b.clase].cita);
+  const iCita = bls.indexOf(conCita);
+  ok(R.monitor.en(bls, conCita.ini + 1) === iCita,
+     'el cabezal cae en el bloque que le toca según los tiempos sumados',
+     'el monitor no coloca bien el cabezal en el tiempo');
+
+  w.eval('_rodMonT = ' + (conCita.ini + 1) + '; _rodMonUlt = -1; rodMonPintar(true);');
+  await esperar(200);
+  const ter = cuadro.querySelector('.rod-mon-tercio');
+  ok(ter && ter.textContent.length > 10,
+     'y el rótulo de la fuente sale encima del video, con la pinta que va a tener',
+     'no sale el rótulo de la fuente: ' + (ter ? ter.textContent : 'sin rótulo'));
+  ok(ter && !ter.className.includes('rod-mon-tercio-falta'),
+     'y no se marca como falta cuando la cita está puesta',
+     'un bloque con su cita sale marcado como si le faltara');
+  ok(g('rod-mon-sub') && g('rod-mon-sub').textContent.indexOf(ter.textContent) < 0,
+     'y el rótulo no se mete dentro del texto que se dice: son dos cosas y se leen aparte',
+     'el rótulo se coló en el texto hablado');
+
+  /* ⚠️ Y LA FALTA DE CITA SE VE EN EL SITIO DE LA CITA. El bloque de IA
+     no tiene ninguna fuente: eso es lo que el disparador de la base no
+     deja publicar, y aquí se ve como un hueco rojo donde debería estar
+     el crédito, que es donde de verdad se nota. */
+  ok(!!sinCita, '(hay un bloque que necesita cita y no la tiene, para probarlo)',
+     'el fixture ya no trae un bloque sin cita: la comprobación no prueba nada');
+  w.eval('_rodMonT = ' + (sinCita.ini + 1) + '; _rodMonUlt = -1; rodMonPintar(true);');
+  await esperar(200);
+  const terFalta = cuadro.querySelector('.rod-mon-tercio');
+  ok(terFalta && terFalta.className.indexOf('rod-mon-tercio-falta') >= 0,
+     '⚠️ y un bloque que necesita cita y no la tiene lo enseña EN EL HUECO DEL RÓTULO, en rojo',
+     'el bloque sin fuente no avisa en el monitor');
+
+  /* Las muescas de la pista salen de la MISMA lista que la pestaña de
+     sonido: si fueran dos listas, una de las dos estaría mal algún día y
+     sería siempre la que menos se mira. */
+  ok(R.monitor.senales().length === R.senales().length,
+     'las muescas de sonido de la pista son las mismas señales de la pestaña 🔊 Sonido',
+     'la pista y la pestaña de sonido cuentan señales distintas: ' +
+       R.monitor.senales().length + ' vs ' + R.senales().length);
+  const muescas = g('rod-mon-pista').querySelectorAll('.rod-mon-tick');
+  ok(muescas.length === R.senales().length,
+     'y se pintan todas sobre la pista (' + muescas.length + ')',
+     'faltan muescas en la pista: ' + muescas.length + ' de ' + R.senales().length);
+
+  /* ⚠️ CORRER EL MONITOR NO ESCRIBE NADA EN LOS BLOQUES. Es la decisión
+     número 1 de la herramienta vista desde otro sitio: si el monitor
+     dejara el minuto de entrada pegado a la fila, mover un bloque
+     después dejaría mintiendo todos los tiempos de abajo. */
+  w.eval('_rodMonT = 0; rodMonCorrer(true);');
+  await esperar(800);
+  const corrio = w.eval('_rodMonT');
+  ok(corrio > 0.2,
+     'al darle a ▶️ el cabezal avanza en tiempo real (' + corrio.toFixed(1) + ' s)',
+     'el monitor no avanza al ponerlo a correr');
+  ok(w.eval('_rodBlo.every(b => b.ini === undefined)'),
+     '⚠️ y correrlo NO escribe el minuto de entrada en ninguna fila',
+     'el monitor dejó `ini` escrito en los bloques: al reordenar, todos los tiempos mentirían');
+  w.eval('rodMonCorrer(false)');
+
+  /* Arrastrar el cabezal, con eventos de puntero DE VERDAD: lo que puede
+     fallar ahí es de pantalla —una pista que no recibe el gesto, un
+     `touch-action` que se lo regala al desplazamiento— y nada de eso se
+     ve llamando a la función por dentro. */
+  const pista = g('rod-mon-pista');
+  const rp = pista.getBoundingClientRect();
+  ok(w.getComputedStyle(pista).touchAction === 'none',
+     'la pista lleva `touch-action: none`, sin el cual el gesto se lo queda el desplazamiento',
+     'la pista del monitor no tiene `touch-action: none`: en una tableta no se puede arrastrar');
+  const total16 = R.tiempos(w.eval('JSON.parse(JSON.stringify(_rodBlo))'))
+    .reduce((a, b) => a + b.dur, 0);
+  const pev = (tipo, x) => new w.PointerEvent(tipo, {
+    bubbles: true, cancelable: true, pointerId: 7, pointerType: 'touch',
+    clientX: x, clientY: rp.top + rp.height / 2 });
+  pista.dispatchEvent(pev('pointerdown', rp.left + rp.width * 0.5));
+  pista.dispatchEvent(pev('pointerup',   rp.left + rp.width * 0.5));
+  await esperar(200);
+  const medio = w.eval('_rodMonT');
+  ok(Math.abs(medio - total16 / 2) < total16 * 0.1,
+     'y tocando la mitad de la pista el cabezal salta a la mitad del video (' +
+       Math.round(medio) + ' s de ' + total16 + ')',
+     'tocar la pista no mueve el cabezal: quedó en ' + Math.round(medio));
+
+  /* ⚠️ Y AL SALIR DE LA PESTAÑA EL BUCLE SE PARA SOLO. Cambiar de
+     pestaña vacía el cuerpo sin avisar a nadie: un bucle que siguiera
+     corriendo escribiría en nodos sueltos para siempre. */
+  w.eval('rodMonCorrer(true); _rodPestana = "citas"; rodPintarPestanas(); rodRender();');
+  await esperar(500);
+  ok(w.eval('_rodMonCorre') === false,
+     'y al cambiar de pestaña el bucle se para solo, en vez de seguir por detrás',
+     'el bucle del monitor sigue corriendo con la pestaña cerrada');
+
+  /* ═══ 17. LA CÁMARA ES UN ESPEJO Y NADA MÁS ═══
+     Aquí no hay cámara: se le pone un doble a `getUserMedia` y se mira
+     QUÉ PIDE y qué hace con lo que recibe. Es la única manera de
+     comprobar las dos cosas que de verdad importan —que no pide el
+     micrófono y que apaga las pistas al soltarla—, porque las dos son
+     invisibles en la pantalla y las dos se notan en la vida real: una en
+     lo que dice el navegador al pedir permiso, y la otra en la luz del
+     aparato, que se queda encendida detrás del chat o de las finanzas. */
+  log('');
+  log('── 17. La cámara: un espejo, sin micrófono y que se apaga ──');
+  /* ⚠️ El doble devuelve un MediaStream DE VERDAD, sacado de un lienzo con
+     `captureStream()`, y no un objeto cualquiera: `video.srcObject` está
+     tipado y con un objeto suelto LANZA. Con un doble de mentira, la
+     herramienta se iba por el `catch` y la sonda aprobaba el camino del
+     error creyendo que probaba el bueno — que es la peor manera de que
+     una sonda mienta. */
+  w.eval(`
+    window.__rodPedidos = [];
+    window.__rodParadas = 0;
+    if (!navigator.mediaDevices) navigator.mediaDevices = {};
+    navigator.mediaDevices.getUserMedia = async (c) => {
+      window.__rodPedidos.push(c);
+      const lienzo = document.createElement('canvas');
+      lienzo.width = 64; lienzo.height = 36;
+      lienzo.getContext('2d').fillRect(0, 0, 64, 36);
+      const flujo = lienzo.captureStream(1);
+      flujo.getTracks().forEach(p => {
+        const parar = p.stop.bind(p);
+        p.stop = () => { window.__rodParadas++; parar(); };
+      });
+      return flujo;
+    };
+  `);
+  w.eval('_rodPestana = "monitor"; rodPintarPestanas(); rodRender();');
+  await esperar(500);
+
+  const notaCam = g('rod-mon-cam-nota');
+  ok(notaCam && /no graba/i.test(notaCam.textContent) && /no se sube/i.test(notaCam.textContent),
+     '⚠️ la pantalla dice, sin que nadie lo pregunte, que no graba y que no sube nada',
+     'la pestaña no dice qué hace con la imagen de la cámara');
+
+  await w.eval('rodMonCamara()');
+  await esperar(400);
+  const pedido = w.eval('window.__rodPedidos[0]');
+  ok(w.eval('window.__rodPedidos.length') === 1,
+     'al tocar 🎥 se pide la cámara una sola vez',
+     'la cámara se pidió ' + w.eval('window.__rodPedidos.length') + ' veces');
+  ok(pedido && pedido.audio === false,
+     '⚠️ y se pide SIN micrófono: pedirlo cambia lo que el navegador enseña al dar permiso',
+     'la cámara se pide con micrófono: ' + JSON.stringify(pedido));
+  ok(w.eval('FaroRodaje.camara.encendida()') === true,
+     'y queda encendida',
+     'la cámara no quedó encendida');
+
+  /* Una sola para toda la herramienta: el monitor y el teleprompter
+     cuelgan sus dos `<video>` del MISMO flujo. Con dos peticiones, el
+     segundo aparato se encontraría la cámara ocupada por el primero en
+     la mitad de los navegadores. */
+  w.eval('rodPrompterAbrir("")');
+  await w.eval('rodPrompterCamara()');
+  await esperar(400);
+  ok(w.eval('window.__rodPedidos.length') === 1,
+     '⚠️ y el teleprompter usa LA MISMA, no pide otra: dos peticiones se estorban entre sí',
+     'el teleprompter pidió una segunda cámara: ' + w.eval('window.__rodPedidos.length'));
+  const espejo = g('rod-cam-espejo');
+  ok(espejo && espejo.style.display !== 'none',
+     'el espejo del teleprompter se enseña',
+     'el espejo del teleprompter no salió');
+  ok(g('rod-cam-video') && g('rod-cam-video').srcObject,
+     'y su video está colgado del flujo',
+     'el espejo no tiene la imagen colgada');
+  const vEspejo = g('rod-cam-video');
+  ok(/scaleX\(-1\)|matrix\(-1/.test(w.getComputedStyle(vEspejo).transform),
+     '⚠️ y va ESPEJADA: sin espejar, mover el hombro derecho se ve moverse al izquierdo y se encuadra al revés',
+     'el espejo no está espejado: ' + w.getComputedStyle(vEspejo).transform);
+
+  w.eval('rodPrompterCerrar()');
+  await esperar(300);
+  ok(w.eval('window.__rodParadas') === 0,
+     'cerrar el teleprompter con el monitor detrás NO apaga la cámara: la sigue mirando alguien',
+     'se apagó la cámara que el monitor estaba usando');
+
+  /* ⚠️ Y AL SALIR DE LA VISTA SE APAGA LA LUZ DE VERDAD. Soltar el
+     `<video>` no para nada: hay que parar las PISTAS, o el aparato se
+     queda con la cámara encendida detrás del chat o de las finanzas. */
+  w.eval('document.getElementById("rod-back-btn").click()');
+  await esperar(400);
+  ok(w.eval('window.__rodParadas') >= 1,
+     '⚠️ pero salir de la vista PARA LAS PISTAS: soltar el <video> deja la luz encendida',
+     'al salir de El Rodaje la cámara se quedó encendida');
+  ok(w.eval('FaroRodaje.camara.encendida()') === false,
+     'y la herramienta lo sabe: no se queda creyendo que la tiene',
+     'la herramienta cree que sigue teniendo la cámara');
+  f.style.height = altoMarco;
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);

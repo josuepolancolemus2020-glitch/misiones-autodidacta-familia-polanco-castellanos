@@ -886,6 +886,13 @@ function switchView(id) {
       b.classList.toggle('active', b.dataset.view === id));
   }
 
+  /* 🎬 El Rodaje es la única pantalla oscura de la casa, y con motivo: ahí
+     se juzgan imágenes y rótulos, y sobre blanco no se ven como se van a
+     ver. La barra de abajo vive FUERA de la vista, así que se le avisa con
+     una clase en el `body`: sin ella, una franja blanca corta la sala por
+     el borde de abajo justo donde está el mando. */
+  document.body.classList.toggle('rod-sala', id === 'view-rodaje');
+
   if (id === 'view-inicio')   renderHome();
   if (id === 'view-misiones') renderMissions(currentQuery);
   if (id === 'view-rutas')    renderRutas();
