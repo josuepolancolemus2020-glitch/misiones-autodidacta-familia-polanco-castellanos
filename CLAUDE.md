@@ -578,12 +578,89 @@ propio apartado y el primero, con herramienta y prompt, y con los minutos en
 que aparece cada fuente sacados de los bloques) y los **guiones de los
 reels**.
 
+### ✂️ El banco de cortes: de una grabación larga, un archivo por toma
+
+**Pedido por el autor el 7 de septiembre de 2026**, al estrenar la
+herramienta: «quiero que haya la opción de cortar alguna pista de audio o
+video para después descargarlos y solo editarlos en otro programa con los
+clip dados».
+
+**El reparto que lo explica todo: la cámara es aparte.** Aquí NO se graba.
+Se llega con la grabación hecha con la cámara de verdad, y lo que hace
+falta es partirla en las tomas que la secuencia ya tiene escritas —porque
+el montaje no empieza por editar: empieza por buscar en catorce minutos
+dónde estaba cada frase—. La lista de tomas es la misma de 🎞️ Secuencia,
+así que no hay que acordarse de nada ni escribirla dos veces.
+
+Vive en **`js/tools/rodaje-cortes.js`**, aparte de `rodaje.js`, y eso no es
+manía de ordenar: `rodaje.js` no toca ni un aparato del navegador —pinta,
+suma y guarda—, mientras que esto toca `AudioContext`, `MediaRecorder`,
+`captureStream` y descargas, y cada uno falla de una manera distinta en
+cada aparato. **Si el banco no carga, El Rodaje sigue entero**: la pestaña
+lo dice y ya. La sonda lo comprueba apagándolo a propósito.
+
+**Cinco reglas más, y ninguna es de adorno:**
+
+1. ⚠️ **EL ARCHIVO NO SALE DEL APARATO, Y LA PANTALLA LO DICE.** No sube a
+   Supabase, no pasa por ninguna red y no se guarda en ningún sitio. Se
+   dice en verde y sin que nadie lo pregunte, porque **a nadie se le
+   ocurre por su cuenta que un sitio web NO sube el archivo que le das**, y
+   una grabación de catorce minutos subiendo sin avisar por la conexión de
+   una tableta sería una factura de datos y de tiempo que nadie pidió.
+2. ⚠️ **EL AUDIO SE CORTA EXACTO; EL VIDEO SE REPROCESA.** No es una
+   decisión: en un navegador el audio se decodifica entero a muestras y se
+   corta por la muestra que uno quiera —sale un WAV, sin pérdida y al
+   instante—, pero el video no se puede recortar sin volver a codificarlo.
+   Se hace reproduciendo el trozo y grabándolo, o sea que **tarda lo que
+   dura el trozo, suena, y pierde algo de calidad**. Se dice ANTES, en el
+   propio botón, no después.
+3. ⚠️ **Y PASE LO QUE PASE, SALEN LOS TIEMPOS.** Aunque el aparato no
+   pueda cortar nada. El autor edita en otro programa, y ese programa
+   corta mejor que cualquier navegador: sin pérdida y al instante. Una
+   lista de entradas y salidas exactas —y las órdenes de `ffmpeg` ya
+   escritas— vale más que un recorte reprocesado. Es la salida que no
+   depende de nada, y por eso la pestaña dice lo que este navegador puede
+   y lo que no **antes** de que nadie marque cuarenta entradas: en el
+   Safari de un iPad no existe `captureStream` y el video no se puede
+   cortar de ninguna manera.
+   Los tiempos van en `00:02:05.500`, **con horas siempre y con
+   milésimas**: un «2:05» pegado en un programa de montaje se lee como dos
+   horas en unos y como dos minutos en otros, y esa ambigüedad se paga
+   cortando mal.
+4. **Las marcas se guardan en el APARATO, no en la nube, y con la firma
+   del archivo** (nombre y tamaño). Van con el archivo, y el archivo es de
+   este aparato: subirlas sería prometer en la tableta las marcas de una
+   grabación que allí no está. Y con la firma porque la misma secuencia se
+   corta de dos grabaciones —la buena y la repetida—: mezclar las marcas de
+   una con la otra saca los trozos equivocados sin avisar de nada.
+5. **El reproductor no se destruye al cambiar de pestaña.** Se guarda el
+   nodo y se vuelve a colgar. Creándolo de nuevo en cada pintado, mirar las
+   Citas un momento perdería el archivo abierto — y volver a buscarlo en una
+   tableta son cinco toques y la carpeta equivocada dos veces.
+
+Dos detalles que salieron de medirlo, no de pensarlo: el clip sale con **el
+número de orden delante** (`01 - La flecha rota.wav`), para que los clips se
+ordenen solos en la carpeta y entren al montaje en la fila del video; y el
+mando de transporte **no baja de línea** —envuelto, el botón de +5 s caía
+justo debajo del botón flotante de Destellos, que se lo comía—, así que por
+debajo de 400 px se retiran los saltos de ±5 s, que son los únicos que se
+pueden hacer de otra manera arrastrando el deslizador. Los de una décima no
+tienen sustituto: cortar en el segundo entero se come la primera sílaba.
+
 **Antes de publicar un cambio de El Rodaje:**
 
 ```
 node _dev/servidor-estatico.js      (en otra terminal)
 _dev/probe-rodaje.html              (en el navegador)
+_dev/probe-rodaje-cortes.html       (el banco de cortes)
 ```
+
+La sonda de los cortes **fabrica un WAV de verdad dentro del navegador** y
+lo corta: es la única manera de comprobar que el corte cae donde se dijo, y
+se comprueba contando los BYTES del archivo que sale. Si estuviera corrido,
+lo que llega al montaje está corrido y no se descubre hasta ahí. También
+mide el mando con el reloj en la mano —una fila, 44 px— porque eso es de
+pantalla y de pantalla no se sabe nada leyendo el código.
 
 La comprobación **5-bis** le pega un párrafo entero de prosa que empieza
 por siete palabras de clase distintas, y exige que salga UN bloque con sus
@@ -646,7 +723,7 @@ Cada sonda termina poniendo **APRUEBA** o **SUSPENDE** en `document.title`,
 con el veredicto DELANTE (el rótulo viejo «SONDA-APRUEBA» ya se retiró).
 No es decoración: es lo que se lee al correrlas en tanda. Once sondas
 antiguas no lo hacían, y en la auditoría del 20 de agosto de 2026
-aparecieron **veintinueve más**; hoy lo hacen las ochenta y nueve. La
+aparecieron **veintinueve más**; hoy lo hacen las noventa. La
 única excepción es `probe-alto-util.html`, que no es una sonda sino un
 instrumento de medida y se titula INSTRUMENTO. La cuenta no se escribe de
 memoria (esta línea ya se quedó vieja una vez): sale de

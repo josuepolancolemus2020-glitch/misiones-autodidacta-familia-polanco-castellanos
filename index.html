@@ -2494,6 +2494,11 @@ placeholder="[CÁMARA 0:30] La flecha rota
   <script src="js/tools/metas-videos.js"></script>
   <script src="js/tools/criba.js"></script>
   <script src="js/tools/rodaje.js"></script>
+  <!-- El banco de cortes va DESPUÉS de rodaje.js y en su propio archivo:
+       es el único de la herramienta que toca sonido, grabador y descargas,
+       o sea lo único que puede no existir en un aparato. Si falta, la
+       pestaña lo dice y el cuaderno de dirección sigue entero. -->
+  <script src="js/tools/rodaje-cortes.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

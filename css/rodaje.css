@@ -445,3 +445,117 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
    justo por donde pasa el dedo al llevar un bloque hacia el final de la
    secuencia, y se comía el gesto sin que se viera por qué. */
 body.rod-arrastrando-body #destello-fab { pointer-events: none; }
+
+/* ═══════════ ✂️ EL BANCO DE CORTES ═══════════
+   De una grabación larga, un archivo por toma. Lo único de la herramienta
+   que toca aparatos del navegador, y por eso también lo único cuya
+   pantalla tiene que decir qué puede y qué no ANTES de que alguien marque
+   cuarenta entradas y salidas. */
+
+.rod-cor-oculto { display: none; }
+
+/* La línea de que el archivo no sale del aparato. Va en verde y no en el
+   gris de las demás notas a propósito: es lo primero que uno se pregunta
+   al ver un botón que pide un archivo, y nadie da por hecho que un sitio
+   web NO lo sube. */
+.rod-cor-privado {
+  color: #15803d; font-weight: 600;
+  background: rgba(22,163,74,.08); border-radius: 8px;
+  padding: .4rem .55rem; margin-top: .45rem;
+}
+
+/* Lo que puede este navegador. Amarillo cuando falta algo —no rojo: no
+   está roto, es que ese aparato no llega—, y lo que falta va con ⛔ y en
+   palabras, no con un icono a secas. */
+.rod-cor-cap {
+  background: rgba(22,163,74,.07); border: 1px solid rgba(22,163,74,.25);
+  border-left: 3px solid #16a34a; border-radius: 10px;
+  padding: .55rem .7rem; margin: .5rem 0 .2rem; font-size: .8rem; line-height: 1.45;
+}
+.rod-cor-cap-medio {
+  background: #fffbeb; border-color: rgba(234,179,8,.4); border-left-color: #eab308;
+}
+
+.rod-cor-ficha {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: .55rem .7rem; margin: .6rem 0 .5rem;
+}
+
+.rod-cor-caja {
+  background: #000; border-radius: 12px; overflow: hidden;
+  /* Se queda pegado arriba al desplazar la lista de tomas: marcar una
+     entrada mirando el reproductor y la fila a la vez es el gesto entero
+     de esta pantalla, y con el video fuera de vista hay que subir y bajar
+     por cada marca. */
+  position: sticky; top: 0; z-index: 5;
+}
+.rod-cor-medio { display: block; width: 100%; max-height: 46vh; background: #000; }
+audio.rod-cor-medio { max-height: none; }
+
+/* El reloj, grande y de números de ancho fijo: es el dato que se mira al
+   marcar, y con la tipografía normal los dígitos bailan y la última cifra
+   no se puede seguir. */
+.rod-cor-reloj {
+  font-variant-numeric: tabular-nums; font-weight: 800;
+  font-size: 1.35rem; text-align: center; padding: .35rem 0 .2rem;
+  color: var(--text); letter-spacing: .01em;
+}
+
+/* El mando. Los saltos de una décima existen porque cortar en el segundo
+   entero te come la primera sílaba o te deja la respiración de antes. */
+.rod-cor-mando {
+  /* ⚠️ NO baja de línea: los siete se reparten el ancho. Envueltos, el
+     último caía en un segundo renglón y justo debajo del botón flotante
+     de Destellos, que se lo comía — y ese botón es «+5 s», el que se usa
+     para buscar la toma siguiente. Es la misma excepción al flex-wrap que
+     los chips de materia, y por lo mismo: aquí lo que se sale no es
+     adorno, es el mando. */
+  display: flex; flex-wrap: nowrap; gap: .3rem; justify-content: center;
+  margin-bottom: .5rem;
+}
+.rod-cor-mando .rod-b {
+  flex: 1 1 0; min-width: 0; padding: .5rem .2rem; font-size: .8rem;
+}
+
+.rod-cor-fila {
+  background: var(--surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: 10px; padding: .6rem; margin-bottom: .5rem;
+}
+/* Una toma ya marcada se ve de un vistazo: con treinta bloques, saber
+   cuáles quedan es la única pregunta que uno se hace al volver. */
+.rod-cor-fila-lista { border-left-color: #16a34a; background: rgba(22,163,74,.04); }
+
+.rod-cor-marcas {
+  display: flex; align-items: center; flex-wrap: wrap; gap: .4rem;
+  margin: .4rem 0 .1rem; font-variant-numeric: tabular-nums;
+}
+.rod-cor-m {
+  font-weight: 700; font-size: .9rem; color: var(--faint);
+  background: var(--bg); border-radius: 7px; padding: .15rem .45rem;
+}
+.rod-cor-m-si { color: #15803d; background: rgba(22,163,74,.12); }
+.rod-cor-flecha { color: var(--faint); }
+.rod-cor-dif { font-size: .76rem; color: var(--muted); }
+.rod-cor-dif-ojo { color: #b45309; font-weight: 600; }
+
+/* El renglón de avisos vive al final y fuera del pintado del banco: así un
+   repintado no se lo lleva por delante mientras se está cortando, que es
+   justo cuando se está mirando. */
+.rod-cor-aviso {
+  position: sticky; bottom: 0;
+  font-size: .82rem; line-height: 1.4; min-height: 1.2em;
+  color: var(--text); background: var(--bg);
+  padding: .5rem .2rem calc(.5rem + env(safe-area-inset-bottom, 0px));
+  margin: .6rem 0 0;
+}
+
+/* Por debajo de 400 px, los saltos de ±5 s se van y los cinco que quedan
+   recuperan sus 44 px. Se van ESOS y no otros porque son los únicos que
+   se pueden hacer de otra manera —arrastrando el deslizador del propio
+   reproductor—; los de una décima no tienen sustituto, y son la razón de
+   que este mando exista: cortar en el segundo entero se come la primera
+   sílaba o deja la respiración de antes. */
+@media (max-width: 400px) {
+  .rod-cor-salto5 { display: none; }
+}

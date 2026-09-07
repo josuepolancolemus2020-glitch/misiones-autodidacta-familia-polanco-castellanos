@@ -830,6 +830,13 @@ const ROD_PESTANAS = [
   { k: 'sonido',    n: '🔊 Sonido' },
   { k: 'citas',     n: '📚 Citas' },
   { k: 'reels',     n: '📱 Reels' },
+  /* El banco de cortes va EL ÚLTIMO porque es lo último que se hace: se
+     llega a él con la grabación ya en la mano. Y vive en su propio
+     archivo (`rodaje-cortes.js`), que es el único de la herramienta que
+     toca aparatos del navegador —sonido, grabador, descargas— y por tanto
+     el único que puede no existir en un aparato. Si no carga, El Rodaje
+     sigue entero y la pestaña lo dice. */
+  { k: 'cortes',    n: '✂️ Cortes' },
 ];
 
 function rodPintarPestanas() {
@@ -848,7 +855,8 @@ function rodPintarPestanas() {
                 camara: _rodBlo.filter(x => x.clase === 'camara').length,
                 sonido: rodSenales().length,
                 citas: _rodFue.length,
-                reels: _rodRee.length }[p.k];
+                reels: _rodRee.length,
+                cortes: rodCortesMarcados() }[p.k];
     if (n) {
       const s = document.createElement('span');
       s.className = 'rod-pest-n';
@@ -914,7 +922,51 @@ function rodRender() {
      camara:    rodRenderCamara,
      sonido:    rodRenderSonido,
      citas:     rodRenderCitas,
-     reels:     rodRenderReels }[_rodPestana] || rodRenderSecuencia)(cuerpo);
+     reels:     rodRenderReels,
+     cortes:    rodRenderCortes }[_rodPestana] || rodRenderSecuencia)(cuerpo);
+}
+
+/* Cuántas tomas tienen ya su entrada y su salida marcadas. Se le pregunta
+   al banco de cortes en vez de guardarlo aquí: las marcas son de un
+   archivo que vive en ESTE aparato, y el cuaderno de dirección viaja. */
+function rodCortesMarcados() {
+  if (!window.FaroCortes || !window.FaroCortes._marcas) return 0;
+  const m = window.FaroCortes._marcas() || {};
+  return Object.keys(m).filter(k => m[k] && m[k].fin > m[k].ini).length;
+}
+
+/* La pestaña ✂️ Cortes solo delega. Si `rodaje-cortes.js` no cargó —o el
+   aparato no tiene lo que necesita—, se dice y no se rompe nada: es la
+   misma regla que la repisa de enlaces sin su SQL. */
+function rodRenderCortes(cuerpo) {
+  if (!window.FaroCortes || typeof window.FaroCortes.render !== 'function') {
+    cuerpo.appendChild(rodVacio('✂️', 'El banco de cortes no cargó.',
+      'Falta js/tools/rodaje-cortes.js. Todo lo demás de El Rodaje sigue funcionando: ' +
+      'es un archivo aparte a propósito, para que lo que toca la cámara y el sonido no ' +
+      'pueda llevarse por delante el cuaderno de dirección.'));
+    return;
+  }
+  if (!_rodBlo.length) {
+    cuerpo.appendChild(rodVacio('✂️', 'Primero la secuencia, después los cortes.',
+      'Los cortes se hacen contra las tomas que tenga escritas el video: sin bloques no ' +
+      'hay nada que cortar. Escribe la secuencia en 🎞️ Secuencia y vuelve.'));
+    return;
+  }
+  /* Se le pasan los bloques YA con su minuto sumado, y dos ganchos: uno
+     para escribir avisos en la propia pestaña y otro para repintarla
+     cuando cambie una marca. El banco no sabe nada de esta pantalla. */
+  window.FaroCortes.alRepintar = () => { rodRender(); };
+  window.FaroCortes.alAbrir = () => { rodPintarPestanas(); rodRender(); };
+  window.FaroCortes.render(cuerpo, rodTiempos(_rodBlo), _rodPid, txt => {
+    const e = document.getElementById('rod-cor-aviso');
+    if (e) e.textContent = txt || '';
+  });
+  /* El renglón de avisos va al final y fuera del pintado del banco: así
+     un repintado no se lo lleva por delante mientras se está cortando. */
+  const av = document.createElement('p');
+  av.id = 'rod-cor-aviso';
+  av.className = 'rod-cor-aviso';
+  cuerpo.appendChild(av);
 }
 
 /* ══════════════ PESTAÑA: LA SECUENCIA ══════════════ */
