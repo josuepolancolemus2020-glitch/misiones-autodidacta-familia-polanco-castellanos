@@ -509,9 +509,68 @@ function nuevaBase(w, opciones){
      'y al borrar una fuente se quita de los bloques que la nombraban',
      'quedó un fid apuntando a nada: el bloque parecería tener cita y no la tiene');
 
-  /* ═══ 10. LAS EXPORTACIONES ═══ */
+  /* ═══ 10. UNA FUENTE SE USA POR TRES CAMINOS ═══
+     Una fuente entra en un bloque de tres maneras: acreditada en su lista
+     de citas, como la pista de música, o como el origen de un golpe. La
+     primera versión solo contaba la primera, y «The Calendar of Rain»
+     —que suena en todo el video— decía «todavía no la usa ningún bloque».
+     Eso es la frase que uno lee justo antes de darle a borrar. */
   log('');
-  log('── 10. Lo que sale por el chat ──');
+  log('── 10. Una fuente se usa por tres caminos, no solo por la lista de citas ──');
+  /* Se le quita a la música su cita explícita: a partir de aquí solo la
+     usa el `musica.fid` del primer bloque. Tiene que seguir contando. */
+  base.tablas.rodaje_bloques.find(b => b.bid === 'b-1').fids = [];
+  await w.eval('rodCargarProyecto()');
+  await esperar(400);
+  const usosMus = w.eval('rodUsos("f-mus")');
+  ok(usosMus.length >= 1,
+     '⚠️ una pista que solo entra como música sigue contando como usada',
+     'una fuente usada solo como música dice que no la usa nadie: es la frase que se lee antes de borrarla');
+  const usosSfx = w.eval('rodUsos("f-mus").filter(u => u.via === "música").length');
+  ok(usosSfx >= 1, 'y se sabe por qué camino entra (música, cita o sonido)',
+     'no se distingue por qué camino entra la fuente');
+
+  /* ═══ 10-bis. LA VOZ EN OFF Y LA CUENTA POR PALABRAS ═══
+     Un video-ensayo es casi todo «yo hablando SOBRE material de archivo».
+     Esa narración va en el guion de un bloque de archivo o gráfico —que es
+     lo correcto para el presupuesto, porque esos segundos no son cara
+     hablando—, y si el teleprompter solo leyera los de clase `camara` ese
+     texto se escribiría, se guardaría y no se ensayaría nunca. */
+  log('');
+  log('── 10-bis. La voz en off y la cuenta por palabras ──');
+  const bOff = base.tablas.rodaje_bloques.find(b => b.bid === 'b-2');
+  bOff.guion = 'El lenguaje de los heptápodos no tiene principio ni fin, y por eso quien lo aprende deja de vivir el tiempo en línea recta.';
+  await w.eval('rodCargarProyecto()');
+  await esperar(400);
+  w.eval('rodPrompterAbrir("")');
+  await esperar(300);
+  const txtOff = g('rod-prompter-txt');
+  ok(txtOff && /heptápodos/.test(txtOff.textContent),
+     '⚠️ el teleprompter lleva también el guion que se dice EN OFF, no solo el de cámara',
+     'la narración en off se escribe, se guarda y no se ensaya nunca: el teleprompter la salta');
+  ok(txtOff && /EN OFF/.test(txtOff.textContent) && /A CÁMARA/.test(txtOff.textContent),
+     'y cada bloque dice si se graba mirando al lente o en off',
+     'el teleprompter no distingue lo que va a cámara de lo que va en off');
+  w.eval('rodPrompterCerrar()');
+  await esperar(150);
+
+  /* Todo el presupuesto descansa sobre un número escrito a ojo, y a ojo se
+     falla siempre por el mismo lado. Sin esta cuenta, un párrafo de tres
+     minutos marcado como «0:45» no se descubre hasta el montaje. */
+  ok(Math.abs(R.durGuion('una dos tres cuatro cinco seis siete ocho nueve diez'.repeat(15)) - 60) < 8,
+     'ciento cincuenta palabras salen ≈ 1:00 hablando (' + R.reloj(R.durGuion('una dos tres cuatro cinco seis siete ocho nueve diez'.repeat(15))) + ')',
+     'la cuenta por palabras no cuadra: ' + R.durGuion('una dos tres cuatro cinco seis siete ocho nueve diez'.repeat(15)));
+  ok(R.durGuion('') === 0 && R.durGuion('   ') === 0,
+     'y un guion vacío no estima nada, para no avisar de la nada',
+     'un guion vacío da una estimación');
+  const revOff = w.eval('rodRevisar()');
+  ok(revOff.some(a => /heptápodos|La Llegada/.test(a.txt) && /escrito/.test(a.txt)),
+     'y la revisión avisa de que lo escrito no cabe en el tiempo que se le puso',
+     'no avisa del guion que no cabe: el video sale de veintiún minutos y se descubre montando');
+
+  /* ═══ 11. LAS EXPORTACIONES ═══ */
+  log('');
+  log('── 11. Lo que sale por el chat ──');
   const bib = R.exportar.bibliografia();
   ok(/INTELIGENCIA ARTIFICIAL/.test(bib) && /Google MusicFX/.test(bib) && /melancholic piano/.test(bib),
      'la descripción de YouTube separa lo generado por una máquina, con su herramienta y su prompt',
@@ -528,9 +587,9 @@ function nuevaBase(w, opciones){
      'y el plan de rodaje lleva la secuencia con sus tiempos y sus señales de sonido',
      'el plan de rodaje no lleva lo que tiene que llevar');
 
-  /* ═══ 11. EL TELEPROMPTER ═══ */
+  /* ═══ 12. EL TELEPROMPTER ═══ */
   log('');
-  log('── 11. El teleprompter ──');
+  log('── 12. El teleprompter ──');
   w.eval('rodPrompterAbrir("")');
   await esperar(300);
   const prom = g('rod-prompter');
@@ -540,9 +599,18 @@ function nuevaBase(w, opciones){
   ok(txt && /déjà vu/.test(txt.textContent),
      'y lleva el guion de las tomas a cámara',
      'el teleprompter no trae el guion');
-  ok(txt && !/Clips de tinta/.test(txt.textContent),
-     'y NO lleva lo que no se dice en voz alta',
-     'el teleprompter trae texto que no se dice a cámara');
+  /* Un bloque SIN guion no aparece. Lo que sí aparece —pequeño y en gris—
+     es la nota de lo que se ve, que es una indicación de plano y para eso
+     está un teleprompter. Lo que no puede pasar es que se cuele como texto
+     grande algo que nadie va a decir: entre el texto que hay que leer y lo
+     que hay que hacer con la cara, lo segundo va en letra chica. */
+  ok(txt && !/Microtúbulos/.test(txt.textContent),
+     'y un bloque sin guion escrito no aparece: no hay nada que leer en él',
+     'el teleprompter trae bloques que no tienen ni una palabra que decir');
+  const grandes = txt ? [...txt.querySelectorAll('.rod-prom-p')].map(n => n.textContent).join(' ') : '';
+  ok(!/Plano medio|Clips de tinta/.test(grandes),
+     'y las indicaciones de plano no se cuelan como texto que leer, van en letra chica',
+     'una indicación de plano salió como texto grande: se leería en voz alta');
   /* La letra tiene que ser grande de verdad: se lee a un brazo de
      distancia, que es donde se pone una tableta para grabarse. */
   const parr = txt && txt.querySelector('.rod-prom-p');
@@ -556,9 +624,9 @@ function nuevaBase(w, opciones){
      'al cerrar el teleprompter el texto sigue pasando por detrás');
   f.style.height = altoMarco;
 
-  /* ═══ 12. LA BASE VIEJA SIGUE FUNCIONANDO ═══ */
+  /* ═══ 13. LA BASE VIEJA SIGUE FUNCIONANDO ═══ */
   log('');
-  log('── 12. Sin correr el SQL, se dice qué falta ──');
+  log('── 13. Sin correr el SQL, se dice qué falta ──');
   nuevaBase(w, { sinTabla: true });
   await w.eval('initRodaje()');
   await esperar(500);
@@ -570,13 +638,13 @@ function nuevaBase(w, opciones){
      'y también el de comprobar, que es el que se pega mañana sin repetir las quinientas líneas',
      'no menciona el archivo de comprobación');
 
-  /* ═══ 13. EL SERVICE WORKER NO PUEDE SERVIR EL JS VIEJO ═══
+  /* ═══ 14. EL SERVICE WORKER NO PUEDE SERVIR EL JS VIEJO ═══
      Esto no se ve desde el navegador —la sonda corre sin service
      worker—, así que se lee el archivo. Y hace falta: el 28 de agosto de
      2026 F.A.R.O sirvió el HTML nuevo con el JS viejo, y el rótulo de
      una pestaña salía con nada debajo. */
   log('');
-  log('── 13. El service worker revalida contra el servidor ──');
+  log('── 14. El service worker revalida contra el servidor ──');
   const sw = await (await fetch('/sw.js', { cache: 'no-store' })).text();
   const ramaPropia = sw.split('} else {')[0];
   ok(/cache:\s*'no-cache'/.test(ramaPropia),

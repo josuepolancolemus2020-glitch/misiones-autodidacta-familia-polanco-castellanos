@@ -371,7 +371,7 @@ ser mentira; y se publica con una canción, un clip y tres imágenes sin
 decir de dónde salieron—. Las tres las impide la forma de los datos, no la
 buena memoria de nadie.
 
-**Doce reglas, y ninguna es de adorno:**
+**Catorce reglas, y ninguna es de adorno:**
 
 1. ⚠️ **NO SE GUARDA NUNCA EL MINUTO EN QUE EMPIEZA UN BLOQUE.** Se guarda
    cuánto DURA; el minuto de entrada lo suma `rodTiempos()` cada vez que se
@@ -404,7 +404,18 @@ buena memoria de nadie.
    BASE.** El disparador `rodaje_guarda_citas` rechaza poner un proyecto en
    `publicado` mientras quede un bloque de clase `pelicula`, `ia`, `archivo`
    o `musica` sin fuente apuntada, o una fuente marcada para salir en
-   pantalla sin rótulo escrito. **Y el mensaje NOMBRA los bloques que
+   pantalla sin rótulo escrito.
+   ⚠️ **Y cuenta fuentes que EXISTEN, no elementos de la lista.** `fids` es
+   texto dentro de un `jsonb` y ninguna llave ajena lo sostiene, así que un
+   guardia que mirara `jsonb_array_length(fids) = 0` dejaría pasar un bloque
+   cuyo único `fid` apunta a una fuente ya borrada: el video se publicaría
+   «con cita» y la cita no llevaría a ninguna parte. La pantalla limpia los
+   bloques al borrar una fuente, pero son dos escrituras separadas sobre la
+   red de una tableta, y si la segunda no entra queda el hueco. Un guardia
+   que se puede burlar sin querer no es un guardia. `rodRevisar()` mira lo
+   mismo, con `rodFuente(x)`: si la pantalla dijera «se puede publicar» y la
+   base lo rechazara, el autor se encontraría un error de PostgreSQL que
+   habla de otra cosa. **Y el mensaje NOMBRA los bloques que
    faltan**: un «no se puede» a secas obliga a abrir cuarenta bloques uno
    por uno desde una tableta. Las clases `camara`, `grafico`, `pantalla` y
    `titulo` no exigen nada, porque pueden ser enteramente propias: exigir
@@ -452,13 +463,32 @@ buena memoria de nadie.
     sale se marcan solas, y se traen también su guion y su título. No es un
     detalle: un corto que enseña tres segundos de una película necesita el
     mismo crédito que el video largo, y al corto lo ve mucha más gente.
-11. **Nada de la base llega a un atributo del HTML.** Todo con
+11. ⚠️ **EL TELEPROMPTER LLEVA TAMBIÉN LA VOZ EN OFF, no solo lo que se
+    dice a cámara.** Un video-ensayo es casi todo «yo hablando SOBRE
+    material de archivo». Esa narración va en el `guion` de un bloque de
+    clase `archivo` o `grafico` —que es lo correcto para el presupuesto,
+    porque esos segundos no son cara hablando—, y la primera versión del
+    teleprompter solo leía los de clase `camara`: o sea que el guion narrado
+    se escribía, se guardaba, y no se ensayaba nunca. Ahora entra cualquier
+    bloque con guion, y cada uno dice si se graba **🎤 A CÁMARA** o
+    **🎙️ EN OFF** — leer en off una frase escrita para mirar al lente sale
+    forzado, y al revés se nota más.
+12. ⚠️ **LO ESCRITO SE MIDE EN PALABRAS, porque `dur` es una adivinanza.**
+    Todo el presupuesto descansa sobre un número que una persona escribe a
+    ojo, y a ojo se falla siempre por el mismo lado: un bloque con
+    cuatrocientas palabras marcado como «0:45» miente, el porcentaje sale
+    bonito y el video sale de veintiún minutos. `rodDurGuion()` cuenta a 150
+    palabras por minuto —el ritmo de un ensayo hablado en español— y avisa
+    en la propia fila y en la revisión cuando la diferencia es grande. No
+    pretende ser exacta; lo que tiene que hacer es cazar el «0:45» de un
+    párrafo de tres minutos, que si no no se descubre hasta el montaje.
+13. **Nada de la base llega a un atributo del HTML.** Todo con
     `createElement` y `textContent`. Lo único que va a un atributo es una
     dirección, comprobada con `URL()` en `rodEnlace()` y puesta con
     `setAttribute` — no con un grep, que `java\tscript:` y `JavaScript:` lo
     pasan y el navegador los ejecuta igual. Esta aplicación tiene dentro la
     Bóveda, las finanzas, el chat y los teléfonos del Buzón.
-12. **Aquí NO hay puerta pública, y es a propósito.** A diferencia de
+14. **Aquí NO hay puerta pública, y es a propósito.** A diferencia de
     `metas_videos`, no existe ninguna función `security definer` ni política
     para `anon`: no hay nada que nadie de fuera tenga que leer. Con la clave
     publicable no se puede ni mirar la lista de proyectos. La prueba del SQL

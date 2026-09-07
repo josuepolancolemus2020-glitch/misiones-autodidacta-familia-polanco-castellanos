@@ -430,3 +430,10 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.5; }
 /* Para quien lea sobre un cristal delante del objetivo. Sin esto hay que
    aprenderse el texto o mirar a un lado, y las dos cosas se notan. */
 .rod-prom-espejo { transform: scaleX(-1); }
+
+/* La voz en off, en el teleprompter. Se distingue del texto a cámara sin
+   gritar: leer en off una frase escrita para mirar al lente sale forzado,
+   y al revés se nota todavía más, así que hay que ver de un vistazo cuál
+   es cuál mientras pasa el texto. */
+.rod-prom-off .rod-prom-rot { border-color: #06b6d4; color: #06b6d4; }
+.rod-prom-off .rod-prom-p   { color: #cbd5e1; font-weight: 600; }

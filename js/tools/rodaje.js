@@ -263,6 +263,26 @@ function rodTiempos(bloques) {
   });
 }
 
+/* ⚠️ CUÁNTO DURA DE VERDAD LO QUE ESTÁ ESCRITO.
+   Todo el presupuesto de cámara descansa sobre un número que escribe una
+   persona a ojo, y a ojo se falla siempre por el mismo lado: un bloque con
+   cuatrocientas palabras marcado como «0:45» miente, el porcentaje sale
+   bonito, y el video sale de veintiún minutos. Sin esta cuenta eso no se
+   descubre hasta el teleprompter, con el reloj corriendo, o hasta el
+   montaje — que es después de haber escrito el guion entero confiando en
+   el número.
+
+   Ciento cincuenta palabras por minuto es el ritmo de un ensayo hablado en
+   español: ni el de leer un prospecto ni el de un informativo. No pretende
+   ser exacto —por eso solo se avisa cuando la diferencia es grande—: lo que
+   tiene que hacer es cazar el «0:45» de un párrafo de tres minutos. */
+const ROD_PALABRAS_MIN = 150;
+
+function rodDurGuion(txt) {
+  const n = String(txt == null ? '' : txt).trim().split(/\s+/).filter(Boolean).length;
+  return n ? Math.max(1, Math.round((n / ROD_PALABRAS_MIN) * 60)) : 0;
+}
+
 function rodTotal(bloques) {
   return (bloques || []).reduce((a, b) => a + Math.max(0, Number(b.dur) || 0), 0);
 }
@@ -468,6 +488,38 @@ async function rodCargarProyecto() {
 function rodProyecto() { return _rodPro.find(p => p.pid === _rodPid) || null; }
 function rodFuente(fid) { return _rodFue.find(f => f.fid === fid) || null; }
 
+/* ⚠️ DÓNDE SE USA UNA FUENTE, Y POR LOS TRES CAMINOS.
+   Una fuente puede entrar en un bloque de tres maneras: acreditada en su
+   lista de citas, como la pista de música, o como el origen de un golpe
+   de sonido. Contar solo la primera —que es lo que hacía la primera
+   versión— dejaba a «The Calendar of Rain», que suena en todo el video,
+   diciendo «todavía no la usa ningún bloque». Eso no es un detalle de
+   pantalla: es la frase que uno lee justo antes de darle a borrar.
+
+   Devuelve las apariciones con su minuto ABSOLUTO ya sumado, ordenadas,
+   que es lo que necesitan la ficha, la exportación de rótulos y la
+   bibliografía. */
+function rodUsos(fid) {
+  if (!fid) return [];
+  const usos = [];
+  rodTiempos(_rodBlo).forEach(b => {
+    if ((Array.isArray(b.fids) ? b.fids : []).indexOf(fid) >= 0) {
+      usos.push({ b, t: b.ini, via: 'cita' });
+    }
+    const mus = b.musica && typeof b.musica === 'object' ? b.musica : {};
+    /* Solo cuando la música ENTRA o SUBE: un «sigue igual» no es una
+       aparición nueva, y con doce bloques seguidos llenaría la ficha de
+       la misma pista repetida doce veces. */
+    if (mus.fid === fid && (mus.acc === 'entra' || mus.acc === 'sube')) {
+      usos.push({ b, t: b.ini, via: 'música' });
+    }
+    (Array.isArray(b.sfx) ? b.sfx : []).forEach(x => {
+      if (x.fid === fid) usos.push({ b, t: b.ini + (Number(x.t) || 0), via: 'sonido' });
+    });
+  });
+  return usos.sort((a, b) => a.t - b.t);
+}
+
 /* ══════════════ LA CABECERA ══════════════ */
 
 function rodPintarSelector() {
@@ -632,8 +684,13 @@ function rodRevisar() {
 
   _rodBlo.forEach(b => {
     const c = rodClase(b.clase);
-    const fids = Array.isArray(b.fids) ? b.fids : [];
-    if (c.cita && !fids.length) {
+    /* ⚠️ Se cuentan las citas que EXISTEN, no los elementos de la lista.
+       Es exactamente lo que mira el disparador de la base: un `fid` que
+       apunta a una fuente ya borrada no es una cita, y si aquí contara
+       como tal la pantalla diría «se puede publicar» y la base lo
+       rechazaría con un error que habla de otra cosa. */
+    const vivas = (Array.isArray(b.fids) ? b.fids : []).filter(x => rodFuente(x));
+    if (c.cita && !vivas.length) {
       av.push({ para: true, txt: 'El bloque «' + (b.titulo || 'sin título') + '» (' + c.n + ') no tiene fuente declarada.' });
     }
   });
@@ -660,6 +717,15 @@ function rodRevisar() {
   _rodBlo.forEach(b => {
     if (b.clase === 'camara' && !String(b.guion || '').trim()) {
       av.push({ para: false, txt: 'La toma «' + (b.titulo || 'sin título') + '» no tiene guion escrito: el teleprompter la salta.' });
+    }
+    /* El aviso que evita el video de veintiún minutos: lo escrito no cabe
+       en el tiempo que se le puso. Solo cuando la diferencia es grande —la
+       cuenta por palabras no pretende ser exacta— y en segundos absolutos
+       además de en porcentaje, para que un bloque de 5 s no salte por nada. */
+    const est = rodDurGuion(b.guion);
+    if (est && Math.abs(est - b.dur) > Math.max(8, b.dur * 0.35)) {
+      av.push({ para: false, txt: 'En «' + (b.titulo || 'sin título') + '» lo escrito son ≈ ' +
+        rodReloj(est) + ' hablando y le pusiste ' + rodReloj(b.dur) + '.' });
     }
     const mus = b.musica && typeof b.musica === 'object' ? b.musica : {};
     if (mus.acc && mus.acc !== 'sale' && !mus.fid) {
@@ -737,6 +803,13 @@ function rodPintarPestanas() {
       try { b.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) {}
     });
     cont.appendChild(b);
+    /* La activa se trae a la vista aunque no se haya llegado a ella
+       tocándola —al abrir la herramienta, o al volver de una ventana—: con
+       cinco pestañas y una tableta estrecha, la última queda medio fuera y
+       parece que no hay nada seleccionado. */
+    if (p.k === _rodPestana) {
+      try { b.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) {}
+    }
   });
 }
 
@@ -856,6 +929,17 @@ function rodFila(b, topeBloque) {
     g.className = 'rod-guion';
     g.textContent = '“' + String(b.guion).slice(0, 220) + (String(b.guion).length > 220 ? '…”' : '”');
     cuerpo.appendChild(g);
+    /* Lo que dura lo escrito frente a lo presupuestado. Se dice aquí, en la
+       fila, y no solo en la revisión: es donde está el texto que hay que
+       recortar. */
+    const est = rodDurGuion(b.guion);
+    if (est && Math.abs(est - b.dur) > Math.max(8, b.dur * 0.35)) {
+      const a = document.createElement('div');
+      a.className = 'rod-sub rod-sub-falta';
+      a.textContent = '⏱ Lo escrito son ≈ ' + rodReloj(est) + ' hablando, y le pusiste ' +
+        rodReloj(b.dur) + (est > b.dur ? '. Sobra texto o falta tiempo.' : '. Sobra tiempo o falta texto.');
+      cuerpo.appendChild(a);
+    }
   }
   if (b.visual) {
     const v = document.createElement('div');
@@ -906,7 +990,9 @@ function rodFila(b, topeBloque) {
   const btns = document.createElement('div');
   btns.className = 'rod-btns';
   btns.appendChild(rodBoton('✏️ Editar', () => rodBloqueAbrir(b)));
-  if (b.clase === 'camara' && b.guion) {
+  /* Cualquier bloque con guion, no solo los de cámara: la voz en off
+     también se ensaya, y es la mitad del texto de un ensayo. */
+  if (String(b.guion || '').trim()) {
     btns.appendChild(rodBoton('📖 Ensayar', () => rodPrompterAbrir(b.bid)));
   }
   btns.appendChild(rodBoton(b.listo ? '↩️ A borrador' : '✅ Listo', () => rodBloqueListo(b, !b.listo)));
@@ -1066,11 +1152,26 @@ function rodRenderCamara(cuerpo) {
     : 'El resto del video es material de apoyo. Estas son las frases que solo puedes decir tú, ' +
       'así que son las que hay que grabar con intención.';
   intro.appendChild(ip);
+  /* Y se dice que el teleprompter lleva TAMBIÉN la voz en off: si no, la
+     narración escrita en un bloque de archivo parece texto que nadie va a
+     leer, y se acaba escribiendo en las notas. */
+  const off = _rodBlo.filter(b => b.clase !== 'camara' && String(b.guion || '').trim());
+  if (off.length) {
+    const p = document.createElement('p');
+    p.className = 'rod-intro-p';
+    p.textContent = '🎙️ Y hay ' + off.length + (off.length === 1 ? ' bloque más' : ' bloques más') +
+      ' con guion para decir en off, sobre material de apoyo. Esos no cuentan en el presupuesto ' +
+      'de cámara —no eres tú en pantalla— pero el teleprompter también los lleva.';
+    intro.appendChild(p);
+  }
   cuerpo.appendChild(intro);
 
   const barra = document.createElement('div');
   barra.className = 'rod-barra';
-  if (tomas.length) barra.appendChild(rodBoton('📖 Teleprompter (todas)', () => rodPrompterAbrir(''), 'rod-b-pri'));
+  const conGuion = _rodBlo.filter(b => String(b.guion || '').trim()).length;
+  if (conGuion) {
+    barra.appendChild(rodBoton('📖 Teleprompter (' + conGuion + ')', () => rodPrompterAbrir(''), 'rod-b-pri'));
+  }
   barra.appendChild(rodBoton('➕ Toma nueva', () => rodBloqueAbrir(null, 'camara')));
   cuerpo.appendChild(barra);
 
@@ -1353,11 +1454,13 @@ function rodFilaFuente(f) {
     card.appendChild(a);
   }
 
-  const usos = _rodBlo.filter(b => (Array.isArray(b.fids) ? b.fids : []).indexOf(f.fid) >= 0).length;
+  const usos = rodUsos(f.fid);
   const u = document.createElement('div');
   u.className = 'rod-sub';
-  u.textContent = usos ? '📍 Se acredita en ' + usos + (usos === 1 ? ' bloque' : ' bloques')
-                       : '📍 Todavía no la usa ningún bloque';
+  u.textContent = usos.length
+    ? '📍 Suena o se ve en ' + usos.length + (usos.length === 1 ? ' momento: ' : ' momentos: ') +
+      usos.slice(0, 6).map(x => rodReloj(x.t)).join(', ') + (usos.length > 6 ? '…' : '')
+    : '📍 Todavía no la usa ningún bloque';
   card.appendChild(u);
 
   const btns = document.createElement('div');
@@ -2019,19 +2122,35 @@ async function rodFuenteBorrar(f) {
   if (!sb) return;
   /* Se dice CUÁNTOS bloques se quedan sin cita, y esos bloques dejan de
      poder publicarse. Borrar una fuente no es como borrar una nota. */
-  const usos = _rodBlo.filter(b => (Array.isArray(b.fids) ? b.fids : []).indexOf(f.fid) >= 0);
+  const donde = rodUsos(f.fid);
   if (!confirm('Borrar «' + (f.titulo || f.fid) + '».' +
-      (usos.length ? ' ' + usos.length + (usos.length === 1 ? ' bloque se queda' : ' bloques se quedan') +
-                     ' sin cita, y con eso el video no se deja publicar.' : '') + ' ¿Seguir?')) return;
+      (donde.length ? ' Se usa en ' + donde.length +
+                      (donde.length === 1 ? ' momento del video' : ' momentos del video') +
+                      ', y los bloques que la acreditaban se quedan sin cita: con eso el video ' +
+                      'no se deja publicar.' : '') + ' ¿Seguir?')) return;
   const { error } = await sb.from(ROD_T_FUE).delete().eq('id', f.id);
   if (error) { alert('No se pudo borrar: ' + error.message); return; }
 
-  /* Y se quita de los bloques que la nombraban. Si no, quedaría un `fid`
-     apuntando a nada: el bloque parecería tener cita y no la tendría, que
-     es peor que no tenerla, porque nadie lo mira dos veces. */
-  await Promise.all(usos.map(b => {
-    const fids = (Array.isArray(b.fids) ? b.fids : []).filter(x => x !== f.fid);
-    return sb.from(ROD_T_BLO).update({ fids }).eq('id', b.id);
+  /* Y se quita de los bloques que la nombraban, POR LOS TRES CAMINOS. Si
+     no, quedaría un `fid` apuntando a nada: el bloque parecería tener cita
+     y no la tendría, que es peor que no tenerla porque nadie lo mira dos
+     veces —y la música y los golpes se quedarían señalando a un hueco—. */
+  const tocados = _rodBlo.filter(b =>
+    (Array.isArray(b.fids) ? b.fids : []).indexOf(f.fid) >= 0 ||
+    (b.musica && b.musica.fid === f.fid) ||
+    (Array.isArray(b.sfx) ? b.sfx : []).some(x => x.fid === f.fid));
+
+  await Promise.all(tocados.map(b => {
+    const cambio = { fids: (Array.isArray(b.fids) ? b.fids : []).filter(x => x !== f.fid) };
+    if (b.musica && b.musica.fid === f.fid) {
+      const m = Object.assign({}, b.musica);
+      delete m.fid;
+      cambio.musica = m;
+    }
+    if ((Array.isArray(b.sfx) ? b.sfx : []).some(x => x.fid === f.fid)) {
+      cambio.sfx = b.sfx.map(x => x.fid === f.fid ? Object.assign({}, x, { fid: '' }) : x);
+    }
+    return sb.from(ROD_T_BLO).update(cambio).eq('id', b.id);
   }));
   await rodCargarProyecto();
 }
@@ -2479,14 +2598,22 @@ function rodPrompterAbrir(bid) {
   if (!caja) return;
   caja.textContent = '';
 
+  /* ⚠️ TODO LO QUE SE DICE EN VOZ ALTA, NO SOLO LO QUE SE DICE A CÁMARA.
+     Un video-ensayo es casi todo «yo hablando SOBRE material de archivo».
+     Esa narración se escribe en el guion de un bloque de clase `archivo` o
+     `grafico` —que es lo correcto para el presupuesto, porque esos segundos
+     no son cara hablando—, y la primera versión del teleprompter solo leía
+     los de clase `camara`: o sea que el guion narrado se escribía, se
+     guardaba, y no se ensayaba nunca. Aquí entra cualquier bloque que tenga
+     guion escrito, y cada uno dice si se graba mirando al lente o en off. */
   const tomas = rodTiempos(_rodBlo)
-    .filter(b => b.clase === 'camara' && String(b.guion || '').trim())
+    .filter(b => String(b.guion || '').trim())
     .filter(b => !bid || b.bid === bid);
 
   if (!tomas.length) {
     caja.appendChild(Object.assign(document.createElement('p'), {
       className: 'rod-prom-nota',
-      textContent: 'No hay ninguna toma a cámara con guion escrito.',
+      textContent: 'No hay ningún bloque con guion escrito, ni a cámara ni en off.',
     }));
   }
 
@@ -2494,12 +2621,22 @@ function rodPrompterAbrir(bid) {
     className: 'rod-prom-nota', textContent: '[ Mira al lente. Respira. Empieza. ]',
   }));
 
-  tomas.forEach((b, i) => {
+  let nCam = 0;
+  tomas.forEach(b => {
+    const aCamara = b.clase === 'camara';
+    if (aCamara) nCam++;
     const s = document.createElement('div');
-    s.className = 'rod-prom-toma';
+    s.className = 'rod-prom-toma' + (aCamara ? '' : ' rod-prom-off');
+    /* El rótulo dice cómo se graba, no solo cuándo: leer en off una frase
+       escrita para mirar al lente sale forzado, y al revés se nota más. Y
+       lleva lo que dura lo escrito al lado de lo presupuestado, porque es
+       aquí, ensayando, donde se descubre si el número era una fantasía. */
+    const estimado = rodDurGuion(b.guion);
     s.appendChild(Object.assign(document.createElement('div'), {
       className: 'rod-prom-rot',
-      textContent: 'TOMA ' + (i + 1) + ' · minuto ' + rodReloj(b.ini) + ' · dura ' + rodReloj(b.dur),
+      textContent: (aCamara ? '🎤 A CÁMARA ' + nCam : '🎙️ EN OFF') +
+        ' · minuto ' + rodReloj(b.ini) + ' · presupuestado ' + rodReloj(b.dur) +
+        (estimado ? ' · escrito ≈ ' + rodReloj(estimado) : ''),
     }));
     /* Cada párrafo aparte y con aire entre ellos: un muro de texto se
        pierde de vista en cuanto uno levanta los ojos al objetivo. */
@@ -2603,14 +2740,24 @@ function rodExportarRotulos() {
   const L = [];
   L.push('RÓTULOS DE PANTALLA · en el orden en que salen');
   L.push('');
+  /* Sale de rodUsos, o sea de los TRES caminos: la música que entra en el
+     minuto 6 necesita su crédito en el minuto 6 igual que un clip. Lo que
+     decide si aparece o no es la casilla «sale en pantalla» de la fuente,
+     que es de quien dirige; no el camino por el que entró. */
+  const filas = [];
+  _rodFue.filter(f => f.pantalla).forEach(f => {
+    rodUsos(f.fid).forEach(u => filas.push({ t: u.t, txt: f.rotulo || rodRotulo(f) }));
+  });
+  filas.sort((a, b) => a.t - b.t);
+  /* Un mismo rótulo repetido en el mismo segundo se pone una vez: pasa
+     cuando un bloque acredita la película y además arranca su música. */
+  let ultimo = '';
   let n = 0;
-  rodTiempos(_rodBlo).forEach(b => {
-    (Array.isArray(b.fids) ? b.fids : []).forEach(x => {
-      const f = rodFuente(x);
-      if (!f || !f.pantalla) return;
-      n++;
-      L.push(rodReloj(b.ini) + '   ' + (f.rotulo || rodRotulo(f)));
-    });
+  filas.forEach(x => {
+    const firma = x.t + '|' + x.txt;
+    if (firma === ultimo) return;
+    ultimo = firma; n++;
+    L.push(rodReloj(x.t) + '   ' + x.txt);
   });
   if (!n) L.push('(ninguna fuente está marcada para salir en pantalla)');
   L.push('');
@@ -2644,10 +2791,9 @@ function rodExportarBibliografia() {
      escribe a mano por lo mismo que todo lo demás de esta herramienta:
      un minuto escrito a mano se queda viejo al mover un bloque. */
   const minutos = {};
-  rodTiempos(_rodBlo).forEach(b => {
-    (Array.isArray(b.fids) ? b.fids : []).forEach(x => {
-      (minutos[x] = minutos[x] || []).push(rodReloj(b.ini));
-    });
+  _rodFue.forEach(f => {
+    const m = rodUsos(f.fid).map(u => rodReloj(u.t));
+    if (m.length) minutos[f.fid] = m;
   });
 
   orden.filter(g => grupos[g]).forEach(g => {
@@ -2787,6 +2933,8 @@ window.FaroRodaje = {
   reloj: rodReloj,
   segs: rodSegs,
   tiempos: rodTiempos,
+  durGuion: rodDurGuion,
+  usos: rodUsos,
   presupuesto: rodPresupuesto,
   rotulo: rodRotulo,
   enlace: rodEnlace,

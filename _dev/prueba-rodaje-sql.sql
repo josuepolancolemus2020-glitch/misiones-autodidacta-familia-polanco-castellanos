@@ -227,6 +227,31 @@ update public.rodaje_fuentes set rotulo = '«Dune» (Frank Herbert, 1965)'
 update public.rodaje_proyectos set estado = 'publicado' where pid = 'p-prueba';
 \echo '  ✔ 3f. y con el rótulo escrito, publica'
 
+-- ⚠️ Y EL HUECO QUE SE ABRE SOLO: un `fid` que apunta a una fuente
+-- borrada. `fids` es texto dentro de un jsonb y ninguna llave ajena lo
+-- sostiene, así que un guardia que contara elementos de la lista en vez de
+-- fuentes que EXISTEN dejaría publicar un bloque «con cita» cuya cita no
+-- lleva a ninguna parte. La pantalla limpia los bloques al borrar una
+-- fuente, pero son dos escrituras sobre la red de una tableta: si la
+-- segunda no entra, queda el hueco y nadie vuelve a mirar.
+update public.rodaje_proyectos set estado = 'montaje' where pid = 'p-prueba';
+update public.rodaje_bloques set fids = '["f-fantasma"]'::jsonb
+ where pid = 'p-prueba' and bid = 'b-1';
+do $$
+begin
+  begin
+    update public.rodaje_proyectos set estado = 'publicado' where pid = 'p-prueba';
+    raise exception '3g. DEJÓ publicar con un fid que apunta a una fuente que no existe';
+  exception when raise_exception then
+    if position('sin fuente declarada' in sqlerrm) = 0 then raise; end if;
+  end;
+end $$;
+\echo '  ✔ 3g. y un fid que apunta a una fuente borrada NO cuenta como cita'
+
+update public.rodaje_bloques set fids = '["f-arr"]'::jsonb
+ where pid = 'p-prueba' and bid = 'b-1';
+update public.rodaje_proyectos set estado = 'publicado' where pid = 'p-prueba';
+
 -- ════════════════════════════════════════════════════════════════════
 -- 4. LOS TIEMPOS NO SE GUARDAN
 -- ════════════════════════════════════════════════════════════════════

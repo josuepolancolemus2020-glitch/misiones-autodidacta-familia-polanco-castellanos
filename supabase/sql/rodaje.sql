@@ -500,6 +500,17 @@ begin
   if new.estado <> 'publicado' then return new; end if;
   if tg_op = 'UPDATE' and old.estado = 'publicado' then return new; end if;
 
+  -- ⚠️ SE CUENTAN FUENTES QUE EXISTEN, NO ELEMENTOS DE UNA LISTA.
+  -- La primera versión miraba `jsonb_array_length(b.fids) = 0`, y eso deja
+  -- un hueco que se abre solo: `fids` es texto dentro de un jsonb y ninguna
+  -- llave ajena lo sostiene, así que un bloque cuyo único `fid` apunte a una
+  -- fuente ya borrada pasaba el guardia con una lista de un elemento que no
+  -- lleva a ninguna parte — y el video se publicaba «con cita».
+  --
+  -- La pantalla lo tapa (al borrar una fuente limpia los bloques que la
+  -- nombraban), pero eso son dos escrituras separadas sobre la red de una
+  -- tableta: si la segunda no entra, queda el hueco y nadie vuelve a mirar.
+  -- Un guardia que se puede burlar sin querer no es un guardia.
   select string_agg(x.t, ', ' order by x.o)
     into v_sin_fuente
     from (
@@ -508,7 +519,11 @@ begin
         from public.rodaje_bloques b
        where b.pid = new.pid
          and b.clase in ('pelicula','ia','archivo','musica')
-         and jsonb_array_length(b.fids) = 0
+         and not exists (
+               select 1
+                 from jsonb_array_elements_text(b.fids) e
+                 join public.rodaje_fuentes f
+                   on f.pid = b.pid and f.fid = e.value)
        limit 12
     ) x;
 
