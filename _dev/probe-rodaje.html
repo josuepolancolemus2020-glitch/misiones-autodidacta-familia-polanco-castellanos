@@ -331,6 +331,18 @@ function nuevaBase(w, opciones){
      'y una cabecera de clase música DE VERDAD («MÚSICA 0:30 Respiro») sigue abriendo su bloque',
      'se rompió la cabecera de clase música al arreglar lo anterior');
 
+  /* ⚠️ Y EL NOMBRE DE LA PISTA NO SE TIRA. «musica: The Calendar of Rain
+     sigue de fondo» traía el título de la canción, y la primera versión
+     leía «sigue» y «fondo» y dejaba caer el resto en silencio: el dato que
+     más cuesta volver a escribir era justo el que se perdía. */
+  const conPista = R.leerGuion('[CÁMARA 0:20] A\n> musica: The Calendar of Rain entra de fondo 0:25→1:04');
+  ok(conPista.bloques[0].musica.acc === 'entra' && conPista.bloques[0].musica.ini === 25,
+     'la directiva de música lee la acción y el trozo',
+     'no leyó la música: ' + JSON.stringify(conPista.bloques[0].musica));
+  ok(conPista.citas.some(c => /Calendar of Rain/.test(c)),
+     '⚠️ y el nombre de la pista se guarda como cita en vez de tirarse',
+     'el título de la canción se perdió en silencio: ' + JSON.stringify(conPista.citas));
+
   /* ═══ 6. LA HERRAMIENTA CON LAS TABLAS PUESTAS ═══ */
   log('');
   log('── 6. Un video de principio a fin ──');
@@ -717,6 +729,38 @@ function nuevaBase(w, opciones){
      'y al cerrarlo se para el paso del texto, que si no seguiría corriendo por detrás',
      'al cerrar el teleprompter el texto sigue pasando por detrás');
   f.style.height = altoMarco;
+
+  /* ═══ 12-bis. UN CORTE DE RED NO ES UNA SECUENCIA VACÍA ═══
+     El cliente de Supabase no lanza cuando la petición se cae: devuelve
+     `{data: null, error}`. Sin mirar ese error, un corte dejaba la lista en
+     cero y la pantalla decía «La secuencia está vacía» con un botón que
+     invita a PEGAR EL GUION: el camino natural después de una mala señal
+     era pegar los treinta bloques encima de los treinta que ya estaban. */
+  log('');
+  log('── 12-bis. Un corte de red no se enseña como una secuencia vacía ──');
+  const fetchBueno = w.fetch;
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url, location.origin);
+    if (/rodaje_bloques/.test(u.pathname + u.search) || /rodaje_bloques/.test(u.pathname)) {
+      return new Response(JSON.stringify({ message: 'TypeError: Failed to fetch' }), { status: 503 });
+    }
+    return fetchBueno(url, init);
+  };
+  await w.eval('rodCargarProyecto()');
+  await esperar(500);
+  const tras = g('rod-cuerpo');
+  ok(tras && !/secuencia está vacía/i.test(tras.textContent),
+     '⚠️ no dice «la secuencia está vacía» cuando lo que pasó fue un corte',
+     'un corte de red se enseña como una secuencia vacía, e invita a pegar el guion otra vez');
+  ok(tras && /señal|no se pudo/i.test(tras.textContent),
+     'sino que dice que fue la señal y que los datos siguen donde estaban',
+     'no explica que fue la señal: ' + (tras ? tras.textContent.slice(0, 120) : ''));
+  ok(w.eval('_rodBlo.length') === 3,
+     'y NO borra lo que ya tenía en memoria: escribir encima sería lo siguiente',
+     'se perdieron los bloques de memoria tras el corte: ' + w.eval('_rodBlo.length'));
+  w.fetch = fetchBueno;
+  await w.eval('rodCargarProyecto()');
+  await esperar(400);
 
   /* ═══ 13. LA BASE VIEJA SIGUE FUNCIONANDO ═══ */
   log('');

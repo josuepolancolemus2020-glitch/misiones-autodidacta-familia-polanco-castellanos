@@ -371,7 +371,7 @@ ser mentira; y se publica con una canción, un clip y tres imágenes sin
 decir de dónde salieron—. Las tres las impide la forma de los datos, no la
 buena memoria de nadie.
 
-**Catorce reglas, y ninguna es de adorno:**
+**Quince reglas, y ninguna es de adorno:**
 
 1. ⚠️ **NO SE GUARDA NUNCA EL MINUTO EN QUE EMPIEZA UN BLOQUE.** Se guarda
    cuánto DURA; el minuto de entrada lo suma `rodTiempos()` cada vez que se
@@ -530,7 +530,18 @@ buena memoria de nadie.
     `setAttribute` — no con un grep, que `java\tscript:` y `JavaScript:` lo
     pasan y el navegador los ejecuta igual. Esta aplicación tiene dentro la
     Bóveda, las finanzas, el chat y los teléfonos del Buzón.
-14. **Aquí NO hay puerta pública, y es a propósito.** A diferencia de
+14. ⚠️ **UN CORTE DE RED NO SE ENSEÑA COMO UNA SECUENCIA VACÍA.** El
+    cliente de Supabase no lanza cuando la petición se cae: devuelve
+    `{data: null, error}`. Sin mirar ese error, un corte dejaba la lista en
+    cero y la pantalla decía «La secuencia está vacía» con un botón que
+    invita a **pegar el guion**: o sea que el camino natural después de una
+    mala señal era pegar los treinta bloques encima de los treinta que ya
+    estaban. Y lo que hay en memoria **no se tira hasta saber que llegó lo
+    nuevo** — solo al cambiar de video, donde sí hay que vaciar—. Lo mismo
+    al abrir: `error.code === '42P01'` es «falta el SQL» y lo demás es la
+    señal; decir lo primero cuando pasa lo segundo manda a pegar quinientas
+    líneas en una base que ya las tiene.
+15. **Aquí NO hay puerta pública, y es a propósito.** A diferencia de
     `metas_videos`, no existe ninguna función `security definer` ni política
     para `anon`: no hay nada que nadie de fuera tenga que leer. Con la clave
     publicable no se puede ni mirar la lista de proyectos. La prueba del SQL

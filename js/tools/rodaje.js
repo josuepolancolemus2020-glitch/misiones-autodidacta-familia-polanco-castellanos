@@ -169,6 +169,8 @@ let _rodPid      = '';     // el que está abierto
 let _rodBlo      = [];     // sus bloques, en orden
 let _rodFue      = [];     // sus fuentes
 let _rodRee      = [];     // sus reels
+let _rodFallo    = '';     // lo que dijo la nube cuando no se pudo traer
+let _rodCargadoPid = null; // de qué video es lo que hay ahora mismo en memoria
 let _rodPestana  = 'secuencia';
 let _rodEdBloque = null;   // el bloque abierto en el formulario
 let _rodEdFuente = null;
@@ -473,7 +475,19 @@ function rodSinTabla() {
 
 async function rodCargarProyecto() {
   const sb = rodSb();
-  _rodBlo = []; _rodFue = []; _rodRee = [];
+
+  /* ⚠️ LO QUE HAY EN MEMORIA NO SE TIRA HASTA SABER QUE LLEGÓ LO NUEVO.
+     Vaciarlo primero es lo natural de escribir y lo peor de usar: si la
+     petición se cae, lo que queda en pantalla es una secuencia vacía —y lo
+     siguiente que hace cualquiera con una secuencia vacía es volver a
+     pegar el guion, encima del que ya estaba—.
+     Solo se vacía cuando se cambia DE VIDEO: ahí sí, enseñar los bloques
+     del anterior con el nuevo seleccionado sería peor que no enseñar
+     nada. */
+  if (_rodCargadoPid !== _rodPid) {
+    _rodBlo = []; _rodFue = []; _rodRee = [];
+    _rodCargadoPid = _rodPid;
+  }
 
   if (sb && _rodPid) {
     /* Las tres de golpe. Son tres viajes sí o sí —PostgREST no junta
@@ -484,10 +498,27 @@ async function rodCargarProyecto() {
       sb.from(ROD_T_FUE).select('*').eq('pid', _rodPid).order('clase').order('id').limit(500),
       sb.from(ROD_T_REE).select('*').eq('pid', _rodPid).order('orden').order('id').limit(200),
     ]);
-    _rodBlo = (b && b.data) || [];
-    _rodFue = (f && f.data) || [];
-    _rodRee = (r && r.data) || [];
-    try { localStorage.setItem(ROD_ULTIMO, _rodPid); } catch (e) {}
+
+    /* ⚠️ UN FALLO AL TRAER NO PUEDE PARECER UNA SECUENCIA VACÍA.
+       El cliente de Supabase no lanza cuando la petición se cae: devuelve
+       `{ data: null, error }`. Sin mirar ese error, un corte de red dejaba
+       `_rodBlo` en cero y la pantalla decía «La secuencia está vacía» con
+       un botón que invita a PEGAR EL GUION — o sea que el camino natural
+       después de una mala señal era pegar los treinta bloques otra vez
+       encima de los treinta que ya estaban. Se dice lo que pasó y no se
+       toca nada. */
+    const fallo = (b && b.error) || (f && f.error) || (r && r.error);
+    if (fallo) {
+      _rodFallo = fallo.message || 'sin detalle';
+    } else {
+      _rodFallo = '';
+      _rodBlo = (b && b.data) || [];
+      _rodFue = (f && f.data) || [];
+      _rodRee = (r && r.data) || [];
+      try { localStorage.setItem(ROD_ULTIMO, _rodPid); } catch (e) {}
+    }
+  } else {
+    _rodBlo = []; _rodFue = []; _rodRee = []; _rodFallo = '';
   }
 
   rodPintarSelector();
@@ -848,6 +879,20 @@ function rodRender() {
   if (!cuerpo) return;
   if (!_rodHay) return rodSinTabla();
   cuerpo.textContent = '';
+
+  /* Y si lo que hubo fue un corte, se dice ANTES de pintar nada: enseñar
+     una secuencia a medias como si fuera la buena es peor que no enseñar
+     nada, porque lo que se hace a continuación es escribir encima. */
+  if (_rodFallo) {
+    cuerpo.appendChild(rodVacio('📡', 'No se pudo traer este video entero.',
+      'Fue la señal, no tus datos: siguen donde estaban. NO escribas nada hasta que ' +
+      'cargue bien, o escribirás encima de lo que hay. (' + _rodFallo + ')'));
+    const barra = document.createElement('div');
+    barra.className = 'rod-barra';
+    barra.appendChild(rodBoton('🔄 Volver a intentarlo', () => rodCargarProyecto(), 'rod-b-pri'));
+    cuerpo.appendChild(barra);
+    return;
+  }
 
   if (!_rodPid) {
     const v = document.createElement('div');
@@ -1933,11 +1978,26 @@ function rodPintarFuentesDe(idCaja, marcadas) {
     caja.appendChild(l);
   });
 }
+/* ⚠️ EL MISMO TOPE QUE EL `check` DE LA BASE, escrito aquí con su nombre:
+   `rodaje_bloques_formas` y `rodaje_reels_formas` no dejan pasar de
+   veinte. Sin este número en la pantalla, marcar la casilla veintiuno se
+   guardaba sin protestar hasta que la base rebotaba el guardado ENTERO con
+   un mensaje que habla de una restricción y no dice qué casilla sobra. Si
+   alguna vez sube, sube en LOS DOS SITIOS. */
+const ROD_MAX_FIDS = 20;
+
 function rodFidsDe(idCaja) {
   const caja = document.getElementById(idCaja);
   if (!caja) return [];
   return [...caja.querySelectorAll('input[data-rod-fid]')]
-    .filter(i => i.checked).map(i => i.getAttribute('data-rod-fid'));
+    .filter(i => i.checked).map(i => i.getAttribute('data-rod-fid'))
+    .slice(0, ROD_MAX_FIDS);
+}
+
+function rodFidsMarcadas(idCaja) {
+  const caja = document.getElementById(idCaja);
+  if (!caja) return 0;
+  return [...caja.querySelectorAll('input[data-rod-fid]')].filter(i => i.checked).length;
 }
 
 /* ── Los efectos de sonido del bloque ──
@@ -2044,6 +2104,10 @@ async function rodBloqueGuardar() {
   if (rodClase(clase).cita && !fids.length && av) {
     av.textContent = '⚠️ Se guarda, pero este bloque es material ajeno sin fuente: ' +
                      'con él puesto así, el video no se deja publicar.';
+  }
+  if (rodFidsMarcadas('rod-b-fuentes') > ROD_MAX_FIDS && av) {
+    av.textContent = '⚠️ Un bloque acredita como mucho ' + ROD_MAX_FIDS + ' fuentes. Se guardan ' +
+                     'las ' + ROD_MAX_FIDS + ' primeras; las demás se quedan sin marcar.';
   }
 
   const mus = {};
@@ -2575,7 +2639,16 @@ function rodLeerGuion(texto) {
         return;
       }
       if (['musica', 'bgm', 'pista', 'cancion'].indexOf(clave) >= 0) {
-        actual.musica = rodLeerMusica(valor);
+        const m = rodLeerMusica(valor);
+        actual.musica = {};
+        ['acc', 'niv', 'ini', 'fin'].forEach(k => { if (m[k] !== undefined) actual.musica[k] = m[k]; });
+        /* ⚠️ Y EL NOMBRE DE LA PISTA NO SE TIRA. «musica: The Calendar of
+           Rain sigue de fondo» traía el título de la canción, y la primera
+           versión leía «sigue» y «fondo» y dejaba caer el resto en
+           silencio: el dato que más cuesta volver a escribir era justo el
+           que se perdía. Se guarda como cita, que es lo que acaba siendo:
+           esa canción hay que declararla igual. */
+        if (m.nombre) { actual.citas.push(m.nombre); citasSueltas.push(m.nombre); }
         return;
       }
       /* Una palabra con dos puntos que no es de las de arriba NO se tira
@@ -2641,6 +2714,21 @@ function rodLeerMusica(txt) {
     const uno = s.match(/\bdesde\s+(\d{1,2}:\d{2})/);
     if (uno) m.ini = rodSegs(uno[1]);
   }
+
+  /* Lo que queda después de quitarle las palabras que sí se entienden es,
+     casi siempre, el NOMBRE DE LA PISTA. Se devuelve en vez de tirarlo: el
+     título de una canción es el dato que más cuesta volver a escribir. Va
+     sobre el texto ORIGINAL y no sobre el de minúsculas, que si no la
+     canción acabaría citada en minúsculas para siempre. */
+  const nombre = String(txt || '')
+    .replace(/(\d{1,2}:\d{2}(?::\d{2})?)\s*(?:→|->|-|a|hasta)\s*(\d{1,2}:\d{2}(?::\d{2})?)/gi, ' ')
+    .replace(/\b(?:desde|hasta)\s+\d{1,2}:\d{2}/gi, ' ')
+    .replace(/\b(primer\s+plano|primerplano|media\s+altura)\b/gi, ' ')
+    .replace(/\b(sale|silencio|corta|baja|duck|sube|crece|sigue|continua|continúa|entra|adelante|medio|fondo|de|en|el|la|los|las|un|una|a|y)\b/gi, ' ')
+    .replace(/[,.;:·|]/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  if (nombre.length >= 3) m.nombre = nombre;   // menos de tres letras es un resto, no un título
   return m;
 }
 
