@@ -555,7 +555,6 @@ function rodPintarPanel() {
   const pro = rodProyecto();
   if (!pro) return;
 
-  const bl = rodTiempos(_rodBlo);
   const pre = rodPresupuesto(_rodBlo, pro);
 
   const tarjeta = (rot, val, pie, cls) => {
@@ -649,24 +648,31 @@ function rodPintarPanel() {
       ? '⛔ ' + paran + (paran === 1 ? ' cosa impide publicar' : ' cosas impiden publicar')
       : '⚠️ ' + avisos.length + (avisos.length === 1 ? ' aviso' : ' avisos') + ' antes de publicar';
     caja.appendChild(t);
+    /* Los que PARAN salen TODOS: son los que hay que arreglar sí o sí, y
+       esconder uno detrás de un «y 4 más» es esconder justo el que impide
+       publicar. De los que solo avisan salen seis: un panel de treinta
+       líneas no se lee, y lo que no se lee no avisa de nada. */
+    const paranL = avisos.filter(a => a.para);
+    const sueltos = avisos.filter(a => !a.para);
+    const TOPE = 6;
     const ul = document.createElement('ul');
     ul.className = 'rod-revision-l';
-    avisos.slice(0, 12).forEach(a => {
+    paranL.concat(sueltos.slice(0, TOPE)).forEach(a => {
       const li = document.createElement('li');
       li.className = a.para ? 'rod-rev-para' : '';
       li.textContent = (a.para ? '⛔ ' : '· ') + a.txt;
       ul.appendChild(li);
     });
     caja.appendChild(ul);
-    if (avisos.length > 12) {
+    if (sueltos.length > TOPE) {
       const mas = document.createElement('div');
       mas.className = 'rod-revision-mas';
-      mas.textContent = 'y ' + (avisos.length - 12) + ' más.';
+      mas.textContent = 'y ' + (sueltos.length - TOPE) + ' aviso' +
+        (sueltos.length - TOPE === 1 ? '' : 's') + ' más, en su bloque o en su ficha.';
       caja.appendChild(mas);
     }
     cont.appendChild(caja);
   }
-  void bl;
 }
 
 /* ⚠️ LA REVISIÓN DE ANTES DE PUBLICAR.
@@ -718,14 +724,15 @@ function rodRevisar() {
     if (b.clase === 'camara' && !String(b.guion || '').trim()) {
       av.push({ para: false, txt: 'La toma «' + (b.titulo || 'sin título') + '» no tiene guion escrito: el teleprompter la salta.' });
     }
-    /* El aviso que evita el video de veintiún minutos: lo escrito no cabe
-       en el tiempo que se le puso. Solo cuando la diferencia es grande —la
-       cuenta por palabras no pretende ser exacta— y en segundos absolutos
-       además de en porcentaje, para que un bloque de 5 s no salte por nada. */
+    /* El aviso que evita el video de veintiún minutos: lo escrito NO CABE en
+       el tiempo que se le puso. Solo en ese sentido —sobrar tiempo es una
+       decisión de dirección—, solo cuando la diferencia es grande —la cuenta
+       por palabras no pretende ser exacta— y con un mínimo en segundos
+       absolutos, para que un bloque de cinco segundos no salte por nada. */
     const est = rodDurGuion(b.guion);
-    if (est && Math.abs(est - b.dur) > Math.max(8, b.dur * 0.35)) {
+    if (est - b.dur > Math.max(8, b.dur * 0.25)) {
       av.push({ para: false, txt: 'En «' + (b.titulo || 'sin título') + '» lo escrito son ≈ ' +
-        rodReloj(est) + ' hablando y le pusiste ' + rodReloj(b.dur) + '.' });
+        rodReloj(est) + ' hablando y solo le pusiste ' + rodReloj(b.dur) + ': no cabe.' });
     }
     const mus = b.musica && typeof b.musica === 'object' ? b.musica : {};
     if (mus.acc && mus.acc !== 'sale' && !mus.fid) {
@@ -932,12 +939,18 @@ function rodFila(b, topeBloque) {
     /* Lo que dura lo escrito frente a lo presupuestado. Se dice aquí, en la
        fila, y no solo en la revisión: es donde está el texto que hay que
        recortar. */
+    /* ⚠️ SOLO CUANDO EL TEXTO NO CABE, nunca cuando sobra tiempo.
+       La asimetría es real: no se pueden decir tres minutos de palabras en
+       cuarenta y cinco segundos, pero dejar un plano respirando sin hablar
+       encima es una decisión de dirección, no un error. La primera versión
+       avisaba de las dos y llenaba el panel de avisos que no lo eran —y un
+       panel lleno de avisos que no importan es un panel que no se lee—. */
     const est = rodDurGuion(b.guion);
-    if (est && Math.abs(est - b.dur) > Math.max(8, b.dur * 0.35)) {
+    if (est - b.dur > Math.max(8, b.dur * 0.25)) {
       const a = document.createElement('div');
       a.className = 'rod-sub rod-sub-falta';
-      a.textContent = '⏱ Lo escrito son ≈ ' + rodReloj(est) + ' hablando, y le pusiste ' +
-        rodReloj(b.dur) + (est > b.dur ? '. Sobra texto o falta tiempo.' : '. Sobra tiempo o falta texto.');
+      a.textContent = '⏱ Lo escrito son ≈ ' + rodReloj(est) + ' hablando y le pusiste ' +
+        rodReloj(b.dur) + ': no cabe. Recorta el texto o dale más tiempo.';
       cuerpo.appendChild(a);
     }
   }
@@ -1656,9 +1669,12 @@ function rodProyectoAbrir(pro) {
   if (borrar) borrar.style.display = pro ? '' : 'none';
   const av = document.getElementById('rod-p-aviso');
   if (av) av.textContent = '';
-  document.getElementById('rod-p-titulo')
-    ? (document.getElementById('rod-p-ventana').dataset.pid = pro ? pro.pid : '')
-    : null;
+  /* El pid del proyecto que se está editando viaja en el propio rótulo de
+     la ventana y no en una variable suelta: si viviera en una variable, dos
+     ventanas abiertas seguidas (editar uno, cancelar, crear otro) podrían
+     dejarla apuntando al anterior y el guardado corregiría el video
+     equivocado. Vacío = uno nuevo. */
+  if (t) t.dataset.pid = pro ? pro.pid : '';
   rodOverlay('rod-p-overlay', true);
 }
 
@@ -2544,17 +2560,32 @@ async function rodPegarMeter() {
   /* Primero las citas, porque los bloques van a apuntar a ellas. Nacen
      SIN VERIFICAR y con lo poco que traía el texto: es lo contrario de
      inventárselas, y es mejor que perderlas. La revisión de arriba las
-     va a nombrar hasta que alguien las complete. */
+     va a nombrar hasta que alguien las complete.
+
+     Van TODAS EN UN SOLO VIAJE. Una a una eran veinte peticiones seguidas
+     con la señal de una tableta, y cada una es una oportunidad de que se
+     corte por la mitad: veinte fuentes creadas y ni un bloque, que es el
+     estado más difícil de deshacer a mano. */
   const porTexto = {};
-  for (const txt of _rodPegado.citas) {
+  const nuevas = [];
+  _rodPegado.citas.forEach(txt => {
     const ya = _rodFue.find(f => (f.titulo || '').toLowerCase() === txt.toLowerCase());
-    if (ya) { porTexto[txt] = ya.fid; continue; }
+    if (ya) { porTexto[txt] = ya.fid; return; }
     const fid = rodId('f');
     const base = { pid: _rodPid, fid, clase: 'web', titulo: txt.slice(0, 200),
                    licencia: 'desconocida', pantalla: true, verificada: false };
     base.rotulo = rodRotulo(base);
-    const { error } = await sb.from(ROD_T_FUE).insert(base);
-    if (!error) porTexto[txt] = fid;
+    porTexto[txt] = fid;
+    nuevas.push(base);
+  });
+  if (nuevas.length) {
+    const { error: eF } = await sb.from(ROD_T_FUE).insert(nuevas);
+    if (eF) {
+      if (btn) btn.textContent = '➕ Añadir';
+      if (av) av.textContent = '⚠️ No se pudieron crear las fuentes: ' + (eF.message || '') +
+                               ' No se añadió nada; vuelve a intentarlo.';
+      return;
+    }
   }
 
   let orden = (_rodBlo.length ? Math.max(..._rodBlo.map(b => Number(b.orden) || 0)) : 0);
@@ -2572,7 +2603,12 @@ async function rodPegarMeter() {
   const { error } = await sb.from(ROD_T_BLO).insert(filas);
   if (btn) { btn.disabled = false; }
   if (error) {
-    if (av) av.textContent = '⚠️ ' + (error.message || 'No se pudieron guardar.');
+    /* Si las fuentes entraron y los bloques no, se DICE: son dos viajes y
+       el segundo puede fallar solo. Callarlo dejaría al autor volviendo a
+       pegar el mismo guion y creando las fuentes por segunda vez. */
+    if (av) av.textContent = '⚠️ ' + (error.message || 'No se pudieron guardar los bloques.') +
+      (nuevas.length ? ' Las ' + nuevas.length + ' fuentes SÍ se crearon: al volver a pegar el ' +
+                       'mismo guion se reconocen por el título y no se duplican.' : '');
     return;
   }
   rodOverlay('rod-pegar-overlay', false);

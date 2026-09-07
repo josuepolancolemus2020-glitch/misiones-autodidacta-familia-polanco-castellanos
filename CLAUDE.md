@@ -479,9 +479,17 @@ buena memoria de nadie.
     cuatrocientas palabras marcado como «0:45» miente, el porcentaje sale
     bonito y el video sale de veintiún minutos. `rodDurGuion()` cuenta a 150
     palabras por minuto —el ritmo de un ensayo hablado en español— y avisa
-    en la propia fila y en la revisión cuando la diferencia es grande. No
-    pretende ser exacta; lo que tiene que hacer es cazar el «0:45» de un
-    párrafo de tres minutos, que si no no se descubre hasta el montaje.
+    en la propia fila y en la revisión. No pretende ser exacta; lo que tiene
+    que hacer es cazar el «0:45» de un párrafo de tres minutos, que si no no
+    se descubre hasta el montaje.
+    ⚠️ **Y avisa en UN SOLO SENTIDO: cuando el texto NO CABE.** Que sobre
+    tiempo es una decisión de dirección —un plano respirando sin nadie
+    hablando encima— y no un error. La primera versión avisaba de las dos y
+    llenaba el panel: ocho avisos de los que ninguno era un problema, y un
+    panel lleno de avisos que no importan es un panel que no se lee. Por lo
+    mismo, del panel salen **todos** los que PARAN y solo seis de los que
+    avisan: esconder detrás de un «y 4 más» justo el que impide publicar
+    sería el peor recorte posible.
 13. **Nada de la base llega a un atributo del HTML.** Todo con
     `createElement` y `textContent`. Lo único que va a un atributo es una
     dirección, comprobada con `URL()` en `rodEnlace()` y puesta con

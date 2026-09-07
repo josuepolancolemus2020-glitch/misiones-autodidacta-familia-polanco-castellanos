@@ -563,10 +563,30 @@ function nuevaBase(w, opciones){
   ok(R.durGuion('') === 0 && R.durGuion('   ') === 0,
      'y un guion vacío no estima nada, para no avisar de la nada',
      'un guion vacío da una estimación');
-  const revOff = w.eval('rodRevisar()');
-  ok(revOff.some(a => /heptápodos|La Llegada/.test(a.txt) && /escrito/.test(a.txt)),
-     'y la revisión avisa de que lo escrito no cabe en el tiempo que se le puso',
+  /* ⚠️ Y solo en un sentido: cuando el texto NO CABE. Que sobre tiempo es
+     una decisión de dirección —un plano respirando sin nadie hablando
+     encima—, y avisar de las dos cosas llenaba el panel de avisos que no
+     lo eran. Un panel lleno de avisos que no importan no se lee. */
+  bOff.dur = 20;
+  bOff.guion = 'El lenguaje de los heptápodos no tiene principio ni fin. '.repeat(8);
+  await w.eval('rodCargarProyecto()');
+  await esperar(400);
+  const revLargo = w.eval('rodRevisar()');
+  ok(revLargo.some(a => /La Llegada/.test(a.txt) && /no cabe/.test(a.txt)),
+     'y la revisión avisa cuando lo escrito NO CABE en el tiempo que se le puso',
      'no avisa del guion que no cabe: el video sale de veintiún minutos y se descubre montando');
+
+  bOff.dur = 600;
+  bOff.guion = 'Cuatro palabras nada más.';
+  await w.eval('rodCargarProyecto()');
+  await esperar(400);
+  const revCorto = w.eval('rodRevisar()');
+  ok(!revCorto.some(a => /La Llegada/.test(a.txt) && /cabe/.test(a.txt)),
+     'y NO avisa cuando sobra tiempo: dejar un plano respirando es una decisión, no un error',
+     'avisa de que sobra tiempo y llena el panel de avisos que no lo son');
+  bOff.dur = 120; bOff.guion = '';
+  await w.eval('rodCargarProyecto()');
+  await esperar(300);
 
   /* ═══ 11. LAS EXPORTACIONES ═══ */
   log('');
