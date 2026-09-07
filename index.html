@@ -1605,29 +1605,24 @@
         </button>
       </div>
       <div class="rod-form">
-        <p class="rod-ayuda">Cada bloque empieza con una cabecera: <code>[CÁMARA 0:30] Título</code>.
-          También vale <code>CLIP 3:45 — Título</code> o <code>## TOMA 1 (0:15) Título</code>.
-          Las clases que se reconocen: cámara/toma, película/clip, IA, gráfico/canva,
-          archivo/b-roll, pantalla, música y título/cartón.</p>
-        <p class="rod-ayuda">Debajo, las líneas que empiezan por <code>&gt;</code> dicen lo demás:
-          <code>visual:</code>, <code>sfx 0:04 golpe grave</code>,
-          <code>música: entra de fondo 0:25→1:04</code>, <code>fuente:</code>, <code>nota:</code>.
-          Todo lo que no sea una de esas <strong>se queda como guion</strong>: nada se coloca a la
-          fuerza en un campo que no le toca, porque ahí no se ve que está mal.</p>
-        <textarea id="rod-pegar-txt" class="rod-in" rows="10"
-placeholder="[CÁMARA 0:30] La flecha rota
-¿Alguna vez has tenido un déjà vu tan visceral que sentiste que ya sabías lo que iba a pasar?
-&gt; visual: Plano medio cálido, luz de ventana
-&gt; sfx 0:04 golpe grave de sub-bajo
-&gt; música: entra de fondo 0:25→1:04
-&gt; fuente: Arrival (Denis Villeneuve, 2016)
+        <!-- ⚠️ EL MOLDE SE ENSEÑA, NO SE EXPLICA.
+             Antes eran dos párrafos de prosa que había que leer entero y
+             convertir en un formato en la cabeza. Ahora se ve la forma
+             escrita —que es lo que se va a copiar— y la lista de etiquetas
+             sale del propio código (`ROD_ETIQUETAS`), así que no puede
+             quedarse vieja el día que se añada una palabra. -->
+        <div id="rod-pegar-molde"></div>
 
-[PELÍCULA 3:45] La Llegada y los heptápodos
-&gt; visual: Clips de tinta circular
-&gt; fuente: Arrival (Denis Villeneuve, 2016)"></textarea>
         <div class="rod-barra">
-          <button type="button" class="rod-b rod-b-pri" id="rod-pegar-leer">Leer el guion</button>
-          <button type="button" class="rod-b" id="rod-pegar-portapapeles" style="display:none;">📥 Del portapapeles</button>
+          <button type="button" class="rod-b" id="rod-pegar-ejemplo">📄 Un ejemplo</button>
+          <button type="button" class="rod-b" id="rod-pegar-portapapeles" style="display:none;">📥 Portapapeles</button>
+        </div>
+
+        <textarea id="rod-pegar-txt" class="rod-in" rows="10"
+placeholder="Pega aquí el guion tal como lo tengas escrito.
+Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea>
+        <div class="rod-barra">
+          <button type="button" class="rod-b rod-b-pri" id="rod-pegar-leer">👁 Ver qué entiende</button>
         </div>
         <div id="rod-pegar-vista" class="rod-pegar-vista"></div>
         <p class="rod-aviso" id="rod-pegar-aviso"></p>

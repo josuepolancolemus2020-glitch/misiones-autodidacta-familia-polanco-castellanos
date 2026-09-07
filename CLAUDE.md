@@ -462,6 +462,45 @@ buena memoria de nadie.
    fuerza en otro campo**: ahí no se ve que está mal. Las citas escritas a
    mano en el texto se crean como fuentes SIN VERIFICAR en vez de perderse:
    ninguna se descarta y ninguna se inventa.
+   ⚠️ **Y LAS ETIQUETAS SE ESCRIBEN COMO SE ESCRIBEN DE VERDAD.**
+   Ampliación del 7 de septiembre de 2026, después de que el autor pegara
+   su primer guion largo: «quiero que haya especificación más precisa de
+   qué poner para que no rechace el sistema tanto lo que copio y pego».
+   Un guion escrito de verdad no dice `rotulo:`; dice `TEXTO EN PANTALLA:`,
+   `AUDIO (Tú - Voz en off):`, `BGM:` y `SONIDOS:`. Ahora:
+
+   - **Una etiqueta puede ser de VARIAS PALABRAS** y llevar un paréntesis
+     detrás. Con la tabla de una sola palabra, `TEXTO EN PANTALLA: …`
+     entraba por la rama de la cabecera —«TEXTO» nombra una clase y venía
+     en mayúsculas— y abría un bloque nuevo titulado «EN PANTALLA: …»:
+     o sea que la forma en que la gente escribe era justo la que se
+     descuartizaba.
+   - ⚠️ **Una clave es SOLO letras y espacios**, y eso es lo que salva a
+     las cabeceras. `## MÚSICA 0:30 Respiro` y `[TOMA 0:30] Título` también
+     llevan dos puntos —dentro de su duración—; si al comparar se les
+     quitaran los dígitos y el corchete, quedarían en «musica» y «toma» y
+     se leerían como directivas: el bloque no se abriría y sus líneas se
+     irían al anterior. `rodClaveEtiqueta` devuelve vacío en cuanto ve un
+     dígito, una almohadilla o un corchete.
+   - **`AUDIO:`, `VOZ EN OFF:` y `NARRACIÓN:` van al GUION**, y sin la
+     etiqueta delante: leer «Audio:» en voz alta delante de la cámara
+     sería el peor final posible.
+   - ⚠️ **Lo que no se entiende se NOMBRA, con su número de renglón y con
+     el nombre bueno al lado.** Nunca se rechazó nada —esas líneas se
+     quedan en el guion, que es lo correcto— pero no se decía cuál ni por
+     qué, y un rechazo silencioso se ve desde fuera igual que un rechazo.
+     Solo se marca lo que INTENTABA ser una etiqueta (viñeta delante o
+     rótulo en mayúsculas): si no, «Su mandamiento fue claro: …» saldría
+     marcado y el aviso sería ruido.
+   - **La lista que enseña la ventana sale de `ROD_ETIQUETAS`**, no
+     escrita a mano en la pantalla. Es la misma regla que las materias de
+     Videos M.E.T.A.S: una lista a mano estaría equivocada el día que
+     alguien añada una palabra, y quien la lea se fiará. La sonda lo
+     comprueba palabra por palabra (comprobación 5-ter).
+   - **Y hay un botón «📄 Un ejemplo»** que rellena el recuadro con un
+     guion que funciona y lo lee de una vez. Aprender editando algo que ya
+     va cuesta un tercio que aprender leyendo cómo debería ser.
+
    ⚠️ Y en la cabecera **el tiempo se saca ANTES que el número de orden**.
    Al revés, «PELÍCULA 1:15 — La Llegada» perdía el 1 —el quitanúmeros se lo
    comía creyendo que era el «1.» de una lista— y el bloque entraba con 15
@@ -524,9 +563,13 @@ buena memoria de nadie.
     hablando encima— y no un error. La primera versión avisaba de las dos y
     llenaba el panel: ocho avisos de los que ninguno era un problema, y un
     panel lleno de avisos que no importan es un panel que no se lee. Por lo
-    mismo, del panel salen **todos** los que PARAN y solo seis de los que
-    avisan: esconder detrás de un «y 4 más» justo el que impide publicar
-    sería el peor recorte posible.
+    mismo, del panel salen **todos** los que PARAN, a la vista, y los que
+    solo avisan van **plegados** detrás de su cuenta. Esconder detrás de un
+    «y 4 más» justo el que impide publicar sería el peor recorte posible;
+    pero dejar treinta avisos abiertos tapaba las pestañas y había que
+    barrerlos enteros cada vez que se entraba — entre los treinta, los
+    cuatro que sí paran dejaban de verse—. Un panel que no se lee no avisa
+    de nada, y uno que tapa la herramienta la esconde.
 13. **Nada de la base llega a un atributo del HTML.** Todo con
     `createElement` y `textContent`. Lo único que va a un atributo es una
     dirección, comprobada con `URL()` en `rodEnlace()` y puesta con

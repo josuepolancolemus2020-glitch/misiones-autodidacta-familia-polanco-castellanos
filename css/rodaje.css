@@ -277,7 +277,15 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.55; }
                     max-height: 32vh; overflow-y: auto; }
 .rod-revision-l li { margin: .18rem 0; }
 .rod-rev-para     { font-weight: 700; color: #fda4af; }
-.rod-revision-mas { margin-top: .3rem; opacity: .7; }
+.rod-revision-mas { margin-top: .4rem; }
+.rod-revision-mas > summary {
+  cursor: pointer; list-style: none; min-height: 32px;
+  display: flex; align-items: center;
+  font-size: .8rem; font-weight: 600; color: #fdba74;
+}
+.rod-revision-mas > summary::before { content: '▸ '; margin-right: .3rem; }
+.rod-revision-mas[open] > summary::before { content: '▾ '; }
+.rod-revision-mas > summary::-webkit-details-marker { display: none; }
 
 /* ── Las pestañas ──
    ⚠️ NO bajan de línea: se deslizan. Es la misma excepción al flex-wrap
@@ -961,6 +969,55 @@ textarea.rod-in { min-height: 70px; resize: vertical; line-height: 1.55; }
   .rod-reel { flex-direction: column; }
   .rod-reel-marco { width: 100%; max-width: 190px; align-self: center; }
 }
+
+/* ── El molde de la ventana de pegar ──
+   Se lee como una ficha, no como un párrafo: la forma escrita primero,
+   porque es lo que se va a copiar, y la explicación debajo y en corto. */
+.rod-molde {
+  background: rgba(139,92,246,.07); border: 1px solid rgba(139,92,246,.26);
+  border-radius: 12px; padding: .6rem .7rem; margin-bottom: .3rem;
+}
+.rod-molde-t { font-size: .84rem; font-weight: 700; color: #e2e8f0; margin-bottom: .4rem; }
+.rod-molde-p {
+  font-family: var(--rod-mono); font-size: .76rem; line-height: 1.6;
+  background: #05080f; border: 1px solid var(--border); border-radius: 8px;
+  color: #cbd5e1; padding: .5rem .6rem; margin: 0 0 .5rem;
+  /* Un molde que se parte de renglón deja de parecer un molde. Se
+     desliza, como las pestañas. */
+  white-space: pre; overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.rod-molde-l { font-size: .76rem; color: var(--muted); line-height: 1.5; }
+.rod-molde-l b { color: #e2e8f0; }
+.rod-molde-chips { display: flex; flex-wrap: wrap; gap: .25rem; margin: .5rem 0 .1rem; }
+.rod-molde-chips .rod-chip { font-size: .66rem; letter-spacing: .03em; }
+
+.rod-molde-todas { margin-top: .5rem; }
+.rod-molde-todas > summary {
+  cursor: pointer; font-size: .78rem; font-weight: 600; color: var(--rod-luz);
+  padding: .35rem 0; min-height: 32px; list-style: none;
+}
+.rod-molde-todas > summary::before { content: '▸ '; }
+.rod-molde-todas[open] > summary::before { content: '▾ '; }
+.rod-molde-todas > summary::-webkit-details-marker { display: none; }
+.rod-molde-fila { margin: .45rem 0; }
+.rod-molde-campo { display: block; font-size: .72rem; color: var(--muted); }
+.rod-molde-pal {
+  display: block; font-family: var(--rod-mono); font-size: .72rem; line-height: 1.6;
+  color: #c4b5fd; word-break: break-word;
+}
+
+/* Lo que el lector NO entendió. En ámbar y no en rojo: no está roto —el
+   texto sigue dentro del bloque— pero hay que verlo, porque es justo lo
+   que desde fuera parece «me rechazó lo que pegué». */
+.rod-pegar-no {
+  background: rgba(234,179,8,.08); border: 1px solid rgba(234,179,8,.3);
+  border-left: 3px solid #eab308; border-radius: 10px;
+  padding: .55rem .7rem; margin-top: .6rem;
+}
+.rod-pegar-no-t { font-size: .8rem; font-weight: 700; color: #fde047; margin-bottom: .3rem; }
+.rod-pegar-no-l { font-size: .78rem; line-height: 1.55; color: #e2e8f0; }
+.rod-pegar-no-l b { font-family: var(--rod-mono); color: #fbbf24; }
+.rod-pegar-no-s { color: #86efac; font-weight: 600; }
 
 .rod-pegar-res { font-weight: 700; font-size: .88rem; margin-bottom: .4rem; color: #f1f5f9; }
 .rod-pegar-fila {

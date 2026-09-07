@@ -353,6 +353,91 @@ function nuevaBase(w, opciones){
      '⚠️ y el nombre de la pista se guarda como cita en vez de tirarse',
      'el título de la canción se perdió en silencio: ' + JSON.stringify(conPista.citas));
 
+  /* ═══ 5-ter. EL GUION SE PEGA COMO ESTÁ ESCRITO, NO COMO DEBERÍA ═══
+     Un guion de verdad no dice «rotulo:»: dice «TEXTO EN PANTALLA:»,
+     «AUDIO (Tú - Voz en off):», «BGM:» y «SONIDOS:». Antes, «TEXTO EN
+     PANTALLA:» entraba por la rama de la cabecera —«TEXTO» nombra una
+     clase y venía en mayúsculas— y abría un bloque NUEVO titulado «EN
+     PANTALLA: …»: o sea que la forma en que la gente escribe de verdad
+     era justo la que se descuartizaba. */
+  log('');
+  log('── 5-ter. Las etiquetas como se escriben de verdad ──');
+  const crudo = R.leerGuion(
+    '[CÁMARA 0:15] El gancho\n' +
+    'VISUAL: Louise abrazando a su hija\n' +
+    'SFX: viento suave\n' +
+    'BGM: entra de fondo 0:00→0:25 The Calendar of Rain\n' +
+    'TEXTO EN PANTALLA: ¿Y si el futuro ya nos dolió?\n' +
+    'AUDIO (Tú - Voz en off): Toda la vida nos han dicho que el tiempo es una línea recta.\n' +
+    'Objetivo: romper la percepción del espectador\n' +
+    'REFERENCIAS: Einstein, Relatividad General\n' +
+    'REBANADAS: esto no es ninguna etiqueta\n' +
+    'Su mandamiento fue claro: no harás una máquina.');
+
+  ok(crudo.bloques.length === 1,
+     '⚠️ un guion escrito con «TEXTO EN PANTALLA:» y «AUDIO (Tú):» sigue siendo UN bloque',
+     'se descuartizó en ' + crudo.bloques.length + ' bloques: ' +
+       crudo.bloques.map(b => b.titulo).join(' | '));
+  const c0 = crudo.bloques[0] || {};
+  ok(c0.visual === 'Louise abrazando a su hija',
+     'y «VISUAL:» en mayúsculas llena lo que se ve',
+     'VISUAL no llegó a su campo: ' + JSON.stringify(c0.visual));
+  ok(c0.rotulo === '¿Y si el futuro ya nos dolió?',
+     '⚠️ y «TEXTO EN PANTALLA:» va al rótulo, en vez de abrir un bloque de título',
+     'TEXTO EN PANTALLA no llegó al rótulo: ' + JSON.stringify(c0.rotulo));
+  ok(/línea recta/.test(c0.guion || '') && !/AUDIO/.test(c0.guion || ''),
+     '⚠️ y «AUDIO (Tú - Voz en off):» va al guion SIN la etiqueta delante: se lee en voz alta',
+     'el audio no llegó limpio al guion: ' + JSON.stringify(c0.guion));
+  ok(c0.sfx && c0.sfx.length === 1 && /viento/.test(c0.sfx[0].que),
+     'y «SFX:» pone su golpe de sonido',
+     'SFX no llegó: ' + JSON.stringify(c0.sfx));
+  ok(c0.musica && c0.musica.acc === 'entra' && c0.musica.fin === 25,
+     'y «BGM:» pone la música con su trozo de la pista',
+     'BGM no llegó: ' + JSON.stringify(c0.musica));
+  ok(/romper la percepción/i.test(c0.notas || ''),
+     'y «Objetivo:» se queda como nota tuya, fuera del guion',
+     'Objetivo no llegó a las notas: ' + JSON.stringify(c0.notas));
+  ok((c0.citas || []).some(x => /Einstein/.test(x)),
+     'y «REFERENCIAS:» crea su cita',
+     'REFERENCIAS no creó cita: ' + JSON.stringify(c0.citas));
+
+  /* ⚠️ Y LO QUE NO SE ENTIENDE SE NOMBRA CON SU RENGLÓN. Es la queja del
+     autor: «que no rechace el sistema tanto lo que copio y pego». No
+     rechazaba nada —el texto se queda en el guion— pero no lo decía, y un
+     rechazo silencioso se ve igual que un rechazo. */
+  const noE = crudo.noEntendidas || [];
+  ok(noE.length === 1 && noE[0].rotulo === 'REBANADAS',
+     '⚠️ la etiqueta inventada se apunta, con su número de renglón',
+     'no se apuntó la etiqueta desconocida: ' + JSON.stringify(noE));
+  ok(noE.length === 1 && noE[0].linea === 9,
+     'y el renglón es el de verdad (el 9), que es lo que deja arreglarla de un toque',
+     'el número de renglón no cuadra: ' + JSON.stringify(noE.map(x => x.linea)));
+  ok(/REBANADAS/.test(c0.guion || ''),
+     'y aun así el texto NO se pierde: se queda dentro del guion',
+     'la línea desconocida se perdió');
+  ok(!noE.some(x => /mandamiento/i.test(x.rotulo)),
+     '⚠️ y una frase de prosa con dos puntos NO se marca: si no, el aviso sería ruido y nadie lo leería',
+     'una línea de prosa se marcó como etiqueta rota: ' + JSON.stringify(noE));
+
+  /* Y la lista que se enseña en la ventana sale del propio lector: una
+     escrita a mano en la pantalla estaría equivocada el día que alguien
+     añada una palabra, y quien la lea se fiará. */
+  w.eval('rodPegarAbrir()');
+  await esperar(200);
+  const molde = g('rod-pegar-molde');
+  const palabras = Object.keys(w.eval('ROD_ETIQUETAS'));
+  ok(molde && palabras.length > 20 &&
+     palabras.every(k => molde.textContent.indexOf(k) >= 0),
+     'la ventana de pegar enseña LAS ' + palabras.length + ' etiquetas que el lector acepta, sacadas del propio lector',
+     'el molde de la ventana no enseña todas las etiquetas: es una lista a mano y se quedará vieja');
+  w.eval('document.getElementById("rod-pegar-ejemplo").click()');
+  await esperar(250);
+  const vistaPeg = g('rod-pegar-vista');
+  ok(vistaPeg && /2 bloques/.test(vistaPeg.textContent),
+     'y «📄 Ponme un ejemplo» rellena el recuadro y lo lee de una vez',
+     'el botón del ejemplo no dejó nada leído: ' + (vistaPeg ? vistaPeg.textContent.slice(0, 80) : 'sin vista'));
+  w.eval('rodOverlay("rod-pegar-overlay", false)');
+
   /* ═══ 6. LA HERRAMIENTA CON LAS TABLAS PUESTAS ═══ */
   log('');
   log('── 6. Un video de principio a fin ──');

@@ -694,28 +694,48 @@ function rodPintarPanel() {
       ? '⛔ ' + paran + (paran === 1 ? ' cosa impide publicar' : ' cosas impiden publicar')
       : '⚠️ ' + avisos.length + (avisos.length === 1 ? ' aviso' : ' avisos') + ' antes de publicar';
     caja.appendChild(t);
-    /* Los que PARAN salen TODOS: son los que hay que arreglar sí o sí, y
-       esconder uno detrás de un «y 4 más» es esconder justo el que impide
-       publicar. De los que solo avisan salen seis: un panel de treinta
-       líneas no se lee, y lo que no se lee no avisa de nada. */
+    /* ⚠️ LOS QUE PARAN SALEN TODOS Y A LA VISTA. Son los que hay que
+       arreglar sí o sí, y esconder uno detrás de un «y 4 más» es esconder
+       justo el que impide publicar.
+
+       ⚠️ Y LOS QUE SOLO AVISAN SE PLIEGAN. Antes salían seis sueltos y el
+       panel medía dos pantallas: entre treinta avisos que no paran nada,
+       los cuatro que sí lo hacen dejaban de verse, y para llegar a las
+       pestañas había que barrer la lista entera cada vez que se entraba.
+       Un panel que no se lee no avisa de nada, y uno que tapa la
+       herramienta la esconde. Plegados siguen contados en el rótulo, que
+       es lo que hace que se abran cuando toca. */
     const paranL = avisos.filter(a => a.para);
     const sueltos = avisos.filter(a => !a.para);
-    const TOPE = 6;
-    const ul = document.createElement('ul');
-    ul.className = 'rod-revision-l';
-    paranL.concat(sueltos.slice(0, TOPE)).forEach(a => {
-      const li = document.createElement('li');
-      li.className = a.para ? 'rod-rev-para' : '';
-      li.textContent = (a.para ? '⛔ ' : '· ') + a.txt;
-      ul.appendChild(li);
-    });
-    caja.appendChild(ul);
-    if (sueltos.length > TOPE) {
-      const mas = document.createElement('div');
-      mas.className = 'rod-revision-mas';
-      mas.textContent = 'y ' + (sueltos.length - TOPE) + ' aviso' +
-        (sueltos.length - TOPE === 1 ? '' : 's') + ' más, en su bloque o en su ficha.';
-      caja.appendChild(mas);
+
+    if (paranL.length) {
+      const ul = document.createElement('ul');
+      ul.className = 'rod-revision-l';
+      paranL.forEach(a => {
+        const li = document.createElement('li');
+        li.className = 'rod-rev-para';
+        li.textContent = '⛔ ' + a.txt;
+        ul.appendChild(li);
+      });
+      caja.appendChild(ul);
+    }
+
+    if (sueltos.length) {
+      const det = document.createElement('details');
+      det.className = 'rod-revision-mas';
+      const sum = document.createElement('summary');
+      sum.textContent = sueltos.length + (sueltos.length === 1 ? ' aviso más' : ' avisos más') +
+        ', que no impiden publicar';
+      det.appendChild(sum);
+      const ul2 = document.createElement('ul');
+      ul2.className = 'rod-revision-l';
+      sueltos.forEach(a => {
+        const li = document.createElement('li');
+        li.textContent = '· ' + a.txt;
+        ul2.appendChild(li);
+      });
+      det.appendChild(ul2);
+      caja.appendChild(det);
     }
     cont.appendChild(caja);
   }
@@ -3183,18 +3203,85 @@ const ROD_PALABRAS_CLASE = {
   musica:   ['musica', 'música', 'respiro', 'interludio', 'bgm'],
   titulo:   ['titulo', 'título', 'carton', 'cartón', 'texto', 'rotulo', 'rótulo', 'placa'],
 };
-/* Las palabras que abren una directiva. Viven aquí arriba y no dentro del
-   lector porque hacen falta DOS veces: para decidir que una línea es una
-   directiva y no una cabecera —«Música: entra de fondo» es lo primero—, y
-   para repartirla después. Dos listas separadas se habrían desincronizado
-   a la tercera palabra que alguien añadiera. */
-const ROD_DIRECTIVAS = [
-  'visual', 'imagen', 'plano', 'video', 'toma',
-  'nota', 'notas', 'rotulo', 'cintillo', 'lower',
-  'fuente', 'cita', 'credito', 'creditos', 'ref', 'referencia',
-  'sfx', 'fx', 'efecto', 'sonido', 'golpe',
-  'musica', 'bgm', 'pista', 'cancion',
-];
+/* ══ LAS ETIQUETAS QUE SE RECONOCEN AL PRINCIPIO DE UNA LÍNEA ══
+   Y a qué campo va cada una. UNA SOLA TABLA, usada dos veces: para
+   decidir que una línea es una etiqueta y no una cabecera —«Música:
+   entra de fondo» es lo primero— y para repartirla después. Dos listas
+   se habrían desincronizado a la tercera palabra que alguien añadiera.
+
+   ⚠️ ADMITE ETIQUETAS DE VARIAS PALABRAS, Y ESO NO ES UN LUJO.
+   Un guion escrito de verdad no dice «rotulo:»: dice «TEXTO EN PANTALLA:»,
+   «AUDIO (Tú):», «VOZ EN OFF:» y «BGM:». Con la tabla de una sola palabra,
+   «TEXTO EN PANTALLA: ¿Y si el futuro...» entraba por la rama de la
+   cabecera —«TEXTO» nombra una clase y venía en mayúsculas— y abría un
+   bloque NUEVO titulado «EN PANTALLA: ¿Y si el futuro...». O sea que la
+   forma en que la gente escribe de verdad era justo la que se
+   descuartizaba, y parecía que había funcionado.
+
+   ⚠️ Y «AUDIO», «VOZ» y «NARRACIÓN» van al GUION, que es donde va lo que
+   se dice. Antes caían en el saco de «no la entiendo, la dejo como
+   guion» — que daba el mismo resultado por casualidad, pero avisando de
+   un problema que no existía. */
+const ROD_ETIQUETAS = {
+  /* lo que se VE */
+  'visual': 'visual', 'imagen': 'visual', 'plano': 'visual', 'video': 'visual',
+  'toma': 'visual', 'en pantalla': 'visual', 'broll': 'visual', 'b roll': 'visual',
+  /* lo que se DICE — va al guion, que es el texto del teleprompter */
+  'audio': 'guion', 'voz': 'guion', 'voz en off': 'guion', 'en off': 'guion',
+  'off': 'guion', 'locucion': 'guion', 'narracion': 'guion', 'guion': 'guion',
+  'dice': 'guion', 'texto': 'guion',
+  /* el rótulo que sale ENCIMA del video */
+  'rotulo': 'rotulo', 'cintillo': 'rotulo', 'lower': 'rotulo', 'lower third': 'rotulo',
+  'texto en pantalla': 'rotulo', 'texto de pantalla': 'rotulo', 'cartel': 'rotulo',
+  /* las citas */
+  'fuente': 'fuente', 'fuentes': 'fuente', 'cita': 'fuente', 'citas': 'fuente',
+  'credito': 'fuente', 'creditos': 'fuente', 'ref': 'fuente', 'referencia': 'fuente',
+  'referencias': 'fuente', 'bibliografia': 'fuente',
+  /* el sonido puntual */
+  'sfx': 'sfx', 'fx': 'sfx', 'efecto': 'sfx', 'efectos': 'sfx', 'sonido': 'sfx',
+  'sonidos': 'sfx', 'efecto de sonido': 'sfx', 'golpe': 'sfx',
+  /* la música de fondo */
+  'musica': 'musica', 'bgm': 'musica', 'pista': 'musica', 'cancion': 'musica',
+  'banda sonora': 'musica', 'musica de fondo': 'musica',
+  /* para ti, no sale en el video */
+  'nota': 'nota', 'notas': 'nota', 'objetivo': 'nota', 'idea': 'nota',
+};
+
+/* Deja una etiqueta en su forma de comparar: sin tildes, sin mayúsculas,
+   sin la viñeta de delante y SIN LO QUE VAYA ENTRE PARÉNTESIS —«AUDIO
+   (Tú - Voz en off):» es «audio», y quien lo escribió no va a acordarse
+   de quitar el paréntesis—. Los acentos se quitan con el rango de marcas
+   combinantes escrito con escapes: en claro son caracteres invisibles
+   que cualquier editor se come al copiar el archivo. */
+function rodClaveEtiqueta(txt) {
+  const limpio = String(txt || '')
+    .replace(/\([^)]*\)/g, ' ')          // «AUDIO (Tú - Voz en off)» → «AUDIO»
+    .replace(/^[>\-•*·\s]+/, '')          // la viñeta de delante
+    .trim();
+  /* ⚠️ UNA ETIQUETA ES SOLO LETRAS Y ESPACIOS. NADA MÁS, Y ESTO ES LO QUE
+     SALVA A LAS CABECERAS. Una cabecera lleva dos puntos dentro de su
+     duración —«## MÚSICA 0:30 Respiro», «[TOMA 0:30] Título»— así que
+     también entra por aquí; si se le quitaran los números y el corchete
+     antes de comparar, «## MÚSICA 0» quedaría en «musica» y la cabecera se
+     leería como una directiva de música: el bloque no se abriría y sus
+     líneas se irían al bloque anterior. Con la puerta cerrada a los
+     dígitos, a la almohadilla y al corchete, eso no puede pasar. */
+  if (!limpio || !/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]+$/.test(limpio)) return '';
+  return limpio
+    .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+/* La etiqueta que más se le parece, para poder decir «¿querías decir…?».
+   Un «no la entiendo» a secas obliga a volver al texto de ayuda y a
+   compararlo a ojo; con el nombre bueno delante se arregla en un toque. */
+function rodEtiquetaParecida(clave) {
+  const ks = Object.keys(ROD_ETIQUETAS);
+  const sinPlural = clave.replace(/s$/, '');
+  if (ROD_ETIQUETAS[sinPlural]) return sinPlural;
+  return ks.find(k => k.indexOf(clave) >= 0 || clave.indexOf(k) >= 0) || '';
+}
 
 function rodClaseDe(palabra) {
   const p = String(palabra || '').toLowerCase().replace(/[^a-záéíóúñ-]/g, '');
@@ -3220,8 +3307,15 @@ function rodLeerGuion(texto) {
   const bloques = [];
   const avisos = [];
   const citasSueltas = [];
+  /* ⚠️ LAS LÍNEAS QUE NO SE ENTENDIERON SE APUNTAN CON SU NÚMERO.
+     No se tiran —siguen en el guion, que es lo correcto— pero antes no se
+     decía CUÁL ni POR QUÉ, y desde fuera eso se ve como «el sistema me
+     rechaza lo que pego». Una etiqueta mal escrita se arregla en un
+     segundo si te dicen en qué renglón está y cómo se llamaba. */
+  const noEntendidas = [];
   let actual = null;
   let sinCabecera = 0;
+  let nLinea = 0;
 
   const nuevo = (clase, titulo, dur) => {
     actual = { clase: clase || 'camara', titulo: titulo || '', dur: dur || 0,
@@ -3232,6 +3326,7 @@ function rodLeerGuion(texto) {
   };
 
   String(texto == null ? '' : texto).replace(/\r/g, '').split('\n').forEach(cruda => {
+    nLinea++;
     const l = cruda.trim();
     if (!l) return;
     if (/^[-=_~#*·—–]{3,}$/.test(l)) return;          // ---, ***, ═══, ———
@@ -3243,12 +3338,25 @@ function rodLeerGuion(texto) {
        es una de las palabras que nombran una clase de bloque: en vez de
        poner la música del bloque abría un bloque NUEVO titulado «entra de
        fondo». Lo mismo con «Rótulo:», «Toma:» y «Texto:». */
-    const dirAntes = l.match(/^[>\-•*·]?\s*([a-zA-Záéíóúñ]{2,12})\s*[:：]\s*(.*)$/) ||
-                     l.match(/^[>\-•*·]\s*(sfx|fx|efecto|sonido|golpe)\b\s*(.*)$/i);
-    const claveAntes = dirAntes
-      ? dirAntes[1].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      : '';
-    const esDirectiva = actual && ROD_DIRECTIVAS.indexOf(claveAntes) >= 0;
+    /* Hasta 40 caracteres antes de los dos puntos, para que quepan las de
+       varias palabras («TEXTO EN PANTALLA:», «AUDIO (Tú - Voz en off):»).
+       Y la forma sin dos puntos para el sonido, que se escribe así:
+       «> sfx 0:04 golpe grave». */
+    let dirAntes = l.match(/^([^:：\n]{2,40})[:：]\s*(.*)$/);
+    let claveAntes = dirAntes ? rodClaveEtiqueta(dirAntes[1]) : '';
+    /* ⚠️ Y SI ESO NO DIO UNA ETIQUETA CONOCIDA, SE PRUEBA LA FORMA SIN DOS
+       PUNTOS: «> sfx 0:04 golpe grave», que es como se escribe un efecto.
+       Esa línea TAMBIÉN lleva dos puntos —dentro de su tiempo—, así que la
+       primera forma la atrapa y devuelve «sfx 0», que no es ninguna
+       etiqueta. Sin este segundo intento, los efectos escritos así se
+       perdían: el efecto se quedaba escrito en el guion y el bloque salía
+       mudo, que no da ningún error y se descubre en el montaje. */
+    if (!ROD_ETIQUETAS[claveAntes]) {
+      const sinDosPuntos = l.match(/^[>\-•*·]\s*(sfx|fx|efecto|sonido|golpe)\b\s*(.*)$/i);
+      if (sinDosPuntos) { dirAntes = sinDosPuntos; claveAntes = rodClaveEtiqueta(sinDosPuntos[1]); }
+    }
+    const campoAntes = ROD_ETIQUETAS[claveAntes] || '';
+    const esDirectiva = !!(actual && campoAntes);
 
     /* ── ¿Es una cabecera de bloque? ── */
     let cab = null;
@@ -3304,29 +3412,28 @@ function rodLeerGuion(texto) {
     }
     if (cab) { nuevo(cab.clase, cab.titulo, cab.dur); return; }
 
-    /* ── La directiva, ya reconocida arriba ── */
+    /* ── La etiqueta, ya reconocida arriba ── */
     const dir = dirAntes;
-    if (dir && actual) {
-      /* Sin tildes para comparar: nadie escribe «música» y «musica» igual
-         dos veces seguidas, y el guion viene pegado de otro sitio. Los
-         acentos se quitan con el rango de marcas combinantes escrito con
-         escapes: en claro son caracteres invisibles que cualquier editor
-         se come al copiar el archivo. */
-      const clave = claveAntes;
+    if (esDirectiva) {
+      const campo = campoAntes;
       const valor = (dir[2] || '').trim();
-      if (['visual', 'imagen', 'plano', 'video', 'toma'].indexOf(clave) >= 0) { actual.visual = valor; return; }
-      if (['nota', 'notas'].indexOf(clave) >= 0) { actual.notas = valor; return; }
-      if (['rotulo', 'cintillo', 'lower'].indexOf(clave) >= 0) { actual.rotulo = valor; return; }
-      if (['fuente', 'cita', 'credito', 'creditos', 'ref', 'referencia'].indexOf(clave) >= 0) {
+      if (campo === 'visual') { actual.visual = valor; return; }
+      if (campo === 'nota')   { actual.notas = valor; return; }
+      if (campo === 'rotulo') { actual.rotulo = valor; return; }
+      /* «AUDIO:», «VOZ EN OFF:», «NARRACIÓN:» — lo que se dice va al
+         guion, y SIN la etiqueta delante: leer «Audio:» en voz alta
+         delante de la cámara sería el peor final posible. */
+      if (campo === 'guion')  { if (valor) actual.guion.push(valor); return; }
+      if (campo === 'fuente') {
         if (valor) { actual.citas.push(valor); citasSueltas.push(valor); }
         return;
       }
-      if (['sfx', 'fx', 'efecto', 'sonido', 'golpe'].indexOf(clave) >= 0) {
+      if (campo === 'sfx') {
         const t = rodSacaTiempo(valor);
         actual.sfx.push({ t: t.seg, que: t.resto.replace(/^[-–—:.]\s*/, '').trim(), fid: '' });
         return;
       }
-      if (['musica', 'bgm', 'pista', 'cancion'].indexOf(clave) >= 0) {
+      if (campo === 'musica') {
         const m = rodLeerMusica(valor);
         actual.musica = {};
         ['acc', 'niv', 'ini', 'fin'].forEach(k => { if (m[k] !== undefined) actual.musica[k] = m[k]; });
@@ -3339,9 +3446,24 @@ function rodLeerGuion(texto) {
         if (m.nombre) { actual.citas.push(m.nombre); citasSueltas.push(m.nombre); }
         return;
       }
-      /* Una palabra con dos puntos que no es de las de arriba NO se tira
-         ni se coloca en un campo cualquiera: se queda como guion. Meterla
-         donde no va la escondería, y esconder es peor que no entender. */
+    }
+
+    /* ⚠️ UNA ETIQUETA QUE NO ESTÁ EN LA TABLA NO SE TIRA NI SE COLOCA EN
+       UN CAMPO CUALQUIERA: se queda como guion, y SE APUNTA.
+       Meterla donde no va la escondería, y esconder es peor que no
+       entender. Pero callarlo también: desde fuera, un texto que se pega
+       y del que la mitad acaba en el sitio raro se ve como «el sistema me
+       rechaza lo que copio». Se apunta solo lo que INTENTABA ser una
+       etiqueta —una viñeta delante, o el rótulo en mayúsculas—, que es lo
+       que distingue «SONIDOS: viento» de «Su mandamiento fue claro: …». */
+    if (dirAntes && dir[2] !== undefined && !esDirectiva && claveAntes &&
+        claveAntes.split(' ').length <= 3 && claveAntes.length <= 24) {
+      const rotulo = dirAntes[1].trim();
+      const parecePuesta = /^[>\-•*·]/.test(l) ||
+                           (rotulo === rotulo.toLocaleUpperCase('es') && /[A-ZÁÉÍÓÚÜÑ]/.test(rotulo));
+      if (parecePuesta && noEntendidas.length < 20) {
+        noEntendidas.push({ linea: nLinea, rotulo, sugerencia: rodEtiquetaParecida(claveAntes) });
+      }
     }
 
     if (!actual) {
@@ -3377,7 +3499,7 @@ function rodLeerGuion(texto) {
       ' a mano en el texto. Se van a crear como fuentes SIN VERIFICAR, para que no se pierdan: ' +
       'ábrelas después en 📚 Citas y complétalas. Ninguna se descarta.');
   }
-  return { bloques: salida, avisos, citas: [...new Set(citasSueltas)] };
+  return { bloques: salida, avisos, citas: [...new Set(citasSueltas)], noEntendidas };
 }
 
 /* «entra de fondo 0:25→1:04», «sale», «baja a media altura». Se leen las
@@ -3420,6 +3542,112 @@ function rodLeerMusica(txt) {
   return m;
 }
 
+/* El ejemplo que rellena el recuadro. Existe porque aprender editando algo
+   que ya funciona cuesta un tercio que aprender leyendo cómo debería ser:
+   se ve la forma, se le da a «Ver qué entiende», y se escribe encima. */
+const ROD_EJEMPLO = [
+  '[CÁMARA 0:30] La flecha rota',
+  '¿Alguna vez has tenido un déjà vu tan visceral que ya sabías lo que iba a pasar?',
+  'Esto de aquí es lo que se dice: todo lo que no lleve etiqueta es el guion.',
+  'visual: Plano medio cálido, luz de ventana',
+  'sfx: 0:04 golpe grave de sub-bajo',
+  'musica: entra de fondo 0:25→1:04 The Calendar of Rain',
+  'nota: esto es para ti; no sale en el video',
+  '',
+  '[PELÍCULA 1:15] Louise ve el futuro',
+  'visual: Clip 01:12:04 — 01:13:18, la escritura circular',
+  'rotulo: Arrival · Villeneuve · 2016',
+  'fuente: Arrival (Denis Villeneuve, 2016, Paramount Pictures)',
+].join('\n');
+
+/* ⚠️ EL MOLDE SE PINTA DESDE `ROD_ETIQUETAS` Y `ROD_CLASES`, NO A MANO.
+   Es la misma regla que las materias de Videos M.E.T.A.S: una lista
+   escrita en la pantalla estaría equivocada el día que alguien añada una
+   palabra al lector, y el que la lea se fiará. Lo que se enseña aquí es
+   literalmente lo que el lector acepta. */
+function rodPegarMolde() {
+  const caja = document.getElementById('rod-pegar-molde');
+  if (!caja) return;
+  caja.textContent = '';
+
+  const t = document.createElement('div');
+  t.className = 'rod-molde-t';
+  t.textContent = '🧩 Una cabecera por bloque, y debajo lo que tenga.';
+  caja.appendChild(t);
+
+  const pre = document.createElement('pre');
+  pre.className = 'rod-molde-p';
+  pre.textContent = '[CÁMARA 0:30] La flecha rota\n' +
+                    'Lo que se dice va suelto, sin etiqueta.\n' +
+                    'visual: lo que se ve\n' +
+                    'sfx: 0:04 el golpe de sonido\n' +
+                    'musica: entra de fondo 0:25→1:04\n' +
+                    'fuente: Arrival (Villeneuve, 2016)';
+  caja.appendChild(pre);
+
+  const cl = document.createElement('div');
+  cl.className = 'rod-molde-l';
+  cl.appendChild(Object.assign(document.createElement('b'),
+    { textContent: 'Dentro del corchete: qué es y cuánto DURA. ' }));
+  cl.appendChild(document.createTextNode(
+    'No el minuto en que empieza — ese lo suma la herramienta sola, y por eso ' +
+    'puedes mover bloques sin que nada quede mintiendo.'));
+  caja.appendChild(cl);
+
+  /* Las ocho clases, con su color, sacadas del catálogo. Se enseña la
+     variante CON TILDE cuando existe: es la que se escribe, y una lista de
+     ayuda que pone «PELICULA» enseña a escribirlo mal —aunque el lector
+     acepte las dos—. La tilde se busca en las palabras que el propio
+     lector reconoce, para que no haya una segunda lista que mantener. */
+  const chips = document.createElement('div');
+  chips.className = 'rod-molde-chips';
+  Object.keys(ROD_CLASES).forEach(k => {
+    const c = ROD_CLASES[k];
+    const palabra = (ROD_PALABRAS_CLASE[k] || []).find(w => /[áéíóú]/.test(w)) || k;
+    const e = document.createElement('span');
+    e.className = 'rod-chip rod-p-' + c.col;
+    e.textContent = c.ic + ' ' + palabra.toLocaleUpperCase('es');
+    chips.appendChild(e);
+  });
+  caja.appendChild(chips);
+
+  /* Y la lista entera de etiquetas, agrupada por dónde va cada una. Se
+     puede desplegar: es la respuesta exacta a «¿qué puedo escribir?», y
+     dejarla abierta siempre convertiría la ventana en un manual. */
+  const det = document.createElement('details');
+  det.className = 'rod-molde-todas';
+  const sum = document.createElement('summary');
+  sum.textContent = 'Todas las etiquetas que entiende';
+  det.appendChild(sum);
+
+  const CAMPOS = [
+    ['visual', '🎥 lo que se ve'],
+    ['guion',  '🎤 lo que se dice'],
+    ['rotulo', '🏷️ el rótulo encima del video'],
+    ['fuente', '📚 una fuente que hay que citar'],
+    ['sfx',    '💥 un golpe de sonido'],
+    ['musica', '🎵 la música de fondo'],
+    ['nota',   '📝 una nota para ti (no sale en el video)'],
+  ];
+  CAMPOS.forEach(([campo, rot]) => {
+    const fila = document.createElement('div');
+    fila.className = 'rod-molde-fila';
+    fila.appendChild(Object.assign(document.createElement('span'),
+      { className: 'rod-molde-campo', textContent: rot }));
+    const palabras = Object.keys(ROD_ETIQUETAS).filter(k => ROD_ETIQUETAS[k] === campo);
+    fila.appendChild(Object.assign(document.createElement('code'),
+      { className: 'rod-molde-pal', textContent: palabras.join(':  ') + ':' }));
+    det.appendChild(fila);
+  });
+  det.appendChild(Object.assign(document.createElement('p'), {
+    className: 'rod-ayuda',
+    textContent: 'Da igual la mayúscula, el acento y el « > » de delante. ' +
+      'Lo que no esté en esta lista se queda en el guion —no se pierde— y te lo digo abajo, ' +
+      'con el número de renglón.',
+  }));
+  caja.appendChild(det);
+}
+
 function rodPegarAbrir() {
   const ta = document.getElementById('rod-pegar-txt');
   if (ta) ta.value = '';
@@ -3429,6 +3657,7 @@ function rodPegarAbrir() {
   if (av) av.textContent = '';
   const btn = document.getElementById('rod-pegar-meter');
   if (btn) btn.style.display = 'none';
+  rodPegarMolde();
   rodOverlay('rod-pegar-overlay', true);
 }
 
@@ -3447,7 +3676,7 @@ function rodPegarLeer() {
 
   if (!r.bloques.length) {
     if (av) av.textContent = '⚠️ No se reconoció ni un bloque. Hace falta al menos una línea de cabecera, ' +
-                             'como «[CÁMARA 0:30] El gancho».';
+                             'como «[CÁMARA 0:30] El gancho». Toca «📄 Ponme un ejemplo» para ver la forma.';
     if (btn) btn.style.display = 'none';
     return;
   }
@@ -3456,7 +3685,8 @@ function rodPegarLeer() {
   const cam = r.bloques.filter(b => b.clase === 'camara').reduce((a, b) => a + b.dur, 0);
   const res = document.createElement('div');
   res.className = 'rod-pegar-res';
-  res.textContent = r.bloques.length + ' bloques · ' + rodReloj(total) + ' en total · ' +
+  const n = r.bloques.length;
+  res.textContent = n + (n === 1 ? ' bloque · ' : ' bloques · ') + rodReloj(total) + ' en total · ' +
     (total ? Math.round((cam / total) * 100) : 0) + '% a cámara';
   prev.appendChild(res);
 
@@ -3467,10 +3697,19 @@ function rodPegarLeer() {
     f.appendChild(Object.assign(document.createElement('span'),
       { className: 'rod-chip rod-p-' + c.col, textContent: c.ic + ' ' + rodReloj(b.dur) }));
     f.appendChild(document.createTextNode(' ' + b.titulo));
+    /* ⚠️ SE DICE QUÉ SE ENTENDIÓ DE CADA BLOQUE, CAMPO POR CAMPO.
+       Antes solo salían los efectos, la música y las citas: lo que se dice
+       y lo que se ve —que son los dos campos que más se escriben— no se
+       nombraban, así que no había forma de saber si una línea había caído
+       en su sitio o se había quedado suelta en el guion. */
     const extras = [];
-    if (b.sfx.length) extras.push(b.sfx.length + ' efecto' + (b.sfx.length === 1 ? '' : 's'));
-    if (b.musica && b.musica.acc) extras.push('música ' + (ROD_ACC[b.musica.acc] || {}).n);
-    if (b.citas.length) extras.push(b.citas.length + ' cita' + (b.citas.length === 1 ? '' : 's'));
+    if (b.guion)  extras.push('🎤 lo que se dice');
+    if (b.visual) extras.push('🎥 lo que se ve');
+    if (b.rotulo) extras.push('🏷️ rótulo');
+    if (b.sfx.length) extras.push('💥 ' + b.sfx.length + ' golpe' + (b.sfx.length === 1 ? '' : 's'));
+    if (b.musica && b.musica.acc) extras.push('🎵 música ' + ((ROD_ACC[b.musica.acc] || {}).n || '').toLowerCase());
+    if (b.citas.length) extras.push('📚 ' + b.citas.length + ' cita' + (b.citas.length === 1 ? '' : 's'));
+    if (b.notas) extras.push('📝 nota');
     if (extras.length) {
       f.appendChild(Object.assign(document.createElement('div'),
         { className: 'rod-pegar-extras', textContent: '↳ ' + extras.join(' · ') }));
@@ -3478,11 +3717,50 @@ function rodPegarLeer() {
     prev.appendChild(f);
   });
 
+  /* ⚠️ Y LO QUE NO SE ENTENDIÓ SE NOMBRA, CON SU RENGLÓN Y SU ARREGLO.
+     Es la queja del autor el 7 de septiembre de 2026: «que no rechace el
+     sistema tanto lo que copio y pego». No rechazaba nada —esas líneas se
+     guardan en el guion— pero no lo decía, así que desde fuera se veía
+     como un rechazo silencioso. Con el renglón y el nombre bueno delante,
+     se arregla en un toque en vez de volver al texto de ayuda a
+     compararlo a ojo. */
+  if (r.noEntendidas.length) {
+    const caja = document.createElement('div');
+    caja.className = 'rod-pegar-no';
+    caja.appendChild(Object.assign(document.createElement('div'), {
+      className: 'rod-pegar-no-t',
+      textContent: '📝 ' + r.noEntendidas.length +
+        (r.noEntendidas.length === 1 ? ' renglón se guardó' : ' renglones se guardaron') +
+        ' como guion, porque su etiqueta no está en la lista:',
+    }));
+    r.noEntendidas.forEach(x => {
+      const li = document.createElement('div');
+      li.className = 'rod-pegar-no-l';
+      li.appendChild(Object.assign(document.createElement('b'),
+        { textContent: 'renglón ' + x.linea }));
+      li.appendChild(document.createTextNode(' · «' + x.rotulo + ':»'));
+      if (x.sugerencia) {
+        li.appendChild(Object.assign(document.createElement('span'), {
+          className: 'rod-pegar-no-s',
+          textContent: '  →  aquí se escribe «' + x.sugerencia + ':»',
+        }));
+      }
+      caja.appendChild(li);
+    });
+    caja.appendChild(Object.assign(document.createElement('div'), {
+      className: 'rod-pegar-extras',
+      textContent: 'No se pierde nada: el texto está dentro del bloque. Si querías que fuera a su ' +
+                   'campo, cámbiale el nombre a la etiqueta y vuelve a darle a «Ver qué entiende».',
+    }));
+    prev.appendChild(caja);
+  }
+
   if (av) av.textContent = r.avisos.join(' ');
   if (btn) {
     btn.style.display = '';
-    btn.textContent = '➕ Añadir estos ' + r.bloques.length + ' bloques' +
-      (r.citas.length ? ' y ' + r.citas.length + ' fuentes' : '');
+    btn.textContent = (n === 1 ? '➕ Añadir este bloque' : '➕ Añadir estos ' + n + ' bloques') +
+      (r.citas.length ? ' y ' + r.citas.length +
+        (r.citas.length === 1 ? ' fuente' : ' fuentes') : '');
   }
 }
 
@@ -4007,6 +4285,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   clic('rod-pegar-cerrar', () => rodOverlay('rod-pegar-overlay', false));
   clic('rod-pegar-leer', rodPegarLeer);
+  /* El ejemplo se pone y se lee de una vez: ver el resultado al lado de la
+     forma es lo que enseña, y hacerlo en dos toques rompe justo eso. */
+  clic('rod-pegar-ejemplo', () => {
+    const ta = document.getElementById('rod-pegar-txt');
+    if (!ta) return;
+    ta.value = ROD_EJEMPLO;
+    rodPegarLeer();
+  });
   clic('rod-pegar-meter', rodPegarMeter);
   /* El portapapeles: en una tableta, pegar en un recuadro grande con el
      dedo es donde se abandona. Solo se enseña si el navegador lo deja. */
