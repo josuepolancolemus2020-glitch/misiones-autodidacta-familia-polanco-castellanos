@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · El Rodaje</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:400px;height:700px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de la herramienta 🎬 EL RODAJE.
+
+   Esta herramienta escribe el cuaderno de dirección de un video que
+   después se publica con nombre y apellidos. Lo que puede salir mal no
+   es «se ve feo»:
+
+   1. QUE LOS TIEMPOS SE SUMEN Y NO SE GUARDEN. Es la decisión número 1
+      del archivo. Si el minuto de entrada de un bloque estuviera
+      guardado, meter veinte segundos en el medio dejaría equivocados
+      todos los de abajo, sin error y sin aviso, y eso no se descubre en
+      la pantalla: se descubre grabando.
+
+   2. QUE MOVER UN BLOQUE SE LLEVE SUS SEÑALES DE AUDIO. Los efectos
+      cuelgan del bloque y su tiempo se cuenta desde el principio DE ESE
+      BLOQUE. Si colgaran del reloj, reordenar dejaría los golpes
+      sonando en el sitio de antes.
+
+   3. QUE EL PRESUPUESTO DE CÁMARA MUERDA. «Mi aparición en la cámara
+      que solo se limite a expresar lo más importante»: son dos topes,
+      el porcentaje del video y lo que dura una toma seguida.
+
+   4. QUE NINGUNA CITA SE PIERDA NI SE INVENTE. Lo generado con IA no se
+      guarda sin decir con qué se hizo; una fuente borrada se quita de
+      los bloques que la nombraban; y las citas que vienen escritas a
+      mano en el guion pegado se crean sin verificar en vez de tirarse.
+
+   5. QUE NADA DE LA BASE LLEGUE A UN ATRIBUTO. Esta aplicación tiene
+      dentro la Bóveda, las finanzas y el chat de la casa.
+
+   6. QUE EL ARRASTRE FUNCIONE CON EL DEDO. Se prueba con eventos de
+      puntero DE VERDAD, no llamando por dentro a la función: lo que
+      puede fallar ahí es de pantalla —un asa que el dedo no alcanza, un
+      `touch-action` que le regala el gesto al desplazamiento— y nada de
+      eso se ve llamando funciones.
+
+   7. QUE LA BASE VIEJA SIGA FUNCIONANDO. Mientras no se corra
+      rodaje.sql las tablas no existen: la herramienta tiene que decir
+      qué archivo falta, porque desde una tableta no se adivina.
+
+   Como en las demás sondas: aquí no se lee el código, se ejecuta el
+   index.html de verdad con una base de mentira a nivel de fetch. El
+   cliente de Supabase es el auténtico. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── La base de datos de mentira ────────────────────────────────── */
+function nuevaBase(w, opciones){
+  const estado = {
+    tablas: { rodaje_proyectos: [], rodaje_bloques: [], rodaje_fuentes: [], rodaje_reels: [] },
+    llamadas: [],
+    sinTabla: !!(opciones && opciones.sinTabla),
+    proxId: 100,
+  };
+  const filtra = (filas, params) => filas.filter(fila =>
+    [...params.entries()].every(([col, val]) => {
+      if (['select','order','limit','offset'].includes(col)) return true;
+      if (val.startsWith('eq.')) return String(fila[col]) === val.slice(3);
+      return true;
+    }));
+
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url, location.origin);
+    if (!u.pathname.startsWith('/rest/v1/')) return new Response('{}', { status: 200 });
+
+    const tabla  = u.pathname.replace('/rest/v1/', '');
+    const params = u.searchParams;
+    const metodo = (init && init.method) || 'GET';
+    const cuerpo = (init && init.body) ? JSON.parse(init.body) : null;
+    estado.llamadas.push({ tabla, metodo, params: u.search, cuerpo });
+
+    const json = (d, s) => new Response(metodo === 'HEAD' ? null : JSON.stringify(d),
+      { status: s || 200, headers: { 'Content-Type': 'application/json' } });
+
+    if (estado.sinTabla) {
+      return json({ code: '42P01', message: 'relation "public.' + tabla + '" does not exist' }, 404);
+    }
+    if (!estado.tablas[tabla]) return json({ code: '42P01', message: 'no existe' }, 404);
+    const filas = estado.tablas[tabla];
+
+    if (metodo === 'GET') {
+      let r = filtra(filas, params);
+      /* PostgREST admite varios `order`; el cliente los manda repetidos.
+         Se aplican del último al primero, que es como ordena de verdad. */
+      const ordenes = params.getAll('order');
+      [...ordenes].reverse().forEach(o => {
+        const [col, dir] = o.split('.');
+        r = [...r].sort((a,b) => (a[col] > b[col] ? 1 : a[col] < b[col] ? -1 : 0) * (dir === 'desc' ? -1 : 1));
+      });
+      return json(r);
+    }
+    if (metodo === 'POST') {
+      /* ⚠️ QUE LA BASE DE MENTIRA MUERDA ES LA MITAD DE LA COMPROBACIÓN.
+         Aquí se copian los dos `check` que de verdad importan de
+         rodaje.sql: el de la IA y el de la dirección. Una base falsa que
+         aceptara cualquier cosa haría pasar la sonda con un código que
+         en la base de verdad reventaría con un error de PostgreSQL. */
+      const nuevas = (Array.isArray(cuerpo) ? cuerpo : [cuerpo]);
+      for (const n of nuevas) {
+        if (tabla === 'rodaje_fuentes') {
+          const ia = String(n.clase || '').slice(0,3) === 'ia_';
+          if (ia && (!String(n.herramienta || '').trim() || n.licencia !== 'generado_ia')) {
+            return json({ code: '23514',
+              message: 'new row violates check constraint "rodaje_fuentes_ia_declarada"' }, 400);
+          }
+          if (!ia && n.licencia === 'generado_ia') {
+            return json({ code: '23514',
+              message: 'new row violates check constraint "rodaje_fuentes_licencia_ia"' }, 400);
+          }
+        }
+        if ('url' in n && n.url && !/^https?:\/\//i.test(String(n.url))) {
+          return json({ code: '23514', message: 'violates check constraint on url' }, 400);
+        }
+        estado.tablas[tabla].push(Object.assign({ id: estado.proxId++ }, n));
+      }
+      return json([]);
+    }
+    if (metodo === 'PATCH') {
+      filtra(filas, params).forEach(fila => Object.assign(fila, cuerpo));
+      return json([]);
+    }
+    if (metodo === 'DELETE') {
+      filtra(filas, params).forEach(fila => {
+        const i = estado.tablas[tabla].indexOf(fila);
+        if (i >= 0) estado.tablas[tabla].splice(i, 1);
+      });
+      return json([]);
+    }
+    return json([]);
+  };
+  return estado;
+}
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);                 // que arranque el index de verdad
+  const w = f.contentWindow;
+
+  if (w.eval('typeof initRodaje') !== 'function') {
+    log('✘ index.html no cargó js/tools/rodaje.js');
+    document.title = 'SUSPENDE · El Rodaje'; return;
+  }
+  w.eval('window.verificarSesion = () => ({ user: "josue", nombre: "Josué Edmundo" })');
+
+  const base = nuevaBase(w, {});
+  const R = w.FaroRodaje;
+  const g = id => w.document.getElementById(id);
+  /* `confirm` de mentira: los borrados preguntan, y una sonda que se
+     quedara esperando un diálogo no termina nunca. */
+  w.confirm = () => true;
+  w.alert = () => {};
+
+  /* ═══ 1. LOS TIEMPOS SE SUMAN, NO SE GUARDAN ═══ */
+  log('── 1. Los tiempos se suman; el minuto de entrada no se guarda ──');
+  const bl = [{bid:'a',dur:15},{bid:'b',dur:30},{bid:'c',dur:45}];
+  const t = R.tiempos(bl);
+  ok(t.map(x=>x.ini).join(',') === '0,15,45',
+     'los minutos de entrada salen de sumar las duraciones (0, 0:15, 0:45)',
+     'los tiempos no se suman bien: ' + t.map(x=>x.ini).join(','));
+  ok(bl.every(x => x.ini === undefined),
+     'y NO se escriben en la fila: un tiempo guardado se queda viejo al reordenar',
+     'rodTiempos() escribió el tiempo en la fila original: se puede quedar viejo');
+  const movido = R.tiempos([bl[2], bl[0], bl[1]]);
+  ok(movido.map(x=>x.ini).join(',') === '0,45,60',
+     'y al cambiar el orden se recalculan solos',
+     'al reordenar los tiempos no se recalcularon: ' + movido.map(x=>x.ini).join(','));
+
+  /* ═══ 2. EL PRESUPUESTO DE CÁMARA ═══ */
+  log('');
+  log('── 2. El presupuesto de cámara, que es la petición central ──');
+  const pro = { cam_pct: 30, cam_bloque: 45, dur_obj: 200 };
+  const p1 = R.presupuesto([{clase:'camara',dur:60},{clase:'pelicula',dur:140}], pro);
+  ok(p1.total === 200 && Math.round(p1.pct) === 30,
+     'cuenta el total y el porcentaje de cámara (200 s, 30 %)',
+     'las cuentas no salen: ' + p1.total + ' / ' + Math.round(p1.pct));
+  ok(p1.largas.length === 1,
+     'y caza la toma de 1:00 seguida con el tope en 0:45, que es el número que de verdad avisa',
+     'no cazó la toma demasiado larga');
+  const p2 = R.presupuesto([{clase:'camara',dur:100},{clase:'pelicula',dur:100}], pro);
+  ok(p2.excede === true && p1.excede === false,
+     'el 50 % excede el tope del 30 % y el 30 % justo no',
+     'el tope no muerde donde debe');
+
+  /* ═══ 3. NADA DE LA BASE LLEGA A UN ATRIBUTO ═══ */
+  log('');
+  log('── 3. Ni una dirección envenenada llega a un href ──');
+  const venenos = [
+    'javascript:alert(1)',
+    'java\tscript:alert(1)',
+    'JavaScript:alert(1)',
+    'data:text/html,<script>alert(1)</scr' + 'ipt>',
+    'vbscript:msgbox(1)',
+    'https://ok.com/a" onload="alert(1)',
+    '  javascript:alert(1)  ',
+    'file:///etc/passwd',
+  ];
+  ok(venenos.every(v => R.enlace(v) === '' || R.enlace(v).startsWith('http')),
+     'los ocho enlaces envenenados no salen como http(s)',
+     'ALGUNO pasó: ' + venenos.filter(v => R.enlace(v) && !R.enlace(v).startsWith('http')).join(' | '));
+  ok(R.enlace('javascript:alert(1)') === '' && R.enlace('data:text/html,x') === '',
+     'y javascript: y data: se caen del todo',
+     'javascript: o data: sobrevivieron a rodEnlace()');
+  ok(R.esc('<img src=x onerror=1>').indexOf('<') < 0 && R.esc('a"b').indexOf('&quot;') >= 0,
+     'y rodEsc escapa el < y también la comilla, como redEsc en Redacción',
+     'rodEsc no escapa lo que tiene que escapar');
+
+  /* ═══ 4. EL RÓTULO SE ARMA ═══ */
+  log('');
+  log('── 4. El rótulo de pantalla se arma con los campos ──');
+  const rotMus = R.rotulo({clase:'ia_musica', titulo:'The Calendar of Rain',
+                           herramienta:'Google MusicFX', licencia:'generado_ia'});
+  ok(/Google MusicFX/.test(rotMus) && /Calendar of Rain/.test(rotMus),
+     'la música de Google nombra su herramienta: «' + rotMus + '»',
+     'el rótulo de la música generada no nombra la herramienta: ' + rotMus);
+  const rotPel = R.rotulo({clase:'pelicula', titulo:'Arrival', autoria:'Denis Villeneuve',
+                           anio:'2016', editor:'Paramount Pictures', licencia:'uso_justo'});
+  ok(/Villeneuve/.test(rotPel) && /2016/.test(rotPel) && /Paramount/.test(rotPel) && /uso justo/.test(rotPel),
+     'y el clip nombra director, año, estudio y con qué derecho se usa',
+     'al rótulo del clip le falta algo: ' + rotPel);
+  const rotPobre = R.rotulo({clase:'web', titulo:'Solo título'});
+  ok(!/undefined|null|\(\)|«»|,\s*\)/.test(rotPobre),
+     'y con los campos vacíos no cuelgan paréntesis ni comas huérfanas: «' + rotPobre + '»',
+     'el rótulo deja restos con campos vacíos: ' + rotPobre);
+  /* Las trece clases tienen que dar algo legible: una clase sin forma
+     propia acabaría citando un artículo como si fuera una película. */
+  const todas = Object.keys(R.fuentes).map(k =>
+    R.rotulo({clase:k, titulo:'X', autoria:'Y', anio:'2020', editor:'Z',
+              herramienta:'Google Veo', licencia: k.slice(0,3)==='ia_' ? 'generado_ia' : 'uso_justo'}));
+  ok(todas.every(x => x && x.length > 3 && !/undefined/.test(x)),
+     'y las trece clases de fuente dan un rótulo propio',
+     'alguna clase no arma rótulo: ' + todas.filter(x => !x || /undefined/.test(x)).join(' | '));
+
+  /* ═══ 5. EL LECTOR DE GUION ═══ */
+  log('');
+  log('── 5. Pegar el guion de golpe ──');
+  const r5 = R.leerGuion(
+    '[CÁMARA 0:30] La flecha rota\n' +
+    '¿Alguna vez has tenido un déjà vu tan visceral?\n' +
+    '> visual: Plano medio cálido\n' +
+    '> sfx 0:04 golpe grave de sub-bajo\n' +
+    '> música: entra de fondo 0:25→1:04\n' +
+    '> fuente: Arrival (Denis Villeneuve, 2016)\n' +
+    '\n---\n\n' +
+    'PELÍCULA 1:15 — La Llegada\n' +
+    '> fuente: Arrival (Denis Villeneuve, 2016)\n' +
+    '\n## GRÁFICO (0:45) El universo bloque\n' +
+    '> nota: hacerlo en Canva\n' +
+    '\nTOMA 4 (0:20) El cierre\n' +
+    'Tu intuición no es magia.\n');
+  ok(r5.bloques.length === 4,
+     'lee los cuatro bloques, con corchetes, sin corchetes, con ## y con paréntesis',
+     'no leyó los cuatro bloques: ' + r5.bloques.length);
+  ok(r5.bloques.map(b=>b.clase).join(',') === 'camara,pelicula,grafico,camara',
+     'y reconoce cámara, película, gráfico y «TOMA» como cámara',
+     'las clases salieron mal: ' + r5.bloques.map(b=>b.clase).join(','));
+  ok(r5.bloques.map(b=>b.dur).join(',') === '30,75,45,20',
+     '⚠️ y las duraciones enteras: 0:30, 1:15, 0:45 y 0:20',
+     'PERDIÓ duración en alguna cabecera (el número de orden se come el reloj): ' +
+       r5.bloques.map(b=>b.dur).join(','));
+  ok(r5.bloques[3].titulo === 'El cierre',
+     'y «TOMA 4 (0:20) El cierre» deja de título «El cierre», sin el 4',
+     'el número de orden se quedó en el título: «' + r5.bloques[3].titulo + '»');
+  ok(r5.bloques[0].sfx.length === 1 && r5.bloques[0].sfx[0].t === 4,
+     'el efecto de sonido queda a los 4 s DEL BLOQUE, no del video',
+     'el efecto no se leyó bien: ' + JSON.stringify(r5.bloques[0].sfx));
+  const m5 = r5.bloques[0].musica;
+  ok(m5.acc === 'entra' && m5.niv === 'fondo' && m5.ini === 25 && m5.fin === 64,
+     'y la música lee acción, altura y trozo en la misma línea',
+     'la música no se leyó: ' + JSON.stringify(m5));
+  ok(r5.citas.length === 1,
+     'la misma cita repetida en dos bloques se junta en una sola fuente',
+     'las citas repetidas se duplicaron: ' + JSON.stringify(r5.citas));
+  /* ⚠️ Lo que NO se entiende no se coloca a la fuerza en un campo: ahí no
+     se ve que está mal. Se queda como guion, que se lee. */
+  const r5b = R.leerGuion('[CÁMARA 0:20] Hola\nPregunta: ¿y esto qué?');
+  ok(/Pregunta/.test(r5b.bloques[0].guion) && !r5b.bloques[0].visual,
+     'y una palabra con dos puntos que no se reconoce se queda en el guion, no en otro campo',
+     'una directiva desconocida acabó en un campo que no le toca');
+
+  /* ═══ 6. LA HERRAMIENTA CON LAS TABLAS PUESTAS ═══ */
+  log('');
+  log('── 6. Un video de principio a fin ──');
+  base.tablas.rodaje_proyectos.push({
+    id: 1, pid: 'p-test', titulo: 'Intuición', tesis: 'La intuición es memoria del futuro',
+    estado: 'guion', dur_obj: 600, cam_pct: 30, cam_bloque: 45, url: '', notas: '' });
+  base.tablas.rodaje_fuentes.push(
+    { id: 10, pid:'p-test', fid:'f-mus', clase:'ia_musica', titulo:'The Calendar of Rain',
+      herramienta:'Google MusicFX', prompt:'melancholic piano', licencia:'generado_ia',
+      rotulo:'Música «The Calendar of Rain» · generada con Google MusicFX',
+      pantalla:true, verificada:true, autoria:'', obra:'', anio:'', editor:'', url:'', notas:'' },
+    { id: 11, pid:'p-test', fid:'f-arr', clase:'pelicula', titulo:'Arrival',
+      autoria:'Denis Villeneuve', anio:'2016', editor:'Paramount Pictures',
+      licencia:'uso_justo', rotulo:'Clip: «Arrival» (Denis Villeneuve, 2016)',
+      pantalla:true, verificada:false, herramienta:'', prompt:'', obra:'', url:'', notas:'' });
+  base.tablas.rodaje_bloques.push(
+    { id: 20, pid:'p-test', bid:'b-1', orden:1, clase:'camara', titulo:'La flecha rota', dur:60,
+      guion:'¿Alguna vez has tenido un déjà vu?', visual:'Plano medio', notas:'', rotulo:'',
+      /* Cita su pista: es lo natural —el bloque donde entra la música es
+         donde se acredita— y además es lo que hace que la comprobación 10
+         signifique algo. Sin una sola fuente citada por un bloque, el
+         «Aparece en» de la bibliografía no tendría de dónde salir y la
+         prueba habría pasado por no tener nada que mirar. */
+      listo:false, fids:['f-mus'], sfx:[{t:4,que:'golpe grave',fid:''}],
+      musica:{acc:'entra',fid:'f-mus',ini:0,fin:64,niv:'fondo'} },
+    { id: 21, pid:'p-test', bid:'b-2', orden:2, clase:'pelicula', titulo:'La Llegada', dur:120,
+      guion:'', visual:'Clips de tinta', notas:'', rotulo:'', listo:true,
+      fids:['f-arr'], sfx:[], musica:{acc:'baja',fid:'f-mus',niv:'fondo'} },
+    { id: 22, pid:'p-test', bid:'b-3', orden:3, clase:'ia', titulo:'Microtúbulos', dur:70,
+      guion:'', visual:'Zoom a una neurona', notas:'', rotulo:'', listo:false,
+      fids:[], sfx:[{t:10,que:'zumbido'}], musica:{} });
+
+  const altoMarco = f.style.height;
+  f.style.height = '1400px';
+  /* La aplicación arranca con `#app-container` escondido hasta que entra
+     la sesión; aquí la sesión es de mentira, así que se enseña a mano.
+     Con el panel escondido las tarjetas miden 0×0 y la sonda aprobaría
+     un arrastre que en la tableta no funciona. */
+  w.document.getElementById('app-container').style.display = '';
+  w.eval('switchView("view-rodaje")');
+  await esperar(900);
+
+  ok(g('rod-proyecto') && g('rod-proyecto').value === 'p-test',
+     'el video se abre y sale en el selector',
+     'no se abrió el video: ' + (g('rod-proyecto') ? g('rod-proyecto').value : 'sin selector'));
+
+  const panel = g('rod-panel');
+  ok(panel && /4:10/.test(panel.textContent),
+     'el panel suma los tres bloques y da 4:10 de duración',
+     'el panel no suma bien: ' + (panel ? panel.textContent.slice(0,120) : 'sin panel'));
+  ok(panel && /24%/.test(panel.textContent),
+     'y dice que sales el 24 % en cámara (1:00 de 4:10)',
+     'el porcentaje de cámara no sale: ' + (panel ? panel.textContent.slice(0,200) : ''));
+  ok(panel && /1:00/.test(panel.textContent),
+     'y que la toma más larga es de 1:00, por encima del tope de 0:45',
+     'no avisa de la toma larga');
+
+  /* ⚠️ La revisión: las dos cosas que PARAN son las mismas que el
+     disparador de la base no deja saltar. Verlas aquí es verlas antes de
+     chocarse con un error de PostgreSQL que habla de un `raise`. */
+  const rev = R.revisar();
+  const paran = rev.filter(a => a.para);
+  ok(paran.some(a => /Microtúbulos/.test(a.txt)),
+     'la revisión PARA por el bloque de IA sin fuente declarada',
+     'no paró por el bloque de IA sin fuente: ' + JSON.stringify(rev.map(a=>a.txt)));
+  ok(rev.some(a => !a.para && /Arrival/.test(a.txt) && /verificad/.test(a.txt)),
+     'y avisa —sin parar— de la fuente sin verificar en el original',
+     'no avisa de la fuente sin verificar');
+  ok(rev.some(a => /cámara/.test(a.txt) && /seguidos|tope/.test(a.txt)) ||
+     rev.some(a => /toma/i.test(a.txt) && /tope/.test(a.txt)),
+     'y de la toma que se pasa del tope de tiempo seguido',
+     'no avisa de la toma demasiado larga: ' + JSON.stringify(rev.map(a=>a.txt)));
+
+  /* ═══ 7. LA PESTAÑA DE SONIDO ═══ */
+  log('');
+  log('── 7. La lógica del audio, en el orden en que suena ──');
+  const sen = R.senales();
+  ok(sen.length === 4,
+     'las cuatro señales: dos de música y dos golpes',
+     'salieron ' + sen.length + ' señales en vez de 4');
+  ok(sen.map(s => s.t).join(',') === '0,4,60,190',
+     '⚠️ y su minuto ABSOLUTO sale de sumar el del bloque más el de dentro (0, 0:04, 1:00, 3:10)',
+     'los tiempos absolutos del audio no salen: ' + sen.map(s=>s.t).join(','));
+  ok(sen.every((s,i) => i===0 || s.t >= sen[i-1].t),
+     'y salen ordenadas por cuándo suenan, que es como se comprueba que el audio tiene sentido',
+     'las señales no salen en orden');
+
+  /* ═══ 8. ARRASTRAR UN BLOQUE SE LLEVA SU SONIDO ═══ */
+  log('');
+  log('── 8. Arrastrar con el dedo, y que el sonido se vaya con el bloque ──');
+  w.eval('_rodPestana = "secuencia"; rodPintarPestanas(); rodRender();');
+  await esperar(400);
+
+  const lista = g('rod-lista');
+  const titulos = () => [...lista.querySelectorAll('.rod-card .rod-tit')].map(n => n.textContent);
+  ok(titulos().join(',') === 'La flecha rota,La Llegada,Microtúbulos',
+     'los tres bloques salen en su orden',
+     'no salieron los tres: ' + titulos().join(','));
+
+  const asas = lista.querySelectorAll('[data-rod-asa]');
+  ok(asas.length === 3, 'cada bloque lleva su asa', 'faltan asas: ' + asas.length);
+  ok(asas[0] && w.getComputedStyle(asas[0]).touchAction === 'none',
+     '⚠️ y el asa tiene touch-action:none, sin el cual el dedo desplaza la página en vez de arrastrar',
+     'al asa le falta touch-action:none: en una tableta el arrastre no arrancaría');
+  const cajaAsa = asas[0] && asas[0].getBoundingClientRect();
+  ok(cajaAsa && cajaAsa.width >= 30 && cajaAsa.height >= 44,
+     'y es una franja alta, no un botón de un milímetro (' +
+       Math.round(cajaAsa.width) + '×' + Math.round(cajaAsa.height) + ' px)',
+     'el asa es demasiado pequeña para el dedo: ' +
+       (cajaAsa ? Math.round(cajaAsa.width)+'×'+Math.round(cajaAsa.height) : 'no está'));
+
+  /* Y se dice con palabras: un asa con puntos no se descubre sola, y lo
+     que se ordena tampoco es evidente.
+
+     Se busca en el CONTENEDOR y no dentro de la lista: la nota vive fuera
+     del elemento que arrastra a propósito, para que no pueda contarse
+     como una fila —que es el fallo que en los videos de M.E.T.A.S hubo
+     que salir a esquivar—. */
+  const nota = g('rod-cuerpo').querySelector('.rod-orden-nota');
+  ok(nota && /rrastra/.test(nota.textContent) && /minutos|tiempo/i.test(nota.textContent),
+     'y encima se explica qué es el orden y que los minutos se vuelven a sumar',
+     'no se explica el orden encima de la lista');
+
+  /* ── El arrastre, con eventos de puntero DE VERDAD ── */
+  const arrastra = (desdeAsa, hastaTarjeta) => {
+    const a = desdeAsa.getBoundingClientRect();
+    const b = hastaTarjeta.getBoundingClientRect();
+    const ev = (t, x, y) => new w.PointerEvent(t, {
+      bubbles: true, cancelable: true, pointerId: 7, pointerType: 'touch',
+      clientX: x, clientY: y });
+    desdeAsa.dispatchEvent(ev('pointerdown', a.left + a.width/2, a.top + a.height/2));
+    desdeAsa.dispatchEvent(ev('pointermove', b.left + b.width/2, b.top + b.height - 2));
+    desdeAsa.dispatchEvent(ev('pointermove', b.left + b.width/2, b.top + 2));
+    desdeAsa.dispatchEvent(ev('pointerup',   b.left + b.width/2, b.top + 2));
+  };
+  const tarjetas = () => [...lista.querySelectorAll('.rod-card')];
+  const antesDeArrastrar = tarjetas();
+  antesDeArrastrar[0].scrollIntoView();
+  await esperar(150);
+  arrastra(antesDeArrastrar[2].querySelector('[data-rod-asa]'), tarjetas()[0]);
+  await esperar(500);
+
+  ok(titulos().join(',') === 'Microtúbulos,La flecha rota,La Llegada',
+     'arrastrando el tercero hasta arriba, la lista queda en su orden nuevo',
+     'el arrastre no movió nada: ' + titulos().join(','));
+
+  const orden = () => base.tablas.rodaje_bloques
+    .filter(b => b.pid === 'p-test').slice()
+    .sort((a,b) => a.orden - b.orden).map(b => b.titulo).join(',');
+  ok(orden() === 'Microtúbulos,La flecha rota,La Llegada',
+     'y el orden nuevo queda guardado en la nube',
+     'la nube se quedó con el orden viejo: ' + orden());
+
+  const escrituras = base.llamadas.filter(l =>
+    l.metodo === 'PATCH' && l.cuerpo && 'orden' in l.cuerpo).length;
+  ok(escrituras === 3,
+     'con una escritura por fila movida y ninguna de más (' + escrituras + ')',
+     'se escribieron ' + escrituras + ' filas: se están reescribiendo las que no cambiaron');
+
+  /* ⚠️ Y AL SOLTAR NO SE REPINTA la lista: es la lección de la barra de
+     grupos de M.E.T.A.S —repintar le arranca de debajo del dedo el
+     elemento que iba a recibir el toque siguiente—. */
+  ok(tarjetas().every(n => antesDeArrastrar.indexOf(n) >= 0),
+     'y al soltar no se repinta: la lista no salta de debajo del dedo',
+     'la lista se repintó al soltar; el toque siguiente cae en otra fila');
+
+  /* ⚠️ Y ESTO ES LO QUE JUSTIFICA LA DECISIÓN 2: el golpe de sonido del
+     bloque movido tiene que sonar AHORA en su sitio nuevo, sin haber
+     tocado nada. Si los efectos colgaran del reloj, seguiría en 3:10. */
+  const sen2 = R.senales();
+  const zumbido = sen2.find(s => s.sfx && /zumbido/.test(s.sfx.que));
+  ok(zumbido && zumbido.t === 10,
+     '⚠️ y el golpe del bloque movido suena ahora en 0:10, no donde estaba: sus señales viajan con él',
+     'el efecto de sonido se quedó en el minuto viejo: ' + (zumbido ? zumbido.t : 'no está'));
+
+  /* Las flechas del teclado, que son la otra manera: el arrastre de
+     precisión en una tableta falla lo bastante como para que una función
+     que solo se pueda usar arrastrando sea una función que a veces no
+     existe. */
+  const asaPrimera = tarjetas()[0].querySelector('[data-rod-asa]');
+  asaPrimera.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+  await esperar(400);
+  ok(titulos().join(',') === 'La flecha rota,Microtúbulos,La Llegada',
+     'y las flechas del teclado mueven un puesto, para el que no acierte arrastrando',
+     'el teclado no mueve: ' + titulos().join(','));
+
+  /* ═══ 9. LA CITA NO SE PIERDE NI SE INVENTA ═══ */
+  log('');
+  log('── 9. Ninguna cita se pierde y ninguna se inventa ──');
+  const antesF = base.tablas.rodaje_fuentes.length;
+  const malIA = await w.eval(`(async () => {
+    const { error } = await _sb.from('rodaje_fuentes').insert({
+      pid: 'p-test', fid: 'f-malo', clase: 'ia_musica', titulo: 'X',
+      herramienta: '', licencia: 'generado_ia' });
+    return !!error;
+  })()`);
+  ok(malIA === true && base.tablas.rodaje_fuentes.length === antesF,
+     '⚠️ una fuente generada con IA NO entra sin decir con qué se hizo',
+     'ENTRÓ una fuente de IA sin herramienta: «generado con IA» dejaría de significar nada');
+
+  const malLic = await w.eval(`(async () => {
+    const { error } = await _sb.from('rodaje_fuentes').insert({
+      pid: 'p-test', fid: 'f-malo2', clase: 'pelicula', titulo: 'X', licencia: 'generado_ia' });
+    return !!error;
+  })()`);
+  ok(malLic === true,
+     'y «generado con IA» no se le puede poner a un clip de película',
+     'se pudo marcar un clip de película como generado con IA');
+
+  /* Borrar una fuente la quita de los bloques que la nombraban: un `fid`
+     apuntando a nada haría que el bloque PARECIERA tener cita. */
+  await w.eval('rodFuenteBorrar(_rodFue.find(f => f.fid === "f-arr"))');
+  await esperar(500);
+  const b2 = base.tablas.rodaje_bloques.find(b => b.bid === 'b-2');
+  ok(b2 && Array.isArray(b2.fids) && b2.fids.length === 0,
+     'y al borrar una fuente se quita de los bloques que la nombraban',
+     'quedó un fid apuntando a nada: el bloque parecería tener cita y no la tiene');
+
+  /* ═══ 10. LAS EXPORTACIONES ═══ */
+  log('');
+  log('── 10. Lo que sale por el chat ──');
+  const bib = R.exportar.bibliografia();
+  ok(/INTELIGENCIA ARTIFICIAL/.test(bib) && /Google MusicFX/.test(bib) && /melancholic piano/.test(bib),
+     'la descripción de YouTube separa lo generado por una máquina, con su herramienta y su prompt',
+     'la bibliografía no separa lo generado con IA o no lleva el prompt');
+  ok(/Aparece en/.test(bib),
+     'y dice en qué minutos aparece cada fuente, sacado de los bloques',
+     'la bibliografía no dice en qué minutos aparece cada fuente');
+  const rot = R.exportar.rotulos();
+  ok(/Google MusicFX/.test(rot) || /rótulo/.test(rot),
+     'los rótulos de pantalla salen con su minuto delante',
+     'los rótulos de pantalla no salen');
+  const plan = R.exportar.plan();
+  ok(/SECUENCIA/.test(plan) && /SONIDO/.test(plan) && /0:00/.test(plan),
+     'y el plan de rodaje lleva la secuencia con sus tiempos y sus señales de sonido',
+     'el plan de rodaje no lleva lo que tiene que llevar');
+
+  /* ═══ 11. EL TELEPROMPTER ═══ */
+  log('');
+  log('── 11. El teleprompter ──');
+  w.eval('rodPrompterAbrir("")');
+  await esperar(300);
+  const prom = g('rod-prompter');
+  ok(prom && prom.style.display === 'flex', 'se abre a pantalla entera',
+     'el teleprompter no se abrió');
+  const txt = g('rod-prompter-txt');
+  ok(txt && /déjà vu/.test(txt.textContent),
+     'y lleva el guion de las tomas a cámara',
+     'el teleprompter no trae el guion');
+  ok(txt && !/Clips de tinta/.test(txt.textContent),
+     'y NO lleva lo que no se dice en voz alta',
+     'el teleprompter trae texto que no se dice a cámara');
+  /* La letra tiene que ser grande de verdad: se lee a un brazo de
+     distancia, que es donde se pone una tableta para grabarse. */
+  const parr = txt && txt.querySelector('.rod-prom-p');
+  const tam = parr ? parseFloat(w.getComputedStyle(parr).fontSize) : 0;
+  ok(tam >= 24, 'y la letra es de ' + Math.round(tam) + ' px, legible a un brazo de distancia',
+     'la letra del teleprompter es de ' + Math.round(tam) + ' px: no se lee desde donde se graba');
+  w.eval('rodPrompterCerrar()');
+  await esperar(200);
+  ok(g('rod-prompter').style.display === 'none' && w.eval('_rodPromInt') === null,
+     'y al cerrarlo se para el paso del texto, que si no seguiría corriendo por detrás',
+     'al cerrar el teleprompter el texto sigue pasando por detrás');
+  f.style.height = altoMarco;
+
+  /* ═══ 12. LA BASE VIEJA SIGUE FUNCIONANDO ═══ */
+  log('');
+  log('── 12. Sin correr el SQL, se dice qué falta ──');
+  nuevaBase(w, { sinTabla: true });
+  await w.eval('initRodaje()');
+  await esperar(500);
+  const cuerpo = g('rod-cuerpo');
+  ok(cuerpo && /rodaje\.sql/.test(cuerpo.textContent),
+     'dice el archivo exacto que hay que correr: desde una tableta no se adivina',
+     'no dice qué archivo falta: ' + (cuerpo ? cuerpo.textContent.slice(0,140) : ''));
+  ok(cuerpo && /rodaje_comprueba\.sql/.test(cuerpo.textContent),
+     'y también el de comprobar, que es el que se pega mañana sin repetir las quinientas líneas',
+     'no menciona el archivo de comprobación');
+
+  /* ═══ 13. EL SERVICE WORKER NO PUEDE SERVIR EL JS VIEJO ═══
+     Esto no se ve desde el navegador —la sonda corre sin service
+     worker—, así que se lee el archivo. Y hace falta: el 28 de agosto de
+     2026 F.A.R.O sirvió el HTML nuevo con el JS viejo, y el rótulo de
+     una pestaña salía con nada debajo. */
+  log('');
+  log('── 13. El service worker revalida contra el servidor ──');
+  const sw = await (await fetch('/sw.js', { cache: 'no-store' })).text();
+  const ramaPropia = sw.split('} else {')[0];
+  ok(/cache:\s*'no-cache'/.test(ramaPropia),
+     'los archivos propios se piden con `cache: no-cache`',
+     'sin eso la caché HTTP del navegador sirve el JS viejo con el HTML nuevo, y no parece un fallo de caché');
+  ok(/faro-app-v(\d+)/.test(sw) && parseInt(sw.match(/faro-app-v(\d+)/)[1], 10) >= 85,
+     'y la versión está sellada por encima de la v84, que es la de antes de esta herramienta',
+     'falta sellar CACHE_NAME en sw.js: el despliegue existiría y nadie lo vería');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'APRUEBA · El Rodaje' : 'SUSPENDE · El Rodaje';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message) + '\n' + (e && e.stack));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SUSPENDE · El Rodaje';
+});
+</script>
+</body>
+</html>

@@ -346,6 +346,169 @@ createdb videostest
 psql -v ON_ERROR_STOP=1 -d videostest -f _dev/prueba-videos-sql.sql
 ```
 
+## Normativa: los video-ensayos propios se dirigen desde El Rodaje
+
+**Pedido por el autor el 7 de septiembre de 2026**, para sus video-ensayos
+de diez minutos en adelante.
+
+**NO es «Videos M.E.T.A.S», aunque las dos lleven claqueta y estén pegadas
+en el Acceso Rápido.** Aquella publica videos AJENOS de YouTube para que un
+alumno los vea dentro de su misión; esta escribe el video PROPIO: su
+secuencia, su guion, su sonido y sus citas. Se parecen en el icono y en
+nada más, y confundirlas es empezar a meter el guion en la tabla
+equivocada.
+
+Vive en `js/tools/rodaje.js` y `css/rodaje.css`, con cuatro tablas en
+`supabase/sql/rodaje.sql` y su comprobación aparte en
+`supabase/sql/rodaje_comprueba.sql`.
+
+Qué resuelve: en un video-ensayo de catorce minutos, lo que se dice a
+cámara son cuatro o cinco como mucho; el resto es material de apoyo,
+música y rótulos. Eso, llevado en la cabeza o en un cuaderno, sale mal de
+tres maneras concretas —se sale demasiado en cámara porque nadie está
+midiendo; se mueve un bloque y todos los minutos escritos después pasan a
+ser mentira; y se publica con una canción, un clip y tres imágenes sin
+decir de dónde salieron—. Las tres las impide la forma de los datos, no la
+buena memoria de nadie.
+
+**Doce reglas, y ninguna es de adorno:**
+
+1. ⚠️ **NO SE GUARDA NUNCA EL MINUTO EN QUE EMPIEZA UN BLOQUE.** Se guarda
+   cuánto DURA; el minuto de entrada lo suma `rodTiempos()` cada vez que se
+   pinta y muere al terminar el pintado. Si estuviera guardado, meter veinte
+   segundos en el medio dejaría equivocados todos los tiempos de abajo, sin
+   error y sin aviso — y ese fallo no se descubre en la pantalla: se
+   descubre grabando, con el guion en la mano. La prueba del SQL lo vigila:
+   si alguien añadiera una columna `ini` a `rodaje_bloques`, revienta.
+2. ⚠️ **LOS EFECTOS DE SONIDO Y LA MÚSICA CUELGAN DEL BLOQUE, NO DEL
+   RELOJ.** Un golpe se guarda como «a los 4 segundos DE ESTE BLOQUE», no
+   «en el 3:12». Por lo mismo que arriba: arrastrar el bloque a otro sitio
+   se lleva sus señales con él y no hay nada más que tocar. La pestaña
+   🔊 **Sonido** suma los dos números y enseña la lógica del audio del video
+   entero en el orden en que suena, que es lo que el autor pidió ver y lo
+   único que dice si el audio tiene sentido de principio a fin.
+3. ⚠️ **LA CITA ES UNA FILA, NO UN TEXTO SUELTO.** Una película que sale en
+   seis bloques se escribe UNA vez y los seis apuntan a ella. Así el rótulo
+   que ve el espectador es el mismo las seis veces y la bibliografía no
+   puede llevar dos versiones del mismo dato. Es lo que convierte «citar
+   todo absolutamente» en algo que se puede cumplir sin acordarse.
+4. ⚠️ **«GENERADO CON IA» NO ENTRA SIN DECIR CON QUÉ SE HIZO.** Las cinco
+   clases `ia_` exigen `herramienta` («Google MusicFX», «Google Veo») y
+   licencia `generado_ia`, y eso lo muerde un `check` de la base
+   (`rodaje_fuentes_ia_declarada`), no una pantalla. Con el espejo puesto:
+   `generado_ia` tampoco se le puede poner a un clip de película, que sería
+   la puerta de atrás. Y el **prompt** se guarda porque es lo único que hace
+   reproducible una pieza generada: es lo que separa «música: IA» —que no
+   dice nada— de una cita.
+5. ⚠️ **NO SE PUEDE PUBLICAR CON MATERIAL AJENO SIN FUENTE, Y LO PARA LA
+   BASE.** El disparador `rodaje_guarda_citas` rechaza poner un proyecto en
+   `publicado` mientras quede un bloque de clase `pelicula`, `ia`, `archivo`
+   o `musica` sin fuente apuntada, o una fuente marcada para salir en
+   pantalla sin rótulo escrito. **Y el mensaje NOMBRA los bloques que
+   faltan**: un «no se puede» a secas obliga a abrir cuarenta bloques uno
+   por uno desde una tableta. Las clases `camara`, `grafico`, `pantalla` y
+   `titulo` no exigen nada, porque pueden ser enteramente propias: exigir
+   donde no toca enseña a rellenar por rellenar, y una casilla rellenada por
+   rellenar es peor que una vacía.
+6. **El rótulo de pantalla se ARMA, no se escribe.** `rodRotulo()` lo
+   construye con los campos, con una forma por clase —una película y un
+   artículo no se citan igual, y citarlos igual es no citarlos—. Se puede
+   corregir a mano y hay un botón para volver al armado; lo que no puede es
+   quedarse sin escribir. Se enseña mientras se escribe, con fondo oscuro y
+   barra de color: con la misma pinta que va a tener encima del video.
+7. ⚠️ **EL PRESUPUESTO DE CÁMARA SE VE EN TODAS LAS PESTAÑAS.** «Mi
+   aparición en la cámara que solo se limite a expresar lo más importante.»
+   Un número que solo sale al final llega cuando ya se grabó. Y son **DOS**
+   topes: `cam_pct` (cuánto del video entero) y `cam_bloque` (cuánto puede
+   durar UNA toma seguida). El segundo es el que de verdad muerde: un video
+   con 25 % de cámara puede ser insoportable si ese 25 % es una parrafada de
+   tres minutos y medio en el arranque.
+8. **El guion se PEGA de golpe, no se escribe campo por campo.** Catorce
+   minutos son treinta bloques, y treinta bloques a mano en una tableta son
+   doscientos toques; además el texto casi nunca se inventa aquí. Se lee tal
+   como venga —`[CÁMARA 0:30] Título`, `CLIP 3:45 — Título`,
+   `## TOMA 1 (0:15) Título`— con las líneas `>` para lo demás.
+   ⚠️ **Y lo que NO se entiende se queda como guion, nunca se coloca a la
+   fuerza en otro campo**: ahí no se ve que está mal. Las citas escritas a
+   mano en el texto se crean como fuentes SIN VERIFICAR en vez de perderse:
+   ninguna se descarta y ninguna se inventa.
+   ⚠️ Y en la cabecera **el tiempo se saca ANTES que el número de orden**.
+   Al revés, «PELÍCULA 1:15 — La Llegada» perdía el 1 —el quitanúmeros se lo
+   comía creyendo que era el «1.» de una lista— y el bloque entraba con 15
+   segundos en vez de 75, desplazando todos los minutos de abajo sin dar
+   ningún error.
+9. ⚠️ **El orden se cambia ARRASTRANDO, con PUNTEROS.** Mismo aparato que la
+   repisa de enlaces y los videos de M.E.T.A.S, y aquí importa más que en
+   ninguna: mover un bloque cambia los minutos de todos los de abajo. Las
+   mismas cuatro reglas: el asa sigue siendo un botón y **las flechas del
+   teclado la mueven**; `touch-action: none` en el asa; **al soltar NO se
+   repinta** la lista (sí el panel de arriba, porque los minutos ya son
+   otros); y solo se escriben las filas cuyo número cambió.
+   **Y la nota que lo explica va FUERA del contenedor que arrastra**, no
+   dentro como en los videos de M.E.T.A.S: allí era un hijo que no era una
+   fila y el aparato tuvo que aprender a saltárselo. Sacándola, esa clase de
+   fallo deja de poder existir.
+10. **El reel HEREDA las fuentes de su bloque.** Al elegir de qué bloque
+    sale se marcan solas, y se traen también su guion y su título. No es un
+    detalle: un corto que enseña tres segundos de una película necesita el
+    mismo crédito que el video largo, y al corto lo ve mucha más gente.
+11. **Nada de la base llega a un atributo del HTML.** Todo con
+    `createElement` y `textContent`. Lo único que va a un atributo es una
+    dirección, comprobada con `URL()` en `rodEnlace()` y puesta con
+    `setAttribute` — no con un grep, que `java\tscript:` y `JavaScript:` lo
+    pasan y el navegador los ejecuta igual. Esta aplicación tiene dentro la
+    Bóveda, las finanzas, el chat y los teléfonos del Buzón.
+12. **Aquí NO hay puerta pública, y es a propósito.** A diferencia de
+    `metas_videos`, no existe ninguna función `security definer` ni política
+    para `anon`: no hay nada que nadie de fuera tenga que leer. Con la clave
+    publicable no se puede ni mirar la lista de proyectos. La prueba del SQL
+    lo vigila: si aparece una `security definer` en `rodaje_*`, suspende.
+    Y es **de la casa**, no de cada quien: un video se hace entre varios, y
+    una secuencia que solo puede tocar quien la abrió convierte «arréglame
+    esa frase» en «pásame tu sesión».
+
+**Lo permanente sale por el chat**, igual que el SQL y que el catálogo de
+los videos de M.E.T.A.S, y por lo mismo —el autor trabaja desde la tableta,
+sin el repositorio ni el editor de video delante—. Son cuatro
+exportaciones: el **plan de rodaje** (la secuencia con sus tiempos, su voz y
+sus señales de sonido), los **rótulos de pantalla** (uno por línea, con su
+minuto, para tenerlos al lado mientras se montan los cintillos), la
+**descripción de YouTube** (agrupada, con lo generado por una máquina en su
+propio apartado y el primero, con herramienta y prompt, y con los minutos en
+que aparece cada fuente sacados de los bloques) y los **guiones de los
+reels**.
+
+**Antes de publicar un cambio de El Rodaje:**
+
+```
+node _dev/servidor-estatico.js      (en otra terminal)
+_dev/probe-rodaje.html              (en el navegador)
+```
+
+La comprobación **8** mueve un bloque **con eventos de puntero de verdad**,
+no llamando por dentro a la función: lo que puede fallar ahí es de pantalla
+—un asa que el dedo no alcanza, un `touch-action` que le regala el gesto al
+desplazamiento— y nada de eso se ve llamando funciones. Y comprueba lo que
+justifica la regla 2: que el golpe de sonido del bloque movido suene en su
+sitio nuevo sin haber tocado nada. Para medir, abre la vista de verdad
+(`switchView`) y enseña `#app-container`: con el panel escondido las
+tarjetas miden 0×0 y la sonda aprobaría un arrastre que en la tableta no
+funciona.
+
+Y el SQL, contra un PostgreSQL de verdad, que es donde se ve si el `check`
+muerde y si el guardia de las citas para:
+
+```
+createdb rodajetest
+psql -v ON_ERROR_STOP=1 -d rodajetest -f _dev/prueba-rodaje-sql.sql
+```
+
+⚠️ Esa prueba **reparte los permisos de tabla como los reparte Supabase**
+(`grant all` a `anon` y `authenticated` sobre todo `public`) antes de probar
+la puerta. Sin esa línea aprobaría por el motivo equivocado —rebotaría por
+falta de permiso de tabla— y no habría probado la seguridad por fila, que es
+lo único que de verdad guarda esto en la base de verdad.
+
 ## El mapa de rutas se explora por materia, no en lista
 
 «Mis Rutas» agrupa las rutas **por materia**, y todo arranca **plegado**. Es
@@ -378,7 +541,7 @@ Cada sonda termina poniendo **APRUEBA** o **SUSPENDE** en `document.title`,
 con el veredicto DELANTE (el rótulo viejo «SONDA-APRUEBA» ya se retiró).
 No es decoración: es lo que se lee al correrlas en tanda. Once sondas
 antiguas no lo hacían, y en la auditoría del 20 de agosto de 2026
-aparecieron **veintinueve más**; hoy lo hacen las ochenta y cinco. La
+aparecieron **veintinueve más**; hoy lo hacen las ochenta y nueve. La
 única excepción es `probe-alto-util.html`, que no es una sonda sino un
 instrumento de medida y se titula INSTRUMENTO. La cuenta no se escribe de
 memoria (esta línea ya se quedó vieja una vez): sale de

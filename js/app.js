@@ -905,6 +905,7 @@ function switchView(id) {
   if (id === 'view-msug' && typeof initMetasSug === 'function') initMetasSug();
   if (id === 'view-mvid' && typeof initMetasVideos === 'function') initMetasVideos();
   if (id === 'view-criba' && typeof initCriba === 'function') initCriba();
+  if (id === 'view-rodaje' && typeof initRodaje === 'function') initRodaje();
 
   // El FAB de Destellos vive en toda la app, excepto en el Chat
   // (estorbaría sobre la barra de escritura) y el editor de Redacción

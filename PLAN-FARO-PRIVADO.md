@@ -29,6 +29,7 @@ pierde por el camino.
 | La clave de servicio en la función de notificaciones | ⚠️ los avisos siguen rotos |
 | Apagar el alta pública de cuentas en Supabase | ⛔ pendiente |
 | `recursos_enlaces` (la repisa de enlaces de las misiones) | ⏳ pendiente de correr el SQL |
+| `rodaje` (El Rodaje: el cuaderno de dirección de los videos) | ⏳ pendiente de correr el SQL, y **son dos archivos en orden** |
 | `criba.sql` (La Criba: la tabla y las cuatro fuentes) | ✅ corrido |
 | La cadena de afinado: `criba_temas` → `criba_afina` 1-4 → `criba_prensa` | ✅ corrida entera, en ese orden |
 | `criba_reloj.sql` (el reloj diario de La Criba) | ✅ corrido y funcionando: cosecha sola a las **05:10 UTC** |
@@ -114,6 +115,41 @@ Zone → Make private.
      El archivo trae además las cinco comprobaciones para pegar después, y la
      cuarta es la que de verdad prueba la defensa: un `insert` con
      `javascript:` en la dirección TIENE que fallar.
+   · ⚠️ **Correr `supabase/sql/rodaje.sql`** en el SQL Editor, y **después**
+     `supabase/sql/rodaje_comprueba.sql`. En ese orden y son dos: el primero
+     crea, el segundo solo mira. No dependen de nada más que de
+     `es_familia()`, que ya está. El primero se puede correr dos veces sin
+     borrar ni un bloque.
+     Crea las cuatro tablas de **El Rodaje**, el cuaderno de dirección de los
+     video-ensayos propios que el autor pidió el 7 de septiembre de 2026:
+     `rodaje_proyectos`, `rodaje_bloques` (la secuencia), `rodaje_fuentes`
+     (el registro de citas) y `rodaje_reels`. Hasta que se corra, la
+     herramienta **no funciona y lo dice a la vista**, nombrando estos dos
+     archivos: no finge que guarda.
+     Lo que hay que mirar al pegarlo es **la tabla del final**, nunca el
+     «Success» del editor: sale en VERTICAL, con nueve filas, y todas tienen
+     que llevar ✅. Dos de ellas se leen al revés que las demás —«puerta
+     pública (NO debe haberla)» tiene que decir `ninguna`—: aquí, a
+     diferencia de los videos de M.E.T.A.S, **no hay ninguna función
+     `security definer` ni política para `anon`**, porque no hay nada que
+     nadie de fuera tenga que leer.
+     Y trae dos cosas que no tiene ningún otro archivo de la casa:
+     un **`check` que no deja guardar nada «generado con IA» sin decir con
+     qué herramienta se hizo** (`rodaje_fuentes_ia_declarada`), y un
+     **disparador que no deja marcar un video como publicado** mientras
+     quede un bloque de material ajeno sin fuente declarada o una fuente
+     anunciada en pantalla sin su rótulo — y su mensaje NOMBRA los bloques
+     que faltan. Es la petición del autor —«quiero citar todo
+     absolutamente»— convertida en algo que no se puede saltar desde la
+     consola del navegador.
+     El archivo **se para solo** si falta `es_familia()`, igual que la
+     repisa. Y si mañana hay que volver a comprobar que quedó puesto, se
+     pega solo `rodaje_comprueba.sql`, que son veinte líneas y no
+     quinientas.
+     Probado antes de mandarlo contra un PostgreSQL de verdad con
+     `_dev/prueba-rodaje-sql.sql`: las ocho comprobaciones pasan, incluida
+     la de que `anon` no ve ni una fila con los permisos de tabla repartidos
+     como los reparte Supabase.
    · ✅ **CORRIDO** — `supabase/sql/metas_videos_tope_10.sql`, el 28 de
      agosto de 2026. La comprobación del final devolvió lo que tenía que
      devolver: `tope_preguntas = 10`. Sube de cinco a diez el tope de

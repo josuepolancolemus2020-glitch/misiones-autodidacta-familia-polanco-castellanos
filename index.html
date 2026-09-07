@@ -8,6 +8,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/criba.css">
+  <link rel="stylesheet" href="css/rodaje.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="apple-touch-icon" href="img/icon-192.png">
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
@@ -127,6 +128,15 @@
         <button type="button" class="qa-item" data-qa="view-mvid">
           <span class="qa-icon qa-mvid"><i class="fa-solid fa-clapperboard"></i></span>
           <span class="qa-label">Videos M.E.T.A.S</span>
+        </button>
+        <!-- El cuaderno de dirección de los video-ensayos propios. Va
+             pegado a Videos M.E.T.A.S por vecindad de oficio y NO porque sea
+             lo mismo: aquella publica videos ajenos para que un alumno los
+             vea; esta escribe el video propio, con su guion, su sonido y sus
+             citas. Pedido por el autor el 7 de septiembre de 2026. -->
+        <button type="button" class="qa-item" data-qa="view-rodaje">
+          <span class="qa-icon qa-rod"><i class="fa-solid fa-film"></i></span>
+          <span class="qa-label">El Rodaje</span>
         </button>
         <!-- La edición del día de La Criba. Va con contador a la vista por
              lo mismo que Sugerencias: una edición que hay que acordarse de
@@ -1224,6 +1234,446 @@
     </div>
   </div>
 
+
+  <!-- ========== EL RODAJE 🎬 (el cuaderno de dirección de un video) ==========
+       Pedido por el autor el 7 de septiembre de 2026 para sus video-ensayos
+       de diez minutos en adelante.
+
+       NO es «Videos M.E.T.A.S», aunque las dos lleven claqueta. Aquella
+       publica videos AJENOS de YouTube para que un alumno los vea dentro de
+       su misión; esta escribe el video PROPIO: su secuencia, su guion, su
+       sonido y sus citas.
+
+       La lista de bloques, las pestañas y el panel de arriba los pinta
+       js/tools/rodaje.js con createElement: ni un dato de la base se
+       interpola aquí dentro. -->
+  <div id="view-rodaje" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="rod-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">El Rodaje</h1>
+      <div></div>
+    </header>
+    <div class="view-scroll">
+      <div class="rod-cab">
+
+        <label class="rod-lbl" for="rod-proyecto">Video</label>
+        <select id="rod-proyecto" class="rod-sel"></select>
+
+        <div class="rod-barra">
+          <button type="button" class="rod-b rod-b-pri" id="rod-nuevo-btn">➕ Video nuevo</button>
+          <button type="button" class="rod-b" id="rod-editar-btn">⚙️ Ajustes y estado</button>
+        </div>
+
+        <!-- El panel: duración, presupuesto de cámara, mezcla y avisos. Va
+             AQUÍ, encima de las pestañas, para que se vea mientras se
+             escribe el guion y no solo al final, que es cuando ya se grabó. -->
+        <div id="rod-panel"></div>
+
+        <div class="rod-pestanas" id="rod-pestanas"></div>
+        <div class="rod-cuerpo" id="rod-cuerpo"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Ajustes del video. El presupuesto de cámara son DOS números y hacen
+       falta los dos: el porcentaje del video entero y lo que puede durar
+       una toma seguida. -->
+  <div id="rod-p-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Datos del video">
+      <div class="msug-det-head">
+        <div class="msug-det-titulo" id="rod-p-ventana">Video nuevo</div>
+        <button type="button" class="msug-det-cerrar" id="rod-p-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="rod-form">
+        <label class="rod-lbl" for="rod-p-titulo">Título</label>
+        <input type="text" id="rod-p-titulo" class="rod-in" maxlength="160"
+               placeholder="Intuición: memoria del futuro">
+
+        <label class="rod-lbl" for="rod-p-tesis">Tesis en una línea</label>
+        <textarea id="rod-p-tesis" class="rod-in" rows="2" maxlength="300"
+                  placeholder="La intuición no es magia: es un recuerdo del futuro."></textarea>
+        <p class="rod-ayuda">No es el título: es lo que el video <strong>sostiene</strong>.
+          Se relee para decidir si un bloque sobra, y lo que hay que buscar no se relee.</p>
+
+        <div class="rod-dos">
+          <div>
+            <label class="rod-lbl" for="rod-p-dur">Duración objetivo</label>
+            <input type="text" id="rod-p-dur" class="rod-in" placeholder="12:00" inputmode="numeric">
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-p-estado">Estado</label>
+            <select id="rod-p-estado" class="rod-sel"></select>
+          </div>
+        </div>
+
+        <p class="rod-ayuda" style="margin-top:.9rem;"><strong>🎤 El presupuesto de cámara.</strong>
+          Son dos topes y hacen falta los dos: un video puede tener un 25 % de cámara y ser
+          insoportable si ese 25 % es una sola parrafada de tres minutos en el arranque.</p>
+        <div class="rod-dos">
+          <div>
+            <label class="rod-lbl" for="rod-p-campct">Máximo en cámara (%)</label>
+            <input type="number" id="rod-p-campct" class="rod-in" min="0" max="100" placeholder="30">
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-p-camblo">Toma más larga</label>
+            <input type="text" id="rod-p-camblo" class="rod-in" placeholder="0:45" inputmode="numeric">
+          </div>
+        </div>
+
+        <label class="rod-lbl" for="rod-p-url">Dónde quedó publicado</label>
+        <input type="url" id="rod-p-url" class="rod-in" inputmode="url" placeholder="https://…">
+
+        <label class="rod-lbl" for="rod-p-notas">Notas</label>
+        <textarea id="rod-p-notas" class="rod-in" rows="2" maxlength="1000"></textarea>
+
+        <p class="rod-aviso" id="rod-p-aviso"></p>
+        <button type="button" class="rod-b rod-b-pri rod-b-ancho" id="rod-p-guardar">Guardar</button>
+        <p class="rod-ayuda">Marcarlo como <strong>✅ Publicado</strong> es lo último que se hace, y
+          la base no lo deja mientras quede material ajeno sin fuente declarada o una fuente
+          anunciada en pantalla sin su rótulo. Eso no es una pantalla que se pueda saltar: es un
+          disparador dentro de Supabase.</p>
+        <button type="button" class="rod-b rod-b-ancho" id="rod-p-borrar"
+                style="display:none;color:#b91c1c;">🗑️ Borrar este video y todo lo suyo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Un bloque de la secuencia. Aquí viven también sus efectos de sonido y
+       su música: cuelgan del bloque a propósito, para que arrastrarlo en la
+       secuencia se los lleve con él. -->
+  <div id="rod-b-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Bloque de la secuencia">
+      <div class="msug-det-head">
+        <div class="msug-det-titulo" id="rod-b-ventana">Bloque nuevo</div>
+        <button type="button" class="msug-det-cerrar" id="rod-b-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="rod-form">
+        <div class="rod-dos">
+          <div>
+            <label class="rod-lbl" for="rod-b-clase">Qué se ve</label>
+            <select id="rod-b-clase" class="rod-sel"></select>
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-b-dur">Cuánto dura</label>
+            <input type="text" id="rod-b-dur" class="rod-in" placeholder="0:30" inputmode="numeric">
+          </div>
+        </div>
+        <p class="rod-ayuda">Se escribe lo que <strong>DURA</strong>, nunca el minuto en que empieza:
+          ese lo suma la pantalla. Si estuviera escrito a mano, meter veinte segundos en el medio
+          dejaría equivocados todos los tiempos de abajo sin que nada avisara.</p>
+
+        <label class="rod-lbl" for="rod-b-titulo">Título del bloque</label>
+        <input type="text" id="rod-b-titulo" class="rod-in" maxlength="160"
+               placeholder="El gancho melancólico">
+
+        <label class="rod-lbl" for="rod-b-guion">Lo que se dice</label>
+        <textarea id="rod-b-guion" class="rod-in" rows="4"
+                  placeholder="¿Alguna vez has experimentado un déjà vu tan visceral…?"></textarea>
+        <p class="rod-ayuda">En una toma a cámara esto es literalmente lo que el teleprompter va a
+          pasar por delante. Escríbelo con sus pausas.</p>
+
+        <label class="rod-lbl" for="rod-b-visual">Lo que se ve</label>
+        <textarea id="rod-b-visual" class="rod-in" rows="2"
+                  placeholder="Plano medio cálido, luz de ventana."></textarea>
+
+        <!-- ── El sonido del bloque ── -->
+        <p class="rod-ayuda" style="margin-top:1rem;"><strong>💥 Efectos de sonido.</strong>
+          El segundo se cuenta <strong>desde el principio de este bloque</strong>, no desde el
+          principio del video: así, al mover el bloque, los golpes se van con él.</p>
+        <div id="rod-b-sfx"></div>
+        <button type="button" class="rod-b" id="rod-b-sfx-mas">➕ Otro efecto</button>
+
+        <p class="rod-ayuda" style="margin-top:1rem;"><strong>🎵 La música en este bloque.</strong>
+          El silencio es una decisión: si la pista tiene que irse, se dice con «Sale».</p>
+        <div class="rod-tres">
+          <div>
+            <label class="rod-lbl" for="rod-b-mus-acc">Qué hace</label>
+            <select id="rod-b-mus-acc" class="rod-sel"></select>
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-b-mus-fid">Qué pista</label>
+            <select id="rod-b-mus-fid" class="rod-sel"></select>
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-b-mus-niv">A qué altura</label>
+            <select id="rod-b-mus-niv" class="rod-sel"></select>
+          </div>
+        </div>
+        <div class="rod-dos">
+          <div>
+            <label class="rod-lbl" for="rod-b-mus-ini">Trozo, desde</label>
+            <input type="text" id="rod-b-mus-ini" class="rod-in" placeholder="0:25" inputmode="numeric">
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-b-mus-fin">Trozo, hasta</label>
+            <input type="text" id="rod-b-mus-fin" class="rod-in" placeholder="1:04" inputmode="numeric">
+          </div>
+        </div>
+
+        <!-- ── Las citas del bloque ── -->
+        <p class="rod-ayuda" style="margin-top:1rem;"><strong>📚 Qué se acredita aquí.</strong>
+          Los clips, lo generado con IA, el material de archivo y la música <em>siempre</em>
+          llevan fuente: sin ella el video no se deja publicar.</p>
+        <div id="rod-b-fuentes" class="rod-caja-checks"></div>
+
+        <label class="rod-lbl" for="rod-b-rotulo">Rótulo propio de este bloque (opcional)</label>
+        <input type="text" id="rod-b-rotulo" class="rod-in" maxlength="300"
+               placeholder="déjalo vacío y se usan los rótulos de las fuentes">
+
+        <label class="rod-lbl" for="rod-b-notas">Notas de rodaje</label>
+        <textarea id="rod-b-notas" class="rod-in" rows="2" maxlength="1000"></textarea>
+
+        <label class="rod-check" style="border:0;margin-top:.5rem;">
+          <input type="checkbox" id="rod-b-listo">
+          <span>✅ Este bloque está terminado</span>
+        </label>
+
+        <p class="rod-aviso" id="rod-b-aviso"></p>
+        <button type="button" class="rod-b rod-b-pri rod-b-ancho" id="rod-b-guardar">Guardar el bloque</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Una fuente. Es la tabla por la que existe la herramienta: «quiero
+       citar todo absolutamente». Lo generado con IA no entra sin decir con
+       qué se hizo, y eso lo muerde un check de la base, no esta pantalla. -->
+  <div id="rod-f-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Datos de la fuente">
+      <div class="msug-det-head">
+        <div class="msug-det-titulo" id="rod-f-ventana">Fuente nueva</div>
+        <button type="button" class="msug-det-cerrar" id="rod-f-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="rod-form">
+        <label class="rod-lbl" for="rod-f-clase">Qué es</label>
+        <select id="rod-f-clase" class="rod-sel"></select>
+
+        <label class="rod-lbl" for="rod-f-titulo">Título de la obra</label>
+        <input type="text" id="rod-f-titulo" class="rod-in" maxlength="200"
+               placeholder="Arrival · The Calendar of Rain · Dune">
+
+        <div class="rod-dos">
+          <div>
+            <label class="rod-lbl" for="rod-f-autoria">Quién la hizo</label>
+            <input type="text" id="rod-f-autoria" class="rod-in" maxlength="160"
+                   placeholder="Denis Villeneuve">
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-f-anio">Año</label>
+            <input type="text" id="rod-f-anio" class="rod-in" maxlength="24" placeholder="2016">
+          </div>
+        </div>
+        <div class="rod-dos">
+          <div>
+            <label class="rod-lbl" for="rod-f-obra">Obra que la contiene</label>
+            <input type="text" id="rod-f-obra" class="rod-in" maxlength="200"
+                   placeholder="el álbum, la revista, la serie">
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-f-editor">Estudio, sello o editorial</label>
+            <input type="text" id="rod-f-editor" class="rod-in" maxlength="160"
+                   placeholder="Paramount Pictures">
+          </div>
+        </div>
+
+        <!-- Solo para lo generado con IA. Se enseña y se esconde con la
+             clase: enseñar los veinte campos siempre convierte esto en un
+             muro y deja sin saber cuáles importan de verdad. -->
+        <div id="rod-f-ia" style="display:none;">
+          <p class="rod-ayuda" style="margin-top:.9rem;"><strong>🤖 Lo hizo una máquina.</strong>
+            La herramienta y el prompt no son archivística: el prompt es lo único que hace
+            reproducible una pieza generada, y es lo que separa «música: IA» —que no dice nada—
+            de una cita de verdad. <strong>Sin la herramienta, la base no la deja entrar.</strong></p>
+          <label class="rod-lbl" for="rod-f-herramienta">Con qué se hizo</label>
+          <input type="text" id="rod-f-herramienta" class="rod-in" maxlength="160"
+                 placeholder="Google MusicFX · Google Veo · Google Imagen">
+          <label class="rod-lbl" for="rod-f-prompt">El prompt, tal cual</label>
+          <textarea id="rod-f-prompt" class="rod-in" rows="3" maxlength="2000"
+                    placeholder="melancholic piano, analog sub-bass, distant rain, 90 bpm"></textarea>
+        </div>
+
+        <label class="rod-lbl" for="rod-f-licencia">Con qué derecho se usa</label>
+        <select id="rod-f-licencia" class="rod-sel"></select>
+
+        <label class="rod-lbl" for="rod-f-url">Dirección (opcional)</label>
+        <input type="url" id="rod-f-url" class="rod-in" inputmode="url" placeholder="https://…">
+
+        <label class="rod-lbl">Así saldrá en la pantalla</label>
+        <div class="rod-vista" id="rod-f-vista"></div>
+        <label class="rod-lbl" for="rod-f-rotulo">Corregir el rótulo a mano (opcional)</label>
+        <input type="text" id="rod-f-rotulo" class="rod-in" maxlength="300"
+               placeholder="déjalo vacío y se arma solo con los campos de arriba">
+        <button type="button" class="rod-b" id="rod-f-rearmar">↻ Volver al rótulo armado</button>
+
+        <label class="rod-check" style="border:0;margin-top:.6rem;">
+          <input type="checkbox" id="rod-f-pantalla">
+          <span>🏷️ Este crédito sale <strong>en pantalla</strong>, no solo en la descripción</span>
+        </label>
+        <label class="rod-check" style="border:0;">
+          <input type="checkbox" id="rod-f-verificada">
+          <span>✅ Comprobado en el original (no de memoria)</span>
+        </label>
+
+        <label class="rod-lbl" for="rod-f-notas">Notas</label>
+        <textarea id="rod-f-notas" class="rod-in" rows="2" maxlength="1000"></textarea>
+
+        <p class="rod-aviso" id="rod-f-aviso"></p>
+        <button type="button" class="rod-b rod-b-pri rod-b-ancho" id="rod-f-guardar">Guardar la fuente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Un reel. Al elegir el bloque del que sale, HEREDA SUS FUENTES: al
+       corto lo ve mucha más gente que al video largo. -->
+  <div id="rod-r-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Datos del reel">
+      <div class="msug-det-head">
+        <div class="msug-det-titulo" id="rod-r-ventana">Reel nuevo</div>
+        <button type="button" class="msug-det-cerrar" id="rod-r-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="rod-form">
+        <label class="rod-lbl" for="rod-r-bid">De qué bloque del video sale</label>
+        <select id="rod-r-bid" class="rod-sel"></select>
+        <p class="rod-ayuda">Al elegirlo se traen su guion y <strong>sus fuentes</strong>.
+          Elige el bloque que se entiende solo: el dato que sorprende, no la conclusión.</p>
+
+        <label class="rod-lbl" for="rod-r-titulo">El cartel (el texto grande)</label>
+        <input type="text" id="rod-r-titulo" class="rod-in" maxlength="160"
+               placeholder="TU INTUICIÓN ES UN RECUERDO DEL FUTURO">
+        <p class="rod-ayuda">Es lo que se lee sin sonido, que es como se ven casi todos.</p>
+
+        <label class="rod-lbl" for="rod-r-gancho">Los tres primeros segundos</label>
+        <textarea id="rod-r-gancho" class="rod-in" rows="2" maxlength="400"
+                  placeholder="¿Alguna vez un déjà vu te salvó de un peligro?"></textarea>
+        <p class="rod-ayuda">Van aparte del guion porque son lo único que decide si alguien se queda.</p>
+
+        <label class="rod-lbl" for="rod-r-guion">El guion del reel</label>
+        <textarea id="rod-r-guion" class="rod-in" rows="4"></textarea>
+
+        <label class="rod-lbl" for="rod-r-cta">La invitación al video largo</label>
+        <input type="text" id="rod-r-cta" class="rod-in" maxlength="300">
+
+        <div class="rod-tres">
+          <div>
+            <label class="rod-lbl" for="rod-r-dur">Dura</label>
+            <input type="text" id="rod-r-dur" class="rod-in" placeholder="0:45" inputmode="numeric">
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-r-red">Dónde</label>
+            <select id="rod-r-red" class="rod-sel"></select>
+          </div>
+          <div>
+            <label class="rod-lbl" for="rod-r-estado">Estado</label>
+            <select id="rod-r-estado" class="rod-sel"></select>
+          </div>
+        </div>
+
+        <label class="rod-lbl">Los créditos que lleva el corto</label>
+        <div id="rod-r-fuentes" class="rod-caja-checks"></div>
+
+        <label class="rod-lbl" for="rod-r-hashtags">Etiquetas</label>
+        <input type="text" id="rod-r-hashtags" class="rod-in" maxlength="300"
+               placeholder="#ciencia #intuicion #dune">
+
+        <p class="rod-aviso" id="rod-r-aviso"></p>
+        <button type="button" class="rod-b rod-b-pri rod-b-ancho" id="rod-r-guardar">Guardar el reel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pegar el guion de golpe. Un guion de catorce minutos son treinta
+       bloques, y treinta bloques escritos campo por campo en una tableta
+       son doscientos toques. Se lee tal como venga. -->
+  <div id="rod-pegar-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Pegar el guion">
+      <div class="msug-det-head">
+        <div class="msug-det-titulo">Pegar el guion de golpe</div>
+        <button type="button" class="msug-det-cerrar" id="rod-pegar-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="rod-form">
+        <p class="rod-ayuda">Cada bloque empieza con una cabecera: <code>[CÁMARA 0:30] Título</code>.
+          También vale <code>CLIP 3:45 — Título</code> o <code>## TOMA 1 (0:15) Título</code>.
+          Las clases que se reconocen: cámara/toma, película/clip, IA, gráfico/canva,
+          archivo/b-roll, pantalla, música y título/cartón.</p>
+        <p class="rod-ayuda">Debajo, las líneas que empiezan por <code>&gt;</code> dicen lo demás:
+          <code>visual:</code>, <code>sfx 0:04 golpe grave</code>,
+          <code>música: entra de fondo 0:25→1:04</code>, <code>fuente:</code>, <code>nota:</code>.
+          Todo lo que no sea una de esas <strong>se queda como guion</strong>: nada se coloca a la
+          fuerza en un campo que no le toca, porque ahí no se ve que está mal.</p>
+        <textarea id="rod-pegar-txt" class="rod-in" rows="10"
+placeholder="[CÁMARA 0:30] La flecha rota
+¿Alguna vez has tenido un déjà vu tan visceral que sentiste que ya sabías lo que iba a pasar?
+&gt; visual: Plano medio cálido, luz de ventana
+&gt; sfx 0:04 golpe grave de sub-bajo
+&gt; música: entra de fondo 0:25→1:04
+&gt; fuente: Arrival (Denis Villeneuve, 2016)
+
+[PELÍCULA 3:45] La Llegada y los heptápodos
+&gt; visual: Clips de tinta circular
+&gt; fuente: Arrival (Denis Villeneuve, 2016)"></textarea>
+        <div class="rod-barra">
+          <button type="button" class="rod-b rod-b-pri" id="rod-pegar-leer">Leer el guion</button>
+          <button type="button" class="rod-b" id="rod-pegar-portapapeles" style="display:none;">📥 Del portapapeles</button>
+        </div>
+        <div id="rod-pegar-vista" class="rod-pegar-vista"></div>
+        <p class="rod-aviso" id="rod-pegar-aviso"></p>
+        <button type="button" class="rod-b rod-b-pri rod-b-ancho" id="rod-pegar-meter" style="display:none;">Añadir</button>
+        <p class="rod-ayuda">Las citas escritas a mano en el texto se crean como fuentes
+          <strong>sin verificar</strong> para que no se pierdan. Ninguna se descarta y ninguna se
+          inventa: quedan marcadas en ámbar hasta que las completes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- El recuadro de exportar. Lo permanente sale por el chat, igual que el
+       SQL y que el catálogo de los videos: el autor trabaja desde la
+       tableta, sin el repositorio ni el editor de video delante. -->
+  <div id="rod-texto-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Texto para copiar">
+      <div class="msug-det-head">
+        <div class="msug-det-titulo" id="rod-texto-ventana">Texto</div>
+        <button type="button" class="msug-det-cerrar" id="rod-texto-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="rod-form">
+        <textarea id="rod-texto-caja" class="rod-in" rows="16" readonly></textarea>
+        <button type="button" class="rod-b rod-b-pri rod-b-ancho" id="rod-texto-copiar">📋 Copiar todo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- El teleprompter. Pantalla entera y negra: cualquier otra cosa es algo
+       que se mira mientras se debería estar mirando al objetivo. -->
+  <div id="rod-prompter" class="rod-prompter">
+    <div class="rod-prom-cab">
+      <div id="rod-prom-reloj" class="rod-prom-reloj">0:00</div>
+      <div style="display:flex;gap:.35rem;align-items:center;">
+        <button type="button" class="rod-b rod-b-min" id="rod-prom-menos" aria-label="Más despacio">−</button>
+        <span class="rod-prom-vel" id="rod-prom-vel">2</span>
+        <button type="button" class="rod-b rod-b-min" id="rod-prom-mas" aria-label="Más rápido">+</button>
+        <button type="button" class="rod-b rod-b-pri" id="rod-prom-pasar">▶️ Pasar</button>
+        <button type="button" class="rod-b rod-b-min" id="rod-prom-espejo" title="Espejo, para leer sobre un cristal">🪞</button>
+        <button type="button" class="rod-b rod-b-min" id="rod-prom-cerrar" aria-label="Cerrar">✕</button>
+      </div>
+    </div>
+    <div class="rod-prom-area" id="rod-prompter-area">
+      <div id="rod-prompter-txt"></div>
+    </div>
+  </div>
+
   <!-- ========== REDACCIÓN 📰 (sala de redacción de la revista) ========== -->
   <div id="view-redaccion" class="view">
     <header class="app-header compact">
@@ -2041,6 +2491,7 @@
   <script src="js/tools/metas-sugerencias.js"></script>
   <script src="js/tools/metas-videos.js"></script>
   <script src="js/tools/criba.js"></script>
+  <script src="js/tools/rodaje.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
