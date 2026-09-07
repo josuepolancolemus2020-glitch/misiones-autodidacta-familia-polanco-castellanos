@@ -2606,7 +2606,14 @@ function rodLeerGuion(texto) {
            peor, porque parece que funcionó.
            La forma con corchetes es inequívoca y no necesita esto; una
            cabecera pelada necesita su tiempo, o al menos un «##». */
-        if (t.seg || conAlmohadilla) {
+        /* Y la tercera forma de corroborar: la palabra de clase ESCRITA EN
+           MAYÚSCULAS. Así se escribe una cabecera —«PELÍCULA La Llegada»—
+           y así no se escribe la prosa, que era el problema. Deja pasar
+           las cabeceras a las que todavía no se les puso duración sin
+           volver a abrirle la puerta a «Yo no sabía entonces…». */
+        const enMayusculas = prim === prim.toLocaleUpperCase('es') &&
+                             /[A-ZÁÉÍÓÚÜÑ]/.test(prim);
+        if (t.seg || conAlmohadilla || enMayusculas) {
           const titulo = t.resto
             .replace(/^\s*\d{1,2}(?:\s*[.:)\-–—]\s*|\s+)/, '')
             .replace(/^[-–—:.]\s*/, '').trim();

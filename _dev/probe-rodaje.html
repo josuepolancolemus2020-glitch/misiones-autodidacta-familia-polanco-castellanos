@@ -326,6 +326,16 @@ function nuevaBase(w, opciones){
      'sino que rellenan su campo, que es lo que quería quien las escribió',
      'las directivas sin «>» no rellenaron su campo');
 
+  /* Y las tres formas de corroborar una cabecera pelada: el tiempo, el
+     «##» y la palabra EN MAYÚSCULAS. La tercera deja pasar las cabeceras a
+     las que todavía no se les puso duración —«PELÍCULA La Llegada»— sin
+     volver a abrirle la puerta a «Yo no sabía entonces…», que no va en
+     mayúsculas. */
+  const mays = R.leerGuion('[CÁMARA 0:20] A\ntexto\nPELÍCULA La Llegada');
+  ok(mays.bloques.length === 2 && mays.bloques[1].clase === 'pelicula',
+     'y una cabecera en MAYÚSCULAS sin tiempo sigue abriendo su bloque',
+     'una cabecera en mayúsculas sin duración se tragó como guion');
+
   const cabMus = R.leerGuion('[CÁMARA 0:20] A\ntexto\nMÚSICA 0:30 Respiro\n> musica: sigue');
   ok(cabMus.bloques.length === 2 && cabMus.bloques[1].clase === 'musica',
      'y una cabecera de clase música DE VERDAD («MÚSICA 0:30 Respiro») sigue abriendo su bloque',

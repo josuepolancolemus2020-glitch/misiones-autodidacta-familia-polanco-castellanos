@@ -448,7 +448,10 @@ buena memoria de nadie.
    líneas entraba como **seis bloques vacíos con el texto convertido en
    títulos**: el guion no se perdía, se descuartizaba, que es peor porque
    parece que funcionó. La forma con corchetes es inequívoca y no necesita
-   nada; una pelada, sí.
+   nada; una pelada necesita corroborarse de una de tres maneras: su
+   **duración**, un **`##`** delante, o la palabra de clase **en
+   MAYÚSCULAS** —que es como se escribe una cabecera y como no se escribe
+   la prosa—.
 
    ⚠️ **Y las directivas se reconocen ANTES que las cabeceras.** Al revés,
    «Música: entra de fondo» —que es como se escribe sin acordarse del `>`—
