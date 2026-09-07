@@ -788,6 +788,54 @@ function nuevaBase(w, opciones){
      'la nota del orden se cuenta como una tarjeta: ' + titulos().join(','));
   f.style.height = altoMarco;
 
+  /* ═══ 12-bis. LAS TARJETAS Y LOS CAMPOS TIENEN FONDO ═══
+     El 7 de septiembre de 2026 salió a la luz que `.mvid-in`, `.mvid-card`
+     y `.mvid-chip-f` pintaban su fondo con `var(--card)` — y `--card` NO
+     EXISTE en esta aplicación: es un token del mundo de las misiones, que
+     tiene otra paleta y otras hojas. `var(--card)` sin respaldo se
+     resuelve a nada, y «nada» en un `background` es transparente: los
+     campos y las tarjetas salían sin fondo, con el gris de la página
+     detrás.
+
+     ⚠️ ES EL PEOR TIPO DE FALLO DE CSS: no da error, no rompe la página y
+     no lo caza ninguna sonda que mire el HTML, porque el HTML está bien.
+     Hay que mirar el color CALCULADO, que es lo que hace esto. Y se mira
+     aquí, con la vista abierta de verdad: con el panel escondido los
+     elementos no existen y la comprobación aprobaría sola. */
+  log('');
+  log('── 12-bis. Los campos y las tarjetas tienen fondo de verdad ──');
+  f.style.height = '1100px';
+  w.document.getElementById('app-container').style.display = '';
+  w.eval('switchView("view-mvid")');
+  await esperar(500);
+
+  const opaco = el => {
+    if (!el) return false;
+    const c = w.getComputedStyle(el).backgroundColor;
+    /* `transparent` y `rgba(…, 0)` son lo mismo para el ojo: se ve lo de
+       detrás. Cualquier alfa por debajo de 1 en un campo de texto es el
+       síntoma de una variable que no existe. */
+    const m = c.match(/^rgba?\(([^)]+)\)$/);
+    if (!m) return c !== 'transparent';
+    const p = m[1].split(',').map(x => parseFloat(x));
+    return p.length < 4 || p[3] > 0.99;
+  };
+
+  const campo   = g('mvid-buscar');
+  const tarjeta = lista.querySelector('.mvid-card');
+  const chip    = w.document.querySelector('#mvid-chips .mvid-chip-f');
+
+  ok(opaco(campo),
+     'el campo de buscar tiene fondo opaco (' + (campo ? w.getComputedStyle(campo).backgroundColor : 'no está') + ')',
+     'el campo de buscar es TRANSPARENTE: se ve el gris de la página por debajo. Suele ser una variable que no existe en esta aplicación (--card no está; se usa --surface)');
+  ok(opaco(tarjeta),
+     'y la tarjeta del video también (' + (tarjeta ? w.getComputedStyle(tarjeta).backgroundColor : 'no está') + ')',
+     'la tarjeta del video es TRANSPARENTE: mira si su background usa una variable que no existe aquí');
+  ok(!chip || opaco(chip),
+     'y el chip de materia también',
+     'el chip de materia es TRANSPARENTE: mira si su background usa una variable que no existe aquí');
+  f.style.height = altoMarco;
+
   /* ═══ 13. El service worker no puede servir el JS viejo ═══
      Esto no se ve desde el navegador —la sonda corre sin service
      worker—, así que se lee el archivo. Y hace falta: el 28 de agosto

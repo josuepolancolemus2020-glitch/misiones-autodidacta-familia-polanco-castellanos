@@ -932,6 +932,36 @@ En español, y explicando **por qué** está así, no qué hace la línea. Casi
 todo comentario de este proyecto nace de un problema real; contarlo evita
 que alguien lo «arregle» de vuelta al problema.
 
+## Dos paletas, y no se mezclan
+
+⚠️ **La aplicación y las misiones son dos mundos de CSS distintos**, y
+usar un token del otro no da ningún error: se resuelve a nada.
+
+| | La aplicación (`index.html`) | Las misiones |
+|---|---|---|
+| Hojas | `app.css` + `criba.css` + `rodaje.css` | la de la misión + `taller-neuro.css` + `recursos-enlaces.css` |
+| Tokens | `--brand`, `--surface`, `--bg`, `--border`, `--text`, `--muted`, `--faint`, `--accent` | `--pri`, `--sec`, `--card`, `--dark`, `--gray`… |
+| Tipografía | Outfit | Nunito / Fredoka |
+
+⚠️ **`--card` NO EXISTE en la aplicación.** El fondo blanco de una tarjeta
+o de un campo es **`--surface`**. Y el 7 de septiembre de 2026 se
+descubrió que tres reglas de Videos M.E.T.A.S —el campo de texto, la
+tarjeta del video y el chip de materia— llevaban `background: var(--card)`
+sin respaldo: se resolvían a nada, y «nada» en un `background` es
+**transparente**. Los campos y las tarjetas llevaban meses saliendo sin
+fondo, con el gris de la página detrás.
+
+Es el peor tipo de fallo de CSS y por eso está escrito aquí: **no da
+error, no rompe la página, y no lo caza ninguna sonda que mire el HTML,
+porque el HTML está bien.** Hay que mirar el color CALCULADO. La
+comprobación **12-bis** de `probe-videos-metas.html` lo hace ahora, con la
+vista abierta de verdad —con el panel escondido los elementos no existen y
+la comprobación aprobaría sola—.
+
+Si se copia una regla del mundo de las misiones, se le cambia el token al
+copiarla. Y si se quiere un respaldo, se escribe: `var(--card, #fff)`,
+como ya hacen las reglas de Asignaciones.
+
 ## Detalles del repositorio
 
 - Sin framework ni compilación: HTML, CSS y JS planos que se sirven tal

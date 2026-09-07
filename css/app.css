@@ -4421,7 +4421,16 @@ body {
   padding: 0.6rem 0.7rem;
   border: 1.5px solid var(--border);
   border-radius: 10px;
-  background: var(--card);
+  /* ⚠️ --surface, NO --card. En esta aplicación `--card` NO EXISTE: es un
+     token del mundo de las misiones, que tiene su propia paleta (--pri,
+     --sec, --card, --dark) y sus propias hojas. Aquí `var(--card)` sin
+     respaldo se resuelve a nada, y «nada» en un `background` es
+     transparente: el campo salía sin fondo, con el gris de la página
+     detrás, y solo se notaba al mirarlo dos veces.
+     Es el peor tipo de fallo de CSS porque no da error, no rompe la
+     página y no lo caza ninguna sonda que mire el HTML: hay que mirar el
+     color calculado. La de Videos M.E.T.A.S lo hace desde ahora. */
+  background: var(--surface);
   color: var(--text);
   font-size: 0.95rem;
   font-family: inherit;
@@ -4460,7 +4469,7 @@ textarea.mvid-in { min-height: 60px; resize: vertical; }
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
-  background: var(--card);
+  background: var(--surface);   /* --card no existe aquí; ver la nota de .mvid-in */
   border: 1.5px solid var(--border);
   border-radius: 12px;
   padding: 0.7rem;
@@ -4655,7 +4664,7 @@ textarea.mvid-in { min-height: 60px; resize: vertical; }
   padding: 0.3rem 0.65rem;
   border-radius: 999px;
   border: 1.5px solid var(--border);
-  background: var(--card);
+  background: var(--surface);   /* --card no existe aquí; ver la nota de .mvid-in */
   color: var(--muted);
   cursor: pointer;
   white-space: nowrap;
