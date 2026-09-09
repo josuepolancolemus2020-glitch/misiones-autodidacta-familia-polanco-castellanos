@@ -1,4 +1,4 @@
-const CACHE_NAME = 'faro-app-v91';
+const CACHE_NAME = 'faro-app-v92';
 
 /* ══════════════════════════════════════════════════════════════════
    ¿SE PUEDE GUARDAR ESTA RESPUESTA?
@@ -52,6 +52,31 @@ const STATIC_ASSETS = [
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
+/* ⚠️ LA LISTA DEL ARRANQUE SE SACA DE index.html, NO SE ESCRIBE AQUÍ.
+   Son 32 archivos y suben cada vez que se añade una herramienta. Una lista a
+   mano en este archivo estaría equivocada el día que alguien añada un
+   `<script>` y nadie lo notaría: la aplicación seguiría abriendo, solo que
+   otra vez lenta, que es justo el fallo que no se ve. Es la misma regla que
+   las materias de Videos M.E.T.A.S y las cuentas del Estudio Mayor.
+   Si el análisis falla se devuelve lo mínimo: entonces el primer arranque
+   tras una versión nueva va por la red, que es lo que pasaba siempre. */
+async function listaDelArranque() {
+  const lista = ['./index.html'];
+  try {
+    const resp = await fetch('./index.html', { cache: 'no-cache' });
+    if (!sePuedeGuardar(new Request('./index.html'), resp)) return lista;
+    const html = await resp.text();
+    const re = /(?:src|href)="([^"]+)"/g;
+    let m;
+    while ((m = re.exec(html)) !== null) {
+      const u = m[1];
+      if (!/^(js|css|img)\//.test(u)) continue;   // nada externo, nada de data: ni #
+      if (lista.indexOf('./' + u) === -1) lista.push('./' + u);
+    }
+  } catch (_) {}
+  return lista;
+}
+
 // Al instalar: pre-cachea imágenes, la librería de Supabase y los externos.
 // Uno por uno y comprobando lo que llega, en vez de cache.addAll: addAll no
 // mira el contenido, así que si la instalación ocurre con la sesión de la
@@ -60,15 +85,20 @@ const STATIC_ASSETS = [
 // nada: un externo caído dejaba la instalación entera sin hacer.
 self.addEventListener('install', event => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => Promise.all(
-      STATIC_ASSETS.map(url =>
-        fetch(url)
-          .then(resp => { if (sePuedeGuardar(new Request(url), resp)) return cache.put(url, resp); })
-          .catch(() => {})
-      )
-    ))
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    /* El arranque entero va aquí dentro. Cuesta unos dos megas UNA vez por
+       versión, y ocurre en segundo plano mientras la copia anterior sigue
+       sirviendo la aplicación al instante: nadie espera por esto. Lo que
+       compra es que el primer arranque después de publicar también sea
+       instantáneo, en vez de ser el lento de siempre. */
+    const urls = STATIC_ASSETS.concat(await listaDelArranque());
+    await Promise.all(urls.map(url =>
+      fetch(url, { cache: 'no-cache' })
+        .then(resp => { if (sePuedeGuardar(new Request(url), resp)) return cache.put(url, resp); })
+        .catch(() => {})
+    ));
+  })());
 });
 
 // Al activar: elimina cachés viejos y toma control inmediato
@@ -87,38 +117,59 @@ self.addEventListener('fetch', event => {
   const isImage = event.request.destination === 'image';
 
   if (isLocal && !isImage) {
-    // Archivos propios (HTML, CSS, JS): siempre va a la red primero.
-    // Se devuelve lo que llegue, pero solo se GUARDA lo que pase el filtro:
-    // así, si la puerta contesta con su pantalla de inicio de sesión, el
-    // usuario la ve y entra, pero esa pantalla no se queda guardada ocupando
-    // el sitio del archivo de verdad.
-    //
-    // ⚠️ Y REVALIDANDO CONTRA EL SERVIDOR (`cache: 'no-cache'` → ETag/304).
-    // Sin eso, «ir a la red primero» no basta: la petición la sigue
-    // atendiendo la CACHÉ HTTP DEL NAVEGADOR, que guarda hasta diez
-    // minutos, y el service worker ni se entera. El resultado es el peor
-    // de los posibles porque no parece un fallo de caché: llega el HTML
-    // NUEVO con el CSS y el JS VIEJOS, así que la pantalla enseña los
-    // huecos de lo nuevo y el código que los llena es el de antes.
-    //
-    // Pasó el 28 de agosto de 2026 con el filtro por materia de los
-    // videos: el rótulo MATERIA salía y debajo no había ni un chip,
-    // porque el HTML era del despliegue nuevo y `metas-videos.js` del
-    // anterior. Se delató por el texto del desplegable, que era el de la
-    // versión vieja.
-    //
-    // M.E.T.A.S ya tenía esta línea, con esta misma nota. Aquí faltaba.
-    event.respondWith(
-      fetch(event.request, { cache: 'no-cache' })
-        .then(response => {
-          if (sePuedeGuardar(event.request, response)) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
+    /* ⚠️ ARCHIVOS PROPIOS: PRIMERO LA COPIA GUARDADA, Y SIN TOCAR LA RED.
+       Hasta la v91 esto iba a la red primero y además revalidando
+       (`cache: 'no-cache'`), o sea que CADA UNO de los 32 archivos del
+       arranque esperaba un viaje completo al servidor antes de pintarse
+       nada. En una computadora no se nota; en el teléfono del autor, con
+       la señal de la casa, eran QUINCE SEGUNDOS de pantalla en blanco cada
+       vez que abría la aplicación. Una aplicación que tarda quince
+       segundos en abrir es una aplicación que no se abre para apuntar un
+       gasto de treinta lempiras.
+
+       ⚠️ Y ESTO NO DEVUELVE EL FALLO DEL 28 DE AGOSTO DE 2026, que es lo
+       primero que hay que comprobar antes de tocar este archivo. Aquel día
+       llegó el HTML NUEVO con el JavaScript VIEJO (el rótulo MATERIA salía
+       y debajo no había ni un chip) y la causa fue MEZCLAR DOS ORÍGENES: el
+       HTML venía de la red y el JavaScript de la caché HTTP del navegador.
+       Aquí no puede pasar, y por construcción: todo sale del MISMO caché,
+       y ese caché lleva la versión en el nombre (`CACHE_NAME`). Un
+       despliegue nuevo crea un caché nuevo, entero, y al activarse borra el
+       viejo de una vez. O se sirve toda la versión anterior o toda la
+       nueva; media versión no existe.
+
+       Y por eso aquí NO se revalida contra el servidor: escribir lo nuevo
+       dentro del caché de la versión vieja es exactamente cómo se fabrica
+       esa media versión. Lo nuevo entra por la puerta de `install`, que
+       llena su propio caché aparte.
+
+       La red solo se toca cuando el archivo NO está guardado: la primera
+       vez, o si el pre-cacheo no llegó a terminar. Y lo que llegue solo se
+       guarda si pasa el filtro de la puerta. */
+    event.respondWith((async () => {
+      /* Una notificación del chat abre `index.html?view=chat`. Sin
+         ignoreSearch eso no casa con el `index.html` guardado y el arranque
+         desde una notificación volvería a ser el lento. */
+      const guardada = await caches.match(event.request, { ignoreSearch: true });
+      if (guardada) return guardada;
+      try {
+        const response = await fetch(event.request);
+        if (sePuedeGuardar(event.request, response)) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      } catch (e) {
+        /* Sin red y sin copia. Una navegación cae en el index guardado
+           (que es la aplicación entera) antes que en la pantalla de
+           dinosaurio del navegador. */
+        if (event.request.mode === 'navigate') {
+          const index = await caches.match('./index.html');
+          if (index) return index;
+        }
+        throw e;
+      }
+    })());
   } else {
     // Imágenes y recursos externos: cache-first (no cambian frecuentemente)
     event.respondWith(

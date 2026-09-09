@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · El arranque de F.A.R.O</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{position:absolute;left:-9999px;width:380px;height:640px;border:0}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda del ARRANQUE.
+
+   Motivo, del 9 de septiembre de 2026: «cuando inicio la aplicación me queda
+   mucho tiempo esperando, como 15 segundos». Eran dos esperas apiladas, y
+   esta sonda vigila que ninguna de las dos vuelva:
+
+   A. LOS ARCHIVOS. Hasta la v91 el service worker iba a la RED PRIMERO para
+      cada archivo propio, y encima revalidando. Son 32 archivos: 32 viajes
+      completos al servidor antes de pintar nada. Ahora se sirven de la copia
+      guardada y la red no se toca.
+
+   B. LA PANTALLA. auth.js no enseñaba NADA —ni login ni aplicación— hasta
+      terminar dos consultas a la red. Ahora pinta con lo recordado en el
+      aparato y comprueba detrás.
+
+   ⚠️ Y LO QUE HAY QUE PROTEGER MIENTRAS SE ACELERA, que es lo caro:
+
+   · el fallo del 28 de agosto de 2026 (HTML nuevo con JavaScript viejo). Se
+     evita porque todo sale del MISMO caché y el caché lleva la versión en el
+     nombre: o toda la versión vieja o toda la nueva. Aquí se comprueba que
+     el que sirve NO escribe en el caché lo que baja de la red revalidando,
+     que es como se fabricaría media versión;
+   · el envenenamiento de Cloudflare Access: el filtro sigue puesto;
+   · y que pintar antes NO deja entrar a nadie: si la comprobación dice que
+     no, se cierra la sesión y se manda al login.
+
+   El worker no se puede instalar de verdad desde aquí, así que se ejecuta
+   su código con un `self`, un `caches` y un `fetch` de mentira, y se le
+   cuentan los viajes a la red. La pantalla sí es el index.html de verdad. */
+
+const out = document.getElementById('out');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── Un mundo de mentira donde correr sw.js ───────────────────────── */
+function mundo(src, opciones) {
+  const estado = { red: [], almacenes: {}, borrados: [], oyentes: {} };
+  const o = opciones || {};
+
+  function Respuesta(cuerpo, tipo, extra) {
+    return Object.assign({
+      ok: true, redirected: false, type: 'basic', _cuerpo: cuerpo,
+      headers: { get: () => tipo },
+      clone() { return Respuesta(cuerpo, tipo, extra); },
+      text: async () => cuerpo,
+    }, extra || {});
+  }
+
+  /* ⚠️ Las direcciones se normalizan, como hace el CacheStorage de verdad:
+     `cache.put('./js/app.js', …)` se guarda bajo la dirección completa. Sin
+     esto, la sonda comparaba «./js/app.js» con «https://…/js/app.js», no
+     casaban nunca, y suspendía diciendo que el worker iba a la red — un
+     fallo de la sonda que se lee exactamente igual que el fallo de verdad. */
+  const norm = u => new URL(String((u && u.url) || u), 'https://faro.local/').href;
+
+  const cacheFalso = nombre => {
+    const almacen = estado.almacenes[nombre] || (estado.almacenes[nombre] = {});
+    return {
+      put: async (req, resp) => { almacen[norm(req)] = resp; },
+      match: async (req) => almacen[norm(req)] || null,
+    };
+  };
+
+  const self_ = {
+    addEventListener: (t, fn) => { (estado.oyentes[t] = estado.oyentes[t] || []).push(fn); },
+    skipWaiting: () => { estado.skipWaiting = true; },
+    clients: { claim: () => Promise.resolve(), matchAll: async () => [] },
+    registration: { showNotification: () => {} },
+  };
+
+  const caches_ = {
+    open: async n => cacheFalso(n),
+    keys: async () => Object.keys(estado.almacenes),
+    delete: async n => { estado.borrados.push(n); delete estado.almacenes[n]; return true; },
+    match: async (req, opts) => {
+      const pedido = norm(req);
+      for (const nombre of Object.keys(estado.almacenes)) {
+        const almacen = estado.almacenes[nombre];
+        if (almacen[pedido]) return almacen[pedido];
+        if (opts && opts.ignoreSearch) {
+          const sinBusqueda = pedido.split('?')[0];
+          for (const k of Object.keys(almacen)) {
+            if (k.split('?')[0] === sinBusqueda) return almacen[k];
+          }
+        }
+      }
+      return null;
+    },
+  };
+
+  /* Cada viaje a la red queda apuntado: es lo que se cuenta. */
+  const fetch_ = async (req, init) => {
+    const url = String(req.url || req);
+    estado.red.push({ url, init: init || null });
+    if (o.sinRed) throw new Error('sin red');
+    if (/index\.html/.test(url)) {
+      return Respuesta(o.indexHtml || '', 'text/html');
+    }
+    if (o.puertaCaducada) {
+      // Cloudflare Access contestando su pantalla de acceso con código 200
+      return Respuesta('<html>acceso</html>', 'text/html');
+    }
+    return Respuesta('contenido', /\.css$/.test(url) ? 'text/css' : 'text/javascript');
+  };
+
+  const Request_ = function (url) { return { url: String(url), destination: '', mode: 'no-cors' }; };
+  const location_ = { origin: 'https://faro.local' };
+  const URL_ = URL;
+
+  new Function('self','caches','fetch','Request','location','URL','Response',
+    src)(self_, caches_, fetch_, Request_, location_, URL_, Respuesta);
+
+  estado.disparar = async (tipo, evento) => {
+    const fns = estado.oyentes[tipo] || [];
+    const esperas = [];
+    for (const fn of fns) {
+      fn(Object.assign({
+        waitUntil: p => esperas.push(p),
+        respondWith: p => { evento._respuesta = p; esperas.push(p); },
+      }, evento));
+    }
+    await Promise.all(esperas.map(p => Promise.resolve(p).catch(() => {})));
+    return evento._respuesta ? Promise.resolve(evento._respuesta).catch(e => e) : null;
+  };
+  return estado;
+}
+
+const peticion = (url, extra) => Object.assign({
+  url, destination: '', mode: 'no-cors',
+}, extra || {});
+
+window.addEventListener('load', async () => {
+try {
+  const src = await (await fetch('/sw.js')).text();
+  const indexReal = await (await fetch('/index.html')).text();
+
+  log('── 1. La lista del arranque sale del index, no escrita a mano ──');
+  const m = mundo(src, { indexHtml: indexReal });
+  await m.disparar('install', {});
+  const pedidos = m.red.map(r => r.url);
+  const propios = [...new Set((indexReal.match(/(?:src|href)="((?:js|css|img)\/[^"]+)"/g) || [])
+    .map(x => x.replace(/^.*?="/, '').replace(/"$/, '')))];
+  ok(propios.length >= 25, `index.html carga ${propios.length} archivos propios`, 'no se pudo leer la lista del index');
+  const faltan = propios.filter(f => !pedidos.some(p => p.indexOf(f) !== -1));
+  ok(faltan.length === 0,
+     `la instalación se los guarda TODOS (${propios.length}), sin lista escrita a mano`,
+     'la instalación se dejó fuera ' + faltan.length + ': ' + faltan.slice(0,4).join(', '));
+  ok(pedidos.some(p => /index\.html/.test(p)), 'y el propio index.html', 'no guarda el index: sin red no habría aplicación');
+  ok(!/STATIC_ASSETS\s*=\s*\[[^\]]*app\.css/.test(src),
+     'y la lista no está copiada dentro de sw.js, que se quedaría vieja',
+     'hay una lista de archivos escrita a mano en sw.js');
+
+  log('── 2. Servir NO toca la red: eso son los 15 segundos ──');
+  const m2 = mundo(src, { indexHtml: indexReal });
+  await m2.disparar('install', {});
+  const viajesTrasInstalar = m2.red.length;
+  const resp = await m2.disparar('fetch', { request: peticion('https://faro.local/js/app.js', { destination: 'script' }) });
+  ok(m2.red.length === viajesTrasInstalar,
+     'pedir js/app.js con copia guardada NO hace ni un viaje a la red',
+     '⚠️ sigue yendo a la red por cada archivo: vuelven los 15 segundos');
+  ok(resp && resp._cuerpo !== undefined, 'y aun así devuelve el archivo', 'no devolvió nada');
+
+  const m2b = mundo(src, { indexHtml: indexReal });
+  const r2b = await m2b.disparar('fetch', { request: peticion('https://faro.local/js/app.js', { destination: 'script' }) });
+  ok(m2b.red.length === 1, 'sin copia guardada sí va a la red (la primera vez)', 'no va a la red cuando no tiene copia');
+  ok(r2b && r2b._cuerpo !== undefined, 'y la devuelve', 'no devolvió el archivo de la red');
+
+  log('── 3. No vuelve el fallo del 28 de agosto: media versión no existe ──');
+  ok(!/fetch\(event\.request,\s*\{\s*cache:\s*'no-cache'\s*\}\)/.test(src),
+     'el que SIRVE ya no revalida: no puede meter lo nuevo en el caché de lo viejo',
+     '⚠️ revalida al servir: escribiría archivos nuevos dentro de la versión vieja');
+  ok(/cache:\s*'no-cache'/.test(src),
+     'y el que INSTALA sí revalida, que es donde toca traer lo nuevo',
+     'la instalación no revalida: podría llenarse de archivos viejos del navegador');
+  ok(/caches\.keys\(\)[\s\S]*?key !== CACHE_NAME[\s\S]*?caches\.delete/.test(src),
+     'al activar se borra el caché anterior entero, de una vez',
+     'no se borra el caché viejo: podrían convivir dos versiones');
+  const mVer = src.match(/CACHE_NAME = 'faro-app-v(\d+)'/);
+  ok(!!mVer && Number(mVer[1]) >= 92,
+     `el caché lleva la versión en el nombre (v${mVer ? mVer[1] : '?'}), que es lo que separa una versión de otra`,
+     'no subió CACHE_NAME: el caché nuevo no se distinguiría del viejo');
+
+  log('── 4. La puerta de Cloudflare sigue sin poder envenenar nada ──');
+  const m4 = mundo(src, { indexHtml: indexReal, puertaCaducada: true });
+  await m4.disparar('fetch', { request: peticion('https://faro.local/js/app.js', { destination: 'script' }) });
+  const guardado = Object.values(m4.almacenes).some(a =>
+    Object.keys(a).some(k => /app\.js/.test(k)));
+  await esperar(50);
+  ok(!guardado,
+     'la pantalla de acceso NO se guarda como si fuera js/app.js',
+     '⚠️ se guardaría la pantalla de la puerta: la aplicación queda envenenada');
+
+  log('── 5. Una notificación del chat también abre al instante ──');
+  const m5 = mundo(src, { indexHtml: indexReal });
+  await m5.disparar('install', {});
+  const antes5 = m5.red.length;
+  await m5.disparar('fetch', {
+    request: peticion('https://faro.local/index.html?view=chat', { mode: 'navigate', destination: 'document' }) });
+  ok(m5.red.length === antes5,
+     'index.html?view=chat casa con el index guardado (ignoreSearch)',
+     'la dirección con ?view=chat no casa: abrir desde una notificación vuelve a ser lento');
+
+  log('── 6. Sin red, la aplicación abre igual ──');
+  const m6 = mundo(src, { indexHtml: indexReal });
+  await m6.disparar('install', {});
+  m6.sinRed = true;
+  const m6b = mundo(src, { indexHtml: indexReal, sinRed: true });
+  const r6 = await m6b.disparar('fetch', {
+    request: peticion('https://faro.local/index.html', { mode: 'navigate', destination: 'document' }) });
+  ok(r6 instanceof Error || r6 === null || (r6 && r6._cuerpo !== undefined),
+     'sin copia y sin red, falla sin colgarse', 'se queda colgado');
+  const r6c = await m6.disparar('fetch', {
+    request: peticion('https://faro.local/index.html', { mode: 'navigate', destination: 'document' }) });
+  ok(r6c && r6c._cuerpo !== undefined, 'con copia guardada abre aunque no haya red', 'sin red no abre pese a tener copia');
+
+  /* ── La pantalla, con el index.html de verdad ── */
+  log('── 7. auth.js pinta antes de preguntar ──');
+  const authSrc = await (await fetch('/js/auth.js')).text();
+  ok(/const recordado = _miembroRecordado\(\);[\s\S]{0,200}aplicarSesion\(\);/.test(authSrc),
+     'auth.js pinta con lo recordado ANTES de preguntar a la red',
+     'auth.js sigue esperando a la red antes de enseñar nada');
+  ok(/_recordarMiembro\(m\)[\s\S]*?JSON\.stringify\(\{ user: m\.user \}\)/.test(authSrc),
+     'y de lo recordado se guarda solo el identificador, nunca el nombre',
+     'guarda el nombre: retocarlo a mano cambiaría lo que se lee en pantalla');
+
+  /* ⚠️ DOS ESCENARIOS, y hacen falta los dos.
+
+     La comprobación de auth.js es `getSession()` y luego una consulta a
+     `familia_miembros`. SIN sesión guardada, `getSession()` contesta que no
+     hay nadie en menos de un milisegundo: la aplicación se pinta y se va al
+     login tan seguido que desde fuera no se distingue de no haberla pintado.
+     Así que la VELOCIDAD se mide con una sesión guardada, donde la consulta
+     sí sale a la red —y aquí la red a Supabase está cerrada, que es
+     exactamente la mala señal que se quiere retratar—, y la SEGURIDAD se
+     mide sin ella, donde la respuesta llega enseguida y tiene que ser que
+     no. Con un solo escenario, una de las dos no se prueba. */
+  const REF = 'sb-bzrnjvalpwlcnpszvwim-auth-token';
+  const sesionFalsa = JSON.stringify({
+    access_token: 'x.y.z', token_type: 'bearer',
+    expires_in: 999999999, expires_at: 4102444800, refresh_token: 'r',
+    user: { id: '00000000-0000-0000-0000-000000000002', aud: 'authenticated', role: 'authenticated' },
+  });
+
+  async function abrir(conSesion) {
+    try {
+      localStorage.setItem('faro.miembro', JSON.stringify({ user: 'jael' }));
+      if (conSesion) localStorage.setItem(REF, sesionFalsa);
+      else localStorage.removeItem(REF);
+    } catch (_) {}
+    const f = document.createElement('iframe');
+    f.src = '/index.html';
+    document.body.appendChild(f);
+    const linea = [];
+    const t0 = Date.now();
+    const reloj = setInterval(() => {
+      try {
+        const d = f.contentWindow.document;
+        const app = d.getElementById('app-container');
+        const ent = d.getElementById('login-screen');
+        if (!app || !ent) return;
+        linea.push({
+          t: Date.now() - t0,
+          app: app.style.display !== 'none',
+          login: ent.style.display !== 'none' && ent.style.visibility !== 'hidden',
+        });
+      } catch (_) {}
+    }, 5);
+    await new Promise(r => f.addEventListener('load', r, { once: true }));
+    return { f, linea, parar: () => clearInterval(reloj) };
+  }
+
+  log('── 7-bis. Y se ve, con el index.html de verdad ──');
+  const A = await abrir(true);
+  await esperar(1200);
+  A.parar();
+  const visto = A.linea.filter(x => x.app);
+  ok(visto.length > 0,
+     'con un miembro recordado la aplicación se pinta, aunque la consulta a la red no conteste',
+     'la aplicación no se pintó: sigue habiendo pantalla en blanco esperando a la red');
+  ok(visto.length > 0 && visto[0].t < 400,
+     `y se pinta enseguida (a los ${visto.length ? visto[0].t : '?'} ms de cargar), no cuando conteste el servidor`,
+     'tardó en pintarse: la espera sigue ahí');
+  const ultimo = A.linea[A.linea.length - 1];
+  ok(ultimo && ultimo.app,
+     'y se queda puesta mientras la comprobación va por detrás',
+     'la pantalla se fue mientras la comprobación seguía en marcha');
+  A.f.remove();
+
+  log('── 8. Pero pintar antes NO deja entrar a nadie ──');
+  /* Sin sesión de Supabase, la comprobación dice que no. Si esto fallara, el
+     recuerdo del aparato sería una llave, y no lo es: los datos los sigue
+     guardando la seguridad por fila, pero la pantalla tampoco puede quedarse
+     puesta como si nada. */
+  const B = await abrir(false);
+  await esperar(1500);
+  B.parar();
+  const acabaEnLogin = B.linea.length && B.linea[B.linea.length - 1].login;
+  ok(!!acabaEnLogin,
+     'sin sesión buena, la comprobación devuelve la pantalla de entrada',
+     '\u26a0\ufe0f se quedó dentro con solo el recuerdo del aparato: eso sería una llave falsa');
+  let recuerdo = null;
+  try { recuerdo = localStorage.getItem('faro.miembro'); } catch (_) {}
+  ok(!recuerdo, 'y el recuerdo se borra al no valer', 'el recuerdo sobrevive a una comprobación fallida');
+  B.f.remove();
+  try { localStorage.removeItem('faro.miembro'); localStorage.removeItem(REF); } catch (_) {}
+
+  log('── 9. Una versión nueva se estrena, pero no en las manos de nadie ──');
+  const idx = await (await fetch('/index.html')).text();
+  ok(/controllerchange/.test(idx), 'la página escucha el relevo del worker', 'nadie escucha: la versión nueva no se estrenaría hasta vaya a saber cuándo');
+  ok(/_swYaControlada/.test(idx) && /Date\.now\(\) - _swArranque > 10000/.test(idx),
+     'y solo recarga si acaba de abrir: a media escritura, no',
+     'recargaría la pantalla encima de alguien que está escribiendo');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'APRUEBA · arranque' : 'SUSPENDE · arranque';
+} catch (e) {
+  log('✘ la sonda reventó: ' + (e && e.stack || e));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SUSPENDE · arranque';
+}
+});
+</script>
+</body>
+</html>

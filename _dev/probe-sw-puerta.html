@@ -81,8 +81,22 @@ window.addEventListener('load', async () => {
     ok(!sePuedeGuardar(pet('script'), resp({ tipo: 'text/html' })),
        'supabase.min.js no se puede sustituir por una pantalla de acceso',
        'la librería se podría envenenar y entonces no entra nadie');
-    ok(/STATIC_ASSETS\.map/.test(src) && /sePuedeGuardar\(new Request\(url\), resp\)/.test(src),
-       'el pre-cacheo de la instalación también filtra', 'la instalación guarda sin mirar');
+    /* ⚠️ NINGÚN `cache.put` SIN HABER MIRADO ANTES, y se comprueba uno por
+       uno en vez de buscar un trozo de código concreto. La versión anterior
+       de esta línea exigía ver «STATIC_ASSETS.map», que era CÓMO estaba
+       escrita la instalación aquel día; el 9 de septiembre de 2026 esa
+       instalación pasó a sacar su lista del index y la sonda suspendió sin
+       que el filtro se hubiera tocado. Una sonda pegada a la forma del
+       código avisa de los cambios, no de las averías, y la que avisa de
+       todo acaba ignorada. Lo que hay que sostener es esto: que no se
+       guarde nada sin pasar por sePuedeGuardar. */
+    const puts = [];
+    let iPut = src.indexOf('cache.put(');
+    while (iPut !== -1) { puts.push(iPut); iPut = src.indexOf('cache.put(', iPut + 1); }
+    const sinMirar = puts.filter(i => src.lastIndexOf('sePuedeGuardar(', i) < i - 400);
+    ok(puts.length >= 2 && sinMirar.length === 0,
+       'los ' + puts.length + ' sitios donde se guarda pasan antes por el filtro',
+       sinMirar.length + ' de ' + puts.length + ' guardan sin mirar lo que llega');
 
     log('\n── NORMAS ──');
     /* El guion largo por su punto de código, no literal, para que este archivo

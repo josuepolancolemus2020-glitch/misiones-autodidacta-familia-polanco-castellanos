@@ -60,6 +60,27 @@ const MIEMBROS = {
 
 const AUTH_KEY = 'faro_session';   /* solo para borrar el rastro del login viejo */
 
+/* Quién entró la última vez EN ESTE APARATO. Existe solo para poder pintar la
+   aplicación al instante mientras se comprueba de verdad; ver la nota grande
+   de `restaurar()`. Guarda el identificador, nunca el nombre: el nombre se
+   vuelve a sacar de MIEMBROS, así que retocar esto a mano no sirve ni para
+   ponerse otro nombre en la pantalla. */
+const AUTH_MIEMBRO_KEY = 'faro.miembro';
+
+function _recordarMiembro(m) {
+  try {
+    if (m && m.user) localStorage.setItem(AUTH_MIEMBRO_KEY, JSON.stringify({ user: m.user }));
+    else localStorage.removeItem(AUTH_MIEMBRO_KEY);
+  } catch (_) {}
+}
+function _miembroRecordado() {
+  try {
+    const m = JSON.parse(localStorage.getItem(AUTH_MIEMBRO_KEY) || 'null');
+    if (m && m.user && MIEMBROS[m.user]) return { user: m.user, nombre: MIEMBROS[m.user].nombre };
+  } catch (_) {}
+  return null;
+}
+
 /* ── El cliente ─────────────────────────────────────────────────────
    Mismo proyecto y misma clave publicable que ya usa el chat. Una clave
    publicable en el navegador es correcta: lo que la vuelve segura es la
@@ -138,11 +159,13 @@ async function iniciarSesion(correo, contrasena) {
   /* Autenticado pero sin fila en familia_miembros: no es de la casa. Se le
      cierra la sesión en el acto, para no dejar un token vivo dando vueltas. */
   if (!_sesionActual) { try { await _authSb.auth.signOut(); } catch (_) {} }
+  _recordarMiembro(_sesionActual);
   return !!_sesionActual;
 }
 
 async function cerrarSesion() {
   _sesionActual = null;
+  _recordarMiembro(null);
   try { localStorage.removeItem(AUTH_KEY); } catch (_) {}
   if (_authSb) { try { await _authSb.auth.signOut(); } catch (_) {} }
 }
@@ -196,25 +219,75 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof renderHome === 'function') renderHome();
     /* Gancho blando, como el de arriba: si alguien dejó fijado el Apunte
        rápido, la aplicación abre ahí. Si finanzas.js no estuviera cargado,
-       F.A.R.O arranca igual que siempre. */
-    if (typeof faroArranqueApunteFijo === 'function') faroArranqueApunteFijo();
+       F.A.R.O arranca igual que siempre.
+
+       ⚠️ Y VA APLAZADO UN TURNO, no llamado aquí mismo. Este archivo es el
+       PRIMERO de los `<script>`, así que su `DOMContentLoaded` corre ANTES
+       que el de finanzas.js y el de app.js. Desde que la aplicación se pinta
+       con lo recordado (sin esperar a la red), esta línea puede alcanzar a
+       finanzas.js antes de que enganche los botones de la hoja: saldría
+       abierta y con los chips muertos. Un `setTimeout` de cero espera a que
+       terminen todos los arranques. No cuesta nada visible y no rompe la
+       regla del foco: en un arranque no hay ningún toque del que colgarse,
+       así que el teclado no iba a salir de todos modos. */
+    if (typeof faroArranqueApunteFijo === 'function') setTimeout(faroArranqueApunteFijo, 0);
   }
 
-  /* ── Restaurar la sesión guardada, si la hay ── */
+  /* ── Restaurar la sesión guardada, si la hay ──────────────────────────
+     ⚠️ SE PINTA CON LO RECORDADO Y SE COMPRUEBA DETRÁS, no al revés.
+
+     Antes esto no enseñaba NADA (ni el login, ni la aplicación) hasta que
+     terminaban dos viajes a la red: renovar el token y preguntarle a
+     `familia_miembros` quién es el que entró. Con la señal del teléfono del
+     autor eso era una pantalla en blanco de varios segundos, encima de los
+     que ya costaba cargar los archivos. Y una pantalla en blanco no se lee
+     como «cargando»: se lee como «se rompió», y la gente vuelve a tocar el
+     icono, que es peor.
+
+     ⚠️ Y ESTO NO ABRE NINGUNA PUERTA, que es lo que parece a primera vista.
+     Lo recordado solo decide QUÉ SE DIBUJA mientras se comprueba; no da
+     acceso a ni un dato. Quien manda sobre los datos es la seguridad por
+     fila de la base, que mira el token de verdad en cada consulta: sin
+     sesión buena, las tablas devuelven vacío aunque la pantalla esté
+     pintada. Por eso se puede adelantar el dibujo sin adelantar el permiso.
+     Y si la comprobación dice que no (el token caducó, o esa persona ya no
+     tiene fila en `familia_miembros`), se cierra la sesión y se manda al
+     login, que es lo que pasaba antes, solo que unos segundos después. */
   (async function restaurar() {
     if (!_authSb) {
       error('No se pudo cargar el servicio de acceso. Revisa la conexión.');
       mostrarLogin();
       return;
     }
+
+    const recordado = _miembroRecordado();
+    if (recordado) {
+      _sesionActual = recordado;
+      aplicarSesion();
+    }
+
+    let real = null;
     try {
       const { data } = await _authSb.auth.getSession();
-      _sesionActual = await _quienEs(data && data.session);
+      real = await _quienEs(data && data.session);
     } catch (_) {
-      _sesionActual = null;
+      real = null;
     }
-    if (_sesionActual) aplicarSesion();
-    else mostrarLogin();
+
+    if (real) {
+      const cambio = !recordado || recordado.user !== real.user;
+      _sesionActual = real;
+      _recordarMiembro(real);
+      /* Solo se vuelve a pintar si resultó ser OTRO: repintar por repintar
+         le movería la pantalla debajo del dedo a quien ya está tocando. */
+      if (cambio) aplicarSesion();
+      return;
+    }
+
+    _sesionActual = null;
+    _recordarMiembro(null);
+    if (recordado) { try { await _authSb.auth.signOut(); } catch (_) {} }
+    mostrarLogin();
   })();
 
   /* Si el token caduca o alguien cierra sesión en otra pestaña, se vuelve al

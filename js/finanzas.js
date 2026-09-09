@@ -1233,8 +1233,8 @@ function _finUpdateContextoUI() {
    APUNTE RÁPIDO
    La hoja con la que se anotan los gastos e ingresos del día. Las reglas
    están en CLAUDE.md; en corto: se pide solo lo que no se puede adivinar
-   (el monto y la categoría), lo demás viene puesto —la cuenta de la última
-   vez, el día de hoy—, y guardar deja la hoja abierta para el siguiente.
+   (el monto y la categoría), lo demás viene puesto: la cuenta de la última
+   vez y el día de hoy. Guardar deja la hoja abierta para el siguiente.
    Editar un movimiento es esta misma hoja con todo puesto.
 ───────────────────────────────────────────── */
 
@@ -1941,7 +1941,7 @@ function _finQEnganchar() {
 
   /* ⚠️ VOLVER AL TELÉFONO ES LO QUE DE VERDAD SE PIDIÓ. Apagar la pantalla
      no cierra nada, pero el teléfono deja la página en segundo plano y al
-     encenderla vuelve tal como estaba — o sea, con la hoja cerrada si se
+     encenderla vuelve tal como estaba: con la hoja cerrada si se
      cerró. `visibilitychange` es el único aviso que da el navegador de que
      alguien volvió a mirar, y sirve igual para la pantalla apagada, para
      cambiar de aplicación y para volver de la cámara.

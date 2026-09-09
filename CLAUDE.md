@@ -1171,6 +1171,113 @@ Dos cosas que parecen detalle y no lo son:
    La misión anuncia «3 hojas», «4 hojas»: si alguien parte una hoja y no
    toca el rótulo, la misión miente, y la sonda lo caza.
 
+## La aplicación abre al instante, y eso son DOS esperas distintas
+
+**Pedido por el autor el 9 de septiembre de 2026:** «cuando inicio la
+aplicación me queda mucho tiempo esperando, como 15 segundos, debes dejarla
+que abra al instante». Eran dos esperas apiladas, y quien toque el arranque
+tiene que saber que son dos, porque arreglar una sola deja la mitad del
+problema con la misma pinta.
+
+**La primera espera: los archivos.** `index.html` carga **32 archivos
+propios** (dos megas), y hasta la v91 `sw.js` iba a la **red primero** para
+cada uno, y encima revalidando (`cache: 'no-cache'`). Son 32 viajes completos
+al servidor antes de pintar nada. En una computadora no se nota; con la señal
+de un teléfono son los quince segundos.
+
+Ahora los archivos propios se sirven **de la copia guardada, sin tocar la
+red**. La red solo se toca cuando el archivo no está guardado.
+
+⚠️ **Y esto NO devuelve el fallo del 28 de agosto de 2026** (HTML nuevo con
+JavaScript viejo), que es lo primero que hay que comprobar antes de tocar
+`sw.js`. Aquel fallo salió de **mezclar dos orígenes**: el HTML venía de la
+red y el JavaScript de la caché HTTP del navegador. Aquí no puede pasar por
+construcción: todo sale del **mismo caché**, y el caché lleva la versión en
+el nombre (`CACHE_NAME`). Un despliegue nuevo crea un caché nuevo entero y al
+activarse borra el viejo de una vez: **o toda la versión anterior o toda la
+nueva, media versión no existe**.
+
+De ahí se siguen tres reglas que no se negocian:
+
+1. ⚠️ **El que SIRVE no revalida.** Escribir lo nuevo dentro del caché de la
+   versión vieja es exactamente cómo se fabrica esa media versión. Lo nuevo
+   entra por `install`, que llena su propio caché aparte, y ahí sí se
+   revalida.
+2. **La lista del arranque sale de `index.html`, no escrita en `sw.js`.** La
+   instalación se trae el HTML, saca de él los `src` y `href` propios y los
+   guarda. Una lista a mano estaría equivocada el día que alguien añada un
+   `<script>`, y el síntoma sería que la aplicación vuelve a abrir lenta, que
+   es justo el fallo que no se ve. Misma regla que las materias de Videos
+   M.E.T.A.S.
+3. **Se pre-cachea todo el arranque al instalar**, en segundo plano y
+   mientras la copia anterior sigue sirviendo al instante. Así el primer
+   arranque después de publicar también es instantáneo, en vez de ser el
+   lento de siempre.
+
+**Y cómo llega entonces una versión nueva**, que es lo que se paga por servir
+de la copia guardada: el navegador comprueba `sw.js` al abrir; si cambió, el
+worker nuevo se instala, llena su caché, se activa, borra el viejo y toma el
+mando. La página que ya está corriendo lleva los archivos de antes, así que
+`index.html` escucha `controllerchange` y **recarga una vez, solo si la
+aplicación acaba de abrir** (menos de diez segundos). Pasado ese rato ya hay
+alguien trabajando y recargarle la pantalla encima le borraría el monto a
+medio escribir: esa versión la estrenará en el siguiente arranque. Publicar
+no vale una pantalla que se recarga sola en las manos de alguien.
+
+**La segunda espera: la pantalla.** `js/auth.js` no enseñaba **nada** (ni el
+login ni la aplicación) hasta terminar dos viajes a la red: renovar el token
+y preguntarle a `familia_miembros` quién entró. Con mala señal eso es una
+pantalla en blanco de varios segundos, y una pantalla en blanco no se lee
+como «cargando»: se lee como «se rompió», y la gente vuelve a tocar el icono.
+
+Ahora **se pinta con lo recordado en el aparato y se comprueba por detrás**
+(`AUTH_MIEMBRO_KEY`).
+
+⚠️ **Y esto NO abre ninguna puerta**, que es lo que parece a primera vista y
+por eso está escrito aquí. Lo recordado decide **qué se dibuja** mientras se
+comprueba; no da acceso a ni un dato. Quien manda sobre los datos es la
+**seguridad por fila**, que mira el token de verdad en cada consulta: sin
+sesión buena las tablas devuelven vacío aunque la pantalla esté pintada. Por
+eso se puede adelantar el dibujo sin adelantar el permiso. Y si la
+comprobación dice que no, se cierra la sesión, se borra el recuerdo y se
+manda al login. Del recuerdo se guarda **solo el identificador**, nunca el
+nombre: el nombre se vuelve a sacar de `MIEMBROS`, así que retocar esa llave
+a mano no sirve ni para ponerse otro nombre en la pantalla.
+
+⚠️ **Y lo que dependa de otros módulos va aplazado un turno.** `auth.js` es
+el PRIMERO de los `<script>`, así que su `DOMContentLoaded` corre antes que
+el de `finanzas.js` y el de `app.js`. Desde que la aplicación se pinta sin
+esperar a la red, `faroArranqueApunteFijo()` puede alcanzar a `finanzas.js`
+antes de que enganche los botones: la hoja saldría abierta y con los chips
+muertos. Va con un `setTimeout` de cero, y no rompe la regla del foco porque
+en un arranque no hay ningún toque del que colgarse.
+
+**Antes de publicar un cambio del arranque:**
+
+```
+node _dev/servidor-estatico.js      (en otra terminal)
+_dev/probe-sw-arranque.html         (en el navegador)
+_dev/probe-sw-puerta.html           (el filtro de la puerta)
+```
+
+`probe-sw-arranque` corre el código de `sw.js` con un `caches` y un `fetch`
+de mentira y **le cuenta los viajes a la red**: si servir un archivo guardado
+vuelve a tocar la red, suspende. Y abre el `index.html` de verdad con un
+miembro recordado para medir en milisegundos cuándo se pinta.
+
+⚠️ Ese caché de mentira **normaliza las direcciones** como el `CacheStorage`
+de verdad (`cache.put('./js/app.js', …)` se guarda bajo la dirección
+completa). Sin eso comparaba «./js/app.js» con «https://…/js/app.js», no
+casaban nunca, y la sonda suspendía diciendo que el worker iba a la red: un
+fallo de la sonda que se lee exactamente igual que el fallo de verdad.
+
+⚠️ Y las sondas **no se pegan a la forma del código**. La de la puerta exigía
+ver `STATIC_ASSETS.map`, que era cómo estaba escrita la instalación aquel
+día; al cambiarla suspendió sin que el filtro se hubiera tocado. Ahora busca
+**cada `cache.put` y comprueba que tiene su `sePuedeGuardar` delante**, que es
+lo que de verdad hay que sostener. Una sonda pegada a la forma avisa de los
+cambios, no de las averías, y la que avisa de todo acaba ignorada.
+
 ## Sellar la versión en cada cambio
 
 El aparato guarda la aplicación en caché y se queda con la versión vieja.

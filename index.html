@@ -2582,6 +2582,30 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(() => {});
       });
+
+      /* ⚠️ CÓMO LLEGA UNA VERSIÓN NUEVA, ahora que los archivos se sirven de
+         la copia guardada. El navegador comprueba `sw.js` al abrir; si cambió,
+         el worker nuevo se instala, llena SU caché aparte, se activa, borra el
+         viejo y toma el mando. Pero esta página ya está corriendo con los
+         archivos de antes: hace falta recargar una vez para estrenarla.
+
+         Y se recarga SOLO SI ACABA DE ABRIR (menos de diez segundos). Pasado
+         ese rato ya hay alguien trabajando, y recargarle la pantalla encima
+         le borraría el monto a medio escribir para darle una versión que
+         igual va a tener en el siguiente arranque. Publicar no vale una
+         pantalla que se recarga sola en las manos de alguien.
+
+         La primera vez que se instala no se recarga: no había versión previa
+         que estrenar, y sería un parpadeo gratis al estrenar la aplicación. */
+      const _swArranque = Date.now();
+      const _swYaControlada = !!navigator.serviceWorker.controller;
+      let _swRecargando = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!_swYaControlada || _swRecargando) return;
+        if (Date.now() - _swArranque > 10000) return;
+        _swRecargando = true;
+        location.reload();
+      });
     }
   </script>
 
