@@ -1022,6 +1022,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof finGoFamilia === 'function') finGoFamilia();
       return;
     }
+    // «Apuntar gasto»: Finanzas con la hoja del Apunte rápido ya abierta.
+    if (btn.dataset.qa === 'apunte') {
+      if (typeof finGoApunte === 'function') finGoApunte();
+      return;
+    }
     switchView(btn.dataset.qa);
   });
 

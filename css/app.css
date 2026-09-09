@@ -2670,6 +2670,130 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 4px 12px rgba(71,85,105,.25);
 }
 
+/* ====== FINANZAS: APUNTE RÁPIDO ======
+   La hoja con la que se anotan los gastos del día. Las reglas están en
+   CLAUDE.md; aquí solo lo que es de pantalla. Todo con tokens de la
+   aplicación (--surface, --bg, --border): aquí NO existe --card. */
+.finq-modal { padding-top: 14px; }
+.finq-head { margin-bottom: 8px; }
+.finq-tipo {
+  display: flex; gap: 4px; flex: 1; max-width: 250px;
+  background: var(--bg); border-radius: 12px; padding: 4px;
+}
+.finq-tipo-btn {
+  flex: 1; min-height: 38px; background: none; border: none; border-radius: 9px;
+  cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 700;
+  color: var(--muted); transition: all .15s;
+}
+.finq-tipo-activo { background: var(--surface); color: #dc2626; box-shadow: var(--shadow); }
+.finq-modal[data-tipo="ingreso"] .finq-tipo-activo { color: #16a34a; }
+.finq-form { display: flex; flex-direction: column; }
+.finq-modo { font-size: 12px; font-weight: 700; color: var(--fin); margin: 0 0 8px; }
+.finq-modo[hidden] { display: none; }
+
+/* El monto: grande, arriba y con el teclado numérico (inputmode=decimal).
+   Sin caja: la raya de abajo basta y deja sitio a la cifra. */
+.finq-monto-wrap {
+  display: flex; align-items: baseline; gap: 8px;
+  border-bottom: 2px solid var(--border); padding: 4px 4px 2px; margin-bottom: 6px;
+  transition: border-color .15s; cursor: text;
+}
+.finq-monto-wrap:focus-within { border-color: var(--brand-light); }
+.finq-moneda { font-size: 20px; font-weight: 800; color: var(--muted); }
+.finq-monto {
+  flex: 1; min-width: 0; min-height: 48px; width: 100%;
+  background: none; border: none; outline: none;
+  font-family: inherit; font-size: 36px; font-weight: 900; color: var(--text);
+  letter-spacing: -.5px;
+}
+.finq-monto::placeholder { color: var(--faint); font-weight: 700; }
+.finq-eco { font-size: 12px; font-weight: 600; color: var(--muted); min-height: 16px; margin-bottom: 8px; }
+.finq-eco-mal { color: #dc2626; }
+.finq-desc { min-height: 44px; }
+
+.finq-label {
+  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+  color: var(--muted); margin: 12px 0 6px;
+}
+.finq-label-hint { text-transform: none; letter-spacing: 0; font-weight: 600; color: #16a34a; }
+
+/* Chips: un toque cada uno. 36 px de alto como mínimo, que es lo que
+   alcanza un dedo; envueltos, porque las más usadas van primero y con el
+   teclado puesto se ve al menos la primera fila. */
+.finq-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.finq-chip {
+  min-height: 36px; padding: 6px 12px; border-radius: 18px;
+  border: 1.5px solid var(--border); background: var(--bg);
+  font-family: inherit; font-size: 13px; font-weight: 600; color: var(--text);
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.finq-chip:active { transform: scale(.95); }
+.finq-chip-activo { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }
+.finq-chips-falta { animation: finqFalta .4s ease 2; }
+@keyframes finqFalta {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-4px); }
+  75%      { transform: translateX(4px); }
+}
+.finq-fila[hidden] { display: none; }
+.finq-fecha { margin-top: 8px; min-height: 44px; }
+.finq-fecha[hidden] { display: none; }
+.finq-sin-cuenta { font-size: 12px; color: var(--muted); flex-basis: 100%; line-height: 1.4; }
+.finq-aviso { font-size: 12px; font-weight: 700; color: #dc2626; margin: 10px 0 0; }
+.finq-aviso[hidden] { display: none; }
+.finq-guardar { margin-top: 14px; min-height: 48px; }
+.finq-modal[data-tipo="ingreso"] .finq-guardar { background: linear-gradient(135deg, #15803d, #16a34a); }
+
+/* Lo apuntado del día, en la misma hoja */
+.finq-hoy { margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px; }
+.finq-hoy[hidden] { display: none; }
+.finq-hoy-cab {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  font-size: 12px; font-weight: 800; color: var(--text); margin-bottom: 4px;
+}
+.finq-hoy-total { color: var(--muted); font-weight: 700; white-space: nowrap; font-size: 11px; }
+.finq-hoy-lista { display: flex; flex-direction: column; }
+.finq-hoy-fila {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--border);
+}
+.finq-hoy-fila:last-child { border-bottom: none; }
+.finq-hoy-desc { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.finq-hoy-monto { font-weight: 800; white-space: nowrap; }
+.finq-hoy-monto.fin-mov-out { color: #dc2626; }
+.finq-hoy-monto.fin-mov-in  { color: #16a34a; }
+.finq-deshacer {
+  background: var(--bg); border: none; border-radius: 8px;
+  min-height: 32px; padding: 4px 10px; flex-shrink: 0;
+  font-family: inherit; font-size: 12px; font-weight: 700; color: var(--brand); cursor: pointer;
+}
+.finq-vacio { font-size: 12px; color: var(--muted); padding: 4px 0; }
+
+/* Lo que no es diario, al pie y a un toque */
+.finq-mas {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+  margin-top: 14px; font-size: 12px; font-weight: 600; color: var(--muted);
+}
+.finq-mas[hidden] { display: none; }
+.finq-mas-btn {
+  background: none; border: none; padding: 6px 0; min-height: 32px;
+  font-family: inherit; font-size: 12px; font-weight: 700; color: var(--brand); cursor: pointer;
+}
+
+/* La lista del panel, por día, con la suma de cada uno */
+.fin-dia-cab { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 10px 2px 0; }
+.fin-dia-cab:first-child { margin-top: 0; }
+.fin-dia-nombre { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+.fin-dia-total { display: flex; gap: 8px; font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.fin-dia-total .fin-mov-out { color: #dc2626; }
+.fin-dia-total .fin-mov-in  { color: #16a34a; }
+
+/* Lo de hoy en la tarjeta de gastos del mes */
+.fin-card-hoy { font-size: 11px; font-weight: 700; opacity: .9; margin-bottom: 2px; min-height: 13px; }
+
+/* Acceso Rápido: apuntar gasto, en el rojo de los gastos */
+.qa-apunte { background: linear-gradient(135deg, #dc2626, #f87171); }
+
 /* ====== FIX: tembladera al llegar al final del scroll ======
    Al terminar el scroll interno, el gesto se encadenaba al documento y el
    navegador movia su barra / hacia el rebote elastico, sacudiendo el header.

@@ -346,6 +346,95 @@ createdb videostest
 psql -v ON_ERROR_STOP=1 -d videostest -f _dev/prueba-videos-sql.sql
 ```
 
+## Normativa: los gastos del día se apuntan desde el Apunte rápido
+
+**Pedido por el autor el 9 de septiembre de 2026**: «que no se dé tantas
+vueltas para tomar nota de los egresos e ingresos diarios… que se pueda
+anotar los gastos por día, pero que el usuario no tenga tanta carga
+cognitiva para hacerlo».
+
+Antes, apuntar un gasto era: el «+», un modal con cuatro pestañas, un
+desplegable para el tipo, otro para la categoría, otro para la cuenta, la
+fecha, la descripción y «Guardar», que además cerraba el modal: el segundo
+gasto del día volvía a empezar de cero. Seis campos para decir «pan, 30».
+
+Ahora el «+» abre **el Apunte rápido** (`finAbrirApunte`, en
+`js/finanzas.js`, hoja `#fin-q-overlay` en `index.html`): el monto arriba
+con el teclado numérico ya puesto, la categoría de un toque, y la cuenta y
+el día ya puestos. Guardar deja la hoja abierta para el siguiente. Desde la
+portada, el Acceso Rápido «Apuntar gasto» llega ahí de un toque.
+
+**Diez reglas, y ninguna es de adorno:**
+
+1. ⚠️ **Lo que se sabe seguro se pide primero, y lo que se puede adivinar
+   no se pide.** El monto es lo único que hay que escribir. La cuenta se
+   recuerda de la última vez (`localStorage`, por contexto), el día es hoy
+   y la descripción es opcional. Cada campo que se pide es una decisión, y
+   una decisión por gasto son treinta al mes.
+2. ⚠️ **La categoría es UN toque y NO se adivina.** Chips con emoji,
+   ordenados por lo que más se usa —salen del historial (`_finHistCache`),
+   no de una lista fija—. No viene ninguna marcada y **después de guardar
+   se limpia**: una categoría que se queda puesta es un gasto mal archivado
+   sin ningún error, y eso no lo descubre nadie hasta que las estadísticas
+   mienten. Solo se marca sola cuando la descripción coincide con una de
+   antes («pan» → 🍚 Alimentación, y se trae también su cuenta), y la
+   pantalla lo dice («como la última vez»); si se sigue escribiendo y deja
+   de coincidir («pantalón»), se desmarca. Una tocada a mano no se la pisa
+   ninguna sugerencia.
+3. ⚠️ **El monto escrito se devuelve entendido.** El campo acepta lo que
+   sale de un teclado de tableta —«12,50», «1,234», «20+35+12» para la
+   lista del mercado— y el botón lleva la cifra («Guardar gasto · L.
+   67.00»); con coma o suma, debajo se dice cómo se leyó. «1,234» son mil
+   doscientos treinta y cuatro (tres cifras justas tras la coma), no uno
+   con veintitrés. Es la regla de la duración de El Rodaje: adivinar
+   acierta la mitad de las veces y falla en silencio; enseñar acierta
+   siempre.
+4. ⚠️ **El foco va DENTRO del mismo toque que abre la hoja**, sin ningún
+   `await` delante: es lo que hace que en una tableta salga el teclado
+   solo. Lo que llega después (cuentas, historial) se repinta cuando llega,
+   sin tocar el monto ni el foco.
+5. **Guardar NO cierra la hoja.** Se limpian el monto, la descripción y la
+   categoría; se quedan el tipo, el día y la cuenta; y el teclado sigue en
+   el monto. Los gastos se apuntan en tanda, al final del día, y volver a
+   abrir por cada uno es exactamente la vuelta que el autor pidió quitar.
+6. **Lo apuntado del día se ve en la misma hoja, con su suma**, y el último
+   de la sesión tiene «↶ Deshacer». Se ve lo que ya está sin salir, y un
+   error se quita al momento en vez de buscarlo después en el historial.
+7. **El día es un chip: Hoy · Ayer · 📅 Otro día.** Casi todo se apunta hoy
+   o se apunta ayer lo de anoche; un selector de fecha para eso es abrir un
+   calendario treinta veces al mes. El día elegido se queda mientras la
+   hoja esté abierta, para apuntar de una vez todo lo de ayer.
+8. **Con una sola cuenta, la cuenta no se pregunta.** Se usa y ya. Con
+   varias, chips, con la de la última vez marcada. Sin ninguna, la hoja lo
+   dice y ofrece crearla.
+9. **Editar es la misma hoja.** Tocar un movimiento la abre con todo puesto
+   y «Guardar cambios», y ahí sí se cierra al guardar. Un solo formulario
+   para lo mismo: dos se arreglan en uno y se quedan rotos en el otro. El
+   modal viejo queda para lo que no es diario —envío familiar, cuenta y
+   deuda—, a un toque desde el pie de la hoja.
+10. **La lista del panel va POR DÍA, con la suma de cada uno**, y la
+    tarjeta de gastos del mes dice lo de hoy. Es lo que el autor pidió con
+    «anotar los gastos por día»: verlos por día, no solo escribirlos. Los
+    envíos entre cuentas no suman en ningún subtotal, y si el corte de
+    filas se llenó, el día más viejo se descarta antes que enseñar un
+    subtotal a medias.
+
+Nada de la base llega a un atributo del HTML: todo con `createElement` y
+`textContent`, como en las Sugerencias. Una descripción la escribe alguien
+de la casa, pero la hoja vive en el mismo dominio que la Bóveda.
+
+**Antes de publicar un cambio del Apunte rápido:**
+
+```
+node _dev/servidor-estatico.js      (en otra terminal)
+_dev/probe-finanzas-apunte.html     (en el navegador)
+```
+
+La sonda mide los toques con el reloj —el monto, los chips y el botón con
+la hoja abierta de verdad— y comprueba que guardar deja el foco en el
+monto, que la categoría se limpia, que «1,234» no entra como uno con
+veintitrés y que una descripción envenenada sale como texto.
+
 ## Normativa: los video-ensayos propios se dirigen desde El Rodaje
 
 **Pedido por el autor el 7 de septiembre de 2026**, para sus video-ensayos

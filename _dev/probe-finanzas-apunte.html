@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Apunte rápido de Finanzas</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:380px;height:640px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda del APUNTE RÁPIDO de Finanzas.
+
+   Lo que se comprueba es lo que el autor pidió el 9 de septiembre de
+   2026: que apuntar un gasto no dé vueltas y no pida decidir nada que se
+   pueda adivinar. Eso se mide, no se lee:
+
+   1. QUE LA HOJA ABRA LISTA PARA ESCRIBIR. El foco en el monto en el
+      mismo toque, el teclado numérico pedido (inputmode=decimal), el
+      tipo en Gasto, el día en Hoy, y con una sola cuenta, sin preguntar
+      por la cuenta.
+
+   2. QUE UN GASTO SEAN TRES GESTOS: cifra, categoría, guardar. Y que lo
+      guardado lleve puesto lo que no se pidió: la fecha de hoy, quién
+      lo apuntó, la cuenta y el contexto. Y que el saldo baje.
+
+   3. QUE GUARDAR NO CIERRE. El segundo gasto del día empieza con el
+      teclado todavía en el monto, y la categoría LIMPIA: una que se
+      quede puesta es un gasto mal archivado sin ningún error.
+
+   4. QUE LO DEL DÍA SE VEA Y SE PUEDA DESHACER sin salir de la hoja.
+
+   5. QUE LA MEMORIA AYUDE Y NO ESTORBE: las categorías más usadas
+      primero, «pan» marca sola Alimentación y la pantalla lo dice, y
+      seguir escribiendo «pantalón» la desmarca.
+
+   6. QUE EL MONTO ESCRITO SE DEVUELVA ENTENDIDO: «20+35», «12,50» y
+      «1,234» —que NO es uno con veintitrés— y que «abc» no guarde nada.
+
+   7. QUE LOS TOQUES MIDAN LO QUE MIDE UN DEDO, con la hoja abierta de
+      verdad y el reloj en la mano.
+
+   Como en las demás sondas: se ejecuta el index.html de verdad con una
+   base de datos de mentira a nivel de fetch. El cliente de Supabase es
+   el auténtico. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── La base de datos de mentira ────────────────────────────────────
+   Contesta como PostgREST a lo que usa Finanzas: filtros eq/neq/gte/lt/
+   in, order con varias claves, limit, select de columnas, HEAD que
+   cuenta, POST que devuelve la fila si se le pide (Prefer:
+   return=representation, y UNA sola con Accept vnd.pgrst.object),
+   PATCH y DELETE por filtro. */
+function nuevaBase(w){
+  const estado = { tablas: { cuentas: [], transacciones: [], deudas: [] }, llamadas: [], proxId: 1000 };
+  const sinComillas = v => v.replace(/^"|"$/g, '');
+  const cumple = (fila, col, val) => {
+    if (val.startsWith('eq.'))  return String(fila[col]) === val.slice(3);
+    if (val.startsWith('neq.')) return String(fila[col]) !== val.slice(4);
+    if (val.startsWith('gte.')) return String(fila[col]) >= val.slice(4);
+    if (val.startsWith('lte.')) return String(fila[col]) <= val.slice(4);
+    if (val.startsWith('gt.'))  return String(fila[col]) >  val.slice(3);
+    if (val.startsWith('lt.'))  return String(fila[col]) <  val.slice(3);
+    if (val.startsWith('in.'))  return val.slice(4, -1).split(',').map(sinComillas).includes(String(fila[col]));
+    return true;
+  };
+  const filtra = (filas, params) => filas.filter(fila =>
+    [...params.entries()].every(([col, val]) =>
+      ['select','order','limit','offset'].includes(col) ? true : cumple(fila, col, val)));
+
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url, location.origin);
+    if (!u.pathname.startsWith('/rest/v1/')) return new Response('{}', { status: 200 });
+
+    const tabla  = u.pathname.replace('/rest/v1/', '');
+    const params = u.searchParams;
+    const metodo = (init && init.method) || 'GET';
+    const cuerpo = (init && init.body) ? JSON.parse(init.body) : null;
+    const cabs   = new Headers((init && init.headers) || {});
+    const prefer = cabs.get('Prefer') || '';
+    const unaSola = /vnd\.pgrst\.object/.test(cabs.get('Accept') || '');
+    estado.llamadas.push({ tabla, metodo, params: u.search, cuerpo, prefer });
+
+    const json = (dato, status, extra) => new Response(
+      metodo === 'HEAD' || dato === null ? null : JSON.stringify(dato),
+      { status: status || 200,
+        headers: Object.assign({ 'Content-Type': 'application/json' }, extra || {}) });
+
+    const filas = estado.tablas[tabla];
+    if (!filas) return json({ code: '42P01', message: 'relation "public.' + tabla + '" does not exist' }, 404);
+
+    const proyecta = r => {
+      const sel = params.get('select');
+      if (!sel || sel === '*') return r;
+      const cols = sel.split(',').map(x => x.trim());
+      return r.map(fila => Object.fromEntries(cols.filter(c => c in fila).map(c => [c, fila[c]])));
+    };
+
+    if (metodo === 'HEAD') {
+      return json(null, 200, { 'content-range': '*/' + filtra(filas, params).length });
+    }
+    if (metodo === 'GET') {
+      let r = filtra(filas, params);
+      const orden = params.get('order');
+      if (orden) {
+        const claves = orden.split(',').map(o => { const [col, dir] = o.split('.'); return { col, desc: dir === 'desc' }; });
+        r = [...r].sort((a, b) => {
+          for (const k of claves) {
+            const x = a[k.col], y = b[k.col];
+            if (x === y) continue;
+            const c = x > y ? 1 : -1;
+            return k.desc ? -c : c;
+          }
+          return 0;
+        });
+      }
+      const lim = params.get('limit');
+      if (lim) r = r.slice(0, Number(lim));
+      r = proyecta(r);
+      if (unaSola) return r.length === 1 ? json(r[0]) : json({ code: 'PGRST116', message: 'JSON object requested, multiple (or no) rows returned' }, 406);
+      return json(r);
+    }
+    if (metodo === 'POST') {
+      const nuevas = (Array.isArray(cuerpo) ? cuerpo : [cuerpo]).map(n => Object.assign({ id: estado.proxId++ }, n));
+      nuevas.forEach(n => filas.push(n));
+      if (!/return=representation/.test(prefer)) return json(null, 201);
+      return unaSola ? json(nuevas[0], 201) : json(nuevas, 201);
+    }
+    if (metodo === 'PATCH') {
+      const r = filtra(filas, params);
+      r.forEach(fila => Object.assign(fila, cuerpo));
+      return /return=representation/.test(prefer) ? json(unaSola ? r[0] : r) : json(null, 204);
+    }
+    if (metodo === 'DELETE') {
+      const r = filtra(filas, params);
+      r.forEach(fila => filas.splice(filas.indexOf(fila), 1));
+      return /return=representation/.test(prefer) ? json(r) : json(null, 204);
+    }
+    return json([]);
+  };
+  return estado;
+}
+
+const pad = x => String(x).padStart(2, '0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const HOY = iso(new Date());
+const AYER = iso(new Date(Date.now() - 86400000));
+const ANTIER = iso(new Date(Date.now() - 2 * 86400000));
+
+function siembra(base){
+  base.tablas.cuentas = [
+    { id: 1, nombre: 'Efectivo', saldo_actual: 1000, contexto: 'familia' },
+  ];
+  /* El historial: muchos de Transporte para que salga primero, un «Pan»
+     de Alimentación para la sugerencia, y un envío que no debe contar. */
+  let id = 1;
+  const t = (extra) => Object.assign({ id: id++, tipo: 'egreso', monto: 10, categoria: 'Otros',
+    descripcion: '', fecha: ANTIER, usuario: 'Evelyn Sarahí', cuenta_id: 1, contexto: 'familia' }, extra);
+  base.tablas.transacciones = [
+    t({ categoria: 'Transporte', descripcion: 'Bus', monto: 12 }),
+    t({ categoria: 'Transporte', descripcion: 'Bus', monto: 12 }),
+    t({ categoria: 'Transporte', descripcion: 'Taxi', monto: 60 }),
+    t({ categoria: 'Transporte', descripcion: 'Bus', monto: 12 }),
+    t({ categoria: 'Alimentación', descripcion: 'Pan', monto: 30 }),
+    t({ categoria: 'Salud', descripcion: 'Pastillas', monto: 80, fecha: AYER }),
+    t({ tipo: 'ingreso', categoria: 'Salario', descripcion: 'Quincena', monto: 5000, fecha: AYER }),
+    /* Un envío entre cuentas, que NO suma en ningún subtotal. */
+    t({ categoria: 'Envío Familiar', descripcion: 'Para Jael', monto: 200, fecha: AYER }),
+    /* Lo envenenado: una descripción escrita por alguien de la casa, pero
+       la hoja vive en el mismo dominio que la Bóveda. */
+    t({ categoria: 'Otros', descripcion: '<img src=x onerror="window.__COLADO=1"> " onmouseover="window.__COLADO=1', monto: 5, fecha: AYER }),
+  ];
+}
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);                 // que arranque el index de verdad
+  const w = f.contentWindow;
+  const d = w.document;
+  const $ = id => d.getElementById(id);
+  const texto = id => ($(id) || {}).textContent || '';
+
+  if (w.eval('typeof finAbrirApunte') !== 'function') {
+    log('✘ index.html no cargó el Apunte rápido (js/finanzas.js)');
+    document.title = 'SUSPENDE · apunte rápido'; return;
+  }
+  w.eval('window.verificarSesion = () => ({ user: "josue", nombre: "Josué Edmundo" })');
+  try { w.localStorage.removeItem('faro.fin.apunte.familia'); } catch (_) {}
+
+  const base = nuevaBase(w);
+  siembra(base);
+  const cuenta = id => base.tablas.cuentas.find(c => c.id === id);
+  const ultimaLlamada = (tabla, metodo) => base.llamadas.filter(l => l.tabla === tabla && l.metodo === metodo).pop();
+
+  /* La aplicación arranca con #app-container escondido hasta que entra
+     alguien. Para medir hay que enseñarlo y abrir la vista de verdad. */
+  $('login-screen').style.display = 'none';
+  $('app-container').style.display = '';
+  w.eval('switchView("view-finanzas")');
+  for (let i = 0; i < 40 && texto('fin-saldo-total') === 's/d'; i++) await esperar(100);
+  await esperar(200);
+
+  const escribe = (id, valor) => { const el = $(id); el.value = valor; el.dispatchEvent(new w.Event('input', { bubbles: true })); };
+  const chipCat = nombre => [...d.querySelectorAll('#fin-q-cats .finq-chip')].find(b => b.dataset.cat === nombre);
+  const guarda = async () => { $('fin-q-form').requestSubmit(); await esperar(350); };
+
+  log('── 1. La hoja abre lista para escribir ──');
+  $('fin-fab').click();
+  await esperar(250);
+  const hoja = $('fin-q-overlay');
+  ok(hoja.style.display === 'flex', 'el «+» abre el Apunte rápido', 'el «+» no abre la hoja');
+  const monto = $('fin-q-monto');
+  ok(d.activeElement === monto, 'con el foco YA en el monto', 'el foco no está en el monto: ' + (d.activeElement && d.activeElement.id));
+  ok(monto.getAttribute('inputmode') === 'decimal', 'y pidiendo el teclado numérico (inputmode=decimal)', 'no pide el teclado numérico');
+  ok(d.querySelector('#fin-q-tipo .finq-tipo-activo').dataset.tipo === 'egreso', 'el tipo arranca en Gasto, que es lo de todos los días', 'el tipo no arranca en Gasto');
+  ok(d.querySelector('#fin-q-dias .finq-chip-activo').dataset.dia === 'hoy', 'y el día en Hoy', 'el día no arranca en Hoy');
+  ok($('fin-q-cuenta-fila').hidden && w.getComputedStyle($('fin-q-cuenta-fila')).display === 'none',
+     'con una sola cuenta, la cuenta no se pregunta', 'con una sola cuenta sigue preguntando la cuenta');
+  ok(!d.querySelector('#fin-q-cats .finq-chip-activo'), 'ninguna categoría viene marcada de antemano', 'hay una categoría marcada sin que nadie la tocara');
+  ok(!d.querySelector('.fin-modal-tab[data-fintab="transaccion"]') && !$('fin-form-transaccion'),
+     'y el formulario viejo de seis campos ya no existe', 'sigue existiendo el formulario viejo de Transacción');
+
+  log('── 2. Las categorías más usadas van primero ──');
+  const orden = [...d.querySelectorAll('#fin-q-cats .finq-chip')].map(b => b.dataset.cat);
+  ok(orden[0] === 'Transporte', 'Transporte (4 apuntes) es el primer chip', 'el orden no sale del historial: ' + orden.slice(0, 3).join(', '));
+  ok(orden[1] === 'Alimentación', 'Alimentación (1) el segundo', 'el segundo no es Alimentación: ' + orden[1]);
+  ok(orden.length === 11 && orden.includes('Salud'), 'y están las once del presupuesto de la familia', 'faltan categorías: ' + orden.length);
+
+  log('── 3. Un gasto son tres gestos: cifra, categoría, guardar ──');
+  const llamadasAntes = base.llamadas.length;
+  escribe('fin-q-monto', '45');
+  ok(texto('fin-q-guardar').includes('45.00'), 'el botón lleva la cifra entendida: ' + texto('fin-q-guardar'), 'el botón no dice cuánto va a guardar: ' + texto('fin-q-guardar'));
+  chipCat('Transporte').click();
+  await esperar(50);
+  ok(chipCat('Transporte').classList.contains('finq-chip-activo'), 'un toque marca la categoría', 'el chip no se marcó');
+  await guarda();
+  const post = ultimaLlamada('transacciones', 'POST');
+  ok(!!post && post.cuerpo && Number(post.cuerpo.monto) === 45 && post.cuerpo.tipo === 'egreso' && post.cuerpo.categoria === 'Transporte',
+     'se guardó un egreso de 45 en Transporte', 'no se guardó lo que se escribió: ' + JSON.stringify(post && post.cuerpo));
+  ok(post && post.cuerpo.fecha === HOY, 'con la fecha de hoy sin haberla tocado', 'la fecha no es hoy: ' + (post && post.cuerpo.fecha));
+  ok(post && post.cuerpo.usuario === 'Josué Edmundo', 'y quién lo apuntó', 'no consta quién lo apuntó');
+  ok(post && String(post.cuerpo.cuenta_id) === '1' && post.cuerpo.contexto === 'familia', 'la única cuenta y el contexto puestos solos', 'faltan la cuenta o el contexto: ' + JSON.stringify(post && post.cuerpo));
+  ok(cuenta(1).saldo_actual === 955, 'y el saldo bajó de 1000 a 955', 'el saldo no se ajustó: ' + cuenta(1).saldo_actual);
+  const guardado = base.tablas.transacciones.find(t => t.id >= 1000);
+
+  log('── 4. Guardar no cierra: el siguiente empieza con el teclado puesto ──');
+  ok(hoja.style.display === 'flex', 'la hoja sigue abierta', 'la hoja se cerró al guardar');
+  ok(monto.value === '' && d.activeElement === monto, 'el monto quedó vacío y con el foco', 'el monto no quedó listo: «' + monto.value + '», foco en ' + (d.activeElement && d.activeElement.id));
+  ok(!d.querySelector('#fin-q-cats .finq-chip-activo'), 'la categoría se LIMPIÓ (una que se queda puesta archiva mal el siguiente)', 'la categoría se quedó marcada');
+  ok(d.querySelector('#fin-q-dias .finq-chip-activo').dataset.dia === 'hoy', 'el día se queda', 'el día se perdió');
+
+  log('── 5. Lo apuntado del día se ve ahí mismo, y se puede deshacer ──');
+  await esperar(300);
+  const caja = $('fin-q-hoy');
+  ok(!caja.hidden && texto('fin-q-hoy-titulo').includes('hoy'), 'sale «Apuntado hoy»', 'no sale lo apuntado hoy: ' + texto('fin-q-hoy-titulo'));
+  ok(texto('fin-q-hoy-lista').includes('Transporte') && texto('fin-q-hoy-total').includes('45.00'),
+     'con el gasto recién puesto y su suma', 'la lista del día no enseña el gasto: ' + texto('fin-q-hoy-lista') + ' / ' + texto('fin-q-hoy-total'));
+  const deshacer = d.querySelector('#fin-q-hoy-lista .finq-deshacer');
+  ok(!!deshacer, 'y el último tiene «↶ Deshacer»', 'no hay forma de deshacer el último');
+  if (deshacer) deshacer.click();
+  await esperar(350);
+  ok(!base.tablas.transacciones.find(t => t.id === guardado.id), 'deshacer lo borra de la base', 'deshacer no lo borró');
+  ok(cuenta(1).saldo_actual === 1000, 'y devuelve el saldo a 1000', 'el saldo no volvió: ' + cuenta(1).saldo_actual);
+  await esperar(200);
+  ok(!d.querySelector('#fin-q-hoy-lista .finq-deshacer'), 'y ya no queda nada que deshacer', 'sigue ofreciendo deshacer algo que no existe');
+
+  log('── 6. La descripción se acuerda de la categoría, y no estorba ──');
+  escribe('fin-q-monto', '30');
+  escribe('fin-q-desc', 'pan');
+  await esperar(50);
+  ok(chipCat('Alimentación').classList.contains('finq-chip-activo'), '«pan» marca sola 🍚 Alimentación (como el «Pan» de antes)', 'la descripción no sugirió la categoría');
+  ok(texto('fin-q-cat-hint').includes('como la última vez'), 'y la pantalla dice por qué', 'se marcó sin decir por qué');
+  escribe('fin-q-desc', 'pantalón');
+  await esperar(50);
+  ok(!d.querySelector('#fin-q-cats .finq-chip-activo'), 'seguir escribiendo «pantalón» la desmarca: no se archiva ropa como comida', 'la categoría sugerida se quedó puesta con otra descripción');
+  chipCat('Ropa y Calzado').click();
+  escribe('fin-q-desc', 'pan');
+  await esperar(50);
+  ok(chipCat('Ropa y Calzado').classList.contains('finq-chip-activo'), 'y una categoría tocada a mano no se la pisa ninguna sugerencia', 'la sugerencia pisó lo que el usuario eligió');
+  const opciones = [...d.querySelectorAll('#fin-q-desc-list option')].map(o => o.value);
+  ok(opciones[0] === 'Bus' && opciones.includes('Pan') && !opciones.includes('Quincena'),
+     'el teclado completa con lo de antes, lo más repetido primero, y solo del tipo activo', 'el autocompletado no sale del historial: ' + opciones.join(', '));
+
+  log('── 7. Sin categoría no se guarda, y lo dice ──');
+  w.eval('_finQElegirCategoria("", true)');
+  const postsAntes = base.llamadas.filter(l => l.tabla === 'transacciones' && l.metodo === 'POST').length;
+  await guarda();
+  ok(base.llamadas.filter(l => l.tabla === 'transacciones' && l.metodo === 'POST').length === postsAntes, 'no se guardó nada', 'guardó un gasto sin categoría');
+  ok(!$('fin-q-aviso').hidden && /categor/i.test(texto('fin-q-aviso')), 'y avisa de qué falta: ' + texto('fin-q-aviso'), 'no dice qué falta');
+
+  log('── 8. El monto se devuelve entendido ──');
+  escribe('fin-q-monto', '20+35+12');
+  ok(texto('fin-q-eco').includes('67.00') && texto('fin-q-guardar').includes('67.00'), '«20+35+12» se entiende como L. 67.00 y lo dice', 'la suma no se entiende: ' + texto('fin-q-eco'));
+  escribe('fin-q-monto', '12,50');
+  ok(texto('fin-q-guardar').includes('12.50'), '«12,50» (coma de tableta) son doce con cincuenta', 'la coma decimal no se entiende: ' + texto('fin-q-guardar'));
+  escribe('fin-q-monto', '1,234');
+  ok(texto('fin-q-guardar').includes('1,234.00'), '«1,234» son mil doscientos treinta y cuatro, no uno con veintitrés', 'la coma de miles se leyó mal: ' + texto('fin-q-guardar'));
+  escribe('fin-q-monto', 'abc');
+  ok($('fin-q-eco').classList.contains('finq-eco-mal') && !texto('fin-q-guardar').includes('L.'), '«abc» no se entiende y se dice', 'un monto inválido pasa sin aviso');
+  chipCat('Alimentación').click();
+  await guarda();
+  ok(base.llamadas.filter(l => l.tabla === 'transacciones' && l.metodo === 'POST').length === postsAntes, 'y no se guarda', 'guardó un monto que no era un número');
+  ok(d.activeElement === monto, 'devolviendo el foco al monto para corregirlo', 'el foco no volvió al monto');
+
+  log('── 9. Ayer, y una suma de mercado ──');
+  d.querySelector('#fin-q-dias [data-dia="ayer"]').click();
+  await esperar(300);
+  ok(texto('fin-q-hoy-titulo').includes('ayer'), 'al elegir Ayer la lista pasa a lo de ayer', 'la lista del día no cambió: ' + texto('fin-q-hoy-titulo'));
+  ok(texto('fin-q-hoy-lista').includes('Pastillas') && !texto('fin-q-hoy-lista').includes('Para Jael'),
+     'con lo de ayer, y sin el envío entre cuentas', 'la lista de ayer está mal: ' + texto('fin-q-hoy-lista'));
+  ok(texto('fin-q-hoy-total').includes('85.00') && texto('fin-q-hoy-total').includes('5,000.00'),
+     'y la suma separa gastos e ingresos: ' + texto('fin-q-hoy-total'), 'la suma de ayer no cuadra: ' + texto('fin-q-hoy-total'));
+  escribe('fin-q-monto', '20+35');
+  escribe('fin-q-desc', 'Mercado');
+  chipCat('Alimentación').click();
+  await guarda();
+  const postAyer = ultimaLlamada('transacciones', 'POST');
+  ok(postAyer && Number(postAyer.cuerpo.monto) === 55 && postAyer.cuerpo.fecha === AYER, 'se guardó 55 con la fecha de ayer', 'no se guardó bien lo de ayer: ' + JSON.stringify(postAyer && postAyer.cuerpo));
+  ok(d.querySelector('#fin-q-dias .finq-chip-activo').dataset.dia === 'ayer', 'y el día se queda en Ayer para seguir apuntando lo de ayer', 'el día volvió a Hoy');
+
+  log('── 10. Ingreso: mismo gesto, otras categorías, el saldo sube ──');
+  d.querySelector('#fin-q-tipo [data-tipo="ingreso"]').click();
+  await esperar(50);
+  const catsIng = [...d.querySelectorAll('#fin-q-cats .finq-chip')].map(b => b.dataset.cat);
+  ok(catsIng.includes('Salario') && !catsIng.includes('Transporte'), 'las categorías pasan a las de ingreso', 'las categorías no cambiaron: ' + catsIng.join(', '));
+  ok(texto('fin-q-guardar').startsWith('Guardar ingreso'), 'y el botón dice «Guardar ingreso»', 'el botón no cambió: ' + texto('fin-q-guardar'));
+  const saldoAntes = cuenta(1).saldo_actual;
+  escribe('fin-q-monto', '500');
+  chipCat('Regalo').click();
+  await guarda();
+  ok(cuenta(1).saldo_actual === saldoAntes + 500, 'un ingreso de 500 sube el saldo', 'el saldo no subió: ' + cuenta(1).saldo_actual);
+  ok(d.querySelector('#fin-q-tipo .finq-tipo-activo').dataset.tipo === 'ingreso', 'el tipo se queda para el siguiente', 'el tipo volvió a Gasto');
+
+  log('── 11. Los toques miden lo que mide un dedo ──');
+  const alto = el => el.getBoundingClientRect().height;
+  ok(alto(monto) >= 44, `el monto mide ${alto(monto).toFixed(0)} px de alto`, `el monto mide ${alto(monto).toFixed(0)} px: menos de 44`);
+  const unChip = d.querySelector('#fin-q-cats .finq-chip');
+  ok(alto(unChip) >= 36, `un chip de categoría mide ${alto(unChip).toFixed(0)} px`, `un chip mide ${alto(unChip).toFixed(0)} px: menos de 36`);
+  ok(alto($('fin-q-guardar')) >= 44, `el botón de guardar mide ${alto($('fin-q-guardar')).toFixed(0)} px`, 'el botón de guardar mide menos de 44 px');
+  ok(w.getComputedStyle($('fin-q-desc')).backgroundColor !== 'rgba(0, 0, 0, 0)', 'el campo de descripción tiene fondo (nada de var(--card))', 'el campo de descripción sale transparente');
+
+  log('── 12. Cerrar, y la lista del panel va por día con su suma ──');
+  /* Uno de hoy, para que haya un «Hoy» que mirar (el de 45 se deshizo). */
+  d.querySelector('#fin-q-tipo [data-tipo="egreso"]').click();
+  d.querySelector('#fin-q-dias [data-dia="hoy"]').click();
+  escribe('fin-q-monto', '45');
+  chipCat('Transporte').click();
+  await guarda();
+  $('fin-q-close').click();
+  await esperar(100);
+  ok(hoja.style.display === 'none', 'la X cierra la hoja', 'la X no cierra');
+  await w.eval('initFinanzas()');
+  await esperar(300);
+  const cabs = [...d.querySelectorAll('#fin-movimientos-list .fin-dia-cab')];
+  const nombres = cabs.map(c => c.querySelector('.fin-dia-nombre').textContent);
+  const totalDe = nombre => { const c = cabs.find(x => x.querySelector('.fin-dia-nombre').textContent === nombre); return c ? c.querySelector('.fin-dia-total').textContent : ''; };
+  ok(nombres[0] === 'Hoy' && nombres[1] === 'Ayer' && nombres.length === 3, 'los días van con cabecera: ' + nombres.join(' · '), 'la lista no va por día: ' + nombres.join(' · '));
+  ok(totalDe('Hoy').includes('45.00'), 'hoy suma 45: ' + totalDe('Hoy'), 'la suma de hoy no cuadra: ' + totalDe('Hoy'));
+  ok(totalDe('Ayer').includes('140.00') && totalDe('Ayer').includes('5,500.00'),
+     'ayer suma 80 + 5 + 55 = 140 de gastos y 5,000 + 500 de ingresos, sin el envío: ' + totalDe('Ayer'), 'la suma de ayer en el panel no cuadra: ' + totalDe('Ayer'));
+  ok(texto('fin-gastos-hoy').includes('45.00') && texto('fin-gastos-hoy').includes('1 gasto'), 'la tarjeta del mes dice lo de hoy: ' + texto('fin-gastos-hoy'), 'la tarjeta del mes no dice lo de hoy: ' + texto('fin-gastos-hoy'));
+  const filaPanel = [...d.querySelectorAll('#fin-movimientos-list .fin-mov-row')].find(r => r.textContent.includes('Mercado'));
+  ok(filaPanel && !filaPanel.querySelector('.fin-mov-meta').textContent.includes('sep'), 'la fila ya no repite la fecha: la dice la cabecera', 'la fila repite la fecha que ya dice la cabecera');
+
+  log('── 13. Editar es la misma hoja, con todo puesto ──');
+  const filaAyer = base.tablas.transacciones.find(t => t.descripcion === 'Mercado');
+  w.eval('finEditTransaccion(' + JSON.stringify(filaAyer) + ')');
+  await esperar(250);
+  ok(hoja.style.display === 'flex' && !$('fin-q-modo').hidden, 'tocar un movimiento abre la hoja en modo edición', 'editar no abre la hoja');
+  ok(monto.value === '55' && $('fin-q-desc').value === 'Mercado', 'con el monto y la descripción puestos', 'no vienen puestos: ' + monto.value + ' / ' + $('fin-q-desc').value);
+  ok(chipCat('Alimentación') && chipCat('Alimentación').classList.contains('finq-chip-activo'), 'la categoría marcada', 'la categoría no viene marcada');
+  ok(d.querySelector('#fin-q-dias .finq-chip-activo').dataset.dia === 'ayer', 'y el día (ayer)', 'el día no viene puesto');
+  ok(texto('fin-q-guardar').startsWith('Guardar cambios'), 'el botón dice «Guardar cambios»', 'el botón no dice que es un cambio: ' + texto('fin-q-guardar'));
+  ok($('fin-q-hoy').hidden && $('fin-q-mas').hidden, 'sin la lista del día ni los otros registros, que aquí sobran', 'al editar sobran cosas en la hoja');
+  const saldoAntesEdit = cuenta(1).saldo_actual;
+  escribe('fin-q-monto', '75');
+  await guarda();
+  const patch = ultimaLlamada('transacciones', 'PATCH');
+  ok(patch && Number(patch.cuerpo.monto) === 75 && /id=eq\./.test(patch.params), 'se actualiza la fila con un PATCH, no se duplica', 'no se actualizó: ' + JSON.stringify(patch));
+  ok(cuenta(1).saldo_actual === saldoAntesEdit - 20, 'y el saldo se reconcilia por la diferencia (−20)', 'el saldo no se reconcilió: ' + cuenta(1).saldo_actual);
+  ok(hoja.style.display === 'none', 'y al editar sí se cierra al guardar', 'en edición la hoja se quedó abierta');
+
+  log('── 14. Con varias cuentas: chips, y se recuerda la última ──');
+  base.tablas.cuentas.push({ id: 2, nombre: 'Banco', saldo_actual: 5000, contexto: 'familia' });
+  await w.eval('initFinanzas()');
+  await esperar(200);
+  $('fin-fab').click();
+  await esperar(250);
+  ok(!$('fin-q-cuenta-fila').hidden && d.querySelectorAll('#fin-q-cuentas [data-cuenta]').length === 2, 'con dos cuentas salen los dos chips', 'no salen los chips de cuenta');
+  d.querySelector('#fin-q-cuentas [data-cuenta="2"]').click();
+  escribe('fin-q-monto', '100');
+  chipCat('Transporte').click();
+  await guarda();
+  const postBanco = ultimaLlamada('transacciones', 'POST');
+  ok(postBanco && String(postBanco.cuerpo.cuenta_id) === '2', 'se guardó en Banco', 'no se guardó en la cuenta elegida');
+  ok(cuenta(2).saldo_actual === 4900, 'y bajó el saldo de Banco', 'el saldo de Banco no bajó: ' + cuenta(2).saldo_actual);
+  $('fin-q-close').click();
+  $('fin-fab').click();
+  await esperar(250);
+  ok(d.querySelector('#fin-q-cuentas .finq-chip-activo').dataset.cuenta === '2', 'al volver a abrir, Banco viene marcado: se recuerda la última', 'no se acuerda de la última cuenta');
+  escribe('fin-q-desc', 'bus');
+  await esperar(50);
+  ok(d.querySelector('#fin-q-cuentas .finq-chip-activo').dataset.cuenta === '1', 'y «bus» se trae también la cuenta de la otra vez (Efectivo)', 'la sugerencia no cambió la cuenta');
+  $('fin-q-close').click();
+
+  log('── 15. Nada de la base llega a un atributo del HTML ──');
+  w.__COLADO = undefined;
+  $('fin-fab').click();
+  await esperar(100);
+  d.querySelector('#fin-q-dias [data-dia="ayer"]').click();
+  await esperar(300);
+  const zonas = [$('fin-q-hoy-lista'), $('fin-movimientos-list')];
+  const conAtributo = zonas.flatMap(z => [...z.querySelectorAll('*')]).filter(el => [...el.attributes].some(a => /^on/i.test(a.name)));
+  ok(conAtributo.length === 0, 'ninguna descripción se convirtió en un manejador de evento', '⚠️ se coló un atributo on*: ' + conAtributo.length);
+  ok(!zonas.some(z => z.querySelector('img')), 'y la etiqueta <img> envenenada sale como texto', 'la descripción se pintó como HTML');
+  zonas.forEach(z => [...z.querySelectorAll('*')].forEach(el => {
+    try { el.dispatchEvent(new w.MouseEvent('mouseover', { bubbles: true })); } catch (_) {}
+  }));
+  ok(w.__COLADO === undefined, 'pasar el ratón por encima no ejecuta nada', '⚠️⚠️ CORRIÓ JAVASCRIPT METIDO EN UNA DESCRIPCIÓN');
+  $('fin-q-close').click();
+
+  log('── 16. En la Escuela, las categorías de la escuela ──');
+  w.eval('_finContexto = "escuela"');
+  await w.eval('initFinanzas()');
+  await esperar(200);
+  $('fin-fab').click();
+  await esperar(150);
+  const catsEsc = [...d.querySelectorAll('#fin-q-cats .finq-chip')].map(b => b.dataset.cat);
+  ok(catsEsc.includes('Material Didáctico') && !catsEsc.includes('Vivienda'), 'salen Material Didáctico y compañía', 'las categorías no son las de la escuela: ' + catsEsc.join(', '));
+  ok(texto('fin-q-cuentas').trim() !== '' && !$('fin-q-cuenta-fila').hidden && /Crear cuenta/.test(texto('fin-q-cuentas')),
+     'y sin cuentas en la escuela, la hoja lo dice y ofrece crear una', 'sin cuentas no dice nada: ' + texto('fin-q-cuentas'));
+  $('fin-q-close').click();
+  w.eval('_finContexto = "familia"');
+
+  log('── 17. Desde la portada, un toque ──');
+  w.eval('switchView("view-inicio")');
+  await esperar(100);
+  const qa = d.querySelector('#quick-access [data-qa="apunte"]');
+  ok(!!qa, 'el Acceso Rápido tiene «Apuntar gasto»', 'falta el acceso directo en la portada');
+  if (qa) qa.click();
+  await esperar(300);
+  ok($('view-finanzas').classList.contains('active') && hoja.style.display === 'flex' && d.activeElement === monto,
+     'y abre Finanzas con la hoja puesta y el foco en el monto', 'el acceso directo no deja la hoja lista');
+  $('fin-q-close').click();
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = fallos === 0 ? 'APRUEBA · apunte rápido' : 'SUSPENDE · apunte rápido';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.stack || e));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SUSPENDE · apunte rápido';
+});
+</script>
+</body>
+</html>

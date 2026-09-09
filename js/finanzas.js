@@ -83,16 +83,29 @@ let _finCuentasCache   = [];
 let _finGastosMesCache = [];
 let _finDeudasCache    = [];
 
+// Historial reciente de cada contexto, para el Apunte rápido: de aquí salen
+// el orden de las categorías (las más usadas primero), las descripciones
+// que se autocompletan y la categoría «como la última vez». Son cuatro
+// columnas de las últimas filas: no pesa, y se trae al ENTRAR a Finanzas
+// para que la hoja abra sin esperar a nada, con el teclado ya puesto.
+const FIN_HIST_LIMITE = 300;
+let _finHistCache = { familia: [], escuela: [] };
+
+// La última carga del panel, para que la hoja se ponga al día si se abrió
+// antes de que llegaran las cuentas (desde el Acceso Rápido pasa siempre).
+let _finInitPromesa = null;
+
+// Cuántas filas se traen para la lista del panel. Van agrupadas por día,
+// así que el último día del corte puede venir a medias: si el corte se
+// llenó, ese día se descarta, para que ningún subtotal mienta.
+const FIN_LISTA_LIMITE = 40;
+
 // Filtro activo de la lista "Últimos Movimientos" ('' | ingreso | egreso | transfer)
 let _finMovFilter = '';
 
 // Estado del modal de detalle: qué tarjeta lo abrió y qué mes se está viendo.
 let _finDetailKind = null; // 'saldo' | 'gastos' | 'deudas' | 'historial'
 let _finGastosView = null; // { year, month(0-based) }: compartido por gastos e historial
-
-// Estado de edición de una transacción (para reutilizar el formulario).
-let _finEditingId       = null;
-let _finEditingOriginal = null; // { monto, tipo, cuenta_id } previos
 
 // Deuda a la que se le está registrando un abono.
 let _finAbonoDeuda = null;
@@ -147,26 +160,21 @@ function _finCats(tipo) {
   return tipo === 'ingreso' ? FIN_CATS_INGRESO : FIN_CATS_EGRESO;
 }
 
-// Rellena el select de categoría según el tipo. Si `selected` es una categoría
-// vieja que ya no está en la lista, se agrega como opción extra para no perderla.
-function _finFillCategoriaSelect(tipo, selected) {
-  const select = document.getElementById('fin-t-categoria');
-  if (!select) return;
-  const cats = _finCats(tipo);
-  select.innerHTML = '';
-  cats.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.v;
-    opt.textContent = `${c.e} ${c.label}`;
-    select.appendChild(opt);
-  });
-  if (selected && !cats.find(c => c.v === selected)) {
-    const opt = document.createElement('option');
-    opt.value = selected;
-    opt.textContent = `📦 ${selected}`;
-    select.appendChild(opt);
-  }
-  if (selected) select.value = selected;
+// Fecha ISO de hoy más `dias` (negativo hacia atrás), en hora local.
+function _finFechaOffset(dias) {
+  const d = new Date();
+  d.setDate(d.getDate() + dias);
+  const pad = x => String(x).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// Nombre de un día para las cabeceras: «Hoy», «Ayer» o «lunes, 7 sep».
+function _finNombreDia(iso) {
+  if (iso === _finToday()) return 'Hoy';
+  if (iso === _finFechaOffset(-1)) return 'Ayer';
+  const d = new Date(iso + 'T00:00:00');
+  if (isNaN(d)) return iso || '';
+  return d.toLocaleDateString('es-HN', { weekday: 'long', day: 'numeric', month: 'short' }).replace('.', '');
 }
 
 /* ─────────────────────────────────────────────
@@ -187,12 +195,20 @@ async function initFinanzas() {
   const prevRange = _finMonthRange(now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear(),
                                    now.getMonth() === 0 ? 11 : now.getMonth() - 1);
 
-  const [cuentasRes, gastosRes, gastosPrevRes, deudasRes] = await Promise.all([
+  const contexto = _finContexto;
+  const carga = Promise.all([
     _finCtx(_sb.from(FIN_CUENTAS_TABLE).select('*')).order('nombre'),
     _finCtx(_sb.from(FIN_TRANSACCIONES_TABLE).select('*')).eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', _finStartOfMonth()).order('fecha', { ascending: false }),
     _finCtx(_sb.from(FIN_TRANSACCIONES_TABLE).select('monto')).eq('tipo', 'egreso').neq('categoria', FIN_TRANSFER_CATEGORY).gte('fecha', prevRange.start).lt('fecha', prevRange.end),
     _finCtx(_sb.from(FIN_DEUDAS_TABLE).select('*')).order('fecha_limite', { ascending: true, nullsFirst: false }),
+    // El historial del Apunte rápido (ver FIN_HIST_LIMITE).
+    _finCtx(_sb.from(FIN_TRANSACCIONES_TABLE).select('tipo, categoria, descripcion, cuenta_id'))
+      .neq('categoria', FIN_TRANSFER_CATEGORY)
+      .order('id', { ascending: false })
+      .limit(FIN_HIST_LIMITE),
   ]);
+  _finInitPromesa = carga;
+  const [cuentasRes, gastosRes, gastosPrevRes, deudasRes, histRes] = await carga;
 
   if (cuentasRes.error) {
     console.error('[Finanzas] Error cargando cuentas:', cuentasRes.error);
@@ -209,6 +225,7 @@ async function initFinanzas() {
     _finGastosMesCache = gastosRes.data || [];
     const totalGastos = _finGastosMesCache.reduce((sum, t) => sum + Number(t.monto || 0), 0);
     document.getElementById('fin-gastos-mes').textContent = _finMoney(totalGastos);
+    _finPintarGastosHoy();
 
     // Comparación con el mes anterior en la propia tarjeta.
     const deltaEl = document.getElementById('fin-gastos-delta');
@@ -234,7 +251,26 @@ async function initFinanzas() {
     document.getElementById('fin-deudas-total').textContent = _finMoney(totalDeuda);
   }
 
+  if (histRes.error) {
+    console.error('[Finanzas] Error cargando el historial del apunte:', histRes.error);
+  } else {
+    _finHistCache[contexto] = histRes.data || [];
+  }
+
   await finLoadMovimientos();
+}
+
+// Lo de HOY en la propia tarjeta de gastos del mes: es el número que se
+// mira al apuntar, y el mes entero no dice si hoy se fue la mano.
+function _finPintarGastosHoy() {
+  const el = document.getElementById('fin-gastos-hoy');
+  if (!el) return;
+  const hoy = _finToday();
+  const deHoy = _finGastosMesCache.filter(t => t.fecha === hoy);
+  const total = deHoy.reduce((s, t) => s + Number(t.monto || 0), 0);
+  el.textContent = deHoy.length
+    ? `Hoy ${_finMoney(total)} · ${deHoy.length} ${deHoy.length === 1 ? 'gasto' : 'gastos'}`
+    : 'Hoy sin gastos apuntados';
 }
 
 function _finStartOfMonth() {
@@ -329,7 +365,7 @@ async function finLoadMovimientos() {
   const { data, error } = await query
     .order('fecha', { ascending: false })
     .order('id', { ascending: false })
-    .limit(10);
+    .limit(FIN_LISTA_LIMITE);
 
   if (error) {
     console.error('[Finanzas] Error cargando movimientos:', error);
@@ -338,12 +374,62 @@ async function finLoadMovimientos() {
   }
 
   if (!data || !data.length) {
-    container.innerHTML = '<div class="fin-empty">Aún no hay movimientos registrados.</div>';
+    container.innerHTML = '<div class="fin-empty">Aún no hay movimientos registrados. Toca el «+» para apuntar el primero.</div>';
     return;
   }
 
+  // Si el corte se llenó, el día más viejo puede haber quedado a medias y su
+  // subtotal mentiría: se descarta, salvo que sea el único que hay.
+  let filas = data;
+  if (filas.length === FIN_LISTA_LIMITE) {
+    const ultimoDia = filas[filas.length - 1].fecha;
+    const sinUltimo = filas.filter(t => t.fecha !== ultimoDia);
+    if (sinUltimo.length) filas = sinUltimo;
+  }
+
   container.innerHTML = '';
-  data.forEach(t => container.appendChild(_finRenderMovimiento(t)));
+  let dia = null;
+  filas.forEach(t => {
+    if (t.fecha !== dia) {
+      dia = t.fecha;
+      container.appendChild(_finCabeceraDia(dia, filas.filter(x => x.fecha === dia)));
+    }
+    container.appendChild(_finRenderMovimiento(t));
+  });
+}
+
+// Cabecera de un día en la lista: su nombre y lo que sumó, gastos e
+// ingresos por separado. Los envíos entre cuentas no suman en ningún
+// subtotal: no son dinero que entre ni salga de la casa.
+function _finCabeceraDia(fecha, filas) {
+  const cab = document.createElement('div');
+  cab.className = 'fin-dia-cab';
+
+  const nombre = document.createElement('span');
+  nombre.className = 'fin-dia-nombre';
+  nombre.textContent = _finNombreDia(fecha);
+
+  const total = document.createElement('span');
+  total.className = 'fin-dia-total';
+  const reales = filas.filter(t => t.categoria !== FIN_TRANSFER_CATEGORY);
+  const gas = reales.filter(t => t.tipo === 'egreso').reduce((s, t) => s + Number(t.monto || 0), 0);
+  const ing = reales.filter(t => t.tipo === 'ingreso').reduce((s, t) => s + Number(t.monto || 0), 0);
+  if (gas > 0) {
+    const s = document.createElement('span');
+    s.className = 'fin-mov-out';
+    s.textContent = '− ' + _finMoney(gas);
+    total.appendChild(s);
+  }
+  if (ing > 0) {
+    const s = document.createElement('span');
+    s.className = 'fin-mov-in';
+    s.textContent = '+ ' + _finMoney(ing);
+    total.appendChild(s);
+  }
+  if (!gas && !ing) total.textContent = 'solo envíos entre cuentas';
+
+  cab.append(nombre, total);
+  return cab;
 }
 
 function _finRenderMovimiento(t) {
@@ -368,7 +454,7 @@ function _finRenderMovimiento(t) {
 
   const meta = document.createElement('div');
   meta.className = 'fin-mov-meta';
-  meta.textContent = `${t.usuario || 'Familia'} · ${t.categoria || ''} · ${_finFormatDate(t.fecha)}`;
+  meta.textContent = `${t.usuario || 'Familia'} · ${t.categoria || ''}`;
 
   info.append(desc, meta);
 
@@ -387,7 +473,7 @@ function _finRenderMovimiento(t) {
 }
 
 function _finRenderCuentaOptions(cuentas) {
-  ['fin-t-cuenta', 'fin-tr-origen', 'fin-tr-destino', 'fin-a-cuenta'].forEach(id => _finFillCuentaSelect(id, cuentas));
+  ['fin-tr-origen', 'fin-tr-destino', 'fin-a-cuenta'].forEach(id => _finFillCuentaSelect(id, cuentas));
 }
 
 function _finFillCuentaSelect(selectId, cuentas) {
@@ -892,158 +978,48 @@ async function finDeleteTransaccion(t) {
   await _finRefreshGastosDetailIfOpen();
 }
 
+// Editar un movimiento: es la MISMA hoja del Apunte rápido, con todo
+// puesto. Un solo formulario para lo mismo: dos se arreglan en uno y se
+// quedan rotos en el otro.
 function finEditTransaccion(t) {
-  _finEditingId = t.id;
-  _finEditingOriginal = {
-    monto: Number(t.monto || 0),
-    tipo: t.tipo,
-    cuenta_id: t.cuenta_id,
-  };
-
-  const overlay = document.getElementById('fin-modal-overlay');
-  if (!overlay) return;
-  overlay.style.display = 'flex';
-  finSwitchTab('transaccion');
-
-  document.getElementById('fin-t-tipo').value = t.tipo || 'egreso';
-  _finFillCategoriaSelect(t.tipo || 'egreso', t.categoria || 'Otros');
-  document.getElementById('fin-t-monto').value       = t.monto;
-  document.getElementById('fin-t-descripcion').value = t.descripcion || '';
-  document.getElementById('fin-t-cuenta').value      = t.cuenta_id || '';
-  document.getElementById('fin-t-fecha').value       = t.fecha || _finToday();
-
-  const btn = document.querySelector('#fin-form-transaccion .fin-submit-btn');
-  if (btn) btn.textContent = 'Actualizar Transacción';
+  finAbrirApunte({ editar: t });
 }
 
 /* ─────────────────────────────────────────────
-   MODAL
+   MODAL · lo que no es diario: envío familiar, cuenta y deuda.
+   Los gastos e ingresos van por el Apunte rápido, más abajo.
 ───────────────────────────────────────────── */
 
 function finOpenModal(tab) {
   const overlay = document.getElementById('fin-modal-overlay');
   if (!overlay) return;
-
-  // Alta nueva: sale de cualquier modo de edición previo.
-  _finEditingId = null;
-  _finEditingOriginal = null;
-  const editBtn = document.querySelector('#fin-form-transaccion .fin-submit-btn');
-  if (editBtn) editBtn.textContent = 'Guardar Transacción';
-
   overlay.style.display = 'flex';
-  ['fin-t-fecha', 'fin-tr-fecha'].forEach(id => {
-    const input = document.getElementById(id);
-    if (input && !input.value) input.value = _finToday();
-  });
-  _finFillCategoriaSelect(document.getElementById('fin-t-tipo')?.value || 'egreso');
-  finSwitchTab(tab || 'transaccion');
+  const fecha = document.getElementById('fin-tr-fecha');
+  if (fecha && !fecha.value) fecha.value = _finToday();
+  finSwitchTab(tab || 'transferencia');
 }
 
 function finCloseModal() {
   const overlay = document.getElementById('fin-modal-overlay');
   if (overlay) overlay.style.display = 'none';
-  _finEditingId = null;
-  _finEditingOriginal = null;
-  const btn = document.querySelector('#fin-form-transaccion .fin-submit-btn');
-  if (btn) btn.textContent = 'Guardar Transacción';
 }
 
 function finSwitchTab(tab) {
   document.querySelectorAll('.fin-modal-tab').forEach(btn => {
     btn.classList.toggle('fin-modal-tab-active', btn.dataset.fintab === tab);
   });
-  document.getElementById('fin-form-transaccion').style.display    = tab === 'transaccion'    ? 'flex' : 'none';
-  document.getElementById('fin-form-transferencia').style.display  = tab === 'transferencia'  ? 'flex' : 'none';
-  document.getElementById('fin-form-cuenta').style.display         = tab === 'cuenta'         ? 'flex' : 'none';
-  document.getElementById('fin-form-deuda').style.display          = tab === 'deuda'          ? 'flex' : 'none';
+  const pon = (id, visible) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = visible ? 'flex' : 'none';
+  };
+  pon('fin-form-transferencia', tab === 'transferencia');
+  pon('fin-form-cuenta',        tab === 'cuenta');
+  pon('fin-form-deuda',         tab === 'deuda');
 }
 
 /* ─────────────────────────────────────────────
    ENVÍO DE FORMULARIOS
 ───────────────────────────────────────────── */
-
-async function finSubmitTransaccion(e) {
-  e.preventDefault();
-  if (!_sb) return;
-
-  const tipo        = document.getElementById('fin-t-tipo').value;
-  const monto       = parseFloat(document.getElementById('fin-t-monto').value);
-  const categoria   = document.getElementById('fin-t-categoria').value;
-  const descripcion = document.getElementById('fin-t-descripcion').value.trim();
-  const cuentaId     = document.getElementById('fin-t-cuenta').value;
-  const fecha        = document.getElementById('fin-t-fecha').value;
-
-  if (!monto || monto <= 0 || !cuentaId) return;
-
-  const btn = e.target.querySelector('.fin-submit-btn');
-  if (btn) btn.disabled = true;
-
-  // ── Modo edición: actualiza el registro y reconcilia los saldos ──
-  if (_finEditingId) {
-    const editId = _finEditingId;
-    const orig = _finEditingOriginal || {};
-
-    const { error: errUpd } = await _sb
-      .from(FIN_TRANSACCIONES_TABLE)
-      .update({ tipo, monto, categoria, descripcion, fecha, cuenta_id: cuentaId })
-      .eq('id', editId);
-
-    if (errUpd) {
-      console.error('[Finanzas] Error actualizando transacción:', errUpd);
-      if (typeof toast === 'function') toast('No se pudo actualizar la transacción');
-      if (btn) btn.disabled = false;
-      return;
-    }
-
-    // Efecto sobre el saldo: ingreso suma, egreso resta.
-    const oldEffect = (orig.tipo === 'ingreso' ? 1 : -1) * Number(orig.monto || 0);
-    const newEffect = (tipo === 'ingreso' ? 1 : -1) * monto;
-
-    if (String(orig.cuenta_id) === String(cuentaId)) {
-      await _finApplyBalanceDelta(cuentaId, newEffect - oldEffect);
-    } else {
-      if (orig.cuenta_id) await _finApplyBalanceDelta(orig.cuenta_id, -oldEffect);
-      await _finApplyBalanceDelta(cuentaId, newEffect);
-    }
-
-    if (typeof toast === 'function') toast('✅ Transacción actualizada');
-    _finEditingId = null;
-    _finEditingOriginal = null;
-    e.target.reset();
-    document.getElementById('fin-t-fecha').value = _finToday();
-    if (btn) { btn.disabled = false; btn.textContent = 'Guardar Transacción'; }
-    finCloseModal();
-    await initFinanzas();
-    await _finRefreshGastosDetailIfOpen();
-    return;
-  }
-
-  const { error: errInsert } = await _sb.from(FIN_TRANSACCIONES_TABLE).insert({
-    tipo, monto, categoria, descripcion, fecha,
-    usuario: _finCurrentUserName(),
-    cuenta_id: cuentaId,
-    ..._finCtxData(),
-  });
-
-  if (errInsert) {
-    console.error('[Finanzas] Error guardando transacción:', errInsert);
-    if (typeof toast === 'function') toast('No se pudo guardar la transacción');
-    if (btn) btn.disabled = false;
-    return;
-  }
-
-  // Actualiza matemáticamente el saldo de la cuenta afectada
-  const delta = tipo === 'ingreso' ? monto : -monto;
-  await _finApplyBalanceDelta(cuentaId, delta);
-
-  if (typeof toast === 'function') toast('✅ Transacción registrada');
-  e.target.reset();
-  document.getElementById('fin-t-fecha').value = _finToday();
-  _finFillCategoriaSelect(document.getElementById('fin-t-tipo')?.value || 'egreso');
-  if (btn) btn.disabled = false;
-  finCloseModal();
-  await initFinanzas();
-}
 
 async function finSubmitTransferencia(e) {
   e.preventDefault();
@@ -1190,6 +1166,15 @@ async function finGoFamilia() {
   switchView('view-finanzas');
 }
 
+// «Apuntar gasto» del Acceso Rápido: Finanzas de la familia con la hoja ya
+// abierta. Va SIN await delante: el teclado de una tableta solo sale si el
+// foco se pone dentro del mismo toque, y un await lo rompe.
+function finGoApunte() {
+  _finContexto = 'familia';
+  switchView('view-finanzas');
+  finAbrirApunte();
+}
+
 // Acceso directo al presupuesto de la escuela (desde el Acceso Rápido del inicio).
 async function finGoEscuela() {
   const ok = await _finCheckContexto();
@@ -1242,9 +1227,640 @@ function _finUpdateContextoUI() {
 
   const btn = document.getElementById('fin-ctx-btn');
   if (btn) btn.classList.toggle('fin-ctx-btn-volver', esEscuela);
+}
 
-  // El select de categorías del formulario depende del contexto.
-  _finFillCategoriaSelect(document.getElementById('fin-t-tipo')?.value || 'egreso');
+/* ─────────────────────────────────────────────
+   APUNTE RÁPIDO
+   La hoja con la que se anotan los gastos e ingresos del día. Las reglas
+   están en CLAUDE.md; en corto: se pide solo lo que no se puede adivinar
+   (el monto y la categoría), lo demás viene puesto —la cuenta de la última
+   vez, el día de hoy—, y guardar deja la hoja abierta para el siguiente.
+   Editar un movimiento es esta misma hoja con todo puesto.
+───────────────────────────────────────────── */
+
+const FIN_PREF_KEY = 'faro.fin.apunte.';
+
+// Estado de la hoja mientras está abierta.
+const _finQ = {
+  tipo: 'egreso',
+  categoria: '',
+  catManual: false,   // la tocó el usuario: ninguna sugerencia se la pisa
+  catAuto: false,     // la puso la descripción: si deja de coincidir, se quita
+  cuentaId: '',
+  dia: 'hoy',         // 'hoy' | 'ayer' | 'otro'
+  editando: null,     // la fila que se edita, o null si es un apunte nuevo
+  ultimo: null,       // el último apunte guardado en esta sesión (para deshacer)
+  abierta: false,
+};
+
+function _finQEl(id) { return document.getElementById(id); }
+
+function _finQLeerPref() {
+  try { return JSON.parse(localStorage.getItem(FIN_PREF_KEY + _finContexto) || '{}') || {}; }
+  catch (_) { return {}; }
+}
+function _finQGuardarPref(p) {
+  try { localStorage.setItem(FIN_PREF_KEY + _finContexto, JSON.stringify(Object.assign(_finQLeerPref(), p))); }
+  catch (_) {}
+}
+
+// Lee el monto tal como sale de un teclado de tableta y devuelve
+// { valor, partes } o null si no se entiende. Acepta «150», «12.50»,
+// «12,50» (coma decimal), «1,234» (coma de miles: tres cifras justas
+// detrás) y «20+35+12» (una suma, para la lista del mercado).
+// Nunca adivina en silencio: lo entendido se enseña debajo del campo.
+function _finQLeerMonto(texto) {
+  const limpio = String(texto || '').replace(/\s+/g, '').replace(/^L\.?/i, '');
+  if (!limpio || !/^[0-9.,+]+$/.test(limpio)) return null;
+  if (/^\+|\+$|\+\+/.test(limpio)) return null;
+  const partes = limpio.split('+').map(p => {
+    let t = p;
+    if (t.includes(',') && t.includes('.')) t = t.replace(/,/g, '');   // 1,234.50
+    else if (/^\d{1,3}(,\d{3})+$/.test(t)) t = t.replace(/,/g, '');   // 1,234 · 12,000
+    else t = t.replace(',', '.');                                     // 12,50
+    if (!/^(\d+\.?\d*|\.\d+)$/.test(t)) return NaN;
+    return parseFloat(t);
+  });
+  if (partes.some(v => !isFinite(v))) return null;
+  const valor = Math.round(partes.reduce((a, b) => a + b, 0) * 100) / 100;
+  if (!(valor > 0)) return null;
+  return { valor, partes };
+}
+
+function _finQVerbo() {
+  if (_finQ.editando) return 'Guardar cambios';
+  return _finQ.tipo === 'ingreso' ? 'Guardar ingreso' : 'Guardar gasto';
+}
+
+// Debajo del monto se dice qué se entendió, y el botón lleva la cifra.
+// Con un número liso el botón basta; el eco sale cuando hay coma, suma o
+// algo que no se entiende, que es cuando hace falta.
+function _finQEco() {
+  const eco = _finQEl('fin-q-eco');
+  const btn = _finQEl('fin-q-guardar');
+  const inp = _finQEl('fin-q-monto');
+  if (!eco || !btn || !inp) return;
+  const texto = inp.value.trim();
+  const m = _finQLeerMonto(texto);
+  const verbo = _finQVerbo();
+  eco.classList.toggle('finq-eco-mal', !!texto && !m);
+  if (!texto) {
+    eco.textContent = '';
+    btn.textContent = verbo;
+    return;
+  }
+  if (!m) {
+    eco.textContent = 'No se entiende el monto: solo números, coma o punto, y «+» para sumar.';
+    btn.textContent = verbo;
+    return;
+  }
+  btn.textContent = `${verbo} · ${_finMoney(m.valor)}`;
+  if (m.partes.length > 1) {
+    eco.textContent = `Se entiende ${_finMoney(m.valor)} = ${m.partes.map(v => _finMoney(v).replace('L. ', '')).join(' + ')}`;
+  } else if (/[,.]/.test(texto)) {
+    eco.textContent = `Se entiende ${_finMoney(m.valor)}`;
+  } else {
+    eco.textContent = '';
+  }
+}
+
+function _finQAviso(texto) {
+  const el = _finQEl('fin-q-aviso');
+  if (!el) return;
+  el.textContent = texto || '';
+  el.hidden = !texto;
+}
+
+function _finQNormaliza(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ').trim();
+}
+
+// Las categorías del tipo activo, las más usadas primero. El orden sale del
+// historial, no de una lista fija: lo que más se apunta queda en la primera
+// fila, que es la que se ve con el teclado puesto.
+function _finQCategoriasOrdenadas(tipo) {
+  const lista = _finCats(tipo);
+  const cuenta = {};
+  (_finHistCache[_finContexto] || []).forEach(h => {
+    if (h.tipo === tipo && h.categoria) cuenta[h.categoria] = (cuenta[h.categoria] || 0) + 1;
+  });
+  return lista
+    .map((c, i) => ({ c, i, n: cuenta[c.v] || 0 }))
+    .sort((a, b) => b.n - a.n || a.i - b.i)
+    .map(x => x.c);
+}
+
+function _finQPintarCategorias() {
+  const wrap = _finQEl('fin-q-cats');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const cats = _finQCategoriasOrdenadas(_finQ.tipo).slice();
+  // Al editar, una categoría vieja que ya no está en la lista se conserva.
+  if (_finQ.categoria && !cats.find(c => c.v === _finQ.categoria)) {
+    cats.unshift({ v: _finQ.categoria, e: '📦', label: _finQ.categoria });
+  }
+  cats.forEach(c => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    const activo = c.v === _finQ.categoria;
+    b.className = 'finq-chip' + (activo ? ' finq-chip-activo' : '');
+    b.dataset.cat = c.v;
+    b.setAttribute('aria-pressed', activo ? 'true' : 'false');
+    b.textContent = `${c.e} ${c.v}`;
+    wrap.appendChild(b);
+  });
+}
+
+function _finQElegirCategoria(v, manual) {
+  _finQ.categoria = v || '';
+  if (manual) { _finQ.catManual = true; _finQ.catAuto = false; }
+  document.querySelectorAll('#fin-q-cats .finq-chip').forEach(b => {
+    const activo = b.dataset.cat === _finQ.categoria;
+    b.classList.toggle('finq-chip-activo', activo);
+    b.setAttribute('aria-pressed', activo ? 'true' : 'false');
+  });
+  if (manual) {
+    const hint = _finQEl('fin-q-cat-hint');
+    if (hint) hint.textContent = '';
+    _finQAviso('');
+  }
+}
+
+// «Como la última vez»: si la descripción coincide con una de antes, su
+// categoría (y su cuenta) se marcan solas y la pantalla lo dice. Si se
+// sigue escribiendo y deja de coincidir, se desmarca: una categoría que se
+// queda puesta por inercia es un gasto mal archivado sin ningún error.
+function _finQSugerencia(desc) {
+  const clave = _finQNormaliza(desc);
+  if (!clave) return null;
+  return (_finHistCache[_finContexto] || []).find(h =>
+    h.tipo === _finQ.tipo && _finQNormaliza(h.descripcion) === clave) || null;
+}
+
+function _finQAlEscribirDesc() {
+  if (_finQ.catManual || _finQ.editando) return;
+  const hint = _finQEl('fin-q-cat-hint');
+  const s = _finQSugerencia((_finQEl('fin-q-desc') || {}).value);
+  const cats = _finCats(_finQ.tipo);
+  if (s && s.categoria && cats.find(c => c.v === s.categoria)) {
+    _finQElegirCategoria(s.categoria, false);
+    _finQ.catAuto = true;
+    if (hint) hint.textContent = '· como la última vez';
+    if (s.cuenta_id && _finCuentasCache.find(c => String(c.id) === String(s.cuenta_id))) {
+      _finQElegirCuenta(String(s.cuenta_id));
+    }
+  } else if (_finQ.catAuto) {
+    _finQ.catAuto = false;
+    _finQElegirCategoria('', false);
+    if (hint) hint.textContent = '';
+  }
+}
+
+// Las descripciones de antes, las más repetidas primero, para que el
+// teclado las complete. Solo las del tipo activo.
+function _finQPintarDatalist() {
+  const dl = _finQEl('fin-q-desc-list');
+  if (!dl) return;
+  dl.innerHTML = '';
+  const vistos = new Map();
+  (_finHistCache[_finContexto] || []).forEach(h => {
+    if (h.tipo !== _finQ.tipo) return;
+    const d = String(h.descripcion || '').trim();
+    if (!d) return;
+    const k = _finQNormaliza(d);
+    const e = vistos.get(k);
+    if (e) e.n++; else vistos.set(k, { d, n: 1 });
+  });
+  [...vistos.values()].sort((a, b) => b.n - a.n).slice(0, 30).forEach(x => {
+    const o = document.createElement('option');
+    o.value = x.d;
+    dl.appendChild(o);
+  });
+}
+
+// Con una sola cuenta no se pregunta: se usa. Con varias, chips, con la de
+// la última vez marcada (o la de la fila que se edita).
+function _finQPintarCuentas() {
+  const fila = _finQEl('fin-q-cuenta-fila');
+  const wrap = _finQEl('fin-q-cuentas');
+  if (!fila || !wrap) return;
+  wrap.innerHTML = '';
+  const cuentas = _finCuentasCache;
+
+  if (!cuentas.length) {
+    _finQ.cuentaId = '';
+    fila.hidden = false;
+    const aviso = document.createElement('div');
+    aviso.className = 'finq-sin-cuenta';
+    aviso.textContent = 'Primero hace falta una cuenta (efectivo, banco…).';
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'finq-chip';
+    b.textContent = '＋ Crear cuenta';
+    b.addEventListener('click', () => { finCerrarApunte(); finOpenModal('cuenta'); });
+    wrap.append(aviso, b);
+    return;
+  }
+
+  const ids = cuentas.map(c => String(c.id));
+  if (!ids.includes(String(_finQ.cuentaId))) {
+    const pref = String(_finQLeerPref().cuenta_id || '');
+    _finQ.cuentaId = ids.includes(pref) ? pref : ids[0];
+  }
+  fila.hidden = cuentas.length === 1;
+  cuentas.forEach(c => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    const activo = String(c.id) === String(_finQ.cuentaId);
+    b.className = 'finq-chip' + (activo ? ' finq-chip-activo' : '');
+    b.dataset.cuenta = String(c.id);
+    b.setAttribute('aria-pressed', activo ? 'true' : 'false');
+    b.textContent = c.nombre;
+    b.title = _finMoney(c.saldo_actual);
+    wrap.appendChild(b);
+  });
+}
+
+function _finQElegirCuenta(id) {
+  _finQ.cuentaId = String(id || '');
+  document.querySelectorAll('#fin-q-cuentas .finq-chip[data-cuenta]').forEach(b => {
+    const activo = b.dataset.cuenta === _finQ.cuentaId;
+    b.classList.toggle('finq-chip-activo', activo);
+    b.setAttribute('aria-pressed', activo ? 'true' : 'false');
+  });
+}
+
+function _finQFechaElegida() {
+  if (_finQ.dia === 'hoy') return _finToday();
+  if (_finQ.dia === 'ayer') return _finFechaOffset(-1);
+  const inp = _finQEl('fin-q-fecha');
+  return (inp && inp.value) || _finToday();
+}
+
+function _finQElegirDia(dia) {
+  _finQ.dia = dia;
+  document.querySelectorAll('#fin-q-dias .finq-chip').forEach(b => {
+    const activo = b.dataset.dia === dia;
+    b.classList.toggle('finq-chip-activo', activo);
+    b.setAttribute('aria-pressed', activo ? 'true' : 'false');
+  });
+  const inp = _finQEl('fin-q-fecha');
+  if (inp) {
+    inp.hidden = dia !== 'otro';
+    if (dia === 'otro' && !inp.value) inp.value = _finToday();
+  }
+  _finQPintarDelDia();
+}
+
+function _finQPintarTipo() {
+  document.querySelectorAll('#fin-q-tipo .finq-tipo-btn').forEach(b => {
+    const activo = b.dataset.tipo === _finQ.tipo;
+    b.classList.toggle('finq-tipo-activo', activo);
+    b.setAttribute('aria-selected', activo ? 'true' : 'false');
+  });
+  const hoja = document.querySelector('#fin-q-overlay .finq-modal');
+  if (hoja) hoja.dataset.tipo = _finQ.tipo;
+}
+
+function _finQElegirTipo(tipo) {
+  if (_finQ.tipo === tipo) return;
+  _finQ.tipo = tipo;
+  _finQ.categoria = '';
+  _finQ.catManual = false;
+  _finQ.catAuto = false;
+  const hint = _finQEl('fin-q-cat-hint');
+  if (hint) hint.textContent = '';
+  _finQPintarTipo();
+  _finQPintarCategorias();
+  _finQPintarDatalist();
+  _finQEco();
+  _finQAviso('');
+}
+
+// Lo apuntado del día elegido, en la misma hoja, con su suma. Se ve lo que
+// ya está sin salir, y el último de esta sesión se puede deshacer.
+async function _finQPintarDelDia() {
+  const caja = _finQEl('fin-q-hoy');
+  if (!caja || !_sb) return;
+  if (_finQ.editando) { caja.hidden = true; return; }
+
+  const fecha = _finQFechaElegida();
+  await _finCheckContexto();
+  const { data, error } = await _finCtx(_sb.from(FIN_TRANSACCIONES_TABLE).select('*'))
+    .eq('fecha', fecha)
+    .neq('categoria', FIN_TRANSFER_CATEGORY)
+    .order('id', { ascending: false });
+
+  // Si cambió el día mientras cargaba, esto ya no es lo que se ve.
+  if (!_finQ.abierta || _finQ.editando || _finQFechaElegida() !== fecha) return;
+
+  const titulo = _finQEl('fin-q-hoy-titulo');
+  const total  = _finQEl('fin-q-hoy-total');
+  const lista  = _finQEl('fin-q-hoy-lista');
+  if (!titulo || !total || !lista) return;
+
+  const nombre = _finNombreDia(fecha);
+  titulo.textContent = 'Apuntado ' + (nombre === 'Hoy' ? 'hoy' : nombre === 'Ayer' ? 'ayer' : 'el ' + nombre);
+  lista.innerHTML = '';
+  total.textContent = '';
+  caja.hidden = false;
+
+  if (error) {
+    const v = document.createElement('div');
+    v.className = 'finq-vacio';
+    v.textContent = 'No se pudo leer el día (señal).';
+    lista.appendChild(v);
+    return;
+  }
+  const filas = data || [];
+  if (!filas.length) {
+    const v = document.createElement('div');
+    v.className = 'finq-vacio';
+    v.textContent = 'Nada apuntado todavía.';
+    lista.appendChild(v);
+    return;
+  }
+
+  const gas = filas.filter(t => t.tipo === 'egreso').reduce((s, t) => s + Number(t.monto || 0), 0);
+  const ing = filas.filter(t => t.tipo === 'ingreso').reduce((s, t) => s + Number(t.monto || 0), 0);
+  const partes = [`${filas.length} ${filas.length === 1 ? 'apunte' : 'apuntes'}`];
+  if (gas > 0) partes.push('− ' + _finMoney(gas));
+  if (ing > 0) partes.push('+ ' + _finMoney(ing));
+  total.textContent = partes.join(' · ');
+
+  const yo = _finCurrentUserName();
+  filas.forEach(t => {
+    const fila = document.createElement('div');
+    fila.className = 'finq-hoy-fila';
+
+    const desc = document.createElement('span');
+    desc.className = 'finq-hoy-desc';
+    let texto = `${_finCatEmoji(t.categoria)} ${t.descripcion || t.categoria || 'Movimiento'}`;
+    if (t.usuario && t.usuario !== yo) texto += ` · ${t.usuario}`;
+    desc.textContent = texto;
+
+    const monto = document.createElement('span');
+    monto.className = 'finq-hoy-monto ' + (t.tipo === 'ingreso' ? 'fin-mov-in' : 'fin-mov-out');
+    monto.textContent = (t.tipo === 'ingreso' ? '+ ' : '− ') + _finMoney(t.monto);
+
+    fila.append(desc, monto);
+
+    if (_finQ.ultimo && String(_finQ.ultimo.id) === String(t.id)) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'finq-deshacer';
+      b.textContent = '↶ Deshacer';
+      b.addEventListener('click', () => _finQDeshacer(t));
+      fila.appendChild(b);
+    }
+    lista.appendChild(fila);
+  });
+}
+
+function finAbrirApunte(opts) {
+  const overlay = _finQEl('fin-q-overlay');
+  if (!overlay) return;
+  const t = (opts && opts.editar) || null;
+
+  _finQ.editando  = t;
+  _finQ.abierta   = true;
+  _finQ.ultimo    = null;
+  _finQ.tipo      = t ? (t.tipo === 'ingreso' ? 'ingreso' : 'egreso') : 'egreso';
+  _finQ.categoria = t ? (t.categoria || '') : '';
+  _finQ.catManual = !!t;
+  _finQ.catAuto   = false;
+  _finQ.cuentaId  = t ? String(t.cuenta_id || '') : '';
+
+  let dia = 'hoy';
+  if (t) dia = t.fecha === _finToday() ? 'hoy' : t.fecha === _finFechaOffset(-1) ? 'ayer' : 'otro';
+  const fechaInp = _finQEl('fin-q-fecha');
+  if (fechaInp) fechaInp.value = (t && t.fecha) || _finToday();
+
+  const monto = _finQEl('fin-q-monto');
+  const desc  = _finQEl('fin-q-desc');
+  if (monto) monto.value = t ? String(t.monto) : '';
+  if (desc)  desc.value  = t ? (t.descripcion || '') : '';
+  const hint = _finQEl('fin-q-cat-hint');
+  if (hint) hint.textContent = '';
+  _finQAviso('');
+
+  const modo = _finQEl('fin-q-modo');
+  if (modo) modo.hidden = !t;
+  const mas = _finQEl('fin-q-mas');
+  if (mas) mas.hidden = !!t;
+
+  _finQPintarTipo();
+  _finQPintarCategorias();
+  _finQPintarCuentas();
+  _finQPintarDatalist();
+  _finQElegirDia(dia);
+  _finQEco();
+
+  overlay.style.display = 'flex';
+  // El foco va DENTRO del mismo toque que abrió la hoja: es lo que hace que
+  // en una tableta salga el teclado solo. Después de un await no sale.
+  if (monto) { monto.focus(); if (t) monto.select(); }
+
+  // Si el panel todavía estaba cargando (desde el Acceso Rápido pasa
+  // siempre), las cuentas y el historial llegan después: se repinta lo
+  // que depende de ellos, sin tocar el monto ni el foco.
+  const carga = _finInitPromesa;
+  if (carga) {
+    carga.then(() => {
+      if (!_finQ.abierta || _finInitPromesa !== carga) return;
+      _finQPintarCuentas();
+      _finQPintarCategorias();
+      _finQPintarDatalist();
+    }).catch(() => {});
+  }
+}
+
+function finCerrarApunte() {
+  const overlay = _finQEl('fin-q-overlay');
+  if (overlay) overlay.style.display = 'none';
+  _finQ.abierta = false;
+  _finQ.editando = null;
+}
+
+async function _finQGuardar(e) {
+  if (e) e.preventDefault();
+  if (!_sb) return;
+  const montoInp = _finQEl('fin-q-monto');
+  const descInp  = _finQEl('fin-q-desc');
+  const btn      = _finQEl('fin-q-guardar');
+
+  const m = _finQLeerMonto(montoInp ? montoInp.value : '');
+  if (!m) {
+    _finQAviso('Escribe el monto: solo números.');
+    if (montoInp) montoInp.focus();
+    return;
+  }
+  if (!_finQ.categoria) {
+    _finQAviso('Toca una categoría.');
+    const wrap = _finQEl('fin-q-cats');
+    if (wrap) {
+      wrap.classList.remove('finq-chips-falta');
+      void wrap.offsetWidth;
+      wrap.classList.add('finq-chips-falta');
+    }
+    return;
+  }
+  if (!_finQ.cuentaId) {
+    _finQAviso('Hace falta una cuenta donde apuntarlo.');
+    return;
+  }
+  const fecha = _finQFechaElegida();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    _finQAviso('La fecha no se entiende.');
+    return;
+  }
+
+  const tipo        = _finQ.tipo;
+  const monto       = m.valor;
+  const categoria   = _finQ.categoria;
+  const descripcion = (descInp ? descInp.value : '').trim();
+  const cuentaId    = _finQ.cuentaId;
+
+  if (btn) btn.disabled = true;
+  try {
+    // ── Edición: actualiza la fila y reconcilia los saldos ──
+    if (_finQ.editando) {
+      const orig = _finQ.editando;
+      const { error: errUpd } = await _sb
+        .from(FIN_TRANSACCIONES_TABLE)
+        .update({ tipo, monto, categoria, descripcion, fecha, cuenta_id: cuentaId })
+        .eq('id', orig.id);
+      if (errUpd) {
+        console.error('[Finanzas] Error actualizando el apunte:', errUpd);
+        _finQAviso('No se guardó el cambio. Revisa la señal y vuelve a intentar.');
+        return;
+      }
+      // Efecto sobre el saldo: ingreso suma, egreso resta.
+      const oldEffect = (orig.tipo === 'ingreso' ? 1 : -1) * Number(orig.monto || 0);
+      const newEffect = (tipo === 'ingreso' ? 1 : -1) * monto;
+      if (String(orig.cuenta_id) === String(cuentaId)) {
+        await _finApplyBalanceDelta(cuentaId, newEffect - oldEffect);
+      } else {
+        if (orig.cuenta_id) await _finApplyBalanceDelta(orig.cuenta_id, -oldEffect);
+        await _finApplyBalanceDelta(cuentaId, newEffect);
+      }
+      if (typeof toast === 'function') toast('✅ Apunte actualizado');
+      finCerrarApunte();
+      await initFinanzas();
+      await _finRefreshGastosDetailIfOpen();
+      return;
+    }
+
+    // ── Apunte nuevo ──
+    const { data, error } = await _sb.from(FIN_TRANSACCIONES_TABLE).insert({
+      tipo, monto, categoria, descripcion, fecha,
+      usuario: _finCurrentUserName(),
+      cuenta_id: cuentaId,
+      ..._finCtxData(),
+    }).select().single();
+
+    if (error) {
+      console.error('[Finanzas] Error guardando el apunte:', error);
+      _finQAviso('No se guardó. Revisa la señal y vuelve a intentar.');
+      return;
+    }
+
+    await _finApplyBalanceDelta(cuentaId, tipo === 'ingreso' ? monto : -monto);
+
+    // Memoria para el siguiente: el historial en el aparato, la cuenta
+    // preferida y el último apunte (para deshacer).
+    const hist = _finHistCache[_finContexto] || (_finHistCache[_finContexto] = []);
+    hist.unshift({ tipo, categoria, descripcion, cuenta_id: cuentaId });
+    if (hist.length > FIN_HIST_LIMITE) hist.length = FIN_HIST_LIMITE;
+    _finQGuardarPref({ cuenta_id: cuentaId });
+    _finQ.ultimo = data || null;
+
+    if (typeof toast === 'function') {
+      toast(`✅ ${tipo === 'ingreso' ? 'Ingreso' : 'Gasto'} apuntado · ${_finMoney(monto)}`);
+    }
+
+    // La hoja se queda abierta para el siguiente: se limpia lo que es de
+    // este apunte (monto, descripción, categoría) y se queda lo que suele
+    // repetirse (tipo, día, cuenta). El teclado sigue en el monto.
+    if (montoInp) montoInp.value = '';
+    if (descInp)  descInp.value  = '';
+    _finQ.categoria = '';
+    _finQ.catManual = false;
+    _finQ.catAuto   = false;
+    const hint = _finQEl('fin-q-cat-hint');
+    if (hint) hint.textContent = '';
+    _finQPintarCategorias();
+    _finQPintarDatalist();
+    _finQEco();
+    _finQAviso('');
+    if (montoInp) montoInp.focus();
+
+    _finQPintarDelDia();
+    initFinanzas(); // el panel se pone al día detrás, sin parar la hoja
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function _finQDeshacer(t) {
+  if (!_sb || !t) return;
+  const { error } = await _sb.from(FIN_TRANSACCIONES_TABLE).delete().eq('id', t.id);
+  if (error) {
+    console.error('[Finanzas] Error deshaciendo el apunte:', error);
+    if (typeof toast === 'function') toast('No se pudo deshacer');
+    return;
+  }
+  // Devuelve al saldo lo que este apunte le había quitado (o puesto).
+  await _finApplyBalanceDelta(t.cuenta_id, (t.tipo === 'ingreso' ? -1 : 1) * Number(t.monto || 0));
+  if (_finQ.ultimo && String(_finQ.ultimo.id) === String(t.id)) _finQ.ultimo = null;
+  const hist = _finHistCache[_finContexto] || [];
+  const i = hist.findIndex(h => h.tipo === t.tipo && h.categoria === t.categoria &&
+    (h.descripcion || '') === (t.descripcion || '') && String(h.cuenta_id) === String(t.cuenta_id));
+  if (i >= 0) hist.splice(i, 1);
+  if (typeof toast === 'function') toast('↶ Apunte deshecho');
+  _finQPintarDelDia();
+  initFinanzas();
+}
+
+// Enganche de la hoja. Todo delegado en los contenedores: los chips se
+// repintan y no pueden llevar el manejador cada uno.
+function _finQEnganchar() {
+  const overlay = _finQEl('fin-q-overlay');
+  if (!overlay) return;
+
+  _finQEl('fin-q-close')?.addEventListener('click', finCerrarApunte);
+  overlay.addEventListener('click', e => { if (e.target === overlay) finCerrarApunte(); });
+  overlay.addEventListener('keydown', e => { if (e.key === 'Escape') finCerrarApunte(); });
+
+  _finQEl('fin-q-tipo')?.addEventListener('click', e => {
+    const b = e.target.closest('[data-tipo]');
+    if (b) _finQElegirTipo(b.dataset.tipo);
+  });
+  _finQEl('fin-q-cats')?.addEventListener('click', e => {
+    const b = e.target.closest('[data-cat]');
+    if (b) _finQElegirCategoria(b.dataset.cat, true);
+  });
+  _finQEl('fin-q-cuentas')?.addEventListener('click', e => {
+    const b = e.target.closest('[data-cuenta]');
+    if (b) _finQElegirCuenta(b.dataset.cuenta);
+  });
+  _finQEl('fin-q-dias')?.addEventListener('click', e => {
+    const b = e.target.closest('[data-dia]');
+    if (b) _finQElegirDia(b.dataset.dia);
+  });
+  _finQEl('fin-q-fecha')?.addEventListener('change', () => _finQPintarDelDia());
+  _finQEl('fin-q-monto')?.addEventListener('input', () => { _finQEco(); _finQAviso(''); });
+  _finQEl('fin-q-desc')?.addEventListener('input', _finQAlEscribirDesc);
+  _finQEl('fin-q-form')?.addEventListener('submit', _finQGuardar);
+
+  // Lo que no es diario sigue en el modal de siempre, a un toque.
+  _finQEl('fin-q-mas')?.addEventListener('click', e => {
+    const b = e.target.closest('[data-fintab]');
+    if (!b) return;
+    finCerrarApunte();
+    finOpenModal(b.dataset.fintab);
+  });
 }
 
 /* ─────────────────────────────────────────────
@@ -1587,7 +2203,11 @@ function _finRenderTrend(porMes, year, month) {
 ───────────────────────────────────────────── */
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('fin-fab')?.addEventListener('click', () => finOpenModal('transaccion'));
+  // El «+» abre el Apunte rápido: los gastos e ingresos del día van por ahí.
+  document.getElementById('fin-fab')?.addEventListener('click', () => finAbrirApunte());
+  _finQEnganchar();
+
+  // El modal de siempre queda para lo que no es diario.
   document.getElementById('fin-modal-close')?.addEventListener('click', finCloseModal);
   document.getElementById('fin-modal-overlay')?.addEventListener('click', e => {
     if (e.target.id === 'fin-modal-overlay') finCloseModal();
@@ -1597,16 +2217,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => finSwitchTab(btn.dataset.fintab));
   });
 
-  document.getElementById('fin-form-transaccion')?.addEventListener('submit', finSubmitTransaccion);
   document.getElementById('fin-form-transferencia')?.addEventListener('submit', finSubmitTransferencia);
   document.getElementById('fin-form-cuenta')?.addEventListener('submit', finSubmitCuenta);
   document.getElementById('fin-form-deuda')?.addEventListener('submit', finSubmitDeuda);
-
-  // Las categorías del formulario dependen del tipo (ingreso/egreso).
-  _finFillCategoriaSelect('egreso');
-  document.getElementById('fin-t-tipo')?.addEventListener('change', e => {
-    _finFillCategoriaSelect(e.target.value);
-  });
 
   // Filtros de la lista de movimientos.
   document.getElementById('fin-mov-chips')?.addEventListener('click', e => {
