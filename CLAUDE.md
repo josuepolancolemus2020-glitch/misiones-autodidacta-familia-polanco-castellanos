@@ -419,6 +419,34 @@ portada, el Acceso Rápido «Apuntar gasto» llega ahí de un toque.
     filas se llenó, el día más viejo se descarta antes que enseñar un
     subtotal a medias.
 
+11. ⚠️ **SE PUEDE DEJAR FIJADA, y es un interruptor, no el modo por
+    defecto.** Ampliación del 9 de septiembre de 2026: «quisiera poder
+    activarle que siempre se muestre en la pantalla». Encendido
+    (`FIN_FIJO_KEY`), la hoja está puesta al entrar a Finanzas, al volver a
+    encender la pantalla y al abrir la aplicación. Cuatro cosas que no se
+    negocian:
+
+    - **La ✕ sigue cerrando.** Una hoja fijada que no se pudiera cerrar
+      dejaría el saldo y el historial detrás de una ventana que no se quita.
+    - **La llave es del APARATO y global**, no de cada presupuesto ni de la
+      nube. Es una costumbre de un teléfono: encenderla en el del autor no
+      puede abrirle la hoja en la cara a quien solo entra a mirar el saldo, y
+      no cambia al pasar de Familia a Escuela.
+    - ⚠️ **Se vuelve con `visibilitychange`, nunca con `focus`.** En Android
+      el `focus` salta también al abrirse el teclado: la hoja se reabriría
+      sola en medio de escribir un monto. Y no se abre nunca por debajo de
+      otra ventana ni estando en otra pantalla, porque entonces aparecería al
+      cerrar la de arriba, que es el peor momento posible.
+    - ⚠️ **Una dirección con `?view=` manda SIEMPRE.** Quien toca la
+      notificación de un mensaje del chat quiere el chat; encontrarse las
+      finanzas en su lugar es perder el mensaje que venía a leer. Lo vigila
+      la comprobación 20 de la sonda.
+
+    Y lo que NO puede hacer, porque ninguna página web puede: salir encima de
+    la pantalla de bloqueo ni encenderse sola. Eso es de una aplicación
+    nativa con permisos del sistema. Lo más cerca que se llega es esto —estar
+    ya puesta al volver— más fijar la aplicación desde el propio Android.
+
 Nada de la base llega a un atributo del HTML: todo con `createElement` y
 `textContent`, como en las Sugerencias. Una descripción la escribe alguien
 de la casa, pero la hoja vive en el mismo dominio que la Bóveda.

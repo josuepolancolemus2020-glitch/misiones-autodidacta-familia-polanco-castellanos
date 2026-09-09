@@ -1240,6 +1240,24 @@ function _finUpdateContextoUI() {
 
 const FIN_PREF_KEY = 'faro.fin.apunte.';
 
+/* ⚠️ «Dejarlo siempre abierto» es de ESTE APARATO Y GLOBAL, no de cada
+   presupuesto. Quien lo enciende lo enciende porque apunta a diario desde su
+   teléfono, y esa costumbre no cambia al pasar de Familia a Escuela: una
+   llave por contexto obligaría a encenderlo dos veces y la segunda no se
+   encuentra nunca. Y va en el aparato, no en la nube, porque es una manía de
+   este teléfono: encenderlo aquí no puede abrirle la hoja en la cara a otro
+   de la casa que solo entra a mirar el saldo. */
+const FIN_FIJO_KEY = 'faro.fin.apunte.fijo';
+
+function finApunteFijo() {
+  try { return localStorage.getItem(FIN_FIJO_KEY) === '1'; }
+  catch (_) { return false; }
+}
+function finPonerApunteFijo(v) {
+  try { v ? localStorage.setItem(FIN_FIJO_KEY, '1') : localStorage.removeItem(FIN_FIJO_KEY); }
+  catch (_) {}
+}
+
 // Estado de la hoja mientras está abierta.
 const _finQ = {
   tipo: 'egreso',
@@ -1618,6 +1636,60 @@ async function _finQPintarDelDia() {
   });
 }
 
+function _finQPintarFijo() {
+  const btn = _finQEl('fin-q-fijo');
+  const sub = _finQEl('fin-q-fijo-sub');
+  if (!btn) return;
+  const on = finApunteFijo();
+  btn.setAttribute('aria-checked', on ? 'true' : 'false');
+  btn.classList.toggle('finq-fijo-on', on);
+  /* Se dice con PALABRAS lo que va a pasar, y en las dos posiciones. Un
+     interruptor con solo un rótulo obliga a encenderlo para averiguar qué
+     hace, y el que lo enciende sin querer no sabe qué le cambió. */
+  if (sub) {
+    sub.textContent = on
+      ? 'Al entrar a Finanzas y al volver al teléfono ya estará abierta. La ✕ la cierra igual.'
+      : 'Ahora hay que tocar el + cada vez que quieras apuntar.';
+  }
+}
+
+function _finQAlternarFijo() {
+  const on = !finApunteFijo();
+  finPonerApunteFijo(on);
+  _finQPintarFijo();
+  if (typeof toast === 'function') {
+    toast(on ? '📌 El Apunte se quedará abierto' : 'El Apunte ya no se abre solo');
+  }
+}
+
+/* ¿Hay otra ventana encima? Abrir la hoja automáticamente por debajo del
+   detalle de una tarjeta o del modal de deudas dejaría dos ventanas apiladas
+   y la de abajo aparecería sola al cerrar la de arriba, que es el peor
+   momento para que aparezca algo. */
+function _finQOtraVentana() {
+  return ['fin-modal-overlay', 'fin-detail-modal-overlay', 'fin-abono-overlay']
+    .some(id => {
+      const el = document.getElementById(id);
+      return el && el.style.display !== 'none' && el.style.display !== '';
+    });
+}
+
+/* Se abre sola solo si está encendido, si de verdad se está mirando
+   Finanzas, y si no hay ya algo abierto. Las tres condiciones hacen falta. */
+function _finQAbrirSiFijo() {
+  if (!finApunteFijo()) return;
+  if (_finQ.abierta || _finQOtraVentana()) return;
+  const vista = document.getElementById('view-finanzas');
+  if (!vista || !vista.classList.contains('active')) return;
+  finAbrirApunte();
+}
+
+/* Al entrar a Finanzas. Va llamada desde switchView, o sea DENTRO del toque
+   que cambió de vista: por eso aquí el teclado sí sale solo. */
+function finApunteAlEntrar() {
+  _finQAbrirSiFijo();
+}
+
 function finAbrirApunte(opts) {
   const overlay = _finQEl('fin-q-overlay');
   if (!overlay) return;
@@ -1649,6 +1721,9 @@ function finAbrirApunte(opts) {
   if (modo) modo.hidden = !t;
   const mas = _finQEl('fin-q-mas');
   if (mas) mas.hidden = !!t;
+  const fijo = _finQEl('fin-q-fijo');
+  if (fijo) fijo.hidden = !!t;
+  _finQPintarFijo();
 
   _finQPintarTipo();
   _finQPintarCategorias();
@@ -1854,6 +1929,8 @@ function _finQEnganchar() {
   _finQEl('fin-q-desc')?.addEventListener('input', _finQAlEscribirDesc);
   _finQEl('fin-q-form')?.addEventListener('submit', _finQGuardar);
 
+  _finQEl('fin-q-fijo')?.addEventListener('click', _finQAlternarFijo);
+
   // Lo que no es diario sigue en el modal de siempre, a un toque.
   _finQEl('fin-q-mas')?.addEventListener('click', e => {
     const b = e.target.closest('[data-fintab]');
@@ -1861,6 +1938,34 @@ function _finQEnganchar() {
     finCerrarApunte();
     finOpenModal(b.dataset.fintab);
   });
+
+  /* ⚠️ VOLVER AL TELÉFONO ES LO QUE DE VERDAD SE PIDIÓ. Apagar la pantalla
+     no cierra nada, pero el teléfono deja la página en segundo plano y al
+     encenderla vuelve tal como estaba — o sea, con la hoja cerrada si se
+     cerró. `visibilitychange` es el único aviso que da el navegador de que
+     alguien volvió a mirar, y sirve igual para la pantalla apagada, para
+     cambiar de aplicación y para volver de la cámara.
+     NO se usa `focus`: en Android salta también al abrirse el teclado, y la
+     hoja se reabriría sola en medio de escribir un monto. */
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') _finQAbrirSiFijo();
+  });
+}
+
+/* Al abrir la aplicación desde cero. Lo llama js/auth.js en cuanto la sesión
+   queda puesta, que es el único instante en que se sabe que hay alguien
+   dentro y que la pantalla ya no es la del login.
+   ⚠️ Una dirección con ?view= manda SIEMPRE: quien toca una notificación del
+   chat quiere el chat, y encontrarse las finanzas en su lugar es perder el
+   mensaje que venía a leer. */
+function faroArranqueApunteFijo() {
+  if (!finApunteFijo()) return;
+  try {
+    if (new URLSearchParams(window.location.search).get('view')) return;
+  } catch (_) {}
+  if (typeof switchView !== 'function') return;
+  switchView('view-finanzas');
+  _finQAbrirSiFijo();
 }
 
 /* ─────────────────────────────────────────────

@@ -2769,6 +2769,32 @@ a { text-decoration: none; color: inherit; }
 }
 .finq-vacio { font-size: 12px; color: var(--muted); padding: 4px 0; }
 
+/* El interruptor de «dejarlo siempre abierto». Fila entera tocable. */
+.finq-fijo {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  margin-top: 14px; padding: 12px; min-height: 56px;
+  background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px;
+  font-family: inherit; text-align: left; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.finq-fijo[hidden] { display: none; }
+.finq-fijo-on { border-color: var(--brand); background: var(--surface); }
+.finq-fijo-sw {
+  width: 44px; height: 26px; border-radius: 13px; flex-shrink: 0;
+  background: var(--faint); position: relative; transition: background .15s;
+}
+.finq-fijo-on .finq-fijo-sw { background: var(--brand); }
+.finq-fijo-bola {
+  position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; box-shadow: var(--shadow);
+  transition: transform .15s;
+}
+.finq-fijo-on .finq-fijo-bola { transform: translateX(18px); }
+.finq-fijo-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.finq-fijo-tit { font-size: 13px; font-weight: 800; color: var(--text); }
+.finq-fijo-sub { font-size: 11px; font-weight: 600; color: var(--muted); line-height: 1.35; }
+
 /* Lo que no es diario, al pie y a un toque */
 .finq-mas {
   display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;

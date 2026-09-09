@@ -903,6 +903,11 @@ function switchView(id) {
   if (id === 'view-redes'   && typeof initRedes === 'function')   initRedes();
   if (id === 'view-collage')        initCollage();
   if (id === 'view-finanzas' && typeof initFinanzas === 'function') initFinanzas();
+  /* Va DESPUÉS de initFinanzas y no dentro: initFinanzas se vuelve a llamar
+     tras guardar, tras deshacer y tras borrar una cuenta, y desde ahí la hoja
+     se abriría encima del detalle que se estaba mirando. Aquí solo corre al
+     cambiar de vista de verdad, que es cuando se quiere. */
+  if (id === 'view-finanzas' && typeof finApunteAlEntrar === 'function') finApunteAlEntrar();
   if (id === 'view-fin-stats' && typeof initFinStats === 'function') initFinStats();
   if (id === 'view-inventario' && typeof initInventario === 'function') initInventario();
   if (id === 'view-destellos' && typeof initDestellos === 'function') initDestellos();

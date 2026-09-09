@@ -40,6 +40,14 @@ pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
    7. QUE LOS TOQUES MIDAN LO QUE MIDE UN DEDO, con la hoja abierta de
       verdad y el reloj en la mano.
 
+   8. QUE SE PUEDA DEJAR FIJADA. El autor apunta a diario y pidió no tener
+      que tocar el «+» cada vez: encendido el interruptor, la hoja está
+      puesta al entrar a Finanzas y al volver a encender la pantalla. Con
+      tres cosas que no se negocian: la ✕ sigue cerrando (si no, se queda
+      uno encerrado), no se abre encima de otra ventana, y una dirección
+      con ?view= manda siempre —quien toca una notificación del chat quiere
+      el chat—.
+
    Como en las demás sondas: se ejecuta el index.html de verdad con una
    base de datos de mentira a nivel de fetch. El cliente de Supabase es
    el auténtico. */
@@ -191,6 +199,7 @@ function siembra(base){
   }
   w.eval('window.verificarSesion = () => ({ user: "josue", nombre: "Josué Edmundo" })');
   try { w.localStorage.removeItem('faro.fin.apunte.familia'); } catch (_) {}
+  try { w.localStorage.removeItem('faro.fin.apunte.fijo'); } catch (_) {}
 
   const base = nuevaBase(w);
   siembra(base);
@@ -447,6 +456,87 @@ function siembra(base){
   ok($('view-finanzas').classList.contains('active') && hoja.style.display === 'flex' && d.activeElement === monto,
      'y abre Finanzas con la hoja puesta y el foco en el monto', 'el acceso directo no deja la hoja lista');
   $('fin-q-close').click();
+
+  log('── 18. Se puede dejar fijada, y entonces vuelve sola ──');
+  w.eval('switchView("view-finanzas")');
+  await esperar(200);
+  $('fin-fab').click();
+  await esperar(200);
+  const swFijo = $('fin-q-fijo');
+  ok(!!swFijo && swFijo.getAttribute('aria-checked') === 'false', 'el interruptor existe y nace apagado', 'falta el interruptor o nace encendido');
+  ok(texto('fin-q-fijo-sub').includes('tocar el +'), 'y dice con palabras qué pasa ahora: ' + texto('fin-q-fijo-sub'), 'el interruptor no explica su estado');
+  const altoSw = swFijo.getBoundingClientRect().height;
+  ok(altoSw >= 44, `la fila entera es tocable (${altoSw.toFixed(0)} px)`, `la fila del interruptor mide ${altoSw.toFixed(0)} px: menos de 44`);
+
+  swFijo.click();
+  await esperar(100);
+  ok(swFijo.getAttribute('aria-checked') === 'true', 'un toque lo enciende', 'no se encendió');
+  ok(w.localStorage.getItem('faro.fin.apunte.fijo') === '1', 'y queda guardado en el aparato, no en la nube', 'no se guardó la preferencia');
+  ok(texto('fin-q-fijo-sub').includes('volver al teléfono'), 'y ahora explica lo nuevo: ' + texto('fin-q-fijo-sub'), 'el texto no cambió al encenderlo');
+
+  $('fin-q-close').click();
+  await esperar(100);
+  ok(hoja.style.display === 'none', 'la ✕ SIGUE cerrando: no se queda uno encerrado', '⚠️ con el interruptor puesto la ✕ dejó de cerrar');
+
+  w.eval('switchView("view-inicio")');
+  await esperar(100);
+  w.eval('switchView("view-finanzas")');
+  await esperar(250);
+  ok(hoja.style.display === 'flex', 'al volver a entrar a Finanzas, la hoja ya está puesta', 'no se abrió sola al entrar');
+  ok(d.activeElement === monto, 'y con el foco en el monto (entrar es un toque, así que el teclado sale)', 'el foco no quedó en el monto al entrar');
+
+  $('fin-q-close').click();
+  await esperar(100);
+  /* Apagar y encender la pantalla: el navegador solo avisa con esto. */
+  w.document.dispatchEvent(new w.Event('visibilitychange'));
+  await esperar(250);
+  ok(hoja.style.display === 'flex', 'y al volver a encender la pantalla, vuelve sola', 'al volver al teléfono la hoja no reapareció');
+
+  log('── 19. Fijada, pero sin estorbar ──');
+  $('fin-q-close').click();
+  await esperar(100);
+  w.eval('finOpenModal("cuenta")');
+  await esperar(150);
+  w.document.dispatchEvent(new w.Event('visibilitychange'));
+  await esperar(250);
+  ok(hoja.style.display === 'none', 'no se abre por debajo del modal de Cuenta', 'se abrió apilada bajo otra ventana');
+  w.eval('finCloseModal()');
+
+  w.eval('switchView("view-chat")');
+  await esperar(150);
+  w.document.dispatchEvent(new w.Event('visibilitychange'));
+  await esperar(250);
+  ok(hoja.style.display === 'none', 'ni cuando se está mirando otra pantalla', 'se abrió estando en el Chat');
+
+  log('── 20. Una notificación del chat manda sobre el fijado ──');
+  /* Es el caso que rompería el cambio sin que nadie lo viera: quien toca la
+     notificación de un mensaje quiere leerlo, no apuntar un gasto. */
+  w.eval('switchView("view-inicio")');
+  await esperar(100);
+  const buscadorReal = w.location.search;
+  w.history.replaceState(null, '', w.location.pathname + '?view=chat');
+  w.eval('faroArranqueApunteFijo()');
+  await esperar(250);
+  ok(hoja.style.display === 'none' && !$('view-finanzas').classList.contains('active'),
+     'con ?view=chat en la dirección, el arranque NO se lleva la pantalla a Finanzas',
+     '⚠️ el fijado secuestró una notificación del chat');
+  w.history.replaceState(null, '', w.location.pathname + buscadorReal);
+  w.eval('faroArranqueApunteFijo()');
+  await esperar(250);
+  ok($('view-finanzas').classList.contains('active') && hoja.style.display === 'flex',
+     'y sin ?view=, abrir la aplicación cae en Finanzas con la hoja puesta',
+     'el arranque fijado no abre la hoja');
+
+  log('── 21. Y se puede apagar ──');
+  $('fin-q-fijo').click();
+  await esperar(100);
+  ok(!w.localStorage.getItem('faro.fin.apunte.fijo'), 'apagarlo borra la preferencia', 'la preferencia sigue guardada');
+  $('fin-q-close').click();
+  w.eval('switchView("view-inicio")');
+  await esperar(100);
+  w.eval('switchView("view-finanzas")');
+  await esperar(250);
+  ok(hoja.style.display === 'none', 'y ya no se abre sola: se vuelve a como estaba', 'sigue abriéndose sola después de apagarlo');
 
   log('');
   log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);

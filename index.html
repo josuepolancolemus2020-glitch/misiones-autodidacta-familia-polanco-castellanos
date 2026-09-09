@@ -713,6 +713,17 @@
         <button type="button" class="finq-mas-btn" data-fintab="cuenta">Cuenta</button>
         <button type="button" class="finq-mas-btn" data-fintab="deuda">Deuda</button>
       </div>
+
+      <!-- Dejar la hoja fijada. La fila ENTERA es el botón: un interruptor de
+           40 px al que solo se le puede dar en la bolita se falla con el dedo,
+           y este se toca una vez en la vida y tiene que salir a la primera. -->
+      <button type="button" class="finq-fijo" id="fin-q-fijo" role="switch" aria-checked="false">
+        <span class="finq-fijo-sw"><span class="finq-fijo-bola"></span></span>
+        <span class="finq-fijo-txt">
+          <span class="finq-fijo-tit">📌 Dejarlo siempre abierto</span>
+          <span class="finq-fijo-sub" id="fin-q-fijo-sub">Ahora hay que tocar el + cada vez que quieras apuntar.</span>
+        </span>
+      </button>
     </div>
   </div>
 

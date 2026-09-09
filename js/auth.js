@@ -194,6 +194,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     mostrarApp();
     if (typeof renderHome === 'function') renderHome();
+    /* Gancho blando, como el de arriba: si alguien dejó fijado el Apunte
+       rápido, la aplicación abre ahí. Si finanzas.js no estuviera cargado,
+       F.A.R.O arranca igual que siempre. */
+    if (typeof faroArranqueApunteFijo === 'function') faroArranqueApunteFijo();
   }
 
   /* ── Restaurar la sesión guardada, si la hay ── */
