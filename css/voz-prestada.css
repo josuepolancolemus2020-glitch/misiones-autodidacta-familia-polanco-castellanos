@@ -665,9 +665,14 @@
    Sacarlos del flujo haría más alta la caja del texto, y una caja más
    alta REPAGINA el texto entero debajo del dedo del lector: la página
    que estaba mirando pasa a ser otra. Se apagan con opacidad, que no
-   mueve un píxel de la caja. */
+   mueve un píxel de la caja.
+   ⚠️ Y desde el 10 de septiembre de 2026, a CERO, no a 0.1: el autor
+   pidió que las barras «desaparezcan», y un fantasma al diez por
+   ciento encima del texto no es desaparecer. Vuelven con un toque
+   doble en el centro (vozToqueCentro), con Escape, o al salir de
+   pantalla completa. */
 #voz-lector.voz-desnudo .voz-l-top,
-#voz-lector.voz-desnudo .voz-l-pie { opacity: .1; pointer-events: none; }
+#voz-lector.voz-desnudo .voz-l-pie { opacity: 0; pointer-events: none; }
 #voz-lector .voz-l-top, #voz-lector .voz-l-pie { transition: opacity .25s; }
 
 /* El aviso de la sala: dentro de ella y con su papel, porque el de la

@@ -1963,6 +1963,8 @@ let _vozRuedaHasta = 0;
 let _vozPanelTab = 'ind';
 let _vozBuscaTxt = '';
 let _vozVuelta = null;   // la hoja que se está pasando (modo «hojear»)
+let _vozToqueUltimo = 0; // el reloj del toque anterior del centro (modo desnudo)
+let _vozToqueFreno = 0;  // tras alternar las barras, un respiro que se traga el toque de más
 
 function vozModo() {
   return _vozAj.modo === 'scroll' ? 'scroll' : 'paginas';
@@ -2002,6 +2004,14 @@ function vozAbrirLector(cid) {
   vozSubCerrarBarra();
 
   sala.hidden = false;
+  /* La sala abre SIEMPRE con sus barras: el modo desnudo es de cada
+     lectura, no un estado que se hereda de la anterior. */
+  sala.classList.remove('voz-desnudo');
+  const full = document.getElementById('voz-l-full');
+  if (full) {
+    full.hidden = !vozPuedePantallaCompleta();
+    full.setAttribute('aria-pressed', vozEnPantallaCompleta() ? 'true' : 'false');
+  }
   document.body.classList.add('voz-sala');
   vozCargarLetras();
   vozAplicaAjustes();
@@ -2783,7 +2793,7 @@ function vozEngancharSala() {
       vozCerrarPaneles();
       return;
     }
-    b.classList.toggle('voz-desnudo');
+    vozToqueCentro(b);
   });
 
   /* La rueda del ratón pasa página, como en un lector de escritorio.
@@ -2823,6 +2833,17 @@ function vozEngancharSala() {
     document.fonts.addEventListener('loadingdone', repag);
   }
 
+  /* Al salir de pantalla completa —por donde sea: el gesto del
+     sistema, Escape, el botón— las barras vuelven solas. Sin esto
+     quedaría una pantalla normal sin mandos y sin ninguna pista de
+     cómo recuperarlos. Y el ⛶ dice en qué estado está. */
+  ['fullscreenchange', 'webkitfullscreenchange'].forEach(ev =>
+    document.addEventListener(ev, () => {
+      const b = document.getElementById('voz-l-full');
+      if (b) b.setAttribute('aria-pressed', vozEnPantallaCompleta() ? 'true' : 'false');
+      if (!vozEnPantallaCompleta()) vozDesnudo(false);
+    }));
+
   /* El permiso de no apagar la pantalla se pierde al irse a otra
      aplicación; al volver, se vuelve a pedir. */
   document.addEventListener('visibilitychange', () => {
@@ -2860,7 +2881,11 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Escape') {
     if (vozSubBarraAbierta()) { vozSubCerrarBarra(); return; }
     const abierto = ['voz-panel-aa', 'voz-panel-ind'].some(id => { const p = document.getElementById(id); return p && !p.hidden; });
-    if (abierto) vozCerrarPaneles(); else vozCerrarLector();
+    if (abierto) vozCerrarPaneles();
+    /* Con las barras escondidas, Escape las devuelve antes de cerrar
+       nada: es la salida que no depende de saberse el toque doble. */
+    else if (sala.classList.contains('voz-desnudo')) vozDesnudo(false);
+    else vozCerrarLector();
   }
 });
 
@@ -2920,6 +2945,66 @@ function vozPantallaCompleta(encender) {
       if (p && p.catch) p.catch(() => {});
     }
   } catch (e) {}
+}
+
+/* ⚠️ EL MODO DESNUDO: LAS BARRAS DESAPARECEN DEL TODO, Y VUELVEN CON UN
+   TOQUE DOBLE. Pedido por el autor el 10 de septiembre de 2026, con la
+   captura de las barras rayadas en rojo: «pueda desaparecer esas
+   barras, con un sutil toque de dos o tres aparezcan». Antes el modo
+   desnudo las dejaba en opacidad 0.1 —un fantasma que seguía encima del
+   texto— y un solo toque las devolvía.
+
+   La asimetría de los toques es a propósito y va en los dos sentidos:
+   · ESCONDERLAS cuesta UN toque, porque es la puerta de entrada a leer
+     a página limpia y una puerta de dos toques no la encuentra nadie.
+   · DEVOLVERLAS cuesta DOS toques seguidos, porque leyendo a página
+     limpia el dedo roza el centro sin querer —al apoyar la mano, al
+     errar el borde al pasar página— y si UN toque las devolviera, la
+     lectura limpia se rompería a cada rato.
+   · Y tras cada cambio hay un RESPIRO de medio segundo que se traga el
+     toque de más: el segundo toque de un doble no re-esconde lo que el
+     primero escondió, y el tercer toque de un triple no deshace lo que
+     el doble acaba de hacer. Por eso «dos o tres» toques hacen lo
+     mismo, que es exactamente como lo pidió el autor.
+   Las barras siguen EN EL FLUJO (regla 8: quitarlas repaginaría el
+   texto debajo del dedo); lo que cambia es que su opacidad baja a 0.
+   Escape también las devuelve, para quien no se sepa el gesto. */
+function vozDesnudo(poner) {
+  const sala = document.getElementById('voz-lector');
+  if (sala) sala.classList.toggle('voz-desnudo', !!poner);
+}
+
+function vozToqueCentro(sala) {
+  const ahora = Date.now();
+  if (ahora < _vozToqueFreno) return;
+  if (!sala.classList.contains('voz-desnudo')) {
+    sala.classList.add('voz-desnudo');
+    _vozToqueFreno = ahora + 450;
+    _vozToqueUltimo = 0;
+    return;
+  }
+  if (ahora - _vozToqueUltimo < 450) {
+    sala.classList.remove('voz-desnudo');
+    _vozToqueFreno = ahora + 450;
+    _vozToqueUltimo = 0;
+  } else {
+    _vozToqueUltimo = ahora;
+  }
+}
+
+/* ⚠️ EL ⛶ DE LA BARRA HACE LAS DOS COSAS DE UNA VEZ: pantalla completa
+   Y barras fuera. El ajuste ya existía, pero enterrado en Aa →
+   Pantalla, y un acceso de tres toques no es un acceso directo. Salir
+   —con el ⛶ otra vez, con Escape o con el gesto del sistema— devuelve
+   las barras solo: quien sale de pantalla completa quiere sus mandos. */
+function vozPantallaCompletaDirecta() {
+  if (vozEnPantallaCompleta()) {
+    vozPantallaCompleta(false);
+    vozDesnudo(false);
+  } else {
+    vozPantallaCompleta(true);
+    vozDesnudo(true);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -4428,6 +4513,7 @@ document.addEventListener('DOMContentLoaded', () => {
   on('voz-l-aa', 'click', () => { vozPintarAjustes(); vozAbrirPanel('voz-panel-aa'); });
   on('voz-l-ind', 'click', () => { vozPintarPanelInd(); vozAbrirPanel('voz-panel-ind'); });
   on('voz-l-marca', 'click', vozMarcaToggle);
+  on('voz-l-full', 'click', vozPantallaCompletaDirecta);
   on('voz-ant', 'click', () => vozPasar(-1));
   on('voz-sig', 'click', () => vozPasar(1));
 });

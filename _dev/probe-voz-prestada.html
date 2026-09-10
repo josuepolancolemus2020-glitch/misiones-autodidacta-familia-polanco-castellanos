@@ -1299,6 +1299,92 @@ function margenVisible(w){
      'y sube a la nube FIRMADA, con la maquinaria de reintentos de siempre',
      '⚠️ la lectura no llegó firmada a la nube: ' + JSON.stringify(subida26 || base26.escritas.map(x => x.cid)));
 
+  log('── 27. PANTALLA COMPLETA A UN TOQUE, Y LAS BARRAS QUE DESAPARECEN ──');
+  /* «Un acceso directo de pantalla completa… y pueda desaparecer esas
+     barras, con un sutil toque de dos o tres aparezcan» (el autor, 10
+     de septiembre de 2026, con las barras rayadas en rojo en una
+     captura). Lo que puede salir mal: que las barras solo se atenúen
+     —un fantasma encima del texto no es desaparecer—, que un roce las
+     devuelva en mitad de la lectura limpia, que el toque de más de un
+     doble o un triple deshaga lo recién hecho, o que salir de pantalla
+     completa con el gesto del sistema deje una pantalla sin mandos y
+     sin pista. La pantalla completa va con un doble, porque en un
+     Chromium sin cabeza la de verdad no existe. */
+  nuevaBase(w, {});
+  w.eval(`window.__fs = null;
+          Object.defineProperty(document, 'fullscreenElement', { configurable: true, get: () => window.__fs });
+          document.documentElement.requestFullscreen = async function () { window.__fs = document.documentElement; document.dispatchEvent(new Event('fullscreenchange')); };
+          document.exitFullscreen = async function () { window.__fs = null; document.dispatchEvent(new Event('fullscreenchange')); };
+          _vozCuentos = [${JSON.stringify(cuentoLargo('c-full'))}]; vozGuardaLocal(); vozRender();
+          _vozAj.modo = 'paginas'; _vozAj.paso = 'deslizar'; vozGuardaAjustes(); vozAbrirLector('c-full')`);
+  await esperar(500);
+  const salaF = d.getElementById('voz-lector');
+  const hojaF = d.getElementById('voz-hoja');
+  const btnFull = d.getElementById('voz-l-full');
+  ok(!!btnFull && !btnFull.hidden && btnFull.textContent.indexOf('⛶') > -1,
+     'el ⛶ está a la vista en la barra de la sala, no enterrado en los ajustes', 'no está el botón ⛶ en la barra');
+  btnFull.click();
+  /* La opacidad lleva una transición de 0.25 s: se mide DESPUÉS de que
+     termine, o sale un número a mitad de camino. */
+  await esperar(450);
+  ok(!!w.__fs && salaF.classList.contains('voz-desnudo') && btnFull.getAttribute('aria-pressed') === 'true',
+     'un toque pone pantalla completa Y esconde las barras',
+     'el ⛶ no hizo las dos cosas: fs=' + !!w.__fs + ' desnudo=' + salaF.classList.contains('voz-desnudo'));
+  const opTop = w.getComputedStyle(d.querySelector('.voz-l-top')).opacity;
+  ok(opTop === '0' && w.getComputedStyle(d.querySelector('.voz-l-pie')).opacity === '0',
+     'y las barras DESAPARECEN de verdad (opacidad calculada 0, no el fantasma al 10 % de antes)',
+     'las barras quedaron en opacidad ' + opTop);
+  await esperar(600);
+  hojaF.click();
+  await esperar(600);
+  ok(salaF.classList.contains('voz-desnudo'),
+     'un ROCE del centro no las devuelve: leyendo a página limpia se roza sin querer',
+     '⚠️ un solo toque devolvió las barras');
+  hojaF.click(); hojaF.click();
+  await esperar(100);
+  ok(!salaF.classList.contains('voz-desnudo') && !!w.__fs,
+     'un toque DOBLE las devuelve, sin salirse de pantalla completa', 'el toque doble no devolvió las barras');
+  await esperar(600);
+  hojaF.click();
+  await esperar(50);
+  ok(salaF.classList.contains('voz-desnudo'), 'y un toque las vuelve a esconder (entrar cuesta uno; salir, dos)', 'un toque no escondió las barras');
+  hojaF.click();
+  await esperar(100);
+  ok(salaF.classList.contains('voz-desnudo'),
+     'el segundo toque de ese doble cae en el respiro y NO las devuelve', '⚠️ esconder con un doble las escondió y devolvió en el acto');
+  await esperar(600);
+  hojaF.click(); hojaF.click(); hojaF.click();
+  await esperar(100);
+  ok(!salaF.classList.contains('voz-desnudo'),
+     'un toque TRIPLE hace lo mismo que el doble: el tercer toque no deshace nada («dos o tres», como se pidió)',
+     '⚠️ el tercer toque del triple volvió a esconder las barras');
+  await esperar(600);
+  hojaF.click();
+  await esperar(50);
+  d.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+  await esperar(100);
+  ok(!salaF.classList.contains('voz-desnudo') && !salaF.hidden,
+     'Escape devuelve las barras sin cerrar la sala: la salida que no exige saberse el gesto', 'Escape cerró la sala o no devolvió las barras');
+  await esperar(600);
+  hojaF.click();
+  await esperar(50);
+  w.eval(`window.__fs = null; document.dispatchEvent(new Event('fullscreenchange'))`);
+  await esperar(100);
+  ok(!salaF.classList.contains('voz-desnudo') && btnFull.getAttribute('aria-pressed') === 'false',
+     'salir de pantalla completa con el gesto del sistema devuelve las barras y apaga el ⛶',
+     '⚠️ al salir del sistema quedó una pantalla sin mandos');
+  await esperar(600);
+  hojaF.click();
+  await esperar(50);
+  w.eval('vozCerrarLector()');
+  await esperar(200);
+  w.eval('vozAbrirLector("c-full")');
+  await esperar(400);
+  ok(!salaF.classList.contains('voz-desnudo'),
+     'y la sala siempre abre con sus barras: el modo desnudo no se hereda de la lectura anterior', 'la sala abrió sin barras');
+  w.eval('vozCerrarLector()');
+  await esperar(200);
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

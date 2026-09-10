@@ -1187,6 +1187,17 @@ el diseño.
    ⚠️ **Y el modo desnudo APAGA los mandos, no los quita del sitio.** Sacarlos
    del flujo haría más alta la caja y **repaginaría el texto debajo del dedo
    del lector**: la página que estaba mirando pasaría a ser otra.
+   ⚠️ **Desde el 10 de septiembre de 2026 los apaga A CERO, y volver cuesta
+   un toque DOBLE.** El autor lo pidió con la captura de las barras rayadas
+   en rojo: «pueda desaparecer esas barras, con un sutil toque de dos o tres
+   aparezcan». La asimetría es a propósito: esconderlas cuesta UN toque (es
+   la puerta de entrada y una puerta de dos toques no la encuentra nadie);
+   devolverlas cuesta DOS seguidos, porque leyendo a página limpia el dedo
+   roza el centro sin querer y un solo toque las devolvería a cada rato. Y
+   tras cada cambio hay un respiro de medio segundo que se traga el toque de
+   más: por eso «dos o tres» hacen lo mismo, tal como se pidió. Escape las
+   devuelve sin cerrar la sala, salir de pantalla completa también, y la
+   sala siempre ABRE con sus barras. Comprobación **27**.
    ⚠️ Las zonas llevan `touch-action: pan-y pinch-zoom`, no `none`: se le quita
    al navegador el gesto horizontal —que es el nuestro— y se le deja el de
    acercar, porque quitarle el de acercar a una pantalla de lectura es
@@ -1368,8 +1379,12 @@ el diseño.
    permiso viejo que aún se estaba soltando, no pedía uno nuevo, y la
    pantalla se apagaba leyendo. La sonda lo cazó (comprobación 7) porque
    cuenta los permisos pedidos y soltados con un doble.
-   Y hay «⛶ Pantalla completa» en los ajustes, solo donde el navegador lo
-   permite; se sale sola al cerrar la sala.
+   Y la pantalla completa tiene **acceso directo: el ⛶ de la barra de la
+   sala** (pedido por el autor el 10 de septiembre de 2026; el ajuste
+   existía, pero enterrado en Aa → Pantalla, y un acceso de tres toques no
+   es un acceso). Un toque pone pantalla completa Y esconde las barras; se
+   enseña solo donde el navegador lo permite, se sale sola al cerrar la
+   sala, y salir por donde sea devuelve las barras.
 
 18. ⚠️ **EL RELLENO AUTOMÁTICO NO PISA LO TOCADO A MANO, Y RECUERDA QUÉ
    RELLENÓ ÉL.** La primera versión rellenaba el título con «Cuento sin
@@ -1596,6 +1611,13 @@ sin etiqueta no entre nada, que la cola quede vacía y que la subida llegue
 FIRMADA. La otra mitad del puente —el botón dentro de la misión— la vigila
 `_dev/probe-lecturas-marcador.html`, pulsándolo de verdad y contando los
 párrafos que viajan.
+
+La comprobación **27** es la lectura a página limpia: el ⛶ de la barra
+(con una pantalla completa de mentira, que en un Chromium sin cabeza no hay
+de verdad), la opacidad CALCULADA en cero, el roce que no devuelve, el
+doble y el triple que sí, el respiro que se traga el toque de más, Escape,
+y que salir de pantalla completa con el gesto del sistema nunca deja una
+pantalla sin mandos.
 
 Las comprobaciones **21 a 25** son las de la segunda ronda (subrayados,
 retirar, deslizar, hojear y el anaquel) y comparten una regla: **los botones
