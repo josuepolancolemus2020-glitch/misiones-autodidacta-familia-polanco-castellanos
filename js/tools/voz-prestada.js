@@ -79,6 +79,11 @@ const VOZ_TABLE = 'voz_prestada';
      posición: un marcador es «aquí me quedé pensando», y eso es de una
      persona, no de la casa. */
 const VOZ_LOCAL   = 'faro_voz_cuentos_v1';
+/* La cola del puente desde las misiones: js/lecturas.js deja aquí las
+   lecturas que alguien manda con su botón, y esta herramienta las
+   recoge al abrirse. Misiones y aplicación comparten origen, así que
+   comparten localStorage; la nube no interviene hasta llegar aquí. */
+const VOZ_ENTRANTES = 'faro_voz_entrantes_v1';
 const VOZ_AJUSTES = 'faro_voz_ajustes_v1';
 const VOZ_POS     = 'faro_voz_posicion_v1';
 const VOZ_MARCAS  = 'faro_voz_marcas_v1';
@@ -132,6 +137,10 @@ const VOZ_GENEROS = [
   { id: 'discurso', ic: '🎙️', t: 'Discurso',  pl: 'discursos' },
   { id: 'articulo', ic: '📰', t: 'Artículo',  pl: 'artículos' },
   { id: 'novela',   ic: '📚', t: 'Novela corta', pl: 'novelas cortas' },
+  /* Entró el 10 de septiembre de 2026 con el puente de las lecturas:
+     las misiones traen entrevistas imaginadas y careos. Añadir un
+     género es esta línea y nada más (regla 15). */
+  { id: 'entrevista', ic: '🎤', t: 'Entrevista', pl: 'entrevistas' },
   { id: 'texto',    ic: '📄', t: 'Texto',     pl: 'textos' },
 ];
 
@@ -565,7 +574,10 @@ function vozParecenVersos(lineas) {
 function vozGeneroDePalabra(s) {
   const t = vozSinTildes(s).toLowerCase();
   if (!t.trim()) return '';
-  if (/cuento|relato|fabula|leyenda|microrrelato|historia/.test(t)) return 'cuento';
+  /* Antes que «cuento»: una «entrevista imaginada» o un «careo» traen
+     palabras de historia dentro y caerían en el cajón equivocado. */
+  if (/entrevista|conversa|charla|careo|debate|coloquio|dialogo/.test(t)) return 'entrevista';
+  if (/cuento|relato|capitulo|fabula|leyenda|microrrelato|historia/.test(t)) return 'cuento';
   if (/ensayo|reflexion/.test(t)) return 'ensayo';
   if (/poema|poes|verso|soneto|haiku|romance/.test(t)) return 'poema';
   if (/cronica|reportaje/.test(t)) return 'cronica';
@@ -1087,11 +1099,93 @@ function vozRotuloNube() {
   return { ic: '⏳', t: 'Mirando la nube…', cls: 'voz-nube-no' };
 }
 
+/* ⚠️ EL PUENTE DESDE LAS MISIONES. Las lecturas «a la manera de» que
+   viven dentro de las misiones (Borges, Cervantes, Harari, las
+   entrevistas imaginadas, los careos) llegan por la cola
+   `faro_voz_entrantes_v1`, que llena el botón de js/lecturas.js. Aquí
+   se recogen al abrir la herramienta: se crean SIN `puesto_por`, y esa
+   ausencia es a propósito —es exactamente la marca que
+   vozSubirPendientes() ya usa para «esto falta en la nube»—, así que la
+   subida, la firma y el reintento son los de siempre, sin un segundo
+   camino que mantener.
+
+   Tres reglas, y las tres tienen dueño:
+   · Un texto VIVO del anaquel con el mismo identificador NO se pisa:
+     puede llevar una corrección hecha a mano aquí, y el puente no sabe
+     más que la misión. Mandarla otra vez no deshace nada.
+   · Una LÁPIDA solo revive si el envío es MÁS NUEVO que ella: quien la
+     retiró ayer y la manda hoy, la quiere de vuelta; quien la mandó
+     ayer y la retiró hoy, no.
+   · Sin etiqueta no entra nada, tampoco por aquí: la regla 1 no tiene
+     puerta de servicio.
+   Si dos personas mandan la MISMA lectura desde dos aparatos, las dos
+   copias caen en el mismo cid: la primera que sube firma la fila y la
+   otra rebota por la seguridad por fila sin ruido — el contenido es
+   idéntico, así que no se pierde nada. */
+function vozTraerEntrantes() {
+  let cola = [];
+  try { cola = JSON.parse(localStorage.getItem(VOZ_ENTRANTES) || '[]') || []; } catch (e) { return 0; }
+  if (!Array.isArray(cola) || !cola.length) return 0;
+  const guardados = vozLeeLocal();
+  const conocidos = new Map();
+  guardados.forEach(c => { if (c && c.cid) conocidos.set(c.cid, c); });
+  _vozCuentos.forEach(c => { if (c && c.cid && !conocidos.has(c.cid)) conocidos.set(c.cid, c); });
+  let entraron = 0;
+  cola.forEach(e => {
+    if (!e || !e.id || !Array.isArray(e.capitulos)) return;
+    const ya = conocidos.get(String(e.id));
+    if (ya && (!ya.borrado || (ya.actualizado || 0) >= (e.cuando || 0))) return;
+    /* Se copia campo a campo y solo bloques de párrafo: la cola vive en
+       localStorage y aquí no entra ninguna forma que no se conozca. La
+       pantalla pinta todo con textContent igual, pero una cola no es
+       una puerta. */
+    const caps = e.capitulos
+      .map(cap => ({
+        t: String((cap && cap.t) || ''),
+        p: (Array.isArray(cap && cap.p) ? cap.p : [])
+          .map(b => ({ k: 'p', t: String((b && b.t) || '').trim() }))
+          .filter(b => b.t),
+      }))
+      .filter(c => c.p.length);
+    if (!caps.length) return;
+    const c = {
+      cid: String(e.id),
+      titulo: String(e.titulo || 'Sin título'),
+      voz: String(e.voz || '').trim(),
+      maquina: String(e.maquina || '').trim(),
+      genero: vozGeneroDePalabra(String(e.generoPista || '')) || 'texto',
+      encargo: String(e.encargo || ''),
+      nota: String(e.nota || ''),
+      capitulos: caps,
+      palabras: vozPalabras(caps),
+      borrado: false,
+      actualizado: e.cuando || Date.now(),
+      creado_at: new Date().toISOString(),
+    };
+    if (!c.voz || !c.maquina) return;
+    _vozCuentos = _vozCuentos.filter(x => x.cid !== c.cid).concat([c]);
+    conocidos.set(c.cid, c);
+    entraron++;
+  });
+  /* La cola se vacía ENTERA: cada entrada o entró, o se descartó a
+     propósito (ya estaba viva, o su lápida es más nueva, o venía sin
+     etiqueta). Dejarla sería reexaminarla en cada arranque. */
+  try { localStorage.removeItem(VOZ_ENTRANTES); } catch (e) {}
+  if (entraron) vozGuardaLocal();
+  return entraron;
+}
+
 async function initVozPrestada() {
   vozLeeAjustes();
   _vozEstadoNube = 'mirando';
   if (!_vozCuentos.length) _vozCuentos = vozFusiona(vozLeeLocal(), []);
+  const entrantes = vozTraerEntrantes();
   vozRender();                       // se pinta YA con lo del aparato
+  if (entrantes) {
+    /* El aviso del anaquel es el de la aplicación (toast), no vozAviso:
+       ese vive dentro de la sala y aquí la sala está cerrada. */
+    try { if (typeof toast === 'function') toast('📖 ' + (entrantes === 1 ? 'Una lectura de las misiones entró al anaquel' : entrantes + ' lecturas de las misiones entraron al anaquel')); } catch (e) {}
+  }
   const nube = await vozBajar();     // y se corrige cuando llegue
   /* ⚠️ Lo que hay en memoria NO se tira hasta saber que llegó lo nuevo.
      Con un corte de señal, tirarlo dejaría el anaquel en cero y la

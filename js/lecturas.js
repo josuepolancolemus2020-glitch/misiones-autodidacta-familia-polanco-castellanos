@@ -142,6 +142,7 @@
     btn.addEventListener('click', () => alternar(clave));
 
     montarActividades(card, cuerpo, clave, p);
+    montarPuente(card, cuerpo, clave);
   }
 
   function abrir(clave, silencio) {
@@ -489,6 +490,99 @@
     p.a.forEach((q, i) => { h += '<div class="pl"><strong>III.' + (i + 1) + '.</strong> ' + esc(q.guia) + '</div>'; });
     h += '</div>';
     return h;
+  }
+
+  /* ─────────────── El puente a La Voz Prestada ───────────────
+     Pedido por el autor el 10 de septiembre de 2026: que estas lecturas
+     —los ejercicios de estilo «a la manera de» Borges, Cervantes,
+     Harari, las entrevistas imaginadas, los careos— se puedan mandar a
+     📖 La Voz Prestada, el lector de F.A.R.O, «para que se ubiquen
+     allí». Encajan sin torcer nada: son EXACTAMENTE el objeto de esa
+     herramienta (prosa escrita por una máquina imitando una voz ajena),
+     y por eso viajan CON SU ETIQUETA puesta: la voz sale del propio
+     rótulo de la tarjeta y la máquina es «la casa (ejercicio de
+     estilo)», que es como las presenta la lect-nota de cada una.
+
+     CÓMO VIAJA, y por qué así: el botón NO habla con Supabase. Deja la
+     lectura en una cola del aparato (`faro_voz_entrantes_v1`,
+     localStorage: las misiones y la aplicación comparten origen) y La
+     Voz Prestada la recoge al abrirse, la firma con quien entró y la
+     sube con su maquinaria de reintentos de siempre. Un segundo cliente
+     de Supabase aquí está prohibido por la regla del cliente único, y
+     una misión no tiene por qué pedir red para esto.
+
+     ⚠️ EL IDENTIFICADOR ES ESTABLE (SAVE_KEY + clave de la lectura),
+     nunca al azar: mandarla dos veces —o desde dos aparatos— tiene que
+     caer en LA MISMA ficha del anaquel, no criar gemelos. Y por lo
+     mismo el toque REEMPLAZA la entrada de la cola en vez de añadir.
+
+     ⚠️ LOS PÁRRAFOS VIAJAN YA REPARTIDOS (capitulos con bloques k:'p'),
+     no como texto a leer: el DOM de la tarjeta YA ES la estructura, y
+     pasarlo por el lector de pegado sería darle a un careo lleno de
+     turnos en negrita la oportunidad de descuartizarse en capítulos. Lo
+     que sí se conserva es la *cursiva* y la **negrita**, en la marca
+     que la sala ya pinta troceando nodos. */
+  function planoDe(n) {
+    if (n.nodeType === 3) return n.textContent;
+    if (n.nodeType !== 1) return '';
+    if (n.tagName === 'BR') return '\n';
+    const dentro = [...n.childNodes].map(planoDe).join('');
+    if (/^(EM|I)$/.test(n.tagName) && dentro.trim()) return '*' + dentro + '*';
+    if (/^(STRONG|B)$/.test(n.tagName) && dentro.trim()) return '**' + dentro + '**';
+    return dentro;
+  }
+
+  function mandarAVozPrestada(card, clave, btn) {
+    const rotulo = (card.querySelector('.lect-tit') || card.querySelector('h2') || { textContent: '' }).textContent;
+    /* La voz, del propio rótulo («…, a la manera de Borges)»); si la
+       tarjeta no la trae así (el careo no imita a nadie), la del mapa. */
+    const mVoz = rotulo.match(/a la (?:manera|forma) de ([^)]+)\)/i);
+    const voz = mVoz ? mVoz[1].trim() : vozDe(card);
+    const mPar = rotulo.match(/\(([^()]*)\)\s*$/);
+    const parrafos = [...card.querySelectorAll('.lect-p')]
+      .map(el => planoDe(el).replace(/[ \t]+/g, ' ').replace(/ ?\n ?/g, '\n').trim())
+      .filter(Boolean);
+    if (!parrafos.length) { aviso('Esta lectura no tiene texto que mandar'); return; }
+    const nota = (card.querySelector('.lect-nota') || { textContent: '' }).textContent.replace(/\s+/g, ' ').trim();
+    let saveKey = '';
+    try { saveKey = (typeof SAVE_KEY !== 'undefined' && SAVE_KEY) ? SAVE_KEY : ''; } catch (e) {}
+    if (!saveKey) saveKey = location.pathname.split('/').pop().replace(/\.html$/, '');
+    const h1 = document.querySelector('h1');
+    const mision = ((h1 && h1.textContent) || document.title).replace(/\s+/g, ' ').trim();
+    const entrada = {
+      id: ('lect-' + saveKey + '-' + clave).replace(/[^A-Za-z0-9_-]/g, '-'),
+      titulo: tituloDe(card),
+      voz: voz,
+      maquina: 'la casa (ejercicio de estilo)',
+      generoPista: mPar ? mPar[1] : '',
+      encargo: 'Lectura de la misión «' + mision + '»',
+      nota: nota,
+      capitulos: [{ t: '', p: parrafos.map(t => ({ k: 'p', t: t })) }],
+      cuando: Date.now(),
+    };
+    try {
+      const cola = (JSON.parse(localStorage.getItem('faro_voz_entrantes_v1') || '[]') || [])
+        .filter(x => x && x.id !== entrada.id);
+      cola.push(entrada);
+      localStorage.setItem('faro_voz_entrantes_v1', JSON.stringify(cola));
+    } catch (e) { aviso('No se pudo guardar en este aparato'); return; }
+    if (btn) btn.textContent = '✓ Mandada · ábrela en F.A.R.O';
+    sonido('click');
+    aviso('📖 Guardada. Ábrela en F.A.R.O → La Voz Prestada');
+  }
+
+  function montarPuente(card, cuerpo, clave) {
+    const fila = document.createElement('div');
+    fila.className = 'lect-avoz';
+    fila.style.cssText = 'margin-top:0.8rem;';
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'fm-acc';
+    b.textContent = '📖 Mandar a La Voz Prestada';
+    b.setAttribute('aria-label', 'Mandar esta lectura a La Voz Prestada, el lector de F.A.R.O, para leerla como un libro');
+    b.addEventListener('click', () => mandarAVozPrestada(card, clave, b));
+    fila.appendChild(b);
+    cuerpo.appendChild(fila);
   }
 
   /* ─────────────── Arranque ─────────────── */

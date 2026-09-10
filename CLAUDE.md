@@ -970,7 +970,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Veinticinco reglas, y ninguna es de adorno:**
+**Veintiséis reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -1515,6 +1515,45 @@ el diseño.
    porque `elementFromPoint` —que es lo que usa el arrastre— no ve nada fuera
    de la ventana del marco.
 
+26. **LAS LECTURAS DE LAS MISIONES ENTRAN POR UN PUENTE, Y EL PUENTE ES UNA
+   COLA DEL APARATO.** Pedido por el autor el 10 de septiembre de 2026: que
+   las lecturas «a la manera de» que viven dentro de las misiones (Borges,
+   Cervantes, Harari, las entrevistas imaginadas, los careos) se puedan
+   mandar aquí «para que se ubiquen allí». Encajan sin torcer nada: son
+   exactamente el objeto de esta herramienta —prosa escrita por una máquina
+   imitando una voz ajena—, así que viajan CON la etiqueta puesta: la voz
+   sale del propio rótulo de la tarjeta («…, a la manera de Borges)») y la
+   máquina es «la casa (ejercicio de estilo)», que es como las presenta la
+   lect-nota de cada una.
+   El botón vive en `js/lecturas.js` —el aparato compartido: se pone una vez
+   y sale en las trece misiones con Lecturas— y **NO habla con Supabase**:
+   deja la lectura en la cola `faro_voz_entrantes_v1` (localStorage;
+   misiones y aplicación comparten origen) y `vozTraerEntrantes()` la recoge
+   al abrir la herramienta. La ficha se crea **SIN `puesto_por` a
+   propósito**: esa ausencia es la misma marca que `vozSubirPendientes()` ya
+   usa para «esto falta en la nube», así que la firma, la subida y el
+   reintento son los de siempre y no hay un segundo camino que mantener. Un
+   cliente de Supabase propio en la misión lo prohíbe la regla del cliente
+   único.
+   ⚠️ **El identificador es ESTABLE** (`lect-<SAVE_KEY>-<lectura>`): mandarla
+   dos veces —o desde dos aparatos— cae en la MISMA ficha del anaquel, y el
+   toque REEMPLAZA su entrada en la cola en vez de añadir otra. Si dos
+   personas mandan la misma lectura, la primera que sube firma la fila y la
+   otra rebota por la seguridad por fila sin ruido: el contenido es idéntico.
+   ⚠️ **Los párrafos viajan YA REPARTIDOS** (capítulo único con bloques
+   `k:'p'`), nunca como texto para el lector de pegado: el DOM de la tarjeta
+   ya es la estructura, y pasarle a ese lector un careo lleno de turnos en
+   negrita sería darle la oportunidad de descuartizarse en capítulos.
+   ⚠️ **Y tres reglas con dueño:** un texto VIVO del anaquel con el mismo
+   identificador NO se pisa (puede llevar una corrección hecha a mano aquí,
+   y el puente no sabe más que la misión); una LÁPIDA solo revive si el
+   envío es MÁS NUEVO que ella (retirado ayer y mandado hoy, vuelve; mandado
+   ayer y retirado hoy, no); y sin etiqueta no entra nada, tampoco por el
+   puente. La cola se vacía entera en cada recogida: cada entrada entró o se
+   descartó a propósito. El género sale de la pista del rótulo, y para las
+   entrevistas y los careos se añadió `entrevista` a VOZ_GENEROS (regla 15:
+   añadir un género es una línea en un archivo).
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -1549,6 +1588,14 @@ género.
 
 La comprobación **19** ensancha el marco a 1000 px para ver el libro abierto
 a dos páginas, y mide ahí también la última página.
+
+La comprobación **26** es el puente desde las misiones: siembra la cola,
+arranca la herramienta y exige que lo mandado entre con su etiqueta y su
+género, que un texto vivo no se pise, que una lápida más nueva gane, que
+sin etiqueta no entre nada, que la cola quede vacía y que la subida llegue
+FIRMADA. La otra mitad del puente —el botón dentro de la misión— la vigila
+`_dev/probe-lecturas-marcador.html`, pulsándolo de verdad y contando los
+párrafos que viajan.
 
 Las comprobaciones **21 a 25** son las de la segunda ronda (subrayados,
 retirar, deslizar, hojear y el anaquel) y comparten una regla: **los botones

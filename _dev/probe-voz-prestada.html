@@ -1241,6 +1241,64 @@ function margenVisible(w){
   chipHerr('Recientes').click();
   await esperar(150);
 
+  log('── 26. EL PUENTE: las lecturas de las misiones entran al anaquel ──');
+  /* js/lecturas.js deja la lectura en la cola faro_voz_entrantes_v1 y
+     esta herramienta la recoge al abrir: la crea con su etiqueta, sin
+     puesto_por —que es la marca de «falta en la nube»— y la maquinaria
+     de siempre la firma y la sube. Lo que puede salir mal: que pise un
+     texto vivo (una corrección manual perdida), que reviva una lápida
+     más nueva (un retirado que resucita), que entre algo sin etiqueta,
+     o que la cola no se vacíe y se reexamine en cada arranque. */
+  const base26 = nuevaBase(w, {});
+  w.eval(`_vozCuentos = [Object.assign(${JSON.stringify(cuentoLargo('lect-x-viva'))}, { titulo: 'Título corregido a mano', puesto_por: ${JSON.stringify(VOZ_UID)} })]; vozGuardaLocal();
+          (function(){
+            const l = vozLeeLocal().filter(c => c.cid !== 'lect-x-rev' && c.cid !== 'lect-x-muerta');
+            l.push(Object.assign(${JSON.stringify(cuentoLargo('lect-x-rev'))}, { borrado: true, actualizado: Date.now() - 99999 }));
+            l.push(Object.assign(${JSON.stringify(cuentoLargo('lect-x-muerta'))}, { borrado: true, actualizado: Date.now() - 50 }));
+            localStorage.setItem('faro_voz_cuentos_v1', JSON.stringify(l));
+          })();
+          (function(){
+            const cap = [{ t: '', p: [
+              { k: 'p', t: 'Un párrafo de la lectura, largo y de prosa de verdad, para que haya palabras que contar y que pesar.' },
+              { k: 'p', t: 'Otro párrafo con *una cursiva* dentro y bastante cuerpo para no parecer un resto.' } ] }];
+            localStorage.setItem('faro_voz_entrantes_v1', JSON.stringify([
+              { id: 'lect-x-nueva',  titulo: 'Los subrayados de mi padre', voz: 'Borges', maquina: 'la casa (ejercicio de estilo)', generoPista: 'entrevista, a la manera de Punset', encargo: 'Lectura de la misión «El Escocés»', nota: 'Ejercicio de estilo de la casa.', capitulos: cap, cuando: Date.now() },
+              { id: 'lect-x-viva',   titulo: 'Título que NO debe pisar',   voz: 'Borges', maquina: 'la casa', capitulos: cap, cuando: Date.now() },
+              { id: 'lect-x-rev',    titulo: 'La revivida',                voz: 'Harari', maquina: 'la casa (ejercicio de estilo)', generoPista: 'ensayo', capitulos: cap, cuando: Date.now() },
+              { id: 'lect-x-muerta', titulo: 'La retirada después',        voz: 'Harari', maquina: 'la casa', capitulos: cap, cuando: Date.now() - 99999999 },
+              { id: 'lect-x-sin',    titulo: 'Sin etiqueta',               voz: '', maquina: '', capitulos: cap, cuando: Date.now() }
+            ]));
+          })()`);
+  await w.eval('initVozPrestada()');
+  await esperar(600);
+  const nueva26 = JSON.parse(w.eval('JSON.stringify(_vozCuentos.find(c => c.cid === "lect-x-nueva") || null)'));
+  ok(!!nueva26 && nueva26.voz === 'Borges' && /la casa/.test(nueva26.maquina) && nueva26.palabras > 10,
+     'la lectura mandada entra al anaquel con su etiqueta (voz y máquina) y sus palabras contadas',
+     'la lectura no entró bien: ' + JSON.stringify(nueva26));
+  ok(!!nueva26 && nueva26.genero === 'entrevista' && Number(w.eval('VOZ_GENEROS.filter(g => g.id === "entrevista").length')) === 1,
+     'con el género salido de la pista del rótulo («entrevista», el género nuevo del puente)',
+     'el género no se mapeó: ' + (nueva26 && nueva26.genero));
+  ok(w.eval('_vozCuentos.find(c => c.cid === "lect-x-viva").titulo') === 'Título corregido a mano',
+     'un texto VIVO con el mismo identificador NO se pisa: la corrección manual se queda',
+     '⚠️ el puente pisó un texto vivo del anaquel');
+  ok(Number(w.eval('_vozCuentos.filter(c => c.cid === "lect-x-rev").length')) === 1,
+     'una lápida VIEJA revive si el envío es más nuevo (retirado ayer, mandado hoy)',
+     'la lápida vieja no dejó revivir la lectura');
+  ok(Number(w.eval('_vozCuentos.filter(c => c.cid === "lect-x-muerta").length')) === 0 &&
+     w.eval('vozLeeLocal().some(c => c.cid === "lect-x-muerta" && c.borrado === true)'),
+     'y una lápida MÁS NUEVA que el envío gana: lo retirado no resucita solo',
+     '⚠️ un envío viejo revivió un texto retirado después');
+  ok(Number(w.eval('_vozCuentos.filter(c => c.cid === "lect-x-sin").length')) === 0,
+     'sin etiqueta no entra nada, tampoco por el puente',
+     '⚠️ entró una lectura sin voz ni máquina');
+  ok(w.eval('localStorage.getItem("faro_voz_entrantes_v1")') === null,
+     'y la cola queda vacía: cada entrada entró o se descartó a propósito',
+     'la cola no se vació y se reexaminaría en cada arranque');
+  const subida26 = base26.escritas.find(x => x.cid === 'lect-x-nueva');
+  ok(!!subida26 && subida26.puesto_por === VOZ_UID && subida26.genero === 'entrevista' && subida26.borrado === false,
+     'y sube a la nube FIRMADA, con la maquinaria de reintentos de siempre',
+     '⚠️ la lectura no llegó firmada a la nube: ' + JSON.stringify(subida26 || base26.escritas.map(x => x.cid)));
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

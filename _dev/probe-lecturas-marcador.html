@@ -381,6 +381,41 @@ f.onload=async()=>{
         '  el quiz de la misión sigue funcionando', '  cargar la puerta rompió el motor de la misión');
     }
     g.remove();
+
+    log('── El puente a La Voz Prestada ──');
+    /* El botón de cada lectura deja el texto ENTERO, con su etiqueta y
+       un identificador estable, en la cola que la aplicación recoge.
+       Fallar callado aquí es una lectura que «se mandó» y nunca llega. */
+    try{ w.localStorage.removeItem('faro_voz_entrantes_v1'); }catch(e){}
+    w.FaroLecturas.abrir('borges');
+    const btnV=d.querySelector('#lect-borges .lect-avoz button');
+    ok(!!btnV && /Voz Prestada/.test(btnV.textContent),
+      'cada lectura lleva su botón «Mandar a La Voz Prestada»', 'no está el botón del puente');
+    if(btnV){
+      btnV.click(); await esperar(150);
+      let cola=[]; try{ cola=JSON.parse(w.localStorage.getItem('faro_voz_entrantes_v1')||'[]'); }catch(e){}
+      const e1=cola[0]||{};
+      const nP=d.querySelectorAll('#lect-borges .lect-p').length;
+      ok(cola.length===1 && e1.voz==='Borges' && /la casa/.test(e1.maquina||''),
+        'el toque deja la lectura en la cola con su etiqueta: la voz del rótulo y «la casa (ejercicio de estilo)»',
+        'la cola no quedó bien: '+JSON.stringify(e1).slice(0,140));
+      ok(!!e1.id && e1.id.indexOf('faro_dorado_escoces')>-1 && e1.id.indexOf('borges')>-1,
+        'con identificador estable (SAVE_KEY + lectura), para que dos envíos caigan en la misma ficha',
+        'el identificador no es estable: '+e1.id);
+      ok(!!e1.capitulos && !!e1.capitulos[0] && e1.capitulos[0].p.length===nP && e1.capitulos[0].p.every(b=>b.k==='p'&&b.t.length>40),
+        'y con los '+nP+' párrafos ENTEROS del texto, ya repartidos en bloques',
+        'faltan párrafos: '+(e1.capitulos&&e1.capitulos[0]?e1.capitulos[0].p.length:0)+' de '+nP);
+      ok(e1.titulo==='Los subrayados de mi padre' && /cuento/i.test(e1.generoPista||''),
+        'con su título limpio y la pista del género del propio rótulo',
+        'título o género: «'+e1.titulo+'» / «'+e1.generoPista+'»');
+      ok(/misión/.test(e1.encargo||'') && (e1.nota||'').length>20,
+        'y diciendo de qué misión viene, con la nota de la casa que enmarca el pastiche',
+        'sin origen o sin la nota: '+e1.encargo);
+      btnV.click(); await esperar(150);
+      try{ cola=JSON.parse(w.localStorage.getItem('faro_voz_entrantes_v1')||'[]'); }catch(e){}
+      ok(cola.length===1, 'tocarlo dos veces REEMPLAZA la entrada, no cría gemelos', 'dos toques dejaron '+cola.length+' entradas');
+      try{ w.localStorage.removeItem('faro_voz_entrantes_v1'); }catch(e){}
+    }
     cerrar();
   }catch(e){ fallos++; log('✘ '+e.message+'\n'+e.stack); cerrar(); }
 };
