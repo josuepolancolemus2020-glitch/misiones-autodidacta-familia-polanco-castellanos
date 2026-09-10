@@ -3214,8 +3214,16 @@ function vozSubBarra() {
   b.appendChild(colores);
   const acciones = vozNodo('div', 'voz-subbar-acciones');
   acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-nota-btn', '✎ Nota', () => vozSubAbrirNota()));
+  /* El marcador de lectura vive aquí, con los colores, porque es el
+     mismo gesto: se selecciona y se decide qué se hace con lo
+     seleccionado. En un botón aparte habría que soltar el texto,
+     buscarlo y volver. Calcado de la barra de las misiones. */
+  acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-lugar', '🔖 Aquí me quedé', () => vozSubAquiMeQuede(), 'Poner el marcador de lectura en este párrafo'));
   acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-quitar', '🗑 Quitar', () => vozSubQuitar(_vozSubEditando)));
-  acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-cerrar', '✕', () => vozSubCerrarBarra(), 'Cerrar'));
+  acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-cerrar', '✕ Cerrar', () => {
+    try { window.getSelection().removeAllRanges(); } catch (e) {}
+    vozSubCerrarBarra();
+  }, 'Cerrar'));
   b.appendChild(acciones);
   const nota = vozNodo('div', 'voz-subbar-notacaja');
   nota.hidden = true;
@@ -3243,7 +3251,15 @@ function vozSubAbrirBarra(texto, catActiva, caja) {
   b.querySelectorAll('.voz-subbar-color').forEach(btn => {
     btn.setAttribute('aria-pressed', btn.dataset.cat === catActiva ? 'true' : 'false');
   });
-  b.querySelector('.voz-subbar-acciones').hidden = !editando;
+  /* Las acciones se ven SIEMPRE, como en la barra de las misiones
+     (pedido del autor, 10 de septiembre de 2026): una selección nueva
+     también puede anotarse, marcar el lugar o cerrarse. Lo que cambia
+     por modo es qué botones: sobre una marca ya puesta no hay trozo
+     nuevo al que llevar el marcador —«Aquí me quedé» se calla en vez de
+     mentir— y sobre una selección nueva no hay nada que quitar. */
+  b.querySelector('.voz-subbar-acciones').hidden = false;
+  b.querySelector('.voz-subbar-quitar').hidden = !editando;
+  b.querySelector('.voz-subbar-lugar').hidden = editando;
   b.querySelector('.voz-subbar-notacaja').hidden = true;
   b.classList.toggle('voz-subbar-editando', editando);
   b.hidden = false;
@@ -3333,15 +3349,61 @@ function vozSubMarcarCon(cat) {
 
 function vozSubGuardarNota(texto) {
   const c = _vozLeyendo;
-  if (!c || !_vozSubEditando) return;
-  const m = vozSubDe(c.cid).find(x => x.id === _vozSubEditando);
-  if (!m) return;
-  m.n = String(texto || '').trim();
-  m.u = Date.now();
+  if (!c) return;
+  const nota = String(texto || '').trim();
+  if (_vozSubEditando) {
+    const m = vozSubDe(c.cid).find(x => x.id === _vozSubEditando);
+    if (!m) return;
+    m.n = nota;
+    m.u = Date.now();
+    vozSubGuardaMarca(m);
+    vozSubRepintar(m.cap, m.vp);
+    vozSubCerrarBarra();
+    vozAviso(m.n ? '✎ Nota guardada' : 'Nota quitada');
+    return;
+  }
+  /* Anotar sin haber elegido color todavía: se marca como DUDA, que es
+     lo que casi siempre es una nota escrita a bote pronto, y se cambia
+     de color después tocándola. Igual que en las misiones. */
+  const s = _vozSubSel || vozLeerSeleccionSala();
+  if (!s || s.varios) { vozSubCerrarBarra(); return; }
+  const m = { id: vozSubId(), cap: s.cap, vp: s.vp, i: s.i, f: s.f, t: s.t, c: 'duda', n: nota, u: Date.now(), del: false, user: _vozYo || null };
   vozSubGuardaMarca(m);
-  vozSubRepintar(m.cap, m.vp);
+  try { window.getSelection().removeAllRanges(); } catch (e) {}
   vozSubCerrarBarra();
-  vozAviso(m.n ? '✎ Nota guardada' : 'Nota quitada');
+  vozSubRepintar(m.cap, m.vp);
+  vozAviso(nota ? '✎ Nota guardada, marcada como ? · Duda' : '? · Duda subrayada');
+}
+
+/* «🔖 Aquí me quedé» desde la selección. El marcador cae en el PÁRRAFO
+   seleccionado —no en la página, que cambia con la letra—, con el trozo
+   como extracto y la fracción del punto donde empieza la selección: así
+   sobrevive a un cambio de letra como los demás marcadores. Si ese
+   párrafo ya tenía marcador, se pisa: dos marcadores en el mismo
+   párrafo no separan nada. */
+function vozSubAquiMeQuede() {
+  const c = _vozLeyendo;
+  const s = _vozSubSel || vozLeerSeleccionSala();
+  if (!c || !s || s.varios) { vozSubCerrarBarra(); return; }
+  let sub = 0;
+  try {
+    const el = document.querySelector('#voz-texto [data-cap="' + s.cap + '"][data-vp="' + s.vp + '"]');
+    const largo = el ? vozCuerpoDe(el).textContent.length : 0;
+    if (largo > 0) sub = Math.max(0, Math.min(1, s.i / largo));
+  } catch (e) {}
+  const lista = vozLeeMarcas(c.cid).filter(m => !(m.cap === s.cap && m.vp === s.vp));
+  lista.push({ cap: s.cap, vp: s.vp, sub: Math.round(sub * 1000) / 1000,
+               txt: s.t.length > 110 ? s.t.slice(0, 108).replace(/\s+\S*$/, '') + '…' : s.t,
+               cuando: Date.now() });
+  lista.sort((a, b) => a.cap - b.cap || a.vp - b.vp || a.sub - b.sub);
+  vozGuardaMarcas(c.cid, lista);
+  try { window.getSelection().removeAllRanges(); } catch (e) {}
+  vozSubCerrarBarra();
+  vozPintarBotonMarca();
+  vozPintarBarraMarcas();
+  const panel = document.getElementById('voz-panel-ind');
+  if (panel && !panel.hidden && _vozPanelTab === 'marcas') vozPintarPanelInd('marcas');
+  vozAviso('🔖 Aquí te quedaste: marcador puesto en este párrafo');
 }
 
 /* ⚠️ Quitar es poner LÁPIDA, no borrar: si este aparato borrara la

@@ -903,6 +903,9 @@
   border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-size: 13px;
 }
 .voz-subbar-quitar { color: #b91c1c; border-color: rgba(185,28,28,.4); }
+/* «Aquí me quedé» resaltado como en las misiones: es la acción que no
+   es un color y la que más se usa al dejar de leer. */
+.voz-subbar-lugar { color: var(--story); border-color: var(--story); font-weight: 600; }
 .voz-subbar-cerrar { margin-left: auto; min-width: 38px; }
 .voz-subbar-notacaja { display: flex; flex-direction: column; gap: 6px; }
 .voz-subbar-notacaja[hidden] { display: none; }

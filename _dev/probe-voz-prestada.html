@@ -926,6 +926,50 @@ function margenVisible(w){
   w.eval('vozCerrarLector()');
   await esperar(200);
 
+  /* La barra de una selección NUEVA trae también Nota, «Aquí me quedé»
+     y Cerrar, calcada de la barra de las misiones (pedido del autor,
+     10 de septiembre de 2026). */
+  w.eval(`_vozCuentos = [${JSON.stringify(cuentoLargo('c-sub2'))}]; vozGuardaLocal(); vozRender();
+          try { localStorage.removeItem('faro_voz_marcas_v1'); } catch (e) {}
+          vozAbrirLector('c-sub2')`);
+  await esperar(500);
+  w.eval('vozIrPagina(1, true)');
+  await esperar(250);
+  const sel21b = selecciona(5, 40);
+  await esperar(500);
+  ok(!barra.hidden && !barra.querySelector('.voz-subbar-acciones').hidden &&
+     !barra.querySelector('.voz-subbar-lugar').hidden && barra.querySelector('.voz-subbar-quitar').hidden &&
+     !barra.querySelector('.voz-subbar-cerrar').hidden,
+     'sobre una selección NUEVA la barra trae Nota, «Aquí me quedé» y Cerrar, y esconde Quitar (como en las misiones)',
+     'la barra de la selección nueva no trae las acciones de las misiones');
+  barra.querySelector('.voz-subbar-lugar').click();
+  await esperar(250);
+  const lugares21 = JSON.parse(w.eval('JSON.stringify(vozLeeMarcas("c-sub2"))'));
+  ok(lugares21.length === 1 && lugares21[0].cap === sel21b.cap && lugares21[0].vp === sel21b.vp && barra.hidden,
+     '«Aquí me quedé» pone el marcador en el PÁRRAFO seleccionado y cierra la barra',
+     'el marcador de lugar no quedó: ' + JSON.stringify(lugares21));
+  selecciona(0, 30);
+  await esperar(500);
+  barra.querySelector('.voz-subbar-nota-btn').click();
+  await esperar(100);
+  barra.querySelector('.voz-subbar-notatxt').value = 'Apunte a bote pronto';
+  [...barra.querySelectorAll('.voz-subbar-notacaja .voz-subbar-acc')].pop().click();
+  await esperar(300);
+  const subs21b = JSON.parse(w.eval('JSON.stringify(vozSubDe("c-sub2"))'));
+  ok(subs21b.length === 1 && subs21b[0].c === 'duda' && subs21b[0].n === 'Apunte a bote pronto' &&
+     !!d.querySelector('#voz-texto mark.voz-hl-duda.voz-hl-nota'),
+     '«Nota» sobre la selección crea la marca como DUDA con su nota, que después se recolorea tocándola',
+     'la nota sobre selección nueva no creó la marca: ' + JSON.stringify(subs21b));
+  d.querySelector('#voz-texto mark.voz-hl-duda').click();
+  await esperar(250);
+  ok(barra.querySelector('.voz-subbar-lugar').hidden && !barra.querySelector('.voz-subbar-quitar').hidden,
+     'y sobre una marca ya puesta «Aquí me quedé» se esconde y sale Quitar: no hay trozo nuevo al que llevar el marcador',
+     'la barra de edición no cambió sus acciones');
+  barra.querySelector('.voz-subbar-cerrar').click();
+  await esperar(150);
+  w.eval('vozCerrarLector()');
+  await esperar(200);
+
   log('── 22. ⚠️ RETIRAR A LA VISTA, SIN confirm(), Y CON LÁPIDA DURABLE ──');
   /* El autor lo dijo el 10 de septiembre de 2026: «el cuento de muestra
      no se puede eliminar». Tres cosas fallaban a la vez: el botón solo

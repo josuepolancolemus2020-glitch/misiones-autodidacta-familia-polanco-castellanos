@@ -1440,6 +1440,18 @@ el diseño.
    ⚠️ **Y los tokens `--fm-*` se declaran por papel dentro de `#voz-lector`**:
    en noche los mismos amarillos deslumbran, así que van traslúcidos, como en
    el modo oscuro de las misiones. Ni uno en `:root`.
+   ⚠️ **La barra de una selección NUEVA trae también «✎ Nota», «🔖 Aquí me
+   quedé» y «✕ Cerrar»**, calcada de la barra de las misiones (pedido del
+   autor el 10 de septiembre de 2026, con su captura al lado): es el mismo
+   gesto —se selecciona y se decide qué hacer con lo seleccionado— y en un
+   botón aparte habría que soltar el texto, buscarlo y volver. «Nota» sin
+   color elegido marca como DUDA, que es lo que casi siempre es una nota a
+   bote pronto, y se recolorea tocándola. «Aquí me quedé» pone el marcador
+   de lectura EN EL PÁRRAFO seleccionado —no en la página, que cambia con
+   la letra—, con el trozo como extracto, pisando el que ese párrafo ya
+   tuviera. Sobre una marca ya puesta «Aquí me quedé» se esconde —no hay
+   trozo nuevo al que llevar el marcador— y sale «Quitar». La comprobación
+   21 pulsa las tres.
 
 22. ⚠️ **RETIRAR ESTÁ A LA VISTA, ES DE DOS TOQUES EN EL MISMO SITIO, Y NO
    PASA POR `confirm()`.** «El cuento de muestra que está al principio no se
