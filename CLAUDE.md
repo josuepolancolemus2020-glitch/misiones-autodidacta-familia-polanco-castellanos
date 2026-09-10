@@ -1413,6 +1413,19 @@ degradado por eso mismo.
 - Sin framework ni compilación: HTML, CSS y JS planos que se sirven tal
   cual. La aplicación se publica en Cloudflare Pages, detrás de una puerta
   con contraseña (Cloudflare Access).
+- **Los iconos se generan con el navegador, no a mano.** En la sesión no hay
+  ImageMagick, ni ffmpeg, ni Pillow, pero sí Chromium: se carga el original en
+  un lienzo y se exporta con `toDataURL`. El maestro a resolución completa vive
+  en `img/faro-icono-fuente.png`, y de él salen `icon-192`, `icon-512` y
+  `icon-maskable-512`.
+  ⚠️ **El `maskable` es un archivo APARTE y no es un capricho:** Android
+  recorta ese icono en círculo, así que el fondo tiene que llegar al borde y el
+  dibujo quedarse dentro del 76 % central. Usando el icono normal, que trae su
+  baldosa redondeada con esquinas blancas, el recorte se comía la palabra
+  «F.A.R.O» y encima dejaba un marco blanco. Las medidas (la caja de color del
+  original y el radio de su esquina) **se sacan leyendo los píxeles**, no a
+  ojo, y el dibujo se pinta un 4 % más grande que el recorte para que su borde
+  suavizado no deje una costura clara sobre el azul.
 - **Un solo cliente de Supabase en toda la aplicación**, el de `js/auth.js`
   (`window.faroSb`). No se crea otro: la razón, larga y cara, está escrita
   en ese archivo.
