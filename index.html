@@ -2338,6 +2338,11 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <button type="button" class="voz-btn voz-btn-pri" id="voz-nuevo-btn2">➕ Pegar un texto</button>
       </div>
 
+      <!-- La fila de herramientas del anaquel: la vista (cuadrícula,
+           lista, detalle), el orden y la agrupación. La pinta
+           vozPintarHerramientas() y lo elegido es del aparato. -->
+      <div id="voz-herr" class="voz-herr"></div>
+
       <!-- Dos filas de chips, género y voz, sacadas de los textos del
            anaquel. Cada una se esconde cuando no separa nada. -->
       <div class="voz-chips" id="voz-chips-gen" hidden></div>
@@ -2369,7 +2374,7 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
     </div>
 
     <div class="voz-l-mid" id="voz-mid">
-      <div id="voz-hoja"><div id="voz-texto"></div><div id="voz-cola"></div></div>
+      <div id="voz-hoja"><div id="voz-texto" class="voz-texto"></div><div id="voz-cola"></div></div>
       <!-- Bordes para pasar página; el centro es la propia hoja, que
            apaga los mandos y deja seleccionar texto. Y no es la única
            forma: los botones ‹ › del pie están a la vista, las flechas
@@ -2455,8 +2460,9 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
 
       <div class="voz-falta" id="voz-falta" hidden></div>
       <button type="button" class="voz-btn voz-btn-pri" id="voz-guardar-btn">📖 Guardar en el anaquel</button>
-      <button type="button" class="voz-btn" id="voz-retirar-btn" hidden
-              style="margin-top:8px;width:100%;">🗑 Retirar del anaquel</button>
+      <!-- El botón de retirar con su confirmación al lado: lo pinta
+           vozAbrirPegar(), porque tiene que saber de qué texto es. -->
+      <div id="voz-retirar-caja" class="voz-retirar-hoja" hidden></div>
     </div>
   </div>
 
@@ -2472,6 +2478,22 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         </button>
       </div>
       <div id="voz-ayuda-cuerpo"></div>
+    </div>
+  </div>
+
+  <!-- El menú de un texto del anaquel (⋯ en la lista y en la cuadrícula):
+       leer, copiar, compartir, corregir y retirar, y la etiqueta
+       siempre arriba. Lo pinta vozMenuAbrir(); el botón de retirar es el
+       de dos pasos, a la vista, sin `confirm()`. -->
+  <div id="voz-menu-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal voz-menu" role="dialog" aria-modal="true" aria-labelledby="voz-menu-tit">
+      <div class="msug-det-head">
+        <div class="msug-det-titulo" id="voz-menu-tit">Texto</div>
+        <button type="button" class="msug-det-cerrar" id="voz-menu-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="voz-menu-cuerpo"></div>
     </div>
   </div>
 

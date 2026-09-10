@@ -943,6 +943,13 @@ herramienta para poder leer como en formato epub, algunos cuentos que le pido a
 esta IA que me redacte con las voces de otros escritores». **Y ampliado ese
 mismo día:** que sirva, «lo más profesional» posible, para leer en línea con
 ese formato cuentos, ensayos y textos importantes «de diferentes géneros».
+**Y otra vez ese día, después de probarla en el teléfono:** «hace falta poder
+seleccionar texto para remarcarlo según el código de colores que está en las
+lecturas de las misiones», «el cuento de muestra no se puede eliminar», «no
+aparece leer deslizando para abajo», «no está leer con la simulación que pase
+la página… tal como un libro», y «ver los libros en cuadrícula, en lista, en
+detalle y poder moverlos, hacer una clasificación por voces de autores». Son
+las reglas 21 a 25.
 
 Vive en `js/tools/voz-prestada.js` y `css/voz-prestada.css`, con su tabla en
 `supabase/sql/voz_prestada.sql` y la comprobación aparte en
@@ -963,7 +970,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Veinte reglas, y ninguna es de adorno:**
+**Veinticinco reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -1253,6 +1260,13 @@ el diseño.
    haya corrido el SQL la herramienta funciona entera con la copia del aparato
    y **lo dice a la vista** («📴 Solo en este aparato»), que es lo contrario de
    fingir que viaja.
+   ⚠️ **Y la lápida se queda en el aparato aunque se vuelva a guardar el
+   anaquel.** La primera versión de `vozGuardaLocal()` escribía solo los textos
+   vivos, así que la lápida duraba hasta el siguiente guardado; si la subida
+   había fallado por la señal, en el arranque siguiente la nube devolvía el
+   texto viejo, no había lápida que lo parara, y el cuento resucitaba. Es la
+   mitad escondida de «el cuento de muestra no se puede eliminar» (regla 22).
+   Ahora las lápidas se conservan seis meses, como en `lecturas_marcas`.
    ⚠️ **Los ajustes de lectura, la posición y los marcadores son DEL
    APARATO**, no de la nube. La letra es una costumbre de unos ojos; y la
    posición parece que debería viajar y **no debe**, porque en esta casa el
@@ -1305,9 +1319,13 @@ el diseño.
    Y el aviso nombra el motivo, que son cuatro y se arreglan distinto: falta
    correr el SQL, no hay sesión, no hay señal, o el texto es de otro. Un
    aviso que se equivoca de causa manda a mirar donde no está el problema.
-   Por lo mismo, **corregir y retirar solo se ofrecen en lo propio**: lo
-   impide la seguridad por fila, pero enseñar un botón que la base va a
-   rechazar es prometer algo que no se puede hacer.
+   Por lo mismo, **corregir y retirar solo funcionan en lo propio**, y en lo
+   ajeno los botones salen **apagados y avisan al tocarlos** («lo puso otra
+   persona de la casa»): lo impide la seguridad por fila, y enseñar un botón
+   vivo que la base va a rechazar es prometer algo que no se puede hacer;
+   pero quitarlo sin más parece un fallo de la pantalla, y un fallo de
+   pantalla se «arregla» reinstalando. Un botón apagado que explica es lo
+   único que no manda a nadie a buscar donde no está el problema.
    ⚠️ **Y los avisos se VEN.** La aplicación tiene `toast()` (js/app.js), no
    `showToast()`, que era lo que llamaba la primera versión: ningún aviso de
    guardado salió nunca en F.A.R.O y el de copiar caía en un `alert`. Y con
@@ -1376,6 +1394,127 @@ el diseño.
    un filtro o una búsqueda puestos, y los chips —sacados de los textos,
    nunca de una lista escrita— se esconden cuando no separan nada.
 
+21. ⚠️ **LOS SUBRAYADOS SON LOS CINCO COLORES DE LA CASA Y VIAJAN POR LA
+   TABLA DE LAS MISIONES.** Pedido por el autor el 10 de septiembre de 2026.
+   Son los mismos cinco del marcador de las misiones (`js/lecturas-marcador.js`):
+   D dato, V voz, I idea, C contracita, ? duda, con la misma trama —cada color
+   lleva además su raya distinta, para la fotocopia en gris y para quien no
+   separa el rojo del verde— y con la letra al final del trozo. Y van por la
+   MISMA tabla, `lecturas_marcas`, con `mision = 'voz:<cid>'` y `zona =
+   'cap<N>'`: no se inventa una segunda tabla de subrayados para el mismo
+   gesto. Son de CADA QUIEN (la tabla lleva seguridad por fila con el usuario
+   que entró), a diferencia del texto, que es de la casa. Si esa tabla no está
+   corrida, el panel lo dice («falta correr lecturas_marcas.sql») y los
+   subrayados viven en el aparato hasta entonces.
+   Cómo se hace: se selecciona un trozo —el centro de la hoja es texto de
+   verdad, regla 8— y al soltar sale la barra con los cinco colores pegada al
+   trozo; un toque marca. Tocar una marca la abre para cambiarle el color,
+   ponerle nota o quitarla. **Quitar deja lápida** (`del`), por lo mismo que
+   los textos. La marca se guarda por **capítulo, párrafo y desplazamiento de
+   caracteres sobre el TEXTO del bloque, no sobre su HTML**: así una marca
+   sigue valiendo aunque el bloque ya tenga otras pintadas encima, y sobrevive
+   a un cambio de letra porque se repinta con el texto. Si el texto se corrige
+   y el trozo ya no está donde estaba, se reancla **solo si aparece una vez**:
+   con dos apariciones, adivinar es peor que no pintar.
+   ⚠️ **La marca se pinta troceando nodos de texto y colgando `<mark>`**, nunca
+   con `innerHTML`, y el `::after` con la letra sale de un `data-ini` que
+   ponemos nosotros. Una nota con HTML dentro se guarda como texto y se pinta
+   como texto. Comprobación **21**: marca, cambio de letra, nota con veneno,
+   color calculado en papel y en noche, la subida FIRMADA a `lecturas_marcas`
+   con la base de mentira exigiendo lo que exige la de verdad, y la lápida.
+   ⚠️ **Y los tokens `--fm-*` se declaran por papel dentro de `#voz-lector`**:
+   en noche los mismos amarillos deslumbran, así que van traslúcidos, como en
+   el modo oscuro de las misiones. Ni uno en `:root`.
+
+22. ⚠️ **RETIRAR ESTÁ A LA VISTA, ES DE DOS TOQUES EN EL MISMO SITIO, Y NO
+   PASA POR `confirm()`.** «El cuento de muestra que está al principio no se
+   puede eliminar» (el autor, 10 de septiembre de 2026). Fallaban tres cosas a
+   la vez y ninguna daba error: el botón solo estaba al FONDO de la hoja de
+   corregir; pasaba por `window.confirm`, que en la aplicación instalada en el
+   teléfono puede no salir nunca —el botón parecía muerto—; y la lápida se
+   perdía al volver a guardar el anaquel (regla 12), así que aunque se
+   retirara, resucitaba desde la nube en el siguiente arranque. Ahora el 🗑
+   está en la ficha, en el ⋯ de la lista y de la cuadrícula, y al pie de la
+   hoja de corregir; un toque abre **«Sí, retirar · No» al lado**, sin diálogo
+   del navegador, y nada se retira con un solo toque. La comprobación **22**
+   pulsa los botones de verdad, cuenta las llamadas a `confirm`, y vuelve a
+   arrancar con la nube devolviendo todavía el texto viejo: la lápida tiene
+   que ganar y volver a subirse sola.
+
+23. **LEER DESLIZANDO ES OTRO MODO, NO OTRA PANTALLA.** «No aparece leer
+   deslizando para abajo.» Es el primer ajuste de la sala (📖 En páginas ·
+   ↕️ Deslizando): en desplazamiento se pinta el texto ENTERO seguido —portada,
+   epígrafe y todos los capítulos, cada bloque con su `data-cap`—, sin columnas
+   ni alto fijo, y la caja se desliza hacia abajo. Todo lo que puso la
+   paginación se quita uno por uno (`vozColocarScroll`), para que cambiar de
+   modo a mitad de lectura no deje una columna de dos metros.
+   ⚠️ **Las zonas de toque de los bordes se ESCONDEN en este modo.** Son
+   hermanas de la caja, no hijas, y un dedo que empezara a deslizar encima de
+   una zona no desplazaría la caja de debajo: el navegador desplaza al
+   antepasado del elemento tocado. Cuarenta por ciento de la pantalla sin
+   poder deslizar sería un modo de desplazamiento roto en silencio.
+   ⚠️ **La posición se apunta al parar de deslizar, por párrafo y fracción**,
+   con el mismo formato que en páginas (regla 6): el bloque que cruza el borde
+   de arriba y cuánto de él ya pasó. Por eso se puede cambiar de modo sin
+   perder el sitio, y por eso vuelve al mismo sitio al abrir. Comprobación
+   **23**: overflow calculado, sin columnas, zonas escondidas, párrafo
+   apuntado, vuelta al sitio, y el mismo párrafo a la vista al volver a
+   páginas.
+
+24. **HOJEAR ES UNA INSTANTÁNEA QUE SE PLIEGA, Y SIGUE AL DEDO.** «No está
+   leer con la simulación que pase la página cuando se pasa la hoja tal como
+   un libro.» Ajuste «Pasar página»: Deslizar · 📄 Hojear · De golpe. Al pasar,
+   `vozInstantanea()` clona `#voz-texto` recortado a la página que se va, se
+   cambia por debajo a la de destino, y el clon gira en 3D alrededor del lomo
+   —hacia adelante sobre su borde izquierdo, hacia atrás sobre el derecho— con
+   una sombra que crece con el giro. Con el dedo (o el lápiz) **la hoja sigue
+   al dedo** mientras se arrastra y al soltar termina de pasar o vuelve, según
+   cuánto se llevó (`vozVueltaEmpieza/Mueve/Suelta`). Con el ratón no: un
+   arrastre de ratón es una selección.
+   ⚠️ **El clon PIERDE el `id`**: dos `#voz-texto` en el documento romperían
+   la paginación, el buscador y la posición. Se queda con la clase
+   `.voz-texto`, y por eso la tipografía de la hoja vive en la CLASE y no en
+   el `id`: si viviera en el `id`, la hoja que se pliega saldría en Times a
+   16 px. ⚠️ **Es un clon del DOM, no una imagen**: así lleva la misma letra y
+   los mismos subrayados sin pintar nada en un lienzo. Y `.voz-l-mid` recorta
+   con `overflow: hidden`, porque girada en perspectiva la hoja crece por el
+   borde cercano y se salía por encima de la barra. Comprobación **24**: la
+   hoja existe con su clon sin `id`, no recibe el puntero, lleva la misma
+   letra calculada, desaparece al terminar; con eventos de puntero de tipo
+   `touch` sigue al dedo y decide al soltar; con `mouse` no pliega; y «De
+   golpe» pasa al instante.
+
+25. **EL ANAQUEL TIENE TRES VISTAS, SEIS ÓRDENES Y DOS AGRUPACIONES, Y LA
+   ETIQUETA VA EN LAS TRES.** «Ver los libros en cuadrícula, en lista, en
+   detalle y poder moverlos, hacer una clasificación por voces de autores.»
+   ▦ cuadrícula (portadas de 2:3 con el color de la voz), ☰ lista (una fila
+   por texto, con ⋯ para lo demás) y ▤ detalle (las fichas). Orden: recientes,
+   **manual**, título, voz, género, a medias primero. Agrupar: por voz o por
+   género, con el lomo del color de la voz y la cuenta de cada grupo.
+   ⚠️ **La etiqueta —voz y máquina— está en las tres vistas y en el menú ⋯.**
+   Una vista compacta que la perdiera sería la forma más barata de romper la
+   regla 1; la sonda mira las tres.
+   ⚠️ **La vista, el orden, la agrupación y el orden a mano son DEL APARATO**
+   (`faro_voz_anaquel_v1`), nunca de la nube. Es la regla 9 de la repisa de
+   enlaces: la seguridad por fila solo deja escribir la fila propia, así que
+   un orden común de la casa es imposible sin escribir filas ajenas, y fingir
+   lo contrario sería un arrastre que parece guardarse y no se guarda. El chip
+   lo dice: «Manual (este aparato)».
+   ⚠️ **El orden a mano se cambia ARRASTRANDO EL ASA, con PUNTEROS**, con las
+   mismas cuatro reglas que la repisa, los videos de M.E.T.A.S y El Rodaje: el
+   asa es un botón y **las flechas del teclado la mueven**; `touch-action:
+   none` en el asa y solo en el asa (en toda la tarjeta, la lista dejaría de
+   deslizarse); **al soltar NO se repinta** (el nodo se mueve, no se vuelve a
+   crear); y se explica con palabras encima de la lista. En la cuadrícula el
+   destino se decide por la mitad izquierda o derecha de la tarjeta de debajo
+   si el dedo va en su misma fila, y por la mitad de arriba o abajo si no.
+   Comprobación **25**: las tres vistas con su etiqueta, el color calculado de
+   la portada, los grupos coherentes, el orden por título, ↑ con el teclado, un
+   arrastre con eventos de puntero de verdad, que no escribió nada en la nube,
+   y que el orden sobrevive a volver a abrir. Se prueba en la vista de lista,
+   porque `elementFromPoint` —que es lo que usa el arrastre— no ve nada fuera
+   de la ventana del marco.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -1410,6 +1549,15 @@ género.
 
 La comprobación **19** ensancha el marco a 1000 px para ver el libro abierto
 a dos páginas, y mide ahí también la última página.
+
+Las comprobaciones **21 a 25** son las de la segunda ronda (subrayados,
+retirar, deslizar, hojear y el anaquel) y comparten una regla: **los botones
+se pulsan y los gestos se hacen con eventos de puntero**, no llamando por
+dentro a la función. El 🗑 que no retiraba, la zona que tapaba el
+desplazamiento y el arrastre que no arrancaba son fallos de pantalla, y de
+pantalla no se sabe nada llamando funciones. Y la base de mentira sirve
+también `lecturas_marcas`, exigiendo lo mismo que la de verdad (firma, misión,
+color de los cinco): un doble complaciente esconde la costura.
 
 ⚠️ Las comprobaciones de la nube (13, 17 y 14) reutilizan **el mismo marco**,
 cambiándole la base de mentira, en vez de abrir un segundo `index.html`: un

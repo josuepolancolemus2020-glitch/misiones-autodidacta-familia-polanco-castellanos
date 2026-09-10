@@ -221,6 +221,12 @@ Zone → Make private.
      tabla de lo que cada quien subraya y anota en las misiones. Se comprueba
      en un minuto: `select count(*) from public.lecturas_marcas;` responde si
      existe, y falla si no.
+     **Desde el 10 de septiembre de 2026 también la usan los subrayados de La
+     Voz Prestada** (con `mision = 'voz:<cid>'`), así que ahora importa el
+     doble. Si no está, la sala sigue subrayando y el panel de subrayados lo
+     dice a la vista («📴 Solo en este aparato: falta correr
+     lecturas_marcas.sql»); las marcas se quedan en el aparato hasta que se
+     corra. Va entero, de una vez, y no hay que volver a correr nada más.
    · ⚠️ **Ponerle freno a `faro_buzon_retirar` y `faro_buzon_mio`.** Salió al
      revisar la seguridad del buzón el 8 de agosto de 2026, y está desde el
      primer archivo. `faro_buzon_enviar` sí tiene freno (cinco al día por

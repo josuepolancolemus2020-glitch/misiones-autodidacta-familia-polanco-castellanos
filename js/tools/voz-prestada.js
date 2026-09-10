@@ -169,8 +169,24 @@ function vozCid() {
   return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
+/* ⚠️ LA COPIA DEL APARATO GUARDA TAMBIÉN LAS LÁPIDAS. La primera versión
+   escribía solo la lista viva (`_vozCuentos`), así que una lápida recién
+   puesta se perdía en cuanto la nube contestaba o se guardaba otro
+   texto: si la subida de la lápida había fallado —sin señal, o con la
+   tabla vieja—, en el siguiente arranque la fila de la nube volvía sin
+   nadie que la contradijera y EL TEXTO RETIRADO RESUCITABA. Es
+   literalmente lo que la lápida existe para impedir, roto por el lado
+   de acá. Ahora la lista viva se escribe junto con las lápidas que ya
+   había, y `vozSubirPendientes()` las sube cuando vuelve la señal. Las
+   de más de 180 días se barren, como hace la higiene de la nube. */
 function vozGuardaLocal() {
-  try { localStorage.setItem(VOZ_LOCAL, JSON.stringify(_vozCuentos)); } catch (e) {}
+  try {
+    const vivos = new Map(_vozCuentos.map(c => [c.cid, c]));
+    const limite = Date.now() - 180 * 86400000;
+    const lapidas = vozLeeLocal().filter(c =>
+      c && c.cid && c.borrado && !vivos.has(c.cid) && (c.actualizado || 0) > limite);
+    localStorage.setItem(VOZ_LOCAL, JSON.stringify(_vozCuentos.concat(lapidas)));
+  } catch (e) {}
 }
 
 function vozLeeLocal() {
@@ -1097,7 +1113,57 @@ async function initVozPrestada() {
 
 /* ══════════════════════════════════════════════════════════════════
    EL ANAQUEL
-   ══════════════════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════════════════
+   Tres vistas (cuadrícula, lista y detalle), seis órdenes —uno de ellos
+   a mano, arrastrando— y dos agrupaciones (por voz y por género), que
+   es lo que pidió el autor el 10 de septiembre de 2026 al probar la
+   herramienta: «ver los libros en cuadrícula, en lista, en detalle y
+   poder moverlos, hacer una clasificación por voces de autores».
+
+   ⚠️ LA VISTA, EL ORDEN Y LA AGRUPACIÓN SON DEL APARATO, y el orden a
+   mano también. Es la regla 9 de la repisa de enlaces: la seguridad por
+   fila solo deja escribir la fila propia, así que un orden común de la
+   casa es imposible sin poder escribir las filas ajenas, y fingir lo
+   contrario sería un arrastre que parece guardarse y no se guarda. Aquí
+   se dice en el propio chip: «Manual (este aparato)». */
+
+const VOZ_ANAQUEL = 'faro_voz_anaquel_v1';
+let _vozAnaquel = { vista: 'detalle', orden: 'recientes', grupo: '', manual: [] };
+
+const VOZ_VISTAS = [
+  { id: 'cuadricula', ic: '▦', t: 'Cuadrícula' },
+  { id: 'lista',      ic: '☰', t: 'Lista' },
+  { id: 'detalle',    ic: '▤', t: 'Detalle' },
+];
+const VOZ_ORDENES = [
+  { id: 'recientes', t: 'Recientes' },
+  { id: 'manual',    t: 'Manual (este aparato)' },
+  { id: 'titulo',    t: 'Título' },
+  { id: 'voz',       t: 'Voz' },
+  { id: 'genero',    t: 'Género' },
+  { id: 'avance',    t: 'A medias primero' },
+];
+const VOZ_GRUPOS = [
+  { id: '',       t: 'Sin agrupar' },
+  { id: 'voz',    t: 'Por voz' },
+  { id: 'genero', t: 'Por género' },
+];
+
+function vozLeeAnaquel() {
+  try {
+    const s = localStorage.getItem(VOZ_ANAQUEL);
+    if (s) _vozAnaquel = Object.assign({ vista: 'detalle', orden: 'recientes', grupo: '', manual: [] }, JSON.parse(s) || {});
+  } catch (e) {}
+  if (!VOZ_VISTAS.some(v => v.id === _vozAnaquel.vista)) _vozAnaquel.vista = 'detalle';
+  if (!VOZ_ORDENES.some(o => o.id === _vozAnaquel.orden)) _vozAnaquel.orden = 'recientes';
+  if (!VOZ_GRUPOS.some(g => g.id === _vozAnaquel.grupo)) _vozAnaquel.grupo = '';
+  if (!Array.isArray(_vozAnaquel.manual)) _vozAnaquel.manual = [];
+  return _vozAnaquel;
+}
+
+function vozGuardaAnaquel() {
+  try { localStorage.setItem(VOZ_ANAQUEL, JSON.stringify(_vozAnaquel)); } catch (e) {}
+}
 
 /* El lomo del libro se pinta con un color sacado de la VOZ, no del
    título ni al azar: así todos los textos «al modo de» el mismo
@@ -1196,9 +1262,62 @@ function vozEnCurso() {
   return mejor;
 }
 
+/* ¿Es mío? Lo impide de verdad la seguridad por fila; esto solo decide
+   qué botones se enseñan, para no prometer lo que la base va a
+   rechazar. */
+function vozEsMio(c) {
+  return !c.puesto_por || !_vozYo || c.puesto_por === _vozYo;
+}
+
+function vozOrdena(lista) {
+  const o = _vozAnaquel.orden;
+  const rec = (a, b) => (b.actualizado || 0) - (a.actualizado || 0);
+  const tit = (a, b) => (a.titulo || '').localeCompare(b.titulo || '', 'es');
+  const l = lista.slice();
+  if (o === 'titulo') l.sort((a, b) => tit(a, b) || rec(a, b));
+  else if (o === 'voz') l.sort((a, b) => (a.voz || '').localeCompare(b.voz || '', 'es') || tit(a, b));
+  else if (o === 'genero') {
+    const idx = c => VOZ_GENEROS.findIndex(g => g.id === vozGenero(c.genero).id);
+    l.sort((a, b) => idx(a) - idx(b) || tit(a, b));
+  } else if (o === 'avance') {
+    /* Lo empezado primero (lo más avanzado antes), después lo sin
+       empezar por recientes, y lo leído al final. */
+    const peso = c => { const av = vozAvance(c); return av >= 100 ? 2 : (av > 0 ? 0 : 1); };
+    l.sort((a, b) => peso(a) - peso(b) || (vozAvance(b) - vozAvance(a)) || rec(a, b));
+  } else if (o === 'manual') {
+    const pos = new Map(_vozAnaquel.manual.map((cid, i) => [cid, i]));
+    l.sort((a, b) => {
+      const pa = pos.has(a.cid) ? pos.get(a.cid) : Infinity;
+      const pb = pos.has(b.cid) ? pos.get(b.cid) : Infinity;
+      return pa - pb || rec(a, b);
+    });
+  } else l.sort(rec);
+  return l;
+}
+
+function vozAgrupa(lista) {
+  const g = _vozAnaquel.grupo;
+  if (!g) return [{ clave: '', titulo: '', ic: '', items: lista }];
+  const m = new Map();
+  lista.forEach(c => {
+    const clave = g === 'voz' ? ((c.voz || '').trim() || '—') : vozGenero(c.genero).id;
+    if (!m.has(clave)) m.set(clave, []);
+    m.get(clave).push(c);
+  });
+  const grupos = [...m.entries()].map(([clave, items]) => {
+    if (g === 'voz') return { clave: clave, titulo: '🎭 al modo de ' + clave, ic: '', items: items, h: vozColor(clave) };
+    const gen = vozGenero(clave);
+    return { clave: clave, titulo: gen.ic + ' ' + gen.pl.charAt(0).toUpperCase() + gen.pl.slice(1), ic: gen.ic, items: items };
+  });
+  if (g === 'voz') grupos.sort((a, b) => b.items.length - a.items.length || a.clave.localeCompare(b.clave, 'es'));
+  else grupos.sort((a, b) => VOZ_GENEROS.findIndex(x => x.id === a.clave) - VOZ_GENEROS.findIndex(x => x.id === b.clave));
+  return grupos;
+}
+
 function vozRender() {
   const cont = document.getElementById('voz-lista');
   if (!cont) return;
+  vozLeeAnaquel();
 
   /* La barra de estado de la nube. Va SIEMPRE a la vista, también
      cuando todo va bien: si solo apareciera cuando algo falla, nadie
@@ -1222,6 +1341,8 @@ function vozRender() {
     hero.hidden = !c;
     if (c) hero.appendChild(vozSigueLeyendo(c));
   }
+
+  vozPintarHerramientas();
 
   /* Los chips: género y voz, sacados de los textos y nunca de una lista
      escrita aquí. Cada fila se esconde cuando no separa nada. */
@@ -1260,15 +1381,77 @@ function vozRender() {
     chips.hidden = voces.length < 2;
   }
 
-  const lista = vozVisibles();
+  const lista = vozOrdena(vozVisibles());
   cont.textContent = '';
+  cont.className = 'voz-lista voz-lista-' + _vozAnaquel.vista;
 
   if (!lista.length) {
     cont.appendChild(vozVacio());
     return;
   }
 
-  lista.forEach(c => cont.appendChild(vozFicha(c)));
+  const manual = _vozAnaquel.orden === 'manual';
+  if (manual) {
+    const nota = vozNodo('p', 'voz-orden-nota',
+      'Este es tu orden, en este aparato. Arrastra el ⠿ de cada texto para cambiarlo; con el teclado, las flechas.');
+    cont.appendChild(nota);
+  }
+  vozAgrupa(lista).forEach(gr => {
+    if (gr.titulo) {
+      const h = vozNodo('div', 'voz-grupo-tit');
+      if (gr.h != null) h.style.setProperty('--voz-h', String(gr.h));
+      h.appendChild(vozNodo('span', 'voz-grupo-lomo'));
+      h.appendChild(vozNodo('span', 'voz-grupo-txt', gr.titulo));
+      h.appendChild(vozNodo('span', 'voz-grupo-n', gr.items.length === 1 ? '1 texto' : gr.items.length + ' textos'));
+      cont.appendChild(h);
+    }
+    const caja = vozNodo('div', 'voz-grupo voz-grupo-' + _vozAnaquel.vista);
+    gr.items.forEach(c => caja.appendChild(vozItem(c, manual)));
+    cont.appendChild(caja);
+    if (manual) vozMontarArrastre(caja);
+  });
+}
+
+/* La fila de herramientas del anaquel: la vista, el orden y la
+   agrupación. Chips, no desplegables: un toque en vez de dos y un menú
+   del sistema. Se pinta desde las listas de arriba, nunca a mano. */
+function vozPintarHerramientas() {
+  const caja = document.getElementById('voz-herr');
+  if (!caja) return;
+  caja.textContent = '';
+
+  const vistas = vozNodo('div', 'voz-vistas');
+  vistas.setAttribute('role', 'group');
+  vistas.setAttribute('aria-label', 'Vista del anaquel');
+  VOZ_VISTAS.forEach(v => {
+    const b = vozBoton('voz-vista' + (_vozAnaquel.vista === v.id ? ' voz-vista-on' : ''), v.ic, () => {
+      _vozAnaquel.vista = v.id; vozGuardaAnaquel(); vozRender();
+    }, 'Ver en ' + v.t.toLowerCase());
+    b.setAttribute('aria-pressed', _vozAnaquel.vista === v.id ? 'true' : 'false');
+    vistas.appendChild(b);
+  });
+  caja.appendChild(vistas);
+
+  const fila = (rotulo, ops, activo, alTocar) => {
+    const f = vozNodo('div', 'voz-chips voz-chips-herr');
+    f.appendChild(vozNodo('span', 'voz-herr-rot', rotulo));
+    ops.forEach(o => {
+      const b = vozBoton('voz-chip voz-chip-chica' + (o.id === activo ? ' voz-chip-on' : ''), o.t, () => {
+        alTocar(o.id);
+        b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+      });
+      f.appendChild(b);
+    });
+    caja.appendChild(f);
+  };
+  fila('Orden', VOZ_ORDENES, _vozAnaquel.orden, id => {
+    _vozAnaquel.orden = id;
+    if (id === 'manual' && !_vozAnaquel.manual.length) {
+      _vozAnaquel.manual = vozOrdena(_vozCuentos.slice()).map(c => c.cid);
+    }
+    vozGuardaAnaquel(); vozRender();
+  });
+  fila('Agrupar', VOZ_GRUPOS, _vozAnaquel.grupo, id => { _vozAnaquel.grupo = id; vozGuardaAnaquel(); vozRender(); });
 }
 
 function vozVacio() {
@@ -1302,7 +1485,7 @@ function vozSigueLeyendo(c) {
   barra.appendChild(dentro);
   card.appendChild(barra);
   const caps = (c.capitulos || []).length;
-  const quedan = Math.max(0, (c.palabras || vozPalabras(c.capitulos)) - vozLeido(c, pos));
+  const quedan = Math.max(0, (vozPalabras(c.capitulos) || c.palabras || 0) - vozLeido(c, pos));
   const datos = ['Vas por el ' + av + ' %'];
   if (caps > 1) datos.push('cap. ' + ((pos.cap || 0) + 1) + ' de ' + caps);
   datos.push('quedan ≈ ' + vozMinutos(quedan) + ' min');
@@ -1310,6 +1493,39 @@ function vozSigueLeyendo(c) {
   card.appendChild(vozNodo('div', 'voz-sigue-meta', datos.join(' · ')));
   card.appendChild(vozBoton('voz-btn voz-btn-pri voz-sigue-btn', '📖 Continuar', () => vozAbrirLector(c.cid)));
   return card;
+}
+
+/* Un texto en la vista que toque. Todos llevan `data-voz-cid`, que es
+   la llave con la que el arrastre los reconoce en el documento, y el
+   asa ⠿ solo en el orden manual. */
+function vozItem(c, manual) {
+  const el = _vozAnaquel.vista === 'cuadricula' ? vozPortadaMini(c)
+           : _vozAnaquel.vista === 'lista' ? vozFila(c)
+           : vozFicha(c);
+  el.setAttribute('data-voz-cid', c.cid);
+  if (manual) {
+    const asa = vozBoton('voz-asa', '⠿', null, 'Mover «' + (c.titulo || 'este texto') + '»: arrastra, o usa las flechas del teclado');
+    asa.setAttribute('data-voz-asa', '1');
+    el.appendChild(asa);
+    el.classList.add('voz-con-asa');
+  }
+  return el;
+}
+
+/* La etiqueta, tal como va en las tres vistas: la voz imitada y la
+   máquina, siempre las dos. */
+function vozEtiquetaNodo(c) {
+  const et = vozNodo('div', 'voz-etiqueta');
+  et.appendChild(vozNodo('span', 'voz-et-voz', '🎭 al modo de ' + (c.voz || '—')));
+  et.appendChild(vozNodo('span', 'voz-et-maq', '🤖 ' + (c.maquina || '—')));
+  return et;
+}
+
+function vozBotonLeer(c, clase) {
+  const av = vozAvance(c);
+  return vozBoton(clase || 'voz-btn voz-btn-pri',
+    av > 0 && av < 100 ? '📖 Seguir leyendo' : (av >= 100 ? '📖 Releer' : '📖 Leer'),
+    () => vozAbrirLector(c.cid));
 }
 
 function vozFicha(c) {
@@ -1324,16 +1540,12 @@ function vozFicha(c) {
   card.appendChild(lomo);
 
   const cuerpo = vozNodo('div', 'voz-ficha-cuerpo');
-  const tit = vozNodo('h3', 'voz-ficha-tit', c.titulo || 'Sin título');
-  cuerpo.appendChild(tit);
+  cuerpo.appendChild(vozNodo('h3', 'voz-ficha-tit', c.titulo || 'Sin título'));
 
   /* ⚠️ LA ETIQUETA. Va aquí, en la portada del anaquel, antes que
      ninguna otra cosa del texto, y con las dos mitades: la voz que se
      imita y la máquina que escribió. Ver la cabecera del archivo. */
-  const et = vozNodo('div', 'voz-etiqueta');
-  et.appendChild(vozNodo('span', 'voz-et-voz', '🎭 al modo de ' + (c.voz || '—')));
-  et.appendChild(vozNodo('span', 'voz-et-maq', '🤖 ' + (c.maquina || '—')));
-  cuerpo.appendChild(et);
+  cuerpo.appendChild(vozEtiquetaNodo(c));
 
   const caps = (c.capitulos || []).length;
   const meta = vozNodo('div', 'voz-ficha-meta');
@@ -1357,9 +1569,7 @@ function vozFicha(c) {
   }
 
   const pie = vozNodo('div', 'voz-ficha-pie');
-  pie.appendChild(vozBoton('voz-btn voz-btn-pri',
-    av > 0 && av < 100 ? '📖 Seguir leyendo' : (av >= 100 ? '📖 Releer' : '📖 Leer'),
-    () => vozAbrirLector(c.cid)));
+  pie.appendChild(vozBotonLeer(c));
   pie.appendChild(vozBoton('voz-btn', '📋', () => vozCopiar(c), 'Copiar el texto con su etiqueta'));
   if (navigator.share) {
     pie.appendChild(vozBoton('voz-btn', '📤', () => vozCompartir(c), 'Compartir el texto con su etiqueta'));
@@ -1368,16 +1578,198 @@ function vozFicha(c) {
   /* ⚠️ Corregir y retirar SOLO se ofrecen en lo propio. Lo impide de
      verdad la seguridad por fila, no esta línea; pero enseñar un botón
      que la base va a rechazar es prometer algo que no se puede hacer, y
-     el que lo toca se queda pensando que la aplicación falló. */
-  const mio = !c.puesto_por || !_vozYo || c.puesto_por === _vozYo;
-  const edit = vozBoton('voz-btn', '✏️', mio ? () => vozAbrirPegar(c) : null,
+     el que lo toca se queda pensando que la aplicación falló. Y el que
+     no se ofrece lo DICE al tocarlo, en vez de quedarse mudo. */
+  const mio = vozEsMio(c);
+  const edit = vozBoton('voz-btn', '✏️', mio ? () => vozAbrirPegar(c) : () => vozAvisoAjeno(c),
     mio ? 'Corregir la ficha' : 'Lo puso otra persona de la casa');
-  edit.disabled = !mio;
+  edit.classList.toggle('voz-btn-apagado', !mio);
   pie.appendChild(edit);
+  if (mio) pie.appendChild(vozBotonRetirar(c, 'voz-btn'));
+  else pie.appendChild(vozBoton('voz-btn voz-btn-apagado', '🗑', () => vozAvisoAjeno(c), 'Lo puso otra persona de la casa'));
 
   cuerpo.appendChild(pie);
   card.appendChild(cuerpo);
   return card;
+}
+
+function vozAvisoAjeno(c) {
+  vozAviso('✋ «' + (c.titulo || 'Este texto') + '» lo puso otra persona de la casa: solo ella puede corregirlo o retirarlo');
+}
+
+/* La vista de lista: una fila por texto, con lo justo para reconocerlo
+   y un ⋯ con todo lo demás. Tocar la fila abre la sala. */
+function vozFila(c) {
+  const g = vozGenero(c.genero);
+  const fila = vozNodo('div', 'voz-fila');
+  fila.style.setProperty('--voz-h', String(vozColor(c.voz)));
+  const abrir = vozBoton('voz-fila-abrir', null, () => vozAbrirLector(c.cid));
+  const lomo = vozNodo('span', 'voz-fila-lomo', (c.titulo || '?').trim().charAt(0).toUpperCase());
+  abrir.appendChild(lomo);
+  const txt = vozNodo('span', 'voz-fila-txt');
+  txt.appendChild(vozNodo('span', 'voz-fila-tit', c.titulo || 'Sin título'));
+  const av = vozAvance(c);
+  txt.appendChild(vozNodo('span', 'voz-fila-meta',
+    g.ic + ' ' + g.t + ' · 🎭 ' + (c.voz || '—') + ' · 🤖 ' + (c.maquina || '—') + ' · ≈ ' + vozMinutos(c.palabras) + ' min' +
+    (av >= 100 ? ' · ✓ leído' : (av > 0 ? ' · ' + av + ' %' : ''))));
+  abrir.appendChild(txt);
+  if (av > 0) {
+    const barra = vozNodo('span', 'voz-avance voz-fila-avance');
+    const dentro = vozNodo('span', 'voz-avance-in');
+    dentro.style.width = av + '%';
+    barra.appendChild(dentro);
+    txt.appendChild(barra);
+  }
+  fila.appendChild(abrir);
+  fila.appendChild(vozBoton('voz-btn voz-fila-mas', '⋯', () => vozMenuAbrir(c), 'Más opciones de «' + (c.titulo || 'este texto') + '»'));
+  return fila;
+}
+
+/* La cuadrícula: portadas, como una estantería vista de frente. El
+   color es el de la voz, así que los textos «al modo de» la misma
+   persona se ven juntos aunque no estén agrupados. */
+function vozPortadaMini(c) {
+  const g = vozGenero(c.genero);
+  const caja = vozNodo('div', 'voz-portada-mini');
+  caja.style.setProperty('--voz-h', String(vozColor(c.voz)));
+  const abrir = vozBoton('voz-portada-mini-abrir', null, () => vozAbrirLector(c.cid));
+  abrir.setAttribute('aria-label', 'Leer «' + (c.titulo || 'Sin título') + '», al modo de ' + (c.voz || '—'));
+  const tapa = vozNodo('span', 'voz-tapa');
+  tapa.appendChild(vozNodo('span', 'voz-tapa-gen', g.ic + ' ' + g.t));
+  tapa.appendChild(vozNodo('span', 'voz-tapa-tit', c.titulo || 'Sin título'));
+  tapa.appendChild(vozNodo('span', 'voz-tapa-voz', 'al modo de ' + (c.voz || '—')));
+  tapa.appendChild(vozNodo('span', 'voz-tapa-maq', '🤖 ' + (c.maquina || '—')));
+  const av = vozAvance(c);
+  const barra = vozNodo('span', 'voz-tapa-avance');
+  const dentro = vozNodo('span', 'voz-tapa-avance-in');
+  dentro.style.width = av + '%';
+  barra.appendChild(dentro);
+  tapa.appendChild(barra);
+  abrir.appendChild(tapa);
+  caja.appendChild(abrir);
+  caja.appendChild(vozBoton('voz-portada-mini-mas', '⋯', () => vozMenuAbrir(c), 'Más opciones de «' + (c.titulo || 'este texto') + '»'));
+  return caja;
+}
+
+/* El menú de un texto (⋯), para la lista y la cuadrícula, donde no
+   caben los botones. Es una hoja como la de pegar, con las mismas
+   opciones que la ficha de detalle, y retirar con su confirmación. */
+let _vozMenuDe = null;
+
+function vozMenuAbrir(c) {
+  const ov = document.getElementById('voz-menu-overlay');
+  const cuerpo = document.getElementById('voz-menu-cuerpo');
+  const tit = document.getElementById('voz-menu-tit');
+  if (!ov || !cuerpo) return;
+  _vozMenuDe = c.cid;
+  if (tit) tit.textContent = c.titulo || 'Sin título';
+  cuerpo.textContent = '';
+  cuerpo.appendChild(vozEtiquetaNodo(c));
+  const g = vozGenero(c.genero);
+  const av = vozAvance(c);
+  cuerpo.appendChild(vozNodo('p', 'voz-menu-meta',
+    g.ic + ' ' + g.t + ' · ' + (c.palabras || 0).toLocaleString('es-HN') + ' palabras · ≈ ' + vozMinutos(c.palabras) + ' min' +
+    (av >= 100 ? ' · ✓ leído' : (av > 0 ? ' · vas por el ' + av + ' %' : ''))));
+  if (c.encargo) cuerpo.appendChild(vozNodo('p', 'voz-menu-enc', '« ' + c.encargo + ' »'));
+
+  const lista = vozNodo('div', 'voz-menu-lista');
+  const leer = vozBotonLeer(c, 'voz-btn voz-btn-pri voz-btn-ancho');
+  leer.addEventListener('click', vozCerrarMenu);
+  lista.appendChild(leer);
+  lista.appendChild(vozBoton('voz-btn voz-btn-ancho', '📋 Copiar con su etiqueta', () => { vozCerrarMenu(); vozCopiar(c); }));
+  if (navigator.share) lista.appendChild(vozBoton('voz-btn voz-btn-ancho', '📤 Compartir con su etiqueta', () => { vozCerrarMenu(); vozCompartir(c); }));
+  if (vozEsMio(c)) {
+    lista.appendChild(vozBoton('voz-btn voz-btn-ancho', '✏️ Corregir la ficha o el texto', () => { vozCerrarMenu(); vozAbrirPegar(c); }));
+    lista.appendChild(vozBotonRetirar(c, 'voz-btn voz-btn-ancho', '🗑 Retirar del anaquel'));
+  } else {
+    lista.appendChild(vozNodo('p', 'voz-menu-nota',
+      '✋ Lo puso otra persona de la casa: solo ella puede corregirlo o retirarlo. Tú puedes leerlo, copiarlo y compartirlo.'));
+  }
+  cuerpo.appendChild(lista);
+  ov.style.display = 'flex';
+}
+
+function vozCerrarMenu() {
+  const ov = document.getElementById('voz-menu-overlay');
+  if (ov) ov.style.display = 'none';
+  _vozMenuDe = null;
+}
+
+/* ══════════════ MOVER LOS TEXTOS CON EL DEDO ══════════════
+   Con PUNTEROS y no con el `draggable` del navegador: ese es de ratón y
+   en el navegador de casi ninguna tableta existe. Es el mismo aparato
+   que mueve las tarjetas de la repisa de enlaces y los videos de
+   M.E.T.A.S, con las mismas cuatro reglas: el asa es un botón y las
+   flechas del teclado la mueven; `touch-action: none` en el asa; al
+   soltar NO se repinta (la lista ya está en el orden bueno: solo se
+   guarda); y la nota que lo explica va FUERA del contenedor que
+   arrastra. Aquí hay una quinta, por la cuadrícula: la mitad que hay
+   que cruzar es la de la IZQUIERDA cuando el dedo va por la misma fila
+   de portadas, y la de ARRIBA cuando cambia de fila. */
+function vozMontarArrastre(caja) {
+  if (caja.dataset.vozArrastre) return;
+  caja.dataset.vozArrastre = '1';
+  let nodo = null, idPuntero = null;
+  const items = () => [...caja.querySelectorAll(':scope > [data-voz-cid]')];
+
+  const guardar = () => {
+    /* El orden entero, leyendo TODOS los contenedores del anaquel en el
+       orden en que están (con agrupación hay varios): lo que se arrastró
+       dentro de un grupo queda en su sitio y lo demás se conserva. */
+    const todos = [...document.querySelectorAll('#voz-lista [data-voz-cid]')].map(n => n.getAttribute('data-voz-cid'));
+    const resto = _vozAnaquel.manual.filter(cid => todos.indexOf(cid) < 0);
+    _vozAnaquel.manual = todos.concat(resto);
+    vozGuardaAnaquel();
+  };
+
+  const soltar = () => {
+    if (!nodo) return;
+    nodo.classList.remove('voz-arrastrando');
+    caja.classList.remove('voz-moviendo');
+    nodo = null; idPuntero = null;
+    guardar();
+  };
+
+  caja.addEventListener('pointerdown', ev => {
+    const asa = ev.target.closest('[data-voz-asa]');
+    if (!asa) return;
+    const item = asa.closest('[data-voz-cid]');
+    if (!item || item.parentNode !== caja) return;
+    ev.preventDefault();
+    nodo = item; idPuntero = ev.pointerId;
+    nodo.classList.add('voz-arrastrando');
+    caja.classList.add('voz-moviendo');
+    try { asa.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  caja.addEventListener('pointermove', ev => {
+    if (!nodo || ev.pointerId !== idPuntero) return;
+    ev.preventDefault();
+    const bajo = document.elementFromPoint(ev.clientX, ev.clientY);
+    const destino = bajo && bajo.closest ? bajo.closest('[data-voz-cid]') : null;
+    if (!destino || destino === nodo || destino.parentNode !== caja) return;
+    const r = destino.getBoundingClientRect();
+    const mismaFila = ev.clientY >= r.top && ev.clientY <= r.bottom && _vozAnaquel.vista === 'cuadricula';
+    const antes = mismaFila ? (ev.clientX < r.left + r.width / 2) : (ev.clientY < r.top + r.height / 2);
+    caja.insertBefore(nodo, antes ? destino : destino.nextSibling);
+  });
+  caja.addEventListener('pointerup', soltar);
+  caja.addEventListener('pointercancel', soltar);
+
+  caja.addEventListener('keydown', ev => {
+    const asa = ev.target.closest ? ev.target.closest('[data-voz-asa]') : null;
+    if (!asa) return;
+    const dir = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[ev.key];
+    if (!dir) return;
+    ev.preventDefault();
+    const item = asa.closest('[data-voz-cid]');
+    const hermanos = items();
+    const i = hermanos.indexOf(item);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= hermanos.length) return;
+    caja.insertBefore(dir < 0 ? item : hermanos[j], dir < 0 ? hermanos[j] : item);
+    asa.focus();
+    guardar();
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1419,6 +1811,15 @@ function vozFicha(c) {
    cualquier navegador, sin depender de cómo cuente cada uno el relleno
    de la derecha. La sonda mide la última página (comprobación 6).
 
+   ⚠️ Y HAY UN SEGUNDO MODO, EL DESPLAZAMIENTO, pedido por el autor el 10
+   de septiembre de 2026 («leer deslizando para abajo»). Ahí el texto va
+   ENTERO y seguido —todos los capítulos, uno detrás de otro— en una
+   caja que se desplaza hacia abajo, sin columnas. Es lo que muchos
+   prefieren para un ensayo, y es también lo que hay que ofrecer cuando
+   el gesto de pasar página no sale. La posición se guarda igual que en
+   páginas: por bloque y fracción, nunca por píxeles de desplazamiento,
+   que cambian con la letra igual que cambian las páginas.
+
    ⚠️ Y LA POSICIÓN SE GUARDA POR PÁRRAFO, NUNCA POR NÚMERO DE PÁGINA.
    Esta es la regla que no se negocia y la que parece de más. El número
    de páginas depende del tamaño de letra, del ancho de la pantalla y
@@ -1457,6 +1858,7 @@ const VOZ_DOS_DESDE = 860;     // en «auto», dos páginas a partir de este anc
 let _vozAncla = 0;
 let _vozSub = 0;
 let _vozRepagTimer = null;
+let _vozScrollTimer = null;
 let _vozArrastre = null;
 let _vozTragarClic = false;
 let _vozM = 24;       // el margen de la izquierda de la hoja, puesto por vozPaginar
@@ -1466,6 +1868,11 @@ let _vozLuz = null;   // el permiso de «no apagar la pantalla»
 let _vozRuedaHasta = 0;
 let _vozPanelTab = 'ind';
 let _vozBuscaTxt = '';
+let _vozVuelta = null;   // la hoja que se está pasando (modo «hojear»)
+
+function vozModo() {
+  return _vozAj.modo === 'scroll' ? 'scroll' : 'paginas';
+}
 
 /* Pinta un texto con sus cursivas y negritas SIN innerHTML: se trocea y
    se van colgando nodos de texto y <em>/<strong> creados a mano. Es la
@@ -1498,6 +1905,7 @@ function vozAbrirLector(cid) {
     : (_vozCapActual === 0 ? -1 : 0);   // −1 es la portada; ver vozPintarCap
   _vozSub = (pos && typeof pos.sub === 'number') ? pos.sub : 0;
   _vozBuscaTxt = '';
+  vozSubCerrarBarra();
 
   sala.hidden = false;
   document.body.classList.add('voz-sala');
@@ -1507,6 +1915,7 @@ function vozAbrirLector(cid) {
   vozPintarCap(_vozAncla, _vozSub);   // −1 al abrir un texto nuevo: la portada
   vozEngancharSala();
   vozLuz(true);
+  vozSubSincronizar(cid);
 }
 
 function vozCerrarLector() {
@@ -1514,6 +1923,7 @@ function vozCerrarLector() {
   if (sala) sala.hidden = true;
   document.body.classList.remove('voz-sala');
   vozCerrarPaneles();
+  vozSubCerrarBarra();
   vozLuz(false);
   vozPantallaCompleta(false);
   _vozLeyendo = null;
@@ -1557,6 +1967,7 @@ function vozAplicaAjustes() {
   sala.style.setProperty('--voz-fam', fam);
   sala.style.setProperty('--voz-just', _vozAj.just ? 'justify' : 'left');
   sala.classList.toggle('voz-capital', !!_vozAj.capital);
+  sala.classList.toggle('voz-modo-scroll', vozModo() === 'scroll');
 }
 
 /* Cómo se llama un capítulo en el índice y en el pie cuando no trae
@@ -1570,9 +1981,10 @@ function vozNombreCap(c, i) {
 }
 
 /* Un bloque del texto convertido en su nodo. Todo con createElement y
-   textContent; el único atributo que se escribe es `data-vp`, y es un
-   número que ponemos nosotros. */
-function vozNodoBloque(p, i, anterior) {
+   textContent; los únicos atributos que se escriben son `data-vp` y
+   `data-cap`, y son números que ponemos nosotros. Al final se le pintan
+   encima los subrayados que tenga (ver vozAplicarSubrayados). */
+function vozNodoBloque(p, i, anterior, cap) {
   let el;
   if (p.k === 'sep') {
     el = vozNodo('div', 'voz-sep', '✦');
@@ -1604,51 +2016,49 @@ function vozNodoBloque(p, i, anterior) {
     vozPintaTexto(el, p.t);
   }
   el.dataset.vp = String(i);
+  el.dataset.cap = String(cap || 0);
+  if (_vozLeyendo && p.k !== 'sep' && p.k !== 'fin') vozAplicarSubrayados(el, _vozLeyendo.cid, cap || 0, i);
   return el;
 }
 
-function vozPintarCap(ancla, sub) {
-  const c = _vozLeyendo;
-  const hoja = document.getElementById('voz-hoja');
-  const texto = document.getElementById('voz-texto');
-  if (!c || !hoja || !texto) return;
-  const cap = (c.capitulos || [])[_vozCapActual] || { t: '', p: [] };
+/* ⚠️ LA PORTADA ES LA PRIMERA PÁGINA DE TODO TEXTO, Y LLEVA LA
+   ETIQUETA. No es una pantalla de bienvenida que se pueda quitar para
+   ganar una página: es el sitio donde dice, en grande y antes que el
+   texto, que esto lo escribió una máquina imitando a alguien. Ver la
+   cabecera del archivo. */
+function vozPortadaNodo(c) {
   const g = vozGenero(c.genero);
+  const port = vozNodo('div', 'voz-portada');
+  /* ⚠️ LA PORTADA ES UNA POSICIÓN DE LECTURA MÁS, LA −1, y sin esto no
+     la ve nadie: al abrir un texto nuevo la lectura se coloca en el
+     párrafo 0, que está en la página SIGUIENTE, así que la portada
+     —que es donde dice en grande que esto lo escribió una máquina
+     imitando a alguien— se saltaba entera y en silencio. */
+  port.dataset.vp = '-1';
+  port.dataset.cap = '0';
+  port.appendChild(vozNodo('div', 'voz-portada-gen', g.t.toUpperCase()));
+  port.appendChild(vozNodo('div', 'voz-portada-tit', c.titulo || 'Sin título'));
+  port.appendChild(vozNodo('div', 'voz-portada-voz', 'al modo de ' + (c.voz || '—')));
+  port.appendChild(vozNodo('div', 'voz-portada-linea'));
+  port.appendChild(vozNodo('div', 'voz-portada-maq',
+    g.t + ' escrito por ' + (c.maquina || 'una máquina') + '.'));
+  port.appendChild(vozNodo('div', 'voz-portada-aviso',
+    'No es un texto de ' + (c.voz || 'esa persona') + ': es una imitación de su voz.'));
+  if (c.encargo) port.appendChild(vozNodo('div', 'voz-portada-enc', '« ' + c.encargo + ' »'));
+  const datos = [];
+  const pal = c.palabras || vozPalabras(c.capitulos);
+  if ((c.capitulos || []).length > 1) datos.push(c.capitulos.length + ' capítulos');
+  datos.push(pal.toLocaleString('es-HN') + ' palabras');
+  datos.push('≈ ' + vozMinutos(pal) + ' min de lectura');
+  port.appendChild(vozNodo('div', 'voz-portada-datos', datos.join(' · ')));
+  if (c.creado_at) port.appendChild(vozNodo('div', 'voz-portada-fec', vozFecha(c.creado_at)));
+  return port;
+}
 
-  texto.textContent = '';
-
-  /* ⚠️ LA PORTADA ES LA PRIMERA PÁGINA DE TODO TEXTO, Y LLEVA LA
-     ETIQUETA. No es una pantalla de bienvenida que se pueda quitar para
-     ganar una página: es el sitio donde dice, en grande y antes que el
-     texto, que esto lo escribió una máquina imitando a alguien. Ver la
-     cabecera del archivo. */
-  if (_vozCapActual === 0) {
-    const port = vozNodo('div', 'voz-portada');
-    /* ⚠️ LA PORTADA ES UNA POSICIÓN DE LECTURA MÁS, LA −1, y sin esto no
-       la ve nadie: al abrir un texto nuevo la lectura se coloca en el
-       párrafo 0, que está en la página SIGUIENTE, así que la portada
-       —que es donde dice en grande que esto lo escribió una máquina
-       imitando a alguien— se saltaba entera y en silencio. */
-    port.dataset.vp = '-1';
-    port.appendChild(vozNodo('div', 'voz-portada-gen', g.t.toUpperCase()));
-    port.appendChild(vozNodo('div', 'voz-portada-tit', c.titulo || 'Sin título'));
-    port.appendChild(vozNodo('div', 'voz-portada-voz', 'al modo de ' + (c.voz || '—')));
-    port.appendChild(vozNodo('div', 'voz-portada-linea'));
-    port.appendChild(vozNodo('div', 'voz-portada-maq',
-      g.t + ' escrito por ' + (c.maquina || 'una máquina') + '.'));
-    port.appendChild(vozNodo('div', 'voz-portada-aviso',
-      'No es un texto de ' + (c.voz || 'esa persona') + ': es una imitación de su voz.'));
-    if (c.encargo) port.appendChild(vozNodo('div', 'voz-portada-enc', '« ' + c.encargo + ' »'));
-    const datos = [];
-    const pal = c.palabras || vozPalabras(c.capitulos);
-    if ((c.capitulos || []).length > 1) datos.push(c.capitulos.length + ' capítulos');
-    datos.push(pal.toLocaleString('es-HN') + ' palabras');
-    datos.push('≈ ' + vozMinutos(pal) + ' min de lectura');
-    port.appendChild(vozNodo('div', 'voz-portada-datos', datos.join(' · ')));
-    if (c.creado_at) port.appendChild(vozNodo('div', 'voz-portada-fec', vozFecha(c.creado_at)));
-    texto.appendChild(port);
-  }
-
+/* El cuerpo de un capítulo: su epígrafe, su título y sus bloques. Lo
+   usan los dos modos: en páginas, un capítulo cada vez; en
+   desplazamiento, todos seguidos. */
+function vozPintarCuerpoCap(texto, c, cap, ci) {
   /* El epígrafe, en su propia página entre la portada y el capítulo,
      como en un libro. No lleva `data-vp`: no es un sitio donde se
      guarde la lectura, es una antesala. */
@@ -1661,49 +2071,89 @@ function vozPintarCap(ancla, sub) {
     });
     texto.appendChild(epi);
   }
-
   if (cap.t) {
     const h = vozNodo('h2', 'voz-cap-tit');
+    h.dataset.capTit = String(ci);
     /* El número del capítulo encima del título, salvo que el título ya
        lo traiga («I. El pozo», «Capítulo 3»): dos números uno encima
        del otro se leen como una errata. */
     const yaNumerado = /^\s*([IVXLCDM]+|\d+)\b/i.test(cap.t) || VOZ_PAL_CAP.test(cap.t);
-    if ((c.capitulos || []).length > 1 && !yaNumerado) h.appendChild(vozNodo('span', 'voz-cap-num', String(_vozCapActual + 1)));
+    if ((c.capitulos || []).length > 1 && !yaNumerado) h.appendChild(vozNodo('span', 'voz-cap-num', String(ci + 1)));
     const t = vozNodo('span', 'voz-cap-txt');
     vozPintaTexto(t, cap.t);
     h.appendChild(t);
     texto.appendChild(h);
+  } else if (ci > 0) {
+    const h = vozNodo('h2', 'voz-cap-tit voz-cap-tit-mudo');
+    h.dataset.capTit = String(ci);
+    h.appendChild(vozNodo('span', 'voz-cap-num', String(ci + 1)));
+    texto.appendChild(h);
   }
-
   let anterior = null;
   (cap.p || []).forEach((p, i) => {
-    texto.appendChild(vozNodoBloque(p, i, anterior));
+    texto.appendChild(vozNodoBloque(p, i, anterior, ci));
     anterior = p;
   });
+}
 
-  /* El pie del capítulo dice qué viene después. Sin esto, el final de
-     un capítulo y el final del texto se ven exactamente igual: una
-     página que no pasa. */
+/* El pie del capítulo dice qué viene después. Sin esto, el final de
+   un capítulo y el final del texto se ven exactamente igual: una
+   página que no pasa. */
+function vozFinNodo(c, ci) {
+  const g = vozGenero(c.genero);
+  const cap = (c.capitulos || [])[ci] || { p: [] };
   const fin = vozNodo('div', 'voz-fin-cap');
-  const hayMas = _vozCapActual < (c.capitulos.length - 1);
+  const hayMas = ci < (c.capitulos.length - 1);
   const yaDiceFin = (cap.p || []).some(b => b.k === 'fin');
   fin.appendChild(vozNodo('div', 'voz-fin-marca', hayMas ? '❧' : '✦ ✦ ✦'));
   if (hayMas) {
-    fin.appendChild(vozNodo('div', 'voz-fin-txt', 'Sigue: ' + vozNombreCap(c, _vozCapActual + 1)));
+    fin.appendChild(vozNodo('div', 'voz-fin-txt', 'Sigue: ' + vozNombreCap(c, ci + 1)));
   } else {
     if (!yaDiceFin) fin.appendChild(vozNodo('div', 'voz-fin-txt', 'Fin de «' + (c.titulo || 'el texto') + '».'));
     fin.appendChild(vozNodo('div', 'voz-fin-et',
       g.t + ' escrito por ' + (c.maquina || 'una máquina') + ', al modo de ' + (c.voz || '—') + '.'));
   }
-  texto.appendChild(fin);
+  return fin;
+}
 
+function vozPintarCap(ancla, sub) {
+  const c = _vozLeyendo;
+  const texto = document.getElementById('voz-texto');
+  if (!c || !texto) return;
+  if (vozModo() === 'scroll') { vozPintarTodo(ancla, sub); return; }
+  const cap = (c.capitulos || [])[_vozCapActual] || { t: '', p: [] };
+  texto.textContent = '';
+  if (_vozCapActual === 0) texto.appendChild(vozPortadaNodo(c));
+  vozPintarCuerpoCap(texto, c, cap, _vozCapActual);
+  texto.appendChild(vozFinNodo(c, _vozCapActual));
   vozPaginar(ancla, sub);
 }
 
-/* Cuenta las páginas y coloca la vista. Se llama al pintar, al cambiar
-   un ajuste y cada vez que la caja cambia de tamaño. Ver la nota grande
-   de arriba sobre la última página. */
+/* El modo desplazamiento pinta el texto ENTERO: portada, epígrafes,
+   capítulos y el pie del final, seguidos. Cada bloque lleva su capítulo
+   en `data-cap`, que es lo que permite guardar la posición igual que en
+   páginas y llegar a un marcador o a un hallazgo del buscador. */
+function vozPintarTodo(ancla, sub) {
+  const c = _vozLeyendo;
+  const texto = document.getElementById('voz-texto');
+  if (!c || !texto) return;
+  texto.textContent = '';
+  texto.appendChild(vozPortadaNodo(c));
+  const caps = c.capitulos || [];
+  caps.forEach((cap, ci) => vozPintarCuerpoCap(texto, c, cap, ci));
+  texto.appendChild(vozFinNodo(c, caps.length - 1));
+  vozPaginar(ancla, sub);
+}
+
+/* Coloca la vista según el modo. Se llama al pintar, al cambiar un
+   ajuste y cada vez que la caja cambia de tamaño. Ver la nota grande de
+   arriba sobre la última página. */
 function vozPaginar(ancla, sub) {
+  if (vozModo() === 'scroll') vozColocarScroll(ancla, sub);
+  else vozPaginarPaginas(ancla, sub);
+}
+
+function vozPaginarPaginas(ancla, sub) {
   const hoja = document.getElementById('voz-hoja');
   const texto = document.getElementById('voz-texto');
   const cola = document.getElementById('voz-cola');
@@ -1757,6 +2207,29 @@ function vozPaginar(ancla, sub) {
   vozIrAncla(ancla == null ? _vozAncla : ancla, sub == null ? _vozSub : sub);
 }
 
+/* El modo desplazamiento: sin columnas, sin alto fijo, y la caja se
+   desplaza hacia abajo. Los estilos que puso la paginación se quitan
+   aquí, uno por uno, para que un cambio de modo a mitad de lectura no
+   deje una columna de dos metros. */
+function vozColocarScroll(ancla, sub) {
+  const hoja = document.getElementById('voz-hoja');
+  const texto = document.getElementById('voz-texto');
+  const cola = document.getElementById('voz-cola');
+  if (!hoja || !texto) return;
+  const B = hoja.clientWidth;
+  if (B < 40) return;
+  const M = Math.max(_vozAj.margen, Math.floor((B - VOZ_ANCHO_LIBRO) / 2));
+  _vozM = M; _vozCols = 1; _vozPaso = 0; _vozPaginas = 1; _vozPagina = 0;
+  hoja.style.padding = VOZ_ALTO_MARGEN + 'px ' + M + 'px ' + (VOZ_ALTO_MARGEN * 4) + 'px ' + M + 'px';
+  if (cola) cola.style.flexBasis = '0px';
+  texto.style.height = '';
+  texto.style.width = '';
+  texto.style.columnCount = '';
+  texto.style.columnWidth = '';
+  texto.style.columnGap = '';
+  vozIrAnclaScroll(_vozCapActual, ancla == null ? _vozAncla : ancla, sub == null ? _vozSub : sub, false);
+}
+
 function vozPaso() {
   return _vozPaso || ((document.getElementById('voz-texto') || {}).clientWidth || 0) + VOZ_HUECO;
 }
@@ -1789,6 +2262,7 @@ function vozRango(el) {
 function vozIrPagina(n, seco) {
   const hoja = document.getElementById('voz-hoja');
   if (!hoja) return;
+  if (vozModo() === 'scroll') return;
   _vozPagina = Math.min(Math.max(0, n), _vozPaginas - 1);
   /* ⚠️ SE MUEVE `scrollLeft` A PELO, Y LO SUAVE LO PONE EL CSS
      (`scroll-behavior`, en la hoja). `scrollTo({behavior:'smooth'})` no
@@ -1841,8 +2315,48 @@ function vozIrAncla(i, sub) {
   vozIrPagina(r.ini + Math.floor((sub || 0) * span + 1e-6), true);
 }
 
+/* Lo mismo, en desplazamiento: el bloque que toca el borde de arriba y
+   qué parte de él queda por encima. */
+function vozAnclaScroll() {
+  const hoja = document.getElementById('voz-hoja');
+  const texto = document.getElementById('voz-texto');
+  if (!hoja || !texto) return { cap: _vozCapActual, ancla: _vozAncla, sub: _vozSub };
+  const top = hoja.scrollTop + 4;
+  const ps = texto.querySelectorAll('[data-vp]');
+  let mejor = null;
+  for (let i = 0; i < ps.length; i++) {
+    if (ps[i].offsetTop <= top) mejor = ps[i]; else break;
+  }
+  if (!mejor) mejor = ps[0];
+  if (!mejor) return { cap: 0, ancla: 0, sub: 0 };
+  const h = mejor.offsetHeight || 1;
+  const sub = Math.max(0, Math.min(1, (hoja.scrollTop - mejor.offsetTop) / h));
+  return { cap: Number(mejor.dataset.cap) || 0, ancla: Number(mejor.dataset.vp) || 0, sub: Math.round(sub * 1000) / 1000 };
+}
+
+function vozIrAnclaScroll(cap, vp, sub, suave) {
+  const hoja = document.getElementById('voz-hoja');
+  const texto = document.getElementById('voz-texto');
+  if (!hoja || !texto) return;
+  const el = texto.querySelector('[data-cap="' + Number(cap) + '"][data-vp="' + Number(vp) + '"]');
+  hoja.style.scrollBehavior = suave ? '' : 'auto';
+  hoja.scrollTop = el ? Math.max(0, Math.round(el.offsetTop - 6 + (sub || 0) * el.offsetHeight)) : 0;
+  _vozCapActual = Math.min(Math.max(0, cap), ((_vozLeyendo && _vozLeyendo.capitulos) || []).length - 1);
+  vozApuntarPos();
+  vozPintarPie();
+}
+
 function vozApuntarPos() {
   if (!_vozLeyendo) return;
+  const caps = (_vozLeyendo.capitulos || []).length;
+  if (vozModo() === 'scroll') {
+    const hoja = document.getElementById('voz-hoja');
+    const a = vozAnclaScroll();
+    _vozCapActual = a.cap; _vozAncla = a.ancla; _vozSub = a.sub;
+    const fin = !!hoja && hoja.scrollTop + hoja.clientHeight >= hoja.scrollHeight - 8;
+    vozGuardaPos(_vozLeyendo.cid, _vozCapActual, _vozAncla, _vozSub, fin);
+    return;
+  }
   const a = vozAncla();
   _vozAncla = a.ancla;
   _vozSub = a.sub;
@@ -1850,7 +2364,6 @@ function vozApuntarPos() {
      tal: un porcentaje calculado por palabras no llega nunca al cien
      con exactitud, y una barra al 98 % de un texto terminado es una
      barra que miente. */
-  const caps = (_vozLeyendo.capitulos || []).length;
   const fin = _vozCapActual >= caps - 1 && _vozPagina >= _vozPaginas - 1;
   vozGuardaPos(_vozLeyendo.cid, _vozCapActual, _vozAncla, _vozSub, fin);
 }
@@ -1858,24 +2371,60 @@ function vozApuntarPos() {
 /* Pasar página, y al llegar al borde saltar de capítulo: al final de
    uno se entra por la primera página del siguiente y al principio de
    uno se entra por la ÚLTIMA del anterior, que es por donde se
-   entraría en un libro yendo hacia atrás. */
+   entraría en un libro yendo hacia atrás. En desplazamiento, «pasar
+   página» es bajar casi una pantalla. */
 function vozPasar(d) {
   const c = _vozLeyendo;
   if (!c) return;
+  if (vozModo() === 'scroll') {
+    const hoja = document.getElementById('voz-hoja');
+    if (!hoja) return;
+    hoja.style.scrollBehavior = '';
+    hoja.scrollTop += d * Math.round(hoja.clientHeight * 0.88);
+    return;
+  }
+  if (_vozVuelta) return;   // hay una hoja pasándose: se espera a que termine
   const destino = _vozPagina + d;
-  if (destino >= 0 && destino < _vozPaginas) { vozIrPagina(destino); return; }
+  const dentro = destino >= 0 && destino < _vozPaginas;
   const capDestino = _vozCapActual + d;
-  if (capDestino < 0 || capDestino >= (c.capitulos || []).length) return;
-  vozIrCapitulo(capDestino, d < 0);
+  if (!dentro && (capDestino < 0 || capDestino >= (c.capitulos || []).length)) return;
+  const cambiar = () => { if (dentro) vozIrPagina(destino, true); else vozIrCapitulo(capDestino, d < 0); };
+  if (_vozAj.paso === 'hojear') vozVoltear(d, cambiar);
+  else if (_vozAj.paso === 'golpe' || !dentro) cambiar();
+  else vozIrPagina(destino);
 }
 
 function vozIrCapitulo(i, alFinal) {
   const c = _vozLeyendo;
   if (!c) return;
-  _vozCapActual = Math.min(Math.max(0, i), (c.capitulos || []).length - 1);
+  const ci = Math.min(Math.max(0, i), (c.capitulos || []).length - 1);
+  if (vozModo() === 'scroll') {
+    const texto = document.getElementById('voz-texto');
+    const hoja = document.getElementById('voz-hoja');
+    const h = texto && (texto.querySelector('[data-cap-tit="' + ci + '"]') ||
+                        texto.querySelector('[data-cap="' + ci + '"][data-vp]'));
+    if (hoja) {
+      hoja.style.scrollBehavior = '';
+      hoja.scrollTop = h ? Math.max(0, h.offsetTop - 6) : 0;
+    }
+    _vozCapActual = ci;
+    return;
+  }
+  _vozCapActual = ci;
   _vozPagina = 0;
   vozPintarCap(_vozCapActual === 0 ? -1 : 0, 0);
   if (alFinal) vozIrPagina(_vozPaginas - 1, true);
+}
+
+/* Ir a un sitio exacto del texto, desde el índice, un marcador, un
+   subrayado o un hallazgo del buscador, en el modo que esté. */
+function vozIrA(cap, vp, sub) {
+  const c = _vozLeyendo;
+  if (!c) return;
+  const ci = Math.min(Math.max(0, cap || 0), (c.capitulos || []).length - 1);
+  if (vozModo() === 'scroll') { vozIrAnclaScroll(ci, vp, sub || 0, true); return; }
+  if (ci !== _vozCapActual) { _vozCapActual = ci; vozPintarCap(vp, sub || 0); }
+  else vozIrAncla(vp, sub || 0);
 }
 
 /* Las muescas de la barra: dónde empieza cada capítulo, por palabras.
@@ -1886,7 +2435,7 @@ function vozPintarBarraMarcas() {
   if (!c || !caja) return;
   caja.textContent = '';
   const caps = c.capitulos || [];
-  const total = c.palabras || vozPalabras(caps) || 1;
+  const total = vozPalabras(caps) || c.palabras || 1;
   if (caps.length < 2) return;
   let acum = 0;
   caps.forEach((cap, i) => {
@@ -1904,14 +2453,18 @@ function vozPintarPie() {
   const pie = document.getElementById('voz-pag');
   if (!pie || !c) return;
   const caps = (c.capitulos || []).length;
-  const total = c.palabras || vozPalabras(c.capitulos) || 1;
+  const total = vozPalabras(c.capitulos) || c.palabras || 1;
   const leido = vozLeido(c, { cap: _vozCapActual, ancla: _vozAncla, sub: _vozSub });
-  const ultima = _vozCapActual === caps - 1 && _vozPagina === _vozPaginas - 1;
+  const hoja = document.getElementById('voz-hoja');
+  const ultima = vozModo() === 'scroll'
+    ? !!hoja && hoja.scrollTop + hoja.clientHeight >= hoja.scrollHeight - 8
+    : (_vozCapActual === caps - 1 && _vozPagina === _vozPaginas - 1);
   const quedan = ultima ? 0 : Math.max(0, total - leido);
   const pct = ultima ? 100 : Math.min(99, Math.round((leido / total) * 100));
 
   pie.textContent = '';
-  pie.appendChild(vozNodo('span', 'voz-pag-n', 'pág. ' + (_vozPagina + 1) + ' / ' + _vozPaginas));
+  if (vozModo() === 'scroll') pie.appendChild(vozNodo('span', 'voz-pag-n', pct + ' %'));
+  else pie.appendChild(vozNodo('span', 'voz-pag-n', 'pág. ' + (_vozPagina + 1) + ' / ' + _vozPaginas));
   if (caps > 1) {
     pie.appendChild(vozNodo('span', 'voz-pag-cap', 'cap. ' + (_vozCapActual + 1) + ' de ' + caps));
   }
@@ -1935,6 +2488,116 @@ function vozPintarPie() {
   vozPintarBotonMarca();
 }
 
+/* ─── Hojear: la hoja que se pliega ──────────────────────────────────
+   Pedido por el autor el 10 de septiembre de 2026: «la simulación que
+   pase la página cuando se pasa la hoja tal como un libro». Se hace
+   con UNA idea y sin ninguna biblioteca: se toma una INSTANTÁNEA de la
+   página actual (un clon del texto, recortado a la página que se ve),
+   se cambia por debajo a la página de destino, y la instantánea se
+   pliega hacia el lomo con una rotación en 3D hasta desaparecer. Para
+   atrás es el espejo: la hoja se pliega hacia la derecha y aparece la
+   anterior. Con el dedo, la hoja SIGUE al dedo mientras se arrastra, y
+   al soltar termina de pasar o vuelve a su sitio según cuánto se llevó.
+
+   ⚠️ La instantánea es un clon del DOM, no una imagen: así se ve igual
+   que la página (misma letra, mismos subrayados) y no hay que pintar
+   nada en un lienzo. Y el clon pierde el `id`: dos #voz-texto en el
+   documento romperían la paginación, el buscador y la posición. Lleva
+   la clase `.voz-texto`, que es la que trae la tipografía. */
+function vozInstantanea() {
+  const hoja = document.getElementById('voz-hoja');
+  const texto = document.getElementById('voz-texto');
+  const mid = document.getElementById('voz-mid');
+  if (!hoja || !texto || !mid) return null;
+  const W = hoja.clientWidth - 2 * _vozM;
+  const H = hoja.clientHeight - 2 * VOZ_ALTO_MARGEN;
+  if (W < 40 || H < 40) return null;
+  const leaf = vozNodo('div', 'voz-vuelta');
+  leaf.style.left = _vozM + 'px';
+  leaf.style.top = VOZ_ALTO_MARGEN + 'px';
+  leaf.style.width = W + 'px';
+  leaf.style.height = H + 'px';
+  const cara = vozNodo('div', 'voz-vuelta-cara');
+  const clon = texto.cloneNode(true);
+  clon.removeAttribute('id');
+  clon.classList.add('voz-texto-clon');
+  clon.style.marginLeft = (-_vozPagina * vozPaso()) + 'px';
+  cara.appendChild(clon);
+  leaf.appendChild(cara);
+  leaf.appendChild(vozNodo('div', 'voz-vuelta-sombra'));
+  mid.appendChild(leaf);
+  return leaf;
+}
+
+function vozVoltear(d, cambiar) {
+  const leaf = vozInstantanea();
+  if (!leaf) { cambiar(); return; }
+  cambiar();
+  leaf.classList.add(d > 0 ? 'voz-vuelta-izq' : 'voz-vuelta-der');
+  _vozVuelta = { el: leaf, dir: d, interactivo: false, f: 0 };
+  /* Dos cuadros de espera: el primero para que el navegador coloque la
+     hoja en su sitio, el segundo para que la transición arranque desde
+     ahí y no desde el final. */
+  requestAnimationFrame(() => requestAnimationFrame(() => vozVueltaTermina(leaf, d, true)));
+}
+
+function vozVueltaTermina(leaf, d, completar) {
+  leaf.classList.add('voz-vuelta-anim');
+  const sombra = leaf.querySelector('.voz-vuelta-sombra');
+  if (completar) {
+    leaf.style.transform = 'perspective(1400px) rotateY(' + (d > 0 ? -90 : 90) + 'deg)';
+    if (sombra) sombra.style.opacity = '1';
+  } else {
+    leaf.style.transform = 'perspective(1400px) rotateY(0deg)';
+    if (sombra) sombra.style.opacity = '0';
+  }
+  let hecho = false;
+  const fin = () => {
+    if (hecho) return;
+    hecho = true;
+    if (leaf.parentNode) leaf.parentNode.removeChild(leaf);
+    if (_vozVuelta && _vozVuelta.el === leaf) _vozVuelta = null;
+  };
+  leaf.addEventListener('transitionend', fin, { once: true });
+  setTimeout(fin, 560);   // por si el navegador no avisa del final
+}
+
+/* El arrastre con el dedo: la hoja sigue al dedo. Solo dentro del
+   capítulo; en los bordes (la página siguiente está en otro capítulo,
+   que aún no está pintado) se pasa al soltar, con la animación entera. */
+function vozVueltaEmpieza(dx) {
+  if (_vozVuelta || vozModo() === 'scroll' || _vozAj.paso !== 'hojear') return false;
+  const d = dx < 0 ? 1 : -1;
+  const destino = _vozPagina + d;
+  if (destino < 0 || destino >= _vozPaginas) return false;
+  const leaf = vozInstantanea();
+  if (!leaf) return false;
+  const origen = _vozPagina;
+  vozIrPagina(destino, true);
+  leaf.classList.add(d > 0 ? 'voz-vuelta-izq' : 'voz-vuelta-der');
+  _vozVuelta = { el: leaf, dir: d, origen: origen, destino: destino, interactivo: true, f: 0, ancho: leaf.offsetWidth || 1 };
+  return true;
+}
+
+function vozVueltaMueve(dx) {
+  const v = _vozVuelta;
+  if (!v || !v.interactivo) return;
+  const f = Math.max(0, Math.min(1, (v.dir > 0 ? -dx : dx) / v.ancho));
+  v.f = f;
+  v.el.style.transform = 'perspective(1400px) rotateY(' + (f * 90 * (v.dir > 0 ? -1 : 1)) + 'deg)';
+  const sombra = v.el.querySelector('.voz-vuelta-sombra');
+  if (sombra) sombra.style.opacity = String(f);
+}
+
+function vozVueltaSuelta(rapido) {
+  const v = _vozVuelta;
+  if (!v || !v.interactivo) return;
+  v.interactivo = false;
+  const completar = (v.f || 0) > 0.22 || (rapido && (v.f || 0) > 0.05);
+  if (!completar) vozIrPagina(v.origen, true);   // por debajo vuelve la página de antes
+  vozVueltaTermina(v.el, v.dir, completar);
+}
+
 /* ─── Los gestos ───────────────────────────────────────────────────
    Con PUNTEROS y nunca con el arrastre del navegador, igual que en el
    resto de la casa. Y el gesto NO es la única forma de pasar página:
@@ -1953,26 +2616,54 @@ function vozEngancharSala() {
   if (!hoja || !mid || mid.dataset.enganchado) return;
   mid.dataset.enganchado = '1';
 
+  const haySeleccion = () => { const s = window.getSelection && window.getSelection(); return !!(s && String(s).trim()); };
+
   mid.addEventListener('pointerdown', e => {
-    _vozArrastre = { x: e.clientX, y: e.clientY, t: Date.now() };
+    _vozArrastre = { x: e.clientX, y: e.clientY, t: Date.now(), id: e.pointerId, tipo: e.pointerType, vuelta: false };
+  });
+  mid.addEventListener('pointermove', e => {
+    const a = _vozArrastre;
+    if (!a || e.pointerId !== a.id) return;
+    const dx = e.clientX - a.x, dy = e.clientY - a.y;
+    if (a.vuelta === false) {
+      /* La hoja sigue al dedo solo con el dedo (o el lápiz): con el
+         ratón un arrastre es una selección de texto. */
+      if (a.tipo === 'mouse' || _vozAj.paso !== 'hojear' || vozModo() === 'scroll') return;
+      if (Math.abs(dx) < 12 || Math.abs(dx) < Math.abs(dy)) return;
+      if (haySeleccion()) return;
+      a.vuelta = vozVueltaEmpieza(dx) ? true : 'no';
+    }
+    if (a.vuelta === true) { e.preventDefault(); vozVueltaMueve(dx); }
   });
   mid.addEventListener('pointerup', e => {
-    if (!_vozArrastre) return;
-    const dx = e.clientX - _vozArrastre.x;
-    const dy = e.clientY - _vozArrastre.y;
+    const a = _vozArrastre;
+    if (!a) return;
     _vozArrastre = null;
+    const dx = e.clientX - a.x;
+    const dy = e.clientY - a.y;
+    const dt = Date.now() - a.t;
+    if (a.vuelta === true) {
+      _vozTragarClic = true;
+      vozVueltaSuelta(Math.abs(dx) > 40 && dt < 260);
+      setTimeout(() => { _vozTragarClic = false; }, 350);
+      return;
+    }
+    if (vozModo() === 'scroll') return;
     /* Un arrastre con texto seleccionado es una selección, no un paso
        de página: quien está copiando una frase no quiere que la página
        se le vaya de debajo del dedo. */
-    const sel = window.getSelection && window.getSelection();
-    if (sel && String(sel).trim()) return;
+    if (haySeleccion()) return;
     if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
       _vozTragarClic = true;      // un deslizamiento no es además un toque
       vozPasar(dx < 0 ? 1 : -1);
       setTimeout(() => { _vozTragarClic = false; }, 350);
     }
   });
-  mid.addEventListener('pointercancel', () => { _vozArrastre = null; });
+  mid.addEventListener('pointercancel', () => {
+    const a = _vozArrastre;
+    _vozArrastre = null;
+    if (a && a.vuelta === true) vozVueltaSuelta(false);
+  });
 
   /* Los bordes pasan página, que es como se pasa en cualquier lector.
      El centro —que es la propia hoja, para que el texto se pueda
@@ -1985,9 +2676,13 @@ function vozEngancharSala() {
   zona('voz-z-der', () => vozPasar(1));
   hoja.addEventListener('click', e => {
     if (_vozTragarClic) return;
+    /* Tocar un subrayado lo abre para cambiarle el color, ponerle nota
+       o quitarlo. No apaga los mandos. */
+    const mk = e.target && e.target.closest ? e.target.closest('mark.voz-hl') : null;
+    if (mk) { e.preventDefault(); vozSubAbrirMarca(mk.dataset.subId, mk.getBoundingClientRect()); return; }
     if (e.target && e.target.closest && e.target.closest('a, mark')) return;
-    const sel = window.getSelection && window.getSelection();
-    if (sel && String(sel).trim()) return;
+    if (haySeleccion()) return;
+    if (vozSubBarraAbierta()) { vozSubCerrarBarra(); return; }
     const b = document.getElementById('voz-lector');
     if (!b) return;
     if (!document.getElementById('voz-panel-aa').hidden || !document.getElementById('voz-panel-ind').hidden) {
@@ -1998,8 +2693,10 @@ function vozEngancharSala() {
   });
 
   /* La rueda del ratón pasa página, como en un lector de escritorio.
-     Con freno: una rueda libre manda veinte pasos en medio segundo. */
+     Con freno: una rueda libre manda veinte pasos en medio segundo. En
+     desplazamiento la rueda es del navegador, que ya sabe desplazar. */
   mid.addEventListener('wheel', e => {
+    if (vozModo() === 'scroll') return;
     const d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
     if (Math.abs(d) < 8) return;
     e.preventDefault();
@@ -2008,6 +2705,13 @@ function vozEngancharSala() {
     _vozRuedaHasta = ahora + 380;
     vozPasar(d > 0 ? 1 : -1);
   }, { passive: false });
+
+  /* En desplazamiento, la posición se apunta al parar de desplazar. */
+  hoja.addEventListener('scroll', () => {
+    if (vozModo() !== 'scroll') return;
+    clearTimeout(_vozScrollTimer);
+    _vozScrollTimer = setTimeout(() => { vozApuntarPos(); vozPintarPie(); }, 150);
+  }, { passive: true });
 
   /* Repaginar cuando cambia el tamaño: al girar la tableta, al salir el
      teclado, al cambiar la letra. Y SIEMPRE recuperando el párrafo, no
@@ -2031,6 +2735,17 @@ function vozEngancharSala() {
     const sala = document.getElementById('voz-lector');
     if (document.visibilityState === 'visible' && sala && !sala.hidden && !_vozLuz) vozLuz(true);
   });
+
+  /* La barra de subrayar se abre al soltar la selección. Con un respiro,
+     porque en el teléfono la selección se ajusta varias veces mientras
+     se arrastran los tiradores. */
+  let tSel = null;
+  document.addEventListener('selectionchange', () => {
+    const sala = document.getElementById('voz-lector');
+    if (!sala || sala.hidden) return;
+    clearTimeout(tSel);
+    tSel = setTimeout(vozSubAlSeleccionar, 260);
+  });
 }
 
 /* Las flechas del teclado y el escape. Se engancha una sola vez, en el
@@ -2039,12 +2754,17 @@ document.addEventListener('keydown', e => {
   const sala = document.getElementById('voz-lector');
   if (!sala || sala.hidden) return;
   const dentroDeCampo = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '');
-  if (dentroDeCampo) { if (e.key === 'Escape') vozCerrarPaneles(); return; }
-  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); vozPasar(1); }
-  else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') { e.preventDefault(); vozPasar(-1); }
-  else if (e.key === 'Home') { e.preventDefault(); vozIrPagina(0); }
-  else if (e.key === 'End') { e.preventDefault(); vozIrPagina(_vozPaginas - 1); }
+  if (dentroDeCampo) { if (e.key === 'Escape') { vozCerrarPaneles(); vozSubCerrarBarra(); } return; }
+  const scroll = vozModo() === 'scroll';
+  const hoja = document.getElementById('voz-hoja');
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); vozPasar(1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); vozPasar(-1); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); if (scroll && hoja) { hoja.style.scrollBehavior = ''; hoja.scrollTop += 80; } else vozPasar(1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); if (scroll && hoja) { hoja.style.scrollBehavior = ''; hoja.scrollTop -= 80; } else vozPasar(-1); }
+  else if (e.key === 'Home') { e.preventDefault(); if (scroll && hoja) hoja.scrollTop = 0; else vozIrPagina(0); }
+  else if (e.key === 'End') { e.preventDefault(); if (scroll && hoja) hoja.scrollTop = hoja.scrollHeight; else vozIrPagina(_vozPaginas - 1); }
   else if (e.key === 'Escape') {
+    if (vozSubBarraAbierta()) { vozSubCerrarBarra(); return; }
     const abierto = ['voz-panel-aa', 'voz-panel-ind'].some(id => { const p = document.getElementById(id); return p && !p.hidden; });
     if (abierto) vozCerrarPaneles(); else vozCerrarLector();
   }
@@ -2108,6 +2828,493 @@ function vozPantallaCompleta(encender) {
   } catch (e) {}
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   LOS SUBRAYADOS · el código de colores de la casa, dentro del cuento
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 10 de septiembre de 2026: «seleccionar texto
+   para remarcarlo según el código de colores que está en las lecturas
+   de las misiones de Storytelling». Son los MISMOS cinco colores del
+   marcador de las misiones (js/lecturas-marcador.js), con el mismo
+   significado y la misma trama para la fotocopia, y viajan por la
+   MISMA tabla (`lecturas_marcas`), con `mision = 'voz:<cid>'`: así lo
+   que se subraya en la tableta está en el teléfono, y es de CADA QUIEN
+   —la tabla lleva seguridad por fila con el usuario que entró—, igual
+   que en las misiones. Un subrayado de la hija no le aparece al padre.
+
+     🟡 DATO (D)        lo comprobable: una cifra, un nombre, un lugar.
+     🟢 VOZ (V)         quién habla: el narrador, un personaje, la fuente.
+     🔴 IDEA (I)        la tesis, el mecanismo, la imagen que sostiene.
+     🔵 CONTRACITA (C)  la frase que estorba, la objeción.
+     🟣 DUDA (?)        no lo entendí, o hay que verificar.
+
+   ⚠️ LA MARCA SE GUARDA POR CARACTERES DENTRO DEL BLOQUE (ini, fin) Y
+   CON EL TEXTO MARCADO. Los caracteres son lo que permite volver a
+   pintarla; el texto es lo que permite comprobar que sigue apuntando a
+   lo mismo si el texto se corrige, y lo que se copia a la lista de
+   subrayados sin abrir el cuento. Si el trozo ya no está donde estaba,
+   se busca; si aparece una sola vez, se reancla; si no, no se pinta
+   pero NO se borra: perder la nota de alguien porque se arregló una
+   coma sería el peor fallo posible de esto.
+
+   ⚠️ Y SE PINTA TROCEANDO NODOS DE TEXTO, nunca con innerHTML: es el
+   mismo texto pegado de siempre y F.A.R.O tiene dentro la Bóveda. */
+
+const VOZ_CATS = [
+  { id: 'dato',   ini: 'D', nombre: 'Dato',       ayuda: 'lo comprobable: una cifra, un nombre, un lugar' },
+  { id: 'voz',    ini: 'V', nombre: 'Voz',        ayuda: 'quién habla: el narrador, un personaje, la fuente' },
+  { id: 'idea',   ini: 'I', nombre: 'Idea',       ayuda: 'la tesis, el mecanismo, la imagen que sostiene' },
+  { id: 'contra', ini: 'C', nombre: 'Contracita', ayuda: 'la frase que estorba, la objeción' },
+  { id: 'duda',   ini: '?', nombre: 'Duda',       ayuda: 'no lo entendí, o hay que verificar' },
+];
+function vozCat(id) { return VOZ_CATS.find(c => c.id === id) || VOZ_CATS[2]; }
+
+const VOZ_SUB = 'faro_voz_subrayados_v1';
+const VOZ_SUB_TABLA = 'lecturas_marcas';
+let _vozSubTodo = null;      // {cid: [marcas]}, lápidas incluidas
+let _vozSubSel = null;       // la selección viva, sin marcar todavía
+let _vozSubEditando = null;  // id de la marca que se está tocando
+let _vozSubNube = 'local';   // local | subiendo | al-dia | sin-sesion | sin-tabla | sin-senal
+let _vozSubTimer = null;
+let _vozSubSincronizando = false;
+
+function vozSubLeeTodo() {
+  if (_vozSubTodo) return _vozSubTodo;
+  try {
+    const s = localStorage.getItem(VOZ_SUB);
+    const v = s ? JSON.parse(s) : {};
+    _vozSubTodo = (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+  } catch (e) { _vozSubTodo = {}; }
+  return _vozSubTodo;
+}
+
+function vozSubGuardaTodo() {
+  try { localStorage.setItem(VOZ_SUB, JSON.stringify(vozSubLeeTodo())); } catch (e) {}
+}
+
+/* Las marcas vivas y MÍAS de un texto. Las de otra persona que haya
+   entrado en este aparato no se pintan: son suyas. Las que se hicieron
+   sin sesión (sin dueño) se dan por mías, y la nube las firma al subir. */
+function vozSubDe(cid) {
+  const todas = vozSubLeeTodo()[cid] || [];
+  return todas.filter(m => m && !m.del && (!m.user || !_vozYo || m.user === _vozYo));
+}
+
+function vozSubId() {
+  return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+/* El contenedor del texto de un bloque: en una lista, el texto sin la
+   viñeta, para que los caracteres se cuenten sobre lo que se lee. */
+function vozCuerpoDe(el) {
+  return el.querySelector('.voz-li-txt') || el;
+}
+
+/* Los trozos de nodo de texto que cubren [ini, fin) dentro de un
+   contenedor, en orden. */
+function vozTrozosDe(cont, ini, fin) {
+  const trozos = [];
+  const w = document.createTreeWalker(cont, NodeFilter.SHOW_TEXT);
+  let pos = 0, n;
+  while ((n = w.nextNode())) {
+    const len = n.nodeValue.length;
+    const a = pos, b = pos + len;
+    if (b > ini && a < fin) trozos.push({ n: n, desde: Math.max(0, ini - a), hasta: Math.min(len, fin - a) });
+    pos = b;
+    if (pos >= fin) break;
+  }
+  return trozos;
+}
+
+/* Envuelve unos trozos en el elemento que devuelva `hacer`. El corte se
+   hace de atrás hacia adelante dentro de cada nodo para que el primer
+   splitText no invalide el desplazamiento del segundo. */
+function vozEnvolverTrozos(trozos, hacer) {
+  return trozos.map((t, k) => {
+    let nodo = t.n;
+    if (t.hasta < nodo.nodeValue.length) nodo.splitText(t.hasta);
+    if (t.desde > 0) nodo = nodo.splitText(t.desde);
+    const el = hacer(k, trozos.length);
+    nodo.parentNode.replaceChild(el, nodo);
+    el.appendChild(nodo);
+    return el;
+  });
+}
+
+function vozAplicarSubrayados(el, cid, cap, vp) {
+  const marcas = vozSubDe(cid).filter(m => m.cap === cap && m.vp === vp);
+  if (!marcas.length) return;
+  const cont = vozCuerpoDe(el);
+  const plano = cont.textContent;
+  marcas.sort((a, b) => a.i - b.i).forEach(m => {
+    let i = m.i, f = m.f;
+    if (plano.slice(i, f) !== m.t) {
+      /* El texto se movió: se reancla solo si el trozo aparece UNA vez.
+         Si aparece dos, adivinar cuál era es peor que no pintar. */
+      const k = plano.indexOf(m.t);
+      if (k < 0 || plano.indexOf(m.t, k + 1) >= 0) return;
+      i = k; f = k + m.t.length;
+      m.i = i; m.f = f;
+    }
+    const trozos = vozTrozosDe(cont, i, f);
+    if (!trozos.length) return;
+    const cat = vozCat(m.c);
+    vozEnvolverTrozos(trozos, (k, total) => {
+      const mk = vozNodo('mark', 'voz-hl voz-hl-' + cat.id + (k === total - 1 ? ' voz-hl-fin' : '') + (m.n ? ' voz-hl-nota' : ''));
+      mk.dataset.subId = m.id;
+      mk.dataset.ini = cat.ini;
+      mk.tabIndex = 0;
+      mk.setAttribute('role', 'button');
+      mk.setAttribute('aria-label', cat.nombre + (m.n ? ', con nota' : '') + ': ' + m.t.slice(0, 60));
+      return mk;
+    });
+  });
+}
+
+/* ─── La selección ─── */
+function vozLeerSeleccionSala() {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount || sel.isCollapsed) return null;
+  const r = sel.getRangeAt(0);
+  const texto = document.getElementById('voz-texto');
+  if (!texto) return null;
+  const bloqueDe = n => { if (!n) return null; const e = n.nodeType === 3 ? n.parentElement : n; return e && e.closest ? e.closest('#voz-texto [data-vp]') : null; };
+  const bIni = bloqueDe(r.startContainer), bFin = bloqueDe(r.endContainer);
+  if (!bIni || !bFin) return null;
+  if (bIni !== bFin) return { varios: true };
+  const vp = Number(bIni.dataset.vp);
+  if (!(vp >= 0)) return null;
+  const cont = vozCuerpoDe(bIni);
+  let ini;
+  try {
+    /* El desplazamiento se mide sobre el texto del bloque, no sobre su
+       HTML: así una marca sigue valiendo aunque el bloque ya tenga otras
+       marcas pintadas encima, que cambian el HTML pero no el texto. */
+    const antes = document.createRange();
+    antes.selectNodeContents(cont);
+    antes.setEnd(r.startContainer, r.startOffset);
+    ini = antes.toString().length;
+  } catch (e) { return null; }
+  const plano = cont.textContent;
+  const fin = Math.min(plano.length, ini + r.toString().length);
+  const t = plano.slice(ini, fin);
+  if (!t.trim()) return null;
+  return { cap: Number(bIni.dataset.cap) || 0, vp: vp, i: ini, f: fin, t: t, caja: r.getBoundingClientRect() };
+}
+
+function vozSubAlSeleccionar() {
+  if (_vozSubEditando) return;
+  const s = vozLeerSeleccionSala();
+  if (s && s.varios) { vozSubCerrarBarra(); return; }
+  if (s) { _vozSubSel = s; vozSubAbrirBarra(s.t, null, s.caja); }
+  else if (_vozSubSel) { _vozSubSel = null; vozSubCerrarBarra(); }
+}
+
+/* ─── La barra ───
+   Vive DENTRO de la sala (se tiñe con el papel) y se abre pegada a lo
+   seleccionado: debajo si cabe, encima si no, y al pie si no cabe en
+   ninguno. Con cinco colores de 44 px: es el dedo quien la usa. */
+function vozSubBarra() {
+  let b = document.getElementById('voz-subbar');
+  if (b) return b;
+  const sala = document.getElementById('voz-lector');
+  if (!sala) return null;
+  b = vozNodo('div', 'voz-subbar');
+  b.id = 'voz-subbar';
+  b.hidden = true;
+  b.setAttribute('role', 'toolbar');
+  b.setAttribute('aria-label', 'Subrayar');
+  b.appendChild(vozNodo('div', 'voz-subbar-txt'));
+  const colores = vozNodo('div', 'voz-subbar-colores');
+  VOZ_CATS.forEach(c => {
+    const btn = vozBoton('voz-subbar-color voz-subbar-color-' + c.id, null, () => vozSubMarcarCon(c.id), c.nombre + ': ' + c.ayuda);
+    btn.dataset.cat = c.id;
+    btn.appendChild(vozNodo('span', 'voz-subbar-ini', c.ini));
+    btn.appendChild(vozNodo('span', 'voz-subbar-nombre', c.nombre));
+    colores.appendChild(btn);
+  });
+  b.appendChild(colores);
+  const acciones = vozNodo('div', 'voz-subbar-acciones');
+  acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-nota-btn', '✎ Nota', () => vozSubAbrirNota()));
+  acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-quitar', '🗑 Quitar', () => vozSubQuitar(_vozSubEditando)));
+  acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-cerrar', '✕', () => vozSubCerrarBarra(), 'Cerrar'));
+  b.appendChild(acciones);
+  const nota = vozNodo('div', 'voz-subbar-notacaja');
+  nota.hidden = true;
+  const ta = vozNodo('textarea', 'voz-subbar-notatxt');
+  ta.rows = 3;
+  ta.placeholder = 'Tu nota sobre este trozo';
+  ta.setAttribute('aria-label', 'Nota del subrayado');
+  nota.appendChild(ta);
+  nota.appendChild(vozBoton('voz-subbar-acc', '💾 Guardar nota', () => vozSubGuardarNota(ta.value)));
+  b.appendChild(nota);
+  sala.appendChild(b);
+  return b;
+}
+
+function vozSubBarraAbierta() {
+  const b = document.getElementById('voz-subbar');
+  return !!(b && !b.hidden);
+}
+
+function vozSubAbrirBarra(texto, catActiva, caja) {
+  const b = vozSubBarra();
+  if (!b) return;
+  const editando = !!_vozSubEditando;
+  b.querySelector('.voz-subbar-txt').textContent = '«' + String(texto || '').replace(/\s+/g, ' ').slice(0, 110) + (texto && texto.length > 110 ? '…' : '') + '»';
+  b.querySelectorAll('.voz-subbar-color').forEach(btn => {
+    btn.setAttribute('aria-pressed', btn.dataset.cat === catActiva ? 'true' : 'false');
+  });
+  b.querySelector('.voz-subbar-acciones').hidden = !editando;
+  b.querySelector('.voz-subbar-notacaja').hidden = true;
+  b.classList.toggle('voz-subbar-editando', editando);
+  b.hidden = false;
+  vozSubColocarBarra(caja);
+}
+
+function vozSubColocarBarra(caja) {
+  const b = document.getElementById('voz-subbar');
+  const sala = document.getElementById('voz-lector');
+  if (!b || !sala) return;
+  b.classList.remove('voz-subbar-abajo');
+  const sr = sala.getBoundingClientRect();
+  const bw = b.offsetWidth, bh = b.offsetHeight;
+  if (!caja || !caja.height) { b.classList.add('voz-subbar-abajo'); b.style.left = ''; b.style.top = ''; return; }
+  const arriba = caja.top - sr.top, abajo = caja.bottom - sr.top;
+  const pie = sala.clientHeight - 64;
+  let top;
+  if (abajo + 10 + bh < pie) top = abajo + 10;
+  else if (arriba - 10 - bh > 60) top = arriba - 10 - bh;
+  else { b.classList.add('voz-subbar-abajo'); b.style.left = ''; b.style.top = ''; return; }
+  const centro = (caja.left + caja.right) / 2 - sr.left;
+  const left = Math.max(8, Math.min(sala.clientWidth - bw - 8, centro - bw / 2));
+  b.style.left = left + 'px';
+  b.style.top = top + 'px';
+}
+
+function vozSubCerrarBarra() {
+  const b = document.getElementById('voz-subbar');
+  if (b) b.hidden = true;
+  _vozSubEditando = null;
+  _vozSubSel = null;
+}
+
+function vozSubAbrirMarca(id, caja) {
+  const c = _vozLeyendo;
+  if (!c || !id) return;
+  const m = vozSubDe(c.cid).find(x => x.id === id);
+  if (!m) return;
+  _vozSubSel = null;
+  _vozSubEditando = id;
+  vozSubAbrirBarra(m.t, m.c, caja);
+  const ta = document.querySelector('#voz-subbar .voz-subbar-notatxt');
+  if (ta) ta.value = m.n || '';
+}
+
+function vozSubAbrirNota() {
+  const b = document.getElementById('voz-subbar');
+  if (!b) return;
+  const caja = b.querySelector('.voz-subbar-notacaja');
+  caja.hidden = !caja.hidden;
+  if (!caja.hidden) { const ta = caja.querySelector('textarea'); if (ta) ta.focus(); }
+}
+
+/* ─── Crear, cambiar, anotar, quitar ─── */
+function vozSubGuardaMarca(m) {
+  const c = _vozLeyendo;
+  if (!c) return;
+  const todo = vozSubLeeTodo();
+  const lista = todo[c.cid] || (todo[c.cid] = []);
+  const k = lista.findIndex(x => x.id === m.id);
+  if (k >= 0) lista[k] = m; else lista.push(m);
+  vozSubGuardaTodo();
+  vozSubPedirNube();
+}
+
+function vozSubMarcarCon(cat) {
+  const c = _vozLeyendo;
+  if (!c) return;
+  if (_vozSubEditando) {
+    const m = vozSubDe(c.cid).find(x => x.id === _vozSubEditando);
+    if (!m) return;
+    m.c = cat; m.u = Date.now();
+    vozSubGuardaMarca(m);
+    vozSubRepintar(m.cap, m.vp);
+    vozSubCerrarBarra();
+    return;
+  }
+  const s = _vozSubSel || vozLeerSeleccionSala();
+  if (!s || s.varios) { vozAviso('Selecciona dentro de un mismo párrafo'); return; }
+  const m = { id: vozSubId(), cap: s.cap, vp: s.vp, i: s.i, f: s.f, t: s.t, c: cat, n: '', u: Date.now(), del: false, user: _vozYo || null };
+  vozSubGuardaMarca(m);
+  try { window.getSelection().removeAllRanges(); } catch (e) {}
+  vozSubCerrarBarra();
+  vozSubRepintar(m.cap, m.vp);
+  vozAviso(vozCat(cat).ini + ' · ' + vozCat(cat).nombre + ' subrayada');
+}
+
+function vozSubGuardarNota(texto) {
+  const c = _vozLeyendo;
+  if (!c || !_vozSubEditando) return;
+  const m = vozSubDe(c.cid).find(x => x.id === _vozSubEditando);
+  if (!m) return;
+  m.n = String(texto || '').trim();
+  m.u = Date.now();
+  vozSubGuardaMarca(m);
+  vozSubRepintar(m.cap, m.vp);
+  vozSubCerrarBarra();
+  vozAviso(m.n ? '✎ Nota guardada' : 'Nota quitada');
+}
+
+/* ⚠️ Quitar es poner LÁPIDA, no borrar: si este aparato borrara la
+   marca, la tableta que aún la tiene la subiría otra vez. */
+function vozSubQuitar(id) {
+  const c = _vozLeyendo;
+  if (!c || !id) return;
+  const m = (vozSubLeeTodo()[c.cid] || []).find(x => x.id === id);
+  if (!m) return;
+  m.del = true; m.u = Date.now();
+  vozSubGuardaMarca(m);
+  vozSubCerrarBarra();
+  vozSubRepintar(m.cap, m.vp);
+  const panel = document.getElementById('voz-panel-ind');
+  if (panel && !panel.hidden && _vozPanelTab === 'subs') vozPintarPanelInd('subs');
+}
+
+/* Vuelve a pintar un solo bloque con sus marcas, sin tocar el resto:
+   repintar el capítulo entero le arrancaría la selección y la página de
+   debajo del dedo. En páginas, después se recoloca por el párrafo
+   apuntado, porque una marca puede mover una línea. */
+function vozSubRepintar(cap, vp) {
+  const c = _vozLeyendo;
+  const texto = document.getElementById('voz-texto');
+  if (!c || !texto) return;
+  const viejo = texto.querySelector('[data-cap="' + cap + '"][data-vp="' + vp + '"]');
+  const capitulo = (c.capitulos || [])[cap];
+  if (!viejo || !capitulo) return;
+  const p = (capitulo.p || [])[vp];
+  if (!p) return;
+  const anterior = vp > 0 ? capitulo.p[vp - 1] : null;
+  const nuevo = vozNodoBloque(p, vp, anterior, cap);
+  viejo.parentNode.replaceChild(nuevo, viejo);
+  if (vozModo() !== 'scroll') vozPaginar(_vozAncla, _vozSub);
+}
+
+/* ─── La nube: la misma tabla que el marcador de las misiones ─── */
+function vozSubAFila(m, yo, cid) {
+  return {
+    id: m.id, user_id: yo, mision: 'voz:' + cid, zona: 'cap' + (m.cap || 0), parrafo: m.vp,
+    ini: m.i, fin: m.f, texto: m.t, color: m.c, nota: m.n || '', borrada: !!m.del,
+    actualizado: m.u || 0, fecha: new Date(m.u || Date.now()).toLocaleDateString('es-HN'),
+  };
+}
+
+function vozSubDeFila(r) {
+  return {
+    id: r.id, cap: parseInt(String(r.zona || '').replace(/^cap/, ''), 10) || 0, vp: r.parrafo,
+    i: r.ini, f: r.fin, t: r.texto, c: r.color, n: r.nota || '', u: r.actualizado || 0,
+    del: !!r.borrada, user: r.user_id, sync: r.actualizado || 0,
+  };
+}
+
+function vozSubPedirNube() {
+  if (!_vozLeyendo) return;
+  const cid = _vozLeyendo.cid;
+  if (_vozSubNube === 'al-dia') _vozSubNube = 'pendiente';
+  clearTimeout(_vozSubTimer);
+  _vozSubTimer = setTimeout(() => vozSubSincronizar(cid), 2500);
+}
+
+/* Baja lo de la nube para ESTE texto y ESTE usuario, fusiona por
+   identificador (gana la versión más nueva por el reloj del aparato) y
+   sube lo que aquí es más nuevo o no estaba. Igual que el marcador de
+   las misiones, con la misma tabla. */
+async function vozSubSincronizar(cid) {
+  if (_vozSubSincronizando) return;
+  const sb = vozSb();
+  if (!sb) { _vozSubNube = 'sin-sesion'; vozSubPintarEstado(); return; }
+  const yo = await vozYo();
+  if (!yo) { _vozSubNube = 'sin-sesion'; vozSubPintarEstado(); return; }
+  _vozSubSincronizando = true;
+  _vozSubNube = 'subiendo'; vozSubPintarEstado();
+  try {
+    const todo = vozSubLeeTodo();
+    const mias = todo[cid] || (todo[cid] = []);
+    /* Lo marcado sin sesión pasa a ser de quien entró. */
+    mias.forEach(m => { if (!m.user) m.user = yo; });
+
+    const { data, error } = await vozConReloj(sb.from(VOZ_SUB_TABLA)
+      .select('*').eq('mision', 'voz:' + cid).eq('user_id', yo));
+    if (error) {
+      if (error.code === '42P01' || /relation .* does not exist/i.test(error.message || '')) _vozSubNube = 'sin-tabla';
+      else _vozSubNube = 'sin-senal';
+      vozSubGuardaTodo(); vozSubPintarEstado();
+      return;
+    }
+    const remotas = (data || []).map(vozSubDeFila);
+    const porId = new Map(mias.map(m => [m.id, m]));
+    const subir = [];
+    let cambio = false;
+    remotas.forEach(r => {
+      const l = porId.get(r.id);
+      if (!l) { porId.set(r.id, r); cambio = true; return; }
+      if ((r.u || 0) > (l.u || 0)) { porId.set(r.id, Object.assign({}, r)); cambio = true; }
+      else if ((l.u || 0) > (r.u || 0) || (l.sync || 0) < (l.u || 0)) subir.push(l);
+    });
+    porId.forEach(m => { if (m.user === yo && !remotas.find(r => r.id === m.id)) subir.push(m); });
+    todo[cid] = [...porId.values()];
+    if (subir.length) {
+      const { error: e2 } = await vozConReloj(sb.from(VOZ_SUB_TABLA)
+        .upsert(subir.map(m => vozSubAFila(m, yo, cid)), { onConflict: 'id' }));
+      if (e2) { _vozSubNube = e2.code === 'FARO_RELOJ' ? 'sin-senal' : 'error'; vozSubGuardaTodo(); vozSubPintarEstado(); return; }
+      subir.forEach(m => { m.sync = m.u || 0; });
+    }
+    vozSubGuardaTodo();
+    _vozSubNube = 'al-dia';
+    if (cambio && _vozLeyendo && _vozLeyendo.cid === cid) {
+      /* La nube trajo marcas que aquí no estaban: se repinta guardando
+         el sitio, como con un cambio de letra. */
+      vozPintarCap(_vozAncla, _vozSub);
+    }
+  } catch (e) {
+    _vozSubNube = 'error';
+  } finally {
+    _vozSubSincronizando = false;
+    vozSubPintarEstado();
+  }
+}
+
+function vozSubRotuloNube() {
+  if (_vozSubNube === 'al-dia')     return '☁️ Tus subrayados también están en la nube, y solo los ves tú.';
+  if (_vozSubNube === 'subiendo' || _vozSubNube === 'pendiente') return '⏳ Guardando en la nube…';
+  if (_vozSubNube === 'sin-tabla')  return '📴 Solo en este aparato: falta correr lecturas_marcas.sql';
+  if (_vozSubNube === 'sin-sesion') return '📴 Solo en este aparato: entra en F.A.R.O para que viajen';
+  if (_vozSubNube === 'sin-senal')  return '📡 Sin señal: se guardan aquí y suben cuando vuelva';
+  if (_vozSubNube === 'error')      return '⚠️ La nube rechazó los subrayados; se quedan en este aparato';
+  return '📴 Solo en este aparato por ahora';
+}
+
+function vozSubPintarEstado() {
+  const e = document.getElementById('voz-sub-estado');
+  if (e) e.textContent = vozSubRotuloNube();
+}
+
+/* Lo subrayado, en texto plano, para copiarlo o pegarlo en un chat. Va
+   con la etiqueta del texto delante, como todo lo que sale de aquí. */
+function vozSubTextoPlano(c) {
+  const marcas = vozSubDe(c.cid).slice().sort((a, b) => a.cap - b.cap || a.vp - b.vp || a.i - b.i);
+  const L = [];
+  L.push('Subrayados de «' + (c.titulo || 'Sin título') + '»');
+  L.push(vozGenero(c.genero).t + ' escrito por ' + (c.maquina || 'una máquina') + ', al modo de ' + (c.voz || '—') + '.');
+  L.push('');
+  let capAnt = -1;
+  marcas.forEach(m => {
+    if (m.cap !== capAnt) { capAnt = m.cap; L.push('── ' + vozNombreCap(c, m.cap) + ' ──'); }
+    L.push('[' + vozCat(m.c).nombre.toUpperCase() + '] «' + m.t + '»' + (m.n ? ' — ' + m.n : ''));
+  });
+  if (!marcas.length) L.push('(sin subrayados)');
+  return L.join('\n') + '\n';
+}
+
 /* ─── Los paneles de la sala: la letra, y el índice con sus pestañas ──
    Viven DENTRO de #voz-lector, no colgando del body, y eso es una
    decisión de color: la sala redefine sus tokens (papel, sepia,
@@ -2127,6 +3334,7 @@ function vozAbrirPanel(id) {
   const abierto = document.getElementById(id);
   const yaEstaba = abierto && !abierto.hidden;
   vozCerrarPaneles();
+  vozSubCerrarBarra();
   if (abierto && !yaEstaba) { abierto.hidden = false; }
 }
 
@@ -2149,11 +3357,12 @@ function vozPintarAjustes() {
       const b = vozBoton('voz-aj-chip' + (o.id === activo ? ' voz-aj-on' : ''),
         (o.ic ? o.ic + ' ' : '') + o.t, () => alTocar(o.id));
       if (o.css) b.style.fontFamily = o.css;
+      b.setAttribute('aria-pressed', o.id === activo ? 'true' : 'false');
       caja.appendChild(b);
     });
   };
 
-  const guarda = () => {
+  const guarda = (repintar) => {
     vozGuardaAjustes();
     vozAplicaAjustes();
     /* ⚠️ Cambiar la letra repagina el texto entero, así que hay que
@@ -2161,17 +3370,26 @@ function vozPintarAjustes() {
        porque medirlo ahora daría el párrafo de después del cambio: ver
        la nota de `_vozAncla`. Si se volviera al número de página, subir
        un punto la letra movería al lector media página cada vez. */
-    vozPaginar(_vozAncla, _vozSub);
+    if (repintar) vozPintarCap(_vozAncla, _vozSub);
+    else vozPaginar(_vozAncla, _vozSub);
     vozPintarAjustes();
   };
 
-  chips(fila('Color'), VOZ_TEMAS, _vozAj.tema, id => { _vozAj.tema = id; guarda(); });
-  chips(fila('Letra'), VOZ_LETRAS, _vozAj.letra, id => { _vozAj.letra = id; guarda(); });
+  /* El modo va el primero: es la decisión más grande de la sala. */
+  chips(fila('Lectura'), [{ id: 'paginas', ic: '📖', t: 'En páginas' }, { id: 'scroll', ic: '↕️', t: 'Deslizando' }],
+    vozModo(), id => { _vozAj.modo = id; guarda(true); });
+  if (vozModo() !== 'scroll') {
+    chips(fila('Pasar página'), [{ id: 'deslizar', t: 'Deslizar' }, { id: 'hojear', t: '📄 Hojear, como un libro' }, { id: 'golpe', t: 'De golpe' }],
+      _vozAj.paso || 'deslizar', id => { _vozAj.paso = id; guarda(false); });
+  }
+
+  chips(fila('Color'), VOZ_TEMAS, _vozAj.tema, id => { _vozAj.tema = id; guarda(false); });
+  chips(fila('Letra'), VOZ_LETRAS, _vozAj.letra, id => { _vozAj.letra = id; guarda(false); });
 
   const menosMas = (caja, valor, paso, min, max, pon, muestra) => {
-    const b1 = vozBoton('voz-aj-mm', '−', () => { pon(Math.max(min, +(valor - paso).toFixed(2))); guarda(); }, 'Menos');
+    const b1 = vozBoton('voz-aj-mm', '−', () => { pon(Math.max(min, +(valor - paso).toFixed(2))); guarda(false); }, 'Menos');
     const v  = vozNodo('span', 'voz-aj-val', muestra);
-    const b2 = vozBoton('voz-aj-mm', '+', () => { pon(Math.min(max, +(valor + paso).toFixed(2))); guarda(); }, 'Más');
+    const b2 = vozBoton('voz-aj-mm', '+', () => { pon(Math.min(max, +(valor + paso).toFixed(2))); guarda(false); }, 'Más');
     caja.appendChild(b1); caja.appendChild(v); caja.appendChild(b2);
   };
 
@@ -2179,20 +3397,18 @@ function vozPintarAjustes() {
   menosMas(fila('Interlínea'), _vozAj.alto, 0.1, 1.2, 2.4, v => { _vozAj.alto = v; }, _vozAj.alto.toFixed(1));
   menosMas(fila('Márgenes'), _vozAj.margen, 6, 8, 80, v => { _vozAj.margen = v; }, _vozAj.margen + ' px');
 
-  const cj = fila('Alineado');
-  chips(cj, [{ id: 'si', t: 'Justificado' }, { id: 'no', t: 'A la izquierda' }],
-    _vozAj.just ? 'si' : 'no', id => { _vozAj.just = (id === 'si'); guarda(); });
+  chips(fila('Alineado'), [{ id: 'si', t: 'Justificado' }, { id: 'no', t: 'A la izquierda' }],
+    _vozAj.just ? 'si' : 'no', id => { _vozAj.just = (id === 'si'); guarda(false); });
 
-  const cc = fila('Capitular');
-  chips(cc, [{ id: 'si', t: 'Con capitular' }, { id: 'no', t: 'Sin capitular' }],
-    _vozAj.capital ? 'si' : 'no', id => { _vozAj.capital = (id === 'si'); guarda(); });
+  chips(fila('Capitular'), [{ id: 'si', t: 'Con capitular' }, { id: 'no', t: 'Sin capitular' }],
+    _vozAj.capital ? 'si' : 'no', id => { _vozAj.capital = (id === 'si'); guarda(false); });
 
   /* Las dos páginas solo se ofrecen donde caben: en un teléfono de pie
      un chip que no hace nada es un chip que parece roto. */
   const hoja = document.getElementById('voz-hoja');
-  if (hoja && hoja.clientWidth >= 560) {
+  if (vozModo() !== 'scroll' && hoja && hoja.clientWidth >= 560) {
     chips(fila('Páginas'), [{ id: 'auto', t: 'Auto' }, { id: '1', t: 'Una' }, { id: '2', t: 'Dos, como un libro' }],
-      String(_vozAj.paginas || 'auto'), id => { _vozAj.paginas = id; guarda(); });
+      String(_vozAj.paginas || 'auto'), id => { _vozAj.paginas = id; guarda(false); });
   }
 
   if (vozPuedePantallaCompleta()) {
@@ -2203,13 +3419,15 @@ function vozPintarAjustes() {
   }
 
   p.appendChild(vozNodo('p', 'voz-aj-nota',
-    'La letra y el color son de este aparato: no le cambian la lectura a nadie más de la casa. ' +
-    'Toca el centro de la página para esconder los mandos; los bordes pasan página.'));
+    'La letra, el color y el modo son de este aparato: no le cambian la lectura a nadie más de la casa. ' +
+    'Toca el centro de la página para esconder los mandos; los bordes pasan página. ' +
+    'Selecciona un trozo para subrayarlo con el código de colores de la casa.'));
 }
 
-/* El panel de la izquierda del libro: el índice, los marcadores y el
-   buscador, en pestañas. Son tres cosas que en un lector de libros
-   están juntas porque hacen lo mismo: ir a un sitio del texto. */
+/* El panel de la izquierda del libro: el índice, los marcadores, los
+   subrayados y el buscador, en pestañas. Son cuatro cosas que en un
+   lector de libros están juntas porque hacen lo mismo: ir a un sitio
+   del texto. */
 function vozPintarPanelInd(tab) {
   const p = document.getElementById('voz-panel-ind');
   const c = _vozLeyendo;
@@ -2218,7 +3436,7 @@ function vozPintarPanelInd(tab) {
   p.textContent = '';
 
   const tabs = vozNodo('div', 'voz-tabs');
-  [['ind', '☰ Índice'], ['marcas', '🔖 Marcadores'], ['busca', '🔍 Buscar']].forEach(([id, t]) => {
+  [['ind', '☰ Índice'], ['marcas', '🔖 Marcas'], ['subs', '🖍 Subrayados'], ['busca', '🔍 Buscar']].forEach(([id, t]) => {
     const b = vozBoton('voz-tab' + (_vozPanelTab === id ? ' voz-tab-on' : ''), t, () => vozPintarPanelInd(id));
     b.setAttribute('role', 'tab');
     b.setAttribute('aria-selected', _vozPanelTab === id ? 'true' : 'false');
@@ -2229,6 +3447,7 @@ function vozPintarPanelInd(tab) {
   const cuerpo = vozNodo('div', 'voz-panel-cuerpo');
   p.appendChild(cuerpo);
   if (_vozPanelTab === 'marcas') vozPintarMarcas(cuerpo);
+  else if (_vozPanelTab === 'subs') vozPintarSubrayados(cuerpo);
   else if (_vozPanelTab === 'busca') vozPintarBuscador(cuerpo);
   else vozPintarIndice(cuerpo);
 }
@@ -2263,15 +3482,14 @@ function vozPintarIndice(cuerpo) {
       'Este texto va de un tirón, sin capítulos. Se lee entero pasando páginas.'));
   }
   const portada = vozBoton('voz-ind-item' + (_vozCapActual === 0 && _vozAncla === -1 ? ' voz-ind-on' : ''), null, () => {
-    vozIrCapitulo(0, false); vozCerrarPaneles();
+    vozIrA(0, -1, 0); vozCerrarPaneles();
   });
   portada.appendChild(vozNodo('span', 'voz-ind-n', '·'));
   portada.appendChild(vozNodo('span', 'voz-ind-t', 'Portada'));
   cuerpo.appendChild(portada);
   caps.forEach((cap, i) => {
     const b = vozBoton('voz-ind-item' + (i === _vozCapActual && _vozAncla !== -1 ? ' voz-ind-on' : ''), null, () => {
-      _vozCapActual = i; _vozPagina = 0;
-      vozPintarCap(0, 0); vozCerrarPaneles();
+      vozIrCapitulo(i, false); vozCerrarPaneles();
     });
     b.appendChild(vozNodo('span', 'voz-ind-n', String(i + 1)));
     b.appendChild(vozNodo('span', 'voz-ind-t', vozNombreCap(c, i)));
@@ -2345,8 +3563,7 @@ function vozPintarMarcas(cuerpo) {
   lista.forEach((m, idx) => {
     const fila = vozNodo('div', 'voz-marca');
     const ir = vozBoton('voz-marca-ir', null, () => {
-      _vozCapActual = Math.min(Math.max(0, m.cap || 0), (c.capitulos || []).length - 1);
-      vozPintarCap(m.vp, m.sub || 0);
+      vozIrA(m.cap || 0, m.vp, m.sub || 0);
       vozCerrarPaneles();
     });
     ir.appendChild(vozNodo('span', 'voz-marca-cap', vozNombreCap(c, m.cap || 0)));
@@ -2359,6 +3576,65 @@ function vozPintarMarcas(cuerpo) {
       vozPintarPanelInd('marcas');
       vozPintarBotonMarca();
     }, 'Quitar este marcador'));
+    cuerpo.appendChild(fila);
+  });
+}
+
+/* ─── Los subrayados, en su pestaña ─── */
+function vozPintarSubrayados(cuerpo) {
+  const c = _vozLeyendo;
+  cuerpo.appendChild(vozNodo('div', 'voz-ind-tit', 'Subrayados'));
+
+  /* La leyenda del código de la casa, siempre a la vista: un código de
+     colores que hay que recordar no es un código, es una adivinanza. */
+  const ley = vozNodo('div', 'voz-ley');
+  VOZ_CATS.forEach(cat => {
+    const f = vozNodo('div', 'voz-ley-fila');
+    f.appendChild(vozNodo('span', 'voz-ley-muestra voz-hl voz-hl-' + cat.id, cat.ini + ' · ' + cat.nombre));
+    f.appendChild(vozNodo('span', 'voz-ley-ayuda', cat.ayuda));
+    ley.appendChild(f);
+  });
+  cuerpo.appendChild(ley);
+  const estado = vozNodo('p', 'voz-aj-nota voz-sub-estado', vozSubRotuloNube());
+  estado.id = 'voz-sub-estado';
+  cuerpo.appendChild(estado);
+
+  const marcas = vozSubDe(c.cid).slice().sort((a, b) => a.cap - b.cap || a.vp - b.vp || a.i - b.i);
+  if (!marcas.length) {
+    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota',
+      'Todavía no hay subrayados. Selecciona un trozo del texto —manteniendo el dedo sobre una palabra— y elige su color.'));
+    return;
+  }
+  const barra = vozNodo('div', 'voz-sub-barra-panel');
+  barra.appendChild(vozBoton('voz-btn', '📋 Copiar los subrayados', () => {
+    const texto = vozSubTextoPlano(c);
+    const fin = ok => vozAviso(ok ? '📋 Subrayados copiados, con la etiqueta delante' : 'No se pudo copiar');
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(() => fin(true), () => vozCopiarViejo(texto, fin));
+    else vozCopiarViejo(texto, fin);
+  }));
+  cuerpo.appendChild(barra);
+
+  let capAnt = -1;
+  marcas.forEach(m => {
+    if (m.cap !== capAnt) {
+      capAnt = m.cap;
+      cuerpo.appendChild(vozNodo('div', 'voz-sub-cap', vozNombreCap(c, m.cap)));
+    }
+    const cat = vozCat(m.c);
+    const fila = vozNodo('div', 'voz-sub-item voz-sub-item-' + cat.id);
+    const ir = vozBoton('voz-sub-ir', null, () => {
+      vozIrA(m.cap, m.vp, 0);
+      vozCerrarPaneles();
+      setTimeout(() => {
+        const el = document.querySelector('#voz-texto [data-cap="' + m.cap + '"][data-vp="' + m.vp + '"]');
+        if (el) { el.classList.add('voz-p-hit'); setTimeout(() => el.classList.remove('voz-p-hit'), 2600); }
+      }, 80);
+    });
+    ir.appendChild(vozNodo('span', 'voz-sub-ini', cat.ini + ' · ' + cat.nombre));
+    ir.appendChild(vozNodo('span', 'voz-sub-txt', m.t));
+    if (m.n) ir.appendChild(vozNodo('span', 'voz-sub-nota', '✎ ' + m.n));
+    fila.appendChild(ir);
+    fila.appendChild(vozBoton('voz-marca-x', '✕', () => vozSubQuitar(m.id), 'Quitar este subrayado'));
     cuerpo.appendChild(fila);
   });
 }
@@ -2416,9 +3692,8 @@ function vozPintarBuscador(cuerpo) {
                  : 'Nada con «' + q.trim() + '»'));
     res.slice(0, 80).forEach(r => {
       const b = vozBoton('voz-busca-item', null, () => {
-        _vozCapActual = r.cap;
-        vozPintarCap(r.vp, 0);
-        vozResaltar(r.vp, q);
+        vozIrA(r.cap, r.vp, 0);
+        vozResaltar(r.cap, r.vp, q);
         vozCerrarPaneles();
       });
       b.appendChild(vozNodo('span', 'voz-marca-cap', vozNombreCap(c, r.cap)));
@@ -2436,16 +3711,12 @@ function vozPintarBuscador(cuerpo) {
 
 /* Pone el término en <mark> dentro de un texto plano, sin innerHTML:
    se trocea y se cuelgan nodos. Sin tildes y sin mayúsculas, como la
-   búsqueda; se busca sobre una copia normalizada que mide lo mismo
-   que el original (NFD quita las tildes en marcas aparte, y de las
-   marcas se salta al comparar). */
+   búsqueda; se busca sobre una copia normalizada con un mapa de
+   posiciones al original, porque NFD cambia los largos. */
 function vozResaltarEn(nodo, texto, q) {
   const s = String(texto || '');
   const n = vozSinTildes(q).toLowerCase().trim();
   if (!n) { nodo.textContent = s; return; }
-  /* Mapa de posiciones: para cada carácter del texto sin tildes, su
-     posición en el original. Así «corazon» encuentra «corazón» y el
-     recorte se hace en el sitio correcto del original. */
   const mapa = [];
   let plano = '';
   for (let i = 0; i < s.length; i++) {
@@ -2462,12 +3733,12 @@ function vozResaltarEn(nodo, texto, q) {
   if (desde < s.length) nodo.appendChild(document.createTextNode(s.slice(desde)));
 }
 
-/* Resalta el término dentro del párrafo ya pintado y lo hace parpadear
+/* Resalta el término dentro del bloque ya pintado y lo hace parpadear
    un momento, para que el ojo lo encuentre en la página. */
-function vozResaltar(vp, q) {
+function vozResaltar(cap, vp, q) {
   const texto = document.getElementById('voz-texto');
   if (!texto) return;
-  const el = texto.querySelector('[data-vp="' + Number(vp) + '"]');
+  const el = texto.querySelector('[data-cap="' + Number(cap) + '"][data-vp="' + Number(vp) + '"]');
   if (!el) return;
   const nodosTexto = [];
   const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -2648,8 +3919,12 @@ function vozAbrirPegar(cuento) {
 
   const tit = g('voz-pegar-tit');
   if (tit) tit.textContent = cuento ? '✏️ Corregir el texto' : '➕ Pegar un texto';
-  const retirar = g('voz-retirar-btn');
-  if (retirar) retirar.hidden = !cuento;
+  const retirar = g('voz-retirar-caja');
+  if (retirar) {
+    retirar.textContent = '';
+    retirar.hidden = !cuento;
+    if (cuento) retirar.appendChild(vozBotonRetirar(cuento, 'voz-btn voz-btn-ancho', '🗑 Retirar del anaquel'));
+  }
 
   ov.style.display = 'flex';
   vozRepasar();
@@ -2913,11 +4188,17 @@ async function vozGuardarPegado() {
    este aparato borrara la fila, la tableta que todavía tiene su copia
    la subiría otra vez en la siguiente sincronización y el texto
    resucitaría solo, sin que nadie entendiera por qué. */
-async function vozRetirar() {
-  if (!_vozEditando) return;
-  const c = _vozCuentos.find(x => x.cid === _vozEditando);
+/* ⚠️ Y SE CONFIRMA EN LA PROPIA PANTALLA, NO CON `confirm()`. El diálogo
+   del navegador no se ve igual en todos los aparatos —en una aplicación
+   instalada puede no salir, y entonces el botón parece que no hace
+   nada—, y un «¿Retirar?» que no se ve es un texto que «no se puede
+   eliminar». Por eso el botón 🗑 pide la confirmación con un segundo
+   botón al lado, y esta función ya viene confirmada. */
+async function vozRetirar(cid) {
+  const id = cid || _vozEditando;
+  if (!id) return;
+  const c = _vozCuentos.find(x => x.cid === id);
   if (!c) return;
-  if (!confirm('¿Retirar «' + (c.titulo || 'este texto') + '» del anaquel?')) return;
   const lapida = Object.assign({}, c, { borrado: true, actualizado: Date.now() });
   _vozCuentos = _vozCuentos.filter(x => x.cid !== c.cid);
   try {
@@ -2926,8 +4207,37 @@ async function vozRetirar() {
     localStorage.setItem(VOZ_LOCAL, JSON.stringify(guardados));
   } catch (e) {}
   vozCerrarPegar();
+  vozCerrarMenu();
   vozRender();
-  await vozSubir(lapida);
+  const res = await vozSubir(lapida);
+  if (res.ok) vozAviso('🗑 Retirado del anaquel, también en los demás aparatos');
+  else if (res.motivo === 'sin-nube' || res.motivo === 'sin-sesion') vozAviso('🗑 Retirado de este aparato');
+  else if (res.motivo === 'sin-senal') vozAviso('🗑 Retirado aquí. En la nube se retira cuando vuelva la señal');
+  else if (res.motivo === 'ajeno') vozAviso('✋ Ese texto lo puso otra persona de la casa: solo esa persona puede retirarlo');
+  else vozAviso('⚠️ Retirado aquí, pero la nube lo rechazó: ' + (res.detalle || 'sin detalle'));
+}
+
+/* El botón de retirar con su confirmación al lado, para la ficha y para
+   el menú. Un toque enseña «Sí, retirar · No» en el mismo sitio; nada se
+   retira con un solo toque, y nada depende de un diálogo del navegador. */
+function vozBotonRetirar(c, clase, rotulo, alConfirmar) {
+  const caja = vozNodo('span', 'voz-retirar-caja');
+  const b = vozBoton(clase || 'voz-btn', rotulo || '🗑', null, 'Retirar del anaquel');
+  const si = vozBoton('voz-btn voz-btn-peligro', 'Sí, retirar', () => {
+    vozRetirar(c.cid);
+    if (alConfirmar) alConfirmar();
+  }, 'Confirmar: retirar del anaquel');
+  const no = vozBoton('voz-btn', 'No', () => {
+    caja.classList.remove('voz-retirar-abierto'); si.hidden = true; no.hidden = true;
+  }, 'No retirar');
+  si.hidden = true; no.hidden = true;
+  b.addEventListener('click', () => {
+    const abierto = caja.classList.toggle('voz-retirar-abierto');
+    si.hidden = !abierto; no.hidden = !abierto;
+    if (abierto) si.focus();
+  });
+  caja.appendChild(b); caja.appendChild(si); caja.appendChild(no);
+  return caja;
 }
 
 /* La ventana de ayuda. ⚠️ La lista de etiquetas se pinta LEYENDO
@@ -2989,12 +4299,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   on('voz-pegar-cerrar', 'click', vozCerrarPegar);
   on('voz-guardar-btn', 'click', vozGuardarPegado);
-  on('voz-retirar-btn', 'click', vozRetirar);
+  /* El botón de retirar de la hoja de corregir lo pinta vozAbrirPegar,
+     porque tiene que saber de qué texto es. */
   on('voz-ayuda-btn', 'click', vozAbrirAyuda);
   on('voz-ayuda-cerrar', 'click', () => {
     const ov = document.getElementById('voz-ayuda-overlay');
     if (ov) ov.style.display = 'none';
   });
+  on('voz-menu-cerrar', 'click', vozCerrarMenu);
+  /* Tocar fuera de la hoja del menú la cierra, como las demás de la
+     casa; dentro, no. */
+  on('voz-menu-overlay', 'click', e => { if (e.target.id === 'voz-menu-overlay') vozCerrarMenu(); });
   on('voz-ejemplo-btn', 'click', () => {
     const ta = document.getElementById('voz-pegar-txt');
     if (!ta) return;
