@@ -150,54 +150,41 @@ Zone → Make private.
      `_dev/prueba-rodaje-sql.sql`: las ocho comprobaciones pasan, incluida
      la de que `anon` no ve ni una fila con los permisos de tabla repartidos
      como los reparte Supabase.
-   · ⚠️ **Correr `supabase/sql/voz_prestada.sql`** en el SQL Editor, y
-     **después** `supabase/sql/voz_prestada_comprueba.sql`. En ese orden y
-     son dos: el primero crea, el segundo solo mira. No dependen de nada
-     más que de `es_familia()`, que ya está. El primero se puede correr dos
-     veces sin borrar ni un cuento.
-     ⚠️ **Y SI YA SE CORRIÓ EL DÍA DEL ESTRENO, HAY QUE VOLVER A CORRERLO:**
-     la tarde del 10 de septiembre de 2026 la tabla ganó la columna
-     `genero` (cuento, ensayo, poema, carta…), y un `create table if not
-     exists` no toca una tabla que ya existe. El archivo la añade aparte con
-     `add column if not exists`, sin tocar ni un cuento. Mientras no se
-     re-corra, la herramienta sigue funcionando y lo dice en su barra
-     («la base va vieja: vuelve a correr voz_prestada.sql»), guardando el
-     género solo en el aparato. La fila que lo delata en la comprobación es
-     **«columna genero»**: tiene que decir `existe` (en `voz_prestada.sql`)
-     o `1` (en `voz_prestada_comprueba.sql`).
-     Crea la tabla de **La Voz Prestada**, el anaquel de los cuentos que una
-     máquina escribe «al modo de» otros escritores, que el autor pidió el 10
-     de septiembre de 2026. Hasta que se corra, la herramienta **funciona
-     entera con la copia del aparato y lo dice a la vista** («📴 Solo en
-     este aparato: falta correr voz_prestada.sql»): no finge que viaja, y
-     nada de lo que se guarde mientras tanto se pierde.
-     Lo que hay que mirar al pegarlo es **la tabla del final**, nunca el
-     «Success» del editor: sale en VERTICAL, con once filas, y todas tienen
-     que llevar ✅. Tres se leen al revés que las demás y tienen que decir
-     `ninguna` — «borrado de verdad (NO debe poder)» y «puerta pública (NO
-     debe haberla)»—: aquí se retira con lápida (si un aparato borrara la
-     fila, la tableta que aún tuviera su copia resucitaría el cuento en la
-     siguiente sincronización) y no hay nada que nadie de fuera tenga que
-     leer.
-     Y trae la línea que sostiene toda la herramienta: un **`check` que no
-     deja guardar un cuento sin decir A QUIÉN imita y QUÉ MÁQUINA lo
-     escribió** (`voz_prestada_etiqueta`), y que vale también al corregir,
-     para que la etiqueta no se pueda vaciar después. Es el hermano de
-     `rodaje_fuentes_ia_declarada`: un cuento «al modo de» alguien, leído
-     seis meses después en una tableta, no se distingue de uno que sí fuera
-     suyo, y así nace una atribución falsa sin que nadie mienta.
-     El archivo **se para solo** si falta `es_familia()`, igual que los
-     otros dos. Y si mañana hay que volver a comprobar que quedó puesto, se
-     pega solo `voz_prestada_comprueba.sql`, que son veinte líneas y no
-     trescientas — y entre sus filas va «⚠️ cuentos SIN etiqueta», que tiene
-     que decir 0 siempre.
+   · ✅ **CORRIDO** — `supabase/sql/voz_prestada.sql` y después
+     `supabase/sql/voz_prestada_comprueba.sql`, el 10 de septiembre de 2026,
+     **dos veces**: la del estreno por la mañana y la ampliada con la columna
+     `genero` por la tarde, y la re-corrida no tocó el cuento que ya había.
+     La comprobación del final devolvió lo que tenía que devolver: las once
+     filas con ✅ —`columnas = 14`, `políticas = 3`, `seguridad por fila =
+     true`, los dos checks y `columna genero = existe`— y `voz_prestada_comprueba`
+     con `checks con nombre = 3`, `columna genero = 1`, `cuentos SIN etiqueta
+     = 0`, `cuentos en el anaquel = 1` y `retirados con lápida = 0`.
+     Crea la tabla de **La Voz Prestada**, el anaquel de los textos que una
+     máquina escribe «al modo de» otros escritores —cuentos, ensayos, poemas,
+     cartas—, que el autor pidió ese mismo día. Trae la línea que sostiene
+     toda la herramienta: un **`check` que no deja guardar un texto sin decir
+     A QUIÉN imita y QUÉ MÁQUINA lo escribió** (`voz_prestada_etiqueta`), y
+     que vale también al corregir, para que la etiqueta no se pueda vaciar
+     después. Es el hermano de `rodaje_fuentes_ia_declarada`: un cuento «al
+     modo de» alguien, leído seis meses después en una tableta, no se
+     distingue de uno que sí fuera suyo, y así nace una atribución falsa sin
+     que nadie mienta.
+     ⚠️ **Si el archivo vuelve a crecer, hay que volver a correrlo**, como
+     pasó con `genero`: un `create table if not exists` no toca una tabla
+     que ya existe, así que cada columna nueva va aparte con `add column if
+     not exists`, y lo que hay que mirar es la fila que la nombra en la
+     tabla del final, nunca el «Success» del editor. La lista de géneros NO
+     vive en la base (solo mira el largo): añadir uno es una línea en
+     `js/tools/voz-prestada.js`, no otra pasada por el editor. Y si mañana
+     hay que volver a comprobar que quedó puesto, se pega solo
+     `voz_prestada_comprueba.sql`, que son veinte líneas y no trescientas.
      Probado antes de mandarlo contra un PostgreSQL de verdad con
      `_dev/prueba-voz-prestada-sql.sql`: las dieciocho comprobaciones pasan,
      incluida la de que `anon` no ve ni una fila, la de que un cuento ajeno
      se lee pero no se corrige, y la de que **la tabla del estreno recibe
      la columna `genero` al re-correr el archivo** (la prueba crea primero
-     la tabla vieja, que es el camino que va a recorrer la base de verdad),
-     con los permisos repartidos como los reparte Supabase.
+     la tabla vieja, que es el camino que recorrió la base de verdad), con
+     los permisos repartidos como los reparte Supabase.
    · ✅ **CORRIDO** — `supabase/sql/metas_videos_tope_10.sql`, el 28 de
      agosto de 2026. La comprobación del final devolvió lo que tenía que
      devolver: `tope_preguntas = 10`. Sube de cinco a diez el tope de
