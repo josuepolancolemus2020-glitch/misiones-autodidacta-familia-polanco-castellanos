@@ -142,6 +142,22 @@ alter table public.voz_prestada add constraint voz_prestada_cuerpo check (
   and pg_column_size(capitulos) <= 600000
 );
 
+-- ⚠️ Y LA FIRMA TIENE RESPALDO EN LA BASE.
+-- `puesto_por` es `not null` y la política de escritura exige que sea
+-- quien entró, así que una fila sin firmar NO ENTRA. El 10 de septiembre
+-- de 2026 el aparato se olvidó de mandarla y el fallo se vio así: el
+-- cuento se guardaba, se veía donde se pegó, y no aparecía nunca en el
+-- otro aparato. Desde fuera parece la señal, y no lo era: la escritura
+-- llegaba y la base la rechazaba, que es de los síntomas que más
+-- despistan porque la mitad visible funciona.
+--
+-- El aparato ya la manda (ver vozSubir), pero esto es la otra mitad de
+-- la misma regla: si algún día otro cliente se olvida, la firma la pone
+-- la base con quien de verdad entró. No abre ninguna puerta —auth.uid()
+-- es el token de verdad, no algo que el navegador pueda escribir— y la
+-- política sigue comparándolo igual.
+alter table public.voz_prestada alter column puesto_por set default auth.uid();
+
 create index if not exists voz_prestada_idx on public.voz_prestada (actualizado desc);
 create index if not exists voz_prestada_voz_idx on public.voz_prestada (voz);
 

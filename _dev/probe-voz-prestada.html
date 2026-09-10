@@ -51,6 +51,11 @@ pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
    `#app-container`: con el panel escondido, la caja del texto mide 0×0
    y la sonda aprobaría una paginación que en la tableta no existe. */
 
+/* Quién entra, en la sonda. La herramienta lo saca de la sesión de
+   Supabase; aquí se le pone una de mentira para poder comprobar que la
+   fila sale FIRMADA, que es justo lo que faltaba. */
+const VOZ_UID = '11111111-1111-1111-1111-111111111111';
+
 const out = document.getElementById('out'), f = document.getElementById('f');
 const L = []; let fallos = 0;
 function log(s){ L.push(s); out.textContent = L.join('\n'); }
@@ -60,7 +65,7 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
 /* ── La base de datos de mentira ────────────────────────────────── */
 function nuevaBase(w, opciones){
   const o = opciones || {};
-  const estado = { filas: o.filas || [], llamadas: [] };
+  const estado = { filas: o.filas || [], llamadas: [], escritas: [] };
   w.fetch = async (url, init) => {
     const u = new URL(typeof url === 'string' ? url : url.url);
     const m = (init && init.method) || 'GET';
@@ -81,6 +86,32 @@ function nuevaBase(w, opciones){
     if (m === 'GET') {
       return new Response(JSON.stringify(estado.filas),
         { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    /* ⚠️ LA BASE DE MENTIRA EXIGE LO MISMO QUE LA DE VERDAD.
+       Antes aceptaba cualquier escritura y devolvía 201, así que la
+       sonda aprobaba una subida que en Supabase rebotaba: `puesto_por`
+       es `not null` y la política pide que sea quien entró. Eso fue el
+       fallo del 10 de septiembre de 2026 —el cuento se veía donde se
+       pegó y no llegaba nunca al otro aparato— y no lo cazó nadie
+       porque cada mitad se probaba por separado. Un doble complaciente
+       no prueba la costura: la esconde. Misma lección que el
+       `grant all` de la prueba del SQL y que postgrest-falso.js. */
+    let cuerpo = null;
+    try { cuerpo = JSON.parse(init && init.body); } catch (e) {}
+    const filas = Array.isArray(cuerpo) ? cuerpo : (cuerpo ? [cuerpo] : []);
+    for (const f of filas) {
+      if (!f.puesto_por) {
+        return new Response(JSON.stringify({ code: '23502',
+          message: 'null value in column "puesto_por" violates not-null constraint' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } });
+      }
+      if (f.puesto_por !== VOZ_UID) {
+        return new Response(JSON.stringify({ code: '42501',
+          message: 'new row violates row-level security policy' }),
+          { status: 403, headers: { 'Content-Type': 'application/json' } });
+      }
+      estado.filas = estado.filas.filter(x => x.cid !== f.cid).concat([f]);
+      estado.escritas.push(f);
     }
     return new Response('[]', { status: 201, headers: { 'Content-Type': 'application/json' } });
   };
@@ -111,7 +142,9 @@ function cuentoLargo(cid){
   await new Promise(r => f.addEventListener('load', r, { once: true }));
   await esperar(1200);
   const w = f.contentWindow, d = w.document;
-  nuevaBase(w, {});
+  const base = nuevaBase(w, {});
+  w.eval(`window.faroSb.auth.getSession = async () => (` +
+         `{ data: { session: { user: { id: ${JSON.stringify(VOZ_UID)} } } } })`);
 
   /* La aplicación arranca con `#app-container` escondido hasta que entra
      alguien. Sin esto todo mide 0×0 y las medidas de pantalla mienten. */
@@ -377,6 +410,63 @@ function cuentoLargo(cid){
      'borró la fila: otro aparato lo resucitaría en la siguiente sincronización');
   ok(Number(w.eval('_vozCuentos.filter(c => c.cid === "c-largo").length')) === 0,
      'y desaparece del anaquel', 'sigue en el anaquel después de retirarlo');
+
+  log('── 15. ⚠️ LO QUE SE GUARDA LLEGA A LA NUBE, Y FIRMADO ──');
+  /* La comprobación que faltaba y que costó el fallo. No basta con que
+     el cuento aparezca en el anaquel: eso es la copia del aparato, y se
+     ve igual de bien cuando la subida rebotó. Hay que mirar lo que
+     RECIBIÓ la nube. */
+  base.escritas.length = 0;
+  w.eval('vozAbrirPegar(null)');
+  await esperar(120);
+  d.getElementById('voz-pegar-txt').value = 'Una casa contaba.';
+  d.getElementById('voz-f-titulo').value = 'La casa firmada';
+  d.getElementById('voz-f-voz').value = 'un narrador de pueblo';
+  d.getElementById('voz-f-maquina').value = 'una máquina de prueba';
+  w.eval('vozPintarBotonGuardar()');
+  await w.eval('vozGuardarPegado()');
+  await esperar(400);
+  const subida = base.escritas.find(x => x.titulo === 'La casa firmada');
+  ok(!!subida, 'el cuento guardado llega de verdad a la nube',
+     '⚠️ el cuento se guardó SOLO en el aparato: en el otro no aparecería nunca');
+  ok(subida && subida.puesto_por === VOZ_UID,
+     'y va firmado con quien lo puso, que es lo que la tabla exige',
+     '⚠️ la fila sube SIN firmar: la base la rechaza y parece un problema de señal');
+  ok(subida && subida.voz && subida.maquina,
+     'y con su etiqueta dentro', 'la fila sube sin la etiqueta');
+
+  log('── 16. El botón ✏️ de la ficha abre la hoja de verdad ──');
+  /* Se TOCA el botón, no se llama a la función: el botón llamaba a una
+     función que no existía y la sonda no se enteró porque abría la hoja
+     por dentro. Lo que no se toca, no se prueba. */
+  w.eval(`_vozCuentos = [${JSON.stringify(cuentoLargo('c-edit'))}];
+          _vozCuentos[0].puesto_por = ${JSON.stringify(VOZ_UID)}; vozRender()`);
+  await esperar(200);
+  const botones = [...d.querySelectorAll('.voz-ficha .voz-btn')];
+  const lapiz = botones.find(b => b.textContent.indexOf('✏') > -1);
+  ok(!!lapiz && !lapiz.disabled, 'el cuento propio ofrece corregirse',
+     'no hay botón de corregir en un cuento propio');
+  let reventó = '';
+  w.onerror = e => { reventó = String(e); };
+  if (lapiz) lapiz.click();
+  await esperar(250);
+  ok(!reventó, 'y tocarlo no revienta (' + (reventó || 'sin error') + ')',
+     '⚠️ tocar ✏️ revienta: ' + reventó);
+  ok(d.getElementById('voz-pegar-overlay').style.display === 'flex',
+     'y abre la hoja con el cuento dentro', 'el botón no abrió nada');
+  w.eval('vozCerrarPegar()');
+  await esperar(120);
+
+  /* Y el de otra persona no se ofrece: lo impide la seguridad por fila,
+     y un botón que la base va a rechazar es una promesa que no se puede
+     cumplir. */
+  w.eval(`_vozCuentos[0].puesto_por = 'de-otra-persona'; vozRender()`);
+  await esperar(200);
+  const lapiz2 = [...d.querySelectorAll('.voz-ficha .voz-btn')]
+    .find(b => b.textContent.indexOf('✏') > -1);
+  ok(lapiz2 && lapiz2.disabled,
+     'y el cuento de otra persona no ofrece corregirse',
+     'ofrece corregir un cuento ajeno, que la base va a rechazar');
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas dos últimas se hacen en EL MISMO marco, cambiándole la base

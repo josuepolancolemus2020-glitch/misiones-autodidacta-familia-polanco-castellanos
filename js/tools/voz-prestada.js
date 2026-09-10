@@ -522,18 +522,92 @@ async function vozBajar() {
   return data || [];
 }
 
+/* ⚠️ QUIÉN SOY, Y POR QUÉ HAY QUE MANDARLO A MANO.
+   `puesto_por` es `not null` y la política de escritura exige que sea el
+   identificador de quien entró (`puesto_por = auth.uid()`). O sea que una
+   fila sin ese campo NO ENTRA: rebota con «null value in column
+   puesto_por» o con la seguridad por fila, según cuál muerda primero.
+
+   El 10 de septiembre de 2026 se subió la herramienta sin esta línea y
+   el fallo se vio así: el cuento se guardaba, se veía en el aparato
+   donde se pegó, y no aparecía nunca en el otro. Desde fuera parece un
+   problema de señal, y no lo es: la escritura llegaba y la base la
+   rechazaba.
+
+   Se escapó porque las dos mitades se probaron por separado —la prueba
+   del SQL escribía `puesto_por` a mano y la base de mentira de la sonda
+   aceptaba cualquier escritura sin mirar—, y la costura entre las dos no
+   la probó nadie. Ahora la sonda la mira (comprobación 15). */
+let _vozYo = null;
+
+async function vozYo() {
+  if (_vozYo) return _vozYo;
+  const sb = vozSb();
+  if (!sb || !sb.auth) return null;
+  try {
+    const { data } = await sb.auth.getSession();
+    _vozYo = (data && data.session && data.session.user && data.session.user.id) || null;
+  } catch (e) { _vozYo = null; }
+  return _vozYo;
+}
+
 async function vozSubir(c) {
   const sb = vozSb();
   if (!sb || !_vozHayTabla) return { ok: false, motivo: 'sin-nube' };
+  const yo = await vozYo();
+  if (!yo) return { ok: false, motivo: 'sin-sesion' };
+
   const fila = {
     cid: c.cid, titulo: c.titulo, voz: c.voz, maquina: c.maquina,
     encargo: c.encargo || null, nota: c.nota || null,
     capitulos: c.capitulos || [], palabras: c.palabras || 0,
     borrado: !!c.borrado, actualizado: c.actualizado || Date.now(),
+    puesto_por: yo,
   };
   const { error } = await vozConReloj(sb.from(VOZ_TABLE).upsert(fila, { onConflict: 'cid' }));
-  if (error) return { ok: false, motivo: error.message || 'error' };
+  if (error) {
+    /* Se distinguen tres motivos porque los tres se arreglan de manera
+       distinta, y decir el que no es manda a buscar donde no está. */
+    if (error.code === 'FARO_RELOJ') return { ok: false, motivo: 'sin-senal' };
+    if (error.code === '42501' || error.code === '23502' ||
+        /row-level security|violates check|no cambia de dueño/i.test(error.message || '')) {
+      return { ok: false, motivo: 'ajeno', detalle: error.message || '' };
+    }
+    return { ok: false, motivo: 'error', detalle: error.message || '' };
+  }
   return { ok: true };
+}
+
+/* ⚠️ LO QUE NO SUBIÓ SE REINTENTA DE VERDAD, y esto no es un adorno:
+   antes la pantalla decía «subirá cuando vuelva la señal» y NADA lo
+   volvía a intentar nunca. Prometer un reintento que no existe es peor
+   que decir que falló, porque el que lo lee deja de vigilarlo.
+   Corre al abrir la herramienta, después de saber qué hay en la nube, y
+   solo con lo PROPIO: una fila ajena no se puede escribir —lo impide la
+   seguridad por fila— y reintentarla sería insistir cada vez para nada. */
+async function vozSubirPendientes(nube) {
+  const yo = await vozYo();
+  if (!yo || !_vozHayTabla) return 0;
+  const enNube = new Map((nube || []).map(c => [c.cid, c.actualizado || 0]));
+  const pendientes = vozLeeLocal().filter(c =>
+    c && c.cid && (!c.puesto_por || c.puesto_por === yo) &&
+    (!enNube.has(c.cid) || enNube.get(c.cid) < (c.actualizado || 0)));
+  if (!pendientes.length) return 0;
+
+  let subidos = 0;
+  for (const c of pendientes) {
+    const r = await vozSubir(c);
+    if (!r.ok) continue;
+    subidos++;
+    /* Se apunta el dueño en la copia del aparato para no volver a
+       mirarla en el próximo arranque. */
+    c.puesto_por = yo;
+    const todos = vozLeeLocal().map(x => (x.cid === c.cid ? c : x));
+    try { localStorage.setItem(VOZ_LOCAL, JSON.stringify(todos)); } catch (e) {}
+    const enMemoria = _vozCuentos.find(x => x.cid === c.cid);
+    if (enMemoria) enMemoria.puesto_por = yo;
+  }
+  return subidos;
 }
 
 function vozRotuloNube() {
@@ -558,6 +632,12 @@ async function initVozPrestada() {
   if (nube) {
     _vozCuentos = vozFusiona(vozLeeLocal(), nube);
     vozGuardaLocal();
+    vozRender();
+    /* Y lo que se guardó sin señal sube AHORA. Ver vozSubirPendientes. */
+    const subidos = await vozSubirPendientes(nube);
+    if (subidos && typeof showToast === 'function') {
+      showToast('☁️ ' + subidos + (subidos === 1 ? ' cuento que faltaba ya subió' : ' cuentos que faltaban ya subieron'));
+    }
   }
   vozRender();
 }
@@ -728,11 +808,17 @@ function vozFicha(c) {
   copiar.addEventListener('click', () => vozCopiar(c));
   pie.appendChild(copiar);
 
+  /* ⚠️ Corregir y retirar SOLO se ofrecen en lo propio. Lo impide de
+     verdad la seguridad por fila, no esta línea; pero enseñar un botón
+     que la base va a rechazar es prometer algo que no se puede hacer, y
+     el que lo toca se queda pensando que la aplicación falló. */
+  const mio = !c.puesto_por || !_vozYo || c.puesto_por === _vozYo;
   const edit = vozNodo('button', 'voz-btn', '✏️');
   edit.type = 'button';
-  edit.title = 'Corregir la ficha';
-  edit.setAttribute('aria-label', 'Corregir la ficha');
-  edit.addEventListener('click', () => vozAbrirFicha(c));
+  edit.disabled = !mio;
+  edit.title = mio ? 'Corregir la ficha' : 'Lo puso otra persona de la casa';
+  edit.setAttribute('aria-label', edit.title);
+  if (mio) edit.addEventListener('click', () => vozAbrirPegar(c));
   pie.appendChild(edit);
 
   cuerpo.appendChild(pie);
@@ -1513,6 +1599,10 @@ async function vozGuardarPegado() {
     borrado: false,
     creado_at: viejo ? viejo.creado_at : new Date().toISOString(),
     actualizado: Date.now(),
+    /* Se firma también en la copia del aparato: es lo que deja saber,
+       sin preguntarle a la nube, qué cuentos son míos y cuáles no —para
+       no ofrecer corregir el de otro y para no reintentar su subida—. */
+    puesto_por: (viejo && viejo.puesto_por) || _vozYo || null,
   };
 
   _vozCuentos = [c].concat(_vozCuentos.filter(x => x.cid !== c.cid));
@@ -1521,12 +1611,18 @@ async function vozGuardarPegado() {
   vozRender();
 
   const res = await vozSubir(c);
-  if (!res.ok && typeof showToast === 'function') {
-    showToast(res.motivo === 'sin-nube'
-      ? '📴 Guardado en este aparato'
-      : '📡 Guardado aquí; subirá cuando vuelva la señal');
-  } else if (res.ok && typeof showToast === 'function') {
-    showToast('📖 Guardado en el anaquel');
+  if (typeof showToast === 'function') {
+    /* ⚠️ Cada motivo se dice como es. «Subirá cuando vuelva la señal»
+       puesto en todos los casos era mentira en dos de ellos: con la
+       tabla sin instalar no va a subir nunca, y con un cuento ajeno
+       tampoco por mucho que vuelva la señal. Un aviso que se equivoca de
+       causa manda a mirar donde no está el problema. */
+    if (res.ok) showToast('📖 Guardado, y ya está en los demás aparatos');
+    else if (res.motivo === 'sin-nube')   showToast('📴 Guardado aquí. Falta correr voz_prestada.sql para que viaje');
+    else if (res.motivo === 'sin-sesion') showToast('📴 Guardado aquí. Entra en F.A.R.O para que viaje');
+    else if (res.motivo === 'sin-senal')  showToast('📡 Guardado aquí. Subirá solo la próxima vez que abras esto');
+    else if (res.motivo === 'ajeno')      showToast('✋ Ese cuento lo puso otra persona: solo quien lo puso puede corregirlo');
+    else showToast('⚠️ Guardado aquí, pero la nube lo rechazó: ' + (res.detalle || 'sin detalle'));
   }
   vozRender();
 }

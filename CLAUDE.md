@@ -1145,6 +1145,51 @@ el diseño.
    personas: una posición común significa que la hija abre el cuento por donde
    iba el padre y el marcador de los dos se pierde a la vez.
 
+13. ⚠️ **LA FILA VA FIRMADA, Y LAS DOS MITADES SE PRUEBAN JUNTAS.**
+   `puesto_por` es `not null` y la política de escritura exige que sea quien
+   entró, así que **una fila sin firmar no entra**. El aparato la manda
+   (`vozYo()`, desde la sesión) y la base tiene el respaldo puesto
+   (`default auth.uid()`): si algún día otro cliente se olvida, la firma ella.
+
+   Está escrito aquí porque el fallo ya pasó, el 10 de septiembre de 2026, el
+   mismo día de estrenarla: el aparato no mandaba `puesto_por` y **el síntoma
+   no se parecía en nada a la causa**. El cuento se guardaba, se veía en el
+   aparato donde se pegó, y no aparecía nunca en el otro. Desde fuera eso es
+   un problema de señal; en realidad la escritura llegaba y la base la
+   rechazaba. La mitad visible funcionaba perfectamente.
+
+   ⚠️ **Y la lección que vale para toda la casa, no solo para aquí: las dos
+   mitades estaban bien y la costura entre ellas no la probó nadie.** La
+   prueba del SQL escribía `puesto_por` a mano —así que la tabla aprobaba— y
+   la base de mentira de la sonda aceptaba cualquier escritura y devolvía
+   201 —así que la pantalla aprobaba—. Cada doble era complaciente justo en
+   el sitio donde el otro no miraba. Por eso ahora **la base de mentira
+   exige lo mismo que la de verdad**: sin `puesto_por` devuelve 23502, y con
+   uno ajeno devuelve 42501. Un doble complaciente no prueba la costura: la
+   esconde. Es la misma regla que el `grant all` de la prueba del SQL y que
+   `postgrest-falso.js`, y se comprueba de la única manera que vale:
+   **quitando el arreglo y viendo que la sonda suspende**.
+
+   Del mismo día y de la misma clase: el botón ✏️ de la ficha llamaba a una
+   función que no existía y **habría reventado al tocarlo**. No lo cazó
+   nadie porque la sonda abría la hoja llamando a la función por dentro. Lo
+   que no se toca, no se prueba: la comprobación 16 **pulsa el botón**.
+
+14. ⚠️ **LO QUE NO SUBIÓ SE REINTENTA DE VERDAD, Y LOS AVISOS DICEN LA CAUSA.**
+   La primera versión decía «subirá cuando vuelva la señal» y **nada lo
+   volvía a intentar nunca**. Prometer un reintento que no existe es peor que
+   decir que falló, porque quien lo lee deja de vigilarlo. Ahora
+   `vozSubirPendientes()` corre al abrir, después de saber qué hay en la
+   nube, y sube lo propio que allá falte o esté más viejo — solo lo PROPIO,
+   porque una fila ajena la rechaza la seguridad por fila y reintentarla
+   sería insistir cada vez para nada.
+   Y el aviso nombra el motivo, que son cuatro y se arreglan distinto: falta
+   correr el SQL, no hay sesión, no hay señal, o el cuento es de otro. Un
+   aviso que se equivoca de causa manda a mirar donde no está el problema.
+   Por lo mismo, **corregir y retirar solo se ofrecen en lo propio**: lo
+   impide la seguridad por fila, pero enseñar un botón que la base va a
+   rechazar es prometer algo que no se puede hacer.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -1163,6 +1208,11 @@ letra a 30 px y comprueba que **el mismo párrafo sigue a la vista**. Eso no se
 ve llamando funciones: hay que medir la pantalla. Y para medir se abre la vista
 con `switchView` y se enseña `#app-container`, porque con el panel escondido la
 caja mide 0×0 y la sonda aprobaría una paginación que en la tableta no existe.
+
+La comprobación **15** es la que faltaba el día del estreno y la que hay que
+entender antes de tocar la subida: **no basta con que el cuento aparezca en el
+anaquel**. Eso es la copia del aparato, y se ve igual de bien cuando la subida
+rebotó. Hay que mirar lo que RECIBIÓ la nube, y que llegó firmado.
 
 ⚠️ Las dos últimas comprobaciones reutilizan **el mismo marco**, cambiándole la
 base de mentira, en vez de abrir un segundo `index.html`: un segundo marco del

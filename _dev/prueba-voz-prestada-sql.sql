@@ -164,6 +164,23 @@ begin
 end $$;
 \echo '  ✔ 1e. y una vez guardada, la etiqueta ya no se puede vaciar'
 
+-- ⚠️ Y SI EL APARATO SE OLVIDA DE FIRMAR, FIRMA LA BASE.
+-- Es el fallo del 10 de septiembre de 2026: `puesto_por` es `not null`,
+-- el aparato no lo mandaba y la fila rebotaba. El cuento se veía donde
+-- se pegó y no llegaba nunca al otro aparato, que desde fuera parece un
+-- problema de señal. El aparato ya lo manda; esto comprueba el respaldo.
+do $$
+declare quien uuid;
+begin
+  insert into public.voz_prestada (cid, titulo, voz, maquina, capitulos)
+  values ('c-sin-firma', 'Sin firmar', 'una voz', 'Claude', pg_temp.cuerpo());
+  select puesto_por into quien from public.voz_prestada where cid = 'c-sin-firma';
+  if quien is distinct from auth.uid() then
+    raise exception '1f. la fila sin firmar no quedó a nombre de quien entró (quedó %)', quien;
+  end if;
+end $$;
+\echo '  ✔ 1f. y si el aparato se olvida de firmar la fila, la firma la base'
+
 -- ════════════════════════════════════════════════════════════════════
 -- 2. EL CUERPO ES UNA LISTA, Y NO CRECE SIN FRENO
 -- ════════════════════════════════════════════════════════════════════
@@ -265,7 +282,7 @@ do $$
 declare n int;
 begin
   select count(*) into n from public.voz_prestada;
-  if n <> 1 then raise exception '4e. siendo de la casa se ven % cuentos (esperaba 1)', n; end if;
+  if n <> 2 then raise exception '4e. siendo de la casa se ven % cuentos (esperaba 2)', n; end if;
   insert into public.voz_prestada (cid, titulo, voz, maquina, capitulos, puesto_por)
   values ('c-2', 'El faro que no era', 'una voz de informe', 'Claude',
           pg_temp.cuerpo(), auth.uid());
@@ -285,7 +302,7 @@ do $$
 declare n int;
 begin
   select count(*) into n from public.voz_prestada;
-  if n <> 2 then raise exception '5a. otro de la casa ve % cuentos (esperaba 2)', n; end if;
+  if n <> 3 then raise exception '5a. otro de la casa ve % cuentos (esperaba 3)', n; end if;
 
   update public.voz_prestada set titulo = 'Pisado' where cid = 'c-1';
   if found then raise exception '5b. otro de la casa PUDO corregir un cuento ajeno'; end if;
