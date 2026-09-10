@@ -93,6 +93,13 @@ create table if not exists public.voz_prestada (
   voz           text not null,
   maquina       text not null,
 
+  -- El género: cuento, ensayo, poema, carta… La LISTA vive en el
+  -- aparato (VOZ_GENEROS, en js/tools/voz-prestada.js), no aquí: este
+  -- `check` solo mira el largo, para que añadir un género sea una línea
+  -- en un archivo y no una migración que alguien pega desde una tableta.
+  -- Es la regla 8 de la repisa de enlaces.
+  genero        text not null default 'cuento',
+
   -- El encargo con el que salió. Se guarda porque es lo ÚNICO que hace
   -- repetible una pieza generada: es lo que separa «cuento hecho con
   -- IA» —que no dice nada— de una ficha. Misma razón que el prompt de
@@ -121,6 +128,17 @@ create table if not exists public.voz_prestada (
   guardado_at   timestamptz not null default now()
 );
 
+-- ── La columna que llegó después ────────────────────────────────────
+-- ⚠️ `genero` ENTRÓ EL 10 DE SEPTIEMBRE DE 2026, DESPUÉS DE LA TABLA.
+-- El `create table if not exists` de arriba NO añade columnas a una
+-- tabla que ya existe: si este archivo se corrió el día del estreno, la
+-- tabla está y le falta esta columna. Por eso va aparte y con
+-- `if not exists`: en una base recién creada no hace nada, y en la del
+-- estreno añade la columna sin tocar ni un cuento. Mientras no se
+-- vuelva a correr, la herramienta lo dice en su barra («la base va
+-- vieja») y guarda el género solo en el aparato.
+alter table public.voz_prestada add column if not exists genero text not null default 'cuento';
+
 -- ── Los `check` que se tiran y se vuelven a poner ───────────────────
 -- ⚠️ SE TIRAN Y SE VUELVEN A PONER, NO SE AÑADEN «SI NO EXISTEN».
 --   Con `if not exists`, re-correr el archivo después de cambiar un
@@ -129,6 +147,13 @@ create table if not exists public.voz_prestada (
 alter table public.voz_prestada drop constraint if exists voz_prestada_etiqueta;
 alter table public.voz_prestada add constraint voz_prestada_etiqueta check (
   length(btrim(voz)) between 2 and 120 and length(btrim(maquina)) between 2 and 120
+);
+
+-- El género es una palabra corta. No se cierra a una lista: ver la
+-- nota de la columna.
+alter table public.voz_prestada drop constraint if exists voz_prestada_genero;
+alter table public.voz_prestada add constraint voz_prestada_genero check (
+  length(btrim(genero)) between 1 and 30
 );
 
 -- El cuerpo tiene que ser una LISTA, tener al menos un capítulo y no
@@ -266,7 +291,7 @@ revoke execute on function public.voz_prestada_higiene() from public, anon, auth
 with c(orden, que, esperado, hay) as (
             select 1, 'tabla voz_prestada', 'existe',
                    case when to_regclass('public.voz_prestada') is null then 'NO ESTÁ' else 'existe' end
-  union all select 2, 'columnas (han de ser 13)', '13',
+  union all select 2, 'columnas (han de ser 14)', '14',
                    (select count(*)::text from information_schema.columns
                      where table_schema = 'public' and table_name = 'voz_prestada')
   union all select 3, 'políticas (select, insert, update)', '3',
@@ -282,6 +307,11 @@ with c(orden, que, esperado, hay) as (
   union all select 6, 'check del cuerpo (lista y tope)', 'existe',
                    case when exists (select 1 from pg_constraint
                                       where conname = 'voz_prestada_cuerpo')
+                        then 'existe' else 'NO ESTÁ' end
+  union all select 11, 'columna genero (del 10/9/2026)', 'existe',
+                   case when exists (select 1 from information_schema.columns
+                                      where table_schema = 'public' and table_name = 'voz_prestada'
+                                        and column_name = 'genero')
                         then 'existe' else 'NO ESTÁ' end
   union all select 7, 'disparador (hora y dueño)', 'existe',
                    case when to_regproc('public.voz_prestada_guarda') is null

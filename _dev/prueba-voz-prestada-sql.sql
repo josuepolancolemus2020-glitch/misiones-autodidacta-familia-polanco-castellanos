@@ -67,7 +67,22 @@ create or replace function auth.uid() returns uuid
 create or replace function public.es_familia() returns boolean
   language sql stable as $$ select false $$;
 
-\echo '── Corriendo supabase/sql/voz_prestada.sql ──'
+-- ⚠️ PRIMERO SE DEJA LA TABLA COMO QUEDÓ EL DÍA DEL ESTRENO, SIN LA
+-- COLUMNA `genero`. Es el camino que de verdad va a recorrer la base del
+-- autor: la tabla ya existe, y el archivo nuevo tiene que AÑADIR la
+-- columna con `add column if not exists`, porque un `create table if not
+-- exists` no toca una tabla que ya está. Si esta prueba arrancara con la
+-- base vacía, aprobaría sin haber probado la migración.
+create table public.voz_prestada (
+  cid text primary key, titulo text not null, voz text not null, maquina text not null,
+  encargo text, nota text, capitulos jsonb not null default '[]'::jsonb,
+  palabras integer not null default 0, borrado boolean not null default false,
+  puesto_por uuid not null references auth.users(id) on delete cascade,
+  actualizado bigint not null default 0,
+  creado_at timestamptz not null default now(), guardado_at timestamptz not null default now()
+);
+
+\echo '── Corriendo supabase/sql/voz_prestada.sql sobre la tabla del estreno ──'
 \i supabase/sql/voz_prestada.sql
 \echo '── Y otra vez, que tiene que ser idempotente ──'
 \i supabase/sql/voz_prestada.sql
@@ -98,10 +113,16 @@ begin
   if n <> 1 then raise exception '0b. disparadores duplicados o faltantes: % (esperaba 1)', n; end if;
 
   select count(*) into n from pg_constraint
-   where conname in ('voz_prestada_etiqueta', 'voz_prestada_cuerpo');
-  if n <> 2 then raise exception '0c. checks duplicados o faltantes: % (esperaba 2)', n; end if;
+   where conname in ('voz_prestada_etiqueta', 'voz_prestada_cuerpo', 'voz_prestada_genero');
+  if n <> 3 then raise exception '0c. checks duplicados o faltantes: % (esperaba 3)', n; end if;
+
+  -- Y la tabla del estreno recibió su columna nueva, con 14 en total.
+  select count(*) into n from information_schema.columns
+   where table_schema = 'public' and table_name = 'voz_prestada';
+  if n <> 14 then raise exception '0d. la tabla tiene % columnas (esperaba 14: falta o sobra genero)', n; end if;
 end $$;
 \echo '  ✔ 0. correrlo dos veces no duplica políticas, disparadores ni checks'
+\echo '  ✔ 0d. y a la tabla del estreno le añadió la columna genero sin tocar nada más'
 
 -- ════════════════════════════════════════════════════════════════════
 -- 1. EL CHECK DE LA ETIQUETA MUERDE
@@ -180,6 +201,26 @@ begin
   end if;
 end $$;
 \echo '  ✔ 1f. y si el aparato se olvida de firmar la fila, la firma la base'
+
+-- ⚠️ EL GÉNERO: una fila sin él (un aparato con el código del estreno)
+-- entra como «cuento», y una con el género vacío no entra. La lista de
+-- géneros NO vive en la base —a propósito—, así que aquí solo se prueba
+-- el largo.
+do $$
+declare g text;
+begin
+  select genero into g from public.voz_prestada where cid = 'c-1';
+  if g is distinct from 'cuento' then
+    raise exception '1g. una fila sin género no quedó como «cuento» (quedó %)', g;
+  end if;
+  update public.voz_prestada set genero = 'ensayo' where cid = 'c-1';
+  begin
+    update public.voz_prestada set genero = '   ' where cid = 'c-1';
+    raise exception '1h. ENTRÓ un género vacío';
+  exception when check_violation then null;
+  end;
+end $$;
+\echo '  ✔ 1g. una fila sin género entra como «cuento», y 1h. un género vacío no entra'
 
 -- ════════════════════════════════════════════════════════════════════
 -- 2. EL CUERPO ES UNA LISTA, Y NO CRECE SIN FRENO

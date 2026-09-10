@@ -39,7 +39,11 @@ with n as (
     (select count(*) from pg_trigger t join pg_class c on c.oid = t.tgrelid
       where c.relname = 'voz_prestada' and not t.tgisinternal)              as disparadores,
     (select count(*) from pg_constraint
-      where conname in ('voz_prestada_etiqueta', 'voz_prestada_cuerpo'))    as checks,
+      where conname in ('voz_prestada_etiqueta', 'voz_prestada_cuerpo',
+                        'voz_prestada_genero'))                             as checks,
+    (select count(*) from information_schema.columns
+      where table_schema = 'public' and table_name = 'voz_prestada'
+        and column_name = 'genero')                                         as col_genero,
     -- Los cuentos que hay, y los retirados con lápida. Con query_to_xml,
     -- que recibe la consulta como TEXTO y solo la mira si se llega a
     -- ella: si la tabla no existe, esta rama ni se ejecuta en vez de
@@ -66,10 +70,11 @@ select * from (
             select 1 as orden, 'tabla voz_prestada' as que, 'existe' as esperado,
                    case when to_regclass('public.voz_prestada') is null then 'NO ESTÁ' else 'existe' end as hay
               from n
-  union all select 2, 'columnas', '13', cols::text from n
+  union all select 2, 'columnas (14 desde el 10/9/2026)', '14', cols::text from n
   union all select 3, 'políticas (select, insert, update)', '3', pols::text from n
   union all select 4, 'seguridad por fila', 'true', coalesce(rls::text, 'NO') from n
-  union all select 5, 'checks con nombre (etiqueta y cuerpo)', '2', checks::text from n
+  union all select 5, 'checks con nombre (etiqueta, cuerpo y género)', '3', checks::text from n
+  union all select 13, 'columna genero (si dice 0, re-correr voz_prestada.sql)', '1', col_genero::text from n
   union all select 6, 'disparador (hora y dueño)', '1', disparadores::text from n
   union all select 7, 'higiene de lápidas', 'existe',
                    case when to_regproc('public.voz_prestada_higiene') is null

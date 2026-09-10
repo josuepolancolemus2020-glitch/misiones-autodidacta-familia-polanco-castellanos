@@ -936,11 +936,13 @@ la puerta. Sin esa línea aprobaría por el motivo equivocado —rebotaría por
 falta de permiso de tabla— y no habría probado la seguridad por fila, que es
 lo único que de verdad guarda esto en la base de verdad.
 
-## Normativa: los cuentos de encargo se leen en La Voz Prestada
+## Normativa: los textos de encargo se leen en La Voz Prestada
 
 **Pedido por el autor el 10 de septiembre de 2026:** «necesito una nueva
 herramienta para poder leer como en formato epub, algunos cuentos que le pido a
-esta IA que me redacte con las voces de otros escritores».
+esta IA que me redacte con las voces de otros escritores». **Y ampliado ese
+mismo día:** que sirva, «lo más profesional» posible, para leer en línea con
+ese formato cuentos, ensayos y textos importantes «de diferentes géneros».
 
 Vive en `js/tools/voz-prestada.js` y `css/voz-prestada.css`, con su tabla en
 `supabase/sql/voz_prestada.sql` y la comprobación aparte en
@@ -951,17 +953,17 @@ herramienta se pasa el día recordando.
 
 **NO es Redacción y NO es la repisa de enlaces**, aunque las tres guarden
 texto. Redacción escribe lo de la casa; la repisa cuelga material de repaso
-dentro de una misión; esta guarda **piezas de ficción escritas por una máquina
-imitando una voz ajena**, que es un objeto con un problema propio y por eso
-tiene herramienta propia.
+dentro de una misión; esta guarda **piezas escritas por una máquina imitando
+una voz ajena** —cuentos, ensayos, poemas, cartas, discursos—, que es un objeto
+con un problema propio y por eso tiene herramienta propia.
 
-Qué resuelve: un cuento de encargo vivía dentro de una ventana de chat, o sea
+Qué resuelve: un texto de encargo vivía dentro de una ventana de chat, o sea
 que a los tres días no existía —no se encontraba, no se sabía por dónde iba uno
 y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Doce reglas, y ninguna es de adorno:**
+**Veinte reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -971,10 +973,13 @@ el diseño.
    a la máquina, más falta hace la etiqueta.
 
    Por eso `voz` (a quién se imita) y `maquina` (qué lo escribió) viajan
-   pegadas al cuento **en cuatro sitios, y los cuatro hacen falta**: la ficha
-   del anaquel, la **portada** —que es la primera página de todo cuento y no se
+   pegadas al texto **en cuatro sitios, y los cuatro hacen falta**: la ficha
+   del anaquel, la **portada** —que es la primera página de todo texto y no se
    puede quitar—, el pie de todas las páginas, y **dentro de lo que copia el
-   botón 📋**. No existe ningún botón que copie el cuento pelado.
+   botón 📋 y de lo que manda el botón 📤 de compartir**. No existe ningún botón
+   que saque el texto pelado. La portada dice además el género con su nombre
+   («Ensayo escrito por Claude.»), para que un ensayo no salga rotulado como
+   cuento.
 
    Es la regla de oro del Estudio Mayor («ninguna fuente entra sin su
    etiqueta») y la de la repisa («lo que hace la máquina va etiquetado»),
@@ -996,13 +1001,14 @@ el diseño.
    botón copia solo lo de debajo, porque ese texto tiene un único destino —la
    descripción pública de un video— y una nota interna pegada ahí sería el
    autor confesando en público lo que no comprobó. Aquí el destino es
-   cualquiera: otro chat, un correo, la carpeta de alguien. Y por eso mismo la
-   etiqueta tiene que ir **delante y dentro**: un cuento que sale de aquí sin
-   ella es, a partir del siguiente reenvío, un cuento atribuido a esa persona.
-   Quien conozca la regla de El Rodaje va a querer «arreglar» esta al revés;
-   está escrito en el código para que no lo haga.
+   cualquiera: otro chat, un correo, la carpeta de alguien, WhatsApp desde la
+   hoja de compartir. Y por eso mismo la etiqueta tiene que ir **delante y
+   dentro**: un texto que sale de aquí sin ella es, a partir del siguiente
+   reenvío, un texto atribuido a esa persona. Quien conozca la regla de El
+   Rodaje va a querer «arreglar» esta al revés; está escrito en el código para
+   que no lo haga.
 
-3. ⚠️ **EL CUENTO SE PEGA DE GOLPE, Y LO QUE NO SE ENTIENDE SE QUEDA COMO
+3. ⚠️ **EL TEXTO SE PEGA DE GOLPE, Y LO QUE NO SE ENTIENDE SE QUEDA COMO
    PROSA.** Misma regla que el guion de El Rodaje y las preguntas de los
    videos, y por lo mismo: el texto ya viene escrito en otra ventana y
    trocearlo a mano en una tableta son doscientos toques.
@@ -1011,20 +1017,54 @@ el diseño.
    archivo, así que va escrita antes de tocar ninguna:**
 
    > equivocarse hacia «esto es prosa» cuesta un índice;
-   > equivocarse hacia «esto es un título» **PARTE EL CUENTO**.
+   > equivocarse hacia «esto es un título» **PARTE EL TEXTO**.
 
-   Lo primero se arregla leyendo —el cuento se lee igual de bien de corrido—.
+   Lo primero se arregla leyendo —el texto se lee igual de bien de corrido—.
    Lo segundo mete un salto de página en mitad de una frase **y parece que
    funcionó**: sale su índice, salen sus páginas, todo. Solo se descubre
-   leyendo el cuento entero, que es cuando ya no se está mirando la
+   leyendo el texto entero, que es cuando ya no se está mirando la
    herramienta. Es el fallo del lector de guiones de El Rodaje, mordiendo el
    doble.
 
-   Por eso una línea pelada solo asciende a cabecera si se corrobora de una de
-   tres maneras —la palabra «Capítulo» **con su número u ordinal**, un número o
-   un romano **a solas**, o un rótulo **EN MAYÚSCULAS**—, y en las tres tiene
-   que estar sola entre blancos. Las almohadillas (`##`) son inequívocas y no
+   Por eso una línea pelada solo asciende a cabecera si se corrobora —la
+   palabra «Capítulo» con su número u ordinal, un número o un romano **a
+   solas o con su título corto** («I. El pozo»), un rótulo **EN MAYÚSCULAS**,
+   o una **negrita sola, corta y sin punto final**—, y casi siempre tiene que
+   estar sola entre blancos. Las almohadillas (`##`) son inequívocas y no
    necesitan nada. Ante la duda, prosa: siempre.
+
+   **Lo que entiende, porque es lo que una máquina escribe de verdad**, y se
+   añadió el 10 de septiembre de 2026 al abrir la herramienta a los ensayos:
+   `> cita` para las citas (y una cita antes del primer capítulo es el
+   **epígrafe**, que va en su propia página entre la portada y el capítulo
+   uno, como en un libro); `- `, `* `, `• ` y `1. ` para las **listas**; `###`
+   para los **subtítulos** de dentro de un capítulo; `---` arriba y abajo de
+   las etiquetas como cerca de cabecera y no como salto de escena; **«FIN»**
+   a solas como marca del final y no como un capítulo con cero párrafos; y la
+   **primera línea pelada como título si debajo vienen las etiquetas**.
+   ⚠️ **El nivel de almohadilla más alto que use el texto es el de
+   capítulo**, y lo más hondo es subtítulo: un ensayo con `##` secciones y
+   `###` subsecciones no sale con veinte capítulos. Y un `###` suelto en un
+   texto que trae sus capítulos pelados («Capítulo 1:», «II») es subtítulo,
+   no capítulo. **Dos negritas en serie son dos capítulos**; una sola, sin
+   nada delante, es el título: un título es único y los capítulos vienen en
+   serie (`vozHaySiguienteIgual`).
+   ⚠️ **Y con varios capítulos y sin título, el título se queda vacío y la
+   hoja lo pide**: ponerle al libro el nombre de su primer capítulo sin
+   decirlo se descubre a los seis meses. Con un solo capítulo que sí lo
+   traiga, ese es el título y se le quita al capítulo para que no salga dos
+   veces.
+
+   ⚠️ **LOS VERSOS SON LA ÚNICA EXCEPCIÓN A LA ASIMETRÍA, Y POR UN MOTIVO
+   CONCRETO: JUNTARLOS DESTRUYE EL POEMA SIN AVISAR Y SIN VUELTA ATRÁS**,
+   porque el texto crudo no se guarda. Tres o más renglones cortos seguidos se
+   quedan con sus saltos (`vozParecenVersos`); si eran prosa a un renglón por
+   frase salen feos pero enteros, y se arreglan desde ✏️. Lo que separa una
+   cosa de otra es el punto: renglones que son **frases** —casi todos acaban
+   en punto y no son brevísimos— son prosa; la sonda lo vigila con el mismo
+   párrafo de siete renglones de la comprobación 2. Un `Género: poema` y el
+   interruptor «Respetar los saltos de línea» fuerzan los versos en todo el
+   texto, hasta con renglones largos.
 
 4. ⚠️ **Y LAS ETIQUETAS SE MIRAN ANTES QUE LAS CABECERAS.** Al revés, «Nota:
    se escribió de un tirón» —que es como se escribe sin acordarse de nada—
@@ -1036,31 +1076,72 @@ el diseño.
    se abriría y sus líneas se irían al anterior—. `vozClaveEtiqueta` devuelve
    vacío en cuanto ve un dígito, una almohadilla o un corchete.
    **Las etiquetas solo valen ARRIBA**, hasta el primer párrafo de prosa, para
-   que un «Nota:» dicho por un personaje no se salga del cuento.
+   que un «Nota:» dicho por un personaje no se salga del cuento. Valen también
+   con viñeta delante (`- **Voz:** Rulfo`), que es como las escribe una
+   máquina que hace listas de todo, y `Género:` es una de ellas.
    ⚠️ **Y lo que intentaba ser una etiqueta y no se entendió se NOMBRA**, con
-   su renglón, y se queda dentro del cuento: un rechazo callado se ve desde
-   fuera igual que un rechazo, y el autor vuelve a pegar.
+   su renglón, y se queda dentro del texto: un rechazo callado se ve desde
+   fuera igual que un rechazo, y el autor vuelve a pegar. Solo se marca lo que
+   lo intentaba: un rótulo en mayúsculas, o una o dos palabras con dos puntos
+   **entre otras etiquetas que sí se entendieron**; una frase de la prosa con
+   dos puntos no.
    La lista de etiquetas sale de `VOZ_ETIQUETAS`, **nunca escrita a mano en la
    ventana de ayuda**: una copia estaría equivocada el día que alguien añada
    una palabra, y quien la lea se fiará. La sonda la comprueba una por una.
 
 5. ⚠️ **SE PAGINA DE VERDAD, CON COLUMNAS, Y NO ES UN ADORNO.** El texto lleva
-   `column-width` igual al ancho de la caja, así que el navegador lo reparte en
+   columnas del ancho exacto de la página, así que el navegador lo reparte en
    páginas y se avanza moviendo `scrollLeft`. Es el aparato de los lectores de
    epub y es del navegador: no hay que medir renglones ni cortar palabras.
    Hace falta por dos cosas concretas: en una tableta, un texto que se desplaza
    **pierde el sitio** cada vez que cambia el alto de la ventana —al salir el
    teclado, al esconderse la barra, al girar—; y «te quedan cuatro páginas» es
-   lo único que le dice a alguien si termina el cuento antes de dormirse.
+   lo único que le dice a alguien si termina el capítulo antes de dormirse.
 
-6. ⚠️ **LA POSICIÓN SE GUARDA POR PÁRRAFO, NUNCA POR NÚMERO DE PÁGINA.** Es la
-   regla que parece de más y es la que sostiene la anterior. El número de
-   páginas depende del tamaño de letra, del ancho de la pantalla y de si el
-   aparato está de pie o acostado: guardar «iba por la página 12» y volver con
-   la letra un punto más grande deja al lector **en otra frase**. Y **no da
-   ningún error**: la aplicación abre, la página existe, el texto es del mismo
-   cuento. Es la misma familia que el minuto guardado de El Rodaje —un número
-   correcto que deja de serlo cuando cambia lo de al lado—.
+   ⚠️ **LA ÚLTIMA PÁGINA SALÍA CORRIDA, Y COSTÓ VERLO.** La primera versión
+   ponía los márgenes como `padding` de la caja y dejaba que las columnas se
+   salieran de `#voz-texto` por la derecha. El navegador NO cuenta el margen
+   derecho detrás de una columna que se sale, así que el desplazamiento máximo
+   se quedaba corto en lo que medía el margen: **la última página de todos los
+   capítulos** salía movida a la derecha con la cola de la anterior asomando
+   por el borde izquierdo. El número de página era correcto, el texto era el
+   mismo; solo estaba mal puesto, y solo en la última, que es la que la sonda
+   no medía. Ahora `#voz-hoja` es un `flex` con dos hijos: el texto, al que
+   `vozPaginar()` le pone un **ancho explícito** igual a todas sus páginas
+   juntas (medidas en una primera pasada), y una **cola** (`#voz-cola`) del
+   ancho del margen. Así el desplazamiento cubre exactamente lo que hay, sin
+   depender de cómo cuente cada navegador el relleno de la derecha. La
+   comprobación **6** mide el margen del texto en la primera página, en dos de
+   en medio **y en la última**, y que el desplazamiento llega justo.
+
+   **En pantalla ancha, dos páginas como un libro abierto.** En «Auto», a
+   partir de 860 px de caja el texto va a dos columnas por página (el paso
+   sigue siendo el ancho de la caja más el canal, así que nada más cambia), y
+   el ajuste «Páginas» permite forzar una o dos. Un renglón de treinta
+   palabras se pierde al volver al margen: es la razón por la que los libros
+   no se imprimen a lo ancho de un monitor. Comprobación **19**.
+
+6. ⚠️ **LA POSICIÓN SE GUARDA POR PÁRRAFO Y FRACCIÓN, NUNCA POR NÚMERO DE
+   PÁGINA.** Es la regla que parece de más y es la que sostiene la anterior.
+   El número de páginas depende del tamaño de letra, del ancho de la pantalla
+   y de si el aparato está de pie o acostado: guardar «iba por la página 12» y
+   volver con la letra un punto más grande deja al lector **en otra frase**. Y
+   **no da ningún error**: la aplicación abre, la página existe, el texto es
+   del mismo cuento. Es la misma familia que el minuto guardado de El Rodaje
+   —un número correcto que deja de serlo cuando cambia lo de al lado—.
+
+   ⚠️ **Y LA FRACCIÓN HACE FALTA POR LOS ENSAYOS.** Un párrafo de página y
+   media con la letra grande deja páginas enteras sin ningún párrafo que
+   empiece en ellas; con solo el índice, la posición guardada sería «el
+   párrafo siguiente» y al volver se saltaría media página de lectura, sin
+   error. Se guarda el último bloque que empieza en la página o antes, y **en
+   qué parte de él va uno** (`sub`), medido con sus fragmentos
+   (`getClientRects`, uno por columna). La fracción apunta al **centro** de la
+   porción vista —en la segunda página de un párrafo de tres vale 0,5—, para
+   que `floor(fracción × páginas)` caiga en la misma página aunque la fracción
+   se haya redondeado, y en la proporcional si el párrafo ahora ocupa más.
+   Comprobación **7**: se va a una página en mitad de un párrafo, se cierra la
+   sala y al volver a abrir cae en esa misma página.
 
    ⚠️ **Y el párrafo se RECUERDA al pasar página, no se mide al repaginar.**
    Medirlo en el momento de repaginar da el párrafo equivocado **siempre**,
@@ -1070,6 +1151,13 @@ el diseño.
    es la página en que estamos y **no `scrollLeft`**, que durante el
    desplazamiento suave todavía enseña de dónde veníamos.
 
+   **La última página del último capítulo se apunta como «leído»** (`fin`),
+   y el avance de la ficha y de la barra se calcula sobre las palabras de
+   verdad del cuerpo, no sobre la columna `palabras`: un texto con esa
+   columna descuadrada salía al 107 % y se archivaba como leído a medias. La
+   barra de la sala es del texto **entero**, con una muesca donde empieza
+   cada capítulo, y el pie dice cuánto queda en minutos.
+
 7. ⚠️ **EL PASO DE PÁGINA MUEVE `scrollLeft` A PELO; LO SUAVE LO PONE EL CSS.**
    `scrollTo({behavior:'smooth'})` no existe en los Safari anteriores a 2022 y
    allí **no da error: sencillamente no pasa la página**. Un lector que no pasa
@@ -1078,12 +1166,19 @@ el diseño.
    de golpe: peor que suave y muchísimo mejor que nada.
 
 8. **El toque en el borde pasa página y el del centro apaga los mandos, pero
-   NO es la única forma:** hay dos botones a la vista en el pie y las flechas
-   del teclado funcionan. Misma regla que el asa de arrastre de la repisa: un
-   gesto que sea la única manera de hacer algo es algo que a veces no se puede
-   hacer —con el dedo mojado, con funda, con la mano llena—.
+   NO es la única forma:** hay dos botones a la vista en el pie, las flechas
+   del teclado (y espacio, inicio y fin) y **la rueda del ratón** funcionan.
+   Misma regla que el asa de arrastre de la repisa: un gesto que sea la única
+   manera de hacer algo es algo que a veces no se puede hacer —con el dedo
+   mojado, con funda, con la mano llena—.
+   ⚠️ **El centro NO es una zona encima del texto: es la propia hoja.** Las
+   zonas de los bordes cogen el puntero y el contenedor no (`pointer-events:
+   none`), así que una frase se puede seleccionar y copiar, que es lo primero
+   que se hace con un ensayo. Y un arrastre **con texto seleccionado no pasa
+   página**: quien está copiando no quiere que la página se le vaya de debajo
+   del dedo. Comprobación **8** lo mide con eventos de puntero de verdad.
    ⚠️ **Y el modo desnudo APAGA los mandos, no los quita del sitio.** Sacarlos
-   del flujo haría más alta la caja y **repaginaría el cuento debajo del dedo
+   del flujo haría más alta la caja y **repaginaría el texto debajo del dedo
    del lector**: la página que estaba mirando pasaría a ser otra.
    ⚠️ Las zonas llevan `touch-action: pan-y pinch-zoom`, no `none`: se le quita
    al navegador el gesto horizontal —que es el nuestro— y se le deja el de
@@ -1093,11 +1188,11 @@ el diseño.
 9. ⚠️ **LA SALA REDEFINE LOS TOKENS DENTRO DE SÍ MISMA; EL ANAQUEL NO.**
    `#voz-lector` declara `--bg`, `--surface`, `--text`, `--muted` y `--border`
    en tres juegos (papel, sepia, noche), y **`#view-voz` se queda en el mundo
-   claro de la aplicación**. Los tres papeles no son manía: un cuento se lee de
+   claro de la aplicación**. Los tres papeles no son manía: un texto se lee de
    noche en la cama —donde una pantalla blanca deslumbra y despierta— y a
    mediodía en un patio —donde el gris no se ve—. Y en noche el texto **no es
    blanco puro**, que deja estela al pasar la vista.
-   Todo lo de la sala (los dos paneles incluidos) cuelga **dentro** de
+   Todo lo de la sala (los paneles y el aviso incluidos) cuelga **dentro** de
    `#voz-lector`, así que se tiñe solo: por eso aquí no hay que nombrar seis
    `id` uno por uno como en El Rodaje. **Y no se toca ni un token de `:root`.**
    ⚠️ Y `--card` **no existe** en la aplicación: el fondo blanco es
@@ -1106,18 +1201,28 @@ el diseño.
    de peso gana la que vaya después. Los dos fallan igual: sin error, sin
    romper la página y sin que se entere ninguna sonda que mire el HTML. Se
    miran con el color **calculado** (comprobación 10).
+   ⚠️ **Y LAS LETRAS DE LIBRO (Literata, Atkinson Hyperlegible) NO SE TRAEN CON
+   `@import`.** Un `@import` en la hoja de estilo bloquea el pintado de la
+   aplicación entera hasta que Google Fonts conteste —o falle, que con mala
+   señal tarda lo mismo—: devuelve la espera de quince segundos que costó
+   quitar del arranque. Las pide `vozCargarLetras()` con un `<link>` la
+   primera vez que se abre la sala; mientras llegan se lee en Georgia, y
+   cuando llegan la sala se repagina sola (`document.fonts`).
 
 10. ⚠️ **NADA DE LA BASE NI DEL PEGADO LLEGA A UN ATRIBUTO NI A `innerHTML`.**
    Todo con `createElement` y `textContent`. Aquí entra el texto **más largo de
    toda la aplicación**, pegado desde otra ventana, y F.A.R.O tiene dentro la
    Bóveda, las finanzas, el chat y los teléfonos del Buzón del lector. Las
    cursivas y las negritas (`*así*`, `**así**`) se pintan troceando y colgando
-   nodos `<em>`/`<strong>`: un `innerHTML` aquí para pintar una cursiva sería
-   la puerta más ancha de la casa por el motivo más tonto.
+   nodos `<em>`/`<strong>`; **el resaltado del buscador también**, troceando
+   los nodos de texto y colgando `<mark>`. Un `innerHTML` aquí para pintar una
+   cursiva sería la puerta más ancha de la casa por el motivo más tonto.
+   Comprobación **9** lo prueba con veneno en un párrafo, una cita, una lista
+   y el resaltado.
 
 11. ⚠️ **UN CORTE DE RED NO SE ENSEÑA COMO UN ANAQUEL VACÍO**, y lo que hay en
    memoria no se tira hasta saber que llegó lo nuevo. Si un corte dejara el
-   anaquel en cero, la pantalla diría «todavía no hay cuentos» con un botón que
+   anaquel en cero, la pantalla diría «todavía no hay textos» con un botón que
    invita a **pegar**, y el camino natural después de una mala señal sería
    pegar encima los que ya estaban. `error.code === '42P01'` es «falta el SQL»
    y lo demás es la señal; decir lo primero cuando pasa lo segundo manda a
@@ -1131,19 +1236,29 @@ el diseño.
    nunca y el anaquel se quedaría en «Mirando la nube…» hasta cerrar la
    aplicación. Ocho segundos, y el reloj **no cancela** la petición.
 
+   ⚠️ **Y LA BASE DEL ESTRENO, SIN LA COLUMNA `genero`, NO ES NI «SIN SEÑAL»
+   NI «FALTA EL SQL».** La tabla se creó el 10 de septiembre sin esa columna;
+   con el archivo nuevo sin volver a correr, PostgREST rebota la consulta
+   entera con `42703` (`column … does not exist`). La herramienta la vuelve a
+   pedir **sin la columna**, sigue funcionando con el género solo en el
+   aparato, **no manda la columna al guardar** (también rebotaría) y la barra
+   dice exactamente qué archivo volver a correr («la base va vieja»).
+   Comprobación **17**.
+
 12. **Es de la casa, se retira con lápida, y funciona sin nube diciéndolo.**
-   Los cuatro leen todos los cuentos; corregir y retirar es solo de quien lo
+   Los cuatro leen todos los textos; corregir y retirar es solo de quien lo
    puso, y eso lo hace cumplir la seguridad por fila. **No hay política de
    `delete`**: si un aparato borrara la fila, la tableta que todavía tiene su
-   copia la subiría otra vez y el cuento resucitaría solo. Y mientras nadie
+   copia la subiría otra vez y el texto resucitaría solo. Y mientras nadie
    haya corrido el SQL la herramienta funciona entera con la copia del aparato
    y **lo dice a la vista** («📴 Solo en este aparato»), que es lo contrario de
    fingir que viaja.
-   ⚠️ **Los ajustes de lectura y la posición son DEL APARATO**, no de la nube.
-   La letra es una costumbre de unos ojos; y la posición parece que debería
-   viajar y **no debe**, porque en esta casa el mismo cuento lo leen cuatro
-   personas: una posición común significa que la hija abre el cuento por donde
-   iba el padre y el marcador de los dos se pierde a la vez.
+   ⚠️ **Los ajustes de lectura, la posición y los marcadores son DEL
+   APARATO**, no de la nube. La letra es una costumbre de unos ojos; y la
+   posición parece que debería viajar y **no debe**, porque en esta casa el
+   mismo texto lo leen cuatro personas: una posición común significa que la
+   hija abre el cuento por donde iba el padre y el marcador de los dos se
+   pierde a la vez.
 
 13. ⚠️ **LA FILA VA FIRMADA, Y LAS DOS MITADES SE PRUEBAN JUNTAS.**
    `puesto_por` es `not null` y la política de escritura exige que sea quien
@@ -1164,16 +1279,20 @@ el diseño.
    la base de mentira de la sonda aceptaba cualquier escritura y devolvía
    201 —así que la pantalla aprobaba—. Cada doble era complaciente justo en
    el sitio donde el otro no miraba. Por eso ahora **la base de mentira
-   exige lo mismo que la de verdad**: sin `puesto_por` devuelve 23502, y con
-   uno ajeno devuelve 42501. Un doble complaciente no prueba la costura: la
-   esconde. Es la misma regla que el `grant all` de la prueba del SQL y que
-   `postgrest-falso.js`, y se comprueba de la única manera que vale:
-   **quitando el arreglo y viendo que la sonda suspende**.
+   exige lo mismo que la de verdad**: sin `puesto_por` devuelve 23502, con
+   uno ajeno devuelve 42501, y sin la columna `genero` rebota como PostgREST.
+   Un doble complaciente no prueba la costura: la esconde. Es la misma regla
+   que el `grant all` de la prueba del SQL y que `postgrest-falso.js`, y se
+   comprueba de la única manera que vale: **quitando el arreglo y viendo que
+   la sonda suspende**.
 
    Del mismo día y de la misma clase: el botón ✏️ de la ficha llamaba a una
    función que no existía y **habría reventado al tocarlo**. No lo cazó
    nadie porque la sonda abría la hoja llamando a la función por dentro. Lo
-   que no se toca, no se prueba: la comprobación 16 **pulsa el botón**.
+   que no se toca, no se prueba: la comprobación 16 **pulsa el botón**, y
+   comprueba además que el texto devuelto al recuadro de corregir **se vuelve
+   a leer igual** (mismos capítulos y bloques): el alfabeto de ida es el de
+   vuelta, o corregir una coma cambiaría la estructura.
 
 14. ⚠️ **LO QUE NO SUBIÓ SE REINTENTA DE VERDAD, Y LOS AVISOS DICEN LA CAUSA.**
    La primera versión decía «subirá cuando vuelva la señal» y **nada lo
@@ -1184,11 +1303,78 @@ el diseño.
    porque una fila ajena la rechaza la seguridad por fila y reintentarla
    sería insistir cada vez para nada.
    Y el aviso nombra el motivo, que son cuatro y se arreglan distinto: falta
-   correr el SQL, no hay sesión, no hay señal, o el cuento es de otro. Un
+   correr el SQL, no hay sesión, no hay señal, o el texto es de otro. Un
    aviso que se equivoca de causa manda a mirar donde no está el problema.
    Por lo mismo, **corregir y retirar solo se ofrecen en lo propio**: lo
    impide la seguridad por fila, pero enseñar un botón que la base va a
    rechazar es prometer algo que no se puede hacer.
+   ⚠️ **Y los avisos se VEN.** La aplicación tiene `toast()` (js/app.js), no
+   `showToast()`, que era lo que llamaba la primera versión: ningún aviso de
+   guardado salió nunca en F.A.R.O y el de copiar caía en un `alert`. Y con
+   la sala abierta el aviso de la aplicación tampoco serviría —vive por
+   debajo de ella—, así que `vozAviso()` pinta uno **dentro de la sala**, que
+   además se tiñe con el papel puesto.
+
+15. ⚠️ **LOS GÉNEROS VIVEN EN EL APARATO, NO EN LA BASE.** `VOZ_GENEROS`
+   (cuento, ensayo, poema, crónica, carta, discurso, artículo, novela corta,
+   texto) es una lista en `voz-prestada.js`; la columna `genero` guarda una
+   palabra corta y su `check` **solo mira el largo**. Añadir un género tiene
+   que ser una línea en un archivo, no una migración que alguien pega desde
+   una tableta: es la regla 8 de la repisa de enlaces. El género se elige con
+   un chip (un toque, no un desplegable de nueve), lo trae la etiqueta
+   `Género:` si el texto la lleva, y un texto que es casi todo verso se
+   propone solo como poema. Es el ÚNICO campo con lista cerrada, y lo que no
+   se reconoce cae en «texto», nunca en «cuento»: un ensayo archivado como
+   cuento se descubre a los seis meses.
+
+16. **Marcadores y buscador, en el mismo panel que el índice.** Son tres
+   cosas que en un lector de libros van juntas porque hacen lo mismo: ir a
+   un sitio del texto. El marcador es el párrafo de la página con su
+   fracción, igual que la posición, y por lo mismo sobrevive a un cambio de
+   letra; son del aparato, como la posición. **El buscador busca en el texto
+   guardado, no en la pantalla** (en la pantalla solo está el capítulo
+   abierto), sin tildes y sin mayúsculas —quien busca «corazon» en una
+   tableta no escribe la tilde—, y el resaltado en el original se hace con un
+   mapa de posiciones entre el texto sin tildes y el texto de verdad, porque
+   `normalize('NFD')` cambia los largos. Comprobación **18**.
+
+17. ⚠️ **LA PANTALLA NO SE APAGA MIENTRAS SE LEE.** Una tableta se apaga sola
+   al minuto y medio sin que la toquen, y leyendo una página larga no se la
+   toca. Es el mismo permiso que pide el teleprompter de El Rodaje; puede no
+   existir o negarse, y si falla no pasa nada más que lo de antes. **Se
+   suelta al cerrar la sala** —un permiso que se queda puesto detrás del chat
+   es una batería que se acaba a las tres de la tarde— y se vuelve a pedir al
+   volver de otra aplicación (`visibilitychange`).
+   ⚠️ **Y la variable se suelta ANTES de esperar al permiso.** Cerrar y volver
+   a abrir la sala en el mismo tirón encontraba la variable ocupada por el
+   permiso viejo que aún se estaba soltando, no pedía uno nuevo, y la
+   pantalla se apagaba leyendo. La sonda lo cazó (comprobación 7) porque
+   cuenta los permisos pedidos y soltados con un doble.
+   Y hay «⛶ Pantalla completa» en los ajustes, solo donde el navegador lo
+   permite; se sale sola al cerrar la sala.
+
+18. ⚠️ **EL RELLENO AUTOMÁTICO NO PISA LO TOCADO A MANO, Y RECUERDA QUÉ
+   RELLENÓ ÉL.** La primera versión rellenaba el título con «Cuento sin
+   título» al abrir la hoja vacía, así que cuando después se pegaba un texto
+   con su `# Título` el campo ya no estaba vacío y **el título de verdad no
+   entraba nunca**. Se veía en cada pegado, y parecía que el lector no sacaba
+   el título. Ahora `_vozAuto` guarda lo que puso el lector, y solo se pisa
+   eso; lo que la persona escribió no se toca. Igual con el género (un chip
+   tocado no se lo pisa ninguna etiqueta) y con el interruptor de versos.
+   Comprobación **4**: se abre la hoja vacía, se pega DESPUÉS un texto con
+   `# Título`, y el campo tiene que traerlo.
+
+19. **La hoja de pegar avisa de lo que va a pasar antes de guardar**: cuántos
+   capítulos, subtítulos, citas, estrofas y listas entendió; qué renglones
+   parecían etiquetas y no se entendieron; y **si ya hay un texto con ese
+   título en el anaquel**, porque casi siempre es el mismo pegado dos veces
+   (no se para el guardado: dos cuentos pueden llamarse igual, pero se dice).
+
+20. **«Sigue leyendo» arriba del anaquel, y chips de género y de voz.** Es lo
+   primero que hace un lector de libros al abrirse, y lo que evita buscar
+   entre treinta fichas el que se estaba leyendo. La tarjeta se esconde con
+   un filtro o una búsqueda puestos, y los chips —sacados de los textos,
+   nunca de una lista escrita— se esconden cuando no separan nada.
 
 **Antes de publicar un cambio de La Voz Prestada:**
 
@@ -1199,26 +1385,37 @@ _dev/probe-voz-prestada.html        (en el navegador)
 
 La comprobación **2** le pega un párrafo de prosa cuyos siete renglones
 empiezan por siete palabras que nombran una parte de un libro, y exige que
-salga **un** capítulo con **un** párrafo dentro: es el fallo más caro del
-lector y el que menos se ve, porque descuartizar un cuento parece haber
-funcionado. Es la hermana de la 5-bis de El Rodaje.
+salga **un** capítulo con **un** párrafo **de prosa** dentro: es el fallo más
+caro del lector y el que menos se ve, porque descuartizar un texto parece
+haber funcionado. Es la hermana de la 5-bis de El Rodaje. Y su contraria: un
+poema de cuatro renglones tiene que salir con sus cuatro versos.
+
+La comprobación **6** mide el margen del texto en la primera página y **en la
+última**: la última salió corrida durante todo el primer día sin que la sonda
+lo viera, porque medía la 0, la 1 y la 3 de quince.
 
 La comprobación **7** abre la sala de verdad, se va a la página 3, sube la
-letra a 30 px y comprueba que **el mismo párrafo sigue a la vista**. Eso no se
-ve llamando funciones: hay que medir la pantalla. Y para medir se abre la vista
-con `switchView` y se enseña `#app-container`, porque con el panel escondido la
+letra a 30 px y comprueba que **el mismo párrafo sigue a la vista**; después
+sube a 34 px, se pone en mitad de un párrafo partido entre páginas, cierra y
+vuelve a abrir, y exige caer en **esa** página. Eso no se ve llamando
+funciones: hay que medir la pantalla. Y para medir se abre la vista con
+`switchView` y se enseña `#app-container`, porque con el panel escondido la
 caja mide 0×0 y la sonda aprobaría una paginación que en la tableta no existe.
 
 La comprobación **15** es la que faltaba el día del estreno y la que hay que
-entender antes de tocar la subida: **no basta con que el cuento aparezca en el
+entender antes de tocar la subida: **no basta con que el texto aparezca en el
 anaquel**. Eso es la copia del aparato, y se ve igual de bien cuando la subida
-rebotó. Hay que mirar lo que RECIBIÓ la nube, y que llegó firmado.
+rebotó. Hay que mirar lo que RECIBIÓ la nube, que llegó firmado y con su
+género.
 
-⚠️ Las dos últimas comprobaciones reutilizan **el mismo marco**, cambiándole la
-base de mentira, en vez de abrir un segundo `index.html`: un segundo marco del
-mismo origen se queda colgado y la sonda no llega a poner su veredicto en el
-título — y en tanda solo se lee el título, así que una sonda sin veredicto se
-lee igual que una que nadie corrió.
+La comprobación **19** ensancha el marco a 1000 px para ver el libro abierto
+a dos páginas, y mide ahí también la última página.
+
+⚠️ Las comprobaciones de la nube (13, 17 y 14) reutilizan **el mismo marco**,
+cambiándole la base de mentira, en vez de abrir un segundo `index.html`: un
+segundo marco del mismo origen se queda colgado y la sonda no llega a poner
+su veredicto en el título — y en tanda solo se lee el título, así que una
+sonda sin veredicto se lee igual que una que nadie corrió.
 
 Y el SQL, contra un PostgreSQL de verdad, que es donde se ve si el `check`
 muerde y si la puerta cierra:
@@ -1228,14 +1425,18 @@ createdb voztest
 psql -v ON_ERROR_STOP=1 -d voztest -f _dev/prueba-voz-prestada-sql.sql
 ```
 
-⚠️ Esa prueba **reparte los permisos como los reparte Supabase** —`grant all`
-sobre `public` a `anon` y `authenticated`, **y `grant usage on schema auth`**—
-antes de probar la puerta. Sin lo primero aprobaría por el motivo equivocado
-(rebotaría por falta de permiso de tabla, sin haber probado la seguridad por
-fila); sin lo segundo revienta con «permission denied for schema auth» en la
-primera escritura hecha como usuario de la casa, que es un fallo **de la
-prueba** disfrazado de fallo de la tabla y manda a buscar el error en el
-archivo bueno.
+⚠️ Esa prueba **empieza dejando la tabla como quedó el día del estreno, sin
+la columna `genero`**, y solo después corre el archivo: es el camino que de
+verdad va a recorrer la base del autor, y un `create table if not exists` no
+toca una tabla que ya existe. Arrancando con la base vacía aprobaría sin haber
+probado la migración. Y **reparte los permisos como los reparte Supabase**
+—`grant all` sobre `public` a `anon` y `authenticated`, **y `grant usage on
+schema auth`**— antes de probar la puerta. Sin lo primero aprobaría por el
+motivo equivocado (rebotaría por falta de permiso de tabla, sin haber probado
+la seguridad por fila); sin lo segundo revienta con «permission denied for
+schema auth» en la primera escritura hecha como usuario de la casa, que es un
+fallo **de la prueba** disfrazado de fallo de la tabla y manda a buscar el
+error en el archivo bueno.
 
 ## El mapa de rutas se explora por materia, no en lista
 
@@ -1695,7 +1896,7 @@ como ya hacen las reglas de Asignaciones.
 ⚠️ **Y hay dos pantallas que son la excepción, con la misma técnica y
 motivos distintos: El Rodaje y la sala de lectura de La Voz Prestada.**
 La segunda (`#voz-lector`, en `css/voz-prestada.css`) redefine los mismos
-tokens en **tres** juegos —papel, sepia y noche— porque un cuento se lee de
+tokens en **tres** juegos —papel, sepia y noche— porque un texto se lee de
 noche en la cama y a mediodía en un patio. Todo lo suyo cuelga DENTRO de
 `#voz-lector`, así que ahí no hay que nombrar ventanas sueltas una por una; su
 anaquel (`#view-voz`) se queda en el mundo claro de la casa. Y lo de siempre:

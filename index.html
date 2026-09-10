@@ -2291,13 +2291,14 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
   </div>
 
   <!-- ========== LA VOZ PRESTADA 📖 ==========
-       El anaquel de los cuentos que una máquina escribe «al modo de»
-       otros escritores, y la sala donde se leen en páginas.
+       El anaquel de los textos que una máquina escribe «al modo de»
+       otros escritores —cuentos, ensayos, poemas, cartas—, y la sala
+       donde se leen en páginas, como un libro.
 
        ⚠️ La voz imitada y la máquina que escribió viajan PEGADAS al
-       cuento y no se pueden apagar: en la ficha, en la portada, en el
-       pie de cada página y dentro de lo que copia el botón 📋. Un
-       cuento «al modo de» alguien, leído seis meses después en una
+       texto y no se pueden apagar: en la ficha, en la portada, en el
+       pie de cada página y dentro de lo que copia o comparte el botón.
+       Un cuento «al modo de» alguien, leído seis meses después en una
        tableta y sin la ventana del chat alrededor, no se distingue de
        uno que sí fuera suyo: así nace una atribución falsa, sin mala
        fe y por olvido. El motivo entero está en la cabecera de
@@ -2308,7 +2309,7 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <i class="fa-solid fa-arrow-left"></i>
       </button>
       <h1 class="view-title">La Voz Prestada</h1>
-      <button class="back-icon-btn" id="voz-nuevo-btn" aria-label="Pegar un cuento">
+      <button class="back-icon-btn" id="voz-nuevo-btn" aria-label="Pegar un texto">
         <i class="fa-solid fa-plus"></i>
       </button>
     </header>
@@ -2317,22 +2318,29 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
       <div class="msug-intro">
         <div class="msug-intro-ic"><i class="fa-solid fa-book-open"></i></div>
         <div>
-          <p class="msug-intro-txt">Los cuentos que le pides a una máquina
+          <p class="msug-intro-txt">Cuentos, ensayos, poemas y otros textos que le pides a una máquina
             <strong>con la voz de otros escritores</strong>, para leerlos en páginas
-            y volver justo donde los dejaste.</p>
-          <span class="msug-intro-count">Cada cuento dice siempre a quién imita y qué máquina lo escribió.</span>
+            como un libro y volver justo donde los dejaste.</p>
+          <span class="msug-intro-count">Cada texto dice siempre a quién imita y qué máquina lo escribió.</span>
         </div>
       </div>
 
       <div id="voz-nube" class="voz-nube"></div>
 
+      <!-- Lo último que se dejó a medias, con su botón de continuar. Lo
+           pinta vozRender() y se esconde cuando no hay nada empezado. -->
+      <div id="voz-sigue" hidden></div>
+
       <div class="voz-cab">
         <input id="voz-busca" class="voz-busca" type="search"
-               placeholder="Buscar por título, voz o encargo…"
-               aria-label="Buscar un cuento">
-        <button type="button" class="voz-btn voz-btn-pri" id="voz-nuevo-btn2">➕ Pegar un cuento</button>
+               placeholder="Buscar por título, voz, género o encargo…"
+               aria-label="Buscar un texto">
+        <button type="button" class="voz-btn voz-btn-pri" id="voz-nuevo-btn2">➕ Pegar un texto</button>
       </div>
 
+      <!-- Dos filas de chips, género y voz, sacadas de los textos del
+           anaquel. Cada una se esconde cuando no separa nada. -->
+      <div class="voz-chips" id="voz-chips-gen" hidden></div>
       <div class="voz-chips" id="voz-chips" hidden></div>
       <div class="voz-lista" id="voz-lista"></div>
 
@@ -2345,20 +2353,27 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
        incluidos— vive DENTRO de #voz-lector para que se tiña solo con
        el papel que esté puesto; un panel colgado del body saldría
        blanco encima de la sala de noche, que es el fallo que en El
-       Rodaje obligó a nombrar seis `id` uno por uno. -->
-  <div id="voz-lector" hidden data-tema="papel">
+       Rodaje obligó a nombrar seis `id` uno por uno.
+
+       #voz-hoja es un flex con DOS hijos: el texto en columnas y una
+       «cola» del ancho del margen. Sin la cola, la última página de
+       cada capítulo salía corrida: ver la nota grande de la sala en
+       js/tools/voz-prestada.js. -->
+  <div id="voz-lector" hidden data-tema="papel" role="region" aria-label="Sala de lectura">
     <div class="voz-l-top">
       <button type="button" class="voz-l-ico" id="voz-l-salir" aria-label="Salir de la lectura">✕</button>
       <div id="voz-l-tit"></div>
-      <button type="button" class="voz-l-ico" id="voz-l-ind" aria-label="Índice del cuento">☰</button>
-      <button type="button" class="voz-l-ico" id="voz-l-aa" aria-label="Letra, tamaño y color">Aa</button>
+      <button type="button" class="voz-l-ico" id="voz-l-marca" aria-label="Poner un marcador en esta página" aria-pressed="false">🔖</button>
+      <button type="button" class="voz-l-ico" id="voz-l-ind" aria-label="Índice, marcadores y buscador">☰</button>
+      <button type="button" class="voz-l-ico voz-l-aa" id="voz-l-aa" aria-label="Letra, tamaño y color">Aa</button>
     </div>
 
     <div class="voz-l-mid" id="voz-mid">
-      <div id="voz-hoja"><div id="voz-texto"></div></div>
-      <!-- Bordes para pasar página, centro para apagar los mandos. Y no
-           es la única forma: los botones ‹ › del pie están a la vista y
-           las flechas del teclado funcionan. -->
+      <div id="voz-hoja"><div id="voz-texto"></div><div id="voz-cola"></div></div>
+      <!-- Bordes para pasar página; el centro es la propia hoja, que
+           apaga los mandos y deja seleccionar texto. Y no es la única
+           forma: los botones ‹ › del pie están a la vista, las flechas
+           del teclado y la rueda del ratón funcionan. -->
       <div class="voz-zonas">
         <div id="voz-z-izq"></div><div id="voz-z-mid"></div><div id="voz-z-der"></div>
       </div>
@@ -2366,7 +2381,12 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
       <div class="voz-panel" id="voz-panel-ind" hidden></div>
     </div>
 
-    <div class="voz-barra"><div class="voz-barra-in" id="voz-barra-in"></div></div>
+    <!-- El avance del texto ENTERO, por palabras, con una muesca donde
+         empieza cada capítulo. -->
+    <div class="voz-barra" id="voz-barra" role="progressbar" aria-label="Leído">
+      <div id="voz-barra-marcas"></div>
+      <div class="voz-barra-in" id="voz-barra-in"></div>
+    </div>
 
     <div class="voz-l-pie">
       <button type="button" class="voz-l-ico" id="voz-ant" aria-label="Página anterior">‹</button>
@@ -2375,36 +2395,48 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
     </div>
   </div>
 
-  <!-- Pegar un cuento, y corregirlo: es la MISMA hoja. Con dos
+  <!-- Pegar un texto, y corregirlo: es la MISMA hoja. Con dos
        formularios, un arreglo se hace en uno y se queda sin hacer en el
        otro (regla 9 del Apunte rápido de Finanzas). -->
   <div id="voz-pegar-overlay" class="fin-modal-overlay" style="display:none;">
-    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Pegar un cuento">
+    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Pegar un texto">
       <div class="msug-det-head">
-        <div class="msug-det-titulo" id="voz-pegar-tit">➕ Pegar un cuento</div>
+        <div class="msug-det-titulo" id="voz-pegar-tit">➕ Pegar un texto</div>
         <button type="button" class="msug-det-cerrar" id="voz-pegar-cerrar" aria-label="Cerrar">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
       <textarea id="voz-pegar-txt" class="voz-pegar-txt"
-        placeholder="Pega aquí el cuento entero, tal como te lo dio la máquina. Se reparte en capítulos solo."></textarea>
+        placeholder="Pega aquí el texto entero, tal como te lo dio la máquina. Se reparte solo en capítulos, citas, listas y versos."></textarea>
 
       <div class="voz-pegar-barra">
         <button type="button" class="voz-btn" id="voz-ejemplo-btn">📄 Un ejemplo</button>
         <button type="button" class="voz-btn" id="voz-ayuda-btn">❔ Cómo se pega</button>
       </div>
+      <!-- Para un poema, o para cualquier texto en que cada renglón
+           importa. Se enciende solo al elegir el género Poema. -->
+      <label class="voz-interruptor" for="voz-f-versos">
+        <input type="checkbox" id="voz-f-versos">
+        <span>Respetar los saltos de línea (versos)</span>
+      </label>
 
       <div class="voz-rep" id="voz-pegar-repaso"></div>
 
       <div class="voz-campo">
         <label for="voz-f-titulo">Título</label>
-        <input id="voz-f-titulo" type="text" autocomplete="off">
+        <input id="voz-f-titulo" type="text" autocomplete="off" placeholder="El título del texto">
+      </div>
+      <!-- El género: un chip, un toque. La lista sale de VOZ_GENEROS. -->
+      <div class="voz-campo">
+        <span class="voz-campo-rot" id="voz-genero-rot">Género</span>
+        <input type="hidden" id="voz-f-genero" value="cuento">
+        <div class="voz-chips voz-chips-form" id="voz-genero-chips" role="group" aria-labelledby="voz-genero-rot"></div>
       </div>
       <div class="voz-campo voz-campo-obl">
         <label for="voz-f-voz">🎭 La voz que se imita · hace falta</label>
         <input id="voz-f-voz" type="text" autocomplete="off"
-               placeholder="p. ej. un narrador de pueblo, de frase corta">
+               placeholder="p. ej. Rulfo, o «un narrador de pueblo, de frase corta»">
       </div>
       <div class="voz-campo voz-campo-obl">
         <label for="voz-f-maquina">🤖 La máquina que lo escribió · hace falta</label>
@@ -2414,7 +2446,7 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
       <div class="voz-campo">
         <label for="voz-f-encargo">Lo que le pediste</label>
         <textarea id="voz-f-encargo"
-          placeholder="El encargo con el que salió este cuento. Es lo único que lo hace repetible."></textarea>
+          placeholder="El encargo con el que salió este texto. Es lo único que lo hace repetible."></textarea>
       </div>
       <div class="voz-campo">
         <label for="voz-f-nota">Una nota tuya <em>(opcional)</em></label>
@@ -2432,9 +2464,9 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
        VOZ_ETIQUETAS, no escrita aquí: una copia a mano estaría
        equivocada el día que alguien añada una palabra. -->
   <div id="voz-ayuda-overlay" class="fin-modal-overlay" style="display:none;">
-    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Cómo se pega un cuento">
+    <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Cómo se pega un texto">
       <div class="msug-det-head">
-        <div class="msug-det-titulo">❔ Cómo se pega un cuento</div>
+        <div class="msug-det-titulo">❔ Cómo se pega un texto</div>
         <button type="button" class="msug-det-cerrar" id="voz-ayuda-cerrar" aria-label="Cerrar">
           <i class="fa-solid fa-xmark"></i>
         </button>

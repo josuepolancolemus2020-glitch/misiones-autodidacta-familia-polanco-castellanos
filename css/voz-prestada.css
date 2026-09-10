@@ -1,10 +1,11 @@
 /* ─────────────────────────────────────────────
-   LA VOZ PRESTADA 📖 · el lector de los cuentos de encargo
+   LA VOZ PRESTADA 📖 · el lector de los textos de encargo
 
    Hoja propia, como la de El Rodaje y La Criba, y por lo mismo: una
    sala de lectura tiene un vocabulario visual que no usa nadie más
-   —columnas de texto, portada, índice, tres colores de papel— y meterlo
-   en app.css sería añadirle seiscientas líneas que solo se usan aquí.
+   —columnas de texto, portada, epígrafe, capitular, índice, tres
+   colores de papel— y meterlo en app.css sería añadirle setecientas
+   líneas que solo se usan aquí.
 
    ⚠️ SON DOS MUNDOS, Y ESTÁN SEPARADOS A PROPÓSITO:
 
@@ -19,14 +20,27 @@
    · LA SALA (`#voz-lector`) redefine esos mismos tokens DENTRO DE SÍ
      MISMA, con tres juegos de valores (papel, sepia, noche). Es lo que
      hace El Rodaje, y por la misma razón de fondo aunque el caso sea
-     otro: un cuento se lee de noche en la cama —y ahí una pantalla
+     otro: un texto se lee de noche en la cama —y ahí una pantalla
      blanca deslumbra y despierta— y se lee a mediodía en un patio
      —donde el gris no se ve—. Como todo lo de la sala cuelga DENTRO de
-     `#voz-lector` (los paneles incluidos), no hace falta nombrar
-     ventanas sueltas una por una como allá.
+     `#voz-lector` (los paneles y el aviso incluidos), no hace falta
+     nombrar ventanas sueltas una por una como allá.
 
    ⚠️ Y NO SE TOCA NI UN TOKEN DE `:root`. El resto de F.A.R.O es claro
    y sigue siéndolo. Un token redefinido arriba teñiría la casa entera.
+
+   LAS LETRAS: Literata se dibujó para leer libros en pantalla (es la de
+   Google Play Libros) y Atkinson Hyperlegible para quien lee con
+   dificultad. Vienen de Google Fonts; sin señal caen en Georgia y en
+   Verdana y no pasa nada más.
+   ⚠️ Y NO SE TRAEN CON `@import` DESDE AQUÍ: un `@import` bloquea el
+   pintado de la aplicación entera hasta que la red conteste —o falle—,
+   y la aplicación tiene que abrir al instante aunque la señal sea mala
+   (ver «La aplicación abre al instante» en CLAUDE.md). Las pide
+   `vozCargarLetras()`, en js/tools/voz-prestada.js, la PRIMERA vez que
+   se abre la sala, con un <link> que no bloquea nada; cuando llegan, la
+   sala se repagina sola (`document.fonts`). La sonda del arranque lo
+   habría cazado: con el @import puesto, suspendía.
 ───────────────────────────────────────────── */
 
 /* ═══════════════ EL ANAQUEL ═══════════════ */
@@ -44,6 +58,7 @@
   background: var(--surface); color: var(--text); font-size: 15px; font-family: inherit;
 }
 .voz-busca::placeholder { color: var(--muted); }
+.voz-busca:focus { outline: none; border-color: var(--story); }
 
 .voz-nube {
   display: flex; align-items: center; gap: 8px;
@@ -54,6 +69,27 @@
 .voz-nube-ok { background: #f0fdf4; border-color: rgba(22,163,74,.25); color: #15803d; }
 .voz-nube-no { background: #fffbeb; border-color: rgba(217,119,6,.25); color: #b45309; }
 
+/* «Sigue leyendo»: la tarjeta de arriba, con el lomo del color de la
+   voz. El color liso va en `background-color` y el brillo en
+   `background-image`, SEPARADOS: el atajo `background: linear-gradient`
+   deja el color de fondo en transparente. */
+.voz-sigue {
+  position: relative; overflow: hidden;
+  margin-bottom: 14px; padding: 14px 16px 14px 20px;
+  border: 1px solid var(--border); border-radius: 16px;
+  background: var(--surface); box-shadow: 0 2px 8px rgba(15,23,42,.06);
+}
+.voz-sigue::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 7px;
+  background-color: hsl(var(--voz-h, 25) 42% 38%);
+  background-image: linear-gradient(180deg, rgba(255,255,255,.25), rgba(0,0,0,.25));
+}
+.voz-sigue-rot { font-size: 11.5px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: var(--story); }
+.voz-sigue-tit { font-size: 17px; font-weight: 800; line-height: 1.25; margin: 4px 0 3px; color: var(--text); }
+.voz-sigue-et { font-size: 12.5px; color: var(--muted); margin-bottom: 9px; }
+.voz-sigue-meta { font-size: 12px; color: var(--muted); margin: 6px 0 10px; }
+.voz-sigue-btn { width: 100%; }
+
 /* ⚠️ LOS CHIPS NO BAJAN DE LÍNEA: SE DESLIZAN. Es la excepción a la
    regla del `flex-wrap` de la casa, y es la misma que ya se escribió
    para las materias de Videos M.E.T.A.S: con seis o siete voces
@@ -62,15 +98,16 @@
    página entera. El degradado del borde dice que hay más. */
 .voz-chips {
   display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px;
-  padding-bottom: 10px; margin-bottom: 6px;
+  padding-bottom: 8px; margin-bottom: 4px;
   -webkit-overflow-scrolling: touch; scrollbar-width: none;
   -webkit-mask-image: linear-gradient(to right, #000 88%, transparent);
           mask-image: linear-gradient(to right, #000 88%, transparent);
 }
 .voz-chips::-webkit-scrollbar { display: none; }
+.voz-chips[hidden] { display: none; }
 .voz-chip {
   flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  padding: 8px 14px; border-radius: 999px; cursor: pointer; min-height: 36px;
   border: 1px solid var(--border); background: var(--surface);
   color: var(--text); font: inherit; font-size: 13px; white-space: nowrap;
 }
@@ -96,14 +133,15 @@
    el mismo fallo silencioso del `var(--card)` y no lo caza ninguna
    sonda que mire el HTML. */
 .voz-lomo {
-  flex: 0 0 46px; display: flex; align-items: center; justify-content: center;
+  flex: 0 0 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
   background-color: hsl(var(--voz-h, 25) 42% 38%);
   background-image: linear-gradient(160deg, rgba(255,255,255,.22), rgba(0,0,0,.28));
 }
 .voz-lomo-ini {
-  font-family: Georgia, serif; font-size: 22px; color: #fff;
+  font-family: "Literata", Georgia, serif; font-size: 22px; color: #fff;
   text-shadow: 0 1px 2px rgba(0,0,0,.4);
 }
+.voz-lomo-gen { font-size: 13px; opacity: .9; }
 
 .voz-ficha-cuerpo { flex: 1 1 auto; min-width: 0; padding: 14px 15px; }
 .voz-ficha-tit {
@@ -111,21 +149,27 @@
   font-weight: 700;
 }
 
-/* ⚠️ LA ETIQUETA. Se ve antes que ningún otro dato del cuento y las dos
+/* ⚠️ LA ETIQUETA. Se ve antes que ningún otro dato del texto y las dos
    mitades van juntas: la voz imitada y la máquina que escribió. No se
    apaga, no se pliega y no hay ajuste que la quite. La razón, entera,
    está en la cabecera de js/tools/voz-prestada.js. */
 .voz-etiqueta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
-.voz-et-voz, .voz-et-maq {
+.voz-et-voz, .voz-et-maq, .voz-et-gen {
   font-size: 11.5px; padding: 3px 9px; border-radius: 999px;
   border: 1px solid transparent; line-height: 1.3;
 }
-.voz-et-voz { background: var(--story-bg); color: var(--story); border-color: var(--story-border); }
-.voz-et-maq { background: var(--ia-bg); color: var(--ia); border-color: var(--ia-border); }
+.voz-et-voz { background: var(--story-bg, #fdf6ec); color: var(--story); border-color: var(--story-border, rgba(120,53,15,.2)); }
+.voz-et-maq { background: var(--ia-bg, #ecfeff); color: var(--ia, #0891b2); border-color: var(--ia-border, rgba(8,145,178,.2)); }
+.voz-et-gen { background: var(--bg); color: var(--muted); border-color: var(--border); }
 
 .voz-ficha-meta {
   display: flex; flex-wrap: wrap; gap: 4px 12px;
-  font-size: 12px; color: var(--muted); margin-bottom: 10px;
+  font-size: 12px; color: var(--muted); margin-bottom: 8px;
+}
+.voz-ficha-gen { font-weight: 700; color: var(--text); }
+.voz-ficha-enc {
+  margin: 0 0 10px; font-size: 12.5px; line-height: 1.45; color: var(--muted); font-style: italic;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .voz-avance { height: 5px; border-radius: 99px; background: var(--bg); overflow: hidden; }
 .voz-avance-in { height: 100%; background: var(--story); border-radius: 99px; }
@@ -138,7 +182,8 @@
   color: var(--text); font: inherit; font-size: 14px; min-height: 40px;
 }
 .voz-btn:active { transform: scale(.97); }
-.voz-btn-pri { flex: 1 1 auto; background: var(--story); border-color: var(--story); color: #fff; }
+.voz-btn:disabled { opacity: .45; cursor: default; }
+.voz-btn-pri { flex: 1 1 auto; background: var(--story); border-color: var(--story); color: #fff; font-weight: 600; }
 .voz-cab .voz-btn-pri { flex: 1 1 auto; white-space: nowrap; }
 .voz-btn-flojo { opacity: .55; }
 
@@ -148,9 +193,14 @@
   width: 100%; min-height: 190px; resize: vertical; box-sizing: border-box;
   padding: 12px 13px; border: 1px solid var(--border); border-radius: 12px;
   background: var(--surface); color: var(--text);
-  font-family: Georgia, "Times New Roman", serif; font-size: 15px; line-height: 1.55;
+  font-family: "Literata", Georgia, "Times New Roman", serif; font-size: 15px; line-height: 1.55;
 }
-.voz-pegar-barra { display: flex; gap: 8px; margin: 9px 0 14px; flex-wrap: wrap; }
+.voz-pegar-barra { display: flex; gap: 8px; margin: 9px 0 8px; flex-wrap: wrap; }
+.voz-interruptor {
+  display: flex; align-items: center; gap: 9px; margin: 0 0 12px;
+  font-size: 13px; color: var(--text); cursor: pointer; min-height: 36px;
+}
+.voz-interruptor input { width: 18px; height: 18px; accent-color: var(--story); margin: 0; flex: 0 0 auto; }
 
 .voz-rep {
   border: 1px dashed var(--border); border-radius: 12px;
@@ -175,15 +225,15 @@
 .voz-rep-cap-t { flex: 1 1 auto; min-width: 0; color: var(--text); }
 .voz-rep-cap-p { flex: 0 0 auto; font-size: 11.5px; color: var(--muted); }
 
-.voz-rep-avisos {
-  margin-top: 11px; padding: 9px 11px; border-radius: 10px;
+.voz-rep-avisos, .voz-rep-repetido {
+  margin-top: 11px; padding: 9px 11px; border-radius: 10px; font-size: 12.5px; line-height: 1.45;
   background: #fffbeb; border: 1px solid rgba(217,119,6,.25); color: #92400e;
 }
-.voz-rep-avisos-t { font-size: 12.5px; font-weight: 600; margin-bottom: 5px; }
+.voz-rep-avisos-t { font-weight: 600; margin-bottom: 5px; }
 .voz-rep-aviso { font-size: 12px; opacity: .9; }
 
 .voz-campo { margin-bottom: 12px; }
-.voz-campo label {
+.voz-campo label, .voz-campo-rot {
   display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 5px;
 }
 .voz-campo input, .voz-campo textarea {
@@ -194,6 +244,7 @@
 }
 .voz-campo textarea { min-height: 60px; resize: vertical; }
 .voz-campo-obl label { color: var(--story); font-weight: 600; }
+.voz-chips-form { padding-bottom: 4px; margin-bottom: 0; }
 
 /* ⚠️ ÁMBAR, NO ROJO, Y ANTES DE TOCAR NADA. Es la señal de la regla de
    la casa para «esto está a medias y el guardado se va a parar»: la
@@ -218,165 +269,270 @@
   position: fixed; inset: 0; z-index: 3200;
   display: flex; flex-direction: column;
   background: var(--bg); color: var(--text);
-  font-family: var(--voz-fam, Georgia, serif);
+  font-family: var(--voz-fam, "Literata", Georgia, serif);
 }
 #voz-lector[hidden] { display: none; }
 
 /* Los tres papeles. Se redefinen los tokens de la aplicación DENTRO de
    la sala, así que todo lo que herede de app.css se tiñe solo. */
 #voz-lector[data-tema="papel"] {
-  --bg: #f6f4ef; --surface: #fffdf8; --text: #1c1917;
-  --muted: #78716c; --border: #e4e0d6; --story: #78350f;
+  --bg: #f7f5f0; --surface: #fffdf9; --text: #1f1d1a;
+  --muted: #7a736b; --border: #e6e1d6; --story: #7a3d10; --marca: #fde68a;
 }
 #voz-lector[data-tema="sepia"] {
-  --bg: #f2e8d5; --surface: #f7efe0; --text: #43331f;
-  --muted: #8a7355; --border: #dfd0b4; --story: #8a4b12;
+  --bg: #f1e7d3; --surface: #f6eddb; --text: #3f3020;
+  --muted: #86714f; --border: #dccbaa; --story: #8a4a12; --marca: #f2d38a;
 }
 /* En noche el texto NO es blanco puro: el blanco sobre negro deja
    estela al pasar la vista y cansa a los pocos minutos, que es justo lo
    contrario de para lo que se enciende este color. */
 #voz-lector[data-tema="noche"] {
-  --bg: #12141a; --surface: #191d25; --text: #c8ccd4;
-  --muted: #7d8694; --border: #262b35; --story: #d8a25f;
+  --bg: #121418; --surface: #1a1d23; --text: #cfd3da;
+  --muted: #7f8794; --border: #272c36; --story: #d9a55e; --marca: #6b5320;
 }
 
 .voz-l-top {
-  flex: 0 0 auto; display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; border-bottom: 1px solid var(--border);
+  flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-bottom: 1px solid var(--border);
   background: var(--surface);
-  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  font-family: "Outfit", system-ui, sans-serif;
 }
 .voz-l-ico {
   flex: 0 0 auto; width: 40px; height: 40px; border-radius: 11px; cursor: pointer;
   border: 1px solid var(--border); background: var(--bg); color: var(--text);
-  font: inherit; font-size: 15px; font-family: system-ui, sans-serif;
+  font: inherit; font-size: 16px; font-family: "Outfit", system-ui, sans-serif;
+  display: inline-flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
 }
+.voz-l-ico:active { transform: scale(.95); }
+.voz-l-aa { font-weight: 700; font-family: "Literata", Georgia, serif; }
+/* El marcador puesto se ve: el botón se pinta del color de la tinta. */
+.voz-l-ico-on { background: var(--story); border-color: var(--story); color: #fff; }
 #voz-l-tit { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 .voz-l-tit-t {
   font-size: 14px; font-weight: 700; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  font-family: system-ui, sans-serif;
 }
 /* La mitad de arriba de la etiqueta, en todas las páginas. */
 .voz-l-tit-v {
   font-size: 11px; color: var(--story);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  font-family: system-ui, sans-serif;
 }
 
 .voz-l-mid { position: relative; flex: 1 1 auto; min-height: 0; }
 
+/* La hoja: un flex con el texto y la cola. El relleno de la izquierda y
+   el alto del texto los pone vozPaginar(); aquí solo lo que no cambia.
+   `touch-action: pan-y pinch-zoom`: se le quita al navegador el gesto
+   horizontal —que es el nuestro— y se le dejan el vertical y el de
+   acercar. */
 #voz-hoja {
   position: absolute; inset: 0; overflow: hidden;
+  display: flex; align-items: stretch;
   /* Lo suave del paso de página se pone AQUÍ y no con
      `scrollTo({behavior})`: ver la nota de vozIrPagina(). */
   scroll-behavior: smooth;
-  padding: 18px var(--voz-margen, 22px);
+  padding: 16px 0 16px var(--voz-margen, 24px);
   box-sizing: border-box;
+  touch-action: pan-y pinch-zoom;
+  -webkit-tap-highlight-color: transparent;
 }
 #voz-texto {
+  flex: 0 0 auto;
   column-fill: auto;
   font-size: var(--voz-tam, 19px);
-  line-height: var(--voz-alto, 1.65);
+  line-height: var(--voz-alto, 1.6);
   text-align: var(--voz-just, justify);
   hyphens: auto; -webkit-hyphens: auto;
+  orphans: 2; widows: 2;
   color: var(--text);
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  overflow-wrap: break-word;
 }
-.voz-p { margin: 0 0 .85em; text-indent: 1.2em; }
-/* El primer párrafo de una escena no lleva sangría: es como se compone
-   un libro, y la sangría dice «esto viene de arriba», que ahí es mentira. */
-.voz-p:first-of-type, .voz-sep + .voz-p, .voz-cap-tit + .voz-p { text-indent: 0; }
+#voz-cola { flex: 0 0 var(--voz-margen, 24px); }
+
+.voz-p { margin: 0 0 .85em; text-indent: 1.3em; }
+.voz-p-sin-sangria { text-indent: 0; }
+/* La capitular del primer párrafo del capítulo: tres renglones, del
+   color de la tinta. Solo con la clase que pone el ajuste, y solo en el
+   párrafo que empieza por letra (lo decide vozNodoBloque). */
+#voz-lector.voz-capital .voz-p-capital::first-letter {
+  float: left; font-size: 3.15em; line-height: .84; font-weight: 700;
+  padding: .06em .1em 0 0; color: var(--story);
+}
+.voz-sub {
+  font-size: 1.05em; font-weight: 700; margin: 1.3em 0 .6em; text-indent: 0;
+  text-align: left; break-after: avoid; line-height: 1.3;
+  font-family: "Outfit", system-ui, sans-serif; letter-spacing: .1px;
+}
 .voz-cita {
-  text-indent: 0; margin-left: 1.4em; font-style: italic; color: var(--muted);
+  margin: .9em 0 1em 1.2em; padding-left: .9em; text-indent: 0; text-align: left;
+  border-left: 2px solid var(--border); font-style: italic; color: var(--muted);
+  white-space: pre-line; font-size: .95em;
 }
+.voz-verso {
+  margin: .9em 0 1em 1.4em; text-indent: 0; text-align: left;
+  white-space: pre-line; hyphens: manual; -webkit-hyphens: manual;
+}
+.voz-li { display: flex; gap: .55em; margin: 0 0 .35em .6em; text-indent: 0; text-align: left; }
+.voz-li-primero { margin-top: .5em; }
+.voz-li-marca { flex: 0 0 1.4em; text-align: right; color: var(--story); }
+.voz-li-txt { flex: 1 1 auto; min-width: 0; }
+.voz-li + .voz-p { margin-top: .9em; }
 .voz-sep {
-  text-align: center; margin: 1.3em 0; color: var(--muted);
+  text-align: center; margin: 1.3em 0; color: var(--story);
   font-size: .8em; letter-spacing: .5em; text-indent: 0;
 }
-.voz-cap-tit {
-  font-size: 1.15em; font-weight: 700; margin: 0 0 1em; text-align: center;
-  break-before: column; text-indent: 0; color: var(--text);
+.voz-fin-palabra {
+  text-align: center; margin: 1.8em 0 1em; letter-spacing: .4em; font-size: .85em;
+  font-weight: 700; color: var(--muted); text-indent: 0;
 }
-/* El primer capítulo no salta de columna: ya viene detrás de la portada,
-   que salta ella. Sin esto quedaría una página en blanco entre las dos. */
-.voz-portada + .voz-cap-tit { break-before: auto; }
+.voz-cap-tit {
+  font-size: 1.28em; font-weight: 700; margin: .4em 0 1.1em; text-align: center;
+  break-before: column; break-after: avoid; text-indent: 0; color: var(--text); line-height: 1.25;
+  padding-top: 1.2em;
+}
+.voz-cap-num {
+  display: block; font-size: .62em; font-weight: 600; letter-spacing: .35em; color: var(--story);
+  margin-bottom: .7em; font-family: "Outfit", system-ui, sans-serif;
+}
+/* El primer capítulo no salta de columna: ya viene detrás de la portada
+   (o del epígrafe), que saltan ellos. Sin esto quedaría una página en
+   blanco entre las dos. */
+.voz-portada + .voz-cap-tit, .voz-epigrafe + .voz-cap-tit { break-before: auto; }
+/* El párrafo que sigue a un salto de escena o a un subtítulo no lleva
+   sangría: es principio, no continuación. */
+.voz-sep + .voz-p, .voz-sub + .voz-p, .voz-cap-tit + .voz-p, .voz-cita + .voz-p, .voz-verso + .voz-p { text-indent: 0; }
 
 /* ⚠️ LA PORTADA OCUPA SU PROPIA PÁGINA. Es la primera página de todo
-   cuento y lleva la etiqueta escrita en grande. No se puede quitar. */
+   texto y lleva la etiqueta escrita en grande. No se puede quitar. */
 .voz-portada {
-  break-after: column; text-align: center; padding-top: 14%;
+  break-after: column; text-align: center; padding-top: 12%; text-indent: 0;
 }
-.voz-portada-tit { font-size: 1.7em; font-weight: 700; line-height: 1.25; margin-bottom: .5em; }
-.voz-portada-voz { font-size: 1em; font-style: italic; color: var(--story); }
+.voz-portada-gen {
+  font-size: .68em; letter-spacing: .35em; color: var(--story); font-weight: 600;
+  font-family: "Outfit", system-ui, sans-serif; margin-bottom: 1.4em;
+}
+.voz-portada-tit { font-size: 1.75em; font-weight: 700; line-height: 1.22; margin-bottom: .55em; }
+.voz-portada-voz { font-size: 1.02em; font-style: italic; color: var(--story); }
 .voz-portada-linea {
-  width: 46px; height: 2px; background: var(--border); margin: 1.1em auto;
+  width: 46px; height: 2px; background: var(--story); opacity: .55; margin: 1.2em auto;
 }
-.voz-portada-maq { font-size: .82em; color: var(--muted); font-family: system-ui, sans-serif; }
+.voz-portada-maq { font-size: .82em; color: var(--muted); font-family: "Outfit", system-ui, sans-serif; }
 .voz-portada-aviso {
-  font-size: .78em; color: var(--muted); margin-top: .5em; line-height: 1.5;
-  font-family: system-ui, sans-serif;
+  font-size: .76em; color: var(--muted); margin-top: .5em; line-height: 1.5;
+  font-family: "Outfit", system-ui, sans-serif;
 }
 .voz-portada-enc {
-  font-size: .8em; color: var(--muted); margin-top: 1.4em; font-style: italic; line-height: 1.5;
+  font-size: .82em; color: var(--muted); margin-top: 1.5em; font-style: italic; line-height: 1.5;
 }
-.voz-portada-fec { font-size: .72em; color: var(--muted); margin-top: 1.2em; font-family: system-ui, sans-serif; }
+.voz-portada-datos {
+  font-size: .72em; color: var(--muted); margin-top: 1.6em;
+  font-family: "Outfit", system-ui, sans-serif;
+}
+.voz-portada-fec { font-size: .7em; color: var(--muted); margin-top: .5em; font-family: "Outfit", system-ui, sans-serif; }
 
-.voz-fin-cap { text-align: center; margin-top: 1.6em; text-indent: 0; }
+/* El epígrafe: su propia página, a media altura y a la derecha, como
+   en un libro. */
+.voz-epigrafe {
+  break-after: column; padding: 28% 0 0 22%; text-indent: 0; text-align: left;
+  font-style: italic; color: var(--muted); font-size: .95em; line-height: 1.55;
+}
+.voz-epi-cita, .voz-epi-verso { white-space: pre-line; margin-bottom: 1em; }
+
+.voz-fin-cap { text-align: center; margin-top: 1.8em; text-indent: 0; break-inside: avoid; }
 .voz-fin-marca { color: var(--story); font-size: 1.1em; letter-spacing: .3em; }
-.voz-fin-txt { font-size: .82em; color: var(--muted); margin-top: .5em; font-family: system-ui, sans-serif; }
+.voz-fin-txt { font-size: .82em; color: var(--muted); margin-top: .5em; font-family: "Outfit", system-ui, sans-serif; }
 .voz-fin-et {
   font-size: .74em; color: var(--muted); margin-top: .9em; line-height: 1.5;
-  font-family: system-ui, sans-serif;
+  font-family: "Outfit", system-ui, sans-serif;
 }
 
-/* Las tres zonas del toque. ⚠️ `touch-action: pan-y pinch-zoom` y no
-   `none`: se le quita al navegador el gesto horizontal —que es el
-   nuestro— y se le dejan el vertical y el de acercar, porque quitarle
-   el de acercar a una pantalla de lectura es quitarle la letra grande a
-   quien la necesita. */
-.voz-zonas { position: absolute; inset: 0; display: flex; touch-action: pan-y pinch-zoom; }
-.voz-zonas > div { height: 100%; -webkit-tap-highlight-color: transparent; }
-#voz-z-izq { flex: 0 0 26%; cursor: w-resize; }
-#voz-z-mid { flex: 1 1 auto; cursor: pointer; }
-#voz-z-der { flex: 0 0 26%; cursor: e-resize; }
+/* Lo encontrado por el buscador: el párrafo parpadea y la palabra queda
+   marcada hasta que se pase página. */
+.voz-mark { background: var(--marca, #fde68a); color: inherit; border-radius: 3px; padding: 0 .05em; }
+.voz-p-hit { animation: vozHit 2.4s ease-out; }
+@keyframes vozHit {
+  0%   { background: var(--marca, #fde68a); box-shadow: 0 0 0 6px var(--marca, #fde68a); }
+  100% { background: transparent; box-shadow: 0 0 0 6px transparent; }
+}
 
-.voz-barra { height: 3px; background: var(--border); flex: 0 0 auto; }
-.voz-barra-in { height: 100%; background: var(--story); width: 0; transition: width .2s; }
+/* Las zonas del toque. El contenedor NO recibe el puntero —para que el
+   centro sea la propia hoja y el texto se pueda seleccionar— y solo los
+   dos bordes lo cogen. ⚠️ `touch-action: pan-y pinch-zoom` y no `none`:
+   se le quita al navegador el gesto horizontal —que es el nuestro— y se
+   le dejan el vertical y el de acercar, porque quitarle el de acercar a
+   una pantalla de lectura es quitarle la letra grande a quien la
+   necesita. */
+.voz-zonas { position: absolute; inset: 0; display: flex; touch-action: pan-y pinch-zoom; pointer-events: none; }
+.voz-zonas > div { height: 100%; -webkit-tap-highlight-color: transparent; }
+#voz-z-izq { flex: 0 0 20%; cursor: w-resize; pointer-events: auto; }
+#voz-z-mid { flex: 1 1 auto; pointer-events: none; }
+#voz-z-der { flex: 0 0 20%; cursor: e-resize; pointer-events: auto; }
+
+.voz-barra { position: relative; height: 4px; background: var(--border); flex: 0 0 auto; }
+#voz-barra-marcas { position: absolute; inset: 0; pointer-events: none; }
+.voz-barra-tick { position: absolute; top: -1px; width: 2px; height: 6px; background: var(--muted); opacity: .6; }
+.voz-barra-in { position: relative; height: 100%; background: var(--story); width: 0; transition: width .25s; }
 
 .voz-l-pie {
   flex: 0 0 auto; display: flex; align-items: center; gap: 10px;
-  padding: 9px 12px; border-top: 1px solid var(--border); background: var(--surface);
-  padding-bottom: calc(9px + env(safe-area-inset-bottom, 0px));
-  font-family: system-ui, sans-serif;
+  padding: 8px 10px; border-top: 1px solid var(--border); background: var(--surface);
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  font-family: "Outfit", system-ui, sans-serif;
 }
 #voz-pag {
   flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap;
-  justify-content: center; gap: 3px 10px; font-size: 12px; color: var(--muted);
+  justify-content: center; gap: 2px 10px; font-size: 12px; color: var(--muted); line-height: 1.35;
 }
 .voz-pag-n { font-weight: 700; color: var(--text); }
 .voz-pag-maq { color: var(--story); }
 
 /* ⚠️ EL MODO DESNUDO NO QUITA LOS MANDOS DEL SITIO: LOS APAGA.
    Sacarlos del flujo haría más alta la caja del texto, y una caja más
-   alta REPAGINA el cuento entero debajo del dedo del lector: la página
+   alta REPAGINA el texto entero debajo del dedo del lector: la página
    que estaba mirando pasa a ser otra. Se apagan con opacidad, que no
    mueve un píxel de la caja. */
 #voz-lector.voz-desnudo .voz-l-top,
-#voz-lector.voz-desnudo .voz-l-pie { opacity: .12; pointer-events: none; }
+#voz-lector.voz-desnudo .voz-l-pie { opacity: .1; pointer-events: none; }
 #voz-lector .voz-l-top, #voz-lector .voz-l-pie { transition: opacity .25s; }
+
+/* El aviso de la sala: dentro de ella y con su papel, porque el de la
+   aplicación queda por debajo. */
+.voz-toast {
+  position: absolute; left: 50%; bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%) translateY(8px); z-index: 9;
+  max-width: 88%; padding: 9px 16px; border-radius: 20px; text-align: center;
+  background: var(--text); color: var(--bg);
+  font: 600 13px "Outfit", system-ui, sans-serif;
+  opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+}
+.voz-toast-on { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* Los paneles de la sala: cuelgan DENTRO de #voz-lector, así que se
    tiñen con el papel que esté puesto. */
 .voz-panel {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
-  max-height: 64%; overflow-y: auto;
+  max-height: 74%; overflow-y: auto;
   background: var(--surface); border-top: 1px solid var(--border);
-  border-radius: 18px 18px 0 0; padding: 16px 16px 22px;
+  border-radius: 18px 18px 0 0; padding: 14px 16px 22px;
   box-shadow: 0 -8px 30px rgba(0,0,0,.18);
-  font-family: system-ui, sans-serif;
+  font-family: "Outfit", system-ui, sans-serif; color: var(--text);
+  -webkit-overflow-scrolling: touch;
 }
 .voz-panel[hidden] { display: none; }
-.voz-aj-fila { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.voz-tabs { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 12px; margin-bottom: 12px; }
+.voz-tab {
+  flex: 1 1 0; min-width: 0; padding: 9px 4px; border: 0; border-radius: 9px; cursor: pointer;
+  background: transparent; color: var(--muted); font: inherit; font-size: 12.5px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.voz-tab-on { background: var(--surface); color: var(--story); box-shadow: 0 1px 3px rgba(0,0,0,.14); }
+
+.voz-aj-fila { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; flex-wrap: wrap; }
 .voz-aj-rot { flex: 0 0 84px; font-size: 12.5px; color: var(--muted); }
 .voz-aj-caja { flex: 1 1 160px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .voz-aj-chip {
@@ -393,29 +549,59 @@
 .voz-aj-val { min-width: 58px; text-align: center; font-size: 13px; color: var(--text); }
 .voz-aj-nota { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 10px 0 0; }
 
-.voz-ind-tit { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+.voz-ind-ficha { padding: 2px 0 12px; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
+.voz-ind-ficha-t { font-size: 15px; font-weight: 800; margin-bottom: 7px; }
+.voz-ind-ficha-p { font-size: 12.5px; color: var(--muted); line-height: 1.45; margin: 6px 0 0; }
+.voz-ind-ficha-datos { font-weight: 600; }
+.voz-ind-tit { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
 .voz-ind-item {
   display: flex; align-items: baseline; gap: 10px; width: 100%; cursor: pointer;
-  padding: 11px 10px; border: 0; border-bottom: 1px solid var(--border);
+  padding: 11px 8px; border: 0; border-bottom: 1px solid var(--border);
   background: transparent; color: var(--text); font: inherit; font-size: 14px; text-align: left;
 }
 .voz-ind-n { flex: 0 0 auto; font-size: 11px; color: var(--muted); min-width: 18px; }
 .voz-ind-t { flex: 1 1 auto; min-width: 0; }
+.voz-ind-min { flex: 0 0 auto; font-size: 11px; color: var(--muted); }
 .voz-ind-on { color: var(--story); font-weight: 700; }
 
+.voz-marca { display: flex; align-items: stretch; gap: 6px; border-bottom: 1px solid var(--border); }
+.voz-marca-ir {
+  flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; cursor: pointer;
+  padding: 10px 6px; border: 0; background: transparent; color: var(--text); font: inherit; text-align: left;
+}
+.voz-marca-cap { font-size: 11px; color: var(--story); font-weight: 700; }
+.voz-marca-txt { font-size: 13.5px; line-height: 1.4; font-family: var(--voz-fam, Georgia, serif); }
+.voz-marca-cuando { font-size: 11px; color: var(--muted); }
+.voz-marca-x {
+  flex: 0 0 40px; border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 15px; cursor: pointer;
+}
+
+.voz-busca-caja { margin-bottom: 10px; }
+.voz-busca-in {
+  width: 100%; box-sizing: border-box; padding: 11px 13px; border-radius: 11px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-size: 15px;
+}
+.voz-busca-in:focus { outline: none; border-color: var(--story); }
+.voz-busca-n { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.voz-busca-item {
+  display: flex; flex-direction: column; gap: 3px; width: 100%; cursor: pointer;
+  padding: 10px 6px; border: 0; border-bottom: 1px solid var(--border);
+  background: transparent; color: var(--text); font: inherit; text-align: left;
+}
+.voz-busca-ext { font-size: 13.5px; line-height: 1.4; font-family: var(--voz-fam, Georgia, serif); }
+
 @media (min-width: 760px) {
-  /* En pantalla ancha el texto no se estira a lo ancho de un monitor:
-     un renglón de treinta palabras se pierde al volver al margen. Se
-     mantiene la caja en una anchura de libro y se centra. */
-  #voz-hoja { padding-left: max(var(--voz-margen, 22px), calc((100% - 680px) / 2)); }
-  #voz-hoja { padding-right: max(var(--voz-margen, 22px), calc((100% - 680px) / 2)); }
-  .voz-panel { left: 50%; transform: translateX(-50%); width: min(560px, 92%); border-radius: 18px 18px 0 0; }
+  .voz-panel { left: 50%; transform: translateX(-50%); width: min(600px, 94%); border-radius: 18px 18px 0 0; }
+  .voz-l-top { padding-left: 16px; padding-right: 16px; }
+  .voz-l-pie { padding-left: 16px; padding-right: 16px; }
 }
 
 @media (max-width: 380px) {
   .voz-ficha-pie { flex-wrap: wrap; }
-  .voz-lomo { flex-basis: 34px; }
+  .voz-lomo { flex-basis: 36px; }
   .voz-aj-rot { flex-basis: 100%; }
+  .voz-l-top { gap: 6px; padding-left: 8px; padding-right: 8px; }
+  .voz-l-ico { width: 38px; height: 38px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

@@ -155,6 +155,16 @@ Zone → Make private.
      son dos: el primero crea, el segundo solo mira. No dependen de nada
      más que de `es_familia()`, que ya está. El primero se puede correr dos
      veces sin borrar ni un cuento.
+     ⚠️ **Y SI YA SE CORRIÓ EL DÍA DEL ESTRENO, HAY QUE VOLVER A CORRERLO:**
+     la tarde del 10 de septiembre de 2026 la tabla ganó la columna
+     `genero` (cuento, ensayo, poema, carta…), y un `create table if not
+     exists` no toca una tabla que ya existe. El archivo la añade aparte con
+     `add column if not exists`, sin tocar ni un cuento. Mientras no se
+     re-corra, la herramienta sigue funcionando y lo dice en su barra
+     («la base va vieja: vuelve a correr voz_prestada.sql»), guardando el
+     género solo en el aparato. La fila que lo delata en la comprobación es
+     **«columna genero»**: tiene que decir `existe` (en `voz_prestada.sql`)
+     o `1` (en `voz_prestada_comprueba.sql`).
      Crea la tabla de **La Voz Prestada**, el anaquel de los cuentos que una
      máquina escribe «al modo de» otros escritores, que el autor pidió el 10
      de septiembre de 2026. Hasta que se corra, la herramienta **funciona
@@ -162,7 +172,7 @@ Zone → Make private.
      este aparato: falta correr voz_prestada.sql»): no finge que viaja, y
      nada de lo que se guarde mientras tanto se pierde.
      Lo que hay que mirar al pegarlo es **la tabla del final**, nunca el
-     «Success» del editor: sale en VERTICAL, con diez filas, y todas tienen
+     «Success» del editor: sale en VERTICAL, con once filas, y todas tienen
      que llevar ✅. Tres se leen al revés que las demás y tienen que decir
      `ninguna` — «borrado de verdad (NO debe poder)» y «puerta pública (NO
      debe haberla)»—: aquí se retira con lápida (si un aparato borrara la
@@ -182,10 +192,12 @@ Zone → Make private.
      trescientas — y entre sus filas va «⚠️ cuentos SIN etiqueta», que tiene
      que decir 0 siempre.
      Probado antes de mandarlo contra un PostgreSQL de verdad con
-     `_dev/prueba-voz-prestada-sql.sql`: las quince comprobaciones pasan,
-     incluida la de que `anon` no ve ni una fila y la de que un cuento ajeno
-     se lee pero no se corrige, con los permisos repartidos como los reparte
-     Supabase.
+     `_dev/prueba-voz-prestada-sql.sql`: las dieciocho comprobaciones pasan,
+     incluida la de que `anon` no ve ni una fila, la de que un cuento ajeno
+     se lee pero no se corrige, y la de que **la tabla del estreno recibe
+     la columna `genero` al re-correr el archivo** (la prueba crea primero
+     la tabla vieja, que es el camino que va a recorrer la base de verdad),
+     con los permisos repartidos como los reparte Supabase.
    · ✅ **CORRIDO** — `supabase/sql/metas_videos_tope_10.sql`, el 28 de
      agosto de 2026. La comprobación del final devolvió lo que tenía que
      devolver: `tope_preguntas = 10`. Sube de cinco a diez el tope de
