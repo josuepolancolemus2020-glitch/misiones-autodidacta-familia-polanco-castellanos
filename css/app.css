@@ -4552,6 +4552,19 @@ body {
    Acceso Rápido un triángulo se confunde con «reproducir algo de aquí»,
    y esto no reproduce nada, administra. */
 .qa-mvid { background: linear-gradient(135deg, #b91c1c, #f87171); }
+/* El marrón de tinta y cuero de Storytelling (--story): es la materia a
+   la que pertenece lo que se lee aquí, y ningún otro botón lo usa.
+   ⚠️ El color liso va aparte del degradado a propósito: `background:
+   linear-gradient(...)` deja el `background-color` en transparente, y
+   si algún día el degradado no pinta (una impresión, un navegador con
+   los degradados desactivados) el icono se quedaría sin fondo. */
+.qa-voz { background-color: #78350f; background-image: linear-gradient(135deg, #78350f, #b97a45); }
+
+/* Con la sala de lectura abierta, el cuerpo no se desplaza por detrás:
+   en una tableta, un dedo que se pase de la caja del texto arrastraría
+   la página de debajo y la lectura se quedaría a medio camino entre las
+   dos pantallas. */
+body.voz-sala { overflow: hidden; }
 
 /* La Criba. `position: relative` hace falta para que la insignia del
    contador se coloque encima del icono, igual que en Sugerencias. */

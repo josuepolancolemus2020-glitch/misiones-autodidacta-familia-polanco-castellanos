@@ -1,0 +1,431 @@
+/* ─────────────────────────────────────────────
+   LA VOZ PRESTADA 📖 · el lector de los cuentos de encargo
+
+   Hoja propia, como la de El Rodaje y La Criba, y por lo mismo: una
+   sala de lectura tiene un vocabulario visual que no usa nadie más
+   —columnas de texto, portada, índice, tres colores de papel— y meterlo
+   en app.css sería añadirle seiscientas líneas que solo se usan aquí.
+
+   ⚠️ SON DOS MUNDOS, Y ESTÁN SEPARADOS A PROPÓSITO:
+
+   · EL ANAQUEL (`#view-voz`) vive en el mundo CLARO de la aplicación y
+     usa sus tokens tal cual: `--surface`, `--bg`, `--border`, `--text`,
+     `--muted`. Es una pantalla de la casa como las demás.
+     ⚠️ Y `--card` NO EXISTE en la aplicación: el fondo blanco de una
+     tarjeta es `--surface`. Escribir `var(--card)` aquí no da error, no
+     rompe nada y deja el fondo TRANSPARENTE, que es como Videos
+     M.E.T.A.S estuvo meses sin que nadie lo viera.
+
+   · LA SALA (`#voz-lector`) redefine esos mismos tokens DENTRO DE SÍ
+     MISMA, con tres juegos de valores (papel, sepia, noche). Es lo que
+     hace El Rodaje, y por la misma razón de fondo aunque el caso sea
+     otro: un cuento se lee de noche en la cama —y ahí una pantalla
+     blanca deslumbra y despierta— y se lee a mediodía en un patio
+     —donde el gris no se ve—. Como todo lo de la sala cuelga DENTRO de
+     `#voz-lector` (los paneles incluidos), no hace falta nombrar
+     ventanas sueltas una por una como allá.
+
+   ⚠️ Y NO SE TOCA NI UN TOKEN DE `:root`. El resto de F.A.R.O es claro
+   y sigue siéndolo. Un token redefinido arriba teñiría la casa entera.
+───────────────────────────────────────────── */
+
+/* ═══════════════ EL ANAQUEL ═══════════════ */
+
+.voz-cab {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 0 12px; flex-wrap: wrap;
+}
+/* 220 y no 180: con 180 los dos caben en la misma fila en un teléfono,
+   pero el campo de buscar se queda en 170 px y escribir ahí es escribir
+   a ciegas. Con 220 la fila se parte antes y cada cosa se ve entera. */
+.voz-busca {
+  flex: 1 1 220px; min-width: 0;
+  padding: 11px 14px; border: 1px solid var(--border); border-radius: 12px;
+  background: var(--surface); color: var(--text); font-size: 15px; font-family: inherit;
+}
+.voz-busca::placeholder { color: var(--muted); }
+
+.voz-nube {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 13px; border-radius: 12px; margin-bottom: 12px;
+  font-size: 13px; line-height: 1.35; border: 1px solid var(--border);
+}
+.voz-nube-ic { font-size: 15px; }
+.voz-nube-ok { background: #f0fdf4; border-color: rgba(22,163,74,.25); color: #15803d; }
+.voz-nube-no { background: #fffbeb; border-color: rgba(217,119,6,.25); color: #b45309; }
+
+/* ⚠️ LOS CHIPS NO BAJAN DE LÍNEA: SE DESLIZAN. Es la excepción a la
+   regla del `flex-wrap` de la casa, y es la misma que ya se escribió
+   para las materias de Videos M.E.T.A.S: con seis o siete voces
+   guardadas, envueltos ocupan tres renglones y empujan el anaquel fuera
+   de la pantalla, así que para elegir una voz habría que deslizar la
+   página entera. El degradado del borde dice que hay más. */
+.voz-chips {
+  display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px;
+  padding-bottom: 10px; margin-bottom: 6px;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 88%, transparent);
+          mask-image: linear-gradient(to right, #000 88%, transparent);
+}
+.voz-chips::-webkit-scrollbar { display: none; }
+.voz-chip {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); font: inherit; font-size: 13px; white-space: nowrap;
+}
+.voz-chip-n {
+  font-size: 11px; padding: 1px 7px; border-radius: 999px;
+  background: var(--bg); color: var(--muted);
+}
+.voz-chip-on { background: var(--story); border-color: var(--story); color: #fff; }
+.voz-chip-on .voz-chip-n { background: rgba(255,255,255,.22); color: #fff; }
+
+.voz-lista { display: flex; flex-direction: column; gap: 12px; }
+
+.voz-ficha {
+  display: flex; gap: 0; overflow: hidden;
+  border: 1px solid var(--border); border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(15,23,42,.06);
+}
+
+/* El lomo del libro. ⚠️ El color liso va en `background-color` y el
+   brillo en `background-image`, SEPARADOS: el atajo `background:
+   linear-gradient(...)` deja el color de fondo en transparente, que es
+   el mismo fallo silencioso del `var(--card)` y no lo caza ninguna
+   sonda que mire el HTML. */
+.voz-lomo {
+  flex: 0 0 46px; display: flex; align-items: center; justify-content: center;
+  background-color: hsl(var(--voz-h, 25) 42% 38%);
+  background-image: linear-gradient(160deg, rgba(255,255,255,.22), rgba(0,0,0,.28));
+}
+.voz-lomo-ini {
+  font-family: Georgia, serif; font-size: 22px; color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+
+.voz-ficha-cuerpo { flex: 1 1 auto; min-width: 0; padding: 14px 15px; }
+.voz-ficha-tit {
+  margin: 0 0 7px; font-size: 16px; line-height: 1.3; color: var(--text);
+  font-weight: 700;
+}
+
+/* ⚠️ LA ETIQUETA. Se ve antes que ningún otro dato del cuento y las dos
+   mitades van juntas: la voz imitada y la máquina que escribió. No se
+   apaga, no se pliega y no hay ajuste que la quite. La razón, entera,
+   está en la cabecera de js/tools/voz-prestada.js. */
+.voz-etiqueta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+.voz-et-voz, .voz-et-maq {
+  font-size: 11.5px; padding: 3px 9px; border-radius: 999px;
+  border: 1px solid transparent; line-height: 1.3;
+}
+.voz-et-voz { background: var(--story-bg); color: var(--story); border-color: var(--story-border); }
+.voz-et-maq { background: var(--ia-bg); color: var(--ia); border-color: var(--ia-border); }
+
+.voz-ficha-meta {
+  display: flex; flex-wrap: wrap; gap: 4px 12px;
+  font-size: 12px; color: var(--muted); margin-bottom: 10px;
+}
+.voz-avance { height: 5px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.voz-avance-in { height: 100%; background: var(--story); border-radius: 99px; }
+.voz-avance-txt { display: block; font-size: 11.5px; color: var(--muted); margin: 5px 0 0; }
+
+.voz-ficha-pie { display: flex; gap: 8px; margin-top: 12px; }
+.voz-btn {
+  padding: 9px 14px; border-radius: 11px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); font: inherit; font-size: 14px; min-height: 40px;
+}
+.voz-btn:active { transform: scale(.97); }
+.voz-btn-pri { flex: 1 1 auto; background: var(--story); border-color: var(--story); color: #fff; }
+.voz-cab .voz-btn-pri { flex: 1 1 auto; white-space: nowrap; }
+.voz-btn-flojo { opacity: .55; }
+
+/* ═══════════════ LA HOJA DE PEGAR ═══════════════ */
+
+.voz-pegar-txt {
+  width: 100%; min-height: 190px; resize: vertical; box-sizing: border-box;
+  padding: 12px 13px; border: 1px solid var(--border); border-radius: 12px;
+  background: var(--surface); color: var(--text);
+  font-family: Georgia, "Times New Roman", serif; font-size: 15px; line-height: 1.55;
+}
+.voz-pegar-barra { display: flex; gap: 8px; margin: 9px 0 14px; flex-wrap: wrap; }
+
+.voz-rep {
+  border: 1px dashed var(--border); border-radius: 12px;
+  padding: 12px 13px; margin-bottom: 14px; background: var(--bg);
+}
+.voz-rep-vacio { margin: 0; font-size: 13px; color: var(--muted); }
+.voz-rep-linea { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.voz-rep-dato {
+  font-size: 12px; padding: 3px 9px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+}
+.voz-rep-caps { display: flex; flex-direction: column; gap: 4px; }
+.voz-rep-cap {
+  display: flex; align-items: baseline; gap: 8px; font-size: 13px;
+  padding: 4px 0; border-bottom: 1px solid var(--border);
+}
+.voz-rep-cap:last-child { border-bottom: 0; }
+.voz-rep-cap-n {
+  flex: 0 0 auto; min-width: 20px; text-align: center; font-size: 11px;
+  color: var(--muted); background: var(--surface); border-radius: 6px; padding: 1px 4px;
+}
+.voz-rep-cap-t { flex: 1 1 auto; min-width: 0; color: var(--text); }
+.voz-rep-cap-p { flex: 0 0 auto; font-size: 11.5px; color: var(--muted); }
+
+.voz-rep-avisos {
+  margin-top: 11px; padding: 9px 11px; border-radius: 10px;
+  background: #fffbeb; border: 1px solid rgba(217,119,6,.25); color: #92400e;
+}
+.voz-rep-avisos-t { font-size: 12.5px; font-weight: 600; margin-bottom: 5px; }
+.voz-rep-aviso { font-size: 12px; opacity: .9; }
+
+.voz-campo { margin-bottom: 12px; }
+.voz-campo label {
+  display: block; font-size: 12.5px; color: var(--muted); margin-bottom: 5px;
+}
+.voz-campo input, .voz-campo textarea {
+  width: 100%; box-sizing: border-box; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 11px;
+  background: var(--surface); color: var(--text);
+  font-family: inherit; font-size: 15px;
+}
+.voz-campo textarea { min-height: 60px; resize: vertical; }
+.voz-campo-obl label { color: var(--story); font-weight: 600; }
+
+/* ⚠️ ÁMBAR, NO ROJO, Y ANTES DE TOCAR NADA. Es la señal de la regla de
+   la casa para «esto está a medias y el guardado se va a parar»: la
+   misma que usa el quiz de Videos M.E.T.A.S para una pregunta sin
+   respuesta marcada. El rojo es para lo que ya salió mal. */
+.voz-campo-ambar { border-color: #d97706; background: #fffbeb; }
+.voz-falta {
+  font-size: 13px; color: #b45309; background: #fffbeb;
+  border: 1px solid rgba(217,119,6,.3); border-radius: 10px;
+  padding: 9px 12px; margin-bottom: 10px;
+}
+
+.voz-ayuda-fila { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.voz-ayuda-campo { flex: 0 0 38%; font-size: 13px; font-weight: 600; color: var(--text); }
+.voz-ayuda-claves { flex: 1 1 auto; font-size: 12.5px; color: var(--muted); word-break: break-word; }
+.voz-ayuda-nota { font-size: 13px; line-height: 1.5; margin-top: 10px; color: var(--muted); }
+.voz-ayuda-nota strong { color: var(--text); }
+
+/* ═══════════════ LA SALA DE LECTURA ═══════════════ */
+
+#voz-lector {
+  position: fixed; inset: 0; z-index: 3200;
+  display: flex; flex-direction: column;
+  background: var(--bg); color: var(--text);
+  font-family: var(--voz-fam, Georgia, serif);
+}
+#voz-lector[hidden] { display: none; }
+
+/* Los tres papeles. Se redefinen los tokens de la aplicación DENTRO de
+   la sala, así que todo lo que herede de app.css se tiñe solo. */
+#voz-lector[data-tema="papel"] {
+  --bg: #f6f4ef; --surface: #fffdf8; --text: #1c1917;
+  --muted: #78716c; --border: #e4e0d6; --story: #78350f;
+}
+#voz-lector[data-tema="sepia"] {
+  --bg: #f2e8d5; --surface: #f7efe0; --text: #43331f;
+  --muted: #8a7355; --border: #dfd0b4; --story: #8a4b12;
+}
+/* En noche el texto NO es blanco puro: el blanco sobre negro deja
+   estela al pasar la vista y cansa a los pocos minutos, que es justo lo
+   contrario de para lo que se enciende este color. */
+#voz-lector[data-tema="noche"] {
+  --bg: #12141a; --surface: #191d25; --text: #c8ccd4;
+  --muted: #7d8694; --border: #262b35; --story: #d8a25f;
+}
+
+.voz-l-top {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+}
+.voz-l-ico {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 11px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font: inherit; font-size: 15px; font-family: system-ui, sans-serif;
+}
+#voz-l-tit { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.voz-l-tit-t {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: system-ui, sans-serif;
+}
+/* La mitad de arriba de la etiqueta, en todas las páginas. */
+.voz-l-tit-v {
+  font-size: 11px; color: var(--story);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: system-ui, sans-serif;
+}
+
+.voz-l-mid { position: relative; flex: 1 1 auto; min-height: 0; }
+
+#voz-hoja {
+  position: absolute; inset: 0; overflow: hidden;
+  /* Lo suave del paso de página se pone AQUÍ y no con
+     `scrollTo({behavior})`: ver la nota de vozIrPagina(). */
+  scroll-behavior: smooth;
+  padding: 18px var(--voz-margen, 22px);
+  box-sizing: border-box;
+}
+#voz-texto {
+  column-fill: auto;
+  font-size: var(--voz-tam, 19px);
+  line-height: var(--voz-alto, 1.65);
+  text-align: var(--voz-just, justify);
+  hyphens: auto; -webkit-hyphens: auto;
+  color: var(--text);
+}
+.voz-p { margin: 0 0 .85em; text-indent: 1.2em; }
+/* El primer párrafo de una escena no lleva sangría: es como se compone
+   un libro, y la sangría dice «esto viene de arriba», que ahí es mentira. */
+.voz-p:first-of-type, .voz-sep + .voz-p, .voz-cap-tit + .voz-p { text-indent: 0; }
+.voz-cita {
+  text-indent: 0; margin-left: 1.4em; font-style: italic; color: var(--muted);
+}
+.voz-sep {
+  text-align: center; margin: 1.3em 0; color: var(--muted);
+  font-size: .8em; letter-spacing: .5em; text-indent: 0;
+}
+.voz-cap-tit {
+  font-size: 1.15em; font-weight: 700; margin: 0 0 1em; text-align: center;
+  break-before: column; text-indent: 0; color: var(--text);
+}
+/* El primer capítulo no salta de columna: ya viene detrás de la portada,
+   que salta ella. Sin esto quedaría una página en blanco entre las dos. */
+.voz-portada + .voz-cap-tit { break-before: auto; }
+
+/* ⚠️ LA PORTADA OCUPA SU PROPIA PÁGINA. Es la primera página de todo
+   cuento y lleva la etiqueta escrita en grande. No se puede quitar. */
+.voz-portada {
+  break-after: column; text-align: center; padding-top: 14%;
+}
+.voz-portada-tit { font-size: 1.7em; font-weight: 700; line-height: 1.25; margin-bottom: .5em; }
+.voz-portada-voz { font-size: 1em; font-style: italic; color: var(--story); }
+.voz-portada-linea {
+  width: 46px; height: 2px; background: var(--border); margin: 1.1em auto;
+}
+.voz-portada-maq { font-size: .82em; color: var(--muted); font-family: system-ui, sans-serif; }
+.voz-portada-aviso {
+  font-size: .78em; color: var(--muted); margin-top: .5em; line-height: 1.5;
+  font-family: system-ui, sans-serif;
+}
+.voz-portada-enc {
+  font-size: .8em; color: var(--muted); margin-top: 1.4em; font-style: italic; line-height: 1.5;
+}
+.voz-portada-fec { font-size: .72em; color: var(--muted); margin-top: 1.2em; font-family: system-ui, sans-serif; }
+
+.voz-fin-cap { text-align: center; margin-top: 1.6em; text-indent: 0; }
+.voz-fin-marca { color: var(--story); font-size: 1.1em; letter-spacing: .3em; }
+.voz-fin-txt { font-size: .82em; color: var(--muted); margin-top: .5em; font-family: system-ui, sans-serif; }
+.voz-fin-et {
+  font-size: .74em; color: var(--muted); margin-top: .9em; line-height: 1.5;
+  font-family: system-ui, sans-serif;
+}
+
+/* Las tres zonas del toque. ⚠️ `touch-action: pan-y pinch-zoom` y no
+   `none`: se le quita al navegador el gesto horizontal —que es el
+   nuestro— y se le dejan el vertical y el de acercar, porque quitarle
+   el de acercar a una pantalla de lectura es quitarle la letra grande a
+   quien la necesita. */
+.voz-zonas { position: absolute; inset: 0; display: flex; touch-action: pan-y pinch-zoom; }
+.voz-zonas > div { height: 100%; -webkit-tap-highlight-color: transparent; }
+#voz-z-izq { flex: 0 0 26%; cursor: w-resize; }
+#voz-z-mid { flex: 1 1 auto; cursor: pointer; }
+#voz-z-der { flex: 0 0 26%; cursor: e-resize; }
+
+.voz-barra { height: 3px; background: var(--border); flex: 0 0 auto; }
+.voz-barra-in { height: 100%; background: var(--story); width: 0; transition: width .2s; }
+
+.voz-l-pie {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-top: 1px solid var(--border); background: var(--surface);
+  padding-bottom: calc(9px + env(safe-area-inset-bottom, 0px));
+  font-family: system-ui, sans-serif;
+}
+#voz-pag {
+  flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap;
+  justify-content: center; gap: 3px 10px; font-size: 12px; color: var(--muted);
+}
+.voz-pag-n { font-weight: 700; color: var(--text); }
+.voz-pag-maq { color: var(--story); }
+
+/* ⚠️ EL MODO DESNUDO NO QUITA LOS MANDOS DEL SITIO: LOS APAGA.
+   Sacarlos del flujo haría más alta la caja del texto, y una caja más
+   alta REPAGINA el cuento entero debajo del dedo del lector: la página
+   que estaba mirando pasa a ser otra. Se apagan con opacidad, que no
+   mueve un píxel de la caja. */
+#voz-lector.voz-desnudo .voz-l-top,
+#voz-lector.voz-desnudo .voz-l-pie { opacity: .12; pointer-events: none; }
+#voz-lector .voz-l-top, #voz-lector .voz-l-pie { transition: opacity .25s; }
+
+/* Los paneles de la sala: cuelgan DENTRO de #voz-lector, así que se
+   tiñen con el papel que esté puesto. */
+.voz-panel {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+  max-height: 64%; overflow-y: auto;
+  background: var(--surface); border-top: 1px solid var(--border);
+  border-radius: 18px 18px 0 0; padding: 16px 16px 22px;
+  box-shadow: 0 -8px 30px rgba(0,0,0,.18);
+  font-family: system-ui, sans-serif;
+}
+.voz-panel[hidden] { display: none; }
+.voz-aj-fila { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.voz-aj-rot { flex: 0 0 84px; font-size: 12.5px; color: var(--muted); }
+.voz-aj-caja { flex: 1 1 160px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.voz-aj-chip {
+  padding: 8px 12px; border-radius: 10px; cursor: pointer; min-height: 38px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font: inherit; font-size: 13px;
+}
+.voz-aj-on { background: var(--story); border-color: var(--story); color: #fff; }
+.voz-aj-mm {
+  width: 42px; height: 38px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  font: inherit; font-size: 17px; line-height: 1;
+}
+.voz-aj-val { min-width: 58px; text-align: center; font-size: 13px; color: var(--text); }
+.voz-aj-nota { font-size: 12px; color: var(--muted); line-height: 1.5; margin: 10px 0 0; }
+
+.voz-ind-tit { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+.voz-ind-item {
+  display: flex; align-items: baseline; gap: 10px; width: 100%; cursor: pointer;
+  padding: 11px 10px; border: 0; border-bottom: 1px solid var(--border);
+  background: transparent; color: var(--text); font: inherit; font-size: 14px; text-align: left;
+}
+.voz-ind-n { flex: 0 0 auto; font-size: 11px; color: var(--muted); min-width: 18px; }
+.voz-ind-t { flex: 1 1 auto; min-width: 0; }
+.voz-ind-on { color: var(--story); font-weight: 700; }
+
+@media (min-width: 760px) {
+  /* En pantalla ancha el texto no se estira a lo ancho de un monitor:
+     un renglón de treinta palabras se pierde al volver al margen. Se
+     mantiene la caja en una anchura de libro y se centra. */
+  #voz-hoja { padding-left: max(var(--voz-margen, 22px), calc((100% - 680px) / 2)); }
+  #voz-hoja { padding-right: max(var(--voz-margen, 22px), calc((100% - 680px) / 2)); }
+  .voz-panel { left: 50%; transform: translateX(-50%); width: min(560px, 92%); border-radius: 18px 18px 0 0; }
+}
+
+@media (max-width: 380px) {
+  .voz-ficha-pie { flex-wrap: wrap; }
+  .voz-lomo { flex-basis: 34px; }
+  .voz-aj-rot { flex-basis: 100%; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ⚠️ LAS FRANJAS DE COLOR VAN AL FINAL DEL ARCHIVO, Y NO ES ORDEN.
+   `.voz-ficha` declara `border: 1px solid var(--border)` —el atajo, que
+   incluye el color— y pesa lo mismo que estas. A igualdad de peso gana
+   la que vaya DESPUÉS. Con estas reglas arriba, el anaquel entero se
+   pintaría gris sin dar ningún error, sin romper nada y con el HTML
+   perfecto: es exactamente el fallo que tuvo El Rodaje desde el primer
+   día y se caza igual, mirando el color CALCULADO.
+   ═══════════════════════════════════════════════════════════════════ */
+.voz-ficha { border-left: 4px solid hsl(var(--voz-h, 25) 42% 38%); }
+.voz-ficha:hover { box-shadow: 0 3px 10px rgba(15,23,42,.1); }

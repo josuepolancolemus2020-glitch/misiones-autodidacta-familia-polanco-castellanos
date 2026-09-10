@@ -918,6 +918,16 @@ function switchView(id) {
   if (id === 'view-mvid' && typeof initMetasVideos === 'function') initMetasVideos();
   if (id === 'view-criba' && typeof initCriba === 'function') initCriba();
   if (id === 'view-rodaje' && typeof initRodaje === 'function') initRodaje();
+  if (id === 'view-voz' && typeof initVozPrestada === 'function') initVozPrestada();
+  /* La sala de lectura cubre la pantalla entera por encima de todo, así
+     que si se cambia de vista por debajo —una notificación del chat, el
+     botón de atrás— hay que cerrarla: si no, el destino de ese toque se
+     queda escondido detrás de un cuento y parece que la aplicación no
+     hizo nada. */
+  if (id !== 'view-voz' && typeof vozCerrarLector === 'function') {
+    const sala = document.getElementById('voz-lector');
+    if (sala && !sala.hidden) vozCerrarLector();
+  }
 
   // El FAB de Destellos vive en toda la app, excepto en el Chat
   // (estorbaría sobre la barra de escritura) y el editor de Redacción

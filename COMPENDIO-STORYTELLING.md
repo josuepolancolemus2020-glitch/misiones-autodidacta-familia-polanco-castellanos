@@ -89,6 +89,59 @@ escribe como vacía.
 
 ---
 
+## 2-bis. El anaquel de voces prestadas: leer lo que escribió una máquina
+
+**Añadido el 10 de septiembre de 2026**, a petición del autor: «necesito una
+nueva herramienta para poder leer como en formato epub, algunos cuentos que le
+pido a esta IA que me redacte con las voces de otros escritores».
+
+Es el segundo aparato compartido de la materia, junto al Cuaderno de Hilos, y
+vive también en F.A.R.O y no dentro de una misión: **📖 La Voz Prestada**
+(`js/tools/voz-prestada.js`), en el Acceso Rápido, pegada a Redacción. Sus
+reglas de construcción están en `CLAUDE.md`; lo que hace falta saber aquí es
+por qué pertenece a esta materia y qué enseña.
+
+**Qué guarda:** cuentos que el autor le encarga a una máquina pidiéndole que
+escriba *al modo de* alguien —la frase corta de uno, la enumeración de otro, el
+narrador que no se fía de sí mismo—. Cada cuento se lee en páginas, con la
+letra y el papel que se elijan, y vuelve solo a donde se dejó.
+
+**Por qué es de esta materia y no un juguete aparte.** Un pastiche es el
+ejercicio más viejo del oficio de escribir, y es exactamente lo que la **Ruta 2
+· ✍️ Pluma Afilada** enseña: imitar una voz obliga a nombrar qué la hace esa
+voz —la longitud de la frase, el verbo que trabaja, la distancia psíquica, el
+detalle concreto—, que es lo que sus siete etapas desmontan una por una. Leer
+una imitación al lado de la lista de rasgos es la práctica; pedirle a una
+máquina una imitación mala a propósito y localizar por qué falla, todavía
+mejor.
+
+**Y por qué obliga a una regla de la materia, no solo de la herramienta:**
+
+> **Ninguna voz imitada se guarda sin decir que es imitada y quién la imitó.**
+
+Es el equivalente exacto, en esta materia, de la regla de oro del capítulo 1
+—«ninguna estructura sin autor, año y crítica»— y hermana de la regla de la
+Ruta de la Ley («nada se cita de memoria»). El motivo es el mismo y aquí se ve
+más rápido: un cuento «al modo de» alguien, leído seis meses después en una
+tableta y sin la ventana del chat alrededor, **no se distingue de uno que sí
+fuera suyo**. Así nace una atribución falsa: sin mala fe, por olvido. Y cuanto
+mejor le sale a la máquina, más falta hace la etiqueta.
+
+Por eso la voz imitada y la máquina que escribió van pegadas al cuento en
+cuatro sitios —la ficha, la portada, el pie de cada página y dentro de lo que
+copia el botón de copiar—, la base lo hace cumplir con un `check` y **no existe
+ningún botón que copie el cuento pelado**. El nombre de la herramienta es el
+recordatorio.
+
+**Lo que esto le da a la materia, además de una biblioteca:** una colección de
+prosa comparable. Diez cuentos con el mismo encargo y distintas voces, leídos
+seguidos, enseñan la diferencia entre una voz y un tema mejor que cualquier
+explicación — y el **encargo se guarda con cada cuento**, que es lo único que
+hace repetible una pieza generada y lo que permite comparar dos voces sobre el
+mismo pedido.
+
+---
+
 ## 3. El mapa: las ocho rutas de un vistazo
 
 | # | Ruta | Dominio | Etapas | Estado |
@@ -164,6 +217,13 @@ la prosa es dónde se vive.
    de Gardner (1984), y qué se paga en cada uno.
 7. **Reescribir es escribir**: el borrador cero (Anne Lamott, 1994) y las
    pasadas: cada una arregla una sola cosa.
+
+**El aparato de esta ruta es 📖 La Voz Prestada** (capítulo 2-bis): el pastiche
+es el ejercicio de la imitación de voz, y las siete etapas de arriba son la
+lista de rasgos con la que se juzga si la imitación agarró. Las etapas 1, 2, 3
+y 6 se practican leyendo dos cuentos del mismo encargo con voces distintas,
+uno detrás de otro. **Y ninguno se guarda sin su etiqueta**, por la misma razón
+por la que aquí no hay estructura sin autor y sin año.
 
 ---
 
@@ -350,6 +410,12 @@ Object.entries(g.R).filter(([k,r])=>r.color==='story')
 - **El kit de escritura a mano** (`css/kit-mano.css`) encaja en esta materia
   mejor que en ninguna otra, porque se practica escribiendo. Queda apuntado para
   las rutas de la Pluma Afilada y las Personas de Papel, que son de lápiz.
+- **📖 La Voz Prestada** (capítulo 2-bis) está construida y funciona desde el
+  aparato, pero **su SQL hay que correrlo a mano** (`supabase/sql/voz_prestada.sql`,
+  apuntado en `PLAN-FARO-PRIVADO.md`). Hasta entonces los cuentos no viajan
+  entre aparatos, y la herramienta lo dice a la vista en vez de fingir que sí.
+  Queda apuntado que las etapas de la Pluma Afilada la usen como material de
+  taller cuando se construyan.
 - **Las fuentes por comprobar** de cada etapa se verifican al construirla,
   contra la obra y no contra un resumen. Lo que no se pueda comprobar no entra,
   y se queda escrito como pendiente en su misión, como manda el capítulo 1.

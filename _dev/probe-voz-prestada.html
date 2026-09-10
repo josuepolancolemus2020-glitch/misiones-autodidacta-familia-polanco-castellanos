@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · La Voz Prestada</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:400px;height:700px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de la herramienta 📖 LA VOZ PRESTADA.
+
+   Esta herramienta guarda cuentos que una máquina escribió imitando la
+   voz de otro y los deja leer como un libro. Lo que puede salir mal no
+   es «se ve feo»:
+
+   1. QUE UN CUENTO SE GUARDE SIN SU ETIQUETA. Es LA regla. Un cuento
+      «al modo de» alguien, leído seis meses después en una tableta y
+      sin la ventana del chat alrededor, no se distingue de uno que sí
+      fuera suyo: así nace una atribución falsa, sin mala fe. La
+      etiqueta tiene que estar en la ficha, en la portada, en el pie de
+      cada página y dentro de lo que copia el botón 📋, y el guardado
+      tiene que PARARSE si falta.
+
+   2. QUE EL PEGADO DESCUARTICE EL CUENTO. Una línea corta y suelta que
+      ascienda a capítulo mete un salto de página en mitad de una
+      escena, y eso PARECE QUE FUNCIONÓ: sale el índice, salen las
+      páginas, todo. Solo se descubre leyendo el cuento entero.
+
+   3. QUE AL CAMBIAR LA LETRA SE PIERDA EL SITIO. El número de páginas
+      depende del tamaño de letra y del ancho de la pantalla, así que la
+      posición se guarda por PÁRRAFO. Si se guardara por página, subir
+      un punto la letra dejaría al lector en otra frase, sin ningún
+      error. Se mide de verdad: se abre la sala, se pasa a la página 3,
+      se sube la letra y se mira si el párrafo sigue a la vista.
+
+   4. QUE UN TEXTO PEGADO ESCRIBA HTML DENTRO DE F.A.R.O. Aquí entra el
+      texto más largo de toda la aplicación, pegado desde otra ventana,
+      y esta aplicación tiene dentro la Bóveda, las finanzas, el chat y
+      los teléfonos del Buzón del lector.
+
+   5. QUE UN CORTE DE RED SE VEA COMO UN ANAQUEL VACÍO, que es lo que
+      invita a pegar encima los cuentos que ya estaban.
+
+   Como en las demás sondas: aquí no se lee el código, se ejecuta el
+   index.html de verdad con una base de datos de mentira a nivel de
+   fetch. El cliente de Supabase es el auténtico.
+
+   ⚠️ Y PARA MEDIR SE ABRE LA VISTA DE VERDAD (`switchView`) Y SE ENSEÑA
+   `#app-container`: con el panel escondido, la caja del texto mide 0×0
+   y la sonda aprobaría una paginación que en la tableta no existe. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── La base de datos de mentira ────────────────────────────────── */
+function nuevaBase(w, opciones){
+  const o = opciones || {};
+  const estado = { filas: o.filas || [], llamadas: [] };
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url);
+    const m = (init && init.method) || 'GET';
+    if (!/voz_prestada/.test(u.pathname)) {
+      return new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    estado.llamadas.push({ m, url: u.pathname + u.search, cuerpo: init && init.body });
+    if (o.sinTabla) {
+      return new Response(JSON.stringify({
+        code: '42P01', message: 'relation "public.voz_prestada" does not exist' }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } });
+    }
+    /* Un corte de señal de verdad NO es un 503 con cuerpo: es la
+       petición que no llega. El cliente de Supabase no lanza por eso
+       —devuelve {data:null,error}—, y esa es justo la rama que hay que
+       probar, porque es la que se olvida mirar. */
+    if (o.sinSenal) throw new TypeError('Failed to fetch');
+    if (m === 'GET') {
+      return new Response(JSON.stringify(estado.filas),
+        { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    return new Response('[]', { status: 201, headers: { 'Content-Type': 'application/json' } });
+  };
+  return estado;
+}
+
+/* Un cuento largo de verdad, para que haya varias páginas que pasar.
+   El texto es de la sonda: hace falta prosa larga, no prosa buena. */
+function cuentoLargo(cid){
+  const p = [];
+  for (let i = 0; i < 40; i++) {
+    p.push({ k: 'p', t: 'Párrafo número ' + (i + 1) + '. ' +
+      'La casa contaba en voz baja y nadie del pueblo quiso nunca ' +
+      'preguntarle en qué número iba, porque preguntar era entrar y ' +
+      'entrar era sumar uno más a la cuenta de aquella tarde larga.' });
+  }
+  return {
+    cid: cid, titulo: 'La casa que contaba',
+    voz: 'un narrador de pueblo', maquina: 'una máquina de prueba',
+    encargo: 'un cuento sobre una casa que cuenta',
+    capitulos: [{ t: 'Capítulo 1', p: p }, { t: 'Capítulo 2', p: p.slice(0, 12) }],
+    palabras: 40 * 34, borrado: false, actualizado: 1000,
+    creado_at: '2026-09-10T10:00:00Z',
+  };
+}
+
+(async () => {
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w = f.contentWindow, d = w.document;
+  nuevaBase(w, {});
+
+  /* La aplicación arranca con `#app-container` escondido hasta que entra
+     alguien. Sin esto todo mide 0×0 y las medidas de pantalla mienten. */
+  d.getElementById('app-container').style.display = '';
+  w.eval('switchView("view-voz")');
+  await esperar(250);
+
+  log('── 1. El lector de texto pegado ──');
+  const r1 = w.eval(`JSON.stringify(vozLeer(${JSON.stringify(
+    '# El faro que no era\n\n**Al modo de:** un narrador de pueblo\nEscrito por: Claude\n' +
+    'Encargo: una luz que nadie encendió\n\nCapítulo 1: La luz\n\n' +
+    'Nadie recordaba haberla encendido.\n\n—¿Y si se apaga? —dijo el niño.\n' +
+    '—No se apaga —dijo su madre.\n\n* * *\n\nSe apagó un martes.\n\nII\n\nSubieron la cuesta.')}))`);
+  const c1 = JSON.parse(r1);
+  ok(c1.titulo === 'El faro que no era', 'saca el título del cuento', 'no sacó el título: ' + c1.titulo);
+  ok(c1.voz === 'un narrador de pueblo', 'y la voz imitada, aun escrita con **asteriscos**',
+     'la voz salió mal: ' + JSON.stringify(c1.voz));
+  ok(c1.maquina === 'Claude', 'y la máquina', 'la máquina salió mal: ' + c1.maquina);
+  ok(c1.capitulos.length === 2, 'reparte los dos capítulos', 'capítulos: ' + c1.capitulos.length);
+  ok(c1.capitulos[0].p.filter(x => x.k === 'sep').length === 1,
+     'y el salto de escena se guarda como salto, no como texto', 'perdió el * * *');
+  const dial = c1.capitulos[0].p.filter(x => (x.t || '').startsWith('—'));
+  ok(dial.length === 2, 'cada raya de diálogo abre párrafo aunque no haya blanco delante',
+     'pegó las rayas de diálogo en un párrafo: ' + dial.length);
+
+  log('── 2. ⚠️ Y NO DESCUARTIZA UN PÁRRAFO DE PROSA ──');
+  /* El fallo más caro y el que menos se ve. Siete renglones seguidos que
+     empiezan por siete palabras que nombran una parte de un libro: si
+     alguna asciende a capítulo, el cuento sale partido y PARECE que
+     funcionó. Es la comprobación 5-bis del lector de El Rodaje. */
+  const prosa = ['Parte de la culpa era suya y lo sabía.',
+    'Acto seguido cerró la puerta sin ruido.',
+    'Prólogo de nada, se dijo, esto no empieza.',
+    'Sección por sección revisó la casa.',
+    'Introducción no hacía falta: ya se conocían.',
+    'Coda o no, la noche seguía.',
+    'Interludio, pensó, y se rió sola.'].join('\n');
+  const c2 = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(prosa)}))`));
+  ok(c2.capitulos.length === 1, 'un párrafo de prosa se queda en UN capítulo',
+     'lo partió en ' + c2.capitulos.length + ' capítulos');
+  ok(c2.capitulos[0].p.length === 1, 'y en UN párrafo, con sus siete renglones dentro',
+     'lo partió en ' + c2.capitulos[0].p.length + ' párrafos');
+  const c2b = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(
+    'El tren se fue.\n\nNadie volvió a hablar de eso.\n\nY así fue.')}))`));
+  ok(c2b.capitulos.length === 1 && c2b.capitulos[0].p.length === 3,
+     'y tres frases cortas y sueltas siguen siendo tres frases, no tres capítulos',
+     'ascendió frases sueltas a capítulo');
+  const c2c = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(
+    'Antes.\n\nCapítulo 3\n\nDespués.')}))`));
+  ok(c2c.capitulos.length === 2, 'pero «Capítulo 3» sí abre capítulo',
+     'no reconoció una cabecera de verdad');
+
+  log('── 3. Lo que no se entiende se NOMBRA y se queda dentro ──');
+  const c3 = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(
+    'TONO: melancólico\n\nEmpezó a llover.')}))`));
+  ok(c3.avisos.length === 1 && c3.avisos[0].linea === 1,
+     'nombra el renglón que parecía una etiqueta y no se entendió',
+     'no avisó de la línea que no entendió');
+  ok(JSON.stringify(c3.capitulos).indexOf('TONO: melancólico') > -1,
+     'y NO la tira: se queda como texto del cuento', 'perdió la línea que no entendió');
+
+  log('── 4. ⚠️ LA ETIQUETA NO SE APAGA: el guardado se para ──');
+  w.eval('vozAbrirPegar(null)');
+  await esperar(120);
+  d.getElementById('voz-pegar-txt').value = 'Había una casa.';
+  d.getElementById('voz-f-titulo').value = 'La casa';
+  w.eval('vozRepasar()');
+  await esperar(120);
+  // El repaso rellena solo lo que el texto traía; aquí no traía etiqueta.
+  d.getElementById('voz-f-voz').value = '';
+  d.getElementById('voz-f-maquina').value = '';
+  w.eval('vozPintarBotonGuardar()');
+  const falta = d.getElementById('voz-falta');
+  ok(falta && !falta.hidden && /voz/i.test(falta.textContent) && /m[áa]quina/i.test(falta.textContent),
+     'sin la voz y sin la máquina, dice EXACTAMENTE qué falta',
+     'no nombra lo que falta: ' + (falta ? falta.textContent : 'no está'));
+  ok(d.getElementById('voz-f-voz').classList.contains('voz-campo-ambar'),
+     'y el campo se pone en ámbar antes de tocar nada', 'el campo no avisa');
+  const antes = Number(w.eval('_vozCuentos.length'));
+  await w.eval('vozGuardarPegado()');
+  await esperar(150);
+  ok(Number(w.eval('_vozCuentos.length')) === antes,
+     'y el guardado NO entra: es la regla de la herramienta',
+     '⚠️ SE GUARDÓ un cuento sin decir a quién imita ni qué máquina lo escribió');
+
+  d.getElementById('voz-f-voz').value = 'un narrador de pueblo';
+  d.getElementById('voz-f-maquina').value = 'una máquina de prueba';
+  await w.eval('vozGuardarPegado()');
+  await esperar(200);
+  ok(Number(w.eval('_vozCuentos.length')) === antes + 1,
+     'y con la etiqueta puesta, sí entra', 'con la etiqueta puesta tampoco entró');
+
+  log('── 5. La etiqueta está en los cuatro sitios ──');
+  w.eval(`_vozCuentos = [${JSON.stringify(cuentoLargo('c-largo'))}]; vozRender()`);
+  await esperar(150);
+  const ficha = d.querySelector('.voz-ficha');
+  ok(ficha && /al modo de un narrador de pueblo/.test(ficha.textContent),
+     '1) en la ficha del anaquel', 'la ficha no dice a quién imita');
+  ok(ficha && /una máquina de prueba/.test(ficha.textContent),
+     '   y también qué máquina lo escribió', 'la ficha no dice qué máquina');
+  const plano = w.eval('vozTextoPlano(_vozCuentos[0])');
+  ok(/narrador de pueblo/.test(plano) && /una máquina de prueba/.test(plano),
+     '2) dentro de lo que copia el botón 📋', 'lo copiado sale sin etiqueta');
+  ok(plano.indexOf('narrador de pueblo') < plano.indexOf('La casa contaba en voz baja'),
+     '   y va DELANTE del cuento, no escondida al final',
+     'la etiqueta va detrás del cuento: en un reenvío se pierde');
+
+  log('── 6. ⚠️ LA PAGINACIÓN ES REAL, medida en la pantalla ──');
+  w.eval('vozAbrirLector("c-largo")');
+  await esperar(400);
+  const hoja = d.getElementById('voz-hoja');
+  ok(hoja && hoja.clientWidth > 100 && hoja.clientHeight > 100,
+     'la caja del texto mide de verdad (' + (hoja ? hoja.clientWidth + '×' + hoja.clientHeight : '0×0') + ')',
+     'la caja mide 0×0: lo que venga detrás no prueba nada');
+  const pags1 = Number(w.eval('_vozPaginas'));
+  ok(pags1 > 3, 'el cuento se reparte en varias páginas (' + pags1 + ')',
+     'no paginó: salió en ' + pags1 + ' página(s)');
+  ok(/1 \/ /.test(d.getElementById('voz-pag').textContent),
+     'y el pie dice por cuál va y cuántas hay', 'el pie no dice la página');
+  ok(/una máquina de prueba/.test(d.getElementById('voz-pag').textContent),
+     '3) en el pie de todas las páginas', 'el pie no lleva la máquina');
+  const port = d.querySelector('.voz-portada');
+  ok(port && /al modo de/.test(port.textContent) && /No es un texto de/.test(port.textContent),
+     '4) en la portada, que es la primera página de todo cuento',
+     'la portada no lleva la etiqueta');
+  /* ⚠️ Y ABRIR UN CUENTO NUEVO TIENE QUE CAER EN LA PORTADA. La portada
+     es la posición −1; si la lectura se colocara en el párrafo 0, que
+     está en la página siguiente, la portada se saltaría entera y en
+     silencio — y es donde dice en grande que esto lo escribió una
+     máquina imitando a alguien. */
+  ok(Number(w.eval('_vozPagina')) === 0 && Number(w.eval('_vozAncla')) === -1,
+     '   y un cuento nuevo se abre POR la portada, no saltándosela',
+     '⚠️ abrir el cuento se salta la portada (página ' + w.eval('_vozPagina') + ')');
+
+  w.eval('vozPasar(1)');
+  await esperar(400);
+  ok(Number(w.eval('_vozPagina')) === 1 && hoja.scrollLeft > 10,
+     'y pasar página mueve la hoja de verdad (' + Math.round(hoja.scrollLeft) + ' px)',
+     'pasó de página sin mover nada: la paginación es de mentira');
+
+  /* ⚠️ Y EL RENGLÓN EMPIEZA DONDE EMPEZABA. Si el salto de página no
+     mide exactamente lo que mide una columna, cada página se corre un
+     poco: a la tercera, el texto sale cortado por la izquierda y asoma
+     la columna siguiente por la derecha. La página existe, el número es
+     correcto y el cuento es el mismo — solo está mal puesto. Se mira
+     comparando el borde izquierdo del texto en tres páginas seguidas. */
+  const bordes = [];
+  for (const p of [0, 1, 3]) {
+    w.eval('vozIrPagina(' + p + ', true)');
+    await esperar(220);
+    bordes.push(w.eval(`(function(){
+      const h = document.getElementById('voz-hoja');
+      const ps = h.querySelectorAll('[data-vp]');
+      const x = h.getBoundingClientRect().left;
+      for (const p of ps) {
+        const r = p.getBoundingClientRect();
+        if (r.left - x > -1 && r.left - x < h.clientWidth) return Math.round(r.left - x);
+      }
+      return -999;
+    })()`));
+  }
+  ok(bordes[0] > 0 && bordes.every(b => Math.abs(b - bordes[0]) <= 1),
+     'y el texto empieza en el mismo margen en todas las páginas (' + bordes.join(', ') + ' px)',
+     '⚠️ el texto se corre de página en página: ' + bordes.join(', ') + ' px');
+  w.eval('vozIrPagina(1, true)');
+  await esperar(200);
+
+  log('── 7. ⚠️ AL CAMBIAR LA LETRA NO SE PIERDE EL SITIO ──');
+  w.eval('vozIrPagina(3, true)');
+  await esperar(250);
+  const ancla1 = Number(w.eval('_vozAncla'));
+  w.eval('_vozAj.tam = 30; _vozAj.alto = 2; vozAplicaAjustes(); vozPaginar(_vozAncla)');
+  await esperar(400);
+  const pags2 = Number(w.eval('_vozPaginas'));
+  ok(pags2 > pags1, 'con la letra más grande hay más páginas (' + pags1 + ' → ' + pags2 + ')',
+     'la letra no cambió la paginación: no se está paginando de verdad');
+  const visible = w.eval(`(function(){
+    const h = document.getElementById('voz-hoja');
+    const el = h.querySelector('[data-vp="' + ${ancla1} + '"]');
+    if (!el) return 'no-esta';
+    const pagDelParrafo = Math.floor((el.offsetLeft + 2) / vozPaso());
+    return pagDelParrafo === _vozPagina ? 'si' : ('no:' + pagDelParrafo + ' vs ' + _vozPagina);
+  })()`);
+  ok(visible === 'si',
+     'y la lectura sigue en el MISMO PÁRRAFO, no en el mismo número de página',
+     '⚠️ se perdió el sitio al cambiar la letra (' + visible + ')');
+  w.eval('_vozAj.tam = 19; _vozAj.alto = 1.65; vozAplicaAjustes(); vozPaginar(_vozAncla)');
+  await esperar(300);
+
+  log('── 8. Los gestos y los mandos ──');
+  const zonas = d.querySelector('.voz-zonas');
+  const ta = zonas ? w.getComputedStyle(zonas).touchAction : '';
+  ok(/pan-y/.test(ta) && /pinch-zoom/.test(ta),
+     'las zonas dejan el gesto horizontal a la herramienta y el de acercar al lector (' + ta + ')',
+     'el touch-action de las zonas está mal: ' + ta);
+  const zi = d.getElementById('voz-z-izq');
+  ok(zi && zi.getBoundingClientRect().width > 40 && zi.getBoundingClientRect().height > 100,
+     'y el borde de pasar página es alcanzable con el dedo (' +
+       (zi ? Math.round(zi.getBoundingClientRect().width) : 0) + ' px de ancho)',
+     'la zona de pasar página es demasiado estrecha');
+  const pagAntes = Number(w.eval('_vozPagina'));
+  d.getElementById('voz-sig').click();
+  await esperar(350);
+  ok(Number(w.eval('_vozPagina')) === pagAntes + 1,
+     'y el botón ‹ › del pie pasa página: no todo depende del deslizamiento',
+     'el botón del pie no pasa página');
+
+  log('── 9. ⚠️ UN TEXTO PEGADO NO ESCRIBE HTML ──');
+  const veneno = '<img src=x onerror="window.__colado=1"> y una comilla " suelta';
+  w.eval(`_vozCuentos[0].capitulos = [{t: 'x', p: [{k:'p', t: ${JSON.stringify(veneno)}}]}];
+          _vozLeyendo = _vozCuentos[0]; _vozCapActual = 0; vozPintarCap(0)`);
+  await esperar(250);
+  ok(!w.__colado, 'el HTML pegado no se ejecuta', '⚠️ SE EJECUTÓ HTML venido del texto pegado');
+  ok(d.getElementById('voz-texto').querySelectorAll('img').length === 0,
+     'y ni siquiera se crea el elemento', 'creó un <img> desde el texto pegado');
+  ok(/<img src=x/.test(d.getElementById('voz-texto').textContent),
+     'se lee tal cual, con sus signos', 'el texto se perdió al escaparlo');
+  w.eval('vozCerrarLector()');
+  await esperar(150);
+
+  log('── 10. El color de la franja está CALCULADO, no solo escrito ──');
+  /* El fallo del `var(--card)` y el de las franjas de El Rodaje: el HTML
+     está bien, no hay error, y el color se resuelve a nada. Solo se ve
+     mirando el color calculado. */
+  w.eval(`_vozCuentos = [${JSON.stringify(cuentoLargo('c-largo'))}]; vozRender()`);
+  await esperar(200);
+  const f2 = d.querySelector('.voz-ficha'), lomo = d.querySelector('.voz-lomo');
+  const franja = f2 ? w.getComputedStyle(f2).borderLeftColor : '';
+  const fondoLomo = lomo ? w.getComputedStyle(lomo).backgroundColor : '';
+  ok(/^rgba?\(/.test(franja) && !/rgba\(0, 0, 0, 0\)/.test(franja),
+     'la franja de color de la ficha se pinta (' + franja + ')',
+     'la franja se resolvió a nada: ' + franja);
+  ok(fondoLomo && !/rgba\(0, 0, 0, 0\)/.test(fondoLomo),
+     'y el lomo del libro tiene fondo opaco (' + fondoLomo + ')',
+     'el lomo salió transparente: ' + fondoLomo);
+  const et = d.querySelector('.voz-et-voz');
+  ok(et && !/rgba\(0, 0, 0, 0\)/.test(w.getComputedStyle(et).backgroundColor),
+     'y la etiqueta tiene fondo propio: no se confunde con el resto de la ficha',
+     'la etiqueta salió sin fondo');
+
+  log('── 11. La ayuda sale de VOZ_ETIQUETAS, no escrita a mano ──');
+  w.eval('vozAbrirPegar(null); vozAbrirAyuda()');
+  await esperar(200);
+  const ayuda = d.getElementById('voz-ayuda-cuerpo').textContent.toLowerCase();
+  const claves = JSON.parse(w.eval('JSON.stringify(Object.keys(VOZ_ETIQUETAS))'));
+  const perdidas = claves.filter(c => ayuda.indexOf(c) === -1);
+  ok(perdidas.length === 0,
+     'la ventana enseña las ' + claves.length + ' etiquetas que el lector entiende de verdad',
+     'la ayuda no nombra: ' + perdidas.join(', ') + ' (una lista a mano se queda vieja)');
+  d.getElementById('voz-ayuda-cerrar').click();
+  w.eval('vozCerrarPegar()');
+  await esperar(120);
+
+  log('── 12. Retirar deja lápida, no borra ──');
+  w.confirm = () => true;
+  w.eval('vozAbrirPegar(_vozCuentos[0])');
+  await esperar(150);
+  await w.eval('vozRetirar()');
+  await esperar(250);
+  const guardados = JSON.parse(w.localStorage.getItem('faro_voz_cuentos_v1') || '[]');
+  const lap = guardados.filter(c => c.cid === 'c-largo' && c.borrado === true);
+  ok(lap.length === 1, 'el cuento retirado se queda marcado, para que el retiro viaje',
+     'borró la fila: otro aparato lo resucitaría en la siguiente sincronización');
+  ok(Number(w.eval('_vozCuentos.filter(c => c.cid === "c-largo").length')) === 0,
+     'y desaparece del anaquel', 'sigue en el anaquel después de retirarlo');
+
+  log('── 13. Con la base vieja no revienta: dice qué falta ──');
+  /* ⚠️ Estas dos últimas se hacen en EL MISMO marco, cambiándole la base
+     de mentira y volviendo a arrancar la herramienta, y no abriendo un
+     segundo index.html. Un segundo marco del mismo origen se queda
+     colgado en este entorno y la sonda no llega nunca a poner su
+     veredicto en el título — y una sonda sin veredicto no es media
+     sonda: es ninguna, porque en tanda solo se lee el título. Se prueba
+     lo mismo: cómo reacciona la herramienta a que la tabla no exista y a
+     que la señal se caiga. */
+  nuevaBase(w, { sinTabla: true });
+  await w.eval('initVozPrestada()');
+  await esperar(400);
+  const nube = d.getElementById('voz-nube').textContent;
+  ok(/voz_prestada\.sql/.test(nube),
+     'nombra el archivo que hay que correr (desde una tableta no se adivina)',
+     'no dice qué archivo falta: ' + nube);
+  ok(/aparato/i.test(nube),
+     'y dice que por ahora solo vive en este aparato, en vez de fingir que viaja',
+     'no avisa de que no viaja');
+
+  log('── 14. ⚠️ UN CORTE DE RED NO VACÍA EL ANAQUEL ──');
+  /* Lección 14 de El Rodaje: si un corte dejara el anaquel en cero, la
+     pantalla diría «no hay cuentos» con un botón que invita a PEGAR, y
+     el camino natural después de una mala señal sería pegar encima los
+     que ya estaban. */
+  w.eval(`_vozCuentos = [${JSON.stringify(cuentoLargo('c-red'))}]; vozRender()`);
+  nuevaBase(w, { sinSenal: true });
+  /* Con reloj: si algún día una petición caída dejara la herramienta
+     esperando para siempre, la sonda tiene que DECIRLO, no colgarse.
+     Una sonda colgada no pone veredicto en el título, y en tanda solo se
+     lee el título: se leería igual que una sonda que nadie corrió. */
+  const r14 = await Promise.race([
+    w.eval('initVozPrestada().then(function(){return "ok"},function(e){return "revento: "+e.message})'),
+    esperar(11000).then(() => 'SE QUEDÓ ESPERANDO'),
+  ]);
+  ok(r14 === 'ok', 'la herramienta vuelve de una petición caída (' + r14 + ')',
+     'con la señal caída la herramienta se queda colgada: ' + r14);
+  await esperar(400);
+  ok(Number(w.eval('_vozCuentos.length')) === 1,
+     'con la señal caída, lo que ya estaba se queda',
+     '⚠️ un corte de red dejó el anaquel vacío');
+  const nube2 = d.getElementById('voz-nube').textContent;
+  ok(/se[ñn]al/i.test(nube2),
+     'y lo dice como señal, no como «falta el SQL»',
+     'confunde un corte de red con una tabla que falta: ' + nube2);
+  ok(!/voz_prestada\.sql/.test(nube2),
+     'y no manda a pegar trescientas líneas de SQL en una base que ya las tiene',
+     'con la señal caída manda a correr el SQL otra vez');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = (fallos === 0 ? 'APRUEBA' : 'SUSPENDE') + ' · La Voz Prestada';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SUSPENDE · La Voz Prestada';
+});
+</script>
+</body>
+</html>

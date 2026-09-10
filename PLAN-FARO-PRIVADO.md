@@ -150,6 +150,42 @@ Zone → Make private.
      `_dev/prueba-rodaje-sql.sql`: las ocho comprobaciones pasan, incluida
      la de que `anon` no ve ni una fila con los permisos de tabla repartidos
      como los reparte Supabase.
+   · ⚠️ **Correr `supabase/sql/voz_prestada.sql`** en el SQL Editor, y
+     **después** `supabase/sql/voz_prestada_comprueba.sql`. En ese orden y
+     son dos: el primero crea, el segundo solo mira. No dependen de nada
+     más que de `es_familia()`, que ya está. El primero se puede correr dos
+     veces sin borrar ni un cuento.
+     Crea la tabla de **La Voz Prestada**, el anaquel de los cuentos que una
+     máquina escribe «al modo de» otros escritores, que el autor pidió el 10
+     de septiembre de 2026. Hasta que se corra, la herramienta **funciona
+     entera con la copia del aparato y lo dice a la vista** («📴 Solo en
+     este aparato: falta correr voz_prestada.sql»): no finge que viaja, y
+     nada de lo que se guarde mientras tanto se pierde.
+     Lo que hay que mirar al pegarlo es **la tabla del final**, nunca el
+     «Success» del editor: sale en VERTICAL, con diez filas, y todas tienen
+     que llevar ✅. Tres se leen al revés que las demás y tienen que decir
+     `ninguna` — «borrado de verdad (NO debe poder)» y «puerta pública (NO
+     debe haberla)»—: aquí se retira con lápida (si un aparato borrara la
+     fila, la tableta que aún tuviera su copia resucitaría el cuento en la
+     siguiente sincronización) y no hay nada que nadie de fuera tenga que
+     leer.
+     Y trae la línea que sostiene toda la herramienta: un **`check` que no
+     deja guardar un cuento sin decir A QUIÉN imita y QUÉ MÁQUINA lo
+     escribió** (`voz_prestada_etiqueta`), y que vale también al corregir,
+     para que la etiqueta no se pueda vaciar después. Es el hermano de
+     `rodaje_fuentes_ia_declarada`: un cuento «al modo de» alguien, leído
+     seis meses después en una tableta, no se distingue de uno que sí fuera
+     suyo, y así nace una atribución falsa sin que nadie mienta.
+     El archivo **se para solo** si falta `es_familia()`, igual que los
+     otros dos. Y si mañana hay que volver a comprobar que quedó puesto, se
+     pega solo `voz_prestada_comprueba.sql`, que son veinte líneas y no
+     trescientas — y entre sus filas va «⚠️ cuentos SIN etiqueta», que tiene
+     que decir 0 siempre.
+     Probado antes de mandarlo contra un PostgreSQL de verdad con
+     `_dev/prueba-voz-prestada-sql.sql`: las quince comprobaciones pasan,
+     incluida la de que `anon` no ve ni una fila y la de que un cuento ajeno
+     se lee pero no se corrige, con los permisos repartidos como los reparte
+     Supabase.
    · ✅ **CORRIDO** — `supabase/sql/metas_videos_tope_10.sql`, el 28 de
      agosto de 2026. La comprobación del final devolvió lo que tenía que
      devolver: `tope_preguntas = 10`. Sube de cinco a diez el tope de
