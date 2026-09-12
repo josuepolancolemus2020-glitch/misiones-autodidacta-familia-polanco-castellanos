@@ -707,7 +707,36 @@ function vozFuenteDeTexto(t, n) {
   let num = (n != null) ? n : null;
   const m = s.match(/^(?:\[\^?(\d{1,3})\]|\((\d{1,3})\)|(\d{1,3})[.)])\s+(.*)$/);
   if (m) { num = parseInt(m[1] || m[2] || m[3], 10); s = m[4].trim(); }
-  return { k: 'fuente', t: s, n: (num != null && !isNaN(num)) ? num : null, url: vozUrlEn(s) };
+  return { k: 'fuente', t: s, n: (num != null && !isNaN(num)) ? num : null, url: vozUrlEn(s) || vozDominioAlFinal(s) };
+}
+
+/* ⚠️ Y UNA ENTRADA QUE TERMINA EN UN DOMINIO PELADO TAMBIÉN DA ENLACE.
+   Hace falta por la ida y vuelta, y se descubrió por ahí: la lista de
+   un informe llega con el dominio en su propio renglón, se junta con
+   su título —«TALIS 2018: … · publications.iadb.org»— y entonces ya no
+   es «solo un dominio». Sin esto, corregir el texto le quitaba el 🔗 a
+   todas sus fuentes, sin dar ningún error y sin que se viera hasta
+   tocar una.
+
+   Solo se mira el ÚLTIMO trozo y solo si está TODO en minúsculas, que
+   es como se escribe un dominio y como no se escribe el final de una
+   frase: «Debate.» y «Melville House.» no llevan punto dentro de una
+   palabra, y «S.A.» va en mayúsculas. Dentro de la prosa no se busca
+   nada: ahí «informe.pdf» tendría la misma pinta y saldría un enlace
+   falso. */
+const VOZ_NO_DOMINIO = /\.(pdf|docx?|txt|rtf|odt|xlsx?|pptx?|csv|zip|rar|jpe?g|png|gif|webp|svg|mp3|mp4|mov|avi|md|json|xml)$/;
+
+function vozDominioAlFinal(s) {
+  const ult = String(s || '').trim().split(/\s+/).pop() || '';
+  const limpio = ult.replace(/[.,;:)\]]+$/, '');
+  if (!/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,24}$/.test(limpio)) return '';
+  /* Un nombre de archivo tiene la misma forma que un dominio —
+     «informe.pdf» pasaría por un sitio web y saldría un 🔗 que no lleva
+     a ninguna parte—, así que las terminaciones de archivo se
+     descartan a mano. Es la misma clase de lista que la de palabras
+     que no son apellidos. */
+  if (VOZ_NO_DOMINIO.test(limpio)) return '';
+  return vozEnlaceBueno('https://' + limpio);
 }
 
 /* ─── Las tablas ───────────────────────────────────────────────────
@@ -750,6 +779,76 @@ function vozTituloTabla(l) {
   const s = vozDesnuda(String(l || '')).trim();
   if (!s || s.length > 140) return '';
   return /^(tabla|cuadro|figura|gr[áa]fico|gr[áa]fica)\b\s*\d{0,3}\s*[:.–—-]?\s*\S/i.test(s) ? s : '';
+}
+
+/* ⚠️ LA BIBLIOGRAFÍA DE UN INFORME NO VIENE DENTRO DEL TEXTO, Y POR
+   ESO TIENE CAJA PROPIA. Descubierto el 12 de septiembre de 2026, con
+   el primer informe de investigación que el autor pegó tal cual desde
+   Gemini: la herramienta le dijo «una llamada del texto no tiene
+   fuente» y él había copiado todo lo que se podía copiar. Y era
+   verdad las dos cosas.
+
+   Lo que pasa es que un informe así tiene las fuentes en OTRO SITIO de
+   la pantalla —plegadas bajo un «Fuentes usadas en el informe»— y las
+   llamadas son numeritos dibujados, no letras. Al copiar el informe no
+   viene ni la lista ni los numeritos: en ochomil palabras llegó UNA
+   sola llamada, la única escrita a mano dentro de una frase
+   —«(TALIS 2018)»—, y ninguna fuente. Ninguna regla de lectura puede
+   arreglar eso, porque lo que falta no está en el texto. Lo único que
+   lo arregla es una caja donde pegar la lista, que es lo que hay aquí.
+
+   Un renglón, una fuente. Y un renglón que es SOLO un dominio
+   («publications.iadb.org») no es una fuente: es el rótulo que esos
+   informes ponen encima del título, y se junta con el de debajo.
+   Separados serían dos entradas y ninguna de las dos diría nada. */
+const VOZ_SOLO_DOMINIO = /^(https?:\/\/)?[a-z0-9-]+(\.[a-z0-9-]{2,})+\/?$/i;
+
+function vozFuentesDeLista(txt) {
+  const lineas = String(txt || '').replace(/\r\n?/g, '\n').split('\n')
+    .map(l => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  /* Un «Fuentes usadas en el informe» pegado de cabecera es el rótulo
+     de la lista, no la primera fuente. */
+  if (lineas.length && vozEsTituloFuentes(lineas[0])) lineas.shift();
+  const juntas = [];
+  for (let i = 0; i < lineas.length; i++) {
+    let l = lineas[i];
+    if (VOZ_SOLO_DOMINIO.test(l) && i + 1 < lineas.length && !VOZ_SOLO_DOMINIO.test(lineas[i + 1])) {
+      /* El título delante —que es por donde se busca el apellido— y el
+         dominio detrás, que es de donde sale el enlace. */
+      l = lineas[i + 1] + ' · ' + l.replace(/\/$/, '');
+      i++;
+    }
+    juntas.push({ t: l });
+  }
+  /* El dominio queda al FINAL de la entrada, que es donde
+     `vozDominioAlFinal` lo busca: así el enlace sobrevive a corregir el
+     texto, que es donde se perdía. */
+  return juntas.map(x => vozFuenteDeTexto(x.t, null));
+}
+
+/* Mete las fuentes de la caja en lo que se leyó del texto: en el
+   capítulo de bibliografía que el texto ya traía, si lo traía, y si no
+   en uno nuevo al final. Va aparte del lector a propósito: el lector
+   lee UN texto, y aquí son dos cosas pegadas en dos sitios. */
+function vozComponerFuentes(r, txt) {
+  const lista = vozFuentesDeLista(txt);
+  if (!lista.length) return r;
+  const caps = r.capitulos || [];
+  const ultimo = caps[caps.length - 1];
+  if (ultimo && ultimo.ref) ultimo.p = (ultimo.p || []).concat(lista);
+  else caps.push({ t: 'Referencias', ref: true, p: lista });
+  r.cuenta.fuentes += lista.length;
+  return r;
+}
+
+/* Las fuentes de un texto guardado, devueltas a la caja: un renglón
+   cada una, con su número si lo traía. */
+function vozFuentesTexto(c) {
+  const L = [];
+  (c.capitulos || []).forEach(cap => (cap.p || []).forEach(b => {
+    if (b.k === 'fuente') L.push((b.n != null ? '[' + b.n + '] ' : '') + b.t);
+  }));
+  return L.join('\n');
 }
 
 /* El texto buscable de un bloque, sea de la clase que sea. Una tabla no
@@ -5262,6 +5361,14 @@ let _vozAuto = {};             // lo que el lector rellenó solo, para poder pis
 let _vozGeneroTocado = false;  // ¿el género lo eligió la persona con un chip?
 let _vozVersosTocado = false;  // ¿el interruptor de versos lo tocó la persona?
 
+/* ¿Este texto es en verso, o solo tiene algún trozo que lo parece? */
+function vozVersosMandan(c) {
+  if (vozGenero(c.genero).id === 'poema') return true;
+  const n = vozCuentaBloques(c.capitulos);
+  const total = n.p + n.verso;
+  return n.verso > 0 && n.verso * 2 >= total;
+}
+
 function vozAbrirPegar(cuento) {
   const ov = document.getElementById('voz-pegar-overlay');
   if (!ov) return;
@@ -5272,11 +5379,20 @@ function vozAbrirPegar(cuento) {
 
   const ta = document.getElementById('voz-pegar-txt');
   const g = id => document.getElementById(id);
-  if (ta) ta.value = cuento ? vozTextoCuerpo(cuento) : '';
+  if (ta) ta.value = cuento ? vozTextoCuerpo(cuento, { sinFuentes: true }) : '';
+  const fu = g('voz-f-fuentes');
+  if (fu) fu.value = cuento ? vozFuentesTexto(cuento) : '';
   ['voz-f-titulo', 'voz-f-voz', 'voz-f-maquina', 'voz-f-encargo', 'voz-f-nota']
     .forEach(id => { const e = g(id); if (e) e.value = ''; });
   const versos = g('voz-f-versos');
-  if (versos) versos.checked = cuento ? vozCuentaBloques(cuento.capitulos).verso > 0 : false;
+  /* ⚠️ Y VUELVE ENCENDIDO SOLO SI EL TEXTO ES DE VERDAD EN VERSO. Con
+     «tiene alguna estrofa» se encendía en un ensayo de ochomil
+     palabras al que cinco trozos se le habían leído como verso —una
+     tabla, una lista—, y encendido fuerza el verso en TODO el texto:
+     al guardar salían más estrofas, y a la siguiente corrección más.
+     Un interruptor que se retroalimenta destroza la prosa en tres
+     vueltas, y ninguna da error. */
+  if (versos) versos.checked = cuento ? vozVersosMandan(cuento) : false;
 
   if (cuento) {
     g('voz-f-titulo').value  = cuento.titulo || '';
@@ -5336,14 +5452,21 @@ function vozPintarChipsGenero() {
    Sin la cabecera de etiquetas: esas viven en sus campos, y repetirlas
    dentro del texto haría que al volver a leer se duplicaran. Lo que sale
    de aquí lo vuelve a entender vozLeer tal cual: es el mismo alfabeto. */
-function vozTextoCuerpo(c) {
+function vozTextoCuerpo(c, op) {
+  /* Con `sinFuentes`, la bibliografía no sale aquí: sale en su caja
+     (ver `vozFuentesDeLista`). Es lo que hace que corregir un informe
+     devuelva cada cosa a donde se pega, y no las dos revueltas en el
+     mismo recuadro. */
+  const sinFuentes = !!(op && op.sinFuentes);
   const L = [];
   (c.capitulos || []).forEach((cap, i) => {
+    if (sinFuentes && cap.ref && (cap.p || []).length && (cap.p || []).every(b => b.k === 'fuente')) return;
     if (cap.epi && cap.epi.length) {
       cap.epi.forEach(b => { L.push(b.t.split('\n').map(x => '> ' + x).join('\n')); L.push(''); });
     }
     if (cap.t) { if (i || L.length) L.push(''); L.push('## ' + cap.t); L.push(''); }
     (cap.p || []).forEach(p => {
+      if (sinFuentes && p.k === 'fuente') return;
       if (p.k === 'sep') L.push('* * *');
       else if (p.k === 'fin') L.push('FIN');
       else if (p.k === 'h3') L.push('### ' + p.t);
@@ -5385,6 +5508,8 @@ function vozRepasar() {
   if (!ta || !caja) return;
 
   let r = vozLeer(ta.value, vozOpcionesLectura());
+  const cajaFu = document.getElementById('voz-f-fuentes');
+  r = vozComponerFuentes(r, cajaFu ? cajaFu.value : '');
   const versos = document.getElementById('voz-f-versos');
 
   /* ⚠️ LO QUE EL TEXTO TRAÍA ESCRITO RELLENA EL CAMPO, Y NO PISA LO
@@ -5404,7 +5529,7 @@ function vozRepasar() {
     vozPonGenero(r.genero);
     if (r.genero === 'poema' && versos && !versos.checked && !_vozVersosTocado) {
       versos.checked = true;
-      r = vozLeer(ta.value, vozOpcionesLectura());
+      r = vozComponerFuentes(vozLeer(ta.value, vozOpcionesLectura()), cajaFu ? cajaFu.value : '');
     }
   }
   _vozPegado = r;
@@ -5444,11 +5569,23 @@ function vozRepasar() {
     const sinCitar = mapaPeg.idx.lista.filter(f => !mapaPeg.donde.has(f.fid)).length;
     const citadas = mapaPeg.idx.lista.length - sinCitar;
     const l = [];
+    /* ⚠️ Y SIN NINGUNA BIBLIOGRAFÍA, EL AVISO DICE QUÉ HACER. Decirle a
+       alguien «una llamada del texto no tiene fuente» cuando el texto
+       no trae NI UNA fuente se lee como un reproche y no como una
+       instrucción: él copió todo lo que se podía copiar, y la lista
+       vive en otro sitio de la pantalla del informe. El aviso tiene que
+       nombrar la caja donde se pega. */
+    if (!mapaPeg.idx.lista.length && mapaPeg.huerfanas.length) {
+      l.push((mapaPeg.huerfanas.length === 1 ? 'El texto trae una llamada a una fuente' : 'El texto trae ' + mapaPeg.huerfanas.length + ' llamadas a fuentes') +
+             ' (' + mapaPeg.huerfanas.slice(0, 4).map(h => h.t).join(', ') + (mapaPeg.huerfanas.length > 4 ? '…' : '') + ') y NINGUNA bibliografía. ' +
+             'Si es un informe, su lista de fuentes suele estar plegada en otra parte de la pantalla: ábrela, cópiala y pégala aquí arriba, en «📚 Las fuentes del informe». ' +
+             'Se guarda igual sin ella, pero las citas no se podrán consultar.');
+    }
     if (citadas) l.push(citadas === 1 ? 'Una fuente queda enlazada con su llamada en el texto.'
                                       : citadas + ' fuentes quedan enlazadas con sus llamadas en el texto.');
     if (sinCitar) l.push(sinCitar === 1 ? 'Una fuente de la bibliografía no se cita en ninguna parte.'
                                         : sinCitar + ' fuentes de la bibliografía no se citan en ninguna parte.');
-    if (mapaPeg.huerfanas.length) {
+    if (mapaPeg.huerfanas.length && mapaPeg.idx.lista.length) {
       l.push((mapaPeg.huerfanas.length === 1 ? 'Una llamada del texto no tiene fuente' : mapaPeg.huerfanas.length + ' llamadas del texto no tienen fuente') +
              ': ' + mapaPeg.huerfanas.slice(0, 6).map(h => h.t).join(', ') + (mapaPeg.huerfanas.length > 6 ? '…' : ''));
     }
@@ -5721,7 +5858,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
     vozRepasar();
   });
+  let tFuentes = null;
   on('voz-f-versos', 'change', () => { _vozVersosTocado = true; vozRepasar(); });
+  on('voz-f-fuentes', 'input', () => { clearTimeout(tFuentes); tFuentes = setTimeout(vozRepasar, 220); });
   vozPintarChipsGenero();
 
   let tRepaso = null;

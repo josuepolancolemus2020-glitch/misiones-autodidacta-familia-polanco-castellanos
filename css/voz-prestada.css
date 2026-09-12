@@ -1168,6 +1168,18 @@
   border-top: 1px solid var(--border); font-family: system-ui, sans-serif;
 }
 
+/* La caja donde se pega la lista de fuentes de un informe. Va más baja
+   que la del texto —es una lista, no un ensayo— y con letra de sistema,
+   porque lo que se pega ahí son títulos y direcciones. */
+/* ⚠️ Y SE ENVUELVE, no se desliza a lo ancho. Un `white-space: pre`
+   dejaba cada fuente en un renglón larguísimo que había que arrastrar
+   para leer entero —y se comía el final del texto de ayuda—. Envolver
+   no cambia lo que se lee: un renglón envuelto sigue siendo un solo
+   renglón para quien lo reparte. */
+.voz-fuentes-txt {
+  min-height: 96px; resize: vertical; font-size: 13px; line-height: 1.5;
+}
+
 /* ─── El panel 📚 Fuentes ───────────────────────────────────────── */
 .voz-fu-item { border-bottom: 1px solid var(--border); padding: 9px 0; }
 .voz-fu-cab { display: flex; gap: 8px; align-items: flex-start; }

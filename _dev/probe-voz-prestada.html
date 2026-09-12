@@ -1811,6 +1811,104 @@ function margenVisible(w){
      'con la tabla escrita con sus tubos y su alineación', 'la tabla no vuelve con su forma');
   w.eval('vozCerrarLector()');
 
+  log('── 30. ⚠️ LA BIBLIOGRAFÍA DE UN INFORME SE PEGA APARTE ──');
+  /* Descubierto el 12 de septiembre de 2026, con el primer informe de
+     investigación que el autor pegó tal cual: la herramienta le dijo
+     «una llamada del texto no tiene fuente» y él había copiado todo lo
+     que se podía copiar. Y era verdad las dos cosas: un informe así
+     guarda sus fuentes en OTRO sitio de la pantalla y las llamadas son
+     numeritos dibujados, no letras. Ninguna regla de lectura arregla
+     eso, porque lo que falta no está en el texto. Lo que lo arregla es
+     una caja donde pegar la lista. */
+  const informe = 'El Impuesto sobre el Tiempo\n\nVoz: un informe\nEscrito por: Gemini\nGénero: ensayo\n\n' +
+    'Los docentes dedican solo el 78 % de su tiempo a enseñar (TALIS 2018). ' +
+    'En América Latina la cifra baja (Educación 2020, 2019).\n\n' +
+    'Y hay un efecto sobre la permanencia en el aula (Urban, 2021).';
+  /* Tal como se copia de «Fuentes usadas en el informe»: el dominio en
+     un renglón y el título en el siguiente. */
+  const lista = 'Fuentes usadas en el informe\npublications.iadb.org\nTALIS 2018: ¿ESTÁN PREPARADOS LOS DOCENTES?\n' +
+    'educacion2020.cl\nMenos carga administrativa, más calidad — Educación 2020, 2019\n' +
+    'urban.org\nThe Influence of School Administrators on Teacher Retention, 2021';
+
+  w.eval('vozAbrirPegar(null)');
+  await esperar(200);
+  d.getElementById('voz-pegar-txt').value = informe;
+  w.eval('vozRepasar()');
+  await esperar(250);
+  const rep30 = d.getElementById('voz-pegar-repaso').textContent;
+  ok(/NINGUNA bibliograf/i.test(rep30) && /fuentes del informe/i.test(rep30),
+     '⚠️ sin bibliografía, el repaso NO suelta un reproche: dice dónde pegar la lista',
+     'el aviso no explica qué hacer: ' + rep30.slice(0, 260));
+
+  d.getElementById('voz-f-fuentes').value = lista;
+  w.eval('vozRepasar()');
+  await esperar(300);
+  const r30 = JSON.parse(w.eval('JSON.stringify(_vozPegado)'));
+  const cap30 = r30.capitulos[r30.capitulos.length - 1];
+  ok(cap30.ref === true && cap30.p.length === 3 && cap30.p.every(b => b.k === 'fuente'),
+     'la lista pegada en su caja entra como bibliografía, con sus tres entradas',
+     'la caja de fuentes no entró: ' + JSON.stringify(r30.capitulos.map(c => c.t + '/' + c.p.map(b => b.k).join('+'))));
+  ok(/TALIS 2018: ¿ESTÁN PREPARADOS/.test(cap30.p[0].t) && /publications\.iadb\.org/.test(cap30.p[0].t),
+     '⚠️ y el renglón que es SOLO un dominio se junta con su título, en vez de contar como una fuente vacía',
+     'el dominio quedó como una entrada suelta: ' + JSON.stringify(cap30.p.map(b => b.t.slice(0, 40))));
+  ok(cap30.p[0].url === 'https://publications.iadb.org/',
+     'y ese dominio pelado se convierte en enlace, comprobado con URL()',
+     'el dominio no dio enlace: ' + cap30.p[0].url);
+  const m30 = JSON.parse(w.eval(`(function(){ const m = vozMapaCitas({ cid: '__inf__', capitulos: _vozPegado.capitulos }); vozOlvidaFuentes();
+    return JSON.stringify({ enlazadas: m.donde.size, huerfanas: m.huerfanas.length }); })()`));
+  ok(m30.enlazadas === 3 && m30.huerfanas === 0,
+     '⚠️ y las TRES llamadas del texto («(TALIS 2018)», «(Educación 2020, 2019)», «(Urban, 2021)») casan con sus entradas',
+     'las llamadas no casaron con la lista pegada: ' + JSON.stringify(m30));
+  const rep30b = d.getElementById('voz-pegar-repaso').textContent;
+  ok(/3 fuentes quedan enlazadas/.test(rep30b) && !/NINGUNA bibliograf/i.test(rep30b),
+     'y el repaso lo dice antes de guardar', 'el repaso no confirma el enlace: ' + rep30b.slice(0, 200));
+
+  /* Y al corregirlo, cada cosa vuelve a su caja: el cuerpo sin la
+     bibliografía dentro, y la bibliografía en la suya. */
+  d.getElementById('voz-f-titulo').value = 'El Impuesto sobre el Tiempo';
+  d.getElementById('voz-f-voz').value = 'un informe';
+  d.getElementById('voz-f-maquina').value = 'Gemini';
+  w.eval('vozGuardarPegado()');
+  await esperar(700);
+  const cidInf = w.eval('_vozCuentos[0].cid');
+  w.eval(`vozAbrirPegar(_vozCuentos.find(c => c.cid === ${JSON.stringify(cidInf)}))`);
+  await esperar(300);
+  const cuerpo30 = d.getElementById('voz-pegar-txt').value;
+  const caja30 = d.getElementById('voz-f-fuentes').value;
+  ok(!/TALIS 2018: ¿ESTÁN/.test(cuerpo30) && caja30.split('\n').filter(Boolean).length === 3,
+     'al corregirlo, el cuerpo vuelve sin la bibliografía dentro y las tres fuentes vuelven a su caja',
+     'la ida y vuelta revuelve las dos cajas: cuerpo=' + cuerpo30.slice(0, 60) + ' | caja=' + JSON.stringify(caja30.slice(0, 80)));
+  w.eval('vozRepasar()');
+  await esperar(250);
+  const r30b = JSON.parse(w.eval('JSON.stringify(_vozPegado)'));
+  ok(JSON.stringify(r30b.capitulos) === JSON.stringify(r30.capitulos),
+     '⚠️ y se vuelve a leer IGUAL: mismos capítulos, mismas fuentes',
+     '⚠️ corregir un informe le cambia la bibliografía');
+
+  /* ⚠️ Y EL INTERRUPTOR DE VERSOS NO VUELVE ENCENDIDO POR CINCO
+     ESTROFAS EN OCHOMIL PALABRAS. Encendido fuerza el verso en TODO el
+     texto: al guardar salen más estrofas y a la siguiente corrección
+     más. Un interruptor que se retroalimenta destroza la prosa en tres
+     vueltas, y ninguna da error. */
+  const conEstrofa = JSON.parse(JSON.stringify(r30.capitulos));
+  conEstrofa[0].p.push({ k: 'verso', t: 'Agua que no vuelves, tierra que no olvida.' });
+  w.eval(`vozCerrarPegar();
+          _vozCuentos = [{ cid: 'c-mixto', titulo: 'Mixto', genero: 'ensayo', voz: 'X', maquina: 'Y',
+                           capitulos: ${JSON.stringify(conEstrofa)}, palabras: 100, borrado: false, actualizado: 9 }];
+          vozGuardaLocal(); vozRender(); vozAbrirPegar(_vozCuentos.find(c => c.cid === 'c-mixto'))`);
+  await esperar(300);
+  ok(d.getElementById('voz-f-versos').checked === false,
+     '⚠️ un ensayo con una estrofa suelta NO vuelve con «respetar los saltos de línea» encendido',
+     '⚠️ el interruptor de versos se retroalimenta: un ensayo con una estrofa vuelve en modo verso');
+  w.eval(`vozCerrarPegar();
+          _vozCuentos = [{ cid: 'c-poema', titulo: 'Poema', genero: 'poema', voz: 'X', maquina: 'Y',
+                           capitulos: [{ t: '', p: [{ k: 'verso', t: 'Uno y dos' }] }], palabras: 2, borrado: false, actualizado: 9 }];
+          vozGuardaLocal(); vozRender(); vozAbrirPegar(_vozCuentos.find(c => c.cid === 'c-poema'))`);
+  await esperar(300);
+  ok(d.getElementById('voz-f-versos').checked === true,
+     'pero un poema sí vuelve con el interruptor puesto', 'un poema perdió el interruptor de versos');
+  w.eval('vozCerrarPegar()');
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

@@ -970,7 +970,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Veintiocho reglas, y ninguna es de adorno:**
+**Veintinueve reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -1765,6 +1765,60 @@ el diseño.
    tubos y su renglón de guiones, y con las fuentes como vinieron; es la
    comprobación 16 aplicada a lo nuevo, y la sonda compara las dos formas.
 
+29. ⚠️ **LA BIBLIOGRAFÍA DE UN INFORME NO VIENE DENTRO DEL TEXTO, Y POR
+   ESO TIENE CAJA PROPIA.**
+   Descubierto el 12 de septiembre de 2026, con el primer informe de
+   investigación que el autor pegó tal cual desde Gemini: la herramienta le
+   dijo «una llamada del texto no tiene fuente» y él había copiado todo lo
+   que se podía copiar. **Y era verdad las dos cosas.**
+
+   Un informe así guarda sus fuentes en **otro sitio de la pantalla**
+   —plegadas bajo un «Fuentes usadas en el informe»— y las llamadas son
+   **numeritos dibujados, no letras**. Al copiar el informe no viene ni la
+   lista ni los numeritos: de ochomil palabras llegó UNA sola llamada, la
+   única escrita a mano dentro de una frase («(TALIS 2018)»), y ninguna
+   fuente. **Ninguna regla de lectura puede arreglar eso, porque lo que
+   falta no está en el texto**; lo único que lo arregla es una caja donde
+   pegar la lista, y eso es `#voz-f-fuentes` en la hoja de pegar.
+
+   **Un renglón, una fuente.** Y un renglón que es **solo un dominio**
+   (`publications.iadb.org`) no es una fuente: es el rótulo que esos
+   informes ponen encima del título, y se junta con el de debajo —el
+   título delante, que es por donde se busca el apellido, y el dominio
+   detrás, que es de donde sale el enlace—. Separados serían dos entradas
+   y ninguna de las dos diría nada.
+
+   ⚠️ **Y el enlace se perdía al corregir.** Juntado con su título, el
+   dominio ya no es «solo un dominio», así que al releer la caja se
+   quedaba sin `url` y **todas las fuentes perdían su 🔗 sin dar ningún
+   error**. Por eso `vozDominioAlFinal()` mira el ÚLTIMO trozo de la
+   entrada y solo si está **todo en minúsculas**, que es como se escribe
+   un dominio y como no se escribe el final de una frase («Debate.» y
+   «Melville House.» no llevan punto dentro de una palabra, y «S.A.» va en
+   mayúsculas). Dentro de la prosa no se busca nada: ahí «informe.pdf»
+   tendría la misma pinta. Y las terminaciones de archivo se descartan a
+   mano, como las palabras que no son apellidos.
+
+   **Al corregir, cada cosa vuelve a su caja**: el cuerpo sin la
+   bibliografía dentro (`vozTextoCuerpo(c, {sinFuentes:true})`) y las
+   entradas en la suya. Revolverlas en el mismo recuadro obligaría a
+   separarlas a mano en cada corrección.
+
+   ⚠️ **Y sin NINGUNA bibliografía, el aviso dice qué hacer, no lo que
+   falta.** Decirle a alguien «una llamada del texto no tiene fuente»
+   cuando el texto no trae ni una se lee como un reproche y no como una
+   instrucción —él copió todo lo que se podía copiar—: el aviso nombra la
+   caja donde se pega la lista.
+
+   ⚠️ **Y EL INTERRUPTOR DE VERSOS NO SE RETROALIMENTA.** Volvía encendido
+   con que el texto tuviera **una** estrofa, y encendido fuerza el verso en
+   TODO el texto: un ensayo de ochomil palabras al que cinco trozos se le
+   habían leído como verso —una tabla, una lista— volvía en modo verso, al
+   guardar salían más estrofas, y a la siguiente corrección más. Un
+   interruptor que se retroalimenta destroza la prosa en tres vueltas y
+   ninguna da error. Ahora vuelve encendido solo si el género es poema o
+   si el verso es **la mitad o más** de los bloques (`vozVersosMandan`).
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -1819,6 +1873,12 @@ tabla de verdad, mira `break-inside` y el `position: sticky` **calculados**,
 exige que solo haya UNA vista en el documento —con las dos, el texto del
 bloque sale duplicado— y da la vuelta al texto para ver que corregir no
 deshace las tablas.
+
+La comprobación **30** es el informe de investigación pegado tal como
+llega: sin sus fuentes dentro, con la lista pegada aparte (con el dominio
+en su propio renglón, como se copia), y con la ida y vuelta de corregir,
+que es donde el enlace se perdía. Y vigila que el interruptor de versos no
+vuelva encendido en un ensayo con una estrofa suelta.
 
 La comprobación **27** es la lectura a página limpia: el ⛶ de la barra
 (con una pantalla completa de mentira, que en un Chromium sin cabeza no hay
