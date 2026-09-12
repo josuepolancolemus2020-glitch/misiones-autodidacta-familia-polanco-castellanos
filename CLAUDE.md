@@ -970,7 +970,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Veintinueve reglas, y ninguna es de adorno:**
+**Treinta reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -1819,12 +1819,84 @@ el diseño.
    ninguna da error. Ahora vuelve encendido solo si el género es poema o
    si el verso es **la mitad o más** de los bloques (`vozVersosMandan`).
 
+30. ⚠️ **ADJUNTAR UN ARCHIVO ES MEJOR QUE PEGAR, Y NO ES UNA COMODIDAD.**
+   Pedido por el autor el 12 de septiembre de 2026: «podrías poner adjuntar
+   ya sea de Drive, de OneDrive… al adjuntar en pdf o en Documentos de
+   Google, o un word, las citas ya están bien específicas y con mejor
+   orden». Y tiene razón por un motivo que se puede escribir: **copiar una
+   pantalla pierde información y un archivo no.** Al copiar, los títulos
+   pierden su renglón —el de su informe llegó pegado a la frase
+   siguiente—, las tablas se deshacen, los numeritos de las citas son
+   dibujos y no viajan, y la lista de fuentes se queda donde estaba. En un
+   `.docx` todo eso está dicho con todas las letras: qué párrafo es título
+   y de qué nivel, dónde empieza cada celda, qué trozo va en superíndice y
+   a qué nota al pie apunta, y a dónde lleva cada enlace.
+
+   ⚠️ **Y ESTO NO ES UN SEGUNDO LECTOR.** No entiende textos: los ESCRIBE
+   en el mismo alfabeto que `vozLeer` ya entiende (`#`, `>`, `- `, tubos,
+   `[3]`, `[^3]: …`) y los deja **en el recuadro, a la vista**. Dos
+   lectores con dos juegos de reglas se irían separando solos y el día que
+   alguien arreglara uno el otro se quedaría roto; y un adjunto que se
+   guardara sin enseñarse sería la única parte de esta herramienta que
+   hace cosas a espaldas de quien la usa, y encima con lo que más puede
+   salir torcido. Tampoco **pisa lo que ya había escrito**: se añade
+   debajo.
+
+   ⚠️ **DE DRIVE Y DE ONEDRIVE SE ADJUNTA SIN CONECTAR NINGUNA CUENTA:**
+   el selector de archivos del propio aparato ya los ofrece como orígenes.
+   Meter aquí el selector de Google o el de Microsoft sería traer dos
+   identificaciones más, dos librerías de fuera y dos cosas que pueden
+   caerse —en una aplicación que tiene dentro la Bóveda— para llegar al
+   mismo archivo al que ya se llega con un toque.
+
+   **Vive en `js/tools/voz-adjunto.js`, aparte**, por la misma razón que el
+   banco de cortes de El Rodaje: `voz-prestada.js` no toca ni un aparato
+   del navegador, y esto toca `DecompressionStream`, `DOMParser`, `File` y
+   `ArrayBuffer`. **Si no carga, la hoja de pegar sigue entera** y el botón
+   lo dice; la sonda lo comprueba apagándolo a propósito.
+
+   ⚠️ **Un `.docx` se abre sin librerías, y con una trampa dentro:** el
+   navegador ya sabe descomprimir (`DecompressionStream('deflate-raw')`) y
+   el índice del zip son treinta líneas — traer una librería sería un
+   archivo más en el arranque que costó quince segundos quitar. **Y los
+   tamaños se leen del DIRECTORIO CENTRAL, nunca de la cabecera de cada
+   archivo:** Word escribe ceros ahí y pone el bueno en un descriptor
+   DETRÁS de los datos, así que quien se fíe de la cabecera lee cero bytes
+   y se encuentra **un documento vacío sin ningún error**.
+
+   ⚠️ **Y EL PDF SE RECHAZA A PROPÓSITO, DICIENDO QUÉ HACER.** Un PDF no
+   guarda renglones: guarda letras con sus coordenadas, y muchos llevan
+   codificaciones propias, así que lo que se saca no es texto equivocado
+   —es un revoltijo de símbolos— y no se ve hasta leerlo. **Un revoltijo
+   que parece haber funcionado es lo peor que puede salir de aquí**, y no
+   hace falta: el mismo documento, descargado como Word, trae todo dicho.
+   El `.pdf` sí está en la lista del selector, para poder explicarlo: si no
+   estuviera, el archivo no se podría ni elegir y nadie sabría por qué.
+
+   Detalles que salieron de probarlo: el superíndice de dígitos se escribe
+   como `[3]` **solo si son dígitos** (un «1.er» no es una cita); la
+   dirección de un enlace se pone al lado del texto **solo si ese texto
+   tiene cinco caracteres o más**, porque en un informe exportado las
+   llamadas de las citas SON enlaces de uno o dos caracteres y el párrafo
+   se llenaría de direcciones; y las notas al pie **se renumeran desde 1**,
+   porque los identificadores de Word saltan y una bibliografía que empieza
+   en la nota 7 se lee como si faltaran seis.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
 node _dev/servidor-estatico.js      (en otra terminal)
 _dev/probe-voz-prestada.html        (en el navegador)
+_dev/probe-voz-adjunto.html         (el lector de archivos)
 ```
+
+⚠️ La sonda del adjunto **fabrica un `.docx` de verdad dentro del
+navegador** —con su zip, su CRC32 y su `deflate-raw`— y lo lee, en vez de
+darle a las funciones un XML ya descomprimido. Es la misma lección que la
+sonda del banco de cortes, que se fabrica un WAV y lo corta: lo que puede
+fallar aquí es el FORMATO, y eso no se ve nunca llamando funciones. Y
+escribe los tamaños de la cabecera **en cero, como los escribe Word**,
+que es la trampa que deja un documento vacío sin dar ningún error.
 
 La comprobación **2** le pega un párrafo de prosa cuyos siete renglones
 empiezan por siete palabras que nombran una parte de un libro, y exige que
@@ -1955,7 +2027,7 @@ Cada sonda termina poniendo **APRUEBA** o **SUSPENDE** en `document.title`,
 con el veredicto DELANTE (el rótulo viejo «SONDA-APRUEBA» ya se retiró).
 No es decoración: es lo que se lee al correrlas en tanda. Once sondas
 antiguas no lo hacían, y en la auditoría del 20 de agosto de 2026
-aparecieron **veintinueve más**; hoy lo hacen las noventa y cuatro. La
+aparecieron **veintinueve más**; hoy lo hacen las noventa y cinco. La
 única excepción es `probe-alto-util.html`, que no es una sonda sino un
 instrumento de medida y se titula INSTRUMENTO. La cuenta no se escribe de
 memoria (esta línea ya se quedó vieja una vez): sale de

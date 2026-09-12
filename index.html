@@ -2421,9 +2421,18 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         placeholder="Pega aquí el texto entero, tal como te lo dio la máquina. Se reparte solo en capítulos, citas, listas y versos."></textarea>
 
       <div class="voz-pegar-barra">
+        <!-- ⚠️ ADJUNTAR ES MEJOR QUE PEGAR, y por eso va el primero y
+             resaltado: al copiar la pantalla de un informe se pierden
+             los títulos, las tablas y los numeritos de las citas; el
+             archivo los trae dichos con todas las letras. El selector
+             del propio aparato ya ofrece Drive y OneDrive, así que no
+             hace falta conectar ninguna cuenta. -->
+        <button type="button" class="voz-btn voz-btn-adj" id="voz-adjuntar-btn">📎 Adjuntar un archivo</button>
+        <input type="file" id="voz-f-archivo" hidden>
         <button type="button" class="voz-btn" id="voz-ejemplo-btn">📄 Un ejemplo</button>
         <button type="button" class="voz-btn" id="voz-ayuda-btn">❔ Cómo se pega</button>
       </div>
+      <div class="voz-adj-estado" id="voz-adj-estado" hidden></div>
       <!-- Para un poema, o para cualquier texto en que cada renglón
            importa. Se enciende solo al elegir el género Poema. -->
       <label class="voz-interruptor" for="voz-f-versos">
@@ -2813,6 +2822,11 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
        pestaña lo dice y el cuaderno de dirección sigue entero. -->
   <script src="js/tools/rodaje-cortes.js"></script>
   <script src="js/tools/voz-prestada.js"></script>
+  <!-- El lector de archivos adjuntos va APARTE y DESPUÉS: toca
+       DecompressionStream, DOMParser y ArrayBuffer, que fallan distinto
+       en cada aparato. Si no carga, la hoja de pegar sigue entera y el
+       botón lo dice. Misma razón que el banco de cortes de El Rodaje. -->
+  <script src="js/tools/voz-adjunto.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

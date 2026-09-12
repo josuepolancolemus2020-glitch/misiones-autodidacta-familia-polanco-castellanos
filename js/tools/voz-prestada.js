@@ -5403,6 +5403,12 @@ function vozAbrirPegar(cuento) {
   }
   vozPonGenero(cuento ? vozGenero(cuento.genero).id : 'cuento');
 
+  const inpArch = g('voz-f-archivo');
+  if (inpArch && window.VozAdjunto && window.VozAdjunto.acepta) inpArch.accept = window.VozAdjunto.acepta;
+  const btnAdj = g('voz-adjuntar-btn');
+  if (btnAdj && !vozAdjuntoHay()) btnAdj.textContent = '📎 Adjuntar (no disponible aquí)';
+  vozAdjDecir('');
+
   const tit = g('voz-pegar-tit');
   if (tit) tit.textContent = cuento ? '✏️ Corregir el texto' : '➕ Pegar un texto';
   const retirar = g('voz-retirar-caja');
@@ -5484,6 +5490,89 @@ function vozTextoCuerpo(c, op) {
     });
   });
   return L.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   📎 EL ARCHIVO ADJUNTO
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026: «podrías poner
+   adjuntar ya sea de Drive, de OneDrive… al adjuntar en pdf o en
+   Documentos de Google, o un word, las citas ya están bien específicas
+   y con mejor orden».
+
+   Y es cierto, por un motivo que se puede escribir: COPIAR una pantalla
+   pierde información y ADJUNTAR un archivo no. Al copiar, los títulos
+   pierden su renglón —el de su informe llegó pegado a la frase
+   siguiente—, las tablas se deshacen en una fila de tubos, los
+   numeritos de las citas son dibujos y no viajan, y la lista de fuentes
+   se queda donde estaba. En el archivo todo eso está dicho con todas
+   las letras.
+
+   ⚠️ Y DE DRIVE Y DE ONEDRIVE SE ADJUNTA SIN CONECTAR NINGUNA CUENTA:
+   el selector de archivos del propio aparato ya los ofrece como
+   orígenes, igual que la carpeta de descargas. Meter aquí el selector
+   de Google o el de Microsoft sería traer dos identificaciones más, dos
+   librerías de fuera y dos cosas que pueden caerse —en una aplicación
+   que tiene dentro la Bóveda— para llegar al mismo archivo al que ya se
+   llega con un toque.
+
+   ⚠️ Y LO LEÍDO SE DEJA EN EL RECUADRO, A LA VISTA, NO SE GUARDA SOLO.
+   Es la regla de toda la hoja de pegar: se enseña qué se entendió antes
+   de guardar nada. Un adjunto que fuera directo al anaquel sería la
+   única parte de esta herramienta que hace cosas a espaldas de quien la
+   usa, y encima con lo que más puede salir torcido. */
+function vozAdjuntoHay() {
+  return !!(window.VozAdjunto && typeof window.VozAdjunto.leer === 'function');
+}
+
+function vozAdjDecir(msg, mal) {
+  const caja = document.getElementById('voz-adj-estado');
+  if (!caja) return;
+  caja.textContent = msg || '';
+  caja.hidden = !msg;
+  caja.classList.toggle('voz-adj-mal', !!mal);
+}
+
+async function vozAdjuntar(file) {
+  if (!file) return;
+  if (!vozAdjuntoHay()) {
+    vozAdjDecir('El lector de archivos no cargó en este aparato. Pega el texto a mano en el recuadro y funciona igual.', true);
+    return;
+  }
+  const ta = document.getElementById('voz-pegar-txt');
+  if (!ta) return;
+  vozAdjDecir('📎 Abriendo «' + file.name + '»…');
+  const r = await window.VozAdjunto.leer(file);
+  if (r.error) { vozAdjDecir('📎 ' + r.error, true); return; }
+  if (!String(r.texto || '').trim()) {
+    vozAdjDecir('📎 «' + file.name + '» se abrió, pero no tiene texto dentro. Si es un documento escaneado, lo que hay son fotos de las páginas, no letras.', true);
+    return;
+  }
+
+  /* ⚠️ Lo que ya estaba escrito NO se pisa sin avisar: se añade debajo.
+     Alguien que pega un texto, adjunta un anexo y guarda espera tener
+     las dos cosas, y perder lo escrito sin poder deshacerlo sería la
+     peor sorpresa de toda la herramienta. */
+  const habia = ta.value.trim();
+  ta.value = habia ? (habia + '\n\n' + r.texto) : r.texto;
+
+  /* El lector nuevo manda: lo que traiga el archivo vuelve a rellenar
+     el título y las demás etiquetas (`_vozAuto`), y el interruptor de
+     versos se queda como estaba. */
+  vozRepasar();
+
+  const c = r.cuenta;
+  const partes = [];
+  if (c) {
+    if (c.cabeceras) partes.push(c.cabeceras + (c.cabeceras === 1 ? ' apartado' : ' apartados'));
+    if (c.tablas) partes.push(c.tablas + (c.tablas === 1 ? ' tabla' : ' tablas'));
+    if (c.notas) partes.push(c.notas + (c.notas === 1 ? ' nota al pie' : ' notas al pie'));
+    if (c.listas) partes.push(c.listas + (c.listas === 1 ? ' ítem de lista' : ' ítems de lista'));
+    if (c.citas) partes.push(c.citas + (c.citas === 1 ? ' cita' : ' citas'));
+  }
+  vozAdjDecir('📎 ' + file.name + (partes.length ? ' · ' + partes.join(' · ') : '') +
+              (habia ? ' · añadido debajo de lo que ya había' : '') +
+              '. Está en el recuadro de arriba: míralo antes de guardar.');
 }
 
 function vozCerrarPegar() {
@@ -5860,6 +5949,24 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   let tFuentes = null;
   on('voz-f-versos', 'change', () => { _vozVersosTocado = true; vozRepasar(); });
+  /* El botón toca el selector del aparato, que es quien ofrece Drive,
+     OneDrive y la carpeta de descargas. Y se vacía después de cada uno,
+     para que adjuntar DOS VECES EL MISMO archivo vuelva a avisar: sin
+     eso, el segundo toque no dispara nada y parece que se rompió. */
+  on('voz-adjuntar-btn', 'click', () => {
+    const inp = document.getElementById('voz-f-archivo');
+    if (!inp) return;
+    if (!vozAdjuntoHay()) {
+      vozAdjDecir('El lector de archivos no cargó en este aparato. Pega el texto a mano en el recuadro y funciona igual.', true);
+      return;
+    }
+    inp.click();
+  });
+  on('voz-f-archivo', 'change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    await vozAdjuntar(f);
+  });
   on('voz-f-fuentes', 'input', () => { clearTimeout(tFuentes); tFuentes = setTimeout(vozRepasar, 220); });
   vozPintarChipsGenero();
 

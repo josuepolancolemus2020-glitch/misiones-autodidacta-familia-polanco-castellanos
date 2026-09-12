@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Adjuntar en La Voz Prestada</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:430px;height:760px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda del 📎 ADJUNTO de LA VOZ PRESTADA.
+
+   Qué resuelve el adjunto: copiar la pantalla de un informe PIERDE
+   información —los títulos pierden su renglón, las tablas se deshacen,
+   los numeritos de las citas son dibujos y no viajan— y un archivo no.
+
+   ⚠️ Y POR ESO ESTA SONDA FABRICA UN .docx DE VERDAD DENTRO DEL
+   NAVEGADOR, con su zip y su compresión, en vez de llamar por dentro a
+   las funciones con un XML de mentira. Es la misma lección que la sonda
+   del banco de cortes, que se fabrica un WAV y lo corta: lo que puede
+   fallar aquí es el formato —un tamaño leído de la cabecera en vez del
+   directorio, un `deflate-raw` que no es el que el navegador espera— y
+   nada de eso se ve dándole a la función un texto ya descomprimido.
+
+   Lo que puede salir mal, en orden:
+
+   1. QUE EL .docx SE ABRA VACÍO. Word escribe CEROS en el tamaño de la
+      cabecera de cada archivo y pone el bueno en un descriptor DETRÁS
+      de los datos. Quien se fíe de la cabecera lee cero bytes y se
+      encuentra un documento vacío, sin ningún error.
+
+   2. QUE SE PIERDA JUSTO LO QUE SE VENÍA A BUSCAR: los títulos con su
+      nivel, las tablas con sus celdas, los superíndices de las citas y
+      las notas al pie. Es lo único que justifica adjuntar en vez de
+      pegar.
+
+   3. QUE UN PDF DEVUELVA UN REVOLTIJO EN VEZ DE DECIR QUE NO. Un
+      revoltijo que parece haber funcionado es lo peor que puede salir
+      de aquí.
+
+   4. QUE EL ADJUNTO SE GUARDE SOLO. Lo leído tiene que quedarse EN EL
+      RECUADRO, a la vista, como todo lo demás de esta hoja.
+
+   5. QUE SI EL LECTOR DE ARCHIVOS NO CARGA, LA HOJA DE PEGAR SE ROMPA.
+      Se apaga a propósito y se comprueba que se puede seguir pegando a
+      mano, igual que el banco de cortes con El Rodaje. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+/* ── Fabricar un .docx de verdad ───────────────────────────────────
+   Un zip con su tabla CRC32, su directorio central y sus datos
+   comprimidos con el mismo `deflate-raw` que el navegador sabe
+   descomprimir. Se escribe aquí entero para que lo que se prueba sea
+   el formato, no una versión amable de él. */
+const TABLA_CRC = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(u8){
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < u8.length; i++) c = TABLA_CRC[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+async function desinflar(u8, w){
+  const flujo = new w.Blob([u8]).stream().pipeThrough(new w.CompressionStream('deflate-raw'));
+  return new Uint8Array(await new w.Response(flujo).arrayBuffer());
+}
+async function hacerZip(archivos, w){
+  const te = new TextEncoder();
+  const partes = [], dir = [];
+  let pos = 0;
+  for (const [nombre, texto] of archivos) {
+    const crudo = te.encode(texto);
+    const comp = await desinflar(crudo, w);
+    const nom = te.encode(nombre);
+    const cab = new Uint8Array(30 + nom.length);
+    const dv = new DataView(cab.buffer);
+    dv.setUint32(0, 0x04034b50, true);
+    dv.setUint16(4, 20, true); dv.setUint16(6, 0x08, true);   // bit 3: los tamaños van detrás
+    dv.setUint16(8, 8, true);                                  // deflate
+    /* ⚠️ CEROS EN LOS TAMAÑOS DE LA CABECERA, como los escribe Word: si
+       el lector se fía de aquí, lee un documento vacío. */
+    dv.setUint32(14, 0, true); dv.setUint32(18, 0, true); dv.setUint32(22, 0, true);
+    dv.setUint16(26, nom.length, true); dv.setUint16(28, 0, true);
+    cab.set(nom, 30);
+    partes.push(cab, comp);
+    dir.push({ nombre: nom, crc: crc32(crudo), comp: comp.length, crudo: crudo.length, local: pos });
+    pos += cab.length + comp.length;
+  }
+  const iniDir = pos;
+  for (const e of dir) {
+    const c = new Uint8Array(46 + e.nombre.length);
+    const dv = new DataView(c.buffer);
+    dv.setUint32(0, 0x02014b50, true);
+    dv.setUint16(4, 20, true); dv.setUint16(6, 20, true); dv.setUint16(8, 0x08, true);
+    dv.setUint16(10, 8, true);
+    dv.setUint32(16, e.crc, true); dv.setUint32(20, e.comp, true); dv.setUint32(24, e.crudo, true);
+    dv.setUint16(28, e.nombre.length, true);
+    dv.setUint32(42, e.local, true);
+    c.set(e.nombre, 46);
+    partes.push(c);
+    pos += c.length;
+  }
+  const fin = new Uint8Array(22);
+  const dvf = new DataView(fin.buffer);
+  dvf.setUint32(0, 0x06054b50, true);
+  dvf.setUint16(8, dir.length, true); dvf.setUint16(10, dir.length, true);
+  dvf.setUint32(12, pos - iniDir, true); dvf.setUint32(16, iniDir, true);
+  partes.push(fin);
+  return new w.Blob(partes, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+
+const W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+const R = 'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+const p = (estilo, dentro) => '<w:p>' + (estilo ? '<w:pPr>' + estilo + '</w:pPr>' : '') + dentro + '</w:p>';
+const estilo = v => '<w:pStyle w:val="' + v + '"/>';
+const t = s => '<w:r><w:t xml:space="preserve">' + s + '</w:t></w:r>';
+const celda = s => '<w:tc>' + p('', t(s)) + '</w:tc>';
+const fila = xs => '<w:tr>' + xs.map(celda).join('') + '</w:tr>';
+
+const DOCUMENTO =
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+'<w:document ' + W + ' ' + R + '><w:body>' +
+  p(estilo('Title'), t('El Impuesto sobre el Tiempo')) +
+  p(estilo('Heading1'), t('Resumen Ejecutivo')) +
+  p('', t('Los docentes dedican el 78 % del tiempo') +
+        '<w:r><w:rPr><w:vertAlign w:val="superscript"/></w:rPr><w:t>3</w:t></w:r>' +
+        t(' a enseñar') + '<w:r><w:footnoteReference w:id="2"/></w:r>' + t('.')) +
+  p(estilo('Heading2'), t('Los datos')) +
+  '<w:tbl>' + fila(['Año', 'Deuda', '% del PIB']) + fila(['1980', '1.388', '61']) + fila(['1990', '3.588', '122']) + '</w:tbl>' +
+  p('<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr>', t('Primero la mecha')) +
+  p(estilo('Heading1'), t('Referencias')) +
+  p('', t('[3] Banco Central de Honduras (1982). Memoria anual. ') +
+        '<w:hyperlink r:id="rId9"><w:r><w:t>Ver el informe completo</w:t></w:r></w:hyperlink>') +
+  p('', t('Harari, Y. N. (2014). Sapiens. Debate. ') +
+        '<w:hyperlink r:id="rId9"><w:r><w:t>1</w:t></w:r></w:hyperlink>') +
+'</w:body></w:document>';
+
+const NOTAS =
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+'<w:footnotes ' + W + '>' +
+  '<w:footnote w:id="0">' + p('', t('separador')) + '</w:footnote>' +
+  '<w:footnote w:id="2">' + p('', t('TALIS 2018, tabla I.2.1.')) + '</w:footnote>' +
+'</w:footnotes>';
+
+const RELS =
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+'<Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://example.org/bch" TargetMode="External"/>' +
+'</Relationships>';
+
+(async () => {
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w = f.contentWindow, d = w.document;
+  d.getElementById('app-container').style.display = '';
+  w.eval('switchView("view-voz")');
+  await esperar(250);
+
+  log('── 1. El lector de archivos está, y aparte ──');
+  ok(typeof w.VozAdjunto === 'object' && typeof w.VozAdjunto.leer === 'function',
+     'window.VozAdjunto existe y vive en su propio archivo',
+     'no cargó js/tools/voz-adjunto.js');
+  ok(w.VozAdjunto.puede() === true,
+     'y este navegador sabe abrir un comprimido (DecompressionStream)',
+     'el navegador no puede abrir un .docx: la sonda no puede medir nada');
+  ok(/\.docx/.test(w.VozAdjunto.acepta) && /\.pdf/.test(w.VozAdjunto.acepta),
+     'el selector acepta .docx… y también .pdf, para poder explicar por qué no sirve',
+     'la lista de formatos no está bien: ' + w.VozAdjunto.acepta);
+
+  log('── 2. ⚠️ UN .docx DE VERDAD, FABRICADO Y LEÍDO ──');
+  const blob = await hacerZip([
+    ['[Content_Types].xml', '<?xml version="1.0"?><Types/>'],
+    ['word/document.xml', DOCUMENTO],
+    ['word/footnotes.xml', NOTAS],
+    ['word/_rels/document.xml.rels', RELS],
+  ], w);
+  const archivo = new w.File([blob], 'informe.docx',
+    { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+  const r = await w.VozAdjunto.leer(archivo);
+  ok(!r.error && r.texto && r.texto.length > 100,
+     '⚠️ el .docx se abre y trae texto (Word pone CEROS en los tamaños de la cabecera: el tamaño bueno está en el directorio)',
+     '⚠️ el .docx salió vacío o con error: ' + (r.error || JSON.stringify(r.texto)));
+  const txt = r.texto || '';
+  ok(/^# El Impuesto sobre el Tiempo/m.test(txt),
+     'el estilo «Título» sale como título del documento («# …»)', 'no sacó el título: ' + txt.slice(0, 80));
+  ok(/^## Resumen Ejecutivo/m.test(txt) && /^### Los datos/m.test(txt),
+     '⚠️ y los apartados salen con SU NIVEL: «Título 1» capítulo, «Título 2» subtítulo',
+     '⚠️ los apartados perdieron el nivel — es lo único que se pierde al copiar la pantalla');
+  ok(/^\| Año \| Deuda \| % del PIB \|$/m.test(txt) && /^\|---\|---\|---\|$/m.test(txt),
+     '⚠️ la tabla sale con sus tubos Y su renglón de guiones, que es lo que la hace inequívoca',
+     '⚠️ la tabla no salió en la forma que el lector entiende:\n' + txt);
+  ok(/78 % del tiempo\[3\] a enseñar/.test(txt),
+     '⚠️ EL SUPERÍNDICE «3» SALE COMO LLAMADA «[3]» — es justo lo que no viaja al copiar la pantalla',
+     '⚠️ el superíndice de la cita se perdió: ' + (txt.match(/.{0,40}78 %.{0,40}/) || [''])[0]);
+  ok(/a enseñar\[\^1\]\./.test(txt) && /^\[\^1\]: TALIS 2018, tabla I\.2\.1\.$/m.test(txt),
+     '⚠️ y la nota al pie sale como «[^1]» con su texto al final, renumerada desde 1',
+     '⚠️ la nota al pie se perdió o se quedó con el número interno de Word');
+  ok(/^- Primero la mecha$/m.test(txt), 'y un párrafo de lista sale con su viñeta', 'la lista no salió');
+  ok(/Ver el informe completo \(https:\/\/example\.org\/bch\)/.test(txt),
+     'la dirección de un enlace se escribe al lado, que es lo que le da su 🔗 a una fuente',
+     'el enlace no trajo su dirección');
+  ok(!/1 \(https:\/\/example\.org\/bch\)/.test(txt),
+     '⚠️ pero NO detrás de un enlace de un carácter: en un informe esas son las llamadas de las citas, y el párrafo se llenaría de direcciones',
+     '⚠️ le puso la dirección a una llamada de cita');
+
+  log('── 3. Y lo leído lo entiende el lector de siempre ──');
+  const leido = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(txt)}))`));
+  ok(leido.titulo === 'El Impuesto sobre el Tiempo',
+     'el título del documento acaba en el campo Título', 'el título no llegó: ' + leido.titulo);
+  ok(leido.cuenta.tablas === 1 && leido.cuenta.fuentes >= 3,
+     'con su tabla y su bibliografía (las dos entradas más la nota al pie)',
+     'el lector no vio la tabla o las fuentes: ' + JSON.stringify(leido.cuenta));
+  const mapa = JSON.parse(w.eval(`(function(){ const m = vozMapaCitas({ cid:'__adj__', capitulos: ${JSON.stringify(leido.capitulos)} }); vozOlvidaFuentes();
+    return JSON.stringify({ enlazadas: m.donde.size, huerfanas: m.huerfanas.length }); })()`));
+  ok(mapa.enlazadas === 2 && mapa.huerfanas === 0,
+     '⚠️ y las DOS llamadas del cuerpo —el superíndice «[3]» y la nota «[^1]»— casan con sus fuentes',
+     'las llamadas del .docx no casaron: ' + JSON.stringify(mapa));
+
+  log('── 4. ⚠️ UN PDF DICE QUE NO, Y DICE QUÉ HACER ──');
+  const pdf = new w.File([new w.Blob(['%PDF-1.7\n1 0 obj\n'])], 'informe.pdf', { type: 'application/pdf' });
+  const rp = await w.VozAdjunto.leer(pdf);
+  ok(rp.error && /Word|\.docx/.test(rp.error) && !rp.texto,
+     '⚠️ un PDF no devuelve un revoltijo: devuelve la frase que dice cómo sacarlo en Word',
+     '⚠️ el PDF devolvió texto o un mensaje que no ayuda: ' + JSON.stringify(rp));
+  const falso = new w.File([new w.Blob(['%PDF-1.7 con otro nombre'])], 'cosa.bin');
+  ok((await w.VozAdjunto.leer(falso)).error,
+     'y un PDF con otro nombre también se caza, por su primera línea', 'un PDF renombrado se coló');
+  const doc = new w.File([new w.Blob(['x'])], 'viejo.doc');
+  ok(/\.docx/.test((await w.VozAdjunto.leer(doc)).error || ''),
+     'un Word antiguo (.doc) dice que se guarde como .docx', 'no explica lo del .doc');
+
+  log('── 5. Adjuntar de verdad, pulsando el botón ──');
+  w.eval('vozAbrirPegar(null)');
+  await esperar(250);
+  const btn = d.getElementById('voz-adjuntar-btn');
+  const inp = d.getElementById('voz-f-archivo');
+  ok(btn && inp && /Adjuntar/.test(btn.textContent) && !/no disponible/.test(btn.textContent),
+     'el botón 📎 está en la hoja de pegar', 'no hay botón de adjuntar');
+  ok((inp.accept || '').indexOf('.docx') >= 0,
+     'y el selector del aparato —el que ya ofrece Drive y OneDrive— acepta los formatos que se leen',
+     'el selector no tiene los formatos: ' + inp.accept);
+  const dt = new w.DataTransfer();
+  dt.items.add(archivo);
+  inp.files = dt.files;
+  inp.dispatchEvent(new w.Event('change', { bubbles: true }));
+  await esperar(700);
+  const ta = d.getElementById('voz-pegar-txt');
+  ok(/^# El Impuesto sobre el Tiempo/m.test(ta.value),
+     '⚠️ y lo leído se queda EN EL RECUADRO, a la vista, no se guarda solo',
+     '⚠️ el adjunto no llegó al recuadro (o se guardó por su cuenta)');
+  ok(d.getElementById('voz-f-titulo').value === 'El Impuesto sobre el Tiempo',
+     'y el título rellena su campo, como pidió el autor', 'el título no rellenó el campo');
+  const estado = d.getElementById('voz-adj-estado');
+  ok(estado && !estado.hidden && /informe\.docx/.test(estado.textContent) && /tabla/.test(estado.textContent),
+     'y se dice qué llegó (apartados, tablas, notas al pie)', 'no dice qué se leyó del archivo: ' + (estado ? estado.textContent : 'sin caja'));
+  const repaso = d.getElementById('voz-pegar-repaso').textContent;
+  ok(/tabla/.test(repaso) && /fuente/.test(repaso),
+     'y el repaso de siempre cuenta lo que entendió, antes de guardar', 'el repaso no se refrescó: ' + repaso.slice(0, 160));
+
+  /* ⚠️ Y NO PISA LO QUE YA HABÍA ESCRITO: se añade debajo. */
+  ta.value = 'Un párrafo escrito a mano que no se puede perder.';
+  const dt2 = new w.DataTransfer();
+  dt2.items.add(archivo);
+  inp.files = dt2.files;
+  inp.dispatchEvent(new w.Event('change', { bubbles: true }));
+  await esperar(700);
+  ok(/Un párrafo escrito a mano/.test(ta.value) && /# El Impuesto/.test(ta.value),
+     '⚠️ y adjuntar NO pisa lo que ya estaba escrito: se añade debajo',
+     '⚠️ adjuntar borró lo que la persona había escrito');
+
+  log('── 6. ⚠️ SIN EL LECTOR DE ARCHIVOS, LA HOJA SIGUE ENTERA ──');
+  /* La misma comprobación que el banco de cortes con El Rodaje: se
+     apaga a propósito y se mira que lo demás no dependa de él. */
+  w.eval('window.__vadj = window.VozAdjunto; delete window.VozAdjunto;');
+  w.eval('vozCerrarPegar(); vozAbrirPegar(null)');
+  await esperar(300);
+  ok(/no disponible/.test(d.getElementById('voz-adjuntar-btn').textContent),
+     'el botón lo dice en vez de quedarse muerto', 'el botón no avisa de que no hay lector');
+  d.getElementById('voz-adjuntar-btn').click();
+  await esperar(200);
+  ok(!d.getElementById('voz-adj-estado').hidden,
+     'y al tocarlo explica qué hacer (pegar a mano)', 'tocarlo no dice nada');
+  d.getElementById('voz-pegar-txt').value = 'Voz: X\nMáquina: Y\n\nSe sigue pudiendo pegar a mano.';
+  w.eval('vozRepasar()');
+  await esperar(250);
+  ok(/palabras/.test(d.getElementById('voz-pegar-repaso').textContent),
+     '⚠️ y pegar a mano sigue funcionando entero sin el lector de archivos',
+     '⚠️ sin el lector de archivos, la hoja de pegar se rompe');
+  w.eval('window.VozAdjunto = window.__vadj;');
+
+  log('');
+  log(fallos === 0 ? 'RESULTADO: APRUEBA' : `RESULTADO: SUSPENDE · ${fallos} fallo(s)`);
+  document.title = (fallos === 0 ? 'APRUEBA' : 'SUSPENDE') + ' · Adjuntar en La Voz Prestada';
+})().catch(e => {
+  log('✘ la sonda reventó: ' + (e && e.message) + '\n' + (e && e.stack));
+  log('RESULTADO: SUSPENDE');
+  document.title = 'SUSPENDE · Adjuntar en La Voz Prestada';
+});
+</script>
+</body>
+</html>

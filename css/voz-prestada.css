@@ -1168,6 +1168,18 @@
   border-top: 1px solid var(--border); font-family: system-ui, sans-serif;
 }
 
+/* El botón de adjuntar va resaltado porque es el camino MEJOR, no el
+   de repuesto: un archivo trae los títulos, las tablas y las llamadas
+   de las citas, y copiar una pantalla los pierde. */
+.voz-btn-adj { border-color: var(--story); color: var(--story); font-weight: 600; }
+.voz-adj-estado {
+  font-size: 12px; line-height: 1.45; color: var(--muted);
+  background: var(--story-bg, #fdf6ec); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 10px; margin-bottom: 10px;
+}
+.voz-adj-estado[hidden] { display: none; }
+.voz-adj-mal { color: #b45309; border-color: rgba(180,83,9,.4); }
+
 /* La caja donde se pega la lista de fuentes de un informe. Va más baja
    que la del texto —es una lista, no un ensayo— y con letra de sistema,
    porque lo que se pega ahí son títulos y direcciones. */
