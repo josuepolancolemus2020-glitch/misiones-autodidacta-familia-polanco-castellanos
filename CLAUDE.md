@@ -442,6 +442,15 @@ portada, el Acceso Rápido «Apuntar gasto» llega ahí de un toque.
       finanzas en su lugar es perder el mensaje que venía a leer. Lo vigila
       la comprobación 20 de la sonda.
 
+    ⚠️ **Y DESDE EL 12 DE SEPTIEMBRE DE 2026 NO ES EL ÚNICO QUE QUIERE ESE
+    HUECO.** La Voz Prestada tiene su propio interruptor de aparato (su
+    regla 34), así que **quién se queda la pantalla al entrar lo decide
+    `faroArranqueInicio` (js/app.js)**, en un solo sitio y en orden: con las
+    dos encendidas, abre la lectura —que es la que cambia de pantalla— y la
+    hoja de los gastos NO se planta encima; sigue puesta para cuando se
+    entre a Finanzas, que es lo que este interruptor promete. Si algún día
+    hay un tercero, se añade ahí y no en su propio arranque.
+
     Y lo que NO puede hacer, porque ninguna página web puede: salir encima de
     la pantalla de bloqueo ni encenderse sola. Eso es de una aplicación
     nativa con permisos del sistema. Lo más cerca que se llega es esto —estar
@@ -970,7 +979,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Treinta y tres reglas, y ninguna es de adorno:**
+**Treinta y cuatro reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -2105,6 +2114,64 @@ el diseño.
    pidió: los estantes ya viajaban por la columna `estantes` de la regla 32,
    y esto es solo la manera de mirarlos.
 
+34. 📖 **F.A.R.O PUEDE ABRIR AQUÍ, Y LA LLAVE ES DEL APARATO.**
+   Pedido por el autor el 12 de septiembre de 2026: «que la herramienta de
+   La Voz Prestada pueda activarle que al abrir F.A.R.O sea lo primero que
+   se presente, tal como está Finanzas, pero que solo se active en el
+   dispositivo que uno desee; es decir, que en otros dispositivos siga
+   Finanzas como primer acceso».
+
+   Es el interruptor del Apunte rápido (regla 11 de Finanzas) y **se
+   escribe igual a propósito**: misma clase de llave, mismo `role="switch"`
+   de fila entera —una bolita de 26 px se falla con el dedo y esto se toca
+   una vez en la vida—, las mismas palabras en las dos posiciones y el
+   mismo respeto por `?view=`. Dos interruptores que hacen lo mismo
+   escritos de dos maneras se arreglan en uno y se quedan rotos en el otro.
+
+   ⚠️ **LA LLAVE ES DEL APARATO, Y ESO ES LA MITAD DE LO QUE SE PIDIÓ.**
+   `faro.voz.abre_aqui` vive en `localStorage` y **no viaja a la nube**:
+   encenderla en la tableta del autor no puede cambiarle la pantalla de
+   entrada a quien en esta casa abre F.A.R.O para mirar el saldo. Es la
+   misma razón por la que son del aparato la posición de lectura, la letra
+   y el orden a mano (reglas 12 y 25). Y es **global al aparato**, no de
+   cada presupuesto ni de cada quien: una llave por contexto obligaría a
+   encenderla dos veces y la segunda no se encuentra nunca. La sonda mira
+   que encenderla **no escriba ni una fila**.
+
+   ⚠️ **VA AL PIE DEL ANAQUEL, debajo de los textos.** Lo que se usa a
+   diario va arriba; lo que se decide una vez en la vida, al final. Ponerlo
+   arriba sería devolverle a la cabecera el sitio que acaba de costar
+   recuperar (regla 33), y por un interruptor que casi nadie vuelve a
+   tocar.
+
+   ⚠️ **Y PASA SOLO AL ABRIR, NUNCA AL VOLVER A LA APLICACIÓN.** Ahí está
+   la diferencia con el Apunte rápido, y no es un olvido: aquel abre una
+   HOJA encima de la pantalla en que ya estabas —y solo si estabas en
+   Finanzas—, mientras que esto **cambia de pantalla**. Volver del teclado
+   o de otra aplicación y encontrarse que F.A.R.O se llevó por delante el
+   chat a medio escribir sería el peor momento posible, que es la lección
+   ya escrita en el `visibilitychange` de Finanzas.
+
+   ⚠️ **Y UNA SOLA COSA ABRE F.A.R.O: LO DECIDE `faroArranqueInicio`**
+   (js/app.js), en un solo sitio. Ahora hay DOS interruptores de aparato
+   que quieren el mismo hueco, y con cada uno mirando solo su llave un
+   aparato con las dos encendidas abriría el anaquel y le plantaría encima
+   la hoja de los gastos: la de abajo aparecería al cerrar la de arriba.
+   Preguntando en orden desde un solo sitio eso no puede pasar, y ninguna
+   de las dos herramientas tiene que saber que la otra existe. **La lectura
+   va primero** porque es la que cambia de pantalla; el Apunte rápido sigue
+   pegado a Finanzas, así que quien tenga las dos encendidas entra a leer y
+   se encuentra su hoja puesta en cuanto entre a Finanzas — que es lo que
+   cada interruptor prometió por separado. **Y el árbitro tiene nombre
+   propio** para que la sonda llame a ESE y no a una copia escrita al lado:
+   un doble que reparte el turno a su manera aprobaría con el reparto de
+   verdad roto (la lección de la costura del 10 de septiembre, regla 13).
+
+   Comprobación **35**: el interruptor se pulsa de verdad, se mide que está
+   al pie, que no escribe en la nube, que `?view=` manda, que con las dos
+   encendidas no se apilan, que volver a la aplicación no cambia de
+   pantalla, y que apagándolo F.A.R.O vuelve a abrir donde abría.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -2270,6 +2337,22 @@ instrumento. Dos sondas
 (`probe-tiempos-push-sesion` y `probe-verif-dosclientes-reales`) hablan
 con el Supabase real y por eso SUSPENDEN en las sesiones de Claude Code,
 donde el proxy bloquea `supabase.co`: en el aparato del autor aprueban.
+
+⚠️ **Y una tercera, `probe-sw-arranque`, suspende ahí por la máquina y no
+por una avería**, en su única comprobación de reloj («se pinta enseguida»,
+tope 400 ms). Comprobado el 12 de septiembre de 2026, porque el número
+asusta —12,5 segundos— y se parece demasiado a la espera que esa sonda
+vigila: **se midió el mismo commit que la arregló** (`73cea66`, «Arranque:
+la aplicación abre al instante») sirviéndolo aparte, y da **12,5 s
+también**. O sea que el Chromium sin cabeza de estas sesiones tarda eso en
+cargar y ejecutar los 32 archivos (`DOMContentLoaded` a los 12,6 s), sin
+service worker que sirva de la copia guardada, que es justo lo que hace
+instantáneo el arranque de verdad. La forma de comprobarlo es esa y no
+otra: **medir una versión que se sabe buena en la misma máquina**; si esa
+también tarda, es la máquina. Las otras 24 comprobaciones del archivo sí
+valen ahí y hay que leerlas. Y la sonda dice ahora **el número** en el
+fallo, no solo «tardó»: sin él no se distingue una espera que ha vuelto de
+una máquina lenta, y se empieza a buscar la avería donde no está.
 
 Y las cuentas que dependen del catálogo **se sacan del catálogo**, no se
 escriben a mano. Tres sondas de la Casa Cerrada esperaban una, dos y tres

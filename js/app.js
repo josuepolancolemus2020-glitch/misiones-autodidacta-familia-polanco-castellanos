@@ -950,6 +950,35 @@ function switchView(id) {
 }
 
 /* ─────────────────────────────────────────────
+   QUÉ ABRE F.A.R.O
+─────────────────────────────────────────────
+   ⚠️ UNA SOLA COSA ABRE LA APLICACIÓN, Y SE DECIDE AQUÍ. Desde el 12 de
+   septiembre de 2026 hay dos herramientas que se pueden dejar puestas al
+   arrancar —el Apunte rápido de Finanzas (su regla 11) y el anaquel de La
+   Voz Prestada (su regla 34)—, y las dos son interruptores de APARATO.
+
+   Con cada una mirando solo su llave, un aparato con las dos encendidas
+   abriría el anaquel y le plantaría encima la hoja de los gastos: la de
+   abajo aparecería al cerrar la de arriba, que es el peor momento posible
+   para que aparezca algo. Preguntando en orden desde un solo sitio eso no
+   puede pasar, y ninguna de las dos tiene que saber que la otra existe.
+
+   La lectura va primero porque es la que CAMBIA DE PANTALLA; el Apunte
+   rápido abre una hoja y sigue pegado a Finanzas, así que quien tenga las
+   dos encendidas entra a leer y se encuentra su hoja puesta en cuanto
+   entre a Finanzas — que es lo que cada interruptor prometió por separado.
+
+   ⚠️ Y TIENE NOMBRE PROPIO para que la sonda pueda llamar a ESTE, y no a
+   una copia suya escrita al lado: un doble que reparte el turno a su
+   manera aprobaría con el reparto de verdad roto. Es la lección de la
+   costura del 10 de septiembre. */
+function faroArranqueInicio() {
+  if (typeof faroArranqueVozPrestada === 'function' && faroArranqueVozPrestada()) return 'voz';
+  if (typeof faroArranqueApunteFijo === 'function') { faroArranqueApunteFijo(); return 'finanzas'; }
+  return '';
+}
+
+/* ─────────────────────────────────────────────
    TOAST
 ───────────────────────────────────────────── */
 

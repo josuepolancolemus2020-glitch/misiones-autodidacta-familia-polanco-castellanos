@@ -2361,6 +2361,123 @@ function filasHoja(d){
   w.eval('vozCerrarLector()');
   await esperar(200);
 
+  log('── 35. QUE F.A.R.O ABRA AQUÍ, Y SOLO EN ESTE APARATO ──');
+  /* Pedido por el autor el 12 de septiembre de 2026: «que al abrir F.A.R.O
+     sea lo primero que se presente, tal como está Finanzas, pero que solo
+     se active en el dispositivo que uno desee».
+
+     Lo que puede salir mal aquí no es que el interruptor no guarde: es que
+     secuestre una notificación del chat, que la preferencia viaje a la nube
+     y le cambie la pantalla de entrada a otro de la casa, o que con las dos
+     herramientas encendidas una abra encima de la otra. Las tres se miden. */
+  const base35 = nuevaBase(w, {});
+  w.eval(`_vozCuentos = []; vozGuardaLocal(); localStorage.removeItem('faro.voz.abre_aqui');
+          localStorage.removeItem('faro.fin.apunte.fijo'); vozRender()`);
+  await esperar(250);
+
+  const swAbre = d.getElementById('voz-abre-aqui');
+  ok(!!swAbre && swAbre.getAttribute('role') === 'switch' && swAbre.getAttribute('aria-checked') === 'false',
+     'el anaquel trae su interruptor, apagado de fábrica: es un interruptor, no el modo por defecto',
+     'no está el interruptor de abrir aquí');
+  const subApagado = d.getElementById('voz-abre-aqui-sub').textContent;
+  ok(swAbre.getBoundingClientRect().height >= 50 && swAbre.getBoundingClientRect().width > 200,
+     'y la fila ENTERA es el botón: una bolita de 26 px se falla con el dedo y esto se toca una vez en la vida',
+     'el interruptor no es una fila entera: ' + Math.round(swAbre.getBoundingClientRect().width) + '×' + Math.round(swAbre.getBoundingClientRect().height));
+  const yLista = d.getElementById('voz-lista').getBoundingClientRect().top;
+  ok(swAbre.getBoundingClientRect().top > yLista,
+     '⚠️ y va AL PIE, debajo de los textos: lo que se decide una vez no puede volver a ocupar la cabecera del anaquel (regla 33)',
+     '⚠️ el interruptor se puso por encima de los textos');
+  /* ⚠️ Y EL BOTÓN FLOTANTE DE DESTELLOS NO LO TAPA. Es la tercera vez en
+     el mismo día que ese botón se come algo: vive fijo en la esquina de
+     abajo a la derecha y esta fila es lo último del anaquel, o sea que
+     cae justo ahí — se veía en la foto tapando el final de la frase que
+     explica lo que hace el interruptor. Se mide con el anaquel al tope
+     del desplazamiento, que es el caso peor. */
+  const cajaSc = d.querySelector('#view-voz .view-scroll') || d.scrollingElement;
+  if (cajaSc) cajaSc.scrollTop = cajaSc.scrollHeight;
+  await esperar(250);
+  const rSw = d.getElementById('voz-abre-aqui').getBoundingClientRect();
+  const fabSw = d.querySelector('.destello-fab');
+  const rFab = fabSw ? fabSw.getBoundingClientRect() : null;
+  ok(!rFab || !(rSw.right > rFab.left && rSw.left < rFab.right && rSw.bottom > rFab.top && rSw.top < rFab.bottom),
+     '⚠️ y el botón flotante de Destellos no lo tapa ni con el anaquel hasta abajo: cae justo en esa esquina',
+     '⚠️ el botón flotante se come el interruptor y la frase que lo explica');
+
+  /* Se PULSA, como se pulsa. */
+  const antes35 = base35.escritas.length;
+  swAbre.click();
+  await esperar(250);
+  ok(w.localStorage.getItem('faro.voz.abre_aqui') === '1' && swAbre.getAttribute('aria-checked') === 'true',
+     'un toque lo enciende y queda guardado en el APARATO', 'el interruptor no guardó nada');
+  ok(d.getElementById('voz-abre-aqui-sub').textContent !== subApagado,
+     'y dice con palabras lo que va a pasar EN LAS DOS posiciones: con un solo rótulo hay que encenderlo para saber qué hace',
+     'el interruptor dice lo mismo encendido que apagado');
+  ok(base35.escritas.slice(antes35).length === 0 && base35.llamadas.filter(l => l.m !== 'GET').length === 0,
+     '⚠️ y NO viaja a la nube: encenderlo en este aparato no puede cambiarle la pantalla de entrada a otro de la casa',
+     '⚠️ la preferencia de arranque escribió en la nube: ' + JSON.stringify(base35.escritas.slice(antes35)));
+
+  /* El arranque de verdad: el MISMO árbitro que llama js/auth.js. */
+  w.eval('switchView("view-inicio")');
+  await esperar(150);
+  ok(w.eval('typeof faroArranqueInicio') === 'function',
+     'y el reparto del arranque tiene nombre propio, para poder llamar a ESTE y no a una copia suya',
+     'no existe faroArranqueInicio: la sonda estaría probando un doble');
+  const abrio = w.eval('faroArranqueInicio()');
+  await esperar(300);
+  ok(abrio === 'voz' && d.getElementById('view-voz').classList.contains('active'),
+     'al abrir la aplicación, F.A.R.O entra en La Voz Prestada', 'el arranque no abre el anaquel: ' + abrio);
+
+  /* ⚠️ Una notificación del chat manda SIEMPRE. */
+  w.eval('switchView("view-inicio")');
+  await esperar(150);
+  const busca35 = w.location.search;
+  w.history.replaceState(null, '', w.location.pathname + '?view=chat');
+  const abrio2 = w.eval('faroArranqueInicio()');
+  await esperar(250);
+  ok(abrio2 !== 'voz' && !d.getElementById('view-voz').classList.contains('active'),
+     '⚠️ pero con ?view= en la dirección NO se lleva la pantalla: quien toca la notificación de un mensaje quiere el mensaje',
+     '⚠️ el arranque secuestró una notificación del chat');
+  w.history.replaceState(null, '', w.location.pathname + busca35);
+
+  /* ⚠️ Con las DOS encendidas, una sola se queda la pantalla. */
+  w.eval(`localStorage.setItem('faro.fin.apunte.fijo', '1'); switchView("view-inicio")`);
+  await esperar(150);
+  const abrio3 = w.eval('faroArranqueInicio()');
+  await esperar(400);
+  const hojaFin = d.getElementById('fin-q-overlay');
+  ok(abrio3 === 'voz' && d.getElementById('view-voz').classList.contains('active'),
+     'con el Apunte rápido TAMBIÉN fijado, la lectura se queda la pantalla —es la que cambia de vista—',
+     'con las dos encendidas no abrió el anaquel: ' + abrio3);
+  ok(!hojaFin || hojaFin.style.display === 'none',
+     '⚠️ y la hoja de los gastos NO se planta encima: apilada, aparecería al cerrar la de arriba, que es el peor momento posible',
+     '⚠️ las dos se abrieron a la vez, una encima de la otra');
+  w.eval(`localStorage.removeItem('faro.fin.apunte.fijo')`);
+
+  /* ⚠️ Y volver a la aplicación NO cambia de pantalla. */
+  w.eval('switchView("view-chat")');
+  await esperar(150);
+  d.dispatchEvent(new w.Event('visibilitychange'));
+  await esperar(300);
+  ok(!d.getElementById('view-voz').classList.contains('active'),
+     '⚠️ y volver a la aplicación no se lleva por delante lo que estabas haciendo: esto pasa SOLO al abrir',
+     '⚠️ volver de otra aplicación cambió la pantalla al anaquel');
+
+  /* Y se apaga. */
+  w.eval('switchView("view-voz"); vozRender()');
+  await esperar(300);
+  d.getElementById('voz-abre-aqui').click();
+  await esperar(200);
+  ok(!w.localStorage.getItem('faro.voz.abre_aqui'),
+     'apagarlo borra la preferencia', 'la preferencia sigue guardada');
+  w.eval('switchView("view-inicio")');
+  await esperar(150);
+  const abrio4 = w.eval('faroArranqueInicio()');
+  await esperar(250);
+  ok(abrio4 !== 'voz' && !d.getElementById('view-voz').classList.contains('active'),
+     'y apagado, F.A.R.O vuelve a abrir donde abría', 'apagado sigue abriendo el anaquel');
+  w.eval('switchView("view-voz")');
+  await esperar(250);
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un
