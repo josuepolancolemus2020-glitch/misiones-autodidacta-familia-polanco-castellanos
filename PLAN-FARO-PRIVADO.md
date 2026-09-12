@@ -150,6 +150,18 @@ Zone → Make private.
      `_dev/prueba-rodaje-sql.sql`: las ocho comprobaciones pasan, incluida
      la de que `anon` no ve ni una fila con los permisos de tabla repartidos
      como los reparte Supabase.
+   · ⏳ **HAY QUE VOLVER A CORRERLO** — `supabase/sql/voz_prestada.sql`
+     creció el **12 de septiembre de 2026** con la columna `estantes`, que
+     son los nombres con los que cada quien ordena su anaquel («Maestría»,
+     «Filosofía», «Para citar»). Hasta que se vuelva a pegar, los estantes
+     funcionan igual pero **solo en el aparato donde se ponen**, y la barra
+     del anaquel lo dice. Se pega el archivo **entero** —es idempotente— y
+     después `voz_prestada_comprueba.sql`, y lo que hay que mirar es que
+     diga `columnas = 15`, `checks con nombre = 4` y `columna estantes = 1`.
+     Probado antes de mandarlo contra un PostgreSQL de verdad
+     (`_dev/prueba-voz-prestada-sql.sql`): las veinte comprobaciones pasan,
+     incluida la migración desde la tabla del estreno y la de que una lista
+     de veinte estantes rebota contra el `check`.
    · ✅ **CORRIDO** — `supabase/sql/voz_prestada.sql` y después
      `supabase/sql/voz_prestada_comprueba.sql`, el 10 de septiembre de 2026,
      **dos veces**: la del estreno por la mañana y la ampliada con la columna

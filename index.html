@@ -2352,6 +2352,9 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
       <!-- Dos filas de chips, género y voz, sacadas de los textos del
            anaquel. Cada una se esconde cuando no separa nada. -->
       <div class="voz-chips" id="voz-chips-gen" hidden></div>
+      <!-- Los estantes: los nombres con los que cada quien ordena su
+           anaquel. Salen de los textos, nunca de una lista escrita. -->
+      <div class="voz-chips" id="voz-chips-est" hidden></div>
       <div class="voz-chips" id="voz-chips" hidden></div>
       <div class="voz-lista" id="voz-lista"></div>
 
@@ -2490,6 +2493,13 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <input id="voz-f-maquina" type="text" autocomplete="off"
                placeholder="p. ej. Claude, ChatGPT, Gemini…">
         <div class="voz-chips voz-chips-form" id="voz-maquina-chips" role="group" aria-label="Máquinas"></div>
+      </div>
+      <!-- ⚠️ Los estantes son un eje APARTE del género: el género dice
+           qué ES el texto y sale en su portada; el estante dice dónde lo
+           pone su dueño. Ver la nota grande de voz-prestada.js. -->
+      <div class="voz-campo">
+        <span class="voz-campo-rot">🗂 Estantes <em>(opcional)</em></span>
+        <div id="voz-estantes-caja"></div>
       </div>
       <div class="voz-campo">
         <label for="voz-f-encargo">Lo que le pediste <em>(opcional)</em></label>

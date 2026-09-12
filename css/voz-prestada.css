@@ -1168,6 +1168,17 @@
   border-top: 1px solid var(--border); font-family: system-ui, sans-serif;
 }
 
+/* Los estantes: la fila de chips y el campo de crear uno nuevo. */
+.voz-est-nuevo { display: flex; gap: 6px; align-items: center; }
+.voz-est-in {
+  flex: 1 1 auto; min-width: 0; padding: 9px 12px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font: inherit; font-size: 13.5px; min-height: 38px;
+}
+.voz-est-in:focus { outline: none; border-color: var(--story); }
+.voz-est-vacio { font-size: 12px; color: var(--muted); line-height: 1.45; flex: 1 1 auto; }
+.voz-menu-est { margin: 10px 0 4px; display: flex; flex-direction: column; gap: 6px; }
+
 /* El aviso de un nombre de máquina mal escrito. Va en ámbar y no en
    rojo: no hay nada roto, hay algo que conviene unificar. */
 .voz-unificar { margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }

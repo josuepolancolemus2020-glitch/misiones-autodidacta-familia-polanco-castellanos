@@ -164,10 +164,16 @@ const VOZ_AJUSTES_POR_DEFECTO = {
 
 let _vozCuentos = [];      // el anaquel, ya fusionado (aparato + nube)
 let _vozHayTabla = true;   // ¿se corrió ya el SQL en esta base?
-let _vozNubeVieja = false; // la tabla está, pero sin la columna `genero`
+let _vozNubeVieja = false; // la tabla está, pero le falta alguna columna nueva
+/* ⚠️ Y CUÁLES le faltan, que ya no es una sola. Cada columna añadida
+   después del estreno puede no estar en una base que no volvió a correr
+   el SQL, y PostgREST rebota la consulta ENTERA por una sola que
+   falte. Se piden todas y se van quitando las que la base nombre. */
+let _vozFaltan = [];
 let _vozEstadoNube = 'mirando'; // mirando | puesta | vieja | sin-tabla | sin-senal | sin-sesion
 let _vozFiltroVoz = '';    // '' = todas las voces
 let _vozFiltroGen = '';    // '' = todos los géneros
+let _vozFiltroEst = '';    // '' = todos los estantes
 let _vozBusca = '';
 let _vozLeyendo = null;    // el texto abierto en la sala
 let _vozCapActual = 0;
@@ -176,6 +182,7 @@ let _vozPaginas = 1;
 let _vozAj = Object.assign({}, VOZ_AJUSTES_POR_DEFECTO);
 let _vozPegado = null;     // lo último que entendió el lector de texto
 let _vozEditando = null;   // cid del texto que se está corrigiendo
+let _vozEstantesForm = []; // los estantes puestos en la hoja de pegar
 
 /* ══════════════ COSAS PEQUEÑAS ══════════════ */
 
@@ -1561,24 +1568,40 @@ function vozFusiona(local, nube) {
 
 const VOZ_COLUMNAS = 'cid,titulo,voz,maquina,encargo,nota,capitulos,palabras,borrado,puesto_por,creado_at,actualizado';
 
+/* Las que llegaron DESPUÉS de la tabla, en orden de llegada. Añadir una
+   es esta línea más su `alter table … add column if not exists` en el
+   SQL: la maquinaria de «la base va vieja» ya no hay que tocarla. */
+const VOZ_COLS_NUEVAS = ['genero', 'estantes'];
+
+function vozFaltaColumna(error) {
+  return !!error && (error.code === '42703' || /column .* does not exist/i.test(error.message || ''));
+}
+
 async function vozBajar() {
   const sb = vozSb();
   if (!sb) { _vozEstadoNube = 'sin-sesion'; return null; }
   const pide = (cols) => vozConReloj(sb.from(VOZ_TABLE)
     .select(cols).order('actualizado', { ascending: false }).limit(400));
 
-  let { data, error } = await pide(VOZ_COLUMNAS + ',genero');
-
   /* ⚠️ LA BASE PUEDE IR UNA VERSIÓN ATRÁS: con la tabla creada el día
-     del estreno y sin volver a correr el SQL, la columna `genero` no
-     existe y PostgREST rebota la consulta entera (42703). Eso NO es
+     del estreno y sin volver a correr el SQL, la columna nueva no
+     existe y PostgREST rebota la consulta ENTERA (42703). Eso NO es
      «sin señal» ni «falta el SQL»: la tabla está y los textos también.
-     Se vuelve a pedir sin la columna, se trabaja con el género solo en
-     el aparato y la barra dice exactamente qué hay que volver a correr. */
-  if (error && (error.code === '42703' || /column .* does not exist/i.test(error.message || ''))) {
-    _vozNubeVieja = true;
-    ({ data, error } = await pide(VOZ_COLUMNAS));
+     Se vuelve a pedir sin esa columna —la que el propio error nombra—,
+     se trabaja con ella solo en el aparato, y la barra dice exactamente
+     qué hay que volver a correr. Con dos columnas nuevas hay que
+     quitarlas UNA A UNA: quitar las dos por una que falte dejaría el
+     género en el aparato en una base que sí lo tiene. */
+  let faltan = [], data = null, error = null;
+  for (let intento = 0; intento <= VOZ_COLS_NUEVAS.length; intento++) {
+    const extras = VOZ_COLS_NUEVAS.filter(c => faltan.indexOf(c) < 0);
+    ({ data, error } = await pide([VOZ_COLUMNAS].concat(extras).join(',')));
+    if (!vozFaltaColumna(error) || !extras.length) break;
+    const nombrada = extras.find(c => new RegExp('\\b' + c + '\\b').test(error.message || ''));
+    faltan.push(nombrada || extras[extras.length - 1]);
   }
+  _vozFaltan = faltan;
+  _vozNubeVieja = faltan.length > 0;
 
   if (error) {
     /* ⚠️ UN CORTE DE RED NO ES UNA TABLA QUE FALTA. El cliente de
@@ -1641,7 +1664,8 @@ async function vozSubir(c) {
     borrado: !!c.borrado, actualizado: c.actualizado || Date.now(),
     puesto_por: yo,
   };
-  if (!_vozNubeVieja) fila.genero = c.genero || 'cuento';
+  if (_vozFaltan.indexOf('genero') < 0) fila.genero = c.genero || 'cuento';
+  if (_vozFaltan.indexOf('estantes') < 0) fila.estantes = vozEstantesDe(c);
   const { error } = await vozConReloj(sb.from(VOZ_TABLE).upsert(fila, { onConflict: 'cid' }));
   if (error) {
     /* Se distinguen los motivos porque cada uno se arregla de manera
@@ -1804,6 +1828,146 @@ async function initVozPrestada() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   LOS ESTANTES DEL ANAQUEL
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026: «me gustaría tener
+   la opción de poder editar las categorías de los textos para ubicarlos
+   en los anaqueles según mis criterios y no que me los den
+   predeterminados».
+
+   ⚠️ Y SON UN EJE APARTE DEL GÉNERO, que es la decisión que lo explica
+   todo. El género dice QUÉ ES el texto —un ensayo, un poema— y por eso
+   sale en su portada («Ensayo escrito por Gemini»): es parte de la
+   etiqueta, la regla 1, y no se puede renombrar a gusto sin que esa
+   frase deje de decir lo que tiene que decir. El estante dice DÓNDE LO
+   PONE SU DUEÑO —«Maestría», «Filosofía», «Para citar»— y no significa
+   nada fuera de su anaquel.
+
+   Y hacía falta porque el género no sirve para esto: los veintiún
+   textos del autor son casi todos «Ensayo», así que agrupar por género
+   le daba un solo montón. Lo que de verdad los separa es la materia, y
+   eso no se puede adivinar desde aquí ni meter en una lista fija.
+
+   Un texto puede estar en VARIOS estantes, y eso no es un lujo: un
+   ensayo de la maestría sobre burocracia está a la vez en «Maestría» y
+   en «Burocracia», y obligar a elegir uno de los dos es obligar a
+   perder el otro. Al agrupar, ese texto sale en los dos montones, que
+   es lo que significa tener estantes y no cajones.
+
+   ⚠️ VIAJAN, y por eso están en la base y no en el aparato: un estante
+   es una propiedad del TEXTO, y el texto es de la casa. Es lo contrario
+   del orden a mano (regla 25), que es del aparato porque la seguridad
+   por fila no deja escribir las filas de los demás. Aquí cada quien
+   escribe los suyos, que es justo lo que la seguridad por fila permite.
+   Mientras no se corra el SQL, funcionan igual guardados en el aparato
+   y la barra lo dice: es la regla de la repisa de enlaces. */
+const VOZ_EST_MAX = 12;      // el mismo tope que el `check` de la base
+const VOZ_EST_LARGO = 40;
+
+/* Los estantes de un texto, limpios: sin repetidos —ni con otra
+   mayúscula o sin la tilde—, recortados y con el tope puesto. Se limpia
+   al LEER y no solo al escribir, porque en la base puede haber entrado
+   cualquier cosa desde otro aparato. */
+function vozEstantesDe(c) {
+  const l = Array.isArray(c && c.estantes) ? c.estantes : [];
+  const vistos = new Set(), out = [];
+  l.forEach(x => {
+    const t = String(x == null ? '' : x).replace(/\s+/g, ' ').trim().slice(0, VOZ_EST_LARGO);
+    const k = vozSinTildes(t).toLowerCase();
+    if (!t || vistos.has(k)) return;
+    vistos.add(k);
+    out.push(t);
+  });
+  return out.slice(0, VOZ_EST_MAX);
+}
+
+/* Todos los estantes del anaquel, por lo más usado. ⚠️ Salen de los
+   TEXTOS, nunca de una lista escrita aquí: es lo que pidió el autor con
+   todas las letras —«según mis criterios y no que me los den
+   predeterminados»— y es además la regla 15 de esta herramienta. */
+function vozEstantesTodos() {
+  const cuenta = new Map();
+  (_vozCuentos || []).forEach(c => {
+    if (!c || c.borrado) return;
+    vozEstantesDe(c).forEach(e => {
+      const k = vozSinTildes(e).toLowerCase();
+      if (!cuenta.has(k)) cuenta.set(k, { t: e, n: 0 });
+      cuenta.get(k).n++;
+    });
+  });
+  return [...cuenta.values()].sort((a, b) => b.n - a.n || a.t.localeCompare(b.t, 'es'));
+}
+
+function vozEnEstante(c, nombre) {
+  const k = vozSinTildes(nombre).toLowerCase();
+  return vozEstantesDe(c).some(e => vozSinTildes(e).toLowerCase() === k);
+}
+
+/* ⚠️ UNA SOLA FILA DE ESTANTES PARA LOS DOS SITIOS donde se ponen: la
+   hoja de pegar —donde se guardan al guardar el texto— y el menú ⋯
+   —donde se guardan al momento, que es lo que hace llevadero archivar
+   veinte textos que ya estaban—. Dos copias de esto se irían separando
+   solas, y la que menos se mira sería la que se quedara rota.
+   `dame()` devuelve lo puesto y `pon(lista)` lo recibe. */
+function vozPintarEstantes(caja, dame, pon) {
+  if (!caja) return;
+  const puestos = dame();
+  const repinta = () => vozPintarEstantes(caja, dame, pon);
+  caja.textContent = '';
+
+  const fila = vozNodo('div', 'voz-chips voz-chips-form');
+  const alterna = (nombre) => {
+    const l = dame();
+    const k = vozSinTildes(nombre).toLowerCase();
+    const i = l.findIndex(e => vozSinTildes(e).toLowerCase() === k);
+    if (i >= 0) l.splice(i, 1);
+    else {
+      if (l.length >= VOZ_EST_MAX) { vozAviso('🗂 El tope son ' + VOZ_EST_MAX + ' estantes por texto'); return; }
+      l.push(nombre);
+    }
+    pon(l);
+    repinta();
+  };
+  /* Primero los que tiene puestos, y detrás los demás del anaquel: así
+     lo que ya está se lee de un vistazo sin buscarlo entre veinte. */
+  const todos = vozEstantesTodos().map(x => x.t);
+  const orden = puestos.concat(todos.filter(t => !puestos.some(p => vozSinTildes(p).toLowerCase() === vozSinTildes(t).toLowerCase())));
+  orden.forEach(nombre => {
+    const on = puestos.some(p => vozSinTildes(p).toLowerCase() === vozSinTildes(nombre).toLowerCase());
+    const b = vozBoton('voz-chip voz-chip-chica' + (on ? ' voz-chip-on' : ''), '🗂 ' + nombre,
+      () => alterna(nombre), on ? 'Quitar de «' + nombre + '»' : 'Poner en «' + nombre + '»');
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    fila.appendChild(b);
+  });
+  if (!orden.length) {
+    fila.appendChild(vozNodo('span', 'voz-est-vacio',
+      'Todavía no hay estantes. Escribe uno abajo: «Maestría», «Filosofía», lo que te sirva para encontrarlos.'));
+  }
+  caja.appendChild(fila);
+
+  /* El campo de crear uno nuevo. Con su botón además de la tecla de
+     entrar: en una tableta, «pulsa Enter» es una instrucción que no se
+     ve por ninguna parte. */
+  const nuevo = vozNodo('div', 'voz-est-nuevo');
+  const inp = vozNodo('input', 'voz-est-in');
+  inp.type = 'text';
+  inp.maxLength = VOZ_EST_LARGO;
+  inp.placeholder = 'Un estante nuevo…';
+  inp.setAttribute('aria-label', 'Crear un estante nuevo');
+  const crea = () => {
+    const t = inp.value.replace(/\s+/g, ' ').trim().slice(0, VOZ_EST_LARGO);
+    if (!t) return;
+    inp.value = '';
+    if (!vozEstantesDe({ estantes: dame() }).some(e => vozSinTildes(e).toLowerCase() === vozSinTildes(t).toLowerCase())) alterna(t);
+    else repinta();
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); crea(); } });
+  nuevo.appendChild(inp);
+  nuevo.appendChild(vozBoton('voz-btn voz-btn-chico', '+ Añadir', crea));
+  caja.appendChild(nuevo);
+}
+
+/* ══════════════════════════════════════════════════════════════════
    EL ANAQUEL
    ══════════════════════════════════════════════════════════════════
    Tres vistas (cuadrícula, lista y detalle), seis órdenes —uno de ellos
@@ -1836,9 +2000,10 @@ const VOZ_ORDENES = [
   { id: 'avance',    t: 'A medias primero' },
 ];
 const VOZ_GRUPOS = [
-  { id: '',       t: 'Sin agrupar' },
-  { id: 'voz',    t: 'Por voz' },
-  { id: 'genero', t: 'Por género' },
+  { id: '',        t: 'Sin agrupar' },
+  { id: 'estante', t: 'Por estante' },
+  { id: 'voz',     t: 'Por voz' },
+  { id: 'genero',  t: 'Por género' },
 ];
 
 function vozLeeAnaquel() {
@@ -1893,9 +2058,10 @@ function vozVisibles() {
   return _vozCuentos.filter(c => {
     if (_vozFiltroVoz && (c.voz || '') !== _vozFiltroVoz) return false;
     if (_vozFiltroGen && vozGenero(c.genero).id !== _vozFiltroGen) return false;
+    if (_vozFiltroEst && !(_vozFiltroEst === '\u0000' ? !vozEstantesDe(c).length : vozEnEstante(c, _vozFiltroEst))) return false;
     if (!q) return true;
     const heno = vozSinTildes([c.titulo, c.voz, c.maquina, c.encargo, c.nota, vozGenero(c.genero).t]
-      .filter(Boolean).join(' ')).toLowerCase();
+      .concat(vozEstantesDe(c)).filter(Boolean).join(' ')).toLowerCase();
     return heno.includes(q);
   });
 }
@@ -2081,6 +2247,38 @@ function vozOrdena(lista) {
 function vozAgrupa(lista) {
   const g = _vozAnaquel.grupo;
   if (!g) return [{ clave: '', titulo: '', ic: '', items: lista }];
+
+  /* ⚠️ POR ESTANTE, UN TEXTO SALE EN CADA UNO DE LOS SUYOS, y eso es lo
+     que significa tener estantes y no cajones: un ensayo de la maestría
+     sobre burocracia está en «Maestría» y en «Burocracia», y enseñarlo
+     solo en el primero sería esconderlo del segundo — que es justo el
+     montón donde alguien lo iría a buscar. Los que no están en ninguno
+     van juntos y al final, para que no desaparezcan. */
+  if (g === 'estante') {
+    const m = new Map();
+    const sueltos = [];
+    /* ⚠️ Con un estante FILTRADO, solo sale ese montón. Sin esto, filtrar
+       por «Filosofía» enseñaba además el montón «Maestría» —porque el
+       mismo texto está en los dos— y la pantalla contestaba a una
+       pregunta que nadie hizo. */
+    const soloEste = _vozFiltroEst && _vozFiltroEst !== '\u0000' ? vozSinTildes(_vozFiltroEst).toLowerCase() : '';
+    lista.forEach(c => {
+      const suyos = vozEstantesDe(c);
+      if (!suyos.length) { sueltos.push(c); return; }
+      suyos.forEach(e => {
+        const k = vozSinTildes(e).toLowerCase();
+        if (soloEste && k !== soloEste) return;
+        if (!m.has(k)) m.set(k, { t: e, items: [] });
+        m.get(k).items.push(c);
+      });
+    });
+    const grupos = [...m.values()]
+      .sort((a, b) => b.items.length - a.items.length || a.t.localeCompare(b.t, 'es'))
+      .map(x => ({ clave: x.t, titulo: '🗂 ' + x.t, ic: '', items: x.items, h: vozColor(x.t) }));
+    if (sueltos.length) grupos.push({ clave: '', titulo: '🗂 Sin estante', ic: '', items: sueltos });
+    return grupos;
+  }
+
   const m = new Map();
   lista.forEach(c => {
     const clave = g === 'voz' ? ((c.voz || '').trim() || '—') : vozGenero(c.genero).id;
@@ -2121,7 +2319,7 @@ function vozRender() {
   const hero = document.getElementById('voz-sigue');
   if (hero) {
     hero.textContent = '';
-    const c = (_vozBusca.trim() || _vozFiltroVoz || _vozFiltroGen) ? null : vozEnCurso();
+    const c = (_vozBusca.trim() || _vozFiltroVoz || _vozFiltroGen || _vozFiltroEst) ? null : vozEnCurso();
     hero.hidden = !c;
     if (c) hero.appendChild(vozSigueLeyendo(c));
   }
@@ -2147,6 +2345,29 @@ function vozRender() {
     gens.forEach(([g, n]) => pon(g.id, g.ic + ' ' + g.t, n));
     gchips.hidden = gens.length < 2;
   }
+  /* Los estantes: la fila de filtro, con «Sin estante» para encontrar
+     lo que falta por archivar, que es lo primero que hace falta cuando
+     se estrenan. */
+  const echips = document.getElementById('voz-chips-est');
+  if (echips) {
+    echips.textContent = '';
+    const ests = vozEstantesTodos();
+    const pon = (id, txt, n) => {
+      const b = vozBoton('voz-chip' + (_vozFiltroEst === id ? ' voz-chip-on' : ''), null, () => {
+        _vozFiltroEst = id; vozRender();
+        b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+      });
+      b.appendChild(vozNodo('span', null, txt));
+      if (n != null) b.appendChild(vozNodo('span', 'voz-chip-n', String(n)));
+      echips.appendChild(b);
+    };
+    const sinEstante = _vozCuentos.filter(c => !vozEstantesDe(c).length).length;
+    pon('', 'Todos los estantes', _vozCuentos.length);
+    ests.forEach(e => pon(e.t, '🗂 ' + e.t, e.n));
+    if (sinEstante && ests.length) pon('\u0000', '🗂 Sin estante', sinEstante);
+    echips.hidden = !ests.length;
+  }
+
   const chips = document.getElementById('voz-chips');
   if (chips) {
     chips.textContent = '';
@@ -2456,6 +2677,16 @@ function vozMenuAbrir(c) {
     (av >= 100 ? ' · ✓ leído' : (av > 0 ? ' · vas por el ' + av + ' %' : ''))));
   if (c.encargo) cuerpo.appendChild(vozNodo('p', 'voz-menu-enc', '« ' + c.encargo + ' »'));
 
+  /* ⚠️ LOS ESTANTES SE PONEN AQUÍ MISMO, y se guardan al tocarlos. Sin
+     esto, archivar los veintiún textos que ya estaban serían veintiuna
+     vueltas por la hoja de corregir —que además devuelve el ensayo
+     entero a un recuadro— para tocar un chip. */
+  if (vozEsMio(c)) {
+    const caja = vozNodo('div', 'voz-menu-est');
+    cuerpo.appendChild(caja);
+    vozPintarEstantes(caja, () => vozEstantesDe(c), l => vozGuardaEstantes(c, l));
+  }
+
   const lista = vozNodo('div', 'voz-menu-lista');
   const leer = vozBotonLeer(c, 'voz-btn voz-btn-pri voz-btn-ancho');
   leer.addEventListener('click', vozCerrarMenu);
@@ -2471,6 +2702,23 @@ function vozMenuAbrir(c) {
   }
   cuerpo.appendChild(lista);
   ov.style.display = 'flex';
+}
+
+/* Guarda los estantes de un texto al momento y los sube por el camino
+   de siempre. Sin `await` en el toque: la fila se repinta ya y la nube
+   se entera cuando pueda, que es lo que deja archivar diez textos
+   seguidos sin esperar a nada. */
+function vozGuardaEstantes(c, lista) {
+  c.estantes = lista;
+  c.actualizado = Date.now();
+  vozGuardaLocal();
+  vozRender();
+  vozSubir(c).then(res => {
+    if (res.ok) return;
+    if (res.motivo === 'sin-senal') vozAviso('🗂 Guardado aquí. Subirá solo la próxima vez que abras esto');
+    else if (res.motivo === 'sin-nube') vozAviso('🗂 Guardado aquí. Falta correr voz_prestada.sql para que viaje');
+    else if (res.motivo === 'sin-sesion') vozAviso('🗂 Guardado aquí. Entra en F.A.R.O para que viaje');
+  });
 }
 
 function vozCerrarMenu() {
@@ -5552,6 +5800,9 @@ function vozAbrirPegar(cuento) {
   }
   vozPonGenero(cuento ? vozGenero(cuento.genero).id : 'cuento');
   vozPintarChipsFicha();
+  _vozEstantesForm = cuento ? vozEstantesDe(cuento) : [];
+  vozPintarEstantes(document.getElementById('voz-estantes-caja'),
+    () => _vozEstantesForm.slice(), l => { _vozEstantesForm = l; });
 
   const inpArch = g('voz-f-archivo');
   if (inpArch && window.VozAdjunto && window.VozAdjunto.acepta) inpArch.accept = window.VozAdjunto.acepta;
@@ -6042,6 +6293,7 @@ async function vozGuardarPegado() {
     encargo: g('voz-f-encargo').trim(),
     nota: g('voz-f-nota').trim(),
     capitulos: r.capitulos,
+    estantes: _vozEstantesForm.slice(),
     palabras: vozPalabras(r.capitulos),
     borrado: false,
     creado_at: viejo ? viejo.creado_at : new Date().toISOString(),

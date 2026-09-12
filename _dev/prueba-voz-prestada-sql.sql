@@ -113,16 +113,17 @@ begin
   if n <> 1 then raise exception '0b. disparadores duplicados o faltantes: % (esperaba 1)', n; end if;
 
   select count(*) into n from pg_constraint
-   where conname in ('voz_prestada_etiqueta', 'voz_prestada_cuerpo', 'voz_prestada_genero');
-  if n <> 3 then raise exception '0c. checks duplicados o faltantes: % (esperaba 3)', n; end if;
+   where conname in ('voz_prestada_etiqueta', 'voz_prestada_cuerpo',
+                     'voz_prestada_genero', 'voz_prestada_estantes');
+  if n <> 4 then raise exception '0c. checks duplicados o faltantes: % (esperaba 4)', n; end if;
 
-  -- Y la tabla del estreno recibió su columna nueva, con 14 en total.
+  -- Y la tabla del estreno recibió sus columnas nuevas, con 15 en total.
   select count(*) into n from information_schema.columns
    where table_schema = 'public' and table_name = 'voz_prestada';
-  if n <> 14 then raise exception '0d. la tabla tiene % columnas (esperaba 14: falta o sobra genero)', n; end if;
+  if n <> 15 then raise exception '0d. la tabla tiene % columnas (esperaba 15: falta o sobra genero/estantes)', n; end if;
 end $$;
 \echo '  ✔ 0. correrlo dos veces no duplica políticas, disparadores ni checks'
-\echo '  ✔ 0d. y a la tabla del estreno le añadió la columna genero sin tocar nada más'
+\echo '  ✔ 0d. y a la tabla del estreno le añadió genero y estantes sin tocar nada más'
 
 -- ════════════════════════════════════════════════════════════════════
 -- 1. EL CHECK DE LA ETIQUETA MUERDE
@@ -221,6 +222,38 @@ begin
   end;
 end $$;
 \echo '  ✔ 1g. una fila sin género entra como «cuento», y 1h. un género vacío no entra'
+
+-- ⚠️ LOS ESTANTES: una fila sin ellos entra con la lista vacía (un
+-- aparato con el código de antes), una lista de verdad entra, y lo que
+-- no es una lista o pasa del tope NO entra. Los NOMBRES no se
+-- comprueban aquí a propósito: un `check` no puede llevar una
+-- subconsulta dentro, que es lo que haría falta para recorrer la lista.
+do $$
+declare e jsonb;
+begin
+  select estantes into e from public.voz_prestada where cid = 'c-1';
+  if e is distinct from '[]'::jsonb then
+    raise exception '1i. una fila sin estantes no quedó con la lista vacía (quedó %)', e;
+  end if;
+  update public.voz_prestada set estantes = '["Maestría","Filosofía"]'::jsonb where cid = 'c-1';
+  begin
+    update public.voz_prestada set estantes = '"Maestría"'::jsonb where cid = 'c-1';
+    raise exception '1j. ENTRÓ un estante que no es una lista';
+  exception when check_violation then null;
+  end;
+  begin
+    update public.voz_prestada
+       set estantes = (select jsonb_agg('estante ' || g) from generate_series(1, 20) g)
+     where cid = 'c-1';
+    raise exception '1k. ENTRARON veinte estantes (el tope son doce)';
+  exception when check_violation then null;
+  end;
+  select estantes into e from public.voz_prestada where cid = 'c-1';
+  if jsonb_array_length(e) <> 2 then
+    raise exception '1l. los estantes buenos no se quedaron puestos (quedó %)', e;
+  end if;
+end $$;
+\echo '  ✔ 1i. sin estantes la lista queda vacía, 1j. lo que no es lista no entra y 1k. veinte estantes rebotan'
 
 -- ════════════════════════════════════════════════════════════════════
 -- 2. EL CUERPO ES UNA LISTA, Y NO CRECE SIN FRENO

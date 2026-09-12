@@ -99,6 +99,9 @@ create table if not exists public.voz_prestada (
   -- en un archivo y no una migración que alguien pega desde una tableta.
   -- Es la regla 8 de la repisa de enlaces.
   genero        text not null default 'cuento',
+  -- Los estantes del anaquel: los nombres que la persona pone para
+  -- ordenar sus textos a su manera. Ver la nota de más abajo.
+  estantes      jsonb not null default '[]'::jsonb,
 
   -- El encargo con el que salió. Se guarda porque es lo ÚNICO que hace
   -- repetible una pieza generada: es lo que separa «cuento hecho con
@@ -139,6 +142,16 @@ create table if not exists public.voz_prestada (
 -- vieja») y guarda el género solo en el aparato.
 alter table public.voz_prestada add column if not exists genero text not null default 'cuento';
 
+-- ⚠️ `estantes` ENTRÓ EL 12 DE SEPTIEMBRE DE 2026, y por lo mismo va
+-- aparte: el `create table if not exists` de arriba no añade columnas a
+-- una tabla que ya existe. Son los nombres con los que cada quien
+-- ordena su anaquel —«Maestría», «Filosofía», «Para citar»—, y son un
+-- eje APARTE del género: el género dice QUÉ ES el texto y sale en su
+-- portada; el estante dice DÓNDE LO PONE su dueño. Mientras no se
+-- vuelva a correr este archivo, la herramienta funciona igual con los
+-- estantes guardados solo en el aparato y lo dice en su barra.
+alter table public.voz_prestada add column if not exists estantes jsonb not null default '[]'::jsonb;
+
 -- ── Los `check` que se tiran y se vuelven a poner ───────────────────
 -- ⚠️ SE TIRAN Y SE VUELVEN A PONER, NO SE AÑADEN «SI NO EXISTEN».
 --   Con `if not exists`, re-correr el archivo después de cambiar un
@@ -154,6 +167,21 @@ alter table public.voz_prestada add constraint voz_prestada_etiqueta check (
 alter table public.voz_prestada drop constraint if exists voz_prestada_genero;
 alter table public.voz_prestada add constraint voz_prestada_genero check (
   length(btrim(genero)) between 1 and 30
+);
+
+-- Los estantes: una LISTA, con tope de cuántos y de cuánto pesan.
+-- ⚠️ No se comprueba aquí que cada nombre sea un texto corto, y no es
+-- un olvido: un `check` de PostgreSQL NO PUEDE llevar una subconsulta
+-- dentro, que es lo que haría falta para recorrer la lista. Lo que sí
+-- se puede es contar y pesar, que es lo que impide el daño de verdad
+-- —una lista sin freno que se lleve la cuota de la base—; que cada
+-- nombre sea un texto lo comprueba la pantalla, y lo que llegue de otra
+-- forma se pinta con textContent y no puede hacer nada.
+alter table public.voz_prestada drop constraint if exists voz_prestada_estantes;
+alter table public.voz_prestada add constraint voz_prestada_estantes check (
+  jsonb_typeof(estantes) = 'array'
+  and jsonb_array_length(estantes) <= 12
+  and pg_column_size(estantes) <= 2000
 );
 
 -- El cuerpo tiene que ser una LISTA, tener al menos un capítulo y no
@@ -312,6 +340,15 @@ with c(orden, que, esperado, hay) as (
                    case when exists (select 1 from information_schema.columns
                                       where table_schema = 'public' and table_name = 'voz_prestada'
                                         and column_name = 'genero')
+                        then 'existe' else 'NO ESTÁ' end
+  union all select 12, 'columna estantes (del 12/9/2026)', 'existe',
+                   case when exists (select 1 from information_schema.columns
+                                      where table_schema = 'public' and table_name = 'voz_prestada'
+                                        and column_name = 'estantes')
+                        then 'existe' else 'NO ESTÁ' end
+  union all select 13, 'check de los estantes (lista y tope)', 'existe',
+                   case when exists (select 1 from pg_constraint
+                                      where conname = 'voz_prestada_estantes')
                         then 'existe' else 'NO ESTÁ' end
   union all select 7, 'disparador (hora y dueño)', 'existe',
                    case when to_regproc('public.voz_prestada_guarda') is null

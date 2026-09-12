@@ -109,6 +109,10 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
 function nuevaBase(w, opciones){
   const o = opciones || {};
   const estado = { filas: o.filas || [], llamadas: [], escritas: [], marcas: o.marcas || [], marcasEscritas: [] };
+  /* Las columnas que esta base NO tiene. `sinGenero` se queda por lo
+     que ya estaba escrito; `faltan` sirve para cualquiera de las
+     nuevas, que ya son dos. */
+  const faltan = o.faltan || (o.sinGenero ? ['genero'] : []);
   const json = (cuerpo, status) => new Response(JSON.stringify(cuerpo),
     { status: status || 200, headers: { 'Content-Type': 'application/json' } });
   w.fetch = async (url, init) => {
@@ -147,8 +151,14 @@ function nuevaBase(w, opciones){
     if (m === 'GET') {
       /* La base del DÍA DEL ESTRENO no tiene la columna `genero`, y
          PostgREST rebota la consulta entera con el error de PostgreSQL. */
-      if (o.sinGenero && /genero/.test(u.search)) {
-        return json({ code: '42703', message: 'column voz_prestada.genero does not exist' }, 400);
+      /* ⚠️ Sin `\b` en el nombre: la lista de columnas viaja CODIFICADA
+         («%2Cgenero%2C»), así que la C del %2C pegada delante mata el
+         borde de palabra y la comparación no casaría nunca — la base de
+         mentira diría que la columna sí está y la sonda aprobaría una
+         base vieja que en Supabase rebota. */
+      const falta = faltan.find(col => u.search.indexOf(col) >= 0);
+      if (falta) {
+        return json({ code: '42703', message: 'column voz_prestada.' + falta + ' does not exist' }, 400);
       }
       return json(estado.filas);
     }
@@ -171,8 +181,9 @@ function nuevaBase(w, opciones){
       if (fila.puesto_por !== VOZ_UID) {
         return json({ code: '42501', message: 'new row violates row-level security policy' }, 403);
       }
-      if (o.sinGenero && ('genero' in fila)) {
-        return json({ code: 'PGRST204', message: "Could not find the 'genero' column of 'voz_prestada' in the schema cache" }, 400);
+      const sobra = faltan.find(col => col in fila);
+      if (sobra) {
+        return json({ code: 'PGRST204', message: "Could not find the '" + sobra + "' column of 'voz_prestada' in the schema cache" }, 400);
       }
       estado.filas = estado.filas.filter(x => x.cid !== fila.cid).concat([fila]);
       estado.escritas.push(fila);
@@ -2049,6 +2060,104 @@ function margenVisible(w){
   ok(!avisoAjeno.hidden && !avisoAjeno.querySelector('.voz-btn') && /otra persona/.test(avisoAjeno.textContent),
      '⚠️ de un texto ajeno se avisa pero NO se ofrece el botón: lo rechazaría la seguridad por fila',
      '⚠️ ofrece corregir un texto de otra persona: ' + avisoAjeno.textContent);
+
+  log('── 33. 🗂 LOS ESTANTES: el anaquel ordenado a su manera ──');
+  /* Pedido por el autor el 12 de septiembre de 2026: «poder editar las
+     categorías de los textos para ubicarlos en los anaqueles según mis
+     criterios y no que me los den predeterminados». Son un eje APARTE
+     del género —el género dice qué ES el texto y sale en su portada; el
+     estante dice dónde lo pone su dueño—, y hacían falta porque sus
+     veintiún textos son casi todos «Ensayo»: agrupar por género le daba
+     un solo montón. */
+  const base33 = nuevaBase(w, {});
+  const conEst = (cid, tit, est) => ({ cid: cid, titulo: tit, genero: 'ensayo', voz: 'Investigación profunda',
+    maquina: 'Gemini', capitulos: [{ t: '', p: [{ k: 'p', t: 'Algo.' }] }], palabras: 1, borrado: false,
+    actualizado: 1, estantes: est, puesto_por: VOZ_UID });
+  w.eval(`_vozCuentos = ${JSON.stringify([
+    conEst('e1', 'El Leviatán', ['Maestría', 'Burocracia']),
+    conEst('e2', 'La Disputa', ['Maestría', 'Filosofía']),
+    conEst('e3', 'Sin archivar', []),
+  ])}; vozGuardaLocal(); _vozAnaquel.grupo = 'estante'; _vozAnaquel.vista = 'detalle'; vozGuardaAnaquel(); _vozFiltroEst = ''; vozRender()`);
+  await esperar(400);
+
+  const titulosGrupo = [...d.querySelectorAll('#voz-lista .voz-grupo-txt')].map(x => x.textContent);
+  ok(titulosGrupo.indexOf('🗂 Maestría') === 0 && titulosGrupo.indexOf('🗂 Sin estante') === titulosGrupo.length - 1,
+     'agrupa por estante, el más usado primero y «Sin estante» al final, para que lo que falta por archivar no desaparezca',
+     'los montones no salen como se espera: ' + JSON.stringify(titulosGrupo));
+  ok(titulosGrupo.indexOf('🗂 Burocracia') > 0 && titulosGrupo.indexOf('🗂 Filosofía') > 0,
+     '⚠️ y un texto sale en CADA uno de sus estantes: enseñarlo solo en el primero lo escondería del montón donde se le va a buscar',
+     'un texto con dos estantes no sale en los dos: ' + JSON.stringify(titulosGrupo));
+
+  const chipsEst = [...d.querySelectorAll('#voz-chips-est .voz-chip')].map(x => x.textContent);
+  ok(chipsEst.some(t => /Maestría2$|Maestría 2$|Maestría/.test(t)) && chipsEst.some(t => /Sin estante/.test(t)),
+     'y la fila de filtro trae los estantes con su cuenta, y «Sin estante» para encontrar lo que falta por archivar',
+     'los chips de estante no están bien: ' + JSON.stringify(chipsEst));
+  [...d.querySelectorAll('#voz-chips-est .voz-chip')].find(x => /Filosofía/.test(x.textContent)).click();
+  await esperar(300);
+  const fichasFil = [...d.querySelectorAll('#voz-lista .voz-ficha')];
+  ok(fichasFil.length === 1 && /La Disputa/.test(fichasFil[0].textContent),
+     'tocar un estante deja solo sus textos', 'el filtro por estante no filtra: ' + fichasFil.length + ' fichas');
+  ok([...d.querySelectorAll('#voz-lista .voz-grupo-txt')].join === undefined ||
+     [...d.querySelectorAll('#voz-lista .voz-grupo-txt')].map(x => x.textContent).join() === '🗂 Filosofía',
+     '⚠️ y sale SOLO ese montón: con el mismo texto en dos estantes, enseñar también el otro contesta a una pregunta que nadie hizo',
+     'filtrando por un estante salen otros montones: ' + JSON.stringify([...d.querySelectorAll('#voz-lista .voz-grupo-txt')].map(x => x.textContent)));
+  [...d.querySelectorAll('#voz-chips-est .voz-chip')][0].click();
+  await esperar(300);
+
+  /* Ponerlos desde el menú ⋯, que es lo que hace llevadero archivar
+     veinte textos que ya estaban: pulsando de verdad. */
+  const antes33 = base33.escritas.length;
+  w.eval(`vozMenuAbrir(_vozCuentos.find(c => c.cid === 'e3'))`);
+  await esperar(350);
+  const cajaEst = d.querySelector('.voz-menu-est');
+  ok(cajaEst && [...cajaEst.querySelectorAll('.voz-chip')].some(x => /Maestría/.test(x.textContent)),
+     'el menú ⋯ trae los estantes del anaquel para ponerlos de un toque',
+     'el menú no trae los estantes');
+  [...cajaEst.querySelectorAll('.voz-chip')].find(x => /Maestría/.test(x.textContent)).click();
+  await esperar(300);
+  cajaEst.querySelector('.voz-est-in').value = 'Para citar';
+  [...cajaEst.querySelectorAll('.voz-btn')].find(x => /Añadir/.test(x.textContent)).click();
+  await esperar(500);
+  const e3 = JSON.parse(w.eval(`JSON.stringify(_vozCuentos.find(c => c.cid === 'e3').estantes)`));
+  ok(e3.length === 2 && e3.indexOf('Maestría') >= 0 && e3.indexOf('Para citar') >= 0,
+     'un toque lo pone en un estante, y el campo crea uno nuevo que no existía',
+     'los estantes no quedaron: ' + JSON.stringify(e3));
+  const subido33 = base33.escritas.slice(antes33).filter(x => x.cid === 'e3').pop();
+  ok(subido33 && Array.isArray(subido33.estantes) && subido33.estantes.indexOf('Para citar') >= 0 && subido33.genero === 'ensayo',
+     '⚠️ y VIAJAN: suben a la nube con el texto, porque un estante es del texto y el texto es de la casa',
+     '⚠️ los estantes no llegaron a la nube: ' + JSON.stringify(subido33));
+  w.eval('vozCerrarMenu()');
+
+  /* Y el mismo texto, dos veces en el mismo estante, no se duplica. */
+  w.eval(`(function(){ const c = _vozCuentos.find(x => x.cid === 'e3');
+    c.estantes = ['Maestría', 'maestria', ' MAESTRÍA ', 'Otro']; })()`);
+  const limpio33 = JSON.parse(w.eval(`JSON.stringify(vozEstantesDe(_vozCuentos.find(c => c.cid === 'e3')))`));
+  ok(limpio33.length === 2,
+     'y «Maestría», «maestria» y « MAESTRÍA » son el mismo estante: si no, el anaquel saldría con tres montones iguales',
+     'no unifica los estantes que solo cambian de mayúscula o de tilde: ' + JSON.stringify(limpio33));
+
+  /* ⚠️ Y CON UNA BASE SIN LA COLUMNA NUEVA, se quita ESA y no la otra. */
+  const baseSinEst = nuevaBase(w, { faltan: ['estantes'], filas: [Object.assign(conEst('e9', 'De la nube', []), { genero: 'poema' })] });
+  w.eval(`_vozFaltan = []; _vozNubeVieja = false; _vozCuentos = []; vozGuardaLocal();
+          window.__r33 = null; vozBajar().then(r => { window.__r33 = r || []; })`);
+  await esperar(900);
+  const bajado = JSON.parse(w.eval('JSON.stringify(window.__r33 || [])'));
+  ok(bajado.length === 1 && bajado[0].genero === 'poema',
+     '⚠️ con una base sin `estantes` los textos SÍ llegan, y con su género: se quita la columna que falta, no todas las nuevas',
+     '⚠️ una columna que falta se llevó por delante a la otra: ' + JSON.stringify(bajado));
+  ok(JSON.parse(w.eval('JSON.stringify(_vozFaltan)')).join() === 'estantes',
+     'y la herramienta sabe exactamente cuál le falta a esta base',
+     'no identificó la columna que falta: ' + w.eval('JSON.stringify(_vozFaltan)'));
+  const antes33b = baseSinEst.escritas.length;
+  await esperar(50);
+  w.eval(`vozSubir(${JSON.stringify(conEst('e8', 'Nuevo', ['Maestría']))})`);
+  await esperar(600);
+  const sub33b = baseSinEst.escritas.slice(antes33b).pop();
+  ok(sub33b && !('estantes' in sub33b) && sub33b.genero === 'ensayo',
+     'y lo que se guarde sube SIN la columna que la base no tiene, así que entra igual',
+     'la subida no se adapta a la base vieja: ' + JSON.stringify(sub33b));
+  w.eval(`_vozFaltan = []; _vozNubeVieja = false; _vozAnaquel.grupo = ''; vozGuardaAnaquel()`);
+  nuevaBase(w, {});
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

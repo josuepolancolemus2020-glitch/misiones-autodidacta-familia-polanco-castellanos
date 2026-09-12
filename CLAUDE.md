@@ -970,7 +970,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Treinta y una reglas, y ninguna es de adorno:**
+**Treinta y dos reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -1977,12 +1977,70 @@ el diseño.
    no se puede hacer—, y a dos letras no se ofrece nada, que ahí ya caben
    cosas distintas de verdad.
 
+32. 🗂 **LOS ESTANTES SON DEL DUEÑO, Y SON UN EJE APARTE DEL GÉNERO.**
+   Pedido por el autor el 12 de septiembre de 2026: «poder editar las
+   categorías de los textos para ubicarlos en los anaqueles según mis
+   criterios y no que me los den predeterminados».
+
+   ⚠️ **Y son un eje aparte a propósito.** El género dice QUÉ ES el texto
+   —un ensayo, un poema— y por eso sale en su portada («Ensayo escrito por
+   Gemini»): es parte de la etiqueta, la regla 1, y renombrarlo a gusto
+   haría que esa frase dejara de decir lo que tiene que decir. El estante
+   dice DÓNDE LO PONE SU DUEÑO y no significa nada fuera de su anaquel.
+   Hacían falta porque el género no sirve para esto: los veintiún textos
+   del autor son casi todos «Ensayo», así que agrupar por género le daba un
+   solo montón. Lo que de verdad los separa es la materia, y eso no se
+   puede adivinar desde aquí ni meter en una lista fija.
+
+   ⚠️ **Un texto está en VARIOS estantes, y al agrupar sale en cada uno.**
+   Un ensayo de la maestría sobre burocracia está en «Maestría» y en
+   «Burocracia»; enseñarlo solo en el primero lo escondería del montón
+   donde alguien lo va a buscar. Los que no están en ninguno van juntos y
+   al final («Sin estante»), que es además el filtro que dice qué falta por
+   archivar. **Y filtrando por un estante sale solo ese montón**: con el
+   mismo texto en dos, enseñar también el otro contesta a una pregunta que
+   nadie hizo.
+
+   ⚠️ **VIAJAN, y por eso están en la base y no en el aparato**: un estante
+   es una propiedad del TEXTO, y el texto es de la casa. Es lo contrario
+   del orden a mano (regla 25), que es del aparato porque la seguridad por
+   fila no deja escribir las filas ajenas; aquí cada quien escribe los
+   suyos, que es justo lo que esa seguridad permite. **Pide correr el SQL**
+   (`estantes jsonb`), y hasta entonces funcionan igual guardados en el
+   aparato y la barra lo dice — la regla de la repisa de enlaces.
+
+   ⚠️ **Y CON DOS COLUMNAS NUEVAS, LA QUE FALTA SE QUITA UNA A UNA.**
+   PostgREST rebota la consulta ENTERA por una sola columna que no exista,
+   y la maquinaria de «la base va vieja» estaba escrita para una:
+   `VOZ_COLS_NUEVAS` las lista, y `vozBajar` va quitando **la que el propio
+   error nombra**. Quitarlas todas de golpe dejaría el género en el aparato
+   en una base que sí lo tiene, sin dar ningún error. Añadir una columna
+   nueva es ponerla en esa lista y en el SQL; la maquinaria ya no se toca.
+
+   Se ponen en **dos sitios con una sola función** (`vozPintarEstantes`):
+   la hoja de pegar —se guardan con el texto— y el menú **⋯** —se guardan
+   al tocarlos—, que es lo que hace llevadero archivar veinte textos que ya
+   estaban, porque la hoja de corregir devuelve el ensayo entero a un
+   recuadro. Y «Maestría», «maestria» y « MAESTRÍA » son **el mismo
+   estante**: si no, el anaquel saldría con tres montones iguales.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
 node _dev/servidor-estatico.js      (en otra terminal)
 _dev/probe-voz-prestada.html        (en el navegador)
 _dev/probe-voz-adjunto.html         (el lector de archivos)
+```
+
+Y el SQL, contra un PostgreSQL de verdad. ⚠️ En esta sesión Postgres no
+corre como root, así que va con su propio usuario:
+
+```
+mkdir -p /tmp/pg && chown postgres:postgres /tmp/pg
+su postgres -c "initdb -D /tmp/pg/data -U postgres --auth=trust"
+su postgres -c "pg_ctl -D /tmp/pg/data -o '-k /tmp/pg -p 55432 -c listen_addresses=' -l /tmp/pg/log start"
+createdb -h /tmp/pg -p 55432 -U postgres voztest
+psql -h /tmp/pg -p 55432 -U postgres -v ON_ERROR_STOP=1 -d voztest -f _dev/prueba-voz-prestada-sql.sql
 ```
 
 ⚠️ La sonda del adjunto **fabrica un `.docx` de verdad dentro del
