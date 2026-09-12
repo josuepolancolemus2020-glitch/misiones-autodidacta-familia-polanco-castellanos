@@ -66,6 +66,20 @@ pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
       toque tapaban la caja) y que HOJEAR deje dos #voz-texto en el
       documento. Y que el anaquel pierda la etiqueta en alguna vista.
 
+  10. QUE PONER UN BOTÓN A UNA CITA SE COMA TEXTO DEL ENSAYO. Si la
+      llamada se sustituyera por un numerito, el texto plano del párrafo
+      cambiaría —y con él se moverían TODOS los subrayados de ese
+      párrafo, que se guardan por desplazamiento de caracteres— sin dar
+      ningún error. Se compara el pintado con el guardado carácter por
+      carácter. Y que consultar una fuente mueva la lectura, que en un
+      lector paginado es perder la página.
+
+  11. QUE UNA TABLA DESAPAREZCA. Con `break-inside: avoid` y una caja
+      que se desliza —que es INDIVISIBLE para el navegador—, una tabla
+      más alta que la página se recorta: queda el rótulo solo con media
+      página en blanco debajo. No da error, el número de páginas sigue
+      saliendo bien, y solo se descubre leyendo.
+
    Como en las demás sondas: aquí no se lee el código, se ejecuta el
    index.html de verdad con una base de datos de mentira a nivel de
    fetch. El cliente de Supabase es el auténtico.
@@ -1428,6 +1442,374 @@ function margenVisible(w){
      'y la sala siempre abre con sus barras: el modo desnudo no se hereda de la lectura anterior', 'la sala abrió sin barras');
   w.eval('vozCerrarLector()');
   await esperar(200);
+
+  log('── 28. ⚠️ LAS CITAS SE CONSULTAN SIN SALIR DE LA PÁGINA ──');
+  /* Pedido por el autor el 12 de septiembre de 2026, pegando aquí sus
+     ensayos de investigación: «que las citas me las puedas crear para
+     que el usuario pueda seleccionarlas y consultarlas desde el formato
+     de la lectura». Lo que puede salir mal, y en este orden:
+
+     1. QUE LA LLAMADA SE COMA TEXTO DEL ENSAYO. Es el fallo caro: si el
+        botón sustituyera «(Harari, 2014, p. 45)» por un numerito, el
+        texto plano del párrafo cambiaría —y con él se moverían TODOS
+        los subrayados de ese párrafo, que se guardan por desplazamiento
+        de caracteres— sin dar ningún error y sin que la página se vea
+        rota. Se mide comparando el texto pintado con el guardado,
+        carácter por carácter.
+     2. QUE CONSULTAR MUEVA LA LECTURA. En un lector paginado, ir a la
+        bibliografía y volver es perder la página, que es justo lo que
+        se pidió evitar.
+     3. QUE UNA ZONA DE PASAR PÁGINA SE COMA LA LLAMADA. Las zonas
+        cubren los bordes y van ENCIMA del texto: sin apartarlas, una
+        llamada cerca del margen es intocable.
+     4. QUE UNA DIRECCIÓN DE LA BIBLIOGRAFÍA ESCRIBA HTML O EJECUTE
+        `javascript:`. Aquí entra texto pegado desde otra ventana y esta
+        aplicación tiene dentro la Bóveda. */
+  const ensayo =
+    '# La deuda que no se ve\n\n' +
+    'Voz: un ensayista de los setenta\nEscrito por: una máquina de prueba\nGénero: ensayo\n\n' +
+    '## El punto de partida\n\n' +
+    'La deuda creció sin freno (Harari, 2014, p. 45) y nadie firmó eso. Graeber (2011) lo dijo antes, ' +
+    'y el dato de 1982 no se discute[3]. El resto lo cuenta la tabla, que no miente nunca aunque la lean mal.\n\n' +
+    'Un paréntesis cualquiera (en 1955 volvió su padre) no es una cita, y una llamada sin fuente (Prebisch, 1949) sí lo parece.\n\n' +
+    'Tabla 1: Deuda externa, 1980-2000\n\n' +
+    '| Año | Deuda | % del PIB | Fuente |\n' +
+    '|-----|------:|:---------:|--------|\n' +
+    '| 1980 | 1.388 | 61 | BCH |\n' +
+    '| 1990 | 3.588 | 122 | BCH |\n' +
+    '| 2000 | 4.711 | 79 | <img src=x onerror="window.__colado9=1"> |\n\n' +
+    '## Referencias\n\n' +
+    '- Harari, Y. N. (2014). *Sapiens: de animales a dioses*. Debate. https://example.org/sapiens\n' +
+    '- Graeber, D. (2011). Debt: The First 5,000 Years. Melville House.\n' +
+    '- [3] Banco Central de Honduras (1982). Memoria anual. javascript:alert(1)\n' +
+    '- Sin citar, A. (1999). Un libro que nadie menciona.\n';
+  const r28 = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(ensayo)}))`));
+  ok(r28.cuenta.fuentes === 4 && r28.cuenta.tablas === 1,
+     'el lector saca las 4 fuentes de la bibliografía y la tabla',
+     'no leyó bien la bibliografía o la tabla: ' + JSON.stringify(r28.cuenta));
+  ok(r28.capitulos.length === 2 && r28.capitulos[1].ref === true &&
+     r28.capitulos[1].p.every(b => b.k === 'fuente'),
+     'y el capítulo «Referencias» queda marcado como bibliografía, con sus entradas como fuentes',
+     'la bibliografía no se reconoció: ' + JSON.stringify(r28.capitulos.map(c => c.t + '/' + !!c.ref)));
+  ok(r28.capitulos[1].p[2].n === 3 && r28.capitulos[1].p[2].t.indexOf('[3]') < 0,
+     'el número de la entrada se guarda aparte del texto, como la viñeta de una lista',
+     'el número no se separó: ' + JSON.stringify(r28.capitulos[1].p[2]));
+  ok(r28.capitulos[1].p[0].url === 'https://example.org/sapiens' && !r28.capitulos[1].p[2].url,
+     '⚠️ la dirección de una fuente se comprueba con URL(): entra la http y NO entra la javascript:',
+     '⚠️ una dirección mala pasó el filtro: ' + JSON.stringify(r28.capitulos[1].p.map(x => x.url)));
+
+  /* ⚠️ LA FORMA EN QUE DE VERDAD SE PEGA UNA BIBLIOGRAFÍA: un rótulo
+     pelado al final («REFERENCIAS») y las entradas a renglón seguido,
+     sin blancos en medio, porque en el original iban con sangría
+     francesa. Sin la excepción del capítulo de bibliografía, las
+     cuarenta entradas se juntarían en UNA sola fuente kilométrica —ni
+     se cita, ni se consulta, ni se ve que esté mal—. Y con los
+     capítulos en «##», ese rótulo pelado entra como SUBTÍTULO (regla
+     3), no como capítulo: hay que cazarlo también ahí. */
+  const r28b = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(
+    'Voz: X\nMáquina: Y\n\n## Uno\n\nLa deuda creció (Harari, 2014) y el resto lo dijo Graeber (2011).\n\n' +
+    'REFERENCIAS\n\nHarari, Y. N. (2014). Sapiens. Debate.\nGraeber, D. (2011). Debt. Melville House.\n' +
+    'Prebisch, R. (1949). El desarrollo económico. CEPAL.')}))`));
+  const capRef = r28b.capitulos[r28b.capitulos.length - 1];
+  ok(capRef.ref === true && capRef.p.length === 3 && capRef.p.every(b => b.k === 'fuente'),
+     '⚠️ una bibliografía a renglón seguido bajo un rótulo pelado da TRES fuentes, no un párrafo con las tres dentro',
+     'las entradas se juntaron en un solo bloque: ' + JSON.stringify(capRef.p.map(b => b.k + ':' + (b.t || '').slice(0, 20))));
+  ok(capRef.t === 'REFERENCIAS' && r28b.capitulos.length === 2,
+     'y la bibliografía queda en su propio capítulo, para que el índice de la sala lleve a ella',
+     'la bibliografía no quedó como capítulo: ' + r28b.capitulos.map(c => c.t).join(' | '));
+  const m28b = JSON.parse(w.eval(`(function(){ const m = vozMapaCitas({cid:'__x__', capitulos: ${JSON.stringify(r28b.capitulos)}}); vozOlvidaFuentes();
+    return JSON.stringify({ donde: [...m.donde.keys()], huer: m.huerfanas.length }); })()`));
+  ok(m28b.donde.length === 2 && m28b.huer === 0,
+     'y las dos llamadas del cuerpo casan con sus entradas, sin ninguna huérfana',
+     'las llamadas no casaron: ' + JSON.stringify(m28b));
+  /* Y la contraria, que es la que protege el texto: una «Nota del
+     autor» al PRINCIPIO es prosa, y no se parte renglón a renglón. */
+  const r28c = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(
+    'Voz: X\nMáquina: Y\n\n## Nota del autor\n\nEste ensayo se escribió de un tirón.\nNo hubo tiempo de comprobar cada dato.\n\n## Uno\n\nEmpieza aquí.')}))`));
+  ok(r28c.capitulos[0].p.length === 1 && r28c.capitulos[0].p[0].k === 'p' && !r28c.capitulos[0].ref,
+     'y una «Nota del autor» al principio sigue siendo prosa entera, sin partirse renglón a renglón',
+     '⚠️ partió en renglones una nota que era prosa: ' + JSON.stringify(r28c.capitulos[0].p));
+
+  const ens28 = { cid: 'c-cit', titulo: r28.titulo, genero: 'ensayo', voz: r28.voz, maquina: r28.maquina,
+                  capitulos: r28.capitulos, palabras: 0, borrado: false, actualizado: 2000,
+                  creado_at: '2026-09-12T10:00:00Z' };
+  w.eval(`_vozCuentos = [${JSON.stringify(ens28)}]; vozGuardaLocal();
+          _vozAj.modo = 'paginas'; _vozAj.paso = 'deslizar'; _vozAj.tam = 19; _vozAj.tema = 'papel'; _vozAj.margen = 24; vozGuardaAjustes();
+          vozRender(); vozAbrirLector('c-cit')`);
+  await esperar(650);
+  w.eval('vozIrA(0, 0, 0)');
+  await esperar(350);
+
+  const cits = [...d.querySelectorAll('#voz-texto .voz-cit')];
+  ok(cits.length === 3,
+     'las tres llamadas con fuente salen como botones: «(Harari, 2014, p. 45)», «(2011)» y «[3]»',
+     'salieron ' + cits.length + ' llamadas: ' + cits.map(b => b.textContent).join(' | '));
+  ok(cits.some(b => b.textContent === '(Harari, 2014, p. 45)') && cits.some(b => b.textContent === '[3]'),
+     'y cada botón lleva dentro el texto TAL CUAL se escribió, sin quitar ni una coma',
+     'el botón reescribió la cita: ' + cits.map(b => b.textContent).join(' | '));
+  ok(!cits.some(b => /1955/.test(b.textContent)) && !cits.some(b => /Prebisch/.test(b.textContent)),
+     'y lo que no tiene fuente NO se toca: ni «(en 1955 volvió su padre)» ni «(Prebisch, 1949)»',
+     '⚠️ marcó como cita algo que no apunta a ninguna fuente');
+  /* ⚠️ LA COMPROBACIÓN QUE SOSTIENE TODAS LAS DEMÁS: el texto pintado
+     tiene que ser EXACTAMENTE el guardado. Si no lo fuera, los
+     subrayados de ese párrafo se habrían movido al estrenar esto. */
+  const parr0 = d.querySelector('#voz-texto .voz-p[data-vp="0"]');
+  ok(parr0 && parr0.textContent === r28.capitulos[0].p[0].t,
+     '⚠️ y el texto pintado del párrafo es CARÁCTER POR CARÁCTER el guardado: los subrayados ya puestos no se mueven',
+     '⚠️ el pintado cambió el texto del párrafo, y eso desplaza los subrayados guardados');
+
+  /* ⚠️ Y LA LLAMADA SE PARTE COMO UNA PALABRA. Con un `button`,
+     «(Harari, 2014, p. 45)» al final de un renglón no se parte: abre un
+     hueco blanco de media línea en un texto justificado y en una
+     columna estrecha se sale por el borde. Eso es de pantalla, y de
+     pantalla no se sabe nada leyendo el código: se mide. */
+  ok(cits.every(b => b.tagName === 'SPAN') && cits.every(b => w.getComputedStyle(b).display === 'inline'),
+     'y son elementos EN LÍNEA (display calculado «inline»), así que una llamada larga se parte al final del renglón',
+     'las llamadas son cajas: una larga abre un hueco en el texto justificado o se sale de la columna');
+  const hojaCit = d.getElementById('voz-hoja');
+  const bordeCit = hojaCit.getBoundingClientRect().left + hojaCit.clientWidth;
+  ok(cits.every(b => { const r = b.getBoundingClientRect(); return r.width === 0 || r.right <= bordeCit + 1; }),
+     'y ninguna se sale del ancho de la hoja', 'una llamada se sale por el borde de la página');
+
+  const pagCit = Number(w.eval('_vozPagina')), anclaCit = Number(w.eval('_vozAncla'));
+  const bHarari = cits.find(b => /Harari/.test(b.textContent));
+  bHarari.click();
+  await esperar(250);
+  const citbar = d.getElementById('voz-citbar');
+  ok(citbar && !citbar.hidden && /Sapiens/.test(citbar.textContent),
+     'tocar la llamada abre la ficha de su fuente, encima de la página',
+     'no salió la ficha de la fuente al tocar la llamada');
+  ok(Number(w.eval('_vozPagina')) === pagCit && Number(w.eval('_vozAncla')) === anclaCit,
+     '⚠️ y CONSULTAR NO MUEVE LA LECTURA: misma página y mismo párrafo',
+     '⚠️ consultar una fuente movió la lectura (página ' + pagCit + '→' + w.eval('_vozPagina') + ')');
+  const enlaceCit = citbar.querySelector('.voz-citbar-ir');
+  ok(enlaceCit && enlaceCit.getAttribute('href') === 'https://example.org/sapiens',
+     'con su enlace puesto con setAttribute, no interpolado', 'el enlace de la ficha no está bien');
+  ok(d.querySelectorAll('#voz-texto img, #voz-citbar img').length === 0 && !w.__colado9,
+     'y el veneno de la tabla y de la bibliografía no crea ni un elemento',
+     '⚠️ un texto pegado escribió HTML dentro de la sala');
+
+  /* La forma numérica y las dos citas en un mismo paréntesis. */
+  d.getElementById('voz-citbar').hidden = true;
+  cits.find(b => b.textContent === '[3]').click();
+  await esperar(200);
+  ok(/Banco Central/.test(d.getElementById('voz-citbar').textContent) &&
+     !d.querySelector('#voz-citbar .voz-citbar-ir'),
+     'la llamada numérica «[3]» abre la entrada 3, y una fuente con dirección mala no enseña botón de abrir',
+     'la llamada numérica no casó con su entrada, o enseñó un enlace que no debía');
+
+  /* ⚠️ Y LA ZONA DE PASAR PÁGINA NO SE COME LA LLAMADA. */
+  w.eval('vozCitCerrar()');
+  /* ⚠️ El PRIMER fragmento, no la caja entera: desde que la llamada es
+     un elemento en línea puede partirse en dos renglones, y el centro
+     de la caja que los envuelve a los dos cae en el hueco de en medio
+     —sobre el párrafo, no sobre la llamada—. Medir ahí daría un fallo
+     de la sonda con la misma pinta que el fallo de verdad. */
+  const cajaCit = bHarari.getClientRects()[0] || bHarari.getBoundingClientRect();
+  const xCit = Math.round(cajaCit.left + cajaCit.width / 2), yCit = Math.round(cajaCit.top + cajaCit.height / 2);
+  const bajo = w.eval(`(function(){ const e = vozBajoLaZona(${xCit}, ${yCit}); return e && e.closest && e.closest('.voz-cit') ? 'cit' : (e ? e.className : 'nada'); })()`);
+  ok(bajo === 'cit',
+     'apartando las zonas se ve la llamada que hay debajo (elementFromPoint devolvía siempre la zona)',
+     'no se encuentra la llamada bajo el toque: ' + bajo);
+  const zIzq = d.getElementById('voz-z-izq');
+  zIzq.dispatchEvent(new w.MouseEvent('click', { clientX: xCit, clientY: yCit, bubbles: true }));
+  await esperar(250);
+  ok(!d.getElementById('voz-citbar').hidden && Number(w.eval('_vozPagina')) === pagCit,
+     '⚠️ y un toque que recoge la zona sobre una llamada abre la ficha en vez de pasar página',
+     '⚠️ la zona de pasar página se comió el toque de la llamada');
+  w.eval('vozCitCerrar()');
+
+  /* Con el teclado: lo que solo se puede hacer con el dedo, a veces no
+     se puede hacer. Misma regla que el asa de arrastre de la repisa. */
+  bHarari.focus();
+  bHarari.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  await esperar(200);
+  ok(!d.getElementById('voz-citbar').hidden && Number(w.eval('_vozPagina')) === pagCit,
+     'y con el foco puesto, Enter la abre sin pasar página', 'con el teclado la llamada no se abre');
+  w.eval('vozCitCerrar()');
+
+  /* El panel 📚 Fuentes: la bibliografía por la que se navega. */
+  w.eval(`vozAbrirPanel('voz-panel-ind'); vozPintarPanelInd('fuentes')`);
+  await esperar(250);
+  const panelFu = d.getElementById('voz-panel-ind');
+  ok([...panelFu.querySelectorAll('.voz-tab')].some(b => /Fuentes/.test(b.textContent)),
+     'la sala tiene pestaña 📚 Fuentes cuando el texto trae bibliografía',
+     'no hay pestaña de fuentes');
+  ok(panelFu.querySelectorAll('.voz-fu-item').length === 4,
+     'con las cuatro entradas', 'el panel no lista las cuatro fuentes');
+  ok(/Citada una vez/.test(panelFu.textContent) && panelFu.querySelectorAll('.voz-fu-ir').length >= 4,
+     'y cada una dice dónde se la cita, con un botón que lleva allí',
+     'el panel no dice dónde se cita cada fuente');
+  ok(/No se la cita/.test(panelFu.textContent),
+     '⚠️ y señala la fuente que está en la bibliografía y no se cita en ninguna parte',
+     'no señala la fuente que no se cita: en un ensayo eso es un error, no un adorno');
+  ok(panelFu.querySelectorAll('.voz-fu-huerfana').length === 1 && /Prebisch/.test(panelFu.textContent),
+     '⚠️ y la llamada del texto que no tiene fuente («(Prebisch, 1949)»), con su nombre',
+     'no señala la llamada sin fuente');
+  const irCita = [...panelFu.querySelectorAll('.voz-fu-ir')].find(b => /El punto de partida/.test(b.textContent));
+  irCita.click();
+  await esperar(350);
+  ok(Number(w.eval('_vozCapActual')) === 0 && d.getElementById('voz-panel-ind').hidden,
+     'y tocarlo lleva al párrafo donde se la cita y cierra el panel',
+     'el botón de ir a la cita no llevó a ninguna parte');
+
+  /* Un texto SIN bibliografía no cambia en nada: ni pestaña, ni botones. */
+  w.eval(`vozCerrarLector();
+          _vozCuentos = [${JSON.stringify(cuentoLargo('c-sinfu'))}]; vozGuardaLocal(); vozRender(); vozAbrirLector('c-sinfu')`);
+  await esperar(550);
+  w.eval(`vozAbrirPanel('voz-panel-ind'); vozPintarPanelInd('ind')`);
+  await esperar(200);
+  ok(!d.querySelector('#voz-texto .voz-cit') &&
+     ![...d.querySelectorAll('#voz-panel-ind .voz-tab')].some(b => /Fuentes/.test(b.textContent)),
+     'y un cuento sin bibliografía no tiene ni llamadas ni pestaña de fuentes: nada cambia para él',
+     'un texto sin fuentes salió con llamadas o con pestaña vacía');
+  w.eval('vozCerrarPaneles(); vozCerrarLector()');
+
+  log('── 29. LAS TABLAS: enteras, en fichas, y a pantalla completa ──');
+  /* «Que cuando hayan tablas se pueda ver lo mejor posible.» Una tabla
+     de un ensayo no cabe en la página de un teléfono, y eso no se
+     arregla encogiendo la letra hasta que no se lea. Lo que puede
+     salir mal: que la paginación la parta por la mitad; que se pinten
+     las dos vistas a la vez —y entonces el texto del bloque saldría
+     duplicado, que es sobre lo que se miden los subrayados y el
+     avance—; y que no cabiendo no se diga, que es la avería que se
+     lee como «esta herramienta no sirve para tablas». */
+  w.eval(`_vozCuentos = [${JSON.stringify(ens28)}]; vozGuardaLocal(); vozRender(); vozAbrirLector('c-cit')`);
+  await esperar(650);
+  w.eval('vozIrA(0, 0, 0)');
+  await esperar(400);
+  /* La tabla puede haber caído en otra página: se busca por el texto. */
+  const vpTabla = r28.capitulos[0].p.findIndex(b => b.k === 'tabla');
+  w.eval(`vozIrA(0, ${vpTabla}, 0)`);
+  await esperar(400);
+  const fig = d.querySelector('#voz-texto .voz-tabla');
+  ok(fig, 'la tabla se pinta como figura', 'no se pintó la tabla');
+  ok(fig && /Tabla 1/.test((fig.querySelector('.voz-tabla-tit') || {}).textContent || ''),
+     'con su rótulo («Tabla 1: …»), sacado del renglón de encima',
+     'el rótulo de la tabla no salió');
+  const tbl = fig.querySelector('table');
+  const enFichas0 = fig.dataset.vista === 'fichas';
+  ok(enFichas0 || (tbl && tbl.querySelectorAll('thead th').length === 4 && tbl.querySelectorAll('tbody tr').length === 3),
+     'como tabla de verdad: cuatro columnas de cabecera y tres filas' + (enFichas0 ? ' (aquí salió en fichas por lo estrecho de la caja)' : ''),
+     'la tabla no tiene la forma que traía');
+  ok(w.getComputedStyle(fig).breakInside === 'avoid',
+     '⚠️ y con break-inside CALCULADO en «avoid»: la paginación por columnas no la parte por la mitad',
+     '⚠️ la tabla se puede partir entre dos páginas: break-inside = ' + w.getComputedStyle(fig).breakInside);
+  /* ⚠️ Una sola vista en el documento: con las dos, el texto del bloque
+     contaría el doble y los subrayados de ese bloque caerían donde no
+     es. */
+  ok(!(fig.querySelector('table') && fig.querySelector('.voz-tabla-fichas')),
+     '⚠️ y solo hay UNA vista en el documento, nunca las dos con una escondida',
+     '⚠️ están pintadas las dos vistas: el texto del bloque sale duplicado');
+  ok(fig.textContent.indexOf('1.388') > -1 && fig.textContent.indexOf('1.388') === fig.textContent.lastIndexOf('1.388'),
+     'y un dato de la tabla aparece una sola vez', 'un dato de la tabla aparece dos veces');
+
+  const mandos = fig.querySelector('.voz-tabla-mandos');
+  ok(mandos && !mandos.hidden,
+     'en una caja estrecha la tabla no cabe, y SE DICE, con sus dos salidas',
+     'la tabla no cabe y no sale ningún mando: la avería que se lee como «no sirve para tablas»');
+  ok(fig.dataset.vista === 'fichas' && fig.querySelectorAll('.voz-tf').length === 3,
+     '⚠️ y con cuatro columnas en un teléfono empieza EN FICHAS, una por fila, que es lo único que se lee ahí',
+     'con la caja estrecha no pasó a fichas: vista=' + fig.dataset.vista);
+  ok([...fig.querySelectorAll('.voz-tf-l')].some(e => e.textContent === '% del PIB'),
+     'y cada dato lleva al lado el nombre de su columna: no se pierde ninguno',
+     'las fichas no traen el nombre de la columna');
+  const bTabla = [...fig.querySelectorAll('.voz-tabla-b')].find(b => /Como tabla/.test(b.textContent));
+  bTabla.click();
+  await esperar(400);
+  const fig2 = d.querySelector('#voz-texto .voz-tabla');
+  ok(fig2 && fig2.dataset.vista === 'tabla' && fig2.querySelector('table') && !fig2.querySelector('.voz-tabla-fichas'),
+     'y el botón «▦ Como tabla» la devuelve a tabla, pulsándolo de verdad',
+     'el botón de cambiar de vista no hizo nada');
+  ok(fig2.classList.contains('voz-tabla-ancha') && /No cabe/.test(mandos.textContent + fig2.textContent),
+     'que sigue sin caber y lo dice, con el degradado del borde diciendo que hay más',
+     'no avisa de que la tabla se sale');
+
+  [...fig2.querySelectorAll('.voz-tabla-b')].find(b => /entera/.test(b.textContent)).click();
+  await esperar(300);
+  const tablon = d.getElementById('voz-tablon');
+  ok(tablon, '«⤢ Verla entera» abre la tabla a pantalla completa', 'no se abrió la tabla entera');
+  ok(tablon && tablon.querySelectorAll('tbody tr').length === 3 &&
+     w.getComputedStyle(tablon.querySelector('thead th')).position === 'sticky',
+     'con las tres filas y la cabecera clavada al deslizar (position calculado: sticky)',
+     'la tabla entera no tiene la cabecera clavada');
+  ok(tablon && w.getComputedStyle(tablon.querySelector('tbody th')).position === 'sticky',
+     'y la primera columna también: es lo que deja comparar la primera fila con la última',
+     'la primera columna no se queda quieta');
+  tablon.querySelector('.voz-tablon-x').click();
+  await esperar(200);
+  ok(!d.getElementById('voz-tablon'), 'y la ✕ la cierra', 'la tabla entera no se cierra');
+
+  /* ⚠️ Y EL TOQUE EN UN MANDO DE LA TABLA NO APAGA LAS BARRAS DE LA
+     SALA. Estos botones se REHACEN dentro de su propia respuesta, así
+     que cuando el aviso llega arriba el botón ya está suelto y no
+     cuelga de la tabla: sin pararlo, cambiar de vista escondía además
+     los mandos de la sala. */
+  ok(!d.getElementById('voz-lector').classList.contains('voz-desnudo'),
+     'y tocar un mando de la tabla no esconde las barras de la sala',
+     '⚠️ cambiar la vista de la tabla apagó los mandos de la sala');
+
+  /* ⚠️ UNA TABLA MÁS ALTA QUE LA PÁGINA NO PUEDE DESAPARECER. Con
+     `break-inside: avoid` y una caja que se desliza —que es
+     INDIVISIBLE para el navegador— lo que salía era el rótulo solo con
+     media página en blanco debajo y las filas en ninguna parte: no da
+     error, el número de páginas sigue saliendo bien, y solo se
+     descubre leyendo. */
+  const tablaLarga = 'Voz: X\nMáquina: Y\n\n## Datos\n\nTabla 9: Muchas filas\n\n' +
+    '| País | Deuda | PIB |\n|---|---:|---:|\n' +
+    Array.from({ length: 22 }, (_, k) => '| País número ' + (k + 1) + ' | ' + (1000 + k) + ' | ' + (40 + k) + ' |').join('\n') +
+    '\n\nY eso es todo.';
+  const rL = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(tablaLarga)}))`));
+  w.eval(`vozCerrarLector();
+          _vozCuentos = [{ cid: 'c-larga', titulo: 'Muchas filas', genero: 'ensayo', voz: 'X', maquina: 'Y',
+                           capitulos: ${JSON.stringify(rL.capitulos)}, palabras: 200, borrado: false, actualizado: 3 }];
+          vozGuardaLocal(); vozRender(); vozAbrirLector('c-larga')`);
+  await esperar(650);
+  const vpL = rL.capitulos[0].p.findIndex(b => b.k === 'tabla');
+  w.eval(`vozIrA(0, ${vpL}, 0)`);
+  await esperar(500);
+  const figL = d.querySelector('#voz-texto .voz-tabla');
+  const medida = JSON.parse(w.eval(`(function(){
+    const f = document.querySelector('#voz-texto .voz-tabla');
+    const c = f.querySelector('.voz-tabla-cuerpo');
+    const h = document.getElementById('voz-hoja');
+    return JSON.stringify({ vista: f.dataset.vista, trozos: f.getClientRects().length,
+      cajaAlto: c.clientHeight, cajaDentro: c.scrollHeight, pagina: h.clientHeight - 32,
+      ultima: f.textContent.indexOf('País número 22') > -1 });
+  })()`));
+  ok(medida.ultima,
+     '⚠️ con veintidós filas, la última sigue estando en la página: no se recorta ni una',
+     '⚠️ la tabla larga perdió filas por el camino: ' + JSON.stringify(medida));
+  ok(medida.vista === 'fichas' ? medida.trozos > 1 : medida.cajaAlto <= medida.pagina && medida.cajaDentro > medida.cajaAlto,
+     medida.vista === 'fichas'
+       ? 'y en fichas se reparte entre las páginas en vez de recortarse'
+       : 'y como tabla se topa al alto de la página y se desliza dentro, en vez de recortarse',
+     '⚠️ la tabla larga ni se reparte ni se topa: ' + JSON.stringify(medida));
+  ok([...figL.querySelectorAll('.voz-tabla-b')].some(b => /entera/.test(b.textContent)),
+     'y ofrece verla entera, que es la salida que no depende de la página',
+     'una tabla que no cabe de alto no ofrece verla entera');
+  w.eval(`vozCerrarLector(); _vozCuentos = [${JSON.stringify(ens28)}]; vozGuardaLocal(); vozRender(); vozAbrirLector('c-cit')`);
+  await esperar(600);
+
+  /* El buscador tiene que encontrar una cifra que solo está dentro de
+     una tabla: en un ensayo de investigación es justo lo que se busca. */
+  const res29 = JSON.parse(w.eval(`JSON.stringify(vozBuscarEnTexto('3.588'))`));
+  ok(res29.length === 1 && res29[0].vp === vpTabla,
+     'el buscador encuentra una cifra que solo vive dentro de una tabla',
+     'el buscador no mira dentro de las tablas: ' + JSON.stringify(res29));
+
+  /* Ida y vuelta: corregir un ensayo no le puede deshacer las tablas ni
+     la bibliografía. Es la comprobación 16 aplicada a lo nuevo. */
+  const vuelta29 = w.eval(`vozTextoCuerpo(_vozLeyendo)`);
+  const r29 = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify('x')}.length ? vozTextoCuerpo(_vozLeyendo) : ''))`));
+  const forma = caps => caps.map(c => (c.t || '-') + (c.ref ? '·ref' : '') + '[' +
+    (c.p || []).map(b => b.k + (b.k === 'tabla' ? '(' + b.cab.length + 'x' + b.f.length + ')' : '') + (b.n != null ? '#' + b.n : '')).join(',') + ']').join(' || ');
+  ok(forma(r29.capitulos) === forma(r28.capitulos),
+     '⚠️ y el texto que vuelve al recuadro de corregir se lee IGUAL: mismas tablas y misma bibliografía',
+     '⚠️ corregir deshace las tablas o la bibliografía:\n     ida:    ' + forma(r28.capitulos) + '\n     vuelta: ' + forma(r29.capitulos));
+  ok(/\| Año \| Deuda/.test(vuelta29) && /:---:/.test(vuelta29),
+     'con la tabla escrita con sus tubos y su alineación', 'la tabla no vuelve con su forma');
+  w.eval('vozCerrarLector()');
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

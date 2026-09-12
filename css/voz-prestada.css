@@ -699,11 +699,22 @@
   -webkit-overflow-scrolling: touch;
 }
 .voz-panel[hidden] { display: none; }
-.voz-tabs { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 12px; margin-bottom: 12px; }
+/* ⚠️ Con la pestaña 📚 Fuentes son CINCO, y en un teléfono de 400 px
+   repartidas a partes iguales el rótulo de cada una se cortaba a la
+   mitad («Mar…», «Sub…», «Bus…»): una pestaña que no se puede leer es
+   una pestaña que no se toca. Se DESLIZAN, como los chips de materia
+   de Videos M.E.T.A.S y por lo mismo, y siguen repartiéndose el ancho
+   cuando caben enteras. */
+.voz-tabs {
+  display: flex; gap: 4px; background: var(--bg); padding: 4px;
+  border-radius: 12px; margin-bottom: 12px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.voz-tabs::-webkit-scrollbar { display: none; }
 .voz-tab {
-  flex: 1 1 0; min-width: 0; padding: 9px 4px; border: 0; border-radius: 9px; cursor: pointer;
+  flex: 1 0 auto; min-width: 0; padding: 9px 10px; border: 0; border-radius: 9px; cursor: pointer;
   background: transparent; color: var(--muted); font: inherit; font-size: 12.5px; font-weight: 600;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .voz-tab-on { background: var(--surface); color: var(--story); box-shadow: 0 1px 3px rgba(0,0,0,.14); }
 
@@ -952,6 +963,246 @@
   .voz-aj-rot { flex-basis: 100%; }
   .voz-l-top { gap: 6px; padding-left: 8px; padding-right: 8px; }
   .voz-l-ico { width: 38px; height: 38px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAS FUENTES CITADAS Y LAS TABLAS (12 de septiembre de 2026)
+   ═══════════════════════════════════════════════════════════════════
+   Todo esto vive DENTRO de `#voz-lector`, así que se tiñe solo con el
+   papel puesto (papel, sepia, noche) y no hay que nombrar ninguna
+   ventana suelta: es la ventaja que ya tiene la sala sobre El Rodaje.
+   Y los colores salen de los tokens de la sala —`--story`, `--surface`,
+   `--border`—, nunca de `--card`, que EN LA APLICACIÓN NO EXISTE y se
+   resolvería a transparente sin dar ningún error. */
+
+/* ─── La llamada a una fuente, dentro del texto ─────────────────── */
+/* ⚠️ Lleva dentro el texto TAL CUAL SE ESCRIBIÓ («[3]», «(Harari,
+   2014)»): no se sustituye por nada, se le da un botón. Ver la nota
+   grande de `voz-prestada.js`. Por eso hereda la letra de la lectura y
+   no se le pone tamaño propio: un «(Harari, 2014)» con otra letra en
+   mitad de una frase es una errata a la vista. */
+.voz-cit {
+  /* `display: inline` y nada de caja: una llamada larga tiene que
+     poder partirse al final de un renglón como cualquier palabra. Ver
+     la nota de `vozNodoLlamada`. */
+  display: inline; font: inherit; color: var(--story); cursor: pointer;
+  border-bottom: 1px dotted currentColor;
+}
+.voz-cit:active { opacity: .6; }
+.voz-cit:focus-visible { outline: 2px solid var(--story); outline-offset: 2px; border-radius: 3px; }
+/* La numérica sube como un exponente, que es como se leen las llamadas
+   numéricas en cualquier libro y en cualquier enciclopedia. */
+.voz-cit-n {
+  font-size: .72em; vertical-align: super; line-height: 0;
+  font-weight: 700; border-bottom: 0; padding: 0 .06em;
+  white-space: nowrap;
+}
+.voz-cit-n:hover { text-decoration: underline; }
+.voz-cit-ap { white-space: normal; }
+
+/* ─── La ficha de la fuente, encima de la lectura ───────────────── */
+.voz-citbar {
+  position: absolute; z-index: 24; max-width: min(460px, 94%);
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.28);
+  padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px;
+  font-family: system-ui, sans-serif;
+}
+.voz-citbar[hidden] { display: none; }
+/* Si no cabe ni encima ni debajo del trozo, al pie: es mejor que salir
+   tapando justo la frase que se estaba leyendo. */
+.voz-citbar-abajo { left: 50% !important; transform: translateX(-50%); bottom: 74px; top: auto !important; }
+.voz-citbar-cab { display: flex; align-items: center; gap: 8px; }
+.voz-citbar-rot {
+  font-size: 10.5px; font-weight: 800; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--story);
+}
+.voz-citbar-x {
+  margin-left: auto; min-width: 34px; height: 30px; border-radius: 9px;
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  font-size: 14px; cursor: pointer;
+}
+.voz-citbar-f { display: flex; gap: 9px; align-items: flex-start; }
+.voz-citbar-n {
+  flex: 0 0 auto; min-width: 22px; height: 22px; border-radius: 7px;
+  background: var(--story); color: #fff; font-size: 11.5px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; margin-top: 2px;
+}
+.voz-citbar-cuerpo { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+.voz-citbar-t {
+  margin: 0; font-size: 13.5px; line-height: 1.45;
+  font-family: var(--voz-fam, Georgia, serif); overflow-wrap: anywhere;
+}
+.voz-citbar-acc { display: flex; gap: 6px; flex-wrap: wrap; }
+.voz-citbar-b, .voz-citbar-ir {
+  font-size: 11.5px; padding: 6px 9px; border-radius: 9px;
+  border: 1px solid var(--border); background: none; color: var(--text);
+  cursor: pointer; text-decoration: none; min-height: 30px;
+  display: inline-flex; align-items: center;
+}
+.voz-citbar-ir { color: var(--story); border-color: var(--story); font-weight: 600; }
+
+/* ─── La bibliografía, dentro del texto ─────────────────────────── */
+/* Sangría francesa: la segunda línea entrada, como en cualquier norma
+   de cita. Es lo que deja ver de un vistazo dónde empieza cada entrada
+   en una lista de cuarenta. */
+.voz-fuente {
+  margin: 0 0 .7em; padding-left: 1.6em; text-indent: -1.6em;
+  text-align: left; font-size: .92em; line-height: 1.5;
+}
+.voz-fuente-n {
+  display: inline-block; min-width: 1.5em; color: var(--story); font-weight: 700;
+  text-indent: 0;
+}
+.voz-fuente-t { overflow-wrap: anywhere; }
+.voz-fuente-ir { color: var(--story); text-decoration: none; margin-left: .3em; }
+
+/* ─── Las tablas ────────────────────────────────────────────────── */
+/* `break-inside: avoid` para que la paginación por columnas no parta
+   una tabla por la mitad: media tabla al final de una página y media al
+   principio de la otra no se lee, y en un ensayo eso son los datos. */
+.voz-tabla {
+  margin: 1.1em 0; padding: 0; break-inside: avoid; page-break-inside: avoid;
+  text-indent: 0; text-align: left;
+}
+.voz-tabla-tit {
+  font-size: .78em; font-weight: 700; color: var(--story);
+  margin-bottom: .45em; line-height: 1.35; letter-spacing: .2px;
+  font-family: system-ui, sans-serif;
+}
+/* Cuando no cabe de alto en la página se la deja partirse: pedir que
+   no la partan la hace desaparecer. Ver la nota de
+   `vozAjustarUnaTabla`. Cada fila y cada ficha siguen enteras, que es
+   lo que se nota leyendo. */
+.voz-tabla-larga { break-inside: auto; page-break-inside: auto; }
+/* Una ficha y una fila NUNCA se parten por dentro: es lo que se nota
+   leyendo, y es cierto quepa o no quepa la tabla entera. */
+.voz-tf, .voz-tabla-t tr { break-inside: avoid; page-break-inside: avoid; }
+/* ⚠️ Y LA CAJA QUE SE DESLIZA SOLO EXISTE PARA LA TABLA. Un `overflow`
+   distinto de `visible` hace la caja INDIVISIBLE: no se puede repartir
+   entre dos páginas por mucho `break-inside: auto` que se le ponga. Las
+   fichas no necesitan deslizarse a lo ancho, así que aquí no llevan
+   caja y se parten solas. */
+.voz-tabla-cuerpo { overflow: visible; }
+.voz-tabla[data-vista="tabla"] .voz-tabla-cuerpo { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.voz-tabla-larga[data-vista="tabla"] .voz-tabla-cuerpo { overflow-y: auto; }
+.voz-tabla-t {
+  border-collapse: collapse; width: 100%; font-size: .8em;
+  font-family: system-ui, sans-serif; line-height: 1.35;
+}
+.voz-tabla-t th, .voz-tabla-t td {
+  border: 1px solid var(--border); padding: .38em .5em; text-align: left;
+  vertical-align: top;
+}
+.voz-tabla-t thead th {
+  background: var(--marca); font-weight: 700; font-size: .95em;
+}
+.voz-tabla-t tbody th { font-weight: 600; }
+.voz-td-der { text-align: right; font-variant-numeric: tabular-nums; }
+.voz-td-cen { text-align: center; }
+/* El degradado del borde dice que hay más a la derecha, como en los
+   chips de materia de Videos M.E.T.A.S: una tabla cortada sin ninguna
+   señal se lee como una tabla de tres columnas. */
+.voz-tabla-ancha .voz-tabla-cuerpo {
+  -webkit-mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+}
+.voz-tabla-mandos {
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  margin-top: .45em; font-family: system-ui, sans-serif;
+}
+.voz-tabla-mandos[hidden] { display: none; }
+.voz-tabla-b {
+  font-size: 11.5px; padding: 5px 9px; min-height: 30px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  cursor: pointer;
+}
+.voz-tabla-nota { font-size: 11px; color: var(--muted); }
+
+/* Una ficha por fila: la única forma de leer de corrido una tabla de
+   seis columnas en un teléfono sin perder ni un dato. */
+.voz-tabla-fichas { display: flex; flex-direction: column; gap: 8px; }
+.voz-tf {
+  border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px;
+  font-family: system-ui, sans-serif; font-size: .8em; line-height: 1.4;
+}
+.voz-tf-tit { font-weight: 700; margin-bottom: 4px; color: var(--story); }
+.voz-tf-par { display: flex; gap: 8px; align-items: baseline; }
+.voz-tf-l { flex: 0 0 42%; color: var(--muted); font-size: .92em; overflow-wrap: anywhere; }
+.voz-tf-v { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+
+/* La tabla entera, a pantalla completa: se desliza a lo ancho con la
+   cabecera y la primera columna clavadas, que es lo que hace falta para
+   comparar la primera fila con la última. Por encima de las zonas de
+   pasar página, o el deslizamiento se lo comerían ellas. */
+.voz-tablon {
+  position: absolute; inset: 0; z-index: 40; background: var(--bg);
+  display: flex; flex-direction: column;
+}
+.voz-tablon-cab {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-bottom: 1px solid var(--border); font-family: system-ui, sans-serif;
+}
+.voz-tablon-tit {
+  font-size: 12.5px; font-weight: 700; color: var(--story);
+  flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.voz-tablon-mm { display: flex; gap: 6px; flex: 0 0 auto; }
+.voz-tablon-b {
+  width: 38px; height: 38px; border-radius: 10px; font-size: 15px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
+}
+.voz-tablon-x { color: var(--story); font-weight: 700; }
+.voz-tablon-caja { flex: 1 1 auto; overflow: auto; -webkit-overflow-scrolling: touch; padding: 0 0 6px; }
+.voz-tablon-caja .voz-tabla-t { width: auto; min-width: 100%; font-size: 1em; }
+.voz-tablon-caja .voz-tabla-t thead th {
+  position: sticky; top: 0; z-index: 2; background: var(--marca);
+}
+.voz-tablon-caja .voz-tabla-t tbody th {
+  position: sticky; left: 0; z-index: 1; background: var(--surface);
+}
+.voz-tablon-caja .voz-tabla-t thead th:first-child { z-index: 3; }
+.voz-tablon-pie {
+  padding: 6px 10px; font-size: 11px; color: var(--muted);
+  border-top: 1px solid var(--border); font-family: system-ui, sans-serif;
+}
+
+/* ─── El panel 📚 Fuentes ───────────────────────────────────────── */
+.voz-fu-item { border-bottom: 1px solid var(--border); padding: 9px 0; }
+.voz-fu-cab { display: flex; gap: 8px; align-items: flex-start; }
+.voz-fu-n {
+  flex: 0 0 auto; min-width: 22px; height: 22px; border-radius: 7px;
+  background: var(--story); color: #fff; font-size: 11.5px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; margin-top: 2px;
+}
+.voz-fu-t {
+  flex: 1 1 auto; min-width: 0; font-size: 13.5px; line-height: 1.45;
+  font-family: var(--voz-fam, Georgia, serif); overflow-wrap: anywhere;
+}
+.voz-fu-pie { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+.voz-fu-rot { font-size: 11px; color: var(--muted); }
+.voz-fu-ir, .voz-fu-url, .voz-fu-huerfana {
+  font-size: 11.5px; padding: 5px 8px; min-height: 30px; border-radius: 9px;
+  border: 1px solid var(--border); background: none; color: var(--text);
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.voz-fu-url { color: var(--story); border-color: var(--story); }
+.voz-fu-ver { color: var(--muted); }
+/* Una fuente que no se cita en ninguna parte, y una llamada sin fuente,
+   son errores de un trabajo de investigación, no adornos: se ven. */
+.voz-fu-sola { font-size: 11.5px; color: #b45309; }
+.voz-fu-huerfana { display: flex; width: 100%; margin-bottom: 5px; color: #b45309; border-color: rgba(180,83,9,.4); }
+.voz-rep-fuentes {
+  margin-top: 8px; font-size: 12px; line-height: 1.45; color: var(--text);
+  background: var(--story-bg, #fdf6ec); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 10px;
+}
+
+@media (max-width: 380px) {
+  .voz-tf-l { flex-basis: 50%; }
+  .voz-citbar { max-width: 96%; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

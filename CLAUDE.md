@@ -970,7 +970,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Veintiséis reglas, y ninguna es de adorno:**
+**Veintiocho reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -1581,6 +1581,190 @@ el diseño.
    entrevistas y los careos se añadió `entrevista` a VOZ_GENEROS (regla 15:
    añadir un género es una línea en un archivo).
 
+27. ⚠️ **UNA CITA NO SE QUITA DEL TEXTO: SE LE PONE UN BOTÓN.**
+   Pedido por el autor el 12 de septiembre de 2026, al empezar a pegar aquí
+   sus ensayos de investigación: «que las citas me las puedas crear para que
+   el usuario pueda seleccionarlas y consultarlas desde el formato de la
+   lectura que se presenta».
+
+   Ni se mueve, ni se acorta, ni se cambia por un numerito: un «(Harari,
+   2014, p. 45)» se queda escrito tal cual y ADEMÁS se puede tocar. Es la
+   asimetría de la regla 3, y aquí muerde más fuerte —equivocarse hacia
+   «esto no era una cita» cuesta un botón que no sale, y la cita se sigue
+   leyendo donde está; equivocarse hacia «esto sí lo era» **borra palabras
+   de un ensayo y parece que funcionó**, porque la página sigue llena—.
+   Tiene además una consecuencia que no se ve y que es la que de verdad la
+   sostiene: el texto plano del párrafo sigue siendo **carácter por
+   carácter** el mismo de antes, así que **los subrayados ya puestos no se
+   mueven ni uno** (se guardan por desplazamiento de caracteres, regla 21).
+   Un marcador que cambiara «[3]» por «³» los desplazaría todos, sin error
+   y sin aviso. La sonda lo compara carácter por carácter.
+
+   ⚠️ **Y CONSULTAR UNA FUENTE NO MUEVE LA LECTURA.** La ficha sale
+   ENCIMA, pegada a la llamada, con la misma maquinaria que la barra de
+   subrayar (`vozColocarFlotante`, una sola función para las dos), y al
+   cerrarla uno sigue en la misma frase. Llevar al lector hasta la
+   bibliografía y devolverlo es, en un lector paginado, perder la página:
+   es exactamente lo que se pidió evitar con «consultarlas DESDE el formato
+   de la lectura».
+
+   ⚠️ **Y LA BIBLIOGRAFÍA ES UN CAPÍTULO DEL ENSAYO, NO UNA TABLA NUEVA.**
+   Un capítulo final llamado «Referencias», «Bibliografía», «Fuentes»,
+   «Obras citadas» o «Notas» pasa a `ref` y sus entradas a bloques
+   `k:'fuente'` dentro de `capitulos`, que ya es un objeto libre: **esto no
+   pide ni una columna nueva ni volver a correr el SQL desde una tableta**.
+   Es la regla 15 (los géneros viven en el aparato) y la 21 (no se inventa
+   una segunda tabla para el mismo gesto), otra vez. Se pide que esté AL
+   FINAL —los dos últimos capítulos— porque un ensayo puede ABRIR con una
+   «Nota» del autor, y eso es prosa. El número de la entrada se guarda
+   aparte del texto, igual que la viñeta de un ítem de lista, para que el
+   que exporta lo escriba una sola vez y no dos.
+
+   ⚠️ **Y dentro de un capítulo de bibliografía, CADA RENGLÓN ES UNA
+   ENTRADA.** Es la excepción a «renglones seguidos son un párrafo», y se
+   permite porque el rótulo del capítulo la corrobora sin ninguna duda: una
+   bibliografía se pega casi siempre así —una entrada por renglón y sin
+   blancos en medio, porque en el original iban con sangría francesa— y
+   juntarlas dejaría las cuarenta en UNA sola fuente kilométrica, que ni se
+   cita, ni se consulta, ni se ve que esté mal. La lista para esto es la
+   **estricta** (`vozEsTituloBibliografia`) y **no lleva «notas»** dentro:
+   una «Nota del autor» al principio de un ensayo es prosa de verdad y
+   partirla renglón a renglón sería el fallo de la regla 3.
+   Y con los capítulos en `##`, un «REFERENCIAS» pelado al final entra
+   como **subtítulo** (regla 3), no como capítulo: se caza también ahí, y
+   entonces **la bibliografía se queda en su propio capítulo** —para que el
+   índice de la sala lleve a ella, que es lo que más se consulta de un
+   ensayo, y para que la ida y vuelta del recuadro de corregir sea estable—.
+
+   Se casan las dos formas que se usan de verdad, y ninguna más: la
+   **numérica** —`[3]`, `[^3]`, `³`— contra el número de la entrada, y la
+   de **autor y año** —`(Harari, 2014, p. 45)`, `Harari (2014)`, y varias
+   en un mismo paréntesis separadas por `;`— por apellido en la cabeza de
+   la entrada más el año. ⚠️ **Y una bibliografía sin números NO se numera sola**: sería
+   fácil contar 1, 2, 3 por el orden de la lista y casar así los «[2]» del
+   cuerpo, y sería adivinar —en una bibliografía en APA el orden es
+   alfabético, así que ese «[2]» apuntaría a quien no es y la ficha
+   enseñaría a OTRO autor, sin que nadie tuviera por qué dudarlo: una
+   atribución falsa, que es exactamente contra lo que existe esta
+   herramienta—. Sin número escrito, la llamada se queda como texto y el
+   repaso la cuenta entre las que no tienen fuente, que es lo que dice qué
+   hay que arreglar en vez de taparlo. Y el apellido de FUERA del
+   paréntesis solo vale cuando dentro no hay ninguno (la forma narrativa):
+   sumándolo siempre, un «(Smith, 2014)» en una frase que empezaba por
+   «Harari» podría casar con la entrada de Harari.
+   Sin bibliografía que las respalde **no se toca ni
+   un carácter**: un ensayo lleno de paréntesis se lee igual que antes de
+   que esto existiera. Las notas al pie escritas `[^3]: …` son lo ÚNICO
+   que el lector mueve de sitio —se juntan en un capítulo «Notas» al
+   final—, y se permite porque esa forma no se escribe por accidente ni
+   una vez.
+
+   ⚠️ **Y LAS ZONAS DE PASAR PÁGINA NO SE COMEN LA LLAMADA.** Cubren los
+   bordes de la hoja y van ENCIMA del texto, así que una llamada —o un
+   subrayado— cerca del margen sería intocable y nadie entendería por qué
+   ese botón sí y ese no. `vozBajoLaZona()` apaga un instante el puntero de
+   las zonas, mira qué hay debajo y le manda el toque. Sin eso,
+   `elementFromPoint` devuelve siempre la zona.
+
+   **El panel 📚 Fuentes es el camino de vuelta**, y solo sale cuando el
+   texto trae bibliografía (una pestaña que se abre vacía se lee como una
+   pestaña rota, igual que el chip de «dos páginas»). Cada entrada dice en
+   qué párrafos se la cita y lleva a cada uno de un toque. **Y dice las dos
+   cosas que no cuadran**, que en un trabajo de investigación son errores y
+   no adornos: la fuente que está en la bibliografía y no se cita en
+   ninguna parte, y la llamada del texto que no tiene fuente. El repaso del
+   pegado las cuenta **antes de guardar**, que es cuando el texto todavía
+   está en el recuadro. Encontrarlas después, releyendo cuarenta páginas,
+   es tanto como no encontrarlas.
+
+   Y lo de siempre: la dirección de una fuente se comprueba con `URL()` y
+   no con un grep (`java\tscript:` y `JavaScript:` pasan un grep ingenuo y
+   el navegador los ejecuta igual), solo `http` y `https`, y se pone con
+   `setAttribute`.
+
+28. ⚠️ **UNA TABLA SE LEE POR SU RENGLÓN DE GUIONES, Y SI NO CABE SE MIDE.**
+   «Que cuando hayan tablas se pueda ver lo mejor posible» (el autor, 12 de
+   septiembre de 2026).
+
+   Se leen las de tubos (`| a | b |`), que es como las escribe cualquier
+   máquina, y **solo con su renglón de guiones debajo** (`|---|---:|:--:|`,
+   que además dice cómo va alineada cada columna: los números de un ensayo
+   se leen mal a la izquierda). Ese renglón es lo único que las hace
+   inequívocas: sin pedirlo, tres frases con un tubo dentro se convertirían
+   en una tabla de tres filas, que es el fallo de la regla 3 con otra cara.
+   El rótulo («Tabla 2: Deuda externa») sale del renglón de encima. Las
+   filas se cuadran al ancho de la más ancha: a una fila corta la tabla le
+   sale escalonada, y recortar a la larga le perdería un dato.
+
+   ⚠️ **Y SI NO CABE, SE MIDE; NO SE ADIVINA.** Es la lección de las hojas
+   del kit de escritura a mano. Se mira el ancho REAL de la tabla contra el
+   de su caja, **después de pintar y con las columnas ya puestas** —una
+   tabla mide lo que mide la columna de la página, y pasarla a fichas le
+   cambia el alto, así que midiendo después de contar las páginas el número
+   de páginas sería el de la tabla que ya no está—. Con una tabla que cabe
+   no sale ningún mando: un botón que no hace falta estorba en mitad de una
+   página de lectura.
+
+   Y cuando no cabe hay **dos salidas de verdad**, no una letra encogida
+   hasta que no se lea: **en fichas** —una por fila, con el nombre de su
+   columna al lado de cada dato, que es lo único que se lee de corrido en
+   un teléfono y no pierde ni un dato—, que es además donde empieza sola si
+   la caja es estrecha y la tabla trae tres columnas o más; y **entera**, a
+   pantalla completa, que se desliza a lo ancho con la cabecera y la
+   primera columna clavadas, que es lo que hace falta para comparar la
+   primera fila con la última.
+
+   ⚠️ **Y UNA TABLA MÁS ALTA QUE LA PÁGINA NO PUEDE PEDIR QUE NO LA
+   PARTAN: DESAPARECE.** `break-inside: avoid` hay que pedirlo mientras la
+   tabla QUEPA; cuando no cabe, el navegador no puede cumplirlo y lo que
+   hace en una caja de columnas con alto fijo es **recortarla**: queda el
+   rótulo solo con media página en blanco debajo y las filas no están en
+   ninguna parte. No da error, la página no se rompe y el número de
+   páginas sigue saliendo bien.
+
+   ⚠️ **Y debajo hay una segunda trampa, que es la que costó encontrar:
+   UNA CAJA QUE SE DESLIZA NO SE PARTE NUNCA.** Un `overflow` distinto de
+   `visible` hace la caja indivisible para el navegador, así que la caja
+   que le da a la tabla su deslizamiento a lo ancho no se puede repartir
+   entre dos páginas por mucho `break-inside: auto` que se le ponga. De ahí
+   que las dos vistas se traten distinto: las **fichas** no necesitan
+   deslizarse a lo ancho, así que no llevan caja y se parten solas entre
+   páginas (con cada ficha entera); la **tabla** sí la necesita, así que se
+   le pone **tope de alto** y se desliza también hacia abajo dentro de su
+   caja, con el botón de verla entera al lado. Y el alto se mide **en la
+   caja, no en la figura**: una figura que el navegador ya repartió entre
+   dos columnas dice medir lo que mide la columna, así que preguntarle a
+   ella contesta «sí cabe» justo en el caso en que no.
+
+   ⚠️ **Y el toque en un mando de la tabla se para con `stopPropagation`.**
+   Estos botones **se rehacen dentro de su propia respuesta** —cambia la
+   vista y los mandos se vuelven a pintar—, así que cuando el aviso llega
+   arriba el botón ya está suelto, sin padres, y el «¿cuelga esto de la
+   tabla?» del toque al centro contesta que no: cambiar de vista escondía
+   además las barras de la sala.
+
+   ⚠️ **Y SE PINTA UNA VISTA CADA VEZ, NUNCA LAS DOS ESCONDIENDO UNA.** Con
+   las dos en el documento el texto del bloque saldría DUPLICADO, y sobre
+   ese texto se miden los subrayados (regla 21) y el avance de la lectura
+   (regla 6): cada tabla contaría el doble de lo que hay. La sonda cuenta
+   las apariciones de un dato.
+
+   `break-inside: avoid` para que la paginación por columnas no parta una
+   tabla por la mitad: media al final de una página y media al principio de
+   la otra no se lee, y en un ensayo eso son los datos. Se mira
+   **calculado**, como el color de las franjas.
+
+   Y lo que hay dentro de una tabla **cuenta y se busca**: `vozTextoDeBloque`
+   da el texto de cualquier bloque, y con él cuentan las palabras (si no,
+   media página de datos contaría cero y el avance daría un salto al
+   cruzarla) y busca el buscador —una cifra dentro de una tabla es justo lo
+   que se busca en un ensayo de investigación—.
+
+   Y la ida y vuelta: **corregir un ensayo no le puede deshacer las tablas
+   ni la bibliografía.** Lo que vuelve al recuadro de corregir sale con sus
+   tubos y su renglón de guiones, y con las fuentes como vinieron; es la
+   comprobación 16 aplicada a lo nuevo, y la sonda compara las dos formas.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -1623,6 +1807,18 @@ sin etiqueta no entre nada, que la cola quede vacía y que la subida llegue
 FIRMADA. La otra mitad del puente —el botón dentro de la misión— la vigila
 `_dev/probe-lecturas-marcador.html`, pulsándolo de verdad y contando los
 párrafos que viajan.
+
+Las comprobaciones **28** y **29** son las citas y las tablas. La 28
+compara el texto pintado con el guardado **carácter por carácter** —que es
+lo que impide que poner los botones desplace los subrayados ya hechos—,
+comprueba que consultar no mueve la página, que una llamada sin fuente no
+se toca, que una dirección `javascript:` de la bibliografía no llega a
+ningún `href`, y **dispara el toque sobre la zona de pasar página** para
+ver que la llamada de debajo lo recibe. La 29 pulsa los botones de la
+tabla de verdad, mira `break-inside` y el `position: sticky` **calculados**,
+exige que solo haya UNA vista en el documento —con las dos, el texto del
+bloque sale duplicado— y da la vuelta al texto para ver que corregir no
+deshace las tablas.
 
 La comprobación **27** es la lectura a página limpia: el ⛶ de la barra
 (con una pantalla completa de mentira, que en un Chromium sin cabeza no hay
