@@ -1440,6 +1440,29 @@ el diseño.
    ⚠️ **Y los tokens `--fm-*` se declaran por papel dentro de `#voz-lector`**:
    en noche los mismos amarillos deslumbran, así que van traslúcidos, como en
    el modo oscuro de las misiones. Ni uno en `:root`.
+   ⚠️ **MIENTRAS SE SELECCIONA, LA BARRA NO ESTÁ.** Pedido por el autor el
+   12 de septiembre de 2026, con la captura de su tableta al lado: salía a
+   los 260 ms de que la selección dejara de moverse, y en una tableta eso
+   es MIENTRAS se selecciona —los tiradores se arrastran a tirones, con
+   pausas para mirar dónde va el borde, y cada pausa de un cuarto de
+   segundo plantaba la barra **encima del párrafo**, tapando justo lo que
+   hay que ver para elegir el trozo; y encima Android pone su propia barra
+   de copiar, así que quedaban dos—. Ahora cada movimiento de la selección
+   la cierra al instante y solo se abre cuando la selección lleva
+   **tres segundos quieta** (`VOZ_SUB_ESPERA`).
+   ⚠️ **Y escribir en la propia barra no cuenta como seleccionar.** Tocar
+   «✎ Nota» lleva el foco al recuadro y el navegador recoge la selección
+   del texto al hacerlo: sin esa guarda, abrir la nota **cerraba la barra
+   que acababa de abrirla** —el recuadro aparecía y se iba en el mismo
+   gesto— y la nota no se guardaba nunca. El fallo ya existía antes, pero
+   solo dentro de la ventana de 260 ms, así que unas veces pasaba y otras
+   no; poner los tres segundos lo hizo determinista y la sonda lo cazó.
+   ⚠️ **Y con el RATÓN no se espera**, porque ahí SÍ existe un gesto que
+   dice «ya terminé»: soltar el botón. Con el dedo no existe —los
+   tiradores son del sistema y no nos avisan de nada—, y por eso allí hay
+   que adivinarlo por el reloj. Tres segundos delante de una computadora,
+   donde el gesto es inequívoco, serían tiempo muerto por nada.
+
    ⚠️ **La barra de una selección NUEVA trae también «✎ Nota», «🔖 Aquí me
    quedé» y «✕ Cerrar»**, calcada de la barra de las misiones (pedido del
    autor el 10 de septiembre de 2026, con su captura al lado): es el mismo

@@ -93,6 +93,12 @@ pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
    fila sale FIRMADA, que es justo lo que faltaba. */
 const VOZ_UID = '11111111-1111-1111-1111-111111111111';
 
+/* Lo que hay que esperar a que salga la barra de subrayar: los tres
+   segundos que la herramienta espera a que la selección se quede
+   quieta, más un respiro. Va en una constante para que el día que ese
+   número cambie no haya que cazar cinco esperas por el archivo. */
+const VOZ_SUB_ESPERA_SONDA = 3400;
+
 const out = document.getElementById('out'), f = document.getElementById('f');
 const L = []; let fallos = 0;
 function log(s){ L.push(s); out.textContent = L.join('\n'); }
@@ -818,10 +824,37 @@ function margenVisible(w){
     const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
     return JSON.stringify({ vp: Number(p.dataset.vp), cap: Number(p.dataset.cap), t: r.toString() });
   })()`));
+  /* ⚠️ MIENTRAS SE SELECCIONA, LA BARRA NO ESTÁ (pedido del autor el 12
+     de septiembre de 2026, con la captura de su tableta al lado). Salía
+     a los 260 ms de que la selección dejara de moverse, y en una
+     tableta eso es MIENTRAS se selecciona: los tiradores se arrastran a
+     tirones, con pausas para mirar dónde va el borde, y cada pausa
+     plantaba la barra encima del párrafo — tapando justo lo que hay que
+     ver para elegir el trozo. */
+  selecciona(3, 25);
+  await esperar(700);
+  ok(!d.getElementById('voz-subbar') || d.getElementById('voz-subbar').hidden,
+     '⚠️ recién hecha la selección, la barra NO está: no estorba mientras se arrastran los tiradores',
+     '⚠️ la barra sale encima del párrafo mientras se está seleccionando');
+  await esperar(2900);
+  let barra = d.getElementById('voz-subbar');
+  ok(barra && !barra.hidden,
+     'y sale cuando la selección lleva tres segundos quieta, que es cuando de verdad se terminó',
+     'no salió la barra de subrayar al terminar la selección');
+  /* ⚠️ Y LA DE VERDAD, que es la que describe el fallo: con la barra YA
+     ABIERTA, mover la selección —arrastrar un tirador— la cierra al
+     instante. La de arriba, con la barra sin crear todavía, aprobaría
+     sola aunque nada de esto funcionara. */
+  selecciona(10, 46);
+  await esperar(350);
+  ok(barra.hidden,
+     '⚠️ y con la barra ABIERTA, mover la selección la cierra al instante: es lo que pasa al arrastrar un tirador',
+     '⚠️ al seguir ajustando la selección la barra se queda encima del párrafo');
+  await esperar(VOZ_SUB_ESPERA_SONDA);
+  ok(!barra.hidden, 'y vuelve sola al quedarse quieta otra vez', 'la barra no volvió después de reajustar la selección');
+
   const sel1 = selecciona(3, 25);
-  await esperar(500);
-  const barra = d.getElementById('voz-subbar');
-  ok(barra && !barra.hidden, 'al soltar una selección sale la barra de subrayar', 'no salió la barra de subrayar al seleccionar');
+  await esperar(VOZ_SUB_ESPERA_SONDA);
   ok(barra && barra.querySelectorAll('.voz-subbar-color').length === 5 &&
      ['D', 'V', 'I', 'C', '?'].every(ini => [...barra.querySelectorAll('.voz-subbar-ini')].some(e => e.textContent === ini)),
      'con los cinco colores de la casa (D · V · I · C · ?)', 'la barra no trae los cinco colores');
@@ -911,7 +944,7 @@ function margenVisible(w){
   /* Cerrar y volver a abrir: lo marcado se pinta desde el aparato, sin
      esperar a la nube. */
   selecciona(0, 18);
-  await esperar(450);
+  await esperar(VOZ_SUB_ESPERA_SONDA);
   barra.querySelector('.voz-subbar-color-duda').click();
   await esperar(250);
   w.eval('vozCerrarLector()');
@@ -931,7 +964,7 @@ function margenVisible(w){
     const tn = (function busca(n){ for (const k of n.childNodes) { if (k.nodeType === 3 && k.textContent.length > 30) return k; if (k.nodeType === 1) { const r = busca(k); if (r) return r; } } return null; })(p);
     const r = document.createRange(); r.setStart(tn, 2); r.setEnd(tn, 40);
     const s = window.getSelection(); s.removeAllRanges(); s.addRange(r); })()`);
-  await esperar(450);
+  await esperar(VOZ_SUB_ESPERA_SONDA);
   if (barra && !barra.hidden) barra.querySelector('.voz-subbar-color-contra').click();
   await esperar(250);
   ok(!w.__colado4 && d.querySelectorAll('#voz-texto img').length === 0 && d.querySelector('#voz-texto mark.voz-hl-contra') &&
@@ -950,7 +983,7 @@ function margenVisible(w){
   w.eval('vozIrPagina(1, true)');
   await esperar(250);
   const sel21b = selecciona(5, 40);
-  await esperar(500);
+  await esperar(VOZ_SUB_ESPERA_SONDA);
   ok(!barra.hidden && !barra.querySelector('.voz-subbar-acciones').hidden &&
      !barra.querySelector('.voz-subbar-lugar').hidden && barra.querySelector('.voz-subbar-quitar').hidden &&
      !barra.querySelector('.voz-subbar-cerrar').hidden,
@@ -963,7 +996,7 @@ function margenVisible(w){
      '«Aquí me quedé» pone el marcador en el PÁRRAFO seleccionado y cierra la barra',
      'el marcador de lugar no quedó: ' + JSON.stringify(lugares21));
   selecciona(0, 30);
-  await esperar(500);
+  await esperar(VOZ_SUB_ESPERA_SONDA);
   barra.querySelector('.voz-subbar-nota-btn').click();
   await esperar(100);
   barra.querySelector('.voz-subbar-notatxt').value = 'Apunte a bote pronto';

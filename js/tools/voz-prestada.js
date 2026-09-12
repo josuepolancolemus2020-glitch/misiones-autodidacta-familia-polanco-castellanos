@@ -3838,6 +3838,14 @@ function vozEngancharSala() {
     if (a && a.vuelta === true) vozVueltaSuelta(false);
   });
 
+  /* ⚠️ Con el RATÓN, soltar el botón ES el gesto que dice «ya terminé de
+     seleccionar», así que la barra sale enseguida y no hay que esperar
+     los tres segundos del dedo. Va en su propio escuchador porque el de
+     arriba se sale antes por varios caminos. Ver `VOZ_SUB_ESPERA`. */
+  mid.addEventListener('pointerup', e => {
+    if (e.pointerType === 'mouse' && !_vozSubEditando) vozSubProgramar(60);
+  });
+
   /* Los bordes pasan página, que es como se pasa en cualquier lector.
      El centro —que es la propia hoja, para que el texto se pueda
      seleccionar y copiar— apaga y enciende los mandos. */
@@ -3945,15 +3953,18 @@ function vozEngancharSala() {
     if (document.visibilityState === 'visible' && sala && !sala.hidden && !_vozLuz) vozLuz(true);
   });
 
-  /* La barra de subrayar se abre al soltar la selección. Con un respiro,
-     porque en el teléfono la selección se ajusta varias veces mientras
-     se arrastran los tiradores. */
-  let tSel = null;
+  /* ⚠️ MIENTRAS SE SELECCIONA, LA BARRA NO ESTÁ. Ver la nota de
+     `VOZ_SUB_ESPERA`. Cada movimiento de la selección la cierra al
+     instante y vuelve a poner el reloj a cero; solo se abre cuando la
+     selección lleva un rato quieta. */
   document.addEventListener('selectionchange', () => {
     const sala = document.getElementById('voz-lector');
     if (!sala || sala.hidden) return;
-    clearTimeout(tSel);
-    tSel = setTimeout(vozSubAlSeleccionar, 260);
+    if (vozSubDentroDeLaBarra()) return;
+    /* Con una marca abierta para editarla no hay nada que cerrar: eso
+       no es una selección en curso, es un toque sobre lo ya subrayado. */
+    if (!_vozSubEditando && vozSubBarraAbierta()) vozSubCerrarBarra();
+    vozSubProgramar(VOZ_SUB_ESPERA);
   });
 }
 
@@ -4282,8 +4293,54 @@ function vozLeerSeleccionSala() {
   return { cap: Number(bIni.dataset.cap) || 0, vp: vp, i: ini, f: fin, t: t, caja: r.getBoundingClientRect() };
 }
 
+/* ⚠️ LA BARRA DE SUBRAYAR NO SALE MIENTRAS SE ESTÁ SELECCIONANDO.
+   Pedido por el autor el 12 de septiembre de 2026, con la captura de su
+   tableta delante: «quiero que al momento de seleccionar desaparezca y
+   que solo al momento de terminar lo seleccionado aparezca… para que no
+   me estorbe cuando estoy seleccionando».
+
+   Salía a los 260 milésimas de que la selección dejara de moverse, y en
+   una tableta eso es MIENTRAS se selecciona: los tiradores se arrastran
+   a tirones, con pausas para mirar dónde va el borde, y cada pausa de un
+   cuarto de segundo plantaba la barra ENCIMA del párrafo — tapando
+   justo lo que hay que ver para elegir el trozo. Y encima de ella
+   Android pone su propia barra de copiar, así que quedaban dos.
+
+   Ahora: cada movimiento de la selección la cierra al instante, y solo
+   se abre cuando la selección lleva TRES SEGUNDOS quieta. Tres es el
+   número que pidió el autor y es el que hace falta con el dedo: con
+   menos, una pausa para mirar se lee como «ya terminé».
+
+   ⚠️ Y CON EL RATÓN NO SE ESPERA, porque ahí SÍ existe un gesto que
+   dice «ya terminé»: soltar el botón. Con el dedo no existe —los
+   tiradores son del sistema y no nos avisan de nada—, y por eso allí
+   hay que adivinarlo por el reloj. Esperar tres segundos delante de una
+   computadora, donde el gesto es inequívoco, sería tiempo muerto por
+   nada. */
+const VOZ_SUB_ESPERA = 3000;
+let _vozSelTimer = null;
+
+function vozSubProgramar(ms) {
+  clearTimeout(_vozSelTimer);
+  _vozSelTimer = setTimeout(vozSubAlSeleccionar, ms);
+}
+
+/* ⚠️ ESCRIBIR EN LA BARRA CAMBIA LA SELECCIÓN DE LA PÁGINA, Y ESO NO ES
+   SELECCIONAR. Tocar «✎ Nota» lleva el foco al recuadro de la nota, y
+   el navegador recoge la selección del texto al hacerlo: sin esta
+   guarda, abrir la nota CERRABA la barra que acababa de abrirla —el
+   recuadro aparecía y se iba en el mismo gesto— y la nota no se
+   guardaba nunca. Lo mismo tocando un color. Lo cazó la sonda al poner
+   los tres segundos: antes el fallo existía igual, pero solo dentro de
+   la ventana de 260 ms, así que unas veces pasaba y otras no. */
+function vozSubDentroDeLaBarra() {
+  const a = document.activeElement;
+  return !!(a && a.closest && a.closest('#voz-subbar, #voz-citbar'));
+}
+
 function vozSubAlSeleccionar() {
   if (_vozSubEditando) return;
+  if (vozSubDentroDeLaBarra()) return;
   const s = vozLeerSeleccionSala();
   if (s && s.varios) { vozSubCerrarBarra(); return; }
   if (s) { _vozSubSel = s; vozSubAbrirBarra(s.t, null, s.caja); }
