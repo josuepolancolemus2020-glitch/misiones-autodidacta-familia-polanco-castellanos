@@ -970,7 +970,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Treinta y dos reglas, y ninguna es de adorno:**
+**Treinta y tres reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -2023,6 +2023,87 @@ el diseño.
    estaban, porque la hoja de corregir devuelve el ensayo entero a un
    recuadro. Y «Maestría», «maestria» y « MAESTRÍA » son **el mismo
    estante**: si no, el anaquel saldría con tres montones iguales.
+
+33. ⚠️ **EL ANAQUEL SE MIRA COMO EN PLAY LIBROS: LO PUESTO SE VE, LO DEMÁS
+   SE ABRE.** Rehecho el 12 de septiembre de 2026, el mismo día de
+   estrenar los estantes y con la captura del autor delante: «observo una
+   enorme carga cognitiva en estar clasificando o categorizando; me gusta
+   como está configurado Google Play Libros, donde de manera vertical se
+   despliegan para ver los anaqueles, sin tantas vueltas. Igual se pueden
+   seleccionar varios libros y mandarlos a las categorías».
+
+   Y tenía razón, y se podía contar: antes del primer libro había **cinco
+   filas de chips** —vista, orden, agrupar, género, estante y voz—, todas
+   deslizándose a lo ancho. Media pantalla de mandos para llegar a lo que
+   se venía a ver, y ninguno contestaba la pregunta con la que uno abre un
+   anaquel, que es «¿dónde están mis cosas?». Cada eje nuevo añadía su
+   fila: la herramienta empeoraba al crecer, que es la señal de que la
+   forma estaba mal y no de que faltara sitio.
+
+   Ahora en la barra queda **una sola fila**: las tres vistas, 🗂 Estantes,
+   ⇅ Orden y ☑ Elegir. Debajo, **solo los filtros que estén PUESTOS**, cada
+   uno con su equis, y la fila entera se esconde cuando no hay ninguno. Lo
+   demás vive en una hoja que se abre, y dentro va **EN VERTICAL —un
+   renglón de 44 px por estante, con su cuenta—**, que es como se miran los
+   estantes de una estantería y como no se miran seis chips deslizándose.
+   Los ESTANTES van primero, que es a lo que se abre esa hoja; el género y
+   la voz, debajo. Y elegir un estante **cierra la hoja**: se vino a ver
+   ese montón, no a seguir mirando la lista.
+
+   ⚠️ **Y NO CONTRADICE LA REGLA DE LOS CHIPS QUE SE DESLIZAN** (la de las
+   materias de Videos M.E.T.A.S). Allí el problema era que ocho chips
+   ENVUELTOS ocupaban tres renglones y empujaban lo importante fuera de la
+   pantalla, y la respuesta fue deslizarlos. Aquí el problema es el
+   contrario —son CINCO FILAS— y deslizar cada una no quita ni una: lo que
+   sobra no es el envoltorio, es tenerlas todas a la vez.
+
+   ⚠️ **ELEGIR VARIOS Y MOVERLOS DE UNA VEZ ES LA OTRA MITAD, Y LA QUE DE
+   VERDAD QUITA LA CARGA.** Con veintidós textos por archivar, hacerlo de
+   uno en uno son veintidós vueltas por el menú **⋯** de cada uno. ☑ Elegir
+   enciende el modo, un toque marca un texto, y 🗂 Mover abre la misma hoja
+   vertical: tocar un estante los mete a todos y, **si ya estaban todos,
+   los saca** —un solo renglón para las dos cosas, que es el interruptor de
+   siempre aplicado a varios—. Cuatro cosas que no se negocian:
+
+   - **Se entra por un BOTÓN, no solo por una pulsación larga.** Un gesto
+     que sea la única manera de hacer algo es algo que a veces no se puede
+     hacer: es la regla del asa de arrastre de la repisa.
+   - ⚠️ **Mientras se elige, el toque ELIGE y nada más**, y el asa de
+     arrastrar se retira: el mismo dedo no puede querer dos cosas a la vez,
+     y un toque que abriera el texto encima haría perder la selección.
+   - ⚠️ **Los ajenos no se tocan y se DICE.** La seguridad por fila los
+     rechazaría, y moverlos en la pantalla sería prometer algo que la base
+     deshace en el siguiente arranque. Es la regla 14 vista desde aquí.
+   - ⚠️ **Crear un estante nuevo se hace DENTRO de la hoja de mover, y no
+     pierde la selección.** Si hubiera que salir a crearlo, archivar veinte
+     textos serían veinte selecciones.
+
+   ⚠️ **Y EN LA BARRA, LOS BOTONES VAN PRIMERO Y EL CAMBIO DE VISTA AL
+   FINAL.** La barra se desliza, así que lo último es lo que se sale de la
+   pantalla: puestas las vistas delante —que fue como nació— **☑ Elegir
+   caía fuera del borde derecho en TODOS los teléfonos** (medido: 393 px
+   de mandos en una caja de 280 a 390), o sea que la mitad de lo que se
+   pidió no se veía sin deslizar una barra que no parece deslizarse. No
+   daba error, la barra era de una fila y el HTML estaba bien. Ahora los
+   tres botones caben enteros hasta en una pantalla de 320 px, lo que
+   asoma es la vista —que se toca una vez al mes—, y el degradado del
+   borde dice que hay más. Es además donde las pone Play Libros. La
+   comprobación **34** lo mide **en píxeles**, como el color calculado:
+   esto se cazó mirando una foto, no leyendo el código.
+
+   ⚠️ **Y EL BOTÓN FLOTANTE DE DESTELLOS SE APARTA MIENTRAS SE ELIGE.**
+   Vive en la esquina de abajo a la derecha, que es exactamente donde cae
+   el «✕ Salir» de la barra de elegidos: se lo comía entero. Es el mismo
+   estorbo que ya está escrito en El Rodaje. **Y la regla necesitó
+   `!important`**, que aquí no es pereza: `switchView` (js/app.js) le
+   escribe `style.display = 'flex'` EN LA ETIQUETA al entrar en cada
+   vista, y un estilo en la etiqueta le gana a cualquier regla por
+   específica que sea — así que sin él la regla existe, no da ningún
+   error y no hace nada, que es el peor de los fallos.
+
+   **Y no hizo falta correr ni una línea de SQL**, que es lo que el autor
+   pidió: los estantes ya viajaban por la columna `estantes` de la regla 32,
+   y esto es solo la manera de mirarlos.
 
 **Antes de publicar un cambio de La Voz Prestada:**
 
