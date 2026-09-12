@@ -1714,7 +1714,19 @@ async function vozSubirPendientes(nube) {
 
 function vozRotuloNube() {
   if (_vozEstadoNube === 'puesta')    return { ic: '☁️', t: 'Los textos viajan a todos los aparatos de la casa', cls: 'voz-nube-ok' };
-  if (_vozEstadoNube === 'vieja')     return { ic: '☁️', t: 'Viajan, pero la base va vieja: vuelve a correr voz_prestada.sql para que el género también viaje', cls: 'voz-nube-no' };
+  if (_vozEstadoNube === 'vieja') {
+    /* ⚠️ Y NOMBRA LA COLUMNA QUE FALTA, no «el género» siempre. Desde
+       que son dos, un mensaje fijo manda a buscar lo que no es: quien
+       lea «para que el género también viaje» con el género ya puesto y
+       los estantes sin poner, vuelve a correr el archivo sin entender
+       qué arregló. Es la regla de siempre: un aviso que se equivoca de
+       causa manda a mirar donde no está el problema. */
+    const nombres = { genero: 'el género', estantes: 'los estantes' };
+    const l = _vozFaltan.map(c => nombres[c] || c);
+    const que = l.length ? l.join(' y ') : 'lo nuevo';
+    return { ic: '☁️', t: 'Viajan, pero la base va vieja: vuelve a correr voz_prestada.sql para que ' +
+             que + (l.length > 1 ? ' también viajen' : ' también viaje'), cls: 'voz-nube-no' };
+  }
   if (_vozEstadoNube === 'sin-tabla') return { ic: '📴', t: 'Solo en este aparato: falta correr voz_prestada.sql', cls: 'voz-nube-no' };
   if (_vozEstadoNube === 'sin-senal') return { ic: '📡', t: 'Sin señal: se guarda aquí y sube cuando vuelva', cls: 'voz-nube-no' };
   if (_vozEstadoNube === 'sin-sesion') return { ic: '📴', t: 'Solo en este aparato: entra en F.A.R.O para que viaje', cls: 'voz-nube-no' };
