@@ -2346,6 +2346,7 @@ function vozRender() {
      33): lo puesto se ve, lo demás se abre. */
   vozPintarFiltroPuesto();
   vozPintarSelBarra();
+  vozPintarAbreAqui();
 
   const lista = vozOrdena(vozVisibles());
   cont.textContent = '';
@@ -2376,6 +2377,98 @@ function vozRender() {
     cont.appendChild(caja);
     if (manual) vozMontarArrastre(caja);
   });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   QUE F.A.R.O ABRA AQUÍ — Y SOLO EN ESTE APARATO
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026: «quiero que la
+   herramienta de La Voz Prestada pueda activarle que al abrir F.A.R.O
+   sea lo primero que se presente, tal como está Finanzas, pero que solo
+   se active en el dispositivo que uno desee; es decir, que en otros
+   dispositivos siga Finanzas como primer acceso».
+
+   Es el mismo interruptor del Apunte rápido (regla 11 de Finanzas) y se
+   escribe igual a propósito: mismo tipo de llave, mismo `role="switch"`
+   de fila entera, y el mismo respeto por `?view=`. Dos interruptores que
+   hacen lo mismo escritos de dos maneras se arreglan en uno y se quedan
+   rotos en el otro.
+
+   ⚠️ LA LLAVE ES DEL APARATO, Y ESO ES LA MITAD DE LO QUE SE PIDIÓ. Va en
+   `localStorage` y NO en la nube: encenderla en la tableta del autor no
+   puede cambiarle la pantalla de entrada a quien en esta casa abre F.A.R.O
+   para mirar el saldo. Es la misma razón por la que son del aparato la
+   posición de lectura, los ajustes de letra y el orden a mano del anaquel:
+   una costumbre de unos ojos no es un dato de la casa.
+
+   ⚠️ Y ES GLOBAL AL APARATO, no de cada presupuesto ni de cada quien: es
+   una costumbre de este teléfono, y una llave por contexto obligaría a
+   encenderla dos veces —y la segunda no se encuentra nunca—. */
+const VOZ_INICIO_KEY = 'faro.voz.abre_aqui';
+
+function vozAbreAqui() {
+  try { return localStorage.getItem(VOZ_INICIO_KEY) === '1'; }
+  catch (_) { return false; }
+}
+function vozPonerAbreAqui(v) {
+  try { v ? localStorage.setItem(VOZ_INICIO_KEY, '1') : localStorage.removeItem(VOZ_INICIO_KEY); }
+  catch (_) {}
+}
+
+/* Se dice con PALABRAS lo que va a pasar, y en las DOS posiciones: un
+   interruptor con un solo rótulo obliga a encenderlo para averiguar qué
+   hace, y quien lo enciende sin querer no sabe qué le cambió. Calcado del
+   Apunte rápido. */
+function vozPintarAbreAqui() {
+  const btn = document.getElementById('voz-abre-aqui');
+  const sub = document.getElementById('voz-abre-aqui-sub');
+  if (!btn) return;
+  const on = vozAbreAqui();
+  btn.setAttribute('aria-checked', on ? 'true' : 'false');
+  btn.classList.toggle('finq-fijo-on', on);
+  if (sub) {
+    sub.textContent = on
+      ? 'Al abrir F.A.R.O entrarás aquí, en este aparato. En los demás sigue abriendo donde abría.'
+      : 'Ahora F.A.R.O abre donde abre siempre, y aquí se llega desde el Acceso Rápido.';
+  }
+}
+
+function vozAlternarAbreAqui() {
+  const on = !vozAbreAqui();
+  vozPonerAbreAqui(on);
+  vozPintarAbreAqui();
+  if (typeof toast === 'function') {
+    toast(on ? '📖 F.A.R.O abrirá aquí, solo en este aparato'
+             : 'F.A.R.O vuelve a abrir donde abría');
+  }
+}
+
+/* Al abrir la aplicación desde cero. Lo llama js/auth.js en cuanto la
+   sesión queda puesta, que es el único instante en que se sabe que hay
+   alguien dentro y que la pantalla ya no es la del login. Devuelve `true`
+   si ABRIÓ aquí, para que quien lo llama sepa que el hueco está ocupado y
+   no le ponga otra cosa encima.
+
+   ⚠️ UNA DIRECCIÓN CON `?view=` MANDA SIEMPRE, igual que en el Apunte
+   rápido: quien toca la notificación de un mensaje del chat quiere el
+   chat, y encontrarse un anaquel de ensayos en su lugar es perder el
+   mensaje que venía a leer.
+
+   ⚠️ Y ESTO PASA SOLO AL ABRIR, NUNCA AL VOLVER A LA APLICACIÓN. Ahí está
+   la diferencia con el Apunte rápido, y no es un olvido: aquel abre una
+   HOJA encima de la pantalla en que ya estabas —y solo si estabas en
+   Finanzas—, mientras que esto CAMBIA DE PANTALLA. Volver del teclado o de
+   otra aplicación y encontrarse que F.A.R.O se llevó por delante el chat a
+   medio escribir sería el peor momento posible, que es la lección que ya
+   está escrita en `visibilitychange` de Finanzas. */
+function faroArranqueVozPrestada() {
+  if (!vozAbreAqui()) return false;
+  try {
+    if (new URLSearchParams(window.location.search).get('view')) return false;
+  } catch (_) {}
+  if (typeof switchView !== 'function') return false;
+  switchView('view-voz');
+  return true;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -6683,6 +6776,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   on('voz-menu-cerrar', 'click', vozCerrarMenu);
   on('voz-anaq-cerrar', 'click', vozCerrarHoja);
+  on('voz-abre-aqui', 'click', vozAlternarAbreAqui);
   on('voz-anaq-overlay', 'click', e => { if (e.target.id === 'voz-anaq-overlay') vozCerrarHoja(); });
   /* ⚠️ EL TOQUE SE ATRAPA EN LA CAPTURA. Eligiendo, una tarjeta no abre
      nada: se marca. Si se dejara llegar al botón de leer o al menú, el

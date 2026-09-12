@@ -1200,6 +1200,19 @@
 .voz-herr .voz-vista { min-width: 36px; height: 32px; padding: 0 6px; font-size: 15px; }
 .voz-herr-on { background: var(--brand); border-color: var(--brand); color: #fff; }
 
+/* El interruptor de «que F.A.R.O abra aquí» es el del Apunte rápido: usa
+   sus clases y aquí solo se le da el aire del pie. Ni un color propio, para
+   que el día que se retoque aquel, este vaya detrás. */
+/* ⚠️ Y LLEVA AIRE DEBAJO POR EL BOTÓN FLOTANTE DE DESTELLOS. Es la
+   TERCERA vez en el mismo día que ese botón se come algo: vive fijo en la
+   esquina de abajo a la derecha, y esta fila es lo último del anaquel, o
+   sea que cae justo ahí — medido en la foto, tapaba el final de la frase
+   que explica lo que hace el interruptor. Con este hueco debajo, la fila
+   queda siempre por encima de su banda: si el anaquel se desliza, al
+   llegar al final sobran estos píxeles; y si no se desliza, es que la fila
+   con su hueco cabía entera, o sea que tampoco llega. */
+.voz-abre-aqui { margin-top: 20px; margin-bottom: 82px; }
+
 /* Los filtros puestos, con su equis. Es lo único que queda a la vista. */
 .voz-filtro-puesto { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .voz-filtro-puesto[hidden] { display: none; }

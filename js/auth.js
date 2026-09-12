@@ -230,7 +230,12 @@ document.addEventListener('DOMContentLoaded', () => {
        terminen todos los arranques. No cuesta nada visible y no rompe la
        regla del foco: en un arranque no hay ningún toque del que colgarse,
        así que el teclado no iba a salir de todos modos. */
-    if (typeof faroArranqueApunteFijo === 'function') setTimeout(faroArranqueApunteFijo, 0);
+    /* Quién se queda la pantalla al entrar lo decide `faroArranqueInicio`
+       (js/app.js), en un solo sitio: hay dos interruptores de aparato que
+       pueden querer el mismo hueco y, preguntando cada uno por su cuenta,
+       uno abriría encima del otro. La nota larga está allí. */
+    if (typeof faroArranqueInicio === 'function') setTimeout(faroArranqueInicio, 0);
+    else if (typeof faroArranqueApunteFijo === 'function') setTimeout(faroArranqueApunteFijo, 0);
   }
 
   /* ── Restaurar la sesión guardada, si la hay ──────────────────────────
