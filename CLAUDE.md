@@ -1887,14 +1887,39 @@ el diseño.
    DETRÁS de los datos, así que quien se fíe de la cabecera lee cero bytes
    y se encuentra **un documento vacío sin ningún error**.
 
+   ⚠️ **EL SELECTOR NO FILTRA POR FORMATO, Y ESO NO ES DEJADEZ: ES LO
+   ÚNICO QUE DEJA ELEGIR UN DOCUMENTO DE GOOGLE.** Descubierto el 12 de
+   septiembre de 2026, con la captura de la carpeta de Drive del autor:
+   sus tareas de la maestría están en Documentos de Google y el selector
+   no le dejaba tocarlas —solo los Word—. El motivo es que **un Documento
+   de Google no es un archivo**: no tiene bytes, vive en el servidor, y el
+   aparato lo enseña como un archivo «virtual» de clase
+   `application/vnd.google-apps.document`; los formatos de verdad (.docx,
+   .html, .txt) son EXPORTACIONES que se fabrican al elegirlo. Con una
+   lista de formatos puesta, el selector compara la clase con la lista, no
+   encuentra ninguna y lo deja **apagado**: desde fuera parece que la
+   aplicación no los admite. Filtrar por el nombre no servía de nada de
+   todas formas —los selectores de Android se saltan la lista la mitad de
+   las veces—, así que la comprobación de verdad siempre estuvo en
+   `vadjLeer`, mirando lo que hay DENTRO.
+
+   Y como el aparato decide solo a qué formato exporta —unas veces un
+   `.docx`, otras un PDF, otras nada—, los cuatro finales están
+   contemplados y **los tres malos nombran el mismo camino de dos toques**
+   (`vadjGoogleComo`, en un solo sitio): un archivo **vacío** (la
+   exportación falló), un **`.gdoc`** (que es solo un atajo con la
+   dirección dentro, no el documento), un **PDF**, y una exportación que
+   llega bien pero **sin nombre de formato** — esa se reconoce por lo que
+   trae dentro, no por cómo se llama.
+
    ⚠️ **Y EL PDF SE RECHAZA A PROPÓSITO, DICIENDO QUÉ HACER.** Un PDF no
    guarda renglones: guarda letras con sus coordenadas, y muchos llevan
    codificaciones propias, así que lo que se saca no es texto equivocado
    —es un revoltijo de símbolos— y no se ve hasta leerlo. **Un revoltijo
    que parece haber funcionado es lo peor que puede salir de aquí**, y no
    hace falta: el mismo documento, descargado como Word, trae todo dicho.
-   El `.pdf` sí está en la lista del selector, para poder explicarlo: si no
-   estuviera, el archivo no se podría ni elegir y nadie sabría por qué.
+   Y se puede elegir igual —el selector no filtra—, así que la explicación
+   siempre llega.
 
    Detalles que salieron de probarlo: el superíndice de dígitos se escribe
    como `[3]` **solo si son dígitos** (un «1.er» no es una cita); la

@@ -174,9 +174,16 @@ const RELS =
   ok(w.VozAdjunto.puede() === true,
      'y este navegador sabe abrir un comprimido (DecompressionStream)',
      'el navegador no puede abrir un .docx: la sonda no puede medir nada');
-  ok(/\.docx/.test(w.VozAdjunto.acepta) && /\.pdf/.test(w.VozAdjunto.acepta),
-     'el selector acepta .docx… y también .pdf, para poder explicar por qué no sirve',
-     'la lista de formatos no está bien: ' + w.VozAdjunto.acepta);
+  /* ⚠️ EL SELECTOR NO FILTRA NADA, y eso es lo que deja elegir un
+     DOCUMENTO DE GOOGLE. Un documento de Google no es un archivo: no
+     tiene bytes, y el aparato lo enseña como «virtual» con la clase
+     application/vnd.google-apps.document. Con una lista de formatos
+     puesta, el selector no encuentra ninguna coincidencia y lo deja
+     APAGADO — desde fuera parece que la aplicación no los admite, que
+     es justo lo que le pasó al autor con su carpeta de la maestría. */
+  ok(w.VozAdjunto.acepta === '',
+     '⚠️ el selector no filtra por formato: es lo único que deja elegir un Documento de Google',
+     '⚠️ hay una lista de formatos puesta, y eso apaga los Documentos de Google en el selector: ' + JSON.stringify(w.VozAdjunto.acepta));
 
   log('── 2. ⚠️ UN .docx DE VERDAD, FABRICADO Y LEÍDO ──');
   const blob = await hacerZip([
@@ -240,6 +247,35 @@ const RELS =
   ok(/\.docx/.test((await w.VozAdjunto.leer(doc)).error || ''),
      'un Word antiguo (.doc) dice que se guarde como .docx', 'no explica lo del .doc');
 
+  log('── 4-bis. ⚠️ LO QUE LLEGA CUANDO SE ELIGE UN DOCUMENTO DE GOOGLE ──');
+  /* Un documento de Google no tiene bytes: el aparato lo EXPORTA al
+     elegirlo y decide él a qué formato. Puede llegar bien (un .docx),
+     puede llegar como PDF, puede llegar vacío, y en una computadora
+     puede llegar el «.gdoc», que es solo un atajo con la dirección
+     dentro. Los cuatro casos tienen que decir qué hacer, y los tres
+     malos tienen que nombrar el camino de los dos toques. */
+  const vacio = new w.File([new w.Blob([])], 'Tarea de la maestría');
+  const rv = await w.VozAdjunto.leer(vacio);
+  ok(rv.error && /Word \(\.docx\)/.test(rv.error),
+     'un archivo vacío —un documento de Google que el aparato no supo exportar— dice cómo sacarlo en Word',
+     'no explica el archivo vacío: ' + JSON.stringify(rv));
+  const atajo = new w.File([new w.Blob(['{"url":"https://docs.google.com/open?id=1a2b","doc_id":"1a2b"}'])], 'Burocracia.gdoc');
+  const ra = await w.VozAdjunto.leer(atajo);
+  ok(ra.error && /atajo/.test(ra.error) && /Word \(\.docx\)/.test(ra.error),
+     '⚠️ y un «.gdoc» dice que es un ATAJO al documento, no el documento: abrirlo daría cuatro letras sueltas y ninguna pista',
+     'el .gdoc no se explica: ' + JSON.stringify(ra));
+  ok(/Word \(\.docx\)/.test(rp.error),
+     'y el PDF nombra el mismo camino, que es el único útil cuando la exportación sale mal',
+     'el aviso del PDF no dice cómo conseguir un .docx');
+
+  /* Y la otra mitad: una exportación que llega BIEN pero SIN nombre de
+     formato. Lo que decide es lo que hay dentro, no el nombre. */
+  const expo = new w.File([new w.Blob(['<html><body><h1>Un informe</h1><p>Con su párrafo.</p></body></html>'])], 'Tarea exportada');
+  const re = await w.VozAdjunto.leer(expo);
+  ok(!re.error && /^# Un informe/m.test(re.texto || ''),
+     'una exportación sin extensión se reconoce por lo que trae dentro, no por su nombre',
+     'una exportación sin extensión no se leyó: ' + JSON.stringify(re));
+
   log('── 5. Adjuntar de verdad, pulsando el botón ──');
   w.eval('vozAbrirPegar(null)');
   await esperar(250);
@@ -247,9 +283,9 @@ const RELS =
   const inp = d.getElementById('voz-f-archivo');
   ok(btn && inp && /Adjuntar/.test(btn.textContent) && !/no disponible/.test(btn.textContent),
      'el botón 📎 está en la hoja de pegar', 'no hay botón de adjuntar');
-  ok((inp.accept || '').indexOf('.docx') >= 0,
-     'y el selector del aparato —el que ya ofrece Drive y OneDrive— acepta los formatos que se leen',
-     'el selector no tiene los formatos: ' + inp.accept);
+  ok(!inp.accept,
+     '⚠️ y el selector del aparato —el que ofrece Drive y OneDrive— no lleva filtro, para que los Documentos de Google se puedan elegir',
+     '⚠️ el selector lleva filtro y eso apaga los Documentos de Google: ' + inp.accept);
   const dt = new w.DataTransfer();
   dt.items.add(archivo);
   inp.files = dt.files;

@@ -5936,8 +5936,18 @@ function vozAbrirAyuda() {
   if (!ov || !caja) return;
   caja.textContent = '';
 
+  /* Lo primero de la ayuda es el atajo que evita toda la ayuda: si el
+     texto está en un archivo, adjuntarlo trae los títulos y las tablas
+     ya puestos y no hay que saberse nada de lo de abajo. */
+  const adj = vozNodo('div', 'voz-ayuda-nota');
+  adj.appendChild(vozNodo('strong', null, '📎 Si el texto está en un archivo, adjúntalo: '));
+  adj.appendChild(document.createTextNode(
+    'trae los títulos, las tablas, las notas al pie y los enlaces ya puestos, y el selector del aparato incluye Drive y OneDrive. ' +
+    'Un Documento de Google no es un archivo y el aparato lo exporta al elegirlo, así que si sale mal: ábrelo, ⋮ → «Compartir y exportar» → «Guardar como Word (.docx)», y adjunta ese. Un PDF no sirve: no guarda el texto en renglones.'));
+  caja.appendChild(adj);
+
   caja.appendChild(vozNodo('p', null,
-    'Pega el texto tal como venga. Lo único que hace falta saber es esto:'));
+    'Y si lo pegas a mano, pégalo tal como venga. Lo único que hace falta saber es esto:'));
 
   const porCampo = {};
   Object.entries(VOZ_ETIQUETAS).forEach(([clave, campo]) => {

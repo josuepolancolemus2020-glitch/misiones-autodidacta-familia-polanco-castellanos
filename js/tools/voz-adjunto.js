@@ -66,11 +66,28 @@ const VADJ_R  = 'http://schemas.openxmlformats.org/officeDocument/2006/relations
 const VADJ_TX = 'urn:oasis:names:tc:opendocument:xmlns:text:1.0';
 const VADJ_TB = 'urn:oasis:names:tc:opendocument:xmlns:table:1.0';
 
-/* Lo que el selector del aparato deja elegir. El PDF va incluido A
-   PROPÓSITO aunque no se lea: si no estuviera, quien lo intente se
-   encuentra un archivo que no se puede ni seleccionar y sin ninguna
-   explicación, que es la peor de las dos maneras de decir que no. */
-const VADJ_ACEPTA = '.docx,.odt,.html,.htm,.md,.markdown,.txt,.text,.pdf';
+/* ⚠️ EL SELECTOR NO FILTRA NADA, Y ESO NO ES DEJADEZ: ES LO ÚNICO QUE
+   DEJA ELEGIR UN DOCUMENTO DE GOOGLE.
+   Descubierto el 12 de septiembre de 2026, con la captura de la carpeta
+   de Drive del autor: sus tareas están en Documentos de Google y el
+   selector no le dejaba tocarlas — solo los Word.
+
+   El motivo es que un Documento de Google NO ES UN ARCHIVO: no tiene
+   bytes, vive en el servidor y el aparato lo enseña como un archivo
+   «virtual» cuya clase es `application/vnd.google-apps.document`. Los
+   formatos de verdad (.docx, .html, .txt) son EXPORTACIONES que se
+   fabrican al elegirlo. Con una lista de formatos puesta, el selector
+   compara la clase del archivo con la lista, no encuentra ninguna, y
+   lo deja apagado: desde fuera parece que la aplicación no los admite.
+
+   Sin lista, se pueden elegir todos y el aparato exporta el documento
+   al vuelo. Lo que llegue puede ser un .docx —lo mejor— o un PDF, según
+   el aparato, y eso NO se puede elegir desde aquí; por eso lo que sí se
+   hace es reconocer lo que llegue y decir qué hacer con ello. Filtrar
+   por el nombre no sirve de nada aquí: los selectores de Android se
+   saltan la lista la mitad de las veces, así que la comprobación de
+   verdad siempre estuvo en `vadjLeer`, mirando lo que hay dentro. */
+const VADJ_ACEPTA = '';
 
 function vadjPuede() {
   return typeof DecompressionStream === 'function' && typeof DOMParser === 'function';
@@ -504,8 +521,18 @@ async function vadjLeerHtml(txt) {
    dice CÓMO conseguir eso, que es la única respuesta útil. */
 function vadjPdfNo() {
   return 'Un PDF no guarda el texto en renglones, sino letras con sus coordenadas: lo que se saca de ahí sale revuelto y no se ve hasta leerlo. ' +
-         'Ese mismo documento sirve perfecto en otro formato: en Documentos de Google, «Archivo → Descargar → Word (.docx)», y adjunta ese. ' +
-         'Un .docx trae los títulos, las tablas, las notas al pie y los enlaces dichos con todas las letras.';
+         'Ese mismo documento sirve perfecto en otro formato. ' + vadjGoogleComo();
+}
+
+/* ⚠️ LA FRASE QUE RESUELVE EL CASO DE VERDAD, y por eso está en un solo
+   sitio y la usan los tres avisos: un Documento de Google no tiene
+   bytes, así que el aparato lo EXPORTA al elegirlo y decide él a qué
+   formato — unas veces .docx y otras un PDF—. Cuando sale mal, lo único
+   útil que se puede decir es cómo conseguir un .docx de verdad, que es
+   con dos toques dentro de Documentos de Google. */
+function vadjGoogleComo() {
+  return 'Si es un Documento de Google: ábrelo, toca ⋮ → «Compartir y exportar» → «Guardar como Word (.docx)», y adjunta ese. ' +
+         'Un .docx trae los títulos, las tablas, las notas al pie y los enlaces dichos con todas las letras; un PDF no trae ninguno.';
 }
 
 /* ══════════════ LA PUERTA ══════════════ */
@@ -528,7 +555,17 @@ async function vadjLeer(file) {
       return { error: 'El archivo pesa ' + Math.round(file.size / 1048576) + ' MB y el tope son ' +
                       Math.round(VADJ_MAX / 1048576) + '. Casi siempre es por las imágenes de dentro, que aquí no se usan.' };
     }
+    if (file.size === 0) {
+      return { error: 'El archivo llegó vacío. Si venía de Drive, casi siempre es un Documento de Google que el aparato no supo exportar: ' + vadjGoogleComo() };
+    }
     const ext = vadjExtension(file.name);
+    /* Un «.gdoc» no es el documento: es un ATAJO de dos renglones con su
+       dirección dentro, que es lo que deja en el disco la aplicación de
+       Drive. Abrirlo daría un puñado de letras sueltas y ninguna pista
+       de por qué. */
+    if (ext === 'gdoc' || ext === 'gsheet' || ext === 'gslides' || ext === 'gdraw') {
+      return { error: 'Ese archivo es solo un atajo al documento de Google, no el documento. ' + vadjGoogleComo() };
+    }
     if (ext === 'pdf') return { error: vadjPdfNo() };
     if (ext === 'doc') return { error: 'Ese es un Word antiguo (.doc). Ábrelo y guárdalo como .docx, que es el que se lee.' };
     if (ext === 'txt' || ext === 'text' || ext === 'md' || ext === 'markdown') {
@@ -560,7 +597,19 @@ async function vadjLeer(file) {
       return { texto: r.texto, cuenta: r.cuenta, formato: 'docx' };
     }
     if (String.fromCharCode.apply(null, cabeza) === '%PDF-') return { error: vadjPdfNo() };
-    return { error: 'No sé leer un archivo «.' + (ext || '?') + '». Sirven .docx, .odt, .html, .md y .txt.' };
+    /* Una exportación puede llegar sin extensión y siendo HTML o texto
+       (pasa con los documentos de Google). Se mira lo que hay dentro
+       antes de rendirse: es la misma regla de siempre —lo que decide es
+       el contenido, no el nombre—. */
+    const texto = await file.text();
+    if (/<\/(p|div|body|h[1-6])>/i.test(texto)) {
+      const r = await vadjLeerHtml(texto);
+      if (String(r.texto || '').trim()) return { texto: r.texto, cuenta: r.cuenta, formato: 'html' };
+    }
+    if (texto.trim() && !/[\u0000-\u0008\u000e-\u001f]/.test(texto.slice(0, 2000))) {
+      return { texto: texto.replace(/\r\n?/g, '\n'), cuenta: null, formato: 'texto' };
+    }
+    return { error: 'No sé leer un archivo «.' + (ext || '?') + '». Sirven .docx, .odt, .html, .md y .txt. ' + vadjGoogleComo() };
   } catch (e) {
     return { error: 'No se pudo abrir el archivo (' + ((e && e.message) || 'sin detalle') + '). ' +
                     'Si es un .docx, ábrelo y vuelve a guardarlo; si no, guárdalo como .txt.' };
@@ -572,5 +621,5 @@ window.VozAdjunto = {
   acepta: VADJ_ACEPTA,
   leer: vadjLeer,
   /* Para la sonda y para quien quiera probar las piezas por separado. */
-  _partes: { vadjZipAbrir, vadjZipSacar, vadjLeerDocx, vadjLeerOdt, vadjLeerHtml, vadjTablaEnTubos, vadjPdfNo },
+  _partes: { vadjZipAbrir, vadjZipSacar, vadjLeerDocx, vadjLeerOdt, vadjLeerHtml, vadjTablaEnTubos, vadjPdfNo, vadjGoogleComo },
 };
