@@ -5459,6 +5459,7 @@ function vozAbrirPegar(cuento) {
     g('voz-f-nota').value    = cuento.nota || '';
   }
   vozPonGenero(cuento ? vozGenero(cuento.genero).id : 'cuento');
+  vozPintarChipsFicha();
 
   const inpArch = g('voz-f-archivo');
   if (inpArch && window.VozAdjunto && window.VozAdjunto.acepta) inpArch.accept = window.VozAdjunto.acepta;
@@ -5487,6 +5488,117 @@ function vozPonGenero(id) {
   const e = document.getElementById('voz-f-genero');
   if (e) e.value = vozGenero(id).id;
   vozPintarChipsGenero();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LOS CHIPS DE LA VOZ Y DE LA MÁQUINA
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026, con la hoja de pegar
+   en la pantalla y los ejemplos rodeados a mano: «necesito que allí
+   pongas para poder seleccionar: Gemini, Perplexity, Claude».
+
+   Son los DOS campos que hacen falta para guardar, o sea los dos que se
+   escriben en cada texto, y siempre son los mismos tres o cuatro
+   valores. Escribirlos a mano en una tableta, veinte veces, no es solo
+   lento: se escriben MAL. En el anaquel de esta casa hay un «Gemeni» de
+   eso, y una máquina mal escrita rompe en silencio el chip que agrupa
+   por máquina —salen dos montones donde había uno— sin dar ningún
+   error y sin que nadie lo mire.
+
+   ⚠️ Y LAS SUGERENCIAS SALEN DEL HISTORIAL, NO DE UNA LISTA ESCRITA A
+   MANO. Es la regla 2 del Apunte rápido, y aquí importa más: la voz que
+   se imita es de cada casa —«Rulfo», «un narrador de pueblo», «un
+   informe de investigación»— y una lista fija no la puede adivinar
+   nunca. Lo que sí lleva lista es la MÁQUINA, porque son cuatro y son
+   las mismas para todo el mundo; van detrás de las que ya se usaron, y
+   solo las que no estén ya.
+
+   Escribir a mano se sigue pudiendo, y eso no es un detalle: un chip
+   que fuera la única manera de rellenar el campo dejaría fuera la
+   primera vez que se usa una voz nueva. */
+
+/* Las cuatro de siempre. Es una lista corta y cerrada A PROPÓSITO: no
+   es «los modelos que existen» —eso estaría viejo en un mes— sino los
+   que esta casa usa, y añadir uno es esta línea. Misma regla que
+   VOZ_GENEROS. */
+const VOZ_MAQUINAS = ['Gemini', 'Claude', 'ChatGPT', 'Perplexity'];
+
+/* Lo que ya se usó en el anaquel, de lo más usado a lo menos. Las
+   lápidas no cuentan: un texto retirado no tiene por qué seguir
+   proponiendo su voz. */
+function vozUsados(campo) {
+  const cuenta = new Map();
+  (_vozCuentos || []).forEach(c => {
+    if (!c || c.borrado) return;
+    const v = String(c[campo] || '').trim();
+    if (!v) return;
+    cuenta.set(v, (cuenta.get(v) || 0) + 1);
+  });
+  return [...cuenta.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(x => x[0]);
+}
+
+/* Pinta una fila de chips que rellenan un campo de texto de un toque.
+   El chip puesto se ve marcado, y tocarlo otra vez LO QUITA: sin eso,
+   un chip tocado por error solo se deshace borrando el campo a mano. */
+function vozPintarChipsCampo(idCaja, idCampo, sugeridas) {
+  const caja = document.getElementById(idCaja);
+  const campo = document.getElementById(idCampo);
+  if (!caja || !campo) return;
+  const actual = campo.value.trim().toLowerCase();
+  const vistos = new Set();
+  const lista = [];
+  sugeridas.forEach(v => {
+    const k = v.trim().toLowerCase();
+    if (!k || vistos.has(k)) return;
+    vistos.add(k);
+    lista.push(v.trim());
+  });
+  caja.textContent = '';
+  caja.hidden = !lista.length;
+  /* Un tope: con cuarenta textos en el anaquel, la fila de voces sería
+     más larga que el formulario. Se deslizan (`.voz-chips` ya lo hace),
+     pero lo que no cabe en dos vistazos no lo lee nadie. */
+  lista.slice(0, 8).forEach(v => {
+    const puesto = v.toLowerCase() === actual;
+    const b = vozBoton('voz-chip voz-chip-chica' + (puesto ? ' voz-chip-on' : ''), v, () => {
+      campo.value = puesto ? '' : v;
+      /* Rellenar un campo obligatorio tiene que apagar el aviso de
+         «falta…» en el momento, no al guardar. */
+      vozPintarBotonGuardar();
+      vozPintarChipsCampo(idCaja, idCampo, sugeridas);
+      campo.focus();
+    }, puesto ? 'Quitar «' + v + '»' : 'Poner «' + v + '»');
+    b.setAttribute('aria-pressed', puesto ? 'true' : 'false');
+    caja.appendChild(b);
+  });
+}
+
+/* ⚠️ ¿Dos nombres que se diferencian en UNA sola letra? Hace falta por
+   el «Gemeni» que hay en el anaquel de esta casa: proponerlo como chip
+   al lado de «Gemini» sería repartir la errata en vez de pararla, y
+   además con los dos a la vista nadie distingue cuál es cuál de un
+   vistazo. Una letra, y no dos: a dos ya caben cosas distintas de
+   verdad («Claude» y «Claude 3»). El texto viejo se queda como está
+   —no se le toca nada a nadie por detrás—, pero el que se guarde de
+   ahora en adelante lleva el nombre bueno. */
+function vozUnaLetraDe(a, b) {
+  const x = vozSinTildes(a).toLowerCase().trim(), y = vozSinTildes(b).toLowerCase().trim();
+  if (x === y || Math.abs(x.length - y.length) > 1) return false;
+  let i = 0, j = 0, fallos = 0;
+  while (i < x.length && j < y.length) {
+    if (x[i] === y[j]) { i++; j++; continue; }
+    if (++fallos > 1) return false;
+    if (x.length > y.length) i++;
+    else if (y.length > x.length) j++;
+    else { i++; j++; }
+  }
+  return fallos + (x.length - i) + (y.length - j) <= 1;
+}
+
+function vozPintarChipsFicha() {
+  vozPintarChipsCampo('voz-voz-chips', 'voz-f-voz', vozUsados('voz'));
+  const usadas = vozUsados('maquina').filter(m => !VOZ_MAQUINAS.some(b => vozUnaLetraDe(m, b)));
+  vozPintarChipsCampo('voz-maquina-chips', 'voz-f-maquina', usadas.concat(VOZ_MAQUINAS));
 }
 
 function vozPintarChipsGenero() {
@@ -6016,6 +6128,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   let tFuentes = null;
   on('voz-f-versos', 'change', () => { _vozVersosTocado = true; vozRepasar(); });
+  /* Escribiendo a mano, el chip que coincida se marca solo: así se ve
+     que eso mismo ya se había usado antes, que es la mitad de lo que
+     estos chips existen para evitar (dos maneras de escribir lo mismo). */
+  ['voz-f-voz', 'voz-f-maquina'].forEach(id => on(id, 'input', () => { vozPintarChipsFicha(); vozPintarBotonGuardar(); }));
   /* El botón toca el selector del aparato, que es quien ofrece Drive,
      OneDrive y la carpeta de descargas. Y se vacía después de cada uno,
      para que adjuntar DOS VECES EL MISMO archivo vuelva a avisar: sin

@@ -2466,15 +2466,24 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <input type="hidden" id="voz-f-genero" value="cuento">
         <div class="voz-chips voz-chips-form" id="voz-genero-chips" role="group" aria-labelledby="voz-genero-rot"></div>
       </div>
+      <!-- ⚠️ Los dos campos que HACEN FALTA se rellenan con un toque, no
+           escribiéndolos otra vez. Las sugerencias salen del HISTORIAL
+           del anaquel —lo que esta casa usa de verdad—, no de una lista
+           escrita a mano: es la regla de los chips de categoría del
+           Apunte rápido. Y escribir a mano se sigue pudiendo: de ahí
+           salió un «Gemeni» en el anaquel, que es justo lo que un chip
+           evita. -->
       <div class="voz-campo voz-campo-obl">
         <label for="voz-f-voz">🎭 La voz que se imita · hace falta</label>
         <input id="voz-f-voz" type="text" autocomplete="off"
                placeholder="p. ej. Rulfo, o «un narrador de pueblo, de frase corta»">
+        <div class="voz-chips voz-chips-form" id="voz-voz-chips" role="group" aria-label="Voces ya usadas"></div>
       </div>
       <div class="voz-campo voz-campo-obl">
         <label for="voz-f-maquina">🤖 La máquina que lo escribió · hace falta</label>
         <input id="voz-f-maquina" type="text" autocomplete="off"
                placeholder="p. ej. Claude, ChatGPT, Gemini…">
+        <div class="voz-chips voz-chips-form" id="voz-maquina-chips" role="group" aria-label="Máquinas"></div>
       </div>
       <div class="voz-campo">
         <label for="voz-f-encargo">Lo que le pediste</label>

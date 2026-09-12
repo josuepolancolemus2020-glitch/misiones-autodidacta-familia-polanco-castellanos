@@ -1942,6 +1942,64 @@ function margenVisible(w){
      'pero un poema sí vuelve con el interruptor puesto', 'un poema perdió el interruptor de versos');
   w.eval('vozCerrarPegar()');
 
+  log('── 31. LOS CHIPS DE LA VOZ Y DE LA MÁQUINA ──');
+  /* Pedido por el autor el 12 de septiembre de 2026, con la hoja de
+     pegar en pantalla y los ejemplos rodeados a mano: «necesito que
+     allí pongas para poder seleccionar: Gemini, Perplexity, Claude».
+     Son los dos campos que HACEN FALTA para guardar, o sea los dos que
+     se escriben en cada texto, y siempre son los mismos tres o cuatro
+     valores. Escribirlos a mano en una tableta no es solo lento: se
+     escriben mal, y en su anaquel hay un «Gemeni» de eso — que rompe en
+     silencio el agrupar por máquina, sin dar ningún error. */
+  const conVoces = (cid, voz, maq) => ({ cid: cid, titulo: cid, genero: 'ensayo', voz: voz, maquina: maq,
+    capitulos: [{ t: '', p: [{ k: 'p', t: 'Algo.' }] }], palabras: 1, borrado: false, actualizado: 1 });
+  w.eval(`_vozCuentos = ${JSON.stringify([
+    conVoces('a', 'Investigación profunda', 'Gemini'),
+    conVoces('b', 'Investigación profunda', 'Gemeni'),
+    conVoces('c', 'Rulfo', 'Claude'),
+    conVoces('d', 'un narrador de pueblo', 'Claude'),
+    conVoces('e', 'Investigación profunda', 'Gemini'),
+  ])}; vozGuardaLocal(); vozRender(); vozAbrirPegar(null)`);
+  await esperar(350);
+  const chipsDe = id => [...d.querySelectorAll('#' + id + ' .voz-chip')].map(x => x.textContent);
+  const cv = chipsDe('voz-voz-chips'), cm = chipsDe('voz-maquina-chips');
+  ok(cv[0] === 'Investigación profunda' && cv.indexOf('Rulfo') > 0,
+     '⚠️ las voces salen del HISTORIAL del anaquel y por lo más usado: una lista fija no puede adivinar «un narrador de pueblo»',
+     'los chips de voz no salen del historial: ' + JSON.stringify(cv));
+  ok(['Gemini', 'Claude', 'ChatGPT', 'Perplexity'].every(m => cm.indexOf(m) >= 0),
+     'y las máquinas traen las cuatro de siempre (Gemini, Claude, ChatGPT, Perplexity), que es lo que se pidió',
+     'faltan máquinas en los chips: ' + JSON.stringify(cm));
+  ok(cm.indexOf('Gemeni') < 0,
+     '⚠️ y «Gemeni» NO se propone al lado de «Gemini»: un chip con la errata dentro la reparte en vez de pararla',
+     '⚠️ la errata del anaquel se ofrece como chip: ' + JSON.stringify(cm));
+  ok(cm.indexOf('Claude') < cm.indexOf('ChatGPT'),
+     'y lo ya usado va delante de lo de la lista', 'el orden de las máquinas no es el esperado: ' + JSON.stringify(cm));
+
+  const chipGemini = [...d.querySelectorAll('#voz-maquina-chips .voz-chip')].find(x => x.textContent === 'Gemini');
+  chipGemini.click();
+  await esperar(200);
+  ok(d.getElementById('voz-f-maquina').value === 'Gemini' &&
+     [...d.querySelectorAll('#voz-maquina-chips .voz-chip')].find(x => x.textContent === 'Gemini').getAttribute('aria-pressed') === 'true',
+     'un toque rellena el campo y el chip se queda marcado',
+     'el chip no rellenó el campo: ' + d.getElementById('voz-f-maquina').value);
+  const falta1 = d.getElementById('voz-falta').textContent;
+  ok(!/la máquina/.test(falta1),
+     '⚠️ y el aviso de «falta…» se apaga en el momento, no al guardar',
+     'el aviso sigue pidiendo la máquina después de ponerla: ' + falta1);
+  [...d.querySelectorAll('#voz-maquina-chips .voz-chip')].find(x => x.textContent === 'Gemini').click();
+  await esperar(200);
+  ok(d.getElementById('voz-f-maquina').value === '',
+     'y tocarlo otra vez lo quita: un chip tocado por error se deshace igual que se puso',
+     'tocar el chip puesto no lo quitó');
+  const campoVoz = d.getElementById('voz-f-voz');
+  campoVoz.value = 'Rulfo';
+  campoVoz.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(200);
+  ok([...d.querySelectorAll('#voz-voz-chips .voz-chip')].find(x => x.textContent === 'Rulfo').getAttribute('aria-pressed') === 'true',
+     'y escribiendo a mano se marca el chip que coincide: se ve que eso ya se había usado antes',
+     'escribir a mano no marca el chip que coincide');
+  w.eval('vozCerrarPegar()');
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

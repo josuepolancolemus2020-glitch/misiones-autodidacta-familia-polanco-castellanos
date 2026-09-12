@@ -970,7 +970,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Treinta reglas, y ninguna es de adorno:**
+**Treinta y una reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -1929,6 +1929,38 @@ el diseño.
    se llenaría de direcciones; y las notas al pie **se renumeran desde 1**,
    porque los identificadores de Word saltan y una bibliografía que empieza
    en la nota 7 se lee como si faltaran seis.
+
+31. **LA VOZ Y LA MÁQUINA SE ELIGEN CON UN TOQUE, Y LAS SUGERENCIAS SALEN
+   DEL HISTORIAL.** Pedido por el autor el 12 de septiembre de 2026, con
+   la hoja de pegar en pantalla y los ejemplos rodeados a mano: «necesito
+   que allí pongas para poder seleccionar: Gemini, Perplexity, Claude».
+
+   Son los dos campos que HACEN FALTA para guardar, o sea los dos que se
+   escriben en **cada** texto, y siempre son los mismos tres o cuatro
+   valores. Escribirlos a mano en una tableta no es solo lento: **se
+   escriben mal**, y en el anaquel de esta casa hay un «Gemeni» de eso —
+   que parte en dos el montón del chip que agrupa por máquina, sin dar
+   ningún error y sin que nadie lo mire.
+
+   ⚠️ **Las voces salen del historial, nunca de una lista escrita**: la
+   voz que se imita es de cada casa —«Rulfo», «un narrador de pueblo», «un
+   informe de investigación»— y ninguna lista fija la puede adivinar. Es
+   la regla 2 del Apunte rápido. La **máquina** sí lleva lista
+   (`VOZ_MAQUINAS`), porque son cuatro y son las mismas para todo el
+   mundo; van detrás de las ya usadas y solo las que no estén.
+
+   ⚠️ **Y un nombre que se diferencia en UNA letra de uno bueno no se
+   propone**: un chip con «Gemeni» dentro reparte la errata en vez de
+   pararla, y con los dos a la vista nadie los distingue de un vistazo.
+   Una letra y no dos: a dos ya caben cosas distintas de verdad («Claude»
+   y «Claude 3»). Al texto viejo no se le toca nada por detrás; lo que
+   cambia es lo que se guarde de ahora en adelante.
+
+   Escribir a mano se sigue pudiendo —un chip que fuera la única manera
+   de rellenar el campo dejaría fuera la primera vez que se usa una voz
+   nueva—, el chip que coincide se marca solo al escribir, tocarlo otra
+   vez lo quita, y el aviso de «falta…» se apaga **en el momento**, no al
+   guardar.
 
 **Antes de publicar un cambio de La Voz Prestada:**
 
