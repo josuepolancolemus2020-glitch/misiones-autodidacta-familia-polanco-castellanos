@@ -2349,14 +2349,16 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
            vozPintarHerramientas() y lo elegido es del aparato. -->
       <div id="voz-herr" class="voz-herr"></div>
 
-      <!-- Dos filas de chips, género y voz, sacadas de los textos del
-           anaquel. Cada una se esconde cuando no separa nada. -->
-      <div class="voz-chips" id="voz-chips-gen" hidden></div>
-      <!-- Los estantes: los nombres con los que cada quien ordena su
-           anaquel. Salen de los textos, nunca de una lista escrita. -->
-      <div class="voz-chips" id="voz-chips-est" hidden></div>
-      <div class="voz-chips" id="voz-chips" hidden></div>
+      <!-- ⚠️ LO PUESTO SE VE; LO DEMÁS SE ABRE. Aquí había cinco filas de
+           chips —orden, agrupar, género, estante y voz— antes del primer
+           libro: media pantalla de mandos para llegar a lo que se venía
+           a ver. Ahora solo sale lo que está PUESTO, con su ✕ para
+           quitarlo, y lo demás vive en la hoja de 🗂 Estantes. -->
+      <div id="voz-filtro-puesto" class="voz-filtro-puesto" hidden></div>
       <div class="voz-lista" id="voz-lista"></div>
+      <!-- La barra de la selección múltiple, al pie y solo mientras se
+           está eligiendo. -->
+      <div id="voz-sel-barra" class="voz-sel-barra" hidden></div>
 
     </div>
   </div>
@@ -2538,6 +2540,22 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
        leer, copiar, compartir, corregir y retirar, y la etiqueta
        siempre arriba. Lo pinta vozMenuAbrir(); el botón de retirar es el
        de dos pasos, a la vista, sin `confirm()`. -->
+  <!-- ⚠️ LA HOJA DEL ANAQUEL: estantes, géneros y voces EN VERTICAL, una
+       fila por cosa, como los estantes de un lector de libros. Sirve
+       también para ordenar y para mover lo seleccionado: el cuerpo lo
+       pinta quien la abre. -->
+  <div id="voz-anaq-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal voz-anaq" role="dialog" aria-modal="true" aria-labelledby="voz-anaq-tit">
+      <div class="msug-det-head">
+        <div class="msug-det-titulo" id="voz-anaq-tit">🗂 Estantes</div>
+        <button type="button" class="msug-det-cerrar" id="voz-anaq-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="voz-anaq-cuerpo"></div>
+    </div>
+  </div>
+
   <div id="voz-menu-overlay" class="fin-modal-overlay" style="display:none;">
     <div class="fin-modal voz-menu" role="dialog" aria-modal="true" aria-labelledby="voz-menu-tit">
       <div class="msug-det-head">

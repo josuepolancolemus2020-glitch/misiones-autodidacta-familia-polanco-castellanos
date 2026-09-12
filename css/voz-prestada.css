@@ -213,9 +213,14 @@
    Chips y no desplegables: un toque en vez de dos. La vista es un
    grupo de tres botones con `aria-pressed`, como las pestañas de la
    sala. Lo elegido es del APARATO (localStorage), nunca de la nube. */
-.voz-herr { display: flex; flex-direction: column; gap: 2px; margin-bottom: 6px; }
+/* ⚠️ La regla de `.voz-herr` se escribe UNA sola vez, al final del
+   archivo. Aquí vivía la de antes —columna, para las cinco filas de
+   chips— y quedarse las dos, fiándose de que gana la de más abajo, es el
+   mismo fallo que las franjas de color de El Rodaje: no da error, no
+   rompe la página, y el día que alguien mueva un bloque la barra vuelve
+   a apilarse sin que nadie haya tocado nada. */
 .voz-vistas {
-  display: inline-flex; gap: 3px; align-self: flex-start; margin-bottom: 6px;
+  display: inline-flex; gap: 3px; flex: 0 0 auto;
   background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 3px;
 }
 .voz-vista {
@@ -224,11 +229,6 @@
   display: inline-flex; align-items: center; justify-content: center;
 }
 .voz-vista-on { background: var(--surface); color: var(--story); box-shadow: 0 1px 3px rgba(15,23,42,.14); }
-.voz-chips-herr { align-items: center; padding-bottom: 6px; margin-bottom: 0; }
-.voz-herr-rot {
-  flex: 0 0 auto; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
-  color: var(--muted); margin-right: 2px;
-}
 .voz-chip-chica { padding: 6px 11px; min-height: 32px; font-size: 12.5px; }
 .voz-orden-nota { margin: 0 0 4px; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
 
@@ -1167,6 +1167,109 @@
   padding: 6px 10px; font-size: 11px; color: var(--muted);
   border-top: 1px solid var(--border); font-family: system-ui, sans-serif;
 }
+
+/* ── La barra del anaquel, la hoja vertical y elegir varios ──────────
+   Rehecho el 12/9/2026: antes del primer libro había cinco filas de
+   chips. Ver la nota grande de voz-prestada.js. */
+/* ⚠️ Y se DESLIZAN en vez de envolverse, como los chips de materia de
+   Videos M.E.T.A.S: envueltos volverían a ser dos renglones, que es
+   justo lo que se vino a quitar. Aquí sí es la respuesta buena, porque
+   son cuatro cosas y no cinco filas. */
+.voz-herr {
+  display: flex; flex-direction: row; align-items: center; gap: 6px;
+  flex-wrap: nowrap; overflow-x: auto; margin-bottom: 10px;
+  padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.voz-herr::-webkit-scrollbar { display: none; }
+.voz-herr .voz-btn { flex: 0 0 auto; white-space: nowrap; }
+.voz-herr-btn { flex: 0 0 auto; }
+/* ⚠️ EL DEGRADADO DEL BORDE DICE QUE HAY MÁS. Medido: los mandos ocupan
+   393 px y la caja de un teléfono son de 280 a 390, así que algo asoma
+   siempre. Los tres botones caben enteros hasta en una pantalla de
+   320 px (265 px de 280) y lo que se sale es el cambio de vista, que se
+   toca una vez al mes; pero una barra que se desliza y no lo parece es
+   una barra que nadie desliza. Misma solución que los chips de materia
+   de Videos M.E.T.A.S. */
+.voz-herr {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+}
+/* Las vistas, al final y pegadas a la derecha cuando sobra sitio. Con la
+   barra llena, el margen automático se encoge solo y no estorba. */
+.voz-herr .voz-vistas { margin-left: auto; }
+.voz-herr .voz-vista { min-width: 36px; height: 32px; padding: 0 6px; font-size: 15px; }
+.voz-herr-on { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+/* Los filtros puestos, con su equis. Es lo único que queda a la vista. */
+.voz-filtro-puesto { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.voz-filtro-puesto[hidden] { display: none; }
+.voz-puesto {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  padding: 6px 10px; border-radius: 999px; min-height: 32px; font-size: 12.5px;
+  border: 1px solid var(--brand); background: var(--brand); color: #fff; font-weight: 600;
+}
+.voz-puesto-x { opacity: .8; font-size: 11px; }
+
+/* La hoja: una fila por estante, a lo ancho entero y de 44 px. */
+.voz-anaq { max-height: 86vh; }
+.voz-hoja-rot {
+  font-size: 10.5px; font-weight: 800; letter-spacing: .7px; text-transform: uppercase;
+  color: var(--muted); margin: 14px 0 4px;
+}
+.voz-hoja-rot:first-child { margin-top: 2px; }
+.voz-hoja-fila {
+  display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer;
+  padding: 11px 10px; min-height: 44px; border: 0; border-radius: 10px;
+  background: none; color: var(--text); font: inherit; font-size: 14px; text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.voz-hoja-fila:hover { background: var(--bg); }
+.voz-hoja-on { color: var(--brand); font-weight: 700; }
+.voz-hoja-ic { flex: 0 0 auto; font-size: 15px; }
+.voz-hoja-txt { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.voz-hoja-n {
+  flex: 0 0 auto; font-size: 11.5px; font-weight: 700; color: var(--muted);
+  background: var(--bg); border-radius: 99px; padding: 2px 8px;
+}
+.voz-hoja-tic { flex: 0 0 14px; color: var(--brand); font-weight: 800; }
+.voz-hoja-nota { font-size: 12.5px; color: var(--muted); line-height: 1.45; margin: 4px 0 8px; }
+.voz-hoja-aviso {
+  font-size: 12.5px; line-height: 1.45; color: #92400e; margin: 4px 0 8px;
+  background: var(--story-bg, #fdf6ec); border: 1px solid rgba(180,83,9,.3);
+  border-radius: 10px; padding: 8px 10px;
+}
+
+/* Elegir varios: la tarjeta marcada y la barra del pie. */
+.voz-elegible { cursor: pointer; }
+.voz-elegido { outline: 3px solid var(--brand); outline-offset: 2px; }
+/* ⚠️ La barra de elegidos se queda pegada abajo, pero POR DEBAJO de la
+   lista, no encima: `sticky` con `bottom: 0` la fija mientras se
+   desplaza y deja de tapar cuando se llega al final. Y la lista lleva
+   aire por debajo mientras se elige (`.voz-eligiendo`), porque si no,
+   los últimos textos —que son justo los que se van a tocar— quedan
+   detrás de ella. */
+.voz-sel-barra {
+  position: sticky; bottom: 0; z-index: 5;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 12px; margin-top: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; box-shadow: 0 -2px 14px rgba(15,23,42,.10);
+}
+.voz-sel-barra[hidden] { display: none; }
+.voz-sel-n { flex: 1 1 140px; font-size: 12.5px; font-weight: 600; color: var(--text); }
+body.voz-eligiendo #voz-lista { padding-bottom: 76px; }
+/* ⚠️ Y EL BOTÓN FLOTANTE DE DESTELLOS SE APARTA MIENTRAS SE ELIGE. Vive
+   en la esquina de abajo a la derecha, que es exactamente donde cae el
+   «✕ Salir» de esta barra: medido en el teléfono, se lo comía entero. Es
+   el mismo estorbo que ya está escrito en El Rodaje —allí se le quita el
+   puntero mientras dura un arrastre—, y aquí se esconde: mientras se
+   eligen textos no hay nada que apuntar en Destellos.
+   ⚠️ Y LLEVA `!important` A PROPÓSITO, que aquí no es pereza: `switchView`
+   (js/app.js) le escribe `style.display = 'flex'` EN LA ETIQUETA al
+   entrar en cada vista, y un estilo en la etiqueta le gana a cualquier
+   regla de una hoja por específica que sea. Sin esto la regla existe, no
+   da ningún error, y no hace nada — que es el peor de los fallos. */
+body.voz-eligiendo .destello-fab { display: none !important; }
 
 /* Los estantes: la fila de chips y el campo de crear uno nuevo. */
 .voz-est-nuevo { display: flex; gap: 6px; align-items: center; }

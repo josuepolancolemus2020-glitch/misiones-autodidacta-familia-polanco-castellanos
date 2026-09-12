@@ -174,6 +174,10 @@ let _vozEstadoNube = 'mirando'; // mirando | puesta | vieja | sin-tabla | sin-se
 let _vozFiltroVoz = '';    // '' = todas las voces
 let _vozFiltroGen = '';    // '' = todos los géneros
 let _vozFiltroEst = '';    // '' = todos los estantes
+/* La marca de «los que no están en ninguno». Un carácter que no puede
+   ser el nombre de un estante, para no confundirlo con uno que se
+   llamara así. */
+const VOZ_SIN_ESTANTE = '\u0000';
 let _vozBusca = '';
 let _vozLeyendo = null;    // el texto abierto en la sala
 let _vozCapActual = 0;
@@ -2070,7 +2074,7 @@ function vozVisibles() {
   return _vozCuentos.filter(c => {
     if (_vozFiltroVoz && (c.voz || '') !== _vozFiltroVoz) return false;
     if (_vozFiltroGen && vozGenero(c.genero).id !== _vozFiltroGen) return false;
-    if (_vozFiltroEst && !(_vozFiltroEst === '\u0000' ? !vozEstantesDe(c).length : vozEnEstante(c, _vozFiltroEst))) return false;
+    if (_vozFiltroEst && !(_vozFiltroEst === VOZ_SIN_ESTANTE ? !vozEstantesDe(c).length : vozEnEstante(c, _vozFiltroEst))) return false;
     if (!q) return true;
     const heno = vozSinTildes([c.titulo, c.voz, c.maquina, c.encargo, c.nota, vozGenero(c.genero).t]
       .concat(vozEstantesDe(c)).filter(Boolean).join(' ')).toLowerCase();
@@ -2273,7 +2277,7 @@ function vozAgrupa(lista) {
        por «Filosofía» enseñaba además el montón «Maestría» —porque el
        mismo texto está en los dos— y la pantalla contestaba a una
        pregunta que nadie hizo. */
-    const soloEste = _vozFiltroEst && _vozFiltroEst !== '\u0000' ? vozSinTildes(_vozFiltroEst).toLowerCase() : '';
+    const soloEste = _vozFiltroEst && _vozFiltroEst !== VOZ_SIN_ESTANTE ? vozSinTildes(_vozFiltroEst).toLowerCase() : '';
     lista.forEach(c => {
       const suyos = vozEstantesDe(c);
       if (!suyos.length) { sueltos.push(c); return; }
@@ -2337,66 +2341,11 @@ function vozRender() {
   }
 
   vozPintarHerramientas();
-
-  /* Los chips: género y voz, sacados de los textos y nunca de una lista
-     escrita aquí. Cada fila se esconde cuando no separa nada. */
-  const gchips = document.getElementById('voz-chips-gen');
-  if (gchips) {
-    gchips.textContent = '';
-    const gens = vozGenerosUsados();
-    const pon = (id, txt, n) => {
-      const b = vozBoton('voz-chip' + (_vozFiltroGen === id ? ' voz-chip-on' : ''), null, () => {
-        _vozFiltroGen = id; vozRender();
-        b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-      });
-      b.appendChild(vozNodo('span', null, txt));
-      if (n != null) b.appendChild(vozNodo('span', 'voz-chip-n', String(n)));
-      gchips.appendChild(b);
-    };
-    pon('', 'Todo', _vozCuentos.length);
-    gens.forEach(([g, n]) => pon(g.id, g.ic + ' ' + g.t, n));
-    gchips.hidden = gens.length < 2;
-  }
-  /* Los estantes: la fila de filtro, con «Sin estante» para encontrar
-     lo que falta por archivar, que es lo primero que hace falta cuando
-     se estrenan. */
-  const echips = document.getElementById('voz-chips-est');
-  if (echips) {
-    echips.textContent = '';
-    const ests = vozEstantesTodos();
-    const pon = (id, txt, n) => {
-      const b = vozBoton('voz-chip' + (_vozFiltroEst === id ? ' voz-chip-on' : ''), null, () => {
-        _vozFiltroEst = id; vozRender();
-        b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-      });
-      b.appendChild(vozNodo('span', null, txt));
-      if (n != null) b.appendChild(vozNodo('span', 'voz-chip-n', String(n)));
-      echips.appendChild(b);
-    };
-    const sinEstante = _vozCuentos.filter(c => !vozEstantesDe(c).length).length;
-    pon('', 'Todos los estantes', _vozCuentos.length);
-    ests.forEach(e => pon(e.t, '🗂 ' + e.t, e.n));
-    if (sinEstante && ests.length) pon('\u0000', '🗂 Sin estante', sinEstante);
-    echips.hidden = !ests.length;
-  }
-
-  const chips = document.getElementById('voz-chips');
-  if (chips) {
-    chips.textContent = '';
-    const voces = vozVoces();
-    const pon = (id, txt, n) => {
-      const b = vozBoton('voz-chip' + (_vozFiltroVoz === id ? ' voz-chip-on' : ''), null, () => {
-        _vozFiltroVoz = id; vozRender();
-        b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-      });
-      b.appendChild(vozNodo('span', null, txt));
-      if (n != null) b.appendChild(vozNodo('span', 'voz-chip-n', String(n)));
-      chips.appendChild(b);
-    };
-    pon('', 'Todas las voces', _vozCuentos.length);
-    voces.forEach(([v, n]) => pon(v, '🎭 ' + v, n));
-    chips.hidden = voces.length < 2;
-  }
+  /* Y debajo, SOLO lo que esté puesto. Las tres filas de chips de género,
+     estante y voz que había aquí se fueron a la hoja que abre 🗂 (regla
+     33): lo puesto se ve, lo demás se abre. */
+  vozPintarFiltroPuesto();
+  vozPintarSelBarra();
 
   const lista = vozOrdena(vozVisibles());
   cont.textContent = '';
@@ -2429,13 +2378,290 @@ function vozRender() {
   });
 }
 
-/* La fila de herramientas del anaquel: la vista, el orden y la
-   agrupación. Chips, no desplegables: un toque en vez de dos y un menú
-   del sistema. Se pinta desde las listas de arriba, nunca a mano. */
+/* ══════════════════════════════════════════════════════════════════
+   LA BARRA DEL ANAQUEL, Y LA HOJA DE LOS ESTANTES
+   ══════════════════════════════════════════════════════════════════
+   Rehecho el 12 de septiembre de 2026, con la captura del autor
+   delante: «observo una enorme carga cognitiva en estar clasificando o
+   categorizando, a mí me gusta como está configurado Google Play Libros
+   […] donde de manera vertical se despliegan para ver los anaqueles,
+   sin tantas vueltas».
+
+   Y tenía razón, y se podía contar: antes del primer libro había CINCO
+   filas de chips —vista, orden, agrupar, género, estante y voz—, todas
+   deslizándose a lo ancho. Media pantalla de mandos para llegar a lo que
+   se venía a ver, y ninguno contestaba la pregunta con la que uno abre
+   un anaquel, que es «¿dónde están mis cosas?».
+
+   ⚠️ LA REGLA QUE LO ORDENA TODO: LO PUESTO SE VE; LO DEMÁS SE ABRE.
+   En la barra queda solo la vista, un botón de estantes, uno de orden y
+   uno de elegir; debajo, únicamente los filtros que estén PUESTOS, cada
+   uno con su equis. Lo demás vive en una hoja que se abre, y dentro va
+   EN VERTICAL —una fila por estante, con su cuenta—, que es como se
+   miran los estantes de una estantería y como no se miran seis chips
+   que se deslizan.
+
+   ⚠️ Y NO CONTRADICE LA REGLA DE LOS CHIPS QUE SE DESLIZAN (la de las
+   materias de Videos M.E.T.A.S). Allí el problema era que ocho chips
+   ENVUELTOS ocupaban tres renglones y empujaban lo importante fuera de
+   la pantalla, y la respuesta fue deslizarlos. Aquí el problema es el
+   contrario: son CINCO FILAS de chips, y deslizar cada una no quita ni
+   una. Lo que sobra no es el envoltorio: es tenerlas todas a la vez. */
+
+/* Una fila de la hoja: icono, nombre, cuenta y la marca de lo puesto. A
+   lo ancho entero y de 44 px, que es un renglón de estantería y no un
+   chip que hay que cazar deslizando. */
+function vozFilaHoja(icono, texto, cuenta, puesto, alTocar, ayuda) {
+  const b = vozBoton('voz-hoja-fila' + (puesto ? ' voz-hoja-on' : ''), null, alTocar, ayuda);
+  b.setAttribute('aria-pressed', puesto ? 'true' : 'false');
+  b.appendChild(vozNodo('span', 'voz-hoja-ic', icono));
+  b.appendChild(vozNodo('span', 'voz-hoja-txt', texto));
+  if (cuenta != null) b.appendChild(vozNodo('span', 'voz-hoja-n', String(cuenta)));
+  b.appendChild(vozNodo('span', 'voz-hoja-tic', puesto ? '\u2713' : ''));
+  return b;
+}
+
+function vozAbrirHoja(titulo, pinta) {
+  const ov = document.getElementById('voz-anaq-overlay');
+  const cuerpo = document.getElementById('voz-anaq-cuerpo');
+  const tit = document.getElementById('voz-anaq-tit');
+  if (!ov || !cuerpo) return;
+  if (tit) tit.textContent = titulo;
+  cuerpo.textContent = '';
+  pinta(cuerpo);
+  ov.style.display = 'flex';
+}
+
+function vozCerrarHoja() {
+  const ov = document.getElementById('voz-anaq-overlay');
+  if (ov) ov.style.display = 'none';
+}
+
+/* La hoja de los estantes: los estantes primero —que es a lo que se
+   viene—, y debajo el género y la voz, que también son maneras de
+   buscar. Todo en vertical y todo con su cuenta. */
+function vozHojaEstantes(cuerpo) {
+  const total = _vozCuentos.length;
+  const elige = (campo, valor) => {
+    if (campo === 'est') _vozFiltroEst = valor;
+    if (campo === 'gen') _vozFiltroGen = valor;
+    if (campo === 'voz') _vozFiltroVoz = valor;
+    vozCerrarHoja();
+    vozRender();
+  };
+
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'ESTANTES'));
+  cuerpo.appendChild(vozFilaHoja('\ud83d\udcda', 'Todos los textos', total, !_vozFiltroEst,
+    () => elige('est', ''), 'Ver todo el anaquel'));
+  const ests = vozEstantesTodos();
+  ests.forEach(e => cuerpo.appendChild(vozFilaHoja('\ud83d\uddc2', e.t, e.n, _vozFiltroEst === e.t,
+    () => elige('est', e.t), 'Ver el estante «' + e.t + '»')));
+  const sinEstante = _vozCuentos.filter(c => !vozEstantesDe(c).length).length;
+  if (sinEstante) {
+    cuerpo.appendChild(vozFilaHoja('\ud83d\uddc2', 'Sin estante', sinEstante, _vozFiltroEst === VOZ_SIN_ESTANTE,
+      () => elige('est', VOZ_SIN_ESTANTE), 'Ver lo que falta por archivar'));
+  }
+  if (!ests.length) {
+    cuerpo.appendChild(vozNodo('p', 'voz-hoja-nota',
+      'Todavía no hay estantes. Elige varios textos con el botón de elegir y ponlos en uno, o créalo desde el menú de cualquiera.'));
+  }
+
+  const gens = vozGenerosUsados();
+  if (gens.length > 1) {
+    cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'GÉNERO'));
+    cuerpo.appendChild(vozFilaHoja('\ud83d\udcd8', 'Todos los géneros', total, !_vozFiltroGen, () => elige('gen', '')));
+    gens.forEach(([g, n]) => cuerpo.appendChild(vozFilaHoja(g.ic, g.t, n, _vozFiltroGen === g.id,
+      () => elige('gen', g.id))));
+  }
+
+  const voces = vozVoces();
+  if (voces.length > 1) {
+    cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'VOZ QUE SE IMITA'));
+    cuerpo.appendChild(vozFilaHoja('\ud83c\udfad', 'Todas las voces', total, !_vozFiltroVoz, () => elige('voz', '')));
+    voces.forEach(([v, n]) => cuerpo.appendChild(vozFilaHoja('\ud83c\udfad', v, n, _vozFiltroVoz === v,
+      () => elige('voz', v))));
+  }
+}
+
+function vozHojaOrden(cuerpo) {
+  const pon = (campo, id) => {
+    if (campo === 'orden') {
+      _vozAnaquel.orden = id;
+      if (id === 'manual' && !_vozAnaquel.manual.length) {
+        _vozAnaquel.manual = vozOrdena(_vozCuentos.slice()).map(c => c.cid);
+      }
+    } else _vozAnaquel.grupo = id;
+    vozGuardaAnaquel();
+    vozCerrarHoja();
+    vozRender();
+  };
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'ORDEN'));
+  VOZ_ORDENES.forEach(o => cuerpo.appendChild(vozFilaHoja('\u21c5', o.t, null, _vozAnaquel.orden === o.id,
+    () => pon('orden', o.id))));
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'AGRUPAR'));
+  VOZ_GRUPOS.forEach(g => cuerpo.appendChild(vozFilaHoja('\u25a4', g.t, null, _vozAnaquel.grupo === g.id,
+    () => pon('grupo', g.id))));
+}
+
+/* ══════════════ ELEGIR VARIOS Y MOVERLOS DE UNA VEZ ══════════════
+   La otra mitad de lo que se pidió: «en Play Libros se pueden
+   seleccionar varios libros y mandarlos a las categorías hechas». Con
+   veintidós textos por archivar, hacerlo de uno en uno son veintidós
+   vueltas por el menú de cada uno — y eso es justo la carga que sobraba.
+
+   ⚠️ Y SE ENTRA POR UN BOTÓN, NO SOLO POR UNA PULSACIÓN LARGA. Un gesto
+   que sea la única manera de hacer algo es algo que a veces no se puede
+   hacer: es la regla del asa de arrastre de la repisa. */
+let _vozSel = null;   // null = no se está eligiendo; si no, un Set de cid
+
+function vozSelActiva() { return !!_vozSel; }
+
+function vozSelAlterna(cid) {
+  if (!_vozSel) return;
+  if (_vozSel.has(cid)) _vozSel.delete(cid); else _vozSel.add(cid);
+  vozPintarSelBarra();
+  document.querySelectorAll('#voz-lista [data-voz-cid]').forEach(el => {
+    el.classList.toggle('voz-elegido', _vozSel.has(el.getAttribute('data-voz-cid')));
+  });
+}
+
+function vozSelEntrar() { _vozSel = new Set(); vozRender(); }
+function vozSelSalir() { _vozSel = null; vozRender(); }
+
+function vozPintarSelBarra() {
+  const barra = document.getElementById('voz-sel-barra');
+  if (!barra) return;
+  barra.textContent = '';
+  if (!_vozSel) { barra.hidden = true; document.body.classList.remove('voz-eligiendo'); return; }
+  barra.hidden = false;
+  document.body.classList.add('voz-eligiendo');
+  const n = _vozSel.size;
+  barra.appendChild(vozNodo('span', 'voz-sel-n', n === 0 ? 'Toca los textos que quieras mover'
+    : (n === 1 ? 'Un texto elegido' : n + ' textos elegidos')));
+  const mover = vozBoton('voz-btn voz-btn-pri voz-btn-chico', '\ud83d\uddc2 Mover a un estante',
+    () => vozAbrirHoja('\ud83d\uddc2 Mover a un estante', vozHojaMover));
+  mover.disabled = n === 0;
+  barra.appendChild(mover);
+  barra.appendChild(vozBoton('voz-btn voz-btn-chico', 'Salir', () => vozSelSalir(), 'Salir de elegir'));
+}
+
+/* La hoja de mover: los estantes en vertical, con la cuenta de cuántos
+   de los elegidos están YA en cada uno. Tocar uno los mete a todos; si
+   ya estaban todos, los saca. Es el mismo interruptor de siempre
+   aplicado a varios a la vez, y así una sola fila sirve para las dos
+   cosas.
+   ⚠️ Los textos AJENOS no se tocan y se dice: la seguridad por fila los
+   rechazaría, y hacer como que se movieron sería prometer algo que la
+   base deshace en el siguiente arranque. */
+function vozHojaMover(cuerpo) {
+  const elegidos = _vozCuentos.filter(c => _vozSel && _vozSel.has(c.cid));
+  const mios = elegidos.filter(vozEsMio);
+  const ajenos = elegidos.length - mios.length;
+
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-nota',
+    (mios.length === 1 ? 'Un texto elegido' : mios.length + ' textos elegidos') +
+    '. Toca un estante para meterlos; si ya están todos, los saca.'));
+  if (ajenos) {
+    cuerpo.appendChild(vozNodo('p', 'voz-hoja-aviso',
+      (ajenos === 1 ? 'Uno de los elegidos lo puso' : ajenos + ' de los elegidos los puso') +
+      ' otra persona de la casa: esos no se pueden mover.'));
+  }
+
+  const aplica = (nombre) => {
+    const dentro = mios.filter(c => vozEnEstante(c, nombre)).length;
+    const quitar = dentro === mios.length && mios.length > 0;
+    let tocados = 0;
+    mios.forEach(c => {
+      const l = vozEstantesDe(c);
+      const i = l.findIndex(e => vozSinTildes(e).toLowerCase() === vozSinTildes(nombre).toLowerCase());
+      if (quitar) { if (i < 0) return; l.splice(i, 1); }
+      else { if (i >= 0) return; if (l.length >= VOZ_EST_MAX) return; l.push(nombre); }
+      tocados++;
+      vozGuardaEstantes(c, l);
+    });
+    vozAviso(quitar ? 'Sacados de «' + nombre + '»'
+                    : (tocados === 1 ? 'Un texto' : tocados + ' textos') + ' en «' + nombre + '»');
+    vozAbrirHoja('\ud83d\uddc2 Mover a un estante', vozHojaMover);
+  };
+
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'ESTANTES'));
+  vozEstantesTodos().forEach(e => {
+    const dentro = mios.filter(c => vozEnEstante(c, e.t)).length;
+    cuerpo.appendChild(vozFilaHoja('\ud83d\uddc2', e.t,
+      dentro ? dentro + '/' + mios.length : null,
+      dentro === mios.length && mios.length > 0,
+      () => aplica(e.t)));
+  });
+
+  /* Crear uno nuevo aquí mismo: si hubiera que salir a crearlo, la
+     selección se perdería por el camino. */
+  const nuevo = vozNodo('div', 'voz-est-nuevo');
+  const inp = vozNodo('input', 'voz-est-in');
+  inp.type = 'text';
+  inp.maxLength = VOZ_EST_LARGO;
+  inp.placeholder = 'Un estante nuevo…';
+  inp.setAttribute('aria-label', 'Crear un estante nuevo');
+  const crea = () => {
+    const t = inp.value.replace(/\s+/g, ' ').trim().slice(0, VOZ_EST_LARGO);
+    if (!t) return;
+    inp.value = '';
+    aplica(t);
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); crea(); } });
+  nuevo.appendChild(inp);
+  nuevo.appendChild(vozBoton('voz-btn voz-btn-chico', '+ Crear y mover', crea));
+  cuerpo.appendChild(nuevo);
+}
+
+/* Los filtros PUESTOS, cada uno con su equis. Es lo único que queda a la
+   vista de las cinco filas de antes, y se esconde entero cuando no hay
+   ninguno. */
+function vozPintarFiltroPuesto() {
+  const caja = document.getElementById('voz-filtro-puesto');
+  if (!caja) return;
+  caja.textContent = '';
+  const puestos = [];
+  if (_vozFiltroEst) puestos.push(['\ud83d\uddc2 ' + (_vozFiltroEst === VOZ_SIN_ESTANTE ? 'Sin estante' : _vozFiltroEst),
+    () => { _vozFiltroEst = ''; vozRender(); }]);
+  if (_vozFiltroGen) puestos.push([vozGenero(_vozFiltroGen).ic + ' ' + vozGenero(_vozFiltroGen).t,
+    () => { _vozFiltroGen = ''; vozRender(); }]);
+  if (_vozFiltroVoz) puestos.push(['\ud83c\udfad ' + _vozFiltroVoz, () => { _vozFiltroVoz = ''; vozRender(); }]);
+  if (_vozAnaquel.grupo) {
+    const g = VOZ_GRUPOS.find(x => x.id === _vozAnaquel.grupo);
+    if (g) puestos.push(['\u25a4 ' + g.t, () => { _vozAnaquel.grupo = ''; vozGuardaAnaquel(); vozRender(); }]);
+  }
+  caja.hidden = !puestos.length;
+  puestos.forEach(([txt, quita]) => {
+    const b = vozBoton('voz-puesto', null, quita, 'Quitar «' + txt + '»');
+    b.appendChild(vozNodo('span', null, txt));
+    b.appendChild(vozNodo('span', 'voz-puesto-x', '\u2715'));
+    caja.appendChild(b);
+  });
+}
+
 function vozPintarHerramientas() {
   const caja = document.getElementById('voz-herr');
   if (!caja) return;
   caja.textContent = '';
+
+  /* ⚠️ LOS TRES BOTONES VAN PRIMERO Y LAS VISTAS AL FINAL, y no es
+     gusto: la barra se desliza, así que lo último es lo que se sale de
+     la pantalla. Puestas las vistas delante —que fue como nació— ☑
+     Elegir caía fuera del borde derecho EN TODOS los teléfonos
+     (medido: 435 px de mandos en una caja de 280 a 390), o sea que la
+     mitad de lo que se pidió este día no se veía sin deslizar una barra
+     que no parece deslizarse. Y de las cuatro cosas, la vista es la que
+     se toca una vez al mes; los estantes, cada vez. Además es donde las
+     pone Play Libros: el nombre y las acciones a la izquierda, el
+     cambio de vista a la derecha. */
+  caja.appendChild(vozBoton('voz-btn voz-btn-chico voz-herr-btn', '\ud83d\uddc2 Estantes',
+    () => vozAbrirHoja('\ud83d\uddc2 Estantes', vozHojaEstantes), 'Ver los estantes, los géneros y las voces'));
+  caja.appendChild(vozBoton('voz-btn voz-btn-chico voz-herr-btn', '\u21c5 Orden',
+    () => vozAbrirHoja('\u21c5 Orden del anaquel', vozHojaOrden), 'Cambiar el orden y la agrupación'));
+  caja.appendChild(vozBoton('voz-btn voz-btn-chico voz-herr-btn' + (vozSelActiva() ? ' voz-herr-on' : ''),
+    vozSelActiva() ? '\u2715 Salir' : '\u2611 Elegir',
+    () => (vozSelActiva() ? vozSelSalir() : vozSelEntrar()),
+    'Elegir varios textos para moverlos de una vez'));
 
   const vistas = vozNodo('div', 'voz-vistas');
   vistas.setAttribute('role', 'group');
@@ -2448,27 +2674,6 @@ function vozPintarHerramientas() {
     vistas.appendChild(b);
   });
   caja.appendChild(vistas);
-
-  const fila = (rotulo, ops, activo, alTocar) => {
-    const f = vozNodo('div', 'voz-chips voz-chips-herr');
-    f.appendChild(vozNodo('span', 'voz-herr-rot', rotulo));
-    ops.forEach(o => {
-      const b = vozBoton('voz-chip voz-chip-chica' + (o.id === activo ? ' voz-chip-on' : ''), o.t, () => {
-        alTocar(o.id);
-        b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-      });
-      f.appendChild(b);
-    });
-    caja.appendChild(f);
-  };
-  fila('Orden', VOZ_ORDENES, _vozAnaquel.orden, id => {
-    _vozAnaquel.orden = id;
-    if (id === 'manual' && !_vozAnaquel.manual.length) {
-      _vozAnaquel.manual = vozOrdena(_vozCuentos.slice()).map(c => c.cid);
-    }
-    vozGuardaAnaquel(); vozRender();
-  });
-  fila('Agrupar', VOZ_GRUPOS, _vozAnaquel.grupo, id => { _vozAnaquel.grupo = id; vozGuardaAnaquel(); vozRender(); });
 }
 
 function vozVacio() {
@@ -2516,10 +2721,17 @@ function vozSigueLeyendo(c) {
    la llave con la que el arrastre los reconoce en el documento, y el
    asa ⠿ solo en el orden manual. */
 function vozItem(c, manual) {
+  /* Eligiendo, no hay asa: el dedo está para marcar, no para arrastrar,
+     y dos gestos sobre la misma tarjeta se pisan. */
+  if (vozSelActiva()) manual = false;
   const el = _vozAnaquel.vista === 'cuadricula' ? vozPortadaMini(c)
            : _vozAnaquel.vista === 'lista' ? vozFila(c)
            : vozFicha(c);
   el.setAttribute('data-voz-cid', c.cid);
+  if (vozSelActiva()) {
+    el.classList.add('voz-elegible');
+    if (_vozSel.has(c.cid)) el.classList.add('voz-elegido');
+  }
   if (manual) {
     const asa = vozBoton('voz-asa', '⠿', null, 'Mover «' + (c.titulo || 'este texto') + '»: arrastra, o usa las flechas del teclado');
     asa.setAttribute('data-voz-asa', '1');
@@ -6470,6 +6682,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ov) ov.style.display = 'none';
   });
   on('voz-menu-cerrar', 'click', vozCerrarMenu);
+  on('voz-anaq-cerrar', 'click', vozCerrarHoja);
+  on('voz-anaq-overlay', 'click', e => { if (e.target.id === 'voz-anaq-overlay') vozCerrarHoja(); });
+  /* ⚠️ EL TOQUE SE ATRAPA EN LA CAPTURA. Eligiendo, una tarjeta no abre
+     nada: se marca. Si se dejara llegar al botón de leer o al menú, el
+     primer toque abriría el lector y la selección se perdería. */
+  const lista = document.getElementById('voz-lista');
+  if (lista) {
+    lista.addEventListener('click', e => {
+      if (!vozSelActiva()) return;
+      const el = e.target && e.target.closest ? e.target.closest('[data-voz-cid]') : null;
+      if (!el) return;
+      e.preventDefault();
+      e.stopPropagation();
+      vozSelAlterna(el.getAttribute('data-voz-cid'));
+    }, true);
+  }
   /* Tocar fuera de la hoja del menú la cierra, como las demás de la
      casa; dentro, no. */
   on('voz-menu-overlay', 'click', e => { if (e.target.id === 'voz-menu-overlay') vozCerrarMenu(); });

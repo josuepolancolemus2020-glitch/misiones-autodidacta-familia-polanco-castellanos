@@ -231,6 +231,28 @@ function margenVisible(w){
   })()`);
 }
 
+/* ── La hoja del anaquel (rehecha el 12/9/2026) ──────────────────
+   Desde que la barra es de una fila, los filtros y el orden viven
+   dentro de una hoja que se abre. La sonda la abre y pulsa sus filas
+   COMO SE PULSAN de verdad, no llamando a `vozHojaEstantes` por
+   dentro: lo que puede fallar ahí —un botón que no se alcanza, una
+   hoja que no abre— no se ve llamando funciones. */
+function abreHoja(d, rotulo){
+  const b = [...d.querySelectorAll('#voz-herr .voz-herr-btn')].find(x => x.textContent.indexOf(rotulo) > -1);
+  if (b) b.click();
+  return b;
+}
+function filaHoja(d, txt){
+  return [...d.querySelectorAll('#voz-anaq-cuerpo .voz-hoja-fila')]
+    .find(x => (x.querySelector('.voz-hoja-txt') || {}).textContent === txt);
+}
+function vozCerrarHojaSonda(w){ w.eval('vozCerrarHoja()'); }
+function filasHoja(d){
+  return [...d.querySelectorAll('#voz-anaq-cuerpo .voz-hoja-fila')]
+    .map(x => (x.querySelector('.voz-hoja-txt') || {}).textContent +
+              ((x.querySelector('.voz-hoja-n') || {}).textContent ? ' ' + x.querySelector('.voz-hoja-n').textContent : ''));
+}
+
 (async () => {
   await new Promise(r => f.addEventListener('load', r, { once: true }));
   await esperar(1200);
@@ -1276,9 +1298,16 @@ function margenVisible(w){
   await esperar(250);
   ok(d.querySelectorAll('#voz-lista .voz-ficha').length === 4 && d.querySelectorAll('#voz-lista .voz-ficha .voz-etiqueta').length === 4, 'y detalle vuelve a las fichas, con su etiqueta', 'detalle no pinta las fichas');
   ok(JSON.parse(w.localStorage.getItem('faro_voz_anaquel_v1') || '{}').vista === 'detalle', 'la vista elegida se recuerda en el aparato', 'la vista no se guarda en el aparato');
-  const chipHerr = txt => [...d.querySelectorAll('#voz-herr .voz-chip')].find(b => b.textContent.trim() === txt);
-  chipHerr('Por voz').click();
-  await esperar(250);
+  /* Desde el 12/9/2026 el orden y la agrupación no son chips en la
+     barra: viven en la hoja ⇅ Orden, que se abre. Se pulsa de verdad. */
+  const ponOrden = async txt => { abreHoja(d, 'Orden'); await esperar(150); const fl = filaHoja(d, txt); if (fl) fl.click(); await esperar(250); };
+  ok(!!abreHoja(d, 'Orden'), 'el ⇅ Orden de la barra abre su hoja', 'no hay botón de orden en la barra');
+  await esperar(150);
+  ok(filasHoja(d).join('|').indexOf('Sin agrupar') > -1 && filasHoja(d).join('|').indexOf('Recientes') > -1,
+     'y dentro van el orden y la agrupación, en vertical y una por renglón',
+     'la hoja de orden no trae sus filas: ' + JSON.stringify(filasHoja(d)));
+  vozCerrarHojaSonda(w);
+  await ponOrden('Por voz');
   const grupos = [...d.querySelectorAll('#voz-lista .voz-grupo-tit')];
   ok(grupos.length === 3 && grupos.every(g => /al modo de/.test(g.textContent)), 'agrupar por voz hace un grupo por escritor imitado (tres voces, cuatro textos)', 'por voz no salen tres grupos: ' + grupos.length);
   const coherente = w.eval(`(function(){ return [...document.querySelectorAll('#voz-lista .voz-grupo-tit')].every(t => {
@@ -1287,13 +1316,10 @@ function margenVisible(w){
     return cids.length > 0 && voces.size === 1 && t.textContent.indexOf([...voces][0]) > -1; }); })()`);
   ok(coherente === true, 'y cada grupo lleva solo los textos de su voz, y se llama como ella', 'un grupo mezcla voces');
   ok(grupos.length && /Rulfo/.test(grupos[0].textContent) && /2 textos/.test(grupos[0].textContent), 'la voz con más textos va primero, con su cuenta', 'el orden o la cuenta de los grupos está mal: ' + (grupos[0] ? grupos[0].textContent : ''));
-  chipHerr('Por género').click();
-  await esperar(250);
+  await ponOrden('Por género');
   ok(d.querySelectorAll('#voz-lista .voz-grupo-tit').length === 2, 'por género, dos grupos', 'por género no salen dos grupos');
-  chipHerr('Sin agrupar').click();
-  await esperar(150);
-  chipHerr('Título').click();
-  await esperar(250);
+  await ponOrden('Sin agrupar');
+  await ponOrden('Título');
   const titulos = [...d.querySelectorAll('#voz-lista .voz-ficha-tit')].map(e => e.textContent);
   ok(titulos.join('|') === 'Bruma|Ceniza|Marea|Zanja', 'ordenar por título ordena por título', 'el orden por título salió: ' + titulos.join('|'));
   /* El orden a mano se prueba en la vista de lista, que es donde caben
@@ -1301,8 +1327,7 @@ function margenVisible(w){
      lo que usa el arrastre, no ve nada fuera de la ventana. */
   vistas.find(b => /lista/i.test(b.getAttribute('aria-label'))).click();
   await esperar(200);
-  chipHerr('Manual (este aparato)').click();
-  await esperar(250);
+  await ponOrden('Manual (este aparato)');
   const asas = [...d.querySelectorAll('#voz-lista .voz-asa')];
   ok(asas.length === 4 && w.getComputedStyle(asas[0]).touchAction === 'none', 'en orden manual cada texto lleva su asa, con touch-action: none', 'faltan asas o el touch-action no es none');
   ok(!!d.querySelector('#voz-lista .voz-orden-nota'), 'y se explica con palabras encima de la lista', 'no se explica el arrastre');
@@ -1340,8 +1365,7 @@ function margenVisible(w){
   await w.eval('initVozPrestada()');
   await esperar(400);
   ok(cids().join() === ordenC.join() && d.querySelectorAll('#voz-lista .voz-asa').length === 4, 'y se conserva al volver a abrir la herramienta', 'al volver a abrir se perdió el orden a mano: ' + cids().join());
-  chipHerr('Recientes').click();
-  await esperar(150);
+  await ponOrden('Recientes');
 
   log('── 26. EL PUENTE: las lecturas de las misiones entran al anaquel ──');
   /* js/lecturas.js deja la lectura en la cola faro_voz_entrantes_v1 y
@@ -2088,12 +2112,21 @@ function margenVisible(w){
      '⚠️ y un texto sale en CADA uno de sus estantes: enseñarlo solo en el primero lo escondería del montón donde se le va a buscar',
      'un texto con dos estantes no sale en los dos: ' + JSON.stringify(titulosGrupo));
 
-  const chipsEst = [...d.querySelectorAll('#voz-chips-est .voz-chip')].map(x => x.textContent);
-  ok(chipsEst.some(t => /Maestría2$|Maestría 2$|Maestría/.test(t)) && chipsEst.some(t => /Sin estante/.test(t)),
-     'y la fila de filtro trae los estantes con su cuenta, y «Sin estante» para encontrar lo que falta por archivar',
-     'los chips de estante no están bien: ' + JSON.stringify(chipsEst));
-  [...d.querySelectorAll('#voz-chips-est .voz-chip')].find(x => /Filosofía/.test(x.textContent)).click();
+  abreHoja(d, 'Estantes');
+  await esperar(200);
+  const enHoja = filasHoja(d);
+  ok(enHoja.indexOf('Maestría 2') > -1 && enHoja.some(t => /^Sin estante/.test(t)),
+     'y la hoja 🗂 trae los estantes con su cuenta, y «Sin estante» para encontrar lo que falta por archivar',
+     'la hoja de estantes no está bien: ' + JSON.stringify(enHoja));
+  filaHoja(d, 'Filosofía').click();
   await esperar(300);
+  ok(d.getElementById('voz-anaq-overlay').style.display === 'none',
+     '⚠️ y elegir un estante CIERRA la hoja: se vino a ver ese montón, no a seguir mirando la lista de estantes',
+     'la hoja se queda abierta encima de lo que se vino a ver');
+  const puesto33 = [...d.querySelectorAll('#voz-filtro-puesto .voz-puesto')].map(x => x.textContent);
+  ok(puesto33.some(t => /Filosofía/.test(t) && /\u2715/.test(t)),
+     'y lo puesto queda a la vista, con su equis para quitarlo',
+     'el filtro puesto no sale: ' + JSON.stringify(puesto33));
   const fichasFil = [...d.querySelectorAll('#voz-lista .voz-ficha')];
   ok(fichasFil.length === 1 && /La Disputa/.test(fichasFil[0].textContent),
      'tocar un estante deja solo sus textos', 'el filtro por estante no filtra: ' + fichasFil.length + ' fichas');
@@ -2101,8 +2134,12 @@ function margenVisible(w){
      [...d.querySelectorAll('#voz-lista .voz-grupo-txt')].map(x => x.textContent).join() === '🗂 Filosofía',
      '⚠️ y sale SOLO ese montón: con el mismo texto en dos estantes, enseñar también el otro contesta a una pregunta que nadie hizo',
      'filtrando por un estante salen otros montones: ' + JSON.stringify([...d.querySelectorAll('#voz-lista .voz-grupo-txt')].map(x => x.textContent)));
-  [...d.querySelectorAll('#voz-chips-est .voz-chip')][0].click();
+  [...d.querySelectorAll('#voz-filtro-puesto .voz-puesto')].find(x => /Filosofía/.test(x.textContent)).click();
   await esperar(300);
+  const traAspa = [...d.querySelectorAll('#voz-lista .voz-ficha-tit')].map(x => x.textContent);
+  ok(!w.eval('_vozFiltroEst') &&
+     ['El Leviatán', 'La Disputa', 'Sin archivar'].every(t => traAspa.indexOf(t) > -1),
+     'y la equis lo quita y vuelve el anaquel entero', 'la equis no quitó el filtro: ' + JSON.stringify(traAspa));
 
   /* Ponerlos desde el menú ⋯, que es lo que hace llevadero archivar
      veinte textos que ya estaban: pulsando de verdad. */
@@ -2158,6 +2195,171 @@ function margenVisible(w){
      'la subida no se adapta a la base vieja: ' + JSON.stringify(sub33b));
   w.eval(`_vozFaltan = []; _vozNubeVieja = false; _vozAnaquel.grupo = ''; vozGuardaAnaquel()`);
   nuevaBase(w, {});
+
+  log('── 34. EL ANAQUEL A LA MANERA DE PLAY LIBROS: una barra, una hoja y elegir varios ──');
+  /* Pedido por el autor el 12 de septiembre de 2026 con su captura
+     delante: «observo una enorme carga cognitiva en estar clasificando
+     […] me gusta como está configurado Google Play Libros, donde de
+     manera vertical se despliegan para ver los anaqueles, sin tantas
+     vueltas. Igual se pueden seleccionar varios libros y mandarlos a
+     las categorías».
+
+     Lo que se mide aquí es lo que se pidió, y se mide en la PANTALLA:
+     que la barra sea UNA fila (antes eran cinco, y esa era la carga),
+     que la hoja despliegue los estantes EN VERTICAL, y que se puedan
+     elegir varios y moverlos de una vez PULSANDO de verdad. Nada de
+     esto se ve llamando funciones. */
+  const base34 = nuevaBase(w, {});
+  const c34 = (cid, tit, est, mio) => ({ cid: cid, titulo: tit, genero: 'ensayo', voz: 'Investigación profunda',
+    maquina: 'Gemini', capitulos: [{ t: '', p: [{ k: 'p', t: 'Algo.' }] }], palabras: 1, borrado: false,
+    actualizado: 1, estantes: est, puesto_por: mio === false ? 'otra-persona-de-la-casa' : VOZ_UID });
+  w.eval(`_vozCuentos = ${JSON.stringify([
+    c34('m1', 'El Leviatán', []),
+    c34('m2', 'La Disputa', []),
+    c34('m3', 'La Criba', ['Maestría']),
+    c34('m4', 'De otra persona', [], false),
+  ])}; vozGuardaLocal(); _vozSel = null; _vozAnaquel.vista = 'lista'; _vozAnaquel.grupo = ''; _vozAnaquel.orden = 'recientes';
+       vozGuardaAnaquel(); _vozFiltroEst = ''; _vozFiltroGen = ''; _vozFiltroVoz = ''; _vozBusca = ''; vozRender()`);
+  await esperar(400);
+
+  /* ── La barra: una fila, y lo que no está puesto no ocupa sitio ── */
+  const herr = d.getElementById('voz-herr');
+  const hijos34 = [...herr.children].filter(x => x.getBoundingClientRect().width > 0);
+  /* ⚠️ «Una fila» NO se mide por el `top` de cada hijo. Con
+     align-items:center, el grupo de vistas (44 px) y un botón (32 px)
+     empiezan a alturas distintas, y contar tops diría dos renglones
+     donde hay uno: la sonda suspendería por su propia medida. Lo que de
+     verdad dice que van en fila es que todos SE CRUZAN en vertical. */
+  const r0 = hijos34[0].getBoundingClientRect();
+  const enFila = hijos34.every(x => { const r = x.getBoundingClientRect(); return r.top < r0.bottom && r.bottom > r0.top; });
+  ok(hijos34.length === 4 && enFila,
+     '⚠️ la barra del anaquel es UNA sola fila: las vistas y tres botones (' + hijos34.length + ' cosas, todas en el mismo renglón)',
+     '⚠️ la barra vuelve a ocupar varios renglones: ' + JSON.stringify(hijos34.map(x => Math.round(x.getBoundingClientRect().top))));
+  ok(herr.getBoundingClientRect().height < 60,
+     'y mide menos de 60 px de alto, que es lo que se ahorró de las cinco filas de chips de antes',
+     'la barra mide ' + Math.round(herr.getBoundingClientRect().height) + ' px de alto');
+  ok(d.getElementById('voz-filtro-puesto').hidden,
+     'y sin ningún filtro puesto no se enseña ninguna fila de filtros: lo puesto se ve, lo demás se abre',
+     'la fila de filtros sale aunque no haya ninguno puesto');
+  /* ⚠️ Y LOS TRES BOTONES CABEN ENTEROS DENTRO DE LA BARRA. Esto se
+     cazó mirando una foto y no leyendo el código: la barra se desliza,
+     y con las vistas delante ☑ Elegir —que es la mitad de lo que se
+     pidió— caía fuera del borde derecho en TODOS los teléfonos. No daba
+     error, la barra era de una fila y el HTML estaba bien; solo que la
+     función no se veía. Se mide en píxeles, como el color calculado. */
+  const rHerr = herr.getBoundingClientRect();
+  const fuera = [...herr.querySelectorAll('.voz-herr-btn')]
+    .filter(x => { const r = x.getBoundingClientRect(); return r.right > rHerr.right + 1 || r.left < rHerr.left - 1; })
+    .map(x => x.textContent.trim());
+  ok(fuera.length === 0,
+     '⚠️ y los tres botones —🗂 Estantes, ⇅ Orden y ☑ Elegir— caben ENTEROS en la barra de un teléfono: lo que asoma por la derecha es el cambio de vista, que se toca una vez al mes',
+     '⚠️ un botón de la barra se sale del borde y no se ve: ' + JSON.stringify(fuera));
+  const topBarra = herr.getBoundingClientRect().bottom;
+  const topPrimero = d.querySelector('#voz-lista .voz-fila').getBoundingClientRect().top;
+  ok(topPrimero - topBarra < 120,
+     'y el primer texto empieza a menos de 120 px de la barra (' + Math.round(topPrimero - topBarra) + ' px): antes había media pantalla de mandos por delante',
+     'todavía hay ' + Math.round(topPrimero - topBarra) + ' px de mandos antes del primer texto');
+
+  /* ── La hoja: en vertical, un renglón por estante, y de 44 px ── */
+  abreHoja(d, 'Estantes');
+  await esperar(250);
+  const filas34 = [...d.querySelectorAll('#voz-anaq-cuerpo .voz-hoja-fila')];
+  ok(d.getElementById('voz-anaq-overlay').style.display !== 'none' && filas34.length >= 2,
+     'el botón 🗂 Estantes abre la hoja', 'la hoja no abre o sale vacía');
+  const izq34 = new Set(filas34.map(x => Math.round(x.getBoundingClientRect().left)));
+  ok(izq34.size === 1 && filas34[0].getBoundingClientRect().top < filas34[1].getBoundingClientRect().top,
+     '⚠️ y los estantes se despliegan EN VERTICAL, uno por renglón, como los estantes de una estantería',
+     '⚠️ los estantes no van en vertical: ' + izq34.size + ' sangrías distintas');
+  ok(filas34.every(x => x.getBoundingClientRect().height >= 40),
+     'y cada renglón mide 40 px o más: es un renglón que se toca con el dedo, no un chip que se caza deslizando',
+     'un renglón de la hoja mide ' + Math.round(Math.min(...filas34.map(x => x.getBoundingClientRect().height))) + ' px');
+  ok(filasHoja(d).indexOf('Todos los textos 4') === 0,
+     'y arriba del todo, «Todos los textos» con su cuenta', 'la hoja no empieza por «Todos los textos»: ' + JSON.stringify(filasHoja(d)));
+  const rots34 = [...d.querySelectorAll('#voz-anaq-cuerpo .voz-hoja-rot')].map(x => x.textContent);
+  ok(rots34.indexOf('ESTANTES') === 0,
+     'y los ESTANTES van primero, que es a lo que se abre esta hoja', 'los estantes no van primero: ' + JSON.stringify(rots34));
+  vozCerrarHojaSonda(w);
+  await esperar(150);
+
+  /* ── Elegir varios y moverlos de una vez ── */
+  const botElegir = [...d.querySelectorAll('#voz-herr .voz-herr-btn')].find(x => /Elegir/.test(x.textContent));
+  botElegir.click();
+  await esperar(300);
+  ok(!d.getElementById('voz-sel-barra').hidden,
+     '☑ Elegir enciende la barra de elegidos', 'el botón de elegir no enciende nada');
+  const filasSel = [...d.querySelectorAll('#voz-lista [data-voz-cid]')];
+  ok(filasSel.length === 4 && filasSel.every(x => x.classList.contains('voz-elegible')),
+     'y todos los textos quedan elegibles', 'los textos no se marcan como elegibles');
+  ok(!d.querySelector('#voz-lista .voz-asa'),
+     '⚠️ y el asa de arrastrar se retira mientras se elige: el mismo dedo no puede querer dos cosas a la vez',
+     '⚠️ el asa de arrastrar sigue puesta mientras se elige');
+  /* Se PULSAN los textos, no se llama a vozSelAlterna. */
+  filasSel[0].click();
+  filasSel[1].click();
+  filasSel[3].click();   // este es de otra persona
+  await esperar(250);
+  ok(filasSel[0].classList.contains('voz-elegido') && filasSel[1].classList.contains('voz-elegido'),
+     'tocar un texto lo elige, y se ve', 'tocar un texto no lo elige');
+  ok(!d.getElementById('voz-menu-overlay') || d.getElementById('voz-menu-overlay').style.display === 'none',
+     '⚠️ y NO abre el texto ni su menú: mientras se elige, el toque elige y nada más',
+     '⚠️ tocar un texto mientras se elige abrió otra cosa encima');
+  ok(/3 textos elegidos/.test(d.getElementById('voz-sel-barra').textContent),
+     'y la barra dice cuántos van', 'la barra no lleva la cuenta: ' + d.getElementById('voz-sel-barra').textContent);
+  /* ⚠️ Y EL BOTÓN FLOTANTE DE DESTELLOS NO PUEDE TAPAR LA BARRA. Vive en
+     la esquina de abajo a la derecha, que es donde cae «✕ Salir»: medido
+     en la foto, se lo comía entero. Y la regla que lo aparta necesitó
+     `!important`, porque `switchView` le escribe el display en la
+     etiqueta — o sea que la regla podía existir y no hacer nada. */
+  const fab34 = d.querySelector('.destello-fab');
+  ok(!fab34 || w.getComputedStyle(fab34).display === 'none',
+     '⚠️ y el botón flotante de Destellos se aparta mientras se elige: cae justo encima de «✕ Salir»',
+     '⚠️ el botón flotante sigue encima de la barra de elegidos');
+
+  const antes34 = base34.escritas.length;
+  [...d.querySelectorAll('#voz-sel-barra .voz-btn')].find(x => /Mover/.test(x.textContent)).click();
+  await esperar(300);
+  ok(/otra persona/.test(d.getElementById('voz-anaq-cuerpo').textContent),
+     '⚠️ y la hoja de mover avisa de los ajenos: la seguridad por fila los rechazaría, y moverlos en la pantalla sería prometer algo que la base deshace',
+     '⚠️ no avisa de que uno de los elegidos es de otra persona');
+  d.querySelector('#voz-anaq-cuerpo .voz-est-in').value = 'Para la tesis';
+  [...d.querySelectorAll('#voz-anaq-cuerpo .voz-btn')].find(x => /Crear y mover/.test(x.textContent)).click();
+  await esperar(500);
+  const tras34 = JSON.parse(w.eval(`JSON.stringify(_vozCuentos.map(c => c.cid + ':' + vozEstantesDe(c).join('+')))`));
+  ok(tras34.indexOf('m1:Para la tesis') > -1 && tras34.indexOf('m2:Para la tesis') > -1,
+     'un toque mueve TODOS los elegidos al estante, y el campo lo crea si no existía (' + JSON.stringify(tras34) + ')',
+     'mover varios de una vez no funcionó: ' + JSON.stringify(tras34));
+  ok(tras34.indexOf('m4:') > -1,
+     '⚠️ y el texto ajeno se queda como estaba', '⚠️ tocó un texto de otra persona: ' + JSON.stringify(tras34));
+  ok(!d.querySelector('#voz-sel-barra').hidden && /3 textos elegidos/.test(d.getElementById('voz-sel-barra').textContent),
+     '⚠️ y la selección NO se pierde al crear el estante: si se perdiera, archivar veinte textos serían veinte selecciones',
+     '⚠️ se perdió la selección al mover');
+  const subidos34 = base34.escritas.slice(antes34).map(x => x.cid + ':' + (x.estantes || []).join('+'));
+  ok(subidos34.indexOf('m1:Para la tesis') > -1 && subidos34.indexOf('m2:Para la tesis') > -1 &&
+     subidos34.every(x => x.indexOf('m4:') !== 0),
+     '⚠️ y lo movido VIAJA a la nube, sin el ajeno', '⚠️ lo movido no llegó bien a la nube: ' + JSON.stringify(subidos34));
+  /* El mismo renglón saca lo que ya estaba dentro: un solo interruptor. */
+  const filaTesis = filaHoja(d, 'Para la tesis');
+  ok(filaTesis && filaTesis.getAttribute('aria-pressed') === 'true',
+     'con todos los elegidos dentro, el renglón sale marcado', 'el renglón no dice que ya están todos dentro');
+  filaTesis.click();
+  await esperar(400);
+  const tras34b = JSON.parse(w.eval(`JSON.stringify(_vozCuentos.map(c => c.cid + ':' + vozEstantesDe(c).join('+')))`));
+  ok(tras34b.indexOf('m1:') > -1 && tras34b.indexOf('m2:') > -1,
+     'y volver a tocarlo los saca: un solo renglón para meter y para sacar',
+     'volver a tocar el estante no los sacó: ' + JSON.stringify(tras34b));
+  vozCerrarHojaSonda(w);
+  await esperar(100);
+  [...d.querySelectorAll('#voz-sel-barra .voz-btn')].find(x => /Salir/.test(x.textContent)).click();
+  await esperar(300);
+  ok(d.getElementById('voz-sel-barra').hidden && !d.querySelector('#voz-lista .voz-elegible'),
+     'y «Salir» devuelve el anaquel de siempre', 'no se sale de elegir');
+  const trasSalir = d.querySelectorAll('#voz-lista [data-voz-cid]').length;
+  filasSel[0] && d.querySelectorAll('#voz-lista [data-voz-cid]')[0].click();
+  await esperar(250);
+  ok(trasSalir === 4 && d.getElementById('voz-lector').style.display !== 'none',
+     'y fuera de elegir, tocar un texto vuelve a abrirlo para leer', 'fuera de elegir, tocar un texto ya no lo abre');
+  w.eval('vozCerrarLector()');
+  await esperar(200);
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
