@@ -319,7 +319,7 @@ revoke execute on function public.voz_prestada_higiene() from public, anon, auth
 with c(orden, que, esperado, hay) as (
             select 1, 'tabla voz_prestada', 'existe',
                    case when to_regclass('public.voz_prestada') is null then 'NO ESTÁ' else 'existe' end
-  union all select 2, 'columnas (han de ser 14)', '14',
+  union all select 2, 'columnas (han de ser 15)', '15',
                    (select count(*)::text from information_schema.columns
                      where table_schema = 'public' and table_name = 'voz_prestada')
   union all select 3, 'políticas (select, insert, update)', '3',
