@@ -1962,6 +1962,21 @@ el diseño.
    vez lo quita, y el aviso de «falta…» se apaga **en el momento**, no al
    guardar.
 
+   ⚠️ **Y LA ERRATA QUE YA ESTÁ EN EL ANAQUEL SE ARREGLA DESDE EL
+   ANAQUEL, NO DESDE EL REPOSITORIO.** «Corrige el Gemeni del anaquel a
+   Gemini» (el autor, 12 de septiembre de 2026): esa errata vive DENTRO
+   de sus textos, y la única mano que puede escribir esas filas es la
+   suya —la seguridad por fila no deja otra—, así que lo que se pone es
+   el arreglo a un toque: el anaquel avisa de la máquina que está **a una
+   letra** de una buena y ofrece cambiarla en todos sus textos de una vez
+   (`vozMaquinasTorcidas`, `vozUnificarMaquina`). Sube por `vozSubir`, el
+   camino de siempre, que ya sabe reintentar y distinguir los motivos:
+   **aquí no se abre un segundo camino a la nube**, porque uno de los dos
+   se quedaría viejo. De los textos **ajenos se avisa pero no se ofrece
+   el botón** —lo rechazaría la base, y enseñarlo sería prometer lo que
+   no se puede hacer—, y a dos letras no se ofrece nada, que ahí ya caben
+   cosas distintas de verdad.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```

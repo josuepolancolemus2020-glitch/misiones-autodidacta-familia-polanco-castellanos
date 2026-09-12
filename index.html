@@ -2327,6 +2327,12 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
 
       <div id="voz-nube" class="voz-nube"></div>
 
+      <!-- ⚠️ El aviso de un nombre de máquina mal escrito, con su botón
+           de unificar. Lo pinta vozPintarUnificar() y solo sale cuando
+           de verdad hay uno: un aviso que estuviera siempre acabaría
+           siendo parte del decorado. -->
+      <div id="voz-unificar" class="voz-unificar" hidden></div>
+
       <!-- Lo último que se dejó a medias, con su botón de continuar. Lo
            pinta vozRender() y se esconde cuando no hay nada empezado. -->
       <div id="voz-sigue" hidden></div>
@@ -2486,7 +2492,7 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <div class="voz-chips voz-chips-form" id="voz-maquina-chips" role="group" aria-label="Máquinas"></div>
       </div>
       <div class="voz-campo">
-        <label for="voz-f-encargo">Lo que le pediste</label>
+        <label for="voz-f-encargo">Lo que le pediste <em>(opcional)</em></label>
         <textarea id="voz-f-encargo"
           placeholder="El encargo con el que salió este texto. Es lo único que lo hace repetible."></textarea>
       </div>

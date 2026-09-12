@@ -1961,6 +1961,97 @@ function vozEsMio(c) {
   return !c.puesto_por || !_vozYo || c.puesto_por === _vozYo;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   UNIFICAR UN NOMBRE DE MÁQUINA MAL ESCRITO
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026: «corrige el Gemeni
+   del anaquel a Gemini». Esa errata la escribió una tableta y está
+   DENTRO de sus textos, así que no se arregla desde ningún archivo del
+   repositorio: la única mano que puede escribir esas filas es la suya,
+   porque la seguridad por fila solo deja escribir lo propio. Lo que sí
+   se puede es ponerle el arreglo a un toque.
+
+   Y no es por una errata: es por TODAS las que vengan. El nombre de la
+   máquina es un campo libre que se escribe en cada texto desde una
+   tableta, así que esto va a volver a pasar. Un «Gemeni» suelto parte
+   en dos el montón del chip que agrupa por máquina —salen dos donde
+   había uno—, sin dar ningún error y sin que nadie lo mire.
+
+   ⚠️ Y SOLO SE OFRECE LO QUE ESTÁ A UNA LETRA de uno de los nombres
+   buenos (`vozUnaLetraDe`, la misma que decide qué chips se proponen).
+   A dos letras ya caben cosas distintas de verdad —«Claude» y «Claude
+   3»— y unificarlas sería cambiarle a alguien lo que quiso escribir.
+
+   ⚠️ Y SOLO LO PROPIO. Un texto ajeno lo rechazaría la base, así que
+   ofrecerlo sería prometer algo que no se puede hacer; los de otros se
+   cuentan aparte y se dice de quién es el arreglo. */
+function vozMaquinasTorcidas() {
+  const malas = new Map();
+  (_vozCuentos || []).forEach(c => {
+    if (!c || c.borrado) return;
+    const m = String(c.maquina || '').trim();
+    if (!m) return;
+    const buena = VOZ_MAQUINAS.find(b => vozUnaLetraDe(m, b));
+    if (!buena) return;
+    if (!malas.has(m)) malas.set(m, { mala: m, buena: buena, mios: [], ajenos: 0 });
+    const e = malas.get(m);
+    if (vozEsMio(c)) e.mios.push(c.cid); else e.ajenos++;
+  });
+  return [...malas.values()];
+}
+
+function vozPintarUnificar() {
+  const caja = document.getElementById('voz-unificar');
+  if (!caja) return;
+  const lista = vozMaquinasTorcidas();
+  caja.textContent = '';
+  caja.hidden = !lista.length;
+  lista.forEach(x => {
+    const fila = vozNodo('div', 'voz-unif-fila');
+    const n = x.mios.length;
+    fila.appendChild(vozNodo('span', 'voz-unif-txt',
+      (n + x.ajenos === 1 ? 'Un texto dice' : (n + x.ajenos) + ' textos dicen') +
+      ' «' + x.mala + '», que parece «' + x.buena + '» mal escrito. Así salen dos máquinas donde hay una.'));
+    if (n) {
+      fila.appendChild(vozBoton('voz-btn voz-btn-chico', '✏️ Cambiar a «' + x.buena + '»',
+        () => vozUnificarMaquina(x.mala, x.buena),
+        'Corregir la máquina en ' + n + (n === 1 ? ' texto' : ' textos')));
+    }
+    if (x.ajenos) {
+      fila.appendChild(vozNodo('span', 'voz-unif-ajeno',
+        x.ajenos === 1 ? 'Uno lo puso otra persona de la casa: solo esa persona puede corregirlo.'
+                       : x.ajenos + ' los puso otra persona de la casa: solo esa persona puede corregirlos.'));
+    }
+    caja.appendChild(fila);
+  });
+}
+
+/* Cambia el nombre en los textos propios y los sube por el camino de
+   siempre (`vozSubir`), que ya sabe reintentar, distinguir los motivos
+   y respetar las lápidas. Aquí no se inventa un segundo camino a la
+   nube: uno de los dos se quedaría viejo. */
+async function vozUnificarMaquina(mala, buena) {
+  const sucio = String(mala).trim().toLowerCase();
+  const tocados = (_vozCuentos || []).filter(c =>
+    c && !c.borrado && vozEsMio(c) && String(c.maquina || '').trim().toLowerCase() === sucio);
+  if (!tocados.length) return;
+  tocados.forEach(c => { c.maquina = buena; c.actualizado = Date.now(); });
+  vozGuardaLocal();
+  vozRender();
+  let bien = 0, mal = '';
+  for (const c of tocados) {
+    const res = await vozSubir(c);
+    if (res.ok) bien++; else mal = res.motivo || 'rechazo';
+  }
+  const cuantos = tocados.length === 1 ? 'Un texto' : tocados.length + ' textos';
+  if (bien === tocados.length) vozAviso('✏️ ' + cuantos + ' con «' + buena + '», también en los demás aparatos');
+  else if (mal === 'sin-senal') vozAviso('✏️ ' + cuantos + ' corregidos aquí. Subirán solos la próxima vez que abras esto');
+  else if (mal === 'sin-nube') vozAviso('✏️ ' + cuantos + ' corregidos aquí. Falta correr voz_prestada.sql para que viaje');
+  else if (mal === 'sin-sesion') vozAviso('✏️ ' + cuantos + ' corregidos aquí. Entra en F.A.R.O para que viaje');
+  else vozAviso('✏️ ' + cuantos + ' corregidos aquí, pero la nube rechazó alguno');
+  vozRender();
+}
+
 function vozOrdena(lista) {
   const o = _vozAnaquel.orden;
   const rec = (a, b) => (b.actualizado || 0) - (a.actualizado || 0);
@@ -2022,6 +2113,7 @@ function vozRender() {
     est.appendChild(vozNodo('span', 'voz-nube-ic', r.ic));
     est.appendChild(vozNodo('span', null, r.t));
   }
+  vozPintarUnificar();
 
   /* «Sigue leyendo»: lo último que se dejó a medias, arriba y con un
      botón. Es lo primero que hace un lector de libros al abrirse, y lo

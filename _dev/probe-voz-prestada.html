@@ -2000,6 +2000,56 @@ function margenVisible(w){
      'escribir a mano no marca el chip que coincide');
   w.eval('vozCerrarPegar()');
 
+  log('── 32. ⚠️ UNIFICAR UN NOMBRE DE MÁQUINA MAL ESCRITO ──');
+  /* «Corrige el Gemeni del anaquel a Gemini» (el autor, 12 de
+     septiembre de 2026). Esa errata está DENTRO de sus textos y solo su
+     mano puede escribir esas filas —la seguridad por fila no deja
+     otra—, así que lo que se le pone es el arreglo a un toque. Y no es
+     por una errata: el nombre de la máquina es un campo libre que se
+     escribe en cada texto desde una tableta, así que va a volver a
+     pasar. */
+  /* Base propia: por aquí ya pasaron varias sondas que cambiaron la de
+     mentira, así que la `base` del principio ya no es la que atiende. */
+  const base32 = nuevaBase(w, {});
+  w.eval(`_vozCuentos = ${JSON.stringify([
+    Object.assign(conVoces('u1', 'Investigación profunda', 'Gemeni'), { puesto_por: VOZ_UID }),
+    Object.assign(conVoces('u2', 'Investigación profunda', 'Gemini'), { puesto_por: VOZ_UID }),
+    Object.assign(conVoces('u3', 'Rulfo', 'Claude'), { puesto_por: VOZ_UID }),
+    Object.assign(conVoces('u4', 'Otra', 'Claude 3'), { puesto_por: VOZ_UID }),
+  ])}; vozGuardaLocal(); vozRender()`);
+  await esperar(350);
+  const avisoU = d.getElementById('voz-unificar');
+  ok(avisoU && !avisoU.hidden && /Gemeni/.test(avisoU.textContent) && /Gemini/.test(avisoU.textContent),
+     'el anaquel avisa de que un texto dice «Gemeni» y que parece «Gemini» mal escrito',
+     'no avisa de la máquina mal escrita: ' + (avisoU ? avisoU.textContent : 'sin caja'));
+  ok(!/Claude 3/.test(avisoU.textContent),
+     '⚠️ y NO ofrece unificar «Claude 3» con «Claude»: a dos letras ya caben cosas distintas de verdad',
+     '⚠️ quiere unificar dos máquinas que son distintas de verdad: ' + avisoU.textContent);
+  const antesU = base32.escritas.length;
+  avisoU.querySelector('.voz-btn').click();
+  await esperar(900);
+  const maquinas = JSON.parse(w.eval('JSON.stringify(_vozCuentos.map(c => c.maquina))'));
+  ok(maquinas.filter(m => m === 'Gemini').length === 2 && maquinas.indexOf('Gemeni') < 0 && maquinas.indexOf('Claude 3') >= 0,
+     'un toque lo cambia a «Gemini» y no toca las demás máquinas',
+     'la corrección no quedó: ' + JSON.stringify(maquinas));
+  ok(d.getElementById('voz-unificar').hidden,
+     'y el aviso se va, porque ya no hay nada que unificar', 'el aviso sigue después de corregir');
+  const subidaU = base32.escritas.slice(antesU).find(x => x.cid === 'u1');
+  ok(subidaU && subidaU.maquina === 'Gemini' && subidaU.puesto_por === VOZ_UID,
+     '⚠️ y la corrección SUBE A LA NUBE firmada, por el camino de siempre: si no, el otro aparato la devolvería mal escrita',
+     '⚠️ la corrección no llegó a la nube: ' + JSON.stringify(subidaU || base32.escritas.slice(antesU)));
+
+  /* ⚠️ Y LO AJENO NO SE OFRECE: lo rechazaría la base, así que enseñar
+     el botón sería prometer lo que no se puede hacer. */
+  w.eval(`_vozCuentos = ${JSON.stringify([
+    Object.assign(conVoces('u5', 'Otra voz', 'Gemeni'), { puesto_por: '99999999-9999-9999-9999-999999999999' }),
+  ])}; vozGuardaLocal(); vozRender()`);
+  await esperar(300);
+  const avisoAjeno = d.getElementById('voz-unificar');
+  ok(!avisoAjeno.hidden && !avisoAjeno.querySelector('.voz-btn') && /otra persona/.test(avisoAjeno.textContent),
+     '⚠️ de un texto ajeno se avisa pero NO se ofrece el botón: lo rechazaría la seguridad por fila',
+     '⚠️ ofrece corregir un texto de otra persona: ' + avisoAjeno.textContent);
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

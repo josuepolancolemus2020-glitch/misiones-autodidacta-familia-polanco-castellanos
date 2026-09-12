@@ -1168,6 +1168,19 @@
   border-top: 1px solid var(--border); font-family: system-ui, sans-serif;
 }
 
+/* El aviso de un nombre de máquina mal escrito. Va en ámbar y no en
+   rojo: no hay nada roto, hay algo que conviene unificar. */
+.voz-unificar { margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+.voz-unificar[hidden] { display: none; }
+.voz-unif-fila {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  background: var(--story-bg, #fdf6ec); border: 1px solid rgba(180,83,9,.3);
+  border-radius: 12px; padding: 10px 12px;
+}
+.voz-unif-txt { font-size: 12.5px; line-height: 1.45; color: #92400e; flex: 1 1 220px; }
+.voz-unif-ajeno { font-size: 11.5px; color: var(--muted); flex: 1 1 100%; }
+.voz-btn-chico { padding: 7px 12px; min-height: 34px; font-size: 12.5px; }
+
 /* El botón de adjuntar va resaltado porque es el camino MEJOR, no el
    de repuesto: un archivo trae los títulos, las tablas y las llamadas
    de las citas, y copiar una pantalla los pierde. */
