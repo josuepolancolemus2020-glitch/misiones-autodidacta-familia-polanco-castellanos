@@ -2502,6 +2502,65 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
     </div>
   </div>
 
+  <!-- ========== EL TALLER DE COMPRENSIÓN ==========
+       Pantalla propia y no un panel: aquí se escribe, se arrastra y se
+       lee la corrección, y eso no cabe en tres cuartos de pantalla. Se
+       tiñe con el papel que tenga puesta la lectura (data-tema), para
+       que abrir el taller de noche no deslumbre. Todo lo de dentro lo
+       pinta vozActPintarTaller(), en js/tools/voz-prestada.js. -->
+  <div id="voz-act-overlay" hidden role="region" aria-label="Taller de comprensión">
+    <div class="voz-act-top">
+      <div id="voz-act-tit"></div>
+      <button type="button" class="voz-l-ico" id="voz-act-cerrar" aria-label="Cerrar el taller">✕</button>
+    </div>
+    <div class="voz-act-mid" id="voz-act-cuerpo"></div>
+
+    <!-- ⚠️ LAS DOS HOJAS CUELGAN DENTRO DEL TALLER, no del body, y
+         eso arregla dos cosas de una vez: se tiñen solas con el
+         papel que tenga puesta la lectura (regla 9: todo lo de la
+         sala vive dentro de ella), y dejan de abrirse POR DEBAJO.
+         Colgando del body salían con el z-index 100 de
+         `.fin-modal-overlay`, que está muy por debajo del taller
+         (3300) y de la sala (3200): el botón respondía, la hoja se
+         abría, y no se veía absolutamente nada. -->
+
+    <!-- La hoja de pegar actividades. Como la del texto: se pega de golpe
+         y el repaso dice ANTES de guardar qué entendió de cada tipo. -->
+    <div id="voz-act-pegar-overlay" class="fin-modal-overlay" style="display:none;">
+      <div class="fin-modal" role="dialog" aria-modal="true" aria-labelledby="voz-act-pegar-tit">
+        <div class="msug-det-head">
+          <div class="msug-det-titulo" id="voz-act-pegar-tit">📝 Actividades</div>
+          <button type="button" class="msug-det-cerrar" id="voz-act-pegar-cerrar" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="voz-act-sugerencia" id="voz-act-sugerencia"></p>
+        <textarea id="voz-act-pegar-txt" class="voz-pegar-txt"
+                  placeholder="Pega aquí las actividades tal como te las dio la máquina…"></textarea>
+        <div class="voz-pegar-barra">
+          <button type="button" class="voz-btn" id="voz-act-ejemplo-btn">📄 Un ejemplo</button>
+          <button type="button" class="voz-btn" id="voz-act-ayuda-btn">❔ Cómo se pegan</button>
+        </div>
+        <div class="voz-rep" id="voz-act-repaso"></div>
+        <button type="button" class="voz-btn voz-btn-pri" id="voz-act-guardar-btn" disabled>📝 Guardar las actividades</button>
+      </div>
+    </div>
+
+    <!-- La ayuda del pegado de actividades. La lista de formas se pinta
+         LEYENDO VOZ_ACT_TIPOS y VOZ_ACT_CABECERAS, no escrita aquí. -->
+    <div id="voz-act-ayuda-overlay" class="fin-modal-overlay" style="display:none;">
+      <div class="fin-modal" role="dialog" aria-modal="true" aria-label="Cómo se pegan las actividades">
+        <div class="msug-det-head">
+          <div class="msug-det-titulo">❔ Cómo se pegan las actividades</div>
+          <button type="button" class="msug-det-cerrar" id="voz-act-ayuda-cerrar" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="voz-act-ayuda-cuerpo"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== DRAWER ========== -->
   <div id="drawer-overlay" class="drawer-overlay"></div>
   <aside id="app-drawer" class="app-drawer" role="navigation" aria-label="Menú principal">

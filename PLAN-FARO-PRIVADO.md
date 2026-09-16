@@ -150,6 +150,28 @@ Zone → Make private.
      `_dev/prueba-rodaje-sql.sql`: las ocho comprobaciones pasan, incluida
      la de que `anon` no ve ni una fila con los permisos de tabla repartidos
      como los reparte Supabase.
+   · ⏳ **FALTA CORRER** — `supabase/sql/voz_actividades.sql` y después
+     `supabase/sql/voz_actividades_comprueba.sql`. Es lo único nuevo que hay
+     que pegar del taller de comprensión de La Voz Prestada (16 de septiembre
+     de 2026): las tarjetas, las parejas y las preguntas de cada texto, para
+     que estén en los aparatos de los cuatro.
+
+     **Mientras no se corra, el taller funciona ENTERO** con la copia del
+     aparato y lo dice a la vista («📴 Solo en este aparato: falta correr
+     voz_actividades.sql»), que es lo contrario de fingir que viaja. O sea
+     que no corre prisa; lo que se pierde hasta entonces es que las
+     actividades que pega uno las vean los demás.
+
+     Lo que hay que saber antes de pegarlo: es de la casa para LEER y de
+     quien lo puso para ESCRIBIR, no hay política de `delete` —se vacía con
+     lápida, por lo mismo que los textos— y el avance de cada quien NO viaja,
+     vive en el aparato como la posición de lectura.
+
+     Probado antes de mandarlo contra un PostgreSQL de verdad con
+     `_dev/prueba-voz-actividades-sql.sql`: las ocho comprobaciones pasan,
+     incluida la de que `anon` no ve ni una fila con los permisos de tabla
+     repartidos como los reparte Supabase, y la de que un taller no puede
+     cambiar de dueño.
    · ✅ **CORRIDO** — `supabase/sql/voz_prestada.sql` y después
      `supabase/sql/voz_prestada_comprueba.sql`, el 10 de septiembre de 2026,
      **dos veces**: la del estreno por la mañana y la ampliada con la columna

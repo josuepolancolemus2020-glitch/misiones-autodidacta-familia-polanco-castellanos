@@ -436,18 +436,18 @@
 
 /* Los tres papeles. Se redefinen los tokens de la aplicación DENTRO de
    la sala, así que todo lo que herede de app.css se tiñe solo. */
-#voz-lector[data-tema="papel"] {
+#voz-lector[data-tema="papel"], #voz-act-overlay[data-tema="papel"] {
   --bg: #f7f5f0; --surface: #fffdf9; --text: #1f1d1a;
   --muted: #7a736b; --border: #e6e1d6; --story: #7a3d10; --marca: #fde68a;
 }
-#voz-lector[data-tema="sepia"] {
+#voz-lector[data-tema="sepia"], #voz-act-overlay[data-tema="sepia"] {
   --bg: #f1e7d3; --surface: #f6eddb; --text: #3f3020;
   --muted: #86714f; --border: #dccbaa; --story: #8a4a12; --marca: #f2d38a;
 }
 /* En noche el texto NO es blanco puro: el blanco sobre negro deja
    estela al pasar la vista y cansa a los pocos minutos, que es justo lo
    contrario de para lo que se enciende este color. */
-#voz-lector[data-tema="noche"] {
+#voz-lector[data-tema="noche"], #voz-act-overlay[data-tema="noche"] {
   --bg: #121418; --surface: #1a1d23; --text: #cfd3da;
   --muted: #7f8794; --border: #272c36; --story: #d9a55e; --marca: #6b5320;
 }
@@ -823,14 +823,15 @@
    quien no distingue el rojo del verde—. Los tokens se declaran por
    papel: en noche los mismos amarillos deslumbran, así que van
    traslúcidos, como allá en el modo oscuro. */
-#voz-lector[data-tema="papel"], #voz-lector[data-tema="sepia"] {
+#voz-lector[data-tema="papel"], #voz-lector[data-tema="sepia"],
+#voz-act-overlay[data-tema="papel"], #voz-act-overlay[data-tema="sepia"] {
   --fm-dato:   #fef08a;  --fm-dato-fw:   #a16207;
   --fm-voz:    #bbf7d0;  --fm-voz-fw:    #15803d;
   --fm-idea:   #fecaca;  --fm-idea-fw:   #b91c1c;
   --fm-contra: #bfdbfe;  --fm-contra-fw: #1d4ed8;
   --fm-duda:   #e9d5ff;  --fm-duda-fw:   #7e22ce;
 }
-#voz-lector[data-tema="noche"] {
+#voz-lector[data-tema="noche"], #voz-act-overlay[data-tema="noche"] {
   --fm-dato:   rgba(250,204,21,.32);  --fm-dato-fw:   #fde047;
   --fm-voz:    rgba(34,197,94,.30);   --fm-voz-fw:    #86efac;
   --fm-idea:   rgba(248,113,113,.30); --fm-idea-fw:   #fca5a5;
@@ -954,6 +955,269 @@
   .voz-l-ico { width: 38px; height: 38px; }
 }
 
+
+/* ═══════════════ EL TALLER DE COMPRENSIÓN ═══════════════
+   Pantalla propia, encima de la sala (que está en 3200), porque se
+   abre DESDE la sala sin cerrarla: al terminar el taller se vuelve a
+   la página en que se iba, sin volver a buscarla. Se tiñe con los
+   mismos tres papeles, declarados una sola vez arriba. */
+#voz-act-overlay {
+  position: fixed; inset: 0; z-index: 3300;
+  display: flex; flex-direction: column;
+  background: var(--bg); color: var(--text);
+  font-family: "Outfit", system-ui, sans-serif;
+}
+#voz-act-overlay[hidden] { display: none; }
+
+.voz-act-top {
+  flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-bottom: 1px solid var(--border); background: var(--surface);
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+}
+#voz-act-tit { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.voz-act-tit-t {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* La etiqueta también aquí, y por lo mismo que en el pie de cada
+   página: un cuestionario sin ella atribuye el texto igual que el
+   texto (regla 1). */
+.voz-act-tit-v {
+  font-size: 11px; color: var(--story);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.voz-act-mid {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 760px) {
+  .voz-act-mid { max-width: 720px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+}
+
+/* ─── Sin actividades todavía: las dos puertas ─── */
+.voz-act-vacio { text-align: center; padding: 10px 0; }
+.voz-act-vacio-ic { font-size: 40px; margin-bottom: 6px; }
+.voz-act-vacio-t { margin: 0 0 6px; font-size: 16px; font-weight: 700; color: var(--text); }
+.voz-act-vacio-p { margin: 0 0 16px; font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+.voz-act-puertas { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.voz-act-puerta {
+  display: flex; flex-direction: column; gap: 4px; cursor: pointer;
+  padding: 14px 15px; border-radius: 14px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font: inherit; text-align: left;
+}
+.voz-act-puerta:active { transform: scale(.99); }
+.voz-act-puerta-ic { font-size: 22px; }
+.voz-act-puerta-t { font-size: 15px; font-weight: 700; }
+.voz-act-puerta-p { font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+
+/* ─── El resumen, con su anillo ───
+   El anillo es un `conic-gradient`, no una imagen ni un lienzo: se
+   pinta con una variable y no pesa nada. */
+.voz-act-resumen { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.voz-act-anillo {
+  flex: 0 0 auto; width: 76px; height: 76px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: conic-gradient(var(--story) calc(var(--voz-pct, 0) * 1%), var(--border) 0);
+}
+.voz-act-anillo::before {
+  content: ''; position: absolute; width: 60px; height: 60px; border-radius: 50%; background: var(--bg);
+}
+.voz-act-anillo { position: relative; }
+.voz-act-anillo-n { position: relative; font-size: 15px; font-weight: 800; color: var(--text); }
+.voz-act-resumen-txt { flex: 1 1 auto; min-width: 0; }
+.voz-act-resumen-t { font-size: 17px; font-weight: 800; color: var(--text); }
+.voz-act-resumen-p { font-size: 12.5px; color: var(--muted); line-height: 1.45; margin-top: 2px; }
+.voz-act-resumen-hoy { color: var(--story); font-weight: 600; }
+.voz-act-chips { margin-bottom: 10px; }
+.voz-act-botones { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.voz-act-botones .voz-btn { min-height: 48px; }
+.voz-act-pie { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+/* ─── La lista plegada, para corregir una errata ─── */
+.voz-act-lista { margin-top: 12px; }
+.voz-act-lista-sum {
+  cursor: pointer; padding: 10px 2px; font-size: 13px; color: var(--muted);
+  border-top: 1px solid var(--border); list-style: none;
+}
+.voz-act-lista-sum::-webkit-details-marker { display: none; }
+.voz-act-fila { position: relative; padding: 9px 34px 9px 10px; border-bottom: 1px solid var(--border); }
+.voz-act-fila-cab { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.voz-act-fila-n { font-size: 11px; color: var(--muted); min-width: 16px; }
+.voz-act-fila-tipo { font-size: 11px; font-weight: 700; color: var(--story); }
+.voz-act-fila-auto { font-size: 10.5px; color: var(--muted); }
+.voz-act-fila-q { font-size: 13.5px; line-height: 1.4; color: var(--text); }
+.voz-act-fila-sol { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.voz-act-fila-x {
+  position: absolute; right: 2px; top: 8px; width: 30px; height: 30px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer;
+}
+
+/* ─── La sesión ─── */
+.voz-act-barra { height: 5px; border-radius: 99px; background: var(--border); overflow: hidden; margin-bottom: 10px; }
+.voz-act-barra-in { height: 100%; background: var(--story); border-radius: 99px; transition: width .25s; }
+.voz-act-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-bottom: 10px; }
+.voz-act-meta-tipo { font-size: 12px; font-weight: 700; color: var(--story); }
+.voz-act-meta-n { font-size: 12px; color: var(--muted); }
+.voz-act-meta-cap { font-size: 11.5px; color: var(--muted); font-style: italic; }
+.voz-act-caja { display: flex; flex-direction: column; gap: 10px; }
+.voz-act-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.voz-act-btns[hidden] { display: none; }
+.voz-act-btns .voz-btn { flex: 1 1 140px; min-height: 46px; }
+.voz-act-si { color: #15803d; border-color: rgba(21,128,61,.45); font-weight: 600; }
+.voz-act-no { color: #b91c1c; border-color: rgba(185,28,28,.45); font-weight: 600; }
+.voz-act-sesion-pie { margin-top: 18px; }
+.voz-act-salir { width: 100%; opacity: .75; }
+.voz-act-ayuda { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+/* La cuenta de las que faltan ocupa su propio renglón: al lado del
+   botón de deshacer quedaban los dos a media anchura y se leían como
+   una sola cosa. */
+.voz-act-btns .voz-act-ayuda { flex: 1 1 100%; }
+
+/* El enunciado va en la letra de LIBRO, no en la de la aplicación: lo
+   que se pregunta es un trozo del texto y tiene que leerse como en el
+   texto, o la pregunta parece de otro sitio. */
+.voz-act-q {
+  font-family: var(--voz-fam, "Literata", Georgia, serif);
+  font-size: 17px; line-height: 1.5; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px 15px; white-space: pre-line;
+}
+.voz-act-q-hueco { white-space: normal; }
+.voz-act-trozo { white-space: pre-line; }
+.voz-act-hueco {
+  display: inline-block; min-width: 96px; border-bottom: 2px solid var(--story);
+  margin: 0 .2em; vertical-align: baseline;
+}
+
+/* La tarjeta: alta a propósito, para que la cara ocupe la pantalla y
+   no se lea la cruz de reojo antes de pensar. */
+.voz-act-tarjeta {
+  display: flex; flex-direction: column; gap: 10px;
+  min-height: 150px; padding: 18px 16px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  box-shadow: 0 2px 10px rgba(15,23,42,.06);
+}
+.voz-act-cara {
+  font-family: var(--voz-fam, "Literata", Georgia, serif);
+  font-size: 18px; line-height: 1.5; color: var(--text); white-space: pre-line;
+}
+.voz-act-cruz { border-top: 1px dashed var(--border); padding-top: 10px; color: var(--story); font-weight: 600; }
+
+.voz-act-ops { display: flex; flex-direction: column; gap: 8px; }
+.voz-act-op {
+  display: flex; align-items: flex-start; gap: 10px; cursor: pointer; text-align: left;
+  padding: 12px 13px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font: inherit; font-size: 14.5px; min-height: 48px;
+}
+.voz-act-op:active { transform: scale(.99); }
+.voz-act-op:disabled { cursor: default; }
+.voz-act-op-l {
+  flex: 0 0 24px; height: 24px; border-radius: 50%; background: var(--bg);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: var(--muted);
+}
+.voz-act-op-t { flex: 1 1 auto; min-width: 0; line-height: 1.4; }
+.voz-act-campo, .voz-act-area {
+  width: 100%; box-sizing: border-box; padding: 13px 14px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font: inherit; font-size: 16px;
+}
+.voz-act-area { resize: vertical; font-family: var(--voz-fam, Georgia, serif); line-height: 1.5; }
+.voz-act-campo:focus, .voz-act-area:focus { outline: none; border-color: var(--story); }
+.voz-act-pauta { padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); }
+.voz-act-pauta-t { font-size: 12px; font-weight: 700; color: var(--story); margin-bottom: 4px; }
+.voz-act-pauta-p { font-size: 14px; line-height: 1.5; color: var(--text); font-family: var(--voz-fam, Georgia, serif); }
+
+/* ─── Emparejar ─── */
+.voz-act-tablero { display: flex; gap: 10px; align-items: flex-start; }
+.voz-act-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.voz-act-par {
+  display: flex; flex-direction: column; gap: 3px; cursor: pointer; text-align: left;
+  padding: 11px 12px; border-radius: 12px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font: inherit; font-size: 13.5px;
+  min-height: 46px; line-height: 1.35;
+}
+/* ⚠️ `touch-action: none` SOLO en la ficha que se arrastra: puesto en
+   el tablero entero, la pantalla del taller dejaría de deslizarse y no
+   se llegaría al botón de comprobar. */
+.voz-act-par-i { touch-action: none; }
+.voz-act-par-t { display: block; }
+.voz-act-par-con { font-size: 11.5px; color: var(--story); font-weight: 600; }
+.voz-act-par-elegida { border-color: var(--story); box-shadow: 0 0 0 2px var(--story) inset; }
+.voz-act-par-hecho { opacity: .75; }
+.voz-act-par-diana { border-color: var(--story); border-style: dashed; background: var(--bg); }
+.voz-act-arrastrando { opacity: .35; }
+.voz-act-fantasma {
+  position: fixed; z-index: 3400; pointer-events: none;
+  transform: translate(-50%, -50%); max-width: 200px;
+  padding: 8px 11px; border-radius: 10px; font: 600 13px "Outfit", system-ui, sans-serif;
+  background: var(--story); color: #fff; box-shadow: 0 8px 20px rgba(0,0,0,.28);
+}
+
+/* ─── El veredicto ─── */
+.voz-act-fb { padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border); }
+.voz-act-fb-t { font-size: 15px; font-weight: 800; }
+.voz-act-fb-r { font-size: 13.5px; line-height: 1.45; margin-top: 4px; }
+.voz-act-final { text-align: center; padding: 16px 0 6px; }
+.voz-act-final-ic { font-size: 44px; }
+.voz-act-final-t { font-size: 26px; font-weight: 800; color: var(--text); margin-top: 4px; }
+.voz-act-final-p { font-size: 13.5px; line-height: 1.55; color: var(--muted); margin: 8px 0 0; }
+.voz-act-revisar { margin-top: 16px; }
+.voz-act-rev { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.voz-act-rev-q { font-size: 13.5px; line-height: 1.4; color: var(--text); }
+.voz-act-rev-s { font-size: 13px; color: var(--story); margin-top: 3px; font-weight: 600; }
+.voz-act-rev-ir {
+  margin-top: 6px; padding: 6px 11px; border-radius: 9px; cursor: pointer; min-height: 36px;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-size: 12.5px;
+}
+
+/* ─── El enlace del pie del texto ───
+   Va DENTRO del texto paginado, así que hereda su letra: se le pone la
+   de la aplicación a mano para que no parezca un párrafo más. */
+.voz-fin-taller {
+  display: flex; flex-direction: column; gap: 3px; cursor: pointer; text-align: center;
+  margin: 1.6em auto 0; max-width: 24em; padding: 12px 14px;
+  border-radius: 14px; border: 1px solid var(--border); background: var(--surface);
+  color: var(--text); font-family: "Outfit", system-ui, sans-serif; text-indent: 0;
+  break-inside: avoid;
+}
+.voz-fin-taller-ic { font-size: 20px; }
+.voz-fin-taller-t { font-size: 14px; font-weight: 700; color: var(--story); line-height: 1.3; }
+.voz-fin-taller-p { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+/* ─── La insignia de la ficha del anaquel ─── */
+.voz-ficha-taller { position: relative; }
+.voz-ficha-taller-n {
+  position: absolute; top: -5px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px;
+  border-radius: 99px; background: var(--muted); color: var(--surface);
+  font: 700 10px "Outfit", system-ui, sans-serif;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.voz-ficha-taller-hoy .voz-ficha-taller-n { background: var(--story); color: #fff; }
+
+/* ─── La hoja de pegar actividades ─── */
+.voz-act-sugerencia {
+  margin: 0 0 10px; padding: 10px 12px; border-radius: 10px;
+  background: var(--bg); border: 1px dashed var(--border);
+  font-size: 12.5px; line-height: 1.5; color: var(--muted);
+}
+/* El aviso que PARA el guardado se ve distinto del que solo avisa: son
+   dos cosas distintas y pintarlas igual es esconder la que importa. */
+.voz-rep-para { background: #fff7ed; border-color: rgba(194,65,12,.35); color: #9a3412; }
+.voz-rep-aviso-por { margin-top: 6px; font-style: italic; opacity: .85; }
+.voz-ayuda-forma {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px;
+  color: var(--text); background: var(--bg); border-radius: 6px; padding: 2px 6px; display: inline-block;
+}
+.voz-ayuda-cab { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+
+@media (max-width: 380px) {
+  .voz-act-tablero { gap: 6px; }
+  .voz-act-par { font-size: 12.5px; padding: 9px 10px; }
+  .voz-act-mid { padding-left: 12px; padding-right: 12px; }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    ⚠️ LAS FRANJAS DE COLOR VAN AL FINAL DEL ARCHIVO, Y NO ES ORDEN.
    `.voz-ficha` declara `border: 1px solid var(--border)` —el atajo, que
@@ -970,3 +1234,14 @@
 .voz-fila { border-left: 4px solid hsl(var(--voz-h, 25) 42% 38%); }
 .voz-fila:hover { box-shadow: 0 2px 8px rgba(15,23,42,.08); }
 .voz-arrastrando.voz-ficha, .voz-arrastrando.voz-fila { border-left-color: var(--story); }
+/* `.voz-act-fila`, `.voz-act-fb` y `.voz-act-op` declaran el atajo
+   `border: 1px solid var(--border)`, que incluye el color: sus franjas
+   y sus bordes de estado van AQUÍ por lo mismo que los del anaquel. */
+.voz-act-fila-ambar { border-left: 3px solid #d97706; background: #fffbeb; }
+.voz-act-fb-ok   { border-color: rgba(21,128,61,.45);  background: rgba(34,197,94,.10);  color: #15803d; }
+.voz-act-fb-casi { border-color: rgba(217,119,6,.45);  background: rgba(250,204,21,.12); color: #a16207; }
+.voz-act-fb-no   { border-color: rgba(185,28,28,.45);  background: rgba(248,113,113,.10); color: #b91c1c; }
+.voz-act-op-ok  { border-color: #15803d; background: rgba(34,197,94,.12); }
+.voz-act-op-no  { border-color: #b91c1c; background: rgba(248,113,113,.12); }
+.voz-act-par-ok  { border-color: #15803d; background: rgba(34,197,94,.10); }
+.voz-act-par-mal { border-color: #b91c1c; background: rgba(248,113,113,.10); }

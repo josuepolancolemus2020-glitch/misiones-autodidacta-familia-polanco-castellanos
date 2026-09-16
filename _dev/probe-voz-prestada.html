@@ -88,7 +88,7 @@ const esperar = ms => new Promise(r => setTimeout(r, ms));
 /* ── La base de datos de mentira ────────────────────────────────── */
 function nuevaBase(w, opciones){
   const o = opciones || {};
-  const estado = { filas: o.filas || [], llamadas: [], escritas: [], marcas: o.marcas || [], marcasEscritas: [] };
+  const estado = { filas: o.filas || [], llamadas: [], escritas: [], marcas: o.marcas || [], marcasEscritas: [], act: o.act || [], actEscritas: [] };
   const json = (cuerpo, status) => new Response(JSON.stringify(cuerpo),
     { status: status || 200, headers: { 'Content-Type': 'application/json' } });
   w.fetch = async (url, init) => {
@@ -113,6 +113,26 @@ function nuevaBase(w, opciones){
         if (['dato', 'voz', 'idea', 'contra', 'duda'].indexOf(fila.color) < 0) return json({ code: '23514', message: 'violates check constraint "lecturas_marcas_color_check"' }, 400);
         estado.marcas = estado.marcas.filter(x => x.id !== fila.id).concat([fila]);
         estado.marcasEscritas.push(fila);
+      }
+      return json([], 201);
+    }
+    /* El taller de comprensión viaja por su propia tabla, y la base de
+       mentira la exige igual que la de verdad: firmada con quien entró
+       y con `items` que sea una lista. Un doble complaciente no prueba
+       la costura, la esconde. */
+    if (/voz_actividades/.test(u.pathname)) {
+      estado.llamadas.push({ m, url: u.pathname + u.search, cuerpo: init && init.body });
+      if (o.sinTablaAct) return json({ code: '42P01', message: 'relation "public.voz_actividades" does not exist' }, 404);
+      if (m === 'GET') return json(estado.act);
+      let cuerpo = null;
+      try { cuerpo = JSON.parse(init && init.body); } catch (e) {}
+      const filas = Array.isArray(cuerpo) ? cuerpo : (cuerpo ? [cuerpo] : []);
+      for (const fila of filas) {
+        if (!fila.puesto_por) return json({ code: '23502', message: 'null value in column "puesto_por"' }, 400);
+        if (fila.puesto_por !== VOZ_UID) return json({ code: '42501', message: 'new row violates row-level security policy' }, 403);
+        if (!Array.isArray(fila.items)) return json({ code: '23514', message: 'violates check constraint "voz_actividades_items_lista"' }, 400);
+        estado.act = estado.act.filter(x => x.cid !== fila.cid).concat([fila]);
+        estado.actEscritas.push(fila);
       }
       return json([], 201);
     }
@@ -1428,6 +1448,249 @@ function margenVisible(w){
      'y la sala siempre abre con sus barras: el modo desnudo no se hereda de la lectura anterior', 'la sala abrió sin barras');
   w.eval('vozCerrarLector()');
   await esperar(200);
+
+  log('── 28. EL TALLER DE COMPRENSIÓN: lo leído se queda o no se queda ──');
+  /* Pedido por el autor el 16 de septiembre de 2026. Lo que puede
+     salir mal, por orden de gravedad: que se guarde un examen con la
+     respuesta cambiada (nadie lo descubre hasta que un niño acierta y
+     la pantalla le dice que falló); que una actividad generada desde
+     un subrayado tenga una respuesta que NO está en el texto; que lo
+     pegado escriba HTML dentro de F.A.R.O; que la hoja de pegar se
+     abra por debajo del taller y parezca que el botón no responde; y
+     que el avance se comparta entre las cuatro personas de la casa. */
+  const base28 = nuevaBase(w, {});
+  w.eval(`_vozCuentos = [${JSON.stringify(cuentoLargo('c-act'))}]; vozGuardaLocal();
+          ['faro_voz_actividades_v1','faro_voz_act_avance_v1','faro_voz_subrayados_v1'].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+          _vozAct = null; _vozSubTodo = null; _vozAnaquel = { vista: 'detalle', orden: 'recientes', grupo: '', manual: [] };
+          _vozFiltroVoz = ''; _vozFiltroGen = ''; _vozBusca = ''; vozGuardaAnaquel(); vozRender()`);
+  await esperar(250);
+
+  /* 28.1 El lector entiende los cinco tipos tal como los escribe una
+     máquina, con sus títulos de sección y su lista final de
+     respuestas EN NEGRITA —que es como la escribe de verdad—. */
+  const leido28 = JSON.parse(w.eval(`JSON.stringify(vozActLeer(${JSON.stringify(
+    '### 1. Tarjetas de memoria\n- **1910** :: el año en que se secó el pozo\n- Remedios :: la que se quedó\n'
+    + '\n### 2. Emparejar\n- Los Ochoa → los primeros en irse\n- El maestro → se fue después\n- El que vendía cal → el tercero\n'
+    + '\n### 3. Preguntas de comprensión\n1. ¿Qué dejaron los Ochoa?\n   a) Una mesa y dos sillas\n   b) Nada\n   c) La carreta\n   d) El pozo\n'
+    + '2. ¿Quién se quedó?\n   A) El maestro\n   B) Remedios\n   C) Nadie\n   D) Los Ochoa\n'
+    + '\n**Respuestas: 1-A, 2-B**\n'
+    + '\n### 4. Completar\n1. El retrato se quedó mirando la puerta ___ años.\n   Respuesta: muchos\n'
+    + '2. Ya no llega ninguna ___ . (cuerda)\n'
+    + '\n### 5. Preguntas abiertas\n1. ¿Qué simboliza el agua?\n   Pauta: la sequía como vaciamiento del pueblo.\n'
+  )}))`));
+  ok(leido28.cuenta.flash === 2 && leido28.cuenta.pares === 1 && leido28.cuenta.opcion === 2
+     && leido28.cuenta.completar === 2 && leido28.cuenta.abierta === 1,
+     'el lector saca los cinco tipos de una tanda escrita como la escribe una máquina',
+     'los tipos salieron mal: ' + JSON.stringify(leido28.cuenta));
+  const ops28 = leido28.items.filter(i => i.k === 'opcion');
+  ok(ops28.length === 2 && ops28[0].ok === 0 && ops28[1].ok === 1 && leido28.sinCorrecta.length === 0,
+     '⚠️ y la lista final «**Respuestas: 1-A, 2-B**», EN NEGRITA, marca las correctas (los adornos se quitan antes de mirar)',
+     '⚠️ la lista final en negrita no se aplicó: ' + JSON.stringify(ops28.map(o => o.ok)));
+  const par28 = leido28.items.find(i => i.k === 'pares');
+  ok(par28 && par28.ps.length === 3 && par28.ps[0][0] === 'Los Ochoa' && par28.ps[0][1] === 'los primeros en irse',
+     'las parejas salen enteras y en su orden', 'las parejas salieron mal: ' + JSON.stringify(par28 && par28.ps));
+  const comp28 = leido28.items.filter(i => i.k === 'completar');
+  ok(comp28.length === 2 && comp28[0].a === 'muchos' && comp28[1].a === 'cuerda' && /___/.test(comp28[1].q),
+     'y las de completar traen su hueco y su respuesta, escrita en un renglón o entre paréntesis',
+     'las de completar salieron mal: ' + JSON.stringify(comp28.map(c => c.a)));
+
+  /* 28.2 ⚠️ LA REGLA QUE NO SE NEGOCIA: sin decir cuál es la correcta,
+     no se marca ninguna y el guardado SE PARA. */
+  const malo28 = JSON.parse(w.eval(`JSON.stringify(vozActLeer(${JSON.stringify(
+    '## Comprensión\n1. ¿Por qué se fueron todos?\nA) Por la sequía\nB) Por el maestro\nC) Por la carreta\n2. El retrato lo borró el ___ .\n'
+  )}))`));
+  ok(malo28.items.filter(i => i.k === 'opcion')[0].ok === -1 && malo28.sinCorrecta.length === 1 && malo28.sinRespuesta.length === 1,
+     '⚠️ sin decir cuál es la buena NO se marca ninguna a ojo, y se nombra cuál falta',
+     '⚠️ marcó una respuesta que el texto no decía: ' + JSON.stringify(malo28.sinCorrecta.length));
+  w.eval('vozActAbrirPegar("c-act")');
+  await esperar(200);
+  d.getElementById('voz-act-pegar-txt').value = '## Comprensión\n1. ¿Por qué se fueron todos?\nA) Por la sequía\nB) Por el maestro\n';
+  w.eval('vozActRepasar()');
+  await esperar(150);
+  const btnG = d.getElementById('voz-act-guardar-btn');
+  ok(btnG.disabled && /respuesta/i.test(btnG.textContent) && /marca la buena/i.test(d.getElementById('voz-act-repaso').textContent),
+     'y el botón de guardar se PARA, diciendo en qué pregunta falta y cómo marcarla',
+     'el guardado no se paró con una pregunta sin respuesta: ' + btnG.textContent);
+
+  /* 28.3 La hoja de pegar se ve POR ENCIMA del taller. Colgando del
+     body salía con z-index 100 bajo un taller de 3300: el botón
+     respondía, la hoja se abría y no se veía nada. */
+  const cajaHoja = d.getElementById('voz-act-pegar-txt').getBoundingClientRect();
+  const encima = w.eval(`(function(){ const r = document.getElementById('voz-act-pegar-txt').getBoundingClientRect();
+    const n = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return !!(n && n.closest && n.closest('#voz-act-pegar-overlay')); })()`);
+  ok(cajaHoja.height > 40 && encima === true,
+     'la hoja de pegar se ve POR ENCIMA del taller: el dedo la toca a ella y no a lo de debajo',
+     '⚠️ la hoja de pegar quedó por debajo del taller (el botón responde y no se ve nada)');
+  /* ⚠️ Y se abrió SIN abrir antes el taller a propósito: la hoja vive
+     dentro de él, así que con el taller cerrado no se vería nada. Que
+     abrirla lo abra sola es lo que impide ese fallo mudo. */
+  ok(!d.getElementById('voz-act-overlay').hidden,
+     'y abrirla con el taller cerrado lo abre a él primero, en vez de no enseñar nada',
+     '⚠️ la hoja se abrió con el taller cerrado: no se vería nada y parecería un botón muerto');
+  const padreHoja = w.eval(`document.getElementById('voz-act-pegar-overlay').parentElement.id`);
+  ok(padreHoja === 'voz-act-overlay',
+     'y cuelga DENTRO del taller, así que se tiñe sola con el papel que tenga puesto la lectura',
+     'la hoja cuelga de ' + padreHoja + ', así que saldría blanca sobre el papel de noche');
+
+  /* 28.4 Guardar de verdad, con el ejemplo de la casa. */
+  d.getElementById('voz-act-pegar-txt').value = w.eval('VOZ_ACT_EJEMPLO');
+  w.eval('vozActRepasar()');
+  await esperar(200);
+  ok(!d.getElementById('voz-act-guardar-btn').disabled,
+     'con el ejemplo de la casa el guardado se abre', 'el ejemplo de la casa no se puede guardar');
+  base28.actEscritas.length = 0;
+  w.eval('vozActGuardarPegado()');
+  await esperar(250);
+  const guardadas = Number(w.eval('vozActCuenta("c-act")'));
+  ok(guardadas === 8, 'y quedan las 8 actividades del ejemplo guardadas', 'quedaron ' + guardadas);
+  await esperar(1600);
+  const filaAct = base28.actEscritas.find(x => x.cid === 'c-act');
+  ok(!!filaAct && filaAct.puesto_por === VOZ_UID && Array.isArray(filaAct.items) && filaAct.items.length === 8,
+     'suben a voz_actividades FIRMADAS y con su lista entera',
+     '⚠️ la nube no recibió el taller como debía: ' + JSON.stringify(filaAct && filaAct.puesto_por));
+
+  /* 28.5 ⚠️ LAS GENERADAS SACAN LA RESPUESTA DEL TEXTO, NO LA INVENTAN. */
+  const cuerpo28 = w.eval('_vozCuentos[0].capitulos[0].p[3].t');
+  const trozo28 = cuerpo28.slice(21, 33);
+  w.eval(`(function(){
+    const todo = vozSubLeeTodo(); todo['c-act'] = [
+      { id: 'sub-corto', cap: 0, vp: 3, i: 21, f: 33, t: ${JSON.stringify(trozo28)}, c: 'dato', n: '', u: Date.now(), del: false, user: ${JSON.stringify(VOZ_UID)} },
+      { id: 'sub-nota',  cap: 0, vp: 5, i: 0,  f: 20, t: _vozCuentos[0].capitulos[0].p[5].t.slice(0, 20), c: 'idea', n: '¿De qué habla aquí?', u: Date.now(), del: false, user: ${JSON.stringify(VOZ_UID)} }];
+    vozSubGuardaTodo(); })()`);
+  const gen28 = JSON.parse(w.eval('JSON.stringify(vozActGenerar("c-act"))'));
+  const cCorto = gen28.find(g => g.k === 'completar');
+  const cNota = gen28.find(g => g.k === 'flash');
+  ok(gen28.length === 2 && !!cCorto && !!cNota,
+     'de dos subrayados salen dos actividades: un completar del trozo corto y una tarjeta de la marca con nota',
+     'las generadas salieron mal: ' + JSON.stringify(gen28.map(g => g.k)));
+  ok(cCorto && cCorto.a === trozo28 && cuerpo28.indexOf(cCorto.a) >= 0 && /___/.test(cCorto.q)
+     && cCorto.q.indexOf(cCorto.a) < 0,
+     '⚠️ y la respuesta del completar ES el trozo marcado, sacado del texto y tapado en su propia frase',
+     '⚠️ la respuesta generada no es el trozo del texto: «' + (cCorto && cCorto.a) + '»');
+  ok(cNota && cNota.f === '¿De qué habla aquí?',
+     'y la tarjeta usa la NOTA de quien leyó como cara: es mejor pregunta que cualquiera generada',
+     'la tarjeta no usó la nota: ' + JSON.stringify(cNota && cNota.f));
+  w.eval('vozActGenerarYGuardar("c-act")');
+  await esperar(200);
+  ok(Number(w.eval('vozActCuenta("c-act")')) === 10 && Number(w.eval('vozActDe("c-act").items.filter(i => !i.auto).length')) === 8,
+     'refrescar desde los subrayados AÑADE las suyas y no pisa las pegadas a mano',
+     'al generar se perdieron las pegadas: ' + w.eval('vozActCuenta("c-act")'));
+  w.eval('vozActGenerarYGuardar("c-act")');
+  await esperar(200);
+  ok(Number(w.eval('vozActCuenta("c-act")')) === 10,
+     'y volver a generar las REEMPLAZA en vez de duplicarlas', 'generar dos veces dejó ' + w.eval('vozActCuenta("c-act")'));
+
+  /* 28.6 El taller se juega: una de selección, una de completar con
+     una falta de ortografía, y una de emparejar a toques. */
+  w.eval('vozActAbrirTaller("c-act")');
+  await esperar(300);
+  ok(!d.getElementById('voz-act-overlay').hidden && /Taller de/.test(d.getElementById('voz-act-tit').textContent)
+     && /al modo de/.test(d.getElementById('voz-act-tit').textContent),
+     'el taller abre con la etiqueta del texto en su cabecera (la regla 1 vale también aquí)',
+     'el taller no abrió o no lleva la etiqueta');
+  const jugar = (k) => w.eval(`(function(){
+    vozActEmpezar('c-act', 'todas');
+    const s = _vozActSesion, i = s.cola.findIndex(x => x.k === ${JSON.stringify(k)});
+    if (i < 0) return 'no hay';
+    s.cola = [s.cola[i]]; s.i = 0; vozActPintarTaller(); return 'ok'; })()`);
+  jugar('opcion');
+  await esperar(200);
+  const itOp = JSON.parse(w.eval('JSON.stringify(_vozActSesion.cola[0])'));
+  d.querySelectorAll('.voz-act-op')[(itOp.ok + 1) % itOp.o.length].click();
+  await esperar(200);
+  ok(d.querySelectorAll('.voz-act-op-ok').length === 1 && d.querySelectorAll('.voz-act-op-no').length === 1
+     && /No era/.test(d.querySelector('.voz-act-fb-t').textContent)
+     && d.querySelector('.voz-act-fb-r').textContent.indexOf(itOp.o[itOp.ok]) >= 0,
+     '⚠️ al fallar una de selección se enseña LA BUENA en el acto: un taller que solo dice «no» enseña a fallar dos veces',
+     'al fallar no se enseñó la respuesta buena');
+  jugar('completar');
+  await esperar(200);
+  const itC = JSON.parse(w.eval('JSON.stringify(_vozActSesion.cola[0])'));
+  d.querySelector('.voz-act-campo').value = itC.a.slice(0, -1) + 'x';
+  [...d.querySelectorAll('.voz-act-btns .voz-btn')].find(b => /Comprobar/.test(b.textContent)).click();
+  await esperar(200);
+  ok(/Casi/.test(d.querySelector('.voz-act-fb-t').textContent) && w.eval('_vozActSesion.bien') === 1,
+     'una falta de ortografía cuenta como acierto y se dice «casi»: castigarla es castigar por escribir deprisa en una tableta',
+     'la respuesta casi buena no se aceptó: ' + d.querySelector('.voz-act-fb-t').textContent);
+  jugar('pares');
+  await esperar(200);
+  const nPares = Number(w.eval('_vozActSesion.cola[0].ps.length'));
+  for (let k = 0; k < nPares; k++) {
+    const iz = [...d.querySelectorAll('.voz-act-par-i')].filter(n => !n.classList.contains('voz-act-par-hecho'))[0];
+    iz.click();
+    await esperar(60);
+    const idx = Number(iz.dataset.iz);
+    const de = [...d.querySelectorAll('.voz-act-par-d')].find(n => Number(n.dataset.de) === idx);
+    if (de) de.click();
+    await esperar(60);
+  }
+  ok(!!d.querySelector('.voz-act-btns .voz-btn') && /Comprobar/.test(d.querySelector('.voz-act-btns .voz-btn').textContent),
+     'emparejar se hace tocando una y su pareja, sin arrastrar: un gesto que sea la única manera es algo que a veces no se puede hacer',
+     'no se pudo emparejar a toques');
+  [...d.querySelectorAll('.voz-act-btns .voz-btn')].find(b => /Comprobar/.test(b.textContent)).click();
+  await esperar(200);
+  ok(/Bien/.test(d.querySelector('.voz-act-fb-t').textContent),
+     'y emparejadas bien, cuenta como acierto', 'emparejar bien salió mal');
+  const asaPar = w.eval(`(function(){ const n = document.querySelector('.voz-act-par-i'); return n ? getComputedStyle(n).touchAction : 'no hay'; })()`);
+  ok(asaPar === 'none',
+     'la ficha que se arrastra lleva `touch-action: none` (sin eso el navegador se queda el gesto y el arrastre no arranca)',
+     'la ficha de emparejar no tiene touch-action: none: ' + asaPar);
+
+  /* 28.7 El avance es del APARATO, con repaso espaciado, y no viaja. */
+  const av28 = JSON.parse(w.localStorage.getItem('faro_voz_act_avance_v1') || '{}');
+  const apuntadas = Object.keys(av28['c-act'] || {}).length;
+  ok(apuntadas >= 3, 'el avance queda apuntado en el aparato (' + apuntadas + ' actividades)', 'no se apuntó el avance');
+  const unaBien = Object.values(av28['c-act']).find(a => a.ok > 0);
+  ok(unaBien && unaBien.prox > Date.now() + 20 * 3600000,
+     'y lo acertado no vuelve a preguntarse mañana: el repaso es espaciado',
+     'lo acertado vuelve demasiado pronto');
+  ok(base28.llamadas.filter(l => l.m !== 'GET' && /voz_act/.test(l.url)).length
+     === base28.actEscritas.length,
+     '⚠️ y el AVANCE no viaja: a la nube solo suben las actividades, nunca qué acertó cada quien',
+     '⚠️ el avance de una persona se subió a la nube');
+
+  /* 28.8 Nada de lo pegado escribe HTML dentro de F.A.R.O. */
+  w.eval(`window.__colado5 = 0; vozActGuardarFicha('c-act', [
+    { id: 'v1', k: 'flash', f: '<img src=x onerror="window.__colado5=1">', r: 'y una comilla " suelta' },
+    { id: 'v2', k: 'opcion', q: '<b>negrita</b> <img src=y onerror="window.__colado5=1">', o: ['<i>a</i>', 'b'], ok: 0 }], true);
+    vozActEmpezar('c-act', 'todas'); _vozActSesion.cola = vozActDe('c-act').items.slice(); _vozActSesion.i = 0; vozActPintarTaller()`);
+  await esperar(300);
+  ok(!w.__colado5 && d.querySelectorAll('#voz-act-cuerpo img, #voz-act-cuerpo b, #voz-act-cuerpo i').length === 0
+     && /<img src=x/.test(d.getElementById('voz-act-cuerpo').textContent),
+     '⚠️ una actividad con HTML dentro se lee como texto y no crea ni un elemento',
+     '⚠️ EL HTML de una actividad pegada creó elementos o se ejecutó');
+  w.eval('vozActCerrarTaller()');
+  await esperar(150);
+
+  /* 28.9 El enlace del pie del texto: es donde de verdad se decide. */
+  w.eval(`vozActGuardarFicha('c-act', [{ id: 'z1', k: 'flash', f: 'a', r: 'b' }], true);
+          _vozAj.modo = 'paginas'; vozGuardaAjustes(); vozAbrirLector('c-act'); vozIrCapitulo(1, true)`);
+  await esperar(600);
+  w.eval('vozIrPagina(_vozPaginas - 1, true)');
+  await esperar(300);
+  const enlacePie = d.querySelector('#voz-texto .voz-fin-taller');
+  ok(!!enlacePie, 'el pie de la última página lleva el enlace al taller', 'no hay enlace al taller al final del texto');
+  const desnudoAntes = d.getElementById('voz-lector').classList.contains('voz-desnudo');
+  if (enlacePie) enlacePie.click();
+  await esperar(300);
+  ok(!d.getElementById('voz-act-overlay').hidden,
+     'y tocarlo abre el taller sin cerrar la lectura: al terminar se vuelve a la página en que se iba',
+     'el enlace del pie no abrió el taller');
+  ok(d.getElementById('voz-lector').classList.contains('voz-desnudo') === desnudoAntes,
+     'y tocar ese botón NO apaga además los mandos de la sala', '⚠️ tocar el enlace del pie apagó las barras de la lectura');
+  w.eval('vozActCerrarTaller(); vozCerrarLector()');
+  await esperar(200);
+
+  /* 28.10 Sin la tabla corrida, el taller funciona entero y LO DICE. */
+  nuevaBase(w, { sinTablaAct: true });
+  w.eval('_vozActNube = "local"; vozActSincronizar("c-act")');
+  await esperar(400);
+  ok(/voz_actividades\.sql/.test(w.eval('vozActRotuloNube()')) && /aparato/i.test(w.eval('vozActRotuloNube()')),
+     'sin correr el SQL el taller funciona igual y dice qué archivo falta, en vez de fingir que viaja',
+     'no dice qué falta: ' + w.eval('vozActRotuloNube()'));
+  ok(Number(w.eval('vozActCuenta("c-act")')) === 1,
+     'y lo que había en el aparato no se pierde', 'se perdieron las actividades sin tabla');
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

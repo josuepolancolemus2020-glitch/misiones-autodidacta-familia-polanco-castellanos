@@ -970,7 +970,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Veintiséis reglas, y ninguna es de adorno:**
+**Veintisiete reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -1581,6 +1581,98 @@ el diseño.
    entrevistas y los careos se añadió `entrevista` a VOZ_GENEROS (regla 15:
    añadir un género es una línea en un archivo).
 
+27. ⚠️ **EL TALLER DE COMPRENSIÓN: LO LEÍDO SE QUEDA O NO SE QUEDA.**
+   Pedido por el autor el 16 de septiembre de 2026: «que en cada ensayo de
+   esta herramienta pudieras crear el enlace de actividades de comprensión
+   lectora… tarjetas de memoria, de arrastre, preguntas de comprensión, de
+   completar y de selección para recordar datos importantes como fechas,
+   referencias». Vive en la misma herramienta, con su tabla aparte
+   (`supabase/sql/voz_actividades.sql` y su comprobación
+   `voz_actividades_comprueba.sql`).
+
+   Qué resuelve, y no es un adorno: un ensayo leído de corrido en una
+   tableta se siente entendido mientras se lee y se ha ido a los tres
+   días. Esa sensación tiene nombre en esta casa —es la misma que audita
+   la Ruta del Expediente Dorado: la facilidad con que corre un texto
+   releído mide la COSTUMBRE y se factura como saber—. Lo único que la
+   desmiente es cerrar el libro e intentar decirlo.
+
+   **Cinco tipos, en `VOZ_ACT_TIPOS`**: 🃏 tarjeta, 🔗 emparejar, 🔘
+   selección, ✏️ completar y 💭 abierta. Viven en el aparato, no en la
+   base (regla 15): añadir uno es una línea en un archivo.
+
+   ⚠️ **SON DOS PUERTAS, Y LAS DOS HACEN FALTA:**
+   · **Se PEGAN**, como el texto, como el guion de El Rodaje y como el
+     quiz de Videos M.E.T.A.S. Las escribe la misma máquina que escribió
+     el texto, en la misma ventana. El lector entiende lo que una máquina
+     escribe de verdad: títulos de sección, `a :: b`, `a → b`, `A) B) C)
+     D)` con ✅, `___` con su «Respuesta:», «Pauta:» y la lista final
+     «**Respuestas: 1-A, 2-B**».
+     ⚠️ **Y LOS ADORNOS SE QUITAN ANTES DE MIRAR QUÉ DICE LA LÍNEA**
+     (`vozActPelaAdornos`). Una máquina escribe esa lista final en
+     negrita y con viñeta, porque es un pie de tabla; sin quitarlos no
+     casaba con nada y las dos preguntas se quedaban sin correcta, o sea
+     que el guardado se paraba pidiendo justo lo que el texto ya traía
+     escrito. Se descubrió pegando lo que de verdad devuelve una máquina,
+     no leyendo el código.
+   · **Se GENERAN desde los subrayados**, y eso cierra un círculo que ya
+     estaba abierto: quien lee marca con los cinco colores lo que importa
+     (regla 21), y eso YA ES la lista de lo que hay que recordar. Un
+     subrayado que no se vuelve a mirar es un rotulador gastado.
+     ⚠️ **LA RESPUESTA SALE DEL TEXTO, NUNCA SE INVENTA**: es el trozo
+     que la persona marcó, tapado dentro de su propia frase
+     (`vozActFrase`). Un trozo corto da un COMPLETAR; uno largo, una
+     TARJETA; y una marca con NOTA da una tarjeta con la nota delante,
+     porque esa es la pregunta que quien leía ya se hizo y es mejor que
+     cualquiera generada. Las generadas llevan `auto` y se REEMPLAZAN
+     enteras al refrescar; las pegadas a mano no se tocan.
+
+   ⚠️ **Y LO QUE NO SE HACE, POR LA REGLA QUE NO SE NEGOCIA DE VIDEOS
+   M.E.T.A.S: aquí NO se adivina cuál es la correcta.** Si el texto
+   pegado no lo dice, no se marca ninguna: la pregunta sale en ámbar, se
+   dice con palabras y **el guardado se para nombrando cuál falta**.
+   Marcar la A a ojo acierta una de cada cuatro veces, y un examen con la
+   respuesta cambiada no lo descubre nadie hasta que alguien acierta y la
+   pantalla le dice que falló.
+
+   **Cómo se juega**: una actividad a la vez y **MEZCLADAS**, no
+   agrupadas por tipo. Es la práctica intercalada del taller de la
+   memoria: diez tarjetas seguidas se contestan en piloto automático
+   porque el cerebro ya sabe qué va a tener que hacer. ⚠️ **Al fallar se
+   enseña la buena EN EL ACTO**: un taller que dice «no» y pasa a la
+   siguiente enseña a fallar dos veces. Y una falta de ortografía cuenta
+   como acierto («casi»): castigarla es castigar por escribir deprisa en
+   una tableta lo que sí se sabía.
+   ⚠️ **Emparejar se hace TOCANDO una y su pareja**, y además se puede
+   arrastrar con punteros: es la regla del asa de la repisa, un gesto que
+   sea la única manera de hacer algo es algo que a veces no se puede
+   hacer. `touch-action: none` va SOLO en la ficha que se arrastra; en el
+   tablero entero, la pantalla del taller dejaría de deslizarse y no se
+   llegaría al botón de comprobar.
+
+   ⚠️ **LAS ACTIVIDADES SON DE LA CASA; EL AVANCE ES DEL APARATO.** Los
+   cuatro las ven y las hacen —un cuestionario que solo pudiera ver quien
+   lo pegó convierte «hazle las preguntas a tu hermana» en «pásame tu
+   sesión»— pero qué acertó cada quien NO viaja, por lo mismo que la
+   posición de lectura (regla 12). Con repaso espaciado a 1, 3, 14 y 30
+   días, como el taller de la memoria.
+
+   **Tres enlaces, y el que importa es el primero:** al pie de la última
+   página del texto (es el único momento en que alguien tiene el texto
+   entero leído y las manos libres; un botón que haya que ir a buscar
+   después de cerrar el libro se toca una vez en la vida), la pestaña 📝
+   del panel de la sala, y el 📝 de la ficha del anaquel con la cuenta de
+   las que tocan hoy.
+
+   ⚠️ **Y LAS DOS HOJAS DEL TALLER CUELGAN DENTRO DE ÉL**, no del body.
+   Colgando del body salían con el `z-index: 100` de `.fin-modal-overlay`,
+   muy por debajo del taller (3300) y de la sala (3200): el botón
+   respondía, la hoja se abría y no se veía absolutamente nada. Dentro se
+   tiñen además solas con el papel puesto (regla 9). Y como el precio es
+   que con el taller cerrado no se verían, `vozActAbrirPegar` **abre el
+   taller primero**: la trampa deja de poder existir en vez de quedar
+   escrita en un comentario. Lo cazó la sonda, no la lectura del código.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -1623,6 +1715,32 @@ sin etiqueta no entre nada, que la cola quede vacía y que la subida llegue
 FIRMADA. La otra mitad del puente —el botón dentro de la misión— la vigila
 `_dev/probe-lecturas-marcador.html`, pulsándolo de verdad y contando los
 párrafos que viajan.
+
+La comprobación **28** es el taller de comprensión, y es la más larga
+porque lo que puede salir mal está ordenado por gravedad: que se guarde
+un examen con la respuesta cambiada; que una actividad generada tenga
+una respuesta que NO está en el texto (se comprueba buscándola dentro
+del párrafo); que lo pegado escriba HTML; que la hoja de pegar se abra
+por debajo del taller y parezca un botón muerto (se mide con
+`elementFromPoint`, no leyendo el z-index); y que el avance de una
+persona se suba a la nube, que se comprueba contando las escrituras.
+
+Y el SQL del taller, contra un PostgreSQL de verdad:
+
+```
+createdb acttest
+psql -v ON_ERROR_STOP=1 -d acttest -f _dev/prueba-voz-actividades-sql.sql
+```
+
+⚠️ Esa prueba mira la puerta **dos veces y en este orden**: primero que
+el `revoke` del archivo le quitó a `anon` el permiso de tabla —y que a
+`authenticated` no se le dio `delete`, porque aquí se vacía con lápida—,
+y solo DESPUÉS reparte los permisos como los reparte Supabase
+(`grant all` sobre `public`) para probar que, aun con el permiso de tabla
+abierto, la seguridad por fila sigue dejando fuera a `anon`. Al revés
+—concediendo primero— las dos comprobaciones se tapan: la del `revoke`
+falla siempre y la de la seguridad por fila aprueba por el motivo
+equivocado.
 
 La comprobación **27** es la lectura a página limpia: el ⛶ de la barra
 (con una pantalla completa de mentira, que en un Chromium sin cabeza no hay

@@ -1675,6 +1675,14 @@ function vozFicha(c) {
      el que lo toca se queda pensando que la aplicación falló. Y el que
      no se ofrece lo DICE al tocarlo, en vez de quedarse mudo. */
   const mio = vozEsMio(c);
+  const nAct = vozActCuenta(c.cid);
+  const tocan = nAct ? vozActResumen(c.cid).tocan : 0;
+  const taller = vozBoton('voz-btn voz-ficha-taller' + (tocan ? ' voz-ficha-taller-hoy' : ''), '📝',
+    () => vozActAbrirTaller(c.cid),
+    nAct ? ('Taller de comprensión: ' + nAct + (tocan ? ', ' + tocan + ' tocan hoy' : '')) : 'Montar el taller de comprensión de este texto');
+  if (nAct) taller.appendChild(vozNodo('span', 'voz-ficha-taller-n', String(tocan || nAct)));
+  pie.appendChild(taller);
+
   const edit = vozBoton('voz-btn', '✏️', mio ? () => vozAbrirPegar(c) : () => vozAvisoAjeno(c),
     mio ? 'Corregir la ficha' : 'Lo puso otra persona de la casa');
   edit.classList.toggle('voz-btn-apagado', !mio);
@@ -1770,6 +1778,11 @@ function vozMenuAbrir(c) {
   const leer = vozBotonLeer(c, 'voz-btn voz-btn-pri voz-btn-ancho');
   leer.addEventListener('click', vozCerrarMenu);
   lista.appendChild(leer);
+  const nA = vozActCuenta(c.cid);
+  const tA = nA ? vozActResumen(c.cid).tocan : 0;
+  lista.appendChild(vozBoton('voz-btn voz-btn-ancho',
+    nA ? ('📝 Taller de comprensión · ' + nA + (tA ? ' · ⏰ ' + tA + ' hoy' : '')) : '📝 Montar el taller de comprensión',
+    () => { vozCerrarMenu(); vozActAbrirTaller(c.cid); }));
   lista.appendChild(vozBoton('voz-btn voz-btn-ancho', '📋 Copiar con su etiqueta', () => { vozCerrarMenu(); vozCopiar(c); }));
   if (navigator.share) lista.appendChild(vozBoton('voz-btn voz-btn-ancho', '📤 Compartir con su etiqueta', () => { vozCerrarMenu(); vozCompartir(c); }));
   if (vozEsMio(c)) {
@@ -2014,6 +2027,7 @@ function vozAbrirLector(cid) {
   }
   document.body.classList.add('voz-sala');
   vozCargarLetras();
+  vozActSincronizar(cid);
   vozAplicaAjustes();
   vozPintarBarraMarcas();
   vozPintarCap(_vozAncla, _vozSub);   // −1 al abrir un texto nuevo: la portada
@@ -2216,6 +2230,22 @@ function vozFinNodo(c, ci) {
     if (!yaDiceFin) fin.appendChild(vozNodo('div', 'voz-fin-txt', 'Fin de «' + (c.titulo || 'el texto') + '».'));
     fin.appendChild(vozNodo('div', 'voz-fin-et',
       g.t + ' escrito por ' + (c.maquina || 'una máquina') + ', al modo de ' + (c.voz || '—') + '.'));
+    /* ⚠️ EL ENLACE AL TALLER VA AQUÍ, AL PIE DE LA ÚLTIMA PÁGINA, y no
+       solo en un panel: es el único momento en que alguien tiene a la
+       vez el texto entero leído y las manos libres. Un botón que haya
+       que ir a buscar después de cerrar el libro es un botón que se
+       toca una vez en la vida. */
+    const n = vozActCuenta(c.cid);
+    const res = vozActResumen(c.cid);
+    const enlace = vozBoton('voz-fin-taller', null, () => vozActAbrirTaller(c.cid, 'sala'));
+    enlace.appendChild(vozNodo('span', 'voz-fin-taller-ic', '📝'));
+    enlace.appendChild(vozNodo('span', 'voz-fin-taller-t',
+      n ? (res.tocan ? 'Repasar lo leído · ' + res.tocan + ' tocan hoy' : 'Taller de comprensión · ' + n)
+        : '¿Se quedó? Monta el taller de este texto'));
+    enlace.appendChild(vozNodo('span', 'voz-fin-taller-p',
+      n ? 'Tarjetas, parejas y preguntas sobre lo que acabas de leer.'
+        : 'Tarjetas, parejas y preguntas para comprobar que lo leído se quedó.'));
+    fin.appendChild(enlace);
   }
   return fin;
 }
@@ -2784,7 +2814,10 @@ function vozEngancharSala() {
        o quitarlo. No apaga los mandos. */
     const mk = e.target && e.target.closest ? e.target.closest('mark.voz-hl') : null;
     if (mk) { e.preventDefault(); vozSubAbrirMarca(mk.dataset.subId, mk.getBoundingClientRect()); return; }
-    if (e.target && e.target.closest && e.target.closest('a, mark')) return;
+    /* Un botón dentro del texto (el enlace al taller del pie) hace lo
+       suyo y NO apaga los mandos: tocarlo y que además desaparezca la
+       barra sería la peor sorpresa posible. */
+    if (e.target && e.target.closest && e.target.closest('a, mark, button')) return;
     if (haySeleccion()) return;
     if (vozSubBarraAbierta()) { vozSubCerrarBarra(); return; }
     const b = document.getElementById('voz-lector');
@@ -3677,7 +3710,7 @@ function vozPintarPanelInd(tab) {
   p.textContent = '';
 
   const tabs = vozNodo('div', 'voz-tabs');
-  [['ind', '☰ Índice'], ['marcas', '🔖 Marcas'], ['subs', '🖍 Subrayados'], ['busca', '🔍 Buscar']].forEach(([id, t]) => {
+  [['ind', '☰ Índice'], ['marcas', '🔖 Marcas'], ['subs', '🖍 Subray.'], ['busca', '🔍 Buscar'], ['taller', '📝 Taller']].forEach(([id, t]) => {
     const b = vozBoton('voz-tab' + (_vozPanelTab === id ? ' voz-tab-on' : ''), t, () => vozPintarPanelInd(id));
     b.setAttribute('role', 'tab');
     b.setAttribute('aria-selected', _vozPanelTab === id ? 'true' : 'false');
@@ -3690,6 +3723,7 @@ function vozPintarPanelInd(tab) {
   if (_vozPanelTab === 'marcas') vozPintarMarcas(cuerpo);
   else if (_vozPanelTab === 'subs') vozPintarSubrayados(cuerpo);
   else if (_vozPanelTab === 'busca') vozPintarBuscador(cuerpo);
+  else if (_vozPanelTab === 'taller') vozPintarPestanaTaller(cuerpo);
   else vozPintarIndice(cuerpo);
 }
 
@@ -3878,6 +3912,38 @@ function vozPintarSubrayados(cuerpo) {
     fila.appendChild(vozBoton('voz-marca-x', '✕', () => vozSubQuitar(m.id), 'Quitar este subrayado'));
     cuerpo.appendChild(fila);
   });
+}
+
+/* La pestaña 📝 del panel: el resumen y la puerta. El taller entero no
+   cabe en un panel de tres cuartos de pantalla —hay que escribir,
+   arrastrar y leer la corrección—, así que aquí va lo que se decide de
+   un vistazo y el botón que abre la pantalla de verdad. */
+function vozPintarPestanaTaller(cuerpo) {
+  const c = _vozLeyendo;
+  const n = vozActCuenta(c.cid);
+  const res = vozActResumen(c.cid);
+  const nSub = vozSubDe(c.cid).length;
+  cuerpo.appendChild(vozNodo('div', 'voz-ind-tit', 'Taller de comprensión'));
+  if (!n) {
+    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota',
+      'Todavía no hay actividades para este texto. Sirven para lo único que leer de corrido no hace: '
+      + 'comprobar que lo leído se quedó — fechas, nombres, referencias.'));
+  } else {
+    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota',
+      n + (n === 1 ? ' actividad' : ' actividades') + ' · ' + res.firmes + ' ya te salen de memoria · '
+      + (res.tocan ? res.tocan + ' tocan repasar hoy' : 'hoy no toca ninguna')));
+  }
+  cuerpo.appendChild(vozBoton('voz-btn voz-btn-pri voz-btn-ancho',
+    n ? (res.tocan ? '▶️ Repasar lo que toca hoy (' + res.tocan + ')' : '📝 Abrir el taller') : '📝 Montar el taller',
+    () => { vozCerrarPaneles(); vozActAbrirTaller(c.cid, 'sala'); }));
+  if (nSub) {
+    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota',
+      '🖍 Tienes ' + nSub + (nSub === 1 ? ' subrayado' : ' subrayados') + ' aquí: cada uno puede convertirse en una '
+      + 'pregunta cuya respuesta es el trozo que marcaste, sin escribir nada.'));
+  }
+  const est = vozNodo('p', 'voz-aj-nota voz-act-estado', vozActRotuloNube());
+  est.id = 'voz-act-estado';
+  cuerpo.appendChild(est);
 }
 
 /* ─── El buscador de la sala ──────────────────────────────────────
@@ -4528,6 +4594,1607 @@ function vozAbrirAyuda() {
   ov.style.display = 'flex';
 }
 
+
+/* ══════════════════════════════════════════════════════════════════
+   EL TALLER DE COMPRENSIÓN · lo leído se queda o no se queda
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 16 de septiembre de 2026: «que en cada ensayo
+   de esta herramienta pudieras crear el enlace de actividades de
+   comprensión lectora, con el propósito de haber asimilado bien el
+   contenido leído… tarjetas de memoria, de arrastre, preguntas de
+   comprensión, preguntas de completar y de selección para recordar
+   datos importantes como fechas, referencias».
+
+   Qué resuelve, y por qué no es un adorno: un ensayo leído de corrido
+   en una tableta se siente entendido mientras se lee y se ha ido a los
+   tres días. Esa sensación tiene nombre en la casa —es la misma que
+   audita la Ruta del Expediente Dorado: la facilidad con que corre un
+   texto releído mide la COSTUMBRE y se factura como saber—. Lo único
+   que la desmiente es cerrar el libro e intentar decirlo.
+
+   ⚠️ DE DÓNDE SALEN LAS ACTIVIDADES, Y POR QUÉ SON DOS PUERTAS:
+
+   1. SE PEGAN, como el texto, como el guion de El Rodaje y como el
+      quiz de Videos M.E.T.A.S. Las escribe la misma máquina que
+      escribió el texto, en la misma ventana, y trocearlas a mano en
+      una tableta son doscientos toques.
+   2. SE GENERAN DESDE LOS SUBRAYADOS, y esto cierra un círculo que ya
+      estaba abierto: quien lee marca con los cinco colores lo que
+      importa (regla 21), y eso YA ES la lista de lo que hay que
+      recordar. La respuesta de una actividad generada es SIEMPRE el
+      trozo que la persona marcó —sale del texto, no se inventa—.
+
+   ⚠️ Y LO QUE NO SE HACE, POR LA MISMA REGLA QUE NO SE NEGOCIA EN
+   VIDEOS M.E.T.A.S: aquí NO se adivina cuál es la respuesta correcta.
+   Una opción marcada a ojo acierta una de cada cuatro veces, y un quiz
+   con la respuesta cambiada no lo descubre nadie hasta que alguien
+   acierta y la pantalla le dice que falló. Si el texto pegado no dice
+   cuál es, no se marca ninguna: la pregunta sale en ÁMBAR, se dice con
+   palabras y el guardado se para nombrando cuál falta.
+   ══════════════════════════════════════════════════════════════════ */
+
+const VOZ_ACT_LOCAL  = 'faro_voz_actividades_v1';
+const VOZ_ACT_AVANCE = 'faro_voz_act_avance_v1';
+const VOZ_ACT_TABLA  = 'voz_actividades';
+
+/* Los cinco tipos, con su nombre y su icono. Como los géneros, viven
+   en el aparato y no en la base (regla 15): añadir uno es una línea
+   aquí, no una migración que alguien pega desde una tableta. */
+const VOZ_ACT_TIPOS = [
+  { id: 'flash',     ic: '🃏', t: 'Tarjeta',   pl: 'tarjetas de memoria' },
+  { id: 'pares',     ic: '🔗', t: 'Emparejar', pl: 'de emparejar' },
+  { id: 'opcion',    ic: '🔘', t: 'Selección', pl: 'de selección' },
+  { id: 'completar', ic: '✏️', t: 'Completar', pl: 'de completar' },
+  { id: 'abierta',   ic: '💭', t: 'Abierta',   pl: 'abiertas' },
+];
+function vozActTipo(id) { return VOZ_ACT_TIPOS.find(t => t.id === id) || VOZ_ACT_TIPOS[0]; }
+
+let _vozAct = null;        // {cid: ficha} del aparato, lápidas incluidas
+let _vozActNube = 'local'; // local | subiendo | al-dia | sin-tabla | sin-sesion | sin-senal | error
+let _vozActTimer = null;
+let _vozActSincronizando = false;
+
+function vozActId() {
+  return 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+function vozActLeeTodo() {
+  if (_vozAct) return _vozAct;
+  try { _vozAct = JSON.parse(localStorage.getItem(VOZ_ACT_LOCAL) || '{}') || {}; }
+  catch (e) { _vozAct = {}; }
+  return _vozAct;
+}
+
+function vozActGuardaTodo() {
+  try { localStorage.setItem(VOZ_ACT_LOCAL, JSON.stringify(vozActLeeTodo())); } catch (e) {}
+}
+
+/* La ficha de actividades de un texto. Devuelve SIEMPRE un objeto, con
+   la lista vacía si no hay nada: así quien la pinta no tiene que
+   preguntar dos veces. Una ficha con lápida cuenta como vacía. */
+function vozActDe(cid) {
+  const f = vozActLeeTodo()[cid];
+  if (!f || f.borrado || !Array.isArray(f.items)) return { cid: cid, items: [], actualizado: 0 };
+  return f;
+}
+
+function vozActCuenta(cid) {
+  return vozActDe(cid).items.length;
+}
+
+/* ─── El lector de lo pegado ──────────────────────────────────────
+   ⚠️ AQUÍ LA ASIMETRÍA ES LA CONTRARIA QUE EN EL TEXTO, y por eso va
+   escrita antes de tocar ninguna expresión regular:
+
+     en el texto, ascender una línea a título PARTE el cuento;
+     aquí, NO reconocer una pregunta la pierde, y perderla se ve.
+
+   Un texto pegado se lee entero y un renglón mal leído se descubre
+   leyendo; una tanda de actividades se REPASA ANTES de guardar (la
+   pantalla dice cuántas entendió de cada tipo), así que equivocarse
+   hacia «esto era una pregunta» sale a la luz en el acto. Por eso
+   aquí se puede ser generoso donde allá había que ser miedoso.
+
+   Lo único que NO se toca es la respuesta correcta: sin decirlo el
+   texto, no se marca. */
+
+/* Las cabeceras que cambian de modo. Se comparan sin tildes y en
+   minúsculas, y basta con que la línea las CONTENGA: una máquina
+   escribe «## 3. Preguntas de comprensión lectora (selección)» y eso
+   tiene que caer en su sitio. */
+const VOZ_ACT_CABECERAS = [
+  [/tarjet|memor|flash|anverso|memoriz/, 'flash'],
+  [/empareja|arrastr|relacion|une (?:cada|las|los)|columna|parej/, 'pares'],
+  [/completa|rellen|hueco|espacio en blanco|llena/, 'completar'],
+  [/abierta|analisis|reflexi|desarroll|ensayo corto|responde con tus/, 'abierta'],
+  [/comprension|seleccion|opcion|eleccion|quiz|multiple|test|marca la/, 'opcion'],
+];
+
+function vozActModoDeCabecera(linea) {
+  const t = vozSinTildes(linea).toLowerCase();
+  for (const [re, modo] of VOZ_ACT_CABECERAS) if (re.test(t)) return modo;
+  return '';
+}
+
+/* Una cabecera es una almohadilla, un rótulo en MAYÚSCULAS o una
+   negrita sola: las tres formas en que una máquina separa secciones.
+   Se le quitan los adornos antes de mirar qué dice. */
+function vozActEsCabecera(l) {
+  const s = l.trim();
+  if (!s) return '';
+  const pelada = s.replace(/^#{1,6}\s*/, '').replace(/^\*\*|\*\*$/g, '').replace(/^[*_]+|[*_]+$/g, '').trim();
+  if (!pelada || pelada.length > 90) return '';
+  const esAlmohadilla = /^#{1,6}\s/.test(s);
+  const esNegrita = /^\*\*[^*]+\*\*[.:]?$/.test(s);
+  const esMayus = pelada === pelada.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(pelada);
+  const acabaEnDosPuntos = /:$/.test(pelada) && pelada.split(/\s+/).length <= 8;
+  if (!esAlmohadilla && !esNegrita && !esMayus && !acabaEnDosPuntos) return '';
+  return vozActModoDeCabecera(pelada);
+}
+
+/* Quita la numeración de delante («1.», «3)», «- », «• »), que es como
+   vienen numeradas las preguntas, y devuelve lo que queda. */
+function vozActSinVineta(l) {
+  return l.replace(/^\s*(?:[-*•·]\s+|\d{1,3}\s*[.)\]-]\s*)/, '').trim();
+}
+
+/* Una opción: «A) texto», «a. texto», «B - texto». La letra tiene que
+   ser una sola y de las ocho primeras: con más, cualquier palabra que
+   empiece por letra y guion pasaría por opción. */
+function vozActOpcion(l) {
+  const m = l.trim().match(/^\(?([A-Ha-h])\)?\s*[.)\-–—]\s*(\S.*)$/);
+  if (!m) return null;
+  return { letra: m[1].toUpperCase(), t: m[2].trim() };
+}
+
+/* La marca de «esta es la buena», en cualquiera de las formas en que
+   una máquina la escribe. Devuelve el texto ya limpio y si estaba
+   marcada, para no dejar el ✅ dentro de la opción. */
+function vozActMarcaCorrecta(t) {
+  let s = t, ok = false;
+  const marcas = [/\s*[✅✔✓☑]\s*/g, /\s*\((?:correcta?|respuesta correcta|la correcta|buena)\)\s*/gi,
+                  /\s*\[(?:correcta?|x|X)\]\s*/g, /\s*←\s*(?:correcta?)?\s*$/i];
+  marcas.forEach(re => { if (re.test(s)) { ok = true; s = s.replace(re, ' '); } });
+  /* La negrita entera como marca, que es lo que hace una máquina
+     cuando no quiere poner un emoji. Solo si envuelve TODA la opción:
+     una negrita en mitad de la frase es énfasis, no respuesta. */
+  const neg = s.trim().match(/^\*\*(.+)\*\*$/);
+  if (neg) { ok = true; s = neg[1]; }
+  return { t: s.replace(/\s{2,}/g, ' ').trim(), ok: ok };
+}
+
+/* ⚠️ LOS ADORNOS SE QUITAN ANTES DE MIRAR QUÉ DICE LA LÍNEA, y esto
+   no es cosmética: una máquina escribe la lista de soluciones en
+   negrita («**Respuestas: 1-A, 2-B**») y con viñeta («- Respuesta:
+   B»), porque es un pie de tabla. Sin quitarlos, la línea no casaba
+   con nada, se iba por la rama de «no se entendió» y las DOS preguntas
+   se quedaban sin correcta: o sea que el guardado se paraba pidiendo
+   justo lo que el texto ya traía escrito. Se descubrió pegando lo que
+   de verdad devuelve una máquina, no leyendo el código. */
+function vozActPelaAdornos(l) {
+  return String(l || '').trim()
+    .replace(/^[-*•·]\s+/, '')
+    .replace(/^\*\*(.+)\*\*[.:]?$/, '$1')
+    .replace(/^[_*](.+)[_*]$/, '$1')
+    .trim();
+}
+
+/* «Respuesta: B», «Correcta: 3», «R: b)». Devuelve el índice (0-3) o
+   el texto, que es lo que hace falta para las de completar. */
+function vozActLineaRespuesta(l) {
+  const m = vozActPelaAdornos(l).match(/^(?:respuestas?|correctas?|clave|soluci[oó]n|r)\s*[:.\-–—]\s*(\S.*)$/i);
+  return m ? m[1].trim().replace(/\*\*/g, '').trim() : null;
+}
+
+/* La lista final «Respuestas: 1-C, 2-A, 3-B», que es como una máquina
+   cierra una tanda larga. Devuelve {1:'C', 2:'A'}. */
+function vozActListaRespuestas(v) {
+  const pares = {};
+  const re = /(\d{1,3})\s*[-–—.:)]\s*([A-Ha-h1-8])\b/g;
+  let m, n = 0;
+  while ((m = re.exec(v))) { pares[Number(m[1])] = m[2].toUpperCase(); n++; }
+  return n >= 2 ? pares : null;
+}
+
+function vozActIndiceLetra(s) {
+  const t = String(s || '').trim().replace(/[).\]]/g, '');
+  if (/^[A-Ha-h]$/.test(t)) return t.toUpperCase().charCodeAt(0) - 65;
+  if (/^[1-8]$/.test(t)) return Number(t) - 1;
+  return -1;
+}
+
+/* Un par: «a :: b», «a → b», «a — b», «a | b». ⚠️ La raya larga va la
+   ÚLTIMA y solo si no hay otro separador, porque una frase normal la
+   lleva dentro («—dijo Remedios—») y partiría la frase en dos. */
+function vozActPar(l) {
+  const s = vozActSinVineta(l);
+  if (!s) return null;
+  const seps = [/\s*::\s*/, /\s*(?:→|->|=>|⇒)\s*/, /\s+\|\s+/, /\s*\t+\s*/, /\s+[–—]\s+/];
+  for (const re of seps) {
+    const p = s.split(re);
+    if (p.length === 2 && p[0].trim() && p[1].trim()) {
+      return { a: p[0].trim().replace(/^\*\*|\*\*$/g, '').trim(), b: p[1].trim() };
+    }
+  }
+  return null;
+}
+
+/* ⚠️ EL HUECO SE ESCRIBE DE MUCHAS MANERAS y todas valen: «___»,
+   «____», «…», «[  ]», «( )». Se normalizan a UN hueco, porque lo que
+   la pantalla enseña y lo que se compara tiene que ser lo mismo. */
+const VOZ_ACT_HUECO = /_{2,}|\[\s*\]|\(\s*\)|\.{4,}|…{2,}/;
+function vozActNormalizaHueco(s) {
+  return s.replace(/_{2,}|\[\s*\]|\(\s*\)|\.{4,}|…{2,}/g, '___');
+}
+
+function vozActLeer(texto) {
+  const lineas = String(texto || '').replace(/\r/g, '').split('\n');
+  const items = [];
+  const avisos = [];
+  let modo = '';
+  let actual = null;
+  let listaFinal = null;
+
+  const cerrar = () => {
+    if (!actual) return;
+    const it = actual;
+    actual = null;
+    if (it.k === 'opcion') {
+      if (it.o.length < 2) {
+        /* Una pregunta sin opciones no es de selección: casi siempre
+           es una abierta que vino en la sección equivocada. Se guarda
+           como abierta en vez de tirarla — nunca se descarta nada. */
+        items.push({ id: vozActId(), k: 'abierta', q: it.q, guia: it.guia || '' });
+        return;
+      }
+      items.push({ id: vozActId(), k: 'opcion', q: it.q, o: it.o.slice(0, 6), ok: it.ok, n: it.n });
+      return;
+    }
+    if (it.k === 'completar') {
+      items.push({ id: vozActId(), k: 'completar', q: vozActNormalizaHueco(it.q), a: (it.a || '').trim(), n: it.n });
+      return;
+    }
+    if (it.k === 'abierta') { items.push({ id: vozActId(), k: 'abierta', q: it.q, guia: (it.guia || '').trim() }); return; }
+    if (it.k === 'pares') {
+      if (it.ps.length >= 2) items.push({ id: vozActId(), k: 'pares', q: it.q || 'Empareja cada una con la suya', ps: it.ps.slice(0, 8) });
+      else if (it.ps.length === 1) items.push({ id: vozActId(), k: 'flash', f: it.ps[0][0], r: it.ps[0][1] });
+      return;
+    }
+  };
+
+  lineas.forEach((cruda, i) => {
+    const l = cruda.trim();
+    const renglon = i + 1;
+    if (!l) return;
+    /* Las rayas de separación no dicen nada y no abren nada. */
+    if (/^([-–—=_*]\s*){3,}$/.test(l)) return;
+
+    /* 1. Las cabeceras, antes que nada: cambian de modo y cierran lo
+          que estuviera a medias. */
+    const cab = vozActEsCabecera(l);
+    if (cab) { cerrar(); modo = cab; return; }
+    /* Una cabecera que no nombra ningún tipo tampoco es contenido: es
+       un título de sección («## Actividades»). Cierra y se salta. */
+    if (/^#{1,6}\s/.test(l)) { cerrar(); return; }
+
+    /* 2. La lista final de respuestas, antes que la línea suelta de
+          respuesta: «Respuestas: 1-C, 2-A» tiene las dos formas. */
+    const resp = vozActLineaRespuesta(l);
+    if (resp) {
+      const lista = vozActListaRespuestas(resp);
+      if (lista) { listaFinal = Object.assign(listaFinal || {}, lista); return; }
+      if (actual && actual.k === 'opcion') {
+        const k = vozActIndiceLetra(resp);
+        if (k >= 0) actual.ok = k;
+        else {
+          /* «Respuesta: porque se secó el pozo» — no es una letra: se
+             busca la opción que diga eso. */
+          const n = vozSinTildes(resp).toLowerCase();
+          const j = actual.o.findIndex(o => vozSinTildes(o).toLowerCase() === n);
+          if (j >= 0) actual.ok = j;
+          else avisos.push({ n: renglon, t: 'La respuesta «' + resp.slice(0, 40) + '» no coincide con ninguna opción' });
+        }
+        return;
+      }
+      if (actual && actual.k === 'completar') { actual.a = resp; return; }
+      if (actual && actual.k === 'abierta') { actual.guia = resp; return; }
+      return;
+    }
+
+    /* 3. La pauta de una abierta. */
+    const mPauta = vozActPelaAdornos(l).match(/^(?:pauta|gu[ií]a|orientaci[oó]n|se espera|criterio)\s*[:.\-–—]\s*(\S.*)$/i);
+    if (mPauta) {
+      if (actual && actual.k === 'abierta') actual.guia = ((actual.guia ? actual.guia + ' ' : '') + mPauta[1]).trim();
+      else if (actual && actual.k === 'opcion' && !actual.o.length) { actual.k = 'abierta'; actual.guia = mPauta[1]; }
+      return;
+    }
+
+    /* 4. Una opción, solo si hay una pregunta abierta esperándolas.
+          Sin esa condición, «a) pan b) leche» de una lista cualquiera
+          entraría como examen. */
+    const op = vozActOpcion(l);
+    if (op && actual && actual.k === 'opcion') {
+      const m = vozActMarcaCorrecta(op.t);
+      if (m.ok && actual.ok < 0) actual.ok = actual.o.length;
+      actual.o.push(m.t);
+      return;
+    }
+
+    /* 5. Un par o una tarjeta: dos mitades separadas. */
+    const par = vozActPar(l);
+    if (par && modo !== 'opcion' && modo !== 'completar' && modo !== 'abierta' && !VOZ_ACT_HUECO.test(l)) {
+      if (modo === 'pares') {
+        if (!actual || actual.k !== 'pares') { cerrar(); actual = { k: 'pares', q: '', ps: [] }; }
+        actual.ps.push([par.a, par.b]);
+      } else {
+        cerrar();
+        items.push({ id: vozActId(), k: 'flash', f: par.a, r: par.b });
+      }
+      return;
+    }
+
+    /* 6. Lo que abre una pregunta: una línea numerada, o una que
+          pregunta, o una que trae un hueco. */
+    const pelada = vozActSinVineta(l).replace(/^\*\*|\*\*$/g, '').trim();
+    const numerada = /^\s*\d{1,3}\s*[.)\]-]\s/.test(l) || /^\s*[-*•·]\s/.test(l);
+    const nOrden = (l.match(/^\s*(\d{1,3})\s*[.)\]-]\s/) || [])[1];
+    const pregunta = /[?¿]/.test(pelada);
+    const hueco = VOZ_ACT_HUECO.test(pelada);
+
+    if (hueco && (numerada || pregunta || modo === 'completar' || modo === '')) {
+      cerrar();
+      actual = { k: 'completar', q: pelada, a: '', n: nOrden ? Number(nOrden) : 0 };
+      /* «El pozo se secó en ___ . (1910)» — el paréntesis del final es
+         la respuesta, que es como se escribe cuando no se quiere poner
+         un renglón aparte. */
+      const m = pelada.match(/^(.*___[^()]*?)\s*[(\[]([^()\[\]]{1,60})[)\]]\s*$/);
+      if (m) { actual.q = vozActNormalizaHueco(m[1].trim()); actual.a = m[2].trim(); }
+      return;
+    }
+
+    if (numerada || pregunta) {
+      if (modo === 'abierta') { cerrar(); actual = { k: 'abierta', q: pelada, guia: '' }; return; }
+      if (modo === 'flash' || modo === 'pares') {
+        /* En una sección de tarjetas, una línea suelta que no es un par
+           es la CARA de una tarjeta cuya cruz viene en la línea de
+           abajo: se deja abierta y la siguiente la cierra. */
+        cerrar();
+        actual = { k: 'flash2', f: pelada, r: '' };
+        return;
+      }
+      cerrar();
+      actual = { k: 'opcion', q: pelada, o: [], ok: -1, n: nOrden ? Number(nOrden) : 0 };
+      return;
+    }
+
+    /* 7. La cruz de una tarjeta abierta en la línea anterior. */
+    if (actual && actual.k === 'flash2') {
+      const r = pelada.replace(/^(?:reverso|respuesta|cruz|atr[aá]s)\s*[:.\-–—]\s*/i, '').trim();
+      items.push({ id: vozActId(), k: 'flash', f: actual.f, r: r });
+      actual = null;
+      return;
+    }
+
+    /* 8. Una línea que continúa el enunciado de lo que esté abierto.
+          Nunca se descarta: se pega a lo anterior. */
+    if (actual && (actual.k === 'opcion' || actual.k === 'abierta') && !(actual.o && actual.o.length)) {
+      actual.q = (actual.q + ' ' + pelada).trim();
+      return;
+    }
+    if (actual && actual.k === 'completar') { actual.q = vozActNormalizaHueco((actual.q + ' ' + pelada).trim()); return; }
+
+    /* 9. Y lo que no se entendió se NOMBRA, con su renglón, pero solo
+          si INTENTABA ser algo: una frase de prosa suelta entre dos
+          secciones es una explicación, no un fallo, y marcarla sería
+          ruido —la lección de las etiquetas de El Rodaje—. */
+    if (modo && pelada.length > 3 && (op || /^[-*•·]/.test(l))) {
+      avisos.push({ n: renglon, t: '«' + pelada.slice(0, 48) + '» no se entendió como ' + vozActTipo(modo === 'flash' ? 'flash' : modo).t.toLowerCase() });
+    }
+  });
+  cerrar();
+
+  /* La lista final de respuestas se aplica AL TERMINAR, cuando ya
+     están todas las preguntas numeradas: es lo que permite escribirla
+     al pie, que es donde la escribe una máquina. */
+  if (listaFinal) {
+    items.forEach(it => {
+      if (it.k !== 'opcion' || it.ok >= 0 || !it.n) return;
+      const v = listaFinal[it.n];
+      if (v == null) return;
+      const k = vozActIndiceLetra(v);
+      if (k >= 0 && k < it.o.length) it.ok = k;
+    });
+  }
+
+  /* Las que se quedaron sin correcta, nombradas una por una: un «hay
+     preguntas sin respuesta» a secas obliga a repasar cuarenta desde
+     una tableta. */
+  const sinCorrecta = items.filter(it => it.k === 'opcion' && it.ok < 0);
+  const sinRespuesta = items.filter(it => it.k === 'completar' && !it.a);
+
+  const cuenta = {};
+  VOZ_ACT_TIPOS.forEach(t => { cuenta[t.id] = items.filter(i => i.k === t.id).length; });
+  return { items: items, avisos: avisos, cuenta: cuenta, sinCorrecta: sinCorrecta, sinRespuesta: sinRespuesta };
+}
+
+/* ─── Las actividades que salen de los subrayados ─────────────────
+   ⚠️ LA RESPUESTA SALE DEL TEXTO, NUNCA SE INVENTA. Es la única
+   generación automática que esta casa se permite, y se permite por un
+   motivo que se puede escribir: lo que devuelve no es una pregunta
+   pensada por una máquina, es EL TROZO QUE LA PERSONA MARCÓ, tapado
+   dentro de su propia frase. La «respuesta correcta» es literalmente
+   lo que dice el texto, así que no hay nada que adivinar ni nada que
+   pueda salir cambiado.
+
+   Es también lo que cierra el círculo de la regla 21: se lee, se
+   subraya lo que importa, y eso mismo —sin escribir nada más— es la
+   lista de lo que hay que recordar. Un subrayado que no se vuelve a
+   mirar es un rotulador gastado.
+
+   Qué sale de cada marca:
+   · con NOTA escrita → una TARJETA: delante lo que uno se preguntó,
+     detrás el trozo. La nota es la pregunta que la persona ya se hizo
+     leyendo, y es mejor pregunta que cualquiera generada.
+   · trozo CORTO (hasta doce palabras) → un COMPLETAR: su propia frase
+     con el trozo tapado. Es lo que de verdad fija una fecha o un
+     nombre, que es lo que el autor pidió recordar.
+   · trozo LARGO → una TARJETA: delante la frase con el hueco, detrás
+     el trozo entero. Se recuerda y se voltea; escribir treinta
+     palabras en una tableta no lo hace nadie dos veces. */
+
+const VOZ_ACT_PAL_CORTO = 12;
+
+/* La frase que contiene el trozo [i, f) dentro de un párrafo. Se corta
+   por el punto, el signo de cierre o la raya de diálogo, que es donde
+   corta una frase en español. Si la frase sale enorme (un párrafo sin
+   puntos), se recorta por palabras alrededor del trozo: un hueco
+   perdido en trescientas palabras no se puede contestar. */
+function vozActFrase(plano, i, f) {
+  const antes = plano.slice(0, i);
+  const despues = plano.slice(f);
+  let ini = 0;
+  const mIni = antes.match(/[.!?…»]\s+(?=[^.!?…»]*$)/);
+  if (mIni) ini = antes.length - (antes.length - (mIni.index + mIni[0].length));
+  let fin = plano.length;
+  const mFin = despues.match(/[.!?…]["»']?\s/);
+  if (mFin) fin = f + mFin.index + mFin[0].replace(/\s+$/, '').length;
+  let frase = plano.slice(ini, fin).trim();
+  let di = i - ini, df = f - ini;
+  /* Demasiado larga: se recortan las palabras de los extremos y se
+     dice con una elipsis que ahí había más. */
+  const pal = frase.split(/\s+/);
+  if (pal.length > 45) {
+    const antesT = frase.slice(0, di).split(/\s+/);
+    const quita = antesT.slice(0, Math.max(0, antesT.length - 14)).join(' ');
+    if (quita.length) { frase = '… ' + frase.slice(quita.length).trim(); const d = quita.length - 2; di -= d; df -= d; }
+    const trasT = frase.slice(df).split(/\s+/);
+    if (trasT.length > 16) frase = frase.slice(0, df) + ' ' + trasT.slice(0, 15).join(' ') + ' …';
+  }
+  return { frase: frase, i: Math.max(0, di), f: Math.max(0, df) };
+}
+
+/* El texto plano de un bloque, con las mismas reglas con que se cuenta
+   el desplazamiento de una marca: sin los asteriscos de la cursiva y
+   sin la viñeta de una lista. Tiene que dar EXACTAMENTE lo mismo que
+   vozCuerpoDe(el).textContent, o los índices de la marca apuntarían a
+   otro sitio. */
+function vozActPlanoDeBloque(b) {
+  if (!b) return '';
+  return String(b.t || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
+}
+
+function vozActGenerar(cid) {
+  const c = _vozCuentos.find(x => x.cid === cid);
+  if (!c) return [];
+  const marcas = vozSubDe(cid).slice().sort((a, b) => a.cap - b.cap || a.vp - b.vp || a.i - b.i);
+  const fuera = [];
+  marcas.forEach(m => {
+    const cap = (c.capitulos || [])[m.cap];
+    const b = ((cap && cap.p) || [])[m.vp];
+    const plano = vozActPlanoDeBloque(b);
+    if (!plano) return;
+    let i = m.i, f = m.f;
+    /* El texto pudo corregirse después de marcar: se reancla igual que
+       al pintar (regla 21), y solo si el trozo aparece UNA vez. */
+    if (plano.slice(i, f) !== m.t) {
+      const k = plano.indexOf(m.t);
+      if (k < 0 || plano.indexOf(m.t, k + 1) >= 0) return;
+      i = k; f = k + m.t.length;
+    }
+    const trozo = plano.slice(i, f).trim();
+    if (trozo.length < 2) return;
+    const cat = vozCat(m.c);
+    const donde = vozNombreCap(c, m.cap);
+    const base = { auto: 1, sub: m.id, cat: m.c, cap: m.cap, vp: m.vp, donde: donde };
+
+    if (m.n) {
+      fuera.push(Object.assign({ id: 'auto-n-' + m.id, k: 'flash', f: m.n, r: trozo }, base));
+      return;
+    }
+    const r = vozActFrase(plano, i, f);
+    const conHueco = (r.frase.slice(0, r.i) + '___' + r.frase.slice(r.f)).replace(/\s{2,}/g, ' ').trim();
+    if (trozo.split(/\s+/).length <= VOZ_ACT_PAL_CORTO) {
+      fuera.push(Object.assign({ id: 'auto-c-' + m.id, k: 'completar', q: conHueco, a: trozo }, base));
+    } else {
+      fuera.push(Object.assign({ id: 'auto-f-' + m.id, k: 'flash',
+        f: cat.ini + ' · ¿Cómo lo dice el texto?\n' + conHueco, r: trozo }, base));
+    }
+  });
+  return fuera;
+}
+
+/* Las generadas se REEMPLAZAN enteras cada vez, y las pegadas no se
+   tocan: son dos cosechas distintas y mezclarlas haría imposible
+   volver a generar sin perder lo escrito a mano. Se distinguen por
+   `auto`, no por el sitio de la lista. */
+function vozActRefrescarAuto(cid) {
+  const ficha = vozActDe(cid);
+  const aMano = (ficha.items || []).filter(it => !it.auto);
+  const auto = vozActGenerar(cid);
+  return { aMano: aMano, auto: auto };
+}
+
+function vozActGuardarFicha(cid, items, callado) {
+  const todo = vozActLeeTodo();
+  const viejo = todo[cid];
+  todo[cid] = {
+    cid: cid,
+    items: items,
+    borrado: false,
+    actualizado: Date.now(),
+    creado_at: (viejo && viejo.creado_at) || new Date().toISOString(),
+    puesto_por: (viejo && viejo.puesto_por) || _vozYo || null,
+  };
+  vozActGuardaTodo();
+  vozActPedirNube(cid);
+  if (!callado) vozRender();
+  return todo[cid];
+}
+
+/* ─── La nube ─────────────────────────────────────────────────────
+   Las actividades son DE LA CASA, como el texto y por lo mismo: un
+   cuestionario que solo pudiera ver quien lo pegó convierte «hazle las
+   preguntas a tu hermana» en «pásame tu sesión». Lo que NO viaja es el
+   avance —qué acertó cada quien—: eso es del aparato, como la posición
+   de lectura, y por la misma razón de la regla 12 (aquí el mismo texto
+   lo leen cuatro personas).
+
+   Y si nadie ha corrido el SQL, el taller funciona ENTERO con la copia
+   del aparato y lo dice a la vista, que es lo contrario de fingir que
+   viaja. */
+const VOZ_ACT_COLUMNAS = 'cid,items,borrado,puesto_por,creado_at,actualizado';
+
+function vozActPedirNube(cid) {
+  clearTimeout(_vozActTimer);
+  if (_vozActNube === 'al-dia') _vozActNube = 'pendiente';
+  vozActPintarEstado();
+  _vozActTimer = setTimeout(() => vozActSincronizar(cid), 1200);
+}
+
+async function vozActSincronizar(cid) {
+  if (_vozActSincronizando) return;
+  const sb = vozSb();
+  if (!sb) { _vozActNube = 'sin-sesion'; vozActPintarEstado(); return; }
+  const yo = await vozYo();
+  if (!yo) { _vozActNube = 'sin-sesion'; vozActPintarEstado(); return; }
+  _vozActSincronizando = true;
+  _vozActNube = 'subiendo'; vozActPintarEstado();
+  try {
+    const { data, error } = await vozConReloj(sb.from(VOZ_ACT_TABLA).select(VOZ_ACT_COLUMNAS));
+    if (error) {
+      if (error.code === '42P01' || /relation .* does not exist/i.test(error.message || '')) _vozActNube = 'sin-tabla';
+      else _vozActNube = 'sin-senal';
+      vozActPintarEstado();
+      return;
+    }
+    /* Baja lo de la nube y se queda con lo más nuevo por el reloj del
+       aparato, igual que los textos. Lo de aquí NO se tira: si la
+       nube no trae una ficha, es que falta subirla. */
+    const todo = vozActLeeTodo();
+    let cambio = false;
+    (data || []).forEach(fila => {
+      const mio = todo[fila.cid];
+      if (!mio || (fila.actualizado || 0) > (mio.actualizado || 0)) {
+        todo[fila.cid] = {
+          cid: fila.cid, items: Array.isArray(fila.items) ? fila.items : [],
+          borrado: !!fila.borrado, actualizado: fila.actualizado || 0,
+          creado_at: fila.creado_at, puesto_por: fila.puesto_por,
+        };
+        cambio = true;
+      }
+    });
+    const enNube = new Map((data || []).map(f => [f.cid, f.actualizado || 0]));
+    const subir = Object.values(todo).filter(f =>
+      f && f.cid && (!f.puesto_por || f.puesto_por === yo) &&
+      (!enNube.has(f.cid) || enNube.get(f.cid) < (f.actualizado || 0)));
+    for (const f of subir) {
+      const { error: e2 } = await vozConReloj(sb.from(VOZ_ACT_TABLA).upsert({
+        cid: f.cid, items: f.items || [], borrado: !!f.borrado,
+        actualizado: f.actualizado || Date.now(), puesto_por: yo,
+      }, { onConflict: 'cid' }));
+      if (e2) {
+        _vozActNube = (e2.code === 'FARO_RELOJ') ? 'sin-senal'
+          : (e2.code === '42501' || e2.code === '23502') ? 'ajeno' : 'error';
+        vozActGuardaTodo(); vozActPintarEstado();
+        return;
+      }
+      f.puesto_por = yo;
+      cambio = true;
+    }
+    vozActGuardaTodo();
+    _vozActNube = 'al-dia';
+    if (cambio) { vozRender(); vozActPintarTaller(); }
+  } catch (e) {
+    _vozActNube = 'error';
+  } finally {
+    _vozActSincronizando = false;
+    vozActPintarEstado();
+  }
+}
+
+function vozActRotuloNube() {
+  if (_vozActNube === 'al-dia')    return '☁️ Las actividades están en todos los aparatos de la casa.';
+  if (_vozActNube === 'subiendo' || _vozActNube === 'pendiente') return '⏳ Guardando en la nube…';
+  if (_vozActNube === 'sin-tabla') return '📴 Solo en este aparato: falta correr voz_actividades.sql';
+  if (_vozActNube === 'sin-sesion') return '📴 Solo en este aparato: entra en F.A.R.O para que viajen';
+  if (_vozActNube === 'sin-senal') return '📡 Sin señal: se guardan aquí y suben cuando vuelva';
+  if (_vozActNube === 'ajeno')     return '✋ Las puso otra persona de la casa: puedes hacerlas, no cambiarlas';
+  if (_vozActNube === 'error')     return '⚠️ La nube rechazó las actividades; se quedan en este aparato';
+  return '📴 Solo en este aparato por ahora';
+}
+
+function vozActPintarEstado() {
+  const e = document.getElementById('voz-act-estado');
+  if (e) e.textContent = vozActRotuloNube();
+}
+
+/* ─── El avance: de cada quien y de este aparato ──────────────────
+   Con repaso espaciado, el mismo del taller de la memoria: lo que sale
+   bien se vuelve a preguntar a los 3 días, a las 2 semanas y al mes;
+   lo que sale mal, mañana. Un repaso que pregunta todo cada vez es un
+   repaso que nadie hace dos veces. */
+const VOZ_ACT_ESCALA = [1, 3, 14, 30];
+
+function vozActAvanceTodo() {
+  try { return JSON.parse(localStorage.getItem(VOZ_ACT_AVANCE) || '{}') || {}; } catch (e) { return {}; }
+}
+function vozActAvanceDe(cid) {
+  return vozActAvanceTodo()[cid] || {};
+}
+function vozActApuntar(cid, id, acerto) {
+  const todo = vozActAvanceTodo();
+  const mio = todo[cid] || (todo[cid] = {});
+  const a = mio[id] || (mio[id] = { ok: 0, mal: 0, n: 0 });
+  if (acerto) { a.ok++; a.n = Math.min(VOZ_ACT_ESCALA.length - 1, (a.n || 0) + 1); }
+  else { a.mal++; a.n = 0; }
+  a.visto = Date.now();
+  a.prox = Date.now() + VOZ_ACT_ESCALA[a.n] * 86400000;
+  try { localStorage.setItem(VOZ_ACT_AVANCE, JSON.stringify(todo)); } catch (e) {}
+}
+function vozActToca(cid, id) {
+  const a = vozActAvanceDe(cid)[id];
+  return !a || !a.prox || a.prox <= Date.now();
+}
+function vozActResumen(cid) {
+  const items = vozActDe(cid).items || [];
+  const av = vozActAvanceDe(cid);
+  let vistas = 0, firmes = 0, tocan = 0;
+  items.forEach(it => {
+    const a = av[it.id];
+    if (a && a.visto) vistas++;
+    if (a && (a.n || 0) >= 2) firmes++;
+    if (vozActToca(cid, it.id)) tocan++;
+  });
+  return { total: items.length, vistas: vistas, firmes: firmes, tocan: tocan };
+}
+
+/* ─── El taller: una actividad a la vez, y mezcladas ──────────────
+   ⚠️ MEZCLADAS A PROPÓSITO, no agrupadas por tipo. Es la práctica
+   intercalada del taller de la memoria (js/taller-neuro.js): diez
+   tarjetas seguidas se contestan con la mano, en piloto automático,
+   porque el cerebro ya sabe QUÉ va a tener que hacer; mezcladas, cada
+   una obliga a decidir antes de responder. Cuesta más y se queda más.
+
+   Y una a la vez, no todas en una lista: en un teléfono una lista de
+   cuarenta actividades es un barrido de varios metros donde nadie
+   sabe por dónde iba. */
+
+let _vozActSesion = null;   // {cid, cola, i, bien, mal, revisar}
+let _vozActTexto = null;    // el texto cuyo taller está abierto
+let _vozActVolver = null;   // a dónde se vuelve al cerrar: 'sala' o null
+
+function vozActBaraja(l) {
+  const a = l.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+/* Comparar lo escrito con lo esperado: sin tildes, sin mayúsculas, sin
+   los signos de puntuación de los extremos y sin los artículos de
+   delante. Quien escribe «el pozo» habiendo marcado «pozo» sabe la
+   respuesta, y decirle que no la sabe es enseñarle a odiar el taller. */
+function vozActNormal(s) {
+  return vozSinTildes(String(s || ''))
+    .toLowerCase()
+    .replace(/[«»"'`´¨.,;:!¡?¿()\[\]{}…—–-]/g, ' ')
+    .replace(/^\s*(?:el|la|los|las|un|una|unos|unas|de|del)\s+/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/* Distancia de edición, con tope: solo hace falta saber si son «casi»
+   iguales, y una tabla de 300×300 para decir «no» es tiempo tirado. */
+function vozActDistancia(a, b, tope) {
+  if (Math.abs(a.length - b.length) > tope) return tope + 1;
+  let prev = [], fila = [];
+  for (let j = 0; j <= b.length; j++) prev[j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    fila = [i];
+    let mejor = i;
+    for (let j = 1; j <= b.length; j++) {
+      const c = a[i - 1] === b[j - 1] ? 0 : 1;
+      fila[j] = Math.min(prev[j] + 1, fila[j - 1] + 1, prev[j - 1] + c);
+      if (fila[j] < mejor) mejor = fila[j];
+    }
+    if (mejor > tope) return tope + 1;
+    prev = fila;
+  }
+  return prev[b.length];
+}
+
+/* Tres respuestas, no dos: bien, CASI y mal. «Casi» es una falta de
+   ortografía o una letra cambiada, y tratarla como un fallo es
+   castigar por escribir deprisa en una tableta lo que sí se sabía. */
+function vozActComparar(dado, esperado) {
+  const a = vozActNormal(dado), b = vozActNormal(esperado);
+  if (!a) return 'vacio';
+  if (a === b) return 'bien';
+  const tope = b.length <= 5 ? 1 : (b.length <= 12 ? 2 : 3);
+  if (vozActDistancia(a, b, tope) <= tope) return 'casi';
+  /* Y si lo escrito contiene la respuesta entera (o al revés) con algo
+     de más, también vale: «en 1910» por «1910». */
+  if (b.length >= 4 && (a.indexOf(b) >= 0 || b.indexOf(a) >= 0)) return 'casi';
+  return 'mal';
+}
+
+function vozActAbrirTaller(cid, desde) {
+  const c = _vozCuentos.find(x => x.cid === cid);
+  if (!c) return;
+  _vozActTexto = cid;
+  _vozActVolver = desde || null;
+  _vozActSesion = null;
+  const ov = document.getElementById('voz-act-overlay');
+  if (!ov) return;
+  /* Se tiñe con el papel que tenga puesto la lectura: abrir el taller
+     de noche con una pantalla blanca es el deslumbre de la regla 9. */
+  ov.dataset.tema = _vozAj.tema || 'papel';
+  ov.hidden = false;
+  document.body.classList.add('voz-sala');
+  vozActSincronizar(cid);
+  vozActPintarTaller();
+}
+
+function vozActCerrarTaller() {
+  const ov = document.getElementById('voz-act-overlay');
+  if (ov) ov.hidden = true;
+  _vozActSesion = null;
+  const sala = document.getElementById('voz-lector');
+  if (!sala || sala.hidden) document.body.classList.remove('voz-sala');
+  _vozActTexto = null;
+  vozRender();
+}
+
+/* ─── La portada del taller ─── */
+function vozActPintarTaller() {
+  const ov = document.getElementById('voz-act-overlay');
+  const cuerpo = document.getElementById('voz-act-cuerpo');
+  if (!ov || ov.hidden || !cuerpo) return;
+  const cid = _vozActTexto;
+  const c = _vozCuentos.find(x => x.cid === cid);
+  if (!c) return;
+  const tit = document.getElementById('voz-act-tit');
+  if (tit) {
+    tit.textContent = '';
+    tit.appendChild(vozNodo('span', 'voz-act-tit-t', '📝 Taller de ' + (c.titulo || 'el texto')));
+    /* La etiqueta también aquí: es la regla 1, y un cuestionario que
+       se comparte sin ella atribuye el texto igual que el texto. */
+    tit.appendChild(vozNodo('span', 'voz-act-tit-v', '🎭 al modo de ' + (c.voz || '—') + ' · 🤖 ' + (c.maquina || '—')));
+  }
+  cuerpo.textContent = '';
+  if (_vozActSesion) { vozActPintarSesion(cuerpo); return; }
+
+  const items = vozActDe(cid).items || [];
+  const res = vozActResumen(cid);
+  const mio = vozEsMio(c);
+
+  if (!items.length) {
+    const v = vozNodo('div', 'voz-act-vacio');
+    v.appendChild(vozNodo('div', 'voz-act-vacio-ic', '📝'));
+    v.appendChild(vozNodo('p', 'voz-act-vacio-t', 'Todavía no hay actividades para este texto.'));
+    v.appendChild(vozNodo('p', 'voz-act-vacio-p',
+      'Sirven para lo único que una lectura de corrido no hace: comprobar que lo leído se quedó. '
+      + 'Hay dos maneras de ponerlas, y se pueden usar las dos.'));
+    const puertas = vozNodo('div', 'voz-act-puertas');
+    puertas.appendChild(vozActPuerta('📋', 'Pegar las actividades',
+      'Pídeselas a la misma máquina que escribió el texto y pega aquí lo que te dé. Entiende tarjetas, emparejar, selección, completar y abiertas.',
+      () => vozActAbrirPegar(cid)));
+    const nSub = vozSubDe(cid).length;
+    puertas.appendChild(vozActPuerta('🖍', 'Sacarlas de mis subrayados',
+      nSub ? ('Tienes ' + nSub + (nSub === 1 ? ' subrayado' : ' subrayados') + ' en este texto. Cada uno se convierte en una pregunta cuya respuesta es el trozo que marcaste.')
+           : 'Subraya mientras lees y cada marca se convertirá en una pregunta. Ahora mismo no hay ninguna.',
+      nSub ? () => vozActGenerarYGuardar(cid) : null));
+    v.appendChild(puertas);
+    cuerpo.appendChild(v);
+    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota voz-act-estado', vozActRotuloNube())).id = 'voz-act-estado';
+    return;
+  }
+
+  /* El resumen de arriba: cuántas hay, cuántas se saben y cuántas
+     tocan hoy. El número que de verdad se usa es el último. */
+  const cab = vozNodo('div', 'voz-act-resumen');
+  const anillo = vozNodo('div', 'voz-act-anillo');
+  const pct = res.total ? Math.round((res.firmes / res.total) * 100) : 0;
+  anillo.style.setProperty('--voz-pct', pct);
+  anillo.appendChild(vozNodo('span', 'voz-act-anillo-n', pct + '%'));
+  anillo.setAttribute('role', 'img');
+  anillo.setAttribute('aria-label', 'Sabidas de memoria: ' + pct + ' por ciento');
+  cab.appendChild(anillo);
+  const datos = vozNodo('div', 'voz-act-resumen-txt');
+  datos.appendChild(vozNodo('div', 'voz-act-resumen-t', res.total + (res.total === 1 ? ' actividad' : ' actividades')));
+  datos.appendChild(vozNodo('div', 'voz-act-resumen-p',
+    res.firmes + ' te salen ya de memoria · ' + res.vistas + ' vistas alguna vez'));
+  datos.appendChild(vozNodo('div', 'voz-act-resumen-p voz-act-resumen-hoy',
+    res.tocan ? ('⏰ ' + res.tocan + (res.tocan === 1 ? ' toca repasarla hoy' : ' tocan repasar hoy'))
+              : '✓ Hoy no toca ninguna: vuelve en unos días'));
+  cab.appendChild(datos);
+  cuerpo.appendChild(cab);
+
+  /* Los chips de qué hay, sacados de las actividades y no de una lista
+     escrita: el día que se añada un tipo, esto ya lo dice. */
+  const chips = vozNodo('div', 'voz-chips voz-act-chips');
+  VOZ_ACT_TIPOS.forEach(t => {
+    const n = items.filter(i => i.k === t.id).length;
+    if (!n) return;
+    const ch = vozNodo('span', 'voz-chip voz-chip-chica');
+    ch.appendChild(document.createTextNode(t.ic + ' ' + t.t));
+    ch.appendChild(vozNodo('span', 'voz-chip-n', String(n)));
+    chips.appendChild(ch);
+  });
+  cuerpo.appendChild(chips);
+
+  const botones = vozNodo('div', 'voz-act-botones');
+  if (res.tocan) {
+    botones.appendChild(vozBoton('voz-btn voz-btn-pri voz-btn-ancho',
+      '▶️ Repasar lo que toca hoy (' + res.tocan + ')', () => vozActEmpezar(cid, 'toca')));
+  }
+  botones.appendChild(vozBoton('voz-btn voz-btn-ancho',
+    '🔁 Hacerlas todas (' + res.total + ')', () => vozActEmpezar(cid, 'todas')));
+  const fallados = (items || []).filter(it => { const a = vozActAvanceDe(cid)[it.id]; return a && a.mal > 0 && (a.n || 0) === 0; });
+  if (fallados.length) {
+    botones.appendChild(vozBoton('voz-btn voz-btn-ancho',
+      '💢 Solo las que fallé (' + fallados.length + ')', () => vozActEmpezar(cid, 'fallados')));
+  }
+  cuerpo.appendChild(botones);
+
+  /* Lo que hay dentro, plegado: se mira para corregir una errata, no
+     para estudiar —estudiar es el botón de arriba—. */
+  const det = vozNodo('details', 'voz-act-lista');
+  const sum = vozNodo('summary', 'voz-act-lista-sum', '👁 Ver las ' + res.total + ' actividades');
+  det.appendChild(sum);
+  items.forEach((it, n) => det.appendChild(vozActFilaLista(cid, it, n, mio)));
+  cuerpo.appendChild(det);
+
+  const pie = vozNodo('div', 'voz-act-pie');
+  if (mio) {
+    pie.appendChild(vozBoton('voz-btn', '📋 Pegar más', () => vozActAbrirPegar(cid)));
+    const nSub = vozSubDe(cid).length;
+    if (nSub) pie.appendChild(vozBoton('voz-btn', '🖍 Refrescar desde mis subrayados (' + nSub + ')', () => vozActGenerarYGuardar(cid)));
+    pie.appendChild(vozActBotonBorrar(cid));
+  } else {
+    pie.appendChild(vozNodo('p', 'voz-menu-nota', '✋ Las puso otra persona de la casa: puedes hacerlas, pero solo ella puede cambiarlas.'));
+  }
+  cuerpo.appendChild(pie);
+  const est = vozNodo('p', 'voz-aj-nota voz-act-estado', vozActRotuloNube());
+  est.id = 'voz-act-estado';
+  cuerpo.appendChild(est);
+}
+
+function vozActPuerta(ic, titulo, txt, alTocar) {
+  const b = vozBoton('voz-act-puerta' + (alTocar ? '' : ' voz-btn-apagado'), null, alTocar || (() => {}));
+  b.appendChild(vozNodo('span', 'voz-act-puerta-ic', ic));
+  b.appendChild(vozNodo('span', 'voz-act-puerta-t', titulo));
+  b.appendChild(vozNodo('span', 'voz-act-puerta-p', txt));
+  if (!alTocar) b.disabled = true;
+  return b;
+}
+
+/* Una fila de la lista plegada. Enseña el enunciado y, en las de
+   selección, cuál es la buena: es la única manera de cazar una
+   respuesta cambiada sin hacer la actividad entera. */
+function vozActFilaLista(cid, it, n, mio) {
+  const t = vozActTipo(it.k);
+  const fila = vozNodo('div', 'voz-act-fila' + (it.k === 'opcion' && it.ok < 0 ? ' voz-act-fila-ambar' : ''));
+  const cab = vozNodo('div', 'voz-act-fila-cab');
+  cab.appendChild(vozNodo('span', 'voz-act-fila-n', String(n + 1)));
+  cab.appendChild(vozNodo('span', 'voz-act-fila-tipo', t.ic + ' ' + t.t));
+  if (it.auto) cab.appendChild(vozNodo('span', 'voz-act-fila-auto', '🖍 de un subrayado'));
+  fila.appendChild(cab);
+  const q = it.k === 'flash' ? it.f : (it.k === 'pares' ? (it.q || 'Emparejar') : it.q);
+  fila.appendChild(vozNodo('div', 'voz-act-fila-q', String(q || '').replace(/\n/g, ' ')));
+  let sol = '';
+  if (it.k === 'flash') sol = '→ ' + it.r;
+  else if (it.k === 'completar') sol = '→ ' + (it.a || '⚠️ sin respuesta');
+  else if (it.k === 'opcion') sol = it.ok >= 0 ? ('→ ' + 'ABCDEF'[it.ok] + ') ' + it.o[it.ok]) : '⚠️ sin respuesta marcada';
+  else if (it.k === 'pares') sol = it.ps.length + ' parejas';
+  else if (it.k === 'abierta') sol = it.guia ? ('Pauta: ' + it.guia) : 'Sin pauta';
+  fila.appendChild(vozNodo('div', 'voz-act-fila-sol', sol));
+  if (mio) {
+    fila.appendChild(vozBoton('voz-act-fila-x', '✕', () => {
+      const quedan = (vozActDe(cid).items || []).filter(x => x.id !== it.id);
+      vozActGuardarFicha(cid, quedan);
+      vozActPintarTaller();
+      vozAviso('Actividad quitada');
+    }, 'Quitar esta actividad'));
+  }
+  return fila;
+}
+
+/* Borrar el taller entero, de dos toques y a la vista, como retirar un
+   texto (regla 22): nada se borra con un solo toque y sin diálogo del
+   navegador, que en la aplicación instalada puede no salir. */
+function vozActBotonBorrar(cid) {
+  const caja = vozNodo('span', 'voz-retirar-caja');
+  const b = vozBoton('voz-btn', '🗑 Vaciar el taller', null, 'Quitar todas las actividades de este texto');
+  const si = vozBoton('voz-btn voz-btn-peligro', 'Sí, vaciar', () => {
+    vozActGuardarFicha(cid, []);
+    vozActPintarTaller();
+    vozAviso('🗑 Taller vaciado');
+  });
+  const no = vozBoton('voz-btn', 'No', () => { caja.classList.remove('voz-retirar-abierto'); si.hidden = true; no.hidden = true; });
+  si.hidden = true; no.hidden = true;
+  b.addEventListener('click', () => {
+    const abierto = caja.classList.toggle('voz-retirar-abierto');
+    si.hidden = !abierto; no.hidden = !abierto;
+    if (abierto) si.focus();
+  });
+  caja.appendChild(b); caja.appendChild(si); caja.appendChild(no);
+  return caja;
+}
+
+function vozActGenerarYGuardar(cid) {
+  const r = vozActRefrescarAuto(cid);
+  if (!r.auto.length) { vozAviso('No hay subrayados de los que sacar actividades'); return; }
+  vozActGuardarFicha(cid, r.aMano.concat(r.auto));
+  vozActPintarTaller();
+  vozAviso('🖍 ' + r.auto.length + (r.auto.length === 1 ? ' actividad sacada de tus subrayados' : ' actividades sacadas de tus subrayados'));
+}
+
+/* ─── La sesión ─── */
+function vozActEmpezar(cid, modo) {
+  const items = vozActDe(cid).items || [];
+  const av = vozActAvanceDe(cid);
+  let cola = items;
+  if (modo === 'toca') cola = items.filter(it => vozActToca(cid, it.id));
+  else if (modo === 'fallados') cola = items.filter(it => { const a = av[it.id]; return a && a.mal > 0 && (a.n || 0) === 0; });
+  if (!cola.length) cola = items;
+  _vozActSesion = { cid: cid, cola: vozActBaraja(cola), i: 0, bien: 0, mal: 0, revisar: [], estado: null };
+  vozActPintarTaller();
+}
+
+function vozActSiguiente() {
+  const s = _vozActSesion;
+  if (!s) return;
+  s.i++;
+  s.estado = null;
+  vozActPintarTaller();
+}
+
+function vozActPintarSesion(cuerpo) {
+  const s = _vozActSesion;
+  const it = s.cola[s.i];
+  if (!it) { vozActPintarFinal(cuerpo); return; }
+
+  const barra = vozNodo('div', 'voz-act-barra');
+  const dentro = vozNodo('div', 'voz-act-barra-in');
+  dentro.style.width = Math.round((s.i / s.cola.length) * 100) + '%';
+  barra.appendChild(dentro);
+  cuerpo.appendChild(barra);
+
+  const t = vozActTipo(it.k);
+  const meta = vozNodo('div', 'voz-act-meta');
+  meta.appendChild(vozNodo('span', 'voz-act-meta-tipo', t.ic + ' ' + t.t));
+  meta.appendChild(vozNodo('span', 'voz-act-meta-n', (s.i + 1) + ' de ' + s.cola.length));
+  if (it.donde) meta.appendChild(vozNodo('span', 'voz-act-meta-cap', it.donde));
+  cuerpo.appendChild(meta);
+
+  const caja = vozNodo('div', 'voz-act-caja');
+  cuerpo.appendChild(caja);
+  if (it.k === 'flash') vozActPintaFlash(caja, it);
+  else if (it.k === 'opcion') vozActPintaOpcion(caja, it);
+  else if (it.k === 'completar') vozActPintaCompletar(caja, it);
+  else if (it.k === 'pares') vozActPintaPares(caja, it);
+  else vozActPintaAbierta(caja, it);
+
+  const pie = vozNodo('div', 'voz-act-sesion-pie');
+  pie.appendChild(vozBoton('voz-btn voz-act-salir', '⏸ Dejarlo aquí', () => { _vozActSesion = null; vozActPintarTaller(); }));
+  cuerpo.appendChild(pie);
+}
+
+/* El veredicto de una actividad: lo apunta, lo enseña y ofrece seguir.
+   ⚠️ Y cuando se falla, se enseña la respuesta buena EN EL ACTO. Un
+   taller que dice «no» y pasa a la siguiente enseña a fallar dos
+   veces: la corrección inmediata es la mitad del aparato. */
+function vozActVeredicto(caja, it, bien, dicho, casi) {
+  const s = _vozActSesion;
+  if (!s || s.estado) return;
+  s.estado = bien ? 'bien' : 'mal';
+  vozActApuntar(s.cid, it.id, bien);
+  if (bien) s.bien++; else { s.mal++; s.revisar.push(it); }
+  const fb = vozNodo('div', 'voz-act-fb ' + (bien ? (casi ? 'voz-act-fb-casi' : 'voz-act-fb-ok') : 'voz-act-fb-no'));
+  fb.appendChild(vozNodo('div', 'voz-act-fb-t',
+    bien ? (casi ? '✓ Casi exacto, cuenta' : '✓ Bien') : '✕ No era'));
+  if (dicho) fb.appendChild(vozNodo('div', 'voz-act-fb-r', dicho));
+  caja.appendChild(fb);
+  const sig = vozBoton('voz-btn voz-btn-pri voz-btn-ancho',
+    s.i + 1 >= s.cola.length ? '🏁 Terminar' : 'Siguiente ▶', vozActSiguiente);
+  caja.appendChild(sig);
+  setTimeout(() => { try { sig.focus(); } catch (e) {} }, 40);
+  try { if (typeof sfx === 'function') sfx(bien ? 'ok' : 'err'); } catch (e) {}
+}
+
+function vozActPintaFlash(caja, it) {
+  const tarjeta = vozNodo('div', 'voz-act-tarjeta');
+  const cara = vozNodo('div', 'voz-act-cara');
+  vozPintaTexto(cara, it.f);
+  tarjeta.appendChild(cara);
+  caja.appendChild(tarjeta);
+  const btns = vozNodo('div', 'voz-act-btns');
+  btns.appendChild(vozBoton('voz-btn voz-btn-pri voz-btn-ancho', '🔄 Voltear', () => {
+    btns.hidden = true;
+    const cruz = vozNodo('div', 'voz-act-cara voz-act-cruz');
+    vozPintaTexto(cruz, it.r);
+    tarjeta.appendChild(cruz);
+    /* ⚠️ Se pregunta DESPUÉS de voltear, no antes: el juicio tiene que
+       hacerse con la respuesta delante, que es cuando uno sabe de
+       verdad si la tenía. Es el «cierre de cuaderno» del taller de la
+       memoria vuelto del revés. */
+    const juicio = vozNodo('div', 'voz-act-btns');
+    juicio.appendChild(vozBoton('voz-btn voz-act-si', '✓ La tenía', () => vozActVeredicto(caja, it, true)));
+    juicio.appendChild(vozBoton('voz-btn voz-act-no', '✕ No me salió', () => vozActVeredicto(caja, it, false)));
+    caja.appendChild(juicio);
+  }));
+  caja.appendChild(btns);
+}
+
+function vozActPintaOpcion(caja, it) {
+  const q = vozNodo('div', 'voz-act-q');
+  vozPintaTexto(q, it.q);
+  caja.appendChild(q);
+  const ops = vozNodo('div', 'voz-act-ops');
+  /* Las opciones NO se barajan: el orden es el que escribió quien las
+     puso, y barajarlas cambiaría la letra de la respuesta —que es lo
+     que se lee en la lista de arriba para corregir una errata—. */
+  it.o.forEach((o, k) => {
+    const b = vozBoton('voz-act-op', null, () => {
+      if (_vozActSesion.estado) return;
+      ops.querySelectorAll('.voz-act-op').forEach((n, j) => {
+        if (j === it.ok) n.classList.add('voz-act-op-ok');
+        else if (j === k) n.classList.add('voz-act-op-no');
+        n.disabled = true;
+      });
+      vozActVeredicto(caja, it, k === it.ok, k === it.ok ? '' : 'La buena era la ' + 'ABCDEF'[it.ok] + ': ' + it.o[it.ok]);
+    });
+    b.appendChild(vozNodo('span', 'voz-act-op-l', 'ABCDEF'[k]));
+    const txt = vozNodo('span', 'voz-act-op-t');
+    vozPintaTexto(txt, o);
+    b.appendChild(txt);
+    ops.appendChild(b);
+  });
+  caja.appendChild(ops);
+}
+
+function vozActPintaCompletar(caja, it) {
+  const q = vozNodo('div', 'voz-act-q voz-act-q-hueco');
+  /* El hueco se pinta como un hueco de verdad, no como tres guiones
+     bajos: partiendo la frase por él y colgando una raya en medio. */
+  const trozos = String(it.q || '').split('___');
+  trozos.forEach((t, k) => {
+    const sp = vozNodo('span', 'voz-act-trozo');
+    vozPintaTexto(sp, t);
+    q.appendChild(sp);
+    if (k < trozos.length - 1) q.appendChild(vozNodo('span', 'voz-act-hueco', ' '));
+  });
+  caja.appendChild(q);
+  const campo = vozNodo('input', 'voz-act-campo');
+  campo.type = 'text';
+  campo.autocomplete = 'off';
+  campo.autocapitalize = 'off';
+  campo.spellcheck = false;
+  campo.placeholder = 'Escribe lo que va en el hueco';
+  campo.setAttribute('aria-label', 'Lo que va en el hueco');
+  caja.appendChild(campo);
+  const comprobar = () => {
+    if (_vozActSesion.estado) return;
+    const r = vozActComparar(campo.value, it.a);
+    if (r === 'vacio') { campo.focus(); return; }
+    campo.disabled = true;
+    vozActVeredicto(caja, it, r !== 'mal', 'Era: ' + it.a, r === 'casi');
+  };
+  campo.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); comprobar(); } });
+  const btns = vozNodo('div', 'voz-act-btns');
+  btns.appendChild(vozBoton('voz-btn voz-btn-pri voz-btn-ancho', '✓ Comprobar', comprobar));
+  btns.appendChild(vozBoton('voz-btn', '👁 No me sale', () => {
+    if (_vozActSesion.estado) return;
+    campo.disabled = true;
+    vozActVeredicto(caja, it, false, 'Era: ' + it.a);
+  }));
+  caja.appendChild(btns);
+  setTimeout(() => { try { campo.focus(); } catch (e) {} }, 60);
+}
+
+function vozActPintaAbierta(caja, it) {
+  const q = vozNodo('div', 'voz-act-q');
+  vozPintaTexto(q, it.q);
+  caja.appendChild(q);
+  const ta = vozNodo('textarea', 'voz-act-area');
+  ta.rows = 4;
+  ta.placeholder = 'Contéstala con tus palabras, o en tu cuaderno';
+  ta.setAttribute('aria-label', 'Tu respuesta');
+  caja.appendChild(ta);
+  const btns = vozNodo('div', 'voz-act-btns');
+  btns.appendChild(vozBoton('voz-btn voz-btn-pri voz-btn-ancho', '👁 Ver la pauta', () => {
+    if (_vozActSesion.estado) return;
+    btns.hidden = true;
+    ta.disabled = true;
+    const pauta = vozNodo('div', 'voz-act-pauta');
+    pauta.appendChild(vozNodo('div', 'voz-act-pauta-t', '✅ Lo que se esperaba'));
+    vozPintaTexto(pauta.appendChild(vozNodo('div', 'voz-act-pauta-p')),
+      it.guia || 'Esta pregunta no trae pauta: compárala con lo que dice el texto.');
+    caja.appendChild(pauta);
+    /* ⚠️ Una abierta NO la corrige la máquina: la corrige quien la
+       contestó, comparando. Es la norma 5-quater de la casa —el
+       análisis complejo va sin premio— y por eso aquí el juicio es
+       suyo y no puntúa como acierto automático. */
+    const juicio = vozNodo('div', 'voz-act-btns');
+    juicio.appendChild(vozBoton('voz-btn voz-act-si', '✓ Lo tenía', () => vozActVeredicto(caja, it, true)));
+    juicio.appendChild(vozBoton('voz-btn voz-act-no', '✕ Me faltó', () => vozActVeredicto(caja, it, false)));
+    caja.appendChild(juicio);
+  }));
+  caja.appendChild(btns);
+}
+
+/* ─── Emparejar ───────────────────────────────────────────────────
+   ⚠️ SE PUEDE ARRASTRAR, PERO TOCAR DOS VECES HACE LO MISMO. Es la
+   regla del asa de la repisa y del anaquel: un gesto que sea la única
+   manera de hacer algo es algo que a veces no se puede hacer —con el
+   dedo mojado, con funda, con la mano llena— y aquí además lo usa
+   quien está estudiando, no quien administra. El arrastre va con
+   PUNTEROS, nunca con el `draggable` del navegador, que en el
+   navegador de casi ninguna tableta existe. */
+function vozActPintaPares(caja, it) {
+  const q = vozNodo('div', 'voz-act-q');
+  vozPintaTexto(q, it.q || 'Empareja cada una con la suya');
+  caja.appendChild(q);
+  caja.appendChild(vozNodo('p', 'voz-act-ayuda',
+    'Toca una de la izquierda y después su pareja de la derecha. También puedes arrastrarla.'));
+
+  const izq = it.ps.map((p, k) => ({ k: k, t: p[0] }));
+  const der = vozActBaraja(it.ps.map((p, k) => ({ k: k, t: p[1] })));
+  const hechas = {};
+  let elegida = null;
+
+  const tablero = vozNodo('div', 'voz-act-tablero');
+  const colI = vozNodo('div', 'voz-act-col');
+  const colD = vozNodo('div', 'voz-act-col');
+  tablero.appendChild(colI); tablero.appendChild(colD);
+  caja.appendChild(tablero);
+
+  const btns = vozNodo('div', 'voz-act-btns');
+  caja.appendChild(btns);
+
+  const pintar = () => {
+    colI.textContent = ''; colD.textContent = '';
+    izq.forEach(a => {
+      const b = vozBoton('voz-act-par voz-act-par-i' + (hechas[a.k] != null ? ' voz-act-par-hecho' : '')
+        + (elegida === a.k ? ' voz-act-par-elegida' : ''), null, () => {
+        if (_vozActSesion.estado || hechas[a.k] != null) return;
+        elegida = (elegida === a.k) ? null : a.k;
+        pintar();
+      });
+      b.dataset.iz = String(a.k);
+      const t = vozNodo('span', 'voz-act-par-t');
+      vozPintaTexto(t, a.t);
+      b.appendChild(t);
+      if (hechas[a.k] != null) b.appendChild(vozNodo('span', 'voz-act-par-con', '→ ' + it.ps[hechas[a.k]][1]));
+      b.setAttribute('aria-pressed', elegida === a.k ? 'true' : 'false');
+      colI.appendChild(b);
+    });
+    const usadas = Object.values(hechas);
+    der.forEach(d => {
+      if (usadas.indexOf(d.k) >= 0) return;
+      const b = vozBoton('voz-act-par voz-act-par-d', null, () => {
+        if (_vozActSesion.estado) return;
+        if (elegida == null) { vozAviso('Toca primero una de la izquierda'); return; }
+        hechas[elegida] = d.k;
+        elegida = null;
+        pintar();
+      });
+      b.dataset.de = String(d.k);
+      const t = vozNodo('span', 'voz-act-par-t');
+      vozPintaTexto(t, d.t);
+      b.appendChild(t);
+      colD.appendChild(b);
+    });
+    btns.textContent = '';
+    const faltan = izq.filter(a => hechas[a.k] == null).length;
+    if (faltan) {
+      btns.appendChild(vozNodo('p', 'voz-act-ayuda', faltan === 1 ? 'Falta una pareja' : 'Faltan ' + faltan + ' parejas'));
+      if (Object.keys(hechas).length) {
+        btns.appendChild(vozBoton('voz-btn', '↺ Deshacer', () => {
+          const ks = Object.keys(hechas);
+          delete hechas[ks[ks.length - 1]];
+          elegida = null; pintar();
+        }));
+      }
+    } else {
+      btns.appendChild(vozBoton('voz-btn voz-btn-pri voz-btn-ancho', '✓ Comprobar', () => {
+        if (_vozActSesion.estado) return;
+        let bien = 0;
+        izq.forEach(a => { if (hechas[a.k] === a.k) bien++; });
+        colI.querySelectorAll('.voz-act-par-i').forEach((n, j) => {
+          n.classList.add(hechas[izq[j].k] === izq[j].k ? 'voz-act-par-ok' : 'voz-act-par-mal');
+          n.disabled = true;
+          if (hechas[izq[j].k] !== izq[j].k) {
+            const c = n.querySelector('.voz-act-par-con');
+            if (c) c.textContent = '→ era: ' + it.ps[izq[j].k][1];
+          }
+        });
+        colD.textContent = '';
+        btns.textContent = '';
+        vozActVeredicto(caja, it, bien === izq.length,
+          bien === izq.length ? '' : ('Acertaste ' + bien + ' de ' + izq.length));
+      }));
+      btns.appendChild(vozBoton('voz-btn', '↺ Empezar de nuevo', () => {
+        Object.keys(hechas).forEach(k => delete hechas[k]);
+        elegida = null; pintar();
+      }));
+    }
+  };
+  pintar();
+  vozActArrastrePares(tablero, (iz, de) => {
+    if (_vozActSesion.estado || hechas[iz] != null) return;
+    hechas[iz] = de;
+    elegida = null;
+    pintar();
+  });
+}
+
+/* El arrastre, con punteros y `touch-action: none` en la ficha que se
+   arrastra: sin eso el navegador se queda el gesto para desplazar la
+   página y el arrastre no arranca nunca. */
+function vozActArrastrePares(tablero, alSoltar) {
+  if (tablero.dataset.enganchado) return;
+  tablero.dataset.enganchado = '1';
+  let nodo = null, idp = null, fantasma = null;
+  const soltar = ev => {
+    if (!nodo) return;
+    const bajo = document.elementFromPoint(ev.clientX, ev.clientY);
+    const destino = bajo && bajo.closest ? bajo.closest('.voz-act-par-d') : null;
+    nodo.classList.remove('voz-act-arrastrando');
+    if (fantasma && fantasma.parentNode) fantasma.parentNode.removeChild(fantasma);
+    tablero.querySelectorAll('.voz-act-par-d').forEach(n => n.classList.remove('voz-act-par-diana'));
+    const iz = Number(nodo.dataset.iz);
+    nodo = null; idp = null; fantasma = null;
+    if (destino) alSoltar(iz, Number(destino.dataset.de));
+  };
+  tablero.addEventListener('pointerdown', ev => {
+    const it = ev.target.closest ? ev.target.closest('.voz-act-par-i') : null;
+    if (!it || it.disabled || it.classList.contains('voz-act-par-hecho')) return;
+    nodo = it; idp = ev.pointerId;
+    try { it.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  tablero.addEventListener('pointermove', ev => {
+    if (!nodo || ev.pointerId !== idp) return;
+    if (!fantasma) {
+      /* El fantasma solo nace cuando el dedo se movió de verdad: sin
+         eso, un toque normal dejaría una ficha flotando un instante. */
+      const r = nodo.getBoundingClientRect();
+      if (Math.abs(ev.clientY - (r.top + r.height / 2)) < 6 && Math.abs(ev.clientX - (r.left + r.width / 2)) < 12) return;
+      nodo.classList.add('voz-act-arrastrando');
+      fantasma = vozNodo('div', 'voz-act-fantasma', nodo.textContent.replace(/→.*$/, '').trim());
+      document.body.appendChild(fantasma);
+    }
+    ev.preventDefault();
+    fantasma.style.left = ev.clientX + 'px';
+    fantasma.style.top = ev.clientY + 'px';
+    const bajo = document.elementFromPoint(ev.clientX, ev.clientY);
+    const destino = bajo && bajo.closest ? bajo.closest('.voz-act-par-d') : null;
+    tablero.querySelectorAll('.voz-act-par-d').forEach(n => n.classList.toggle('voz-act-par-diana', n === destino));
+  });
+  tablero.addEventListener('pointerup', soltar);
+  tablero.addEventListener('pointercancel', ev => {
+    if (fantasma && fantasma.parentNode) fantasma.parentNode.removeChild(fantasma);
+    if (nodo) nodo.classList.remove('voz-act-arrastrando');
+    nodo = null; idp = null; fantasma = null;
+  });
+}
+
+function vozActPintarFinal(cuerpo) {
+  const s = _vozActSesion;
+  const total = s.bien + s.mal;
+  const pct = total ? Math.round((s.bien / total) * 100) : 0;
+  const fin = vozNodo('div', 'voz-act-final');
+  fin.appendChild(vozNodo('div', 'voz-act-final-ic', pct >= 80 ? '🎉' : (pct >= 50 ? '💪' : '📖')));
+  fin.appendChild(vozNodo('div', 'voz-act-final-t', s.bien + ' de ' + total));
+  fin.appendChild(vozNodo('p', 'voz-act-final-p',
+    pct >= 80 ? 'Eso se quedó. Las que acertaste vuelven a preguntarse dentro de unos días, no mañana.'
+      : (pct >= 50 ? 'A medias, que es donde se aprende. Las falladas vuelven mañana.'
+        : 'Vale la pena releer el texto antes de volver: las falladas vuelven mañana.')));
+  cuerpo.appendChild(fin);
+
+  if (s.revisar.length) {
+    const lista = vozNodo('div', 'voz-act-revisar');
+    lista.appendChild(vozNodo('div', 'voz-ind-tit', 'Lo que se escapó'));
+    s.revisar.forEach(it => {
+      const f = vozNodo('div', 'voz-act-rev');
+      f.appendChild(vozNodo('div', 'voz-act-rev-q', String(it.k === 'flash' ? it.f : it.q || '').replace(/\n/g, ' ')));
+      const sol = it.k === 'flash' ? it.r : (it.k === 'completar' ? it.a
+        : (it.k === 'opcion' && it.ok >= 0 ? it.o[it.ok] : (it.k === 'pares' ? it.ps.map(p => p[0] + ' → ' + p[1]).join(' · ') : (it.guia || ''))));
+      if (sol) f.appendChild(vozNodo('div', 'voz-act-rev-s', sol));
+      /* Y se puede ir al sitio del texto de donde salió, que es lo que
+         convierte un fallo en una relectura y no en un número. */
+      if (it.cap != null && it.vp != null) {
+        f.appendChild(vozBoton('voz-act-rev-ir', '📖 Ver en el texto', () => {
+          vozActCerrarTaller();
+          vozAbrirLector(s.cid);
+          setTimeout(() => vozIrA(it.cap, it.vp, 0), 320);
+        }));
+      }
+      lista.appendChild(f);
+    });
+    cuerpo.appendChild(lista);
+  }
+
+  const btns = vozNodo('div', 'voz-act-botones');
+  if (s.revisar.length) {
+    btns.appendChild(vozBoton('voz-btn voz-btn-pri voz-btn-ancho', '🔁 Repetir las ' + s.revisar.length + ' falladas', () => {
+      _vozActSesion = { cid: s.cid, cola: vozActBaraja(s.revisar), i: 0, bien: 0, mal: 0, revisar: [], estado: null };
+      vozActPintarTaller();
+    }));
+  }
+  btns.appendChild(vozBoton('voz-btn voz-btn-ancho', '📊 Volver al taller', () => { _vozActSesion = null; vozActPintarTaller(); }));
+  cuerpo.appendChild(btns);
+}
+
+/* ─── La hoja de pegar actividades ────────────────────────────────
+   Como la de pegar el texto: se pega de golpe lo que dio la máquina y
+   la pantalla dice ANTES de guardar qué entendió de cada tipo y qué
+   renglón no. Y con un ejemplo que funciona: aprender editando algo
+   que ya va cuesta un tercio que aprender leyendo cómo debería ser. */
+
+const VOZ_ACT_EJEMPLO = [
+  '## Tarjetas de memoria',
+  '1910 :: El año en que se secó el pozo del pueblo',
+  'Remedios :: La única que no quiso irse',
+  '',
+  '## Emparejar',
+  'Los Ochoa → los primeros en marcharse',
+  'El maestro → se fue después de los Ochoa',
+  'El que vendía cal → el tercero en irse',
+  '',
+  '## Preguntas de selección',
+  '1. ¿Por qué Remedios no quiso irse del pueblo?',
+  'A) Porque no tenía carreta',
+  'B) Porque allí están enterrados los suyos ✅',
+  'C) Porque el pozo todavía daba agua',
+  'D) Porque esperaba al maestro',
+  '',
+  '2. ¿Qué le pasó al retrato que dejaron los Ochoa?',
+  'A) Se lo llevó el viento',
+  'B) Lo borró el sol',
+  'C) Lo recogió Remedios',
+  'D) Se quemó en el incendio',
+  'Respuesta: B',
+  '',
+  '## Completar',
+  '1. El retrato se quedó mirando la puerta ___ años.',
+  'Respuesta: muchos',
+  '2. El agua corría muy abajo, donde ya no llega ninguna ___ . (cuerda)',
+  '',
+  '## Pregunta abierta',
+  '1. ¿Qué quiere decir que el sol borrara el retrato?',
+  'Pauta: el olvido del pueblo, que no necesita a nadie que lo empuje.',
+].join('\n');
+
+let _vozActPegandoEn = null;   // cid del texto al que se le pegan
+let _vozActPegado = null;      // lo último que entendió el lector
+
+function vozActAbrirPegar(cid) {
+  /* ⚠️ LA HOJA VIVE DENTRO DEL TALLER, ASÍ QUE CON EL TALLER CERRADO NO
+     SE VE. Cuelga ahí a propósito —para teñirse con el papel y para no
+     quedar por debajo de sus 3300 de z-index—, y el precio es este: si
+     alguien la abriera desde el anaquel, el botón respondería, la hoja
+     se abriría y la pantalla no cambiaría. Un fallo que no da error y
+     se lee como «el botón está muerto». En vez de escribir la regla en
+     un comentario y confiar, se abre el taller primero: la trampa deja
+     de poder existir. Lo cazó la sonda, no la lectura del código. */
+  const taller = document.getElementById('voz-act-overlay');
+  if (taller && taller.hidden) vozActAbrirTaller(cid);
+  _vozActPegandoEn = cid;
+  _vozActPegado = null;
+  const ov = document.getElementById('voz-act-pegar-overlay');
+  const ta = document.getElementById('voz-act-pegar-txt');
+  const c = _vozCuentos.find(x => x.cid === cid);
+  if (!ov || !ta) return;
+  ta.value = '';
+  const tit = document.getElementById('voz-act-pegar-tit');
+  if (tit) tit.textContent = '📝 Actividades de «' + ((c && c.titulo) || 'el texto') + '»';
+  const sug = document.getElementById('voz-act-sugerencia');
+  if (sug) {
+    /* Lo que hay que pedirle a la máquina, listo para copiar: sin esta
+       frase, la primera tanda vuelve con cinco formatos distintos. */
+    sug.textContent = 'Pídeselo así a la máquina que escribió el texto: «De este texto hazme actividades de '
+      + 'comprensión: 6 tarjetas de memoria (dato :: significado), 4 parejas para emparejar (a → b), '
+      + '5 preguntas de selección con cuatro opciones y la correcta marcada con ✅, 4 de completar con ___ '
+      + 'y su Respuesta:, y 2 abiertas con su Pauta:. Incluye fechas, nombres y referencias.»';
+  }
+  vozActRepasar();
+  ov.style.display = 'flex';
+  setTimeout(() => { try { ta.focus(); } catch (e) {} }, 60);
+}
+
+function vozActCerrarPegar() {
+  const ov = document.getElementById('voz-act-pegar-overlay');
+  if (ov) ov.style.display = 'none';
+  _vozActPegandoEn = null;
+  _vozActPegado = null;
+}
+
+function vozActRepasar() {
+  const ta = document.getElementById('voz-act-pegar-txt');
+  const caja = document.getElementById('voz-act-repaso');
+  if (!ta || !caja) return;
+  caja.textContent = '';
+  const txt = ta.value.trim();
+  if (!txt) {
+    caja.appendChild(vozNodo('p', 'voz-rep-vacio',
+      'Pega aquí las actividades. Se entienden tal como las escribe una máquina: con sus títulos de sección, '
+      + 'sus números, sus A) B) C) D) y sus ✅.'));
+    _vozActPegado = null;
+    vozActPintarBotonGuardar();
+    return;
+  }
+  const r = vozActLeer(txt);
+  _vozActPegado = r;
+
+  const linea = vozNodo('div', 'voz-rep-linea');
+  VOZ_ACT_TIPOS.forEach(t => {
+    if (!r.cuenta[t.id]) return;
+    linea.appendChild(vozNodo('span', 'voz-rep-dato', t.ic + ' ' + r.cuenta[t.id] + ' ' + t.pl));
+  });
+  if (!r.items.length) linea.appendChild(vozNodo('span', 'voz-rep-dato', '— no se entendió ninguna todavía'));
+  caja.appendChild(linea);
+
+  /* ⚠️ LAS QUE NO PUEDEN CORREGIRSE SE NOMBRAN, UNA POR UNA, Y PARAN
+     EL GUARDADO. Es la regla que no se negocia del quiz de Videos
+     M.E.T.A.S: una pregunta de selección sin respuesta marcada no se
+     guarda en silencio, porque guardarla es publicar un examen que no
+     se puede aprobar y no enterarse hasta que alguien lo hace. */
+  if (r.sinCorrecta.length || r.sinRespuesta.length) {
+    const av = vozNodo('div', 'voz-rep-avisos voz-rep-para');
+    av.appendChild(vozNodo('div', 'voz-rep-avisos-t',
+      '⚠️ Falta decir cuál es la respuesta en ' + (r.sinCorrecta.length + r.sinRespuesta.length)
+      + (r.sinCorrecta.length + r.sinRespuesta.length === 1 ? ' actividad:' : ' actividades:')));
+    r.sinCorrecta.forEach(it => av.appendChild(vozNodo('div', 'voz-rep-aviso',
+      '🔘 «' + String(it.q).slice(0, 56) + '» — marca la buena con ✅ o escribe «Respuesta: B»')));
+    r.sinRespuesta.forEach(it => av.appendChild(vozNodo('div', 'voz-rep-aviso',
+      '✏️ «' + String(it.q).slice(0, 56) + '» — escribe debajo «Respuesta: …»')));
+    av.appendChild(vozNodo('div', 'voz-rep-aviso voz-rep-aviso-por',
+      'No se marca ninguna a ojo: acertaría una de cada cuatro veces, y un examen con la respuesta cambiada '
+      + 'no lo descubre nadie hasta que alguien acierta y la pantalla le dice que falló.'));
+    caja.appendChild(av);
+  }
+
+  if (r.avisos.length) {
+    const av = vozNodo('div', 'voz-rep-avisos');
+    av.appendChild(vozNodo('div', 'voz-rep-avisos-t', 'Estos renglones no se entendieron y se quedaron fuera:'));
+    r.avisos.slice(0, 8).forEach(a => av.appendChild(vozNodo('div', 'voz-rep-aviso', 'Renglón ' + a.n + ': ' + a.t)));
+    caja.appendChild(av);
+  }
+
+  if (r.items.length) {
+    const lista = vozNodo('div', 'voz-rep-caps');
+    r.items.slice(0, 40).forEach((it, n) => {
+      const f = vozNodo('div', 'voz-rep-cap');
+      f.appendChild(vozNodo('span', 'voz-rep-cap-n', String(n + 1)));
+      const t = vozActTipo(it.k);
+      f.appendChild(vozNodo('span', 'voz-rep-cap-t',
+        t.ic + ' ' + String(it.k === 'flash' ? it.f : (it.k === 'pares' ? it.q : it.q) || '').replace(/\n/g, ' ').slice(0, 70)));
+      f.appendChild(vozNodo('span', 'voz-rep-cap-p',
+        it.k === 'opcion' ? (it.ok >= 0 ? 'ABCDEF'[it.ok] : '⚠️') : (it.k === 'pares' ? it.ps.length + ' pares' : '')));
+      lista.appendChild(f);
+    });
+    caja.appendChild(lista);
+  }
+  vozActPintarBotonGuardar();
+}
+
+function vozActPintarBotonGuardar() {
+  const b = document.getElementById('voz-act-guardar-btn');
+  if (!b) return;
+  const r = _vozActPegado;
+  const para = r && (r.sinCorrecta.length || r.sinRespuesta.length);
+  b.disabled = !r || !r.items.length || !!para;
+  b.textContent = !r || !r.items.length ? '📝 Guardar las actividades'
+    : (para ? '⚠️ Falta decir cuál es la respuesta'
+      : '📝 Guardar ' + r.items.length + (r.items.length === 1 ? ' actividad' : ' actividades'));
+}
+
+function vozActGuardarPegado() {
+  const r = _vozActPegado;
+  const cid = _vozActPegandoEn;
+  if (!r || !r.items.length || !cid) return;
+  if (r.sinCorrecta.length || r.sinRespuesta.length) { vozActPintarBotonGuardar(); return; }
+  /* Se AÑADEN a lo que ya hubiera, no se pisa: quien pega una segunda
+     tanda está ampliando el taller, no rehaciéndolo. Para vaciarlo
+     está su botón. */
+  const antes = vozActDe(cid).items || [];
+  vozActGuardarFicha(cid, antes.concat(r.items));
+  vozActCerrarPegar();
+  vozActPintarTaller();
+  vozAviso('📝 ' + r.items.length + (r.items.length === 1 ? ' actividad guardada' : ' actividades guardadas'));
+}
+
+/* La ayuda: la lista de formas sale de VOZ_ACT_TIPOS y de las
+   cabeceras de verdad, nunca escrita a mano en el HTML —una copia
+   estaría equivocada el día que alguien añada una palabra, y quien la
+   lea se fiará—. Misma regla que VOZ_ETIQUETAS y ROD_ETIQUETAS. */
+function vozActAbrirAyuda() {
+  const ov = document.getElementById('voz-act-ayuda-overlay');
+  const caja = document.getElementById('voz-act-ayuda-cuerpo');
+  if (!ov || !caja) return;
+  caja.textContent = '';
+  caja.appendChild(vozNodo('p', 'voz-ayuda-nota',
+    'Se pega tal como venga. Los títulos de sección dicen de qué tipo es lo que viene debajo, '
+    + 'y si no hay títulos se reconoce por la forma.'));
+  const ejemplos = {
+    flash: 'dato :: lo que significa',
+    pares: 'una cosa → su pareja',
+    opcion: '1. ¿Pregunta?  ·  A) … B) … ✅  ·  o «Respuesta: B»',
+    completar: '1. La frase con su ___ .  ·  «Respuesta: …» o «(…)» al final',
+    abierta: '1. ¿Pregunta abierta?  ·  «Pauta: …»',
+  };
+  VOZ_ACT_TIPOS.forEach(t => {
+    const f = vozNodo('div', 'voz-ayuda-fila');
+    f.appendChild(vozNodo('div', 'voz-ayuda-campo', t.ic + ' ' + t.t));
+    const d = vozNodo('div', 'voz-ayuda-claves');
+    d.appendChild(vozNodo('div', 'voz-ayuda-forma', ejemplos[t.id]));
+    d.appendChild(vozNodo('div', 'voz-ayuda-cab', 'Títulos que lo abren: ' + vozActPalabrasDe(t.id)));
+    f.appendChild(d);
+    caja.appendChild(f);
+  });
+  caja.appendChild(vozNodo('p', 'voz-ayuda-nota',
+    '⚠️ Si el texto no dice cuál es la respuesta correcta, no se marca ninguna y el guardado se para '
+    + 'nombrando cuál falta. Marcarla a ojo acertaría una de cada cuatro veces.'));
+  caja.appendChild(vozNodo('p', 'voz-ayuda-nota',
+    'Lo que no se entiende se queda fuera y se dice con su número de renglón: nunca se coloca a la fuerza '
+    + 'en el sitio equivocado, que es donde ya no se ve que está mal.'));
+  ov.style.display = 'flex';
+}
+
+/* Las palabras de cada cabecera, sacadas de la propia tabla que usa el
+   lector: si se cambia la tabla, la ayuda cambia sola. */
+function vozActPalabrasDe(modo) {
+  const fila = VOZ_ACT_CABECERAS.find(f => f[1] === modo);
+  if (!fila) return '—';
+  return String(fila[0]).replace(/^\/|\/$/g, '').split('|')
+    .map(s => s.replace(/[\\^$.*+?()[\]{}]/g, '').replace(/\s\(\?:.*$/, '').trim())
+    .filter(Boolean).slice(0, 6).join(', ') + '…';
+}
+
 /* ══════════════ ENGANCHES ══════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -4548,6 +6215,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ov) ov.style.display = 'none';
   });
   on('voz-menu-cerrar', 'click', vozCerrarMenu);
+  on('voz-act-cerrar', 'click', vozActCerrarTaller);
+  on('voz-act-pegar-cerrar', 'click', vozActCerrarPegar);
+  on('voz-act-guardar-btn', 'click', vozActGuardarPegado);
+  on('voz-act-ayuda-btn', 'click', vozActAbrirAyuda);
+  on('voz-act-ayuda-cerrar', 'click', () => {
+    const ov = document.getElementById('voz-act-ayuda-overlay');
+    if (ov) ov.style.display = 'none';
+  });
+  on('voz-act-ejemplo-btn', 'click', () => {
+    const ta = document.getElementById('voz-act-pegar-txt');
+    if (!ta) return;
+    ta.value = VOZ_ACT_EJEMPLO;
+    vozActRepasar();
+  });
+  let tActRep = null;
+  on('voz-act-pegar-txt', 'input', () => {
+    clearTimeout(tActRep);
+    tActRep = setTimeout(vozActRepasar, 220);
+  });
   /* Tocar fuera de la hoja del menú la cierra, como las demás de la
      casa; dentro, no. */
   on('voz-menu-overlay', 'click', e => { if (e.target.id === 'voz-menu-overlay') vozCerrarMenu(); });
