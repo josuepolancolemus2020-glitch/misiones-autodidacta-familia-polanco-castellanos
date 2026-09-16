@@ -8080,7 +8080,7 @@ function vozActHash(s) {
    función acepta y lo que el aparato acepta tiene que ser lo mismo. */
 function vozActNormalizaTexto(s) {
   return String(s == null ? '' : s)
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[«»“”„‟"]/g, '"').replace(/[‘’‚‛']/g, "'").replace(/[–—‑]/g, '-').replace(/…/g, '...')
     .replace(/\s+/g, ' ').trim();

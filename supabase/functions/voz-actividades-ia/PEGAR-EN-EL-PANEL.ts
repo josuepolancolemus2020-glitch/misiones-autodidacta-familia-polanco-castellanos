@@ -90,7 +90,7 @@ interface Descartada { motivo: string; q: string }
    curva sería un falso rechazo. */
 function normaliza(s: string): string {
   return String(s ?? "")
-    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[«»“”„‟"]/g, '"')
     .replace(/[‘’‚‛']/g, "'")
