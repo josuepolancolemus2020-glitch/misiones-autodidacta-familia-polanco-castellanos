@@ -1,4 +1,4 @@
-const CACHE_NAME = 'faro-app-v114';
+const CACHE_NAME = 'faro-app-v115';
 
 /* ══════════════════════════════════════════════════════════════════
    ¿SE PUEDE GUARDAR ESTA RESPUESTA?

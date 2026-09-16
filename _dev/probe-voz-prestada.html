@@ -178,28 +178,6 @@ function nuevaBase(w, opciones){
       }
       return json([], 201);
     }
-    /* La Edge Function voz-actividades-ia, de mentira: devuelve lo que
-       le diga `o.ia` —un objeto, una función del cuerpo, o los dos
-       fallos con nombre— y APUNTA con qué cabecera y qué cuerpo la
-       llamaron, que es lo que hay que mirar: que viaje la sesión y que
-       viaje el texto entero. */
-    if (/\/functions\/v1\/voz-actividades-ia/.test(u.pathname)) {
-      /* ⚠️ El cliente puede llamar a fetch con un `Request` ya armado en vez
-         de (url, init): entonces las cabeceras y el cuerpo van DENTRO del
-         Request, y un doble que solo mirase `init` diría que la llamada
-         salió sin sesión y sin texto cuando salió con las dos. */
-      const req = (typeof url === 'string') ? null : url;
-      const cab = (init && init.headers) || (req && req.headers) || {};
-      const auth = typeof cab.get === 'function' ? (cab.get('Authorization') || cab.get('authorization') || '') : (cab.Authorization || cab.authorization || '');
-      let crudo = init && init.body != null ? init.body : null;
-      if (crudo == null && req && typeof req.text === 'function') { try { crudo = await req.clone().text(); } catch (e) {} }
-      let cuerpo = null; try { cuerpo = JSON.parse(crudo); } catch (e) {}
-      estado.ia = { auth: auth || '', cuerpo: cuerpo, veces: ((estado.ia && estado.ia.veces) || 0) + 1 };
-      if (o.ia === 'no-desplegada') return json({ code: 'NOT_FOUND', message: 'Requested function was not found' }, 404);
-      if (o.ia === 'sin-clave') return json({ error: 'sin_clave', detalle: 'Falta el secreto ANTHROPIC_API_KEY en Supabase → Edge Functions → Secrets' }, 500);
-      if (!auth) return json({ error: 'sin_sesion' }, 401);
-      return json(typeof o.ia === 'function' ? o.ia(cuerpo) : (o.ia || { ok: true, items: [], descartadas: 0 }));
-    }
     /* El taller de comprensión viaja por su propia tabla, y la base de
        mentira la exige igual que la de verdad: firmada con quien entró
        y con `items` que sea una lista. Un doble complaciente no prueba
@@ -295,7 +273,7 @@ function nuevaBase(w, opciones){
    El texto es de la sonda: hace falta prosa larga, no prosa buena. */
 function vozActViasDe(w, cid){
   const v = JSON.parse(w.eval('JSON.stringify(vozActDe(' + JSON.stringify(cid) + ').items.map(i => vozActVia(i)))'));
-  const c = { txt: 0, sub: 0, ia: 0, mano: 0 };
+  const c = { txt: 0, sub: 0, mano: 0 };
   v.forEach(x => { c[x || 'mano'] = (c[x || 'mano'] || 0) + 1; });
   return c;
 }
@@ -2745,8 +2723,13 @@ function filasHoja(d){
   base28.actEscritas.length = 0;
   w.eval('vozActGuardarPegado()');
   await esperar(250);
-  const guardadas = Number(w.eval('vozActCuenta("c-act")'));
-  ok(guardadas === 8, 'y quedan las 8 actividades del ejemplo guardadas', 'quedaron ' + guardadas);
+  /* ⚠️ Se cuentan LAS PEGADAS, no el total. Desde que el taller se monta
+     solo al abrirlo (36-bis), este texto ya trae sus 📖 sacadas del propio
+     texto, así que un total clavado a 8 suspendería por el automático
+     funcionando — que es lo contrario de lo que esta comprobación mira. */
+  const pegadas28 = Number(w.eval('vozActDe("c-act").items.filter(i => !i.auto).length'));
+  ok(pegadas28 === 8, 'y quedan las 8 actividades del ejemplo guardadas',
+     'quedaron ' + pegadas28 + ' pegadas (total ' + w.eval('vozActCuenta("c-act")') + ')');
   await esperar(1600);
   const filaAct = base28.actEscritas.find(x => x.cid === 'c-act');
   /* ⚠️ Y EL FALLO DICE LA CAUSA, no «no llegó». Cuando el taller pedía
@@ -2756,10 +2739,16 @@ function filasHoja(d){
      rótulo de la barra ES el diagnóstico —la herramienta ya se lo dice al
      lector con palabras— así que se enseña aquí tal cual. */
   const porQueNo = String(w.eval('vozActRotuloNube()'));
-  ok(!!filaAct && filaAct.puesto_por === VOZ_UID && Array.isArray(filaAct.items) && filaAct.items.length === 8,
-     'suben a voz_actividades FIRMADAS y con su lista entera',
+  /* «Con su lista entera» se mide contra lo que hay en el aparato, no
+     contra un número escrito: el taller también se monta solo, así que un
+     8 clavado aquí suspendería por el automático funcionando. */
+  const enAparato28 = Number(w.eval('vozActCuenta("c-act")'));
+  ok(!!filaAct && filaAct.puesto_por === VOZ_UID && Array.isArray(filaAct.items)
+     && filaAct.items.length === enAparato28 && enAparato28 >= 8,
+     'suben a voz_actividades FIRMADAS y con su lista entera (' + enAparato28 + ')',
      '⚠️ la nube no recibió el taller. La herramienta dice: «' + porQueNo + '»' +
-     (filaAct ? ' · firma=' + JSON.stringify(filaAct.puesto_por) + ' items=' + (filaAct.items || []).length
+     (filaAct ? ' · firma=' + JSON.stringify(filaAct.puesto_por) + ' items=' + (filaAct.items || []).length +
+                ' cuando en el aparato hay ' + enAparato28
               : ' · no se escribió ni una fila'));
   /* ⚠️ Y LA COSTURA, NOMBRADA: que las columnas que el aparato PIDE existan
      todas en la tabla. Es la comprobación que faltaba el 16 de septiembre de
@@ -2794,15 +2783,21 @@ function filasHoja(d){
   ok(cNota && cNota.f === '¿De qué habla aquí?',
      'y la tarjeta usa la NOTA de quien leyó como cara: es mejor pregunta que cualquiera generada',
      'la tarjeta no usó la nota: ' + JSON.stringify(cNota && cNota.f));
+  /* ⚠️ Y AQUÍ SE CUENTA POR VÍA, NO EL TOTAL. Son TRES las que conviven
+     —lo pegado a mano, lo sacado del texto y lo de los subrayados— y lo
+     que se está probando es justo que ninguna pise a las otras. Un total
+     clavado no distingue «no pisó nada» de «pisó dos y añadió dos». */
+  const viasAntes = vozActViasDe(w, 'c-act');
   w.eval('vozActGenerarYGuardar("c-act")');
   await esperar(200);
-  ok(Number(w.eval('vozActCuenta("c-act")')) === 10 && Number(w.eval('vozActDe("c-act").items.filter(i => !i.auto).length')) === 8,
-     'refrescar desde los subrayados AÑADE las suyas y no pisa las pegadas a mano',
-     'al generar se perdieron las pegadas: ' + w.eval('vozActCuenta("c-act")'));
+  const vias28 = vozActViasDe(w, 'c-act');
+  ok(vias28.sub === 2 && vias28.mano === 8 && vias28.txt === viasAntes.txt,
+     'refrescar desde los subrayados AÑADE las suyas y no pisa ni las pegadas a mano ni las sacadas del texto',
+     'al generar se movió algo que no era suyo: ' + JSON.stringify(vias28) + ' (antes ' + JSON.stringify(viasAntes) + ')');
   w.eval('vozActGenerarYGuardar("c-act")');
   await esperar(200);
-  ok(Number(w.eval('vozActCuenta("c-act")')) === 10,
-     'y volver a generar las REEMPLAZA en vez de duplicarlas', 'generar dos veces dejó ' + w.eval('vozActCuenta("c-act")'));
+  ok(JSON.stringify(vozActViasDe(w, 'c-act')) === JSON.stringify(vias28),
+     'y volver a generar las REEMPLAZA en vez de duplicarlas', 'generar dos veces dejó ' + JSON.stringify(vozActViasDe(w, 'c-act')));
 
   /* 28.6 El taller se juega: una de selección, una de completar con
      una falta de ortografía, y una de emparejar a toques. */
@@ -2952,12 +2947,15 @@ function filasHoja(d){
      'y lo que había en el aparato no se pierde', 'se perdieron las actividades sin tabla');
 
 
-  /* ── 36-bis. LAS ACTIVIDADES QUE GENERA EL SISTEMA ──
+  /* ── 36-bis. EL TALLER LO MONTA EL SISTEMA, DEL PROPIO TEXTO ──
      Pedido por el autor el 16 de septiembre de 2026: «que el sistema
-     genere las actividades de cada lectura». Dos puertas: la del aparato
-     (recorta el texto: todas sus respuestas están en él letra por letra)
-     y la de Claude (lee, pero solo entra lo que CITA el texto). */
-  log('── 36-bis. Las actividades que genera el sistema: del texto y de Claude ──');
+     genere las actividades de cada lectura», y aclarado el mismo día:
+     «no quiero APIs ni nada de eso; el sistema debe tener las actividades
+     una vez que se pegue o suba un ensayo». O sea dos cosas que se
+     comprueban aquí: que el generador del aparato recorta el texto —todas
+     sus respuestas están en él letra por letra— y que corre SOLO, en el
+     guardado, sin que nadie toque un botón. */
+  log('── 36-bis. El taller lo monta el sistema, del propio texto ──');
   nuevaBase(w, { act: [] });
   const textoGen = [
     '# El pozo y la escuela', '', 'Voz: Rulfo', 'Máquina: Claude', 'Género: ensayo', '',
@@ -3014,6 +3012,18 @@ function filasHoja(d){
   ok(pr.some(i => /bibliograf/i.test(i.q) && i.ps.length === 4 && i.ps.some(p => p[0] === 'Ochoa' && /Memorias del pozo/.test(p[1]))),
      'la bibliografía da un emparejar autor → obra con sus cuatro entradas');
   ok(pr.some(i => /capítulo/i.test(i.q) && i.ps.length >= 3), 'y los capítulos, un emparejar capítulo → idea');
+  /* ⚠️ LA RED DE SEGURIDAD, SOBRE TODAS Y DE TODOS LOS TIPOS: ninguna
+     respuesta puede estar fuera del texto. Las de arriba miran un tipo
+     cada una; esta las mira todas, incluidas las tarjetas, que es por
+     donde se escapaba. Quien la sostiene es el cedazo de
+     `vozActGenerarDelTexto`: apagarlo con un generador que invente deja
+     esta comprobación en rojo, que es justo lo que tiene que pasar. */
+  const respTodas = gen.map(i => i.k === 'flash' ? i.r : i.k === 'completar' ? i.a
+    : i.k === 'opcion' ? (i.o || [])[i.ok] : null).filter(x => x != null);
+  const fugadas = respTodas.filter(x => !enTexto(x));
+  ok(respTodas.length >= 8 && !fugadas.length,
+     '⚠️ NINGUNA de las ' + respTodas.length + ' respuestas generadas está fuera del texto: el sistema recorta, no inventa',
+     '⚠️ hay respuestas que NO están escritas en el texto: ' + JSON.stringify(fugadas.slice(0, 3)));
   const gen2 = JSON.parse(w.eval('JSON.stringify(vozActGenerarDelTexto("c-gen", 40))'));
   ok(JSON.stringify(gen2.map(i => i.id)) === JSON.stringify(gen.map(i => i.id)), 'y generar dos veces da los MISMOS ids: reemplaza, no duplica');
   const genDef = JSON.parse(w.eval('JSON.stringify(vozActGenerarDelTexto("c-gen"))'));
@@ -3038,51 +3048,117 @@ function filasHoja(d){
   const vias3 = JSON.parse(w.eval('JSON.stringify(vozActDe("c-gen").items.map(i => vozActVia(i)))'));
   ok(vias3.filter(v => v === 'txt').length === 10 && vias3.filter(v => v === 'sub').length === 1, 'y volver a sacar del texto reemplaza las 📖 sin duplicarlas ni tocar la 🖍');
 
-  /* La puerta de Claude, contra la función de mentira. */
-  const citaBuena = 'El maestro sostiene que la escuela fue lo que los trajo de vuelta, no el agua';
-  const baseIa = nuevaBase(w, { act: [], ia: (cuerpo) => ({ ok: true, tesis: 'La plaza, no la tierra.', descartadas: 1, items: [
-    { id: 'x', k: 'flash', nivel: 'tesis', donde: 'La vuelta', cita: citaBuena, f: '¿Qué sostiene el maestro?', r: 'Que fue la escuela, no el agua' },
-    { id: 'y', k: 'completar', nivel: 'dato', donde: 'La sequía', cita: 'El pozo se secó en el verano de 1927', q: 'El pozo se secó en ___.', a: '1928' },
-    { id: 'z', k: 'opcion', nivel: 'dato', donde: 'La memoria', cita: 'Remigio Ochoa murió en Comayagua en 1960', q: '¿Dónde murió?', o: ['Comayagua', 'Tegucigalpa'], ok: 0 },
-    { id: 'v', k: 'abierta', nivel: 'juicio', donde: 'La vuelta', cita: 'lo que devuelve a la gente a un lugar no es lo que hay en la tierra sino lo que hay en la plaza', q: '¿Qué evidencia da el texto?<img src=x onerror="window.__colado9=1">', guia: 'Solo la afirmación del maestro.' },
-  ] }) });
-  const resIa = await w.eval('vozActPedirIA("c-gen")');
-  const llamadaIa = baseIa.ia;
-  ok(resIa && resIa.guardadas === 2 && resIa.descartadas === 3,
-     '🤖 de cuatro que devolvió Claude entran DOS: la que cita el texto y la abierta; se descartan la de la respuesta cambiada (1928 con cita de 1927) y la de la cita inventada',
-     '⚠️ entraron ' + JSON.stringify(resIa));
-  const deIa = JSON.parse(w.eval('JSON.stringify(vozActDe("c-gen").items.filter(i => vozActVia(i) === "ia"))'));
-  ok(deIa.length === 2 && deIa.every(i => /^ia-/.test(i.id) && i.cita) && !deIa.some(i => i.a === '1928'),
-     'y las guardadas llevan via=ia, su id ia-… y su cita; la de 1928 no está', JSON.stringify(deIa.map(i => i.k)));
-  ok(vozActViasDe(w, 'c-gen').txt === 10 && vozActViasDe(w, 'c-gen').sub === 1, 'y pedírselas a Claude no tocó las 📖 ni la 🖍');
+  /* ── Y NO EXISTE NINGUNA PUERTA DE PAGO ───────────────────────────
+     «No quiero APIs ni nada de eso» (el autor, 16 de septiembre de
+     2026). Hubo un rato una segunda puerta que le pedía las actividades
+     a Claude por una Edge Function, con su clave de pago. Esto vigila
+     que no vuelva por la puerta de atrás: ni la función, ni el botón. */
+  ok(w.eval('typeof vozActPedirIA') === 'undefined' && w.eval('typeof VOZ_ACT_FUNCION') === 'undefined',
+     '⚠️ la puerta de pago no existe: ni vozActPedirIA ni la dirección de la función',
+     'quedó viva la puerta de la Edge Function');
+  ok(!('ia' in JSON.parse(w.eval('JSON.stringify(VOZ_ACT_VIAS)'))),
+     'y tampoco su vía en el rótulo de procedencia');
   w.eval('vozActAbrirTaller("c-gen")');
   await esperar(200);
-  const filasIa = [...d.querySelectorAll('#voz-act-cuerpo .voz-act-fila-auto')].map(e => e.textContent);
-  ok(filasIa.some(t => /Claude/.test(t)) && filasIa.some(t => /sacada del texto/.test(t)) && filasIa.some(t => /subrayado/.test(t)),
-     'en la lista cada actividad dice de dónde salió: 🤖 Claude, 📖 el texto o 🖍 un subrayado (la etiqueta de la regla 1, por pregunta)');
-  ok(!w.__colado9 && d.querySelectorAll('#voz-act-cuerpo img').length === 0 && /<img src=x/.test(d.getElementById('voz-act-cuerpo').textContent),
-     '⚠️ un enunciado de Claude con HTML dentro se pinta como texto y no crea ni un elemento');
-  ok([...d.querySelectorAll('#voz-act-cuerpo .voz-act-fila-cita')].some(e => e.textContent.indexOf('El maestro sostiene') >= 0),
-     'y debajo de cada generada se ve la cita de la que salió');
+  const botonesT = [...d.querySelectorAll('#voz-act-cuerpo button')].map(e => e.textContent);
+  ok(!botonesT.some(t => /Claude|IA\b|API/i.test(t)),
+     'y en el taller no hay ni un botón que pida nada por la red: ' + botonesT.map(t => t.slice(0, 22)).join(' | '));
+  const filasVia = [...d.querySelectorAll('#voz-act-cuerpo .voz-act-fila-auto')].map(e => e.textContent);
+  ok(filasVia.some(t => /sacada del texto/.test(t)) && filasVia.some(t => /subrayado/.test(t)),
+     'cada actividad sigue diciendo de dónde salió: 📖 el texto o 🖍 un subrayado (la etiqueta de la regla 1, por pregunta)');
   w.eval('vozActCerrarTaller()');
   await esperar(120);
-  ok(!!llamadaIa && /^Bearer /.test(llamadaIa.auth) && llamadaIa.cuerpo && llamadaIa.cuerpo.titulo === 'El pozo y la escuela'
-     && /El pozo se secó/.test(llamadaIa.cuerpo.texto) && /Memorias del pozo/.test(llamadaIa.cuerpo.texto) && llamadaIa.veces === 1,
-     '⚠️ la función recibió la SESIÓN (Bearer) y el texto ENTERO con su bibliografía, en una sola llamada',
-     '⚠️ la llamada a la función salió sin sesión o sin el texto: ' + JSON.stringify(llamadaIa && { auth: (llamadaIa.auth || '').slice(0, 12), veces: llamadaIa.veces }));
 
-  /* Y los motivos, con nombre: falta desplegar, falta la clave. */
-  nuevaBase(w, { act: [], ia: 'no-desplegada' });
-  await w.eval('vozActPedirIA("c-gen")');
-  ok(/desplegar/i.test(w.eval('_vozActIaMsg')) && /voz-actividades-ia/.test(w.eval('_vozActIaMsg')) && /Sacarlas del texto/.test(w.eval('_vozActIaMsg')),
-     '⚠️ sin la función desplegada lo DICE, nombra la función y recuerda que 📖 Sacarlas del texto sigue funcionando: «' + w.eval('_vozActIaMsg').slice(0, 60) + '…»');
-  nuevaBase(w, { act: [], ia: 'sin-clave' });
-  await w.eval('vozActPedirIA("c-gen")');
-  ok(/ANTHROPIC_API_KEY/.test(w.eval('_vozActIaMsg')) && /Secrets/.test(w.eval('_vozActIaMsg')),
-     'y sin la clave puesta nombra el secreto y dónde va, en vez de decir «error»');
-  const nAntes = Number(w.eval('vozActDe("c-gen").items.length'));
-  ok(nAntes === 14, 'y ninguno de los dos fallos tocó lo que ya había (10 📖 + 1 🖍 + 1 a mano + 2 🤖 = ' + nAntes + ')',
-     'con los fallos de la función cambió la cuenta de actividades: ' + nAntes + ' en vez de 14');
+  /* ── EL TALLER SE MONTA SOLO AL GUARDAR EL ENSAYO ──────────────────
+     Es lo que se pidió con todas las letras: «el sistema debe tener las
+     actividades una vez que se pegue o suba un ensayo». Se prueba por el
+     camino de verdad —se abre la hoja, se pega y se PULSA el botón—,
+     porque llamar a vozGuardarPegado() por dentro se salta justo lo que
+     puede estar mal: que el automático no esté enganchado al guardado. */
+  nuevaBase(w, { act: [] });
+  await w.eval('initVozPrestada()');
+  await esperar(400);
+  w.eval('vozAbrirPegar(null)');
+  await esperar(200);
+  d.getElementById('voz-pegar-txt').value = textoGen;
+  d.getElementById('voz-f-titulo').value = 'El pozo y la escuela';
+  d.getElementById('voz-f-voz').value = 'Rulfo';
+  d.getElementById('voz-f-maquina').value = 'Claude';
+  w.eval('vozRepasar()');
+  await esperar(250);
+  d.getElementById('voz-guardar-btn').click();
+  await esperar(800);
+  const cidAuto = w.eval('_vozCuentos[0].cid');
+  const nAuto = Number(w.eval('vozActCuenta(' + JSON.stringify(cidAuto) + ')'));
+  ok(nAuto >= 8,
+     '⚠️ AL GUARDAR EL ENSAYO EL TALLER YA ESTÁ MONTADO: ' + nAuto + ' actividades sin tocar ningún botón',
+     '⚠️ se guardó el ensayo y el taller quedó vacío (' + nAuto + '): el automático no está enganchado al guardado');
+  const viasAuto = vozActViasDe(w, cidAuto);
+  ok(viasAuto.txt === nAuto, 'y todas son de vía txt, o sea sacadas del propio texto', JSON.stringify(viasAuto));
+  ok([...d.querySelectorAll('#view-voz .voz-ficha-taller')].length >= 1,
+     'y la ficha del anaquel ya enseña su botón de taller, sin haber abierto nada');
+
+  /* Corregir el texto refresca las 📖 y NO toca lo pegado a mano: esto
+     corre en CADA guardado, así que si tocara lo de a mano, arreglar una
+     coma le borraría a alguien el cuestionario que escribió. */
+  w.eval('vozActGuardarFicha(' + JSON.stringify(cidAuto) + ', vozActDe(' + JSON.stringify(cidAuto) +
+         ').items.concat([{ id: "mano-9", k: "flash", f: "Puesta a mano", r: "No se toca" }]), true)');
+  w.eval('vozAbrirPegar(_vozCuentos.find(c => c.cid === ' + JSON.stringify(cidAuto) + '))');
+  await esperar(300);
+  d.getElementById('voz-pegar-txt').value = d.getElementById('voz-pegar-txt').value
+    .replace('con once alumnos', 'con doce alumnos');
+  w.eval('vozRepasar()');
+  await esperar(250);
+  d.getElementById('voz-guardar-btn').click();
+  await esperar(800);
+  const viasCorr = vozActViasDe(w, cidAuto);
+  ok(viasCorr.mano === 1 && viasCorr.txt >= 8,
+     '⚠️ corregir el texto vuelve a sacar las 📖 y deja intacta la pegada a mano (' + JSON.stringify(viasCorr) + ')',
+     '⚠️ una corrección se llevó por delante lo pegado a mano: ' + JSON.stringify(viasCorr));
+  const respCorr = JSON.parse(w.eval('JSON.stringify(vozActDe(' + JSON.stringify(cidAuto) +
+    ').items.filter(i => i.k === "completar").map(i => i.a))'));
+  ok(!respCorr.some(a => a === 'once'), 'y las respuestas siguen el texto corregido, no el viejo');
+
+  /* Y un taller vacío se monta al abrirlo: es lo que da taller a los
+     textos que ya estaban en el anaquel antes de que esto existiera. */
+  w.eval('vozActGuardarFicha(' + JSON.stringify(cidAuto) + ', [], true)');
+  ok(Number(w.eval('vozActCuenta(' + JSON.stringify(cidAuto) + ')')) === 0, 'con el taller vaciado a mano, parte de cero');
+  w.eval('vozActAbrirTaller(' + JSON.stringify(cidAuto) + ')');
+  await esperar(600);
+  ok(Number(w.eval('vozActCuenta(' + JSON.stringify(cidAuto) + ')')) >= 8,
+     '⚠️ y abrir un taller VACÍO lo monta solo: los textos de antes no hay que volver a guardarlos',
+     'abrir el taller vacío no montó nada');
+  w.eval('vozActCerrarTaller()');
+  await esperar(120);
+
+  /* ⚠️ PERO NO CON LA NUBE A MEDIO CONTESTAR. Montar con la señal caída
+     escribiría una ficha con el reloj de AHORA, que le ganaría por más
+     nueva a las actividades que otra persona de la casa pegó en otro
+     aparato — y se las llevaría sin dar ningún error. */
+  w.eval('vozActGuardarFicha(' + JSON.stringify(cidAuto) + ', [], true)');
+  w.eval('_vozActNube = "sin-senal"');
+  w.eval('vozActMontarSiVacio(' + JSON.stringify(cidAuto) + ')');
+  ok(Number(w.eval('vozActCuenta(' + JSON.stringify(cidAuto) + ')')) === 0,
+     '⚠️ con la nube sin contestar NO se monta nada: montar a ciegas borraría lo que otro aparato pegó a mano',
+     '⚠️ se montó el taller sin saber qué hay en la nube');
+  w.eval('_vozActNube = "al-dia"');
+  w.eval('vozActMontarSiVacio(' + JSON.stringify(cidAuto) + ')');
+  ok(Number(w.eval('vozActCuenta(' + JSON.stringify(cidAuto) + ')')) >= 8, 'y en cuanto la nube contesta, sí');
+
+  /* ── EL CEDAZO: lo que se responde está ESCRITO en el texto ─────────
+     Es el único guardia del generador y el que hace que «el sistema
+     genera las actividades» no signifique «el sistema se inventa las
+     respuestas». Se comprueba por los dos lados: que deja pasar lo que
+     está y que para lo que no. */
+  const TT = JSON.parse(w.eval('JSON.stringify(vozActPreparaTexto(vozActTodoPlano(_vozCuentos.find(x => x.cid === "c-gen"))))'));
+  const literal = (x) => w.eval('vozActLiteral(' + JSON.stringify(x) + ', vozActPreparaTexto(vozActTodoPlano(_vozCuentos.find(v => v.cid === "c-gen"))))');
+  ok(literal('1927') === true && literal('Remigio Ochoa') === true && literal('El pozo se secó en el verano de 1927') === true,
+     'el cedazo deja pasar un año, un nombre y una frase que SÍ están en el texto');
+  ok(literal('1928') === false && literal('Ochoa murió en Comayagua') === false,
+     '⚠️ y para un año cambiado y una frase inventada: una pregunta cuya respuesta no está escrita no se guarda',
+     '⚠️ el cedazo deja pasar una respuesta que no está en el texto');
+  ok(TT.norm.length > 500 && /memorias del pozo/.test(TT.norm),
+     'y el texto con el que compara lleva la bibliografía dentro: un año de una referencia es respuesta buena');
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

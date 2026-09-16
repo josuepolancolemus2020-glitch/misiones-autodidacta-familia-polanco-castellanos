@@ -1834,6 +1834,14 @@ function vozTraerEntrantes() {
      etiqueta). Dejarla sería reexaminarla en cada arranque. */
   try { localStorage.removeItem(VOZ_ENTRANTES); } catch (e) {}
   if (entraron) vozGuardaLocal();
+  /* ⚠️ Y AQUÍ NO SE MONTA EL TALLER, aunque parezca el sitio. El puente
+     corre en el arranque, ANTES de que las actividades hayan bajado de la
+     nube, y el identificador de una lectura es ESTABLE (`lect-…`): o sea
+     que puede existir ya una ficha de otro aparato —con preguntas pegadas
+     a mano— que este todavía no ha visto. Montar aquí escribiría encima
+     con el reloj de ahora y se las llevaría por delante sin dar un error.
+     Se montan al abrir el taller (`vozActMontarSiVacio`), que es donde ya
+     se sabe qué hay en la nube. */
   return entraron;
 }
 
@@ -6728,6 +6736,14 @@ async function vozGuardarPegado() {
 
   _vozCuentos = [c].concat(_vozCuentos.filter(x => x.cid !== c.cid));
   vozGuardaLocal();
+  /* ⚠️ AQUÍ SE MONTA EL TALLER, ANTES DE PINTAR Y ANTES DE SUBIR NADA.
+     «El sistema debe tener las actividades una vez que se pegue o suba un
+     ensayo»: o sea que al volver al anaquel la ficha ya tiene que decir
+     cuántas hay, no «montar el taller». Corre en el aparato y tarda lo que
+     tarda un puñado de expresiones regulares, así que no hay nada que
+     esperar; y solo toca las de vía 'txt', de modo que corregir una coma
+     no le borra a nadie lo que pegó a mano. */
+  const nAct = vozActMontarDelTexto(c.cid);
   vozCerrarPegar();
   vozRender();
 
@@ -6737,12 +6753,17 @@ async function vozGuardarPegado() {
      tabla sin instalar no va a subir nunca, y con un texto ajeno
      tampoco por mucho que vuelva la señal. Un aviso que se equivoca de
      causa manda a mirar donde no está el problema. */
-  if (res.ok) vozAviso('📖 Guardado, y ya está en los demás aparatos');
-  else if (res.motivo === 'sin-nube')   vozAviso('📴 Guardado aquí. Falta correr voz_prestada.sql para que viaje');
-  else if (res.motivo === 'sin-sesion') vozAviso('📴 Guardado aquí. Entra en F.A.R.O para que viaje');
-  else if (res.motivo === 'sin-senal')  vozAviso('📡 Guardado aquí. Subirá solo la próxima vez que abras esto');
-  else if (res.motivo === 'ajeno')      vozAviso('✋ Ese texto lo puso otra persona: solo quien lo puso puede corregirlo');
-  else vozAviso('⚠️ Guardado aquí, pero la nube lo rechazó: ' + (res.detalle || 'sin detalle'));
+  let msg;
+  if (res.ok) msg = '📖 Guardado, y ya está en los demás aparatos';
+  else if (res.motivo === 'sin-nube')   msg = '📴 Guardado aquí. Falta correr voz_prestada.sql para que viaje';
+  else if (res.motivo === 'sin-sesion') msg = '📴 Guardado aquí. Entra en F.A.R.O para que viaje';
+  else if (res.motivo === 'sin-senal')  msg = '📡 Guardado aquí. Subirá solo la próxima vez que abras esto';
+  else if (res.motivo === 'ajeno')      msg = '✋ Ese texto lo puso otra persona: solo quien lo puso puede corregirlo';
+  else msg = '⚠️ Guardado aquí, pero la nube lo rechazó: ' + (res.detalle || 'sin detalle');
+  /* Y se DICE que el taller quedó montado. Hacerlo en silencio sería la
+     mitad de lo que se pidió: nadie va a abrir un taller que no sabe que
+     existe. */
+  vozAviso(msg + (nAct ? ' · 📝 ' + nAct + (nAct === 1 ? ' actividad lista' : ' actividades listas') : ''));
   vozRender();
 }
 
@@ -7810,7 +7831,8 @@ function vozActAbrirTaller(cid, desde) {
   ov.dataset.tema = _vozAj.tema || 'papel';
   ov.hidden = false;
   document.body.classList.add('voz-sala');
-  vozActSincronizar(cid);
+  /* Detrás de la sincronización, nunca delante: ver vozActMontarSiVacio. */
+  Promise.resolve(vozActSincronizar(cid)).then(() => vozActMontarSiVacio(cid));
   vozActPintarTaller();
 }
 
@@ -7853,17 +7875,14 @@ function vozActPintarTaller() {
     v.appendChild(vozNodo('p', 'voz-act-vacio-t', 'Todavía no hay actividades para este texto.'));
     v.appendChild(vozNodo('p', 'voz-act-vacio-p',
       'Sirven para lo único que una lectura de corrido no hace: comprobar que lo leído se quedó. '
-      + 'Hay dos maneras de ponerlas, y se pueden usar las dos.'));
+      + 'Normalmente se montan solas al guardar el texto; aquí están las maneras de ponerlas a mano.'));
     const puertas = vozNodo('div', 'voz-act-puertas');
     /* Las que GENERAN van primero, que es lo que el autor pidió: no tener
        que pedirlas en otra ventana y pegarlas. La de pegar se queda, la
        última, para quien ya las tenga escritas. */
-    puertas.appendChild(vozActPuerta('📖', 'Sacarlas del texto, ahora',
+    puertas.appendChild(vozActPuerta('📖', 'Sacarlas del texto',
       'Al instante y sin señal: fechas, cifras, nombres, términos, la idea de cada capítulo y la bibliografía, tapados en sus propias frases. Todas las respuestas están en el texto, letra por letra.',
       () => vozActGenerarTextoYGuardar(cid)));
-    puertas.appendChild(vozActPuerta('🤖', 'Pedírselas a Claude',
-      'Lee el texto entero y escribe actividades de síntesis: la tesis, la idea de cada sección, los datos que sostienen el argumento, las relaciones. Tarda medio minuto y cuesta unos centavos. Solo entran las que citan el texto.',
-      () => vozActPedirIA(cid)));
     const nSub = vozSubDe(cid).length;
     puertas.appendChild(vozActPuerta('🖍', 'Sacarlas de mis subrayados',
       nSub ? ('Tienes ' + nSub + (nSub === 1 ? ' subrayado' : ' subrayados') + ' en este texto. Cada uno se convierte en una pregunta cuya respuesta es el trozo que marcaste.')
@@ -7874,8 +7893,7 @@ function vozActPintarTaller() {
       () => vozActAbrirPegar(cid)));
     v.appendChild(puertas);
     cuerpo.appendChild(v);
-    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota voz-act-ia-estado', _vozActIaMsg)).id = 'voz-act-ia-estado';
-    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota voz-act-estado', vozActRotuloNube())).id = 'voz-act-estado';
+      cuerpo.appendChild(vozNodo('p', 'voz-aj-nota voz-act-estado', vozActRotuloNube())).id = 'voz-act-estado';
     return;
   }
 
@@ -7937,7 +7955,6 @@ function vozActPintarTaller() {
   const pie = vozNodo('div', 'voz-act-pie');
   if (mio) {
     pie.appendChild(vozBoton('voz-btn', '📖 Sacar más del texto', () => vozActGenerarTextoYGuardar(cid), 'Vuelve a sacar del texto las actividades del aparato (reemplaza las 📖 de antes)'));
-    pie.appendChild(vozBoton('voz-btn', '🤖 Pedírselas a Claude', () => vozActPedirIA(cid), 'Le pide a Claude actividades de síntesis (reemplaza las 🤖 de antes)'));
     pie.appendChild(vozBoton('voz-btn', '📋 Pegar más', () => vozActAbrirPegar(cid)));
     const nSub = vozSubDe(cid).length;
     if (nSub) pie.appendChild(vozBoton('voz-btn', '🖍 Refrescar desde mis subrayados (' + nSub + ')', () => vozActGenerarYGuardar(cid)));
@@ -7946,7 +7963,6 @@ function vozActPintarTaller() {
     pie.appendChild(vozNodo('p', 'voz-menu-nota', '✋ Las puso otra persona de la casa: puedes hacerlas, pero solo ella puede cambiarlas.'));
   }
   cuerpo.appendChild(pie);
-  cuerpo.appendChild(vozNodo('p', 'voz-aj-nota voz-act-ia-estado', _vozActIaMsg)).id = 'voz-act-ia-estado';
   const est = vozNodo('p', 'voz-aj-nota voz-act-estado', vozActRotuloNube());
   est.id = 'voz-act-estado';
   cuerpo.appendChild(est);
@@ -8026,48 +8042,58 @@ function vozActGenerarYGuardar(cid) {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   LAS ACTIVIDADES QUE GENERA EL SISTEMA: DEL TEXTO Y DE CLAUDE
+   LAS ACTIVIDADES LAS MONTA EL SISTEMA, DEL PROPIO TEXTO
    ══════════════════════════════════════════════════════════════════
    Pedido por el autor el 16 de septiembre de 2026: «procura tú generar
    las actividades, que no tenga que estar haciendo las actividades y
    pegarlas, que el sistema genere las actividades de cada lectura tomando
    en consideración los mejores criterios de abstracción y síntesis».
 
-   Son DOS puertas más, y las dos hacen falta porque no fallan igual:
+   ⚠️ Y ACLARADO POR ÉL EL MISMO DÍA, DESPUÉS DE VER LA PRIMERA VERSIÓN:
+   «no quiero APIs ni nada de eso; el sistema debe tener las actividades
+   una vez que se pegue o suba un ensayo». Hubo un rato una segunda puerta
+   que le pedía las actividades a Claude por una Edge Function, con su
+   clave de pago y su despliegue a mano. Está quitada entera, y el motivo
+   se escribe para que no vuelva: una herramienta cuyo trabajo principal
+   depende de una clave que hay que comprar, de una función que hay que
+   desplegar y de que haya señal NO ESTÁ TERMINADA. Se queda lo que corre
+   en el aparato, al instante, sin cuenta y sin red — que además es lo
+   único que puede cumplir «que ya estén listas al pegar el ensayo», que
+   es lo que de verdad se pidió.
 
-   · LA DEL APARATO (vozActGenerarDelTexto): corre aquí, al instante y sin
-     señal. Mira el texto como lo miraría alguien con un lápiz —fechas,
-     cifras, nombres propios, términos en negrita, definiciones, la
-     primera frase de cada capítulo, las frases que concluyen, la
-     bibliografía— y arma con eso completar, tarjetas, parejas, selección
-     y abiertas. NO entiende el texto: lo recorta. Por eso todas sus
-     respuestas están, letra por letra, en el texto; y por eso no sabe cuál
-     es la tesis, solo dónde suele estar.
-   · LA DE CLAUDE (vozActPedirIA): sí lee, y por eso mismo tiene que CITAR.
-     Cada actividad que devuelve trae el fragmento literal que la respalda,
-     y la que no lo tenga en el texto no entra: lo comprueba la función
-     (supabase/functions/voz-actividades-ia/verifica.ts) y lo vuelve a
-     comprobar el aparato antes de guardar (vozActCitaEnTexto), porque la
-     pantalla no se fía de la base ni la base de la pantalla. Es la única
-     manera de que «el sistema genera las actividades» no signifique «el
-     sistema se inventa las respuestas».
+   CÓMO LO HACE, Y QUÉ NO HACE: `vozActGenerarDelTexto` mira el texto como
+   lo miraría alguien con un lápiz —fechas, cifras, nombres propios,
+   términos en negrita, definiciones, la primera y la última frase de cada
+   capítulo, las frases que concluyen, las que razonan («porque», «sin
+   embargo»), los subtítulos y la bibliografía— y arma con eso completar,
+   tarjetas, parejas, selección y abiertas.
+
+   ⚠️ NO ENTIENDE EL TEXTO: LO RECORTA. De ahí salen las dos cosas que hay
+   que saber antes de tocarlo. La buena: todas sus respuestas están en el
+   texto LETRA POR LETRA, así que no puede inventarse ninguna — que es la
+   regla que no se negocia (la de los videos de M.E.T.A.S) y la que hacía
+   cara la otra puerta. La otra: no sabe cuál es la tesis, solo dónde
+   suele estar, así que la pregunta por la tesis es siempre ABIERTA y la
+   frase del texto va de PAUTA, no de corrección — corregir a alguien con
+   una frase que se eligió por su posición sería enseñarle mal.
+
+   ⚠️ Y AUN ASÍ SE COMPRUEBA, CON `vozActLiteral`. Por construcción la
+   respuesta sale del texto; pero entre la frase y la respuesta hay un
+   `hueco()`, un `corta()` y cuatro expresiones regulares, y cualquiera de
+   ellas puede devolver un día algo que ya no está escrito en ninguna
+   parte. Una pregunta cuya respuesta no existe en el texto no la descubre
+   nadie hasta que alguien la falla teniendo razón. Cuesta un `indexOf`.
 
    ⚠️ LAS PROCEDENCIAS NO SE MEZCLAN AL REFRESCAR. Cada actividad lleva
-   `via`: 'sub' (de un subrayado), 'txt' (sacada del texto por el aparato),
-   'ia' (generada por Claude) o nada (pegada a mano). Volver a generar por
-   una vía reemplaza SOLO las suyas: si «sacar del texto» borrara las de
-   Claude, o al revés, cada botón desharía el trabajo del otro sin avisar.
+   `via`: 'sub' (de un subrayado), 'txt' (sacada del texto) o nada (pegada
+   a mano). Volver a generar por una vía reemplaza SOLO las suyas: si
+   «sacar del texto» borrara las pegadas, el automático del guardado le
+   borraría a alguien lo que escribió a mano cada vez que corrige una coma.
    Las viejas con `auto: 1` y sin `via` son de subrayados, que era la única
    vía que había. */
-const VOZ_ACT_VIAS = { sub: '🖍 de un subrayado', txt: '📖 sacada del texto', ia: '🤖 generada por Claude' };
+const VOZ_ACT_VIAS = { sub: '🖍 de un subrayado', txt: '📖 sacada del texto' };
 function vozActVia(it) { return (it && it.via) || (it && it.auto ? 'sub' : ''); }
 
-const VOZ_ACT_FUNCION = 'voz-actividades-ia';
-/* Más que el reloj de las consultas (8 s): la función lee el texto entero
-   y escribe treinta actividades, y en el plan gratuito de Supabase tiene
-   150 s de pared. Aquí se espera un poco menos, para que el aviso sea
-   nuestro y no un error de red sin explicar. */
-const VOZ_ACT_IA_ESPERA = 140000;
 const VOZ_ACT_TXT_TOPE = 28;
 
 function vozActHash(s) {
@@ -8091,14 +8117,35 @@ function vozActSinPuntuacion(s) {
 function vozActPreparaTexto(texto) {
   return { norm: vozActNormalizaTexto(texto), sinP: vozActSinPuntuacion(texto) };
 }
-function vozActCitaEnTexto(cita, T) {
-  const c = vozActNormalizaTexto(cita);
-  if (c.length < 15) return false;
+
+/* ⚠️ ¿ESTÁ ESTO ESCRITO EN EL TEXTO? Es el único guardia del generador, y
+   es barato a propósito. La respuesta de cada actividad sale de recortar
+   una frase, así que por construcción está; pero entre la frase y la
+   respuesta pasan un `hueco()`, un `corta()` y cuatro expresiones
+   regulares, y el día que una de ellas devuelva algo que no está escrito
+   en ninguna parte, la pregunta se guarda igual y nadie lo descubre hasta
+   que alguien la falla teniendo razón. Sin mínimo de largo —un año son
+   cuatro caracteres— y con la segunda vuelta sin puntuación, para que una
+   coma comida no tire una respuesta buena. */
+function vozActLiteral(x, T) {
+  const c = vozActNormalizaTexto(x);
+  if (!c) return false;
   if (T.norm.indexOf(c) >= 0) return true;
-  const cp = vozActSinPuntuacion(cita);
-  return cp.length >= 15 && T.sinP.indexOf(cp) >= 0;
+  const cp = vozActSinPuntuacion(x);
+  return !!cp && T.sinP.indexOf(cp) >= 0;
 }
 
+/* El texto entero y plano, PARA COMPROBAR, con la bibliografía dentro:
+   un año de una referencia es respuesta buena aunque `vozActUnidades` no
+   mire los capítulos de fuentes (allí no se sacan frases). */
+function vozActTodoPlano(c) {
+  const out = [];
+  (c.capitulos || []).forEach(cap => {
+    if (cap.t) out.push(cap.t);
+    (cap.p || []).forEach(b => { if (b) out.push(vozActPlanoDeBloque(b)); });
+  });
+  return out.join(' \n ');
+}
 /* ─── El texto, frase a frase ─── */
 const VOZ_ACT_ABREV = /\b(?:sr|sra|srta|dr|dra|lic|ing|prof|p|pp|ej|cf|vol|núm|art|cap|ud|uds)\.$/i;
 function vozActFrases(t) {
@@ -8133,6 +8180,10 @@ const VOZ_ACT_RE_ANIO = /\b(?:1[5-9]\d{2}|20\d{2})\b/g;
 const VOZ_ACT_RE_CIFRA = /\b\d[\d.,]*\s?(?:%|por ciento|millones?|mil|millar(?:es)?|km|kg|metros|años|d[oó]lares|lempiras|euros|habitantes|personas|veces|p[aá]ginas|horas|d[ií]as|siglos)\b/gi;
 const VOZ_ACT_RE_DEF = /^([A-ZÁÉÍÓÚÑ][^,.;:()]{1,45}?) (es|son|significa|se define como|se entiende por|consiste en|se llama|se conoce como|designa) (.{20,})$/;
 const VOZ_ACT_RE_TESIS = /\b(en conclusi[oó]n|en definitiva|en suma|en resumen|por lo tanto|por tanto|de ah[ií] que|lo esencial|lo importante|la tesis|sostengo|sostiene que|la idea central|lo que importa|en el fondo|dicho de otro modo|en otras palabras|lo cierto es que|conviene recordar)\b/i;
+/* Los conectores que marcan un razonamiento, no una enumeración. Van
+   con el blanco delante dentro del grupo para poder cortar la frase por
+   ahí sin comerse la última letra de la cabeza. */
+const VOZ_ACT_RE_ARG = /\s(porque|pero |sin embargo|no obstante|en cambio|a diferencia de|por eso|por ello|por lo tanto|por tanto|de modo que|de ahí que|aunque|mientras que|gracias a|debido a|a pesar de|puesto que|ya que)/i;
 
 /* Los nombres propios de una frase: palabras con mayúscula que NO son la
    primera —la primera la lleva por ser la primera—, en tirada, con sus
@@ -8201,10 +8252,11 @@ function vozActGenerarDelTexto(cid, tope) {
   const U = vozActUnidades(c);
   const donde = ci => vozNombreCap(c, ci);
   const palabras = U.reduce((n, u) => n + vozPalabrasDe(u.frase), 0);
-  /* Cuántas: crece con el largo, como en la función de Claude. `tope` lo
-     pisa (la sonda lo usa para ver todo lo que el generador sabe sacar). */
+  /* Cuántas: crece con el largo. Un cuento de seiscientas palabras no da
+     para treinta preguntas sin repetirse; un ensayo de ocho mil sí. `tope`
+     lo pisa (la sonda lo usa para ver todo lo que el generador sabe sacar). */
   const objetivo = tope || Math.min(VOZ_ACT_TXT_TOPE, palabras < 800 ? 10 : palabras < 3000 ? 18 : palabras < 8000 ? 26 : 32);
-  const grupos = { tesis: [], ideas: [], datos: [], terminos: [], refs: [], estructura: [] };
+  const grupos = { tesis: [], ideas: [], argumento: [], datos: [], terminos: [], refs: [], estructura: [] };
   const usadas = new Set();
   const vecesResp = {};
   const cuenta = r => { const k = vozActNormalizaTexto(r); vecesResp[k] = (vecesResp[k] || 0) + 1; return vecesResp[k]; };
@@ -8254,6 +8306,30 @@ function vozActGenerarDelTexto(cid, tope) {
       q: '¿Cuál es la idea principal de «' + (cap.t || donde(ci)) + '»? Dila con tus palabras.',
       guia: 'Empieza así: «' + top.frase + '»' + (ult && ult !== top ? ' Y termina así: «' + ult.frase + '»' : ''),
     }, top, 'idea'));
+  });
+
+  /* ── El argumento: las frases que RAZONAN ──────────────────────────
+     Lo que separa un ensayo de una lista de datos es el «porque» y el
+     «sin embargo»: ahí está el argumento, que es justo lo que se olvida
+     primero y lo que ninguna pregunta de fecha toca. Se parte la frase
+     por su conector y se pide el final. NO hay que entender nada para
+     hacerlo —la respuesta es la frase entera, letra por letra— y aun así
+     lo que se recuerda es el razonamiento y no el dato. Tope de cinco:
+     con más, el texto entero se convertiría en esto y se comerían las
+     frases buenas de los grupos de abajo. */
+  U.forEach(u => {
+    if (grupos.argumento.length >= 5 || usadas.has(u.frase) || !buena(u)) return;
+    const m = u.frase.match(VOZ_ACT_RE_ARG);
+    if (!m) return;
+    const cabeza = u.frase.slice(0, m.index).trim();
+    const cola = u.frase.slice(m.index + m[0].length).trim();
+    if (vozPalabrasDe(cabeza) < 4 || vozPalabrasDe(cola) < 4) return;
+    if (cuenta(u.frase) > 1) return;
+    grupos.argumento.push(mk('flash', {
+      f: 'Sigue el razonamiento: «' + cabeza + ' ' + m[0].trim() + '…»',
+      r: u.frase,
+    }, u, 'relacion'));
+    usadas.add(u.frase);
   });
 
   /* ── Los datos: fechas, años, cifras y nombres, tapados en su frase ── */
@@ -8354,147 +8430,83 @@ function vozActGenerarDelTexto(cid, tope) {
 
   /* ── El reparto: se intercalan los grupos y se corta en el objetivo, así
      la tesis y las ideas siempre entran y los datos no se lo comen todo ── */
-  const orden = ['tesis', 'ideas', 'datos', 'terminos', 'refs', 'estructura'];
+  const orden = ['tesis', 'ideas', 'argumento', 'datos', 'terminos', 'refs', 'estructura'];
   const fuera = []; let hay = true;
   while (hay && fuera.length < objetivo) {
     hay = false;
     orden.forEach(g => { if (fuera.length < objetivo && grupos[g].length) { fuera.push(grupos[g].shift()); hay = true; } });
   }
-  return fuera;
+
+  /* ⚠️ EL CEDAZO: lo que se responde tiene que estar ESCRITO en el texto.
+     Ver `vozActLiteral`. Se mira la respuesta de cada tipo —el reverso de
+     una tarjeta, lo que va en el hueco, la opción correcta—; las parejas
+     y las abiertas no, que ahí lo que se arma son títulos y pautas, no una
+     respuesta literal. */
+  const T = vozActPreparaTexto(vozActTodoPlano(c));
+  return fuera.filter(it => {
+    if (it.k === 'flash') return vozActLiteral(it.r, T);
+    if (it.k === 'completar') return vozActLiteral(it.a, T);
+    if (it.k === 'opcion') return vozActLiteral((it.o || [])[it.ok], T);
+    return true;
+  });
 }
 
-function vozActGenerarTextoYGuardar(cid) {
+/* ⚠️ EL TALLER SE MONTA SOLO, Y ESTE ES EL MOTOR DE LAS TRES PUERTAS.
+   «El sistema debe tener las actividades una vez que se pegue o suba un
+   ensayo» (el autor, 16 de septiembre de 2026). Un botón que hay que ir a
+   buscar después de guardar se toca una vez en la vida —es la misma razón
+   por la que el enlace al taller está al pie de la última página del
+   texto, y no en un menú—, así que esto corre en el propio guardado.
+
+   Callado a propósito: no avisa ni repinta, porque los tres sitios que lo
+   llaman ya van a repintar. Devuelve cuántas puso, para que el aviso lo dé
+   quien llamó y en su propio idioma.
+
+   ⚠️ Y SOLO TOCA LAS DE VÍA 'txt'. Lo hace `vozActRefrescarAuto`, y aquí
+   importa más que en ningún otro sitio: esto corre en CADA guardado, así
+   que si tocara las pegadas a mano, corregir una coma le borraría a alguien
+   el cuestionario que escribió. */
+function vozActMontarDelTexto(cid) {
   const r = vozActRefrescarAuto(cid, 'txt');
-  if (!r.auto.length) { vozAviso('El texto es demasiado corto para sacarle actividades'); return; }
-  vozActGuardarFicha(cid, r.aMano.concat(r.auto));
+  if (!r.auto.length) return 0;
+  vozActGuardarFicha(cid, r.aMano.concat(r.auto), true);
+  return r.auto.length;
+}
+
+/* La puerta 📖 a mano, que es la misma con aviso: se queda porque el
+   automático no cubre los textos que ya estaban en el anaquel el día que
+   esto se escribió, ni el «sácame más» después de corregir a mano. */
+function vozActGenerarTextoYGuardar(cid) {
+  const n = vozActMontarDelTexto(cid);
+  if (!n) { vozAviso('El texto es demasiado corto para sacarle actividades'); return; }
+  vozRender();
   vozActPintarTaller();
-  vozAviso('📖 ' + r.auto.length + (r.auto.length === 1 ? ' actividad sacada del texto' : ' actividades sacadas del texto'));
+  vozAviso('📖 ' + n + (n === 1 ? ' actividad sacada del texto' : ' actividades sacadas del texto'));
 }
 
-/* ─── La puerta de Claude ─────────────────────────────────────────
-   Llama a la Edge Function voz-actividades-ia con el texto entero. Lo que
-   vuelve se SANEA (solo los campos que el taller conoce, con sus topes) y
-   se COMPRUEBA (la cita de cada actividad tiene que estar en el texto),
-   y solo entonces se guarda con via 'ia'. */
-let _vozActIaEnMarcha = null;
-let _vozActIaMsg = '';
-
-function vozActPintarIa(msg) {
-  _vozActIaMsg = msg || '';
-  const e = document.getElementById('voz-act-ia-estado');
-  if (e) e.textContent = _vozActIaMsg;
-}
-
-function vozActSanea(x) {
-  if (!x || typeof x !== 'object') return null;
-  const k = String(x.k || '');
-  if (!VOZ_ACT_TIPOS.some(t => t.id === k)) return null;
-  const s = (v, n) => String(v == null ? '' : v).replace(/\s+/g, ' ').trim().slice(0, n || 600);
-  const it = { id: 'ia-' + vozActHash(k + '|' + s(x.q || x.f) + '|' + s(x.a || x.r)), k: k, auto: 1, via: 'ia',
-               cita: s(x.cita, 300), donde: s(x.donde, 120), nivel: s(x.nivel, 12) };
-  if (k === 'flash') { it.f = s(x.f || x.q); it.r = s(x.r || x.a, 400); if (!it.f || !it.r) return null; }
-  else if (k === 'completar') { it.q = s(x.q); it.a = s(x.a, 200); if (!/___/.test(it.q) || !it.a) return null; }
-  else if (k === 'opcion') {
-    it.q = s(x.q); it.o = (Array.isArray(x.o) ? x.o : []).map(v => s(v, 200)).filter(Boolean).slice(0, 6);
-    it.ok = Number.isInteger(x.ok) ? x.ok : -1;
-    if (!it.q || it.o.length < 2 || it.ok < 0 || it.ok >= it.o.length) return null;
-  } else if (k === 'pares') {
-    it.q = s(x.q) || 'Empareja cada una con la suya';
-    it.ps = (Array.isArray(x.ps) ? x.ps : []).map(p => Array.isArray(p) ? [s(p[0], 120), s(p[1], 160)] : [s(p && p.a, 120), s(p && p.b, 160)])
-      .filter(p => p[0] && p[1]).slice(0, 8);
-    if (it.ps.length < 2) return null;
-  } else { it.q = s(x.q); it.guia = s(x.guia, 900); if (!it.q || !it.guia) return null; }
-  return it;
-}
-
-/* ⚠️ LOS MOTIVOS SE DISTINGUEN, porque se arreglan distinto y un aviso
-   que se equivoca de causa manda a mirar donde no está el problema
-   (regla 14): falta desplegar la función, falta la clave, caducó la
-   sesión, no hay señal, o Claude no contestó a tiempo. */
-function vozActMotivoIa(error, cuerpo) {
-  const st = error && error.context && error.context.status;
-  const cod = cuerpo && cuerpo.error;
-  const det = cuerpo && cuerpo.detalle;
-  if (error && error.code === 'FARO_RELOJ') return '⏳ Claude no contestó en dos minutos. Vuelve a intentarlo; si el texto es muy largo, pídele las actividades por capítulos.';
-  if (st === 404) return '📴 Falta desplegar la función «voz-actividades-ia» en Supabase (Edge Functions → Deploy a new function). Mientras tanto, 📖 Sacarlas del texto funciona igual.';
-  if (cod === 'sin_clave' || cod === 'clave_mala') return '🔑 ' + (det || 'Falta la clave de Anthropic en los Secrets de la función');
-  if (cod === 'sin_sesion' || st === 401) return '📴 La sesión caducó: vuelve a entrar en F.A.R.O y prueba otra vez';
-  if (cod === 'no_es_de_la_casa' || st === 403) return '✋ Esta cuenta no es de la casa: la función solo atiende a la familia';
-  if (cod === 'limite' || st === 429) return '⏳ Anthropic pide esperar un momento: vuelve a intentarlo en un minuto';
-  if (cod === 'texto_largo' || st === 413) return '📏 El texto es demasiado largo para pedirlo de una vez';
-  if (cod === 'texto_corto') return 'El texto es demasiado corto para sacarle actividades';
-  if (cod === 'rechazo') return '✋ Claude declinó este texto';
-  if (error && /FetchError/i.test(error.name || '')) return '📡 Sin señal: no se pudo llegar a la función. Se puede volver a intentar cuando vuelva.';
-  return '⚠️ ' + (det || (error && error.message) || 'La función devolvió un error');
-}
-
-async function vozActPedirIA(cid) {
+/* ⚠️ Y AL ABRIR UN TALLER VACÍO SE MONTA TAMBIÉN, PERO SOLO CUANDO SE SABE
+   QUE LA NUBE NO TIENE NADA MÁS QUE DAR. Es lo que hace que los textos que
+   ya estaban en el anaquel tengan taller sin volver a guardarlos uno por
+   uno; y la condición no es un detalle: generar con la nube a medio
+   contestar escribiría una ficha nueva con el reloj de AHORA, que le
+   ganaría por más nueva a las actividades que otra persona de la casa
+   pegó a mano en otro aparato — y las borraría sin dar ningún error.
+   'al-dia' es «ya bajó y no había», 'sin-sesion' y 'sin-tabla' son «no hay
+   nube que consultar». En 'sin-senal', 'subiendo' o 'error' NO se monta:
+   se queda la pantalla de las puertas, que es lo honesto. */
+function vozActMontarSiVacio(cid) {
+  if (vozActCuenta(cid)) return 0;
+  if (['al-dia', 'sin-sesion', 'sin-tabla'].indexOf(_vozActNube) < 0) return 0;
   const c = _vozCuentos.find(x => x.cid === cid);
-  if (!c) return null;
-  if (_vozActIaEnMarcha) { vozAviso('⏳ Claude ya está leyendo un texto: espera a que termine'); return null; }
-  const sb = vozSb();
-  if (!sb || !sb.functions) { const m = '📴 Sin conexión con la nube: entra en F.A.R.O para pedírselas a Claude'; vozActPintarIa(m); vozAviso(m); return null; }
-  const yo = await vozYo();
-  if (!yo) { const m = '📴 Entra en F.A.R.O para pedírselas a Claude'; vozActPintarIa(m); vozAviso(m); return null; }
-  const texto = vozTextoCuerpo(c, {});
-  if (texto.trim().length < 200) { const m = 'El texto es demasiado corto para sacarle actividades'; vozActPintarIa(m); vozAviso(m); return null; }
-
-  _vozActIaEnMarcha = cid;
-  vozActPintarIa('⏳ Claude está leyendo «' + (c.titulo || 'el texto') + '»… tarda medio minuto. Puedes seguir en otra cosa.');
-  let resultado = null;
-  try {
-    const capitulos = (c.capitulos || []).map(x => x.t).filter(Boolean);
-    const { data, error } = await vozConReloj(sb.functions.invoke(VOZ_ACT_FUNCION, {
-      body: { cid: cid, titulo: c.titulo || '', genero: c.genero || '', capitulos: capitulos, texto: texto },
-    }), VOZ_ACT_IA_ESPERA);
-    if (error) {
-      let cuerpo = null;
-      try { cuerpo = error.context && error.context.json ? await error.context.json() : null; } catch (e) {}
-      const m = vozActMotivoIa(error, cuerpo);
-      vozActPintarIa(m); vozAviso(m);
-      return null;
-    }
-    if (!data || !data.ok || !Array.isArray(data.items)) {
-      const m = vozActMotivoIa(null, data);
-      vozActPintarIa(m); vozAviso(m);
-      return null;
-    }
-    /* ⚠️ Se vuelve a comprobar aquí lo que la función ya comprobó. No es
-       desconfianza de la función: es que el texto contra el que se
-       comprueba es ESTE, el del aparato, y lo que se guarda es lo que
-       este aparato decide guardar. */
-    const T = vozActPreparaTexto(texto);
-    const buenas = [], fuera = [];
-    data.items.forEach(x => {
-      const it = vozActSanea(x);
-      if (!it) { fuera.push(x); return; }
-      if (!vozActCitaEnTexto(it.cita, T)) { fuera.push(x); return; }
-      if (it.k === 'completar' && vozActSinPuntuacion(it.cita).indexOf(vozActSinPuntuacion(it.a)) < 0) { fuera.push(x); return; }
-      buenas.push(it);
-    });
-    if (!buenas.length) {
-      const m = '⚠️ Claude devolvió ' + data.items.length + ' actividades y ninguna citaba el texto: no se guardó ninguna';
-      vozActPintarIa(m); vozAviso(m);
-      return null;
-    }
-    const r = vozActRefrescarAuto(cid, 'ia');
-    vozActGuardarFicha(cid, r.aMano.concat(buenas));
-    const desc = (Number(data.descartadas) || 0) + fuera.length;
-    const m = '🤖 ' + buenas.length + (buenas.length === 1 ? ' actividad de Claude' : ' actividades de Claude') +
-              (desc ? ' · ' + desc + (desc === 1 ? ' descartada por no citar el texto' : ' descartadas por no citar el texto') : '');
-    resultado = { guardadas: buenas.length, descartadas: desc, tesis: data.tesis || '' };
-    vozActPintarIa('');
-    vozActPintarTaller();
-    vozAviso(m);
-  } catch (e) {
-    const m = '⚠️ ' + ((e && e.message) || 'No se pudo pedir las actividades');
-    vozActPintarIa(m); vozAviso(m);
-  } finally {
-    _vozActIaEnMarcha = null;
-  }
-  return resultado;
+  /* Y solo en lo propio: montarle el taller al texto de otra persona lo
+     firmaría con mi nombre —el dueño del taller es quien lo empieza— y
+     dejaría a quien lo escribió sin poder cambiarlo. Ahí está la puerta 📖,
+     que es un toque y es a propósito. */
+  if (!c || !vozEsMio(c)) return 0;
+  const n = vozActMontarDelTexto(cid);
+  if (n) { vozRender(); vozActPintarTaller(); }
+  return n;
 }
-
 
 /* ─── La sesión ─── */
 function vozActEmpezar(cid, modo) {

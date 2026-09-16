@@ -2319,69 +2319,94 @@ el diseño.
      opciones se guardaba tal cual, o sea una pregunta que nadie puede
      acertar. Se queda sin marcar y el guardado la nombra.
 
-   ⚠️ **Y DESDE EL 16 DE SEPTIEMBRE DE 2026 LAS ACTIVIDADES LAS GENERA EL
-   SISTEMA.** Es lo que el autor pidió después de estrenar el taller:
-   «procura tú generar las actividades, que no tenga que estar haciendo las
-   actividades y pegarlas… tomando en consideración los mejores criterios de
-   abstracción y síntesis». Son DOS puertas más —la de pegar se queda, la
-   última— y no fallan igual, que es por lo que son dos:
+   ⚠️ **Y DESDE EL 16 DE SEPTIEMBRE DE 2026 EL TALLER LO MONTA EL SISTEMA,
+   DEL PROPIO TEXTO Y AL GUARDARLO.** Es lo que el autor pidió después de
+   estrenar el taller —«procura tú generar las actividades, que no tenga que
+   estar haciendo las actividades y pegarlas… tomando en consideración los
+   mejores criterios de abstracción y síntesis»— y precisó el mismo día, al
+   ver la primera versión: **«no quiero APIs ni nada de eso; el sistema debe
+   tener las actividades una vez que se pegue o suba un ensayo»**.
+
+   ⚠️ **HUBO UN RATO UNA PUERTA DE PAGO, Y ESTÁ QUITADA ENTERA.** Le pedía
+   las actividades a Claude por una Edge Function (`voz-actividades-ia`), con
+   su clave de Anthropic en los Secrets, su despliegue a mano desde el panel
+   y su coste por texto. Funcionaba, y aun así estaba mal, por un motivo que
+   se puede escribir en una frase: **una herramienta cuyo trabajo principal
+   depende de una clave que hay que comprar, de una función que hay que
+   desplegar y de que haya señal no está terminada.** Y no cumplía lo que se
+   pidió: «que ya estén listas al pegar el ensayo» no se puede prometer con
+   medio minuto de espera y una factura. Se queda lo que corre en el aparato.
+   Si alguien vuelve a proponer una puerta de red aquí, esto es la respuesta.
 
    · 📖 **SACARLAS DEL TEXTO** (`vozActGenerarDelTexto`) corre en el aparato,
      al instante y sin señal. Mira el texto como lo miraría alguien con un
      lápiz —fechas, años, cifras, nombres propios, términos en negrita,
-     definiciones («X es…»), los subtítulos, la primera frase de cada
-     capítulo, la que concluye («en conclusión», «sostiene que»…) y la
+     definiciones («X es…»), los subtítulos, la primera y la última frase de
+     cada capítulo, la que concluye («en conclusión», «sostiene que»…), **las
+     que razonan** («porque», «sin embargo», «por lo tanto») y la
      bibliografía— y arma completar, tarjetas, selección, parejas y
      abiertas. **NO entiende el texto: lo RECORTA.** Por eso todas sus
      respuestas están en el texto letra por letra, y en una selección
      también los distractores —son los OTROS años del texto, nunca
      inventados; sin cuatro años distintos, la pregunta se hace completar—.
-     Y por eso mismo no sabe cuál es la tesis: sabe dónde suele estar. Se
-     reparte por grupos intercalados (tesis, ideas, datos, términos,
-     referencias, estructura) y se corta según el largo, así la tesis entra
-     siempre y los datos no se lo comen todo: un ensayo corto da diez, uno
-     largo hasta 28. ⚠️ Una frase da hasta DOS datos, un número y un nombre:
-     con uno solo el año se comía siempre al nombre («decía Remigio Ochoa,
-     que había nacido en 1881») y un ensayo lleno de nombres salía sin uno.
-   · 🤖 **PEDÍRSELAS A CLAUDE** (`vozActPedirIA`) llama a la Edge Function
-     **`voz-actividades-ia`** con el texto entero. Ahí sí se lee, con los
-     criterios escritos en el `system` de la función —la tesis primero, una
-     idea por sección, los datos que sostienen el argumento, las relaciones,
-     los términos, el juicio; recordar antes que reconocer—, y por eso mismo
-     tiene que CITAR: **cada actividad trae el fragmento literal del texto
-     que la respalda, y la que no lo tenga en el texto no entra**. Lo
-     comprueba la función (`verifica.ts`, sin red, probado desde Node) y lo
-     vuelve a comprobar el aparato antes de guardar (`vozActCitaEnTexto`):
-     la pantalla no se fía de la base ni la base de la pantalla. Es la única
-     manera de que «el sistema genera las actividades» no signifique «el
-     sistema se inventa las respuestas», y se comprobó como se comprueban
-     estas cosas: quitando la comprobación del aparato y viendo entrar una
-     selección con la cita inventada, con la sonda suspendiendo. La clave de
-     Anthropic vive en los **Secrets** de la función (`ANTHROPIC_API_KEY`),
-     nunca en el código de la aplicación, que lo lee cualquiera; la función
-     solo atiende a sesiones de `familia_miembros`, y **comprueba la clave
-     DESPUÉS de la sesión**, para que nadie de la calle sepa si está puesta.
-     Si no está desplegada, o le falta la clave, o caducó la sesión, o no
-     hay señal, o Claude no contesta a tiempo, **el aviso nombra cuál**
-     (regla 14) y recuerda que 📖 sigue funcionando. El modelo es
-     `claude-opus-5` a esfuerzo `medium`, por el reloj de la función en el
-     plan gratuito de Supabase (150 s), no por ahorrar.
+     Y por eso mismo no sabe cuál es la tesis: sabe dónde suele estar, así
+     que esa pregunta es siempre ABIERTA y la frase del texto va de PAUTA y
+     no de corrección. Se reparte por grupos intercalados (tesis, ideas,
+     argumento, datos, términos, referencias, estructura) y se corta según
+     el largo, así la tesis entra siempre y los datos no se lo comen todo:
+     un ensayo corto da diez, uno largo hasta 28.
+     ⚠️ Una frase da hasta DOS datos, un número y un nombre: con uno solo el
+     año se comía siempre al nombre («decía Remigio Ochoa, que había nacido
+     en 1881») y un ensayo lleno de nombres salía sin uno.
+     ⚠️ **Y el grupo del ARGUMENTO es el que justifica todo lo demás:** lo
+     que separa un ensayo de una lista de datos es el «porque» y el «sin
+     embargo», y eso es lo que se olvida primero y lo que ninguna pregunta
+     de fecha toca. Se parte la frase por su conector y se pide el final: no
+     hay que entender nada para armarla —la respuesta es la frase entera— y
+     aun así lo que se recuerda es el razonamiento. Tope de cinco, o se
+     comería las frases buenas de los demás grupos.
+
+   ⚠️ **Y SE MONTA SOLO, QUE ES LA MITAD QUE DE VERDAD SE PIDIÓ.** Un botón
+   que hay que ir a buscar después de guardar se toca una vez en la vida —es
+   la razón por la que el primer enlace al taller está al pie de la última
+   página del texto—. `vozActMontarDelTexto` corre **en el propio guardado
+   de la hoja de pegar**, en el alta y en cada corrección, y el aviso lo dice
+   («📝 12 actividades listas»). La puerta 📖 a mano se queda para el «sácame
+   más» y para los textos que ya estaban en el anaquel.
+
+   ⚠️ **Y AL ABRIR UN TALLER VACÍO SE MONTA TAMBIÉN, PERO SOLO CON LA NUBE
+   YA CONTESTADA** (`vozActMontarSiVacio`, y solo en lo propio). Es lo que da
+   taller a los textos que ya estaban sin volver a guardarlos uno por uno, y
+   la condición no es un detalle: montar con la nube a medio contestar
+   escribiría una ficha con el reloj de AHORA, que le ganaría por más nueva a
+   las actividades que otra persona de la casa pegó a mano en otro aparato, y
+   se las llevaría **sin dar ningún error**. Por eso el puente de las
+   misiones tampoco monta al recoger, aunque parezca el sitio: corre en el
+   arranque, antes de que nada haya bajado, y el identificador de una lectura
+   es estable. `'al-dia'` es «ya bajó y no había»; `'sin-sesion'` y
+   `'sin-tabla'`, «no hay nube que consultar». En `'sin-senal'` no se monta.
+
+   ⚠️ **Y AUN RECORTANDO SE COMPRUEBA, CON `vozActLiteral`.** Por
+   construcción la respuesta sale del texto; pero entre la frase y la
+   respuesta hay un `hueco()`, un `corta()` y cuatro expresiones regulares, y
+   cualquiera de ellas puede devolver un día algo que ya no está escrito en
+   ninguna parte. Una pregunta cuya respuesta no existe no la descubre nadie
+   hasta que alguien la falla teniendo razón —la regla que no se negocia de
+   los videos de M.E.T.A.S—. Cuesta un `indexOf`, mira el reverso de las
+   tarjetas, lo que va en el hueco y la opción correcta, y compara contra el
+   texto **con la bibliografía dentro** (el año de una referencia es
+   respuesta buena). Se comprobó como se comprueban estas cosas: poniendo un
+   generador que inventa una frase y viendo que **con el cedazo la tarjeta se
+   cae y sin él la sonda suspende**.
 
    ⚠️ **LAS PROCEDENCIAS NO SE MEZCLAN AL REFRESCAR.** Cada actividad lleva
-   `via` —`sub`, `txt`, `ia` o nada (pegada a mano)— y volver a generar por
-   una vía reemplaza SOLO las suyas: si «sacar del texto» borrara las de
-   Claude, o al revés, cada botón desharía el trabajo del otro sin avisar.
-   Las viejas con `auto: 1` y sin `via` son de subrayados. Y en la lista
-   cada una dice de dónde salió y enseña su cita: es la etiqueta de la
-   regla 1 aplicada a cada pregunta.
-
-   La función son dos archivos —`index.ts` (la red) y `verifica.ts` (lo que
-   se prueba)— cosidos por `node _dev/arma-voz-actividades-ia.js` en
-   `PEGAR-EN-EL-PANEL.ts`, que es lo que se pega en Supabase → Edge
-   Functions → Deploy a new function, igual que `criba-cosecha` y por lo
-   mismo: desplegar dos archivos exige la CLI, o sea un ordenador. **Y lo
-   que se pega va en el chat**, como el SQL: es el mismo autor con la misma
-   tableta.
+   `via` —`sub`, `txt` o nada (pegada a mano)— y volver a generar por una vía
+   reemplaza SOLO las suyas. Aquí importa más que antes: el automático corre
+   en **cada** guardado, así que si tocara las pegadas a mano, corregir una
+   coma le borraría a alguien el cuestionario que escribió. Las viejas con
+   `auto: 1` y sin `via` son de subrayados. Y en la lista cada una dice de
+   dónde salió y enseña su cita: es la etiqueta de la regla 1 aplicada a
+   cada pregunta.
 
 **Antes de publicar un cambio de La Voz Prestada:**
 
@@ -2492,22 +2517,14 @@ createdb acttest
 psql -v ON_ERROR_STOP=1 -d acttest -f _dev/prueba-voz-actividades-sql.sql
 ```
 
-Y la parte pura de la función que le pide a Claude las actividades, desde
-Node y sin Deno, más el cosido para el panel:
-
-```
-node --experimental-strip-types _dev/prueba-voz-actividades-ia.mjs
-node _dev/arma-voz-actividades-ia.js
-```
-
-La prueba le da a `verifica.ts` trece actividades como las devuelve una
-máquina —con una cita inventada, una respuesta cambiada con cita buena, un
-`ok` fuera de rango, un «todas las anteriores», una repetida— y exige que
-entren cinco y se descarten ocho, cada una con su motivo. Y comprueba que
-`PEGAR-EN-EL-PANEL.ts` lleva EXACTAMENTE el `verifica.ts` probado: cosido
-viejo, sonda que suspende. La sección **36-bis** de la sonda de La Voz
-Prestada hace lo mismo desde el aparato, con una función de borde de
-mentira que apunta con qué sesión y qué texto la llamaron.
+La sección **36-bis** de esa sonda es el generador: le pega un ensayo con
+fechas, cifras, nombres, un término en negrita, una definición, frases que
+concluyen y su bibliografía, y exige que **ninguna** de las respuestas que
+salen —el reverso de las tarjetas incluido— esté fuera del texto. Y prueba
+lo automático por el camino de verdad: abre la hoja, pega y **pulsa el
+botón de guardar**, porque llamar a `vozGuardarPegado()` por dentro se
+salta justo lo que puede estar mal, que es que el automático no esté
+enganchado al guardado.
 
 ⚠️ Esa prueba mira la puerta **dos veces y en este orden**: primero que
 el `revoke` del archivo le quitó a `anon` el permiso de tabla —y que a

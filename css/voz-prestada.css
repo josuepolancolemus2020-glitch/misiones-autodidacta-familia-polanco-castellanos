@@ -1061,8 +1061,6 @@
    la lista vea de dónde viene sin abrir el texto: es la etiqueta de la
    regla 1 aplicada a cada pregunta. */
 .voz-act-fila-cita { font-size: 11.5px; line-height: 1.4; color: var(--muted); font-style: italic; margin-top: 2px; }
-.voz-act-ia-estado { margin: 6px 0 0; }
-.voz-act-ia-estado:empty { display: none; }
 .voz-act-fila-q { font-size: 13.5px; line-height: 1.4; color: var(--text); }
 .voz-act-fila-sol { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .voz-act-fila-x {

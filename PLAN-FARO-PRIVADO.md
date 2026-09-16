@@ -32,7 +32,7 @@ pierde por el camino.
 | `rodaje` (El Rodaje: el cuaderno de dirección de los videos) | ⏳ pendiente de correr el SQL, y **son dos archivos en orden** |
 | `voz_prestada` (La Voz Prestada: el anaquel de textos) | ✅ corrido, y **re-corrido el 12/9/2026** por las columnas `genero` y `estantes` |
 | `voz_actividades` (el taller de comprensión de esos textos) | ✅ corrido el **16/9/2026**, con las trece filas de la comprobación cuadradas |
-| `voz-actividades-ia` (Edge Function: Claude escribe las actividades) | ⏳ **falta desplegarla** desde el panel, y ponerle el secreto `ANTHROPIC_API_KEY` |
+| `voz-actividades-ia` (Edge Function) | 🗑 **retirada el 16/9/2026**: las actividades las monta el aparato, sin clave ni despliegue |
 | `criba.sql` (La Criba: la tabla y las cuatro fuentes) | ✅ corrido |
 | La cadena de afinado: `criba_temas` → `criba_afina` 1-4 → `criba_prensa` | ✅ corrida entera, en ese orden |
 | `criba_reloj.sql` (el reloj diario de La Criba) | ✅ corrido y funcionando: cosecha sola a las **05:10 UTC** |
@@ -153,48 +153,18 @@ Zone → Make private.
      `_dev/prueba-rodaje-sql.sql`: las ocho comprobaciones pasan, incluida
      la de que `anon` no ve ni una fila con los permisos de tabla repartidos
      como los reparte Supabase.
-   · ⏳ **FALTA DESPLEGAR** — la Edge Function **`voz-actividades-ia`**, que
-     es la que le pide a Claude las actividades de comprensión de un texto de
-     La Voz Prestada (pedido del autor, 16 de septiembre de 2026). NO es SQL:
-     va en **Supabase → Edge Functions → Deploy a new function**, con el
-     nombre exacto `voz-actividades-ia`, pegando entero
-     `supabase/functions/voz-actividades-ia/PEGAR-EN-EL-PANEL.ts`, y con
-     «Enforce JWT Verification» **apagado** (la función comprueba ella misma
-     que el Bearer sea de alguien de `familia_miembros`; con la verificación
-     del panel encendida, la clave publicable pasaría igual). Y en **Edge
-     Functions → Secrets**, `ANTHROPIC_API_KEY` con una clave de la API de
-     Anthropic (console.anthropic.com → API keys).
+   · 🗑 **RETIRADA** — hubo un rato una Edge Function `voz-actividades-ia`
+     que le pedía a Claude las actividades de comprensión, con su clave de
+     Anthropic en los Secrets y su despliegue a mano desde el panel. **Ya no
+     hay nada que desplegar ni ninguna clave que comprar**: el autor lo
+     precisó el 16 de septiembre de 2026 —«no quiero APIs ni nada de eso; el
+     sistema debe tener las actividades una vez que se pegue o suba un
+     ensayo»— y tenía razón. Las actividades las monta ahora el aparato, del
+     propio texto y en el momento de guardarlo. Si quedó desplegada en el
+     panel de alguna prueba, se puede borrar; y el secreto `ANTHROPIC_API_KEY`,
+     si llegó a ponerse, ya no lo usa nadie. El porqué, largo, está en la
+     regla 35 de `CLAUDE.md`.
 
-     **Mientras no se despliegue, el taller genera igual**: la puerta
-     📖 «Sacarlas del texto» corre en el aparato y no necesita nada; la
-     puerta 🤖 dice a la vista qué falta («falta desplegar la función…» o
-     «falta el secreto ANTHROPIC_API_KEY…»), que es lo contrario de fingir.
-
-     Cómo se comprueba que quedó: abrir un texto en La Voz Prestada → 📝
-     Taller → 🤖 Pedírselas a Claude. Tarda medio minuto; al terminar dice
-     «🤖 N actividades de Claude» y, si descartó alguna por no citar el
-     texto, cuántas.
-
-     ⚠️ **Y CUESTA DINERO CADA VEZ, APARTE DE LA SUSCRIPCIÓN DE CLAUDE.AI.**
-     La API de Anthropic es otro producto y se paga por uso, con crédito
-     comprado por adelantado en console.anthropic.com → Billing. Eso tiene
-     una ventaja que conviene saber: el crédito prepagado **es el techo**,
-     así que no puede llegar un cobro que nadie pidió. Cuánto cuesta de
-     verdad **se mide, no se adivina** —la regla de las tablas y la de la
-     duración de El Rodaje—: después del primer texto, console.anthropic.com
-     → **Usage** dice el gasto real, y con ese número se decide si vale la
-     pena. Y el mismo día conviene ponerle un **límite de gasto** (Billing →
-     Limits), que es lo único que hace imposible una sorpresa. Quemar
-     crédito solo puede hacerlo alguien de `familia_miembros` con sesión
-     abierta, porque la función mira eso antes que nada. Y la puerta 📖
-     «Sacarlas del texto» no cuesta nunca nada.
-
-     Probado antes de mandarlo: la parte que interpreta lo que devuelve la
-     máquina (`verifica.ts`) contra Node con trece actividades trampa, y la
-     puerta del aparato contra una función de mentira en la sonda. Lo que
-     NO se pudo probar desde la sesión es la llamada real a Anthropic, que
-     el proxy no deja salir: si al desplegar el panel se queja de un
-     `import`, es ahí donde hay que mirar primero.
    · ✅ **CORRIDO** — `supabase/sql/voz_actividades.sql` y después
      `supabase/sql/voz_actividades_comprueba.sql`, el **16 de septiembre de
      2026**, el mismo día de estrenar el taller de comprensión de La Voz
