@@ -301,11 +301,35 @@ function vozBoton(clase, texto, alTocar, rotulo) {
    en un `alert`. Y con la sala abierta el aviso de la aplicación tampoco
    serviría: vive con z-index 999 y la sala está por encima, así que se
    pinta uno DENTRO de la sala, que además se tiñe con el papel puesto. */
-function vozAviso(msg) {
+/* ⚠️ EL AVISO SE PINTA EN LA CAPA DE MÁS ARRIBA QUE ESTÉ ABIERTA, y hay
+   TRES, no dos. La aplicación tiene su `toast()`, pero vive por debajo de la
+   sala de lectura, así que con la sala abierta no se vería: por eso existe
+   este aviso propio, colgado DENTRO de `#voz-lector`. Lo que se pasó por alto
+   al añadir el taller es que él está por ENCIMA de la sala (3300 contra 3200),
+   así que un aviso colgado de la sala le queda debajo y tampoco se ve — y el
+   taller se abre casi siempre desde el pie de la última página, o sea con la
+   sala puesta. O sea que «🖍 8 actividades sacadas de tus subrayados», «no hay
+   subrayados de los que sacar actividades» y los avisos de error no se veían
+   nunca por el camino normal.
+
+   El nodo es UNO solo y se muda de capa (`appendChild` lo reparenta): con uno
+   por capa, el que se quedara detrás seguiría enseñando el aviso de antes. Y
+   no hace falta tocar el CSS porque `.voz-toast` se coloca contra su padre y
+   el taller declara los mismos tokens, así que se tiñe con el papel puesto. */
+function vozAvisoCapa() {
+  const taller = document.getElementById('voz-act-overlay');
+  if (taller && !taller.hidden) return taller;
   const sala = document.getElementById('voz-lector');
-  if (sala && !sala.hidden) {
+  if (sala && !sala.hidden) return sala;
+  return null;
+}
+
+function vozAviso(msg) {
+  const capa = vozAvisoCapa();
+  if (capa) {
     let t = document.getElementById('voz-toast');
-    if (!t) { t = vozNodo('div', 'voz-toast'); t.id = 'voz-toast'; sala.appendChild(t); }
+    if (!t) { t = vozNodo('div', 'voz-toast'); t.id = 'voz-toast'; }
+    if (t.parentNode !== capa) capa.appendChild(t);
     t.textContent = msg;
     t.classList.add('voz-toast-on');
     clearTimeout(t._tid);
@@ -4553,7 +4577,18 @@ function vozEngancharSala() {
       if (cit) { vozCitAbrirBtn(cit); return; }
       const mk = bajo && bajo.closest ? bajo.closest('mark.voz-hl') : null;
       if (mk) { vozSubAbrirMarca(mk.dataset.subId, mk.getBoundingClientRect()); return; }
-      const bt = bajo && bajo.closest ? bajo.closest('.voz-tabla-mandos button, .voz-fuente-ir') : null;
+      /* ⚠️ CUALQUIER BOTÓN, no una lista de los que había el día que se
+         escribió esto. Con la lista a mano, el enlace «Taller de
+         comprensión» del pie de la última página —que llegó después— se
+         quedaba fuera: su tercio izquierdo cae bajo la zona de pasar
+         página, así que tocarlo ahí no abría el taller, RETROCEDÍA una
+         página. Y el centro del botón sí funcionaba, que es lo que hace
+         que no se vea: unas veces va y otras no, según dónde caiga el
+         dedo. La condición es la misma que la del toque al centro
+         (`closest('a, mark, button')`, unas líneas más abajo): las dos
+         miran lo mismo porque son el mismo gesto sobre el mismo texto, y
+         cuando no coinciden lo que sobra es siempre el borde. */
+      const bt = bajo && bajo.closest ? bajo.closest('button, a[href]') : null;
       if (bt) { bt.click(); return; }
       fn();
     });
@@ -6884,6 +6919,16 @@ let _vozAct = null;        // {cid: ficha} del aparato, lápidas incluidas
 let _vozActNube = 'local'; // local | subiendo | al-dia | sin-tabla | sin-sesion | sin-senal | error
 let _vozActTimer = null;
 let _vozActSincronizando = false;
+/* ⚠️ LO QUE SE GUARDÓ MIENTRAS SUBÍA LO ANTERIOR NO SE TIRA: SE APUNTA.
+   La subida empieza haciendo su lista de lo que falta, así que lo que se
+   guarde DESPUÉS de ese momento no entra en esa vuelta; y la vuelta nueva
+   que pide el guardado se encontraba la subida en marcha y se iba sin hacer
+   nada. Lo caro no era perderlo —se recuperaba al volver a abrir el
+   taller—: era que la vuelta en marcha terminaba poniendo «☁️ están en
+   todos los aparatos de la casa» con lo último todavía aquí. Decir que
+   viajó lo que no viajó es peor que decir que falló, porque el que lo lee
+   deja de vigilarlo (regla 14). */
+let _vozActOtraVuelta = null;
 
 function vozActId() {
   return 'a' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -6911,6 +6956,28 @@ function vozActDe(cid) {
 
 function vozActCuenta(cid) {
   return vozActDe(cid).items.length;
+}
+
+/* ⚠️ EL DUEÑO DEL TALLER NO ES EL DUEÑO DEL TEXTO, Y SON DOS FILAS EN DOS
+   TABLAS CON DOS FIRMAS DISTINTAS. Aquí se preguntaba `vozEsMio(c)`, o sea
+   quién pegó el CUENTO, y lo que decide si la base acepta escribir es
+   `voz_actividades.puesto_por`, o sea quién pegó las ACTIVIDADES. En esta
+   casa eso no es un caso raro, es el caso normal: alguien pega el ensayo y
+   otro le pone las preguntas —que es justo lo que el taller existe para
+   permitir, «hazle las preguntas a tu hermana»—.
+
+   Y fallaba de las dos maneras, las dos malas: con el texto de otra persona
+   y las actividades mías, la pantalla apagaba MIS botones y me decía que las
+   había puesto otro; con el texto mío y las actividades de otra, enseñaba los
+   botones vivos y la base los rechazaba después con un 42501. Enseñar un
+   botón vivo que la base va a rechazar es prometer algo que no se puede
+   hacer, y apagarlo sin motivo parece un fallo de la pantalla (regla 14).
+
+   Sin ficha todavía, el taller es de quien lo empiece: no hay fila que
+   firmar y `vozActDe` devuelve una vacía y sin firma. */
+function vozActEsMio(cid) {
+  const f = vozActDe(cid);
+  return !f.puesto_por || !_vozYo || f.puesto_por === _vozYo;
 }
 
 /* ─── El lector de lo pegado ──────────────────────────────────────
@@ -6958,7 +7025,16 @@ function vozActEsCabecera(l) {
   const esAlmohadilla = /^#{1,6}\s/.test(s);
   const esNegrita = /^\*\*[^*]+\*\*[.:]?$/.test(s);
   const esMayus = pelada === pelada.toUpperCase() && /[A-ZÁÉÍÓÚÑ]/.test(pelada);
-  const acabaEnDosPuntos = /:$/.test(pelada) && pelada.split(/\s+/).length <= 8;
+  /* ⚠️ UNA LÍNEA NUMERADA ES UNA PREGUNTA, NUNCA UNA CABECERA PELADA.
+     «1. Según el texto, elige la opción correcta:» son ocho palabras, acaba
+     en dos puntos y nombra un tipo («opción»), así que entraba por aquí
+     como cabecera de sección: la pregunta se comía a sí misma y desaparecía
+     de la tanda entera sin dar ningún aviso. Y no rompe las cabeceras de
+     verdad, que una máquina numera pero escribe con almohadilla («## 3.
+     Preguntas de comprensión»), en negrita o en mayúsculas: esas tres se
+     miran aparte y siguen mandando. */
+  const numerada = /^\s*\d{1,3}\s*[.)\]-]\s/.test(s.replace(/^#{1,6}\s*/, '').replace(/^\*\*\s*/, ''));
+  const acabaEnDosPuntos = !numerada && /:$/.test(pelada) && pelada.split(/\s+/).length <= 8;
   if (!esAlmohadilla && !esNegrita && !esMayus && !acabaEnDosPuntos) return '';
   return vozActModoDeCabecera(pelada);
 }
@@ -6973,9 +7049,22 @@ function vozActSinVineta(l) {
    ser una sola y de las ocho primeras: con más, cualquier palabra que
    empiece por letra y guion pasaría por opción. */
 function vozActOpcion(l) {
-  const m = l.trim().match(/^\(?([A-Ha-h])\)?\s*[.)\-–—]\s*(\S.*)$/);
+  let s = l.trim();
+  /* ⚠️ Y LA NEGRITA ENVUELVE LA LÍNEA ENTERA, NO SOLO EL TEXTO. Poner
+     «**B) el pozo se secó**» es como una máquina marca la buena cuando no
+     quiere usar un emoji, y con el `**` delante esta expresión no casaba:
+     la opción no se reconocía, se caía de la lista en el paso 8 y —lo
+     caro— las letras de después se corrían, así que la correcta pasaba a
+     señalar a otra. Se le quita el envoltorio y se le vuelve a poner
+     alrededor del TEXTO, para que `vozActMarcaCorrecta` lo siga viendo
+     como lo que es: la marca de que esa es la buena. */
+  const env = s.match(/^\*\*(.+)\*\*$/);
+  const negrita = !!env;
+  if (env) s = env[1].trim();
+  const m = s.match(/^\(?([A-Ha-h])\)?\s*[.)\-–—]\s*(\S.*)$/);
   if (!m) return null;
-  return { letra: m[1].toUpperCase(), t: m[2].trim() };
+  const t = m[2].trim();
+  return { letra: m[1].toUpperCase(), t: negrita ? '**' + t + '**' : t };
 }
 
 /* La marca de «esta es la buena», en cualquiera de las formas en que
@@ -7013,7 +7102,17 @@ function vozActPelaAdornos(l) {
 /* «Respuesta: B», «Correcta: 3», «R: b)». Devuelve el índice (0-3) o
    el texto, que es lo que hace falta para las de completar. */
 function vozActLineaRespuesta(l) {
-  const m = vozActPelaAdornos(l).match(/^(?:respuestas?|correctas?|clave|soluci[oó]n|r)\s*[:.\-–—]\s*(\S.*)$/i);
+  /* ⚠️ Y EL RÓTULO PUEDE LLEVAR SU ADJETIVO DETRÁS. Nadie escribe
+     «Respuesta: B» a secas tantas veces como «Respuesta correcta: B», y
+     con el separador pegado al rótulo esa línea no casaba con nada: se
+     tiraba sin aviso y el guardado se paraba pidiendo cuál era la correcta
+     con la respuesta escrita dos renglones más arriba. Es el mismo fallo
+     que los adornos de `vozActPelaAdornos`, un escalón más adentro. La
+     palabra de en medio va de una lista corta y cerrada: dejar pasar
+     cualquiera convertiría «Respuesta que dio el autor: …» —prosa— en una
+     marca de corrección. */
+  const m = vozActPelaAdornos(l).match(
+    /^(?:respuestas?|correctas?|clave|soluci[oó]n|r)\b(?:\s+(?:de\s+)?(?:correctas?|buenas?|final(?:es)?|v[aá]lidas?|respuestas?))?\s*[:.\-–—]\s*(\S.*)$/i);
   return m ? m[1].trim().replace(/\*\*/g, '').trim() : null;
 }
 
@@ -7064,7 +7163,18 @@ function vozActLeer(texto) {
   const avisos = [];
   let modo = '';
   let actual = null;
-  let listaFinal = null;
+  /* ⚠️ CADA LISTA FINAL DE RESPUESTAS CUBRE SU TRAMO, NO TODA LA TANDA.
+     Era un solo mapa por NÚMERO, fundido con `Object.assign` cada vez que
+     aparecía una lista. Con dos secciones —que es lo normal: unas de
+     comprensión y otras de selección— las dos vuelven a numerar desde 1,
+     así que la segunda lista pisaba a la primera y la primera sección
+     quedaba marcada con las respuestas de la segunda: un examen con la
+     correcta cambiada, guardado sin un solo aviso y sin parar el guardado.
+     Es el peor resultado que puede salir de aquí, y el que no descubre
+     nadie hasta que alguien acierta y la pantalla le dice que falló.
+     Ahora cada lista se apunta con el tramo de preguntas al que sigue. */
+  const listas = [];
+  let desdeLista = 0;
 
   const cerrar = () => {
     if (!actual) return;
@@ -7078,7 +7188,22 @@ function vozActLeer(texto) {
         items.push({ id: vozActId(), k: 'abierta', q: it.q, guia: it.guia || '' });
         return;
       }
-      items.push({ id: vozActId(), k: 'opcion', q: it.q, o: it.o.slice(0, 6), ok: it.ok, n: it.n });
+      /* ⚠️ Y LA LETRA SEÑALADA TIENE QUE EXISTIR. «Respuesta: D» con tres
+         opciones se guardaba tal cual, con `ok = 3` sobre una lista de
+         tres: una pregunta que NADIE puede acertar, porque la buena no
+         está entre las que se enseñan. Pasa de verdad —una máquina escribe
+         cuatro opciones, se le cae una al copiar, y la clave sigue
+         diciendo D—, y no da ningún error: se descubre en la pantalla de
+         quien la contesta. Se deja SIN marcar, que es lo que hace que el
+         guardado se pare y la nombre, en vez de adivinar cuál quiso decir. */
+      const ops = it.o.slice(0, 6);
+      let ok = it.ok;
+      if (ok >= ops.length) {
+        avisos.push({ n: it.okN || 0, t: 'La respuesta señalada («' + String(it.okTxt || '').slice(0, 20) +
+          '») no existe: esta pregunta solo tiene ' + ops.length + ' opciones' });
+        ok = -1;
+      }
+      items.push({ id: vozActId(), k: 'opcion', q: it.q, o: ops, ok: ok, n: it.n });
       return;
     }
     if (it.k === 'completar') {
@@ -7113,10 +7238,18 @@ function vozActLeer(texto) {
     const resp = vozActLineaRespuesta(l);
     if (resp) {
       const lista = vozActListaRespuestas(resp);
-      if (lista) { listaFinal = Object.assign(listaFinal || {}, lista); return; }
+      if (lista) {
+        /* Se cierra antes de apuntar el tramo: la lista va SIEMPRE al pie
+           de su sección, así que la última pregunta de esa sección tiene
+           que estar ya en `items` o el tramo la dejaría fuera. */
+        cerrar();
+        listas.push({ pares: lista, desde: desdeLista, hasta: items.length });
+        desdeLista = items.length;
+        return;
+      }
       if (actual && actual.k === 'opcion') {
         const k = vozActIndiceLetra(resp);
-        if (k >= 0) actual.ok = k;
+        if (k >= 0) { actual.ok = k; actual.okN = renglon; actual.okTxt = resp; }
         else {
           /* «Respuesta: porque se secó el pozo» — no es una letra: se
              busca la opción que diga eso. */
@@ -7227,15 +7360,31 @@ function vozActLeer(texto) {
   /* La lista final de respuestas se aplica AL TERMINAR, cuando ya
      están todas las preguntas numeradas: es lo que permite escribirla
      al pie, que es donde la escribe una máquina. */
-  if (listaFinal) {
-    items.forEach(it => {
+  listas.forEach(L => {
+    const tramo = items.slice(L.desde, L.hasta);
+    /* ⚠️ Y DENTRO DE UN TRAMO, UN NÚMERO REPETIDO NO SE RESUELVE: SE DEJA
+       SIN MARCAR. Pasa cuando una máquina pone UNA sola lista al final de
+       una tanda con varias secciones renumeradas desde 1; ahí el «1-C» no
+       dice a cuál de las dos preguntas 1 se refiere, y elegir una acierta
+       la mitad de las veces y falla en silencio. Sin marcar, la pregunta
+       sale en ámbar, el guardado se para y lo dice: es la regla que no se
+       negocia, la misma de los quiz de Videos M.E.T.A.S. */
+    const veces = {};
+    tramo.forEach(it => { if (it.k === 'opcion' && it.n) veces[it.n] = (veces[it.n] || 0) + 1; });
+    tramo.forEach(it => {
       if (it.k !== 'opcion' || it.ok >= 0 || !it.n) return;
-      const v = listaFinal[it.n];
+      const v = L.pares[it.n];
       if (v == null) return;
+      if (veces[it.n] > 1) {
+        avisos.push({ n: 0, t: 'Hay ' + veces[it.n] + ' preguntas con el número ' + it.n +
+          ' y una sola lista de respuestas: no se marca ninguna, porque «' + it.n + '-' + v +
+          '» no dice a cuál de ellas se refiere' });
+        return;
+      }
       const k = vozActIndiceLetra(v);
       if (k >= 0 && k < it.o.length) it.ok = k;
     });
-  }
+  });
 
   /* Las que se quedaron sin correcta, nombradas una por una: un «hay
      preguntas sin respuesta» a secas obliga a repasar cuarenta desde
@@ -7309,9 +7458,22 @@ function vozActFrase(plano, i, f) {
    sin la viñeta de una lista. Tiene que dar EXACTAMENTE lo mismo que
    vozCuerpoDe(el).textContent, o los índices de la marca apuntarían a
    otro sitio. */
+/* ⚠️ EL TEXTO DE UN BLOQUE SE PIDE POR LA MISMA PUERTA QUE LO PIDE EL
+   RESTO DE LA HERRAMIENTA (`vozTextoDeBloque`), no por una copia. Aquí
+   había un `b.t` a pelo, y una TABLA no tiene `t`: tiene celdas. O sea que
+   un subrayado hecho dentro de una tabla —que es justo donde están las
+   fechas y las cifras que el taller existe para recordar— se guardaba, no
+   generaba nada, y la pantalla decía «no hay subrayados de los que sacar
+   actividades». Es el mismo motivo por el que `vozPalabras` ya la usa: una
+   copia se queda vieja el día que el texto aprenda una clase nueva de
+   bloque, y el único aviso será que algo dejó de salir.
+
+   Los asteriscos se quitan DESPUÉS, y eso sí es de aquí: los caracteres de
+   una marca se cuentan sobre lo que se LEE, y en la pantalla la negrita es
+   un `<strong>`, no dos asteriscos. */
 function vozActPlanoDeBloque(b) {
   if (!b) return '';
-  return String(b.t || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
+  return String(vozTextoDeBloque(b) || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
 }
 
 function vozActGenerar(cid) {
@@ -7393,7 +7555,28 @@ function vozActGuardarFicha(cid, items, callado) {
    Y si nadie ha corrido el SQL, el taller funciona ENTERO con la copia
    del aparato y lo dice a la vista, que es lo contrario de fingir que
    viaja. */
-const VOZ_ACT_COLUMNAS = 'cid,items,borrado,puesto_por,creado_at,actualizado';
+/* ⚠️ EN LA BASE LA LÁPIDA SE LLAMA `borrada`, EN FEMENINO, Y AQUÍ DENTRO
+   `borrado`. No es un descuido de nadie: la tabla es `voz_actividades` y su
+   archivo SQL escribió la columna concordando con ella, mientras que
+   `voz_prestada` —masculino— la tiene en `borrado`, y el taller se escribió
+   copiando las funciones de los textos. Las dos mitades estaban bien; la
+   costura entre ellas era una letra.
+
+   Lo que pasaba, y por qué costó verlo: PostgREST rebota la consulta ENTERA
+   por una columna que no existe (42703), así que el taller no subía NUNCA. Y
+   ese código no es 42P01, así que caía en la rama de «sin señal»: la barra
+   decía «📡 Sin señal» con la señal perfecta y el SQL recién corrido, o sea
+   que mandaba a mirar el wifi. Es la regla 13 otra vez —la prueba del SQL
+   escribía `borrada` a mano y aprobaba; la base de mentira de la sonda
+   aceptaba cualquier columna y también— y por eso la sonda ahora saca la
+   lista de columnas DEL PROPIO ARCHIVO SQL.
+
+   El nombre de la costura vive en esta constante y se usa en los TRES
+   sitios que lo tocan —la lista que se pide, la fila que se lee y la que se
+   escribe—: con el nombre escrito a mano tres veces, arreglar dos y olvidar
+   el tercero deja la mitad rota, que es exactamente esta avería. */
+const VOZ_ACT_COL_LAPIDA = 'borrada';
+const VOZ_ACT_COLUMNAS = 'cid,items,' + VOZ_ACT_COL_LAPIDA + ',puesto_por,creado_at,actualizado';
 
 function vozActPedirNube(cid) {
   clearTimeout(_vozActTimer);
@@ -7403,7 +7586,7 @@ function vozActPedirNube(cid) {
 }
 
 async function vozActSincronizar(cid) {
-  if (_vozActSincronizando) return;
+  if (_vozActSincronizando) { _vozActOtraVuelta = cid; return; }
   const sb = vozSb();
   if (!sb) { _vozActNube = 'sin-sesion'; vozActPintarEstado(); return; }
   const yo = await vozYo();
@@ -7413,7 +7596,14 @@ async function vozActSincronizar(cid) {
   try {
     const { data, error } = await vozConReloj(sb.from(VOZ_ACT_TABLA).select(VOZ_ACT_COLUMNAS));
     if (error) {
+      /* ⚠️ TRES CAUSAS DISTINTAS Y TRES ARREGLOS DISTINTOS, y decir una por
+         otra manda a mirar donde no está el problema (regla 14). 42P01 es
+         «la tabla no está»: hay que correr el SQL. 42703 es «la tabla está
+         pero le falta una columna»: hay que VOLVER a correrlo, y decir «sin
+         señal» ahí manda a mirar el wifi con la señal perfecta, que es lo
+         que pasaba con la lápida. Lo demás sí es la señal. */
       if (error.code === '42P01' || /relation .* does not exist/i.test(error.message || '')) _vozActNube = 'sin-tabla';
+      else if (vozFaltaColumna(error)) _vozActNube = 'base-vieja';
       else _vozActNube = 'sin-senal';
       vozActPintarEstado();
       return;
@@ -7428,7 +7618,7 @@ async function vozActSincronizar(cid) {
       if (!mio || (fila.actualizado || 0) > (mio.actualizado || 0)) {
         todo[fila.cid] = {
           cid: fila.cid, items: Array.isArray(fila.items) ? fila.items : [],
-          borrado: !!fila.borrado, actualizado: fila.actualizado || 0,
+          borrado: !!fila[VOZ_ACT_COL_LAPIDA], actualizado: fila.actualizado || 0,
           creado_at: fila.creado_at, puesto_por: fila.puesto_por,
         };
         cambio = true;
@@ -7440,11 +7630,12 @@ async function vozActSincronizar(cid) {
       (!enNube.has(f.cid) || enNube.get(f.cid) < (f.actualizado || 0)));
     for (const f of subir) {
       const { error: e2 } = await vozConReloj(sb.from(VOZ_ACT_TABLA).upsert({
-        cid: f.cid, items: f.items || [], borrado: !!f.borrado,
+        cid: f.cid, items: f.items || [], [VOZ_ACT_COL_LAPIDA]: !!f.borrado,
         actualizado: f.actualizado || Date.now(), puesto_por: yo,
       }, { onConflict: 'cid' }));
       if (e2) {
         _vozActNube = (e2.code === 'FARO_RELOJ') ? 'sin-senal'
+          : vozFaltaColumna(e2) ? 'base-vieja'
           : (e2.code === '42501' || e2.code === '23502') ? 'ajeno' : 'error';
         vozActGuardaTodo(); vozActPintarEstado();
         return;
@@ -7459,7 +7650,18 @@ async function vozActSincronizar(cid) {
     _vozActNube = 'error';
   } finally {
     _vozActSincronizando = false;
-    vozActPintarEstado();
+    /* Y si mientras subía se guardó algo, otra vuelta. Va por
+       vozActPedirNube, o sea con su espera de 1200 ms y su rótulo de
+       «guardando», que es el camino de siempre: un segundo camino a la
+       nube se queda viejo el día que se toque el primero. No se enrosca,
+       porque cuando el reloj dispare esta subida ya habrá terminado. */
+    if (_vozActOtraVuelta !== null) {
+      const otro = _vozActOtraVuelta;
+      _vozActOtraVuelta = null;
+      vozActPedirNube(otro);
+    } else {
+      vozActPintarEstado();
+    }
   }
 }
 
@@ -7467,6 +7669,7 @@ function vozActRotuloNube() {
   if (_vozActNube === 'al-dia')    return '☁️ Las actividades están en todos los aparatos de la casa.';
   if (_vozActNube === 'subiendo' || _vozActNube === 'pendiente') return '⏳ Guardando en la nube…';
   if (_vozActNube === 'sin-tabla') return '📴 Solo en este aparato: falta correr voz_actividades.sql';
+  if (_vozActNube === 'base-vieja') return '📴 Solo en este aparato: la base va vieja, vuelve a correr voz_actividades.sql';
   if (_vozActNube === 'sin-sesion') return '📴 Solo en este aparato: entra en F.A.R.O para que viajen';
   if (_vozActNube === 'sin-senal') return '📡 Sin señal: se guardan aquí y suben cuando vuelva';
   if (_vozActNube === 'ajeno')     return '✋ Las puso otra persona de la casa: puedes hacerlas, no cambiarlas';
@@ -7639,7 +7842,7 @@ function vozActPintarTaller() {
 
   const items = vozActDe(cid).items || [];
   const res = vozActResumen(cid);
-  const mio = vozEsMio(c);
+  const mio = vozActEsMio(cid);
 
   if (!items.length) {
     const v = vozNodo('div', 'voz-act-vacio');

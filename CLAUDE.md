@@ -2264,6 +2264,61 @@ el diseño.
    taller primero**: la trampa deja de poder existir en vez de quedar
    escrita en un comentario. Lo cazó la sonda, no la lectura del código.
 
+   ⚠️ **Y OCHO AVERÍAS MÁS, TODAS DEL MISMO DÍA Y NINGUNA VISIBLE**, cazadas
+   revisando el taller ya publicado el 16 de septiembre de 2026. Van escritas
+   porque cinco son de una familia que esta casa ya conoce y volverá a
+   encontrarse:
+
+   · ⚠️ **LA LÁPIDA SE LLAMA `borrada` EN LA BASE Y `borrado` AQUÍ.** La tabla
+     es «actividades» y su SQL escribió la columna en femenino; el taller se
+     escribió copiando las funciones de los textos, donde es `borrado`.
+     PostgREST rebota la consulta ENTERA por una columna que no existe, así
+     que el taller **no subía nunca**, y como `42703` no es `42P01` caía en la
+     rama de «sin señal»: la barra mandaba a mirar el wifi con la señal
+     perfecta y el SQL recién corrido. Es la **regla 13 entera, repetida**:
+     la prueba del SQL escribía `borrada` a mano y aprobaba; la base de
+     mentira devolvía sus filas mirase lo que mirase el `select` y también.
+     Cada doble complaciente justo donde el otro no miraba. Ahora el nombre
+     vive en `VOZ_ACT_COL_LAPIDA` —usado en los tres sitios de la costura, que
+     con el nombre escrito tres veces se arreglan dos y se olvida el tercero—
+     y **la sonda saca las columnas del propio `voz_actividades.sql`**: una
+     lista escrita a mano en la sonda sería un tercer doble complaciente.
+   · ⚠️ **EL DUEÑO DEL TALLER NO ES EL DUEÑO DEL TEXTO.** Son dos filas en dos
+     tablas con dos firmas, y aquí se preguntaba por la del cuento. Con el
+     texto de otra y las actividades mías, la pantalla apagaba MIS botones;
+     con el texto mío y las actividades de otra, los enseñaba vivos y la base
+     los rechazaba con un 42501 (regla 14). Y no es un caso raro: «hazle las
+     preguntas a tu hermana» es para lo que existe el taller.
+   · ⚠️ **HAY TRES CAPAS DE AVISO, NO DOS.** `toast()` vive bajo la sala, por
+     eso existe `vozAviso`; y el taller vive sobre la sala, así que un aviso
+     colgado de ella le queda debajo. Ningún aviso del taller se veía por el
+     camino normal. Se pinta en la capa de más arriba que esté abierta.
+   · ⚠️ **LA ZONA DE PASAR PÁGINA REENVÍA CUALQUIER BOTÓN**, no una lista de
+     los que había ese día. El enlace al taller llegó después de esa lista, y
+     su tercio izquierdo —bajo la zona— **retrocedía una página** en vez de
+     abrirlo. El centro sí funcionaba, que es lo que lo escondía.
+   · ⚠️ **EL TEXTO DE UN BLOQUE SE PIDE POR `vozTextoDeBloque`**, no por una
+     copia con `b.t`: una tabla no tiene `t`, tiene celdas, y un subrayado
+     hecho sobre una fecha de una tabla se guardaba y no generaba nada.
+   · ⚠️ **UN GUARDADO HECHO MIENTRAS SUBE LO ANTERIOR SE APUNTA, NO SE TIRA.**
+     La vuelta en marcha terminaba diciendo «☁️ están en todos los aparatos»
+     con lo último todavía aquí, que es peor que decir que falló.
+   · ⚠️ **Y CUATRO MANERAS EN QUE UNA MÁQUINA MARCA LA BUENA Y EL LECTOR NO
+     ENTENDÍA**, las cuatro acabando en una pregunta perdida o en la respuesta
+     CAMBIADA: la opción con la **línea entera en negrita** (`**B) …**`), que
+     al caerse corría las letras de después; el **enunciado numerado que acaba
+     en dos puntos** («1. Según el texto, elige la opción correcta:»), que se
+     ascendía a cabecera y se comía su propia pregunta; **«Respuesta correcta:
+     B»**, que no casaba por llevar el adjetivo antes del separador; y —la
+     peor— **la lista final de respuestas guardada en un solo mapa por
+     número**, que con dos secciones renumeradas desde 1 marcaba la primera
+     sección con las respuestas de la segunda, sin un aviso y sin parar el
+     guardado. Ahora cada lista cubre **su tramo**, y un número repetido
+     dentro de un tramo **no se resuelve**: se deja sin marcar y se dice.
+   · ⚠️ **Y LA LETRA SEÑALADA TIENE QUE EXISTIR:** «Respuesta: D» con tres
+     opciones se guardaba tal cual, o sea una pregunta que nadie puede
+     acertar. Se queda sin marcar y el guardado la nombra.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -2353,6 +2408,18 @@ del párrafo); que lo pegado escriba HTML; que la hoja de pegar se abra
 por debajo del taller y parezca un botón muerto (se mide con
 `elementFromPoint`, no leyendo el z-index); y que el avance de una
 persona se suba a la nube, que se comprueba contando las escrituras.
+
+⚠️ Y desde el 16 de septiembre de 2026 vigila además **la costura con la
+base**: saca la lista de columnas **del propio `supabase/sql/voz_actividades.sql`**
+—una copia escrita en la sonda se quedaría vieja y volvería a aprobar el
+fallo que vino a cazar—, rebota como rebota PostgREST cuando el aparato pide
+una columna que no existe, y si no puede leer ese archivo **SUSPENDE** en vez
+de aprobar con la lista vacía. Pulsa el enlace del pie **con un dedo en el
+sitio donde está**, no con `.click()`, que se salta el reparto de toques y por
+eso no veía que la zona de pasar página se comía su tercio izquierdo. Y le
+pega las **cuatro formas en que una máquina marca la buena**, incluida la de
+dos secciones con dos listas de respuestas, que es la que marcaba la
+respuesta cambiada.
 
 Y el SQL del taller, contra un PostgreSQL de verdad:
 

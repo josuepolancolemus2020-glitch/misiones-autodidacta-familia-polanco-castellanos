@@ -105,6 +105,43 @@ function log(s){ L.push(s); out.textContent = L.join('\n'); }
 function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
 const esperar = ms => new Promise(r => setTimeout(r, ms));
 
+/* ⚠️ LAS COLUMNAS DE `voz_actividades` SE SACAN DEL PROPIO ARCHIVO SQL,
+   NUNCA ESCRITAS A MANO AQUÍ. El 16 de septiembre de 2026 el taller pedía
+   `borrado` y la tabla tenía `borrada` —una letra, y en femenino porque la
+   tabla es «actividades»—: PostgREST rebota la consulta ENTERA por eso
+   (42703), o sea que el taller no subía nunca, y encima ese código caía en
+   la rama de «sin señal», así que la barra mandaba a mirar el wifi.
+
+   Y no lo cazó nadie porque LOS DOS DOBLES ERAN COMPLACIENTES justo donde el
+   otro no miraba, que es la regla 13 al pie de la letra: la prueba del SQL
+   escribe las filas a mano, con el nombre bueno, así que la tabla aprobaba; y
+   esta base de mentira devolvía `estado.act` mirase lo que mirase el `select`,
+   así que la pantalla también. Una lista escrita a mano en este archivo sería
+   un tercer doble complaciente: se quedaría vieja el día que la tabla cambie,
+   y quien la lea se fiará. Sale del archivo, y si no se puede leer la sonda
+   SUSPENDE en vez de aprobar con la lista vacía —que aceptaría cualquier
+   columna, que es la avería de arriba otra vez—. */
+let VOZ_ACT_COLS = null;
+
+async function columnasDeVozActividades(){
+  const r = await fetch('/supabase/sql/voz_actividades.sql');
+  if (!r.ok) throw new Error('no se pudo leer voz_actividades.sql: ' + r.status);
+  const sql = await r.text();
+  const cuerpo = (sql.match(/create table if not exists public\.voz_actividades\s*\(([\s\S]*?)\n\);/i) || [])[1];
+  if (!cuerpo) throw new Error('no encontré el create table de voz_actividades');
+  const cols = [];
+  cuerpo.split('\n').forEach(l => {
+    const m = l.match(/^\s{2}([a-z_]+)\s+(text|jsonb|uuid|boolean|bigint|timestamptz)\b/);
+    if (m) cols.push(m[1]);
+  });
+  /* Y las que llegaran después por su `alter table … add column`, que es
+     como crece una tabla ya corrida sin romper la del autor. */
+  let a; const re = /alter table public\.voz_actividades add column if not exists\s+([a-z_]+)/gi;
+  while ((a = re.exec(sql))) if (cols.indexOf(a[1]) < 0) cols.push(a[1]);
+  if (cols.length < 5) throw new Error('saqué solo ' + cols.length + ' columnas de voz_actividades.sql');
+  return cols;
+}
+
 /* ── La base de datos de mentira ────────────────────────────────── */
 function nuevaBase(w, opciones){
   const o = opciones || {};
@@ -148,11 +185,29 @@ function nuevaBase(w, opciones){
     if (/voz_actividades/.test(u.pathname)) {
       estado.llamadas.push({ m, url: u.pathname + u.search, cuerpo: init && init.body });
       if (o.sinTablaAct) return json({ code: '42P01', message: 'relation "public.voz_actividades" does not exist' }, 404);
-      if (m === 'GET') return json(estado.act);
+      /* ⚠️ UNA COLUMNA QUE NO EXISTE TUMBA LA CONSULTA ENTERA, no la
+         columna. Así rebota PostgREST y así tiene que rebotar este doble,
+         o esconde justo la costura que existe para probar. Las columnas
+         salen de voz_actividades.sql, no de una lista escrita aquí. */
+      /* `faltanAct` finge una base a la que le falta una columna del
+         taller, que es lo que se encuentra quien corrió una versión
+         anterior del archivo: la tabla está, los datos están, y PostgREST
+         rebota igual. Tiene que decirse distinto de «no hay señal». */
+      const ausentes = (VOZ_ACT_COLS || []).filter(c => (o.faltanAct || []).indexOf(c) < 0);
+      const noEsta = (nombres) => ausentes.length
+        ? nombres.find(n => n && ausentes.indexOf(n) < 0) : null;
+      if (m === 'GET') {
+        const pedidas = (u.searchParams.get('select') || '').split(',').map(x => x.trim()).filter(Boolean);
+        const mala = noEsta(pedidas);
+        if (mala) return json({ code: '42703', message: 'column voz_actividades.' + mala + ' does not exist' }, 400);
+        return json(estado.act);
+      }
       let cuerpo = null;
       try { cuerpo = JSON.parse(init && init.body); } catch (e) {}
       const filas = Array.isArray(cuerpo) ? cuerpo : (cuerpo ? [cuerpo] : []);
       for (const fila of filas) {
+        const malaE = noEsta(Object.keys(fila));
+        if (malaE) return json({ code: '42703', message: 'column "' + malaE + '" of relation "voz_actividades" does not exist' }, 400);
         if (!fila.puesto_por) return json({ code: '23502', message: 'null value in column "puesto_por"' }, 400);
         if (fila.puesto_por !== VOZ_UID) return json({ code: '42501', message: 'new row violates row-level security policy' }, 403);
         if (!Array.isArray(fila.items)) return json({ code: '23514', message: 'violates check constraint "voz_actividades_items_lista"' }, 400);
@@ -277,6 +332,19 @@ function filasHoja(d){
 (async () => {
   await new Promise(r => f.addEventListener('load', r, { once: true }));
   await esperar(1200);
+  /* Antes que nada, porque la base de mentira las necesita para rebotar
+     como rebota la de verdad. Si esto falla no se sigue: una sonda que
+     corriera con la lista vacía aceptaría cualquier columna y aprobaría
+     el fallo que vino a vigilar. */
+  try {
+    VOZ_ACT_COLS = await columnasDeVozActividades();
+  } catch (e) {
+    fallos++;
+    log('  ✘ no pude sacar las columnas de supabase/sql/voz_actividades.sql: ' + e.message);
+    log('\nRESULTADO: SUSPENDE · 1 fallo(s)');
+    document.title = 'SUSPENDE · La Voz Prestada';
+    return;
+  }
   const w = f.contentWindow, d = w.document;
   const base = nuevaBase(w, {});
   w.eval(`window.faroSb.auth.getSession = async () => (` +
@@ -2562,6 +2630,58 @@ function filasHoja(d){
      'y el botón de guardar se PARA, diciendo en qué pregunta falta y cómo marcarla',
      'el guardado no se paró con una pregunta sin respuesta: ' + btnG.textContent);
 
+  /* 28.2-bis LAS CUATRO FORMAS EN QUE UNA MÁQUINA MARCA LA BUENA Y EL
+     LECTOR NO LAS ENTENDÍA. Las cuatro salieron de la revisión del 16 de
+     septiembre de 2026 y las cuatro acaban en el mismo sitio: o la
+     pregunta desaparece, o queda marcada la opción que no era. Ninguna da
+     error, y un examen con la respuesta cambiada no lo descubre nadie
+     hasta que un niño acierta y la pantalla le dice que falló — por eso
+     van con su caso escrito tal como lo escribe una máquina. */
+  const leer28 = t => JSON.parse(w.eval('JSON.stringify(vozActLeer(' + JSON.stringify(t) + '))'));
+  const opsDe = r => r.items.filter(i => i.k === 'opcion');
+
+  const rNeg = leer28('## Selección\n\n1. ¿Por qué se fue el arriero?\nA) Porque llovía\n' +
+                      '**B) Porque el pozo se secó**\nC) Porque se lo dijeron\nD) No se dice');
+  ok(opsDe(rNeg).length === 1 && opsDe(rNeg)[0].o.length === 4 && opsDe(rNeg)[0].ok === 1,
+     'una opción con la LÍNEA ENTERA en negrita se reconoce Y marca la buena («**B) …**»)',
+     '⚠️ la opción en negrita se perdió o marcó otra: opciones=' +
+     (opsDe(rNeg)[0] ? opsDe(rNeg)[0].o.length : 0) + ' ok=' + (opsDe(rNeg)[0] ? opsDe(rNeg)[0].ok : '—') +
+     ' — al caerse una opción, las letras de después se corren y la correcta señala a otra');
+
+  const rNum = leer28('## Selección\n\n1. Según el texto, elige la opción correcta:\n' +
+                      'A) El pozo estaba lleno\nB) El pozo se secó\nC) No había pozo\n\nRespuesta: B');
+  ok(opsDe(rNum).length === 1 && opsDe(rNum)[0].ok === 1,
+     'un enunciado NUMERADO que acaba en dos puntos es una pregunta, no una cabecera de sección',
+     '⚠️ la pregunta numerada desapareció de la tanda: salieron ' + opsDe(rNum).length +
+     ' de selección (se la comió vozActEsCabecera por acabar en «:» con ocho palabras)');
+
+  const rRc = leer28('## Selección\n\n1. ¿Qué pasó con el pozo?\nA) Se llenó\nB) Se secó\nC) Lo taparon\n\nRespuesta correcta: B');
+  ok(opsDe(rRc).length === 1 && opsDe(rRc)[0].ok === 1,
+     '«Respuesta correcta: B» se entiende, no solo «Respuesta: B»',
+     '⚠️ «Respuesta correcta: B» se tiró sin aviso y el guardado pediría lo que el texto ya traía escrito');
+
+  /* ⚠️ LA QUE DE VERDAD IMPORTA: dos secciones renumeradas desde 1, cada
+     una con su lista al pie. Con un solo mapa por número, la segunda
+     lista pisaba a la primera y la primera sección quedaba marcada con
+     las respuestas de la segunda. */
+  const rDos = leer28(
+    '## Comprensión (selección)\n\n1. ¿Quién narra?\nA) El arriero\nB) El pueblo\nC) Nadie\n\n' +
+    '2. ¿Cuándo ocurre?\nA) De día\nB) De noche\nC) No se dice\n\nRespuestas: 1-A, 2-B\n\n' +
+    '## Datos (selección)\n\n1. ¿En qué año?\nA) 1918\nB) 1927\nC) 1955\n\n' +
+    '2. ¿Cuántos eran?\nA) Tres\nB) Siete\nC) Doce\n\nRespuestas: 1-C, 2-A');
+  const oDos = opsDe(rDos);
+  ok(oDos.length === 4 && oDos[0].ok === 0 && oDos[1].ok === 1 && oDos[2].ok === 2 && oDos[3].ok === 0,
+     '⚠️ con DOS secciones numeradas desde 1, cada lista de respuestas marca SOLO la suya',
+     '⚠️ una lista de respuestas se comió a la otra y hay preguntas con la correcta CAMBIADA: ' +
+     oDos.map(x => x.n + '→' + x.ok).join(' '));
+
+  const rFuera = leer28('## Selección\n\n1. ¿De qué color era?\nA) Rojo\nB) Verde\nC) Azul\n\nRespuesta: D');
+  ok(opsDe(rFuera).length === 1 && opsDe(rFuera)[0].ok === -1 && rFuera.sinCorrecta.length === 1 &&
+     rFuera.avisos.some(a => /no existe/.test(a.t)),
+     'y «Respuesta: D» con tres opciones NO se guarda: no se puede acertar, así que se queda sin marcar y se dice',
+     '⚠️ se guardó una pregunta que nadie puede acertar: ok=' + (opsDe(rFuera)[0] ? opsDe(rFuera)[0].ok : '—') +
+     ' con ' + (opsDe(rFuera)[0] ? opsDe(rFuera)[0].o.length : 0) + ' opciones');
+
   /* 28.3 La hoja de pegar se ve POR ENCIMA del taller. Colgando del
      body salía con z-index 100 bajo un taller de 3300: el botón
      respondía, la hoja se abría y no se veía nada. */
@@ -2596,9 +2716,29 @@ function filasHoja(d){
   ok(guardadas === 8, 'y quedan las 8 actividades del ejemplo guardadas', 'quedaron ' + guardadas);
   await esperar(1600);
   const filaAct = base28.actEscritas.find(x => x.cid === 'c-act');
+  /* ⚠️ Y EL FALLO DICE LA CAUSA, no «no llegó». Cuando el taller pedía
+     `borrado` y la tabla tenía `borrada`, esta comprobación suspendía con un
+     «undefined» que no señalaba a ninguna parte: hay que abrir la sonda y
+     ponerse a depurar para saber si fue la firma, la lista o la columna. El
+     rótulo de la barra ES el diagnóstico —la herramienta ya se lo dice al
+     lector con palabras— así que se enseña aquí tal cual. */
+  const porQueNo = String(w.eval('vozActRotuloNube()'));
   ok(!!filaAct && filaAct.puesto_por === VOZ_UID && Array.isArray(filaAct.items) && filaAct.items.length === 8,
      'suben a voz_actividades FIRMADAS y con su lista entera',
-     '⚠️ la nube no recibió el taller como debía: ' + JSON.stringify(filaAct && filaAct.puesto_por));
+     '⚠️ la nube no recibió el taller. La herramienta dice: «' + porQueNo + '»' +
+     (filaAct ? ' · firma=' + JSON.stringify(filaAct.puesto_por) + ' items=' + (filaAct.items || []).length
+              : ' · no se escribió ni una fila'));
+  /* ⚠️ Y LA COSTURA, NOMBRADA: que las columnas que el aparato PIDE existan
+     todas en la tabla. Es la comprobación que faltaba el 16 de septiembre de
+     2026, y la única que separa «no llegó por la señal» de «no llegó porque
+     el nombre de una columna no casa». */
+  const pedidas = String(w.eval('VOZ_ACT_COLUMNAS')).split(',').map(x => x.trim()).filter(Boolean);
+  const sobra = pedidas.filter(c => VOZ_ACT_COLS.indexOf(c) < 0);
+  ok(!sobra.length,
+     'y pide solo columnas que voz_actividades.sql tiene de verdad (' + pedidas.length + ' de ' + VOZ_ACT_COLS.length + ')',
+     '⚠️ el aparato pide columnas que la tabla NO tiene: ' + sobra.join(', ') +
+     ' — PostgREST rebota la consulta ENTERA con 42703 y el taller no sube nunca. ' +
+     'La tabla tiene: ' + VOZ_ACT_COLS.join(', '));
 
   /* 28.5 ⚠️ LAS GENERADAS SACAN LA RESPUESTA DEL TEXTO, NO LA INVENTAN. */
   const cuerpo28 = w.eval('_vozCuentos[0].capitulos[0].p[3].t');
@@ -2722,15 +2862,51 @@ function filasHoja(d){
   const enlacePie = d.querySelector('#voz-texto .voz-fin-taller');
   ok(!!enlacePie, 'el pie de la última página lleva el enlace al taller', 'no hay enlace al taller al final del texto');
   const desnudoAntes = d.getElementById('voz-lector').classList.contains('voz-desnudo');
-  if (enlacePie) enlacePie.click();
-  await esperar(300);
+  /* ⚠️ SE PULSA CON UN DEDO DE VERDAD, NO CON .click(). Un `.click()` va
+     directo al elemento y se salta el reparto de toques, que es justo lo
+     único que puede fallar aquí: las zonas de pasar página cubren los bordes
+     de la hoja y van POR ENCIMA del texto, así que un botón que caiga cerca
+     del margen es intocable con el dedo aunque exista, esté enganchado y la
+     sonda lo apruebe. Es la misma avería que ya tiene su arreglo escrito para
+     las llamadas de cita (`vozBajoLaZona`, regla 27), y el enlace del pie es
+     el camino por el que de verdad se entra al taller.
+     Se toca DONDE ESTÁ, se pregunta al documento qué hay en ese punto —que es
+     lo que hace el navegador con un dedo— y se le manda el toque a eso. */
+  let quienRecibe = null;
+  if (enlacePie) {
+    const r = enlacePie.getBoundingClientRect();
+    const cx = Math.round(r.left + r.width / 2), cy = Math.round(r.top + r.height / 2);
+    quienRecibe = d.elementFromPoint(cx, cy);
+    const blanco = quienRecibe || enlacePie;
+    const dedoPie = (tipo) => blanco.dispatchEvent(new w.PointerEvent(tipo,
+      { bubbles: true, cancelable: true, pointerId: 21, pointerType: 'touch', clientX: cx, clientY: cy, isPrimary: true }));
+    dedoPie('pointerdown'); dedoPie('pointerup');
+    blanco.dispatchEvent(new w.MouseEvent('click', { bubbles: true, cancelable: true, clientX: cx, clientY: cy }));
+  }
+  await esperar(320);
   ok(!d.getElementById('voz-act-overlay').hidden,
-     'y tocarlo abre el taller sin cerrar la lectura: al terminar se vuelve a la página en que se iba',
-     'el enlace del pie no abrió el taller');
+     'y un DEDO en el sitio donde está lo abre, sin cerrar la lectura: al terminar se vuelve a la página en que se iba',
+     'el dedo no abrió el taller. En ese punto de la pantalla lo que recibe el toque es: ' +
+     (quienRecibe ? (quienRecibe.className || quienRecibe.tagName) : '(nada)') +
+     ' — si es una zona de pasar página, se está comiendo el enlace (regla 27, vozBajoLaZona)');
   ok(d.getElementById('voz-lector').classList.contains('voz-desnudo') === desnudoAntes,
      'y tocar ese botón NO apaga además los mandos de la sala', '⚠️ tocar el enlace del pie apagó las barras de la lectura');
   w.eval('vozActCerrarTaller(); vozCerrarLector()');
   await esperar(200);
+
+  /* 28.9-bis UNA COLUMNA QUE FALTA NO ES UN CORTE DE SEÑAL. Es la avería
+     del 16 de septiembre de 2026 vista desde el otro lado: PostgREST rebota
+     la consulta entera con 42703, que no es 42P01, así que caía en «sin
+     señal» y la barra mandaba a mirar el wifi con la señal perfecta y el
+     SQL recién corrido. Un aviso que se equivoca de causa manda a mirar
+     donde no está el problema. */
+  nuevaBase(w, { faltanAct: ['borrada'] });
+  w.eval('_vozActNube = "local"; vozActSincronizar("c-act")');
+  await esperar(400);
+  const rotAct = String(w.eval('vozActRotuloNube()'));
+  ok(/vieja/i.test(rotAct) && /voz_actividades\.sql/.test(rotAct) && !/señal/i.test(rotAct),
+     '⚠️ y si a la tabla le falta una columna lo DICE («la base va vieja»), no lo achaca a la señal',
+     '⚠️ una columna que falta se está leyendo como otra cosa: «' + rotAct + '»');
 
   /* 28.10 Sin la tabla corrida, el taller funciona entero y LO DICE. */
   nuevaBase(w, { sinTablaAct: true });
