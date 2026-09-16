@@ -30,6 +30,8 @@ pierde por el camino.
 | Apagar el alta pública de cuentas en Supabase | ⛔ pendiente |
 | `recursos_enlaces` (la repisa de enlaces de las misiones) | ⏳ pendiente de correr el SQL |
 | `rodaje` (El Rodaje: el cuaderno de dirección de los videos) | ⏳ pendiente de correr el SQL, y **son dos archivos en orden** |
+| `voz_prestada` (La Voz Prestada: el anaquel de textos) | ✅ corrido, y **re-corrido el 12/9/2026** por las columnas `genero` y `estantes` |
+| `voz_actividades` (el taller de comprensión de esos textos) | ✅ corrido el **16/9/2026**, con las trece filas de la comprobación cuadradas |
 | `criba.sql` (La Criba: la tabla y las cuatro fuentes) | ✅ corrido |
 | La cadena de afinado: `criba_temas` → `criba_afina` 1-4 → `criba_prensa` | ✅ corrida entera, en ese orden |
 | `criba_reloj.sql` (el reloj diario de La Criba) | ✅ corrido y funcionando: cosecha sola a las **05:10 UTC** |
@@ -150,22 +152,26 @@ Zone → Make private.
      `_dev/prueba-rodaje-sql.sql`: las ocho comprobaciones pasan, incluida
      la de que `anon` no ve ni una fila con los permisos de tabla repartidos
      como los reparte Supabase.
-   · ⏳ **FALTA CORRER** — `supabase/sql/voz_actividades.sql` y después
-     `supabase/sql/voz_actividades_comprueba.sql`. Es lo único nuevo que hay
-     que pegar del taller de comprensión de La Voz Prestada (16 de septiembre
-     de 2026): las tarjetas, las parejas y las preguntas de cada texto, para
-     que estén en los aparatos de los cuatro.
+   · ✅ **CORRIDO** — `supabase/sql/voz_actividades.sql` y después
+     `supabase/sql/voz_actividades_comprueba.sql`, el **16 de septiembre de
+     2026**, el mismo día de estrenar el taller de comprensión de La Voz
+     Prestada. Guarda las tarjetas, las parejas y las preguntas de cada
+     texto, para que estén en los aparatos de los cuatro.
 
-     **Mientras no se corra, el taller funciona ENTERO** con la copia del
-     aparato y lo dice a la vista («📴 Solo en este aparato: falta correr
-     voz_actividades.sql»), que es lo contrario de fingir que viaja. O sea
-     que no corre prisa; lo que se pierde hasta entonces es que las
-     actividades que pega uno las vean los demás.
+     La comprobación salió con **las trece filas cuadradas**: `columnas = 7`,
+     `políticas = 3`, `seguridad por fila = true`, `checks con nombre = 2`,
+     `disparador = 1`, `higiene de lápidas = existe`, y las dos que se leen
+     al revés —`borrado de verdad = 0` y `puerta pública = 0`— más la que de
+     verdad importa, `⚠️ preguntas SIN correcta = 0`. Los tres informativos
+     del final salieron en 0 porque todavía no se había pegado ninguna tanda:
+     esa es la fila que hay que mirar la próxima vez para saber si lo pegado
+     desde la tableta llegó.
 
-     Lo que hay que saber antes de pegarlo: es de la casa para LEER y de
-     quien lo puso para ESCRIBIR, no hay política de `delete` —se vacía con
-     lápida, por lo mismo que los textos— y el avance de cada quien NO viaja,
-     vive en el aparato como la posición de lectura.
+     Lo que hay que saber si algún día se vuelve a tocar: es de la casa para
+     LEER y de quien lo puso para ESCRIBIR, no hay política de `delete` —se
+     vacía con lápida, por lo mismo que los textos— y el avance de cada quien
+     NO viaja, vive en el aparato como la posición de lectura. Y volver a
+     pegarlo no rompe nada: es idempotente.
 
      Probado antes de mandarlo contra un PostgreSQL de verdad con
      `_dev/prueba-voz-actividades-sql.sql`: las ocho comprobaciones pasan,
