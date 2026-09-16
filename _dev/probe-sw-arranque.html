@@ -289,9 +289,13 @@ try {
   ok(visto.length > 0,
      'con un miembro recordado la aplicación se pinta, aunque la consulta a la red no conteste',
      'la aplicación no se pintó: sigue habiendo pantalla en blanco esperando a la red');
+  /* ⚠️ Y EL NÚMERO VA TAMBIÉN EN EL FALLO. Sin él, «tardó en pintarse»
+     no distingue entre una espera que ha vuelto (que es lo que esta sonda
+     vigila) y un Chromium sin cabeza que va lento en una sesión cargada,
+     y quien lo lea empieza buscando la avería en el sitio equivocado. */
   ok(visto.length > 0 && visto[0].t < 400,
      `y se pinta enseguida (a los ${visto.length ? visto[0].t : '?'} ms de cargar), no cuando conteste el servidor`,
-     'tardó en pintarse: la espera sigue ahí');
+     `tardó en pintarse: ${visto.length ? visto[0].t : '?'} ms (el tope son 400). Si es una máquina lenta, se ve corriéndola en otra; si vuelve a subir en todas, la espera ha vuelto`);
   const ultimo = A.linea[A.linea.length - 1];
   ok(ultimo && ultimo.app,
      'y se queda puesta mientras la comprobación va por detrás',

@@ -17,6 +17,15 @@
    índice, sus marcadores y su buscador, y volviendo justo a donde se
    dejó—.
 
+   Y desde el 12 de septiembre de 2026 lee también ENSAYOS DE
+   INVESTIGACIÓN, que traen dos cosas que un cuento no tiene: CITAS
+   —que se pueden tocar para ver su fuente sin salir de la página— y
+   TABLAS —que en un teléfono no caben y aquí se pueden ver de tres
+   maneras—. Las dos reglas grandes de eso están escritas enteras más
+   abajo, en la cabecera de «LAS FUENTES Y LAS TABLAS», y la primera es
+   la que no se negocia: una cita NO se quita del texto, se le pone un
+   botón.
+
    ⚠️ Y HACE UNA TERCERA QUE NO SE NEGOCIA: NO DEJA QUE SE OLVIDE QUIÉN
    LO ESCRIBIÓ. Un cuento escrito por una máquina imitando la voz de
    Rulfo NO ES DE RULFO, y a los seis meses, leído en una tableta y sin
@@ -155,10 +164,20 @@ const VOZ_AJUSTES_POR_DEFECTO = {
 
 let _vozCuentos = [];      // el anaquel, ya fusionado (aparato + nube)
 let _vozHayTabla = true;   // ¿se corrió ya el SQL en esta base?
-let _vozNubeVieja = false; // la tabla está, pero sin la columna `genero`
+let _vozNubeVieja = false; // la tabla está, pero le falta alguna columna nueva
+/* ⚠️ Y CUÁLES le faltan, que ya no es una sola. Cada columna añadida
+   después del estreno puede no estar en una base que no volvió a correr
+   el SQL, y PostgREST rebota la consulta ENTERA por una sola que
+   falte. Se piden todas y se van quitando las que la base nombre. */
+let _vozFaltan = [];
 let _vozEstadoNube = 'mirando'; // mirando | puesta | vieja | sin-tabla | sin-senal | sin-sesion
 let _vozFiltroVoz = '';    // '' = todas las voces
 let _vozFiltroGen = '';    // '' = todos los géneros
+let _vozFiltroEst = '';    // '' = todos los estantes
+/* La marca de «los que no están en ninguno». Un carácter que no puede
+   ser el nombre de un estante, para no confundirlo con uno que se
+   llamara así. */
+const VOZ_SIN_ESTANTE = '\u0000';
 let _vozBusca = '';
 let _vozLeyendo = null;    // el texto abierto en la sala
 let _vozCapActual = 0;
@@ -167,6 +186,7 @@ let _vozPaginas = 1;
 let _vozAj = Object.assign({}, VOZ_AJUSTES_POR_DEFECTO);
 let _vozPegado = null;     // lo último que entendió el lector de texto
 let _vozEditando = null;   // cid del texto que se está corrigiendo
+let _vozEstantesForm = []; // los estantes puestos en la hoja de pegar
 
 /* ══════════════ COSAS PEQUEÑAS ══════════════ */
 
@@ -304,8 +324,11 @@ function vozPalabrasDe(t) {
 function vozPalabras(caps) {
   let n = 0;
   (caps || []).forEach(c => {
-    (c.p || []).forEach(p => { if (p.t) n += vozPalabrasDe(p.t); });
-    (c.epi || []).forEach(p => { if (p.t) n += vozPalabrasDe(p.t); });
+    /* Con `vozTextoDeBloque` y no con `p.t`: una tabla no tiene `t`,
+       tiene celdas, y sin esto media página de datos contaría cero —y
+       el avance de la lectura daría un salto al cruzarla—. */
+    (c.p || []).forEach(p => { n += vozPalabrasDe(vozTextoDeBloque(p)); });
+    (c.epi || []).forEach(p => { n += vozPalabrasDe(vozTextoDeBloque(p)); });
   });
   return n;
 }
@@ -606,12 +629,451 @@ function vozItemLista(l) {
   return { t: resto, n: n };
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   LAS FUENTES Y LAS TABLAS: LO QUE UN ENSAYO TIENE Y UN CUENTO NO
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026, al empezar a pegar
+   aquí sus ensayos de investigación: que las citas «se puedan
+   seleccionar y consultar desde el formato de la lectura», y que
+   «cuando hayan tablas se pueda ver lo mejor posible».
+
+   ⚠️ LA REGLA QUE MANDA SOBRE TODO LO DE AQUÍ ABAJO, y está escrita la
+   primera porque es la que se va a querer romper: UNA CITA NO SE QUITA
+   DEL TEXTO, SE LE PONE UN BOTÓN. Ni se mueve, ni se acorta, ni se
+   cambia por un numerito. Un «(Harari, 2014, p. 45)» se queda escrito
+   tal cual y ADEMÁS se puede tocar. Es la asimetría de la regla 3
+   aplicada a esto, y muerde más fuerte: equivocarse hacia «esto no era
+   una cita» cuesta un botón que no sale —y la cita se sigue leyendo
+   donde está—; equivocarse hacia «esto sí lo era» BORRA PALABRAS DE UN
+   ENSAYO Y PARECE QUE FUNCIONÓ, porque la página sigue llena y el texto
+   sigue corriendo. Ante la duda, prosa: siempre. Por eso una llamada
+   solo se convierte en botón cuando hay una fuente DE VERDAD a la que
+   apuntar; sin bibliografía que la respalde no se toca ni un carácter.
+
+   Y la segunda, que es la regla 6 vista desde otro sitio: CONSULTAR UNA
+   FUENTE NO MUEVE LA LECTURA. En un lector paginado, saltar a la
+   bibliografía y volver es perder la página, y es exactamente lo que el
+   autor pidió que no pasara —«consultarlas DESDE el formato de la
+   lectura»—. La ficha sale encima, pegada a la llamada, y al cerrarla
+   uno sigue en la misma frase.
+
+   Y la tercera: LA BIBLIOGRAFÍA ES UN CAPÍTULO DEL ENSAYO. Sus entradas
+   son bloques `fuente` dentro de `capitulos`, que ya es un objeto
+   libre, así que esto no pide ni una columna nueva ni volver a correr
+   el SQL desde una tableta. Es la regla 15 (los géneros viven en el
+   aparato, no en la base) aplicada otra vez, y es también la 21: no se
+   inventa una segunda tabla para el mismo gesto. */
+
+/* ¿El título de este capítulo es el de una bibliografía? Solo cuenta
+   si está AL FINAL del texto —lo mira quien llama—: un ensayo puede
+   abrir con una «Nota» del autor, y eso es prosa. */
+/* ⚠️ Y LA VERSIÓN ESTRICTA, que es la que decide si dentro de ese
+   capítulo cada RENGLÓN es una entrada. Sin «notas» a propósito: una
+   «Nota del autor» al principio de un ensayo es prosa de verdad, y
+   partirla renglón a renglón sería el fallo de la regla 3. «Referencias»
+   o «Bibliografía» encabezando un capítulo no son prosa nunca. */
+function vozEsTituloBibliografia(t) {
+  const s = vozSinTildes(String(t || '')).toLowerCase()
+    .replace(/^[ivxlcdm\d]+[.)\s-]+/, '').replace(/[.:]+$/, '').trim();
+  return /^(referencias|bibliografia|obras citadas|obras consultadas|fuentes|fuentes consultadas|referencias bibliograficas)\b/.test(s);
+}
+
+function vozEsTituloFuentes(t) {
+  const s = vozSinTildes(String(t || '')).toLowerCase()
+    .replace(/^[ivxlcdm\d]+[.)\s-]+/, '').replace(/[.:]+$/, '').trim();
+  return /^(referencias|bibliografia|fuentes|obras citadas|obras consultadas|notas|notas al pie|referencias bibliograficas|fuentes consultadas)\b/.test(s);
+}
+
+/* ⚠️ UNA DIRECCIÓN SE COMPRUEBA CON `URL()`, NUNCA CON UN GREP:
+   `java\tscript:` y `JavaScript:` pasan un grep ingenuo y el navegador
+   los ejecuta igual. Es la misma regla de la repisa de enlaces y de
+   `rodEnlace()`, y aquí hace falta por lo mismo: esta dirección acaba
+   dentro de un `href` de F.A.R.O, que tiene dentro la Bóveda, las
+   finanzas, el chat y los teléfonos del Buzón. */
+function vozEnlaceBueno(u) {
+  try {
+    const url = new URL(String(u || '').trim());
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+    return url.href;
+  } catch (e) { return ''; }
+}
+
+/* La dirección que trae escrita una entrada de bibliografía, si trae
+   alguna. No se le quita del texto: en una bibliografía la dirección se
+   escribe a la vista, y quitarla para ponerla en un botón sería
+   reescribir la cita del autor. */
+function vozUrlEn(t) {
+  const m = String(t || '').match(/https?:\/\/[^\s<>"')\]]+/i);
+  if (!m) return '';
+  return vozEnlaceBueno(m[0].replace(/[.,;:)\]]+$/, ''));
+}
+
+/* Una entrada de bibliografía: su número, si lo trae delante, y el
+   resto. El número se guarda APARTE del texto, igual que la viñeta de
+   un ítem de lista (`{k:'li', t, n}`), y por lo mismo: así el que
+   exporta lo vuelve a escribir UNA sola vez —y no dos— y la llamada
+   «[3]» del cuerpo sabe a qué fila apunta. */
+function vozFuenteDeTexto(t, n) {
+  let s = String(t || '').trim();
+  let num = (n != null) ? n : null;
+  const m = s.match(/^(?:\[\^?(\d{1,3})\]|\((\d{1,3})\)|(\d{1,3})[.)])\s+(.*)$/);
+  if (m) { num = parseInt(m[1] || m[2] || m[3], 10); s = m[4].trim(); }
+  return { k: 'fuente', t: s, n: (num != null && !isNaN(num)) ? num : null, url: vozUrlEn(s) || vozDominioAlFinal(s) };
+}
+
+/* ⚠️ Y UNA ENTRADA QUE TERMINA EN UN DOMINIO PELADO TAMBIÉN DA ENLACE.
+   Hace falta por la ida y vuelta, y se descubrió por ahí: la lista de
+   un informe llega con el dominio en su propio renglón, se junta con
+   su título —«TALIS 2018: … · publications.iadb.org»— y entonces ya no
+   es «solo un dominio». Sin esto, corregir el texto le quitaba el 🔗 a
+   todas sus fuentes, sin dar ningún error y sin que se viera hasta
+   tocar una.
+
+   Solo se mira el ÚLTIMO trozo y solo si está TODO en minúsculas, que
+   es como se escribe un dominio y como no se escribe el final de una
+   frase: «Debate.» y «Melville House.» no llevan punto dentro de una
+   palabra, y «S.A.» va en mayúsculas. Dentro de la prosa no se busca
+   nada: ahí «informe.pdf» tendría la misma pinta y saldría un enlace
+   falso. */
+const VOZ_NO_DOMINIO = /\.(pdf|docx?|txt|rtf|odt|xlsx?|pptx?|csv|zip|rar|jpe?g|png|gif|webp|svg|mp3|mp4|mov|avi|md|json|xml)$/;
+
+function vozDominioAlFinal(s) {
+  const ult = String(s || '').trim().split(/\s+/).pop() || '';
+  const limpio = ult.replace(/[.,;:)\]]+$/, '');
+  if (!/^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,24}$/.test(limpio)) return '';
+  /* Un nombre de archivo tiene la misma forma que un dominio —
+     «informe.pdf» pasaría por un sitio web y saldría un 🔗 que no lleva
+     a ninguna parte—, así que las terminaciones de archivo se
+     descartan a mano. Es la misma clase de lista que la de palabras
+     que no son apellidos. */
+  if (VOZ_NO_DOMINIO.test(limpio)) return '';
+  return vozEnlaceBueno('https://' + limpio);
+}
+
+/* ─── Las tablas ───────────────────────────────────────────────────
+   Se leen las de tubos («| a | b |»), que es como las escribe cualquier
+   máquina, y SOLO con su renglón de guiones debajo. Ese renglón es lo
+   que hace inequívoca la tabla: sin él, tres frases con un tubo dentro
+   se convertirían en una tabla de tres filas y el ensayo saldría
+   descuartizado en silencio, que es el fallo de la regla 3. */
+function vozFilaTabla(l) {
+  const s0 = String(l || '').trim();
+  if (s0.indexOf('|') < 0) return null;
+  let s = s0;
+  if (s[0] === '|') s = s.slice(1);
+  if (s[s.length - 1] === '|' && s[s.length - 2] !== '\\') s = s.slice(0, -1);
+  const celdas = s.split('|').map(x => x.trim());
+  if (celdas.length < 2) return null;
+  return celdas;
+}
+
+/* El renglón de guiones, que además dice cómo va alineada cada
+   columna: «:--» a la izquierda, «:-:» al centro, «--:» a la derecha.
+   Los números de un ensayo se leen mal alineados a la izquierda. */
+function vozSepTabla(l) {
+  const c = vozFilaTabla(l);
+  if (!c) return null;
+  if (!c.every(x => /^:?-{2,}:?$/.test(x.replace(/\s/g, '')))) return null;
+  return c.map(x => {
+    const s = x.replace(/\s/g, '');
+    if (/^:.*:$/.test(s)) return 'c';
+    if (/:$/.test(s)) return 'd';
+    return '';
+  });
+}
+
+/* El rótulo de una tabla («Tabla 2: Deuda externa, 1980-2000»), que en
+   un ensayo va escrito en el renglón de encima y es lo que permite
+   nombrarla después. Se le pide la palabra delante: una frase
+   cualquiera encima de una tabla es el final del párrafo anterior. */
+function vozTituloTabla(l) {
+  const s = vozDesnuda(String(l || '')).trim();
+  if (!s || s.length > 140) return '';
+  return /^(tabla|cuadro|figura|gr[áa]fico|gr[áa]fica)\b\s*\d{0,3}\s*[:.–—-]?\s*\S/i.test(s) ? s : '';
+}
+
+/* ⚠️ LA BIBLIOGRAFÍA DE UN INFORME NO VIENE DENTRO DEL TEXTO, Y POR
+   ESO TIENE CAJA PROPIA. Descubierto el 12 de septiembre de 2026, con
+   el primer informe de investigación que el autor pegó tal cual desde
+   Gemini: la herramienta le dijo «una llamada del texto no tiene
+   fuente» y él había copiado todo lo que se podía copiar. Y era
+   verdad las dos cosas.
+
+   Lo que pasa es que un informe así tiene las fuentes en OTRO SITIO de
+   la pantalla —plegadas bajo un «Fuentes usadas en el informe»— y las
+   llamadas son numeritos dibujados, no letras. Al copiar el informe no
+   viene ni la lista ni los numeritos: en ochomil palabras llegó UNA
+   sola llamada, la única escrita a mano dentro de una frase
+   —«(TALIS 2018)»—, y ninguna fuente. Ninguna regla de lectura puede
+   arreglar eso, porque lo que falta no está en el texto. Lo único que
+   lo arregla es una caja donde pegar la lista, que es lo que hay aquí.
+
+   Un renglón, una fuente. Y un renglón que es SOLO un dominio
+   («publications.iadb.org») no es una fuente: es el rótulo que esos
+   informes ponen encima del título, y se junta con el de debajo.
+   Separados serían dos entradas y ninguna de las dos diría nada. */
+const VOZ_SOLO_DOMINIO = /^(https?:\/\/)?[a-z0-9-]+(\.[a-z0-9-]{2,})+\/?$/i;
+
+function vozFuentesDeLista(txt) {
+  const lineas = String(txt || '').replace(/\r\n?/g, '\n').split('\n')
+    .map(l => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  /* Un «Fuentes usadas en el informe» pegado de cabecera es el rótulo
+     de la lista, no la primera fuente. */
+  if (lineas.length && vozEsTituloFuentes(lineas[0])) lineas.shift();
+  const juntas = [];
+  for (let i = 0; i < lineas.length; i++) {
+    let l = lineas[i];
+    if (VOZ_SOLO_DOMINIO.test(l) && i + 1 < lineas.length && !VOZ_SOLO_DOMINIO.test(lineas[i + 1])) {
+      /* El título delante —que es por donde se busca el apellido— y el
+         dominio detrás, que es de donde sale el enlace. */
+      l = lineas[i + 1] + ' · ' + l.replace(/\/$/, '');
+      i++;
+    }
+    juntas.push({ t: l });
+  }
+  /* El dominio queda al FINAL de la entrada, que es donde
+     `vozDominioAlFinal` lo busca: así el enlace sobrevive a corregir el
+     texto, que es donde se perdía. */
+  return juntas.map(x => vozFuenteDeTexto(x.t, null));
+}
+
+/* Mete las fuentes de la caja en lo que se leyó del texto: en el
+   capítulo de bibliografía que el texto ya traía, si lo traía, y si no
+   en uno nuevo al final. Va aparte del lector a propósito: el lector
+   lee UN texto, y aquí son dos cosas pegadas en dos sitios. */
+function vozComponerFuentes(r, txt) {
+  const lista = vozFuentesDeLista(txt);
+  if (!lista.length) return r;
+  const caps = r.capitulos || [];
+  const ultimo = caps[caps.length - 1];
+  if (ultimo && ultimo.ref) ultimo.p = (ultimo.p || []).concat(lista);
+  else caps.push({ t: 'Referencias', ref: true, p: lista });
+  r.cuenta.fuentes += lista.length;
+  return r;
+}
+
+/* Las fuentes de un texto guardado, devueltas a la caja: un renglón
+   cada una, con su número si lo traía. */
+function vozFuentesTexto(c) {
+  const L = [];
+  (c.capitulos || []).forEach(cap => (cap.p || []).forEach(b => {
+    if (b.k === 'fuente') L.push((b.n != null ? '[' + b.n + '] ' : '') + b.t);
+  }));
+  return L.join('\n');
+}
+
+/* El texto buscable de un bloque, sea de la clase que sea. Una tabla no
+   tiene `t` —tiene celdas—, y sin esto el buscador no encontraría nunca
+   una cifra dentro de una tabla, que en un ensayo de investigación es
+   justo lo que se busca. */
+function vozTextoDeBloque(b) {
+  if (!b) return '';
+  if (b.k === 'tabla') {
+    return (b.tit ? b.tit + ' ' : '') + (b.cab || []).join(' ') + ' ' +
+           (b.f || []).map(fila => fila.join(' ')).join(' ');
+  }
+  return b.t || '';
+}
+
+/* ─── Casar una llamada del texto con su fuente ────────────────────
+   Son dos formas y hay que entender las dos, porque un ensayo usa una
+   o la otra y nunca las dos a la vez:
+
+     · la numérica —«[3]», «[^3]», «³»—, que apunta a la entrada 3 de
+       la bibliografía y no tiene ninguna ambigüedad;
+     · la de autor y año —«(Harari, 2014, p. 45)», «Harari (2014)»—,
+       que es la de las normas APA y se casa por APELLIDO + AÑO.
+
+   Y en las dos manda lo mismo: si no hay una fuente a la que apuntar,
+   NO SE TOCA EL TEXTO. Sin bibliografía, un ensayo lleno de paréntesis
+   se lee exactamente igual que antes de que existiera esto. */
+
+const VOZ_SUPER = { '¹': '1', '²': '2', '³': '3', '⁰': '0',
+  '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9' };
+
+/* Las palabras que en un paréntesis de cita NO son el apellido de
+   nadie. Sin esta lista, «(Cfr. Harari, 2014)» buscaría a un señor
+   llamado Cfr. */
+const VOZ_NO_APELLIDO = /^(cfr|cf|vid|ver|vease|veanse|et|al|ibid|ibidem|op|cit|p|pp|pag|pags|cap|caps|n|num|vol|ed|eds|trad|comp|coord|apud|como|segun|citado|citada|en|de|del|la|el|los|las|y|e|o|u|a|por|para|sobre|entre|desde|hasta|tabla|cuadro|figura|grafico|anexo|nota)$/;
+
+/* Los apellidos que trae escrito un trozo de cita, en minúsculas y sin
+   tildes: las palabras que empiezan por mayúscula y no están en la
+   lista de arriba. */
+function vozApellidosEn(s) {
+  const out = [];
+  const re = /([A-ZÁÉÍÓÚÜÑ][\wÁÉÍÓÚÜÑáéíóúüñ'’-]{2,})/g;
+  let m;
+  while ((m = re.exec(String(s || ''))) !== null) {
+    const p = vozSinTildes(m[1]).toLowerCase().replace(/[^a-z0-9'’-]/g, '');
+    if (p.length > 2 && !VOZ_NO_APELLIDO.test(p)) out.push(p);
+  }
+  return out;
+}
+
+function vozAniosEn(s) {
+  const out = [];
+  const re = /\b(1[5-9]\d{2}|20\d{2})\b/g;
+  let m;
+  while ((m = re.exec(String(s || ''))) !== null) out.push(m[1]);
+  return out;
+}
+
+/* El índice de fuentes de un texto: la lista en el orden en que están
+   escritas, cada una con su número —si lo trae— y con la cabeza de la
+   entrada, que es donde va el apellido en cualquier norma de cita
+   («Harari, Y. N. (2014). Sapiens…»). Se calcula una vez por texto
+   abierto: en un ensayo de cien párrafos esto se preguntaría una vez
+   por párrafo pintado. */
+let _vozIdxFuentes = null;
+
+function vozIndiceFuentes(c) {
+  if (!c) return null;
+  if (_vozIdxFuentes && _vozIdxFuentes.cid === c.cid) return _vozIdxFuentes;
+  const lista = [];
+  (c.capitulos || []).forEach((cap, ci) => (cap.p || []).forEach((b, i) => {
+    if (b.k !== 'fuente') return;
+    const t = b.t || '';
+    lista.push({
+      fid: 'f' + lista.length,
+      n: (b.n != null) ? b.n : null,
+      t: t,
+      url: b.url || vozUrlEn(t),
+      cap: ci, vp: i,
+      /* El apellido va en los primeros caracteres de la entrada: se
+         miran noventa, que es de sobra para «García Márquez, G. (1967)»
+         y poco para que un apellido del TÍTULO case por casualidad. */
+      cabeza: vozSinTildes(t).toLowerCase().slice(0, 90),
+      anios: vozAniosEn(t),
+    });
+  }));
+  const porN = new Map();
+  lista.forEach(f => { if (f.n != null && !porN.has(f.n)) porN.set(f.n, f); });
+  /* ⚠️ Y UNA BIBLIOGRAFÍA SIN NÚMEROS NO SE NUMERA SOLA. Sería fácil
+     contar 1, 2, 3 por el orden de la lista y casar así los «[2]» del
+     cuerpo; y sería adivinar. En una bibliografía de estilo APA el
+     orden es alfabético, así que ese «[2]» apuntaría a quien no es, la
+     ficha enseñaría a OTRO autor y nadie tendría por qué dudarlo: una
+     atribución falsa, que es exactamente contra lo que existe esta
+     herramienta. Sin número escrito, la llamada se queda como texto y
+     el repaso la cuenta entre las que no tienen fuente, que es lo que
+     dice qué hay que arreglar —numerar la bibliografía— en vez de
+     taparlo con una suposición. */
+  _vozIdxFuentes = { cid: c.cid, lista: lista, porN: porN };
+  return _vozIdxFuentes;
+}
+
+function vozOlvidaFuentes() { _vozIdxFuentes = null; }
+
+/* ¿A qué fuentes apunta un paréntesis de cita? `antes` es lo que va
+   escrito justo delante, y hace falta para la forma narrativa —«Harari
+   (2014) sostiene…»—, donde el apellido está FUERA del paréntesis. */
+function vozCasaParentesis(dentro, antes, idx) {
+  const anios = vozAniosEn(dentro);
+  if (!anios.length) return [];
+  const fuera = vozApellidosEn(String(antes || '').slice(-70));
+  const out = [];
+  /* Un paréntesis puede llevar varias citas separadas por «;»
+     —«(Harari, 2014; Graeber, 2011)»— y entonces la ficha las enseña
+     todas: en un ensayo eso es una sola afirmación con dos respaldos. */
+  String(dentro).split(';').forEach(trozo => {
+    /* El apellido de FUERA del paréntesis solo vale cuando dentro no
+       hay ninguno, que es la forma narrativa —«Harari (2014) sostiene»—.
+       Sumándolo siempre, un «(Smith, 2014)» en una frase que empezaba
+       por «Harari» podría casar con la entrada de Harari: la ficha
+       enseñaría al autor equivocado. */
+    const dentroAp = vozApellidosEn(trozo);
+    const ap = dentroAp.length ? dentroAp : fuera.slice(-2);
+    const an = vozAniosEn(trozo).length ? vozAniosEn(trozo) : anios;
+    if (!ap.length) return;
+    for (const f of idx.lista) {
+      if (!an.some(a => f.anios.indexOf(a) >= 0)) continue;
+      if (!ap.some(p => new RegExp('(^|[^a-z0-9])' + p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z0-9]|$)').test(f.cabeza))) continue;
+      if (out.indexOf(f) < 0) out.push(f);
+      break;
+    }
+  });
+  return out;
+}
+
+/* ¿Esto INTENTABA ser una cita? Sirve para contar las que se quedaron
+   sin fuente y decirlo en el repaso del pegado: en un ensayo, una
+   llamada sin entrada en la bibliografía es casi siempre una fuente
+   que se quedó sin apuntar, y encontrarla releyendo cuarenta páginas
+   es lo que hace que nadie la busque. No se marca un paréntesis
+   cualquiera que lleve un año dentro («en 1955 volvió a Comala»): se
+   le pide empezar por un nombre propio y ser corto. */
+function vozPareceCita(dentro) {
+  const s = String(dentro || '').trim();
+  if (s.split(/\s+/).length > 9) return false;
+  if (!vozAniosEn(s).length) return false;
+  return /^([A-ZÁÉÍÓÚÑ]|et al|cfr|cf\.)/.test(s) && vozApellidosEn(s).length > 0;
+}
+
+/* Las llamadas que hay en un trozo de texto, con dónde empieza y acaba
+   cada una. Es la ÚNICA función que decide qué es una llamada: la usa
+   el que pinta y la usa el que cuenta, para que el repaso del pegado no
+   pueda decir una cosa y la página otra. */
+function vozLlamadasEn(s, idx) {
+  const res = [], huerfanas = [];
+  const txt = String(s || '');
+  if (!txt) return { res: res, huerfanas: huerfanas };
+  const re = /\[\^?(\d{1,3})\]|\(([^()]{2,160})\)|([¹²³⁰⁴-⁹]{1,3})/g;
+  let m;
+  while ((m = re.exec(txt)) !== null) {
+    const ini = m.index, fin = re.lastIndex;
+    let fuentes = [], numero = null, parecia = false;
+    if (m[1] != null || m[3] != null) {
+      numero = m[1] != null ? parseInt(m[1], 10)
+        : parseInt(String(m[3]).split('').map(ch => VOZ_SUPER[ch] || '').join(''), 10);
+      parecia = !!numero;
+      const f = idx && !isNaN(numero) ? idx.porN.get(numero) : null;
+      if (f) fuentes = [f];
+    } else {
+      parecia = vozPareceCita(m[2]);
+      if (idx) fuentes = vozCasaParentesis(m[2], txt.slice(Math.max(0, ini - 70), ini), idx);
+    }
+    if (fuentes.length) res.push({ i: ini, f: fin, t: txt.slice(ini, fin), fuentes: fuentes, n: numero });
+    else if (parecia) huerfanas.push({ i: ini, f: fin, t: txt.slice(ini, fin) });
+  }
+  return { res: res, huerfanas: huerfanas };
+}
+
+/* Dónde está citada cada fuente, para el panel 📚 Fuentes y para el
+   repaso. Recorre el texto una vez y se queda con el capítulo y el
+   párrafo de cada llamada: es lo que convierte la lista de la
+   bibliografía en algo por lo que se puede navegar. */
+function vozMapaCitas(c) {
+  const idx = vozIndiceFuentes(c);
+  const donde = new Map(), huerfanas = [];
+  if (!idx) return { idx: null, donde: donde, huerfanas: huerfanas };
+  (c.capitulos || []).forEach((cap, ci) => {
+    (cap.p || []).forEach((b, i) => {
+      /* Una entrada de bibliografía no se cita a sí misma: su «(2014)»
+         es la fecha de la obra, no una llamada. Se mira BLOQUE a
+         bloque y no capítulo a capítulo, porque la bibliografía puede
+         colgar de un subtítulo dentro de un capítulo que sí tiene
+         cuerpo citado más arriba. */
+      if (b.k === 'fuente') return;
+      const t = vozTextoDeBloque(b);
+      if (!t) return;
+      const ll = vozLlamadasEn(t, idx);
+      ll.res.forEach(x => x.fuentes.forEach(f => {
+        if (!donde.has(f.fid)) donde.set(f.fid, []);
+        const l = donde.get(f.fid);
+        if (!l.some(y => y.cap === ci && y.vp === i)) l.push({ cap: ci, vp: i, t: x.t });
+      }));
+      ll.huerfanas.forEach(x => huerfanas.push({ cap: ci, vp: i, t: x.t }));
+    });
+  });
+  return { idx: idx, donde: donde, huerfanas: huerfanas };
+}
+
 function vozLeer(texto, opciones) {
   const op = opciones || {};
   const versos = op.versos === 'si' ? 'si' : 'auto';
   const out = { titulo: '', voz: '', maquina: '', genero: '', encargo: '', nota: '',
                 capitulos: [], avisos: [],
-                cuenta: { citas: 0, versos: 0, listas: 0, subt: 0 } };
+                cuenta: { citas: 0, versos: 0, listas: 0, subt: 0, fuentes: 0, tablas: 0 } };
   const lineas = String(texto || '').replace(/\r\n?/g, '\n').replace(/\u00a0/g, ' ').split('\n');
 
   /* Primera pasada: qué nivel de almohadilla es el de capítulo. El
@@ -655,6 +1117,18 @@ function vozLeer(texto, opciones) {
 
   let cap = null, buf = [], bufCita = [], frente = true;
   let enCerca = false, bufCerca = [];
+  /* ⚠️ DENTRO DE UN CAPÍTULO DE BIBLIOGRAFÍA, CADA RENGLÓN ES UNA
+     ENTRADA. Una bibliografía se pega casi siempre así —una entrada por
+     renglón y sin blancos en medio, porque en el original iban con
+     sangría francesa—, y juntarlas como se juntan las líneas de un
+     párrafo dejaría las cuarenta entradas en UNA SOLA fuente kilométrica:
+     ni se puede citar, ni se puede consultar, ni se ve que esté mal. Es
+     la excepción a «renglones seguidos son un párrafo», y se permite
+     porque el rótulo del capítulo la corrobora sin ninguna duda. */
+  let enBiblio = false;
+  /* Las notas al pie definidas por el camino («[^3]: …»): se juntan
+     aquí y se cuelgan al final, como en un libro. */
+  const notas = [];
 
   const hayContenido = () => !!(cap && cap.p.length);
   const asegura = () => { if (!cap) cap = { t: '', p: [] }; };
@@ -686,6 +1160,12 @@ function vozLeer(texto, opciones) {
     cierraCita();
     if (!buf.length) return;
     asegura();
+    if (enBiblio) {
+      buf.forEach(l => { const t = l.trim(); if (t) cap.p.push({ k: 'p', t: t }); });
+      buf = [];
+      frente = false;
+      return;
+    }
     const modo = (versos === 'si' || out.genero === 'poema') ? 'si' : 'auto';
     const esVerso = (modo === 'si' && buf.length >= 2) || (modo === 'auto' && vozParecenVersos(buf));
     if (esVerso) {
@@ -698,11 +1178,21 @@ function vozLeer(texto, opciones) {
     frente = false; // la cabecera del pegado termina en la primera prosa
   };
   const abreCap = (t) => {
-    cierra();
+    cierra();                       // con la bandera del capítulo que se cierra
     if (cap) out.capitulos.push(cap);
     cap = { t: String(t || '').trim(), p: [] };
+    enBiblio = vozEsTituloBibliografia(cap.t);
   };
   const marca = (p) => { cierra(); asegura(); cap.p.push(p); frente = false; };
+  /* Un subtítulo puede ser también la cabecera de la bibliografía: con
+     los capítulos en «##», un «REFERENCIAS» pelado al final entra como
+     subtítulo del último capítulo, no como capítulo propio (regla 3), y
+     sin esto sus cuarenta entradas se juntarían en un párrafo. */
+  const marcaSub = (t) => {
+    marca({ k: 'h3', t: t });
+    out.cuenta.subt++;
+    if (vozEsTituloBibliografia(t)) enBiblio = true;
+  };
 
   for (let i = 0; i < lineas.length; i++) {
     const cruda = lineas[i];
@@ -722,6 +1212,60 @@ function vozLeer(texto, opciones) {
 
     if (!l) { cierra(); continue; }
 
+    /* ⚠️ UNA TABLA SE LEE POR SU RENGLÓN DE GUIONES, y eso es lo único
+       que la hace inequívoca. Sin pedirlo, tres frases con un tubo
+       dentro se convertirían en una tabla de tres filas: es el fallo de
+       la regla 3 —partir el texto y parecer que funcionó— con otra
+       cara. */
+    const filaT = vozFilaTabla(l);
+    const alT = filaT ? vozSepTabla((lineas[i + 1] || '').trim()) : null;
+    if (filaT && alT) {
+      /* El rótulo («Tabla 2: Deuda externa») va en el renglón de
+         encima y ya entró en el párrafo que se estaba juntando: se le
+         saca de ahí antes de cerrarlo, para que no quede como una
+         frase suelta colgando encima de la tabla. */
+      let titT = '';
+      if (buf.length && vozTituloTabla(buf[buf.length - 1])) { titT = vozTituloTabla(buf[buf.length - 1]); buf.pop(); }
+      else if (!buf.length && cap && cap.p.length) {
+        /* Y casi siempre el rótulo tiene un blanco debajo, así que ya
+           se cerró como párrafo propio: se le saca de ahí. Solo si el
+           bloque ENTERO era el rótulo — si venía pegado al final de un
+           párrafo de verdad, ese párrafo no se toca. */
+        const ult = cap.p[cap.p.length - 1];
+        if (ult.k === 'p' && vozTituloTabla(ult.t) === ult.t.trim()) { titT = ult.t.trim(); cap.p.pop(); }
+      }
+      const filas = [];
+      let j = i + 2;
+      for (; j < lineas.length; j++) {
+        const lj = lineas[j].trim();
+        if (!lj) break;
+        const cf = vozFilaTabla(lj);
+        if (!cf) break;
+        filas.push(cf);
+      }
+      /* Todas las filas al ancho de la más ancha: a una fila a la que
+         le falta una celda la tabla le sale escalonada, y a una que
+         trae de más recortarla le perdería un dato. */
+      let ancho = filaT.length;
+      filas.forEach(f => { if (f.length > ancho) ancho = f.length; });
+      const cuadra = f => { const c = f.slice(); while (c.length < ancho) c.push(''); return c; };
+      marca({ k: 'tabla', tit: titT, cab: cuadra(filaT), al: cuadra(alT).map(x => x || ''), f: filas.map(cuadra) });
+      out.cuenta.tablas++;
+      i = j - 1;
+      continue;
+    }
+
+    /* Una nota al pie escrita como se escriben («[^3]: …»). Se apunta y
+       se saca de aquí: dejarla en mitad de la prosa parte el párrafo en
+       dos. Es lo ÚNICO que este lector mueve de sitio, y se permite
+       porque esa forma no se escribe por accidente ni una vez. */
+    const fn = l.match(/^\[\^([^\]]{1,12})\]:\s*(\S.*)$/);
+    if (fn) {
+      const numN = parseInt(fn[1], 10);
+      notas.push({ n: isNaN(numN) ? null : numN, t: fn[2].trim() });
+      continue;
+    }
+
     if (vozEsSeparador(l)) {
       /* Una raya ANTES de cualquier contenido es la cerca de una
          cabecera («---» arriba y abajo de las etiquetas, como escriben
@@ -738,7 +1282,7 @@ function vozLeer(texto, opciones) {
       const t = vozDesnuda(alm[2]);
       if (i === primerAlm && tituloEnAlm) { if (!out.titulo) out.titulo = t; continue; }
       if (esCapAlm(alm[1].length)) abreCap(t);
-      else { marca({ k: 'h3', t: t }); out.cuenta.subt++; }
+      else marcaSub(t);
       continue;
     }
 
@@ -831,7 +1375,7 @@ function vozLeer(texto, opciones) {
       if (puedeSerTitulo && !vozHaySiguienteIgual(lineas, i, clase, conAlmohadillas)) {
         out.titulo = t;
       } else if (nivel === 'sub' && (cap || out.capitulos.length)) {
-        marca({ k: 'h3', t: t }); out.cuenta.subt++;
+        marcaSub(t);
       } else {
         abreCap(t);
       }
@@ -885,6 +1429,71 @@ function vozLeer(texto, opciones) {
     }
   }
 
+  /* ── LA BIBLIOGRAFÍA ES UN CAPÍTULO DEL ENSAYO ──
+     Un capítulo que se llama «Referencias», «Bibliografía» o «Notas» y
+     está AL FINAL: sus entradas dejan de ser ítems de lista y pasan a
+     ser bloques `fuente`, que es lo que las hace consultables desde
+     una llamada del cuerpo. No se mueven ni se reescriben: solo se les
+     separa el número de delante, igual que a un ítem de lista se le
+     separa la viñeta. Y se pide que esté al final porque un ensayo
+     puede ABRIR con una «Nota» del autor, y eso es prosa.  */
+  const nCaps = out.capitulos.length;
+  const conFuentes = [];
+  out.capitulos.forEach((cap, ci) => {
+    if (ci < nCaps - 2) { conFuentes.push(cap); return; }
+    /* O el capítulo entero se llama «Referencias», o la bibliografía
+       cuelga de un subtítulo dentro del último capítulo, que es como
+       queda cuando los capítulos van en «##» y el rótulo final va
+       pelado (regla 3: con almohadillas puestas, unas mayúsculas
+       sueltas son subtítulo). Desde ahí hasta el final, todo son
+       fuentes. */
+    let desde = 0, titulo = '';
+    if (vozEsTituloFuentes(cap.t)) cap.ref = true;
+    else {
+      const k = (cap.p || []).findIndex(b => b.k === 'h3' && vozEsTituloBibliografia(b.t));
+      if (k < 0) { conFuentes.push(cap); return; }
+      desde = k + 1;
+      titulo = cap.p[k].t;
+    }
+    const aFuente = b => {
+      if (b.k !== 'li' && b.k !== 'p') return b;
+      /* Deja de contar como ítem de lista: en el repaso del pegado,
+         «3 ítems de lista» y «3 fuentes» para las mismas tres líneas se
+         lee como si el lector hubiera entendido seis cosas. */
+      if (b.k === 'li' && out.cuenta.listas > 0) out.cuenta.listas--;
+      out.cuenta.fuentes++;
+      return vozFuenteDeTexto(b.t, b.n);
+    };
+    if (!desde) { cap.p = (cap.p || []).map(aFuente); conFuentes.push(cap); return; }
+    /* ⚠️ Y LA BIBLIOGRAFÍA SE QUEDA EN SU PROPIO CAPÍTULO, aunque
+       viniera como subtítulo. Dos razones y las dos pesan: en el índice
+       de la sala «Referencias» tiene que ser una entrada a la que se
+       pueda ir —es lo que más se consulta de un ensayo—, y sin esto la
+       ida y vuelta del recuadro de corregir no sería estable (el
+       subtítulo vuelve como capítulo al releerse, y la comprobación 16
+       exige que lo que sale se lea IGUAL). */
+    const cuerpo = (cap.p || []).slice(0, desde - 1);
+    const fuentes = (cap.p || []).slice(desde).map(aFuente);
+    if (cuerpo.length) conFuentes.push({ t: cap.t, p: cuerpo, epi: cap.epi });
+    else if (cap.epi) conFuentes.push({ t: cap.t, p: [], epi: cap.epi });
+    conFuentes.push({ t: titulo, ref: true, p: fuentes });
+  });
+  out.capitulos = conFuentes.filter(c => (c.p || []).length || c.t);
+  if (!out.capitulos.length) out.capitulos = [{ t: '', p: [] }];
+
+  /* Las notas al pie recogidas por el camino van a su propio capítulo,
+     al final, como en un libro. Si el texto ya traía uno de fuentes,
+     se le suman ahí en vez de abrir otro que diría casi lo mismo. */
+  if (notas.length) {
+    const bloques = notas.map(x => vozFuenteDeTexto(x.t, x.n));
+    out.cuenta.fuentes += bloques.length;
+    const ultimo = out.capitulos[out.capitulos.length - 1];
+    if (ultimo && ultimo.ref) ultimo.p = (ultimo.p || []).concat(bloques);
+    else if (out.capitulos.length === 1 && !ultimo.t && !(ultimo.p || []).length) {
+      ultimo.t = 'Notas'; ultimo.ref = true; ultimo.p = bloques;
+    } else out.capitulos.push({ t: 'Notas', ref: true, p: bloques });
+  }
+
   /* El género, si el texto no lo dijo: un texto que es casi todo verso
      es un poema. Lo demás lo elige quien pega, y por defecto «cuento». */
   if (!out.genero) {
@@ -898,7 +1507,7 @@ function vozLeer(texto, opciones) {
 /* Cuántos bloques de cada clase trae un texto guardado, para la ficha
    y para la hoja de corregir. */
 function vozCuentaBloques(caps) {
-  const n = { p: 0, cita: 0, verso: 0, li: 0, h3: 0, sep: 0 };
+  const n = { p: 0, cita: 0, verso: 0, li: 0, h3: 0, sep: 0, tabla: 0, fuente: 0 };
   (caps || []).forEach(c => (c.p || []).concat(c.epi || []).forEach(b => { if (n[b.k] != null) n[b.k]++; }));
   return n;
 }
@@ -963,24 +1572,40 @@ function vozFusiona(local, nube) {
 
 const VOZ_COLUMNAS = 'cid,titulo,voz,maquina,encargo,nota,capitulos,palabras,borrado,puesto_por,creado_at,actualizado';
 
+/* Las que llegaron DESPUÉS de la tabla, en orden de llegada. Añadir una
+   es esta línea más su `alter table … add column if not exists` en el
+   SQL: la maquinaria de «la base va vieja» ya no hay que tocarla. */
+const VOZ_COLS_NUEVAS = ['genero', 'estantes'];
+
+function vozFaltaColumna(error) {
+  return !!error && (error.code === '42703' || /column .* does not exist/i.test(error.message || ''));
+}
+
 async function vozBajar() {
   const sb = vozSb();
   if (!sb) { _vozEstadoNube = 'sin-sesion'; return null; }
   const pide = (cols) => vozConReloj(sb.from(VOZ_TABLE)
     .select(cols).order('actualizado', { ascending: false }).limit(400));
 
-  let { data, error } = await pide(VOZ_COLUMNAS + ',genero');
-
   /* ⚠️ LA BASE PUEDE IR UNA VERSIÓN ATRÁS: con la tabla creada el día
-     del estreno y sin volver a correr el SQL, la columna `genero` no
-     existe y PostgREST rebota la consulta entera (42703). Eso NO es
+     del estreno y sin volver a correr el SQL, la columna nueva no
+     existe y PostgREST rebota la consulta ENTERA (42703). Eso NO es
      «sin señal» ni «falta el SQL»: la tabla está y los textos también.
-     Se vuelve a pedir sin la columna, se trabaja con el género solo en
-     el aparato y la barra dice exactamente qué hay que volver a correr. */
-  if (error && (error.code === '42703' || /column .* does not exist/i.test(error.message || ''))) {
-    _vozNubeVieja = true;
-    ({ data, error } = await pide(VOZ_COLUMNAS));
+     Se vuelve a pedir sin esa columna —la que el propio error nombra—,
+     se trabaja con ella solo en el aparato, y la barra dice exactamente
+     qué hay que volver a correr. Con dos columnas nuevas hay que
+     quitarlas UNA A UNA: quitar las dos por una que falte dejaría el
+     género en el aparato en una base que sí lo tiene. */
+  let faltan = [], data = null, error = null;
+  for (let intento = 0; intento <= VOZ_COLS_NUEVAS.length; intento++) {
+    const extras = VOZ_COLS_NUEVAS.filter(c => faltan.indexOf(c) < 0);
+    ({ data, error } = await pide([VOZ_COLUMNAS].concat(extras).join(',')));
+    if (!vozFaltaColumna(error) || !extras.length) break;
+    const nombrada = extras.find(c => new RegExp('\\b' + c + '\\b').test(error.message || ''));
+    faltan.push(nombrada || extras[extras.length - 1]);
   }
+  _vozFaltan = faltan;
+  _vozNubeVieja = faltan.length > 0;
 
   if (error) {
     /* ⚠️ UN CORTE DE RED NO ES UNA TABLA QUE FALTA. El cliente de
@@ -1043,7 +1668,8 @@ async function vozSubir(c) {
     borrado: !!c.borrado, actualizado: c.actualizado || Date.now(),
     puesto_por: yo,
   };
-  if (!_vozNubeVieja) fila.genero = c.genero || 'cuento';
+  if (_vozFaltan.indexOf('genero') < 0) fila.genero = c.genero || 'cuento';
+  if (_vozFaltan.indexOf('estantes') < 0) fila.estantes = vozEstantesDe(c);
   const { error } = await vozConReloj(sb.from(VOZ_TABLE).upsert(fila, { onConflict: 'cid' }));
   if (error) {
     /* Se distinguen los motivos porque cada uno se arregla de manera
@@ -1092,7 +1718,19 @@ async function vozSubirPendientes(nube) {
 
 function vozRotuloNube() {
   if (_vozEstadoNube === 'puesta')    return { ic: '☁️', t: 'Los textos viajan a todos los aparatos de la casa', cls: 'voz-nube-ok' };
-  if (_vozEstadoNube === 'vieja')     return { ic: '☁️', t: 'Viajan, pero la base va vieja: vuelve a correr voz_prestada.sql para que el género también viaje', cls: 'voz-nube-no' };
+  if (_vozEstadoNube === 'vieja') {
+    /* ⚠️ Y NOMBRA LA COLUMNA QUE FALTA, no «el género» siempre. Desde
+       que son dos, un mensaje fijo manda a buscar lo que no es: quien
+       lea «para que el género también viaje» con el género ya puesto y
+       los estantes sin poner, vuelve a correr el archivo sin entender
+       qué arregló. Es la regla de siempre: un aviso que se equivoca de
+       causa manda a mirar donde no está el problema. */
+    const nombres = { genero: 'el género', estantes: 'los estantes' };
+    const l = _vozFaltan.map(c => nombres[c] || c);
+    const que = l.length ? l.join(' y ') : 'lo nuevo';
+    return { ic: '☁️', t: 'Viajan, pero la base va vieja: vuelve a correr voz_prestada.sql para que ' +
+             que + (l.length > 1 ? ' también viajen' : ' también viaje'), cls: 'voz-nube-no' };
+  }
   if (_vozEstadoNube === 'sin-tabla') return { ic: '📴', t: 'Solo en este aparato: falta correr voz_prestada.sql', cls: 'voz-nube-no' };
   if (_vozEstadoNube === 'sin-senal') return { ic: '📡', t: 'Sin señal: se guarda aquí y sube cuando vuelva', cls: 'voz-nube-no' };
   if (_vozEstadoNube === 'sin-sesion') return { ic: '📴', t: 'Solo en este aparato: entra en F.A.R.O para que viaje', cls: 'voz-nube-no' };
@@ -1206,6 +1844,146 @@ async function initVozPrestada() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   LOS ESTANTES DEL ANAQUEL
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026: «me gustaría tener
+   la opción de poder editar las categorías de los textos para ubicarlos
+   en los anaqueles según mis criterios y no que me los den
+   predeterminados».
+
+   ⚠️ Y SON UN EJE APARTE DEL GÉNERO, que es la decisión que lo explica
+   todo. El género dice QUÉ ES el texto —un ensayo, un poema— y por eso
+   sale en su portada («Ensayo escrito por Gemini»): es parte de la
+   etiqueta, la regla 1, y no se puede renombrar a gusto sin que esa
+   frase deje de decir lo que tiene que decir. El estante dice DÓNDE LO
+   PONE SU DUEÑO —«Maestría», «Filosofía», «Para citar»— y no significa
+   nada fuera de su anaquel.
+
+   Y hacía falta porque el género no sirve para esto: los veintiún
+   textos del autor son casi todos «Ensayo», así que agrupar por género
+   le daba un solo montón. Lo que de verdad los separa es la materia, y
+   eso no se puede adivinar desde aquí ni meter en una lista fija.
+
+   Un texto puede estar en VARIOS estantes, y eso no es un lujo: un
+   ensayo de la maestría sobre burocracia está a la vez en «Maestría» y
+   en «Burocracia», y obligar a elegir uno de los dos es obligar a
+   perder el otro. Al agrupar, ese texto sale en los dos montones, que
+   es lo que significa tener estantes y no cajones.
+
+   ⚠️ VIAJAN, y por eso están en la base y no en el aparato: un estante
+   es una propiedad del TEXTO, y el texto es de la casa. Es lo contrario
+   del orden a mano (regla 25), que es del aparato porque la seguridad
+   por fila no deja escribir las filas de los demás. Aquí cada quien
+   escribe los suyos, que es justo lo que la seguridad por fila permite.
+   Mientras no se corra el SQL, funcionan igual guardados en el aparato
+   y la barra lo dice: es la regla de la repisa de enlaces. */
+const VOZ_EST_MAX = 12;      // el mismo tope que el `check` de la base
+const VOZ_EST_LARGO = 40;
+
+/* Los estantes de un texto, limpios: sin repetidos —ni con otra
+   mayúscula o sin la tilde—, recortados y con el tope puesto. Se limpia
+   al LEER y no solo al escribir, porque en la base puede haber entrado
+   cualquier cosa desde otro aparato. */
+function vozEstantesDe(c) {
+  const l = Array.isArray(c && c.estantes) ? c.estantes : [];
+  const vistos = new Set(), out = [];
+  l.forEach(x => {
+    const t = String(x == null ? '' : x).replace(/\s+/g, ' ').trim().slice(0, VOZ_EST_LARGO);
+    const k = vozSinTildes(t).toLowerCase();
+    if (!t || vistos.has(k)) return;
+    vistos.add(k);
+    out.push(t);
+  });
+  return out.slice(0, VOZ_EST_MAX);
+}
+
+/* Todos los estantes del anaquel, por lo más usado. ⚠️ Salen de los
+   TEXTOS, nunca de una lista escrita aquí: es lo que pidió el autor con
+   todas las letras —«según mis criterios y no que me los den
+   predeterminados»— y es además la regla 15 de esta herramienta. */
+function vozEstantesTodos() {
+  const cuenta = new Map();
+  (_vozCuentos || []).forEach(c => {
+    if (!c || c.borrado) return;
+    vozEstantesDe(c).forEach(e => {
+      const k = vozSinTildes(e).toLowerCase();
+      if (!cuenta.has(k)) cuenta.set(k, { t: e, n: 0 });
+      cuenta.get(k).n++;
+    });
+  });
+  return [...cuenta.values()].sort((a, b) => b.n - a.n || a.t.localeCompare(b.t, 'es'));
+}
+
+function vozEnEstante(c, nombre) {
+  const k = vozSinTildes(nombre).toLowerCase();
+  return vozEstantesDe(c).some(e => vozSinTildes(e).toLowerCase() === k);
+}
+
+/* ⚠️ UNA SOLA FILA DE ESTANTES PARA LOS DOS SITIOS donde se ponen: la
+   hoja de pegar —donde se guardan al guardar el texto— y el menú ⋯
+   —donde se guardan al momento, que es lo que hace llevadero archivar
+   veinte textos que ya estaban—. Dos copias de esto se irían separando
+   solas, y la que menos se mira sería la que se quedara rota.
+   `dame()` devuelve lo puesto y `pon(lista)` lo recibe. */
+function vozPintarEstantes(caja, dame, pon) {
+  if (!caja) return;
+  const puestos = dame();
+  const repinta = () => vozPintarEstantes(caja, dame, pon);
+  caja.textContent = '';
+
+  const fila = vozNodo('div', 'voz-chips voz-chips-form');
+  const alterna = (nombre) => {
+    const l = dame();
+    const k = vozSinTildes(nombre).toLowerCase();
+    const i = l.findIndex(e => vozSinTildes(e).toLowerCase() === k);
+    if (i >= 0) l.splice(i, 1);
+    else {
+      if (l.length >= VOZ_EST_MAX) { vozAviso('🗂 El tope son ' + VOZ_EST_MAX + ' estantes por texto'); return; }
+      l.push(nombre);
+    }
+    pon(l);
+    repinta();
+  };
+  /* Primero los que tiene puestos, y detrás los demás del anaquel: así
+     lo que ya está se lee de un vistazo sin buscarlo entre veinte. */
+  const todos = vozEstantesTodos().map(x => x.t);
+  const orden = puestos.concat(todos.filter(t => !puestos.some(p => vozSinTildes(p).toLowerCase() === vozSinTildes(t).toLowerCase())));
+  orden.forEach(nombre => {
+    const on = puestos.some(p => vozSinTildes(p).toLowerCase() === vozSinTildes(nombre).toLowerCase());
+    const b = vozBoton('voz-chip voz-chip-chica' + (on ? ' voz-chip-on' : ''), '🗂 ' + nombre,
+      () => alterna(nombre), on ? 'Quitar de «' + nombre + '»' : 'Poner en «' + nombre + '»');
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    fila.appendChild(b);
+  });
+  if (!orden.length) {
+    fila.appendChild(vozNodo('span', 'voz-est-vacio',
+      'Todavía no hay estantes. Escribe uno abajo: «Maestría», «Filosofía», lo que te sirva para encontrarlos.'));
+  }
+  caja.appendChild(fila);
+
+  /* El campo de crear uno nuevo. Con su botón además de la tecla de
+     entrar: en una tableta, «pulsa Enter» es una instrucción que no se
+     ve por ninguna parte. */
+  const nuevo = vozNodo('div', 'voz-est-nuevo');
+  const inp = vozNodo('input', 'voz-est-in');
+  inp.type = 'text';
+  inp.maxLength = VOZ_EST_LARGO;
+  inp.placeholder = 'Un estante nuevo…';
+  inp.setAttribute('aria-label', 'Crear un estante nuevo');
+  const crea = () => {
+    const t = inp.value.replace(/\s+/g, ' ').trim().slice(0, VOZ_EST_LARGO);
+    if (!t) return;
+    inp.value = '';
+    if (!vozEstantesDe({ estantes: dame() }).some(e => vozSinTildes(e).toLowerCase() === vozSinTildes(t).toLowerCase())) alterna(t);
+    else repinta();
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); crea(); } });
+  nuevo.appendChild(inp);
+  nuevo.appendChild(vozBoton('voz-btn voz-btn-chico', '+ Añadir', crea));
+  caja.appendChild(nuevo);
+}
+
+/* ══════════════════════════════════════════════════════════════════
    EL ANAQUEL
    ══════════════════════════════════════════════════════════════════
    Tres vistas (cuadrícula, lista y detalle), seis órdenes —uno de ellos
@@ -1238,9 +2016,10 @@ const VOZ_ORDENES = [
   { id: 'avance',    t: 'A medias primero' },
 ];
 const VOZ_GRUPOS = [
-  { id: '',       t: 'Sin agrupar' },
-  { id: 'voz',    t: 'Por voz' },
-  { id: 'genero', t: 'Por género' },
+  { id: '',        t: 'Sin agrupar' },
+  { id: 'estante', t: 'Por estante' },
+  { id: 'voz',     t: 'Por voz' },
+  { id: 'genero',  t: 'Por género' },
 ];
 
 function vozLeeAnaquel() {
@@ -1295,9 +2074,10 @@ function vozVisibles() {
   return _vozCuentos.filter(c => {
     if (_vozFiltroVoz && (c.voz || '') !== _vozFiltroVoz) return false;
     if (_vozFiltroGen && vozGenero(c.genero).id !== _vozFiltroGen) return false;
+    if (_vozFiltroEst && !(_vozFiltroEst === VOZ_SIN_ESTANTE ? !vozEstantesDe(c).length : vozEnEstante(c, _vozFiltroEst))) return false;
     if (!q) return true;
     const heno = vozSinTildes([c.titulo, c.voz, c.maquina, c.encargo, c.nota, vozGenero(c.genero).t]
-      .filter(Boolean).join(' ')).toLowerCase();
+      .concat(vozEstantesDe(c)).filter(Boolean).join(' ')).toLowerCase();
     return heno.includes(q);
   });
 }
@@ -1311,16 +2091,16 @@ function vozLeido(c, pos) {
   const caps = c.capitulos || [];
   let n = 0;
   for (let i = 0; i < (pos.cap || 0) && i < caps.length; i++) {
-    (caps[i].p || []).forEach(b => { n += vozPalabrasDe(b.t); });
-    (caps[i].epi || []).forEach(b => { n += vozPalabrasDe(b.t); });
+    (caps[i].p || []).forEach(b => { n += vozPalabrasDe(vozTextoDeBloque(b)); });
+    (caps[i].epi || []).forEach(b => { n += vozPalabrasDe(vozTextoDeBloque(b)); });
   }
   const cap = caps[pos.cap || 0];
   if (cap) {
-    (cap.epi || []).forEach(b => { n += vozPalabrasDe(b.t); });
+    (cap.epi || []).forEach(b => { n += vozPalabrasDe(vozTextoDeBloque(b)); });
     const ancla = typeof pos.ancla === 'number' ? pos.ancla : 0;
     (cap.p || []).forEach((b, i) => {
-      if (i < ancla) n += vozPalabrasDe(b.t);
-      else if (i === ancla) n += Math.round(vozPalabrasDe(b.t) * Math.min(1, Math.max(0, pos.sub || 0)));
+      if (i < ancla) n += vozPalabrasDe(vozTextoDeBloque(b));
+      else if (i === ancla) n += Math.round(vozPalabrasDe(vozTextoDeBloque(b)) * Math.min(1, Math.max(0, pos.sub || 0)));
     });
   }
   return n;
@@ -1363,6 +2143,97 @@ function vozEsMio(c) {
   return !c.puesto_por || !_vozYo || c.puesto_por === _vozYo;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   UNIFICAR UN NOMBRE DE MÁQUINA MAL ESCRITO
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026: «corrige el Gemeni
+   del anaquel a Gemini». Esa errata la escribió una tableta y está
+   DENTRO de sus textos, así que no se arregla desde ningún archivo del
+   repositorio: la única mano que puede escribir esas filas es la suya,
+   porque la seguridad por fila solo deja escribir lo propio. Lo que sí
+   se puede es ponerle el arreglo a un toque.
+
+   Y no es por una errata: es por TODAS las que vengan. El nombre de la
+   máquina es un campo libre que se escribe en cada texto desde una
+   tableta, así que esto va a volver a pasar. Un «Gemeni» suelto parte
+   en dos el montón del chip que agrupa por máquina —salen dos donde
+   había uno—, sin dar ningún error y sin que nadie lo mire.
+
+   ⚠️ Y SOLO SE OFRECE LO QUE ESTÁ A UNA LETRA de uno de los nombres
+   buenos (`vozUnaLetraDe`, la misma que decide qué chips se proponen).
+   A dos letras ya caben cosas distintas de verdad —«Claude» y «Claude
+   3»— y unificarlas sería cambiarle a alguien lo que quiso escribir.
+
+   ⚠️ Y SOLO LO PROPIO. Un texto ajeno lo rechazaría la base, así que
+   ofrecerlo sería prometer algo que no se puede hacer; los de otros se
+   cuentan aparte y se dice de quién es el arreglo. */
+function vozMaquinasTorcidas() {
+  const malas = new Map();
+  (_vozCuentos || []).forEach(c => {
+    if (!c || c.borrado) return;
+    const m = String(c.maquina || '').trim();
+    if (!m) return;
+    const buena = VOZ_MAQUINAS.find(b => vozUnaLetraDe(m, b));
+    if (!buena) return;
+    if (!malas.has(m)) malas.set(m, { mala: m, buena: buena, mios: [], ajenos: 0 });
+    const e = malas.get(m);
+    if (vozEsMio(c)) e.mios.push(c.cid); else e.ajenos++;
+  });
+  return [...malas.values()];
+}
+
+function vozPintarUnificar() {
+  const caja = document.getElementById('voz-unificar');
+  if (!caja) return;
+  const lista = vozMaquinasTorcidas();
+  caja.textContent = '';
+  caja.hidden = !lista.length;
+  lista.forEach(x => {
+    const fila = vozNodo('div', 'voz-unif-fila');
+    const n = x.mios.length;
+    fila.appendChild(vozNodo('span', 'voz-unif-txt',
+      (n + x.ajenos === 1 ? 'Un texto dice' : (n + x.ajenos) + ' textos dicen') +
+      ' «' + x.mala + '», que parece «' + x.buena + '» mal escrito. Así salen dos máquinas donde hay una.'));
+    if (n) {
+      fila.appendChild(vozBoton('voz-btn voz-btn-chico', '✏️ Cambiar a «' + x.buena + '»',
+        () => vozUnificarMaquina(x.mala, x.buena),
+        'Corregir la máquina en ' + n + (n === 1 ? ' texto' : ' textos')));
+    }
+    if (x.ajenos) {
+      fila.appendChild(vozNodo('span', 'voz-unif-ajeno',
+        x.ajenos === 1 ? 'Uno lo puso otra persona de la casa: solo esa persona puede corregirlo.'
+                       : x.ajenos + ' los puso otra persona de la casa: solo esa persona puede corregirlos.'));
+    }
+    caja.appendChild(fila);
+  });
+}
+
+/* Cambia el nombre en los textos propios y los sube por el camino de
+   siempre (`vozSubir`), que ya sabe reintentar, distinguir los motivos
+   y respetar las lápidas. Aquí no se inventa un segundo camino a la
+   nube: uno de los dos se quedaría viejo. */
+async function vozUnificarMaquina(mala, buena) {
+  const sucio = String(mala).trim().toLowerCase();
+  const tocados = (_vozCuentos || []).filter(c =>
+    c && !c.borrado && vozEsMio(c) && String(c.maquina || '').trim().toLowerCase() === sucio);
+  if (!tocados.length) return;
+  tocados.forEach(c => { c.maquina = buena; c.actualizado = Date.now(); });
+  vozGuardaLocal();
+  vozRender();
+  let bien = 0, mal = '';
+  for (const c of tocados) {
+    const res = await vozSubir(c);
+    if (res.ok) bien++; else mal = res.motivo || 'rechazo';
+  }
+  const cuantos = tocados.length === 1 ? 'Un texto' : tocados.length + ' textos';
+  if (bien === tocados.length) vozAviso('✏️ ' + cuantos + ' con «' + buena + '», también en los demás aparatos');
+  else if (mal === 'sin-senal') vozAviso('✏️ ' + cuantos + ' corregidos aquí. Subirán solos la próxima vez que abras esto');
+  else if (mal === 'sin-nube') vozAviso('✏️ ' + cuantos + ' corregidos aquí. Falta correr voz_prestada.sql para que viaje');
+  else if (mal === 'sin-sesion') vozAviso('✏️ ' + cuantos + ' corregidos aquí. Entra en F.A.R.O para que viaje');
+  else vozAviso('✏️ ' + cuantos + ' corregidos aquí, pero la nube rechazó alguno');
+  vozRender();
+}
+
 function vozOrdena(lista) {
   const o = _vozAnaquel.orden;
   const rec = (a, b) => (b.actualizado || 0) - (a.actualizado || 0);
@@ -1392,6 +2263,38 @@ function vozOrdena(lista) {
 function vozAgrupa(lista) {
   const g = _vozAnaquel.grupo;
   if (!g) return [{ clave: '', titulo: '', ic: '', items: lista }];
+
+  /* ⚠️ POR ESTANTE, UN TEXTO SALE EN CADA UNO DE LOS SUYOS, y eso es lo
+     que significa tener estantes y no cajones: un ensayo de la maestría
+     sobre burocracia está en «Maestría» y en «Burocracia», y enseñarlo
+     solo en el primero sería esconderlo del segundo — que es justo el
+     montón donde alguien lo iría a buscar. Los que no están en ninguno
+     van juntos y al final, para que no desaparezcan. */
+  if (g === 'estante') {
+    const m = new Map();
+    const sueltos = [];
+    /* ⚠️ Con un estante FILTRADO, solo sale ese montón. Sin esto, filtrar
+       por «Filosofía» enseñaba además el montón «Maestría» —porque el
+       mismo texto está en los dos— y la pantalla contestaba a una
+       pregunta que nadie hizo. */
+    const soloEste = _vozFiltroEst && _vozFiltroEst !== VOZ_SIN_ESTANTE ? vozSinTildes(_vozFiltroEst).toLowerCase() : '';
+    lista.forEach(c => {
+      const suyos = vozEstantesDe(c);
+      if (!suyos.length) { sueltos.push(c); return; }
+      suyos.forEach(e => {
+        const k = vozSinTildes(e).toLowerCase();
+        if (soloEste && k !== soloEste) return;
+        if (!m.has(k)) m.set(k, { t: e, items: [] });
+        m.get(k).items.push(c);
+      });
+    });
+    const grupos = [...m.values()]
+      .sort((a, b) => b.items.length - a.items.length || a.t.localeCompare(b.t, 'es'))
+      .map(x => ({ clave: x.t, titulo: '🗂 ' + x.t, ic: '', items: x.items, h: vozColor(x.t) }));
+    if (sueltos.length) grupos.push({ clave: '', titulo: '🗂 Sin estante', ic: '', items: sueltos });
+    return grupos;
+  }
+
   const m = new Map();
   lista.forEach(c => {
     const clave = g === 'voz' ? ((c.voz || '').trim() || '—') : vozGenero(c.genero).id;
@@ -1424,6 +2327,7 @@ function vozRender() {
     est.appendChild(vozNodo('span', 'voz-nube-ic', r.ic));
     est.appendChild(vozNodo('span', null, r.t));
   }
+  vozPintarUnificar();
 
   /* «Sigue leyendo»: lo último que se dejó a medias, arriba y con un
      botón. Es lo primero que hace un lector de libros al abrirse, y lo
@@ -1431,49 +2335,18 @@ function vozRender() {
   const hero = document.getElementById('voz-sigue');
   if (hero) {
     hero.textContent = '';
-    const c = (_vozBusca.trim() || _vozFiltroVoz || _vozFiltroGen) ? null : vozEnCurso();
+    const c = (_vozBusca.trim() || _vozFiltroVoz || _vozFiltroGen || _vozFiltroEst) ? null : vozEnCurso();
     hero.hidden = !c;
     if (c) hero.appendChild(vozSigueLeyendo(c));
   }
 
   vozPintarHerramientas();
-
-  /* Los chips: género y voz, sacados de los textos y nunca de una lista
-     escrita aquí. Cada fila se esconde cuando no separa nada. */
-  const gchips = document.getElementById('voz-chips-gen');
-  if (gchips) {
-    gchips.textContent = '';
-    const gens = vozGenerosUsados();
-    const pon = (id, txt, n) => {
-      const b = vozBoton('voz-chip' + (_vozFiltroGen === id ? ' voz-chip-on' : ''), null, () => {
-        _vozFiltroGen = id; vozRender();
-        b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-      });
-      b.appendChild(vozNodo('span', null, txt));
-      if (n != null) b.appendChild(vozNodo('span', 'voz-chip-n', String(n)));
-      gchips.appendChild(b);
-    };
-    pon('', 'Todo', _vozCuentos.length);
-    gens.forEach(([g, n]) => pon(g.id, g.ic + ' ' + g.t, n));
-    gchips.hidden = gens.length < 2;
-  }
-  const chips = document.getElementById('voz-chips');
-  if (chips) {
-    chips.textContent = '';
-    const voces = vozVoces();
-    const pon = (id, txt, n) => {
-      const b = vozBoton('voz-chip' + (_vozFiltroVoz === id ? ' voz-chip-on' : ''), null, () => {
-        _vozFiltroVoz = id; vozRender();
-        b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-      });
-      b.appendChild(vozNodo('span', null, txt));
-      if (n != null) b.appendChild(vozNodo('span', 'voz-chip-n', String(n)));
-      chips.appendChild(b);
-    };
-    pon('', 'Todas las voces', _vozCuentos.length);
-    voces.forEach(([v, n]) => pon(v, '🎭 ' + v, n));
-    chips.hidden = voces.length < 2;
-  }
+  /* Y debajo, SOLO lo que esté puesto. Las tres filas de chips de género,
+     estante y voz que había aquí se fueron a la hoja que abre 🗂 (regla
+     33): lo puesto se ve, lo demás se abre. */
+  vozPintarFiltroPuesto();
+  vozPintarSelBarra();
+  vozPintarAbreAqui();
 
   const lista = vozOrdena(vozVisibles());
   cont.textContent = '';
@@ -1506,13 +2379,382 @@ function vozRender() {
   });
 }
 
-/* La fila de herramientas del anaquel: la vista, el orden y la
-   agrupación. Chips, no desplegables: un toque en vez de dos y un menú
-   del sistema. Se pinta desde las listas de arriba, nunca a mano. */
+/* ══════════════════════════════════════════════════════════════════
+   QUE F.A.R.O ABRA AQUÍ — Y SOLO EN ESTE APARATO
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026: «quiero que la
+   herramienta de La Voz Prestada pueda activarle que al abrir F.A.R.O
+   sea lo primero que se presente, tal como está Finanzas, pero que solo
+   se active en el dispositivo que uno desee; es decir, que en otros
+   dispositivos siga Finanzas como primer acceso».
+
+   Es el mismo interruptor del Apunte rápido (regla 11 de Finanzas) y se
+   escribe igual a propósito: mismo tipo de llave, mismo `role="switch"`
+   de fila entera, y el mismo respeto por `?view=`. Dos interruptores que
+   hacen lo mismo escritos de dos maneras se arreglan en uno y se quedan
+   rotos en el otro.
+
+   ⚠️ LA LLAVE ES DEL APARATO, Y ESO ES LA MITAD DE LO QUE SE PIDIÓ. Va en
+   `localStorage` y NO en la nube: encenderla en la tableta del autor no
+   puede cambiarle la pantalla de entrada a quien en esta casa abre F.A.R.O
+   para mirar el saldo. Es la misma razón por la que son del aparato la
+   posición de lectura, los ajustes de letra y el orden a mano del anaquel:
+   una costumbre de unos ojos no es un dato de la casa.
+
+   ⚠️ Y ES GLOBAL AL APARATO, no de cada presupuesto ni de cada quien: es
+   una costumbre de este teléfono, y una llave por contexto obligaría a
+   encenderla dos veces —y la segunda no se encuentra nunca—. */
+const VOZ_INICIO_KEY = 'faro.voz.abre_aqui';
+
+function vozAbreAqui() {
+  try { return localStorage.getItem(VOZ_INICIO_KEY) === '1'; }
+  catch (_) { return false; }
+}
+function vozPonerAbreAqui(v) {
+  try { v ? localStorage.setItem(VOZ_INICIO_KEY, '1') : localStorage.removeItem(VOZ_INICIO_KEY); }
+  catch (_) {}
+}
+
+/* Se dice con PALABRAS lo que va a pasar, y en las DOS posiciones: un
+   interruptor con un solo rótulo obliga a encenderlo para averiguar qué
+   hace, y quien lo enciende sin querer no sabe qué le cambió. Calcado del
+   Apunte rápido. */
+function vozPintarAbreAqui() {
+  const btn = document.getElementById('voz-abre-aqui');
+  const sub = document.getElementById('voz-abre-aqui-sub');
+  if (!btn) return;
+  const on = vozAbreAqui();
+  btn.setAttribute('aria-checked', on ? 'true' : 'false');
+  btn.classList.toggle('finq-fijo-on', on);
+  if (sub) {
+    sub.textContent = on
+      ? 'Al abrir F.A.R.O entrarás aquí, en este aparato. En los demás sigue abriendo donde abría.'
+      : 'Ahora F.A.R.O abre donde abre siempre, y aquí se llega desde el Acceso Rápido.';
+  }
+}
+
+function vozAlternarAbreAqui() {
+  const on = !vozAbreAqui();
+  vozPonerAbreAqui(on);
+  vozPintarAbreAqui();
+  if (typeof toast === 'function') {
+    toast(on ? '📖 F.A.R.O abrirá aquí, solo en este aparato'
+             : 'F.A.R.O vuelve a abrir donde abría');
+  }
+}
+
+/* Al abrir la aplicación desde cero. Lo llama js/auth.js en cuanto la
+   sesión queda puesta, que es el único instante en que se sabe que hay
+   alguien dentro y que la pantalla ya no es la del login. Devuelve `true`
+   si ABRIÓ aquí, para que quien lo llama sepa que el hueco está ocupado y
+   no le ponga otra cosa encima.
+
+   ⚠️ UNA DIRECCIÓN CON `?view=` MANDA SIEMPRE, igual que en el Apunte
+   rápido: quien toca la notificación de un mensaje del chat quiere el
+   chat, y encontrarse un anaquel de ensayos en su lugar es perder el
+   mensaje que venía a leer.
+
+   ⚠️ Y ESTO PASA SOLO AL ABRIR, NUNCA AL VOLVER A LA APLICACIÓN. Ahí está
+   la diferencia con el Apunte rápido, y no es un olvido: aquel abre una
+   HOJA encima de la pantalla en que ya estabas —y solo si estabas en
+   Finanzas—, mientras que esto CAMBIA DE PANTALLA. Volver del teclado o de
+   otra aplicación y encontrarse que F.A.R.O se llevó por delante el chat a
+   medio escribir sería el peor momento posible, que es la lección que ya
+   está escrita en `visibilitychange` de Finanzas. */
+function faroArranqueVozPrestada() {
+  if (!vozAbreAqui()) return false;
+  try {
+    if (new URLSearchParams(window.location.search).get('view')) return false;
+  } catch (_) {}
+  if (typeof switchView !== 'function') return false;
+  switchView('view-voz');
+  return true;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LA BARRA DEL ANAQUEL, Y LA HOJA DE LOS ESTANTES
+   ══════════════════════════════════════════════════════════════════
+   Rehecho el 12 de septiembre de 2026, con la captura del autor
+   delante: «observo una enorme carga cognitiva en estar clasificando o
+   categorizando, a mí me gusta como está configurado Google Play Libros
+   […] donde de manera vertical se despliegan para ver los anaqueles,
+   sin tantas vueltas».
+
+   Y tenía razón, y se podía contar: antes del primer libro había CINCO
+   filas de chips —vista, orden, agrupar, género, estante y voz—, todas
+   deslizándose a lo ancho. Media pantalla de mandos para llegar a lo que
+   se venía a ver, y ninguno contestaba la pregunta con la que uno abre
+   un anaquel, que es «¿dónde están mis cosas?».
+
+   ⚠️ LA REGLA QUE LO ORDENA TODO: LO PUESTO SE VE; LO DEMÁS SE ABRE.
+   En la barra queda solo la vista, un botón de estantes, uno de orden y
+   uno de elegir; debajo, únicamente los filtros que estén PUESTOS, cada
+   uno con su equis. Lo demás vive en una hoja que se abre, y dentro va
+   EN VERTICAL —una fila por estante, con su cuenta—, que es como se
+   miran los estantes de una estantería y como no se miran seis chips
+   que se deslizan.
+
+   ⚠️ Y NO CONTRADICE LA REGLA DE LOS CHIPS QUE SE DESLIZAN (la de las
+   materias de Videos M.E.T.A.S). Allí el problema era que ocho chips
+   ENVUELTOS ocupaban tres renglones y empujaban lo importante fuera de
+   la pantalla, y la respuesta fue deslizarlos. Aquí el problema es el
+   contrario: son CINCO FILAS de chips, y deslizar cada una no quita ni
+   una. Lo que sobra no es el envoltorio: es tenerlas todas a la vez. */
+
+/* Una fila de la hoja: icono, nombre, cuenta y la marca de lo puesto. A
+   lo ancho entero y de 44 px, que es un renglón de estantería y no un
+   chip que hay que cazar deslizando. */
+function vozFilaHoja(icono, texto, cuenta, puesto, alTocar, ayuda) {
+  const b = vozBoton('voz-hoja-fila' + (puesto ? ' voz-hoja-on' : ''), null, alTocar, ayuda);
+  b.setAttribute('aria-pressed', puesto ? 'true' : 'false');
+  b.appendChild(vozNodo('span', 'voz-hoja-ic', icono));
+  b.appendChild(vozNodo('span', 'voz-hoja-txt', texto));
+  if (cuenta != null) b.appendChild(vozNodo('span', 'voz-hoja-n', String(cuenta)));
+  b.appendChild(vozNodo('span', 'voz-hoja-tic', puesto ? '\u2713' : ''));
+  return b;
+}
+
+function vozAbrirHoja(titulo, pinta) {
+  const ov = document.getElementById('voz-anaq-overlay');
+  const cuerpo = document.getElementById('voz-anaq-cuerpo');
+  const tit = document.getElementById('voz-anaq-tit');
+  if (!ov || !cuerpo) return;
+  if (tit) tit.textContent = titulo;
+  cuerpo.textContent = '';
+  pinta(cuerpo);
+  ov.style.display = 'flex';
+}
+
+function vozCerrarHoja() {
+  const ov = document.getElementById('voz-anaq-overlay');
+  if (ov) ov.style.display = 'none';
+}
+
+/* La hoja de los estantes: los estantes primero —que es a lo que se
+   viene—, y debajo el género y la voz, que también son maneras de
+   buscar. Todo en vertical y todo con su cuenta. */
+function vozHojaEstantes(cuerpo) {
+  const total = _vozCuentos.length;
+  const elige = (campo, valor) => {
+    if (campo === 'est') _vozFiltroEst = valor;
+    if (campo === 'gen') _vozFiltroGen = valor;
+    if (campo === 'voz') _vozFiltroVoz = valor;
+    vozCerrarHoja();
+    vozRender();
+  };
+
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'ESTANTES'));
+  cuerpo.appendChild(vozFilaHoja('\ud83d\udcda', 'Todos los textos', total, !_vozFiltroEst,
+    () => elige('est', ''), 'Ver todo el anaquel'));
+  const ests = vozEstantesTodos();
+  ests.forEach(e => cuerpo.appendChild(vozFilaHoja('\ud83d\uddc2', e.t, e.n, _vozFiltroEst === e.t,
+    () => elige('est', e.t), 'Ver el estante «' + e.t + '»')));
+  const sinEstante = _vozCuentos.filter(c => !vozEstantesDe(c).length).length;
+  if (sinEstante) {
+    cuerpo.appendChild(vozFilaHoja('\ud83d\uddc2', 'Sin estante', sinEstante, _vozFiltroEst === VOZ_SIN_ESTANTE,
+      () => elige('est', VOZ_SIN_ESTANTE), 'Ver lo que falta por archivar'));
+  }
+  if (!ests.length) {
+    cuerpo.appendChild(vozNodo('p', 'voz-hoja-nota',
+      'Todavía no hay estantes. Elige varios textos con el botón de elegir y ponlos en uno, o créalo desde el menú de cualquiera.'));
+  }
+
+  const gens = vozGenerosUsados();
+  if (gens.length > 1) {
+    cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'GÉNERO'));
+    cuerpo.appendChild(vozFilaHoja('\ud83d\udcd8', 'Todos los géneros', total, !_vozFiltroGen, () => elige('gen', '')));
+    gens.forEach(([g, n]) => cuerpo.appendChild(vozFilaHoja(g.ic, g.t, n, _vozFiltroGen === g.id,
+      () => elige('gen', g.id))));
+  }
+
+  const voces = vozVoces();
+  if (voces.length > 1) {
+    cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'VOZ QUE SE IMITA'));
+    cuerpo.appendChild(vozFilaHoja('\ud83c\udfad', 'Todas las voces', total, !_vozFiltroVoz, () => elige('voz', '')));
+    voces.forEach(([v, n]) => cuerpo.appendChild(vozFilaHoja('\ud83c\udfad', v, n, _vozFiltroVoz === v,
+      () => elige('voz', v))));
+  }
+}
+
+function vozHojaOrden(cuerpo) {
+  const pon = (campo, id) => {
+    if (campo === 'orden') {
+      _vozAnaquel.orden = id;
+      if (id === 'manual' && !_vozAnaquel.manual.length) {
+        _vozAnaquel.manual = vozOrdena(_vozCuentos.slice()).map(c => c.cid);
+      }
+    } else _vozAnaquel.grupo = id;
+    vozGuardaAnaquel();
+    vozCerrarHoja();
+    vozRender();
+  };
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'ORDEN'));
+  VOZ_ORDENES.forEach(o => cuerpo.appendChild(vozFilaHoja('\u21c5', o.t, null, _vozAnaquel.orden === o.id,
+    () => pon('orden', o.id))));
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'AGRUPAR'));
+  VOZ_GRUPOS.forEach(g => cuerpo.appendChild(vozFilaHoja('\u25a4', g.t, null, _vozAnaquel.grupo === g.id,
+    () => pon('grupo', g.id))));
+}
+
+/* ══════════════ ELEGIR VARIOS Y MOVERLOS DE UNA VEZ ══════════════
+   La otra mitad de lo que se pidió: «en Play Libros se pueden
+   seleccionar varios libros y mandarlos a las categorías hechas». Con
+   veintidós textos por archivar, hacerlo de uno en uno son veintidós
+   vueltas por el menú de cada uno — y eso es justo la carga que sobraba.
+
+   ⚠️ Y SE ENTRA POR UN BOTÓN, NO SOLO POR UNA PULSACIÓN LARGA. Un gesto
+   que sea la única manera de hacer algo es algo que a veces no se puede
+   hacer: es la regla del asa de arrastre de la repisa. */
+let _vozSel = null;   // null = no se está eligiendo; si no, un Set de cid
+
+function vozSelActiva() { return !!_vozSel; }
+
+function vozSelAlterna(cid) {
+  if (!_vozSel) return;
+  if (_vozSel.has(cid)) _vozSel.delete(cid); else _vozSel.add(cid);
+  vozPintarSelBarra();
+  document.querySelectorAll('#voz-lista [data-voz-cid]').forEach(el => {
+    el.classList.toggle('voz-elegido', _vozSel.has(el.getAttribute('data-voz-cid')));
+  });
+}
+
+function vozSelEntrar() { _vozSel = new Set(); vozRender(); }
+function vozSelSalir() { _vozSel = null; vozRender(); }
+
+function vozPintarSelBarra() {
+  const barra = document.getElementById('voz-sel-barra');
+  if (!barra) return;
+  barra.textContent = '';
+  if (!_vozSel) { barra.hidden = true; document.body.classList.remove('voz-eligiendo'); return; }
+  barra.hidden = false;
+  document.body.classList.add('voz-eligiendo');
+  const n = _vozSel.size;
+  barra.appendChild(vozNodo('span', 'voz-sel-n', n === 0 ? 'Toca los textos que quieras mover'
+    : (n === 1 ? 'Un texto elegido' : n + ' textos elegidos')));
+  const mover = vozBoton('voz-btn voz-btn-pri voz-btn-chico', '\ud83d\uddc2 Mover a un estante',
+    () => vozAbrirHoja('\ud83d\uddc2 Mover a un estante', vozHojaMover));
+  mover.disabled = n === 0;
+  barra.appendChild(mover);
+  barra.appendChild(vozBoton('voz-btn voz-btn-chico', 'Salir', () => vozSelSalir(), 'Salir de elegir'));
+}
+
+/* La hoja de mover: los estantes en vertical, con la cuenta de cuántos
+   de los elegidos están YA en cada uno. Tocar uno los mete a todos; si
+   ya estaban todos, los saca. Es el mismo interruptor de siempre
+   aplicado a varios a la vez, y así una sola fila sirve para las dos
+   cosas.
+   ⚠️ Los textos AJENOS no se tocan y se dice: la seguridad por fila los
+   rechazaría, y hacer como que se movieron sería prometer algo que la
+   base deshace en el siguiente arranque. */
+function vozHojaMover(cuerpo) {
+  const elegidos = _vozCuentos.filter(c => _vozSel && _vozSel.has(c.cid));
+  const mios = elegidos.filter(vozEsMio);
+  const ajenos = elegidos.length - mios.length;
+
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-nota',
+    (mios.length === 1 ? 'Un texto elegido' : mios.length + ' textos elegidos') +
+    '. Toca un estante para meterlos; si ya están todos, los saca.'));
+  if (ajenos) {
+    cuerpo.appendChild(vozNodo('p', 'voz-hoja-aviso',
+      (ajenos === 1 ? 'Uno de los elegidos lo puso' : ajenos + ' de los elegidos los puso') +
+      ' otra persona de la casa: esos no se pueden mover.'));
+  }
+
+  const aplica = (nombre) => {
+    const dentro = mios.filter(c => vozEnEstante(c, nombre)).length;
+    const quitar = dentro === mios.length && mios.length > 0;
+    let tocados = 0;
+    mios.forEach(c => {
+      const l = vozEstantesDe(c);
+      const i = l.findIndex(e => vozSinTildes(e).toLowerCase() === vozSinTildes(nombre).toLowerCase());
+      if (quitar) { if (i < 0) return; l.splice(i, 1); }
+      else { if (i >= 0) return; if (l.length >= VOZ_EST_MAX) return; l.push(nombre); }
+      tocados++;
+      vozGuardaEstantes(c, l);
+    });
+    vozAviso(quitar ? 'Sacados de «' + nombre + '»'
+                    : (tocados === 1 ? 'Un texto' : tocados + ' textos') + ' en «' + nombre + '»');
+    vozAbrirHoja('\ud83d\uddc2 Mover a un estante', vozHojaMover);
+  };
+
+  cuerpo.appendChild(vozNodo('p', 'voz-hoja-rot', 'ESTANTES'));
+  vozEstantesTodos().forEach(e => {
+    const dentro = mios.filter(c => vozEnEstante(c, e.t)).length;
+    cuerpo.appendChild(vozFilaHoja('\ud83d\uddc2', e.t,
+      dentro ? dentro + '/' + mios.length : null,
+      dentro === mios.length && mios.length > 0,
+      () => aplica(e.t)));
+  });
+
+  /* Crear uno nuevo aquí mismo: si hubiera que salir a crearlo, la
+     selección se perdería por el camino. */
+  const nuevo = vozNodo('div', 'voz-est-nuevo');
+  const inp = vozNodo('input', 'voz-est-in');
+  inp.type = 'text';
+  inp.maxLength = VOZ_EST_LARGO;
+  inp.placeholder = 'Un estante nuevo…';
+  inp.setAttribute('aria-label', 'Crear un estante nuevo');
+  const crea = () => {
+    const t = inp.value.replace(/\s+/g, ' ').trim().slice(0, VOZ_EST_LARGO);
+    if (!t) return;
+    inp.value = '';
+    aplica(t);
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); crea(); } });
+  nuevo.appendChild(inp);
+  nuevo.appendChild(vozBoton('voz-btn voz-btn-chico', '+ Crear y mover', crea));
+  cuerpo.appendChild(nuevo);
+}
+
+/* Los filtros PUESTOS, cada uno con su equis. Es lo único que queda a la
+   vista de las cinco filas de antes, y se esconde entero cuando no hay
+   ninguno. */
+function vozPintarFiltroPuesto() {
+  const caja = document.getElementById('voz-filtro-puesto');
+  if (!caja) return;
+  caja.textContent = '';
+  const puestos = [];
+  if (_vozFiltroEst) puestos.push(['\ud83d\uddc2 ' + (_vozFiltroEst === VOZ_SIN_ESTANTE ? 'Sin estante' : _vozFiltroEst),
+    () => { _vozFiltroEst = ''; vozRender(); }]);
+  if (_vozFiltroGen) puestos.push([vozGenero(_vozFiltroGen).ic + ' ' + vozGenero(_vozFiltroGen).t,
+    () => { _vozFiltroGen = ''; vozRender(); }]);
+  if (_vozFiltroVoz) puestos.push(['\ud83c\udfad ' + _vozFiltroVoz, () => { _vozFiltroVoz = ''; vozRender(); }]);
+  if (_vozAnaquel.grupo) {
+    const g = VOZ_GRUPOS.find(x => x.id === _vozAnaquel.grupo);
+    if (g) puestos.push(['\u25a4 ' + g.t, () => { _vozAnaquel.grupo = ''; vozGuardaAnaquel(); vozRender(); }]);
+  }
+  caja.hidden = !puestos.length;
+  puestos.forEach(([txt, quita]) => {
+    const b = vozBoton('voz-puesto', null, quita, 'Quitar «' + txt + '»');
+    b.appendChild(vozNodo('span', null, txt));
+    b.appendChild(vozNodo('span', 'voz-puesto-x', '\u2715'));
+    caja.appendChild(b);
+  });
+}
+
 function vozPintarHerramientas() {
   const caja = document.getElementById('voz-herr');
   if (!caja) return;
   caja.textContent = '';
+
+  /* ⚠️ LOS TRES BOTONES VAN PRIMERO Y LAS VISTAS AL FINAL, y no es
+     gusto: la barra se desliza, así que lo último es lo que se sale de
+     la pantalla. Puestas las vistas delante —que fue como nació— ☑
+     Elegir caía fuera del borde derecho EN TODOS los teléfonos
+     (medido: 435 px de mandos en una caja de 280 a 390), o sea que la
+     mitad de lo que se pidió este día no se veía sin deslizar una barra
+     que no parece deslizarse. Y de las cuatro cosas, la vista es la que
+     se toca una vez al mes; los estantes, cada vez. Además es donde las
+     pone Play Libros: el nombre y las acciones a la izquierda, el
+     cambio de vista a la derecha. */
+  caja.appendChild(vozBoton('voz-btn voz-btn-chico voz-herr-btn', '\ud83d\uddc2 Estantes',
+    () => vozAbrirHoja('\ud83d\uddc2 Estantes', vozHojaEstantes), 'Ver los estantes, los géneros y las voces'));
+  caja.appendChild(vozBoton('voz-btn voz-btn-chico voz-herr-btn', '\u21c5 Orden',
+    () => vozAbrirHoja('\u21c5 Orden del anaquel', vozHojaOrden), 'Cambiar el orden y la agrupación'));
+  caja.appendChild(vozBoton('voz-btn voz-btn-chico voz-herr-btn' + (vozSelActiva() ? ' voz-herr-on' : ''),
+    vozSelActiva() ? '\u2715 Salir' : '\u2611 Elegir',
+    () => (vozSelActiva() ? vozSelSalir() : vozSelEntrar()),
+    'Elegir varios textos para moverlos de una vez'));
 
   const vistas = vozNodo('div', 'voz-vistas');
   vistas.setAttribute('role', 'group');
@@ -1525,27 +2767,6 @@ function vozPintarHerramientas() {
     vistas.appendChild(b);
   });
   caja.appendChild(vistas);
-
-  const fila = (rotulo, ops, activo, alTocar) => {
-    const f = vozNodo('div', 'voz-chips voz-chips-herr');
-    f.appendChild(vozNodo('span', 'voz-herr-rot', rotulo));
-    ops.forEach(o => {
-      const b = vozBoton('voz-chip voz-chip-chica' + (o.id === activo ? ' voz-chip-on' : ''), o.t, () => {
-        alTocar(o.id);
-        b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-      });
-      f.appendChild(b);
-    });
-    caja.appendChild(f);
-  };
-  fila('Orden', VOZ_ORDENES, _vozAnaquel.orden, id => {
-    _vozAnaquel.orden = id;
-    if (id === 'manual' && !_vozAnaquel.manual.length) {
-      _vozAnaquel.manual = vozOrdena(_vozCuentos.slice()).map(c => c.cid);
-    }
-    vozGuardaAnaquel(); vozRender();
-  });
-  fila('Agrupar', VOZ_GRUPOS, _vozAnaquel.grupo, id => { _vozAnaquel.grupo = id; vozGuardaAnaquel(); vozRender(); });
 }
 
 function vozVacio() {
@@ -1593,10 +2814,17 @@ function vozSigueLeyendo(c) {
    la llave con la que el arrastre los reconoce en el documento, y el
    asa ⠿ solo en el orden manual. */
 function vozItem(c, manual) {
+  /* Eligiendo, no hay asa: el dedo está para marcar, no para arrastrar,
+     y dos gestos sobre la misma tarjeta se pisan. */
+  if (vozSelActiva()) manual = false;
   const el = _vozAnaquel.vista === 'cuadricula' ? vozPortadaMini(c)
            : _vozAnaquel.vista === 'lista' ? vozFila(c)
            : vozFicha(c);
   el.setAttribute('data-voz-cid', c.cid);
+  if (vozSelActiva()) {
+    el.classList.add('voz-elegible');
+    if (_vozSel.has(c.cid)) el.classList.add('voz-elegido');
+  }
   if (manual) {
     const asa = vozBoton('voz-asa', '⠿', null, 'Mover «' + (c.titulo || 'este texto') + '»: arrastra, o usa las flechas del teclado');
     asa.setAttribute('data-voz-asa', '1');
@@ -1774,6 +3002,16 @@ function vozMenuAbrir(c) {
     (av >= 100 ? ' · ✓ leído' : (av > 0 ? ' · vas por el ' + av + ' %' : ''))));
   if (c.encargo) cuerpo.appendChild(vozNodo('p', 'voz-menu-enc', '« ' + c.encargo + ' »'));
 
+  /* ⚠️ LOS ESTANTES SE PONEN AQUÍ MISMO, y se guardan al tocarlos. Sin
+     esto, archivar los veintiún textos que ya estaban serían veintiuna
+     vueltas por la hoja de corregir —que además devuelve el ensayo
+     entero a un recuadro— para tocar un chip. */
+  if (vozEsMio(c)) {
+    const caja = vozNodo('div', 'voz-menu-est');
+    cuerpo.appendChild(caja);
+    vozPintarEstantes(caja, () => vozEstantesDe(c), l => vozGuardaEstantes(c, l));
+  }
+
   const lista = vozNodo('div', 'voz-menu-lista');
   const leer = vozBotonLeer(c, 'voz-btn voz-btn-pri voz-btn-ancho');
   leer.addEventListener('click', vozCerrarMenu);
@@ -1794,6 +3032,23 @@ function vozMenuAbrir(c) {
   }
   cuerpo.appendChild(lista);
   ov.style.display = 'flex';
+}
+
+/* Guarda los estantes de un texto al momento y los sube por el camino
+   de siempre. Sin `await` en el toque: la fila se repinta ya y la nube
+   se entera cuando pueda, que es lo que deja archivar diez textos
+   seguidos sin esperar a nada. */
+function vozGuardaEstantes(c, lista) {
+  c.estantes = lista;
+  c.actualizado = Date.now();
+  vozGuardaLocal();
+  vozRender();
+  vozSubir(c).then(res => {
+    if (res.ok) return;
+    if (res.motivo === 'sin-senal') vozAviso('🗂 Guardado aquí. Subirá solo la próxima vez que abras esto');
+    else if (res.motivo === 'sin-nube') vozAviso('🗂 Guardado aquí. Falta correr voz_prestada.sql para que viaje');
+    else if (res.motivo === 'sin-sesion') vozAviso('🗂 Guardado aquí. Entra en F.A.R.O para que viaje');
+  });
 }
 
 function vozCerrarMenu() {
@@ -2015,6 +3270,11 @@ function vozAbrirLector(cid) {
   _vozSub = (pos && typeof pos.sub === 'number') ? pos.sub : 0;
   _vozBuscaTxt = '';
   vozSubCerrarBarra();
+  /* El índice de fuentes y lo que se eligió para cada tabla son de
+     ESTE texto: heredarlos del anterior enseñaría la bibliografía de
+     otro ensayo pegada a las llamadas de este. */
+  vozOlvidaFuentes();
+  _vozVistaTabla = {};
 
   sala.hidden = false;
   /* La sala abre SIEMPRE con sus barras: el modo desnudo es de cada
@@ -2042,6 +3302,8 @@ function vozCerrarLector() {
   document.body.classList.remove('voz-sala');
   vozCerrarPaneles();
   vozSubCerrarBarra();
+  vozCitCerrar();
+  vozTablonCerrar();
   vozLuz(false);
   vozPantallaCompleta(false);
   _vozLeyendo = null;
@@ -2111,16 +3373,20 @@ function vozNodoBloque(p, i, anterior, cap) {
     vozPintaTexto(el, p.t);
   } else if (p.k === 'cita') {
     el = vozNodo('blockquote', 'voz-cita');
-    vozPintaTexto(el, p.t);
+    vozPintaCuerpo(el, p.t);
   } else if (p.k === 'verso') {
     el = vozNodo('div', 'voz-verso');
-    vozPintaTexto(el, p.t);
+    vozPintaCuerpo(el, p.t);
   } else if (p.k === 'li') {
     el = vozNodo('div', 'voz-li' + (anterior && anterior.k === 'li' ? '' : ' voz-li-primero'));
     el.appendChild(vozNodo('span', 'voz-li-marca', p.n != null ? p.n + '.' : '•'));
     const t = vozNodo('span', 'voz-li-txt');
-    vozPintaTexto(t, p.t);
+    vozPintaCuerpo(t, p.t);
     el.appendChild(t);
+  } else if (p.k === 'tabla') {
+    el = vozNodoTabla(p, i, cap);
+  } else if (p.k === 'fuente') {
+    el = vozNodoFuente(p, cap, i);
   } else if (p.k === 'fin') {
     el = vozNodo('div', 'voz-fin-palabra', 'FIN');
   } else {
@@ -2131,12 +3397,453 @@ function vozNodoBloque(p, i, anterior, cap) {
        una raya de diálogo o una comilla la capitular sale ridícula—. */
     if (!anterior || anterior.k !== 'p') el.classList.add('voz-p-sin-sangria');
     if (!anterior && /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(p.t || '')) el.classList.add('voz-p-capital');
-    vozPintaTexto(el, p.t);
+    vozPintaCuerpo(el, p.t);
   }
   el.dataset.vp = String(i);
   el.dataset.cap = String(cap || 0);
-  if (_vozLeyendo && p.k !== 'sep' && p.k !== 'fin') vozAplicarSubrayados(el, _vozLeyendo.cid, cap || 0, i);
+  if (_vozLeyendo && p.k !== 'sep' && p.k !== 'fin' && p.k !== 'tabla') vozAplicarSubrayados(el, _vozLeyendo.cid, cap || 0, i);
   return el;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   LAS LLAMADAS A FUENTES, PINTADAS
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Lo mismo que `vozPintaTexto`, más las llamadas a fuentes convertidas
+   en botones. Va aparte porque `vozPintaTexto` la usan también sitios
+   donde una llamada NO se toca —el índice, los extractos del buscador,
+   la ficha del anaquel—, y porque así el orden queda escrito en un solo
+   sitio: el texto se pinta primero ENTERO, con sus cursivas, y las
+   llamadas se le ponen encima después.
+
+   ⚠️ Y EL BOTÓN LLEVA DENTRO EL TEXTO TAL CUAL SE ESCRIBIÓ: «[3]» o
+   «(Harari, 2014, p. 45)», sin quitar ni una coma. Eso no es estética:
+   es lo que hace que el texto plano del bloque siga siendo EXACTAMENTE
+   el mismo de antes, y por tanto que los subrayados ya puestos —que se
+   guardan por desplazamiento de caracteres sobre ese texto— no se
+   muevan ni un carácter al estrenar esto. Un marcador que cambiara
+   «[3]» por «³» desplazaría todos los subrayados del párrafo, sin
+   error y sin aviso. */
+function vozPintaCuerpo(nodo, t) {
+  vozPintaTexto(nodo, t);
+  vozCitasEn(nodo, _vozLeyendo ? vozIndiceFuentes(_vozLeyendo) : null);
+}
+
+function vozCitasEn(cont, idx) {
+  if (!cont || !idx || !idx.lista.length) return;
+  const nodos = [];
+  const w = document.createTreeWalker(cont, NodeFilter.SHOW_TEXT);
+  let n;
+  while ((n = w.nextNode())) nodos.push(n);
+  nodos.forEach(nodo => {
+    const s = nodo.nodeValue;
+    if (!s || (s.indexOf('(') < 0 && s.indexOf('[') < 0 && !/[¹²³⁰⁴-⁹]/.test(s))) return;
+    if (nodo.parentElement && nodo.parentElement.closest('.voz-cit')) return;
+    const ll = vozLlamadasEn(s, idx).res;
+    if (!ll.length) return;
+    const frag = document.createDocumentFragment();
+    let k = 0;
+    ll.forEach(x => {
+      if (x.i > k) frag.appendChild(document.createTextNode(s.slice(k, x.i)));
+      frag.appendChild(vozNodoLlamada(x));
+      k = x.f;
+    });
+    if (k < s.length) frag.appendChild(document.createTextNode(s.slice(k)));
+    if (nodo.parentNode) nodo.parentNode.replaceChild(frag, nodo);
+  });
+}
+
+/* ⚠️ Y LA LLAMADA ES UN `span`, NO UN `button`, aunque se comporte como
+   uno. Un botón es una caja: «(Harari, 2014, p. 45)» al final de un
+   renglón NO SE PARTE, así que en un texto justificado abre un hueco
+   blanco de media línea, y en una columna estrecha se sale por el
+   borde. Un `span` se parte como cualquier palabra. Lleva `role` y
+   `tabindex` para que siga siendo un botón para quien no usa el dedo,
+   que es lo mismo que ya hacen las marcas de subrayado de esta sala. */
+function vozNodoLlamada(x) {
+  const b = vozNodo('span', 'voz-cit ' + (x.n != null ? 'voz-cit-n' : 'voz-cit-ap'), x.t);
+  b.dataset.fids = x.fuentes.map(f => f.fid).join(',');
+  b.tabIndex = 0;
+  b.setAttribute('role', 'button');
+  b.setAttribute('aria-label', 'Consultar la fuente: ' + String(x.fuentes[0].t || '').slice(0, 90));
+  return b;
+}
+
+/* ─── La ficha de la fuente ────────────────────────────────────────
+   ⚠️ CONSULTAR UNA FUENTE NO MUEVE LA LECTURA. Sale ENCIMA, pegada a la
+   llamada, como la barra de subrayar, y al cerrarla uno sigue en la
+   misma frase. Llevar al lector hasta la bibliografía y devolverlo es,
+   en un lector paginado, perder la página —y es exactamente lo que el
+   autor pidió que no pasara: «consultarlas DESDE el formato de la
+   lectura»—. Vive DENTRO de la sala, así que se tiñe con el papel
+   puesto: una ficha blanca saliendo de noche deslumbra justo al leer a
+   oscuras. */
+function vozCitBarra() {
+  let b = document.getElementById('voz-citbar');
+  if (b) return b;
+  const sala = document.getElementById('voz-lector');
+  if (!sala) return null;
+  b = vozNodo('div', 'voz-citbar');
+  b.id = 'voz-citbar';
+  b.hidden = true;
+  b.setAttribute('role', 'dialog');
+  b.setAttribute('aria-label', 'La fuente citada');
+  sala.appendChild(b);
+  return b;
+}
+
+function vozCitAbierta() {
+  const b = document.getElementById('voz-citbar');
+  return !!(b && !b.hidden);
+}
+
+function vozCitCerrar() {
+  const b = document.getElementById('voz-citbar');
+  if (b) b.hidden = true;
+}
+
+function vozCitAbrirBtn(btn) {
+  const c = _vozLeyendo;
+  if (!c || !btn) return;
+  const idx = vozIndiceFuentes(c);
+  const fids = String(btn.dataset.fids || '').split(',').filter(Boolean);
+  const fuentes = fids.map(id => idx.lista.find(f => f.fid === id)).filter(Boolean);
+  if (!fuentes.length) return;
+  vozCitAbrir(fuentes, btn.getBoundingClientRect());
+}
+
+function vozCitAbrir(fuentes, caja) {
+  const b = vozCitBarra();
+  if (!b) return;
+  vozSubCerrarBarra();
+  b.textContent = '';
+
+  const cab = vozNodo('div', 'voz-citbar-cab');
+  cab.appendChild(vozNodo('span', 'voz-citbar-rot',
+    fuentes.length > 1 ? fuentes.length + ' fuentes' : 'La fuente'));
+  cab.appendChild(vozBoton('voz-citbar-x', '✕', () => vozCitCerrar(), 'Cerrar'));
+  b.appendChild(cab);
+
+  fuentes.forEach(f => {
+    const fila = vozNodo('div', 'voz-citbar-f');
+    fila.appendChild(vozNodo('span', 'voz-citbar-n', f.n != null ? String(f.n) : '❧'));
+    const cuerpo = vozNodo('div', 'voz-citbar-cuerpo');
+    const t = vozNodo('p', 'voz-citbar-t');
+    /* Con `vozPintaTexto` y no con `vozPintaCuerpo`: dentro de una
+       ficha de fuente, el «(2014)» de la propia entrada no es una
+       llamada a nada. */
+    vozPintaTexto(t, f.t);
+    cuerpo.appendChild(t);
+    const acc = vozNodo('div', 'voz-citbar-acc');
+    /* ⚠️ La dirección ya vino comprobada con `URL()` desde el lector, y
+       se pone con `setAttribute`: nunca interpolada en un atributo. */
+    if (f.url) {
+      const a = vozNodo('a', 'voz-citbar-ir', '🔗 Abrir la fuente');
+      a.setAttribute('href', f.url);
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+      acc.appendChild(a);
+    }
+    acc.appendChild(vozBoton('voz-citbar-b', '📋 Copiar', () => {
+      vozAlPortapapeles(f.t, '📋 Fuente copiada');
+    }));
+    acc.appendChild(vozBoton('voz-citbar-b', '📚 Todas', () => {
+      vozCitCerrar();
+      vozAbrirPanel('voz-panel-ind');
+      vozPintarPanelInd('fuentes');
+    }, 'Ver todas las fuentes del texto'));
+    cuerpo.appendChild(acc);
+    fila.appendChild(cuerpo);
+    b.appendChild(fila);
+  });
+
+  b.hidden = false;
+  vozColocarFlotante(b, caja, 'voz-citbar-abajo');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LAS TABLAS
+   ══════════════════════════════════════════════════════════════════
+   Una tabla de un ensayo no cabe en la página de un teléfono, y eso no
+   se arregla encogiendo la letra hasta que no se lea. Se ofrecen las
+   dos salidas de verdad y se elige MIDIENDO, no adivinando:
+
+     · en FICHAS —una por fila, con el nombre de la columna al lado de
+       cada dato—, que es lo único que se lee de corrido en una pantalla
+       estrecha y no pierde ni un dato;
+     · ENTERA, a pantalla completa, que se desliza a lo ancho con la
+       primera columna y la cabecera clavadas: es la que hace falta para
+       comparar dos filas lejanas.
+
+   ⚠️ Y SE PINTA UNA VISTA CADA VEZ, NUNCA LAS DOS ESCONDIENDO UNA. Con
+   las dos en el documento, el texto del bloque saldría DUPLICADO, y ese
+   texto es sobre el que se guardan los subrayados y sobre el que mide
+   la posición de lectura: cada tabla contaría el doble de lo que hay. */
+const VOZ_TABLA_ESTRECHA = 460;   // por debajo de esto, y con 3 columnas, fichas
+let _vozVistaTabla = {};          // lo elegido a mano, por bloque, mientras dure la lectura
+
+function vozClaveTabla(cap, vp) { return (cap || 0) + ':' + vp; }
+
+function vozNodoTabla(p, i, cap) {
+  const fig = vozNodo('figure', 'voz-tabla');
+  if (p.tit) {
+    const cp = vozNodo('figcaption', 'voz-tabla-tit');
+    vozPintaTexto(cp, p.tit);
+    fig.appendChild(cp);
+  }
+  fig.appendChild(vozNodo('div', 'voz-tabla-cuerpo'));
+  const mandos = vozNodo('div', 'voz-tabla-mandos');
+  mandos.hidden = true;
+  fig.appendChild(mandos);
+  fig._vozT = p;
+  fig.dataset.clave = vozClaveTabla(cap, i);
+  vozTablaPinta(fig, _vozVistaTabla[fig.dataset.clave] || 'tabla');
+  return fig;
+}
+
+function vozTablaPinta(fig, vista) {
+  const p = fig._vozT;
+  const cuerpo = fig.querySelector('.voz-tabla-cuerpo');
+  if (!p || !cuerpo) return;
+  cuerpo.textContent = '';
+  fig.dataset.vista = vista;
+  if (vista === 'fichas') cuerpo.appendChild(vozTablaFichas(p));
+  else cuerpo.appendChild(vozTablaTabla(p));
+}
+
+function vozTablaTabla(p) {
+  const t = vozNodo('table', 'voz-tabla-t');
+  const cab = vozNodo('thead');
+  const fc = vozNodo('tr');
+  (p.cab || []).forEach((celda, k) => {
+    const th = vozNodo('th', vozTablaAl(p, k));
+    th.setAttribute('scope', 'col');
+    vozPintaTexto(th, celda);
+    fc.appendChild(th);
+  });
+  cab.appendChild(fc);
+  t.appendChild(cab);
+  const cuerpo = vozNodo('tbody');
+  (p.f || []).forEach(fila => {
+    const tr = vozNodo('tr');
+    fila.forEach((celda, k) => {
+      /* La primera celda es la que nombra la fila: va como cabecera de
+         fila, que es lo que la deja clavada al deslizar a lo ancho y lo
+         que hace que un lector de pantalla diga de qué fila habla cada
+         dato. */
+      const td = vozNodo(k === 0 ? 'th' : 'td', vozTablaAl(p, k) + (k === 0 ? ' voz-td-1' : ''));
+      if (k === 0) td.setAttribute('scope', 'row');
+      vozPintaTexto(td, celda);
+      tr.appendChild(td);
+    });
+    cuerpo.appendChild(tr);
+  });
+  t.appendChild(cuerpo);
+  return t;
+}
+
+function vozTablaAl(p, k) {
+  const a = (p.al || [])[k] || '';
+  return a === 'd' ? 'voz-td-der' : (a === 'c' ? 'voz-td-cen' : '');
+}
+
+/* Una ficha por fila: el primer dato hace de título y los demás van
+   con el nombre de su columna al lado. Es la única forma de leer de
+   corrido una tabla de seis columnas en un teléfono, y no pierde ni un
+   dato: lo que se pierde al encoger la letra, sí. */
+function vozTablaFichas(p) {
+  const caja = vozNodo('div', 'voz-tabla-fichas');
+  (p.f || []).forEach(fila => {
+    const fi = vozNodo('div', 'voz-tf');
+    const tit = vozNodo('div', 'voz-tf-tit');
+    vozPintaTexto(tit, fila[0] || '—');
+    fi.appendChild(tit);
+    fila.forEach((celda, k) => {
+      if (k === 0 || !String(celda || '').trim()) return;
+      const par = vozNodo('div', 'voz-tf-par');
+      par.appendChild(vozNodo('span', 'voz-tf-l', (p.cab || [])[k] || ''));
+      const v = vozNodo('span', 'voz-tf-v');
+      vozPintaTexto(v, celda);
+      par.appendChild(v);
+      fi.appendChild(par);
+    });
+    caja.appendChild(fi);
+  });
+  return caja;
+}
+
+/* ⚠️ SI UNA TABLA NO CABE, SE MIDE; NO SE ADIVINA. Es la lección de las
+   hojas del kit de escritura a mano: una medida calculada a ojo sale
+   partida y nadie lo nota hasta que la imprime. Aquí se mira el ancho
+   REAL de la tabla contra el de su caja, después de pintar, y solo
+   entonces salen los mandos. Con una tabla que cabe, no sale ninguno:
+   un botón que no hace falta es un botón que estorba en mitad de una
+   página de lectura. */
+function vozAjustarTablas() {
+  const texto = document.getElementById('voz-texto');
+  if (!texto) return;
+  /* El alto de la página, que es la otra mitad del problema: ver la
+     nota de `vozAjustarUnaTabla`. En el modo deslizando no hay páginas
+     y no hay nada que medir. */
+  const hoja = document.getElementById('voz-hoja');
+  const altoPag = (vozModo() === 'scroll' || !hoja) ? 0 : hoja.clientHeight - 2 * VOZ_ALTO_MARGEN;
+  texto.querySelectorAll('.voz-tabla').forEach(fig => {
+    const p = fig._vozT;
+    const cuerpo = fig.querySelector('.voz-tabla-cuerpo');
+    const mandos = fig.querySelector('.voz-tabla-mandos');
+    if (!p || !cuerpo || !mandos) return;
+    const enFichas = fig.dataset.vista === 'fichas';
+    const cabe = enFichas ? true : cuerpo.scrollWidth <= cuerpo.clientWidth + 2;
+    /* Sin elección a mano y con la tabla ancha en una caja estrecha,
+       se empieza en fichas: es lo que de verdad se puede leer ahí. */
+    if (!enFichas && !cabe && !_vozVistaTabla[fig.dataset.clave] &&
+        cuerpo.clientWidth < VOZ_TABLA_ESTRECHA && (p.cab || []).length >= 3) {
+      vozTablaPinta(fig, 'fichas');
+      vozAjustarUnaTabla(fig, p, true, true, altoPag);
+      return;
+    }
+    vozAjustarUnaTabla(fig, p, cabe, enFichas, altoPag);
+  });
+}
+
+/* ⚠️ UNA TABLA MÁS ALTA QUE LA PÁGINA NO PUEDE PEDIR QUE NO LA PARTAN:
+   DESAPARECE. `break-inside: avoid` está para que media tabla no se
+   quede al final de una página y media al principio de la otra, y eso
+   hay que pedirlo mientras la tabla QUEPA. Cuando no cabe, el navegador
+   no puede cumplirlo y lo que hace en una caja de columnas con alto
+   fijo es RECORTARLA: queda el rótulo solo con media página en blanco
+   debajo, y las filas no están en ninguna parte. No da error, la página
+   no se rompe y el número de páginas sigue saliendo bien: el fallo de
+   siempre, el que parece que funcionó.
+
+   ⚠️ Y HAY UNA SEGUNDA TRAMPA DEBAJO, que es la que costó encontrar:
+   UNA CAJA QUE SE DESLIZA NO SE PARTE NUNCA. `overflow` distinto de
+   `visible` la hace indivisible para el navegador, así que la caja que
+   da a la tabla su deslizamiento a lo ancho no se puede repartir entre
+   dos páginas por mucho `break-inside: auto` que se le ponga. De ahí
+   las dos respuestas, y son distintas a propósito:
+
+     · las FICHAS no necesitan deslizarse a lo ancho, así que no llevan
+       caja: se parten solas entre páginas, con cada ficha entera;
+     · la TABLA sí la necesita, así que se le pone TOPE DE ALTO y se
+       desliza también hacia abajo dentro de su caja, con el botón de
+       verla entera al lado. Nada se pierde y nada se recorta. */
+function vozAjustarUnaTabla(fig, p, cabe, enFichas, altoPag) {
+  const mandos = fig.querySelector('.voz-tabla-mandos');
+  const cuerpo = fig.querySelector('.voz-tabla-cuerpo');
+  if (cuerpo) cuerpo.style.maxHeight = '';
+  fig.classList.remove('voz-tabla-larga');
+  /* ⚠️ Y EL ALTO SE MIDE EN LA CAJA, NO EN LA FIGURA. Una figura que el
+     navegador YA repartió entre dos columnas dice medir lo que mide la
+     columna, así que preguntarle a ella si es más alta que la página
+     contesta que no —justo en el caso en que sí—. La caja de la tabla
+     es indivisible (se desliza), así que ella sí dice su alto de
+     verdad. Las fichas no llevan caja: se parten solas y no hay nada
+     que topar. */
+  let larga = false;
+  if (!enFichas && cuerpo && altoPag) {
+    const resto = Math.max(0, fig.offsetHeight - cuerpo.offsetHeight);   // el rótulo y los mandos
+    larga = cuerpo.offsetHeight + resto > altoPag;
+    if (larga) {
+      fig.classList.add('voz-tabla-larga');
+      cuerpo.style.maxHeight = Math.max(140, altoPag - resto - 10) + 'px';
+    }
+  }
+  fig.classList.toggle('voz-tabla-ancha', !cabe && !enFichas);
+  mandos.textContent = '';
+  if (cabe && !enFichas && !larga) { mandos.hidden = true; return; }
+  mandos.hidden = false;
+  /* ⚠️ Y EL TOQUE SE PARA AQUÍ (`stopPropagation`). El toque al centro de
+     la hoja apaga los mandos de la sala, y se libra de eso mirando si
+     lo tocado cuelga de la tabla… pero estos botones SE REHACEN dentro
+     de su propia respuesta (la vista cambia y los mandos se vuelven a
+     pintar), así que cuando el aviso llega arriba el botón ya está
+     suelto, sin padres, y no cuelga de nada: cambiar de vista escondía
+     además las barras de la sala. */
+  mandos.appendChild(vozBoton('voz-tabla-b', '⤢ Verla entera',
+    ev => { if (ev) ev.stopPropagation(); vozTablonAbrir(p); }, 'Abrir la tabla a pantalla completa'));
+  mandos.appendChild(vozBoton('voz-tabla-b', enFichas ? '▦ Como tabla' : '▤ En fichas', ev => {
+    if (ev) ev.stopPropagation();
+    const nueva = enFichas ? 'tabla' : 'fichas';
+    _vozVistaTabla[fig.dataset.clave] = nueva;
+    vozTablaPinta(fig, nueva);
+    vozAjustarTablas();
+    /* Cambiar de vista cambia el alto del bloque, así que hay que
+       repaginar — y volviendo al PÁRRAFO apuntado, nunca al número de
+       página: ver la nota grande de la sala. */
+    vozPaginar(_vozAncla, _vozSub);
+  }));
+  if (!cabe && !enFichas) mandos.appendChild(vozNodo('span', 'voz-tabla-nota', 'No cabe de ancho en la página'));
+  else if (larga && !enFichas) mandos.appendChild(vozNodo('span', 'voz-tabla-nota', 'Más alta que la página: se desliza dentro'));
+}
+
+/* La tabla a pantalla completa: se desliza a lo ancho y a lo alto con
+   la cabecera y la primera columna clavadas, que es lo que hace falta
+   para comparar la primera fila con la última. Vive dentro de la sala
+   (se tiñe con el papel) y por encima de las zonas de pasar página. */
+function vozTablonAbrir(p) {
+  const sala = document.getElementById('voz-lector');
+  if (!sala || !p) return;
+  vozTablonCerrar();
+  const ov = vozNodo('div', 'voz-tablon');
+  ov.id = 'voz-tablon';
+  ov.setAttribute('role', 'dialog');
+  ov.setAttribute('aria-label', p.tit || 'La tabla, entera');
+  const cab = vozNodo('div', 'voz-tablon-cab');
+  cab.appendChild(vozNodo('span', 'voz-tablon-tit', p.tit || 'La tabla'));
+  const mm = vozNodo('div', 'voz-tablon-mm');
+  let tam = 15;
+  const caja = vozNodo('div', 'voz-tablon-caja');
+  const pon = v => { tam = Math.max(9, Math.min(26, v)); caja.style.fontSize = tam + 'px'; };
+  mm.appendChild(vozBoton('voz-tablon-b', '−', () => pon(tam - 1), 'Letra más pequeña'));
+  mm.appendChild(vozBoton('voz-tablon-b', '+', () => pon(tam + 1), 'Letra más grande'));
+  mm.appendChild(vozBoton('voz-tablon-b voz-tablon-x', '✕', () => vozTablonCerrar(), 'Cerrar'));
+  cab.appendChild(mm);
+  ov.appendChild(cab);
+  caja.appendChild(vozTablaTabla(p));
+  caja.style.fontSize = tam + 'px';
+  ov.appendChild(caja);
+  ov.appendChild(vozNodo('div', 'voz-tablon-pie', 'Se desliza a lo ancho. La cabecera y la primera columna se quedan quietas.'));
+  sala.appendChild(ov);
+}
+
+function vozTablonCerrar() {
+  const ov = document.getElementById('voz-tablon');
+  if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+  return !!ov;
+}
+
+/* Un bloque de bibliografía: sangría francesa —la segunda línea
+   entrada, como en cualquier norma de cita, que es lo que deja ver de
+   un vistazo dónde empieza cada entrada— y su número delante si lo
+   trae. Se le pone `id` para poder llegar desde el panel. */
+function vozNodoFuente(p, cap, i) {
+  const el = vozNodo('div', 'voz-fuente');
+  if (p.n != null) el.appendChild(vozNodo('span', 'voz-fuente-n', String(p.n)));
+  const t = vozNodo('span', 'voz-fuente-t');
+  vozPintaTexto(t, p.t);
+  el.appendChild(t);
+  const url = p.url || vozUrlEn(p.t);
+  if (url) {
+    const a = vozNodo('a', 'voz-fuente-ir', '🔗');
+    a.setAttribute('href', url);
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener noreferrer');
+    a.setAttribute('aria-label', 'Abrir la fuente');
+    el.appendChild(a);
+  }
+  return el;
+}
+
+/* Copiar un trozo corto —una fuente, una cifra— con el mismo respaldo
+   que el botón 📋 del anaquel: en un WebView sin permiso de
+   portapapeles, `navigator.clipboard` no existe o falla en silencio. */
+function vozAlPortapapeles(texto, aviso) {
+  const fin = ok => vozAviso(ok ? (aviso || '📋 Copiado') : 'No se pudo copiar');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(texto).then(() => fin(true), () => vozCopiarViejo(texto, fin));
+  } else vozCopiarViejo(texto, fin);
 }
 
 /* ⚠️ LA PORTADA ES LA PRIMERA PÁGINA DE TODO TEXTO, Y LLEVA LA
@@ -2325,6 +4032,11 @@ function vozPaginarPaginas(ancla, sub) {
      salto de página que caía justo en el borde), se vuelve a medir. */
   texto.style.columnCount = String(cols);
   texto.style.width = W + 'px';
+  /* ⚠️ Las tablas se miden AQUÍ, con las columnas ya puestas y ANTES de
+     contar las páginas: la caja de una tabla mide lo que mide la
+     columna, y pasar una a fichas le cambia el alto. Midiendo después,
+     el número de páginas sería el de la tabla que ya no está. */
+  vozAjustarTablas();
   const mide = () => Math.max(1, Math.round((hoja.scrollWidth - M + G) / (cw + G)));
   let paginas = Math.max(1, Math.ceil(mide() / cols));
   for (let intento = 0; intento < 4; intento++) {
@@ -2361,6 +4073,7 @@ function vozColocarScroll(ancla, sub) {
   texto.style.columnCount = '';
   texto.style.columnWidth = '';
   texto.style.columnGap = '';
+  vozAjustarTablas();
   vozIrAnclaScroll(_vozCapActual, ancla == null ? _vozAncla : ancla, sub == null ? _vozSub : sub, false);
 }
 
@@ -2578,7 +4291,7 @@ function vozPintarBarraMarcas() {
       m.style.left = Math.min(99.5, (acum / total) * 100) + '%';
       caja.appendChild(m);
     }
-    (cap.p || []).concat(cap.epi || []).forEach(b => { acum += vozPalabrasDe(b.t); });
+    (cap.p || []).concat(cap.epi || []).forEach(b => { acum += vozPalabrasDe(vozTextoDeBloque(b)); });
   });
 }
 
@@ -2732,6 +4445,19 @@ function vozVueltaSuelta(rapido) {
   vozVueltaTermina(v.el, v.dir, completar);
 }
 
+/* Qué hay bajo el dedo cuando el toque lo recogió una zona de pasar
+   página. Se apaga un instante el puntero de las dos zonas y se mira:
+   sin eso, `elementFromPoint` devuelve siempre la zona. */
+function vozBajoLaZona(x, y) {
+  const zs = [document.getElementById('voz-z-izq'), document.getElementById('voz-z-der')].filter(Boolean);
+  const antes = zs.map(z => z.style.pointerEvents);
+  zs.forEach(z => { z.style.pointerEvents = 'none'; });
+  let el = null;
+  try { el = document.elementFromPoint(x, y); } catch (e) {}
+  zs.forEach((z, i) => { z.style.pointerEvents = antes[i]; });
+  return el;
+}
+
 /* ─── Los gestos ───────────────────────────────────────────────────
    Con PUNTEROS y nunca con el arrastre del navegador, igual que en el
    resto de la casa. Y el gesto NO es la única forma de pasar página:
@@ -2799,12 +4525,38 @@ function vozEngancharSala() {
     if (a && a.vuelta === true) vozVueltaSuelta(false);
   });
 
+  /* ⚠️ Con el RATÓN, soltar el botón ES el gesto que dice «ya terminé de
+     seleccionar», así que la barra sale enseguida y no hay que esperar
+     los tres segundos del dedo. Va en su propio escuchador porque el de
+     arriba se sale antes por varios caminos. Ver `VOZ_SUB_ESPERA`. */
+  mid.addEventListener('pointerup', e => {
+    if (e.pointerType === 'mouse' && !_vozSubEditando) vozSubProgramar(60);
+  });
+
   /* Los bordes pasan página, que es como se pasa en cualquier lector.
      El centro —que es la propia hoja, para que el texto se pueda
      seleccionar y copiar— apaga y enciende los mandos. */
+  /* ⚠️ Y LA ZONA DE PASAR PÁGINA NO SE COME LO QUE HAY DEBAJO. Las
+     zonas cubren los bordes de la hoja y van ENCIMA del texto, así que
+     una llamada a fuente —o un subrayado— que caiga cerca del margen
+     sería intocable: el toque pasaría página y nadie entendería por
+     qué ese botón sí y ese no. Se mira qué hay debajo apagando un
+     instante el puntero de las zonas, y si es algo que se toca, se le
+     manda el toque a él. */
   const zona = (id, fn) => {
     const z = document.getElementById(id);
-    if (z) z.addEventListener('click', () => { if (!_vozTragarClic) fn(); });
+    if (!z) return;
+    z.addEventListener('click', ev => {
+      if (_vozTragarClic) return;
+      const bajo = vozBajoLaZona(ev.clientX, ev.clientY);
+      const cit = bajo && bajo.closest ? bajo.closest('.voz-cit') : null;
+      if (cit) { vozCitAbrirBtn(cit); return; }
+      const mk = bajo && bajo.closest ? bajo.closest('mark.voz-hl') : null;
+      if (mk) { vozSubAbrirMarca(mk.dataset.subId, mk.getBoundingClientRect()); return; }
+      const bt = bajo && bajo.closest ? bajo.closest('.voz-tabla-mandos button, .voz-fuente-ir') : null;
+      if (bt) { bt.click(); return; }
+      fn();
+    });
   };
   zona('voz-z-izq', () => vozPasar(-1));
   zona('voz-z-der', () => vozPasar(1));
@@ -2814,10 +4566,17 @@ function vozEngancharSala() {
        o quitarlo. No apaga los mandos. */
     const mk = e.target && e.target.closest ? e.target.closest('mark.voz-hl') : null;
     if (mk) { e.preventDefault(); vozSubAbrirMarca(mk.dataset.subId, mk.getBoundingClientRect()); return; }
-    /* Un botón dentro del texto (el enlace al taller del pie) hace lo
-       suyo y NO apaga los mandos: tocarlo y que además desaparezca la
+    /* Tocar una llamada a fuente abre su ficha encima, sin moverse de
+       la página. Tampoco apaga los mandos: no es un toque al centro. */
+    const cit = e.target && e.target.closest ? e.target.closest('.voz-cit') : null;
+    if (cit) { e.preventDefault(); vozCitAbrirBtn(cit); return; }
+    /* Los mandos de una tabla son botones: se dejan en paz. */
+    if (e.target && e.target.closest && e.target.closest('.voz-tabla-mandos, .voz-tabla-cuerpo')) return;
+    /* Y cualquier BOTÓN del texto (el enlace al taller del pie) hace lo
+       suyo y NO apaga los mandos: tocarlo y que además desapareciera la
        barra sería la peor sorpresa posible. */
     if (e.target && e.target.closest && e.target.closest('a, mark, button')) return;
+    if (vozCitAbierta()) { vozCitCerrar(); return; }
     if (haySeleccion()) return;
     if (vozSubBarraAbierta()) { vozSubCerrarBarra(); return; }
     const b = document.getElementById('voz-lector');
@@ -2884,15 +4643,18 @@ function vozEngancharSala() {
     if (document.visibilityState === 'visible' && sala && !sala.hidden && !_vozLuz) vozLuz(true);
   });
 
-  /* La barra de subrayar se abre al soltar la selección. Con un respiro,
-     porque en el teléfono la selección se ajusta varias veces mientras
-     se arrastran los tiradores. */
-  let tSel = null;
+  /* ⚠️ MIENTRAS SE SELECCIONA, LA BARRA NO ESTÁ. Ver la nota de
+     `VOZ_SUB_ESPERA`. Cada movimiento de la selección la cierra al
+     instante y vuelve a poner el reloj a cero; solo se abre cuando la
+     selección lleva un rato quieta. */
   document.addEventListener('selectionchange', () => {
     const sala = document.getElementById('voz-lector');
     if (!sala || sala.hidden) return;
-    clearTimeout(tSel);
-    tSel = setTimeout(vozSubAlSeleccionar, 260);
+    if (vozSubDentroDeLaBarra()) return;
+    /* Con una marca abierta para editarla no hay nada que cerrar: eso
+       no es una selección en curso, es un toque sobre lo ya subrayado. */
+    if (!_vozSubEditando && vozSubBarraAbierta()) vozSubCerrarBarra();
+    vozSubProgramar(VOZ_SUB_ESPERA);
   });
 }
 
@@ -2903,6 +4665,12 @@ document.addEventListener('keydown', e => {
   if (!sala || sala.hidden) return;
   const dentroDeCampo = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '');
   if (dentroDeCampo) { if (e.key === 'Escape') { vozCerrarPaneles(); vozSubCerrarBarra(); } return; }
+  /* Con el foco en una llamada, Enter y el espacio la abren en vez de
+     pasar página: es lo que hace que la bibliografía se pueda consultar
+     también con un teclado, y la misma regla del asa de arrastre —lo
+     que solo se puede hacer con el dedo, a veces no se puede hacer—. */
+  const citFoco = e.target && e.target.closest ? e.target.closest('.voz-cit') : null;
+  if (citFoco && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); vozCitAbrirBtn(citFoco); return; }
   const scroll = vozModo() === 'scroll';
   const hoja = document.getElementById('voz-hoja');
   if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); vozPasar(1); }
@@ -2912,6 +4680,8 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Home') { e.preventDefault(); if (scroll && hoja) hoja.scrollTop = 0; else vozIrPagina(0); }
   else if (e.key === 'End') { e.preventDefault(); if (scroll && hoja) hoja.scrollTop = hoja.scrollHeight; else vozIrPagina(_vozPaginas - 1); }
   else if (e.key === 'Escape') {
+    if (vozTablonCerrar()) return;
+    if (vozCitAbierta()) { vozCitCerrar(); return; }
     if (vozSubBarraAbierta()) { vozSubCerrarBarra(); return; }
     const abierto = ['voz-panel-aa', 'voz-panel-ind'].some(id => { const p = document.getElementById(id); return p && !p.hidden; });
     if (abierto) vozCerrarPaneles();
@@ -3213,8 +4983,54 @@ function vozLeerSeleccionSala() {
   return { cap: Number(bIni.dataset.cap) || 0, vp: vp, i: ini, f: fin, t: t, caja: r.getBoundingClientRect() };
 }
 
+/* ⚠️ LA BARRA DE SUBRAYAR NO SALE MIENTRAS SE ESTÁ SELECCIONANDO.
+   Pedido por el autor el 12 de septiembre de 2026, con la captura de su
+   tableta delante: «quiero que al momento de seleccionar desaparezca y
+   que solo al momento de terminar lo seleccionado aparezca… para que no
+   me estorbe cuando estoy seleccionando».
+
+   Salía a los 260 milésimas de que la selección dejara de moverse, y en
+   una tableta eso es MIENTRAS se selecciona: los tiradores se arrastran
+   a tirones, con pausas para mirar dónde va el borde, y cada pausa de un
+   cuarto de segundo plantaba la barra ENCIMA del párrafo — tapando
+   justo lo que hay que ver para elegir el trozo. Y encima de ella
+   Android pone su propia barra de copiar, así que quedaban dos.
+
+   Ahora: cada movimiento de la selección la cierra al instante, y solo
+   se abre cuando la selección lleva TRES SEGUNDOS quieta. Tres es el
+   número que pidió el autor y es el que hace falta con el dedo: con
+   menos, una pausa para mirar se lee como «ya terminé».
+
+   ⚠️ Y CON EL RATÓN NO SE ESPERA, porque ahí SÍ existe un gesto que
+   dice «ya terminé»: soltar el botón. Con el dedo no existe —los
+   tiradores son del sistema y no nos avisan de nada—, y por eso allí
+   hay que adivinarlo por el reloj. Esperar tres segundos delante de una
+   computadora, donde el gesto es inequívoco, sería tiempo muerto por
+   nada. */
+const VOZ_SUB_ESPERA = 3000;
+let _vozSelTimer = null;
+
+function vozSubProgramar(ms) {
+  clearTimeout(_vozSelTimer);
+  _vozSelTimer = setTimeout(vozSubAlSeleccionar, ms);
+}
+
+/* ⚠️ ESCRIBIR EN LA BARRA CAMBIA LA SELECCIÓN DE LA PÁGINA, Y ESO NO ES
+   SELECCIONAR. Tocar «✎ Nota» lleva el foco al recuadro de la nota, y
+   el navegador recoge la selección del texto al hacerlo: sin esta
+   guarda, abrir la nota CERRABA la barra que acababa de abrirla —el
+   recuadro aparecía y se iba en el mismo gesto— y la nota no se
+   guardaba nunca. Lo mismo tocando un color. Lo cazó la sonda al poner
+   los tres segundos: antes el fallo existía igual, pero solo dentro de
+   la ventana de 260 ms, así que unas veces pasaba y otras no. */
+function vozSubDentroDeLaBarra() {
+  const a = document.activeElement;
+  return !!(a && a.closest && a.closest('#voz-subbar, #voz-citbar'));
+}
+
 function vozSubAlSeleccionar() {
   if (_vozSubEditando) return;
+  if (vozSubDentroDeLaBarra()) return;
   const s = vozLeerSeleccionSala();
   if (s && s.varios) { vozSubCerrarBarra(); return; }
   if (s) { _vozSubSel = s; vozSubAbrirBarra(s.t, null, s.caja); }
@@ -3300,22 +5116,30 @@ function vozSubAbrirBarra(texto, catActiva, caja) {
 }
 
 function vozSubColocarBarra(caja) {
-  const b = document.getElementById('voz-subbar');
+  vozColocarFlotante(document.getElementById('voz-subbar'), caja, 'voz-subbar-abajo');
+}
+
+/* Pegar algo a un trozo del texto: debajo si cabe, encima si no, y al
+   pie si no cabe en ninguno de los dos. Lo usan la barra de subrayar y
+   la ficha de la fuente citada, y está en un solo sitio a propósito:
+   con dos copias, una se quedaría vieja el día que alguien arregle la
+   otra, y sería la que menos se mira. */
+function vozColocarFlotante(b, caja, claseAbajo) {
   const sala = document.getElementById('voz-lector');
   if (!b || !sala) return;
-  b.classList.remove('voz-subbar-abajo');
+  b.classList.remove(claseAbajo);
+  const alPie = () => { b.classList.add(claseAbajo); b.style.left = ''; b.style.top = ''; };
   const sr = sala.getBoundingClientRect();
   const bw = b.offsetWidth, bh = b.offsetHeight;
-  if (!caja || !caja.height) { b.classList.add('voz-subbar-abajo'); b.style.left = ''; b.style.top = ''; return; }
+  if (!caja || !caja.height) { alPie(); return; }
   const arriba = caja.top - sr.top, abajo = caja.bottom - sr.top;
   const pie = sala.clientHeight - 64;
   let top;
   if (abajo + 10 + bh < pie) top = abajo + 10;
   else if (arriba - 10 - bh > 60) top = arriba - 10 - bh;
-  else { b.classList.add('voz-subbar-abajo'); b.style.left = ''; b.style.top = ''; return; }
+  else { alPie(); return; }
   const centro = (caja.left + caja.right) / 2 - sr.left;
-  const left = Math.max(8, Math.min(sala.clientWidth - bw - 8, centro - bw / 2));
-  b.style.left = left + 'px';
+  b.style.left = Math.max(8, Math.min(sala.clientWidth - bw - 8, centro - bw / 2)) + 'px';
   b.style.top = top + 'px';
 }
 
@@ -3609,6 +5433,7 @@ function vozAbrirPanel(id) {
   const yaEstaba = abierto && !abierto.hidden;
   vozCerrarPaneles();
   vozSubCerrarBarra();
+  vozCitCerrar();
   if (abierto && !yaEstaba) { abierto.hidden = false; }
 }
 
@@ -3710,10 +5535,26 @@ function vozPintarPanelInd(tab) {
   p.textContent = '';
 
   const tabs = vozNodo('div', 'voz-tabs');
-  [['ind', '☰ Índice'], ['marcas', '🔖 Marcas'], ['subs', '🖍 Subray.'], ['busca', '🔍 Buscar'], ['taller', '📝 Taller']].forEach(([id, t]) => {
+  /* La pestaña de fuentes solo sale cuando el texto TIENE fuentes: un
+     cuento no lleva bibliografía, y una pestaña que se abre vacía se
+     lee como una pestaña rota. Misma regla que el chip de «dos
+     páginas», que solo se ofrece donde caben. */
+  const hayFuentes = !!(vozIndiceFuentes(c) || { lista: [] }).lista.length;
+  if (!hayFuentes && _vozPanelTab === 'fuentes') _vozPanelTab = 'ind';
+  /* La del taller va la ÚLTIMA y sale siempre, aunque no haya
+     actividades todavía: ahí es donde se montan, así que esconderla
+     cuando está vacía sería esconder la puerta de entrada. */
+  const pestanas = [['ind', '☰ Índice'], ['marcas', '🔖 Marcas'], ['subs', '🖍 Subrayados'],
+                    ['busca', '🔍 Buscar'], ['taller', '📝 Taller']];
+  if (hayFuentes) pestanas.splice(1, 0, ['fuentes', '📚 Fuentes']);
+  pestanas.forEach(([id, t]) => {
     const b = vozBoton('voz-tab' + (_vozPanelTab === id ? ' voz-tab-on' : ''), t, () => vozPintarPanelInd(id));
     b.setAttribute('role', 'tab');
     b.setAttribute('aria-selected', _vozPanelTab === id ? 'true' : 'false');
+    /* La pestaña puesta se trae a la vista sola: con cinco, en un
+       teléfono, la última queda fuera del borde y no se ve que hay
+       más. Misma regla que los chips de materia de Videos M.E.T.A.S. */
+    if (_vozPanelTab === id) setTimeout(() => { try { b.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) {} }, 0);
     tabs.appendChild(b);
   });
   p.appendChild(tabs);
@@ -3721,6 +5562,7 @@ function vozPintarPanelInd(tab) {
   const cuerpo = vozNodo('div', 'voz-panel-cuerpo');
   p.appendChild(cuerpo);
   if (_vozPanelTab === 'marcas') vozPintarMarcas(cuerpo);
+  else if (_vozPanelTab === 'fuentes') vozPintarFuentes(cuerpo);
   else if (_vozPanelTab === 'subs') vozPintarSubrayados(cuerpo);
   else if (_vozPanelTab === 'busca') vozPintarBuscador(cuerpo);
   else if (_vozPanelTab === 'taller') vozPintarPestanaTaller(cuerpo);
@@ -3957,18 +5799,105 @@ function vozBuscarEnTexto(q) {
   const res = [];
   (c.capitulos || []).forEach((cap, ci) => {
     (cap.p || []).forEach((b, i) => {
-      if (!b.t) return;
-      const heno = vozSinTildes(b.t).toLowerCase();
+      /* El texto buscable, no `b.t`: una cifra dentro de una tabla es
+         justo lo que se busca en un ensayo de investigación, y una
+         entrada de bibliografía es lo segundo. */
+      const bt = vozTextoDeBloque(b);
+      if (!bt) return;
+      const heno = vozSinTildes(bt).toLowerCase();
       const k = heno.indexOf(n);
       if (k < 0) return;
       const ini = Math.max(0, k - 45);
-      let ext = b.t.slice(ini, Math.min(b.t.length, k + n.length + 60)).replace(/\s+/g, ' ');
+      let ext = bt.slice(ini, Math.min(bt.length, k + n.length + 60)).replace(/\s+/g, ' ');
       if (ini > 0) ext = '…' + ext;
-      if (k + n.length + 60 < b.t.length) ext += '…';
+      if (k + n.length + 60 < bt.length) ext += '…';
       res.push({ cap: ci, vp: i, ext: ext });
     });
   });
   return res;
+}
+
+/* ─── 📚 El panel de fuentes ───────────────────────────────────────
+   La bibliografía del ensayo, pero por la que se puede navegar: cada
+   entrada dice EN QUÉ PÁRRAFOS se la cita y lleva a cada uno de un
+   toque. Es el camino de vuelta del que abre la ficha de una llamada
+   —«¿dónde más usé esto?»— y no hay otra forma de contestarlo sin
+   releer el ensayo entero.
+
+   ⚠️ Y DICE LAS DOS COSAS QUE NO CUADRAN, porque en un trabajo de
+   investigación son errores y no adornos: la fuente que está en la
+   bibliografía y no se cita en ninguna parte, y la llamada del texto
+   que no tiene fuente que la respalde. Las dos se descubren, si no,
+   releyendo cuarenta páginas, que es tanto como no descubrirlas. */
+function vozPintarFuentes(cuerpo) {
+  const c = _vozLeyendo;
+  const mapa = vozMapaCitas(c);
+  const idx = mapa.idx;
+  if (!idx || !idx.lista.length) {
+    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota',
+      'Este texto no trae bibliografía. Se reconoce un capítulo final llamado «Referencias», «Bibliografía», «Fuentes» o «Notas».'));
+    return;
+  }
+
+  cuerpo.appendChild(vozNodo('div', 'voz-ind-tit',
+    idx.lista.length === 1 ? 'Una fuente' : idx.lista.length + ' fuentes'));
+  cuerpo.appendChild(vozNodo('p', 'voz-aj-nota',
+    'Toca una llamada dentro del texto —«[3]», «(Harari, 2014)»— para ver su fuente sin salir de la página.'));
+
+  idx.lista.forEach(f => {
+    const donde = mapa.donde.get(f.fid) || [];
+    const it = vozNodo('div', 'voz-fu-item');
+    const cab = vozNodo('div', 'voz-fu-cab');
+    cab.appendChild(vozNodo('span', 'voz-fu-n', f.n != null ? String(f.n) : '❧'));
+    const t = vozNodo('span', 'voz-fu-t');
+    vozPintaTexto(t, f.t);
+    cab.appendChild(t);
+    it.appendChild(cab);
+
+    const pie = vozNodo('div', 'voz-fu-pie');
+    if (donde.length) {
+      pie.appendChild(vozNodo('span', 'voz-fu-rot',
+        donde.length === 1 ? 'Citada una vez:' : 'Citada ' + donde.length + ' veces:'));
+      donde.slice(0, 12).forEach(d => {
+        pie.appendChild(vozBoton('voz-fu-ir', vozNombreCap(c, d.cap) + ' · ' + d.t, () => {
+          vozIrA(d.cap, d.vp, 0);
+          vozResaltar(d.cap, d.vp, d.t);
+          vozCerrarPaneles();
+        }, 'Ir a donde se la cita'));
+      });
+    } else {
+      pie.appendChild(vozNodo('span', 'voz-fu-sola', '⚠ No se la cita en el texto'));
+    }
+    if (f.url) {
+      const a = vozNodo('a', 'voz-fu-url', '🔗 Abrir');
+      a.setAttribute('href', f.url);
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+      pie.appendChild(a);
+    }
+    pie.appendChild(vozBoton('voz-fu-ir voz-fu-ver', '📖 En la bibliografía', () => {
+      vozIrA(f.cap, f.vp, 0);
+      vozResaltar(f.cap, f.vp, '');
+      vozCerrarPaneles();
+    }, 'Ir a la entrada, dentro del texto'));
+    it.appendChild(pie);
+    cuerpo.appendChild(it);
+  });
+
+  if (mapa.huerfanas.length) {
+    cuerpo.appendChild(vozNodo('div', 'voz-ind-tit', 'Sin fuente'));
+    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota',
+      mapa.huerfanas.length === 1
+        ? 'Una llamada del texto no tiene entrada en la bibliografía.'
+        : mapa.huerfanas.length + ' llamadas del texto no tienen entrada en la bibliografía.'));
+    mapa.huerfanas.slice(0, 30).forEach(h => {
+      cuerpo.appendChild(vozBoton('voz-fu-huerfana', h.t + ' · ' + vozNombreCap(c, h.cap), () => {
+        vozIrA(h.cap, h.vp, 0);
+        vozResaltar(h.cap, h.vp, h.t);
+        vozCerrarPaneles();
+      }, 'Ir a la llamada'));
+    });
+  }
 }
 
 function vozPintarBuscador(cuerpo) {
@@ -4060,6 +5989,21 @@ function vozResaltar(cap, vp, q) {
   setTimeout(() => el.classList.remove('voz-p-hit'), 2600);
 }
 
+/* Una tabla devuelta a texto, con sus tubos y su renglón de guiones.
+   Lo usan las dos salidas —lo que copia el botón 📋 y lo que vuelve al
+   recuadro de corregir—, y tiene que ser la MISMA forma que el lector
+   entiende: si no, corregir una coma de un ensayo le desharía las
+   tablas, y eso no da ningún error. */
+function vozTablaEnTexto(p) {
+  const L = [];
+  if (p.tit) { L.push(p.tit); L.push(''); }
+  const fila = celdas => '| ' + celdas.map(x => String(x == null ? '' : x).replace(/\|/g, '/')).join(' | ') + ' |';
+  L.push(fila(p.cab || []));
+  L.push(fila((p.al || []).map(a => a === 'c' ? ':---:' : (a === 'd' ? '---:' : '---'))));
+  (p.f || []).forEach(f => L.push(fila(f)));
+  return L;
+}
+
 /* ══════════════════════════════════════════════════════════════════
    COPIAR Y COMPARTIR EL TEXTO
    ══════════════════════════════════════════════════════════════════
@@ -4100,6 +6044,8 @@ function vozTextoPlano(c) {
       else if (p.k === 'fin') L.push('FIN');
       else if (p.k === 'h3') L.push(p.t);
       else if (p.k === 'li') L.push((p.n != null ? p.n + '. ' : '• ') + p.t);
+      else if (p.k === 'fuente') L.push((p.n != null ? '[' + p.n + '] ' : '• ') + p.t);
+      else if (p.k === 'tabla') vozTablaEnTexto(p).forEach(x => L.push(x));
       else if (p.k === 'cita') L.push(p.t.split('\n').map(x => '    ' + x).join('\n'));
       else L.push(p.t);
       L.push('');
@@ -4199,6 +6145,14 @@ let _vozAuto = {};             // lo que el lector rellenó solo, para poder pis
 let _vozGeneroTocado = false;  // ¿el género lo eligió la persona con un chip?
 let _vozVersosTocado = false;  // ¿el interruptor de versos lo tocó la persona?
 
+/* ¿Este texto es en verso, o solo tiene algún trozo que lo parece? */
+function vozVersosMandan(c) {
+  if (vozGenero(c.genero).id === 'poema') return true;
+  const n = vozCuentaBloques(c.capitulos);
+  const total = n.p + n.verso;
+  return n.verso > 0 && n.verso * 2 >= total;
+}
+
 function vozAbrirPegar(cuento) {
   const ov = document.getElementById('voz-pegar-overlay');
   if (!ov) return;
@@ -4209,11 +6163,20 @@ function vozAbrirPegar(cuento) {
 
   const ta = document.getElementById('voz-pegar-txt');
   const g = id => document.getElementById(id);
-  if (ta) ta.value = cuento ? vozTextoCuerpo(cuento) : '';
+  if (ta) ta.value = cuento ? vozTextoCuerpo(cuento, { sinFuentes: true }) : '';
+  const fu = g('voz-f-fuentes');
+  if (fu) fu.value = cuento ? vozFuentesTexto(cuento) : '';
   ['voz-f-titulo', 'voz-f-voz', 'voz-f-maquina', 'voz-f-encargo', 'voz-f-nota']
     .forEach(id => { const e = g(id); if (e) e.value = ''; });
   const versos = g('voz-f-versos');
-  if (versos) versos.checked = cuento ? vozCuentaBloques(cuento.capitulos).verso > 0 : false;
+  /* ⚠️ Y VUELVE ENCENDIDO SOLO SI EL TEXTO ES DE VERDAD EN VERSO. Con
+     «tiene alguna estrofa» se encendía en un ensayo de ochomil
+     palabras al que cinco trozos se le habían leído como verso —una
+     tabla, una lista—, y encendido fuerza el verso en TODO el texto:
+     al guardar salían más estrofas, y a la siguiente corrección más.
+     Un interruptor que se retroalimenta destroza la prosa en tres
+     vueltas, y ninguna da error. */
+  if (versos) versos.checked = cuento ? vozVersosMandan(cuento) : false;
 
   if (cuento) {
     g('voz-f-titulo').value  = cuento.titulo || '';
@@ -4223,6 +6186,16 @@ function vozAbrirPegar(cuento) {
     g('voz-f-nota').value    = cuento.nota || '';
   }
   vozPonGenero(cuento ? vozGenero(cuento.genero).id : 'cuento');
+  vozPintarChipsFicha();
+  _vozEstantesForm = cuento ? vozEstantesDe(cuento) : [];
+  vozPintarEstantes(document.getElementById('voz-estantes-caja'),
+    () => _vozEstantesForm.slice(), l => { _vozEstantesForm = l; });
+
+  const inpArch = g('voz-f-archivo');
+  if (inpArch && window.VozAdjunto && window.VozAdjunto.acepta) inpArch.accept = window.VozAdjunto.acepta;
+  const btnAdj = g('voz-adjuntar-btn');
+  if (btnAdj && !vozAdjuntoHay()) btnAdj.textContent = '📎 Adjuntar (no disponible aquí)';
+  vozAdjDecir('');
 
   const tit = g('voz-pegar-tit');
   if (tit) tit.textContent = cuento ? '✏️ Corregir el texto' : '➕ Pegar un texto';
@@ -4245,6 +6218,117 @@ function vozPonGenero(id) {
   const e = document.getElementById('voz-f-genero');
   if (e) e.value = vozGenero(id).id;
   vozPintarChipsGenero();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LOS CHIPS DE LA VOZ Y DE LA MÁQUINA
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026, con la hoja de pegar
+   en la pantalla y los ejemplos rodeados a mano: «necesito que allí
+   pongas para poder seleccionar: Gemini, Perplexity, Claude».
+
+   Son los DOS campos que hacen falta para guardar, o sea los dos que se
+   escriben en cada texto, y siempre son los mismos tres o cuatro
+   valores. Escribirlos a mano en una tableta, veinte veces, no es solo
+   lento: se escriben MAL. En el anaquel de esta casa hay un «Gemeni» de
+   eso, y una máquina mal escrita rompe en silencio el chip que agrupa
+   por máquina —salen dos montones donde había uno— sin dar ningún
+   error y sin que nadie lo mire.
+
+   ⚠️ Y LAS SUGERENCIAS SALEN DEL HISTORIAL, NO DE UNA LISTA ESCRITA A
+   MANO. Es la regla 2 del Apunte rápido, y aquí importa más: la voz que
+   se imita es de cada casa —«Rulfo», «un narrador de pueblo», «un
+   informe de investigación»— y una lista fija no la puede adivinar
+   nunca. Lo que sí lleva lista es la MÁQUINA, porque son cuatro y son
+   las mismas para todo el mundo; van detrás de las que ya se usaron, y
+   solo las que no estén ya.
+
+   Escribir a mano se sigue pudiendo, y eso no es un detalle: un chip
+   que fuera la única manera de rellenar el campo dejaría fuera la
+   primera vez que se usa una voz nueva. */
+
+/* Las cuatro de siempre. Es una lista corta y cerrada A PROPÓSITO: no
+   es «los modelos que existen» —eso estaría viejo en un mes— sino los
+   que esta casa usa, y añadir uno es esta línea. Misma regla que
+   VOZ_GENEROS. */
+const VOZ_MAQUINAS = ['Gemini', 'Claude', 'ChatGPT', 'Perplexity'];
+
+/* Lo que ya se usó en el anaquel, de lo más usado a lo menos. Las
+   lápidas no cuentan: un texto retirado no tiene por qué seguir
+   proponiendo su voz. */
+function vozUsados(campo) {
+  const cuenta = new Map();
+  (_vozCuentos || []).forEach(c => {
+    if (!c || c.borrado) return;
+    const v = String(c[campo] || '').trim();
+    if (!v) return;
+    cuenta.set(v, (cuenta.get(v) || 0) + 1);
+  });
+  return [...cuenta.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(x => x[0]);
+}
+
+/* Pinta una fila de chips que rellenan un campo de texto de un toque.
+   El chip puesto se ve marcado, y tocarlo otra vez LO QUITA: sin eso,
+   un chip tocado por error solo se deshace borrando el campo a mano. */
+function vozPintarChipsCampo(idCaja, idCampo, sugeridas) {
+  const caja = document.getElementById(idCaja);
+  const campo = document.getElementById(idCampo);
+  if (!caja || !campo) return;
+  const actual = campo.value.trim().toLowerCase();
+  const vistos = new Set();
+  const lista = [];
+  sugeridas.forEach(v => {
+    const k = v.trim().toLowerCase();
+    if (!k || vistos.has(k)) return;
+    vistos.add(k);
+    lista.push(v.trim());
+  });
+  caja.textContent = '';
+  caja.hidden = !lista.length;
+  /* Un tope: con cuarenta textos en el anaquel, la fila de voces sería
+     más larga que el formulario. Se deslizan (`.voz-chips` ya lo hace),
+     pero lo que no cabe en dos vistazos no lo lee nadie. */
+  lista.slice(0, 8).forEach(v => {
+    const puesto = v.toLowerCase() === actual;
+    const b = vozBoton('voz-chip voz-chip-chica' + (puesto ? ' voz-chip-on' : ''), v, () => {
+      campo.value = puesto ? '' : v;
+      /* Rellenar un campo obligatorio tiene que apagar el aviso de
+         «falta…» en el momento, no al guardar. */
+      vozPintarBotonGuardar();
+      vozPintarChipsCampo(idCaja, idCampo, sugeridas);
+      campo.focus();
+    }, puesto ? 'Quitar «' + v + '»' : 'Poner «' + v + '»');
+    b.setAttribute('aria-pressed', puesto ? 'true' : 'false');
+    caja.appendChild(b);
+  });
+}
+
+/* ⚠️ ¿Dos nombres que se diferencian en UNA sola letra? Hace falta por
+   el «Gemeni» que hay en el anaquel de esta casa: proponerlo como chip
+   al lado de «Gemini» sería repartir la errata en vez de pararla, y
+   además con los dos a la vista nadie distingue cuál es cuál de un
+   vistazo. Una letra, y no dos: a dos ya caben cosas distintas de
+   verdad («Claude» y «Claude 3»). El texto viejo se queda como está
+   —no se le toca nada a nadie por detrás—, pero el que se guarde de
+   ahora en adelante lleva el nombre bueno. */
+function vozUnaLetraDe(a, b) {
+  const x = vozSinTildes(a).toLowerCase().trim(), y = vozSinTildes(b).toLowerCase().trim();
+  if (x === y || Math.abs(x.length - y.length) > 1) return false;
+  let i = 0, j = 0, fallos = 0;
+  while (i < x.length && j < y.length) {
+    if (x[i] === y[j]) { i++; j++; continue; }
+    if (++fallos > 1) return false;
+    if (x.length > y.length) i++;
+    else if (y.length > x.length) j++;
+    else { i++; j++; }
+  }
+  return fallos + (x.length - i) + (y.length - j) <= 1;
+}
+
+function vozPintarChipsFicha() {
+  vozPintarChipsCampo('voz-voz-chips', 'voz-f-voz', vozUsados('voz'));
+  const usadas = vozUsados('maquina').filter(m => !VOZ_MAQUINAS.some(b => vozUnaLetraDe(m, b)));
+  vozPintarChipsCampo('voz-maquina-chips', 'voz-f-maquina', usadas.concat(VOZ_MAQUINAS));
 }
 
 function vozPintarChipsGenero() {
@@ -4273,24 +6357,121 @@ function vozPintarChipsGenero() {
    Sin la cabecera de etiquetas: esas viven en sus campos, y repetirlas
    dentro del texto haría que al volver a leer se duplicaran. Lo que sale
    de aquí lo vuelve a entender vozLeer tal cual: es el mismo alfabeto. */
-function vozTextoCuerpo(c) {
+function vozTextoCuerpo(c, op) {
+  /* Con `sinFuentes`, la bibliografía no sale aquí: sale en su caja
+     (ver `vozFuentesDeLista`). Es lo que hace que corregir un informe
+     devuelva cada cosa a donde se pega, y no las dos revueltas en el
+     mismo recuadro. */
+  const sinFuentes = !!(op && op.sinFuentes);
   const L = [];
   (c.capitulos || []).forEach((cap, i) => {
+    if (sinFuentes && cap.ref && (cap.p || []).length && (cap.p || []).every(b => b.k === 'fuente')) return;
     if (cap.epi && cap.epi.length) {
       cap.epi.forEach(b => { L.push(b.t.split('\n').map(x => '> ' + x).join('\n')); L.push(''); });
     }
     if (cap.t) { if (i || L.length) L.push(''); L.push('## ' + cap.t); L.push(''); }
     (cap.p || []).forEach(p => {
+      if (sinFuentes && p.k === 'fuente') return;
       if (p.k === 'sep') L.push('* * *');
       else if (p.k === 'fin') L.push('FIN');
       else if (p.k === 'h3') L.push('### ' + p.t);
       else if (p.k === 'li') L.push((p.n != null ? p.n + '. ' : '- ') + p.t);
+      /* Una fuente vuelve como vino: con su número entre corchetes si
+         lo traía, y con viñeta si no. Dentro de un capítulo de
+         bibliografía, el lector las dos las vuelve a entender como
+         fuentes — que es lo que exige la comprobación 16: el alfabeto
+         de ida tiene que ser el de vuelta. */
+      else if (p.k === 'fuente') L.push((p.n != null ? '[' + p.n + '] ' : '- ') + p.t);
+      else if (p.k === 'tabla') vozTablaEnTexto(p).forEach(x => L.push(x));
       else if (p.k === 'cita') L.push(p.t.split('\n').map(x => '> ' + x).join('\n'));
       else L.push(p.t);
       L.push('');
     });
   });
   return L.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   📎 EL ARCHIVO ADJUNTO
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 12 de septiembre de 2026: «podrías poner
+   adjuntar ya sea de Drive, de OneDrive… al adjuntar en pdf o en
+   Documentos de Google, o un word, las citas ya están bien específicas
+   y con mejor orden».
+
+   Y es cierto, por un motivo que se puede escribir: COPIAR una pantalla
+   pierde información y ADJUNTAR un archivo no. Al copiar, los títulos
+   pierden su renglón —el de su informe llegó pegado a la frase
+   siguiente—, las tablas se deshacen en una fila de tubos, los
+   numeritos de las citas son dibujos y no viajan, y la lista de fuentes
+   se queda donde estaba. En el archivo todo eso está dicho con todas
+   las letras.
+
+   ⚠️ Y DE DRIVE Y DE ONEDRIVE SE ADJUNTA SIN CONECTAR NINGUNA CUENTA:
+   el selector de archivos del propio aparato ya los ofrece como
+   orígenes, igual que la carpeta de descargas. Meter aquí el selector
+   de Google o el de Microsoft sería traer dos identificaciones más, dos
+   librerías de fuera y dos cosas que pueden caerse —en una aplicación
+   que tiene dentro la Bóveda— para llegar al mismo archivo al que ya se
+   llega con un toque.
+
+   ⚠️ Y LO LEÍDO SE DEJA EN EL RECUADRO, A LA VISTA, NO SE GUARDA SOLO.
+   Es la regla de toda la hoja de pegar: se enseña qué se entendió antes
+   de guardar nada. Un adjunto que fuera directo al anaquel sería la
+   única parte de esta herramienta que hace cosas a espaldas de quien la
+   usa, y encima con lo que más puede salir torcido. */
+function vozAdjuntoHay() {
+  return !!(window.VozAdjunto && typeof window.VozAdjunto.leer === 'function');
+}
+
+function vozAdjDecir(msg, mal) {
+  const caja = document.getElementById('voz-adj-estado');
+  if (!caja) return;
+  caja.textContent = msg || '';
+  caja.hidden = !msg;
+  caja.classList.toggle('voz-adj-mal', !!mal);
+}
+
+async function vozAdjuntar(file) {
+  if (!file) return;
+  if (!vozAdjuntoHay()) {
+    vozAdjDecir('El lector de archivos no cargó en este aparato. Pega el texto a mano en el recuadro y funciona igual.', true);
+    return;
+  }
+  const ta = document.getElementById('voz-pegar-txt');
+  if (!ta) return;
+  vozAdjDecir('📎 Abriendo «' + file.name + '»…');
+  const r = await window.VozAdjunto.leer(file);
+  if (r.error) { vozAdjDecir('📎 ' + r.error, true); return; }
+  if (!String(r.texto || '').trim()) {
+    vozAdjDecir('📎 «' + file.name + '» se abrió, pero no tiene texto dentro. Si es un documento escaneado, lo que hay son fotos de las páginas, no letras.', true);
+    return;
+  }
+
+  /* ⚠️ Lo que ya estaba escrito NO se pisa sin avisar: se añade debajo.
+     Alguien que pega un texto, adjunta un anexo y guarda espera tener
+     las dos cosas, y perder lo escrito sin poder deshacerlo sería la
+     peor sorpresa de toda la herramienta. */
+  const habia = ta.value.trim();
+  ta.value = habia ? (habia + '\n\n' + r.texto) : r.texto;
+
+  /* El lector nuevo manda: lo que traiga el archivo vuelve a rellenar
+     el título y las demás etiquetas (`_vozAuto`), y el interruptor de
+     versos se queda como estaba. */
+  vozRepasar();
+
+  const c = r.cuenta;
+  const partes = [];
+  if (c) {
+    if (c.cabeceras) partes.push(c.cabeceras + (c.cabeceras === 1 ? ' apartado' : ' apartados'));
+    if (c.tablas) partes.push(c.tablas + (c.tablas === 1 ? ' tabla' : ' tablas'));
+    if (c.notas) partes.push(c.notas + (c.notas === 1 ? ' nota al pie' : ' notas al pie'));
+    if (c.listas) partes.push(c.listas + (c.listas === 1 ? ' ítem de lista' : ' ítems de lista'));
+    if (c.citas) partes.push(c.citas + (c.citas === 1 ? ' cita' : ' citas'));
+  }
+  vozAdjDecir('📎 ' + file.name + (partes.length ? ' · ' + partes.join(' · ') : '') +
+              (habia ? ' · añadido debajo de lo que ya había' : '') +
+              '. Está en el recuadro de arriba: míralo antes de guardar.');
 }
 
 function vozCerrarPegar() {
@@ -4315,6 +6496,8 @@ function vozRepasar() {
   if (!ta || !caja) return;
 
   let r = vozLeer(ta.value, vozOpcionesLectura());
+  const cajaFu = document.getElementById('voz-f-fuentes');
+  r = vozComponerFuentes(r, cajaFu ? cajaFu.value : '');
   const versos = document.getElementById('voz-f-versos');
 
   /* ⚠️ LO QUE EL TEXTO TRAÍA ESCRITO RELLENA EL CAMPO, Y NO PISA LO
@@ -4334,7 +6517,7 @@ function vozRepasar() {
     vozPonGenero(r.genero);
     if (r.genero === 'poema' && versos && !versos.checked && !_vozVersosTocado) {
       versos.checked = true;
-      r = vozLeer(ta.value, vozOpcionesLectura());
+      r = vozComponerFuentes(vozLeer(ta.value, vozOpcionesLectura()), cajaFu ? cajaFu.value : '');
     }
   }
   _vozPegado = r;
@@ -4357,8 +6540,45 @@ function vozRepasar() {
   if (r.cuenta.citas) datos.push(r.cuenta.citas + (r.cuenta.citas === 1 ? ' cita' : ' citas'));
   if (r.cuenta.versos) datos.push(r.cuenta.versos + (r.cuenta.versos === 1 ? ' estrofa en verso' : ' estrofas en verso'));
   if (r.cuenta.listas) datos.push(r.cuenta.listas + (r.cuenta.listas === 1 ? ' ítem de lista' : ' ítems de lista'));
+  if (r.cuenta.tablas) datos.push(r.cuenta.tablas + (r.cuenta.tablas === 1 ? ' tabla' : ' tablas'));
+  if (r.cuenta.fuentes) datos.push(r.cuenta.fuentes + (r.cuenta.fuentes === 1 ? ' fuente' : ' fuentes'));
   datos.forEach(t => res.appendChild(vozNodo('span', 'voz-rep-dato', t)));
   caja.appendChild(res);
+
+  /* ⚠️ Y SE DICE CUÁNTAS LLAMADAS SE QUEDARON SIN FUENTE. En un ensayo
+     de investigación eso no es un detalle de pantalla: es una cita que
+     no se puede comprobar. Encontrarlas después, releyendo cuarenta
+     páginas, es tanto como no encontrarlas — y aquí salen antes de
+     guardar, que es cuando el texto todavía está en el recuadro y se
+     arregla pegándolo otra vez. */
+  const mapaPeg = vozMapaCitas({ cid: '__pegado__', capitulos: r.capitulos });
+  vozOlvidaFuentes();   // ese índice es de un texto que no existe todavía
+  if (r.cuenta.fuentes || mapaPeg.huerfanas.length) {
+    const sinCitar = mapaPeg.idx.lista.filter(f => !mapaPeg.donde.has(f.fid)).length;
+    const citadas = mapaPeg.idx.lista.length - sinCitar;
+    const l = [];
+    /* ⚠️ Y SIN NINGUNA BIBLIOGRAFÍA, EL AVISO DICE QUÉ HACER. Decirle a
+       alguien «una llamada del texto no tiene fuente» cuando el texto
+       no trae NI UNA fuente se lee como un reproche y no como una
+       instrucción: él copió todo lo que se podía copiar, y la lista
+       vive en otro sitio de la pantalla del informe. El aviso tiene que
+       nombrar la caja donde se pega. */
+    if (!mapaPeg.idx.lista.length && mapaPeg.huerfanas.length) {
+      l.push((mapaPeg.huerfanas.length === 1 ? 'El texto trae una llamada a una fuente' : 'El texto trae ' + mapaPeg.huerfanas.length + ' llamadas a fuentes') +
+             ' (' + mapaPeg.huerfanas.slice(0, 4).map(h => h.t).join(', ') + (mapaPeg.huerfanas.length > 4 ? '…' : '') + ') y NINGUNA bibliografía. ' +
+             'Si es un informe, su lista de fuentes suele estar plegada en otra parte de la pantalla: ábrela, cópiala y pégala aquí arriba, en «📚 Las fuentes del informe». ' +
+             'Se guarda igual sin ella, pero las citas no se podrán consultar.');
+    }
+    if (citadas) l.push(citadas === 1 ? 'Una fuente queda enlazada con su llamada en el texto.'
+                                      : citadas + ' fuentes quedan enlazadas con sus llamadas en el texto.');
+    if (sinCitar) l.push(sinCitar === 1 ? 'Una fuente de la bibliografía no se cita en ninguna parte.'
+                                        : sinCitar + ' fuentes de la bibliografía no se citan en ninguna parte.');
+    if (mapaPeg.huerfanas.length && mapaPeg.idx.lista.length) {
+      l.push((mapaPeg.huerfanas.length === 1 ? 'Una llamada del texto no tiene fuente' : mapaPeg.huerfanas.length + ' llamadas del texto no tienen fuente') +
+             ': ' + mapaPeg.huerfanas.slice(0, 6).map(h => h.t).join(', ') + (mapaPeg.huerfanas.length > 6 ? '…' : ''));
+    }
+    if (l.length) caja.appendChild(vozNodo('div', 'voz-rep-fuentes', l.join(' ')));
+  }
 
   const ind = vozNodo('div', 'voz-rep-caps');
   r.capitulos.forEach((c, i) => {
@@ -4460,6 +6680,7 @@ async function vozGuardarPegado() {
     encargo: g('voz-f-encargo').trim(),
     nota: g('voz-f-nota').trim(),
     capitulos: r.capitulos,
+    estantes: _vozEstantesForm.slice(),
     palabras: vozPalabras(r.capitulos),
     borrado: false,
     creado_at: viejo ? viejo.creado_at : new Date().toISOString(),
@@ -4558,8 +6779,18 @@ function vozAbrirAyuda() {
   if (!ov || !caja) return;
   caja.textContent = '';
 
+  /* Lo primero de la ayuda es el atajo que evita toda la ayuda: si el
+     texto está en un archivo, adjuntarlo trae los títulos y las tablas
+     ya puestos y no hay que saberse nada de lo de abajo. */
+  const adj = vozNodo('div', 'voz-ayuda-nota');
+  adj.appendChild(vozNodo('strong', null, '📎 Si el texto está en un archivo, adjúntalo: '));
+  adj.appendChild(document.createTextNode(
+    'trae los títulos, las tablas, las notas al pie y los enlaces ya puestos, y el selector del aparato incluye Drive y OneDrive. ' +
+    'Un Documento de Google no es un archivo y el aparato lo exporta al elegirlo, así que si sale mal: ábrelo, ⋮ → «Compartir y exportar» → «Guardar como Word (.docx)», y adjunta ese. Un PDF no sirve: no guarda el texto en renglones.'));
+  caja.appendChild(adj);
+
   caja.appendChild(vozNodo('p', null,
-    'Pega el texto tal como venga. Lo único que hace falta saber es esto:'));
+    'Y si lo pegas a mano, pégalo tal como venga. Lo único que hace falta saber es esto:'));
 
   const porCampo = {};
   Object.entries(VOZ_ETIQUETAS).forEach(([clave, campo]) => {
@@ -6234,6 +8465,23 @@ document.addEventListener('DOMContentLoaded', () => {
     clearTimeout(tActRep);
     tActRep = setTimeout(vozActRepasar, 220);
   });
+  on('voz-anaq-cerrar', 'click', vozCerrarHoja);
+  on('voz-abre-aqui', 'click', vozAlternarAbreAqui);
+  on('voz-anaq-overlay', 'click', e => { if (e.target.id === 'voz-anaq-overlay') vozCerrarHoja(); });
+  /* ⚠️ EL TOQUE SE ATRAPA EN LA CAPTURA. Eligiendo, una tarjeta no abre
+     nada: se marca. Si se dejara llegar al botón de leer o al menú, el
+     primer toque abriría el lector y la selección se perdería. */
+  const lista = document.getElementById('voz-lista');
+  if (lista) {
+    lista.addEventListener('click', e => {
+      if (!vozSelActiva()) return;
+      const el = e.target && e.target.closest ? e.target.closest('[data-voz-cid]') : null;
+      if (!el) return;
+      e.preventDefault();
+      e.stopPropagation();
+      vozSelAlterna(el.getAttribute('data-voz-cid'));
+    }, true);
+  }
   /* Tocar fuera de la hoja del menú la cierra, como las demás de la
      casa; dentro, no. */
   on('voz-menu-overlay', 'click', e => { if (e.target.id === 'voz-menu-overlay') vozCerrarMenu(); });
@@ -6246,7 +8494,31 @@ document.addEventListener('DOMContentLoaded', () => {
       .forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
     vozRepasar();
   });
+  let tFuentes = null;
   on('voz-f-versos', 'change', () => { _vozVersosTocado = true; vozRepasar(); });
+  /* Escribiendo a mano, el chip que coincida se marca solo: así se ve
+     que eso mismo ya se había usado antes, que es la mitad de lo que
+     estos chips existen para evitar (dos maneras de escribir lo mismo). */
+  ['voz-f-voz', 'voz-f-maquina'].forEach(id => on(id, 'input', () => { vozPintarChipsFicha(); vozPintarBotonGuardar(); }));
+  /* El botón toca el selector del aparato, que es quien ofrece Drive,
+     OneDrive y la carpeta de descargas. Y se vacía después de cada uno,
+     para que adjuntar DOS VECES EL MISMO archivo vuelva a avisar: sin
+     eso, el segundo toque no dispara nada y parece que se rompió. */
+  on('voz-adjuntar-btn', 'click', () => {
+    const inp = document.getElementById('voz-f-archivo');
+    if (!inp) return;
+    if (!vozAdjuntoHay()) {
+      vozAdjDecir('El lector de archivos no cargó en este aparato. Pega el texto a mano en el recuadro y funciona igual.', true);
+      return;
+    }
+    inp.click();
+  });
+  on('voz-f-archivo', 'change', async (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    await vozAdjuntar(f);
+  });
+  on('voz-f-fuentes', 'input', () => { clearTimeout(tFuentes); tFuentes = setTimeout(vozRepasar, 220); });
   vozPintarChipsGenero();
 
   let tRepaso = null;

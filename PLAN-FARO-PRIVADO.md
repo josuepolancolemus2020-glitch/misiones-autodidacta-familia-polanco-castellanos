@@ -172,6 +172,20 @@ Zone → Make private.
      incluida la de que `anon` no ve ni una fila con los permisos de tabla
      repartidos como los reparte Supabase, y la de que un taller no puede
      cambiar de dueño.
+   · ✅ **CORRIDO** — `supabase/sql/voz_prestada.sql` volvió a crecer el
+     **12 de septiembre de 2026** con la columna `estantes` —los nombres
+     con los que cada quien ordena su anaquel: «Maestría», «Filosofía»,
+     «Para citar»— y el autor lo pegó entero ese mismo día, con
+     `voz_prestada_comprueba.sql` detrás. Las dos comprobaciones salieron
+     con **todo en ✅**: `columnas = 15`, `checks con nombre = 4`, `columna
+     estantes = 1`, `seguridad por fila = true`, `puerta pública = 0` y
+     —la que de verdad importa— `cuentos SIN etiqueta = 0`, con **22
+     textos en el anaquel y 3 retirados con lápida**. Y la re-corrida no
+     tocó ni uno de los 22, que es para lo que el archivo es idempotente.
+     Probado antes de mandarlo contra un PostgreSQL de verdad
+     (`_dev/prueba-voz-prestada-sql.sql`): las veinte comprobaciones pasan,
+     incluida la migración desde la tabla del estreno y la de que una lista
+     de veinte estantes rebota contra el `check`.
    · ✅ **CORRIDO** — `supabase/sql/voz_prestada.sql` y después
      `supabase/sql/voz_prestada_comprueba.sql`, el 10 de septiembre de 2026,
      **dos veces**: la del estreno por la mañana y la ampliada con la columna

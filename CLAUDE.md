@@ -442,6 +442,15 @@ portada, el Acceso Rápido «Apuntar gasto» llega ahí de un toque.
       finanzas en su lugar es perder el mensaje que venía a leer. Lo vigila
       la comprobación 20 de la sonda.
 
+    ⚠️ **Y DESDE EL 12 DE SEPTIEMBRE DE 2026 NO ES EL ÚNICO QUE QUIERE ESE
+    HUECO.** La Voz Prestada tiene su propio interruptor de aparato (su
+    regla 34), así que **quién se queda la pantalla al entrar lo decide
+    `faroArranqueInicio` (js/app.js)**, en un solo sitio y en orden: con las
+    dos encendidas, abre la lectura —que es la que cambia de pantalla— y la
+    hoja de los gastos NO se planta encima; sigue puesta para cuando se
+    entre a Finanzas, que es lo que este interruptor promete. Si algún día
+    hay un tercero, se añade ahí y no en su propio arranque.
+
     Y lo que NO puede hacer, porque ninguna página web puede: salir encima de
     la pantalla de bloqueo ni encenderse sola. Eso es de una aplicación
     nativa con permisos del sistema. Lo más cerca que se llega es esto —estar
@@ -970,7 +979,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Veintisiete reglas, y ninguna es de adorno:**
+**Treinta y cinco reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -1440,6 +1449,29 @@ el diseño.
    ⚠️ **Y los tokens `--fm-*` se declaran por papel dentro de `#voz-lector`**:
    en noche los mismos amarillos deslumbran, así que van traslúcidos, como en
    el modo oscuro de las misiones. Ni uno en `:root`.
+   ⚠️ **MIENTRAS SE SELECCIONA, LA BARRA NO ESTÁ.** Pedido por el autor el
+   12 de septiembre de 2026, con la captura de su tableta al lado: salía a
+   los 260 ms de que la selección dejara de moverse, y en una tableta eso
+   es MIENTRAS se selecciona —los tiradores se arrastran a tirones, con
+   pausas para mirar dónde va el borde, y cada pausa de un cuarto de
+   segundo plantaba la barra **encima del párrafo**, tapando justo lo que
+   hay que ver para elegir el trozo; y encima Android pone su propia barra
+   de copiar, así que quedaban dos—. Ahora cada movimiento de la selección
+   la cierra al instante y solo se abre cuando la selección lleva
+   **tres segundos quieta** (`VOZ_SUB_ESPERA`).
+   ⚠️ **Y escribir en la propia barra no cuenta como seleccionar.** Tocar
+   «✎ Nota» lleva el foco al recuadro y el navegador recoge la selección
+   del texto al hacerlo: sin esa guarda, abrir la nota **cerraba la barra
+   que acababa de abrirla** —el recuadro aparecía y se iba en el mismo
+   gesto— y la nota no se guardaba nunca. El fallo ya existía antes, pero
+   solo dentro de la ventana de 260 ms, así que unas veces pasaba y otras
+   no; poner los tres segundos lo hizo determinista y la sonda lo cazó.
+   ⚠️ **Y con el RATÓN no se espera**, porque ahí SÍ existe un gesto que
+   dice «ya terminé»: soltar el botón. Con el dedo no existe —los
+   tiradores son del sistema y no nos avisan de nada—, y por eso allí hay
+   que adivinarlo por el reloj. Tres segundos delante de una computadora,
+   donde el gesto es inequívoco, serían tiempo muerto por nada.
+
    ⚠️ **La barra de una selección NUEVA trae también «✎ Nota», «🔖 Aquí me
    quedé» y «✕ Cerrar»**, calcada de la barra de las misiones (pedido del
    autor el 10 de septiembre de 2026, con su captura al lado): es el mismo
@@ -1581,7 +1613,566 @@ el diseño.
    entrevistas y los careos se añadió `entrevista` a VOZ_GENEROS (regla 15:
    añadir un género es una línea en un archivo).
 
-27. ⚠️ **EL TALLER DE COMPRENSIÓN: LO LEÍDO SE QUEDA O NO SE QUEDA.**
+27. ⚠️ **UNA CITA NO SE QUITA DEL TEXTO: SE LE PONE UN BOTÓN.**
+   Pedido por el autor el 12 de septiembre de 2026, al empezar a pegar aquí
+   sus ensayos de investigación: «que las citas me las puedas crear para que
+   el usuario pueda seleccionarlas y consultarlas desde el formato de la
+   lectura que se presenta».
+
+   Ni se mueve, ni se acorta, ni se cambia por un numerito: un «(Harari,
+   2014, p. 45)» se queda escrito tal cual y ADEMÁS se puede tocar. Es la
+   asimetría de la regla 3, y aquí muerde más fuerte —equivocarse hacia
+   «esto no era una cita» cuesta un botón que no sale, y la cita se sigue
+   leyendo donde está; equivocarse hacia «esto sí lo era» **borra palabras
+   de un ensayo y parece que funcionó**, porque la página sigue llena—.
+   Tiene además una consecuencia que no se ve y que es la que de verdad la
+   sostiene: el texto plano del párrafo sigue siendo **carácter por
+   carácter** el mismo de antes, así que **los subrayados ya puestos no se
+   mueven ni uno** (se guardan por desplazamiento de caracteres, regla 21).
+   Un marcador que cambiara «[3]» por «³» los desplazaría todos, sin error
+   y sin aviso. La sonda lo compara carácter por carácter.
+
+   ⚠️ **Y CONSULTAR UNA FUENTE NO MUEVE LA LECTURA.** La ficha sale
+   ENCIMA, pegada a la llamada, con la misma maquinaria que la barra de
+   subrayar (`vozColocarFlotante`, una sola función para las dos), y al
+   cerrarla uno sigue en la misma frase. Llevar al lector hasta la
+   bibliografía y devolverlo es, en un lector paginado, perder la página:
+   es exactamente lo que se pidió evitar con «consultarlas DESDE el formato
+   de la lectura».
+
+   ⚠️ **Y LA BIBLIOGRAFÍA ES UN CAPÍTULO DEL ENSAYO, NO UNA TABLA NUEVA.**
+   Un capítulo final llamado «Referencias», «Bibliografía», «Fuentes»,
+   «Obras citadas» o «Notas» pasa a `ref` y sus entradas a bloques
+   `k:'fuente'` dentro de `capitulos`, que ya es un objeto libre: **esto no
+   pide ni una columna nueva ni volver a correr el SQL desde una tableta**.
+   Es la regla 15 (los géneros viven en el aparato) y la 21 (no se inventa
+   una segunda tabla para el mismo gesto), otra vez. Se pide que esté AL
+   FINAL —los dos últimos capítulos— porque un ensayo puede ABRIR con una
+   «Nota» del autor, y eso es prosa. El número de la entrada se guarda
+   aparte del texto, igual que la viñeta de un ítem de lista, para que el
+   que exporta lo escriba una sola vez y no dos.
+
+   ⚠️ **Y dentro de un capítulo de bibliografía, CADA RENGLÓN ES UNA
+   ENTRADA.** Es la excepción a «renglones seguidos son un párrafo», y se
+   permite porque el rótulo del capítulo la corrobora sin ninguna duda: una
+   bibliografía se pega casi siempre así —una entrada por renglón y sin
+   blancos en medio, porque en el original iban con sangría francesa— y
+   juntarlas dejaría las cuarenta en UNA sola fuente kilométrica, que ni se
+   cita, ni se consulta, ni se ve que esté mal. La lista para esto es la
+   **estricta** (`vozEsTituloBibliografia`) y **no lleva «notas»** dentro:
+   una «Nota del autor» al principio de un ensayo es prosa de verdad y
+   partirla renglón a renglón sería el fallo de la regla 3.
+   Y con los capítulos en `##`, un «REFERENCIAS» pelado al final entra
+   como **subtítulo** (regla 3), no como capítulo: se caza también ahí, y
+   entonces **la bibliografía se queda en su propio capítulo** —para que el
+   índice de la sala lleve a ella, que es lo que más se consulta de un
+   ensayo, y para que la ida y vuelta del recuadro de corregir sea estable—.
+
+   Se casan las dos formas que se usan de verdad, y ninguna más: la
+   **numérica** —`[3]`, `[^3]`, `³`— contra el número de la entrada, y la
+   de **autor y año** —`(Harari, 2014, p. 45)`, `Harari (2014)`, y varias
+   en un mismo paréntesis separadas por `;`— por apellido en la cabeza de
+   la entrada más el año. ⚠️ **Y una bibliografía sin números NO se numera sola**: sería
+   fácil contar 1, 2, 3 por el orden de la lista y casar así los «[2]» del
+   cuerpo, y sería adivinar —en una bibliografía en APA el orden es
+   alfabético, así que ese «[2]» apuntaría a quien no es y la ficha
+   enseñaría a OTRO autor, sin que nadie tuviera por qué dudarlo: una
+   atribución falsa, que es exactamente contra lo que existe esta
+   herramienta—. Sin número escrito, la llamada se queda como texto y el
+   repaso la cuenta entre las que no tienen fuente, que es lo que dice qué
+   hay que arreglar en vez de taparlo. Y el apellido de FUERA del
+   paréntesis solo vale cuando dentro no hay ninguno (la forma narrativa):
+   sumándolo siempre, un «(Smith, 2014)» en una frase que empezaba por
+   «Harari» podría casar con la entrada de Harari.
+   Sin bibliografía que las respalde **no se toca ni
+   un carácter**: un ensayo lleno de paréntesis se lee igual que antes de
+   que esto existiera. Las notas al pie escritas `[^3]: …` son lo ÚNICO
+   que el lector mueve de sitio —se juntan en un capítulo «Notas» al
+   final—, y se permite porque esa forma no se escribe por accidente ni
+   una vez.
+
+   ⚠️ **Y LAS ZONAS DE PASAR PÁGINA NO SE COMEN LA LLAMADA.** Cubren los
+   bordes de la hoja y van ENCIMA del texto, así que una llamada —o un
+   subrayado— cerca del margen sería intocable y nadie entendería por qué
+   ese botón sí y ese no. `vozBajoLaZona()` apaga un instante el puntero de
+   las zonas, mira qué hay debajo y le manda el toque. Sin eso,
+   `elementFromPoint` devuelve siempre la zona.
+
+   **El panel 📚 Fuentes es el camino de vuelta**, y solo sale cuando el
+   texto trae bibliografía (una pestaña que se abre vacía se lee como una
+   pestaña rota, igual que el chip de «dos páginas»). Cada entrada dice en
+   qué párrafos se la cita y lleva a cada uno de un toque. **Y dice las dos
+   cosas que no cuadran**, que en un trabajo de investigación son errores y
+   no adornos: la fuente que está en la bibliografía y no se cita en
+   ninguna parte, y la llamada del texto que no tiene fuente. El repaso del
+   pegado las cuenta **antes de guardar**, que es cuando el texto todavía
+   está en el recuadro. Encontrarlas después, releyendo cuarenta páginas,
+   es tanto como no encontrarlas.
+
+   Y lo de siempre: la dirección de una fuente se comprueba con `URL()` y
+   no con un grep (`java\tscript:` y `JavaScript:` pasan un grep ingenuo y
+   el navegador los ejecuta igual), solo `http` y `https`, y se pone con
+   `setAttribute`.
+
+28. ⚠️ **UNA TABLA SE LEE POR SU RENGLÓN DE GUIONES, Y SI NO CABE SE MIDE.**
+   «Que cuando hayan tablas se pueda ver lo mejor posible» (el autor, 12 de
+   septiembre de 2026).
+
+   Se leen las de tubos (`| a | b |`), que es como las escribe cualquier
+   máquina, y **solo con su renglón de guiones debajo** (`|---|---:|:--:|`,
+   que además dice cómo va alineada cada columna: los números de un ensayo
+   se leen mal a la izquierda). Ese renglón es lo único que las hace
+   inequívocas: sin pedirlo, tres frases con un tubo dentro se convertirían
+   en una tabla de tres filas, que es el fallo de la regla 3 con otra cara.
+   El rótulo («Tabla 2: Deuda externa») sale del renglón de encima. Las
+   filas se cuadran al ancho de la más ancha: a una fila corta la tabla le
+   sale escalonada, y recortar a la larga le perdería un dato.
+
+   ⚠️ **Y SI NO CABE, SE MIDE; NO SE ADIVINA.** Es la lección de las hojas
+   del kit de escritura a mano. Se mira el ancho REAL de la tabla contra el
+   de su caja, **después de pintar y con las columnas ya puestas** —una
+   tabla mide lo que mide la columna de la página, y pasarla a fichas le
+   cambia el alto, así que midiendo después de contar las páginas el número
+   de páginas sería el de la tabla que ya no está—. Con una tabla que cabe
+   no sale ningún mando: un botón que no hace falta estorba en mitad de una
+   página de lectura.
+
+   Y cuando no cabe hay **dos salidas de verdad**, no una letra encogida
+   hasta que no se lea: **en fichas** —una por fila, con el nombre de su
+   columna al lado de cada dato, que es lo único que se lee de corrido en
+   un teléfono y no pierde ni un dato—, que es además donde empieza sola si
+   la caja es estrecha y la tabla trae tres columnas o más; y **entera**, a
+   pantalla completa, que se desliza a lo ancho con la cabecera y la
+   primera columna clavadas, que es lo que hace falta para comparar la
+   primera fila con la última.
+
+   ⚠️ **Y UNA TABLA MÁS ALTA QUE LA PÁGINA NO PUEDE PEDIR QUE NO LA
+   PARTAN: DESAPARECE.** `break-inside: avoid` hay que pedirlo mientras la
+   tabla QUEPA; cuando no cabe, el navegador no puede cumplirlo y lo que
+   hace en una caja de columnas con alto fijo es **recortarla**: queda el
+   rótulo solo con media página en blanco debajo y las filas no están en
+   ninguna parte. No da error, la página no se rompe y el número de
+   páginas sigue saliendo bien.
+
+   ⚠️ **Y debajo hay una segunda trampa, que es la que costó encontrar:
+   UNA CAJA QUE SE DESLIZA NO SE PARTE NUNCA.** Un `overflow` distinto de
+   `visible` hace la caja indivisible para el navegador, así que la caja
+   que le da a la tabla su deslizamiento a lo ancho no se puede repartir
+   entre dos páginas por mucho `break-inside: auto` que se le ponga. De ahí
+   que las dos vistas se traten distinto: las **fichas** no necesitan
+   deslizarse a lo ancho, así que no llevan caja y se parten solas entre
+   páginas (con cada ficha entera); la **tabla** sí la necesita, así que se
+   le pone **tope de alto** y se desliza también hacia abajo dentro de su
+   caja, con el botón de verla entera al lado. Y el alto se mide **en la
+   caja, no en la figura**: una figura que el navegador ya repartió entre
+   dos columnas dice medir lo que mide la columna, así que preguntarle a
+   ella contesta «sí cabe» justo en el caso en que no.
+
+   ⚠️ **Y el toque en un mando de la tabla se para con `stopPropagation`.**
+   Estos botones **se rehacen dentro de su propia respuesta** —cambia la
+   vista y los mandos se vuelven a pintar—, así que cuando el aviso llega
+   arriba el botón ya está suelto, sin padres, y el «¿cuelga esto de la
+   tabla?» del toque al centro contesta que no: cambiar de vista escondía
+   además las barras de la sala.
+
+   ⚠️ **Y SE PINTA UNA VISTA CADA VEZ, NUNCA LAS DOS ESCONDIENDO UNA.** Con
+   las dos en el documento el texto del bloque saldría DUPLICADO, y sobre
+   ese texto se miden los subrayados (regla 21) y el avance de la lectura
+   (regla 6): cada tabla contaría el doble de lo que hay. La sonda cuenta
+   las apariciones de un dato.
+
+   `break-inside: avoid` para que la paginación por columnas no parta una
+   tabla por la mitad: media al final de una página y media al principio de
+   la otra no se lee, y en un ensayo eso son los datos. Se mira
+   **calculado**, como el color de las franjas.
+
+   Y lo que hay dentro de una tabla **cuenta y se busca**: `vozTextoDeBloque`
+   da el texto de cualquier bloque, y con él cuentan las palabras (si no,
+   media página de datos contaría cero y el avance daría un salto al
+   cruzarla) y busca el buscador —una cifra dentro de una tabla es justo lo
+   que se busca en un ensayo de investigación—.
+
+   Y la ida y vuelta: **corregir un ensayo no le puede deshacer las tablas
+   ni la bibliografía.** Lo que vuelve al recuadro de corregir sale con sus
+   tubos y su renglón de guiones, y con las fuentes como vinieron; es la
+   comprobación 16 aplicada a lo nuevo, y la sonda compara las dos formas.
+
+29. ⚠️ **LA BIBLIOGRAFÍA DE UN INFORME NO VIENE DENTRO DEL TEXTO, Y POR
+   ESO TIENE CAJA PROPIA.**
+   Descubierto el 12 de septiembre de 2026, con el primer informe de
+   investigación que el autor pegó tal cual desde Gemini: la herramienta le
+   dijo «una llamada del texto no tiene fuente» y él había copiado todo lo
+   que se podía copiar. **Y era verdad las dos cosas.**
+
+   Un informe así guarda sus fuentes en **otro sitio de la pantalla**
+   —plegadas bajo un «Fuentes usadas en el informe»— y las llamadas son
+   **numeritos dibujados, no letras**. Al copiar el informe no viene ni la
+   lista ni los numeritos: de ochomil palabras llegó UNA sola llamada, la
+   única escrita a mano dentro de una frase («(TALIS 2018)»), y ninguna
+   fuente. **Ninguna regla de lectura puede arreglar eso, porque lo que
+   falta no está en el texto**; lo único que lo arregla es una caja donde
+   pegar la lista, y eso es `#voz-f-fuentes` en la hoja de pegar.
+
+   **Un renglón, una fuente.** Y un renglón que es **solo un dominio**
+   (`publications.iadb.org`) no es una fuente: es el rótulo que esos
+   informes ponen encima del título, y se junta con el de debajo —el
+   título delante, que es por donde se busca el apellido, y el dominio
+   detrás, que es de donde sale el enlace—. Separados serían dos entradas
+   y ninguna de las dos diría nada.
+
+   ⚠️ **Y el enlace se perdía al corregir.** Juntado con su título, el
+   dominio ya no es «solo un dominio», así que al releer la caja se
+   quedaba sin `url` y **todas las fuentes perdían su 🔗 sin dar ningún
+   error**. Por eso `vozDominioAlFinal()` mira el ÚLTIMO trozo de la
+   entrada y solo si está **todo en minúsculas**, que es como se escribe
+   un dominio y como no se escribe el final de una frase («Debate.» y
+   «Melville House.» no llevan punto dentro de una palabra, y «S.A.» va en
+   mayúsculas). Dentro de la prosa no se busca nada: ahí «informe.pdf»
+   tendría la misma pinta. Y las terminaciones de archivo se descartan a
+   mano, como las palabras que no son apellidos.
+
+   **Al corregir, cada cosa vuelve a su caja**: el cuerpo sin la
+   bibliografía dentro (`vozTextoCuerpo(c, {sinFuentes:true})`) y las
+   entradas en la suya. Revolverlas en el mismo recuadro obligaría a
+   separarlas a mano en cada corrección.
+
+   ⚠️ **Y sin NINGUNA bibliografía, el aviso dice qué hacer, no lo que
+   falta.** Decirle a alguien «una llamada del texto no tiene fuente»
+   cuando el texto no trae ni una se lee como un reproche y no como una
+   instrucción —él copió todo lo que se podía copiar—: el aviso nombra la
+   caja donde se pega la lista.
+
+   ⚠️ **Y EL INTERRUPTOR DE VERSOS NO SE RETROALIMENTA.** Volvía encendido
+   con que el texto tuviera **una** estrofa, y encendido fuerza el verso en
+   TODO el texto: un ensayo de ochomil palabras al que cinco trozos se le
+   habían leído como verso —una tabla, una lista— volvía en modo verso, al
+   guardar salían más estrofas, y a la siguiente corrección más. Un
+   interruptor que se retroalimenta destroza la prosa en tres vueltas y
+   ninguna da error. Ahora vuelve encendido solo si el género es poema o
+   si el verso es **la mitad o más** de los bloques (`vozVersosMandan`).
+
+30. ⚠️ **ADJUNTAR UN ARCHIVO ES MEJOR QUE PEGAR, Y NO ES UNA COMODIDAD.**
+   Pedido por el autor el 12 de septiembre de 2026: «podrías poner adjuntar
+   ya sea de Drive, de OneDrive… al adjuntar en pdf o en Documentos de
+   Google, o un word, las citas ya están bien específicas y con mejor
+   orden». Y tiene razón por un motivo que se puede escribir: **copiar una
+   pantalla pierde información y un archivo no.** Al copiar, los títulos
+   pierden su renglón —el de su informe llegó pegado a la frase
+   siguiente—, las tablas se deshacen, los numeritos de las citas son
+   dibujos y no viajan, y la lista de fuentes se queda donde estaba. En un
+   `.docx` todo eso está dicho con todas las letras: qué párrafo es título
+   y de qué nivel, dónde empieza cada celda, qué trozo va en superíndice y
+   a qué nota al pie apunta, y a dónde lleva cada enlace.
+
+   ⚠️ **Y ESTO NO ES UN SEGUNDO LECTOR.** No entiende textos: los ESCRIBE
+   en el mismo alfabeto que `vozLeer` ya entiende (`#`, `>`, `- `, tubos,
+   `[3]`, `[^3]: …`) y los deja **en el recuadro, a la vista**. Dos
+   lectores con dos juegos de reglas se irían separando solos y el día que
+   alguien arreglara uno el otro se quedaría roto; y un adjunto que se
+   guardara sin enseñarse sería la única parte de esta herramienta que
+   hace cosas a espaldas de quien la usa, y encima con lo que más puede
+   salir torcido. Tampoco **pisa lo que ya había escrito**: se añade
+   debajo.
+
+   ⚠️ **DE DRIVE Y DE ONEDRIVE SE ADJUNTA SIN CONECTAR NINGUNA CUENTA:**
+   el selector de archivos del propio aparato ya los ofrece como orígenes.
+   Meter aquí el selector de Google o el de Microsoft sería traer dos
+   identificaciones más, dos librerías de fuera y dos cosas que pueden
+   caerse —en una aplicación que tiene dentro la Bóveda— para llegar al
+   mismo archivo al que ya se llega con un toque.
+
+   **Vive en `js/tools/voz-adjunto.js`, aparte**, por la misma razón que el
+   banco de cortes de El Rodaje: `voz-prestada.js` no toca ni un aparato
+   del navegador, y esto toca `DecompressionStream`, `DOMParser`, `File` y
+   `ArrayBuffer`. **Si no carga, la hoja de pegar sigue entera** y el botón
+   lo dice; la sonda lo comprueba apagándolo a propósito.
+
+   ⚠️ **Un `.docx` se abre sin librerías, y con una trampa dentro:** el
+   navegador ya sabe descomprimir (`DecompressionStream('deflate-raw')`) y
+   el índice del zip son treinta líneas — traer una librería sería un
+   archivo más en el arranque que costó quince segundos quitar. **Y los
+   tamaños se leen del DIRECTORIO CENTRAL, nunca de la cabecera de cada
+   archivo:** Word escribe ceros ahí y pone el bueno en un descriptor
+   DETRÁS de los datos, así que quien se fíe de la cabecera lee cero bytes
+   y se encuentra **un documento vacío sin ningún error**.
+
+   ⚠️ **EL SELECTOR NO FILTRA POR FORMATO, Y ESO NO ES DEJADEZ: ES LO
+   ÚNICO QUE DEJA ELEGIR UN DOCUMENTO DE GOOGLE.** Descubierto el 12 de
+   septiembre de 2026, con la captura de la carpeta de Drive del autor:
+   sus tareas de la maestría están en Documentos de Google y el selector
+   no le dejaba tocarlas —solo los Word—. El motivo es que **un Documento
+   de Google no es un archivo**: no tiene bytes, vive en el servidor, y el
+   aparato lo enseña como un archivo «virtual» de clase
+   `application/vnd.google-apps.document`; los formatos de verdad (.docx,
+   .html, .txt) son EXPORTACIONES que se fabrican al elegirlo. Con una
+   lista de formatos puesta, el selector compara la clase con la lista, no
+   encuentra ninguna y lo deja **apagado**: desde fuera parece que la
+   aplicación no los admite. Filtrar por el nombre no servía de nada de
+   todas formas —los selectores de Android se saltan la lista la mitad de
+   las veces—, así que la comprobación de verdad siempre estuvo en
+   `vadjLeer`, mirando lo que hay DENTRO.
+
+   Y como el aparato decide solo a qué formato exporta —unas veces un
+   `.docx`, otras un PDF, otras nada—, los cuatro finales están
+   contemplados y **los tres malos nombran el mismo camino de dos toques**
+   (`vadjGoogleComo`, en un solo sitio): un archivo **vacío** (la
+   exportación falló), un **`.gdoc`** (que es solo un atajo con la
+   dirección dentro, no el documento), un **PDF**, y una exportación que
+   llega bien pero **sin nombre de formato** — esa se reconoce por lo que
+   trae dentro, no por cómo se llama.
+
+   ⚠️ **Y EL PDF SE RECHAZA A PROPÓSITO, DICIENDO QUÉ HACER.** Un PDF no
+   guarda renglones: guarda letras con sus coordenadas, y muchos llevan
+   codificaciones propias, así que lo que se saca no es texto equivocado
+   —es un revoltijo de símbolos— y no se ve hasta leerlo. **Un revoltijo
+   que parece haber funcionado es lo peor que puede salir de aquí**, y no
+   hace falta: el mismo documento, descargado como Word, trae todo dicho.
+   Y se puede elegir igual —el selector no filtra—, así que la explicación
+   siempre llega.
+
+   Detalles que salieron de probarlo: el superíndice de dígitos se escribe
+   como `[3]` **solo si son dígitos** (un «1.er» no es una cita); la
+   dirección de un enlace se pone al lado del texto **solo si ese texto
+   tiene cinco caracteres o más**, porque en un informe exportado las
+   llamadas de las citas SON enlaces de uno o dos caracteres y el párrafo
+   se llenaría de direcciones; y las notas al pie **se renumeran desde 1**,
+   porque los identificadores de Word saltan y una bibliografía que empieza
+   en la nota 7 se lee como si faltaran seis.
+
+31. **LA VOZ Y LA MÁQUINA SE ELIGEN CON UN TOQUE, Y LAS SUGERENCIAS SALEN
+   DEL HISTORIAL.** Pedido por el autor el 12 de septiembre de 2026, con
+   la hoja de pegar en pantalla y los ejemplos rodeados a mano: «necesito
+   que allí pongas para poder seleccionar: Gemini, Perplexity, Claude».
+
+   Son los dos campos que HACEN FALTA para guardar, o sea los dos que se
+   escriben en **cada** texto, y siempre son los mismos tres o cuatro
+   valores. Escribirlos a mano en una tableta no es solo lento: **se
+   escriben mal**, y en el anaquel de esta casa hay un «Gemeni» de eso —
+   que parte en dos el montón del chip que agrupa por máquina, sin dar
+   ningún error y sin que nadie lo mire.
+
+   ⚠️ **Las voces salen del historial, nunca de una lista escrita**: la
+   voz que se imita es de cada casa —«Rulfo», «un narrador de pueblo», «un
+   informe de investigación»— y ninguna lista fija la puede adivinar. Es
+   la regla 2 del Apunte rápido. La **máquina** sí lleva lista
+   (`VOZ_MAQUINAS`), porque son cuatro y son las mismas para todo el
+   mundo; van detrás de las ya usadas y solo las que no estén.
+
+   ⚠️ **Y un nombre que se diferencia en UNA letra de uno bueno no se
+   propone**: un chip con «Gemeni» dentro reparte la errata en vez de
+   pararla, y con los dos a la vista nadie los distingue de un vistazo.
+   Una letra y no dos: a dos ya caben cosas distintas de verdad («Claude»
+   y «Claude 3»). Al texto viejo no se le toca nada por detrás; lo que
+   cambia es lo que se guarde de ahora en adelante.
+
+   Escribir a mano se sigue pudiendo —un chip que fuera la única manera
+   de rellenar el campo dejaría fuera la primera vez que se usa una voz
+   nueva—, el chip que coincide se marca solo al escribir, tocarlo otra
+   vez lo quita, y el aviso de «falta…» se apaga **en el momento**, no al
+   guardar.
+
+   ⚠️ **Y LA ERRATA QUE YA ESTÁ EN EL ANAQUEL SE ARREGLA DESDE EL
+   ANAQUEL, NO DESDE EL REPOSITORIO.** «Corrige el Gemeni del anaquel a
+   Gemini» (el autor, 12 de septiembre de 2026): esa errata vive DENTRO
+   de sus textos, y la única mano que puede escribir esas filas es la
+   suya —la seguridad por fila no deja otra—, así que lo que se pone es
+   el arreglo a un toque: el anaquel avisa de la máquina que está **a una
+   letra** de una buena y ofrece cambiarla en todos sus textos de una vez
+   (`vozMaquinasTorcidas`, `vozUnificarMaquina`). Sube por `vozSubir`, el
+   camino de siempre, que ya sabe reintentar y distinguir los motivos:
+   **aquí no se abre un segundo camino a la nube**, porque uno de los dos
+   se quedaría viejo. De los textos **ajenos se avisa pero no se ofrece
+   el botón** —lo rechazaría la base, y enseñarlo sería prometer lo que
+   no se puede hacer—, y a dos letras no se ofrece nada, que ahí ya caben
+   cosas distintas de verdad.
+
+32. 🗂 **LOS ESTANTES SON DEL DUEÑO, Y SON UN EJE APARTE DEL GÉNERO.**
+   Pedido por el autor el 12 de septiembre de 2026: «poder editar las
+   categorías de los textos para ubicarlos en los anaqueles según mis
+   criterios y no que me los den predeterminados».
+
+   ⚠️ **Y son un eje aparte a propósito.** El género dice QUÉ ES el texto
+   —un ensayo, un poema— y por eso sale en su portada («Ensayo escrito por
+   Gemini»): es parte de la etiqueta, la regla 1, y renombrarlo a gusto
+   haría que esa frase dejara de decir lo que tiene que decir. El estante
+   dice DÓNDE LO PONE SU DUEÑO y no significa nada fuera de su anaquel.
+   Hacían falta porque el género no sirve para esto: los veintiún textos
+   del autor son casi todos «Ensayo», así que agrupar por género le daba un
+   solo montón. Lo que de verdad los separa es la materia, y eso no se
+   puede adivinar desde aquí ni meter en una lista fija.
+
+   ⚠️ **Un texto está en VARIOS estantes, y al agrupar sale en cada uno.**
+   Un ensayo de la maestría sobre burocracia está en «Maestría» y en
+   «Burocracia»; enseñarlo solo en el primero lo escondería del montón
+   donde alguien lo va a buscar. Los que no están en ninguno van juntos y
+   al final («Sin estante»), que es además el filtro que dice qué falta por
+   archivar. **Y filtrando por un estante sale solo ese montón**: con el
+   mismo texto en dos, enseñar también el otro contesta a una pregunta que
+   nadie hizo.
+
+   ⚠️ **VIAJAN, y por eso están en la base y no en el aparato**: un estante
+   es una propiedad del TEXTO, y el texto es de la casa. Es lo contrario
+   del orden a mano (regla 25), que es del aparato porque la seguridad por
+   fila no deja escribir las filas ajenas; aquí cada quien escribe los
+   suyos, que es justo lo que esa seguridad permite. **Pide correr el SQL**
+   (`estantes jsonb`), y hasta entonces funcionan igual guardados en el
+   aparato y la barra lo dice — la regla de la repisa de enlaces.
+
+   ⚠️ **Y CON DOS COLUMNAS NUEVAS, LA QUE FALTA SE QUITA UNA A UNA.**
+   PostgREST rebota la consulta ENTERA por una sola columna que no exista,
+   y la maquinaria de «la base va vieja» estaba escrita para una:
+   `VOZ_COLS_NUEVAS` las lista, y `vozBajar` va quitando **la que el propio
+   error nombra**. Quitarlas todas de golpe dejaría el género en el aparato
+   en una base que sí lo tiene, sin dar ningún error. Añadir una columna
+   nueva es ponerla en esa lista y en el SQL; la maquinaria ya no se toca.
+
+   Se ponen en **dos sitios con una sola función** (`vozPintarEstantes`):
+   la hoja de pegar —se guardan con el texto— y el menú **⋯** —se guardan
+   al tocarlos—, que es lo que hace llevadero archivar veinte textos que ya
+   estaban, porque la hoja de corregir devuelve el ensayo entero a un
+   recuadro. Y «Maestría», «maestria» y « MAESTRÍA » son **el mismo
+   estante**: si no, el anaquel saldría con tres montones iguales.
+
+33. ⚠️ **EL ANAQUEL SE MIRA COMO EN PLAY LIBROS: LO PUESTO SE VE, LO DEMÁS
+   SE ABRE.** Rehecho el 12 de septiembre de 2026, el mismo día de
+   estrenar los estantes y con la captura del autor delante: «observo una
+   enorme carga cognitiva en estar clasificando o categorizando; me gusta
+   como está configurado Google Play Libros, donde de manera vertical se
+   despliegan para ver los anaqueles, sin tantas vueltas. Igual se pueden
+   seleccionar varios libros y mandarlos a las categorías».
+
+   Y tenía razón, y se podía contar: antes del primer libro había **cinco
+   filas de chips** —vista, orden, agrupar, género, estante y voz—, todas
+   deslizándose a lo ancho. Media pantalla de mandos para llegar a lo que
+   se venía a ver, y ninguno contestaba la pregunta con la que uno abre un
+   anaquel, que es «¿dónde están mis cosas?». Cada eje nuevo añadía su
+   fila: la herramienta empeoraba al crecer, que es la señal de que la
+   forma estaba mal y no de que faltara sitio.
+
+   Ahora en la barra queda **una sola fila**: las tres vistas, 🗂 Estantes,
+   ⇅ Orden y ☑ Elegir. Debajo, **solo los filtros que estén PUESTOS**, cada
+   uno con su equis, y la fila entera se esconde cuando no hay ninguno. Lo
+   demás vive en una hoja que se abre, y dentro va **EN VERTICAL —un
+   renglón de 44 px por estante, con su cuenta—**, que es como se miran los
+   estantes de una estantería y como no se miran seis chips deslizándose.
+   Los ESTANTES van primero, que es a lo que se abre esa hoja; el género y
+   la voz, debajo. Y elegir un estante **cierra la hoja**: se vino a ver
+   ese montón, no a seguir mirando la lista.
+
+   ⚠️ **Y NO CONTRADICE LA REGLA DE LOS CHIPS QUE SE DESLIZAN** (la de las
+   materias de Videos M.E.T.A.S). Allí el problema era que ocho chips
+   ENVUELTOS ocupaban tres renglones y empujaban lo importante fuera de la
+   pantalla, y la respuesta fue deslizarlos. Aquí el problema es el
+   contrario —son CINCO FILAS— y deslizar cada una no quita ni una: lo que
+   sobra no es el envoltorio, es tenerlas todas a la vez.
+
+   ⚠️ **ELEGIR VARIOS Y MOVERLOS DE UNA VEZ ES LA OTRA MITAD, Y LA QUE DE
+   VERDAD QUITA LA CARGA.** Con veintidós textos por archivar, hacerlo de
+   uno en uno son veintidós vueltas por el menú **⋯** de cada uno. ☑ Elegir
+   enciende el modo, un toque marca un texto, y 🗂 Mover abre la misma hoja
+   vertical: tocar un estante los mete a todos y, **si ya estaban todos,
+   los saca** —un solo renglón para las dos cosas, que es el interruptor de
+   siempre aplicado a varios—. Cuatro cosas que no se negocian:
+
+   - **Se entra por un BOTÓN, no solo por una pulsación larga.** Un gesto
+     que sea la única manera de hacer algo es algo que a veces no se puede
+     hacer: es la regla del asa de arrastre de la repisa.
+   - ⚠️ **Mientras se elige, el toque ELIGE y nada más**, y el asa de
+     arrastrar se retira: el mismo dedo no puede querer dos cosas a la vez,
+     y un toque que abriera el texto encima haría perder la selección.
+   - ⚠️ **Los ajenos no se tocan y se DICE.** La seguridad por fila los
+     rechazaría, y moverlos en la pantalla sería prometer algo que la base
+     deshace en el siguiente arranque. Es la regla 14 vista desde aquí.
+   - ⚠️ **Crear un estante nuevo se hace DENTRO de la hoja de mover, y no
+     pierde la selección.** Si hubiera que salir a crearlo, archivar veinte
+     textos serían veinte selecciones.
+
+   ⚠️ **Y EN LA BARRA, LOS BOTONES VAN PRIMERO Y EL CAMBIO DE VISTA AL
+   FINAL.** La barra se desliza, así que lo último es lo que se sale de la
+   pantalla: puestas las vistas delante —que fue como nació— **☑ Elegir
+   caía fuera del borde derecho en TODOS los teléfonos** (medido: 393 px
+   de mandos en una caja de 280 a 390), o sea que la mitad de lo que se
+   pidió no se veía sin deslizar una barra que no parece deslizarse. No
+   daba error, la barra era de una fila y el HTML estaba bien. Ahora los
+   tres botones caben enteros hasta en una pantalla de 320 px, lo que
+   asoma es la vista —que se toca una vez al mes—, y el degradado del
+   borde dice que hay más. Es además donde las pone Play Libros. La
+   comprobación **34** lo mide **en píxeles**, como el color calculado:
+   esto se cazó mirando una foto, no leyendo el código.
+
+   ⚠️ **Y EL BOTÓN FLOTANTE DE DESTELLOS SE APARTA MIENTRAS SE ELIGE.**
+   Vive en la esquina de abajo a la derecha, que es exactamente donde cae
+   el «✕ Salir» de la barra de elegidos: se lo comía entero. Es el mismo
+   estorbo que ya está escrito en El Rodaje. **Y la regla necesitó
+   `!important`**, que aquí no es pereza: `switchView` (js/app.js) le
+   escribe `style.display = 'flex'` EN LA ETIQUETA al entrar en cada
+   vista, y un estilo en la etiqueta le gana a cualquier regla por
+   específica que sea — así que sin él la regla existe, no da ningún
+   error y no hace nada, que es el peor de los fallos.
+
+   **Y no hizo falta correr ni una línea de SQL**, que es lo que el autor
+   pidió: los estantes ya viajaban por la columna `estantes` de la regla 32,
+   y esto es solo la manera de mirarlos.
+
+34. 📖 **F.A.R.O PUEDE ABRIR AQUÍ, Y LA LLAVE ES DEL APARATO.**
+   Pedido por el autor el 12 de septiembre de 2026: «que la herramienta de
+   La Voz Prestada pueda activarle que al abrir F.A.R.O sea lo primero que
+   se presente, tal como está Finanzas, pero que solo se active en el
+   dispositivo que uno desee; es decir, que en otros dispositivos siga
+   Finanzas como primer acceso».
+
+   Es el interruptor del Apunte rápido (regla 11 de Finanzas) y **se
+   escribe igual a propósito**: misma clase de llave, mismo `role="switch"`
+   de fila entera —una bolita de 26 px se falla con el dedo y esto se toca
+   una vez en la vida—, las mismas palabras en las dos posiciones y el
+   mismo respeto por `?view=`. Dos interruptores que hacen lo mismo
+   escritos de dos maneras se arreglan en uno y se quedan rotos en el otro.
+
+   ⚠️ **LA LLAVE ES DEL APARATO, Y ESO ES LA MITAD DE LO QUE SE PIDIÓ.**
+   `faro.voz.abre_aqui` vive en `localStorage` y **no viaja a la nube**:
+   encenderla en la tableta del autor no puede cambiarle la pantalla de
+   entrada a quien en esta casa abre F.A.R.O para mirar el saldo. Es la
+   misma razón por la que son del aparato la posición de lectura, la letra
+   y el orden a mano (reglas 12 y 25). Y es **global al aparato**, no de
+   cada presupuesto ni de cada quien: una llave por contexto obligaría a
+   encenderla dos veces y la segunda no se encuentra nunca. La sonda mira
+   que encenderla **no escriba ni una fila**.
+
+   ⚠️ **VA AL PIE DEL ANAQUEL, debajo de los textos.** Lo que se usa a
+   diario va arriba; lo que se decide una vez en la vida, al final. Ponerlo
+   arriba sería devolverle a la cabecera el sitio que acaba de costar
+   recuperar (regla 33), y por un interruptor que casi nadie vuelve a
+   tocar.
+
+   ⚠️ **Y PASA SOLO AL ABRIR, NUNCA AL VOLVER A LA APLICACIÓN.** Ahí está
+   la diferencia con el Apunte rápido, y no es un olvido: aquel abre una
+   HOJA encima de la pantalla en que ya estabas —y solo si estabas en
+   Finanzas—, mientras que esto **cambia de pantalla**. Volver del teclado
+   o de otra aplicación y encontrarse que F.A.R.O se llevó por delante el
+   chat a medio escribir sería el peor momento posible, que es la lección
+   ya escrita en el `visibilitychange` de Finanzas.
+
+   ⚠️ **Y UNA SOLA COSA ABRE F.A.R.O: LO DECIDE `faroArranqueInicio`**
+   (js/app.js), en un solo sitio. Ahora hay DOS interruptores de aparato
+   que quieren el mismo hueco, y con cada uno mirando solo su llave un
+   aparato con las dos encendidas abriría el anaquel y le plantaría encima
+   la hoja de los gastos: la de abajo aparecería al cerrar la de arriba.
+   Preguntando en orden desde un solo sitio eso no puede pasar, y ninguna
+   de las dos herramientas tiene que saber que la otra existe. **La lectura
+   va primero** porque es la que cambia de pantalla; el Apunte rápido sigue
+   pegado a Finanzas, así que quien tenga las dos encendidas entra a leer y
+   se encuentra su hoja puesta en cuanto entre a Finanzas — que es lo que
+   cada interruptor prometió por separado. **Y el árbitro tiene nombre
+   propio** para que la sonda llame a ESE y no a una copia escrita al lado:
+   un doble que reparte el turno a su manera aprobaría con el reparto de
+   verdad roto (la lección de la costura del 10 de septiembre, regla 13).
+
+   Comprobación **35**: el interruptor se pulsa de verdad, se mide que está
+   al pie, que no escribe en la nube, que `?view=` manda, que con las dos
+   encendidas no se apilan, que volver a la aplicación no cambia de
+   pantalla, y que apagándolo F.A.R.O vuelve a abrir donde abría.
+
+35. ⚠️ **EL TALLER DE COMPRENSIÓN: LO LEÍDO SE QUEDA O NO SE QUEDA.**
    Pedido por el autor el 16 de septiembre de 2026: «que en cada ensayo de
    esta herramienta pudieras crear el enlace de actividades de comprensión
    lectora… tarjetas de memoria, de arrastre, preguntas de comprensión, de
@@ -1678,7 +2269,27 @@ el diseño.
 ```
 node _dev/servidor-estatico.js      (en otra terminal)
 _dev/probe-voz-prestada.html        (en el navegador)
+_dev/probe-voz-adjunto.html         (el lector de archivos)
 ```
+
+Y el SQL, contra un PostgreSQL de verdad. ⚠️ En esta sesión Postgres no
+corre como root, así que va con su propio usuario:
+
+```
+mkdir -p /tmp/pg && chown postgres:postgres /tmp/pg
+su postgres -c "initdb -D /tmp/pg/data -U postgres --auth=trust"
+su postgres -c "pg_ctl -D /tmp/pg/data -o '-k /tmp/pg -p 55432 -c listen_addresses=' -l /tmp/pg/log start"
+createdb -h /tmp/pg -p 55432 -U postgres voztest
+psql -h /tmp/pg -p 55432 -U postgres -v ON_ERROR_STOP=1 -d voztest -f _dev/prueba-voz-prestada-sql.sql
+```
+
+⚠️ La sonda del adjunto **fabrica un `.docx` de verdad dentro del
+navegador** —con su zip, su CRC32 y su `deflate-raw`— y lo lee, en vez de
+darle a las funciones un XML ya descomprimido. Es la misma lección que la
+sonda del banco de cortes, que se fabrica un WAV y lo corta: lo que puede
+fallar aquí es el FORMATO, y eso no se ve nunca llamando funciones. Y
+escribe los tamaños de la cabecera **en cero, como los escribe Word**,
+que es la trampa que deja un documento vacío sin dar ningún error.
 
 La comprobación **2** le pega un párrafo de prosa cuyos siete renglones
 empiezan por siete palabras que nombran una parte de un libro, y exige que
@@ -1716,7 +2327,25 @@ FIRMADA. La otra mitad del puente —el botón dentro de la misión— la vigila
 `_dev/probe-lecturas-marcador.html`, pulsándolo de verdad y contando los
 párrafos que viajan.
 
-La comprobación **28** es el taller de comprensión, y es la más larga
+Las comprobaciones **28** y **29** son las citas y las tablas. La 28
+compara el texto pintado con el guardado **carácter por carácter** —que es
+lo que impide que poner los botones desplace los subrayados ya hechos—,
+comprueba que consultar no mueve la página, que una llamada sin fuente no
+se toca, que una dirección `javascript:` de la bibliografía no llega a
+ningún `href`, y **dispara el toque sobre la zona de pasar página** para
+ver que la llamada de debajo lo recibe. La 29 pulsa los botones de la
+tabla de verdad, mira `break-inside` y el `position: sticky` **calculados**,
+exige que solo haya UNA vista en el documento —con las dos, el texto del
+bloque sale duplicado— y da la vuelta al texto para ver que corregir no
+deshace las tablas.
+
+La comprobación **30** es el informe de investigación pegado tal como
+llega: sin sus fuentes dentro, con la lista pegada aparte (con el dominio
+en su propio renglón, como se copia), y con la ida y vuelta de corregir,
+que es donde el enlace se perdía. Y vigila que el interruptor de versos no
+vuelva encendido en un ensayo con una estrofa suelta.
+
+La comprobación **36** es el taller de comprensión, y es la más larga
 porque lo que puede salir mal está ordenado por gravedad: que se guarde
 un examen con la respuesta cambiada; que una actividad generada tenga
 una respuesta que NO está en el texto (se comprueba buscándola dentro
@@ -1817,7 +2446,7 @@ Cada sonda termina poniendo **APRUEBA** o **SUSPENDE** en `document.title`,
 con el veredicto DELANTE (el rótulo viejo «SONDA-APRUEBA» ya se retiró).
 No es decoración: es lo que se lee al correrlas en tanda. Once sondas
 antiguas no lo hacían, y en la auditoría del 20 de agosto de 2026
-aparecieron **veintinueve más**; hoy lo hacen las noventa y cuatro. La
+aparecieron **veintinueve más**; hoy lo hacen las noventa y cinco. La
 única excepción es `probe-alto-util.html`, que no es una sonda sino un
 instrumento de medida y se titula INSTRUMENTO. La cuenta no se escribe de
 memoria (esta línea ya se quedó vieja una vez): sale de
@@ -1826,6 +2455,22 @@ instrumento. Dos sondas
 (`probe-tiempos-push-sesion` y `probe-verif-dosclientes-reales`) hablan
 con el Supabase real y por eso SUSPENDEN en las sesiones de Claude Code,
 donde el proxy bloquea `supabase.co`: en el aparato del autor aprueban.
+
+⚠️ **Y una tercera, `probe-sw-arranque`, suspende ahí por la máquina y no
+por una avería**, en su única comprobación de reloj («se pinta enseguida»,
+tope 400 ms). Comprobado el 12 de septiembre de 2026, porque el número
+asusta —12,5 segundos— y se parece demasiado a la espera que esa sonda
+vigila: **se midió el mismo commit que la arregló** (`73cea66`, «Arranque:
+la aplicación abre al instante») sirviéndolo aparte, y da **12,5 s
+también**. O sea que el Chromium sin cabeza de estas sesiones tarda eso en
+cargar y ejecutar los 32 archivos (`DOMContentLoaded` a los 12,6 s), sin
+service worker que sirva de la copia guardada, que es justo lo que hace
+instantáneo el arranque de verdad. La forma de comprobarlo es esa y no
+otra: **medir una versión que se sabe buena en la misma máquina**; si esa
+también tarda, es la máquina. Las otras 24 comprobaciones del archivo sí
+valen ahí y hay que leerlas. Y la sonda dice ahora **el número** en el
+fallo, no solo «tardó»: sin él no se distingue una espera que ha vuelto de
+una máquina lenta, y se empieza a buscar la avería donde no está.
 
 Y las cuentas que dependen del catálogo **se sacan del catálogo**, no se
 escriben a mano. Tres sondas de la Casa Cerrada esperaban una, dos y tres

@@ -213,9 +213,14 @@
    Chips y no desplegables: un toque en vez de dos. La vista es un
    grupo de tres botones con `aria-pressed`, como las pestañas de la
    sala. Lo elegido es del APARATO (localStorage), nunca de la nube. */
-.voz-herr { display: flex; flex-direction: column; gap: 2px; margin-bottom: 6px; }
+/* ⚠️ La regla de `.voz-herr` se escribe UNA sola vez, al final del
+   archivo. Aquí vivía la de antes —columna, para las cinco filas de
+   chips— y quedarse las dos, fiándose de que gana la de más abajo, es el
+   mismo fallo que las franjas de color de El Rodaje: no da error, no
+   rompe la página, y el día que alguien mueva un bloque la barra vuelve
+   a apilarse sin que nadie haya tocado nada. */
 .voz-vistas {
-  display: inline-flex; gap: 3px; align-self: flex-start; margin-bottom: 6px;
+  display: inline-flex; gap: 3px; flex: 0 0 auto;
   background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 3px;
 }
 .voz-vista {
@@ -224,11 +229,6 @@
   display: inline-flex; align-items: center; justify-content: center;
 }
 .voz-vista-on { background: var(--surface); color: var(--story); box-shadow: 0 1px 3px rgba(15,23,42,.14); }
-.voz-chips-herr { align-items: center; padding-bottom: 6px; margin-bottom: 0; }
-.voz-herr-rot {
-  flex: 0 0 auto; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
-  color: var(--muted); margin-right: 2px;
-}
 .voz-chip-chica { padding: 6px 11px; min-height: 32px; font-size: 12.5px; }
 .voz-orden-nota { margin: 0 0 4px; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
 
@@ -699,11 +699,22 @@
   -webkit-overflow-scrolling: touch;
 }
 .voz-panel[hidden] { display: none; }
-.voz-tabs { display: flex; gap: 4px; background: var(--bg); padding: 4px; border-radius: 12px; margin-bottom: 12px; }
+/* ⚠️ Con la pestaña 📚 Fuentes son CINCO, y en un teléfono de 400 px
+   repartidas a partes iguales el rótulo de cada una se cortaba a la
+   mitad («Mar…», «Sub…», «Bus…»): una pestaña que no se puede leer es
+   una pestaña que no se toca. Se DESLIZAN, como los chips de materia
+   de Videos M.E.T.A.S y por lo mismo, y siguen repartiéndose el ancho
+   cuando caben enteras. */
+.voz-tabs {
+  display: flex; gap: 4px; background: var(--bg); padding: 4px;
+  border-radius: 12px; margin-bottom: 12px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.voz-tabs::-webkit-scrollbar { display: none; }
 .voz-tab {
-  flex: 1 1 0; min-width: 0; padding: 9px 4px; border: 0; border-radius: 9px; cursor: pointer;
+  flex: 1 0 auto; min-width: 0; padding: 9px 10px; border: 0; border-radius: 9px; cursor: pointer;
   background: transparent; color: var(--muted); font: inherit; font-size: 12.5px; font-weight: 600;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .voz-tab-on { background: var(--surface); color: var(--story); box-shadow: 0 1px 3px rgba(0,0,0,.14); }
 
@@ -1216,6 +1227,410 @@
   .voz-act-tablero { gap: 6px; }
   .voz-act-par { font-size: 12.5px; padding: 9px 10px; }
   .voz-act-mid { padding-left: 12px; padding-right: 12px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAS FUENTES CITADAS Y LAS TABLAS (12 de septiembre de 2026)
+   ═══════════════════════════════════════════════════════════════════
+   Todo esto vive DENTRO de `#voz-lector`, así que se tiñe solo con el
+   papel puesto (papel, sepia, noche) y no hay que nombrar ninguna
+   ventana suelta: es la ventaja que ya tiene la sala sobre El Rodaje.
+   Y los colores salen de los tokens de la sala —`--story`, `--surface`,
+   `--border`—, nunca de `--card`, que EN LA APLICACIÓN NO EXISTE y se
+   resolvería a transparente sin dar ningún error. */
+
+/* ─── La llamada a una fuente, dentro del texto ─────────────────── */
+/* ⚠️ Lleva dentro el texto TAL CUAL SE ESCRIBIÓ («[3]», «(Harari,
+   2014)»): no se sustituye por nada, se le da un botón. Ver la nota
+   grande de `voz-prestada.js`. Por eso hereda la letra de la lectura y
+   no se le pone tamaño propio: un «(Harari, 2014)» con otra letra en
+   mitad de una frase es una errata a la vista. */
+.voz-cit {
+  /* `display: inline` y nada de caja: una llamada larga tiene que
+     poder partirse al final de un renglón como cualquier palabra. Ver
+     la nota de `vozNodoLlamada`. */
+  display: inline; font: inherit; color: var(--story); cursor: pointer;
+  border-bottom: 1px dotted currentColor;
+}
+.voz-cit:active { opacity: .6; }
+.voz-cit:focus-visible { outline: 2px solid var(--story); outline-offset: 2px; border-radius: 3px; }
+/* La numérica sube como un exponente, que es como se leen las llamadas
+   numéricas en cualquier libro y en cualquier enciclopedia. */
+.voz-cit-n {
+  font-size: .72em; vertical-align: super; line-height: 0;
+  font-weight: 700; border-bottom: 0; padding: 0 .06em;
+  white-space: nowrap;
+}
+.voz-cit-n:hover { text-decoration: underline; }
+.voz-cit-ap { white-space: normal; }
+
+/* ─── La ficha de la fuente, encima de la lectura ───────────────── */
+.voz-citbar {
+  position: absolute; z-index: 24; max-width: min(460px, 94%);
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.28);
+  padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px;
+  font-family: system-ui, sans-serif;
+}
+.voz-citbar[hidden] { display: none; }
+/* Si no cabe ni encima ni debajo del trozo, al pie: es mejor que salir
+   tapando justo la frase que se estaba leyendo. */
+.voz-citbar-abajo { left: 50% !important; transform: translateX(-50%); bottom: 74px; top: auto !important; }
+.voz-citbar-cab { display: flex; align-items: center; gap: 8px; }
+.voz-citbar-rot {
+  font-size: 10.5px; font-weight: 800; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--story);
+}
+.voz-citbar-x {
+  margin-left: auto; min-width: 34px; height: 30px; border-radius: 9px;
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  font-size: 14px; cursor: pointer;
+}
+.voz-citbar-f { display: flex; gap: 9px; align-items: flex-start; }
+.voz-citbar-n {
+  flex: 0 0 auto; min-width: 22px; height: 22px; border-radius: 7px;
+  background: var(--story); color: #fff; font-size: 11.5px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; margin-top: 2px;
+}
+.voz-citbar-cuerpo { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+.voz-citbar-t {
+  margin: 0; font-size: 13.5px; line-height: 1.45;
+  font-family: var(--voz-fam, Georgia, serif); overflow-wrap: anywhere;
+}
+.voz-citbar-acc { display: flex; gap: 6px; flex-wrap: wrap; }
+.voz-citbar-b, .voz-citbar-ir {
+  font-size: 11.5px; padding: 6px 9px; border-radius: 9px;
+  border: 1px solid var(--border); background: none; color: var(--text);
+  cursor: pointer; text-decoration: none; min-height: 30px;
+  display: inline-flex; align-items: center;
+}
+.voz-citbar-ir { color: var(--story); border-color: var(--story); font-weight: 600; }
+
+/* ─── La bibliografía, dentro del texto ─────────────────────────── */
+/* Sangría francesa: la segunda línea entrada, como en cualquier norma
+   de cita. Es lo que deja ver de un vistazo dónde empieza cada entrada
+   en una lista de cuarenta. */
+.voz-fuente {
+  margin: 0 0 .7em; padding-left: 1.6em; text-indent: -1.6em;
+  text-align: left; font-size: .92em; line-height: 1.5;
+}
+.voz-fuente-n {
+  display: inline-block; min-width: 1.5em; color: var(--story); font-weight: 700;
+  text-indent: 0;
+}
+.voz-fuente-t { overflow-wrap: anywhere; }
+.voz-fuente-ir { color: var(--story); text-decoration: none; margin-left: .3em; }
+
+/* ─── Las tablas ────────────────────────────────────────────────── */
+/* `break-inside: avoid` para que la paginación por columnas no parta
+   una tabla por la mitad: media tabla al final de una página y media al
+   principio de la otra no se lee, y en un ensayo eso son los datos. */
+.voz-tabla {
+  margin: 1.1em 0; padding: 0; break-inside: avoid; page-break-inside: avoid;
+  text-indent: 0; text-align: left;
+}
+.voz-tabla-tit {
+  font-size: .78em; font-weight: 700; color: var(--story);
+  margin-bottom: .45em; line-height: 1.35; letter-spacing: .2px;
+  font-family: system-ui, sans-serif;
+}
+/* Cuando no cabe de alto en la página se la deja partirse: pedir que
+   no la partan la hace desaparecer. Ver la nota de
+   `vozAjustarUnaTabla`. Cada fila y cada ficha siguen enteras, que es
+   lo que se nota leyendo. */
+.voz-tabla-larga { break-inside: auto; page-break-inside: auto; }
+/* Una ficha y una fila NUNCA se parten por dentro: es lo que se nota
+   leyendo, y es cierto quepa o no quepa la tabla entera. */
+.voz-tf, .voz-tabla-t tr { break-inside: avoid; page-break-inside: avoid; }
+/* ⚠️ Y LA CAJA QUE SE DESLIZA SOLO EXISTE PARA LA TABLA. Un `overflow`
+   distinto de `visible` hace la caja INDIVISIBLE: no se puede repartir
+   entre dos páginas por mucho `break-inside: auto` que se le ponga. Las
+   fichas no necesitan deslizarse a lo ancho, así que aquí no llevan
+   caja y se parten solas. */
+.voz-tabla-cuerpo { overflow: visible; }
+.voz-tabla[data-vista="tabla"] .voz-tabla-cuerpo { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.voz-tabla-larga[data-vista="tabla"] .voz-tabla-cuerpo { overflow-y: auto; }
+.voz-tabla-t {
+  border-collapse: collapse; width: 100%; font-size: .8em;
+  font-family: system-ui, sans-serif; line-height: 1.35;
+}
+.voz-tabla-t th, .voz-tabla-t td {
+  border: 1px solid var(--border); padding: .38em .5em; text-align: left;
+  vertical-align: top;
+}
+.voz-tabla-t thead th {
+  background: var(--marca); font-weight: 700; font-size: .95em;
+}
+.voz-tabla-t tbody th { font-weight: 600; }
+.voz-td-der { text-align: right; font-variant-numeric: tabular-nums; }
+.voz-td-cen { text-align: center; }
+/* El degradado del borde dice que hay más a la derecha, como en los
+   chips de materia de Videos M.E.T.A.S: una tabla cortada sin ninguna
+   señal se lee como una tabla de tres columnas. */
+.voz-tabla-ancha .voz-tabla-cuerpo {
+  -webkit-mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+}
+.voz-tabla-mandos {
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  margin-top: .45em; font-family: system-ui, sans-serif;
+}
+.voz-tabla-mandos[hidden] { display: none; }
+.voz-tabla-b {
+  font-size: 11.5px; padding: 5px 9px; min-height: 30px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  cursor: pointer;
+}
+.voz-tabla-nota { font-size: 11px; color: var(--muted); }
+
+/* Una ficha por fila: la única forma de leer de corrido una tabla de
+   seis columnas en un teléfono sin perder ni un dato. */
+.voz-tabla-fichas { display: flex; flex-direction: column; gap: 8px; }
+.voz-tf {
+  border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px;
+  font-family: system-ui, sans-serif; font-size: .8em; line-height: 1.4;
+}
+.voz-tf-tit { font-weight: 700; margin-bottom: 4px; color: var(--story); }
+.voz-tf-par { display: flex; gap: 8px; align-items: baseline; }
+.voz-tf-l { flex: 0 0 42%; color: var(--muted); font-size: .92em; overflow-wrap: anywhere; }
+.voz-tf-v { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+
+/* La tabla entera, a pantalla completa: se desliza a lo ancho con la
+   cabecera y la primera columna clavadas, que es lo que hace falta para
+   comparar la primera fila con la última. Por encima de las zonas de
+   pasar página, o el deslizamiento se lo comerían ellas. */
+.voz-tablon {
+  position: absolute; inset: 0; z-index: 40; background: var(--bg);
+  display: flex; flex-direction: column;
+}
+.voz-tablon-cab {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-bottom: 1px solid var(--border); font-family: system-ui, sans-serif;
+}
+.voz-tablon-tit {
+  font-size: 12.5px; font-weight: 700; color: var(--story);
+  flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.voz-tablon-mm { display: flex; gap: 6px; flex: 0 0 auto; }
+.voz-tablon-b {
+  width: 38px; height: 38px; border-radius: 10px; font-size: 15px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;
+}
+.voz-tablon-x { color: var(--story); font-weight: 700; }
+.voz-tablon-caja { flex: 1 1 auto; overflow: auto; -webkit-overflow-scrolling: touch; padding: 0 0 6px; }
+.voz-tablon-caja .voz-tabla-t { width: auto; min-width: 100%; font-size: 1em; }
+.voz-tablon-caja .voz-tabla-t thead th {
+  position: sticky; top: 0; z-index: 2; background: var(--marca);
+}
+.voz-tablon-caja .voz-tabla-t tbody th {
+  position: sticky; left: 0; z-index: 1; background: var(--surface);
+}
+.voz-tablon-caja .voz-tabla-t thead th:first-child { z-index: 3; }
+.voz-tablon-pie {
+  padding: 6px 10px; font-size: 11px; color: var(--muted);
+  border-top: 1px solid var(--border); font-family: system-ui, sans-serif;
+}
+
+/* ── La barra del anaquel, la hoja vertical y elegir varios ──────────
+   Rehecho el 12/9/2026: antes del primer libro había cinco filas de
+   chips. Ver la nota grande de voz-prestada.js. */
+/* ⚠️ Y se DESLIZAN en vez de envolverse, como los chips de materia de
+   Videos M.E.T.A.S: envueltos volverían a ser dos renglones, que es
+   justo lo que se vino a quitar. Aquí sí es la respuesta buena, porque
+   son cuatro cosas y no cinco filas. */
+.voz-herr {
+  display: flex; flex-direction: row; align-items: center; gap: 6px;
+  flex-wrap: nowrap; overflow-x: auto; margin-bottom: 10px;
+  padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.voz-herr::-webkit-scrollbar { display: none; }
+.voz-herr .voz-btn { flex: 0 0 auto; white-space: nowrap; }
+.voz-herr-btn { flex: 0 0 auto; }
+/* ⚠️ EL DEGRADADO DEL BORDE DICE QUE HAY MÁS. Medido: los mandos ocupan
+   393 px y la caja de un teléfono son de 280 a 390, así que algo asoma
+   siempre. Los tres botones caben enteros hasta en una pantalla de
+   320 px (265 px de 280) y lo que se sale es el cambio de vista, que se
+   toca una vez al mes; pero una barra que se desliza y no lo parece es
+   una barra que nadie desliza. Misma solución que los chips de materia
+   de Videos M.E.T.A.S. */
+.voz-herr {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+}
+/* Las vistas, al final y pegadas a la derecha cuando sobra sitio. Con la
+   barra llena, el margen automático se encoge solo y no estorba. */
+.voz-herr .voz-vistas { margin-left: auto; }
+.voz-herr .voz-vista { min-width: 36px; height: 32px; padding: 0 6px; font-size: 15px; }
+.voz-herr-on { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+/* El interruptor de «que F.A.R.O abra aquí» es el del Apunte rápido: usa
+   sus clases y aquí solo se le da el aire del pie. Ni un color propio, para
+   que el día que se retoque aquel, este vaya detrás. */
+/* ⚠️ Y LLEVA AIRE DEBAJO POR EL BOTÓN FLOTANTE DE DESTELLOS. Es la
+   TERCERA vez en el mismo día que ese botón se come algo: vive fijo en la
+   esquina de abajo a la derecha, y esta fila es lo último del anaquel, o
+   sea que cae justo ahí — medido en la foto, tapaba el final de la frase
+   que explica lo que hace el interruptor. Con este hueco debajo, la fila
+   queda siempre por encima de su banda: si el anaquel se desliza, al
+   llegar al final sobran estos píxeles; y si no se desliza, es que la fila
+   con su hueco cabía entera, o sea que tampoco llega. */
+.voz-abre-aqui { margin-top: 20px; margin-bottom: 82px; }
+
+/* Los filtros puestos, con su equis. Es lo único que queda a la vista. */
+.voz-filtro-puesto { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.voz-filtro-puesto[hidden] { display: none; }
+.voz-puesto {
+  display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+  padding: 6px 10px; border-radius: 999px; min-height: 32px; font-size: 12.5px;
+  border: 1px solid var(--brand); background: var(--brand); color: #fff; font-weight: 600;
+}
+.voz-puesto-x { opacity: .8; font-size: 11px; }
+
+/* La hoja: una fila por estante, a lo ancho entero y de 44 px. */
+.voz-anaq { max-height: 86vh; }
+.voz-hoja-rot {
+  font-size: 10.5px; font-weight: 800; letter-spacing: .7px; text-transform: uppercase;
+  color: var(--muted); margin: 14px 0 4px;
+}
+.voz-hoja-rot:first-child { margin-top: 2px; }
+.voz-hoja-fila {
+  display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer;
+  padding: 11px 10px; min-height: 44px; border: 0; border-radius: 10px;
+  background: none; color: var(--text); font: inherit; font-size: 14px; text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.voz-hoja-fila:hover { background: var(--bg); }
+.voz-hoja-on { color: var(--brand); font-weight: 700; }
+.voz-hoja-ic { flex: 0 0 auto; font-size: 15px; }
+.voz-hoja-txt { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.voz-hoja-n {
+  flex: 0 0 auto; font-size: 11.5px; font-weight: 700; color: var(--muted);
+  background: var(--bg); border-radius: 99px; padding: 2px 8px;
+}
+.voz-hoja-tic { flex: 0 0 14px; color: var(--brand); font-weight: 800; }
+.voz-hoja-nota { font-size: 12.5px; color: var(--muted); line-height: 1.45; margin: 4px 0 8px; }
+.voz-hoja-aviso {
+  font-size: 12.5px; line-height: 1.45; color: #92400e; margin: 4px 0 8px;
+  background: var(--story-bg, #fdf6ec); border: 1px solid rgba(180,83,9,.3);
+  border-radius: 10px; padding: 8px 10px;
+}
+
+/* Elegir varios: la tarjeta marcada y la barra del pie. */
+.voz-elegible { cursor: pointer; }
+.voz-elegido { outline: 3px solid var(--brand); outline-offset: 2px; }
+/* ⚠️ La barra de elegidos se queda pegada abajo, pero POR DEBAJO de la
+   lista, no encima: `sticky` con `bottom: 0` la fija mientras se
+   desplaza y deja de tapar cuando se llega al final. Y la lista lleva
+   aire por debajo mientras se elige (`.voz-eligiendo`), porque si no,
+   los últimos textos —que son justo los que se van a tocar— quedan
+   detrás de ella. */
+.voz-sel-barra {
+  position: sticky; bottom: 0; z-index: 5;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 12px; margin-top: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; box-shadow: 0 -2px 14px rgba(15,23,42,.10);
+}
+.voz-sel-barra[hidden] { display: none; }
+.voz-sel-n { flex: 1 1 140px; font-size: 12.5px; font-weight: 600; color: var(--text); }
+body.voz-eligiendo #voz-lista { padding-bottom: 76px; }
+/* ⚠️ Y EL BOTÓN FLOTANTE DE DESTELLOS SE APARTA MIENTRAS SE ELIGE. Vive
+   en la esquina de abajo a la derecha, que es exactamente donde cae el
+   «✕ Salir» de esta barra: medido en el teléfono, se lo comía entero. Es
+   el mismo estorbo que ya está escrito en El Rodaje —allí se le quita el
+   puntero mientras dura un arrastre—, y aquí se esconde: mientras se
+   eligen textos no hay nada que apuntar en Destellos.
+   ⚠️ Y LLEVA `!important` A PROPÓSITO, que aquí no es pereza: `switchView`
+   (js/app.js) le escribe `style.display = 'flex'` EN LA ETIQUETA al
+   entrar en cada vista, y un estilo en la etiqueta le gana a cualquier
+   regla de una hoja por específica que sea. Sin esto la regla existe, no
+   da ningún error, y no hace nada — que es el peor de los fallos. */
+body.voz-eligiendo .destello-fab { display: none !important; }
+
+/* Los estantes: la fila de chips y el campo de crear uno nuevo. */
+.voz-est-nuevo { display: flex; gap: 6px; align-items: center; }
+.voz-est-in {
+  flex: 1 1 auto; min-width: 0; padding: 9px 12px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font: inherit; font-size: 13.5px; min-height: 38px;
+}
+.voz-est-in:focus { outline: none; border-color: var(--story); }
+.voz-est-vacio { font-size: 12px; color: var(--muted); line-height: 1.45; flex: 1 1 auto; }
+.voz-menu-est { margin: 10px 0 4px; display: flex; flex-direction: column; gap: 6px; }
+
+/* El aviso de un nombre de máquina mal escrito. Va en ámbar y no en
+   rojo: no hay nada roto, hay algo que conviene unificar. */
+.voz-unificar { margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+.voz-unificar[hidden] { display: none; }
+.voz-unif-fila {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  background: var(--story-bg, #fdf6ec); border: 1px solid rgba(180,83,9,.3);
+  border-radius: 12px; padding: 10px 12px;
+}
+.voz-unif-txt { font-size: 12.5px; line-height: 1.45; color: #92400e; flex: 1 1 220px; }
+.voz-unif-ajeno { font-size: 11.5px; color: var(--muted); flex: 1 1 100%; }
+.voz-btn-chico { padding: 7px 12px; min-height: 34px; font-size: 12.5px; }
+
+/* El botón de adjuntar va resaltado porque es el camino MEJOR, no el
+   de repuesto: un archivo trae los títulos, las tablas y las llamadas
+   de las citas, y copiar una pantalla los pierde. */
+.voz-btn-adj { border-color: var(--story); color: var(--story); font-weight: 600; }
+.voz-adj-estado {
+  font-size: 12px; line-height: 1.45; color: var(--muted);
+  background: var(--story-bg, #fdf6ec); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 10px; margin-bottom: 10px;
+}
+.voz-adj-estado[hidden] { display: none; }
+.voz-adj-mal { color: #b45309; border-color: rgba(180,83,9,.4); }
+
+/* La caja donde se pega la lista de fuentes de un informe. Va más baja
+   que la del texto —es una lista, no un ensayo— y con letra de sistema,
+   porque lo que se pega ahí son títulos y direcciones. */
+/* ⚠️ Y SE ENVUELVE, no se desliza a lo ancho. Un `white-space: pre`
+   dejaba cada fuente en un renglón larguísimo que había que arrastrar
+   para leer entero —y se comía el final del texto de ayuda—. Envolver
+   no cambia lo que se lee: un renglón envuelto sigue siendo un solo
+   renglón para quien lo reparte. */
+.voz-fuentes-txt {
+  min-height: 96px; resize: vertical; font-size: 13px; line-height: 1.5;
+}
+
+/* ─── El panel 📚 Fuentes ───────────────────────────────────────── */
+.voz-fu-item { border-bottom: 1px solid var(--border); padding: 9px 0; }
+.voz-fu-cab { display: flex; gap: 8px; align-items: flex-start; }
+.voz-fu-n {
+  flex: 0 0 auto; min-width: 22px; height: 22px; border-radius: 7px;
+  background: var(--story); color: #fff; font-size: 11.5px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; margin-top: 2px;
+}
+.voz-fu-t {
+  flex: 1 1 auto; min-width: 0; font-size: 13.5px; line-height: 1.45;
+  font-family: var(--voz-fam, Georgia, serif); overflow-wrap: anywhere;
+}
+.voz-fu-pie { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+.voz-fu-rot { font-size: 11px; color: var(--muted); }
+.voz-fu-ir, .voz-fu-url, .voz-fu-huerfana {
+  font-size: 11.5px; padding: 5px 8px; min-height: 30px; border-radius: 9px;
+  border: 1px solid var(--border); background: none; color: var(--text);
+  cursor: pointer; text-decoration: none; display: inline-flex; align-items: center;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.voz-fu-url { color: var(--story); border-color: var(--story); }
+.voz-fu-ver { color: var(--muted); }
+/* Una fuente que no se cita en ninguna parte, y una llamada sin fuente,
+   son errores de un trabajo de investigación, no adornos: se ven. */
+.voz-fu-sola { font-size: 11.5px; color: #b45309; }
+.voz-fu-huerfana { display: flex; width: 100%; margin-bottom: 5px; color: #b45309; border-color: rgba(180,83,9,.4); }
+.voz-rep-fuentes {
+  margin-top: 8px; font-size: 12px; line-height: 1.45; color: var(--text);
+  background: var(--story-bg, #fdf6ec); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 10px;
+}
+
+@media (max-width: 380px) {
+  .voz-tf-l { flex-basis: 50%; }
+  .voz-citbar { max-width: 96%; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════

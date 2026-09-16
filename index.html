@@ -2327,6 +2327,12 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
 
       <div id="voz-nube" class="voz-nube"></div>
 
+      <!-- ⚠️ El aviso de un nombre de máquina mal escrito, con su botón
+           de unificar. Lo pinta vozPintarUnificar() y solo sale cuando
+           de verdad hay uno: un aviso que estuviera siempre acabaría
+           siendo parte del decorado. -->
+      <div id="voz-unificar" class="voz-unificar" hidden></div>
+
       <!-- Lo último que se dejó a medias, con su botón de continuar. Lo
            pinta vozRender() y se esconde cuando no hay nada empezado. -->
       <div id="voz-sigue" hidden></div>
@@ -2343,11 +2349,36 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
            vozPintarHerramientas() y lo elegido es del aparato. -->
       <div id="voz-herr" class="voz-herr"></div>
 
-      <!-- Dos filas de chips, género y voz, sacadas de los textos del
-           anaquel. Cada una se esconde cuando no separa nada. -->
-      <div class="voz-chips" id="voz-chips-gen" hidden></div>
-      <div class="voz-chips" id="voz-chips" hidden></div>
+      <!-- ⚠️ LO PUESTO SE VE; LO DEMÁS SE ABRE. Aquí había cinco filas de
+           chips —orden, agrupar, género, estante y voz— antes del primer
+           libro: media pantalla de mandos para llegar a lo que se venía
+           a ver. Ahora solo sale lo que está PUESTO, con su ✕ para
+           quitarlo, y lo demás vive en la hoja de 🗂 Estantes. -->
+      <div id="voz-filtro-puesto" class="voz-filtro-puesto" hidden></div>
       <div class="voz-lista" id="voz-lista"></div>
+      <!-- La barra de la selección múltiple, al pie y solo mientras se
+           está eligiendo. -->
+      <div id="voz-sel-barra" class="voz-sel-barra" hidden></div>
+
+      <!-- ⚠️ QUE F.A.R.O ABRA AQUÍ, Y SOLO EN ESTE APARATO. Pedido por el
+           autor el 12 de septiembre de 2026. Va AL PIE a propósito: es un
+           interruptor que se toca una vez en la vida, y ponerlo arriba
+           sería devolver a la cabecera del anaquel el sitio que acaba de
+           costar recuperar (regla 33). Lo que se usa a diario va arriba;
+           lo que se decide una vez, al final.
+
+           Y usa las clases `finq-fijo…` del Apunte rápido a propósito: es
+           el MISMO interruptor —el mismo gesto, la misma promesa, la misma
+           llave de aparato— y copiarle el estilo con otro nombre sería
+           tener dos que se arreglan por separado hasta que uno se quede
+           viejo. Es la regla del aparato compartido. -->
+      <button type="button" class="finq-fijo voz-abre-aqui" id="voz-abre-aqui" role="switch" aria-checked="false">
+        <span class="finq-fijo-sw"><span class="finq-fijo-bola"></span></span>
+        <span class="finq-fijo-txt">
+          <span class="finq-fijo-tit">📖 Que F.A.R.O abra aquí</span>
+          <span class="finq-fijo-sub" id="voz-abre-aqui-sub">Ahora F.A.R.O abre donde abre siempre, y aquí se llega desde el Acceso Rápido.</span>
+        </span>
+      </button>
 
     </div>
   </div>
@@ -2421,15 +2452,38 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         placeholder="Pega aquí el texto entero, tal como te lo dio la máquina. Se reparte solo en capítulos, citas, listas y versos."></textarea>
 
       <div class="voz-pegar-barra">
+        <!-- ⚠️ ADJUNTAR ES MEJOR QUE PEGAR, y por eso va el primero y
+             resaltado: al copiar la pantalla de un informe se pierden
+             los títulos, las tablas y los numeritos de las citas; el
+             archivo los trae dichos con todas las letras. El selector
+             del propio aparato ya ofrece Drive y OneDrive, así que no
+             hace falta conectar ninguna cuenta. -->
+        <button type="button" class="voz-btn voz-btn-adj" id="voz-adjuntar-btn">📎 Adjuntar un archivo</button>
+        <input type="file" id="voz-f-archivo" hidden>
         <button type="button" class="voz-btn" id="voz-ejemplo-btn">📄 Un ejemplo</button>
         <button type="button" class="voz-btn" id="voz-ayuda-btn">❔ Cómo se pega</button>
       </div>
+      <div class="voz-adj-estado" id="voz-adj-estado" hidden></div>
       <!-- Para un poema, o para cualquier texto en que cada renglón
            importa. Se enciende solo al elegir el género Poema. -->
       <label class="voz-interruptor" for="voz-f-versos">
         <input type="checkbox" id="voz-f-versos">
         <span>Respetar los saltos de línea (versos)</span>
       </label>
+
+      <!-- ⚠️ LA BIBLIOGRAFÍA SE PEGA APARTE, y no es una comodidad: un
+           informe de investigación NO lleva sus fuentes dentro del
+           texto. Las guarda en otro sitio de la pantalla —plegadas bajo
+           un «Fuentes usadas en el informe»— y los numeritos de las
+           citas son adornos de esa pantalla, no letras: al copiar el
+           informe no viene ni la lista ni los numeritos. Sin esta caja
+           no hay absolutamente ninguna forma de que lleguen, y el texto
+           se guarda con sus citas apuntando a la nada. -->
+      <div class="voz-campo">
+        <label for="voz-f-fuentes">📚 Las fuentes del informe <em>(opcional)</em></label>
+        <textarea id="voz-f-fuentes" class="voz-fuentes-txt"
+          placeholder="Una fuente por renglón. Si el informe guarda su lista de fuentes en otra parte de la pantalla (en Gemini, «Fuentes usadas en el informe»), ábrela, cópiala y pégala aquí."></textarea>
+      </div>
 
       <div class="voz-rep" id="voz-pegar-repaso"></div>
 
@@ -2443,18 +2497,34 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <input type="hidden" id="voz-f-genero" value="cuento">
         <div class="voz-chips voz-chips-form" id="voz-genero-chips" role="group" aria-labelledby="voz-genero-rot"></div>
       </div>
+      <!-- ⚠️ Los dos campos que HACEN FALTA se rellenan con un toque, no
+           escribiéndolos otra vez. Las sugerencias salen del HISTORIAL
+           del anaquel —lo que esta casa usa de verdad—, no de una lista
+           escrita a mano: es la regla de los chips de categoría del
+           Apunte rápido. Y escribir a mano se sigue pudiendo: de ahí
+           salió un «Gemeni» en el anaquel, que es justo lo que un chip
+           evita. -->
       <div class="voz-campo voz-campo-obl">
         <label for="voz-f-voz">🎭 La voz que se imita · hace falta</label>
         <input id="voz-f-voz" type="text" autocomplete="off"
                placeholder="p. ej. Rulfo, o «un narrador de pueblo, de frase corta»">
+        <div class="voz-chips voz-chips-form" id="voz-voz-chips" role="group" aria-label="Voces ya usadas"></div>
       </div>
       <div class="voz-campo voz-campo-obl">
         <label for="voz-f-maquina">🤖 La máquina que lo escribió · hace falta</label>
         <input id="voz-f-maquina" type="text" autocomplete="off"
                placeholder="p. ej. Claude, ChatGPT, Gemini…">
+        <div class="voz-chips voz-chips-form" id="voz-maquina-chips" role="group" aria-label="Máquinas"></div>
+      </div>
+      <!-- ⚠️ Los estantes son un eje APARTE del género: el género dice
+           qué ES el texto y sale en su portada; el estante dice dónde lo
+           pone su dueño. Ver la nota grande de voz-prestada.js. -->
+      <div class="voz-campo">
+        <span class="voz-campo-rot">🗂 Estantes <em>(opcional)</em></span>
+        <div id="voz-estantes-caja"></div>
       </div>
       <div class="voz-campo">
-        <label for="voz-f-encargo">Lo que le pediste</label>
+        <label for="voz-f-encargo">Lo que le pediste <em>(opcional)</em></label>
         <textarea id="voz-f-encargo"
           placeholder="El encargo con el que salió este texto. Es lo único que lo hace repetible."></textarea>
       </div>
@@ -2490,6 +2560,22 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
        leer, copiar, compartir, corregir y retirar, y la etiqueta
        siempre arriba. Lo pinta vozMenuAbrir(); el botón de retirar es el
        de dos pasos, a la vista, sin `confirm()`. -->
+  <!-- ⚠️ LA HOJA DEL ANAQUEL: estantes, géneros y voces EN VERTICAL, una
+       fila por cosa, como los estantes de un lector de libros. Sirve
+       también para ordenar y para mover lo seleccionado: el cuerpo lo
+       pinta quien la abre. -->
+  <div id="voz-anaq-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal voz-anaq" role="dialog" aria-modal="true" aria-labelledby="voz-anaq-tit">
+      <div class="msug-det-head">
+        <div class="msug-det-titulo" id="voz-anaq-tit">🗂 Estantes</div>
+        <button type="button" class="msug-det-cerrar" id="voz-anaq-cerrar" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="voz-anaq-cuerpo"></div>
+    </div>
+  </div>
+
   <div id="voz-menu-overlay" class="fin-modal-overlay" style="display:none;">
     <div class="fin-modal voz-menu" role="dialog" aria-modal="true" aria-labelledby="voz-menu-tit">
       <div class="msug-det-head">
@@ -2858,6 +2944,11 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
        pestaña lo dice y el cuaderno de dirección sigue entero. -->
   <script src="js/tools/rodaje-cortes.js"></script>
   <script src="js/tools/voz-prestada.js"></script>
+  <!-- El lector de archivos adjuntos va APARTE y DESPUÉS: toca
+       DecompressionStream, DOMParser y ArrayBuffer, que fallan distinto
+       en cada aparato. Si no carga, la hoja de pegar sigue entera y el
+       botón lo dice. Misma razón que el banco de cortes de El Rodaje. -->
+  <script src="js/tools/voz-adjunto.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
