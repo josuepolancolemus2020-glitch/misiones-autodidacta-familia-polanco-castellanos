@@ -173,8 +173,21 @@ Zone → Make private.
      Cómo se comprueba que quedó: abrir un texto en La Voz Prestada → 📝
      Taller → 🤖 Pedírselas a Claude. Tarda medio minuto; al terminar dice
      «🤖 N actividades de Claude» y, si descartó alguna por no citar el
-     texto, cuántas. Cuesta unos centavos por texto (un ensayo de ocho mil
-     palabras, unos 20 centavos de dólar).
+     texto, cuántas.
+
+     ⚠️ **Y CUESTA DINERO CADA VEZ, APARTE DE LA SUSCRIPCIÓN DE CLAUDE.AI.**
+     La API de Anthropic es otro producto y se paga por uso, con crédito
+     comprado por adelantado en console.anthropic.com → Billing. Eso tiene
+     una ventaja que conviene saber: el crédito prepagado **es el techo**,
+     así que no puede llegar un cobro que nadie pidió. Cuánto cuesta de
+     verdad **se mide, no se adivina** —la regla de las tablas y la de la
+     duración de El Rodaje—: después del primer texto, console.anthropic.com
+     → **Usage** dice el gasto real, y con ese número se decide si vale la
+     pena. Y el mismo día conviene ponerle un **límite de gasto** (Billing →
+     Limits), que es lo único que hace imposible una sorpresa. Quemar
+     crédito solo puede hacerlo alguien de `familia_miembros` con sesión
+     abierta, porque la función mira eso antes que nada. Y la puerta 📖
+     «Sacarlas del texto» no cuesta nunca nada.
 
      Probado antes de mandarlo: la parte que interpreta lo que devuelve la
      máquina (`verifica.ts`) contra Node con trece actividades trampa, y la
