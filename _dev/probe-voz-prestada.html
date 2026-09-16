@@ -178,6 +178,28 @@ function nuevaBase(w, opciones){
       }
       return json([], 201);
     }
+    /* La Edge Function voz-actividades-ia, de mentira: devuelve lo que
+       le diga `o.ia` —un objeto, una función del cuerpo, o los dos
+       fallos con nombre— y APUNTA con qué cabecera y qué cuerpo la
+       llamaron, que es lo que hay que mirar: que viaje la sesión y que
+       viaje el texto entero. */
+    if (/\/functions\/v1\/voz-actividades-ia/.test(u.pathname)) {
+      /* ⚠️ El cliente puede llamar a fetch con un `Request` ya armado en vez
+         de (url, init): entonces las cabeceras y el cuerpo van DENTRO del
+         Request, y un doble que solo mirase `init` diría que la llamada
+         salió sin sesión y sin texto cuando salió con las dos. */
+      const req = (typeof url === 'string') ? null : url;
+      const cab = (init && init.headers) || (req && req.headers) || {};
+      const auth = typeof cab.get === 'function' ? (cab.get('Authorization') || cab.get('authorization') || '') : (cab.Authorization || cab.authorization || '');
+      let crudo = init && init.body != null ? init.body : null;
+      if (crudo == null && req && typeof req.text === 'function') { try { crudo = await req.clone().text(); } catch (e) {} }
+      let cuerpo = null; try { cuerpo = JSON.parse(crudo); } catch (e) {}
+      estado.ia = { auth: auth || '', cuerpo: cuerpo, veces: ((estado.ia && estado.ia.veces) || 0) + 1 };
+      if (o.ia === 'no-desplegada') return json({ code: 'NOT_FOUND', message: 'Requested function was not found' }, 404);
+      if (o.ia === 'sin-clave') return json({ error: 'sin_clave', detalle: 'Falta el secreto ANTHROPIC_API_KEY en Supabase → Edge Functions → Secrets' }, 500);
+      if (!auth) return json({ error: 'sin_sesion' }, 401);
+      return json(typeof o.ia === 'function' ? o.ia(cuerpo) : (o.ia || { ok: true, items: [], descartadas: 0 }));
+    }
     /* El taller de comprensión viaja por su propia tabla, y la base de
        mentira la exige igual que la de verdad: firmada con quien entró
        y con `items` que sea una lista. Un doble complaciente no prueba
@@ -271,6 +293,12 @@ function nuevaBase(w, opciones){
 
 /* Un texto largo de verdad, para que haya varias páginas que pasar.
    El texto es de la sonda: hace falta prosa larga, no prosa buena. */
+function vozActViasDe(w, cid){
+  const v = JSON.parse(w.eval('JSON.stringify(vozActDe(' + JSON.stringify(cid) + ').items.map(i => vozActVia(i)))'));
+  const c = { txt: 0, sub: 0, ia: 0, mano: 0 };
+  v.forEach(x => { c[x || 'mano'] = (c[x || 'mano'] || 0) + 1; });
+  return c;
+}
 function cuentoLargo(cid){
   const p = [];
   for (let i = 0; i < 40; i++) {
@@ -347,8 +375,13 @@ function filasHoja(d){
   }
   const w = f.contentWindow, d = w.document;
   const base = nuevaBase(w, {});
+  /* Con `access_token`: el cliente solo pone la cabecera Authorization si
+     la sesión trae uno, y la función de borde de mentira —como la de
+     verdad— rechaza sin ella. Sin el token, la sonda diría que la
+     puerta de Claude «no manda la sesión» cuando lo que no la tiene es
+     la sesión de mentira. */
   w.eval(`window.faroSb.auth.getSession = async () => (` +
-         `{ data: { session: { user: { id: ${JSON.stringify(VOZ_UID)} } } } })`);
+         `{ data: { session: { access_token: 'tok.prueba', user: { id: ${JSON.stringify(VOZ_UID)} } } } })`);
   /* El permiso de no apagar la pantalla, de mentira: en Chromium sin
      cabeza puede no existir o negarse, y lo que se prueba es que la
      herramienta lo PIDE y lo SUELTA. */
@@ -2918,6 +2951,138 @@ function filasHoja(d){
   ok(Number(w.eval('vozActCuenta("c-act")')) === 1,
      'y lo que había en el aparato no se pierde', 'se perdieron las actividades sin tabla');
 
+
+  /* ── 36-bis. LAS ACTIVIDADES QUE GENERA EL SISTEMA ──
+     Pedido por el autor el 16 de septiembre de 2026: «que el sistema
+     genere las actividades de cada lectura». Dos puertas: la del aparato
+     (recorta el texto: todas sus respuestas están en él letra por letra)
+     y la de Claude (lee, pero solo entra lo que CITA el texto). */
+  log('── 36-bis. Las actividades que genera el sistema: del texto y de Claude ──');
+  nuevaBase(w, { act: [] });
+  const textoGen = [
+    '# El pozo y la escuela', '', 'Voz: Rulfo', 'Máquina: Claude', 'Género: ensayo', '',
+    '## La sequía', '',
+    'El pozo se secó en el verano de 1927, y con él se fue medio pueblo. Nadie vuelve a un pueblo sin agua, decía Remigio Ochoa, el arriero, que había nacido en 1881 y conocía cada vereda. La **sequía** es el nombre que le dan aquí a los años en que el cielo se olvida de llover, y ese olvido duró siete años seguidos. El pueblo llegó a tener 1.200 habitantes antes de que se fueran todos.', '',
+    '## La vuelta', '',
+    'Volvieron tres familias en 1930: los Ochoa, los Paz y los Cárcamo. El maestro sostiene que la escuela fue lo que los trajo de vuelta, no el agua. La escuela abrió el 3 de marzo de 1931 con once alumnos y un solo pizarrón. Un pizarrón es una tabla pintada de negro donde se escribe con tiza y se borra con la mano. En conclusión, lo que devuelve a la gente a un lugar no es lo que hay en la tierra sino lo que hay en la plaza.', '',
+    '## La memoria', '',
+    'Cincuenta años después, Ochoa escribió sus memorias de aquellos días. Las publicó en 1955 una editorial pequeña de Tegucigalpa. Por lo tanto, lo que sabemos del pozo lo sabemos por él y por nadie más. El libro tiene 212 páginas y ninguna fotografía.', '',
+    '## Referencias', '',
+    '[1] Ochoa, R. (1955). Memorias del pozo. Tegucigalpa: Editorial del Sur.',
+    '[2] Paz, L. (1962). La vuelta al pueblo. San Pedro Sula: Imprenta Central.',
+    '[3] Cárcamo, M. (1978). Escuelas de aldea. Comayagua: Ediciones del Valle.',
+    '[4] Villeda, A. (1990). Sequías del siglo. Tegucigalpa: Guaymuras.',
+  ].join('\n');
+  w.eval(`(function(){ const r = vozLeer(${JSON.stringify(textoGen)});
+    const c = Object.assign({}, r, { cid: 'c-gen', borrado: false, actualizado: Date.now(), puesto_por: ${JSON.stringify(VOZ_UID)} });
+    _vozCuentos = _vozCuentos.filter(x => x.cid !== 'c-gen').concat([c]); vozGuardaLocal(); })()`);
+  const capsGen = Number(w.eval('_vozCuentos.find(x => x.cid === "c-gen").capitulos.length'));
+  ok(capsGen === 4, 'el ensayo de prueba entra con sus tres capítulos y la bibliografía (' + capsGen + ')');
+
+  /* La puerta del aparato, con el tope abierto para ver todo lo que sabe sacar. */
+  const gen = JSON.parse(w.eval('JSON.stringify(vozActGenerarDelTexto("c-gen", 40))'));
+  const deTipo = k => gen.filter(i => i.k === k);
+  const TG = JSON.parse(w.eval('JSON.stringify(vozActPreparaTexto(vozTextoCuerpo(_vozCuentos.find(x => x.cid === "c-gen"), {})))'));
+  const sinP = s => w.eval('vozActSinPuntuacion(' + JSON.stringify(s) + ')');
+  const enTexto = s => TG.sinP.indexOf(sinP(s)) >= 0;
+  ok(gen.length >= 12 && gen.every(i => i.via === 'txt' && i.auto === 1 && /^txt-/.test(i.id) && i.cita && i.donde),
+     'el aparato saca ' + gen.length + ' actividades del ensayo, todas con via=txt, su cita y su capítulo',
+     'salieron ' + gen.length + ' y no todas llevan via/cita/donde');
+  const ab = deTipo('abierta');
+  ok(ab.length >= 3 && /tesis/i.test(ab[0].q) && /sostiene que|En conclusi[oó]n|Por lo tanto/i.test(ab[0].guia),
+     'la tesis va primero, y su pauta es una frase que sostiene o concluye (no una inventada)',
+     'la tesis no salió primero o su pauta no es del texto: ' + JSON.stringify(ab[0] && ab[0].guia));
+  ok(ab.some(i => /«La vuelta»/.test(i.q)) && ab.some(i => /«La memoria»/.test(i.q)),
+     'y hay una abierta por capítulo con su idea principal, con la frase con que empieza como pauta');
+  const compl = deTipo('completar');
+  ok(compl.length >= 3 && compl.every(i => /___/.test(i.q) && enTexto(i.a) && sinP(i.cita).indexOf(sinP(i.a)) >= 0),
+     '⚠️ cada completar tiene su hueco, y su respuesta está en el texto Y dentro de su propia cita (' + compl.length + ')',
+     '⚠️ un completar tiene una respuesta que no sale del texto: ' + JSON.stringify(compl.map(i => i.a)));
+  const respDatos = compl.map(i => i.a).concat(deTipo('opcion').map(i => i.o[i.ok]));
+  ok(respDatos.some(a => /^\d{4}$/.test(a) || /de 1931/.test(a)) && respDatos.some(a => /^(Ochoa|Remigio Ochoa|Tegucigalpa)$/.test(a)),
+     'hay fechas y nombres propios tapados en sus frases (' + respDatos.join(' · ') + ')',
+     'faltan fechas o nombres entre los datos: ' + respDatos.join(' · '));
+  const fl = deTipo('flash');
+  ok(fl.some(i => /«sequía»/.test(i.f)) && fl.some(i => /«Un pizarrón»/.test(i.f)),
+     'el término en negrita da una tarjeta, y la definición («Un pizarrón es…») otra',
+     'faltan las tarjetas de término: ' + JSON.stringify(fl.map(i => i.f)));
+  const op = deTipo('opcion');
+  ok(op.length >= 1 && op.every(i => i.o.length === 4 && i.ok >= 0 && i.ok < 4 && enTexto(i.o[i.ok]) && i.o.every(x => TG.norm.indexOf(x) >= 0)),
+     '⚠️ las de selección tienen cuatro opciones y TODAS salen del texto, la buena incluida: no se inventa ni un distractor (' + op.length + ')',
+     '⚠️ una selección lleva una opción que no está en el texto: ' + JSON.stringify(op.map(i => i.o)));
+  const pr = deTipo('pares');
+  ok(pr.some(i => /bibliograf/i.test(i.q) && i.ps.length === 4 && i.ps.some(p => p[0] === 'Ochoa' && /Memorias del pozo/.test(p[1]))),
+     'la bibliografía da un emparejar autor → obra con sus cuatro entradas');
+  ok(pr.some(i => /capítulo/i.test(i.q) && i.ps.length >= 3), 'y los capítulos, un emparejar capítulo → idea');
+  const gen2 = JSON.parse(w.eval('JSON.stringify(vozActGenerarDelTexto("c-gen", 40))'));
+  ok(JSON.stringify(gen2.map(i => i.id)) === JSON.stringify(gen.map(i => i.id)), 'y generar dos veces da los MISMOS ids: reemplaza, no duplica');
+  const genDef = JSON.parse(w.eval('JSON.stringify(vozActGenerarDelTexto("c-gen"))'));
+  ok(genDef.length === 10 && genDef[0].k === 'abierta' && /tesis/i.test(genDef[0].q) && genDef.some(i => i.k === 'pares'),
+     'con el tope de un texto corto (10) se intercalan los grupos: la tesis entra siempre y los datos no se lo comen todo (' +
+     genDef.map(i => i.k).join(',') + ')');
+
+  /* Las procedencias no se pisan. */
+  w.eval('vozActGuardarFicha("c-gen", [{ id: "mano-1", k: "flash", f: "A mano", r: "R" }], true)');
+  w.eval('vozActGenerarTextoYGuardar("c-gen")');
+  const vias1 = JSON.parse(w.eval('JSON.stringify(vozActDe("c-gen").items.map(i => vozActVia(i)))'));
+  ok(vias1.filter(v => v === 'txt').length === 10 && vias1.filter(v => v === '').length === 1,
+     'sacarlas del texto AÑADE las 📖 y no toca la pegada a mano', JSON.stringify(vias1));
+  w.eval(`(function(){ const todo = vozSubLeeTodo(); todo['c-gen'] = [
+    { id: 'sg1', cap: 0, vp: 0, i: 3, f: 7, t: 'pozo', c: 'dato', n: '', u: Date.now(), del: false, user: ${JSON.stringify(VOZ_UID)} }];
+    vozSubGuardaTodo(); })()`);
+  w.eval('vozActGenerarYGuardar("c-gen")');
+  const vias2 = JSON.parse(w.eval('JSON.stringify(vozActDe("c-gen").items.map(i => vozActVia(i)))'));
+  ok(vias2.filter(v => v === 'txt').length === 10 && vias2.filter(v => v === 'sub').length === 1 && vias2.filter(v => v === '').length === 1,
+     '⚠️ refrescar desde los subrayados NO borra las sacadas del texto ni la pegada: cada vía reemplaza solo las suyas', JSON.stringify(vias2));
+  w.eval('vozActGenerarTextoYGuardar("c-gen")');
+  const vias3 = JSON.parse(w.eval('JSON.stringify(vozActDe("c-gen").items.map(i => vozActVia(i)))'));
+  ok(vias3.filter(v => v === 'txt').length === 10 && vias3.filter(v => v === 'sub').length === 1, 'y volver a sacar del texto reemplaza las 📖 sin duplicarlas ni tocar la 🖍');
+
+  /* La puerta de Claude, contra la función de mentira. */
+  const citaBuena = 'El maestro sostiene que la escuela fue lo que los trajo de vuelta, no el agua';
+  const baseIa = nuevaBase(w, { act: [], ia: (cuerpo) => ({ ok: true, tesis: 'La plaza, no la tierra.', descartadas: 1, items: [
+    { id: 'x', k: 'flash', nivel: 'tesis', donde: 'La vuelta', cita: citaBuena, f: '¿Qué sostiene el maestro?', r: 'Que fue la escuela, no el agua' },
+    { id: 'y', k: 'completar', nivel: 'dato', donde: 'La sequía', cita: 'El pozo se secó en el verano de 1927', q: 'El pozo se secó en ___.', a: '1928' },
+    { id: 'z', k: 'opcion', nivel: 'dato', donde: 'La memoria', cita: 'Remigio Ochoa murió en Comayagua en 1960', q: '¿Dónde murió?', o: ['Comayagua', 'Tegucigalpa'], ok: 0 },
+    { id: 'v', k: 'abierta', nivel: 'juicio', donde: 'La vuelta', cita: 'lo que devuelve a la gente a un lugar no es lo que hay en la tierra sino lo que hay en la plaza', q: '¿Qué evidencia da el texto?<img src=x onerror="window.__colado9=1">', guia: 'Solo la afirmación del maestro.' },
+  ] }) });
+  const resIa = await w.eval('vozActPedirIA("c-gen")');
+  const llamadaIa = baseIa.ia;
+  ok(resIa && resIa.guardadas === 2 && resIa.descartadas === 3,
+     '🤖 de cuatro que devolvió Claude entran DOS: la que cita el texto y la abierta; se descartan la de la respuesta cambiada (1928 con cita de 1927) y la de la cita inventada',
+     '⚠️ entraron ' + JSON.stringify(resIa));
+  const deIa = JSON.parse(w.eval('JSON.stringify(vozActDe("c-gen").items.filter(i => vozActVia(i) === "ia"))'));
+  ok(deIa.length === 2 && deIa.every(i => /^ia-/.test(i.id) && i.cita) && !deIa.some(i => i.a === '1928'),
+     'y las guardadas llevan via=ia, su id ia-… y su cita; la de 1928 no está', JSON.stringify(deIa.map(i => i.k)));
+  ok(vozActViasDe(w, 'c-gen').txt === 10 && vozActViasDe(w, 'c-gen').sub === 1, 'y pedírselas a Claude no tocó las 📖 ni la 🖍');
+  w.eval('vozActAbrirTaller("c-gen")');
+  await esperar(200);
+  const filasIa = [...d.querySelectorAll('#voz-act-cuerpo .voz-act-fila-auto')].map(e => e.textContent);
+  ok(filasIa.some(t => /Claude/.test(t)) && filasIa.some(t => /sacada del texto/.test(t)) && filasIa.some(t => /subrayado/.test(t)),
+     'en la lista cada actividad dice de dónde salió: 🤖 Claude, 📖 el texto o 🖍 un subrayado (la etiqueta de la regla 1, por pregunta)');
+  ok(!w.__colado9 && d.querySelectorAll('#voz-act-cuerpo img').length === 0 && /<img src=x/.test(d.getElementById('voz-act-cuerpo').textContent),
+     '⚠️ un enunciado de Claude con HTML dentro se pinta como texto y no crea ni un elemento');
+  ok([...d.querySelectorAll('#voz-act-cuerpo .voz-act-fila-cita')].some(e => e.textContent.indexOf('El maestro sostiene') >= 0),
+     'y debajo de cada generada se ve la cita de la que salió');
+  w.eval('vozActCerrarTaller()');
+  await esperar(120);
+  ok(!!llamadaIa && /^Bearer /.test(llamadaIa.auth) && llamadaIa.cuerpo && llamadaIa.cuerpo.titulo === 'El pozo y la escuela'
+     && /El pozo se secó/.test(llamadaIa.cuerpo.texto) && /Memorias del pozo/.test(llamadaIa.cuerpo.texto) && llamadaIa.veces === 1,
+     '⚠️ la función recibió la SESIÓN (Bearer) y el texto ENTERO con su bibliografía, en una sola llamada',
+     '⚠️ la llamada a la función salió sin sesión o sin el texto: ' + JSON.stringify(llamadaIa && { auth: (llamadaIa.auth || '').slice(0, 12), veces: llamadaIa.veces }));
+
+  /* Y los motivos, con nombre: falta desplegar, falta la clave. */
+  nuevaBase(w, { act: [], ia: 'no-desplegada' });
+  await w.eval('vozActPedirIA("c-gen")');
+  ok(/desplegar/i.test(w.eval('_vozActIaMsg')) && /voz-actividades-ia/.test(w.eval('_vozActIaMsg')) && /Sacarlas del texto/.test(w.eval('_vozActIaMsg')),
+     '⚠️ sin la función desplegada lo DICE, nombra la función y recuerda que 📖 Sacarlas del texto sigue funcionando: «' + w.eval('_vozActIaMsg').slice(0, 60) + '…»');
+  nuevaBase(w, { act: [], ia: 'sin-clave' });
+  await w.eval('vozActPedirIA("c-gen")');
+  ok(/ANTHROPIC_API_KEY/.test(w.eval('_vozActIaMsg')) && /Secrets/.test(w.eval('_vozActIaMsg')),
+     'y sin la clave puesta nombra el secreto y dónde va, en vez de decir «error»');
+  const nAntes = Number(w.eval('vozActDe("c-gen").items.length'));
+  ok(nAntes === 14, 'y ninguno de los dos fallos tocó lo que ya había (10 📖 + 1 🖍 + 1 a mano + 2 🤖 = ' + nAntes + ')',
+     'con los fallos de la función cambió la cuenta de actividades: ' + nAntes + ' en vez de 14');
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

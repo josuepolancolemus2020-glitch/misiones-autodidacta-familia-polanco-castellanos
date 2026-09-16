@@ -2319,6 +2319,70 @@ el diseño.
      opciones se guardaba tal cual, o sea una pregunta que nadie puede
      acertar. Se queda sin marcar y el guardado la nombra.
 
+   ⚠️ **Y DESDE EL 16 DE SEPTIEMBRE DE 2026 LAS ACTIVIDADES LAS GENERA EL
+   SISTEMA.** Es lo que el autor pidió después de estrenar el taller:
+   «procura tú generar las actividades, que no tenga que estar haciendo las
+   actividades y pegarlas… tomando en consideración los mejores criterios de
+   abstracción y síntesis». Son DOS puertas más —la de pegar se queda, la
+   última— y no fallan igual, que es por lo que son dos:
+
+   · 📖 **SACARLAS DEL TEXTO** (`vozActGenerarDelTexto`) corre en el aparato,
+     al instante y sin señal. Mira el texto como lo miraría alguien con un
+     lápiz —fechas, años, cifras, nombres propios, términos en negrita,
+     definiciones («X es…»), los subtítulos, la primera frase de cada
+     capítulo, la que concluye («en conclusión», «sostiene que»…) y la
+     bibliografía— y arma completar, tarjetas, selección, parejas y
+     abiertas. **NO entiende el texto: lo RECORTA.** Por eso todas sus
+     respuestas están en el texto letra por letra, y en una selección
+     también los distractores —son los OTROS años del texto, nunca
+     inventados; sin cuatro años distintos, la pregunta se hace completar—.
+     Y por eso mismo no sabe cuál es la tesis: sabe dónde suele estar. Se
+     reparte por grupos intercalados (tesis, ideas, datos, términos,
+     referencias, estructura) y se corta según el largo, así la tesis entra
+     siempre y los datos no se lo comen todo: un ensayo corto da diez, uno
+     largo hasta 28. ⚠️ Una frase da hasta DOS datos, un número y un nombre:
+     con uno solo el año se comía siempre al nombre («decía Remigio Ochoa,
+     que había nacido en 1881») y un ensayo lleno de nombres salía sin uno.
+   · 🤖 **PEDÍRSELAS A CLAUDE** (`vozActPedirIA`) llama a la Edge Function
+     **`voz-actividades-ia`** con el texto entero. Ahí sí se lee, con los
+     criterios escritos en el `system` de la función —la tesis primero, una
+     idea por sección, los datos que sostienen el argumento, las relaciones,
+     los términos, el juicio; recordar antes que reconocer—, y por eso mismo
+     tiene que CITAR: **cada actividad trae el fragmento literal del texto
+     que la respalda, y la que no lo tenga en el texto no entra**. Lo
+     comprueba la función (`verifica.ts`, sin red, probado desde Node) y lo
+     vuelve a comprobar el aparato antes de guardar (`vozActCitaEnTexto`):
+     la pantalla no se fía de la base ni la base de la pantalla. Es la única
+     manera de que «el sistema genera las actividades» no signifique «el
+     sistema se inventa las respuestas», y se comprobó como se comprueban
+     estas cosas: quitando la comprobación del aparato y viendo entrar una
+     selección con la cita inventada, con la sonda suspendiendo. La clave de
+     Anthropic vive en los **Secrets** de la función (`ANTHROPIC_API_KEY`),
+     nunca en el código de la aplicación, que lo lee cualquiera; la función
+     solo atiende a sesiones de `familia_miembros`, y **comprueba la clave
+     DESPUÉS de la sesión**, para que nadie de la calle sepa si está puesta.
+     Si no está desplegada, o le falta la clave, o caducó la sesión, o no
+     hay señal, o Claude no contesta a tiempo, **el aviso nombra cuál**
+     (regla 14) y recuerda que 📖 sigue funcionando. El modelo es
+     `claude-opus-5` a esfuerzo `medium`, por el reloj de la función en el
+     plan gratuito de Supabase (150 s), no por ahorrar.
+
+   ⚠️ **LAS PROCEDENCIAS NO SE MEZCLAN AL REFRESCAR.** Cada actividad lleva
+   `via` —`sub`, `txt`, `ia` o nada (pegada a mano)— y volver a generar por
+   una vía reemplaza SOLO las suyas: si «sacar del texto» borrara las de
+   Claude, o al revés, cada botón desharía el trabajo del otro sin avisar.
+   Las viejas con `auto: 1` y sin `via` son de subrayados. Y en la lista
+   cada una dice de dónde salió y enseña su cita: es la etiqueta de la
+   regla 1 aplicada a cada pregunta.
+
+   La función son dos archivos —`index.ts` (la red) y `verifica.ts` (lo que
+   se prueba)— cosidos por `node _dev/arma-voz-actividades-ia.js` en
+   `PEGAR-EN-EL-PANEL.ts`, que es lo que se pega en Supabase → Edge
+   Functions → Deploy a new function, igual que `criba-cosecha` y por lo
+   mismo: desplegar dos archivos exige la CLI, o sea un ordenador. **Y lo
+   que se pega va en el chat**, como el SQL: es el mismo autor con la misma
+   tableta.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -2427,6 +2491,23 @@ Y el SQL del taller, contra un PostgreSQL de verdad:
 createdb acttest
 psql -v ON_ERROR_STOP=1 -d acttest -f _dev/prueba-voz-actividades-sql.sql
 ```
+
+Y la parte pura de la función que le pide a Claude las actividades, desde
+Node y sin Deno, más el cosido para el panel:
+
+```
+node --experimental-strip-types _dev/prueba-voz-actividades-ia.mjs
+node _dev/arma-voz-actividades-ia.js
+```
+
+La prueba le da a `verifica.ts` trece actividades como las devuelve una
+máquina —con una cita inventada, una respuesta cambiada con cita buena, un
+`ok` fuera de rango, un «todas las anteriores», una repetida— y exige que
+entren cinco y se descarten ocho, cada una con su motivo. Y comprueba que
+`PEGAR-EN-EL-PANEL.ts` lleva EXACTAMENTE el `verifica.ts` probado: cosido
+viejo, sonda que suspende. La sección **36-bis** de la sonda de La Voz
+Prestada hace lo mismo desde el aparato, con una función de borde de
+mentira que apunta con qué sesión y qué texto la llamaron.
 
 ⚠️ Esa prueba mira la puerta **dos veces y en este orden**: primero que
 el `revoke` del archivo le quitó a `anon` el permiso de tabla —y que a

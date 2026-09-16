@@ -1057,6 +1057,12 @@
 .voz-act-fila-n { font-size: 11px; color: var(--muted); min-width: 16px; }
 .voz-act-fila-tipo { font-size: 11px; font-weight: 700; color: var(--story); }
 .voz-act-fila-auto { font-size: 10.5px; color: var(--muted); }
+/* La cita de la que salió una actividad generada, para que quien revisa
+   la lista vea de dónde viene sin abrir el texto: es la etiqueta de la
+   regla 1 aplicada a cada pregunta. */
+.voz-act-fila-cita { font-size: 11.5px; line-height: 1.4; color: var(--muted); font-style: italic; margin-top: 2px; }
+.voz-act-ia-estado { margin: 6px 0 0; }
+.voz-act-ia-estado:empty { display: none; }
 .voz-act-fila-q { font-size: 13.5px; line-height: 1.4; color: var(--text); }
 .voz-act-fila-sol { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .voz-act-fila-x {

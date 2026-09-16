@@ -1567,12 +1567,12 @@ function vozSb() {
    si llega después, la próxima vez que se abra la herramienta se usa. */
 const VOZ_ESPERA_MAX = 8000;
 
-function vozConReloj(peticion) {
+function vozConReloj(peticion, ms) {
   return Promise.race([
     peticion,
     new Promise(res => setTimeout(() => res({
       data: null, error: { code: 'FARO_RELOJ', message: 'la petición no volvió' },
-    }), VOZ_ESPERA_MAX)),
+    }), ms || VOZ_ESPERA_MAX)),
   ]);
 }
 
@@ -7498,7 +7498,7 @@ function vozActGenerar(cid) {
     if (trozo.length < 2) return;
     const cat = vozCat(m.c);
     const donde = vozNombreCap(c, m.cap);
-    const base = { auto: 1, sub: m.id, cat: m.c, cap: m.cap, vp: m.vp, donde: donde };
+    const base = { auto: 1, via: 'sub', sub: m.id, cat: m.c, cap: m.cap, vp: m.vp, donde: donde };
 
     if (m.n) {
       fuera.push(Object.assign({ id: 'auto-n-' + m.id, k: 'flash', f: m.n, r: trozo }, base));
@@ -7520,10 +7520,13 @@ function vozActGenerar(cid) {
    tocan: son dos cosechas distintas y mezclarlas haría imposible
    volver a generar sin perder lo escrito a mano. Se distinguen por
    `auto`, no por el sitio de la lista. */
-function vozActRefrescarAuto(cid) {
+function vozActRefrescarAuto(cid, via) {
+  via = via || 'sub';
   const ficha = vozActDe(cid);
-  const aMano = (ficha.items || []).filter(it => !it.auto);
-  const auto = vozActGenerar(cid);
+  /* «aMano» son TODAS las que no son de esta vía: las pegadas y las de
+     las otras dos vías. Ver la nota de las procedencias más abajo. */
+  const aMano = (ficha.items || []).filter(it => vozActVia(it) !== via);
+  const auto = via === 'txt' ? vozActGenerarDelTexto(cid) : (via === 'sub' ? vozActGenerar(cid) : []);
   return { aMano: aMano, auto: auto };
 }
 
@@ -7852,16 +7855,26 @@ function vozActPintarTaller() {
       'Sirven para lo único que una lectura de corrido no hace: comprobar que lo leído se quedó. '
       + 'Hay dos maneras de ponerlas, y se pueden usar las dos.'));
     const puertas = vozNodo('div', 'voz-act-puertas');
-    puertas.appendChild(vozActPuerta('📋', 'Pegar las actividades',
-      'Pídeselas a la misma máquina que escribió el texto y pega aquí lo que te dé. Entiende tarjetas, emparejar, selección, completar y abiertas.',
-      () => vozActAbrirPegar(cid)));
+    /* Las que GENERAN van primero, que es lo que el autor pidió: no tener
+       que pedirlas en otra ventana y pegarlas. La de pegar se queda, la
+       última, para quien ya las tenga escritas. */
+    puertas.appendChild(vozActPuerta('📖', 'Sacarlas del texto, ahora',
+      'Al instante y sin señal: fechas, cifras, nombres, términos, la idea de cada capítulo y la bibliografía, tapados en sus propias frases. Todas las respuestas están en el texto, letra por letra.',
+      () => vozActGenerarTextoYGuardar(cid)));
+    puertas.appendChild(vozActPuerta('🤖', 'Pedírselas a Claude',
+      'Lee el texto entero y escribe actividades de síntesis: la tesis, la idea de cada sección, los datos que sostienen el argumento, las relaciones. Tarda medio minuto y cuesta unos centavos. Solo entran las que citan el texto.',
+      () => vozActPedirIA(cid)));
     const nSub = vozSubDe(cid).length;
     puertas.appendChild(vozActPuerta('🖍', 'Sacarlas de mis subrayados',
       nSub ? ('Tienes ' + nSub + (nSub === 1 ? ' subrayado' : ' subrayados') + ' en este texto. Cada uno se convierte en una pregunta cuya respuesta es el trozo que marcaste.')
            : 'Subraya mientras lees y cada marca se convertirá en una pregunta. Ahora mismo no hay ninguna.',
       nSub ? () => vozActGenerarYGuardar(cid) : null));
+    puertas.appendChild(vozActPuerta('📋', 'Pegar las actividades',
+      'Si ya las tienes escritas en otra ventana, pégalas aquí. Entiende tarjetas, emparejar, selección, completar y abiertas.',
+      () => vozActAbrirPegar(cid)));
     v.appendChild(puertas);
     cuerpo.appendChild(v);
+    cuerpo.appendChild(vozNodo('p', 'voz-aj-nota voz-act-ia-estado', _vozActIaMsg)).id = 'voz-act-ia-estado';
     cuerpo.appendChild(vozNodo('p', 'voz-aj-nota voz-act-estado', vozActRotuloNube())).id = 'voz-act-estado';
     return;
   }
@@ -7923,6 +7936,8 @@ function vozActPintarTaller() {
 
   const pie = vozNodo('div', 'voz-act-pie');
   if (mio) {
+    pie.appendChild(vozBoton('voz-btn', '📖 Sacar más del texto', () => vozActGenerarTextoYGuardar(cid), 'Vuelve a sacar del texto las actividades del aparato (reemplaza las 📖 de antes)'));
+    pie.appendChild(vozBoton('voz-btn', '🤖 Pedírselas a Claude', () => vozActPedirIA(cid), 'Le pide a Claude actividades de síntesis (reemplaza las 🤖 de antes)'));
     pie.appendChild(vozBoton('voz-btn', '📋 Pegar más', () => vozActAbrirPegar(cid)));
     const nSub = vozSubDe(cid).length;
     if (nSub) pie.appendChild(vozBoton('voz-btn', '🖍 Refrescar desde mis subrayados (' + nSub + ')', () => vozActGenerarYGuardar(cid)));
@@ -7931,6 +7946,7 @@ function vozActPintarTaller() {
     pie.appendChild(vozNodo('p', 'voz-menu-nota', '✋ Las puso otra persona de la casa: puedes hacerlas, pero solo ella puede cambiarlas.'));
   }
   cuerpo.appendChild(pie);
+  cuerpo.appendChild(vozNodo('p', 'voz-aj-nota voz-act-ia-estado', _vozActIaMsg)).id = 'voz-act-ia-estado';
   const est = vozNodo('p', 'voz-aj-nota voz-act-estado', vozActRotuloNube());
   est.id = 'voz-act-estado';
   cuerpo.appendChild(est);
@@ -7954,7 +7970,7 @@ function vozActFilaLista(cid, it, n, mio) {
   const cab = vozNodo('div', 'voz-act-fila-cab');
   cab.appendChild(vozNodo('span', 'voz-act-fila-n', String(n + 1)));
   cab.appendChild(vozNodo('span', 'voz-act-fila-tipo', t.ic + ' ' + t.t));
-  if (it.auto) cab.appendChild(vozNodo('span', 'voz-act-fila-auto', '🖍 de un subrayado'));
+  if (it.auto) cab.appendChild(vozNodo('span', 'voz-act-fila-auto', VOZ_ACT_VIAS[vozActVia(it)] || VOZ_ACT_VIAS.sub));
   fila.appendChild(cab);
   const q = it.k === 'flash' ? it.f : (it.k === 'pares' ? (it.q || 'Emparejar') : it.q);
   fila.appendChild(vozNodo('div', 'voz-act-fila-q', String(q || '').replace(/\n/g, ' ')));
@@ -7965,6 +7981,9 @@ function vozActFilaLista(cid, it, n, mio) {
   else if (it.k === 'pares') sol = it.ps.length + ' parejas';
   else if (it.k === 'abierta') sol = it.guia ? ('Pauta: ' + it.guia) : 'Sin pauta';
   fila.appendChild(vozNodo('div', 'voz-act-fila-sol', sol));
+  /* De dónde salió, para revisarla sin abrir el texto: es la etiqueta de
+     la regla 1 aplicada a cada pregunta generada. */
+  if (it.cita && vozActVia(it) !== 'sub') fila.appendChild(vozNodo('div', 'voz-act-fila-cita', '“' + String(it.cita).slice(0, 160) + (String(it.cita).length > 160 ? '…' : '') + '”' + (it.donde ? ' — ' + it.donde : '')));
   if (mio) {
     fila.appendChild(vozBoton('voz-act-fila-x', '✕', () => {
       const quedan = (vozActDe(cid).items || []).filter(x => x.id !== it.id);
@@ -7999,12 +8018,483 @@ function vozActBotonBorrar(cid) {
 }
 
 function vozActGenerarYGuardar(cid) {
-  const r = vozActRefrescarAuto(cid);
+  const r = vozActRefrescarAuto(cid, 'sub');
   if (!r.auto.length) { vozAviso('No hay subrayados de los que sacar actividades'); return; }
   vozActGuardarFicha(cid, r.aMano.concat(r.auto));
   vozActPintarTaller();
   vozAviso('🖍 ' + r.auto.length + (r.auto.length === 1 ? ' actividad sacada de tus subrayados' : ' actividades sacadas de tus subrayados'));
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   LAS ACTIVIDADES QUE GENERA EL SISTEMA: DEL TEXTO Y DE CLAUDE
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 16 de septiembre de 2026: «procura tú generar
+   las actividades, que no tenga que estar haciendo las actividades y
+   pegarlas, que el sistema genere las actividades de cada lectura tomando
+   en consideración los mejores criterios de abstracción y síntesis».
+
+   Son DOS puertas más, y las dos hacen falta porque no fallan igual:
+
+   · LA DEL APARATO (vozActGenerarDelTexto): corre aquí, al instante y sin
+     señal. Mira el texto como lo miraría alguien con un lápiz —fechas,
+     cifras, nombres propios, términos en negrita, definiciones, la
+     primera frase de cada capítulo, las frases que concluyen, la
+     bibliografía— y arma con eso completar, tarjetas, parejas, selección
+     y abiertas. NO entiende el texto: lo recorta. Por eso todas sus
+     respuestas están, letra por letra, en el texto; y por eso no sabe cuál
+     es la tesis, solo dónde suele estar.
+   · LA DE CLAUDE (vozActPedirIA): sí lee, y por eso mismo tiene que CITAR.
+     Cada actividad que devuelve trae el fragmento literal que la respalda,
+     y la que no lo tenga en el texto no entra: lo comprueba la función
+     (supabase/functions/voz-actividades-ia/verifica.ts) y lo vuelve a
+     comprobar el aparato antes de guardar (vozActCitaEnTexto), porque la
+     pantalla no se fía de la base ni la base de la pantalla. Es la única
+     manera de que «el sistema genera las actividades» no signifique «el
+     sistema se inventa las respuestas».
+
+   ⚠️ LAS PROCEDENCIAS NO SE MEZCLAN AL REFRESCAR. Cada actividad lleva
+   `via`: 'sub' (de un subrayado), 'txt' (sacada del texto por el aparato),
+   'ia' (generada por Claude) o nada (pegada a mano). Volver a generar por
+   una vía reemplaza SOLO las suyas: si «sacar del texto» borrara las de
+   Claude, o al revés, cada botón desharía el trabajo del otro sin avisar.
+   Las viejas con `auto: 1` y sin `via` son de subrayados, que era la única
+   vía que había. */
+const VOZ_ACT_VIAS = { sub: '🖍 de un subrayado', txt: '📖 sacada del texto', ia: '🤖 generada por Claude' };
+function vozActVia(it) { return (it && it.via) || (it && it.auto ? 'sub' : ''); }
+
+const VOZ_ACT_FUNCION = 'voz-actividades-ia';
+/* Más que el reloj de las consultas (8 s): la función lee el texto entero
+   y escribe treinta actividades, y en el plan gratuito de Supabase tiene
+   150 s de pared. Aquí se espera un poco menos, para que el aviso sea
+   nuestro y no un error de red sin explicar. */
+const VOZ_ACT_IA_ESPERA = 140000;
+const VOZ_ACT_TXT_TOPE = 28;
+
+function vozActHash(s) {
+  let h = 5381; s = String(s || '');
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+
+/* Las mismas dos funciones que verifica.ts, en el aparato: lo que la
+   función acepta y lo que el aparato acepta tiene que ser lo mismo. */
+function vozActNormalizaTexto(s) {
+  return String(s == null ? '' : s)
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[«»“”„‟"]/g, '"').replace(/[‘’‚‛']/g, "'").replace(/[–—‑]/g, '-').replace(/…/g, '...')
+    .replace(/\s+/g, ' ').trim();
+}
+function vozActSinPuntuacion(s) {
+  return vozActNormalizaTexto(s).replace(/[^\p{L}\p{N} ]+/gu, ' ').replace(/\s+/g, ' ').trim();
+}
+function vozActPreparaTexto(texto) {
+  return { norm: vozActNormalizaTexto(texto), sinP: vozActSinPuntuacion(texto) };
+}
+function vozActCitaEnTexto(cita, T) {
+  const c = vozActNormalizaTexto(cita);
+  if (c.length < 15) return false;
+  if (T.norm.indexOf(c) >= 0) return true;
+  const cp = vozActSinPuntuacion(cita);
+  return cp.length >= 15 && T.sinP.indexOf(cp) >= 0;
+}
+
+/* ─── El texto, frase a frase ─── */
+const VOZ_ACT_ABREV = /\b(?:sr|sra|srta|dr|dra|lic|ing|prof|p|pp|ej|cf|vol|núm|art|cap|ud|uds)\.$/i;
+function vozActFrases(t) {
+  const s = String(t || '').replace(/\s+/g, ' ').trim();
+  const out = []; let ini = 0;
+  const re = /[.!?…]+["»”’)]*\s+/g; let m;
+  while ((m = re.exec(s))) {
+    const fin = m.index + m[0].length;
+    const trozo = s.slice(ini, fin).trim();
+    const sig = s.charAt(fin);
+    if (VOZ_ACT_ABREV.test(trozo.replace(/["»”’)]+$/, ''))) continue;
+    if (sig && !/[A-ZÁÉÍÓÚÑ«"“¿¡(\d]/.test(sig)) continue;
+    if (trozo) out.push(trozo);
+    ini = fin;
+  }
+  const resto = s.slice(ini).trim();
+  if (resto) out.push(resto);
+  return out;
+}
+
+const VOZ_ACT_VACIAS = new Set(('el la los las un una unos unas de del al a ante bajo con contra desde en entre hacia hasta ' +
+  'para por segun según sin sobre tras y e o u ni que como cuando donde mientras aunque pero sino si ya no es son era eran fue ' +
+  'fueron ser esta está estan están estaba estaban hay ha han he se su sus le les lo mi mis tu tus nuestro nuestra nuestros ' +
+  'nuestras este esta estos estas ese esa esos esas aquel aquella aquello esto eso el ella ellos ellas nosotros usted ustedes ' +
+  'yo tu me te nos os tambien también mas más muy mucho poco todo toda todos todas otro otra otros otras cada uno algun alguna ' +
+  'ningun ninguna entonces asi así aqui aquí alli allí ahi ahí ahora antes despues después luego solo sólo tan tanto bien mal ' +
+  'casi porque pues aun aún hasta sino').split(' '));
+
+const VOZ_ACT_MESES = 'enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre';
+const VOZ_ACT_RE_FECHA = new RegExp('\\b\\d{1,2} de (?:' + VOZ_ACT_MESES + ')(?: de \\d{4})?\\b', 'gi');
+const VOZ_ACT_RE_ANIO = /\b(?:1[5-9]\d{2}|20\d{2})\b/g;
+const VOZ_ACT_RE_CIFRA = /\b\d[\d.,]*\s?(?:%|por ciento|millones?|mil|millar(?:es)?|km|kg|metros|años|d[oó]lares|lempiras|euros|habitantes|personas|veces|p[aá]ginas|horas|d[ií]as|siglos)\b/gi;
+const VOZ_ACT_RE_DEF = /^([A-ZÁÉÍÓÚÑ][^,.;:()]{1,45}?) (es|son|significa|se define como|se entiende por|consiste en|se llama|se conoce como|designa) (.{20,})$/;
+const VOZ_ACT_RE_TESIS = /\b(en conclusi[oó]n|en definitiva|en suma|en resumen|por lo tanto|por tanto|de ah[ií] que|lo esencial|lo importante|la tesis|sostengo|sostiene que|la idea central|lo que importa|en el fondo|dicho de otro modo|en otras palabras|lo cierto es que|conviene recordar)\b/i;
+
+/* Los nombres propios de una frase: palabras con mayúscula que NO son la
+   primera —la primera la lleva por ser la primera—, en tirada, con sus
+   «de la» en medio («Juan de la Cruz»). Sin diccionario: es lo que hace
+   que «Estado» o «Iglesia» salgan también, y está bien, porque en un
+   ensayo esos son justo los nombres que hay que recordar. */
+function vozActNombres(frase) {
+  const toks = frase.split(' ');
+  const out = []; let run = [];
+  const esCap = t => /^[«"“(]?[A-ZÁÉÍÓÚÑ][\p{L}'’-]*[.,;:!?»")”]*$/u.test(t);
+  const conector = t => /^(de|del|la|las|los|y|e)$/.test(t);
+  const pela = t => t.replace(/^[«"“(]+|[.,;:!?»")”]+$/g, '');
+  const cierra = () => { if (run.length) out.push(run.join(' ')); run = []; };
+  for (let i = 1; i < toks.length; i++) {
+    const t = toks[i];
+    if (esCap(t) && !VOZ_ACT_VACIAS.has(pela(t).toLowerCase())) {
+      run.push(pela(t));
+      if (/[.,;:!?]$/.test(t.replace(/[»")”]+$/, ''))) cierra();
+    } else if (run.length && conector(t) && i + 1 < toks.length && esCap(toks[i + 1])) {
+      run.push(t);
+    } else cierra();
+  }
+  cierra();
+  return out.filter(n => n.length >= 3 && n.length <= 40 && !/^(de|del|la|las|los|y|e)$/.test(n));
+}
+
+function vozActNegritas(raw) {
+  const out = []; let m; const re = /\*\*([^*\n]{2,60})\*\*/g;
+  while ((m = re.exec(String(raw || '')))) out.push(m[1].trim());
+  return out;
+}
+
+/* Las entradas de la bibliografía que se dejan leer: «Apellido, N. (Año).
+   Título». Lo que no tenga esa forma no se usa: adivinar un año en una
+   referencia es inventarse un dato. */
+function vozActFuentes(c) {
+  const out = [];
+  (c.capitulos || []).forEach(cap => (cap.p || []).forEach(b => {
+    if (!b || b.k !== 'fuente') return;
+    const t = String(b.t || '').replace(/\s+/g, ' ').trim();
+    const m = t.match(/^([^,(]{2,40}?),\s*([^()]{0,40}?)\s*\(?(\d{4})[a-z]?\)?[.:]?\s*(.{5,120}?)(?:\.\s|$)/);
+    if (!m) return;
+    out.push({ apellido: m[1].trim(), anio: m[3], titulo: m[4].trim().replace(/[.:]$/, ''), t: t });
+  }));
+  return out;
+}
+
+/* Las frases del texto con su sitio: capítulo, bloque y el texto crudo
+   del bloque (para las negritas, que en el plano ya no están). */
+function vozActUnidades(c) {
+  const U = [];
+  (c.capitulos || []).forEach((cap, ci) => {
+    if (cap.ref) return;
+    (cap.p || []).forEach((b, vi) => {
+      if (!b || !/^(p|li|cita)$/.test(b.k)) return;
+      const plano = vozActPlanoDeBloque(b);
+      vozActFrases(plano).forEach(fr => U.push({ cap: ci, vp: vi, frase: fr, raw: b.t || '' }));
+    });
+  });
+  return U;
+}
+
+function vozActGenerarDelTexto(cid, tope) {
+  const c = _vozCuentos.find(x => x.cid === cid);
+  if (!c) return [];
+  const U = vozActUnidades(c);
+  const donde = ci => vozNombreCap(c, ci);
+  const palabras = U.reduce((n, u) => n + vozPalabrasDe(u.frase), 0);
+  /* Cuántas: crece con el largo, como en la función de Claude. `tope` lo
+     pisa (la sonda lo usa para ver todo lo que el generador sabe sacar). */
+  const objetivo = tope || Math.min(VOZ_ACT_TXT_TOPE, palabras < 800 ? 10 : palabras < 3000 ? 18 : palabras < 8000 ? 26 : 32);
+  const grupos = { tesis: [], ideas: [], datos: [], terminos: [], refs: [], estructura: [] };
+  const usadas = new Set();
+  const vecesResp = {};
+  const cuenta = r => { const k = vozActNormalizaTexto(r); vecesResp[k] = (vecesResp[k] || 0) + 1; return vecesResp[k]; };
+  /* Una frase «buena» para preguntar: ni un fragmento ni un párrafo. Y
+     empieza por mayúscula, que es como se sabe que es una frase entera. */
+  const buena = u => { const n = vozPalabrasDe(u.frase); return n >= 6 && n <= 45 && /^[A-ZÁÉÍÓÚÑ«"“¿¡(]/.test(u.frase); };
+  const hueco = (frase, resp) => {
+    const i = frase.indexOf(resp);
+    if (i < 0) return null;
+    return (frase.slice(0, i) + '___' + frase.slice(i + resp.length)).replace(/\s{2,}/g, ' ').trim();
+  };
+  const corta = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
+  /* ⚠️ El id sale del tipo, el enunciado y la respuesta: volver a generar
+     el mismo texto da los mismos ids, así que reemplaza en vez de duplicar. */
+  const mk = (k, campos, u, nivel) => Object.assign({
+    id: 'txt-' + vozActHash(k + '|' + (campos.q || campos.f || '') + '|' + (campos.a || campos.r || '')),
+    k: k, auto: 1, via: 'txt', nivel: nivel, donde: donde(u.cap), cita: u.frase, cap: u.cap, vp: u.vp,
+  }, campos);
+
+  /* ── La tesis: la frase que concluye, si la hay; si no, la primera ── */
+  const marcada = U.find(u => VOZ_ACT_RE_TESIS.test(u.frase) && buena(u));
+  const primera = U.find(buena);
+  const tesisU = marcada || primera;
+  if (tesisU) {
+    grupos.tesis.push(mk('abierta', {
+      q: '¿Cuál es la tesis de «' + (c.titulo || 'este texto') + '»? Dila en una frase, con tus palabras.',
+      guia: 'El texto lo dice así: «' + tesisU.frase + '»' +
+            (marcada && primera && primera !== marcada ? ' — y empieza diciendo: «' + primera.frase + '»' : ''),
+    }, tesisU, 'tesis'));
+    grupos.tesis.push(mk('flash', { f: 'La frase con que el texto resume lo que quiere que entiendas. ¿Cómo la dice?', r: tesisU.frase }, tesisU, 'tesis'));
+    usadas.add(tesisU.frase);
+  }
+
+  /* ── Una idea por capítulo: cómo empieza y cómo termina ── */
+  (c.capitulos || []).forEach((cap, ci) => {
+    if (cap.ref) return;
+    const deCap = U.filter(u => u.cap === ci);
+    if (deCap.length < 3) return;
+    const top = deCap.find(buena);
+    const ult = deCap.slice().reverse().find(buena);
+    if (!top) return;
+    /* La frase va de PAUTA y no se gasta: se enseña solo después de
+       contestar, así que un completar sobre esa misma frase no la
+       regala. Lo que sí se gasta es lo que va de REVERSO de una tarjeta
+       (la tesis, los términos), que ahí la frase se ve entera. */
+    grupos.ideas.push(mk('abierta', {
+      q: '¿Cuál es la idea principal de «' + (cap.t || donde(ci)) + '»? Dila con tus palabras.',
+      guia: 'Empieza así: «' + top.frase + '»' + (ult && ult !== top ? ' Y termina así: «' + ult.frase + '»' : ''),
+    }, top, 'idea'));
+  });
+
+  /* ── Los datos: fechas, años, cifras y nombres, tapados en su frase ── */
+  const anios = new Set();
+  U.forEach(u => (u.frase.match(VOZ_ACT_RE_ANIO) || []).forEach(a => anios.add(a)));
+  U.forEach(u => {
+    if (!buena(u) || usadas.has(u.frase)) return;
+    const cands = [];
+    (u.frase.match(VOZ_ACT_RE_FECHA) || []).forEach(x => cands.push({ t: x, cl: 'fecha' }));
+    (u.frase.match(VOZ_ACT_RE_ANIO) || []).forEach(x => { if (!cands.some(k => k.t.indexOf(x) >= 0)) cands.push({ t: x, cl: 'anio' }); });
+    (u.frase.match(VOZ_ACT_RE_CIFRA) || []).forEach(x => { if (!cands.some(k => k.t.indexOf(x) >= 0 || x.indexOf(k.t) >= 0)) cands.push({ t: x, cl: 'cifra' }); });
+    const nombres = vozActNombres(u.frase).filter(x => !cands.some(k => k.t.indexOf(x) >= 0 || x.indexOf(k.t) >= 0));
+    /* Hasta DOS por frase: un número y un nombre. Con uno solo, el año se
+       comía siempre al nombre («decía Remigio Ochoa, que había nacido en
+       1881») y un ensayo lleno de nombres salía sin ninguno. */
+    const elegidos = [];
+    if (cands[0]) elegidos.push(cands[0]);
+    if (nombres[0]) elegidos.push({ t: nombres[0], cl: 'nombre' });
+    let puso = false;
+    elegidos.forEach(cd => {
+      if (cuenta(cd.t) > 2) return;
+      const q = hueco(u.frase, cd.t);
+      if (!q) return;
+      /* Los años, alguna vez como selección —con los OTROS años del texto
+         de distractores, nunca inventados—, y las menos: recordar antes
+         que reconocer. */
+      if (cd.cl === 'anio' && anios.size >= 4 && grupos.datos.filter(d => d.k === 'opcion').length < Math.ceil(objetivo / 6)) {
+        const otros = [...anios].filter(a => a !== cd.t).sort((a, b) => Math.abs(a - cd.t) - Math.abs(b - cd.t)).slice(0, 3);
+        const o = otros.concat([cd.t]).sort((a, b) => a - b);
+        grupos.datos.push(mk('opcion', { q: q.replace('___', '¿___?'), o: o, ok: o.indexOf(cd.t) }, u, 'dato'));
+      } else {
+        grupos.datos.push(mk('completar', { q: q, a: cd.t }, u, 'dato'));
+      }
+      puso = true;
+    });
+    if (puso) usadas.add(u.frase);
+  });
+
+  /* ── Los términos: negritas, definiciones y subtítulos ── */
+  U.forEach(u => {
+    if (usadas.has(u.frase)) return;
+    const negs = vozActNegritas(u.raw).filter(n => u.frase.indexOf(n) >= 0);
+    if (negs.length) {
+      if (cuenta(negs[0]) > 1 || !buena(u)) return;
+      grupos.terminos.push(mk('flash', { f: '¿Qué dice el texto sobre «' + negs[0] + '»?', r: u.frase }, u, 'termino'));
+      usadas.add(u.frase);
+      return;
+    }
+    const m = u.frase.match(VOZ_ACT_RE_DEF);
+    if (m && m[1].split(' ').length <= 5 && buena(u)) {
+      if (cuenta(m[1]) > 1) return;
+      grupos.terminos.push(mk('flash', { f: '¿Qué es «' + m[1] + '», según el texto?', r: u.frase }, u, 'termino'));
+      usadas.add(u.frase);
+    }
+  });
+  (c.capitulos || []).forEach((cap, ci) => (cap.p || []).forEach((b, vi) => {
+    if (!b || b.k !== 'h3' || !b.t) return;
+    const sig = (cap.p || []).slice(vi + 1).find(x => x && /^(p|li|cita)$/.test(x.k));
+    const fr = sig && vozActFrases(vozActPlanoDeBloque(sig))[0];
+    if (!fr || vozPalabrasDe(fr) < 6 || vozPalabrasDe(fr) > 45) return;
+    grupos.terminos.push(mk('flash', { f: '¿De qué trata «' + b.t + '»?', r: fr }, { cap: ci, vp: vi, frase: fr }, 'idea'));
+  }));
+
+  /* ── Las referencias: la bibliografía, o las citas del cuerpo ── */
+  const F = vozActFuentes(c);
+  if (F.length >= 2) {
+    const uF = { cap: 0, vp: 0, frase: F.slice(0, 6).map(f => f.t).join(' ') };
+    grupos.refs.push(mk('pares', { q: 'Empareja cada autor de la bibliografía con su obra', ps: F.slice(0, 6).map(f => [f.apellido, corta(f.titulo, 60)]) }, uF, 'dato'));
+    const aniosF = [...new Set(F.map(f => f.anio))];
+    F.slice(0, 4).forEach(f => {
+      const uf = { cap: 0, vp: 0, frase: f.t };
+      if (aniosF.length >= 4) {
+        const otros = aniosF.filter(a => a !== f.anio).sort((a, b) => Math.abs(a - f.anio) - Math.abs(b - f.anio)).slice(0, 3);
+        const o = otros.concat([f.anio]).sort((a, b) => a - b);
+        grupos.refs.push(mk('opcion', { q: '¿En qué año se publicó «' + f.titulo + '», de ' + f.apellido + '?', o: o, ok: o.indexOf(f.anio) }, uf, 'dato'));
+      } else {
+        grupos.refs.push(mk('completar', { q: f.apellido + ' (___). ' + f.titulo + '.', a: f.anio }, uf, 'dato'));
+      }
+    });
+  } else {
+    const vistos = {}; const re = /\(([A-ZÁÉÍÓÚÑ][\p{L}’' -]{1,30}?),\s*(\d{4})[a-z]?(?:[,;:][^)]*)?\)/gu;
+    U.forEach(u => { let m; while ((m = re.exec(u.frase))) if (!vistos[m[1]]) vistos[m[1]] = { anio: m[2], u: u }; });
+    const lista = Object.keys(vistos).slice(0, 6);
+    if (lista.length >= 2) {
+      grupos.refs.push(mk('pares', { q: 'Empareja cada autor citado con el año de su obra', ps: lista.map(a => [a, vistos[a].anio]) }, vistos[lista[0]].u, 'dato'));
+    }
+  }
+
+  /* ── La estructura: cada capítulo con su idea ── */
+  const caps = (c.capitulos || []).map((cap, ci) => ({ cap: cap, ci: ci })).filter(x => x.cap.t && !x.cap.ref);
+  if (caps.length >= 3) {
+    const ps = [];
+    caps.slice(0, 6).forEach(x => { const top = U.find(u => u.cap === x.ci && buena(u)); if (top) ps.push([x.cap.t, corta(top.frase, 70)]); });
+    if (ps.length >= 3) {
+      grupos.estructura.push(mk('pares', { q: '¿A qué capítulo pertenece cada idea?', ps: ps }, { cap: caps[0].ci, vp: 0, frase: ps.map(p => p[1]).join(' ') }, 'relacion'));
+    }
+  }
+
+  /* ── El reparto: se intercalan los grupos y se corta en el objetivo, así
+     la tesis y las ideas siempre entran y los datos no se lo comen todo ── */
+  const orden = ['tesis', 'ideas', 'datos', 'terminos', 'refs', 'estructura'];
+  const fuera = []; let hay = true;
+  while (hay && fuera.length < objetivo) {
+    hay = false;
+    orden.forEach(g => { if (fuera.length < objetivo && grupos[g].length) { fuera.push(grupos[g].shift()); hay = true; } });
+  }
+  return fuera;
+}
+
+function vozActGenerarTextoYGuardar(cid) {
+  const r = vozActRefrescarAuto(cid, 'txt');
+  if (!r.auto.length) { vozAviso('El texto es demasiado corto para sacarle actividades'); return; }
+  vozActGuardarFicha(cid, r.aMano.concat(r.auto));
+  vozActPintarTaller();
+  vozAviso('📖 ' + r.auto.length + (r.auto.length === 1 ? ' actividad sacada del texto' : ' actividades sacadas del texto'));
+}
+
+/* ─── La puerta de Claude ─────────────────────────────────────────
+   Llama a la Edge Function voz-actividades-ia con el texto entero. Lo que
+   vuelve se SANEA (solo los campos que el taller conoce, con sus topes) y
+   se COMPRUEBA (la cita de cada actividad tiene que estar en el texto),
+   y solo entonces se guarda con via 'ia'. */
+let _vozActIaEnMarcha = null;
+let _vozActIaMsg = '';
+
+function vozActPintarIa(msg) {
+  _vozActIaMsg = msg || '';
+  const e = document.getElementById('voz-act-ia-estado');
+  if (e) e.textContent = _vozActIaMsg;
+}
+
+function vozActSanea(x) {
+  if (!x || typeof x !== 'object') return null;
+  const k = String(x.k || '');
+  if (!VOZ_ACT_TIPOS.some(t => t.id === k)) return null;
+  const s = (v, n) => String(v == null ? '' : v).replace(/\s+/g, ' ').trim().slice(0, n || 600);
+  const it = { id: 'ia-' + vozActHash(k + '|' + s(x.q || x.f) + '|' + s(x.a || x.r)), k: k, auto: 1, via: 'ia',
+               cita: s(x.cita, 300), donde: s(x.donde, 120), nivel: s(x.nivel, 12) };
+  if (k === 'flash') { it.f = s(x.f || x.q); it.r = s(x.r || x.a, 400); if (!it.f || !it.r) return null; }
+  else if (k === 'completar') { it.q = s(x.q); it.a = s(x.a, 200); if (!/___/.test(it.q) || !it.a) return null; }
+  else if (k === 'opcion') {
+    it.q = s(x.q); it.o = (Array.isArray(x.o) ? x.o : []).map(v => s(v, 200)).filter(Boolean).slice(0, 6);
+    it.ok = Number.isInteger(x.ok) ? x.ok : -1;
+    if (!it.q || it.o.length < 2 || it.ok < 0 || it.ok >= it.o.length) return null;
+  } else if (k === 'pares') {
+    it.q = s(x.q) || 'Empareja cada una con la suya';
+    it.ps = (Array.isArray(x.ps) ? x.ps : []).map(p => Array.isArray(p) ? [s(p[0], 120), s(p[1], 160)] : [s(p && p.a, 120), s(p && p.b, 160)])
+      .filter(p => p[0] && p[1]).slice(0, 8);
+    if (it.ps.length < 2) return null;
+  } else { it.q = s(x.q); it.guia = s(x.guia, 900); if (!it.q || !it.guia) return null; }
+  return it;
+}
+
+/* ⚠️ LOS MOTIVOS SE DISTINGUEN, porque se arreglan distinto y un aviso
+   que se equivoca de causa manda a mirar donde no está el problema
+   (regla 14): falta desplegar la función, falta la clave, caducó la
+   sesión, no hay señal, o Claude no contestó a tiempo. */
+function vozActMotivoIa(error, cuerpo) {
+  const st = error && error.context && error.context.status;
+  const cod = cuerpo && cuerpo.error;
+  const det = cuerpo && cuerpo.detalle;
+  if (error && error.code === 'FARO_RELOJ') return '⏳ Claude no contestó en dos minutos. Vuelve a intentarlo; si el texto es muy largo, pídele las actividades por capítulos.';
+  if (st === 404) return '📴 Falta desplegar la función «voz-actividades-ia» en Supabase (Edge Functions → Deploy a new function). Mientras tanto, 📖 Sacarlas del texto funciona igual.';
+  if (cod === 'sin_clave' || cod === 'clave_mala') return '🔑 ' + (det || 'Falta la clave de Anthropic en los Secrets de la función');
+  if (cod === 'sin_sesion' || st === 401) return '📴 La sesión caducó: vuelve a entrar en F.A.R.O y prueba otra vez';
+  if (cod === 'no_es_de_la_casa' || st === 403) return '✋ Esta cuenta no es de la casa: la función solo atiende a la familia';
+  if (cod === 'limite' || st === 429) return '⏳ Anthropic pide esperar un momento: vuelve a intentarlo en un minuto';
+  if (cod === 'texto_largo' || st === 413) return '📏 El texto es demasiado largo para pedirlo de una vez';
+  if (cod === 'texto_corto') return 'El texto es demasiado corto para sacarle actividades';
+  if (cod === 'rechazo') return '✋ Claude declinó este texto';
+  if (error && /FetchError/i.test(error.name || '')) return '📡 Sin señal: no se pudo llegar a la función. Se puede volver a intentar cuando vuelva.';
+  return '⚠️ ' + (det || (error && error.message) || 'La función devolvió un error');
+}
+
+async function vozActPedirIA(cid) {
+  const c = _vozCuentos.find(x => x.cid === cid);
+  if (!c) return null;
+  if (_vozActIaEnMarcha) { vozAviso('⏳ Claude ya está leyendo un texto: espera a que termine'); return null; }
+  const sb = vozSb();
+  if (!sb || !sb.functions) { const m = '📴 Sin conexión con la nube: entra en F.A.R.O para pedírselas a Claude'; vozActPintarIa(m); vozAviso(m); return null; }
+  const yo = await vozYo();
+  if (!yo) { const m = '📴 Entra en F.A.R.O para pedírselas a Claude'; vozActPintarIa(m); vozAviso(m); return null; }
+  const texto = vozTextoCuerpo(c, {});
+  if (texto.trim().length < 200) { const m = 'El texto es demasiado corto para sacarle actividades'; vozActPintarIa(m); vozAviso(m); return null; }
+
+  _vozActIaEnMarcha = cid;
+  vozActPintarIa('⏳ Claude está leyendo «' + (c.titulo || 'el texto') + '»… tarda medio minuto. Puedes seguir en otra cosa.');
+  let resultado = null;
+  try {
+    const capitulos = (c.capitulos || []).map(x => x.t).filter(Boolean);
+    const { data, error } = await vozConReloj(sb.functions.invoke(VOZ_ACT_FUNCION, {
+      body: { cid: cid, titulo: c.titulo || '', genero: c.genero || '', capitulos: capitulos, texto: texto },
+    }), VOZ_ACT_IA_ESPERA);
+    if (error) {
+      let cuerpo = null;
+      try { cuerpo = error.context && error.context.json ? await error.context.json() : null; } catch (e) {}
+      const m = vozActMotivoIa(error, cuerpo);
+      vozActPintarIa(m); vozAviso(m);
+      return null;
+    }
+    if (!data || !data.ok || !Array.isArray(data.items)) {
+      const m = vozActMotivoIa(null, data);
+      vozActPintarIa(m); vozAviso(m);
+      return null;
+    }
+    /* ⚠️ Se vuelve a comprobar aquí lo que la función ya comprobó. No es
+       desconfianza de la función: es que el texto contra el que se
+       comprueba es ESTE, el del aparato, y lo que se guarda es lo que
+       este aparato decide guardar. */
+    const T = vozActPreparaTexto(texto);
+    const buenas = [], fuera = [];
+    data.items.forEach(x => {
+      const it = vozActSanea(x);
+      if (!it) { fuera.push(x); return; }
+      if (!vozActCitaEnTexto(it.cita, T)) { fuera.push(x); return; }
+      if (it.k === 'completar' && vozActSinPuntuacion(it.cita).indexOf(vozActSinPuntuacion(it.a)) < 0) { fuera.push(x); return; }
+      buenas.push(it);
+    });
+    if (!buenas.length) {
+      const m = '⚠️ Claude devolvió ' + data.items.length + ' actividades y ninguna citaba el texto: no se guardó ninguna';
+      vozActPintarIa(m); vozAviso(m);
+      return null;
+    }
+    const r = vozActRefrescarAuto(cid, 'ia');
+    vozActGuardarFicha(cid, r.aMano.concat(buenas));
+    const desc = (Number(data.descartadas) || 0) + fuera.length;
+    const m = '🤖 ' + buenas.length + (buenas.length === 1 ? ' actividad de Claude' : ' actividades de Claude') +
+              (desc ? ' · ' + desc + (desc === 1 ? ' descartada por no citar el texto' : ' descartadas por no citar el texto') : '');
+    resultado = { guardadas: buenas.length, descartadas: desc, tesis: data.tesis || '' };
+    vozActPintarIa('');
+    vozActPintarTaller();
+    vozAviso(m);
+  } catch (e) {
+    const m = '⚠️ ' + ((e && e.message) || 'No se pudo pedir las actividades');
+    vozActPintarIa(m); vozAviso(m);
+  } finally {
+    _vozActIaEnMarcha = null;
+  }
+  return resultado;
+}
+
 
 /* ─── La sesión ─── */
 function vozActEmpezar(cid, modo) {
