@@ -639,9 +639,22 @@
    necesita. */
 .voz-zonas { position: absolute; inset: 0; display: flex; touch-action: pan-y pinch-zoom; pointer-events: none; }
 .voz-zonas > div { height: 100%; -webkit-tap-highlight-color: transparent; }
-#voz-z-izq { flex: 0 0 20%; cursor: w-resize; pointer-events: auto; }
+/* ⚠️ NINGUNA RECIBE EL PUNTERO, Y ESO ES LO QUE DEJA SUBRAYAR EN TODO
+   EL ANCHO. Las dos cubren el 20 % de cada borde —el 40 % del ancho— y
+   van encima del texto. Mientras lo recibían, sobre ellas
+   `caretRangeFromPoint` devolvía un DIV en vez de una posición de texto
+   (medido, comprobación 38), y eso rompía las dos mitades del subrayar:
+   una palabra del borde no se podía marcar tocándola, y un tirador de
+   selección soltado ahí se iba media página más allá, porque el navegador
+   resuelve con lo más cercano del flujo y en una caja de COLUMNAS eso
+   queda lejísimos. Ahora el borde lo decide la coordenada, dentro del
+   mismo toque que ya decide todo lo demás (`bordePagina`, en
+   voz-prestada.js). Se quedan en el documento porque siguen marcando DÓNDE
+   está el borde —de ellas se lee el ancho, para no escribir el 20 % dos
+   veces— y porque el modo desplazamiento las esconde. */
+#voz-z-izq { flex: 0 0 20%; pointer-events: none; }
 #voz-z-mid { flex: 1 1 auto; pointer-events: none; }
-#voz-z-der { flex: 0 0 20%; cursor: e-resize; pointer-events: auto; }
+#voz-z-der { flex: 0 0 20%; pointer-events: none; }
 
 .voz-barra { position: relative; height: 4px; background: var(--border); flex: 0 0 auto; }
 #voz-barra-marcas { position: absolute; inset: 0; pointer-events: none; }

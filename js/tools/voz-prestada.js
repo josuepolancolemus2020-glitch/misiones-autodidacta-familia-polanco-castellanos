@@ -4515,19 +4515,6 @@ function vozVueltaSuelta(rapido) {
   vozVueltaTermina(v.el, v.dir, completar);
 }
 
-/* Qué hay bajo el dedo cuando el toque lo recogió una zona de pasar
-   página. Se apaga un instante el puntero de las dos zonas y se mira:
-   sin eso, `elementFromPoint` devuelve siempre la zona. */
-function vozBajoLaZona(x, y) {
-  const zs = [document.getElementById('voz-z-izq'), document.getElementById('voz-z-der')].filter(Boolean);
-  const antes = zs.map(z => z.style.pointerEvents);
-  zs.forEach(z => { z.style.pointerEvents = 'none'; });
-  let el = null;
-  try { el = document.elementFromPoint(x, y); } catch (e) {}
-  zs.forEach((z, i) => { z.style.pointerEvents = antes[i]; });
-  return el;
-}
-
 /* ─── Los gestos ───────────────────────────────────────────────────
    Con PUNTEROS y nunca con el arrastre del navegador, igual que en el
    resto de la casa. Y el gesto NO es la única forma de pasar página:
@@ -4603,44 +4590,60 @@ function vozEngancharSala() {
     if (e.pointerType === 'mouse' && !_vozSubEditando) vozSubProgramar(60);
   });
 
-  /* Los bordes pasan página, que es como se pasa en cualquier lector.
-     El centro —que es la propia hoja, para que el texto se pueda
-     seleccionar y copiar— apaga y enciende los mandos. */
-  /* ⚠️ Y LA ZONA DE PASAR PÁGINA NO SE COME LO QUE HAY DEBAJO. Las
-     zonas cubren los bordes de la hoja y van ENCIMA del texto, así que
-     una llamada a fuente —o un subrayado— que caiga cerca del margen
-     sería intocable: el toque pasaría página y nadie entendería por
-     qué ese botón sí y ese no. Se mira qué hay debajo apagando un
-     instante el puntero de las zonas, y si es algo que se toca, se le
-     manda el toque a él. */
-  const zona = (id, fn) => {
-    const z = document.getElementById(id);
-    if (!z) return;
-    z.addEventListener('click', ev => {
-      if (_vozTragarClic) return;
-      const bajo = vozBajoLaZona(ev.clientX, ev.clientY);
-      const cit = bajo && bajo.closest ? bajo.closest('.voz-cit') : null;
-      if (cit) { vozCitAbrirBtn(cit); return; }
-      const mk = bajo && bajo.closest ? bajo.closest('mark.voz-hl') : null;
-      if (mk) { vozSubAbrirMarca(mk.dataset.subId, mk.getBoundingClientRect()); return; }
-      /* ⚠️ CUALQUIER BOTÓN, no una lista de los que había el día que se
-         escribió esto. Con la lista a mano, el enlace «Taller de
-         comprensión» del pie de la última página —que llegó después— se
-         quedaba fuera: su tercio izquierdo cae bajo la zona de pasar
-         página, así que tocarlo ahí no abría el taller, RETROCEDÍA una
-         página. Y el centro del botón sí funcionaba, que es lo que hace
-         que no se vea: unas veces va y otras no, según dónde caiga el
-         dedo. La condición es la misma que la del toque al centro
-         (`closest('a, mark, button')`, unas líneas más abajo): las dos
-         miran lo mismo porque son el mismo gesto sobre el mismo texto, y
-         cuando no coinciden lo que sobra es siempre el borde. */
-      const bt = bajo && bajo.closest ? bajo.closest('button, a[href]') : null;
-      if (bt) { bt.click(); return; }
-      fn();
-    });
+  /* ⚠️ LAS ZONAS DE PASAR PÁGINA NO RECIBEN EL PUNTERO, Y EL BORDE SE
+     DECIDE POR LA COORDENADA. Pedido por el autor el 18 de septiembre de
+     2026: «cuando selecciono el texto la marca azul no se limita a
+     seleccionar la palabra sino que esa marca se expande hasta bastantes
+     palabras más».
+
+     La causa, MEDIDA y no supuesta (comprobación 38): las dos zonas
+     cubren el 20 % de cada borde —el 40 % del ancho, 160 px de 400 en la
+     tableta del autor— y van ENCIMA del texto. Sobre ellas,
+     `caretRangeFromPoint` devuelve un DIV y no una posición de texto; con
+     el puntero apagado, el mismo punto devuelve el texto. Y ESO es lo
+     que el navegador usa para resolver dónde cae el tirador de una
+     selección arrastrado con el dedo: si el tirador se suelta sobre una
+     zona no hay posición que devolver, así que Chrome resuelve con lo más
+     cercano que encuentra en el flujo — y en una caja de COLUMNAS «lo más
+     cercano» puede estar media página más allá. De ahí el tirador
+     disparado hasta el final del párrafo en la captura del autor.
+
+     Son dos fallos, no uno, y por eso no basta con apagarlas mientras hay
+     selección: con las zonas puestas, una palabra del 20 % de cualquier
+     borde NO SE PUEDE SELECCIONAR tocándola, porque el toque que abre la
+     selección tampoco encuentra texto. Cuarenta por ciento del ancho de
+     un ensayo sin poder marcar.
+
+     El arreglo quita código en vez de añadirlo: las zonas salen del
+     reparto de toques y el borde se decide aquí mismo, por la X, dentro
+     del único toque que ya decide todo lo demás. Con eso desaparece
+     también `vozBajoLaZona()` y la familia entera de averías que existía
+     para tapar —la llamada de cita intocable cerca del margen, el enlace
+     del taller que retrocedía una página al tocarle el tercio izquierdo—:
+     ahora el botón, el subrayado o la cita reciben su toque directamente,
+     como cualquier otro. La trampa deja de poder existir en vez de quedar
+     escrita en un comentario.
+
+     Lo que se paga: en un ratón se pierde el cursor de flecha sobre los
+     bordes. Se puede pagar —quien usa ratón tiene los botones ‹ › del
+     pie, las flechas del teclado y la rueda, que son tres maneras— y lo
+     que se compra es poder subrayar en todo el ancho.
+
+     ⚠️ Y el ancho del borde se LEE de las propias zonas, no se escribe
+     aquí: el 20 % vive en el CSS y dos números que tienen que decir lo
+     mismo escritos en dos sitios se arreglan en uno. En modo
+     desplazamiento las zonas están en `display:none`, así que miden cero
+     y el borde no pasa página — que es justo lo que ese modo necesita. */
+  const bordePagina = x => {
+    const zi = document.getElementById('voz-z-izq');
+    const zd = document.getElementById('voz-z-der');
+    if (!zi || !zd) return 0;
+    const ri = zi.getBoundingClientRect(), rd = zd.getBoundingClientRect();
+    if (ri.width && x >= ri.left && x < ri.right) return -1;
+    if (rd.width && x >= rd.left && x < rd.right) return 1;
+    return 0;
   };
-  zona('voz-z-izq', () => vozPasar(-1));
-  zona('voz-z-der', () => vozPasar(1));
+
   hoja.addEventListener('click', e => {
     if (_vozTragarClic) return;
     /* Tocar un subrayado lo abre para cambiarle el color, ponerle nota
@@ -4658,6 +4661,10 @@ function vozEngancharSala() {
        barra sería la peor sorpresa posible. */
     if (e.target && e.target.closest && e.target.closest('a, mark, button')) return;
     if (vozCitAbierta()) { vozCitCerrar(); return; }
+    /* Con una selección viva, el toque NO hace nada más que dejar que el
+       navegador la deshaga: ni pasa página ni apaga los mandos. Quien
+       acaba de marcar una frase y roza el borde no quiere irse de
+       página, y el toque siguiente ya la encuentra sin selección. */
     if (haySeleccion()) return;
     if (vozSubBarraAbierta()) { vozSubCerrarBarra(); return; }
     const b = document.getElementById('voz-lector');
@@ -4666,6 +4673,16 @@ function vozEngancharSala() {
       vozCerrarPaneles();
       return;
     }
+    /* El borde pasa página; el centro apaga y enciende los mandos.
+       ⚠️ Y SOLO SI EL TOQUE TRAE COORDENADAS. Un `click` que no viene de
+       un dedo ni de un ratón —el que dispara `elemento.click()`, o el que
+       manda el teclado al pulsar Enter sobre algo con el foco— llega con
+       `clientX` en CERO y `detail` en cero, o sea apuntando al borde
+       izquierdo de la pantalla: sin esta guarda, pulsar Enter retrocedería
+       una página en vez de apagar los mandos. Lo cazó la comprobación 27,
+       que toca con `.click()`. */
+    const lado = e.detail > 0 ? bordePagina(e.clientX) : 0;
+    if (lado) { vozPasar(lado); return; }
     vozToqueCentro(b);
   });
 

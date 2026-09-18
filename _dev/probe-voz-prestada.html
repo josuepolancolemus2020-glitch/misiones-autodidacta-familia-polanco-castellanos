@@ -1810,12 +1810,17 @@ function filasHoja(d){
      de la sonda con la misma pinta que el fallo de verdad. */
   const cajaCit = bHarari.getClientRects()[0] || bHarari.getBoundingClientRect();
   const xCit = Math.round(cajaCit.left + cajaCit.width / 2), yCit = Math.round(cajaCit.top + cajaCit.height / 2);
-  const bajo = w.eval(`(function(){ const e = vozBajoLaZona(${xCit}, ${yCit}); return e && e.closest && e.closest('.voz-cit') ? 'cit' : (e ? e.className : 'nada'); })()`);
+  /* ⚠️ Desde el 18 de septiembre de 2026 las zonas de pasar página NO
+     reciben el puntero (regla 38), así que la llamada recibe el toque
+     DIRECTAMENTE: ya no hay que apartar nada. Esta comprobación mira lo
+     mismo que antes —que una cita pegada al margen se pueda tocar— por el
+     camino que ahora existe. */
+  const bajoEl = d.elementFromPoint(xCit, yCit);
+  const bajo = bajoEl && bajoEl.closest && bajoEl.closest('.voz-cit') ? 'cit' : (bajoEl ? bajoEl.className : 'nada');
   ok(bajo === 'cit',
-     'apartando las zonas se ve la llamada que hay debajo (elementFromPoint devolvía siempre la zona)',
+     'la llamada pegada al margen recibe el toque directamente: bajo el dedo está ella y no una zona de pasar página',
      'no se encuentra la llamada bajo el toque: ' + bajo);
-  const zIzq = d.getElementById('voz-z-izq');
-  zIzq.dispatchEvent(new w.MouseEvent('click', { clientX: xCit, clientY: yCit, bubbles: true }));
+  bajoEl.dispatchEvent(new w.MouseEvent('click', { clientX: xCit, clientY: yCit, detail: 1, bubbles: true }));
   await esperar(250);
   ok(!d.getElementById('voz-citbar').hidden && Number(w.eval('_vozPagina')) === pagCit,
      '⚠️ y un toque que recoge la zona sobre una llamada abre la ficha en vez de pasar página',
@@ -3391,6 +3396,80 @@ function filasHoja(d){
   w.eval('vozCerrarLector()');
   await esperar(150);
 
+
+  /* ── 38. SE PUEDE SUBRAYAR EN TODO EL ANCHO ──
+     Pedido por el autor el 18 de septiembre de 2026 con la captura de su
+     tableta: «la marca azul no se limita a seleccionar la palabra sino
+     que esa marca se expande hasta bastantes palabras más».
+
+     ⚠️ Esto se mide con `caretRangeFromPoint`, que es EXACTAMENTE lo que
+     el navegador usa para resolver dónde cae un tirador de selección
+     arrastrado con el dedo. Mirar el HTML no sirve: el HTML estaba bien
+     y las zonas estaban donde debían. Lo que fallaba era el reparto de
+     toques, y eso solo se ve preguntando por un punto. */
+  log('── 38. Subrayar en todo el ancho: las zonas no se comen el texto ──');
+  const txtSel = Object.assign(cuentoLargo('c-sel'), { puesto_por: VOZ_UID, borrado: false, actualizado: Date.now() });
+  w.eval(`(function(){ _vozCuentos = [${JSON.stringify(txtSel)}]; vozGuardaLocal(); vozRender(); })()`);
+  w.eval('vozAbrirLector("c-sel")');
+  await esperar(1500);
+  const medidaSel = JSON.parse(w.eval(`(function(){
+    const mid = document.getElementById('voz-mid');
+    const zi = document.getElementById('voz-z-izq'), zd = document.getElementById('voz-z-der');
+    const rm = mid.getBoundingClientRect();
+    const mira = (x, y) => {
+      const el = document.elementFromPoint(x, y);
+      let r = null; try { r = document.caretRangeFromPoint(x, y); } catch (e) {}
+      const t = !!(r && r.startContainer && r.startContainer.nodeType === 3);
+      return { encima: el ? (el.id || el.className || el.tagName) : null, texto: t };
+    };
+    const px = f => Math.round(rm.left + rm.width * f);
+    /* Tres alturas, porque un renglón suelto podría caer en un blanco. */
+    const alturas = [0.35, 0.5, 0.65].map(f => Math.round(rm.top + rm.height * f));
+    const enTodas = f => alturas.map(y => mira(px(f), y));
+    return JSON.stringify({
+      ancho: Math.round(rm.width),
+      zonas: Math.round(zi.getBoundingClientRect().width) + Math.round(zd.getBoundingClientRect().width),
+      pe: getComputedStyle(zd).pointerEvents,
+      izq: enTodas(0.08), centro: enTodas(0.5), der: enTodas(0.90), borde: enTodas(0.96),
+    });
+  })()`));
+  const hayTexto38 = l => l.some(x => x.texto);
+  ok(medidaSel.pe === 'none',
+     'las zonas de pasar página NO reciben el puntero (calculado: ' + medidaSel.pe + ')',
+     '⚠️ las zonas siguen recibiendo el puntero: tapan el ' +
+     Math.round(medidaSel.zonas / medidaSel.ancho * 100) + ' % del ancho al subrayar');
+  ok(hayTexto38(medidaSel.centro), 'en el centro se encuentra texto donde ponerlo (era lo que ya funcionaba)');
+  ok(hayTexto38(medidaSel.izq) && hayTexto38(medidaSel.der) && hayTexto38(medidaSel.borde),
+     '⚠️ Y TAMBIÉN EN LOS BORDES: el tirador de la selección encuentra texto en el 20 % de cada lado, que es el ' +
+     Math.round(medidaSel.zonas / medidaSel.ancho * 100) + ' % del ancho que antes estaba muerto',
+     '⚠️ sobre el borde NO hay posición de texto: izq=' + JSON.stringify(medidaSel.izq.map(x => x.encima)) +
+     ' der=' + JSON.stringify(medidaSel.der.map(x => x.encima)) +
+     ' — el tirador soltado ahí se irá media página más allá, que es la avería que esto vigila');
+  ok(!medidaSel.izq.concat(medidaSel.der, medidaSel.borde).some(x => /voz-z-/.test(String(x.encima))),
+     'y lo que hay bajo el dedo en el borde es el TEXTO, no la zona',
+     'el dedo sigue tocando la zona: ' + JSON.stringify(medidaSel.der.map(x => x.encima)));
+
+  /* Y lo que la zona hacía sigue haciéndose: el borde pasa página. */
+  const pagAntes38 = Number(w.eval('_vozPagina || 0'));
+  const rmid38 = d.getElementById('voz-mid').getBoundingClientRect();
+  const tocaEn38 = (f) => {
+    const x = Math.round(rmid38.left + rmid38.width * f), y = Math.round(rmid38.top + rmid38.height * 0.5);
+    const el = d.elementFromPoint(x, y);
+    /* `detail: 1` porque un toque de verdad lo trae, y el reparto del
+       borde exige coordenadas: sin él esto probaría un camino que no es. */
+    if (el) el.dispatchEvent(new w.MouseEvent('click', { bubbles: true, cancelable: true, detail: 1, clientX: x, clientY: y }));
+  };
+  tocaEn38(0.93);
+  await esperar(500);
+  ok(Number(w.eval('_vozPagina || 0')) === pagAntes38 + 1,
+     'tocar el borde derecho sigue pasando página, ahora decidido por la coordenada',
+     'el borde ya no pasa página: ' + w.eval("_vozPagina") + ' (antes ' + pagAntes38 + ')');
+  tocaEn38(0.07);
+  await esperar(500);
+  ok(Number(w.eval('_vozPagina || 0')) === pagAntes38,
+     'y el izquierdo retrocede');
+  w.eval('vozCerrarLector()');
+  await esperar(200);
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

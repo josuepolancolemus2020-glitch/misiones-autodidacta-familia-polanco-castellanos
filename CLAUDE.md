@@ -979,7 +979,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Treinta y seis reglas, y ninguna es de adorno:**
+**Treinta y siete reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -2481,6 +2481,63 @@ el diseño.
    por la columna `orden` —que ya existe— y, a igualdad, por cuándo se
    pusieron.
 
+37. ⚠️ **SE SUBRAYA EN TODO EL ANCHO: LAS ZONAS DE PASAR PÁGINA NO
+   RECIBEN EL PUNTERO.**
+   Pedido por el autor el 18 de septiembre de 2026, con la captura de su
+   tableta al lado: «cuando selecciono el texto la marca azul no se limita
+   a seleccionar la palabra sino que esa marca se expande hasta bastantes
+   palabras más». En la foto se ve un tirador pegado a la palabra y el
+   otro disparado hasta el final del párrafo, en el borde derecho.
+
+   ⚠️ **LA CAUSA SE MIDIÓ, NO SE ADIVINÓ, y no se ve leyendo el HTML.**
+   Las dos zonas cubren el 20 % de cada borde —el 40 % del ancho, 160 px
+   de 400 en su tableta— y van ENCIMA del texto. Sobre ellas,
+   `caretRangeFromPoint` devuelve **un DIV y no una posición de texto**;
+   con el puntero apagado, el mismo punto devuelve el texto. Y eso es
+   exactamente lo que el navegador usa para resolver dónde cae un tirador
+   de selección arrastrado con el dedo: si se suelta sobre una zona no hay
+   posición que devolver, así que Chrome resuelve con lo más cercano del
+   flujo — y en una caja de COLUMNAS «lo más cercano» está media página
+   más allá. De ahí el tirador disparado. Y explica el «a veces» del
+   autor: por el centro funciona; por los bordes, no.
+
+   ⚠️ **Y ERAN DOS FALLOS, NO UNO.** Por eso no bastaba con apagarlas
+   mientras hubiera selección: con las zonas puestas, una palabra del 20 %
+   de cualquier borde **no se podía ni empezar a seleccionar** tocándola,
+   porque el toque que abre la selección tampoco encontraba texto.
+   Cuarenta por ciento del ancho de un ensayo sin poder marcar, en la
+   herramienta cuyos subrayados son la regla 21.
+
+   **El arreglo QUITA código.** Las zonas salen del reparto de toques
+   (`pointer-events: none`) y el borde lo decide la coordenada dentro del
+   único toque que ya decidía todo lo demás (`bordePagina`). Con eso
+   desaparece `vozBajoLaZona()` y **la familia entera de averías que
+   existía para taparlo**: la llamada de cita intocable cerca del margen
+   (regla 27) y el enlace del taller que retrocedía una página al tocarle
+   el tercio izquierdo (regla 35) eran el mismo fallo visto dos veces.
+   Ahora el botón, el subrayado o la cita reciben su toque directamente,
+   como cualquier otro: la trampa deja de poder existir en vez de quedar
+   escrita en un comentario.
+
+   ⚠️ **Y UN TOQUE SIN COORDENADAS NO PASA PÁGINA.** Un `click` que no
+   viene de un dedo ni de un ratón —el de `elemento.click()`, o el que
+   manda el teclado al pulsar Enter sobre algo con el foco— llega con
+   `clientX` en cero, o sea apuntando al borde izquierdo: sin la guarda de
+   `e.detail > 0`, pulsar Enter retrocedería una página en vez de apagar
+   los mandos. Lo cazó la comprobación 27 en el acto, porque toca con
+   `.click()`.
+
+   El ancho del borde **se LEE de las propias zonas**, no se escribe en el
+   JavaScript: el 20 % vive en el CSS y dos números que tienen que decir
+   lo mismo en dos sitios se arreglan en uno. Y en modo desplazamiento las
+   zonas están en `display:none`, así que miden cero y el borde no pasa
+   página — que es justo lo que ese modo necesita, sin una línea más.
+
+   Lo que se paga, dicho: en un ratón se pierde el cursor de flecha sobre
+   los bordes. Se puede pagar —quien usa ratón tiene los botones ‹ › del
+   pie, las flechas del teclado y la rueda, que son tres maneras— y lo que
+   se compra es poder subrayar en todo el ancho.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -2598,6 +2655,18 @@ lo automático por el camino de verdad: abre la hoja, pega y **pulsa el
 botón de guardar**, porque llamar a `vozGuardarPegado()` por dentro se
 salta justo lo que puede estar mal, que es que el automático no esté
 enganchado al guardado.
+
+La comprobación **38** es la que hay que entender antes de tocar el
+reparto de toques de la sala: **pregunta por un PUNTO, con
+`caretRangeFromPoint`**, que es lo que el navegador usa para resolver el
+tirador de una selección. Mirar el HTML no sirve —el HTML estaba bien y
+las zonas estaban donde debían—; lo que fallaba era quién recibía el
+dedo, y eso solo se ve preguntando. Mide el centro y los dos bordes, a
+tres alturas, y exige que en los tres haya posición de TEXTO; y después
+comprueba que el borde sigue pasando página, ahora por la coordenada. Se
+probó devolviendo el `pointer-events: auto` a las zonas: la sonda
+suspende en cuatro sitios y el fallo dice el porcentaje del ancho que
+queda muerto.
 
 La comprobación **37** son los recursos de refuerzo, y mira lo que de
 verdad puede salir mal: que una dirección `javascript:` llegue a un
