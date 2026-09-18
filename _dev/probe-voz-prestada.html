@@ -146,7 +146,7 @@ async function columnasDeVozActividades(){
 function nuevaBase(w, opciones){
   const o = opciones || {};
   const estado = { filas: o.filas || [], llamadas: [], escritas: [], marcas: o.marcas || [], marcasEscritas: [],
-                   act: o.act || [], actEscritas: [] };
+                   act: o.act || [], actEscritas: [], recs: o.recs || [], recsEscritos: [] };
   /* Las columnas que esta base NO tiene. `sinGenero` se queda por lo
      que ya estaba escrito; `faltan` sirve para cualquiera de las
      nuevas, que ya son dos. */
@@ -175,6 +175,41 @@ function nuevaBase(w, opciones){
         if (['dato', 'voz', 'idea', 'contra', 'duda'].indexOf(fila.color) < 0) return json({ code: '23514', message: 'violates check constraint "lecturas_marcas_color_check"' }, 400);
         estado.marcas = estado.marcas.filter(x => x.id !== fila.id).concat([fila]);
         estado.marcasEscritas.push(fila);
+      }
+      return json([], 201);
+    }
+    /* ⚠️ LOS RECURSOS DE UN TEXTO VIAJAN POR recursos_enlaces, la tabla de
+       la repisa de las misiones, con mision='voz:<cid>'. Y este doble
+       exige lo MISMO que la de verdad, que es la única manera de que la
+       costura se pruebe: firmado con quien entró (42501 si es de otro),
+       con `mision` y con una dirección http/https (el check de la
+       columna). Un doble complaciente no prueba la costura: la esconde.
+       ⚠️ Y el GET NO filtra por usuario, a diferencia de las marcas: los
+       recursos son DE LA CASA. Si este doble filtrara, la sonda aprobaría
+       una repisa que en la casa de verdad solo se vería a sí misma. */
+    if (/recursos_enlaces/.test(u.pathname)) {
+      estado.llamadas.push({ m, url: u.pathname + u.search, cuerpo: init && init.body });
+      if (o.sinTablaRec) return json({ code: '42P01', message: 'relation "public.recursos_enlaces" does not exist' }, 404);
+      if (m === 'GET') {
+        const mision = decodeURIComponent((u.search.match(/mision=eq\.([^&]+)/) || [])[1] || '');
+        if (/user_id=eq|anadido_por=eq/.test(u.search)) {
+          return json({ code: 'FILTRA_POR_USUARIO', message: 'la repisa es de la casa: no se filtra por quien entró' }, 400);
+        }
+        return json(estado.recs.filter(x => x.mision === mision));
+      }
+      let cuerpo = null;
+      try { cuerpo = JSON.parse(init && init.body); } catch (e) {}
+      const filas = Array.isArray(cuerpo) ? cuerpo : (cuerpo ? [cuerpo] : []);
+      for (const fila of filas) {
+        if (!fila.id || !fila.mision || !fila.anadido_por) return json({ code: '23502', message: 'null value violates not-null constraint' }, 400);
+        if (fila.anadido_por !== VOZ_UID) return json({ code: '42501', message: 'new row violates row-level security policy' }, 403);
+        if (!/^https?:\/\//.test(String(fila.url || '')) || /["'<>\\ ]/.test(String(fila.url || ''))) {
+          return json({ code: '23514', message: 'violates check constraint "recursos_enlaces_url_check"' }, 400);
+        }
+        if (!String(fila.titulo || '').trim()) return json({ code: '23514', message: 'violates check constraint "recursos_enlaces_titulo_check"' }, 400);
+        if (['maquina', 'casa'].indexOf(fila.origen) < 0) return json({ code: '23514', message: 'violates check constraint "recursos_enlaces_origen_check"' }, 400);
+        estado.recs = estado.recs.filter(x => x.id !== fila.id).concat([fila]);
+        estado.recsEscritos.push(fila);
       }
       return json([], 201);
     }
@@ -3159,6 +3194,203 @@ function filasHoja(d){
      '⚠️ el cedazo deja pasar una respuesta que no está en el texto');
   ok(TT.norm.length > 500 && /memorias del pozo/.test(TT.norm),
      'y el texto con el que compara lleva la bibliografía dentro: un año de una referencia es respuesta buena');
+
+  /* ── 37. LA REPISA DE RECURSOS DE UN TEXTO ──
+     Pedida por el autor el 18 de septiembre de 2026: «agregar en las
+     lecturas algún vínculo url o dirección de una app, que podría ser un
+     recurso para reforzar el aprendizaje». Viaja por `recursos_enlaces`
+     con mision='voz:<cid>', así que aquí se prueban DOS cosas que no se
+     ven solas: que la dirección no puede llegar envenenada a un `href`,
+     y que la costura con esa tabla es la de verdad (firmada, con su
+     prefijo, y SIN filtrar por usuario, porque es de la casa). */
+  log('── 37. Los recursos de refuerzo de un texto ──');
+  const baseRec = nuevaBase(w, { act: [], recs: [] });
+  await w.eval('initVozPrestada()');
+  await esperar(400);
+  const cidRec = w.eval('_vozCuentos[0].cid');
+  w.eval('vozAbrirLector(' + JSON.stringify(cidRec) + ')');
+  await esperar(500);
+  w.eval("vozPintarPanelInd('recs'); vozAbrirPanel('voz-panel-ind')");
+  await esperar(250);
+  const pRec = d.getElementById('voz-panel-ind');
+  ok(!pRec.hidden && [...pRec.querySelectorAll('.voz-tab')].some(b => /Recursos/.test(b.textContent)),
+     'la pestaña 🔗 Recursos existe y abre, aunque no haya ni un recurso (es la puerta de entrada, como la del taller)',
+     'no hay pestaña de recursos o el panel no abrió');
+  const abrir37 = [...pRec.querySelectorAll('button')].find(b => /Poner un recurso/.test(b.textContent));
+  ok(!!abrir37, 'y ofrece poner uno', 'no sale el botón de poner un recurso');
+
+  /* ⚠️ Se PULSA, y se comprueba que la hoja queda ENCIMA de la sala
+     midiendo con elementFromPoint, no leyendo el z-index: colgada del
+     body saldría por debajo y el botón parecería muerto (regla 35). */
+  abrir37.click();
+  await esperar(250);
+  const ovRec = d.getElementById('voz-rec-overlay');
+  ok(ovRec.style.display === 'flex', 'pulsar el botón abre la hoja', 'la hoja no se abrió al pulsar');
+  ok(ovRec.parentElement && ovRec.parentElement.id === 'voz-lector',
+     'y cuelga DENTRO de #voz-lector, así que se tiñe con el papel puesto y sale por encima de la sala',
+     'la hoja cuelga de ' + (ovRec.parentElement && ovRec.parentElement.id) + ': saldría por debajo de la sala');
+  const cajaRec = ovRec.querySelector('.fin-modal').getBoundingClientRect();
+  const encimaRec = w.document.elementFromPoint(cajaRec.left + cajaRec.width / 2, cajaRec.top + 20);
+  ok(!!encimaRec && ovRec.contains(encimaRec),
+     'y el dedo la toca a ella y no a la lectura de debajo (medido con elementFromPoint)',
+     'lo que hay en ese punto es ' + (encimaRec && encimaRec.className));
+
+  /* ⚠️ UNA DIRECCIÓN ENVENENADA NO LLEGA A NINGÚN href, Y SE DICE POR QUÉ. */
+  const campoUrl = d.getElementById('voz-rec-url');
+  const campoNom = d.getElementById('voz-rec-nom');
+  campoUrl.value = 'javascript:alert(1)';
+  campoUrl.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(120);
+  const notaMala = d.getElementById('voz-rec-url-nota');
+  ok(!notaMala.hidden && /https/.test(notaMala.textContent) && /aplicaci/i.test(notaMala.textContent),
+     '⚠️ una dirección que no es http/https se para Y SE EXPLICA, nombrando qué poner («la dirección normal de la app»)',
+     'no explica por qué no vale: ' + notaMala.textContent.slice(0, 90));
+  d.getElementById('voz-rec-guardar').click();
+  await esperar(200);
+  ok(ovRec.style.display === 'flex' && /Falta/.test(d.getElementById('voz-rec-falta').textContent),
+     'y el guardado se PARA nombrando lo que falta, en vez de guardar un enlace muerto',
+     'se guardó con una dirección que no vale');
+  ok(!w.eval('vozRecCuenta(' + JSON.stringify(cidRec) + ')'), 'no quedó ni un recurso guardado');
+
+  /* La dirección sin https se entiende y se DICE cómo se entendió: es la
+     regla del monto del Apunte rápido y de la duración de El Rodaje. */
+  campoUrl.value = 'www.khanacademy.org/math/fracciones-en-la-recta';
+  campoUrl.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(120);
+  ok(/Se entiende https:\/\/www\.khanacademy\.org/.test(notaMala.textContent),
+     'pegar «www.algo.com» sin el https se entiende, y se dice cómo: «' + notaMala.textContent.slice(0, 52) + '…»',
+     'no entiende una dirección sin https: ' + notaMala.textContent.slice(0, 80));
+  ok(/fracciones en la recta/i.test(campoNom.value) && /khanacademy/.test(campoNom.value),
+     '⚠️ y el nombre se rellena solo de la propia dirección: lo que se puede adivinar no se pide',
+     'el nombre no se rellenó: ' + JSON.stringify(campoNom.value));
+
+  /* ⚠️ Y EL RELLENO AUTOMÁTICO NO PISA LO ESCRITO A MANO (regla 18). */
+  campoNom.value = 'Lo escribí yo';
+  campoNom.dispatchEvent(new w.Event('input', { bubbles: true }));
+  campoUrl.value = 'https://www.geogebra.org/m/otra-cosa';
+  campoUrl.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(120);
+  ok(campoNom.value === 'Lo escribí yo',
+     '⚠️ y al cambiar la dirección NO pisa el nombre que escribió una persona (regla 18)',
+     'el relleno automático se comió lo escrito a mano: ' + JSON.stringify(campoNom.value));
+
+  /* Guardar de verdad, con veneno en el nombre y en el para qué. */
+  campoNom.value = 'Fracciones <img src=x onerror="window.__colado37=1">';
+  campoNom.dispatchEvent(new w.Event('input', { bubbles: true }));
+  d.getElementById('voz-rec-para').value = 'Hacer los diez primeros ejercicios <b>después</b> del capítulo 2';
+  d.getElementById('voz-rec-dura').value = '12 min';
+  [...d.querySelectorAll('#voz-rec-tipos button')].find(b => /Ejercicios/.test(b.textContent)).click();
+  [...d.querySelectorAll('#voz-rec-origen button')].find(b => /máquina/.test(b.textContent)).click();
+  await esperar(120);
+  d.getElementById('voz-rec-guardar').click();
+  await esperar(300);
+  ok(ovRec.style.display === 'none' && Number(w.eval('vozRecCuenta(' + JSON.stringify(cidRec) + ')')) === 1,
+     'con la dirección buena y su nombre, guarda y cierra la hoja',
+     'no guardó: quedan ' + w.eval('vozRecCuenta(' + JSON.stringify(cidRec) + ')'));
+
+  w.eval("vozPintarPanelInd('recs')");
+  await esperar(200);
+  const card37 = d.querySelector('#voz-panel-ind .voz-rec-card');
+  const a37 = card37 && card37.querySelector('a.voz-rec-abre');
+  ok(!!a37 && a37.getAttribute('href') === 'https://www.geogebra.org/m/otra-cosa',
+     'la tarjeta lleva su enlace, puesto con setAttribute y comprobado con URL()',
+     'el href salió como ' + (a37 && a37.getAttribute('href')));
+  ok(!!a37 && a37.getAttribute('target') === '_blank' && /noopener/.test(a37.getAttribute('rel') || '') && /noreferrer/.test(a37.getAttribute('rel') || ''),
+     '⚠️ y se abre en otra pestaña CON rel="noopener noreferrer": sin noopener, la página abierta puede tocar window.opener, que es F.A.R.O con la sesión de la casa',
+     'el enlace sale sin noopener: rel=' + (a37 && a37.getAttribute('rel')));
+  ok(!w.__colado37 && card37.querySelectorAll('img, b').length === 0
+     && /<img src=x/.test(card37.textContent) && /<b>después<\/b>/.test(card37.textContent),
+     '⚠️ un nombre y un «para qué» con HTML dentro se pintan como TEXTO y no crean ni un elemento',
+     'el veneno creó elementos o se ejecutó');
+  ok(/lo trajo una máquina/.test(card37.textContent),
+     '⚠️ y la etiqueta de quién lo trae está EN LA TARJETA (regla 1 aplicada a cada recurso)',
+     'la tarjeta no dice quién lo trae: ' + card37.textContent.slice(0, 80));
+  const franja37 = w.getComputedStyle(card37).borderLeftColor;
+  ok(/rgb\(21, 128, 61\)/.test(franja37),
+     'y su franja de color por tipo se pinta de verdad (color CALCULADO, no el HTML): ' + franja37,
+     '⚠️ la franja del tipo se resolvió a ' + franja37 + ': el atajo del borde se la comió');
+
+  /* ⚠️ LA COSTURA: lo que RECIBIÓ la nube. Que aparezca en la pantalla es
+     la copia del aparato, y se ve igual de bien cuando la subida rebotó. */
+  await esperar(1900);
+  const filaRec = baseRec.recsEscritos.find(x => x.mision === 'voz:' + cidRec);
+  ok(!!filaRec && filaRec.anadido_por === VOZ_UID && filaRec.origen === 'maquina'
+     && filaRec.url === 'https://www.geogebra.org/m/otra-cosa' && filaRec.tipo === 'ejercicio',
+     '⚠️ y la nube recibió el recurso FIRMADO, con mision=«voz:…», su tipo y su etiqueta de origen',
+     '⚠️ la nube no lo recibió bien. La herramienta dice: «' + w.eval('vozRecRotuloNube()') + '» · ' + JSON.stringify(filaRec || null));
+  const getRec = baseRec.llamadas.filter(x => /recursos_enlaces/.test(x.url) && x.m === 'GET');
+  ok(getRec.length >= 1 && !getRec.some(x => /user_id=eq|anadido_por=eq/.test(x.url)),
+     '⚠️ y al bajarlos NO se filtra por quien entró: los recursos son DE LA CASA, al contrario que los subrayados',
+     'la consulta filtró por usuario: ' + JSON.stringify(getRec.map(x => x.url)));
+
+  /* Lo ajeno no se toca, y se DICE por qué (regla 14). */
+  w.eval(`(function(){ const t = vozRecLeeTodo(); t[${JSON.stringify(cidRec)}].push({
+    id: 'r-ajeno', tipo: 'video', tit: 'Un vídeo de otra persona', url: 'https://example.org/v',
+    para: '', fuente: 'example.org', origen: 'casa', dura: '', orden: 5, del: false,
+    u: Date.now(), user: 'otro-uid-2222', quien: 'evelyn', sync: Date.now() }); vozRecGuardaTodo(); })()`);
+  w.eval("vozPintarPanelInd('recs')");
+  await esperar(200);
+  const cards37 = [...d.querySelectorAll('#voz-panel-ind .voz-rec-card')];
+  const ajena37 = cards37.find(x => /otra persona/.test(x.textContent));
+  ok(!!ajena37 && !ajena37.querySelector('.voz-retirar-caja') && /solo quien lo puso/.test(ajena37.textContent),
+     '⚠️ el recurso de otra persona no trae botones vivos que la base va a rechazar, y DICE por qué (regla 14)',
+     'el ajeno sale con botones o sin explicación');
+
+  /* Quitar: dos toques en el mismo sitio, sin confirm(), y deja LÁPIDA. */
+  const confAntes = w.__confirms || 0;
+  const mia37 = cards37.find(x => /Fracciones/.test(x.textContent));
+  const bBorra = [...mia37.querySelectorAll('button')].find(b => b.textContent === '🗑');
+  bBorra.click();
+  await esperar(120);
+  ok(Number(w.eval('vozRecCuenta(' + JSON.stringify(cidRec) + ')')) === 2,
+     '⚠️ un solo toque en 🗑 no quita nada: pide confirmación al lado',
+     'un solo toque se llevó el recurso');
+  const bSi = [...mia37.querySelectorAll('button')].find(b => /Sí, quitar/.test(b.textContent) && !b.hidden);
+  ok(!!bSi, 'y sale «Sí, quitar» pegado al 🗑, sin diálogo del navegador');
+  bSi.click();
+  await esperar(300);
+  ok(Number(w.eval('vozRecCuenta(' + JSON.stringify(cidRec) + ')')) === 1,
+     'el segundo toque sí lo quita');
+  ok((w.__confirms || 0) === confAntes,
+     '⚠️ y no pasó por window.confirm ni una vez: en la aplicación instalada ese diálogo puede no salir nunca y el botón parecería muerto (regla 22)',
+     'llamó a confirm ' + ((w.__confirms || 0) - confAntes) + ' veces');
+  const conLapida = JSON.parse(w.eval('JSON.stringify((vozRecLeeTodo()[' + JSON.stringify(cidRec) + '] || []).filter(r => r.del))'));
+  ok(conLapida.length === 1,
+     '⚠️ y deja LÁPIDA en vez de borrar la fila: si se borrara, la tableta que aún tiene su copia lo resucitaría en la siguiente sincronización',
+     'no quedó lápida: ' + JSON.stringify(conLapida));
+  await esperar(1900);
+  const subidaLapida = baseRec.recsEscritos.filter(x => x.id === filaRec.id).pop();
+  ok(!!subidaLapida && subidaLapida.borrado === true,
+     'y la lápida sube a la nube, que es lo que la hace ganar en los demás aparatos',
+     'la lápida no subió: ' + JSON.stringify(subidaLapida || null));
+
+  /* El atajo del pie de la última página: solo cuando hay alguno. */
+  w.eval('vozCerrarPaneles()');
+  w.eval('_vozCapActual = _vozLeyendo.capitulos.length - 1; vozPintarCap(-1, 0)');
+  await esperar(300);
+  ok(!!d.querySelector('#voz-texto .voz-fin-recs'),
+     'al pie de la última página sale el atajo a los recursos (el momento en que alguien acaba de leer y tiene las manos libres)',
+     'no sale el atajo al pie del texto');
+  w.eval(`(function(){ const t = vozRecLeeTodo(); t[${JSON.stringify(cidRec)}].forEach(r => { r.del = true; }); vozRecGuardaTodo(); })()`);
+  w.eval('vozPintarCap(-1, 0)');
+  await esperar(250);
+  ok(!d.querySelector('#voz-texto .voz-fin-recs'),
+     '⚠️ y sin ninguno NO sale: un segundo botón vacío en mitad de una página de lectura es ruido, y para ponerlos está la pestaña',
+     'el atajo sale con la repisa vacía');
+
+  /* ⚠️ Y SIN LA TABLA CORRIDA, LO DICE Y NOMBRA EL ARCHIVO. No es «sin
+     señal»: es la avería de la lápida del taller, que mandaba a mirar el
+     wifi con la señal perfecta. */
+  nuevaBase(w, { act: [], recs: [], sinTablaRec: true });
+  await w.eval('vozRecSincronizar(' + JSON.stringify(cidRec) + ')');
+  await esperar(200);
+  const rotRec = String(w.eval('vozRecRotuloNube()'));
+  ok(/recursos_enlaces\.sql/.test(rotRec) && /aparato/i.test(rotRec),
+     '⚠️ sin la tabla corrida nombra el archivo que hay que correr y dice que por ahora no viaja: «' + rotRec + '»',
+     'no dice qué falta: ' + rotRec);
+  w.eval('vozCerrarLector()');
+  await esperar(150);
+
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

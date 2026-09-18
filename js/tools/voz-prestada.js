@@ -1847,6 +1847,7 @@ function vozTraerEntrantes() {
 
 async function initVozPrestada() {
   vozLeeAjustes();
+  vozRecEngancha();
   _vozEstadoNube = 'mirando';
   if (!_vozCuentos.length) _vozCuentos = vozFusiona(vozLeeLocal(), []);
   const entrantes = vozTraerEntrantes();
@@ -3053,6 +3054,21 @@ function vozMenuAbrir(c) {
   lista.appendChild(vozBoton('voz-btn voz-btn-ancho',
     nA ? ('📝 Taller de comprensión · ' + nA + (tA ? ' · ⏰ ' + tA + ' hoy' : '')) : '📝 Montar el taller de comprensión',
     () => { vozCerrarMenu(); vozActAbrirTaller(c.cid); }));
+  /* Los recursos VIVEN en la sala, así que desde aquí se entra a ellos
+     en vez de abrirse una hoja: la hoja cuelga dentro de #voz-lector y
+     con la sala cerrada no se vería nada (regla 35). El botón solo sale
+     cuando hay alguno; ponerlos es la pestaña 🔗 de dentro. */
+  const nRec = vozRecCuenta(c.cid);
+  if (nRec) {
+    lista.appendChild(vozBoton('voz-btn voz-btn-ancho',
+      '🔗 ' + (nRec === 1 ? 'Un recurso de refuerzo' : nRec + ' recursos de refuerzo'),
+      () => {
+        vozCerrarMenu();
+        vozAbrirLector(c.cid);
+        vozPintarPanelInd('recs');
+        vozAbrirPanel('voz-panel-ind');
+      }));
+  }
   lista.appendChild(vozBoton('voz-btn voz-btn-ancho', '📋 Copiar con su etiqueta', () => { vozCerrarMenu(); vozCopiar(c); }));
   if (navigator.share) lista.appendChild(vozBoton('voz-btn voz-btn-ancho', '📤 Compartir con su etiqueta', () => { vozCerrarMenu(); vozCompartir(c); }));
   if (vozEsMio(c)) {
@@ -3326,6 +3342,7 @@ function vozAbrirLector(cid) {
   vozEngancharSala();
   vozLuz(true);
   vozSubSincronizar(cid);
+  vozRecSincronizar(cid);
 }
 
 function vozCerrarLector() {
@@ -3985,6 +4002,27 @@ function vozFinNodo(c, ci) {
       n ? 'Tarjetas, parejas y preguntas sobre lo que acabas de leer.'
         : 'Tarjetas, parejas y preguntas para comprobar que lo leído se quedó.'));
     fin.appendChild(enlace);
+
+    /* ⚠️ Y LOS RECURSOS, AQUÍ TAMBIÉN, PERO SOLO SI HAY ALGUNO. El pie de
+       la última página es el único momento en que alguien tiene el texto
+       entero leído y las manos libres —el mismo argumento que el taller—,
+       y es justo cuando apetece el vídeo o los ejercicios. Pero un
+       segundo botón donde antes había uno, y vacío, es ruido en mitad de
+       una página de lectura: la puerta para PONERLOS es la pestaña 🔗 del
+       panel, que sale siempre. */
+    const nRec = vozRecCuenta(c.cid);
+    if (nRec) {
+      const er = vozBoton('voz-fin-taller voz-fin-recs', null, () => {
+        vozPintarPanelInd('recs');
+        vozAbrirPanel('voz-panel-ind');
+      });
+      er.appendChild(vozNodo('span', 'voz-fin-taller-ic', '🔗'));
+      er.appendChild(vozNodo('span', 'voz-fin-taller-t',
+        nRec === 1 ? 'Un recurso para reforzar esto' : nRec + ' recursos para reforzar esto'));
+      er.appendChild(vozNodo('span', 'voz-fin-taller-p',
+        'Se abren en otra pestaña, así que no pierdes la página.'));
+      fin.appendChild(er);
+    }
   }
   return fin;
 }
@@ -5456,6 +5494,658 @@ function vozSubTextoPlano(c) {
   return L.join('\n') + '\n';
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   LA REPISA DE RECURSOS DE UN TEXTO
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 18 de septiembre de 2026: «la posibilidad de
+   agregar en las lecturas algún vínculo url o dirección de una app, que
+   podría ser un recurso para reforzar el aprendizaje o asimilación de la
+   lectura».
+
+   ⚠️ Y VIAJA POR `recursos_enlaces`, LA TABLA DE LAS MISIONES, CON
+   `mision = 'voz:<cid>'`. No se inventa una segunda tabla para el mismo
+   gesto: es exactamente lo que ya hacen los subrayados con
+   `lecturas_marcas` (regla 21) y la bibliografía dentro de `capitulos`
+   (regla 27). Y tiene una consecuencia que es media herramienta: **esto
+   no pide ni una columna nueva ni volver a correr el SQL desde una
+   tableta**. `recursos_enlaces.mision` es texto libre, sin `check` ni
+   llave ajena, así que un prefijo basta para que los enlaces de un texto
+   y los de una misión no se mezclen nunca.
+
+   DE QUIÉN SON: DE LA CASA, como el texto y como la repisa de las
+   misiones — y al contrario que los subrayados, que son de cada quien.
+   Un recurso que refuerza una lectura sirve a los cuatro; uno que solo
+   viera quien lo pegó habría que pegarlo cuatro veces. Los cuatro los
+   ven; quitar y corregir es solo de quien lo puso, y eso lo hace cumplir
+   la seguridad por fila, no la pantalla.
+
+   ⚠️ SOLO `http` Y `https`, COMPROBADO CON `URL()`. Aquí el dato acaba
+   dentro de un `href` de una página que tiene al lado la Bóveda, las
+   finanzas, el chat y los teléfonos del Buzón. Nunca con un grep, que
+   `java\tscript:` y `JavaScript:` lo pasan y el navegador los ejecuta
+   igual (regla 2 de la repisa). Y con `rel="noopener noreferrer"`: sin
+   `noopener`, la página que se abre puede tocar `window.opener` y esa
+   ventana es F.A.R.O con la sesión de la casa puesta.
+
+   ⚠️ Y LO QUE SE PIDIÓ COMO «DIRECCIÓN DE UNA APP» ES UNA `https`, no un
+   esquema propio. No es un recorte: los enlaces de aplicación de Android
+   (App Links) SON direcciones `https`, así que un enlace a
+   `https://www.duolingo.com/…` abre la aplicación si está instalada, y
+   abre la web si no — que es lo que hace falta cuando el mismo texto se
+   lee en cuatro aparatos. Un `duolingo://` no se puede comprobar, no se
+   puede abrir desde media pantalla y deja la puerta abierta a cualquier
+   otro esquema, `javascript:` incluido. Cuando se pega otra cosa, la
+   pantalla lo DICE y nombra qué poner en su lugar: un rechazo callado se
+   ve desde fuera igual que una herramienta rota (regla 14).
+
+   LO QUE NO LLEVA, Y SE DICE: no hay arrastre para ordenar. La repisa de
+   las misiones lo tiene porque allí se cuelgan diez cosas de NotebookLM;
+   un texto lleva tres o cuatro recursos, y montar el aparato de punteros
+   para tres tarjetas es código que se mantiene y no se usa. Se ordenan
+   por la columna `orden` —que ya existe y es de cada quien— y, a igualdad,
+   por cuándo se pusieron.
+   ══════════════════════════════════════════════════════════════════ */
+
+const VOZ_REC = 'faro_voz_recursos_v1';
+const VOZ_REC_TABLA = 'recursos_enlaces';
+
+/* ⚠️ LOS TIPOS VIVEN EN EL APARATO, NO EN LA BASE. La columna `tipo` no
+   lleva `check` a propósito (regla 8 de la repisa, regla 15 de aquí):
+   añadir uno tiene que ser esta línea, no una migración que alguien pega
+   desde una tableta. El primero es el de por defecto. */
+const VOZ_REC_TIPOS = [
+  { id: 'app',       ic: '📱', t: 'App o web' },
+  { id: 'video',     ic: '🎬', t: 'Video' },
+  { id: 'audio',     ic: '🎧', t: 'Audio' },
+  { id: 'ejercicio', ic: '🎮', t: 'Ejercicios' },
+  { id: 'lectura',   ic: '📄', t: 'Otra lectura' },
+  { id: 'curso',     ic: '🎓', t: 'Curso o clase' },
+  { id: 'mapa',      ic: '🗺️', t: 'Mapa o esquema' },
+];
+function vozRecTipo(id) {
+  return VOZ_REC_TIPOS.find(t => t.id === id) || VOZ_REC_TIPOS[0];
+}
+
+/* ⚠️ Y LA ETIQUETA DE MÁQUINA NO SE APAGA, tampoco aquí. Es la regla de
+   oro del Estudio Mayor y la regla 1 de esta herramienta: un recurso que
+   recomendó una máquina puede estar inventado con el mismo tono seguro
+   con el que dice los buenos, y colgarlo sin distinguirlo al lado de uno
+   que alguien abrió y comprobó es el chiste malo. Son dos y no van a ser
+   más, y por eso `origen` SÍ lleva `check` en la base.
+   Viene puesto «la casa» porque pegar una dirección con la propia mano ES
+   la casa eligiendo; lo otro es un toque y se ve en la tarjeta, así que
+   una etiqueta equivocada se ve y se arregla — al contrario que una que
+   no estuviera. */
+const VOZ_REC_ORIGENES = [
+  { id: 'casa',    ic: '🏠', t: 'Lo elegí yo',       corto: 'de la casa' },
+  { id: 'maquina', ic: '🤖', t: 'Lo trajo una máquina', corto: 'lo trajo una máquina' },
+];
+
+let _vozRecTodo = null;         // {cid: [recursos]}, lápidas incluidas
+let _vozRecNube = 'local';      // local | subiendo | pendiente | al-dia | sin-sesion | sin-tabla | sin-senal | ajeno | error
+let _vozRecTimer = null;
+let _vozRecSincronizando = false;
+let _vozRecOtraVuelta = null;
+let _vozRecEnHoja = null;       // {cid, id} del que se está escribiendo
+let _vozRecAuto = {};           // ⚠️ qué rellenó la pantalla: ver vozRecMiraUrl
+let _vozRecMiembro = { uid: '', nombre: '' };
+
+function vozRecLeeTodo() {
+  if (_vozRecTodo) return _vozRecTodo;
+  try {
+    const s = localStorage.getItem(VOZ_REC);
+    const v = s ? JSON.parse(s) : {};
+    _vozRecTodo = (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+  } catch (e) { _vozRecTodo = {}; }
+  return _vozRecTodo;
+}
+
+function vozRecGuardaTodo() {
+  try { localStorage.setItem(VOZ_REC, JSON.stringify(vozRecLeeTodo())); } catch (e) {}
+}
+
+/* Los vivos de un texto, DE TODA LA CASA (aquí no se filtra por quien
+   entró: eso es lo de los subrayados). Ordenados por `orden` y, a
+   igualdad, por cuándo se pusieron. */
+function vozRecDe(cid) {
+  return (vozRecLeeTodo()[cid] || [])
+    .filter(r => r && !r.del)
+    .sort((a, b) => (a.orden || 0) - (b.orden || 0) || (a.u || 0) - (b.u || 0));
+}
+
+function vozRecCuenta(cid) { return vozRecDe(cid).length; }
+
+function vozRecId() {
+  return 'r' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+/* Es mío si lo puse yo, o si todavía no lo ha firmado nadie (se puso sin
+   sesión y la subida lo firmará). Igual que vozEsMio y vozActEsMio. */
+function vozRecEsMio(r) {
+  return !!r && (!r.user || !_vozYo || r.user === _vozYo);
+}
+
+/* El nombre corto de quien entró, para poder enseñarlo en la tarjeta sin
+   una segunda consulta por recurso. Se pregunta UNA vez y se recuerda: no
+   cambia entre un viaje a la nube y el siguiente, y preguntarlo en cada
+   sincronización doblaba las peticiones de la repisa de las misiones a
+   cambio de nada. NO se usa para permisos nunca —lo escribe el aparato—:
+   para eso está `anadido_por`, que lo comprueba la seguridad por fila. */
+async function vozRecMiembro(yo) {
+  if (!yo) return '';
+  if (_vozRecMiembro.uid === yo) return _vozRecMiembro.nombre;
+  const sb = vozSb();
+  if (!sb) return '';
+  try {
+    const r = await sb.from('familia_miembros').select('miembro').eq('user_id', yo).maybeSingle();
+    const n = (r && r.data && r.data.miembro) ? String(r.data.miembro) : '';
+    /* Solo se recuerda si de verdad se supo: guardar el vacío dejaría los
+       recursos sin nombre hasta recargar la página. */
+    if (n) _vozRecMiembro = { uid: yo, nombre: n };
+    return n;
+  } catch (e) { return ''; }
+}
+
+/* ── La dirección ──────────────────────────────────────────────────
+   Con `URL()` y nada más, y devolviendo el MOTIVO cuando no vale, que es
+   lo que separa una herramienta que explica de una que parece rota. */
+function vozRecMiraUrl(u) {
+  const t = String(u || '').trim();
+  if (!t) return { ok: false, motivo: '' };
+  let url;
+  try { url = new URL(t); } catch (e) {
+    /* Lo más común de todo: pegar «www.algo.com» sin el https. Se
+       propone en vez de rechazarlo, porque escribir «https://» en el
+       teclado de una tableta es lo que hace que nadie ponga el enlace. */
+    if (/^[\w-]+(\.[\w-]+)+(\/|$)/.test(t)) {
+      try { return { ok: true, url: new URL('https://' + t).href, puesto: 'https://' }; } catch (e2) {}
+    }
+    return { ok: false, motivo: 'Eso no parece una dirección. Tiene que empezar por https:// y llevar un punto.' };
+  }
+  if (url.protocol === 'http:' || url.protocol === 'https:') return { ok: true, url: url.href };
+  /* ⚠️ Y AQUÍ SE EXPLICA, en vez de decir «no vale». Quien escribe
+     «duolingo://» quiere abrir una aplicación, y la respuesta buena
+     existe: su dirección https, que en Android abre la propia app si
+     está instalada. Decir solo «no» manda a buscar donde no está. */
+  return {
+    ok: false,
+    motivo: 'Aquí solo entran direcciones https. Si querías abrir una aplicación, pon su dirección '
+          + 'normal (la de su página): en el teléfono y la tableta esa misma dirección abre la app '
+          + 'si está instalada, y la página si no.',
+  };
+}
+
+function vozRecDominio(u) {
+  try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; }
+}
+
+/* El nombre que se adivina de una dirección, para no pedir lo que se
+   puede deducir (regla 1 del Apunte rápido). Del último trozo del camino
+   si dice algo, y si no del dominio. */
+function vozRecNombreDeUrl(u) {
+  const dom = vozRecDominio(u);
+  let trozo = '';
+  try {
+    const partes = new URL(u).pathname.split('/').filter(Boolean);
+    const ult = partes[partes.length - 1] || '';
+    trozo = decodeURIComponent(ult).replace(/\.(html?|php|aspx?|pdf)$/i, '').replace(/[-_+]+/g, ' ').trim();
+    /* Un identificador («a8f3c210», «watch») no es un nombre: mejor el
+       dominio solo que un título que no dice nada. */
+    if (trozo.length < 4 || trozo.length > 90 || !/[aeiouáéíóú]/i.test(trozo) || /^\d+$/.test(trozo)) trozo = '';
+  } catch (e) {}
+  if (!trozo) return dom;
+  return trozo.charAt(0).toUpperCase() + trozo.slice(1) + (dom ? ' — ' + dom : '');
+}
+
+/* ── Guardar, quitar, y la nube ────────────────────────────────────── */
+
+function vozRecGuardar(cid, r) {
+  const todo = vozRecLeeTodo();
+  const lista = todo[cid] || (todo[cid] = []);
+  const i = lista.findIndex(x => x && x.id === r.id);
+  if (i >= 0) lista[i] = r; else lista.push(r);
+  vozRecGuardaTodo();
+  vozRecPedirNube(cid);
+}
+
+/* ⚠️ QUITAR DEJA LÁPIDA, no borra la fila, aunque esta tabla SÍ tenga
+   política de `delete`. Por lo mismo que los textos, los subrayados, los
+   videos de M.E.T.A.S y la repisa: si este aparato borrara la fila, la
+   tableta que todavía tiene su copia la subiría otra vez en la siguiente
+   sincronización y el recurso resucitaría solo, sin que nadie entendiera
+   por qué. */
+function vozRecQuitar(cid, id) {
+  const lista = vozRecLeeTodo()[cid] || [];
+  const r = lista.find(x => x && x.id === id);
+  if (!r) return;
+  r.del = true;
+  r.u = Date.now();
+  vozRecGuardaTodo();
+  vozRecPedirNube(cid);
+}
+
+function vozRecDeFila(f) {
+  return {
+    id: f.id, tipo: f.tipo || 'app', tit: f.titulo || '', url: f.url || '',
+    para: f.descripcion || '', fuente: f.fuente || '', origen: f.origen || 'casa',
+    dura: f.dura || '', orden: f.orden || 0, del: !!f.borrado,
+    u: f.actualizado || 0, user: f.anadido_por || '', quien: f.miembro || '',
+    sync: f.actualizado || 0,
+  };
+}
+
+function vozRecAFila(r, yo, cid, quien) {
+  return {
+    id: r.id, mision: 'voz:' + cid, tipo: r.tipo || 'app',
+    titulo: String(r.tit || '').slice(0, 200),
+    url: r.url,
+    descripcion: String(r.para || '').slice(0, 400),
+    fuente: String(r.fuente || '').slice(0, 80),
+    origen: r.origen === 'maquina' ? 'maquina' : 'casa',
+    dura: String(r.dura || '').slice(0, 40),
+    anadido_por: yo,
+    miembro: String(r.quien || quien || '').slice(0, 40),
+    borrado: !!r.del,
+    actualizado: r.u || Date.now(),
+    orden: r.orden || 0,
+  };
+}
+
+function vozRecPedirNube(cid) {
+  if (_vozRecNube === 'al-dia') _vozRecNube = 'pendiente';
+  vozRecPintarEstado();
+  clearTimeout(_vozRecTimer);
+  _vozRecTimer = setTimeout(() => vozRecSincronizar(cid), 1500);
+}
+
+/* Baja los recursos de ESTE texto —de toda la casa—, fusiona por
+   identificador (gana el más nuevo por el reloj del aparato) y sube lo
+   PROPIO que allá falte o esté más viejo.
+
+   ⚠️ Solo lo propio: una fila ajena la rechaza la seguridad por fila, y
+   reintentarla sería insistir cada vez para nada (regla 14).
+   ⚠️ Y un corte de red no vacía la repisa: lo que hay en memoria no se
+   tira hasta saber que llegó lo nuevo (regla 11). */
+async function vozRecSincronizar(cid) {
+  if (_vozRecSincronizando) { _vozRecOtraVuelta = cid; return; }
+  const sb = vozSb();
+  if (!sb) { _vozRecNube = 'sin-sesion'; vozRecPintarEstado(); return; }
+  const yo = await vozYo();
+  if (!yo) { _vozRecNube = 'sin-sesion'; vozRecPintarEstado(); return; }
+  _vozRecSincronizando = true;
+  _vozRecNube = 'subiendo'; vozRecPintarEstado();
+  try {
+    const todo = vozRecLeeTodo();
+    const mios = todo[cid] || (todo[cid] = []);
+    /* Lo puesto sin sesión pasa a ser de quien entró, igual que una marca. */
+    mios.forEach(r => { if (!r.user) r.user = yo; });
+
+    const { data, error } = await vozConReloj(sb.from(VOZ_REC_TABLA)
+      .select('*').eq('mision', 'voz:' + cid));
+    if (error) {
+      /* ⚠️ TRES CAUSAS Y TRES ARREGLOS, y decir una por otra manda a
+         mirar donde no está el problema. 42P01 es «falta el SQL»; 42703
+         es «la tabla está pero le falta una columna», o sea volver a
+         correrlo; lo demás sí es la señal. Es la avería de la lápida del
+         taller, que decía «sin señal» con la señal perfecta. */
+      if (error.code === '42P01' || /relation .* does not exist/i.test(error.message || '')) _vozRecNube = 'sin-tabla';
+      else if (vozFaltaColumna(error)) _vozRecNube = 'base-vieja';
+      else _vozRecNube = 'sin-senal';
+      vozRecGuardaTodo(); vozRecPintarEstado();
+      return;
+    }
+    const quien = await vozRecMiembro(yo);
+    const remotos = (data || []).map(vozRecDeFila);
+    const porId = new Map(mios.map(r => [r.id, r]));
+    const subir = [];
+    let cambio = false;
+    remotos.forEach(x => {
+      const l = porId.get(x.id);
+      if (!l) { porId.set(x.id, x); cambio = true; return; }
+      if ((x.u || 0) > (l.u || 0)) { porId.set(x.id, Object.assign({}, x)); cambio = true; }
+      else if ((l.u || 0) > (x.u || 0) || (l.sync || 0) < (l.u || 0)) subir.push(l);
+    });
+    porId.forEach(r => { if (r.user === yo && !remotos.find(x => x.id === r.id)) subir.push(r); });
+    todo[cid] = [...porId.values()];
+    const mias = subir.filter(r => r.user === yo);
+    if (mias.length) {
+      const { error: e2 } = await vozConReloj(sb.from(VOZ_REC_TABLA)
+        .upsert(mias.map(r => vozRecAFila(r, yo, cid, quien)), { onConflict: 'id' }));
+      if (e2) {
+        _vozRecNube = (e2.code === 'FARO_RELOJ') ? 'sin-senal'
+          : vozFaltaColumna(e2) ? 'base-vieja'
+          : (e2.code === '42501' || e2.code === '23502' || e2.code === '23514') ? 'ajeno' : 'error';
+        vozRecGuardaTodo(); vozRecPintarEstado();
+        return;
+      }
+      mias.forEach(r => { r.sync = r.u || 0; if (!r.quien) r.quien = quien; });
+    }
+    vozRecGuardaTodo();
+    _vozRecNube = 'al-dia';
+    if (cambio) vozRecRepintar(cid);
+  } catch (e) {
+    _vozRecNube = 'error';
+  } finally {
+    _vozRecSincronizando = false;
+    /* Y si mientras subía se guardó algo, otra vuelta: un guardado hecho
+       durante la subida se APUNTA, no se tira — o la vuelta en marcha
+       terminaría diciendo «están en todos los aparatos» con lo último
+       todavía aquí, que es peor que decir que falló. */
+    if (_vozRecOtraVuelta !== null) {
+      const otro = _vozRecOtraVuelta;
+      _vozRecOtraVuelta = null;
+      vozRecPedirNube(otro);
+    } else {
+      vozRecPintarEstado();
+    }
+  }
+}
+
+function vozRecRotuloNube() {
+  if (_vozRecNube === 'al-dia')     return '☁️ Los recursos están en todos los aparatos de la casa.';
+  if (_vozRecNube === 'subiendo' || _vozRecNube === 'pendiente') return '⏳ Guardando en la nube…';
+  if (_vozRecNube === 'sin-tabla')  return '📴 Solo en este aparato: falta correr recursos_enlaces.sql';
+  if (_vozRecNube === 'base-vieja') return '📴 Solo en este aparato: la base va vieja, vuelve a correr recursos_enlaces.sql';
+  if (_vozRecNube === 'sin-sesion') return '📴 Solo en este aparato: entra en F.A.R.O para que viajen';
+  if (_vozRecNube === 'sin-senal')  return '📡 Sin señal: se guardan aquí y suben cuando vuelva';
+  if (_vozRecNube === 'ajeno')      return '✋ Alguno lo puso otra persona de la casa: puedes abrirlo, no cambiarlo';
+  if (_vozRecNube === 'error')      return '⚠️ La nube rechazó algún recurso; se queda en este aparato';
+  return '📴 Solo en este aparato por ahora';
+}
+
+function vozRecPintarEstado() {
+  const e = document.getElementById('voz-rec-estado');
+  if (e) e.textContent = vozRecRotuloNube();
+  const p = document.getElementById('voz-rec-pie');
+  if (p && _vozRecEnHoja) p.textContent = vozRecRotuloNube();
+}
+
+/* Repinta donde se vean los recursos, sin tocar nada más: el panel si
+   está abierto en esa pestaña, y el pie de la última página, que enseña
+   la cuenta. */
+function vozRecRepintar(cid) {
+  if (_vozLeyendo && _vozLeyendo.cid === cid && _vozPanelTab === 'recs') {
+    const p = document.getElementById('voz-panel-ind');
+    if (p && !p.hidden) vozPintarPanelInd('recs');
+  }
+  vozRender();
+}
+
+/* ── La pestaña 🔗 del panel de la sala ───────────────────────────────
+   ⚠️ Sale SIEMPRE, aunque no haya ni un recurso, y es la excepción a la
+   regla de la pestaña de Fuentes (que solo sale cuando hay bibliografía).
+   El motivo es el mismo que hace que la del taller salga vacía: aquí es
+   donde se PONEN, así que esconderla cuando está vacía sería esconder la
+   única puerta de entrada. */
+function vozRecPintarPanel(cuerpo, c) {
+  const lista = vozRecDe(c.cid);
+
+  const intro = vozNodo('p', 'voz-panel-nota',
+    lista.length
+      ? 'Se abren en otra pestaña, así que la lectura se queda donde está.'
+      : 'Un vídeo, una app de ejercicios, otra lectura: lo que ayude a que esto se quede. '
+        + 'Se abren en otra pestaña y los ven los cuatro.');
+  cuerpo.appendChild(intro);
+
+  lista.forEach(r => cuerpo.appendChild(vozRecTarjeta(c, r)));
+
+  cuerpo.appendChild(vozBoton('voz-btn voz-btn-pri voz-btn-ancho',
+    lista.length ? '➕ Otro recurso' : '➕ Poner un recurso',
+    () => vozRecAbrirHoja(c.cid, null)));
+
+  const est = vozNodo('p', 'voz-aj-nota voz-rec-estado', vozRecRotuloNube());
+  est.id = 'voz-rec-estado';
+  cuerpo.appendChild(est);
+}
+
+/* ⚠️ NADA DE ESTO SE ARMA CON HTML. La dirección se comprueba con
+   `URL()` y se pone con `setAttribute`; el título, la descripción y el
+   nombre de quien lo puso van con `textContent`. Un recurso lo escribe
+   alguien de la casa, pero esta página tiene al lado la Bóveda. */
+function vozRecTarjeta(c, r) {
+  const card = vozNodo('div', 'voz-rec-card voz-rec-t-' + (vozRecTipo(r.tipo).id));
+  const tipo = vozRecTipo(r.tipo);
+  const bueno = vozRecMiraUrl(r.url);
+
+  /* Si la dirección no pasa la comprobación NO se pinta un enlace: se
+     pinta un aviso. Enseñar un enlace muerto es peor que decir que está
+     mal, porque el que lo toca cree que el recurso ya no existe. */
+  const cab = bueno.ok ? document.createElement('a') : vozNodo('div', 'voz-rec-roto');
+  if (bueno.ok) {
+    cab.className = 'voz-rec-abre';
+    cab.setAttribute('href', bueno.url);
+    cab.setAttribute('target', '_blank');
+    /* ⚠️ `noopener` no es adorno: sin él la página que se abre puede
+       tocar `window.opener`, y esa ventana es F.A.R.O con la sesión de la
+       casa puesta. */
+    cab.setAttribute('rel', 'noopener noreferrer');
+  }
+  cab.appendChild(vozNodo('span', 'voz-rec-ic', tipo.ic));
+  const txt = vozNodo('span', 'voz-rec-txt');
+  txt.appendChild(vozNodo('span', 'voz-rec-nom', r.tit || vozRecDominio(r.url) || 'Sin nombre'));
+  const meta = [tipo.t, vozRecDominio(r.url), r.dura].filter(Boolean).join(' · ');
+  if (meta) txt.appendChild(vozNodo('span', 'voz-rec-meta', meta));
+  if (r.para) txt.appendChild(vozNodo('span', 'voz-rec-para', r.para));
+  if (!bueno.ok) txt.appendChild(vozNodo('span', 'voz-rec-mal', '⚠️ ' + (bueno.motivo || 'La dirección no vale')));
+  cab.appendChild(txt);
+  if (bueno.ok) cab.appendChild(vozNodo('span', 'voz-rec-flecha', '↗'));
+  card.appendChild(cab);
+
+  const pie = vozNodo('div', 'voz-rec-pie-card');
+  /* ⚠️ LA ETIQUETA, EN LA TARJETA Y SIEMPRE. Regla 1: lo que trajo una
+     máquina va dicho donde se lee, no en un campo que hay que abrir. */
+  const or = VOZ_REC_ORIGENES.find(o => o.id === r.origen) || VOZ_REC_ORIGENES[0];
+  pie.appendChild(vozNodo('span', 'voz-rec-et voz-rec-et-' + or.id, or.ic + ' ' + or.corto));
+  if (r.quien) pie.appendChild(vozNodo('span', 'voz-rec-quien', 'lo puso ' + r.quien));
+
+  if (vozRecEsMio(r)) {
+    pie.appendChild(vozBoton('voz-btn voz-btn-chico', '✏️', () => vozRecAbrirHoja(c.cid, r), 'Corregir este recurso'));
+    /* Dos toques en el mismo sitio y sin `confirm()`, igual que retirar un
+       texto (regla 22): el diálogo del navegador puede no salir nunca en
+       la aplicación instalada, y entonces el botón parece muerto. */
+    const caja = vozNodo('span', 'voz-retirar-caja');
+    const b = vozBoton('voz-btn voz-btn-chico', '🗑', null, 'Quitar este recurso');
+    const si = vozBoton('voz-btn voz-btn-peligro voz-btn-chico', 'Sí, quitar', () => {
+      vozRecQuitar(c.cid, r.id);
+      vozRecRepintar(c.cid);
+      vozAviso('🔗 Recurso quitado');
+    }, 'Confirmar: quitar el recurso');
+    const no = vozBoton('voz-btn voz-btn-chico', 'No', () => {
+      caja.classList.remove('voz-retirar-abierto'); si.hidden = true; no.hidden = true;
+    }, 'No quitarlo');
+    si.hidden = true; no.hidden = true;
+    b.addEventListener('click', () => {
+      const abierto = caja.classList.toggle('voz-retirar-abierto');
+      si.hidden = !abierto; no.hidden = !abierto;
+      if (abierto) si.focus();
+    });
+    caja.appendChild(b); caja.appendChild(si); caja.appendChild(no);
+    pie.appendChild(caja);
+  } else {
+    /* ⚠️ Y en lo ajeno los botones NO se enseñan muertos ni se esconden
+       sin más: se dice por qué. Lo impide la seguridad por fila, y un
+       botón que la base va a rechazar promete algo que no se puede hacer;
+       pero quitarlo callando parece un fallo de la pantalla, y un fallo de
+       pantalla se «arregla» reinstalando (regla 14). */
+    pie.appendChild(vozNodo('span', 'voz-rec-ajeno', '✋ solo quien lo puso puede cambiarlo'));
+  }
+  card.appendChild(pie);
+  return card;
+}
+
+/* ── La hoja de poner o corregir un recurso ──────────────────────────── */
+
+function vozRecAbrirHoja(cid, r) {
+  const ov = document.getElementById('voz-rec-overlay');
+  if (!ov) return;
+  _vozRecEnHoja = { cid: cid, id: (r && r.id) || null };
+  /* Lo que rellenó la pantalla se apunta aparte, para no pisar nunca lo
+     que escribió una persona (regla 18: el relleno automático recuerda
+     qué rellenó él). Al corregir no hay nada automático que pisar. */
+  _vozRecAuto = {};
+  const g = id => document.getElementById(id);
+  g('voz-rec-tit').textContent = r ? '✏️ Corregir el recurso' : '🔗 Un recurso para reforzar';
+  g('voz-rec-url').value = (r && r.url) || '';
+  g('voz-rec-nom').value = (r && r.tit) || '';
+  g('voz-rec-para').value = (r && r.para) || '';
+  g('voz-rec-dura').value = (r && r.dura) || '';
+  _vozRecEnHoja.tipo = (r && r.tipo) || VOZ_REC_TIPOS[0].id;
+  _vozRecEnHoja.origen = (r && r.origen) || 'casa';
+  g('voz-rec-guardar').textContent = r ? '💾 Guardar los cambios' : '🔗 Guardar el recurso';
+  ov.style.display = 'flex';
+  vozRecPintarHoja();
+  /* El foco va DENTRO del mismo toque, sin ningún `await` delante: es lo
+     que hace que en una tableta salga el teclado solo (regla 4 del Apunte
+     rápido). Al corregir va al nombre, que es lo que se suele retocar. */
+  try { g(r ? 'voz-rec-nom' : 'voz-rec-url').focus(); } catch (e) {}
+}
+
+function vozRecCerrarHoja() {
+  const ov = document.getElementById('voz-rec-overlay');
+  if (ov) ov.style.display = 'none';
+  _vozRecEnHoja = null;
+}
+
+function vozRecPintarChips(caja, lista, puesto, alElegir) {
+  caja.textContent = '';
+  lista.forEach(x => {
+    const ch = vozBoton('voz-chip' + (x.id === puesto ? ' voz-chip-on' : ''),
+      x.ic + ' ' + x.t, () => alElegir(x.id));
+    ch.setAttribute('aria-pressed', x.id === puesto ? 'true' : 'false');
+    caja.appendChild(ch);
+  });
+}
+
+/* Lo que falta para poder guardar, NOMBRADO. Un «no se puede» a secas
+   obliga a mirar cinco campos desde una tableta (regla 1). */
+function vozRecQueFalta() {
+  const g = id => (document.getElementById(id) || {}).value || '';
+  const falta = [];
+  const u = vozRecMiraUrl(g('voz-rec-url'));
+  if (!g('voz-rec-url').trim()) falta.push('la dirección');
+  else if (!u.ok) falta.push('una dirección que valga');
+  if (!g('voz-rec-nom').trim()) falta.push('cómo se llama');
+  return falta;
+}
+
+function vozRecPintarHoja() {
+  if (!_vozRecEnHoja) return;
+  const g = id => document.getElementById(id);
+  vozRecPintarChips(g('voz-rec-tipos'), VOZ_REC_TIPOS, _vozRecEnHoja.tipo,
+    id => { _vozRecEnHoja.tipo = id; vozRecPintarHoja(); });
+  vozRecPintarChips(g('voz-rec-origen'), VOZ_REC_ORIGENES, _vozRecEnHoja.origen,
+    id => { _vozRecEnHoja.origen = id; vozRecPintarHoja(); });
+
+  /* El aviso de la dirección se dice MIENTRAS se escribe y no al
+     guardar: es la regla de la duración de El Rodaje y del monto del
+     Apunte rápido — enseñar cómo se entendió acierta siempre. */
+  const nota = g('voz-rec-url-nota');
+  const crudo = g('voz-rec-url').value.trim();
+  const u = vozRecMiraUrl(crudo);
+  if (!crudo) { nota.hidden = true; nota.textContent = ''; nota.classList.remove('voz-rec-nota-mal'); }
+  else if (!u.ok) { nota.hidden = false; nota.textContent = '⚠️ ' + u.motivo; nota.classList.add('voz-rec-nota-mal'); }
+  else if (u.puesto) { nota.hidden = false; nota.textContent = 'Se entiende ' + u.url; nota.classList.remove('voz-rec-nota-mal'); }
+  else { nota.hidden = true; nota.textContent = ''; nota.classList.remove('voz-rec-nota-mal'); }
+
+  const falta = vozRecQueFalta();
+  const av = g('voz-rec-falta');
+  const b = g('voz-rec-guardar');
+  b.classList.toggle('voz-btn-flojo', falta.length > 0);
+  ['voz-rec-url', 'voz-rec-nom'].forEach((id, i) => {
+    const e = g(id);
+    const vacio = !String(e.value || '').trim() || (i === 0 && !vozRecMiraUrl(e.value).ok);
+    e.classList.toggle('voz-campo-ambar', vacio);
+  });
+  av.hidden = !falta.length;
+  av.textContent = falta.length
+    ? 'Falta ' + falta.join(' y ') + '.'
+    : '';
+  const pie = g('voz-rec-pie');
+  if (pie) pie.textContent = vozRecRotuloNube();
+}
+
+/* ⚠️ AL PEGAR LA DIRECCIÓN SE RELLENAN SOLOS EL NOMBRE Y DE DÓNDE ES, y
+   solo se pisa lo que rellenó la pantalla antes. Es la regla 18: la
+   primera versión del título del texto rellenaba el campo al abrir y el
+   título de verdad no entraba nunca. Aquí lo que se puede deducir de la
+   dirección no se pide (regla 1 del Apunte rápido): en una tableta,
+   escribir a mano el nombre de un recurso cuya dirección ya se pegó es
+   justo el paso en que se deja de poner recursos. */
+function vozRecAlEscribirUrl() {
+  if (!_vozRecEnHoja) return;
+  const u = vozRecMiraUrl(document.getElementById('voz-rec-url').value);
+  if (u.ok) {
+    const nom = document.getElementById('voz-rec-nom');
+    if (!nom.value.trim() || nom.value === _vozRecAuto.nom) {
+      nom.value = vozRecNombreDeUrl(u.url);
+      _vozRecAuto.nom = nom.value;
+    }
+    _vozRecEnHoja.fuente = vozRecDominio(u.url);
+  }
+  vozRecPintarHoja();
+}
+
+function vozRecGuardarHoja() {
+  if (!_vozRecEnHoja) return;
+  const falta = vozRecQueFalta();
+  if (falta.length) {
+    vozRecPintarHoja();
+    const av = document.getElementById('voz-rec-falta');
+    if (av) av.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    return;
+  }
+  const g = id => document.getElementById(id).value;
+  const cid = _vozRecEnHoja.cid;
+  const viejo = (vozRecLeeTodo()[cid] || []).find(x => x && x.id === _vozRecEnHoja.id);
+  const u = vozRecMiraUrl(g('voz-rec-url'));
+  const r = {
+    id: (viejo && viejo.id) || vozRecId(),
+    tipo: _vozRecEnHoja.tipo,
+    tit: g('voz-rec-nom').trim().slice(0, 200),
+    url: u.url,
+    para: g('voz-rec-para').trim().slice(0, 400),
+    fuente: (_vozRecEnHoja.fuente || vozRecDominio(u.url)).slice(0, 80),
+    origen: _vozRecEnHoja.origen === 'maquina' ? 'maquina' : 'casa',
+    dura: g('voz-rec-dura').trim().slice(0, 40),
+    orden: (viejo && viejo.orden) || 0,
+    del: false,
+    u: Date.now(),
+    user: (viejo && viejo.user) || _vozYo || '',
+    quien: (viejo && viejo.quien) || _vozRecMiembro.nombre || '',
+    sync: (viejo && viejo.sync) || 0,
+  };
+  vozRecGuardar(cid, r);
+  vozRecCerrarHoja();
+  vozRecRepintar(cid);
+  vozAviso(viejo ? '🔗 Recurso corregido' : '🔗 Recurso puesto');
+}
+
+/* Los oyentes, una sola vez y desde el arranque de la herramienta: la
+   hoja vive en el HTML, así que sus botones existen siempre. */
+let _vozRecEnganchado = false;
+function vozRecEngancha() {
+  /* ⚠️ Una sola vez. `initVozPrestada` corre cada vez que se entra a la
+     herramienta, y un segundo oyente en el botón de guardar guardaría el
+     mismo recurso dos veces — con dos identificadores, así que la nube se
+     quedaría con un gemelo y no habría error que lo dijera. */
+  if (_vozRecEnganchado) return;
+  _vozRecEnganchado = true;
+  const cer = document.getElementById('voz-rec-cerrar');
+  if (cer) cer.addEventListener('click', vozRecCerrarHoja);
+  const g = document.getElementById('voz-rec-guardar');
+  if (g) g.addEventListener('click', vozRecGuardarHoja);
+  const url = document.getElementById('voz-rec-url');
+  if (url) { url.addEventListener('input', vozRecAlEscribirUrl); url.addEventListener('change', vozRecAlEscribirUrl); }
+  ['voz-rec-nom', 'voz-rec-para', 'voz-rec-dura'].forEach(id => {
+    const e = document.getElementById(id);
+    if (e) e.addEventListener('input', vozRecPintarHoja);
+  });
+  const ov = document.getElementById('voz-rec-overlay');
+  /* Tocar el fondo cierra, como las demás hojas de la casa; tocar dentro
+     no, que si no se cierra al elegir un chip. */
+  if (ov) ov.addEventListener('click', e => { if (e.target === ov) vozRecCerrarHoja(); });
+}
+
 /* ─── Los paneles de la sala: la letra, y el índice con sus pestañas ──
    Viven DENTRO de #voz-lector, no colgando del body, y eso es una
    decisión de color: la sala redefine sus tokens (papel, sepia,
@@ -5587,8 +6277,14 @@ function vozPintarPanelInd(tab) {
   /* La del taller va la ÚLTIMA y sale siempre, aunque no haya
      actividades todavía: ahí es donde se montan, así que esconderla
      cuando está vacía sería esconder la puerta de entrada. */
+  /* La de los recursos va pegada a la del taller —las dos son «qué hacer
+     con esto que acabo de leer»— y, como ella, sale SIEMPRE aunque esté
+     vacía: ahí es donde se ponen, así que esconderla cuando no hay
+     ninguno sería esconder la puerta de entrada. */
+  const nRec = vozRecCuenta(c.cid);
   const pestanas = [['ind', '☰ Índice'], ['marcas', '🔖 Marcas'], ['subs', '🖍 Subrayados'],
-                    ['busca', '🔍 Buscar'], ['taller', '📝 Taller']];
+                    ['busca', '🔍 Buscar'], ['recs', '🔗 Recursos' + (nRec ? ' · ' + nRec : '')],
+                    ['taller', '📝 Taller']];
   if (hayFuentes) pestanas.splice(1, 0, ['fuentes', '📚 Fuentes']);
   pestanas.forEach(([id, t]) => {
     const b = vozBoton('voz-tab' + (_vozPanelTab === id ? ' voz-tab-on' : ''), t, () => vozPintarPanelInd(id));
@@ -5608,6 +6304,7 @@ function vozPintarPanelInd(tab) {
   else if (_vozPanelTab === 'fuentes') vozPintarFuentes(cuerpo);
   else if (_vozPanelTab === 'subs') vozPintarSubrayados(cuerpo);
   else if (_vozPanelTab === 'busca') vozPintarBuscador(cuerpo);
+  else if (_vozPanelTab === 'recs') vozRecPintarPanel(cuerpo, c);
   else if (_vozPanelTab === 'taller') vozPintarPestanaTaller(cuerpo);
   else vozPintarIndice(cuerpo);
 }

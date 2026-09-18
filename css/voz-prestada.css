@@ -1632,6 +1632,63 @@ body.voz-eligiendo .destello-fab { display: none !important; }
   border-radius: 10px; padding: 8px 10px;
 }
 
+/* ─── El panel 🔗 Recursos ──────────────────────────────────────────
+   ⚠️ TODO CUELGA DENTRO DE #voz-lector, así que se tiñe solo con el
+   papel puesto (papel, sepia y noche) y no hay que nombrar ningún `id`
+   uno por uno como en El Rodaje. Y con los tokens de LA APLICACIÓN
+   —`--surface`, `--border`, `--text`, `--muted`—, nunca `--card`, que en
+   esta casa no existe y se resuelve a transparente sin dar ningún error.
+   ────────────────────────────────────────────────────────────────── */
+#voz-lector .voz-rec-card {
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--surface); margin: 8px 0; overflow: hidden;
+}
+#voz-lector .voz-rec-abre,
+#voz-lector .voz-rec-roto {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 11px; text-decoration: none; color: var(--text);
+}
+#voz-lector .voz-rec-abre { cursor: pointer; }
+#voz-lector .voz-rec-abre:hover { background: rgba(127,127,127,.06); }
+#voz-lector .voz-rec-ic { flex: 0 0 auto; font-size: 20px; line-height: 1.2; }
+#voz-lector .voz-rec-txt { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+#voz-lector .voz-rec-nom {
+  font-size: 14px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere;
+}
+#voz-lector .voz-rec-meta { font-size: 11.5px; color: var(--muted); overflow-wrap: anywhere; }
+#voz-lector .voz-rec-para {
+  font-size: 12.5px; line-height: 1.45; color: var(--text);
+  font-family: var(--voz-fam, Georgia, serif); margin-top: 2px;
+}
+#voz-lector .voz-rec-mal { font-size: 11.5px; color: #b45309; line-height: 1.4; }
+#voz-lector .voz-rec-flecha { flex: 0 0 auto; color: var(--muted); font-size: 14px; }
+#voz-lector .voz-rec-pie-card {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  padding: 0 11px 9px; font-size: 11px;
+}
+/* La etiqueta de quién lo trae. Va SIEMPRE y se ve: es la regla 1
+   aplicada a cada recurso — lo que trajo una máquina va dicho donde se
+   lee, no en un campo que hay que abrir. */
+#voz-lector .voz-rec-et {
+  padding: 2px 7px; border-radius: 999px; font-weight: 700;
+  border: 1px solid var(--border); color: var(--muted);
+}
+#voz-lector .voz-rec-quien, #voz-lector .voz-rec-ajeno { color: var(--muted); }
+#voz-lector .voz-rec-ajeno { font-size: 10.5px; }
+#voz-lector .voz-rec-estado { margin: 8px 0 0; }
+#voz-lector .voz-rec-estado:empty { display: none; }
+/* El atajo del pie de la última página, hermano del del taller. */
+.voz-fin-recs { margin-top: 8px; }
+
+/* La hoja. Cuelga dentro de la sala, así que hereda su papel; lo que
+   necesita es poder deslizarse en un teléfono acostado. */
+#voz-rec-overlay .fin-modal { max-height: 92vh; overflow-y: auto; }
+#voz-rec-overlay .voz-rec-nota { margin: -4px 0 8px; font-size: 11.5px; line-height: 1.4; }
+#voz-rec-overlay .voz-rec-nota-mal { color: #b45309; }
+#voz-rec-overlay .voz-rec-pie { margin-top: 8px; font-size: 11px; color: var(--muted); }
+#voz-rec-overlay .voz-rec-pie:empty { display: none; }
+#voz-rec-overlay textarea { resize: vertical; min-height: 52px; }
+
 @media (max-width: 380px) {
   .voz-tf-l { flex-basis: 50%; }
   .voz-citbar { max-width: 96%; }
@@ -1664,3 +1721,17 @@ body.voz-eligiendo .destello-fab { display: none !important; }
 .voz-act-op-no  { border-color: #b91c1c; background: rgba(248,113,113,.12); }
 .voz-act-par-ok  { border-color: #15803d; background: rgba(34,197,94,.10); }
 .voz-act-par-mal { border-color: #b91c1c; background: rgba(248,113,113,.10); }
+/* `.voz-rec-card` declara el atajo `border: 1px solid var(--border)`:
+   su franja por tipo va AQUÍ por lo mismo que las del anaquel y las del
+   taller. Con estas reglas arriba, las tarjetas saldrían todas grises
+   sin dar ningún error y con el HTML bien — el fallo que solo se caza
+   mirando el color CALCULADO. */
+#voz-lector .voz-rec-t-app       { border-left: 4px solid #2563eb; }
+#voz-lector .voz-rec-t-video     { border-left: 4px solid #b91c1c; }
+#voz-lector .voz-rec-t-audio     { border-left: 4px solid #7c3aed; }
+#voz-lector .voz-rec-t-ejercicio { border-left: 4px solid #15803d; }
+#voz-lector .voz-rec-t-lectura   { border-left: 4px solid #a16207; }
+#voz-lector .voz-rec-t-curso     { border-left: 4px solid #0e7490; }
+#voz-lector .voz-rec-t-mapa      { border-left: 4px solid #be185d; }
+/* Y la etiqueta de máquina, que también declara el atajo del borde. */
+#voz-lector .voz-rec-et-maquina { border-color: rgba(217,119,6,.5); color: #b45309; }

@@ -979,7 +979,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Treinta y cinco reglas, y ninguna es de adorno:**
+**Treinta y seis reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -2408,6 +2408,79 @@ el diseño.
    dónde salió y enseña su cita: es la etiqueta de la regla 1 aplicada a
    cada pregunta.
 
+36. 🔗 **LOS RECURSOS DE REFUERZO VIAJAN POR LA TABLA DE LA REPISA, Y NO
+   PIDEN NI UNA LÍNEA DE SQL.**
+   Pedido por el autor el 18 de septiembre de 2026: «la posibilidad de
+   agregar en las lecturas algún vínculo url o dirección de una app, que
+   podría ser un recurso para reforzar el aprendizaje o asimilación de la
+   lectura».
+
+   ⚠️ **Van en `recursos_enlaces` con `mision = 'voz:<cid>'`**, la tabla
+   de la repisa de las misiones. No se inventa una segunda tabla para el
+   mismo gesto: es exactamente lo que ya hacen los subrayados con
+   `lecturas_marcas` (regla 21) y la bibliografía dentro de `capitulos`
+   (regla 27). `mision` es texto libre, sin `check` ni llave ajena, así
+   que el prefijo basta para que los enlaces de un texto y los de una
+   misión no se mezclen nunca — y por eso **esto no pidió correr nada**,
+   que es media herramienta cuando el SQL lo pega alguien desde una
+   tableta.
+
+   ⚠️ **SON DE LA CASA, al contrario que los subrayados.** Los cuatro los
+   ven; quitar y corregir es solo de quien lo puso, y lo hace cumplir la
+   seguridad por fila. Un recurso que refuerza una lectura sirve a los
+   cuatro; uno que solo viera quien lo pegó habría que pegarlo cuatro
+   veces. De ahí una cosa que la sonda vigila: **la consulta NO filtra por
+   `anadido_por`** —si lo hiciera, cada quien vería solo los suyos y nadie
+   entendería por qué—, y la base de mentira devuelve un error si alguien
+   se lo añade.
+
+   ⚠️ **Y «LA DIRECCIÓN DE UNA APP» ES UNA `https`, y no es un recorte.**
+   Los enlaces de aplicación de Android (App Links) SON direcciones
+   `https`: una a `https://www.duolingo.com/…` abre la app si está
+   instalada y la web si no, que es justo lo que hace falta cuando el
+   mismo texto se lee en cuatro aparatos. Un `duolingo://` no se puede
+   comprobar con `URL()`, no se puede abrir desde media pantalla, y abrir
+   la puerta a esquemas propios la abre también a `javascript:`. Así que
+   solo `http` y `https` — **y cuando se pega otra cosa la pantalla lo
+   DICE y nombra qué poner**, porque un rechazo callado se ve desde fuera
+   igual que una herramienta rota (regla 14). Lo mismo al revés: pegar
+   «www.algo.com» sin el https **se entiende y se dice cómo se entendió**,
+   que es la regla del monto del Apunte rápido — escribir «https://» en el
+   teclado de una tableta es el paso en que se deja de poner recursos.
+
+   ⚠️ **Y `rel="noopener noreferrer"` NO ES ADORNO.** El enlace se abre en
+   otra pestaña —para no perder la página, que es la regla 27— y sin
+   `noopener` la página que se abre puede tocar `window.opener`: esa
+   ventana es F.A.R.O con la sesión de la casa puesta, con la Bóveda, las
+   finanzas, el chat y los teléfonos del Buzón detrás. La dirección va con
+   `setAttribute` y comprobada con `URL()`, nunca con un grep; el nombre y
+   el «para qué» con `textContent`.
+
+   **Dónde se ven, y por qué ahí:** la pestaña **🔗 Recursos** del panel de
+   la sala, que sale SIEMPRE aunque esté vacía —es la puerta para
+   ponerlos, igual que la del taller, y al contrario que la de Fuentes—;
+   un atajo **al pie de la última página**, pegado al del taller y **solo
+   si hay alguno**, porque ahí es donde alguien acaba de leer y tiene las
+   manos libres, pero un segundo botón vacío en mitad de una página de
+   lectura es ruido; y **la cuenta en el menú ⋯** del anaquel, que lleva a
+   la sala y abre esa pestaña, porque la hoja cuelga dentro de
+   `#voz-lector` y con la sala cerrada no se vería nada (regla 35).
+
+   Lo demás es lo de siempre, y por lo mismo: los **tipos viven en el
+   aparato** (`VOZ_REC_TIPOS`), que añadir uno sea una línea y no una
+   migración; **la etiqueta de quién lo trae va en la tarjeta y siempre**
+   (🏠 la casa · 🤖 una máquina), que es la regla 1 aplicada a cada
+   recurso; **quitar deja lápida**, con dos toques en el mismo sitio y sin
+   `confirm()` (regla 22); los avisos de la nube **nombran la causa**, y
+   `42703` es «vuelve a correrlo», no «sin señal».
+
+   **Y lo que NO lleva, dicho:** no hay arrastre para ordenar. La repisa
+   de las misiones lo tiene porque allí se cuelgan diez cosas de
+   NotebookLM; un texto lleva tres o cuatro, y montar el aparato de
+   punteros para tres tarjetas es código que se mantiene y no se usa. Van
+   por la columna `orden` —que ya existe— y, a igualdad, por cuándo se
+   pusieron.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -2525,6 +2598,20 @@ lo automático por el camino de verdad: abre la hoja, pega y **pulsa el
 botón de guardar**, porque llamar a `vozGuardarPegado()` por dentro se
 salta justo lo que puede estar mal, que es que el automático no esté
 enganchado al guardado.
+
+La comprobación **37** son los recursos de refuerzo, y mira lo que de
+verdad puede salir mal: que una dirección `javascript:` llegue a un
+`href` (se prueba escribiéndola y mirando que el guardado se para y que
+la pantalla explica qué poner), que el enlace salga **sin `noopener`**,
+que la subida llegue a `recursos_enlaces` **firmada y con su prefijo
+`voz:`**, que la consulta **no filtre por usuario** —son de la casa—, que
+quitar deje lápida sin pasar por `confirm()`, y que el ajeno no traiga
+botones que la base va a rechazar. Los botones **se pulsan** y la hoja se
+mide con `elementFromPoint`, no leyendo el z-index. Se comprobó de la
+única manera que vale: quitando el `noopener` y quitando la comprobación
+del esquema, y viendo que la sonda suspende las dos veces — la segunda
+con el `javascript:alert(1)` convertido en el nombre del recurso, que es
+exactamente el fallo que esa comprobación existe para impedir.
 
 ⚠️ Esa prueba mira la puerta **dos veces y en este orden**: primero que
 el `revoke` del archivo le quitó a `anon` el permiso de tabla —y que a

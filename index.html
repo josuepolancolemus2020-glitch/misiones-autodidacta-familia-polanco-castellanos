@@ -2434,6 +2434,70 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
       <div id="voz-pag"></div>
       <button type="button" class="voz-l-ico" id="voz-sig" aria-label="Página siguiente">›</button>
     </div>
+
+    <!-- ⚠️ LA HOJA DE UN RECURSO CUELGA DENTRO DE #voz-lector, NO DEL
+         BODY. Colgada del body saldría con el z-index 100 de
+         .fin-modal-overlay, muy por debajo de la sala (3200): el botón
+         responde, la hoja se abre y no se ve absolutamente nada. Es
+         exactamente la avería de las dos hojas del taller (regla 35), y
+         se evita por construcción en vez de dejarla escrita en un
+         comentario. Y dentro se tiñe sola con el papel puesto. -->
+    <div id="voz-rec-overlay" class="fin-modal-overlay voz-rec-overlay" style="display:none;">
+      <div class="fin-modal" role="dialog" aria-modal="true" aria-labelledby="voz-rec-tit">
+        <div class="msug-det-head">
+          <div class="msug-det-titulo" id="voz-rec-tit">🔗 Un recurso</div>
+          <button type="button" class="msug-det-cerrar" id="voz-rec-cerrar" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- La dirección va PRIMERA porque es lo único que se pega, y
+             al pegarla se rellenan solos el nombre y de dónde es: lo que
+             se puede adivinar no se pide (regla 1 del Apunte rápido). -->
+        <div class="voz-campo voz-campo-obl">
+          <label for="voz-rec-url">🔗 La dirección · hace falta</label>
+          <input id="voz-rec-url" type="url" inputmode="url" autocomplete="off"
+                 spellcheck="false" placeholder="https://…">
+        </div>
+        <p class="voz-aj-nota voz-rec-nota" id="voz-rec-url-nota" hidden></p>
+
+        <div class="voz-campo voz-campo-obl">
+          <label for="voz-rec-nom">Cómo se llama · hace falta</label>
+          <input id="voz-rec-nom" type="text" maxlength="200" autocomplete="off"
+                 placeholder="p. ej. «Fracciones en la recta — Khan Academy»">
+        </div>
+
+        <div class="voz-campo">
+          <label for="voz-rec-tipos-h">Qué es</label>
+          <div class="voz-chips voz-chips-form" id="voz-rec-tipos"
+               role="group" aria-labelledby="voz-rec-tipos-h"></div>
+          <span id="voz-rec-tipos-h" hidden>Qué es</span>
+        </div>
+
+        <div class="voz-campo">
+          <label for="voz-rec-para">Para qué sirve, o qué hacer con él (opcional)</label>
+          <textarea id="voz-rec-para" rows="2" maxlength="400"
+                    placeholder="p. ej. «Hacer los diez primeros ejercicios después de leer el capítulo 2»"></textarea>
+        </div>
+
+        <div class="voz-campo">
+          <label for="voz-rec-origen-h">Quién lo trae</label>
+          <div class="voz-chips voz-chips-form" id="voz-rec-origen"
+               role="group" aria-labelledby="voz-rec-origen-h"></div>
+          <span id="voz-rec-origen-h" hidden>Quién lo trae</span>
+        </div>
+
+        <div class="voz-campo">
+          <label for="voz-rec-dura">Cuánto lleva (opcional)</label>
+          <input id="voz-rec-dura" type="text" maxlength="40" autocomplete="off"
+                 placeholder="p. ej. «12 min», «3 ejercicios»">
+        </div>
+
+        <p class="voz-falta" id="voz-rec-falta" hidden></p>
+        <button type="button" class="voz-btn voz-btn-pri voz-btn-ancho" id="voz-rec-guardar">🔗 Guardar el recurso</button>
+        <div class="voz-rec-pie" id="voz-rec-pie"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Pegar un texto, y corregirlo: es la MISMA hoja. Con dos
