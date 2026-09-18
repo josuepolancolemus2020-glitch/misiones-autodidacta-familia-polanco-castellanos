@@ -971,8 +971,18 @@ function switchView(id) {
    ⚠️ Y TIENE NOMBRE PROPIO para que la sonda pueda llamar a ESTE, y no a
    una copia suya escrita al lado: un doble que reparte el turno a su
    manera aprobaría con el reparto de verdad roto. Es la lección de la
-   costura del 10 de septiembre. */
+   costura del 10 de septiembre.
+
+   ⚠️ Y DESDE EL 18 DE SEPTIEMBRE DE 2026 LO COMPARTIDO VA PRIMERO, por
+   encima de los dos interruptores. No es una preferencia: es la petición
+   más explícita que puede llegar a esta aplicación. Un interruptor lo
+   encendió alguien una vez en la vida; compartir algo a F.A.R.O es una
+   persona eligiendo AHORA, con el dedo, entre todas las aplicaciones del
+   aparato, y abrirle el anaquel de siempre o la hoja de los gastos sería
+   perder por el camino lo que acababa de mandar. Es el mismo motivo por
+   el que una dirección con `?view=` manda sobre los dos. */
 function faroArranqueInicio() {
+  if (typeof faroArranqueCompartido === 'function' && faroArranqueCompartido()) return 'compartido';
   if (typeof faroArranqueVozPrestada === 'function' && faroArranqueVozPrestada()) return 'voz';
   if (typeof faroArranqueApunteFijo === 'function') { faroArranqueApunteFijo(); return 'finanzas'; }
   return '';

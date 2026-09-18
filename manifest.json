@@ -7,6 +7,16 @@
   "background_color": "#ffffff",
   "theme_color": "#114494",
   "orientation": "portrait",
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "comp_tit",
+      "text": "comp_txt",
+      "url": "comp_url"
+    }
+  },
   "icons": [
     {
       "src": "img/icon-192.png",

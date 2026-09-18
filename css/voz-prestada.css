@@ -1702,6 +1702,62 @@ body.voz-eligiendo .destello-fab { display: none !important; }
 #voz-rec-overlay .voz-rec-pie:empty { display: none; }
 #voz-rec-overlay textarea { resize: vertical; min-height: 52px; }
 
+/* La dirección y su 📋 en la misma fila. El campo se lleva lo que
+   sobre y el botón no se encoge: al revés, en un teléfono de 320 px el
+   📋 se quedaba en media rendija imposible de tocar. */
+.voz-rec-url-fila { display: flex; gap: 6px; align-items: stretch; }
+.voz-rec-url-fila input { flex: 1 1 auto; min-width: 0; }
+.voz-rec-url-fila .voz-btn { flex: 0 0 auto; min-width: 44px; }
+
+/* ── Pegar varios de golpe ─────────────────────────────────── */
+#voz-recv-overlay .fin-modal { max-height: 92vh; overflow-y: auto; }
+#voz-recv-overlay textarea { resize: vertical; min-height: 120px; font-size: 13px; }
+.voz-recv-repaso { margin: 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.voz-recv-repaso:empty { display: none; }
+.voz-recv-cuenta { margin: 0; font-size: 13px; font-weight: 600; }
+.voz-recv-lista { display: flex; flex-direction: column; gap: 4px; }
+.voz-recv-fila {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 6px 8px; border-radius: 8px; background: rgba(127,127,127,.07);
+}
+.voz-recv-ic { flex: 0 0 auto; font-size: 16px; line-height: 1.3; }
+.voz-recv-txt2 { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.voz-recv-nom { font-size: 12.5px; font-weight: 600; overflow-wrap: anywhere; }
+.voz-recv-dom { font-size: 11px; color: var(--muted); overflow-wrap: anywhere; }
+.voz-recv-malo { margin: 0; font-size: 11.5px; line-height: 1.45; color: #b45309; }
+/* El renglón crudo, en monoespaciada: es lo que la persona escribió y
+   tiene que poder compararlo letra por letra con lo que ve arriba. */
+.voz-recv-crudo { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+
+/* ── La hoja de lo compartido ───────────────────────────────
+   Esta vive en #view-voz, o sea en el mundo CLARO de la aplicación: no
+   se le nombra la sala delante a propósito. */
+#voz-comp-overlay .fin-modal { max-height: 92vh; overflow-y: auto; }
+.voz-comp-que {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px; border-radius: 10px;
+  background: rgba(127,127,127,.08); border: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.voz-comp-ic { flex: 0 0 auto; font-size: 22px; line-height: 1.1; }
+.voz-comp-que-txt { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.voz-comp-que-nom { font-size: 13.5px; font-weight: 700; overflow-wrap: anywhere; }
+.voz-comp-que-url { font-size: 11px; color: var(--muted); overflow-wrap: anywhere; }
+.voz-comp-lista { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.voz-comp-item {
+  display: flex; flex-direction: column; gap: 2px;
+  width: 100%; text-align: left; cursor: pointer;
+  /* 44 px de alto mínimo: esto se toca con el dedo y con prisa. */
+  min-height: 44px; padding: 8px 10px;
+  border-radius: 10px; background: var(--surface);
+  border: 1px solid var(--border); font: inherit; color: inherit;
+}
+.voz-comp-item:hover { border-color: var(--brand); background: rgba(127,127,127,.05); }
+.voz-comp-item-tit { font-size: 13.5px; font-weight: 600; overflow-wrap: anywhere; }
+.voz-comp-item-et { font-size: 11px; color: var(--muted); overflow-wrap: anywhere; }
+.voz-comp-item-et:empty { display: none; }
+.voz-comp-item-n { font-size: 10.5px; color: var(--muted); }
+
 @media (max-width: 380px) {
   .voz-tf-l { flex-basis: 50%; }
   .voz-citbar { max-width: 96%; }

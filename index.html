@@ -2381,6 +2381,40 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
       </button>
 
     </div>
+
+    <!-- ⚠️ LA HOJA DE LO COMPARTIDO CUELGA DE #view-voz, NO DE LA SALA, y
+         es el revés exacto de la de un recurso. Esta se abre con la sala
+         CERRADA —llega con la aplicación recién abierta, desde la hoja de
+         compartir del aparato—, así que dentro de #voz-lector no se
+         vería; y aquí el z-index 100 de .fin-modal-overlay le basta,
+         porque encima del anaquel no hay nada. Se queda además en el
+         mundo claro de la aplicación, como el resto del anaquel (regla
+         9). -->
+    <div id="voz-comp-overlay" class="fin-modal-overlay voz-comp-overlay" style="display:none;">
+      <div class="fin-modal" role="dialog" aria-modal="true" aria-labelledby="voz-comp-tit">
+        <div class="msug-det-head">
+          <div class="msug-det-titulo" id="voz-comp-tit">🔗 Te compartieron algo</div>
+          <button type="button" class="msug-det-cerrar" id="voz-comp-cerrar" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Lo que llegó, antes de nada: si el enlace no es el que se
+             creía, se ve aquí y no después de colgarlo en una lectura. -->
+        <div class="voz-comp-que" id="voz-comp-que"></div>
+
+        <p class="voz-aj-nota" id="voz-comp-sub"></p>
+
+        <button type="button" class="voz-btn voz-btn-ancho" id="voz-comp-texto" hidden>📝 Guardarlo como un texto nuevo</button>
+
+        <div class="voz-campo">
+          <label for="voz-comp-busca">Buscar la lectura</label>
+          <input id="voz-comp-busca" type="search" autocomplete="off"
+                 placeholder="por título, voz o máquina…">
+        </div>
+        <div class="voz-comp-lista" id="voz-comp-lista"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ========== LA SALA DE LECTURA ==========
@@ -2456,8 +2490,16 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
              se puede adivinar no se pide (regla 1 del Apunte rápido). -->
         <div class="voz-campo voz-campo-obl">
           <label for="voz-rec-url">🔗 La dirección · hace falta</label>
-          <input id="voz-rec-url" type="url" inputmode="url" autocomplete="off"
-                 spellcheck="false" placeholder="https://…">
+          <div class="voz-rec-url-fila">
+            <input id="voz-rec-url" type="url" inputmode="url" autocomplete="off"
+                   spellcheck="false" placeholder="https://…">
+            <!-- Un toque en vez de mantener tocado el recuadro y acertarle
+                 a «Pegar», que en una tableta falla una de cada tres veces.
+                 Nace escondido: la pantalla lo enseña solo donde el
+                 navegador deja leer el portapapeles. -->
+            <button type="button" class="voz-btn voz-btn-chico" id="voz-rec-pegar"
+                    aria-label="Pegar la dirección del portapapeles" hidden>📋</button>
+          </div>
         </div>
         <p class="voz-aj-nota voz-rec-nota" id="voz-rec-url-nota" hidden></p>
 
@@ -2496,6 +2538,44 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <p class="voz-falta" id="voz-rec-falta" hidden></p>
         <button type="button" class="voz-btn voz-btn-pri voz-btn-ancho" id="voz-rec-guardar">🔗 Guardar el recurso</button>
         <div class="voz-rec-pie" id="voz-rec-pie"></div>
+      </div>
+    </div>
+
+    <!-- Pegar VARIOS de golpe. Misma casa que la de arriba —dentro de
+         #voz-lector, por el z-index— y con el repaso antes de guardar, que
+         es lo que impide colgar en una lectura un enlace que no lleva a
+         ninguna parte. -->
+    <div id="voz-recv-overlay" class="fin-modal-overlay voz-rec-overlay" style="display:none;">
+      <div class="fin-modal" role="dialog" aria-modal="true" aria-labelledby="voz-recv-tit">
+        <div class="msug-det-head">
+          <div class="msug-det-titulo" id="voz-recv-tit">📋 Pegar varios recursos</div>
+          <button type="button" class="msug-det-cerrar" id="voz-recv-cerrar" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="voz-campo">
+          <label for="voz-recv-txt">Las direcciones, una por renglón</label>
+          <textarea id="voz-recv-txt" rows="7" spellcheck="false"
+                    placeholder="Resumen en audio | https://1drv.ms/…&#10;Mapa mental | https://1drv.ms/…&#10;https://1drv.ms/…"></textarea>
+        </div>
+        <button type="button" class="voz-btn voz-btn-ancho" id="voz-recv-pegar" hidden>📋 Pegar del portapapeles</button>
+
+        <div class="voz-recv-repaso" id="voz-recv-repaso"></div>
+
+        <div class="voz-campo">
+          <label for="voz-recv-origen-h">Quién los trae</label>
+          <div class="voz-chips voz-chips-form" id="voz-recv-origen"
+               role="group" aria-labelledby="voz-recv-origen-h"></div>
+          <span id="voz-recv-origen-h" hidden>Quién los trae</span>
+          <!-- Viene marcado 🤖 porque esta puerta existe para el montón que
+               devuelve un cuaderno de NotebookLM. Se dice, para que quien
+               pegó sus propios enlaces sepa que tiene que tocarlo. -->
+          <p class="voz-aj-nota">Viene marcado 🤖 porque esto suele ser lo que devuelve un cuaderno: si los elegiste tú, tócalo.</p>
+        </div>
+
+        <button type="button" class="voz-btn voz-btn-pri voz-btn-ancho" id="voz-recv-guardar">🔗 Poner los recursos</button>
+        <p class="voz-aj-nota">Lo que no cuadre se corrige después con el ✏️ de cada tarjeta.</p>
       </div>
     </div>
   </div>

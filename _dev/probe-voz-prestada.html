@@ -3471,6 +3471,244 @@ function filasHoja(d){
   w.eval('vozCerrarLector()');
   await esperar(200);
 
+  /* ── 39. COMPARTIR A F.A.R.O ──
+     Pedido por el autor el 18 de septiembre de 2026: sus recursos de
+     NotebookLM viven en OneDrive y traer un enlace hasta aquí eran diez
+     toques y tres aplicaciones.
+
+     ⚠️ Lo que de verdad puede salir mal aquí y no se ve son DOS cosas:
+     que el manifiesto y el código se llamen los parámetros de dos maneras
+     —entonces lo compartido llega y no lo recoge nadie, sin ningún error,
+     con la aplicación abriendo como siempre: la costura de la regla 13
+     otra vez—, y que el enlace venga DENTRO del texto y no en el campo
+     `url`, que es lo que hacen casi todas las aplicaciones de Android. */
+  log('── 39. Compartir a F.A.R.O desde otra aplicación ──');
+  let manif39 = null;
+  try { manif39 = await (await fetch('../manifest.json', { cache: 'no-store' })).json(); } catch (e) {}
+  const st39 = manif39 && manif39.share_target;
+  ok(!!st39 && String(st39.method || '').toUpperCase() === 'GET' && /index\.html$/.test(st39.action || ''),
+     'manifest.json declara la puerta de compartir (GET a index.html): es lo que pone a F.A.R.O en la hoja de compartir de Android',
+     'no hay share_target en el manifiesto, o no es un GET a index.html: ' + JSON.stringify(st39 || null));
+  const par39 = JSON.parse(w.eval('JSON.stringify(VOZ_COMP_PARAMS)'));
+  ok(!!st39 && st39.params && st39.params.url === par39.url
+     && st39.params.text === par39.txt && st39.params.title === par39.tit,
+     '⚠️ Y LOS NOMBRES DEL MANIFIESTO SON LOS QUE LEE LA HERRAMIENTA (VOZ_COMP_PARAMS). Escritos en dos sitios, cambiar uno dejaría lo compartido llegando y sin nadie que lo recoja —sin error ninguno—',
+     '⚠️ el manifiesto y el código NO dicen lo mismo: manifiesto=' + JSON.stringify(st39 && st39.params) + ' código=' + JSON.stringify(par39));
+
+  const base39 = nuevaBase(w, { act: [], recs: [] });
+  await w.eval('initVozPrestada()');
+  await esperar(400);
+  const cid39 = String(w.eval('_vozCuentos[0].cid'));
+  /* La etiqueta se compara con la del PROPIO texto, leída ahora: una
+     inyectada a mano probaría que la sonda sabe escribir, no que la
+     lista lleva la etiqueta del texto que está enseñando. */
+  const voz39 = String(w.eval('_vozCuentos[0].voz || ""'));
+  const maq39 = String(w.eval('_vozCuentos[0].maquina || ""'));
+  const limpio39 = String(w.eval('location.pathname'));
+
+  /* Lo que manda OneDrive de verdad: el enlace DENTRO del texto, con una
+     frase delante, y el nombre del archivo en el título —con veneno, que
+     esto lo escribió otra aplicación—. */
+  const tit39 = 'Resumen en audio <img src=x onerror="window.__colado39=1">';
+  w.eval('history.replaceState(null, "", ' + JSON.stringify(limpio39) + ' + "?comp_tit=" + '
+    + JSON.stringify(encodeURIComponent(tit39)) + ' + "&comp_txt=" + '
+    + JSON.stringify(encodeURIComponent('Mira este archivo: https://1drv.ms/u/s!AbCdEf/resumen.mp3')) + ')');
+
+  /* ⚠️ Se llama al ÁRBITRO DE VERDAD (`faroArranqueInicio`, js/app.js) y
+     no a una copia escrita al lado: un doble que reparte el turno a su
+     manera aprobaría con el reparto de verdad roto (regla 34). */
+  const quien39 = String(w.eval('faroArranqueInicio()'));
+  await esperar(500);
+  ok(quien39 === 'compartido',
+     '⚠️ lo compartido gana el arranque por encima de los dos interruptores de aparato: `faroArranqueInicio` devuelve «compartido»',
+     'el árbitro del arranque devolvió «' + quien39 + '»: lo compartido se perdió por el camino');
+
+  const ovC39 = d.getElementById('voz-comp-overlay');
+  ok(!!ovC39 && ovC39.style.display === 'flex', 'y se abre la hoja de «¿a qué lectura va?»',
+     'la hoja de lo compartido no se abrió');
+  ok(!!ovC39 && ovC39.parentElement && ovC39.parentElement.id === 'view-voz',
+     '⚠️ y cuelga de #view-voz y NO de la sala: llega con la sala cerrada, y dentro de #voz-lector (que está hidden) no se vería nada —que es la avería de las hojas del taller, regla 35—',
+     'la hoja cuelga de ' + (ovC39 && ovC39.parentElement && ovC39.parentElement.id));
+  const caja39 = ovC39.querySelector('.fin-modal').getBoundingClientRect();
+  const enc39 = d.elementFromPoint(caja39.left + caja39.width / 2, caja39.top + 20);
+  ok(!!enc39 && ovC39.contains(enc39),
+     'y el dedo la toca a ella (medido con elementFromPoint, no leyendo el z-index)',
+     'en ese punto hay ' + (enc39 && (enc39.id || enc39.className)));
+
+  const que39 = d.getElementById('voz-comp-que');
+  ok(/1drv\.ms/.test(que39.textContent) && /resumen\.mp3/.test(que39.textContent),
+     '⚠️ LA DIRECCIÓN SE SACA DE DENTRO DEL TEXTO, que es donde la mandan casi todas las aplicaciones de Android (EXTRA_TEXT): leyendo solo el campo `url`, esto no recibiría nada en la mitad de ellas y sin dar ningún error',
+     'no encontró el enlace dentro del texto compartido: ' + que39.textContent.slice(0, 120));
+  ok(!w.__colado39 && que39.querySelectorAll('img').length === 0 && /<img src=x/.test(que39.textContent),
+     'y lo que mandó la otra aplicación se pinta como TEXTO: ni un elemento creado',
+     'el veneno de lo compartido creó elementos o se ejecutó');
+  ok(String(w.eval('vozRecTipoDeUrl("https://1drv.ms/u/s!AbCdEf/resumen.mp3")')) === 'audio',
+     'el tipo se adivina de la dirección (un .mp3 es 🎧 Audio), y se puede cambiar con un toque desde ✏️',
+     'el tipo adivinado para un .mp3 fue ' + w.eval('vozRecTipoDeUrl("https://1drv.ms/u/s!AbCdEf/resumen.mp3")'));
+
+  const item39 = [...ovC39.querySelectorAll('.voz-comp-item')];
+  ok(item39.length === 1 && !!voz39 && !!maq39
+     && item39[0].textContent.indexOf(voz39) >= 0 && item39[0].textContent.indexOf(maq39) >= 0,
+     '⚠️ y cada lectura de la lista trae SU ETIQUETA —la voz y la máquina—: una lista compacta que la perdiera sería la forma más barata de romper la regla 1',
+     'la lista sale sin etiqueta: ' + (item39[0] ? item39[0].textContent.slice(0, 90) : '(vacía)'));
+
+  /* Se PULSA la lectura, como se pulsa con el dedo. */
+  item39[0].click();
+  await esperar(900);
+  const ovR39 = d.getElementById('voz-rec-overlay');
+  ok(ovC39.style.display === 'none' && !d.getElementById('voz-lector').hidden && ovR39.style.display === 'flex',
+     '⚠️ elegir la lectura ABRE LA SALA y encima la hoja del recurso: la hoja cuelga dentro de #voz-lector, así que con la sala cerrada el botón respondería y no se vería nada',
+     'no quedó la hoja del recurso abierta sobre la sala');
+  ok(d.getElementById('voz-rec-url').value === 'https://1drv.ms/u/s!AbCdEf/resumen.mp3',
+     'con la dirección ya puesta',
+     'la dirección no llegó al campo: ' + JSON.stringify(d.getElementById('voz-rec-url').value));
+  ok(d.getElementById('voz-rec-nom').value === tit39,
+     'y con el nombre que mandó quien compartió, que dice bastante más que «1drv.ms»',
+     'el nombre salió como ' + JSON.stringify(d.getElementById('voz-rec-nom').value));
+  ok(String(w.eval('_vozRecEnHoja.tipo')) === 'audio',
+     'y el tipo ya viene marcado 🎧',
+     'el tipo quedó en ' + w.eval('_vozRecEnHoja.tipo'));
+  ok(!/comp_/.test(String(w.eval('location.search'))),
+     '⚠️ y la dirección de la página se limpia al atenderla: si no, recargar más tarde volvería a abrir la hoja de la nada',
+     'los parámetros siguen puestos: ' + w.eval('location.search'));
+
+  d.getElementById('voz-rec-guardar').click();
+  await esperar(2100);
+  const fila39 = base39.recsEscritos.find(x => x.url === 'https://1drv.ms/u/s!AbCdEf/resumen.mp3');
+  ok(!!fila39 && fila39.anadido_por === VOZ_UID && fila39.mision === 'voz:' + cid39 && fila39.tipo === 'audio',
+     '⚠️ y la nube recibió el recurso compartido FIRMADO, con su mision=«voz:…» y su tipo (que aparezca en la pantalla es la copia del aparato, y se ve igual de bien cuando la subida rebotó)',
+     'la nube no lo recibió: ' + JSON.stringify(fila39 || null) + ' · la herramienta dice «' + w.eval('vozRecRotuloNube()') + '»');
+  w.eval('vozCerrarLector()');
+  await esperar(200);
+
+  /* Compartir un TEXTO sin ninguna dirección no es un callejón sin
+     salida: entra por la hoja de pegar de siempre. */
+  const ensayo39 = 'Un ensayo entero mandado desde el chat de una máquina. ' + 'Palabra '.repeat(80);
+  w.eval('history.replaceState(null, "", ' + JSON.stringify(limpio39) + ' + "?comp_txt=" + '
+    + JSON.stringify(encodeURIComponent(ensayo39)) + ')');
+  w.eval('faroArranqueInicio()');
+  await esperar(400);
+  const bt39 = d.getElementById('voz-comp-texto');
+  ok(ovC39.style.display === 'flex' && !bt39.hidden && /no trae ninguna direcci/i.test(que39.textContent),
+     'lo compartido SIN dirección se dice con palabras y ofrece guardarlo como un texto del anaquel, en vez de dejar una pantalla sin salida',
+     'no ofrece la salida: ' + que39.textContent.slice(0, 90) + ' / botón oculto=' + bt39.hidden);
+  bt39.click();
+  await esperar(400);
+  ok(d.getElementById('voz-pegar-overlay').style.display === 'flex'
+     && d.getElementById('voz-pegar-txt').value.indexOf('Un ensayo entero') === 0,
+     'y entra por la hoja de pegar de siempre, con el texto ya puesto: no hay un segundo lector ni un segundo formulario',
+     'no se abrió la hoja de pegar con el texto');
+  w.eval('vozCerrarPegar && vozCerrarPegar()');
+  await esperar(150);
+  w.eval('history.replaceState(null, "", ' + JSON.stringify(limpio39) + ')');
+  ok(w.eval('faroArranqueCompartido()') === false,
+     'y sin nada compartido no se roba la pantalla: el arranque sigue siendo el de siempre',
+     'faroArranqueCompartido dice que sí sin parámetros ningunos');
+
+
+  /* ── 40. PEGAR VARIOS RECURSOS DE GOLPE ──
+     La otra mitad de lo mismo, y la que sirve también en el iPad, donde
+     no existe la hoja de compartir de Android.
+
+     ⚠️ Lo que se vigila aquí es la asimetría de la regla 3 con el filo
+     puesto del lado que corta: un renglón de prosa convertido en recurso
+     cuelga en la lectura un enlace que no lleva a ninguna parte Y PARECE
+     QUE FUNCIONÓ. Por eso el caso que importa es «informe.pdf», que sin
+     la frontera de VOZ_REC_TLD entraría como `https://informe.pdf`. */
+  log('── 40. Pegar varios recursos de golpe ──');
+  const base40 = nuevaBase(w, { act: [], recs: [] });
+  /* ⚠️ Con la repisa VACÍA, y no es un detalle de limpieza: el recurso
+     que dejó puesto la comprobación 39 subiría al arrancar y contaría
+     como un viaje de escritura, o sea que la comprobación de «un solo
+     viaje» aprobaría o suspendería por lo que hizo la de antes. */
+  w.eval('(function(){ try { localStorage.removeItem(VOZ_REC); } catch (e) {} _vozRecTodo = null; })()');
+  await w.eval('initVozPrestada()');
+  await esperar(400);
+  const cid40 = String(w.eval('_vozCuentos[0].cid'));
+  w.eval('vozAbrirLector(' + JSON.stringify(cid40) + ')');
+  await esperar(700);
+  w.eval("vozPintarPanelInd('recs'); vozAbrirPanel('voz-panel-ind')");
+  await esperar(250);
+  const bVar40 = [...d.querySelectorAll('#voz-panel-ind button')].find(b => /Pegar varios/.test(b.textContent));
+  ok(!!bVar40, 'la pestaña 🔗 Recursos ofrece pegar varios de golpe', 'no sale el botón de pegar varios');
+  bVar40.click();
+  await esperar(300);
+  const ovV40 = d.getElementById('voz-recv-overlay');
+  ok(ovV40.style.display === 'flex' && ovV40.parentElement.id === 'voz-lector',
+     'pulsarlo abre su hoja, colgada dentro de #voz-lector para que salga por encima de la sala',
+     'no abrió, o cuelga de ' + (ovV40.parentElement && ovV40.parentElement.id));
+  const cajaV40 = ovV40.querySelector('.fin-modal').getBoundingClientRect();
+  const encV40 = d.elementFromPoint(cajaV40.left + cajaV40.width / 2, cajaV40.top + 20);
+  ok(!!encV40 && ovV40.contains(encV40), 'y el dedo la toca a ella (elementFromPoint)',
+     'en ese punto hay ' + (encV40 && (encV40.id || encV40.className)));
+
+  const pegado40 = [
+    'Resumen en audio | https://1drv.ms/u/s!aaa/resumen.mp3',
+    '[Mapa mental <img src=x onerror="window.__colado40=1">](https://1drv.ms/u/s!bbb/mapa.png)',
+    'https://www.youtube.com/watch?v=abc123',
+    'www.khanacademy.org/math/fracciones',
+    'Guía de estudio — informe.pdf',
+    'Este renglón es prosa y no lleva nada.',
+    'javascript:alert(1)',
+    'https://1drv.ms/u/s!aaa/resumen.mp3',
+  ].join('\n');
+  const ta40 = d.getElementById('voz-recv-txt');
+  ta40.value = pegado40;
+  ta40.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(250);
+
+  const leido40 = JSON.parse(w.eval('JSON.stringify(_vozRecV.leido)'));
+  ok(leido40.items.length === 4,
+     'entiende las cuatro formas que se escriben de verdad: «Nombre | dirección», [Nombre](dirección), la dirección sola y el dominio sin https',
+     'entendió ' + leido40.items.length + ' en vez de 4: ' + JSON.stringify(leido40.items.map(x => x.url)));
+  ok(leido40.repes.length === 1,
+     'y el repetido se salta en vez de colgarse dos veces',
+     'los repetidos salieron ' + leido40.repes.length);
+  ok(leido40.malos.length === 3 && leido40.malos.map(m => m.n).join(',') === '5,6,7',
+     '⚠️ Y LOS TRES QUE NO LO ERAN SE QUEDAN FUERA Y SE NOMBRAN CON SU NÚMERO DE RENGLÓN (5, 6 y 7). «informe.pdf» es el que importa: sin la frontera de VOZ_REC_TLD entraría como https://informe.pdf y colgaría un enlace muerto que parece bueno',
+     'los renglones malos salieron ' + JSON.stringify(leido40.malos));
+  const tipos40 = leido40.items.map(x => x.tipo).join(',');
+  ok(tipos40 === 'audio,mapa,video,ejercicio',
+     'y a cada uno se le adivina su tipo por la dirección (' + tipos40 + '), que se ve antes de guardar y se cambia con un toque',
+     'los tipos adivinados fueron ' + tipos40);
+
+  const rep40 = d.getElementById('voz-recv-repaso');
+  ok(/Entendí 4 recursos/.test(rep40.textContent) && /Renglón 5/.test(rep40.textContent),
+     'el repaso lo dice ANTES de guardar, con los renglones que no entendió a la vista',
+     'el repaso no lo cuenta: ' + rep40.textContent.slice(0, 140));
+  ok(!w.__colado40 && rep40.querySelectorAll('img').length === 0 && /<img src=x/.test(rep40.textContent),
+     'y un nombre con HTML dentro se pinta como texto: ni un elemento creado',
+     'el veneno del pegado creó elementos o se ejecutó');
+
+  d.getElementById('voz-recv-guardar').click();
+  await esperar(300);
+  ok(ovV40.style.display === 'none' && Number(w.eval('vozRecCuenta(' + JSON.stringify(cid40) + ')')) === 4,
+     'guardar pone los cuatro de una vez',
+     'quedaron ' + w.eval('vozRecCuenta(' + JSON.stringify(cid40) + ')') + ' recursos');
+  w.eval("vozPintarPanelInd('recs')");
+  await esperar(250);
+  const cards40 = [...d.querySelectorAll('#voz-panel-ind .voz-rec-card')];
+  ok(cards40.length === 4 && cards40.every(c => /lo trajo una máquina/.test(c.textContent)),
+     '⚠️ y los cuatro salen con la etiqueta 🤖: esta puerta existe para el montón que devuelve un cuaderno, y de los dos errores posibles el que la regla 1 existe para impedir es el otro —etiquetar como de la casa lo que hizo una máquina—',
+     'no todos llevan la etiqueta de máquina');
+  const ordenes40 = JSON.parse(w.eval('JSON.stringify(vozRecDe(' + JSON.stringify(cid40) + ').map(r => r.orden))'));
+  ok(ordenes40.length === 4 && ordenes40.every((x, i) => i === 0 || x > ordenes40[i - 1]),
+     'y en el orden en que se pegaron, sin empates que hagan bailar la repisa entre un arranque y el siguiente',
+     'el orden salió ' + JSON.stringify(ordenes40));
+
+  await esperar(2100);
+  const escritos40 = base40.recsEscritos.filter(x => x.mision === 'voz:' + cid40);
+  ok(escritos40.length === 4 && escritos40.every(x => x.anadido_por === VOZ_UID && x.origen === 'maquina'),
+     'la nube los recibió los cuatro, firmados y con su etiqueta',
+     'la nube recibió ' + escritos40.length + ': ' + w.eval('vozRecRotuloNube()'));
+  const viajes40 = base40.llamadas.filter(x => /recursos_enlaces/.test(x.url) && x.m !== 'GET');
+  ok(viajes40.length === 1,
+     '⚠️ Y EN UN SOLO VIAJE A LA NUBE, no cuatro: con la señal de una tableta, cuatro escrituras por pegado es lo que hace que un cuaderno entero tarde',
+     'hubo ' + viajes40.length + ' viajes de escritura para un solo pegado');
+  w.eval('vozCerrarLector()');
+  await esperar(150);
+
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

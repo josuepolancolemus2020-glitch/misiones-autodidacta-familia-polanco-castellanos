@@ -2410,6 +2410,13 @@ function vozRender() {
     cont.appendChild(caja);
     if (manual) vozMontarArrastre(caja);
   });
+
+  /* ⚠️ Y SI HAY UNA HOJA DE LO COMPARTIDO ABIERTA, SE REPINTA. Llega con
+     la aplicación recién abierta, o sea con el anaquel todavía en lo que
+     guarda el aparato: sin esto, la lista de lecturas entre las que
+     elegir se quedaría con las de antes de que contestara la nube, y un
+     texto puesto desde otro aparato no aparecería. */
+  if (_vozComp) vozCompPintar();
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -5699,6 +5706,10 @@ function vozRecDominio(u) {
 /* El nombre que se adivina de una dirección, para no pedir lo que se
    puede deducir (regla 1 del Apunte rápido). Del último trozo del camino
    si dice algo, y si no del dominio. */
+const VOZ_REC_NO_NOMBRE = ['watch', 'view', 'index', 'home', 'default', 'file',
+  'files', 'download', 'share', 'shared', 'embed', 'video', 'audio', 'item',
+  'edit', 'preview', 'open', 'redir', 'link', 'page', 'main', 'start'];
+
 function vozRecNombreDeUrl(u) {
   const dom = vozRecDominio(u);
   let trozo = '';
@@ -5707,11 +5718,177 @@ function vozRecNombreDeUrl(u) {
     const ult = partes[partes.length - 1] || '';
     trozo = decodeURIComponent(ult).replace(/\.(html?|php|aspx?|pdf)$/i, '').replace(/[-_+]+/g, ' ').trim();
     /* Un identificador («a8f3c210», «watch») no es un nombre: mejor el
-       dominio solo que un título que no dice nada. */
+       dominio solo que un título que no dice nada.
+       ⚠️ Y «watch» estaba escrito aquí de ejemplo y pasaba igual, porque
+       tiene cinco letras y una vocal: un vídeo de YouTube entraba en la
+       repisa llamándose «Watch — youtube.com». Se vio al pegar varios de
+       golpe, donde salen cuatro nombres juntos y uno no dice nada; con
+       uno solo cada vez, nadie se había fijado. Son las palabras que
+       ningún sitio usa como título, descartadas a mano como las
+       terminaciones de archivo de la regla 29. */
+    if (VOZ_REC_NO_NOMBRE.indexOf(trozo.toLowerCase()) >= 0) trozo = '';
     if (trozo.length < 4 || trozo.length > 90 || !/[aeiouáéíóú]/i.test(trozo) || /^\d+$/.test(trozo)) trozo = '';
   } catch (e) {}
   if (!trozo) return dom;
   return trozo.charAt(0).toUpperCase() + trozo.slice(1) + (dom ? ' — ' + dom : '');
+}
+
+/* ⚠️ EL TIPO SE ADIVINA DE LA DIRECCIÓN, Y AQUÍ SÍ SE PUEDE ADIVINAR.
+   Parece que contradice la regla que no se negocia de los videos de
+   M.E.T.A.S y del taller —«si el texto no dice cuál es la correcta, no se
+   marca ninguna»—, y no la contradice: allá lo adivinado es la RESPUESTA
+   de un examen, que nadie vuelve a mirar y que solo se descubre cuando
+   alguien acierta y la pantalla le dice que falló. Aquí lo adivinado es un
+   icono que se ve en la tarjeta, al lado del nombre, y que se cambia con
+   un toque desde ✏️. Un error que se ve y se arregla en un toque no es de
+   la misma familia que uno que nadie puede ver. Es la misma licencia que
+   ya se toma `vozRecNombreDeUrl` con el nombre.
+   Y lo que no se reconoce cae en el primero —📱 App o web—, que es el que
+   no afirma nada. */
+function vozRecTipoDeUrl(u) {
+  const t = String(u || '').toLowerCase();
+  let dom = '', cam = '';
+  try { const x = new URL(t); dom = x.hostname.replace(/^www\./, ''); cam = x.pathname; } catch (e) { cam = t; }
+  const ext = (cam.match(/\.([a-z0-9]{2,5})$/) || [])[1] || '';
+
+  if (['mp3', 'm4a', 'wav', 'ogg', 'oga', 'aac', 'flac', 'opus'].indexOf(ext) >= 0) return 'audio';
+  if (['mp4', 'webm', 'mov', 'mkv', 'avi'].indexOf(ext) >= 0) return 'video';
+  if (['pdf', 'doc', 'docx', 'odt', 'epub', 'txt', 'rtf'].indexOf(ext) >= 0) return 'lectura';
+  if (['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].indexOf(ext) >= 0) return 'mapa';
+
+  const tiene = l => l.some(d => dom === d || dom.endsWith('.' + d));
+  if (tiene(['youtube.com', 'youtu.be', 'vimeo.com', 'dailymotion.com', 'tiktok.com'])) return 'video';
+  if (tiene(['spotify.com', 'soundcloud.com', 'ivoox.com', 'podcasts.apple.com', 'anchor.fm'])) return 'audio';
+  if (tiene(['coursera.org', 'edx.org', 'udemy.com', 'classroom.google.com', 'platzi.com', 'domestika.org'])) return 'curso';
+  if (tiene(['khanacademy.org', 'duolingo.com', 'quizlet.com', 'wordwall.net', 'liveworksheets.com',
+             'geogebra.org', 'kahoot.it', 'educaplay.com', 'blooket.com'])) return 'ejercicio';
+  if (tiene(['miro.com', 'mindmeister.com', 'canva.com', 'lucid.app', 'coggle.it', 'xmind.app'])) return 'mapa';
+  if (tiene(['wikipedia.org', 'jstor.org', 'scielo.org', 'dialnet.unirioja.es', 'redalyc.org',
+             'academia.edu', 'researchgate.net', 'medium.com'])) return 'lectura';
+  if (/(^|\/)mapa|mindmap|esquema/.test(cam)) return 'mapa';
+  if (/(^|\/)(guia|guide|resumen|summary|apuntes)/.test(cam)) return 'lectura';
+  return VOZ_REC_TIPOS[0].id;
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   PEGAR VARIOS RECURSOS DE GOLPE
+   ═════════════════════════════════════════════════════════════════
+   Pedido por el autor el 18 de septiembre de 2026, contando cómo trabaja
+   de verdad: lo que NotebookLM le genera para un ensayo —el audio, el
+   mapa mental, la guía de estudio— no se puede compartir desde ahí, así
+   que lo baja, lo sube a OneDrive y saca el enlace de cada uno. Cuando
+   llega aquí ya tiene seis direcciones y la paciencia gastada.
+
+   ⚠️ SE PEGAN DE GOLPE, COMO TODO LO DEMÁS EN ESTA CASA. Es el patrón del
+   guion de El Rodaje, de las preguntas de los videos de M.E.T.A.S, del
+   texto de esta misma herramienta y de las actividades del taller, y por
+   el mismo motivo: el material ya viene escrito en otra ventana y meterlo
+   de uno en uno son doce toques por recurso en una tableta. Con seis
+   recursos por cuaderno, eso es exactamente lo que hace que los recursos
+   no se pongan.
+
+   ⚠️ Y AQUÍ MANDA LA ASIMETRÍA DE LA REGLA 3, con el mismo filo:
+
+     equivocarse hacia «este renglón no era una dirección» cuesta un
+     renglón NOMBRADO que se arregla a mano;
+     equivocarse hacia «esto sí lo era» cuelga en la lectura un recurso
+     que no lleva a ninguna parte Y PARECE QUE FUNCIONÓ —sale su tarjeta,
+     sale su icono, sale todo—, y no se descubre hasta que alguien lo
+     toca, que puede ser dentro de un mes.
+
+   Ante la duda, no es una dirección.
+   ════════════════════════════════════════════════════════════════ */
+
+/* Las terminaciones que se aceptan SIN `https://` delante. No es la lista
+   de todas las que existen —ni falta que hace—: es la frontera que separa
+   «algo.com» de «informe.pdf», que sin ella entraría como
+   `https://informe.pdf` y colgaría un enlace muerto sin dar ningún error.
+   Es la misma cautela de `vozDominioAlFinal` (regla 29), que descarta a
+   mano las terminaciones de archivo. Lo que no esté aquí entra igual,
+   pero escribiendo su `https://`. */
+const VOZ_REC_TLD = ['com', 'org', 'net', 'edu', 'gov', 'int', 'mil', 'io', 'app', 'co',
+  'es', 'mx', 'hn', 'gt', 'cr', 'pa', 'do', 'sv', 'ni', 'py', 'uy', 'bo', 'ec', 've',
+  'ar', 'cl', 'pe', 'br', 'us', 'uk', 'ca', 'fr', 'de', 'it', 'pt',
+  'ai', 'dev', 'me', 'tv', 'info', 'page', 'online', 'site', 'xyz', 'blog', 'academy'];
+
+function vozRecPareceDominio(t) {
+  const s = String(t || '').trim();
+  if (/^www\./i.test(s)) return true;
+  const host = s.split('/')[0];
+  const ult = (host.split('.').pop() || '').toLowerCase();
+  return VOZ_REC_TLD.indexOf(ult) >= 0;
+}
+
+/* Lo que queda del renglón después de quitarle la dirección, limpio de
+   los separadores con que la gente las escribe. Menos de tres letras no
+   es un nombre: mejor el que se deduce de la dirección. */
+function vozRecNombreSuelto(x) {
+  const t = String(x || '')
+    .replace(/[|\t]+/g, ' ')
+    .replace(/^[\s—–·•:\-]+/, '')
+    .replace(/[\s—–·•:\-]+$/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return t.length >= 3 ? t.slice(0, 200) : '';
+}
+
+/* Un renglón → {url, nombre}, o nada. Tres formas y ninguna más, que son
+   las que se escriben de verdad. */
+function vozRecUrlDeLinea(linea) {
+  const l = String(linea || '').replace(/^\s*[-*•·]\s+/, '').replace(/^\s*\d+[.)]\s+/, '').trim();
+  if (!l) return null;
+
+  /* 1) Como las escribe una máquina que hace listas: [Nombre](dirección). */
+  const m = l.match(/^\[([^\]]{1,200})\]\(\s*([^\s)]+)\s*\)$/);
+  if (m) {
+    const u = vozRecMiraUrl(m[2]);
+    return u.ok ? { url: u.url, nombre: vozRecNombreSuelto(m[1]) } : null;
+  }
+
+  /* 2) Lo normal: un http(s) en algún sitio del renglón. Lo que queda a
+     los lados es el nombre —«Guía de estudio | https://…», «https://…
+     (mapa mental)»— y si no queda nada se deduce de la dirección. */
+  const h = l.match(/https?:\/\/[^\s<>"'\)\]]+/);
+  if (h) {
+    const u = vozRecMiraUrl(h[0]);
+    if (!u.ok) return null;
+    return { url: u.url, nombre: vozRecNombreSuelto(l.slice(0, h.index) + ' ' + l.slice(h.index + h[0].length)) };
+  }
+
+  /* 3) Un dominio pelado al final del renglón, que es como se escribe sin
+     acordarse del https. Solo si de verdad lo parece: ver VOZ_REC_TLD. */
+  const t = l.match(/(?:^|[\s|\t])((?:www\.)?[\w-]+(?:\.[\w-]+)+(?:\/\S*)?)$/);
+  if (t && vozRecPareceDominio(t[1])) {
+    const u = vozRecMiraUrl(t[1]);
+    if (u.ok) return { url: u.url, nombre: vozRecNombreSuelto(l.slice(0, l.length - t[1].length)) };
+  }
+  return null;
+}
+
+/* El repaso ENTERO antes de guardar: lo entendido, lo repetido y los
+   renglones que no se entendieron CON SU NÚMERO. Un rechazo callado se
+   ve desde fuera igual que una herramienta rota (regla 14), y «se
+   pusieron 4 de 6» sin decir cuáles dos obliga a contar a mano. */
+function vozRecLeerVarios(txt, cid) {
+  const yaHay = new Set(vozRecDe(cid).map(r => r.url));
+  const vistos = new Set();
+  const items = [], repes = [], malos = [];
+  String(txt || '').split(/\r?\n/).forEach((linea, i) => {
+    const l = linea.trim();
+    if (!l) return;
+    const d = vozRecUrlDeLinea(l);
+    if (!d) { malos.push({ n: i + 1, t: l.slice(0, 70) }); return; }
+    /* Repetido no es un error: el mismo enlace pegado dos veces —o uno
+       que ya estaba— se dice y se salta. Colgarlo dos veces sí lo sería. */
+    if (yaHay.has(d.url) || vistos.has(d.url)) { repes.push(d.url); return; }
+    vistos.add(d.url);
+    items.push({
+      url: d.url,
+      tit: (d.nombre || vozRecNombreDeUrl(d.url)).slice(0, 200),
+      tipo: vozRecTipoDeUrl(d.url),
+    });
+  });
+  return { items: items, repes: repes, malos: malos };
 }
 
 /* ── Guardar, quitar, y la nube ────────────────────────────────────── */
@@ -5910,6 +6087,15 @@ function vozRecPintarPanel(cuerpo, c) {
     lista.length ? '➕ Otro recurso' : '➕ Poner un recurso',
     () => vozRecAbrirHoja(c.cid, null)));
 
+  /* Y la puerta de los montones: seis enlaces de un cuaderno de
+     NotebookLM entran de una vez. Va DEBAJO del de uno solo porque uno
+     solo es lo que se hace casi siempre; este es el atajo del día que se
+     archiva un cuaderno entero. */
+  cuerpo.appendChild(vozBoton('voz-btn voz-btn-ancho',
+    '📋 Pegar varios de golpe',
+    () => vozRecVAbrir(c.cid),
+    'Pegar varias direcciones, una por renglón'));
+
   const est = vozNodo('p', 'voz-aj-nota voz-rec-estado', vozRecRotuloNube());
   est.id = 'voz-rec-estado';
   cuerpo.appendChild(est);
@@ -5992,7 +6178,7 @@ function vozRecTarjeta(c, r) {
 
 /* ── La hoja de poner o corregir un recurso ──────────────────────────── */
 
-function vozRecAbrirHoja(cid, r) {
+function vozRecAbrirHoja(cid, r, pre) {
   const ov = document.getElementById('voz-rec-overlay');
   if (!ov) return;
   _vozRecEnHoja = { cid: cid, id: (r && r.id) || null };
@@ -6002,7 +6188,7 @@ function vozRecAbrirHoja(cid, r) {
   _vozRecAuto = {};
   const g = id => document.getElementById(id);
   g('voz-rec-tit').textContent = r ? '✏️ Corregir el recurso' : '🔗 Un recurso para reforzar';
-  g('voz-rec-url').value = (r && r.url) || '';
+  g('voz-rec-url').value = (r && r.url) || (pre && pre.url) || '';
   g('voz-rec-nom').value = (r && r.tit) || '';
   g('voz-rec-para').value = (r && r.para) || '';
   g('voz-rec-dura').value = (r && r.dura) || '';
@@ -6010,11 +6196,31 @@ function vozRecAbrirHoja(cid, r) {
   _vozRecEnHoja.origen = (r && r.origen) || 'casa';
   g('voz-rec-guardar').textContent = r ? '💾 Guardar los cambios' : '🔗 Guardar el recurso';
   ov.style.display = 'flex';
+
+  /* ⚠️ LO COMPARTIDO ENTRA POR LA MISMA PUERTA QUE LO TECLEADO: se
+     rellena el campo y se dispara el MISMO relleno automático. Con un
+     camino aparte, un arreglo del relleno se haría en uno y se quedaría
+     sin hacer en el otro —que es la razón por la que corregir un texto y
+     pegarlo son la misma hoja (regla 9 del Apunte rápido)—. */
+  if (!r && pre && pre.url) {
+    _vozRecEnHoja.tipo = vozRecTipoDeUrl(pre.url);
+    vozRecAlEscribirUrl();
+    /* El nombre que manda quien comparte gana al deducido de la
+       dirección —«Guía de estudio — Burocracia» dice bastante más que
+       «1drv.ms»—, pero solo pisa lo que rellenó la pantalla (regla 18). */
+    const nom = g('voz-rec-nom');
+    const propuesto = vozRecNombreSuelto(pre.tit || '') || vozRecNombreSuelto(pre.resto || '');
+    if (propuesto && (!nom.value.trim() || nom.value === _vozRecAuto.nom)) {
+      nom.value = propuesto.slice(0, 200);
+      _vozRecAuto.nom = nom.value;
+    }
+  }
   vozRecPintarHoja();
   /* El foco va DENTRO del mismo toque, sin ningún `await` delante: es lo
      que hace que en una tableta salga el teclado solo (regla 4 del Apunte
-     rápido). Al corregir va al nombre, que es lo que se suele retocar. */
-  try { g(r ? 'voz-rec-nom' : 'voz-rec-url').focus(); } catch (e) {}
+     rápido). Al corregir va al nombre, que es lo que se suele retocar, y
+     lo mismo con lo compartido: la dirección ya viene puesta. */
+  try { g((r || (pre && pre.url)) ? 'voz-rec-nom' : 'voz-rec-url').focus(); } catch (e) {}
 }
 
 function vozRecCerrarHoja() {
@@ -6137,6 +6343,177 @@ function vozRecGuardarHoja() {
   vozAviso(viejo ? '🔗 Recurso corregido' : '🔗 Recurso puesto');
 }
 
+/* ── El portapapeles ─────────────────────────────────────
+   Un toque en vez de mantener tocado el recuadro y acertarle a «Pegar»,
+   que en una tableta falla una de cada tres veces. Mismo aparato que el
+   de las preguntas de Videos M.E.T.A.S y el del guion de El Rodaje.
+   ⚠️ Y el botón NO SALE donde el navegador no deja leer el portapapeles:
+   un botón que siempre contesta «no pude» se lee como una avería. */
+function vozRecHayPortapapeles() {
+  try { return !!(navigator.clipboard && navigator.clipboard.readText); } catch (e) { return false; }
+}
+
+async function vozRecDelPortapapeles(idCampo, alTerminar) {
+  const e = document.getElementById(idCampo);
+  if (!e) return;
+  try {
+    const t = await navigator.clipboard.readText();
+    if (!t || !t.trim()) { vozAviso('El portapapeles está vacío: copia primero la dirección.'); return; }
+    e.value = t.trim();
+    if (alTerminar) alTerminar();
+  } catch (err) {
+    /* Y si no dejó, se dice CÓMO hacerlo a mano: un «no se pudo» a secas
+       deja a alguien mirando un botón que no hace nada. */
+    vozAviso('El navegador no dejó leer el portapapeles: mantén tocado el recuadro y dale a «Pegar».');
+  }
+}
+
+/* ── La hoja de pegar varios ──────────────────────────────── */
+let _vozRecV = null;     // {cid, origen, leido}
+
+function vozRecVAbrir(cid) {
+  const ov = document.getElementById('voz-recv-overlay');
+  if (!ov) return;
+  /* ⚠️ Y VIENE MARCADO 🤖, no 🏠, que es al revés que la hoja de uno solo.
+     No es un descuido: esta puerta existe para el montón que devuelve un
+     cuaderno de NotebookLM, o sea material de MÁQUINA, y de los dos
+     errores posibles solo uno importa. Etiquetar como de la máquina algo
+     que eligió la casa es una imprecisión que se ve en la tarjeta y se
+     arregla con un toque; etiquetar como de la casa un resumen
+     automático es exactamente lo que la regla 1 existe para impedir, y
+     eso no se ve nunca. Y se dice con palabras encima de los chips, para
+     que quien pegó sus propios enlaces sepa que tiene que tocarlo. */
+  _vozRecV = { cid: cid, origen: 'maquina', leido: null };
+  const ta = document.getElementById('voz-recv-txt');
+  if (ta) ta.value = '';
+  const bp = document.getElementById('voz-recv-pegar');
+  if (bp) bp.hidden = !vozRecHayPortapapeles();
+  ov.style.display = 'flex';
+  vozRecVPintar();
+  /* El foco, dentro del mismo toque (regla 4 del Apunte rápido). */
+  try { if (ta) ta.focus(); } catch (e) {}
+}
+
+function vozRecVCerrar() {
+  const ov = document.getElementById('voz-recv-overlay');
+  if (ov) ov.style.display = 'none';
+  _vozRecV = null;
+}
+
+function vozRecVPintar() {
+  if (!_vozRecV) return;
+  const ta = document.getElementById('voz-recv-txt');
+  const caja = document.getElementById('voz-recv-repaso');
+  const b = document.getElementById('voz-recv-guardar');
+  const chips = document.getElementById('voz-recv-origen');
+  if (!ta || !caja || !b) return;
+
+  if (chips) {
+    vozRecPintarChips(chips, VOZ_REC_ORIGENES, _vozRecV.origen,
+      id => { _vozRecV.origen = id; vozRecVPintar(); });
+  }
+
+  const r = vozRecLeerVarios(ta.value, _vozRecV.cid);
+  _vozRecV.leido = r;
+  caja.textContent = '';
+
+  if (!ta.value.trim()) {
+    caja.appendChild(vozNodo('p', 'voz-aj-nota',
+      'Una dirección por renglón. Si delante escribes su nombre —«Guía de estudio | https://…»— '
+      + 'se queda ese; si no, se saca de la propia dirección.'));
+    b.textContent = '🔗 Poner los recursos';
+    b.classList.add('voz-btn-flojo');
+    return;
+  }
+
+  caja.appendChild(vozNodo('p', 'voz-recv-cuenta',
+    r.items.length
+      ? (r.items.length === 1 ? 'Entendí 1 recurso' : 'Entendí ' + r.items.length + ' recursos')
+      : 'Todavía no entiendo ninguna dirección'));
+
+  /* Lo entendido se VE antes de guardar, con el icono que se le adivinó:
+     un tipo que no se puede ver no se puede corregir. Es el repaso de la
+     hoja de pegar un texto (regla 19). */
+  if (r.items.length) {
+    const lista = vozNodo('div', 'voz-recv-lista');
+    r.items.forEach(it => {
+      const fila = vozNodo('div', 'voz-recv-fila');
+      fila.appendChild(vozNodo('span', 'voz-recv-ic', vozRecTipo(it.tipo).ic));
+      const txt = vozNodo('span', 'voz-recv-txt2');
+      txt.appendChild(vozNodo('span', 'voz-recv-nom', it.tit));
+      txt.appendChild(vozNodo('span', 'voz-recv-dom', vozRecTipo(it.tipo).t + ' · ' + vozRecDominio(it.url)));
+      fila.appendChild(txt);
+      lista.appendChild(fila);
+    });
+    caja.appendChild(lista);
+  }
+
+  if (r.repes.length) {
+    caja.appendChild(vozNodo('p', 'voz-aj-nota',
+      r.repes.length === 1 ? '1 ya estaba puesto en esta lectura, y se salta.'
+                           : r.repes.length + ' ya estaban puestos en esta lectura, y se saltan.'));
+  }
+
+  /* ⚠️ Y LOS QUE NO SE ENTENDIERON SE NOMBRAN, con su número de renglón.
+     Ninguno se descarta en silencio: un rechazo callado se ve desde fuera
+     igual que una herramienta rota (regla 4, regla 14). */
+  r.malos.forEach(m => {
+    const l = vozNodo('p', 'voz-recv-malo');
+    l.appendChild(vozNodo('span', null, '⚠️ Renglón ' + m.n + ', no parece una dirección: '));
+    l.appendChild(vozNodo('span', 'voz-recv-crudo', m.t));
+    caja.appendChild(l);
+  });
+  if (r.malos.length) {
+    caja.appendChild(vozNodo('p', 'voz-aj-nota',
+      'Si alguno sí lo era, ponle https:// delante y vuelve a mirar. Esos renglones no se guardan.'));
+  }
+
+  b.textContent = r.items.length
+    ? '🔗 Poner ' + (r.items.length === 1 ? 'el recurso' : 'los ' + r.items.length)
+    : '🔗 Poner los recursos';
+  b.classList.toggle('voz-btn-flojo', !r.items.length);
+}
+
+function vozRecVGuardar() {
+  if (!_vozRecV) return;
+  const r = _vozRecV.leido || { items: [] };
+  if (!r.items.length) {
+    vozRecVPintar();
+    vozAviso('No hay ninguna dirección que poner todavía.');
+    return;
+  }
+  const cid = _vozRecV.cid;
+  const or = _vozRecV.origen === 'maquina' ? 'maquina' : 'casa';
+  const todo = vozRecLeeTodo();
+  const lista = todo[cid] || (todo[cid] = []);
+  let orden = vozRecDe(cid).reduce((m, x) => Math.max(m, x.orden || 0), 0);
+  const ahora = Date.now();
+  r.items.forEach((it, i) => {
+    orden += 1;
+    lista.push({
+      id: vozRecId(), tipo: it.tipo, tit: it.tit, url: it.url,
+      para: '', fuente: vozRecDominio(it.url).slice(0, 80), origen: or, dura: '',
+      orden: orden, del: false,
+      /* Relojes distintos y crecientes: con el mismo, dos recursos del
+         mismo pegado empatarían también en el desempate por `u` y el
+         orden de la repisa bailaría entre un arranque y el siguiente. */
+      u: ahora + i,
+      user: _vozYo || '', quien: _vozRecMiembro.nombre || '', sync: 0,
+    });
+  });
+  vozRecGuardaTodo();
+  /* ⚠️ UN SOLO VIAJE A LA NUBE PARA LOS SEIS. `vozRecGuardar` la pide en
+     cada llamada y el temporizador acabaría juntándolas, pero contar con
+     eso es contar con un detalle de otra función: aquí se escribe todo y
+     se pide una vez, que es lo que de verdad hace falta con la señal de
+     una tableta. */
+  vozRecPedirNube(cid);
+  const n = r.items.length;
+  vozRecVCerrar();
+  vozRecRepintar(cid);
+  vozAviso('🔗 ' + n + (n === 1 ? ' recurso puesto' : ' recursos puestos'));
+}
+
 /* Los oyentes, una sola vez y desde el arranque de la herramienta: la
    hoja vive en el HTML, así que sus botones existen siempre. */
 let _vozRecEnganchado = false;
@@ -6161,6 +6538,258 @@ function vozRecEngancha() {
   /* Tocar el fondo cierra, como las demás hojas de la casa; tocar dentro
      no, que si no se cierra al elegir un chip. */
   if (ov) ov.addEventListener('click', e => { if (e.target === ov) vozRecCerrarHoja(); });
+
+  const bpeg = document.getElementById('voz-rec-pegar');
+  if (bpeg) {
+    bpeg.hidden = !vozRecHayPortapapeles();
+    bpeg.addEventListener('click', () => vozRecDelPortapapeles('voz-rec-url', vozRecAlEscribirUrl));
+  }
+
+  /* ── La hoja de pegar varios ── */
+  const vcer = document.getElementById('voz-recv-cerrar');
+  if (vcer) vcer.addEventListener('click', vozRecVCerrar);
+  const vg = document.getElementById('voz-recv-guardar');
+  if (vg) vg.addEventListener('click', vozRecVGuardar);
+  const vta = document.getElementById('voz-recv-txt');
+  if (vta) { vta.addEventListener('input', vozRecVPintar); vta.addEventListener('change', vozRecVPintar); }
+  const vpeg = document.getElementById('voz-recv-pegar');
+  if (vpeg) vpeg.addEventListener('click', () => vozRecDelPortapapeles('voz-recv-txt', vozRecVPintar));
+  const vov = document.getElementById('voz-recv-overlay');
+  if (vov) vov.addEventListener('click', e => { if (e.target === vov) vozRecVCerrar(); });
+
+  /* ── La hoja de lo compartido ── */
+  const ccer = document.getElementById('voz-comp-cerrar');
+  if (ccer) ccer.addEventListener('click', vozCompCerrar);
+  const cbus = document.getElementById('voz-comp-busca');
+  if (cbus) cbus.addEventListener('input', vozCompPintar);
+  const ctex = document.getElementById('voz-comp-texto');
+  if (ctex) ctex.addEventListener('click', vozCompComoTexto);
+  const cov = document.getElementById('voz-comp-overlay');
+  if (cov) cov.addEventListener('click', e => { if (e.target === cov) vozCompCerrar(); });
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   COMPARTIR A F.A.R.O — «Compartir → F.A.R.O», desde donde sea
+   ═════════════════════════════════════════════════════════════════
+   Pedido por el autor el 18 de septiembre de 2026: sus recursos de
+   NotebookLM acaban en OneDrive, y traer de allá un enlace hasta aquí
+   eran diez toques y tres aplicaciones —copiar el vínculo, salir,
+   abrir F.A.R.O, buscar la lectura, abrir Recursos, pegar, nombrar—.
+
+   Ahora F.A.R.O sale en la hoja de compartir del aparato: en OneDrive
+   es ⋯ → Compartir → F.A.R.O, y lo único que queda por decidir es a
+   qué lectura va.
+
+   ⚠️ Y LA DIRECCIÓN CASI NUNCA VIENE EN EL CAMPO `url`. Es el detalle
+   que decide si esto funciona o no: las aplicaciones de Android mandan
+   el enlace dentro del TEXTO (`EXTRA_TEXT`), a veces con una frase
+   delante —«Mira este archivo: https://1drv.ms/…»—, y solo las que
+   usan el intento de tipo URL rellenan `url`. Quien lea solo `url`
+   tendrá una herramienta que en la mitad de las aplicaciones no recibe
+   nada, y sin dar ningún error: llega la hoja, no llega el enlace. Por
+   eso se busca también DENTRO del texto, y lo que sobra a los lados se
+   propone como nombre.
+
+   ⚠️ Y ES DE ANDROID CON LA APLICACIÓN INSTALADA. En el iPad no existe
+   esta puerta —Safari no reparte a aplicaciones web— y allí sigue
+   valiendo el pegado de siempre, que por eso mismo también se arregló
+   (la hoja de pegar varios). Una sola de las dos dejaría a medio mundo
+   fuera.
+   ═════════════════════════════════════════════════════════════════ */
+
+/* Los nombres que se declaran en `manifest.json`. Van aquí y no
+   escritos dos veces: si alguien cambia uno en el manifiesto y no aquí,
+   lo compartido llega y no lo recoge nadie —sin error, con la aplicación
+   abriendo como siempre—, que es el peor de los fallos. La sonda lee el
+   manifiesto de verdad y compara. */
+const VOZ_COMP_PARAMS = { url: 'comp_url', txt: 'comp_txt', tit: 'comp_tit' };
+
+let _vozComp = null;    // {url, tit, txt, resto} de lo que acaba de llegar
+
+function vozCompartidoLee() {
+  let p;
+  try { p = new URLSearchParams(window.location.search); } catch (e) { return null; }
+  const crudo = (p.get(VOZ_COMP_PARAMS.url) || '').trim();
+  const txt   = (p.get(VOZ_COMP_PARAMS.txt) || '').trim();
+  const tit   = (p.get(VOZ_COMP_PARAMS.tit) || '').trim();
+  if (!crudo && !txt && !tit) return null;
+
+  let url = '', resto = txt;
+  const u1 = vozRecMiraUrl(crudo);
+  if (u1.ok) url = u1.url;
+  else {
+    /* Ver arriba: el enlace viene DENTRO del texto casi siempre. */
+    const m = txt.match(/https?:\/\/[^\s<>"'\)\]]+/);
+    if (m) {
+      const u2 = vozRecMiraUrl(m[0]);
+      if (u2.ok) {
+        url = u2.url;
+        resto = (txt.slice(0, m.index) + ' ' + txt.slice(m.index + m[0].length)).replace(/\s+/g, ' ').trim();
+      }
+    }
+  }
+  return { url: url, tit: tit, txt: txt, resto: resto };
+}
+
+/* ⚠️ LA DIRECCIÓN SE LIMPIA AL CERRAR, NO AL LEER, y el orden importa.
+   Limpiándola al leer, lo compartido se perdería en silencio en el caso
+   que más va a pasar: `index.html` recarga UNA vez cuando el service
+   worker nuevo toma el mando dentro de los diez primeros segundos (ver
+   `controllerchange`), o sea justo al abrir —que es cuando llega esto—.
+   Dejando los parámetros puestos, esa recarga vuelve a abrir la hoja,
+   que es lo correcto; y una vez atendida o cerrada se quitan, para que
+   recargar la página más tarde no la haga aparecer de la nada. */
+function vozCompartidoLimpiar() {
+  try {
+    const u = new URL(window.location.href);
+    let tocado = false;
+    Object.keys(VOZ_COMP_PARAMS).forEach(k => {
+      if (u.searchParams.has(VOZ_COMP_PARAMS[k])) { u.searchParams.delete(VOZ_COMP_PARAMS[k]); tocado = true; }
+    });
+    if (!tocado) return;
+    const q = u.searchParams.toString();
+    history.replaceState(null, '', u.pathname + (q ? '?' + q : '') + u.hash);
+  } catch (e) {}
+}
+
+/* Lo llama `faroArranqueInicio` (js/app.js), que es el único sitio donde
+   se decide quién se queda la pantalla al abrir. Devuelve `true` si
+   había algo compartido, para que no le pongan nada encima. */
+function faroArranqueCompartido() {
+  const d = vozCompartidoLee();
+  if (!d) return false;
+  if (typeof switchView !== 'function') return false;
+  switchView('view-voz');
+  vozCompAbrir(d);
+  return true;
+}
+
+function vozCompAbrir(d) {
+  const ov = document.getElementById('voz-comp-overlay');
+  if (!ov) return;
+  _vozComp = d;
+  const bus = document.getElementById('voz-comp-busca');
+  if (bus) bus.value = '';
+  ov.style.display = 'flex';
+  vozCompPintar();
+}
+
+function vozCompCerrar() {
+  const ov = document.getElementById('voz-comp-overlay');
+  if (ov) ov.style.display = 'none';
+  _vozComp = null;
+  vozCompartidoLimpiar();
+}
+
+/* Los textos entre los que elegir, ordenados por lo último que se tocó y
+   filtrados por el buscador —sin tildes ni mayúsculas, como el de la
+   sala: quien busca «burocracia» en una tableta no escribe la tilde—. */
+function vozCompCandidatos() {
+  const q = vozSinTildes(((document.getElementById('voz-comp-busca') || {}).value || '')).toLowerCase().trim();
+  return _vozCuentos
+    .filter(c => {
+      if (!q) return true;
+      return vozSinTildes((c.titulo || '') + ' ' + (c.voz || '') + ' ' + (c.maquina || '')).toLowerCase().indexOf(q) >= 0;
+    })
+    .slice()
+    .sort((a, b) => (b.actualizado || 0) - (a.actualizado || 0));
+}
+
+function vozCompPintar() {
+  if (!_vozComp) return;
+  const que = document.getElementById('voz-comp-que');
+  const lista = document.getElementById('voz-comp-lista');
+  if (!que || !lista) return;
+  const d = _vozComp;
+
+  /* Lo que llegó, a la vista y antes de nada: si el enlace no es el que
+     se creía, se ve aquí y no después de colgarlo en una lectura.
+     Todo con `textContent`: esto lo escribió otra aplicación. */
+  que.textContent = '';
+  if (d.url) {
+    que.appendChild(vozNodo('span', 'voz-comp-ic', vozRecTipo(vozRecTipoDeUrl(d.url)).ic));
+    const t = vozNodo('span', 'voz-comp-que-txt');
+    const nom = vozRecNombreSuelto(d.tit || '') || vozRecNombreSuelto(d.resto || '') || vozRecNombreDeUrl(d.url);
+    t.appendChild(vozNodo('span', 'voz-comp-que-nom', nom));
+    t.appendChild(vozNodo('span', 'voz-comp-que-url', d.url));
+    que.appendChild(t);
+  } else {
+    que.appendChild(vozNodo('span', 'voz-comp-ic', '📝'));
+    const t = vozNodo('span', 'voz-comp-que-txt');
+    t.appendChild(vozNodo('span', 'voz-comp-que-nom', 'Lo que compartiste no trae ninguna dirección'));
+    t.appendChild(vozNodo('span', 'voz-comp-que-url', (d.txt || d.tit || '').slice(0, 160)));
+    que.appendChild(t);
+  }
+
+  /* El botón de guardarlo como texto sale cuando no hay dirección —si no,
+     esa pantalla sería un callejón sin salida— y también cuando lo
+     compartido es largo, que es un ensayo entero mandado desde el chat de
+     una máquina y es justo lo que esta herramienta lee. */
+  const bt = document.getElementById('voz-comp-texto');
+  if (bt) bt.hidden = !(!d.url || (d.txt || '').length >= 400);
+
+  const cand = vozCompCandidatos();
+  lista.textContent = '';
+  const sub = document.getElementById('voz-comp-sub');
+  if (sub) {
+    sub.textContent = d.url
+      ? (_vozCuentos.length ? '¿A qué lectura va este recurso?' : 'Todavía no hay ninguna lectura en el anaquel.')
+      : 'Puedes guardarlo como un texto nuevo del anaquel.';
+  }
+
+  if (!cand.length) {
+    lista.appendChild(vozNodo('p', 'voz-aj-nota',
+      _vozCuentos.length ? 'Ninguna lectura coincide con eso.'
+                         : 'Pega primero un texto en el anaquel y vuelve a compartir el enlace.'));
+    return;
+  }
+
+  cand.slice(0, 40).forEach(c => {
+    const b = vozBoton('voz-comp-item', null, () => vozCompElegir(c.cid),
+      'Poner el recurso en «' + (c.titulo || 'Sin título') + '»');
+    b.appendChild(vozNodo('span', 'voz-comp-item-tit', c.titulo || 'Sin título'));
+    /* ⚠️ LA ETIQUETA VA TAMBIÉN AQUÍ. Es la regla 1 y la 25: una lista
+       compacta que la perdiera sería la forma más barata de romperla, y
+       además es lo que distingue dos ensayos que se llaman parecido. */
+    b.appendChild(vozNodo('span', 'voz-comp-item-et',
+      [c.voz ? 'a la manera de ' + c.voz : '', c.maquina ? 'lo escribió ' + c.maquina : '']
+        .filter(Boolean).join(' · ')));
+    const n = vozRecCuenta(c.cid);
+    if (n) b.appendChild(vozNodo('span', 'voz-comp-item-n', n === 1 ? '1 recurso' : n + ' recursos'));
+    lista.appendChild(b);
+  });
+  if (cand.length > 40) {
+    lista.appendChild(vozNodo('p', 'voz-aj-nota', 'Hay más: escribe arriba para buscar.'));
+  }
+}
+
+/* ⚠️ ELEGIR LA LECTURA ABRE LA SALA, y no es un rodeo: la hoja del
+   recurso cuelga DENTRO de `#voz-lector` a propósito —colgada del body
+   saldría con el z-index 100 de `.fin-modal-overlay`, muy por debajo de
+   la sala—, así que con la sala cerrada el botón respondiendo y la hoja
+   sin verse es exactamente la avería de las dos hojas del taller (regla
+   35). Se abre la sala primero y la trampa deja de poder existir. Es lo
+   mismo que ya hace la cuenta de recursos del menú ⋯ del anaquel. */
+function vozCompElegir(cid) {
+  const d = _vozComp;
+  vozCompCerrar();
+  if (typeof vozAbrirLector === 'function') vozAbrirLector(cid);
+  vozRecAbrirHoja(cid, null, d);
+}
+
+/* Lo compartido sin dirección —o muy largo— entra por la hoja de pegar
+   de siempre, con el texto ya puesto. No hay un segundo lector ni un
+   segundo formulario: es la regla 30 (el adjunto no es un segundo
+   lector) y la 9 del Apunte rápido. */
+function vozCompComoTexto() {
+  const d = _vozComp;
+  if (!d) return;
+  vozCompCerrar();
+  if (typeof vozAbrirPegar !== 'function') return;
+  vozAbrirPegar();
+  const ta = document.getElementById('voz-pegar-txt');
+  if (ta) ta.value = d.txt || d.tit || '';
+  if (typeof vozRepasar === 'function') vozRepasar();
 }
 
 /* ─── Los paneles de la sala: la letra, y el índice con sus pestañas ──

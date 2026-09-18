@@ -979,7 +979,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Treinta y siete reglas, y ninguna es de adorno:**
+**Treinta y ocho reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -2538,6 +2538,122 @@ el diseño.
    pie, las flechas del teclado y la rueda, que son tres maneras— y lo que
    se compra es poder subrayar en todo el ancho.
 
+38. 🔗 **LOS RECURSOS ENTRAN DESDE FUERA: F.A.R.O SALE EN LA HOJA DE
+   COMPARTIR, Y TAMBIÉN SE PEGAN DE GOLPE.**
+   Pedido por el autor el 18 de septiembre de 2026, contando cómo trabaja
+   de verdad: lo que NotebookLM le genera para un ensayo —el resumen en
+   audio, el mapa mental, la guía de estudio— **no se puede compartir
+   desde ahí**, así que lo baja, lo sube a OneDrive y saca el enlace de
+   cada uno. «Me gustaría saber cómo podría automatizar este proceso».
+
+   ⚠️ **Y EL TRAMO DE NOTEBOOKLM NO SE PUEDE AUTOMATIZAR. Va escrito
+   para que no se vuelva a intentar:** no tiene API pública ni enlaces
+   de compartir para lo que genera, así que lo único que quedaría sería
+   pedirle las credenciales de Google —o un robot que finja ser un
+   navegador—, y eso es la regla 30 con otro nombre: dos identificaciones
+   más y dos librerías de fuera dentro de la aplicación que tiene la
+   Bóveda. Lo mismo para una puerta a Microsoft Graph que generara sola
+   los enlaces de OneDrive. Lo que SÍ se quita es todo lo de DESPUÉS de
+   la descarga, que además es la parte cara: eran unos diez toques por
+   recurso repartidos entre tres aplicaciones, y con seis recursos por
+   cuaderno eso es exactamente lo que hace que los recursos no se pongan.
+
+   **Son dos puertas, y las dos hacen falta porque ninguna sirve en todos
+   los aparatos.**
+
+   ⚠️ **LA PRIMERA: COMPARTIR A F.A.R.O** (`share_target` en
+   `manifest.json`, y `faroArranqueCompartido` en `js/tools/voz-prestada.js`).
+   En OneDrive es ⋯ → Compartir → F.A.R.O, y lo único que queda por
+   decidir es a qué lectura va. Cinco cosas que no se negocian:
+
+   - ⚠️ **LA DIRECCIÓN CASI NUNCA VIENE EN EL CAMPO `url`.** Es el
+     detalle que decide si esto funciona o no: las aplicaciones de
+     Android mandan el enlace dentro del TEXTO (`EXTRA_TEXT`), muchas
+     veces con una frase delante —«Mira este archivo: https://1drv.ms/…»—,
+     y solo las que usan el intento de tipo URL rellenan `url`. Quien lea
+     solo `url` tendrá una herramienta que en la mitad de las
+     aplicaciones no recibe nada **y sin dar ningún error**: llega la
+     hoja, no llega el enlace. Se busca también dentro del texto, y lo
+     que sobra a los lados se propone como nombre.
+   - ⚠️ **LO COMPARTIDO GANA EL ARRANQUE**, por encima de los dos
+     interruptores de aparato, y lo decide `faroArranqueInicio` (js/app.js)
+     como manda la regla 34: en un solo sitio. No es una preferencia —un
+     interruptor lo encendió alguien una vez en la vida; compartir algo es
+     una persona eligiendo AHORA, con el dedo, entre todas las
+     aplicaciones del aparato—.
+   - ⚠️ **LA HOJA DE ELEGIR LECTURA CUELGA DE `#view-voz`, NO DE LA
+     SALA**, y es el revés exacto de la del recurso. Esta se abre con la
+     sala CERRADA —llega con la aplicación recién abierta—, así que
+     dentro de `#voz-lector`, que está `hidden`, no se vería nada: la
+     avería de las hojas del taller (regla 35) por el otro lado. Y al
+     elegir la lectura **se abre la sala primero** y después la hoja del
+     recurso, que sí vive dentro de la sala.
+   - ⚠️ **LOS PARÁMETROS SE LLAMAN IGUAL EN EL MANIFIESTO Y EN EL
+     CÓDIGO** (`VOZ_COMP_PARAMS`), y la sonda lee el manifiesto de verdad
+     para compararlos. Escritos en dos sitios, cambiar uno dejaría lo
+     compartido llegando y sin nadie que lo recoja, sin error y con la
+     aplicación abriendo como siempre. Es la costura de la regla 13.
+   - ⚠️ **Y LA DIRECCIÓN SE LIMPIA AL CERRAR, NO AL LEER.** Limpiándola
+     al leer, lo compartido se perdería en silencio en el caso que más va
+     a pasar: `index.html` recarga UNA vez cuando el service worker nuevo
+     toma el mando dentro de los diez primeros segundos, o sea justo al
+     abrir, que es cuando llega esto.
+
+   Y lo que hay que saber antes de prometer nada: **es de Android con la
+   aplicación instalada**. En el iPad no existe esta puerta. Por eso la
+   segunda no es un lujo.
+
+   ⚠️ **LA SEGUNDA: PEGAR VARIOS DE GOLPE.** Mismo patrón que el guion de
+   El Rodaje, las preguntas de los videos de M.E.T.A.S, el texto de esta
+   herramienta y las actividades del taller. Entiende las cuatro formas
+   que se escriben de verdad: `Nombre | https://…`, `[Nombre](https://…)`,
+   la dirección sola y el dominio sin `https`.
+
+   - ⚠️ **Y AQUÍ MANDA LA ASIMETRÍA DE LA REGLA 3, con el mismo filo:**
+     equivocarse hacia «este renglón no era una dirección» cuesta un
+     renglón NOMBRADO con su número, que se arregla a mano; equivocarse
+     hacia «esto sí lo era» cuelga en la lectura un enlace que no lleva a
+     ninguna parte **y parece que funcionó** —sale su tarjeta, sale su
+     icono—, y no se descubre hasta que alguien lo toca, que puede ser
+     dentro de un mes. El caso que lo explica es `informe.pdf`: sin la
+     frontera de `VOZ_REC_TLD` entraría como `https://informe.pdf`. Es la
+     misma cautela de `vozDominioAlFinal` (regla 29).
+   - ⚠️ **VIENE MARCADO 🤖, al revés que la hoja de uno solo**, y se dice
+     con palabras encima de los chips. Esta puerta existe para el montón
+     que devuelve un cuaderno, o sea material de MÁQUINA, y de los dos
+     errores posibles solo uno importa: etiquetar como de la máquina algo
+     que eligió la casa se ve en la tarjeta y se arregla con un toque;
+     etiquetar como de la casa un resumen automático es exactamente lo
+     que la regla 1 existe para impedir, y eso no se ve nunca.
+   - **Un solo viaje a la nube para los seis.** Se escribe todo y se pide
+     la nube una vez: con la señal de una tableta, una escritura por
+     recurso es lo que hace que un cuaderno entero tarde.
+   - **Y el tipo se adivina de la dirección** (un `.mp3` es 🎧, YouTube es
+     🎬), que parece contradecir la regla que no se negocia de los videos
+     de M.E.T.A.S y no la contradice: allá lo adivinado es la RESPUESTA
+     de un examen, que solo se descubre cuando alguien acierta y la
+     pantalla le dice que falló; aquí es un icono que se ve en la tarjeta
+     y se cambia con un toque. Es la licencia que ya se toma
+     `vozRecNombreDeUrl` con el nombre.
+
+   Y el **📋 del portapapeles** en las dos hojas, que nace escondido donde
+   el navegador no deja leerlo: un botón que siempre contesta «no pude»
+   se lee como una avería.
+
+   Y un detalle que salió de MIRAR LA PANTALLA y no de leer el código: un
+   vídeo de YouTube entraba llamándose **«Watch — youtube.com»**. El
+   comentario de `vozRecNombreDeUrl` ponía «watch» de ejemplo de lo que hay
+   que rechazar y pasaba igual, porque tiene cinco letras y una vocal. Con
+   un recurso cada vez nadie se había fijado; con cuatro nombres juntos en
+   el repaso, el que no dice nada salta a la vista. Van en
+   `VOZ_REC_NO_NOMBRE`, descartadas a mano como las terminaciones de
+   archivo de la regla 29.
+
+   **Y no hizo falta correr ni una línea de SQL**, que es media
+   herramienta cuando el SQL lo pega alguien desde una tableta: los
+   recursos ya viajaban por `recursos_enlaces` con el prefijo `voz:` de la
+   regla 36, y esto es solo cómo entran.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -2667,6 +2783,30 @@ comprueba que el borde sigue pasando página, ahora por la coordenada. Se
 probó devolviendo el `pointer-events: auto` a las zonas: la sonda
 suspende en cuatro sitios y el fallo dice el porcentaje del ancho que
 queda muerto.
+
+Las comprobaciones **39** y **40** son las dos puertas por las que entran
+los recursos. La 39 **lee `manifest.json` de verdad** y compara sus
+nombres con `VOZ_COMP_PARAMS`: escritos en dos sitios, cambiar uno dejaría
+lo compartido llegando y sin nadie que lo recoja, sin error y con la
+aplicación abriendo como siempre. Después mete el enlace **dentro del
+texto** —que es donde lo mandan casi todas las aplicaciones de Android, y
+no en el campo `url`—, llama al **árbitro de verdad**
+(`faroArranqueInicio`, nunca a una copia escrita al lado), y pulsa la
+lectura para ver que se abre la sala y encima la hoja del recurso, medido
+con `elementFromPoint` y no leyendo el z-index. Y comprueba que la
+dirección de la página se limpia al atenderla, que lo compartido sin
+ninguna dirección no deja una pantalla sin salida, y que la nube recibió
+el recurso firmado.
+
+La **40** le pega ocho renglones donde solo cuatro son direcciones, y el
+que importa es **`informe.pdf`**: sin la frontera de `VOZ_REC_TLD` entra
+como `https://informe.pdf` y cuelga en la lectura un enlace muerto que
+parece bueno. Exige que los tres malos se queden fuera **y salgan
+nombrados con su número de renglón** (5, 6 y 7), que el repetido se
+salte, que los cuatro tipos adivinados sean los que son, y que la subida
+sea **UN solo viaje de escritura** —por eso empieza vaciando la repisa: si
+no, el recurso que dejó puesto la 39 subiría al arrancar y esa
+comprobación aprobaría o suspendería por lo que hizo la de antes—.
 
 La comprobación **37** son los recursos de refuerzo, y mira lo que de
 verdad puede salir mal: que una dirección `javascript:` llegue a un
