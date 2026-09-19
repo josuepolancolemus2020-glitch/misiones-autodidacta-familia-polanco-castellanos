@@ -1729,6 +1729,19 @@ body.voz-eligiendo .destello-fab { display: none !important; }
    tiene que poder compararlo letra por letra con lo que ve arriba. */
 .voz-recv-crudo { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
 
+/* ── El video dentro de la lectura ──────────────────────── */
+#voz-yt-overlay .fin-modal { max-height: 92vh; overflow-y: auto; width: min(760px, 96vw); }
+/* 16:9 EXACTO. Un reproductor estirado no enseña lo que se va a ver, que
+   es la misma razón por la que el monitor de El Rodaje no se estira. */
+.voz-yt-caja {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  background: #000; border-radius: 10px; overflow: hidden;
+}
+.voz-yt-caja iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.voz-yt-fuera { display: block; text-align: center; margin-top: 8px; text-decoration: none; }
+.voz-yt-fuera[hidden] { display: none; }
+.voz-rec-ver { white-space: nowrap; }
+
 /* ── La hoja de lo compartido ───────────────────────────────
    Esta vive en #view-voz, o sea en el mundo CLARO de la aplicación: no
    se le nombra la sala delante a propósito. */

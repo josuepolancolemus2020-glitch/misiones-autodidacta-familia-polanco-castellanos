@@ -146,7 +146,7 @@ async function columnasDeVozActividades(){
 function nuevaBase(w, opciones){
   const o = opciones || {};
   const estado = { filas: o.filas || [], llamadas: [], escritas: [], marcas: o.marcas || [], marcasEscritas: [],
-                   act: o.act || [], actEscritas: [], recs: o.recs || [], recsEscritos: [] };
+                   act: o.act || [], actEscritas: [], recs: o.recs || [], recsEscritos: [], oembed: [] };
   /* Las columnas que esta base NO tiene. `sinGenero` se queda por lo
      que ya estaba escrito; `faltan` sirve para cualquiera de las
      nuevas, que ya son dos. */
@@ -156,6 +156,24 @@ function nuevaBase(w, opciones){
   w.fetch = async (url, init) => {
     const u = new URL(typeof url === 'string' ? url : url.url);
     const m = (init && init.method) || 'GET';
+    /* ⚠️ LA PUERTA PÚBLICA DE YOUTUBE (oEmbed), de donde sale el título de
+       un video. Este doble exige lo MISMO que la de verdad: solo contesta
+       si lo que le llegó es la dirección CANÓNICA de un video, o sea si
+       la herramienta le mandó los once caracteres y nada más. Un doble
+       que contestara a cualquier cosa escondería justo lo que esta
+       comprobación existe para mirar —que lo pegado no viaja a YouTube—,
+       que es la lección de la costura del 10 de septiembre. */
+    if (/\/oembed$/.test(u.pathname)) {
+      estado.llamadas.push({ m, url: u.href });
+      estado.oembed.push(u.searchParams.get('url') || '');
+      if (o.sinOembed) return json({ error: 'Not Found' }, 404);
+      const mm = String(u.searchParams.get('url') || '')
+        .match(/^https:\/\/www\.youtube\.com\/watch\?v=([A-Za-z0-9_-]{11})$/);
+      if (!mm) return json({ error: 'Not Found' }, 404);
+      const t = (o.titulos || {})[mm[1]];
+      if (!t) return json({ error: 'Not Found' }, 404);
+      return json({ title: t, author_name: 'Un canal', type: 'video' });
+    }
     /* Los subrayados viajan por lecturas_marcas, la tabla del marcador de
        las misiones, y la base de mentira la exige igual que la de verdad:
        firmada con quien entró, con `mision` y con un color de los cinco. */
@@ -3707,6 +3725,154 @@ function filasHoja(d){
      'hubo ' + viajes40.length + ' viajes de escritura para un solo pegado');
   w.eval('vozCerrarLector()');
   await esperar(150);
+
+
+  /* ── 41. LOS VIDEOS DE YOUTUBE ──
+     «Subiré los videos que son cortos a YouTube y los guardaré en recursos
+     de las lecturas» (el autor, 18 de septiembre de 2026).
+
+     ⚠️ Lo que de verdad puede salir mal aquí está ordenado por gravedad:
+     que algo pegado por una persona llegue al `src` de un `<iframe>`
+     —el peor sitio del HTML—; que cerrar el video lo deje SONANDO detrás
+     de la lectura; y que lo pegado viaje a YouTube al pedir el título. */
+  log('── 41. Los videos de YouTube: once caracteres y nada más ──');
+
+  const YT41 = 'dQw4w9WgXcQ';
+  const casos41 = [
+    ['https://www.youtube.com/watch?v=' + YT41,            YT41, 0],
+    ['https://youtu.be/' + YT41 + '?t=90',                 YT41, 90],
+    ['https://www.youtube.com/shorts/' + YT41,             YT41, 0],
+    ['https://m.youtube.com/watch?v=' + YT41 + '&t=1m30s', YT41, 90],
+    ['https://www.youtube-nocookie.com/embed/' + YT41,     YT41, 0],
+    /* Y lo que NO tiene que pasar el cedazo: */
+    ['https://www.youtube.com/watch?v=abc"><img src=x onerror=alert(1)>', '', 0],
+    ['javascript:alert(1)//youtube.com/watch?v=' + YT41,   '', 0],
+    ['https://www.youtube.com/watch?v=corto',              '', 0],
+    ['https://vimeo.com/' + YT41,                          '', 0],
+  ];
+  const malos41 = casos41.filter(c => {
+    const r = JSON.parse(w.eval('JSON.stringify(vozRecYt(' + JSON.stringify(c[0]) + '))'));
+    return r.id !== c[1] || r.ini !== c[2];
+  });
+  ok(!malos41.length,
+     '⚠️ del enlace solo sale lo que cabe en ONCE caracteres de [A-Za-z0-9_-]: las cinco formas buenas dan su identificador (y sus segundos), y una con comillas dentro, un javascript: y un Vimeo no dan nada',
+     'el cedazo del identificador falla en: ' + JSON.stringify(malos41.map(c => c[0])));
+
+  const embed41 = String(w.eval('vozRecYtEmbed(' + JSON.stringify(YT41) + ', 90)'));
+  ok(embed41 === 'https://www.youtube-nocookie.com/embed/' + YT41
+       + '?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&start=90',
+     'y la dirección del reproductor se arma con un literal delante y el identificador detrás, en youtube-nocookie.com',
+     'la dirección del reproductor salió como ' + embed41);
+
+  /* La nube de esta sección sabe contestar la puerta de YouTube, y con
+     veneno en el título: eso lo escribe otra casa. */
+  const titulo41 = 'Resumen en video <img src=x onerror="window.__colado41=1">';
+  const base41 = nuevaBase(w, { act: [], recs: [], titulos: { ['dQw4w9WgXcQ']: titulo41 } });
+  w.eval('(function(){ try { localStorage.removeItem(VOZ_REC); } catch (e) {} _vozRecTodo = null; })()');
+  await w.eval('initVozPrestada()');
+  await esperar(400);
+  const cid41 = String(w.eval('_vozCuentos[0].cid'));
+  w.eval('vozAbrirLector(' + JSON.stringify(cid41) + ')');
+  await esperar(700);
+  w.eval("vozPintarPanelInd('recs'); vozAbrirPanel('voz-panel-ind')");
+  await esperar(250);
+  [...d.querySelectorAll('#voz-panel-ind button')].find(b => /Poner un recurso|Otro recurso/.test(b.textContent)).click();
+  await esperar(200);
+
+  const url41 = 'https://www.youtube.com/watch?v=' + YT41;
+  const campoU41 = d.getElementById('voz-rec-url');
+  const campoN41 = d.getElementById('voz-rec-nom');
+  campoU41.value = url41;
+  campoU41.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(120);
+  /* Lo que de verdad importa aquí es que NUNCA se quede vacío: si el
+     título tarda es el dominio, y si ya llegó es el título. Exigir el
+     dominio a los 120 ms sería medir lo rápida que es la base de mentira
+     y no lo que se sostiene. */
+  ok(!!campoN41.value.trim(),
+     'mientras el título viaja, el nombre es el dominio: el campo nunca se queda vacío',
+     'el nombre quedó en ' + JSON.stringify(campoN41.value));
+  await esperar(600);
+  ok(campoN41.value === titulo41,
+     '⚠️ y cuando llega, el nombre pasa a ser EL TÍTULO DEL VIDEO: sin esto, los seis videos de un cuaderno se llamarían todos «youtube.com»',
+     'el título no llegó al campo: ' + JSON.stringify(campoN41.value));
+  ok(base41.oembed.length === 1 && base41.oembed[0] === 'https://www.youtube.com/watch?v=' + YT41,
+     '⚠️ Y A YOUTUBE NO LE SALE DE AQUÍ NADA QUE NO SEAN ESOS ONCE CARACTERES: la consulta se arma con el identificador comprobado, no con lo que se pegó',
+     'lo que se le mandó a YouTube fue ' + JSON.stringify(base41.oembed));
+
+  d.getElementById('voz-rec-guardar').click();
+  await esperar(300);
+  w.eval("vozPintarPanelInd('recs')");
+  await esperar(250);
+  const card41 = d.querySelector('#voz-panel-ind .voz-rec-card');
+  ok(!!card41 && !w.__colado41 && card41.querySelectorAll('img').length === 0
+     && /<img src=x/.test(card41.textContent),
+     'y un título con HTML dentro —lo escribió otra casa— se pinta como texto: ni un elemento creado',
+     'el veneno del título de YouTube creó elementos o se ejecutó');
+
+  /* ▶ Ver aquí: se PULSA, como se pulsa con el dedo. */
+  const bVer41 = [...card41.querySelectorAll('button')].find(b => /Ver aquí/.test(b.textContent));
+  ok(!!bVer41, 'la tarjeta de un video ofrece ▶ Ver aquí', 'no sale el botón de ver el video');
+  bVer41.click();
+  await esperar(300);
+  const ovY41 = d.getElementById('voz-yt-overlay');
+  ok(ovY41.style.display === 'flex' && ovY41.parentElement.id === 'voz-lector',
+     'y abre su hoja, colgada dentro de #voz-lector para que salga por encima de la sala',
+     'no abrió, o cuelga de ' + (ovY41.parentElement && ovY41.parentElement.id));
+  const cajaY41 = ovY41.querySelector('.fin-modal').getBoundingClientRect();
+  const encY41 = d.elementFromPoint(cajaY41.left + cajaY41.width / 2, cajaY41.top + 20);
+  ok(!!encY41 && ovY41.contains(encY41), 'y el dedo la toca a ella (elementFromPoint, no el z-index)',
+     'en ese punto hay ' + (encY41 && (encY41.id || encY41.className)));
+
+  const marco41 = d.querySelector('#voz-yt-caja iframe');
+  ok(!!marco41 && marco41.getAttribute('src') === 'https://www.youtube-nocookie.com/embed/' + YT41
+       + '?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3',
+     '⚠️ Y EL src DEL IFRAME ES EL LITERAL MÁS LOS ONCE CARACTERES, nada más: es el peor sitio del HTML donde puede acabar algo escrito por una persona, y por eso al dato se le quita la capacidad de hacer daño en vez de escaparlo mejor',
+     'el src del reproductor salió como ' + (marco41 && marco41.getAttribute('src')));
+  const fuera41 = d.getElementById('voz-yt-fuera');
+  ok(!fuera41.hidden && fuera41.getAttribute('href') === url41
+     && /noopener/.test(fuera41.getAttribute('rel') || ''),
+     'y la salida a YouTube está a la vista con su noopener: un video que su dueño no deje incrustar sale aquí como un cuadro negro, y esto es lo único que queda',
+     'la salida a YouTube no está bien: ' + (fuera41 && fuera41.getAttribute('href')) + ' rel=' + (fuera41 && fuera41.getAttribute('rel')));
+
+  d.getElementById('voz-yt-cerrar').click();
+  await esperar(200);
+  ok(ovY41.style.display === 'none' && d.querySelectorAll('#voz-yt-caja iframe').length === 0,
+     '⚠️ y al cerrar el IFRAME SE QUITA, no se esconde: escondiendo el panel el video seguiría sonando detrás de la lectura y no habría forma de pararlo sin cerrar la aplicación (la lección de la cámara de El Rodaje)',
+     'al cerrar quedaron ' + d.querySelectorAll('#voz-yt-caja iframe').length + ' reproductores vivos');
+
+  bVer41.click();
+  await esperar(250);
+  ok(d.querySelectorAll('#voz-yt-caja iframe').length === 1, 'vuelve a abrir',
+     'no volvió a abrir: hay ' + d.querySelectorAll('#voz-yt-caja iframe').length + ' reproductores');
+  w.eval('vozCerrarLector()');
+  await esperar(250);
+  ok(d.querySelectorAll('#voz-yt-caja iframe').length === 0,
+     'y salir de la lectura con el video abierto también lo apaga',
+     'el video sigue vivo después de cerrar la sala');
+
+  /* Sin la puerta de YouTube no pasa nada más que lo de antes: es un
+     adorno útil, no una pieza. Con OTRO video, que el título se recuerda
+     por identificador y el de arriba ya se sabe. */
+  const YT41B = 'Zx9yQ1w2E3r';
+  nuevaBase(w, { act: [], recs: [], sinOembed: true });
+  w.eval('vozAbrirLector(' + JSON.stringify(cid41) + ')');
+  await esperar(600);
+  w.eval("vozPintarPanelInd('recs'); vozAbrirPanel('voz-panel-ind')");
+  await esperar(200);
+  [...d.querySelectorAll('#voz-panel-ind button')].find(b => /Otro recurso|Poner un recurso/.test(b.textContent)).click();
+  await esperar(200);
+  const campoU41b = d.getElementById('voz-rec-url');
+  campoU41b.value = 'https://youtu.be/' + YT41B;
+  campoU41b.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(900);
+  ok(/youtube|youtu\.be/.test(d.getElementById('voz-rec-nom').value)
+     && d.getElementById('voz-rec-guardar').textContent.length > 0,
+     'y si la puerta de YouTube no contesta, se queda el nombre que había y la hoja sigue entera: el título es un adorno útil, no una pieza',
+     'sin la puerta de YouTube la hoja se quedó rara: nombre=' + JSON.stringify(d.getElementById('voz-rec-nom').value));
+  w.eval('vozRecCerrarHoja()');
+  w.eval('vozCerrarLector()');
+  await esperar(200);
 
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');

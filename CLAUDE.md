@@ -979,7 +979,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Treinta y ocho reglas, y ninguna es de adorno:**
+**Treinta y nueve reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -2654,6 +2654,83 @@ el diseño.
    recursos ya viajaban por `recursos_enlaces` con el prefijo `voz:` de la
    regla 36, y esto es solo cómo entran.
 
+39. ▶ **UN VIDEO DE YOUTUBE: ONCE CARACTERES, SU TÍTULO TRAÍDO, Y SE VE
+   DENTRO DE LA LECTURA.**
+   Decidido por el autor el 18 de septiembre de 2026, al elegir dónde
+   guardar lo que le genera NotebookLM: «subiré los videos que son cortos
+   a YouTube y los guardaré en recursos de las lecturas». Y es mejor que
+   OneDrive por un motivo que se puede escribir: un vínculo de OneDrive se
+   rompe si el archivo se mueve o si alguien toca los permisos, **y no
+   avisa**; se descubre tocando la tarjeta seis meses después.
+
+   ⚠️ **AQUÍ VUELVE LA REGLA 1 DE VIDEOS M.E.T.A.S, PALABRA POR PALABRA:
+   por la pantalla no viaja NUNCA una dirección hasta el `src` de un
+   `<iframe>` —viajan ONCE CARACTERES.** Es el peor sitio del HTML donde
+   puede acabar algo escrito por una persona, y en vez de escapar mejor se
+   le quita al dato la capacidad de hacer daño: en `[A-Za-z0-9_-]` no hay
+   comillas, ni espacios, ni dos puntos, ni barras, así que `javascript:`
+   no se puede ni escribir. La dirección del reproductor se arma siempre
+   con un literal delante (`youtube-nocookie.com`, el dominio sin
+   seguimiento) y el identificador ya comprobado detrás.
+
+   ⚠️ **Y `vozRecYt` ES UNA SEGUNDA COPIA DEL EXTRACTOR, A PROPÓSITO.**
+   Videos M.E.T.A.S tiene el suyo (`mvidDeEnlace`) y llamarlo desde aquí
+   ataría esta herramienta a que aquel archivo cargue, cuando la casa
+   tiene escrito que si un aparato no carga lo demás sigue entero. Lo que
+   NO se duplica es lo que de verdad hay que sostener, que no es el
+   código sino **la invariante**: de este lado tampoco llega al `src` nada
+   que no sean esos once caracteres, y eso lo comprueba la sonda **aquí**,
+   no allá. Si algún día hace falta un tercero, entonces sí va a un
+   archivo común.
+
+   ⚠️ **EL TÍTULO SE LE PIDE A YOUTUBE, Y LA CONSULTA SE ARMA CON EL
+   IDENTIFICADOR.** Un enlace de YouTube pelado no trae nombre, así que
+   sin esto las seis tarjetas de un cuaderno se llamarían todas
+   «youtube.com». Se pide a su puerta pública (oEmbed), que no lleva
+   clave, ni cuenta, ni librería. Cuatro cosas que no se negocian:
+
+   - **A YouTube no le sale de aquí ni un carácter que no sean esos
+     once**: la consulta se construye con el identificador comprobado, no
+     con lo que se pegó. Quien pegue una dirección con algo escondido
+     dentro no se lo manda a nadie. La sonda mira **lo que recibió** la
+     puerta, no lo que salió en la pantalla.
+   - **Sin credenciales**: la sesión de YouTube de quien lee no tiene nada
+     que hacer en esto.
+   - ⚠️ **Con reloj propio** (seis segundos), que es la regla 11: una
+     petición que no vuelve —no que falla: que **no vuelve**— dejaría
+     «buscando el título…» puesto para siempre.
+   - **Y si falla no pasa nada más que lo de antes.** Es un adorno útil,
+     no una pieza: sin señal, con la puerta caída o con un video privado
+     —que oEmbed no contesta— se queda el dominio y el nombre se escribe a
+     mano. El que llega **no pisa lo escrito a mano ni un enlace que ya
+     cambió** (regla 18 por la puerta de atrás: ponerle a un video el
+     título de otro es peor que no ponerle ninguno, porque no se nota).
+   El nombre escrito delante de la barra manda siempre sobre el título
+   traído, y mientras viaja se dice («⏳ buscando su título en
+   YouTube…»): un nombre que va a cambiar solo en dos segundos, dicho, no
+   asusta.
+
+   ⚠️ **Y SE VE DENTRO DE LA LECTURA, porque mandarlo a otra pestaña es
+   perder la página.** Es la misma razón por la que una cita se consulta
+   encima del texto y no yendo a la bibliografía (regla 27). El marco es
+   **16:9 exacto** —un reproductor estirado no enseña lo que se va a ver,
+   como el monitor de El Rodaje— y la hoja cuelga **dentro de
+   `#voz-lector`** (regla 35).
+
+   ⚠️ **Y AL CERRAR, EL IFRAME SE QUITA; NO SE ESCONDE EL PANEL.**
+   Escondiéndolo, el video **sigue sonando detrás de la lectura** y no hay
+   forma de pararlo sin cerrar la aplicación. Es la lección de la cámara
+   de El Rodaje —soltar el elemento no apaga nada—, y vale también al
+   salir de la sala.
+
+   **Y el ↗ de la tarjeta se queda**, siempre: un video que su dueño no
+   permita incrustar sale aquí como un cuadro negro, y entonces esa es la
+   única salida —la pantalla lo dice con palabras, en vez de dejar a
+   alguien mirando un rectángulo oscuro—. Es la regla 3 de Videos
+   M.E.T.A.S y la del asa de la repisa: un gesto que sea la única manera
+   de hacer algo es algo que a veces no se puede hacer. **Y ▶ Ver aquí
+   sale para cualquiera**, no solo para quien lo puso: ver no es corregir.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -2807,6 +2884,21 @@ salte, que los cuatro tipos adivinados sean los que son, y que la subida
 sea **UN solo viaje de escritura** —por eso empieza vaciando la repisa: si
 no, el recurso que dejó puesto la 39 subiría al arrancar y esa
 comprobación aprobaría o suspendería por lo que hizo la de antes—.
+
+La comprobación **41** son los videos de YouTube, y lo que mira está
+ordenado por gravedad: que algo pegado por una persona llegue al `src` de
+un `<iframe>` (se le pasan por el cedazo nueve enlaces, entre ellos uno
+con comillas dentro, un `javascript:` y un Vimeo, y después se compara el
+`src` de verdad **carácter por carácter** con el literal más los once);
+que cerrar el video lo deje **sonando detrás de la lectura** (se cuentan
+los `iframe` que quedan en el documento, no si el panel está escondido);
+y que lo pegado viaje a YouTube al pedir el título —para eso la base de
+mentira **apunta lo que recibe** la puerta oEmbed y solo contesta a la
+dirección canónica, como la de verdad—. Se probó de la única manera que
+vale: mandándole a YouTube la dirección pegada en vez del identificador
+y dejando que cerrar solo escondiera el panel —la sonda suspende seis
+veces, y los fallos dicen «lo que se le mandó a YouTube fue …&pegado=…»
+y «al cerrar quedaron 1 reproductores vivos»—.
 
 La comprobación **37** son los recursos de refuerzo, y mira lo que de
 verdad puede salir mal: que una dirección `javascript:` llegue a un

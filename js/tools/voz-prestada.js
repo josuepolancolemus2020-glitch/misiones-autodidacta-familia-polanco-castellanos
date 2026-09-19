@@ -3360,6 +3360,8 @@ function vozCerrarLector() {
   vozSubCerrarBarra();
   vozCitCerrar();
   vozTablonCerrar();
+  /* Y el video, que si no se queda sonando detrás del anaquel. */
+  vozRecCerrarVideo();
   vozLuz(false);
   vozPantallaCompleta(false);
   _vozLeyendo = null;
@@ -5699,6 +5701,152 @@ function vozRecMiraUrl(u) {
   };
 }
 
+/* ═════════════════════════════════════════════════════════════════
+   LOS VIDEOS DE YOUTUBE: ONCE CARACTERES Y NADA MÁS
+   ═════════════════════════════════════════════════════════════════
+   Pedido por el autor el 18 de septiembre de 2026, al decidir cómo
+   guardar lo que le genera NotebookLM: «subiré los videos que son cortos
+   a YouTube y los guardaré en recursos de las lecturas».
+
+   ⚠️ AQUÍ VUELVE LA REGLA 1 DE VIDEOS M.E.T.A.S, PALABRA POR PALABRA:
+   **por ningún sitio viaja una dirección hasta el `src` de un
+   `<iframe>`: viajan ONCE CARACTERES.** Ese es el peor sitio del HTML
+   donde puede acabar algo escrito por una persona, y en vez de escapar
+   mejor se le quita al dato la capacidad de hacer daño: en
+   `[A-Za-z0-9_-]` no hay comillas, ni espacios, ni dos puntos, ni
+   barras, así que `javascript:` no se puede ni escribir. La dirección
+   del reproductor se arma SIEMPRE con un literal delante y el
+   identificador ya comprobado detrás.
+
+   ⚠️ Y ESTO ES UNA SEGUNDA COPIA DEL EXTRACTOR, a propósito. Videos
+   M.E.T.A.S tiene el suyo (`mvidDeEnlace`) y llamarlo desde aquí ataría
+   esta herramienta a que aquel archivo cargue —y la casa tiene escrito
+   que si un aparato no carga, lo demás sigue entero—. Lo que NO se
+   duplica es lo que de verdad hay que sostener, que no es el código sino
+   la invariante: **de este lado tampoco llega al `src` nada que no sean
+   esos once caracteres**, y eso lo comprueba la sonda aquí, no allá. Si
+   algún día hace falta un tercero, entonces sí va a un archivo común.
+   ═════════════════════════════════════════════════════════════════ */
+
+/* De un enlace, `{id, ini}` —y `id` vacío si no había nada aprovechable.
+   Con `URL()` y no con una expresión sobre el texto pelado, por lo mismo
+   que en toda la casa: `java\tscript:` y `JavaScript:` pasan un grep
+   ingenuo y el navegador los ejecuta igual. */
+function vozRecYt(txt) {
+  const s = String(txt == null ? '' : txt).trim();
+  const nada = { id: '', ini: 0 };
+  if (!s) return nada;
+  let u;
+  try { u = new URL(s); } catch (e) { return nada; }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') return nada;
+
+  const host = u.hostname.replace(/^www\./, '').replace(/^m\./, '');
+  let bruto = '';
+  if (host === 'youtu.be') bruto = u.pathname.slice(1);
+  else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+    if (u.pathname === '/watch') bruto = u.searchParams.get('v') || '';
+    else {
+      const m = u.pathname.match(/^\/(embed|shorts|live|v)\/([^/?#]+)/);
+      if (m) bruto = m[2];
+    }
+  }
+  /* El cedazo: once caracteres del alfabeto bueno, o nada. */
+  if (!/^[A-Za-z0-9_-]{11}$/.test(bruto)) return nada;
+
+  /* Los segundos del `&t=`, que YouTube escribe de tres maneras. Se
+     guardan porque empezar el video donde empieza lo que importa es la
+     defensa más barata contra los minutos de careta. */
+  const t = String(u.searchParams.get('t') || u.searchParams.get('start') || '').trim().toLowerCase();
+  let ini = 0;
+  if (/^\d+$/.test(t)) ini = parseInt(t, 10);
+  else {
+    const m = t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/);
+    if (m && (m[1] || m[2] || m[3])) ini = (+(m[1] || 0)) * 3600 + (+(m[2] || 0)) * 60 + (+(m[3] || 0));
+  }
+  if (!isFinite(ini) || ini < 0 || ini > 86400) ini = 0;
+  return { id: bruto, ini: ini };
+}
+
+/* La dirección del reproductor. Único sitio del archivo donde se arma
+   una de YouTube, y se arma con un literal delante y el identificador
+   comprobado detrás. `youtube-nocookie.com` es el dominio sin
+   seguimiento, que es el que corresponde en la pantalla de lectura de
+   una casa. */
+function vozRecYtEmbed(id, ini) {
+  const p = ['rel=0', 'modestbranding=1', 'playsinline=1', 'iv_load_policy=3'];
+  if (ini) p.push('start=' + ini);
+  return 'https://www.youtube-nocookie.com/embed/' + id + '?' + p.join('&');
+}
+
+/* ── El título, traído de YouTube ───────────────────────────────
+   Un enlace de YouTube pelado no trae nombre, así que sin esto las
+   tarjetas de un cuaderno entero se llamarían todas «youtube.com». Se le
+   pide a la puerta pública de YouTube (oEmbed), que no lleva clave, ni
+   cuenta, ni librería: una dirección y un JSON con el título dentro.
+
+   ⚠️ LA CONSULTA SE ARMA CON EL IDENTIFICADOR, NO CON LO QUE SE PEGÓ. A
+   YouTube no le sale de aquí ni un carácter que no sean esos once: quien
+   pegue una dirección con algo escondido dentro no se lo manda a nadie.
+   ⚠️ Y SIN CREDENCIALES: la sesión de YouTube de quien lee no tiene nada
+   que hacer en esto.
+   ⚠️ Y CON RELOJ PROPIO, que es la lección de la regla 11: una petición
+   que no vuelve —no que falla: que no vuelve— dejaría «buscando el
+   título…» puesto para siempre. Seis segundos y se queda el nombre que
+   había, que es el dominio: llegar tarde no puede costar más que no
+   llegar.
+   ⚠️ Y si falla NO PASA NADA MÁS QUE LO DE ANTES. Es un adorno útil, no
+   una pieza: sin señal, con la puerta caída o con un video privado —que
+   oEmbed no contesta— el recurso se guarda igual y el nombre se escribe
+   a mano. */
+const VOZ_REC_TIT_ESPERA = 6000;
+let _vozRecTitulos = {};      // id -> { hecho, t, esperando: [] }
+
+async function vozRecPideTitulo(id) {
+  const dir = 'https://www.youtube.com/oembed?format=json&url='
+            + encodeURIComponent('https://www.youtube.com/watch?v=' + id);
+  const ctrl = (typeof AbortController === 'function') ? new AbortController() : null;
+  const reloj = setTimeout(() => { try { if (ctrl) ctrl.abort(); } catch (e) {} }, VOZ_REC_TIT_ESPERA);
+  try {
+    const r = await fetch(dir, { credentials: 'omit', signal: ctrl ? ctrl.signal : undefined });
+    if (!r || !r.ok) return '';
+    const j = await r.json();
+    return (j && typeof j.title === 'string') ? j.title.replace(/\s+/g, ' ').trim().slice(0, 200) : '';
+  } catch (e) {
+    return '';
+  } finally { clearTimeout(reloj); }
+}
+
+/* Devuelve el título si ya se sabe; si no, lo pide UNA vez por video y
+   avisa por `alLlegar`. Se recuerda por identificador y no por
+   dirección: dos enlaces del mismo video son el mismo título, y pedirlo
+   dos veces es un viaje de más por cada forma de escribirlo. */
+function vozRecTitulo(url, alLlegar) {
+  const y = vozRecYt(url);
+  if (!y.id) return null;
+  let g = _vozRecTitulos[y.id];
+  if (g && g.hecho) return g.t || null;
+  if (!g) {
+    g = _vozRecTitulos[y.id] = { hecho: false, t: '', esperando: [] };
+    vozRecPideTitulo(y.id).then(t => {
+      const viejo = _vozRecTitulos[y.id] || { esperando: [] };
+      _vozRecTitulos[y.id] = { hecho: true, t: t, esperando: [] };
+      (viejo.esperando || []).forEach(fn => { try { fn(t); } catch (e) {} });
+    });
+  }
+  if (alLlegar && g.esperando) g.esperando.push(alLlegar);
+  return null;
+}
+
+/* ¿Se está esperando el título de este enlace? Sirve para decirlo en el
+   repaso: un nombre que va a cambiar solo en dos segundos, dicho, no
+   asusta; sin decirlo parece que se guardó mal. */
+function vozRecTituloPendiente(url) {
+  const y = vozRecYt(url);
+  if (!y.id) return false;
+  const g = _vozRecTitulos[y.id];
+  return !!g && !g.hecho;
+}
+
 function vozRecDominio(u) {
   try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; }
 }
@@ -5869,7 +6017,7 @@ function vozRecUrlDeLinea(linea) {
    renglones que no se entendieron CON SU NÚMERO. Un rechazo callado se
    ve desde fuera igual que una herramienta rota (regla 14), y «se
    pusieron 4 de 6» sin decir cuáles dos obliga a contar a mano. */
-function vozRecLeerVarios(txt, cid) {
+function vozRecLeerVarios(txt, cid, alLlegarTitulo) {
   const yaHay = new Set(vozRecDe(cid).map(r => r.url));
   const vistos = new Set();
   const items = [], repes = [], malos = [];
@@ -5882,10 +6030,17 @@ function vozRecLeerVarios(txt, cid) {
        que ya estaba— se dice y se salta. Colgarlo dos veces sí lo sería. */
     if (yaHay.has(d.url) || vistos.has(d.url)) { repes.push(d.url); return; }
     vistos.add(d.url);
+    /* El nombre escrito delante manda siempre. Sin él, el título de
+       YouTube si es un video —y si todavía no llegó, el dominio, con el
+       aviso de que se está buscando—. */
+    const suyo = !!d.nombre;
+    const tit = suyo ? d.nombre : (vozRecTitulo(d.url, alLlegarTitulo) || vozRecNombreDeUrl(d.url));
     items.push({
       url: d.url,
-      tit: (d.nombre || vozRecNombreDeUrl(d.url)).slice(0, 200),
+      tit: String(tit).slice(0, 200),
       tipo: vozRecTipoDeUrl(d.url),
+      auto: !suyo,
+      pidiendo: !suyo && vozRecTituloPendiente(d.url),
     });
   });
   return { items: items, repes: repes, malos: malos };
@@ -6141,6 +6296,16 @@ function vozRecTarjeta(c, r) {
   pie.appendChild(vozNodo('span', 'voz-rec-et voz-rec-et-' + or.id, or.ic + ' ' + or.corto));
   if (r.quien) pie.appendChild(vozNodo('span', 'voz-rec-quien', 'lo puso ' + r.quien));
 
+  /* ▶ Ver aquí: solo si de verdad es un video, y para CUALQUIERA —ver
+     no es corregir, así que no depende de quién lo puso—. El enlace ↗ de
+     arriba se queda igual: un video que su dueño no deje incrustar sale
+     aquí como un cuadro negro, y esa es la salida (regla 3 de Videos
+     M.E.T.A.S). */
+  if (vozRecYt(r.url).id) {
+    pie.appendChild(vozBoton('voz-btn voz-btn-chico voz-rec-ver', '▶ Ver aquí',
+      () => vozRecVerVideo(r), 'Ver el video sin salir de la lectura'));
+  }
+
   if (vozRecEsMio(r)) {
     pie.appendChild(vozBoton('voz-btn voz-btn-chico', '✏️', () => vozRecAbrirHoja(c.cid, r), 'Corregir este recurso'));
     /* Dos toques en el mismo sitio y sin `confirm()`, igual que retirar un
@@ -6174,6 +6339,70 @@ function vozRecTarjeta(c, r) {
   }
   card.appendChild(pie);
   return card;
+}
+
+/* ── Ver el video DENTRO de la lectura ───────────────────────
+   Pedido por el autor el 18 de septiembre de 2026, al decidir subir a
+   YouTube los videos cortos que le genera NotebookLM. Un resumen de tres
+   minutos del ensayo que uno acaba de leer se mira ahí mismo: mandarlo a
+   otra pestaña es, en un lector paginado, perder la página —que es la
+   misma razón por la que una cita se consulta encima del texto y no
+   yendo a la bibliografía (regla 27)—.
+
+   ⚠️ LA HOJA CUELGA DENTRO DE #voz-lector, como todo lo de la sala: del
+   body saldría con el z-index 100 de .fin-modal-overlay, muy por debajo
+   de la sala (3200), y el botón respondería sin que se viera nada
+   (regla 35). */
+function vozRecVerVideo(r) {
+  const y = vozRecYt(r && r.url);
+  if (!y.id) return;
+  const ov = document.getElementById('voz-yt-overlay');
+  const caja = document.getElementById('voz-yt-caja');
+  if (!ov || !caja) return;
+  const tit = document.getElementById('voz-yt-tit');
+  if (tit) tit.textContent = r.tit || 'Video';
+
+  vozRecVaciarVideo();
+  const f = document.createElement('iframe');
+  f.setAttribute('title', r.tit || 'video');
+  f.setAttribute('allow', 'accelerometer; encrypted-media; gyroscope; picture-in-picture');
+  f.setAttribute('allowfullscreen', '');
+  f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+  /* ⚠️ EL ÚNICO DATO QUE ENTRA AQUÍ SON LOS ONCE CARACTERES. La dirección
+     se arma con un literal delante; lo que se pegó no toca este `src`. */
+  f.setAttribute('src', vozRecYtEmbed(y.id, y.ini));
+  caja.appendChild(f);
+
+  /* Y la salida a YouTube, siempre a la vista: si el dueño del video no
+     deja incrustarlo, aquí sale un cuadro negro y esto es lo único que
+     queda. Con noopener, por lo de siempre. */
+  const fuera = document.getElementById('voz-yt-fuera');
+  const bueno = vozRecMiraUrl(r.url);
+  if (fuera) {
+    fuera.hidden = !bueno.ok;
+    if (bueno.ok) {
+      fuera.setAttribute('href', bueno.url);
+      fuera.setAttribute('target', '_blank');
+      fuera.setAttribute('rel', 'noopener noreferrer');
+    }
+  }
+  ov.style.display = 'flex';
+}
+
+/* ⚠️ SE QUITA EL IFRAME, NO SE ESCONDE EL PANEL. Escondiéndolo, el video
+   SIGUE SONANDO detrás de la lectura y no hay manera de pararlo más que
+   cerrando la aplicación. Es la lección de la cámara de El Rodaje:
+   soltar el elemento no apaga nada, hay que quitarlo. Con `textContent`
+   y no con `innerHTML`, como todo en este archivo. */
+function vozRecVaciarVideo() {
+  const caja = document.getElementById('voz-yt-caja');
+  if (caja) caja.textContent = '';
+}
+
+function vozRecCerrarVideo() {
+  vozRecVaciarVideo();
+  const ov = document.getElementById('voz-yt-overlay');
+  if (ov) ov.style.display = 'none';
 }
 
 /* ── La hoja de poner o corregir un recurso ──────────────────────────── */
@@ -6300,11 +6529,31 @@ function vozRecAlEscribirUrl() {
   if (u.ok) {
     const nom = document.getElementById('voz-rec-nom');
     if (!nom.value.trim() || nom.value === _vozRecAuto.nom) {
-      nom.value = vozRecNombreDeUrl(u.url);
+      /* Si es un video, su título de YouTube; si ya se sabe entra ahora
+         mismo y si no, el dominio y se cambia solo cuando llegue. */
+      const yaTit = vozRecTitulo(u.url, t => vozRecTituloLlego(u.url, t));
+      nom.value = yaTit || vozRecNombreDeUrl(u.url);
       _vozRecAuto.nom = nom.value;
     }
     _vozRecEnHoja.fuente = vozRecDominio(u.url);
   }
+  vozRecPintarHoja();
+}
+
+/* ⚠️ Y CUANDO LLEGA, SE MIRA QUE SIGA HACIENDO FALTA. Mientras el
+   título viajaba, la persona pudo escribir el suyo o cambiar de enlace:
+   pisarle lo escrito sería la regla 18 rota por la puerta de atrás, y
+   ponerle el título de otro video es peor todavía porque no se nota. */
+function vozRecTituloLlego(url, t) {
+  if (!t || !_vozRecEnHoja) return;
+  const campo = document.getElementById('voz-rec-url');
+  const nom = document.getElementById('voz-rec-nom');
+  if (!campo || !nom) return;
+  const ahora = vozRecMiraUrl(campo.value);
+  if (!ahora.ok || vozRecYt(ahora.url).id !== vozRecYt(url).id) return;
+  if (nom.value.trim() && nom.value !== _vozRecAuto.nom) return;
+  nom.value = t;
+  _vozRecAuto.nom = t;
   vozRecPintarHoja();
 }
 
@@ -6413,7 +6662,9 @@ function vozRecVPintar() {
       id => { _vozRecV.origen = id; vozRecVPintar(); });
   }
 
-  const r = vozRecLeerVarios(ta.value, _vozRecV.cid);
+  /* Al llegar un título se repinta, y solo si esta hoja sigue abierta:
+     con la hoja cerrada, repintar buscaría nodos que ya no están. */
+  const r = vozRecLeerVarios(ta.value, _vozRecV.cid, () => { if (_vozRecV) vozRecVPintar(); });
   _vozRecV.leido = r;
   caja.textContent = '';
 
@@ -6441,7 +6692,9 @@ function vozRecVPintar() {
       fila.appendChild(vozNodo('span', 'voz-recv-ic', vozRecTipo(it.tipo).ic));
       const txt = vozNodo('span', 'voz-recv-txt2');
       txt.appendChild(vozNodo('span', 'voz-recv-nom', it.tit));
-      txt.appendChild(vozNodo('span', 'voz-recv-dom', vozRecTipo(it.tipo).t + ' · ' + vozRecDominio(it.url)));
+      txt.appendChild(vozNodo('span', 'voz-recv-dom',
+        (it.pidiendo ? '⏳ buscando su título en YouTube… · ' : '')
+        + vozRecTipo(it.tipo).t + ' · ' + vozRecDominio(it.url)));
       fila.appendChild(txt);
       lista.appendChild(fila);
     });
@@ -6556,6 +6809,12 @@ function vozRecEngancha() {
   if (vpeg) vpeg.addEventListener('click', () => vozRecDelPortapapeles('voz-recv-txt', vozRecVPintar));
   const vov = document.getElementById('voz-recv-overlay');
   if (vov) vov.addEventListener('click', e => { if (e.target === vov) vozRecVCerrar(); });
+
+  /* ── El reproductor ── */
+  const ycer = document.getElementById('voz-yt-cerrar');
+  if (ycer) ycer.addEventListener('click', vozRecCerrarVideo);
+  const yov = document.getElementById('voz-yt-overlay');
+  if (yov) yov.addEventListener('click', e => { if (e.target === yov) vozRecCerrarVideo(); });
 
   /* ── La hoja de lo compartido ── */
   const ccer = document.getElementById('voz-comp-cerrar');

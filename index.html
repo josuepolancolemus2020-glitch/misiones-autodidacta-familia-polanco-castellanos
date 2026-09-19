@@ -2578,6 +2578,25 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <p class="voz-aj-nota">Lo que no cuadre se corrige después con el ✏️ de cada tarjeta.</p>
       </div>
     </div>
+
+    <!-- ▶ El video, DENTRO de la lectura. Cuelga de #voz-lector por lo
+         mismo que las otras dos hojas (el z-index), y el iframe se CREA
+         al abrir y se QUITA al cerrar: escondiendo el panel, el video
+         seguiría sonando detrás de la lectura. -->
+    <div id="voz-yt-overlay" class="fin-modal-overlay voz-yt-overlay" style="display:none;">
+      <div class="fin-modal voz-yt-modal" role="dialog" aria-modal="true" aria-labelledby="voz-yt-tit">
+        <div class="msug-det-head">
+          <div class="msug-det-titulo" id="voz-yt-tit">Video</div>
+          <button type="button" class="msug-det-cerrar" id="voz-yt-cerrar" aria-label="Cerrar el video">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <!-- 16:9 exacto: un reproductor estirado no es el que se va a ver. -->
+        <div class="voz-yt-caja" id="voz-yt-caja"></div>
+        <a class="voz-btn voz-btn-ancho voz-yt-fuera" id="voz-yt-fuera" hidden>↗ Verlo en YouTube</a>
+        <p class="voz-aj-nota">Si sale un cuadro negro, el dueño del video no permite incrustarlo: ábrelo en YouTube.</p>
+      </div>
+    </div>
   </div>
 
   <!-- Pegar un texto, y corregirlo: es la MISMA hoja. Con dos
