@@ -1491,37 +1491,64 @@ el diseño.
    la letra—, con el trozo como extracto, pisando el que ese párrafo ya
    tuviera.
 
-   ⚠️ **Y EL PÁRRAFO MARCADO SE VE, que es media función.** Pedido por el
-   autor el 19 de septiembre de 2026: «cuando marco una palabra en un
-   párrafo no se mira la figura cuando seleccioné aquí me quedé». Y era
-   verdad: el 🔖 de la barra de arriba solo se enciende si el marcador cae
-   en el párrafo que ANCLA la página, así que ponerlo desde la selección
-   no cambiaba absolutamente nada en la pantalla —y un botón que no
-   cambia nada se lee, desde fuera, igual que un botón muerto—. Ahora el
-   párrafo lleva su fondo, su raya y su 🔖 en el margen.
+   ⚠️ **Y SE MARCA EL TROZO, NO EL PÁRRAFO.** Pedido por el autor el 19 de
+   septiembre de 2026, en dos vueltas del mismo día, y las dos hacen
+   falta para entenderlo.
 
-   ⚠️ **Y LAS TRES COSAS QUE LO PINTAN ESTÁN ELEGIDAS PARA NO MOVER
-   NADA**: `background`, `box-shadow: inset` y un `::after` fuera del
-   flujo. Ninguna cambia el alto ni el ancho del bloque, así que el
-   número de páginas no se mueve y al lector no se le cambia la página
-   debajo del dedo. Un `border-left` habría repaginado el texto entero, y
-   un 🔖 metido como NODO correría un carácter todos los subrayados del
-   párrafo —se guardan por desplazamiento sobre el texto— sin dar ningún
-   error. Nada de `color-mix` tampoco: en un navegador que no lo conozca
-   la declaración entera se cae y el párrafo se queda sin pintar, o sea el
-   fallo que esto vino a arreglar. El tono va por papel
-   (`--voz-marcado`), como los `--fm-*`.
+   Primero: «cuando marco una palabra en un párrafo no se mira la figura
+   cuando seleccioné aquí me quedé». Y era verdad: el 🔖 de la barra de
+   arriba solo se enciende si el marcador cae en el párrafo que ANCLA la
+   página, así que ponerlo desde la selección no cambiaba absolutamente
+   nada en la pantalla —y un botón que no cambia nada se lee, desde
+   fuera, igual que un botón muerto—.
+
+   La primera respuesta fue teñir el párrafo entero, y el autor la probó
+   y la devolvió en el acto: **«me marca todo el párrafo cuando a veces
+   solo es una palabra la que he seleccionado, quedo en las mismas porque
+   no voy a ver exactamente por dónde me quedé»**. Tenía razón otra vez, y
+   la lección se puede escribir: **un marcador que señala doce renglones
+   no es un marcador**, porque lo único que tiene que decir es dónde se
+   paró uno. Pintar de más y pintar de menos fallan igual.
+
+   Ahora: el **trozo seleccionado** lleva su fondo y su raya —se guarda
+   `i`, `f` y el texto exacto, y se pinta con la MISMA maquinaria que los
+   subrayados (`vozTrozosDe`, `vozEnvolverTrozos`) y el mismo reanclaje,
+   porque es exactamente el mismo gesto—; y el **párrafo** lleva solo la
+   raya del borde y el 🔖 del margen, para encontrarlo al pasar páginas.
+   Un marcador puesto con el 🔖 de la barra no trae trozo —ahí no hay
+   selección— y entonces se queda solo con lo del párrafo: es lo más fino
+   que se sabe, y fingir más sería inventar.
+
+   ⚠️ **Y TODO LO QUE LO PINTA ESTÁ ELEGIDO PARA NO MOVER NADA**:
+   `background`, `box-shadow: inset` y un `::after` fuera del flujo.
+   Ninguna cambia el alto ni el ancho, así que el número de páginas no se
+   mueve y al lector no se le cambia la página debajo del dedo. La raya
+   del trozo va con `box-shadow` y **no con `border-bottom`**, que sí
+   cambia la caja y puede correr un renglón; un `border-left` habría
+   repaginado el texto entero; y un 🔖 metido como NODO correría un
+   carácter todos los subrayados del párrafo —se guardan por
+   desplazamiento sobre el texto— sin dar ningún error. Nada de
+   `color-mix` tampoco: en un navegador que no lo conozca la declaración
+   entera se cae y el párrafo se queda sin pintar, o sea el fallo que
+   esto vino a arreglar. El tono va por papel (`--voz-marcado`), como los
+   `--fm-*`.
 
    ⚠️ **Y EL REPINTADO VIVE EN `vozGuardaMarcas`**, no en cada sitio que
    guarda: hay cuatro caminos que ponen o quitan un marcador —el 🔖 de la
    barra, este, la ✕ del panel y el que pisa uno que ya estaba— y con el
    repintado escrito en cada uno se arreglan tres y se olvida el cuarto.
    Puesto en el único sitio por el que pasan todos, esa clase de fallo
-   deja de poder existir. Y **cambia la clase de los nodos que ya están**,
-   sin repintar el capítulo: repintarlo le arrancaría al lector la
-   selección y la página de debajo del dedo. La comprobación **21** mira
-   el color **calculado**, compara el texto del bloque carácter por
-   carácter y cuenta las páginas antes y después. Sobre una marca ya puesta «Aquí me quedé» se esconde —no hay
+   deja de poder existir. Y **cambia la clase de los nodos que ya están**;
+   el trozo, que no se puede poner ni quitar con una clase, obliga a
+   repintar **solo ese bloque** (`vozSubRepintar`, la misma función de los
+   subrayados) y nunca el capítulo, que le arrancaría al lector la
+   selección y la página de debajo del dedo. La comprobación **21** exige
+   que el `mark` del marcador lleve **el trozo seleccionado carácter por
+   carácter** y que sea MÁS CORTO que el párrafo, mira los colores
+   **calculados**, comprueba que el trozo no lleva borde ni relleno, y
+   cuenta las páginas antes y después. Se probó quitando el pintado del
+   trozo: la sonda suspende cuatro veces y uno de los fallos dice «se
+   está marcando el párrafo entero, que es justo lo que no sirve». Sobre una marca ya puesta «Aquí me quedé» se esconde —no hay
    trozo nuevo al que llevar el marcador— y sale «Quitar». La comprobación
    21 pulsa las tres.
 

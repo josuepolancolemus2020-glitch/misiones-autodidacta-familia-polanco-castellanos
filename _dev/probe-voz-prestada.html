@@ -1198,14 +1198,37 @@ function filasHoja(d){
      —sin error, sin romper la página y con el HTML bien—. */
   const bloque21 = d.querySelector(selBloque21);
   const pintado21 = w.getComputedStyle(bloque21);
-  ok(bloque21.classList.contains('voz-p-marcado')
-     && !/rgba\(0, 0, 0, 0\)|transparent/.test(pintado21.backgroundColor),
-     '⚠️ y el párrafo marcado SE VE, con su fondo de verdad (color calculado: ' + pintado21.backgroundColor + ') y su 🔖 en el margen',
-     '⚠️ el párrafo no se pinta: clase=' + bloque21.className + ' fondo=' + pintado21.backgroundColor
+  ok(bloque21.classList.contains('voz-p-marcado') && pintado21.boxShadow && pintado21.boxShadow !== 'none',
+     'el párrafo lleva su raya y su 🔖 en el margen, para encontrarlo al pasar páginas',
+     '⚠️ el párrafo no se señala: clase=' + bloque21.className + ' sombra=' + pintado21.boxShadow
        + ' — poner el marcador desde la selección no cambia nada en la pantalla');
-  ok(/16/.test(w.getComputedStyle(bloque21, '::after').content) || pintado21.position === 'relative',
-     'y el 🔖 sale de un pseudo-elemento, colocado fuera del flujo',
-     'el 🔖 no está puesto como pseudo-elemento');
+
+  /* ⚠️ Y LO QUE DE VERDAD IMPORTA: SE MARCA EL TROZO, NO EL PÁRRAFO.
+     El autor probó la primera versión el 19 de septiembre de 2026 y dijo
+     lo único que hacía falta oír: «me marca todo el párrafo cuando a veces
+     solo es una palabra la que he seleccionado, quedo en las mismas
+     porque no voy a ver exactamente por dónde me quedé». Un párrafo de
+     doce renglones teñido entero no dice dónde se paró uno, que es lo
+     único que un marcador tiene que decir. */
+  const trozo21 = bloque21.querySelector('mark.voz-hl-lugar');
+  ok(!!trozo21 && trozo21.textContent === sel21b.t,
+     '⚠️ Y SE MARCA EL TROZO SELECCIONADO, carácter por carácter —«' + sel21b.t.slice(0, 32) + '…»—, que es lo único que dice por dónde se quedó uno',
+     '⚠️ no se marcó el trozo: ' + (trozo21 ? JSON.stringify(trozo21.textContent) : '(no hay mark.voz-hl-lugar)')
+       + ' — se esperaba ' + JSON.stringify(sel21b.t));
+  ok(!!trozo21 && trozo21.textContent.length < bloque21.textContent.length,
+     'y NO el párrafo entero: se marcan ' + (trozo21 ? trozo21.textContent.length : 0)
+       + ' caracteres de los ' + bloque21.textContent.length + ' del párrafo',
+     '⚠️ se está marcando el párrafo entero, que es justo lo que no sirve');
+  const pintTrozo21 = trozo21 ? w.getComputedStyle(trozo21) : null;
+  ok(!!pintTrozo21 && !/rgba\(0, 0, 0, 0\)|transparent/.test(pintTrozo21.backgroundColor)
+     && pintTrozo21.boxShadow && pintTrozo21.boxShadow !== 'none',
+     'y el trozo se pinta de verdad (color CALCULADO: ' + (pintTrozo21 && pintTrozo21.backgroundColor) + ', con su raya)',
+     '⚠️ el trozo no se pinta: fondo=' + (pintTrozo21 && pintTrozo21.backgroundColor)
+       + ' sombra=' + (pintTrozo21 && pintTrozo21.boxShadow));
+  ok(!!pintTrozo21 && pintTrozo21.borderBottomWidth === '0px' && pintTrozo21.paddingTop === '0px',
+     '⚠️ y su raya va con `box-shadow`, no con un borde: un borde cambia la caja del trozo y puede correr un renglón, o sea repaginar el capítulo justo al decir dónde se quedó uno',
+     'el trozo lleva borde o relleno: borde=' + (pintTrozo21 && pintTrozo21.borderBottomWidth)
+       + ' relleno=' + (pintTrozo21 && pintTrozo21.paddingTop));
 
   /* ⚠️ Y LAS DOS COSAS QUE NO PUEDE MOVER, que es por lo que la marca se
      pinta con fondo y sombra interior y no con un borde o un nodo. */
@@ -1220,9 +1243,11 @@ function filasHoja(d){
   /* Y quitarlo lo quita de la pantalla, por el camino de siempre. */
   w.eval('(function(){ const c = _vozLeyendo; vozGuardaMarcas(c.cid, []); })()');
   await esperar(200);
-  ok(!d.querySelector(selBloque21).classList.contains('voz-p-marcado'),
-     'y al quitar el marcador, el párrafo se despinta —el repintado vive en `vozGuardaMarcas`, por donde pasan los cuatro caminos que ponen o quitan uno—',
-     'el párrafo sigue marcado después de quitar el marcador');
+  ok(!d.querySelector(selBloque21).classList.contains('voz-p-marcado')
+     && !d.querySelector(selBloque21 + ' mark.voz-hl-lugar'),
+     'y al quitar el marcador se van la raya Y el trozo —el repintado vive en `vozGuardaMarcas`, por donde pasan los cuatro caminos que ponen o quitan uno—',
+     'después de quitar el marcador queda: clase=' + d.querySelector(selBloque21).className
+       + ' trozo=' + !!d.querySelector(selBloque21 + ' mark.voz-hl-lugar'));
   w.eval('(function(){ const c = _vozLeyendo; vozGuardaMarcas(c.cid, ' + JSON.stringify(lugares21) + '); })()');
   await esperar(150);
   selecciona(0, 30);

@@ -268,11 +268,21 @@ function vozLeeMarcas(cid) {
 let _vozMarcasSet = null;
 
 function vozGuardaMarcas(cid, lista) {
+  /* Lo de antes, para saber qué bloques hay que volver a pintar: el
+     trozo marcado no se pone ni se quita con una clase. */
+  const antes = (_vozLeyendo && _vozLeyendo.cid === cid) ? vozLeeMarcas(cid) : [];
   try {
     const m = JSON.parse(localStorage.getItem(VOZ_MARCAS) || '{}') || {};
     m[cid] = lista;
     localStorage.setItem(VOZ_MARCAS, JSON.stringify(m));
   } catch (e) {}
+  const firma = x => (x.cap || 0) + ':' + x.vp + '|' + (x.i != null ? x.i + '-' + x.f : '');
+  const viejas = new Map(antes.map(x => [(x.cap || 0) + ':' + x.vp, firma(x)]));
+  const nuevas = new Map((lista || []).map(x => [(x.cap || 0) + ':' + x.vp, firma(x)]));
+  const cambiados = [];
+  new Set([...viejas.keys(), ...nuevas.keys()]).forEach(k => {
+    if (viejas.get(k) !== nuevas.get(k)) cambiados.push(k);
+  });
   /* ⚠️ Y EL TEXTO SE REPINTA AQUÍ, no en cada sitio que guarda. Hay
      cuatro caminos que ponen o quitan un marcador —el 🔖 de la barra, el
      «🔖 Aquí me quedé» de la selección, la ✕ del panel y el que pisa uno
@@ -280,22 +290,22 @@ function vozGuardaMarcas(cid, lista) {
      tres y se olvida el cuarto. Puesto en el único sitio por el que pasan
      todos, esa clase de fallo deja de poder existir. */
   _vozMarcasSet = null;
-  if (_vozLeyendo && _vozLeyendo.cid === cid) vozRepintarMarcasTexto();
+  if (_vozLeyendo && _vozLeyendo.cid === cid) vozRepintarMarcasTexto(cambiados);
 }
 
-/* Los marcadores del texto que se está leyendo, en un conjunto
-   «capítulo:párrafo». Se recuerda porque `vozNodoBloque` pregunta por CADA
-   bloque y un ensayo son doscientos: sin esto, pintar un capítulo sería
-   doscientas lecturas de localStorage con su JSON.parse. Se tira en
-   cuanto algo cambia. */
+/* Los marcadores del texto que se está leyendo, en un mapa
+   «capítulo:párrafo» → marca. Se recuerda porque `vozNodoBloque` pregunta
+   por CADA bloque y un ensayo son doscientos: sin esto, pintar un
+   capítulo sería doscientas lecturas de localStorage con su JSON.parse.
+   Se tira en cuanto algo cambia. */
 function vozMarcasSet() {
   if (_vozMarcasSet) return _vozMarcasSet;
-  const s = new Set();
+  const m = new Map();
   if (_vozLeyendo) {
-    vozLeeMarcas(_vozLeyendo.cid).forEach(m => s.add((m.cap || 0) + ':' + m.vp));
+    vozLeeMarcas(_vozLeyendo.cid).forEach(x => m.set((x.cap || 0) + ':' + x.vp, x));
   }
-  _vozMarcasSet = s;
-  return s;
+  _vozMarcasSet = m;
+  return m;
 }
 
 /* ⚠️ SE CAMBIA LA CLASE DE LOS NODOS QUE YA ESTÁN; NO SE REPINTA NADA.
@@ -305,13 +315,21 @@ function vozMarcasSet() {
    Por eso la marca del párrafo se pinta con fondo, sombra INTERIOR y un
    pseudo-elemento: ni una de las tres cambia el alto ni el ancho del
    bloque, así que el número de páginas no se mueve. */
-function vozRepintarMarcasTexto() {
+function vozRepintarMarcasTexto(cambiados) {
   const texto = document.getElementById('voz-texto');
   if (!texto) return;
-  const set = vozMarcasSet();
+  const mapa = vozMarcasSet();
   texto.querySelectorAll('[data-vp]').forEach(el => {
     const k = (el.dataset.cap || '0') + ':' + el.dataset.vp;
-    el.classList.toggle('voz-p-marcado', set.has(k));
+    el.classList.toggle('voz-p-marcado', mapa.has(k));
+  });
+  /* El TROZO no se puede poner ni quitar cambiando una clase: hay que
+     volver a pintar ese bloque. Se repinta SOLO él —con la misma función
+     que usan los subrayados— y no el capítulo, que le arrancaría al
+     lector la selección y la página de debajo del dedo. */
+  (cambiados || []).forEach(k => {
+    const t = String(k).split(':');
+    vozSubRepintar(Number(t[0]) || 0, Number(t[1]));
   });
 }
 
@@ -3511,8 +3529,52 @@ function vozNodoBloque(p, i, anterior, cap) {
      sin dar ningún error y sin que se viera hasta releerlo. Por eso el
      🔖 sale de un `::after` del CSS, como la letra de un subrayado. */
   if (vozMarcasSet().has((cap || 0) + ':' + i)) el.classList.add('voz-p-marcado');
-  if (_vozLeyendo && p.k !== 'sep' && p.k !== 'fin' && p.k !== 'tabla') vozAplicarSubrayados(el, _vozLeyendo.cid, cap || 0, i);
+  if (_vozLeyendo && p.k !== 'sep' && p.k !== 'fin' && p.k !== 'tabla') {
+    vozAplicarSubrayados(el, _vozLeyendo.cid, cap || 0, i);
+    /* DESPUÉS de los subrayados, para que el trozo del marcador quede por
+       encima si los dos caen sobre las mismas palabras. */
+    vozPintarMarcaLugar(el, cap || 0, i);
+  }
   return el;
+}
+
+/* ⚠️ EL MARCADOR SE PINTA SOBRE EL TROZO QUE SE SELECCIONÓ, NO SOBRE EL
+   PÁRRAFO ENTERO. Pedido por el autor el 19 de septiembre de 2026, al
+   probar la primera versión: «me marca todo el párrafo cuando a veces
+   solo es una palabra la que he seleccionado, quedo en las mismas porque
+   no voy a ver exactamente por dónde me quedé». Y tenía razón: un
+   párrafo de doce renglones teñido entero no dice dónde se paró uno, que
+   es lo único que un marcador tiene que decir.
+
+   Se usa la MISMA maquinaria que los subrayados —`vozTrozosDe` y
+   `vozEnvolverTrozos`, con el mismo reanclaje— porque es exactamente el
+   mismo gesto: un trozo guardado por desplazamiento de caracteres sobre
+   el texto del bloque. Dos aparatos para lo mismo se arreglan en uno y se
+   quedan rotos en el otro.
+
+   Un marcador puesto con el 🔖 de la barra NO trae trozo —ahí no hay
+   selección, se marca la página—, y entonces solo queda la raya y el 🔖
+   del margen: es lo más fino que se sabe, y fingir más sería inventar. */
+function vozPintarMarcaLugar(el, cap, vp) {
+  const m = vozMarcasSet().get((cap || 0) + ':' + vp);
+  if (!m || !m.t || !(m.f > m.i)) return;
+  const cont = vozCuerpoDe(el);
+  const plano = cont.textContent;
+  let i = m.i, f = m.f;
+  if (plano.slice(i, f) !== m.t) {
+    /* El texto se corrigió: se reancla solo si el trozo aparece UNA vez.
+       Con dos apariciones, adivinar es peor que no pintar (regla 21). */
+    const k = plano.indexOf(m.t);
+    if (k < 0 || plano.indexOf(m.t, k + 1) >= 0) return;
+    i = k; f = k + m.t.length;
+  }
+  const trozos = vozTrozosDe(cont, i, f);
+  if (!trozos.length) return;
+  vozEnvolverTrozos(trozos, () => {
+    const mk = vozNodo('mark', 'voz-hl-lugar');
+    mk.setAttribute('aria-label', 'Aquí me quedé');
+    return mk;
+  });
 }
 
 
@@ -5417,6 +5479,11 @@ function vozSubAquiMeQuede() {
   } catch (e) {}
   const lista = vozLeeMarcas(c.cid).filter(m => !(m.cap === s.cap && m.vp === s.vp));
   lista.push({ cap: s.cap, vp: s.vp, sub: Math.round(sub * 1000) / 1000,
+               /* ⚠️ El TROZO exacto, con su desplazamiento: es lo que se
+                  pinta en el texto. `txt` es el extracto del panel, que va
+                  recortado a 110; `t`, `i` y `f` son la posición de verdad
+                  y no se recortan, o el reanclaje no casaría. */
+               i: s.i, f: s.f, t: s.t,
                txt: s.t.length > 110 ? s.t.slice(0, 108).replace(/\s+\S*$/, '') + '…' : s.t,
                cuando: Date.now() });
   lista.sort((a, b) => a.cap - b.cap || a.vp - b.vp || a.sub - b.sub);

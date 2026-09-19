@@ -544,13 +544,16 @@
    debajo del dedo. Un `border-left` habría repaginado el texto entero, y
    un 🔖 metido como nodo correría un carácter todos los subrayados del
    párrafo (se guardan por desplazamiento, regla 21). */
+/* ⚠️ EL PÁRRAFO NO SE TIÑE ENTERO. La primera versión le ponía fondo a
+   todo el bloque, y el autor lo probó y lo dijo el mismo día: «me marca
+   todo el párrafo cuando a veces solo es una palabra la que he
+   seleccionado, quedo en las mismas porque no voy a ver exactamente por
+   dónde me quedé». Doce renglones teñidos no dicen dónde se paró uno.
+   Aquí queda solo la RAYA del borde —para encontrar el párrafo al pasar
+   páginas— y el 🔖 del margen; lo fino lo pinta `.voz-hl-lugar` sobre el
+   trozo de verdad. */
 #voz-lector .voz-p-marcado {
   position: relative;
-  /* ⚠️ Un valor escrito por papel, NUNCA `color-mix`: en un navegador
-     que no lo conozca la declaración entera se cae y el párrafo se
-     queda sin pintar —o sea, el fallo que esto vino a arreglar, otra
-     vez y sin dar ningún error—. */
-  background: var(--voz-marcado, rgba(253, 230, 138, .45));
   box-shadow: inset 3px 0 0 var(--story);
   border-radius: 0 5px 5px 0;
 }
@@ -1853,3 +1856,19 @@ body.voz-eligiendo .destello-fab { display: none !important; }
 #voz-lector .voz-rec-t-mapa      { border-left: 4px solid #be185d; }
 /* Y la etiqueta de máquina, que también declara el atajo del borde. */
 #voz-lector .voz-rec-et-maquina { border-color: rgba(217,119,6,.5); color: #b45309; }
+
+/* ⚠️ EL TROZO DONDE SE QUEDÓ LA LECTURA. Va aquí abajo, con las demás
+   reglas de color, y NO lleva `border-bottom` ni `padding`: un borde o un
+   relleno cambian la caja del trozo y pueden correr un renglón, o sea
+   repaginar el capítulo justo al decir dónde se quedó uno. La raya se
+   dibuja con `box-shadow`, que no ocupa sitio.
+   Y se distingue de los cinco subrayados a propósito: aquellos llevan su
+   trama y su letra (D V I C ?); este, la raya llena del color de la tinta
+   y ninguna letra. */
+#voz-lector .voz-hl-lugar {
+  background: var(--voz-marcado, rgba(253, 230, 138, .45));
+  color: inherit;
+  box-shadow: inset 0 -2px 0 var(--story);
+  border-radius: 2px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
