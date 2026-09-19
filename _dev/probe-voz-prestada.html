@@ -97,7 +97,7 @@ const VOZ_UID = '11111111-1111-1111-1111-111111111111';
    segundos que la herramienta espera a que la selección se quede
    quieta, más un respiro. Va en una constante para que el día que ese
    número cambie no haya que cazar cinco esperas por el archivo. */
-const VOZ_SUB_ESPERA_SONDA = 3400;
+const VOZ_SUB_ESPERA_SONDA = 2400;   // VOZ_SUB_ESPERA (2 s) y un respiro
 
 const out = document.getElementById('out'), f = document.getElementById('f');
 const L = []; let fallos = 0;
@@ -1025,7 +1025,7 @@ function filasHoja(d){
   await esperar(2900);
   let barra = d.getElementById('voz-subbar');
   ok(barra && !barra.hidden,
-     'y sale cuando la selección lleva tres segundos quieta, que es cuando de verdad se terminó',
+     'y sale cuando la selección lleva dos segundos quieta, que es cuando de verdad se terminó',
      'no salió la barra de subrayar al terminar la selección');
   /* ⚠️ Y LA DE VERDAD, que es la que describe el fallo: con la barra YA
      ABIERTA, mover la selección —arrastrar un tirador— la cierra al
@@ -1175,12 +1175,56 @@ function filasHoja(d){
      !barra.querySelector('.voz-subbar-cerrar').hidden,
      'sobre una selección NUEVA la barra trae Nota, «Aquí me quedé» y Cerrar, y esconde Quitar (como en las misiones)',
      'la barra de la selección nueva no trae las acciones de las misiones');
+  /* Lo de antes, para poder comparar: el texto del bloque carácter por
+     carácter y cuántas páginas hay. */
+  const selBloque21 = '#voz-texto [data-cap="' + sel21b.cap + '"][data-vp="' + sel21b.vp + '"]';
+  const txtAntes21 = String(d.querySelector(selBloque21).textContent);
+  const pagsAntes21 = Number(w.eval('_vozPaginas || 0'));
+
   barra.querySelector('.voz-subbar-lugar').click();
   await esperar(250);
   const lugares21 = JSON.parse(w.eval('JSON.stringify(vozLeeMarcas("c-sub2"))'));
   ok(lugares21.length === 1 && lugares21[0].cap === sel21b.cap && lugares21[0].vp === sel21b.vp && barra.hidden,
      '«Aquí me quedé» pone el marcador en el PÁRRAFO seleccionado y cierra la barra',
      'el marcador de lugar no quedó: ' + JSON.stringify(lugares21));
+
+  /* ⚠️ Y SE VE. Pedido por el autor el 19 de septiembre de 2026: «cuando
+     marco una palabra en un párrafo no se mira la figura cuando
+     seleccioné aquí me quedé». Y era verdad: el 🔖 de la barra solo se
+     enciende si el marcador cae en el párrafo que ancla la página, así
+     que poner uno desde la selección no cambiaba NADA en la pantalla y se
+     leía igual que un botón muerto.
+     Se mira el color CALCULADO, no la clase: es el fallo del `var(--card)`
+     —sin error, sin romper la página y con el HTML bien—. */
+  const bloque21 = d.querySelector(selBloque21);
+  const pintado21 = w.getComputedStyle(bloque21);
+  ok(bloque21.classList.contains('voz-p-marcado')
+     && !/rgba\(0, 0, 0, 0\)|transparent/.test(pintado21.backgroundColor),
+     '⚠️ y el párrafo marcado SE VE, con su fondo de verdad (color calculado: ' + pintado21.backgroundColor + ') y su 🔖 en el margen',
+     '⚠️ el párrafo no se pinta: clase=' + bloque21.className + ' fondo=' + pintado21.backgroundColor
+       + ' — poner el marcador desde la selección no cambia nada en la pantalla');
+  ok(/16/.test(w.getComputedStyle(bloque21, '::after').content) || pintado21.position === 'relative',
+     'y el 🔖 sale de un pseudo-elemento, colocado fuera del flujo',
+     'el 🔖 no está puesto como pseudo-elemento');
+
+  /* ⚠️ Y LAS DOS COSAS QUE NO PUEDE MOVER, que es por lo que la marca se
+     pinta con fondo y sombra interior y no con un borde o un nodo. */
+  ok(String(bloque21.textContent) === txtAntes21,
+     '⚠️ y el texto del bloque sigue siendo CARÁCTER POR CARÁCTER el mismo: un 🔖 metido como nodo correría todos los subrayados del párrafo, que se guardan por desplazamiento (regla 21)',
+     'el texto del bloque cambió al marcarlo: ' + JSON.stringify(String(bloque21.textContent).slice(0, 60))
+       + ' antes ' + JSON.stringify(txtAntes21.slice(0, 60)));
+  ok(Number(w.eval('_vozPaginas || 0')) === pagsAntes21,
+     'y el número de páginas es el mismo: marcar no repagina el texto debajo del dedo del lector',
+     'marcar repaginó: ' + w.eval('_vozPaginas') + ' páginas, antes ' + pagsAntes21);
+
+  /* Y quitarlo lo quita de la pantalla, por el camino de siempre. */
+  w.eval('(function(){ const c = _vozLeyendo; vozGuardaMarcas(c.cid, []); })()');
+  await esperar(200);
+  ok(!d.querySelector(selBloque21).classList.contains('voz-p-marcado'),
+     'y al quitar el marcador, el párrafo se despinta —el repintado vive en `vozGuardaMarcas`, por donde pasan los cuatro caminos que ponen o quitan uno—',
+     'el párrafo sigue marcado después de quitar el marcador');
+  w.eval('(function(){ const c = _vozLeyendo; vozGuardaMarcas(c.cid, ' + JSON.stringify(lugares21) + '); })()');
+  await esperar(150);
   selecciona(0, 30);
   await esperar(VOZ_SUB_ESPERA_SONDA);
   barra.querySelector('.voz-subbar-nota-btn').click();

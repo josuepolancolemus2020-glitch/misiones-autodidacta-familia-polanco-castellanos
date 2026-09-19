@@ -265,12 +265,54 @@ function vozLeeMarcas(cid) {
   } catch (e) { return []; }
 }
 
+let _vozMarcasSet = null;
+
 function vozGuardaMarcas(cid, lista) {
   try {
     const m = JSON.parse(localStorage.getItem(VOZ_MARCAS) || '{}') || {};
     m[cid] = lista;
     localStorage.setItem(VOZ_MARCAS, JSON.stringify(m));
   } catch (e) {}
+  /* ⚠️ Y EL TEXTO SE REPINTA AQUÍ, no en cada sitio que guarda. Hay
+     cuatro caminos que ponen o quitan un marcador —el 🔖 de la barra, el
+     «🔖 Aquí me quedé» de la selección, la ✕ del panel y el que pisa uno
+     que ya estaba—, y con el repintado escrito en cada uno se arreglan
+     tres y se olvida el cuarto. Puesto en el único sitio por el que pasan
+     todos, esa clase de fallo deja de poder existir. */
+  _vozMarcasSet = null;
+  if (_vozLeyendo && _vozLeyendo.cid === cid) vozRepintarMarcasTexto();
+}
+
+/* Los marcadores del texto que se está leyendo, en un conjunto
+   «capítulo:párrafo». Se recuerda porque `vozNodoBloque` pregunta por CADA
+   bloque y un ensayo son doscientos: sin esto, pintar un capítulo sería
+   doscientas lecturas de localStorage con su JSON.parse. Se tira en
+   cuanto algo cambia. */
+function vozMarcasSet() {
+  if (_vozMarcasSet) return _vozMarcasSet;
+  const s = new Set();
+  if (_vozLeyendo) {
+    vozLeeMarcas(_vozLeyendo.cid).forEach(m => s.add((m.cap || 0) + ':' + m.vp));
+  }
+  _vozMarcasSet = s;
+  return s;
+}
+
+/* ⚠️ SE CAMBIA LA CLASE DE LOS NODOS QUE YA ESTÁN; NO SE REPINTA NADA.
+   Repintar el capítulo le arrancaría al lector la selección y la página
+   de debajo del dedo —la lección de la barra de grupos de M.E.T.A.S—, y
+   además volvería a paginar justo cuando acaba de decir dónde se quedó.
+   Por eso la marca del párrafo se pinta con fondo, sombra INTERIOR y un
+   pseudo-elemento: ni una de las tres cambia el alto ni el ancho del
+   bloque, así que el número de páginas no se mueve. */
+function vozRepintarMarcasTexto() {
+  const texto = document.getElementById('voz-texto');
+  if (!texto) return;
+  const set = vozMarcasSet();
+  texto.querySelectorAll('[data-vp]').forEach(el => {
+    const k = (el.dataset.cap || '0') + ':' + el.dataset.vp;
+    el.classList.toggle('voz-p-marcado', set.has(k));
+  });
 }
 
 /* Un nodo con su texto dentro, en una línea. En este archivo NO se
@@ -3311,6 +3353,10 @@ function vozPintaTexto(nodo, t) {
 }
 
 function vozAbrirLector(cid) {
+  /* ⚠️ El conjunto de marcadores es del texto que se esté leyendo: sin
+     tirarlo aquí, al abrir el siguiente se marcarían los párrafos que
+     tenían el mismo número en el anterior. */
+  _vozMarcasSet = null;
   const c = _vozCuentos.find(x => x.cid === cid);
   if (!c) return;
   _vozLeyendo = c;
@@ -3459,6 +3505,12 @@ function vozNodoBloque(p, i, anterior, cap) {
   }
   el.dataset.vp = String(i);
   el.dataset.cap = String(cap || 0);
+  /* ⚠️ LA MARCA VA EN UNA CLASE, NUNCA EN EL TEXTO DEL BLOQUE. Un 🔖
+     metido como nodo de texto correría un carácter todos los subrayados
+     del párrafo —se guardan por desplazamiento sobre el texto, regla 21—
+     sin dar ningún error y sin que se viera hasta releerlo. Por eso el
+     🔖 sale de un `::after` del CSS, como la letra de un subrayado. */
+  if (vozMarcasSet().has((cap || 0) + ':' + i)) el.classList.add('voz-p-marcado');
   if (_vozLeyendo && p.k !== 'sep' && p.k !== 'fin' && p.k !== 'tabla') vozAplicarSubrayados(el, _vozLeyendo.cid, cap || 0, i);
   return el;
 }
@@ -5114,7 +5166,15 @@ function vozLeerSeleccionSala() {
    hay que adivinarlo por el reloj. Esperar tres segundos delante de una
    computadora, donde el gesto es inequívoco, sería tiempo muerto por
    nada. */
-const VOZ_SUB_ESPERA = 3000;
+/* ⚠️ DOS SEGUNDOS, no tres. Se puso en tres el 12 de septiembre de 2026
+   para que la barra no saliera MIENTRAS se arrastran los tiradores; al
+   usarlo de verdad, el autor pidió bajarlo el 19: tres segundos con el
+   trozo ya elegido y el dedo quieto se sienten como que no va a salir, y
+   entonces uno vuelve a tocar y deshace la selección. Dos siguen siendo
+   más largos que cualquier pausa de las que se hacen mirando dónde cae
+   el borde, que es lo único que este reloj tiene que aguantar. Con el
+   RATÓN no se espera nada: ahí soltar el botón dice «ya terminé». */
+const VOZ_SUB_ESPERA = 2000;
 let _vozSelTimer = null;
 
 function vozSubProgramar(ms) {

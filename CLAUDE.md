@@ -1458,7 +1458,15 @@ el diseño.
    hay que ver para elegir el trozo; y encima Android pone su propia barra
    de copiar, así que quedaban dos—. Ahora cada movimiento de la selección
    la cierra al instante y solo se abre cuando la selección lleva
-   **tres segundos quieta** (`VOZ_SUB_ESPERA`).
+   **dos segundos quieta** (`VOZ_SUB_ESPERA`).
+   ⚠️ **Y son DOS desde el 19 de septiembre de 2026, no tres.** Se
+   pusieron tres el 12 y al usarlo de verdad el autor pidió bajarlo: con
+   el trozo ya elegido y el dedo quieto, tres segundos se sienten como
+   que la barra no va a salir, y entonces uno vuelve a tocar y deshace la
+   selección. Dos siguen siendo más largos que cualquiera de las pausas
+   que se hacen mirando dónde cae el borde, que es lo único que este
+   reloj tiene que aguantar. El número vive en `VOZ_SUB_ESPERA` y la
+   sonda lo espera con un respiro encima (`VOZ_SUB_ESPERA_SONDA`).
    ⚠️ **Y escribir en la propia barra no cuenta como seleccionar.** Tocar
    «✎ Nota» lleva el foco al recuadro y el navegador recoge la selección
    del texto al hacerlo: sin esa guarda, abrir la nota **cerraba la barra
@@ -1469,7 +1477,7 @@ el diseño.
    ⚠️ **Y con el RATÓN no se espera**, porque ahí SÍ existe un gesto que
    dice «ya terminé»: soltar el botón. Con el dedo no existe —los
    tiradores son del sistema y no nos avisan de nada—, y por eso allí hay
-   que adivinarlo por el reloj. Tres segundos delante de una computadora,
+   que adivinarlo por el reloj. Dos segundos delante de una computadora,
    donde el gesto es inequívoco, serían tiempo muerto por nada.
 
    ⚠️ **La barra de una selección NUEVA trae también «✎ Nota», «🔖 Aquí me
@@ -1481,7 +1489,39 @@ el diseño.
    bote pronto, y se recolorea tocándola. «Aquí me quedé» pone el marcador
    de lectura EN EL PÁRRAFO seleccionado —no en la página, que cambia con
    la letra—, con el trozo como extracto, pisando el que ese párrafo ya
-   tuviera. Sobre una marca ya puesta «Aquí me quedé» se esconde —no hay
+   tuviera.
+
+   ⚠️ **Y EL PÁRRAFO MARCADO SE VE, que es media función.** Pedido por el
+   autor el 19 de septiembre de 2026: «cuando marco una palabra en un
+   párrafo no se mira la figura cuando seleccioné aquí me quedé». Y era
+   verdad: el 🔖 de la barra de arriba solo se enciende si el marcador cae
+   en el párrafo que ANCLA la página, así que ponerlo desde la selección
+   no cambiaba absolutamente nada en la pantalla —y un botón que no
+   cambia nada se lee, desde fuera, igual que un botón muerto—. Ahora el
+   párrafo lleva su fondo, su raya y su 🔖 en el margen.
+
+   ⚠️ **Y LAS TRES COSAS QUE LO PINTAN ESTÁN ELEGIDAS PARA NO MOVER
+   NADA**: `background`, `box-shadow: inset` y un `::after` fuera del
+   flujo. Ninguna cambia el alto ni el ancho del bloque, así que el
+   número de páginas no se mueve y al lector no se le cambia la página
+   debajo del dedo. Un `border-left` habría repaginado el texto entero, y
+   un 🔖 metido como NODO correría un carácter todos los subrayados del
+   párrafo —se guardan por desplazamiento sobre el texto— sin dar ningún
+   error. Nada de `color-mix` tampoco: en un navegador que no lo conozca
+   la declaración entera se cae y el párrafo se queda sin pintar, o sea el
+   fallo que esto vino a arreglar. El tono va por papel
+   (`--voz-marcado`), como los `--fm-*`.
+
+   ⚠️ **Y EL REPINTADO VIVE EN `vozGuardaMarcas`**, no en cada sitio que
+   guarda: hay cuatro caminos que ponen o quitan un marcador —el 🔖 de la
+   barra, este, la ✕ del panel y el que pisa uno que ya estaba— y con el
+   repintado escrito en cada uno se arreglan tres y se olvida el cuarto.
+   Puesto en el único sitio por el que pasan todos, esa clase de fallo
+   deja de poder existir. Y **cambia la clase de los nodos que ya están**,
+   sin repintar el capítulo: repintarlo le arrancaría al lector la
+   selección y la página de debajo del dedo. La comprobación **21** mira
+   el color **calculado**, compara el texto del bloque carácter por
+   carácter y cuenta las páginas antes y después. Sobre una marca ya puesta «Aquí me quedé» se esconde —no hay
    trozo nuevo al que llevar el marcador— y sale «Quitar». La comprobación
    21 pulsa las tres.
 
