@@ -232,9 +232,50 @@
 .voz-chip-chica { padding: 6px 11px; min-height: 32px; font-size: 12.5px; }
 .voz-orden-nota { margin: 0 0 4px; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
 
-/* Los grupos (por voz o por género): un rótulo con su lomo y la caja
-   de sus textos. Sin agrupar hay una sola caja sin rótulo. */
-.voz-grupo-tit { display: flex; align-items: center; gap: 9px; margin: 6px 0 0; padding: 4px 0; }
+/* Los grupos (por estante, por voz o por género): un rótulo con su lomo
+   y la caja de sus textos. Sin agrupar hay una sola caja sin rótulo.
+
+   Y el rótulo es un BOTÓN que pliega su montón (regla 40): de ahí que
+   lleve puestos los frenos de un botón —sin borde, sin fondo, ancho
+   entero, texto a la izquierda— y 44 px de alto, que es lo que un dedo
+   acierta. Con un solo grupo se pinta como un `div` y no lleva nada de
+   esto: un mando que no separa nada es un toque cobrado de más. */
+.voz-grupo-tit {
+  display: flex; align-items: center; gap: 9px; margin: 6px 0 0; padding: 4px 0;
+  width: 100%; min-height: 44px; border: 0; background: transparent;
+  color: inherit; font: inherit; text-align: left;
+}
+button.voz-grupo-tit { cursor: pointer; }
+button.voz-grupo-tit:focus-visible { outline: 2px solid var(--story); outline-offset: 2px; border-radius: 8px; }
+/* El galón: abajo cuando está abierto, de lado cuando está plegado, que
+   es como se lee en cualquier pantalla. */
+.voz-grupo-gal {
+  margin-left: auto; flex: 0 0 auto; font-size: 13px; color: var(--muted);
+  transition: transform .18s ease;
+}
+.voz-grupo-tit[aria-expanded="false"] .voz-grupo-gal { transform: rotate(-90deg); }
+/* ⚠️ ESTA LÍNEA ES LO QUE HACE QUE EL PLEGADO EXISTA, y sin ella no da
+   ningún error. El `[hidden]` del navegador vive en la hoja del
+   USUARIO-AGENTE, que es la más débil de todas: la pierde contra
+   cualquier `display` escrito aquí, y `.voz-grupo` trae `display: flex`
+   y la cuadrícula `display: grid`. O sea que `caja.hidden = true` deja
+   el montón ENTERO a la vista con el `aria-expanded` diciendo que está
+   cerrado: el mando responde y no hace nada, que es el peor de los
+   fallos. Ya pasó en Mis Rutas y está escrito en app.css al lado de
+   `.materia-rutas[hidden]`. Hoy gana por peso —dos clases contra una— y
+   el `!important` está para que no lo pueda destronar en silencio una
+   regla futura más específica (`#voz-lista .voz-grupo`, por ejemplo). Se
+   mira el display CALCULADO, como los colores: mirando el HTML no se ve. */
+.voz-grupo[hidden] { display: none !important; }
+/* La nota de encima: cuántos hay abiertos y el mando de abrirlos o
+   cerrarlos todos. Sin él, quien abre cinco para buscar una cosa se queda
+   con cinco abiertos, porque esto se recuerda a propósito. */
+.voz-grupos-nota {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin: 0 0 2px;
+}
+.voz-grupos-nota-t { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.voz-grupos-nota[hidden] { display: none !important; }
 .voz-grupo-lomo {
   flex: 0 0 auto; width: 10px; height: 22px; border-radius: 3px;
   background-color: var(--story);

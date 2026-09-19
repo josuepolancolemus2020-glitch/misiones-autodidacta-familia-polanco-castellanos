@@ -2093,7 +2093,7 @@ function vozPintarEstantes(caja, dame, pon) {
    se dice en el propio chip: «Manual (este aparato)». */
 
 const VOZ_ANAQUEL = 'faro_voz_anaquel_v1';
-let _vozAnaquel = { vista: 'detalle', orden: 'recientes', grupo: '', manual: [] };
+let _vozAnaquel = { vista: 'detalle', orden: 'recientes', grupo: '', manual: [], abiertos: {} };
 
 const VOZ_VISTAS = [
   { id: 'cuadricula', ic: '▦', t: 'Cuadrícula' },
@@ -2118,12 +2118,17 @@ const VOZ_GRUPOS = [
 function vozLeeAnaquel() {
   try {
     const s = localStorage.getItem(VOZ_ANAQUEL);
-    if (s) _vozAnaquel = Object.assign({ vista: 'detalle', orden: 'recientes', grupo: '', manual: [] }, JSON.parse(s) || {});
+    if (s) _vozAnaquel = Object.assign({ vista: 'detalle', orden: 'recientes', grupo: '', manual: [], abiertos: {} }, JSON.parse(s) || {});
   } catch (e) {}
   if (!VOZ_VISTAS.some(v => v.id === _vozAnaquel.vista)) _vozAnaquel.vista = 'detalle';
   if (!VOZ_ORDENES.some(o => o.id === _vozAnaquel.orden)) _vozAnaquel.orden = 'recientes';
   if (!VOZ_GRUPOS.some(g => g.id === _vozAnaquel.grupo)) _vozAnaquel.grupo = '';
   if (!Array.isArray(_vozAnaquel.manual)) _vozAnaquel.manual = [];
+  /* Qué estantes quedaron abiertos. Un objeto, no una lista: se mira por
+     clave mil veces al pintar y se escribe una. Y es del APARATO, como la
+     vista y el orden a mano (regla 25): que un estante esté abierto es una
+     postura de esta pantalla, no una propiedad del texto. */
+  if (!_vozAnaquel.abiertos || typeof _vozAnaquel.abiertos !== 'object' || Array.isArray(_vozAnaquel.abiertos)) _vozAnaquel.abiertos = {};
   return _vozAnaquel;
 }
 
@@ -2404,6 +2409,108 @@ function vozAgrupa(lista) {
   return grupos;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   LOS ESTANTES SE PLIEGAN: SE ABRE EL QUE SE QUIERE MIRAR
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 19 de septiembre de 2026, con la foto de su
+   tableta y los dos rótulos rodeados a mano: «necesito que las materias o
+   categorías de las lecturas puedan desplegarse y solo seleccionar las
+   lecturas que yo elija». Con «Por estante» puesto, los diez textos de
+   Educación se pintaban enteros antes de llegar al rótulo del estante
+   siguiente, así que para ver qué hay en Cultura_Cine había que barrer
+   los diez de arriba — y con ocho estantes eso son varios metros. Es el
+   problema de escala de «Mis Rutas», y por eso NO se inventa un aparato
+   nuevo: se copia ese, con sus cuatro reglas, cada una salida allá de un
+   fallo medido.
+
+   1. ⚠️ NADA SE ABRE SOLO. Abrir «los que tengan algo» con ocho estantes
+      es abrir casi todos y devolver el problema.
+   2. ⚠️ UN SOLO GRUPO NO LLEVA MANDO: cobrar un toque por un nivel que
+      ahí no separa nada es peor que no agrupar. Pasa siempre que se
+      filtra por un estante, que es cuando ya se eligió el montón.
+   3. ⚠️ BUSCANDO SE ABREN, Y ESO NO SE GUARDA. Es el efecto de la
+      búsqueda, no la decisión de nadie: un resultado escondido detrás de
+      un rótulo plegado se lee igual que una búsqueda que no encontró
+      nada, y entonces se busca otra cosa.
+   4. ⚠️ TODO SE PINTA Y SE ESCONDE CON `hidden`, nunca se crea al abrir.
+      Aquí manda además una razón propia: el arrastre del orden a mano
+      guarda el orden leyendo TODOS los contenedores del anaquel
+      (`vozMontarArrastre`), así que un grupo que no estuviera en el DOM
+      les borraría el sitio a los textos de dentro sin dar ningún error. */
+
+/* La clave lleva delante el eje, y eso no es adorno: un estante llamado
+   «Cuento» y el género «cuento» darían la misma clave, y abrir uno
+   abriría el otro al cambiar de agrupación. */
+function vozGrupoClave(gr) {
+  return _vozAnaquel.grupo + ':' + vozSinTildes(String(gr.clave || '')).toLowerCase();
+}
+
+function vozGrupoAbierto(gr, nGrupos) {
+  if (nGrupos < 2) return true;
+  if (_vozBusca.trim()) return true;
+  return _vozAnaquel.abiertos[vozGrupoClave(gr)] === true;
+}
+
+/* Las claves de los grupos que se están enseñando. Se guardan al pintar
+   para que «Abrir todos» y la cuenta no tengan que volver a agrupar: con
+   una lista escrita dos veces, una se quedaría vieja. */
+let _vozGruposVistos = [];
+
+function vozAlternarGrupo(k, btn) {
+  if (!btn) return;
+  const abierto = btn.getAttribute('aria-expanded') === 'true';
+  const m = Object.assign({}, _vozAnaquel.abiertos);
+  /* Cerrado se BORRA en vez de guardarse en falso: «no está abierto» es la
+     ausencia, así que la llave del aparato no crece con los estantes que
+     alguien abrió una vez y volvió a cerrar. */
+  if (abierto) delete m[k]; else m[k] = true;
+  _vozAnaquel.abiertos = m;
+  vozGuardaAnaquel();
+  /* ⚠️ SE TOCA EL DOM, NO SE REPINTA EL ANAQUEL. Un repintado deja sin foco
+     al botón que se acaba de pulsar —con el teclado se pierde el sitio— y en
+     una tableta le arranca de debajo del dedo la tarjeta que iba a recibir
+     el toque siguiente: es la lección de la barra de grupos de M.E.T.A.S, la
+     misma por la que el arrastre no repinta al soltar. */
+  btn.setAttribute('aria-expanded', String(!abierto));
+  const panel = document.getElementById(btn.getAttribute('aria-controls'));
+  if (panel) panel.hidden = abierto;
+  vozPintarGruposNota();
+}
+
+/* Encima de los grupos: cuántos hay abiertos y el mando para abrirlos o
+   cerrarlos todos. Va aquí y no en la barra de arriba porque esa barra es
+   de UNA fila a propósito (regla 33) y esto solo hace falta con los
+   estantes puestos. Y hace falta: quien abrió cinco para buscar una cosa
+   se queda con cinco abiertos para siempre, porque el estado se recuerda
+   a propósito — es el «Plegar todas» de Mis Rutas. */
+function vozPintarGruposNota() {
+  const caja = document.getElementById('voz-grupos-nota');
+  if (!caja) return;
+  caja.textContent = '';
+  const n = _vozGruposVistos.length;
+  caja.hidden = n < 2 || !!_vozBusca.trim();
+  if (caja.hidden) return;
+  const abiertos = _vozGruposVistos.filter(k => _vozAnaquel.abiertos[k] === true).length;
+  caja.appendChild(vozNodo('span', 'voz-grupos-nota-t', abiertos
+    ? (abiertos === 1 ? '1 abierto de ' + n : abiertos + ' abiertos de ' + n)
+    : 'Toca un rótulo para ver sus textos.'));
+  caja.appendChild(vozBoton('voz-btn voz-btn-chico', abiertos ? 'Cerrar todos' : 'Abrir todos',
+    () => vozGruposTodos(!abiertos)));
+}
+
+function vozGruposTodos(abrir) {
+  const m = Object.assign({}, _vozAnaquel.abiertos);
+  _vozGruposVistos.forEach(k => { if (abrir) m[k] = true; else delete m[k]; });
+  _vozAnaquel.abiertos = m;
+  vozGuardaAnaquel();
+  vozRender();
+  /* Cerrando, se vuelve arriba: lo que se venía a ver es la lista de
+     estantes, y quedarse a mitad de la página donde estaba el montón que
+     acaba de desaparecer deja la pantalla en un sitio que no dice nada. */
+  const cont = document.getElementById('voz-lista');
+  if (!abrir && cont && cont.scrollIntoView) cont.scrollIntoView({ block: 'start' });
+}
+
 function vozRender() {
   const cont = document.getElementById('voz-lista');
   if (!cont) return;
@@ -2456,20 +2563,44 @@ function vozRender() {
       'Este es tu orden, en este aparato. Arrastra el ⠿ de cada texto para cambiarlo; con el teclado, las flechas.');
     cont.appendChild(nota);
   }
-  vozAgrupa(lista).forEach(gr => {
+  const grupos = vozAgrupa(lista);
+  _vozGruposVistos = grupos.filter(g => g.titulo).map(vozGrupoClave);
+  const nota = vozNodo('div', 'voz-grupos-nota');
+  nota.id = 'voz-grupos-nota';
+  cont.appendChild(nota);
+
+  grupos.forEach((gr, i) => {
+    const panelId = 'voz-grupo-caja-' + i;
+    /* Con un grupo solo, el rótulo se queda como era: un rótulo. Regla 2. */
+    const plegable = !!gr.titulo && _vozGruposVistos.length > 1;
+    const abierto = plegable ? vozGrupoAbierto(gr, _vozGruposVistos.length) : true;
     if (gr.titulo) {
-      const h = vozNodo('div', 'voz-grupo-tit');
+      const k = vozGrupoClave(gr);
+      const h = plegable
+        ? vozBoton('voz-grupo-tit', null, ev => vozAlternarGrupo(k, ev.currentTarget))
+        : vozNodo('div', 'voz-grupo-tit');
+      if (plegable) {
+        h.setAttribute('aria-expanded', String(abierto));
+        h.setAttribute('aria-controls', panelId);
+      }
       if (gr.h != null) h.style.setProperty('--voz-h', String(gr.h));
       h.appendChild(vozNodo('span', 'voz-grupo-lomo'));
       h.appendChild(vozNodo('span', 'voz-grupo-txt', gr.titulo));
       h.appendChild(vozNodo('span', 'voz-grupo-n', gr.items.length === 1 ? '1 texto' : gr.items.length + ' textos'));
+      /* El galón va con una letra de verdad y no con un icono del CDN: si
+         Font Awesome no llega —y llega de fuera—, el rótulo se quedaría sin
+         nada que diga que se abre. */
+      if (plegable) h.appendChild(vozNodo('span', 'voz-grupo-gal', '\u25be'));
       cont.appendChild(h);
     }
     const caja = vozNodo('div', 'voz-grupo voz-grupo-' + _vozAnaquel.vista);
+    caja.id = panelId;
+    caja.hidden = !abierto;
     gr.items.forEach(c => caja.appendChild(vozItem(c, manual)));
     cont.appendChild(caja);
     if (manual) vozMontarArrastre(caja);
   });
+  vozPintarGruposNota();
 
   /* ⚠️ Y SI HAY UNA HOJA DE LO COMPARTIDO ABIERTA, SE REPINTA. Llega con
      la aplicación recién abierta, o sea con el anaquel todavía en lo que

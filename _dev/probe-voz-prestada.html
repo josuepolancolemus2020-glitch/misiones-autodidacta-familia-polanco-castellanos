@@ -3944,6 +3944,154 @@ function filasHoja(d){
   await esperar(200);
 
 
+  /* ── 42. LOS ESTANTES SE PLIEGAN ──
+     Pedido el 19 de septiembre de 2026: «necesito que las materias o
+     categorías de las lecturas puedan desplegarse y solo seleccionar las
+     lecturas que yo elija». Lo que puede salir mal aquí está ordenado por
+     gravedad, y lo primero NO se ve leyendo el HTML: que el mando responda
+     y el montón se quede entero a la vista, porque el `[hidden]` del
+     navegador lo pierde contra el `display: flex` de `.voz-grupo`. Eso ya
+     pasó una vez en Mis Rutas, así que se mira el display CALCULADO, como
+     se miran los colores. Después: que se abra solo (con ocho estantes es
+     devolver el problema), que abrir uno abra otros, que el estante
+     «Cuento» y el género «cuento» compartan llave, que esto viaje a la
+     nube, y que buscando el resultado se quede escondido detrás de un
+     rótulo plegado — que se lee igual que una búsqueda sin resultados. */
+  log('── 42. Los estantes se pliegan: se abre el que se quiere mirar ──');
+  const base42 = nuevaBase(w, {});
+  const conEst42 = (cid, tit, est, gen) => Object.assign(cuentoLargo(cid), {
+    titulo: tit, voz: 'Rulfo', maquina: 'Claude', genero: gen, estantes: est, puesto_por: VOZ_UID });
+  w.eval(`_vozCuentos = ${JSON.stringify([
+      conEst42('e1', 'Zanja',  ['Educaci\u00f3n'], 'cuento'),
+      conEst42('e2', 'Bruma',  ['Educaci\u00f3n'], 'ensayo'),
+      conEst42('e3', 'Marea',  ['Cultura_Cine'], 'cuento'),
+      conEst42('e4', 'Ceniza', ['Cuento'], 'cuento'),
+    ])}; vozGuardaLocal();
+    _vozAnaquel = { vista: 'lista', orden: 'recientes', grupo: 'estante', manual: [], abiertos: {} }; vozGuardaAnaquel();
+    _vozFiltroVoz = ''; _vozFiltroGen = ''; _vozFiltroEst = ''; _vozBusca = ''; vozRender()`);
+  await esperar(300);
+
+  const rots42 = () => [...d.querySelectorAll('#voz-lista .voz-grupo-tit')];
+  const cajas42 = () => [...d.querySelectorAll('#voz-lista .voz-grupo')];
+  ok(rots42().length === 3 && cajas42().length === 3,
+     'por estante salen los tres montones (Educación, Cultura_Cine, Cuento)',
+     'no salen tres grupos: ' + rots42().length + ' rótulos y ' + cajas42().length + ' cajas');
+  ok(cajas42().every(c => c.hidden === true),
+     '⚠️ y NINGUNO se abre solo: con ocho estantes, abrir «los que tengan algo» es abrir casi todos y devolver el problema',
+     '⚠️ un estante sale abierto sin que nadie lo tocara');
+  ok(cajas42().every(c => w.getComputedStyle(c).display === 'none'),
+     '⚠️ y el plegado se ve en el display CALCULADO: el `[hidden]` del navegador pierde contra el `display: flex` de la clase, así que sin una regla NUESTRA el mando respondería y el montón se quedaría entero a la vista',
+     '⚠️ plegado, el montón sigue pintado: display calculado = ' + cajas42().map(c => w.getComputedStyle(c).display).join(', '));
+  ok(d.querySelectorAll('#voz-lista .voz-grupo [data-voz-cid]').length === 4,
+     'y aun plegados los cuatro textos están EN EL DOM, escondidos y no sin crear: el arrastre del orden a mano guarda el orden leyendo todos los contenedores, y un grupo que no estuviera les borraría el sitio',
+     'los textos de un grupo plegado no están en el documento: ' + d.querySelectorAll('#voz-lista .voz-grupo [data-voz-cid]').length);
+  const edu42 = rots42().find(r => /Educaci/.test(r.textContent));
+  ok(!!edu42 && edu42.tagName === 'BUTTON' && edu42.getAttribute('aria-expanded') === 'false'
+     && edu42.getBoundingClientRect().height >= 44,
+     'el rótulo es un botón de verdad, con su aria-expanded y 44 px de alto (' + (edu42 ? Math.round(edu42.getBoundingClientRect().height) : '?') + ' px)',
+     'el rótulo no es un botón de 44 px con aria: ' + (edu42 && edu42.tagName) + ' ' + (edu42 && edu42.getAttribute('aria-expanded')) + ' ' + (edu42 && Math.round(edu42.getBoundingClientRect().height)));
+  ok(!!edu42 && /2 textos/.test(edu42.textContent),
+     'y plegado dice cuántos lleva dentro, que es la única cosa que se puede leer sin abrirlo',
+     'el rótulo no dice su cuenta: ' + (edu42 && edu42.textContent));
+  const nota42 = d.getElementById('voz-grupos-nota');
+  ok(!!nota42 && !nota42.hidden && /Toca/.test(nota42.textContent),
+     'y se explica con palabras encima de la lista: un galón no se explica solo',
+     'no se explica que los rótulos se abren: ' + (nota42 && nota42.textContent));
+
+  base42.llamadas.length = 0;
+  edu42.click();
+  await esperar(250);
+  const abierta42 = d.getElementById(edu42.getAttribute('aria-controls'));
+  ok(!!abierta42 && abierta42.hidden === false && w.getComputedStyle(abierta42).display !== 'none'
+     && abierta42.getBoundingClientRect().height > 0
+     && abierta42.querySelectorAll('[data-voz-cid]').length === 2,
+     'un toque en el rótulo abre sus dos textos, de verdad y con alto (' + (abierta42 ? Math.round(abierta42.getBoundingClientRect().height) : '?') + ' px)',
+     'el toque no abrió el estante: hidden=' + (abierta42 && abierta42.hidden) + ' display=' + (abierta42 && w.getComputedStyle(abierta42).display));
+  ok(cajas42().filter(c => !c.hidden).length === 1,
+     '⚠️ Y SOLO ESE: es lo que se pidió con «solo seleccionar las lecturas que yo elija»',
+     'abrir uno abrió ' + cajas42().filter(c => !c.hidden).length + ' estantes');
+  ok(edu42.getAttribute('aria-expanded') === 'true' && rots42().indexOf(edu42) === 0,
+     'sin repintar el anaquel: es el mismo botón, con su aria cambiado (un repintado le quita el foco y, en una tableta, le arranca del dedo la tarjeta siguiente)',
+     'el rótulo se repintó al pulsarlo');
+  ok(/1 abierto de 3/.test(d.getElementById('voz-grupos-nota').textContent)
+     && /Cerrar todos/.test(d.getElementById('voz-grupos-nota').textContent),
+     'y la nota lleva la cuenta y el mando de cerrarlos todos: quien abre cinco para buscar una cosa se queda con cinco abiertos, porque esto se recuerda a propósito',
+     'la nota no lleva la cuenta ni el cierre: ' + d.getElementById('voz-grupos-nota').textContent);
+  ok(base42.llamadas.filter(l => l.m !== 'GET').length === 0,
+     '⚠️ y abrir un estante NO viaja a la nube: es una postura de esta pantalla, como la vista y el orden a mano',
+     '⚠️ abrir un estante escribió en la nube');
+  const guard42 = JSON.parse(w.localStorage.getItem('faro_voz_anaquel_v1') || '{}');
+  ok(guard42.abiertos && guard42.abiertos['estante:educacion'] === true
+     && Object.keys(guard42.abiertos).length === 1,
+     'se guarda en el aparato, con el eje delante de la clave y solo el que está abierto',
+     'lo abierto no se guardó bien: ' + JSON.stringify(guard42.abiertos));
+
+  await w.eval('initVozPrestada()');
+  await esperar(500);
+  ok(cajas42().filter(c => !c.hidden).length === 1
+     && rots42().find(r => /Educaci/.test(r.textContent)).getAttribute('aria-expanded') === 'true',
+     'y sigue abierto al volver a abrir la herramienta',
+     'al volver a abrir se perdió lo que estaba abierto');
+
+  /* ⚠️ LA LLAVE LLEVA EL EJE DELANTE: un estante llamado «Cuento» y el
+     género «cuento» darían la misma clave, y abrir uno abriría el otro al
+     cambiar de agrupación — sin dar ningún error. */
+  w.eval(`_vozAnaquel.abiertos = { 'estante:cuento': true }; vozGuardaAnaquel();
+          _vozAnaquel.grupo = 'genero'; vozGuardaAnaquel(); vozRender()`);
+  await esperar(250);
+  const gCuento = rots42().find(r => /Cuento/.test(r.textContent));
+  ok(!!gCuento && gCuento.getAttribute('aria-expanded') === 'false',
+     '⚠️ y abrir el ESTANTE «Cuento» no abre el GÉNERO «cuento»: la clave lleva el eje delante',
+     'el estante y el género comparten llave: el género salió ' + (gCuento && gCuento.getAttribute('aria-expanded')));
+
+  /* Buscando se abren, y eso NO se guarda: es el efecto de la búsqueda. */
+  w.eval(`_vozAnaquel.grupo = 'estante'; _vozAnaquel.abiertos = {}; vozGuardaAnaquel();
+          _vozBusca = 'Rulfo'; vozRender()`);
+  await esperar(250);
+  ok(cajas42().every(c => c.hidden === false),
+     '⚠️ buscando, los montones se abren: un resultado escondido detrás de un rótulo plegado se lee igual que una búsqueda que no encontró nada',
+     'buscando, el resultado se queda escondido');
+  ok(d.getElementById('voz-grupos-nota').hidden === true,
+     'y la nota de abrir y cerrar se quita, porque ahí no manda nadie',
+     'buscando sigue saliendo el mando de abrir todos');
+  w.eval("_vozBusca = ''; vozRender()");
+  await esperar(250);
+  ok(cajas42().every(c => c.hidden === true)
+     && Object.keys(JSON.parse(w.localStorage.getItem('faro_voz_anaquel_v1') || '{}').abiertos || {}).length === 0,
+     'y al borrar la búsqueda vuelven a estar plegados: abrirlos era el efecto de buscar, no la decisión de nadie, y no se guardó',
+     '⚠️ la búsqueda dejó los estantes abiertos para siempre');
+
+  /* Abrir y cerrar todos, que es la vuelta a la vista compacta. */
+  d.querySelector('#voz-grupos-nota .voz-btn').click();
+  await esperar(250);
+  ok(cajas42().every(c => !c.hidden) && /3 abiertos de 3/.test(d.getElementById('voz-grupos-nota').textContent),
+     '«Abrir todos» los abre y la nota lo dice',
+     '«Abrir todos» no abrió los tres: ' + d.getElementById('voz-grupos-nota').textContent);
+  d.querySelector('#voz-grupos-nota .voz-btn').click();
+  await esperar(250);
+  ok(cajas42().every(c => c.hidden) && /Toca/.test(d.getElementById('voz-grupos-nota').textContent),
+     'y el mismo mando los cierra: un solo botón para las dos cosas, como el interruptor de los estantes de varios',
+     '«Cerrar todos» no los cerró');
+
+  /* ⚠️ CON UN SOLO MONTÓN NO HAY MANDO: cobrar un toque por un nivel
+     que ahí no separa nada es peor que no agrupar. Pasa siempre que se
+     filtra por un estante, que es cuando ya se eligió el montón. */
+  w.eval("_vozFiltroEst = 'Educaci\u00f3n'; vozRender()");
+  await esperar(250);
+  ok(rots42().length === 1 && rots42()[0].tagName !== 'BUTTON'
+     && cajas42().length === 1 && cajas42()[0].hidden === false,
+     '⚠️ filtrando por un estante queda un solo montón, abierto y SIN mando: un toque cobrado por un nivel que ahí no separa nada',
+     'con un solo montón sigue habiendo mando o sale plegado: ' + rots42().length + ' rótulos, ' + (rots42()[0] && rots42()[0].tagName) + ', hidden=' + (cajas42()[0] && cajas42()[0].hidden));
+  ok(d.getElementById('voz-grupos-nota').hidden === true,
+     'y la nota tampoco sale',
+     'con un solo montón sale la nota de abrir y cerrar');
+  w.eval("_vozFiltroEst = ''; _vozAnaquel.grupo = ''; _vozAnaquel.abiertos = {}; vozGuardaAnaquel(); vozRender()");
+  await esperar(200);
+  ok(d.querySelectorAll('#voz-lista .voz-grupo-tit').length === 0
+     && d.querySelectorAll('#voz-lista .voz-grupo')[0].hidden === false,
+     'y sin agrupar no hay rótulos ni nada plegado: el anaquel de siempre',
+     'sin agrupar quedó algo plegado');
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

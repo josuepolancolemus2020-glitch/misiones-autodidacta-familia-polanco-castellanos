@@ -979,7 +979,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Treinta y nueve reglas, y ninguna es de adorno:**
+**Cuarenta reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -2798,6 +2798,84 @@ el diseño.
    de hacer algo es algo que a veces no se puede hacer. **Y ▶ Ver aquí
    sale para cualquiera**, no solo para quien lo puso: ver no es corregir.
 
+40. 🗂 **LOS ESTANTES SE PLIEGAN: SE ABRE EL QUE SE QUIERE MIRAR.**
+   Pedido por el autor el 19 de septiembre de 2026, con la foto de su
+   tableta y los dos rótulos rodeados a mano: «necesito que las materias o
+   categorías de las lecturas puedan desplegarse y solo seleccionar las
+   lecturas que yo elija». Con «Por estante» puesto, los diez textos de
+   Educación se pintaban enteros antes de llegar al rótulo del estante
+   siguiente, así que para ver qué hay en Cultura_Cine había que barrer los
+   diez de arriba — y con ocho estantes eso son varios metros de barrido.
+
+   Es **el problema de escala de «Mis Rutas»**, o sea uno que esta casa ya
+   resolvió, y por eso **NO se inventa un aparato nuevo: se copia ese**,
+   con sus cuatro reglas, cada una salida allá de un fallo medido.
+   Cambiar dos veces el mismo plegado en dos pantallas es arreglarlo en una
+   y dejarlo roto en la otra.
+
+   - ⚠️ **NADA SE ABRE SOLO.** Abrir «los que tengan algo» con ocho
+     estantes es abrir casi todos y devolver el problema. Es lo que ya
+     está escrito arriba, en el mapa de rutas.
+   - ⚠️ **UN SOLO MONTÓN NO LLEVA MANDO**, y se pinta como un rótulo y no
+     como un botón: cobrar un toque por un nivel que ahí no separa nada es
+     peor que no agrupar. Pasa siempre que se filtra por un estante, que es
+     justo cuando ya se eligió el montón.
+   - ⚠️ **BUSCANDO SE ABREN, Y ESO NO SE GUARDA.** Es el efecto de la
+     búsqueda, no la decisión de nadie: un resultado escondido detrás de un
+     rótulo plegado se lee **igual que una búsqueda que no encontró nada**,
+     y entonces se busca otra cosa. Al borrar la búsqueda vuelven a estar
+     como estaban.
+   - ⚠️ **TODO SE PINTA Y SE ESCONDE CON `hidden`**, nunca se crea al
+     abrir. Vale aquí la razón del mapa de rutas —lo que nace al desplegar
+     deja de poder encontrarse— y **una propia, más cara**: el arrastre del
+     orden a mano guarda el orden leyendo TODOS los contenedores del
+     anaquel (`vozMontarArrastre`), así que un grupo que no estuviera en el
+     documento **les borraría el sitio a los textos de dentro** sin dar
+     ningún error.
+
+   ⚠️ **Y `.voz-grupo[hidden] { display: none }` ES LO QUE HACE QUE EL
+   PLEGADO EXISTA.** El `[hidden]` del navegador vive en la hoja del
+   usuario-agente, la más débil de todas, y la pierde contra cualquier
+   `display` escrito en la nuestra: `.voz-grupo` trae `display: flex` y la
+   cuadrícula `display: grid`. O sea que sin una regla NUESTRA,
+   `caja.hidden = true` deja el montón ENTERO a la vista con el
+   `aria-expanded` diciendo que está cerrado — el mando responde y no hace
+   nada, que es el peor de los fallos. **Ya pasó en Mis Rutas** y está
+   escrito en `app.css` al lado de `.materia-rutas[hidden]`; es la familia
+   del `var(--card)` y de las franjas de color: no da error, no rompe la
+   página y no lo caza ninguna sonda que mire el HTML. Se mira el display
+   **CALCULADO**. Hoy gana por peso —dos clases contra una— y el
+   `!important` está para que no lo destrone en silencio una regla futura
+   más específica; lo que no se puede quitar nunca es la regla.
+
+   ⚠️ **LA LLAVE LLEVA EL EJE DELANTE** (`estante:educacion`), porque un
+   estante llamado «Cuento» y el género «cuento» darían la misma clave y
+   abrir uno abriría el otro al cambiar de agrupación. Y es **del
+   APARATO**, en `faro_voz_anaquel_v1` y sin viajar a la nube: que un
+   estante esté abierto es una postura de esta pantalla, como la vista y el
+   orden a mano (reglas 12 y 25). Lo cerrado se BORRA de la llave en vez de
+   guardarse en falso, para que no crezca con lo que alguien abrió una vez.
+
+   ⚠️ **Y AL PULSAR SE TOCA EL DOM, NO SE REPINTA EL ANAQUEL.** Un
+   repintado deja sin foco al botón que se acaba de pulsar —con el teclado
+   se pierde el sitio— y en una tableta le arranca de debajo del dedo la
+   tarjeta que iba a recibir el toque siguiente: es la lección de la barra
+   de grupos de M.E.T.A.S, la misma por la que el arrastre no repinta al
+   soltar.
+
+   **Y encima de la lista va una nota con la cuenta y un solo mando:**
+   «Abrir todos» cuando no hay ninguno, «Cerrar todos» cuando hay alguno.
+   Hace falta porque el estado se recuerda a propósito, así que quien abrió
+   cinco para buscar una cosa se queda con cinco abiertos para siempre — es
+   el «Plegar todas» de Mis Rutas. Va **ahí y no en la barra de arriba**,
+   que es de UNA fila a propósito (regla 33) y donde ☑ Elegir ya se caía
+   por el borde. Y el galón es **una letra de verdad** (`▾`) y no un icono
+   de Font Awesome: ese viene de un CDN, y si no llega el rótulo se queda
+   sin nada que diga que se abre.
+
+   **Y no hizo falta correr ni una línea de SQL**: agrupar y plegar es cómo
+   se miran los estantes de la regla 32, no una propiedad nueva del texto.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -2966,6 +3044,20 @@ vale: mandándole a YouTube la dirección pegada en vez del identificador
 y dejando que cerrar solo escondiera el panel —la sonda suspende seis
 veces, y los fallos dicen «lo que se le mandó a YouTube fue …&pegado=…»
 y «al cerrar quedaron 1 reproductores vivos»—.
+
+La comprobación **42** son los estantes plegables, y lo que mira está
+ordenado por gravedad. Primero, que el mando **responda y no haga nada**:
+se mira el `display` **CALCULADO** de la caja, porque el `[hidden]` del
+navegador pierde contra el `display: flex` de la clase y eso no se ve
+leyendo el HTML. Se comprobó quitando la regla `.voz-grupo[hidden]`, y la
+sonda suspende diciendo «display calculado = flex, flex, flex».
+Después: que ninguno se abra solo, que abrir uno no abra otros, que los
+textos de un montón plegado sigan EN EL DOM (o el arrastre del orden a
+mano les borraría el sitio), que el estante «Cuento» y el género «cuento»
+no compartan llave, que abrir no escriba **ni una fila** en la nube, que
+buscando se abran y que al borrar la búsqueda vuelvan a estar como
+estaban, y que con un solo montón no haya mando ninguno. Los rótulos **se
+pulsan**, y el alto del botón se mide en píxeles (44).
 
 La comprobación **37** son los recursos de refuerzo, y mira lo que de
 verdad puede salir mal: que una dirección `javascript:` llegue a un
