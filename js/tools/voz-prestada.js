@@ -7175,6 +7175,11 @@ function vozCompartidoLimpiar() {
 function faroArranqueCompartido() {
   const d = vozCompartidoLee();
   if (!d) return false;
+  /* Un enlace de NotebookLM es un cuaderno para el inventario de
+     Redacción, no un recurso de una lectura: se lo queda 📓 Cuadernos
+     (js/tools/redaccion-cuadernos.js) si ese archivo cargó. Lo demás
+     sigue viniendo a las lecturas. */
+  if (typeof rcuCompartido === 'function' && rcuCompartido(d)) return true;
   if (typeof switchView !== 'function') return false;
   switchView('view-voz');
   vozCompAbrir(d);

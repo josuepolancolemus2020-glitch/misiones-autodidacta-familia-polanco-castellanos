@@ -1261,6 +1261,169 @@ para probar que la seguridad por fila sigue dejando fuera a `anon` y a un
 usuario con sesión que no es de la casa. Y comprueba que la guardia de
 dependencias para **nombrando el archivo** que falta.
 
+## Normativa: los cuadernos de NotebookLM se inventarían en Redacción
+
+**Pedido por el autor el 21 de septiembre de 2026:** «llevar un inventario
+de direcciones url de los cuadernos que trabajo en Notebook … organizar
+muy bien todo ya que allí estudio asiduamente y tomo muchas referencias
+del contenido que genero en esa aplicación».
+
+Vive en `js/tools/redaccion-cuadernos.js` y `css/redaccion-cuadernos.css`,
+con su tabla en `supabase/sql/redaccion_cuadernos.sql` y la comprobación
+aparte en `supabase/sql/redaccion_cuadernos_comprueba.sql`. Es el chip
+**📓 Cuadernos** de la fila de ediciones de Redacción, pegado a 📣 Redes.
+
+**Qué resuelve:** NotebookLM no tiene carpetas ni etiquetas y no deja
+exportar la lista de cuadernos. Con treinta, dar con el de un tema es
+barrer una cuadrícula de tarjetas iguales, y lo que se sacó de cada uno
+—las referencias que acaban en una nota, un video o un ensayo— vive en la
+cabeza de quien lo sacó. Esto es el catálogo que le falta.
+
+**Diez reglas, y ninguna es de adorno:**
+
+1. ⚠️ **ES UN CATÁLOGO, NO UNA COPIA.** Cada cuaderno es una FICHA: su
+   dirección, su nombre y su emoji (los mismos con que NotebookLM lo
+   pinta), en qué estantes está, de qué serie es y con qué número, en qué
+   va (en marcha, en pausa, terminado), cuántas fuentes tiene, unas notas
+   —qué hay dentro y para qué sirve— y las **referencias**: lo que se sacó
+   de él, cada una con dónde se usó y su fecha. El contenido sigue
+   viviendo en el cuaderno; la ficha dice dónde está y qué hay.
+
+2. ⚠️ **LA DIRECCIÓN SE ENTIENDE, Y EL IDENTIFICADOR MANDA.** Se aceptan
+   los dos dominios con que Google ha servido NotebookLM
+   (`notebooklm.google.com` y `notebook.google.com`, en `RCU_HOSTS`), y de
+   `/notebook/<id>` se saca el identificador (`rcuMiraUrl`). Es lo que
+   evita fichar dos veces el mismo cuaderno: la misma dirección se pega un
+   día con `?authuser=1` y otro sin él, y la hoja lo dice y lleva a la
+   ficha que ya estaba en vez de guardar un gemelo. La dirección se guarda
+   TAL CUAL vino —con su `authuser`, que en un aparato con dos cuentas de
+   Google es lo que abre la cuenta buena—. Sin el `https://` se entiende y
+   se dice cómo; otra dirección `https` entra como un enlace más, y
+   también se dice; `javascript:` no entra y el motivo explica qué poner.
+
+3. **LOS ESTANTES SON DEL AUTOR, Y UN CUADERNO ESTÁ EN VARIOS.** Como los
+   de La Voz Prestada (su regla 32): salen de los propios cuadernos, nunca
+   de una lista escrita, y «Maestría», «maestria» y « MAESTRÍA » son el
+   mismo estante (`rcuClave`): escribir «maestria» marca el que ya existía
+   con su rótulo de siempre. Y aparte van las **series**: el autor numera
+   sus cuadernos en NotebookLM («1_Filosofía de la Disociación», «1.2_El
+   Deseo y el Obstáculo»), así que el número se propone solo al leerlo
+   (`rcuSerieNDe`) **sin tocar el nombre**, para que se reconozca igual
+   que allá; un año («2026 fue…») no cuenta porque no lleva separador
+   detrás.
+
+4. ⚠️ **SE MIRA COMO PLAY LIBROS, Y EL PLEGADO EXISTE DE VERDAD.** Una
+   sola fila de botones que se desliza (los botones primero; La Voz
+   Prestada, 33), el buscador, y debajo SOLO los filtros que estén
+   puestos, con su equis. Los estantes, las series y los estados se eligen
+   en una hoja vertical de renglones de 44 px con su cuenta, y elegir uno
+   cierra la hoja. La lista va agrupada por estante y PLEGADA, con las
+   cuatro reglas del anaquel (regla 40 de allá): nada se abre solo; un
+   solo montón no lleva mando; buscando se abre todo y eso no se guarda; y
+   `.rcu-grupo[hidden] { display: none !important }` es lo que hace que
+   el plegado exista, porque el `[hidden]` del navegador pierde contra el
+   `display: flex` de la clase. Se mira el display CALCULADO. Lo abierto
+   se recuerda en el aparato con el eje delante (`estante:maestria`), en
+   `faro_redaccion_cuadernos_anaquel_v1`, junto con el orden y la
+   agrupación: cómo se mira el inventario es una postura de este aparato,
+   no viaja.
+
+5. ⚠️ **ABRIR EL CUADERNO ES LA CONSULTA, Y ES EL ORDEN POR DEFECTO.** El
+   ↗ de la ficha es un enlace de verdad —se puede mantener pulsado para
+   abrirlo en otra pestaña— con `target="_blank"` y `rel="noopener
+   noreferrer"` (la pestaña que se abre no puede tocar la ventana de
+   F.A.R.O, que tiene dentro la Bóveda), y al tocarlo se apunta `ultima` y
+   viaja. El orden por defecto es esa última consulta: lo que se consulta
+   a diario sube solo, sin ordenar nada a mano. Y la ficha reescribe su
+   «abierto hace un momento» sin repintar la lista, que le arrancaría al
+   dedo la ficha que iba a tocar.
+
+6. **SE PEGAN VARIOS DE GOLPE, Y LO QUE NO SE ENTIENDE SE NOMBRA.**
+   `rcuLeerVarios` entiende lo que se escribe de verdad: `🧠 Nombre |
+   dirección`, `[Nombre](dirección)`, la dirección sola, y el nombre en un
+   renglón con la dirección en el siguiente; el emoji y el número de serie
+   se separan solos. Un renglón sin dirección sale NOMBRADO con su número
+   (la asimetría de La Voz Prestada, 38); un `javascript:` dice por qué
+   no; el mismo cuaderno dos veces se salta y se dice; y todos suben en UN
+   solo viaje (`rcuSubirVarios`): con la señal de una tableta, una
+   escritura por cuaderno es lo que hace que pegar la lista tarde.
+
+7. ⚠️ **COMPARTIR A F.A.R.O CON UN ENLACE DE NOTEBOOKLM CAE AQUÍ, NO EN
+   LAS LECTURAS.** Desde el teléfono, en NotebookLM: Compartir → F.A.R.O.
+   `faroArranqueCompartido` (La Voz Prestada) le ofrece primero lo
+   compartido a `rcuCompartido`, que se lo queda si la dirección es de un
+   cuaderno: abre Redacción en 📓 Cuadernos con la hoja ya rellena (la
+   dirección, y el nombre y el emoji si la otra aplicación los mandó), o
+   la ficha que ya estaba si era repetido. Lo demás sigue yendo a las
+   lecturas. **Y la dirección de la página se limpia al CERRAR la hoja, no
+   al leer**, por lo mismo que allá: `index.html` recarga una vez cuando
+   el service worker nuevo toma el mando.
+
+8. ⚠️ **TABLA PROPIA, Y POR QUÉ NO VA EN `recursos_enlaces`.** La casa
+   tiene por regla no inventar una segunda tabla para el mismo gesto, y la
+   repisa también guarda enlaces con nombre. Pero una ficha no es un enlace
+   de repisa: lleva estantes, serie, estado, notas y una lista de
+   referencias que crece con los meses, y `recursos_enlaces.opciones`
+   tiene un tope de 2.000 caracteres que esa lista reventaría en silencio
+   —un `check` de PostgreSQL rebotando el guardado con un mensaje que
+   habla de otra cosa—. `redaccion_cuadernos` lleva sus topes a la medida
+   (notas 8.000, referencias 60.000), `url` con el check de forma de
+   siempre, `estado` sin lista (vive en `RCU_ESTADOS`), la RLS de la casa
+   con `es_familia()` y sin política de delete. Hasta que se corra, la
+   herramienta funciona entera con la copia del aparato y lo dice («📴
+   Solo en este aparato: falta correr redaccion_cuadernos.sql»); al
+   correrlo, lo pendiente sube solo.
+
+9. **LO DE SIEMPRE, Y POR LO MISMO:** nada de lo escrito llega a un
+   atributo ni a `innerHTML` (todo con `createElement` y `textContent`;
+   la sonda le mete veneno a las notas y a una referencia); retirar deja
+   lápida, con dos toques en el mismo sitio y sin `confirm()`, y desde la
+   lista se devuelve; la fusión entre aparatos gana por el reloj del
+   aparato (`actualizado`); un corte de red no es una tabla que falta
+   (`42P01`); y el buscador mira título, estantes, serie, notas,
+   referencias y dirección, sin tildes ni mayúsculas.
+
+10. **📋 EXPORTAR SACA EL INVENTARIO ENTERO EN TEXTO**, agrupado por
+    estante, con cada cuaderno, su dirección, su serie y estado, sus
+    notas y sus referencias con dónde se usaron. Es el mismo reparto que
+    el catálogo de los videos de M.E.T.A.S: la nube lo pone en los
+    aparatos hoy; el texto lo deja pegado en un chat, un documento o un
+    respaldo, sin depender de que Supabase siga en pie.
+
+**Antes de publicar un cambio de los cuadernos:**
+
+```
+node _dev/servidor-estatico.js        (en otra terminal)
+_dev/probe-redaccion-cuadernos.html   (en el navegador)
+```
+
+La sonda está ordenada por gravedad: veneno en las notas y en una
+referencia que tiene que salir como texto, y la dirección al `href` solo
+comprobada y con `noopener`; los dos dominios, el identificador y el
+`?authuser=` que se respeta, y el gemelo que no entra; la lista pegada con
+sus renglones malos NOMBRADOS (4 y 5) y el repetido (9), subiendo en UN
+viaje; el plegado con el display CALCULADO, que nada se abra solo, que
+buscando se abra todo y no se guarde, y que abrir un grupo no escriba
+nada en la nube; la última consulta al pulsar ↗; retirar con dos toques
+sin `confirm()` y la lápida que viaja; el `42P01` y la subida de lo
+pendiente; y lo compartido, llamando al árbitro de verdad
+(`faroArranqueInicio`) y comprobando que la dirección se limpia al
+guardar y no antes. Los botones **se pulsan**, y la hoja se mide con
+`elementFromPoint`.
+
+Y el SQL, contra un PostgreSQL de verdad, con el servidor de la sesión
+levantado como dice el apartado de La Voz Prestada:
+
+```
+createdb -h /tmp/pg -p 55432 -U postgres cuadernostest
+psql -h /tmp/pg -p 55432 -U postgres -v ON_ERROR_STOP=1 -d cuadernostest -f _dev/prueba-redaccion-cuadernos-sql.sql
+```
+
+Esa prueba mira la puerta dos veces y en el mismo orden que la de las
+redes, y comprueba que los checks muerden: sin dirección o sin nombre no
+entra, unos estantes o unas referencias que no sean una lista no entran,
+y la guardia de dependencias para nombrando el archivo.
+
 ## Normativa: los textos de encargo se leen en La Voz Prestada
 
 **Pedido por el autor el 10 de septiembre de 2026:** «necesito una nueva
@@ -3890,7 +4053,7 @@ usar un token del otro no da ningún error: se resuelve a nada.
 
 | | La aplicación (`index.html`) | Las misiones |
 |---|---|---|
-| Hojas | `app.css` + `criba.css` + `rodaje.css` + `voz-prestada.css` + `redaccion-redes.css` | la de la misión + `taller-neuro.css` + `recursos-enlaces.css` |
+| Hojas | `app.css` + `criba.css` + `rodaje.css` + `voz-prestada.css` + `redaccion-redes.css` + `redaccion-cuadernos.css` | la de la misión + `taller-neuro.css` + `recursos-enlaces.css` |
 | Tokens | `--brand`, `--surface`, `--bg`, `--border`, `--text`, `--muted`, `--faint`, `--accent` | `--pri`, `--sec`, `--card`, `--dark`, `--gray`… |
 | Tipografía | Outfit | Nunito / Fredoka |
 
