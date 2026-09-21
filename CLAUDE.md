@@ -975,7 +975,7 @@ comentario y perfil. El texto es **texto plano** a propósito: ninguna red
 acepta negritas pegadas, y un HTML aquí sería una promesa que la red no
 cumple.
 
-**Trece reglas, y ninguna es de adorno:**
+**Catorce reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA CUENTA DE X ES PONDERADA, NO DE CARACTERES.** X cuenta 280
    «unidades»: un enlace vale **23** pase lo que pase (lo acorta t.co), un
@@ -1163,6 +1163,50 @@ cumple.
       «Corregir las seguras» dejaba `¡q bn!¡!¡!`: la regla de abrir la
       exclamación rellenaba de «¡» cada «!» del «!!!».
 
+14. 𝗡 **LA NEGRITA UNICODE EXISTE, ES PARA UNA PALABRA, Y LO QUE PIERDE SE
+    DICE AL LADO.** Pedido por el autor el 21 de septiembre de 2026,
+    después de preguntar si en Facebook un post admite negrita o color: no
+    lo admite. Ninguna red tiene negrita en un post de perfil o de página
+    (solo los grupos, y en computadora); lo que hacen los generadores es
+    cambiar cada letra por un SÍMBOLO matemático que se le parece (𝗮𝘀í).
+    El botón **𝗡 Negrita** del editor hace eso con la palabra seleccionada
+    —o con la que tenga el cursor dentro— y otro toque la devuelve
+    (`rrdNegrita`, `rrdSinNegrita`, `rrdNegritaToggle`).
+
+    ⚠️ **EL AVISO ES LA MITAD DEL BOTÓN.** En cuanto hay una palabra así
+    en el texto, debajo del recuadro se dice lo que se pierde
+    (`rrdNegritaAviso`): no son letras, así que el buscador de la red no
+    encuentra esas palabras, los lectores de pantalla las deletrean, en
+    algunos aparatos salen como cuadros y **el corrector no las revisa**.
+    Con una frase entera pasa a rojo: así casi nadie lo lee ni lo
+    encuentra. Es la regla de las abreviaturas y los «!!!»: se dice, y lo
+    decide quien escribe. Y el corrector no calla el hueco: tapa la
+    negrita como tapa una dirección (`COR_NEGRITA`) y la señala con su
+    propia regla `redes-negrita`, que corre sobre el texto SIN tapar
+    (`crudo`), con el mismo porqué en su tarjeta.
+
+    ⚠️ **Solo hay símbolos para A-Z, a-z y 0-9.** La tilde y la eñe van
+    como la letra en negrita más la marca suelta (o + U+0301, que es lo
+    que hace NFD) y al quitar la negrita NFC las vuelve a juntar. La
+    sonda lo comprueba de ida y vuelta con «educación».
+
+    ⚠️ **Y X LA COBRA DOBLE, Y LA CUENTA LO SABE.** Un símbolo de estos
+    está fuera de las tablas de peso 1 de twitter-text, así que cuesta 2,
+    y una «𝗼́» son 2 más 1 de su tilde suelta: tres unidades por una
+    letra. `rrdLargoX` cuenta ahora como twitter-text de verdad —normaliza
+    a NFC, un emoji vale 2 tenga los puntos de código que tenga, y lo
+    demás se suma punto por punto— en vez de cobrar 2 por cualquier
+    grafema raro, que se quedaba corto justo aquí. En una pieza de X el
+    aviso lo dice con el número.
+
+    **Al bajar el dedo sobre el botón no se le quita el foco al
+    recuadro** (`pointerdown` cancelado): tocar un botón se lleva el foco
+    y, con él, en muchos navegadores la selección que se acababa de
+    hacer, y el botón parecería no hacer nada. El cambio se mete con
+    `setRangeText` —conserva el deshacer— y un `input` disparado a mano,
+    para que corran los mismos ganchos que al teclear: guardar, crecer, el
+    espejo y el corrector.
+
 **Antes de publicar un cambio de las redes:**
 
 ```
@@ -1190,6 +1234,17 @@ seguras» rellene un «!!!» de «¡», que el toque sobre una palabra no abra
 su burbuja, que al salir queden subrayados puestos, y —lo que cazó el
 choque de nombres— que el corrector de la nota de la revista siga
 abriendo y cazando después, sin que se le cuelen las reglas de redes.
+
+La sección **16** es la negrita Unicode: la ida y vuelta con tilde y eñe,
+que X cobre 8 por «𝗵𝗼𝗹𝗮» y 3 por una «𝗼́» (y siga cobrando 2 por una
+familia de emojis y por un keycap), que el `pointerdown` del botón esté
+cancelado, que un toque ponga la negrita en la palabra seleccionada y
+otro la quite, que sin selección sea la palabra bajo el cursor y en un
+espacio no cambie nada y lo diga, que el aviso salga con lo que se pierde
+(ámbar con una palabra, rojo con la frase entera, y con el coste en X
+solo en una pieza de X), y que el corrector señale la negrita con su
+regla sobre el trozo exacto sin que ninguna otra mire dentro, cazando la
+errata de fuera igual.
 
 Y el SQL, contra un PostgreSQL de verdad, con el servidor de la sesión
 levantado como dice el apartado de La Voz Prestada:

@@ -260,19 +260,30 @@ function rrdPesa1(cp) {
          (cp >= 0x2010 && cp <= 0x201F) || (cp >= 0x2032 && cp <= 0x2037);
 }
 
+/* ⚠️ Se cuenta como cuenta twitter-text de verdad, y no «2 por cualquier
+   grafema raro»: se normaliza a NFC antes (una «é» escrita como e + tilde
+   suelta se junta y vale 1); un emoji vale 2 tenga los puntos de código
+   que tenga (la familia 👨‍👩‍👧 son cinco y cuesta 2, el keycap 1️⃣ tres y
+   cuesta 2); y todo lo demás se suma punto por punto. Es lo que hace
+   que la negrita Unicode (rrdNegrita) cueste lo que cuesta: un símbolo
+   de esos pesa 2, y «𝗼́» son 2 más la tilde suelta de 1, tres unidades
+   por una letra. La versión anterior cobraba 2 por ese grafema entero
+   y se quedaba corta justo ahí. */
+const RRD_ES_EMOJI = /\p{Extended_Pictographic}|\p{Regional_Indicator}|[\u20E3\uFE0F]/u;
 function rrdLargoX(texto) {
-  const t = String(texto || '');
+  const t = String(texto || '').normalize('NFC');
   let total = 0;
   const sinEnlaces = t.replace(RRD_URL_RE, () => { total += RRD_X_ENLACE; return ''; });
+  const pesa = cp => rrdPesa1(cp) ? 1 : 2;
   if (typeof Intl !== 'undefined' && Intl.Segmenter) {
     const seg = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
     for (const { segment } of seg.segment(sinEnlaces)) {
       const cps = [...segment].map(c => c.codePointAt(0));
-      total += cps.every(rrdPesa1) ? cps.length : 2;
+      total += (cps.length > 1 && RRD_ES_EMOJI.test(segment)) ? 2 : cps.reduce((a, cp) => a + pesa(cp), 0);
     }
     return total;
   }
-  for (const ch of sinEnlaces) total += rrdPesa1(ch.codePointAt(0)) ? 1 : 2;
+  for (const ch of sinEnlaces) total += pesa(ch.codePointAt(0));
   return total;
 }
 
@@ -292,6 +303,100 @@ function rrdMinSeg(seg) {
 }
 function rrdHashtags(texto) {
   return (String(texto || '').match(/(?:^|\s)#[\p{L}\p{N}_]+/gu) || []).map(s => s.trim());
+}
+
+/* ── La negrita Unicode ─────────────────────────────────────────────
+   Ninguna red tiene negrita en un post de perfil o de página: lo único
+   que existe es cambiar cada letra por un SÍMBOLO matemático que se le
+   parece (𝗮𝘀í), que es lo que hacen los generadores. Se ofrece porque
+   el autor lo pidió (21 de septiembre de 2026) y porque para UNA
+   palabra sirve; pero lo que se pierde se dice al lado, siempre
+   (rrdNegritaAviso): no son letras —el buscador de la red no encuentra
+   esas palabras, los lectores de pantalla las deletrean, en algunos
+   aparatos salen como cuadros y el corrector no las revisa— y en X
+   cada una cuesta 2. Va la sans-serif bold (U+1D5D4…), la que mejor se
+   ve en las aplicaciones.
+   ⚠️ Solo hay símbolos para A-Z, a-z y 0-9: la tilde y la eñe van como
+   la letra en negrita más la marca suelta (o + U+0301), que es lo que
+   hace NFD; y al quitar la negrita, NFC las vuelve a juntar. La sonda
+   comprueba la ida y vuelta con «educación». */
+const RRD_NEG_A = 0x1D5D4, RRD_NEG_a = 0x1D5EE, RRD_NEG_0 = 0x1D7EC;
+// Cualquier «fuente» de generador (todo el bloque de símbolos alfanuméricos
+// matemáticos), con sus marcas sueltas: es lo que cuenta el aviso.
+const RRD_NEG_RUN = /(?:[\u{1D400}-\u{1D7FF}][\u0300-\u036F]*)+/gu;
+const RRD_NEG_HAY = /[\u{1D400}-\u{1D7FF}]/u;
+
+function rrdNegrita(s) {
+  return String(s || '').normalize('NFD').replace(/[A-Za-z0-9]/g, ch => {
+    const c = ch.charCodeAt(0);
+    if (c >= 65 && c <= 90) return String.fromCodePoint(RRD_NEG_A + c - 65);
+    if (c >= 97 && c <= 122) return String.fromCodePoint(RRD_NEG_a + c - 97);
+    return String.fromCodePoint(RRD_NEG_0 + c - 48);
+  });
+}
+function rrdSinNegrita(s) {
+  return String(s || '').replace(/[\u{1D5D4}-\u{1D607}\u{1D7EC}-\u{1D7F5}]/gu, ch => {
+    const cp = ch.codePointAt(0);
+    if (cp <= 0x1D5ED) return String.fromCharCode(65 + cp - RRD_NEG_A);
+    if (cp <= 0x1D607) return String.fromCharCode(97 + cp - RRD_NEG_a);
+    return String.fromCharCode(48 + cp - RRD_NEG_0);
+  }).normalize('NFC');
+}
+function rrdNegritaCuenta(texto) {
+  return (String(texto || '').match(RRD_NEG_RUN) || []).length;
+}
+
+/* El botón 𝗡: pone en negrita la selección del recuadro —o la palabra
+   que tenga el cursor dentro— y con otro toque la quita. */
+function rrdNegritaToggle() {
+  const ta = document.getElementById('rrd-e-texto');
+  if (!ta) return;
+  const v = ta.value;
+  let s = ta.selectionStart, e = ta.selectionEnd;
+  if (s === e) {                       // sin selección: la palabra bajo el cursor
+    while (s > 0 && !/\s/.test(v[s - 1])) s--;
+    while (e < v.length && !/\s/.test(v[e])) e++;
+  }
+  const trozo = v.slice(s, e);
+  if (!trozo.trim()) {
+    rrdNegritaAviso('Selecciona la palabra que quieres en negrita, o pon el cursor dentro de ella, y vuelve a tocar 𝗡.');
+    ta.focus();
+    return;
+  }
+  const quitar = RRD_NEG_HAY.test(trozo) && !/[A-Za-z0-9]/.test(trozo);
+  const nuevo = quitar ? rrdSinNegrita(trozo) : rrdNegrita(trozo);
+  ta.focus();
+  ta.setSelectionRange(s, e);
+  // setRangeText conserva el historial de deshacer y NO dispara input:
+  // se dispara a mano, para que corran los MISMOS ganchos que al
+  // teclear (guardar, crecer, el espejo, el corrector). Y lo convertido
+  // se queda seleccionado: otro toque lo devuelve.
+  ta.setRangeText(nuevo, s, e, 'select');
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+/* El aviso: sale en cuanto hay una negrita Unicode en el texto y se va
+   con ella; con un mensaje, dice eso (el «selecciona primero»). En rojo
+   cuando es una frase entera: así casi nadie lo lee ni lo encuentra. */
+function rrdNegritaAviso(mensaje) {
+  const el = document.getElementById('rrd-e-negrita-aviso');
+  if (!el) return;
+  const p = rrdPieza(_rrdId);
+  const texto = p ? (p.texto || '') : '';
+  const n = rrdNegritaCuenta(texto);
+  const palabras = rrdPalabras(texto);
+  const grave = n >= 6 || (palabras >= 6 && n * 2 >= palabras);
+  el.className = 'rrd-aviso rrd-negrita-aviso' + (grave ? ' rrd-aviso-rojo' : '');
+  if (mensaje) { el.textContent = mensaje; el.style.display = ''; return; }
+  if (!n) { el.textContent = ''; el.style.display = 'none'; return; }
+  el.textContent = (grave
+    ? '🔴 ' + n + ' palabras en negrita Unicode: así casi nadie lo lee ni lo encuentra. Déjala para una o dos palabras. '
+    : '𝗡 ' + (n === 1 ? 'Una palabra' : n + ' palabras') + ' en negrita Unicode. ') +
+    'Son símbolos que parecen letras, no letras: el buscador de la red no encuentra esas palabras, ' +
+    'los lectores de pantalla las deletrean, en algunos aparatos salen como cuadros y el corrector no las revisa' +
+    (p && p.red === 'x' ? ', y en X cada letra cuesta 2 unidades' : '') +
+    '. Para quitarla, selecciónala y vuelve a tocar 𝗡.';
+  el.style.display = '';
 }
 
 /* ── Las partes de un hilo ──────────────────────────────────────────
@@ -1139,6 +1244,7 @@ function rrdPintarAnalisis() {
   if (!p) return;
   const regla = rrdRegla(p.red, p.clase);
   const an = rrdAnalisis(p);
+  rrdNegritaAviso();
   const cont = document.getElementById('rrd-e-contador');
   const avisos = document.getElementById('rrd-e-avisos');
   const gancho = document.getElementById('rrd-e-gancho');
@@ -1527,6 +1633,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('rrd-e-partir-btn')?.addEventListener('click', rrdPartirAhora);
   document.getElementById('rrd-e-molde-btn')?.addEventListener('click', rrdPonerMolde);
+  // 𝗡 Negrita. Al bajar el dedo sobre el botón NO se le quita el foco al
+  // recuadro: así la selección que se acaba de hacer sigue viva y el
+  // teclado no parpadea. El click llega igual.
+  const negBtn = document.getElementById('rrd-e-negrita-btn');
+  negBtn?.addEventListener('pointerdown', e => e.preventDefault());
+  negBtn?.addEventListener('click', rrdNegritaToggle);
   document.getElementById('rrd-e-copiar-btn')?.addEventListener('click', rrdCopiar);
   document.getElementById('rrd-e-compartir-btn')?.addEventListener('click', rrdCompartir);
   document.getElementById('rrd-e-abrir-btn')?.addEventListener('click', rrdAbrirRed);

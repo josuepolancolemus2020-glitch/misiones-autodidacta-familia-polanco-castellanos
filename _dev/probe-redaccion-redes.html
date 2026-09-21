@@ -474,6 +474,97 @@ function termina() {
   ok(g('_corHallazgos').every(h => !/^redes-/.test(h.regla.id)), 'y sobre la nota NO corren las reglas de redes', 'las reglas de redes se colaron en la revista');
   w.eval('corCerrar(); corDespintar()');
 
+  log('── 16. Negrita Unicode: un botón, con su aviso, y X la cobra bien ──');
+  const negEsperada = '𝗛𝗼𝗹𝗮 𝗲𝗱𝘂𝗰𝗮𝗰𝗶𝗼\u0301𝗻 𝗻\u0303 𝟯';
+  const neg = w.rrdNegrita('Hola educación ñ 3');
+  ok(neg === negEsperada, 'rrdNegrita cambia letras y cifras por símbolos, y la tilde y la virgulilla van como marca suelta',
+     'salió ' + neg + ' (' + [...neg].map(c => c.codePointAt(0).toString(16)).join(' ') + ')');
+  ok(w.rrdSinNegrita(neg) === 'Hola educación ñ 3', 'y rrdSinNegrita devuelve el texto de antes, con las tildes juntadas', 'volvió: ' + w.rrdSinNegrita(neg));
+  ok(lx('𝗵𝗼𝗹𝗮') === 8, 'en X cada letra en negrita Unicode cuesta 2 («𝗵𝗼𝗹𝗮» = 8)', '«𝗵𝗼𝗹𝗮» dio ' + lx('𝗵𝗼𝗹𝗮'));
+  ok(lx('𝗼\u0301') === 3, 'y una vocal con tilde en negrita cuesta 3 (símbolo de 2 + tilde suelta de 1)', '«𝗼́» dio ' + lx('𝗼\u0301'));
+  ok(lx('e\u0301') === 1, 'mientras que una «é» escrita como e + tilde suelta se junta (NFC) y vale 1', 'dio ' + lx('e\u0301'));
+  ok(lx('👨‍👩‍👧') === 2, 'una familia de emojis sigue valiendo 2', 'la familia dio ' + lx('👨‍👩‍👧'));
+  ok(lx('1️⃣') === 2, 'y un dígito con recuadro (keycap) vale 2', 'el keycap dio ' + lx('1️⃣'));
+  ok(new RegExp('[' + g('COR_L') + ']', 'u').test('𝗯') === false, 'el diccionario del corrector no ve letras dentro de una negrita Unicode (no la acusa de tecleo)', 'COR_L casa con un símbolo de negrita');
+
+  const pn = w.rrdNueva('facebook', 'post', { texto: 'Creemos que la bandera importa mucho.' });
+  w.rrdAbrir(pn.id);
+  await esperar(250);
+  const tan = d.getElementById('rrd-e-texto');
+  const negBtn = d.getElementById('rrd-e-negrita-btn');
+  ok(!!negBtn && negBtn.offsetParent !== null, 'el botón 𝗡 Negrita está a la vista encima del recuadro', 'no hay botón de negrita a la vista');
+  const pdEv = new w.PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'touch' });
+  ok(negBtn && !negBtn.dispatchEvent(pdEv), 'bajar el dedo sobre el botón no le quita el foco al recuadro (pointerdown cancelado)', 'el pointerdown no se cancela: tocar el botón deshace la selección');
+  const iB = tan.value.indexOf('bandera');
+  tan.focus(); tan.setSelectionRange(iB, iB + 7);
+  negBtn.click();
+  await esperar(250);
+  ok(tan.value === 'Creemos que la 𝗯𝗮𝗻𝗱𝗲𝗿𝗮 importa mucho.', 'seleccionar «bandera» y tocar 𝗡 la pone en negrita Unicode, y nada más', 'el recuadro dice: ' + tan.value);
+  ok(tan.selectionStart === iB && tan.selectionEnd === iB + 14, 'y la palabra convertida se queda seleccionada, para deshacer con otro toque', 'selección ' + tan.selectionStart + '-' + tan.selectionEnd);
+  ok(w.rrdPieza(pn.id).texto === tan.value, 'y la pieza guardada lleva la negrita', 'la pieza dice: ' + w.rrdPieza(pn.id).texto);
+  ok(d.getElementById('rrd-e-espejo').textContent === tan.value, 'y el espejo sigue igual al recuadro', 'el espejo se desfasó');
+  const avN = d.getElementById('rrd-e-negrita-aviso');
+  ok(avN && avN.style.display !== 'none' && /Una palabra en negrita Unicode/.test(avN.textContent) && /lectores de pantalla/.test(avN.textContent) && /buscador/.test(avN.textContent) && /vuelve a tocar/.test(avN.textContent),
+     'y el aviso dice lo que se pierde (buscador, lectores de pantalla) y cómo quitarla', 'el aviso dice: ' + (avN && avN.textContent));
+  ok(!/cuesta 2/.test(avN.textContent), '(en Facebook no habla del coste de X)', 'el aviso de Facebook habla de X');
+  ok(!avN.classList.contains('rrd-aviso-rojo'), 'con una palabra el aviso es ámbar, no rojo', 'salió rojo con una sola palabra');
+  negBtn.click();                       // con la palabra todavía seleccionada
+  await esperar(250);
+  ok(tan.value === 'Creemos que la bandera importa mucho.', 'otro toque con la palabra seleccionada quita la negrita', 'el recuadro dice: ' + tan.value);
+  ok(avN.style.display === 'none', 'y sin negrita el aviso se va', 'el aviso sigue: ' + avN.textContent);
+  const iM = tan.value.indexOf('mucho') + 2;
+  tan.setSelectionRange(iM, iM);
+  negBtn.click();
+  await esperar(250);
+  ok(tan.value === 'Creemos que la bandera importa 𝗺𝘂𝗰𝗵𝗼.', 'sin selección, 𝗡 pone en negrita la palabra bajo el cursor (y deja el punto en paz)', 'el recuadro dice: ' + tan.value);
+  // El cursor pegado al final de una palabra es esa palabra
+  const iEsp = tan.value.indexOf(' la ');
+  tan.setSelectionRange(iEsp, iEsp);
+  negBtn.click();
+  await esperar(250);
+  ok(tan.value === 'Creemos 𝗾𝘂𝗲 la bandera importa 𝗺𝘂𝗰𝗵𝗼.', 'con el cursor pegado al final de «que», 𝗡 toma «que»', 'el recuadro dice: ' + tan.value);
+  ok(/2 palabras en negrita/.test(avN.textContent), 'y el aviso cuenta dos', 'el aviso dice: ' + avN.textContent);
+  // Sin nada que poner en negrita: no cambia nada y lo dice
+  tan.value = '';
+  tan.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(250);
+  ok(avN.style.display === 'none', '(sin texto, el aviso está recogido)', 'el aviso sigue con el texto vacío: ' + avN.textContent);
+  negBtn.click();
+  await esperar(100);
+  ok(tan.value === '' && avN.style.display !== 'none' && /Selecciona/.test(avN.textContent), 'sin nada que poner en negrita, no cambia nada y el aviso dice qué hacer', 'cambió el texto o no avisó: ' + avN.textContent);
+  tan.value = 'Creemos que la bandera importa mucho para todos.';
+  tan.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(250);
+  tan.setSelectionRange(0, tan.value.length);
+  negBtn.click();
+  await esperar(250);
+  ok(w.rrdNegritaCuenta(tan.value) === 8 && avN.classList.contains('rrd-aviso-rojo') && /🔴/.test(avN.textContent), 'una frase entera en negrita sale en ROJO', 'cuenta ' + w.rrdNegritaCuenta(tan.value) + ', clase ' + avN.className + ': ' + avN.textContent);
+  negBtn.click();                       // todo sigue seleccionado: vuelve entero
+  await esperar(250);
+  ok(tan.value === 'Creemos que la bandera importa mucho para todos.', 'y otro toque devuelve la frase entera con sus letras', 'el recuadro dice: ' + tan.value);
+
+  // En X la cuenta y el aviso lo cobran
+  const pxNeg = w.rrdNueva('x', 'post', { texto: '𝗵𝗼𝗹𝗮 mundo' });
+  w.rrdAbrir(pxNeg.id);
+  await esperar(300);
+  ok(/^14 \/ 280/.test(texto('rrd-e-contador')), 'en una pieza de X el contador cobra la negrita al doble («𝗵𝗼𝗹𝗮 mundo» = 14)', 'el contador dice: ' + texto('rrd-e-contador'));
+  ok(/cuesta 2 unidades/.test(d.getElementById('rrd-e-negrita-aviso').textContent), 'y el aviso de X lo dice con el número', 'el aviso de X dice: ' + d.getElementById('rrd-e-negrita-aviso').textContent);
+
+  // El corrector la señala y no busca erratas dentro
+  const pcNeg = w.rrdNueva('facebook', 'post', { texto: 'Creemos que la 𝗯𝗮𝗻𝗱𝗲𝗿𝗮 𝗶𝗺𝗽𝗼𝗿𝘁𝗮 mucho. Fué asi.' });
+  w.rrdAbrir(pcNeg.id);
+  await esperar(250);
+  d.getElementById('rrd-e-corr-btn').click();
+  await esperar(400);
+  const hsN = g('_corHallazgos');
+  const hNeg = hsN.find(h => h.regla.id === 'redes-negrita');
+  ok(!!hNeg && hNeg.original === '𝗯𝗮𝗻𝗱𝗲𝗿𝗮 𝗶𝗺𝗽𝗼𝗿𝘁𝗮' && hNeg.regla.nivel === 'revisa' && hNeg.regla.zona, 'el corrector señala la negrita Unicode con su regla (revisa, zona) sobre el trozo exacto', 'hallazgos: ' + hsN.map(h => h.regla.id + ':' + h.original).join(' | '));
+  const iNeg = pcNeg.texto.indexOf('𝗯𝗮𝗻𝗱𝗲𝗿𝗮'), fNeg = pcNeg.texto.indexOf(' mucho');
+  ok(hsN.every(h => h.regla.id === 'redes-negrita' || h.fin <= iNeg || h.ini >= fNeg), 'y ninguna otra regla mira dentro de la negrita', 'algo casó dentro: ' + hsN.filter(h => h.regla.id !== 'redes-negrita' && !(h.fin <= iNeg || h.ini >= fNeg)).map(h => h.regla.id + ':' + h.original).join(','));
+  ok(hsN.some(h => h.original === 'Fué'), 'mientras que la errata de fuera («Fué») sí se caza', 'no cazó «Fué»');
+  ok(/símbolos, no letras/.test(hNeg ? hNeg.regla.titulo : ''), 'y su tarjeta se titula por lo que es', 'título: ' + (hNeg && hNeg.regla.titulo));
+  w.eval('corCerrar(); corDespintar()');
+
   termina();
 })().catch(e => { fallos++; log('✘ la sonda reventó: ' + (e && e.stack || e)); termina(); });
 </script>
