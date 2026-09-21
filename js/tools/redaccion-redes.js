@@ -956,6 +956,7 @@ async function rrdSaveNow() {
 function rrdAbrir(id) {
   const p = rrdPieza(id);
   if (!p) return;
+  if (_rrdId !== id) rrdCorDespintar();
   _rrdId = id;
   _rrdRetirando = null;
   document.getElementById('rrd-e-rotulo').value = p.titulo || '';
@@ -1069,7 +1070,7 @@ function rrdPintarNota() {
   el.style.display = '';
   el.appendChild(rrdEl('span', null, `📰 Sale de la nota «${n ? (n.titulo || 'Sin título') : 'ya no está'}».`));
   if (n && typeof redOpenEditor === 'function') {
-    el.appendChild(rrdBtn('rrd-mini-btn', 'Abrir la nota', async () => { await rrdSaveNow(); redOpenEditor(n.id); }));
+    el.appendChild(rrdBtn('rrd-mini-btn', 'Abrir la nota', async () => { await rrdSaveNow(); rrdCorDespintar(); redOpenEditor(n.id); }));
     el.appendChild(rrdBtn('rrd-mini-btn', '🔖 Traer sus citas', () => {
       const nuevas = rrdFuentesDeNota(n);
       if (!nuevas.length) { rrdAviso('La nota no tiene citas'); return; }
@@ -1264,6 +1265,89 @@ function rrdCrecerTexto() {
   if (!ta) return;
   ta.style.height = 'auto';
   ta.style.height = Math.max(140, ta.scrollHeight + 4) + 'px';
+  rrdEspejoPintar();   // el espejo lleva siempre el mismo texto que el recuadro
+}
+
+/* ── 🪶 El corrector que enseña, sobre la pieza ───────────────────────
+   Pedido por el autor el 21 de septiembre de 2026: «características
+   respecto a la corrección de ortografía y estilo, tal como la tiene o
+   si es posible mejor, como está en la redacción de la revista».
+
+   Es EL MISMO corrector (js/tools/corrector.js): el mismo panel, las
+   mismas reglas con su porqué, el mismo diccionario y la misma memoria
+   de lo que se te repite. Lo único que cambia es el SUJETO: la nota
+   vive en un cuerpo con formato y la pieza en un <textarea>, y eso lo
+   sabe solo este objeto.
+
+   ⚠️ EL ESPEJO. Un <textarea> no tiene nodos de texto, y los
+   subrayados del corrector (CSS Custom Highlight) solo se pintan sobre
+   nodos. Así que detrás del recuadro hay un <div> con el MISMO texto,
+   la misma letra, el mismo relleno y el mismo ancho, con la tinta
+   transparente: el subrayado se pinta ahí y se ve a través del
+   recuadro, en el sitio exacto de cada palabra. Para que cuadre, los
+   dos comparten TODAS las medidas en el CSS (.rrd-e-texto y
+   .rrd-e-espejo van en la misma regla) y el recuadro crece con el
+   texto en vez de desplazarse por dentro. La sonda mide que las
+   medidas calculadas son iguales y que el primer subrayado cae donde
+   empieza el texto.
+
+   El toque sobre una palabra subrayada llega por el índice del cursor
+   (`selectionStart`), no por el punto: dentro de un <textarea> el
+   navegador no sabe decir qué carácter hay bajo el dedo. */
+const RRD_SUJETO_CORRECTOR = {
+  id: 'redes',
+  listo: () => !!rrdPieza(_rrdId),
+  campos: () => [{ id: 'cuerpo', mapa: rrdEspejoMapa }],
+  /* Con el mismo cinturón que la nota: si lo que hay en ese tramo ya
+     no es lo que se iba a corregir, no se toca nada. */
+  aplicar(h) {
+    const ta = document.getElementById('rrd-e-texto');
+    if (!ta) return false;
+    if (h.original && ta.value.slice(h.ini, h.fin) !== h.original) return false;
+    ta.value = ta.value.slice(0, h.ini) + h.sugerencia + ta.value.slice(h.fin);
+    rrdCrecerTexto();
+    return true;
+  },
+  aplicable: () => true,
+  guardar: () => rrdQueueSave(),
+  scroll: () => document.querySelector('#view-redaccion-pieza .view-scroll'),
+  /* Las opciones del análisis para un post: se tapan direcciones,
+     hashtags y menciones; entran las reglas de las redes; una oración
+     es kilométrica desde 30 palabras y no 45; y la minúscula con que
+     empieza un renglón no se acusa. */
+  opciones: { redes: true, mascara: true, largaMax: 30, mayusTrasSalto: false },
+};
+
+function rrdEspejoPintar() {
+  const ta = document.getElementById('rrd-e-texto');
+  const esp = document.getElementById('rrd-e-espejo');
+  if (!ta || !esp) return;
+  esp.textContent = ta.value;
+}
+
+/* El mapa que pide el corrector: el texto y el nodo que lo sostiene.
+   Un solo nodo con todo el texto, con sus saltos de línea, que el
+   espejo pinta con `white-space: pre-wrap` igual que el recuadro. */
+function rrdEspejoMapa() {
+  rrdEspejoPintar();
+  const ta = document.getElementById('rrd-e-texto');
+  const esp = document.getElementById('rrd-e-espejo');
+  const texto = ta ? ta.value : '';
+  const nodo = esp && esp.firstChild;
+  return { texto, tramos: nodo ? [{ node: nodo, ini: 0, fin: texto.length }] : [] };
+}
+
+function rrdCorregir() {
+  if (typeof corAbrirNueva !== 'function') { rrdAviso('El corrector no cargó (falta js/tools/corrector.js)'); return; }
+  rrdCamposEditor();   // lo tecleado, en la pieza, antes de mirar
+  corAbrirNueva(RRD_SUJETO_CORRECTOR);
+}
+
+/* Los subrayados pertenecen a la pieza que se estaba corrigiendo: al
+   abrir otra o al salir, se recogen. */
+function rrdCorDespintar() {
+  if (typeof corOcultarBurbuja === 'function') corOcultarBurbuja();
+  if (typeof corDespintar === 'function') corDespintar();
 }
 
 /* ── Copiar, compartir, abrir ─────────────────────────────────────── */
@@ -1417,6 +1501,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // El editor de la pieza
   document.getElementById('rrd-editor-back-btn')?.addEventListener('click', async () => {
+    rrdCorDespintar();
     await rrdSaveNow();
     if (typeof _redEdicion !== 'undefined') _redEdicion = 'redes';
     if (typeof switchView === 'function') switchView('view-redaccion');
@@ -1430,6 +1515,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const v = document.getElementById('rrd-e-enlace').value;
     if (nota) nota.textContent = v.trim() ? rrdEnlaceEntendido(v).nota : '';
   });
+  // El corrector que enseña, sobre la pieza
+  document.getElementById('rrd-e-corr-btn')?.addEventListener('click', rrdCorregir);
+  const taCor = document.getElementById('rrd-e-texto');
+  taCor?.addEventListener('input', () => { if (typeof corTextoTecleado === 'function') corTextoTecleado(); });
+  taCor?.addEventListener('click', e => {
+    if (typeof corTocaEnIndice === 'function') corTocaEnIndice(taCor.selectionStart, e.clientX, e.clientY);
+  });
+  document.querySelector('#view-redaccion-pieza .view-scroll')
+    ?.addEventListener('scroll', () => { if (typeof corOcultarBurbuja === 'function') corOcultarBurbuja(); }, { passive: true });
+
   document.getElementById('rrd-e-partir-btn')?.addEventListener('click', rrdPartirAhora);
   document.getElementById('rrd-e-molde-btn')?.addEventListener('click', rrdPonerMolde);
   document.getElementById('rrd-e-copiar-btn')?.addEventListener('click', rrdCopiar);

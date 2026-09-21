@@ -14,6 +14,15 @@
    hacia ningún servicio externo. Mismo criterio que la bitácora y
    la papelera: los textos de la familia son de la familia.
 
+   Desde el 21 de septiembre de 2026 revisa DOS cosas con el mismo
+   panel, las mismas reglas y la misma memoria: la nota de la revista
+   (título, entradilla y el cuerpo con formato) y la pieza para redes
+   de Redacción, que vive en un <textarea>. Lo que cambia entre una y
+   otra —qué campos hay, cómo se leen, cómo se escribe una corrección,
+   qué caja se desplaza, cómo se guarda— está en su SUJETO
+   (COR_SUJETO_NOTA aquí, RRD_SUJETO_CORRECTOR en redaccion-redes.js)
+   y en ningún otro sitio. Todo lo demás no sabe sobre qué está.
+
    Dos motores trabajan juntos:
    · Las REGLAS de este archivo cazan los errores de norma que un
      diccionario no ve (tildes con historia, dequeísmo, «haber»
@@ -1291,6 +1300,66 @@ const R_PROPIO = {
   ejemplo: { mal: 'el filósofo Gustabo Bueno', bien: 'el filósofo Gustavo Bueno' },
 };
 
+/* ── Las reglas de las redes ──────────────────────────────────────
+   Solo corren sobre una pieza para redes (opts.redes). Son de ESTILO
+   de ese sitio, no de norma: en un post caben cosas que en la revista
+   no, y al revés. Cada una con su porqué, como las demás; y las
+   cuatro son «revísalo tú», porque en una red la intención manda —un
+   «!!!» puede ser justo lo que se quería decir—. Lo que NO va aquí es
+   lo que ya mide la propia pieza (topes, hashtags de más, el enlace
+   dentro del post de LinkedIn): eso lo dice rrdAnalisis con el tope de
+   cada red delante, y decirlo dos veces sería tener dos versiones. */
+const COR_REGLAS_REDES = [
+  {
+    id: 'redes-chat', cat: 'estilo', nivel: 'revisa',
+    re: corPal('q|xq|pq|xk|tb|tmb|xfa|dnd|bn|tqm|salu2'),
+    sug: m => ({ q: 'que', xq: 'porque', pq: 'porque', xk: 'porque', tb: 'también', tmb: 'también',
+      xfa: 'por favor', dnd: 'dónde', bn: 'bien', tqm: 'te quiero mucho', salu2: 'saludos' }[m.toLowerCase()]),
+    titulo: 'Abreviatura de chat',
+    porque: 'En un mensaje entre amigos «q», «xq» y «tb» se leen sin pensar; en la cuenta de una revista se leen como prisa. Quien llega a un post sin conocer a quien lo escribió juzga el cuidado de la revista por el cuidado del post, y una abreviatura de chat le dice que ahí no se revisa nada. Escribir la palabra entera cuesta dos letras y compra credibilidad.',
+    norma: 'Estilo en redes',
+    ejemplo: { mal: 'Creemos q la escuela tb importa', bien: 'Creemos que la escuela también importa' },
+  },
+  {
+    /* Sustituye a 'signos-repetidos' (mismo cedazo): el porqué de la
+       revista habla de prosa; en una red la decisión es otra. */
+    id: 'redes-signos', cat: 'tipografia', nivel: 'revisa',
+    re: new RegExp(`(?<![=&|!(])[!?]{2,}|[¡¿]{2,}`, 'gu'),
+    sugm: (m) => { const t = m[0]; if (t.includes('¿')) return '¿'; if (t.includes('¡')) return '¡'; if (t.includes('?')) return '?'; return '!'; },
+    titulo: 'Signos repetidos (!!!, ???)',
+    porque: 'La Ortografía admite doblar o triplicar los signos en textos informales para marcar intensidad, así que no es una falta: es una decisión. Lo que hay que saber al tomarla es que en una red el énfasis se gasta rápido —tres signos en cada post equivalen a ninguno— y que un «!!!» suena a grito en un texto que quiere que le crean. Uno solo suele decir lo mismo, y lo dice con más calma.',
+    norma: 'RAE · Ortografía 2010',
+    ejemplo: { mal: '¡No te lo pierdas!!!', bien: '¡No te lo pierdas!' },
+  },
+  {
+    id: 'redes-grito', cat: 'estilo', nivel: 'revisa', zona: true,
+    re: /(?<![A-ZÁÉÍÓÚÑ])(?:[A-ZÁÉÍÓÚÑ]{2,}[ ,;:]+){2,}[A-ZÁÉÍÓÚÑ]{2,}(?![A-Za-zÁÉÍÓÚÜÑáéíóúüñ])/gu,
+    titulo: 'Varias palabras en MAYÚSCULAS seguidas',
+    porque: 'En pantalla, tres o más palabras seguidas en mayúsculas se leen como un grito, y además se leen peor: el ojo reconoce las palabras por su silueta (las astas de la b, la d, la l), y en mayúsculas todas las siluetas son un rectángulo. Para destacar una idea en una red hay otras cosas: ponerla sola en su renglón, ponerla al principio, o decirla más corta. Las siglas (ONU, UNAH) no cuentan: son mayúsculas por derecho.',
+    norma: 'Ortotipografía · estilo en redes',
+    ejemplo: { mal: 'ESTO ES MUY IMPORTANTE PARA TODOS', bien: 'Esto es muy importante para todos' },
+  },
+  {
+    id: 'redes-emoji', cat: 'estilo', nivel: 'revisa', zona: true,
+    re: /(?:\p{Extended_Pictographic}\uFE0F?(?:\u200D\p{Extended_Pictographic}\uFE0F?)*[ ]?){4,}/gu,
+    titulo: 'Racimo de emojis',
+    porque: 'Un emoji en el sitio justo dice algo que una palabra no; cuatro seguidos ya no dicen nada, solo ocupan. Y en X cada uno cuesta dos unidades de las 280. Con uno al principio del renglón, como viñeta, o uno al final, como gesto, se consigue lo mismo y se lee mejor. Un lector de pantalla, además, los lee en voz alta uno por uno: «cara sonriente, cara sonriente, cara sonriente…».',
+    norma: 'Estilo en redes',
+    ejemplo: { mal: 'Nueva edición 🎉🎉🎉🎉🎉', bien: 'Nueva edición 🎉' },
+  },
+];
+
+/* Las reglas de la revista que en redes se cambian por su versión de
+   redes (misma caza, otro porqué): con las dos, el descarte de solapes
+   se quedaría con la primera y el porqué de redes no saldría nunca. */
+const COR_REDES_SUSTITUYE = new Set(['signos-repetidos']);
+
+/* Lo que se TAPA antes de pasar las reglas sobre una pieza para redes:
+   un hashtag y una mención no son palabras del texto. «#educacion» sin
+   tilde puede ser a propósito —en X, «#educación» y «#educacion» son
+   etiquetas distintas— y «@usuario_hn» no está en ningún diccionario. */
+const COR_ETIQUETAS = /(?<![\p{L}\p{N}_])[#@][\p{L}\p{N}_]+/gu;
+
 /* Lo que el diccionario no debe tocar: URLs, correos y dominios */
 const COR_URLS = /(?:https?:\/\/|www\.)[^\s]+|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+|[A-Za-z0-9-]+\.(?:com|org|net|es|hn|edu|gob|info|io|app|dev|me)(?:\/[^\s]*)?(?![A-Za-zÁÉÍÓÚÜÑáéíóúüñ])/g;
 
@@ -1410,14 +1479,35 @@ const COR_STOP = new Set(['sobre', 'entre', 'hasta', 'desde', 'porque', 'cuando'
   'aunque', 'también', 'además', 'estos', 'estas', 'otros', 'otras', 'todos', 'todas', 'mismo', 'misma',
   'puede', 'pueden', 'tiene', 'tienen', 'hacer', 'haber', 'estar', 'según', 'quien', 'quienes']);
 
-/* ── El análisis completo de un campo de texto ── */
-function corAnalizarTexto(texto, campo) {
+/* ── El análisis completo de un campo de texto ──
+   `opts` lo pone el sujeto (ver COR_SUJETO_NOTA): `mascara` tapa
+   direcciones, hashtags y menciones antes de las reglas; `redes` añade
+   las reglas de las redes; `largaMax` es a partir de cuántas palabras
+   una oración es kilométrica (45 en la revista, 30 en un post); y
+   `mayusTrasSalto: false` deja en paz la minúscula con que empieza un
+   renglón nuevo, que en un post es una decisión y no un descuido. */
+function corAnalizarTexto(texto, campo, opts) {
+  opts = opts || {};
   const hallazgos = [];
 
-  for (const regla of COR_REGLAS) {
+  /* El tapado conserva el LARGO, así que los índices de lo que casa
+     siguen cuadrando con el texto de verdad; y como el relleno no es
+     una letra, ninguna regla casa «a través» de él. */
+  let textoReglas = texto;
+  if (opts.mascara) {
+    COR_URLS.lastIndex = 0;
+    textoReglas = textoReglas.replace(COR_URLS, u => '~'.repeat(u.length));
+    COR_ETIQUETAS.lastIndex = 0;
+    textoReglas = textoReglas.replace(COR_ETIQUETAS, e => '~'.repeat(e.length));
+  }
+  const reglas = opts.redes
+    ? COR_REGLAS.filter(r => !COR_REDES_SUSTITUYE.has(r.id)).concat(COR_REGLAS_REDES)
+    : COR_REGLAS;
+
+  for (const regla of reglas) {
     regla.re.lastIndex = 0;
     let m;
-    while ((m = regla.re.exec(texto))) {
+    while ((m = regla.re.exec(textoReglas))) {
       if (regla.id === 'cion' && m[3]) continue;                   // plural: correcto
       if (regla.id === 'duplicada' && COR_DUP_OK.has(m[1].toLowerCase())) continue;
       // «Bora Bora», «Baden Baden»: la reduplicación de nombre propio
@@ -1436,7 +1526,7 @@ function corAnalizarTexto(texto, campo) {
      título extranjero («Why not?») no es una pregunta del texto, y
      el punto de ejemplo.com no cierra oración. El tapado conserva
      el largo, así que los índices siguen cuadrando con el texto. */
-  let textoOra = texto;
+  let textoOra = textoReglas;   // con las direcciones y etiquetas ya tapadas si opts.mascara
   COR_URLS.lastIndex = 0;
   textoOra = textoOra.replace(COR_URLS, u => u.replace(/[.!?¿¡…:]/g, '~'));
   textoOra = textoOra.replace(/"[^"\n]{1,120}"|«[^»\n]{1,160}»|“[^”\n]{1,160}”/g,
@@ -1458,11 +1548,12 @@ function corAnalizarTexto(texto, campo) {
     norma: 'RAE · Ortografía 2010',
     ejemplo: { mal: 'Terminó. luego se fue', bien: 'Terminó. Luego se fue' },
   };
+  const largaMax = opts.largaMax || 45;
   const R_LARGA = {
     id: 'oracion-larga', cat: 'estilo', nivel: 'revisa', titulo: 'Oración kilométrica',
     zona: true,   // subraya la oración entera: es señal de fondo, no botón
-    porque: 'Más de 45 palabras sin un punto: el lector llega al final sin aire y sin recordar el inicio. Casi siempre hay dos o tres ideas ahí dentro pidiendo su propia oración. El punto es gratis.',
-    norma: 'Estilo periodístico',
+    porque: `Más de ${largaMax} palabras sin un punto${opts.redes ? ', que en la pantalla de un teléfono es media pantalla de corrido' : ''}: el lector llega al final sin aire y sin recordar el inicio. Casi siempre hay dos o tres ideas ahí dentro pidiendo su propia oración. El punto es gratis.`,
+    norma: opts.redes ? 'Estilo en redes' : 'Estilo periodístico',
     ejemplo: null,
   };
   const R_ECO = {
@@ -1480,6 +1571,9 @@ function corAnalizarTexto(texto, campo) {
   };
 
   oraciones.forEach(o => {
+    // Un signo suelto («!!!» parte en «!» y «!») no es una oración a la que
+    // le falte nada: sin esta guarda, corregir las seguras dejaba «¡q bn!¡!¡!».
+    if (/^[\s!?¡¿.…]*$/.test(o.txt)) return;
     const abre = o.txt.includes('¿'), cierra = o.txt.includes('?');
     if (cierra && !abre) {
       const off = o.ini + (o.txt.match(/^\s*/)[0] || '').length;
@@ -1492,13 +1586,14 @@ function corAnalizarTexto(texto, campo) {
       hallazgos.push({ campo, ini: off, fin: off, hlFin: o.fin, original: '', sugerencia: '¡', regla: R_ABRIR_EXC });
     }
     const m0 = o.txt.match(/^(\s*)([a-záéíóúñ])/u);
-    if (m0 && o.ini > 0) {
+    const trasSalto = o.ini > 0 && textoOra[o.ini - 1] === '\n';
+    if (m0 && o.ini > 0 && !(opts.mayusTrasSalto === false && trasSalto)) {
       const off = o.ini + m0[1].length;
       hallazgos.push({ campo, ini: off, fin: off + 1, original: m0[2],
         sugerencia: m0[2].toUpperCase(), regla: R_MAYUS });
     }
     const palabras = o.txt.split(/\s+/).filter(Boolean);
-    if (palabras.length > 45) {
+    if (palabras.length > largaMax) {
       // ancho cero + hlIni/hlFin, como las preguntas sin abrir: la zona
       // se subraya entera pero no reclama el tramo, para que los
       // errores DE DENTRO de la oración larga no desaparezcan.
@@ -1578,21 +1673,88 @@ function corAnalizarTexto(texto, campo) {
   return limpios;
 }
 
-/* ── Analizar la nota entera: título, entradilla y cuerpo ── */
+/* ── El sujeto: de dónde lee el corrector y dónde escribe ──────────
+   Un sujeto dice: si hay algo abierto (`listo`), qué campos tiene
+   (`campos`: cada uno con `texto()` o, el que se subraya, con `mapa()`
+   que devuelve el texto plano y los nodos que lo sostienen), cómo se
+   escribe una corrección (`aplicar`), si se puede escribir sola
+   (`aplicable`), cómo se guarda después (`guardar`), qué caja se
+   desplaza para ir al hallazgo (`scroll`) y con qué `opciones` se
+   analiza. El panel, la burbuja, la píldora y la memoria no saben
+   sobre qué están: por eso la pieza para redes entró sin tocarlos.
+
+   El de la nota de la revista es este. El de las redes está en
+   redaccion-redes.js (RRD_SUJETO_CORRECTOR), que es donde vive el
+   <textarea> y su espejo. */
+const COR_SUJETO_NOTA = {
+  id: 'nota',
+  listo: () => typeof redNota === 'function' && !!redNota(),
+  campos: () => [
+    { id: 'titulo',     texto: () => (document.getElementById('red-e-titulo') || {}).value || '' },
+    { id: 'entradilla', texto: () => (document.getElementById('red-e-entradilla') || {}).value || '' },
+    { id: 'cuerpo',     mapa: corMapaCuerpo },
+  ],
+  /* Aplicar una corrección sin romper el HTML, y con cinturón: antes de
+     tocar nada se comprueba que en ese tramo siga estando LO QUE SE VA
+     A CORREGIR. Si el escritor tecleó después del análisis, los índices
+     apuntan a texto viejo, y aplicar a ciegas corrompía la nota en
+     silencio («Sí,educacióncion…»). Si no cuadra, no se toca nada: el
+     re-análisis pondrá el hallazgo donde toca. */
+  aplicar(h, mapa) {
+    if (h.campo === 'titulo' || h.campo === 'entradilla') {
+      const el = document.getElementById(h.campo === 'titulo' ? 'red-e-titulo' : 'red-e-entradilla');
+      if (!el) return false;
+      if (h.original && el.value.slice(h.ini, h.fin) !== h.original) return false;
+      el.value = el.value.slice(0, h.ini) + h.sugerencia + el.value.slice(h.fin);
+      return true;
+    }
+    /* En el cuerpo: localizar el tramo (nodo de texto) que contiene el rango */
+    const tramo = mapa && mapa.tramos.find(t => t.ini <= h.ini && h.fin <= t.fin);
+    if (!tramo) return false;   // partido por formato: se corrige a mano
+    const rel0 = h.ini - tramo.ini, rel1 = h.fin - tramo.ini;
+    const v = tramo.node.nodeValue;
+    if (h.original && v.slice(rel0, rel1) !== h.original) return false;
+    tramo.node.nodeValue = v.slice(0, rel0) + h.sugerencia + v.slice(rel1);
+    return true;
+  },
+  /* ¿Se puede aplicar sola? (no cruza etiquetas) */
+  aplicable(h, mapa) {
+    if (h.campo !== 'cuerpo') return true;
+    return !!(mapa && mapa.tramos.find(t => t.ini <= h.ini && h.fin <= t.fin));
+  },
+  guardar: () => { if (typeof redQueueSave === 'function') redQueueSave(); },
+  scroll: () => document.querySelector('#view-redaccion-editor .view-scroll'),
+  opciones: {},
+};
+
+let _corSujeto = null;
+function corSujeto() { return _corSujeto || COR_SUJETO_NOTA; }
+function corGuardar() { corSujeto().guardar(); }
+
+/* El texto de un campo, tal como se analizó */
+function corTextoDe(campo) {
+  const c = corSujeto().campos().find(x => x.id === campo);
+  if (!c) return '';
+  if (c.mapa) return _corMapa ? _corMapa.texto : '';
+  return c.texto();
+}
+
+/* ── Analizar el sujeto entero, campo por campo ── */
 let _corHallazgos = [];
 let _corMapa = null;
 let _corStatsContadas = false;
 let _corPintado = false;   // ¿hay subrayados puestos sobre el texto?
 
 function corAnalizar() {
-  _corMapa = corMapaCuerpo();
-  const titulo = document.getElementById('red-e-titulo');
-  const entrad = document.getElementById('red-e-entradilla');
-  _corHallazgos = [
-    ...corAnalizarTexto(titulo ? titulo.value : '', 'titulo'),
-    ...corAnalizarTexto(entrad ? entrad.value : '', 'entradilla'),
-    ...corAnalizarTexto(_corMapa.texto, 'cuerpo'),
-  ];
+  const sujeto = corSujeto();
+  _corMapa = null;
+  _corHallazgos = [];
+  sujeto.campos().forEach(c => {
+    let texto;
+    if (c.mapa) { _corMapa = c.mapa(); texto = _corMapa.texto; }
+    else texto = c.texto();
+    _corHallazgos.push(...corAnalizarTexto(texto, c.id, sujeto.opciones));
+  });
   return _corHallazgos;
 }
 
@@ -1696,7 +1858,7 @@ function corIrAlTexto(i) {
   if (!h || !h._rango) return;
   corCerrar();
   const rect = h._rango.getBoundingClientRect();
-  const scroll = document.querySelector('#view-redaccion-editor .view-scroll');
+  const scroll = corSujeto().scroll();
   if (scroll && rect.height) {
     scroll.scrollBy({ top: rect.top - window.innerHeight * 0.35, behavior: 'smooth' });
   }
@@ -1741,6 +1903,49 @@ function corHallazgoEnPunto(x, y) {
     if (tam < mejorTam) { mejor = i; mejorTam = tam; }
   });
   return mejor;
+}
+
+/* Lo mismo, pero por ÍNDICE en el texto: es lo que puede dar un
+   <textarea> (su `selectionStart`), que no tiene nodos donde preguntar
+   por un punto. Las zonas tampoco responden aquí, por lo mismo. */
+function corHallazgoEnIndice(idx) {
+  let mejor = -1, mejorTam = Infinity;
+  _corHallazgos.forEach((h, i) => {
+    if (h.campo !== 'cuerpo' || h.regla.zona || !h._rango) return;
+    if (idx < h.ini || idx > h.fin) return;
+    const tam = h.fin - h.ini;
+    if (tam < mejorTam) { mejor = i; mejorTam = tam; }
+  });
+  return mejor;
+}
+
+/* Un toque sobre el texto de un sujeto sin nodos (la pieza para redes):
+   llega con el índice del cursor y el punto del dedo. */
+function corTocaEnIndice(idx, x, y) {
+  corOcultarBurbuja();
+  if (!_corPintado) return;
+  const i = corHallazgoEnIndice(idx);
+  if (i >= 0) corMostrarBurbuja(i, x, y);
+}
+
+/* Lo que pasa al teclear, en cualquier sujeto. La burbuja se esfuma.
+   Escribir es la mejor señal de que el diccionario hará falta: se pone
+   a cargar desde ya, para que al pulsar «Corregir y aprender» los
+   tecleos salgan a la primera. Y si hay subrayados puestos, teclear
+   los deja RANCIOS (apuntan a índices del texto viejo): se re-analiza
+   con un respiro de medio segundo para que todo vuelva a cuadrar. */
+let _corReanaliza = null;
+function corTextoTecleado() {
+  corOcultarBurbuja();
+  corDiccAsegura();
+  if (!_corPintado) return;
+  clearTimeout(_corReanaliza);
+  _corReanaliza = setTimeout(() => {
+    if (!_corPintado) return;
+    corAnalizar();
+    corPintar();
+    corActualizarPildora();
+  }, 500);
 }
 
 function corAbrirEn(indice) {
@@ -1791,7 +1996,7 @@ function corMostrarBurbuja(indice, x, y) {
     const hh = _corHallazgos[indice];
     corOcultarBurbuja();
     if (hh && corAplicar(hh)) {
-      redQueueSave();
+      corGuardar();
       corAnalizar();
       corPintar();
       if (typeof toast === 'function') toast('✅ Corregido');
@@ -1812,38 +2017,18 @@ function corMostrarBurbuja(indice, x, y) {
   });
 }
 
-/* ── Aplicar una corrección sin romper el HTML ──
-   Con cinturón: antes de tocar nada se comprueba que en ese tramo
-   siga estando LO QUE SE VA A CORREGIR. Si el escritor tecleó después
-   del análisis, los índices apuntan a texto viejo, y aplicar a ciegas
-   corrompía la nota en silencio («Sí,educacióncion…»). Si no cuadra,
-   no se toca nada: el re-análisis pondrá el hallazgo donde toca. */
+/* ── Aplicar una corrección: lo hace el sujeto, que sabe dónde vive
+   el texto (un nodo con formato, un <textarea>…). Aquí solo se mira
+   que haya algo que aplicar. ── */
 function corAplicar(h) {
   if (h.sugerencia === null || h.sugerencia === undefined) return false;
-
-  if (h.campo === 'titulo' || h.campo === 'entradilla') {
-    const el = document.getElementById(h.campo === 'titulo' ? 'red-e-titulo' : 'red-e-entradilla');
-    if (!el) return false;
-    if (h.original && el.value.slice(h.ini, h.fin) !== h.original) return false;
-    el.value = el.value.slice(0, h.ini) + h.sugerencia + el.value.slice(h.fin);
-    return true;
-  }
-
-  /* En el cuerpo: localizar el tramo (nodo de texto) que contiene el rango */
-  const tramo = _corMapa.tramos.find(t => t.ini <= h.ini && h.fin <= t.fin);
-  if (!tramo) return false;   // partido por formato: se corrige a mano
-  const rel0 = h.ini - tramo.ini, rel1 = h.fin - tramo.ini;
-  const v = tramo.node.nodeValue;
-  if (h.original && v.slice(rel0, rel1) !== h.original) return false;
-  tramo.node.nodeValue = v.slice(0, rel0) + h.sugerencia + v.slice(rel1);
-  return true;
+  return corSujeto().aplicar(h, _corMapa);
 }
 
-/* ¿Se puede aplicar sola? (tiene sugerencia y no cruza etiquetas) */
+/* ¿Se puede aplicar sola? (tiene sugerencia y el sujeto puede escribirla) */
 function corEsAplicable(h) {
   if (h.sugerencia === null || h.sugerencia === undefined) return false;
-  if (h.campo !== 'cuerpo') return true;
-  return !!_corMapa.tramos.find(t => t.ini <= h.ini && h.fin <= t.fin);
+  return corSujeto().aplicable(h, _corMapa);
 }
 
 /* ── La vista de resultados ── */
@@ -1856,9 +2041,7 @@ const COR_CATS = {
 const COR_CAMPOS = { titulo: 'Título', entradilla: 'Entradilla', cuerpo: '' };
 
 function corExtracto(h) {
-  let texto;
-  if (h.campo === 'cuerpo') texto = _corMapa.texto;
-  else texto = (document.getElementById(h.campo === 'titulo' ? 'red-e-titulo' : 'red-e-entradilla') || { value: '' }).value;
+  const texto = corTextoDe(h.campo);
   const ini = Math.max(0, h.ini - 28), fin = Math.min(texto.length, h.fin + 28);
   const antes = (ini > 0 ? '…' : '') + texto.slice(ini, h.ini);
   const despues = texto.slice(h.fin, fin) + (fin < texto.length ? '…' : '');
@@ -1900,7 +2083,7 @@ function corRender() {
     .sort((a, b) => b[1].n - a[1].n).slice(0, 3);
   const memoria = document.getElementById('cor-memoria');
   memoria.innerHTML = top.length
-    ? '<div class="cor-memoria-t">📈 Lo que más se te repite (todas tus notas)</div>' +
+    ? '<div class="cor-memoria-t">📈 Lo que más se te repite (todas tus notas y piezas)</div>' +
       top.map(([, v]) => `<div class="cor-memoria-item">${redEsc(v.titulo)} · <b>en ${v.n} revisi${v.n === 1 ? 'ón' : 'ones'}</b></div>`).join('') +
       '<div class="cor-memoria-pie">Cuando una de estas deje de aparecer, ya no será un error tuyo: será historia.</div>'
     : '';
@@ -1941,7 +2124,7 @@ function corRender() {
     btn.addEventListener('click', () => {
       const h = _corHallazgos[Number(btn.dataset.cor)];
       if (h && corAplicar(h)) {
-        redQueueSave();
+        corGuardar();
         corAnalizar();
         corPintar();
         corRender();
@@ -1960,7 +2143,7 @@ function corRender() {
       if (!h || !h.otras || h.otras[j] === undefined) return;
       h.sugerencia = h.otras[j];
       if (corAplicar(h)) {
-        redQueueSave();
+        corGuardar();
         corAnalizar();
         corPintar();
         corRender();
@@ -1985,7 +2168,7 @@ function corRender() {
        los rangos de lo que falta */
     let n = 0;
     [...seguras].sort((a, b) => b.ini - a.ini).forEach(h => { if (corAplicar(h)) n++; });
-    redQueueSave();
+    corGuardar();
     corAnalizar();
     corPintar();
     corRender();
@@ -1993,9 +2176,24 @@ function corRender() {
   });
 }
 
-function corAbrir() {
+/* `sujeto` viene del botón que abre (la nota o la pieza); la píldora y
+   los toques sobre el texto reabren sin decirlo, sobre el que ya estaba.
+   Cambiar de sujeto recoge los subrayados del anterior: apuntaban a
+   nodos de otra pantalla. */
+function corAbrir(sujeto) {
   const overlay = document.getElementById('cor-overlay');
-  if (!overlay || typeof redNota !== 'function' || !redNota()) return;
+  if (!overlay) return;
+  if (sujeto && sujeto !== _corSujeto) {
+    // Al cambiar de sujeto no queda nada del anterior: ni subrayados, ni
+    // burbuja, ni hallazgos. Si quedaran los hallazgos de la pieza y la
+    // nota no estuviera abierta, un toque sobre el texto encontraría un
+    // hallazgo con índices de OTRO texto.
+    corDespintar();
+    corOcultarBurbuja();
+    _corHallazgos = [];
+    _corSujeto = sujeto;
+  }
+  if (!corSujeto().listo()) return;
   corDiccAsegura();
   corAnalizar();
   corStatsContar(_corHallazgos);
@@ -2007,9 +2205,9 @@ function corAbrir() {
 
 /* El botón del editor arranca una sesión nueva (cuenta para la memoria);
    la píldora y los toques sobre el texto reabren SIN volver a contar. */
-function corAbrirNueva() {
+function corAbrirNueva(sujeto) {
   _corStatsContadas = false;
-  corAbrir();
+  corAbrir(sujeto);
 }
 
 function corCerrar() {
@@ -2020,12 +2218,14 @@ function corCerrar() {
 
 /* ── Wiring ── */
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('red-corr-btn')?.addEventListener('click', corAbrirNueva);
+  document.getElementById('red-corr-btn')?.addEventListener('click', () => corAbrirNueva(COR_SUJETO_NOTA));
   document.getElementById('cor-close')?.addEventListener('click', corCerrar);
   document.getElementById('cor-overlay')?.addEventListener('click', e => {
     if (e.target.id === 'cor-overlay') corCerrar();
   });
-  document.getElementById('cor-pildora')?.addEventListener('click', corAbrir);
+  // Sin argumento a propósito: el oyente recibiría el MouseEvent y
+  // corAbrir lo tomaría por un sujeto nuevo.
+  document.getElementById('cor-pildora')?.addEventListener('click', () => corAbrir());
 
   /* Tocar un subrayado enseña su burbuja SIN estorbar la escritura.
      La marca de cita tiene prioridad: su propio modal ya escucha este
@@ -2039,26 +2239,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const i = corHallazgoEnPunto(e.clientX, e.clientY);
     if (i >= 0) corMostrarBurbuja(i, e.clientX, e.clientY);
   });
-  // La burbuja se esfuma al escribir o al desplazar el texto.
-  // Y escribir es la mejor señal de que el diccionario hará falta:
-  // se pone a cargar desde ya, para que al pulsar «Corregir y
-  // aprender» los tecleos salgan a la primera.
-  // Además, si hay subrayados puestos, teclear los deja RANCIOS
-  // (apuntan a índices del texto viejo): se re-analiza con un
-  // respiro de medio segundo para que todo vuelva a cuadrar.
-  let _corReanaliza = null;
-  cuerpoCor?.addEventListener('input', () => {
-    corOcultarBurbuja();
-    corDiccAsegura();
-    if (!_corPintado) return;
-    clearTimeout(_corReanaliza);
-    _corReanaliza = setTimeout(() => {
-      if (!_corPintado) return;
-      corAnalizar();
-      corPintar();
-      corActualizarPildora();
-    }, 500);
-  });
+  // La burbuja se esfuma al escribir o al desplazar el texto (ver
+  // corTextoTecleado, que es lo mismo para la pieza para redes).
+  cuerpoCor?.addEventListener('input', corTextoTecleado);
   document.querySelector('#view-redaccion-editor .view-scroll')
     ?.addEventListener('scroll', corOcultarBurbuja, { passive: true });
 

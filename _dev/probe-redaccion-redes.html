@@ -86,7 +86,11 @@ function termina() {
   d.getElementById('app-container').style.display = '';
   w.eval("switchView('view-redaccion')");
   await esperar(500);
-  w.eval(`
+  // La nota de prueba se siembra con una función porque hay que volver a
+  // sembrarla más abajo: el botón de volver de la pieza pasa por
+  // switchView('view-redaccion'), que vuelve a correr initRedaccion(), y con
+  // la nube de mentira eso deja _redNotas en cero.
+  const sembrarNota = () => w.eval(`
     _redEdiciones = [{ id: 1, numero: 1, titulo: 'Nº 01 · prueba', fecha_cierre: null, archivada: false }];
     _redNotas = [
       { id: 1, edicion_id: 1, autor: 'josue', titulo: 'La bandera entre una batalla cromática',
@@ -98,6 +102,7 @@ function termina() {
     _redPapelera = true; _redLoaded = true; _redEdicion = 1;
     redRender();
   `);
+  sembrarNota();
   await esperar(200);
   const texto = id => (d.getElementById(id) || {}).textContent || '';
   const g = expr => w.eval(expr);   // las variables `let` del módulo no cuelgan de window
@@ -349,6 +354,125 @@ function termina() {
   w.rrdAbrir(pl.id);
   await esperar(150);
   ok(d.getElementById('destello-fab').style.display === 'none', 'el FAB se esconde en el editor de la pieza', 'el FAB sigue puesto');
+
+  log('── 15. 🪶 El corrector que enseña, sobre la pieza ──');
+  /* El mismo corrector de la revista. Lo que puede salir mal, por
+     gravedad: que no abra (el choque de nombres con rodaje-cortes.js lo
+     tuvo roto dos semanas); que corrija en el espejo y no en el texto;
+     que el subrayado caiga en otro sitio del que se ve; que acuse un
+     hashtag o una dirección; y que las reglas de las redes no enseñen. */
+  const frase30 = Array.from({ length: 34 }, (_, i) => 'palabra' + i).join(' ') + '.';
+  const pc = w.rrdNueva('x', 'post', { texto:
+    'Fué un logro para la educacion del pais.  La escuela , dijo el director, dió frutos.\n' +
+    'q bn!!! 😀😀😀😀 mira https://ejemplo.com/educacion y #educacion @educacion_hn\n' +
+    'ESTO ES MUY IMPORTANTE para todos.\n' + frase30 + '\nminúscula al empezar el renglón.' });
+  w.rrdAbrir(pc.id);
+  await esperar(200);
+  ok(!!d.getElementById('rrd-e-corr-btn'), 'el editor de la pieza tiene «Corregir y aprender»', 'no está el botón');
+  d.getElementById('rrd-e-corr-btn').click();
+  await esperar(300);
+  ok(d.getElementById('cor-overlay').style.display === 'flex', 'el botón abre el corrector', 'el corrector no abrió (¿otro archivo pisó corAbrir?)');
+  let hs = g('_corHallazgos');
+  let ids = hs.map(h => h.regla.id);
+  ['monosilabos', 'cion', 'doble-espacio', 'espacio-antes', 'redes-chat', 'redes-signos', 'redes-emoji', 'redes-grito', 'oracion-larga']
+    .forEach(id => ok(ids.includes(id), `caza «${id}»`, `NO cazó «${id}» · encontrados: ${[...new Set(ids)].join(', ')}`));
+  ok(hs.filter(h => h.regla.id === 'cion').length === 1, 'la tilde de «educacion» solo se pide en la palabra, no en la dirección ni en el hashtag',
+     'acusó la dirección o el hashtag: ' + hs.filter(h => h.regla.id === 'cion').map(h => h.ini).join(','));
+  const tx = pc.texto;
+  const enEtiqueta = hs.filter(h => h.ini >= tx.indexOf('#educacion') && h.ini < tx.indexOf('#educacion') + 10 ||
+                                    h.ini >= tx.indexOf('@educacion_hn') && h.ini < tx.indexOf('@educacion_hn') + 13);
+  ok(enEtiqueta.length === 0, 'ni el hashtag ni la mención reciben ningún hallazgo', 'hay hallazgos dentro de la etiqueta: ' + enEtiqueta.map(h => h.regla.id).join(','));
+  ok(!ids.includes('mayuscula'), 'la minúscula al empezar un renglón no se acusa en un post', 'acusó la minúscula tras el salto de línea');
+  const larga = hs.find(h => h.regla.id === 'oracion-larga');
+  ok(larga && /30 palabras/.test(larga.regla.porque), 'en redes una oración es kilométrica desde 30 palabras, y el porqué lo dice', 'el tope no bajó a 30: ' + (larga && larga.regla.porque.slice(0, 40)));
+  ok(hs.filter(h => /^redes-/.test(h.regla.id)).every(h => h.regla.porque.length > 80 && h.regla.norma && h.regla.ejemplo),
+     'cada regla de redes enseña: porqué largo, norma y ejemplo', 'una regla de redes va sin porqué, norma o ejemplo');
+  ok(hs.filter(h => /^redes-/.test(h.regla.id)).every(h => h.regla.nivel === 'revisa'), 'y todas son «revísalo tú»: en una red la intención manda', 'una regla de redes se aplica sola');
+  const chat = hs.find(h => h.regla.id === 'redes-chat');
+  ok(chat && chat.sugerencia === 'que' && chat.original === 'q', '«q» propone «que»', 'la abreviatura no propone: ' + JSON.stringify(chat && chat.sugerencia));
+
+  log('── 15b. Los subrayados están en el ESPEJO, en el sitio exacto ──');
+  const esp = d.getElementById('rrd-e-espejo');   // `ta` viene de la comprobación 11: es el mismo recuadro
+  ok(w.CSS.highlights.has('corr-orto'), 'la ortografía está pintada', 'no hay pintura de ortografía');
+  const mono = hs.findIndex(h => h.regla.id === 'monosilabos');
+  const rango = g(`_corHallazgos[${mono}]._rango`);
+  ok(rango && rango.toString() === 'Fué' && esp.contains(rango.startContainer), 'el subrayado de «Fué» vive en el espejo', 'el rango no está en el espejo: ' + (rango && rango.toString()));
+  ok(esp.textContent === ta.value, 'el espejo lleva exactamente el texto del recuadro', 'el espejo y el recuadro no dicen lo mismo');
+  const cs = w.getComputedStyle(ta), ce = w.getComputedStyle(esp);
+  const iguales = ['fontFamily', 'fontSize', 'lineHeight', 'paddingLeft', 'paddingTop', 'width', 'letterSpacing', 'whiteSpace'].filter(k => cs[k] !== ce[k]);
+  ok(iguales.length === 0, 'recuadro y espejo comparten letra, tamaño, interlineado, relleno y ancho', 'difieren en: ' + iguales.map(k => k + ' ' + cs[k] + '≠' + ce[k]).join(', '));
+  ok(Math.abs(esp.scrollHeight - ta.scrollHeight) <= 2, 'y parten las líneas igual (misma altura de contenido)', `alturas distintas: espejo ${esp.scrollHeight} · recuadro ${ta.scrollHeight}`);
+  const rr = rango.getBoundingClientRect(), rt = ta.getBoundingClientRect();
+  ok(Math.abs(rr.left - (rt.left + parseFloat(cs.paddingLeft))) < 2 && Math.abs(rr.top - (rt.top + parseFloat(cs.paddingTop))) < 3,
+     'el primer subrayado cae donde empieza el texto del recuadro', `el subrayado cae en ${Math.round(rr.left)},${Math.round(rr.top)} y el texto empieza en ${Math.round(rt.left + parseFloat(cs.paddingLeft))},${Math.round(rt.top + parseFloat(cs.paddingTop))}`);
+  ok(w.getComputedStyle(esp).pointerEvents === 'none' && w.getComputedStyle(esp).color === 'rgba(0, 0, 0, 0)', 'el espejo no recibe el dedo y su tinta es transparente', 'el espejo se ve o recibe toques');
+
+  log('── 15c. Corregir escribe en el TEXTO de la pieza, no en el espejo ──');
+  const cion = hs.findIndex(h => h.regla.id === 'cion');
+  const btnCion = d.querySelector(`#cor-lista [data-cor="${cion}"]`);
+  ok(!!btnCion, 'la tarjeta de «educacion» tiene su botón Corregir', 'no hay botón Corregir');
+  btnCion && btnCion.click();
+  await esperar(250);
+  ok(ta.value.includes('educación del pais') && !ta.value.includes('educacion del'), 'el recuadro dice ya «educación»', 'el recuadro no cambió: ' + ta.value.slice(0, 60));
+  ok(w.rrdPieza(pc.id).texto.includes('educación del pais'), 'y la pieza guardada también', 'la pieza no se enteró');
+  ok(esp.textContent === ta.value, 'y el espejo sigue igual al recuadro', 'el espejo se quedó viejo');
+  await esperar(300);
+  ok(texto('rrd-e-salida').includes('educación del pais'), 'y la salida que se copia ya lleva la corrección', 'la salida no se repintó');
+  const todo = d.getElementById('cor-aplicar-todo');
+  ok(!!todo && /Corregir las \d+ seguras/.test(todo.textContent), 'hay «Corregir las N seguras»', 'no hay corrección en masa');
+  todo && todo.click();
+  await esperar(300);
+  ok(/^Fue un logro/.test(ta.value) && ta.value.includes('dio frutos') && !ta.value.includes('  ') && ta.value.includes('La escuela, dijo'),
+     'las seguras corrigen «Fué», «dió», el doble espacio y la coma pegada', 'quedó: ' + ta.value.slice(0, 90));
+  ok(ta.value.includes('q bn!!!'), 'y las de redes («q», «!!!») se quedan para que las decida quien escribe', 'la corrección en masa tocó una regla de redes: ' + ta.value.slice(ta.value.indexOf('bn') - 4, ta.value.indexOf('bn') + 8));
+  ok(!ta.value.includes('!¡'), 'y un «!!!» no se rellena de «¡» por dentro', 'los signos sueltos se tomaron por oraciones: ' + ta.value.slice(ta.value.indexOf('bn'), ta.value.indexOf('bn') + 12));
+  ok(!!JSON.parse(w.localStorage.getItem('faro_corrector_stats_v1') || '{}').monosilabos, 'la memoria del aprendiz cuenta también las piezas', 'la memoria no contó la pieza');
+
+  log('── 15d. Tocar una palabra subrayada abre su burbuja, y 📍 lleva al sitio ──');
+  w.eval('corCerrar()');
+  await esperar(100);
+  hs = g('_corHallazgos');
+  const iChat = hs.findIndex(h => h.regla.id === 'redes-chat');
+  const idxQ = ta.value.indexOf('q bn');
+  ta.setSelectionRange(idxQ, idxQ);
+  const rt2 = ta.getBoundingClientRect();
+  ta.dispatchEvent(new w.MouseEvent('click', { bubbles: true, clientX: rt2.left + 30, clientY: rt2.top + 40 }));
+  await esperar(150);
+  const bur = d.getElementById('cor-burbuja');
+  ok(bur.style.display === 'block' && bur.textContent.includes('Abreviatura de chat'), 'el toque sobre «q» abre la burbuja de la abreviatura', 'la burbuja no salió: ' + bur.style.display + ' · ' + bur.textContent.slice(0, 40));
+  bur.querySelector('[data-bur-fix]')?.click();
+  await esperar(250);
+  ok(ta.value.includes('que bn'), 'y «Corregir» en la burbuja escribe «que» en el recuadro', 'la burbuja no corrigió: ' + ta.value.slice(ta.value.indexOf('bn') - 6, ta.value.indexOf('bn') + 4));
+  ok(iChat >= 0, '(había burbuja que abrir)', 'no había hallazgo de chat');
+  w.eval('corAbrir()');
+  await esperar(150);
+  hs = g('_corHallazgos');
+  const iGrito = hs.findIndex(h => h.regla.id === 'redes-grito');
+  w.eval(`corIrAlTexto(${iGrito})`);
+  await esperar(200);
+  ok(d.getElementById('cor-overlay').style.display === 'none' && w.CSS.highlights.has('corr-activa'), '📍 cierra el panel y deja el hallazgo activo en amarillo sobre el texto', 'Ver en el texto no funcionó');
+  ok(d.getElementById('cor-pildora').style.display !== 'none', 'y la píldora ofrece volver', 'no hay píldora');
+
+  log('── 15e. Al salir, los subrayados se recogen; y el corrector de la nota sigue vivo ──');
+  d.getElementById('rrd-editor-back-btn').click();
+  await esperar(400);
+  ok(!w.CSS.highlights.has('corr-orto') && !w.CSS.highlights.has('corr-activa') && d.getElementById('cor-pildora').style.display === 'none',
+     'volver a la lista recoge subrayados y píldora', 'quedaron subrayados o píldora al salir');
+  // Volver pasó por initRedaccion() con la nube de mentira: la nota hay que
+  // volver a sembrarla para poder abrirla (en la aplicación de verdad la
+  // trae la nube).
+  sembrarNota();
+  w.eval('redRender(); redOpenEditor(1)');
+  await esperar(150);
+  ok(g('!!redNota()'), '(la nota de prueba vuelve a estar abierta)', 'no se pudo abrir la nota: _redNotas=' + g('_redNotas.length'));
+  d.getElementById('red-e-titulo').value = 'La educacion en la bandera';   // una errata en el título de la nota
+  d.getElementById('red-corr-btn').click();
+  await esperar(300);
+  ok(d.getElementById('cor-overlay').style.display === 'flex' && g('_corHallazgos').some(h => h.regla.id === 'cion' && h.campo === 'titulo'),
+     'el corrector de la nota de la revista abre y caza sobre su propio texto',
+     'el corrector de la nota no abre o no caza (¿el choque de nombres con rodaje-cortes.js?): overlay=' + d.getElementById('cor-overlay').style.display + ' sujeto=' + g('corSujeto().id') + ' ids=' + g('_corHallazgos').map(h => h.regla.id + ':' + h.campo).join(','));
+  ok(g('_corHallazgos').every(h => !/^redes-/.test(h.regla.id)), 'y sobre la nota NO corren las reglas de redes', 'las reglas de redes se colaron en la revista');
+  w.eval('corCerrar(); corDespintar()');
 
   termina();
 })().catch(e => { fallos++; log('✘ la sonda reventó: ' + (e && e.stack || e)); termina(); });

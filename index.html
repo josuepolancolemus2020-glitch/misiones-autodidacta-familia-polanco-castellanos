@@ -2025,13 +2025,26 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <button type="button" class="rrd-herr-btn" id="rrd-e-molde-btn" style="display:none;"
           title="Gancho, desarrollo y cierre">📄 Molde</button>
       </div>
-      <textarea id="rrd-e-texto" class="rrd-e-texto" rows="6" spellcheck="true"
-        placeholder="Escribe aquí…"></textarea>
+      <!-- El espejo va DETRÁS del recuadro, con el mismo texto y la tinta
+           transparente: ahí pinta sus subrayados el corrector, que solo
+           sabe pintar sobre nodos de texto (un textarea no tiene). Los dos
+           comparten todas las medidas en css/redaccion-redes.css. -->
+      <div class="rrd-e-caja">
+        <div class="rrd-e-espejo" id="rrd-e-espejo" aria-hidden="true"></div>
+        <textarea id="rrd-e-texto" class="rrd-e-texto" rows="6" spellcheck="true"
+          placeholder="Escribe aquí…"></textarea>
+      </div>
       <div class="rrd-contador" id="rrd-e-contador">0</div>
       <div class="rrd-opciones" id="rrd-e-opciones" style="display:none;"></div>
       <div class="rrd-avisos" id="rrd-e-avisos" style="display:none;"></div>
       <div class="rrd-gancho" id="rrd-e-gancho" style="display:none;"></div>
       <div class="rrd-partes" id="rrd-e-partes" style="display:none;"></div>
+
+      <!-- El mismo corrector que enseña de las notas de la revista, sobre
+           esta pieza (js/tools/corrector.js con el sujeto de redes). -->
+      <button type="button" class="red-corr-btn" id="rrd-e-corr-btn">
+        <i class="fa-solid fa-spell-check"></i> Corregir y aprender
+      </button>
 
       <label class="red-e-label" for="rrd-e-enlace">Enlace que va con la pieza <span class="red-e-label-opcional">(la nota en línea, el video…; en X cuenta 23)</span></label>
       <input type="url" id="rrd-e-enlace" class="rrd-e-enlace" inputmode="url" autocapitalize="off"

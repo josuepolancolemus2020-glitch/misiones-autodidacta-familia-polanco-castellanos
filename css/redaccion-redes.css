@@ -152,13 +152,38 @@
 }
 .rrd-herr-btn:active { transform: scale(.96); }
 
-.rrd-e-texto {
-  width: 100%; min-height: 140px; resize: vertical; box-sizing: border-box;
-  background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r-sm);
-  padding: 12px 14px; font-family: inherit; font-size: 15px; line-height: 1.55;
-  color: var(--text); outline: none;
+/* ── El recuadro y su espejo ──
+   El corrector subraya con la API de resaltado del navegador, que solo
+   pinta sobre nodos de texto; un <textarea> no tiene. Por eso detrás
+   del recuadro hay un espejo con el mismo texto y la tinta
+   transparente. ⚠️ Los dos comparten TODAS las medidas en UNA regla
+   —letra, tamaño, interlineado, relleno, ancho, cómo parte las
+   palabras—: si una cambia en uno y no en el otro, el subrayado sale
+   una palabra más allá sin dar ningún error. Y el recuadro NO se
+   desplaza por dentro (crece con el texto, overflow hidden): un
+   desplazamiento interno movería el texto y no el espejo. */
+.rrd-e-caja {
+  position: relative; background: var(--surface);
+  border: 1.5px solid var(--border); border-radius: var(--r-sm);
 }
-.rrd-e-texto:focus { border-color: #7c3aed; }
+.rrd-e-caja:focus-within { border-color: #7c3aed; }
+.rrd-e-texto, .rrd-e-espejo {
+  display: block; width: 100%; box-sizing: border-box; margin: 0;
+  padding: 12px 14px; border: 0; border-radius: var(--r-sm);
+  font-family: inherit; font-size: 15px; line-height: 1.55; letter-spacing: normal;
+  white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; tab-size: 4;
+}
+.rrd-e-texto {
+  position: relative; z-index: 1; min-height: 140px; resize: vertical;
+  background: transparent; color: var(--text); outline: none; overflow: hidden;
+}
+.rrd-e-espejo {
+  position: absolute; inset: 0; z-index: 0; overflow: hidden;
+  color: transparent; pointer-events: none; user-select: none;
+}
+/* El hallazgo activo (amarillo) pone la tinta oscura en la nota; en el
+   espejo tiene que seguir transparente, o el texto saldría dos veces. */
+.rrd-e-espejo::highlight(corr-activa) { color: transparent; }
 
 .rrd-contador {
   font-size: 12px; font-weight: 700; color: var(--muted); margin: 6px 0 8px;
