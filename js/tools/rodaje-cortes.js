@@ -59,31 +59,44 @@
       toques y la carpeta equivocada dos veces.
 ───────────────────────────────────────────── */
 
-const COR_MARCAS = 'FARO_ROD_CORTES_V1';
+/* ⚠️ EL PREFIJO ES `rcor`, NO `cor`, Y NO ES CAPRICHO. Este archivo nació
+   el 7 de septiembre de 2026 con `corAbrir` y `corRender`, y esos dos
+   nombres ya eran del corrector de Redacción (js/tools/corrector.js,
+   que carga ANTES). Dos funciones globales con el mismo nombre no dan
+   ningún error: la última en cargar pisa a la primera en silencio. O sea
+   que desde ese día «Corregir y aprender» de la revista reventaba con un
+   TypeError al tocarlo, y la sonda del corrector suspendía sin que nadie
+   supiera por qué: se cazó el 21 de septiembre, al enganchar el corrector
+   a las piezas para redes. Lección para toda la casa: un archivo nuevo
+   NO estrena un prefijo que ya use otro; se comprueba juntando los
+   `function` de todos los archivos que carga index.html y pasándolos por
+   `sort | uniq -d`, que tiene que devolver vacío (la orden entera está
+   en CLAUDE.md, «Detalles del repositorio»). */
+const RCOR_MARCAS = 'FARO_ROD_CORTES_V1';
 
 /* Cuánto se permite abrir sin avisar. Decodificar el audio de un archivo
    lo pone ENTERO en memoria como números de coma flotante: catorce
    minutos en estéreo a 48 kHz son unos 320 MB, que en una tableta es
    pedir que se cierre la aplicación. No se prohíbe —el autor sabrá—,
    pero se dice antes de intentarlo. */
-const COR_AVISO_MB = 250;
+const RCOR_AVISO_MB = 250;
 
-let _corArchivo = null;    // el File que se abrió
-let _corMedio   = null;    // el <video> o <audio>, que sobrevive a los pintados
-let _corUrl     = '';      // su dirección de objeto, para soltarla después
-let _corEsVideo = false;
-let _corBuffer  = null;    // el audio ya decodificado, una sola vez
-let _corDecodificando = false;
-let _corMarcas  = {};      // { bid: { ini, fin } }
-let _corPid     = '';
-let _corTrabajando = '';   // qué bloque se está sacando ahora mismo
+let _rcorArchivo = null;    // el File que se abrió
+let _rcorMedio   = null;    // el <video> o <audio>, que sobrevive a los pintados
+let _rcorUrl     = '';      // su dirección de objeto, para soltarla después
+let _rcorEsVideo = false;
+let _rcorBuffer  = null;    // el audio ya decodificado, una sola vez
+let _rcorDecodificando = false;
+let _rcorMarcas  = {};      // { bid: { ini, fin } }
+let _rcorPid     = '';
+let _rcorTrabajando = '';   // qué bloque se está sacando ahora mismo
 
 /* ══════════════ QUÉ PUEDE ESTE NAVEGADOR ══════════════
    Se pregunta y se enseña, en vez de intentarlo y fallar a media faena.
    En el Safari de un iPad no existe `captureStream`, así que el corte de
    video no se puede hacer ahí de ninguna manera — y es mejor saberlo
    antes de marcar cuarenta entradas y salidas. */
-function corPuede() {
+function rcorPuede() {
   const v = document.createElement('video');
   const grab = typeof MediaRecorder !== 'undefined';
   return {
@@ -104,7 +117,7 @@ function corPuede() {
    el resto de la herramienta: un «2:05» pegado en un programa de montaje
    se lee como dos horas y cinco minutos en unos y como dos minutos y
    cinco segundos en otros, y esa ambigüedad se paga cortando mal. */
-function corRelojMs(s) {
+function rcorRelojMs(s) {
   const t = Math.max(0, Number(s) || 0);
   const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60);
   const g = Math.floor(t % 60), ms = Math.round((t - Math.floor(t)) * 1000);
@@ -114,7 +127,7 @@ function corRelojMs(s) {
 
 /* Y el corto, para la pantalla, donde el sitio manda y no hay ambigüedad
    porque al lado está el nombre del bloque. */
-function corReloj(s) {
+function rcorReloj(s) {
   const t = Math.max(0, Number(s) || 0);
   const m = Math.floor(t / 60), g = Math.floor(t % 60);
   const d = Math.round((t - Math.floor(t)) * 10);
@@ -124,7 +137,7 @@ function corReloj(s) {
 /* Un nombre de archivo que aguante en cualquier sistema. Lleva el número
    de orden DELANTE porque así los clips se ordenan solos en la carpeta y
    entran al programa de montaje en la fila del video. */
-function corNombre(b, i, ext) {
+function rcorNombre(b, i, ext) {
   const t = String(b.titulo || 'sin titulo')
     /* Sin tildes y sin nada que no sea letra, número, espacio o guion: el
        nombre acaba en la carpeta de otro aparato, y una comilla o un signo
@@ -142,30 +155,30 @@ function corNombre(b, i, ext) {
    se puede cortar de dos grabaciones distintas (la buena y la repetida),
    y mezclar las marcas de una con la otra saca los trozos equivocados sin
    avisar de nada. */
-function corFirma() {
-  if (!_corArchivo) return '';
-  return _corPid + '|' + _corArchivo.name + '|' + _corArchivo.size;
+function rcorFirma() {
+  if (!_rcorArchivo) return '';
+  return _rcorPid + '|' + _rcorArchivo.name + '|' + _rcorArchivo.size;
 }
-function corCargarMarcas() {
-  _corMarcas = {};
-  const f = corFirma();
+function rcorCargarMarcas() {
+  _rcorMarcas = {};
+  const f = rcorFirma();
   if (!f) return;
   try {
-    const g = JSON.parse(localStorage.getItem(COR_MARCAS) || '{}');
-    if (g && g[f]) _corMarcas = g[f];
+    const g = JSON.parse(localStorage.getItem(RCOR_MARCAS) || '{}');
+    if (g && g[f]) _rcorMarcas = g[f];
   } catch (e) {}
 }
-function corGuardarMarcas() {
-  const f = corFirma();
+function rcorGuardarMarcas() {
+  const f = rcorFirma();
   if (!f) return;
   try {
-    const g = JSON.parse(localStorage.getItem(COR_MARCAS) || '{}');
-    g[f] = _corMarcas;
+    const g = JSON.parse(localStorage.getItem(RCOR_MARCAS) || '{}');
+    g[f] = _rcorMarcas;
     /* Solo las diez grabaciones últimas: esto es una libreta de trabajo,
        no un archivo histórico, y el almacén del navegador es pequeño. */
     const claves = Object.keys(g);
     if (claves.length > 10) claves.slice(0, claves.length - 10).forEach(k => delete g[k]);
-    localStorage.setItem(COR_MARCAS, JSON.stringify(g));
+    localStorage.setItem(RCOR_MARCAS, JSON.stringify(g));
   } catch (e) {}
 }
 
@@ -179,18 +192,18 @@ function corGuardarMarcas() {
    Se decodifica UNA VEZ y se guarda: cuarenta tomas de la misma grabación
    son cuarenta cortes y una sola decodificación. Al revés, cada toma
    volvería a masticar los catorce minutos enteros. */
-async function corDecodificar(alAvisar) {
-  if (_corBuffer) return _corBuffer;
-  if (_corDecodificando) return null;
-  if (!_corArchivo) return null;
-  _corDecodificando = true;
+async function rcorDecodificar(alAvisar) {
+  if (_rcorBuffer) return _rcorBuffer;
+  if (_rcorDecodificando) return null;
+  if (!_rcorArchivo) return null;
+  _rcorDecodificando = true;
   try {
     if (alAvisar) alAvisar('⏳ Leyendo el sonido del archivo…');
-    const datos = await _corArchivo.arrayBuffer();
+    const datos = await _rcorArchivo.arrayBuffer();
     const C = new (window.AudioContext || window.webkitAudioContext)();
-    _corBuffer = await C.decodeAudioData(datos);
+    _rcorBuffer = await C.decodeAudioData(datos);
     try { C.close(); } catch (e) {}
-    return _corBuffer;
+    return _rcorBuffer;
   } catch (e) {
     /* Que un video no suelte su audio es normal y no es un fallo de nadie:
        depende del códec y del navegador. Se dice qué queda, que es lo que
@@ -202,7 +215,7 @@ async function corDecodificar(alAvisar) {
     }
     return null;
   } finally {
-    _corDecodificando = false;
+    _rcorDecodificando = false;
   }
 }
 
@@ -214,7 +227,7 @@ async function corDecodificar(alAvisar) {
    Sale WAV y no algo comprimido a propósito: es lo que entra sin discutir
    en cualquier programa de montaje, y como el archivo va a durar lo que
    dura una toma, el tamaño no es el problema. */
-function corWavDe(buf, ini, fin) {
+function rcorWavDe(buf, ini, fin) {
   const sr = buf.sampleRate;
   const a = Math.max(0, Math.floor(ini * sr));
   const b = Math.min(buf.length, Math.ceil(fin * sr));
@@ -257,13 +270,13 @@ function corWavDe(buf, ini, fin) {
    Por eso la pantalla lo dice antes de empezar y la salida de los tiempos
    sigue estando ahí al lado: para un trozo de cuarenta segundos esto vale
    la pena; para cortar catorce minutos en treinta tomas, no. */
-async function corVideoTrozo(ini, fin, alAvanzar) {
-  const v = _corMedio;
+async function rcorVideoTrozo(ini, fin, alAvanzar) {
+  const v = _rcorMedio;
   if (!v) throw new Error('no hay archivo abierto');
   const hacer = v.captureStream ? 'captureStream' : (v.mozCaptureStream ? 'mozCaptureStream' : '');
   if (!hacer) throw new Error('este navegador no sabe capturar el reproductor');
 
-  const p = corPuede();
+  const p = rcorPuede();
   const flujo = v[hacer]();
   const rec = new MediaRecorder(flujo, p.tipo ? { mimeType: p.tipo } : undefined);
   const trozos = [];
@@ -304,7 +317,7 @@ async function corVideoTrozo(ini, fin, alAvanzar) {
 
 /* ══════════════ BAJAR ══════════════ */
 
-function corBajar(blob, nombre) {
+function rcorBajar(blob, nombre) {
   const u = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.setAttribute('href', u);
@@ -319,9 +332,9 @@ function corBajar(blob, nombre) {
 
 /* ══════════════ LO QUE SALE POR EL CHAT ══════════════ */
 
-function corTiempos(bloques) {
+function rcorTiempos(bloques) {
   const L = [];
-  L.push('CORTES · ' + (_corArchivo ? _corArchivo.name : 'sin archivo'));
+  L.push('CORTES · ' + (_rcorArchivo ? _rcorArchivo.name : 'sin archivo'));
   L.push('');
   L.push('Entrada y salida de cada toma dentro de la grabación, en');
   L.push('horas:minutos:segundos.milésimas — la forma que entienden todos');
@@ -329,11 +342,11 @@ function corTiempos(bloques) {
   L.push('');
   let n = 0;
   bloques.forEach((b, i) => {
-    const m = _corMarcas[b.bid];
+    const m = _rcorMarcas[b.bid];
     if (!m || m.fin <= m.ini) return;
     n++;
-    L.push(corRelojMs(m.ini) + '  →  ' + corRelojMs(m.fin) +
-           '   (' + corReloj(m.fin - m.ini) + ')   ' + corNombre(b, i, '').replace(/\.$/, ''));
+    L.push(rcorRelojMs(m.ini) + '  →  ' + rcorRelojMs(m.fin) +
+           '   (' + rcorReloj(m.fin - m.ini) + ')   ' + rcorNombre(b, i, '').replace(/\.$/, ''));
   });
   if (!n) L.push('(todavía no hay ni una toma marcada)');
   return L.join('\n');
@@ -344,12 +357,12 @@ function corTiempos(bloques) {
    la imagen —instantánea y sin pérdida— pero empieza en el fotograma
    clave más cercano, que puede caer hasta un segundo antes; la segunda
    cae donde se dijo, pero vuelve a codificar. */
-function corFfmpeg(bloques) {
+function rcorFfmpeg(bloques) {
   const L = [];
-  const ent = _corArchivo ? _corArchivo.name : 'grabacion.mp4';
+  const ent = _rcorArchivo ? _rcorArchivo.name : 'grabacion.mp4';
   L.push('# CORTES CON ffmpeg · ' + ent);
   L.push('#');
-  if (_corEsVideo) {
+  if (_rcorEsVideo) {
     /* La advertencia va en UNA línea y no partida en tres: esto se lee en
        un recuadro estrecho de una tableta, y una frase cortada por la
        mitad se salta. Y es la que decide entre dos órdenes distintas. */
@@ -367,17 +380,17 @@ function corFfmpeg(bloques) {
   L.push('');
   let n = 0;
   bloques.forEach((b, i) => {
-    const m = _corMarcas[b.bid];
+    const m = _rcorMarcas[b.bid];
     if (!m || m.fin <= m.ini) return;
     n++;
-    const ext = _corEsVideo ? 'mp4' : 'wav';
-    const sal = corNombre(b, i, ext);
+    const ext = _rcorEsVideo ? 'mp4' : 'wav';
+    const sal = rcorNombre(b, i, ext);
     L.push('# ' + (i + 1) + '. ' + (b.titulo || 'sin título'));
-    L.push('ffmpeg -ss ' + corRelojMs(m.ini) + ' -to ' + corRelojMs(m.fin) +
+    L.push('ffmpeg -ss ' + rcorRelojMs(m.ini) + ' -to ' + rcorRelojMs(m.fin) +
            ' -i "' + ent + '" -c copy "' + sal + '"');
-    if (_corEsVideo) {
+    if (_rcorEsVideo) {
       L.push('# exacta:');
-      L.push('ffmpeg -ss ' + corRelojMs(m.ini) + ' -to ' + corRelojMs(m.fin) +
+      L.push('ffmpeg -ss ' + rcorRelojMs(m.ini) + ' -to ' + rcorRelojMs(m.fin) +
              ' -i "' + ent + '" -c:v libx264 -preset veryfast -crf 18 -c:a aac "' + sal + '"');
     }
     L.push('');
@@ -388,9 +401,9 @@ function corFfmpeg(bloques) {
 
 /* ══════════════ LA PANTALLA ══════════════ */
 
-function corRender(cuerpo, bloques, pid, ayuda) {
-  _corPid = pid || '';
-  const p = corPuede();
+function rcorRender(cuerpo, bloques, pid, ayuda) {
+  _rcorPid = pid || '';
+  const p = rcorPuede();
 
   /* ── Lo primero de todo, y sin que nadie lo pregunte ── */
   const aviso = document.createElement('div');
@@ -437,20 +450,20 @@ function corRender(cuerpo, bloques, pid, ayuda) {
   ent.id = 'rod-cor-archivo';
   ent.setAttribute('accept', 'video/*,audio/*');
   ent.className = 'rod-cor-oculto';
-  const btn = rodBoton(_corArchivo ? '📂 Abrir otra grabación' : '📂 Abrir la grabación',
+  const btn = rodBoton(_rcorArchivo ? '📂 Abrir otra grabación' : '📂 Abrir la grabación',
                        () => ent.click(), 'rod-b-pri');
   ent.addEventListener('change', () => {
-    if (ent.files && ent.files[0]) corAbrir(ent.files[0], ayuda);
+    if (ent.files && ent.files[0]) rcorAbrir(ent.files[0], ayuda);
   });
   barra.appendChild(btn);
   barra.appendChild(ent);
-  if (_corArchivo) {
-    barra.appendChild(rodBoton('📋 Los tiempos', () => rodTextoAbrir('Cortes · los tiempos', corTiempos(bloques))));
-    barra.appendChild(rodBoton('📋 Órdenes de ffmpeg', () => rodTextoAbrir('Cortes · ffmpeg', corFfmpeg(bloques))));
+  if (_rcorArchivo) {
+    barra.appendChild(rodBoton('📋 Los tiempos', () => rodTextoAbrir('Cortes · los tiempos', rcorTiempos(bloques))));
+    barra.appendChild(rodBoton('📋 Órdenes de ffmpeg', () => rodTextoAbrir('Cortes · ffmpeg', rcorFfmpeg(bloques))));
   }
   cuerpo.appendChild(barra);
 
-  if (!_corArchivo) {
+  if (!_rcorArchivo) {
     cuerpo.appendChild(rodVacio('🎞️', 'Ninguna grabación abierta.',
       'Toca «📂 Abrir la grabación» y elige el archivo de tu cámara. Si es largo, la primera vez ' +
       'que cortes audio tardará un poco en leerlo: se lee una sola vez y luego cada toma sale al instante.'));
@@ -461,12 +474,12 @@ function corRender(cuerpo, bloques, pid, ayuda) {
   const ficha = document.createElement('div');
   ficha.className = 'rod-cor-ficha';
   ficha.appendChild(Object.assign(document.createElement('div'),
-    { className: 'rod-tit', textContent: _corArchivo.name }));
-  const mb = _corArchivo.size / 1048576;
+    { className: 'rod-tit', textContent: _rcorArchivo.name }));
+  const mb = _rcorArchivo.size / 1048576;
   ficha.appendChild(Object.assign(document.createElement('div'), {
     className: 'rod-sub',
-    textContent: (_corEsVideo ? '🎬 Video' : '🎵 Audio') + ' · ' + mb.toFixed(1) + ' MB' +
-                 (mb > COR_AVISO_MB ? ' · ⚠️ es grande: leer su sonido puede cerrar la aplicación en una tableta' : ''),
+    textContent: (_rcorEsVideo ? '🎬 Video' : '🎵 Audio') + ' · ' + mb.toFixed(1) + ' MB' +
+                 (mb > RCOR_AVISO_MB ? ' · ⚠️ es grande: leer su sonido puede cerrar la aplicación en una tableta' : ''),
   }));
   cuerpo.appendChild(ficha);
 
@@ -475,14 +488,14 @@ function corRender(cuerpo, bloques, pid, ayuda) {
      volver a buscar el archivo en el aparato. */
   const caja = document.createElement('div');
   caja.className = 'rod-cor-caja';
-  caja.appendChild(_corMedio);
+  caja.appendChild(_rcorMedio);
   cuerpo.appendChild(caja);
 
   /* ── El mando ── */
   const reloj = document.createElement('div');
   reloj.className = 'rod-cor-reloj';
   reloj.id = 'rod-cor-reloj';
-  reloj.textContent = corRelojMs(_corMedio.currentTime);
+  reloj.textContent = rcorRelojMs(_rcorMedio.currentTime);
   cuerpo.appendChild(reloj);
 
   /* Siete botones caben en una tableta, pero en un teléfono estrecho se
@@ -494,15 +507,15 @@ function corRender(cuerpo, bloques, pid, ayuda) {
      sílaba o te deja la respiración de antes. */
   const mando = document.createElement('div');
   mando.className = 'rod-cor-mando';
-  mando.appendChild(rodBoton('⏮', () => corSaltar(-5), 'rod-b-min rod-cor-salto5'));
+  mando.appendChild(rodBoton('⏮', () => rcorSaltar(-5), 'rod-b-min rod-cor-salto5'));
   [['◀◀', -1], ['◀', -0.1]].forEach(([t, d]) =>
-    mando.appendChild(rodBoton(t, () => corSaltar(d), 'rod-b-min')));
+    mando.appendChild(rodBoton(t, () => rcorSaltar(d), 'rod-b-min')));
   mando.appendChild(rodBoton('▶ / ⏸', () => {
-    if (_corMedio.paused) _corMedio.play(); else _corMedio.pause();
+    if (_rcorMedio.paused) _rcorMedio.play(); else _rcorMedio.pause();
   }, 'rod-b-pri'));
   [['▶', 0.1], ['▶▶', 1]].forEach(([t, d]) =>
-    mando.appendChild(rodBoton(t, () => corSaltar(d), 'rod-b-min')));
-  mando.appendChild(rodBoton('⏭', () => corSaltar(5), 'rod-b-min rod-cor-salto5'));
+    mando.appendChild(rodBoton(t, () => rcorSaltar(d), 'rod-b-min')));
+  mando.appendChild(rodBoton('⏭', () => rcorSaltar(5), 'rod-b-min rod-cor-salto5'));
   cuerpo.appendChild(mando);
 
   const nota = document.createElement('p');
@@ -515,23 +528,23 @@ function corRender(cuerpo, bloques, pid, ayuda) {
   /* ── Las tomas ── */
   const lista = document.createElement('div');
   lista.id = 'rod-cor-lista';
-  bloques.forEach((b, i) => lista.appendChild(corFila(b, i, bloques, ayuda)));
+  bloques.forEach((b, i) => lista.appendChild(rcorFila(b, i, bloques, ayuda)));
   cuerpo.appendChild(lista);
 }
 
-function corSaltar(d) {
-  if (!_corMedio) return;
-  const t = Math.max(0, Math.min(_corMedio.duration || 1e9, _corMedio.currentTime + d));
-  _corMedio.currentTime = t;
-  corPintarReloj();
+function rcorSaltar(d) {
+  if (!_rcorMedio) return;
+  const t = Math.max(0, Math.min(_rcorMedio.duration || 1e9, _rcorMedio.currentTime + d));
+  _rcorMedio.currentTime = t;
+  rcorPintarReloj();
 }
-function corPintarReloj() {
+function rcorPintarReloj() {
   const e = document.getElementById('rod-cor-reloj');
-  if (e && _corMedio) e.textContent = corRelojMs(_corMedio.currentTime);
+  if (e && _rcorMedio) e.textContent = rcorRelojMs(_rcorMedio.currentTime);
 }
 
-function corFila(b, i, bloques, ayuda) {
-  const m = _corMarcas[b.bid] || {};
+function rcorFila(b, i, bloques, ayuda) {
+  const m = _rcorMarcas[b.bid] || {};
   const hay = m.fin > m.ini;
   const c = rodClase(b.clase);
 
@@ -553,13 +566,13 @@ function corFila(b, i, bloques, ayuda) {
   marcas.className = 'rod-cor-marcas';
   marcas.appendChild(Object.assign(document.createElement('span'), {
     className: 'rod-cor-m' + (m.ini != null ? ' rod-cor-m-si' : ''),
-    textContent: '⏱ ' + (m.ini != null ? corReloj(m.ini) : '—'),
+    textContent: '⏱ ' + (m.ini != null ? rcorReloj(m.ini) : '—'),
   }));
   marcas.appendChild(Object.assign(document.createElement('span'),
     { className: 'rod-cor-flecha', textContent: '→' }));
   marcas.appendChild(Object.assign(document.createElement('span'), {
     className: 'rod-cor-m' + (m.fin != null ? ' rod-cor-m-si' : ''),
-    textContent: (m.fin != null ? corReloj(m.fin) : '—'),
+    textContent: (m.fin != null ? rcorReloj(m.fin) : '—'),
   }));
   if (hay) {
     /* Lo marcado frente a lo previsto. Es el número que dice si te
@@ -568,7 +581,7 @@ function corFila(b, i, bloques, ayuda) {
     const d = (m.fin - m.ini) - Number(b.dur || 0);
     marcas.appendChild(Object.assign(document.createElement('span'), {
       className: 'rod-cor-dif' + (Math.abs(d) > Math.max(10, b.dur * 0.6) ? ' rod-cor-dif-ojo' : ''),
-      textContent: 'dura ' + corReloj(m.fin - m.ini) +
+      textContent: 'dura ' + rcorReloj(m.fin - m.ini) +
                    (Math.abs(d) > Math.max(10, b.dur * 0.6) ? ' · ¿es esta toma?' : ''),
     }));
   }
@@ -576,47 +589,47 @@ function corFila(b, i, bloques, ayuda) {
 
   const btns = document.createElement('div');
   btns.className = 'rod-btns';
-  btns.appendChild(rodBoton('⏱ Entrada', () => corMarcar(b, 'ini', bloques, ayuda)));
-  btns.appendChild(rodBoton('⏱ Salida', () => corMarcar(b, 'fin', bloques, ayuda)));
+  btns.appendChild(rodBoton('⏱ Entrada', () => rcorMarcar(b, 'ini', bloques, ayuda)));
+  btns.appendChild(rodBoton('⏱ Salida', () => rcorMarcar(b, 'fin', bloques, ayuda)));
   if (hay) {
-    btns.appendChild(rodBoton('▶ Probar', () => corProbar(b)));
-    btns.appendChild(rodBoton('⬇ Audio', () => corBajarAudio(b, i, ayuda)));
-    if (_corEsVideo && corPuede().video) {
-      btns.appendChild(rodBoton('⬇ Video', () => corBajarVideo(b, i, ayuda)));
+    btns.appendChild(rodBoton('▶ Probar', () => rcorProbar(b)));
+    btns.appendChild(rodBoton('⬇ Audio', () => rcorBajarAudio(b, i, ayuda)));
+    if (_rcorEsVideo && rcorPuede().video) {
+      btns.appendChild(rodBoton('⬇ Video', () => rcorBajarVideo(b, i, ayuda)));
     }
     btns.appendChild(rodBoton('✕', () => {
-      delete _corMarcas[b.bid];
-      corGuardarMarcas();
-      corRepintar(bloques, ayuda);
+      delete _rcorMarcas[b.bid];
+      rcorGuardarMarcas();
+      rcorRepintar(bloques, ayuda);
     }, 'rod-b-min'));
   }
   card.appendChild(btns);
   return card;
 }
 
-function corMarcar(b, cual, bloques, ayuda) {
-  if (!_corMedio) return;
-  const m = _corMarcas[b.bid] || (_corMarcas[b.bid] = {});
-  m[cual] = _corMedio.currentTime;
+function rcorMarcar(b, cual, bloques, ayuda) {
+  if (!_rcorMedio) return;
+  const m = _rcorMarcas[b.bid] || (_rcorMarcas[b.bid] = {});
+  m[cual] = _rcorMedio.currentTime;
   /* Si al poner la entrada todavía no hay salida, se propone la duración
      prevista: casi siempre está cerca y se ajusta con dos toques, que es
      mejor que escribirla desde cero. Nunca pisa una salida ya puesta. */
   if (cual === 'ini' && m.fin == null && Number(b.dur) > 0) {
     m.fin = m.ini + Number(b.dur);
   }
-  corGuardarMarcas();
-  corRepintar(bloques, ayuda);
+  rcorGuardarMarcas();
+  rcorRepintar(bloques, ayuda);
 }
 
-function corProbar(b) {
-  const m = _corMarcas[b.bid];
-  if (!m || !_corMedio) return;
-  _corMedio.currentTime = m.ini;
-  _corMedio.play();
+function rcorProbar(b) {
+  const m = _rcorMarcas[b.bid];
+  if (!m || !_rcorMedio) return;
+  _rcorMedio.currentTime = m.ini;
+  _rcorMedio.play();
   const para = () => {
-    if (_corMedio.currentTime >= m.fin || _corMedio.paused) {
-      _corMedio.pause();
-      corPintarReloj();
+    if (_rcorMedio.currentTime >= m.fin || _rcorMedio.paused) {
+      _rcorMedio.pause();
+      rcorPintarReloj();
       return;
     }
     requestAnimationFrame(para);
@@ -624,66 +637,66 @@ function corProbar(b) {
   requestAnimationFrame(para);
 }
 
-async function corBajarAudio(b, i, ayuda) {
-  if (_corTrabajando) return;
-  const m = _corMarcas[b.bid];
+async function rcorBajarAudio(b, i, ayuda) {
+  if (_rcorTrabajando) return;
+  const m = _rcorMarcas[b.bid];
   if (!m || m.fin <= m.ini) return;
-  _corTrabajando = b.bid;
+  _rcorTrabajando = b.bid;
   try {
-    const buf = await corDecodificar(ayuda);
+    const buf = await rcorDecodificar(ayuda);
     if (!buf) return;
     if (ayuda) ayuda('✂️ Cortando el audio de «' + (b.titulo || 'sin título') + '»…');
-    const blob = corWavDe(buf, m.ini, m.fin);
-    corBajar(blob, corNombre(b, i, 'wav'));
-    if (ayuda) ayuda('⬇ ' + corNombre(b, i, 'wav') + ' · ' +
+    const blob = rcorWavDe(buf, m.ini, m.fin);
+    rcorBajar(blob, rcorNombre(b, i, 'wav'));
+    if (ayuda) ayuda('⬇ ' + rcorNombre(b, i, 'wav') + ' · ' +
                      (blob.size / 1048576).toFixed(1) + ' MB');
   } finally {
-    _corTrabajando = '';
+    _rcorTrabajando = '';
   }
 }
 
-async function corBajarVideo(b, i, ayuda) {
-  if (_corTrabajando) return;
-  const m = _corMarcas[b.bid];
+async function rcorBajarVideo(b, i, ayuda) {
+  if (_rcorTrabajando) return;
+  const m = _rcorMarcas[b.bid];
   if (!m || m.fin <= m.ini) return;
   const dur = m.fin - m.ini;
   if (!confirm('Cortar el video reproduce el trozo entero para volver a grabarlo: va a tardar ' +
-               corReloj(dur) + ' y va a sonar. Además vuelve a codificar la imagen.\n\n' +
+               rcorReloj(dur) + ' y va a sonar. Además vuelve a codificar la imagen.\n\n' +
                'Si tienes ffmpeg a mano, «📋 Órdenes de ffmpeg» lo hace al instante y sin pérdida. ' +
                '¿Seguir aquí?')) return;
-  _corTrabajando = b.bid;
+  _rcorTrabajando = b.bid;
   try {
-    const blob = await corVideoTrozo(m.ini, m.fin, pct => {
+    const blob = await rcorVideoTrozo(m.ini, m.fin, pct => {
       if (ayuda) ayuda('🎬 Grabando el trozo… ' + Math.round(pct * 100) + '%');
     });
     const ext = (blob.type || '').indexOf('mp4') >= 0 ? 'mp4' : 'webm';
-    corBajar(blob, corNombre(b, i, ext));
-    if (ayuda) ayuda('⬇ ' + corNombre(b, i, ext) + ' · ' + (blob.size / 1048576).toFixed(1) + ' MB');
+    rcorBajar(blob, rcorNombre(b, i, ext));
+    if (ayuda) ayuda('⬇ ' + rcorNombre(b, i, ext) + ' · ' + (blob.size / 1048576).toFixed(1) + ' MB');
   } catch (e) {
     if (ayuda) ayuda('⚠️ No se pudo cortar el video: ' + (e && e.message) +
                      '. Los tiempos y las órdenes de ffmpeg siguen ahí.');
   } finally {
-    _corTrabajando = '';
+    _rcorTrabajando = '';
   }
 }
 
-function corAbrir(file, ayuda) {
-  if (_corUrl) { try { URL.revokeObjectURL(_corUrl); } catch (e) {} }
-  _corArchivo = file;
-  _corBuffer = null;                     // otro archivo, otro sonido
-  _corEsVideo = /^video\//.test(file.type) || /\.(mp4|mov|webm|mkv|avi|m4v)$/i.test(file.name);
-  _corUrl = URL.createObjectURL(file);
+function rcorAbrir(file, ayuda) {
+  if (_rcorUrl) { try { URL.revokeObjectURL(_rcorUrl); } catch (e) {} }
+  _rcorArchivo = file;
+  _rcorBuffer = null;                     // otro archivo, otro sonido
+  _rcorEsVideo = /^video\//.test(file.type) || /\.(mp4|mov|webm|mkv|avi|m4v)$/i.test(file.name);
+  _rcorUrl = URL.createObjectURL(file);
 
-  _corMedio = document.createElement(_corEsVideo ? 'video' : 'audio');
-  _corMedio.className = 'rod-cor-medio';
-  _corMedio.setAttribute('controls', '');
-  _corMedio.setAttribute('playsinline', '');
-  _corMedio.setAttribute('preload', 'metadata');
-  _corMedio.setAttribute('src', _corUrl);
-  _corMedio.addEventListener('timeupdate', corPintarReloj);
-  _corMedio.addEventListener('seeked', corPintarReloj);
+  _rcorMedio = document.createElement(_rcorEsVideo ? 'video' : 'audio');
+  _rcorMedio.className = 'rod-cor-medio';
+  _rcorMedio.setAttribute('controls', '');
+  _rcorMedio.setAttribute('playsinline', '');
+  _rcorMedio.setAttribute('preload', 'metadata');
+  _rcorMedio.setAttribute('src', _rcorUrl);
+  _rcorMedio.addEventListener('timeupdate', rcorPintarReloj);
+  _rcorMedio.addEventListener('seeked', rcorPintarReloj);
 
-  corCargarMarcas();
+  rcorCargarMarcas();
   if (ayuda) ayuda('📂 ' + file.name + ' · el archivo no sale de este aparato');
   if (window.FaroCortes && window.FaroCortes.alAbrir) window.FaroCortes.alAbrir();
 }
@@ -691,7 +704,7 @@ function corAbrir(file, ayuda) {
 /* Repintar la pestaña sin perder el reproductor: lo saca del documento
    antes de vaciar y lo vuelve a colgar. Es lo mismo que hace el resto de
    la herramienta con los relojes, y por lo mismo. */
-function corRepintar(bloques, ayuda) {
+function rcorRepintar(bloques, ayuda) {
   if (window.FaroCortes && window.FaroCortes.alRepintar) window.FaroCortes.alRepintar();
 }
 
@@ -700,21 +713,21 @@ function corRepintar(bloques, ayuda) {
    que una sonda puede hacer. */
 window.FaroCortes = {
   version: 1,
-  puede: corPuede,
-  relojMs: corRelojMs,
-  reloj: corReloj,
-  nombre: corNombre,
-  wavDe: corWavDe,
-  tiempos: corTiempos,
-  ffmpeg: corFfmpeg,
-  render: corRender,
-  abrir: corAbrir,
+  puede: rcorPuede,
+  relojMs: rcorRelojMs,
+  reloj: rcorReloj,
+  nombre: rcorNombre,
+  wavDe: rcorWavDe,
+  tiempos: rcorTiempos,
+  ffmpeg: rcorFfmpeg,
+  render: rcorRender,
+  abrir: rcorAbrir,
   /* Para que la sonda pueda sembrar marcas sin tocar la pantalla. */
-  _marcas: () => _corMarcas,
-  _ponMarcas: m => { _corMarcas = m; },
+  _marcas: () => _rcorMarcas,
+  _ponMarcas: m => { _rcorMarcas = m; },
   _ponArchivo: (nombre, tam, esVideo) => {
-    _corArchivo = { name: nombre, size: tam };
-    _corEsVideo = !!esVideo;
+    _rcorArchivo = { name: nombre, size: tam };
+    _rcorEsVideo = !!esVideo;
   },
   alAbrir: null,
   alRepintar: null,

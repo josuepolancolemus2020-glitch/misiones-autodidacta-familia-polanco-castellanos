@@ -975,7 +975,7 @@ comentario y perfil. El texto es **texto plano** a propósito: ninguna red
 acepta negritas pegadas, y un HTML aquí sería una promesa que la red no
 cumple.
 
-**Doce reglas, y ninguna es de adorno:**
+**Trece reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA CUENTA DE X ES PONDERADA, NO DE CARACTERES.** X cuenta 280
    «unidades»: un enlace vale **23** pase lo que pase (lo acorta t.co), un
@@ -1083,11 +1083,92 @@ cumple.
     ya está copiado y no hay que volver. Y el botón Compartir se esconde
     donde `navigator.share` no existe, en vez de quedarse muerto.
 
+13. ⚠️ **LA PIEZA SE CORRIGE CON EL CORRECTOR DE LA REVISTA, Y ES EL MISMO
+    APARATO, NO UNA COPIA.** Pedido por el autor el 21 de septiembre de
+    2026, con las piezas recién publicadas: «quisiera tener algunas
+    características respecto a la corrección de ortografía y estilo, tal
+    como la tiene o si es posible mejor, como está en la redacción de la
+    revista». El botón **Corregir y aprender** del editor de la pieza abre
+    el corrector de `js/tools/corrector.js`: el mismo panel, las mismas
+    reglas con su porqué, su norma y su ejemplo, el mismo diccionario y la
+    misma memoria del aprendiz, que ahora cuenta «todas tus notas y
+    piezas». Un corrector copiado para las piezas se arreglaría en la
+    revista y se quedaría roto en las redes: es la regla del taller de la
+    memoria.
+
+    Lo que hizo falta para no copiarlo es un **sujeto intercambiable**. El
+    corrector no sabe de notas ni de piezas: sabe de un objeto que le dice
+    si está listo, qué campos tiene y cómo se lee cada uno (`campos()`),
+    cómo se aplica una sugerencia (`aplicar(h)`), cómo se guarda
+    (`guardar()`) y qué caja se desplaza (`scroll()`). `COR_SUJETO_NOTA`
+    vive en `corrector.js` y `RRD_SUJETO_CORRECTOR` aquí, y `corAbrir`
+    recibe el sujeto. Al cambiar de uno a otro recoge subrayados, burbuja
+    y hallazgos del anterior: si quedaran los de la pieza con la nota
+    cerrada, un toque sobre el texto encontraría un hallazgo con índices
+    de OTRO texto.
+
+    ⚠️ **EL TEXTO DE LA PIEZA ES UN `<textarea>`, Y UN `<textarea>` NO SE
+    PUEDE SUBRAYAR.** Los subrayados del corrector son rangos de la Custom
+    Highlight API sobre nodos de texto, y dentro de un `<textarea>` no hay
+    nodos: hay un solo valor. Cambiarlo por un `contenteditable` sería
+    traer a las redes los problemas de la revista con el HTML pegado, para
+    un texto que es plano a propósito. Así que va un **espejo**
+    (`#rrd-e-espejo`): un `div` DETRÁS del recuadro, con el mismo texto
+    (`textContent`, nunca `innerHTML`), las mismas métricas —letra,
+    tamaño, interlineado, relleno, ancho, `white-space: pre-wrap`,
+    `overflow-wrap`— y la tinta transparente; el recuadro va encima con el
+    fondo transparente, los subrayados se pintan en el espejo y se ven a
+    través. Si una sola métrica difiere, el subrayado cae una palabra más
+    allá **sin dar ningún error**: por eso las métricas van en UNA regla
+    compartida (`.rrd-e-texto, .rrd-e-espejo`) y la sonda compara los
+    estilos CALCULADOS y el alto de contenido de los dos, y mide que el
+    primer subrayado cae donde empieza el texto. El espejo no recibe el
+    dedo (`pointer-events: none`), y **la tinta del hallazgo activo
+    también es transparente**: `::highlight(corr-activa)` pone color de
+    letra en `app.css`, y en el espejo eso pintaría el texto dos veces.
+
+    ⚠️ **Y LA BURBUJA SE ABRE POR EL ÍNDICE DEL CURSOR, no por el nodo
+    tocado.** En un `<textarea>` el toque no cae sobre ningún `<mark>`:
+    `corTocaEnIndice(selectionStart, x, y)` busca el hallazgo más pequeño
+    que contenga esa posición y pone la burbuja en el punto del dedo. El
+    espejo se repinta en cada tecla (`rrdEspejoPintar`, desde
+    `rrdCrecerTexto`) y teclear re-analiza con el respiro de medio segundo
+    del corrector, para que los subrayados no apunten a índices del texto
+    viejo.
+
+    **Y para redes hay reglas propias, y las de la revista se ajustan**
+    (`COR_REGLAS_REDES` y las `opciones` del sujeto):
+
+    - `redes-chat` (q, xq, tb, bn, salu2…), `redes-signos` («!!!»,
+      «¿¿»), `redes-grito` (tres o más palabras seguidas EN MAYÚSCULAS) y
+      `redes-emoji` (cuatro o más emojis seguidos). Todas son **revisa**,
+      no error: un «!!!» en una pieza de Facebook puede ser una decisión,
+      y «Corregir las N seguras» **no las toca**; lo decide quien escribe.
+      `redes-signos` sustituye a `signos-repetidos` de la revista
+      (`COR_REDES_SUSTITUYE`): las dos cazarían lo mismo y una pisaría a
+      la otra.
+    - ⚠️ **Los enlaces, las etiquetas y las menciones se ENMASCARAN antes
+      de mirar nada** (`opciones.mascara`): se cambian por virgulillas del
+      mismo largo, para que los índices no se muevan. Sin eso «#educacion»
+      salía como errata de tilde, «@policastsapien» como palabra rara y la
+      dirección de la nota como frase sin mayúscula: tres avisos falsos en
+      cada pieza, y un corrector que avisa de todo acaba ignorado. La
+      regla del eco y la de la oración larga corren también sobre el texto
+      enmascarado.
+    - **La oración larga avisa a las 30 palabras, no a las 45**
+      (`largaMax`): un post se lee en el teléfono y de pie. Y **la
+      mayúscula tras un salto de línea no se exige** (`mayusTrasSalto`): en
+      un hilo o un guion cada renglón empieza como quiere.
+    - Y un signo suelto («!») no cuenta como oración. Sin esa guarda,
+      «Corregir las seguras» dejaba `¡q bn!¡!¡!`: la regla de abrir la
+      exclamación rellenaba de «¡» cada «!» del «!!!».
+
 **Antes de publicar un cambio de las redes:**
 
 ```
 node _dev/servidor-estatico.js      (en otra terminal)
 _dev/probe-redaccion-redes.html     (en el navegador)
+_dev/probe-redaccion-corrector.html (el corrector de la revista: es el mismo aparato)
 ```
 
 La sonda mide la cuenta ponderada de X con un enlace, un emoji y una
@@ -1099,6 +1180,16 @@ que en Facebook las fuentes van al pie y en LinkedIn al comentario; le
 mete veneno en el texto y en una fuente; y cambia la base de mentira de
 `42P01` a «puesta» para ver que las pendientes suben solas como upsert con
 la pieza dentro. Retira con dos toques y cuenta las llamadas a `confirm()`.
+
+La sección **15** es el corrector sobre la pieza, y mira lo que de verdad
+puede salir mal: que el espejo y el recuadro no midan igual (compara los
+estilos CALCULADOS y el alto de contenido, y que el primer subrayado caiga
+donde empieza el texto), que una etiqueta o un enlace salgan como errata,
+que «Corregir» escriba en el espejo y no en la pieza, que «Corregir las
+seguras» rellene un «!!!» de «¡», que el toque sobre una palabra no abra
+su burbuja, que al salir queden subrayados puestos, y —lo que cazó el
+choque de nombres— que el corrector de la nota de la revista siga
+abriendo y cazando después, sin que se le cuelen las reglas de redes.
 
 Y el SQL, contra un PostgreSQL de verdad, con el servidor de la sesión
 levantado como dice el apartado de La Voz Prestada:
@@ -3814,6 +3905,30 @@ degradado por eso mismo.
 - **Un solo cliente de Supabase en toda la aplicación**, el de `js/auth.js`
   (`window.faroSb`). No se crea otro: la razón, larga y cara, está escrita
   en ese archivo.
+- ⚠️ **NINGÚN ARCHIVO DECLARA UNA FUNCIÓN GLOBAL CON EL NOMBRE DE OTRO.**
+  Los `<script>` de `index.html` son clásicos y comparten un solo ámbito:
+  una `function` declarada en un archivo que carga DESPUÉS pisa a la del
+  mismo nombre de uno que cargó antes, **sin ningún error y sin ningún
+  aviso**. Pasó de verdad: `rodaje-cortes.js` nació el 7 de septiembre de
+  2026 con sus `corAbrir` y `corRender` (COR de «cortes») y carga después
+  de `corrector.js` (COR de «corrector»), así que el botón «Corregir y
+  aprender» de la revista estuvo muerto dos semanas: al tocarlo llamaba al
+  del banco de cortes, que reventaba por dentro con un archivo que no
+  existía, y en la pantalla no pasaba nada. Lo cazó la sonda del corrector
+  al volver a correrla el 21 de septiembre, no nadie mirando; el banco de
+  cortes lleva desde entonces el prefijo `rcor`. Antes de publicar un
+  archivo nuevo se comprueba que no repite ninguno, y tiene que devolver
+  vacío:
+
+  ```
+  for f in $(grep -oE 'src="js/[^"]+"' index.html | sed 's/src="//;s/"$//'); do
+    grep -oE "^(async )?function [A-Za-z_$][A-Za-z0-9_$]*" "$f" | sed -E 's/^(async )?function //' | sort -u | sed "s|$| $f|"
+  done | awk '{n[$1]++; f[$1]=f[$1]" "$2} END {for (k in n) if (n[k]>1) print k":"f[k]}'
+  ```
+
+  Y una sonda que abre `index.html` entero ve lo que una que carga dos
+  archivos sueltos no puede ver: el choque solo existe con todos los
+  archivos cargados en su orden.
 - Para revisar en el navegador: `node _dev/servidor-estatico.js`
   (http://localhost:8124) y abrir las sondas de `_dev/`. Cada una termina
   poniendo **APRUEBA** o **SUSPENDE** en el título de la pestaña.
