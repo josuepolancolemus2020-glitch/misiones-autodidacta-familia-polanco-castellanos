@@ -2020,6 +2020,11 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         placeholder="Rótulo para la lista (opcional; si no, la primera línea)">
 
       <div class="rrd-e-herr">
+        <!-- Negrita Unicode: símbolos que parecen negrita, lo único que
+             admite un post. Lo que se pierde lo dice #rrd-e-negrita-aviso
+             en cuanto hay una (js/tools/redaccion-redes.js). -->
+        <button type="button" class="rrd-herr-btn" id="rrd-e-negrita-btn"
+          title="Negrita Unicode: símbolos que parecen negrita. El buscador y los lectores de pantalla no los entienden; en X cuesta doble.">𝗡 Negrita</button>
         <button type="button" class="rrd-herr-btn" id="rrd-e-partir-btn" style="display:none;"
           title="Reparte el texto en partes de 280 por frases">✂️ Partir en hilo</button>
         <button type="button" class="rrd-herr-btn" id="rrd-e-molde-btn" style="display:none;"
@@ -2035,6 +2040,7 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
           placeholder="Escribe aquí…"></textarea>
       </div>
       <div class="rrd-contador" id="rrd-e-contador">0</div>
+      <div class="rrd-aviso rrd-negrita-aviso" id="rrd-e-negrita-aviso" style="display:none;"></div>
       <div class="rrd-opciones" id="rrd-e-opciones" style="display:none;"></div>
       <div class="rrd-avisos" id="rrd-e-avisos" style="display:none;"></div>
       <div class="rrd-gancho" id="rrd-e-gancho" style="display:none;"></div>

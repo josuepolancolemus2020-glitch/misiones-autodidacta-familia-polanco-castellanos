@@ -1304,7 +1304,7 @@ const R_PROPIO = {
    Solo corren sobre una pieza para redes (opts.redes). Son de ESTILO
    de ese sitio, no de norma: en un post caben cosas que en la revista
    no, y al revés. Cada una con su porqué, como las demás; y las
-   cuatro son «revísalo tú», porque en una red la intención manda —un
+   cinco son «revísalo tú», porque en una red la intención manda —un
    «!!!» puede ser justo lo que se quería decir—. Lo que NO va aquí es
    lo que ya mide la propia pieza (topes, hashtags de más, el enlace
    dentro del post de LinkedIn): eso lo dice rrdAnalisis con el tope de
@@ -1347,6 +1347,19 @@ const COR_REGLAS_REDES = [
     norma: 'Estilo en redes',
     ejemplo: { mal: 'Nueva edición 🎉🎉🎉🎉🎉', bien: 'Nueva edición 🎉' },
   },
+  {
+    /* Las «negritas» de generador (y el botón 𝗡 del editor de la pieza):
+       símbolos matemáticos que parecen letras. Se señalan porque NO son
+       letras y el corrector no puede mirar dentro: para las demás reglas
+       se tapan como una dirección, y esta corre sobre el texto SIN tapar
+       (crudo) para que el hueco no sea callado. */
+    id: 'redes-negrita', cat: 'estilo', nivel: 'revisa', zona: true, crudo: true,
+    re: /(?:[\u{1D400}-\u{1D7FF}][\u0300-\u036F]*)+(?:[ ,.;:]+(?:[\u{1D400}-\u{1D7FF}][\u0300-\u036F]*)+)*/gu,
+    titulo: 'Negrita Unicode (símbolos, no letras)',
+    porque: 'Ninguna red tiene negrita en un post: lo que hacen los generadores —y el botón 𝗡 de aquí— es cambiar cada letra por un símbolo matemático que se le parece (𝗮𝘀í). Funciona a la vista y falla en todo lo demás: el buscador de Facebook o de X no encuentra esas palabras, un lector de pantalla las deletrea o las salta, en algunos teléfonos salen como cuadros, y este corrector no puede mirar dentro (por eso no encuentra erratas ahí). En X cada símbolo cuesta 2 unidades. Para UNA palabra clave puede valer; una frase entera así casi nadie la lee.',
+    norma: 'Accesibilidad · estilo en redes',
+    ejemplo: { mal: '𝗟𝗮 𝗲𝗱𝘂𝗰𝗮𝗰𝗶𝗼\u0301𝗻 𝗲𝘀 𝗹𝗼 𝗽𝗿𝗶𝗺𝗲𝗿𝗼', bien: 'La 𝗲𝗱𝘂𝗰𝗮𝗰𝗶𝗼\u0301𝗻 es lo primero' },
+  },
 ];
 
 /* Las reglas de la revista que en redes se cambian por su versión de
@@ -1359,6 +1372,10 @@ const COR_REDES_SUSTITUYE = new Set(['signos-repetidos']);
    tilde puede ser a propósito —en X, «#educación» y «#educacion» son
    etiquetas distintas— y «@usuario_hn» no está en ningún diccionario. */
 const COR_ETIQUETAS = /(?<![\p{L}\p{N}_])[#@][\p{L}\p{N}_]+/gu;
+/* Y la negrita Unicode (símbolos alfanuméricos matemáticos, con sus
+   marcas sueltas): dentro no hay letras que revisar. El tapado conserva
+   el largo en UTF-16, que es el que usan los índices de los hallazgos. */
+const COR_NEGRITA = /(?:[\u{1D400}-\u{1D7FF}][\u0300-\u036F]*)+/gu;
 
 /* Lo que el diccionario no debe tocar: URLs, correos y dominios */
 const COR_URLS = /(?:https?:\/\/|www\.)[^\s]+|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+|[A-Za-z0-9-]+\.(?:com|org|net|es|hn|edu|gob|info|io|app|dev|me)(?:\/[^\s]*)?(?![A-Za-zÁÉÍÓÚÜÑáéíóúüñ])/g;
@@ -1499,15 +1516,20 @@ function corAnalizarTexto(texto, campo, opts) {
     textoReglas = textoReglas.replace(COR_URLS, u => '~'.repeat(u.length));
     COR_ETIQUETAS.lastIndex = 0;
     textoReglas = textoReglas.replace(COR_ETIQUETAS, e => '~'.repeat(e.length));
+    COR_NEGRITA.lastIndex = 0;
+    textoReglas = textoReglas.replace(COR_NEGRITA, n => '~'.repeat(n.length));
   }
   const reglas = opts.redes
     ? COR_REGLAS.filter(r => !COR_REDES_SUSTITUYE.has(r.id)).concat(COR_REGLAS_REDES)
     : COR_REGLAS;
 
   for (const regla of reglas) {
+    // `crudo`: la regla mira el texto SIN tapar. Es la de la negrita
+    // Unicode, que para las demás se tapa y esta existe para señalarla.
+    const fuente = regla.crudo ? texto : textoReglas;
     regla.re.lastIndex = 0;
     let m;
-    while ((m = regla.re.exec(textoReglas))) {
+    while ((m = regla.re.exec(fuente))) {
       if (regla.id === 'cion' && m[3]) continue;                   // plural: correcto
       if (regla.id === 'duplicada' && COR_DUP_OK.has(m[1].toLowerCase())) continue;
       // «Bora Bora», «Baden Baden»: la reduplicación de nombre propio

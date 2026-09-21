@@ -201,6 +201,9 @@
   padding: 8px 12px; font-size: 12.5px; color: #92400e; line-height: 1.45;
 }
 .rrd-aviso-rojo { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+/* El aviso de la negrita Unicode va aparte de los de la red: sale y se va
+   con el texto (rrdNegritaAviso), y pasa a rojo con una frase entera. */
+.rrd-negrita-aviso { margin-bottom: 10px; }
 
 /* Lo que se ve antes de «Ver más» */
 .rrd-gancho { margin-bottom: 12px; }
