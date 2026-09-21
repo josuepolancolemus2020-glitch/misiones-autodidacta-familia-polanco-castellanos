@@ -566,8 +566,15 @@ async function initRedaccion() {
   }
   if (_redEdicion === 'papelera' && !_redPapelera) _redEdicion = 'banco';
   if (_redEdicion === 'buzon' && !_redHayBuzon) _redEdicion = 'banco';
+  // 📣 Redes vive en js/tools/redaccion-redes.js; si ese archivo no
+  // cargó, se vuelve a algo real en vez de enseñar una lista vacía.
+  if (_redEdicion === 'redes' && typeof rrdRender !== 'function') _redEdicion = 'banco';
 
   redRender();
+
+  // Las piezas para redes: lo del aparato ya está; la nube, cuando
+  // llegue, repinta el chip con su cuenta.
+  if (typeof rrdInit === 'function') rrdInit();
 }
 
 /* ── Vista principal ── */
@@ -607,16 +614,20 @@ function redRender() {
 function redRenderAcciones() {
   const enPapelera = _redEdicion === 'papelera';
   const enBuzon    = _redEdicion === 'buzon';
+  const enRedes    = _redEdicion === 'redes';
   const nueva  = document.getElementById('red-nueva-nota-btn');
   const expo   = document.getElementById('red-exportar-btn');
   const vaciar = document.getElementById('red-vaciar-papelera-btn');
   const qr     = document.getElementById('red-qr-btn');
-  if (nueva)  nueva.style.display  = (enPapelera || enBuzon) ? 'none' : '';
-  if (expo)   expo.style.display   = (enPapelera || enBuzon) ? 'none' : '';
+  const pieza  = document.getElementById('red-rrd-nueva-btn');
+  if (nueva)  nueva.style.display  = (enPapelera || enBuzon || enRedes) ? 'none' : '';
+  if (expo)   expo.style.display   = (enPapelera || enBuzon || enRedes) ? 'none' : '';
   if (vaciar) vaciar.style.display = (enPapelera && redNotasPapelera().length) ? '' : 'none';
   // El QR solo dentro del buzón: es lo que se pega en la revista para
   // que entren envíos, y fuera de ahí no significa nada.
   if (qr) qr.style.display = enBuzon ? '' : 'none';
+  // Y «Nueva pieza» solo dentro de 📣 Redes.
+  if (pieza) pieza.style.display = enRedes ? '' : 'none';
 }
 
 /* Bloque "Titulares de portada" de la edición seleccionada */
@@ -651,6 +662,10 @@ function redRenderCabecera() {
     metaEl.textContent = n
       ? `${n} nota${n === 1 ? '' : 's'} eliminada${n === 1 ? '' : 's'} · se pueden restaurar`
       : 'Vacía. Aquí espera lo que borres, por si fue sin querer.';
+    return;
+  }
+  if (_redEdicion === 'redes' && typeof rrdCabecera === 'function') {
+    rrdCabecera(tituloEl, metaEl);
     return;
   }
   if (_redEdicion === 'buzon') {
@@ -712,7 +727,13 @@ function redRenderChips() {
       📬 Buzón${sinAbrir ? ` · ${sinAbrir}` : ''}
     </button>` : '';
 
-  wrap.innerHTML = buzon + papelera + chips + `
+  // 📣 Redes: detrás del buzón y la papelera y DELANTE de las ediciones,
+  // porque se toca a diario y esta fila se desliza: lo del final se sale
+  // de la pantalla. Lo pinta js/tools/redaccion-redes.js con su cuenta
+  // de lo que toca hoy; si ese archivo no cargó, no hay chip.
+  const redes = (typeof rrdChipHtml === 'function') ? rrdChipHtml(_redEdicion === 'redes') : '';
+
+  wrap.innerHTML = buzon + papelera + redes + chips + `
     <button type="button" class="red-ed-chip ${_redEdicion === 'banco' ? 'red-ed-chip-active' : ''}" data-ed="banco">
       🗃️ Banco
     </button>
@@ -722,7 +743,7 @@ function redRenderChips() {
   wrap.querySelectorAll('.red-ed-chip').forEach(btn => btn.addEventListener('click', () => {
     const val = btn.dataset.ed;
     if (val === 'nueva') { redOpenEdicionModal(); return; }
-    if (val === 'banco' || val === 'papelera' || val === 'buzon') { _redEdicion = val; redRender(); return; }
+    if (val === 'banco' || val === 'papelera' || val === 'buzon' || val === 'redes') { _redEdicion = val; redRender(); return; }
     const id = Number(val);
     // Tocar la edición que ya está abierta la manda a editar: es el atajo
     // para corregir el número o la fecha sin buscar el lápiz.
@@ -745,6 +766,11 @@ function redRenderNotas() {
   if (_redEdicion === 'buzon') {
     if (emptyEl) emptyEl.style.display = 'none';
     redRenderBuzon(list);
+    return;
+  }
+  if (_redEdicion === 'redes' && typeof rrdRender === 'function') {
+    if (emptyEl) emptyEl.style.display = 'none';
+    rrdRender(list);
     return;
   }
 
@@ -2318,7 +2344,7 @@ function redEdicionMd() {
 }
 
 async function redExportar() {
-  if (!_redLoaded || _redEdicion === 'papelera') return;
+  if (!_redLoaded || _redEdicion === 'papelera' || _redEdicion === 'redes' || _redEdicion === 'buzon') return;
   const notas = redNotasDeEdicion();
   if (!notas.length) { if (typeof toast === 'function') toast('No hay notas para exportar'); return; }
 

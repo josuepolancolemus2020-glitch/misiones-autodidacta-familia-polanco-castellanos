@@ -935,7 +935,7 @@ function switchView(id) {
   const desFab = document.getElementById('destello-fab');
   if (desFab) {
     desFab.style.display =
-      (id === 'view-chat' || id === 'view-redaccion-editor') ? 'none' : 'flex';
+      (id === 'view-chat' || id === 'view-redaccion-editor' || id === 'view-redaccion-pieza') ? 'none' : 'flex';
     // En las herramientas que tienen su propio botón "+" (Finanzas,
     // Inventario y la Bóveda) el destello se apila arriba para no tapar al "+".
     const vistasConMasFab = ['view-finanzas', 'view-inventario', 'view-boveda'];

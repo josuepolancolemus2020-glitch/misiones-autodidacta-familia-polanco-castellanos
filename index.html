@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/criba.css">
   <link rel="stylesheet" href="css/rodaje.css">
   <link rel="stylesheet" href="css/voz-prestada.css">
+  <link rel="stylesheet" href="css/redaccion-redes.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="apple-touch-icon" href="img/icon-192.png">
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
@@ -1806,6 +1807,11 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <button type="button" class="red-accion-btn red-accion-buzon" id="red-qr-btn" style="display:none;">
           <i class="fa-solid fa-qrcode"></i> QR para la revista
         </button>
+        <!-- Solo dentro de 📣 Redes: una pieza para Facebook, X, LinkedIn,
+             TikTok o YouTube. La hace js/tools/redaccion-redes.js. -->
+        <button type="button" class="red-accion-btn red-accion-principal" id="red-rrd-nueva-btn" style="display:none;">
+          <i class="fa-solid fa-bullhorn"></i> Nueva pieza
+        </button>
       </div>
 
       <!-- Notas agrupadas por sección -->
@@ -1945,6 +1951,14 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <i class="fa-solid fa-spell-check"></i> Corregir y aprender
       </button>
 
+      <!-- De la nota a las redes: un post, un hilo con la nota entera, un
+           guion… con el título, el texto y las citas ya puestos. Lo pinta
+           js/tools/redaccion-redes.js; si ese archivo no carga, el botón
+           no hace nada y la nota sigue entera. -->
+      <button type="button" class="red-corr-btn rrd-desde-nota-btn" id="red-e-redes-btn">
+        <i class="fa-solid fa-bullhorn"></i> Llevar a redes
+      </button>
+
       <!-- Guía de citas: el estilo que usa esta nota y cómo se escribe -->
       <div class="red-guia">
         <button type="button" class="red-guia-toggle" id="red-guia-toggle">
@@ -1972,6 +1986,89 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
           <i class="fa-solid fa-trash"></i> Eliminar
         </button>
       </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========== REDACCIÓN: 📣 EDITOR DE UNA PIEZA PARA REDES ==========
+       Facebook, X, LinkedIn, TikTok y YouTube. Lo que se escribe aquí sale
+       ya con la forma que cada red exige (tope, corte de «Ver más», hilo
+       en partes, fuentes donde esa red las admite) y acaba en Copiar,
+       Compartir o Abrir en la red: publicar se hace desde cada red; la
+       Antena observa lo publicado. Todo lo que pinta el texto va por
+       textContent (js/tools/redaccion-redes.js). -->
+  <div id="view-redaccion-pieza" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="rrd-editor-back-btn" aria-label="Volver">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h1 class="view-title">Pieza para redes</h1>
+      <span class="red-save-state red-save-ok" id="rrd-e-save-state">Guardado ✓</span>
+    </header>
+    <div class="view-scroll">
+
+      <div class="rrd-e-nota" id="rrd-e-nota" style="display:none;"></div>
+
+      <label class="red-e-label">Red</label>
+      <div class="rrd-chips-fila" id="rrd-e-redes"></div>
+
+      <label class="red-e-label">Qué se escribe</label>
+      <div class="rrd-chips-fila" id="rrd-e-clases"></div>
+
+      <input type="text" id="rrd-e-rotulo" class="red-e-titulo rrd-e-rotulo" maxlength="120"
+        placeholder="Rótulo para la lista (opcional; si no, la primera línea)">
+
+      <div class="rrd-e-herr">
+        <button type="button" class="rrd-herr-btn" id="rrd-e-partir-btn" style="display:none;"
+          title="Reparte el texto en partes de 280 por frases">✂️ Partir en hilo</button>
+        <button type="button" class="rrd-herr-btn" id="rrd-e-molde-btn" style="display:none;"
+          title="Gancho, desarrollo y cierre">📄 Molde</button>
+      </div>
+      <textarea id="rrd-e-texto" class="rrd-e-texto" rows="6" spellcheck="true"
+        placeholder="Escribe aquí…"></textarea>
+      <div class="rrd-contador" id="rrd-e-contador">0</div>
+      <div class="rrd-opciones" id="rrd-e-opciones" style="display:none;"></div>
+      <div class="rrd-avisos" id="rrd-e-avisos" style="display:none;"></div>
+      <div class="rrd-gancho" id="rrd-e-gancho" style="display:none;"></div>
+      <div class="rrd-partes" id="rrd-e-partes" style="display:none;"></div>
+
+      <label class="red-e-label" for="rrd-e-enlace">Enlace que va con la pieza <span class="red-e-label-opcional">(la nota en línea, el video…; en X cuenta 23)</span></label>
+      <input type="url" id="rrd-e-enlace" class="rrd-e-enlace" inputmode="url" autocapitalize="off"
+        placeholder="https://…">
+      <div class="rrd-enlace-nota" id="rrd-e-enlace-nota"></div>
+
+      <label class="red-e-label">Fuentes <span class="red-e-label-opcional">(viajan con la pieza y salen donde la red las admite)</span></label>
+      <div class="rrd-fuentes" id="rrd-e-fuentes"></div>
+
+      <label class="red-e-label">Estado</label>
+      <div class="rrd-chips-fila" id="rrd-e-estados"></div>
+      <label class="red-e-label">Cuándo sale</label>
+      <div class="rrd-chips-fila" id="rrd-e-fechas"></div>
+
+      <div class="rrd-salida" id="rrd-e-salida"></div>
+
+      <div class="rrd-e-acciones">
+        <button type="button" class="red-accion-btn red-accion-principal" id="rrd-e-copiar-btn">
+          <i class="fa-solid fa-copy"></i> Copiar
+        </button>
+        <button type="button" class="red-accion-btn" id="rrd-e-compartir-btn">
+          <i class="fa-solid fa-share-nodes"></i> Compartir
+        </button>
+        <button type="button" class="red-accion-btn" id="rrd-e-abrir-btn">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir la red
+        </button>
+      </div>
+
+      <div class="red-guia">
+        <button type="button" class="red-guia-toggle" id="rrd-e-regla-toggle">
+          <i class="fa-solid fa-ruler"></i> La regla de esta red
+          <i class="fa-solid fa-chevron-down red-guia-chev" id="rrd-e-regla-chev"></i>
+        </button>
+        <div class="red-guia-cuerpo rrd-regla" id="rrd-e-regla" style="display:none;"></div>
+      </div>
+
+      <div class="rrd-e-retirar" id="rrd-e-retirar"></div>
 
     </div>
   </div>
@@ -2935,6 +3032,20 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
     </div>
   </div>
 
+  <!-- Modal: de una nota de la revista a las redes (¿para qué red?) -->
+  <div id="rrd-elegir-overlay" class="fin-modal-overlay" style="display:none;">
+    <div class="fin-modal">
+      <div class="fin-modal-head">
+        <div class="des-modal-title"><i class="fa-solid fa-bullhorn" style="color:#4f46e5;"></i> Llevar la nota a…</div>
+        <button type="button" class="fin-modal-close" id="rrd-elegir-close" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <p class="red-cita-ayuda">Se crea una pieza con el título, el texto y las citas de la nota ya puestos. Después se recorta ahí, no aquí.</p>
+      <div id="rrd-elegir-lista"></div>
+    </div>
+  </div>
+
   <!-- Modal: un envío del buzón del lector, abierto -->
   <div id="red-buzon-overlay" class="fin-modal-overlay" style="display:none;">
     <div class="fin-modal">
@@ -3092,6 +3203,9 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
        usa para el buzón del lector. -->
   <script src="js/qr.js"></script>
   <script src="js/tools/redaccion.js"></script>
+  <!-- Las piezas para redes. Va DETRÁS de redaccion.js, que es quien le
+       presta redPlano y redCitasDe; si no carga, el chip 📣 no aparece. -->
+  <script src="js/tools/redaccion-redes.js"></script>
   <script src="js/tools/diccionario.js"></script>
   <script src="js/tools/corrector.js"></script>
   <script src="js/tools/antena.js"></script>

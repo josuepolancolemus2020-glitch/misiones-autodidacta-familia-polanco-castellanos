@@ -945,6 +945,176 @@ la puerta. Sin esa línea aprobaría por el motivo equivocado —rebotaría por
 falta de permiso de tabla— y no habría probado la seguridad por fila, que es
 lo único que de verdad guarda esto en la base de verdad.
 
+## Normativa: los textos para redes se escriben en Redacción, y salen con sus fuentes
+
+**Pedido por el autor el 21 de septiembre de 2026:** «que le agregues las
+opciones para escribir en Facebook, escribir en Twitter o X, escribir en
+LinkedIn, lo que es TikTok y YouTube… guiones para publicar contenido…
+considera los límites de X y otras consideraciones… igual el manejo de
+fuentes, referencias».
+
+Vive en `js/tools/redaccion-redes.js` y `css/redaccion-redes.css`, con su
+tabla en `supabase/sql/redaccion_redes.sql` y la comprobación aparte en
+`supabase/sql/redaccion_redes_comprueba.sql`. Es el chip **📣 Redes** de la
+fila de ediciones de Redacción, y el botón **📣 Llevar a redes** dentro del
+editor de cada nota.
+
+**NO ES LA ANTENA, aunque las dos hablen de las mismas cinco redes.** La
+Antena OBSERVA lo publicado —métricas, comentarios por responder— y
+publicar se hace desde la aplicación de cada red. Esto es lo de ANTES:
+dónde se ESCRIBE la pieza con la forma que cada red exige, y de dónde sale
+ya lista para pegar. Lo que sale de aquí es lo redactado: por eso todo
+acaba en **📋 Copiar**, **📤 Compartir** y **↗ Abrir la red**, y no en un
+botón de publicar. Una pieza marcada «publicada» dice que lo que pase con
+ella se mira en la Antena.
+
+Una **pieza** es red + clase + texto + enlace + fuentes + estado + día, y
+opcionalmente la nota de la revista de la que salió. Las clases: post,
+hilo (solo X), guion (TikTok y YouTube), título (YouTube), descripción,
+comentario y perfil. El texto es **texto plano** a propósito: ninguna red
+acepta negritas pegadas, y un HTML aquí sería una promesa que la red no
+cumple.
+
+**Doce reglas, y ninguna es de adorno:**
+
+1. ⚠️ **LA CUENTA DE X ES PONDERADA, NO DE CARACTERES.** X cuenta 280
+   «unidades»: un enlace vale **23** pase lo que pase (lo acorta t.co), un
+   emoji vale **2**, y las letras latinas con tilde y eñe valen 1. Es la
+   tabla pública de twitter-text, y `rrdLargoX` la aplica con
+   `Intl.Segmenter` para que un emoji de familia cuente 2 y no 6. Contar
+   a secas aprobaría un post que X rechaza, y ese rechazo no se ve aquí:
+   se ve con el post ya pegado, en el teléfono, con el botón apagado. Las
+   demás redes cuentan puntos de código.
+
+2. ⚠️ **LAS FUENTES VIAJAN CON LA PIEZA Y SALEN DONDE CADA RED LAS
+   ADMITE.** Es lo que el autor pidió con «igual el manejo de fuentes» y
+   es la regla de oro del Estudio Mayor llevada a un post: una idea ajena
+   no pierde su fuente por salir de la revista. `rrdSalida` decide el
+   sitio: al pie del texto en Facebook y en las descripciones; **aparte,
+   para la respuesta**, en un post de X (en 280 no caben); **aparte, para
+   el primer comentario y con el enlace**, en LinkedIn; como **última
+   parte** de un hilo; y como **lista para los rótulos** en un guion. Una
+   fuente PENDIENTE sale delatada («⚠️ PENDIENTE: falta buscar la
+   fuente»), igual que en el export de la revista: mejor un aviso gritón
+   que una atribución muda. Las fuentes de una nota entran solas al
+   crear la pieza desde ella (`redCitasDe`), y desde la pieza se pueden
+   volver a traer.
+
+3. ⚠️ **EN LINKEDIN EL ENLACE NO VA DENTRO DEL POST.** Un enlace en el
+   cuerpo baja el alcance, así que el enlace y las fuentes salen en el
+   bloque «Para el primer comentario», y si alguien escribe una dirección
+   dentro del texto, la pantalla lo dice. Es una consideración de la red,
+   no un capricho, y por eso está escrita en `RRD_REGLAS` y no en el
+   código de la salida.
+
+4. **EL HILO SE PARTE POR FRASES, Y NUNCA SE PIERDE UNA PALABRA.**
+   `rrdPartirHilo` reparte primero por párrafos, luego por frases y solo
+   por palabras cuando una frase sola no cabe, dejando siete unidades de
+   sitio para el « n/N» de la numeración. Las partes se separan con una
+   línea que dice solo `---` (la misma raya de El Rodaje y de La Voz
+   Prestada), se pueden partir a mano, y **la numeración se añade al
+   salir, no al guardar**: corregir una parte no descuadra los números.
+   Un post de X que no cabe lo dice en rojo y propone el hilo; ✂️ lo
+   convierte.
+
+5. **LO QUE SE VE ANTES DE «VER MÁS» SE ENSEÑA.** Facebook pliega a los
+   ≈125 caracteres, LinkedIn a los ≈210, YouTube corta el título a ≈70 en
+   la lista y la descripción a ≈150. El editor pinta ese trozo en oscuro
+   y el resto apagado (`rrd-gancho`), y avisa si el primer párrafo pasa
+   del corte: lo que engancha tiene que estar antes de él, y eso no se ve
+   contando el total.
+
+6. **UN GUION SE MIDE EN SEGUNDOS HABLADOS, NO EN LETRAS.** A 150
+   palabras por minuto, que es el ritmo de El Rodaje (su regla 12). TikTok
+   avisa en ámbar pasado el minuto y en rojo pasados los diez; un Short
+   de YouTube, pasados los tres; un video largo no tiene tope y, si es un
+   video-ensayo con secuencia y citas, ese vive en 🎬 El Rodaje. El 📄
+   Molde pone gancho, desarrollo y cierre, y solo aparece con el guion
+   vacío: un molde encima de un texto escrito lo pisa.
+
+7. ⚠️ **LOS TOPES Y LAS REDES VIVEN EN EL APARATO.** `RRD_REDES` y
+   `RRD_REGLAS` son dos listas en el JavaScript; la base guarda `red`,
+   `clase` y `estado` con un tope de largo y sin lista. Que entre
+   Instagram, o que X suba su tope, tiene que ser una línea en un archivo
+   y no una migración que alguien pega desde una tableta. Es la regla 8
+   de la repisa y la 15 de La Voz Prestada. Los números de `RRD_REGLAS`
+   son los públicos de cada red en septiembre de 2026; si uno cambia,
+   cambia ahí y en ningún otro sitio.
+
+8. ⚠️ **NADA DEL TEXTO NI DE LAS FUENTES LLEGA A UN ATRIBUTO NI A
+   `innerHTML`.** Todo con `createElement` y `textContent`, incluidos la
+   lista, el editor y la salida. Una pieza se pega desde cualquier sitio y
+   la pantalla vive en el mismo dominio que la Bóveda. El enlace se
+   comprueba con `URL()` (no con un grep: `java\tscript:` y
+   `JavaScript:` pasan un grep) y solo `http` y `https`; un
+   «www.algo.com» sin el https **se entiende y se dice cómo se entendió**,
+   que es la regla del monto del Apunte rápido. La base lo repite con su
+   `check` de forma: la base no puede fiarse de la pantalla.
+
+9. **SE GUARDA EN EL APARATO PRIMERO Y SE SUBE DESPUÉS.** Cada tecla va a
+   `localStorage` al instante y a la nube con un respiro; sin la tabla
+   (`42P01`) la herramienta funciona entera y la barra lo dice («📴 Solo en
+   este aparato: falta correr redaccion_redes.sql»). Un corte de red NO es
+   una tabla que falta: `42P01` es «la relación no existe» y lo demás es
+   la señal (El Rodaje, regla 14). Lo que no subió se reintenta de verdad
+   al abrir y al volver la señal (`rrdSubirPendientes`), y la subida es
+   un **upsert por identificador nacido en el aparato**, para que el
+   reintento corrija y no duplique. La fusión entre aparatos gana por el
+   reloj del aparato (`actualizado`), como en la repisa y en La Voz
+   Prestada.
+
+10. **ES DE LA CASA, COMO EL RESTO DE REDACCIÓN.** Los cuatro ven y
+    corrigen cualquier pieza; una política por operación con
+    `es_familia()` y nada más. **Retirar deja lápida** (`eliminada`), con
+    dos toques en el mismo sitio y sin `confirm()` (La Voz Prestada,
+    regla 22); no hay política de delete, y desde la lista se devuelve.
+
+11. **LA LISTA SE AGRUPA POR CUÁNDO SALE, NO POR RED.** 🔴 Atrasadas ·
+    📅 Para hoy · 📆 Próximas · 📝 Sin fecha · ✅ Publicadas, con chips de
+    red que se deslizan encima para filtrar. El trabajo de quien maneja
+    cinco redes no es «ver lo de Facebook»: es saber QUÉ TOCA HOY, y eso
+    es lo que lleva el chip 📣 Redes en su cuenta. El día es un chip (Hoy ·
+    Mañana · 📅 Otro día · Sin fecha), como en el Apunte rápido.
+
+12. ⚠️ **ABRIR LA RED COPIA PRIMERO, SIEMPRE.** X y LinkedIn reciben el
+    texto puesto en la dirección (`intent/post`, `shareActive`); Facebook,
+    TikTok y YouTube no lo admiten y se abre la red con el texto ya en el
+    portapapeles. Se copia antes en los dos casos: si la red no lo recibe,
+    ya está copiado y no hay que volver. Y el botón Compartir se esconde
+    donde `navigator.share` no existe, en vez de quedarse muerto.
+
+**Antes de publicar un cambio de las redes:**
+
+```
+node _dev/servidor-estatico.js      (en otra terminal)
+_dev/probe-redaccion-redes.html     (en el navegador)
+```
+
+La sonda mide la cuenta ponderada de X con un enlace, un emoji y una
+tilde; parte un texto en hilo y exige que ninguna parte corte una frase y
+que no se pierda ni una palabra; crea la pieza **pulsando** «Llevar a
+redes» en una nota con una cita puesta y otra pendiente, y mira que las
+dos viajen y que la pendiente salga delatada en la última parte; comprueba
+que en Facebook las fuentes van al pie y en LinkedIn al comentario; le
+mete veneno en el texto y en una fuente; y cambia la base de mentira de
+`42P01` a «puesta» para ver que las pendientes suben solas como upsert con
+la pieza dentro. Retira con dos toques y cuenta las llamadas a `confirm()`.
+
+Y el SQL, contra un PostgreSQL de verdad, con el servidor de la sesión
+levantado como dice el apartado de La Voz Prestada:
+
+```
+createdb -h /tmp/pg -p 55432 -U postgres redestest
+psql -h /tmp/pg -p 55432 -U postgres -v ON_ERROR_STOP=1 -d redestest -f _dev/prueba-redaccion-redes-sql.sql
+```
+
+Esa prueba mira la puerta dos veces y en este orden: primero que el
+`revoke` le quitó a `anon` el permiso de tabla y que a la casa no se le
+dio `delete`; solo después reparte los permisos como los reparte Supabase
+para probar que la seguridad por fila sigue dejando fuera a `anon` y a un
+usuario con sesión que no es de la casa. Y comprueba que la guardia de
+dependencias para **nombrando el archivo** que falta.
+
 ## Normativa: los textos de encargo se leen en La Voz Prestada
 
 **Pedido por el autor el 10 de septiembre de 2026:** «necesito una nueva
@@ -3574,7 +3744,7 @@ usar un token del otro no da ningún error: se resuelve a nada.
 
 | | La aplicación (`index.html`) | Las misiones |
 |---|---|---|
-| Hojas | `app.css` + `criba.css` + `rodaje.css` + `voz-prestada.css` | la de la misión + `taller-neuro.css` + `recursos-enlaces.css` |
+| Hojas | `app.css` + `criba.css` + `rodaje.css` + `voz-prestada.css` + `redaccion-redes.css` | la de la misión + `taller-neuro.css` + `recursos-enlaces.css` |
 | Tokens | `--brand`, `--surface`, `--bg`, `--border`, `--text`, `--muted`, `--faint`, `--accent` | `--pri`, `--sec`, `--card`, `--dark`, `--gray`… |
 | Tipografía | Outfit | Nunito / Fredoka |
 

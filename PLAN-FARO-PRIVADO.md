@@ -67,6 +67,16 @@ Zone → Make private.
 
 **4. Sueltos que no bloquean nada pero siguen ahí:**
 
+   · ⚠️ **Correr `supabase/sql/redaccion_redes.sql`** en el SQL Editor (21 de
+     septiembre de 2026). Es la tabla de las piezas para redes de Redacción
+     (el chip 📣 Redes): Facebook, X, LinkedIn, TikTok y YouTube. Va entero,
+     de una vez, y no hay que volver a correr nada más; depende de
+     `es_familia()` y de `redaccion_notas`, y si faltara una lo dice en la
+     primera línea. Hasta que se corra, la herramienta funciona entera con
+     la copia del aparato y lo dice a la vista («📴 Solo en este aparato:
+     falta correr redaccion_redes.sql»); al correrlo, lo escrito sube solo.
+     Se comprueba otro día con `supabase/sql/redaccion_redes_comprueba.sql`,
+     que solo mira.
    · ⚠️ **Correr `supabase/sql/redaccion_papelera.sql`** en el SQL Editor. Son
      dos columnas en `redaccion_notas` y nada más: no toca ninguna otra tabla ni
      la seguridad por fila. Hasta que se corran, «Eliminar» una nota en

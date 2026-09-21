@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Redacción: 📣 piezas para redes</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:390px;height:700px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de 📣 Redes (js/tools/redaccion-redes.js), ordenada por gravedad:
+
+     1. que la cuenta de X sea PONDERADA (un enlace 23, un emoji 2, una
+        tilde 1): contar a secas aprobaría un post que X rechaza;
+     2. que un hilo salga en partes de 280 SIN cortar frases y sin perder
+        ni una palabra, con la última parte llevando las fuentes;
+     3. que las fuentes de la nota VIAJEN con la pieza y salgan donde cada
+        red las admite (al pie en Facebook, aparte en LinkedIn y en X), y
+        que una pendiente salga DELATADA;
+     4. que nada del texto ni de las fuentes llegue al HTML: veneno en un
+        texto y en una fuente se tiene que ver como texto;
+     5. que sin la tabla (42P01) la herramienta funcione entera y lo DIGA,
+        y que con la tabla la subida llegue como upsert con la pieza dentro;
+     6. que retirar sea de dos toques en el mismo sitio y sin confirm(),
+        y que se pueda devolver.
+
+   Como las demás de esta familia: ejecuta el index.html de verdad con
+   una base de mentira a nivel de fetch, pulsa los botones de verdad, y
+   de cada prueba mira lo que quedó (en el DOM, en localStorage o en lo
+   que viajó a la base), no lo que la pantalla dice que pasó. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+async function hasta(fn, ms) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < (ms || 4000)) { if (fn()) return true; await esperar(50); }
+  return fn();
+}
+function termina() {
+  const v = fallos ? 'SUSPENDE' : 'APRUEBA';
+  log(`\nRESULTADO: ${v}${fallos ? ` (${fallos} fallo${fallos === 1 ? '' : 's'})` : ''}`);
+  document.title = `${v} · redacción: redes`;
+}
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w = f.contentWindow, d = f.contentWindow.document;
+
+  /* La base de mentira. `modo` decide si la tabla de redes existe. Apunta
+     cada llamada para poder afirmar «este upsert llevó la pieza dentro». */
+  const llamadas = [];
+  let modo = 'sin-tabla';
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url);
+    const metodo = (init && init.method) || 'GET';
+    const cabs = new Headers((init && init.headers) || {});
+    llamadas.push({ ruta: u.pathname + u.search, metodo, cuerpo: (init && init.body) || null, prefer: cabs.get('Prefer') || '' });
+    if (u.pathname.endsWith('/redaccion_redes')) {
+      if (modo === 'sin-tabla') {
+        return new Response(JSON.stringify({ code: '42P01', message: 'relation "public.redaccion_redes" does not exist' }),
+          { status: 404, headers: { 'Content-Type': 'application/json' } });
+      }
+      if (metodo === 'POST') return new Response('[]', { status: 201, headers: { 'Content-Type': 'application/json' } });
+      return new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    const unSolo = (cabs.get('Accept') || '').includes('pgrst.object');
+    return new Response(unSolo ? 'null' : '[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  let confirms = 0;
+  w.confirm = () => { confirms++; return true; };
+  let copiado = '';
+  try { Object.defineProperty(w.navigator, 'clipboard', { value: { writeText: async t => { copiado = t; } }, configurable: true }); } catch (e) {}
+  try { w.localStorage.removeItem('faro_redaccion_redes_v1'); } catch (e) {}
+
+  if (w.eval('typeof initRedaccion') !== 'function' || w.eval('typeof rrdRender') !== 'function') {
+    log('✘ index.html no cargó js/tools/redaccion.js o js/tools/redaccion-redes.js');
+    fallos++; termina(); return;
+  }
+
+  d.getElementById('login-screen').style.display = 'none';
+  d.getElementById('app-container').style.display = '';
+  w.eval("switchView('view-redaccion')");
+  await esperar(500);
+  w.eval(`
+    _redEdiciones = [{ id: 1, numero: 1, titulo: 'Nº 01 · prueba', fecha_cierre: null, archivada: false }];
+    _redNotas = [
+      { id: 1, edicion_id: 1, autor: 'josue', titulo: 'La bandera entre una batalla cromática',
+        seccion: 'ACTUALIDAD', tipo: 'Artículo', estado: 'revision',
+        entradilla: 'Una entradilla corta que presenta el tema.',
+        cuerpo: 'Primer párrafo con una idea ajena<sup class="red-cita" contenteditable="false" data-ref="Bueno, G. (1972). Ensayos materialistas. Taurus.">[1]</sup> y sigue.<br><br>Segundo párrafo con otra idea sin fuente todavía<sup class="red-cita red-cita-pendiente" contenteditable="false">[2?]</sup>. Y una frase más para que haya cuerpo. Y otra frase larga que cuenta algo del acontecer educativo del país con detalle suficiente para pasar de una parte.<br><br>Tercer párrafo. Termina aquí.',
+        en_portada: false, eliminada: false, eliminada_at: null, actualizado_at: '2026-09-05T10:00:00Z' },
+    ];
+    _redPapelera = true; _redLoaded = true; _redEdicion = 1;
+    redRender();
+  `);
+  await esperar(200);
+  const texto = id => (d.getElementById(id) || {}).textContent || '';
+  const g = expr => w.eval(expr);   // las variables `let` del módulo no cuelgan de window
+
+  log('── 1. La cuenta de X es ponderada ──');
+  const lx = s => w.rrdLargoX(s);
+  ok(lx('hola') === 4, '«hola» son 4', '«hola» dio ' + lx('hola'));
+  ok(lx('ñandú á') === 7, 'las tildes y la eñe valen 1 («ñandú á» = 7)', '«ñandú á» dio ' + lx('ñandú á'));
+  ok(lx('https://ejemplo.com/una/ruta/muy/larga/que/sigue/y/sigue/mas') === 23,
+     'un enlace vale 23 pase lo que pase', 'el enlace dio ' + lx('https://ejemplo.com/una/ruta/muy/larga/que/sigue/y/sigue/mas'));
+  ok(lx('😀') === 2, 'un emoji vale 2', '«😀» dio ' + lx('😀'));
+  ok(lx('a 😀 b') === 6, '«a 😀 b» son 6', '«a 😀 b» dio ' + lx('a 😀 b'));
+  ok(lx('mira ejemplo.com/x ya') === 4 + 1 + 23 + 1 + 2, 'un dominio pelado también cobra 23', 'el dominio pelado dio ' + lx('mira ejemplo.com/x ya'));
+
+  log('── 2. Partir en hilo: partes de 280, sin cortar frases ni perder palabras ──');
+  const largo = Array.from({ length: 9 }, (_, i) =>
+    `Esta es la frase número ${i + 1} del texto largo, que cuenta una cosa con bastante detalle para que ocupe sitio de verdad. ` +
+    `Y aquí viene una segunda oración de la frase ${i + 1}, también con su punto final.`).join(' ');
+  const partes = w.rrdPartirHilo(largo, 280, w.rrdLargoX, 7);
+  ok(partes.length >= 4, `sale en ${partes.length} partes`, 'salió en una sola parte');
+  ok(partes.every(p => w.rrdLargoX(p) <= 273), 'todas caben en 280 con sitio para el « n/N»',
+     'alguna parte pasa: ' + partes.map(p => w.rrdLargoX(p)).join(', '));
+  ok(partes.every(p => /[.!?…]["»)]?$/.test(p)), 'ninguna parte corta una frase por la mitad',
+     'hay partes cortadas: ' + partes.filter(p => !/[.!?…]["»)]?$/.test(p)).map(p => p.slice(-30)).join(' | '));
+  const norm = s => s.replace(/\s+/g, ' ').trim();
+  ok(norm(partes.join(' ')) === norm(largo), 'no se pierde ni una palabra', 'el texto repartido no es el original');
+  const num = w.rrdNumerar(['a', 'b', 'c']);
+  ok(num[0] === 'a 1/3' && num[2] === 'c 3/3', 'la numeración va « n/N» al final', 'numeró: ' + JSON.stringify(num));
+
+  log('── 3. Sin la tabla: funciona entera y lo DICE ──');
+  await hasta(() => g('_rrdNube') !== 'mirando', 5000);
+  ok(g('_rrdNube') === 'sin-tabla', 'con 42P01 sabe que falta el SQL', 'el estado de la nube es ' + g('_rrdNube'));
+  const chip = d.querySelector('.red-ed-chip.rrd-chip');
+  ok(!!chip, 'el chip 📣 Redes está en la fila de ediciones', 'no hay chip 📣 Redes');
+  chip && chip.click();
+  await esperar(150);
+  ok(g('_redEdicion') === 'redes', 'tocarlo abre el espacio de redes', 'no abrió: _redEdicion = ' + g('_redEdicion'));
+  ok(/Solo en este aparato.*redaccion_redes\.sql/.test(texto('red-list')),
+     'y la barra dice «Solo en este aparato: falta correr redaccion_redes.sql»', 'la barra no nombra el archivo: ' + texto('red-list').slice(0, 120));
+  ok(d.getElementById('red-rrd-nueva-btn').style.display !== 'none' && d.getElementById('red-nueva-nota-btn').style.display === 'none',
+     'la fila de acciones enseña «Nueva pieza» y esconde «Nueva nota»', 'las acciones no cambiaron');
+  ok(texto('red-ed-titulo').includes('Redes'), 'la cabecera dice 📣 Redes', 'la cabecera dice: ' + texto('red-ed-titulo'));
+
+  log('── 4. De la nota a un hilo en X, con sus citas ──');
+  w.eval('redOpenEditor(1)');
+  await esperar(150);
+  const btnRedes = d.getElementById('red-e-redes-btn');
+  ok(!!btnRedes, 'el editor de la nota tiene «Llevar a redes»', 'no está el botón');
+  btnRedes.click();
+  await esperar(250);
+  const ov = d.getElementById('rrd-elegir-overlay');
+  ok(ov.style.display === 'flex', 'se abre la hoja «¿Para qué red?»', 'la hoja no se abrió');
+  const opciones = [...d.querySelectorAll('#rrd-elegir-lista .rrd-elegir-item')];
+  ok(opciones.length === 7, `trae ${opciones.length} opciones`, 'trae ' + opciones.length + ' opciones');
+  const hiloBtn = opciones.find(b => /hilo en X/i.test(b.textContent));
+  hiloBtn && hiloBtn.click();
+  await esperar(250);
+  ok(d.getElementById('view-redaccion-pieza').classList.contains('active'), 'abre el editor de la pieza', 'no abrió el editor de la pieza');
+  let p = w.rrdPieza(g('_rrdId'));
+  ok(p && p.red === 'x' && p.clase === 'hilo' && p.nota_id === 1, 'la pieza es un hilo de X colgado de la nota 1',
+     'la pieza es: ' + JSON.stringify(p && { red: p.red, clase: p.clase, nota_id: p.nota_id }));
+  ok(p && p.fuentes.length === 2 && p.fuentes[0].ref.includes('Bueno') && !p.fuentes[1].ref,
+     'trae las dos citas de la nota, una con referencia y una pendiente', 'las fuentes son: ' + JSON.stringify(p && p.fuentes));
+  ok(p && p.texto.includes('La bandera') && p.texto.includes('Tercer párrafo'), 'el texto trae título y cuerpo', 'el texto no trae la nota');
+  let salida = w.rrdSalida(p);
+  ok(salida.partes && salida.partes.length >= 3, `el hilo sale en ${salida.partes && salida.partes.length} partes`, 'el hilo no sale en partes');
+  ok(salida.partes.every(x => w.rrdLargoX(x) <= 280), 'todas las partes, numeradas, caben en 280',
+     'pasa alguna: ' + salida.partes.map(x => w.rrdLargoX(x)).join(', '));
+  const ultima = salida.partes[salida.partes.length - 1];
+  ok(/📚 Fuentes/.test(salida.partes.slice(-2).join('\n')), 'las fuentes van en la última parte', 'la última parte es: ' + ultima.slice(0, 80));
+  ok(/PENDIENTE/.test(salida.partes.join('\n')), 'la cita sin referencia sale DELATADA', 'la pendiente no sale delatada');
+  ok(/ 1\/\d+$/.test(salida.partes[0]) && new RegExp(' ' + salida.partes.length + '/' + salida.partes.length + '$').test(ultima),
+     'y llevan su n/N', 'no llevan numeración: ' + salida.partes[0].slice(-10));
+  ok(salida.pendientes === 1 && texto('rrd-e-avisos').includes('sin referencia'), 'el editor avisa de la fuente pendiente', 'no avisa: ' + texto('rrd-e-avisos'));
+  const cajas = d.querySelectorAll('#rrd-e-partes .rrd-parte');
+  ok(cajas.length === salida.partes.length, 'la pantalla pinta una caja por parte, con su cuenta', `pinta ${cajas.length} cajas para ${salida.partes.length} partes`);
+  ok(d.getElementById('rrd-e-nota').textContent.includes('La bandera'), 'y dice de qué nota sale', 'no nombra la nota');
+
+  log('── 5. De la nota a un post de Facebook: las fuentes al pie y el corte de «Ver más» ──');
+  w.eval('redOpenEditor(1)');
+  await esperar(120);
+  d.getElementById('red-e-redes-btn').click();
+  await esperar(200);
+  ok(texto('rrd-elegir-lista').includes('ya tiene 1 pieza'), 'la hoja avisa de la pieza que esta nota ya tiene', 'no avisa de la pieza existente: ' + texto('rrd-elegir-lista').slice(-80));
+  const fbBtn = [...d.querySelectorAll('#rrd-elegir-lista .rrd-elegir-item')].find(b => /Facebook/.test(b.textContent));
+  fbBtn && fbBtn.click();
+  await esperar(250);
+  p = w.rrdPieza(g('_rrdId'));
+  salida = w.rrdSalida(p);
+  ok(p.red === 'facebook' && !salida.partes && /📚 Fuentes\n\[1\] Bueno/.test(salida.principal) && /\[2\] ⚠️ PENDIENTE/.test(salida.principal),
+     'las fuentes salen al pie del post, numeradas, con la pendiente delatada', 'la salida es: ' + salida.principal.slice(-160));
+  ok(salida.aparte === null, 'y nada va aparte', 'hay un bloque aparte que no toca');
+  const visto = d.querySelector('#rrd-e-gancho .rrd-gancho-visto');
+  ok(visto && [...visto.textContent].length === 125, 'se enseñan los 125 caracteres que se ven antes de «Ver más»',
+     'el gancho enseña ' + (visto ? [...visto.textContent].length : 'nada'));
+  ok(/\d+ \/ 63206 caracteres/.test(texto('rrd-e-contador')), 'el contador cuenta contra 63.206', 'el contador dice: ' + texto('rrd-e-contador'));
+  ok(texto('rrd-e-salida').includes('Lo que se pega en Facebook'), 'y la salida se enseña tal como se pega', 'no hay salida');
+
+  log('── 6. LinkedIn: el enlace y las fuentes van al primer comentario; un enlace malo no entra ──');
+  const pl = w.rrdNueva('linkedin', 'post', { texto: 'Un post profesional.', fuentes: [{ ref: 'Forster, E. M. (1927). Aspects of the Novel.' }] });
+  w.rrdAbrir(pl.id);
+  await esperar(150);
+  const enl = d.getElementById('rrd-e-enlace');
+  enl.value = 'www.policastsapien.com/nota';
+  enl.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(300);
+  ok(texto('rrd-e-enlace-nota').includes('Se entiende https://www.policastsapien.com/nota'), 'un dominio sin https se entiende y se dice cómo', 'la nota dice: ' + texto('rrd-e-enlace-nota'));
+  salida = w.rrdSalida(w.rrdPieza(pl.id));
+  ok(salida.aparte && salida.aparte.titulo === 'Para el primer comentario' && salida.aparte.texto.includes('https://www.policastsapien.com/nota') && salida.aparte.texto.includes('Forster'),
+     'el enlace y la fuente salen aparte, para el primer comentario', 'aparte: ' + JSON.stringify(salida.aparte));
+  ok(!salida.principal.includes('policastsapien.com') && !salida.principal.includes('Forster'), 'y NO dentro del post', 'el post lleva el enlace o la fuente dentro');
+  ok(texto('rrd-e-salida').includes('primer comentario') && texto('rrd-e-salida').includes('baja el alcance'), 'la pantalla explica por qué', 'la pantalla no lo explica');
+  enl.value = 'javascript:alert(1)';
+  enl.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(300);
+  ok(w.rrdPieza(pl.id).enlace === '' && texto('rrd-e-enlace-nota').includes('No parece una dirección'),
+     'un javascript: no se guarda y la pantalla dice qué poner', 'guardó: ' + JSON.stringify(w.rrdPieza(pl.id).enlace));
+  ok(w.rrdEnlace('java\tscript:alert(1)') === '' && w.rrdEnlace('JavaScript:alert(1)') === '' && w.rrdEnlace('https://a.com/"x') === '',
+     'ni con tabulador ni en mayúsculas ni con comillas', 'un enlace envenenado pasó el cedazo');
+
+  log('── 7. Un post de X que no cabe: rojo, propone el hilo, y ✂️ lo parte ──');
+  const px = w.rrdNueva('x', 'post', { texto: largo });
+  w.rrdAbrir(px.id);
+  await esperar(200);
+  ok(d.getElementById('rrd-e-contador').className.includes('rrd-cont-rojo'), 'el contador va en rojo', 'el contador no está en rojo: ' + d.getElementById('rrd-e-contador').className);
+  ok(/Sobran \d+ \(tope 280\)/.test(texto('rrd-e-avisos')) && /Hilo/.test(texto('rrd-e-avisos')), 'dice cuánto sobra y propone el hilo', 'el aviso dice: ' + texto('rrd-e-avisos'));
+  const partir = d.getElementById('rrd-e-partir-btn');
+  ok(partir.style.display !== 'none', 'aparece ✂️ Partir en hilo', 'no aparece el botón de partir');
+  partir.click();
+  await esperar(300);
+  const pxx = w.rrdPieza(px.id);
+  ok(pxx.clase === 'hilo', 'al partir pasa a 🧵 Hilo', 'la clase sigue siendo ' + pxx.clase);
+  ok(pxx.texto.includes('\n\n---\n\n'), 'y las partes van separadas por ---', 'no hay separadores');
+  salida = w.rrdSalida(pxx);
+  ok(salida.partes.every(x => w.rrdLargoX(x) <= 280), 'todas caben en 280', 'pasa alguna: ' + salida.partes.map(x => w.rrdLargoX(x)).join(', '));
+
+  log('── 8. Un guion se mide en segundos hablados ──');
+  const guion400 = Array.from({ length: 400 }, (_, i) => 'palabra' + i).join(' ');
+  const pg = w.rrdNueva('tiktok', 'guion', { texto: guion400 });
+  let an = w.rrdAnalisis(pg);
+  ok(an.segundos === 160 && an.estado === 'amarillo', '400 palabras son ≈2:40 y en TikTok avisa en ámbar (pasa del minuto)', `dio ${an.segundos} s y estado ${an.estado}`);
+  pg.texto = Array.from({ length: 1600 }, (_, i) => 'p' + i).join(' ');
+  an = w.rrdAnalisis(pg);
+  ok(an.estado === 'rojo' && /tope de 10:00/.test(an.avisos.join(' ')), '1.600 palabras pasan del tope de 10:00 y va en rojo', 'dio ' + an.estado + ' · ' + an.avisos.join(' | '));
+  const py = w.rrdNueva('youtube', 'guion', { texto: guion400 });
+  an = w.rrdAnalisis(py);
+  ok(an.estado === 'ok', 'en YouTube (largo) no hay tope', 'en YouTube dio ' + an.estado);
+  py.opciones = { shorts: true };
+  an = w.rrdAnalisis(py);
+  ok(an.estado === 'ok' && w.rrdAnalisis(Object.assign({}, py, { texto: Array.from({ length: 500 }, () => 'x').join(' ') })).estado === 'rojo',
+     'como Short, 2:40 cabe y 3:20 no', 'el tope del Short no muerde');
+  ok(w.rrdSalida(pg).aparte === null, 'un guion sin fuentes no saca nada aparte', 'sacó algo aparte sin fuentes');
+  pg.fuentes = [{ ref: 'Una fuente' }];
+  ok(/rótulos/.test((w.rrdSalida(pg).aparte || {}).titulo || ''), 'con fuentes, salen aparte para los rótulos', 'no salen para los rótulos');
+
+  log('── 9. Veneno en el texto y en una fuente: se ve como texto ──');
+  // El cierre de script va partido: escrito entero cerraría ESTE script.
+  const veneno = '<img src=x onerror="window.top.__x=1"> "><scr' + 'ipt>window.top.__y=1</scr' + 'ipt>';
+  const pv = w.rrdNueva('facebook', 'post', { texto: 'Hola ' + veneno, titulo: 'T ' + veneno, fuentes: [{ ref: 'F ' + veneno }] });
+  w.rrdAbrir(pv.id);
+  await esperar(200);
+  ok(!d.querySelector('#view-redaccion-pieza img') && !d.querySelector('#view-redaccion-pieza script'),
+     'el editor no fabricó ni un <img> ni un <script>', 'el veneno entró como HTML en el editor');
+  ok(d.querySelector('#rrd-e-salida .rrd-salida-texto').textContent.includes('<img src=x'), 'la salida lo enseña como texto', 'la salida no enseña el veneno como texto');
+  w.eval("_redEdicion = 'redes'; switchView('view-redaccion'); redRender();");
+  await esperar(200);
+  ok(!d.querySelector('#red-list img') && !d.querySelector('#red-list script'), 'la lista tampoco', 'el veneno entró como HTML en la lista');
+  ok([...d.querySelectorAll('#red-list .red-nota-titulo')].some(e => e.textContent.includes('<img src=x')), 'y el rótulo envenenado se lee tal cual', 'el rótulo no se ve');
+  ok(!window.__x && !window.__y, 'nada corrió', 'ALGO CORRIÓ');
+
+  log('── 10. Lo guardado vive en el aparato ──');
+  let local = {};
+  try { local = JSON.parse(w.localStorage.getItem('faro_redaccion_redes_v1')) || {}; } catch (e) {}
+  ok(Array.isArray(local.piezas) && local.piezas.length >= 6, `localStorage guarda las ${local.piezas && local.piezas.length} piezas`, 'no hay piezas en localStorage');
+  ok(local.piezas.some(x => x.nota_id === 1 && x.clase === 'hilo'), 'con el hilo de la nota dentro', 'el hilo no está en el aparato');
+  ok(llamadas.filter(c => c.ruta.includes('redaccion_redes') && c.metodo === 'POST').length === 0,
+     'y sin la tabla no se intentó ni una subida', 'se intentó subir sin tabla');
+
+  log('── 11. Con la tabla: la subida llega como upsert con la pieza dentro ──');
+  modo = 'puesta';
+  await w.rrdInit();
+  await esperar(200);
+  ok(g('_rrdNube') === 'puesta', 'la nube pasa a «puesta»', 'la nube es ' + g('_rrdNube'));
+  const subidas = llamadas.filter(c => c.ruta.includes('redaccion_redes') && c.metodo === 'POST');
+  ok(subidas.length >= 6, `al volver la tabla suben las ${subidas.length} pendientes solas`, 'no subieron las pendientes: ' + subidas.length);
+  ok(subidas.every(c => /merge-duplicates/.test(c.prefer)), 'como upsert (merge-duplicates), para que el reintento corrija y no duplique', 'no van como upsert: ' + (subidas[0] && subidas[0].prefer));
+  const laDelHilo = subidas.map(c => { try { return JSON.parse(c.cuerpo); } catch (e) { return null; } }).find(b => b && b.nota_id === 1 && b.clase === 'hilo');
+  ok(!!laDelHilo, 'el hilo de la nota viajó', 'el hilo no viajó');
+  ok(laDelHilo && laDelHilo.red === 'x' && Array.isArray(laDelHilo.fuentes) && laDelHilo.fuentes.length === 2 && typeof laDelHilo.actualizado === 'number' && laDelHilo.autor,
+     'con su red, sus dos fuentes, su reloj y su autor', 'la fila que viajó: ' + JSON.stringify(laDelHilo).slice(0, 200));
+  ok(laDelHilo && !('subida' in laDelHilo), 'y sin la marca «subida», que es del aparato', 'viajó la marca del aparato');
+  ok(/viajan a todos los aparatos/.test(texto('red-list')), 'la barra ahora dice que viajan', 'la barra dice: ' + texto('red-list').slice(0, 80));
+  // Y al escribir, sube sola tras el debounce
+  w.rrdAbrir(pl.id);
+  await esperar(150);
+  const antes = llamadas.length;
+  const ta = d.getElementById('rrd-e-texto');
+  ta.value = 'Un post profesional, corregido.';
+  ta.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await hasta(() => llamadas.slice(antes).some(c => c.metodo === 'POST' && (c.cuerpo || '').includes('corregido')), 3000);
+  ok(llamadas.slice(antes).some(c => c.metodo === 'POST' && (c.cuerpo || '').includes('corregido')), 'escribir sube la pieza sola al rato', 'lo escrito no subió');
+  ok(texto('rrd-e-save-state').includes('Guardado'), 'y la cabecera dice «Guardado ✓»', 'la cabecera dice: ' + texto('rrd-e-save-state'));
+
+  log('── 12. Copiar copia la salida entera; el estado y el día se tocan de un toque ──');
+  copiado = '';
+  d.getElementById('rrd-e-copiar-btn').click();
+  await esperar(300);
+  ok(copiado.includes('Un post profesional, corregido.') && !copiado.includes('Forster'), 'Copiar lleva el post sin las fuentes (que van al comentario)', 'copió: ' + copiado.slice(0, 100));
+  const hoyChip = [...d.querySelectorAll('#rrd-e-fechas .rrd-fecha-chip')].find(b => b.textContent.trim() === 'Hoy');
+  hoyChip.click();
+  await esperar(150);
+  ok(w.rrdPieza(pl.id).fecha === w.rrdHoy(), 'el chip «Hoy» pone la fecha de hoy', 'la fecha es ' + w.rrdPieza(pl.id).fecha);
+  const listaChip = [...d.querySelectorAll('#rrd-e-estados .rrd-est-chip')].find(b => /Lista/.test(b.textContent));
+  listaChip.click();
+  await esperar(150);
+  ok(w.rrdPieza(pl.id).estado === 'lista', 'y «Lista para salir» cambia el estado', 'el estado es ' + w.rrdPieza(pl.id).estado);
+  d.getElementById('rrd-editor-back-btn').click();
+  await esperar(400);
+  ok(d.getElementById('view-redaccion').classList.contains('active') && g('_redEdicion') === 'redes', 'volver deja el espacio de redes abierto', 'volver fue a otro sitio');
+  ok(/Redes · \d+/.test(d.querySelector('.rrd-chip').textContent), 'el chip 📣 Redes lleva la cuenta de lo que toca hoy', 'el chip dice: ' + d.querySelector('.rrd-chip').textContent);
+  ok(texto('red-list').includes('Para hoy'), 'y la lista la agrupa en «Para hoy»', 'no hay grupo de hoy');
+  const fila = d.querySelector('#red-list .rrd-fila');
+  ok(fila && fila.getBoundingClientRect().height >= 44, 'una fila mide al menos 44 px', 'la fila mide ' + (fila && fila.getBoundingClientRect().height));
+
+  log('── 13. Retirar: dos toques en el mismo sitio, sin confirm(), y se devuelve ──');
+  w.rrdAbrir(pv.id);
+  await esperar(150);
+  confirms = 0;
+  const ret1 = d.querySelector('#rrd-e-retirar button');
+  ok(ret1 && /Retirar/.test(ret1.textContent), 'hay un botón Retirar', 'no hay botón Retirar');
+  ret1.click();
+  await esperar(100);
+  ok(!w.rrdPieza(pv.id).eliminada, 'un toque NO retira', 'un solo toque retiró');
+  const si = [...d.querySelectorAll('#rrd-e-retirar button')].find(b => /Sí, retirar/.test(b.textContent));
+  ok(!!si, 'aparece «Sí, retirar · No» al lado', 'no apareció la confirmación en el sitio');
+  si.click();
+  await esperar(300);
+  ok(w.rrdPieza(pv.id).eliminada === true && confirms === 0, 'el segundo toque retira con lápida y sin confirm()', `eliminada=${w.rrdPieza(pv.id).eliminada}, confirms=${confirms}`);
+  ok(d.getElementById('view-redaccion').classList.contains('active'), 'y vuelve a la lista', 'no volvió');
+  const lapida = llamadas.filter(c => c.metodo === 'POST' && c.ruta.includes('redaccion_redes')).map(c => { try { return JSON.parse(c.cuerpo); } catch (e) { return null; } }).find(b => b && b.id === pv.id && b.eliminada === true);
+  ok(!!lapida, 'la lápida viajó a la nube', 'la lápida no viajó');
+  const devolver = [...d.querySelectorAll('#red-list .rrd-retiradas button')].find(b => /Devolver/.test(b.textContent));
+  ok(!!devolver, 'la lista ofrece devolverla', 'no se puede devolver');
+  devolver && devolver.click();
+  await esperar(300);
+  ok(w.rrdPieza(pv.id).eliminada === false, 'y devolverla la devuelve', 'no se devolvió');
+
+  log('── 14. El botón flotante de Destellos no tapa el editor de la pieza ──');
+  w.rrdAbrir(pl.id);
+  await esperar(150);
+  ok(d.getElementById('destello-fab').style.display === 'none', 'el FAB se esconde en el editor de la pieza', 'el FAB sigue puesto');
+
+  termina();
+})().catch(e => { fallos++; log('✘ la sonda reventó: ' + (e && e.stack || e)); termina(); });
+</script>
+</body>
+</html>
