@@ -569,12 +569,16 @@ async function initRedaccion() {
   // 📣 Redes vive en js/tools/redaccion-redes.js; si ese archivo no
   // cargó, se vuelve a algo real en vez de enseñar una lista vacía.
   if (_redEdicion === 'redes' && typeof rrdRender !== 'function') _redEdicion = 'banco';
+  // 📓 Cuadernos, igual: vive en js/tools/redaccion-cuadernos.js.
+  if (_redEdicion === 'cuadernos' && typeof rcuRender !== 'function') _redEdicion = 'banco';
 
   redRender();
 
   // Las piezas para redes: lo del aparato ya está; la nube, cuando
   // llegue, repinta el chip con su cuenta.
   if (typeof rrdInit === 'function') rrdInit();
+  // Y el inventario de cuadernos de NotebookLM, por el mismo camino.
+  if (typeof rcuInit === 'function') rcuInit();
 }
 
 /* ── Vista principal ── */
@@ -615,13 +619,14 @@ function redRenderAcciones() {
   const enPapelera = _redEdicion === 'papelera';
   const enBuzon    = _redEdicion === 'buzon';
   const enRedes    = _redEdicion === 'redes';
+  const enCuadernos = _redEdicion === 'cuadernos';
   const nueva  = document.getElementById('red-nueva-nota-btn');
   const expo   = document.getElementById('red-exportar-btn');
   const vaciar = document.getElementById('red-vaciar-papelera-btn');
   const qr     = document.getElementById('red-qr-btn');
   const pieza  = document.getElementById('red-rrd-nueva-btn');
-  if (nueva)  nueva.style.display  = (enPapelera || enBuzon || enRedes) ? 'none' : '';
-  if (expo)   expo.style.display   = (enPapelera || enBuzon || enRedes) ? 'none' : '';
+  if (nueva)  nueva.style.display  = (enPapelera || enBuzon || enRedes || enCuadernos) ? 'none' : '';
+  if (expo)   expo.style.display   = (enPapelera || enBuzon || enRedes || enCuadernos) ? 'none' : '';
   if (vaciar) vaciar.style.display = (enPapelera && redNotasPapelera().length) ? '' : 'none';
   // El QR solo dentro del buzón: es lo que se pega en la revista para
   // que entren envíos, y fuera de ahí no significa nada.
@@ -666,6 +671,10 @@ function redRenderCabecera() {
   }
   if (_redEdicion === 'redes' && typeof rrdCabecera === 'function') {
     rrdCabecera(tituloEl, metaEl);
+    return;
+  }
+  if (_redEdicion === 'cuadernos' && typeof rcuCabecera === 'function') {
+    rcuCabecera(tituloEl, metaEl);
     return;
   }
   if (_redEdicion === 'buzon') {
@@ -732,8 +741,11 @@ function redRenderChips() {
   // de la pantalla. Lo pinta js/tools/redaccion-redes.js con su cuenta
   // de lo que toca hoy; si ese archivo no cargó, no hay chip.
   const redes = (typeof rrdChipHtml === 'function') ? rrdChipHtml(_redEdicion === 'redes') : '';
+  // 📓 Cuadernos: pegado a Redes, que es su vecino de trabajo (lo que se
+  // estudia en NotebookLM acaba en una nota o en un post).
+  const cuadernos = (typeof rcuChipHtml === 'function') ? rcuChipHtml(_redEdicion === 'cuadernos') : '';
 
-  wrap.innerHTML = buzon + papelera + redes + chips + `
+  wrap.innerHTML = buzon + papelera + redes + cuadernos + chips + `
     <button type="button" class="red-ed-chip ${_redEdicion === 'banco' ? 'red-ed-chip-active' : ''}" data-ed="banco">
       🗃️ Banco
     </button>
@@ -743,7 +755,7 @@ function redRenderChips() {
   wrap.querySelectorAll('.red-ed-chip').forEach(btn => btn.addEventListener('click', () => {
     const val = btn.dataset.ed;
     if (val === 'nueva') { redOpenEdicionModal(); return; }
-    if (val === 'banco' || val === 'papelera' || val === 'buzon' || val === 'redes') { _redEdicion = val; redRender(); return; }
+    if (val === 'banco' || val === 'papelera' || val === 'buzon' || val === 'redes' || val === 'cuadernos') { _redEdicion = val; redRender(); return; }
     const id = Number(val);
     // Tocar la edición que ya está abierta la manda a editar: es el atajo
     // para corregir el número o la fecha sin buscar el lápiz.
@@ -771,6 +783,11 @@ function redRenderNotas() {
   if (_redEdicion === 'redes' && typeof rrdRender === 'function') {
     if (emptyEl) emptyEl.style.display = 'none';
     rrdRender(list);
+    return;
+  }
+  if (_redEdicion === 'cuadernos' && typeof rcuRender === 'function') {
+    if (emptyEl) emptyEl.style.display = 'none';
+    rcuRender(list);
     return;
   }
 
@@ -2344,7 +2361,7 @@ function redEdicionMd() {
 }
 
 async function redExportar() {
-  if (!_redLoaded || _redEdicion === 'papelera' || _redEdicion === 'redes' || _redEdicion === 'buzon') return;
+  if (!_redLoaded || _redEdicion === 'papelera' || _redEdicion === 'redes' || _redEdicion === 'cuadernos' || _redEdicion === 'buzon') return;
   const notas = redNotasDeEdicion();
   if (!notas.length) { if (typeof toast === 'function') toast('No hay notas para exportar'); return; }
 

@@ -1,0 +1,241 @@
+/* ══════════════════════════════════════════════════════════════════
+   REDACCIÓN · 📓 CUADERNOS · el inventario de los cuadernos de
+   NotebookLM (js/tools/redaccion-cuadernos.js)
+   ──────────────────────────────────────────────────────────────────
+   Mundo de la APLICACIÓN: tokens --surface, --bg, --border, --text,
+   --muted, --faint, --brand. Aquí NO existe --card (CLAUDE.md, «Dos
+   paletas»). Lo que hereda de Redacción (.red-badge, .red-ed-chip,
+   .fin-modal) se usa tal cual. El verde azulado es el color de esta
+   herramienta, para que el chip no se confunda con el morado de Redes.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── El chip de la fila de ediciones ── */
+.red-ed-chip.rcu-chip { border-color: #99f6e4; color: #0f766e; }
+.red-ed-chip.rcu-chip.red-ed-chip-active { background: #f0fdfa; border-color: #0d9488; color: #115e59; }
+
+/* ── La nube, a la vista ── */
+.rcu-nube { font-size: 11.5px; font-weight: 700; border-radius: 10px; padding: 7px 12px; margin-bottom: 10px; }
+.rcu-nube-ok { background: #f0fdf4; color: #15803d; }
+.rcu-nube-no { background: #fffbeb; color: #b45309; }
+
+/* ── Vacío ── */
+.rcu-vacio { text-align: center; color: var(--muted); font-size: 13.5px; padding: 22px 14px; line-height: 1.55; }
+.rcu-vacio-ic { font-size: 40px; margin-bottom: 6px; }
+.rcu-vacio p { margin: 6px 0; }
+
+/* ── La barra: UNA fila que se desliza; los botones primero ──
+   Es la regla 33 de La Voz Prestada: lo que se sale por el borde es lo
+   último, así que lo que se toca a diario va delante. El degradado del
+   borde dice que hay más. */
+.rcu-barra-caja { margin-bottom: 10px; }
+.rcu-barra {
+  display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto;
+  padding-bottom: 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+          mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+}
+.rcu-barra::-webkit-scrollbar { display: none; }
+.rcu-barra-btn {
+  flex-shrink: 0; white-space: nowrap;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px;
+  padding: 7px 13px; font-size: 12.5px; font-weight: 700; color: var(--text);
+  font-family: inherit; cursor: pointer; min-height: 38px;
+}
+.rcu-barra-btn:active { transform: scale(.96); }
+.rcu-barra-btn-1 { background: #0f766e; border-color: #0f766e; color: #fff; }
+
+.rcu-busca {
+  display: block; width: 100%; box-sizing: border-box; margin-top: 6px;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 9px 12px; font-size: 15px; font-family: inherit; color: var(--text); min-height: 42px;
+}
+.rcu-busca:focus { outline: none; border-color: #0d9488; }
+
+/* Los filtros PUESTOS, con su equis; la fila entera se va cuando no hay ninguno */
+.rcu-puestos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.rcu-puesto {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #f0fdfa; border: 1.5px solid #0d9488; border-radius: 20px;
+  padding: 6px 10px 6px 12px; font-size: 12.5px; font-weight: 700; color: #115e59;
+  font-family: inherit; cursor: pointer; min-height: 36px;
+}
+.rcu-puesto-x { font-size: 13px; opacity: .8; }
+
+/* La nota de encima de la lista: la cuenta y un solo mando */
+.rcu-nota-lista {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-size: 12px; color: var(--muted); margin: 4px 0 10px;
+}
+.rcu-mini-btn {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 6px 10px; font-size: 12px; font-weight: 700; color: var(--text);
+  font-family: inherit; cursor: pointer; white-space: nowrap; min-height: 32px;
+}
+.rcu-mini-btn:active { transform: scale(.96); }
+
+/* ── Los grupos, plegables ──
+   ⚠️ `.rcu-grupo[hidden] { display: none }` es lo que hace que el
+   plegado exista: el [hidden] del navegador vive en la hoja más débil
+   y pierde contra cualquier display de la nuestra (La Voz Prestada,
+   regla 40). Sin esta regla el mando responde y no hace nada. */
+.rcu-seccion { margin-bottom: 12px; }
+.rcu-grupo-btn {
+  width: 100%; display: flex; align-items: center; gap: 10px; text-align: left;
+  background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 10px 12px; font-family: inherit; color: var(--text); cursor: pointer;
+  min-height: 44px; margin-bottom: 8px;
+}
+.rcu-grupo-btn:active { transform: scale(.985); }
+.rcu-grupo-btn[aria-expanded="true"] { border-color: #99f6e4; background: #f0fdfa; }
+.rcu-galon { width: 14px; text-align: center; color: var(--muted); font-size: 14px; }
+.rcu-grupo-t { flex: 1; min-width: 0; font-size: 14px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rcu-grupo-n { font-size: 12px; font-weight: 800; color: #0f766e; background: #ccfbf1; border-radius: 10px; padding: 2px 8px; }
+.rcu-grupo-rotulo { display: flex; align-items: center; gap: 10px; padding: 6px 2px 8px; }
+.rcu-grupo-rotulo .rcu-grupo-t { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; }
+.rcu-grupo { display: flex; flex-direction: column; gap: 8px; }
+.rcu-grupo[hidden] { display: none !important; }
+
+/* ── La ficha de un cuaderno ── */
+.rcu-ficha {
+  display: flex; align-items: stretch; gap: 10px;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px;
+  padding: 10px 10px 10px 12px;
+}
+.rcu-ficha-emoji {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; background: #f0fdfa; border: 1px solid #ccfbf1;
+}
+.rcu-ficha-main {
+  flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 0;
+  font-family: inherit; color: var(--text); cursor: pointer;
+}
+.rcu-ficha-t { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.rcu-serie-n {
+  flex-shrink: 0; font-size: 11.5px; font-weight: 800; color: #0f766e;
+  background: #ccfbf1; border-radius: 6px; padding: 1px 6px; font-variant-numeric: tabular-nums;
+}
+.rcu-ficha-titulo { font-size: 14.5px; font-weight: 800; line-height: 1.3; }
+.rcu-ficha-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+.rcu-est-activo    { background: #f0fdf4; color: #15803d; }
+.rcu-est-pausado   { background: #fffbeb; color: #b45309; }
+.rcu-est-terminado { background: #eff6ff; color: #1d4ed8; }
+.rcu-badge-serie { background: #f0fdfa; color: #0f766e; }
+.rcu-badge-ref   { background: #fdf2f8; color: #be185d; }
+.rcu-hace { font-size: 11.5px; color: var(--muted); }
+.rcu-ficha-estantes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.rcu-est-mini {
+  font-size: 11px; font-weight: 700; color: #115e59; background: #f0fdfa;
+  border: 1px solid #99f6e4; border-radius: 8px; padding: 2px 7px;
+}
+.rcu-ficha-notas {
+  margin-top: 6px; font-size: 12.5px; color: var(--muted); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  white-space: pre-line;
+}
+.rcu-ficha-acc { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; justify-content: flex-start; }
+.rcu-abrir, .rcu-ficha-btn {
+  width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  text-decoration: none; font-size: 16px; font-family: inherit; cursor: pointer;
+  background: var(--surface); border: 1.5px solid var(--border); color: var(--text);
+}
+.rcu-abrir { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 800; }
+.rcu-abrir:active, .rcu-ficha-btn:active { transform: scale(.94); }
+
+/* ── Retirados ── */
+.rcu-retirados { margin-top: 14px; font-size: 12.5px; color: var(--muted); }
+.rcu-retirados summary { cursor: pointer; font-weight: 700; padding: 8px 0; min-height: 34px; }
+.rcu-retirado { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.rcu-retirado-t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── La hoja del cuaderno ── */
+.rcu-h-fila { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
+.rcu-h-col { flex: 1; min-width: 0; }
+.rcu-h-col-n { flex: 0 0 84px; }
+.rcu-input, .rcu-textarea {
+  display: block; width: 100%; box-sizing: border-box;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; font-size: 15px; font-family: inherit; color: var(--text); min-height: 44px;
+}
+.rcu-input:focus, .rcu-textarea:focus { outline: none; border-color: #0d9488; }
+.rcu-textarea { resize: vertical; line-height: 1.45; overflow: hidden; }
+.rcu-h-emoji { flex: 0 0 64px; text-align: center; font-size: 22px; padding: 6px; }
+.rcu-h-num { max-width: 140px; }
+.rcu-h-label { display: block; font-size: 11.5px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; margin: 12px 0 6px; }
+.rcu-h-label-d { font-weight: 600; text-transform: none; letter-spacing: 0; }
+.rcu-h-nota { font-size: 12px; color: #0f766e; margin-top: 6px; line-height: 1.4; }
+.rcu-h-nota-mal { color: #b91c1c; }
+.rcu-h-ayuda { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.rcu-h-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rcu-est-chip {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px;
+  padding: 8px 13px; font-size: 12.5px; font-weight: 700; color: var(--muted);
+  font-family: inherit; cursor: pointer; min-height: 38px; transition: all .12s;
+}
+.rcu-est-chip:active { transform: scale(.96); }
+.rcu-est-chip-on { background: #f0fdfa; border-color: #0d9488; color: #115e59; }
+.rcu-est-chip-on.rcu-est-chip-activo    { background: #f0fdf4; border-color: #22c55e; color: #15803d; }
+.rcu-est-chip-on.rcu-est-chip-pausado   { background: #fffbeb; border-color: #f59e0b; color: #b45309; }
+.rcu-est-chip-on.rcu-est-chip-terminado { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; }
+.rcu-h-est-nuevo-fila { display: flex; gap: 8px; margin-top: 8px; }
+.rcu-h-est-nuevo-fila .rcu-input { flex: 1; }
+
+.rcu-ref { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 8px 10px; margin-bottom: 8px; }
+.rcu-ref-cab { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.rcu-ref-n { font-size: 12px; font-weight: 800; color: #be185d; }
+.rcu-ref-x {
+  background: none; border: 0; font-size: 16px; color: var(--muted); cursor: pointer;
+  width: 36px; height: 36px; border-radius: 8px; font-family: inherit;
+}
+.rcu-ref-x:active { background: var(--border); }
+.rcu-ref-t { margin-bottom: 6px; font-size: 14px; }
+.rcu-ref-en { font-size: 13.5px; min-height: 40px; }
+
+.rcu-h-btn {
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 10px 14px; font-size: 13.5px; font-weight: 800; color: var(--text);
+  font-family: inherit; cursor: pointer; min-height: 44px; white-space: nowrap;
+}
+.rcu-h-btn:active { transform: scale(.97); }
+.rcu-h-btn-1 { background: #0f766e; border-color: #0f766e; color: #fff; flex: 1; }
+.rcu-h-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.rcu-h-falta {
+  background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; border-radius: 10px;
+  padding: 9px 12px; font-size: 13px; font-weight: 700; margin-top: 12px; line-height: 1.4;
+}
+.rcu-h-retirar-caja { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
+.rcu-h-retirar {
+  background: var(--surface); border: 1.5px solid #fecaca; border-radius: 10px;
+  padding: 9px 13px; font-size: 13px; font-weight: 800; color: #b91c1c;
+  font-family: inherit; cursor: pointer; min-height: 42px;
+}
+.rcu-h-retirar-si { background: #b91c1c; border-color: #b91c1c; color: #fff; }
+.rcu-h-retirar-q { font-size: 12.5px; color: var(--muted); }
+
+/* ── Pegar varios ── */
+.rcu-p-texto { min-height: 150px; font-size: 14px; }
+.rcu-p-repaso { margin-top: 12px; }
+.rcu-p-cuenta { font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+.rcu-p-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; flex-wrap: wrap; }
+.rcu-p-emoji { font-size: 18px; }
+.rcu-p-t { font-weight: 700; flex: 1; min-width: 0; }
+.rcu-p-aviso { font-size: 11.5px; font-weight: 700; color: #b45309; background: #fffbeb; border-radius: 8px; padding: 2px 8px; }
+.rcu-p-malos { margin-top: 12px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 9px 12px; }
+.rcu-p-malos-t { font-size: 12.5px; font-weight: 800; color: #92400e; margin-bottom: 4px; }
+.rcu-p-malo { font-size: 12.5px; color: #92400e; line-height: 1.45; }
+.rcu-p-ayuda { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+
+/* ── La hoja vertical: un renglón de 44 px por estante, con su cuenta ── */
+.rcu-ver-cab { font-size: 11.5px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; margin: 14px 0 6px; }
+.rcu-ver-fila {
+  width: 100%; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; text-align: left;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 10px 12px; margin-bottom: 6px; font-family: inherit; color: var(--text);
+  cursor: pointer; min-height: 44px;
+}
+.rcu-ver-fila:active { transform: scale(.985); }
+.rcu-ver-fila-on { background: #f0fdfa; border-color: #0d9488; }
+.rcu-ver-t { flex: 1; min-width: 0; font-size: 14px; font-weight: 700; }
+.rcu-ver-n { font-size: 12px; font-weight: 800; color: #0f766e; background: #ccfbf1; border-radius: 10px; padding: 2px 8px; }
+.rcu-ver-ok { font-weight: 800; color: #0f766e; }
+.rcu-ver-d { flex-basis: 100%; font-size: 12px; color: var(--muted); font-weight: 600; }

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · Redacción: 📓 cuadernos de NotebookLM</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:390px;height:700px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de 📓 Cuadernos (js/tools/redaccion-cuadernos.js), ordenada por
+   gravedad:
+
+     1. que nada de lo escrito llegue al HTML: veneno en las notas y en
+        una referencia se tiene que ver como texto, y la dirección va a
+        un href SOLO comprobada con URL(), con noopener;
+     2. que una dirección de NotebookLM se ENTIENDA (los dos dominios, el
+        identificador, el «?authuser=» que se respeta) y que el mismo
+        cuaderno no entre dos veces;
+     3. que pegar una lista entienda lo que se escribe de verdad, NOMBRE
+        con su renglón lo que no, y suba todo en UN viaje;
+     4. que el plegado exista de verdad (display CALCULADO), que nada se
+        abra solo, que buscando se abra todo y no se guarde;
+     5. que abrir el cuaderno apunte la consulta y viaje;
+     6. que retirar sea de dos toques sin confirm() y deje lápida;
+     7. que sin la tabla (42P01) funcione entera y lo diga, y que al
+        aparecer la tabla lo pendiente suba solo;
+     8. que «Compartir a F.A.R.O» con un enlace de NotebookLM caiga aquí
+        y no en las lecturas, y limpie la dirección al cerrar.
+
+   Como las demás de esta familia: ejecuta el index.html de verdad con
+   una base de mentira a nivel de fetch, pulsa los botones de verdad, y
+   de cada prueba mira lo que quedó (en el DOM, en localStorage o en lo
+   que viajó a la base), no lo que la pantalla dice que pasó. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0;
+function log(s){ L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal){ if(c) log('  ✔ '+bien); else { fallos++; log('  ✘ '+mal); } }
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+function termina() {
+  const v = fallos ? 'SUSPENDE' : 'APRUEBA';
+  log(`\nRESULTADO: ${v}${fallos ? ` (${fallos} fallo${fallos === 1 ? '' : 's'})` : ''}`);
+  document.title = `${v} · redacción: cuadernos`;
+}
+
+(async function corre(){
+  await new Promise(r => f.addEventListener('load', r, { once: true }));
+  await esperar(1200);
+  const w = f.contentWindow, d = f.contentWindow.document;
+
+  /* La base de mentira. `modo` decide si la tabla existe. Apunta cada
+     llamada para poder afirmar «este upsert llevó la ficha dentro». */
+  const llamadas = [];
+  let modo = 'sin-tabla';
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url);
+    const metodo = (init && init.method) || 'GET';
+    const cabs = new Headers((init && init.headers) || {});
+    llamadas.push({ ruta: u.pathname + u.search, metodo, cuerpo: (init && init.body) || null, prefer: cabs.get('Prefer') || '' });
+    if (u.pathname.endsWith('/redaccion_cuadernos')) {
+      if (modo === 'sin-tabla') {
+        return new Response(JSON.stringify({ code: '42P01', message: 'relation "public.redaccion_cuadernos" does not exist' }),
+          { status: 404, headers: { 'Content-Type': 'application/json' } });
+      }
+      if (metodo === 'POST') return new Response('[]', { status: 201, headers: { 'Content-Type': 'application/json' } });
+      return new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    const unSolo = (cabs.get('Accept') || '').includes('pgrst.object');
+    return new Response(unSolo ? 'null' : '[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const subidas = () => llamadas.filter(l => l.ruta.includes('/redaccion_cuadernos') && l.metodo === 'POST');
+  const cuerpoDe = l => { try { return JSON.parse(l.cuerpo); } catch (e) { return null; } };
+  let confirms = 0;
+  w.confirm = () => { confirms++; return true; };
+  let copiado = '';
+  try { Object.defineProperty(w.navigator, 'clipboard', { value: { writeText: async t => { copiado = t; } }, configurable: true }); } catch (e) {}
+  const abiertas = [];
+  w.open = (u) => { abiertas.push(u); return null; };
+  // Los ↗ son enlaces de verdad: en la sonda no se abre ninguna pestaña
+  d.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a.rcu-abrir'); if (a) e.preventDefault(); }, true);
+  try { w.localStorage.removeItem('faro_redaccion_cuadernos_v1'); w.localStorage.removeItem('faro_redaccion_cuadernos_anaquel_v1'); } catch (e) {}
+
+  if (w.eval('typeof initRedaccion') !== 'function' || w.eval('typeof rcuRender') !== 'function') {
+    log('✘ index.html no cargó js/tools/redaccion.js o js/tools/redaccion-cuadernos.js');
+    fallos++; termina(); return;
+  }
+  const g = expr => w.eval(expr);
+  const texto = id => (d.getElementById(id) || {}).textContent || '';
+  const visible = el => !!el && el.offsetParent !== null;
+  const display = el => w.getComputedStyle(el).display;
+
+  d.getElementById('login-screen').style.display = 'none';
+  d.getElementById('app-container').style.display = '';
+  w.eval("switchView('view-redaccion')");
+  await esperar(500);
+  w.eval(`
+    _redEdiciones = [{ id: 1, numero: 1, titulo: 'Nº 01 · prueba', fecha_cierre: null, archivada: false }];
+    _redNotas = []; _redPapelera = true; _redLoaded = true; _redEdicion = 1;
+    redRender();
+  `);
+  await esperar(200);
+
+  log('── 1. La dirección se entiende ──');
+  const m1 = w.rcuMiraUrl('https://notebooklm.google.com/notebook/abc123def456?authuser=1');
+  ok(m1.ok && m1.esCuaderno && m1.cuaderno === 'abc123def456' && m1.url === 'https://notebooklm.google.com/notebook/abc123def456?authuser=1',
+     'notebooklm.google.com: cuaderno, identificador, y la dirección se guarda tal cual (con su authuser)', 'dio ' + JSON.stringify(m1));
+  const m2 = w.rcuMiraUrl('https://notebook.google.com/notebook/xyz-789');
+  ok(m2.ok && m2.esCuaderno && m2.cuaderno === 'xyz-789', 'notebook.google.com también es un cuaderno', 'dio ' + JSON.stringify(m2));
+  const m3 = w.rcuMiraUrl('notebooklm.google.com/notebook/sinhttps1');
+  ok(m3.ok && m3.esCuaderno && m3.puesto === 'https://' && m3.cuaderno === 'sinhttps1', 'sin el https:// se entiende y se dice cómo', 'dio ' + JSON.stringify(m3));
+  const m4 = w.rcuMiraUrl('javascript:alert(1)');
+  ok(!m4.ok && /https/.test(m4.motivo), 'javascript: no entra y el motivo explica qué poner', 'dio ' + JSON.stringify(m4));
+  const m5 = w.rcuMiraUrl('https://docs.google.com/document/d/1');
+  ok(m5.ok && !m5.esCuaderno && m5.cuaderno === '', 'otra dirección https entra como enlace, no como cuaderno', 'dio ' + JSON.stringify(m5));
+  ok(/no parece un cuaderno/i.test(w.rcuNotaDeUrl('https://docs.google.com/x').t) && /Cuaderno de NotebookLM/.test(w.rcuNotaDeUrl('https://notebooklm.google.com/notebook/abc123def456').t),
+     'y la nota de la hoja lo dice en voz alta en los dos casos', 'las notas: ' + w.rcuNotaDeUrl('https://docs.google.com/x').t + ' / ' + w.rcuNotaDeUrl('https://notebooklm.google.com/notebook/abc123def456').t);
+  const em = w.rcuEmojiDe('🧠 La IA como Espejo');
+  ok(em.emoji === '🧠' && em.titulo === 'La IA como Espejo', 'el emoji pegado delante del nombre se separa', 'dio ' + JSON.stringify(em));
+  ok(w.rcuSerieNDe('1.2_El Deseo y el Obstáculo') === 1.2 && w.rcuSerieNDe('2_Severance') === 2 && w.rcuSerieNDe('3. Anatomía') === 3 && w.rcuSerieNDe('2026 fue un año') === 0,
+     'el número de serie se saca de «1.2_», «2_» y «3.», y un año no cuenta', 'dio ' + [w.rcuSerieNDe('1.2_El Deseo y el Obstáculo'), w.rcuSerieNDe('2_Severance'), w.rcuSerieNDe('3. Anatomía'), w.rcuSerieNDe('2026 fue un año')].join(','));
+  ok(w.rcuClave('  MAESTRÍA ') === 'maestria' && w.rcuClave('maestria') === 'maestria', '«Maestría», «maestria» y « MAESTRÍA » son el mismo estante', 'claves: ' + w.rcuClave('  MAESTRÍA ') + ' / ' + w.rcuClave('maestria'));
+
+  log('── 2. Pegar varios: lo que se entiende y lo que se nombra ──');
+  const lista = [
+    '🌍 Monroe y Valle: El Choque de Dos Doctrinas | https://notebooklm.google.com/notebook/mon-1',
+    '[Liberalismo en Honduras](https://notebook.google.com/notebook/lib-2)',
+    '2_Severance: La Fractura del Ego — https://notebooklm.google.com/notebook/sev-3',
+    'Un renglón sin nada',
+    'javascript:alert(1)',
+    'https://notebooklm.google.com/notebook/solo-4',
+    'Capital cultural',
+    'https://notebooklm.google.com/notebook/cap-5',
+    'Otra vez | https://notebooklm.google.com/notebook/mon-1?authuser=2',
+  ].join('\n');
+  const r2 = w.rcuLeerVarios(lista);
+  ok(r2.cuadernos.length === 5, 'se entienden cinco cuadernos', 'se entendieron ' + r2.cuadernos.length + ': ' + r2.cuadernos.map(c => c.titulo).join(' | '));
+  const c0 = r2.cuadernos[0], c1 = r2.cuadernos[1], c2 = r2.cuadernos[2], c3 = r2.cuadernos[3], c4 = r2.cuadernos[4];
+  ok(c0 && c0.emoji === '🌍' && c0.titulo === 'Monroe y Valle: El Choque de Dos Doctrinas' && c0.cuaderno === 'mon-1', 'la barra: emoji, nombre y dirección', 'dio ' + JSON.stringify(c0));
+  ok(c1 && c1.titulo === 'Liberalismo en Honduras' && c1.cuaderno === 'lib-2', 'la forma [Nombre](dirección)', 'dio ' + JSON.stringify(c1));
+  ok(c2 && c2.serie_n === 2 && c2.titulo === '2_Severance: La Fractura del Ego', 'la raya, y el «2_» se propone como número sin tocar el nombre', 'dio ' + JSON.stringify(c2));
+  ok(c3 && c3.sinNombre && c3.cuaderno === 'solo-4' && /solo-4/.test(c3.titulo), 'la dirección sola entra con un nombre provisional y se marca «sin nombre»', 'dio ' + JSON.stringify(c3));
+  ok(c4 && c4.titulo === 'Capital cultural' && c4.cuaderno === 'cap-5', 'el nombre en un renglón y la dirección en el siguiente', 'dio ' + JSON.stringify(c4));
+  ok(r2.malos.length === 2 && r2.malos.some(x => x.n === 4) && r2.malos.some(x => x.n === 5 && /https/.test(x.por)),
+     'los dos renglones que no se entienden salen NOMBRADOS con su número (4 y 5), y el javascript: dice por qué', 'malos: ' + JSON.stringify(r2.malos));
+  ok(r2.repetidos.length === 1 && r2.repetidos[0].n === 9, 'el mismo cuaderno con otro authuser se salta y se dice (renglón 9)', 'repetidos: ' + JSON.stringify(r2.repetidos));
+
+  log('── 3. El chip, la lista vacía y la nube que falta ──');
+  const chip = d.querySelector('.red-ed-chip.rcu-chip');
+  ok(!!chip && /📓 Cuadernos/.test(chip.textContent), 'hay un chip 📓 Cuadernos en la fila de ediciones', 'no hay chip');
+  chip.click();
+  await esperar(400);
+  ok(g('_redEdicion') === 'cuadernos', 'tocarlo abre el inventario', '_redEdicion=' + g('_redEdicion'));
+  ok(/falta correr redaccion_cuadernos.sql/.test(texto('red-list')), 'sin la tabla (42P01) la barra dice qué archivo correr', 'la barra dice: ' + (d.querySelector('.rcu-nube') || {}).textContent);
+  ok(/Todavía no hay cuadernos/.test(texto('red-list')) && !!d.querySelector('.rcu-barra-btn'), 'y la lista vacía explica qué es esto, con sus botones', 'no hay vacío o botones');
+  ok(/Cuadernos/.test(texto('red-cabecera-titulo') || d.querySelector('.red-cabecera-txt').textContent), 'la cabecera dice Cuadernos', 'cabecera: ' + d.querySelector('.red-cabecera-txt').textContent);
+
+  log('── 4. Una ficha por la hoja: veneno como texto, y la nube la recibe ──');
+  modo = 'puesta';
+  await w.rcuInit();
+  await esperar(200);
+  ok(/viaja a todos los aparatos/.test(texto('red-list')), 'con la tabla, la barra dice que viaja', 'la barra dice: ' + (d.querySelector('.rcu-nube') || {}).textContent);
+  const btnNuevo = [...d.querySelectorAll('.rcu-barra-btn')].find(b => /Cuaderno/.test(b.textContent));
+  btnNuevo.click();
+  await esperar(200);
+  const ov = d.getElementById('rcu-overlay');
+  ok(ov.style.display === 'flex', 'el botón «＋ Cuaderno» abre la hoja', 'la hoja no abrió');
+  const guardarBtn = d.getElementById('rcu-h-guardar');
+  guardarBtn.scrollIntoView({ block: 'center' });   // elementFromPoint solo ve lo que está en la ventana
+  await esperar(50);
+  const rg = guardarBtn.getBoundingClientRect();
+  const enPunto = d.elementFromPoint(rg.left + rg.width / 2, rg.top + rg.height / 2);
+  ok(enPunto === guardarBtn || guardarBtn.contains(enPunto), 'y la hoja está ENCIMA de todo (elementFromPoint da su botón)', 'en el punto del botón hay: ' + (enPunto && enPunto.className));
+  const veneno = '<img src=x onerror="window.__xss=1"> & "comillas"';
+  d.getElementById('rcu-h-emoji').value = '🧠🧠';
+  d.getElementById('rcu-h-titulo').value = 'La IA como Espejo de la Fe';
+  const urlIn = d.getElementById('rcu-h-url');
+  urlIn.value = 'notebooklm.google.com/notebook/abc123def456?authuser=1';
+  urlIn.dispatchEvent(new w.Event('input', { bubbles: true }));
+  ok(/Se entiende con https/.test(texto('rcu-h-url-nota')) && /Cuaderno de NotebookLM/.test(texto('rcu-h-url-nota')), 'la nota debajo de la dirección dice cómo se entendió', 'la nota dice: ' + texto('rcu-h-url-nota'));
+  const estIn = d.getElementById('rcu-h-est-nuevo');
+  estIn.value = 'Maestría';
+  estIn.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+  await esperar(50);
+  ok([...d.querySelectorAll('#rcu-h-estantes .rcu-est-chip-on')].some(c => c.textContent === 'Maestría'), 'Enter en «Estante nuevo» pone el estante y lo deja marcado', 'chips: ' + [...d.querySelectorAll('#rcu-h-estantes .rcu-est-chip')].map(c => c.textContent + (c.classList.contains('rcu-est-chip-on') ? '*' : '')).join(','));
+  d.getElementById('rcu-h-serie').value = 'Control coercitivo';
+  d.getElementById('rcu-h-serie-n').value = '1,2';
+  [...d.querySelectorAll('#rcu-h-estado .rcu-est-chip')].find(c => /En pausa/.test(c.textContent)).click();
+  d.getElementById('rcu-h-fuentes').value = '35';
+  d.getElementById('rcu-h-notas').value = 'Notas ' + veneno;
+  d.getElementById('rcu-h-ref-add').click();
+  await esperar(50);
+  const refT = d.querySelector('#rcu-h-refs .rcu-ref-t'), refEn = d.querySelector('#rcu-h-refs .rcu-ref-en');
+  ok(!!refT && d.activeElement === refT, '«＋ Referencia» añade una fila y le pone el foco', 'no hay fila de referencia o no tiene el foco');
+  refT.value = 'La fe como interfaz ' + veneno; refT.dispatchEvent(new w.Event('input', { bubbles: true }));
+  refEn.value = 'Nº 3 · La bandera'; refEn.dispatchEvent(new w.Event('input', { bubbles: true }));
+  guardarBtn.click();
+  await esperar(400);
+  ok(ov.style.display === 'none', 'Guardar cierra la hoja', 'la hoja sigue abierta: ' + texto('rcu-h-falta'));
+  const fichas = () => [...d.querySelectorAll('#red-list .rcu-ficha')];
+  ok(fichas().length === 1, 'y hay una ficha en la lista', 'hay ' + fichas().length + ' fichas');
+  const f1 = fichas()[0];
+  const c1g = g('rcuVivos()[0]');
+  ok(c1g.emoji === '🧠' && c1g.titulo === 'La IA como Espejo de la Fe' && c1g.cuaderno === 'abc123def456' && c1g.url === 'https://notebooklm.google.com/notebook/abc123def456?authuser=1',
+     'la ficha guarda UN emoji (no dos), el nombre, el identificador y la dirección entera', 'guardó ' + JSON.stringify({ e: c1g.emoji, t: c1g.titulo, c: c1g.cuaderno, u: c1g.url }));
+  ok(c1g.serie === 'Control coercitivo' && c1g.serie_n === 1.2 && c1g.estado === 'pausado' && c1g.fuentes === 35 && c1g.estantes.length === 1 && c1g.estantes[0] === 'Maestría',
+     'serie, número («1,2» se entiende como 1.2), estado, fuentes y estante', 'guardó ' + JSON.stringify({ s: c1g.serie, n: c1g.serie_n, e: c1g.estado, f: c1g.fuentes, es: c1g.estantes }));
+  ok(c1g.referencias.length === 1 && c1g.referencias[0].en === 'Nº 3 · La bandera' && /^\d{4}-\d{2}-\d{2}$/.test(c1g.referencias[0].f), 'y la referencia, con dónde se usó y su fecha', 'referencias: ' + JSON.stringify(c1g.referencias));
+  ok(!w.__xss && !d.querySelector('#red-list img') && f1.textContent.includes('<img src=x') , 'el veneno de las notas sale como TEXTO (sin img, sin correr nada)', 'xss=' + w.__xss + ' img=' + !!d.querySelector('#red-list img'));
+  ok(/⏸️ En pausa/.test(f1.textContent) && /35 fuentes/.test(f1.textContent) && /🔖 1/.test(f1.textContent) && /Control coercitivo/.test(f1.textContent) && f1.querySelector('.rcu-est-mini').textContent === 'Maestría' && f1.querySelector('.rcu-serie-n').textContent === '1.2',
+     'la ficha enseña estado, fuentes, referencias, serie, número y estante', 'la ficha dice: ' + f1.textContent.replace(/\s+/g, ' ').slice(0, 200));
+  const s1 = subidas();
+  const fila1 = s1.length ? cuerpoDe(s1[s1.length - 1]) : null;
+  ok(!!fila1 && /merge-duplicates/.test(s1[s1.length - 1].prefer) && fila1.id === c1g.id && fila1.titulo === c1g.titulo && Array.isArray(fila1.estantes) && fila1.estantes[0] === 'Maestría' && fila1.referencias[0].t.includes('<img src=x') && fila1.autor,
+     'la nube recibió la ficha como upsert, con sus estantes, sus referencias y el autor', 'la subida: ' + JSON.stringify(fila1).slice(0, 300));
+  const local1 = JSON.parse(w.localStorage.getItem('faro_redaccion_cuadernos_v1') || '{}');
+  ok(local1.cuadernos && local1.cuadernos.length === 1 && local1.cuadernos[0].titulo === c1g.titulo, 'y el aparato la tiene guardada', 'local: ' + JSON.stringify(local1).slice(0, 120));
+  ok(/📓 Cuadernos · 1/.test(d.querySelector('.rcu-chip').textContent), 'el chip lleva la cuenta', 'el chip dice: ' + d.querySelector('.rcu-chip').textContent);
+
+  log('── 5. El mismo cuaderno no entra dos veces ──');
+  btnNuevo.click();
+  await esperar(150);
+  d.getElementById('rcu-h-titulo').value = 'Otro nombre';
+  d.getElementById('rcu-h-url').value = 'https://notebooklm.google.com/notebook/abc123def456';
+  d.getElementById('rcu-h-guardar').click();
+  await esperar(150);
+  ok(/ya está en el inventario/.test(texto('rcu-h-falta')) && fichas().length === 1, 'la hoja lo dice y no guarda un gemelo', 'falta=' + texto('rcu-h-falta') + ' fichas=' + fichas().length);
+  await esperar(1000);
+  ok(g('_rcuHojaId') === c1g.id, 'y lleva a la ficha que ya estaba', '_rcuHojaId=' + g('_rcuHojaId'));
+  d.getElementById('rcu-h-close').click();
+  await esperar(100);
+  btnNuevo.click();
+  await esperar(100);
+  d.getElementById('rcu-h-guardar').click();
+  await esperar(100);
+  ok(/Falta el nombre del cuaderno y la dirección/.test(texto('rcu-h-falta')), 'guardar vacío nombra lo que falta', 'dice: ' + texto('rcu-h-falta'));
+  d.getElementById('rcu-h-close').click();
+  await esperar(100);
+
+  log('── 6. Pegar una lista por la hoja: se lee, se nombra lo malo, y sube en UN viaje ──');
+  [...d.querySelectorAll('.rcu-barra-btn')].find(b => /Pegar lista/.test(b.textContent)).click();
+  await esperar(150);
+  ok(d.getElementById('rcu-pegar-overlay').style.display === 'flex', 'la hoja de pegar abre', 'no abrió');
+  d.getElementById('rcu-p-texto').value = lista;
+  d.getElementById('rcu-p-leer').click();
+  await esperar(100);
+  const rep = texto('rcu-p-repaso');
+  ok(/Se entienden 5 cuadernos/.test(rep) && /renglón 4/.test(rep) && /renglón 5/.test(rep) && /Ya estaban/.test(rep) && /renglón 9/.test(rep), 'el repaso cuenta cinco, nombra los renglones 4 y 5, y el repetido del 9', 'el repaso dice: ' + rep.slice(0, 300));
+  ok(/sin nombre/.test(rep), 'y avisa del que entra sin nombre', 'no avisa del sin nombre');
+  const antes6 = subidas().length;
+  d.getElementById('rcu-p-guardar').click();
+  await esperar(400);
+  ok(fichas().length === 6, 'ahora hay seis fichas', 'hay ' + fichas().length);
+  const s6 = subidas().slice(antes6);
+  const cuerpo6 = s6.length ? cuerpoDe(s6[0]) : null;
+  ok(s6.length === 1 && Array.isArray(cuerpo6) && cuerpo6.length === 5 && cuerpo6.some(x => x.cuaderno === 'sev-3' && x.serie_n === 2) && cuerpo6.some(x => x.emoji === '🌍'),
+     'los cinco subieron en UN solo viaje, con su emoji y su número', 'viajes: ' + s6.length + ' cuerpo: ' + JSON.stringify(cuerpo6).slice(0, 200));
+
+  log('── 7. El plegado: display CALCULADO, nada se abre solo, buscando se abre todo ──');
+  const grupos = () => [...d.querySelectorAll('#red-list .rcu-grupo')];
+  const cabs = () => [...d.querySelectorAll('#red-list .rcu-grupo-btn')];
+  ok(cabs().length === 2 && grupos().length === 2, 'con «Maestría» y «Sin estante» hay dos grupos con mando', 'mandos=' + cabs().length + ' grupos=' + grupos().length);
+  ok(grupos().every(gr => display(gr) === 'none') && cabs().every(c => c.getAttribute('aria-expanded') === 'false'), 'los dos nacen PLEGADOS (display calculado none)', 'display: ' + grupos().map(display).join(','));
+  ok(cabs().every(c => c.getBoundingClientRect().height >= 44), 'el mando de un grupo mide al menos 44 px', 'alturas: ' + cabs().map(c => c.getBoundingClientRect().height).join(','));
+  const cabM = cabs().find(c => /Maestría/.test(c.textContent));
+  cabM.click();
+  await esperar(50);
+  const grM = cabM.parentElement.querySelector('.rcu-grupo');
+  ok(display(grM) !== 'none' && cabM.getAttribute('aria-expanded') === 'true' && grM.querySelectorAll('.rcu-ficha').length === 1, 'tocar «Maestría» lo abre (y solo a él)', 'display=' + display(grM) + ' expanded=' + cabM.getAttribute('aria-expanded'));
+  const otro = cabs().find(c => /Sin estante/.test(c.textContent)).parentElement.querySelector('.rcu-grupo');
+  ok(display(otro) === 'none', 'y «Sin estante» sigue plegado', 'se abrió también');
+  const an7 = JSON.parse(w.localStorage.getItem('faro_redaccion_cuadernos_anaquel_v1') || '{}');
+  ok(an7.abiertos && an7.abiertos['estante:maestria'] === 1, 'lo abierto se recuerda en el aparato con el eje delante (estante:maestria)', 'anaquel: ' + JSON.stringify(an7));
+  ok(subidas().length === antes6 + 1, 'y abrir un grupo no escribió NADA en la nube', 'hubo ' + (subidas().length - antes6 - 1) + ' escrituras de más');
+  const busca = d.getElementById('rcu-busca');
+  busca.focus();
+  busca.value = 'monroe';
+  busca.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(350);
+  ok(fichas().length === 1 && /Monroe/.test(fichas()[0].textContent), 'buscar «monroe» deja una ficha', 'quedan ' + fichas().length);
+  const busca_2 = d.getElementById('rcu-busca');
+  ok(d.activeElement === busca_2, 'y el buscador conserva el foco tras repintar', 'el foco se fue a ' + (d.activeElement && d.activeElement.id));
+  busca_2.value = 'burocracia interfaz';
+  busca_2.dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(350);
+  ok(fichas().length === 0 && /Ningún cuaderno con eso/.test(texto('red-list')), 'sin resultados se dice', 'quedan ' + fichas().length);
+  d.getElementById('rcu-busca').value = 'interfaz';
+  d.getElementById('rcu-busca').dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(350);
+  ok(fichas().length === 1 && /La IA como Espejo/.test(fichas()[0].textContent), 'buscar una palabra de una REFERENCIA encuentra el cuaderno', 'quedan ' + fichas().length);
+  d.getElementById('rcu-busca').value = '';
+  d.getElementById('rcu-busca').dispatchEvent(new w.Event('input', { bubbles: true }));
+  await esperar(350);
+  const cabM2 = cabs().find(c => /Maestría/.test(c.textContent));
+  const cabS2 = cabs().find(c => /Sin estante/.test(c.textContent));
+  ok(cabM2 && cabS2 && display(cabM2.parentElement.querySelector('.rcu-grupo')) !== 'none' && display(cabS2.parentElement.querySelector('.rcu-grupo')) === 'none',
+     'al borrar la búsqueda vuelven a estar como estaban (Maestría abierto, Sin estante plegado)', 'no volvieron');
+  const abrirTodos = [...d.querySelectorAll('#red-list .rcu-mini-btn')].find(b => /Cerrar todos|Abrir todos/.test(b.textContent));
+  ok(abrirTodos && /Cerrar todos/.test(abrirTodos.textContent), 'con uno abierto el mando dice «Cerrar todos»', 'el mando dice: ' + (abrirTodos && abrirTodos.textContent));
+  abrirTodos.click();
+  await esperar(100);
+  ok(grupos().every(gr => display(gr) === 'none'), '«Cerrar todos» los pliega', 'quedó alguno abierto');
+
+  log('── 8. Corregir: «maestria» cae en «Maestría», y el filtro por estante ──');
+  const cabS3 = cabs().find(c => /Sin estante/.test(c.textContent));
+  cabS3.click();
+  await esperar(50);
+  const fichaCap = fichas().find(x => /Capital cultural/.test(x.textContent));
+  fichaCap.querySelector('.rcu-ficha-main').click();
+  await esperar(150);
+  ok(ov.style.display === 'flex' && d.getElementById('rcu-h-titulo').value === 'Capital cultural', 'tocar una ficha abre su hoja con lo suyo', 'título en la hoja: ' + d.getElementById('rcu-h-titulo').value);
+  const estIn2 = d.getElementById('rcu-h-est-nuevo');
+  estIn2.value = 'maestria';
+  d.getElementById('rcu-h-est-add').click();
+  await esperar(50);
+  ok([...d.querySelectorAll('#rcu-h-estantes .rcu-est-chip-on')].map(c => c.textContent).join(',') === 'Maestría', 'escribir «maestria» marca el estante «Maestría» que ya existía, sin crear otro', 'marcados: ' + [...d.querySelectorAll('#rcu-h-estantes .rcu-est-chip-on')].map(c => c.textContent).join(','));
+  d.getElementById('rcu-h-guardar').click();
+  await esperar(300);
+  const cabM3 = cabs().find(c => /Maestría/.test(c.textContent));
+  ok(cabM3 && /2/.test(cabM3.querySelector('.rcu-grupo-n').textContent), 'ahora «Maestría» cuenta dos', 'cuenta: ' + (cabM3 && cabM3.querySelector('.rcu-grupo-n').textContent));
+  [...d.querySelectorAll('.rcu-barra-btn')].find(b => /Estantes/.test(b.textContent)).click();
+  await esperar(150);
+  const ovVer = d.getElementById('rcu-ver-overlay');
+  ok(ovVer.style.display === 'flex' && /Estantes/.test(texto('rcu-ver-titulo')), 'el botón 🗂 Estantes abre la hoja vertical', 'no abrió');
+  const filasVer = [...d.querySelectorAll('#rcu-ver-cuerpo .rcu-ver-fila')];
+  ok(filasVer.length >= 4 && filasVer.every(fl => fl.getBoundingClientRect().height >= 44), 'un renglón de al menos 44 px por estante, serie y estado', 'alturas: ' + filasVer.map(fl => Math.round(fl.getBoundingClientRect().height)).join(','));
+  const filaM = filasVer.find(fl => fl.querySelector('.rcu-ver-t').textContent === 'Maestría');
+  ok(filaM && filaM.querySelector('.rcu-ver-n').textContent === '2', 'la fila de Maestría lleva su cuenta', 'fila: ' + (filaM && filaM.textContent));
+  ok(filasVer.some(fl => /Control coercitivo/.test(fl.textContent)) && filasVer.some(fl => /En pausa/.test(fl.textContent)), 'y debajo van las series y los estados', 'no están');
+  filaM.click();
+  await esperar(200);
+  ok(ovVer.style.display === 'none' && !!d.querySelector('.rcu-puesto') && /Maestría/.test(d.querySelector('.rcu-puesto').textContent), 'tocar el estante cierra la hoja y deja el filtro puesto, con su equis', 'filtro: ' + (d.querySelector('.rcu-puesto') || {}).textContent);
+  ok(fichas().length === 2 && cabs().length === 0 && !d.querySelector('.rcu-grupo-btn'), 'con el filtro hay dos fichas, en un solo montón SIN mando (el filtro puesto ya lo nombra)', 'fichas=' + fichas().length + ' mandos=' + cabs().length);
+  d.querySelector('.rcu-puesto').click();
+  await esperar(200);
+  ok(!d.querySelector('.rcu-puesto') && fichas().length === 6, 'la equis quita el filtro', 'sigue el filtro o faltan fichas: ' + fichas().length);
+
+  log('── 9. El orden ──');
+  [...d.querySelectorAll('.rcu-barra-btn')].find(b => /Orden/.test(b.textContent)).click();
+  await esperar(150);
+  [...d.querySelectorAll('#rcu-ver-cuerpo .rcu-ver-fila')].find(fl => /Sin agrupar/.test(fl.textContent)).click();
+  await esperar(200);
+  [...d.querySelectorAll('.rcu-barra-btn')].find(b => /Orden/.test(b.textContent)).click();
+  await esperar(150);
+  [...d.querySelectorAll('#rcu-ver-cuerpo .rcu-ver-fila')].find(fl => /Título/.test(fl.textContent)).click();
+  await esperar(200);
+  const an9 = JSON.parse(w.localStorage.getItem('faro_redaccion_cuadernos_anaquel_v1') || '{}');
+  ok(an9.orden === 'titulo' && an9.agrupar === 'ninguno', 'orden y agrupación se recuerdan en el aparato', 'anaquel: ' + JSON.stringify(an9));
+  ok(cabs().length === 0 && /2_Severance/.test(fichas()[0].textContent), 'sin agrupar y por título, la lista es una y empieza por «2_Severance»', 'primera: ' + (fichas()[0] || {}).textContent);
+
+  log('── 10. Abrir el cuaderno apunta la consulta, con noopener ──');
+  const fichaIA = fichas().find(x => /La IA como Espejo/.test(x.textContent));
+  const a = fichaIA.querySelector('a.rcu-abrir');
+  ok(!!a && a.getAttribute('href') === 'https://notebooklm.google.com/notebook/abc123def456?authuser=1' && a.getAttribute('target') === '_blank' && /noopener/.test(a.getAttribute('rel')) && /noreferrer/.test(a.getAttribute('rel')),
+     '↗ es un enlace de verdad a la dirección, en otra pestaña y con noopener noreferrer', 'href=' + (a && a.getAttribute('href')) + ' rel=' + (a && a.getAttribute('rel')));
+  ok(/sin abrir desde aquí/.test(fichaIA.querySelector('.rcu-hace').textContent), 'antes de tocarlo dice «sin abrir desde aquí»', 'dice: ' + fichaIA.querySelector('.rcu-hace').textContent);
+  const antes10 = subidas().length;
+  a.click();
+  await esperar(300);
+  ok(g('rcuVivos()').find(c => c.cuaderno === 'abc123def456').ultima > 0, 'tocarlo apunta la última consulta', 'ultima sigue en 0');
+  ok(/abierto hace un momento/.test(fichaIA.querySelector('.rcu-hace').textContent), 'y la ficha lo dice sin repintar la lista', 'dice: ' + fichaIA.querySelector('.rcu-hace').textContent);
+  const s10 = subidas().slice(antes10);
+  ok(s10.length === 1 && (cuerpoDe(s10[0]) || {}).ultima > 0, 'y viaja a la nube', 'subidas: ' + s10.length);
+  [...d.querySelectorAll('.rcu-barra-btn')].find(b => /Orden/.test(b.textContent)).click();
+  await esperar(150);
+  [...d.querySelectorAll('#rcu-ver-cuerpo .rcu-ver-fila')].find(fl => /Última consulta/.test(fl.textContent)).click();
+  await esperar(200);
+  ok(/La IA como Espejo/.test(fichas()[0].textContent), 'por última consulta, el que se abrió va primero', 'primera: ' + fichas()[0].textContent.slice(0, 60));
+
+  log('── 11. Retirar: dos toques, sin confirm(), con lápida; y devolver ──');
+  confirms = 0;
+  fichas()[0].querySelector('.rcu-ficha-main').click();
+  await esperar(150);
+  const ret1 = d.querySelector('#rcu-h-retirar-caja .rcu-h-retirar');
+  ok(!!ret1 && /Retirar/.test(ret1.textContent), 'la hoja tiene «Retirar del inventario»', 'no hay botón');
+  ret1.click();
+  await esperar(50);
+  ok(fichas().length === 6 && !!d.querySelector('.rcu-h-retirar-si'), 'un toque no retira: abre «Sí, retirar» al lado', 'retiró con un toque o no hay «Sí»');
+  d.querySelector('.rcu-h-retirar-si').click();
+  await esperar(300);
+  ok(confirms === 0, 'sin pasar por confirm()', 'pasó por confirm ' + confirms + ' veces');
+  ok(fichas().length === 5 && ov.style.display === 'none', 'retirado: cinco fichas y la hoja cerrada', 'fichas=' + fichas().length);
+  const lap = g('_rcuLista').find(c => c.cuaderno === 'abc123def456');
+  ok(lap && lap.eliminado === true && lap.eliminado_at, 'queda la lápida en el aparato', 'no hay lápida');
+  const ult = subidas()[subidas().length - 1];
+  ok((cuerpoDe(ult) || {}).eliminado === true, 'y la lápida viajó', 'la última subida: ' + (ult && ult.cuerpo || '').slice(0, 100));
+  const dev = d.querySelector('.rcu-retirados .rcu-mini-btn');
+  ok(!!dev && /Devolver/.test(dev.textContent) && /1 retirado/.test(d.querySelector('.rcu-retirados summary').textContent), 'la lista dice «1 retirado» con su Devolver', 'no está');
+  dev.click();
+  await esperar(300);
+  ok(fichas().length === 6 && g('_rcuLista').find(c => c.cuaderno === 'abc123def456').eliminado === false, 'Devolver lo trae de vuelta', 'no volvió');
+
+  log('── 12. Exportar: el inventario en texto ──');
+  [...d.querySelectorAll('.rcu-barra-btn')].find(b => /Exportar/.test(b.textContent)).click();
+  await esperar(200);
+  ok(/^# Cuadernos de NotebookLM/.test(copiado) && /## 🗂 Maestría \(2\)/.test(copiado) && /\*\*La IA como Espejo de la Fe\*\* — https:\/\/notebooklm\.google\.com\/notebook\/abc123def456\?authuser=1/.test(copiado) && /🔖 La fe como interfaz/.test(copiado) && /usado en: Nº 3 · La bandera/.test(copiado) && /## 🗂 Sin estante/.test(copiado),
+     'lo copiado lleva los estantes, cada cuaderno con su dirección, y las referencias con dónde se usaron', 'copiado: ' + copiado.slice(0, 400));
+
+  log('── 13. Sin la tabla se guarda aquí y lo dice; al aparecer, sube solo ──');
+  modo = 'sin-tabla';
+  await w.rcuInit();
+  await esperar(200);
+  ok(/falta correr redaccion_cuadernos.sql/.test(texto('red-list')), 'la barra vuelve a decir que falta el SQL', 'la barra dice: ' + (d.querySelector('.rcu-nube') || {}).textContent);
+  const antes13 = subidas().length;
+  [...d.querySelectorAll('.rcu-barra-btn')].find(b => /Cuaderno/.test(b.textContent)).click();
+  await esperar(150);
+  d.getElementById('rcu-h-titulo').value = 'Homo Burocraticus';
+  d.getElementById('rcu-h-url').value = 'https://notebooklm.google.com/notebook/homo-9';
+  d.getElementById('rcu-h-guardar').click();
+  await esperar(300);
+  ok(fichas().length === 7 && subidas().length === antes13, 'la ficha entra en el aparato y no se intenta subir (no hay tabla)', 'fichas=' + fichas().length + ' subidas de más=' + (subidas().length - antes13));
+  modo = 'puesta';
+  await w.rcuInit();
+  await esperar(300);
+  const s13 = subidas().slice(antes13);
+  const pend = s13.map(cuerpoDe).flat().filter(Boolean);
+  ok(s13.length >= 1 && pend.some(x => x && x.cuaderno === 'homo-9'), 'con la tabla puesta, lo pendiente sube solo con la ficha dentro', 'subidas: ' + s13.length + ' ' + JSON.stringify(pend).slice(0, 200));
+  ok(/viaja a todos los aparatos/.test(texto('red-list')), 'y la barra lo dice', 'la barra dice: ' + (d.querySelector('.rcu-nube') || {}).textContent);
+
+  log('── 14. Compartir a F.A.R.O: un cuaderno cae aquí, no en las lecturas ──');
+  w.history.replaceState(null, '', '/index.html?comp_url=' + encodeURIComponent('https://notebooklm.google.com/notebook/comp-777') + '&comp_tit=' + encodeURIComponent('🎭 Liberalismo compartido'));
+  const quien = w.faroArranqueInicio();
+  await esperar(400);
+  ok(quien === 'compartido', 'el árbitro de verdad (faroArranqueInicio) lo reparte como compartido', 'devolvió ' + quien);
+  ok(d.getElementById('view-redaccion').classList.contains('active') && g('_redEdicion') === 'cuadernos', 'y abre Redacción en 📓 Cuadernos, no La Voz Prestada', 'vista activa: ' + (d.querySelector('.view.active') || {}).id + ' edición=' + g('_redEdicion'));
+  ok(ov.style.display === 'flex' && d.getElementById('rcu-h-url').value === 'https://notebooklm.google.com/notebook/comp-777' && d.getElementById('rcu-h-titulo').value === 'Liberalismo compartido' && d.getElementById('rcu-h-emoji').value === '🎭',
+     'la hoja viene con la dirección, el nombre y el emoji que mandó la otra aplicación', 'url=' + d.getElementById('rcu-h-url').value + ' tit=' + d.getElementById('rcu-h-titulo').value + ' emoji=' + d.getElementById('rcu-h-emoji').value);
+  ok(/comp_url/.test(w.location.search), 'la dirección de la página todavía lleva lo compartido (se limpia al CERRAR, no al leer)', 'ya se limpió: ' + w.location.search);
+  d.getElementById('rcu-h-guardar').click();
+  await esperar(400);
+  ok(!/comp_url/.test(w.location.search) && !/comp_tit/.test(w.location.search), 'al guardar se limpia', 'sigue: ' + w.location.search);
+  ok(g('rcuVivos()').some(c => c.cuaderno === 'comp-777'), 'y el cuaderno compartido está en el inventario', 'no está');
+  w.history.replaceState(null, '', '/index.html?comp_url=' + encodeURIComponent('https://1drv.ms/x/abc'));
+  ok(w.rcuCompartido(w.vozCompartidoLee()) === false, 'un enlace que no es de NotebookLM no se lo queda (sigue a las lecturas)', 'se lo quedó');
+  w.history.replaceState(null, '', '/index.html');
+
+  log('── 15. La cabecera ──');
+  w.eval('redRenderCabecera()');
+  const cab15 = d.querySelector('.red-cabecera-txt').textContent;
+  ok(/8 cuadernos/.test(cab15) && /1 estante/.test(cab15) && /7 en marcha/.test(cab15) && /1 referencia/.test(cab15), 'la cabecera cuenta cuadernos, estantes, en marcha y referencias', 'cabecera: ' + cab15.replace(/\s+/g, ' '));
+
+  termina();
+})().catch(e => { fallos++; log('✘ la sonda reventó: ' + (e && e.stack || e)); termina(); });
+</script>
+</body>
+</html>

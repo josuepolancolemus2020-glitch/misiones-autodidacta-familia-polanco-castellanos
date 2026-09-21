@@ -67,6 +67,14 @@ Zone → Make private.
 
 **4. Sueltos que no bloquean nada pero siguen ahí:**
 
+   · ⚠️ **Correr `supabase/sql/redaccion_cuadernos.sql`** en el SQL Editor (21 de
+     septiembre de 2026). Es la tabla del inventario de cuadernos de NotebookLM
+     de Redacción (el chip 📓 Cuadernos). Va entero, de una vez; depende solo de
+     `es_familia()`, y si faltara lo dice en la primera línea. Hasta que se
+     corra, la herramienta funciona entera con la copia del aparato y lo dice a
+     la vista («📴 Solo en este aparato: falta correr redaccion_cuadernos.sql»);
+     al correrlo, lo fichado sube solo. Se comprueba otro día con
+     `supabase/sql/redaccion_cuadernos_comprueba.sql`, que solo mira.
    · ⚠️ **Correr `supabase/sql/redaccion_redes.sql`** en el SQL Editor (21 de
      septiembre de 2026). Es la tabla de las piezas para redes de Redacción
      (el chip 📣 Redes): Facebook, X, LinkedIn, TikTok y YouTube. Va entero,
