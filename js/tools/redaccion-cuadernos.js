@@ -581,17 +581,38 @@ function rcuCabecera(tituloEl, metaEl) {
 
 /* ── La lista ──────────────────────────────────────────────────────── */
 
+/* El TONO de un estante sale de su clave y es siempre el mismo: la franja
+   del rótulo, el fondo del emoji, la cuenta y el chip van de ese color, y
+   así un estante se reconoce antes de leerlo (es la seña de color de las
+   materias de M.E.T.A.S). Ocho tonos claros, en el CSS; «Sin estante» y lo
+   que no es un estante (una serie, un estado) van en gris. */
+const RCU_TONOS = 8;
+function rcuTono(clave) {
+  const k = rcuClave(clave);
+  if (!k || k === 'sin' || k === 'todo') return 'rcu-tono-x';
+  let h = 0;
+  for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
+  return 'rcu-tono-' + (h % RCU_TONOS);
+}
+
 function rcuRender(list) {
   list.textContent = '';
   if (_rcuNube === 'mirando' && !_rcuInitEnCurso) rcuInit();
 
+  /* La nube es una FRANJA arriba solo cuando hay algo que arreglar (falta
+     el SQL, no hay sesión, no hay señal): ahí tiene que verse. Cuando va
+     bien —o mientras mira— es un renglón discreto al pie: una franja
+     encima de la lista en cada arranque es una noticia que ya se sabe, y
+     cada franja de más empuja la primera ficha una pantalla más abajo,
+     que es la carga que el autor pidió quitar el 22 de septiembre. */
   const nube = rcuRotuloNube();
-  list.appendChild(rcuEl('div', 'rcu-nube ' + (nube.ok ? 'rcu-nube-ok' : 'rcu-nube-no'), `${nube.ic} ${nube.t}`));
+  const grave = !nube.ok && _rcuNube !== 'mirando';
+  const nubeEl = rcuEl('div', 'rcu-nube ' + (grave ? 'rcu-nube-no' : 'rcu-nube-ok'), `${nube.ic} ${nube.t}`);
+  if (grave) list.appendChild(nubeEl);
 
   const vivos = rcuVivos();
-  list.appendChild(rcuBarra(list));
-
   if (!vivos.length) {
+    list.appendChild(rcuBarra(list, null));
     const vacio = rcuEl('div', 'rcu-vacio');
     vacio.appendChild(rcuEl('div', 'rcu-vacio-ic', '📓'));
     const p1 = rcuEl('p'); p1.appendChild(rcuEl('strong', null, 'Todavía no hay cuadernos en el inventario.'));
@@ -599,6 +620,7 @@ function rcuRender(list) {
     vacio.appendChild(rcuEl('p', null, 'Cada cuaderno de NotebookLM entra como una ficha: su dirección, su nombre, en qué estantes lo pones, de qué serie es, en qué va, y la lista de lo que sacaste de él. Se agrupan por estante y se abre el que quieras mirar.'));
     vacio.appendChild(rcuEl('p', null, 'Toca «＋ Cuaderno» y pega la dirección que sale en la barra del navegador; o «📥 Pegar lista» con varios a la vez, un cuaderno por renglón. Y desde el teléfono: Compartir → F.A.R.O.'));
     list.appendChild(vacio);
+    if (!grave) list.appendChild(nubeEl);
     rcuRenderRetirados(list);
     return;
   }
@@ -607,34 +629,25 @@ function rcuRender(list) {
   const grupos = rcuGrupos(filtrados);
   const conMando = grupos.length > 1;
   const buscando = !!rcuClave(_rcuBusca);
+  list.appendChild(rcuBarra(list, { grupos, conMando, buscando }));
 
-  // La nota de encima de la lista: la cuenta y un solo mando
-  const nota = rcuEl('div', 'rcu-nota-lista');
-  const cuenta = rcuEl('span', 'rcu-nota-txt',
-    filtrados.length === vivos.length
-      ? `${vivos.length} cuaderno${vivos.length === 1 ? '' : 's'}${conMando ? ` en ${grupos.length} grupos · toca un grupo para abrirlo` : ''}`
-      : `${filtrados.length} de ${vivos.length}`);
-  nota.appendChild(cuenta);
-  if (conMando && !buscando) {
-    const ab = rcuAnaquel().abiertos;
-    const algunoAbierto = grupos.some(g => ab[g.eje + ':' + g.clave]);
-    nota.appendChild(rcuBtn('rcu-mini-btn', algunoAbierto ? 'Cerrar todos' : 'Abrir todos', () => {
-      grupos.forEach(g => { const k = g.eje + ':' + g.clave; if (algunoAbierto) delete ab[k]; else ab[k] = 1; });
-      rcuGuardaAnaquel();
-      rcuRender(list);
-    }));
+  /* La cuenta solo cuando hay un filtro o una búsqueda puestos: «3 de 9»
+     dice algo. «9 cuadernos» ya lo dice la cabecera de arriba, y escrito
+     tres veces era ruido. */
+  if (filtrados.length !== vivos.length) {
+    list.appendChild(rcuEl('div', 'rcu-nota-lista', `${filtrados.length} de ${vivos.length} cuaderno${vivos.length === 1 ? '' : 's'}`));
   }
-  list.appendChild(nota);
 
   if (!filtrados.length) {
     list.appendChild(rcuEl('div', 'rcu-vacio', 'Ningún cuaderno con eso. Prueba con otra palabra o quita el filtro.'));
+    if (!grave) list.appendChild(nubeEl);
     rcuRenderRetirados(list);
     return;
   }
 
   grupos.forEach(g => {
-    const sec = rcuEl('section', 'rcu-seccion');
     const k = g.eje + ':' + g.clave;
+    const sec = rcuEl('section', 'rcu-seccion ' + (g.eje === 'estante' ? rcuTono(g.clave) : 'rcu-tono-x'));
     const caja = rcuEl('div', 'rcu-grupo');
     /* ⚠️ NADA SE ABRE SOLO; buscando se abre todo y eso no se guarda;
        un solo grupo no lleva mando (La Voz Prestada, regla 40). */
@@ -642,10 +655,11 @@ function rcuRender(list) {
     if (g.rotulo) {
       if (conMando) {
         const cab = rcuBtn('rcu-grupo-btn', '', () => {
-          const ahora = caja.hidden;
+          const ahora = caja.hidden;                 // true: se está abriendo
           caja.hidden = !ahora;
           cab.setAttribute('aria-expanded', ahora ? 'true' : 'false');
           galon.textContent = ahora ? '▾' : '▸';
+          vista.hidden = ahora;
           if (!buscando) {
             if (ahora) rcuAnaquel().abiertos[k] = 1; else delete rcuAnaquel().abiertos[k];
             rcuGuardaAnaquel();
@@ -655,6 +669,16 @@ function rcuRender(list) {
         cab.appendChild(galon);
         cab.appendChild(rcuEl('span', 'rcu-grupo-t', g.rotulo));
         cab.appendChild(rcuEl('span', 'rcu-grupo-n', String(g.items.length)));
+        /* Plegado, el rótulo enseña los emojis de lo que hay dentro: se
+           sabe qué hay en el estante sin abrirlo, y se reconoce por el
+           dibujo antes que por el nombre. Abierto se esconde, porque los
+           emojis ya están en las fichas. */
+        const vista = rcuEl('span', 'rcu-grupo-vista');
+        vista.setAttribute('aria-hidden', 'true');
+        g.items.slice(0, 5).forEach(c => vista.appendChild(rcuEl('span', 'rcu-grupo-vista-e', c.emoji || '📓')));
+        if (g.items.length > 5) vista.appendChild(rcuEl('span', 'rcu-grupo-vista-mas', `+${g.items.length - 5}`));
+        vista.hidden = abierto;
+        cab.appendChild(vista);
         cab.setAttribute('aria-expanded', abierto ? 'true' : 'false');
         sec.appendChild(cab);
       } else {
@@ -665,30 +689,44 @@ function rcuRender(list) {
       }
     }
     caja.hidden = !abierto;
-    g.items.forEach(c => caja.appendChild(rcuFicha(c, list)));
+    g.items.forEach(c => caja.appendChild(rcuFicha(c, list, g)));
     sec.appendChild(caja);
     list.appendChild(sec);
   });
 
+  if (!grave) list.appendChild(nubeEl);
   rcuRenderRetirados(list);
 }
 
-/* Una sola fila de botones que se desliza; debajo, el buscador y los
-   filtros PUESTOS con su equis (y nada más: lo demás vive en una hoja). */
-function rcuBarra(list) {
+/* Una sola fila de botones que se desliza (regla 33 de La Voz Prestada:
+   lo que se toca a diario va delante). Cada botón lleva su icono en una
+   baldosa y su palabra, y el COLOR dice la función: crear va lleno, traer
+   va teñido, mirar va neutro y sacar va ámbar. Debajo, el buscador con el
+   único mando de la lista al lado, y los filtros PUESTOS con su equis (y
+   nada más: lo demás vive en una hoja). */
+function rcuBarra(list, ctx) {
   const caja = rcuEl('div', 'rcu-barra-caja');
   const barra = rcuEl('div', 'rcu-barra');
-  barra.appendChild(rcuBtn('rcu-barra-btn rcu-barra-btn-1', '＋ Cuaderno', () => rcuAbrirHoja(null)));
-  barra.appendChild(rcuBtn('rcu-barra-btn', '📥 Pegar lista', rcuPegarAbrir));
-  barra.appendChild(rcuBtn('rcu-barra-btn', '🗂 Estantes', () => rcuVerAbrir('estantes')));
-  barra.appendChild(rcuBtn('rcu-barra-btn', '⇅ Orden', () => rcuVerAbrir('orden')));
-  barra.appendChild(rcuBtn('rcu-barra-btn', '📋 Exportar', rcuExportar));
+  const boton = (cls, ico, rotulo, alTocar) => {
+    const b = rcuBtn('rcu-barra-btn ' + cls, '', alTocar);
+    b.appendChild(rcuEl('span', 'rcu-barra-ico', ico));
+    b.appendChild(rcuEl('span', 'rcu-barra-txt', rotulo));
+    return b;
+  };
+  barra.appendChild(boton('rcu-barra-crear', '＋', 'Cuaderno', () => rcuAbrirHoja(null)));
+  barra.appendChild(boton('rcu-barra-traer', '📥', 'Pegar lista', rcuPegarAbrir));
+  barra.appendChild(rcuEl('span', 'rcu-barra-sep'));
+  barra.appendChild(boton('rcu-barra-mirar', '🗂', 'Estantes', () => rcuVerAbrir('estantes')));
+  barra.appendChild(boton('rcu-barra-mirar', '⇅', 'Orden', () => rcuVerAbrir('orden')));
+  barra.appendChild(rcuEl('span', 'rcu-barra-sep'));
+  barra.appendChild(boton('rcu-barra-sacar', '📋', 'Exportar', rcuExportar));
   caja.appendChild(barra);
 
   if (rcuVivos().length) {
+    const fila = rcuEl('div', 'rcu-fila-busca');
     const busca = rcuEl('input', 'rcu-busca');
     busca.type = 'search';
-    busca.setAttribute('placeholder', 'Buscar por título, estante, serie, notas o referencia…');
+    busca.setAttribute('placeholder', '🔍 Buscar un cuaderno…');
     busca.value = _rcuBusca;
     busca.id = 'rcu-busca';
     let t = null;
@@ -705,7 +743,20 @@ function rcuBarra(list) {
         }
       }, 180);
     });
-    caja.appendChild(busca);
+    fila.appendChild(busca);
+    /* El único mando de la lista, al lado del buscador: hace falta porque
+       lo abierto se recuerda a propósito, y quien abrió cinco estantes
+       para buscar una cosa se queda con cinco abiertos (regla 40). */
+    if (ctx && ctx.conMando && !ctx.buscando) {
+      const ab = rcuAnaquel().abiertos;
+      const algunoAbierto = ctx.grupos.some(g => ab[g.eje + ':' + g.clave]);
+      fila.appendChild(rcuBtn('rcu-mini-btn', algunoAbierto ? '▴ Cerrar todos' : '▾ Abrir todos', () => {
+        ctx.grupos.forEach(g => { const k = g.eje + ':' + g.clave; if (algunoAbierto) delete ab[k]; else ab[k] = 1; });
+        rcuGuardaAnaquel();
+        rcuRender(list);
+      }));
+    }
+    caja.appendChild(fila);
   }
 
   const f = _rcuFiltro;
@@ -721,31 +772,50 @@ function rcuBarra(list) {
   return caja;
 }
 
-function rcuFicha(c, list) {
-  const ficha = rcuEl('article', 'rcu-ficha');
-  const emoji = rcuEl('div', 'rcu-ficha-emoji', c.emoji || '📓');
-  ficha.appendChild(emoji);
+/* La ficha: VERTICAL y compacta, para que en una cuadrícula no quede
+   ningún hueco entre lo que dice y lo que se puede hacer (en la captura
+   del autor había medio metro). Arriba, el emoji en su baldosa del tono
+   del estante, el número de serie y el título; una sola línea de datos
+   en texto corrido, sin cajitas —y el estado solo si NO está en marcha,
+   que es lo normal y no hace falta decirlo—; los OTROS estantes en que
+   está, porque el estante bajo el que se pinta no se repite dentro; las
+   notas; y al pie los dos botones ROTULADOS, siempre en el mismo sitio:
+   «↗ Abrir» (la consulta, en el color de la herramienta) y «📋 Copiar».
+   Tocar el cuerpo abre la hoja, y el › del rincón lo dice. */
+function rcuFicha(c, list, g) {
+  const f = _rcuFiltro;
+  const enEstante = (g && g.eje === 'estante' && g.clave !== 'sin' && g.clave !== 'todo') ? g.clave
+                  : (f && f.eje === 'estante' && f.clave !== 'sin') ? f.clave : '';
+  const tono = enEstante || (c.estantes || []).map(rcuClave).find(Boolean) || '';
+  const ficha = rcuEl('article', 'rcu-ficha ' + rcuTono(tono));
 
   const main = rcuBtn('rcu-ficha-main', '', () => rcuAbrirHoja(c.id));
-  const tit = rcuEl('div', 'rcu-ficha-t');
+  main.setAttribute('aria-label', 'Ver la ficha de ' + (c.titulo || 'este cuaderno'));
+  const cab = rcuEl('div', 'rcu-ficha-cab');
+  cab.appendChild(rcuEl('span', 'rcu-ficha-emoji', c.emoji || '📓'));
+  const tit = rcuEl('span', 'rcu-ficha-t');
   if (c.serie_n) tit.appendChild(rcuEl('span', 'rcu-serie-n', String(c.serie_n)));
   tit.appendChild(rcuEl('span', 'rcu-ficha-titulo', c.titulo || 'Sin título'));
-  main.appendChild(tit);
+  cab.appendChild(tit);
+  cab.appendChild(rcuEl('span', 'rcu-ficha-flecha', '›'));
+  main.appendChild(cab);
 
   const meta = rcuEl('div', 'rcu-ficha-meta');
   const est = rcuEstado(c.estado);
-  meta.appendChild(rcuEl('span', 'red-badge rcu-est-' + est.id, `${est.ic} ${est.t}`));
-  if (c.serie) meta.appendChild(rcuEl('span', 'red-badge rcu-badge-serie', `🔢 ${c.serie}`));
-  if (c.fuentes) meta.appendChild(rcuEl('span', 'red-badge red-badge-tipo', `${c.fuentes} fuente${c.fuentes === 1 ? '' : 's'}`));
-  if ((c.referencias || []).length) meta.appendChild(rcuEl('span', 'red-badge rcu-badge-ref', `🔖 ${c.referencias.length}`));
-  const hace = rcuEl('span', 'rcu-hace', c.ultima ? `abierto ${rcuHace(c.ultima)}` : 'sin abrir desde aquí');
+  if (est.id !== 'activo') meta.appendChild(rcuEl('span', 'rcu-est rcu-est-' + est.id, `${est.ic} ${est.t}`));
+  if (c.fuentes) meta.appendChild(rcuEl('span', 'rcu-meta-item', `${c.fuentes} fuente${c.fuentes === 1 ? '' : 's'}`));
+  const nref = (c.referencias || []).length;
+  if (nref) meta.appendChild(rcuEl('span', 'rcu-meta-item rcu-meta-ref', `🔖 ${nref} referencia${nref === 1 ? '' : 's'}`));
+  const hace = rcuEl('span', 'rcu-meta-item rcu-hace', c.ultima ? `abierto ${rcuHace(c.ultima)}` : 'sin abrir desde aquí');
   hace.dataset.id = c.id;      // para reescribirlo al abrir sin repintar la lista
   meta.appendChild(hace);
   main.appendChild(meta);
 
-  if ((c.estantes || []).length) {
+  const otros = (c.estantes || []).filter(e => rcuClave(e) && rcuClave(e) !== enEstante);
+  if (otros.length || c.serie) {
     const ests = rcuEl('div', 'rcu-ficha-estantes');
-    c.estantes.forEach(e => ests.appendChild(rcuEl('span', 'rcu-est-mini', e)));
+    otros.forEach(e => ests.appendChild(rcuEl('span', 'rcu-est-mini ' + rcuTono(e), e)));
+    if (c.serie) ests.appendChild(rcuEl('span', 'rcu-serie-mini', `🔢 ${c.serie}`));
     main.appendChild(ests);
   }
   if (c.notas) main.appendChild(rcuEl('div', 'rcu-ficha-notas', c.notas));
@@ -754,14 +824,20 @@ function rcuFicha(c, list) {
   /* ↗ es un enlace de verdad (se puede mantener pulsado para abrir en
      otra pestaña), con noopener, y apunta la consulta al tocarlo. */
   const acc = rcuEl('div', 'rcu-ficha-acc');
-  const a = rcuEnlace(c, '↗');
+  const a = rcuEnlace(c, '');
   a.className = 'rcu-abrir';
   a.setAttribute('aria-label', 'Abrir el cuaderno en NotebookLM');
+  a.appendChild(rcuEl('span', 'rcu-acc-ico', '↗'));
+  a.appendChild(rcuEl('span', null, 'Abrir'));
   acc.appendChild(a);
-  acc.appendChild(rcuBtn('rcu-ficha-btn', '📋', async () => {
+  const copiar = rcuBtn('rcu-ficha-btn', '', async () => {
     const ok = await rcuCopiar(c.url);
     rcuAviso(ok ? '📋 Dirección copiada' : 'No se pudo copiar');
-  }));
+  });
+  copiar.setAttribute('aria-label', 'Copiar la dirección del cuaderno');
+  copiar.appendChild(rcuEl('span', 'rcu-acc-ico', '📋'));
+  copiar.appendChild(rcuEl('span', null, 'Copiar'));
+  acc.appendChild(copiar);
   ficha.appendChild(acc);
   return ficha;
 }

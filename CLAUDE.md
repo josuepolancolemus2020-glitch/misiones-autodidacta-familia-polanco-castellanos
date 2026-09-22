@@ -1279,7 +1279,7 @@ barrer una cuadrícula de tarjetas iguales, y lo que se sacó de cada uno
 —las referencias que acaban en una nota, un video o un ensayo— vive en la
 cabeza de quien lo sacó. Esto es el catálogo que le falta.
 
-**Diez reglas, y ninguna es de adorno:**
+**Once reglas, y ninguna es de adorno:**
 
 1. ⚠️ **ES UN CATÁLOGO, NO UNA COPIA.** Cada cuaderno es una FICHA: su
    dirección, su nombre y su emoji (los mismos con que NotebookLM lo
@@ -1390,6 +1390,61 @@ cabeza de quien lo sacó. Esto es el catálogo que le falta.
     aparatos hoy; el texto lo deja pegado en un chat, un documento o un
     respaldo, sin depender de que Supabase siga en pie.
 
+11. ⚠️ **LA FORMA: CUADRÍCULA, BOTONES CON PALABRA Y UN COLOR POR ESTANTE.**
+    Rehecha el 22 de septiembre de 2026, con la captura del autor en una
+    pantalla ancha delante: «una interfaz muy horrible… esos grandes
+    espacios… sin tanta carga cognitiva, botones con una visualización
+    neurodidáctica». Y tenía razón por cosas que se pueden contar: antes
+    de la primera ficha había SEIS franjas de mandos (cabecera, chips,
+    nube, botones, buscador y nota), la cuenta de cuadernos estaba
+    escrita tres veces, y una ficha de 860 px ponía el texto a la
+    izquierda y dos iconos mudos (↗ 📋) pegados al borde derecho, con
+    medio metro de nada en medio. Lo que manda ahora:
+
+    - ⚠️ **Las fichas van en CUADRÍCULA (`auto-fill`, mínimo 280 px) y
+      son VERTICALES, con los botones al pie.** Una columna en el
+      teléfono, dos en la tableta, tres en el escritorio; y en todas,
+      entre lo que la ficha dice y lo que se puede hacer no queda ningún
+      hueco, porque los botones van debajo del texto y no a un lado. Y
+      `align-items: start`: estiradas a la altura de la más alta de su
+      fila, las cortas quedaban con el mismo hueco, solo que en vertical.
+    - ⚠️ **Los botones LLEVAN SU PALABRA, y el color dice la función.**
+      «↗ Abrir» y «📋 Copiar» en la ficha, en vez de dos iconos; en la
+      barra, cada botón con su icono en una baldosa y su palabra —crear
+      va lleno, traer va teñido, mirar va neutro, sacar va ámbar—. Es lo
+      que el autor llama visualización neurodidáctica y lo que hacen los
+      botones de M.E.T.A.S: se reconoce por el dibujo y el color y se
+      confirma leyendo, sin tener que adivinar qué hace un ↗.
+    - ⚠️ **Cada estante tiene su TONO, sacado de su clave** (`rcuTono`,
+      ocho tonos claros en el CSS; gris para «Sin estante», las series y
+      los estados): la franja del rótulo, el fondo del emoji, la cuenta y
+      el chip van del mismo color, y así un estante se reconoce antes de
+      leerlo. Sale de la clave y no del orden a propósito: si fuera del
+      orden, crear un estante nuevo les cambiaría el color a los demás.
+      Dos estantes pueden compartir tono; se paga a cambio de que ninguno
+      cambie nunca.
+    - **Plegado, el rótulo enseña los emojis de lo que hay dentro**
+      (hasta cinco y «+N»), PEGADOS a la cuenta —al borde derecho, en
+      860 px quedaban a medio metro del nombre—: se sabe qué hay en el
+      estante sin abrirlo. Abierto se esconden, que ya están en las
+      fichas. Y `.rcu-grupo-vista[hidden] { display: none !important }`
+      por lo mismo que la caja del grupo (regla 4): es `inline-flex`.
+    - **Lo que ya está dicho no se repite.** El estante bajo el que se
+      pinta la ficha no sale como chip dentro de ella (sí los OTROS en
+      que está, cada uno con su tono); el estado solo se escribe cuando
+      NO es «en marcha», que es lo normal; la cuenta de cuadernos la dice
+      la cabecera, y la nota de encima de la lista solo aparece con un
+      filtro o una búsqueda («3 de 9»); y los datos de la ficha van en
+      una sola línea de texto corrido, sin cajitas.
+    - **La nube solo es FRANJA cuando hay algo que arreglar** (falta el
+      SQL, no hay sesión, no hay señal). Cuando va bien —o mientras
+      mira— es un renglón discreto al pie de la lista: una franja verde
+      en cada arranque es una noticia que ya se sabe, y cada franja de
+      más empuja la primera ficha una pantalla más abajo.
+    - **Con ratón, lo que se puede tocar lo dice al pasar por encima**,
+      y solo dentro de `@media (hover: hover)`: en una tableta el hover
+      se queda pegado.
+
 **Antes de publicar un cambio de los cuadernos:**
 
 ```
@@ -1409,7 +1464,9 @@ sin `confirm()` y la lápida que viaja; el `42P01` y la subida de lo
 pendiente; y lo compartido, llamando al árbitro de verdad
 (`faroArranqueInicio`) y comprobando que la dirección se limpia al
 guardar y no antes. Los botones **se pulsan**, y la hoja se mide con
-`elementFromPoint`.
+`elementFromPoint`. Y desde el rediseño del 22 de septiembre mira que el
+estante bajo el que se pinta la ficha NO se repita dentro de ella como
+chip, y que sin agrupar por estante el chip sí salga.
 
 Y el SQL, contra un PostgreSQL de verdad, con el servidor de la sesión
 levantado como dice el apartado de La Voz Prestada:

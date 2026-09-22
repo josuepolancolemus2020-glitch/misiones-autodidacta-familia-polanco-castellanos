@@ -4,52 +4,122 @@
    ──────────────────────────────────────────────────────────────────
    Mundo de la APLICACIÓN: tokens --surface, --bg, --border, --text,
    --muted, --faint, --brand. Aquí NO existe --card (CLAUDE.md, «Dos
-   paletas»). Lo que hereda de Redacción (.red-badge, .red-ed-chip,
-   .fin-modal) se usa tal cual. El verde azulado es el color de esta
-   herramienta, para que el chip no se confunda con el morado de Redes.
+   paletas»). Lo que hereda de Redacción (.red-ed-chip, .fin-modal) se
+   usa tal cual. El verde azulado es el color de esta herramienta, para
+   que el chip no se confunda con el morado de Redes.
+
+   ⚠️ REHECHA EL 22 DE SEPTIEMBRE DE 2026, con la captura del autor en
+   una pantalla ancha delante: «una interfaz muy horrible… esos grandes
+   espacios… sin tanta carga cognitiva, botones con una visualización
+   neurodidáctica». Lo que se veía: seis franjas de mandos antes de la
+   primera ficha, la misma cuenta escrita tres veces, y una ficha de
+   860 px con el texto a la izquierda y dos iconos mudos pegados al
+   borde derecho, con un hueco de medio metro en medio. Lo que manda
+   ahora, y por qué, está en CLAUDE.md (regla 11 de los cuadernos):
+   - las fichas van en CUADRÍCULA (auto-fill) y son verticales, con sus
+     botones ROTULADOS al pie: el hueco deja de poder existir;
+   - cada estante tiene su TONO (--rcu-t, --rcu-tf, --rcu-tb), sacado de
+     su clave: la franja del rótulo, el fondo del emoji, la cuenta y el
+     chip van de ese color, así que un estante se reconoce antes de
+     leerlo;
+   - los botones de la barra llevan el icono en su baldosa y la palabra,
+     y el color dice la FUNCIÓN: crear (lleno), traer (teñido), mirar
+     (neutro), sacar (ámbar);
+   - la nube solo es franja cuando hay algo que arreglar.
    ══════════════════════════════════════════════════════════════════ */
+
+/* ── Los tonos de los estantes ──
+   Los pone rcuTono() según la clave del estante, y valen en el rótulo
+   del grupo, en la ficha y en el chip: el mismo estante, el mismo
+   color en los tres sitios. Son claros a propósito: el color es una
+   seña, no un fondo. «Sin estante», las series y los estados van en
+   gris (rcu-tono-x). */
+.rcu-tono-0 { --rcu-t: #0f766e; --rcu-tf: #f0fdfa; --rcu-tb: #99f6e4; }
+.rcu-tono-1 { --rcu-t: #4f46e5; --rcu-tf: #eef2ff; --rcu-tb: #c7d2fe; }
+.rcu-tono-2 { --rcu-t: #be185d; --rcu-tf: #fdf2f8; --rcu-tb: #fbcfe8; }
+.rcu-tono-3 { --rcu-t: #b45309; --rcu-tf: #fffbeb; --rcu-tb: #fde68a; }
+.rcu-tono-4 { --rcu-t: #15803d; --rcu-tf: #f0fdf4; --rcu-tb: #bbf7d0; }
+.rcu-tono-5 { --rcu-t: #0369a1; --rcu-tf: #f0f9ff; --rcu-tb: #bae6fd; }
+.rcu-tono-6 { --rcu-t: #7e22ce; --rcu-tf: #faf5ff; --rcu-tb: #e9d5ff; }
+.rcu-tono-7 { --rcu-t: #c2410c; --rcu-tf: #fff7ed; --rcu-tb: #fed7aa; }
+.rcu-tono-x { --rcu-t: #64748b; --rcu-tf: #f8fafc; --rcu-tb: #e2e8f0; }
 
 /* ── El chip de la fila de ediciones ── */
 .red-ed-chip.rcu-chip { border-color: #99f6e4; color: #0f766e; }
 .red-ed-chip.rcu-chip.red-ed-chip-active { background: #f0fdfa; border-color: #0d9488; color: #115e59; }
 
-/* ── La nube, a la vista ── */
-.rcu-nube { font-size: 11.5px; font-weight: 700; border-radius: 10px; padding: 7px 12px; margin-bottom: 10px; }
-.rcu-nube-ok { background: #f0fdf4; color: #15803d; }
-.rcu-nube-no { background: #fffbeb; color: #b45309; }
+/* ── La nube ──
+   Franja ámbar ARRIBA solo cuando hay algo que arreglar (falta el SQL,
+   no hay sesión, no hay señal). Cuando va bien es un renglón discreto
+   al PIE de la lista: una franja verde en cada arranque es una noticia
+   que ya se sabe y empuja la primera ficha una pantalla más abajo. */
+.rcu-nube { font-size: 12px; font-weight: 700; line-height: 1.4; }
+.rcu-nube-no {
+  background: #fffbeb; color: #b45309; border: 1px solid #fde68a;
+  border-radius: 12px; padding: 9px 12px; margin-bottom: 10px;
+}
+.rcu-nube-ok { color: var(--muted); font-weight: 600; text-align: center; padding: 14px 8px 0; margin-top: 4px; }
 
 /* ── Vacío ── */
-.rcu-vacio { text-align: center; color: var(--muted); font-size: 13.5px; padding: 22px 14px; line-height: 1.55; }
+.rcu-vacio {
+  text-align: center; color: var(--muted); font-size: 13.5px; padding: 26px 16px; line-height: 1.55;
+  background: var(--surface); border: 1.5px dashed var(--border); border-radius: 16px; margin-top: 12px;
+}
 .rcu-vacio-ic { font-size: 40px; margin-bottom: 6px; }
 .rcu-vacio p { margin: 6px 0; }
 
 /* ── La barra: UNA fila que se desliza; los botones primero ──
    Es la regla 33 de La Voz Prestada: lo que se sale por el borde es lo
    último, así que lo que se toca a diario va delante. El degradado del
-   borde dice que hay más. */
-.rcu-barra-caja { margin-bottom: 10px; }
+   borde dice que hay más. Cada botón lleva su icono en una BALDOSA y su
+   palabra: se reconoce por el dibujo y se confirma leyendo, y el color
+   de la baldosa dice para qué es. */
+.rcu-barra-caja { margin-bottom: 12px; }
 .rcu-barra {
-  display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto;
-  padding-bottom: 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; overflow-x: auto;
+  padding: 2px 0 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
   -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
           mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
 }
 .rcu-barra::-webkit-scrollbar { display: none; }
 .rcu-barra-btn {
-  flex-shrink: 0; white-space: nowrap;
-  background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px;
-  padding: 7px 13px; font-size: 12.5px; font-weight: 700; color: var(--text);
-  font-family: inherit; cursor: pointer; min-height: 38px;
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px;
+  padding: 5px 14px 5px 6px; min-height: 42px; font-size: 13px; font-weight: 800; color: var(--text);
+  font-family: inherit; cursor: pointer; transition: transform .12s, box-shadow .15s;
 }
 .rcu-barra-btn:active { transform: scale(.96); }
-.rcu-barra-btn-1 { background: #0f766e; border-color: #0f766e; color: #fff; }
+.rcu-barra-ico {
+  width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+  background: var(--bg);
+}
+/* Crear: lleno, es el que más se toca */
+.rcu-barra-crear { background: #0f766e; border-color: #0f766e; color: #fff; box-shadow: 0 4px 12px rgba(15,118,110,.25); }
+.rcu-barra-crear .rcu-barra-ico { background: rgba(255,255,255,.22); color: #fff; font-size: 18px; font-weight: 900; }
+/* Traer: teñido del color de la herramienta */
+.rcu-barra-traer { background: #f0fdfa; border-color: #99f6e4; color: #115e59; }
+.rcu-barra-traer .rcu-barra-ico { background: #ccfbf1; }
+/* Mirar de otra forma: neutro */
+.rcu-barra-mirar .rcu-barra-ico { background: #eef2ff; }
+/* Sacar de aquí: ámbar */
+.rcu-barra-sacar .rcu-barra-ico { background: #fffbeb; }
+.rcu-barra-sep { width: 1px; align-self: stretch; margin: 8px 2px; background: var(--border); flex-shrink: 0; }
 
+/* El buscador con el único mando de la lista al lado */
+.rcu-fila-busca { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
 .rcu-busca {
-  display: block; width: 100%; box-sizing: border-box; margin-top: 6px;
-  background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px;
+  flex: 1; min-width: 0; box-sizing: border-box;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
   padding: 9px 12px; font-size: 15px; font-family: inherit; color: var(--text); min-height: 42px;
 }
-.rcu-busca:focus { outline: none; border-color: #0d9488; }
+.rcu-busca:focus { outline: none; border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
+.rcu-mini-btn {
+  flex-shrink: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 0 12px; font-size: 12.5px; font-weight: 700; color: var(--muted);
+  font-family: inherit; cursor: pointer; white-space: nowrap; min-height: 42px;
+}
+.rcu-mini-btn:active { transform: scale(.96); }
 
 /* Los filtros PUESTOS, con su equis; la fila entera se va cuando no hay ninguno */
 .rcu-puestos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
@@ -61,92 +131,129 @@
 }
 .rcu-puesto-x { font-size: 13px; opacity: .8; }
 
-/* La nota de encima de la lista: la cuenta y un solo mando */
-.rcu-nota-lista {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  font-size: 12px; color: var(--muted); margin: 4px 0 10px;
-}
-.rcu-mini-btn {
-  background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px;
-  padding: 6px 10px; font-size: 12px; font-weight: 700; color: var(--text);
-  font-family: inherit; cursor: pointer; white-space: nowrap; min-height: 32px;
-}
-.rcu-mini-btn:active { transform: scale(.96); }
+/* La cuenta, solo cuando hay filtro o búsqueda («3 de 9»): sin ellos ya
+   la dice la cabecera de arriba, y escrita tres veces era ruido. */
+.rcu-nota-lista { font-size: 12px; color: var(--muted); margin: -2px 2px 8px; }
 
 /* ── Los grupos, plegables ──
    ⚠️ `.rcu-grupo[hidden] { display: none }` es lo que hace que el
    plegado exista: el [hidden] del navegador vive en la hoja más débil
    y pierde contra cualquier display de la nuestra (La Voz Prestada,
-   regla 40). Sin esta regla el mando responde y no hace nada. */
-.rcu-seccion { margin-bottom: 12px; }
+   regla 40). Sin esta regla el mando responde y no hace nada. Lo mismo
+   vale para la vista de emojis del rótulo, que es inline-flex. */
+.rcu-seccion { margin-bottom: 10px; }
 .rcu-grupo-btn {
   width: 100%; display: flex; align-items: center; gap: 10px; text-align: left;
-  background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px;
-  padding: 10px 12px; font-family: inherit; color: var(--text); cursor: pointer;
-  min-height: 44px; margin-bottom: 8px;
+  background: var(--surface); border: 1px solid var(--border); border-left: 5px solid var(--rcu-t);
+  border-radius: 12px; padding: 8px 12px 8px 10px; font-family: inherit; color: var(--text); cursor: pointer;
+  min-height: 46px; margin-bottom: 8px; transition: background .15s, transform .12s;
 }
-.rcu-grupo-btn:active { transform: scale(.985); }
-.rcu-grupo-btn[aria-expanded="true"] { border-color: #99f6e4; background: #f0fdfa; }
-.rcu-galon { width: 14px; text-align: center; color: var(--muted); font-size: 14px; }
-.rcu-grupo-t { flex: 1; min-width: 0; font-size: 14px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rcu-grupo-n { font-size: 12px; font-weight: 800; color: #0f766e; background: #ccfbf1; border-radius: 10px; padding: 2px 8px; }
-.rcu-grupo-rotulo { display: flex; align-items: center; gap: 10px; padding: 6px 2px 8px; }
-.rcu-grupo-rotulo .rcu-grupo-t { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; }
-.rcu-grupo { display: flex; flex-direction: column; gap: 8px; }
+.rcu-grupo-btn:active { transform: scale(.99); }
+.rcu-grupo-btn[aria-expanded="true"] { background: var(--rcu-tf); border-color: var(--rcu-tb); border-left-color: var(--rcu-t); }
+.rcu-galon { width: 14px; text-align: center; color: var(--rcu-t); font-size: 13px; flex-shrink: 0; }
+.rcu-grupo-t { flex: 0 1 auto; min-width: 0; font-size: 15px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rcu-grupo-n {
+  flex-shrink: 0; font-size: 12px; font-weight: 800; color: var(--rcu-t); background: var(--rcu-tf);
+  border: 1px solid var(--rcu-tb); border-radius: 10px; padding: 1px 8px; min-width: 14px; text-align: center;
+}
+/* Plegado, el rótulo enseña los emojis de lo que hay dentro, PEGADOS a
+   la cuenta: en 860 px de ancho, puestos al borde derecho quedaban a
+   medio metro del nombre y el ojo no los juntaba con él. */
+.rcu-grupo-vista { margin-left: 2px; display: inline-flex; align-items: center; gap: 3px; flex-shrink: 0; font-size: 15px; line-height: 1; opacity: .9; }
+.rcu-grupo-vista[hidden] { display: none !important; }
+.rcu-grupo-vista-mas { font-size: 11px; font-weight: 800; color: var(--muted); margin-left: 2px; }
+.rcu-grupo-rotulo { display: flex; align-items: center; gap: 8px; padding: 4px 2px 8px; }
+.rcu-grupo-rotulo .rcu-grupo-t { font-size: 12.5px; color: var(--rcu-t); text-transform: uppercase; letter-spacing: .4px; }
+.rcu-grupo-rotulo .rcu-grupo-n { font-size: 11px; }
+
+/* La CUADRÍCULA: fichas de 280 px como mínimo, las que quepan. En un
+   teléfono es una columna; en una tableta, dos; en el escritorio, tres.
+   Y en todas la ficha es vertical con los botones al pie, así que no hay
+   ningún hueco entre lo que dice y lo que se puede hacer. */
+.rcu-grupo {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 10px; padding: 0 0 6px;
+  /* ⚠️ align-items: start, no stretch. Estiradas a la altura de la más
+     alta de su fila, las fichas cortas quedaban con un hueco vacío entre
+     las notas y los botones: el mismo hueco que este rediseño vino a
+     quitar, solo que en vertical. Que los pies no queden alineados es un
+     precio que se paga con gusto. */
+  align-items: start;
+}
 .rcu-grupo[hidden] { display: none !important; }
 
 /* ── La ficha de un cuaderno ── */
 .rcu-ficha {
-  display: flex; align-items: stretch; gap: 10px;
-  background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px;
-  padding: 10px 10px 10px 12px;
-}
-.rcu-ficha-emoji {
-  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; background: #f0fdfa; border: 1px solid #ccfbf1;
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 12px 12px 10px; box-shadow: 0 1px 2px rgba(15,23,42,.04);
+  transition: box-shadow .15s, border-color .15s;
 }
 .rcu-ficha-main {
-  flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 0;
+  flex: 1; display: flex; flex-direction: column; min-width: 0; text-align: left;
+  background: none; border: 0; padding: 0; border-radius: 10px;
   font-family: inherit; color: var(--text); cursor: pointer;
 }
-.rcu-ficha-t { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+.rcu-ficha-cab { display: flex; align-items: flex-start; gap: 10px; }
+.rcu-ficha-emoji {
+  width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; background: var(--rcu-tf); border: 1px solid var(--rcu-tb);
+}
+.rcu-ficha-t { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; padding-top: 3px; }
 .rcu-serie-n {
-  flex-shrink: 0; font-size: 11.5px; font-weight: 800; color: #0f766e;
-  background: #ccfbf1; border-radius: 6px; padding: 1px 6px; font-variant-numeric: tabular-nums;
+  flex-shrink: 0; font-size: 11.5px; font-weight: 800; color: var(--rcu-t);
+  background: var(--rcu-tf); border: 1px solid var(--rcu-tb); border-radius: 6px; padding: 0 6px;
+  font-variant-numeric: tabular-nums;
 }
-.rcu-ficha-titulo { font-size: 14.5px; font-weight: 800; line-height: 1.3; }
-.rcu-ficha-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
-.rcu-est-activo    { background: #f0fdf4; color: #15803d; }
-.rcu-est-pausado   { background: #fffbeb; color: #b45309; }
-.rcu-est-terminado { background: #eff6ff; color: #1d4ed8; }
-.rcu-badge-serie { background: #f0fdfa; color: #0f766e; }
-.rcu-badge-ref   { background: #fdf2f8; color: #be185d; }
-.rcu-hace { font-size: 11.5px; color: var(--muted); }
-.rcu-ficha-estantes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-.rcu-est-mini {
-  font-size: 11px; font-weight: 700; color: #115e59; background: #f0fdfa;
-  border: 1px solid #99f6e4; border-radius: 8px; padding: 2px 7px;
+.rcu-ficha-titulo { font-size: 14.5px; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; }
+.rcu-ficha-flecha { flex-shrink: 0; color: var(--faint); font-size: 20px; line-height: 1; padding-top: 8px; }
+/* Una sola línea de datos, en texto corrido y sin cajitas */
+.rcu-ficha-meta { display: flex; flex-wrap: wrap; align-items: center; margin-top: 8px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.rcu-ficha-meta > span + span::before { content: '·'; margin: 0 6px; color: var(--faint); }
+.rcu-est-pausado   { color: #b45309; font-weight: 700; }
+.rcu-est-terminado { color: #1d4ed8; font-weight: 700; }
+.rcu-meta-ref { color: #be185d; font-weight: 700; }
+.rcu-ficha-estantes { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.rcu-est-mini, .rcu-serie-mini {
+  font-size: 11px; font-weight: 700; color: var(--rcu-t); background: var(--rcu-tf);
+  border: 1px solid var(--rcu-tb); border-radius: 8px; padding: 2px 8px;
 }
+.rcu-serie-mini { --rcu-t: #475569; --rcu-tf: #f8fafc; --rcu-tb: #e2e8f0; }
 .rcu-ficha-notas {
-  margin-top: 6px; font-size: 12.5px; color: var(--muted); line-height: 1.4;
+  margin-top: 8px; font-size: 12.5px; color: var(--muted); line-height: 1.45;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   white-space: pre-line;
 }
-.rcu-ficha-acc { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; justify-content: flex-start; }
+/* Al pie, los dos botones ROTULADOS, siempre en el mismo sitio */
+.rcu-ficha-acc { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--bg); }
 .rcu-abrir, .rcu-ficha-btn {
-  width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-  text-decoration: none; font-size: 16px; font-family: inherit; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 40px; padding: 0 12px; border-radius: 11px; text-decoration: none;
+  font-size: 13px; font-weight: 800; font-family: inherit; cursor: pointer;
   background: var(--surface); border: 1.5px solid var(--border); color: var(--text);
 }
-.rcu-abrir { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 800; }
-.rcu-abrir:active, .rcu-ficha-btn:active { transform: scale(.94); }
+.rcu-abrir { flex: 1; background: #0f766e; border-color: #0f766e; color: #fff; }
+.rcu-acc-ico { font-size: 14px; }
+.rcu-abrir:active, .rcu-ficha-btn:active { transform: scale(.96); }
+
+/* Con ratón (la captura del autor era de escritorio): lo que se puede
+   tocar lo dice al pasar por encima. Solo donde hay hover de verdad,
+   que en una tableta se queda pegado. */
+@media (hover: hover) {
+  .rcu-ficha:hover { box-shadow: var(--shadow-md); border-color: var(--rcu-tb); }
+  .rcu-ficha-main:hover .rcu-ficha-titulo { color: var(--rcu-t); }
+  .rcu-grupo-btn:hover { background: var(--rcu-tf); }
+  .rcu-barra-btn:hover, .rcu-mini-btn:hover, .rcu-ficha-btn:hover { box-shadow: var(--shadow); }
+  .rcu-abrir:hover { background: #115e59; }
+}
 
 /* ── Retirados ── */
 .rcu-retirados { margin-top: 14px; font-size: 12.5px; color: var(--muted); }
 .rcu-retirados summary { cursor: pointer; font-weight: 700; padding: 8px 0; min-height: 34px; }
 .rcu-retirado { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
 .rcu-retirado-t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rcu-retirados .rcu-mini-btn { min-height: 36px; }
 
 /* ── La hoja del cuaderno ── */
 .rcu-h-fila { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
