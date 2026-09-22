@@ -67,6 +67,14 @@ Zone → Make private.
 
 **4. Sueltos que no bloquean nada pero siguen ahí:**
 
+   · ⏸ **`supabase/sql/consigna.sql`, PERO TODAVÍA NO.** Es la tabla de 📜 La
+     Consigna (las indicaciones que se le dan a las máquinas), pedida el 22 de
+     septiembre de 2026. El archivo está escrito y **probado contra un
+     PostgreSQL de verdad**, pero la herramienta que lo usa está a medio
+     construir, así que correrlo hoy solo dejaría una tabla vacía esperando.
+     Va cuando La Consigna esté terminada, y entonces el SQL se pega en el
+     chat como siempre. Lo que falta para terminarla está en
+     `PLAN-LA-CONSIGNA.md`.
    · ⚠️ **Correr `supabase/sql/redaccion_cuadernos.sql`** en el SQL Editor (21 de
      septiembre de 2026). Es la tabla del inventario de cuadernos de NotebookLM
      de Redacción (el chip 📓 Cuadernos). Va entero, de una vez; depende solo de

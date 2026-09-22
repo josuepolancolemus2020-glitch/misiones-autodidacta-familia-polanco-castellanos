@@ -12,6 +12,11 @@ Lo largo está en otros documentos y aquí solo se apunta dónde:
 - **`COMPENDIO-RUTA-LEY.md`** — las doce misiones de la Ruta de la Ley y sus
   Grietas, ninguna construida todavía, y **la regla de que en esa ruta no se
   cita ningún artículo de memoria**.
+- **`PLAN-LA-CONSIGNA.md`** — 📜 La Consigna, pedida el 22 de septiembre de
+  2026 y **a medio construir**: el diseño entero (clases, moldes, bloques,
+  frases hechas y las salidas escritas una por una), qué está hecho y
+  comprobado, y **lo que falta, en orden**. Su SQL ya está probado; su
+  JavaScript está a medias y **no se cablea hasta que esté entero**.
 
 ## Normativa: el SQL de Supabase se pega en el chat, SIEMPRE
 
