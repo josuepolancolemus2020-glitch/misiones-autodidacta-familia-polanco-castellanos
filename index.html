@@ -2091,6 +2091,14 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
       <div class="rrd-e-retirar" id="rrd-e-retirar"></div>
 
     </div>
+
+    <!-- ✍️ La caja de corregir el trozo remarcado en la vista previa.
+         Sale pegada al trozo que se acaba de seleccionar en «Lo que se
+         pega en …» y escribe de vuelta en el campo del que ese trozo
+         sale de verdad. Va FUERA de .view-scroll porque se coloca con
+         position:fixed contra la ventana, y su contenido se arma con
+         createElement (js/tools/redaccion-redes.js). -->
+    <div class="rrd-vista-caja" id="rrd-vista-caja" style="display:none;"></div>
   </div>
 
   <!-- ========== ANTENA 📡 (gestión de redes sociales) ========== -->

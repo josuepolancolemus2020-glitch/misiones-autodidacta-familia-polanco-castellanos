@@ -565,6 +565,235 @@ function termina() {
   ok(/símbolos, no letras/.test(hNeg ? hNeg.regla.titulo : ''), 'y su tarjeta se titula por lo que es', 'título: ' + (hNeg && hNeg.regla.titulo));
   w.eval('corCerrar(); corDespintar()');
 
+  /* ════════════════════════════════════════════════════════════════
+     17. ✍️ REMARCAR Y CORREGIR DESDE LA VISTA PREVIA
+     ════════════════════════════════════════════════════════════════
+     Ordenada por gravedad, y lo primero es lo único que de verdad
+     hace daño: que la caja escriba EN OTRO SITIO. La vista previa no
+     es el texto —lleva pegados el enlace, el bloque de fuentes y la
+     numeración del hilo—, así que el trozo hay que localizarlo; y un
+     trozo que aparece dos veces, sin un sitio exacto que comprobar,
+     NO se adivina (la regla del reanclaje de La Voz Prestada). Se
+     comprobó al revés, dejando que eligiera la primera aparición:
+     la sonda suspende diciendo que cambió la que no era.
+
+     Y se selecciona con EVENTOS DE PUNTERO de verdad y se mide la
+     caja con elementFromPoint: lo que puede fallar aquí es de
+     pantalla —una caja que sale fuera del borde, un `<pre>` que no
+     deja seleccionar, una caja que se cierra a sí misma al darle el
+     foco a su propio campo— y nada de eso se ve llamando funciones. */
+  log('── 17. ✍️ Remarcar y corregir desde la vista previa ──');
+
+  const pvis = w.rrdNueva('facebook', 'post', {
+    texto: 'Reflexión sobre los extranjerismos\n\nObservo que el idioma se mezcla con el ingles. Otra frase que se suele utilizar es trendt por reto.',
+    fuentes: [{ ref: 'Bueno, G. (1972). Ensayos materialistes. Taurus.' }] });
+  w.rrdAbrir(pvis.id);
+  await esperar(900);
+
+  const preV = d.querySelector('#rrd-e-salida .rrd-vista');
+  ok(!!preV, 'la vista previa se puede remarcar (lleva .rrd-vista)', 'la caja «Lo que se pega» no es remarcable');
+  ok(preV && preV.childNodes.length === 1 && preV.firstChild.nodeType === 3,
+     'y es UN solo nodo de texto: el desplazamiento de la selección es el del texto',
+     'la vista tiene ' + (preV ? preV.childNodes.length : 0) + ' nodos');
+  ok(!!d.querySelector('#rrd-e-salida .rrd-vista-pista'),
+     'y se explica con palabras encima, como el arrastre de la repisa', 'no hay ninguna nota que lo explique');
+
+  /* Seleccionar un trozo de la vista con el ratón, como se hace. */
+  const cajaV = d.getElementById('rrd-vista-caja');
+  const traer = t => {
+    const pre = d.querySelector('#rrd-e-salida .rrd-vista') || d.querySelector('#rrd-e-partes .rrd-vista');
+    const i = pre.textContent.indexOf(t);
+    if (i < 0) return null;
+    const r = d.createRange();
+    r.setStart(pre.firstChild, i); r.setEnd(pre.firstChild, i + t.length);
+    const sc = d.querySelector('#view-redaccion-pieza .view-scroll');
+    sc.scrollTop += r.getBoundingClientRect().top - 120;
+    return { pre, r: d.createRange(), i, t };
+  };
+  const arrastrar = t => {
+    const pre = d.querySelector('#rrd-e-salida .rrd-vista') || d.querySelector('#rrd-e-partes .rrd-vista');
+    const i = pre.textContent.indexOf(t);
+    const r = d.createRange();
+    r.setStart(pre.firstChild, i); r.setEnd(pre.firstChild, i + t.length);
+    const caja = r.getBoundingClientRect();
+    const y = caja.top + caja.height / 2;
+    const ev = (tipo, x) => pre.dispatchEvent(new w.PointerEvent(tipo, {
+      bubbles: true, cancelable: true, clientX: x, clientY: y, pointerType: 'mouse', button: 0, buttons: 1 }));
+    ev('pointerdown', caja.left + 1);
+    const sel = w.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    ev('pointermove', caja.right - 1);
+    ev('pointerup', caja.right - 1);
+    w.document.dispatchEvent(new w.PointerEvent('pointerup', { bubbles: true, pointerType: 'mouse' }));
+  };
+
+  traer('trendt'); arrastrar('trendt');
+  await esperar(250);
+  ok(cajaV.style.display === 'block', 'al soltar el ratón sale la caja de corregir', 'la caja no salió');
+  ok(/Corregir en el texto/.test(texto('rrd-vista-t') || cajaV.textContent),
+     'y dice en qué campo va a escribir', 'la caja dice: ' + cajaV.textContent.slice(0, 60));
+  const campoV = cajaV.querySelector('.rrd-vista-campo');
+  ok(campoV && campoV.value === 'trendt', 'con el trozo seleccionado dentro', 'el campo dice: ' + (campoV && campoV.value));
+  ok(!w.CSS || !w.CSS.highlights || !!w.CSS.highlights.get('rrd-marca'),
+     'el trozo queda REMARCADO (sin eso, al escribir en la caja se pierde de vista)', 'no se remarcó');
+  const rc = cajaV.getBoundingClientRect();
+  ok(rc.left >= 0 && rc.right <= w.innerWidth + 1 && rc.top >= 0 && rc.bottom <= w.innerHeight + 1,
+     'y sale entera dentro de la pantalla', `la caja se sale: ${Math.round(rc.left)}..${Math.round(rc.right)} de ${w.innerWidth}`);
+  ok(d.elementFromPoint(rc.left + rc.width / 2, rc.top + 6) &&
+     cajaV.contains(d.elementFromPoint(rc.left + rc.width / 2, rc.top + 6)),
+     'y es ella la que recibe el dedo, no lo que hay debajo', 'algo tapa la caja de corregir');
+
+  campoV.value = 'trend';
+  cajaV.querySelector('.rrd-vista-ok').click();
+  await esperar(400);
+  ok(w.rrdPieza(pvis.id).texto.includes('es trend por') && !w.rrdPieza(pvis.id).texto.includes('trendt'),
+     'cambiarlo escribe en el TEXTO de la pieza', 'la pieza dice: ' + w.rrdPieza(pvis.id).texto.slice(-60));
+  ok(d.getElementById('rrd-e-texto').value === w.rrdPieza(pvis.id).texto, 'y el recuadro de escribir va al día', 'el recuadro se quedó viejo');
+  ok(texto('rrd-e-salida').includes('es trend por'), 'y la vista previa también', 'la vista no se enteró');
+  ok(cajaV.style.display === 'none', 'la caja se cierra sola al cambiar', 'la caja se quedó abierta');
+
+  /* Un trozo que sale de una FUENTE se corrige en su fuente, no en el texto */
+  traer('materialistes'); arrastrar('materialistes');
+  await esperar(250);
+  ok(/la fuente \[1\]/.test(cajaV.textContent), 'un trozo del bloque «📚 Fuentes» se corrige EN SU FUENTE',
+     'dice: ' + cajaV.textContent.slice(0, 70));
+  cajaV.querySelector('.rrd-vista-campo').value = 'materialistas';
+  cajaV.querySelector('.rrd-vista-ok').click();
+  await esperar(400);
+  ok(w.rrdPieza(pvis.id).fuentes[0].ref.includes('materialistas'), 'y escribe en la fuente', 'la fuente dice: ' + w.rrdPieza(pvis.id).fuentes[0].ref);
+  ok(!w.rrdPieza(pvis.id).texto.includes('materialistas'), 'sin tocar el texto', 'escribió también en el texto');
+
+  /* Lo que escribe la herramienta no se corrige, y se DICE por qué */
+  traer('Fuentes'); arrastrar('Fuentes');
+  await esperar(250);
+  ok(!cajaV.querySelector('.rrd-vista-campo') && /no sale de lo que escribiste/.test(cajaV.textContent),
+     'el rótulo «📚 Fuentes» no se corrige, y la caja explica por qué', 'la caja dice: ' + cajaV.textContent.slice(0, 80));
+
+  /* ⚠️ Lo que de verdad importa: un trozo repetido sin sitio exacto NO
+     se adivina. Con el desplazamiento de la vista principal sí se sabe
+     cuál es —y se comprueba carácter por carácter—; sin él, se niega. */
+  const pr = w.rrdNueva('facebook', 'post', { texto: 'La palabra contexto se usa mucho. Y otra vez la palabra contexto aquí.' });
+  w.rrdAbrir(pr.id);
+  await esperar(800);
+  const dosVeces = (() => {
+    const pre = d.querySelector('#rrd-e-salida .rrd-vista');
+    const t = pre.textContent;
+    const seg = t.indexOf('palabra contexto', t.indexOf('palabra contexto') + 1);
+    const r = d.createRange();
+    r.setStart(pre.firstChild, seg); r.setEnd(pre.firstChild, seg + 16);
+    const sel = w.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    return { esperado: seg, donde: w.rrdVistaDonde(w.rrdVistaSeleccion()) };
+  })();
+  ok(dosVeces.donde.campo === 'texto' && dosVeces.donde.ini === dosVeces.esperado,
+     'con dos apariciones iguales, se corrige LA QUE SE SELECCIONÓ (el desplazamiento manda, comprobado)',
+     'iba a cambiar la de la posición ' + dosVeces.donde.ini + ' en vez de la ' + dosVeces.esperado);
+  const sinSitio = (() => {
+    const v = w.rrdVistaSeleccion();
+    v.ini = -1; v.cual = 'aparte';        // como una parte del hilo que no se pudo situar
+    return w.rrdVistaDonde(v);
+  })();
+  ok(!!sinSitio.error && /más de una vez/.test(sinSitio.error),
+     'y sin un sitio exacto que comprobar, NO se adivina: se dice y no se toca nada',
+     'adivinó y se puso a cambiar ' + JSON.stringify(sinSitio));
+
+  /* En un hilo de X la vista previa son las partes, y también se corrigen */
+  const ph = w.rrdNueva('x', 'hilo', { texto: Array.from({ length: 6 }, (_, i) =>
+    `Esta es la frase numero ${i + 1} del hilo, que cuenta una cosa con detalle para ocupar sitio y obligar a repartir. Aqui va la segunda oracion, con su punto.`).join(' ') });
+  w.rrdAbrir(ph.id);
+  await esperar(300);
+  w.rrdPartirAhora();
+  await hasta(() => d.querySelectorAll('#rrd-e-partes .rrd-vista').length >= 3, 4000);
+  const presH = d.querySelectorAll('#rrd-e-partes .rrd-vista');
+  ok(presH.length >= 3, `las ${presH.length} partes del hilo también se remarcan`, 'las partes no son remarcables');
+  ok(!!d.querySelector('#rrd-e-partes .rrd-vista-pista'), 'y llevan su nota encima', 'las partes no lo explican');
+  const enParte = (() => {
+    const pre = presH[1];
+    const i = pre.textContent.indexOf('detalle');
+    const r = d.createRange();
+    r.setStart(pre.firstChild, i); r.setEnd(pre.firstChild, i + 7);
+    const sel = w.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    return w.rrdVistaDonde(w.rrdVistaSeleccion());
+  })();
+  ok(enParte.campo === 'texto' && !enParte.error,
+     'y una palabra repetida en SEIS partes se sitúa igual, por el sitio de su parte en el texto',
+     'en la parte 2 dijo: ' + JSON.stringify(enParte));
+  const antesDeParte = w.rrdPieza(ph.id).texto;
+  w.rrdVistaAbrir(w.rrdVistaSeleccion());
+  await esperar(150);
+  cajaV.querySelector('.rrd-vista-campo').value = 'DETALLE';
+  cajaV.querySelector('.rrd-vista-ok').click();
+  await esperar(500);
+  const trasParte = w.rrdPieza(ph.id).texto;
+  ok(trasParte.split('DETALLE').length === 2 && trasParte.indexOf('DETALLE') === enParte.ini,
+     'corregir desde la parte 2 cambia SOLO esa, y en su sitio',
+     'cambió ' + (trasParte.split('DETALLE').length - 1) + ' sitios, el primero en ' + trasParte.indexOf('DETALLE') + ' (se esperaba ' + enParte.ini + ')');
+
+  /* Mientras se mueve la selección la caja NO está: en una tableta cada
+     pausa la plantaría encima del párrafo que hay que leer. */
+  w.eval('rrdVistaCerrar()');
+  // Se vuelve a pedir: corregir rehízo la vista previa y los `<pre>` de
+  // antes ya no cuelgan del documento (seleccionar en un nodo suelto no
+  // selecciona nada, y la sonda estaría midiendo su propio despiste).
+  const preH = d.querySelectorAll('#rrd-e-partes .rrd-vista')[0];
+  const mueve = n => {
+    const r = d.createRange();
+    r.setStart(preH.firstChild, n); r.setEnd(preH.firstChild, n + 10);
+    const sel = w.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  };
+  mueve(5);
+  await esperar(600);
+  ok(!!w.rrdVistaSeleccion(), 'la selección sigue puesta: la vista previa no se rehace sola y se la lleva',
+     'la vista previa se rehizo y se llevó por delante el trozo seleccionado');
+  ok(cajaV.style.display === 'none', 'con el dedo, a los 600 ms la caja todavía NO está (se está seleccionando)', 'la caja salió encima del párrafo mientras se selecciona');
+  /* ⚠️ El número se pide con eval, NUNCA como w.RRD_SEL_ESPERA: un
+     `const` de arriba del archivo no cuelga de window, así que eso daba
+     undefined, esperar(NaN) esperaba CERO y la sonda suspendía diciendo
+     que la caja no salía nunca cuando salía perfectamente. */
+  const espera = g('RRD_SEL_ESPERA');
+  await esperar(espera - 600 + 500);
+  ok(cajaV.style.display === 'block', `pasados los ${espera / 1000} s quieta, sale`,
+     'la caja no salió nunca · selección=' + JSON.stringify(String(w.getSelection())) +
+     ' · la ve la herramienta=' + !!w.rrdVistaSeleccion());
+  mueve(30);
+  await esperar(150);
+  ok(cajaV.style.display === 'none', 'y mover la selección la cierra al instante', 'la caja se quedó puesta al mover la selección');
+  w.eval('rrdVistaCerrar()');
+
+  /* ⚠️ Y escribir en el recuadro NO puede mover la pantalla. Medir el
+     alto poniéndolo en `auto` encogía el recuadro de golpe, todo lo de
+     abajo subía, el navegador reanclaba y la pantalla se iba sola a la
+     vista previa. Se mide en píxeles, que esto no se ve leyendo el
+     código. */
+  log('── 17-bis. Escribir no mueve la pantalla ──');
+  const plar = w.rrdNueva('facebook', 'post', { texto: Array.from({ length: 8 }, (_, i) =>
+    'Observo como el idioma se mezcla con el ingles, y palabras como skill, promt o facto son ya anglicismos cotidianos de las redes sociales. Parrafo ' + (i + 1) + '.').join('\n\n') });
+  w.rrdAbrir(plar.id);
+  await esperar(800);
+  const scL = d.querySelector('#view-redaccion-pieza .view-scroll');
+  const taL = d.getElementById('rrd-e-texto');
+  const medio = Math.floor(taL.value.length / 2);
+  taL.focus(); taL.setSelectionRange(medio, medio);
+  await esperar(200);
+  const y0 = scL.scrollTop;
+  for (const c of 'Y esta frase se escribe de seguido, como se escribe de verdad.') {
+    taL.setRangeText(c, taL.selectionStart, taL.selectionStart, 'end');
+    taL.dispatchEvent(new w.Event('input', { bubbles: true }));
+  }
+  const y1 = scL.scrollTop;
+  await esperar(1200);
+  const y2 = scL.scrollTop;
+  ok(Math.abs(y1 - y0) <= 2 && Math.abs(y2 - y0) <= 2,
+     'escribiendo seguido con el cursor a la vista, la pantalla no se mueve ni un píxel',
+     `la pantalla se fue sola: ${y0} → ${y1} → ${y2} (salto de ${y2 - y0} px)`);
+  for (let i = 0; i < 30; i++) {
+    taL.setRangeText('', taL.selectionStart - 1, taL.selectionStart, 'end');
+    taL.dispatchEvent(new w.Event('input', { bubbles: true }));
+  }
+  await esperar(1200);
+  ok(Math.abs(scL.scrollTop - y0) <= 2, 'y borrando tampoco —que es cuando sí hay que volver a medir el alto—',
+     `borrando se fue a ${scL.scrollTop} desde ${y0}`);
+  ok(taL.scrollHeight <= taL.clientHeight + 6, 'y el recuadro sigue midiendo lo que ocupa su texto',
+     `el recuadro mide ${taL.clientHeight} y su texto ${taL.scrollHeight}`);
+
   termina();
 })().catch(e => { fallos++; log('✘ la sonda reventó: ' + (e && e.stack || e)); termina(); });
 </script>
