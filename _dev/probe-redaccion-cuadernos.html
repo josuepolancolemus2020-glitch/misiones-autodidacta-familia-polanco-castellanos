@@ -208,8 +208,17 @@ function termina() {
      'serie, número («1,2» se entiende como 1.2), estado, fuentes y estante', 'guardó ' + JSON.stringify({ s: c1g.serie, n: c1g.serie_n, e: c1g.estado, f: c1g.fuentes, es: c1g.estantes }));
   ok(c1g.referencias.length === 1 && c1g.referencias[0].en === 'Nº 3 · La bandera' && /^\d{4}-\d{2}-\d{2}$/.test(c1g.referencias[0].f), 'y la referencia, con dónde se usó y su fecha', 'referencias: ' + JSON.stringify(c1g.referencias));
   ok(!w.__xss && !d.querySelector('#red-list img') && f1.textContent.includes('<img src=x') , 'el veneno de las notas sale como TEXTO (sin img, sin correr nada)', 'xss=' + w.__xss + ' img=' + !!d.querySelector('#red-list img'));
-  ok(/⏸️ En pausa/.test(f1.textContent) && /35 fuentes/.test(f1.textContent) && /🔖 1/.test(f1.textContent) && /Control coercitivo/.test(f1.textContent) && f1.querySelector('.rcu-est-mini').textContent === 'Maestría' && f1.querySelector('.rcu-serie-n').textContent === '1.2',
-     'la ficha enseña estado, fuentes, referencias, serie, número y estante', 'la ficha dice: ' + f1.textContent.replace(/\s+/g, ' ').slice(0, 200));
+  ok(/⏸️ En pausa/.test(f1.textContent) && /35 fuentes/.test(f1.textContent) && /🔖 1/.test(f1.textContent) && /Control coercitivo/.test(f1.textContent) && f1.querySelector('.rcu-serie-n').textContent === '1.2',
+     'la ficha enseña estado, fuentes, referencias, serie y número', 'la ficha dice: ' + f1.textContent.replace(/\s+/g, ' ').slice(0, 200));
+  /* El estante bajo el que se pinta la ficha NO se repite dentro de ella
+     (rediseño del 22 de septiembre de 2026): va en el rótulo del grupo. */
+  const rotuloM = d.querySelector('#red-list .rcu-grupo-rotulo');
+  ok(!f1.querySelector('.rcu-est-mini') && !!rotuloM && /Maestría/.test(rotuloM.textContent), 'y el estante «Maestría» va en el rótulo del grupo, no repetido dentro de la ficha', 'chip dentro: ' + !!f1.querySelector('.rcu-est-mini') + ' rótulo: ' + (rotuloM && rotuloM.textContent));
+  const anaqAntes = w.rcuAnaquel().agrupar;
+  w.rcuAnaquel().agrupar = 'ninguno'; w.rcuGuardaAnaquel(); w.rcuRender(d.getElementById('red-list'));
+  const f1b = fichas()[0];
+  ok(!!f1b && !!f1b.querySelector('.rcu-est-mini') && f1b.querySelector('.rcu-est-mini').textContent === 'Maestría', 'sin agrupar por estante, el chip «Maestría» sí sale en la ficha', 'chip: ' + (f1b && f1b.querySelector('.rcu-est-mini') && f1b.querySelector('.rcu-est-mini').textContent));
+  w.rcuAnaquel().agrupar = anaqAntes; w.rcuGuardaAnaquel(); w.rcuRender(d.getElementById('red-list'));
   const s1 = subidas();
   const fila1 = s1.length ? cuerpoDe(s1[s1.length - 1]) : null;
   ok(!!fila1 && /merge-duplicates/.test(s1[s1.length - 1].prefer) && fila1.id === c1g.id && fila1.titulo === c1g.titulo && Array.isArray(fila1.estantes) && fila1.estantes[0] === 'Maestría' && fila1.referencias[0].t.includes('<img src=x') && fila1.autor,
