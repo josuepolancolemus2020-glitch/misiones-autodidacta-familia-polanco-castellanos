@@ -26,27 +26,16 @@ el jueves. Esto es lo que hay que saber para no repetir nada ni perder nada.
 | **La comprobación aparte** | `supabase/sql/consigna_comprueba.sql` | ✅ Escrita; devuelve doce filas en vertical. |
 | **La prueba del SQL** | `_dev/prueba-consigna-sql.sql` | ✅ **RESULTADO: APRUEBA.** Mira la guardia, la idempotencia, los checks que muerden y la puerta dos veces en el orden bueno. |
 | **El vocabulario de bloques** | `js/tools/consigna.js`, líneas 126-464 | ✅ `CSG_EMOJI`, `CSG_LEMA`, `CSG_CLASES`, `CSG_BLOQUES` (los ~50 bloques con su rótulo, su «para qué», su ejemplo escrito y sus cuatro frases hechas) y `CSG_BLOQUES_PROMPT`. Pasa `node --check`. |
+| **El núcleo y su prueba** | `js/tools/consigna.js` (parte 1) y `_dev/test-consigna-node.js` | ✅ 23 de septiembre de 2026 (commit `579cf84`): moldes, armado, lector, repaso, poda, fusión y nube. **RESULTADO: APRUEBA**, 648 comprobaciones, el armado comparado carácter por carácter con el apartado 7. |
+| **La pantalla** | `js/tools/consigna.js` (parte 2) y `css/consigna.css` | ✅ 23 de septiembre de 2026: el anaquel, el compositor y las tres hojas (ver, usar y pegar). Sin un solo `var(--card`. La prueba de Node sigue en APRUEBA y la de humo pasó sin cabeza en Chromium con el `index.html` entero. |
+| **El cableado** | `index.html`, `js/app.js`, `sw.js` | ✅ 23 de septiembre de 2026: el `<link>`, el `<script>`, el botón del Acceso Rápido, las dos vistas y las tres hojas; `initConsigna` en `switchView` y el destello apartado del compositor; `CACHE_NAME` en `faro-app-v128`. El bucle de nombres repetidos devuelve vacío. |
 
 ### Lo que FALTA, en este orden
 
-1. **El resto del núcleo** en `js/tools/consigna.js`, donde el archivo se corta
-   (después de `CSG_BLOQUES_PROMPT`): `CSG_MOLDES` (los diecisiete moldes del
-   apartado 3, que es el trozo más largo), `CSG_EQUIVALE`, `CSG_SINONIMOS`,
-   `CSG_MAQUINAS`, `CSG_TOPES`, `CSG_TEXTOS`, `CSG_COLUMNAS`, y después las
-   funciones puras (`csgArmar`, `csgLeer`, `csgRevisar`, `csgPodar`,
-   `csgFusiona`…) y la nube (`csgBajar`, `csgSubir`, `csgSubirPendientes`),
-   copiando el patrón de `js/tools/redaccion-cuadernos.js`.
-2. **La prueba de Node** `_dev/test-consigna-node.js`, que compara lo que arma
-   `csgArmar` **carácter por carácter** contra los ejemplos escritos en el
-   apartado 7 de este plan.
-3. **La pantalla** (parte 2 del mismo archivo) y `css/consigna.css`: el
-   compositor, el anaquel, las tres hojas.
-4. **El cableado**: el botón del Acceso Rápido y las dos vistas en
-   `index.html`, dos líneas en `switchView` de `js/app.js`, y subir
-   `CACHE_NAME` en `sw.js` (hoy `faro-app-v127` → `v128`).
-5. **La sonda** `_dev/probe-consigna.html` con las 22 comprobaciones del
-   apartado 11, corrida hasta APRUEBA.
-6. **La documentación** en `CLAUDE.md` (la normativa nueva, antes de la de La
+1. **La sonda** `_dev/probe-consigna.html` con las 22 comprobaciones del
+   apartado 11, corrida hasta APRUEBA. Los botones se pulsan y las hojas se
+   miden con `elementFromPoint`, como en las vecinas.
+2. **La documentación** en `CLAUDE.md` (la normativa nueva, antes de la de La
    Voz Prestada) y la entrada del SQL en `PLAN-FARO-PRIVADO.md`.
 
 ### Cómo se retoma sin pensarlo
@@ -64,11 +53,12 @@ y moverlas de golpe) NO va en esta primera versión. La barra del anaquel es
 `[＋ Nueva] · [📋 Pegar] · | · [🗂 Estantes] · [⇅ Orden] · | · [📋 Exportar]` y
 al final las vistas `▦ ☰`.
 
-⚠️ **Y lo que no se puede olvidar al volver:** `js/tools/consigna.js` está a
-medias y **no está cableado en `index.html` a propósito**. Mientras no esté
-entero, no se añade ni el `<script>` ni el `<link>`: un archivo a medias que el
-navegador cargue tira la aplicación entera, porque todos los `<script>` de
-`index.html` comparten un solo ámbito.
+⚠️ **Y lo que no se puede olvidar al volver:** desde el 23 de septiembre de
+2026 `js/tools/consigna.js` **ya está cableado** en `index.html`, y entero. Así
+que cualquier cambio en él lo carga la aplicación de verdad: un error de
+sintaxis tira la casa entera, porque todos los `<script>` comparten un solo
+ámbito. Antes de publicar, `node --check`, la prueba de Node y el bucle de
+nombres repetidos de `CLAUDE.md`.
 
 ---
 

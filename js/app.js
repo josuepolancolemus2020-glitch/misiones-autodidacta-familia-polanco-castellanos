@@ -919,6 +919,7 @@ function switchView(id) {
   if (id === 'view-criba' && typeof initCriba === 'function') initCriba();
   if (id === 'view-rodaje' && typeof initRodaje === 'function') initRodaje();
   if (id === 'view-voz' && typeof initVozPrestada === 'function') initVozPrestada();
+  if (id === 'view-consigna' && typeof initConsigna === 'function') initConsigna();
   /* La sala de lectura cubre la pantalla entera por encima de todo, así
      que si se cambia de vista por debajo —una notificación del chat, el
      botón de atrás— hay que cerrarla: si no, el destino de ese toque se
@@ -930,12 +931,14 @@ function switchView(id) {
   }
 
   // El FAB de Destellos vive en toda la app, excepto en el Chat
-  // (estorbaría sobre la barra de escritura) y el editor de Redacción
-  // (taparía el texto mientras se escribe).
+  // (estorbaría sobre la barra de escritura), el editor de Redacción
+  // (taparía el texto mientras se escribe) y el compositor de La Consigna:
+  // allí la esquina de abajo a la derecha es el botón «▶ Usar» de su barra
+  // fija, y el destello se lo comería entero.
   const desFab = document.getElementById('destello-fab');
   if (desFab) {
     desFab.style.display =
-      (id === 'view-chat' || id === 'view-redaccion-editor' || id === 'view-redaccion-pieza') ? 'none' : 'flex';
+      (id === 'view-chat' || id === 'view-redaccion-editor' || id === 'view-redaccion-pieza' || id === 'view-consigna-editor') ? 'none' : 'flex';
     // En las herramientas que tienen su propio botón "+" (Finanzas,
     // Inventario y la Bóveda) el destello se apila arriba para no tapar al "+".
     const vistasConMasFab = ['view-finanzas', 'view-inventario', 'view-boveda'];

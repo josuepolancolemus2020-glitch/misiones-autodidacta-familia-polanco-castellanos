@@ -263,10 +263,16 @@ function parte1() {
 
   seccion('1.3 Los nombres: prefijo, sin repetir, y ninguno de otro archivo de la casa', () => {
     const mios = nombresArriba(FUENTE);
+    /* initConsigna es la ÚNICA sin prefijo, y a propósito: es el nombre
+       por el que la llama switchView (js/app.js), igual que initRodaje o
+       initVozPrestada en las vecinas. Se admite por su nombre exacto y ningún
+       otro: una lista de excepciones que crece es un prefijo que ya no
+       protege nada. */
+    const sinPrefijoPermitida = n => n === 'initConsigna';
     const fns = mios.filter(x => x.fn).map(x => x.n), vars = mios.filter(x => !x.fn).map(x => x.n);
-    ok(mios.length > 150 && fns.every(n => /^csg/.test(n)) && vars.every(n => /^(CSG_|_csg)/.test(n)),
-      'las ' + mios.length + ' declaraciones de arriba llevan prefijo: funciones csg…, constantes CSG_… y _csg…',
-      'sin prefijo: ' + mios.filter(x => x.fn ? !/^csg/.test(x.n) : !/^(CSG_|_csg)/.test(x.n)).map(x => x.n).join(', '));
+    ok(mios.length > 150 && fns.every(n => /^csg/.test(n) || sinPrefijoPermitida(n)) && vars.every(n => /^(CSG_|_csg)/.test(n)),
+      'las ' + mios.length + ' declaraciones de arriba llevan prefijo: funciones csg…, constantes CSG_… y _csg… (y la puerta initConsigna)',
+      'sin prefijo: ' + mios.filter(x => x.fn ? !(/^csg/.test(x.n) || sinPrefijoPermitida(x.n)) : !/^(CSG_|_csg)/.test(x.n)).map(x => x.n).join(', '));
     const cuenta = new Map();
     mios.forEach(x => cuenta.set(x.n, (cuenta.get(x.n) || 0) + 1));
     const dobles = [...cuenta].filter(([, k]) => k > 1).map(([n, k]) => n + ' ×' + k);
@@ -285,7 +291,11 @@ function parte1() {
     /* Y el bucle de CLAUDE.md, escrito aquí: las funciones de cada <script>
        de index.html más las de consigna.js, y ninguna en dos archivos. */
     const scripts = (fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8').match(/src="js\/[^"]+"/g) || []).map(s => s.slice(5, -1));
-    const archivos = scripts.map(s => [s, path.join(RAIZ, s)]).concat([['js/tools/consigna.js', RUTA]]);
+    /* consigna.js ya está en index.html desde que se cableó la pantalla:
+       se quita de la lista de los <script> y se añade UNA vez desde RUTA
+       (que puede ser la copia averiada de CONSIGNA_RUTA). Contado dos
+       veces, el bucle veía cada función suya «repetida» consigo misma. */
+    const archivos = scripts.filter(s => s !== 'js/tools/consigna.js').map(s => [s, path.join(RAIZ, s)]).concat([['js/tools/consigna.js', RUTA]]);
     const quien = new Map();
     archivos.forEach(([n, r]) => {
       if (!fs.existsSync(r)) return;

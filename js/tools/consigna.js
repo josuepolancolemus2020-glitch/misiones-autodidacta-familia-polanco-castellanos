@@ -1,30 +1,30 @@
-/* ⚠️ EL NÚCLEO ESTÁ TERMINADO Y PROBADO; LA PANTALLA NO. Y NO SE CABLEA
-   HASTA QUE ESTÉ ENTERO.
+/* ⚠️ EL NÚCLEO Y LA PANTALLA ESTÁN ESCRITOS Y CABLEADOS; FALTAN LA
+   SONDA Y LA DOCUMENTACIÓN.
    ──────────────────────────────────────────────────────────────────
-   Así quedó el 23 de septiembre de 2026. Lo que hay de aquí para abajo
-   es el NÚCLEO entero —las listas cerradas (moldes, sinónimos,
-   máquinas, topes), el armado, el lector de lo pegado, el repaso, la
-   poda, la fusión y la nube— y está PROBADO EN NODE:
+   Así quedó el 23 de septiembre de 2026. De aquí para abajo va el
+   NÚCLEO —las listas cerradas, el armado, el lector de lo pegado, el
+   repaso, la poda, la fusión y la nube—, PROBADO EN NODE:
 
        node _dev/test-consigna-node.js
 
-   carga este mismo archivo en un salón vacío y compara lo que arma,
-   carácter por carácter, con los ejemplos escritos en el §7 del plan.
-   Tiene que decir «RESULTADO: APRUEBA» antes y después de tocar
-   cualquier cosa del núcleo.
+   que carga este mismo archivo en un salón vacío y compara lo que arma,
+   carácter por carácter, con los ejemplos del §7 del plan. Tiene que
+   decir «RESULTADO: APRUEBA» antes y después de tocar cualquier cosa.
 
-   Falta la PANTALLA —el compositor, el anaquel, las tres hojas e
-   initConsigna—, que va al final de este mismo archivo, detrás de la
-   marca «PANTALLA», y css/consigna.css. Lo que falta, en orden, está en
-   PLAN-LA-CONSIGNA.md, en la raíz. El SQL ya está terminado y probado
-   (supabase/sql/consigna.sql).
+   Y al final, detrás del cartel «PANTALLA», va la pantalla entera —el
+   anaquel, el compositor, las hojas de Usar y de Pegar, e
+   initConsigna—, con css/consigna.css. Ya está cableada: el botón del
+   Acceso Rápido, las dos vistas y las tres hojas en index.html, sus dos
+   líneas en switchView (js/app.js) y el sello de sw.js.
 
-   Y SIGUE SIN ESTAR EN `index.html`, a propósito, aunque el núcleo ya
-   cargue limpio: la pantalla se va a escribir AQUÍ, y los <script> de la
-   aplicación comparten un solo ámbito, así que un archivo a medio
-   escribir que el navegador cargue no rompe esta herramienta —rompe
-   F.A.R.O entero—. El `<script>` y el `<link>` se añaden el día que la
-   pantalla esté entera y su sonda (_dev/probe-consigna.html) apruebe.
+   Lo que FALTA, en orden: la sonda _dev/probe-consigna.html con las 22
+   comprobaciones del §11 de PLAN-LA-CONSIGNA.md, corrida hasta APRUEBA
+   —la prueba de Node mira el núcleo, pero lo que puede fallar en la
+   pantalla es de pantalla y solo se ve pulsando—; y la normativa en
+   CLAUDE.md y la entrada del SQL en PLAN-FARO-PRIVADO.md. Hasta que la
+   sonda apruebe, esto NO se da por terminado aunque se vea funcionar:
+   el «Corregir y aprender» de la revista estuvo dos semanas muerto con
+   la pantalla entera a la vista.
    ══════════════════════════════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════════════════════════════
@@ -49,14 +49,16 @@
    usar, y la arma csgArmar(), que es una función pura sin DOM. Nunca se
    guarda un texto armado.
 
-   Este archivo va en DOS partes. Esta primera es el NÚCLEO sin pantalla:
+   Este archivo va en DOS partes. La primera es el NÚCLEO sin pantalla:
    las listas cerradas, el vocabulario, los moldes, el armado, el lector
-   de lo pegado, el repaso, la poda, la fusión y la nube. Tiene que poder
+   de lo pegado, el repaso, la poda, la fusión y la nube. La segunda, al
+   final y detrás del cartel «PANTALLA», es la pantalla (el anaquel, el
+   compositor, las hojas e initConsigna), que copia la forma de
+   📓 Cuadernos. El archivo ENTERO —pantalla incluida— tiene que poder
    cargarse en Node con dobles de document/window/localStorage
    (_dev/test-consigna-node.js lo hace), y por eso aquí no se toca el DOM
-   a nivel de archivo. La pantalla (compositor, anaquel, hojas,
-   initConsigna y el cableado) va al final, detrás de la marca
-   «PANTALLA», y copia la forma de 📓 Cuadernos.
+   a nivel de archivo: ni siquiera para colgar un DOMContentLoaded. Los
+   botones se enganchan la primera vez que se abre cada vista u hoja.
 
    EL NÚCLEO, EN ESTE ORDEN (cada apartado abre con su cartel ════):
    · el vocabulario (CSG_BLOQUES) y los moldes con las demás listas
@@ -5469,4 +5471,5653 @@ function csgVolverAVersion(pieza, vid) {
   return n;
 }
 
-/* ── PANTALLA: la escribe la parte 2 ── */
+/* ══════════════════════════════════════════════════════════════════
+   📜 LA CONSIGNA · PANTALLA
+   ──────────────────────────────────────────────────────────────────
+   De aquí para abajo, lo que se ve. Va en tres trozos y en este orden,
+   que importa: en un <script> clásico da igual el orden de las
+   `function`, pero no el de los `let`, y leer uno antes de su renglón
+   revienta con un ReferenceError.
+
+   1. EL ANAQUEL: los ayudantes comunes (csgEl, csgBtn, csgVerAbrir,
+      csgCopiarTexto, csgRepaso…), el inventario, el menú ⋯ e
+      initConsigna.
+   2. EL COMPOSITOR: la hoja «¿Qué le vas a pedir?», los bloques, la
+      vista previa con el repaso, guardar y duplicar en otro molde.
+   3. LAS HOJAS: ▶ Usar, 📋 Pegar lo que ya tengo y abrir la máquina.
+
+   Se escribieron a la vez, cada uno con sus prefijos (csgAnq, csgFicha,
+   csgMenu, csgBit · csgEd, csgNueva, csgDuplicar, csgBorrador · csgUsar,
+   csgPeg, csgVars), y se juntaron el 23 de septiembre de 2026 con un
+   contrato de ids, clases y firmas que los tres respetan. Un nombre
+   repetido entre trozos pisaría al otro sin ningún aviso (pasó con
+   corAbrir): la prueba de Node lo mira sobre el archivo entero.
+   ══════════════════════════════════════════════════════════════════ */
+
+
+/* ══════════════════════════════════════════════════════════════════
+   📜 LA CONSIGNA · PANTALLA, PARTE 1 DE 3: LOS AYUDANTES COMUNES, EL
+   ANAQUEL, EL MENÚ ⋯ E initConsigna
+   ──────────────────────────────────────────────────────────────────
+   Va la PRIMERA detrás de la marca «PANTALLA»: el compositor y las hojas
+   usan los ayudantes de aquí (csgEl, csgBtn, csgVerAbrir, csgCopiarTexto,
+   csgRepaso…), y en un <script> clásico da igual el orden de las
+   `function`, pero no el de los `let`: leer uno antes de su renglón
+   revienta con un ReferenceError.
+
+   Es la forma de 📓 Cuadernos (su regla 11), que el autor aprobó el 22 de
+   septiembre de 2026: una sola fila de botones con su palabra y su color
+   por función, el buscador, SOLO lo que está puesto, y las fichas en
+   cuadrícula con los botones al pie. Lo que esta herramienta añade a esa
+   forma está dicho donde se hace: los chips de clase con su cuenta, el
+   renglón que PREGUNTA «¿sirvió?» (§6.7) y el menú ⋯ con versiones,
+   bitácora, estantes y cuaderno.
+
+   ⚠️ A NIVEL DE ARCHIVO NO SE TOCA NI `document` NI `window`, TAMPOCO
+   PARA COLGAR UN DOMContentLoaded. La prueba de Node
+   (_dev/test-consigna-node.js) carga este archivo entero en salones cuyo
+   `document` REVIENTA si se le toca y que apuntan cualquier toque, y un
+   `document.addEventListener` aquí arriba la haría suspender. Los botones
+   de la cabecera, la ✕ de la hoja vertical y el `online` se enganchan la
+   primera vez que se abre la vista (initConsigna) o la hoja
+   (csgVerAbrir), que es siempre antes de que nadie pueda tocarlos.
+
+   ⚠️ Y NADA DE LO ESCRITO POR UNA PERSONA LLEGA A UN ATRIBUTO NI A
+   innerHTML (regla 15): todo con createElement y textContent. Los
+   `data-csg-foco` que se ponen son claves NUESTRAS («chip:prompt»,
+   «grupo:3»), nunca un título ni un estante.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Constantes del anaquel ─────────────────────────────────────── */
+
+const CSG_ANQ_TONOS = 8;
+const CSG_ANQ_DIA = 86400000;
+/* Solo se pregunta por lo de la última semana: un «¿sirvió?» de hace un
+   mes ya no se contesta de memoria, y contestarlo a ojo es inventar. */
+const CSG_ANQ_PREGUNTA_DIAS = 7;
+/* Tres aperturas sin tocar el renglón y se pliega (§6.7): preguntar
+   siempre lo mismo a quien no quiere contestar convierte la pregunta en
+   ruido, y el ruido se aprende a no leer. */
+const CSG_ANQ_PREGUNTA_VECES = 3;
+/* Un prompt copiado tres veces en treinta días ya no es «de una vez»:
+   es una instrucción que se quiere puesta (§6.9). */
+const CSG_ANQ_USOS_MES = 3;
+const CSG_ANQ_MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+const CSG_ANQ_ORDENES = [
+  { id: 'ultima',    ic: '🕘', t: 'Última usada',     d: 'lo que usas a diario sube solo' },
+  { id: 'usos',      ic: '🔥', t: 'Más usadas',       d: 'por cuántas veces se copiaron o abrieron' },
+  { id: 'valor',     ic: '👍', t: 'Mejor valoradas',  d: '✅ menos ❌; con menos de dos respuestas, al final' },
+  { id: 'titulo',    ic: '🔤', t: 'Título',           d: 'de la A a la Z' },
+  { id: 'recientes', ic: '🆕', t: 'Recientes',        d: 'lo último que se escribió o se corrigió' },
+];
+const CSG_ANQ_AGRUPAR = [
+  { id: 'no',      ic: '☰',  t: 'Sin agrupar',  d: 'una sola lista' },
+  { id: 'estante', ic: '🗂', t: 'Por estante',  d: 'una consigna en dos estantes sale en los dos' },
+  { id: 'clase',   ic: '💬', t: 'Por clase',    d: 'prompts, habilidades, grafos y bucles' },
+  { id: 'maquina', ic: '🤖', t: 'Por máquina',  d: 'Claude, ChatGPT, Gemini…' },
+];
+const CSG_ANQ_ESPECIALES = {
+  borradores: { ic: '🟡', t: 'Borradores' },
+  sinprobar:  { ic: '⏳', t: 'Sin probar' },
+};
+
+/* ── Estado de la pantalla (del aparato y de esta sesión; nada viaja) ── */
+
+let _csgAnqPrefs = null;              // las preferencias del anaquel, leídas UNA vez
+let _csgAnqBusca = '';                // lo escrito en el buscador (de la sesión)
+let _csgAnqBuscaFila = null;          // la fila del buscador: NO se rehace nunca (ver csgAnqBuscaFila)
+let _csgAnqBuscaT = null;
+let _csgAnqGrupos = [];               // [{k, rot, caja, vista}] del último pintado
+let _csgAnqMando = null;              // el «▾ Abrir todos / ▴ Cerrar todos»
+let _csgAnqRotulos = new Map();       // clave de estante → cómo lo escribe la casa
+let _csgAnqRepasos = new Map();       // id → {k, r}: el repaso de cada ficha
+let _csgAnqTextos = new Map();        // id → {k, t}: lo que mira el buscador
+let _csgAnqEnganchado = false;
+let _csgAnqPendiente = false;         // un repintado que esperó a que se soltara la nota
+let _csgAnqRetAbiertas = false;
+let _csgAnqVerPintar = null;          // lo que pinta la hoja vertical abierta
+let _csgAnqBitPlegada = false;        // el renglón de la bitácora, plegado en esta apertura
+let _csgAnqCuadernosPedidos = false;
+let _csgAnqSeguirAhora = false;       // en esta apertura se ofrece seguir el borrador (y no se pregunta)
+
+/* ══════════════════════════════════════════════════════════════════
+   LOS AYUDANTES COMUNES (los usan también el compositor y las hojas)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Construir DOM sin innerHTML: lo escrito va siempre por textContent. */
+function csgEl(tag, cls, texto) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (texto !== undefined && texto !== null) e.textContent = String(texto);
+  return e;
+}
+
+/* El botón de la casa: icono en su baldosa y PALABRA (regla 11 de
+   Cuadernos: se reconoce por el dibujo y el color y se confirma leyendo,
+   sin adivinar qué hace un icono mudo). Con palabra, el icono se esconde
+   del lector de pantalla para que no lea «portapapeles Copiar». */
+function csgBtn(cls, ic, texto, alTocar) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'csg-btn' + (cls ? ' ' + cls : '');
+  const hayTexto = texto !== undefined && texto !== null && texto !== '';
+  if (ic !== undefined && ic !== null && ic !== '') {
+    const i = csgEl('span', 'csg-btn-ic', ic);
+    if (hayTexto) i.setAttribute('aria-hidden', 'true');
+    b.appendChild(i);
+  }
+  if (hayTexto) b.appendChild(csgEl('span', 'csg-btn-t', texto));
+  if (typeof alTocar === 'function') b.addEventListener('click', alTocar);
+  return b;
+}
+
+/* Un botón sin la forma de csgBtn (chips, rótulos, renglones). */
+function csgAnqBoton(cls, texto, alTocar) {
+  const b = csgEl('button', cls, texto);
+  b.type = 'button';
+  if (typeof alTocar === 'function') b.addEventListener('click', alTocar);
+  return b;
+}
+
+/* toast() y no showToast(): la de la aplicación es toast (La Voz
+   Prestada, regla 14, perdió todos sus avisos por el nombre). */
+function csgAviso(msg) {
+  if (typeof toast === 'function') toast(msg);
+}
+
+/* «hace 3 d»: lo justo para saber de un vistazo cuándo fue, sin leer una
+   fecha. Pasadas unas semanas, «hace 11 sem» ya no se lee de un vistazo:
+   ahí sale la fecha. Un reloj del futuro (otro aparato adelantado) no
+   dice «hace -2 min»: dice «hace un momento». */
+function csgHace(ms) {
+  const t = Number(ms);
+  if (!t || !isFinite(t)) return '';
+  const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+  if (s < 60) return 'hace un momento';
+  const m = Math.floor(s / 60);
+  if (m < 60) return 'hace ' + m + ' min';
+  const h = Math.floor(m / 60);
+  if (h < 24) return 'hace ' + h + ' h';
+  const d = Math.floor(h / 24);
+  if (d < 14) return 'hace ' + d + ' d';
+  const sem = Math.floor(d / 7);
+  if (sem < 9) return 'hace ' + sem + ' sem';
+  const f = new Date(t);
+  const ahora = new Date();
+  return f.getDate() + ' ' + CSG_ANQ_MESES[f.getMonth()] + (f.getFullYear() === ahora.getFullYear() ? '' : ' ' + f.getFullYear());
+}
+
+/* El TONO de un estante sale de su CLAVE y no del orden (copia de
+   rcuTono): si saliera del orden, crear un estante nuevo les cambiaría el
+   color a todos los demás. Dos estantes pueden compartir tono; se paga a
+   cambio de que ninguno cambie nunca. «Sin estante» va en gris. */
+function csgTono(clave) {
+  const k = csgClave(clave);
+  if (!k || k === 'sin' || k === 'todo') return 'csg-tono-x';
+  let h = 0;
+  for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
+  return 'csg-tono-' + (h % CSG_ANQ_TONOS);
+}
+
+/* La clase de una pieza, siempre una de las cuatro: una fila tocada a
+   mano con una clase desconocida se pinta como Prompt en vez de romper
+   la ficha. */
+function csgClaseDe(id) {
+  for (let i = 0; i < CSG_CLASES.length; i++) if (CSG_CLASES[i].id === id) return CSG_CLASES[i];
+  return CSG_CLASES[0];
+}
+
+/* El recuadro crece con lo escrito (como rcuCrecer). ⚠️ Y el sitio de la
+   pantalla se guarda y se devuelve: poner la altura en `auto` encoge el
+   recuadro un instante, y si la vista estaba desplazada hasta abajo el
+   navegador la sube de golpe; escribiendo en el último bloque de un
+   compositor largo, la vista saltaba en cada tecla. */
+function csgCrecer(ta) {
+  if (!ta || !ta.style) return;
+  const sc = (ta.closest && ta.closest('.view-scroll, .fin-modal')) || null;
+  const y = sc ? sc.scrollTop : 0;
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(44, ta.scrollHeight + 2) + 'px';
+  if (sc && sc.scrollTop !== y) sc.scrollTop = y;
+}
+
+/* ⚠️ COPIAR VA DENTRO DEL TOQUE. writeText se llama aquí mismo, sin
+   ningún `await` delante: el Safari de un iPad solo deja escribir en el
+   portapapeles mientras dura el gesto, y un `await` antes lo deja fuera.
+   Si la API no existe (una página sin https) o rechaza, se prueba el
+   camino viejo, un recuadro escondido y execCommand('copy'). Nunca lanza:
+   quien copia recibe true o false y decide qué decir. */
+function csgCopiarTexto(texto) {
+  const t = String(texto == null ? '' : texto);
+  let p = null;
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      p = navigator.clipboard.writeText(t);
+    }
+  } catch (e) { p = null; }
+  if (!p || typeof p.then !== 'function') return Promise.resolve(csgAnqCopiarViejo(t));
+  return p.then(() => true, () => csgAnqCopiarViejo(t));
+}
+
+function csgAnqCopiarViejo(t) {
+  let ta = null;
+  let antes = null;
+  try {
+    antes = document.activeElement;
+    ta = document.createElement('textarea');
+    ta.value = t;
+    /* readonly: que no salga el teclado de la tableta por un recuadro que
+       nadie ve; y 16 px, para que el iPad no acerque la página al
+       enfocarlo. Estas son las únicas líneas de estilo del archivo que no
+       son mostrar o esconder, y son para esconder. */
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '-9999px';
+    ta.style.opacity = '0';
+    ta.style.fontSize = '16px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { ta.setSelectionRange(0, t.length); } catch (e) {}
+    return !!(document.execCommand && document.execCommand('copy'));
+  } catch (e) {
+    return false;
+  } finally {
+    try { if (ta && ta.parentNode) ta.parentNode.removeChild(ta); } catch (e) {}
+    try { if (antes && antes !== document.body && typeof antes.focus === 'function') antes.focus({ preventScroll: true }); } catch (e) {}
+  }
+}
+
+/* La última máquina es una costumbre de ESTE aparato (CSG_CLAVES.maquina)
+   y no viaja: en la tableta del autor es Claude y en el teléfono de su
+   hija puede ser Gemini. Si lo guardado ya no es una máquina conocida, se
+   vuelve a Claude en vez de proponer una que no existe. */
+function csgMaquinaUltima() {
+  try {
+    let v = localStorage.getItem(CSG_CLAVES.maquina);
+    if (v) {
+      v = String(v).replace(/^"+|"+$/g, '');
+      for (let i = 0; i < CSG_MAQUINAS.length; i++) if (CSG_MAQUINAS[i].id === v) return v;
+    }
+  } catch (e) {}
+  return 'claude';
+}
+function csgMaquinaApunta(id) {
+  const v = String(id == null ? '' : id);
+  if (!CSG_MAQUINAS.some(m => m.id === v)) return;
+  try { localStorage.setItem(CSG_CLAVES.maquina, v); } catch (e) {}
+}
+
+/* Las preferencias del anaquel (CSG_CLAVES.anaquel): vista, orden,
+   agrupación, grupos abiertos, filtro y «Sin explicaciones». Son del
+   APARATO y nunca de la nube: cómo se mira un anaquel es una postura de
+   esta pantalla, como la letra de La Voz Prestada. Se leen una vez y se
+   devuelve SIEMPRE el mismo objeto, para que el compositor y el anaquel
+   escriban en el mismo sitio; lo que no se reconoce se deja como estaba
+   (el compositor puede guardar ahí algo suyo) y lo que viene torcido se
+   vuelve a lo de siempre. */
+function csgAnqPrefs() {
+  if (_csgAnqPrefs) return _csgAnqPrefs;
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(CSG_CLAVES.anaquel)); } catch (e) { d = null; }
+  if (!d || typeof d !== 'object' || Array.isArray(d)) d = {};
+  const f = (d.filtro && typeof d.filtro === 'object') ? d.filtro : {};
+  const filtro = {};
+  if (typeof f.clase === 'string' && CSG_CLASES.some(c => c.id === f.clase)) filtro.clase = f.clase;
+  if (typeof f.estante === 'string' && f.estante && f.estante.length <= 80) filtro.estante = f.estante;
+  if (typeof f.maquina === 'string' && f.maquina && f.maquina.length <= CSG_TOPES.maquina) filtro.maquina = f.maquina;
+  if (f.especial === 'borradores' || f.especial === 'sinprobar') filtro.especial = f.especial;
+  const abiertos = {};
+  if (d.abiertos && typeof d.abiertos === 'object') Object.keys(d.abiertos).forEach(k => { if (d.abiertos[k]) abiertos[k] = true; });
+  _csgAnqPrefs = Object.assign({}, d, {
+    vista: d.vista === 'lista' ? 'lista' : 'fichas',
+    orden: CSG_ANQ_ORDENES.some(o => o.id === d.orden) ? d.orden : 'ultima',
+    agrupar: CSG_ANQ_AGRUPAR.some(a => a.id === d.agrupar) ? d.agrupar : 'no',
+    abiertos,
+    filtro,
+    sinExplicaciones: !!d.sinExplicaciones,
+  });
+  return _csgAnqPrefs;
+}
+function csgAnqGuardaPrefs() {
+  try { localStorage.setItem(CSG_CLAVES.anaquel, JSON.stringify(csgAnqPrefs())); } catch (e) {}
+}
+
+/* ⚠️ EL REPASO DE CADA FICHA, CON MEMORIA. El anaquel lo necesita para
+   cada pieza en cada pintado —los chips cuentan los borradores y la
+   ficha dice qué falta— y csgRevisar lee el texto entero. La llave es
+   una HUELLA del contenido y no el reloj: el compositor puede pedir el
+   repaso de una copia sin guardar, que lleva el `actualizado` de la
+   pieza de la lista, y con el reloj de llave recibiría el repaso de lo
+   que había antes de escribir. */
+function csgAnqHuella(p, maq) {
+  let h = 2166136261;
+  const mete = s => {
+    s = String(s == null ? '' : s);
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    h ^= 31; h = Math.imul(h, 16777619);
+  };
+  mete(maq); mete(p.molde); mete(p.clase); mete(p.titulo);
+  let largo = 0;
+  (Array.isArray(p.bloques) ? p.bloques : []).forEach(b => {
+    if (!b) return;
+    mete(b.id); mete(b.rotulo); mete(b.t);
+    largo += String(b.t == null ? '' : b.t).length;
+  });
+  const mat = String(p.material == null ? '' : p.material);
+  mete(mat.length); mete(mat.slice(0, 64)); mete(mat.slice(-64));
+  /* El repaso avisa de un título repetido mirando las demás piezas: con
+     la cuenta de la lista dentro, una pieza nueva invalida los repasos. */
+  mete(_csgLista.length);
+  return (h >>> 0).toString(36) + ':' + largo;
+}
+function csgRepaso(p) {
+  const vacio = { para: [], avisa: [], palabras: 0, tokens: 0, cabe: true };
+  if (!p) return vacio;
+  const maq = p.maquina || csgMaquinaUltima();
+  const k = csgAnqHuella(p, maq);
+  const id = String(p.id || '');
+  const ya = id ? _csgAnqRepasos.get(id) : null;
+  if (ya && ya.k === k) return ya.r;
+  let r;
+  try { r = csgRevisar(p, maq); } catch (e) { r = vacio; }
+  if (!r || !Array.isArray(r.para)) r = vacio;
+  if (id) {
+    if (_csgAnqRepasos.size > 400) _csgAnqRepasos.clear();
+    _csgAnqRepasos.set(id, { k, r });
+  }
+  return r;
+}
+
+/* Lo primero que PARA, dicho en corto para la ficha: devuelve la frase
+   ENTERA («falta Formato», «no cabe en la nube»), y quien la pinta le pone
+   delante «🟡 borrador: ». Vacío si no para nada. Un «no se puede» a secas
+   obligaría a abrir la pieza para saber qué le pasa. */
+function csgFaltaDe(p) {
+  const r = csgRepaso(p);
+  if (!r.para || !r.para.length) return '';
+  const x = r.para[0] || {};
+  const msg = String(x.msg || '');
+  const m = msg.match(/^Falta «([^»]+)»/);
+  if (m) return 'falta ' + m[1];
+  if (/^No cabe en la nube/.test(msg)) return 'no cabe en la nube';
+  if (x.bloque === 'aristas') return /vuelve atrás/.test(msg) ? 'una vuelta atrás sin tope' : 'una arista a ninguna parte';
+  if (x.bloque === 'nombre') return 'el name no vale';
+  if (x.bloque === 'disparador') return 'la description es muy larga';
+  if (x.bloque === 'ejemplos') return 'faltan pares de ejemplo';
+  if ((x.arreglo && x.arreglo.tipo === 'hueco') || /hueco sin nombre/.test(msg)) return 'un hueco que no se puede rellenar';
+  const corto = msg.split(/[:.]\s/)[0].trim();
+  return corto.length > 42 ? csgCorta(corto, 41) + '…' : corto;
+}
+
+/* Los estantes de una pieza, limpios: sin vacíos, sin la misma clave dos
+   veces y con los espacios de uno. «Maestría» y « maestria » son el mismo
+   estante (csgClave), o el anaquel sacaría dos montones iguales. */
+function csgAnqEstantesDe(p) {
+  const out = [];
+  const vistos = new Set();
+  (Array.isArray(p && p.estantes) ? p.estantes : []).forEach(e => {
+    const t = String(e == null ? '' : e).replace(/\s+/g, ' ').trim();
+    const k = csgClave(t);
+    if (!k || vistos.has(k)) return;
+    vistos.add(k);
+    out.push(t);
+  });
+  return out;
+}
+
+/* Todos los estantes de las piezas vivas, con su cuenta. El rótulo es
+   como se escribió la PRIMERA vez que aparece, como en Cuadernos y en el
+   export: el anaquel y el respaldo nombran igual el mismo montón. */
+function csgEstantesTodos() {
+  const m = new Map();
+  csgVivas().forEach(p => csgAnqEstantesDe(p).forEach(e => {
+    const k = csgClave(e);
+    if (!m.has(k)) m.set(k, { clave: k, rotulo: e, n: 0 });
+    m.get(k).n++;
+  }));
+  return [...m.values()].sort((a, b) => a.clave.localeCompare(b.clave, 'es'));
+}
+function csgAnqRotuloEstante(clave) {
+  if (clave === 'sin') return 'Sin estante';
+  if (_csgAnqRotulos.has(clave)) return _csgAnqRotulos.get(clave);
+  const e = csgEstantesTodos().find(x => x.clave === clave);
+  return e ? e.rotulo : clave;
+}
+
+/* ── La hoja vertical (#csg-ver-overlay) ─────────────────────────────
+   UNA hoja para todo lo que se elige de una lista: estantes, orden, el
+   menú ⋯ y sus sub-hojas, y lo que abra el compositor («¿Qué le vas a
+   pedir?», los moldes). Renglones de 44 px uno debajo de otro, que es
+   como se mira una estantería (La Voz Prestada, regla 33), y no seis
+   filas de chips deslizándose. Quien la abre le pasa lo que la PINTA; así
+   csgVerPintar() la repinta en su sitio después de un cambio (un estante
+   que se pone) sin que nadie tenga que acordarse de qué había dentro. */
+function csgVerAbrir(titulo, pintar) {
+  csgAnqEngancha();
+  const ov = document.getElementById('csg-ver-overlay');
+  if (!ov) return;
+  const t = document.getElementById('csg-ver-titulo');
+  if (t) t.textContent = titulo == null ? '' : String(titulo);
+  _csgAnqVerPintar = typeof pintar === 'function' ? pintar : null;
+  csgVerPintar();
+  ov.style.display = 'flex';
+  const modal = ov.querySelector('.fin-modal');
+  if (modal) modal.scrollTop = 0;
+}
+function csgVerPintar() {
+  const cuerpo = document.getElementById('csg-ver-cuerpo');
+  if (!cuerpo) return;
+  const ov = document.getElementById('csg-ver-overlay');
+  const modal = ov ? ov.querySelector('.fin-modal') : null;
+  const y = modal ? modal.scrollTop : 0;
+  cuerpo.textContent = '';
+  if (_csgAnqVerPintar) {
+    try { _csgAnqVerPintar(cuerpo); }
+    catch (e) {
+      /* Una hoja que se abre vacía se lee como un botón roto: se dice. */
+      if (typeof console !== 'undefined') console.error('La Consigna · hoja vertical', e);
+      cuerpo.appendChild(csgEl('p', 'csg-nota', 'No se pudo pintar esta hoja: ' + ((e && e.message) || e)));
+    }
+  }
+  if (modal) modal.scrollTop = y;
+}
+function csgVerCerrar() {
+  const ov = document.getElementById('csg-ver-overlay');
+  if (ov) ov.style.display = 'none';
+  _csgAnqVerPintar = null;
+  const cuerpo = document.getElementById('csg-ver-cuerpo');
+  if (cuerpo) cuerpo.textContent = '';
+}
+function csgAnqVerAbierta() {
+  const ov = document.getElementById('csg-ver-overlay');
+  return !!(ov && ov.style.display && ov.style.display !== 'none');
+}
+/* Un renglón de 44 px: icono, rótulo (y una segunda línea gris), cuenta.
+   `on` puede ser true o false (un filtro, un interruptor: se dice con
+   aria-pressed) o null (una acción del menú, que no está «puesta»). */
+function csgVerFila(ic, rotulo, cuenta, on, alTocar, sub) {
+  const b = csgAnqBoton('csg-ver-fila' + (on === true ? ' on' : ''), null, alTocar);
+  const i = csgEl('span', 'csg-ver-ic', ic == null ? '' : ic);
+  i.setAttribute('aria-hidden', 'true');
+  b.appendChild(i);
+  const t = csgEl('span', 'csg-ver-txt');
+  t.appendChild(document.createTextNode(rotulo == null ? '' : String(rotulo)));
+  if (sub) t.appendChild(csgEl('span', 'csg-ver-sub', sub));
+  b.appendChild(t);
+  if (cuenta !== '' && cuenta !== null && cuenta !== undefined) b.appendChild(csgEl('span', 'csg-ver-n', String(cuenta)));
+  if (on === true || on === false) b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  return b;
+}
+function csgVerSep(texto) {
+  return csgEl('div', 'csg-ver-sep', texto);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LO QUE SE PREGUNTA DE CADA PIEZA
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgAnqMaquinaNombre(id) {
+  for (let i = 0; i < CSG_MAQUINAS.length; i++) if (CSG_MAQUINAS[i].id === id) return CSG_MAQUINAS[i].nombre;
+  return String(id == null ? '' : id);
+}
+/* La máquina con que se agrupa y se filtra: la de la lista, o «Otra» si
+   la pieza trae una que ya no se conoce (nunca un montón sin nombre). */
+function csgAnqMaquinaDe(p) {
+  return csgMaquina(p && p.maquina).id;
+}
+function csgAnqMolde(p) {
+  const id = String((p && p.molde) || '');
+  return Object.prototype.hasOwnProperty.call(CSG_MOLDES, id) ? CSG_MOLDES[id] : null;
+}
+/* Borrador = el repaso PARA algo (§2). Se guarda igual —guardar nunca se
+   bloquea—, pero usar no, y eso es lo que el chip tiene que dejar ver. */
+function csgAnqBorrador(p) {
+  return csgRepaso(p).para.length > 0;
+}
+/* Sin probar = ningún uso contestado (§8). Copiada diez veces sin decir
+   nunca si sirvió sigue sin probar: el trabajo es saber cuáles faltan. */
+function csgAnqSinProbar(p) {
+  return !(Array.isArray(p.bitacora) ? p.bitacora : []).some(u => u && u.ok);
+}
+function csgAnqValor(p) {
+  let si = 0, no = 0, reg = 0;
+  (Array.isArray(p.bitacora) ? p.bitacora : []).forEach(u => {
+    if (!u) return;
+    if (u.ok === 'si') si++; else if (u.ok === 'no') no++; else if (u.ok === 'regular') reg++;
+  });
+  return { si, no, reg, contestados: si + no + reg, puntos: si - no };
+}
+function csgAnqUsosMes(p) {
+  const desde = Date.now() - 30 * CSG_ANQ_DIA;
+  return (Array.isArray(p.bitacora) ? p.bitacora : []).filter(u => u && (Number(u.t) || 0) >= desde).length;
+}
+function csgAnqCorto(s, n) {
+  const t = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+  return csgLargoTexto(t) > n ? csgCorta(t, n - 1) + '…' : t;
+}
+
+/* Lo que mira el buscador, sin tildes ni mayúsculas (quien busca
+   «revision» en una tableta no escribe la tilde): título, texto de los
+   bloques, estantes, variables, máquina, clase y molde, y las notas de la
+   bitácora —«inventó una fuente» es justo lo que se busca un mes
+   después—. Con memoria por pieza: el texto de una pieza puede tener
+   sesenta mil caracteres y se busca en cada tecla. */
+function csgAnqTextoDe(p) {
+  const bit = Array.isArray(p.bitacora) ? p.bitacora : [];
+  let notas = 0;
+  bit.forEach(u => { if (u && u.nota) notas += String(u.nota).length; });
+  const k = (p.actualizado || 0) + '|' + bit.length + '|' + notas + '|' + String(p.titulo || '').length + '|' +
+    (Array.isArray(p.bloques) ? p.bloques.length : 0) + '|' + (p.maquina || '') + '|' + (Array.isArray(p.estantes) ? p.estantes.join('\u0001') : '');
+  const ya = _csgAnqTextos.get(p.id);
+  if (ya && ya.k === k) return ya.t;
+  const bloques = (Array.isArray(p.bloques) ? p.bloques : []).filter(Boolean);
+  let vars = [];
+  try { vars = csgVariables(bloques.map(b => String(b.t == null ? '' : b.t))); } catch (e) { vars = []; }
+  const molde = csgAnqMolde(p);
+  const partes = [
+    p.titulo,
+    bloques.map(b => (b.rotulo || '') + ' ' + (b.t || '')).join(' '),
+    csgAnqEstantesDe(p).join(' '),
+    vars.join(' '),
+    p.maquina ? csgAnqMaquinaNombre(p.maquina) : '',
+    csgClaseDe(p.clase).nombre,
+    molde ? molde.nombre : '',
+    p.notas,
+    bit.map(u => (u && u.nota) || '').join(' '),
+  ];
+  const t = csgClave(partes.join(' '));
+  if (_csgAnqTextos.size > 400) _csgAnqTextos.clear();
+  _csgAnqTextos.set(p.id, { k, t });
+  return t;
+}
+
+/* El filtro de verdad. `sinChip` deja fuera la clase y lo especial, que
+   es lo que cuentan los chips: cada chip dice cuántas saldrían al
+   tocarlo, con la búsqueda, el estante y la máquina ya puestos. Varias
+   palabras en el buscador tienen que estar TODAS, en cualquier orden. */
+function csgAnqFiltra(lista, sinChip) {
+  const f = csgAnqPrefs().filtro;
+  const q = csgClave(_csgAnqBusca);
+  const palabras = q ? q.split(' ').filter(Boolean) : [];
+  return lista.filter(p => {
+    if (palabras.length) {
+      const t = csgAnqTextoDe(p);
+      if (!palabras.every(w => t.indexOf(w) >= 0)) return false;
+    }
+    if (f.estante) {
+      const ks = csgAnqEstantesDe(p).map(csgClave);
+      if (f.estante === 'sin' ? ks.length > 0 : ks.indexOf(f.estante) < 0) return false;
+    }
+    if (f.maquina && csgAnqMaquinaDe(p) !== f.maquina) return false;
+    if (!sinChip) {
+      if (f.clase && csgClaseDe(p.clase).id !== f.clase) return false;
+      if (f.especial === 'borradores' && !csgAnqBorrador(p)) return false;
+      if (f.especial === 'sinprobar' && !csgAnqSinProbar(p)) return false;
+    }
+    return true;
+  });
+}
+
+/* El orden. Por defecto, la ÚLTIMA USADA: lo que se usa a diario sube
+   solo, sin ordenar nada a mano (la regla 5 de Cuadernos); a igualdad, lo
+   último que se tocó. «Mejor valoradas» deja al final las que tienen
+   menos de dos respuestas: una sola ✅ no es una valoración, y ponerla
+   delante de una con ocho ✅ y un ❌ mentiría. */
+function csgAnqOrdena(lista) {
+  const o = csgAnqPrefs().orden;
+  const ult = (a, b) => (b.ultima || 0) - (a.ultima || 0) || (b.actualizado || 0) - (a.actualizado || 0);
+  const l = lista.slice();
+  if (o === 'usos') l.sort((a, b) => (b.usos || 0) - (a.usos || 0) || ult(a, b));
+  else if (o === 'valor') {
+    l.sort((a, b) => {
+      const va = csgAnqValor(a), vb = csgAnqValor(b);
+      const pa = va.contestados < 2, pb = vb.contestados < 2;
+      if (pa !== pb) return pa ? 1 : -1;
+      if (!pa) return (vb.puntos - va.puntos) || (vb.contestados - va.contestados) || ult(a, b);
+      return ult(a, b);
+    });
+  } else if (o === 'titulo') {
+    l.sort((a, b) => {
+      const ta = csgClave(a.titulo), tb = csgClave(b.titulo);
+      if (!ta !== !tb) return ta ? -1 : 1;           // las sin título, al final
+      return ta.localeCompare(tb, 'es') || ult(a, b);
+    });
+  } else if (o === 'recientes') l.sort((a, b) => (b.actualizado || 0) - (a.actualizado || 0) || ult(a, b));
+  else l.sort(ult);
+  return l;
+}
+
+/* Los grupos que se pintan: [{eje, clave, rotulo, items}]. Una pieza en
+   dos estantes sale en los dos (La Voz Prestada, regla 32): enseñarla
+   solo en el primero la escondería del montón donde alguien la busca. Y
+   filtrando por el mismo eje con que se agrupa sale UN montón, el
+   elegido: con la pieza en dos estantes, enseñar también el otro
+   contestaría a una pregunta que nadie hizo. */
+function csgAnqGrupos(lista) {
+  const pr = csgAnqPrefs();
+  const ag = pr.agrupar;
+  const f = pr.filtro;
+  if (ag === 'estante') {
+    if (f.estante) return [{ eje: 'estante', clave: f.estante, rotulo: csgAnqRotuloEstante(f.estante), items: csgAnqOrdena(lista) }];
+    const m = new Map();
+    lista.forEach(p => csgAnqEstantesDe(p).forEach(e => {
+      const k = csgClave(e);
+      if (!m.has(k)) m.set(k, []);
+      m.get(k).push(p);
+    }));
+    const gs = [...m.keys()].sort((a, b) => a.localeCompare(b, 'es'))
+      .map(k => ({ eje: 'estante', clave: k, rotulo: csgAnqRotuloEstante(k), items: csgAnqOrdena(m.get(k)) }));
+    const sin = lista.filter(p => !csgAnqEstantesDe(p).length);
+    if (sin.length) gs.push({ eje: 'estante', clave: 'sin', rotulo: 'Sin estante', items: csgAnqOrdena(sin) });
+    return gs;
+  }
+  if (ag === 'clase') {
+    if (f.clase) { const c = csgClaseDe(f.clase); return [{ eje: 'clase', clave: c.id, rotulo: c.ic + ' ' + c.nombre, items: csgAnqOrdena(lista) }]; }
+    return CSG_CLASES.map(c => ({ eje: 'clase', clave: c.id, rotulo: c.ic + ' ' + c.nombre,
+      items: csgAnqOrdena(lista.filter(p => csgClaseDe(p.clase).id === c.id)) })).filter(g => g.items.length);
+  }
+  if (ag === 'maquina') {
+    if (f.maquina) return [{ eje: 'maquina', clave: f.maquina, rotulo: csgAnqMaquinaNombre(f.maquina), items: csgAnqOrdena(lista) }];
+    return CSG_MAQUINAS.map(mq => ({ eje: 'maquina', clave: mq.id, rotulo: mq.nombre,
+      items: csgAnqOrdena(lista.filter(p => csgAnqMaquinaDe(p) === mq.id)) })).filter(g => g.items.length);
+  }
+  return [{ eje: 'no', clave: 'todo', rotulo: '', items: csgAnqOrdena(lista) }];
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EL ANAQUEL (§8)
+   ──────────────────────────────────────────────────────────────────
+   ⚠️ ANTES DE LA PRIMERA FICHA, COMO MUCHO CINCO COSAS: la barra, el
+   buscador, los chips, los filtros PUESTOS y el renglón de la bitácora,
+   y las dos últimas solo existen cuando tienen algo dentro. Es lo que la
+   regla 11 de Cuadernos quitó: seis franjas de mandos antes de la primera
+   ficha, y la cuenta escrita tres veces. Por eso la nube va AL PIE, como
+   franja solo cuando hay algo que arreglar; y por eso aquí no hay bloque
+   de presentación mientras haya piezas. La sonda 13 cuenta los hijos.
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgPintarAnaquel() {
+  if (typeof document === 'undefined' || !document || !document.getElementById) return;
+  const raiz = document.getElementById('csg-anaquel');
+  if (!raiz) return;
+  const ae = document.activeElement;
+  /* ⚠️ Mientras se escribe la nota de un «¿sirvió?», el anaquel no se
+     repinta: le arrancaría el recuadro de debajo de los dedos a mitad de
+     frase (la nube llega cuando llega). Se apunta y se repinta después de
+     soltar el recuadro, con un respiro: repintar EN el blur quitaría de
+     debajo del dedo lo que se iba a tocar, y el toque se perdería. */
+  if (ae && ae !== document.body && raiz.contains(ae) && ae.classList && ae.classList.contains('csg-pregunta-nota')) {
+    _csgAnqPendiente = true;
+    return;
+  }
+  _csgAnqPendiente = false;
+  const focoClave = (ae && ae !== document.body && raiz.contains(ae) && ae.dataset && ae.dataset.csgFoco) || '';
+  let barraX = 0;
+  for (let i = 0; i < raiz.children.length; i++) {
+    if (raiz.children[i].classList.contains('csg-barra')) { barraX = raiz.children[i].scrollLeft; break; }
+  }
+  _csgAnqGrupos = [];
+  _csgAnqMando = null;
+  _csgAnqRotulos = new Map(csgEstantesTodos().map(e => [e.clave, e.rotulo]));
+
+  const vivas = csgVivas();
+  const frag = document.createDocumentFragment();
+  if (!vivas.length) {
+    const seguir = csgAnqSeguirFila();
+    if (seguir) frag.appendChild(seguir);
+    csgAnqVacio(frag);
+    const ret = csgAnqRetiradas();
+    if (ret) frag.appendChild(ret);
+    frag.appendChild(csgAnqNube());
+    raiz.textContent = '';
+    raiz.appendChild(frag);
+    return;
+  }
+
+  const filtradas = csgAnqFiltra(vivas, false);
+  const grupos = csgAnqGrupos(filtradas);
+  const buscando = !!csgClave(_csgAnqBusca);
+  const conMando = grupos.length > 1;
+
+  const barra = csgAnqBarra();
+  const fila = csgAnqBuscaFila(conMando && !buscando ? grupos : null);
+  const chips = csgAnqChips(vivas);
+  frag.appendChild(chips);
+  const puestos = csgAnqPuestos(vivas.length, filtradas.length);
+  if (puestos) frag.appendChild(puestos);
+  /* El renglón de «seguir» y el de la bitácora ocupan el MISMO sitio, y
+     solo uno cada vez (ver csgAnqSeguirFila): antes de la primera ficha
+     caben como mucho cinco cosas (§8, regla 21). */
+  const preg = csgAnqSeguirFila() || (_csgAnqSeguirAhora ? null : csgBitFila());
+  if (preg) frag.appendChild(preg);
+  csgAnqContenido(frag, filtradas, grupos, buscando, conMando);
+  const ret = csgAnqRetiradas();
+  if (ret) frag.appendChild(ret);
+  frag.appendChild(csgAnqNube());
+
+  /* ⚠️ LA FILA DEL BUSCADOR NO SE REHACE: se queda en su sitio y se
+     cambia lo de alrededor. Sacar del documento un recuadro con el foco lo
+     desenfoca, y en una tableta eso cierra el teclado en cada letra (y lo
+     vuelve a abrir, si se le devuelve el foco). Todo se quita y se pone en
+     el mismo tirón, sin medir nada en medio: si el navegador midiera la
+     página a medio vaciar, bajaría el desplazamiento a cero y la vista
+     saltaría arriba. */
+  if (fila.parentNode === raiz) {
+    Array.from(raiz.childNodes).forEach(n => { if (n !== fila) raiz.removeChild(n); });
+    raiz.insertBefore(barra, fila);
+    raiz.appendChild(frag);
+  } else {
+    raiz.textContent = '';
+    raiz.appendChild(barra);
+    raiz.appendChild(fila);
+    raiz.appendChild(frag);
+  }
+
+  /* Ya en el documento, lo que se mide: la barra vuelve a donde estaba
+   (sin eso, tocar ☰ al final de la barra la devolvía al principio y las
+   vistas quedaban fuera de la pantalla), y el chip puesto se trae a la
+   vista. */
+  if (barraX) barra.scrollLeft = barraX;
+  csgAnqChipALaVista(chips);
+  if (focoClave) {
+    const el = Array.from(raiz.querySelectorAll('[data-csg-foco]')).find(x => x.dataset.csgFoco === focoClave);
+    if (el) { try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); } }
+  }
+}
+
+/* Sin ninguna pieza viva: la presentación y la tarjeta del §8, con las
+   dos puertas. Aquí sí va el bloque de presentación: con el anaquel vacío
+   no hay nada que empujar hacia abajo, y es la única vez que alguien
+   necesita que le digan qué es esto. */
+function csgAnqVacio(frag) {
+  const intro = csgEl('div', 'msug-intro csg-intro');
+  const ic = csgEl('div', 'msug-intro-ic', CSG_EMOJI);
+  ic.setAttribute('aria-hidden', 'true');
+  intro.appendChild(ic);
+  const caja = csgEl('div');
+  caja.appendChild(csgEl('p', 'msug-intro-txt', CSG_LEMA));
+  /* Las máquinas salen de CSG_MAQUINAS, no de una lista escrita aquí: el
+     día que entre una, esta frase la nombra sola. */
+  const maqs = CSG_MAQUINAS.filter(m => m.id !== 'otra').map(m => m.nombre);
+  const lista = maqs.length > 1 ? maqs.slice(0, -1).join(', ') + ' o ' + maqs[maqs.length - 1] : maqs.join('');
+  caja.appendChild(csgEl('span', 'msug-intro-count', 'Prompts, habilidades, grafos de agentes y bucles, con la forma que pide ' + lista + '.'));
+  intro.appendChild(caja);
+  frag.appendChild(intro);
+
+  const v = csgEl('div', 'csg-vacio');
+  const grande = csgEl('div', 'csg-vacio-ic', CSG_EMOJI);
+  grande.setAttribute('aria-hidden', 'true');
+  v.appendChild(grande);
+  /* El texto del §8 tal cual, en UN párrafo: partido en dos, el
+     textContent de la tarjeta juntaría las frases sin espacio. */
+  const p = csgEl('p');
+  p.appendChild(csgEl('strong', '', 'Todavía no hay consignas.'));
+  p.appendChild(document.createTextNode(' Cada consigna es lo que le pides a una máquina, con forma: un prompt, una habilidad, un grafo de agentes o un bucle. Se escribe una vez, se guarda y se vuelve a usar en dos toques.'));
+  v.appendChild(p);
+  const acc = csgEl('div', 'csg-vacio-acciones');
+  acc.appendChild(csgBtn('csg-btn-lleno', '＋', 'Nueva', () => csgAnqNueva()));
+  acc.appendChild(csgBtn('csg-btn-tenido', '📋', 'Pegar una que ya tengas', () => csgAnqPegar()));
+  v.appendChild(acc);
+  frag.appendChild(v);
+}
+
+/* Las puertas a las otras dos partes. Van por aquí para que, si una de
+   ellas no cargó, el botón lo DIGA en vez de reventar: un toque que no
+   hace nada se lee como una aplicación rota. */
+function csgAnqNueva() {
+  if (typeof csgNueva === 'function') csgNueva();
+  else csgAviso('No se pudo abrir el compositor: vuelve a abrir F.A.R.O');
+}
+function csgAnqPegar() {
+  if (typeof csgAbrirPegar === 'function') csgAbrirPegar('');
+  else csgAviso('No se pudo abrir la hoja de pegar: vuelve a abrir F.A.R.O');
+}
+function csgAnqUsar(p) {
+  if (typeof csgAbrirUsar === 'function') csgAbrirUsar(p);
+  else csgAviso('No se pudo abrir la hoja de usar: vuelve a abrir F.A.R.O');
+}
+function csgAnqCorregir(p) {
+  if (typeof csgAbrirCompositor === 'function') csgAbrirCompositor(p);
+  else csgAviso('No se pudo abrir el compositor: vuelve a abrir F.A.R.O');
+}
+
+/* La barra: UNA fila que se desliza, los botones PRIMERO (lo que se toca a
+   diario) y las vistas al final (se tocan una vez al mes). Es lo que se
+   aprendió con ☑ Elegir en La Voz Prestada: lo último de una barra que se
+   desliza es lo que se sale de la pantalla. El color dice la función:
+   crear lleno, traer teñido, mirar neutro, sacar ámbar. */
+function csgAnqBarra() {
+  const pr = csgAnqPrefs();
+  const barra = csgEl('div', 'csg-barra');
+  const pon = (b, foco) => { b.dataset.csgFoco = foco; barra.appendChild(b); return b; };
+  pon(csgBtn('csg-btn-lleno', '＋', 'Nueva', () => csgAnqNueva()), 'barra:nueva');
+  pon(csgBtn('csg-btn-tenido', '📋', 'Pegar', () => csgAnqPegar()), 'barra:pegar');
+  const sep = () => { const s = csgEl('span', 'csg-barra-sep'); s.setAttribute('aria-hidden', 'true'); barra.appendChild(s); };
+  sep();
+  pon(csgBtn('csg-btn-neutro', '🗂', 'Estantes', csgAnqEstantesAbrir), 'barra:estantes');
+  pon(csgBtn('csg-btn-neutro', '⇅', 'Orden', csgAnqOrdenAbrir), 'barra:orden');
+  sep();
+  pon(csgBtn('csg-btn-ambar', '📋', 'Exportar', csgAnqExportar), 'barra:exportar');
+  const vistas = csgEl('div', 'csg-vistas');
+  vistas.setAttribute('role', 'group');
+  vistas.setAttribute('aria-label', 'Cómo se ven');
+  [['fichas', '▦', 'Ver en fichas'], ['lista', '☰', 'Ver en lista']].forEach(([id, ic, et]) => {
+    const on = pr.vista === id;
+    const b = csgAnqBoton('csg-chip' + (on ? ' on' : ''), ic, () => {
+      if (csgAnqPrefs().vista === id) return;
+      csgAnqPrefs().vista = id;
+      csgAnqGuardaPrefs();
+      csgPintarAnaquel();
+    });
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.setAttribute('aria-label', et);
+    b.dataset.csgFoco = 'vista:' + id;
+    vistas.appendChild(b);
+  });
+  barra.appendChild(vistas);
+  return barra;
+}
+
+/* ⚠️ La fila del buscador se crea UNA vez y se reutiliza (ver
+   csgPintarAnaquel): solo se le cambia el mando de al lado. El mando es el
+   único de la lista, y hace falta porque lo abierto se recuerda a
+   propósito: quien abrió cinco estantes para buscar una cosa se queda con
+   cinco abiertos para siempre. Buscando no sale: buscando se abre todo. */
+function csgAnqBuscaFila(grupos) {
+  if (!_csgAnqBuscaFila) {
+    const fila = csgEl('div', 'csg-busca');
+    const inp = csgEl('input', 'csg-busca-input');
+    inp.type = 'search';
+    inp.placeholder = '🔍 Buscar una consigna…';
+    inp.setAttribute('aria-label', 'Buscar en las consignas: título, bloques, estantes, variables, máquina y notas');
+    inp.setAttribute('autocomplete', 'off');
+    inp.setAttribute('enterkeyhint', 'search');
+    inp.spellcheck = false;
+    inp.value = _csgAnqBusca;
+    inp.addEventListener('input', () => {
+      clearTimeout(_csgAnqBuscaT);
+      _csgAnqBuscaT = setTimeout(() => { _csgAnqBusca = inp.value; csgPintarAnaquel(); }, 180);
+    });
+    fila.appendChild(inp);
+    _csgAnqBuscaFila = fila;
+  }
+  const fila = _csgAnqBuscaFila;
+  Array.from(fila.querySelectorAll('.csg-busca-mando')).forEach(n => n.parentNode.removeChild(n));
+  if (grupos && grupos.length > 1) {
+    const m = csgAnqBoton('csg-busca-mando', '', csgAnqMandoTocar);
+    m.dataset.csgFoco = 'mando';
+    _csgAnqMando = m;
+    csgAnqMandoRotulo(grupos.map(g => g.eje + ':' + g.clave));
+    fila.appendChild(m);
+  }
+  return fila;
+}
+function csgAnqMandoRotulo(claves) {
+  if (!_csgAnqMando) return;
+  const ks = claves || _csgAnqGrupos.map(r => r.k);
+  const ab = csgAnqPrefs().abiertos;
+  const alguno = ks.some(k => ab[k]);
+  _csgAnqMando.textContent = alguno ? '▴ Cerrar todos' : '▾ Abrir todos';
+}
+/* Se toca el DOM, no se repinta (regla 40 de La Voz Prestada): un
+   repintado deja sin foco al botón que se acaba de pulsar y le arranca a
+   la tableta la tarjeta que iba a recibir el toque siguiente. */
+function csgAnqMandoTocar() {
+  const ab = csgAnqPrefs().abiertos;
+  const alguno = _csgAnqGrupos.some(r => ab[r.k]);
+  _csgAnqGrupos.forEach(r => {
+    if (alguno) delete ab[r.k]; else ab[r.k] = true;
+    csgAnqPonAbierto(r, !alguno);
+  });
+  csgAnqGuardaPrefs();
+  csgAnqMandoRotulo();
+}
+
+/* Los chips de clase, con su cuenta, en UNA fila que se desliza. «Sin
+   probar» va TERCERO: el trabajo no es ver los prompts, es saber cuáles
+   faltan por probar (la misma lección que «Sin video» en Videos
+   M.E.T.A.S). Un chip a cero no sale —dice que no hay nada, y el anaquel
+   ya lo dice sin él—, salvo que esté puesto. */
+function csgAnqChips(vivas) {
+  const f = csgAnqPrefs().filtro;
+  const base = csgAnqFiltra(vivas, true);
+  const fila = csgEl('div', 'csg-chips csg-desliza');
+  fila.setAttribute('role', 'group');
+  fila.setAttribute('aria-label', 'Filtrar por clase');
+  const chip = (foco, rotulo, n, on, alTocar) => {
+    if (!n && !on && foco !== 'chip:todas') return;
+    const b = csgAnqBoton('csg-chip' + (on ? ' on' : ''), rotulo, alTocar);
+    b.appendChild(csgEl('span', 'csg-chip-n', String(n)));
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    b.dataset.csgFoco = foco;
+    fila.appendChild(b);
+  };
+  const pon = cambio => { csgAnqPonFiltro(cambio); csgPintarAnaquel(); };
+  chip('chip:todas', 'Todas', base.length, !f.clase && !f.especial, () => pon({ clase: '', especial: '' }));
+  Object.keys(CSG_ANQ_ESPECIALES).forEach(id => {
+    const e = CSG_ANQ_ESPECIALES[id];
+    const n = base.filter(id === 'borradores' ? csgAnqBorrador : csgAnqSinProbar).length;
+    const on = f.especial === id;
+    chip('chip:' + id, e.ic + ' ' + e.t, n, on, () => pon(on ? { especial: '' } : { especial: id }));
+  });
+  CSG_CLASES.forEach(c => {
+    const n = base.filter(p => csgClaseDe(p.clase).id === c.id).length;
+    const on = f.clase === c.id;
+    chip('chip:' + c.id, c.ic + ' ' + c.nombre, n, on, () => pon(on ? { clase: '' } : { clase: c.id }));
+  });
+  return fila;
+}
+function csgAnqChipALaVista(fila) {
+  if (!fila || !fila.getClientRects || !fila.getClientRects().length) return;
+  const on = fila.querySelector('.csg-chip.on');
+  if (!on || on === fila.firstElementChild) { fila.scrollLeft = 0; return; }
+  const r = fila.getBoundingClientRect();
+  const c = on.getBoundingClientRect();
+  fila.scrollLeft += (c.left - r.left) - (r.width - c.width) / 2;
+}
+
+/* Poner o quitar un filtro. La clase y lo especial son UN solo sitio (la
+   fila de chips elige uno), y el estante y la máquina van aparte: se
+   puede mirar «los borradores de Maestría». `null` lo quita todo. */
+function csgAnqPonFiltro(cambio) {
+  const pr = csgAnqPrefs();
+  if (!cambio) { pr.filtro = {}; csgAnqGuardaPrefs(); return; }
+  const f = Object.assign({}, pr.filtro);
+  if ('estante' in cambio) { if (cambio.estante) f.estante = cambio.estante; else delete f.estante; }
+  if ('maquina' in cambio) { if (cambio.maquina) f.maquina = cambio.maquina; else delete f.maquina; }
+  if ('clase' in cambio || 'especial' in cambio) {
+    delete f.clase; delete f.especial;
+    if (cambio.clase) f.clase = cambio.clase;
+    if (cambio.especial) f.especial = cambio.especial;
+  }
+  pr.filtro = f;
+  csgAnqGuardaPrefs();
+}
+function csgAnqQuitarFiltros() {
+  csgAnqPonFiltro(null);
+  _csgAnqBusca = '';
+  clearTimeout(_csgAnqBuscaT);
+  if (_csgAnqBuscaFila) {
+    const inp = _csgAnqBuscaFila.querySelector('.csg-busca-input');
+    if (inp) inp.value = '';
+  }
+  csgPintarAnaquel();
+}
+
+/* Los filtros PUESTOS, cada uno con su ✕, y al final «3 de 12». Sin
+   filtro ni búsqueda la fila no existe: una fila que dice «12 de 12» es
+   una noticia que ya se sabe. */
+function csgAnqPuestos(total, vistas) {
+  const f = csgAnqPrefs().filtro;
+  const buscando = !!csgClave(_csgAnqBusca);
+  const lista = [];
+  if (f.estante) lista.push({ t: (f.estante === 'sin' ? '' : '🗂 ') + csgAnqRotuloEstante(f.estante), foco: 'puesto:estante', quita: { estante: '' } });
+  if (f.maquina) lista.push({ t: '🤖 ' + csgAnqMaquinaNombre(f.maquina), foco: 'puesto:maquina', quita: { maquina: '' } });
+  if (f.clase) { const c = csgClaseDe(f.clase); lista.push({ t: c.ic + ' ' + c.nombre, foco: 'puesto:clase', quita: { clase: '' } }); }
+  if (f.especial && CSG_ANQ_ESPECIALES[f.especial]) {
+    const e = CSG_ANQ_ESPECIALES[f.especial];
+    lista.push({ t: e.ic + ' ' + e.t, foco: 'puesto:especial', quita: { especial: '' } });
+  }
+  if (!lista.length && !buscando) return null;
+  const fila = csgEl('div', 'csg-puestos');
+  lista.forEach(x => {
+    const b = csgAnqBoton('csg-puesto', x.t + ' ✕', () => { csgAnqPonFiltro(x.quita); csgPintarAnaquel(); });
+    b.setAttribute('aria-label', 'Quitar este filtro');
+    b.dataset.csgFoco = x.foco;
+    fila.appendChild(b);
+  });
+  fila.appendChild(csgEl('span', 'csg-puestos-n', vistas + ' de ' + total));
+  return fila;
+}
+
+/* Las fichas, en su caja o en sus grupos. ⚠️ LOS GRUPOS SE PLIEGAN CON
+   LAS CUATRO REGLAS DEL ANAQUEL (La Voz Prestada, regla 40; Cuadernos,
+   regla 4), y cada una salió de un fallo medido:
+   · NADA SE ABRE SOLO: abrir «los que tengan algo» es abrir todos.
+   · UN SOLO MONTÓN NO LLEVA MANDO: se pinta como rótulo, no como botón;
+     cobrar un toque por un nivel que no separa nada es peor que no
+     agrupar.
+   · BUSCANDO SE ABRE TODO Y ESO NO SE GUARDA: un resultado escondido
+     detrás de un rótulo plegado se lee igual que una búsqueda que no
+     encontró nada.
+   · TODO SE PINTA Y SE ESCONDE CON `hidden`; nunca nace al abrir: lo que
+     no está en el documento no lo encuentra ni el buscador de la página
+     ni la sonda. (.csg-grupo[hidden] lleva su display:none !important en
+     el CSS: sin él, el `hidden` del navegador pierde contra el display de
+     la clase y el mando responde sin hacer nada.)
+   La llave lleva el eje delante (estante:maestria, clase:prompt,
+   maquina:claude): un estante llamado «Prompt» y la clase prompt no
+   pueden compartir llave. */
+function csgAnqContenido(frag, filtradas, grupos, buscando, conMando) {
+  const pr = csgAnqPrefs();
+  if (!filtradas.length) {
+    const v = csgEl('div', 'csg-vacio');
+    v.appendChild(csgEl('p', '', 'Ninguna consigna con eso. Prueba con otra palabra o quita los filtros.'));
+    v.appendChild(csgBtn('csg-btn-neutro', '✕', 'Quitar la búsqueda y los filtros', csgAnqQuitarFiltros));
+    frag.appendChild(v);
+    return;
+  }
+  const hazCaja = () => csgEl('div', pr.vista === 'lista' ? 'csg-lista' : 'csg-grid');
+  const pinta = (caja, g) => g.items.forEach(p => caja.appendChild(pr.vista === 'lista' ? csgFichaFila(p, g) : csgFichaCrear(p, g)));
+  if (grupos.length === 1 && !grupos[0].rotulo) {
+    const caja = hazCaja();
+    pinta(caja, grupos[0]);
+    frag.appendChild(caja);
+    return;
+  }
+  grupos.forEach((g, i) => {
+    const k = g.eje + ':' + g.clave;
+    const tono = g.eje === 'estante' ? csgTono(g.clave === 'sin' ? '' : g.clave)
+      : g.eje === 'clase' ? 'csg-clase-' + g.clave : 'csg-tono-x';
+    const sec = csgEl('section');
+    const caja = csgEl('div', 'csg-grupo');
+    const dentro = hazCaja();
+    pinta(dentro, g);
+    caja.appendChild(dentro);
+    if (!conMando) {
+      const rot = csgEl('div', 'csg-grupo-rot-solo ' + tono);
+      rot.appendChild(csgEl('span', 'csg-grupo-nombre', g.rotulo));
+      rot.appendChild(csgEl('span', 'csg-grupo-n', String(g.items.length)));
+      sec.appendChild(rot);
+      sec.appendChild(caja);
+      frag.appendChild(sec);
+      return;
+    }
+    const rot = csgAnqBoton('csg-grupo-rot ' + tono, null, null);
+    rot.appendChild(csgEl('span', 'csg-grupo-nombre', g.rotulo));
+    rot.appendChild(csgEl('span', 'csg-grupo-n', String(g.items.length)));
+    /* Plegado, el rótulo enseña los emojis de clase de lo que hay dentro,
+       pegados a la cuenta: se sabe qué hay sin abrirlo. Agrupando por
+       clase no sale: serían cinco veces el mismo emoji. */
+    let vista = null;
+    if (g.eje !== 'clase') {
+      const em = g.items.slice(0, 5).map(p => csgClaseDe(p.clase).ic).join('');
+      vista = csgEl('span', 'csg-grupo-vista', em + (g.items.length > 5 ? ' +' + (g.items.length - 5) : ''));
+      vista.setAttribute('aria-hidden', 'true');
+      rot.appendChild(vista);
+    }
+    /* El galón es una letra de verdad y no un icono de Font Awesome: ese
+       viene de un CDN, y si no llega el rótulo se queda sin nada que diga
+       que se abre. Siempre «▾»; plegado lo gira el CSS por aria-expanded. */
+    const galon = csgEl('span', 'csg-grupo-galon', '▾');
+    galon.setAttribute('aria-hidden', 'true');
+    rot.appendChild(galon);
+    rot.dataset.csgFoco = 'grupo:' + i;
+    const reg = { k, rot, caja, vista };
+    rot.addEventListener('click', () => csgAnqAlternar(reg));
+    csgAnqPonAbierto(reg, buscando || !!pr.abiertos[k]);
+    _csgAnqGrupos.push(reg);
+    sec.appendChild(rot);
+    sec.appendChild(caja);
+    frag.appendChild(sec);
+  });
+}
+function csgAnqPonAbierto(reg, abierto) {
+  reg.caja.hidden = !abierto;
+  reg.rot.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+  if (reg.vista) reg.vista.hidden = abierto;
+}
+/* Al pulsar se toca el DOM y NO se repinta. Buscando, lo que se abre o
+   cierra no se guarda (es el efecto de la búsqueda, no una decisión); y
+   lo cerrado se BORRA de la llave en vez de guardarse en falso, para que
+   no crezca con lo que alguien abrió una vez. */
+function csgAnqAlternar(reg) {
+  const abrir = reg.caja.hidden;
+  csgAnqPonAbierto(reg, abrir);
+  if (!csgClave(_csgAnqBusca)) {
+    const ab = csgAnqPrefs().abiertos;
+    if (abrir) ab[reg.k] = true; else delete ab[reg.k];
+    csgAnqGuardaPrefs();
+    csgAnqMandoRotulo();
+  }
+}
+
+/* ── La ficha (▦) ───────────────────────────────────────────────────
+   Vertical y con los botones al pie, sin hueco entre lo que dice y lo que
+   se puede hacer (la captura de Cuadernos: medio metro de nada en medio).
+   Lo que ya está dicho no se repite: el estante del grupo no sale dentro
+   como chip, y «v1» no dice nada. Tres botones y no cuatro: Copiar vive en
+   Usar y en ⋯ (§8: cuatro botones eran las cajitas que el autor
+   rechazó). */
+function csgFichaCrear(p, g) {
+  const clase = csgClaseDe(p.clase);
+  const art = csgEl('article', 'csg-ficha csg-clase-' + clase.id);
+  const cab = csgEl('div', 'csg-ficha-cab');
+  const bal = csgEl('span', 'csg-baldosa', clase.ic);
+  bal.setAttribute('aria-hidden', 'true');
+  cab.appendChild(bal);
+  const tit = String(p.titulo || '').trim();
+  cab.appendChild(csgEl('span', 'csg-ficha-titulo' + (tit ? '' : ' csg-ficha-titulo-vacio'), tit || CSG_SIN_TITULO));
+  art.appendChild(cab);
+  art.appendChild(csgFichaMeta(p));
+
+  const f = csgAnqPrefs().filtro;
+  const enEstante = (g && g.eje === 'estante' && g.clave !== 'sin') ? g.clave
+    : (f.estante && f.estante !== 'sin') ? f.estante : '';
+  const otros = csgAnqEstantesDe(p).filter(e => csgClave(e) !== enEstante);
+  if (otros.length) {
+    const ests = csgEl('div', 'csg-ficha-estantes');
+    otros.forEach(e => ests.appendChild(csgEl('span', csgTono(e), _csgAnqRotulos.get(csgClave(e)) || e)));
+    art.appendChild(ests);
+  }
+  const ex = csgFichaExtracto(p);
+  if (ex) art.appendChild(ex);
+
+  const pie = csgEl('div', 'csg-ficha-pie');
+  pie.appendChild(csgBtn('csg-btn-lleno', '▶', 'Usar', () => csgAnqUsar(p)));
+  pie.appendChild(csgBtn('csg-btn-neutro', '✎', 'Corregir', () => csgAnqCorregir(p)));
+  const mas = csgBtn('csg-mas csg-btn-neutro', '⋯', '', () => csgMenuAbrir(p));
+  mas.setAttribute('aria-label', 'Más: copiar, duplicar, versiones, bitácora, estantes, retirar');
+  pie.appendChild(mas);
+  art.appendChild(pie);
+  return art;
+}
+
+/* UNA línea corrida, con un token delante solo cuando toca, y nunca los
+   dos: el borrador manda, porque una pieza que no se puede usar no se
+   gradúa. */
+function csgFichaMeta(p) {
+  const meta = csgEl('div', 'csg-ficha-meta');
+  const falta = csgFaltaDe(p);
+  if (falta) {
+    meta.appendChild(csgEl('span', 'csg-ficha-token csg-ficha-token-borrador', '🟡 borrador: ' + falta));
+  } else if (csgClaseDe(p.clase).id === 'prompt') {
+    const n = csgAnqUsosMes(p);
+    if (n >= CSG_ANQ_USOS_MES) {
+      const b = csgAnqBoton('csg-ficha-token csg-ficha-token-uso', '⚠ ' + n + ' usos este mes ▸', () => csgFichaGraduar(p));
+      b.setAttribute('aria-label', 'Usada ' + n + ' veces este mes: hacer una copia como Instrucción de sistema');
+      meta.appendChild(b);
+    }
+  }
+  const partes = csgFichaPartes(p);
+  if (partes.length) meta.appendChild(document.createTextNode((meta.childNodes.length ? ' ' : '') + partes.join(' · ')));
+  return meta;
+}
+function csgFichaPartes(p) {
+  const molde = csgAnqMolde(p);
+  const v = csgAnqValor(p);
+  const usos = Math.max(0, parseInt(p.usos, 10) || 0);
+  const partes = [
+    molde ? molde.nombre : '',
+    p.maquina ? csgAnqMaquinaNombre(p.maquina) : '',
+    (parseInt(p.version, 10) || 1) > 1 ? 'v' + parseInt(p.version, 10) : '',
+    usos ? (usos === 1 ? '1 uso' : usos + ' usos') : 'sin usar',
+    v.si ? '👍 ' + v.si : '',
+    v.no ? '👎 ' + v.no : '',
+    /* Ordenando por valoración, las que van al final dicen por qué: si
+       no, parecen las peores y son solo las menos contestadas. */
+    csgAnqPrefs().orden === 'valor' && v.contestados < 2 ? 'pocos usos' : '',
+    csgHace(p.ultima || p.actualizado),
+  ];
+  return partes.filter(Boolean);
+}
+/* «⚠ 3 usos este mes ▸» hace exactamente lo mismo que ⋯ → Duplicar hacia
+   Habilidad · Instrucción de sistema, sin guardar (§6.9): un solo
+   mecanismo, a la vista, y la original no se toca. */
+function csgFichaGraduar(p) {
+  if (typeof csgDuplicarEnMolde !== 'function' || typeof csgAbrirCompositor !== 'function') {
+    csgAviso('No se pudo abrir el compositor: vuelve a abrir F.A.R.O');
+    return;
+  }
+  const nueva = csgDuplicarEnMolde(p, 'sistema');
+  if (!nueva) { csgAviso('No se pudo preparar la copia'); return; }
+  csgAbrirCompositor(nueva);
+  const m = CSG_MOLDES.sistema;
+  csgAviso('Una copia como 🧰 ' + (m ? m.nombre : 'Instrucción de sistema') + ', sin guardar: la original sigue igual');
+}
+/* El primer bloque OBLIGATORIO con texto, en dos líneas grises. Se salta
+   el que aún tiene su texto de nacimiento (la etiqueta de Voz prestada o
+   de Careo): sería la misma frase en todas las fichas de ese molde. */
+function csgFichaExtracto(p) {
+  const molde = csgAnqMolde(p);
+  let t = '';
+  if (molde) {
+    for (let i = 0; i < molde.bloques.length && !t; i++) {
+      const b = molde.bloques[i];
+      if (!b.ob) continue;
+      const x = String(csgTextoDe(p, b.id) || '').trim();
+      if (!x) continue;
+      let ini = '';
+      try { ini = String(csgBloqueDef(p.molde, b.id).inicial || '').trim(); } catch (e) { ini = ''; }
+      if (ini && x === ini) continue;
+      t = x;
+    }
+  }
+  if (!t) {
+    const b = (Array.isArray(p.bloques) ? p.bloques : []).find(x => x && String(x.t || '').trim());
+    if (b) t = String(b.t).trim();
+  }
+  if (!t) return null;
+  return csgEl('div', 'csg-ficha-extracto', t.slice(0, 600).replace(/\s+/g, ' ').trim().slice(0, 240));
+}
+
+/* ── La fila (☰): 44 px, lo justo para reconocerla y usarla ────────── */
+function csgFichaFila(p) {
+  const clase = csgClaseDe(p.clase);
+  const f = csgEl('div', 'csg-fila csg-clase-' + clase.id);
+  const punto = csgEl('span', 'csg-fila-punto');
+  punto.setAttribute('aria-hidden', 'true');
+  f.appendChild(punto);
+  const tit = String(p.titulo || '').trim();
+  f.appendChild(csgEl('span', 'csg-fila-titulo' + (tit ? '' : ' csg-ficha-titulo-vacio'), tit || CSG_SIN_TITULO));
+  /* El 🟡 también aquí: sin él, en la lista no se distingue un borrador y
+     ▶ llevaría a una hoja de usar que se para. */
+  const meta = [csgAnqBorrador(p) ? '🟡' : '', p.maquina ? csgAnqMaquinaNombre(p.maquina) : '', csgHace(p.ultima || p.actualizado)].filter(Boolean).join(' · ');
+  f.appendChild(csgEl('span', 'csg-fila-meta', meta));
+  /* Con su palabra, como todos los botones de la casa; en el teléfono el
+     CSS la esconde (.csg-fila-usar), porque ahí no cabe al lado del
+     título, y la etiqueta sigue diciendo «Usar» al lector de pantalla. */
+  const usar = csgBtn('csg-btn-lleno csg-btn-sm csg-fila-usar', '▶', 'Usar', () => csgAnqUsar(p));
+  usar.setAttribute('aria-label', 'Usar');
+  f.appendChild(usar);
+  const mas = csgBtn('csg-mas csg-btn-neutro csg-btn-sm', '⋯', '', () => csgMenuAbrir(p));
+  mas.setAttribute('aria-label', 'Más: copiar, corregir, duplicar, versiones, bitácora, estantes, retirar');
+  f.appendChild(mas);
+  return f;
+}
+
+/* ── Las retiradas: al final, plegadas, y de ahí se devuelven ──────── */
+function csgAnqTiempo(v, def) {
+  if (typeof v === 'number' && isFinite(v)) return v;
+  const t = Date.parse(v);
+  return isFinite(t) ? t : (def || 0);
+}
+function csgAnqRetiradas() {
+  const ret = csgRetiradas().slice().sort((a, b) =>
+    csgAnqTiempo(b.eliminado_at, b.actualizado) - csgAnqTiempo(a.eliminado_at, a.actualizado));
+  if (!ret.length) return null;
+  const d = csgEl('details', 'csg-retiradas');
+  if (_csgAnqRetAbiertas) d.open = true;
+  d.addEventListener('toggle', () => { _csgAnqRetAbiertas = d.open; });
+  d.appendChild(csgEl('summary', '', '🗑 Retiradas (' + ret.length + ')'));
+  d.appendChild(csgEl('p', 'csg-nota', '«Devolver» la pone otra vez en el anaquel, en todos los aparatos de la casa.'));
+  ret.slice(0, 60).forEach(p => {
+    const clase = csgClaseDe(p.clase);
+    const f = csgEl('div', 'csg-fila csg-clase-' + clase.id);
+    const punto = csgEl('span', 'csg-fila-punto');
+    punto.setAttribute('aria-hidden', 'true');
+    f.appendChild(punto);
+    const tit = String(p.titulo || '').trim();
+    f.appendChild(csgEl('span', 'csg-fila-titulo' + (tit ? '' : ' csg-ficha-titulo-vacio'), tit || CSG_SIN_TITULO));
+    f.appendChild(csgEl('span', 'csg-fila-meta', ('retirada ' + csgHace(csgAnqTiempo(p.eliminado_at, p.actualizado))).trim()));
+    f.appendChild(csgBtn('csg-btn-neutro csg-btn-sm', '↩', 'Devolver', () => {
+      /* Quien devuelve una está mirando las retiradas: el repintado no se
+         las puede cerrar (el aviso `toggle` llega tarde si se abrieron por
+         programa, y entonces la lista se plegaba debajo del dedo). */
+      _csgAnqRetAbiertas = true;
+      p.eliminado = false;
+      p.eliminado_at = null;
+      const r = csgPersistir(p);
+      csgPintarAnaquel();
+      csgAviso('↩ «' + csgAnqCorto(tit || CSG_SIN_TITULO, 40) + '» vuelve al anaquel');
+      Promise.resolve(r).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+    }));
+    d.appendChild(f);
+  });
+  if (ret.length > 60) d.appendChild(csgEl('p', 'csg-nota', 'Y ' + (ret.length - 60) + ' más, las más viejas.'));
+  return d;
+}
+
+/* ── La nube, al pie ─────────────────────────────────────────────────
+   Franja SOLO con algo que arreglar, y diciendo qué (csgRotuloNube ya
+   pone la causa: el SQL, la sesión, la señal, lo que no cabe). Cuando va
+   bien —o mientras mira— es un renglón discreto: una franja verde en cada
+   arranque es una noticia que ya se sabe. */
+function csgAnqNube() {
+  let r;
+  try { r = csgRotuloNube(); } catch (e) { r = { ic: '⏳', t: 'Mirando la nube…', ok: false }; }
+  if (r.ok || r.ic === '⏳') return csgEl('div', 'csg-nube-pie', r.ic + ' ' + r.t);
+  const f = csgEl('div', 'csg-nube-no');
+  f.setAttribute('role', 'status');
+  f.appendChild(csgEl('span', '', r.ic + ' ' + r.t));
+  if (r.accion === 'reintentar') {
+    const b = csgBtn('csg-btn-neutro csg-btn-sm', '↻', 'Reintentar', () => {
+      b.disabled = true;
+      const t = b.querySelector('.csg-btn-t');
+      if (t) t.textContent = 'Mirando…';
+      /* Reintentar es VOLVER A CARGAR (baja, junta y sube lo pendiente):
+         csgSubirPendientes a secas no vuelve a mirar la nube si no hay
+         nada pendiente, y la franja se quedaría diciendo «sin señal». */
+      Promise.resolve(csgCargar()).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+    });
+    f.appendChild(b);
+  }
+  if (r.id && csgDe(r.id)) {
+    f.appendChild(csgBtn('csg-btn-neutro csg-btn-sm', '✎', 'Abrirla', () => { const p = csgDe(r.id); if (p) csgAnqCorregir(p); }));
+  }
+  return f;
+}
+
+/* ── 🗂 Estantes: la hoja vertical de lo que se puede mirar ──────────
+   Estantes primero (a eso se abre), con su tono y su cuenta; después las
+   máquinas y lo que falta (borradores, sin probar). Elegir uno pone el
+   filtro y CIERRA la hoja: se vino a ver ese montón, no a seguir mirando
+   la lista. Volver a tocar el que está puesto lo quita. */
+function csgAnqEstantesAbrir() {
+  csgVerAbrir('🗂 Estantes', cuerpo => {
+    const f = csgAnqPrefs().filtro;
+    const vivas = csgVivas();
+    const elige = cambio => { csgAnqPonFiltro(cambio); csgVerCerrar(); csgPintarAnaquel(); };
+    const nada = !f.estante && !f.maquina && !f.especial && !f.clase;
+    cuerpo.appendChild(csgVerFila(CSG_EMOJI, 'Todas', vivas.length, nada, () => elige(null)));
+
+    cuerpo.appendChild(csgVerSep('Estantes'));
+    const ests = csgEstantesTodos();
+    ests.forEach(e => {
+      const on = f.estante === e.clave;
+      const r = csgVerFila('🗂', e.rotulo, e.n, on, () => elige({ estante: on ? '' : e.clave }));
+      r.classList.add(csgTono(e.clave));
+      cuerpo.appendChild(r);
+    });
+    const sin = vivas.filter(p => !csgAnqEstantesDe(p).length).length;
+    if (sin && ests.length) {
+      const on = f.estante === 'sin';
+      /* 📥 y no ▫️: el cuadrado blanco salía como un punto gris en su
+         baldosa, que se lee como un icono que no cargó. */
+      const r = csgVerFila('📥', 'Sin estante', sin, on, () => elige({ estante: on ? '' : 'sin' }), 'lo que falta por archivar');
+      r.classList.add('csg-tono-x');
+      cuerpo.appendChild(r);
+    }
+    if (!ests.length) cuerpo.appendChild(csgEl('p', 'csg-nota', 'Todavía no hay estantes. Se ponen desde el ⋯ de cada consigna, o en el compositor: la materia, el proyecto, para quién es. Una consigna puede estar en varios.'));
+
+    const cuentas = new Map();
+    vivas.forEach(p => { const m = csgAnqMaquinaDe(p); cuentas.set(m, (cuentas.get(m) || 0) + 1); });
+    const maqs = CSG_MAQUINAS.filter(m => cuentas.get(m.id));
+    if (maqs.length) {
+      cuerpo.appendChild(csgVerSep('Máquinas'));
+      maqs.forEach(m => {
+        const on = f.maquina === m.id;
+        const r = csgVerFila('🤖', m.nombre, cuentas.get(m.id), on, () => elige({ maquina: on ? '' : m.id }));
+        r.classList.add('csg-tono-x');
+        cuerpo.appendChild(r);
+      });
+    }
+
+    cuerpo.appendChild(csgVerSep('Lo que falta'));
+    Object.keys(CSG_ANQ_ESPECIALES).forEach(id => {
+      const e = CSG_ANQ_ESPECIALES[id];
+      const n = vivas.filter(id === 'borradores' ? csgAnqBorrador : csgAnqSinProbar).length;
+      const on = f.especial === id;
+      cuerpo.appendChild(csgVerFila(e.ic, e.t, n, on, () => elige({ especial: on ? '' : id }),
+        id === 'borradores' ? 'guardadas con algo que para el usar' : 'ningún uso contestado todavía'));
+    });
+  });
+}
+
+/* ── ⇅ Orden y agrupación, en la misma hoja ──────────────────────── */
+function csgAnqOrdenAbrir() {
+  csgVerAbrir('⇅ Orden', cuerpo => {
+    const pr = csgAnqPrefs();
+    const pon = (campo, valor) => { pr[campo] = valor; csgAnqGuardaPrefs(); csgVerCerrar(); csgPintarAnaquel(); };
+    cuerpo.appendChild(csgVerSep('Ordenar por'));
+    CSG_ANQ_ORDENES.forEach(o => cuerpo.appendChild(csgVerFila(o.ic, o.t, null, pr.orden === o.id, () => pon('orden', o.id), o.d)));
+    cuerpo.appendChild(csgVerSep('Agrupar'));
+    CSG_ANQ_AGRUPAR.forEach(a => cuerpo.appendChild(csgVerFila(a.ic, a.t, null, pr.agrupar === a.id, () => pon('agrupar', a.id), a.d)));
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'El orden y los grupos son de este aparato: no cambian lo que ven los demás.'));
+  });
+}
+
+/* ── 📋 Exportar: el inventario entero, en texto ─────────────────────
+   Se copia DENTRO del toque (csgCopiarTexto) y además se enseña en la
+   hoja, seleccionable: si el portapapeles falla, el texto está ahí para
+   mantener pulsado. Es texto para un chat o un respaldo, no un formato que
+   se importe (§12); y sale del núcleo (csgExportarTexto), que ya deja
+   fuera las retiradas. */
+function csgAnqExportar() {
+  const vivas = csgVivas();
+  if (!vivas.length) { csgAviso('No hay consignas que exportar'); return; }
+  let texto = '';
+  try { texto = csgExportarTexto(_csgLista); } catch (e) { csgAviso('No se pudo armar el inventario'); return; }
+  const copia = csgCopiarTexto(texto);
+  let pre = null;
+  csgVerAbrir('📋 Exportar', cuerpo => {
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'El inventario entero en texto: ' + vivas.length + (vivas.length === 1 ? ' consigna' : ' consignas') +
+      ', agrupadas por estante, con sus bloques y su bitácora. Es para pegar en un chat o guardar de respaldo; no se vuelve a importar.'));
+    pre = csgEl('pre', 'csg-pre', texto);
+    cuerpo.appendChild(pre);
+    const pie = csgEl('div', 'csg-usar-pie');
+    pie.appendChild(csgBtn('csg-btn-lleno', '📋', 'Copiar', () => {
+      csgCopiarTexto(texto).then(ok => {
+        csgAviso(ok ? '📋 Inventario copiado' : 'No se pudo copiar: mantén pulsado el texto para seleccionarlo');
+        if (!ok) csgAnqSelecciona(pre);
+      });
+    }));
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      pie.appendChild(csgBtn('csg-btn-neutro', '📤', 'Compartir', () => {
+        try {
+          navigator.share({ title: 'La Consigna · inventario', text: texto }).catch(e => {
+            if (!e || e.name !== 'AbortError') csgAviso('No se pudo compartir');
+          });
+        } catch (e) { csgAviso('No se pudo compartir'); }
+      }));
+    }
+    cuerpo.appendChild(pie);
+  });
+  copia.then(ok => {
+    csgAviso(ok ? '📋 Inventario copiado: listo para pegar' : 'No se pudo copiar: está en la hoja, mantén pulsado para seleccionarlo');
+    if (!ok && pre) csgAnqSelecciona(pre);
+  });
+}
+function csgAnqSelecciona(el) {
+  try {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    sel.addRange(r);
+  } catch (e) {}
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LA BITÁCORA PREGUNTADA (§6.7, regla 9)
+   ──────────────────────────────────────────────────────────────────
+   UN renglón, UN uso cada vez: el más reciente de los últimos siete días
+   que siga sin contestar. Se pregunta DESPUÉS, al volver al anaquel,
+   porque el «¿cómo salió?» inmediato preguntaba antes de que la máquina
+   contestara; y se pregunta en vez de pedir que se escriba, porque una
+   bitácora que hay que acordarse de escribir no la escribe nadie.
+   ⚠️ NUNCA SE INVENTA UN RESULTADO: ✕ deja el uso sin contestar para
+   siempre (solo deja de preguntarse), y un renglón ignorado tres
+   aperturas seguidas se pliega a «N usos sin contestar ▸». Lo que se
+   recuerda (lo descartado y las veces) es del aparato
+   (CSG_CLAVES.pregunta): el uso contestado sí viaja, con la pieza.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ✏️ LO QUE SE DEJÓ A MEDIO ESCRIBIR SE OFRECE AL ENTRAR (§6.1). El
+   compositor guarda cada tecla en el borrador del aparato, pero eso no
+   sirve de nada si al volver no se dice: quien salió por la barra de abajo
+   a mitad de un párrafo, o a quien se le cerró la aplicación, abre el
+   anaquel y no ve su texto por ninguna parte. La hoja de ＋ Nueva también
+   lo ofrece, pero hay que saber que está ahí.
+
+   ⚠️ Va en el MISMO sitio que la pregunta de la bitácora y la sustituye
+   en esa apertura: antes de la primera ficha caben como mucho cinco cosas
+   (§8, regla 21), y de las dos, la que pierde algo si se ignora es esta
+   —la pregunta vuelve en la siguiente apertura y no cuenta como ignorada
+   (initConsigna no la apunta), el texto a medio escribir no vuelve si se
+   descarta sin querer—. Con la pieza abierta en el compositor no sale:
+   ahí ya se está siguiendo. */
+function csgAnqSeguirFila() {
+  if (typeof csgBorradorLee !== 'function' || typeof csgBorradorSeguir !== 'function') return null;
+  if (typeof csgEdEnVista === 'function' && csgEdEnVista()) return null;
+  let b = null;
+  try { b = csgBorradorLee(); } catch (e) { b = null; }
+  if (!b || b.guardada || !b.pieza) return null;
+  if (typeof csgEdAlgoEscritoDe === 'function') {
+    let algo = false;
+    try { algo = csgEdAlgoEscritoDe(b.pieza, b.material, b.tituloMano); } catch (e) { algo = false; }
+    if (!algo) return null;
+  }
+  const clase = csgClaseDe(b.pieza.clase);
+  const nombre = String(b.pieza.titulo || '').replace(/\s+/g, ' ').trim() || clase.nombre;
+  const fila = csgEl('div', 'csg-pregunta csg-anq-seguir');
+  fila.appendChild(csgEl('span', 'csg-pregunta-txt', '✏️ «' + csgAnqCorto(nombre, 32) + '» a medio escribir' + (b.t ? ' · ' + csgHace(b.t) : '')));
+  const seguir = csgBtn('csg-btn-lleno csg-btn-sm', '', 'Seguir', () => { csgBorradorSeguir(); });
+  seguir.dataset.csgFoco = 'seguir';
+  fila.appendChild(seguir);
+  /* Descartar es tirar texto de alguien: dos toques en el mismo sitio y
+     sin confirm(), con el mismo botón que la hoja de ＋ Nueva. */
+  if (typeof csgEdDosToques === 'function' && typeof csgBorradorDescarta === 'function') {
+    fila.appendChild(csgEdDosToques('Descartar', 'Sí, descartar', () => {
+      csgBorradorDescarta();
+      csgAviso('Descartado lo que tenías a medio escribir');
+      csgPintarAnaquel();
+    }));
+  }
+  return fila;
+}
+
+function csgBitEstado() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(CSG_CLAVES.pregunta)); } catch (e) { d = null; }
+  if (!d || typeof d !== 'object') d = {};
+  const desc = (d.descartados && typeof d.descartados === 'object') ? d.descartados : {};
+  return { descartados: desc, veces: Math.max(0, parseInt(d.veces, 10) || 0) };
+}
+function csgBitGuarda(st) {
+  /* Lo descartado hace más de ocho días ya no se preguntaría de todos
+     modos (el uso es de antes): se barre, para que la llave no crezca. */
+  const limite = Date.now() - (CSG_ANQ_PREGUNTA_DIAS + 1) * CSG_ANQ_DIA;
+  const desc = {};
+  Object.keys(st.descartados || {}).forEach(u => {
+    const t = Number(st.descartados[u]) || 0;
+    if (t >= limite) desc[u] = t;
+  });
+  try { localStorage.setItem(CSG_CLAVES.pregunta, JSON.stringify({ descartados: desc, veces: st.veces || 0 })); } catch (e) {}
+}
+function csgBitPendientes() {
+  const desde = Date.now() - CSG_ANQ_PREGUNTA_DIAS * CSG_ANQ_DIA;
+  const st = csgBitEstado();
+  const out = [];
+  csgVivas().forEach(p => (Array.isArray(p.bitacora) ? p.bitacora : []).forEach(u => {
+    if (u && u.uid && u.ok == null && (Number(u.t) || 0) >= desde && !st.descartados[u.uid]) out.push({ p, u });
+  }));
+  out.sort((a, b) => (Number(b.u.t) || 0) - (Number(a.u.t) || 0));
+  return out;
+}
+/* Una apertura del anaquel: si hay algo que preguntar, cuenta una vez que
+   se enseña; a la cuarta sin tocarlo, sale plegado. */
+function csgBitApertura() {
+  if (!csgBitPendientes().length) { _csgAnqBitPlegada = false; return; }
+  const st = csgBitEstado();
+  if (st.veces >= CSG_ANQ_PREGUNTA_VECES) { _csgAnqBitPlegada = true; return; }
+  st.veces++;
+  csgBitGuarda(st);
+  _csgAnqBitPlegada = false;
+}
+/* Cualquier toque en el renglón (contestar, descartar, desplegar) dice que
+   se está mirando: la cuenta vuelve a cero. */
+function csgBitTocada() {
+  const st = csgBitEstado();
+  st.veces = 0;
+  csgBitGuarda(st);
+  _csgAnqBitPlegada = false;
+}
+function csgBitFila() {
+  const pend = csgBitPendientes();
+  if (!pend.length) return null;
+  if (_csgAnqBitPlegada) {
+    const b = csgAnqBoton('csg-pregunta csg-pregunta-plegada', (pend.length === 1 ? '1 uso sin contestar' : pend.length + ' usos sin contestar') + ' ▸', () => {
+      csgBitTocada();
+      const nueva = csgBitFila();
+      if (nueva) { b.replaceWith(nueva); const x = nueva.querySelector('button'); if (x) try { x.focus({ preventScroll: true }); } catch (e) {} }
+      else b.remove();
+    });
+    b.setAttribute('aria-expanded', 'false');
+    return b;
+  }
+  const { p, u } = pend[0];
+  const maq = u.maquina ? ' en ' + csgAnqMaquinaNombre(u.maquina) : '';
+  return csgBitFilaUso(p, u, {
+    texto: 'Usaste «' + csgAnqCorto(String(p.titulo || '').trim() || CSG_SIN_TITULO, 32) + '»' + maq + ' ' + csgHace(u.t) + ' · ¿sirvió?',
+    descartar: true,
+    /* Contestado o descartado, en su sitio sale el siguiente; si no queda
+       ninguno, el renglón se va. */
+    alTerminar: fila => {
+      const sig = csgBitFila();
+      if (sig) fila.replaceWith(sig); else fila.remove();
+    },
+  });
+}
+/* El renglón de un uso sin contestar, con ✅ 〰 ❌ (y ✕ en el anaquel).
+   Lo usan el anaquel y la bitácora del menú ⋯: una sola forma de
+   contestar, en los dos sitios. */
+function csgBitFilaUso(p, u, op) {
+  const o = op || {};
+  const fila = csgEl('div', 'csg-pregunta');
+  fila.appendChild(csgEl('span', 'csg-pregunta-txt', o.texto || '¿Sirvió?'));
+  [['si', '✅', 'Sirvió'], ['regular', '〰', 'A medias'], ['no', '❌', 'No sirvió']].forEach(([ok, ic, et]) => {
+    const b = csgAnqBoton('csg-pregunta-b', ic, () => {
+      csgBitTocada();
+      const hecho = csgContestarUso(p, u.uid, ok);
+      if (!hecho) { csgAviso('Ese uso ya no está en la consigna'); if (typeof o.alTerminar === 'function') o.alTerminar(fila); return; }
+      const nota = csgBitFilaNota(p, u, ok, o.alTerminar);
+      fila.replaceWith(nota);
+    });
+    b.setAttribute('aria-label', et);
+    b.title = et;
+    fila.appendChild(b);
+  });
+  if (o.descartar) {
+    /* csg-pregunta-x: el ✕ no contesta, descarta; va apartado de los tres
+       que contestan, al borde del renglón (css/consigna.css). */
+    const x = csgAnqBoton('csg-pregunta-b csg-pregunta-x', '✕', () => {
+      const st = csgBitEstado();
+      st.descartados[u.uid] = Date.now();
+      st.veces = 0;
+      csgBitGuarda(st);
+      _csgAnqBitPlegada = false;
+      if (typeof o.alTerminar === 'function') o.alTerminar(fila);
+    });
+    x.setAttribute('aria-label', 'No preguntar por este uso');
+    x.title = 'No preguntar por este uso';
+    fila.appendChild(x);
+  }
+  return fila;
+}
+/* Contestado, en su sitio sale el campo de UNA línea «qué pasó», que no
+   obliga: no se le pone el foco (sacaría el teclado de la tableta para
+   algo opcional). Se guarda al salir del campo o con Enter, y ✓ pasa al
+   siguiente. */
+function csgBitFilaNota(p, u, ok, alTerminar) {
+  const fila = csgEl('div', 'csg-pregunta');
+  fila.appendChild(csgEl('span', 'csg-pregunta-txt', ok === 'si' ? '✅' : ok === 'no' ? '❌' : '〰'));
+  const inp = csgEl('input', 'csg-pregunta-nota');
+  inp.type = 'text';
+  inp.maxLength = CSG_TOPES.nota_uso;
+  inp.placeholder = 'qué pasó (opcional)';
+  inp.setAttribute('aria-label', 'Qué pasó (opcional)');
+  inp.setAttribute('autocomplete', 'off');
+  inp.setAttribute('enterkeyhint', 'done');
+  inp.value = String(u.nota || '');
+  let guardada = inp.value.replace(/\s+/g, ' ').trim();
+  const guarda = () => {
+    const v = inp.value.replace(/\s+/g, ' ').trim();
+    if (v === guardada) return;
+    guardada = v;
+    csgContestarUso(p, u.uid, ok, v);
+  };
+  const termina = () => {
+    guarda();
+    if (typeof alTerminar === 'function') alTerminar(fila);
+  };
+  inp.addEventListener('blur', () => {
+    guarda();
+    if (_csgAnqPendiente) setTimeout(csgPintarAnaquel, 400);
+  });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); termina(); }
+  });
+  fila.appendChild(inp);
+  const listo = csgAnqBoton('csg-pregunta-b', '✓', termina);
+  listo.setAttribute('aria-label', 'Listo');
+  fila.appendChild(listo);
+  return fila;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EL MENÚ ⋯ (§8)
+   ──────────────────────────────────────────────────────────────────
+   Todo lo que no es usar ni corregir, en la hoja vertical y con un
+   renglón por cosa. Las sub-hojas llevan «‹ Volver» arriba: en una
+   tableta, cerrar y volver a abrir el ⋯ para mirar otra cosa son tres
+   toques. La casa escribe en cualquier pieza (la tabla es de la casa, con
+   es_familia()), así que aquí no hay botones apagados por «lo puso otro».
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgMenuAbrir(p) {
+  if (!p) return;
+  const clase = csgClaseDe(p.clase);
+  csgVerAbrir(clase.ic + ' ' + (String(p.titulo || '').trim() || CSG_SIN_TITULO), cuerpo => csgMenuPintar(p, cuerpo));
+}
+function csgMenuVolver(p) {
+  return csgVerFila('‹', 'Volver', null, null, () => csgMenuAbrir(p));
+}
+function csgMenuPintar(p, cuerpo) {
+  if (!csgDe(p.id) || p.eliminado) {
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Esta consigna ya no está en el anaquel.'));
+    return;
+  }
+  const maq = csgAnqMaquinaNombre(p.maquina || csgMaquinaUltima());
+  const molde = csgAnqMolde(p);
+  const bit = (Array.isArray(p.bitacora) ? p.bitacora : []).filter(Boolean);
+  const sinContestar = bit.filter(u => u.ok == null).length;
+  const vers = (Array.isArray(p.versiones) ? p.versiones : []).filter(Boolean);
+  const est = csgAnqEstantesDe(p);
+  cuerpo.appendChild(csgVerFila('▶', 'Usar', null, null, () => { csgVerCerrar(); csgAnqUsar(p); }, 'rellenar, copiar o abrir en ' + maq));
+  cuerpo.appendChild(csgVerFila('📋', 'Copiar', null, null, () => csgMenuCopiar(p), 'para ' + maq + ', con los últimos valores'));
+  cuerpo.appendChild(csgVerFila('✎', 'Corregir', null, null, () => { csgVerCerrar(); csgAnqCorregir(p); }, molde ? molde.nombre : ''));
+  cuerpo.appendChild(csgVerFila('🔀', 'Duplicar en otro molde…', null, null, () => csgMenuDuplicar(p), 'una copia nueva, sin guardar'));
+  cuerpo.appendChild(csgVerFila('🕘', 'Versiones', vers.length || '', null, () => csgMenuVersiones(p), 'va por la v' + (parseInt(p.version, 10) || 1)));
+  cuerpo.appendChild(csgVerFila('📓', 'Bitácora', bit.length || '', null, () => csgMenuBitacora(p),
+    !bit.length ? 'todavía sin usar' : sinContestar ? (sinContestar === 1 ? '1 uso sin contestar' : sinContestar + ' usos sin contestar') : 'todos los usos contestados'));
+  cuerpo.appendChild(csgVerFila('🗂', 'Estantes', est.length || '', null, () => csgMenuEstantes(p), est.length ? est.join(' · ') : 'en ninguno todavía'));
+  /* Solo si 📓 Cuadernos está cargado: sin él no hay de dónde elegir, y un
+     renglón que abre una lista vacía se lee como roto. */
+  if (typeof rcuVivos === 'function') {
+    let c = null;
+    try { c = p.cuaderno && typeof rcuDe === 'function' ? rcuDe(p.cuaderno) : null; } catch (e) { c = null; }
+    cuerpo.appendChild(csgVerFila('📓', p.cuaderno ? 'Cuaderno ligado' : 'Ligar al cuaderno', null, null, () => csgMenuCuaderno(p),
+      p.cuaderno ? ((c && c.titulo) || p.notas || 'un cuaderno de NotebookLM') : '«↗ NotebookLM» abrirá ese cuaderno'));
+  }
+  cuerpo.appendChild(csgMenuRetirar(p));
+}
+
+/* Copiar desde el menú: lo hace la hoja de usar (csgCopiarDirecto), que
+   es la que sabe armar, rellenar con los últimos valores, decir los
+   huecos y apuntar el uso. Se llama DENTRO del toque, antes de cerrar
+   nada: el portapapeles solo se deja escribir mientras dura el gesto. */
+function csgMenuCopiar(p) {
+  if (typeof csgCopiarDirecto !== 'function') { csgAviso('No se pudo copiar: vuelve a abrir F.A.R.O'); return; }
+  let r = null;
+  try { r = csgCopiarDirecto(p); } catch (e) { csgAviso('No se pudo copiar'); }
+  csgVerCerrar();
+  Promise.resolve(r).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+}
+
+/* Los diecisiete moldes, por clase y con su «cuándo»: el nombre solo no
+   dice cuál elegir. Abre el compositor con una pieza NUEVA sin guardar
+   (§6.9); la original no se toca. */
+function csgMenuDuplicar(p) {
+  csgVerAbrir('🔀 Duplicar en otro molde', cuerpo => {
+    cuerpo.appendChild(csgMenuVolver(p));
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Se abre una copia nueva, sin guardar, con lo escrito en su sitio. Lo que no encuentre sitio sale marcado para colocarlo o quitarlo. La original no cambia.'));
+    CSG_CLASES.forEach(c => {
+      cuerpo.appendChild(csgVerSep(c.ic + ' ' + c.nombre));
+      (CSG_MOLDES_ORDEN[c.id] || []).forEach(mid => {
+        const m = CSG_MOLDES[mid];
+        if (!m) return;
+        const actual = mid === p.molde;
+        const r = csgVerFila(c.ic, m.nombre, null, actual, () => {
+          if (typeof csgDuplicarEnMolde !== 'function' || typeof csgAbrirCompositor !== 'function') {
+            csgAviso('No se pudo abrir el compositor: vuelve a abrir F.A.R.O');
+            return;
+          }
+          const nueva = csgDuplicarEnMolde(p, mid);
+          if (!nueva) { csgAviso('No se pudo preparar la copia'); return; }
+          csgVerCerrar();
+          csgAbrirCompositor(nueva);
+        }, (actual ? 'el de ahora · ' : '') + m.cuando);
+        r.classList.add('csg-clase-' + c.id);
+        cuerpo.appendChild(r);
+      });
+    });
+  });
+}
+
+/* ⚠️ LAS VERSIONES NO SE REESCRIBEN (regla 10). «Volver a esta» crea una
+   versión NUEVA con aquel texto (csgVolverAVersion), y la de ahora queda
+   guardada como otra más: el 👍 que se le dio a cada una sigue hablando de
+   su texto. Cada versión dice cuántas veces se usó y cómo salió EN ESA
+   versión, sacado de la bitácora. Las plegadas ya no guardan texto: se
+   dice, en vez de ofrecer un botón que no puede hacer nada. */
+function csgMenuVersiones(p) {
+  csgVerAbrir('🕘 Versiones', cuerpo => {
+    cuerpo.appendChild(csgMenuVolver(p));
+    const bit = (Array.isArray(p.bitacora) ? p.bitacora : []).filter(Boolean);
+    const cuenta = v => {
+      const us = bit.filter(u => (parseInt(u.v, 10) || 1) === v);
+      const si = us.filter(u => u.ok === 'si').length, no = us.filter(u => u.ok === 'no').length;
+      return [us.length ? (us.length === 1 ? 'usada 1 vez' : 'usada ' + us.length + ' veces') : 'sin usar',
+        si ? '👍 ' + si : '', no ? '👎 ' + no : ''].filter(Boolean).join(' · ');
+    };
+    const vers = (Array.isArray(p.versiones) ? p.versiones : []).filter(x => x && x.vid)
+      .slice().sort((a, b) => (b.v || 0) - (a.v || 0) || (b.t || 0) - (a.t || 0));
+    const plegadas = vers.filter(x => !Array.isArray(x.bloques)).length;
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Corregir una consigna que ya se usó guarda la anterior aquí. «Volver a esta» no borra nada: crea una versión nueva con aquel texto.'));
+    if (plegadas) cuerpo.appendChild(csgEl('p', 'csg-nota', (plegadas === 1 ? 'Se plegó 1 versión vieja' : 'Se plegaron ' + plegadas + ' versiones viejas') +
+      ': se sabe cuándo fueron y cómo salieron, pero ya no guardan su texto (se guardan diez con texto, para que quepan en la nube).'));
+    const ahora = parseInt(p.version, 10) || 1;
+    cuerpo.appendChild(csgMenuVersionFila('v' + ahora + ' · la de ahora', cuenta(ahora), null));
+    vers.forEach(x => {
+      const conTexto = Array.isArray(x.bloques);
+      const sub = cuenta(parseInt(x.v, 10) || 1) + (conTexto ? '' : ' · plegada: ya no guarda su texto');
+      cuerpo.appendChild(csgMenuVersionFila('v' + x.v + (x.t ? ' · hasta el ' + csgHoy(x.t) : ''), sub, conTexto ? () => {
+        const n = csgVolverAVersion(p, x.vid);
+        if (!n) { csgAviso('Esa versión está plegada: ya no guarda su texto'); return; }
+        const r = csgPersistir(p);
+        csgAviso('↩ Vuelve el texto de la v' + x.v + ': ahora es la v' + n);
+        csgVerPintar();
+        csgPintarAnaquel();
+        Promise.resolve(r).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+      } : null));
+    });
+    if (!vers.length) cuerpo.appendChild(csgEl('p', 'csg-nota', 'Todavía no hay versiones anteriores: nacen al corregir una consigna que ya se usó.'));
+  });
+}
+function csgMenuVersionFila(txt, sub, alVolver) {
+  const f = csgEl('div', 'csg-ver-fila');
+  const ic = csgEl('span', 'csg-ver-ic', '🕘');
+  ic.setAttribute('aria-hidden', 'true');
+  f.appendChild(ic);
+  const t = csgEl('span', 'csg-ver-txt');
+  t.appendChild(document.createTextNode(txt));
+  if (sub) t.appendChild(csgEl('span', 'csg-ver-sub', sub));
+  f.appendChild(t);
+  if (alVolver) f.appendChild(csgBtn('csg-btn-tenido csg-btn-sm', '↩', 'Volver a esta', alVolver));
+  return f;
+}
+
+/* La bitácora entera de una pieza: cada uso con su máquina, su versión,
+   su fecha y cómo salió. Los que siguen sin contestar se contestan aquí
+   con los mismos botones que en el anaquel. */
+function csgMenuBitacora(p) {
+  csgVerAbrir('📓 Bitácora', cuerpo => {
+    cuerpo.appendChild(csgMenuVolver(p));
+    const bit = (Array.isArray(p.bitacora) ? p.bitacora : []).filter(u => u && u.uid)
+      .slice().sort((a, b) => (Number(b.t) || 0) - (Number(a.t) || 0));
+    if (!bit.length) {
+      cuerpo.appendChild(csgEl('p', 'csg-nota', 'Todavía no se ha usado. Cada vez que la copies o la abras en una máquina se apunta aquí, y al volver al anaquel se te pregunta si sirvió.'));
+      return;
+    }
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Cada vez que se copia o se abre en una máquina se apunta un uso. Lo que no se contesta se queda sin contestar: nunca se inventa un resultado.'));
+    bit.forEach(u => {
+      const base = [u.t ? csgHoy(u.t) : '', u.maquina ? csgAnqMaquinaNombre(u.maquina) : '', 'v' + (parseInt(u.v, 10) || 1)].filter(Boolean).join(' · ');
+      if (u.ok == null) {
+        cuerpo.appendChild(csgBitFilaUso(p, u, { texto: base + ' · ¿sirvió?', alTerminar: () => { csgVerPintar(); csgPintarAnaquel(); } }));
+        return;
+      }
+      const f = csgEl('div', 'csg-ver-fila');
+      const ic = csgEl('span', 'csg-ver-ic', u.ok === 'si' ? '✅' : u.ok === 'no' ? '❌' : '〰');
+      ic.setAttribute('aria-label', u.ok === 'si' ? 'Sirvió' : u.ok === 'no' ? 'No sirvió' : 'A medias');
+      f.appendChild(ic);
+      const t = csgEl('span', 'csg-ver-txt');
+      t.appendChild(document.createTextNode(base));
+      if (u.nota) t.appendChild(csgEl('span', 'csg-ver-sub', '«' + u.nota + '»'));
+      f.appendChild(t);
+      cuerpo.appendChild(f);
+    });
+  });
+}
+
+/* Los estantes de UNA pieza: un interruptor por estante (tocar pone o
+   quita) y crear uno nuevo AQUÍ DENTRO, sin salir: si hubiera que salir a
+   crearlo, archivar una consigna serían dos viajes. Como mucho doce, de
+   cuarenta caracteres (el tope de `estantes` en la base, CSG_TOPES), y el
+   botón lo dice al llegar en vez de rebotar al guardar. */
+function csgMenuEstantes(p) {
+  csgVerAbrir('🗂 Estantes', cuerpo => {
+    cuerpo.appendChild(csgMenuVolver(p));
+    const propios = new Set(csgAnqEstantesDe(p).map(csgClave));
+    const tope = CSG_TOPES.estantes_n;
+    const lleno = propios.size >= tope;
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Toca un estante para ponerla o quitarla. Una consigna puede estar en varios (hasta ' + tope + ').'));
+    const todos = csgEstantesTodos();
+    todos.forEach(e => {
+      const on = propios.has(e.clave);
+      const r = csgVerFila('🗂', e.rotulo, e.n, on, () => csgMenuEstanteAlterna(p, e.rotulo));
+      r.classList.add(csgTono(e.clave));
+      cuerpo.appendChild(r);
+    });
+    if (!todos.length) cuerpo.appendChild(csgEl('p', 'csg-nota', 'Todavía no hay estantes: escribe el primero aquí abajo.'));
+
+    cuerpo.appendChild(csgVerSep('Estante nuevo'));
+    const inp = csgEl('input', 'csg-input');
+    inp.type = 'text';
+    inp.maxLength = CSG_TOPES.estante;
+    inp.placeholder = 'Nombre del estante (p. ej. Maestría)';
+    inp.setAttribute('aria-label', 'Nombre del estante nuevo');
+    inp.setAttribute('autocomplete', 'off');
+    inp.setAttribute('enterkeyhint', 'done');
+    const crear = () => {
+      const nombre = inp.value.replace(/\s+/g, ' ').trim();
+      if (!nombre) { csgAviso('Escribe el nombre del estante'); inp.focus(); return; }
+      const k = csgClave(nombre);
+      if (!k) { csgAviso('Ese nombre no tiene letras'); inp.focus(); return; }
+      if (propios.has(k)) { csgAviso('Ya está en «' + csgAnqRotuloEstante(k) + '»'); inp.value = ''; inp.focus(); return; }
+      const ya = todos.find(e => e.clave === k);
+      const rot = ya ? ya.rotulo : csgCorta(nombre, CSG_TOPES.estante);
+      if (!csgMenuEstanteAlterna(p, rot)) return;
+      csgAviso(ya ? '🗂 Puesta en «' + rot + '», que ya existía' : '🗂 Estante «' + rot + '» creado');
+      /* La hoja se repintó: el foco va al recuadro NUEVO, en el mismo
+         toque, para poder crear otro sin volver a tocar. */
+      const otro = cuerpo.querySelector('input.csg-input');
+      if (otro && !otro.disabled) otro.focus();
+    };
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); crear(); } });
+    const btn = csgBtn('csg-btn-lleno csg-btn-sm', '＋', lleno ? tope + ' de ' + tope + ': es el tope' : 'Crear y poner', crear);
+    if (lleno) {
+      inp.disabled = true;
+      btn.disabled = true;
+      cuerpo.appendChild(csgEl('p', 'csg-nota', 'Ya está en ' + tope + ' estantes, que es el tope: quita uno para poner otro.'));
+    }
+    const fila = csgEl('div', 'csg-estante-nuevo');
+    fila.appendChild(inp);
+    fila.appendChild(btn);
+    cuerpo.appendChild(fila);
+  });
+}
+/* Pone o quita un estante. Es una EDICIÓN (se sube con el reloj puesto):
+   el estante es de la pieza y viaja. Devuelve false si no se pudo. */
+function csgMenuEstanteAlterna(p, rotulo) {
+  const k = csgClave(rotulo);
+  if (!k) return false;
+  const actuales = csgAnqEstantesDe(p);
+  if (actuales.some(e => csgClave(e) === k)) p.estantes = actuales.filter(e => csgClave(e) !== k);
+  else {
+    if (actuales.length >= CSG_TOPES.estantes_n) {
+      csgAviso('Una consigna está como mucho en ' + CSG_TOPES.estantes_n + ' estantes: quita uno para poner otro');
+      return false;
+    }
+    p.estantes = actuales.concat([csgCorta(String(rotulo).replace(/\s+/g, ' ').trim(), CSG_TOPES.estante)]);
+  }
+  const r = csgSubirLuego(p);
+  csgVerPintar();
+  csgPintarAnaquel();
+  Promise.resolve(r).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+  return true;
+}
+
+/* 📓 Ligar al cuaderno: el identificador va a `cuaderno` y el título a
+   `notas` (§8). Con él, «↗ NotebookLM» abre ESE cuaderno por su dirección
+   comprobada (eso lo hace la hoja de usar). Si 📓 Cuadernos todavía no se
+   abrió en esta sesión, su lista está vacía: se le pide que cargue, UNA
+   vez, en vez de decir «no hay cuadernos» cuando sí los hay. */
+function csgMenuCuaderno(p) {
+  const pintar = cuerpo => {
+    cuerpo.appendChild(csgMenuVolver(p));
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Con un cuaderno ligado, «↗ NotebookLM» abre ESE cuaderno. Salen de tu inventario de 📓 Cuadernos, en Redacción.'));
+    let actual = null;
+    try { actual = p.cuaderno && typeof rcuDe === 'function' ? rcuDe(p.cuaderno) : null; } catch (e) { actual = null; }
+    if (p.cuaderno) {
+      cuerpo.appendChild(csgVerFila('✂️', 'Desligar', null, null, () => {
+        if (!actual || p.notas === actual.titulo) p.notas = '';
+        p.cuaderno = '';
+        const r = csgSubirLuego(p);
+        csgAviso('📓 Desligada: NotebookLM se abrirá en su portada');
+        Promise.resolve(r).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+        csgMenuAbrir(p);
+      }, (actual && actual.titulo) || p.notas || ''));
+    }
+    const leer = () => { try { return typeof rcuVivos === 'function' ? rcuVivos() : []; } catch (e) { return []; } };
+    let lista = leer();
+    if (!lista.length && typeof rcuInit === 'function' && !_csgAnqCuadernosPedidos) {
+      _csgAnqCuadernosPedidos = true;
+      /* rcuInit lee la copia del aparato ANTES de su primera espera: al
+         volver de la llamada ya están los cuadernos de aquí, y los de la
+         nube repintan la hoja cuando lleguen (si sigue abierta en esto). */
+      let viaje = null;
+      try { viaje = rcuInit(); } catch (e) { viaje = null; }
+      Promise.resolve(viaje).then(() => { if (_csgAnqVerPintar === pintar && csgAnqVerAbierta()) csgVerPintar(); }, () => {});
+      lista = leer();
+      if (!lista.length) { cuerpo.appendChild(csgEl('p', 'csg-nota', '⏳ Mirando tus cuadernos…')); return; }
+    }
+    if (!lista.length) {
+      cuerpo.appendChild(csgEl('p', 'csg-nota', 'No hay cuadernos en el inventario. Se ponen en Redacción → 📓 Cuadernos.'));
+      return;
+    }
+    cuerpo.appendChild(csgVerSep('Tus cuadernos'));
+    lista.slice().sort((a, b) => csgClave(a.titulo).localeCompare(csgClave(b.titulo), 'es')).forEach(c => {
+      const on = p.cuaderno === c.id;
+      cuerpo.appendChild(csgVerFila(c.emoji || '📓', c.titulo || 'Sin título', null, on, () => {
+        if (on) return;
+        p.cuaderno = csgCorta(String(c.id), CSG_TOPES.cuaderno);
+        p.notas = csgCorta(String(c.titulo || ''), CSG_TOPES.notas);
+        const r = csgSubirLuego(p);
+        csgAviso('📓 Ligada a «' + csgAnqCorto(c.titulo || 'el cuaderno', 40) + '»');
+        Promise.resolve(r).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+        csgMenuAbrir(p);
+      }));
+    });
+  };
+  csgVerAbrir('📓 Ligar al cuaderno', pintar);
+}
+
+/* 🗑 Retirar: DOS TOQUES EN EL MISMO SITIO y sin confirm() (La Voz
+   Prestada, regla 22: en la aplicación instalada confirm() puede no salir
+   nunca y el botón parece muerto). El primero cambia el renglón por «Sí,
+   retirar · No» ahí mismo; nada se retira con un solo toque. Retirar deja
+   LÁPIDA (eliminado + eliminado_at en ISO): sin ella, la tableta que aún
+   tiene la pieza la volvería a subir y resucitaría sola. */
+function csgMenuRetirar(p) {
+  const fila = csgVerFila('🗑', 'Retirar', null, null, () => {
+    const dos = csgEl('div', 'csg-dos-toques');
+    dos.appendChild(csgEl('span', '', '¿Retirar? Se puede devolver desde «Retiradas», al final del anaquel.'));
+    dos.appendChild(csgBtn('csg-btn-peligro csg-btn-sm', '', 'Sí, retirar', () => {
+      p.eliminado = true;
+      p.eliminado_at = new Date().toISOString();
+      const r = csgPersistir(p);
+      csgVerCerrar();
+      csgPintarAnaquel();
+      csgAviso('🗑 Retirada. Se puede devolver desde «Retiradas», al final del anaquel');
+      Promise.resolve(r).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+    }));
+    const no = csgBtn('csg-btn-neutro csg-btn-sm', '', 'No', () => { dos.replaceWith(fila); try { fila.focus({ preventScroll: true }); } catch (e) {} });
+    dos.appendChild(no);
+    fila.replaceWith(dos);
+    try { no.focus({ preventScroll: true }); } catch (e) {}
+  }, 'se puede devolver desde el final del anaquel');
+  /* En rojo: es el único renglón del menú que se lleva algo del anaquel. */
+  fila.classList.add('csg-ver-fila-peligro');
+  return fila;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EL ARRANQUE DE LA VISTA (§6.1)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Los cables, UNA vez. Aquí y no en un DOMContentLoaded: ver la cabecera
+   de esta parte (la prueba de Node carga el archivo con un `document` que
+   revienta si se le toca). initConsigna y csgVerAbrir llaman a esto antes
+   de que nadie pueda tocar ninguno de estos botones. */
+function csgAnqEngancha() {
+  if (_csgAnqEnganchado) return;
+  if (typeof document === 'undefined' || !document || !document.getElementById) return;
+  _csgAnqEnganchado = true;
+  const al = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  al('csg-back-btn', () => { if (typeof switchView === 'function') switchView('view-inicio'); });
+  al('csg-nueva-btn', () => csgAnqNueva());
+  al('csg-ver-close', () => csgVerCerrar());
+  const ov = document.getElementById('csg-ver-overlay');
+  if (ov) ov.addEventListener('click', e => { if (e.target === ov) csgVerCerrar(); });
+  /* Escape cierra la hoja vertical, que es la de más arriba: con teclado,
+     una hoja que solo se cierra apuntando a la ✕ es una trampa. */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && csgAnqVerAbierta()) csgVerCerrar();
+  });
+  /* Lo que no subió se reintenta DE VERDAD al volver la señal (La Voz
+     Prestada, regla 14): prometer «subirá cuando vuelva» sin nada que lo
+     vuelva a intentar es peor que decir que falló. */
+  if (typeof window !== 'undefined' && window && typeof window.addEventListener === 'function') {
+    window.addEventListener('online', () => {
+      Promise.resolve(csgSubirPendientes()).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+    });
+  }
+}
+
+/* Entrar al anaquel. Pinta AL INSTANTE con lo del aparato y repinta cuando
+   llegue la nube: una pantalla en blanco mientras se espera a la red se lee
+   como «se rompió» (el arranque de la aplicación, 9 de septiembre).
+   csgCargar lee lo del aparato ANTES de su primera espera, así que
+   llamarla primero ya deja la lista puesta para el primer pintado, sin
+   copiar aquí su manera de leer; y dos entradas seguidas comparten el
+   mismo viaje (_csgInitEnCurso), así que no se pide la lista dos veces. */
+function initConsigna() {
+  csgAnqEngancha();
+  /* Una hoja vertical que se quedó abierta en el compositor no puede
+     aparecer encima del anaquel al volver: sería la hoja de otra
+     pantalla. */
+  if (csgAnqVerAbierta()) csgVerCerrar();
+  let viaje = null;
+  try { viaje = csgCargar(); } catch (e) { viaje = null; }
+  /* Si esta apertura ofrece seguir un borrador, la pregunta de la
+     bitácora no sale, y por eso no se apunta como una vez ignorada. */
+  _csgAnqSeguirAhora = !!csgAnqSeguirFila();
+  if (!_csgAnqSeguirAhora) csgBitApertura();
+  csgPintarAnaquel();
+  if (viaje && typeof viaje.then === 'function') {
+    viaje.then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   📜 LA CONSIGNA · PANTALLA (2 de 3): EL COMPOSITOR
+   ──────────────────────────────────────────────────────────────────
+   La hoja «¿Qué le vas a pedir?», el compositor de bloques
+   (#view-consigna-editor), su vista previa con el repaso, el guardado y
+   «Duplicar en otro molde» (§5, pasos 1, 2, 3 y 5; §6.9).
+
+   Va detrás del anaquel (parte 1, que declara los ayudantes comunes:
+   csgEl, csgBtn, csgVerAbrir, csgAnqPrefs…) y delante de las hojas de
+   Usar y Pegar (parte 3). Todo lo que declara aquí lleva el prefijo
+   csgEd, csgNueva, csgDuplicar o csgBorrador —o _csgEd para el estado—:
+   los <script> de index.html comparten un solo ámbito y una función con
+   el nombre de otra la pisa sin ningún aviso (pasó con corAbrir).
+
+   CÓMO ESTÁ HECHO, Y POR QUÉ:
+   · SE EDITA UNA COPIA DE TRABAJO (_csgEdPieza), nunca la pieza de la
+     lista. Así «‹» sin cambios no toca nada, y el anaquel no enseña a
+     medias lo que todavía no se guardó. Al guardar, la copia se VUELCA
+     sobre el objeto de la lista —el mismo objeto, porque la fusión de la
+     nube conserva las referencias— o entra en ella si es nueva.
+   · CADA TECLA VA AL BORRADOR (CSG_CLAVES.borrador) con un respiro
+     corto (regla 19). Un compositor que se cierra por una llamada, por
+     el botón de atrás o por una recarga del service worker perdería el
+     párrafo a medio escribir, y eso en una tableta pasa a diario.
+   · ESCRIBIR NO REPINTA. Cada tecla toca solo lo suyo (sus chips, la
+     línea de variables, el título propuesto); repintar le arrancaría el
+     foco al recuadro y, con él, el teclado de la tableta. Solo repintan
+     los cambios de forma: el molde, abrir un bloque plegado, quitar un
+     bloque libre, la vista previa.
+   · EL FOCO VA DENTRO DEL MISMO TOQUE que abre, sin ningún await
+     delante: es lo que hace que en una tableta salga el teclado solo
+     (regla 4 del Apunte rápido).
+   · NADA ESCRITO POR UNA PERSONA LLEGA A UN ATRIBUTO NI A innerHTML
+     (regla 15): todo con createElement y textContent, el <pre> de la
+     vista previa incluido. Lo único que va a un atributo son literales
+     de este archivo (el ejemplo como marca de agua, los aria).
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Estado del compositor ─────────────────────────────────────────── */
+
+let _csgEdPieza     = null;       // la copia de trabajo (nunca el objeto de la lista)
+let _csgEdNueva     = true;       // todavía no está en la lista
+let _csgEdBase      = '';         // la huella de lo guardado, para saber si cambió
+let _csgEdMaterial  = '';         // el material del compositor, aunque pase de 20.000
+let _csgEdModo      = 'bloques';  // 'bloques' | 'previa'
+let _csgEdTab       = '';         // la pestaña de la vista previa
+let _csgEdAbiertos  = new Set();  // opcionales que la persona desplegó en esta sesión
+let _csgEdAvisos    = [];         // lo que el lector nombró al repartir lo pegado
+let _csgEdAvisosAbiertos = true;
+let _csgEdRecuperar = null;       // un borrador con cambios de ESTA pieza, ofrecido arriba
+let _csgEdAuto      = { tituloMano: false, nombre: '' };
+let _csgEdIgual     = '';         // la clave de título que ya se aceptó repetir
+let _csgEdGuardado  = '';         // '' | 'si': ya está guardada en la lista
+let _csgEdPara      = false;      // lo guardado tiene algo que PARA el uso
+let _csgEdNubeEd    = '';         // '' | 'espera' | 'ok' | 'local'
+let _csgEdCual      = null;       // las preguntas de «¿Cuál elijo?» en curso
+let _csgEdScroll    = 0;          // dónde estaban los bloques antes de la vista previa
+let _csgEdTa        = {};         // id de bloque → su <textarea> pintado
+let _csgEdCartas    = {};         // id de bloque → su tarjeta (o su renglón plegado)
+let _csgEdFilaEl    = null;
+let _csgEdVarsEl    = null;
+let _csgEdContEl    = null;
+let _csgEdSeq       = 0;
+let _csgEdBorradorT = null;
+let _csgEdPreviaT   = null;
+let _csgEdEnganchado = false;   // los cables del compositor, puestos una vez (ver csgEdEngancha)
+
+/* Pistas que viajan con una pieza recién hecha (de un duplicado) y que
+   no son datos de la pieza: qué `name` propuso la máquina, para no
+   tomarlo después por escrito a mano. Un WeakMap y no un campo, porque
+   un campo de más viajaría a la nube en la fila. */
+const _csgEdPistas = new WeakMap();
+
+/* De dónde sale el título propuesto (§5, paso 2): los seis del plan, en
+   su orden, y detrás los que abren los moldes que no tienen ninguno de
+   esos seis (Voz prestada, Instrucción de sistema, Coordinador, Careo…):
+   sin ellos, esas piezas se guardarían como «(sin título)» y el anaquel
+   se llenaría de gemelas sin nombre. */
+const CSG_ED_TITULO_DE = ['tarea', 'pregunta', 'nombre', 'meta', 'paso', 'borrador',
+  'texto', 'tema', 'objetivo', 'identidad', 'mision', 'coordinador', 'postura_a', 'disparador', 'lista'];
+
+/* El respiro del borrador: lo bastante corto para que una recarga a
+   destiempo no se lleve más de una palabra, y lo bastante largo para no
+   escribir el almacén en cada tecla de una ráfaga. */
+const CSG_ED_RESPIRO_BORRADOR = 350;
+
+/* «❓ ¿Cuál elijo?» (§5, paso 2): tres preguntas de sí o no, en orden;
+   la primera que se contesta con un sí decide, y si ninguna, Encargo
+   completo. En ese orden porque va de lo más concreto (tener ejemplos)
+   a lo más general: quien tiene ejemplos casi siempre puede decir
+   también que «se va a reusar», y entonces saldría el molde peor. */
+const CSG_ED_CUAL = [
+  { preg: '¿Tienes ejemplos de cómo quieres la salida?', molde: 'ejemplos' },
+  { preg: '¿Tiene que calcular algo o decidir entre opciones?', molde: 'razonado' },
+  { preg: '¿Se va a quedar puesta en un Proyecto, un Gem o un GPT?', molde: 'sistema' },
+];
+
+/* ══════════════════════════════════════════════════════════════════
+   PASO 1 · «¿QUÉ LE VAS A PEDIR?»
+   ══════════════════════════════════════════════════════════════════ */
+
+/* La hoja de ＋ Nueva. Tres cosas y en este orden: lo que se dejó a
+   medias (lo primero que se quiere al volver), pegar lo que ya se tiene
+   (casi nunca se empieza de cero: el prompt ya existe en otro chat) y
+   las cuatro clases. Un toque en una baldosa abre el compositor
+   DIRECTO, con el molde recomendado y el teclado puesto: preguntar el
+   molde antes sería un toque más para decidir algo que casi siempre es
+   el recomendado. */
+function csgNueva() {
+  csgVerAbrir('¿Qué le vas a pedir?', csgNuevaPintar);
+}
+
+function csgNuevaPintar(cuerpo) {
+  /* Lo que esperaba su respiro se escribe ya: si se salió del compositor
+     por la barra de abajo hace un instante, «Seguir con» tiene que traer
+     también la última palabra. */
+  if (_csgEdPieza) csgBorradorAhora();
+  const b = csgBorradorLee();
+  if (b && !b.guardada && csgEdAlgoEscritoDe(b.pieza, b.material, b.tituloMano)) {
+    const nombre = String(b.pieza.titulo || '').trim() || csgEdTituloPropuesto(b.pieza) || csgEdNombreDeForma(b.pieza);
+    const caja = csgEl('div', 'csg-seguir');
+    caja.appendChild(csgVerFila('✏️', 'Seguir con «' + nombre + '»', null, null, () => {
+      csgVerCerrar();
+      csgBorradorSeguir();
+    }, 'a medio escribir' + (b.t ? ' · ' + csgHace(b.t) : '')));
+    /* Descartar es tirar texto de alguien: dos toques en el mismo sitio y
+       sin confirm(), que en la aplicación instalada puede no salir nunca
+       (La Voz Prestada, regla 22). */
+    caja.appendChild(csgEdDosToques('Descartar', 'Sí, descartar', () => {
+      csgBorradorDescarta();
+      csgVerPintar();
+      csgAviso('Descartado lo que tenías a medio escribir');
+    }));
+    cuerpo.appendChild(caja);
+  }
+
+  const pegar = csgVerFila('📋', 'Pegar lo que ya tengo', null, null, () => {
+    csgVerCerrar();
+    if (typeof csgAbrirPegar === 'function') csgAbrirPegar('');
+  }, 'lo reparte en bloques y propone la forma');
+  pegar.classList.add('csg-ver-fila-tenida');
+  cuerpo.appendChild(pegar);
+
+  const clases = csgEl('div', 'csg-clases');
+  CSG_CLASES.forEach(c => {
+    const bt = csgEl('button', 'csg-clase-baldosa csg-clase-' + c.id);
+    bt.type = 'button';
+    bt.appendChild(csgEl('span', 'csg-clase-ic', c.ic));
+    bt.appendChild(csgEl('span', 'csg-clase-nom', c.nombre));
+    bt.appendChild(csgEl('span', 'csg-clase-para', c.para));
+    /* ⚠️ Sin nada asíncrono entre el toque y el foco: el compositor se
+       abre y enfoca el primer obligatorio en esta misma pila, que es lo
+       único que hace salir el teclado en una tableta. */
+    bt.addEventListener('click', () => {
+      csgVerCerrar();
+      csgAbrirCompositor(null, { clase: c.id });
+    });
+    clases.appendChild(bt);
+  });
+  cuerpo.appendChild(clases);
+}
+
+/* Un botón que pide dos toques en el mismo sitio: el primero lo vuelve
+   rojo y dice qué va a pasar; el segundo lo hace. Se deshace solo a los
+   cuatro segundos, para que un roce de hace un rato no quede armado. */
+function csgEdDosToques(texto, textoSi, alConfirmar) {
+  const b = csgBtn('csg-btn-neutro csg-btn-sm', '', texto);
+  let armado = false, reloj = null;
+  const t = b.querySelector('.csg-btn-t') || b;
+  b.addEventListener('click', () => {
+    if (!armado) {
+      armado = true;
+      t.textContent = textoSi;
+      b.classList.remove('csg-btn-neutro');
+      b.classList.add('csg-btn-peligro');
+      clearTimeout(reloj);
+      reloj = setTimeout(() => {
+        armado = false;
+        t.textContent = texto;
+        b.classList.remove('csg-btn-peligro');
+        b.classList.add('csg-btn-neutro');
+      }, 4000);
+      return;
+    }
+    clearTimeout(reloj);
+    alConfirmar();
+  });
+  return b;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LA PIEZA NUEVA Y EL DUPLICADO
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgEdMoldeDe(id) {
+  return (typeof id === 'string' && Object.prototype.hasOwnProperty.call(CSG_MOLDES, id)) ? CSG_MOLDES[id] : null;
+}
+function csgEdMolde(p) { return csgEdMoldeDe(p && p.molde); }
+
+/* Una pieza nueva SIN guardar, con todos los campos del contrato de la
+   pieza del núcleo (csgDesdeFila). Los bloques nacen con su `inicial`
+   puesto (la etiqueta de Voz prestada y del Careo, el tope de Por
+   lotes): son textos que casi nadie cambia y que, si hubiera que
+   escribirlos, nadie escribiría. Nace sin reloj (`actualizado: 0`):
+   el reloj lo pone el guardado, que es cuando pasa a existir. */
+function csgNuevaPieza(clase, moldeId) {
+  const c = csgClaseDe(clase || 'prompt');
+  const molde = csgEdMoldeDe(moldeId) || csgEdMoldeDe(c && c.molde) || CSG_MOLDES.rapido;
+  const maq = typeof csgMaquinaUltima === 'function' ? csgMaquinaUltima() : 'claude';
+  return {
+    id: csgNuevoId(),
+    clase: molde.clase,
+    molde: molde.id,
+    titulo: '',
+    maquina: maq || 'claude',
+    bloques: molde.bloques.map(e => {
+      const d = csgBloqueDef(molde.id, e.id);
+      return { id: e.id, rotulo: String(d.rotulo || e.id), t: String(d.inicial || '') };
+    }),
+    material: '',
+    estantes: [],
+    cuaderno: '',
+    notas: '',
+    bitacora: [],
+    versiones: [],
+    version: 1,
+    usos: 0,
+    ultima: 0,
+    autor: csgAutor(),
+    eliminado: false,
+    eliminado_at: null,
+    actualizado: 0,
+    subida: false,
+  };
+}
+
+/* «Duplicar en otro molde» (§2, §6.9): una pieza NUEVA sin guardar, en
+   el molde de destino. No abre nada: la devuelve, y quien llama decide.
+   · Los ids que el destino tiene van a su sitio: `comprobacion` es un
+     solo id en las cuatro clases justo para esto (regla 3).
+   · Los demás consultan CSG_EQUIVALE y van al primer candidato que el
+     destino tenga y que no haya recibido ya su propio bloque. Dos
+     orígenes al mismo destino (Siempre y Nunca → Reglas) se pegan con
+     una línea en blanco: juntarlos es la única forma de no perder
+     ninguno.
+   · Lo que no encuentra sitio va al final como BLOQUE LIBRE, con su
+     rótulo de origen y marcado «traído de «X»: colócalo o quítalo». No
+     se tira nada: es texto de la persona, y decidir por ella dónde va un
+     «Rol» en un SKILL.md sería adivinar.
+   · Un texto que sigue siendo el `inicial` de su molde de origen no se
+     trae: la persona no lo escribió, y el destino ya pone el suyo. */
+function csgDuplicarEnMolde(pieza, moldeId) {
+  const src = (pieza && typeof pieza === 'object') ? pieza : {};
+  const destino = csgEdMoldeDe(moldeId) || csgEdMolde(src) || CSG_MOLDES.encargo;
+  const origen = csgEdMolde(src);
+  const nueva = csgNuevaPieza(destino.clase, destino.id);
+  const ids = destino.bloques.map(e => e.id);
+
+  const fuentes = [];
+  const porId = Object.create(null);
+  (Array.isArray(src.bloques) ? src.bloques : []).forEach(b => {
+    if (!b || b.id === undefined || b.id === null || b.id === '') return;
+    const id = String(b.id);
+    const t = String(b.t == null ? '' : b.t);
+    if (!t.trim()) return;
+    const ini = origen ? String(csgBloqueDef(origen.id, id).inicial || '').trim() : '';
+    if (ini && t.trim() === ini) return;
+    /* Un id repetido (una pieza fundida a medias) se junta en vez de
+       perder el segundo. */
+    if (porId[id]) { porId[id].t += '\n\n' + t; return; }
+    const rotulo = String(b.rotulo || '').trim() ||
+      String((origen ? csgBloqueDef(origen.id, id) : csgBloqueDef(null, id)).rotulo || id);
+    porId[id] = { id, rotulo, t, traido: b.traido || '' };
+    fuentes.push(porId[id]);
+  });
+
+  const propio = Object.create(null);
+  const puestos = Object.create(null);
+  const resto = [];
+  fuentes.forEach(f => {
+    if (ids.indexOf(f.id) >= 0) { propio[f.id] = true; (puestos[f.id] = puestos[f.id] || []).push(f.t); }
+    else resto.push(f);
+  });
+  const libres = [];
+  resto.forEach(f => {
+    const cands = Object.prototype.hasOwnProperty.call(CSG_EQUIVALE, f.id) ? CSG_EQUIVALE[f.id] : [];
+    const c = cands.find(x => ids.indexOf(x) >= 0 && !propio[x]);
+    if (c) (puestos[c] = puestos[c] || []).push(f.t);
+    else libres.push(f);
+  });
+
+  nueva.bloques = destino.bloques.map(e => {
+    const d = csgBloqueDef(destino.id, e.id);
+    const ts = puestos[e.id];
+    return { id: e.id, rotulo: String(d.rotulo || e.id), t: ts ? ts.join('\n\n') : String(d.inicial || '') };
+  });
+  const usados = new Set(ids);
+  const deDonde = origen ? origen.nombre : 'la pieza de origen';
+  libres.forEach(f => {
+    const id = csgSlugId(f.rotulo, usados);
+    usados.add(id);
+    nueva.bloques.push({ id, rotulo: f.rotulo, t: f.t, traido: f.traido || deDonde });
+  });
+
+  /* El título: una pieza que YA está en el anaquel se duplica con el
+     nombre del molde detrás, o el anaquel tendría dos fichas iguales y el
+     guardado avisaría de un título repetido que nadie eligió. Una pieza
+     que todavía no existe (lo recién pegado, al cambiar la propuesta del
+     lector) conserva el suyo: ahí no hay dos. */
+  let titulo = String(src.titulo || '').trim();
+  if (titulo && src.id && csgDe(src.id)) {
+    titulo = csgCorta(csgEdTituloSinMolde(titulo) + ' (' + destino.nombre + ')', CSG_TOPES.titulo);
+  }
+  nueva.titulo = titulo;
+  if (src.maquina) nueva.maquina = String(src.maquina);
+  nueva.estantes = Array.isArray(src.estantes) ? src.estantes.filter(x => typeof x === 'string') : [];
+  nueva.material = String(src.material || '');
+  nueva.cuaderno = String(src.cuaderno || '');
+  nueva.notas = String(src.notas || '');
+
+  /* El `name` de un SKILL.md se propone desde el título de origen (sin
+     el sufijo del molde) y se apunta como propuesto, para que corregir el
+     título lo siga proponiendo mientras nadie lo toque a mano. */
+  const pistas = {};
+  if (ids.indexOf('nombre') >= 0 && !puestos.nombre) {
+    const s = csgSlug(csgEdTituloSinMolde(src.titulo));
+    if (s) {
+      nueva.bloques.forEach(b => { if (b.id === 'nombre') b.t = s; });
+      pistas.autoNombre = s;
+    }
+  }
+  _csgEdPistas.set(nueva, pistas);
+  return nueva;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LA COPIA DE TRABAJO
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Una copia profunda con todos los campos de la pieza (los que falten
+   los pone csgNuevaPieza) y sin ids repetidos: si una fila fundida a
+   medias trae dos veces el mismo, se JUNTAN con una línea en blanco en
+   vez de quedarse con el primero, porque el segundo también es texto de
+   alguien. */
+function csgEdClonar(p) {
+  const c = JSON.parse(JSON.stringify(p || {}));
+  const base = csgNuevaPieza(c.clase || 'prompt', c.molde);
+  Object.keys(c).forEach(k => { if (c[k] !== undefined) base[k] = c[k]; });
+  const vistos = Object.create(null);
+  const bloques = [];
+  (Array.isArray(base.bloques) ? base.bloques : []).forEach(b => {
+    if (!b || b.id === undefined || b.id === null || b.id === '') return;
+    const id = String(b.id);
+    const t = String(b.t == null ? '' : b.t);
+    if (vistos[id]) {
+      if (t.trim()) vistos[id].t = vistos[id].t.trim() ? vistos[id].t + '\n\n' + t : t;
+      return;
+    }
+    const o = { id, rotulo: String(b.rotulo || ''), t };
+    if (b.traido) o.traido = String(b.traido);
+    vistos[id] = o;
+    bloques.push(o);
+  });
+  base.bloques = bloques;
+  base.estantes = Array.isArray(base.estantes) ? base.estantes.filter(x => typeof x === 'string') : [];
+  return base;
+}
+
+function csgEdBloque(id) {
+  const p = _csgEdPieza;
+  if (!p || !Array.isArray(p.bloques)) return null;
+  return p.bloques.find(b => b && b.id === id) || null;
+}
+
+function csgEdTexto(id) {
+  const b = csgEdBloque(id);
+  return b ? String(b.t == null ? '' : b.t) : '';
+}
+
+function csgEdPonTexto(id, t) {
+  const p = _csgEdPieza;
+  if (!p) return;
+  let b = csgEdBloque(id);
+  if (!b) {
+    const molde = csgEdMolde(p);
+    b = { id, rotulo: String(csgBloqueDef(molde ? molde.id : null, id).rotulo || id), t: '' };
+    p.bloques.push(b);
+  }
+  b.t = String(t == null ? '' : t);
+}
+
+/* La huella de lo que importa para saber si algo cambió: título, forma,
+   máquina, estantes, los bloques con texto (ordenados por id: el orden
+   en que se guardan no es un cambio) y el material. */
+function csgEdHuella(p, material) {
+  if (!p) return '';
+  const bs = (Array.isArray(p.bloques) ? p.bloques : [])
+    .filter(b => b && b.id && String(b.t == null ? '' : b.t).trim())
+    .map(b => [String(b.id), String(b.t)])
+    .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+  return JSON.stringify([String(p.titulo || '').trim(), String(p.clase || ''), String(p.molde || ''),
+    String(p.maquina || ''), (p.estantes || []).map(String), bs, String(material == null ? '' : material)]);
+}
+
+/* ¿Hay algo ESCRITO por la persona? El texto `inicial` de un molde no
+   cuenta (no lo escribió nadie), ni un título que propuso la
+   herramienta. Es lo que decide si «‹» guarda o descarta una pieza
+   nueva: una hoja en blanco no se guarda como borrador vacío. */
+function csgEdAlgoEscritoDe(p, material, tituloMano) {
+  if (!p) return false;
+  if (String(material == null ? '' : material).trim()) return true;
+  if (tituloMano && String(p.titulo || '').trim()) return true;
+  const molde = csgEdMolde(p);
+  return (Array.isArray(p.bloques) ? p.bloques : []).some(b => {
+    if (!b || !b.id) return false;
+    const t = String(b.t == null ? '' : b.t).trim();
+    if (!t) return false;
+    const ini = String(csgBloqueDef(molde ? molde.id : null, b.id).inicial || '').trim();
+    return !(ini && t === ini);
+  });
+}
+function csgEdAlgoEscrito() {
+  return csgEdAlgoEscritoDe(_csgEdPieza, _csgEdMaterial, _csgEdAuto.tituloMano);
+}
+
+/* Sucio: una pieza nueva lo está en cuanto tiene algo escrito (no hay
+   nada guardado con qué compararla); una de la lista, cuando su huella
+   ya no es la de lo guardado. */
+function csgEdSucio() {
+  if (!_csgEdPieza) return false;
+  if (_csgEdNueva) return csgEdAlgoEscrito();
+  return csgEdHuella(_csgEdPieza, _csgEdMaterial) !== _csgEdBase;
+}
+
+function csgEdEnVista() {
+  const v = document.getElementById('view-consigna-editor');
+  return !!(v && v.classList.contains('active'));
+}
+
+/* El título propuesto: las primeras siete palabras del primer bloque de
+   CSG_ED_TITULO_DE que tenga texto, sin la viñeta de delante y sin la
+   coma o el punto de detrás. Siete, porque un título que no cabe en una
+   ficha de 280 px se corta, y lo que se corta es lo que lo distinguía. */
+function csgEdTituloPropuesto(p) {
+  for (let i = 0; i < CSG_ED_TITULO_DE.length; i++) {
+    const t = csgTextoDe(p, CSG_ED_TITULO_DE[i]).replace(/\s+/g, ' ').trim();
+    if (!t) continue;
+    const limpio = t.replace(/^(?:[-•*]\s+|\d+[.)]\s+)/, '');
+    const pal = limpio.split(' ').filter(Boolean).slice(0, 7).join(' ').replace(/[\s.,;:…—–-]+$/, '');
+    if (pal) return csgCorta(pal, CSG_TOPES.titulo);
+  }
+  return '';
+}
+
+/* El título sin el «(SKILL.md)» que le pone un duplicado: es un rótulo
+   para el anaquel, no parte del nombre, y un `name` que acabe en
+   «-skill-md» no lo escribiría nadie. */
+function csgEdTituloSinMolde(t) {
+  const s = String(t == null ? '' : t).trim();
+  const m = s.match(/^(.*\S)\s+\(([^()]+)\)$/);
+  if (m && Object.keys(CSG_MOLDES).some(k => CSG_MOLDES[k].nombre === m[2])) return m[1];
+  return s;
+}
+
+/* Para nombrar una pieza que no tiene ni título ni texto de donde
+   sacarlo: su clase y su molde («Prompt · Rápido»). */
+function csgEdNombreDeForma(p) {
+  const m = csgEdMolde(p);
+  const c = csgClaseDe((m && m.clase) || (p && p.clase) || 'prompt');
+  return (c ? c.nombre : 'Consigna') + (m ? ' · ' + m.nombre : '');
+}
+
+/* Los bloques como se guardan: primero los del molde en su orden y con
+   texto, con el rótulo de ESE molde; después los libres en el suyo,
+   también vacíos (llevan un rótulo que alguien escribió). Así la fila
+   de la base va «en el orden del molde» (§9) y el armado no depende del
+   orden en que se fueron escribiendo. */
+function csgEdBloquesParaGuardar(p) {
+  const molde = csgEdMolde(p);
+  const ids = molde ? molde.bloques.map(e => e.id) : [];
+  const out = [];
+  const vistos = Object.create(null);
+  const bs = Array.isArray(p.bloques) ? p.bloques : [];
+  ids.forEach(id => {
+    const b = bs.find(x => x && x.id === id);
+    if (!b) return;
+    const t = String(b.t == null ? '' : b.t);
+    if (!t.trim()) return;
+    vistos[id] = true;
+    out.push({ id, rotulo: String(csgBloqueDef(molde.id, id).rotulo || id), t });
+  });
+  bs.forEach(b => {
+    if (!b || !b.id || ids.indexOf(b.id) >= 0 || vistos[b.id]) return;
+    vistos[b.id] = true;
+    out.push({ id: String(b.id), rotulo: String(b.rotulo || b.id), t: String(b.t == null ? '' : b.t) });
+  });
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EL BORRADOR A MEDIO ESCRIBIR (regla 19)
+   ──────────────────────────────────────────────────────────────────
+   Uno solo, con la forma del contrato ({pieza, material, t}) y además
+   lo que hace falta para seguir donde se dejó (`nueva`, `tituloMano`,
+   `autoNombre`). `guardada: true` marca el caso de un material de más de
+   20.000 caracteres: la pieza ya se guardó, pero ese material no cabe
+   en ella (§9, paso 4) y vive aquí para la hoja de Usar.
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgBorradorLee() {
+  try {
+    const b = JSON.parse(localStorage.getItem(CSG_CLAVES.borrador));
+    if (b && typeof b === 'object' && b.pieza && typeof b.pieza === 'object' && b.pieza.id) {
+      b.material = String(b.material == null ? '' : b.material);
+      return b;
+    }
+  } catch (e) {}
+  return null;
+}
+
+/* Sin `id`, se borra el que haya; con `id`, solo si es de esa pieza: el
+   borrador de OTRA pieza es texto de alguien que todavía no decidió. */
+function csgBorradorBorra(id) {
+  try {
+    if (id) {
+      const b = csgBorradorLee();
+      if (!b || b.pieza.id !== id) return;
+    }
+    localStorage.removeItem(CSG_CLAVES.borrador);
+  } catch (e) {}
+}
+
+/* El material que no cupo en la pieza (más de 20.000), si es de ESTA
+   pieza. Lo usa la hoja de Usar cuando se abre desde el anaquel: «lo
+   guardado, o lo que quedó en el borrador si no cabía» (§5, paso 4). */
+function csgBorradorMaterial(id) {
+  const b = csgBorradorLee();
+  if (!b || !id || b.pieza.id !== id) return '';
+  return csgLargoTexto(b.material) > CSG_TOPES.material ? b.material : '';
+}
+
+/* «Descartar» lo que se dejó a medio escribir. ⚠️ NO BASTA CON BORRAR LA
+   LLAVE: si se salió del compositor por la barra de abajo, la copia de
+   trabajo sigue en memoria y SUCIA, y el siguiente csgAbrirCompositor la
+   «guardaría en silencio» al empezar otra pieza (es lo que hace con lo
+   que no se guardó). O sea que lo descartado aparecería en el anaquel dos
+   toques después, y precisamente lo que se pidió tirar. Se suelta también
+   la copia, si es de esa pieza. Lo usan la hoja de ＋ Nueva y el renglón
+   del anaquel: una sola manera de descartar. */
+function csgBorradorDescarta() {
+  const b = csgBorradorLee();
+  clearTimeout(_csgEdBorradorT);
+  _csgEdBorradorT = null;
+  if (_csgEdPieza && (!b || _csgEdPieza.id === b.pieza.id) && !csgEdEnVista()) {
+    _csgEdPieza = null;
+    _csgEdRecuperar = null;
+  }
+  csgBorradorBorra();
+}
+
+function csgBorradorEscribe(guardada) {
+  const p = _csgEdPieza;
+  if (!p) return;
+  try {
+    localStorage.setItem(CSG_CLAVES.borrador, JSON.stringify({
+      pieza: Object.assign({}, p, { material: '' }),
+      material: _csgEdMaterial,
+      t: Date.now(),
+      nueva: _csgEdNueva,
+      guardada: !!guardada,
+      tituloMano: !!_csgEdAuto.tituloMano,
+      autoNombre: _csgEdAuto.nombre || '',
+    }));
+  } catch (e) { /* el almacén lleno lo dice la franja de la nube; aquí no hay más sitio */ }
+}
+
+function csgBorradorAhora() {
+  clearTimeout(_csgEdBorradorT);
+  _csgEdBorradorT = null;
+  const p = _csgEdPieza;
+  if (!p) return;
+  if (csgEdSucio()) csgBorradorEscribe(false);
+  else if (csgLargoTexto(_csgEdMaterial) > CSG_TOPES.material) csgBorradorEscribe(true);
+  else if (!_csgEdRecuperar) csgBorradorBorra(p.id);
+}
+
+function csgBorradorProgramar() {
+  clearTimeout(_csgEdBorradorT);
+  _csgEdBorradorT = setTimeout(csgBorradorAhora, CSG_ED_RESPIRO_BORRADOR);
+}
+
+/* «✏️ Seguir con «X»»: se abre el compositor con lo que había, tal
+   cual, y SUCIO: lo de dentro todavía no está guardado, y «‹» tiene que
+   guardarlo. Si era la corrección de una pieza que entretanto se retiró,
+   se sigue como pieza nueva: volcarla sobre una lápida la escondería. */
+function csgBorradorSeguir() {
+  if (_csgEdPieza) csgBorradorAhora();
+  const b = csgBorradorLee();
+  if (!b) return null;
+  if (_csgEdPieza && _csgEdPieza.id !== b.pieza.id && (_csgEdNueva ? csgEdAlgoEscrito() : csgEdSucio())) csgEdGuardar('callado');
+  const origen = csgDe(b.pieza.id);
+  const copia = csgEdClonar(b.pieza);
+  let nueva = !origen;
+  if (origen && origen.eliminado) { copia.id = csgNuevoId(); nueva = true; }
+  csgEdEmpezar(copia, {
+    nueva,
+    material: b.material,
+    tituloMano: b.tituloMano !== undefined ? !!b.tituloMano : !!String(copia.titulo || '').trim(),
+    autoNombre: b.autoNombre || '',
+  });
+  if (!nueva) _csgEdBase = csgEdHuella(origen, origen.material || '');
+  switchView('view-consigna-editor');
+  csgEdPintar();
+  csgEdFocoInicial('');
+  return _csgEdPieza;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ABRIR EL COMPOSITOR
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Abre el compositor con una pieza de la lista (corregir), una nueva sin
+   guardar (de csgNuevaPieza, de lo pegado o de un duplicado) o null con
+   opts.clase (el molde recomendado de esa clase). opts: { clase, avisos
+   (del lector), foco (id de bloque) }. Devuelve la copia de trabajo. */
+function csgAbrirCompositor(pieza, opts) {
+  const op = (opts && typeof opts === 'object') ? opts : {};
+  let entrada = (pieza && typeof pieza === 'object') ? pieza : null;
+  if (!entrada) {
+    const c = csgClaseDe(op.clase || 'prompt');
+    entrada = csgNuevaPieza(c.id, c.molde);
+  }
+
+  /* La MISMA pieza, abierta y con cambios sin guardar (se salió por la
+     barra de abajo sin «‹», y ahora se vuelve por ✎ o por «✎ Corregir»
+     de Usar): se sigue con la copia de trabajo. Rehacerla desde la lista
+     tiraría lo escrito. */
+  if (_csgEdPieza && entrada.id && _csgEdPieza.id === entrada.id && csgEdSucio()) {
+    if (Array.isArray(op.avisos) && op.avisos.length) _csgEdAvisos = op.avisos.slice();
+    _csgEdModo = 'bloques';
+    switchView('view-consigna-editor');
+    csgEdPintar();
+    csgEdFocoInicial(op.foco || '');
+    return _csgEdPieza;
+  }
+
+  /* OTRA pieza con algo sin guardar: se guarda antes, en silencio y
+     diciéndolo. Hay un solo borrador, y la primera tecla de la pieza
+     nueva lo pisaría. */
+  if (_csgEdPieza && _csgEdPieza.id !== entrada.id && (_csgEdNueva ? csgEdAlgoEscrito() : csgEdSucio())) {
+    csgEdGuardar('callado');
+  }
+
+  /* Y un borrador de OTRA pieza que se quedó a medias de otra vez (la
+     aplicación se cerró con el compositor abierto): por lo mismo, al
+     anaquel antes de empezar esta, y se dice. */
+  const suelto = csgBorradorLee();
+  if (suelto && !suelto.guardada && suelto.pieza.id !== entrada.id &&
+      !(_csgEdPieza && _csgEdPieza.id === suelto.pieza.id)) {
+    if (csgEdAlgoEscritoDe(suelto.pieza, suelto.material, suelto.tituloMano)) {
+      const obj = csgEdVolcar(csgEdClonar(suelto.pieza), suelto.material).obj;
+      csgAviso('💾 Lo que tenías a medio escribir se guardó en el anaquel: «' + (obj.titulo || csgEdNombreDeForma(obj)) + '»');
+    }
+    csgBorradorBorra(suelto.pieza.id);
+  }
+
+  const pistas = _csgEdPistas.get(entrada) || {};
+  const copia = csgEdClonar(entrada);
+  const enLista = csgDe(copia.id);
+  let nueva = !enLista;
+  if (enLista && enLista.eliminado) { copia.id = csgNuevoId(); nueva = true; }
+
+  let material = String(copia.material || '');
+  let recuperar = null;
+  const b = csgBorradorLee();
+  if (b && b.pieza.id === copia.id) {
+    if (b.guardada) {
+      if (!material && csgLargoTexto(b.material) > CSG_TOPES.material) material = b.material;
+    } else if (csgEdHuella(b.pieza, b.material) !== csgEdHuella(copia, material)) {
+      recuperar = b;
+    }
+  }
+
+  csgEdEmpezar(copia, {
+    nueva,
+    material,
+    recuperar,
+    avisos: op.avisos,
+    tituloMano: !!String(copia.titulo || '').trim(),
+    autoNombre: pistas.autoNombre || '',
+  });
+  /* Lo recién pegado o duplicado ya trae texto: el título se propone al
+     abrir, no a la primera tecla. En una pieza de la lista no: cambiarle
+     el título sin que nadie lo toque la haría «cambiada» y «‹» la
+     guardaría. */
+  if (nueva) {
+    if (!_csgEdAuto.tituloMano) csgEdProponerTitulo();
+    else if (!csgEdTexto('nombre').trim()) csgEdProponerNombre();
+  }
+  switchView('view-consigna-editor');
+  csgEdPintar();
+  csgEdFocoInicial(op.foco || '');
+  return _csgEdPieza;
+}
+
+function csgEdEmpezar(copia, cfg) {
+  csgEdEngancha();
+  clearTimeout(_csgEdBorradorT);
+  clearTimeout(_csgEdPreviaT);
+  _csgEdPieza = copia;
+  _csgEdNueva = !!cfg.nueva;
+  _csgEdMaterial = String(cfg.material || '');
+  copia.material = _csgEdMaterial;
+  _csgEdBase = _csgEdNueva ? '' : csgEdHuella(copia, _csgEdMaterial);
+  _csgEdModo = 'bloques';
+  _csgEdTab = '';
+  _csgEdAbiertos = new Set();
+  _csgEdAvisos = Array.isArray(cfg.avisos) ? cfg.avisos.slice() : [];
+  _csgEdAvisosAbiertos = true;
+  _csgEdRecuperar = cfg.recuperar || null;
+  _csgEdAuto = { tituloMano: !!cfg.tituloMano, nombre: String(cfg.autoNombre || '') };
+  _csgEdIgual = '';
+  _csgEdCual = null;
+  _csgEdScroll = 0;
+  _csgEdGuardado = _csgEdNueva ? '' : 'si';
+  _csgEdNubeEd = (!_csgEdNueva && copia.subida === false) ? 'local' : '';
+  _csgEdPara = false;
+  if (!_csgEdNueva) {
+    try { _csgEdPara = csgRevisar(copia, copia.maquina).para.length > 0; } catch (e) { _csgEdPara = false; }
+  }
+}
+
+/* El foco al abrir: el bloque pedido, o el primer obligatorio vacío. Si
+   no falta ninguno (se abre para corregir algo terminado), no se enfoca
+   nada: sacar el teclado encima de una pieza que se viene a leer tapa la
+   mitad de lo que se quería ver. */
+function csgEdFocoInicial(foco) {
+  const id = foco || csgEdPrimerVacio();
+  if (id) csgEdEnfocar(id);
+}
+
+function csgEdPrimerVacio() {
+  const p = _csgEdPieza;
+  const molde = csgEdMolde(p);
+  if (!p || !molde) return '';
+  /* En Libre, «Texto» está si CUALQUIER bloque dice algo (es lo que mira
+     el repaso): lo pegado con sus propios encabezados entra como libres. */
+  if (molde.id === 'libre' && (p.bloques || []).some(b => b && String(b.t || '').trim())) return '';
+  const e = molde.bloques.find(x => x.ob && !csgEdTexto(x.id).trim());
+  return e ? e.id : '';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PINTAR
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgEdScrollEl() {
+  return document.querySelector('#view-consigna-editor .view-scroll');
+}
+
+/* Repinta el cuerpo entero. Solo para cambios de forma: escribir no
+   pasa por aquí. Conserva el desplazamiento, porque vaciar el cuerpo
+   lo recorta a cero y la persona se encontraría arriba del todo después
+   de quitar un bloque del fondo. */
+function csgEdPintar() {
+  const root = document.getElementById('csg-ed');
+  if (!root || !_csgEdPieza) return;
+  const sc = csgEdScrollEl();
+  const y = sc ? sc.scrollTop : 0;
+  root.textContent = '';
+  _csgEdTa = {};
+  _csgEdCartas = {};
+  _csgEdFilaEl = null;
+  _csgEdVarsEl = null;
+  _csgEdContEl = null;
+  if (_csgEdModo === 'previa') csgEdPintarPrevia(root);
+  else csgEdPintarBloques(root);
+  if (sc) sc.scrollTop = y;
+  csgEdPintarBarra();
+  csgEdPintarCabecera();
+}
+
+function csgEdPintarBarra() {
+  const b = document.getElementById('csg-ed-ver');
+  if (!b) return;
+  const ic = b.querySelector('.csg-bb-ic');
+  const t = b.querySelector('.csg-bb-t');
+  const previa = _csgEdModo === 'previa';
+  if (ic) ic.textContent = previa ? '✎' : '👁';
+  if (t) t.textContent = previa ? 'Bloques' : 'Vista previa';
+  b.setAttribute('aria-pressed', previa ? 'true' : 'false');
+}
+
+function csgEdPintarCabecera() {
+  const inp = document.getElementById('csg-ed-titulo');
+  if (inp && _csgEdPieza && inp.value !== String(_csgEdPieza.titulo || '')) inp.value = String(_csgEdPieza.titulo || '');
+  csgEdPintarEstado();
+}
+
+/* Una palabra, a la derecha del título: lo que haría falta saber antes
+   de salir. «Sin guardar» manda sobre todo; después, lo que impide usar
+   lo guardado; después, que no llegó a la nube. */
+function csgEdPintarEstado() {
+  const el = document.getElementById('csg-ed-estado');
+  if (!el) return;
+  let t = '';
+  if (csgEdSucio()) t = 'Sin guardar';
+  else if (_csgEdGuardado === 'si') {
+    if (_csgEdPara) t = '🟡 Borrador';
+    else if (_csgEdNubeEd === 'local') t = '📴 Solo aquí';
+    else t = 'Guardado ✓';
+  }
+  el.textContent = t;
+}
+
+/* ── Los bloques ───────────────────────────────────────────────────── */
+
+function csgEdPintarBloques(root) {
+  const p = _csgEdPieza;
+  if (_csgEdRecuperar) root.appendChild(csgEdFranjaRecuperar());
+  if (_csgEdAvisos.length) root.appendChild(csgEdAvisosLector());
+  root.appendChild(csgEdFila());
+
+  const molde = csgEdMolde(p);
+  const ids = molde ? molde.bloques.map(e => e.id) : [];
+  ids.forEach(id => {
+    const def = csgBloqueDef(molde.id, id);
+    const t = csgEdTexto(id);
+    /* Obligatorio abierto; opcional plegado a un renglón, salvo que
+       tenga texto (plegarlo lo escondería) o que se haya abierto ya. */
+    const abierto = def.ob || !!t.trim() || _csgEdAbiertos.has(id);
+    root.appendChild(abierto ? csgEdTarjeta(def, csgEdBloque(id), false) : csgEdPlegado(def));
+  });
+
+  const vistos = Object.create(null);
+  (p.bloques || []).forEach(b => {
+    if (!b || !b.id || ids.indexOf(b.id) >= 0 || vistos[b.id]) return;
+    vistos[b.id] = true;
+    const def = csgBloqueDef(molde ? molde.id : null, b.id);
+    def.rotulo = String(b.rotulo || '').trim() || String(def.rotulo || b.id);
+    def.ob = false;
+    root.appendChild(csgEdTarjeta(def, b, true));
+  });
+
+  csgEdPie(root);
+  /* Crecer después de colgar: antes de estar en el documento un
+     <textarea> mide cero y se quedaría en su alto mínimo. */
+  Object.keys(_csgEdTa).forEach(k => csgCrecer(_csgEdTa[k]));
+}
+
+/* «tenías cambios sin guardar · Seguir · Descartar». Arriba del todo,
+   porque es lo primero que hay que decidir: escribir antes de decidir
+   dejaría dos versiones de lo mismo. */
+function csgEdFranjaRecuperar() {
+  const b = _csgEdRecuperar;
+  const el = csgEl('div', 'csg-ed-recuperar');
+  el.appendChild(csgEl('span', '', 'Tenías cambios sin guardar en esta consigna' + (b && b.t ? ' (' + csgHace(b.t) + ')' : '') + '.'));
+  el.appendChild(csgBtn('csg-btn-lleno csg-btn-sm', '', 'Seguir', () => {
+    const r = _csgEdRecuperar;
+    _csgEdRecuperar = null;
+    if (!r) return;
+    const id = _csgEdPieza.id;
+    _csgEdPieza = csgEdClonar(r.pieza);
+    _csgEdPieza.id = id;
+    _csgEdMaterial = String(r.material || '');
+    _csgEdPieza.material = _csgEdMaterial;
+    _csgEdAuto = { tituloMano: r.tituloMano !== undefined ? !!r.tituloMano : !!String(_csgEdPieza.titulo || '').trim(), nombre: String(r.autoNombre || '') };
+    csgEdPintar();
+    csgEdTocado();
+  }));
+  el.appendChild(csgEdDosToques('Descartar', 'Sí, descartar', () => {
+    const r = _csgEdRecuperar;
+    _csgEdRecuperar = null;
+    if (r) csgBorradorBorra(r.pieza.id);
+    el.remove();
+    csgAviso('Descartados los cambios que no se guardaron');
+  }));
+  return el;
+}
+
+/* Lo que el lector nombró al repartir lo pegado (regla 8: lo que no se
+   entiende se NOMBRA con su renglón). Arriba y plegable: es lo que
+   explica por qué un renglón está donde está. */
+function csgEdAvisosLector() {
+  const d = document.createElement('details');
+  d.className = 'csg-ed-avisos';
+  d.open = _csgEdAvisosAbiertos;
+  const n = _csgEdAvisos.length;
+  d.appendChild(csgEl('summary', '', '📋 Al repartir lo pegado: ' + n + (n === 1 ? ' cosa que mirar' : ' cosas que mirar')));
+  _csgEdAvisos.forEach(a => {
+    const t = (a && typeof a === 'object') ? String(a.texto || '') : String(a || '');
+    if (t) d.appendChild(csgEl('div', 'csg-rep-item csg-aviso-avisa', t));
+  });
+  d.addEventListener('toggle', () => { _csgEdAvisosAbiertos = d.open; });
+  return d;
+}
+
+/* La primera fila: molde, máquina y estantes. Se desliza a lo ancho (una
+   fila, no tres renglones de chips que empujen el primer bloque fuera
+   de la pantalla: la regla de las materias de Videos M.E.T.A.S). */
+function csgEdFila() {
+  const p = _csgEdPieza;
+  const molde = csgEdMolde(p);
+  const fila = csgEl('div', 'csg-ed-fila csg-desliza');
+
+  const chMolde = csgEl('button', 'csg-chip csg-ed-molde', 'Molde: ' + (molde ? molde.nombre : 'sin molde') + ' ▾');
+  chMolde.type = 'button';
+  chMolde.addEventListener('click', csgEdHojaMolde);
+  fila.appendChild(chMolde);
+  /* Una raya entre molde, máquinas y estantes: en una fila de chips
+     iguales, las tres cosas se leían como una sola lista. */
+  const raya = () => { const s = csgEl('span', 'csg-barra-sep'); s.setAttribute('aria-hidden', 'true'); fila.appendChild(s); };
+  raya();
+
+  CSG_MAQUINAS.forEach(m => {
+    const on = String(p.maquina || '') === m.id;
+    const ch = csgEl('button', 'csg-chip' + (on ? ' on' : ''), m.nombre);
+    ch.type = 'button';
+    ch.setAttribute('aria-pressed', on ? 'true' : 'false');
+    ch.addEventListener('click', () => csgEdPonerMaquina(m.id));
+    fila.appendChild(ch);
+  });
+  raya();
+
+  (p.estantes || []).forEach(e => {
+    const ch = csgEl('button', 'csg-chip on ' + csgTono(csgClave(e)), e + ' ✕');
+    ch.type = 'button';
+    ch.setAttribute('aria-pressed', 'true');
+    ch.addEventListener('click', () => csgEdQuitarEstante(e));
+    fila.appendChild(ch);
+  });
+  const lleno = (p.estantes || []).length >= CSG_TOPES.estantes_n;
+  const mas = csgEl('button', 'csg-chip' + (lleno ? '' : ' csg-chip-mas'), lleno ? 'Tope: ' + CSG_TOPES.estantes_n + ' estantes' : '＋ estante');
+  mas.type = 'button';
+  mas.addEventListener('click', csgEdHojaEstante);
+  fila.appendChild(mas);
+
+  _csgEdFilaEl = fila;
+  return fila;
+}
+
+function csgEdPintarFila() {
+  if (!_csgEdFilaEl || !_csgEdFilaEl.parentNode) return;
+  const vieja = _csgEdFilaEl;
+  const x = vieja.scrollLeft;
+  const nueva = csgEdFila();
+  vieja.replaceWith(nueva);
+  nueva.scrollLeft = x;
+}
+
+/* El renglón «○ Rol · ＋» de un opcional plegado. Un toque lo abre y
+   pone el teclado en él, en el mismo toque. */
+function csgEdPlegado(def) {
+  const bt = csgEl('button', 'csg-bloque csg-bloque-op csg-bloque-plegado');
+  bt.type = 'button';
+  const cab = csgEl('span', 'csg-bloque-cab');
+  cab.appendChild(csgEl('span', 'csg-punto', '○'));
+  cab.appendChild(csgEl('span', '', String(def.rotulo || def.id)));
+  cab.appendChild(csgEl('span', '', ' · ＋'));
+  bt.appendChild(cab);
+  bt.addEventListener('click', () => {
+    csgEdAbrirBloque(def.id);
+    csgEdEnfocar(def.id);
+  });
+  _csgEdCartas[def.id] = bt;
+  return bt;
+}
+
+/* La tarjeta de un bloque abierto: rótulo con su punto, el «para qué»,
+   el recuadro que crece, «📄 usar el ejemplo» mientras está vacío, y la
+   fila de frases hechas. */
+function csgEdTarjeta(def, b, libre) {
+  const id = def.id;
+  const traido = !!(libre && b && b.traido);
+  const card = csgEl('div', 'csg-bloque ' + (def.ob ? 'csg-bloque-ob' : 'csg-bloque-op') +
+    (libre ? ' csg-bloque-libre' : '') + (traido ? ' csg-bloque-traido' : ''));
+
+  const cab = csgEl('div', 'csg-bloque-cab');
+  cab.appendChild(csgEl('span', 'csg-punto', def.ob ? '●' : '○'));
+  const rot = csgEl('span', '', String(def.rotulo || id));
+  rot.id = 'csg-ed-rot-' + (++_csgEdSeq);
+  cab.appendChild(rot);
+  if (libre) cab.appendChild(csgEdBotonQuitarLibre(id, cab));
+  card.appendChild(cab);
+
+  if (traido) card.appendChild(csgEl('div', 'csg-nota', 'traído de «' + b.traido + '»: colócalo o quítalo'));
+  if (def.para_que) {
+    const pq = csgEl('div', 'csg-bloque-para', def.para_que);
+    if (csgAnqPrefs().sinExplicaciones) pq.style.display = 'none';
+    card.appendChild(pq);
+  }
+
+  const ta = document.createElement('textarea');
+  ta.className = 'csg-bloque-ta';
+  ta.rows = 2;
+  if (def.ejemplo) ta.placeholder = def.ejemplo;
+  ta.setAttribute('aria-labelledby', rot.id);
+  if (id === 'nombre' && !libre) {
+    /* El `name` de un SKILL.md es minúsculas y guiones: un corrector que
+       le ponga mayúscula a la primera letra lo deja sin cargar. */
+    ta.setAttribute('autocapitalize', 'none');
+    ta.setAttribute('autocorrect', 'off');
+    ta.spellcheck = false;
+  }
+  ta.value = b ? String(b.t == null ? '' : b.t) : '';
+  card.appendChild(ta);
+  _csgEdTa[id] = ta;
+
+  let ej = null;
+  if (def.ejemplo) {
+    ej = csgEl('button', 'csg-bloque-ejemplo', '📄 usar el ejemplo');
+    ej.type = 'button';
+    ej.style.display = ta.value.trim() ? 'none' : '';
+    ej.addEventListener('pointerdown', e => e.preventDefault());
+    ej.addEventListener('mousedown', e => e.preventDefault());
+    ej.addEventListener('click', () => {
+      if (ta.value.trim()) return;
+      csgEdEnfocarTa(ta);
+      csgEdPonRango(ta, def.ejemplo, 0, ta.value.length);
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    card.appendChild(ej);
+  }
+
+  const chips = csgEdFrases(card, ta, def);
+  ta.addEventListener('input', () => csgEdAlEscribir(id, ta, chips, ej));
+
+  _csgEdCartas[id] = card;
+  return card;
+}
+
+/* Quitar un bloque libre: al momento si está vacío; con texto, dos
+   toques en el mismo sitio, porque lo que se quita es texto de alguien. */
+function csgEdBotonQuitarLibre(id, cab) {
+  const bt = csgBtn('csg-btn-neutro csg-btn-sm csg-mas', '', '✕');
+  bt.setAttribute('aria-label', 'Quitar este bloque');
+  bt.addEventListener('click', () => {
+    if (!csgEdTexto(id).trim()) { csgEdQuitarLibre(id); return; }
+    const dos = csgEl('span', 'csg-dos-toques');
+    dos.appendChild(csgBtn('csg-btn-peligro csg-btn-sm', '', 'Sí, quitar', () => csgEdQuitarLibre(id)));
+    dos.appendChild(csgBtn('csg-btn-neutro csg-btn-sm', '', 'No', () => dos.replaceWith(bt)));
+    bt.replaceWith(dos);
+  });
+  return bt;
+}
+
+function csgEdQuitarLibre(id) {
+  const p = _csgEdPieza;
+  if (!p) return;
+  p.bloques = (p.bloques || []).filter(b => !(b && b.id === id));
+  csgEdPintar();
+  csgEdTocado();
+}
+
+/* ── Las frases hechas (regla 7) ──────────────────────────────────── */
+
+/* La fila de chips bajo el recuadro: «＋ Otro» en los bloques lista, las
+   frases del bloque, y al final «{ } Variable». ⚠️ Todos cancelan el
+   pointerdown: tocar un botón se lleva el foco, y con él el cursor y el
+   teclado de la tableta, y la frase caería donde el cursor ya no está. */
+function csgEdFrases(card, ta, def) {
+  const fila = csgEl('div', 'csg-frases csg-desliza');
+  const noRobes = el => {
+    el.addEventListener('pointerdown', e => e.preventDefault());
+    el.addEventListener('mousedown', e => e.preventDefault());
+  };
+  if (def.lista) {
+    const otro = csgEl('button', 'csg-otro', '＋ Otro');
+    otro.type = 'button';
+    noRobes(otro);
+    otro.addEventListener('click', () => csgEdOtro(ta, def));
+    fila.appendChild(otro);
+  }
+  const chips = [];
+  (Array.isArray(def.frases) ? def.frases : []).forEach(fr => {
+    const frase = String(fr);
+    if (!frase) return;
+    const on = !!csgEdRenglonDe(ta.value, frase);
+    const ch = csgEl('button', 'csg-frase' + (on ? ' on' : ''), frase);
+    ch.type = 'button';
+    ch.setAttribute('aria-pressed', on ? 'true' : 'false');
+    noRobes(ch);
+    ch.addEventListener('click', () => {
+      if (!csgEdQuitarFrase(ta, frase)) csgEdMeterFrase(ta, frase);
+    });
+    chips.push({ ch, frase });
+    fila.appendChild(ch);
+  });
+  const vr = csgEl('button', 'csg-frase csg-frase-var', '{ } Variable');
+  vr.type = 'button';
+  noRobes(vr);
+  vr.addEventListener('click', () => csgEdVariable(ta));
+  fila.appendChild(vr);
+  card.appendChild(fila);
+  return chips;
+}
+
+/* Cambia un trozo del recuadro conservando el deshacer (setRangeText),
+   con un respaldo para el navegador que no lo tenga. */
+function csgEdPonRango(ta, texto, a, b) {
+  if (typeof ta.setRangeText === 'function') ta.setRangeText(texto, a, b, 'end');
+  else {
+    const v = ta.value;
+    ta.value = v.slice(0, a) + texto + v.slice(b);
+    try { ta.setSelectionRange(a + texto.length, a + texto.length); } catch (e) {}
+  }
+}
+
+/* La frase entra donde está el cursor, EN SU PROPIO RENGLÓN: detrás del
+   renglón en que está el cursor, o dentro de él si está vacío. Partir un
+   renglón por la mitad para meterla rompería una frase de la persona, y
+   eso es reescribir (regla 7). Sin foco, el cursor es el último que tuvo
+   el recuadro, que al pintarlo es el final. */
+function csgEdMeterFrase(ta, frase) {
+  const v = ta.value;
+  let pos = typeof ta.selectionEnd === 'number' ? ta.selectionEnd : v.length;
+  if (pos > v.length) pos = v.length;
+  const ini = v.lastIndexOf('\n', pos - 1) + 1;
+  let fin = v.indexOf('\n', pos);
+  if (fin < 0) fin = v.length;
+  let a, b, texto;
+  if (!v.slice(ini, fin).trim()) { a = ini; b = fin; texto = frase; }
+  else { a = fin; b = fin; texto = '\n' + frase; }
+  csgEdPonRango(ta, texto, a, b);
+  const c = a + texto.length;
+  try { ta.setSelectionRange(c, c); } catch (e) {}
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+/* ¿Dónde está la frase PUESTA? En un renglón que es ella y nada más
+   (con su viñeta o su número delante, si los lleva). Un renglón en que la
+   frase sigue pero la persona escribió algo más delante o detrás ya es
+   suyo: la frase está EDITADA, el chip se desmarca y un toque no le quita
+   nada (regla 7). Buscando la frase como un trozo cualquiera, añadirle un
+   «!» al final dejaba el chip marcado, y el toque siguiente le arrancaba
+   la frase a su renglón dejando el «!» solo. Devuelve el renglón entero
+   [a, b) o null. */
+function csgEdRenglonDe(v, frase) {
+  if (!frase) return null;
+  let desde = 0;
+  while (true) {
+    const i = v.indexOf(frase, desde);
+    if (i < 0) return null;
+    const ini = v.lastIndexOf('\n', i - 1) + 1;
+    let fin = v.indexOf('\n', i + frase.length);
+    if (fin < 0) fin = v.length;
+    if (/^\s*(?:[-•*]\s+|\d+[.)]\s+)?$/.test(v.slice(ini, i)) && !v.slice(i + frase.length, fin).trim()) return [ini, fin];
+    desde = i + 1;
+  }
+}
+
+/* Quita EXACTAMENTE esa frase, con su renglón entero (y su viñeta, si la
+   llevaba): quitar solo las palabras dejaría un «- » huérfano o un
+   renglón en blanco en mitad de una lista. */
+function csgEdQuitarFrase(ta, frase) {
+  const v = ta.value;
+  const r = csgEdRenglonDe(v, frase);
+  if (!r) return false;
+  let a = r[0], b = r[1];
+  if (b < v.length) b++;
+  else if (a > 0) a--;
+  csgEdPonRango(ta, '', a, b);
+  try { ta.setSelectionRange(a, a); } catch (e) {}
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+  return true;
+}
+
+/* «{ } Variable»: mete {{}} con el cursor dentro, y enfoca, porque lo
+   siguiente es escribir el nombre. */
+function csgEdVariable(ta) {
+  const enfocado = document.activeElement === ta;
+  const pos = enfocado && typeof ta.selectionEnd === 'number' ? ta.selectionEnd : ta.value.length;
+  csgEdEnfocarTa(ta);
+  csgEdPonRango(ta, '{{}}', pos, pos);
+  try { ta.setSelectionRange(pos + 2, pos + 2); } catch (e) {}
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+/* «＋ Otro»: la plantilla del bloque en un renglón nuevo al final; la de
+   Pasos con el número siguiente. Si la plantilla trae un {{hueco}}, queda
+   seleccionado: lo primero que se escriba lo reemplaza, y no hay que
+   borrarlo a mano letra por letra en una tableta. */
+function csgEdOtro(ta, def) {
+  let pl = String(def.plantilla == null ? '' : def.plantilla);
+  const v = ta.value;
+  if (/^n\. /.test(pl)) {
+    let max = 0, n = 0;
+    v.split('\n').forEach(r => {
+      const m = r.match(/^\s*(\d+)[.)]\s/);
+      if (m) max = Math.max(max, Number(m[1]));
+      if (r.trim()) n++;
+    });
+    pl = String(max ? max + 1 : n + 1) + pl.slice(1);
+  }
+  csgEdEnfocarTa(ta);
+  const pre = v && !v.endsWith('\n') ? '\n' : '';
+  const ins = pre + pl;
+  if (!ins) { try { ta.setSelectionRange(v.length, v.length); } catch (e) {} return; }
+  const a = v.length;
+  csgEdPonRango(ta, ins, a, a);
+  const m = pl.match(/\{\{[^{}]*\}\}/);
+  try {
+    if (m) { const s = a + pre.length + m.index; ta.setSelectionRange(s, s + m[0].length); }
+    else ta.setSelectionRange(a + ins.length, a + ins.length);
+  } catch (e) {}
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+/* ── Escribir ──────────────────────────────────────────────────────── */
+
+function csgEdAlEscribir(id, ta, chips, ej) {
+  csgEdPonTexto(id, ta.value);
+  csgCrecer(ta);
+  (chips || []).forEach(x => {
+    const on = !!csgEdRenglonDe(ta.value, x.frase);
+    x.ch.classList.toggle('on', on);
+    x.ch.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  if (ej) ej.style.display = ta.value.trim() ? 'none' : '';
+  /* El `name` escrito a mano ya no es el propuesto: el título no lo
+     vuelve a pisar. */
+  if (id === 'nombre' && ta.value !== _csgEdAuto.nombre) _csgEdAuto.nombre = '';
+  if (!_csgEdAuto.tituloMano) csgEdProponerTitulo();
+  csgEdTocado();
+}
+
+/* Lo que pasa en cada cambio, sea cual sea: la palabra del estado, la
+   línea de variables y el contador, y el borrador con su respiro. */
+function csgEdTocado() {
+  csgEdPintarEstado();
+  csgEdPintarVars();
+  csgEdPintarContador();
+  csgBorradorProgramar();
+}
+
+/* El título propuesto se escribe EN el campo mientras nadie lo toque a
+   mano (_csgEdAuto): así se ve qué nombre va a llevar la ficha antes de
+   guardar, y se corrige ahí mismo. */
+function csgEdProponerTitulo() {
+  const p = _csgEdPieza;
+  if (!p || _csgEdAuto.tituloMano) return;
+  const t = csgEdTituloPropuesto(p);
+  if (t === String(p.titulo || '')) return;
+  p.titulo = t;
+  const inp = document.getElementById('csg-ed-titulo');
+  if (inp && inp.value !== t) inp.value = t;
+}
+
+/* El `name` de un SKILL.md se propone desde el título (csgSlug) mientras
+   siga vacío o siga siendo lo que propuso la herramienta: lo escrito a
+   mano no se pisa. */
+function csgEdProponerNombre() {
+  const p = _csgEdPieza;
+  const molde = csgEdMolde(p);
+  if (!p || !molde || !molde.bloques.some(e => e.id === 'nombre')) return;
+  const actual = csgEdTexto('nombre');
+  if (actual && actual !== _csgEdAuto.nombre) return;
+  const s = csgSlug(csgEdTituloSinMolde(p.titulo));
+  if (s === actual) return;
+  csgEdPonTexto('nombre', s);
+  _csgEdAuto.nombre = s;
+  const ta = _csgEdTa.nombre;
+  if (ta && ta.value !== s) {
+    ta.value = s;
+    csgCrecer(ta);
+    const card = _csgEdCartas.nombre;
+    const ej = card && card.querySelector('.csg-bloque-ejemplo');
+    if (ej) ej.style.display = s.trim() ? 'none' : '';
+  }
+}
+
+function csgEdAlTitulo() {
+  const inp = document.getElementById('csg-ed-titulo');
+  const p = _csgEdPieza;
+  if (!inp || !p) return;
+  p.titulo = inp.value;
+  /* Vaciado a mano, vuelve a ser la herramienta quien lo propone (a la
+     siguiente tecla de un bloque, no ahora: si se rellenara en el acto,
+     no se podría borrar). */
+  _csgEdAuto.tituloMano = inp.value.trim() !== '';
+  if (_csgEdAuto.tituloMano) csgEdProponerNombre();
+  csgEdTocado();
+  /* En la vista previa, {{titulo}} sale rellenado: se re-arma con un
+     respiro, no en cada tecla. */
+  if (_csgEdModo === 'previa') {
+    clearTimeout(_csgEdPreviaT);
+    _csgEdPreviaT = setTimeout(() => { if (_csgEdModo === 'previa') csgEdPintar(); }, 300);
+  }
+}
+
+/* ── Abrir un bloque y poner el foco ───────────────────────────────── */
+
+function csgEdAbrirBloque(id) {
+  const viejo = _csgEdCartas[id];
+  if (!viejo || _csgEdTa[id] || !_csgEdPieza) return;
+  _csgEdAbiertos.add(id);
+  const molde = csgEdMolde(_csgEdPieza);
+  const def = csgBloqueDef(molde ? molde.id : null, id);
+  const nueva = csgEdTarjeta(def, csgEdBloque(id), false);
+  viejo.replaceWith(nueva);
+  csgCrecer(_csgEdTa[id]);
+}
+
+function csgEdEnfocarTa(ta) {
+  if (!ta) return;
+  if (document.activeElement === ta) return;
+  try { ta.focus({ preventScroll: true }); } catch (e) { ta.focus(); }
+}
+
+/* Enfoca un bloque (abriéndolo si estaba plegado), con el cursor al
+   final, y lo trae al CENTRO: con el teclado de la tableta arriba, un
+   recuadro enfocado al pie de la pantalla queda debajo del teclado. */
+function csgEdEnfocar(id) {
+  if (!id) return false;
+  if (!_csgEdTa[id]) csgEdAbrirBloque(id);
+  const ta = _csgEdTa[id];
+  if (!ta) return false;
+  csgEdEnfocarTa(ta);
+  const n = ta.value.length;
+  try { ta.setSelectionRange(n, n); } catch (e) {}
+  try { ta.scrollIntoView({ block: 'center' }); } catch (e) {}
+  return true;
+}
+
+/* ── El pie: variables, contador, material e interruptor ──────────── */
+
+function csgEdPie(root) {
+  const vars = csgEl('div', 'csg-ed-vars');
+  _csgEdVarsEl = vars;
+  root.appendChild(vars);
+  csgEdPintarVars();
+
+  const cont = csgEl('div', 'csg-ed-contador');
+  _csgEdContEl = cont;
+  root.appendChild(cont);
+  csgEdPintarContador();
+
+  root.appendChild(csgEdMaterialCaja());
+
+  const prefs = csgAnqPrefs();
+  const sw = csgEl('button', 'csg-switch');
+  sw.type = 'button';
+  sw.setAttribute('role', 'switch');
+  sw.setAttribute('aria-checked', prefs.sinExplicaciones ? 'true' : 'false');
+  sw.appendChild(csgEl('span', '', 'Sin explicaciones (este aparato)'));
+  sw.appendChild(csgEl('span', 'csg-switch-bola'));
+  sw.addEventListener('click', () => {
+    const pr = csgAnqPrefs();
+    pr.sinExplicaciones = !pr.sinExplicaciones;
+    csgAnqGuardaPrefs();
+    sw.setAttribute('aria-checked', pr.sinExplicaciones ? 'true' : 'false');
+    /* Se tocan los nodos que ya están, sin repintar: el interruptor está
+       al pie, y repintar dejaría a la persona arriba del todo. */
+    document.querySelectorAll('#csg-ed .csg-bloque-para').forEach(el => { el.style.display = pr.sinExplicaciones ? 'none' : ''; });
+  });
+  root.appendChild(sw);
+}
+
+/* «Variables: {{tema}} · {{n}}». Sin las reservadas ({{maquina}},
+   {{titulo}}, {{hoy}}): se rellenan solas y nunca se preguntan, y
+   nombrarlas aquí haría creer que al usar habrá que escribirlas. */
+function csgEdPintarVars() {
+  const el = _csgEdVarsEl;
+  if (!el || !_csgEdPieza) return;
+  /* Las MISMAS que va a preguntar la hoja de Usar: sin lo que va dentro
+     de un bloque de código (ahí las llaves son una plantilla que se copia
+     tal cual, y el repaso ya las trata así). Si esta línea nombrara un
+     {{x}} que Usar no pregunta, uno buscaría el renglón que no sale. */
+  const sinCodigo = typeof csgUsarSinCodigo === 'function' ? csgUsarSinCodigo : (t => t);
+  const vs = csgVariables((_csgEdPieza.bloques || []).map(b => sinCodigo(String((b && b.t) || ''))))
+    .filter(v => CSG_RESERVADAS.indexOf(v) < 0);
+  el.textContent = '';
+  if (!vs.length) { el.textContent = 'Sin variables'; return; }
+  el.appendChild(document.createTextNode('Variables: '));
+  vs.forEach((v, i) => {
+    if (i) el.appendChild(document.createTextNode(' · '));
+    el.appendChild(csgEl('span', 'csg-var', '{{' + v + '}}'));
+  });
+}
+
+/* El contador solo aparece cuando hace falta (más de 50.000): un número
+   que se ve siempre se deja de mirar, y el día que importa ya no se lee.
+   Se mide como mide la base (csgLargoBase), que es lo que decide si cabe. */
+function csgEdPintarContador() {
+  const el = _csgEdContEl;
+  if (!el || !_csgEdPieza) return;
+  const bs = _csgEdPieza.bloques || [];
+  let bruto = 0;
+  bs.forEach(b => { bruto += String((b && b.t) || '').length; });
+  const n = bruto > 45000 ? csgLargoBase(csgEdBloquesParaGuardar(_csgEdPieza)) : 0;
+  if (n > 50000) {
+    el.style.display = '';
+    el.textContent = csgMiles(n) + ' de ' + csgMiles(CSG_TOPES.bloques) + ' caracteres' +
+      (n > CSG_TOPES.bloques ? ': no cabe en la nube, ' + csgTextoRecorta(n - CSG_TOPES.bloques) : '');
+  } else {
+    el.style.display = 'none';
+    el.textContent = '';
+  }
+}
+
+/* 📎 Material: siempre el último y plegado. SIN maxlength: un recuadro
+   con tope corta lo pegado sin avisar, y lo que se pierde es el final
+   del informe. Lo que pasa de 20.000 no se recorta ni se guarda con la
+   pieza: se queda en el borrador y en la hoja de Usar, y se DICE. */
+function csgEdMaterialCaja() {
+  const det = document.createElement('details');
+  det.className = 'csg-material';
+  const sum = csgEl('summary', '', '📎 Material');
+  det.appendChild(sum);
+  const ta = document.createElement('textarea');
+  ta.className = 'csg-material-ta';
+  ta.rows = 6;
+  ta.placeholder = 'Lo que va DEBAJO de la consigna: el texto a corregir, el informe, la lista. Sale entre marcas y no se repasa.';
+  ta.value = _csgEdMaterial;
+  det.appendChild(ta);
+  const nota = csgEl('div', 'csg-material-nota');
+  det.appendChild(nota);
+  const pinta = () => {
+    const n = csgLargoTexto(_csgEdMaterial);
+    sum.textContent = '📎 Material' + (n ? ' · ' + csgMiles(n) + (n === 1 ? ' carácter' : ' caracteres') : '');
+    nota.textContent = n > CSG_TOPES.material
+      ? '📎 material de ' + csgMiles(n) + ' caracteres: no se guarda con la pieza; pégalo al usar.'
+      : 'Se guarda con la pieza hasta ' + csgMiles(CSG_TOPES.material) + ' caracteres.';
+  };
+  pinta();
+  ta.addEventListener('input', () => {
+    _csgEdMaterial = ta.value;
+    if (_csgEdPieza) _csgEdPieza.material = ta.value;
+    pinta();
+    csgEdTocado();
+  });
+  return det;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MOLDE, MÁQUINA Y ESTANTES
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgEdHojaMolde() {
+  if (!_csgEdPieza) return;
+  _csgEdCual = null;
+  csgVerAbrir('📐 Molde', csgEdPintarHojaMolde);
+}
+
+function csgEdCuando(s) {
+  s = String(s || '').trim();
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+}
+
+function csgEdPintarHojaMolde(cuerpo) {
+  const p = _csgEdPieza;
+  if (!p) return;
+  const actual = csgEdMolde(p);
+  const clase = (actual && actual.clase) || p.clase || 'prompt';
+  const ids = (CSG_MOLDES_ORDEN[clase] || []).filter(id => csgEdMoldeDe(id));
+  const res = _csgEdCual && _csgEdCual.resultado;
+  /* Cada renglón con el emoji de su clase, en su tono, como en «Duplicar
+     en otro molde»: con la baldosa solo en el puesto (un ✓, repetido
+     además por el ✓ del borde) y en el propuesto (👉), los demás quedaban
+     sin baldosa y los nombres no empezaban a la misma altura. El puesto
+     ya se ve por su fondo y su ✓. */
+  const fila = id => {
+    const m = CSG_MOLDES[id];
+    const on = p.molde === id;
+    const cm = csgClaseDe(m.clase || clase);
+    const r = csgVerFila(res === id ? '👉' : cm.ic, m.nombre + (m.recomendado ? ' · recomendado' : ''), null, on, () => {
+      csgVerCerrar();
+      if (!on) csgEdCambiarMolde(id);
+    }, csgEdCuando(m.cuando));
+    r.classList.add('csg-clase-' + cm.id);
+    return r;
+  };
+  ids.forEach(id => cuerpo.appendChild(fila(id)));
+  if (res && ids.indexOf(res) < 0 && csgEdMoldeDe(res)) {
+    const c = csgClaseDe(CSG_MOLDES[res].clase);
+    cuerpo.appendChild(csgVerSep('De ' + (c ? c.ic + ' ' + c.nombre : 'otra clase')));
+    cuerpo.appendChild(fila(res));
+  }
+
+  /* «❓ ¿Cuál elijo?» solo donde sus respuestas viven (Prompt y
+     Habilidad): en un grafo o un bucle, las tres preguntas mandarían a
+     otra clase de consigna por una razón que no tiene que ver. */
+  if (clase !== 'prompt' && clase !== 'habilidad') return;
+  cuerpo.appendChild(csgVerFila('❓', '¿Cuál elijo?', null, !!_csgEdCual, () => {
+    _csgEdCual = _csgEdCual ? null : { paso: 0, dichas: [], resultado: '' };
+    csgVerPintar();
+  }, 'tres preguntas de sí o no'));
+  if (!_csgEdCual) return;
+
+  const caja = csgEl('div', 'csg-cual');
+  _csgEdCual.dichas.forEach(d => caja.appendChild(csgEl('div', 'csg-nota', d.preg + ' — ' + (d.si ? 'Sí' : 'No'))));
+  if (_csgEdCual.resultado) {
+    const m = CSG_MOLDES[_csgEdCual.resultado];
+    caja.appendChild(csgEl('div', 'csg-cual-preg', '👉 Te sirve «' + m.nombre + '»: está marcado arriba. Tócalo para cambiar.'));
+    caja.appendChild(csgBtn('csg-btn-neutro csg-btn-sm', '↺', 'Otra vez', () => {
+      _csgEdCual = { paso: 0, dichas: [], resultado: '' };
+      csgVerPintar();
+    }));
+  } else {
+    const q = CSG_ED_CUAL[_csgEdCual.paso];
+    const preg = csgEl('div', 'csg-cual-preg');
+    preg.appendChild(csgEl('span', '', q.preg));
+    const responde = si => {
+      _csgEdCual.dichas.push({ preg: q.preg, si });
+      if (si) _csgEdCual.resultado = q.molde;
+      else if (_csgEdCual.paso + 1 >= CSG_ED_CUAL.length) _csgEdCual.resultado = 'encargo';
+      else _csgEdCual.paso++;
+      csgVerPintar();
+    };
+    preg.appendChild(csgBtn('csg-btn-tenido csg-btn-sm', '', 'Sí', () => responde(true)));
+    preg.appendChild(csgBtn('csg-btn-neutro csg-btn-sm', '', 'No', () => responde(false)));
+    caja.appendChild(preg);
+  }
+  cuerpo.appendChild(caja);
+}
+
+/* ⚠️ CAMBIAR DE MOLDE NO MUEVE NI TIRA TEXTO. Los bloques se quedan en
+   la pieza con su id: los que el molde nuevo tiene aparecen en su sitio,
+   y los que no, al final como BLOQUES LIBRES, marcados y nombrados en el
+   aviso. Por eso volver al molde de antes lo deja todo como estaba, sin
+   que nadie tenga que colocar nada a mano. Lo único que se descarta es
+   el `inicial` sin tocar del molde viejo (no lo escribió nadie), y los
+   bloques nuevos que traen el suyo nacen con él. */
+function csgEdCambiarMolde(id) {
+  const p = _csgEdPieza;
+  const nuevo = csgEdMoldeDe(id);
+  if (!p || !nuevo || p.molde === id) return;
+  const viejo = csgEdMolde(p);
+  const ids = nuevo.bloques.map(e => e.id);
+  const inicialViejo = bid => viejo ? String(csgBloqueDef(viejo.id, bid).inicial || '').trim() : '';
+
+  p.bloques = (p.bloques || []).filter(b => {
+    if (!b || !b.id) return false;
+    if (ids.indexOf(b.id) >= 0) return true;
+    const t = String(b.t == null ? '' : b.t).trim();
+    if (!t) return false;
+    const ini = inicialViejo(b.id);
+    return !(ini && t === ini);
+  });
+  const libres = [];
+  p.bloques.forEach(b => {
+    if (ids.indexOf(b.id) >= 0) return;
+    if (!String(b.rotulo || '').trim()) b.rotulo = String((viejo ? csgBloqueDef(viejo.id, b.id) : csgBloqueDef(null, b.id)).rotulo || b.id);
+    /* Solo lo que ESTE cambio dejó sin sitio se marca como traído; un
+       libre que ya estaba sigue como estaba. */
+    if (viejo && viejo.bloques.some(e => e.id === b.id) && !b.traido) b.traido = viejo.nombre;
+    libres.push(b);
+  });
+  nuevo.bloques.forEach(e => {
+    const d = csgBloqueDef(nuevo.id, e.id);
+    const b = p.bloques.find(x => x.id === e.id);
+    if (b) {
+      b.rotulo = String(d.rotulo || e.id);
+      delete b.traido;
+      const t = String(b.t == null ? '' : b.t).trim();
+      if (d.inicial && (!t || (t === inicialViejo(e.id) && t !== String(d.inicial).trim()))) b.t = String(d.inicial);
+    } else if (d.inicial) {
+      p.bloques.push({ id: e.id, rotulo: String(d.rotulo || e.id), t: String(d.inicial) });
+    }
+  });
+  /* En el orden del molde nuevo, con los libres detrás. */
+  p.bloques = nuevo.bloques.map(e => p.bloques.find(x => x.id === e.id)).filter(Boolean)
+    .concat(p.bloques.filter(b => ids.indexOf(b.id) < 0));
+  p.molde = nuevo.id;
+  p.clase = nuevo.clase;
+  _csgEdTab = '';
+  csgEdProponerNombre();
+  if (!_csgEdAuto.tituloMano) csgEdProponerTitulo();
+  csgEdPintar();
+  csgEdTocado();
+  csgAviso('Molde: ' + nuevo.nombre + (libres.length
+    ? ' · quedan como bloques libres, al final: ' + libres.map(b => b.rotulo || b.id).join(', ')
+    : ''));
+}
+
+function csgEdPonerMaquina(id) {
+  const p = _csgEdPieza;
+  if (!p || String(p.maquina || '') === id) return;
+  p.maquina = id;
+  if (_csgEdModo === 'previa') csgEdPintar();
+  else csgEdPintarFila();
+  csgEdTocado();
+}
+
+/* ＋ estante: la hoja vertical con los que ya existen (de un toque) y un
+   campo para uno nuevo. «Maestría» y «maestria» son el MISMO estante
+   (csgClave): escribir el segundo pone el primero, con su rótulo de
+   siempre, y el anaquel no sale con dos montones iguales. */
+function csgEdHojaEstante() {
+  const p = _csgEdPieza;
+  if (!p) return;
+  if ((p.estantes || []).length >= CSG_TOPES.estantes_n) {
+    csgAviso('Una consigna va en ' + CSG_TOPES.estantes_n + ' estantes como mucho: quita uno para poner otro.');
+    return;
+  }
+  let campo = null, hay = 0;
+  csgVerAbrir('🗂 Poner en un estante', cuerpo => {
+    const todos = csgEdEstantesTodos();
+    hay = todos.length;
+    const puestos = new Set((p.estantes || []).map(csgClave));
+    const inp = csgEl('input', 'csg-input');
+    campo = inp;
+    inp.type = 'text';
+    inp.maxLength = CSG_TOPES.estante;
+    inp.autocomplete = 'off';
+    inp.placeholder = 'Uno nuevo: la materia, el curso, el proyecto…';
+    inp.setAttribute('aria-label', 'Nombre del estante nuevo');
+    inp.setAttribute('enterkeyhint', 'done');
+    const crear = () => {
+      const v = inp.value.replace(/\s+/g, ' ').trim();
+      if (!v) { inp.focus(); return; }
+      csgVerCerrar();
+      csgEdPonerEstante(v, todos);
+    };
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); crear(); } });
+    cuerpo.appendChild(inp);
+    cuerpo.appendChild(csgBtn('csg-btn-lleno', '＋', 'Crear y poner', crear));
+    if (todos.length) {
+      cuerpo.appendChild(csgVerSep('Los que ya hay'));
+      todos.forEach(e => {
+        const on = puestos.has(e.clave);
+        const f = csgVerFila('🗂', e.rotulo, e.n, on, () => {
+          csgVerCerrar();
+          if (on) csgEdQuitarEstante(e.rotulo);
+          else csgEdPonerEstante(e.rotulo, todos);
+        });
+        f.classList.add(csgTono(e.clave));
+        cuerpo.appendChild(f);
+      });
+    }
+  });
+  /* Sin estantes todavía, lo único que se puede hacer es escribir uno: el
+     teclado sale ya, en el mismo toque que abrió la hoja. Se enfoca
+     DESPUÉS de abrirla y no dentro del pintado: una hoja que todavía está
+     escondida no recibe el foco, y el teclado no saldría. */
+  if (campo && !hay) campo.focus();
+}
+
+function csgEdEstantesTodos() {
+  if (typeof csgEstantesTodos === 'function') {
+    try { return csgEstantesTodos() || []; } catch (e) {}
+  }
+  const m = new Map();
+  csgVivas().forEach(x => (x.estantes || []).forEach(e => {
+    const k = csgClave(e);
+    if (!k) return;
+    if (!m.has(k)) m.set(k, { clave: k, rotulo: String(e).trim(), n: 0 });
+    m.get(k).n++;
+  }));
+  return Array.from(m.values()).sort((a, b) => a.rotulo.localeCompare(b.rotulo, 'es'));
+}
+
+function csgEdPonerEstante(v, todos) {
+  const p = _csgEdPieza;
+  if (!p) return;
+  const k = csgClave(v);
+  if (!k) return;
+  p.estantes = Array.isArray(p.estantes) ? p.estantes : [];
+  if (p.estantes.some(e => csgClave(e) === k)) return;
+  if (p.estantes.length >= CSG_TOPES.estantes_n) {
+    csgAviso('Una consigna va en ' + CSG_TOPES.estantes_n + ' estantes como mucho: quita uno para poner otro.');
+    return;
+  }
+  const ya = (todos || csgEdEstantesTodos()).find(e => e.clave === k);
+  p.estantes.push(csgCorta(ya ? ya.rotulo : v, CSG_TOPES.estante));
+  csgEdPintarFila();
+  csgEdTocado();
+}
+
+function csgEdQuitarEstante(v) {
+  const p = _csgEdPieza;
+  if (!p) return;
+  const k = csgClave(v);
+  p.estantes = (p.estantes || []).filter(e => csgClave(e) !== k);
+  csgEdPintarFila();
+  csgEdTocado();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PASO 3 · LA VISTA PREVIA Y EL REPASO
+   ──────────────────────────────────────────────────────────────────
+   ⚠️ LO QUE SE VE ES LO QUE SE COPIA, CARÁCTER POR CARÁCTER (regla 1):
+   el texto sale del mismo csgArmar que usan los botones de Usar, con el
+   material del compositor, y el <pre> lleva ESE texto y nada más (las
+   variables sin rellenar se pintan en ámbar troceando nodos, no
+   escribiendo HTML). Y el repaso se pide a csgRevisar directamente, no
+   a la caché del anaquel: la copia de trabajo lleva el mismo id y el
+   mismo reloj que la pieza guardada, y la caché devolvería el repaso de
+   lo guardado, no de lo que se está escribiendo.
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgEdAlternarVista() {
+  if (!_csgEdPieza) return;
+  const sc = csgEdScrollEl();
+  if (_csgEdModo === 'bloques') {
+    _csgEdScroll = sc ? sc.scrollTop : 0;
+    /* El teclado abajo: la vista previa se lee, no se escribe. */
+    const a = document.activeElement;
+    if (a && a.blur && a.closest && a.closest('#csg-ed')) a.blur();
+    _csgEdModo = 'previa';
+    csgEdPintar();
+    if (sc) sc.scrollTop = 0;
+  } else {
+    _csgEdModo = 'bloques';
+    csgEdPintar();
+    if (sc) sc.scrollTop = _csgEdScroll;
+  }
+}
+
+function csgEdPintarPrevia(root) {
+  const p = _csgEdPieza;
+  const maq = csgMaquina(p.maquina || (typeof csgMaquinaUltima === 'function' ? csgMaquinaUltima() : 'claude'));
+  const caja = csgEl('div', 'csg-prev');
+
+  const fila = csgEl('div', 'csg-prev-maquinas csg-desliza');
+  CSG_MAQUINAS.forEach(m => {
+    const on = m.id === maq.id;
+    const ch = csgEl('button', 'csg-chip' + (on ? ' on' : ''), m.nombre);
+    ch.type = 'button';
+    ch.setAttribute('aria-pressed', on ? 'true' : 'false');
+    ch.addEventListener('click', () => csgEdPonerMaquina(m.id));
+    fila.appendChild(ch);
+  });
+  caja.appendChild(fila);
+  if (maq.nota) caja.appendChild(csgEl('div', 'csg-nota', maq.nota));
+
+  let arm = null, fallo = '';
+  try { arm = csgArmar(p, maq.id, {}, { material: _csgEdMaterial }); }
+  catch (e) { fallo = String((e && e.message) || e); }
+  if (!arm) {
+    caja.appendChild(csgEl('div', 'csg-rep-item csg-aviso-para', 'No se pudo armar esta consigna: ' + fallo));
+    root.appendChild(caja);
+    return;
+  }
+
+  const molde = csgEdMolde(p);
+  const clase = (molde && molde.clase) || p.clase || 'prompt';
+  let tabs = [];
+  if (clase === 'grafo') tabs = [['mermaid', 'Mermaid'], ['plan', 'Plan'], ['principal', 'Prompt para un chat']];
+  else if (clase === 'bucle') tabs = [['plan', 'Plan'], ['principal', 'Auto-bucle']];
+  else if (arm.forma === 'xml' && arm.sistema) tabs = [['principal', 'Todo'], ['sistema', 'Sistema'], ['encargo', 'Encargo']];
+  if (tabs.length && !tabs.some(t => t[0] === _csgEdTab)) _csgEdTab = 'principal';
+  if (tabs.length) {
+    const tt = csgEl('div', 'csg-prev-tabs');
+    tt.setAttribute('role', 'tablist');
+    tabs.forEach(t => {
+      const on = t[0] === _csgEdTab;
+      const b = csgEl('button', 'csg-prev-tab' + (on ? ' on' : ''), t[1]);
+      b.type = 'button';
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+      b.addEventListener('click', () => { if (_csgEdTab !== t[0]) { _csgEdTab = t[0]; csgEdPintar(); } });
+      tt.appendChild(b);
+    });
+    caja.appendChild(tt);
+  }
+
+  const texto = String((tabs.length ? arm[_csgEdTab] : arm.principal) || '');
+  if (texto) caja.appendChild(csgEdPre(texto));
+  else caja.appendChild(csgEl('div', 'csg-nota', 'Todavía no hay nada que armar: escribe algún bloque.'));
+
+  const notaTab = {
+    mermaid: 'Para verlo dibujado, pégalo en mermaid.live o en un bloque ```mermaid.',
+    plan: 'Para leerlo tú: lo que hará, paso a paso.',
+    sistema: 'Lo que va en las instrucciones de un Proyecto.',
+    encargo: 'Lo que va en el chat.',
+  }[tabs.length ? _csgEdTab : ''];
+  if (notaTab) caja.appendChild(csgEl('div', 'csg-nota', notaTab));
+
+  if (arm.forma === 'skill') {
+    caja.appendChild(csgEl('div', 'csg-nota', 'Es el archivo SKILL.md: en Claude Code va en .claude/skills/<name>/SKILL.md; en claude.ai, en Ajustes → Capacidades → Habilidades.'));
+    if (arm.sistema) {
+      caja.appendChild(csgVerSep('Como instrucción de sistema'));
+      caja.appendChild(csgEdPre(arm.sistema));
+    }
+  }
+
+  let rep = null;
+  try { rep = csgRevisar(p, maq.id); } catch (e) { rep = null; }
+  if (rep) caja.appendChild(csgEdRepaso(rep, maq));
+  root.appendChild(caja);
+}
+
+/* El texto armado en un <pre>, con cada {{hueco}} sin rellenar en su
+   propio <span> ámbar. Troceando nodos de texto: un innerHTML aquí sería
+   la puerta más ancha de la casa por el motivo más tonto. */
+function csgEdPre(texto) {
+  const pre = csgEl('pre', 'csg-pre');
+  const s = String(texto == null ? '' : texto);
+  const re = /\{\{[^{}\n]{0,60}\}\}/g;
+  let i = 0, m;
+  while ((m = re.exec(s))) {
+    if (m.index > i) pre.appendChild(document.createTextNode(s.slice(i, m.index)));
+    pre.appendChild(csgEl('span', 'csg-var', m[0]));
+    i = m.index + m[0].length;
+  }
+  if (i < s.length) pre.appendChild(document.createTextNode(s.slice(i)));
+  return pre;
+}
+
+/* El repaso: lo que PARA, a la vista; lo que avisa, plegado tras su
+   cuenta (regla 13: un panel lleno de avisos que no importan es un panel
+   que no se lee, y entre los treinta dejan de verse los que paran). */
+function csgEdRepaso(rep, maq) {
+  const caja = csgEl('div', 'csg-repaso');
+  let cabe;
+  if (maq.abrir && maq.param) cabe = rep.cabe ? 'cabe en la dirección de ' + maq.nombre : 'no cabe: se abre sin texto y va copiado';
+  else if (maq.abrir) cabe = maq.nombre + ' se abre sin texto: va copiado';
+  else cabe = 'se copia y se pega a mano';
+  caja.appendChild(csgEl('div', 'csg-rep-cuenta',
+    '≈ ' + csgMiles(rep.palabras) + ' palabras (≈ ' + csgMiles(rep.tokens) + ' tokens, a ojo) · ' + cabe +
+    (rep.elementos !== undefined ? ' · ' + rep.elementos + (rep.elementos === 1 ? ' elemento' : ' elementos') : '')));
+
+  const para = Array.isArray(rep.para) ? rep.para : [];
+  const avisa = Array.isArray(rep.avisa) ? rep.avisa : [];
+  if (!para.length) caja.appendChild(csgEl('div', 'csg-nota', '✓ Nada impide usarla.'));
+  para.forEach(x => caja.appendChild(csgEdRepItem(x, 'csg-aviso-para')));
+  if (avisa.length) {
+    const d = document.createElement('details');
+    d.className = 'csg-rep-avisa';
+    d.appendChild(csgEl('summary', '', '▲ ' + avisa.length + (avisa.length === 1 ? ' aviso' : ' avisos')));
+    avisa.forEach(x => d.appendChild(csgEdRepItem(x, 'csg-aviso-avisa')));
+    caja.appendChild(d);
+  }
+  return caja;
+}
+
+function csgEdRepItem(x, clase) {
+  const it = csgEl('div', 'csg-rep-item ' + clase);
+  it.appendChild(csgEl('span', '', String((x && x.msg) || '')));
+  const a = x && x.arreglo;
+  const rot = a ? csgEdRotuloArreglo(a) : '';
+  if (rot) {
+    const b = csgEl('button', 'csg-chip csg-rep-arreglo', rot);
+    b.type = 'button';
+    b.addEventListener('click', () => csgEdArreglo(a));
+    it.appendChild(b);
+  }
+  return it;
+}
+
+/* La palabra del chip de cada arreglo: lo que va a pasar al tocarlo. */
+function csgEdRotuloArreglo(a) {
+  if (!a || !a.tipo) return '';
+  if (a.tipo === 'ir') return a.bloque ? '✎ Ir a «' + csgEdRotuloDe(a.bloque) + '»' : '';
+  if (a.tipo === 'frase') return a.texto ? '＋ ' + csgEdCorto(a.texto, 40) : '';
+  if (a.tipo === 'hueco') return a.a ? '⇄ ' + csgEdCorto(a.a, 40) : '';
+  if (a.tipo === 'abrir') return a.id && csgDe(a.id) ? '↗ Abrirla' : '';
+  if (a.tipo === 'molde') return csgEdMoldeDe(a.molde) ? '⇄ Duplicar en ' + CSG_MOLDES[a.molde].nombre : '';
+  return '';
+}
+
+function csgEdRotuloDe(id) {
+  const molde = csgEdMolde(_csgEdPieza);
+  if (molde && molde.bloques.some(e => e.id === id)) return String(csgBloqueDef(molde.id, id).rotulo || id);
+  const b = csgEdBloque(id);
+  return String((b && b.rotulo) || csgBloqueDef(null, id).rotulo || id);
+}
+
+function csgEdCorto(s, n) {
+  s = String(s == null ? '' : s).replace(/\s+/g, ' ').trim();
+  return csgLargoTexto(s) > n ? csgCorta(s, n - 1) + '…' : s;
+}
+
+/* Un arreglo del repaso, aplicado en el compositor abierto.
+   · 'ir' vuelve a los bloques y pone el teclado en el que falta, en el
+     mismo toque;
+   · 'frase' y 'hueco' se aplican a los datos sin salir de la vista
+     previa: se ve el arreglo hecho y el aviso desaparecer;
+   · 'abrir' y 'molde' cambian de pieza, guardando antes lo de esta. */
+function csgEdArreglo(a) {
+  const p = _csgEdPieza;
+  if (!a || !p) return;
+  if (a.tipo === 'ir') {
+    if (!a.bloque) return;
+    if (_csgEdModo !== 'bloques') {
+      _csgEdModo = 'bloques';
+      csgEdPintar();
+    }
+    csgEdEnfocar(a.bloque);
+    return;
+  }
+  if (a.tipo === 'frase') {
+    if (!a.bloque || !a.texto) return;
+    const t = csgEdTexto(a.bloque);
+    if (t.indexOf(a.texto) < 0) csgEdPonTexto(a.bloque, t.trim() ? t.replace(/\s+$/, '') + '\n' + a.texto : a.texto);
+    _csgEdAbiertos.add(a.bloque);
+    csgEdPintar();
+    csgEdTocado();
+    csgAviso('＋ Puesta en «' + csgEdRotuloDe(a.bloque) + '»');
+    return;
+  }
+  if (a.tipo === 'hueco') {
+    if (!a.bloque || !a.de) return;
+    const t = csgEdTexto(a.bloque);
+    if (t.indexOf(a.de) < 0) return;
+    csgEdPonTexto(a.bloque, t.split(a.de).join(String(a.a == null ? '' : a.a)));
+    if (a.bloque === 'nombre') _csgEdAuto.nombre = '';
+    csgEdPintar();
+    csgEdTocado();
+    return;
+  }
+  if (a.tipo === 'abrir') {
+    const o = csgDe(a.id);
+    if (!o || o.eliminado) return;
+    csgAbrirCompositor(o);
+    return;
+  }
+  if (a.tipo === 'molde') {
+    if (!csgEdMoldeDe(a.molde)) return;
+    /* Primero se guarda esta, y DESPUÉS se duplica: así el duplicado sabe
+       que la de origen ya está en el anaquel y le pone el nombre del
+       molde detrás, en vez de nacer con el mismo título que ella. */
+    if (_csgEdNueva ? csgEdAlgoEscrito() : csgEdSucio()) csgEdGuardar('callado');
+    const dup = csgDuplicarEnMolde(_csgEdPieza || p, a.molde);
+    csgAbrirCompositor(dup);
+    csgAviso('Duplicada en ' + CSG_MOLDES[a.molde].nombre + ': sin guardar; lo que no encontró sitio va al final, marcado.');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PASO 5 · GUARDAR
+   ──────────────────────────────────────────────────────────────────
+   Siempre se puede (regla 5): una pieza a medias es un borrador, no un
+   error. Local al instante, nube con el respiro de csgSubirLuego. Si la
+   pieza ya se usó y su texto en md cambió, nace una versión (regla 10).
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Vuelca una copia de trabajo sobre el objeto de la lista, o la mete si
+   es nueva, y la guarda. Sin pantalla: lo usan el guardado y el rescate
+   de un borrador de otra pieza. Devuelve { obj, nuevaV, grande,
+   promesa, localOk }.
+   ⚠️ Sobre una pieza que ya existe se escriben SOLO los campos que el
+   compositor edita (título, forma, máquina, bloques, material,
+   estantes). La bitácora, las versiones, los usos y el cuaderno viven en
+   el objeto de la lista y pueden haber cambiado mientras se escribía
+   —un uso desde otra hoja, la nube que llegó—; volcarlos desde una copia
+   hecha antes los borraría sin ningún aviso. */
+function csgEdVolcar(p, materialCompositor) {
+  const titulo = csgCorta(String(p.titulo || '').replace(/\s+/g, ' ').trim(), CSG_TOPES.titulo);
+  const limpios = csgEdBloquesParaGuardar(p);
+  const matC = String(materialCompositor == null ? '' : materialCompositor);
+  const grande = csgLargoTexto(matC) > CSG_TOPES.material;
+  const material = grande ? '' : matC;
+  const estantes = (p.estantes || []).map(String);
+  const molde = csgEdMolde(p);
+  const clase = (molde && molde.clase) || String(p.clase || 'prompt');
+
+  let obj = csgDe(p.id);
+  if (obj && obj.eliminado) { p.id = csgNuevoId(); obj = null; }
+  let nuevaV = 0;
+  if (obj) {
+    const antes = csgMdCrudo(obj);
+    const despues = csgMdCrudo({ clase, molde: p.molde, bloques: limpios });
+    if ((obj.usos || 0) > 0 && antes !== despues) nuevaV = csgNuevaVersion(obj, obj.bloques || []);
+    obj.titulo = titulo;
+    obj.clase = clase;
+    obj.molde = String(p.molde || obj.molde || '');
+    obj.maquina = String(p.maquina || obj.maquina || '');
+    obj.bloques = limpios;
+    obj.material = material;
+    obj.estantes = estantes;
+    if (!obj.autor) obj.autor = csgAutor();
+  } else {
+    obj = csgNuevaPieza(clase, p.molde);
+    obj.id = p.id;
+    obj.titulo = titulo;
+    obj.clase = clase;
+    obj.molde = String(p.molde || obj.molde);
+    obj.maquina = String(p.maquina || obj.maquina || '');
+    obj.bloques = limpios;
+    obj.material = material;
+    obj.estantes = estantes;
+    obj.cuaderno = String(p.cuaderno || '');
+    obj.notas = String(p.notas || '');
+  }
+  const promesa = csgSubirLuego(obj);
+  const localOk = !_csgSinEspacio;
+  if (typeof csgMaquinaApunta === 'function' && obj.maquina) csgMaquinaApunta(obj.maquina);
+  return { obj, nuevaV, grande, promesa, localOk };
+}
+
+/* modo: 'boton' (💾), 'usar' (▶), 'volver' (‹) o 'callado' (al cambiar
+   de pieza). Solo 'boton' y 'usar' preguntan por el título repetido: al
+   salir con ‹ se guarda igual, y la ficha y el repaso ya lo avisan;
+   parar la salida con una hoja sería un toque más para irse. `luego`
+   recibe el objeto de la lista cuando el guardado se hizo. */
+function csgEdGuardar(modo, luego) {
+  const p = _csgEdPieza;
+  if (!p) return null;
+  const k = csgClave(String(p.titulo || ''));
+  if (k && (modo === 'boton' || modo === 'usar') && _csgEdIgual !== k) {
+    const otra = csgVivas().find(x => x && x.id !== p.id && csgClave(x.titulo || '') === k);
+    if (otra) { csgEdHojaRepetido(otra, modo, luego); return null; }
+  }
+  clearTimeout(_csgEdBorradorT);
+  /* El id puede cambiar al volcar (si la pieza se retiró mientras se
+     escribía, lo escrito entra como pieza nueva): el borrador que hay que
+     soltar es el del id de ANTES. */
+  const idAntes = p.id;
+  const r = csgEdVolcar(p, _csgEdMaterial);
+  const obj = r.obj;
+
+  _csgEdNueva = false;
+  p.version = obj.version;
+  _csgEdBase = csgEdHuella(p, _csgEdMaterial);
+  _csgEdGuardado = 'si';
+  let rep = null;
+  try { rep = csgRevisar(obj, obj.maquina); } catch (e) { rep = null; }
+  _csgEdPara = !!(rep && rep.para.length);
+  _csgEdNubeEd = r.localOk ? 'espera' : 'local';
+  /* El material de más de 20.000 no va con la pieza: se queda en el
+     borrador, marcado como ya guardado, para la hoja de Usar. */
+  if (r.grande) csgBorradorEscribe(true);
+  else { csgBorradorBorra(idAntes); csgBorradorBorra(p.id); }
+  _csgEdRecuperar = null;
+  csgEdPintarEstado();
+  if (typeof csgPintarAnaquel === 'function') csgPintarAnaquel();
+
+  let aviso = '';
+  if (!r.localOk) {
+    const n = csgRotuloNube();
+    aviso = n.ic + ' ' + n.t;
+  } else {
+    const partes = [];
+    if (_csgEdPara) {
+      const falta = (typeof csgFaltaDe === 'function' ? csgFaltaDe(obj) : '') || (rep && rep.para[0] ? rep.para[0].msg : '');
+      partes.push('🟡 Guardada como borrador' + (falta ? ' · ' + falta : ''));
+    } else partes.push('💾 Guardada');
+    if (r.nuevaV) partes.push('ahora es la v' + r.nuevaV + ' (la anterior queda en Versiones)');
+    if (r.grande) partes.push('el 📎 material de ' + csgMiles(csgLargoTexto(_csgEdMaterial)) + ' caracteres no va con la pieza: pégalo al usar');
+    const notable = _csgEdPara || r.nuevaV || r.grande;
+    if (modo === 'boton' || (modo === 'volver' && notable) || (modo === 'usar' && r.nuevaV)) aviso = partes.join(' · ');
+    else if (modo === 'callado') aviso = '💾 Guardada «' + (obj.titulo || csgEdNombreDeForma(obj)) + '»';
+  }
+  if (aviso) csgAviso(aviso);
+
+  const id = obj.id;
+  Promise.resolve(r.promesa).then(res => {
+    if (_csgEdPieza && _csgEdPieza.id === id && !csgEdSucio()) {
+      _csgEdNubeEd = (res && res.ok) ? 'ok' : 'local';
+      csgEdPintarEstado();
+    }
+    if (typeof csgPintarAnaquel === 'function') csgPintarAnaquel();
+    /* La causa se nombra (regla 18), y solo tras el 💾: después de ‹ o
+       de ▶ la franja del anaquel y la hoja ya lo dicen. */
+    if (!(res && res.ok) && modo === 'boton' && r.localOk && csgEdEnVista()) {
+      const n = csgRotuloNube();
+      if (!n.ok) csgAviso(n.ic + ' ' + n.t);
+    }
+  }).catch(() => {});
+
+  if (typeof luego === 'function') luego(obj);
+  return obj;
+}
+
+/* «Ya hay una «X» · abrirla · guardar igual» (§5, paso 5), en la hoja
+   vertical y no con confirm(): tres renglones de 44 px con la palabra de
+   lo que hacen. */
+function csgEdHojaRepetido(otra, modo, luego) {
+  const k = csgClave(String(otra.titulo || ''));
+  csgVerAbrir('Ya hay una «' + (otra.titulo || CSG_SIN_TITULO) + '»', cuerpo => {
+    cuerpo.appendChild(csgEl('div', 'csg-nota', 'Casi siempre es la misma consigna escrita dos veces. Dos pueden llamarse igual: se dice para que no se te pase.'));
+    cuerpo.appendChild(csgVerFila('📜', 'Abrir la que ya hay', null, null, () => {
+      csgVerCerrar();
+      /* Se abre la otra y ESTA se deja sin guardar, como dice el
+         renglón: es lo que se elige al ver que ya existía. */
+      clearTimeout(_csgEdBorradorT);
+      if (_csgEdPieza) csgBorradorBorra(_csgEdPieza.id);
+      _csgEdPieza = null;
+      csgAbrirCompositor(otra);
+    }, 'lo escrito aquí no se guarda'));
+    cuerpo.appendChild(csgVerFila('💾', 'Guardar igual', null, null, () => {
+      csgVerCerrar();
+      _csgEdIgual = k;
+      csgEdGuardar(modo, luego);
+    }, 'quedan dos con el mismo título'));
+    cuerpo.appendChild(csgVerFila('✎', 'Cambiar el título', null, null, () => {
+      csgVerCerrar();
+      const inp = document.getElementById('csg-ed-titulo');
+      if (inp) { inp.focus(); try { inp.select(); } catch (e) {} }
+    }));
+  });
+}
+
+/* ‹: si hay algo escrito y cambió, se guarda antes de volver (como en
+   Redacción); una pieza nueva sin nada escrito se descarta sin
+   preguntar, porque no hay nada que perder. */
+function csgEdVolver() {
+  const p = _csgEdPieza;
+  clearTimeout(_csgEdPreviaT);
+  if (p) {
+    if (_csgEdNueva) {
+      if (csgEdAlgoEscrito()) csgEdGuardar('volver');
+      else { clearTimeout(_csgEdBorradorT); csgBorradorBorra(p.id); }
+    } else if (csgEdSucio()) csgEdGuardar('volver');
+    else csgBorradorAhora();
+  }
+  switchView('view-consigna');
+  if (typeof csgPintarAnaquel === 'function') csgPintarAnaquel();
+}
+
+/* ▶ Usar: guarda lo que haya cambiado y abre la hoja de Usar con la
+   máquina y el MATERIAL del compositor, aunque pase de 20.000: ese no se
+   guarda con la pieza, pero sí se usa. Una pieza nueva sin nada escrito
+   no se guarda (sería un borrador vacío en el anaquel): la hoja se abre
+   igual y dice qué falta. */
+function csgEdUsar() {
+  const p = _csgEdPieza;
+  if (!p) return;
+  const abrir = obj => {
+    if (typeof csgAbrirUsar === 'function') csgAbrirUsar(obj, { maquina: obj.maquina || p.maquina, material: _csgEdMaterial });
+  };
+  if (_csgEdNueva && !csgEdAlgoEscrito()) { abrir(p); return; }
+  if (_csgEdNueva || csgEdSucio()) { csgEdGuardar('usar', abrir); return; }
+  abrir(csgDe(p.id) || p);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LOS CABLES DE ESTA PARTE
+   ──────────────────────────────────────────────────────────────────
+   ⚠️ SE ENGANCHAN LA PRIMERA VEZ QUE SE ABRE EL COMPOSITOR, NO EN UN
+   DOMContentLoaded. La prueba de Node (_dev/test-consigna-node.js) carga
+   este archivo entero con un `document` que REVIENTA si se le toca y con
+   espías que apuntan cualquier toque a `document` o a `window`: un
+   `document.addEventListener` aquí arriba la haría suspender. Y no hace
+   falta antes: al compositor solo se llega por csgAbrirCompositor o por
+   csgBorradorSeguir, y los dos pasan por csgEdEmpezar, que llama a esto
+   antes de enseñar la vista. Nadie puede tocar un botón que no ve.
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgEdEngancha() {
+  if (_csgEdEnganchado) return;
+  if (typeof document === 'undefined' || !document || typeof document.getElementById !== 'function') return;
+  _csgEdEnganchado = true;
+  const $ = id => document.getElementById(id);
+  const atras = $('csg-ed-back-btn');
+  if (atras) atras.addEventListener('click', csgEdVolver);
+  const tit = $('csg-ed-titulo');
+  if (tit) {
+    tit.addEventListener('input', csgEdAlTitulo);
+    /* Intro en el título baja el teclado: en una tableta, la tecla de
+       intro de un campo de una línea es la única forma de quitarlo. */
+    tit.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); tit.blur(); } });
+  }
+  const ver = $('csg-ed-ver');
+  if (ver) ver.addEventListener('click', csgEdAlternarVista);
+  const guardar = $('csg-ed-guardar');
+  if (guardar) guardar.addEventListener('click', () => csgEdGuardar('boton'));
+  const usar = $('csg-ed-usar');
+  if (usar) usar.addEventListener('click', csgEdUsar);
+  /* El borrador que esperaba su respiro se escribe YA al esconderse la
+     página: una recarga del service worker o cambiar de aplicación a
+     media palabra no esperan a nadie. */
+  if (typeof window !== 'undefined' && window && typeof window.addEventListener === 'function') {
+    window.addEventListener('pagehide', csgBorradorAhora);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') csgBorradorAhora();
+  });
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   📜 LA CONSIGNA · PANTALLA, PARTE 3 DE 3: LAS HOJAS
+   (▶ Usar, 📋 Pegar lo que ya tengo, y abrir la máquina)
+   ──────────────────────────────────────────────────────────────────
+   Va la ÚLTIMA detrás de la marca «PANTALLA», después del anaquel y del
+   compositor: usa sus ayudantes (csgEl, csgBtn, csgVerAbrir,
+   csgCopiarTexto, csgNuevaPieza, csgDuplicarEnMolde, csgAbrirCompositor)
+   y ellos llaman a las cuatro puertas de aquí: csgAbrirUsar,
+   csgCopiarDirecto, csgAbrirPegar y csgAbrirMaquina.
+
+   Es el sitio donde la consigna SALE (Usar) y por donde ENTRA la que ya
+   estaba escrita en otra parte (Pegar). Las dos cosas que no se negocian
+   aquí, y por qué:
+
+   · LO QUE SE COPIA ES LO QUE SE VE, CARÁCTER POR CARÁCTER (regla 1). El
+     <pre> de la hoja, 📋 Copiar, 📤 Compartir y ↗ Abrir salen del MISMO
+     csgArmar con los mismos valores y el mismo material. Si el recuadro
+     armara por su cuenta, un día se separarían sin ningún error, y eso se
+     descubre leyendo lo que la máquina devolvió, sin saber por qué.
+   · UNA VARIABLE VACÍA NO SE COPIA EN SILENCIO (regla 6). Copiar se para
+     y la nombra; «Copiar con huecos» es OTRO botón, explícito.
+
+   ⚠️ A NIVEL DE ARCHIVO NO SE TOCA NI `document` NI `window`, TAMPOCO
+   PARA COLGAR UN DOMContentLoaded (lo mismo que las otras dos partes). La
+   prueba de Node (_dev/test-consigna-node.js) carga el archivo entero con
+   un `document` que REVIENTA si se le toca y con espías que apuntan
+   cualquier toque: un `document.addEventListener` aquí arriba la haría
+   suspender. Los cables de las dos hojas se enganchan la primera vez que
+   se abre una de ellas (csgUsarEngancha), que es siempre antes de que
+   nadie pueda tocar su ✕.
+
+   ⚠️ Y NADA DE LO ESCRITO POR UNA PERSONA LLEGA A UN ATRIBUTO NI A
+   innerHTML (regla 15): todo con createElement y textContent, el <pre>
+   incluido. Los únicos `id` que se ponen son NUESTROS («csg-usar-v-3»),
+   nunca el nombre de una variable; y las direcciones que se abren son los
+   literales de CSG_MAQUINAS con el texto detrás por encodeURIComponent, o
+   la del cuaderno ligado comprobada con URL().
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── Constantes y estado de las hojas ─────────────────────────────── */
+
+/* Un valor de variable más largo que esto no se recuerda como «último
+   valor»: eso ya no es un valor que se repite, es material, y guardar
+   tres copias de un informe por variable llenaría el almacén del
+   aparato —donde también viven las piezas— sin que nadie lo pidiera. Se
+   usa igual; solo no se ofrece la próxima vez. */
+const CSG_USAR_VALOR_MAX = 2000;
+/* Las piezas cuyos últimos valores se recuerdan. Pasado el tope se van
+   primero las que ya no están en el anaquel y después las que hace más
+   que no se usan (la memoria se reordena en cada uso). */
+const CSG_USAR_VARS_PIEZAS = 300;
+/* Escribiendo en el recuadro de pegar, se vuelve a leer tras este
+   respiro. Pegando, al instante: pegar es el caso que importa. */
+const CSG_PEG_RESPIRO = 600;
+
+let _csgUsarPieza = null;        // la pieza que se está usando (la de la lista, casi siempre)
+let _csgUsarMaquina = '';        // la máquina elegida en la hoja
+let _csgUsarNombres = [];        // las variables que se preguntan (sin las reservadas)
+let _csgUsarValores = {};        // nombre → lo escrito ahora mismo
+let _csgUsarMaterial = '';       // el material de ESTE uso (no se guarda)
+let _csgUsarArmado = null;       // lo último que salió de csgArmar: es lo que se copia
+let _csgUsarRep = null;          // el repaso para la máquina elegida
+let _csgUsarEl = null;           // los nodos de la hoja abierta
+let _csgUsarApuntado = '';       // la huella del último uso apuntado en esta apertura
+let _csgUsarExtraK = '';         // la huella de la fila de botones pequeños pintada
+let _csgUsarEnganchado = false;
+
+let _csgPegEl = null;            // los nodos de la hoja de pegar
+let _csgPegTexto = '';           // lo que se leyó (para saber si el recuadro cambió)
+let _csgPegLeido = null;         // lo que devolvió csgLeer
+let _csgPegBase = null;          // la pieza con la propuesta del lector
+let _csgPegPieza = null;         // la que se abrirá: la base, o su duplicado en otro molde
+let _csgPegElegido = '';         // el molde que eligió la persona ('' = el propuesto)
+let _csgPegT = null;
+
+/* ── Ayudantes de esta parte ──────────────────────────────────────── */
+
+/* Mostrar y esconder con las DOS cosas a la vez: `hidden` y el display
+   en la etiqueta. El `[hidden]` del navegador pierde contra cualquier
+   `display` de una clase (La Voz Prestada, regla 40: «el mando responde
+   y no hace nada»), y las clases de estas cajas las pinta otra parte:
+   si un día una lleva `display: flex`, un aviso «escondido» seguiría a
+   la vista diciendo algo que ya no es verdad. */
+function csgUsarMuestra(el, si) {
+  if (!el) return;
+  el.hidden = !si;
+  el.style.display = si ? '' : 'none';
+}
+
+/* Un texto en un renglón y cortado para un chip o un extracto: los
+   valores y los bloques pueden traer saltos y párrafos enteros. */
+function csgUsarCorto(s, n) {
+  const u = csgUnRenglon(String(s == null ? '' : s)).trim();
+  return csgLargoTexto(u) > n ? csgCorta(u, n - 1).replace(/\s+$/, '') + '…' : u;
+}
+
+/* Un aviso ● o ▲ con su texto en un <span>: el signo lo pone el CSS, y
+   el texto va en su propia caja para que un mensaje largo se parta en
+   renglones en vez de estirar la hoja a lo ancho. */
+function csgUsarAviso(cls, texto) {
+  const d = csgEl('div', cls);
+  d.appendChild(csgEl('span', '', String(texto == null ? '' : texto)));
+  return d;
+}
+
+/* «{{tema}}», «{{tema}} y {{n}}», «{{a}}, {{b}} y {{c}}». */
+function csgUsarLista(nombres) {
+  const l = nombres.map(n => '{{' + n + '}}');
+  if (l.length <= 1) return l.join('');
+  return l.slice(0, -1).join(', ') + ' y ' + l[l.length - 1];
+}
+
+/* El molde por su llave PROPIA (CSG_MOLDES['toString'] es una función
+   heredada y una fila tocada a mano con ese molde reventaría la hoja). */
+function csgUsarMolde(p) {
+  const id = p && p.molde;
+  return (typeof id === 'string' && Object.prototype.hasOwnProperty.call(CSG_MOLDES, id)) ? CSG_MOLDES[id] : null;
+}
+
+/* El texto de un bloque SIN su código: lo de entre ``` o ~~~ se vacía y
+   un trozo entre `…` se vuelve espacios. Dentro del código las llaves son
+   una PLANTILLA que se copia tal cual («{{ pedido.id }}», un Handlebars),
+   y el repaso ya las trata así; si esta hoja las preguntara como huecos,
+   Copiar se pararía pidiendo un valor para lo que la persona quiere
+   copiar con sus llaves, y el prompt que existe para dar esa plantilla no
+   se podría usar. Es la regla de csgLecSinCodigo del núcleo, copiada
+   porque los csgLec son internos del lector. */
+function csgUsarSinCodigo(t) {
+  let enCodigo = false;
+  return String(t == null ? '' : t).split('\n').map(l => {
+    if (/^\s*(```|~~~)/.test(l)) { enCodigo = !enCodigo; return ''; }
+    return enCodigo ? '' : l.replace(/`[^`\n]*`/g, x => ' '.repeat(x.length));
+  }).join('\n');
+}
+
+/* Las variables que se PREGUNTAN al usar: las de los bloques, fuera del
+   código, en el orden en que se leen, y sin las reservadas ({{maquina}},
+   {{titulo}}, {{hoy}}), que se rellenan solas: preguntarlas sería pedir
+   lo que ya se sabe. */
+function csgUsarNombres(p) {
+  const textos = (Array.isArray(p && p.bloques) ? p.bloques : [])
+    .filter(b => b && typeof b === 'object')
+    .map(b => csgUsarSinCodigo(b.t));
+  return csgVariables(textos).filter(n => CSG_RESERVADAS.indexOf(n) < 0);
+}
+
+/* ── Los últimos valores de cada variable (CSG_CLAVES.vars) ───────────
+   { [idPieza]: { [nombre]: [tres últimos, el más nuevo primero] } }.
+   Son del APARATO y POR PIEZA (regla 6): el {{tema}} de «Resumen de
+   informe» no tiene nada que ver con el {{tema}} de «Careo», y ofrecer el
+   de una en la otra es rellenar mal sin que se note. */
+
+function csgVarsLee() {
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(CSG_CLAVES.vars)); } catch (e) { d = null; }
+  return (d && typeof d === 'object' && !Array.isArray(d)) ? d : {};
+}
+function csgVarsUltimos(id, nombre) {
+  if (!id) return [];
+  const de = csgVarsLee()[id];
+  if (!de || typeof de !== 'object' || Array.isArray(de)) return [];
+  const l = Object.prototype.hasOwnProperty.call(de, nombre) ? de[nombre] : null;
+  return Array.isArray(l) ? l.filter(x => typeof x === 'string' && x.trim()).slice(0, 3) : [];
+}
+function csgVarsApunta(id, nombres, valores) {
+  if (!id || !Array.isArray(nombres) || !nombres.length) return;
+  const todo = csgVarsLee();
+  const viejo = todo[id];
+  const de = (viejo && typeof viejo === 'object' && !Array.isArray(viejo)) ? viejo : {};
+  let cambio = false;
+  nombres.forEach(n => {
+    const v = String((valores && valores[n]) == null ? '' : valores[n]).trim();
+    if (!v || csgLargoTexto(v) > CSG_USAR_VALOR_MAX) return;
+    const antes = Array.isArray(de[n]) ? de[n].filter(x => typeof x === 'string' && x.trim() && x.trim() !== v) : [];
+    de[n] = [v].concat(antes).slice(0, 3);
+    cambio = true;
+  });
+  if (!cambio) return;
+  /* Se saca y se vuelve a meter: el orden de las llaves es el de los
+     usos, y la poda se lleva primero las del principio. */
+  delete todo[id];
+  todo[id] = de;
+  let ids = Object.keys(todo);
+  if (ids.length > CSG_USAR_VARS_PIEZAS) {
+    ids.forEach(k => {
+      if (Object.keys(todo).length <= CSG_USAR_VARS_PIEZAS || k === id) return;
+      const p = csgDe(k);
+      if (!p || p.eliminado) delete todo[k];
+    });
+    ids = Object.keys(todo);
+    while (ids.length > CSG_USAR_VARS_PIEZAS) { const k = ids.shift(); if (k !== id) delete todo[k]; }
+  }
+  try { localStorage.setItem(CSG_CLAVES.vars, JSON.stringify(todo)); } catch (e) { /* almacén lleno: se usa igual, solo no se recuerda */ }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ↗ ABRIR LA MÁQUINA (§4, regla 16)
+   ──────────────────────────────────────────────────────────────────
+   Se copia primero, SIEMPRE, y dentro del toque. La dirección base es el
+   LITERAL de CSG_MAQUINAS, nunca armada con datos; el texto va detrás con
+   encodeURIComponent solo si esa parte codificada cabe en
+   CSG_PREFILL_MAX (1.500): una dirección larga se corta sin avisar, y lo
+   que se pierde es el final —el Formato—, que es justo lo que hace
+   pegable la respuesta. Por encima se abre pelada, y como ya va copiado,
+   basta con pegar al llegar. Gemini y NotebookLM no admiten el texto en
+   la dirección: se abren siempre pelados.
+   La decisión vive en UNA función (csgUsarDestino) que usan el rótulo
+   del botón y el botón: con dos, el botón diría «pega ahí» de un texto
+   que sí iba en la dirección, o al revés.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* La dirección del cuaderno ligado (§8, menú ⋯ → 📓 Ligar al cuaderno),
+   comprobada con URL() y solo https. Se busca en la lista de 📓
+   Cuadernos si está cargada y, si no, en su copia del aparato: el
+   inventario de cuadernos no tiene por qué haberse abierto en esta
+   sesión para que su dirección exista. Sin nada que la respalde, ''. */
+function csgUsarCuaderno(pieza) {
+  const id = pieza && pieza.cuaderno ? String(pieza.cuaderno) : '';
+  if (!id) return '';
+  let c = null;
+  try { if (typeof rcuDe === 'function') c = rcuDe(id); } catch (e) { c = null; }
+  if (!c) {
+    try {
+      if (typeof rcuLeeLocal === 'function') c = (rcuLeeLocal() || []).find(x => x && x.id === id && !x.eliminado) || null;
+    } catch (e) { c = null; }
+  }
+  if (!c || c.eliminado || !c.url) return '';
+  try {
+    const u = new URL(String(c.url));
+    if (u.protocol === 'https:') return u.href;
+  } catch (e) { /* una dirección que no se entiende no se abre */ }
+  return '';
+}
+
+/* Adónde lleva ↗ con ESTE texto: { maq, url, lleno, donde, ligado }.
+   `url` vacío = no hay a dónde abrir («Otra»). `lleno` = el texto va en
+   la dirección. */
+function csgUsarDestino(maquinaId, texto, pieza) {
+  const maq = csgMaquina(maquinaId);
+  const out = { maq, url: '', lleno: false, donde: maq.donde || maq.nombre, ligado: false };
+  if (!maq.abrir) return out;
+  let base = maq.abrir;
+  if (maq.id === 'notebooklm') {
+    const c = csgUsarCuaderno(pieza);
+    if (c) { base = c; out.ligado = true; out.donde = 'tu cuaderno de NotebookLM'; }
+  }
+  out.url = base;
+  if (maq.param && !out.ligado) {
+    const enc = encodeURIComponent(String(texto == null ? '' : texto));
+    if (enc && enc.length <= CSG_PREFILL_MAX) {
+      out.url = base + (base.indexOf('?') >= 0 ? '&' : '?') + maq.param + '=' + enc;
+      out.lleno = true;
+    }
+  }
+  return out;
+}
+
+/* Copia el texto y abre la máquina. Devuelve { url, lleno, copia }, donde
+   `copia` es la promesa del portapapeles (true/false), para que quien
+   llama pueda dejar el texto seleccionado si falló.
+   ⚠️ El portapapeles se pide ANTES que la ventana y sin ningún `await`
+   delante: el Safari de un iPad solo deja escribir mientras dura el
+   gesto, y abrir primero se lleva el foco a la pestaña nueva.
+   ⚠️ Con noopener, window.open devuelve null SIEMPRE, se haya abierto o
+   no: no hay forma de saber si el navegador bloqueó la ventana. Por eso
+   el aviso dice las dos cosas —está copiado y adónde ir— en vez de fingir
+   que sabe cuál pasó. Y noopener,noreferrer no es adorno: sin él, la
+   página que se abre puede tocar `window.opener`, que es F.A.R.O con la
+   sesión de la casa puesta (la Bóveda, las finanzas, el chat). */
+function csgAbrirMaquina(maquinaId, texto, pieza) {
+  const t = String(texto == null ? '' : texto);
+  const copia = csgCopiarTexto(t);
+  const d = csgUsarDestino(maquinaId, t, pieza);
+  if (!d.url) {
+    copia.then(ok => csgAviso(ok ? '📋 Copiado: pégalo donde lo vayas a usar.' : 'No se pudo copiar: mantén pulsado el texto para copiarlo.'));
+    return { url: '', lleno: false, copia };
+  }
+  try { window.open(d.url, '_blank', 'noopener,noreferrer'); } catch (e) { /* el aviso de abajo dice adónde ir */ }
+  copia.then(ok => {
+    if (ok) csgAviso('Copiado. Si no se abrió, ve a ' + d.donde + ' y pega.');
+    else if (d.lleno) csgAviso('El texto va en la dirección, pero no se pudo copiar: si no aparece en ' + d.donde + ', vuelve aquí y cópialo a mano.');
+    else csgAviso('No se pudo copiar: vuelve aquí, mantén pulsado el texto y cópialo; después pégalo en ' + d.donde + '.');
+  });
+  return { url: d.url, lleno: d.lleno, copia };
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ▶ LA HOJA DE USAR (§5, paso 4)
+   ──────────────────────────────────────────────────────────────────
+   De arriba abajo: las máquinas; lo que PARA (si algo para); las
+   variables con su último valor; el texto armado, que se rellena en vivo;
+   el material, plegado; los botones pequeños que tocan a cada forma; y
+   el pie fijo con 📋 Copiar · 📤 Compartir · ↗ Abrir.
+   La cuenta: volver a usar una pieza son DOS toques (▶ · Copiar), o tres
+   con una variable que cambia. Por eso la primera variable VACÍA recibe
+   el foco en el mismo toque que abre la hoja —sale el teclado solo— y
+   las que tienen su último valor no piden nada.
+   ⚠️ Aquí NO se pregunta «¿sirvió?»: se apunta el uso con ok: null y se
+   pregunta en la siguiente apertura del anaquel (§6.7). Preguntarlo al
+   copiar es preguntar antes de que la máquina conteste.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* opts: { maquina?, material? (el del compositor, aunque pase de 20.000),
+   sinFoco? (cuando se abre fuera de un toque: un foco sin gesto no saca
+   el teclado en un iPad y en Android lo saca a destiempo) }. */
+function csgAbrirUsar(pieza, opts) {
+  if (!pieza || typeof pieza !== 'object') return null;
+  csgUsarEngancha();
+  const ov = document.getElementById('csg-usar-overlay');
+  const cuerpo = document.getElementById('csg-usar-cuerpo');
+  const pie = document.getElementById('csg-usar-pie');
+  if (!ov || !cuerpo || !pie) { csgAviso('No se pudo abrir la hoja de usar: vuelve a abrir F.A.R.O'); return null; }
+  const op = (opts && typeof opts === 'object') ? opts : {};
+  /* La hoja vertical va DESPUÉS en el documento, así que abierta taparía
+     esta entera: el botón respondería y no se vería nada (la avería de
+     las hojas del taller de La Voz Prestada, regla 35). */
+  if (typeof csgVerCerrar === 'function') csgVerCerrar();
+
+  _csgUsarPieza = pieza;
+  _csgUsarMaquina = csgMaquina(op.maquina || pieza.maquina || csgMaquinaUltima()).id;
+  /* El material: el del compositor si viene (puede pasar de 20.000 y
+     entonces no está en la pieza); si no, el guardado; y si tampoco, el
+     que quedó en el borrador por no caber (§5, paso 4). */
+  let mat = (op.material !== undefined && op.material !== null) ? String(op.material) : String(pieza.material || '');
+  if (!mat.trim() && typeof csgBorradorMaterial === 'function') {
+    try { mat = String(csgBorradorMaterial(pieza.id) || '') || mat; } catch (e) {}
+  }
+  _csgUsarMaterial = mat;
+  _csgUsarNombres = csgUsarNombres(pieza);
+  _csgUsarValores = {};
+  _csgUsarNombres.forEach(n => { _csgUsarValores[n] = csgVarsUltimos(pieza.id, n)[0] || ''; });
+  _csgUsarApuntado = '';
+  _csgUsarExtraK = '';
+  _csgUsarRep = csgUsarRepasa();
+
+  const tit = document.getElementById('csg-usar-titulo');
+  if (tit) tit.textContent = '▶ Usar · ' + (String(pieza.titulo || '').replace(/\s+/g, ' ').trim() || CSG_SIN_TITULO);
+  csgUsarPintarCuerpo(cuerpo, pie);
+  ov.style.display = 'flex';
+  const modal = ov.querySelector('.fin-modal');
+  if (modal) modal.scrollTop = 0;
+  csgUsarPintarRepaso();
+  csgUsarRefrescar();
+
+  /* ⚠️ El foco va DENTRO del toque que abrió, sin nada asíncrono delante:
+     es lo que hace que en la tableta salga el teclado solo. Con algo que
+     PARA no se enfoca nada: el teclado taparía justo el aviso que dice
+     por qué no se puede usar. */
+  if (!op.sinFoco && !_csgUsarRep.para.length) {
+    const vacia = _csgUsarEl.inputs.find(r => !String(r.el.value || '').trim());
+    if (vacia) { try { vacia.el.focus(); } catch (e) {} }
+  }
+  return pieza;
+}
+
+/* El repaso de la pieza para la máquina elegida. Si el repaso reventara
+   (una pieza rota que nadie previó), la hoja se deja usar: lo que se
+   copia sale del armado, y una herramienta que no deja copiar por un
+   fallo suyo es peor que una que no avisa. */
+function csgUsarRepasa() {
+  let r = null;
+  try { r = csgRevisar(_csgUsarPieza, _csgUsarMaquina); } catch (e) { r = null; }
+  if (!r || !Array.isArray(r.para)) r = { para: [], avisa: [], palabras: 0, tokens: 0, cabe: false };
+  if (!Array.isArray(r.avisa)) r.avisa = [];
+  return r;
+}
+
+/* Lo que no cambia mientras la hoja está abierta se pinta UNA vez: al
+   escribir una variable solo se rehacen el <pre>, el aviso de lo que
+   falta y los rótulos del pie. Rehacer los recuadros en cada tecla le
+   quitaría el foco a quien está escribiendo. */
+function csgUsarPintarCuerpo(cuerpo, pie) {
+  cuerpo.textContent = '';
+  pie.textContent = '';
+  const p = _csgUsarPieza;
+  const el = { inputs: [] };
+  _csgUsarEl = el;
+
+  /* 1 · A qué máquina. Cambiarla vuelve a armar al instante: la forma es
+     de la máquina (regla 2), y lo que se ve cambia con ella. */
+  el.maquinas = csgEl('div', 'csg-usar-maquinas csg-desliza');
+  el.chips = CSG_MAQUINAS.map(m => {
+    const b = csgEl('button', 'csg-chip', m.nombre);
+    b.type = 'button';
+    b.addEventListener('click', () => csgUsarPonMaquina(m.id));
+    el.maquinas.appendChild(b);
+    return { id: m.id, el: b };
+  });
+  cuerpo.appendChild(el.maquinas);
+  el.nota = csgEl('p', 'csg-nota', '');
+  cuerpo.appendChild(el.nota);
+
+  /* 2 · Lo que PARA, a la vista, y lo que avisa, plegado tras su cuenta
+     (regla 13): entre treinta avisos abiertos, los que paran dejan de
+     verse. */
+  el.para = csgEl('div', 'csg-usar-para');
+  cuerpo.appendChild(el.para);
+  el.avisa = csgEl('details', 'csg-rep-avisa');
+  cuerpo.appendChild(el.avisa);
+
+  /* 3 · Las variables, un renglón de 44 px cada una, con el ÚLTIMO valor
+     que se le puso a ESTA pieza y, debajo, los tres últimos como chips. */
+  if (_csgUsarNombres.length) {
+    const caja = csgEl('div', 'csg-usar-vars');
+    caja.appendChild(csgEl('p', 'csg-nota', _csgUsarNombres.length === 1
+      ? 'Rellena el hueco para este uso: la consigna guardada no cambia.'
+      : 'Rellena los huecos para este uso: la consigna guardada no cambia.'));
+    _csgUsarNombres.forEach((nombre, i) => {
+      const reg = { nombre, el: null, chips: [] };
+      const fila = csgEl('div', 'csg-usar-var');
+      const id = 'csg-usar-v-' + i;          // un id NUESTRO: el nombre es de la persona
+      const lab = csgEl('label', '', '{{' + nombre + '}}');
+      lab.htmlFor = id;
+      const inp = csgEl('input', 'csg-input');
+      inp.type = 'text';
+      inp.id = id;
+      inp.autocomplete = 'off';
+      inp.setAttribute('enterkeyhint', i < _csgUsarNombres.length - 1 ? 'next' : 'done');
+      inp.value = _csgUsarValores[nombre] || '';
+      inp.addEventListener('input', () => {
+        _csgUsarValores[nombre] = inp.value;
+        csgUsarMarcaUltimos(reg);
+        csgUsarRefrescar();
+      });
+      /* Intro pasa al siguiente hueco vacío, o baja el teclado: en una
+         tableta la tecla de intro de un campo de una línea es la única
+         forma de quitarlo, y el siguiente paso es tocar Copiar. */
+      inp.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const sig = _csgUsarEl && _csgUsarEl.inputs.find(r => r !== reg && !String(r.el.value || '').trim());
+        if (sig) { try { sig.el.focus(); } catch (er) {} } else inp.blur();
+      });
+      reg.el = inp;
+      fila.appendChild(lab);
+      fila.appendChild(inp);
+      caja.appendChild(fila);
+      /* Los chips van DENTRO del renglón de su variable, en una línea
+         propia debajo: pegados a la que rellenan, no sueltos entre dos. */
+      const ult = csgVarsUltimos(p.id, nombre);
+      if (ult.length) {
+        const fu = csgEl('div', 'csg-usar-ultimos csg-desliza');
+        ult.forEach(v => {
+          const c = csgEl('button', 'csg-chip', csgUsarCorto(v, 40));
+          c.type = 'button';
+          /* Tocar un chip no se lleva el foco del recuadro: así el
+             teclado no baja y sube entre un valor y el siguiente. */
+          c.addEventListener('pointerdown', e => e.preventDefault());
+          c.addEventListener('click', () => {
+            inp.value = v;
+            _csgUsarValores[nombre] = v;
+            csgUsarMarcaUltimos(reg);
+            csgUsarRefrescar();
+          });
+          reg.chips.push({ v, el: c });
+          fu.appendChild(c);
+        });
+        fila.appendChild(fu);
+      }
+      el.inputs.push(reg);
+      csgUsarMarcaUltimos(reg);
+    });
+    cuerpo.appendChild(caja);
+  }
+
+  /* 4 · Lo que falta, nombrado (regla 6). */
+  el.falta = csgEl('div', 'csg-usar-falta');
+  cuerpo.appendChild(el.falta);
+
+  /* 5 · Lo que se copia, tal cual. Con `pre-wrap` y 16 px (lo pone el
+     CSS): es el recuadro que queda seleccionado si el portapapeles no
+     deja escribir, y a menos de 16 px el iPad acerca la página. */
+  cuerpo.appendChild(csgEl('p', 'csg-nota', 'Lo que se copia, tal cual:'));
+  el.fallo = csgEl('p', 'csg-nota', 'No se pudo copiar solo. El texto quedó seleccionado: mantén pulsado encima y elige «Copiar».');
+  csgUsarMuestra(el.fallo, false);
+  cuerpo.appendChild(el.fallo);
+  el.pre = csgEl('pre', 'csg-pre');
+  el.pre.id = 'csg-usar-pre';
+  cuerpo.appendChild(el.pre);
+
+  /* 6 · El material, plegado: editable aquí y NO guardado. Es el texto al
+     que se aplica la consigna (el informe, la nota), cambia en cada uso,
+     y la pieza es la consigna, no el informe. */
+  const det = csgEl('details', 'csg-material');
+  el.matSum = csgEl('summary', '', '📎 Material');
+  det.appendChild(el.matSum);
+  const ta = csgEl('textarea', 'csg-material-ta csg-textarea');
+  ta.rows = 6;
+  ta.value = _csgUsarMaterial;
+  ta.placeholder = 'Pega aquí el texto al que se aplica la consigna: un informe, una nota, una lista…';
+  ta.setAttribute('aria-label', 'Material para este uso');
+  ta.addEventListener('input', () => {
+    _csgUsarMaterial = ta.value;
+    csgUsarRefrescar();
+  });
+  det.appendChild(ta);
+  det.appendChild(csgEl('p', 'csg-material-nota', 'Va debajo de la consigna, entre marcas. Lo que cambies aquí es solo para este uso: no se guarda con la pieza.'));
+  el.material = ta;
+  cuerpo.appendChild(det);
+
+  /* 7 · Los botones pequeños que tocan a cada forma (sistema y encargo en
+     xml; el archivo en un SKILL.md; el diagrama en un grafo) y el de
+     copiar con los huecos puestos. */
+  el.extra = csgEl('div', 'csg-usar-extra');
+  cuerpo.appendChild(el.extra);
+  el.extraNota = csgEl('p', 'csg-nota', '');
+  cuerpo.appendChild(el.extraNota);
+
+  /* 8 · Voz prestada, Careo e Investigación: lo que la máquina devuelva
+     va derecho a 📖 La Voz Prestada, ya etiquetado (regla 14). Va al
+     final de la hoja y no dentro del pie fijo: el pie son tres botones
+     que tienen que caber en 320 px, y un cuarto los apretaría. */
+  const molde = csgUsarMolde(p);
+  if (molde && molde.vozPrestada) {
+    el.voz = csgBtn('csg-btn-tenido csg-usar-voz', '📖', 'Guardar lo que devolvió', csgUsarVoz);
+    cuerpo.appendChild(el.voz);
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Cuando la máquina conteste, cópialo entero y guárdalo en 📖 La Voz Prestada: allí se lee con su etiqueta puesta.'));
+  }
+
+  /* El pie fijo. Compartir solo donde existe navigator.share: un botón
+     que siempre contesta «no se pudo» se lee como una avería. */
+  el.copiar = csgBtn('csg-btn-lleno', '📋', 'Copiar', () => csgUsarCopiar('todo'));
+  pie.appendChild(el.copiar);
+  el.compartir = null;
+  if (typeof navigator !== 'undefined' && navigator && typeof navigator.share === 'function') {
+    el.compartir = csgBtn('csg-btn-neutro', '📤', 'Compartir', csgUsarCompartir);
+    pie.appendChild(el.compartir);
+  }
+  el.abrir = csgBtn('csg-btn-tenido', '↗', 'Abrir', csgUsarAbrir);
+  pie.appendChild(el.abrir);
+}
+
+/* El chip del último valor que coincide con lo escrito, marcado. */
+function csgUsarMarcaUltimos(reg) {
+  if (!reg || !reg.el) return;
+  const v = String(reg.el.value || '').trim();
+  reg.chips.forEach(c => {
+    const on = !!v && c.v.trim() === v;
+    c.el.classList.toggle('on', on);
+    c.el.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+}
+
+function csgUsarPonMaquina(id) {
+  if (!_csgUsarPieza || !_csgUsarEl) return;
+  _csgUsarMaquina = csgMaquina(id).id;
+  _csgUsarRep = csgUsarRepasa();
+  csgUsarPintarRepaso();
+  csgUsarRefrescar();
+}
+
+/* Lo que PARA y lo que avisa depende de la pieza y de la máquina, no de
+   los valores: se pinta al abrir y al cambiar de máquina, no en cada
+   tecla. */
+function csgUsarPintarRepaso() {
+  const el = _csgUsarEl;
+  const rep = _csgUsarRep;
+  if (!el || !rep) return;
+  const para = el.para;
+  para.textContent = '';
+  csgUsarMuestra(para, rep.para.length > 0);
+  if (rep.para.length) {
+    /* La caja es una fila que se parte: arriba, la frase y «✎ Corregir»
+       pegado a ella; debajo, cada cosa que para en su propio renglón y a
+       todo lo ancho. Metidas junto a la frase, el botón les robaba el
+       ancho y el ● se quedaba solo en un renglón. */
+    para.appendChild(csgEl('span', '', rep.para.length === 1
+      ? 'Todavía no se puede usar: hay una cosa que arreglar.'
+      : 'Todavía no se puede usar: hay ' + rep.para.length + ' cosas que arreglar.'));
+    para.appendChild(csgBtn('csg-btn-sm csg-btn-neutro', '✎', 'Corregir', csgUsarCorregir));
+    rep.para.forEach(x => para.appendChild(csgUsarAviso('csg-aviso-para', (x && x.msg) || '')));
+  }
+  const av = el.avisa;
+  av.textContent = '';
+  csgUsarMuestra(av, rep.avisa.length > 0);
+  if (rep.avisa.length) {
+    av.appendChild(csgEl('summary', '', '▲ ' + (rep.avisa.length === 1 ? '1 aviso' : rep.avisa.length + ' avisos')));
+    rep.avisa.forEach(x => av.appendChild(csgUsarAviso('csg-rep-item csg-aviso-avisa', (x && x.msg) || '')));
+  }
+}
+
+/* Vuelve a armar con la máquina, los valores y el material de ahora, y
+   repinta lo que depende de eso. Lo que se pinta en el <pre> es lo que
+   se guarda en _csgUsarArmado, y lo que se copia sale de ahí: el mismo
+   objeto, no un segundo armado (regla 1). */
+function csgUsarRefrescar() {
+  const el = _csgUsarEl;
+  const p = _csgUsarPieza;
+  if (!el || !p) return;
+  const maq = csgMaquina(_csgUsarMaquina);
+  el.chips.forEach(c => {
+    const on = c.id === maq.id;
+    c.el.classList.toggle('on', on);
+    c.el.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  let a = null;
+  try { a = csgArmar(p, maq.id, _csgUsarValores, { material: _csgUsarMaterial }); } catch (e) { a = null; }
+  if (!a) a = { forma: maq.forma, principal: '', sistema: '', encargo: '', skill: '', mermaid: '', plan: '' };
+  ['principal', 'sistema', 'encargo', 'skill', 'mermaid', 'plan'].forEach(k => { a[k] = String(a[k] == null ? '' : a[k]); });
+  _csgUsarArmado = a;
+  const d = csgUsarDestino(maq.id, a.principal, p);
+  el.nota.textContent = (maq.nota || '') + (d.ligado ? ' Se abre el cuaderno ligado a esta consigna.' : '');
+
+  const faltan = csgUsarFaltan();
+  el.falta.textContent = '';
+  if (faltan.length) {
+    el.falta.appendChild(csgEl('span', '', (faltan.length === 1 ? 'Falta ' : 'Faltan ') + csgUsarLista(faltan) + ': escríbel' +
+      (faltan.length === 1 ? 'a' : 'as') + ' arriba, o usa «Copiar con huecos» para copiar' + (faltan.length === 1 ? 'la' : 'las') +
+      ' con las llaves puestas.'));
+  }
+  csgUsarMuestra(el.falta, faltan.length > 0);
+
+  csgUsarPintarPre(a.principal, faltan);
+
+  const n = csgLargoTexto(_csgUsarMaterial);
+  el.matSum.textContent = '📎 Material' + (String(_csgUsarMaterial).trim()
+    ? ' · ' + csgMiles(n) + ' caracteres' + (n > CSG_TOPES.material ? ' (no va con la pieza: solo para este uso)' : '')
+    : ' · vacío');
+
+  csgUsarPintarExtra(faltan);
+
+  /* El pie. Con algo que PARA, apagados y no quitados: un botón que
+     desaparece se lee como un fallo de la pantalla; uno apagado que al
+     tocarlo dice por qué, no. Por eso aria-disabled y no `disabled`: un
+     botón `disabled` no recibe el toque y no podría decir nada. */
+  const apagado = _csgUsarRep && _csgUsarRep.para.length > 0;
+  [el.copiar, el.compartir, el.abrir].forEach(b => {
+    if (!b) return;
+    if (apagado) b.setAttribute('aria-disabled', 'true');
+    else b.removeAttribute('aria-disabled');
+  });
+  csgUsarMuestra(el.abrir, !!d.url);
+  const t = el.abrir.querySelector('.csg-btn-t');
+  if (t) t.textContent = 'Abrir ' + (d.ligado ? 'su cuaderno' : maq.nombre) + (d.lleno ? '' : ' (copiado: pega ahí)');
+}
+
+/* El texto armado en el <pre>, troceado a mano para marcar en ámbar lo
+   que queda sin rellenar: <span class="csg-var"> con textContent, nunca
+   innerHTML (regla 15). Solo se marcan los huecos que se PREGUNTAN y
+   siguen vacíos: unas llaves dentro de un bloque de código, o dentro del
+   material, se copian tal cual a propósito, y pintarlas de «falta» diría
+   que falta algo que nadie tiene que escribir. */
+function csgUsarPintarPre(texto, faltan) {
+  const pre = _csgUsarEl && _csgUsarEl.pre;
+  if (!pre) return;
+  pre.textContent = '';
+  const s = String(texto == null ? '' : texto);
+  const vacias = new Set(Array.isArray(faltan) ? faltan : []);
+  const re = /\{\{\s*([a-záéíóúñ0-9_]+)\s*\}\}/gi;
+  let i = 0;
+  let m;
+  while ((m = re.exec(s))) {
+    if (!vacias.has(m[1])) continue;
+    if (m.index > i) pre.appendChild(document.createTextNode(s.slice(i, m.index)));
+    pre.appendChild(csgEl('span', 'csg-var', m[0]));
+    i = m.index + m[0].length;
+  }
+  if (i < s.length) pre.appendChild(document.createTextNode(s.slice(i)));
+}
+
+function csgUsarFaltan() {
+  return _csgUsarNombres.filter(n => !String(_csgUsarValores[n] == null ? '' : _csgUsarValores[n]).trim());
+}
+
+/* La fila de botones pequeños. Se rehace solo cuando cambia lo que la
+   decide (la máquina, la forma, si falta algo, si para), no en cada
+   tecla: rehacerla debajo del dedo le quitaría el botón a quien iba a
+   tocarlo. */
+function csgUsarPintarExtra(faltan) {
+  const el = _csgUsarEl;
+  const a = _csgUsarArmado;
+  const p = _csgUsarPieza;
+  if (!el || !a || !p) return;
+  const molde = csgUsarMolde(p);
+  const clase = (molde && molde.clase) || p.clase || 'prompt';
+  const apagado = _csgUsarRep && _csgUsarRep.para.length > 0;
+  const hay = {
+    huecos: faltan.length > 0,
+    sistema: a.forma === 'xml' && !!a.sistema.trim(),
+    encargo: a.forma === 'xml' && !!a.sistema.trim() && !!a.encargo.trim(),
+    skill: a.forma === 'skill',
+    instruccion: a.forma === 'skill' && !!a.sistema.trim(),
+    mmd: clase === 'grafo' && !!a.mermaid.trim(),
+    plan: (clase === 'grafo' || clase === 'bucle') && !!a.plan.trim(),
+  };
+  const k = [_csgUsarMaquina, a.forma, apagado ? 1 : 0].concat(Object.keys(hay).map(x => hay[x] ? 1 : 0)).join('|');
+  if (k === _csgUsarExtraK) return;
+  _csgUsarExtraK = k;
+  const box = el.extra;
+  box.textContent = '';
+  const mete = (cls, ic, txt, fn) => {
+    const b = csgBtn('csg-btn-sm ' + cls, ic, txt, fn);
+    if (apagado) b.setAttribute('aria-disabled', 'true');
+    box.appendChild(b);
+  };
+  if (hay.huecos) mete('csg-btn-neutro', '📋', 'Copiar con huecos', () => csgUsarCopiar('huecos'));
+  if (hay.sistema) mete('csg-btn-neutro', '📋', 'Copiar sistema', () => csgUsarCopiar('sistema'));
+  if (hay.encargo) mete('csg-btn-neutro', '📋', 'Copiar encargo', () => csgUsarCopiar('encargo'));
+  if (hay.skill) mete('csg-btn-ambar', '⬇', 'Descargar SKILL.md', csgUsarDescargarSkill);
+  if (hay.instruccion) mete('csg-btn-neutro', '📋', 'Como instrucción de sistema', () => csgUsarCopiar('instruccion'));
+  if (hay.mmd) mete('csg-btn-ambar', '⬇', 'grafo.mmd', csgUsarDescargarMmd);
+  if (hay.plan) mete('csg-btn-neutro', '📋', 'Copiar el plan', () => csgUsarCopiar('plan'));
+  csgUsarMuestra(box, box.children.length > 0);
+
+  /* Dónde va cada cosa, dicho una vez debajo: un «Copiar sistema» que no
+     dice adónde se pega se toca, se copia y se queda en el portapapeles. */
+  let nota = '';
+  if (hay.sistema) nota = 'El sistema va en las instrucciones de un Proyecto de Claude; el encargo, en el chat. «Copiar» lleva los dos juntos.';
+  if (hay.skill) {
+    const nombre = String(csgTextoDe(p, 'nombre') || '').trim() || csgSlug(p.titulo) || 'su-nombre';
+    nota = 'El SKILL.md va en .claude/skills/' + nombre + '/SKILL.md en Claude Code, o en claude.ai: Ajustes → Capacidades → Habilidades.' +
+      (hay.instruccion ? ' «Como instrucción de sistema» son los mismos bloques en texto seguido, para un Gem, un GPT o un Proyecto.' : '');
+  }
+  if (hay.mmd) nota = 'grafo.mmd es el diagrama en Mermaid, para verlo en un editor que lo pinte. «Copiar» lleva el prompt para hacerlo en un solo chat.';
+  el.extraNota.textContent = nota;
+  csgUsarMuestra(el.extraNota, !!nota);
+}
+
+/* ¿Se puede sacar esto? Si no, lo DICE y devuelve false. Con algo que
+   PARA, nada sale (regla 5: guardar nunca se bloquea; usar sí). Con una
+   variable vacía, nada sale salvo «Copiar con huecos» (regla 6), y el
+   foco va a la que falta DENTRO del toque, para que salga el teclado. */
+function csgUsarPuede(que) {
+  const rep = _csgUsarRep || { para: [] };
+  if (rep.para.length) {
+    csgAviso('Todavía no se puede usar: ' + String((rep.para[0] && rep.para[0].msg) || 'falta algo.'));
+    try { _csgUsarEl.para.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+    return false;
+  }
+  if (que === 'huecos' || que === 'mmd') return true;
+  const f = csgUsarFaltan();
+  if (f.length) {
+    const reg = _csgUsarEl && _csgUsarEl.inputs.find(r => r.nombre === f[0]);
+    if (reg) { try { reg.el.focus(); } catch (e) {} }
+    csgAviso((f.length === 1 ? 'Falta ' : 'Faltan ') + csgUsarLista(f) + ': escríbel' + (f.length === 1 ? 'a' : 'as') + ', o usa «Copiar con huecos».');
+    return false;
+  }
+  return true;
+}
+
+function csgUsarTexto(que) {
+  const a = _csgUsarArmado || {};
+  if (que === 'sistema' || que === 'instruccion') return String(a.sistema || '');
+  if (que === 'encargo') return String(a.encargo || '');
+  if (que === 'plan') return String(a.plan || '');
+  return String(a.principal || '');
+}
+
+/* Lo que hace falta para apuntar un uso, tomado EN EL TOQUE: compartir
+   vuelve cuando la persona eligió a quién, y para entonces la hoja puede
+   estar cerrada o con otros valores. */
+function csgUsarFoto() {
+  const vals = {};
+  _csgUsarNombres.forEach(n => { vals[n] = String(_csgUsarValores[n] == null ? '' : _csgUsarValores[n]); });
+  return { p: _csgUsarPieza, maq: csgMaquina(_csgUsarMaquina).id, nombres: _csgUsarNombres.slice(), valores: vals, material: _csgUsarMaterial };
+}
+
+/* Apuntar el uso: los valores (tres últimos por variable), la máquina, y
+   UN uso con ok: null (csgApuntarUso ya lo guarda y lo sube solo; un
+   csgSubirLuego a secas después contaría como edición y pondría el reloj).
+   ⚠️ Copiar y después ↗ Abrir con lo mismo es UN uso, no dos: la
+   bitácora pregunta «¿sirvió?» por cada uso, y dos entradas por una sola
+   vez convierten la pregunta en ruido. Lo que cuenta como otro uso es
+   otra máquina, otros valores u otro material. */
+function csgUsarApuntar(foto) {
+  const f = foto || csgUsarFoto();
+  if (!f.p) return;
+  csgVarsApunta(f.p.id, f.nombres, f.valores);
+  if (typeof csgMaquinaApunta === 'function') csgMaquinaApunta(f.maq);
+  const huella = f.p.id + '\u0001' + f.maq + '\u0001' + JSON.stringify(f.nombres.map(n => f.valores[n].trim())) + '\u0001' + f.material;
+  if (huella === _csgUsarApuntado) return;
+  _csgUsarApuntado = huella;
+  csgApuntarUso(f.p, f.maq);
+  if (typeof csgPintarAnaquel === 'function') { try { csgPintarAnaquel(); } catch (e) {} }
+}
+
+/* 📋 Copiar, en todas sus formas. ⚠️ csgCopiarTexto se llama DENTRO del
+   toque y sin ningún `await` delante: el Safari de un iPad solo deja
+   escribir en el portapapeles mientras dura el gesto. */
+function csgUsarCopiar(que) {
+  if (!_csgUsarPieza || !_csgUsarArmado) return;
+  if (!csgUsarPuede(que)) return;
+  const texto = csgUsarTexto(que);
+  if (!texto.trim()) { csgAviso('No hay nada que copiar todavía'); return; }
+  const copia = csgCopiarTexto(texto);
+  const maq = csgMaquina(_csgUsarMaquina);
+  const huecos = csgUsarFaltan();
+  if (_csgUsarEl) csgUsarMuestra(_csgUsarEl.fallo, false);
+  /* El plan es para LEER (§3.3): copiarlo no es usar la consigna. */
+  if (que !== 'plan') csgUsarApuntar();
+  copia.then(ok => {
+    if (!ok) { csgUsarFallo(false); return; }
+    let msg = '📋 Copiado' + (maq.donde ? ': pégalo en ' + maq.donde : ': pégalo donde lo vayas a usar');
+    if (que === 'huecos') msg = '📋 Copiado con ' + (huecos.length === 1 ? 'un hueco' : huecos.length + ' huecos') + ': ' + huecos.map(n => '{{' + n + '}}').join(', ');
+    else if (que === 'sistema') msg = '📋 Copiado el sistema: va en las instrucciones del Proyecto';
+    else if (que === 'encargo') msg = '📋 Copiado el encargo: pégalo en el chat';
+    else if (que === 'instruccion') msg = '📋 Copiada como instrucción de sistema: va en un Gem, un GPT o un Proyecto';
+    else if (que === 'plan') msg = '📋 Copiado el plan';
+    csgAviso(msg);
+  });
+}
+
+/* Cuando el portapapeles no deja escribir: el texto queda SELECCIONADO en
+   el <pre> y la hoja dice cómo copiarlo a mano. Un «no se pudo» a secas
+   deja a alguien con el texto delante y sin saber qué hacer con él. */
+function csgUsarFallo(callado) {
+  const el = _csgUsarEl;
+  if (!el) { if (!callado) csgAviso('No se pudo copiar'); return; }
+  csgUsarMuestra(el.fallo, true);
+  try {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    const r = document.createRange();
+    r.selectNodeContents(el.pre);
+    sel.addRange(r);
+  } catch (e) {}
+  try { el.fallo.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
+  if (!callado) csgAviso('No se pudo copiar solo: el texto quedó seleccionado; mantén pulsado para copiarlo');
+}
+
+/* 📤 Compartir: el MISMO texto que Copiar, y nada más (ni un título
+   delante: algunas aplicaciones lo pegan al principio, y lo que llegaría
+   ya no sería lo que se vio). El uso se apunta cuando la persona
+   compartió de verdad; cancelar la hoja del sistema no es usar. */
+function csgUsarCompartir() {
+  if (!_csgUsarPieza || !_csgUsarArmado) return;
+  if (!csgUsarPuede('todo')) return;
+  const texto = String(_csgUsarArmado.principal || '');
+  if (!texto.trim()) { csgAviso('No hay nada que compartir todavía'); return; }
+  if (typeof navigator === 'undefined' || !navigator || typeof navigator.share !== 'function') { csgUsarCopiar('todo'); return; }
+  const foto = csgUsarFoto();
+  let pr;
+  try { pr = navigator.share({ text: texto }); } catch (e) { pr = Promise.reject(e); }
+  Promise.resolve(pr).then(() => csgUsarApuntar(foto), e => {
+    if (e && e.name === 'AbortError') return;
+    csgAviso('No se pudo compartir: usa 📋 Copiar');
+  });
+}
+
+/* ↗ Abrir: copia primero, siempre (csgAbrirMaquina), y apunta el uso
+   DESPUÉS de abrir, para que la ventana salga lo más pegada posible al
+   toque: los navegadores solo dejan abrir ventanas mientras dura el
+   gesto. */
+function csgUsarAbrir() {
+  if (!_csgUsarPieza || !_csgUsarArmado) return;
+  if (!csgUsarPuede('todo')) return;
+  const texto = String(_csgUsarArmado.principal || '');
+  if (!texto.trim()) { csgAviso('No hay nada que llevar todavía'); return; }
+  const foto = csgUsarFoto();
+  if (_csgUsarEl) csgUsarMuestra(_csgUsarEl.fallo, false);
+  const r = csgAbrirMaquina(foto.maq, texto, foto.p);
+  csgUsarApuntar(foto);
+  if (r && r.copia) r.copia.then(ok => { if (!ok) csgUsarFallo(true); });
+}
+
+/* Descargar un archivo hecho aquí (Blob): no pasa por ninguna red.
+   ⚠️ El enlace se revoca DESPUÉS, no en el acto: en Android la descarga
+   empieza cuando ya se volvió de click(), y revocar enseguida la cancela
+   sin ningún aviso. La dirección que va al href es un blob: nuestro, y el
+   nombre del archivo, un literal. */
+function csgUsarDescargar(nombre, texto, tipo) {
+  try {
+    const blob = new Blob([String(texto == null ? '' : texto)], { type: tipo });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', nombre);
+    a.setAttribute('rel', 'noopener');
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => { try { URL.revokeObjectURL(url); } catch (e) {} }, 4000);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/* ⬇ SKILL.md: bajarse el archivo ES usar la habilidad (así se instala),
+   así que cuenta como uso y se para igual que Copiar. */
+function csgUsarDescargarSkill() {
+  if (!_csgUsarPieza || !_csgUsarArmado) return;
+  if (!csgUsarPuede('todo')) return;
+  const texto = String(_csgUsarArmado.skill || _csgUsarArmado.principal || '');
+  if (!texto.trim()) { csgAviso('No hay nada que descargar todavía'); return; }
+  const ok = csgUsarDescargar('SKILL.md', texto, 'text/markdown;charset=utf-8');
+  if (!ok) { csgAviso('Este navegador no dejó descargar: usa 📋 Copiar y guárdalo como SKILL.md'); return; }
+  csgUsarApuntar();
+  csgAviso('⬇ SKILL.md descargado: va en .claude/skills/<nombre>/SKILL.md, o en Ajustes → Capacidades → Habilidades');
+}
+
+/* ⬇ grafo.mmd: el DIAGRAMA, para verlo; no es la consigna que se le da a
+   una máquina, así que no cuenta como uso. Con huecos se baja igual —es
+   un dibujo— y se dice. */
+function csgUsarDescargarMmd() {
+  if (!_csgUsarPieza || !_csgUsarArmado) return;
+  if (!csgUsarPuede('mmd')) return;
+  const texto = String(_csgUsarArmado.mermaid || '');
+  if (!texto.trim()) { csgAviso('Este grafo todavía no tiene nodos'); return; }
+  const ok = csgUsarDescargar('grafo.mmd', texto, 'text/plain;charset=utf-8');
+  const f = csgUsarFaltan();
+  if (!ok) { csgAviso('Este navegador no dejó descargar'); return; }
+  csgAviso('⬇ grafo.mmd descargado' + (f.length ? ' · con ' + (f.length === 1 ? 'un hueco: ' : f.length + ' huecos: ') + f.map(n => '{{' + n + '}}').join(', ') : ''));
+}
+
+/* ✎ Corregir: al compositor, con el foco en lo PRIMERO que para. */
+function csgUsarCorregir() {
+  const p = _csgUsarPieza;
+  if (!p) return;
+  const para = (_csgUsarRep && _csgUsarRep.para) || [];
+  const x = para.find(y => y && (y.bloque || (y.arreglo && y.arreglo.bloque))) || {};
+  const foco = x.bloque || (x.arreglo && x.arreglo.bloque) || '';
+  csgUsarCerrar();
+  if (typeof csgVerCerrar === 'function') csgVerCerrar();
+  if (typeof csgAbrirCompositor === 'function') csgAbrirCompositor(p, { foco });
+  else csgAviso('No se pudo abrir el compositor: vuelve a abrir F.A.R.O');
+}
+
+/* 📖 Guardar lo que devolvió: dos funciones que ya existen en La Voz
+   Prestada, y ni una línea en voz-prestada.js (regla 14). */
+function csgUsarVoz() {
+  csgUsarCerrar();
+  if (typeof switchView === 'function') switchView('view-voz');
+  if (typeof vozAbrirPegar === 'function') vozAbrirPegar(null);
+  else csgAviso('La Voz Prestada no está cargada: vuelve a abrir F.A.R.O');
+}
+
+function csgUsarAbierta() {
+  const ov = document.getElementById('csg-usar-overlay');
+  return !!(ov && ov.style.display && ov.style.display !== 'none');
+}
+
+function csgUsarCerrar() {
+  const ov = document.getElementById('csg-usar-overlay');
+  if (ov) {
+    /* Si el teclado estaba fuera por un recuadro de la hoja, baja con ella. */
+    try { if (document.activeElement && ov.contains(document.activeElement)) document.activeElement.blur(); } catch (e) {}
+    ov.style.display = 'none';
+  }
+  const cuerpo = document.getElementById('csg-usar-cuerpo');
+  if (cuerpo) cuerpo.textContent = '';
+  const pie = document.getElementById('csg-usar-pie');
+  if (pie) pie.textContent = '';
+  _csgUsarPieza = null;
+  _csgUsarEl = null;
+  _csgUsarArmado = null;
+  _csgUsarRep = null;
+  _csgUsarNombres = [];
+  _csgUsarValores = {};
+  _csgUsarMaterial = '';
+  _csgUsarExtraK = '';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   📋 COPIAR DESDE EL MENÚ ⋯ (§8)
+   ──────────────────────────────────────────────────────────────────
+   Un toque, sin abrir nada: arma para SU máquina con los últimos valores
+   de esa pieza. Si queda algún hueco, copia igual y el aviso lo nombra
+   —no es en silencio (regla 6), y quien copia desde el menú es quien ya
+   sabe lo que hace—; si algo PARA, no copia y abre la hoja de Usar para
+   que se vea por qué. Devuelve la promesa del portapapeles.
+   ══════════════════════════════════════════════════════════════════ */
+function csgCopiarDirecto(pieza) {
+  if (!pieza || typeof pieza !== 'object') return Promise.resolve(false);
+  const maq = csgMaquina(pieza.maquina || csgMaquinaUltima());
+  let rep = null;
+  try { rep = csgRevisar(pieza, maq.id); } catch (e) { rep = null; }
+  if (rep && Array.isArray(rep.para) && rep.para.length) {
+    csgAbrirUsar(pieza, { maquina: maq.id });
+    csgAviso('No se copió: ' + String((rep.para[0] && rep.para[0].msg) || 'falta algo.'));
+    return Promise.resolve(false);
+  }
+  const nombres = csgUsarNombres(pieza);
+  const valores = {};
+  nombres.forEach(n => { valores[n] = csgVarsUltimos(pieza.id, n)[0] || ''; });
+  let material = String(pieza.material || '');
+  if (!material.trim() && typeof csgBorradorMaterial === 'function') {
+    try { material = String(csgBorradorMaterial(pieza.id) || '') || material; } catch (e) {}
+  }
+  let a = null;
+  try { a = csgArmar(pieza, maq.id, valores, { material }); } catch (e) { a = null; }
+  const texto = String((a && a.principal) || '');
+  if (!texto.trim()) { csgAviso('No hay nada que copiar todavía'); return Promise.resolve(false); }
+  const copia = csgCopiarTexto(texto);          // ⚠️ dentro del toque
+  const huecos = nombres.filter(n => !String(valores[n]).trim());
+  if (typeof csgMaquinaApunta === 'function') csgMaquinaApunta(maq.id);
+  csgApuntarUso(pieza, maq.id);
+  return copia.then(ok => {
+    if (ok) {
+      csgAviso(huecos.length
+        ? '📋 Copiado con ' + (huecos.length === 1 ? 'un hueco' : huecos.length + ' huecos') + ': ' + huecos.map(n => '{{' + n + '}}').join(', ')
+        : '📋 Copiado para ' + maq.nombre);
+    } else {
+      /* Sin portapapeles: la hoja con el texto seleccionado. Se abre FUERA
+         del toque, así que sin foco (no saldría el teclado a destiempo). */
+      csgAbrirUsar(pieza, { maquina: maq.id, sinFoco: true });
+      csgUsarFallo(false);
+    }
+    if (typeof csgPintarAnaquel === 'function') { try { csgPintarAnaquel(); } catch (e) {} }
+    return ok;
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   📋 PEGAR LO QUE YA TENGO (§5, paso 1-bis, y la propuesta del paso 8)
+   ──────────────────────────────────────────────────────────────────
+   Un recuadro, «Leer», y lo leído: la forma PROPUESTA en un chip (nunca
+   impuesta: un toque la cambia), cómo se repartió, lo que no se entendió
+   NOMBRADO con su renglón, y la cuenta de palabras que entraron y
+   salieron. Nada se descarta (regla 8): la cuenta está a la vista para
+   que eso no haya que creérselo.
+   ⚠️ Esta hoja no guarda nada: abre el compositor con una pieza NUEVA
+   sin guardar, y allí se revisa y se guarda. Un pegado que entrara solo
+   al anaquel metería en él lo que el lector entendió mal sin que nadie
+   lo haya mirado.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Lo que se entiende, dicho con las formas que se escriben de verdad. */
+const CSG_PEG_ENTIENDE = [
+  'encabezados: «## Tarea», «### Formato»',
+  'etiquetas: <tarea>…</tarea>',
+  'rótulos al principio del renglón: «Tarea:», «Contexto:»',
+  'el frontmatter de un SKILL.md: --- name: … description: … ---',
+  'flechas entre nombres: «Investigador → Guionista»',
+  '«Máximo 4 vueltas», «Para cuando…», «Repite…»',
+  'el material entre «=== Material ===» y «=== Fin del material ===»',
+];
+
+function csgAbrirPegar(texto) {
+  csgUsarEngancha();
+  const ov = document.getElementById('csg-pegar-overlay');
+  const cuerpo = document.getElementById('csg-pegar-cuerpo');
+  if (!ov || !cuerpo) { csgAviso('No se pudo abrir la hoja de pegar: vuelve a abrir F.A.R.O'); return; }
+  /* La hoja vertical («¿Qué le vas a pedir?», desde donde casi siempre se
+     llega) va después en el documento y taparía esta. */
+  if (typeof csgVerCerrar === 'function') csgVerCerrar();
+  clearTimeout(_csgPegT);
+  _csgPegT = null;
+  _csgPegTexto = '';
+  _csgPegLeido = null;
+  _csgPegBase = null;
+  _csgPegPieza = null;
+  _csgPegElegido = '';
+  cuerpo.textContent = '';
+  const el = {};
+  _csgPegEl = el;
+
+  cuerpo.appendChild(csgEl('p', 'csg-nota', 'Pega un prompt, una habilidad, un grafo o un bucle que ya tengas: lo reparto en bloques y te propongo la forma. No se pierde ni una palabra.'));
+  const que = csgEl('details', 'csg-nota');
+  que.appendChild(csgEl('summary', '', 'Qué entiendo'));
+  const ul = csgEl('ul', '');
+  CSG_PEG_ENTIENDE.forEach(t => ul.appendChild(csgEl('li', '', t)));
+  que.appendChild(ul);
+  que.appendChild(csgEl('p', '', 'Lo que no entienda se queda como texto en su sitio, y te lo nombro con su renglón.'));
+  cuerpo.appendChild(que);
+
+  const ta = csgEl('textarea', 'csg-pegar-ta');
+  ta.rows = 9;
+  ta.placeholder = 'Pega aquí tu prompt, tu SKILL.md, tu grafo o tu bucle…';
+  ta.setAttribute('aria-label', 'Lo que ya tienes escrito');
+  ta.setAttribute('autocomplete', 'off');
+  ta.spellcheck = false;
+  /* Pegando se lee al instante (pegar es para lo que existe la hoja:
+     ahorra el toque de «Leer»); escribiendo, tras un respiro. */
+  ta.addEventListener('input', e => {
+    clearTimeout(_csgPegT);
+    const tipo = e && e.inputType ? String(e.inputType) : '';
+    if (tipo === 'insertFromPaste' || tipo === 'insertFromDrop') { csgPegLeer('pegado'); return; }
+    _csgPegT = setTimeout(() => csgPegLeer(''), CSG_PEG_RESPIRO);
+  });
+  el.ta = ta;
+  cuerpo.appendChild(ta);
+
+  const acc = csgEl('div', 'csg-pegar-acciones');
+  if (csgPegHayPortapapeles()) acc.appendChild(csgBtn('csg-btn-tenido', '📋', 'Del portapapeles', csgPegPortapapeles));
+  el.leer = csgBtn('csg-btn-lleno', '🔎', 'Leer', () => csgPegLeer('boton'));
+  acc.appendChild(el.leer);
+  cuerpo.appendChild(acc);
+
+  el.res = csgEl('div', '');
+  csgUsarMuestra(el.res, false);
+  cuerpo.appendChild(el.res);
+
+  ov.style.display = 'flex';
+  const modal = ov.querySelector('.fin-modal');
+  if (modal) modal.scrollTop = 0;
+  const t = String(texto == null ? '' : texto);
+  ta.value = t;
+  /* Con texto ya puesto se lee sin esperar a nadie; sin texto, el foco al
+     recuadro DENTRO del toque, para que el teclado —y su «Pegar»— salga
+     solo. */
+  if (t.trim()) csgPegLeer('');
+  else { try { ta.focus(); } catch (e) {} }
+}
+
+/* El botón del portapapeles nace escondido donde el navegador no deja
+   leerlo: un botón que siempre contesta «no pude» se lee como una
+   avería (La Voz Prestada, regla 38). */
+function csgPegHayPortapapeles() {
+  try { return !!(typeof navigator !== 'undefined' && navigator && navigator.clipboard && typeof navigator.clipboard.readText === 'function'); }
+  catch (e) { return false; }
+}
+function csgPegPortapapeles() {
+  let pr;
+  try { pr = navigator.clipboard.readText(); } catch (e) { pr = Promise.reject(e); }
+  Promise.resolve(pr).then(t => {
+    const el = _csgPegEl;
+    if (!el) return;
+    if (!t || !String(t).trim()) { csgAviso('El portapapeles está vacío: copia primero lo que quieras traer.'); return; }
+    el.ta.value = String(t);
+    csgPegLeer('boton');
+  }, () => {
+    /* Y si no dejó, se dice CÓMO hacerlo a mano. */
+    csgAviso('El navegador no dejó leer el portapapeles: mantén tocado el recuadro y dale a «Pegar».');
+  });
+}
+
+/* modo: 'boton' (se tocó Leer o el portapapeles), 'pegado' (se acaba de
+   pegar en el recuadro) o '' (el respiro de escribir, o al abrir). */
+function csgPegLeer(modo) {
+  const desdeBoton = modo === 'boton';
+  clearTimeout(_csgPegT);
+  _csgPegT = null;
+  const el = _csgPegEl;
+  if (!el) return;
+  const texto = String(el.ta.value || '');
+  if (!texto.trim()) {
+    _csgPegTexto = '';
+    _csgPegLeido = null;
+    _csgPegBase = null;
+    _csgPegPieza = null;
+    csgPegPintar();
+    if (desdeBoton) { csgAviso('Pega primero lo que ya tienes'); try { el.ta.focus(); } catch (e) {} }
+    return;
+  }
+  let r = null;
+  try { r = csgLeer(texto); } catch (e) {
+    csgAviso('No se pudo leer: ' + ((e && e.message) || e));
+    return;
+  }
+  _csgPegTexto = texto;
+  _csgPegLeido = r;
+  _csgPegBase = csgPegPieza(r);
+  /* Si la persona ya había elegido otra forma, se respeta al volver a
+     leer: corregir una coma en el recuadro no le deshace la elección. */
+  if (_csgPegElegido && _csgPegElegido !== r.molde && Object.prototype.hasOwnProperty.call(CSG_MOLDES, _csgPegElegido) &&
+      typeof csgDuplicarEnMolde === 'function') {
+    _csgPegPieza = csgDuplicarEnMolde(_csgPegBase, _csgPegElegido);
+  } else {
+    _csgPegElegido = '';
+    _csgPegPieza = _csgPegBase;
+  }
+  csgPegPintar();
+  if (desdeBoton) {
+    /* El botón ya se llevó el foco (y en la tableta, el teclado): se
+       enseña lo leído, que es lo que se vino a ver. */
+    try { el.res.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {}
+  } else if (modo === 'pegado') {
+    /* Recién pegado, el teclado sigue fuera y lo leído queda debajo de
+       él: se asoma lo justo para que se vea la propuesta, sin quitarle
+       el foco al recuadro (quien pega a veces sigue escribiendo). */
+    try { el.res.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+  }
+}
+
+/* La pieza NUEVA, sin guardar, con lo que leyó el lector en el molde que
+   propuso. Sale de csgNuevaPieza para que traiga TODOS los campos de una
+   pieza y los `inicial` del molde (la etiqueta de Voz prestada, el tope
+   de Por lotes); lo leído PISA el inicial cuando trae texto, y lo que el
+   molde no tiene va al final como bloque libre con su rótulo. Un bloque
+   leído vacío no borra el inicial: un «## Tope» sin nada debajo no es
+   una decisión de quitarlo. */
+function csgPegPieza(r) {
+  const p = csgNuevaPieza(r.clase, r.molde);
+  const porId = new Map();
+  p.bloques.forEach(b => porId.set(String(b.id), b));
+  const puestos = new Set();
+  (Array.isArray(r.bloques) ? r.bloques : []).forEach(b => {
+    if (!b || b.id === undefined || b.id === null || b.id === '') return;
+    const id = String(b.id);
+    const t = String(b.t == null ? '' : b.t);
+    const ya = porId.get(id);
+    if (ya) {
+      if (!t.trim()) return;
+      /* Un id que llega dos veces se junta con una línea en blanco: el
+         segundo también es texto de alguien. */
+      ya.t = puestos.has(id) && String(ya.t).trim() ? String(ya.t) + '\n\n' + t : t;
+      puestos.add(id);
+      return;
+    }
+    const nb = { id, rotulo: String(b.rotulo || id), t };
+    porId.set(id, nb);
+    puestos.add(id);
+    p.bloques.push(nb);
+  });
+  p.titulo = csgCorta(String(r.titulo || '').replace(/\s+/g, ' ').trim(), CSG_TOPES.titulo);
+  p.material = String(r.material || '');
+  return p;
+}
+
+/* Cuántos bloques del molde tienen texto de la persona (sin contar los
+   `inicial`, que no los escribió nadie), sobre cuántos tiene el molde. */
+function csgPegContar(p) {
+  const molde = csgUsarMolde(p);
+  if (!molde) return { n: 0, total: 0 };
+  const n = molde.bloques.filter(e => {
+    const t = String(csgTextoDe(p, e.id) || '').trim();
+    const ini = String(csgBloqueDef(molde.id, e.id).inicial || '').trim();
+    return !!t && t !== ini;
+  }).length;
+  return { n, total: molde.bloques.length };
+}
+
+/* La cuenta de «nada se descarta» (§5, paso 9), como la hace la prueba de
+   Node: lo que salió es título + bloques + material, más lo que se leyó
+   como FORMA (los rótulos, que ahora son la forma de los bloques) y
+   menos lo que el lector PUSO sin estar escrito (los nombres de nodo que
+   saca de las flechas). Sin esas dos, un «## Tarea» contaría como una
+   palabra perdida y el aviso mentiría en cada pegado. */
+function csgPegCuenta(r, texto) {
+  const suma = l => (Array.isArray(l) ? l : []).reduce((s, t) => s + csgPalabras(t), 0);
+  const entran = csgPalabras(texto);
+  const contenido = csgPalabras(r.titulo) + suma((r.bloques || []).map(b => b && b.t)) + csgPalabras(r.material);
+  const forma = suma(r.estructura);
+  const puestas = suma(r.anadido);
+  return { entran, salen: contenido + forma - puestas, forma, puestas };
+}
+
+function csgPegPintar() {
+  const el = _csgPegEl;
+  if (!el) return;
+  const res = el.res;
+  res.textContent = '';
+  const r = _csgPegLeido;
+  const p = _csgPegPieza;
+  /* Leído ya, lo principal es abrir: «Leer» pasa a teñido y el lleno es
+     «Abrir en el compositor». Dos botones llenos a la vez no dicen cuál
+     es el siguiente paso. */
+  el.leer.classList.toggle('csg-btn-lleno', !r);
+  el.leer.classList.toggle('csg-btn-tenido', !!r);
+  if (!r || !p) { csgUsarMuestra(res, false); return; }
+  csgUsarMuestra(res, true);
+
+  const molde = csgUsarMolde(p);
+  const clase = csgClaseDe((molde && molde.clase) || p.clase);
+  const propio = p.molde === r.molde;
+  const prop = r.propuesta || {};
+  const cuenta = propio ? { n: prop.reconocidos || 0, total: prop.total || 0 } : csgPegContar(p);
+  /* «una Habilidad», «un Prompt»: el chip se lee en voz alta. */
+  const art = clase.id === 'habilidad' ? 'una' : 'un';
+
+  /* 1 · La propuesta, en un chip que se toca para cambiarla. */
+  /* Sin la clase .csg-chip a propósito: el chip de la casa es de un
+     renglón que no se parte, y esta frase no cabe en 390 px; cortada, se
+     perdía justo el «cambiar», que es lo que dice que se toca. El texto
+     va en un <span> para que la caja (flex que se parte) lo reparta. */
+  const chip = csgEl('button', 'csg-pegar-propuesta csg-clase-' + clase.id);
+  chip.appendChild(csgEl('span', '', (propio ? 'Parece ' : 'Va como ') + art + ' ' + clase.ic + ' ' + clase.nombre + ' · ' +
+    (molde ? molde.nombre : String(p.molde || '')) + ' · ' + cuenta.n + ' de ' + cuenta.total + ' bloques · cambiar'));
+  chip.type = 'button';
+  chip.addEventListener('click', csgPegCambiar);
+  res.appendChild(chip);
+  res.appendChild(csgEl('p', 'csg-nota', propio
+    ? 'Es una propuesta: tócala para elegir otra forma. Cambiarla no pierde nada.'
+    : 'La forma la elegiste tú. Lo que no encontró sitio va al final, marcado para colocarlo o quitarlo.'));
+
+  /* 2 · La cuenta, a la vista: que no se perdió nada no hay que
+     creérselo. Si un día no cuadra, lo dice en rojo antes de abrir. */
+  const c = csgPegCuenta(r, _csgPegTexto);
+  const pal = n => csgMiles(n) + (n === 1 ? ' palabra' : ' palabras');
+  let txt;
+  if (c.entran === c.salen) {
+    txt = '✓ ' + pal(c.entran) + (c.entran === 1 ? ' entró, ' : ' entraron, ') + csgMiles(c.salen) + (c.salen === 1 ? ' salió' : ' salieron') + ': no se perdió ninguna.';
+    if (c.forma) txt += ' ' + csgMiles(c.forma) + (c.forma === 1 ? ' era un rótulo y ahora es' : ' eran rótulos y ahora son') + ' la forma de los bloques.';
+    if (c.puestas) txt += ' Los nombres de los nodos se sacaron de las flechas.';
+  } else {
+    txt = '⚠ ' + pal(c.entran) + (c.entran === 1 ? ' entró' : ' entraron') + ' y ' + csgMiles(c.salen) + (c.salen === 1 ? ' salió' : ' salieron') +
+      ': revisa el reparto antes de abrirlo.';
+  }
+  const cu = csgEl('p', 'csg-pegar-cuenta' + (c.entran === c.salen ? '' : ' csg-aviso-para'));
+  cu.appendChild(csgEl('span', '', txt));
+  res.appendChild(cu);
+
+  /* 3 · Lo que no se entendió del todo, NOMBRADO con su renglón: un
+     rechazo callado se ve desde fuera igual que un rechazo, y se vuelve a
+     pegar lo mismo. */
+  const avisos = Array.isArray(r.avisos) ? r.avisos : [];
+  if (avisos.length) {
+    const av = csgEl('div', 'csg-pegar-avisos');
+    av.appendChild(csgVerSep('Lo que conviene mirar (' + avisos.length + ')'));
+    avisos.forEach(a => av.appendChild(csgUsarAviso('csg-aviso-avisa', (a && a.texto) || '')));
+    res.appendChild(av);
+  }
+
+  /* 4 · Abrir. Es el paso que sigue, y va antes del detalle del reparto:
+     el reparto se vuelve a ver entero en el compositor. */
+  const acc = csgEl('div', 'csg-pegar-acciones');
+  acc.appendChild(csgBtn('csg-btn-lleno', '✏️', 'Abrir en el compositor', csgPegAbrirCompositor));
+  res.appendChild(acc);
+
+  /* 5 · Cómo se repartió: rótulo y primeras palabras de cada bloque. */
+  res.appendChild(csgVerSep('Así lo repartí'));
+  res.appendChild(csgEl('p', 'csg-nota', p.titulo ? 'Título: ' + p.titulo : 'Sin título: el compositor lo propone desde lo escrito.'));
+  const ul = csgEl('ul', 'csg-pegar-bloques');
+  (Array.isArray(p.bloques) ? p.bloques : []).forEach(b => {
+    if (!b || !String(b.t == null ? '' : b.t).trim()) return;
+    const def = csgBloqueDef(p.molde, b.id);
+    const li = csgEl('li', '');
+    li.appendChild(csgEl('b', '', def.libre ? String(b.rotulo || b.id) : String(def.rotulo || b.id)));
+    li.appendChild(document.createTextNode(' · ' + csgUsarCorto(b.t, 90)));
+    if (def.libre) {
+      li.appendChild(csgEl('span', 'csg-nota', b.traido
+        ? ' — traído de «' + b.traido + '»: colócalo o quítalo'
+        : ' — bloque libre: sale al final con su rótulo'));
+    }
+    ul.appendChild(li);
+  });
+  res.appendChild(ul);
+  if (molde) {
+    const faltan = molde.bloques
+      .filter(e => e.ob && !String(csgTextoDe(p, e.id) || '').trim())
+      .map(e => csgBloqueDef(molde.id, e.id).rotulo);
+    if (faltan.length) res.appendChild(csgEl('p', 'csg-nota', 'Le ' + (faltan.length === 1 ? 'falta' : 'faltan') + ' a ' + molde.nombre + ': ' + faltan.join(', ') + '. Se escribe' + (faltan.length === 1 ? '' : 'n') + ' en el compositor.'));
+  }
+  const mat = String(p.material || '');
+  if (mat.trim()) {
+    const n = csgLargoTexto(mat);
+    res.appendChild(csgEl('p', 'csg-nota', '📎 Material aparte: ' + csgMiles(n) + ' caracteres' +
+      (n > CSG_TOPES.material ? ' (pasa de 20.000: no se guardará con la pieza, pero se usa)' : '') + '.'));
+  }
+  const vars = (Array.isArray(r.variables) ? r.variables : []).filter(v => CSG_RESERVADAS.indexOf(v) < 0);
+  res.appendChild(csgEl('p', 'csg-nota', vars.length ? 'Variables: ' + vars.map(v => '{{' + v + '}}').join(' · ') : 'Sin variables.'));
+}
+
+/* «cambiar»: los diecisiete moldes, por clase y con su «cuándo», en la
+   hoja vertical (que va encima de esta). Se reparte SIEMPRE desde lo que
+   leyó el lector, no desde el último cambio: ir y volver entre dos moldes
+   no puede ir acumulando bloques «traídos». */
+function csgPegCambiar() {
+  if (!_csgPegLeido || !_csgPegBase) return;
+  const r = _csgPegLeido;
+  csgVerAbrir('¿Qué forma le doy?', cuerpo => {
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Lo pegado se reparte en el molde que elijas. Lo que no encuentre sitio va al final, marcado para colocarlo o quitarlo: no se pierde nada.'));
+    CSG_CLASES.forEach(c => {
+      cuerpo.appendChild(csgVerSep(c.ic + ' ' + c.nombre));
+      (CSG_MOLDES_ORDEN[c.id] || []).forEach(mid => {
+        const m = Object.prototype.hasOwnProperty.call(CSG_MOLDES, mid) ? CSG_MOLDES[mid] : null;
+        if (!m) return;
+        const on = !!(_csgPegPieza && _csgPegPieza.molde === mid);
+        const cuando = String(m.cuando || '');
+        const sub = (mid === r.molde ? 'lo que propuse · ' : '') + (cuando ? cuando.charAt(0).toUpperCase() + cuando.slice(1) : '');
+        cuerpo.appendChild(csgVerFila(c.ic, m.nombre, null, on, () => csgPegElegir(mid), sub));
+      });
+    });
+  });
+}
+
+function csgPegElegir(mid) {
+  if (typeof csgVerCerrar === 'function') csgVerCerrar();
+  if (!_csgPegLeido || !_csgPegBase) return;
+  if (mid === _csgPegLeido.molde) {
+    _csgPegElegido = '';
+    _csgPegPieza = _csgPegBase;
+  } else {
+    if (typeof csgDuplicarEnMolde !== 'function') { csgAviso('No se pudo cambiar la forma: vuelve a abrir F.A.R.O'); return; }
+    _csgPegElegido = mid;
+    _csgPegPieza = csgDuplicarEnMolde(_csgPegBase, mid);
+  }
+  csgPegPintar();
+}
+
+/* Al compositor con la pieza NUEVA, sin guardar, y con los avisos del
+   lector para enseñarlos arriba. Si el recuadro cambió y el respiro
+   todavía no lo había leído, se lee antes: abrir lo de hace un segundo
+   sería abrir lo que ya no está escrito. */
+function csgPegAbrirCompositor() {
+  const el = _csgPegEl;
+  if (el && String(el.ta.value || '') !== _csgPegTexto) csgPegLeer('');
+  const p = _csgPegPieza;
+  const r = _csgPegLeido;
+  if (!p || !r) { csgAviso('Pega primero lo que ya tienes'); return; }
+  if (typeof csgAbrirCompositor !== 'function') { csgAviso('No se pudo abrir el compositor: vuelve a abrir F.A.R.O'); return; }
+  const avisos = (Array.isArray(r.avisos) ? r.avisos : []).slice();
+  csgPegCerrar();
+  csgAbrirCompositor(p, { avisos });
+}
+
+function csgPegAbierta() {
+  const ov = document.getElementById('csg-pegar-overlay');
+  return !!(ov && ov.style.display && ov.style.display !== 'none');
+}
+
+function csgPegCerrar() {
+  clearTimeout(_csgPegT);
+  _csgPegT = null;
+  const ov = document.getElementById('csg-pegar-overlay');
+  if (ov) {
+    try { if (document.activeElement && ov.contains(document.activeElement)) document.activeElement.blur(); } catch (e) {}
+    ov.style.display = 'none';
+  }
+  const cuerpo = document.getElementById('csg-pegar-cuerpo');
+  if (cuerpo) cuerpo.textContent = '';
+  _csgPegEl = null;
+  _csgPegTexto = '';
+  _csgPegLeido = null;
+  _csgPegBase = null;
+  _csgPegPieza = null;
+  _csgPegElegido = '';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LOS CABLES DE ESTA PARTE
+   ──────────────────────────────────────────────────────────────────
+   Se enganchan la primera vez que se abre una de las dos hojas, y NO en
+   un DOMContentLoaded: ver la cabecera (la prueba de Node carga el
+   archivo con un `document` que revienta si se le toca). Nadie puede
+   tocar la ✕ de una hoja que todavía no se abrió.
+   ══════════════════════════════════════════════════════════════════ */
+function csgUsarEngancha() {
+  if (_csgUsarEnganchado) return;
+  if (typeof document === 'undefined' || !document || typeof document.getElementById !== 'function') return;
+  _csgUsarEnganchado = true;
+  const al = (id, fn) => { const e = document.getElementById(id); if (e) e.addEventListener('click', fn); };
+  al('csg-usar-close', () => csgUsarCerrar());
+  al('csg-pegar-close', () => csgPegCerrar());
+  /* Un toque en el fondo oscuro cierra; uno dentro de la hoja, no. */
+  const fondo = (id, fn) => {
+    const ov = document.getElementById(id);
+    if (ov) ov.addEventListener('click', e => { if (e.target === ov) fn(); });
+  };
+  fondo('csg-usar-overlay', () => csgUsarCerrar());
+  fondo('csg-pegar-overlay', () => csgPegCerrar());
+  /* Escape cierra la de más arriba. En la fase de CAPTURA, para mirar
+     ANTES que el anaquel: si la hoja vertical está abierta encima, es
+     ella la que se cierra (lo hace el anaquel) y esta se queda. Mirando
+     después, la vertical ya estaría cerrada y se irían las dos de un
+     solo Escape. */
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const ver = document.getElementById('csg-ver-overlay');
+    if (ver && ver.style.display && ver.style.display !== 'none') return;
+    if (csgPegAbierta()) csgPegCerrar();
+    else if (csgUsarAbierta()) csgUsarCerrar();
+  }, true);
+}
