@@ -67,14 +67,44 @@ Zone → Make private.
 
 **4. Sueltos que no bloquean nada pero siguen ahí:**
 
-   · ⏸ **`supabase/sql/consigna.sql`, PERO TODAVÍA NO.** Es la tabla de 📜 La
-     Consigna (las indicaciones que se le dan a las máquinas), pedida el 22 de
-     septiembre de 2026. El archivo está escrito y **probado contra un
-     PostgreSQL de verdad**, pero la herramienta que lo usa está a medio
-     construir, así que correrlo hoy solo dejaría una tabla vacía esperando.
-     Va cuando La Consigna esté terminada, y entonces el SQL se pega en el
-     chat como siempre. Lo que falta para terminarla está en
-     `PLAN-LA-CONSIGNA.md`.
+   · ⚠️ **Correr `supabase/sql/consigna.sql`** en el SQL Editor (23 de
+     septiembre de 2026, el día que se terminó la herramienta; el archivo es
+     del 22). Es la tabla de 📜 **La Consigna**, la herramienta del Acceso
+     Rápido pegada a La Voz Prestada donde se escriben, se guardan y se
+     vuelven a usar las indicaciones que se le dan a las máquinas —prompts,
+     habilidades, grafos de agentes y bucles—, pedida por el autor el 22 de
+     septiembre. Crea UNA tabla, `consigna_piezas` (21 columnas: la pieza con
+     sus bloques, su material, sus estantes, su bitácora de usos y sus
+     versiones), con tres políticas de la casa —ver, poner y corregir, las
+     tres con `es_familia()`—, la seguridad por fila puesta, el disparador de
+     la hora del servidor y **ninguna** política de borrado ni puerta
+     pública: se retira con lápida, y con la clave publicable no se puede ni
+     mirar la lista.
+     Depende SOLO de `es_familia()`, que es de
+     `seguridad_familia_1_puerta.sql` y ya está desde la mudanza a privado;
+     si faltara, el archivo **se para en la primera línea** y dice qué correr
+     antes. Va entero, de una vez, y se corre **UNA sola vez**; es
+     idempotente, así que si un día hay que volver a pegarlo no duplica
+     políticas ni borra ninguna pieza.
+     Lo que hay que mirar al pegarlo es **la tabla del final, en VERTICAL**,
+     nunca el «Success» del editor: siete filas, con `21` columnas, `3`
+     políticas, seguridad por fila `true`, `1` disparador, y las dos que se
+     leen al revés —«borrado de verdad (NO debe poder)» y «puerta pública (NO
+     debe haberla)»— en `0`.
+     Hasta que se corra, la herramienta funciona entera con la copia del
+     aparato y lo dice a la vista («📴 Solo en este aparato: falta correr
+     consigna.sql»); al correrlo, lo escrito sube solo y firmado. Y si
+     mañana hay que volver a comprobar que quedó puesto, se pega solo
+     `supabase/sql/consigna_comprueba.sql`, que solo mira y devuelve **doce
+     filas en vertical**: las siete de arriba y cinco informativas (piezas
+     vivas, por clase, usos apuntados, usos sin contestar «¿sirvió?» y
+     retiradas con lápida), que son las que dicen si lo escrito desde la
+     tableta llegó.
+     Probado antes de mandarlo contra un PostgreSQL de verdad con
+     `_dev/prueba-consigna-sql.sql` (vuelto a correr el 23 de septiembre):
+     la guardia para nombrando el archivo que falta, los checks muerden, y
+     `anon` no ve ni una fila con los permisos de tabla repartidos como los
+     reparte Supabase.
    · ⚠️ **Correr `supabase/sql/redaccion_cuadernos.sql`** en el SQL Editor (21 de
      septiembre de 2026). Es la tabla del inventario de cuadernos de NotebookLM
      de Redacción (el chip 📓 Cuadernos). Va entero, de una vez; depende solo de

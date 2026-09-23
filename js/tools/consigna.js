@@ -908,11 +908,17 @@ const CSG_MOLDES = {
          la manera de alguien. */
       { id: 'etiqueta',  ob: true, rotulo: 'Veredicto y etiqueta',
         para_que: 'Qué entrega el juez y la etiqueta de la casa.',
-        inicial: 'Al final, un veredicto de 200 palabras con la postura que gana, por qué, y las tres mejores pruebas de cada lado. Escribe el careo entero encabezado con estas líneas, una por renglón: «Título:» y un título; «Voz: A y B»; «Máquina: {{maquina}}»; «Género: entrevista»; «Consigna: {{titulo}}». Cada turno empieza en su propio renglón por A:, B: o JUEZ:. Termina con FIN solo en su renglón.',
-        ejemplo: 'Al final, un veredicto de 200 palabras con la postura que gana, por qué, y las tres mejores pruebas de cada lado. Escribe el careo entero encabezado con estas líneas, una por renglón: «Título:» y un título; «Voz: A y B»; «Máquina: {{maquina}}»; «Género: entrevista»; «Consigna: {{titulo}}». Cada turno empieza en su propio renglón por A:, B: o JUEZ:. Termina con FIN solo en su renglón.',
+        inicial: 'Al final, un veredicto de 200 palabras con la postura que gana, por qué, y las tres mejores pruebas de cada lado. Escribe el careo entero encabezado con estas líneas, una por renglón: «Título:» y un título; «Voz: A y B»; «Máquina: {{maquina}}»; «Género: entrevista»; «Consigna: {{titulo}}». Cada turno en su propio párrafo, con una línea en blanco entre uno y otro, empezando por A:, B: o JUEZ:. Termina con FIN solo en su renglón.',
+        ejemplo: 'Al final, un veredicto de 200 palabras con la postura que gana, por qué, y las tres mejores pruebas de cada lado. Escribe el careo entero encabezado con estas líneas, una por renglón: «Título:» y un título; «Voz: A y B»; «Máquina: {{maquina}}»; «Género: entrevista»; «Consigna: {{titulo}}». Cada turno en su propio párrafo, con una línea en blanco entre uno y otro, empezando por A:, B: o JUEZ:. Termina con FIN solo en su renglón.',
         frases: ['Veredicto de {{n}} palabras con quién gana y por qué.', 'Las tres mejores pruebas de cada lado.', 'Lo que ninguno probó.', 'Encabeza con Título:, Voz:, Máquina: y Género: entrevista, una por renglón.'] },
     ],
-    auto: 'Escribe el careo entero tú solo, haciendo las tres voces por turnos. Cada turno empieza en su propio renglón por A:, B: o JUEZ:. Respeta las rondas y el largo de cada turno. Al terminar la última ronda, el JUEZ da el veredicto. Encabeza todo con la etiqueta de la casa y termina con FIN solo en su renglón.',
+    /* ⚠️ «Con una línea en blanco entre uno y otro», aquí y en la etiqueta:
+       lo devuelto va a La Voz Prestada («📖 Guardar lo que devolvió»), y su
+       lector junta los renglones seguidos en UN párrafo. Pidiendo solo «su
+       propio renglón», un careo obediente entraba como un párrafo por
+       ronda, con los tres turnos pegados y el primer «JUEZ:» nombrado como
+       etiqueta sin entender; y el texto crudo no se guarda para rehacerlo. */
+    auto: 'Escribe el careo entero tú solo, haciendo las tres voces por turnos. Cada turno en su propio párrafo, con una línea en blanco entre uno y otro, empezando por A:, B: o JUEZ:. Respeta las rondas y el largo de cada turno. Al terminar la última ronda, el JUEZ da el veredicto. Encabeza todo con la etiqueta de la casa y termina con FIN solo en su renglón.',
     pseudo: 'RONDA 1..{N}:\n  A: turno\n  B: turno\n  JUEZ: puntúa la ronda\nal terminar las rondas: JUEZ da el veredicto y se escribe el careo entero con su etiqueta',
     cierre: 'Alterna A, B y JUEZ durante las «Rondas» y cierra con «Veredicto y etiqueta».',
   },
@@ -3705,14 +3711,20 @@ function csgLeer(texto) {
        «Tarea: …») y este renglón está entre esos rótulos: ahí «Notas: …»
        tiene la misma forma que los que sí se entendieron. Dentro de una
        lista (Nodos, Reglas, Ejemplos) «Nombre: algo» es un elemento, y no
-       se nombra. Lo que no se nombra no se pierde: sigue en su bloque. */
+       se nombra. Lo que no se nombra no se pierde: sigue en su bloque.
+       ⚠️ Y LO INTENTABA TAMBIÉN SI ES UNA ERRATA DE UN RÓTULO CONOCIDO
+       (csgLecSugerencia no vacía): «Contexo: …» debajo de una sola frase
+       de prosa no tenía otros rótulos al lado, se quedaba en el Texto sin
+       decir nada, y es justo el caso para el que existe la sugerencia.
+       Una palabra a dos letras de un rótulo no es una frase cualquiera
+       («Viaja:», «Investigador:» no están cerca de ninguno). */
+    if (!sugerencias.has(c.clave)) sugerencias.set(c.clave, csgLecSugerencia(c.clave, clase));
+    const sug = sugerencias.get(c.clave);
     const intentaba = c.forma === 'mayusculas' ||
-      (!esLista && (c.forma === 'negrita' || usaDosPuntos));
+      (!esLista && (c.forma === 'negrita' || usaDosPuntos || !!sug));
     if (!intentaba) return;
     if (nombrados >= NOMBRAR_MAX) { if (!sinNombrar++) primeroSin = c.renglon.n; return; }
     nombrados++;
-    if (!sugerencias.has(c.clave)) sugerencias.set(c.clave, csgLecSugerencia(c.clave, clase));
-    const sug = sugerencias.get(c.clave);
     const rotSug = sug ? csgBloqueDef(molde, CSG_SINONIMOS[sug]).rotulo : '';
     avisos.push({
       renglon: c.renglon.n,
@@ -3944,11 +3956,18 @@ function csgDatosDeCasa(texto) {
     if (/\bisbn(?:-1[03])?[\s:.-]*$/i.test(sinCorreos.slice(Math.max(0, m.index - 16), m.index))) continue;
     if (csgLecEsTelefono(trozo)) mete('telefono', trozo);
   }
+  /* ⚠️ Y LOS NOMBRES, TAMBIÉN CON LOS CORREOS TAPADOS (y las
+     direcciones): «josue@correo.com» no es el nombre de Josué suelto en
+     una frase, es un correo, y ya tiene su aviso. Buscado en el texto
+     entero salía un segundo aviso por el nombre, y su chip «⇄ {{nombre}}»
+     partía el correo en «{{nombre}}@correo.com»: el aviso del correo se
+     iba —ya no parecía un correo— y el dato de la casa seguía ahí. */
+  const sinDirecciones = sinCorreos.replace(/\bhttps?:\/\/[^\s<>"'«»]+/gi, x => ' '.repeat(x.length));
   const ocupados = [];
   csgLecNombresCasa().forEach(nombre => {
     const re = csgLecPatronNombre(nombre);
     let x;
-    while ((x = re.exec(s))) {
+    while ((x = re.exec(sinDirecciones))) {
       const a = x.index, b = a + x[0].length;
       if (ocupados.some(([p, q]) => a < q && b > p)) continue;
       ocupados.push([a, b]);
@@ -5190,7 +5209,21 @@ async function csgSubirVarios(lista) {
   _csgHayTabla = true;
   if (_csgNube === 'sin-senal' || _csgNube === 'sin-sesion' || _csgNube === 'mirando') _csgNube = _csgColsFuera.length ? 'vieja' : 'puesta';
   van.forEach((p, i) => {
-    if (csgHuellaSubida(p) === relojes[i]) { p.subida = true; delete p.motivo; }
+    if (csgHuellaSubida(p) === relojes[i]) {
+      p.subida = true; delete p.motivo;
+      /* ⚠️ Y SI ESTA PIEZA ESPERABA SU RESPIRO, YA NO HACE FALTA: lo que
+         iba a subir es exactamente lo que acaba de llegar (la huella no se
+         movió). Al volver del compositor con ‹, el guardado ponía su
+         respiro de dos segundos y la carga del anaquel subía la pieza en
+         seguida: la misma fila viajaba dos veces, y dos upserts en vuelo
+         pueden llegar en otro orden. Se da por hecho con este resultado. */
+      const ent = _csgLuego[p.id];
+      if (ent) {
+        clearTimeout(ent.t);
+        delete _csgLuego[p.id];
+        ent.esperan.forEach(f => f({ ok: true, motivo: '', local: !!ent.local }));
+      }
+    }
   });
   return esperan.length
     ? { ok: false, motivo: motivoEspera, subidas: van.length }
@@ -5361,8 +5394,12 @@ function csgRotuloNube() {
      firmadas, lo que falta no es firmarlas: es volver a entrar. */
   const sinSesion = _csgLista.filter(p => p && p.subida === false && p.motivo === 'sin-sesion');
   if (_csgNube === 'sin-sesion' || sinSesion.length) {
-    const firmadas = sinSesion.length > 0 && sinSesion.every(p => p.autor);
-    return { ic: '🔑', t: firmadas ? 'Solo en este aparato · sin sesión: vuelve a entrar en F.A.R.O' : 'Solo en este aparato · sin sesión: se firmará al entrar', ok: false };
+    /* ⚠️ Lo que se dice depende de si FALTA una firma, no de si hay
+       pendientes firmadas: con la sesión caducada (JWT expired, o la base
+       que no deja) y nada pendiente, «se firmará al entrar» nombraba una
+       firma que nadie necesitaba; lo que hace falta es volver a entrar. */
+    const faltaFirma = !csgAutor() || sinSesion.some(p => !p.autor);
+    return { ic: '🔑', t: faltaFirma ? 'Solo en este aparato · sin sesión: se firmará al entrar' : 'Solo en este aparato · sin sesión: vuelve a entrar en F.A.R.O', ok: false };
   }
   const grande = _csgLista.find(p => p && p.noCabe && !p.eliminado);
   if (grande) {
@@ -5543,6 +5580,15 @@ const CSG_ANQ_PREGUNTA_VECES = 3;
    es una instrucción que se quiere puesta (§6.9). */
 const CSG_ANQ_USOS_MES = 3;
 const CSG_ANQ_MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+/* ⚠️ «SIN ESTANTE» NO PUEDE LLAMARSE COMO UN ESTANTE. La clave de un
+   estante la escribe una persona y csgClave la deja en minúsculas y
+   RECORTADA; con el centinela 'sin' en el mismo espacio de nombres, un
+   estante llamado «Sin» se confundía con «Sin estante»: filtrar por él
+   enseñaba justo lo contrario (lo que NO tiene estante) y agrupando
+   salían dos montones con la misma llave de plegado. Un blanco delante
+   no lo puede producir csgClave nunca, así que ningún nombre escrito lo
+   suplanta y no hay ningún nombre prohibido que explicar. */
+const CSG_ANQ_SIN = ' sin';
 
 const CSG_ANQ_ORDENES = [
   { id: 'ultima',    ic: '🕘', t: 'Última usada',     d: 'lo que usas a diario sube solo' },
@@ -5580,6 +5626,17 @@ let _csgAnqVerPintar = null;          // lo que pinta la hoja vertical abierta
 let _csgAnqBitPlegada = false;        // el renglón de la bitácora, plegado en esta apertura
 let _csgAnqCuadernosPedidos = false;
 let _csgAnqSeguirAhora = false;       // en esta apertura se ofrece seguir el borrador (y no se pregunta)
+/* ⚠️ LA FOTO DE LA APERTURA. El «¿sirvió?» pregunta en la SIGUIENTE
+   apertura (§6.7), así que solo cuentan los usos de ANTES de abrir: el
+   que se apunta ahora mismo (📋 Copiar y cerrar la hoja) espera a la
+   próxima. Sin la foto, el renglón salía en el mismo repintado del uso,
+   que es el «¿Cómo salió?» inmediato que el §6.7 quitó: preguntaba antes
+   de que la máquina contestara. */
+let _csgAnqBitDesde = 0;
+/* ‹ desde el compositor NO es una apertura: es volver dentro de la
+   herramienta. Contándola, tres idas y vueltas a corregir en una sola
+   visita plegaban la pregunta como si se hubiera ignorado tres veces. */
+let _csgAnqVuelta = false;
 
 /* ══════════════════════════════════════════════════════════════════
    LOS AYUDANTES COMUNES (los usan también el compositor y las hojas)
@@ -5623,7 +5680,20 @@ function csgAnqBoton(cls, texto, alTocar) {
 /* toast() y no showToast(): la de la aplicación es toast (La Voz
    Prestada, regla 14, perdió todos sus avisos por el nombre). */
 function csgAviso(msg) {
-  if (typeof toast === 'function') toast(msg);
+  if (typeof toast !== 'function') return;
+  toast(msg);
+  /* ⚠️ Y SE QUEDA LO QUE TARDA EN LEERSE. toast() lo quita a los dos
+     segundos, y aquí hay avisos de cien caracteres que son una
+     instrucción («va en .claude/skills/<nombre>/SKILL.md…»). Pasados los
+     cincuenta, cada letra alarga el reloj (hasta ocho segundos). Se usa el
+     mismo reloj de toast() (`_t`), para que el siguiente aviso lo cancele
+     como siempre. */
+  const n = String(msg == null ? '' : msg).length;
+  const el = (typeof document !== 'undefined' && document.getElementById) ? document.getElementById('meta-toast') : null;
+  if (el && n > 50) {
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { el.style.opacity = '0'; }, Math.min(8000, 2000 + 45 * (n - 50)));
+  }
 }
 
 /* «hace 3 d»: lo justo para saber de un vistazo cuándo fue, sin leer una
@@ -5654,7 +5724,7 @@ function csgHace(ms) {
    cambio de que ninguno cambie nunca. «Sin estante» va en gris. */
 function csgTono(clave) {
   const k = csgClave(clave);
-  if (!k || k === 'sin' || k === 'todo') return 'csg-tono-x';
+  if (!k) return 'csg-tono-x';
   let h = 0;
   for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
   return 'csg-tono-' + (h % CSG_ANQ_TONOS);
@@ -5881,7 +5951,7 @@ function csgEstantesTodos() {
   return [...m.values()].sort((a, b) => a.clave.localeCompare(b.clave, 'es'));
 }
 function csgAnqRotuloEstante(clave) {
-  if (clave === 'sin') return 'Sin estante';
+  if (clave === CSG_ANQ_SIN) return 'Sin estante';
   if (_csgAnqRotulos.has(clave)) return _csgAnqRotulos.get(clave);
   const e = csgEstantesTodos().find(x => x.clave === clave);
   return e ? e.rotulo : clave;
@@ -6049,7 +6119,7 @@ function csgAnqFiltra(lista, sinChip) {
     }
     if (f.estante) {
       const ks = csgAnqEstantesDe(p).map(csgClave);
-      if (f.estante === 'sin' ? ks.length > 0 : ks.indexOf(f.estante) < 0) return false;
+      if (f.estante === CSG_ANQ_SIN ? ks.length > 0 : ks.indexOf(f.estante) < 0) return false;
     }
     if (f.maquina && csgAnqMaquinaDe(p) !== f.maquina) return false;
     if (!sinChip) {
@@ -6111,7 +6181,7 @@ function csgAnqGrupos(lista) {
     const gs = [...m.keys()].sort((a, b) => a.localeCompare(b, 'es'))
       .map(k => ({ eje: 'estante', clave: k, rotulo: csgAnqRotuloEstante(k), items: csgAnqOrdena(m.get(k)) }));
     const sin = lista.filter(p => !csgAnqEstantesDe(p).length);
-    if (sin.length) gs.push({ eje: 'estante', clave: 'sin', rotulo: 'Sin estante', items: csgAnqOrdena(sin) });
+    if (sin.length) gs.push({ eje: 'estante', clave: CSG_ANQ_SIN, rotulo: 'Sin estante', items: csgAnqOrdena(sin) });
     return gs;
   }
   if (ag === 'clase') {
@@ -6190,8 +6260,12 @@ function csgPintarAnaquel() {
   if (puestos) frag.appendChild(puestos);
   /* El renglón de «seguir» y el de la bitácora ocupan el MISMO sitio, y
      solo uno cada vez (ver csgAnqSeguirFila): antes de la primera ficha
-     caben como mucho cinco cosas (§8, regla 21). */
-  const preg = csgAnqSeguirFila() || (_csgAnqSeguirAhora ? null : csgBitFila());
+     caben como mucho cinco cosas (§8, regla 21). Quién se lo queda lo
+     decide la apertura (initConsigna); si el suyo se va —se contestó, se
+     descartó—, el hueco pasa al otro. */
+  let preg = _csgAnqSeguirAhora ? csgAnqSeguirFila() : null;
+  if (!preg) preg = csgBitFila();
+  if (!preg) preg = csgAnqSeguirFila();
   if (preg) frag.appendChild(preg);
   csgAnqContenido(frag, filtradas, grupos, buscando, conMando);
   const ret = csgAnqRetiradas();
@@ -6454,7 +6528,7 @@ function csgAnqPuestos(total, vistas) {
   const f = csgAnqPrefs().filtro;
   const buscando = !!csgClave(_csgAnqBusca);
   const lista = [];
-  if (f.estante) lista.push({ t: (f.estante === 'sin' ? '' : '🗂 ') + csgAnqRotuloEstante(f.estante), foco: 'puesto:estante', quita: { estante: '' } });
+  if (f.estante) lista.push({ t: (f.estante === CSG_ANQ_SIN ? '' : '🗂 ') + csgAnqRotuloEstante(f.estante), foco: 'puesto:estante', quita: { estante: '' } });
   if (f.maquina) lista.push({ t: '🤖 ' + csgAnqMaquinaNombre(f.maquina), foco: 'puesto:maquina', quita: { maquina: '' } });
   if (f.clase) { const c = csgClaseDe(f.clase); lista.push({ t: c.ic + ' ' + c.nombre, foco: 'puesto:clase', quita: { clase: '' } }); }
   if (f.especial && CSG_ANQ_ESPECIALES[f.especial]) {
@@ -6510,7 +6584,7 @@ function csgAnqContenido(frag, filtradas, grupos, buscando, conMando) {
   }
   grupos.forEach((g, i) => {
     const k = g.eje + ':' + g.clave;
-    const tono = g.eje === 'estante' ? csgTono(g.clave === 'sin' ? '' : g.clave)
+    const tono = g.eje === 'estante' ? csgTono(g.clave === CSG_ANQ_SIN ? '' : g.clave)
       : g.eje === 'clase' ? 'csg-clase-' + g.clave : 'csg-tono-x';
     const sec = csgEl('section');
     const caja = csgEl('div', 'csg-grupo');
@@ -6595,8 +6669,8 @@ function csgFichaCrear(p, g) {
   art.appendChild(csgFichaMeta(p));
 
   const f = csgAnqPrefs().filtro;
-  const enEstante = (g && g.eje === 'estante' && g.clave !== 'sin') ? g.clave
-    : (f.estante && f.estante !== 'sin') ? f.estante : '';
+  const enEstante = (g && g.eje === 'estante' && g.clave !== CSG_ANQ_SIN) ? g.clave
+    : (f.estante && f.estante !== CSG_ANQ_SIN) ? f.estante : '';
   const otros = csgAnqEstantesDe(p).filter(e => csgClave(e) !== enEstante);
   if (otros.length) {
     const ests = csgEl('div', 'csg-ficha-estantes');
@@ -6814,14 +6888,19 @@ function csgAnqEstantesAbrir() {
     });
     const sin = vivas.filter(p => !csgAnqEstantesDe(p).length).length;
     if (sin && ests.length) {
-      const on = f.estante === 'sin';
+      const on = f.estante === CSG_ANQ_SIN;
       /* 📥 y no ▫️: el cuadrado blanco salía como un punto gris en su
          baldosa, que se lee como un icono que no cargó. */
-      const r = csgVerFila('📥', 'Sin estante', sin, on, () => elige({ estante: on ? '' : 'sin' }), 'lo que falta por archivar');
+      const r = csgVerFila('📥', 'Sin estante', sin, on, () => elige({ estante: on ? '' : CSG_ANQ_SIN }), 'lo que falta por archivar');
       r.classList.add('csg-tono-x');
       cuerpo.appendChild(r);
     }
     if (!ests.length) cuerpo.appendChild(csgEl('p', 'csg-nota', 'Todavía no hay estantes. Se ponen desde el ⋯ de cada consigna, o en el compositor: la materia, el proyecto, para quién es. Una consigna puede estar en varios.'));
+    /* Aquí no se crea ninguno, y se dice dónde: un estante vacío no existe
+       (los estantes salen de las piezas, §8), y sin «☑ Elegir» no hay a
+       qué ponérselo desde esta hoja. Un campo que creara uno sin nada
+       dentro se leería como una avería al no verlo en la lista. */
+    else cuerpo.appendChild(csgEl('p', 'csg-nota', 'Un estante nuevo se crea al archivar: en el ⋯ de una consigna → 🗂 Estantes, o con «＋ estante» al escribirla.'));
 
     const cuentas = new Map();
     vivas.forEach(p => { const m = csgAnqMaquinaDe(p); cuentas.set(m, (cuentas.get(m) || 0) + 1); });
@@ -6939,7 +7018,13 @@ function csgAnqSelecciona(el) {
    —la pregunta vuelve en la siguiente apertura y no cuenta como ignorada
    (initConsigna no la apunta), el texto a medio escribir no vuelve si se
    descarta sin querer—. Con la pieza abierta en el compositor no sale:
-   ahí ya se está siguiendo. */
+   ahí ya se está siguiendo.
+   ⚠️ Y GANA UNA VEZ POR BORRADOR, NO SIEMPRE. Ganando siempre, un
+   borrador que nadie decidía dejaba la pregunta sin salir en TODAS las
+   aperturas, y a los siete días el uso se quedaba para siempre sin
+   preguntar. Ya ofrecido (csgAnqSeguirApunta, por su reloj: escribir más
+   lo vuelve a ofrecer), cede el hueco mientras haya algo que preguntar;
+   sigue en ＋ Nueva, y vuelve aquí en cuanto la pregunta se conteste. */
 function csgAnqSeguirFila() {
   if (typeof csgBorradorLee !== 'function' || typeof csgBorradorSeguir !== 'function') return null;
   if (typeof csgEdEnVista === 'function' && csgEdEnVista()) return null;
@@ -6975,7 +7060,7 @@ function csgBitEstado() {
   try { d = JSON.parse(localStorage.getItem(CSG_CLAVES.pregunta)); } catch (e) { d = null; }
   if (!d || typeof d !== 'object') d = {};
   const desc = (d.descartados && typeof d.descartados === 'object') ? d.descartados : {};
-  return { descartados: desc, veces: Math.max(0, parseInt(d.veces, 10) || 0) };
+  return { descartados: desc, veces: Math.max(0, parseInt(d.veces, 10) || 0), seguido: Number(d.seguido) || 0 };
 }
 function csgBitGuarda(st) {
   /* Lo descartado hace más de ocho días ya no se preguntaría de todos
@@ -6986,14 +7071,33 @@ function csgBitGuarda(st) {
     const t = Number(st.descartados[u]) || 0;
     if (t >= limite) desc[u] = t;
   });
-  try { localStorage.setItem(CSG_CLAVES.pregunta, JSON.stringify({ descartados: desc, veces: st.veces || 0 })); } catch (e) {}
+  try { localStorage.setItem(CSG_CLAVES.pregunta, JSON.stringify({ descartados: desc, veces: st.veces || 0, seguido: st.seguido || 0 })); } catch (e) {}
+}
+/* ¿El borrador de ahora ya tuvo su apertura? Se mira por su RELOJ: cada
+   tecla lo reescribe con uno nuevo, así que lo escrito después se vuelve
+   a ofrecer. */
+function csgAnqSeguirOfrecido() {
+  let b = null;
+  try { b = csgBorradorLee(); } catch (e) { b = null; }
+  return !!(b && b.t && csgBitEstado().seguido === b.t);
+}
+function csgAnqSeguirApunta() {
+  let b = null;
+  try { b = csgBorradorLee(); } catch (e) { b = null; }
+  if (!b || !b.t) return;
+  const st = csgBitEstado();
+  st.seguido = b.t;
+  csgBitGuarda(st);
 }
 function csgBitPendientes() {
   const desde = Date.now() - CSG_ANQ_PREGUNTA_DIAS * CSG_ANQ_DIA;
+  /* Solo lo de antes de esta apertura (ver _csgAnqBitDesde). */
+  const hasta = _csgAnqBitDesde || Infinity;
   const st = csgBitEstado();
   const out = [];
   csgVivas().forEach(p => (Array.isArray(p.bitacora) ? p.bitacora : []).forEach(u => {
-    if (u && u.uid && u.ok == null && (Number(u.t) || 0) >= desde && !st.descartados[u.uid]) out.push({ p, u });
+    const t = Number(u && u.t) || 0;
+    if (u && u.uid && u.ok == null && t >= desde && t < hasta && !st.descartados[u.uid]) out.push({ p, u });
   }));
   out.sort((a, b) => (Number(b.u.t) || 0) - (Number(a.u.t) || 0));
   return out;
@@ -7236,6 +7340,13 @@ function csgMenuVersiones(p) {
       const conTexto = Array.isArray(x.bloques);
       const sub = cuenta(parseInt(x.v, 10) || 1) + (conTexto ? '' : ' · plegada: ya no guarda su texto');
       cuerpo.appendChild(csgMenuVersionFila('v' + x.v + (x.t ? ' · hasta el ' + csgHoy(x.t) : ''), sub, conTexto ? () => {
+        /* Si ese texto ya es el de ahora, no nace nada: «Volver a esta»
+           dos veces seguidas fabricaba una versión idéntica y gastaba una
+           de las diez que guardan su texto. */
+        if (csgMdCrudo({ clase: p.clase, molde: p.molde, bloques: x.bloques }) === csgMdCrudo(p)) {
+          csgAviso('Esa ya es la de ahora: no hace falta volver a ella');
+          return;
+        }
         const n = csgVolverAVersion(p, x.vid);
         if (!n) { csgAviso('Esa versión está plegada: ya no guarda su texto'); return; }
         const r = csgPersistir(p);
@@ -7439,6 +7550,10 @@ function csgMenuRetirar(p) {
     dos.appendChild(csgBtn('csg-btn-peligro csg-btn-sm', '', 'Sí, retirar', () => {
       p.eliminado = true;
       p.eliminado_at = new Date().toISOString();
+      /* Lo que quedara a medio escribir de ESTA pieza se va con ella: si
+         no, el anaquel seguía ofreciendo «Seguir» y abrir otra pieza la
+         devolvía como nueva. */
+      if (typeof csgEdSoltarPieza === 'function') csgEdSoltarPieza(p.id);
       const r = csgPersistir(p);
       csgVerCerrar();
       csgPintarAnaquel();
@@ -7483,7 +7598,11 @@ function csgAnqEngancha() {
      vuelva a intentar es peor que decir que falló. */
   if (typeof window !== 'undefined' && window && typeof window.addEventListener === 'function') {
     window.addEventListener('online', () => {
-      Promise.resolve(csgSubirPendientes()).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+      const tras = () => {
+        csgPintarAnaquel();
+        if (typeof csgEdTrasNube === 'function') csgEdTrasNube();
+      };
+      Promise.resolve(csgSubirPendientes()).then(tras, tras);
     });
   }
 }
@@ -7503,13 +7622,28 @@ function initConsigna() {
   if (csgAnqVerAbierta()) csgVerCerrar();
   let viaje = null;
   try { viaje = csgCargar(); } catch (e) { viaje = null; }
-  /* Si esta apertura ofrece seguir un borrador, la pregunta de la
-     bitácora no sale, y por eso no se apunta como una vez ignorada. */
-  _csgAnqSeguirAhora = !!csgAnqSeguirFila();
-  if (!_csgAnqSeguirAhora) csgBitApertura();
+  /* Volver con ‹ desde el compositor no es abrir el anaquel: no cuenta,
+     no mueve la foto de la bitácora y no vuelve a repartir el hueco. */
+  const vuelta = _csgAnqVuelta && !!_csgAnqBitDesde;
+  _csgAnqVuelta = false;
+  if (!vuelta) {
+    _csgAnqBitDesde = Date.now();
+    /* Si esta apertura ofrece seguir un borrador, la pregunta de la
+       bitácora no sale, y por eso no se apunta como una vez ignorada.
+       Seguir gana si no hay nada que preguntar o si es la primera
+       apertura de ESE borrador; si no, el hueco es de la pregunta. */
+    const haySeguir = !!csgAnqSeguirFila();
+    _csgAnqSeguirAhora = haySeguir && (!csgBitPendientes().length || !csgAnqSeguirOfrecido());
+    if (_csgAnqSeguirAhora) csgAnqSeguirApunta();
+    else csgBitApertura();
+  }
   csgPintarAnaquel();
   if (viaje && typeof viaje.then === 'function') {
-    viaje.then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
+    const tras = () => {
+      csgPintarAnaquel();
+      if (typeof csgEdTrasNube === 'function') csgEdTrasNube();
+    };
+    viaje.then(tras, tras);
   }
 }
 
@@ -7567,11 +7701,25 @@ let _csgEdAuto      = { tituloMano: false, nombre: '' };
 let _csgEdIgual     = '';         // la clave de título que ya se aceptó repetir
 let _csgEdGuardado  = '';         // '' | 'si': ya está guardada en la lista
 let _csgEdPara      = false;      // lo guardado tiene algo que PARA el uso
-let _csgEdNubeEd    = '';         // '' | 'espera' | 'ok' | 'local'
+/* ⚠️ LA FOTO DE LO QUE HABÍA EN LA LISTA AL ABRIR (o al guardar por
+   última vez): título, forma, máquina, estantes y material. Contra ella se
+   decide QUÉ cambió la persona, y al guardar se escribe SOLO eso. Volcando
+   la copia entera, un 💾 sin tocar nada deshacía lo que otro aparato —o el
+   menú ⋯ de este mismo— había cambiado mientras el compositor estaba
+   abierto: el texto que la tableta corrigió desaparecía sin rastro. */
+let _csgEdOrig      = null;
+/* Una pieza NUEVA que nace copiando otra (un duplicado, o la copia de una
+   que se retiró) no se guarda al volver si nadie la tocó: su huella al
+   abrir. '' en lo pegado y en lo escrito de cero, que no tienen original y
+   se guardan al volver en cuanto dicen algo. */
+let _csgEdBaseNueva = '';
+let _csgEdBaseNuevaQue = '';      // 'duplicado' | 'retirada': para decirlo con palabras
 let _csgEdCual      = null;       // las preguntas de «¿Cuál elijo?» en curso
 let _csgEdScroll    = 0;          // dónde estaban los bloques antes de la vista previa
-let _csgEdTa        = {};         // id de bloque → su <textarea> pintado
-let _csgEdCartas    = {};         // id de bloque → su tarjeta (o su renglón plegado)
+/* Sin prototipo, como los valores de Usar: el id de un bloque libre viene
+   de la fila, y un «__proto__» le cambiaría el prototipo al mapa. */
+let _csgEdTa        = Object.create(null);   // id de bloque → su <textarea> pintado
+let _csgEdCartas    = Object.create(null);   // id de bloque → su tarjeta (o su renglón plegado)
 let _csgEdFilaEl    = null;
 let _csgEdVarsEl    = null;
 let _csgEdContEl    = null;
@@ -7844,6 +7992,13 @@ function csgDuplicarEnMolde(pieza, moldeId) {
       pistas.autoNombre = s;
     }
   }
+  /* Y DE QUÉ es duplicado: ‹ sin tocarlo no lo guarda (§6.9 y §12, «a
+     la vista y sin guardar»), pero solo si el original ESTÁ en el anaquel.
+     ⚠️ Lo pegado con la forma cambiada («cambiar» en la hoja de Pegar)
+     también pasa por aquí, y su original no está guardado en ninguna
+     parte: tirarlo al volver sería perder lo pegado. Lo decide
+     csgAbrirCompositor mirando la lista, no esta función. */
+  pistas.duplicadoDe = String(src.id || '');
   _csgEdPistas.set(nueva, pistas);
   return nueva;
 }
@@ -7917,6 +8072,69 @@ function csgEdHuella(p, material) {
     String(p.maquina || ''), (p.estantes || []).map(String), bs, String(material == null ? '' : material)]);
 }
 
+/* El título como se guarda (un blanco entre palabras, recortado al tope):
+   comparar el de la copia con el de la lista sin normalizar haría
+   «cambiado» un título con un doble espacio que nadie tocó. */
+function csgEdTituloNorm(t) {
+  return csgCorta(String(t == null ? '' : t).replace(/\s+/g, ' ').trim(), CSG_TOPES.titulo);
+}
+/* La FORMA de una pieza: su molde y sus bloques como se guardan. Es la
+   unidad que se escribe junta (unos bloques sin su molde no se entienden). */
+function csgEdForma(p) {
+  return JSON.stringify([String((p && p.molde) || ''), csgEdBloquesParaGuardar(p || {})]);
+}
+function csgEdFoto(obj, material) {
+  if (!obj || typeof obj !== 'object') return null;
+  return {
+    titulo: csgEdTituloNorm(obj.titulo),
+    maquina: String(obj.maquina || ''),
+    estantes: (Array.isArray(obj.estantes) ? obj.estantes : []).filter(x => typeof x === 'string'),
+    forma: csgEdForma(obj),
+    material: String(material == null ? (obj.material || '') : material),
+  };
+}
+/* La foto que viene del borrador (del aparato, o sea que puede venir
+   tocada): o tiene todos sus campos con su tipo, o no vale. */
+function csgEdFotoValida(o) {
+  if (!o || typeof o !== 'object') return null;
+  if (typeof o.titulo !== 'string' || typeof o.maquina !== 'string' || typeof o.forma !== 'string' ||
+      typeof o.material !== 'string' || !Array.isArray(o.estantes)) return null;
+  return { titulo: o.titulo, maquina: o.maquina, forma: o.forma, material: o.material, estantes: o.estantes.filter(x => typeof x === 'string') };
+}
+/* ¿La versión de AHORA ya se usó? Solo entonces corregirla la guarda
+   aparte (regla 10: el 👍 va atado a su versión). Una versión que nadie
+   ha usado se corrige en su sitio: ningún 👍 habla de ella, y hacer nacer
+   una versión en cada 💾 plegaba a la undécima el texto de la versión que
+   SÍ tenía su 👍. Sin bitácora (una fila de otra parte), manda `usos`. */
+function csgEdVersionUsada(obj) {
+  const v = parseInt(obj && obj.version, 10) || 1;
+  const bit = (Array.isArray(obj && obj.bitacora) ? obj.bitacora : []).filter(u => u && u.uid);
+  if (!bit.length) return ((obj && obj.usos) || 0) > 0;
+  return bit.some(u => (parseInt(u.v, 10) || 1) === v);
+}
+/* Los estantes, a tres bandas y por clave: se quitan los que la persona
+   quitó en el compositor, se añaden los que puso, y se quedan los que el
+   menú ⋯ (u otro aparato) puso mientras tanto. */
+function csgEdMezclaEstantes(actual, antes, mios) {
+  const k = x => csgClave(x);
+  const kAntes = new Set((antes || []).map(k)), kMios = new Set((mios || []).map(k));
+  const out = [];
+  const vistos = new Set();
+  (Array.isArray(actual) ? actual : []).forEach(e => {
+    if (typeof e !== 'string') return;
+    const c = k(e);
+    if (kAntes.has(c) && !kMios.has(c)) return;          // la persona lo quitó
+    if (vistos.has(c)) return;
+    vistos.add(c); out.push(e);
+  });
+  (mios || []).forEach(e => {
+    const c = k(e);
+    if (kAntes.has(c) || vistos.has(c)) return;          // ya estaba, o ya entró
+    vistos.add(c); out.push(e);
+  });
+  return out.slice(0, CSG_TOPES.estantes_n);
+}
+
 /* ¿Hay algo ESCRITO por la persona? El texto `inicial` de un molde no
    cuenta (no lo escribió nadie), ni un título que propuso la
    herramienta. Es lo que decide si «‹» guarda o descarta una pieza
@@ -7945,6 +8163,33 @@ function csgEdSucio() {
   if (!_csgEdPieza) return false;
   if (_csgEdNueva) return csgEdAlgoEscrito();
   return csgEdHuella(_csgEdPieza, _csgEdMaterial) !== _csgEdBase;
+}
+
+/* ¿Hay que guardar antes de soltar la copia? Lo que decide el ‹, el
+   cambio de pieza y el borrador. Una pieza de la lista, si cambió; una
+   nueva con original (duplicado, copia de una retirada), si cambió desde
+   que se abrió; una nueva de cero, si dice algo. Distinto de csgEdSucio,
+   que es lo que dice la cabecera: un duplicado sin tocar SÍ está «sin
+   guardar», pero volver sin tocarlo no tiene que dejar una ficha de más. */
+function csgEdHayQueGuardar() {
+  if (!_csgEdPieza) return false;
+  if (_csgEdNueva) return _csgEdBaseNueva ? csgEdHuella(_csgEdPieza, _csgEdMaterial) !== _csgEdBaseNueva : csgEdAlgoEscrito();
+  return csgEdSucio();
+}
+
+/* Suelta la copia de trabajo si es de esa pieza (la retiró el menú ⋯ de
+   este aparato): su borrador y su copia en memoria se van con ella. Si no,
+   al abrir otra pieza se guardaba «en silencio» lo de la retirada, y
+   volvía como pieza nueva. */
+function csgEdSoltarPieza(id) {
+  if (!id) return;
+  csgBorradorBorra(id);
+  if (_csgEdPieza && _csgEdPieza.id === id && !csgEdEnVista()) {
+    clearTimeout(_csgEdBorradorT);
+    _csgEdBorradorT = null;
+    _csgEdPieza = null;
+    _csgEdRecuperar = null;
+  }
 }
 
 function csgEdEnVista() {
@@ -8076,6 +8321,14 @@ function csgBorradorDescarta() {
 function csgBorradorEscribe(guardada) {
   const p = _csgEdPieza;
   if (!p) return;
+  /* ⚠️ HAY UNA SOLA RANURA, Y NO SE PISA EL BORRADOR DE OTRA PIEZA. Si lo
+     que hay es de otra, con algo escrito y sin guardar, primero va al
+     anaquel y se dice: es texto de alguien que todavía no decidió, y
+     escribir encima lo borraba sin rastro. */
+  const ya = csgBorradorLee();
+  if (ya && !ya.guardada && ya.pieza.id !== p.id && csgEdAlgoEscritoDe(ya.pieza, ya.material, ya.tituloMano)) {
+    csgBorradorRescata(ya);
+  }
   try {
     localStorage.setItem(CSG_CLAVES.borrador, JSON.stringify({
       pieza: Object.assign({}, p, { material: '' }),
@@ -8085,8 +8338,25 @@ function csgBorradorEscribe(guardada) {
       guardada: !!guardada,
       tituloMano: !!_csgEdAuto.tituloMano,
       autoNombre: _csgEdAuto.nombre || '',
+      /* Con qué se comparó al escribirlo: rescatarlo después escribe SOLO
+         lo que se cambió en aquella sesión, no la copia entera. */
+      orig: _csgEdOrig,
+      baseNueva: _csgEdBaseNueva,
+      baseNuevaQue: _csgEdBaseNuevaQue,
     }));
   } catch (e) { /* el almacén lleno lo dice la franja de la nube; aquí no hay más sitio */ }
+}
+
+/* Lleva al anaquel un borrador que nadie decidió (lo de otra pieza que se
+   quedó a medias) y lo dice. Sobre su pieza, escribiendo solo lo que se
+   cambió en aquella sesión; si la pieza ya no está, como nueva. */
+function csgBorradorRescata(b) {
+  if (!b || !b.pieza) return null;
+  const r = csgEdVolcar(csgEdClonar(b.pieza), b.material, csgEdFotoValida(b.orig));
+  const obj = r.obj;
+  csgBorradorBorra(b.pieza.id);
+  csgAviso('💾 Lo que tenías a medio escribir se guardó en el anaquel: «' + (obj.titulo || csgEdNombreDeForma(obj)) + '»');
+  return obj;
 }
 
 function csgBorradorAhora() {
@@ -8094,7 +8364,7 @@ function csgBorradorAhora() {
   _csgEdBorradorT = null;
   const p = _csgEdPieza;
   if (!p) return;
-  if (csgEdSucio()) csgBorradorEscribe(false);
+  if (csgEdHayQueGuardar()) csgBorradorEscribe(false);
   else if (csgLargoTexto(_csgEdMaterial) > CSG_TOPES.material) csgBorradorEscribe(true);
   else if (!_csgEdRecuperar) csgBorradorBorra(p.id);
 }
@@ -8112,7 +8382,7 @@ function csgBorradorSeguir() {
   if (_csgEdPieza) csgBorradorAhora();
   const b = csgBorradorLee();
   if (!b) return null;
-  if (_csgEdPieza && _csgEdPieza.id !== b.pieza.id && (_csgEdNueva ? csgEdAlgoEscrito() : csgEdSucio())) csgEdGuardar('callado');
+  if (_csgEdPieza && _csgEdPieza.id !== b.pieza.id && csgEdHayQueGuardar()) csgEdGuardar('callado');
   const origen = csgDe(b.pieza.id);
   const copia = csgEdClonar(b.pieza);
   let nueva = !origen;
@@ -8122,8 +8392,15 @@ function csgBorradorSeguir() {
     material: b.material,
     tituloMano: b.tituloMano !== undefined ? !!b.tituloMano : !!String(copia.titulo || '').trim(),
     autoNombre: b.autoNombre || '',
+    /* La foto de cuando se empezó a escribir, si el borrador la trae: así
+       lo que otro aparato cambió desde entonces se nota al guardar. */
+    orig: nueva ? null : (csgEdFotoValida(b.orig) || csgEdFoto(origen, origen.material)),
   });
   if (!nueva) _csgEdBase = csgEdHuella(origen, origen.material || '');
+  else if (b.nueva && typeof b.baseNueva === 'string' && b.baseNueva) {
+    _csgEdBaseNueva = b.baseNueva;
+    _csgEdBaseNuevaQue = String(b.baseNuevaQue || '');
+  }
   switchView('view-consigna-editor');
   csgEdPintar();
   csgEdFocoInicial('');
@@ -8162,28 +8439,32 @@ function csgAbrirCompositor(pieza, opts) {
   /* OTRA pieza con algo sin guardar: se guarda antes, en silencio y
      diciéndolo. Hay un solo borrador, y la primera tecla de la pieza
      nueva lo pisaría. */
-  if (_csgEdPieza && _csgEdPieza.id !== entrada.id && (_csgEdNueva ? csgEdAlgoEscrito() : csgEdSucio())) {
+  if (_csgEdPieza && _csgEdPieza.id !== entrada.id && csgEdHayQueGuardar()) {
     csgEdGuardar('callado');
   }
 
   /* Y un borrador de OTRA pieza que se quedó a medias de otra vez (la
      aplicación se cerró con el compositor abierto): por lo mismo, al
-     anaquel antes de empezar esta, y se dice. */
+     anaquel antes de empezar esta, y se dice.
+     ⚠️ TAMBIÉN SI ES EL DE LA PIEZA QUE SE ESTÁ DEJANDO. Se saltaba
+     cuando la copia en memoria era de esa misma pieza, dando por hecho que
+     el bloque de arriba ya la había guardado; pero arriba solo se guarda
+     la copia SUCIA, y con la franja «Tenías cambios sin guardar» puesta y
+     sin elegir, la copia está limpia y lo de antes vive solo en el
+     borrador: la primera tecla de la pieza nueva lo pisaba, sin aviso. */
   const suelto = csgBorradorLee();
-  if (suelto && !suelto.guardada && suelto.pieza.id !== entrada.id &&
-      !(_csgEdPieza && _csgEdPieza.id === suelto.pieza.id)) {
-    if (csgEdAlgoEscritoDe(suelto.pieza, suelto.material, suelto.tituloMano)) {
-      const obj = csgEdVolcar(csgEdClonar(suelto.pieza), suelto.material).obj;
-      csgAviso('💾 Lo que tenías a medio escribir se guardó en el anaquel: «' + (obj.titulo || csgEdNombreDeForma(obj)) + '»');
-    }
-    csgBorradorBorra(suelto.pieza.id);
+  if (suelto && !suelto.guardada && suelto.pieza.id !== entrada.id) {
+    if (csgEdAlgoEscritoDe(suelto.pieza, suelto.material, suelto.tituloMano)) csgBorradorRescata(suelto);
+    else csgBorradorBorra(suelto.pieza.id);
+    if (_csgEdPieza && _csgEdPieza.id === suelto.pieza.id) _csgEdRecuperar = null;
   }
 
   const pistas = _csgEdPistas.get(entrada) || {};
   const copia = csgEdClonar(entrada);
   const enLista = csgDe(copia.id);
   let nueva = !enLista;
-  if (enLista && enLista.eliminado) { copia.id = csgNuevoId(); nueva = true; }
+  const deRetirada = !!(enLista && enLista.eliminado);
+  if (deRetirada) { copia.id = csgNuevoId(); nueva = true; }
 
   let material = String(copia.material || '');
   let recuperar = null;
@@ -8212,6 +8493,14 @@ function csgAbrirCompositor(pieza, opts) {
     if (!_csgEdAuto.tituloMano) csgEdProponerTitulo();
     else if (!csgEdTexto('nombre').trim()) csgEdProponerNombre();
   }
+  /* Un duplicado (§6.9: «una pieza nueva SIN guardar») y la copia de una
+     pieza retirada tienen original: su huella de ahora, con el título ya
+     propuesto, es lo que hay que cambiar para que ‹ la guarde. */
+  const duplicado = !!(pistas.duplicadoDe && csgDe(pistas.duplicadoDe));
+  if (nueva && (duplicado || deRetirada)) {
+    _csgEdBaseNueva = csgEdHuella(_csgEdPieza, _csgEdMaterial);
+    _csgEdBaseNuevaQue = duplicado ? 'duplicado' : 'retirada';
+  }
   switchView('view-consigna-editor');
   csgEdPintar();
   csgEdFocoInicial(op.foco || '');
@@ -8238,7 +8527,13 @@ function csgEdEmpezar(copia, cfg) {
   _csgEdCual = null;
   _csgEdScroll = 0;
   _csgEdGuardado = _csgEdNueva ? '' : 'si';
-  _csgEdNubeEd = (!_csgEdNueva && copia.subida === false) ? 'local' : '';
+  _csgEdBaseNueva = '';
+  _csgEdBaseNuevaQue = '';
+  if (cfg.orig !== undefined) _csgEdOrig = cfg.orig;
+  else {
+    const enL = _csgEdNueva ? null : csgDe(copia.id);
+    _csgEdOrig = enL ? csgEdFoto(enL, enL.material) : null;
+  }
   _csgEdPara = false;
   if (!_csgEdNueva) {
     try { _csgEdPara = csgRevisar(copia, copia.maquina).para.length > 0; } catch (e) { _csgEdPara = false; }
@@ -8283,8 +8578,8 @@ function csgEdPintar() {
   const sc = csgEdScrollEl();
   const y = sc ? sc.scrollTop : 0;
   root.textContent = '';
-  _csgEdTa = {};
-  _csgEdCartas = {};
+  _csgEdTa = Object.create(null);
+  _csgEdCartas = Object.create(null);
   _csgEdFilaEl = null;
   _csgEdVarsEl = null;
   _csgEdContEl = null;
@@ -8322,10 +8617,27 @@ function csgEdPintarEstado() {
   if (csgEdSucio()) t = 'Sin guardar';
   else if (_csgEdGuardado === 'si') {
     if (_csgEdPara) t = '🟡 Borrador';
-    else if (_csgEdNubeEd === 'local') t = '📴 Solo aquí';
+    else if (csgEdEstadoNube() === 'local') t = '📴 Solo aquí';
     else t = 'Guardado ✓';
   }
   el.textContent = t;
+}
+
+/* ⚠️ SI LLEGÓ A LA NUBE SE LEE DE LA PIEZA, NO DE UNA PALABRA GUARDADA.
+   La palabra se fijaba una vez, al volver la subida: guardado mientras la
+   primera bajada todavía miraba, la subida rebotaba («aún no se sabe si
+   hay tabla»), se quedaba en «📴 Solo aquí», y cuando la bajada terminaba
+   y subía la pieza nadie la repintaba. 'espera' mientras hay algo en
+   camino (el respiro de csgSubirLuego o la carga), 'ok' si subió, y
+   'local' solo cuando no subió y no hay nada que lo vaya a intentar. */
+function csgEdEstadoNube() {
+  const p = _csgEdPieza;
+  const obj = p && csgDe(p.id);
+  if (!obj) return 'local';
+  if (obj.subida === true) return 'ok';
+  if (_csgLuego[obj.id] || _csgInitEnCurso) return 'espera';
+  if (!obj.motivo) return 'espera';
+  return 'local';
 }
 
 /* ── Los bloques ───────────────────────────────────────────────────── */
@@ -8377,6 +8689,10 @@ function csgEdFranjaRecuperar() {
     const id = _csgEdPieza.id;
     _csgEdPieza = csgEdClonar(r.pieza);
     _csgEdPieza.id = id;
+    /* Contra lo que había CUANDO se escribió aquello: si otro aparato la
+       corrigió desde entonces, guardar lo dirá y no lo pisará sin rastro. */
+    const o = csgEdFotoValida(r.orig);
+    if (o) _csgEdOrig = o;
     _csgEdMaterial = String(r.material || '');
     _csgEdPieza.material = _csgEdMaterial;
     _csgEdAuto = { tituloMano: r.tituloMano !== undefined ? !!r.tituloMano : !!String(_csgEdPieza.titulo || '').trim(), nombre: String(r.autoNombre || '') };
@@ -8391,6 +8707,28 @@ function csgEdFranjaRecuperar() {
     csgAviso('Descartados los cambios que no se guardaron');
   }));
   return el;
+}
+
+/* ⚠️ ESCRIBIR CON LA FRANJA PUESTA NO PISA LO DE ANTES. La primera tecla
+   escribía el borrador de ahora encima del que se estaba ofreciendo (lo
+   de antes quedaba solo en memoria: cerrar la aplicación lo perdía), y
+   después «Seguir» tiraba lo recién escrito de UN toque. Ahora, al primer
+   cambio, lo de antes se guarda aparte como otra consigna y se dice: las
+   dos versiones siguen, y la persona decide con calma cuál se queda. */
+function csgEdApartarRecuperar() {
+  const r = _csgEdRecuperar;
+  _csgEdRecuperar = null;
+  if (typeof document !== 'undefined' && document.querySelectorAll) {
+    document.querySelectorAll('#csg-ed .csg-ed-recuperar').forEach(x => x.remove());
+  }
+  if (!r || !r.pieza) return null;
+  const copia = csgEdClonar(r.pieza);
+  copia.id = csgNuevoId();
+  const base = String(copia.titulo || '').replace(/\s+/g, ' ').trim() || csgEdNombreDeForma(copia);
+  copia.titulo = csgCorta(base + ' (lo que no se guardó)', CSG_TOPES.titulo);
+  const obj = csgEdVolcar(copia, r.material, null).obj;
+  csgAviso('💾 Lo que tenías sin guardar' + (r.t ? ' ' + csgHace(r.t) : '') + ' se guardó aparte: «' + obj.titulo + '»');
+  return obj;
 }
 
 /* Lo que el lector nombró al repartir lo pegado (regla 8: lo que no se
@@ -8591,7 +8929,12 @@ function csgEdFrases(card, ta, def) {
     const frase = String(fr);
     if (!frase) return;
     const on = !!csgEdRenglonDe(ta.value, frase);
-    const ch = csgEl('button', 'csg-frase' + (on ? ' on' : ''), frase);
+    /* La frase en su propio span, cortado a dos renglones por el CSS; en
+       el `title`, entera. Es un texto NUESTRO (del vocabulario), no algo
+       escrito por una persona: puede ir a un atributo (regla 15). */
+    const ch = csgEl('button', 'csg-frase' + (on ? ' on' : ''));
+    ch.appendChild(csgEl('span', 'csg-frase-t', frase));
+    ch.title = frase;
     ch.type = 'button';
     ch.setAttribute('aria-pressed', on ? 'true' : 'false');
     noRobes(ch);
@@ -8742,6 +9085,7 @@ function csgEdAlEscribir(id, ta, chips, ej) {
 /* Lo que pasa en cada cambio, sea cual sea: la palabra del estado, la
    línea de variables y el contador, y el borrador con su respiro. */
 function csgEdTocado() {
+  if (_csgEdRecuperar && csgEdSucio()) csgEdApartarRecuperar();
   csgEdPintarEstado();
   csgEdPintarVars();
   csgEdPintarContador();
@@ -8824,7 +9168,13 @@ function csgEdEnfocarTa(ta) {
 
 /* Enfoca un bloque (abriéndolo si estaba plegado), con el cursor al
    final, y lo trae al CENTRO: con el teclado de la tableta arriba, un
-   recuadro enfocado al pie de la pantalla queda debajo del teclado. */
+   recuadro enfocado al pie de la pantalla queda debajo del teclado.
+   ⚠️ SALVO QUE EL RECUADRO SEA MÁS ALTO QUE EL HUECO: centrado, un bloque
+   de veinte aristas dejaba arriba y abajo lo que no cabe, y el cursor
+   —que va al FINAL— se quedaba debajo de la barra fija justo cuando el
+   repaso decía «✎ Ir a…». Alto, se alinea por abajo, que respeta el
+   scroll-padding-bottom de la vista: lo que queda a la vista es el
+   cursor, que es donde se va a escribir. */
 function csgEdEnfocar(id) {
   if (!id) return false;
   if (!_csgEdTa[id]) csgEdAbrirBloque(id);
@@ -8833,7 +9183,12 @@ function csgEdEnfocar(id) {
   csgEdEnfocarTa(ta);
   const n = ta.value.length;
   try { ta.setSelectionRange(n, n); } catch (e) {}
-  try { ta.scrollIntoView({ block: 'center' }); } catch (e) {}
+  let hueco = Infinity;
+  try {
+    const sc = csgEdScrollEl();
+    if (sc && sc.clientHeight) hueco = sc.clientHeight - (parseFloat(getComputedStyle(sc).scrollPaddingBottom) || 0);
+  } catch (e) { hueco = Infinity; }
+  try { ta.scrollIntoView({ block: ta.offsetHeight > hueco * 0.8 ? 'end' : 'center' }); } catch (e) {}
   return true;
 }
 
@@ -8966,8 +9321,14 @@ function csgEdPintarHojaMolde(cuerpo) {
   const p = _csgEdPieza;
   if (!p) return;
   const actual = csgEdMolde(p);
-  const clase = (actual && actual.clase) || p.clase || 'prompt';
-  const ids = (CSG_MOLDES_ORDEN[clase] || []).filter(id => csgEdMoldeDe(id));
+  /* ⚠️ La clase de la fila pasa por csgClaseDe, como en la ficha. Es un
+     dato de la base y la base no lo limita a una lista (vive en el
+     aparato): una fila tocada a mano con clase «constructor» indexaba
+     CSG_MOLDES_ORDEN por una propiedad de Object y la hoja reventaba, y
+     con «xyz» se abría vacía. Las dos veces, sin forma de volver a
+     ponerle un molde desde el compositor. */
+  const clase = (actual && actual.clase) || csgClaseDe(p.clase).id;
+  const ids = (Object.prototype.hasOwnProperty.call(CSG_MOLDES_ORDEN, clase) ? CSG_MOLDES_ORDEN[clase] : []).filter(id => csgEdMoldeDe(id));
   const res = _csgEdCual && _csgEdCual.resultado;
   /* Cada renglón con el emoji de su clase, en su tono, como en «Duplicar
      en otro molde»: con la baldosa solo en el puesto (un ✓, repetido
@@ -9426,7 +9787,7 @@ function csgEdArreglo(a) {
     /* Primero se guarda esta, y DESPUÉS se duplica: así el duplicado sabe
        que la de origen ya está en el anaquel y le pone el nombre del
        molde detrás, en vez de nacer con el mismo título que ella. */
-    if (_csgEdNueva ? csgEdAlgoEscrito() : csgEdSucio()) csgEdGuardar('callado');
+    if (csgEdHayQueGuardar()) csgEdGuardar('callado');
     const dup = csgDuplicarEnMolde(_csgEdPieza || p, a.molde);
     csgAbrirCompositor(dup);
     csgAviso('Duplicada en ' + CSG_MOLDES[a.molde].nombre + ': sin guardar; lo que no encontró sitio va al final, marcado.');
@@ -9450,9 +9811,16 @@ function csgEdArreglo(a) {
    estantes). La bitácora, las versiones, los usos y el cuaderno viven en
    el objeto de la lista y pueden haber cambiado mientras se escribía
    —un uso desde otra hoja, la nube que llegó—; volcarlos desde una copia
-   hecha antes los borraría sin ningún aviso. */
-function csgEdVolcar(p, materialCompositor) {
-  const titulo = csgCorta(String(p.titulo || '').replace(/\s+/g, ' ').trim(), CSG_TOPES.titulo);
+   hecha antes los borraría sin ningún aviso.
+   ⚠️ Y DE ESOS, SOLO LOS QUE LA PERSONA CAMBIÓ: los que difieren de
+   `orig`, la foto de lo que había al abrir (_csgEdOrig). Por lo mismo: un
+   título corregido aquí no puede deshacer el texto que otro aparato
+   corrigió mientras tanto, ni los estantes que puso el menú ⋯. Si los dos
+   cambiaron el texto, gana el de aquí —es lo que se está viendo— y el de
+   allá se guarda como versión y se dice (`pisada`): nada se pierde sin
+   rastro. Sin foto (un borrador viejo), se escribe todo, como antes. */
+function csgEdVolcar(p, materialCompositor, orig) {
+  const titulo = csgEdTituloNorm(p.titulo);
   const limpios = csgEdBloquesParaGuardar(p);
   const matC = String(materialCompositor == null ? '' : materialCompositor);
   const grande = csgLargoTexto(matC) > CSG_TOPES.material;
@@ -9463,18 +9831,26 @@ function csgEdVolcar(p, materialCompositor) {
 
   let obj = csgDe(p.id);
   if (obj && obj.eliminado) { p.id = csgNuevoId(); obj = null; }
-  let nuevaV = 0;
+  let nuevaV = 0, pisada = 0;
   if (obj) {
-    const antes = csgMdCrudo(obj);
-    const despues = csgMdCrudo({ clase, molde: p.molde, bloques: limpios });
-    if ((obj.usos || 0) > 0 && antes !== despues) nuevaV = csgNuevaVersion(obj, obj.bloques || []);
-    obj.titulo = titulo;
-    obj.clase = clase;
-    obj.molde = String(p.molde || obj.molde || '');
-    obj.maquina = String(p.maquina || obj.maquina || '');
-    obj.bloques = limpios;
-    obj.material = material;
-    obj.estantes = estantes;
+    const o = (orig && typeof orig === 'object') ? orig : null;
+    if (!o || csgEdForma(p) !== o.forma) {
+      const antes = csgMdCrudo(obj);
+      const despues = csgMdCrudo({ clase, molde: p.molde, bloques: limpios });
+      if (antes !== despues) {
+        /* ¿La cambió OTRO mientras tanto? Entonces su texto no se pisa sin
+           más: queda como versión, aunque no se haya usado nunca. */
+        if (o && csgEdForma(obj) !== o.forma) { nuevaV = csgNuevaVersion(obj, obj.bloques || []); pisada = nuevaV; }
+        else if (csgEdVersionUsada(obj)) nuevaV = csgNuevaVersion(obj, obj.bloques || []);
+      }
+      obj.clase = clase;
+      obj.molde = String(p.molde || obj.molde || '');
+      obj.bloques = limpios;
+    }
+    if (!o || titulo !== o.titulo) obj.titulo = titulo;
+    if (!o || String(p.maquina || '') !== o.maquina) obj.maquina = String(p.maquina || obj.maquina || '');
+    if (!o || JSON.stringify(estantes) !== JSON.stringify(o.estantes)) obj.estantes = o ? csgEdMezclaEstantes(obj.estantes, o.estantes, estantes) : estantes;
+    if (!o || material !== o.material) obj.material = material;
     if (!obj.autor) obj.autor = csgAutor();
   } else {
     obj = csgNuevaPieza(clase, p.molde);
@@ -9492,7 +9868,7 @@ function csgEdVolcar(p, materialCompositor) {
   const promesa = csgSubirLuego(obj);
   const localOk = !_csgSinEspacio;
   if (typeof csgMaquinaApunta === 'function' && obj.maquina) csgMaquinaApunta(obj.maquina);
-  return { obj, nuevaV, grande, promesa, localOk };
+  return { obj, nuevaV, pisada, grande, promesa, localOk };
 }
 
 /* modo: 'boton' (💾), 'usar' (▶), 'volver' (‹) o 'callado' (al cambiar
@@ -9503,6 +9879,16 @@ function csgEdVolcar(p, materialCompositor) {
 function csgEdGuardar(modo, luego) {
   const p = _csgEdPieza;
   if (!p) return null;
+  /* ⚠️ 💾 SIN CAMBIOS NO ESCRIBE NADA. Escribía la copia de trabajo
+     entera: con la nube recién llegada (otro aparato había corregido la
+     pieza), un 💾 sin tocar nada devolvía la pieza a como estaba al abrir,
+     y sobre una retirada en otro aparato la hacía nacer de nuevo. */
+  if (modo === 'boton' && !_csgEdNueva && !csgEdSucio()) {
+    const ya = csgDe(p.id);
+    csgEdPintarEstado();
+    csgAviso(ya && ya.eliminado ? 'Sin cambios: la retiraron en otro aparato, y no hay nada que guardar' : 'Sin cambios: ya estaba guardada');
+    return ya;
+  }
   const k = csgClave(String(p.titulo || ''));
   if (k && (modo === 'boton' || modo === 'usar') && _csgEdIgual !== k) {
     const otra = csgVivas().find(x => x && x.id !== p.id && csgClave(x.titulo || '') === k);
@@ -9513,22 +9899,37 @@ function csgEdGuardar(modo, luego) {
      escribía, lo escrito entra como pieza nueva): el borrador que hay que
      soltar es el del id de ANTES. */
   const idAntes = p.id;
-  const r = csgEdVolcar(p, _csgEdMaterial);
+  const r = csgEdVolcar(p, _csgEdMaterial, _csgEdNueva ? null : _csgEdOrig);
   const obj = r.obj;
 
   _csgEdNueva = false;
+  _csgEdBaseNueva = '';
+  _csgEdBaseNuevaQue = '';
   p.version = obj.version;
-  _csgEdBase = csgEdHuella(p, _csgEdMaterial);
+  /* La copia se pone al día con lo que QUEDÓ en la lista: si se juntó con
+     algo de fuera (el texto de otro aparato que no se tocó aquí, un
+     estante del menú ⋯), seguir con la copia vieja lo volvería a pisar en
+     el siguiente 💾. Solo se repinta si de verdad cambió algo. */
+  const matVista = r.grande ? _csgEdMaterial : String(obj.material || '');
+  let repintar = false;
+  if (csgEdHuella(p, _csgEdMaterial) !== csgEdHuella(obj, matVista)) {
+    const c = csgEdClonar(obj);
+    c.material = _csgEdMaterial;
+    _csgEdPieza = c;
+    repintar = true;
+  }
+  _csgEdOrig = csgEdFoto(obj, obj.material);
+  _csgEdBase = csgEdHuella(_csgEdPieza, _csgEdMaterial);
   _csgEdGuardado = 'si';
   let rep = null;
   try { rep = csgRevisar(obj, obj.maquina); } catch (e) { rep = null; }
   _csgEdPara = !!(rep && rep.para.length);
-  _csgEdNubeEd = r.localOk ? 'espera' : 'local';
   /* El material de más de 20.000 no va con la pieza: se queda en el
      borrador, marcado como ya guardado, para la hoja de Usar. */
   if (r.grande) csgBorradorEscribe(true);
   else { csgBorradorBorra(idAntes); csgBorradorBorra(p.id); }
   _csgEdRecuperar = null;
+  if (repintar && modo !== 'volver' && modo !== 'callado' && csgEdEnVista()) csgEdPintar();
   csgEdPintarEstado();
   if (typeof csgPintarAnaquel === 'function') csgPintarAnaquel();
 
@@ -9542,24 +9943,23 @@ function csgEdGuardar(modo, luego) {
       const falta = (typeof csgFaltaDe === 'function' ? csgFaltaDe(obj) : '') || (rep && rep.para[0] ? rep.para[0].msg : '');
       partes.push('🟡 Guardada como borrador' + (falta ? ' · ' + falta : ''));
     } else partes.push('💾 Guardada');
-    if (r.nuevaV) partes.push('ahora es la v' + r.nuevaV + ' (la anterior queda en Versiones)');
+    if (r.pisada) partes.push('la cambiaron en otro aparato mientras escribías: aquel texto queda como v' + (r.pisada - 1) + ' en 🕘 Versiones');
+    else if (r.nuevaV) partes.push('ahora es la v' + r.nuevaV + ' (la anterior queda en Versiones)');
     if (r.grande) partes.push('el 📎 material de ' + csgMiles(csgLargoTexto(_csgEdMaterial)) + ' caracteres no va con la pieza: pégalo al usar');
     const notable = _csgEdPara || r.nuevaV || r.grande;
     if (modo === 'boton' || (modo === 'volver' && notable) || (modo === 'usar' && r.nuevaV)) aviso = partes.join(' · ');
-    else if (modo === 'callado') aviso = '💾 Guardada «' + (obj.titulo || csgEdNombreDeForma(obj)) + '»';
+    else if (modo === 'callado') aviso = '💾 Guardada «' + (obj.titulo || csgEdNombreDeForma(obj)) + '»' + (r.pisada ? ' · ' + partes[1] : '');
   }
   if (aviso) csgAviso(aviso);
 
   const id = obj.id;
   Promise.resolve(r.promesa).then(res => {
-    if (_csgEdPieza && _csgEdPieza.id === id && !csgEdSucio()) {
-      _csgEdNubeEd = (res && res.ok) ? 'ok' : 'local';
-      csgEdPintarEstado();
-    }
+    if (_csgEdPieza && _csgEdPieza.id === id) csgEdPintarEstado();
     if (typeof csgPintarAnaquel === 'function') csgPintarAnaquel();
     /* La causa se nombra (regla 18), y solo tras el 💾: después de ‹ o
-       de ▶ la franja del anaquel y la hoja ya lo dicen. */
-    if (!(res && res.ok) && modo === 'boton' && r.localOk && csgEdEnVista()) {
+       de ▶ la franja del anaquel y la hoja ya lo dicen. Y «aún se está
+       mirando la nube» no es una causa: subirá al acabar de mirar. */
+    if (!(res && res.ok) && res && res.motivo !== 'sin-nube' && modo === 'boton' && r.localOk && csgEdEnVista()) {
       const n = csgRotuloNube();
       if (!n.ok) csgAviso(n.ic + ' ' + n.t);
     }
@@ -9572,19 +9972,45 @@ function csgEdGuardar(modo, luego) {
 /* «Ya hay una «X» · abrirla · guardar igual» (§5, paso 5), en la hoja
    vertical y no con confirm(): tres renglones de 44 px con la palabra de
    lo que hacen. */
+/* ¿Lo del compositor dice EXACTAMENTE lo mismo que `otra`? Los bloques
+   en md (sin rellenar nada) y el material: el título ya se sabe que es
+   igual, que es por lo que se pregunta. */
+function csgEdMismoQue(otra) {
+  const p = _csgEdPieza;
+  if (!p || !otra) return false;
+  const molde = csgEdMolde(p);
+  const aqui = csgMdCrudo({ clase: (molde && molde.clase) || p.clase, molde: p.molde, bloques: csgEdBloquesParaGuardar(p) });
+  return aqui === csgMdCrudo(otra) && String(_csgEdMaterial || '').trim() === String(otra.material || '').trim();
+}
+
 function csgEdHojaRepetido(otra, modo, luego) {
   const k = csgClave(String(otra.titulo || ''));
+  /* ⚠️ «ABRIR LA QUE YA HAY» NO TIRA LO ESCRITO. Tiraba el texto y el
+     borrador de un solo toque, sin rastro, cuando tirar texto cuesta DOS
+     toques en todo lo demás de la herramienta (Descartar, en ＋ Nueva y en
+     el anaquel). Ahora: si lo de aquí es la MISMA consigna —el caso de
+     siempre, pegada dos veces— no hay nada que perder y se suelta; si dice
+     otra cosa, se guarda aparte antes de abrir la otra (como hace
+     csgAbrirCompositor con cualquier copia sin guardar), y el renglón lo
+     dice ANTES del toque. */
+  const mismo = csgEdMismoQue(otra);
   csgVerAbrir('Ya hay una «' + (otra.titulo || CSG_SIN_TITULO) + '»', cuerpo => {
     cuerpo.appendChild(csgEl('div', 'csg-nota', 'Casi siempre es la misma consigna escrita dos veces. Dos pueden llamarse igual: se dice para que no se te pase.'));
     cuerpo.appendChild(csgVerFila('📜', 'Abrir la que ya hay', null, null, () => {
       csgVerCerrar();
-      /* Se abre la otra y ESTA se deja sin guardar, como dice el
-         renglón: es lo que se elige al ver que ya existía. */
-      clearTimeout(_csgEdBorradorT);
-      if (_csgEdPieza) csgBorradorBorra(_csgEdPieza.id);
-      _csgEdPieza = null;
+      if (_csgEdPieza) {
+        if (csgEdMismoQue(otra)) {
+          clearTimeout(_csgEdBorradorT);
+          csgBorradorBorra(_csgEdPieza.id);
+          _csgEdPieza = null;
+          _csgEdRecuperar = null;
+        } else {
+          _csgEdIgual = k;
+          csgEdGuardar('callado');
+        }
+      }
       csgAbrirCompositor(otra);
-    }, 'lo escrito aquí no se guarda'));
+    }, mismo ? 'dice lo mismo: esta no hace falta guardarla' : 'lo escrito aquí se guarda aparte, no se pierde'));
     cuerpo.appendChild(csgVerFila('💾', 'Guardar igual', null, null, () => {
       csgVerCerrar();
       _csgEdIgual = k;
@@ -9605,14 +10031,59 @@ function csgEdVolver() {
   const p = _csgEdPieza;
   clearTimeout(_csgEdPreviaT);
   if (p) {
-    if (_csgEdNueva) {
-      if (csgEdAlgoEscrito()) csgEdGuardar('volver');
-      else { clearTimeout(_csgEdBorradorT); csgBorradorBorra(p.id); }
-    } else if (csgEdSucio()) csgEdGuardar('volver');
-    else csgBorradorAhora();
+    if (csgEdHayQueGuardar()) csgEdGuardar('volver');
+    else if (_csgEdNueva) {
+      clearTimeout(_csgEdBorradorT);
+      csgBorradorBorra(p.id);
+      /* Un duplicado que nadie tocó no deja una ficha de más (§6.9): se
+         dice, para que no parezca que se perdió. */
+      if (_csgEdBaseNueva) {
+        csgAviso(_csgEdBaseNuevaQue === 'duplicado'
+          ? 'La copia no se guardó: no la tocaste, y la original sigue igual'
+          : 'Sin cambios: no se guardó nada');
+      }
+      _csgEdPieza = null;
+    } else csgBorradorAhora();
   }
+  _csgAnqVuelta = true;
   switchView('view-consigna');
   if (typeof csgPintarAnaquel === 'function') csgPintarAnaquel();
+}
+
+/* Lo que hace el compositor cuando llega la nube (al abrir el anaquel o
+   al volver la señal): su estado dice si la pieza subió ya, y una copia
+   LIMPIA se pone al día con lo que trajo, para no enseñar —ni tomar como
+   punto de partida— lo que otro aparato ya cambió. Si la persona está
+   escribiendo (el foco en un recuadro) no se toca: repintar le cerraría
+   el teclado, y la copia vieja ya no puede pisar nada al guardar (se
+   escribe solo lo que cambió). */
+function csgEdTrasNube() {
+  if (typeof document === 'undefined' || !document || !document.getElementById) return;
+  const p = _csgEdPieza;
+  if (p && !_csgEdNueva && !_csgEdRecuperar && !csgEdSucio()) {
+    const obj = csgDe(p.id);
+    if (obj && !obj.eliminado) {
+      const grande = csgLargoTexto(_csgEdMaterial) > CSG_TOPES.material && !String(obj.material || '');
+      const mat = grande ? _csgEdMaterial : String(obj.material || '');
+      const ae = document.activeElement;
+      const raiz = document.getElementById('view-consigna-editor');
+      const escribiendo = !!(ae && raiz && raiz.contains(ae) && /^(TEXTAREA|INPUT)$/.test(ae.tagName));
+      if (csgEdHuella(obj, mat) !== _csgEdBase && !(csgEdEnVista() && escribiendo)) {
+        const c = csgEdClonar(obj);
+        c.material = mat;
+        _csgEdPieza = c;
+        _csgEdMaterial = mat;
+        _csgEdOrig = csgEdFoto(obj, obj.material);
+        _csgEdBase = csgEdHuella(c, mat);
+        try { _csgEdPara = csgRevisar(c, c.maquina).para.length > 0; } catch (e) { _csgEdPara = false; }
+        if (csgEdEnVista()) {
+          csgEdPintar();
+          csgAviso('↻ Esta consigna cambió en otro aparato: ya se ve lo último');
+        }
+      } else if (csgEdHuella(obj, mat) === _csgEdBase) _csgEdOrig = csgEdFoto(obj, obj.material);
+    }
+  }
+  csgEdPintarEstado();
 }
 
 /* ▶ Usar: guarda lo que haya cambiado y abre la hoja de Usar con la
@@ -9734,7 +10205,13 @@ const CSG_PEG_RESPIRO = 600;
 let _csgUsarPieza = null;        // la pieza que se está usando (la de la lista, casi siempre)
 let _csgUsarMaquina = '';        // la máquina elegida en la hoja
 let _csgUsarNombres = [];        // las variables que se preguntan (sin las reservadas)
-let _csgUsarValores = {};        // nombre → lo escrito ahora mismo
+/* ⚠️ Los mapas de valores van SIN PROTOTIPO (Object.create(null)): el
+   nombre de una variable lo escribe una persona, y en un objeto normal
+   `valores['__proto__'] = ''` no crea ninguna llave —cambia el
+   prototipo—, y leerla devuelve Object.prototype. Así {{__proto__}}
+   salía rellena con «[object Object]», no paraba Copiar, se copiaba con
+   el hueco puesto y el uso reventaba sin apuntarse. */
+let _csgUsarValores = Object.create(null);   // nombre → lo escrito ahora mismo
 let _csgUsarMaterial = '';       // el material de ESTE uso (no se guarda)
 let _csgUsarArmado = null;       // lo último que salió de csgArmar: es lo que se copia
 let _csgUsarRep = null;          // el repaso para la máquina elegida
@@ -9831,7 +10308,10 @@ function csgUsarNombres(p) {
 function csgVarsLee() {
   let d = null;
   try { d = JSON.parse(localStorage.getItem(CSG_CLAVES.vars)); } catch (e) { d = null; }
-  return (d && typeof d === 'object' && !Array.isArray(d)) ? d : {};
+  /* Sin prototipo, como los valores de la hoja: las llaves son ids de
+     pieza y nombres de variable, y un «__proto__» escrito aquí cambiaría
+     el prototipo del objeto en vez de guardarse. */
+  return Object.assign(Object.create(null), (d && typeof d === 'object' && !Array.isArray(d)) ? d : {});
 }
 function csgVarsUltimos(id, nombre) {
   if (!id) return [];
@@ -9844,7 +10324,7 @@ function csgVarsApunta(id, nombres, valores) {
   if (!id || !Array.isArray(nombres) || !nombres.length) return;
   const todo = csgVarsLee();
   const viejo = todo[id];
-  const de = (viejo && typeof viejo === 'object' && !Array.isArray(viejo)) ? viejo : {};
+  const de = Object.assign(Object.create(null), (viejo && typeof viejo === 'object' && !Array.isArray(viejo)) ? viejo : {});
   let cambio = false;
   nombres.forEach(n => {
     const v = String((valores && valores[n]) == null ? '' : valores[n]).trim();
@@ -10005,7 +10485,7 @@ function csgAbrirUsar(pieza, opts) {
   }
   _csgUsarMaterial = mat;
   _csgUsarNombres = csgUsarNombres(pieza);
-  _csgUsarValores = {};
+  _csgUsarValores = Object.create(null);
   _csgUsarNombres.forEach(n => { _csgUsarValores[n] = csgVarsUltimos(pieza.id, n)[0] || ''; });
   _csgUsarApuntado = '';
   _csgUsarExtraK = '';
@@ -10261,6 +10741,17 @@ function csgUsarPintarRepaso() {
    repinta lo que depende de eso. Lo que se pinta en el <pre> es lo que
    se guarda en _csgUsarArmado, y lo que se copia sale de ahí: el mismo
    objeto, no un segundo armado (regla 1). */
+/* Lo que el navegador deja libre al pie al seguir al cursor: el alto de
+   verdad del pie pegado, más un respiro (ver .fin-modal.csg-modal en
+   consigna.css). Medido y no escrito, porque el pie cambia de alto. */
+function csgUsarAltoPie() {
+  const pie = document.getElementById('csg-usar-pie');
+  const hoja = pie && pie.closest ? pie.closest('.fin-modal') : null;
+  if (!pie || !hoja) return;
+  const h = pie.offsetHeight;
+  if (h) hoja.style.scrollPaddingBottom = (h + 12) + 'px';
+}
+
 function csgUsarRefrescar() {
   const el = _csgUsarEl;
   const p = _csgUsarPieza;
@@ -10310,6 +10801,7 @@ function csgUsarRefrescar() {
   csgUsarMuestra(el.abrir, !!d.url);
   const t = el.abrir.querySelector('.csg-btn-t');
   if (t) t.textContent = 'Abrir ' + (d.ligado ? 'su cuaderno' : maq.nombre) + (d.lleno ? '' : ' (copiado: pega ahí)');
+  csgUsarAltoPie();
 }
 
 /* El texto armado en el <pre>, troceado a mano para marcar en ámbar lo
@@ -10428,7 +10920,7 @@ function csgUsarTexto(que) {
    vuelve cuando la persona eligió a quién, y para entonces la hoja puede
    estar cerrada o con otros valores. */
 function csgUsarFoto() {
-  const vals = {};
+  const vals = Object.create(null);
   _csgUsarNombres.forEach(n => { vals[n] = String(_csgUsarValores[n] == null ? '' : _csgUsarValores[n]); });
   return { p: _csgUsarPieza, maq: csgMaquina(_csgUsarMaquina).id, nombres: _csgUsarNombres.slice(), valores: vals, material: _csgUsarMaterial };
 }
@@ -10624,7 +11116,7 @@ function csgUsarCerrar() {
   _csgUsarArmado = null;
   _csgUsarRep = null;
   _csgUsarNombres = [];
-  _csgUsarValores = {};
+  _csgUsarValores = Object.create(null);
   _csgUsarMaterial = '';
   _csgUsarExtraK = '';
 }
@@ -10649,7 +11141,7 @@ function csgCopiarDirecto(pieza) {
     return Promise.resolve(false);
   }
   const nombres = csgUsarNombres(pieza);
-  const valores = {};
+  const valores = Object.create(null);       // sin prototipo: ver _csgUsarValores
   nombres.forEach(n => { valores[n] = csgVarsUltimos(pieza.id, n)[0] || ''; });
   let material = String(pieza.material || '');
   if (!material.trim() && typeof csgBorradorMaterial === 'function') {

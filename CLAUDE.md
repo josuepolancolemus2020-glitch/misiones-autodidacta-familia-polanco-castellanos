@@ -13,10 +13,13 @@ Lo largo está en otros documentos y aquí solo se apunta dónde:
   Grietas, ninguna construida todavía, y **la regla de que en esa ruta no se
   cita ningún artículo de memoria**.
 - **`PLAN-LA-CONSIGNA.md`** — 📜 La Consigna, pedida el 22 de septiembre de
-  2026 y **a medio construir**: el diseño entero (clases, moldes, bloques,
-  frases hechas y las salidas escritas una por una), qué está hecho y
-  comprobado, y **lo que falta, en orden**. Su SQL ya está probado; su
-  JavaScript está a medias y **no se cablea hasta que esté entero**.
+  2026 y **construida entera el 23**: el diseño (clases, moldes, bloques,
+  frases hechas y las salidas escritas una por una), que se queda como
+  referencia y **no se retoca a la ligera**, porque la prueba de Node saca
+  de ahí las salidas y compara el armado con ellas carácter por carácter.
+  Sus reglas, con lo que se aprendió al construirla, están aquí abajo, en
+  «Normativa: las consignas a las máquinas se escriben en La Consigna». Lo
+  único pendiente es **correr su SQL**, apuntado en `PLAN-FARO-PRIVADO.md`.
 
 ## Normativa: el SQL de Supabase se pega en el chat, SIEMPRE
 
@@ -1485,6 +1488,779 @@ Esa prueba mira la puerta dos veces y en el mismo orden que la de las
 redes, y comprueba que los checks muerden: sin dirección o sin nombre no
 entra, unos estantes o unas referencias que no sean una lista no entran,
 y la guardia de dependencias para nombrando el archivo.
+
+## Normativa: las consignas a las máquinas se escriben en La Consigna
+
+**Pedido por el autor el 22 de septiembre de 2026:** «necesito otra
+herramienta aparte, que se vea en el acceso rápido y sea con el propósito de
+que me facilites los mejores formatos tanto para realizar prompt, habilidades
+skills, grafo o loop en cuanto a las indicaciones que haga a diferentes
+inteligencias artificiales. Tenerlas inventariadas, debes crear toda una
+lógica de proceso que me facilite redactarlos con indicaciones programadas,
+busca la mejor idea posible para hacer esta herramienta y la ubiques en
+acceso rápido. Siempre visualmente atractivo, botones modernos etc.»
+
+Vive en `js/tools/consigna.js` y `css/consigna.css`, con su tabla en
+`supabase/sql/consigna.sql` y la comprobación aparte en
+`supabase/sql/consigna_comprueba.sql`. El JavaScript va en dos partes:
+primero el **núcleo** —el vocabulario de bloques, los diecisiete moldes, el
+armado, el lector de lo pegado, el repaso, la poda, la fusión y la nube—, que
+no toca la pantalla; y detrás del cartel «PANTALLA», el anaquel, el
+compositor y las hojas. En `index.html` son dos vistas —`#view-consigna`, el
+anaquel, y `#view-consigna-editor`, el compositor— y tres hojas colgadas del
+`body`: `#csg-ver-overlay` (la vertical), `#csg-usar-overlay` (usar) y
+`#csg-pegar-overlay` (pegar y repartir). Va en el Acceso Rápido **pegada a La
+Voz Prestada**, con 📜 y su baldosa oliva → lima, y **sin insignia**: las
+insignias son para lo que mandó otro y hay que atender, y los borradores
+propios serían ruido y una consulta más al arrancar.
+
+⚠️ **La especificación entera está en `PLAN-LA-CONSIGNA.md` y se queda como
+referencia:** el vocabulario, cada molde con sus rótulos, ejemplos y frases
+hechas, y **las salidas escritas una por una** (su §7). Esas salidas no son
+ilustración: la prueba de Node las saca de ese archivo y compara el armado
+con ellas carácter por carácter, y hace lo mismo con cada texto literal de
+los moldes. Corregir allí un ejemplo es cambiar lo que la herramienta tiene
+que armar. Aquí van las reglas.
+
+**NO es La Voz Prestada, aunque vayan pegadas: es su espejo.** Allá se guarda
+lo que la máquina ESCRIBIÓ; aquí se escribe, con forma, lo que se le PIDE
+—un 💬 prompt, una 🧰 habilidad (un SKILL.md o una instrucción de sistema),
+un 🕸 grafo de agentes o un 🔁 bucle—, se inventaría y se vuelve a usar. Se
+tocan en un solo sitio, y a propósito: en Voz prestada, Investigación y
+Careo la consigna ya le pide a la máquina que encabece lo que devuelva con
+la etiqueta de la casa, y «📖 Guardar lo que devolvió» abre la hoja de pegar
+de allá (regla 14).
+
+**Y NO llama a ninguna IA** (§12 del plan): no escribe, no mejora ni puntúa
+un prompt, y no ejecuta grafos ni bucles: los arma para que los corra un
+chat. Es la lección de la puerta de pago que tuvo un rato el taller de
+comprensión (La Voz Prestada, regla 35): una herramienta cuyo trabajo
+principal depende de una clave, de una función desplegada y de que haya
+señal no está terminada. Tampoco guarda lo que la máquina devolvió: eso es
+La Voz Prestada o Redacción.
+
+**Qué resuelve:** una consigna buena se escribía una vez, dentro de la
+ventana de un chat, y se iba con ella. La siguiente vez se reescribía de
+memoria —sin la regla que la había hecho funcionar— y nadie sabía cuál de
+las versiones había salido bien, ni con qué máquina. Y cada máquina lee
+mejor una forma distinta: Claude, cada bloque en su etiqueta; ChatGPT y
+Gemini, encabezados; NotebookLM, párrafos seguidos sin marcas, porque su
+recuadro enseña el texto crudo; y una habilidad con el frontmatter mal hecho
+no carga nunca, sin dar ningún error. Aquí se escribe una vez, por bloques
+guiados; la forma la pone la máquina elegida en el momento de usarla; se
+guarda con su bitácora y sus versiones; y volver a usarla son dos toques
+(▶ · 📋 Copiar).
+
+**Treinta y cuatro reglas, y ninguna es de adorno.** Las veintidós primeras
+son las del §10 del plan, con lo que se aprendió al construirlas; las doce
+de detrás salieron de construirla, revisarla y sondearla el 23 de septiembre
+de 2026, y cada una está escrita porque su avería ya pasó.
+
+1. ⚠️ **LO QUE SE COPIA ES LO QUE SE VE, CARÁCTER POR CARÁCTER.** La vista
+   previa, 📋 Copiar, ↗ Abrir, 📤 Compartir y el repaso salen de la MISMA
+   `csgArmar`, y la hoja de Usar copia el mismo texto que pintó en su
+   `<pre>`, no un segundo armado. Un prompt que sale distinto de como se vio
+   se descubre leyendo lo que la máquina devolvió, sin saber por qué.
+
+   ⚠️ **Y una sola copia de cada decisión.** El núcleo se escribió en cuatro
+   trozos a la vez, y donde dos decidían lo mismo —si un renglón es un par,
+   qué es «la misma palabra», cuánto sobra— se dejó UNA función y los demás
+   le preguntan a ella. El lector traía su propia regla de pares y en
+   «1) → b» no casaba con la del armado: el repaso de Con ejemplos contaba un
+   par menos de los que la vista previa pintaba. Hoy cuenta con `csgArmPar`.
+   Las tildes se quitan con una sola `csgSinTildes`, y el rango de las
+   marcas combinantes va escrito con ESCAPES: en claro son caracteres
+   invisibles que un editor se come al copiar el archivo, y la comparación
+   dejaría de quitar tildes sin ningún error.
+
+2. ⚠️ **LA PIEZA SON BLOQUES; LA FORMA ES DE LA MÁQUINA.** Nunca se guarda
+   un texto armado: `bloques` es una lista de `{id, rotulo, t}`, y la forma
+   —`xml` para Claude, `md` para ChatGPT, Gemini y «Otra», `seguida` para
+   NotebookLM, `skill` para un SKILL.md— se decide al usar. Guardar el texto
+   armado sería guardar una forma y perder las demás. `csgArmar` es pura:
+   sin DOM, sin almacén y sin red, y la prueba de Node apunta cualquier
+   toque.
+
+   ⚠️ **Y el material no puede cerrar el material.** Lo que se pega debajo
+   muchas veces es otro prompt («revisa este»), y si salió de aquí trae su
+   `</material>` o su «=== Fin del material ===»: el primer cierre de dentro
+   cerraba el material antes de tiempo, la máquina leía el resto como parte
+   de la consigna, y al volver a pegarlo el lector lo repartía entre la Tarea
+   y el Formato. Se neutraliza SOLO esa marca (`csgMaterialTraeCierre`: con
+   `&lt;` en `xml` y con una barra delante del renglón en las demás), y el
+   lector la deshace al leer (`csgLecMaterialDesescapa`).
+
+   ⚠️ **Y en `seguida` un bloque es UN párrafo.** Un bloque de dos párrafos
+   salía con su línea en blanco dentro, y en un recuadro de texto crudo la
+   línea en blanco es lo que separa un bloque del siguiente: un Gem o
+   NotebookLM leían la segunda mitad como una regla más, y el lector, al
+   volver a pegarlo, la mudaba a otro bloque.
+
+3. ⚠️ **UN VOCABULARIO ÚNICO; CADA MOLDE ES UNA LISTA DE IDS CON SUS
+   SOBREESCRITURAS DECLARADAS.** `CSG_BLOQUES` le da a cada id UN
+   significado; el molde solo elige cuáles, en qué orden y con qué palabras
+   (`rotulo`, `para_que`, `ejemplo`, `frases`, `inicial`, `plantilla`), y
+   `csgBloqueDef(molde, id)` es lo ÚNICO que consultan el compositor, el
+   armado y el repaso. `comprobacion` es un solo id en las cuatro clases: con
+   dos, pasar un Encargo a SKILL.md dejaba la comprobación como bloque libre.
+   Y «Duplicar en otro molde» no consulta nada más que el id y
+   `CSG_EQUIVALE`.
+
+   ⚠️ **Cambiar de molde no mueve ni tira texto.** Lo que el molde nuevo no
+   tiene se queda al final como BLOQUE LIBRE, marcado y nombrado en el
+   aviso, y volver al molde de antes lo deja todo como estaba. Lo único que
+   se descarta es el `inicial` sin tocar del molde viejo, que no lo escribió
+   nadie.
+
+4. ⚠️ **LAS LISTAS CERRADAS VIVEN EN EL APARATO; LOS TOPES, EN UN SITIO.**
+   Clases, moldes, bloques, frases, sinónimos y máquinas son JavaScript; la
+   base guarda `clase`, `molde` y `maquina` con un tope de largo y sin
+   lista. Añadir un molde o una máquina es una línea en un archivo, no una
+   migración que alguien pega desde una tableta (la regla 8 de la repisa).
+   Los topes viven en `CSG_TOPES` con los mismos números que los `check` de
+   `consigna.sql`, y la sonda los lee del propio archivo y suspende si uno
+   difiere… o si no puede leerlo.
+
+   ⚠️ **Y `CSG_TOPES` lleva TODOS los números, también los cortos** (clase,
+   molde, máquina, cuaderno, autor, versión). Estaban escritos a mano dentro
+   de `csgAFila`, donde nada los comparaba con el SQL: el día que el SQL
+   cambiara uno, el aparato mandaría de más sin enterarse, y la base
+   rebotaría con un mensaje de PostgreSQL que habla de un `check`.
+
+5. ⚠️ **GUARDAR NUNCA SE BLOQUEA; USAR SÍ.** Una pieza a medias es un
+   borrador, no un error: se guarda con lo que falta nombrado («🟡 borrador:
+   falta Formato», en la ficha) y lo que se para es USAR. Lo que no cabe en
+   la nube se guarda aquí y se dice cuánto sobra.
+
+6. ⚠️ **UNA VARIABLE VACÍA NO SE COPIA EN SILENCIO.** Un `{{hueco}}` se
+   detecta al escribir y se rellena al usar, nunca en la pieza. Con uno
+   vacío, 📋 Copiar se para y lo nombra; «Copiar con huecos» es OTRO botón.
+   `{{maquina}}`, `{{titulo}}` y `{{hoy}}` se rellenan solos, porque
+   preguntarlos sería pedir lo que la herramienta ya sabe. Los últimos
+   valores son POR PIEZA y del aparato (`faro_consigna_vars_v1`).
+
+7. ⚠️ **LOS CHIPS INSERTAN Y QUITAN SU FRASE EXACTA; NUNCA REESCRIBEN.** Un
+   toque mete la frase hecha en su propio renglón con `setRangeText` y un
+   `input` disparado a mano, para que corran los mismos ganchos que al
+   teclear; otro toque la quita si sigue idéntica; editada, el chip se
+   desmarca y no toca nada. El `pointerdown` va cancelado: tocar un botón se
+   lleva el foco, y con él el cursor y el teclado de la tableta, y la frase
+   caería donde el cursor ya no está.
+
+8. ⚠️ **PEGAR RESPETA LA ASIMETRÍA.** Es la de La Voz Prestada (su regla 3):
+   equivocarse hacia «esto es prosa» cuesta un renglón que se coloca a mano;
+   equivocarse hacia «esto es un rótulo» PARTE la consigna y parece que
+   funcionó. Solo asciende a rótulo lo corroborado —una etiqueta `<así>`, la
+   almohadilla, la negrita sola, o de una a tres palabras con dos puntos (o
+   un rótulo EN MAYÚSCULAS) cuya clave esté en `CSG_SINONIMOS`—, y la clave
+   es solo letras y espacios. Una flecha solo
+   es arista fuera de `ejemplos`, entre nombres cortos y en dos renglones o
+   más: un Con ejemplos con tres pares «a → b» es un Prompt, NUNCA un Grafo.
+   Un bucle solo se propone si no se reconoció ningún bloque de prompt. La
+   clase y el molde se PROPONEN con un chip y nunca se imponen, y la hoja de
+   Pegar no guarda nada: abre el compositor con una pieza sin guardar, para
+   que lo que el lector entendió mal no entre al anaquel sin que nadie lo
+   haya mirado.
+
+   ⚠️ **Nada se descarta, y la cuenta está a la vista:** palabras que
+   entraron y palabras que salieron. Lo que no se entiende se queda en su
+   bloque y se NOMBRA con su renglón y el rótulo bueno al lado («¿Querías
+   Contexto?»). Solo se nombra lo que INTENTABA ser un rótulo —en
+   mayúsculas, en negrita, entre otros rótulos con dos puntos, o a dos
+   letras de uno conocido—: «Viaja: el tema y las fuentes» o «Investigador:
+   recibe el tema» son contenido, y un aviso por cada uno haría de la lista
+   de avisos ruido que nadie lee. La errata («Contexo:») se nombra aunque no
+   tenga otros rótulos al lado: debajo de una sola frase de prosa se quedaba
+   callada, que es justo el caso para el que existe la sugerencia.
+
+9. ⚠️ **LA BITÁCORA SE PREGUNTA, NO SE RELLENA, Y NUNCA SE INVENTA UN
+   RESULTADO.** Usar apunta un uso con `ok: null`, y «¿sirvió? ✅ 〰 ❌ ✕» se
+   pregunta en la SIGUIENTE apertura del anaquel, en UN renglón y por UN uso
+   —el más reciente de los últimos siete días—: el «¿cómo salió?» inmediato
+   preguntaba antes de que la máquina contestara, y una bitácora que hay que
+   acordarse de escribir no la escribe nadie. ✕ deja el uso sin contestar
+   para siempre; ignorado tres aperturas seguidas, el renglón se pliega a
+   «N usos sin contestar ▸». Lo contestado viaja con la pieza; lo ignorado
+   es del aparato (`faro_consigna_pregunta_v1`).
+
+   ⚠️ **Y una apertura es una apertura de verdad**, que son tres cosas y las
+   tres se cazaron al revisarla. Solo se pregunta por los usos de ANTES de
+   abrir (`_csgAnqBitDesde`): sin esa foto, copiar y cerrar la hoja de Usar
+   hacía salir el renglón en el mismo repintado, que es el «¿cómo salió?»
+   inmediato por la puerta de atrás. Volver con ‹ desde el compositor NO
+   cuenta como apertura (`_csgAnqVuelta`): tres idas y vueltas a corregir
+   plegaban la pregunta como si se hubiera ignorado tres veces. Y el renglón
+   «✏️ Seguir con…» del borrador, que ocupa el mismo hueco, se lo queda UNA
+   vez por borrador: ganando siempre, un borrador sin decidir dejaba la
+   pregunta sin salir hasta que el uso cumplía siete días, y entonces ya no
+   se preguntaba nunca.
+
+   ⚠️ **Y 📋 Copiar seguido de ↗ Abrir con lo mismo es UN uso, no dos:** dos
+   entradas por una sola vez convierten la pregunta en ruido. Otro uso es
+   otra máquina, otros valores u otro material.
+
+10. ⚠️ **EL 👍 VA ATADO A LA VERSIÓN Y A LA MÁQUINA, Y NADA REESCRIBE EL
+    HISTORIAL.** Cada uso lleva su `v` y su máquina. Corregir una pieza que
+    ya se usó guarda lo de antes como versión y la pieza pasa a la
+    siguiente; «Volver a esta» no borra nada: crea una versión NUEVA con
+    aquel texto, y el 👍 de cada una sigue hablando de su texto. Si el texto
+    cambió lo decide el armado `md` SIN rellenar (`csgMdCrudo`), no
+    `csgArmar`: esa rellena `{{hoy}}` y haría nacer una versión cada día.
+
+    ⚠️ **Y solo nace una versión si la de AHORA ya se usó**
+    (`csgEdVersionUsada`). Naciendo en cada 💾, diez retoques eran diez
+    versiones que nadie había usado, y la poda plegaba a la undécima justo
+    el texto de la que sí tenía su 👍. Ahora tres 💾 seguidos sobre una
+    pieza usada hacen nacer UNA. Y «Volver a esta» sobre la versión que ya
+    es la actual dice «Esa ya es la de ahora» en vez de fabricar un gemelo.
+
+    ⚠️ **Y se PODA POR BYTES, midiendo como mide la base** (`csgPodar`,
+    `csgLargoBase`). Diez versiones con bloques de 60.000 no caben en
+    200.000: solo las diez más recientes conservan sus bloques, las demás
+    quedan en `{vid, v, t}` y la pantalla lo dice; la bitácora se queda en
+    200 usos, quitando antes los viejos sin contestar. Y el `check` es
+    `length(x::text)`, que escribe «": "» y «", "» con su espacio:
+    `[{"a":1,"b":2}]` son 15 caracteres en JavaScript y 17 en la base.
+    Medida con `JSON.stringify`, una bitácora de 200 usos «podada» rebotaba
+    igual con un 23514, porque el margen de la poda es de 2.000.
+
+11. ⚠️ **USOS Y VERSIONES SE FUSIONAN POR UNIÓN DE SU ID, NUNCA POR FILA
+    ENTERA.** Los escalares (título, bloques, material, estantes, máquina…)
+    los gana el `actualizado` más nuevo, como en la repisa, en Redes y en
+    Cuadernos. La bitácora y las versiones se juntan por `uid` y `vid`; un
+    uso con `ok` puesto gana a uno con `null` del mismo `uid`; y `usos` es
+    el mayor de los dos y nunca menos que la bitácora. Así dos aparatos que
+    usaron la misma pieza sin señal no se pisan la bitácora.
+
+    ⚠️ **Y el número de versión nunca retrocede.** Era un escalar más y lo
+    ganaba el reloj: con la tableta corrigiendo la v1 y el teléfono ya en la
+    v2 con su 👍, la fusión dejaba la pieza en la v1, el texto de la v2 no
+    estaba en ninguna parte, y la corrección siguiente fabricaba OTRA v2 que
+    heredaba un 👍 sin merecerlo. Ahora gana el mayor, y el texto del lado
+    que pierde se guarda como versión con un `vid` determinista: los dos
+    aparatos, fusionando cada uno por su lado, fabrican el mismo, y la unión
+    no lo duplica.
+
+    ⚠️ **Y la fusión escribe DENTRO del objeto que ya había** (`csgPisa`), sin
+    cambiarle el objeto a la lista. La hoja de Usar y el compositor guardan
+    referencias a sus piezas, y con un objeto nuevo se quedaban huérfanas:
+    el siguiente guardado volvía a meter la copia vieja y subía la fila de
+    ANTES de la fusión, y un uso apuntado sobre ella ni siquiera se guardaba
+    en el aparato.
+
+12. ⚠️ **EL BUCLE NO SE USA SIN TOPE, NI EL GRAFO CON VUELTA ATRÁS SIN FIN,
+    NI CON UNA ARISTA A NINGUNA PARTE.** Un bucle sin tope es un chat que no
+    termina; una arista a un nodo que no existe es un nodo que la máquina se
+    inventa. Las tres cosas PARAN el uso nombrando lo que falta, y guardar
+    se sigue pudiendo (regla 5). `FIN` es un nodo que existe siempre.
+
+13. ⚠️ **EL REPASO MIRA LO QUE CADA FORMATO EXIGE Y AVISA EN UN SOLO
+    SENTIDO.** `csgRevisar` corre en el aparato, sin red, y separa lo que
+    PARA —a la vista— de lo que AVISA —plegado tras su cuenta—: es la regla
+    12 de El Rodaje, porque un panel lleno de avisos que no importan no se
+    lee. Un frontmatter mal hecho no da error: la habilidad no carga NUNCA.
+    Por eso un `name` fuera de `^[a-z0-9]+(-[a-z0-9]+)*$` o de más de 64, o
+    una `description` vacía o de más de 1.024, PARAN. Avisan Perplexity sin
+    una regla que pida citar con dirección, NotebookLM con `<etiquetas>` en
+    el texto, un bloque hecho solo de frases hechas, el mismo título que
+    otra pieza y el «parece que se repite» de un Encargo que pedía un bucle.
+    Cada aviso que se arregla con una frase trae el chip que la mete.
+
+14. ⚠️ **LA ETIQUETA VIAJA EN LA IDA.** Voz prestada y Careo llevan el
+    bloque `etiqueta` obligatorio y ya relleno: le pide a la máquina que
+    encabece lo que devuelva con `Título:`, `Voz:`, `Máquina: {{maquina}}`,
+    `Género:` y `Consigna: {{titulo}}`, que la hoja de pegar de La Voz
+    Prestada entiende (`VOZ_ETIQUETAS`; «consigna» cae en `encargo`). Así lo
+    que vuelve entra etiquetado sin que nadie se acuerde, que es la regla 1
+    de allá cumplida desde aquí. «📖 Guardar lo que devolvió» sale solo en
+    Voz prestada, Investigación y Careo, y son dos funciones que ya existían
+    —`switchView('view-voz')` y `vozAbrirPegar(null)`—: **ni una línea en
+    `voz-prestada.js`**, y la sonda compara `vozAbrirPegar.toString()` antes
+    y después de cargar esta herramienta.
+
+    ⚠️ **Y el Careo pide «una línea en blanco entre uno y otro» turno**, en
+    sus tres textos (la etiqueta, su ejemplo y el auto-bucle). Pedía solo
+    «su propio renglón», y el lector de La Voz Prestada junta los renglones
+    seguidos en UN párrafo: un careo obediente entraba como un párrafo por
+    ronda, con los tres turnos pegados y el primer «JUEZ:» nombrado como
+    etiqueta sin entender. Y allá el texto crudo no se guarda para rehacerlo.
+
+15. ⚠️ **NADA DE LO ESCRITO LLEGA A UN ATRIBUTO NI A `innerHTML`.** Todo con
+    `csgEl(tag, cls, texto)`, que usa `textContent`, `<pre>` incluido; los
+    `data-csg-foco` que se ponen son claves nuestras («chip:prompt»), nunca
+    un título ni un estante. Las direcciones de las máquinas son LITERALES
+    del JavaScript con el texto detrás por `encodeURIComponent`, y el
+    cuaderno ligado se comprueba con `URL()` y solo si es `https`. Esta
+    aplicación tiene dentro la Bóveda, las finanzas, el chat y los teléfonos
+    del Buzón.
+
+16. ⚠️ **ABRIR LA MÁQUINA COPIA PRIMERO, SIEMPRE, Y EL TEXTO EN LA DIRECCIÓN
+    TIENE TOPE.** Es la regla 12 de Redes. Claude, ChatGPT y Perplexity
+    reciben el texto en la dirección solo si cabe en 1.500 caracteres
+    codificados (`CSG_PREFILL_MAX`): una dirección larga se corta sin
+    avisar, y lo que se pierde es el Formato, que va al final. Por encima se
+    abre pelada y el botón lo dice («copiado: pega ahí»). Gemini y NotebookLM
+    se abren siempre pelados, con el texto ya copiado, y «Otra» solo copia y
+    comparte. Con un cuaderno de 📓 Cuadernos ligado, ↗ NotebookLM abre ESE
+    cuaderno.
+
+    ⚠️ **El portapapeles va DENTRO del toque**, sin ningún `await` delante:
+    el Safari de un iPad solo deja escribir mientras dura el gesto, y abrir
+    la ventana primero se lleva el foco a la pestaña nueva. Si falla, el
+    texto queda seleccionado en el `<pre>` y se dice cómo copiarlo a mano.
+
+    ⚠️ **Con `noopener`, `window.open` devuelve `null` SIEMPRE**, se haya
+    abierto o no, así que no hay forma de saber si el navegador bloqueó la
+    ventana: el aviso dice las dos cosas —que está copiado y adónde ir— en
+    vez de fingir que sabe cuál pasó. Y `noopener,noreferrer` no se quita:
+    sin él, la página que se abre puede tocar `window.opener`, que es F.A.R.O
+    con la sesión de la casa puesta.
+
+    ⚠️ **Y el enlace de «⬇ Descargar SKILL.md» se revoca DESPUÉS, no en el
+    acto:** en Android la descarga empieza cuando ya se volvió de `click()`,
+    y revocarlo enseguida la cancela sin ningún aviso. El archivo sale del
+    aparato (un `Blob`), no pasa por ninguna red, y la pantalla dice dónde
+    va: `.claude/skills/<name>/SKILL.md` en Claude Code, o Ajustes →
+    Capacidades → Habilidades en claude.ai.
+
+17. ⚠️ **EL REPASO AVISA DE DATOS DE LA CASA DENTRO DE UNA PIEZA** —un
+    teléfono, un correo, el nombre de uno de los cuatro— y ofrece con un
+    chip cambiarlo por un `{{hueco}}`: la pieza viaja a la nube y, al
+    usarla, a la máquina de otra empresa. Los nombres salen de `MIEMBROS`
+    (`js/auth.js`), nunca de una lista escrita aquí.
+
+    ⚠️ **Y no avisa en falso, que es lo que enseña a no leer los avisos.**
+    «datos de 2015-2024» —que está en el propio ejemplo del Careo— tiene la
+    forma de un teléfono, y también un ISBN, una racha de años o una cuenta
+    del 1 al 10: se apartan (`csgLecEsTelefono`). Y los nombres se buscan
+    con los correos y las direcciones TAPADOS: buscando en el texto entero,
+    «josue@correo.com» daba un segundo aviso por el nombre, y su chip partía
+    el correo en «{{nombre}}@correo.com»; el aviso del correo desaparecía
+    —ya no parecía un correo— y el dato de la casa seguía ahí.
+
+18. ⚠️ **LOCAL PRIMERO, NUBE DESPUÉS, Y LA CAUSA SE NOMBRA.** Cada guardado
+    va al aparato en el acto (`faro_consigna_v1`) y a la nube con un respiro
+    de dos segundos, como upsert por el `id` nacido en el aparato: el
+    reintento corrige y no duplica. `csgSubirPendientes` sube lo que falte al
+    abrir y al volver la señal, en UN viaje. La franja de la nube sale SOLO
+    cuando hay algo que arreglar, y cada causa se arregla distinto: `42P01`
+    es «falta correr consigna.sql»; `42703` —y `PGRST204` al escribir— es
+    «la base va vieja», y se quita UNA a UNA la columna que el error nombra;
+    `FARO_RELOJ` es la señal (ocho segundos de reloj propio, porque una
+    petición que no vuelve no devuelve nada); y lo demás, «sin sesión» o
+    «no cabe». Un corte de red nunca vacía la lista en memoria (El Rodaje,
+    regla 14). Retirar deja lápida, con dos toques en el mismo sitio y sin
+    `confirm()`, y desde las retiradas se devuelve.
+
+    ⚠️ **Ninguna fila viaja sin `autor`.** La firma sale de la sesión, o del
+    identificador que `auth.js` recuerda en el aparato mientras la comprueba
+    (sin él, cada arranque con mala señal dejaría «sin firma» a quien lleva
+    meses dentro); si no hay ninguno, la pieza se guarda aquí, espera, y se
+    firma y sube sola en cuanto hay quien. Y la franja dice lo que de verdad
+    falta: «se firmará al entrar» solo si falta una firma; con todo firmado y
+    la sesión caducada, «vuelve a entrar en F.A.R.O». Nombrar una firma que
+    nadie necesita manda a buscar donde no está el problema.
+
+    ⚠️ **Guardar es editar, y el reloj se pone SIEMPRE.** Solo se ponía si
+    faltaba, así que la corrección de una pieza que ya existía salía con el
+    reloj de la nube: si esa subida fallaba, en la carga siguiente el empate
+    lo ganaba la nube y la corrección se perdía en silencio.
+
+    ⚠️ **Una fila que la base rechaza tumba el lote entero**, y la franja
+    nombraba a la PRIMERA de la lista, no a la culpable. Rechazado un lote de
+    varias, se reintenta de una en una: suben las buenas y solo la culpable
+    se queda con su motivo. Y `eliminado_at` es un `timestamptz`: retirar
+    poniendo `Date.now()` —lo natural aquí— mandaba un número que PostgreSQL
+    rechaza, y esa fila tumbaba el lote. Se manda siempre como fecha.
+
+    ⚠️ **La copia del aparato guarda las lápidas seis meses, y la que nunca
+    llegó a la nube no se barre nunca:** barrerla es exactamente la
+    resurrección que existe para impedir. Y si el aparato se queda sin sitio
+    —el origen se comparte con La Voz Prestada, que guarda ensayos enteros—,
+    se sabe: el `QuotaExceededError` se tragaba en silencio y, con la nube
+    fallando, la pieza se perdía al cerrar sin un solo aviso.
+
+    ⚠️ **Y una pieza que sube en un lote suelta su respiro pendiente:** al
+    volver del compositor la misma fila viajaba dos veces, y dos upserts en
+    vuelo pueden llegar en otro orden.
+
+19. ⚠️ **EL COMPOSITOR A MEDIO ESCRIBIR SE GUARDA MIENTRAS SE ESCRIBE**
+    (`faro_consigna_borrador_v1`, a los 350 ms de cada tecla, con el
+    material aunque pase de 20.000) y se ofrece al volver: en ＋ Nueva y en
+    el anaquel, en el hueco de la bitácora (regla 9). El material que no
+    cabe en la pieza vive ahí y en la hoja de Usar, y su bloque lo dice
+    («no se guarda con la pieza; pégalo al usar»): nada se descarta en
+    silencio. Lo que pasa con esa ranura cuando hay dos piezas en juego es
+    la regla 25.
+
+20. ⚠️ **LA HERRAMIENTA GUÍA, NO LLAMA.** Ninguna petición de red
+    obligatoria —sin la tabla funciona entera, y lo dice— y ningún botón que
+    le pida a una IA que escriba, mejore o puntúe el prompt. Los tokens son
+    un estimado a ojo, y lo dice.
+
+21. ⚠️ **PANTALLA A 390 PX Y UNA COSA CADA VEZ.** Es la forma de 📓
+    Cuadernos (su regla 11): una barra de una fila que se desliza con los
+    botones PRIMERO —lo último de una barra que se desliza es lo que se sale
+    de la pantalla (La Voz Prestada, regla 33)—, renglones de 44 px, letra
+    de 16 px en todo recuadro y en el `<pre>` (a menos, el iPad hace zoom
+    al enfocar), `<pre>` con `pre-wrap`, baldosas de clase con `1fr` y nunca
+    con un ancho fijo, y la barra fija del compositor —👁 Vista previa ·
+    💾 Guardar · ▶ Usar— ENCIMA de la de la aplicación, con `safe-area` y
+    tres botones que caben en 320 px. Antes de la primera ficha, como mucho
+    cinco cosas: barra, buscador, chips, filtros puestos y el renglón de la
+    bitácora, y los dos últimos solo cuando tienen algo. Con el compositor
+    abierto, el botón de Destellos no está (`switchView` lo apaga en
+    `view-consigna-editor`). La sonda mide en píxeles y mira los colores
+    CALCULADOS.
+
+    ⚠️ **Y nada ensancha la pantalla.** El chip de arreglo más largo del
+    repaso medía 425 px en una pantalla de 320 y hacía deslizar el
+    compositor de lado: ahora parte su texto dentro del aviso y mide 40 de
+    alto como mínimo. Las frases hechas van cortadas a dos renglones, con
+    `max-width: min(86vw, 320px)` y enteras en su `title` —hay frases de 85
+    caracteres—, y a 320 px bajaron de 65 a 48 px de alto. Las notas parten
+    las palabras largas (`overflow-wrap: anywhere`): una dirección pegada no
+    se sale.
+
+    ⚠️ **Y lo que se toca mide de 40 a 44 px:** el pie de la ficha, «⚠ N
+    usos este mes», los últimos valores de una variable, los chips de
+    arreglo, Sí/No, «📄 usar el ejemplo» y la ✕ de las hojas, que en la casa
+    mide 34. La excepción, dicha: ▶ y ⋯ de la vista ☰ se quedan en 36
+    dentro de su fila de 44, como los botones de la bitácora; con 44 la
+    lista dejaría de ser compacta, que es a lo que se viene a ☰.
+
+22. ⚠️ **EL PREFIJO ES `csg` Y NINGUNA FUNCIÓN REPITE NOMBRE DE OTRO
+    ARCHIVO.** Todas las globales lo llevan —con su apellido por parte:
+    `csgArm` el armado, `csgLec` el lector, `csgAnq` el anaquel, `csgEd` el
+    compositor, `csgUsar` y `csgPeg` las hojas—, y la puerta es
+    `initConsigna`, que `switchView` llama al entrar. El bucle de «Detalles
+    del repositorio» tiene que devolver vacío, y la sonda lo corre sobre
+    todos los `<script>` de `index.html`, que es donde existe el choque
+    (pasó con `corAbrir`).
+
+23. ⚠️ **💾 ESCRIBE SOLO LO QUE LA PERSONA CAMBIÓ, Y SIN CAMBIOS NO ESCRIBE
+    NADA.** El compositor saca una FOTO de la pieza al abrirla
+    (`_csgEdOrig`: título, forma, máquina, estantes y material) y al guardar
+    escribe solo lo que difiere de ella; los estantes, a tres bandas —se
+    quitan los que la persona quitó, se añaden los que puso y se quedan los
+    que el menú ⋯ u otro aparato pusieron mientras tanto—. La bitácora, las
+    versiones y los usos no los toca nunca. Volcaba la copia de trabajo
+    entera, y un 💾 sin tocar nada deshacía lo que otro aparato había
+    corregido con el compositor abierto; sobre una pieza que otro aparato
+    había retirado, la hacía nacer de nuevo. Ahora un 💾 sin cambios dice
+    «Sin cambios» y no escribe ni una fila, y si los DOS cambiaron el texto
+    gana el de aquí —es lo que se está viendo— y el de allá queda en
+    🕘 Versiones, y se dice.
+
+    Cuando llega la nube, una copia LIMPIA se pone al día sola
+    (`csgEdTrasNube`: «↻ Esta consigna cambió en otro aparato»), salvo con
+    el dedo dentro de un recuadro, porque repintar cerraría el teclado. Y el
+    estado de la cabecera se lee de la pieza (`csgEdEstadoNube`), no de una
+    palabra fijada al volver la subida: guardado mientras la primera bajada
+    todavía miraba, se quedaba en «📴 Solo aquí» con la pieza ya en la nube.
+
+24. ⚠️ **TIRAR TEXTO CUESTA DOS TOQUES EN TODA LA HERRAMIENTA, TAMBIÉN EN
+    «ABRIR LA QUE YA HAY».** Guardar con el título de otra pieza viva abre
+    «Ya hay una «X»» con tres salidas: Abrir la que ya hay · Guardar igual ·
+    Cambiar el título (casi siempre es la misma consigna pegada dos veces,
+    pero dos pueden llamarse igual). «Abrir la que ya hay» tiraba el texto y
+    el borrador de UN toque y sin rastro, cuando tirar texto cuesta dos en
+    todo lo demás (Descartar, Retirar). Ahora, si lo de aquí dice lo mismo
+    que la otra (`csgEdMismoQue`), no hay nada que perder y se suelta sin
+    crear una gemela; si dice otra cosa, se guarda aparte antes de abrir la
+    otra. Y el renglón lo dice ANTES del toque.
+
+25. ⚠️ **EL BORRADOR TIENE UNA SOLA RANURA, Y NADA LA PISA SIN DECIRLO.**
+    Hay un solo `faro_consigna_borrador_v1` para todo el aparato, y tres
+    averías del mismo día salieron de ahí:
+
+    - Un borrador de OTRA pieza que se quedó a medias (la aplicación se
+      cerró con el compositor abierto) se lleva al anaquel antes de empezar
+      a escribir en la nueva, y se dice (`csgBorradorRescata`: «💾 Lo que
+      tenías a medio escribir se guardó en el anaquel»). ⚠️ **También si es
+      el de la pieza que se está dejando:** se saltaba dando por hecho que
+      ya estaba guardado, pero con la franja «Tenías cambios sin guardar»
+      puesta y sin elegir, lo de antes vivía solo en el borrador, y la
+      primera tecla de la pieza nueva lo pisaba.
+    - Con esa franja puesta, **la primera tecla guarda aparte lo de antes**,
+      como otra consigna llamada «… (lo que no se guardó)», y se dice
+      (`csgEdApartarRecuperar`). Escribía el borrador nuevo encima del que
+      se estaba ofreciendo, y después «Seguir» tiraba de un toque lo recién
+      escrito: las dos versiones siguen, y la persona decide con calma.
+    - **«Descartar» suelta también la copia en memoria**, no solo la llave:
+      si se había salido por la barra de abajo, la copia seguía sucia y el
+      siguiente compositor la guardaba «en silencio», así que lo que se
+      pidió tirar aparecía en el anaquel dos toques después. Lo mismo al
+      retirar una pieza desde ⋯ (`csgEdSoltarPieza`): lo de la retirada
+      volvía como pieza nueva.
+
+26. ⚠️ **UNA COPIA QUE NADIE TOCÓ NO DEJA FICHA; LO PEGADO, SÍ.** «Duplicar
+    en otro molde» —y «⚠ 3 usos este mes ▸», que hace lo mismo hacia una
+    Instrucción de sistema— abre el compositor con una pieza nueva SIN
+    guardar, y ‹ sin tocarla no la guarda y lo dice («La copia no se guardó:
+    no la tocaste»): mirar una copia no puede dejar una ficha de más. Vale
+    también para la copia que se abre de una pieza retirada. ⚠️ **Pero SOLO
+    si el original está en el anaquel:** lo pegado con la forma cambiada en
+    la hoja de Pegar pasa por el mismo duplicado, y su original no está
+    guardado en ninguna parte, así que tirarlo al volver era perder lo
+    pegado. Esa regresión la metió el propio arreglo del duplicado, y la
+    cazó quien lo hacía; lo decide `csgAbrirCompositor` mirando la lista, y
+    la sonda lo mira por los dos lados (el duplicado en la 17, lo pegado en
+    la 7).
+
+27. ⚠️ **UN USO NO ES UNA EDICIÓN.** Copiar, compartir o abrir la máquina
+    apunta el uso, `ultima` y `usos`, y NO toca `actualizado`. Con el reloj
+    puesto en el uso, copiar sin señal una pieza que otro aparato ya había
+    corregido y retirado la convertía en «la más nueva», y al volver la
+    señal su fila entera ganaba la fusión: la pieza retirada resucitaba y
+    la corrección de la tableta se perdía para siempre. El uso llega igual
+    —la bitácora se une por `uid`, y `ultima` y `usos` van por el máximo—,
+    y sube **con la nube delante** (`csgSubirLuego(p, {uso: true})`): a
+    ciegas, la fila entera que lleva el uso le pisaba al otro aparato la
+    corrección de mediodía. Por lo mismo, quien apunta un uso no lo sube
+    después con un `csgSubirLuego` a secas: contaría como edición.
+
+28. ⚠️ **LO QUE CORRE EN CADA TECLA NO PUEDE VOLVER ATRÁS.** La vista previa
+    y el repaso corren en cada tecla, y dos expresiones regulares razonables
+    —`replace(/\s*\n\s*/g, ' ')` para juntar renglones y `\s+(→|->)\s+`
+    para buscar un par— vuelven atrás desde cada espacio de una racha
+    larga: con sesenta mil espacios eran tres y cuatro segundos de pantalla
+    congelada, medidos. Se parte y se recorta (`csgUnRenglon`) y la flecha
+    se busca a mano (`csgArmPar`). La prueba de Node lo cronometra con
+    textos hechos para eso: no se «simplifica» de vuelta a una expresión.
+
+29. ⚠️ **A NIVEL DE ARCHIVO NO SE TOCA NI `document` NI `window`, TAMPOCO
+    PARA UN `DOMContentLoaded`.** La prueba de Node carga `consigna.js`
+    ENTERO en salones cuyo `document` revienta si se le toca y que apuntan
+    cualquier toque a `document` o a `window`: un `addEventListener` aquí
+    arriba la hace suspender. Y no hace falta: los botones se enganchan la
+    primera vez que se abre la vista o la hoja (`initConsigna`,
+    `csgEdEngancha`, `csgVerAbrir`), que es siempre antes de que nadie pueda
+    tocarlos. Es lo que deja probar el núcleo sin navegador, y lo que impide
+    que un DOM distinto del esperado tumbe la carga del archivo —y con ella
+    la casa entera, que comparte ámbito—.
+
+30. ⚠️ **LO QUE ESCRIBIÓ UNA PERSONA NO ES LA LLAVE DE UN OBJETO NORMAL.** El
+    nombre de una variable o el id de un bloque libre los escribió alguien,
+    y en un `{}` normal `valores['__proto__'] = ''` no crea ninguna llave:
+    cambia el prototipo, y leerla devuelve `Object.prototype`. Así
+    `{{__proto__}}` salía rellena con «[object Object]», no paraba Copiar,
+    se copiaba con el hueco puesto y el uso reventaba sin apuntarse. Los
+    mapas de valores van sin prototipo (`Object.create(null)`: los de Usar,
+    la foto del uso, ⋯ → Copiar, `csgVarsLee` y `csgVarsApunta`, y los
+    recuadros y las tarjetas del compositor). Y la hoja de Molde pasa la
+    clase de la fila por `csgClaseDe` y pregunta con `hasOwnProperty`: una
+    fila tocada a mano con la clase «constructor» indexaba
+    `CSG_MOLDES_ORDEN` por una propiedad de `Object`, la hoja reventaba y no
+    quedaba forma de volver a ponerle un molde desde el compositor.
+
+31. ⚠️ **EL ANAQUEL ES EL DE CUADERNOS, Y SU PLEGADO EXISTE DE VERDAD.** Una
+    fila de botones, el buscador, los chips de clase con su cuenta
+    («⏳ Sin probar» va tercero: el trabajo no es ver los prompts, es saber
+    cuáles faltan por probar), solo los filtros PUESTOS, y las fichas en
+    cuadrícula con [▶ Usar] · [✎ Corregir] · [⋯] al pie. Los grupos se
+    pliegan con las cuatro reglas del anaquel (La Voz Prestada, 40;
+    Cuadernos, 4), y `.csg-grupo[hidden] { display: none !important }` es
+    lo que hace que el plegado exista: sin ella, el mando responde y no hace
+    nada. El orden por defecto es «🕘 Última usada»: lo que se usa a diario
+    sube solo. Cada clase tiene su tono fijo y cada estante el suyo, sacado
+    de su clave (`csgTono`). La vista, el orden y lo abierto son del aparato
+    (`faro_consigna_anaquel_v1`).
+
+    ⚠️ **«Sin estante» no puede llamarse como un estante.** Su llave era
+    `'sin'`, en el mismo espacio de nombres que las claves que escribe una
+    persona: un estante llamado «Sin» se confundía con «Sin estante»,
+    filtrar por él enseñaba justo lo contrario y, agrupando, salían dos
+    montones con la misma llave de plegado. Ahora es `' sin'`
+    (`CSG_ANQ_SIN`), con un blanco delante que `csgClave` no produce nunca:
+    ningún nombre lo suplanta y no hay ningún nombre prohibido que explicar.
+
+    ⚠️ **Y la fila del buscador no se rehace nunca:** sacar del documento un
+    recuadro con el foco lo desenfoca, y en una tableta eso cierra el
+    teclado en cada letra. Por lo mismo, mientras se escribe la nota de un
+    «¿sirvió?» el anaquel no se repinta aunque llegue la nube.
+
+32. ⚠️ **EL GRIS DE LA CASA, UN PUNTO MÁS OSCURO AQUÍ DENTRO.** `--muted`
+    (#64748b) y `--faint` (#94a3b8) no llegan al contraste AA sobre los
+    fondos de esta herramienta, que casi nunca son blancos: sobre el `--bg`
+    daban 4,31:1 y sobre los tintes de clase 4,37, y las marcas de agua
+    —entre ellas el EJEMPLO de cada bloque, que es contenido: enseña qué
+    escribir— daban 2,5. Medido con el color CALCULADO. `css/consigna.css`
+    redefine esos dos tokens (#475569 y #64748b) en las dos vistas y en las
+    tres hojas (`.csg-overlay`), como hacen El Rodaje y la sala de La Voz
+    Prestada, y no regla por regla, para que lo que hereda de `app.css`
+    salga igual de legible. **Ni un token en `:root`.** La marca de agua del
+    título va en #586579, porque se pinta sobre `--bg`.
+
+33. ⚠️ **NADA SE ESCONDE DEBAJO DE LA BARRA, DEL PIE NI DE OTRA HOJA.**
+
+    - **Las tres hojas van por encima de todo** (`z-index` 120, y la
+      vertical 130): de la barra fija del compositor (60), de la barra de la
+      aplicación y del botón de Destellos. Y la vertical, encima de las
+      otras dos, porque se abre DESDE ellas: debajo, el botón respondería y
+      la hoja no se vería, que es la avería de las hojas del taller de La
+      Voz Prestada (su regla 35).
+    - **Lo que se escribe en Usar no se queda debajo del pie.** El pie va
+      pegado al borde de abajo, y el navegador, al seguir al cursor —«Intro»
+      de variable en variable, un renglón nuevo del 📎 Material—, lo dejaba
+      justo en ese borde, debajo de los botones, en todos los anchos. La hoja
+      lleva `scroll-padding-bottom` con el alto de VERDAD del pie
+      (`csgUsarAltoPie`, porque el pie cambia de alto), y 130 px de respaldo
+      en el CSS.
+    - **Un bloque más alto que el hueco se alinea por abajo, no al centro**
+      (`csgEdEnfocar`): centrado, un bloque de veinte aristas dejaba el
+      cursor —que va al final— debajo de la barra fija justo cuando el
+      repaso decía «✎ Ir a…».
+    - **El recuadro crece sin mover la vista** (`csgCrecer` guarda el
+      desplazamiento y lo devuelve): poner la altura en `auto` encoge el
+      recuadro un instante, y escribiendo en el último bloque de un
+      compositor largo la vista saltaba en cada tecla.
+    - **Y el aviso de la aplicación se lee entero.** Con el compositor
+      abierto sube por encima de la barra fija, que es donde caía; dentro de
+      La Consigna parte sus renglones en vez de salir cortado por los dos
+      lados; y `csgAviso` lo deja lo que tarda en leerse (pasados cincuenta
+      caracteres, cada letra alarga el reloj, hasta ocho segundos), porque
+      aquí hay avisos de cien caracteres que son una instrucción.
+
+34. ⚠️ **EL `CACHE_NAME` TIENE QUE QUEDAR POR ENCIMA DEL DE `main`, NO SOLO
+    DEL DE LA RAMA.** La Consigna se cableó con `faro-app-v128`, el
+    siguiente de su rama; pero `main` ya había gastado el v128 el 22 de
+    septiembre de 2026, en «Redes: remarcar y corregir…». Con el mismo
+    número, al fusionar el navegador no ve ningún cambio en `sw.js` y la
+    versión nueva no llega a ningún aparato, sin ningún error. Se subió a
+    v129, y está escrito para toda la casa en «Sellar la versión en cada
+    cambio».
+
+**Y lo que NO lleva, dicho: «☑ Elegir».** El §8 del plan la describe entera
+—marcar varias piezas y, desde una barra pegada abajo, 🗂 Mover a estante,
+🤖 Cambiar la máquina o 🗑 Retirar— y se recortó de esta primera versión al
+construirla. No hace la falta que hizo en La Voz Prestada (su regla 33):
+allí había veintidós textos ya guardados que archivar de golpe; aquí una
+consigna se archiva al escribirla, con «＋ estante» en el compositor, o
+desde su ⋯ → 🗂 Estantes. Y es la maquinaria más cara del anaquel: un modo
+en que el toque elige y nada más, su propia barra, y el botón de Destellos
+apartado con `!important`. Sin ella, la barra es:
+
+```
+[＋ Nueva] · [📋 Pegar] · | · [🗂 Estantes] · [⇅ Orden] · | · [📋 Exportar] · ▦ ☰
+```
+
+y la sonda 18 mide a 320 px que ＋ Nueva y 📋 Pegar quedan enteros dentro
+del borde. Una
+consecuencia que se dice en la pantalla: la hoja 🗂 Estantes no crea
+estantes —un estante vacío no existe, porque salen de las piezas, y el
+«crear dentro» venía de la hoja de mover de ☑ Elegir—, así que debajo de la
+lista dice dónde se crea uno. Si algún día vuelve, su diseño está en el §8
+del plan y lo que no se negocia, en la regla 33 de La Voz Prestada.
+
+**Y un cambio más sobre el plan: la cabecera del compositor lleva a la
+derecha el ESTADO, no un 👁.** «Sin guardar», «🟡 Borrador», «📴 Solo aquí»
+o «Guardado ✓», leído de la pieza (regla 23). La vista previa ya está en la
+barra fija, y dos botones para lo mismo en una pantalla son uno de más; lo
+que no estaba en ninguna parte era saber, antes de salir, si lo escrito está
+guardado y si llegó a la nube.
+
+**Antes de publicar un cambio de La Consigna:**
+
+```
+node _dev/servidor-estatico.js       (en otra terminal)
+_dev/probe-consigna.html             (en el navegador)
+node _dev/test-consigna-node.js      (el núcleo, sin navegador)
+```
+
+Desde una sesión sin pantalla, la sonda se corre así, y con el `SONDA_MS`
+puesto: tarda algo más de minuto y medio (103 s medidos, casi todo en los
+respiros de dos segundos de las subidas y nueve en la petición que no
+vuelve), y el tope por omisión de `corre-sonda.js` es de 90.
+
+```
+NODE_PATH=/opt/node22/lib/node_modules SONDA_MS=300000 node _dev/corre-sonda.js _dev/probe-consigna.html
+```
+
+La prueba de Node carga `consigna.js` ENTERO, el mismo que carga
+`index.html`, en salones vacíos con dobles de `document`, `window`,
+`localStorage` y la nube, y está ordenada por gravedad: que cargar el
+archivo no tire F.A.R.O (un nombre repetido, un `const` duplicado, un toque
+al DOM al cargarse); que lo que se copia sea el §7 **carácter por carácter,
+sacado del propio `PLAN-LA-CONSIGNA.md`** —una copia escrita en la prueba se
+quedaría vieja el día que alguien corrigiera el plan— y que `csgArmar` sea
+pura; que no se pierda nada en la nube, con una base de mentira que exige
+lo que la de verdad; que pegar no parta ni descarte nada, cuadrando la BOLSA
+de palabras de entrada y de salida (una cuenta puede cuadrar por
+casualidad; una bolsa, no) y volviendo a pegar los diecisiete moldes
+armados; que el repaso pare lo que tiene que parar y no congele la
+pantalla; y que cada frase, ejemplo y rótulo del JavaScript esté escrito tal
+cual en el plan. Con `CONSIGNA_RUTA=<copia>` se corre contra una copia
+averiada a propósito: así se comprobó que muerde, con 89 averías, y
+suspendió con todas.
+
+La sonda abre el `index.html` de verdad en UN marco de 390 px, que estrecha
+a 320 (y a 320×568) cuando mide; PULSA los botones y mide con
+`getBoundingClientRect` y `elementFromPoint` con la vista abierta de
+verdad. Está ordenada por gravedad: que ninguna función choque con otra de
+la casa; veneno en el título, en un bloque, en un estante y en la nota de un
+«¿sirvió?», que tiene que salir como texto y sin ningún `href` ni `src`
+nuevo; que nada de lo escrito se pierda —el 💾 con el compositor abierto y
+otro aparato corrigiendo, tres 💾 que hacen UNA versión, la franja «Tenías
+cambios sin guardar» al abrir otra pieza y al escribir encima, «Abrir la que
+ya hay», la lápida que gana al arrancar con la nube devolviendo la pieza
+viva—; que Usar copie ANTES de abrir, con `noopener,noreferrer`, se pare
+con un hueco vacío y deje cada recuadro encima del pie a 320×568; el armado
+del §7 visto en la vista previa; los topes leídos de `consigna.sql`; el
+plegado con el `display` CALCULADO; y los píxeles y los colores a 320 px.
+Termina con APRUEBA o SUSPENDE delante en el título, con un resumen por cada
+una de las veintidós comprobaciones del §11 del plan.
+
+⚠️ **Su base de mentira exige lo que exige la de verdad, y lo saca del
+propio `consigna.sql`:** las columnas, sus tipos, los `not null`, los
+`default` y los `check`. `42P01` sin la tabla; `42703` al leer una columna
+que no está y `PGRST204` al escribirla, que es lo que contesta PostgREST;
+`23502` sin `autor`; `23514` si un `check` muerde, midiendo los `jsonb` como
+`jsonb::text`; `22007` si `eliminado_at` no es una fecha; `42P10` si el
+upsert no va por `id`. Si no puede leer el SQL, SUSPENDE. Un doble
+complaciente esconde la costura (La Voz Prestada, regla 13).
+
+⚠️ **Y reutiliza el mismo marco.** Al cambiar de base (sin tabla → puesta →
+vieja → colgada) vuelve a llamar a `initConsigna()`, y donde hay que «volver
+a arrancar» vacía la memoria del módulo y deja el `localStorage`, que es lo
+que hace un arranque; un segundo `index.html` del mismo origen se queda
+colgado y la sonda no llega a su veredicto. La única función de pantalla que
+llama por dentro es `csgAbrirPegar('')`, para medir la hoja de Pegar encima
+de la barra fija: desde el compositor no hay ningún botón que la abra. Y el
+`</script>` de su veneno va escrito `<\/script>`: sin escapar, cerraba el
+propio `<script>` de la sonda a media página.
+
+Se probó de la única manera que vale, averiando el archivo de verdad: sin
+`.csg-grupo[hidden] { display: none !important }` suspende tres veces
+(«display CALCULADO none → block,block,block»); sin `noopener,noreferrer`,
+una; sin la parada de Copiar con un hueco vacío, tres; y sin la unión por
+`uid` de `csgFusiona`, diez. Y cada arreglo de los que paraban («Abrir la
+que ya hay», el 💾 que escribe solo lo cambiado, la versión por uso, las
+dos del borrador, el chip que ensanchaba la pantalla y el pie de Usar) se
+quitó de uno en uno en una copia aparte: la sonda suspende justo en sus
+comprobaciones, y en ninguna otra.
+
+Y el SQL, contra un PostgreSQL de verdad, con el servidor de la sesión
+levantado como dice el apartado de La Voz Prestada:
+
+```
+createdb -h /tmp/pg -p 55432 -U postgres consignatest
+psql -h /tmp/pg -p 55432 -U postgres -v ON_ERROR_STOP=1 -d consignatest -f _dev/prueba-consigna-sql.sql
+```
+
+Esa prueba pone primero el Supabase mínimo de las vecinas —con `grant usage
+on schema auth`, sin el cual la primera escritura como usuario de la casa
+revienta con un fallo de la prueba disfrazado de fallo de la tabla—;
+comprueba que la guardia para NOMBRANDO `seguridad_familia_1_puerta.sql`;
+corre el archivo dos veces sin duplicar políticas ni disparador; hace morder
+los `check` (sin título, una `clase` de 21, unos `bloques` que no son una
+lista, una bitácora de 60.001, unas versiones de 200.001, un material de
+20.001, un `id` de dos letras, la versión 0); y mira la puerta dos veces y
+en el mismo orden que la de las redes: primero que el `revoke` le quitó a
+`anon` el permiso de tabla y que a la casa no se le dio `delete`; solo
+después reparte los permisos como los reparte Supabase, para probar que la
+seguridad por fila deja fuera a `anon` y a un usuario con sesión que no es
+de la casa. Termina con «RESULTADO: APRUEBA».
 
 ## Normativa: los textos de encargo se leen en La Voz Prestada
 
@@ -3699,9 +4475,10 @@ Cada sonda termina poniendo **APRUEBA** o **SUSPENDE** en `document.title`,
 con el veredicto DELANTE (el rótulo viejo «SONDA-APRUEBA» ya se retiró).
 No es decoración: es lo que se lee al correrlas en tanda. Once sondas
 antiguas no lo hacían, y en la auditoría del 20 de agosto de 2026
-aparecieron **veintinueve más**; hoy lo hacen las noventa y cinco. La
-única excepción es `probe-alto-util.html`, que no es una sonda sino un
-instrumento de medida y se titula INSTRUMENTO. La cuenta no se escribe de
+aparecieron **veintinueve más**; el 23 de septiembre de 2026, con la de La
+Consigna, lo hacen las noventa y siete. La única excepción es
+`probe-alto-util.html`, que no es una sonda sino un instrumento de medida y
+se titula INSTRUMENTO. La cuenta no se escribe de
 memoria (esta línea ya se quedó vieja una vez): sale de
 `grep -L APRUEBA _dev/probe-*.html`, que tiene que devolver solo el
 instrumento. Dos sondas
@@ -4031,6 +4808,16 @@ El aparato guarda la aplicación en caché y se queda con la versión vieja.
 En **todo** cambio de HTML, CSS o JS hay que subir `CACHE_NAME` en
 `sw.js`. Si no se sella, el despliegue existe y nadie lo ve.
 
+⚠️ **Y el número nuevo tiene que quedar por encima del de `main`, no solo
+del de la rama.** La Consigna se cableó en su rama con `faro-app-v128`, el
+siguiente del que ella tenía; pero `main` ya había gastado el v128 el 22 de
+septiembre de 2026 («Redes: remarcar y corregir…»). Con el mismo número, al
+fusionar el navegador no ve ningún cambio en `sw.js` y la versión nueva no
+llega a ningún aparato, sin ningún error. Antes de sellar en una rama se
+mira, después de un `git fetch`, `git show origin/main:sw.js | head -1`. Y
+si al fusionar la primera línea de `sw.js` da conflicto, es lo buscado: se
+resuelve dejando el número más alto.
+
 ## Empujar no es publicar: se comprueba el despliegue
 
 `git push` dice que el commit llegó al repositorio. **No dice que el
@@ -4115,7 +4902,7 @@ usar un token del otro no da ningún error: se resuelve a nada.
 
 | | La aplicación (`index.html`) | Las misiones |
 |---|---|---|
-| Hojas | `app.css` + `criba.css` + `rodaje.css` + `voz-prestada.css` + `redaccion-redes.css` + `redaccion-cuadernos.css` | la de la misión + `taller-neuro.css` + `recursos-enlaces.css` |
+| Hojas | `app.css` + `criba.css` + `rodaje.css` + `voz-prestada.css` + `redaccion-redes.css` + `redaccion-cuadernos.css` + `consigna.css` | la de la misión + `taller-neuro.css` + `recursos-enlaces.css` |
 | Tokens | `--brand`, `--surface`, `--bg`, `--border`, `--text`, `--muted`, `--faint`, `--accent` | `--pri`, `--sec`, `--card`, `--dark`, `--gray`… |
 | Tipografía | Outfit | Nunito / Fredoka |
 
@@ -4155,6 +4942,13 @@ mundo de tokens: son los mismos nombres con otros valores, así que todo lo
 que hereda de `app.css` se oscurece solo y los arreglos de `app.css`
 siguen llegando. Lo que no se puede hacer nunca es redefinirlos en
 `:root`: eso teñiría la casa entera.
+
+⚠️ **Y La Consigna, que es clara, redefine solo dos tokens, y por
+contraste.** `css/consigna.css` oscurece un punto `--muted` y `--faint`
+dentro de `#view-consigna`, `#view-consigna-editor` y sus tres hojas
+(`.csg-overlay`), porque sobre sus fondos teñidos no llegaban al contraste
+AA, medido con el color calculado (su regla 32). La misma técnica, y ni un
+token en `:root`.
 
 ⚠️ **Y el mismo cuidado con los ATAJOS.** `background: linear-gradient(…)`
 deja el `background-color` en transparente, y `border-left: 3px solid
@@ -4212,3 +5006,24 @@ degradado por eso mismo.
 - Para revisar en el navegador: `node _dev/servidor-estatico.js`
   (http://localhost:8124) y abrir las sondas de `_dev/`. Cada una termina
   poniendo **APRUEBA** o **SUSPENDE** en el título de la pestaña.
+- **Desde una sesión sin pantalla, las sondas se corren con
+  `_dev/corre-sonda.js`**, con el servidor estático levantado:
+
+  ```
+  NODE_PATH=/opt/node22/lib/node_modules node _dev/corre-sonda.js _dev/probe-consigna.html
+  ```
+
+  Abre la sonda en el Chromium sin cabeza que ya trae la sesión (el
+  Playwright de `/opt/node22/lib/node_modules`; no se corre
+  `playwright install`), espera a que ponga APRUEBA o SUSPENDE en el título
+  e imprime el título, el informe de su `#out` y los errores de la consola,
+  que son lo que un veredicto no dice; deja además una captura en
+  `/tmp/sonda.png`, o en la ruta que se le dé como segundo argumento.
+  `SONDA_MS` es cuánto espera el veredicto (90 s por omisión: la de La
+  Consigna pide 300000 y la de La Voz Prestada 540000) y `SONDA_ANCHO`, el
+  ancho de la ventana (1200 por omisión; casi nunca hace falta, porque las
+  sondas miden dentro de su propio marco). Si se acaba el tiempo imprime
+  «SIN VEREDICTO», que no es un aprobado. Los errores de red a los CDN y a
+  `supabase.co` son del proxy de la sesión y no cuentan; un `pageerror`,
+  sí. Vivió en una carpeta temporal hasta el 23 de septiembre de 2026, y un
+  reinicio del contenedor se lo habría llevado.

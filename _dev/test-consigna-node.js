@@ -1881,6 +1881,15 @@ function parte4() {
     const m = csgLeer(M);
     ok(!m.avisos.length, '«Viaja: …» o «Investigador: …» son contenido, no rótulos fallidos: no se nombran', JSON.stringify(m.avisos));
     cuadra('contenido con dos puntos', M, m);
+    /* La errata de un rótulo conocido se nombra aunque no haya otros
+       rótulos al lado (revisión del 23 de septiembre de 2026): debajo de
+       una sola frase, «Contexo:» se quedaba en el Texto sin decir nada. */
+    const E = 'Resume el informe en cinco puntos.\nContexo: es para la revista de octubre.';
+    const e = csgLeer(E);
+    const ae = e.avisos.find(a => a.renglon === 2);
+    ok(!!ae && !!ae.sugerencia && /«Contexo:» no es un bloque; .*¿Querías Contexto\?/.test(ae.texto) && /Contexo: es para la revista de octubre\./.test(e.bloques.map(x => x.t).join('\n')),
+      '«Contexo:» sin otros rótulos: se NOMBRA con su renglón y su sugerencia, y el renglón sigue en su bloque', JSON.stringify(e.avisos));
+    cuadra('errata sin otros rótulos', E, e);
   });
 
   seccion('4.11 Material, subtítulos, bloques libres y código', () => {
@@ -2282,6 +2291,10 @@ function parte5() {
     ok(dc.avisa.filter(x => /teléfono/.test(x.msg)).length === 1, '  y «2015-2024» o «2026-09-22» no se toman por teléfonos', JSON.stringify(dc.avisa.filter(x => /teléfono/.test(x.msg))));
     const DC = L('csgDatosDeCasa');
     ok(JSON.stringify(DC('Josué Edmundo lo firma; josue también.')) === JSON.stringify([{ tipo: 'nombre', trozo: 'Josué Edmundo' }, { tipo: 'nombre', trozo: 'josue' }]), 'csgDatosDeCasa: el nombre entero es un aviso, no dos; y sin tilde también casa', JSON.stringify(DC('Josué Edmundo lo firma; josue también.')));
+    /* El nombre DENTRO de un correo (o de una dirección) no es un nombre
+       suelto: su chip partía el correo en «{{nombre}}@correo.com». */
+    const enCorreo = DC('Manda el resumen a josue@correo.com y a https://ejemplo.org/evelyn hoy.');
+    ok(JSON.stringify(enCorreo) === JSON.stringify([{ tipo: 'correo', trozo: 'josue@correo.com' }]), 'csgDatosDeCasa: el nombre dentro de un correo o de una dirección no sale como nombre de la casa', JSON.stringify(enCorreo));
     const inv = b => pieza('fuentes', Object.assign({ pregunta: '¿Qué efecto tuvo la jornada extendida?', fuentes: 'Solo informes de organismos.', formato: 'Ensayo.' }, b));
     const px = csgRevisar(inv({ citas: 'Cada dato con (Autor, año, página) pegado a la frase.' }), 'perplexity');
     const pa = px.avisa.find(x => /Perplexity/.test(x.msg));

@@ -33,6 +33,18 @@
    ficha sale gris sin ningún error.
    ══════════════════════════════════════════════════════════════════ */
 
+/* ⚠️ EL GRIS DE LA CASA, UN PUNTO MÁS OSCURO DENTRO DE LA HERRAMIENTA.
+   --muted (#64748b) y --faint (#94a3b8) no llegan al contraste AA sobre
+   los fondos de aquí, que casi nunca son blancos: sobre el --bg de la
+   aplicación el gris daba 4,31:1 (la cuenta de los chips, las notas, la
+   franja de la nube), sobre los tintes de clase 4,37, y las marcas de
+   agua —entre ellas el EJEMPLO de cada bloque, que es contenido: enseña
+   qué escribir— daban 2,5. Medido con el color CALCULADO. Se redefinen
+   los dos tokens en las dos vistas y en las tres hojas, como hacen El
+   Rodaje y la sala de La Voz Prestada, y no regla por regla: así lo que
+   hereda de app.css sale igual de legible. Ni un token en la raíz. */
+#view-consigna, #view-consigna-editor, .csg-overlay { --muted: #475569; --faint: #64748b; }
+
 /* ── La baldosa del Acceso Rápido ──
    El único tono que no roza ninguna baldosa vecina (§1 del plan).
    ⚠️ El color liso va aparte y DESPUÉS del degradado: `background:
@@ -104,7 +116,7 @@
   background: var(--bg); border: 1.5px solid transparent; border-radius: 12px;
   transition: border-color .15s, background-color .15s, box-shadow .15s;
 }
-.csg-ed-titulo::placeholder { color: var(--faint); font-weight: 700; }
+.csg-ed-titulo::placeholder { color: #586579; font-weight: 700; }   /* va sobre --bg: el --faint de aquí daba 4,3 */
 .csg-ed-titulo:focus {
   outline: none; background: var(--surface); border-color: #84cc16;
   box-shadow: 0 0 0 3px rgba(132, 204, 22, .18);
@@ -115,6 +127,14 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .csg-ed-estado:empty { display: none; }
+/* ⚠️ El ↻ de la casa va AL FINAL, no pegado al título. app.js lo mete
+   delante de todo en .header-actions, así que quedaba entre el campo del
+   título y su estado, a tres píxeles y medio del borde del campo: un
+   toque al final del título —que es donde se pone el cursor para
+   corregirlo— podía caer en el ↻ y recargar la aplicación entera. Con el
+   estado en medio, el ↻ queda en la esquina, lejos del campo. */
+#view-consigna-editor .header-actions > .csg-ed-estado { order: 1; }
+#view-consigna-editor .header-actions > .refresh-btn { order: 2; }
 /* En el teléfono, la cabecera del compositor se ciñe: el ↻ que la casa pone
    en todas las cabeceras (js/app.js) y el estado se comían el título, y a
    390 px se leían unos dieciséis caracteres («Resumen de informe p»); a
@@ -306,6 +326,7 @@ button.csg-ver-fila:active { transform: scale(.985); }
    renglón, con el recuadro estirado. */
 .csg-estante-nuevo { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
 .csg-estante-nuevo > .csg-input { flex: 1; min-width: 0; }
+.csg-estante-nuevo > .csg-btn { min-height: 44px; }
 
 /* ── Los recuadros ──
    ⚠️ 16 px en todo lo que se enfoca: a menos, el iPad acerca la página
@@ -351,7 +372,7 @@ button.csg-ver-fila:active { transform: scale(.985); }
 .csg-pre .csg-var { padding: 0; }
 
 /* ── Textos de apoyo ── */
-.csg-nota { margin: 6px 2px; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.csg-nota { margin: 6px 2px; font-size: 12.5px; color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
 
 /* ── El vacío ── */
 .csg-vacio {
@@ -512,6 +533,9 @@ button.csg-ver-fila:active { transform: scale(.985); }
 .csg-puestos { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
 .csg-puesto {
   display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px;
+  /* Un estante de 40 letras sin un blanco («Cultura_Cine_Documentales…»)
+     sacaba el anaquel entero por la derecha: se parte donde haga falta. */
+  max-width: 100%; box-sizing: border-box; overflow-wrap: anywhere; text-align: left;
   background: #f7fee7; border: 1.5px solid #65a30d; border-radius: 20px;
   font-family: inherit; font-size: 13px; font-weight: 700; color: #365314; cursor: pointer;
 }
@@ -697,7 +721,7 @@ button.csg-ver-fila:active { transform: scale(.985); }
 /* «⚠ 3 usos este mes ▸» se TOCA (hace la copia como instrucción de
    sistema), así que tiene cuerpo de botón y alto para el dedo. */
 .csg-ficha-token-uso {
-  min-height: 30px; padding: 2px 10px; border-radius: 999px; cursor: pointer; font-family: inherit;
+  min-height: 40px; padding: 2px 10px; border-radius: 999px; cursor: pointer; font-family: inherit;
   background: var(--csg-tf, #f7fee7); border: 1.5px solid var(--csg-tb, #d9f99d); color: var(--csg-t, #365314);
 }
 .csg-ficha-token-uso:active { transform: scale(.96); }
@@ -725,10 +749,10 @@ button.csg-ver-fila:active { transform: scale(.985); }
    por dentro, y con el relleno de la barra «▶ Usar» se quedaba en «▶ U…»
    (medido en las capturas, en los dos anchos). Usar se estira; los otros
    dos miden lo suyo. */
-.csg-ficha-pie .csg-btn { min-height: 42px; padding: 4px 9px; gap: 6px; }
+.csg-ficha-pie .csg-btn { min-height: 44px; padding: 4px 9px; gap: 6px; }
 .csg-ficha-pie .csg-btn-ic { width: 26px; height: 26px; margin-left: -6px; border-radius: 9px; }
 .csg-ficha-pie .csg-btn-ic:last-child { margin-right: -6px; }
-.csg-ficha-pie .csg-mas { min-width: 42px; }
+.csg-ficha-pie .csg-mas { min-width: 44px; }
 .csg-ficha-pie .csg-btn-lleno { flex: 1; min-width: 0; }
 .csg-ficha .csg-btn-lleno, .csg-fila .csg-btn-lleno {
   background-color: var(--csg-t); border-color: var(--csg-t);
@@ -841,6 +865,8 @@ button.csg-ver-fila:active { transform: scale(.985); }
 .csg-cual-preg { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; line-height: 1.4; }
 .csg-cual-preg > span:not([class]) { flex: 1 1 180px; min-width: 0; }
 .csg-cual > .csg-btn { margin-top: 8px; }
+/* «Sí» y «No» se tocan con el pulgar y deciden el molde: 44, no 36. */
+.csg-cual .csg-btn-sm { min-height: 44px; }
 
 /* ══════════════════════════════════════════════════════════════════
    EL COMPOSITOR (#csg-ed)
@@ -924,7 +950,7 @@ button.csg-ver-fila:active { transform: scale(.985); }
 .csg-bloque-ta::placeholder { color: var(--faint); }
 .csg-bloque-ta:focus { outline: none; background: var(--surface); border-color: #84cc16; }
 .csg-bloque-ejemplo {
-  display: inline-flex; align-items: center; gap: 4px; min-height: 36px; margin-top: 4px; padding: 0 4px;
+  display: inline-flex; align-items: center; gap: 4px; min-height: 44px; margin-top: 4px; padding: 0 4px;
   background: none; border: 0; font-family: inherit; font-size: 13px; font-weight: 800;
   color: #4d7c0f; cursor: pointer;
 }
@@ -950,8 +976,14 @@ button.csg-ver-fila:active { transform: scale(.985); }
    Una fila que se desliza, y cada frase puede ocupar hasta dos renglones:
    las hay de ochenta y cinco caracteres, y en un chip de un renglón
    saldría más ancho que la pantalla y no se leería entera sin
-   deslizar. */
-.csg-frases { margin-top: 8px; gap: 6px; align-items: stretch; }
+   deslizar.
+   ⚠️ DOS COMO MUCHO, Y CADA CHIP SU ALTO. Sin tope, a 320 px salían de
+   TRES renglones (65 px), y con `align-items: stretch` toda la fila —«{ }
+   Variable» incluido— se estiraba a esos 65. Ahora la frase va en su
+   propio span cortado a dos renglones (entera en el `title`, y entera en
+   el recuadro en cuanto se toca) y los chips cortos se quedan en 40. */
+.csg-frases { margin-top: 8px; gap: 6px; align-items: center; }
+.csg-frase-t { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-width: 0; }
 .csg-frase, .csg-otro {
   display: inline-flex; align-items: center; min-height: 40px; box-sizing: border-box;
   padding: 6px 12px; border-radius: 14px; cursor: pointer;
@@ -959,7 +991,7 @@ button.csg-ver-fila:active { transform: scale(.985); }
   transition: background-color .12s, border-color .12s, transform .12s;
 }
 .csg-frase {
-  max-width: min(78vw, 300px); white-space: normal;
+  max-width: min(86vw, 320px); white-space: normal;
   background: #f8fafc; border: 1.5px solid var(--border); color: var(--text);
 }
 .csg-frase:active, .csg-otro:active { transform: scale(.96); }
@@ -1073,7 +1105,16 @@ button.csg-ver-fila:active { transform: scale(.985); }
 .csg-rep-cuenta { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.45; }
 .csg-repaso > .csg-nota { margin: 0; color: #3f6212; font-weight: 700; }
 .csg-rep-item { margin: 0; }
-.csg-rep-arreglo { min-height: 36px; font-size: 12.5px; background: var(--surface); }
+.csg-rep-arreglo { min-height: 40px; font-size: 12.5px; background: var(--surface); }
+/* ⚠️ Y NO SE SALE DE SU AVISO. Llevaba el `nowrap` de todo chip y ningún
+   tope de ancho: «⇄ resumir-informes-de-la-escuela-primaria» llegaba a
+   x=396 en un aviso que acababa en 357, y el compositor ENTERO se
+   deslizaba de lado bajo el dedo (medido a 320 y a 390). Dentro de un
+   aviso el chip parte su texto en renglones y se queda en su caja. */
+.csg-rep-item > .csg-rep-arreglo {
+  max-width: calc(100% - 20px); min-width: 0; white-space: normal; text-align: left;
+  padding-top: 6px; padding-bottom: 6px; line-height: 1.3; overflow-wrap: anywhere;
+}
 .csg-rep-avisa { border-top: 1px solid var(--bg); }
 .csg-rep-avisa > summary { font-size: 13px; color: #b45309; }
 .csg-rep-avisa > .csg-rep-item { margin-bottom: 6px; }
@@ -1096,6 +1137,17 @@ button.csg-ver-fila:active { transform: scale(.985); }
    en letra de ancho fijo, y a 480 px un renglón de prompt se parte en
    tres. */
 .fin-modal.csg-modal { max-width: 560px; }
+/* ⚠️ Lo que se escribe no se esconde DEBAJO DEL PIE. El pie de Usar va
+   pegado (sticky) al borde de abajo, y el navegador, al seguir al cursor
+   —el renglón nuevo del 📎 Material, o el recuadro al que salta «Intro»
+   entre variables—, lo deja justo en ese borde: debajo de los botones, en
+   todos los anchos. El compositor ya lo tenía resuelto así con su barra
+   fija. 130 px es el respaldo; csgUsarRefrescar pone el alto de verdad
+   del pie, que cambia (apilado bajo 480 px, con «📖» debajo). */
+.fin-modal.csg-modal { scroll-padding-bottom: 130px; }
+/* La ✕ de las hojas de la casa mide 34 (app.css): aquí 44, sin que la
+   cabecera crezca (los márgenes negativos devuelven lo que ocupa). */
+.csg-modal .fin-modal-close { width: 44px; height: 44px; margin: -5px -8px -5px 6px; }
 /* La cabecera se queda arriba al deslizar: con un texto largo, la ✕ se
    iba con él y cerrar la hoja pedía volver arriba del todo. Se sale al
    borde (márgenes negativos del mismo tamaño que el relleno de la hoja)
@@ -1175,7 +1227,7 @@ button.csg-ver-fila:active { transform: scale(.985); }
   /* inline-block y no flex: los puntos suspensivos solo salen en una caja
      de bloque, y un valor largo (una dirección, un párrafo) se come la
      fila entera si no se corta. */
-  display: inline-block; min-height: 36px; line-height: 33px; padding: 0 12px;
+  display: inline-block; min-height: 40px; line-height: 37px; padding: 0 12px;
   max-width: 70vw; font-weight: 600; overflow: hidden; text-overflow: ellipsis;
 }
 /* Lo que falta (una variable vacía) y lo que PARA el uso, con su
@@ -1197,7 +1249,7 @@ button.csg-ver-fila:active { transform: scale(.985); }
 .csg-usar-extra { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 /* Estirados: cuando no caben en un renglón, cada uno ocupa el suyo entero
    en vez de quedar dos cortos de distinto largo, escalonados. */
-.csg-usar-extra > .csg-btn { flex: 1 1 auto; min-height: 36px; font-size: 12.5px; }
+.csg-usar-extra > .csg-btn { flex: 1 1 auto; min-height: 44px; font-size: 12.5px; }
 /* «📖 Guardar lo que devolvió», en el marrón de La Voz Prestada, que es
    adonde lleva. */
 .csg-usar-voz {
@@ -1254,7 +1306,7 @@ button.csg-pegar-propuesta { cursor: pointer; }
    no pinta su triángulo, y «Qué entiendo» a secas se leía como un rótulo,
    no como algo que se abre. */
 details.csg-nota > summary {
-  list-style: none; cursor: pointer; font-weight: 800; min-height: 36px;
+  list-style: none; cursor: pointer; font-weight: 800; min-height: 44px;
   display: flex; align-items: center; gap: 6px; -webkit-user-select: none; user-select: none;
 }
 details.csg-nota > summary::-webkit-details-marker { display: none; }
@@ -1273,6 +1325,17 @@ details.csg-nota li { margin: 2px 0; }
    ══════════════════════════════════════════════════════════════════ */
 body:has(#view-consigna-editor.active) #meta-toast {
   bottom: calc(var(--nav-h) + 86px + env(safe-area-inset-bottom, 0px));
+}
+/* ⚠️ Y SE LEE ENTERO. El aviso de la casa va en un renglón (`nowrap`) y
+   centrado, así que uno largo —«⬇ SKILL.md descargado: va en .claude/
+   skills/<nombre>/SKILL.md…», «No se pudo copiar solo: …»— salía cortado
+   POR LOS DOS LADOS en un teléfono: a 390 px se leía la mitad, y era una
+   instrucción. Aquí parte sus renglones dentro de la pantalla; el del
+   resto de la casa no se toca. */
+body:has(#view-consigna.active) #meta-toast,
+body:has(#view-consigna-editor.active) #meta-toast {
+  white-space: normal; width: max-content; max-width: calc(100vw - 32px); box-sizing: border-box;
+  text-align: center; line-height: 1.35;
 }
 
 /* ══════════════════════════════════════════════════════════════════
