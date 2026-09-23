@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/voz-prestada.css">
   <link rel="stylesheet" href="css/redaccion-redes.css">
   <link rel="stylesheet" href="css/redaccion-cuadernos.css">
+  <link rel="stylesheet" href="css/consigna.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="apple-touch-icon" href="img/icon-192.png">
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
@@ -119,6 +120,13 @@
           <span class="qa-icon qa-voz"><i class="fa-solid fa-book-open"></i></span>
           <span class="qa-label">La Voz Prestada</span>
         </button>
+        <!-- 📜 La Consigna, PEGADA a La Voz Prestada porque es su espejo:
+             allá se guarda lo que la máquina ESCRIBIÓ; aquí, con forma, lo
+             que se le PIDE. Sin insignia a propósito: las insignias son
+             para lo que mandó otro y hay que atender, y los borradores
+             propios en la portada serían ruido y una consulta más al
+             arrancar. -->
+        <button type="button" class="qa-item" data-qa="view-consigna"><span class="qa-icon qa-csg"><i class="fa-solid fa-scroll"></i></span><span class="qa-label">La Consigna</span></button>
         <button type="button" class="qa-item" data-qa="view-antena">
           <span class="qa-icon qa-ant"><i class="fa-solid fa-tower-broadcast"></i></span>
           <span class="qa-label">Antena</span>
@@ -1765,6 +1773,41 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
     </div>
   </div>
 
+  <!-- ========== 📜 LA CONSIGNA (js/tools/consigna.js, css/consigna.css) ==========
+       Dos vistas y no una con hojas: el anaquel (lo guardado) y el
+       compositor (escribir una consigna bloque a bloque). El compositor es
+       una VISTA porque se escribe largo y con el teclado de la tableta
+       puesto, y una hoja que tapa media pantalla deja el recuadro debajo
+       del teclado. Todo lo de dentro lo pinta el JavaScript con
+       createElement y textContent: aquí no hay ni un dato. -->
+  <div id="view-consigna" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="csg-back-btn" aria-label="Volver"><i class="fa-solid fa-arrow-left"></i></button>
+      <h1 class="view-title">📜 La Consigna</h1>
+      <button class="back-icon-btn" id="csg-nueva-btn" aria-label="Nueva consigna"><i class="fa-solid fa-plus"></i></button>
+    </header>
+    <div class="view-scroll csg-scroll"><div id="csg-anaquel"></div></div>
+  </div>
+  <!-- El compositor. A la derecha de la cabecera va el ESTADO DE GUARDADO
+       y no un 👁: la vista previa ya está en la barra fija de abajo, y dos
+       botones para lo mismo es ruido. La barra va FUERA del .view-scroll
+       para quedarse fija encima de la barra de la aplicación mientras se
+       desliza; el relleno de abajo del .csg-ed-scroll (css/consigna.css)
+       es lo que impide que tape el último bloque. -->
+  <div id="view-consigna-editor" class="view">
+    <header class="app-header compact">
+      <button class="back-icon-btn" id="csg-ed-back-btn" aria-label="Volver al anaquel"><i class="fa-solid fa-arrow-left"></i></button>
+      <input type="text" id="csg-ed-titulo" class="csg-ed-titulo" placeholder="Título" maxlength="200" autocomplete="off" aria-label="Título de la consigna">
+      <span class="csg-ed-estado" id="csg-ed-estado" aria-live="polite"></span>
+    </header>
+    <div class="view-scroll csg-scroll csg-ed-scroll"><div id="csg-ed"></div></div>
+    <div class="csg-ed-barra" id="csg-ed-barra">
+      <button type="button" class="csg-bb csg-bb-ver" id="csg-ed-ver"><span class="csg-bb-ic">👁</span><span class="csg-bb-t">Vista previa</span></button>
+      <button type="button" class="csg-bb csg-bb-guardar" id="csg-ed-guardar"><span class="csg-bb-ic">💾</span><span class="csg-bb-t">Guardar</span></button>
+      <button type="button" class="csg-bb csg-bb-usar" id="csg-ed-usar"><span class="csg-bb-ic">▶</span><span class="csg-bb-t">Usar</span></button>
+    </div>
+  </div>
+
   <!-- ========== REDACCIÓN 📰 (sala de redacción de la revista) ========== -->
   <div id="view-redaccion" class="view">
     <header class="app-header compact">
@@ -3074,6 +3117,32 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
     </div>
   </div>
 
+  <!-- 📜 La Consigna: sus tres hojas. En ESTE orden y no por capricho: la
+       vertical (#csg-ver-overlay) va la última porque se abre también
+       DESDE las otras dos («cambiar» la propuesta de lo pegado), y además
+       lleva el z-index más alto en css/consigna.css. Las tres van por
+       encima de la barra fija del compositor. Todo lo de dentro lo pinta
+       el JavaScript con textContent. -->
+  <div id="csg-usar-overlay" class="fin-modal-overlay csg-overlay" style="display:none;">
+    <div class="fin-modal csg-modal">
+      <div class="fin-modal-head"><div class="des-modal-title" id="csg-usar-titulo">▶ Usar</div><button type="button" class="fin-modal-close" id="csg-usar-close" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
+      <div id="csg-usar-cuerpo"></div>
+      <div class="csg-usar-pie" id="csg-usar-pie"></div>
+    </div>
+  </div>
+  <div id="csg-pegar-overlay" class="fin-modal-overlay csg-overlay" style="display:none;">
+    <div class="fin-modal csg-modal">
+      <div class="fin-modal-head"><div class="des-modal-title">📋 Pegar lo que ya tengo</div><button type="button" class="fin-modal-close" id="csg-pegar-close" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
+      <div id="csg-pegar-cuerpo"></div>
+    </div>
+  </div>
+  <div id="csg-ver-overlay" class="fin-modal-overlay csg-overlay" style="display:none;">
+    <div class="fin-modal csg-modal">
+      <div class="fin-modal-head"><div class="des-modal-title" id="csg-ver-titulo"></div><button type="button" class="fin-modal-close" id="csg-ver-close" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button></div>
+      <div id="csg-ver-cuerpo"></div>
+    </div>
+  </div>
+
   <!-- 📓 Cuadernos: la ficha de un cuaderno de NotebookLM
        (js/tools/redaccion-cuadernos.js). Todo lo que se escribe aquí se
        pinta con textContent; la dirección va con setAttribute y noopener. -->
@@ -3343,6 +3412,14 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
        en cada aparato. Si no carga, la hoja de pegar sigue entera y el
        botón lo dice. Misma razón que el banco de cortes de El Rodaje. -->
   <script src="js/tools/voz-adjunto.js"></script>
+  <!-- 📜 La Consigna. Después de La Voz Prestada y ANTES de app.js: el
+       botón «📖 Guardar lo que devolvió» llama a vozAbrirPegar, y
+       switchView llama a initConsigna. Todas sus funciones llevan el
+       prefijo csg y ninguna repite nombre de otro archivo: los <script>
+       de aquí comparten un solo ámbito y el que carga después pisa al de
+       antes sin decir nada (el corrector de la revista estuvo muerto dos
+       semanas por eso). -->
+  <script src="js/tools/consigna.js"></script>
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

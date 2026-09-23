@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Sonda · 📜 La Consigna</title>
+<style>body{font-family:system-ui;background:#222;color:#eee;margin:0;padding:10px}
+iframe{width:390px;height:720px;border:0;background:#fff;float:right}
+pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<iframe id="f" src="/index.html"></iframe>
+<pre id="out">midiendo…</pre>
+<script>
+/* Sonda de 📜 La Consigna (js/tools/consigna.js), con las 22
+   comprobaciones del apartado 11 de PLAN-LA-CONSIGNA.md.
+
+   Como las vecinas (Cuadernos, La Voz Prestada): abre el index.html DE
+   VERDAD en UN marco, con una base de mentira a nivel de fetch, una sesión
+   de mentira, el portapapeles, window.open y navigator.share apuntados y
+   confirm() contado; PULSA los botones y mide con getBoundingClientRect y
+   elementFromPoint con la vista abierta de verdad; y de cada prueba mira lo
+   que QUEDÓ —en el DOM, en el almacén o en lo que viajó a la base— y no lo
+   que la pantalla dice que pasó.
+
+   ⚠️ LA BASE DE MENTIRA EXIGE LO QUE EXIGE LA DE VERDAD, y lo que exige lo
+   saca del propio supabase/sql/consigna.sql (las columnas, sus tipos, los
+   `not null`, los `default` y los `check`): 42P01 sin la tabla; 42703 al
+   leer una columna que no está (y PGRST204 al escribirla, que es lo que
+   contesta PostgREST); 23502 sin `autor`; 23514 si un `check` muerde,
+   midiendo los jsonb como jsonb::text; 22007 si `eliminado_at` no es una
+   fecha. Un doble complaciente esconde la costura (La Voz Prestada, regla
+   13): una base que aceptara cualquier cosa aprobaría la subida que la de
+   verdad rebota. Si el SQL no se puede leer, la sonda SUSPENDE.
+
+   ⚠️ UN SOLO MARCO. Al cambiar la base (sin tabla → puesta → vieja →
+   colgada) se reutiliza y se vuelve a llamar a initConsigna(), como manda
+   el §11: un segundo index.html del mismo origen se queda colgado y la
+   sonda no llega a poner su veredicto. Donde hay que «volver a arrancar»
+   (la lápida que tiene que ganar, el borrador que sobrevive a recargar) se
+   hace lo que hace un arranque con el estado del módulo: la memoria se
+   vacía y el aparato (localStorage) se queda.
+
+   Las secciones se CORREN en el orden que pide el estado (sin tabla antes
+   que puesta, los usos antes de la bitácora), y cada una dice su número
+   del §11; al final se resumen en orden. Termina con APRUEBA o SUSPENDE
+   DELANTE en el título. */
+
+const out = document.getElementById('out'), f = document.getElementById('f');
+const L = []; let fallos = 0, total = 0, secc = 0;
+const porSeccion = {};
+function log(s) { L.push(s); out.textContent = L.join('\n'); }
+function ok(c, bien, mal) {
+  total++;
+  const k = porSeccion[secc] || (porSeccion[secc] = { bien: 0, mal: 0 });
+  if (c) { k.bien++; log('  ✔ ' + bien); return true; }
+  fallos++; k.mal++;
+  const d = mal === undefined || mal === null ? '' : String(mal);
+  log('  ✘ ' + bien + (d ? '\n      → ' + d.split('\n').join('\n        ') : ''));
+  return false;
+}
+/* La diferencia exacta: un fallo de una línea en blanco no se busca a ojo. */
+function diff(a, b) {
+  a = String(a); b = String(b);
+  if (a === b) return '';
+  let i = 0;
+  while (i < a.length && i < b.length && a[i] === b[i]) i++;
+  return 'primera diferencia en el carácter ' + i + ' (renglón ' + a.slice(0, i).split('\n').length + ')\n' +
+    'salió:    ' + JSON.stringify(a.slice(Math.max(0, i - 40), i + 60)) + '\nesperado: ' + JSON.stringify(b.slice(Math.max(0, i - 40), i + 60));
+}
+const igual = (a, b, msg) => ok(a === b, msg, diff(a, b));
+const esperar = ms => new Promise(r => setTimeout(r, ms));
+async function hasta(cond, ms, paso) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < (ms || 3000)) { try { if (cond()) return true; } catch (e) {} await esperar(paso || 40); }
+  try { return !!cond(); } catch (e) { return false; }
+}
+const trae = async ruta => { try { const r = await fetch(ruta, { cache: 'no-store' }); return r.ok ? await r.text() : null; } catch (e) { return null; } };
+
+/* Lo que la sonda lee del repositorio, pedido YA: antes de que el service
+   worker que registra index.html tome el mando de esta página. */
+const ARCHIVOS = (async () => {
+  const [PLAN, SQL, CSS, INDEX, VOZ] = await Promise.all(['/PLAN-LA-CONSIGNA.md', '/supabase/sql/consigna.sql', '/css/consigna.css', '/index.html', '/js/tools/voz-prestada.js'].map(trae));
+  const srcs = INDEX ? [...INDEX.matchAll(/src="(js\/[^"]+)"/g)].map(m => m[1]) : [];
+  const JS = {};
+  await Promise.all(srcs.map(async s => { JS[s] = await trae('/' + s); }));
+  return { PLAN, SQL, CSS, INDEX, VOZ, srcs, JS };
+})();
+
+const NOMBRES = {
+  1: 'Veneno: se ve como texto', 2: 'Armado exacto', 3: 'SKILL.md', 4: 'Mermaid', 5: 'Variables', 6: 'Chips',
+  7: 'Pegar y repartir', 8: 'Plegado', 9: 'Nube', 10: 'Fusión', 11: 'Lápida', 12: 'Usar', 13: 'Bitácora preguntada',
+  14: 'Topes', 15: 'Borrador', 16: 'Repaso', 17: 'Compositor a 320 px', 18: 'Píxeles y colores', 19: 'Las tres hojas por encima',
+  20: '📖 Guardar lo que devolvió', 21: 'Export', 22: 'Choque de nombres', 0: 'Arranque y cierre',
+};
+let limpiaPantalla = async () => {};
+/* Cada tramo se encierra: una sección que revienta a medias dice SUSPENDE
+   y la sonda sigue con la siguiente, en vez de quedarse sin veredicto. */
+async function tramo(n, titulo, fn) {
+  secc = n;
+  log('\n── ' + n + '. ' + titulo + ' ──');
+  try { await fn(); }
+  catch (e) {
+    ok(false, 'la sección ' + n + ' terminó sin reventar', String(e && e.stack || e).split('\n').slice(0, 4).join('\n'));
+    try { await limpiaPantalla(); } catch (e2) {}
+  }
+}
+function termina() {
+  const v = fallos ? 'SUSPENDE' : 'APRUEBA';
+  const filas = Object.keys(NOMBRES).map(Number).filter(n => porSeccion[n]).sort((a, b) => a - b)
+    .map(n => (porSeccion[n].mal ? '✘ ' : '✔ ') + n + '. ' + NOMBRES[n] + ' — ' + porSeccion[n].bien + ' bien' + (porSeccion[n].mal ? ', ' + porSeccion[n].mal + ' mal' : ''));
+  const faltan = Object.keys(NOMBRES).map(Number).filter(n => n && !porSeccion[n]);
+  if (faltan.length) { fallos += faltan.length; filas.push('✘ sin correr: ' + faltan.join(', ')); }
+  log('\n══ Resumen por comprobación del §11 ══\n' + filas.join('\n'));
+  log(`\nRESULTADO: ${fallos ? 'SUSPENDE' : 'APRUEBA'}${fallos ? ` (${fallos} fallo${fallos === 1 ? '' : 's'} de ${total})` : ` (${total} comprobaciones)`}`);
+  document.title = `${fallos ? 'SUSPENDE' : 'APRUEBA'} · consigna (${total} comprobaciones${fallos ? ', ' + fallos + ' fallos' : ''})`;
+}
+
+/* ── Lo del SQL, leído del propio archivo ─────────────────────────── */
+function leeSQL(SQL) {
+  const s = String(SQL || '').split('\n').map(l => l.replace(/--.*$/, '')).join('\n');
+  const topes = {}, entre = {};
+  let m;
+  const re = /length\((\w+)(?:::text)?\)\s*<=\s*(\d+)/g;
+  while ((m = re.exec(s))) topes[m[1]] = Number(m[2]);
+  const t = /length\(btrim\(titulo\)\)\s*between\s*(\d+)\s*and\s*(\d+)/.exec(s);
+  if (t) { entre.titulo = [Number(t[1]), Number(t[2])]; topes.titulo = Number(t[2]); }
+  const re2 = /check \((?:length\()?(\w+)\)?\s+between\s+(\d+)\s+and\s+(\d+)\)/g;
+  while ((m = re2.exec(s))) { entre[m[1]] = [Number(m[2]), Number(m[3])]; if (m[1] !== 'id') topes[m[1]] = Number(m[3]); }
+  const minimos = {};
+  const re3 = /check \((\w+)\s*>=\s*(\d+)\)/g;
+  while ((m = re3.exec(s))) minimos[m[1]] = Number(m[2]);
+  const cols = [], tipos = {}, noNulas = new Set(), defectos = {};
+  const cuerpo = /create table if not exists public\.consigna_piezas \(([\s\S]*?)\n\);/.exec(s);
+  if (cuerpo) {
+    /* Una columna puede llevar su check en el renglón de abajo: se junta
+       cada columna con sus renglones de continuación antes de leerla. */
+    const trozos = [];
+    cuerpo[1].split('\n').forEach(l => {
+      if (/^\s*[a-z_]+\s+(text|jsonb|integer|bigint|boolean|timestamptz)\b/.test(l)) trozos.push(l);
+      else if (trozos.length && l.trim()) trozos[trozos.length - 1] += ' ' + l.trim();
+    });
+    trozos.forEach(l => {
+      const x = /^\s*([a-z_]+)\s+(text|jsonb|integer|bigint|boolean|timestamptz)\b(.*)$/.exec(l);
+      cols.push(x[1]); tipos[x[1]] = x[2];
+      if (/not null|primary key/.test(x[3])) noNulas.add(x[1]);
+      let dm;
+      if ((dm = /default\s+'([^']*)'::jsonb/.exec(x[3]))) defectos[x[1]] = JSON.parse(dm[1]);
+      else if ((dm = /default\s+'([^']*)'/.exec(x[3]))) defectos[x[1]] = dm[1];
+      else if ((dm = /default\s+(\d+)/.exec(x[3]))) defectos[x[1]] = Number(dm[1]);
+      else if ((dm = /default\s+(true|false)/.exec(x[3]))) defectos[x[1]] = dm[1] === 'true';
+      else if (/default\s+now\(\)/.test(x[3])) defectos[x[1]] = '__ahora__';
+    });
+  }
+  return { topes, entre, minimos, cols, tipos, noNulas, defectos };
+}
+/* La medida de PostgreSQL, escrita aquí aparte: el TEXTO que escribe
+   jsonb («": "» y «", "» con su espacio), contado en puntos de código.
+   Independiente de csgLargoBase: si la del aparato se torciera, la base
+   de mentira rebotaría lo que la de verdad rebota. */
+function pgTexto(v) {
+  if (v === null || v === undefined) return 'null';
+  if (Array.isArray(v)) return '[' + v.map(x => pgTexto(x === undefined ? null : x)).join(', ') + ']';
+  if (typeof v === 'object') return '{' + Object.keys(v).filter(k => v[k] !== undefined).map(k => JSON.stringify(k) + ': ' + pgTexto(v[k])).join(', ') + '}';
+  return JSON.stringify(v);
+}
+const pgLargo = v => Array.from(pgTexto(v)).length;
+const cpL = s => Array.from(String(s == null ? '' : s)).length;
+
+/* El contador de palabras de la prueba de Node, escrito aparte de
+   csgPalabras: si ésta se estropeara, la cuenta no aprobaría por usar la
+   misma función rota en los dos lados. */
+const ETQ = /<\/?[A-Za-z_][\w.:-]*(?:\s[^<>]*)?\/?>/g;
+const sinTildes = s => String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const cuentaP = t => String(t || '').replace(ETQ, ' ').split(/\s+/).filter(x => /[\p{L}\p{N}]/u.test(x)).length;
+const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) || []).map(x => sinTildes(x).toLowerCase());
+
+(async function corre() {
+  const A = await ARCHIVOS;
+  await new Promise(r => { if (f.contentDocument && f.contentDocument.readyState === 'complete' && f.contentWindow.location.pathname.endsWith('index.html')) r(); else f.addEventListener('load', r, { once: true }); });
+  await esperar(1200);
+  const w = f.contentWindow, d = w.document;
+
+  /* ── Lo que revienta dentro del marco se cuenta como fallo ── */
+  const errores = [];
+  w.addEventListener('error', e => errores.push('error: ' + (e.message || e) + ' @' + (e.filename || '') + ':' + (e.lineno || '')));
+  w.addEventListener('unhandledrejection', e => errores.push('promesa: ' + (e.reason && (e.reason.stack || e.reason.message) || e.reason)));
+  const ceOrig = w.console.error.bind(w.console);
+  w.console.error = (...a) => { const t = a.map(x => x && x.stack ? x.stack : String(x)).join(' '); if (!/Failed to load resource|WebSocket|ERR_|net::/.test(t)) errores.push('console.error: ' + t); ceOrig(...a); };
+
+  const SQLD = leeSQL(A.SQL);
+  const sqlLeido = !!A.SQL && SQLD.cols.length > 0;
+
+  /* ══════════════════════════════════════════════════════════════
+     LA BASE DE MENTIRA, a nivel de fetch
+     ══════════════════════════════════════════════════════════════ */
+  let modo = 'sin-tabla';           // sin-tabla | puesta | vieja | cuelga
+  let colsFuera = [];               // en 'vieja': las columnas que la tabla aún no tiene
+  const tabla = new Map();          // id → fila, como la guarda la base
+  const llamadas = [];
+  const rechazos = [];              // cada respuesta de error que dio la base, con su código
+  const colsVivas = () => (sqlLeido ? SQLD.cols : []).filter(c => colsFuera.indexOf(c) < 0);
+  const defecto = c => {
+    const v = SQLD.defectos[c];
+    if (v === '__ahora__') return new Date().toISOString();
+    return v === undefined ? null : JSON.parse(JSON.stringify(v));
+  };
+  const responde = (estado, cuerpo) => new Response(cuerpo == null ? null : JSON.stringify(cuerpo), { status: estado, headers: { 'Content-Type': 'application/json' } });
+  const rebota = (estado, code, message, l) => { rechazos.push({ code, message }); if (l) { l.estado = estado; l.codigo = code; } return responde(estado, { code, message, details: null, hint: null }); };
+  function compruebaFila(f, nueva, columnas) {
+    const cols = colsVivas();
+    const fuera = Object.keys(f).find(c => cols.indexOf(c) < 0);
+    if (fuera) return [400, 'PGRST204', "Could not find the '" + fuera + "' column of 'consigna_piezas' in the schema cache"];
+    /* ⚠️ Sin `autor` no entra (§11): ninguna fila viaja sin firma. */
+    if (!('autor' in f) || f.autor === null) return [400, '23502', 'null value in column "autor" of relation "consigna_piezas" violates not-null constraint'];
+    for (const c of SQLD.noNulas) {
+      const falta = !(c in f) && ((columnas && columnas.indexOf(c) >= 0) || (nueva && defecto(c) === null));
+      if ((c in f && f[c] === null) || falta) return [400, '23502', 'null value in column "' + c + '" of relation "consigna_piezas" violates not-null constraint'];
+    }
+    const chk = c => [400, '23514', 'new row for relation "consigna_piezas" violates check constraint "consigna_piezas_' + c + '_check"'];
+    for (const c of Object.keys(f)) {
+      const v = f[c], tipo = SQLD.tipos[c];
+      if (v === null) continue;
+      if (tipo === 'text' && typeof v !== 'string') return [400, '22P02', 'invalid input syntax for type text: ' + c];
+      if ((tipo === 'integer' || tipo === 'bigint') && !(typeof v === 'number' && Number.isInteger(v))) return [400, '22P02', 'invalid input syntax for type ' + tipo + ': "' + v + '" (' + c + ')'];
+      if (tipo === 'boolean' && typeof v !== 'boolean') return [400, '22P02', 'invalid input syntax for type boolean (' + c + ')'];
+      if (tipo === 'timestamptz' && (typeof v !== 'string' || isNaN(Date.parse(v)))) return [400, '22007', 'invalid input syntax for type timestamp with time zone: "' + v + '"'];
+      if (tipo === 'jsonb' && !Array.isArray(v)) return chk(c);
+      if (SQLD.entre[c]) {
+        const n = c === 'titulo' ? cpL(String(v).trim()) : (typeof v === 'number' ? v : cpL(v));
+        if (n < SQLD.entre[c][0] || n > SQLD.entre[c][1]) return chk(c);
+      } else if (SQLD.topes[c] !== undefined) {
+        const n = tipo === 'jsonb' ? pgLargo(v) : cpL(v);
+        if (n > SQLD.topes[c]) return chk(c);
+      }
+      if (SQLD.minimos[c] !== undefined && v < SQLD.minimos[c]) return chk(c);
+    }
+    return null;
+  }
+  async function base(u, metodo, cabs, cuerpo) {
+    const l = { tabla: true, metodo, ruta: u.pathname + u.search, cuerpo, prefer: cabs.get('Prefer') || '', onConflict: u.searchParams.get('on_conflict'), estado: 0, codigo: '' };
+    llamadas.push(l);
+    if (modo === 'cuelga') return new Promise(() => {});       // la petición que NO VUELVE
+    if (modo === 'sin-tabla') return rebota(404, '42P01', 'relation "public.consigna_piezas" does not exist', l);
+    const cols = colsVivas();
+    if (metodo === 'GET') {
+      const pedidas = String(u.searchParams.get('select') || '*').split(',').map(x => x.trim()).filter(Boolean);
+      const falta = pedidas.find(c => c !== '*' && cols.indexOf(c) < 0);
+      if (falta) return rebota(400, '42703', 'column consigna_piezas.' + falta + ' does not exist', l);
+      const quiero = pedidas.indexOf('*') >= 0 ? cols : pedidas;
+      const filas = [...tabla.values()].sort((a, b) => (b.actualizado || 0) - (a.actualizado || 0))
+        .map(r => { const o = {}; quiero.forEach(c => { o[c] = c in r ? r[c] : defecto(c); }); return o; });
+      l.estado = 200;
+      return responde(200, filas);
+    }
+    if (metodo === 'POST') {
+      let lista;
+      try { lista = JSON.parse(cuerpo); } catch (e) { return rebota(400, 'PGRST102', 'Empty or invalid json', l); }
+      if (!Array.isArray(lista)) lista = [lista];
+      /* Un upsert de verdad: `on_conflict` solo sobre una columna única (la
+         llave es `id`), y sin «merge-duplicates» un id que ya existe es un
+         23505, no una fila corregida. */
+      if (l.onConflict && l.onConflict !== 'id') return rebota(400, '42P10', 'there is no unique or exclusion constraint matching the ON CONFLICT specification', l);
+      const columnas = (u.searchParams.get('columns') || '').split(',').map(x => x.replace(/"/g, '').trim()).filter(Boolean);
+      const noCol = columnas.find(c => cols.indexOf(c) < 0);
+      if (noCol) return rebota(400, 'PGRST204', "Could not find the '" + noCol + "' column of 'consigna_piezas' in the schema cache", l);
+      if (!/resolution=merge-duplicates/.test(l.prefer) && lista.some(x => tabla.has(x.id))) return rebota(409, '23505', 'duplicate key value violates unique constraint "consigna_piezas_pkey"', l);
+      for (const fila of lista) {
+        const mal = compruebaFila(fila, !tabla.has(fila.id), columnas);
+        if (mal) return rebota(mal[0], mal[1], mal[2], l);
+      }
+      /* Todo o nada, como una transacción: la fila se escribe entera por
+         encima de la que había (el upsert de PostgREST pisa las columnas
+         que manda). */
+      lista.forEach(fila => {
+        const ya = tabla.get(fila.id);
+        const nueva = ya ? Object.assign({}, ya) : {};
+        if (!ya) cols.forEach(c => { nueva[c] = defecto(c); });
+        Object.keys(fila).forEach(c => { nueva[c] = JSON.parse(JSON.stringify(fila[c])); });
+        nueva.actualizado_at = new Date().toISOString();
+        tabla.set(fila.id, nueva);
+      });
+      l.estado = 201;
+      return new Response(null, { status: 201 });
+    }
+    return rebota(405, 'PGRST000', 'método no esperado', l);
+  }
+  w.fetch = async (url, init) => {
+    const u = new URL(typeof url === 'string' ? url : url.url, w.location.href);
+    const metodo = String((init && init.method) || (typeof url !== 'string' && url.method) || 'GET').toUpperCase();
+    const cabs = new Headers((init && init.headers) || {});
+    if (/\/rest\/v1\/consigna_piezas$/.test(u.pathname)) return base(u, metodo, cabs, init && init.body);
+    llamadas.push({ tabla: false, metodo, ruta: u.pathname + u.search });
+    const unSolo = (cabs.get('Accept') || '').includes('pgrst.object');
+    return new Response(unSolo ? 'null' : '[]', { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  const posts = desde => llamadas.slice(desde || 0).filter(l => l.tabla && l.metodo === 'POST');
+  const filasDe = l => { try { const x = JSON.parse(l.cuerpo); return Array.isArray(x) ? x : [x]; } catch (e) { return []; } };
+  const subidasDe = (id, desde) => posts(desde).filter(l => l.estado === 201).map(filasDe).flat().filter(x => x.id === id);
+  /* Una fila de otro aparato, con todas sus columnas: lo que de verdad
+     guardaría la base. */
+  const filaNube = extra => {
+    const o = {};
+    SQLD.cols.forEach(c => { o[c] = defecto(c); });
+    return Object.assign(o, { clase: 'prompt', molde: 'rapido', maquina: 'claude', autor: 'evelyn', actualizado: Date.now() }, extra);
+  };
+
+  /* ── La sesión, el portapapeles, las ventanas, compartir y confirm ── */
+  let sesion = { user: 'josue', nombre: 'Josué Edmundo' };
+  w.verificarSesion = () => sesion;
+  try { w.localStorage.removeItem('faro.miembro'); } catch (e) {}
+  let confirms = 0;
+  w.confirm = () => { confirms++; return true; };
+  let copiado = null, copias = 0;
+  const seq = [];
+  try {
+    Object.defineProperty(w.navigator, 'clipboard', { configurable: true, value: {
+      writeText: t => { seq.push('clip'); copiado = String(t); copias++; return Promise.resolve(); },
+      readText: () => Promise.resolve(''),
+    } });
+  } catch (e) { log('no pude poner el portapapeles de mentira: ' + e.message); }
+  const compartidos = [];
+  try { Object.defineProperty(w.navigator, 'share', { configurable: true, value: dd => { compartidos.push(dd); return Promise.resolve(); } }); } catch (e) {}
+  const abiertas = [];
+  w.open = (u, t, feat) => { seq.push('open'); abiertas.push({ u, t, feat }); return null; };
+  const avisos = [];
+  if (typeof w.toast === 'function') { const t0 = w.toast; w.toast = m => { avisos.push(String(m)); try { t0(m); } catch (e) {} }; }
+  ['faro_consigna_v1', 'faro_consigna_anaquel_v1', 'faro_consigna_vars_v1', 'faro_consigna_maquina_v1', 'faro_consigna_borrador_v1', 'faro_consigna_pregunta_v1']
+    .forEach(k => { try { w.localStorage.removeItem(k); } catch (e) {} });
+
+  /* ── Ayudantes de pantalla ─────────────────────────────────────── */
+  const $ = id => d.getElementById(id);
+  const g = expr => w.eval(expr);
+  const J = x => w.JSON.parse(JSON.stringify(x));          // un objeto del reino del marco
+  const cs = (el, p) => w.getComputedStyle(el).getPropertyValue(p);
+  const vis = el => !!el && el.getClientRects().length > 0 && w.getComputedStyle(el).visibility !== 'hidden';
+  const activa = id => { const v = $(id); return !!v && v.classList.contains('active'); };
+  const anq = () => $('csg-anaquel');
+  const botonCon = (raiz, re) => [...((raiz || d).querySelectorAll('button'))].find(b => re.test(b.textContent) && vis(b));
+  function pulsa(b, que) { if (!b) throw new Error('no encuentro ' + que); b.click(); }
+  function escribe(el, t) { el.focus(); el.value = t; el.dispatchEvent(new w.Event('input', { bubbles: true })); }
+  const verAbierta = id => !!$(id) && $(id).style.display === 'flex';
+  const barraBtn = re => [...anq().querySelectorAll('.csg-barra .csg-btn')].find(b => re.test(b.textContent));
+  const filaVer = re => [...d.querySelectorAll('#csg-ver-cuerpo .csg-ver-fila')].find(x => re.test(x.textContent));
+  const filaMolde = nombre => [...d.querySelectorAll('#csg-ver-cuerpo .csg-ver-fila')].find(x => {
+    const t = x.querySelector('.csg-ver-txt'); return t && t.firstChild && String(t.firstChild.textContent).replace(/ · recomendado$/, '') === nombre;
+  });
+  const fichas = () => [...anq().querySelectorAll('.csg-ficha')];
+  const fichaDe = titulo => fichas().find(x => x.querySelector('.csg-ficha-titulo').textContent === titulo);
+  const pieza = titulo => g('csgVivas()').find(p => p.titulo === titulo) || null;
+  const pieBtn = re => [...$('csg-usar-pie').querySelectorAll('.csg-btn')].find(b => re.test(b.textContent));
+  const ta = id => g('_csgEdTa')[id] || null;
+  const carta = id => g('_csgEdCartas')[id] || null;
+  const franja = () => { const x = anq().querySelector('.csg-nube-no, .csg-nube-pie'); return x ? x.textContent : '(sin franja)'; };
+  const hoyLocal = (() => { const x = new Date(); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); })();
+  function centro(el) {
+    const r = el.getBoundingClientRect();
+    const top = Math.max(0, r.top), bot = Math.min(w.innerHeight, r.bottom);
+    const izq = Math.max(0, r.left), der = Math.min(w.innerWidth, r.right);
+    return { x: (izq + der) / 2, y: (top + bot) / 2 };
+  }
+  const enPunto = el => { const c = centro(el); return d.elementFromPoint(c.x, c.y); };
+  async function ancho(px) { f.style.width = px + 'px'; await esperar(250); }
+
+  /* Entrar al anaquel como una persona: Inicio en la barra de abajo y la
+     baldosa del Acceso Rápido. Cada entrada es una apertura (la bitácora
+     las cuenta). */
+  async function entrar() {
+    pulsa(d.querySelector('#bottom-nav .nav-item[data-view="view-inicio"]'), 'Inicio de la barra de abajo');
+    await esperar(120);
+    pulsa(d.querySelector('[data-qa="view-consigna"]'), 'la baldosa del Acceso Rápido');
+    await esperar(450);
+  }
+  async function nueva(clase) {
+    if (!activa('view-consigna')) await entrar();
+    pulsa($('csg-nueva-btn'), '＋ de la cabecera');
+    await esperar(120);
+    pulsa(d.querySelector('#csg-ver-cuerpo .csg-clase-baldosa.csg-clase-' + clase), 'la baldosa ' + clase);
+    await esperar(200);
+  }
+  async function molde(nombre) {
+    pulsa(d.querySelector('#csg-ed .csg-ed-molde'), 'el chip «Molde ▾»');
+    await esperar(120);
+    pulsa(filaMolde(nombre), 'el molde «' + nombre + '»');
+    await esperar(200);
+  }
+  async function abreBloque(id) {
+    if (!ta(id)) { pulsa(carta(id), 'el bloque plegado ' + id); await esperar(60); }
+    return ta(id);
+  }
+  const titulo = t => escribe($('csg-ed-titulo'), t);
+  async function guardar() { pulsa($('csg-ed-guardar'), '💾 Guardar'); await esperar(250); }
+  async function volver() { pulsa($('csg-ed-back-btn'), '‹ del compositor'); await esperar(350); }
+  async function usarFicha(t) { pulsa(botonCon(fichaDe(t), /Usar/), '▶ Usar de «' + t + '»'); await esperar(250); }
+  async function cierraUsar() { if (verAbierta('csg-usar-overlay')) { pulsa($('csg-usar-close'), '✕ de Usar'); await esperar(150); } }
+  async function menu(t) { pulsa(fichaDe(t).querySelector('.csg-mas'), '⋯ de «' + t + '»'); await esperar(150); }
+  limpiaPantalla = async () => {
+    ['csg-ver-close', 'csg-usar-close', 'csg-pegar-close'].forEach(id => { const x = $(id); if (x && x.closest('.fin-modal-overlay').style.display === 'flex') x.click(); });
+    await esperar(100);
+    if (activa('view-consigna-editor')) { try { $('csg-ed-back-btn').click(); } catch (e) {} await esperar(300); }
+    if (!activa('view-consigna')) await entrar();
+  };
+  /* Lo que quedó sin subir con respiro se deja llegar: sin esto, una
+     subida de hace un segundo caería en mitad de la sección siguiente y le
+     sumaría un viaje que no hizo. */
+  const respiro = () => esperar(2600);
+
+  if (typeof w.initConsigna !== 'function' || typeof w.csgArmar !== 'function') {
+    secc = 0; ok(false, 'index.html cargó js/tools/consigna.js', 'typeof initConsigna = ' + typeof w.initConsigna);
+    termina(); return;
+  }
+  d.getElementById('login-screen').style.display = 'none';
+  d.getElementById('app-container').style.display = '';
+  w.eval("switchView('view-inicio')");
+  await esperar(300);
+
+  /* ══════════════════════════════════════════════════════════════
+     22 · EL CHOQUE DE NOMBRES (el bucle de CLAUDE.md, aquí dentro)
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(22, 'Choque de nombres: ninguna función global en dos archivos', async () => {
+    ok(typeof w.initConsigna === 'function', 'typeof initConsigna === "function": la puerta por la que la llama switchView', 'typeof = ' + typeof w.initConsigna);
+    ok(!!A.INDEX, 'se pudo leer index.html');
+    const noLeidos = A.srcs.filter(s => A.JS[s] == null);
+    ok(A.srcs.length > 20 && !noLeidos.length, 'se leyeron los ' + A.srcs.length + ' <script src="js/…"> de index.html', 'sin leer: ' + noLeidos.join(', '));
+    ok(A.srcs.indexOf('js/tools/consigna.js') >= 0, 'js/tools/consigna.js es uno de ellos');
+    const quien = new Map();
+    A.srcs.forEach(s => {
+      if (A.JS[s] == null) return;
+      new Set([...A.JS[s].matchAll(/^(?:async )?function ([A-Za-z_$][A-Za-z0-9_$]*)/gm)].map(m => m[1]))
+        .forEach(fn => quien.set(fn, (quien.get(fn) || []).concat([s])));
+    });
+    const choques = [...quien].filter(([, l]) => l.length > 1).map(([fn, l]) => fn + ': ' + l.join(' '));
+    ok(quien.size > 1000 && !choques.length, 'el bucle devuelve vacío: ' + quien.size + ' funciones a principio de renglón, ninguna en dos archivos', choques.join('\n') || ('solo ' + quien.size + ' funciones'));
+    const mias = new Set([...(A.JS['js/tools/consigna.js'] || '').matchAll(/^(?:async )?function ([A-Za-z_$][A-Za-z0-9_$]*)/gm)].map(m => m[1]));
+    const sinPrefijo = [...mias].filter(n => !/^csg/.test(n) && n !== 'initConsigna');
+    ok(mias.size > 300 && !sinPrefijo.length, 'las ' + mias.size + ' funciones de consigna.js llevan el prefijo csg (y la puerta initConsigna)', sinPrefijo.join(', '));
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     14 (1/2) · LOS TOPES CONTRA LOS CHECK DEL SQL, Y LA PODA
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(14, 'Topes (1/2): CSG_TOPES contra los check de consigna.sql, y la poda por bytes', async () => {
+    /* Si el SQL no se puede leer, SUSPENDE: aprobar con la lista vacía
+       sería el doble complaciente de siempre. */
+    if (!ok(sqlLeido, 'se puede leer supabase/sql/consigna.sql y trae su create table', 'no se pudo leer: sin él ni esta comprobación ni la base de mentira valen')) return;
+    const T = g('CSG_TOPES');
+    const claves = ['bloques', 'material', 'estantes', 'notas', 'bitacora', 'versiones', 'maquina', 'cuaderno', 'autor', 'titulo', 'clase', 'molde', 'version'];
+    const faltan = claves.filter(k => SQLD.topes[k] === undefined);
+    ok(!faltan.length, 'el SQL trae los ' + claves.length + ' topes que se comparan', 'no se leyeron: ' + faltan.join(', '));
+    const distintos = Object.keys(SQLD.topes).filter(k => T[k] !== SQLD.topes[k]).map(k => k + ': CSG_TOPES ' + T[k] + ' / check ' + SQLD.topes[k]);
+    ok(!distintos.length && Object.keys(SQLD.topes).length >= 13, 'CSG_TOPES dice los mismos números que los ' + Object.keys(SQLD.topes).length + ' check de la base (' + ['bloques', 'material', 'bitacora', 'versiones'].map(k => k + ' ' + SQLD.topes[k]).join(', ') + '…)', distintos.join('\n'));
+    ok(SQLD.cols.length === 21, 'la tabla tiene 21 columnas', SQLD.cols.length + ': ' + SQLD.cols.join(','));
+    const pedidas = String(g('CSG_COLUMNAS')).split(',');
+    ok(pedidas.every(c => SQLD.cols.indexOf(c) >= 0), 'CSG_COLUMNAS son columnas de la tabla', pedidas.filter(c => SQLD.cols.indexOf(c) < 0).join(','));
+
+    /* Once versiones de 30.000 caracteres: diez con bloques NO caben en
+       200.000, así que manda el byte y no la cuenta. */
+    const v11 = J({ id: 'csg-sonda-poda-v', clase: 'prompt', molde: 'rapido', titulo: 'Poda', bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'x' }],
+      versiones: Array.from({ length: 11 }, (_, i) => ({ vid: 'v' + i, v: i + 1, t: 1000 + i, bloques: [{ id: 'tarea', rotulo: 'Tarea', t: String.fromCharCode(97 + i).repeat(30000) }] })) });
+    const r11 = w.csgPodar(v11);
+    const con = v11.versiones.filter(x => Array.isArray(x.bloques)), sin = v11.versiones.filter(x => !Array.isArray(x.bloques));
+    ok(pgLargo(v11.versiones) < 200000 && pgLargo(v11.versiones) <= g('CSG_PODA_VERSIONES'), '11 versiones de 30.000 quedan por debajo de 200.000 medidas como jsonb::text (' + pgLargo(v11.versiones) + ')', pgLargo(v11.versiones));
+    ok(v11.versiones.length === 11 && sin.length > 0 && r11.plegadas === sin.length && con.every(a => sin.every(b => a.t > b.t)),
+      'ninguna se pierde: se pliegan las ' + sin.length + ' más viejas y las ' + con.length + ' más nuevas conservan su texto', JSON.stringify({ n: v11.versiones.length, plegadas: r11.plegadas, con: con.map(x => x.v), sin: sin.map(x => x.v) }));
+    const u250 = J({ id: 'csg-sonda-poda-u', clase: 'prompt', molde: 'rapido', titulo: 'Usos', bloques: [], usos: 250,
+      bitacora: Array.from({ length: 250 }, (_, i) => ({ uid: 'u' + i, t: 100000 + i, maquina: 'claude', v: 1, ok: i % 3 ? null : 'si', nota: '' })) });
+    w.csgPodar(u250);
+    ok(u250.bitacora.length === 200 && u250.bitacora.every(u => u.t >= 100050) && u250.usos === 250, '250 usos → 200, los más recientes, y el contador de usos no baja', JSON.stringify({ n: u250.bitacora.length, min: Math.min(...u250.bitacora.map(u => u.t)), usos: u250.usos }));
+    const b61 = J({ id: 'csg-sonda-poda-b', clase: 'prompt', molde: 'rapido', titulo: 'Grande', bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'x'.repeat(61000) }] });
+    const rb = w.csgPodar(b61);
+    ok(rb.noCabe && b61.noCabe && b61.bloques[0].t.length === 61000, 'unos bloques que no caben NO se recortan: se marcan «no cabe»', JSON.stringify({ noCabe: rb.noCabe, largo: b61.bloques[0].t.length }));
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     1 (1/2) · LO QUE SE COMPRUEBA SIN PANTALLA
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(1, 'Veneno (1/2): el emoji y el CSS', async () => {
+    const vozIcs = g('VOZ_GENEROS.map(x => x.ic)');
+    ok(Array.isArray(vozIcs) && vozIcs.length > 5 && vozIcs.indexOf(g('CSG_EMOJI')) < 0, 'CSG_EMOJI (' + g('CSG_EMOJI') + ') no es ninguno de los emojis de VOZ_GENEROS', vozIcs && vozIcs.join(' '));
+    ok(!!A.CSS && !/var\(\s*--card/.test(A.CSS), 'css/consigna.css no nombra var(--card', A.CSS ? (A.CSS.match(/.*var\(\s*--card.*/) || [''])[0] : 'no se pudo leer el CSS');
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     2 · EL ARMADO, CARÁCTER POR CARÁCTER CONTRA EL §7
+     ══════════════════════════════════════════════════════════════ */
+  const PLAN = A.PLAN || '';
+  /* Los ejemplos del §7 se SACAN del plan: una copia escrita aquí se
+     quedaría vieja el día que alguien corrigiera el plan. */
+  function ejemplo(marca) {
+    const i = PLAN.indexOf(marca);
+    if (i < 0) return null;
+    const m = /\n(```|~~~)\n/.exec(PLAN.slice(i));
+    if (!m) return null;
+    const ini = i + m.index + m[0].length;
+    const fin = PLAN.indexOf('\n' + m[1] + '\n', ini);
+    return fin < 0 ? null : PLAN.slice(ini, fin);
+  }
+  const EJ = {
+    xml: ejemplo('**Encargo completo en `xml` (Claude):**'),
+    md: ejemplo('**El mismo Encargo en `md` (ChatGPT, Gemini, Otra):**'),
+    seguida: ejemplo('**El mismo Encargo en `seguida` (NotebookLM):**'),
+    skill: ejemplo('**SKILL.md de ejemplo**'),
+    mmdCadena: ejemplo('**Mermaid de ejemplo (Cadena):**'),
+    mmdEstrella: ejemplo('**Mermaid en estrella (Coordinador):**'),
+    chatCadena: ejemplo('Ejemplo completo, Cadena en `md`:'),
+    planHasta: ejemplo('**Repite hasta, `plan` de ejemplo:**'),
+    autoHasta: ejemplo('**Repite hasta, auto-bucle en `md`:**'),
+  };
+  const P = (clase, moldeId, bloques, extra) => J(Object.assign({ id: 'csg-sonda-' + moldeId, clase, molde: moldeId, titulo: '', maquina: '',
+    bloques: Object.entries(bloques).map(([id, t]) => ({ id, rotulo: '', t })), material: '' }, extra || {}));
+  const armar = (p, m, v, o) => w.csgArmar(p, m, J(v || {}), J(o || {}));
+  const ENCARGO = P('prompt', 'encargo', {
+    rol: 'Eres un editor de una revista de divulgación en español, riguroso con las fuentes y alérgico a las frases hechas.',
+    contexto: 'Esto va en la revista de la casa, que leen cuatro personas de entre 12 y 50 años.',
+    tarea: 'Reescribe los tres primeros párrafos para que el dato más fuerte salga en la primera frase.',
+    reglas: 'No inventes datos; si no lo sabes, dilo.\nCita cada fuente con su dirección; sin dirección no vale.',
+    formato: 'Primero el resultado; debajo, la lista de cambios.',
+    comprobacion: 'Al final, di en una línea qué no pudiste cumplir y por qué.',
+    tono: 'Directo y sin adornos.',
+  }, { material: '(el texto pegado)' });
+
+  await tramo(2, 'Armado exacto: el §7 carácter por carácter, las reglas de forma y los 17 moldes', async () => {
+    const faltan = Object.keys(EJ).filter(k => !EJ[k]);
+    if (!ok(!faltan.length, 'los ' + Object.keys(EJ).length + ' ejemplos del §7 salen de PLAN-LA-CONSIGNA.md', 'no están: ' + faltan.join(', '))) return;
+    const eXml = armar(ENCARGO, 'claude');
+    igual(eXml.principal, EJ.xml, 'Encargo completo en xml (Claude) = el texto del §7');
+    igual(armar(ENCARGO, 'chatgpt').principal, EJ.md, 'Encargo completo en md (ChatGPT) = el texto del §7');
+    igual(armar(ENCARGO, 'notebooklm').principal, EJ.seguida, 'Encargo completo en seguida (NotebookLM) = el texto del §7');
+    /* sistema + encargo = exactamente los bloques de principal. */
+    const trozos = t => t.split(/\n\n(?=<[a-z_]+>\n)/);
+    const tp = trozos(eXml.principal), ts = trozos(eXml.sistema), te = trozos(eXml.encargo);
+    ok(ts.concat(te).sort().join('|') === tp.slice().sort().join('|') && ts.length + te.length === tp.length && ts.every(t => /^<(rol|reglas|tono)>/.test(t)),
+      'sistema (<rol>, <reglas>, <tono>) + encargo (lo demás, material incluido) = EXACTAMENTE los bloques de principal (' + ts.length + ' + ' + te.length + ' = ' + tp.length + ')',
+      'sistema: ' + ts.map(t => t.split('\n')[0]).join(' ') + ' · encargo: ' + te.map(t => t.split('\n')[0]).join(' '));
+    const RAP = P('prompt', 'rapido', { tarea: 'Resume el informe en diez puntos.', formato: 'En una lista de puntos, sin introducción ni despedida.' }, { material: '(el texto pegado)' });
+    igual(armar(RAP, 'chatgpt').principal, 'Resume el informe en diez puntos.\n\nFormato de salida: En una lista de puntos, sin introducción ni despedida.\n\n=== Material ===\n(el texto pegado)\n=== Fin del material ===',
+      'Rápido en md: sin encabezados (el primero pelado, el segundo «Rótulo: …») y el material entre marcas');
+    ok(armar(RAP, 'claude').principal.endsWith('\n\n<material>\n(el texto pegado)\n</material>'), 'en xml, el material entre <material> y </material>, el último');
+    const FUE = P('prompt', 'fuentes', { pregunta: '¿Qué se sabe?', fuentes: 'Solo organismos.', citas: 'Con dirección.', formato: 'Un ensayo.', limites: 'Hasta 2024.' });
+    const heads = t => (t.match(/^## .+$/gm) || []).map(h => h.slice(3));
+    igual(heads(armar(FUE, 'perplexity').principal).join(' | '), 'Fuentes permitidas | Reglas de cita | Pregunta | Formato de salida | Límites', 'Perplexity: Fuentes y Citas delante en Investigación con fuentes');
+    igual(heads(armar(FUE, 'chatgpt').principal).join(' | '), 'Pregunta | Fuentes permitidas | Reglas de cita | Formato de salida | Límites', '… y en ChatGPT, el orden del molde');
+    const EJEM = P('prompt', 'ejemplos', { tarea: 'Convierte cada cita.', ejemplos: 'Harari 2014 página 45 → (Harari, 2014, p. 45)\nBID 2023 -> (BID, 2023)', caso: 'Ahora haz lo mismo con cada renglón.', formato: 'Un renglón por caso.' });
+    igual(heads(armar(EJEM, 'chatgpt').principal).join(' | '), 'Tarea | Ejemplos | Formato de salida | Ahora tú', '«Ahora tú» sale el ÚLTIMO en Con ejemplos');
+    ok(/<caso>\n[^<]*\n<\/caso>$/.test(armar(EJEM, 'claude').principal), '… también en xml');
+    /* Los 17 moldes, con TODOS sus bloques llenos, en las tres formas (y
+       con cada máquina): ni un bloque, un par o el material se pierden. */
+    const M = g('CSG_MOLDES');
+    const perdidos = [], raros = [];
+    let cuenta = 0;
+    Object.keys(M).forEach(id => {
+      const m = M[id], bl = {};
+      m.bloques.forEach(b => {
+        const def = w.csgBloqueDef(id, b.id);
+        bl[b.id] = b.id === 'nombre' ? 'marca-nombre-' + id
+          : b.id === 'ejemplos' ? 'ENTRADA_' + id + ' → SALIDA_' + id + '\nMARCA_ejemplos_' + id + ' suelto'
+          : def.lista ? 'MARCA_' + b.id + '_' + id + ' uno.\nMARCA2_' + b.id + '_' + id + ' dos'
+          : 'MARCA_' + b.id + '_' + id + ' con 3 vueltas.';
+      });
+      const pz = P(m.clase, id, bl, { titulo: 'Título ' + id, material: 'MATERIAL_' + id });
+      [['claude'], ['chatgpt'], ['notebooklm'], ['otra', 'xml'], ['otra', 'md'], ['otra', 'seguida']].forEach(([maq, forma]) => {
+        cuenta++;
+        const a = armar(pz, maq, {}, forma ? { forma } : {});
+        Object.values(bl).forEach(t => (t.match(/(?:MARCA2?|ENTRADA|SALIDA)_[a-z_]+|marca-nombre-[a-z]+/g) || []).forEach(mk => { if (a.principal.indexOf(mk) < 0) perdidos.push(id + '/' + maq + (forma ? '/' + forma : '') + ': ' + mk); }));
+        if (a.principal.indexOf('MATERIAL_' + id) < 0) perdidos.push(id + '/' + maq + ': el material');
+        if (/undefined|\[object |NaN|null/.test(['principal', 'sistema', 'encargo', 'skill', 'mermaid', 'plan'].map(k => a[k]).join('\n'))) raros.push(id + '/' + maq);
+      });
+    });
+    ok(Object.keys(M).length === 17 && !perdidos.length, 'los 17 moldes × 6 armados (' + cuenta + ', con xml, md y seguida forzadas): ningún bloque, par ni material perdido', perdidos.slice(0, 10).join('\n'));
+    ok(!raros.length, 'ningún armado escribe undefined, null, NaN ni [object …]', raros.join(', '));
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     3 (1/2) · SKILL.md
+     ══════════════════════════════════════════════════════════════ */
+  const SKILL = P('habilidad', 'skill', {
+    nombre: 'corrector-revista-casa',
+    disparador: 'Corrige ortografía y estilo de notas en español de Honduras y devuelve el texto corregido más la lista de cambios con su norma. Úsala cuando pidan «corrige», «revisa el estilo» o peguen una nota para la revista. No la uses para traducir.',
+    pasos: '1. Lee el texto entero antes de tocar nada.\n2. Marca las erratas.\n3. Marca el estilo, con la norma al lado.\n4. Devuelve el texto corregido y la lista de cambios.',
+    recursos: 'Usa la lista de reglas de estilo que va debajo. No busques en internet.',
+    comprobacion: 'Ningún nombre propio cambiado.\nNinguna cifra tocada.\nCada cambio con su norma.',
+    ejemplos: 'Pedido: «Arréglame esta nota» + texto pegado → corrige y devuelve las dos partes.\nNo se activa: «Hazme un post de esta nota».',
+  }, { titulo: 'Corrector de la revista' });
+  await tramo(3, 'SKILL.md (1/2): el archivo, el frontmatter y el name', async () => {
+    const a = armar(SKILL, 'claude');
+    igual(a.skill, EJ.skill || '(sin ejemplo)', 'SKILL.md = el ejemplo del §7');
+    const l = a.skill.split('\n');
+    ok(l[0] === '---' && l[1] === 'name: corrector-revista-casa' && /^description: ".*"$/.test(l[2]) && l[3] === '---', 'frontmatter: --- · name pelado · description entre comillas · ---', l.slice(0, 4).join(' ⏎ '));
+    ok((a.skill.match(/^#{1,2} /gm) || []).length === 6, 'seis encabezados (# y cinco ##)', (a.skill.match(/^#{1,2} .*$/gm) || []).join(' | '));
+    const raro = armar(P('habilidad', 'skill', { nombre: 'mi-habilidad', disparador: 'Úsala cuando digan "corrige" o C:\\notas.\nY también con «arregla».', pasos: 'Lee.' }, { titulo: 'Rara' }), 'claude').skill;
+    ok(raro.split('\n')[2] === 'description: "Úsala cuando digan \\"corrige\\" o C:\\\\notas. Y también con «arregla»."', 'la description escapa " y \\ y pone el salto de renglón como espacio', raro.split('\n')[2]);
+    igual(w.csgSlug('Corrector Revista'), 'corrector-revista', '«Corrector Revista» → corrector-revista');
+    const rv = (nombre, desc) => w.csgRevisar(P('habilidad', 'skill', { nombre, disparador: desc, pasos: '1. Lee.\n2. Corrige.', comprobacion: '- Nada cambiado.' }, { titulo: 'x' }), 'claude');
+    ok(rv('Corrector Revista', 'Corrige notas.').para.some(x => x.bloque === 'nombre' && /name/.test(x.msg)), 'un name con mayúscula PARA el uso nombrándolo');
+    ok(rv('a'.repeat(65), 'x').para.some(x => x.bloque === 'nombre' && /65/.test(x.msg)) && !rv('a'.repeat(64), 'x').para.some(x => x.bloque === 'nombre'), 'uno de 65 PARA; de 64, no');
+    ok(rv('ok', 'd'.repeat(1025)).para.some(x => x.bloque === 'disparador' && /1\.025/.test(x.msg)) && !rv('ok', 'd'.repeat(1024)).para.some(x => x.bloque === 'disparador'), 'una description de 1.025 PARA; de 1.024, no');
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     4 · MERMAID
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(4, 'Mermaid: escapado, aristas a ninguna parte, FIN, la estrella y la Cadena del §7', async () => {
+    const CADENA = P('grafo', 'cadena', {
+      meta: 'Un video-ensayo de doce minutos con guion en bloques, fuentes verificadas y rótulos.',
+      nodos: 'Investigador: recibe el tema, entrega diez fuentes con dirección.\nGuionista: recibe las fuentes, entrega el guion en bloques.\nVerificador: recibe el guion, entrega la lista de citas que no cuadran.\nEditor: recibe el guion aprobado, entrega la versión final.',
+      aristas: 'Investigador → Guionista.\nGuionista → Verificador.\nVerificador → Guionista si hay citas malas (máximo 2 vueltas); si no → Editor.\nEditor → FIN.',
+      estado: 'Viaja: el tema, la lista de fuentes y el guion actual. No viaja: el razonamiento interno de cada uno.',
+      fin: 'Termina cuando el Verificador no encuentra citas malas, o a la segunda vuelta. El Editor entrega el guion en bloques [CÁMARA 0:30] para El Rodaje.',
+    });
+    igual(armar(CADENA, 'chatgpt').mermaid, EJ.mmdCadena || '', 'el Mermaid de la Cadena = el del §7');
+    igual(armar(CADENA, 'chatgpt').principal, EJ.chatCadena || '', 'el prompt para un solo chat de la Cadena, en md = el del §7');
+    const COORD = P('grafo', 'coordinador', {
+      coordinador: 'Coordinador: recibe el encargo, lo parte en tareas, se las da a los especialistas y junta lo que devuelven.',
+      nodos: 'Historiador: fechas y contexto, con fuente.\nEconomista: cifras con fuente y año.\nEditor: la forma final.',
+      reparto: 'Por tema.', juntar: 'En orden.', fin: 'Termina al entregar.' });
+    const mk = armar(COORD, 'claude').mermaid;
+    igual(mk, EJ.mmdEstrella || '', 'la estrella del Coordinador = la del §7');
+    ok(['Historiador', 'Economista', 'Editor'].every(n => mk.indexOf('  Coordinador -->|reparte| ' + n) >= 0 && mk.indexOf('  ' + n + ' -->|entrega| Coordinador') >= 0), 'cada especialista tiene su ida (reparte) y su vuelta (entrega)');
+    const roto = P('grafo', 'cadena', { meta: 'x', nodos: 'Jefe "duro" | uno: revisa <todo>.\nOtro: algo.', aristas: 'Jefe "duro" | uno → Fantasma si "sí" | no.\nOtro → Jefe "duro" | uno.', fin: 'Al acabar.' });
+    const mr = armar(roto, 'claude').mermaid;
+    ok(mr.indexOf('Jefe_duro_uno["Jefe #quot;duro#quot; / uno: revisa #lt;todo#gt;"]') >= 0, 'un nodo con " y | sale escapado (#quot;, /) y con < y > también', mr.split('\n')[1]);
+    ok(mr.indexOf('-.->|si #quot;sí#quot; / no| Fantasma') >= 0, 'la arista a un nodo que no existe va punteada y con su condición escapada', mr);
+    ok(/\n  FIN\(\(FIN\)\)\n/.test(mr) && /\n  FIN\(\(FIN\)\)\n/.test(armar(P('grafo', 'cadena', { nodos: 'Uno: a.', aristas: 'Uno → Uno.' }), 'claude').mermaid), 'FIN está SIEMPRE, aunque ninguna arista llegue a él');
+    const rep = w.csgRevisar(roto, 'claude');
+    ok(rep.para.some(x => x.bloque === 'aristas' && /Fantasma/.test(x.msg)), 'la arista a «Fantasma» PARA el uso nombrándola', JSON.stringify(rep.para.map(x => x.msg)));
+    ok(!w.csgRevisar(P('grafo', 'cadena', { meta: 'x', nodos: 'Uno: a.', aristas: 'Uno → FIN.', fin: 'Al acabar.' }), 'claude').para.some(x => x.bloque === 'aristas'), 'y una arista a FIN no para nada: FIN existe siempre');
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     10 (1/2) · LA FUSIÓN, POR SUS FUNCIONES
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(10, 'Fusión (1/2): unión por uid y vid, ok gana a null, escalares por actualizado', async () => {
+    const fila = x => Object.assign({ id: 'csg-sonda-fusion', clase: 'prompt', molde: 'rapido', titulo: 'x', maquina: 'claude', bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'Resume.' }],
+      material: '', estantes: [], cuaderno: '', notas: '', bitacora: [], versiones: [], version: 1, usos: 0, ultima: 0, autor: 'josue', eliminado: false, eliminado_at: null, actualizado: 0 }, x);
+    const U = (uid, t, ok_) => ({ uid, t, maquina: 'claude', v: 1, ok: ok_, nota: '' });
+    const loc = w.csgDesdeFila(J(fila({ titulo: 'Local', actualizado: 2000, usos: 2, bitacora: [U('u1', 10, null), U('u2', 20, 'si')], versiones: [{ vid: 'va', v: 1, t: 5, bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'Antes.' }] }] })));
+    const nub = J(fila({ titulo: 'Nube', actualizado: 1000, usos: 3, bitacora: [U('u1', 10, 'no'), U('u3', 30, null)], versiones: [{ vid: 'vb', v: 1, t: 6 }] }));
+    const r = w.csgFusiona(J([]).concat([loc]), J([nub]))[0];
+    ok(r === loc, 'la fusión escribe dentro del objeto que ya había (las referencias de la pantalla siguen valiendo)');
+    ok(r.titulo === 'Local', 'escalares: gana el actualizado más nuevo (el del aparato)', r.titulo);
+    ok(r.bitacora.map(u => u.uid).sort().join() === 'u1,u2,u3', 'la bitácora es la UNIÓN por uid (u1, u2, u3)', r.bitacora.map(u => u.uid).join());
+    ok((r.bitacora.find(u => u.uid === 'u1') || {}).ok === 'no', 'un uso con ok puesto gana al mismo uid con null, aunque venga del lado que pierde el reloj');
+    ok(r.versiones.map(x => x.vid).sort().join() === 'va,vb', 'las versiones son la UNIÓN por vid', r.versiones.map(x => x.vid).join());
+    ok(r.usos >= 3 && r.usos >= r.bitacora.length, 'usos = el mayor, y nunca menos que la bitácora', r.usos);
+    ok(r.subida === false, 'y como trae lo que la nube no tiene, queda para subir');
+    const loc2 = w.csgDesdeFila(J(fila({ titulo: 'Local', actualizado: 1000, bitacora: [U('u9', 40, 'si')] })));
+    const r2 = w.csgFusiona(J([]).concat([loc2]), J([fila({ titulo: 'Nube', actualizado: 5000, bitacora: [U('u9', 40, null)] })]))[0];
+    ok(r2.titulo === 'Nube' && (r2.bitacora.find(u => u.uid === 'u9') || {}).ok === 'si', 'con la nube más nueva gana su título, y aun así el «sí» del aparato no se pierde', JSON.stringify({ t: r2.titulo, ok: (r2.bitacora[0] || {}).ok }));
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     9 (1/3) · EL ANAQUEL VACÍO, SIN LA TABLA
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(9, 'Nube (1/3): sin la tabla (42P01) la barra lo dice', async () => {
+    pulsa(d.querySelector('[data-qa="view-consigna"]'), 'la baldosa 📜 La Consigna del Acceso Rápido');
+    await hasta(() => /falta correr consigna\.sql/.test(anq().textContent), 3000);
+    ok(activa('view-consigna'), 'la baldosa abre #view-consigna');
+    ok(!!anq().querySelector('.csg-vacio') && /Todavía no hay consignas/.test(anq().textContent), 'anaquel vacío, con la tarjeta 📜 y sus dos puertas');
+    ok(/Solo en este aparato: falta correr consigna\.sql/.test(franja()) && !!anq().querySelector('.csg-nube-no'), 'con 42P01 la franja dice «falta correr consigna.sql»', franja());
+    ok(llamadas.some(l => l.tabla && l.metodo === 'GET' && l.codigo === '42P01'), 'la base de mentira contestó 42P01 a la lectura');
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     2 (en pantalla) · LO QUE SE VE ES LO QUE SE ARMA
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(2, 'Armado exacto (en pantalla): el §7 pegado, abierto y visto en la vista previa', async () => {
+    pulsa(botonCon(anq(), /Pegar una que ya tengas/), '📋 Pegar una que ya tengas');
+    await esperar(150);
+    ok(verAbierta('csg-pegar-overlay'), 'la hoja de pegar se abre desde la tarjeta vacía');
+    d.querySelector('#csg-pegar-cuerpo .csg-pegar-ta').value = EJ.md;
+    pulsa(botonCon($('csg-pegar-cuerpo'), /Leer/), 'Leer');
+    await esperar(150);
+    ok(/Encargo completo/.test((d.querySelector('.csg-pegar-propuesta') || {}).textContent || ''), 'el md del §7 se lee como Encargo completo', (d.querySelector('.csg-pegar-propuesta') || {}).textContent);
+    pulsa(botonCon($('csg-pegar-cuerpo'), /Abrir en el compositor/), 'Abrir en el compositor');
+    await esperar(300);
+    ok(activa('view-consigna-editor') && g('_csgEdPieza.molde') === 'encargo', 'abre el compositor en Encargo completo');
+    titulo('Encargo del plan');
+    const verCon = async nombre => {
+      pulsa([...d.querySelectorAll('#csg-ed .csg-prev-maquinas .csg-chip')].find(c => c.textContent === nombre), 'el chip ' + nombre);
+      await esperar(120);
+      return (d.querySelector('#csg-ed .csg-pre') || {}).textContent;
+    };
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    igual(await verCon('ChatGPT'), EJ.md, 'la vista previa con ChatGPT enseña EXACTAMENTE el md del §7');
+    igual(await verCon('Claude'), EJ.xml, '… con Claude, el xml del §7');
+    igual(await verCon('NotebookLM'), EJ.seguida, '… y con NotebookLM, la forma seguida del §7');
+    await verCon('Claude');
+    pulsa($('csg-ed-ver'), '✎ Bloques');
+    await esperar(150);
+    await volver();
+    ok(!!pieza('Encargo del plan'), 'y al volver se guarda en el anaquel');
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     17 · EL COMPOSITOR A 320 PX
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(17, 'Compositor a 320 px: baldosas, foco, título, explicaciones, molde, duplicar y borrador', async () => {
+    await ancho(320);
+    pulsa($('csg-nueva-btn'), '＋ de la cabecera');
+    await esperar(150);
+    const hoja = $('csg-ver-overlay').querySelector('.fin-modal').getBoundingClientRect();
+    const bal = [...d.querySelectorAll('#csg-ver-cuerpo .csg-clase-baldosa')];
+    const rs = bal.map(b => b.getBoundingClientRect());
+    ok(bal.length === 4 && rs.every(r => r.right <= hoja.right + 0.5 && r.left >= hoja.left - 0.5 && r.width >= 120) && rs.every(r => r.right <= 320.5),
+      'a 320 px las cuatro baldosas caben en la hoja (right ≤ ' + Math.round(hoja.right) + ') y miden ≥ 120 (' + rs.map(r => Math.round(r.width)).join('/') + ')', JSON.stringify(rs.map(r => [Math.round(r.left), Math.round(r.right)])));
+    const balP = d.querySelector('#csg-ver-cuerpo .csg-clase-baldosa.csg-clase-prompt');
+    balP.click();
+    /* Se mira EN EL MISMO TURNO del toque: el foco tiene que ir dentro del
+       gesto, sin nada asíncrono delante, o el teclado de la tableta no sale. */
+    const focoEnSeguida = d.activeElement === ta('tarea');
+    ok(activa('view-consigna-editor') && g('_csgEdPieza.molde') === 'rapido', 'la baldosa 💬 abre el compositor con el molde Rápido');
+    ok(focoEnSeguida, 'con la Tarea enfocada DENTRO del toque', 'el foco está en: ' + (d.activeElement && (d.activeElement.className || d.activeElement.tagName)));
+    const T1 = 'Reescribe el arranque de la nota de octubre para que enganche.';
+    escribe(ta('tarea'), T1);
+    const propuesto = T1.split(' ').slice(0, 7).join(' ').replace(/[\s.,;:…—–-]+$/, '');
+    igual($('csg-ed-titulo').value, propuesto, 'el título se propone con las primeras siete palabras de la Tarea');
+    titulo('Mi título a mano');
+    escribe(ta('tarea'), T1 + ' Y que el dato vaya delante.');
+    igual($('csg-ed-titulo').value, 'Mi título a mano', 'escrito a mano, seguir escribiendo en la Tarea NO lo pisa');
+    const sw = d.querySelector('#csg-ed .csg-switch');
+    pulsa(sw, '«Sin explicaciones»');
+    const paras = () => [...d.querySelectorAll('#csg-ed .csg-bloque-para')];
+    ok(sw.getAttribute('aria-checked') === 'true' && paras().length > 0 && paras().every(p => cs(p, 'display') === 'none'), '«Sin explicaciones» pliega los «para qué» (display calculado none)', paras().map(p => cs(p, 'display')).join(','));
+    pulsa(sw, '«Sin explicaciones» otra vez');
+    ok(paras().every(p => cs(p, 'display') !== 'none'), 'y otro toque los devuelve');
+    const taF = await abreBloque('formato');
+    const F1 = 'Primero el resultado; debajo, la lista de cambios.';
+    escribe(taF, F1);
+    await molde('Encargo completo');
+    ok(g('_csgEdPieza.molde') === 'encargo', 'el chip «Molde ▾» cambia a Encargo completo');
+    ok(ta('tarea') && ta('tarea').value === T1 + ' Y que el dato vaya delante.' && ta('formato') && ta('formato').value === F1, 'cambiar a Encargo conserva la Tarea y el Formato en su sitio');
+    escribe(await abreBloque('rol'), 'Eres un editor de la revista de la casa, con oficio.');
+    escribe(await abreBloque('comprobacion'), 'Cuenta los párrafos: tienen que ser tres.');
+    await guardar();
+    ok(!!pieza('Mi título a mano'), 'se guarda');
+    await volver();
+    await menu('Mi título a mano');
+    pulsa(filaVer(/Duplicar en otro molde/), '⋯ → Duplicar en otro molde…');
+    await esperar(120);
+    pulsa(filaMolde('SKILL.md'), 'SKILL.md');
+    await esperar(300);
+    ok(activa('view-consigna-editor') && g('_csgEdPieza.molde') === 'skill' && g('_csgEdNueva') === true, 'abre una pieza NUEVA, sin guardar, en SKILL.md');
+    ok(ta('comprobacion') && ta('comprobacion').value === 'Cuenta los párrafos: tienen que ser tres.' && !carta('comprobacion').classList.contains('csg-bloque-libre'), '«comprobacion» se queda EN SU SITIO (es un solo id en las cuatro clases)');
+    const cr = carta('rol');
+    ok(!!cr && cr.classList.contains('csg-bloque-libre') && cr.classList.contains('csg-bloque-traido') && /traído de «Encargo completo»/.test(cr.textContent) && ta('rol').value === 'Eres un editor de la revista de la casa, con oficio.',
+      'y «Rol» va como bloque libre MARCADO «traído de «Encargo completo»», con su texto', cr && cr.className);
+    escribe(await abreBloque('pasos'), '1. Lee todo antes de tocar nada.');
+    await esperar(600);
+    ok(/Lee todo antes de tocar nada/.test(w.localStorage.getItem('faro_consigna_borrador_v1') || ''), 'cada tecla va al borrador del aparato');
+    /* «Recargar»: lo que se pierde es la memoria del módulo; el aparato se
+       queda. Es exactamente lo que hace una recarga con este estado. */
+    w.eval("Object.keys(_csgLuego).forEach(k => clearTimeout(_csgLuego[k].t)); _csgLuego = {}; clearTimeout(_csgEdBorradorT); _csgEdPieza = null; _csgEdRecuperar = null; _csgLista = []; _csgCargada = false; _csgNube = 'mirando'; _csgHayTabla = false; _csgColsFuera = []; _csgInitEnCurso = null; _csgAnqPrefs = null;");
+    await entrar();
+    const seg = anq().querySelector('.csg-anq-seguir');
+    ok(!!seg && /a medio escribir/.test(seg.textContent), 'tras recargar, el anaquel ofrece seguir lo que estaba a medio escribir', seg && seg.textContent);
+    pulsa(seg && botonCon(seg, /Seguir/), 'Seguir');
+    await esperar(300);
+    ok(activa('view-consigna-editor') && ta('pasos') && /Lee todo antes de tocar nada/.test(ta('pasos').value) && g('_csgEdPieza.molde') === 'skill' && !!carta('rol'), 'y «Seguir» lo recupera entero: el molde, los pasos y el bloque traído');
+    await volver();
+    ok(!!pieza('Mi título a mano (SKILL.md)'), 'al volver se guarda como pieza aparte, con el molde detrás del título', g('csgVivas().map(p => p.titulo)').join(' | '));
+    /* Y un duplicado que NO se toca no deja una ficha de más (§6.9, «sin
+       guardar»; revisión del 23 de septiembre de 2026, H5). */
+    const nDup = g('csgVivas().length');
+    const avD = avisos.length;
+    await menu('Mi título a mano');
+    pulsa(filaVer(/Duplicar en otro molde/), '⋯ → Duplicar en otro molde…');
+    await esperar(120);
+    pulsa(filaMolde('Instrucción de sistema'), 'Instrucción de sistema');
+    await esperar(300);
+    ok(activa('view-consigna-editor') && g('_csgEdNueva') === true, 'abre la copia en Instrucción de sistema');
+    await volver();
+    ok(g('csgVivas().length') === nDup && avisos.slice(avD).some(t => /La copia no se guardó/.test(t)), 'volver sin tocarla no la guarda, y se dice', g('csgVivas().length') + ' de ' + nDup + ' · ' + avisos.slice(avD).join(' | '));
+    await ancho(390);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     6 · LOS CHIPS DE FRASES HECHAS
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(6, 'Chips: meten, quitan la idéntica, no tocan la editada; Variable, ＋ Otro y los inicial', async () => {
+    await nueva('prompt');
+    await molde('Encargo completo');
+    titulo('Chips de prueba');
+    escribe(ta('tarea'), 'Resume el acta de la reunión de padres en cinco puntos.');
+    const taF = ta('formato'), cF = carta('formato');
+    escribe(taF, 'Mi línea propia.');
+    const chip = cF.querySelector('.csg-frase:not(.csg-frase-var)');
+    const frase = chip.textContent;
+    const ev = new w.PointerEvent('pointerdown', { bubbles: true, cancelable: true });
+    chip.dispatchEvent(ev);
+    ok(ev.defaultPrevented, 'el pointerdown del chip está cancelado (no se lleva el foco ni el cursor)');
+    const evV = new w.PointerEvent('pointerdown', { bubbles: true, cancelable: true });
+    cF.querySelector('.csg-frase-var').dispatchEvent(evV);
+    ok(evV.defaultPrevented, '… y el de «{ } Variable» también');
+    taF.focus(); taF.setSelectionRange(taF.value.length, taF.value.length);
+    chip.click();
+    ok(taF.value === 'Mi línea propia.\n' + frase && chip.classList.contains('on'), 'un toque mete la frase EN SU PROPIO RENGLÓN y marca el chip', JSON.stringify(taF.value));
+    chip.click();
+    ok(taF.value === 'Mi línea propia.' && !chip.classList.contains('on'), 'otro toque quita EXACTAMENTE esa frase, con su renglón', JSON.stringify(taF.value));
+    chip.click();
+    const editada = frase + ' ¡editada!';
+    escribe(taF, 'Mi línea propia.\n' + editada);
+    ok(!chip.classList.contains('on'), 'editada, el chip se desmarca');
+    chip.click();
+    ok(taF.value.split('\n').indexOf(editada) >= 0, 'y un toque NO le quita nada a la frase editada', JSON.stringify(taF.value));
+    escribe(taF, 'Mi línea propia.');
+    taF.focus(); taF.setSelectionRange(3, 3);
+    cF.querySelector('.csg-frase-var').click();
+    ok(taF.value === 'Mi {{}}línea propia.' && taF.selectionStart === 5 && taF.selectionEnd === 5, '«{ } Variable» mete {{}} donde está el cursor, con el cursor dentro', JSON.stringify([taF.value, taF.selectionStart, taF.selectionEnd]));
+    escribe(taF, 'Mi línea propia.');
+    const taR = await abreBloque('reglas');
+    carta('reglas').querySelector('.csg-otro').click();
+    ok(taR.value === '- ', '«＋ Otro» en Reglas mete su plantilla («- »)', JSON.stringify(taR.value));
+    escribe(taR, '- No inventes datos.');
+    carta('reglas').querySelector('.csg-otro').click();
+    ok(taR.value === '- No inventes datos.\n- ', '… en un renglón nuevo al final', JSON.stringify(taR.value));
+    const taE = await abreBloque('ejemplos');
+    carta('ejemplos').querySelector('.csg-otro').click();
+    ok(taE.value === '{{entrada}} → {{salida}}' && taE.selectionStart === 0 && taE.selectionEnd === 11, 'en Ejemplos mete «{{entrada}} → {{salida}}» con el primer hueco seleccionado', JSON.stringify([taE.value, taE.selectionStart, taE.selectionEnd]));
+    escribe(taE, '');
+    escribe(taR, '- No inventes datos.');
+    await guardar();
+    await volver();
+    const n0 = g('csgVivas().length');
+    const INI = (m, b) => w.csgBloqueDef(m, b).inicial;
+    await nueva('prompt');
+    await molde('Voz prestada');
+    ok(ta('etiqueta') && ta('etiqueta').value === INI('voz', 'etiqueta') && /Máquina: \{\{maquina\}\}/.test(ta('etiqueta').value), 'Voz prestada abre con la etiqueta de la casa ya puesta (su inicial)');
+    await volver();
+    await nueva('bucle');
+    await molde('Careo');
+    ok(ta('etiqueta') && ta('etiqueta').value === INI('careo', 'etiqueta') && /Género: entrevista/.test(ta('etiqueta').value), 'Careo abre con su «Veredicto y etiqueta» puesto');
+    await molde('Por lotes');
+    ok(ta('tope') && ta('tope').value === INI('lotes', 'tope') && /nunca pasa de \{\{n\}\}/.test(ta('tope').value), 'Por lotes abre con su tope puesto');
+    await volver();
+    ok(g('csgVivas().length') === n0, 'y abrir un molde con texto de nacimiento no guarda nada: lo inicial no lo escribió nadie', g('csgVivas().length') + ' contra ' + n0);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     5 · LAS VARIABLES
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(5, 'Variables: al teclear, Copiar se para, «Copiar con huecos», las reservadas y los últimos valores', async () => {
+    await nueva('prompt');
+    ok(/Sin variables/.test(d.querySelector('#csg-ed .csg-ed-vars').textContent), 'sin llaves: «Sin variables»');
+    titulo('Resumen con variables');
+    escribe(ta('tarea'), 'Resume {{tema}} para {{maquina}}: «{{titulo}}», a {{hoy}}.');
+    const vars = d.querySelector('#csg-ed .csg-ed-vars').textContent;
+    ok(/\{\{tema\}\}/.test(vars) && !/maquina|titulo|hoy/.test(vars), 'al teclear se detecta {{tema}}, y las reservadas no se nombran (se rellenan solas)', vars);
+    escribe(await abreBloque('formato'), 'Una lista.');
+    pulsa($('csg-ed-usar'), '▶ Usar del compositor');
+    await esperar(300);
+    ok(verAbierta('csg-usar-overlay'), '▶ Usar guarda y abre la hoja');
+    const inp = d.querySelector('#csg-usar-cuerpo .csg-usar-var .csg-input');
+    ok(!!inp && d.activeElement === inp && inp.value === '', 'con el renglón de {{tema}} vacío y enfocado');
+    const c0 = copias, p0 = pieza('Resumen con variables');
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(150);
+    ok(copias === c0 && p0.usos === 0, 'con {{tema}} vacía, Copiar SE PARA: no copia ni apunta un uso', 'copias ' + (copias - c0) + ', usos ' + p0.usos);
+    ok(/\{\{tema\}\}/.test($('csg-usar-cuerpo').querySelector('.csg-usar-falta').textContent) && vis($('csg-usar-cuerpo').querySelector('.csg-usar-falta')), 'y la hoja NOMBRA la que falta');
+    pulsa(botonCon($('csg-usar-cuerpo'), /Copiar con huecos/), '«Copiar con huecos»');
+    await esperar(150);
+    ok(copias === c0 + 1 && /\{\{tema\}\}/.test(copiado), '«Copiar con huecos» copia con las llaves puestas', copiado);
+    ok(copiado.indexOf('para Claude: «Resumen con variables», a ' + hoyLocal + '.') >= 0, '{{maquina}}, {{titulo}} y {{hoy}} (' + hoyLocal + ') salen rellenos', copiado);
+    escribe(inp, 'lectura');
+    await esperar(100);
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(150);
+    const pre = $('csg-usar-pre');
+    ok(copias === c0 + 2 && copiado === pre.textContent && /lectura/.test(copiado) && !/\{\{/.test(copiado), 'con el valor puesto copia EXACTAMENTE lo que enseña el <pre>, relleno', 'copiado=' + JSON.stringify(copiado) + '\npre=' + JSON.stringify(pre.textContent));
+    await cierraUsar();
+    await volver();
+    await usarFicha('Resumen con variables');
+    const inp2 = d.querySelector('#csg-usar-cuerpo .csg-usar-var .csg-input');
+    const chips2 = [...d.querySelectorAll('#csg-usar-cuerpo .csg-usar-ultimos .csg-chip')].map(c => c.textContent);
+    ok(inp2 && inp2.value === 'lectura' && chips2.indexOf('lectura') >= 0, 'al volver a usarla, {{tema}} trae su ÚLTIMO valor y el chip de los últimos', JSON.stringify([inp2 && inp2.value, chips2]));
+    await cierraUsar();
+    await nueva('prompt');
+    titulo('Otra con tema');
+    escribe(ta('tarea'), 'Explica {{tema}} con un ejemplo.');
+    pulsa($('csg-ed-usar'), '▶ Usar');
+    await esperar(300);
+    const inp3 = d.querySelector('#csg-usar-cuerpo .csg-usar-var .csg-input');
+    ok(inp3 && inp3.value === '' && !d.querySelector('#csg-usar-cuerpo .csg-usar-ultimos'), 'en OTRA pieza con {{tema}} el valor no aparece: los últimos valores son por pieza', inp3 && inp3.value);
+    await cierraUsar();
+    await volver();
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     12 · USAR
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(12, 'Usar: la hoja encima, Copiar apunta el uso, ↗ copia antes de abrir, el tope de la dirección', async () => {
+    await usarFicha('Resumen con variables');
+    for (const px of [390, 320]) {
+      await ancho(px);
+      const bs = [...$('csg-usar-pie').querySelectorAll('.csg-btn')];
+      const malos = bs.filter(b => { const e = enPunto(b); return !e || !b.contains(e); }).map(b => b.textContent);
+      ok(bs.length === 3 && !malos.length && bs.every(b => b.getBoundingClientRect().right <= px + 0.5), 'a ' + px + ' px los tres botones del pie (' + bs.map(b => b.textContent.trim()).join(' · ') + ') están encima de todo (elementFromPoint) y caben',
+        'botones ' + bs.length + ', tapados: ' + malos.join(', ') + ' · right: ' + bs.map(b => Math.round(b.getBoundingClientRect().right)).join('/'));
+    }
+    await ancho(390);
+    pulsa([...d.querySelectorAll('#csg-usar-cuerpo .csg-usar-maquinas .csg-chip')].find(c => c.textContent === 'Claude'), 'chip Claude');
+    const p = pieza('Resumen con variables');
+    const u0 = p.usos, n0 = p.bitacora.length, t0 = Date.now();
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(150);
+    ok(p.usos === u0 + 1 && p.ultima >= t0 && p.bitacora.length === n0 + 1 && p.bitacora[0].ok === null && p.bitacora[0].maquina === 'claude' && p.bitacora[0].v === p.version,
+      'Copiar apunta usos (+1), ultima y UN uso con ok: null, su máquina y su versión', JSON.stringify({ usos: p.usos, ultima: p.ultima >= t0, uso: p.bitacora[0] }));
+    seq.length = 0;
+    const na = abiertas.length;
+    pulsa(pieBtn(/Abrir/), '↗ Abrir');
+    await esperar(150);
+    const texto = $('csg-usar-pre').textContent;
+    const ab = abiertas[na] || {};
+    ok(seq.join(',') === 'clip,open', 'el portapapeles se escribe ANTES de abrir la ventana', seq.join(','));
+    igual(ab.u, 'https://claude.ai/new?q=' + encodeURIComponent(texto), 'la dirección es el literal de Claude + encodeURIComponent(lo armado)');
+    ok(ab.t === '_blank' && ab.feat === 'noopener,noreferrer', 'en otra pestaña y con noopener,noreferrer', JSON.stringify([ab.t, ab.feat]));
+    ok(copiado === texto, 'y lo copiado es lo que se ve');
+    pulsa(pieBtn(/Compartir/), '📤 Compartir');
+    await esperar(100);
+    ok(compartidos.length && compartidos[compartidos.length - 1].text === texto, '📤 Compartir manda el MISMO texto, y nada más', JSON.stringify(compartidos[compartidos.length - 1]));
+    await cierraUsar();
+
+    /* La frontera de la dirección: 1.500 codificados van dentro; 1.501, no. */
+    const sobra = encodeURIComponent(w.csgArmar(P('prompt', 'rapido', { tarea: 'a' }), 'claude', {}, {}).principal).length - 1;
+    await nueva('prompt');
+    titulo('Larga 1501');
+    escribe(ta('tarea'), 'a'.repeat(1501 - sobra));
+    pulsa($('csg-ed-usar'), '▶ Usar');
+    await esperar(300);
+    pulsa([...d.querySelectorAll('#csg-usar-cuerpo .csg-usar-maquinas .csg-chip')].find(c => c.textContent === 'Claude'), 'chip Claude');
+    const enc = encodeURIComponent($('csg-usar-pre').textContent);
+    const nb = abiertas.length;
+    pulsa(pieBtn(/Abrir/), '↗ Abrir');
+    await esperar(120);
+    ok(enc.length === 1501 && (abiertas[nb] || {}).u === 'https://claude.ai/new', 'con 1.501 codificados se abre PELADA (' + enc.length + ')', JSON.stringify(abiertas[nb]).slice(0, 120));
+    ok(/copiado: pega ahí/.test(pieBtn(/Abrir/).textContent), 'y el botón lo dice: «' + pieBtn(/Abrir/).textContent.trim() + '»');
+    await cierraUsar();
+    escribe(ta('tarea'), 'a'.repeat(1500 - sobra));
+    pulsa($('csg-ed-usar'), '▶ Usar');
+    await esperar(300);
+    const nc = abiertas.length;
+    pulsa(pieBtn(/Abrir/), '↗ Abrir');
+    await esperar(120);
+    const u1500 = (abiertas[nc] || {}).u || '';
+    ok(u1500.indexOf('https://claude.ai/new?q=') === 0 && u1500.length - 'https://claude.ai/new?q='.length === 1500 && !/copiado/.test(pieBtn(/Abrir/).textContent),
+      'con 1.500 justos el texto va en la dirección, y el botón no dice «copiado»', u1500.length + ' · ' + pieBtn(/Abrir/).textContent);
+    pulsa([...d.querySelectorAll('#csg-usar-cuerpo .csg-usar-maquinas .csg-chip')].find(c => c.textContent === 'Gemini'), 'chip Gemini');
+    const nd = abiertas.length;
+    pulsa(pieBtn(/Abrir/), '↗ Abrir Gemini');
+    await esperar(120);
+    ok((abiertas[nd] || {}).u === 'https://gemini.google.com/app' && /copiado: pega ahí/.test(pieBtn(/Abrir/).textContent), 'Gemini se abre pelada SIEMPRE, aunque el texto sea corto', JSON.stringify(abiertas[nd]));
+    /* Se deja Claude como la última máquina de este aparato, como estaba. */
+    pulsa([...d.querySelectorAll('#csg-usar-cuerpo .csg-usar-maquinas .csg-chip')].find(c => c.textContent === 'Claude'), 'chip Claude');
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(100);
+    await cierraUsar();
+    await volver();
+
+    /* ⚠️ LO QUE SE ESCRIBE NO SE ESCONDE DEBAJO DEL PIE (revisión del 23 de
+       septiembre de 2026, T2). El pie de la hoja va pegado al borde de
+       abajo, y el navegador deja el recuadro al que salta «Intro» —o el
+       renglón nuevo del 📎 Material— justo en ese borde: debajo de los
+       botones. Se mide en un teléfono pequeño (320×568) y con Intro de
+       verdad, de una variable a la siguiente, y además que el hueco que la
+       hoja deja al pie (scroll-padding-bottom) cubra el pie entero, que es
+       lo que protege también al cursor del Material. */
+    await nueva('prompt');
+    titulo('Ocho huecos');
+    escribe(ta('tarea'), 'Escribe a {{nombre}} de {{grado}} sobre {{tema}} el {{dia}} a las {{hora}} en {{lugar}} con {{cosas}} y {{nota}}.');
+    await guardar();
+    await volver();
+    f.style.height = '568px';
+    await ancho(320);
+    await usarFicha('Ocho huecos');
+    const pieU = $('csg-usar-pie'), hojaU = pieU.closest('.fin-modal');
+    const inps = [...d.querySelectorAll('#csg-usar-cuerpo .csg-usar-var .csg-input')];
+    const spb = parseFloat(cs(hojaU, 'scroll-padding-bottom')) || 0;
+    ok(spb >= pieU.getBoundingClientRect().height, 'la hoja deja al pie su alto entero al seguir al cursor (scroll-padding-bottom ' + spb + ' ≥ ' + Math.round(pieU.getBoundingClientRect().height) + ' del pie)');
+    const tapados = [];
+    for (let i = 0; i < inps.length; i++) {
+      const a = d.activeElement;
+      const r = a && a.getBoundingClientRect(), pt = pieU.getBoundingClientRect().top;
+      if (!a || !a.classList.contains('csg-input') || r.bottom > pt + 1) tapados.push((i + 1) + 'º: ' + (a && a.classList.contains('csg-input') ? Math.round(r.top) + '..' + Math.round(r.bottom) + ' con el pie en ' + Math.round(pt) : 'sin foco'));
+      escribe(a, 'x');
+      a.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+      await esperar(120);
+    }
+    ok(inps.length === 8 && !tapados.length, 'con «Intro» de una variable a la siguiente, a 320×568 cada recuadro enfocado queda ENCIMA del pie pegado', tapados.join(' · '));
+    await cierraUsar();
+    f.style.height = '';
+    await ancho(390);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     3 (2/2) · UN SKILL.md QUE NO CARGARÍA NO SE DEJA USAR
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(3, 'SKILL.md (2/2): name y description malos apagan USAR, nombrándolo', async () => {
+    await nueva('habilidad');
+    ok(g('_csgEdPieza.molde') === 'skill', 'la baldosa 🧰 abre SKILL.md');
+    titulo('Corrector Revista');
+    ok(ta('nombre') && ta('nombre').value === 'corrector-revista', 'el name se propone desde el título: «Corrector Revista» → corrector-revista', ta('nombre') && ta('nombre').value);
+    escribe(ta('disparador'), 'Corrige notas en español. Úsala cuando pidan «corrige».');
+    escribe(ta('pasos'), '1. Lee.\n2. Corrige.');
+    escribe(ta('comprobacion'), '- Nada cambiado.');
+    const probar = async (que, re) => {
+      pulsa($('csg-ed-usar'), '▶ Usar');
+      await esperar(300);
+      const para = d.querySelector('#csg-usar-cuerpo .csg-usar-para');
+      const c0 = copias;
+      const apagados = [...$('csg-usar-pie').querySelectorAll('.csg-btn')].every(b => b.getAttribute('aria-disabled') === 'true');
+      pulsa(pieBtn(/Copiar/), '📋 Copiar');
+      await esperar(100);
+      ok(para && vis(para) && re.test(para.textContent) && apagados && copias === c0, que + ': USAR se apaga y la hoja lo NOMBRA', para && para.textContent);
+      await cierraUsar();
+    };
+    escribe(ta('nombre'), 'Corrector Revista');
+    await probar('un name con mayúscula y espacio', /name «Corrector Revista»/);
+    escribe(ta('nombre'), 'a'.repeat(65));
+    await probar('un name de 65', /name .*65/);
+    escribe(ta('nombre'), 'corrector-revista');
+    escribe(ta('disparador'), 'd'.repeat(1025));
+    await probar('una description de 1.025', /description tiene 1\.025/);
+    escribe(ta('disparador'), 'Corrige notas en español. Úsala cuando pidan «corrige».');
+    pulsa($('csg-ed-usar'), '▶ Usar');
+    await esperar(300);
+    ok(!vis(d.querySelector('#csg-usar-cuerpo .csg-usar-para')) && !pieBtn(/Copiar/).hasAttribute('aria-disabled'), 'arreglado, Usar se enciende');
+    await cierraUsar();
+    await volver();
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     15 · EL BORRADOR
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(15, 'Borrador: guardar nunca se bloquea, la ficha lo dice, usar se para; y el título repetido', async () => {
+    await nueva('prompt');
+    titulo('Solo formato');
+    escribe(await abreBloque('formato'), 'Lista numerada.');
+    await guardar();
+    ok(!!pieza('Solo formato'), 'sin Tarea SE GUARDA');
+    await volver();
+    const f1 = fichaDe('Solo formato');
+    const metas = f1 ? f1.querySelectorAll('.csg-ficha-meta') : [];
+    ok(metas.length === 1 && /^🟡 borrador: falta Tarea/.test(metas[0].textContent), 'la ficha lo dice en su ÚNICA línea corrida: «🟡 borrador: falta Tarea»', metas[0] && metas[0].textContent);
+    await usarFicha('Solo formato');
+    const c0 = copias;
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(100);
+    ok(copias === c0 && /Falta «Tarea»/.test(d.querySelector('#csg-usar-cuerpo .csg-usar-para').textContent) && pieza('Solo formato').usos === 0, 'y USAR se para, diciendo qué falta');
+    await cierraUsar();
+    await nueva('bucle');
+    titulo('Bucle sin tope');
+    escribe(ta('paso'), 'Mejora el párrafo para que se entienda a la primera.');
+    escribe(ta('parada'), 'Para cuando un niño de sexto lo entienda sin ayuda.');
+    escribe(ta('salida'), 'El párrafo final.');
+    await guardar();
+    await volver();
+    const f2 = fichaDe('Bucle sin tope');
+    ok(f2 && /^🟡 borrador: falta Tope/.test(f2.querySelector('.csg-ficha-meta').textContent), 'un bucle sin tope se guarda igual, como borrador que lo dice', f2 && f2.querySelector('.csg-ficha-meta').textContent);
+    await usarFicha('Bucle sin tope');
+    const c1 = copias;
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(100);
+    ok(copias === c1 && /sin tope no se puede usar/.test(d.querySelector('#csg-usar-cuerpo .csg-usar-para').textContent), 'y sin tope no se deja usar');
+    await cierraUsar();
+    const nV = g('csgVivas().length');
+    const idR = pieza('Resumen con variables').id;
+    await nueva('prompt');
+    titulo('Resumen con variables');
+    escribe(ta('tarea'), 'Otra cosa distinta.');
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    const av = [...d.querySelectorAll('#csg-ed .csg-rep-avisa .csg-rep-item')].find(x => /Ya hay otra consigna llamada «Resumen con variables»/.test(x.textContent));
+    ok(!!av && !!av.querySelector('.csg-rep-arreglo') && /Abrirla/.test(av.querySelector('.csg-rep-arreglo').textContent), 'el repaso avisa del título repetido con el enlace «↗ Abrirla»');
+    pulsa($('csg-ed-ver'), '✎ Bloques');
+    await esperar(120);
+    await guardar();
+    ok(verAbierta('csg-ver-overlay') && /Ya hay una «Resumen con variables»/.test($('csg-ver-titulo').textContent) && !!filaVer(/Abrir la que ya hay/) && !!filaVer(/Guardar igual/), 'y 💾 no guarda en silencio: «Ya hay una · Abrir la que ya hay · Guardar igual»');
+    /* ⚠️ «Abrir la que ya hay» NO TIRA LO ESCRITO (revisión del 23 de
+       septiembre de 2026, H1): tiraba el texto y el borrador de un toque,
+       sin rastro. Si lo de aquí dice otra cosa, se guarda aparte antes de
+       abrir la otra, y el renglón lo dice ANTES del toque; si dice lo
+       mismo, no hace falta guardarla y no nace una ficha de más. */
+    const fAbrir = filaVer(/Abrir la que ya hay/);
+    ok(!!fAbrir && /se guarda aparte/.test(fAbrir.textContent), 'el renglón dice ANTES del toque que lo escrito aquí se guarda aparte', fAbrir && fAbrir.textContent);
+    const av0 = avisos.length;
+    pulsa(fAbrir, 'Abrir la que ya hay');
+    await esperar(300);
+    const aparte = g('csgVivas()').filter(p => p.id !== idR && p.titulo === 'Resumen con variables');
+    ok(g('_csgEdPieza.id') === idR && g('csgVivas().length') === nV + 1 && aparte.length === 1 &&
+      (aparte[0].bloques.find(b => b.id === 'tarea') || {}).t === 'Otra cosa distinta.',
+      'abre la que ya había, y lo escrito NO se pierde: queda aparte, con su texto', JSON.stringify({ editando: g('_csgEdPieza.id') === idR, vivas: g('csgVivas().length') + ' de ' + nV, aparte: aparte.map(p => p.bloques) }));
+    ok(avisos.slice(av0).some(t => /Guardada «Resumen con variables»/.test(t)), 'y se dice («💾 Guardada «…»»)', avisos.slice(av0).join(' | '));
+    await volver();
+    /* Y la MISMA consigna escrita dos veces (el caso de siempre): nada que
+       perder, y ninguna ficha de más. */
+    const idS = pieza('Solo formato').id;
+    const nS = g('csgVivas().length');
+    await nueva('prompt');
+    titulo('Solo formato');
+    escribe(await abreBloque('formato'), 'Lista numerada.');
+    await guardar();
+    const fMismo = filaVer(/Abrir la que ya hay/);
+    ok(!!fMismo && /dice lo mismo/.test(fMismo.textContent), 'con el mismo texto, el renglón dice que no hace falta guardarla', fMismo && fMismo.textContent);
+    pulsa(fMismo, 'Abrir la que ya hay');
+    await esperar(300);
+    ok(g('_csgEdPieza.id') === idS && g('csgVivas().length') === nS && !g('csgBorradorLee()'), 'y abre la de antes sin dejar una gemela ni un borrador', JSON.stringify({ vivas: g('csgVivas().length') + ' de ' + nS, borrador: !!g('csgBorradorLee()') }));
+    await volver();
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     16 · EL REPASO
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(16, 'Repaso: datos de la casa con su chip, frases hechas, Perplexity, NotebookLM, y plegado', async () => {
+    await nueva('prompt');
+    await molde('Encargo completo');
+    titulo('Repaso de datos');
+    escribe(await abreBloque('rol'), 'Eres un editor de textos en español, riguroso con las fuentes.');
+    escribe(await abreBloque('contexto'), 'El texto es mío; puedes ser duro.');
+    escribe(ta('tarea'), 'Resume <tarea>esto</tarea>: llama al +504 9876-5432 o escribe a jose.polanco@correo.hn.');
+    escribe(ta('formato'), 'Lista.');
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    const verMaq = async n => { pulsa([...d.querySelectorAll('#csg-ed .csg-prev-maquinas .csg-chip')].find(c => c.textContent === n), 'chip ' + n); await esperar(150); };
+    await verMaq('Claude');
+    const det = d.querySelector('#csg-ed .csg-rep-avisa');
+    const items = () => [...d.querySelectorAll('#csg-ed .csg-rep-avisa .csg-rep-item')].map(x => x.textContent);
+    const rep = w.csgRevisar(g('_csgEdPieza'), 'claude');
+    ok(!!det && !det.open && new RegExp('▲ ' + rep.avisa.length + ' avisos').test(det.querySelector('summary').textContent), 'lo que avisa va PLEGADO tras su cuenta («' + (det && det.querySelector('summary').textContent) + '»)');
+    ok(items().some(t => /un teléfono/.test(t) && /\{\{telefono\}\}/.test(t)) && items().some(t => /un correo/.test(t) && /\{\{correo\}\}/.test(t)), 'teléfono y correo: aviso, cada uno con su chip a {{hueco}}', items().join('\n'));
+    ok(items().some(t => /«Rol», «Contexto» están hechos/.test(t)), 'bloques hechos solo de frases hechas: aviso', items().join('\n'));
+    await verMaq('NotebookLM');
+    ok(items().some(t => /NotebookLM/.test(t) && /«<tarea>»/.test(t)), 'NotebookLM con <tarea> dentro: aviso', items().join('\n'));
+    const chipTel = [...d.querySelectorAll('#csg-ed .csg-rep-arreglo')].find(b => /\{\{telefono\}\}/.test(b.textContent));
+    pulsa(chipTel, 'el chip ⇄ {{telefono}}');
+    await esperar(150);
+    const tt = w.csgTextoDe(g('_csgEdPieza'), 'tarea');
+    ok(/\{\{telefono\}\}/.test(tt) && !/9876/.test(tt) && !items().some(t => /un teléfono/.test(t)), 'un toque lo convierte en {{telefono}} y el aviso se va', tt);
+    await verMaq('Claude');
+    pulsa($('csg-ed-ver'), '✎ Bloques');
+    await esperar(120);
+    await molde('Investigación con fuentes');
+    escribe(ta('pregunta'), '¿Qué efecto tuvo la jornada extendida en la deserción?');
+    escribe(ta('fuentes'), 'Solo informes de organismos.');
+    escribe(ta('citas'), 'Cada dato con (Autor, año, página) pegado a la frase.');
+    escribe(ta('formato'), 'Un ensayo.');
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    await verMaq('Claude');
+    ok(!items().some(t => /Perplexity/.test(t)), 'con Claude, esas Citas no avisan de nada');
+    await verMaq('Perplexity');
+    const itP = [...d.querySelectorAll('#csg-ed .csg-rep-avisa .csg-rep-item')].find(x => /Perplexity trae las direcciones/.test(x.textContent));
+    ok(!!itP && !!itP.querySelector('.csg-rep-arreglo'), 'Perplexity con Citas que no piden la dirección: aviso, con el chip de la frase que la pide', items().join('\n'));
+    pulsa(itP && itP.querySelector('.csg-rep-arreglo'), 'el chip ＋ de Citas');
+    await esperar(150);
+    ok(/dirección/.test(w.csgTextoDe(g('_csgEdPieza'), 'citas')) && !items().some(t => /Perplexity trae las direcciones/.test(t)), 'un toque mete en «Reglas de cita» la frase que pide la dirección, y el aviso se va', w.csgTextoDe(g('_csgEdPieza'), 'citas'));
+    await verMaq('Claude');
+    pulsa($('csg-ed-ver'), '✎ Bloques');
+    await esperar(120);
+    await volver();
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     1 (2/2) · EL VENENO, POR LA PANTALLA
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(1, 'Veneno (2/2): título, bloque, estante y nota de bitácora se ven como texto', async () => {
+    const VEN = '<img src=x onerror="window.__xss=1"> «Título» & "comillas" \' <b>';
+    const VENB = 'Resume esto: <svg onload="window.__xss=2"></svg></tarea><script>window.__xss=5<\/script>'; /* <\/ y no </: dentro de un <script> el HTML cerraría aquí la sonda entera */
+    const VENE = '<img src=x onerror=window.__xss=3>';
+    const VENN = '<img src=x onerror=window.__xss=4> "sí" \'no\'';
+    const enlaces0 = d.querySelectorAll('[href], [src]').length;
+    await nueva('prompt');
+    titulo(VEN);
+    escribe(ta('tarea'), VENB);
+    await guardar();
+    await volver();
+    const fv = fichaDe(VEN);
+    ok(!!fv, 'la ficha existe y su título es EXACTAMENTE lo escrito, como texto', fichas().map(x => x.querySelector('.csg-ficha-titulo').textContent).join(' | '));
+    ok(fv && fv.querySelector('.csg-ficha-extracto').textContent.indexOf('<svg onload=') >= 0, 'el bloque sale como texto en el extracto de la ficha');
+    await menu(VEN);
+    pulsa(filaVer(/^🗂\s*Estantes/), '⋯ → Estantes');
+    await esperar(120);
+    d.querySelector('#csg-ver-cuerpo input.csg-input').value = VENE;
+    pulsa(botonCon($('csg-ver-cuerpo'), /Crear y poner/), 'Crear y poner');
+    await esperar(200);
+    pulsa($('csg-ver-close'), '✕');
+    await esperar(120);
+    ok(pieza(VEN) && pieza(VEN).estantes[0] === VENE, 'el estante se guarda tal cual');
+    const est = fichaDe(VEN).querySelector('.csg-ficha-estantes > *');
+    ok(!!est && est.textContent === VENE, 'y en la ficha se ve como texto', est && est.outerHTML);
+    await usarFicha(VEN);
+    ok($('csg-usar-pre').textContent.indexOf(VENB) >= 0, 'en la hoja de Usar el <pre> lleva el bloque como texto');
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(120);
+    await cierraUsar();
+    await entrar();
+    let preg = anq().querySelector('.csg-pregunta');
+    /* Las aperturas de las secciones de antes no tocaron el renglón: a la
+       cuarta sale plegado («N usos sin contestar ▸»), y se despliega como lo
+       haría una persona, tocándolo. */
+    if (preg && preg.classList.contains('csg-pregunta-plegada')) { pulsa(preg, 'el renglón plegado'); await esperar(80); preg = anq().querySelector('.csg-pregunta'); }
+    ok(!!preg && preg.textContent.indexOf('<img src=x onerror="win') >= 0, 'el «¿sirvió?» nombra la pieza, como texto', preg && preg.textContent);
+    pulsa(preg && preg.querySelector('.csg-pregunta-b'), '✅');
+    await esperar(100);
+    const nota = anq().querySelector('.csg-pregunta-nota');
+    nota.value = VENN;
+    nota.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await esperar(150);
+    ok(pieza(VEN).bitacora[0].nota === VENN, 'la nota se guarda tal cual');
+    await menu(VEN);
+    pulsa(filaVer(/Bitácora/), '⋯ → Bitácora');
+    await esperar(120);
+    ok($('csg-ver-cuerpo').textContent.indexOf('«' + VENN + '»') >= 0, 'y en ⋯ → Bitácora se ve como texto');
+    const raices = ['view-consigna', 'view-consigna-editor', 'csg-ver-overlay', 'csg-usar-overlay', 'csg-pegar-overlay'].map($);
+    const malos = [];
+    raices.forEach(r => r && [r, ...r.querySelectorAll('*')].forEach(el => {
+      for (const a of el.attributes) if (/^on/i.test(a.name) || /onerror|onload|__xss|<img|<svg|<script/i.test(a.value)) malos.push(el.tagName + '[' + a.name + '=' + a.value.slice(0, 50) + ']');
+    }));
+    ok(!malos.length, 'nada de lo escrito llegó a un ATRIBUTO de la pantalla', malos.slice(0, 5).join('\n'));
+    ok(!raices.some(r => r && r.querySelector('img, svg, script, iframe')) && !d.querySelector('[onerror], [onload]'), 'ningún <img>, <svg>, <script> ni manejador nació de lo escrito');
+    ok(w.__xss === undefined, 'no corrió nada (window.__xss sigue sin existir)', w.__xss);
+    pulsa($('csg-ver-close'), '✕');
+    await esperar(100);
+    ok(d.querySelectorAll('[href], [src]').length === enlaces0, 'ningún href ni src nuevo en el documento (' + enlaces0 + ')', d.querySelectorAll('[href], [src]').length + ' contra ' + enlaces0);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     9 (2/3) · SE PONE LA TABLA: UN VIAJE, FIRMADO; SIN SESIÓN; VOLVER
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(9, 'Nube (2/3): con la tabla sube en UN upsert firmado; sin sesión no sube nada y espera la firma', async () => {
+    await respiro();
+    const pend = g('_csgLista').filter(p => p.subida !== true).map(p => p.id);
+    const i0 = llamadas.length;
+    modo = 'puesta';
+    w.initConsigna();
+    await hasta(() => posts(i0).length > 0, 3000);
+    await esperar(400);
+    const ps = posts(i0);
+    const fl = ps.length ? filasDe(ps[0]) : [];
+    ok(ps.length === 1 && ps[0].estado === 201, 'al pasar a «puesta» y volver a abrir, lo pendiente sube en UN solo viaje', ps.map(l => l.estado + ':' + filasDe(l).length).join(' · '));
+    ok(fl.length === pend.length && pend.every(id => fl.some(x => x.id === id)), 'con las ' + pend.length + ' piezas que esperaban dentro', fl.length + ' contra ' + pend.length);
+    ok(ps.length && ps[0].onConflict === 'id' && /resolution=merge-duplicates/.test(ps[0].prefer), 'es un upsert con onConflict por id', ps[0] && (ps[0].onConflict + ' · ' + ps[0].prefer));
+    ok(fl.length && fl.every(x => x.autor === 'josue' && typeof x.actualizado === 'number' && x.actualizado > 0), 'cada fila FIRMADA por josue (la sesión) y con su actualizado', JSON.stringify(fl.map(x => [x.autor, x.actualizado])).slice(0, 200));
+    ok(/Las consignas viajan/.test(franja()) && !anq().querySelector('.csg-nube-no'), 'y la franja se va: queda el renglón discreto al pie', franja());
+
+    /* Sin sesión: ni verificarSesion ni el miembro recordado. */
+    sesion = null;
+    try { w.localStorage.removeItem('faro.miembro'); } catch (e) {}
+    await nueva('prompt');
+    titulo('Sin firma');
+    escribe(ta('tarea'), 'Resume esto sin firma.');
+    const i1 = llamadas.length;
+    await guardar();
+    await respiro();
+    const idS = (pieza('Sin firma') || {}).id;
+    ok(!!idS && pieza('Sin firma').autor === '' && !subidasDe(idS, i1).length && !posts(i1).length, 'sin sesión se guarda aquí y NO sube nada', 'viajes ' + posts(i1).length);
+    await volver();
+    ok(/sin sesión: se firmará al entrar/.test(franja()), 'y la franja lo dice: «sin sesión: se firmará al entrar»', franja());
+    sesion = { user: 'josue', nombre: 'Josué Edmundo' };
+    const i2 = llamadas.length;
+    w.dispatchEvent(new w.Event('online'));
+    await hasta(() => subidasDe(idS, i2).length > 0, 4000);
+    const sub = subidasDe(idS, i2);
+    ok(sub.length === 1 && sub[0].autor === 'josue', 'al volver la sesión, csgSubirPendientes la sube FIRMADA', JSON.stringify(sub.map(x => x.autor)));
+    await esperar(200);
+    await entrar();
+    ok(/Las consignas viajan/.test(franja()), 'y la franja vuelve a estar tranquila', franja());
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     10 (2/2) · LA FUSIÓN, POR LA NUBE
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(10, 'Fusión (2/2): lo que otro aparato apuntó entra por unión, sin perder lo de aquí', async () => {
+    const p = pieza('Resumen con variables');
+    const fila = tabla.get(p.id);
+    const nulo = p.bitacora.find(u => u.ok === null);
+    const f2 = JSON.parse(JSON.stringify(fila));
+    f2.titulo = 'Título viejo de la nube';
+    f2.actualizado = p.actualizado - 5000;
+    f2.bitacora = f2.bitacora.map(u => (nulo && u.uid === nulo.uid) ? Object.assign({}, u, { ok: 'si', nota: 'en el teléfono' }) : u)
+      .concat([{ uid: 'u-otro-aparato', t: Date.now() - 3600000, maquina: 'gemini', v: 1, ok: 'no', nota: 'inventó una fuente' }]);
+    f2.versiones = (f2.versiones || []).concat([{ vid: 'v-otro-aparato', v: 1, t: Date.now() - 7200000, bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'Una versión de otro aparato.' }] }]);
+    tabla.set(p.id, f2);
+    const i0 = llamadas.length;
+    w.initConsigna();
+    await hasta(() => subidasDe(p.id, i0).length > 0, 3000);
+    ok(p.titulo === 'Resumen con variables', 'el título lo gana el actualizado más nuevo (el de aquí)', p.titulo);
+    ok(p.bitacora.some(u => u.uid === 'u-otro-aparato' && u.ok === 'no'), 'el uso del otro aparato entra, con su ❌');
+    ok(!nulo || (p.bitacora.find(u => u.uid === nulo.uid) || {}).ok === 'si', 'y el «¿sirvió?» contestado allá gana al null de aquí');
+    ok(p.versiones.some(x => x.vid === 'v-otro-aparato'), 'la versión del otro aparato entra por su vid');
+    const sub = subidasDe(p.id, i0);
+    ok(sub.length && sub[0].bitacora.some(u => u.uid === 'u-otro-aparato') && sub[0].titulo === 'Resumen con variables', 'y lo fundido vuelve a la nube en su upsert', sub.length);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     10 (3/3) · EL COMPOSITOR ABIERTO NO DESHACE LO DE OTRO APARATO
+     (revisión del 23 de septiembre de 2026, D1 y D2)
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(10, 'Fusión (3/3): 💾 con el compositor abierto escribe solo lo cambiado; corregir no fabrica versiones', async () => {
+    await respiro();
+    const corregir = async t => { pulsa(botonCon(fichaDe(t), /Corregir/), '✎ Corregir de «' + t + '»'); await esperar(300); };
+    const tarea = x => ((x.bloques || []).find(b => b.id === 'tarea') || {}).t;
+    const otroAparato = (id, cambio) => { const f = tabla.get(id); Object.assign(f, cambio, { actualizado: Date.now() }); };
+    await nueva('prompt');
+    titulo('Pieza de dos aparatos');
+    escribe(ta('tarea'), 'Resume el texto A en tres puntos.');
+    await guardar();
+    await volver();
+    await respiro();
+    const id = pieza('Pieza de dos aparatos').id;
+    await corregir('Pieza de dos aparatos');
+    ok(activa('view-consigna-editor') && g('_csgEdPieza.id') === id && !g('csgEdSucio()'), 'el compositor abre la pieza, limpio');
+    /* Otro aparato la corrige mientras el compositor está abierto, y la
+       nube llega (lo que hacen la subida de un uso o la señal que vuelve). */
+    otroAparato(id, { titulo: 'Pieza de dos aparatos', bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'Resume el texto B, CORREGIDO en la tableta.' }], estantes: ['Maestría'] });
+    await g('csgCargar()');
+    ok(tarea(g('csgDe(' + JSON.stringify(id) + ')')) === 'Resume el texto B, CORREGIDO en la tableta.', 'la lista ya tiene lo de la tableta');
+    const i0 = llamadas.length;
+    pulsa($('csg-ed-guardar'), '💾 sin tocar nada');
+    await esperar(200);
+    await respiro();
+    const q = g('csgDe(' + JSON.stringify(id) + ')');
+    ok(tarea(q) === 'Resume el texto B, CORREGIDO en la tableta.' && (q.estantes || []).indexOf('Maestría') >= 0 && !(q.versiones || []).length,
+      '💾 SIN TOCAR NADA no deshace lo de la tableta: el texto B y el estante se quedan, y no nace ninguna versión', JSON.stringify({ tarea: tarea(q), estantes: q.estantes, versiones: (q.versiones || []).length }));
+    ok(!subidasDe(id, i0).length && tarea(tabla.get(id)) === 'Resume el texto B, CORREGIDO en la tableta.', 'y no escribe nada en la base', subidasDe(id, i0).length + ' subidas');
+    /* Solo el título, aquí; el texto, otra vez allá: al volver se escribe
+       el título y el texto de allá se queda. */
+    titulo('Pieza de dos aparatos, retitulada aquí');
+    otroAparato(id, { bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'Texto C, de la tableta.' }] });
+    await g('csgCargar()');
+    await volver();
+    await respiro();
+    const r = g('csgDe(' + JSON.stringify(id) + ')');
+    ok(r.titulo === 'Pieza de dos aparatos, retitulada aquí' && tarea(r) === 'Texto C, de la tableta.' && (r.estantes || []).indexOf('Maestría') >= 0,
+      'cambiando solo el título se escribe SOLO el título: el texto C y el estante de la tableta siguen', JSON.stringify({ titulo: r.titulo, tarea: tarea(r), estantes: r.estantes }));
+    ok(tarea(tabla.get(id)) === 'Texto C, de la tableta.' && tabla.get(id).titulo === 'Pieza de dos aparatos, retitulada aquí', 'y así llega a la base');
+    /* Los dos cambian el TEXTO: gana el de aquí (es lo que se ve), y el de
+       allá queda como versión, aunque la pieza no se haya usado nunca. */
+    await corregir('Pieza de dos aparatos, retitulada aquí');
+    escribe(ta('tarea'), 'Texto D, escrito aquí.');
+    otroAparato(id, { bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'Texto E, de la tableta.' }] });
+    await g('csgCargar()');
+    const av0 = avisos.length;
+    await guardar();
+    const s = g('csgDe(' + JSON.stringify(id) + ')');
+    const conE = (s.versiones || []).find(x => Array.isArray(x.bloques) && x.bloques.some(b => b.t === 'Texto E, de la tableta.'));
+    ok(tarea(s) === 'Texto D, escrito aquí.' && !!conE, 'con los dos cambiando el texto, gana el de aquí y el de allá queda en 🕘 Versiones', JSON.stringify({ tarea: tarea(s), versiones: (s.versiones || []).map(x => x.v + ':' + (x.bloques ? x.bloques.map(b => b.t).join('/') : '—')) }));
+    ok(avisos.slice(av0).some(t => /otro aparato/.test(t)), 'y se dice', avisos.slice(av0).join(' | '));
+    await volver();
+
+    /* D2 · Corregir una pieza USADA hace nacer UNA versión; los 💾 que
+       siguen, mientras la nueva no se use, la corrigen en su sitio. */
+    await nueva('prompt');
+    titulo('Pieza usada una vez');
+    escribe(ta('tarea'), 'Resume el acta en cinco puntos.');
+    await guardar();
+    await volver();
+    await usarFicha('Pieza usada una vez');
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(120);
+    await cierraUsar();
+    const pu = pieza('Pieza usada una vez');
+    ok(pu.usos === 1 && pu.version === 1, 'usada una vez, en la v1');
+    await corregir('Pieza usada una vez');
+    for (let i = 1; i <= 3; i++) {
+      escribe(ta('tarea'), 'Resume el acta en cinco puntos, retoque ' + i + '.');
+      await guardar();
+    }
+    ok(pu.version === 2 && (pu.versiones || []).length === 1 && pu.versiones[0].v === 1 && Array.isArray(pu.versiones[0].bloques) && tarea(pu.versiones[0]) === 'Resume el acta en cinco puntos.',
+      'tres 💾 corrigiendo una pieza usada: UNA versión nueva (v2), y la v1 —la usada— guarda su texto', JSON.stringify({ version: pu.version, versiones: (pu.versiones || []).map(x => x.v) }));
+    ok(tarea(pu) === 'Resume el acta en cinco puntos, retoque 3.', 'y la v2 lleva el último retoque');
+    await volver();
+    await usarFicha('Pieza usada una vez');
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(120);
+    await cierraUsar();
+    await corregir('Pieza usada una vez');
+    escribe(ta('tarea'), 'Resume el acta en siete puntos.');
+    await guardar();
+    ok(pu.version === 3 && (pu.versiones || []).map(x => x.v).join(',') === '2,1', 'usada la v2, corregirla sí hace nacer la v3', JSON.stringify({ version: pu.version, versiones: (pu.versiones || []).map(x => x.v) }));
+    await volver();
+    await respiro();
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     15 (2/2) · LO QUE SE DEJÓ A MEDIO ESCRIBIR NO SE PISA
+     (revisión del 23 de septiembre de 2026, D3 y D4)
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(15, 'Borrador (2/2): la franja «Tenías cambios sin guardar» no pierde nada, ni abriendo otra ni escribiendo encima', async () => {
+    const corregir = async t => { pulsa(botonCon(fichaDe(t), /Corregir/), '✎ Corregir de «' + t + '»'); await esperar(300); };
+    const tarea = x => ((x.bloques || []).find(b => b.id === 'tarea') || {}).t;
+    const recargar = () => w.eval("Object.keys(_csgLuego).forEach(k => clearTimeout(_csgLuego[k].t)); _csgLuego = {}; clearTimeout(_csgEdBorradorT); _csgEdPieza = null; _csgEdRecuperar = null; _csgLista = []; _csgCargada = false; _csgNube = 'mirando'; _csgHayTabla = false; _csgColsFuera = []; _csgInitEnCurso = null; _csgAnqPrefs = null;");
+    const enAlgunSitio = frase => g('csgVivas()').some(p => (p.bloques || []).some(b => String(b.t).indexOf(frase) >= 0)) || String(w.localStorage.getItem('faro_consigna_borrador_v1') || '').indexOf(frase) >= 0;
+    for (const t of ['Pieza X del borrador', 'Pieza Y del borrador', 'Pieza R de la franja']) {
+      await nueva('prompt');
+      titulo(t);
+      escribe(ta('tarea'), 'Texto guardado de ' + t + '.');
+      await guardar();
+      await volver();
+    }
+    await respiro();
+    /* D3 · X con cambios sin guardar, y la aplicación se cierra. Al volver,
+       se abre X, sale la franja y NO se elige; se vuelve y se abre Y. */
+    await corregir('Pieza X del borrador');
+    escribe(ta('tarea'), 'UNA HORA de cambios sin guardar en X.');
+    await esperar(600);
+    recargar();
+    await entrar();
+    await corregir('Pieza X del borrador');
+    ok(!!d.querySelector('#csg-ed .csg-ed-recuperar'), 'en X sale la franja «Tenías cambios sin guardar»');
+    await volver();
+    const av0 = avisos.length;
+    await corregir('Pieza Y del borrador');
+    escribe(ta('tarea'), 'Texto de Y, retocado.');
+    await esperar(600);
+    ok(enAlgunSitio('UNA HORA de cambios sin guardar en X.'), 'abrir OTRA pieza sin haber elegido NO pierde lo de X: sigue en el aparato', JSON.stringify(g('csgVivas()').map(p => p.titulo + ': ' + tarea(p))));
+    ok(tarea(pieza('Pieza X del borrador')) === 'UNA HORA de cambios sin guardar en X.' && avisos.slice(av0).some(t => /a medio escribir se guardó/.test(t)),
+      'se guarda en el anaquel, en X, y se dice', avisos.slice(av0).join(' | '));
+    await volver();
+    await respiro();
+    /* D4 · Con la franja puesta, escribir NO pisa lo de antes, y «Seguir»
+       ya no puede tirar lo recién escrito. */
+    await corregir('Pieza R de la franja');
+    escribe(ta('tarea'), 'Cambios de ayer, sin guardar.');
+    await esperar(600);
+    recargar();
+    await entrar();
+    await corregir('Pieza R de la franja');
+    ok(!!d.querySelector('#csg-ed .csg-ed-recuperar'), 'en R sale la franja');
+    const av1 = avisos.length;
+    escribe(ta('tarea'), 'Texto guardado de Pieza R de la franja. Y un PÁRRAFO NUEVO escrito hoy.');
+    await esperar(600);
+    ok(enAlgunSitio('Cambios de ayer, sin guardar.') && enAlgunSitio('PÁRRAFO NUEVO escrito hoy'), 'escribiendo con la franja puesta, lo de antes Y lo de ahora siguen en el aparato',
+      JSON.stringify({ borrador: String(w.localStorage.getItem('faro_consigna_borrador_v1') || '').slice(0, 160), vivas: g('csgVivas()').map(p => p.titulo) }));
+    const aparte = g('csgVivas()').find(p => /\(lo que no se guardó\)$/.test(p.titulo) && tarea(p) === 'Cambios de ayer, sin guardar.');
+    ok(!!aparte && !d.querySelector('#csg-ed .csg-ed-recuperar') && avisos.slice(av1).some(t => /se guardó aparte/.test(t)),
+      'lo de antes se guarda aparte («… (lo que no se guardó)»), la franja se va y se dice: ya no hay «Seguir» que tire lo de hoy de un toque', avisos.slice(av1).join(' | '));
+    await volver();
+    ok(/PÁRRAFO NUEVO escrito hoy/.test(tarea(pieza('Pieza R de la franja')) || ''), 'y al volver, R se guarda con lo de hoy');
+    await respiro();
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     9 (3/3) · LA BASE VIEJA (42703) Y LA PETICIÓN QUE NO VUELVE
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(9, 'Nube (3/3): 42703 nombra la columna y «vuelve a correr»; FARO_RELOJ no vacía la lista', async () => {
+    await respiro();
+    colsFuera = ['cuaderno'];
+    tabla.forEach(r => { delete r.cuaderno; });
+    modo = 'vieja';
+    const i0 = llamadas.length;
+    w.initConsigna();
+    await esperar(500);
+    ok(llamadas.slice(i0).some(l => l.tabla && l.metodo === 'GET' && l.codigo === '42703') && llamadas.slice(i0).some(l => l.tabla && l.metodo === 'GET' && l.estado === 200 && !/cuaderno/.test(l.ruta)),
+      'la base rebota la lectura con 42703 y el aparato la repite SIN esa columna');
+    ok(/vuelve a correr consigna\.sql/.test(franja()) && /«cuaderno»/.test(franja()), 'la franja dice «vuelve a correr consigna.sql» y NOMBRA la columna', franja());
+    const n0 = fichas().length;
+    pulsa(botonCon(fichaDe('Mi título a mano'), /Corregir/), '✎ Corregir');
+    await esperar(250);
+    escribe(ta('tarea'), ta('tarea').value + ' Con base vieja.');
+    await guardar();
+    await respiro();
+    const sub = posts(i0).filter(l => l.estado === 201).map(filasDe).flat();
+    ok(sub.length && sub.every(x => !('cuaderno' in x)), 'lo que sube no lleva la columna que falta, y la base lo acepta', sub.length + ' filas; rechazos: ' + posts(i0).filter(l => l.estado !== 201).map(l => l.codigo).join(','));
+    await volver();
+    ok(fichas().length === n0, 'y la lista sigue entera');
+    colsFuera = [];
+    modo = 'puesta';
+    w.initConsigna();
+    await esperar(500);
+    ok(/Las consignas viajan/.test(franja()), 'con el SQL vuelto a correr, la franja se va', franja());
+
+    modo = 'cuelga';
+    const n1 = fichas().length, v1 = g('csgVivas().length');
+    w.initConsigna();
+    await esperar(9000);
+    ok(fichas().length === n1 && g('csgVivas().length') === v1 && n1 > 0, 'una petición que NO VUELVE no vacía la lista (' + n1 + ' fichas tras 9 s)', fichas().length + ' contra ' + n1);
+    ok(/sin señal/.test(franja()) && !!botonCon(anq().querySelector('.csg-nube-no'), /Reintentar/), 'a los ocho segundos (FARO_RELOJ) la franja dice «sin señal» con su «Reintentar»', franja());
+    modo = 'puesta';
+    pulsa(botonCon(anq().querySelector('.csg-nube-no'), /Reintentar/), 'Reintentar');
+    await hasta(() => /Las consignas viajan/.test(franja()), 3000);
+    ok(/Las consignas viajan/.test(franja()), 'y «Reintentar» vuelve a mirar la nube', franja());
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     13 · LA BITÁCORA PREGUNTADA
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(13, 'Bitácora preguntada: un renglón de 44 px en su sitio, ✅, ✕, plegado y siete días', async () => {
+    await respiro();
+    /* Una pieza de otro aparato con un uso de hace ocho días, sin contestar. */
+    tabla.set('csg-sonda-ocho-dias', filaNube({ id: 'csg-sonda-ocho-dias', titulo: 'De hace ocho días', bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'Algo viejo.' }], usos: 1,
+      bitacora: [{ uid: 'u-8d', t: Date.now() - 8 * 86400000, maquina: 'claude', v: 1, ok: null, nota: '' }] }));
+    /* Lo que el aparato recuerda de la pregunta se vacía, como en un aparato
+       nuevo: las aperturas de las secciones de antes ya lo habrían plegado. */
+    w.localStorage.removeItem('faro_consigna_pregunta_v1');
+    const pendientes = () => {
+      const desc = (JSON.parse(w.localStorage.getItem('faro_consigna_pregunta_v1') || '{}').descartados) || {};
+      const desde = Date.now() - 7 * 86400000;
+      const out = [];
+      g('csgVivas()').forEach(p => (p.bitacora || []).forEach(u => { if (u && u.ok == null && u.t >= desde && !desc[u.uid]) out.push({ p, u }); }));
+      return out.sort((a, b) => b.u.t - a.u.t);
+    };
+    const antesDeLaFicha = () => {
+      const l = [];
+      for (const c of anq().children) { if (c.matches('.csg-grid, .csg-lista, section') || c.querySelector('.csg-ficha, .csg-fila')) break; l.push(c.className || c.tagName); }
+      return l;
+    };
+    await entrar();
+    ok(!!g('csgDe("csg-sonda-ocho-dias")'), 'la pieza del uso de hace ocho días llegó de la nube');
+    const esperado = pendientes()[0];
+    const preg = anq().querySelector('.csg-pregunta');
+    ok(anq().querySelectorAll('.csg-pregunta').length === 1 && !!esperado, 'sale UN renglón «¿sirvió?» (hay ' + pendientes().length + ' usos pendientes)');
+    ok(preg && Math.abs(preg.getBoundingClientRect().height - 44) < 0.6, 'mide 44 px', preg && preg.getBoundingClientRect().height);
+    ok(preg && esperado && preg.textContent.indexOf(String(esperado.p.titulo).slice(0, 18)) >= 0 && /¿sirvió\?/.test(preg.textContent), 'pregunta por el uso MÁS RECIENTE («' + (esperado && esperado.p.titulo) + '»)', preg && preg.textContent);
+    const chips = anq().querySelector('.csg-chips'), prim = anq().querySelector('.csg-ficha');
+    ok(chips && prim && (chips.compareDocumentPosition(preg) & 4) && (preg.compareDocumentPosition(prim) & 4) && preg.getBoundingClientRect().top >= chips.getBoundingClientRect().bottom && preg.getBoundingClientRect().bottom <= prim.getBoundingClientRect().top,
+      'va DEBAJO de los chips y ENCIMA de la primera ficha');
+    const ant = antesDeLaFicha();
+    ok(ant.length <= 5, 'antes de la primera ficha hay ' + ant.length + ' cosas (≤ 5): ' + ant.join(' · '));
+    pulsa(preg.querySelector('.csg-pregunta-b'), '✅');
+    await esperar(100);
+    const uS = esperado.p.bitacora.find(u => u.uid === esperado.u.uid);
+    ok(uS.ok === 'si' && typeof uS.v === 'number' && uS.v >= 1, '✅ escribe ok «si», con su v (' + uS.v + ')');
+    const nota = anq().querySelector('.csg-pregunta-nota');
+    ok(!!nota && nota.maxLength === 300, 'y abre, sin obligar, el «qué pasó» de 300 como mucho');
+    nota.value = 'n'.repeat(350);
+    const i0 = llamadas.length;
+    nota.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    await esperar(100);
+    ok(cpL(uS.nota) === 300, 'una nota de 350 se guarda cortada a 300', cpL(uS.nota));
+    await hasta(() => subidasDe(esperado.p.id, i0).length > 0, 4000);
+    const sub = subidasDe(esperado.p.id, i0);
+    const us = sub.length ? (sub[sub.length - 1].bitacora || []).find(u => u.uid === uS.uid) : null;
+    ok(us && us.ok === 'si' && us.v === uS.v && cpL(us.nota) === 300, 'y la respuesta viaja: el upsert lleva ok «si», su v y la nota cortada', JSON.stringify(us));
+    const descartados = [];
+    for (let i = 0; i < 30; i++) {
+      const r = anq().querySelector('.csg-pregunta:not(.csg-anq-seguir)');
+      if (!r) break;
+      const x = r.querySelector('.csg-pregunta-x');
+      if (!x) { pulsa(r, 'el renglón plegado'); await esperar(60); continue; }
+      const cual = pendientes()[0];
+      if (cual) descartados.push(cual);
+      pulsa(x, '✕');
+      await esperar(80);
+    }
+    ok(descartados.length > 0 && descartados.every(z => z.p.bitacora.find(u => u.uid === z.u.uid).ok === null), '✕ deja cada uso SIN contestar (' + descartados.length + '): nunca se inventa un resultado');
+    ok(!descartados.some(z => z.u.uid === 'u-8d'), 'y el uso de hace ocho días no se preguntó nunca');
+    await entrar();
+    ok(!anq().querySelector('.csg-pregunta') && g('csgDe("csg-sonda-ocho-dias")').bitacora[0].ok === null, 'al volver a abrir, lo descartado no se vuelve a preguntar (y el de ocho días sigue sin preguntarse, sin contestar)');
+    const ant2 = antesDeLaFicha();
+    ok(ant2.length <= 4, 'sin uso pendiente, antes de la primera ficha hay ' + ant2.length + ' cosas (≤ 4): ' + ant2.join(' · '));
+    await usarFicha('Mi título a mano');
+    pulsa(pieBtn(/Copiar/), '📋 Copiar');
+    await esperar(100);
+    await cierraUsar();
+    const vistas = [];
+    for (let i = 0; i < 4; i++) {
+      await entrar();
+      const r = anq().querySelector('.csg-pregunta');
+      vistas.push(r ? (r.classList.contains('csg-pregunta-plegada') ? 'plegada' : 'abierta') : 'nada');
+    }
+    ok(vistas.join(',') === 'abierta,abierta,abierta,plegada', 'ignorado tres aperturas seguidas, a la cuarta se pliega', vistas.join(','));
+    const pl = anq().querySelector('.csg-pregunta-plegada');
+    ok(!!pl && /1 uso sin contestar ▸/.test(pl.textContent), 'plegado dice «1 uso sin contestar ▸»', pl && pl.textContent);
+    pulsa(pl, 'el renglón plegado');
+    await esperar(80);
+    const ab = anq().querySelector('.csg-pregunta:not(.csg-pregunta-plegada)');
+    ok(!!ab && !!ab.querySelector('.csg-pregunta-x'), 'y un toque lo despliega');
+    pulsa(ab && ab.querySelector('.csg-pregunta-x'), '✕');
+    await esperar(80);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     11 · LA LÁPIDA
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(11, 'Lápida: dos toques sin confirm(), eliminado en el upsert, y gana al arrancar', async () => {
+    await respiro();
+    const p = pieza('Otra con tema');
+    const id = p.id;
+    confirms = 0;
+    await menu('Otra con tema');
+    pulsa(filaVer(/^🗑\s*Retirar/), '⋯ → Retirar');
+    await esperar(80);
+    ok(!p.eliminado && !!botonCon($('csg-ver-cuerpo'), /Sí, retirar/), 'un toque no retira: pone «Sí, retirar · No» ahí mismo');
+    const i0 = llamadas.length;
+    pulsa(botonCon($('csg-ver-cuerpo'), /Sí, retirar/), 'Sí, retirar');
+    await hasta(() => subidasDe(id, i0).length > 0, 3000);
+    ok(p.eliminado === true && confirms === 0, 'el segundo toque retira, y confirm() se llamó ' + confirms + ' veces');
+    ok(!fichaDe('Otra con tema') && /Retiradas \(1\)/.test((anq().querySelector('.csg-retiradas summary') || {}).textContent || ''), 'sale del anaquel y va a «Retiradas», al final');
+    const sub = subidasDe(id, i0);
+    ok(sub.length && sub[0].eliminado === true && typeof sub[0].eliminado_at === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(sub[0].eliminado_at) && !isNaN(Date.parse(sub[0].eliminado_at)),
+      'el upsert lleva eliminado: true y eliminado_at como FECHA ISO', JSON.stringify(sub[0] && [sub[0].eliminado, sub[0].eliminado_at]));
+    /* La nube vuelve a tener la pieza VIVA y más vieja (otro aparato que no
+       se enteró), y la aplicación arranca de nuevo: la memoria se vacía, el
+       aparato se queda. */
+    const r = tabla.get(id);
+    r.eliminado = false; r.eliminado_at = null; r.actualizado = p.actualizado - 60000;
+    w.eval("Object.keys(_csgLuego).forEach(k => clearTimeout(_csgLuego[k].t)); _csgLuego = {}; _csgLista = []; _csgCargada = false; _csgNube = 'mirando'; _csgHayTabla = false; _csgColsFuera = []; _csgInitEnCurso = null;");
+    const i1 = llamadas.length;
+    w.initConsigna();
+    await hasta(() => subidasDe(id, i1).length > 0, 3000);
+    const q = g('csgDe("' + id + '")');
+    ok(q && q.eliminado === true && !fichaDe('Otra con tema'), 'al arrancar con la nube devolviendo la pieza vieja, la LÁPIDA gana', q && q.eliminado);
+    ok(subidasDe(id, i1).some(x => x.eliminado === true) && tabla.get(id).eliminado === true, 'y se vuelve a subir sola: la nube queda con la lápida');
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     14 (2/2) · LO QUE NO CABE NO VIAJA, Y SE DICE
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(14, 'Topes (2/2): bloques de 60.001 y Material de 20.001 no viajan; 19.000 sí', async () => {
+    await respiro();
+    const baseB = pgLargo([{ id: 'tarea', rotulo: 'Tarea', t: '' }]);
+    await nueva('prompt');
+    titulo('Demasiado larga');
+    escribe(ta('tarea'), 'x'.repeat(60001 - baseB));
+    ok(/60\.001 de 60\.000 caracteres: no cabe en la nube, recorta 1 carácter/.test(d.querySelector('#csg-ed .csg-ed-contador').textContent), 'el compositor lo cuenta como la base: «60.001 de 60.000 … recorta 1 carácter»', d.querySelector('#csg-ed .csg-ed-contador').textContent);
+    const i0 = llamadas.length;
+    await guardar();
+    await respiro();
+    const p = pieza('Demasiado larga');
+    ok(p && p.noCabe === true && !subidasDe(p.id, i0).length, 'se guarda en el aparato y NO viaja (bloques de 60.001 medidos como jsonb::text)', p && JSON.stringify({ noCabe: p.noCabe, viajes: subidasDe(p.id, i0).length }));
+    await volver();
+    ok(/«Demasiado larga» no cabe en la nube: recorta 1 carácter/.test(franja()), 'la franja nombra la pieza y lo que sobra', franja());
+    pulsa(botonCon(fichaDe('Demasiado larga'), /Corregir/), '✎ Corregir');
+    await esperar(250);
+    escribe(ta('tarea'), 'Ya es corta.');
+    const i1 = llamadas.length;
+    await guardar();
+    await respiro();
+    ok(subidasDe(p.id, i1).length === 1 && !p.noCabe, 'recortada, sube');
+    await volver();
+    await nueva('prompt');
+    titulo('Con material');
+    escribe(ta('tarea'), 'Resume lo de abajo.');
+    const det = d.querySelector('#csg-ed .csg-material');
+    pulsa(det.querySelector('summary'), '📎 Material');
+    const taM = det.querySelector('.csg-material-ta');
+    escribe(taM, 'm'.repeat(20001));
+    ok(/material de 20\.001 caracteres: no se guarda con la pieza/.test(det.querySelector('.csg-material-nota').textContent), 'el bloque lo dice: «material de 20.001 caracteres: no se guarda con la pieza»', det.querySelector('.csg-material-nota').textContent);
+    const i2 = llamadas.length;
+    await guardar();
+    await respiro();
+    const pm = pieza('Con material');
+    const s2 = subidasDe(pm.id, i2);
+    ok(s2.length === 1 && s2[0].material === '' && pm.material === '', 'un Material de 20.001 NO viaja en el upsert (la columna va vacía)', s2.map(x => String(x.material).length).join(','));
+    escribe(taM, 'm'.repeat(19000));
+    const i3 = llamadas.length;
+    await guardar();
+    await respiro();
+    const s3 = subidasDe(pm.id, i3);
+    ok(s3.length === 1 && s3[0].material.length === 19000, 'uno de 19.000 sí viaja en `material`', s3.map(x => String(x.material).length).join(','));
+    await volver();
+    ok(/Las consignas viajan/.test(franja()), 'y la franja vuelve a estar tranquila', franja());
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     7 · PEGAR Y REPARTIR
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(7, 'Pegar y repartir: la asimetría, las propuestas, lo nombrado y nada descartado', async () => {
+    pulsa(barraBtn(/Pegar/), '📋 Pegar de la barra');
+    await esperar(150);
+    const taP = d.querySelector('#csg-pegar-cuerpo .csg-pegar-ta');
+    ok(verAbierta('csg-pegar-overlay') && d.activeElement === taP, 'la hoja de pegar se abre con el recuadro enfocado');
+    const ids = r => r.bloques.map(b => b.id).join(',');
+    const bl = (r, id) => r.bloques.find(b => b.id === id) || { t: null };
+    const leer = async texto => {
+      taP.value = texto;
+      pulsa(botonCon($('csg-pegar-cuerpo'), /Leer$/), 'Leer');
+      await esperar(120);
+      const r = g('_csgPegLeido');
+      const cu = (d.querySelector('#csg-pegar-cuerpo .csg-pegar-cuenta') || {}).textContent || '';
+      const salida = [r.titulo].concat(r.bloques.map(b => b.t), [r.material]);
+      const e = cuentaP(texto), s = salida.reduce((a, t) => a + cuentaP(t), 0) + (r.estructura || []).reduce((a, t) => a + cuentaP(t), 0) - (r.anadido || []).reduce((a, t) => a + cuentaP(t), 0);
+      const m = new Map();
+      bolsa(texto).concat(...(r.anadido || []).map(bolsa)).forEach(x => m.set(x, (m.get(x) || 0) + 1));
+      [].concat(...salida.map(bolsa), ...(r.estructura || []).map(bolsa)).forEach(x => m.set(x, (m.get(x) || 0) - 1));
+      const sobran = [...m].filter(([, n]) => n).map(([x, n]) => x + (n > 0 ? ' −' + n : ' +' + (-n)));
+      return { r, prop: (d.querySelector('#csg-pegar-cuerpo .csg-pegar-propuesta') || {}).textContent || '', cu, avisos: ((d.querySelector('#csg-pegar-cuerpo .csg-pegar-avisos') || {}).textContent || ''), cuadra: e === s && !sobran.length && /no se perdió ninguna/.test(cu), e, s, sobran };
+    };
+    const cuadra = (nombre, x) => ok(x.cuadra, nombre + ': palabras de entrada = de salida (' + x.e + ') y la hoja lo dice', x.e + ' → ' + x.s + ' ' + x.sobran.slice(0, 6).join(', ') + ' · «' + x.cu + '»');
+
+    const COSTAR = '<contexto>\nEs la columna de apertura del número de octubre; el tema es la memoria.\n</contexto>\n\n<objetivo>\nQue un lector que no conoce el tema entienda por qué importa.\n</objetivo>\n<estilo>Periodístico: frases cortas, el dato primero.</estilo>\n<tono>\nCercano, con algo de humor.\n</tono>\n<audiencia>\nUn estudiante de sexto grado que lee bien.\n</audiencia>\n<respuesta>\n600 palabras en cuatro párrafos, sin subtítulos.\n</respuesta>\n';
+    const a = await leer(COSTAR);
+    ok(a.r.clase === 'prompt' && a.r.molde === 'costar' && ids(a.r) === 'contexto,objetivo,estilo,tono,audiencia,formato', 'un CO-STAR en XML → seis bloques en su sitio (<respuesta> en Formato)', a.r.molde + ' · ' + ids(a.r));
+    ok(/Parece un 💬 Prompt · CO-STAR · 6 de 6 bloques · cambiar/.test(a.prop), 'la propuesta va en un chip: «' + a.prop + '»');
+    cuadra('CO-STAR', a);
+    const EN = '## Role\nYou are an editor who checks every source.\n\n## Context\nThis goes in the family magazine.\n\n## Task\nRewrite the first three paragraphs.\n\n## Output format\nThe paragraphs, then a list of changes.\n\n## Tone\nDirect.\n';
+    const b = await leer(EN);
+    ok(b.r.molde === 'encargo' && ids(b.r) === 'rol,contexto,tarea,formato,tono', 'encabezados en inglés → Encargo completo', ids(b.r));
+    cuadra('en inglés', b);
+    const ES = 'Contexto: Es para la revista de la casa.\nTarea: Resume el informe en diez puntos.\n\nFormato de salida: Lista numerada.\nCÓMO SE COMPRUEBA\n- Cuenta los puntos: deben ser diez.\n**Tono:** Directo y sin adornos.\n';
+    const c = await leer(ES);
+    ok(c.r.molde === 'encargo' && ids(c.r) === 'contexto,tarea,formato,comprobacion,tono', 'rótulos en español (con dos puntos, en MAYÚSCULAS y en negrita) → Encargo completo', ids(c.r));
+    cuadra('en español', c);
+    const e = await leer(EJ.skill || '');
+    ok(e.r.clase === 'habilidad' && e.r.molde === 'skill' && /🧰 Habilidad · SKILL\.md/.test(e.prop), 'un frontmatter → Habilidad · SKILL.md', e.prop);
+    cuadra('SKILL.md', e);
+    const CONEJ = '## Tarea\nTraduce cada palabra al inglés.\n\n## Ejemplos\ngato → cat\nperro → dog\ncasa → house\n\n## Ahora tú\nmesa\n';
+    const h = await leer(CONEJ);
+    ok(h.r.clase === 'prompt' && h.r.molde === 'ejemplos' && bl(h.r, 'ejemplos').t === 'gato → cat\nperro → dog\ncasa → house' && !/aristas|nodos/.test(ids(h.r)) && !/Grafo/.test(h.prop),
+      'Con ejemplos con tres pares «a → b» → Prompt · Con ejemplos, NUNCA Grafo, con los pares en `ejemplos`', h.prop + ' · ' + ids(h.r));
+    cuadra('Con ejemplos', h);
+    const GR = 'Investigador → Guionista\nGuionista → Editor.\n';
+    const k = await leer(GR);
+    ok(k.r.clase === 'grafo' && k.r.molde === 'cadena' && bl(k.r, 'aristas').t === 'Investigador → Guionista\nGuionista → Editor.' && /🕸 Grafo · Cadena/.test(k.prop), 'renglones «Investigador → Guionista» sin ejemplos → Grafo · Cadena', k.prop + ' · ' + ids(k.r));
+    cuadra('Grafo', k);
+    const BU = 'Escribe el primer párrafo del ensayo sobre la memoria.\nPara cuando tenga menos de 80 palabras y empiece con un dato.\nMáximo 4 vueltas.\nRepite con lo que falló en cuenta.\n';
+    const m = await leer(BU);
+    ok(m.r.clase === 'bucle' && m.r.molde === 'hasta' && /^Para cuando/.test(bl(m.r, 'parada').t || '') && bl(m.r, 'tope').t === 'Máximo 4 vueltas.' && /Repite con lo que falló/.test(bl(m.r, 'paso').t || '') && /🔁 Bucle · Repite hasta/.test(m.prop),
+      '«Para cuando… / Máximo 4 vueltas / Repite…» sin bloques de prompt → Bucle · Repite hasta, con parada, tope y paso', m.prop + ' · ' + ids(m.r));
+    cuadra('Bucle', m);
+    const RE = '## Rol\nEres un maestro de sexto grado.\n\n## Tarea\nHaz tres preguntas de repaso sobre el tema.\nRepite esto para cada tema.\n';
+    const n = await leer(RE);
+    ok(n.r.clase === 'prompt' && n.r.molde === 'encargo' && bl(n.r, 'tarea').t === 'Haz tres preguntas de repaso sobre el tema.\nRepite esto para cada tema.', '«## Tarea … Repite esto para cada tema» → Prompt · Encargo, y la frase EN SU BLOQUE', n.r.molde + ' · ' + JSON.stringify(bl(n.r, 'tarea').t));
+    ok(/renglón 6: parece que se repite/.test(n.avisos), 'con el aviso «parece que se repite», nombrando su renglón', n.avisos);
+    cuadra('Encargo que se repite', n);
+    const SIETE = 'Contexto de la época en que se escribió la novela.\nFormato libre para quien la lea en voz alta.\nTono de voz de los personajes del pueblo.\nReglas del juego que nadie se atreve a romper.\nEjemplos de lo que pasó entonces en la plaza.\nAudiencia que la leyó al principio, sin prisa.\nEstilo del autor, sin copiarlo nunca.';
+    const s = await leer('## Tarea\n' + SIETE + '\n');
+    ok(s.r.bloques.length === 1 && s.r.bloques[0].id === 'tarea' && s.r.bloques[0].t === SIETE && !s.avisos, 'siete renglones que empiezan por siete palabras de bloque, sin dos puntos → UN bloque Tarea', ids(s.r));
+    cuadra('siete renglones', s);
+    const NO = 'Contexto: Es para la revista de la casa.\nNotas: que sea breve.\nTarea: Resume el informe en diez puntos.\n';
+    const o = await leer(NO);
+    ok(/renglón 2: «Notas:» no es un bloque/.test(o.avisos) && /Notas: que sea breve\./.test(bl(o.r, 'contexto').t || ''), 'lo que no se entiende se queda en su bloque y se NOMBRA con su renglón', o.avisos);
+    cuadra('lo no entendido', o);
+    /* Y el reparto se abre en el compositor: lo pegado no entra solo al anaquel. */
+    const x = await leer(COSTAR);
+    pulsa(botonCon($('csg-pegar-cuerpo'), /Abrir en el compositor/), 'Abrir en el compositor');
+    await esperar(300);
+    ok(activa('view-consigna-editor') && g('_csgEdPieza.molde') === 'costar' && g('_csgEdNueva') === true && ['contexto', 'objetivo', 'estilo', 'tono', 'audiencia', 'formato'].every(id => ta(id) && ta(id).value === bl(x.r, id).t),
+      '«Abrir en el compositor» abre una pieza NUEVA en CO-STAR con los seis bloques en sus recuadros');
+    await volver();
+    /* ⚠️ Y lo pegado con la forma CAMBIADA («cambiar» → otro molde) se
+       guarda al volver aunque no se toque: pasa por el mismo duplicado que
+       «Duplicar en otro molde», pero su original no está en el anaquel, y
+       tratarlo como una copia sin tocar sería tirar lo pegado. */
+    const nPeg = g('csgVivas().length');
+    pulsa(barraBtn(/Pegar/), '📋 Pegar de la barra');
+    await esperar(150);
+    const taP2 = d.querySelector('#csg-pegar-cuerpo .csg-pegar-ta');
+    taP2.value = COSTAR;
+    pulsa(botonCon($('csg-pegar-cuerpo'), /Leer$/), 'Leer');
+    await esperar(150);
+    pulsa(d.querySelector('#csg-pegar-cuerpo .csg-pegar-propuesta'), 'la propuesta «… · cambiar»');
+    await esperar(150);
+    pulsa(filaMolde('Encargo completo'), 'Encargo completo');
+    await esperar(150);
+    pulsa(botonCon($('csg-pegar-cuerpo'), /Abrir en el compositor/), 'Abrir en el compositor');
+    await esperar(300);
+    ok(activa('view-consigna-editor') && g('_csgEdPieza.molde') === 'encargo', 'con la forma cambiada abre en Encargo completo');
+    await volver();
+    ok(g('csgVivas().length') === nPeg + 1, 'y al volver, lo pegado se guarda (no es una copia de nada que ya esté guardado)', g('csgVivas().length') + ' de ' + nPeg);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     8 · EL PLEGADO
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(8, 'Plegado: display CALCULADO, nada se abre solo, buscando se abre, un montón sin mando, «Sin probar»', async () => {
+    const prefs = () => JSON.parse(w.localStorage.getItem('faro_consigna_anaquel_v1') || '{}');
+    pulsa(barraBtn(/Orden/), '⇅ Orden');
+    await esperar(120);
+    pulsa(filaVer(/Por clase/), 'Agrupar · Por clase');
+    await esperar(250);
+    const cajas = () => [...anq().querySelectorAll('.csg-grupo')];
+    const rots = () => [...anq().querySelectorAll('.csg-grupo-rot')];
+    ok(rots().length >= 3 && cajas().length === rots().length, 'por clase salen ' + rots().length + ' grupos, cada uno con su rótulo-botón');
+    ok(cajas().every(c => c.hidden && cs(c, 'display') === 'none') && rots().every(r => r.getAttribute('aria-expanded') === 'false'), 'NADA se abre solo: todos plegados, con display CALCULADO none', cajas().map(c => cs(c, 'display')).join(','));
+    ok(rots().every(r => r.getBoundingClientRect().height >= 44), 'cada rótulo mide 44 px o más', rots().map(r => Math.round(r.getBoundingClientRect().height)).join(','));
+    const r0 = rots()[0];
+    const c0 = g('CSG_CLASES').find(c => r0.querySelector('.csg-grupo-nombre').textContent === c.ic + ' ' + c.nombre);
+    const k0 = 'clase:' + (c0 && c0.id);
+    pulsa(r0, 'el primer rótulo');
+    await esperar(80);
+    ok(cs(cajas()[0], 'display') !== 'none' && r0.getAttribute('aria-expanded') === 'true' && cajas().slice(1).every(c => cs(c, 'display') === 'none'), 'pulsar un rótulo abre ESE y solo ese');
+    ok(prefs().abiertos && prefs().abiertos[k0] === true && Object.keys(prefs().abiertos).length === 1, 'lo abierto se recuerda en el aparato con el eje delante (' + k0 + ')', JSON.stringify(prefs().abiertos));
+    const antes = JSON.stringify(prefs().abiertos);
+    const bus = anq().querySelector('.csg-busca-input');
+    escribe(bus, 'a');
+    await esperar(350);
+    ok(cajas().length >= 2 && cajas().every(c => cs(c, 'display') !== 'none'), 'buscando, se abren todos (' + cajas().length + ')', cajas().map(c => cs(c, 'display')).join(','));
+    ok(JSON.stringify(prefs().abiertos) === antes, 'y eso NO se guarda', JSON.stringify(prefs().abiertos));
+    escribe(anq().querySelector('.csg-busca-input'), '');
+    await esperar(350);
+    ok(cs(cajas()[0], 'display') !== 'none' && cajas().slice(1).every(c => cs(c, 'display') === 'none'), 'al borrar la búsqueda vuelven a estar como estaban');
+    const chipB = anq().querySelector('.csg-chips [data-csg-foco="chip:bucle"]');
+    pulsa(chipB, 'el chip 🔁 Bucle');
+    await esperar(200);
+    ok(!anq().querySelector('.csg-grupo-rot') && !!anq().querySelector('.csg-grupo-rot-solo') && !anq().querySelector('.csg-busca-mando'), 'con un solo montón no hay mando: el rótulo no es un botón');
+    pulsa(anq().querySelector('.csg-chips [data-csg-foco="chip:bucle"]'), 'el chip 🔁 Bucle otra vez');
+    await esperar(200);
+    const vivas = g('csgVivas()');
+    const sinProbar = vivas.filter(p => !(p.bitacora || []).some(u => u && u.ok)).length;
+    const chipSP = anq().querySelector('.csg-chips [data-csg-foco="chip:sinprobar"] .csg-chip-n');
+    ok(chipSP && chipSP.textContent === String(sinProbar) && sinProbar < vivas.length && sinProbar > 0, '«⏳ Sin probar» cuenta ' + sinProbar + ' de ' + vivas.length + ' (las que no tienen ningún uso contestado)', chipSP && chipSP.textContent);
+    pulsa(barraBtn(/Orden/), '⇅ Orden');
+    await esperar(120);
+    pulsa(filaVer(/Sin agrupar/), 'Sin agrupar');
+    await esperar(250);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     18 · PÍXELES Y COLORES
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(18, 'Píxeles y colores: 320 px, la barra fija, el <pre>, los fondos y los tonos calculados', async () => {
+    await ancho(320);
+    const bN = barraBtn(/Nueva/), bP = barraBtn(/Pegar/);
+    ok(bN && bP && [bN, bP].every(b => { const r = b.getBoundingClientRect(); return r.left >= 0 && r.right <= 320; }), 'a 320 px [＋ Nueva] y [📋 Pegar] están enteros dentro del borde', [bN, bP].map(b => b && Math.round(b.getBoundingClientRect().right)).join('/'));
+    ok(d.scrollingElement.scrollWidth <= 321, 'y la página no se desliza de lado (scrollWidth ' + d.scrollingElement.scrollWidth + ')');
+    const bgs = sel => { const el = d.querySelector(sel); return el ? cs(el, 'background-color') : '(no está)'; };
+    const transp = c => !c || c === 'rgba(0, 0, 0, 0)' || c === 'transparent' || c === '(no está)';
+    ok(!transp(bgs('#csg-anaquel .csg-chips .csg-chip')) && !transp(bgs('#csg-anaquel .csg-ficha')), 'el fondo CALCULADO de un .csg-chip y de una .csg-ficha no es transparente', bgs('#csg-anaquel .csg-chips .csg-chip') + ' · ' + bgs('#csg-anaquel .csg-ficha'));
+    pulsa(barraBtn(/Estantes/), '🗂 Estantes');
+    await esperar(120);
+    ok(!transp(bgs('#csg-ver-cuerpo .csg-ver-fila')), '… ni el de una .csg-ver-fila', bgs('#csg-ver-cuerpo .csg-ver-fila'));
+    pulsa($('csg-ver-close'), '✕');
+    await esperar(100);
+    const porClase = {};
+    fichas().forEach(fc => { const m = /csg-clase-(\w+)/.exec(fc.className); if (m && !porClase[m[1]]) porClase[m[1]] = fc; });
+    const malC = Object.keys(porClase).filter(k => { const fc = porClase[k]; return !cs(fc, '--csg-t').trim() || transp(cs(fc.querySelector('.csg-baldosa'), 'background-color')); });
+    ok(Object.keys(porClase).length >= 3 && !malC.length, 'en cada .csg-clase-* (' + Object.keys(porClase).join(', ') + ') el --csg-t calculado existe y la baldosa tiene fondo', malC.join(','));
+    pulsa($('csg-nueva-btn'), '＋');
+    await esperar(120);
+    const bals = [...d.querySelectorAll('#csg-ver-cuerpo .csg-clase-baldosa')];
+    const tonos = bals.map(b => cs(b, '--csg-t').trim());
+    ok(bals.length === 4 && tonos.every(Boolean) && new Set(tonos).size === 4 && bals.every(b => !transp(cs(b, 'background-color'))), 'las cuatro baldosas de clase: cuatro tonos distintos y con fondo (' + tonos.join(' ') + ')', bals.map(b => cs(b, 'background-color')).join(' '));
+    pulsa(d.querySelector('#csg-ver-cuerpo .csg-clase-baldosa.csg-clase-prompt'), 'baldosa Prompt');
+    await esperar(250);
+    const barra = $('csg-ed-barra').getBoundingClientRect();
+    const bbs = [...$('csg-ed-barra').querySelectorAll('.csg-bb')].map(b => b.getBoundingClientRect());
+    ok(bbs.length === 3 && bbs.every(r => r.right <= barra.right + 0.5 && r.left >= barra.left - 0.5 && r.width >= 44) && barra.right <= 320.5, 'los tres botones de la barra fija caben en 320 px (' + bbs.map(r => Math.round(r.width)).join('/') + ' px)', JSON.stringify(bbs.map(r => [Math.round(r.left), Math.round(r.right)])));
+    const fab = $('destello-fab');
+    ok(!fab || cs(fab, 'display') === 'none', '#destello-fab está display:none CALCULADO en el compositor', fab && cs(fab, 'display'));
+    escribe(ta('tarea'), 'x'.repeat(300));
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    const pre = d.querySelector('#csg-ed .csg-pre');
+    ok(pre && pre.scrollWidth <= pre.clientWidth + 1 && cs(pre, 'font-size') === '16px', 'un <pre> con un renglón de 300 caracteres no se desliza de lado (' + (pre && pre.scrollWidth) + ' ≤ ' + (pre && pre.clientWidth) + ') y su letra calculada es 16 px', pre && cs(pre, 'font-size'));
+    pulsa($('csg-ed-ver'), '✎ Bloques');
+    await esperar(120);
+    escribe(ta('tarea'), '');
+    await volver();
+    /* ⚠️ EL CHIP DE ARREGLO DEL REPASO NO SACA LA PANTALLA POR LA DERECHA
+       (revisión del 23 de septiembre de 2026, T1). Llevaba el `nowrap` de
+       todo chip y ningún tope: «⇄ resumir-informes-de-la-escuela-primaria»
+       llegaba a x=396 y el compositor entero se deslizaba de lado. Se mide
+       el caso de verdad: un SKILL.md con el `name` escrito como un título. */
+    await nueva('habilidad');
+    escribe(ta('nombre'), 'Resumir informes de la escuela primaria');
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(250);
+    const scE = d.querySelector('#view-consigna-editor .view-scroll');
+    const arr = [...d.querySelectorAll('#csg-ed .csg-rep-arreglo')].filter(vis);
+    const slug = arr.find(c => /resumir-informes-de-la-escuela-primaria/.test(c.textContent));
+    const fuera = arr.filter(c => c.getBoundingClientRect().right > c.closest('.csg-rep-item').getBoundingClientRect().right + 0.5)
+      .map(c => '«' + c.textContent + '» hasta ' + Math.round(c.getBoundingClientRect().right));
+    ok(!!slug && scE.scrollWidth <= scE.clientWidth + 1 && !fuera.length,
+      'a 320 px el chip «⇄ resumir-informes-de-la-escuela-primaria» se queda dentro de su aviso y el compositor no se desliza de lado (' + scE.scrollWidth + ' ≤ ' + scE.clientWidth + ')', (slug ? '' : 'no salió el chip · ') + fuera.join(' · '));
+    ok(!slug || slug.getBoundingClientRect().height >= 39.5, 'y el chip mide 40 de alto como mínimo', slug && slug.getBoundingClientRect().height);
+    pulsa($('csg-ed-ver'), '✎ Bloques');
+    await esperar(120);
+    escribe(ta('nombre'), '');
+    await volver();
+    const cl = w.csgTono('maestria');
+    const sp = d.createElement('span');
+    sp.className = cl;
+    anq().appendChild(sp);
+    const tono = cs(sp, '--csg-t').trim();
+    sp.remove();
+    ok(/^csg-tono-[0-7]$/.test(cl) && !!tono, "csgTono('maestria') devuelve " + cl + ' y su --csg-t calculado existe (' + tono + ')');
+    ok(fab && cs(fab, 'display') !== 'none', 'y fuera del compositor el botón de Destellos vuelve', fab && cs(fab, 'display'));
+    await ancho(390);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     19 · LAS TRES HOJAS, POR ENCIMA DE TODO
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(19, 'Las tres hojas por encima: desde el anaquel y desde el compositor con la barra fija', async () => {
+    const dentro = (id, que) => {
+      const modal = $(id).querySelector('.fin-modal');
+      const e = enPunto(modal);
+      return ok(verAbierta(id) && e && modal.contains(e), que + ': en el centro de la hoja (elementFromPoint) hay algo de la hoja', e && (e.className || e.tagName));
+    };
+    pulsa(barraBtn(/Estantes/), '🗂 Estantes');
+    await esperar(120);
+    dentro('csg-ver-overlay', '#csg-ver-overlay desde el anaquel');
+    pulsa($('csg-ver-close'), '✕');
+    await esperar(100);
+    await usarFicha('Mi título a mano');
+    dentro('csg-usar-overlay', '#csg-usar-overlay desde el anaquel');
+    await cierraUsar();
+    pulsa(barraBtn(/Pegar/), '📋 Pegar');
+    await esperar(120);
+    dentro('csg-pegar-overlay', '#csg-pegar-overlay desde el anaquel');
+    pulsa($('csg-pegar-close'), '✕');
+    await esperar(100);
+    pulsa(botonCon(fichaDe('Mi título a mano'), /Corregir/), '✎ Corregir');
+    await esperar(250);
+    const barra = $('csg-ed-barra');
+    ok(activa('view-consigna-editor') && vis(barra) && cs(barra, 'position') === 'fixed', 'en el compositor, con la barra fija puesta');
+    const bbs = [...barra.querySelectorAll('.csg-bb')];
+    pulsa(d.querySelector('#csg-ed .csg-ed-molde'), 'Molde ▾');
+    await esperar(120);
+    dentro('csg-ver-overlay', '#csg-ver-overlay desde el compositor');
+    ok(bbs.every(b => { const e = enPunto(b); return !e || !barra.contains(e); }), '… y tapa la barra fija: ningún botón de la barra recibe el dedo');
+    pulsa($('csg-ver-close'), '✕');
+    await esperar(100);
+    pulsa($('csg-ed-usar'), '▶ Usar');
+    await esperar(300);
+    dentro('csg-usar-overlay', '#csg-usar-overlay desde el compositor');
+    const pie = [...$('csg-usar-pie').querySelectorAll('.csg-btn')];
+    ok(pie.length && pie.every(b => { const e = enPunto(b); return e && b.contains(e); }), '… y los botones de su pie quedan por encima de la barra fija', pie.map(b => b.textContent.trim()).join(' · '));
+    await cierraUsar();
+    /* Desde el compositor no hay ningún botón que abra «Pegar»: se abre por su
+       puerta para medir lo que importa, que es quién tapa a quién con la
+       barra fija debajo. */
+    w.csgAbrirPegar('');
+    await esperar(150);
+    dentro('csg-pegar-overlay', '#csg-pegar-overlay desde el compositor');
+    pulsa($('csg-pegar-close'), '✕');
+    await esperar(100);
+    await volver();
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     20 · 📖 GUARDAR LO QUE DEVOLVIÓ
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(20, '📖 Guardar lo que devolvió: solo en Voz prestada, Careo e Investigación, y sin tocar voz-prestada.js', async () => {
+    const hay = () => !!d.querySelector('#csg-usar-cuerpo .csg-usar-voz');
+    await nueva('prompt');
+    await molde('Voz prestada');
+    titulo('Cuento de prueba');
+    escribe(ta('voz'), 'Juan Rulfo: frases cortas, pueblo seco.');
+    escribe(ta('genero'), 'Un cuento de 800 palabras.');
+    escribe(ta('tema'), 'El río Choluteca en invierno.');
+    pulsa($('csg-ed-usar'), '▶ Usar');
+    await esperar(300);
+    ok(hay(), 'Voz prestada: la hoja de Usar trae «📖 Guardar lo que devolvió»');
+    await cierraUsar();
+    await volver();
+    await nueva('bucle');
+    await molde('Careo');
+    titulo('Careo de prueba');
+    escribe(ta('postura_a'), 'Defiende que la jornada extendida reduce la deserción.');
+    escribe(ta('postura_b'), 'Defiende que la deserción bajó por otras causas.');
+    escribe(ta('juez'), 'Puntúa por evidencia, no por retórica.');
+    escribe(ta('tope'), 'Tres rondas: apertura, réplica y cierre.');
+    pulsa($('csg-ed-usar'), '▶ Usar');
+    await esperar(300);
+    ok(hay(), 'Careo: también');
+    await cierraUsar();
+    await volver();
+    await usarFicha('Repaso de datos');
+    ok(g('csgDe(' + JSON.stringify(pieza('Repaso de datos').id) + ').molde') === 'fuentes' && hay(), 'Investigación con fuentes: también');
+    await cierraUsar();
+    for (const t of ['Mi título a mano', 'Resumen con variables', 'Mi título a mano (SKILL.md)', 'Bucle sin tope']) {
+      await usarFicha(t);
+      ok(!hay(), 'en «' + t + '» (' + pieza(t).molde + ') no sale');
+      await cierraUsar();
+    }
+    await usarFicha('Cuento de prueba');
+    pulsa(botonCon($('csg-usar-cuerpo'), /Guardar lo que devolvió/), '📖 Guardar lo que devolvió');
+    await esperar(500);
+    ok(activa('view-voz') && vis($('voz-pegar-overlay')) && $('voz-pegar-overlay').style.display !== 'none', 'pulsado: #view-voz activa y la hoja #voz-pegar-overlay a la vista', 'voz=' + activa('view-voz') + ' hoja=' + $('voz-pegar-overlay').style.display);
+    ok(!verAbierta('csg-usar-overlay'), 'y la hoja de Usar se cerró');
+    const fuente = String(w.vozAbrirPegar);
+    ok(!!A.VOZ && fuente.length > 100 && A.VOZ.indexOf(fuente) >= 0, 'vozAbrirPegar es, carácter por carácter, la de js/tools/voz-prestada.js (' + fuente.length + ' caracteres): La Consigna no la tocó');
+    const cerrar = $('voz-pegar-cerrar');
+    if (cerrar) { cerrar.click(); await esperar(200); }
+    await entrar();
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     21 · EXPORTAR
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(21, 'Export: todas las vivas, por estante, con bloques y bitácora; ninguna lápida', async () => {
+    copiado = null;
+    pulsa(barraBtn(/Exportar/), '📋 Exportar');
+    await esperar(250);
+    const txt = copiado || '';
+    const pre = d.querySelector('#csg-ver-cuerpo .csg-pre');
+    ok(verAbierta('csg-ver-overlay') && pre && pre.textContent === txt && txt.length > 100, 'se copia dentro del toque y se enseña en la hoja, igual');
+    const vivas = g('csgVivas()'), muertas = g('csgRetiradas()');
+    ok(new RegExp('^F\\.A\\.R\\.O · La Consigna · ' + hoyLocal + ' · ' + vivas.length + ' piezas\\n').test(txt), 'la cabecera cuenta las ' + vivas.length + ' vivas', txt.split('\n')[0]);
+    const faltan = vivas.filter(p => txt.indexOf(String(p.titulo || '(sin título)')) < 0).map(p => p.titulo);
+    ok(!faltan.length, 'todas las piezas vivas están', faltan.join(' | '));
+    ok(muertas.length > 0 && muertas.every(p => txt.indexOf('📜 ' + p.titulo + ' ·') < 0), 'y ninguna retirada (' + muertas.map(p => p.titulo).join(', ') + ')');
+    const cabs = txt.split('\n').filter(l => /^── /.test(l));
+    ok(cabs.length >= 2 && /^── Sin estante ──$/.test(cabs[cabs.length - 1]) && cabs.some(l => l === '── Estante: <img src=x onerror=window.__xss=3> ──'), 'agrupadas por estante, con «Sin estante» al final', cabs.join(' | '));
+    ok(/## Tarea\nReescribe el arranque de la nota de octubre/.test(txt), 'con sus bloques (en md)');
+    const bit = (txt.match(/— Bitácora —\n(?:.+\n?)+/g) || []);
+    ok(bit.some(b => /\n\d{4}-\d{2}-\d{2} · Claude · v\d+ · ✅/.test(b)) && txt.indexOf('«<img src=x onerror=window.__xss=4> "sí" \'no\'»') >= 0, 'y con su bitácora, notas incluidas (como texto)', bit.slice(0, 3).join('\n'));
+    pulsa($('csg-ver-close'), '✕');
+    await esperar(100);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     LO QUE VALE PARA TODA LA SONDA
+     ══════════════════════════════════════════════════════════════ */
+  secc = 0;
+  log('\n── Lo que vale para toda la sonda ──');
+  const malas = rechazos.filter(r => r.code !== '42P01' && r.code !== '42703');
+  ok(!malas.length, 'la base de mentira no rebotó NINGUNA escritura (ni 23502 sin autor, ni 23514, ni 22007, ni una columna de más)', malas.map(r => r.code + ' ' + r.message).slice(0, 5).join('\n'));
+  const noUpsert = posts().filter(l => l.onConflict !== 'id' || !/resolution=merge-duplicates/.test(l.prefer));
+  ok(posts().length > 10 && !noUpsert.length, 'las ' + posts().length + ' escrituras fueron upserts con onConflict por id', noUpsert.map(l => l.ruta + ' · ' + l.prefer).slice(0, 3).join('\n'));
+  const todas = posts().filter(l => l.estado === 201).map(filasDe).flat();
+  ok(todas.length > 10 && todas.every(x => x.autor), 'ninguna de las ' + todas.length + ' filas que viajaron iba sin firma', todas.filter(x => !x.autor).map(x => x.id).join(','));
+  ok(errores.length === 0, 'nada reventó dentro del marco', errores.slice(0, 6).join('\n'));
+  log('\n(base: ' + llamadas.filter(l => l.tabla).length + ' llamadas a consigna_piezas, ' + posts().length + ' escrituras; avisos de la pantalla: ' + avisos.length + ')');
+  termina();
+})().catch(e => { fallos++; log('✘ la sonda reventó: ' + (e && e.stack || e)); termina(); });
+</script>
+</body>
+</html>
