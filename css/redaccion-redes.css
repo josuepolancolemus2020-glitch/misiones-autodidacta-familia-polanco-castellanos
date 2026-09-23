@@ -195,6 +195,16 @@
 
 .rrd-opciones { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 
+/* ⚠️ Nada de lo que se rehace mientras se escribe puede anclar la
+   página. Chrome «ancla» el desplazamiento a un elemento de la pantalla
+   para que no salte cuando algo de arriba cambia de alto; si el ancla
+   que elige es una de estas cajas —que se destruyen y se vuelven a
+   crear en cada tecla—, al perderla reancla en otro sitio y la pantalla
+   se va sola hacia abajo, justo a la vista previa. No da error y parece
+   cosa del teclado. Se le dice que aquí no ancle. */
+.rrd-avisos, .rrd-gancho, .rrd-partes, .rrd-salida, .rrd-opciones,
+.rrd-contador { overflow-anchor: none; }
+
 .rrd-avisos { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
 .rrd-aviso {
   background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px;
@@ -272,6 +282,52 @@
 .rrd-salida-aparte { background: #f5f3ff; border-color: #ddd6fe; }
 .rrd-salida-t { font-size: 11.5px; font-weight: 800; color: var(--muted); margin-bottom: 6px; }
 .rrd-salida-porque { font-size: 11.5px; color: var(--muted); margin: 8px 0; line-height: 1.4; }
+
+/* ── ✍️ Remarcar y corregir desde la vista previa ──
+   El texto se RELEE aquí, con la forma que va a tener en la red: es
+   donde se ve que una palabra está mal. Seleccionar un trozo lo remarca
+   y saca la caja de corregir (js/tools/redaccion-redes.js). */
+.rrd-vista {
+  -webkit-user-select: text; user-select: text;
+  -webkit-touch-callout: default;
+  cursor: text;
+}
+/* El trozo remarcado. Se pinta con la API de resaltado —no con un
+   <mark>— para no partir el único nodo de texto del <pre>: de ese nodo
+   salen los desplazamientos con que se localiza el trozo. */
+::highlight(rrd-marca) { background-color: #fde047; color: #1c1917; }
+
+.rrd-vista-pista {
+  font-size: 11.5px; color: var(--muted); line-height: 1.45; margin-bottom: 8px;
+}
+
+.rrd-vista-caja {
+  position: fixed; z-index: 3400; box-sizing: border-box;
+  background: var(--surface); border: 1.5px solid #7c3aed; border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, .22);
+  padding: 10px 12px 11px;
+}
+.rrd-vista-cab { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.rrd-vista-t { flex: 1; font-size: 12px; font-weight: 800; color: #5b21b6; }
+.rrd-vista-x {
+  background: none; border: none; color: var(--faint); font-size: 15px;
+  font-family: inherit; cursor: pointer; min-width: 34px; min-height: 34px;
+}
+.rrd-vista-campo {
+  width: 100%; box-sizing: border-box; resize: none; overflow: auto;
+  background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font-family: inherit; font-size: 14px; line-height: 1.45;
+  color: var(--text); outline: none;
+}
+.rrd-vista-campo:focus { border-color: #7c3aed; }
+.rrd-vista-btns { display: flex; gap: 8px; margin-top: 8px; }
+.rrd-vista-ok {
+  flex: 1; background: linear-gradient(135deg, #6d28d9, #8b5cf6); border: none;
+  border-radius: 8px; padding: 9px 12px; font-size: 13px; font-weight: 800;
+  color: #fff; font-family: inherit; cursor: pointer; min-height: 38px;
+}
+.rrd-vista-ok:active { transform: scale(.97); }
+.rrd-vista-porque { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
 
 .rrd-e-acciones { display: flex; gap: 8px; margin-bottom: 14px; }
 

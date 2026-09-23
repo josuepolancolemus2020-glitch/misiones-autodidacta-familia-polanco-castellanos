@@ -53,6 +53,18 @@ const RRD_LOCAL_KEY = 'faro_redaccion_redes_v1';
 const RRD_ESPERA_MAX = 8000;          // ms: la petición que no vuelve, no vuelve
 const RRD_PALABRAS_MIN = 150;         // ritmo hablado en español (El Rodaje, regla 12)
 const RRD_X_ENLACE = 23;              // lo que X cobra por cualquier enlace (t.co)
+/* Con el DEDO no hay ningún gesto que diga «ya terminé de seleccionar»
+   —los tiradores son del sistema y no avisan—, así que se adivina por
+   el reloj: la caja de corregir sale cuando la selección lleva dos
+   segundos quieta. Es el número de La Voz Prestada (VOZ_SUB_ESPERA) y
+   por lo mismo: a los 260 ms la caja se planta encima del párrafo
+   MIENTRAS se elige el trozo, que es justo lo que hay que ver. Con
+   ratón no se espera: soltar el botón sí es inequívoco. */
+const RRD_SEL_ESPERA = 2000;
+/* La vista previa se rehace al PARAR de escribir, no en cada tecla:
+   rehacerla mide lo mismo que el texto —media pantalla en un post
+   largo— y el navegador acaba moviendo la página debajo del dedo. */
+const RRD_VISTA_RESPIRO = 700;
 
 /* ── Las redes, en el orden en que se enseñan ──────────────────────
    `clases` es qué se escribe en cada una; la primera es la de siempre. */
@@ -168,6 +180,12 @@ let _rrdFiltro   = '';         // '' = todas las redes
 let _rrdCargada  = false;      // ¿ya se miró la nube esta sesión?
 let _rrdRetirando = null;      // id con el «¿Sí, retirar?» abierto
 let _rrdInitEnCurso = null;    // la promesa de rrdInit mientras corre
+let _rrdVistaTimer = null;     // el respiro antes de rehacer la vista previa
+let _rrdVistaFirma = null;     // lo último que se pintó en la vista previa
+let _rrdVista      = null;     // el trozo remarcado y dónde vive de verdad
+let _rrdVistaEspera = null;    // el reloj de los dos segundos con el dedo
+let _rrdVistaDentro = false;   // ¿el dedo bajó DENTRO de la caja de corregir?
+let _rrdAltoValor  = -1;       // largo del texto la última vez que se midió el alto
 
 /* ── Helpers ──────────────────────────────────────────────────────── */
 
@@ -1043,7 +1061,13 @@ function rrdQueueSave() {
   clearTimeout(_rrdSaveTimer);
   _rrdSaveTimer = setTimeout(rrdSaveNow, 900);
   clearTimeout(_rrdSalidaTimer);
-  _rrdSalidaTimer = setTimeout(rrdPintarAnalisis, 150);
+  _rrdSalidaTimer = setTimeout(() => rrdPintarAnalisis({ vista: false }), 150);
+  /* La cuenta y los avisos van arriba y son dos renglones: se refrescan
+     enseguida. La vista previa mide lo mismo que el texto y se rehace al
+     PARAR de escribir: rehacerla en cada tecla es lo que le mueve la
+     página debajo del dedo a quien está escribiendo. */
+  clearTimeout(_rrdVistaTimer);
+  _rrdVistaTimer = setTimeout(() => rrdPintarVista(), RRD_VISTA_RESPIRO);
 }
 
 async function rrdSaveNow() {
@@ -1062,8 +1086,11 @@ function rrdAbrir(id) {
   const p = rrdPieza(id);
   if (!p) return;
   if (_rrdId !== id) rrdCorDespintar();
+  rrdVistaCerrar();
   _rrdId = id;
   _rrdRetirando = null;
+  _rrdVistaFirma = null;   // otra pieza: la vista previa se pinta entera
+  _rrdAltoValor = -1;
   document.getElementById('rrd-e-rotulo').value = p.titulo || '';
   document.getElementById('rrd-e-texto').value  = p.texto || '';
   document.getElementById('rrd-e-enlace').value = p.enlace || '';
@@ -1238,8 +1265,11 @@ function rrdPintarFuentes() {
   wrap.appendChild(pie);
 }
 
-/* El análisis y la salida, repintados mientras se escribe. */
-function rrdPintarAnalisis() {
+/* El análisis, repintado mientras se escribe: la cuenta, los avisos, el
+   gancho y los interruptores. La VISTA PREVIA (las partes del hilo y lo
+   que se pega) va aparte, en rrdPintarVista, y con su propio respiro:
+   `{ vista: false }` la deja para luego. */
+function rrdPintarAnalisis(op) {
   const p = rrdPieza(_rrdId);
   if (!p) return;
   const regla = rrdRegla(p.red, p.clase);
@@ -1292,24 +1322,6 @@ function rrdPintarAnalisis() {
     } else gancho.style.display = 'none';
   }
 
-  // Las partes del hilo, con su cuenta
-  if (partes) {
-    partes.textContent = '';
-    if (an.partes && an.partes.length) {
-      an.partes.forEach((x, i) => {
-        const c = rrdEl('div', 'rrd-parte' + (x.ok ? '' : ' rrd-parte-rojo'));
-        const cab = rrdEl('div', 'rrd-parte-cab');
-        cab.appendChild(rrdEl('span', null, `Parte ${i + 1}`));
-        cab.appendChild(rrdEl('span', 'rrd-parte-cuenta', `${x.largo}/${regla.max}${x.ok ? '' : ' 🔴'}`));
-        cab.appendChild(rrdBtn('rrd-mini-btn', '📋', () => rrdCopiarTexto(x.texto, `📋 Parte ${i + 1} copiada`)));
-        c.appendChild(cab);
-        c.appendChild(rrdEl('pre', 'rrd-parte-texto', x.texto));
-        partes.appendChild(c);
-      });
-      partes.style.display = '';
-    } else partes.style.display = 'none';
-  }
-
   // Botones que solo tienen sentido en su clase
   if (partirBtn) partirBtn.style.display = (p.red === 'x' && (p.clase === 'hilo' || (p.clase === 'post' && an.estado === 'rojo'))) ? '' : 'none';
   if (moldeBtn) moldeBtn.style.display = (regla.seg !== undefined && !(p.texto || '').trim()) ? '' : 'none';
@@ -1336,41 +1348,410 @@ function rrdPintarAnalisis() {
   // La regla de esta red y clase
   if (reglaEl) reglaEl.textContent = regla.ayuda || '';
 
-  // La salida: lo que se va a copiar, tal cual
-  if (salida) {
-    salida.textContent = '';
-    const s = an.salida;
-    const r = rrdRed(p.red);
-    if (!(p.texto || '').trim()) {
-      salida.appendChild(rrdEl('div', 'rrd-salida-vacia', 'Aquí saldrá el texto tal como se va a pegar en ' + r.nombre + ', con sus fuentes donde esa red las admite.'));
-      salida.style.display = '';
-      return;
-    }
-    if (!an.partes) {
-      const caja = rrdEl('div', 'rrd-salida-caja');
-      caja.appendChild(rrdEl('div', 'rrd-salida-t', `📄 Lo que se pega en ${r.nombre}`));
-      caja.appendChild(rrdEl('pre', 'rrd-salida-texto', s.principal));
-      salida.appendChild(caja);
-    }
-    if (s.aparte) {
-      const caja = rrdEl('div', 'rrd-salida-caja rrd-salida-aparte');
-      caja.appendChild(rrdEl('div', 'rrd-salida-t', `💬 ${s.aparte.titulo}`));
-      caja.appendChild(rrdEl('pre', 'rrd-salida-texto', s.aparte.texto));
-      caja.appendChild(rrdEl('div', 'rrd-salida-porque', s.aparte.porque || ''));
-      caja.appendChild(rrdBtn('rrd-mini-btn', '📋 Copiar esto aparte', () => rrdCopiarTexto(s.aparte.texto, '📋 Copiado: pégalo como comentario')));
-      salida.appendChild(caja);
-    }
-    salida.style.display = '';
+  // La vista previa, salvo que se haya pedido dejarla para el respiro
+  if (!op || op.vista !== false) rrdPintarVista(an);
+}
+
+/* ── La vista previa: lo que se va a pegar, y se puede corregir ────
+   Las partes del hilo y la caja «Lo que se pega en …». Se pinta APARTE
+   del análisis y con dos reglas que no son un adorno:
+
+   · **No se rehace si no cambió ni un carácter.** Rehacerla destruye
+     sus nodos, y con ellos el trozo remarcado y la caja de corregir
+     que cuelga de él (y de paso el sitio donde el navegador tenía
+     anclada la página: por eso se iba sola hacia abajo al escribir).
+     La firma es lo pintado, no la hora.
+   · **Lo pintado es un `<pre>` con UN SOLO nodo de texto** (textContent,
+     nunca innerHTML): así el desplazamiento de la selección dentro del
+     nodo es el desplazamiento dentro del texto, sin mapa de por medio. */
+function rrdPintarVista(an) {
+  const p = rrdPieza(_rrdId);
+  const partes = document.getElementById('rrd-e-partes');
+  const salida = document.getElementById('rrd-e-salida');
+  if (!p || !salida) return;
+  an = an || rrdAnalisis(p);
+  const regla = rrdRegla(p.red, p.clase);
+  const s = an.salida;
+  const r = rrdRed(p.red);
+  const hayTexto = !!(p.texto || '').trim();
+
+  // La firma: si no cambió nada de lo que se ve, no se toca el DOM
+  const firma = JSON.stringify([p.red, p.clase, hayTexto,
+    an.partes ? an.partes.map(x => [x.texto, x.largo, x.ok]) : null,
+    an.partes ? null : s.principal,
+    s.aparte ? [s.aparte.titulo, s.aparte.texto, s.aparte.porque] : null]);
+  /* ⚠️ Y «ya está pintado» NO se pregunta solo a la caja de la salida:
+     en un HILO la vista previa son las partes y esa caja se queda
+     vacía a propósito. Preguntándole solo a ella, la respuesta era
+     siempre «no hay nada» y el hilo se rehacía en cada guardado,
+     llevándose el trozo remarcado. Lo cazó la sonda, no la lectura. */
+  const pintado = salida.childNodes.length || (partes && partes.childNodes.length);
+  if (firma === _rrdVistaFirma && pintado) return;
+  _rrdVistaFirma = firma;
+  // Lo que se rehace se lleva por delante el trozo remarcado
+  rrdVistaCerrar();
+
+  if (partes) {
+    partes.textContent = '';
+    if (an.partes && an.partes.length) {
+      partes.appendChild(rrdVistaPista());
+      const origenes = rrdVistaOrigenes(p.texto, an.partes);
+      an.partes.forEach((x, i) => {
+        const c = rrdEl('div', 'rrd-parte' + (x.ok ? '' : ' rrd-parte-rojo'));
+        const cab = rrdEl('div', 'rrd-parte-cab');
+        cab.appendChild(rrdEl('span', null, `Parte ${i + 1}`));
+        cab.appendChild(rrdEl('span', 'rrd-parte-cuenta', `${x.largo}/${regla.max}${x.ok ? '' : ' 🔴'}`));
+        cab.appendChild(rrdBtn('rrd-mini-btn', '📋', () => rrdCopiarTexto(x.texto, `📋 Parte ${i + 1} copiada`)));
+        c.appendChild(cab);
+        c.appendChild(rrdVistaPre('rrd-parte-texto', x.texto, 'parte', origenes[i]));
+        partes.appendChild(c);
+      });
+      partes.style.display = '';
+    } else partes.style.display = 'none';
   }
+
+  salida.textContent = '';
+  if (!hayTexto) {
+    salida.appendChild(rrdEl('div', 'rrd-salida-vacia', 'Aquí saldrá el texto tal como se va a pegar en ' + r.nombre + ', con sus fuentes donde esa red las admite.'));
+    salida.style.display = '';
+    return;
+  }
+  if (!an.partes) {
+    const caja = rrdEl('div', 'rrd-salida-caja');
+    caja.appendChild(rrdEl('div', 'rrd-salida-t', `📄 Lo que se pega en ${r.nombre}`));
+    caja.appendChild(rrdVistaPista());
+    caja.appendChild(rrdVistaPre('rrd-salida-texto', s.principal, 'principal'));
+    salida.appendChild(caja);
+  }
+  if (s.aparte) {
+    const caja = rrdEl('div', 'rrd-salida-caja rrd-salida-aparte');
+    caja.appendChild(rrdEl('div', 'rrd-salida-t', `💬 ${s.aparte.titulo}`));
+    caja.appendChild(rrdVistaPre('rrd-salida-texto', s.aparte.texto, 'aparte'));
+    caja.appendChild(rrdEl('div', 'rrd-salida-porque', s.aparte.porque || ''));
+    caja.appendChild(rrdBtn('rrd-mini-btn', '📋 Copiar esto aparte', () => rrdCopiarTexto(s.aparte.texto, '📋 Copiado: pégalo como comentario')));
+    salida.appendChild(caja);
+  }
+  salida.style.display = '';
+}
+
+/* ── ✍️ REMARCAR Y CORREGIR DESDE LA VISTA PREVIA ──────────────────
+   Pedido por el autor el 22 de septiembre de 2026, con la captura de su
+   pieza de Facebook y tres trozos rodeados a mano: «cuando leo cómo se
+   va a mirar la publicación me gustaría la opción de remarcar y que se
+   active una caja allí, al seleccionar lo remarcado, corregirlo».
+
+   Y tiene razón por un motivo que se puede escribir: el texto se
+   RELEE en la vista previa, no en el recuadro. Es ahí —con la forma
+   que va a tener en la red, con sus fuentes al pie y su corte de «Ver
+   más»— donde se ve que una palabra está mal. Hasta hoy, arreglarla
+   obligaba a subir media pantalla, buscar esa misma palabra dentro de
+   un recuadro sin formato y no perder el sitio: tres pasos, y el del
+   medio se falla.
+
+   ⚠️ LA VISTA PREVIA NO ES EL TEXTO QUE SE ESCRIBIÓ. Lleva pegados el
+   enlace, el bloque «📚 Fuentes» y, en un hilo, la numeración « 1/4»:
+   texto que escribe la herramienta y que no está en ningún campo. Así
+   que el trozo seleccionado hay que LOCALIZARLO, y aquí manda la misma
+   regla que el reanclaje de los subrayados de La Voz Prestada (su
+   regla 21): se corrige donde se sabe seguro, y con dos sitios
+   posibles no se adivina. Equivocarse hacia «no sé de dónde sale esto»
+   cuesta una frase que lo explica; equivocarse hacia «sale de aquí»
+   cambia una palabra DONDE NO ERA y parece que funcionó. */
+
+/* El `<pre>` de la vista: un solo nodo de texto y nada en ningún
+   atributo (`dataset` lleva de dónde sale, que lo escribimos nosotros). */
+function rrdVistaPre(clase, texto, cual, origen) {
+  const pre = rrdEl('pre', clase + ' rrd-vista', texto);
+  pre.dataset.rrdVista = cual;
+  if (origen !== undefined && origen >= 0) pre.dataset.rrdOrigen = String(origen);
+  return pre;
+}
+
+/* De qué sitio del texto sale cada parte del hilo. Las partes se hacen
+   partiendo por la raya `---` y recortando los blancos (rrdPartesDe),
+   así que cada una es un trozo SEGUIDO del texto y su sitio se sabe
+   buscándola desde donde acabó la anterior —nunca desde el principio,
+   o dos partes que empiecen igual se pisarían—. Lo que no está en el
+   texto (la numeración « 1/4», la parte de las fuentes, el enlace)
+   devuelve -1, y entonces ese trozo se localiza buscando, como el
+   resto. Lo que se devuelve se COMPRUEBA después, carácter por
+   carácter: esto es una pista, no una fe. */
+function rrdVistaOrigenes(texto, partes) {
+  let cursor = 0;
+  return (partes || []).map(x => {
+    const crudo = String(x.texto || '').replace(/ \d+\/\d+$/, '');
+    if (!crudo) return -1;
+    const i = String(texto || '').indexOf(crudo, cursor);
+    if (i < 0) return -1;
+    cursor = i + crudo.length;
+    return i;
+  });
+}
+
+/* Se explica con palabras encima, como el arrastre de la repisa: una
+   caja que sale sola al seleccionar no se adivina mirando. */
+function rrdVistaPista() {
+  return rrdEl('div', 'rrd-vista-pista',
+    '✍️ Selecciona aquí un trozo: queda remarcado y sale una caja para corregirlo sin subir al recuadro.');
+}
+
+/* ¿El nodo cuelga de una vista previa? */
+function rrdVistaDe(nodo) {
+  let e = (nodo && nodo.nodeType === 3) ? nodo.parentNode : nodo;
+  while (e && e.nodeType === 1) {
+    if (e.classList.contains('rrd-vista')) return e;
+    e = e.parentNode;
+  }
+  return null;
+}
+
+/* La selección de ahora, si cae dentro de una vista previa. Los
+   desplazamientos son los del texto porque el `<pre>` tiene un solo
+   nodo; si por lo que sea no lo tuviera, se devuelven en -1 y la
+   localización se hace buscando, que también vale. */
+function rrdVistaSeleccion() {
+  const sel = window.getSelection && window.getSelection();
+  if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+  const r = sel.getRangeAt(0);
+  const pre = rrdVistaDe(r.commonAncestorContainer);
+  if (!pre) return null;
+  const trozo = sel.toString();
+  if (!trozo.trim()) return null;
+  const nodo = pre.firstChild;
+  const directo = nodo && r.startContainer === nodo && r.endContainer === nodo;
+  const origen = pre.dataset.rrdOrigen;
+  return { pre, cual: pre.dataset.rrdVista || '', trozo,
+           origen: origen === undefined ? -1 : Number(origen),
+           ini: directo ? r.startOffset : -1, rango: r.cloneRange() };
+}
+
+/* ── Localizar el trozo: dónde vive de verdad ────────────────────── */
+
+/* -1 = no está; -2 = está más de una vez (y entonces no se toca nada). */
+function rrdBuscaUnico(donde, trozo) {
+  if (!trozo || !donde) return -1;
+  const i = donde.indexOf(trozo);
+  if (i < 0) return -1;
+  return donde.indexOf(trozo, i + 1) >= 0 ? -2 : i;
+}
+
+function rrdVistaDonde(v) {
+  const p = rrdPieza(_rrdId);
+  if (!p) return { error: 'No hay ninguna pieza abierta.' };
+  const trozo = v.trozo;
+
+  /* 1. El sitio EXACTO, cuando se puede saber. La caja «Lo que se pega»
+        se arma con el texto delante (rrdSalida), así que el
+        desplazamiento vale tal cual… salvo por lo que el trim() se
+        llevó por delante. Se comprueba carácter por carácter antes de
+        fiarse: comprobar cuesta un slice y adivinar cuesta una palabra
+        cambiada donde no era. */
+  if (v.ini >= 0) {
+    let ini = -1;
+    if (v.cual === 'principal') {
+      const crudo = String(p.texto || '').replace(/\r/g, '');
+      const sobra = crudo.length - crudo.replace(/^\s+/, '').length;
+      if (crudo === p.texto) ini = v.ini + sobra;
+    } else if (v.cual === 'parte' && v.origen >= 0) {
+      ini = v.origen + v.ini;                       // la parte, en su sitio del texto
+    }
+    if (ini >= 0 && (p.texto || '').slice(ini, ini + trozo.length) === trozo)
+      return { campo: 'texto', ini, fin: ini + trozo.length, rotulo: 'el texto' };
+  }
+
+  /* 2. Si no, tiene que aparecer UNA sola vez en su campo. */
+  let ambiguo = false;
+  const enTexto = rrdBuscaUnico(p.texto || '', trozo);
+  if (enTexto >= 0) return { campo: 'texto', ini: enTexto, fin: enTexto + trozo.length, rotulo: 'el texto' };
+  if (enTexto === -2) ambiguo = true;
+
+  const fuentes = p.fuentes || [];
+  for (let i = 0; i < fuentes.length; i++) {
+    const r = rrdBuscaUnico((fuentes[i] && fuentes[i].ref) || '', trozo);
+    if (r >= 0) return { campo: 'fuente', i, ini: r, fin: r + trozo.length, rotulo: `la fuente [${i + 1}]` };
+    if (r === -2) ambiguo = true;
+  }
+  const enEnlace = rrdBuscaUnico(p.enlace || '', trozo);
+  if (enEnlace >= 0) return { campo: 'enlace', ini: enEnlace, fin: enEnlace + trozo.length, rotulo: 'el enlace' };
+  if (enEnlace === -2) ambiguo = true;
+
+  if (ambiguo) return { error: 'Ese trozo aparece más de una vez, y cambiar el que no era no da ningún error: se descubre publicado. Selecciona un poco más —media frase— para que sea único.' };
+  return { error: 'Ese trozo no sale de lo que escribiste: lo pone la herramienta (la numeración « 1/4» del hilo, el rótulo «📚 Fuentes», el 🔗 del enlace). Lo que hay debajo sí se corrige.' };
+}
+
+/* ── El trozo remarcado ──────────────────────────────────────────── */
+
+/* Se remarca con la API de resaltado del navegador —la misma del
+   corrector—, no con un <mark>: pintar un nodo dentro del `<pre>`
+   partiría su único nodo de texto y los desplazamientos dejarían de
+   ser los del texto. Y hace falta remarcarlo porque en cuanto el dedo
+   toca la caja para escribir, el navegador se lleva la selección: sin
+   la marca, el trozo que se está corrigiendo desaparece de la vista. */
+function rrdVistaMarcar(rango) {
+  if (typeof Highlight === 'undefined' || !window.CSS || !CSS.highlights) return false;
+  try { CSS.highlights.set('rrd-marca', new Highlight(rango)); return true; } catch (e) { return false; }
+}
+function rrdVistaDesmarcar() {
+  if (window.CSS && CSS.highlights) CSS.highlights.delete('rrd-marca');
+}
+
+function rrdVistaCerrar() {
+  clearTimeout(_rrdVistaEspera);
+  _rrdVista = null;
+  rrdVistaDesmarcar();
+  const caja = document.getElementById('rrd-vista-caja');
+  if (caja) { caja.style.display = 'none'; caja.textContent = ''; }
+}
+
+/* Pegada al trozo, y DEBAJO si cabe: encima taparía justo lo que hay
+   que leer para decidir la corrección. */
+function rrdVistaColocar(caja, rango) {
+  const r = rango.getBoundingClientRect();
+  if (!r.width && !r.height) return;
+  const ancho = Math.min(340, window.innerWidth - 20);
+  caja.style.width = ancho + 'px';
+  caja.style.left = Math.max(10, Math.min(r.left + r.width / 2 - ancho / 2, window.innerWidth - ancho - 10)) + 'px';
+  const alto = caja.offsetHeight || 140;
+  let top = r.bottom + 8;
+  if (top + alto > window.innerHeight - 8) top = r.top - alto - 8;
+  caja.style.top = Math.max(8, Math.min(top, window.innerHeight - alto - 8)) + 'px';
+}
+
+function rrdVistaAbrir(v) {
+  const caja = document.getElementById('rrd-vista-caja');
+  const p = rrdPieza(_rrdId);
+  if (!caja || !v || !p) return;
+  const donde = rrdVistaDonde(v);
+  _rrdVista = { trozo: v.trozo, donde, rango: v.rango };
+
+  caja.textContent = '';
+  const cab = rrdEl('div', 'rrd-vista-cab');
+  cab.appendChild(rrdEl('span', 'rrd-vista-t',
+    donde.error ? '✍️ Esto no se corrige desde aquí' : '✍️ Corregir en ' + donde.rotulo));
+  cab.appendChild(rrdBtn('rrd-vista-x', '✕', rrdVistaCerrar));
+  caja.appendChild(cab);
+
+  if (donde.error) {
+    caja.appendChild(rrdEl('div', 'rrd-vista-porque', donde.error));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.className = 'rrd-vista-campo';
+    ta.rows = 2;
+    ta.value = v.trozo;
+    const crece = () => { ta.style.height = 'auto'; ta.style.height = Math.min(160, Math.max(44, ta.scrollHeight)) + 'px'; };
+    ta.addEventListener('input', crece);
+    caja.appendChild(ta);
+    const pie = rrdEl('div', 'rrd-vista-btns');
+    pie.appendChild(rrdBtn('rrd-vista-ok', '✓ Cambiar', () => rrdVistaCambiar(ta.value)));
+    pie.appendChild(rrdBtn('rrd-mini-btn', '✕ Cerrar', rrdVistaCerrar));
+    caja.appendChild(pie);
+    caja.style.display = 'block';
+    crece();
+    /* El foco va DENTRO del mismo gesto que abre la caja, sin ningún
+       await delante: es lo que hace que en una tableta salga el teclado
+       solo (la regla 4 del Apunte rápido). */
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }
+  caja.style.display = 'block';
+  rrdVistaColocar(caja, v.rango);
+  rrdVistaMarcar(v.rango);
+}
+
+async function rrdVistaCambiar(nuevo) {
+  const v = _rrdVista;
+  const p = rrdPieza(_rrdId);
+  if (!v || !p || !v.donde || v.donde.error) return;
+  const d = v.donde;
+  const campo = d.campo === 'texto' ? (p.texto || '')
+              : d.campo === 'fuente' ? (((p.fuentes || [])[d.i] || {}).ref || '')
+              : (p.enlace || '');
+  /* El mismo cinturón que el corrector: si lo que hay en ese tramo ya no
+     es lo que se iba a corregir, no se toca nada. */
+  if (campo.slice(d.ini, d.fin) !== v.trozo) {
+    rrdVistaCerrar();
+    rrdAviso('Ese trozo ya cambió: vuelve a seleccionarlo');
+    return;
+  }
+  const cambiado = campo.slice(0, d.ini) + nuevo + campo.slice(d.fin);
+  if (d.campo === 'texto') {
+    const ta = document.getElementById('rrd-e-texto');
+    if (ta) ta.value = cambiado;
+    p.texto = cambiado;
+    _rrdAltoValor = -1;              // cambió de largo: hay que volver a medir
+    rrdCrecerTexto();
+  } else if (d.campo === 'fuente') {
+    p.fuentes[d.i].ref = cambiado;
+    rrdPintarFuentes();
+  } else {
+    const el = document.getElementById('rrd-e-enlace');
+    if (el) el.value = cambiado;
+    p.enlace = rrdEnlaceEntendido(cambiado).url;
+    const nota = document.getElementById('rrd-e-enlace-nota');
+    if (nota) nota.textContent = cambiado.trim() ? rrdEnlaceEntendido(cambiado).nota : '';
+  }
+  p.actualizado = Date.now(); p.subida = false;
+  rrdVistaCerrar();
+  rrdQueueSave();
+  rrdPintarAnalisis();
+  /* Lo corregido se vuelve a subrayar en el recuadro si el corrector
+     estaba puesto: sus índices son del texto viejo. */
+  if (typeof corTextoTecleado === 'function') corTextoTecleado();
+  rrdAviso('✍️ Corregido en ' + d.rotulo);
+}
+
+/* Mientras se mueve la selección la caja NO está: en una tableta los
+   tiradores se arrastran a tirones y cada pausa la plantaría encima del
+   párrafo, tapando lo que hay que leer para elegir el trozo. */
+function rrdVistaSelCambio() {
+  const caja = document.getElementById('rrd-vista-caja');
+  const abierta = !!(caja && caja.style.display === 'block');
+  const v = rrdVistaSeleccion();
+  /* Escribir en la propia caja recoge la selección del texto: eso NO es
+     seleccionar, y sin esta guarda la caja se cerraría a sí misma en el
+     mismo gesto que la abrió. Pero un trozo NUEVO de la vista previa sí
+     manda, aunque el dedo esté dentro de la caja: si no, con la caja
+     abierta no se podría elegir otro trozo. */
+  if (abierta && !v && (_rrdVistaDentro || caja.contains(document.activeElement))) return;
+  clearTimeout(_rrdVistaEspera);
+  rrdVistaCerrar();
+  if (!v) return;
+  _rrdVistaEspera = setTimeout(() => {
+    const ahora = rrdVistaSeleccion();
+    if (ahora) rrdVistaAbrir(ahora);
+  }, RRD_SEL_ESPERA);
 }
 
 /* El área de texto crece con lo escrito: un guion de tres minutos en
    una caja de cuatro renglones se corrige a ciegas. */
+/* ⚠️ Y MEDIRLO NO PUEDE MOVER LA PÁGINA. Esto ponía la altura en `auto`
+   en CADA tecla para preguntar cuánto ocupaba el contenido. En un post
+   largo eso encoge el recuadro de mil trescientos píxeles a ciento
+   cuarenta durante un instante: todo lo que hay debajo —la vista
+   previa, que mide lo mismo que el texto— sube de golpe, el navegador
+   reancla la página donde puede, y al devolver la altura la pantalla se
+   ha ido sola hacia abajo, a la vista previa. No da ningún error y
+   parece cosa del teclado.
+
+   Escribiendo, el recuadro solo CRECE, y para crecer no hace falta
+   medir en vacío: `scrollHeight` ya dice cuánto ocupa el contenido
+   aunque no quepa. Solo cuando el texto se acorta hay que volver a
+   medir, y entonces se guarda el desplazamiento y se devuelve. */
 function rrdCrecerTexto() {
   const ta = document.getElementById('rrd-e-texto');
   if (!ta) return;
-  ta.style.height = 'auto';
-  ta.style.height = Math.max(140, ta.scrollHeight + 4) + 'px';
+  const largo = (ta.value || '').length;
+  const contenido = ta.scrollHeight;
+  if (contenido > ta.clientHeight) {
+    ta.style.height = Math.max(140, contenido + 4) + 'px';       // crecer: sin encoger nada
+  } else if (largo < _rrdAltoValor || _rrdAltoValor < 0) {
+    const sc = document.querySelector('#view-redaccion-pieza .view-scroll');
+    const y = sc ? sc.scrollTop : 0;
+    ta.style.height = 'auto';
+    ta.style.height = Math.max(140, ta.scrollHeight + 4) + 'px';
+    if (sc && sc.scrollTop !== y) sc.scrollTop = y;
+  }
+  _rrdAltoValor = largo;
   rrdEspejoPintar();   // el espejo lleva siempre el mismo texto que el recuadro
 }
 
@@ -1410,12 +1791,30 @@ const RRD_SUJETO_CORRECTOR = {
     const ta = document.getElementById('rrd-e-texto');
     if (!ta) return false;
     if (h.original && ta.value.slice(h.ini, h.fin) !== h.original) return false;
-    ta.value = ta.value.slice(0, h.ini) + h.sugerencia + ta.value.slice(h.fin);
+    /* Con setRangeText y no con `ta.value = …`: escribir el valor entero
+       manda el cursor AL FINAL del texto, y el navegador se lleva la
+       pantalla detrás del cursor. En un post largo eso es corregir una
+       coma del primer párrafo y aparecer al final. Además conserva el
+       deshacer, como el botón 𝗡 Negrita. */
+    const cursor = ta.selectionStart;
+    if (ta.setRangeText) {
+      ta.setRangeText(h.sugerencia, h.ini, h.fin, 'preserve');
+      const corrido = h.sugerencia.length - (h.fin - h.ini);
+      const donde = cursor > h.fin ? cursor + corrido : Math.min(cursor, ta.value.length);
+      try { ta.setSelectionRange(donde, donde); } catch (e) {}
+    } else {
+      ta.value = ta.value.slice(0, h.ini) + h.sugerencia + ta.value.slice(h.fin);
+    }
+    _rrdAltoValor = -1;
     rrdCrecerTexto();
     return true;
   },
   aplicable: () => true,
-  guardar: () => rrdQueueSave(),
+  /* Guardar y enseñarlo YA. El respiro de la vista previa es para quien
+     está TECLEANDO; una corrección aplicada es un toque con respuesta,
+     y una vista previa que tardara medio segundo en enterarse se lee
+     como que el botón no hizo nada. */
+  guardar: () => { rrdQueueSave(); rrdPintarAnalisis(); },
   scroll: () => document.querySelector('#view-redaccion-pieza .view-scroll'),
   /* Las opciones del análisis para un post: se tapan direcciones,
      hashtags y menciones; entran las reglas de las redes; una oración
@@ -1607,6 +2006,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // El editor de la pieza
   document.getElementById('rrd-editor-back-btn')?.addEventListener('click', async () => {
+    rrdVistaCerrar();
     rrdCorDespintar();
     await rrdSaveNow();
     if (typeof _redEdicion !== 'undefined') _redEdicion = 'redes';
@@ -1629,7 +2029,43 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof corTocaEnIndice === 'function') corTocaEnIndice(taCor.selectionStart, e.clientX, e.clientY);
   });
   document.querySelector('#view-redaccion-pieza .view-scroll')
-    ?.addEventListener('scroll', () => { if (typeof corOcultarBurbuja === 'function') corOcultarBurbuja(); }, { passive: true });
+    ?.addEventListener('scroll', () => {
+      if (typeof corOcultarBurbuja === 'function') corOcultarBurbuja();
+      // La caja va pegada al trozo: al desplazarse, se mueve con él
+      const caja = document.getElementById('rrd-vista-caja');
+      if (caja && caja.style.display === 'block' && _rrdVista) rrdVistaColocar(caja, _rrdVista.rango);
+    }, { passive: true });
+
+  /* ✍️ Remarcar y corregir desde la vista previa. El dedo que baja
+     DENTRO de la caja no cuenta como seleccionar: al llevarse el foco,
+     el navegador recoge la selección del texto y la caja se cerraría a
+     sí misma en el mismo gesto que la abrió (la lección de «✎ Nota» de
+     La Voz Prestada). */
+  /* Los tres cuelgan del documento entero, así que lo primero que hacen
+     es callarse fuera del editor de la pieza: La Voz Prestada tiene su
+     propia barra de selección y esta no puede meterse en medio. */
+  const enLaPieza = () => !!document.getElementById('view-redaccion-pieza')?.classList.contains('active');
+  document.addEventListener('pointerdown', e => {
+    if (!enLaPieza()) return;
+    const caja = document.getElementById('rrd-vista-caja');
+    _rrdVistaDentro = !!(caja && caja.contains(e.target));
+  }, true);
+  document.addEventListener('selectionchange', () => {
+    if (!enLaPieza()) return;
+    rrdVistaSelCambio();
+  });
+  /* Con RATÓN sí existe un gesto que dice «ya terminé»: soltar el
+     botón. Esperar dos segundos delante de una computadora, donde el
+     gesto es inequívoco, sería tiempo muerto por nada. */
+  document.addEventListener('pointerup', e => {
+    if (!enLaPieza()) return;
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    if (_rrdVistaDentro) return;
+    const v = rrdVistaSeleccion();
+    if (!v) return;
+    clearTimeout(_rrdVistaEspera);
+    setTimeout(() => { const w = rrdVistaSeleccion(); if (w) rrdVistaAbrir(w); }, 0);
+  });
 
   document.getElementById('rrd-e-partir-btn')?.addEventListener('click', rrdPartirAhora);
   document.getElementById('rrd-e-molde-btn')?.addEventListener('click', rrdPonerMolde);

@@ -983,7 +983,7 @@ comentario y perfil. El texto es **texto plano** a propósito: ninguna red
 acepta negritas pegadas, y un HTML aquí sería una promesa que la red no
 cumple.
 
-**Catorce reglas, y ninguna es de adorno:**
+**Dieciséis reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA CUENTA DE X ES PONDERADA, NO DE CARACTERES.** X cuenta 280
    «unidades»: un enlace vale **23** pase lo que pase (lo acorta t.co), un
@@ -1215,6 +1215,125 @@ cumple.
     para que corran los mismos ganchos que al teclear: guardar, crecer, el
     espejo y el corrector.
 
+15. ✍️ **LO QUE SE VE «COMO VA A QUEDAR» SE PUEDE REMARCAR Y CORREGIR
+    ALLÍ MISMO.** Pedido por el autor el 22 de septiembre de 2026, con la
+    captura de su pieza de Facebook y tres trozos rodeados a mano:
+    «cuando leo cómo se va a mirar la publicación me gustaría la opción
+    de remarcar y que se active una caja allí, al seleccionar lo
+    remarcado, corregirlo».
+
+    Y tiene razón por un motivo que se puede contar: **el texto se
+    RELEE en la vista previa, no en el recuadro.** Es ahí donde está con
+    la forma que va a tener en la red —sus fuentes al pie, su corte de
+    «Ver más», sus partes numeradas— y por eso es ahí donde se ve que
+    una palabra está mal. Hasta ahora arreglarla eran tres pasos: subir
+    media pantalla, encontrar esa misma palabra dentro de un recuadro
+    sin formato y volver a bajar. El del medio se falla, y con un post
+    largo se falla siempre.
+
+    Va en las CINCO redes y en todas sus clases, porque es la misma
+    caja: la de «Lo que se pega en …», la del bloque aparte y **cada
+    parte de un hilo de X**.
+
+    ⚠️ **LA VISTA PREVIA NO ES EL TEXTO QUE SE ESCRIBIÓ, y ahí está todo
+    el peligro.** Lleva pegados el enlace, el bloque «📚 Fuentes» y la
+    numeración « 1/4»: texto que escribe la herramienta y que no está en
+    ningún campo. Así que el trozo hay que LOCALIZARLO, y manda la
+    asimetría de siempre —la del reanclaje de los subrayados de La Voz
+    Prestada (su regla 21)—:
+
+    > equivocarse hacia «no sé de dónde sale esto» cuesta una frase;
+    > equivocarse hacia «sale de aquí» cambia una palabra **DONDE NO
+    > ERA** y parece que funcionó.
+
+    Por eso se localiza en este orden y nunca a ojo: primero **el sitio
+    exacto**, cuando se puede saber —la caja principal empieza por el
+    propio texto, y cada parte de un hilo lleva apuntado de qué trozo
+    del texto sale (`rrdVistaOrigenes`, buscándola desde donde acabó la
+    anterior)—, y ese sitio **se comprueba carácter por carácter** antes
+    de fiarse: comprobar cuesta un `slice`. Solo si no hay sitio exacto
+    se busca, y entonces tiene que aparecer **una sola vez** en su
+    campo; con dos, **no se adivina**: se dice y no se toca nada. Un
+    trozo que no es de nadie —el rótulo «📚 Fuentes», el 🔗 del enlace,
+    el « 1/4»— dice que lo pone la herramienta, en vez de callar.
+
+    Y escribe en el campo del que ese trozo SALE: el texto, **la fuente
+    [n]** o el enlace. Con el mismo cinturón del corrector: si lo que
+    hay en ese tramo ya no es lo que se iba a corregir, no se toca nada.
+
+    ⚠️ **SE REMARCA CON LA API DE RESALTADO, NO CON UN `<mark>`.** El
+    `<pre>` de la vista tiene UN SOLO nodo de texto, y de ese nodo salen
+    los desplazamientos con que se localiza el trozo: colgarle un nodo
+    dentro lo partiría y los desplazamientos dejarían de ser los del
+    texto. Es la misma razón por la que el corrector pinta así. Y hace
+    falta remarcar porque en cuanto el dedo toca la caja para escribir,
+    el navegador se lleva la selección: sin la marca, el trozo que se
+    está corrigiendo desaparece de la vista.
+
+    ⚠️ **Y MIENTRAS SE SELECCIONA, LA CAJA NO ESTÁ.** Dos segundos
+    quietos con el dedo (`RRD_SEL_ESPERA`), como en La Voz Prestada (su
+    regla 21) y por lo mismo: en una tableta los tiradores se arrastran
+    a tirones y cada pausa plantaría la caja encima del párrafo que hay
+    que leer para elegir el trozo. Cada movimiento la cierra al
+    instante. Con **ratón no se espera**, porque ahí sí existe un gesto
+    que dice «ya terminé»: soltar el botón. Y escribir en la propia caja
+    **no cuenta como seleccionar** —al llevarse el foco, el navegador
+    recoge la selección del texto y la caja se cerraría a sí misma en el
+    mismo gesto que la abrió—; pero un trozo NUEVO de la vista sí manda,
+    o con la caja abierta no se podría elegir otro.
+
+    Y lo de siempre: nada llega a un atributo ni a `innerHTML` (todo con
+    `createElement` y `textContent`), la caja sale **debajo** del trozo
+    si cabe —encima taparía justo lo que hay que leer—, y **se explica
+    con palabras encima de la vista**, que una caja que sale sola al
+    seleccionar no se adivina mirando.
+
+16. ⚠️ **ESCRIBIR EN EL RECUADRO NO PUEDE MOVER LA PANTALLA.** La otra
+    mitad del mismo pedido, el 22 de septiembre de 2026: «cuando quiero
+    seguir escribiendo en la caja donde redacto, inmediatamente se pasa
+    para la parte de abajo, que es esa de cómo sale».
+
+    Eran **dos cosas apiladas**, y arreglar una sola deja el problema
+    con la misma pinta. Se midió en píxeles con el navegador, que esto
+    no se ve leyendo el código: **794 px de salto** por tecla en un post
+    largo.
+
+    - ⚠️ **Medir el alto no puede encoger el recuadro.** Se ponía la
+      altura en `auto` en CADA tecla para preguntar cuánto ocupaba el
+      contenido. En un post largo eso encoge el recuadro de mil
+      trescientos píxeles a ciento cuarenta durante un instante: todo lo
+      que hay debajo —la vista previa, que mide lo mismo que el texto—
+      sube de golpe, el navegador reancla la página donde puede, y al
+      devolver la altura la pantalla se ha ido sola a la vista previa.
+      Escribiendo el recuadro solo CRECE, y para crecer no hace falta
+      medir en vacío: `scrollHeight` ya dice cuánto ocupa el contenido.
+      Solo al acortar el texto hay que volver a medir, y entonces se
+      guarda el desplazamiento y se devuelve.
+    - ⚠️ **La vista previa se rehace al PARAR de escribir, no en cada
+      tecla** (`RRD_VISTA_RESPIRO`), y **no se rehace si no cambió ni un
+      carácter**. La cuenta y los avisos van arriba y son dos renglones:
+      esos sí se refrescan enseguida. Rehacer media pantalla bajo el
+      dedo de quien escribe es lo que la mueve — y además se lleva por
+      delante el trozo remarcado de la regla 15.
+      ⚠️ **Y «ya está pintado» no se le pregunta solo a la caja de la
+      salida:** en un HILO la vista son las partes y esa caja se queda
+      vacía a propósito, así que la respuesta era siempre «no hay nada»
+      y el hilo se rehacía en cada guardado. Lo cazó la sonda.
+    - ⚠️ **`overflow-anchor: none` en todo lo que se rehace mientras se
+      escribe.** Chrome ancla el desplazamiento a un elemento de la
+      pantalla; si el ancla que elige es una de esas cajas, al perderla
+      reancla en otro sitio y la pantalla se va sola. No da error y
+      parece cosa del teclado.
+    - ⚠️ **Y el corrector aplica con `setRangeText`, no escribiendo el
+      valor entero.** `ta.value = …` manda el cursor AL FINAL del texto
+      y el navegador se lleva la pantalla detrás: corregir una coma del
+      primer párrafo y aparecer al final. Además así se conserva el
+      deshacer, como en el botón 𝗡 Negrita (regla 14).
+
+    Y una corrección aplicada **se enseña YA**: el respiro es para quien
+    teclea; una vista previa que tardara medio segundo en enterarse de
+    un toque se lee como que el botón no hizo nada.
+
 **Antes de publicar un cambio de las redes:**
 
 ```
@@ -1242,6 +1361,31 @@ seguras» rellene un «!!!» de «¡», que el toque sobre una palabra no abra
 su burbuja, que al salir queden subrayados puestos, y —lo que cazó el
 choque de nombres— que el corrector de la nota de la revista siga
 abriendo y cazando después, sin que se le cuelen las reglas de redes.
+
+La sección **17** es remarcar y corregir desde la vista previa, y está
+ordenada por gravedad: lo primero que mira es lo único que de verdad
+hace daño, que la caja **escriba en otro sitio**. Comprueba que con dos
+apariciones iguales se cambia **la que se seleccionó** (el
+desplazamiento manda, y se comprueba), y que **sin un sitio exacto no se
+adivina**. Después: que un trozo del bloque «📚 Fuentes» se corrija en
+SU fuente y no en el texto; que el rótulo que escribe la herramienta lo
+diga en vez de callar; que en un hilo de X una palabra repetida en seis
+partes se sitúe igual y corregirla cambie **solo esa**; que el trozo
+quede remarcado; que con el dedo la caja **no esté** a los 600 ms y sí a
+los dos segundos, y que moverla la cierre. Los trozos se seleccionan con
+**eventos de puntero de verdad** y la caja se mide con
+`elementFromPoint` y en píxeles: lo que puede fallar aquí es de pantalla
+—una caja que sale fuera del borde, una caja que se cierra a sí misma al
+dar el foco a su propio campo— y nada de eso se ve llamando funciones.
+La **17-bis** escribe una frase seguida y **mide el salto en píxeles**:
+con el fallo puesto son 794 px. Se probó quitando los tres arreglos:
+la sonda suspende cinco veces.
+
+⚠️ Y un número de esa sonda se pide con `eval`, nunca como
+`w.RRD_SEL_ESPERA`: un `const` de arriba del archivo **no cuelga de
+window**, así que eso daba `undefined`, `esperar(NaN)` esperaba CERO, y
+la sonda suspendía diciendo que la caja no salía nunca cuando salía
+perfectamente. Un fallo de la sonda que se lee igual que el de verdad.
 
 La sección **16** es la negrita Unicode: la ida y vuelta con tilde y eñe,
 que X cobre 8 por «𝗵𝗼𝗹𝗮» y 3 por una «𝗼́» (y siga cobrando 2 por una
