@@ -32,6 +32,7 @@ pierde por el camino.
 | `rodaje` (El Rodaje: el cuaderno de dirección de los videos) | ⏳ pendiente de correr el SQL, y **son dos archivos en orden** |
 | `voz_prestada` (La Voz Prestada: el anaquel de textos) | ✅ corrido, y **re-corrido el 12/9/2026** por las columnas `genero` y `estantes` |
 | `voz_actividades` (el taller de comprensión de esos textos) | ✅ corrido el **16/9/2026**, con las trece filas de la comprobación cuadradas |
+| `consigna` (📜 La Consigna: las piezas que se le piden a la máquina) | ✅ corrido el **23/9/2026**, el mismo día que se publicó la herramienta |
 | `voz-actividades-ia` (Edge Function) | 🗑 **retirada el 16/9/2026**: las actividades las monta el aparato, sin clave ni despliegue |
 | `criba.sql` (La Criba: la tabla y las cuatro fuentes) | ✅ corrido |
 | La cadena de afinado: `criba_temas` → `criba_afina` 1-4 → `criba_prensa` | ✅ corrida entera, en ese orden |
@@ -67,9 +68,10 @@ Zone → Make private.
 
 **4. Sueltos que no bloquean nada pero siguen ahí:**
 
-   · ⚠️ **Correr `supabase/sql/consigna.sql`** en el SQL Editor (23 de
-     septiembre de 2026, el día que se terminó la herramienta; el archivo es
-     del 22). Es la tabla de 📜 **La Consigna**, la herramienta del Acceso
+   · ✅ **`supabase/sql/consigna.sql`: CORRIDO** por el autor el 23 de
+     septiembre de 2026, el mismo día que se terminó la herramienta (el
+     archivo es del 22). Se queda aquí escrito por si hay que volver a
+     pegarlo o comprobarlo. Es la tabla de 📜 **La Consigna**, la herramienta del Acceso
      Rápido pegada a La Voz Prestada donde se escriben, se guardan y se
      vuelven a usar las indicaciones que se le dan a las máquinas —prompts,
      habilidades, grafos de agentes y bucles—, pedida por el autor el 22 de

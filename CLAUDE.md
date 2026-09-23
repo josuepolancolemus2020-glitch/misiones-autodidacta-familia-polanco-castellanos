@@ -18,8 +18,9 @@ Lo largo está en otros documentos y aquí solo se apunta dónde:
   referencia y **no se retoca a la ligera**, porque la prueba de Node saca
   de ahí las salidas y compara el armado con ellas carácter por carácter.
   Sus reglas, con lo que se aprendió al construirla, están aquí abajo, en
-  «Normativa: las consignas a las máquinas se escriben en La Consigna». Lo
-  único pendiente es **correr su SQL**, apuntado en `PLAN-FARO-PRIVADO.md`.
+  «Normativa: las consignas a las máquinas se escriben en La Consigna». Su
+  SQL **ya está corrido** (23 de septiembre de 2026) y está **publicada**
+  desde ese día; ☑ Elegir entró la misma tarde.
 
 ## Normativa: el SQL de Supabase se pega en el chat, SIEMPRE
 

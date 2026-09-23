@@ -11,7 +11,7 @@ visualmente atractivo, botones modernos etc.»
 
 ---
 
-## ✅ TERMINADA: solo falta correr el SQL y publicar
+## ✅ TERMINADA, PUBLICADA Y CON SU SQL CORRIDO
 
 **La Consigna se construyó entera el 23 de septiembre de 2026**, retomada
 donde se había parado el 22 (se acabó el crédito del modelo a media tanda;
@@ -36,17 +36,13 @@ revisión y la documentación están hechos y comprobados.
 
 ### Lo que FALTA
 
-1. **Correr el SQL en Supabase, desde la tableta:** `supabase/sql/consigna.sql`
-   entero, una sola vez, mirando la tabla vertical del final; y otro día, si
-   hace falta, `consigna_comprueba.sql`. Está apuntado con todo su detalle en
-   `PLAN-FARO-PRIVADO.md`, y el archivo se pega en el chat, como siempre.
-   Hasta entonces la herramienta funciona entera en el aparato y lo dice
-   («📴 Solo en este aparato: falta correr consigna.sql»).
-2. **Publicar:** el commit —con `_dev/probe-consigna.html`, que todavía no
-   está en git—, empujar y comprobar que el despliegue salió («Empujar no es
-   publicar», en `CLAUDE.md`). ⚠️ Al fusionar con `main`, la primera línea
-   de `sw.js` da conflicto, y es lo buscado: se resuelve dejando
-   `faro-app-v129` o más.
+Nada de lo que se pidió. El 23 de septiembre de 2026 el autor corrió
+`supabase/sql/consigna.sql` en Supabase y la herramienta se publicó en
+`main` (pull request #17, construcción de Pages en verde); la abrió en la
+tableta y funciona. «☑ Elegir» se pidió y se construyó esa misma tarde
+(`faro-app-v130`), sin tocar el SQL: los estantes y la máquina ya viajaban
+por la tabla. Lo que se cambie de aquí en adelante sigue la normativa de
+`CLAUDE.md` y pasa antes por la sonda.
 
 ### Lo que cambió sobre la especificación de abajo
 
