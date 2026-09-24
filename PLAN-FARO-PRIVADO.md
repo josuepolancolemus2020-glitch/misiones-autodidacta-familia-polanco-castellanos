@@ -36,6 +36,7 @@ pierde por el camino.
 | `redaccion_redes` (📣 Redes de Redacción: las piezas para Facebook, X, LinkedIn, TikTok y YouTube) | ✅ corrido el **24/9/2026**: siete de siete en la comprobación, y las piezas del aparato ya arriba |
 | `redaccion_cuadernos` (📓 Cuadernos de Redacción: el inventario de los cuadernos de NotebookLM) | ✅ corrido el **24/9/2026**: siete de siete, y los 16 cuadernos del aparato ya arriba |
 | `redaccion_papelera` (🗑️ la papelera de las notas de Redacción) | ✅ corrido el **24/9/2026**: siete de siete; «Eliminar» ya aparta en vez de borrar |
+| `buzon_lector` + `buzon_editar` (📬 el Buzón del lector, la única puerta abierta al público) | ✅ corridos el **24/9/2026**, en ese orden: nueve de nueve y cuatro de cuatro; ⚠️ la edición abierta tenía el cierre vencido (ver abajo) |
 | `voz-actividades-ia` (Edge Function) | 🗑 **retirada el 16/9/2026**: las actividades las monta el aparato, sin clave ni despliegue |
 | `criba.sql` (La Criba: la tabla y las cuatro fuentes) | ✅ corrido |
 | La cadena de afinado: `criba_temas` → `criba_afina` 1-4 → `criba_prensa` | ✅ corrida entera, en ese orden |
@@ -174,29 +175,37 @@ Zone → Make private.
      desaparecen, es idempotente en la base vieja y en una hecha con
      `redaccion_tables.sql`, y la comprobación no revienta ni sin la tabla
      ni sin las columnas.
-   · ⚠️ **Correr `supabase/sql/buzon_lector.sql`** en el SQL Editor. Crea las
-     dos tablas del Buzón del lector y su única puerta pública, con la
-     seguridad por fila cerrada. Hasta que se corra, Redacción funciona igual
-     y el chip 📬 Buzón no aparece (está probado que la falta de las tablas no
-     rompe nada), pero lo que manda la gente desde el QR de la revista no
-     tiene dónde caer. **Y detrás, `supabase/sql/buzon_editar.sql`**, que es
-     el que deja al lector corregir lo que mandó sin dejar dos envíos casi
-     iguales en la bandeja. El porqué de todo, en `BUZON-DEL-LECTOR.md`.
-     ⚠️ El chip 📬 Buzón **no sale hasta correr los dos**: la bandeja pide
-     dos columnas que pone el segundo. Desde el 24 de septiembre de 2026
-     cada archivo empieza con su guardia y termina con su tabla en
-     VERTICAL. El primero, nueve filas: las dos tablas, `26 de 26`
-     columnas, seguridad por fila `true · true`, `2` políticas de la casa,
-     la calle puede mandar, retirar y ver el cierre `3 de 3`, **la calle
-     NO puede fabricar folios** en `no`, permisos de tabla de la calle en
-     `0`, y lo que la calle ve de la próxima revista («Nº 7 · cierra
-     30/09/2026», por ejemplo). El segundo, cuatro: `2 de 2` columnas de la
+   · ✅ **`supabase/sql/buzon_lector.sql` y `supabase/sql/buzon_editar.sql`:
+     CORRIDOS** por el autor el 24 de septiembre de 2026, en ese orden y el
+     mismo día que se les puso su guardia, su tabla del final y la cerradura
+     de la función que fabrica los folios. Se queda aquí escrito por si hay
+     que volver a pegarlos o comprobarlos. Crean las dos tablas del Buzón del
+     lector y su única puerta pública, con la seguridad por fila cerrada; el
+     segundo es el que deja al lector corregir lo que mandó sin dejar dos
+     envíos casi iguales en la bandeja. El porqué de todo, en
+     `BUZON-DEL-LECTOR.md`. Son idempotentes: volver a pegarlos no duplica
+     nada, y hay que volver a pegarlos (los dos, en orden) si algún día se
+     añade una clase de envío, porque la lista vive dentro de las funciones.
+     Lo que salió al pegarlos, y es lo que hay que ver si algún día se
+     repite: el primero, **nueve filas cuadradas** —las dos tablas, `26 de
+     26` columnas, seguridad por fila `true · true`, `2` políticas de la
+     casa, la calle puede mandar, retirar y ver el cierre `3 de 3`, **la
+     calle NO puede fabricar folios** en `no` y permisos de tabla de la
+     calle en `0`—; el segundo, **cuatro**: `2 de 2` columnas de la
      corrección, `2 de 2` puertas para recuperar y corregir, y **`25 de 25`
      columnas que pide la bandeja de Redacción**, que es la fila que decide
-     el chip. Otro día, `supabase/sql/buzon_comprueba.sql`, que solo mira:
-     catorce filas, con cuánto ha llegado. Probado con
-     `_dev/prueba-buzon-sql.sql` con los permisos repartidos como los
+     el chip 📬 Buzón. Otro día, `supabase/sql/buzon_comprueba.sql`, que
+     solo mira: catorce filas, con cuánto ha llegado. Probado antes con
+     `_dev/prueba-buzon-sql.sql`, con los permisos repartidos como los
      reparte Supabase al crear cada tabla y cada función.
+     ⚠️ **Y la fila 9 del primero dijo «Nº 3 · cierra 20/08/2026»**, o sea
+     que la edición abierta en Redacción tenía el cierre vencido desde hacía
+     un mes. No es una avería del SQL: es el dato, y es justo lo que la
+     página del lector enseña («🗓️ La próxima cierra el jueves 20 de
+     agosto»), porque la quincena calculada en la página solo entra cuando
+     el servidor no contesta. Se arregla en Redacción, poniéndole a la
+     edición abierta su fecha de cierre de verdad (o archivándola y abriendo
+     la que toca), y se comprueba con la fila 11 de `buzon_comprueba.sql`.
    · ⚠️ **Correr `supabase/sql/metas_sugerencias.sql`** en el SQL Editor. Es un
      solo archivo, no depende de ningún otro salvo de `es_familia()` —que ya
      está— y crea la tabla donde caen las sugerencias que la gente escribe

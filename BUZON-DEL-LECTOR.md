@@ -88,6 +88,21 @@ los permisos de tabla: la seguridad por fila ya lo dejaba fuera, y esta
 es la segunda cerradura. La pantalla del lector no nota nada, porque
 todo lo suyo lo hace por las cinco funciones, que siguen abiertas.
 
+✅ **Y se corrieron ese mismo 24 de septiembre de 2026**, los dos y en
+orden, con sus tablas cuadradas enteras (nueve de nueve y cuatro de
+cuatro).
+
+⚠️ **La fecha de cierre de la edición abierta es lo que ve la calle.**
+La fila 9 de aquella comprobación dijo «Nº 3 · cierra 20/08/2026»: la
+edición abierta en Redacción tenía el cierre vencido desde hacía un mes,
+y eso es exactamente lo que la página enseña («🗓️ La próxima cierra el
+jueves 20 de agosto») y lo que le dice al lector en el «¡Recibido!». La
+quincena que la página sabe calcular sola solo entra cuando el servidor
+**no contesta**; si contesta con una fecha pasada, se fía de ella. No es
+una avería: es el dato. Cada vez que se cierra una revista, la edición
+abierta tiene que ser la siguiente, con su fecha, y la fila 11 de
+`buzon_comprueba.sql` es la manera rápida de verlo sin abrir la página.
+
 ## Las reglas que no se tocan
 
 1. **El enlace no lleva código y no caduca.** La convocatoria de
