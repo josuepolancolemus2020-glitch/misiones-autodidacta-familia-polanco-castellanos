@@ -902,6 +902,11 @@ function rrdFila(p) {
   }
   if (an.salida.pendientes) meta.appendChild(rrdEl('span', 'red-badge red-nota-citas-pend', `🔖 ${an.salida.pendientes} sin fuente`));
   if (p.nota_id) meta.appendChild(rrdEl('span', 'red-badge rrd-badge-nota', '📰 De la revista'));
+  /* Lo que entró desde una lectura lo dice en la lista, como lo que sale
+     de la revista: dentro de un mes nadie se acuerda de dónde vino ese
+     trozo, y casi siempre lo escribió una máquina o la casa imitando a
+     alguien (la etiqueta va en el propio texto). */
+  if (p.opciones && p.opciones.de === 'lectura') meta.appendChild(rrdEl('span', 'red-badge rrd-badge-nota', '📖 De una lectura'));
   if (p.fecha && p.estado !== 'publicada') meta.appendChild(rrdEl('span', 'red-nota-autor', `📅 ${rrdFechaLarga(p.fecha)}`));
   if (p.estado === 'publicada' && p.publicada_at) meta.appendChild(rrdEl('span', 'red-nota-autor', `salió ${rrdFechaLarga(String(p.publicada_at).slice(0, 10))}`));
   main.appendChild(meta);
@@ -1981,6 +1986,227 @@ function rrdPintarRetirar() {
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   📣 LO QUE LLEGA DE LAS LECTURAS
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 24 de septiembre de 2026, con la captura de la
+   barra de subrayar y el hueco de al lado de «✕ Cerrar» rodeado a mano:
+   «en las lecturas tanto de las misiones de storytelling o de La Voz
+   Prestada, cuando se seleccione algún dato importante, tener la opción
+   de enviar a redes, que está en la herramienta de Redacción, que uno
+   pueda elegir la red o una nota para configurarla allí después».
+
+   Llega por UNA cola del aparato (RRD_ENTRANTES_KEY), la escriba la
+   barra de las misiones (js/lecturas-marcador.js) o la de La Voz
+   Prestada, y se recoge AQUÍ. Es el puente de la regla 26 de La Voz
+   Prestada, y por lo mismo: una misión no puede hablar con Supabase (la
+   regla del cliente único) y una cola que se recoge después no pide red
+   para guardar lo que se acaba de elegir. La Voz Prestada escribe en la
+   MISMA cola aunque viva dentro de la aplicación: con dos caminos, uno
+   se quedaría viejo, y así el que se prueba desde la sala es el mismo
+   que usan las misiones.
+
+   ⚠️ SIN ETIQUETA NO ENTRA NADA. Casi todo lo que se lee en esas dos
+   pantallas lo escribió una máquina, o la casa, imitando a alguien (La
+   Voz Prestada, regla 1; las lecturas de las misiones son ejercicios de
+   estilo). Un trozo así que sale a X sin decirlo es, desde el primer
+   retuit, una cita falsa de Borges. Por eso la etiqueta va DENTRO del
+   texto de la pieza y no como fuente —una fuente, en X, se va a la
+   respuesta, y en LinkedIn al primer comentario: donde no la ve quien
+   comparte el post—, y este lector la exige: la entrada que no la trae
+   se descarta, y se dice.
+
+   ⚠️ EL IDENTIFICADOR ES ESTABLE: el mismo trozo al mismo destino es la
+   misma pieza. Dos toques no crían gemelas, reenviarlo NO pisa la pieza
+   viva (puede llevar ya el trabajo de redactarla) y una retirada solo
+   vuelve si el envío es más nuevo que su lápida. Son las tres reglas con
+   dueño del puente de las misiones.
+
+   ⚠️ Y SE RECOGE CON LA NUBE YA CONTESTADA. Una pieza hecha a ciegas
+   llevaría el reloj de AHORA y le ganaría a la misma pieza ya trabajada
+   en otro aparato, sin dar ningún error (La Voz Prestada, regla 35). Sin
+   señal la entrada espera en la cola; sin tabla o sin sesión no hay nube
+   que consultar y se hace aquí, que subirá con las demás cuando la haya.
+   ══════════════════════════════════════════════════════════════════ */
+
+const RRD_ENTRANTES_KEY = 'faro_redaccion_entrantes_v1';
+/* Las notas de la revista NO tienen identificador propio (se lo pone la
+   base al crearlas), así que la nota lleva el del trozo en su cuerpo y es
+   la BASE la que dice si ya salió, desde este aparato o desde otro. No
+   hay apunte en el aparato a propósito: diría «ya salió» también de una
+   nota tirada a la papelera, y volver a mandar el trozo no haría nada
+   (ver redNotaDesdeTrozo). */
+const RRD_ENTRANTE_MAX = 20000;   // un trozo de una lectura, no un libro
+let _rrdRecogiendo = null;        // la vuelta en marcha: una a la vez
+
+function rrdDestinoValido(d) { return d === 'nota' || RRD_REDES.some(r => r.id === d); }
+
+/* LA COSTURA. Lo que escriben las dos barras y lo único que se acepta. Es
+   pura a propósito: la sonda de las misiones la llama sobre lo que
+   escribió la barra DE VERDAD, en vez de fiarse de una copia del formato
+   escrita en la sonda (un doble complaciente no prueba la costura: la
+   esconde). Devuelve { ok, e } o { ok: false, motivo }. */
+function rrdEntranteLimpio(e) {
+  if (!e || typeof e !== 'object') return { ok: false, motivo: 'no es una entrada' };
+  const id = String(e.id || '');
+  if (!/^[A-Za-z0-9_-]{4,60}$/.test(id)) return { ok: false, motivo: 'sin identificador' };
+  const destino = String(e.destino || '');
+  if (!rrdDestinoValido(destino)) return { ok: false, motivo: 'destino desconocido' };
+  const trozo = String(e.trozo == null ? '' : e.trozo).replace(/\r/g, '').trim();
+  if (!trozo) return { ok: false, motivo: 'sin trozo' };
+  if (trozo.length > RRD_ENTRANTE_MAX) return { ok: false, motivo: 'demasiado largo' };
+  const etiqueta = String(e.etiqueta == null ? '' : e.etiqueta).replace(/\s+/g, ' ').trim();
+  if (!etiqueta) return { ok: false, motivo: 'sin etiqueta' };
+  const fuentes = (Array.isArray(e.fuentes) ? e.fuentes : [])
+    .map(f => ({ ref: String((f && f.ref) || '').replace(/\s+/g, ' ').trim().slice(0, 1000) }))
+    .filter(f => f.ref).slice(0, 20);
+  return { ok: true, e: {
+    id: id, destino: destino, trozo: trozo, etiqueta: etiqueta, fuentes: fuentes,
+    titulo: String(e.titulo || '').replace(/\s+/g, ' ').trim().slice(0, 200),
+    origen: e.origen === 'voz' ? 'voz' : 'mision',
+    cuando: Number(e.cuando) || Date.now(),
+  } };
+}
+
+function rrdEntreComillas(t) {
+  const s = String(t || '').trim();
+  return /^[«"“]/.test(s) ? s : '«' + s + '»';
+}
+
+/* El texto de la pieza: la cita entre comillas y, debajo, la etiqueta.
+   En un guion, el trozo es el gancho —una frase que se trajo a propósito
+   de una lectura casi siempre lo es— y la etiqueta va de rótulo en
+   pantalla, porque un guion no se lee: se dice, y lo que no se dice se
+   enseña. Con el molde de siempre (gancho, desarrollo, cierre), que es
+   el que 📄 Molde pone y que ya no saldría con el guion lleno. */
+function rrdCuerpoDeEntrante(e, clase) {
+  const cita = rrdEntreComillas(e.trozo);
+  if (clase === 'guion') {
+    return ['🎣 Gancho (3 segundos):\n' + cita,
+            '📖 Desarrollo:\n',
+            '👉 Cierre (qué hacer ahora):\n',
+            '🏷️ En pantalla mientras se dice la cita:\n' + e.etiqueta].join('\n\n');
+  }
+  return cita + '\n\n' + e.etiqueta;
+}
+
+function rrdCortoDe(t, n) {
+  const s = String(t || '').replace(/\s+/g, ' ').trim();
+  return s.length > n ? s.slice(0, n - 2).replace(/\s+\S*$/, '') + '…' : s;
+}
+
+function rrdColaLee() {
+  try {
+    const c = JSON.parse(localStorage.getItem(RRD_ENTRANTES_KEY) || '[]');
+    return Array.isArray(c) ? c : [];
+  } catch (e) { return []; }
+}
+/* Se quitan POR IDENTIFICADOR y releyendo la cola: si mientras se
+   recogía otra pestaña dejó algo, eso se queda. Lo que no se entiende se
+   va siempre —guardarlo sería volver a descartarlo en cada arranque—. */
+function rrdColaQuitar(ids) {
+  try {
+    const resto = rrdColaLee().filter(x => rrdEntranteLimpio(x).ok && !ids.has(x.id));
+    if (resto.length) localStorage.setItem(RRD_ENTRANTES_KEY, JSON.stringify(resto));
+    else localStorage.removeItem(RRD_ENTRANTES_KEY);
+  } catch (e) {}
+}
+
+/* Recoger. Devuelve lo que pasó, y quien llama decide qué decir: desde
+   La Voz Prestada el aviso de la aplicación vive DEBAJO de la sala y no
+   se vería, así que allí se llama callado y avisa la sala. */
+function rrdRecogerEntrantes(op) {
+  if (_rrdRecogiendo) return _rrdRecogiendo;
+  _rrdRecogiendo = rrdRecogerDeVerdad(op || {}).finally(() => { _rrdRecogiendo = null; });
+  return _rrdRecogiendo;
+}
+
+/* Al arrancar la aplicación: solo si hay algo esperando. Mirar la cola
+   es leer una clave del aparato; bajar las piezas sin motivo en cada
+   arranque sería devolverle la espera que costó quitar. */
+function rrdRecogerSiHay() {
+  if (!rrdColaLee().length) return null;
+  return rrdRecogerEntrantes();
+}
+
+async function rrdRecogerDeVerdad(op) {
+  const res = { hechas: 0, notas: 0, vuelven: 0, yaEstaban: 0, esperan: 0, descartadas: [] };
+  if (!rrdColaLee().length) return res;
+  await rrdInit();
+  const cola = rrdColaLee();   // releída: pudo llegar algo mientras tanto
+  const quitar = new Set();
+  const nubeContesto = _rrdNube === 'puesta' || _rrdNube === 'sin-tabla' || _rrdNube === 'sin-sesion';
+  for (const bruta of cola) {
+    const r = rrdEntranteLimpio(bruta);
+    if (!r.ok) { res.descartadas.push(r.motivo); continue; }
+    const e = r.e;
+
+    if (e.destino === 'nota') {
+      if (typeof redNotaDesdeTrozo !== 'function') { res.esperan++; continue; }
+      /* ⚠️ Con reloj propio: una petición que no vuelve —no que falla:
+         que no vuelve— dejaría esta vuelta colgada para siempre, y con
+         ella todas las siguientes (La Voz Prestada, regla 11). */
+      const hecho = await Promise.race([
+        redNotaDesdeTrozo(e).catch(() => 'no'),
+        new Promise(res2 => setTimeout(() => res2('no'), RRD_ESPERA_MAX)),
+      ]);
+      if (hecho === 'hecha') res.notas++;
+      else if (hecho === 'vuelve') res.vuelven++;
+      else if (hecho === 'ya') res.yaEstaban++;
+      else { res.esperan++; continue; }
+      quitar.add(e.id);
+      continue;
+    }
+
+    if (!nubeContesto) { res.esperan++; continue; }
+    const red = rrdRed(e.destino);
+    const clase = red.clases[0];
+    const ya = rrdPieza(e.id);
+    if (ya && !ya.eliminada) { res.yaEstaban++; quitar.add(e.id); continue; }
+    if (ya && ya.eliminada && e.cuando <= (ya.actualizado || 0)) { res.yaEstaban++; quitar.add(e.id); continue; }
+    if (ya) _rrdPiezas = _rrdPiezas.filter(p => p.id !== e.id);   // la lápida más vieja cede
+    rrdNueva(red.id, clase, {
+      id: e.id,
+      titulo: (red.nombre + ' · «' + rrdCortoDe(e.trozo, 60) + '»').slice(0, 120),
+      texto: rrdCuerpoDeEntrante(e, clase),
+      fuentes: e.fuentes,
+      opciones: { de: 'lectura' },
+    });
+    res.hechas++;
+    quitar.add(e.id);
+  }
+  rrdColaQuitar(quitar);
+  if (res.hechas) {
+    rrdGuardaLocal();
+    if (typeof _redEdicion !== 'undefined' && _redEdicion === 'redes') {
+      const list = document.getElementById('red-list');
+      if (list) rrdRender(list);
+    }
+    if (typeof redRenderChips === 'function') redRenderChips();
+  }
+  if (!op.callado) { const t = rrdAvisoRecogida(res); if (t) rrdAviso(t); }
+  return res;
+}
+
+function rrdAvisoRecogida(res) {
+  const partes = [];
+  if (res.hechas) partes.push(res.hechas + (res.hechas === 1 ? ' pieza' : ' piezas') + ' en 📣 Redes');
+  if (res.notas) partes.push(res.notas + (res.notas === 1 ? ' nota' : ' notas') + ' en 🗃️ Banco de ideas');
+  if (res.vuelven) partes.push(res.vuelven + (res.vuelven === 1 ? ' nota vuelve' : ' notas vuelven') + ' de la papelera');
+  let t = partes.length
+    ? '📥 De tus lecturas: ' + (partes.length > 1 ? partes.slice(0, -1).join(', ') + ' y ' + partes[partes.length - 1] : partes[0])
+    : '';
+  /* Si lo único que pasó es que ya estaba, se dice: si no, volver a
+     mandar un trozo no enseñaría nada y parecería que no llegó. */
+  if (!t && res.yaEstaban) {
+    t = '📥 ' + (res.yaEstaban === 1 ? 'Ese trozo ya estaba' : res.yaEstaban + ' trozos ya estaban') + ' en Redacción: no se duplica';
+  }
+  if (res.esperan) t += (t ? ' · ' : '📥 ') + res.esperan + (res.esperan === 1 ? ' trozo espera' : ' trozos esperan') + ' a que haya señal';
+  const sinEt = res.descartadas.filter(m => m === 'sin etiqueta').length;
+  if (sinEt) t += (t ? ' · ' : '') + '⚠️ ' + sinEt + (sinEt === 1 ? ' trozo sin etiqueta no entró' : ' trozos sin etiqueta no entraron');
+  return t;
+}
+
 /* ── Cableado ─────────────────────────────────────────────────────── */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2091,7 +2317,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const comp = document.getElementById('rrd-e-compartir-btn');
   if (comp && !navigator.share) comp.style.display = 'none';
 
-  window.addEventListener('online', () => { if (_rrdCargada) rrdInit(); });
+  window.addEventListener('online', () => {
+    if (_rrdCargada) rrdInit();
+    /* Lo que llegó de una lectura sin señal esperaba en la cola: al
+       volver la señal entra, sin esperar a que alguien abra Redacción. */
+    rrdRecogerSiHay();
+  });
 
   // Al recargar con el botón 🔄, guardar lo que haya a medias
   (window.faroGuardadosPendientes = window.faroGuardadosPendientes || []).push(async () => {

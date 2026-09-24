@@ -532,13 +532,35 @@
     return dentro;
   }
 
+  /* Lo que dice el rótulo de una lectura sobre sí misma, leído en UN solo
+     sitio: lo usan el puente a La Voz Prestada y el 📣 A redes de la barra
+     de subrayar (js/lecturas-marcador.js). Con dos lecturas del rótulo, una
+     se quedaría vieja el día que cambie su forma, y justo esa diría mal
+     a quién imita el texto. `imita` es la voz SOLO si el rótulo lo dice
+     («…, a la manera de Borges)»): el mapa VOZ tiene «Debate» y «Quintero
+     y Gala», que no son a quién se imita y no pueden ir en una etiqueta. */
+  function rotuloDe(card) {
+    return (card.querySelector('.lect-tit') || card.querySelector('h2') || { textContent: '' }).textContent;
+  }
+  function origenDe(card) {
+    const rotulo = rotuloDe(card);
+    const mVoz = rotulo.match(/a la (?:manera|forma) de ([^)]+)\)/i);
+    const mPar = rotulo.match(/\(([^()]*)\)\s*$/);
+    const h1 = document.querySelector('h1');
+    return {
+      titulo: tituloDe(card),
+      imita: mVoz ? mVoz[1].trim() : '',
+      parentesis: mPar ? mPar[1].trim() : '',
+      mision: ((h1 && h1.textContent) || document.title).replace(/\s+/g, ' ').trim(),
+    };
+  }
+
   function mandarAVozPrestada(card, clave, btn) {
-    const rotulo = (card.querySelector('.lect-tit') || card.querySelector('h2') || { textContent: '' }).textContent;
+    const o = origenDe(card);
     /* La voz, del propio rótulo («…, a la manera de Borges)»); si la
        tarjeta no la trae así (el careo no imita a nadie), la del mapa. */
-    const mVoz = rotulo.match(/a la (?:manera|forma) de ([^)]+)\)/i);
-    const voz = mVoz ? mVoz[1].trim() : vozDe(card);
-    const mPar = rotulo.match(/\(([^()]*)\)\s*$/);
+    const voz = o.imita || vozDe(card);
+    const mPar = o.parentesis ? [null, o.parentesis] : null;
     const parrafos = [...card.querySelectorAll('.lect-p')]
       .map(el => planoDe(el).replace(/[ \t]+/g, ' ').replace(/ ?\n ?/g, '\n').trim())
       .filter(Boolean);
@@ -547,8 +569,7 @@
     let saveKey = '';
     try { saveKey = (typeof SAVE_KEY !== 'undefined' && SAVE_KEY) ? SAVE_KEY : ''; } catch (e) {}
     if (!saveKey) saveKey = location.pathname.split('/').pop().replace(/\.html$/, '');
-    const h1 = document.querySelector('h1');
-    const mision = ((h1 && h1.textContent) || document.title).replace(/\s+/g, ' ').trim();
+    const mision = o.mision;
     const entrada = {
       id: ('lect-' + saveKey + '-' + clave).replace(/[^A-Za-z0-9_-]/g, '-'),
       titulo: tituloDe(card),
@@ -602,6 +623,13 @@
     cerrar: cerrar,
     preguntasImpresas: preguntasImpresas,
     etiquetaCareo: etiquetaCareo,
+    /* Para el 📣 A redes del marcador: qué dice de sí misma la lectura
+       `clave` (su título, a quién imita si lo imita, el paréntesis del
+       rótulo y la misión). null si no existe. */
+    origenDe: function (clave) {
+      const card = document.getElementById('lect-' + String(clave).replace(/^lect-/, ''));
+      return card ? origenDe(card) : null;
+    },
     /* Para las sondas: qué voces hay montadas y cuántas preguntas tiene
        cada una. Sin esto, una lectura sin preguntas se publica sin que
        nadie lo note hasta que un alumno abre la tarjeta y no hay nada. */

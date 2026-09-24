@@ -176,6 +176,24 @@
 .fm-acc:active { transform: scale(.97); }
 .fm-acc-quita { border-color: var(--red, #d63031); color: var(--red, #d63031); }
 
+/* 📣 A redes: el trozo a Redacción de F.A.R.O, con sus destinos abiertos
+   DENTRO de la barra: son seis, y en un teléfono bajan de línea.
+   ⚠️ El `[hidden]` va escrito: el del navegador pierde contra el
+   `display: flex` de la clase, y la fila se quedaría abierta con el
+   `aria-expanded` diciendo que está cerrada. */
+.fm-acc-redes[aria-expanded="true"] { background: var(--dark, #1b2838); color: var(--card, #fff); border-color: var(--dark, #1b2838); }
+.fm-destinos { display: flex; flex-direction: column; gap: 6px; }
+.fm-destinos[hidden] { display: none; }
+.fm-dest-nota { margin: 0; font-size: 0.72rem; line-height: 1.35; color: var(--gray, #64748b); }
+.fm-dest-fila { display: flex; gap: 6px; flex-wrap: wrap; }
+.fm-dest {
+  flex: 1 1 auto; min-height: 40px; border-radius: 10px; cursor: pointer;
+  border: 2px solid var(--border, #cbd5e1); background: var(--card, #fff);
+  color: var(--dark, #1b2838); font-family: inherit; font-size: 0.78rem; font-weight: 700;
+  padding: 6px 10px;
+}
+.fm-dest:active { transform: scale(.96); }
+
 /* ── El panel de marcas, dentro de la sección de Lecturas ── */
 .fm-leyenda { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
 .fm-ley-item {

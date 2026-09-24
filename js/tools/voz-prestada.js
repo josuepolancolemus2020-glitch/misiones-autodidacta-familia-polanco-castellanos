@@ -5429,11 +5429,46 @@ function vozSubBarra() {
      buscarlo y volver. Calcado de la barra de las misiones. */
   acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-lugar', '🔖 Aquí me quedé', () => vozSubAquiMeQuede(), 'Poner el marcador de lectura en este párrafo'));
   acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-quitar', '🗑 Quitar', () => vozSubQuitar(_vozSubEditando)));
+  /* 📣 A redes: el trozo, a Redacción. Va en el hueco que dejaba «✕
+     Cerrar» al irse a la derecha, que es donde el autor lo pidió con la
+     captura (24 de septiembre de 2026), y sale igual sobre una selección
+     nueva que sobre una marca ya puesta: lo que se manda es un trozo, y
+     da igual si ya se había subrayado. */
+  const aRedes = vozBoton('voz-subbar-acc voz-subbar-redes', '📣 A redes', () => vozSubDestinos(),
+    'Mandar este trozo a Redacción: a una red o a una nota');
+  aRedes.setAttribute('aria-expanded', 'false');
+  acciones.appendChild(aRedes);
   acciones.appendChild(vozBoton('voz-subbar-acc voz-subbar-cerrar', '✕ Cerrar', () => {
     try { window.getSelection().removeAllRanges(); } catch (e) {}
     vozSubCerrarBarra();
   }, 'Cerrar'));
   b.appendChild(acciones);
+  /* Los destinos se abren DENTRO de la misma barra y no en una hoja
+     aparte: el trozo sigue a la vista y es un toque más, no una ventana
+     encima de otra. */
+  const dest = vozNodo('div', 'voz-subbar-destinos');
+  dest.hidden = true;
+  dest.appendChild(vozNodo('p', 'voz-subbar-dest-nota',
+    '¿Para dónde? Queda de borrador en Redacción, con su etiqueta. «Nota» si aún no sabes en qué red saldrá.'));
+  const filaD = vozNodo('div', 'voz-subbar-dest-fila');
+  vozDestinosRedaccion().forEach(d => {
+    const bt = vozBoton('voz-subbar-dest', d.t, () => vozSubARedes(d.id),
+      d.id === 'nota' ? 'Guardarlo como nota del banco de ideas de Redacción' : 'Guardarlo como pieza para ' + d.t);
+    bt.dataset.destino = d.id;
+    filaD.appendChild(bt);
+  });
+  dest.appendChild(filaD);
+  b.appendChild(dest);
+  /* ⚠️ Aquí son DOS toques (📣 y la red), y en una tableta el primero
+     puede llevarse la selección —el navegador la suelta al tocar otra
+     cosa— y con ella la barra, que se cierra en cuanto la selección se
+     mueve. Cancelar el dedo AL BAJAR sobre estos botones deja la
+     selección donde estaba; el toque llega igual. Es el truco del botón
+     𝗡 Negrita de Redacción → Redes. */
+  [aRedes].concat([...filaD.children]).forEach(bt => {
+    bt.addEventListener('pointerdown', e => e.preventDefault());
+    bt.addEventListener('mousedown', e => e.preventDefault());
+  });
   const nota = vozNodo('div', 'voz-subbar-notacaja');
   nota.hidden = true;
   const ta = vozNodo('textarea', 'voz-subbar-notatxt');
@@ -5470,8 +5505,11 @@ function vozSubAbrirBarra(texto, catActiva, caja) {
   b.querySelector('.voz-subbar-quitar').hidden = !editando;
   b.querySelector('.voz-subbar-lugar').hidden = editando;
   b.querySelector('.voz-subbar-notacaja').hidden = true;
+  b.querySelector('.voz-subbar-destinos').hidden = true;
+  b.querySelector('.voz-subbar-redes').setAttribute('aria-expanded', 'false');
   b.classList.toggle('voz-subbar-editando', editando);
   b.hidden = false;
+  _vozSubCaja = caja || null;
   vozSubColocarBarra(caja);
 }
 
@@ -5527,7 +5565,173 @@ function vozSubAbrirNota() {
   if (!b) return;
   const caja = b.querySelector('.voz-subbar-notacaja');
   caja.hidden = !caja.hidden;
+  const dest = b.querySelector('.voz-subbar-destinos');
+  if (dest && !caja.hidden) { dest.hidden = true; b.querySelector('.voz-subbar-redes').setAttribute('aria-expanded', 'false'); }
   if (!caja.hidden) { const ta = caja.querySelector('textarea'); if (ta) ta.focus(); }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   📣 A REDES: UN TROZO DE LA LECTURA, A REDACCIÓN
+   ══════════════════════════════════════════════════════════════════
+   Pedido por el autor el 24 de septiembre de 2026, con la captura de
+   esta misma barra y el hueco rodeado a mano: «cuando se seleccione
+   algún dato importante, tener la opción de enviar a redes, que está en
+   la herramienta de Redacción, que uno pueda elegir la red o una nota
+   para configurarla allí después».
+
+   ⚠️ LA ETIQUETA VIAJA DENTRO DEL TROZO, Y ES LA REGLA 1 EN SU PEOR
+   SITIO. Esto es lo único de la sala que sale a la calle: una frase de
+   un texto «al modo de» Graeber, publicada en X sin decir quién la
+   escribió, es desde el primer retuit una cita falsa de Graeber. Por eso
+   va en el propio texto de la pieza —con las palabras de la portada: qué
+   es, qué lo escribió y a quién imita— y no como fuente, que en X se va
+   a la respuesta y en LinkedIn al primer comentario. Redacción no deja
+   entrar un trozo sin ella.
+
+   ⚠️ Y LAS FUENTES DE VERDAD VIAJAN CON ÉL. Si el trozo lleva dentro una
+   llamada —un «[3]» o un «(Harari, 2014)» que casa con la bibliografía
+   (regla 27)—, esas entradas van como fuentes de la pieza, y Redes las
+   saca donde cada red las admite. Un dato sin su fuente es justo lo que
+   no se publica.
+
+   ⚠️ NO MUEVE LA LECTURA. Se guarda en la cola del aparato y la sala
+   sigue en la misma frase: se vino a leer, y lo mandado se termina
+   «allí, después». Es la MISMA cola que escribe la barra de las
+   misiones, y la recoge js/tools/redaccion-redes.js; desde aquí se le
+   pide que la recoja ya, porque la aplicación está abierta.
+
+   El identificador sale del trozo y del destino, no del azar: dos
+   toques no crían dos piezas, y reenviarlo no pisa la que ya se
+   redactó (lo decide quien recoge). */
+
+let _vozSubCaja = null;   // dónde estaba el trozo, para recolocar la barra al crecer
+
+/* Los destinos: las redes salen de RRD_REDES —la lista de Redes, que es
+   la única que sabe qué redes hay— y, si ese archivo no cargó, de una
+   copia de respaldo. Una red nueva allí sale aquí sola. */
+function vozDestinosRedaccion() {
+  const redes = (typeof RRD_REDES !== 'undefined' && Array.isArray(RRD_REDES))
+    ? RRD_REDES.map(r => ({ id: r.id, t: r.nombre }))
+    : [{ id: 'x', t: 'X' }, { id: 'facebook', t: 'Facebook' }, { id: 'linkedin', t: 'LinkedIn' },
+       { id: 'tiktok', t: 'TikTok' }, { id: 'youtube', t: 'YouTube' }];
+  return redes.concat([{ id: 'nota', t: '📰 Nota' }]);
+}
+
+function vozSubDestinos() {
+  const b = document.getElementById('voz-subbar');
+  if (!b) return;
+  const d = b.querySelector('.voz-subbar-destinos');
+  d.hidden = !d.hidden;
+  b.querySelector('.voz-subbar-redes').setAttribute('aria-expanded', String(!d.hidden));
+  if (!d.hidden) b.querySelector('.voz-subbar-notacaja').hidden = true;
+  /* La barra crece: se recoloca con el mismo cálculo de siempre, para
+     que no tape el trozo que se está mandando ni se salga por abajo. */
+  vozSubColocarBarra(_vozSubCaja);
+}
+
+/* Una huella corta y estable: el mismo trozo al mismo destino da siempre
+   la misma. Dos pasadas de FNV-1a con semillas distintas, para que dos
+   trozos distintos no choquen en la práctica. */
+function vozHuella(s) {
+  let h1 = 0x811c9dc5, h2 = 0x9747b28c;
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ c, 16777619) >>> 0;
+    h2 = Math.imul(h2 ^ c, 2246822519) >>> 0;
+  }
+  return h1.toString(36) + h2.toString(36);
+}
+
+/* Las fuentes de verdad que el trozo trae citadas: las llamadas del
+   bloque que caen dentro de lo seleccionado, casadas con la bibliografía
+   por la MISMA función que las pinta (vozLlamadasEn), para que lo que se
+   manda y lo que se ve no puedan decir cosas distintas. */
+function vozFuentesDelTrozo(c, s) {
+  const idx = vozIndiceFuentes(c);
+  if (!idx || !idx.lista.length) return [];
+  const el = document.querySelector('#voz-texto [data-cap="' + s.cap + '"][data-vp="' + s.vp + '"]');
+  let plano = el ? vozCuerpoDe(el).textContent : '';
+  if (!plano) {
+    const bloques = ((c.capitulos || [])[s.cap] || {}).p || [];
+    plano = vozTextoDeBloque(bloques[s.vp]);
+  }
+  const vistas = new Set(), out = [];
+  vozLlamadasEn(plano, idx).res.forEach(x => {
+    if (!(x.i < s.f && x.f > s.i)) return;
+    x.fuentes.forEach(f => {
+      if (vistas.has(f.fid)) return;
+      vistas.add(f.fid);
+      const url = f.url && String(f.t || '').indexOf(f.url) < 0 ? ' ' + f.url : '';
+      out.push({ ref: (String(f.t || '') + url).replace(/\s+/g, ' ').trim() });
+    });
+  });
+  return out;
+}
+
+/* Lo que viaja. El formato lo manda quien recoge (rrdEntranteLimpio, en
+   js/tools/redaccion-redes.js): la sonda comprueba que esto pasa por ahí. */
+function vozEntranteDe(c, s, destino) {
+  const g = vozGenero(c.genero);
+  /* «Crónica escrita», no «escrito»: esto sale a la calle y se lee. Y
+     por lo mismo NO lleva guion largo delante ni de relleno: es texto
+     publicable, y la norma 1-bis no los deja en nada que se publique.
+     Sin voz (la base la exige, pero esto no lo sabe) se calla esa parte
+     en vez de escribir una raya. */
+  const fem = ['cronica', 'carta', 'novela', 'entrevista'].indexOf(g.id) >= 0;
+  return {
+    id: 'rl-' + vozHuella(['voz', c.cid, s.cap, s.vp, s.i, s.f, destino].join('|')),
+    destino: destino,
+    trozo: s.t,
+    etiqueta: 'De «' + (c.titulo || 'Sin título') + '»: ' + g.t.toLowerCase() +
+      (fem ? ' escrita' : ' escrito') + ' por ' + (c.maquina || 'una máquina') +
+      (c.voz ? ', al modo de ' + c.voz : '') + '.',
+    titulo: c.titulo || '',
+    fuentes: vozFuentesDelTrozo(c, s),
+    origen: 'voz',
+    cuando: Date.now(),
+  };
+}
+
+/* La cola es la de Redes (RRD_ENTRANTES_KEY) cuando ese archivo cargó; si
+   no, la misma clave escrita aquí, y la sonda comprueba que son iguales. */
+function vozColaRedaccion() {
+  return (typeof RRD_ENTRANTES_KEY !== 'undefined') ? RRD_ENTRANTES_KEY : 'faro_redaccion_entrantes_v1';
+}
+function vozEncolarARedaccion(e) {
+  try {
+    const clave = vozColaRedaccion();
+    const cola = (JSON.parse(localStorage.getItem(clave) || '[]') || []).filter(x => x && x.id !== e.id);
+    cola.push(e);
+    localStorage.setItem(clave, JSON.stringify(cola));
+    return true;
+  } catch (err) { return false; }
+}
+
+function vozSubARedes(destino) {
+  const c = _vozLeyendo;
+  if (!c) return;
+  let s = null;
+  if (_vozSubEditando) {
+    const m = vozSubDe(c.cid).find(x => x.id === _vozSubEditando);
+    if (m) s = { cap: m.cap, vp: m.vp, i: m.i, f: m.f, t: m.t };
+  } else {
+    s = _vozSubSel || vozLeerSeleccionSala();
+  }
+  if (!s || s.varios || !String(s.t || '').trim()) { vozAviso('Selecciona un trozo dentro de un mismo párrafo'); return; }
+  const e = vozEntranteDe(c, s, destino);
+  if (!vozEncolarARedaccion(e)) { vozAviso('No se pudo guardar en este aparato'); return; }
+  try { window.getSelection().removeAllRanges(); } catch (err) {}
+  vozSubCerrarBarra();
+  const d = vozDestinosRedaccion().find(x => x.id === destino);
+  vozAviso(destino === 'nota'
+    ? '📰 A Redacción, como nota del banco de ideas. La terminas allí cuando quieras.'
+    : '📣 A Redacción → Redes, para ' + (d ? d.t : destino) + '. La terminas allí cuando quieras.');
+  /* La aplicación está abierta: se recoge ya, CALLADO, porque el aviso de
+     la aplicación vive por debajo de la sala y no se vería. Si no hay
+     señal, el trozo espera en la cola y entra cuando la haya. */
+  if (typeof rrdRecogerEntrantes === 'function') {
+    try { rrdRecogerEntrantes({ callado: true }).catch(() => {}); } catch (err) {}
+  }
 }
 
 /* ─── Crear, cambiar, anotar, quitar ─── */

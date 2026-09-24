@@ -1012,6 +1012,21 @@ button.voz-grupo-tit:focus-visible { outline: 2px solid var(--story); outline-of
    es un color y la que más se usa al dejar de leer. */
 .voz-subbar-lugar { color: var(--story); border-color: var(--story); font-weight: 600; }
 .voz-subbar-cerrar { margin-left: auto; min-width: 38px; }
+/* 📣 A redes: el trozo a Redacción. Con el tono de «Aquí me quedé» pero
+   no su color, que ese es el del marcador de lectura y aquí confundiría.
+   Y los destinos se abren DENTRO de la barra, en una fila que baja de
+   línea: son seis y en un teléfono no caben en una. */
+.voz-subbar-redes { font-weight: 600; }
+.voz-subbar-redes[aria-expanded="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.voz-subbar-destinos { display: flex; flex-direction: column; gap: 6px; }
+.voz-subbar-destinos[hidden] { display: none; }
+.voz-subbar-dest-nota { margin: 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
+.voz-subbar-dest-fila { display: flex; gap: 6px; flex-wrap: wrap; }
+.voz-subbar-dest {
+  flex: 1 1 auto; min-height: 40px; padding: 6px 12px; border-radius: 10px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg); color: var(--text); font: inherit; font-size: 13px; font-weight: 600;
+}
+.voz-subbar-dest:active { transform: scale(.96); }
 .voz-subbar-notacaja { display: flex; flex-direction: column; gap: 6px; }
 .voz-subbar-notacaja[hidden] { display: none; }
 .voz-subbar-notatxt {

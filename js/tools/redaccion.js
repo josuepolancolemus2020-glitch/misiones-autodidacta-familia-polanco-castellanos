@@ -577,6 +577,10 @@ async function initRedaccion() {
   // Las piezas para redes: lo del aparato ya está; la nube, cuando
   // llegue, repinta el chip con su cuenta.
   if (typeof rrdInit === 'function') rrdInit();
+  // Y lo que se mandó desde una lectura (📣 A redes, en la barra de
+  // subrayar de las misiones y de La Voz Prestada) entra ahora, si
+  // quedó algo esperando en la cola del aparato.
+  if (typeof rrdRecogerSiHay === 'function') rrdRecogerSiHay();
   // Y el inventario de cuadernos de NotebookLM, por el mismo camino.
   if (typeof rcuInit === 'function') rcuInit();
 }
@@ -1681,6 +1685,107 @@ async function redNuevaNota() {
   }
   _redNotas.unshift(data);
   redOpenEditor(data.id);
+}
+
+/* ── 📣 Un trozo de una lectura, como nota del banco de ideas ──────
+   Es el destino «📰 Nota» del botón 📣 A redes de la barra de subrayar
+   (las misiones y La Voz Prestada). Lo elige quien todavía no sabe en qué
+   red va a salir: de una nota se lleva después a la que sea con «📣
+   Llevar a redes», y sus citas viajan con ella. Lo recoge
+   js/tools/redaccion-redes.js (rrdRecogerEntrantes); aquí solo se crea
+   la nota. Devuelve 'hecha', 'vuelve' (estaba en la papelera y se saca),
+   'ya' (salió antes) o 'no' (espera).
+
+   ⚠️ LA NOTA NACE EN LA BASE (el identificador lo pone la base), así que
+   sin señal o sin sesión NO se crea y el trozo sigue esperando en la
+   cola: no se pierde. Y para no crear dos al recoger dos veces, o desde
+   dos aparatos, el cuerpo lleva el identificador del trozo (data-trozo)
+   y se pregunta por él antes de crear. Se le pregunta A LA BASE cada
+   vez, y no a un apunte del aparato: el apunte diría «ya salió» también
+   cuando la nota está en la papelera, y entonces volver a mandar el
+   trozo no haría nada en el aparato donde más se hace, el mismo.
+
+   ⚠️ Y SI ESTÁ EN LA PAPELERA, LA REGLA DEL PUENTE DE LAS LECTURAS (La
+   Voz Prestada, regla 26): una lápida solo revive si el envío es MÁS
+   NUEVO que ella. Tirada ayer y mandada hoy, vuelve; mandada ayer y
+   tirada hoy, se queda donde la dejaron. Y vuelve LA MISMA nota, con lo
+   que se le hubiera escrito, en vez de criar otra al lado.
+
+   ⚠️ EL CUERPO SE ARMA CON NODOS, NO CON CADENAS. El trozo sale de una
+   lectura y va a parar dentro de un HTML que el editor pinta con
+   innerHTML: el navegador escapa lo que serializa, una cadena montada a
+   mano no. Y la etiqueta (quién escribió eso y a la manera de quién) va
+   DENTRO del cuerpo, no aparte: casi todo lo que se lee en esas pantallas
+   lo escribió una máquina o la casa imitando a alguien. */
+function redCuerpoDeTrozo(e) {
+  const caja = document.createElement('div');
+  const cita = document.createElement('div');
+  cita.setAttribute('data-trozo', e.id);
+  const t = String(e.trozo || '').trim();
+  const conComillas = /^[«"“]/.test(t) ? t : '«' + t + '»';
+  conComillas.split('\n').forEach((linea, i) => {
+    if (i) cita.appendChild(document.createElement('br'));
+    cita.appendChild(document.createTextNode(linea));
+  });
+  (e.fuentes || []).forEach((f, i) => {
+    const sup = document.createElement('sup');
+    sup.className = 'red-cita';
+    sup.setAttribute('contenteditable', 'false');
+    sup.setAttribute('data-ref', f.ref);
+    sup.textContent = '[' + (i + 1) + ']';
+    cita.appendChild(sup);
+  });
+  caja.appendChild(cita);
+  const hueco = document.createElement('div');
+  hueco.appendChild(document.createElement('br'));
+  caja.appendChild(hueco);
+  const pie = document.createElement('div');
+  const it = document.createElement('i');
+  it.textContent = e.etiqueta;
+  pie.appendChild(it);
+  caja.appendChild(pie);
+  return caja.innerHTML;
+}
+
+async function redNotaDesdeTrozo(e) {
+  if (!_sb || !e || !e.id) return 'no';
+  /* `*` y no una lista de columnas: la papelera (eliminada, eliminada_at)
+     puede no existir en una base vieja, y pedir una columna que no está
+     rebota la consulta ENTERA (42703): el trozo esperaría para siempre. */
+  const ya = await _sb.from(RED_T_NOTAS).select('*').like('cuerpo', '%' + e.id + '%').limit(5);
+  if (ya.error) return 'no';
+  const halladas = ya.data || [];
+  if (halladas.some(n => !n.eliminada)) return 'ya';
+  if (halladas.length) {
+    const n = halladas.slice().sort((a, b) =>
+      String(b.eliminada_at || '').localeCompare(String(a.eliminada_at || '')))[0];
+    if (!(Number(e.cuando) > (Date.parse(n.eliminada_at || '') || 0))) return 'ya';
+    const campos = { eliminada: false, eliminada_at: null };
+    const vuelta = await _sb.from(RED_T_NOTAS).update(campos).eq('id', n.id);
+    if (vuelta.error) return 'no';
+    const local = _redNotas.find(x => x.id === n.id);
+    if (local) Object.assign(local, campos);
+    else if (_redLoaded) _redNotas.unshift(Object.assign(n, campos));
+    if (_redLoaded && document.getElementById('view-redaccion')?.classList.contains('active')) redRender();
+    return 'vuelve';
+  }
+  const corto = String(e.trozo || '').replace(/\s+/g, ' ').trim();
+  const fila = {
+    edicion_id: null,          // 🗃️ Banco de ideas: todavía no es de ninguna edición
+    autor: redMiembro(),
+    seccion: 'ACTUALIDAD',
+    tipo: 'Idea',
+    estado: 'idea',
+    titulo: '«' + (corto.length > 70 ? corto.slice(0, 68).replace(/\s+\S*$/, '') + '…' : corto) + '»',
+    cuerpo: redCuerpoDeTrozo(e),
+  };
+  const { data, error } = await _sb.from(RED_T_NOTAS).insert(fila).select().single();
+  if (error || !data) return 'no';
+  if (_redLoaded) {
+    _redNotas.unshift(data);
+    if (document.getElementById('view-redaccion')?.classList.contains('active')) redRender();
+  }
+  return 'hecha';
 }
 
 /* ── Editor ── */

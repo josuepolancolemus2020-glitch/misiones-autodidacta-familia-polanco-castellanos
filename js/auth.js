@@ -236,6 +236,16 @@ document.addEventListener('DOMContentLoaded', () => {
        uno abriría encima del otro. La nota larga está allí. */
     if (typeof faroArranqueInicio === 'function') setTimeout(faroArranqueInicio, 0);
     else if (typeof faroArranqueApunteFijo === 'function') setTimeout(faroArranqueApunteFijo, 0);
+    /* Lo que se mandó a Redacción desde una misión (📣 A redes en la barra
+       de subrayar) espera en una cola de este aparato: una misión no habla
+       con Supabase. Se recoge al volver a F.A.R.O, que es cuando hay sesión,
+       y solo si hay algo (mirar la cola es leer una clave). Va con un
+       respiro, y no al instante, por dos razones: el arranque tiene que
+       pintar sin esperar a la red, y la recogida pregunta a la nube qué
+       piezas hay antes de crear ninguna (una hecha a ciegas le ganaría por
+       reloj a la misma pieza ya trabajada en otro aparato). Y esa pregunta
+       va con el token recién renovado, no con el de antes de comprobarlo. */
+    if (typeof rrdRecogerSiHay === 'function') setTimeout(rrdRecogerSiHay, 3000);
   }
 
   /* ── Restaurar la sesión guardada, si la hay ──────────────────────────

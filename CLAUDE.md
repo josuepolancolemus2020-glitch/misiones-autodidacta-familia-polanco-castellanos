@@ -984,7 +984,7 @@ comentario y perfil. El texto es **texto plano** a propósito: ninguna red
 acepta negritas pegadas, y un HTML aquí sería una promesa que la red no
 cumple.
 
-**Dieciséis reglas, y ninguna es de adorno:**
+**Diecisiete reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA CUENTA DE X ES PONDERADA, NO DE CARACTERES.** X cuenta 280
    «unidades»: un enlace vale **23** pase lo que pase (lo acorta t.co), un
@@ -1335,6 +1335,124 @@ cumple.
     teclea; una vista previa que tardara medio segundo en enterarse de
     un toque se lee como que el botón no hizo nada.
 
+17. 📣 **LO QUE LLEGA DE LAS LECTURAS ENTRA POR UNA COLA, Y SIN ETIQUETA
+    NO ENTRA.** Pedido por el autor el 24 de septiembre de 2026, con la
+    captura de la barra de subrayar y el hueco de antes de «✕ Cerrar»
+    rodeado a mano: «en las lecturas tanto de las misiones de
+    storytelling o de La Voz Prestada, cuando se seleccione algún dato
+    importante, tener la opción de enviar a redes, que está en la
+    herramienta de Redacción, que uno pueda elegir la red o una nota para
+    configurarla allí después».
+
+    Las dos barras de subrayar —la de las misiones
+    (`js/lecturas-marcador.js`, que sale en las cuarenta con lecturas o
+    prosa, las doce de storytelling incluidas) y la de La Voz Prestada—
+    llevan **📣 A redes** en ese hueco, igual sobre una selección nueva que
+    sobre una marca ya puesta. Un toque abre los destinos DENTRO de la
+    misma barra —las cinco redes y **📰 Nota**— y otro toque lo deja de
+    **borrador**: una pieza de esa red con su clase de siempre (post; guion
+    en TikTok y YouTube, con el trozo de gancho y el molde puesto), o una
+    nota del 🗃️ Banco de ideas para cuando todavía no se sabe en qué red
+    saldrá —de una nota se lleva a la red que sea con «📣 Llevar a redes»,
+    y su cita viaja con ella—. La lectura no se mueve: se vino a leer, y lo
+    mandado se termina «allí, después».
+
+    - ⚠️ **UNA COLA DEL APARATO, Y LAS DOS BARRAS ESCRIBEN EN LA MISMA**
+      (`RRD_ENTRANTES_KEY`, `faro_redaccion_entrantes_v1`). Es el puente
+      de la regla 26 de La Voz Prestada: una misión no puede hablar con
+      Supabase (el cliente único), así que deja el trozo en la cola y
+      F.A.R.O lo recoge (`rrdRecogerEntrantes`) al volver con la sesión
+      puesta (`aplicarSesion`, con un respiro, y solo si hay algo: mirar
+      la cola es leer una clave), al abrir Redacción y al volver la señal.
+      La Voz Prestada escribe en la MISMA cola aunque viva dentro de la
+      aplicación, y pide la recogida en el acto: con dos caminos uno se
+      quedaría viejo, y así lo que se prueba desde la sala es lo mismo que
+      usan las misiones.
+    - ⚠️ **SIN ETIQUETA NO ENTRA NADA, Y LA ETIQUETA VA DENTRO DEL TEXTO.**
+      Lo que se lee en esas dos pantallas lo escribió una máquina o la
+      casa imitando a alguien: las lecturas de las misiones son ejercicios
+      de estilo —cuentos «a la manera de» Borges, entrevistas IMAGINADAS
+      con gente real, careos— y La Voz Prestada existe por esa etiqueta
+      (su regla 1). Una frase de ahí publicada en X sin decirlo es, desde
+      el primer retuit, una cita falsa con el nombre al lado. Por eso la
+      etiqueta va en el propio texto de la pieza y **no como fuente** —en X
+      la fuente se va a la respuesta y en LinkedIn al primer comentario,
+      donde no la ve quien comparte—, y el lector (`rrdEntranteLimpio`)
+      descarta la entrada que no la trae, y lo dice.
+      En las misiones dice «De «T» (cuento, a la manera de Borges).
+      Ejercicio de estilo: no son palabras de Borges ni de nadie que
+      aparezca en él.», y el «ni de nadie» no es relleno: en la entrevista
+      imaginada con Forster «a la manera de Soler Serrano», a quien se le
+      ponen palabras en la boca no es al imitado. Se escribe del lado
+      prudente a propósito: decir de más que una cita real es un ejercicio
+      se ve y se arregla al redactar; callarlo de una inventada no lo ve
+      nadie. En La Voz Prestada, con las palabras de su portada: «De «T»:
+      crónica escrita por Gemini, al modo de X.» —con la concordancia
+      bien, que esto sale a la calle—.
+      ⚠️ **Y la etiqueta NO lleva guion largo**, ni delante ni de relleno
+      cuando falta un dato: es texto publicable, y la norma 1-bis no los
+      deja en nada que se publique. La primera versión empezaba por «— De»
+      y la cazó la sonda del arranque, que vigila la raya en `js/auth.js`:
+      el fallo de verdad no estaba ahí, estaba en lo que iba a salir a X.
+      Las dos sondas lo miran ahora en la etiqueta que se manda.
+      Lo que una lectura dice de sí misma lo lee `origenDe`, en
+      `js/lecturas.js` y en UN sitio: el puente a La Voz Prestada usa lo
+      mismo. Y el «a la manera de» sale SOLO del rótulo: el mapa `VOZ` de
+      ese archivo tiene «Debate» y «Quintero y Gala», que no son a quién
+      se imita.
+    - ⚠️ **LAS FUENTES DE VERDAD VIAJAN CON EL TROZO.** Desde La Voz
+      Prestada, si lo seleccionado lleva una llamada que casa con la
+      bibliografía («[1]», «(Harari, 2014)», su regla 27), esa entrada va
+      como fuente de la pieza —casada por `vozLlamadasEn`, la misma función
+      que la pinta, para que lo mandado y lo visto no digan cosas
+      distintas— y Redes la saca donde cada red la admite (la regla 2 de
+      aquí). Un dato sin su fuente es justo lo que no se publica.
+    - ⚠️ **EL IDENTIFICADOR SALE DEL TROZO Y DEL DESTINO** (una huella de
+      dónde está y a dónde va), nunca del azar: dos toques no crían
+      gemelas, reenviarlo **no pisa la pieza viva** —puede llevar ya el
+      trabajo de redactarla— y una retirada solo vuelve si el envío es más
+      nuevo que su lápida. Son las tres reglas con dueño del puente.
+    - ⚠️ **SE RECOGE CON LA NUBE YA CONTESTADA.** Una pieza hecha a ciegas
+      llevaría el reloj de AHORA y le ganaría a la misma pieza ya trabajada
+      en otro aparato, sin dar ningún error (La Voz Prestada, regla 35).
+      Sin señal el trozo espera en la cola y se dice; sin tabla o sin
+      sesión no hay nube que consultar y se hace aquí, que subirá con las
+      demás cuando la haya. Y la recogida va **una a la vez**
+      (`_rrdRecogiendo`) y con reloj propio en lo que pide a la base.
+    - ⚠️ **UNA NOTA NACE EN LA BASE** —el identificador lo pone la base—,
+      así que sin señal no se crea y espera. Para no crear dos al recoger
+      dos veces, o desde dos aparatos, el cuerpo lleva el identificador
+      del trozo (`data-trozo`) y se pregunta por él antes de crear. Y el
+      cuerpo se arma con NODOS (`redCuerpoDeTrozo`): el trozo va a parar a
+      un HTML que el editor pinta con `innerHTML`, y el navegador escapa lo
+      que serializa; una cadena montada a mano, no.
+      ⚠️ **Se le pregunta a la BASE cada vez, y no a un apunte del
+      aparato.** La primera versión apuntaba en el aparato las notas ya
+      hechas, y ese apunte decía «ya salió» también de una nota tirada a
+      la papelera: volver a mandar el trozo no hacía nada, y justo en el
+      aparato donde más se hace, el mismo. Ahora, si todas las notas de
+      ese trozo están en la papelera, manda la regla del puente: **vuelve
+      LA MISMA nota si el envío es más nuevo que la lápida** (tirada ayer y
+      mandada hoy), y se queda donde la dejaron si no. Se pide `*` y no una
+      lista de columnas, porque la papelera puede no existir en una base
+      vieja y una columna que falta rebota la consulta entera. Y si lo
+      único que pasó es que ya estaba, **se dice** («Ese trozo ya estaba
+      en Redacción: no se duplica»): si no, reenviar parecería no llegar.
+    - ⚠️ **SON DOS TOQUES, Y EL PRIMERO NO PUEDE LLEVARSE LA SELECCIÓN.**
+      En una tableta, tocar otra cosa suelta la selección, y las dos barras
+      se cierran cuando la selección se mueve: se cerrarían entre el 📣 y
+      la red. El `pointerdown` de esos botones va cancelado —el truco del
+      𝗡 Negrita, regla 14— y el toque llega igual.
+    - **Las redes de la barra salen de `RRD_REDES`** en La Voz Prestada; en
+      las misiones, que no cargan los archivos de la aplicación, van
+      escritas, y su sonda las compara con las de aquí cargando este
+      archivo en un marco aparte. Lo que entró así lleva en la lista
+      **📖 De una lectura**, como lo de la revista lleva 📰.
+    - **Y no pide SQL nuevo**: las piezas van a `redaccion_redes` y las
+      notas a `redaccion_notas`. Mientras `redaccion_redes.sql` siga sin
+      correr (está en el plan), las piezas viven en el aparato donde se
+      mandaron, como todo lo de Redes, y la barra lo dice.
+
 **Antes de publicar un cambio de las redes:**
 
 ```
@@ -1398,6 +1516,14 @@ espacio no cambie nada y lo diga, que el aviso salga con lo que se pierde
 solo en una pieza de X), y que el corrector señale la negrita con su
 regla sobre el trozo exacto sin que ninguna otra mire dentro, cazando la
 errata de fuera igual.
+
+Lo que llega de las lecturas (regla 17) se prueba de punta a punta desde
+donde se manda: la comprobación **43** de `_dev/probe-voz-prestada.html`
+selecciona, pulsa 📣 y la red, y mira lo que RECIBIÓ la tabla —con la
+etiqueta dentro, la fuente citada, sin gemelas y sin pisar lo redactado—;
+y la costura con las misiones, en `_dev/probe-lecturas-marcador.html`,
+que le pasa lo que escribió la barra de una misión al lector de verdad
+(`rrdEntranteLimpio`) cargando este archivo en un marco aparte.
 
 Y el SQL, contra un PostgreSQL de verdad, con el servidor de la sesión
 levantado como dice el apartado de La Voz Prestada:
@@ -2692,7 +2818,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Cuarenta reglas, y ninguna es de adorno:**
+**Cuarenta y una reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -4589,6 +4715,31 @@ el diseño.
    **Y no hizo falta correr ni una línea de SQL**: agrupar y plegar es cómo
    se miran los estantes de la regla 32, no una propiedad nueva del texto.
 
+41. 📣 **UN TROZO DE LA LECTURA SE MANDA A REDACCIÓN, CON SU ETIQUETA
+   DENTRO.** Pedido por el autor el 24 de septiembre de 2026 con la
+   captura de la barra de subrayar y el hueco de antes de «✕ Cerrar»
+   rodeado a mano. La regla larga es la 17 de las redes de Redacción, que
+   es quien recibe y quien manda sobre el formato; aquí va lo que es de
+   la sala:
+
+   - ⚠️ **ES LO ÚNICO DE LA SALA QUE SALE A LA CALLE, y por eso la regla 1
+     muerde aquí más que en ningún sitio.** El trozo lleva dentro, con las
+     palabras de la portada, qué es, qué lo escribió y a quién imita («De
+     «T»: crónica escrita por Gemini, al modo de X.»), y no como fuente.
+     Es la regla 2 —el copiado lleva la etiqueta dentro— llevada a una
+     red. **Sin guion largo** (norma 1-bis): esto se publica.
+   - ⚠️ **Y las fuentes de verdad van con él**: las llamadas del trozo que
+     casan con la bibliografía (regla 27), casadas por `vozLlamadasEn`,
+     la misma función que las pinta.
+   - ⚠️ **NO MUEVE LA LECTURA.** Se escribe en la cola del aparato, la
+     barra se cierra y la sala sigue en la misma página. Y el aviso lo da
+     la sala (`vozAviso`), con Redes recogiendo **callado**: el `toast()`
+     de la aplicación vive por debajo y no se vería.
+   - Los destinos se abren **dentro de la barra** y salen de `RRD_REDES`;
+     la barra crecida se recoloca con `vozColocarFlotante`, la de siempre,
+     para no tapar el trozo que se manda. Con la nota abierta los destinos
+     se cierran, y al revés: apiladas, la barra se saldría de la hoja.
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -4771,6 +4922,20 @@ no compartan llave, que abrir no escriba **ni una fila** en la nube, que
 buscando se abran y que al borrar la búsqueda vuelvan a estar como
 estaban, y que con un solo montón no haya mando ninguno. Los rótulos **se
 pulsan**, y el alto del botón se mide en píxeles (44).
+
+La comprobación **43** es 📣 A redes, de punta a punta y por gravedad:
+que el trozo llegue a la tabla de Redes **sin su etiqueta** (se mira lo
+que RECIBIÓ la base de mentira, que exige las columnas del propio
+`redaccion_redes.sql` y los `check` de la de verdad, no la pantalla); que
+el dato pierda la fuente que traía citada; que el trozo escriba HTML (se
+le pone un `<img onerror>` y se mira el cuerpo de la nota); que dos
+envíos críen gemelas o pisen lo ya redactado; que la lectura se mueva al
+mandar; que el primer toque se lleve la selección; que la etiqueta lleve
+guion largo, que saldría publicado; y que una nota tirada a la papelera no
+vuelva nunca al mandar otra vez el trozo, o que la saque un envío más viejo
+que su lápida (la base de mentira contesta el `select` como PostgREST y
+apunta el `update` que la saca). Y dos de la regla 17: sin etiqueta no
+entra, y sin señal espera en la cola en vez de crear a ciegas.
 
 La comprobación **37** son los recursos de refuerzo, y mira lo que de
 verdad puede salir mal: que una dirección `javascript:` llegue a un

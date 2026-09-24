@@ -83,6 +83,24 @@
     duda:   { bg: '#e9d5ff', fw: '#7e22ce', sub: 'border-bottom:1.4pt dashed #7e22ce;' },
   };
 
+  /* 📣 A REDES: a dónde puede ir un trozo. Son las redes de Redacción →
+     📣 Redes (RRD_REDES, en js/tools/redaccion-redes.js), escritas aquí
+     porque una misión no carga los archivos de la aplicación; la sonda
+     de este aparato compara las dos listas, y una red que falte aquí
+     sale en su informe. «Nota» es una nota del banco de ideas de la
+     revista, para cuando todavía no se sabe en qué red saldrá. */
+  const DESTINOS = [
+    { id: 'x',        t: 'X' },
+    { id: 'facebook', t: 'Facebook' },
+    { id: 'linkedin', t: 'LinkedIn' },
+    { id: 'tiktok',   t: 'TikTok' },
+    { id: 'youtube',  t: 'YouTube' },
+    { id: 'nota',     t: '📰 Nota' },
+  ];
+  /* La MISMA cola que recoge Redacción (RRD_ENTRANTES_KEY): la misión la
+     escribe y F.A.R.O la recoge al volver. La sonda compara la clave. */
+  const COLA_REDACCION = 'faro_redaccion_entrantes_v1';
+
   /* Secciones con prosa de estudio, para las misiones que no tienen
      Lecturas. No entran Quiz, Flashcards, Sopa ni las demás: ahí no hay
      nada que subrayar, hay ejercicios que resolver. */
@@ -524,8 +542,21 @@
          En un botón aparte habría que soltar el texto, buscarlo y volver. */
       + '<button type="button" class="fm-acc fm-acc-lugar" id="fmBtnAqui">🔖 Aquí me quedé</button>'
       + '<button type="button" class="fm-acc fm-acc-quita" id="fmBtnQuita">🗑 Quitar</button>'
+      /* 📣 A redes: el trozo, a Redacción de F.A.R.O (pedido del autor el
+         24 de septiembre de 2026). En el hueco de antes de «Cerrar», y
+         lo mismo sobre una selección nueva que sobre una marca puesta. */
+      + '<button type="button" class="fm-acc fm-acc-redes" id="fmBtnRedes" aria-expanded="false"'
+      + ' aria-controls="fmDestinos">📣 A redes</button>'
       + '<button type="button" class="fm-acc" id="fmBtnCierra">✕ Cerrar</button>'
-      + '</div>';
+      + '</div>'
+      /* Los destinos se abren DENTRO de la barra: el trozo sigue a la
+         vista y es un toque más, no una ventana encima de otra. */
+      + '<div class="fm-destinos" id="fmDestinos" hidden>'
+      + '<p class="fm-dest-nota">¿Para dónde? Queda de borrador en F.A.R.O → Redacción, con su'
+      + ' etiqueta. «Nota» si aún no sabes en qué red saldrá.</p>'
+      + '<div class="fm-dest-fila">'
+      + DESTINOS.map(d => '<button type="button" class="fm-dest" data-destino="' + d.id + '">' + d.t + '</button>').join('')
+      + '</div></div>';
     document.body.appendChild(b);
     b.querySelectorAll('.fm-color').forEach(btn =>
       btn.addEventListener('click', () => marcarCon(btn.dataset.cat)));
@@ -535,6 +566,19 @@
       if (editando) quitarMarca(editando); else cerrarBarra();
     });
     document.getElementById('fmBtnCierra').addEventListener('click', () => { cerrarBarra(); limpiarSeleccion(); });
+    document.getElementById('fmBtnRedes').addEventListener('click', alternarDestinos);
+    b.querySelectorAll('.fm-dest').forEach(btn =>
+      btn.addEventListener('click', () => aRedes(btn.dataset.destino)));
+    /* ⚠️ Aquí son DOS toques (📣 y la red), y en una tableta el primero
+       puede llevarse la selección: el navegador la suelta al tocar otra
+       cosa y, a los 260 ms, la barra se cerraría sola antes del segundo
+       toque. Cancelar el dedo AL BAJAR sobre estos botones deja la
+       selección donde estaba; el toque llega igual. Es lo que ya hace el
+       botón 𝗡 Negrita de Redacción → Redes con su recuadro. */
+    [document.getElementById('fmBtnRedes')].concat([...b.querySelectorAll('.fm-dest')]).forEach(btn => {
+      btn.addEventListener('pointerdown', e => e.preventDefault());
+      btn.addEventListener('mousedown', e => e.preventDefault());
+    });
   }
 
   function abrirBarra(texto, catActual, hayMarca, rect) {
@@ -548,9 +592,115 @@
        trozo nuevo al que llevar la marca de lectura, así que el botón se
        calla en vez de mentir. */
     document.getElementById('fmBtnAqui').style.display = hayMarca ? 'none' : '';
+    document.getElementById('fmDestinos').hidden = true;
+    document.getElementById('fmBtnRedes').setAttribute('aria-expanded', 'false');
     b.classList.add('fm-abierta');
     anclaRect = rect || null;
     colocarBarra();
+  }
+
+  /* ─────────────── 📣 A redes: un trozo, a Redacción ───────────────
+     Pedido por el autor el 24 de septiembre de 2026, con la captura de la
+     barra y el hueco rodeado a mano: «cuando se seleccione algún dato
+     importante, tener la opción de enviar a redes, que está en la
+     herramienta de Redacción, que uno pueda elegir la red o una nota para
+     configurarla allí después».
+
+     CÓMO VIAJA, y por qué así: igual que el puente a La Voz Prestada de
+     js/lecturas.js. La misión NO habla con Supabase (la regla del cliente
+     único): deja el trozo en una cola del aparato (misiones y aplicación
+     comparten origen) y F.A.R.O la recoge al volver, con su sesión, y lo
+     convierte en una pieza de 📣 Redes o en una nota del banco de ideas.
+
+     ⚠️ LA ETIQUETA VA DENTRO, Y ES LO QUE MÁS IMPORTA DE TODO ESTO. Las
+     lecturas de las misiones son ejercicios de estilo: cuentos «a la
+     manera de» Borges, entrevistas IMAGINADAS con gente real, careos
+     escritos por la casa. Una frase de ahí publicada en X sin decirlo es
+     una cita falsa de Borges, o de Forster, con su nombre al lado. Así
+     que el trozo lleva escrito de dónde sale y que no son palabras de
+     nadie de los que aparecen, y Redacción no deja entrar uno sin eso.
+     Es la regla 1 de La Voz Prestada llevada a donde más muerde: a la
+     calle. Y se escribe del lado prudente a propósito: decir de más que
+     una cita real es un ejercicio se ve y se arregla al redactar; no
+     decirlo de una inventada no lo ve nadie.
+
+     ⚠️ EL IDENTIFICADOR SALE DEL TROZO Y DEL DESTINO, no del azar: dos
+     toques no crían dos piezas, y reenviarlo no pisa la que ya se
+     redactó en Redacción (lo decide quien recoge). */
+  function alternarDestinos() {
+    const d = document.getElementById('fmDestinos');
+    if (!d) return;
+    d.hidden = !d.hidden;
+    document.getElementById('fmBtnRedes').setAttribute('aria-expanded', String(!d.hidden));
+    /* La barra crece: se recoloca para no tapar el trozo que se manda. */
+    colocarBarra();
+  }
+  function huella(s) {
+    let h1 = 0x811c9dc5, h2 = 0x9747b28c;
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charCodeAt(i);
+      h1 = Math.imul(h1 ^ c, 16777619) >>> 0;
+      h2 = Math.imul(h2 ^ c, 2246822519) >>> 0;
+    }
+    return h1.toString(36) + h2.toString(36);
+  }
+  function nombreDeMision() {
+    const h1 = document.querySelector('h1');
+    return ((h1 && h1.textContent) || document.title || '').replace(/\s+/g, ' ').trim();
+  }
+  /* Qué es el trozo y de dónde sale, dicho para que se pueda publicar. */
+  function etiquetaDe(z) {
+    const esLectura = !!(z && z.raiz && z.raiz.id && /^lect-/.test(z.raiz.id));
+    if (esLectura) {
+      /* Lo que la lectura dice de sí misma lo lee js/lecturas.js, en un
+         solo sitio (el puente a La Voz Prestada usa lo mismo). Si ese
+         archivo no está, la etiqueta sale igual, sin el «a la manera de»:
+         todas las lecturas de las misiones son ejercicios de la casa. */
+      const o = (window.FaroLecturas && typeof window.FaroLecturas.origenDe === 'function')
+        ? window.FaroLecturas.origenDe(z.clave) : null;
+      const titulo = (o && o.titulo) || z.titulo;
+      const par = o && o.parentesis ? ' (' + o.parentesis + ')' : '';
+      const quien = o && o.imita ? o.imita + ' ni de ' : '';
+      return { titulo: titulo,
+               etiqueta: 'De «' + titulo + '»' + par + '. Ejercicio de estilo: no son palabras de ' + quien + 'nadie que aparezca en él.' };
+    }
+    const mision = nombreDeMision();
+    if (esFicha()) return { titulo: mision, etiqueta: 'De la ficha «' + mision + '»' + (z ? ' (' + z.titulo + ')' : '') + '.' };
+    return { titulo: mision, etiqueta: 'De la misión «' + mision + '»' + (z ? ' (' + z.titulo + ')' : '') + '.' };
+  }
+  function aRedes(destino) {
+    let s = null;
+    if (editando) {
+      const m = marcas.find(x => x.id === editando);
+      if (m) s = { l: m.l, p: m.p, i: m.i, f: m.f, t: m.t };
+    } else if (seleccion) {
+      s = seleccion;
+    }
+    if (!s || !String(s.t || '').trim()) { aviso('Selecciona un trozo del texto'); return; }
+    const et = etiquetaDe(zonaDe(s.l));
+    const entrada = {
+      id: 'rl-' + huella(['mision', CLAVE, s.l, s.p, s.i, s.f, destino].join('|')),
+      destino: destino,
+      trozo: s.t,
+      etiqueta: et.etiqueta,
+      titulo: et.titulo || '',
+      fuentes: [],
+      origen: 'mision',
+      cuando: ahora(),
+    };
+    try {
+      const cola = (JSON.parse(localStorage.getItem(COLA_REDACCION) || '[]') || [])
+        .filter(x => x && x.id !== entrada.id);
+      cola.push(entrada);
+      localStorage.setItem(COLA_REDACCION, JSON.stringify(cola));
+    } catch (e) { aviso('⚠️ No se pudo guardar en este aparato'); return; }
+    cerrarBarra();
+    limpiarSeleccion();
+    sonido('click');
+    const d = DESTINOS.find(x => x.id === destino);
+    aviso(destino === 'nota'
+      ? '📰 Guardado como nota: entra a Redacción al volver a F.A.R.O'
+      : '📣 Guardado para ' + (d ? d.t : destino) + ': entra a Redacción → Redes al volver a F.A.R.O');
   }
 
   /* ── DÓNDE SE ABRE LA BARRA ──────────────────────────────────────
@@ -1523,6 +1673,9 @@
     impresionExtra: impresionExtra,
     leyendaImpresa: leyendaImpresa,
     categorias: CATS,
+    /* Para la sonda: comparar con la lista y la clave de Redacción. */
+    destinosRedaccion: DESTINOS.map(d => d.id),
+    colaRedaccion: COLA_REDACCION,
     marcas: function () { return vivas().slice(); },
     todas: function () { return marcas.slice(); },
     zonas: function () { return zonas().map(z => ({ clave: z.clave, titulo: z.titulo, parrafos: z.parrafos.length })); },

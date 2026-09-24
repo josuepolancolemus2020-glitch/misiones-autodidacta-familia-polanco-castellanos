@@ -142,11 +142,40 @@ async function columnasDeVozActividades(){
   return cols;
 }
 
+/* Lo mismo para las tablas de Redacción a las que llega 📣 A redes
+   (sección 43): las columnas salen de SU archivo SQL, y la base de
+   mentira rebota como PostgREST cuando se le manda una que no existe.
+   Una lista escrita aquí sería el doble complaciente de la regla 13. */
+let RRD_COLS_SONDA = null, NOTAS_COLS_SONDA = null;
+async function columnasDeTabla(archivo, tabla){
+  const r = await fetch('/supabase/sql/' + archivo);
+  if (!r.ok) throw new Error('no se pudo leer ' + archivo + ': ' + r.status);
+  const sql = await r.text();
+  const re = new RegExp('create table if not exists public\\.' + tabla + '\\s*\\(([\\s\\S]*?)\\n\\);', 'i');
+  const cuerpo = (sql.match(re) || [])[1];
+  if (!cuerpo) throw new Error('no encontré el create table de ' + tabla + ' en ' + archivo);
+  const cols = [];
+  cuerpo.split('\n').forEach(l => {
+    const m = l.match(/^\s{2}([a-z_]+)\s+(text|jsonb|uuid|boolean|bigint|int|integer|timestamptz|date)\b/);
+    if (m) cols.push(m[1]);
+  });
+  let a; const re2 = new RegExp('alter table public\\.' + tabla + ' add column if not exists\\s+([a-z_]+)', 'gi');
+  while ((a = re2.exec(sql))) if (cols.indexOf(a[1]) < 0) cols.push(a[1]);
+  if (cols.length < 5) throw new Error('saqué solo ' + cols.length + ' columnas de ' + tabla);
+  return cols;
+}
+
+function rrdAvisoSonda(w, res) {
+  try { return w.eval('rrdAvisoRecogida(' + JSON.stringify(res) + ')'); } catch (e) { return '?'; }
+}
+
 /* ── La base de datos de mentira ────────────────────────────────── */
 function nuevaBase(w, opciones){
   const o = opciones || {};
   const estado = { filas: o.filas || [], llamadas: [], escritas: [], marcas: o.marcas || [], marcasEscritas: [],
-                   act: o.act || [], actEscritas: [], recs: o.recs || [], recsEscritos: [], oembed: [] };
+                   act: o.act || [], actEscritas: [], recs: o.recs || [], recsEscritos: [], oembed: [],
+                   piezas: o.piezas || [], piezasEscritas: [], notas: o.notas || [], notasEscritas: [],
+                   notasActualizadas: [], notaId: 100 };
   /* Las columnas que esta base NO tiene. `sinGenero` se queda por lo
      que ya estaba escrito; `faltan` sirve para cualquiera de las
      nuevas, que ya son dos. */
@@ -268,6 +297,99 @@ function nuevaBase(w, opciones){
         estado.actEscritas.push(fila);
       }
       return json([], 201);
+    }
+    /* ⚠️ LAS DOS TABLAS DE REDACCIÓN A LAS QUE LLEGA 📣 A REDES, y este
+       doble exige lo MISMO que la base de verdad: las columnas de su SQL
+       (una que no exista rebota la escritura entera, como PostgREST), el
+       tope de largo del identificador, la forma del enlace, fuentes que
+       sean lista y opciones que sean objeto. Si aceptara cualquier cosa,
+       la sonda aprobaría una pieza que Supabase rechaza —el fallo del 10
+       de septiembre con otra cara—. */
+    if (/redaccion_redes/.test(u.pathname)) {
+      estado.llamadas.push({ m, url: u.pathname + u.search, cuerpo: init && init.body });
+      if (o.sinTablaRedes) return json({ code: '42P01', message: 'relation "public.redaccion_redes" does not exist' }, 404);
+      if (o.sinSenalRedes) throw new TypeError('Failed to fetch');
+      const cols = RRD_COLS_SONDA || [];
+      if (m === 'GET') {
+        const pedidas = (u.searchParams.get('select') || '').split(',').map(x => x.trim()).filter(Boolean);
+        const mala = pedidas.find(c => cols.indexOf(c) < 0);
+        if (mala) return json({ code: '42703', message: 'column redaccion_redes.' + mala + ' does not exist' }, 400);
+        return json(estado.piezas);
+      }
+      let cuerpo = null;
+      try { cuerpo = JSON.parse(init && init.body); } catch (e) {}
+      const filas = Array.isArray(cuerpo) ? cuerpo : (cuerpo ? [cuerpo] : []);
+      for (const fila of filas) {
+        const sobra = Object.keys(fila).find(c => cols.indexOf(c) < 0);
+        if (sobra) return json({ code: 'PGRST204', message: "Could not find the '" + sobra + "' column of 'redaccion_redes' in the schema cache" }, 400);
+        const id = String(fila.id || '');
+        if (id.length < 4 || id.length > 60) return json({ code: '23514', message: 'violates check constraint "redaccion_redes_id_check"' }, 400);
+        if (!fila.red || String(fila.red).length > 20 || !fila.clase || String(fila.clase).length > 20) return json({ code: '23514', message: 'violates check constraint "redaccion_redes_red_check"' }, 400);
+        if (String(fila.titulo || '').length > 200 || String(fila.texto || '').length > 70000) return json({ code: '23514', message: 'violates check constraint "redaccion_redes_texto_check"' }, 400);
+        const en = String(fila.enlace || '');
+        if (en && (!/^https?:\/\//.test(en) || /[\s"'<>\\]/.test(en))) return json({ code: '23514', message: 'violates check constraint "redaccion_redes_enlace_check"' }, 400);
+        if (!Array.isArray(fila.fuentes)) return json({ code: '23514', message: 'violates check constraint "redaccion_redes_fuentes_check"' }, 400);
+        if (!fila.opciones || typeof fila.opciones !== 'object' || Array.isArray(fila.opciones) || JSON.stringify(fila.opciones).length > 2000) {
+          return json({ code: '23514', message: 'violates check constraint "redaccion_redes_opciones_check"' }, 400);
+        }
+        estado.piezas = estado.piezas.filter(x => x.id !== fila.id).concat([fila]);
+        estado.piezasEscritas.push(fila);
+      }
+      return json([], 201);
+    }
+    if (/redaccion_notas/.test(u.pathname)) {
+      estado.llamadas.push({ m, url: u.pathname + u.search, cuerpo: init && init.body });
+      if (o.sinSenalNotas) throw new TypeError('Failed to fetch');
+      const cols = NOTAS_COLS_SONDA || [];
+      /* Las columnas pedidas, como las contesta PostgREST: una que no
+         exista rebota la consulta ENTERA (42703), y `*` las trae todas.
+         Contestar siempre lo mismo mirase lo que mirase el `select` es el
+         doble complaciente del taller (regla 35): aprobaba una consulta
+         que la base de verdad rechaza. */
+      const pedidas = (u.searchParams.get('select') || '*').split(',').map(x => x.trim()).filter(Boolean);
+      const malaN = pedidas.find(c => c !== '*' && cols.indexOf(c) < 0);
+      if (malaN) return json({ code: '42703', message: 'column redaccion_notas.' + malaN + ' does not exist' }, 400);
+      const proyecta = n => pedidas.indexOf('*') >= 0 ? Object.assign({}, n)
+        : Object.fromEntries(pedidas.map(c => [c, n[c] === undefined ? null : n[c]]));
+      if (m === 'GET') {
+        const like = u.searchParams.get('cuerpo') || '';
+        let lista = estado.notas;
+        if (like) {
+          const patron = like.replace(/^like\./, '').replace(/[%*]/g, '');
+          lista = lista.filter(n => String(n.cuerpo || '').indexOf(patron) >= 0);
+        }
+        const tope = Number(u.searchParams.get('limit')) || lista.length;
+        return json(lista.slice(0, tope).map(proyecta));
+      }
+      /* Sacar de la papelera es un `update`: se apunta lo que llegó, y
+         una columna que no exista rebota como en la de verdad. */
+      if (m === 'PATCH') {
+        let campos = null;
+        try { campos = JSON.parse(init && init.body); } catch (e) {}
+        if (!campos || typeof campos !== 'object') return json({ code: '400', message: 'sin cuerpo' }, 400);
+        const sobraP = Object.keys(campos).find(c => cols.indexOf(c) < 0);
+        if (sobraP) return json({ code: 'PGRST204', message: "Could not find the '" + sobraP + "' column of 'redaccion_notas' in the schema cache" }, 400);
+        const idq = String(u.searchParams.get('id') || '').replace(/^eq\./, '');
+        const n = estado.notas.find(x => String(x.id) === idq);
+        if (n) { Object.assign(n, campos); estado.notasActualizadas.push({ id: n.id, campos: campos }); }
+        return new Response(null, { status: 204 });
+      }
+      let fila = null;
+      try { fila = JSON.parse(init && init.body); } catch (e) {}
+      if (Array.isArray(fila)) fila = fila[0];
+      if (!fila) return json({ code: '400', message: 'sin cuerpo' }, 400);
+      const sobra = Object.keys(fila).find(c => cols.indexOf(c) < 0);
+      if (sobra) return json({ code: 'PGRST204', message: "Could not find the '" + sobra + "' column of 'redaccion_notas' in the schema cache" }, 400);
+      if (!fila.autor) return json({ code: '23502', message: 'null value in column "autor" violates not-null constraint' }, 400);
+      const nueva = Object.assign({ id: ++estado.notaId, creado_at: new Date().toISOString(),
+        actualizado_at: new Date().toISOString(), eliminada: false }, fila);
+      estado.notas.push(nueva);
+      estado.notasEscritas.push(nueva);
+      /* `.single()` pide UN objeto con su cabecera Accept; sin ella,
+         PostgREST devuelve la lista. */
+      const h = init && init.headers;
+      const acc = h ? (typeof h.get === 'function' ? (h.get('Accept') || '') : (h.Accept || h.accept || '')) : '';
+      return json(/pgrst\.object/.test(acc) ? nueva : [nueva], 201);
     }
     if (!/voz_prestada/.test(u.pathname)) return json([]);
     estado.llamadas.push({ m, url: u.pathname + u.search, cuerpo: init && init.body });
@@ -4091,6 +4213,260 @@ function filasHoja(d){
      && d.querySelectorAll('#voz-lista .voz-grupo')[0].hidden === false,
      'y sin agrupar no hay rótulos ni nada plegado: el anaquel de siempre',
      'sin agrupar quedó algo plegado');
+
+  /* ── 43. 📣 A REDES: UN TROZO DE LA LECTURA, A REDACCIÓN ──
+     Pedido el 24 de septiembre de 2026, con la captura de la barra y el
+     hueco de antes de «✕ Cerrar» rodeado a mano. Lo que se mira, por
+     gravedad:
+       1. ⚠️ que el trozo llegue a Redes SIN su etiqueta: es un texto
+          escrito por una máquina imitando a alguien, y en X sin decirlo
+          es una cita falsa. Se mira lo que RECIBIÓ la tabla, no la pantalla;
+       2. que un dato pierda por el camino la fuente que traía citada;
+       3. que el trozo escriba HTML (se le pone veneno y se mira la nota);
+       4. que dos toques críen dos piezas, o que reenviar pise lo redactado;
+       5. que la lectura se mueva al mandar, que es lo que se pidió evitar;
+       6. que el primer toque se lleve la selección (son dos toques);
+       7. que una nota tirada a la papelera no vuelva nunca al mandar el
+          trozo otra vez, o que la saque un envío más viejo que la lápida;
+       8. que la etiqueta lleve guion largo: sale publicada (norma 1-bis). */
+  log('── 43. 📣 A redes: un trozo de la lectura, a Redacción ──');
+  RRD_COLS_SONDA = await columnasDeTabla('redaccion_redes.sql', 'redaccion_redes');
+  NOTAS_COLS_SONDA = await columnasDeTabla('redaccion_tables.sql', 'redaccion_notas');
+  const base43 = nuevaBase(w, {});
+  const relleno43 = [...Array(10)].map((_, i) => ({ k: 'p', t: 'Párrafo de relleno número ' + (i + 1) + '. ' +
+    'La ceremonia siguió su curso por la avenida principal, con música, banderas y gente asomada a los balcones. '.repeat(3) }));
+  const P43 = 'El traslado se decidió en 2026 según el decreto publicado ese mismo mes [1], y la ceremonia duró tres horas con música y banderas por el recorrido entero.';
+  const V43 = 'Un párrafo con <img src=x onerror="window.__veneno43=1"> escrito dentro como texto, para ver que no se pinta como HTML en ninguna parte del camino.';
+  const c43 = Object.assign(cuentoLargo('c43'), {
+    titulo: 'Los papeles del prócer', voz: 'un informe de investigación', maquina: 'Gemini', genero: 'cronica',
+    puesto_por: VOZ_UID, actualizado: Date.now(),
+    capitulos: [
+      { t: 'Capítulo 1', p: [{ k: 'p', t: P43 }, { k: 'p', t: V43 }].concat(relleno43) },
+      { t: 'Referencias', ref: true, p: [{ k: 'fuente', n: 1, t: 'Diario Oficial La Gaceta, Decreto 12-2026, 3 de septiembre de 2026.' }] },
+    ],
+  });
+  w.eval(`_vozCuentos = [${JSON.stringify(c43)}]; vozGuardaLocal();
+          ['faro_redaccion_entrantes_v1', 'faro_redaccion_redes_v1', 'faro_voz_subrayados_v1']
+            .forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+          _rrdPiezas = []; _rrdCargada = false; _rrdNube = 'mirando'; _rrdHayTabla = false;
+          _vozAj.modo = 'paginas'; _vozAj.paso = 'deslizar'; _vozAj.tam = 19; vozGuardaAjustes();
+          vozRender(); vozAbrirLector('c43')`);
+  await esperar(900);
+  w.eval('vozIrPagina(0, true)');
+  await esperar(300);
+  /* Seleccionar por desplazamiento sobre el TEXTO del bloque, cruzando
+     los nodos que haga falta: el trozo lleva dentro la llamada «[1]», que
+     la sala pinta como su propio nodo. */
+  const seleccionaEn43 = (vp, ini, fin) => JSON.parse(w.eval(`(function(){
+    const el = document.querySelector('#voz-texto [data-cap="0"][data-vp="${vp}"]');
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let pos = 0, n, a = null, b = null;
+    while ((n = tw.nextNode())) {
+      const len = n.nodeValue.length;
+      if (!a && ${ini} <= pos + len) a = [n, ${ini} - pos];
+      if (!b && ${fin} <= pos + len) { b = [n, ${fin} - pos]; break; }
+      pos += len;
+    }
+    const r = document.createRange(); r.setStart(a[0], a[1]); r.setEnd(b[0], b[1]);
+    const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    return JSON.stringify({ t: r.toString() });
+  })()`));
+  const ini43 = P43.indexOf('decreto'), fin43 = P43.indexOf('[1]') + 3;
+  const sel43 = seleccionaEn43(0, ini43, fin43);
+  await esperar(VOZ_SUB_ESPERA_SONDA);
+  const barra43 = d.getElementById('voz-subbar');
+  const bRedes43 = barra43 && barra43.querySelector('.voz-subbar-redes');
+  ok(!!barra43 && !barra43.hidden && !!bRedes43 && bRedes43.getBoundingClientRect().width > 0,
+     'la barra de subrayar trae «📣 A redes» a la vista', 'no está el botón «📣 A redes» en la barra');
+  ok(!!bRedes43 && bRedes43.nextElementSibling && bRedes43.nextElementSibling.classList.contains('voz-subbar-cerrar'),
+     'y va en el hueco de antes de «✕ Cerrar», que es donde el autor lo pidió con su captura',
+     'el botón no está pegado a Cerrar');
+  const pd43 = new w.PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'touch', isPrimary: true });
+  ok(!!bRedes43 && bRedes43.dispatchEvent(pd43) === false,
+     'el dedo que baja sobre él no se lleva la selección (pointerdown cancelado): son dos toques y el primero no puede cerrar la barra',
+     'el pointerdown de «📣 A redes» no está cancelado');
+  const dest43 = barra43.querySelector('.voz-subbar-destinos');
+  ok(w.getComputedStyle(dest43).display === 'none', 'los destinos empiezan cerrados (display calculado)',
+     'los destinos salen abiertos: ' + w.getComputedStyle(dest43).display);
+  const pagAntes43 = Number(w.eval('_vozPagina'));
+  bRedes43.click();
+  await esperar(150);
+  ok(w.getComputedStyle(dest43).display !== 'none' && bRedes43.getAttribute('aria-expanded') === 'true',
+     'un toque los abre DENTRO de la misma barra', 'los destinos no se abrieron: ' + w.getComputedStyle(dest43).display);
+  const ids43 = [...dest43.querySelectorAll('.voz-subbar-dest')].map(x => x.dataset.destino);
+  const redes43 = JSON.parse(w.eval('JSON.stringify(RRD_REDES.map(r => r.id))'));
+  ok(JSON.stringify(ids43) === JSON.stringify(redes43.concat(['nota'])),
+     'y son las redes de Redacción → Redes, sacadas de su propia lista, más «Nota» (' + ids43.join(', ') + ')',
+     'los destinos no son los de Redes: ' + ids43.join(',') + ' / ' + redes43.join(','));
+  const r43 = dest43.getBoundingClientRect(), sr43 = d.getElementById('voz-lector').getBoundingClientRect();
+  ok(r43.left >= sr43.left - 1 && r43.right <= sr43.right + 1 && barra43.getBoundingClientRect().bottom <= sr43.bottom + 1,
+     'la barra crecida cabe entera en la sala (no se sale por los lados ni por abajo)',
+     'la barra crecida se sale: ' + JSON.stringify({ l: r43.left, r: r43.right, b: barra43.getBoundingClientRect().bottom, sala: sr43.bottom }));
+  const bX43 = dest43.querySelector('[data-destino="x"]');
+  ok(bX43.dispatchEvent(new w.PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'touch', isPrimary: true })) === false,
+     'y los destinos tampoco se llevan la selección', 'el pointerdown de un destino no está cancelado');
+  bX43.click();
+  await esperar(1500);
+  ok(barra43.hidden && Number(w.eval('_vozPagina')) === pagAntes43 && !d.getElementById('voz-lector').hidden,
+     '⚠️ y NO MUEVE LA LECTURA: la barra se cierra y la sala sigue en la misma página',
+     'mandar movió la lectura o dejó la barra abierta: página ' + w.eval('_vozPagina') + ' (antes ' + pagAntes43 + ')');
+  const aviso43 = (d.getElementById('voz-toast') || {}).textContent || '';
+  ok(/Redacción/.test(aviso43) && /X/.test(aviso43) && d.getElementById('voz-lector').contains(d.getElementById('voz-toast')),
+     'y lo dice DENTRO de la sala («' + aviso43 + '»): el aviso de la aplicación vive debajo y no se vería',
+     'el aviso no salió en la sala: «' + aviso43 + '»');
+  const pieza43 = base43.piezasEscritas.find(f => /^rl-/.test(f.id) && f.red === 'x');
+  ok(!!pieza43, 'Redacción la recogió al momento y la tabla de Redes RECIBIÓ la pieza (se mira lo que llegó, no la pantalla)',
+     'la pieza no llegó a redaccion_redes: ' + JSON.stringify(base43.llamadas.filter(l => /redaccion/.test(l.url)).map(l => l.m + ' ' + l.url)).slice(0, 300));
+  if (pieza43) {
+    ok(pieza43.texto.indexOf('«' + sel43.t + '»') === 0,
+       'con el trozo EXACTO entre comillas al principio («' + sel43.t + '»)', 'el texto no empieza por el trozo: ' + pieza43.texto.slice(0, 120));
+    ok(/Gemini/.test(pieza43.texto) && /al modo de un informe de investigación/.test(pieza43.texto) && /crónica escrita por/.test(pieza43.texto),
+       '⚠️ y con la ETIQUETA DENTRO DEL TEXTO —qué es, quién lo escribió y a quién imita—, no como fuente (en X la fuente se va a la respuesta)',
+       '⚠️ la pieza llegó sin su etiqueta en el texto: ' + pieza43.texto);
+    /* El guion largo por su escape, no puesto: una sonda que lo llevara
+       dentro se cazaría a sí misma con el grep de la casa. */
+    ok(!/\u2014/.test(pieza43.texto),
+       'y sin guion largo en ninguna parte: es texto publicable (norma 1-bis)',
+       'la pieza trae guion largo, y va a salir publicada: ' + pieza43.texto);
+    ok(pieza43.fuentes.length === 1 && /Decreto 12-2026/.test(pieza43.fuentes[0].ref),
+       '⚠️ y el dato viaja con la fuente que traía citada: la [1] del trozo es la entrada de la bibliografía',
+       '⚠️ se perdió la fuente del trozo: ' + JSON.stringify(pieza43.fuentes));
+    ok(pieza43.clase === 'post' && pieza43.opciones && pieza43.opciones.de === 'lectura' && pieza43.estado === 'borrador',
+       'como borrador de post, marcada «de una lectura» para que la lista lo diga',
+       'la pieza llegó rara: ' + JSON.stringify({ c: pieza43.clase, o: pieza43.opciones, e: pieza43.estado }));
+  }
+  ok(!w.localStorage.getItem('faro_redaccion_entrantes_v1'), 'y la cola queda vacía: lo recogido no se vuelve a recoger',
+     'la cola se quedó con: ' + w.localStorage.getItem('faro_redaccion_entrantes_v1'));
+
+  /* Dos toques, y lo redactado no se pisa. Se «redacta» la pieza —como
+     quien la abrió en Redes y la reescribió— y se vuelve a mandar el
+     mismo trozo al mismo sitio. */
+  const id43 = pieza43 ? pieza43.id : '';
+  w.eval(`(function(){ const p = rrdPieza(${JSON.stringify(id43)}); if (p) { p.texto = 'YA REDACTADA'; p.actualizado = Date.now(); rrdGuardaLocal(); } })()`);
+  const antes43 = base43.piezasEscritas.length;
+  seleccionaEn43(0, ini43, fin43);
+  await esperar(VOZ_SUB_ESPERA_SONDA);
+  barra43.querySelector('.voz-subbar-redes').click(); await esperar(120);
+  barra43.querySelector('.voz-subbar-destinos [data-destino="x"]').click();
+  await esperar(1500);
+  const vivas43 = JSON.parse(w.eval('JSON.stringify(rrdVivas().filter(p => p.id === ' + JSON.stringify(id43) + ').map(p => p.texto))'));
+  ok(vivas43.length === 1 && vivas43[0] === 'YA REDACTADA' && base43.piezasEscritas.slice(antes43).every(f => f.texto !== pieza43.texto),
+     'mandar el mismo trozo otra vez NO cría una gemela ni pisa lo que ya se redactó en Redes',
+     'el reenvío pisó o duplicó: ' + JSON.stringify(vivas43));
+
+  /* Sobre una marca ya puesta, como en la captura: el botón ocupa el
+     hueco que dejaba «Aquí me quedé», y el trozo va de nota. */
+  const ini43b = V43.indexOf('Un párrafo'), fin43b = V43.indexOf('escrito dentro') + 'escrito dentro'.length;
+  seleccionaEn43(1, ini43b, fin43b);
+  await esperar(VOZ_SUB_ESPERA_SONDA);
+  barra43.querySelector('.voz-subbar-color-dato').click();
+  await esperar(250);
+  const mk43 = d.querySelector('#voz-texto [data-cap="0"][data-vp="1"] .voz-hl');
+  ok(!!mk43, 'se subraya un trozo con veneno dentro, para tocarlo después', 'no se pintó el subrayado del trozo envenenado');
+  if (mk43) {
+    mk43.click();
+    await esperar(250);
+    ok(!barra43.hidden && barra43.querySelector('.voz-subbar-lugar').hidden && barra43.querySelector('.voz-subbar-redes').getBoundingClientRect().width > 0,
+       'sobre una marca ya puesta «📣 A redes» ocupa el hueco que deja «Aquí me quedé»',
+       'sobre la marca no sale el botón');
+    barra43.querySelector('.voz-subbar-redes').click(); await esperar(120);
+    barra43.querySelector('.voz-subbar-destinos [data-destino="nota"]').click();
+    await esperar(1500);
+    const nota43 = base43.notasEscritas[0];
+    ok(!!nota43 && nota43.estado === 'idea' && nota43.edicion_id === null && nota43.tipo === 'Idea',
+       'y con «Nota» Redacción crea una nota del 🗃️ Banco de ideas (idea, sin edición)',
+       'no llegó la nota: ' + JSON.stringify(nota43 || base43.llamadas.filter(l => /notas/.test(l.url)).map(l => l.m + ' ' + l.url)).slice(0, 300));
+    if (nota43) {
+      const tpl = d.createElement('template');
+      tpl.innerHTML = nota43.cuerpo;
+      ok(!tpl.content.querySelector('img') && nota43.cuerpo.indexOf('&lt;img') >= 0 && !w.__veneno43,
+         '⚠️ el veneno del trozo llega como TEXTO a la nota (el cuerpo se arma con nodos y el navegador escapa)',
+         '⚠️ el trozo escribió HTML en la nota: ' + nota43.cuerpo.slice(0, 200));
+      ok(/crónica escrita por Gemini, al modo de un informe de investigación/.test(tpl.content.textContent) && !!tpl.content.querySelector('[data-trozo]'),
+         'con la etiqueta dentro del cuerpo y el identificador del trozo, que es lo que la encuentra desde otro aparato',
+         'la nota no lleva su etiqueta o su identificador: ' + nota43.cuerpo.slice(0, 200));
+    }
+    /* Otra vez, al mismo destino y desde este MISMO aparato: la nota ya
+       existe y no se crea otra. Se le pregunta a la BASE por el
+       identificador del trozo, que es lo que la encuentra también desde
+       otro aparato; un apunte en este no sabría si sigue viva o si está
+       en la papelera. */
+    mk43.click(); await esperar(250);
+    barra43.querySelector('.voz-subbar-redes').click(); await esperar(120);
+    barra43.querySelector('.voz-subbar-destinos [data-destino="nota"]').click();
+    await esperar(1500);
+    ok(base43.notasEscritas.length === 1,
+       'mandarlo otra vez NO crea una segunda nota: la base la encuentra por el identificador del trozo',
+       'se crearon ' + base43.notasEscritas.length + ' notas del mismo trozo');
+
+    /* ⚠️ Y LA PAPELERA, con la regla del puente de las lecturas: una
+       lápida solo revive si el envío es MÁS NUEVO que ella. Se tira la
+       nota y se recoge un envío del mismo trozo: hecho ANTES de tirarla
+       (lo que pasa cuando otro aparato la tira mientras este aún no
+       recogía), se queda en la papelera; hecho DESPUÉS, sale LA MISMA
+       nota, sin criar otra al lado. Antes no salía nunca, y en el mismo
+       aparato ni siquiera se preguntaba a la base. */
+    const tplT = d.createElement('template');
+    tplT.innerHTML = nota43 ? nota43.cuerpo : '';
+    const idTrozo43 = ((tplT.content.querySelector('[data-trozo]') || { getAttribute: () => '' }).getAttribute('data-trozo')) || '';
+    const nb43 = nota43 && base43.notas.find(x => x.id === nota43.id);
+    if (nb43 && idTrozo43) {
+      const envio43 = cuando => `localStorage.setItem('faro_redaccion_entrantes_v1', ${JSON.stringify(JSON.stringify([{
+        id: idTrozo43, destino: 'nota', trozo: 'Un párrafo con veneno escrito dentro',
+        etiqueta: 'De «Prueba»: texto escrito por una máquina de prueba.', fuentes: [], origen: 'voz', cuando: cuando }]))})`;
+      nb43.eliminada = true;
+      nb43.eliminada_at = new Date(Date.now() + 3600e3).toISOString();   // tirada DESPUÉS del envío
+      w.eval(envio43(Date.now()));
+      const rP1 = JSON.parse(await w.eval('rrdRecogerEntrantes({ callado: true }).then(r => JSON.stringify(r))'));
+      const avP1 = rrdAvisoSonda(w, rP1);
+      ok(rP1.yaEstaban === 1 && nb43.eliminada === true && base43.notasActualizadas.length === 0 && base43.notasEscritas.length === 1,
+         '⚠️ una nota tirada a la papelera DESPUÉS del envío se queda allí: un envío viejo no la saca',
+         'el envío viejo tocó la nota tirada: ' + JSON.stringify({ r: rP1, el: nb43.eliminada, upd: base43.notasActualizadas.length }));
+      ok(/ya estaba/.test(avP1) && /no se duplica/.test(avP1),
+         'y lo dice, para que volver a mandar no parezca que no llegó («' + avP1 + '»)',
+         'si lo único que pasó es que ya estaba, no se dice: «' + avP1 + '»');
+      nb43.eliminada_at = new Date(Date.now() - 60e3).toISOString();    // tirada ANTES del envío
+      w.eval(envio43(Date.now()));
+      const rP2 = JSON.parse(await w.eval('rrdRecogerEntrantes({ callado: true }).then(r => JSON.stringify(r))'));
+      const avP2 = rrdAvisoSonda(w, rP2);
+      ok(rP2.vuelven === 1 && nb43.eliminada === false && nb43.eliminada_at === null
+         && base43.notasActualizadas.length === 1 && base43.notasEscritas.length === 1,
+         '⚠️ y mandada DESPUÉS de tirarla, sale de la papelera LA MISMA nota, sin criar otra («' + avP2 + '»)',
+         'el envío nuevo no sacó la nota de la papelera: ' + JSON.stringify({ r: rP2, el: nb43.eliminada, upd: base43.notasActualizadas, esc: base43.notasEscritas.length }));
+      ok(!w.localStorage.getItem('faro_redaccion_entrantes_v1'),
+         'y la cola queda vacía después de las dos', 'la cola se quedó con: ' + w.localStorage.getItem('faro_redaccion_entrantes_v1'));
+    } else {
+      ok(false, '', 'no se pudo leer el identificador del trozo en la nota, para probar la papelera');
+    }
+  }
+
+  /* ⚠️ Sin etiqueta no entra nada: una entrada así en la cola (la de un
+     cliente viejo, o una escrita a mano) se descarta y se dice. */
+  w.eval(`localStorage.setItem('faro_redaccion_entrantes_v1', JSON.stringify([{ id: 'rl-sin-etiqueta', destino: 'facebook',
+          trozo: 'Una frase que llega pelada', etiqueta: '', fuentes: [], origen: 'mision', cuando: Date.now() }]))`);
+  const res43 = JSON.parse(await w.eval('rrdRecogerEntrantes({ callado: true }).then(r => JSON.stringify(r))'));
+  ok(res43.descartadas.indexOf('sin etiqueta') >= 0 && !JSON.parse(w.eval('JSON.stringify(!!rrdPieza("rl-sin-etiqueta"))')),
+     '⚠️ un trozo SIN etiqueta no entra a Redes: se descarta, y el recuento lo dice (' + rrdAvisoSonda(w, res43) + ')',
+     '⚠️ entró un trozo sin etiqueta: ' + JSON.stringify(res43));
+
+  /* Sin señal espera; con la señal de vuelta, entra. */
+  const baseSin43 = nuevaBase(w, { sinSenalRedes: true, piezas: base43.piezas });
+  w.eval(`_rrdNube = 'mirando'; localStorage.setItem('faro_redaccion_entrantes_v1', JSON.stringify([{ id: 'rl-sin-senal-43', destino: 'linkedin',
+          trozo: 'Un trozo mandado sin señal', etiqueta: 'De «Prueba»: texto escrito por una máquina de prueba, al modo de nadie.', fuentes: [], origen: 'voz', cuando: Date.now() }]))`);
+  const resSin43 = JSON.parse(await Promise.race([
+    w.eval('rrdRecogerEntrantes({ callado: true }).then(r => JSON.stringify(r))'),
+    esperar(12000).then(() => '{"colgada":true}'),
+  ]));
+  ok(!resSin43.colgada && resSin43.esperan === 1 && !JSON.parse(w.eval('JSON.stringify(!!rrdPieza("rl-sin-senal-43"))'))
+     && /rl-sin-senal-43/.test(w.localStorage.getItem('faro_redaccion_entrantes_v1') || ''),
+     '⚠️ sin señal NO se crea a ciegas: el trozo espera en la cola (una pieza hecha sin mirar la nube le ganaría por reloj a la misma pieza ya trabajada en otro aparato)',
+     '⚠️ sin señal pasó otra cosa: ' + JSON.stringify(resSin43));
+  const baseCon43 = nuevaBase(w, { piezas: base43.piezas });
+  const resCon43 = JSON.parse(await w.eval('rrdRecogerEntrantes({ callado: true }).then(r => JSON.stringify(r))'));
+  ok(resCon43.hechas === 1 && baseCon43.piezasEscritas.some(f => f.id === 'rl-sin-senal-43' && f.red === 'linkedin'),
+     'y con la señal de vuelta entra, y sube', 'con señal no entró: ' + JSON.stringify(resCon43));
+  w.eval('vozCerrarLector()');
+  await esperar(300);
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

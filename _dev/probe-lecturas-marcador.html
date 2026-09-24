@@ -416,6 +416,131 @@ f.onload=async()=>{
       ok(cola.length===1, 'tocarlo dos veces REEMPLAZA la entrada, no cría gemelos', 'dos toques dejaron '+cola.length+' entradas');
       try{ w.localStorage.removeItem('faro_voz_entrantes_v1'); }catch(e){}
     }
+
+    log('── 📣 A redes: un trozo, a Redacción, y la costura con su lector ──');
+    /* Pedido el 24 de septiembre de 2026. Lo que se mira, por gravedad:
+       1. que el trozo salga CON su etiqueta, y que diga que no son palabras
+          de la persona imitada NI de nadie que aparezca: en una entrevista
+          imaginada aparece gente real que no dijo nada de eso;
+       2. que lo escrito pase por el lector DE VERDAD de Redacción
+          (rrdEntranteLimpio, de js/tools/redaccion-redes.js, cargado en un
+          marco aparte), y no por una copia del formato escrita aquí: un
+          doble complaciente no prueba la costura, la esconde;
+       3. que la lista de destinos y la clave de la cola sean las de Redes;
+       4. que el primer toque no se lleve la selección (son dos toques);
+       5. que dos envíos del mismo trozo no críen dos entradas. */
+    const COLA='faro_redaccion_entrantes_v1';
+    try{ w.localStorage.removeItem(COLA); }catch(e){}
+    const leeCola=()=>{ try{ return JSON.parse(w.localStorage.getItem(COLA)||'[]'); }catch(e){ return []; } };
+    w.FaroLecturas.abrir('entrevista'); await esperar(250);
+    const pR=[...d.querySelectorAll('#lect-entrevista .lect-p')].find(x=>/^[A-ZÁÉÍÓÚÑ ]+\./.test(x.textContent.trim()) && x.textContent.length>120 && x!==d.querySelector('#lect-entrevista .lect-p'));
+    const nodoR=pR?[...pR.childNodes].find(n=>n.nodeType===3 && n.nodeValue.trim().length>70):null;
+    ok(!!nodoR, 'hay un turno de la entrevista imaginada con texto para seleccionar', 'no encontré texto en la entrevista');
+    const selecciona=async(nodo,a1,a2)=>{
+      const r=d.createRange(); r.setStart(nodo,a1); r.setEnd(nodo,a2);
+      const sel=w.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      d.dispatchEvent(new w.Event('selectionchange'));
+      await esperar(420);
+      return r.toString();
+    };
+    if(nodoR){
+      const trozoR=await selecciona(nodoR,1,71);
+      const barra=d.getElementById('fmBarra');
+      const bRedes=d.getElementById('fmBtnRedes');
+      const bCierra=d.getElementById('fmBtnCierra');
+      ok(barra && barra.classList.contains('fm-abierta') && !!bRedes && bRedes.getBoundingClientRect().width>0,
+        'la barra sale con «📣 A redes» a la vista',
+        'no está el botón a la vista: '+(bRedes&&bRedes.getBoundingClientRect().width));
+      ok(!!bRedes && !!bCierra && bRedes.nextElementSibling===bCierra,
+        'y va en el hueco de antes de «✕ Cerrar», que es donde el autor lo pidió',
+        'el botón no está pegado a Cerrar');
+      /* El truco que sostiene los dos toques: el dedo que BAJA sobre el
+         botón no se lleva la selección. Se mira que el pointerdown quede
+         cancelado, que es lo que el navegador obedece. */
+      const pd=new w.PointerEvent('pointerdown',{bubbles:true,cancelable:true,pointerType:'touch',isPrimary:true});
+      ok(bRedes.dispatchEvent(pd)===false,
+        'el dedo que baja sobre «📣 A redes» no se lleva la selección (pointerdown cancelado): son dos toques y el primero no puede cerrar la barra',
+        'el pointerdown del botón no está cancelado: en una tableta el primer toque soltaría la selección y la barra se cerraría antes del segundo');
+      const dest=d.getElementById('fmDestinos');
+      ok(w.getComputedStyle(dest).display==='none', 'los destinos empiezan cerrados (display calculado)',
+        'los destinos salen abiertos: '+w.getComputedStyle(dest).display);
+      bRedes.click(); await esperar(120);
+      ok(w.getComputedStyle(dest).display!=='none' && bRedes.getAttribute('aria-expanded')==='true',
+        'un toque los abre dentro de la misma barra', 'no se abrieron: '+w.getComputedStyle(dest).display);
+      const bFb=dest.querySelector('[data-destino="facebook"]');
+      ok(!!bFb && bFb.dispatchEvent(new w.PointerEvent('pointerdown',{bubbles:true,cancelable:true,pointerType:'touch',isPrimary:true}))===false,
+        'y los destinos tampoco se llevan la selección', 'el pointerdown de un destino no está cancelado');
+      bFb.click(); await esperar(150);
+      let cola=leeCola();
+      const eR=cola[0]||{};
+      ok(cola.length===1 && eR.destino==='facebook' && eR.trozo===trozoR,
+        'el toque deja el trozo EXACTO en la cola, con su destino',
+        'la cola quedó: '+JSON.stringify(cola).slice(0,200));
+      ok(!barra.classList.contains('fm-abierta'), 'y la barra se cierra: se vino a leer', 'la barra se quedó abierta');
+      const o=w.FaroLecturas.origenDe('entrevista')||{};
+      ok(/Ejercicio de estilo/.test(eR.etiqueta||'') && !!o.imita && (eR.etiqueta||'').indexOf('no son palabras de '+o.imita+' ni de nadie que aparezca')>-1
+         && (eR.etiqueta||'').indexOf('«'+o.titulo+'»')>-1,
+        '⚠️ con su ETIQUETA: «'+(eR.etiqueta||'')+'»',
+        '⚠️ la etiqueta no dice que es un ejercicio y que no son palabras de nadie: '+eR.etiqueta);
+      /* La raya por su escape: la etiqueta sale publicada tal cual. */
+      ok(!/\u2014/.test(eR.etiqueta||''), 'y sin guion largo: la etiqueta es texto publicable (norma 1-bis)',
+        'la etiqueta trae guion largo, y va a salir publicada: '+eR.etiqueta);
+
+      /* La costura: el lector de verdad, en un marco aparte. */
+      const lector=document.createElement('iframe');
+      lector.style.cssText='position:absolute;left:-9999px;width:10px;height:10px;border:0;';
+      document.body.appendChild(lector);
+      await new Promise(res=>{
+        lector.onload=res;
+        lector.srcdoc='<!DOCTYPE html><html><body><script src="/js/tools/redaccion-redes.js"><\/script></body></html>';
+      });
+      await esperar(200);
+      const lw=lector.contentWindow;
+      const cargo=lw.eval('typeof rrdEntranteLimpio')==='function';
+      ok(cargo, 'el lector de Redacción (rrdEntranteLimpio) carga en su marco', 'no cargó js/tools/redaccion-redes.js');
+      if(cargo){
+        const r=JSON.parse(lw.eval('JSON.stringify(rrdEntranteLimpio('+JSON.stringify(eR)+'))'));
+        ok(r.ok===true, '⚠️ LA COSTURA: lo que escribe la barra de las misiones lo acepta el lector de Redacción',
+          '⚠️ el lector de Redacción rechaza lo que escribe la barra: '+r.motivo);
+        const redes=JSON.parse(lw.eval('JSON.stringify(RRD_REDES.map(r=>r.id))'));
+        const mias=w.FaroMarcador.destinosRedaccion||[];
+        ok(JSON.stringify(mias)===JSON.stringify(redes.concat(['nota'])),
+          'los destinos de la barra son las redes de Redacción, más «Nota» ('+mias.join(', ')+')',
+          'la barra ofrece '+mias.join(',')+' y Redacción tiene '+redes.join(','));
+        ok(w.FaroMarcador.colaRedaccion===lw.eval('RRD_ENTRANTES_KEY'),
+          'y la cola se llama igual en los dos lados', 'la barra escribe en '+w.FaroMarcador.colaRedaccion+' y Redacción lee '+lw.eval('RRD_ENTRANTES_KEY'));
+        const sinEt=Object.assign({},eR,{etiqueta:''});
+        ok(JSON.parse(lw.eval('JSON.stringify(rrdEntranteLimpio('+JSON.stringify(sinEt)+'))')).ok===false,
+          '⚠️ y un trozo SIN etiqueta no entra: el lector lo descarta', '⚠️ el lector deja entrar un trozo sin etiqueta');
+      }
+      lector.remove();
+
+      await selecciona(nodoR,1,71);
+      d.getElementById('fmBtnRedes').click(); await esperar(100);
+      d.querySelector('#fmDestinos [data-destino="facebook"]').click(); await esperar(150);
+      cola=leeCola();
+      ok(cola.length===1 && cola[0].id===eR.id,
+        'mandar el mismo trozo al mismo sitio dos veces deja UNA entrada (identificador estable): no se crían gemelas',
+        'dos envíos dejaron '+cola.length+' entradas');
+
+      /* Sobre una marca ya puesta: el botón sale donde estaba el hueco. */
+      const mR=await marcar(w,d,'lect-entrevista',60,'dato');
+      const mk=d.querySelector('#lect-entrevista .fm-hl');
+      if(mk){
+        mk.click(); await esperar(150);
+        ok(d.getElementById('fmBtnRedes').getBoundingClientRect().width>0 && d.getElementById('fmBtnAqui').style.display==='none',
+          'sobre una marca ya puesta «📣 A redes» también sale (y «Aquí me quedé» se calla)',
+          'sobre una marca no sale el botón');
+        d.getElementById('fmBtnRedes').click(); await esperar(100);
+        d.querySelector('#fmDestinos [data-destino="nota"]').click(); await esperar(150);
+        cola=leeCola();
+        const eN=cola.find(x=>x.destino==='nota')||{};
+        ok(cola.length===2 && !!mR && eN.trozo===mR.texto,
+          'y manda el trozo de la marca, como nota del banco de ideas',
+          'la marca no viajó bien: '+JSON.stringify(eN).slice(0,160));
+      } else ok(false,'','no se pintó la marca para probar el botón encima');
+    }
+    try{ w.localStorage.removeItem(COLA); }catch(e){}
     cerrar();
   }catch(e){ fallos++; log('✘ '+e.message+'\n'+e.stack); cerrar(); }
 };
