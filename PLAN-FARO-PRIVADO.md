@@ -33,6 +33,7 @@ pierde por el camino.
 | `voz_prestada` (La Voz Prestada: el anaquel de textos) | ✅ corrido, y **re-corrido el 12/9/2026** por las columnas `genero` y `estantes` |
 | `voz_actividades` (el taller de comprensión de esos textos) | ✅ corrido el **16/9/2026**, con las trece filas de la comprobación cuadradas |
 | `consigna` (📜 La Consigna: las piezas que se le piden a la máquina) | ✅ corrido el **23/9/2026**, el mismo día que se publicó la herramienta |
+| `redaccion_redes` (📣 Redes de Redacción: las piezas para Facebook, X, LinkedIn, TikTok y YouTube) | ✅ corrido el **24/9/2026**: siete de siete en la comprobación, y las piezas del aparato ya arriba |
 | `voz-actividades-ia` (Edge Function) | 🗑 **retirada el 16/9/2026**: las actividades las monta el aparato, sin clave ni despliegue |
 | `criba.sql` (La Criba: la tabla y las cuatro fuentes) | ✅ corrido |
 | La cadena de afinado: `criba_temas` → `criba_afina` 1-4 → `criba_prensa` | ✅ corrida entera, en ese orden |
@@ -115,16 +116,24 @@ Zone → Make private.
      la vista («📴 Solo en este aparato: falta correr redaccion_cuadernos.sql»);
      al correrlo, lo fichado sube solo. Se comprueba otro día con
      `supabase/sql/redaccion_cuadernos_comprueba.sql`, que solo mira.
-   · ⚠️ **Correr `supabase/sql/redaccion_redes.sql`** en el SQL Editor (21 de
-     septiembre de 2026). Es la tabla de las piezas para redes de Redacción
-     (el chip 📣 Redes): Facebook, X, LinkedIn, TikTok y YouTube. Va entero,
-     de una vez, y no hay que volver a correr nada más; depende de
-     `es_familia()` y de `redaccion_notas`, y si faltara una lo dice en la
-     primera línea. Hasta que se corra, la herramienta funciona entera con
-     la copia del aparato y lo dice a la vista («📴 Solo en este aparato:
-     falta correr redaccion_redes.sql»); al correrlo, lo escrito sube solo.
-     Se comprueba otro día con `supabase/sql/redaccion_redes_comprueba.sql`,
-     que solo mira.
+   · ✅ **`supabase/sql/redaccion_redes.sql`: CORRIDO** por el autor el 24
+     de septiembre de 2026 (el archivo es del 21), el mismo día que entró
+     📣 A redes en las barras de subrayar. Se queda aquí escrito por si hay
+     que volver a pegarlo o comprobarlo. Es la tabla de las piezas para
+     redes de Redacción (el chip 📣 Redes): Facebook, X, LinkedIn, TikTok y
+     YouTube. Va entero, de una vez, y no hay que volver a correr nada más;
+     depende de `es_familia()` y de `redaccion_notas`, y si faltara una lo
+     dice en la primera línea. Es idempotente: volver a pegarlo no duplica
+     nada.
+     Lo que salió al pegarlo, y es lo que hay que ver si algún día se
+     repite: **las siete filas del final cuadradas** —`18` columnas, `3`
+     políticas, seguridad por fila `true`, `1` disparador, y las dos que se
+     leen al revés, «borrado de verdad» y «puerta pública», en `0`—. Y la
+     comprobación aparte, `supabase/sql/redaccion_redes_comprueba.sql` (que
+     solo mira), dio además **10 piezas vivas (facebook 4, x 6), 3
+     retiradas con lápida y 0 atrasadas**: o sea que lo escrito en el
+     aparato mientras no había tabla subió solo en cuanto se abrió
+     Redacción, que es lo que promete su regla 9.
    · ⚠️ **Correr `supabase/sql/redaccion_papelera.sql`** en el SQL Editor. Son
      dos columnas en `redaccion_notas` y nada más: no toca ninguna otra tabla ni
      la seguridad por fila. Hasta que se corran, «Eliminar» una nota en

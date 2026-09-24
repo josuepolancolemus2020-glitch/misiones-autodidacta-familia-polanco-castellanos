@@ -1448,10 +1448,12 @@ cumple.
       escritas, y su sonda las compara con las de aquí cargando este
       archivo en un marco aparte. Lo que entró así lleva en la lista
       **📖 De una lectura**, como lo de la revista lleva 📰.
-    - **Y no pide SQL nuevo**: las piezas van a `redaccion_redes` y las
-      notas a `redaccion_notas`. Mientras `redaccion_redes.sql` siga sin
-      correr (está en el plan), las piezas viven en el aparato donde se
-      mandaron, como todo lo de Redes, y la barra lo dice.
+    - **Y no pidió SQL nuevo**: las piezas van a `redaccion_redes` y las
+      notas a `redaccion_notas`. `redaccion_redes.sql` se corrió el mismo
+      24 de septiembre de 2026 —siete de siete en la comprobación, y diez
+      piezas del aparato ya arriba—, así que lo que llega de una lectura
+      viaja desde el primer día. Sin la tabla viviría en el aparato donde
+      se mandó, como todo lo de Redes, y la barra lo diría (regla 9).
 
 **Antes de publicar un cambio de las redes:**
 
