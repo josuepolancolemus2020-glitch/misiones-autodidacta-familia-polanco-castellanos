@@ -61,6 +61,33 @@ Es idempotente. Mientras no se corra, Redacción funciona igual y el
 chip 📬 Buzón sencillamente no aparece: se comprueba con una sonda que
 la falta de las tablas no rompe nada.
 
+⚠️ **Y el chip no sale hasta correr LOS DOS.** La bandeja pide sus
+columnas por nombre, y dos de ellas (`editado_at` y `ediciones`) las
+pone el segundo archivo: a PostgREST le basta una que falte para
+rebotar la consulta entera, y Redacción lo toma por «aún no hay buzón».
+
+Desde el 24 de septiembre de 2026 los dos archivos **empiezan por su
+guardia** (el primero dice si falta `es_familia()` o las ediciones de la
+revista; el segundo, si se pegó antes que el primero) y **terminan con
+su tabla en VERTICAL**, que es lo que hay que leer en vez del
+«Success»: nueve filas el primero y cuatro el segundo, y la fila que
+decide el chip es la última del segundo, «columnas que pide la bandeja
+de Redacción: 25 de 25». Para mirarlo otro día sin tocar nada,
+`supabase/sql/buzon_comprueba.sql`, que solo mira y dice además cuánto
+ha llegado.
+
+⚠️ **Y ese día se cerró un resquicio de la puerta.** Supabase le da a
+`anon` permiso de ejecutar cada función nueva del esquema `public` en
+cuanto se crea, y el `revoke … from public` del archivo no se lo
+quita: la función interna que fabrica los folios (`faro_buzon_folio`)
+quedaba llamable desde la calle en `/rest/v1/rpc/`. No enseñaba ningún
+envío, pero esta es la única puerta abierta al público. Ahora se le
+quita a `anon` y `authenticated` por su nombre, que es lo que ya hacían
+las funciones de higiene de la casa, y de paso a `anon` se le quitan
+los permisos de tabla: la seguridad por fila ya lo dejaba fuera, y esta
+es la segunda cerradura. La pantalla del lector no nota nada, porque
+todo lo suyo lo hace por las cinco funciones, que siguen abiertas.
+
 ## Las reglas que no se tocan
 
 1. **El enlace no lleva código y no caduca.** La convocatoria de
@@ -214,12 +241,22 @@ abrir  http://localhost:8124/_dev/probe-buzon.html
 ```
 
 Y si se toca el SQL, con un PostgreSQL cualquiera a mano (**nunca sobre
-la base de verdad**: siembra envíos de mentira):
+la base de verdad**: siembra envíos de mentira), desde la raíz del
+repositorio y con el servidor de la sesión levantado como dice
+`CLAUDE.md` en el apartado de La Voz Prestada:
 
 ```
-createdb buzontest
-psql -d buzontest -f _dev/prueba-buzon-sql.sql
+createdb -h /tmp/pg -p 55432 -U postgres buzontest
+psql -h /tmp/pg -p 55432 -U postgres -v ON_ERROR_STOP=1 -d buzontest -f _dev/prueba-buzon-sql.sql
 ```
+
+Antes de lo de siempre, mira las guardias (sacadas de los archivos de
+verdad), que las tablas del final digan la verdad —también que con
+solo el primero la bandeja salga en «23 de 25»—, que la calle no pueda
+fabricar folios ni tocar las tablas y siga pudiendo todo lo suyo, y la
+costura con Redacción: que las columnas que pide la bandeja en
+`js/tools/redaccion.js` existan y sean las mismas que cuentan las
+comprobaciones.
 
 Prueba lo que el navegador no puede ver porque pasa dentro del
 servidor: que la puerta pública deje pasar lo que debe y pare lo que

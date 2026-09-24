@@ -12,10 +12,28 @@
 -- separa una denuncia con nombres y teléfonos de todo el mundo es la
 -- seguridad por fila.
 --
--- Cómo correrla, con un PostgreSQL cualquiera a mano:
+-- Y desde el 24 de septiembre de 2026, antes de lo de siempre:
 --
---   createdb buzontest
---   psql -d buzontest -f _dev/prueba-buzon-sql.sql
+--   · que las GUARDIAS de los dos archivos paren nombrando lo que falta
+--     (se sacan de los archivos de verdad con sed: una copia escrita
+--     aquí aprobaría el día que alguien rompiera el original);
+--   · que las TABLAS DEL FINAL de los dos archivos, y la comprobación
+--     aparte, digan la verdad: todo cuadrado cuando lo está, y la
+--     bandeja en «23 de 25» cuando solo se corrió el primero, que es
+--     justo el caso en que el chip 📬 Buzón no sale;
+--   · que la calle NO pueda llamar a la función que fabrica folios,
+--     con los permisos repartidos como los reparte Supabase al crear
+--     cada función (quitárselo a `public` no se lo quita a anon);
+--   · y la costura con Redacción: que las columnas que pide la bandeja
+--     en js/tools/redaccion.js existan, y que la lista escrita en las
+--     comprobaciones sea la misma.
+--
+-- Cómo correrla, DESDE LA RAÍZ del repositorio (saca trozos de los
+-- archivos con rutas relativas), con el servidor de la sesión levantado
+-- como dice CLAUDE.md en el apartado de La Voz Prestada:
+--
+--   createdb -h /tmp/pg -p 55432 -U postgres buzontest
+--   psql -h /tmp/pg -p 55432 -U postgres -v ON_ERROR_STOP=1 -d buzontest -f _dev/prueba-buzon-sql.sql
 --
 -- Termina con «RESULTADO: APRUEBA» o revienta en el primer fallo.
 -- ════════════════════════════════════════════════════════════════════
@@ -24,13 +42,125 @@
 \pset tuples_only on
 \pset format unaligned
 
--- ── Lo que el buzón da por hecho que ya existe en la base de la revista ──
+-- ── Los roles, y los permisos que Supabase reparte al CREAR cosas ───
 do $$ begin
   if not exists (select 1 from pg_roles where rolname = 'anon') then create role anon; end if;
   if not exists (select 1 from pg_roles where rolname = 'authenticated') then create role authenticated; end if;
 end $$;
 grant usage on schema public to anon, authenticated;
 
+-- ⚠️ En Supabase, cada tabla y cada FUNCIÓN nueva del esquema public
+-- nace con todos los permisos para anon y authenticated: lo deja así
+-- el proyecto al crearse. Se reproduce ANTES de correr los archivos,
+-- que es cuando pasa de verdad. Sin esto la prueba no vería que la
+-- función que fabrica los folios quedaba abierta a la calle, y pasó: el
+-- `revoke … from public` del archivo no le quita a anon el permiso que
+-- tiene por su nombre.
+alter default privileges in schema public grant all on tables to anon, authenticated;
+alter default privileges in schema public grant all on functions to anon, authenticated;
+
+-- Base limpia, por si la prueba se corre dos veces en la misma.
+drop table if exists public.buzon_fotos, public.buzon_mensajes, public.redaccion_ediciones cascade;
+do $$
+declare f regprocedure;
+begin
+  for f in select p.oid::regprocedure from pg_proc p join pg_namespace s on s.oid = p.pronamespace
+            where s.nspname = 'public' and (p.proname like 'faro\_buzon\_%' or p.proname = 'es_familia')
+  loop
+    execute 'drop function ' || f::text;
+  end loop;
+end $$;
+
+-- ════════════════════════════════════════════════════════════════════
+-- 0. LAS GUARDIAS PARAN, Y DICEN QUÉ CORRER
+-- ════════════════════════════════════════════════════════════════════
+\set g_lector `sed -n '/^do \$guardia\$/,/^\$guardia\$;/p' supabase/sql/buzon_lector.sql`
+\set g_editar `sed -n '/^do \$guardia\$/,/^\$guardia\$;/p' supabase/sql/buzon_editar.sql`
+select set_config('prueba.g_lector', :'g_lector', false) is not null;
+select set_config('prueba.g_editar', :'g_editar', false) is not null;
+
+create or replace function pg_temp.para(guardia text, debe_nombrar text) returns void
+language plpgsql as $$
+declare msg text;
+begin
+  if coalesce(guardia, '') = '' then
+    raise exception 'FALLO: no se encontró la guardia en el archivo (¿se corre desde la raíz del repositorio?)';
+  end if;
+  begin
+    execute guardia;
+  exception when others then
+    get stacked diagnostics msg = message_text;
+    if msg not like '%' || debe_nombrar || '%' then
+      raise exception 'FALLO: la guardia paró sin nombrar %: %', debe_nombrar, msg;
+    end if;
+    return;
+  end;
+  raise exception 'FALLO: la guardia NO paró (tenía que nombrar %)', debe_nombrar;
+end $$;
+
+select pg_temp.para(current_setting('prueba.g_lector'), 'seguridad_familia_1_puerta.sql');
+\echo '  ✔ 0a. sin es_familia(), buzon_lector.sql para y nombra seguridad_familia_1_puerta.sql'
+
+-- La de verdad mira si quien entró está en familia_miembros. Aquí se
+-- enciende y se apaga a mano para probar los dos lados de la puerta.
+create or replace function public.es_familia() returns boolean
+  language sql stable as $$ select false $$;
+
+select pg_temp.para(current_setting('prueba.g_lector'), 'redaccion_tables.sql');
+\echo '  ✔ 0b. sin las ediciones de la revista, para y nombra redaccion_tables.sql'
+select pg_temp.para(current_setting('prueba.g_editar'), 'buzon_lector.sql');
+\echo '  ✔ 0c. buzon_editar.sql pegado antes de tiempo para y nombra buzon_lector.sql'
+
+-- ── Las comprobaciones, como vistas: así se les puede preguntar ─────
+-- Se sacan de los archivos de verdad: la tabla del final de cada uno (de
+-- «with n as (» al final) y la comprobación aparte entera.
+\set chk_lector `sed -n '/^with n as (/,$p' supabase/sql/buzon_lector.sql`
+\set chk_editar `sed -n '/^with n as (/,$p' supabase/sql/buzon_editar.sql`
+\set chk_aparte `cat supabase/sql/buzon_comprueba.sql`
+select set_config('prueba.chk_lector', :'chk_lector', false) is not null;
+select set_config('prueba.chk_editar', :'chk_editar', false) is not null;
+select set_config('prueba.chk_aparte', :'chk_aparte', false) is not null;
+do $$
+declare v text;
+begin
+  foreach v in array array['chk_lector', 'chk_editar', 'chk_aparte'] loop
+    if position('with n as (' in current_setting('prueba.' || v)) = 0 then
+      raise exception 'FALLO: no se encontró la comprobación de % en su archivo', v;
+    end if;
+    execute format('create temp view %I as %s', v,
+      regexp_replace(current_setting('prueba.' || v), ';\s*$', ''));
+  end loop;
+end $$;
+
+-- ¿Cuadra? Todas las filas que no son informativas, con lo esperado.
+create or replace function pg_temp.cuadra(vista text) returns text
+language plpgsql as $$
+declare r record; malas text := '';
+begin
+  for r in execute format('select que, esperado, hay from %I where esperado <> ''(informativo)'' order by orden', vista) loop
+    if r.hay is distinct from r.esperado then
+      malas := malas || format(' [%s: esperaba «%s», dice «%s»]', r.que, r.esperado, r.hay);
+    end if;
+  end loop;
+  return malas;
+end $$;
+create or replace function pg_temp.fila(vista text, n int) returns text
+language plpgsql as $$
+declare h text;
+begin
+  execute format('select hay from %I where orden = $1', vista) into h using n;
+  return h;
+end $$;
+
+-- Sin las tablas del buzón, la comprobación aparte no revienta: lo dice.
+do $$ begin
+  if pg_temp.fila('chk_aparte', 1) <> 'NO ESTÁ' then
+    raise exception 'FALLO: sin las tablas, la comprobación aparte dice «%»', pg_temp.fila('chk_aparte', 1);
+  end if;
+end $$;
+\echo '  ✔ 0d. sin las tablas, la comprobación aparte corre y dice NO ESTÁ (no revienta)'
+
+-- ── Lo que el buzón da por hecho que ya existe en la base de la revista ──
 create table if not exists public.redaccion_ediciones (
   id bigint generated always as identity primary key,
   creado_at timestamptz not null default now(),
@@ -39,29 +169,163 @@ create table if not exists public.redaccion_ediciones (
 );
 alter table public.redaccion_ediciones enable row level security;
 
--- La de verdad mira si quien entró está en familia_miembros. Aquí se
--- enciende y se apaga a mano para probar los dos lados de la puerta.
-create or replace function public.es_familia() returns boolean
-  language sql stable as $$ select false $$;
-
 truncate public.redaccion_ediciones;
 insert into public.redaccion_ediciones (numero, titulo, fecha_cierre, archivada)
 values (3, 'Nº 03', '2026-08-15', false), (2, 'Nº 02', '2026-07-31', true);
 
+-- Como los corre el editor: cada archivo en UNA transacción.
 \echo '── Corriendo supabase/sql/buzon_lector.sql ──'
+begin;
 \i supabase/sql/buzon_lector.sql
+commit;
 \echo '── Y otra vez, que tiene que ser idempotente ──'
+begin;
 \i supabase/sql/buzon_lector.sql
+commit;
+
+do $$
+declare m text;
+begin
+  m := pg_temp.cuadra('chk_lector');
+  if m <> '' then raise exception 'FALLO: la tabla del final de buzon_lector.sql no cuadra:%', m; end if;
+  if pg_temp.fila('chk_lector', 9) <> 'Nº 3 · cierra 15/08/2026' then
+    raise exception 'FALLO: lo que la calle ve de la próxima revista sale «%»', pg_temp.fila('chk_lector', 9);
+  end if;
+  -- Con solo el primero, la comprobación aparte tiene que DECIR que falta
+  -- el segundo: la bandeja sin sus dos columnas, que es el caso en que
+  -- el chip 📬 Buzón no sale.
+  if pg_temp.fila('chk_aparte', 5) <> '23 de 25' or pg_temp.fila('chk_aparte', 4) <> '0 de 2'
+     or pg_temp.fila('chk_aparte', 8) <> '3 de 5' then
+    raise exception 'FALLO: con solo buzon_lector.sql, la comprobación aparte no avisa: bandeja «%», corrección «%», puertas «%»',
+      pg_temp.fila('chk_aparte', 5), pg_temp.fila('chk_aparte', 4), pg_temp.fila('chk_aparte', 8);
+  end if;
+end $$;
+\echo '  ✔ 0e. la tabla del final de buzon_lector.sql cuadra, y la aparte avisa de que falta el segundo (bandeja 23 de 25)'
+
 \echo '── Y la corrección del lector ──'
+begin;
 \i supabase/sql/buzon_editar.sql
+commit;
+begin;
 \i supabase/sql/buzon_editar.sql
+commit;
+
+do $$
+declare m text;
+begin
+  m := pg_temp.cuadra('chk_editar');
+  if m <> '' then raise exception 'FALLO: la tabla del final de buzon_editar.sql no cuadra:%', m; end if;
+  m := pg_temp.cuadra('chk_aparte');
+  if m <> '' then raise exception 'FALLO: la comprobación aparte no cuadra:%', m; end if;
+  if pg_temp.fila('chk_aparte', 11) <> 'Nº 3 · cierra 15/08/2026' then
+    raise exception 'FALLO: la comprobación aparte dice de la próxima revista «%»', pg_temp.fila('chk_aparte', 11);
+  end if;
+end $$;
+\echo '  ✔ 0f. con los dos archivos, la tabla del final del segundo y la comprobación aparte cuadran enteras'
+
+-- ════════════════════════════════════════════════════════════════════
+-- LA PUERTA, PRIMERA CERRADURA: los permisos, antes que la seguridad
+-- por fila. Primero se mira lo que dejaron los archivos; solo DESPUÉS
+-- se reparten los permisos de tabla como los reparte Supabase, para
+-- probar la seguridad por fila. Al revés, las dos comprobaciones se
+-- tapan.
+-- ════════════════════════════════════════════════════════════════════
+do $$
+declare f text;
+begin
+  if has_table_privilege('anon', 'public.buzon_mensajes', 'select,insert,update,delete')
+     or has_table_privilege('anon', 'public.buzon_fotos', 'select,insert,update,delete') then
+    raise exception 'FALLO: la calle conserva permisos de tabla sobre el buzón';
+  end if;
+  if has_function_privilege('anon', 'public.faro_buzon_folio()', 'execute')
+     or has_function_privilege('authenticated', 'public.faro_buzon_folio()', 'execute') then
+    raise exception 'FALLO: la función que fabrica folios se puede llamar desde fuera';
+  end if;
+  foreach f in array array[
+    'public.faro_buzon_estado()',
+    'public.faro_buzon_enviar(text,text,text,text,text,text,text,text,text,text,date,text,text,boolean,text,boolean,jsonb)',
+    'public.faro_buzon_retirar(text,text)',
+    'public.faro_buzon_mio(text,text)',
+    'public.faro_buzon_editar(text,text,text,text,text,text,text,text,text,text,text,date,text,text,text,boolean,boolean,jsonb)']
+  loop
+    if not has_function_privilege('anon', f::regprocedure, 'execute') then
+      raise exception 'FALLO: la calle no puede llamar a %, que es una de sus puertas', f;
+    end if;
+  end loop;
+end $$;
+\echo '  ✔ 0g. la calle no tiene permisos de tabla ni puede fabricar folios; sus cinco puertas, sí'
+
+-- Y cerrar no puede romper lo que la puerta existe para hacer: con las
+-- dos cerraduras puestas, la pantalla del lector (que llama con la clave
+-- publicable, o sea como anon) tiene que seguir pudiendo todo lo suyo.
+-- faro_buzon_enviar sigue fabricando su folio porque corre como dueña.
+do $$
+declare fol text; n int;
+begin
+  set local role anon;
+  fol := public.faro_buzon_enviar('cerr|55556666|la puerta sigue abierta para mandar', 'nota', '',
+    'La puerta de la calle sigue sirviendo para mandar lo suyo.', 'Lectora Uno', '5555-6666',
+    '', '', '', '', null, '', '', true, '2026-09', false, '[]'::jsonb);
+  if coalesce(fol, '') = '' then
+    reset role; raise exception 'FALLO: con las cerraduras puestas, la calle ya no puede MANDAR';
+  end if;
+  select count(*) into n from public.faro_buzon_mio(fol, '5555-6666');
+  if n <> 1 then reset role; raise exception 'FALLO: la calle no recupera lo suyo con folio y teléfono'; end if;
+  if public.faro_buzon_editar(fol, '5555-6666', 'cerr2|55556666|corregido', 'nota', '',
+       'La puerta de la calle sigue sirviendo para corregir lo suyo.', 'Lectora Uno',
+       '', '', '', '', null, '', '', '2026-09', false, false, '[]'::jsonb) <> 'ok' then
+    reset role; raise exception 'FALLO: la calle no puede corregir lo suyo';
+  end if;
+  if not public.faro_buzon_retirar(fol, '5555-6666') then
+    reset role; raise exception 'FALLO: la calle no puede retirar lo suyo';
+  end if;
+  select count(*) into n from public.faro_buzon_estado();
+  if n <> 1 then reset role; raise exception 'FALLO: la calle no puede preguntar cuándo cierra la revista'; end if;
+  reset role;
+end $$;
+\echo '  ✔ 0g-bis. con las dos cerraduras puestas, la calle sigue pudiendo mandar, recuperar, corregir, retirar y preguntar el cierre'
+
+-- Y la costura con Redacción: la bandeja pide sus columnas POR NOMBRE,
+-- y con UNA que falte PostgREST rebota la consulta entera y el chip no
+-- sale. La lista se saca de js/tools/redaccion.js, no se copia aquí.
+\set cols_js `sed -n '/from(RED_T_BUZON).select(/,/^ *)/p' js/tools/redaccion.js | grep -v '^ *)' | grep -oE "'[a-z_,]+'" | tr -d "'\n"`
+\set cols_editar `sed -n "/string_to_array(/,/', ',')))/p" supabase/sql/buzon_editar.sql | grep -oE "'[a-z_,]+'" | tr -d "'\n"`
+\set cols_aparte `sed -n "/string_to_array(/,/', ',')))/p" supabase/sql/buzon_comprueba.sql | grep -oE "'[a-z_,]+'" | tr -d "'\n"`
+select set_config('prueba.cols_js', :'cols_js', false) is not null;
+select set_config('prueba.cols_editar', :'cols_editar', false) is not null;
+select set_config('prueba.cols_aparte', :'cols_aparte', false) is not null;
+do $$
+declare js text[]; ed text[]; ap text[]; faltan text[];
+begin
+  js := array(select distinct x from unnest(string_to_array(current_setting('prueba.cols_js'), ',')) x where x <> '' order by 1);
+  ed := array(select distinct x from unnest(string_to_array(current_setting('prueba.cols_editar'), ',')) x where x <> '' order by 1);
+  ap := array(select distinct x from unnest(string_to_array(current_setting('prueba.cols_aparte'), ',')) x where x <> '' order by 1);
+  if coalesce(array_length(js, 1), 0) < 20 then
+    raise exception 'FALLO: no se pudo sacar la lista de columnas de js/tools/redaccion.js (salieron %)', coalesce(array_length(js, 1), 0);
+  end if;
+  if js <> ed then raise exception 'FALLO: la lista de buzon_editar.sql (%) no es la de redaccion.js (%)', ed, js; end if;
+  if js <> ap then raise exception 'FALLO: la lista de buzon_comprueba.sql (%) no es la de redaccion.js (%)', ap, js; end if;
+  faltan := array(select x from unnest(js) x where not exists (
+    select 1 from information_schema.columns
+     where table_schema = 'public' and table_name = 'buzon_mensajes' and column_name = x));
+  if array_length(faltan, 1) is not null then
+    raise exception 'FALLO: la bandeja pide columnas que no existen: %', faltan;
+  end if;
+  if array_length(js, 1) <> 25 then
+    raise exception 'FALLO: la bandeja pide % columnas y las comprobaciones dicen «de 25»', array_length(js, 1);
+  end if;
+end $$;
+\echo '  ✔ 0h. las 25 columnas que pide la bandeja de Redacción existen, y las comprobaciones llevan la misma lista'
 
 truncate public.buzon_mensajes cascade;
 
 -- En Supabase el rol anon SÍ tiene permisos de tabla sobre el esquema
--- public: se los da el proyecto al crearse. Hay que reproducirlo o la
--- prueba de abajo pasa por el motivo equivocado (por falta de permisos
--- de tabla) y no prueba lo que dice probar.
+-- public: se los da el proyecto al crearse, y el archivo se los quita.
+-- Aquí se le vuelven a dar a mano para probar la SEGUNDA cerradura: si
+-- algún día alguien los devuelve sin querer, la seguridad por fila
+-- tiene que seguir dejando fuera a la calle. Sin esta línea la prueba de
+-- abajo pasaría por el motivo equivocado (por falta de permisos de
+-- tabla) y no probaría lo que dice probar.
 grant all on public.buzon_mensajes, public.buzon_fotos to anon, authenticated;
 
 create or replace function pg_temp.di(etiqueta text, cond boolean) returns void

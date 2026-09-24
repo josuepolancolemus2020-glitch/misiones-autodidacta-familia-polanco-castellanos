@@ -182,6 +182,21 @@ Zone → Make private.
      tiene dónde caer. **Y detrás, `supabase/sql/buzon_editar.sql`**, que es
      el que deja al lector corregir lo que mandó sin dejar dos envíos casi
      iguales en la bandeja. El porqué de todo, en `BUZON-DEL-LECTOR.md`.
+     ⚠️ El chip 📬 Buzón **no sale hasta correr los dos**: la bandeja pide
+     dos columnas que pone el segundo. Desde el 24 de septiembre de 2026
+     cada archivo empieza con su guardia y termina con su tabla en
+     VERTICAL. El primero, nueve filas: las dos tablas, `26 de 26`
+     columnas, seguridad por fila `true · true`, `2` políticas de la casa,
+     la calle puede mandar, retirar y ver el cierre `3 de 3`, **la calle
+     NO puede fabricar folios** en `no`, permisos de tabla de la calle en
+     `0`, y lo que la calle ve de la próxima revista («Nº 7 · cierra
+     30/09/2026», por ejemplo). El segundo, cuatro: `2 de 2` columnas de la
+     corrección, `2 de 2` puertas para recuperar y corregir, y **`25 de 25`
+     columnas que pide la bandeja de Redacción**, que es la fila que decide
+     el chip. Otro día, `supabase/sql/buzon_comprueba.sql`, que solo mira:
+     catorce filas, con cuánto ha llegado. Probado con
+     `_dev/prueba-buzon-sql.sql` con los permisos repartidos como los
+     reparte Supabase al crear cada tabla y cada función.
    · ⚠️ **Correr `supabase/sql/metas_sugerencias.sql`** en el SQL Editor. Es un
      solo archivo, no depende de ningún otro salvo de `es_familia()` —que ya
      está— y crea la tabla donde caen las sugerencias que la gente escribe

@@ -49,6 +49,26 @@
 --   una sola y para siempre.
 -- ════════════════════════════════════════════════════════════════════
 
+-- ════════════════════════════════════════════════════════════════════
+-- LO PRIMERO: COMPROBAR LAS DEPENDENCIAS, Y DECIRLO EN CRISTIANO
+-- ════════════════════════════════════════════════════════════════════
+-- El editor corre TODO el pegado dentro de UNA transacción: si falla
+-- una línea, se deshace el pegado entero y lo único que se ve es el
+-- error de la línea que falló, que puede hablar de otra cosa.
+do $guardia$
+begin
+  if to_regproc('public.es_familia') is null then
+    raise exception E'FALTA public.es_familia(), y sin ella las politicas de las dos tablas no se pueden crear.\n'
+      'Como el editor corre todo el pegado en una sola transaccion, eso deshace TAMBIEN las tablas, y despues parece que el archivo no hizo nada.\n'
+      'Que hacer: correr antes supabase/sql/seguridad_familia_1_puerta.sql, y volver a pegar este.';
+  end if;
+  if to_regclass('public.redaccion_ediciones') is null then
+    raise exception E'FALTA la tabla public.redaccion_ediciones (las ediciones de la revista), de la que la puerta publica saca cuando cierra la proxima.\n'
+      'Que hacer: correr antes supabase/sql/redaccion_tables.sql, y volver a pegar este.';
+  end if;
+end
+$guardia$;
+
 -- ── El envío ────────────────────────────────────────────────────────
 create table if not exists public.buzon_mensajes (
   id            bigint generated always as identity primary key,
@@ -152,6 +172,16 @@ begin
 end
 $$;
 
+-- Y con la clave publicable no se toca ninguna de las dos tablas: la
+-- calle entra SOLO por las funciones de abajo, que cuentan, miden y
+-- recortan antes de escribir. Supabase le da a anon todos los permisos
+-- de tabla al crearlas; la seguridad por fila ya lo deja fuera, y esto
+-- es la segunda cerradura, por si algún día alguien apaga la primera
+-- sin querer. A la casa (authenticated) no se le quita nada: su puerta
+-- es es_familia().
+revoke all on public.buzon_mensajes from anon;
+revoke all on public.buzon_fotos    from anon;
+
 -- ── Un folio corto que se pueda dictar por teléfono ─────────────────
 -- Sin 0/O, sin 1/I/L: el lector lo va a leer de una pantalla pequeña y
 -- lo va a repetir en voz alta. «B-7K3M» se dicta; «B-1IO0» no.
@@ -179,6 +209,15 @@ begin
 end
 $$;
 revoke all on function public.faro_buzon_folio() from public;
+-- ⚠️ Y de anon y authenticated POR SU NOMBRE. Supabase les da permiso de
+-- ejecutar cada función nueva del esquema public en cuanto se crea, y
+-- quitárselo a `public` no les quita el suyo: sin esta línea, la función
+-- que fabrica los folios quedaba a la vista de la calle en
+-- /rest/v1/rpc/faro_buzon_folio. No enseña ningún envío, pero esta es la
+-- única puerta abierta al público y se deja sin un solo resquicio. La
+-- sigue llamando faro_buzon_enviar, que corre como dueña (security
+-- definer) y no necesita ese permiso.
+revoke all on function public.faro_buzon_folio() from anon, authenticated;
 
 -- ── Cuándo cierra la edición que viene ──────────────────────────────
 -- Lo ÚNICO que el público puede preguntar. Devuelve el número y la
@@ -362,23 +401,84 @@ grant execute on function public.faro_buzon_retirar(text, text) to anon, authent
 -- Corre las dos puertas de cabo a rabo: lo que entra, lo que se para,
 -- el freno, el retiro, y —lo que de verdad importa— que **desde la
 -- calle, con la clave publicable, no se lea ni una fila**. Esa prueba
--- reproduce a mano los permisos de tabla que Supabase le da al rol
--- anon; sin eso pasaría por el motivo equivocado.
+-- reproduce a mano los permisos que Supabase le da al rol anon al crear
+-- cada tabla y cada función; sin eso pasaría por el motivo equivocado.
 --
--- Suelto, si solo se quiere ver que quedó instalado (pegar tras el Run):
---   select public.faro_buzon_enviar('ana|99887766|se cayo el muro','denuncia',
---     'El muro de la escuela','Se cayó el muro del patio y los niños pasan por ahí todos los días.',
---     'Ana López','9988-7766','','Comayagua','Escuela Lempira','madre',
---     null,'','',true,'2026-08',false,'[]'::jsonb);        -- devuelve B-XXXX
---   select public.faro_buzon_enviar('ana|99887766|se cayo el muro','denuncia',
---     'El muro','Se cayó el muro del patio, corregido.','Ana López','9988-7766','','Comayagua',
---     'Escuela Lempira','madre',null,'','',true,'2026-08',false,'[]'::jsonb);  -- MISMO folio
---   select count(*) from public.buzon_mensajes;            -- 1, no 2
---   select public.faro_buzon_enviar('x|99887766|hola','nota','','corto','Ana','9988-7766',
---     '','','','',null,'','',true,'2026-08',false,'[]'::jsonb);  -- '' (texto de 5 letras)
---   select public.faro_buzon_enviar('y|99887766|texto largo de prueba aqui','nota','',
---     'texto largo de prueba aqui que si pasa','Ana','9988-7766','','','','',
---     null,'','',false,'2026-08',false,'[]'::jsonb);       -- '' (no aceptó la ética)
---   select public.faro_buzon_retirar('B-XXXX','9988-7766'); -- true, y se lleva las fotos
---   select * from public.faro_buzon_estado();
+-- Para ver que quedó instalado NO hace falta mandar un envío de mentira
+-- a la base de verdad (acabaría en la bandeja, con un teléfono
+-- inventado): lo dice la tabla de aquí abajo, y otro día
+-- supabase/sql/buzon_comprueba.sql, que solo mira.
 -- ════════════════════════════════════════════════════════════════════
+
+-- ════════════════════════════════════════════════════════════════════
+-- LA COMPROBACIÓN. Va la última porque el editor enseña el resultado de
+-- la última sentencia: en vez de un «Success. No rows returned» que no
+-- distingue «quedó» de «se pegó a medias», sale escrito qué hay.
+-- EN VERTICAL, una fila por cosa: en la tableta una fila ancha se ve a
+-- medias y lo que cae fuera es siempre el final.
+-- ════════════════════════════════════════════════════════════════════
+with n as (
+  select
+    -- Las columnas que escriben las funciones de este archivo, por su
+    -- nombre: si la tabla viniera de una versión vieja, `create table if
+    -- not exists` no le añadiría las que le falten, y faro_buzon_enviar
+    -- devolvería '' a todo el mundo sin decir por qué.
+    (select count(*) from information_schema.columns
+      where table_schema = 'public' and table_name = 'buzon_mensajes'
+        and column_name = any (array[
+          'id','folio','creado_at','clase','titulo','texto','nombre','tel',
+          'correo','lugar','escuela','cargo','evento_fecha','evento_hora',
+          'evento_lugar','etica_ok','etica_version','permiso_fotos','fotos',
+          'estado','nota_id','motivo','visto_por','visto_at','huella',
+          'freno_dia']))                                                     as cols,
+    (select relrowsecurity from pg_class
+      where oid = to_regclass('public.buzon_mensajes'))                      as rls_m,
+    (select relrowsecurity from pg_class
+      where oid = to_regclass('public.buzon_fotos'))                         as rls_f,
+    (select count(*) from pg_policies
+      where schemaname = 'public'
+        and policyname in ('buzon_mensajes_familia', 'buzon_fotos_familia')) as pols,
+    -- Las tres puertas de la calle, y la que NO lo es.
+    (select count(*) from unnest(array[
+        'public.faro_buzon_estado()',
+        'public.faro_buzon_enviar(text,text,text,text,text,text,text,text,text,text,date,text,text,boolean,text,boolean,jsonb)',
+        'public.faro_buzon_retirar(text,text)']) f
+      where coalesce(has_function_privilege('anon', to_regprocedure(f), 'execute'), false)) as puertas,
+    coalesce(has_function_privilege('anon',
+      to_regprocedure('public.faro_buzon_folio()'), 'execute'), false)
+      or coalesce(has_function_privilege('authenticated',
+      to_regprocedure('public.faro_buzon_folio()'), 'execute'), false)     as folio_abierta,
+    (select count(*) from unnest(array['public.buzon_mensajes', 'public.buzon_fotos']) t
+      where coalesce(has_table_privilege('anon', to_regclass(t),
+              'select,insert,update,delete'), false))                        as anon_tablas,
+    -- Lo que la pantalla del lector va a decir de la próxima revista. Con
+    -- query_to_xml, que recibe la consulta como TEXTO: nombrar la función
+    -- a pelo reventaría antes de empezar si no existiera.
+    case when to_regprocedure('public.faro_buzon_estado()') is null then null else
+      (xpath('/row/c/text()', query_to_xml(
+        'select coalesce(''Nº '' || numero || '' · cierra '' '
+        '|| coalesce(to_char(cierre, ''DD/MM/YYYY''), ''sin fecha''), '
+        '''ninguna edición abierta'') as c '
+        'from (select 1) x left join public.faro_buzon_estado() on true',
+        false, true, '')))[1]::text end                                      as proxima
+)
+select * from (
+            select 1 as orden, 'tabla buzon_mensajes' as que, 'existe' as esperado,
+                   case when to_regclass('public.buzon_mensajes') is null
+                        then 'NO ESTÁ' else 'existe' end as hay
+              from n
+  union all select 2, 'tabla buzon_fotos', 'existe',
+                   case when to_regclass('public.buzon_fotos') is null
+                        then 'NO ESTÁ' else 'existe' end from n
+  union all select 3, 'columnas del envío', '26 de 26', cols || ' de 26' from n
+  union all select 4, 'seguridad por fila (mensajes · fotos)', 'true · true',
+                   coalesce(rls_m::text, 'NO') || ' · ' || coalesce(rls_f::text, 'NO') from n
+  union all select 5, 'políticas de la casa (una por tabla)', '2', pols::text from n
+  union all select 6, 'la calle puede mandar, retirar y ver el cierre', '3 de 3', puertas || ' de 3' from n
+  union all select 7, 'la calle NO puede fabricar folios', 'no',
+                   case when folio_abierta then 'SÍ PUEDE' else 'no' end from n
+  union all select 8, 'permisos de tabla de la calle (NO debe tener)', '0', anon_tablas::text from n
+  union all select 9, 'lo que la calle ve de la próxima revista', '(informativo)',
+                   coalesce(proxima, '—') from n
+) c
+order by orden;

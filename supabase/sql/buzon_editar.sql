@@ -42,6 +42,20 @@
 --   número retira lo que mandó y lo manda otra vez.
 -- ════════════════════════════════════════════════════════════════════
 
+-- ════════════════════════════════════════════════════════════════════
+-- LO PRIMERO: COMPROBAR LA DEPENDENCIA, Y DECIRLO EN CRISTIANO
+-- ════════════════════════════════════════════════════════════════════
+-- Pegado antes de tiempo, lo primero que fallaría es el `alter table`,
+-- con un «relation does not exist» que no dice qué hacer.
+do $guardia$
+begin
+  if to_regclass('public.buzon_mensajes') is null then
+    raise exception E'FALTA la tabla public.buzon_mensajes: este archivo va DESPUES de buzon_lector.sql, que es el que la crea.\n'
+      'Que hacer: correr antes supabase/sql/buzon_lector.sql, y volver a pegar este.';
+  end if;
+end
+$guardia$;
+
 alter table public.buzon_mensajes
   add column if not exists editado_at timestamptz;
 
@@ -205,3 +219,43 @@ grant execute on function public.faro_buzon_editar(
 -- imprime dejan de ser lo mismo) y que corregir uno leído lo devuelva
 -- a la cola.
 -- ════════════════════════════════════════════════════════════════════
+
+-- ════════════════════════════════════════════════════════════════════
+-- LA COMPROBACIÓN. Va la última porque el editor enseña el resultado de
+-- la última sentencia, y EN VERTICAL, una fila por cosa.
+-- Es la de «ya está todo»: este archivo es el segundo, y la fila 4 es
+-- la que decide si en Redacción aparece el chip 📬 Buzón. La bandeja
+-- pide sus columnas POR NOMBRE, y a PostgREST le basta UNA que no
+-- exista para rebotar la consulta entera: la herramienta lo toma por
+-- «aún no hay buzón» y el chip no sale, sin ningún error a la vista.
+-- La lista es la de js/tools/redaccion.js, y la prueba comprueba que
+-- las dos digan lo mismo.
+-- Para volver a mirarlo otro día, supabase/sql/buzon_comprueba.sql.
+-- ════════════════════════════════════════════════════════════════════
+with n as (
+  select
+    (select count(*) from information_schema.columns
+      where table_schema = 'public' and table_name = 'buzon_mensajes'
+        and column_name in ('editado_at', 'ediciones'))                      as cols,
+    (select count(*) from unnest(array[
+        'public.faro_buzon_mio(text,text)',
+        'public.faro_buzon_editar(text,text,text,text,text,text,text,text,text,text,text,date,text,text,text,boolean,boolean,jsonb)']) f
+      where coalesce(has_function_privilege('anon', to_regprocedure(f), 'execute'), false)) as puertas,
+    (select count(*) from information_schema.columns
+      where table_schema = 'public' and table_name = 'buzon_mensajes'
+        and column_name = any (string_to_array(
+          'id,folio,creado_at,clase,titulo,texto,nombre,tel,correo,lugar,escuela,cargo,'
+          'evento_fecha,evento_hora,evento_lugar,etica_version,permiso_fotos,fotos,'
+          'editado_at,ediciones,'
+          'estado,nota_id,motivo,visto_por,visto_at', ',')))                 as bandeja
+)
+select * from (
+            select 1 as orden, 'tabla buzon_mensajes' as que, 'existe' as esperado,
+                   case when to_regclass('public.buzon_mensajes') is null
+                        then 'NO ESTÁ' else 'existe' end as hay
+              from n
+  union all select 2, 'columnas de la corrección', '2 de 2', cols || ' de 2' from n
+  union all select 3, 'el lector puede recuperar y corregir lo suyo', '2 de 2', puertas || ' de 2' from n
+  union all select 4, 'columnas que pide la bandeja de Redacción', '25 de 25', bandeja || ' de 25' from n
+) c
+order by orden;
