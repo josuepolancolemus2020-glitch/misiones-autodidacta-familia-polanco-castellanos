@@ -116,6 +116,16 @@ Zone → Make private.
      la vista («📴 Solo en este aparato: falta correr redaccion_cuadernos.sql»);
      al correrlo, lo fichado sube solo. Se comprueba otro día con
      `supabase/sql/redaccion_cuadernos_comprueba.sql`, que solo mira.
+     Lo que hay que mirar al pegarlo son **las siete filas del final, en
+     VERTICAL**: `19` columnas, `3` políticas, seguridad por fila `true`, `1`
+     disparador, y «borrado de verdad» y «puerta pública» en `0`. La
+     comprobación aparte da once: esas siete y cuatro informativas
+     (cuadernos vivos, estantes distintos, referencias apuntadas y retirados
+     con lápida). Vuelto a probar el 24 de septiembre de 2026 contra un
+     PostgreSQL de verdad con `_dev/prueba-redaccion-cuadernos-sql.sql`, y
+     además el archivo mismo, sin `es_familia()` y en una sola transacción
+     como lo corre el editor: para nombrando el archivo que falta y no deja
+     media tabla.
    · ✅ **`supabase/sql/redaccion_redes.sql`: CORRIDO** por el autor el 24
      de septiembre de 2026 (el archivo es del 21), el mismo día que entró
      📣 A redes en las barras de subrayar. Se queda aquí escrito por si hay
@@ -140,6 +150,20 @@ Zone → Make private.
      Redacción sigue borrando de verdad, y la aplicación lo avisa antes de
      hacerlo en vez de fingir que hay red debajo. Después, borrar solo aparta:
      la nota espera en la papelera hasta que se restaure.
+     Desde el 24 de septiembre de 2026 el archivo empieza con su guardia (si
+     faltara `redaccion_notas`, lo dice) y **termina con siete filas en
+     VERTICAL**: la tabla, `eliminada` como `boolean · no nula · false`,
+     `eliminada_at` como `timestamp with time zone`, el índice, la seguridad
+     por fila en `true`, **la política que deja mandar a la papelera en `1 o
+     más`** —con la seguridad por fila puesta y sin ella, el `update` no da
+     error y no cambia nada: la pantalla diría «en la papelera» y la nota
+     seguiría donde estaba— y la puerta pública en `0`. Para mirarlo otro día
+     sin volver a tocar la tabla, `supabase/sql/redaccion_papelera_comprueba.sql`,
+     que solo mira y añade cuántas notas hay y cuántas esperan en la
+     papelera. Probado con `_dev/prueba-redaccion-papelera-sql.sql`: la
+     guardia sale del archivo de verdad, las notas de antes no desaparecen,
+     es idempotente en la base vieja y en una hecha con `redaccion_tables.sql`,
+     y la comprobación no revienta ni sin la tabla ni sin las columnas.
    · ⚠️ **Correr `supabase/sql/buzon_lector.sql`** en el SQL Editor. Crea las
      dos tablas del Buzón del lector y su única puerta pública, con la
      seguridad por fila cerrada. Hasta que se corra, Redacción funciona igual
