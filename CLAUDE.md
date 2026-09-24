@@ -1653,7 +1653,10 @@ cabeza de quien lo sacó. Esto es el catálogo que le falta.
    con `es_familia()` y sin política de delete. Hasta que se corra, la
    herramienta funciona entera con la copia del aparato y lo dice («📴
    Solo en este aparato: falta correr redaccion_cuadernos.sql»); al
-   correrlo, lo pendiente sube solo.
+   correrlo, lo pendiente sube solo. **Y así pasó:** se corrió el 24 de
+   septiembre de 2026, con las siete filas de la comprobación cuadradas, y
+   los dieciséis cuadernos que vivían en el aparato ya estaban arriba en la
+   comprobación aparte, con sus diez estantes.
 
 9. **LO DE SIEMPRE, Y POR LO MISMO:** nada de lo escrito llega a un
    atributo ni a `innerHTML` (todo con `createElement` y `textContent`;

@@ -34,6 +34,8 @@ pierde por el camino.
 | `voz_actividades` (el taller de comprensión de esos textos) | ✅ corrido el **16/9/2026**, con las trece filas de la comprobación cuadradas |
 | `consigna` (📜 La Consigna: las piezas que se le piden a la máquina) | ✅ corrido el **23/9/2026**, el mismo día que se publicó la herramienta |
 | `redaccion_redes` (📣 Redes de Redacción: las piezas para Facebook, X, LinkedIn, TikTok y YouTube) | ✅ corrido el **24/9/2026**: siete de siete en la comprobación, y las piezas del aparato ya arriba |
+| `redaccion_cuadernos` (📓 Cuadernos de Redacción: el inventario de los cuadernos de NotebookLM) | ✅ corrido el **24/9/2026**: siete de siete, y los 16 cuadernos del aparato ya arriba |
+| `redaccion_papelera` (🗑️ la papelera de las notas de Redacción) | ✅ corrido el **24/9/2026**: siete de siete; «Eliminar» ya aparta en vez de borrar |
 | `voz-actividades-ia` (Edge Function) | 🗑 **retirada el 16/9/2026**: las actividades las monta el aparato, sin clave ni despliegue |
 | `criba.sql` (La Criba: la tabla y las cuatro fuentes) | ✅ corrido |
 | La cadena de afinado: `criba_temas` → `criba_afina` 1-4 → `criba_prensa` | ✅ corrida entera, en ese orden |
@@ -108,24 +110,26 @@ Zone → Make private.
      la guardia para nombrando el archivo que falta, los checks muerden, y
      `anon` no ve ni una fila con los permisos de tabla repartidos como los
      reparte Supabase.
-   · ⚠️ **Correr `supabase/sql/redaccion_cuadernos.sql`** en el SQL Editor (21 de
-     septiembre de 2026). Es la tabla del inventario de cuadernos de NotebookLM
-     de Redacción (el chip 📓 Cuadernos). Va entero, de una vez; depende solo de
-     `es_familia()`, y si faltara lo dice en la primera línea. Hasta que se
-     corra, la herramienta funciona entera con la copia del aparato y lo dice a
-     la vista («📴 Solo en este aparato: falta correr redaccion_cuadernos.sql»);
-     al correrlo, lo fichado sube solo. Se comprueba otro día con
-     `supabase/sql/redaccion_cuadernos_comprueba.sql`, que solo mira.
-     Lo que hay que mirar al pegarlo son **las siete filas del final, en
-     VERTICAL**: `19` columnas, `3` políticas, seguridad por fila `true`, `1`
-     disparador, y «borrado de verdad» y «puerta pública» en `0`. La
-     comprobación aparte da once: esas siete y cuatro informativas
-     (cuadernos vivos, estantes distintos, referencias apuntadas y retirados
-     con lápida). Vuelto a probar el 24 de septiembre de 2026 contra un
-     PostgreSQL de verdad con `_dev/prueba-redaccion-cuadernos-sql.sql`, y
-     además el archivo mismo, sin `es_familia()` y en una sola transacción
-     como lo corre el editor: para nombrando el archivo que falta y no deja
-     media tabla.
+   · ✅ **`supabase/sql/redaccion_cuadernos.sql`: CORRIDO** por el autor el
+     24 de septiembre de 2026 (el archivo es del 21). Se queda aquí escrito
+     por si hay que volver a pegarlo o comprobarlo. Es la tabla del
+     inventario de cuadernos de NotebookLM de Redacción (el chip 📓
+     Cuadernos). Va entero, de una vez; depende solo de `es_familia()`, y si
+     faltara lo dice en la primera línea. Es idempotente: volver a pegarlo
+     no duplica nada.
+     Lo que salió al pegarlo, y es lo que hay que ver si algún día se
+     repite: **las siete filas del final cuadradas**, `19` columnas, `3`
+     políticas, seguridad por fila `true`, `1` disparador, y las dos que se
+     leen al revés, «borrado de verdad» y «puerta pública», en `0`. Y la
+     comprobación aparte, `supabase/sql/redaccion_cuadernos_comprueba.sql`
+     (que solo mira), dio además **16 cuadernos vivos, 10 estantes
+     distintos, 1 referencia apuntada y 0 retirados**: o sea que lo que se
+     había fichado en el aparato mientras no había tabla subió solo al abrir
+     📓 Cuadernos, que es lo que promete su regla 8.
+     Probado antes de mandarlo, el mismo día, contra un PostgreSQL de verdad
+     con `_dev/prueba-redaccion-cuadernos-sql.sql`, y además el archivo
+     mismo, sin `es_familia()` y en una sola transacción como lo corre el
+     editor: para nombrando el archivo que falta y no deja media tabla.
    · ✅ **`supabase/sql/redaccion_redes.sql`: CORRIDO** por el autor el 24
      de septiembre de 2026 (el archivo es del 21), el mismo día que entró
      📣 A redes en las barras de subrayar. Se queda aquí escrito por si hay
@@ -144,26 +148,32 @@ Zone → Make private.
      retiradas con lápida y 0 atrasadas**: o sea que lo escrito en el
      aparato mientras no había tabla subió solo en cuanto se abrió
      Redacción, que es lo que promete su regla 9.
-   · ⚠️ **Correr `supabase/sql/redaccion_papelera.sql`** en el SQL Editor. Son
-     dos columnas en `redaccion_notas` y nada más: no toca ninguna otra tabla ni
-     la seguridad por fila. Hasta que se corran, «Eliminar» una nota en
-     Redacción sigue borrando de verdad, y la aplicación lo avisa antes de
-     hacerlo en vez de fingir que hay red debajo. Después, borrar solo aparta:
-     la nota espera en la papelera hasta que se restaure.
-     Desde el 24 de septiembre de 2026 el archivo empieza con su guardia (si
-     faltara `redaccion_notas`, lo dice) y **termina con siete filas en
-     VERTICAL**: la tabla, `eliminada` como `boolean · no nula · false`,
+   · ✅ **`supabase/sql/redaccion_papelera.sql`: CORRIDO** por el autor el
+     24 de septiembre de 2026. Se queda aquí escrito por si hay que volver a
+     pegarlo o comprobarlo. Son dos columnas en `redaccion_notas` y un
+     índice, y nada más: no toca ninguna otra tabla ni la seguridad por
+     fila. Desde entonces «Eliminar» una nota en Redacción ya no borra:
+     aparta, y la nota espera entera en el chip 🗑️ Papelera hasta que se
+     restaure o se vacíe a conciencia. (Antes de correrlo, la aplicación
+     avisaba de que la nota NO se podría restaurar, en vez de fingir que
+     había red debajo; en una base sin las columnas lo sigue haciendo.)
+     El archivo empieza con su guardia (si faltara `redaccion_notas`, lo
+     dice) y termina con **siete filas en VERTICAL**, que salieron las siete
+     cuadradas: la tabla, `eliminada` como `boolean · no nula · false`,
      `eliminada_at` como `timestamp with time zone`, el índice, la seguridad
-     por fila en `true`, **la política que deja mandar a la papelera en `1 o
-     más`** —con la seguridad por fila puesta y sin ella, el `update` no da
-     error y no cambia nada: la pantalla diría «en la papelera» y la nota
-     seguiría donde estaba— y la puerta pública en `0`. Para mirarlo otro día
-     sin volver a tocar la tabla, `supabase/sql/redaccion_papelera_comprueba.sql`,
-     que solo mira y añade cuántas notas hay y cuántas esperan en la
-     papelera. Probado con `_dev/prueba-redaccion-papelera-sql.sql`: la
-     guardia sale del archivo de verdad, las notas de antes no desaparecen,
-     es idempotente en la base vieja y en una hecha con `redaccion_tables.sql`,
-     y la comprobación no revienta ni sin la tabla ni sin las columnas.
+     por fila en `true`, **la política que deja mandar a la papelera en
+     `1`** (la de siempre de las notas: con la seguridad por fila puesta y
+     sin ella, el `update` no da error y no cambia nada, así que la pantalla
+     diría «en la papelera» y la nota seguiría donde estaba) y la puerta
+     pública en `0`. La comprobación aparte,
+     `supabase/sql/redaccion_papelera_comprueba.sql` (que solo mira y no
+     vuelve a tocar la tabla), dio además **40 notas, 3 de ellas en la
+     papelera**.
+     Probado antes de mandarlo con `_dev/prueba-redaccion-papelera-sql.sql`:
+     la guardia sale del archivo de verdad, las notas de antes no
+     desaparecen, es idempotente en la base vieja y en una hecha con
+     `redaccion_tables.sql`, y la comprobación no revienta ni sin la tabla
+     ni sin las columnas.
    · ⚠️ **Correr `supabase/sql/buzon_lector.sql`** en el SQL Editor. Crea las
      dos tablas del Buzón del lector y su única puerta pública, con la
      seguridad por fila cerrada. Hasta que se corra, Redacción funciona igual
