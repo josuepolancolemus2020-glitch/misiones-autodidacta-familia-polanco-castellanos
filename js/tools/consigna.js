@@ -4509,6 +4509,8 @@ let _csgNube        = 'mirando';   // mirando | puesta | sin-tabla | sin-senal |
 let _csgHayTabla    = false;
 let _csgColsFuera   = [];          // columnas que la base vieja no tiene (42703)
 let _csgInitEnCurso = null;
+let _csgNubeVista   = 0;           // cuándo llegó la última lista de la nube (Date.now); 0 = nunca
+let _csgSubidaCola  = null;        // la cola de la fila de subidas (csgSubirEnCola); null = vacía
 let _csgLuego       = {};          // id → { t, esperan: [resolver], local, soloUsos } de csgSubirLuego
 let _csgSinEspacio  = false;       // el último guardado en el aparato rebotó por el almacén lleno
 
@@ -5230,8 +5232,48 @@ async function csgSubirVarios(lista) {
     : { ok: true, subidas: van.length };
 }
 
-async function csgSubir(p) {
-  const r = await csgSubirVarios([p]);
+/* ⚠️ LAS SUBIDAS VAN EN FILA, UNA DETRÁS DE OTRA. Cada upsert escribe la
+   fila ENTERA, y dos en vuelo pueden llegar en cualquier orden: con ☑
+   Elegir, meter una consigna en «Primero» y en seguida en «Segundo» (la
+   hoja de mover se queda abierta justo para eso), o retirarla y
+   devolverla en el acto, dejaba en la nube la PRIMERA si la segunda
+   llegaba antes —y el aparato, con las dos subidas contestadas, la daba
+   por subida y la franja decía «☁️ viajan» sin que viajara—. La huella
+   de csgSubirVarios impide que un viaje viejo marque la pieza como
+   subida; no impide que llegue DESPUÉS del nuevo. En fila, el último que
+   sale es el último que llega. Nadie espera de más: lo del aparato ya
+   está escrito antes de entrar en la fila, y cada viaje tiene su reloj
+   (csgConReloj), así que uno que no vuelve no la para más de ocho
+   segundos. La usan las dos subidas INMEDIATAS —csgPersistir y
+   csgPersistirVarios, que son las de ☑ Elegir, ↩ Devolver y retirar—,
+   que son las que se tocan una detrás de otra. La del reintento
+   (csgSubirPendientes, al abrir y al volver la señal) va aparte y a
+   propósito: sube lo más nuevo de la lista con la nube delante, y
+   esperando en la fila detrás de una subida que se quedó sin señal
+   tardaba hasta ocho segundos en salir justo cuando la señal volvía.
+   La fila NO va dentro de csgSubirVarios: se llama a sí misma
+   para reintentar de una en una, y dentro de la fila se esperaría a sí
+   misma para siempre.
+   Con la fila VACÍA sale en el acto, sin esperar ni un turno: la huella
+   de lo que sale (csgHuellaSubida) se toma en el mismo instante que antes,
+   y un uso apuntado justo después sigue sin darse por subido. Y al volver
+   la señal la fila se vacía (csgSubidaColaSuelta): lo que salió sin señal
+   ya no va a llegar, y lo nuevo no tiene por qué esperar a que se rinda. */
+function csgSubirEnCola(lista) {
+  const antes = _csgSubidaCola;
+  const sale = () => csgSubirVarios(lista);
+  const viaje = antes ? antes.then(sale, sale) : sale();
+  const cola = viaje.then(() => {}, () => {});
+  _csgSubidaCola = cola;
+  cola.then(() => { if (_csgSubidaCola === cola) _csgSubidaCola = null; });
+  return viaje;
+}
+function csgSubidaColaSuelta() { _csgSubidaCola = null; }
+
+/* `enCola`: por la fila de arriba (lo pide csgPersistir). El respiro de
+   csgSubirLuego sube directo, como siempre. */
+async function csgSubir(p, enCola) {
+  const r = await (enCola ? csgSubirEnCola([p]) : csgSubirVarios([p]));
   return { ok: r.ok, motivo: r.ok ? '' : (r.motivo || (p && p.motivo) || 'error'), detalle: r.detalle };
 }
 
@@ -5294,11 +5336,53 @@ async function csgPersistir(p) {
   p.subida = false;
   const poda = csgPodar(p);
   let local = csgGuardaLocal();
-  const r = await csgSubir(p);
+  const r = await csgSubir(p, true);
   if (r.ok) local = csgGuardaLocal() || local;
   r.poda = poda;
   r.local = local;
   return r;
+}
+
+/* ⚠️ VARIAS EDICIONES DE GOLPE, EN UN SOLO VIAJE. Es lo que usa «☑ Elegir»
+   del anaquel para mover veinte consignas a un estante, cambiarles la
+   máquina o retirarlas: con la señal de una tableta, una escritura por
+   pieza es lo que hace que mover veinte tarde (regla 6 de 📓 Cuadernos,
+   regla 38 de La Voz Prestada), y veinte upserts en vuelo pueden llegar en
+   cualquier orden. Así que es csgPersistir para una lista:
+   · cada pieza entra en la lista, lleva EL RELOJ PUESTO (mover, cambiar
+     la máquina o retirar es una edición: con el reloj viejo, la nube le
+     ganaría el empate y el cambio se perdería en silencio, regla 18) y
+     queda marcada como pendiente;
+   · el aparato se escribe UNA vez antes del viaje —pase lo que pase con
+     la red, lo hecho ya está aquí— y otra al volver, para apuntar lo que
+     llegó, igual que csgPersistir: dos escrituras sean una pieza o veinte;
+   · y todas suben en UN upsert (csgSubirVarios), que ya poda, firma, deja
+     esperando la que no cabe o no tiene firma, reintenta de una en una si
+     la base rechaza el lote y suelta el respiro pendiente de cada una.
+   La misma pieza dos veces en la lista viaja una vez. Quien llama pasa
+   SOLO las que de verdad cambió: una fila que no cambió no tiene por qué
+   llevarse el reloj ni gastar sitio en el viaje. */
+async function csgPersistirVarios(lista) {
+  const van = [];
+  const vistos = new Set();
+  (Array.isArray(lista) ? lista : []).forEach(p => {
+    if (!p || !p.id || vistos.has(p.id)) return;
+    vistos.add(p.id);
+    van.push(p);
+  });
+  if (!van.length) return { ok: true, motivo: '', subidas: 0, local: true };
+  const ahora = Date.now();
+  van.forEach(p => {
+    csgMeteEnLista(p);
+    p.actualizado = ahora;
+    p.subida = false;
+    csgPodar(p);
+  });
+  let local = csgGuardaLocal();
+  let r;
+  try { r = await csgSubirEnCola(van); } catch (e) { r = { ok: false, motivo: 'sin-senal', subidas: 0 }; }
+  if (r.subidas) local = csgGuardaLocal() || local;
+  return { ok: !!r.ok, motivo: r.ok ? '' : (r.motivo || 'error'), detalle: r.detalle || '', subidas: r.subidas || 0, local };
 }
 
 function csgMeteEnLista(p) {
@@ -5369,6 +5453,7 @@ function csgCargar() {
     if (!_csgCargada) { _csgLista = csgFusionaLocal(csgLeeLocal(), _csgLista); _csgCargada = true; }
     const nube = await csgBajar();
     if (nube) {
+      _csgNubeVista = Date.now();
       _csgLista = csgFusiona(_csgLista, nube);
       await csgSubirPendientes(nube);
     }
@@ -5637,6 +5722,25 @@ let _csgAnqBitDesde = 0;
    herramienta. Contándola, tres idas y vueltas a corregir en una sola
    visita plegaban la pregunta como si se hubiera ignorado tres veces. */
 let _csgAnqVuelta = false;
+/* ☑ Elegir (ver «ELEGIR VARIAS Y MOVERLAS DE UNA VEZ», más abajo). Todo en
+   MEMORIA y nada en las preferencias del aparato ni en la nube: el modo no
+   sobrevive a salir de la vista, y una selección que reapareciera al día
+   siguiente haría retirar o mover lo que ya nadie recordaba haber elegido. */
+let _csgEleg = null;                  // null = no se elige; si no, un Set de ids
+let _csgElegRetirar = false;          // el primer toque de 🗑 Retirar ya se dio
+let _csgElegNodos = new Map();        // id → [ficha o fila] del último pintado
+let _csgElegBarraEl = null;           // la barra de elegidas, pegada abajo
+let _csgElegSeq = 0;                  // para los id de aria-labelledby
+let _csgElegHojaVistos = null;        // clave → rótulo de los estantes que ya enseñó la hoja de mover abierta
+/* Cuánto vale la copia de la nube para actuar sobre ella sin volver a
+   pedirla (csgElegNubeAlDia): un minuto. Es lo que se tarda en elegir unas
+   cuantas y tocar una acción; pasado eso, la acción pide la lista antes
+   de escribir. */
+const CSG_ELEG_AL_DIA = 60000;
+/* Y cuánto espera una acción a que la nube conteste antes de escribir
+   igual (csgElegGuarda): lo de aquí no se guarda en el aparato hasta
+   entonces, y cerrar la aplicación en ese rato lo perdería. */
+const CSG_ELEG_ESPERA = 4000;
 
 /* ══════════════════════════════════════════════════════════════════
    LOS AYUDANTES COMUNES (los usan también el compositor y las hojas)
@@ -6232,10 +6336,17 @@ function csgPintarAnaquel() {
   _csgAnqGrupos = [];
   _csgAnqMando = null;
   _csgAnqRotulos = new Map(csgEstantesTodos().map(e => [e.clave, e.rotulo]));
+  /* Los nodos de cada pieza elegible se apuntan de nuevo en cada pintado
+     (csgElegPrepara): los del pintado anterior ya no están en la página. */
+  _csgElegNodos = new Map();
 
   const vivas = csgVivas();
   const frag = document.createDocumentFragment();
   if (!vivas.length) {
+    /* Sin ninguna viva no hay nada que elegir: el modo se apaga, o la barra
+       de abajo se quedaría diciendo «Ninguna elegida» sobre un anaquel
+       vacío (pasa si otro aparato retira las últimas mientras se elige). */
+    if (csgElegActivo()) { _csgEleg = null; _csgElegRetirar = false; }
     const seguir = csgAnqSeguirFila();
     if (seguir) frag.appendChild(seguir);
     csgAnqVacio(frag);
@@ -6244,6 +6355,7 @@ function csgPintarAnaquel() {
     frag.appendChild(csgAnqNube());
     raiz.textContent = '';
     raiz.appendChild(frag);
+    csgElegPinta();
     return;
   }
 
@@ -6300,6 +6412,9 @@ function csgPintarAnaquel() {
     const el = Array.from(raiz.querySelectorAll('[data-csg-foco]')).find(x => x.dataset.csgFoco === focoClave);
     if (el) { try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); } }
   }
+  /* La barra de elegidas se pone al día con lo que quedó a la vista: un
+     filtro, una búsqueda o la nube cambian cuáles «no se ven». */
+  csgElegPinta();
 }
 
 /* Sin ninguna pieza viva: la presentación y la tarjeta del §8, con las
@@ -6363,12 +6478,35 @@ function csgAnqCorregir(p) {
    aprendió con ☑ Elegir en La Voz Prestada: lo último de una barra que se
    desliza es lo que se sale de la pantalla. El color dice la función:
    crear lleno, traer teñido, mirar neutro, sacar ámbar. */
+/* ⚠️ ☑ ELEGIR VA JUSTO DETRÁS DE 📋 PEGAR, y no entre ⇅ Orden y 📋
+   Exportar, que es donde lo ponía el §8 del plan. Medido el 23 de
+   septiembre de 2026 con la vista abierta de verdad: a 320 px la barra
+   mide 280 de ancho (con el degradado del borde en sus últimos 22), y
+   ＋ Nueva y 📋 Pegar ya llegaban al píxel 225; 🗂 Estantes empezaba en el
+   246 y acababa en el 361, y ⇅ Orden en el 469. Detrás de Orden, Elegir
+   habría empezado en el 477, o sea FUERA de la pantalla en todos los
+   teléfonos —a 390 solo se veían Nueva, Pegar y medio Estantes—: la mitad
+   de lo que se pidió no se vería sin deslizar una barra que no parece
+   deslizarse. Es la avería exacta de la regla 33 de La Voz Prestada, y la
+   respuesta es la misma: los tres botones que se tocan PRIMERO, y lo que
+   se sale por la derecha, lo que menos se toca (las vistas ▦ ☰, y antes
+   📋 Exportar). Y por debajo de 390 px el CSS ciñe los botones de la
+   barra (menos relleno, la baldosa más pequeña): aun adelantado, Elegir
+   acababa en el 330, que a 320 es pasado el borde de la barra (300) y a
+   360 debajo de su degradado; ceñido acaba en el 274, entero. */
 function csgAnqBarra() {
   const pr = csgAnqPrefs();
   const barra = csgEl('div', 'csg-barra');
   const pon = (b, foco) => { b.dataset.csgFoco = foco; barra.appendChild(b); return b; };
   pon(csgBtn('csg-btn-lleno', '＋', 'Nueva', () => csgAnqNueva()), 'barra:nueva');
   pon(csgBtn('csg-btn-tenido', '📋', 'Pegar', () => csgAnqPegar()), 'barra:pegar');
+  /* Un interruptor: puesto se ve puesto (aria-pressed y teñido), y volver
+     a tocarlo sale del modo, igual que ✕ Salir de la barra de abajo. La
+     palabra no cambia, para que la barra no se mueva al tocarlo. */
+  const eligiendo = csgElegActivo();
+  const bE = pon(csgBtn('csg-btn-neutro csg-anq-elegir' + (eligiendo ? ' on' : ''), '☑', 'Elegir',
+    () => (csgElegActivo() ? csgElegSalir() : csgElegEntrar())), 'barra:elegir');
+  bE.setAttribute('aria-pressed', eligiendo ? 'true' : 'false');
   const sep = () => { const s = csgEl('span', 'csg-barra-sep'); s.setAttribute('aria-hidden', 'true'); barra.appendChild(s); };
   sep();
   pon(csgBtn('csg-btn-neutro', '🗂', 'Estantes', csgAnqEstantesAbrir), 'barra:estantes');
@@ -6448,6 +6586,9 @@ function csgAnqMandoTocar() {
   });
   csgAnqGuardaPrefs();
   csgAnqMandoRotulo();
+  /* Plegar esconde fichas: la cuenta de «no se ven» de la barra de elegidas
+     cambia sin que se repinte nada más. */
+  csgElegPinta();
 }
 
 /* Los chips de clase, con su cuenta, en UNA fila que se desliza. «Sin
@@ -6647,6 +6788,7 @@ function csgAnqAlternar(reg) {
     csgAnqGuardaPrefs();
     csgAnqMandoRotulo();
   }
+  csgElegPinta();
 }
 
 /* ── La ficha (▦) ───────────────────────────────────────────────────
@@ -6664,7 +6806,8 @@ function csgFichaCrear(p, g) {
   bal.setAttribute('aria-hidden', 'true');
   cab.appendChild(bal);
   const tit = String(p.titulo || '').trim();
-  cab.appendChild(csgEl('span', 'csg-ficha-titulo' + (tit ? '' : ' csg-ficha-titulo-vacio'), tit || CSG_SIN_TITULO));
+  const titEl = csgEl('span', 'csg-ficha-titulo' + (tit ? '' : ' csg-ficha-titulo-vacio'), tit || CSG_SIN_TITULO);
+  cab.appendChild(titEl);
   art.appendChild(cab);
   art.appendChild(csgFichaMeta(p));
 
@@ -6680,6 +6823,11 @@ function csgFichaCrear(p, g) {
   const ex = csgFichaExtracto(p);
   if (ex) art.appendChild(ex);
 
+  /* ⚠️ MIENTRAS SE ELIGE, EL TOQUE ELIGE Y NADA MÁS: la ficha entera es la
+     casilla y los tres botones del pie NO se pintan. Dejarlos puestos
+     sería pedirle al mismo dedo dos cosas a la vez —un toque que cae en
+     ▶ Usar abriría la hoja encima y la selección se perdería detrás—. */
+  if (csgElegActivo()) { csgElegPrepara(art, p, titEl); return art; }
   const pie = csgEl('div', 'csg-ficha-pie');
   pie.appendChild(csgBtn('csg-btn-lleno', '▶', 'Usar', () => csgAnqUsar(p)));
   pie.appendChild(csgBtn('csg-btn-neutro', '✎', 'Corregir', () => csgAnqCorregir(p)));
@@ -6700,7 +6848,11 @@ function csgFichaMeta(p) {
     meta.appendChild(csgEl('span', 'csg-ficha-token csg-ficha-token-borrador', '🟡 borrador: ' + falta));
   } else if (csgClaseDe(p.clase).id === 'prompt') {
     const n = csgAnqUsosMes(p);
-    if (n >= CSG_ANQ_USOS_MES) {
+    /* Mientras se elige, el token se DICE pero no se toca: es un botón
+       dentro de la ficha, y el toque que la elige lo pulsaría también. */
+    if (n >= CSG_ANQ_USOS_MES && csgElegActivo()) {
+      meta.appendChild(csgEl('span', 'csg-ficha-token csg-ficha-token-uso', '⚠ ' + n + ' usos este mes'));
+    } else if (n >= CSG_ANQ_USOS_MES) {
       const b = csgAnqBoton('csg-ficha-token csg-ficha-token-uso', '⚠ ' + n + ' usos este mes ▸', () => csgFichaGraduar(p));
       b.setAttribute('aria-label', 'Usada ' + n + ' veces este mes: hacer una copia como Instrucción de sistema');
       meta.appendChild(b);
@@ -6776,11 +6928,14 @@ function csgFichaFila(p) {
   punto.setAttribute('aria-hidden', 'true');
   f.appendChild(punto);
   const tit = String(p.titulo || '').trim();
-  f.appendChild(csgEl('span', 'csg-fila-titulo' + (tit ? '' : ' csg-ficha-titulo-vacio'), tit || CSG_SIN_TITULO));
+  const titEl = csgEl('span', 'csg-fila-titulo' + (tit ? '' : ' csg-ficha-titulo-vacio'), tit || CSG_SIN_TITULO);
+  f.appendChild(titEl);
   /* El 🟡 también aquí: sin él, en la lista no se distingue un borrador y
      ▶ llevaría a una hoja de usar que se para. */
   const meta = [csgAnqBorrador(p) ? '🟡' : '', p.maquina ? csgAnqMaquinaNombre(p.maquina) : '', csgHace(p.ultima || p.actualizado)].filter(Boolean).join(' · ');
   f.appendChild(csgEl('span', 'csg-fila-meta', meta));
+  /* Eligiendo, la fila entera es la casilla y sin ▶ ni ⋯ (ver csgFichaCrear). */
+  if (csgElegActivo()) { csgElegPrepara(f, p, titEl); return f; }
   /* Con su palabra, como todos los botones de la casa; en el teléfono el
      CSS la esconde (.csg-fila-usar), porque ahí no cabe al lado del
      título, y la etiqueta sigue diciendo «Usar» al lector de pantalla. */
@@ -6897,10 +7052,12 @@ function csgAnqEstantesAbrir() {
     }
     if (!ests.length) cuerpo.appendChild(csgEl('p', 'csg-nota', 'Todavía no hay estantes. Se ponen desde el ⋯ de cada consigna, o en el compositor: la materia, el proyecto, para quién es. Una consigna puede estar en varios.'));
     /* Aquí no se crea ninguno, y se dice dónde: un estante vacío no existe
-       (los estantes salen de las piezas, §8), y sin «☑ Elegir» no hay a
-       qué ponérselo desde esta hoja. Un campo que creara uno sin nada
-       dentro se leería como una avería al no verlo en la lista. */
-    else cuerpo.appendChild(csgEl('p', 'csg-nota', 'Un estante nuevo se crea al archivar: en el ⋯ de una consigna → 🗂 Estantes, o con «＋ estante» al escribirla.'));
+       (los estantes salen de las piezas, §8), y esta hoja es la de MIRAR:
+       no tiene a qué ponérselo. Un campo que creara uno sin nada dentro se
+       leería como una avería al no verlo en la lista. Se crea donde hay
+       consignas a las que ponerlo: el ⋯ de una, el compositor, o varias a
+       la vez con ☑ Elegir → 🗂 Mover a estante. */
+    else cuerpo.appendChild(csgEl('p', 'csg-nota', 'Un estante nuevo se crea al archivar: en el ⋯ de una consigna → 🗂 Estantes, con «＋ estante» al escribirla, o a varias de golpe con ☑ Elegir → 🗂 Mover a estante.'));
 
     const cuentas = new Map();
     vivas.forEach(p => { const m = csgAnqMaquinaDe(p); cuentas.set(m, (cuentas.get(m) || 0) + 1); });
@@ -7410,13 +7567,17 @@ function csgMenuBitacora(p) {
    cuarenta caracteres (el tope de `estantes` en la base, CSG_TOPES), y el
    botón lo dice al llegar en vez de rebotar al guardar. */
 function csgMenuEstantes(p) {
+  /* Lo que esta hoja ya enseñó, mientras siga abierta (csgEstantesConVistos):
+     quitarle a la pieza el único estante que la tenía no puede hacer que
+     el renglón de debajo suba al sitio del dedo. */
+  const vistos = new Map();
   csgVerAbrir('🗂 Estantes', cuerpo => {
     cuerpo.appendChild(csgMenuVolver(p));
     const propios = new Set(csgAnqEstantesDe(p).map(csgClave));
     const tope = CSG_TOPES.estantes_n;
     const lleno = propios.size >= tope;
     cuerpo.appendChild(csgEl('p', 'csg-nota', 'Toca un estante para ponerla o quitarla. Una consigna puede estar en varios (hasta ' + tope + ').'));
-    const todos = csgEstantesTodos();
+    const todos = csgEstantesConVistos(vistos);
     todos.forEach(e => {
       const on = propios.has(e.clave);
       const r = csgVerFila('🗂', e.rotulo, e.n, on, () => csgMenuEstanteAlterna(p, e.rotulo));
@@ -7546,13 +7707,17 @@ function csgMenuCuaderno(p) {
 function csgMenuRetirar(p) {
   const fila = csgVerFila('🗑', 'Retirar', null, null, () => {
     const dos = csgEl('div', 'csg-dos-toques');
-    dos.appendChild(csgEl('span', '', '¿Retirar? Se puede devolver desde «Retiradas», al final del anaquel.'));
+    const sin = typeof csgEdSinGuardar === 'function' && csgEdSinGuardar([p.id]) > 0;
+    dos.appendChild(csgEl('span', '', '¿Retirar? Se puede devolver desde «Retiradas», al final del anaquel.' +
+      (sin ? ' Tenía cambios sin guardar: se guardan con ella.' : '')));
     dos.appendChild(csgBtn('csg-btn-peligro csg-btn-sm', '', 'Sí, retirar', () => {
+      /* Lo que tenía a medio escribir se guarda CON ella antes de la
+         lápida (csgEdGuardaAntesDeRetirar): «↩ Devolver» la trae entera. */
+      if (typeof csgEdGuardaAntesDeRetirar === 'function') csgEdGuardaAntesDeRetirar(p.id);
       p.eliminado = true;
       p.eliminado_at = new Date().toISOString();
-      /* Lo que quedara a medio escribir de ESTA pieza se va con ella: si
-         no, el anaquel seguía ofreciendo «Seguir» y abrir otra pieza la
-         devolvía como nueva. */
+      /* Y su copia del compositor se suelta: si no, el anaquel seguía
+         ofreciendo «Seguir» y abrir otra pieza la devolvía como nueva. */
       if (typeof csgEdSoltarPieza === 'function') csgEdSoltarPieza(p.id);
       const r = csgPersistir(p);
       csgVerCerrar();
@@ -7568,6 +7733,702 @@ function csgMenuRetirar(p) {
   /* En rojo: es el único renglón del menú que se lleva algo del anaquel. */
   fila.classList.add('csg-ver-fila-peligro');
   return fila;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ☑ ELEGIR VARIAS Y MOVERLAS DE UNA VEZ (§8)
+   ──────────────────────────────────────────────────────────────────
+   Pedido por el autor el 23 de septiembre de 2026: «Añade ☑ Elegir para
+   mover varias de golpe». Con veinte consignas por archivar, hacerlo de
+   una en una son veinte vueltas por el ⋯ de cada una; y eso es justo la
+   carga que La Voz Prestada quitó con lo mismo (su regla 33).
+
+   Lo que no se negocia, y por qué:
+   · SE ENTRA POR UN BOTÓN (☑ Elegir de la barra), no por una pulsación
+     larga: un gesto que sea la única manera de hacer algo es algo que a
+     veces no se puede hacer (la regla del asa de la repisa).
+   · MIENTRAS SE ELIGE, EL TOQUE ELIGE Y NADA MÁS. La ficha entera es la
+     casilla (role="checkbox", con Intro y Espacio desde el teclado) y sus
+     botones no se pintan: el mismo dedo no puede querer dos cosas. Los
+     rótulos de los grupos siguen plegando: no son fichas.
+   · LA SELECCIÓN ES DE IDS Y DE MEMORIA. Sobrevive a los repintados —la
+     nube que llega, una búsqueda, un filtro— porque se guarda por id y no
+     por nodo; lo que un filtro deja fuera sigue elegido y la barra lo dice
+     («5 elegidas · 2 no se ven»), porque mover o retirar lo que no se ve
+     sin decirlo sería una sorpresa. Y no se guarda en el aparato: el modo
+     no sobrevive a salir de la vista (csgElegFuera, desde switchView).
+   · CADA ACCIÓN ES UN SOLO VIAJE (csgPersistirVarios): solo las piezas que
+     de verdad cambian, con el reloj puesto y en UN upsert. Mover veinte
+     con una escritura por pieza, con la señal de una tableta, es lo que
+     hace que mover veinte tarde.
+   · RETIRAR SON DOS TOQUES EN EL MISMO SITIO, sin confirm() (regla 22 de
+     La Voz Prestada), y deja la lápida de siempre.
+   · EL BOTÓN DE DESTELLOS SE APARTA mientras se elige: vive en la esquina
+     de abajo a la derecha, que es donde cae la barra. La regla del CSS
+     lleva !important porque switchView le escribe el display EN LA
+     ETIQUETA (css/consigna.css lo cuenta).
+   · Y NADA DE LO ESCRITO POR UNA PERSONA LLEGA A UN ATRIBUTO (regla 15):
+     la ficha se nombra con aria-labelledby apuntando a su propio título,
+     con un id NUESTRO; el estante que se crea en la hoja es texto.
+   ══════════════════════════════════════════════════════════════════ */
+
+function csgElegActivo() { return !!_csgEleg; }
+
+function csgElegEntrar() {
+  if (!csgVivas().length) { csgAviso('Todavía no hay consignas que elegir'); return; }
+  _csgEleg = new Set();
+  _csgElegRetirar = false;
+  /* ⚠️ Y SE PIDE LA NUBE AL ENTRAR. La lista solo se baja al abrir la
+     vista y al volver la señal, así que una tableta que se quedó en el
+     anaquel desde la mañana elige sobre la copia de la mañana; y cada
+     acción sube la fila ENTERA (csgAFila) con el reloj puesto, o sea que
+     esa copia GANA: mover veinte a un estante les pisaba a la vez el texto
+     que otro aparato corrigió al mediodía, y resucitaba la que allí se
+     retiró. Se elige sobre lo de ahora: la selección es de ids y aguanta
+     el repintado, y la que otro aparato retiró sale sola de ella
+     (csgElegCuenta). Lo que se toque antes de que conteste, lo espera
+     csgElegGuarda. Es un viaje de bajada por cada vez que se entra, que es
+     un gesto deliberado y raro; y si ahora no hay nube que conteste (falta
+     el SQL, no hay sesión, no hay señal), no se pide. */
+  const bajar = !!_csgInitEnCurso || csgElegNubeResponde();
+  csgPintarAnaquel();
+  if (bajar) {
+    const tras = () => {
+      csgPintarAnaquel();
+      if (typeof csgEdTrasNube === 'function') csgEdTrasNube();
+    };
+    let viaje = null;
+    try { viaje = csgCargar(); } catch (e) { viaje = null; }
+    Promise.resolve(viaje).then(tras, tras);
+  }
+}
+
+/* ¿Contesta la nube ahora? La última vez que se le preguntó, sí. */
+function csgElegNubeResponde() {
+  return _csgNube === 'puesta' || _csgNube === 'vieja';
+}
+/* ¿Se puede actuar sobre la copia de aquí sin volver a pedir la nube? Sí,
+   si llegó hace menos de CSG_ELEG_AL_DIA y no hay otra bajada en camino. Y
+   también si ahora no hay nube que consultar (falta el SQL, no hay
+   sesión, no hay señal): ahí esperar una bajada que no va a llegar solo
+   retrasaría ocho segundos guardar en el aparato, y lo hecho se sube como
+   siempre cuando vuelva (csgSubirPendientes). */
+function csgElegNubeAlDia() {
+  if (_csgInitEnCurso) return false;
+  if (!csgElegNubeResponde()) return true;
+  return !!_csgNubeVista && Date.now() - _csgNubeVista < CSG_ELEG_AL_DIA;
+}
+
+/* Salir quita la clase del `body` SIEMPRE (csgElegPinta): si se quedara
+   puesta, el botón de Destellos desaparecería de toda la aplicación. La
+   hoja de mover o de máquina que estuviera abierta se cierra con el modo:
+   sin selección no tiene a quién mover. */
+function csgElegSalir(opciones) {
+  const pintar = !(opciones && opciones.pintar === false);
+  const estaba = !!_csgEleg;
+  /* ⚠️ ¿El foco estaba en la barra que se va a esconder? Hay que mirarlo
+     ANTES: escondida con el foco dentro, el navegador lo suelta en el
+     `body` y el siguiente Tab empieza desde lo alto de la página. Con
+     ✕ Salir o «Sí, retirar» desde el teclado, el foco vuelve a ☑ Elegir,
+     que es donde lo deja Escape y por donde se entró. */
+  const ae = typeof document !== 'undefined' && document ? document.activeElement : null;
+  const focoEnBarra = !!(_csgElegBarraEl && ae && _csgElegBarraEl.contains(ae));
+  _csgEleg = null;
+  _csgElegRetirar = false;
+  _csgElegHojaVistos = null;
+  if (_csgAnqVerPintar === csgElegHojaMover || _csgAnqVerPintar === csgElegHojaMaquina) csgVerCerrar();
+  csgElegPinta();
+  if (pintar && estaba) csgPintarAnaquel();
+  if (pintar && focoEnBarra) {
+    const e = document.querySelector('#csg-anaquel [data-csg-foco="barra:elegir"]');
+    if (e) { try { e.focus({ preventScroll: true }); } catch (err) {} }
+  }
+}
+
+/* La puerta de switchView (js/app.js): irse a otra vista sale del modo.
+   Corre en CADA cambio de vista de toda la aplicación, así que no hace
+   nada si no hay nada que hacer y nunca lanza. */
+function csgElegFuera() {
+  try {
+    const cls = typeof document !== 'undefined' && document && document.body && document.body.classList;
+    if (!_csgEleg && !(cls && cls.contains('csg-eligiendo'))) return;
+    csgElegSalir({ pintar: false });
+  } catch (e) {}
+}
+
+/* Escape sale del modo, pero no si hay una hoja abierta encima (la cierra
+   su propio Escape) ni si se está escribiendo en un recuadro: ahí Escape
+   es del recuadro (el buscador lo usa para borrarse). */
+function csgElegEscape(e) {
+  if (!_csgEleg) return false;
+  /* Si ya lo atendió otra hoja (📋 Pegar o ▶ Usar se cierran con su propio
+     Escape en la fase de captura, y marcan el evento), ese Escape era suyo:
+     mirando después, la hoja ya estaría cerrada y una sola tecla cerraba
+     la hoja Y salía del modo, perdiendo la selección. Una tecla, un paso. */
+  if (e && e.defaultPrevented) return false;
+  const v = document.getElementById('view-consigna');
+  if (!v || !v.classList.contains('active')) return false;
+  /* ⚠️ Una hoja está encima si SE VE, no si su etiqueta dice `flex`: otras
+     herramientas dejan sus hojas con `display: flex` dentro de un
+     contenedor escondido (la del recurso de La Voz Prestada, dentro de la
+     sala cerrada al saltar al chat), y mirando la etiqueta Escape no salía
+     nunca del modo. getClientRects() da cero con la hoja o cualquiera de
+     sus antepasados en `display: none`. */
+  const encima = Array.from(document.querySelectorAll('.fin-modal-overlay')).some(o => o.getClientRects().length > 0);
+  if (encima) return false;
+  const t = e && e.target;
+  if (t && t.tagName && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return false;
+  csgElegSalir();
+  return true;
+}
+
+/* La ficha (▦) o la fila (☰), convertida en casilla. La marca de la esquina
+   es un cuadro dibujado por el CSS con su ✓ dentro, y no los signos ☑ ☐:
+   cada tipo de letra pinta esos dos a su manera, y en algunas tabletas
+   salen como un cuadrado vacío los dos. */
+function csgElegPrepara(el, p, titEl) {
+  const id = p.id;
+  el.classList.add('csg-elegible');
+  el.setAttribute('role', 'checkbox');
+  el.tabIndex = 0;
+  if (titEl) {
+    titEl.id = 'csg-eleg-t' + (++_csgElegSeq);
+    el.setAttribute('aria-labelledby', titEl.id);
+  }
+  const marca = csgEl('span', 'csg-eleg-marca', '✓');
+  marca.setAttribute('aria-hidden', 'true');
+  el.appendChild(marca);
+  if (!_csgElegNodos.has(id)) _csgElegNodos.set(id, []);
+  _csgElegNodos.get(id).push(el);
+  csgElegMarcaNodo(el, !!(_csgEleg && _csgEleg.has(id)));
+  el.addEventListener('click', () => csgElegAlterna(id));
+  el.addEventListener('keydown', e => {
+    if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Enter') { e.preventDefault(); csgElegAlterna(id); }
+  });
+}
+function csgElegMarcaNodo(el, on) {
+  el.classList.toggle('csg-elegida', on);
+  el.setAttribute('aria-checked', on ? 'true' : 'false');
+}
+
+/* Un toque marca o desmarca, y se toca el DOM: no se repinta el anaquel
+   (le arrancaría a la tableta la ficha que iba a recibir el toque
+   siguiente, y con el teclado se perdería el foco). Una pieza que sale en
+   dos estantes tiene dos fichas: se marcan las dos. Cambiar la selección
+   desarma el «Sí, retirar»: lo confirmado tiene que ser lo que se ve. */
+function csgElegAlterna(id) {
+  if (!_csgEleg) return;
+  const p = csgDe(id);
+  if (!p || p.eliminado) { _csgEleg.delete(id); csgElegPinta(); return; }
+  const on = !_csgEleg.has(id);
+  if (on) _csgEleg.add(id); else _csgEleg.delete(id);
+  (_csgElegNodos.get(id) || []).forEach(el => csgElegMarcaNodo(el, on));
+  _csgElegRetirar = false;
+  csgElegPinta();
+}
+
+/* Cuántas hay elegidas, cuántas de ellas no se ven y cuáles se ven. Las
+   retiradas —por aquí o desde otro aparato— salen de la selección: una
+   lápida no se puede elegir. «Se ve» es tener una ficha pintada fuera de
+   un grupo plegado: plegar también esconde. */
+function csgElegCuenta() {
+  if (!_csgEleg) return { n: 0, ocultas: 0, visibles: [] };
+  Array.from(_csgEleg).forEach(id => { const p = csgDe(id); if (!p || p.eliminado) _csgEleg.delete(id); });
+  const visibles = [];
+  _csgElegNodos.forEach((nodos, id) => {
+    const p = csgDe(id);
+    if (!p || p.eliminado) return;
+    if (nodos.some(n => n.isConnected && !(n.closest && n.closest('.csg-grupo[hidden]')))) visibles.push(id);
+  });
+  const vistas = new Set(visibles);
+  let ocultas = 0;
+  _csgEleg.forEach(id => { if (!vistas.has(id)) ocultas++; });
+  return { n: _csgEleg.size, ocultas, visibles };
+}
+function csgElegPiezas() {
+  if (!_csgEleg) return [];
+  csgElegCuenta();
+  return csgVivas().filter(p => _csgEleg.has(p.id));
+}
+function csgElegNoSeVen(n) {
+  return n === 1 ? '1 no se ve' : n + ' no se ven';
+}
+function csgElegCuantas(n) {
+  return n === 1 ? '1 consigna' : n + ' consignas';
+}
+
+/* «☑ Todas las que se ven» elige las que están a la vista; con todas ya
+   elegidas, el mismo botón dice «Ninguna» y vacía la selección entera
+   (también lo que no se ve: «ninguna» es ninguna, y la barra ya decía
+   cuántas no se veían). */
+function csgElegTodas() {
+  if (!_csgEleg) return;
+  const c = csgElegCuenta();
+  const todas = c.visibles.length > 0 && c.visibles.every(id => _csgEleg.has(id));
+  if (todas || (!c.visibles.length && c.n)) {
+    _csgEleg.clear();
+    _csgElegNodos.forEach(nodos => nodos.forEach(el => csgElegMarcaNodo(el, false)));
+  } else if (!c.visibles.length) {
+    csgAviso('No hay ninguna consigna a la vista: quita la búsqueda o el filtro');
+    return;
+  } else {
+    c.visibles.forEach(id => { _csgEleg.add(id); (_csgElegNodos.get(id) || []).forEach(el => csgElegMarcaNodo(el, true)); });
+  }
+  _csgElegRetirar = false;
+  csgElegPinta();
+}
+
+/* La barra de elegidas vive FUERA de #csg-anaquel, colgada de la vista, y
+   fija encima de la barra de la aplicación, como la barra del compositor:
+   así no se rehace con cada repintado del anaquel ni se va con el
+   desplazamiento, y el anaquel le deja sitio debajo con su relleno
+   (css/consigna.css). Se crea la primera vez que hace falta. */
+function csgElegBarra() {
+  if (_csgElegBarraEl && _csgElegBarraEl.isConnected) return _csgElegBarraEl;
+  if (typeof document === 'undefined' || !document || !document.getElementById) return null;
+  const vista = document.getElementById('view-consigna');
+  if (!vista) return null;
+  const b = csgEl('div', 'csg-eleg-barra');
+  b.id = 'csg-eleg-barra';
+  b.hidden = true;
+  b.setAttribute('role', 'region');
+  b.setAttribute('aria-label', 'Consignas elegidas');
+  /* La cuenta es un nodo FIJO con role="status", y solo se le cambia el
+     texto: un lector de pantalla anuncia los cambios de una región viva
+     que ya estaba, no los de una que acaba de nacer. Los botones sí se
+     rehacen en cada pintado. */
+  const arriba = csgEl('div', 'csg-eleg-arriba');
+  const n = csgEl('span', 'csg-eleg-n');
+  n.setAttribute('role', 'status');
+  arriba.appendChild(n);
+  const mandos = csgEl('span', 'csg-eleg-mandos');
+  arriba.appendChild(mandos);
+  b.appendChild(arriba);
+  const acc = csgEl('div', 'csg-eleg-acciones');
+  b.appendChild(acc);
+  vista.appendChild(b);
+  _csgElegBarraEl = b;
+  /* Su alto cambia (la cuenta parte renglones distintos al girar la
+     tableta): el relleno del anaquel y el aviso de la aplicación lo leen
+     de --csg-eleg-alto, que se pone al día solo. */
+  if (typeof ResizeObserver === 'function') {
+    try { new ResizeObserver(() => csgElegAlto()).observe(b); } catch (e) {}
+  }
+  return b;
+}
+function csgElegAlto() {
+  const b = _csgElegBarraEl;
+  if (!b || !document.body) return;
+  if (b.hidden || !_csgEleg) { document.body.style.removeProperty('--csg-eleg-alto'); return; }
+  const h = Math.ceil(b.getBoundingClientRect().height);
+  if (h > 0) document.body.style.setProperty('--csg-eleg-alto', h + 'px');
+}
+
+/* Un botón de la barra: icono y palabra, como los de la barra fija del
+   compositor (.csg-bb). `largo` es la parte de la palabra que sobra en un
+   teléfono («Mover» · « a estante»): el CSS la esconde por debajo de 480. */
+function csgElegBoton(cls, ic, texto, largo, alTocar) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'csg-bb ' + cls;
+  if (ic) {
+    const i = csgEl('span', 'csg-bb-ic', ic);
+    i.setAttribute('aria-hidden', 'true');
+    b.appendChild(i);
+  }
+  const t = csgEl('span', 'csg-bb-t', texto);
+  if (largo) t.appendChild(csgEl('span', 'csg-eleg-largo', largo));
+  b.appendChild(t);
+  b.addEventListener('click', alTocar);
+  return b;
+}
+
+/* Pinta la barra con el estado de ahora. Se llama tras cada cambio, y
+   también al final de cada pintado del anaquel, así que es la ÚNICA que
+   pone y quita la clase del body. */
+function csgElegPinta() {
+  if (typeof document === 'undefined' || !document || !document.body) return;
+  const barra = _csgEleg ? csgElegBarra() : _csgElegBarraEl;
+  if (!_csgEleg) {
+    document.body.classList.remove('csg-eligiendo');
+    document.body.style.removeProperty('--csg-eleg-alto');
+    if (barra) barra.hidden = true;
+    return;
+  }
+  document.body.classList.add('csg-eligiendo');
+  if (!barra) return;
+  const ae = document.activeElement;
+  const foco = ae && barra.contains(ae) && ae.dataset ? ae.dataset.csgFoco || '' : '';
+  const c = csgElegCuenta();
+  if (!c.n) _csgElegRetirar = false;
+  barra.hidden = false;
+  const n = barra.querySelector('.csg-eleg-n');
+  const mandos = barra.querySelector('.csg-eleg-mandos');
+  const acc = barra.querySelector('.csg-eleg-acciones');
+  if (!n || !mandos || !acc) return;
+
+  let txt;
+  if (_csgElegRetirar) {
+    /* Y si alguna tenía algo a medio escribir, se dice ANTES del «Sí»: se
+       guarda con ella (csgElegRetirarYa), pero quien la retira tiene que
+       saber que ese texto existe. */
+    const sin = typeof csgEdSinGuardar === 'function' ? csgEdSinGuardar(csgElegPiezas().map(p => p.id)) : 0;
+    txt = '¿Retirar ' + (c.n === 1 ? 'la elegida' : 'las ' + c.n) + '? Se pueden devolver desde «Retiradas».' +
+      (sin ? ' ' + (c.n === 1 ? 'Tenía cambios sin guardar: se guardan con ella.' : sin === 1 ? '1 tenía cambios sin guardar: se guardan con ella.' : sin + ' tenían cambios sin guardar: se guardan con ellas.') : '');
+  }
+  else if (!c.n) txt = 'Ninguna elegida: toca las que quieras mover';
+  else txt = (c.n === 1 ? '1 elegida' : c.n + ' elegidas') + (c.ocultas ? ' · ' + csgElegNoSeVen(c.ocultas) : '');
+  if (n.textContent !== txt) n.textContent = txt;
+  n.classList.toggle('csg-eleg-n-peligro', _csgElegRetirar);
+
+  mandos.textContent = '';
+  const todasVistas = c.visibles.length > 0 && c.visibles.every(id => _csgEleg.has(id));
+  const ninguna = todasVistas || (!c.visibles.length && c.n > 0);
+  const bt = csgBtn('csg-btn-neutro csg-btn-sm csg-eleg-todas', ninguna ? '☐' : '☑', ninguna ? 'Ninguna' : 'Todas', csgElegTodas);
+  if (!ninguna) {
+    const t = bt.querySelector('.csg-btn-t');
+    if (t) t.appendChild(csgEl('span', 'csg-eleg-largo', ' las que se ven'));
+    bt.setAttribute('aria-label', 'Elegir todas las que se ven');
+  } else bt.setAttribute('aria-label', 'No elegir ninguna');
+  bt.dataset.csgFoco = 'eleg:todas';
+  mandos.appendChild(bt);
+  const salir = csgBtn('csg-btn-neutro csg-btn-sm csg-eleg-salir', '✕', 'Salir', () => csgElegSalir());
+  salir.setAttribute('aria-label', 'Salir de elegir');
+  salir.dataset.csgFoco = 'eleg:salir';
+  mandos.appendChild(salir);
+
+  acc.textContent = '';
+  acc.classList.toggle('csg-eleg-confirma', _csgElegRetirar);
+  if (_csgElegRetirar) {
+    /* «Sí» a la izquierda y «No» donde estaba 🗑 Retirar: un doble toque
+       sin querer sobre Retirar cae en «No», y no se lleva nada. */
+    const si = csgElegBoton('csg-bb-si', '🗑', 'Sí, retirar ' + c.n + (c.ocultas ? ' (' + csgElegNoSeVen(c.ocultas) + ')' : ''), '', csgElegRetirarYa);
+    si.dataset.csgFoco = 'eleg:si';
+    acc.appendChild(si);
+    const no = csgElegBoton('csg-bb-no', '', 'No', '', () => {
+      _csgElegRetirar = false;
+      csgElegPinta();
+      const r = barra.querySelector('.csg-bb-retirar');
+      if (r) { try { r.focus({ preventScroll: true }); } catch (e) {} }
+    });
+    no.dataset.csgFoco = 'eleg:no';
+    acc.appendChild(no);
+  } else {
+    const mover = csgElegBoton('csg-bb-mover', '🗂', 'Mover', ' a estante', csgElegMover);
+    mover.dataset.csgFoco = 'eleg:mover';
+    const maq = csgElegBoton('csg-bb-maquina', '🤖', 'Máquina', '', csgElegMaquina);
+    maq.dataset.csgFoco = 'eleg:maquina';
+    const ret = csgElegBoton('csg-bb-retirar', '🗑', 'Retirar', '', csgElegRetirar);
+    ret.dataset.csgFoco = 'eleg:retirar';
+    /* Con cero elegidas no se apagan: responden y DICEN por qué no hacen
+       nada. Un botón apagado sin explicación se lee como una avería. */
+    if (!c.n) [mover, maq, ret].forEach(b => b.setAttribute('aria-disabled', 'true'));
+    acc.appendChild(mover);
+    acc.appendChild(maq);
+    acc.appendChild(ret);
+  }
+  if (foco) {
+    const el = Array.from(barra.querySelectorAll('[data-csg-foco]')).find(x => x.dataset.csgFoco === foco);
+    if (el) { try { el.focus({ preventScroll: true }); } catch (e) {} }
+  }
+  csgElegAlto();
+}
+
+/* Con cero elegidas, cada acción lo dice en vez de no hacer nada. */
+function csgElegHay(que) {
+  if (csgElegPiezas().length) return true;
+  csgAviso('Ninguna elegida: toca primero las consignas que quieras ' + que);
+  return false;
+}
+
+/* Guardar lo que cambió una acción: UN viaje (csgPersistirVarios), y el
+   compositor se entera en el acto si tiene abierta una copia de alguna
+   —si no, la copia seguiría con los estantes o la máquina de antes—. El
+   anaquel se repinta al volver la nube, para que la franja diga cómo fue.
+   `aplica(p)` es la MISMA acción sobre una pieza (poner el estante, la
+   máquina, la lápida), escrita para poder repetirse sin cambiar nada más;
+   `lapida` dice que la acción es retirar.
+   ⚠️ LA ACCIÓN SE ESCRIBE SOBRE LA PIEZA COMO ESTÁ AHORA EN LA NUBE. El
+   upsert sube la fila ENTERA con el reloj puesto, así que la copia de
+   aquí gana todo: si es vieja, pisa el texto que otro aparato corrigió y
+   resucita la que allí se retiró, y la corrección de allá no queda en
+   ningún sitio. Con la copia al día (csgElegNubeAlDia) se guarda en el
+   acto, como siempre. Si no —otra bajada en camino, o la última llegó
+   hace más de un minuto—, primero se baja y se funde (csgCargar), y
+   entonces la acción se vuelve a aplicar sobre lo fundido: la fusión, con
+   la nube más nueva, le devuelve a la pieza SUS escalares —el texto de
+   allá, y también los estantes de antes de tocar—, y `aplica` pone
+   encima solo lo que se tocó aquí. La que llegó retirada no se toca: ni
+   se mueve ni resucita. En pantalla no se nota: lo hecho ya se pintó al
+   tocar, y lo fundido se repinta con la acción puesta en el mismo turno. */
+function csgElegGuarda(cambiadas, aplica, lapida) {
+  const tras = () => {
+    csgPintarAnaquel();
+    if (typeof csgEdTrasNube === 'function') { try { csgEdTrasNube(); } catch (e) {} }
+  };
+  let r = null;
+  if (typeof aplica !== 'function' || csgElegNubeAlDia()) {
+    try { r = csgPersistirVarios(cambiadas); } catch (e) { r = null; }
+    if (typeof csgEdTrasNube === 'function') { try { csgEdTrasNube(); } catch (e) {} }
+  } else {
+    const ids = cambiadas.map(p => p && p.id).filter(Boolean);
+    const sobreLaNube = () => {
+      const van = ids.map(csgDe).filter(p => p && (lapida || !p.eliminado));
+      van.forEach(p => aplica(p));
+      tras();
+      return csgPersistirVarios(van);
+    };
+    let viaje = null;
+    try { viaje = csgCargar(); } catch (e) { viaje = null; }
+    /* ⚠️ CON RELOJ: mientras se espera a la nube, lo tocado aún no está
+       guardado en el aparato. Si la bajada no contesta en CSG_ELEG_ESPERA
+       —sin señal, la petición no vuelve hasta los ocho segundos de
+       csgConReloj—, se escribe con la copia de aquí, como antes de esto:
+       sin nube no hay nada más nuevo que respetar, y cerrar la aplicación
+       en ese rato perdería lo hecho sin ningún aviso. */
+    let reloj = null;
+    const espera = new Promise(res => { reloj = setTimeout(res, CSG_ELEG_ESPERA); });
+    const suelta = () => clearTimeout(reloj);
+    Promise.resolve(viaje).then(suelta, suelta);
+    r = Promise.race([Promise.resolve(viaje), espera]).then(sobreLaNube, sobreLaNube);
+  }
+  Promise.resolve(r).then(tras, tras);
+  return r;
+}
+
+/* Los títulos de unas pocas, para decir CUÁLES («A», «B» y 3 más). */
+function csgElegCuales(ps) {
+  const t = ps.slice(0, 3).map(p => '«' + csgAnqCorto(String(p.titulo || '').trim() || CSG_SIN_TITULO, 28) + '»').join(', ');
+  return ps.length > 3 ? t + ' y ' + (ps.length - 3) + ' más' : t;
+}
+
+/* ── 🗂 Mover a estante ────────────────────────────────────────────── */
+function csgElegMover() {
+  if (!csgElegHay('mover')) return;
+  _csgElegHojaVistos = new Map();
+  csgVerAbrir('🗂 Mover a estante', csgElegHojaMover);
+}
+
+/* ⚠️ LOS ESTANTES QUE ENSEÑA UNA HOJA ABIERTA NO DESAPARECEN DEBAJO DEL
+   DEDO. La lista sale de las piezas (csgEstantesTodos), así que sacar de
+   un estante a las únicas que lo tenían lo borraba de la hoja en el acto:
+   el renglón de debajo subía a su sitio y el segundo toque —el que quería
+   volver a meterlas, porque es un interruptor— caía en OTRO estante y
+   metía la selección ahí, sin que nadie lo hubiera tocado. Es la lección
+   de «al soltar no se repinta»: lo que va a recibir el siguiente toque no
+   se mueve. Mientras la hoja está abierta se recuerda lo que ya enseñó
+   (clave → rótulo), y lo que se vació sigue en su sitio, sin marcar y con
+   su rótulo de siempre, hasta cerrarla. No crea ningún estante vacío en
+   la casa: al cerrar se olvida. Lo usan la hoja de mover de ☑ Elegir y la
+   de ⋯ → Estantes de una sola pieza, que tenían la misma avería. */
+function csgEstantesConVistos(vistos) {
+  const todos = csgEstantesTodos();
+  if (!vistos) return todos;
+  todos.forEach(e => { if (!vistos.has(e.clave)) vistos.set(e.clave, e.rotulo); });
+  const hay = new Set(todos.map(e => e.clave));
+  vistos.forEach((rotulo, clave) => { if (!hay.has(clave)) todos.push({ clave, rotulo, n: 0 }); });
+  return todos.sort((a, b) => a.clave.localeCompare(b.clave, 'es'));
+}
+
+/* La hoja vertical de mover: los estantes de la casa, un renglón de 44 px
+   por estante con su tono y lo que pasa con la SELECCIÓN —✓ si están
+   todas, «–» y «3 de 5» si están algunas, nada si ninguna—. Tocar uno es
+   el interruptor de siempre sobre varias: si ya estaban todas, las saca;
+   si no, las mete. Y se crea uno DENTRO, sin perder la selección: si
+   hubiera que salir a crearlo, archivar veinte serían veinte selecciones.
+   La hoja se queda abierta (se tocan varios estantes seguidos) y se
+   repinta en su sitio; «Listo» la cierra. */
+function csgElegHojaMover(cuerpo) {
+  const ps = csgElegPiezas();
+  const n = ps.length;
+  const listo = csgBtn('csg-btn-lleno csg-eleg-listo', '', 'Listo', () => { csgVerCerrar(); csgElegPinta(); });
+  if (!n) {
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Ya no queda ninguna elegida.'));
+    cuerpo.appendChild(listo);
+    return;
+  }
+  const c = csgElegCuenta();
+  cuerpo.appendChild(csgEl('p', 'csg-nota', (n === 1 ? '1 consigna elegida' : n + ' consignas elegidas') +
+    (c.ocultas ? ' (' + csgElegNoSeVen(c.ocultas) + ' con lo que está puesto)' : '') +
+    '. Toca un estante para meterlas; si ya están todas, las saca.'));
+  const todos = csgEstantesConVistos(_csgElegHojaVistos);
+  todos.forEach(e => {
+    const dentro = ps.filter(p => csgAnqEstantesDe(p).some(x => csgClave(x) === e.clave)).length;
+    const todas = dentro === n;
+    const parte = dentro > 0 && !todas;
+    const r = csgVerFila('🗂', e.rotulo, parte ? dentro + ' de ' + n : '', todas, () => {
+      csgElegEstante(e.rotulo, false);
+      csgVerPintar();
+      csgPintarAnaquel();
+    });
+    r.classList.add(csgTono(e.clave));
+    if (parte) { r.classList.add('csg-ver-fila-parte'); r.setAttribute('aria-pressed', 'mixed'); }
+    cuerpo.appendChild(r);
+  });
+  if (!todos.length) cuerpo.appendChild(csgEl('p', 'csg-nota', 'Todavía no hay estantes: escribe el primero aquí abajo.'));
+
+  cuerpo.appendChild(csgVerSep('Estante nuevo'));
+  const inp = csgEl('input', 'csg-input');
+  inp.type = 'text';
+  inp.maxLength = CSG_TOPES.estante;
+  /* Corto: a 320 px el recuadro mide 150 y «Nombre del estante (p. ej.…»
+     salía cortado; el rótulo «Estante nuevo» de encima ya dice qué va. */
+  inp.placeholder = 'p. ej. Maestría';
+  inp.setAttribute('aria-label', 'Nombre del estante nuevo');
+  inp.setAttribute('autocomplete', 'off');
+  inp.setAttribute('enterkeyhint', 'done');
+  const crear = () => {
+    const nombre = inp.value.replace(/\s+/g, ' ').trim();
+    if (!nombre) { csgAviso('Escribe el nombre del estante'); inp.focus(); return; }
+    if (!csgClave(nombre)) { csgAviso('Ese nombre no tiene letras'); inp.focus(); return; }
+    csgElegEstante(nombre, true);
+    csgVerPintar();
+    csgPintarAnaquel();
+    /* La hoja se repintó: el foco va al recuadro NUEVO, dentro del mismo
+       toque, para poder crear otro sin volver a tocar. */
+    const otro = cuerpo.querySelector('input.csg-input');
+    if (otro) otro.focus();
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); crear(); } });
+  const fila = csgEl('div', 'csg-estante-nuevo');
+  fila.appendChild(inp);
+  fila.appendChild(csgBtn('csg-btn-lleno csg-btn-sm', '＋', 'Crear y poner', crear));
+  cuerpo.appendChild(fila);
+  cuerpo.appendChild(csgEl('p', 'csg-nota', 'Hasta ' + CSG_TOPES.estantes_n + ' estantes por consigna, de ' + CSG_TOPES.estante + ' letras como mucho. «Maestría» y «maestria» son el mismo.'));
+  cuerpo.appendChild(listo);
+}
+
+/* El interruptor sobre varias. Con `crear`, SIEMPRE mete (crear un estante
+   nunca saca a nadie de él). El tope de doce por pieza se respeta: la que
+   ya tiene doce no entra, y se dice cuántas y cuáles. «Maestría» y
+   «maestria» son el mismo estante (csgClave), y se conserva el rótulo que
+   ya existía en la casa: si no, el anaquel sacaría dos montones iguales. */
+function csgElegEstante(rotulo, crear) {
+  const ps = csgElegPiezas();
+  const k = csgClave(rotulo);
+  if (!ps.length || !k) return null;
+  const ya = csgEstantesTodos().find(e => e.clave === k);
+  const rot = ya ? ya.rotulo : csgCorta(String(rotulo).replace(/\s+/g, ' ').trim(), CSG_TOPES.estante);
+  const tiene = p => csgAnqEstantesDe(p).some(x => csgClave(x) === k);
+  const dentro = ps.filter(tiene).length;
+  const sacar = !crear && dentro === ps.length;
+  /* La acción sobre UNA pieza, repetible (csgElegGuarda puede volver a
+     aplicarla sobre la pieza recién fundida con la nube): sacar el estante,
+     o meterlo si no está y cabe. */
+  const aplica = p => {
+    const act = csgAnqEstantesDe(p);
+    if (sacar) { p.estantes = act.filter(x => csgClave(x) !== k); return; }
+    if (act.some(x => csgClave(x) === k) || act.length >= CSG_TOPES.estantes_n) return;
+    p.estantes = act.concat([rot]);
+  };
+  const cambiadas = [], llenas = [];
+  ps.forEach(p => {
+    if (!sacar && tiene(p)) return;
+    if (!sacar && csgAnqEstantesDe(p).length >= CSG_TOPES.estantes_n) { llenas.push(p); return; }
+    aplica(p);
+    cambiadas.push(p);
+  });
+  if (cambiadas.length) csgElegGuarda(cambiadas, aplica);
+  let msg;
+  if (sacar) msg = '🗂 ' + (cambiadas.length === 1 ? '1 consigna sale' : cambiadas.length + ' consignas salen') + ' de «' + rot + '»';
+  else if (cambiadas.length) {
+    msg = '🗂 ' + csgElegCuantas(cambiadas.length) + ' en «' + rot + '»' + (crear && !ya ? ' (estante nuevo)' : '');
+    if (dentro) msg += ' · ' + (dentro === 1 ? '1 ya estaba' : dentro + ' ya estaban');
+  } else if (!llenas.length) msg = 'Ya están todas en «' + rot + '»';
+  else msg = '🗂 Ninguna entró en «' + rot + '»';
+  if (llenas.length) {
+    msg += ' · ' + (llenas.length === 1 ? '1 no cabe: ya está' : llenas.length + ' no caben: ya están') +
+      ' en ' + CSG_TOPES.estantes_n + ' estantes (' + csgElegCuales(llenas) + ')';
+  }
+  csgAviso(msg);
+  return { sacar, cambiadas: cambiadas.length, llenas: llenas.length, rotulo: rot };
+}
+
+/* ── 🤖 Máquina ───────────────────────────────────────────────────── */
+function csgElegMaquina() {
+  if (!csgElegHay('pasar a otra máquina')) return;
+  csgVerAbrir('🤖 Máquina', csgElegHojaMaquina);
+}
+/* Las máquinas de CSG_MAQUINAS, con la marcada si todas las elegidas van
+   a la misma y «2 de 5» si van algunas. Tocar una la pone en las que no la
+   tienen y CIERRA la hoja: aquí no se elige más de una. Cambiar la máquina
+   no toca el texto: la forma (xml, md, seguida) la pone la máquina al
+   usarla (regla 2). */
+function csgElegHojaMaquina(cuerpo) {
+  const ps = csgElegPiezas();
+  const n = ps.length;
+  if (!n) {
+    cuerpo.appendChild(csgEl('p', 'csg-nota', 'Ya no queda ninguna elegida.'));
+    return;
+  }
+  cuerpo.appendChild(csgEl('p', 'csg-nota', 'La máquina que toques pasa a ' + (n === 1 ? 'la elegida' : 'las ' + n + ' elegidas') +
+    '. El texto no cambia: la forma la pone la máquina al usarla.'));
+  CSG_MAQUINAS.forEach(m => {
+    const con = ps.filter(p => csgAnqMaquinaDe(p) === m.id).length;
+    const todas = con === n;
+    const parte = con > 0 && !todas;
+    const r = csgVerFila('🤖', m.nombre, parte ? con + ' de ' + n : '', todas, () => csgElegPonMaquina(m.id));
+    r.classList.add('csg-tono-x');
+    if (parte) { r.classList.add('csg-ver-fila-parte'); r.setAttribute('aria-pressed', 'mixed'); }
+    cuerpo.appendChild(r);
+  });
+}
+function csgElegPonMaquina(id) {
+  const ps = csgElegPiezas();
+  const nombre = csgAnqMaquinaNombre(id);
+  /* ⚠️ Con el MISMO criterio que pinta la hoja (csgAnqMaquinaDe): una
+     máquina que la lista no conoce («grok», una fila tocada a mano) sale
+     como ✓ Otra, y tocar la ✓ no puede cambiarla a «otra», gastar un
+     viaje y ponerle el reloj. Si sale marcada, ya está. */
+  const cambian = ps.filter(p => csgAnqMaquinaDe(p) !== id);
+  csgVerCerrar();
+  if (!cambian.length) { csgAviso('Ya van todas a ' + nombre); csgElegPinta(); return; }
+  const aplica = p => { p.maquina = id; };
+  cambian.forEach(aplica);
+  csgElegGuarda(cambian, aplica);
+  csgPintarAnaquel();
+  csgAviso('🤖 ' + (cambian.length === 1 ? '1 consigna pasa' : cambian.length + ' consignas pasan') + ' a ' + nombre);
+}
+
+/* ── 🗑 Retirar ────────────────────────────────────────────────────── */
+/* El primer toque arma y cambia la fila de acciones por «Sí, retirar N ·
+   No», y la cuenta dice qué va a pasar ANTES de que pase; el foco va a
+   «No». Nada se retira con un solo toque. */
+function csgElegRetirar() {
+  if (!csgElegHay('retirar')) return;
+  _csgElegRetirar = true;
+  csgElegPinta();
+  const barra = _csgElegBarraEl;
+  const no = barra && barra.querySelector('.csg-bb-no');
+  if (no) { try { no.focus({ preventScroll: true }); } catch (e) {} }
+}
+/* Retirar es la lápida de siempre (eliminado + eliminado_at en ISO, como
+   csgMenuRetirar): sin ella, la tableta que aún tiene las piezas las
+   volvería a subir y resucitarían solas. Y se sale del modo: lo elegido ya
+   no está en el anaquel.
+   ⚠️ LO QUE CADA UNA TENÍA A MEDIO ESCRIBIR SE GUARDA CON ELLA, y después
+   se suelta la copia del compositor (csgEdSoltarPieza). Soltarla sin más
+   —como se hacía— tiraba el párrafo que se había dejado sin guardar al
+   salir por la barra de abajo: la lápida llevaba el texto viejo, y
+   «↩ Devolver» traía la consigna sin él, mientras la barra acababa de
+   prometer que «se pueden devolver». Retirar se deshace ENTERO. */
+function csgElegRetirarYa() {
+  const ps = csgElegPiezas();
+  if (!ps.length) { _csgElegRetirar = false; csgElegPinta(); return; }
+  const cuando = new Date().toISOString();
+  let conCambios = 0;
+  ps.forEach(p => { if (typeof csgEdGuardaAntesDeRetirar === 'function' && csgEdGuardaAntesDeRetirar(p.id)) conCambios++; });
+  const aplica = p => { p.eliminado = true; p.eliminado_at = cuando; };
+  const van = ps.map(p => csgDe(p.id) || p);
+  van.forEach(p => {
+    aplica(p);
+    if (typeof csgEdSoltarPieza === 'function') csgEdSoltarPieza(p.id);
+  });
+  csgElegGuarda(van, aplica, true);
+  csgElegSalir();
+  csgAviso('🗑 ' + (ps.length === 1 ? '1 consigna retirada' : ps.length + ' consignas retiradas') +
+    (conCambios ? ' · ' + (ps.length === 1 ? 'con lo que tenía sin guardar' : (conCambios === 1 ? '1 con lo que tenía sin guardar' : conCambios + ' con lo que tenían sin guardar')) : '') +
+    '. Se pueden devolver desde «🗑 Retiradas», al final del anaquel');
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -7589,15 +8450,22 @@ function csgAnqEngancha() {
   const ov = document.getElementById('csg-ver-overlay');
   if (ov) ov.addEventListener('click', e => { if (e.target === ov) csgVerCerrar(); });
   /* Escape cierra la hoja vertical, que es la de más arriba: con teclado,
-     una hoja que solo se cierra apuntando a la ✕ es una trampa. */
+     una hoja que solo se cierra apuntando a la ✕ es una trampa. Sin hoja
+     abierta, sale de ☑ Elegir (una tecla, un paso: con la hoja de mover
+     abierta, el primer Escape la cierra y la selección sigue). */
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && csgAnqVerAbierta()) csgVerCerrar();
+    if (e.key !== 'Escape') return;
+    if (csgAnqVerAbierta()) { csgVerCerrar(); if (csgElegActivo()) csgElegPinta(); return; }
+    csgElegEscape(e);
   });
   /* Lo que no subió se reintenta DE VERDAD al volver la señal (La Voz
      Prestada, regla 14): prometer «subirá cuando vuelva» sin nada que lo
      vuelva a intentar es peor que decir que falló. */
   if (typeof window !== 'undefined' && window && typeof window.addEventListener === 'function') {
     window.addEventListener('online', () => {
+      /* Lo que salió sin señal se quedó colgado en la fila de subidas hasta
+         su reloj (ocho segundos): lo que se toque ahora no lo espera. */
+      if (typeof csgSubidaColaSuelta === 'function') csgSubidaColaSuelta();
       const tras = () => {
         csgPintarAnaquel();
         if (typeof csgEdTrasNube === 'function') csgEdTrasNube();
@@ -7620,6 +8488,9 @@ function initConsigna() {
      aparecer encima del anaquel al volver: sería la hoja de otra
      pantalla. */
   if (csgAnqVerAbierta()) csgVerCerrar();
+  /* ☑ Elegir no sobrevive a salir de la vista (switchView llama a
+     csgElegFuera); por si se entró sin pasar por ahí, se entra sin él. */
+  if (csgElegActivo()) csgElegSalir({ pintar: false });
   let viaje = null;
   try { viaje = csgCargar(); } catch (e) { viaje = null; }
   /* Volver con ‹ desde el compositor no es abrir el anaquel: no cuenta,
@@ -8190,6 +9061,42 @@ function csgEdSoltarPieza(id) {
     _csgEdPieza = null;
     _csgEdRecuperar = null;
   }
+}
+
+/* ¿Cuántas de esas piezas tienen algo a medio escribir? La copia del
+   compositor si es de una de ellas y cambió, o el borrador del aparato si
+   es de una, no está guardado y dice algo (tras cerrar la aplicación, la
+   copia ya no está y el borrador sí). El borrador se lee UNA vez. */
+function csgEdSinGuardar(ids) {
+  const quiere = new Set((ids || []).filter(Boolean));
+  if (!quiere.size) return 0;
+  const hay = new Set();
+  if (_csgEdPieza && quiere.has(_csgEdPieza.id) && csgEdHayQueGuardar()) hay.add(_csgEdPieza.id);
+  const b = csgBorradorLee();
+  if (b && quiere.has(b.pieza.id) && !b.guardada && csgEdAlgoEscritoDe(b.pieza, b.material, b.tituloMano)) hay.add(b.pieza.id);
+  return hay.size;
+}
+
+/* ⚠️ ANTES DE RETIRAR, LO QUE ESA PIEZA TENÍA A MEDIO ESCRIBIR SE GUARDA EN
+   ELLA. Retirar soltaba la copia del compositor y su borrador
+   (csgEdSoltarPieza) sin mirar si habían cambiado: el párrafo que se dejó
+   sin guardar al salir por la barra de abajo no quedaba en NINGÚN sitio,
+   ni en la lápida ni en la nube, y «↩ Devolver» traía la consigna sin él.
+   Con esto, la lápida lleva el texto y devolverla la trae entera. La copia
+   en memoria manda sobre el borrador (el borrador se escribe con un
+   respiro y puede ir un paso atrás). Devuelve true si guardó algo. */
+function csgEdGuardaAntesDeRetirar(id) {
+  if (!id) return false;
+  if (_csgEdPieza && _csgEdPieza.id === id && csgEdHayQueGuardar()) {
+    csgEdGuardar('callado');
+    return true;
+  }
+  const b = csgBorradorLee();
+  if (b && b.pieza.id === id && !b.guardada && csgEdAlgoEscritoDe(b.pieza, b.material, b.tituloMano)) {
+    csgBorradorRescata(b);
+    return true;
+  }
+  return false;
 }
 
 function csgEdEnVista() {
@@ -11609,7 +12516,10 @@ function csgUsarEngancha() {
     if (e.key !== 'Escape') return;
     const ver = document.getElementById('csg-ver-overlay');
     if (ver && ver.style.display && ver.style.display !== 'none') return;
-    if (csgPegAbierta()) csgPegCerrar();
-    else if (csgUsarAbierta()) csgUsarCerrar();
+    /* Y lo MARCA como atendido: el Escape del anaquel mira en la fase de
+       burbuja, cuando esta hoja ya está cerrada, y sin la marca creía que
+       no había nada encima y salía también de ☑ Elegir (csgElegEscape). */
+    if (csgPegAbierta()) { e.preventDefault(); csgPegCerrar(); }
+    else if (csgUsarAbierta()) { e.preventDefault(); csgUsarCerrar(); }
   }, true);
 }

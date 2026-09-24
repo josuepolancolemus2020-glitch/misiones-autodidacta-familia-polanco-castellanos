@@ -813,6 +813,208 @@ button.csg-ver-fila:active { transform: scale(.985); }
 .csg-retiradas .csg-fila { margin-bottom: 6px; opacity: .92; }
 
 /* ══════════════════════════════════════════════════════════════════
+   ☑ ELEGIR VARIAS Y MOVERLAS DE UNA VEZ
+   (js/tools/consigna.js, «ELEGIR VARIAS Y MOVERLAS DE UNA VEZ»)
+   Mientras se elige, la ficha entera es la casilla y sus botones no se
+   pintan; abajo, una barra fija con la cuenta y las tres acciones.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ☑ Elegir puesto: teñido de lima, como un chip puesto. Se lee de un
+   vistazo que el anaquel está en otro modo, y dónde se sale. */
+.csg-btn.csg-anq-elegir.on { background: #f7fee7; border-color: #65a30d; color: #365314; }
+.csg-btn.csg-anq-elegir.on .csg-btn-ic { background: #d9f99d; }
+
+/* ⚠️ POR DEBAJO DE 390 PX LA BARRA DEL ANAQUEL SE CIÑE, y no es gusto:
+   es lo que mete ☑ Elegir ENTERO dentro del borde. Medido con la vista
+   abierta de verdad (23 de septiembre de 2026): a 320 px la barra mide
+   280 de ancho y sus últimos 22 son el degradado del borde, o sea que lo
+   que se lee entero acaba en el píxel 278; con el relleno de siempre,
+   ＋ Nueva y 📋 Pegar medían 99 y 98 y Elegir habría acabado en el 330.
+   Ceñidos (relleno de 8, la baldosa de 24 y dos píxeles menos de hueco)
+   miden 82, 80 y 80, y Elegir acaba en el 274: entero y fuera del
+   degradado, a 320 y a 360. A 390 ya cabe sin ceñir (acaba en el 330,
+   con el degradado empezando en el 348), y ahí se queda como estaba. La palabra NO se acorta: un icono sin palabra es justo lo que
+   la regla 11 de Cuadernos quitó. */
+@media (max-width: 389px) {
+  .csg-barra { gap: 6px; }
+  .csg-barra .csg-btn { padding: 4px 8px; gap: 5px; font-size: 13px; }
+  .csg-barra .csg-btn-ic { width: 24px; height: 24px; margin-left: -4px; border-radius: 8px; font-size: 14px; }
+  .csg-barra-sep { margin: 8px 1px; }
+}
+
+/* ── La ficha y la fila, mientras se elige ──
+   Todo el cuerpo es el botón: cursor de mano, sin selección de texto (en
+   una tableta, una pulsación larga seleccionaría el título en vez de
+   elegir la ficha) y sin el destello gris del toque, que taparía el color
+   de la marca. */
+.csg-elegible {
+  position: relative; cursor: pointer;
+  -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent;
+}
+/* La marca de la esquina: un cuadro DIBUJADO con su ✓ dentro, y no los
+   signos ☑ ☐, que cada tipo de letra pinta a su manera. Sin elegir, un
+   cuadro gris discreto —dice que se puede tocar sin gritarlo—; elegida,
+   lleno del tono de su clase. El gris es el --faint de aquí (#64748b), que
+   sobre blanco da 4,7:1: un borde más claro no se ve al sol. */
+.csg-eleg-marca {
+  width: 24px; height: 24px; box-sizing: border-box; flex-shrink: 0; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 900; line-height: 1;
+  color: transparent; background: var(--surface); border: 2px solid var(--faint);
+  transition: background-color .12s, border-color .12s, color .12s;
+}
+.csg-elegida .csg-eleg-marca { color: #fff; background: var(--csg-t, #4d7c0f); border-color: var(--csg-t, #4d7c0f); }
+.csg-ficha > .csg-eleg-marca { position: absolute; top: 12px; right: 12px; }
+/* El título no se mete debajo de la marca. */
+.csg-ficha.csg-elegible .csg-ficha-cab { padding-right: 32px; }
+/* ⚠️ Elegida se ve elegida SIN DUDAS: el fondo en el tinte de su clase,
+   el borde en su tono y un anillo alrededor. Tres clases de peso a
+   propósito: el paso del ratón (.csg-ficha:hover, más abajo) cambia la
+   sombra y los bordes, y con el mismo peso le quitaba el anillo a la
+   ficha elegida justo mientras se la miraba. La franja de la izquierda
+   la sigue poniendo la regla del final del archivo. */
+.csg-ficha.csg-elegible.csg-elegida {
+  background: var(--csg-tf, #f7fee7);
+  border-top-color: var(--csg-t); border-right-color: var(--csg-t); border-bottom-color: var(--csg-t);
+  box-shadow: 0 0 0 2px var(--csg-t);
+}
+/* En la fila (☰) la marca ocupa el sitio de ▶ y ⋯, a la derecha, en los
+   dos renglones. */
+.csg-fila.csg-elegible { padding-right: 10px; }
+.csg-fila > .csg-eleg-marca { grid-row: 1 / span 2; margin-left: 6px; }
+.csg-fila.csg-elegible.csg-elegida {
+  background: var(--csg-tf, #f7fee7); border-color: var(--csg-t); box-shadow: 0 0 0 1px var(--csg-t);
+}
+
+/* ⚠️ El anaquel le deja sitio a la barra de abajo, que es fija y tapa lo
+   que tenga detrás: sin esto, la última ficha —la que se va a tocar— se
+   quedaba debajo de ella sin poder subir más. El alto de la barra lo pone
+   el JavaScript en --csg-eleg-alto (cambia con los renglones de la
+   cuenta); el respaldo es el que mide a 320 px. */
+body.csg-eligiendo #csg-anaquel { padding-bottom: calc(var(--csg-eleg-alto, 124px) + 20px); }
+
+/* ⚠️ Y EL BOTÓN FLOTANTE DE DESTELLOS SE APARTA MIENTRAS SE ELIGE. Vive en
+   la esquina de abajo a la derecha, que es exactamente donde cae la barra
+   de elegidas (su 🗑 Retirar): se lo comería. Es la regla 33 de La Voz
+   Prestada, y lleva `!important` por lo mismo que allí, que no es pereza:
+   `switchView` (js/app.js) le escribe `style.display = 'flex'` EN LA
+   ETIQUETA al entrar en cada vista, y un estilo en la etiqueta le gana a
+   cualquier regla de una hoja por específica que sea. Sin él, la regla
+   existe, no da ningún error y no hace nada. Y la clase la quita SIEMPRE
+   la salida del modo (csgElegPinta), también al irse de la vista: si se
+   quedara puesta, el destello desaparecería de toda la aplicación. */
+body.csg-eligiendo #destello-fab { display: none !important; }
+
+/* El aviso de la aplicación sube por encima de la barra, como con el
+   compositor: si no, «3 consignas pasan a Claude» taparía los botones que
+   se acaban de tocar. */
+body.csg-eligiendo #meta-toast {
+  bottom: calc(var(--nav-h) + var(--csg-eleg-alto, 124px) + 12px + env(safe-area-inset-bottom, 0px));
+}
+/* ⚠️ Pero con una hoja de La Consigna abierta encima, el aviso va ARRIBA.
+   La hoja tapa la barra de elegidas, así que subirlo por ella era subirlo
+   para nada: caía en medio de la lista de estantes de la hoja de mover
+   (medido el 23 de septiembre de 2026: a 390 px tapaba «Historia» e
+   «Idiomas 1 de 3»), durante los segundos en que se busca el siguiente
+   estante. No recibe el dedo, pero lo que tapa no se lee. Pesa más que la
+   de arriba (lo de dentro del :has suma), así que gana mientras la hoja
+   esté abierta; donde no hay :has, la regla se ignora y queda la de
+   arriba. */
+body.csg-eligiendo:has(.csg-overlay[style*="flex"]) #meta-toast {
+  top: calc(12px + env(safe-area-inset-top, 0px)); bottom: auto;
+}
+
+/* ── La barra de elegidas ──
+   ⚠️ FIJA ENCIMA DE LA BARRA DE LA APLICACIÓN, como la del compositor, y
+   no `sticky; bottom: 0` como decía el §8: dentro del .view-scroll, el
+   fondo de su caja cae DEBAJO de la barra de la aplicación (que es fija y
+   mide --nav-h), así que una barra pegada a `bottom: 0` quedaba tapada
+   justo donde están sus botones. Vive fuera de #csg-anaquel, colgada de
+   la vista: no se rehace con cada repintado ni se va con el
+   desplazamiento. Dos renglones: la cuenta con «Todas» y «Salir» arriba,
+   y las tres acciones abajo, repartidas a partes iguales para que a 320
+   px quepan sin deslizar nada. */
+.csg-eleg-barra {
+  position: fixed; left: 0; right: 0;
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+  z-index: 60; box-sizing: border-box;
+  display: flex; flex-direction: column; gap: 6px; padding: 8px 12px;
+  background: var(--surface); border-top: 1px solid var(--border);
+  box-shadow: 0 -6px 18px rgba(15, 23, 42, .08);
+}
+.csg-eleg-barra[hidden] { display: none !important; }
+.csg-eleg-arriba { display: flex; align-items: center; gap: 6px; min-width: 0; min-height: 40px; }
+.csg-eleg-n {
+  flex: 1 1 auto; min-width: 0; font-size: 13px; font-weight: 800; line-height: 1.25;
+  color: var(--text); overflow-wrap: anywhere;
+}
+.csg-eleg-n-peligro { color: #991b1b; }
+.csg-eleg-mandos { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+/* 40 px como todo lo que se toca aquí (regla 21), no los 36 de un botón
+   pequeño dentro de una fila. */
+.csg-eleg-mandos > .csg-btn { min-height: 40px; }
+.csg-eleg-acciones { display: flex; gap: 8px; min-width: 0; }
+.csg-eleg-acciones > .csg-bb { flex: 1 1 0; min-width: 0; }
+/* El color dice la función, como en el resto de la casa: mover, teñido
+   (trae y lleva); máquina, neutro (no se lleva nada); retirar, en rojo
+   claro —se lleva algo del anaquel— y su «Sí» en rojo lleno.
+   ⚠️ Con DOS clases de peso: `.csg-bb` se declara más abajo (la barra del
+   compositor) con su fondo y su borde, y a igualdad de peso gana la que va
+   después. Con una sola clase, los tres salían blancos sin ningún error
+   (visto en la primera captura a 390). */
+.csg-bb.csg-bb-mover { background: #f7fee7; border-color: #bef264; color: #365314; }
+.csg-bb.csg-bb-retirar { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.csg-bb.csg-bb-si { background: #b91c1c; border-color: #b91c1c; color: #fff; }
+.csg-bb[aria-disabled="true"] { opacity: .55; }
+/* «Sí, retirar 5 (2 no se ven)» se lee entero, en dos renglones si hace
+   falta: lo que se corta con puntos suspensivos es justo lo que no se ve. */
+.csg-eleg-confirma > .csg-bb-si { flex: 2 1 0; }
+.csg-eleg-confirma .csg-bb-t { white-space: normal; text-align: center; }
+/* «Mover a estante» y «Todas las que se ven» en un teléfono dicen solo
+   «Mover» y «Todas»: la etiqueta del botón lleva la frase entera.
+   ⚠️ El corte está en 519 y no en 479: entre 480 y 486 px la palabra
+   larga se enseñaba y no cabía —«🗂 Mover a esta…», medido a 480: 107 px
+   de texto en 105—, y lo que se corta con puntos suspensivos es justo lo
+   que no se lee. A 500 ya cabe con 107 de 107, y a 520 sobra sitio. */
+@media (max-width: 519px) {
+  .csg-eleg-largo { display: none; }
+}
+/* ⚠️ EN LA TABLETA, LA CUENTA Y SUS MANDOS VAN JUNTOS. Con la cuenta
+   estirada (`flex: 1`), a 768 px quedaban 367 px de nada entre «3
+   elegidas» y «☑ Todas», y a 1024 y 1180, 525: el texto a un lado y sus
+   botones pegados al otro, que es la forma que la regla 11 de 📓
+   Cuadernos quitó. Desde 600 la cuenta mide lo que dice y los mandos van
+   detrás; desde 1024 cabe todo en UN renglón, las acciones a la derecha y
+   del tamaño de su palabra —estiradas medían 273 px para 71 de contenido,
+   y armado, «Sí, retirar» era una losa roja de 545—. La barra baja de 111
+   a 65 px, y el anaquel gana ese alto. Va detrás de la regla del «Sí»
+   armado (.csg-eleg-confirma > .csg-bb-si) para ganarle a igualdad de
+   peso: en una fila, el «Sí» también mide su palabra. */
+@media (min-width: 600px) {
+  .csg-eleg-barra { margin: 0 auto; max-width: 700px; }
+  .csg-eleg-n { flex: 0 1 auto; }
+  .csg-eleg-mandos { margin-left: 10px; }
+}
+@media (min-width: 1024px) {
+  .csg-eleg-barra {
+    max-width: 864px; border: 1px solid var(--border); border-bottom: 0;
+    border-radius: 18px 18px 0 0; padding: 10px 14px;
+    flex-direction: row; align-items: center; gap: 12px;
+  }
+  .csg-eleg-arriba { flex: 0 1 auto; }
+  /* Las acciones NO encogen: encogiendo ellas, sus botones (que miden su
+     palabra) se salían de la caja y la barra se deslizaba de lado con
+     «Ninguna elegida: toca las que quieras mover», medido a 1024 y 1180.
+     Lo que parte renglones es la cuenta, que para eso es texto. */
+  .csg-eleg-acciones { margin-left: auto; flex-shrink: 0; }
+  .csg-eleg-acciones > .csg-bb { flex: 0 0 auto; padding: 0 16px; }
+}
+
+/* ── La hoja de mover: ✓ si están todas, «–» y «3 de 5» si algunas ── */
+.csg-ver-fila.csg-ver-fila-parte::after { content: '–'; flex-shrink: 0; font-weight: 900; color: var(--csg-t, #4d7c0f); }
+.csg-eleg-listo { width: 100%; margin-top: 14px; }
+
+/* ══════════════════════════════════════════════════════════════════
    LA HOJA «¿QUÉ LE VAS A PEDIR?» Y LA DE LOS MOLDES (#csg-ver-overlay)
    ══════════════════════════════════════════════════════════════════ */
 
@@ -1348,7 +1550,8 @@ body:has(#view-consigna-editor.active) #meta-toast {
 .csg-frase:focus-visible, .csg-otro:focus-visible, .csg-bloque-ejemplo:focus-visible,
 .csg-bloque-plegado:focus-visible, .csg-clase-baldosa:focus-visible, .csg-switch:focus-visible,
 .csg-bb:focus-visible, .csg-prev-tab:focus-visible, .csg-ficha-token-uso:focus-visible,
-.csg-pregunta-plegada:focus-visible, .csg-pegar-propuesta:focus-visible, .csg-usar-voz:focus-visible {
+.csg-pregunta-plegada:focus-visible, .csg-pegar-propuesta:focus-visible, .csg-usar-voz:focus-visible,
+.csg-elegible:focus-visible {
   outline: 3px solid rgba(101, 163, 13, .55); outline-offset: 2px;
 }
 
@@ -1375,12 +1578,13 @@ body:has(#view-consigna-editor.active) #meta-toast {
   .csg-bloque-ejemplo:hover, .csg-ficha-token-uso:hover { text-decoration: underline; }
   .csg-pregunta-b:hover { border-color: #84cc16; }
   .csg-prev-tab:hover:not(.on) { color: var(--text); }
+  .csg-elegible:hover .csg-eleg-marca { border-color: var(--csg-t, #65a30d); }
 }
 
 /* Quien pidió menos movimiento al sistema no lo tiene aquí tampoco. */
 @media (prefers-reduced-motion: reduce) {
   .csg-btn, .csg-chip, .csg-ver-fila, .csg-grupo-rot, .csg-grupo-galon, .csg-ficha, .csg-bloque,
-  .csg-frase, .csg-otro, .csg-bb, .csg-switch-bola, .csg-switch-bola::after, .csg-clase-baldosa { transition: none; }
+  .csg-frase, .csg-otro, .csg-bb, .csg-switch-bola, .csg-switch-bola::after, .csg-clase-baldosa, .csg-eleg-marca { transition: none; }
 }
 
 /* ══════════════════════════════════════════════════════════════════

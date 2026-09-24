@@ -18,8 +18,9 @@ Lo largo está en otros documentos y aquí solo se apunta dónde:
   referencia y **no se retoca a la ligera**, porque la prueba de Node saca
   de ahí las salidas y compara el armado con ellas carácter por carácter.
   Sus reglas, con lo que se aprendió al construirla, están aquí abajo, en
-  «Normativa: las consignas a las máquinas se escriben en La Consigna». Lo
-  único pendiente es **correr su SQL**, apuntado en `PLAN-FARO-PRIVADO.md`.
+  «Normativa: las consignas a las máquinas se escriben en La Consigna». Su
+  SQL **ya está corrido** (23 de septiembre de 2026) y está **publicada**
+  desde ese día; ☑ Elegir entró la misma tarde.
 
 ## Normativa: el SQL de Supabase se pega en el chat, SIEMPRE
 
@@ -1695,10 +1696,12 @@ guiados; la forma la pone la máquina elegida en el momento de usarla; se
 guarda con su bitácora y sus versiones; y volver a usarla son dos toques
 (▶ · 📋 Copiar).
 
-**Treinta y cuatro reglas, y ninguna es de adorno.** Las veintidós primeras
+**Treinta y cinco reglas, y ninguna es de adorno.** Las veintidós primeras
 son las del §10 del plan, con lo que se aprendió al construirlas; las doce
-de detrás salieron de construirla, revisarla y sondearla el 23 de septiembre
-de 2026, y cada una está escrita porque su avería ya pasó.
+siguientes salieron de construirla, revisarla y sondearla el 23 de
+septiembre de 2026, y cada una está escrita porque su avería ya pasó; y la
+última, ☑ Elegir, la pidió el autor ese mismo día, con la herramienta ya en
+su tableta.
 
 1. ⚠️ **LO QUE SE COPIA ES LO QUE SE VE, CARÁCTER POR CARÁCTER.** La vista
    previa, 📋 Copiar, ↗ Abrir, 📤 Compartir y el repaso salen de la MISMA
@@ -2054,8 +2057,8 @@ de 2026, y cada una está escrita porque su avería ya pasó.
     cinco cosas: barra, buscador, chips, filtros puestos y el renglón de la
     bitácora, y los dos últimos solo cuando tienen algo. Con el compositor
     abierto, el botón de Destellos no está (`switchView` lo apaga en
-    `view-consigna-editor`). La sonda mide en píxeles y mira los colores
-    CALCULADOS.
+    `view-consigna-editor`), y mientras se elige con ☑ Elegir tampoco (regla
+    35). La sonda mide en píxeles y mira los colores CALCULADOS.
 
     ⚠️ **Y nada ensancha la pantalla.** El chip de arreglo más largo del
     repaso medía 425 px en una pantalla de 320 y hacía deslizar el
@@ -2136,7 +2139,9 @@ de 2026, y cada una está escrita porque su avería ya pasó.
       siguiente compositor la guardaba «en silencio», así que lo que se
       pidió tirar aparecía en el anaquel dos toques después. Lo mismo al
       retirar una pieza desde ⋯ (`csgEdSoltarPieza`): lo de la retirada
-      volvía como pieza nueva.
+      volvía como pieza nueva. ⚠️ Y antes de soltarla, lo que tenía a medio
+      escribir se guarda CON ella (`csgEdGuardaAntesDeRetirar`), para que
+      «↩ Devolver» la traiga entera: soltar sin mirar lo tiraba (regla 35).
 
 26. ⚠️ **UNA COPIA QUE NADIE TOCÓ NO DEJA FICHA; LO PEGADO, SÍ.** «Duplicar
     en otro molde» —y «⚠ 3 usos este mes ▸», que hace lo mismo hacia una
@@ -2275,27 +2280,205 @@ de 2026, y cada una está escrita porque su avería ya pasó.
     v129, y está escrito para toda la casa en «Sellar la versión en cada
     cambio».
 
-**Y lo que NO lleva, dicho: «☑ Elegir».** El §8 del plan la describe entera
-—marcar varias piezas y, desde una barra pegada abajo, 🗂 Mover a estante,
-🤖 Cambiar la máquina o 🗑 Retirar— y se recortó de esta primera versión al
-construirla. No hace la falta que hizo en La Voz Prestada (su regla 33):
-allí había veintidós textos ya guardados que archivar de golpe; aquí una
-consigna se archiva al escribirla, con «＋ estante» en el compositor, o
-desde su ⋯ → 🗂 Estantes. Y es la maquinaria más cara del anaquel: un modo
-en que el toque elige y nada más, su propia barra, y el botón de Destellos
-apartado con `!important`. Sin ella, la barra es:
+35. ☑ **ELEGIR VARIAS Y MOVERLAS DE UNA VEZ: EL TOQUE ELIGE, Y CADA ACCIÓN
+    ES UN SOLO VIAJE.** Pedido por el autor el 23 de septiembre de 2026, con
+    La Consigna ya publicada y en su tableta: «Añade ☑ Elegir para mover
+    varias de golpe». Es la mitad del §8 del plan que se había recortado de
+    la primera versión, y hace falta por lo mismo que en La Voz Prestada (su
+    regla 33): con veinte consignas por archivar, hacerlo de una en una son
+    veinte vueltas por el ⋯ de cada una.
 
-```
-[＋ Nueva] · [📋 Pegar] · | · [🗂 Estantes] · [⇅ Orden] · | · [📋 Exportar] · ▦ ☰
-```
+    Cómo se usa: ☑ **Elegir**, en la barra del anaquel, enciende el modo, y
+    puesto se ve puesto (teñido de lima y con `aria-pressed`). Un toque en
+    una ficha o en una fila la marca, y abajo sale la barra de elegidas: la
+    cuenta, «☑ Todas las que se ven» —que con todas elegidas pasa a
+    «☐ Ninguna»—, «✕ Salir» y las tres acciones, 🗂 **Mover a estante**,
+    🤖 **Máquina** y 🗑 **Retirar**. Se sale con ✕ Salir, volviendo a tocar
+    ☑ Elegir, con Escape, al retirar y al irse a otra vista; y si otro
+    aparato retira las últimas vivas, el modo se apaga solo. La selección
+    vive en MEMORIA (`_csgEleg`, un `Set` de ids), ni en el aparato ni en
+    la nube: una selección que reapareciera al día siguiente haría mover o
+    retirar lo que ya nadie recordaba haber elegido. Por lo mismo, entrar a
+    la vista (`initConsigna`) abre siempre sin el modo.
 
-y la sonda 18 mide a 320 px que ＋ Nueva y 📋 Pegar quedan enteros dentro
-del borde. Una
-consecuencia que se dice en la pantalla: la hoja 🗂 Estantes no crea
-estantes —un estante vacío no existe, porque salen de las piezas, y el
-«crear dentro» venía de la hoja de mover de ☑ Elegir—, así que debajo de la
-lista dice dónde se crea uno. Si algún día vuelve, su diseño está en el §8
-del plan y lo que no se negocia, en la regla 33 de La Voz Prestada.
+    Lo que no se negocia:
+
+    - ⚠️ **SE ENTRA POR UN BOTÓN, Y MIENTRAS SE ELIGE EL TOQUE ELIGE Y NADA
+      MÁS.** La ficha entera es la casilla (`role="checkbox"`, con Intro y
+      Espacio desde el teclado), y ▶ Usar, ✎ Corregir y ⋯ no se pintan
+      (`csgFichaCrear` y `csgFichaFila` vuelven antes); el «⚠ N usos este
+      mes» se queda como texto, sin ▸. El mismo dedo no puede querer dos
+      cosas, y un toque que abriera la hoja de Usar encima haría perder la
+      selección. La casilla se nombra con `aria-labelledby` apuntando a su
+      propio título, con un id NUESTRO (regla 15: el título no va a ningún
+      atributo). Y la marca de la esquina es un cuadro DIBUJADO con su ✓,
+      no los signos ☑ ☐, que cada tipo de letra pinta a su manera.
+    - **LA SELECCIÓN ES DE IDS, Y SOBREVIVE A LOS REPINTADOS**: la nube que
+      llega, el evento `online`, una búsqueda, un filtro, cambiar entre ▦ y
+      ☰. Lo que un filtro o un grupo plegado deja fuera sigue elegido y la
+      barra lo dice («3 elegidas · 2 no se ven»): mover o retirar lo que no
+      se ve sin decirlo sería una sorpresa. Lo retirado —aquí o en otro
+      aparato— sale solo de la selección. Y marcar toca el DOM, no repinta
+      el anaquel, que le arrancaría al dedo la ficha siguiente.
+    - ⚠️ **CADA ACCIÓN ES UN SOLO VIAJE** (`csgPersistirVarios`, en el
+      núcleo, al lado de `csgPersistir`): solo las piezas que de verdad
+      cambian, cada una con el reloj puesto —mover, cambiar la máquina o
+      retirar es una edición (regla 18)—, el aparato escrito DOS veces sea
+      una pieza o veinte (antes del viaje y al volver), y todas en UN
+      upsert. Una escritura por pieza, con la señal de una tableta, es lo
+      que hace que mover veinte tarde.
+    - **🗂 MOVER ES EL INTERRUPTOR DE SIEMPRE, SOBRE VARIAS.** La hoja
+      vertical enseña cada estante con lo que pasa con la selección —✓ si
+      están todas, «–» y «2 de 5» si están algunas— y tocar uno las mete, o
+      las saca si ya estaban todas. El tope de doce estantes por consigna
+      (`CSG_TOPES.estantes_n`) se respeta: la que ya tiene doce no entra, y
+      el aviso dice cuántas y CUÁLES. «  MAESTRIA » entra en el «Maestría»
+      que ya había (`csgClave`), con su rótulo de siempre, y solo viajan las
+      que cambian. La hoja se queda abierta —se tocan varios estantes
+      seguidos— y «Listo» la cierra.
+    - ⚠️ **EL ESTANTE NUEVO SE CREA DENTRO DE LA HOJA DE MOVER, SIN PERDER
+      LA SELECCIÓN**: si hubiera que salir a crearlo, archivar veinte serían
+      veinte selecciones. Crear SIEMPRE mete, nunca saca; la hoja se repinta
+      en su sitio y el foco vuelve al recuadro nuevo dentro del mismo toque,
+      para crear otro. Lo escrito es texto de una persona: va por
+      `textContent` y a ningún atributo. La hoja 🗂 Estantes de la barra
+      sigue sin crear ninguno —es la de MIRAR, y no tiene a qué ponérselo—,
+      y debajo de su lista nombra ahora también este camino.
+    - **🤖 MÁQUINA** pone la que se toque en las que no la llevan y cierra
+      la hoja: aquí no se elige más de una. El texto no cambia, porque la
+      forma la pone la máquina al usarla (regla 2).
+    - **🗑 RETIRAR SON DOS TOQUES EN EL MISMO SITIO, SIN `confirm()`**
+      (regla 18; La Voz Prestada, 22). El primero cambia las acciones por
+      «🗑 Sí, retirar N · No», con «No» donde estaba Retirar —un doble toque
+      sin querer cae en «No»— y el foco en «No», y la cuenta dice qué va a
+      pasar ANTES de que pase. Deja la lápida de siempre, con `eliminado_at`
+      como fecha, y sale del modo; desde «🗑 Retiradas» se devuelven.
+      Cambiar la selección desarma el «Sí»: lo confirmado tiene que ser lo
+      que se ve.
+    - **Con ninguna elegida, las acciones no se apagan: responden y DICEN
+      por qué** no hacen nada. Un botón apagado sin explicación se lee como
+      una avería.
+    - ⚠️ **☑ ELEGIR VA DETRÁS DE 📋 PEGAR, NO DONDE LO PONÍA EL §8, Y SE
+      MIDIÓ EN PÍXELES.** Medido el 23 de septiembre de 2026 con la vista
+      abierta de verdad: a 320 px la barra mide 280 de ancho —acaba en el
+      píxel 300— y sus últimos 22 son el degradado del borde; ＋ Nueva y
+      📋 Pegar ya llegaban al 225 y ⇅ Orden acababa en el 469. Detrás de
+      Orden, Elegir habría empezado en el 477: fuera de la pantalla en
+      todos los teléfonos, que es la avería exacta de la regla 33 de La Voz
+      Prestada. La barra es ahora
+
+      ```
+      [＋ Nueva] · [📋 Pegar] · [☑ Elegir] · | · [🗂 Estantes] · [⇅ Orden] · | · [📋 Exportar] · ▦ ☰
+      ```
+
+      y lo que se sale por la derecha es lo que menos se toca. Y aun
+      adelantado acababa en el 330, así que **por debajo de 390 px la barra
+      se ciñe** (menos relleno, la baldosa de 24 y 6 px de hueco): los tres
+      miden 82, 80 y 80 y Elegir acaba en el 274, entero y antes del
+      degradado, a 320 y a 360; a 390 no cambia nada. La palabra no se
+      acorta: un icono sin palabra es lo que quitó la regla 11 de
+      Cuadernos. ⚠️ En las sesiones de Claude Code no llega Google Fonts,
+      la letra de respaldo es más ancha y Elegir acaba en el 292: por eso la
+      sonda lo mide contra el borde de la barra (300) y el de la pantalla
+      (320), y no contra el degradado.
+    - ⚠️ **LA BARRA DE ELEGIDAS ES FIJA, NO `sticky; bottom: 0` COMO DECÍA
+      EL §8.** Dentro del `.view-scroll`, el fondo de su caja cae DEBAJO de
+      la barra de la aplicación, que es fija: pegada a `bottom: 0` quedaba
+      tapada justo donde están sus botones. Va fija encima de la barra de
+      la aplicación, como la del compositor, colgada de `#view-consigna` y
+      fuera de `#csg-anaquel`, así que no se rehace en cada repintado ni se
+      va al desplazar; y el anaquel le deja debajo el sitio de su alto
+      medido (`--csg-eleg-alto`, que un `ResizeObserver` pone al día), o la
+      última ficha —la que se iba a tocar— se quedaba detrás. Desde 600 px
+      la cuenta y sus mandos van juntos (a 1024 los separaban 525 px de
+      nada), y desde 1024 cabe todo en un renglón, con las acciones del
+      ancho de su palabra y sin encoger: encogiendo, la barra se deslizaba
+      de lado con «Ninguna elegida…».
+    - ⚠️ **EL BOTÓN DE DESTELLOS SE APARTA CON `!important`, Y SALIR DE LA
+      VISTA LO DEVUELVE.** Vive en la esquina de abajo a la derecha, que es
+      donde cae 🗑 Retirar: se lo comía. La regla es
+      `body.csg-eligiendo #destello-fab { display: none !important; }`, y
+      el `!important` no es pereza: `switchView` le escribe
+      `style.display = 'flex'` EN LA ETIQUETA al entrar en cada vista, y
+      sin él la regla existe, no da ningún error y no hace nada (la sonda,
+      sin él: «calculado: flex · en la etiqueta: flex»). La otra mitad es
+      una línea en `switchView` (js/app.js):
+
+      ```js
+      if (id !== 'view-consigna' && typeof csgElegFuera === 'function') csgElegFuera();
+      ```
+
+      Sin ella, irse a Inicio con el modo puesto dejaba la clase en el
+      `body` y **la aplicación entera sin Destellos**, en una pantalla que
+      no es esta. La clase la pone y la quita UNA sola función
+      (`csgElegPinta`). Y el aviso de la aplicación sube por encima de la
+      barra de elegidas; con una hoja abierta encima, va arriba: por encima
+      de una barra tapada caía en medio de la lista de estantes.
+
+    Lo que se cazó construyéndola y revisándola ese mismo día; cada arreglo
+    se comprobó quitándolo, y la sonda suspende:
+
+    - ⚠️ **LA ACCIÓN SE ESCRIBE SOBRE LA NUBE DE AHORA.** El upsert sube la
+      FILA ENTERA con el reloj puesto, así que la copia de aquí lo gana
+      todo: la tableta que se quedó en el anaquel desde la mañana, al mover
+      veinte a un estante, les pisaba el texto que otro aparato corrigió al
+      mediodía y resucitaba la que allí se retiró. Ahora ☑ Elegir pide la
+      nube al entrar, y `csgElegGuarda` espera la bajada que esté en camino,
+      o baja primero si la última tiene más de un minuto (`CSG_ELEG_AL_DIA`),
+      y vuelve a aplicar la acción sobre lo fundido: la que llegó retirada
+      ni se mueve ni resucita. Con reloj propio (`CSG_ELEG_ESPERA`, cuatro
+      segundos), porque mientras se espera lo tocado no está guardado en el
+      aparato, y sin señal la espera llegaba a ocho: pasado el reloj se
+      escribe con la copia de aquí, como antes. Queda, dicha, una ventana de
+      un minuto en que se escribe sobre la copia de aquí sin volver a bajar.
+    - ⚠️ **RETIRAR NO TIRA LO QUE LA PIEZA TENÍA A MEDIO ESCRIBIR.**
+      Retirar soltaba la copia del compositor (`csgEdSoltarPieza`) sin
+      mirar si había cambiado: el párrafo dejado sin guardar al salir por
+      la barra de abajo no quedaba en ninguna parte, y «↩ Devolver» traía la
+      consigna sin él justo después de que la barra prometiera que «se
+      pueden devolver». Ahora `csgEdGuardaAntesDeRetirar` lo guarda en ella
+      antes de la lápida —también desde ⋯ → Retirar, que tenía la misma
+      avería—, y el «¿Retirar?» lo dice ANTES del «Sí» («Tenía cambios sin
+      guardar: se guardan con ella.»).
+    - ⚠️ **DOS SUBIDAS SEGUIDAS SALEN EN FILA** (`csgSubirEnCola`, que
+      usan `csgPersistir` y `csgPersistirVarios`). La hoja de mover se
+      queda abierta para tocar varios estantes seguidos, y dos upserts en
+      vuelo llegan en cualquier orden: la nube se quedaba con el primero y
+      el aparato daba la pieza por subida. Con la fila vacía sale en el
+      acto. El reintento (`csgSubirPendientes`) va aparte a propósito
+      —detrás de una subida sin señal esperaría ocho segundos justo cuando
+      la señal vuelve—, y el evento `online` vacía la fila.
+    - ⚠️ **UN RENGLÓN DE LA HOJA NO DESAPARECE DEBAJO DEL DEDO.** Los
+      estantes salen de las piezas, así que sacar de un estante a las
+      únicas que lo tenían lo borraba en el acto: el renglón de abajo subía
+      y el segundo toque —el del interruptor, que quería volver a
+      meterlas— caía en OTRO estante. Mientras la hoja está abierta se
+      recuerda lo que ya enseñó (`csgEstantesConVistos`), y lo vaciado se
+      queda en su sitio, sin marcar, hasta cerrarla; no crea ningún estante
+      vacío en la casa. Vale también para ⋯ → 🗂 Estantes de una sola
+      consigna, que tenía la misma avería.
+    - **Tocar la máquina que ya llevan no escribe nada**: se compara con el
+      mismo criterio que pinta la hoja (`csgAnqMaquinaDe`), así que una
+      máquina que la lista no conoce («grok») sale como ✓ Otra, y tocarla
+      ni la cambia a «otra» ni gasta un viaje.
+    - **Escape: una tecla, un paso.** Con la hoja de mover abierta, el
+      primero la cierra y la selección sigue; el segundo sale del modo. Un
+      Escape con el que ya se cerró 📋 Pegar o ▶ Usar lo marcan ellas
+      (`preventDefault`) y no saca también del modo; y «hay una hoja
+      encima» se mira por si SE VE (`getClientRects`), no por el `display`
+      de su etiqueta, que otras herramientas dejan en `flex` dentro de un
+      contenedor escondido. Saliendo con ✕ o con «Sí, retirar» desde el
+      teclado, el foco vuelve a ☑ Elegir, no al `body`.
+    - **«Mover a estante» dice solo «Mover» por debajo de 520 px**: entre
+      480 y 486 la palabra larga se enseñaba y no cabía, y lo que se corta
+      con puntos suspensivos es justo lo que no se lee.
+    - **Los colores de las acciones llevan DOS clases de peso**: `.csg-bb`,
+      la de la barra del compositor, se declara más abajo en el archivo, y
+      con una sola clase los tres botones salían blancos sin ningún error
+      (visto en la primera captura).
+
+    **Y no hizo falta correr ni una línea de SQL**: estantes, máquina y
+    lápida ya viajaban en `consigna_piezas`.
 
 **Y un cambio más sobre el plan: la cabecera del compositor lleva a la
 derecha el ESTADO, no un 👁.** «Sin guardar», «🟡 Borrador», «📴 Solo aquí»
@@ -2308,14 +2491,15 @@ guardado y si llegó a la nube.
 
 ```
 node _dev/servidor-estatico.js       (en otra terminal)
-_dev/probe-consigna.html             (en el navegador)
+_dev/probe-consigna.html             (en el navegador: las 22 del §11 y la 23, ☑ Elegir)
 node _dev/test-consigna-node.js      (el núcleo, sin navegador)
 ```
 
 Desde una sesión sin pantalla, la sonda se corre así, y con el `SONDA_MS`
-puesto: tarda algo más de minuto y medio (103 s medidos, casi todo en los
-respiros de dos segundos de las subidas y nueve en la petición que no
-vuelve), y el tope por omisión de `corre-sonda.js` es de 90.
+puesto: tarda unos tres minutos (183 s medidos con la 23 dentro; eran 103
+antes de ☑ Elegir, casi todo en los respiros de dos segundos de las subidas
+y nueve en la petición que no vuelve), y el tope por omisión de
+`corre-sonda.js` es de 90.
 
 ```
 NODE_PATH=/opt/node22/lib/node_modules SONDA_MS=300000 node _dev/corre-sonda.js _dev/probe-consigna.html
@@ -2353,7 +2537,62 @@ con un hueco vacío y deje cada recuadro encima del pie a 320×568; el armado
 del §7 visto en la vista previa; los topes leídos de `consigna.sql`; el
 plegado con el `display` CALCULADO; y los píxeles y los colores a 320 px.
 Termina con APRUEBA o SUSPENDE delante en el título, con un resumen por cada
-una de las veintidós comprobaciones del §11 del plan.
+una de las veintidós comprobaciones del §11 del plan y por la 23, ☑ Elegir.
+
+La **18** mide la barra del anaquel fuera del modo: ＋ Nueva y 📋 Pegar
+enteros a 320 px, ☑ Elegir justo detrás de Pegar, de 44 de alto, con
+`right <= 320` y —más estricto, como la comprobación 34 de La Voz
+Prestada— dentro del borde de la propia barra (300); y el botón de
+Destellos con `display` CALCULADO `none` en el compositor y en el modo, y
+de vuelta tras ✕ Salir.
+
+La **23** es ☑ Elegir (95 de las 413 comprobaciones), y corre la última
+porque retira: sus piezas son suyas. Todo PULSADO, con clics o eventos de
+puntero, a 390 y a 320 px, y ordenado por gravedad:
+
+1. **Que el toque solo elija.** En ▦ toca el título, el «⚠ 3 usos» y donde
+   iban ▶, ✎ y ⋯; en ☰, el título y donde iban ▶ y ⋯; y después de cada
+   toque mira qué hoja o vista quedó abierta.
+2. **UN viaje por acción:** un upsert por `id`, firmado `josue`, con el
+   reloj nuevo solo en las filas que cambiaron; las que no, con su reloj de
+   aquí y su fila de allá idénticos. Pasado el respiro, seis acciones son
+   seis escrituras.
+3. **El interruptor de 🗂 Mover:** «1 de 3» mixto que mete las dos que
+   faltan, el segundo toque que saca las tres, «  MAESTRIA » en «Maestría»,
+   el estante creado dentro de la hoja sin perder ni la selección ni el
+   foco, el renglón vaciado que se queda en su sitio y lo vuelve a meter,
+   la pieza con doce estantes que no entra y se nombra, y cero escrituras
+   cuando no cambia nada.
+4. **Veneno** en un título elegido y en el estante creado: texto, sin
+   ningún `<img>` y en ningún atributo.
+5. **🤖 Máquina:** solo viajan las que no la llevaban.
+6. **🗑 Retirar:** armar, «No», volver a armar y «Sí»; UNA escritura con
+   las lápidas y `eliminado_at` en ISO, `confirm()` cero veces, fuera del
+   modo, y las dos de vuelta desde «🗑 Retiradas».
+7. **La selección que sobrevive** a buscar («3 elegidas · 2 no se ven»),
+   a cambiar entre ▦ y ☰, al evento `online` y a la nube que llega tarde:
+   para eso la base de mentira retiene las bajadas (`puertaBajada`) hasta
+   soltarlas. Y volver a entrar en la vista abre sin el modo.
+8. **Los píxeles:** la barra de elegidas entera encima de la de la
+   aplicación, con `elementFromPoint` en cada botón, normal y armada; la
+   última ficha por encima de ella; los botones de acción de 44 (miden 50)
+   y «Todas» y «Salir» de 40 (regla 21); y el botón de Destellos con
+   `display` CALCULADO `none` en el modo y de vuelta después de ✕, de
+   Escape —el primero cierra la hoja de mover y el segundo sale— y de
+   `switchView` a Inicio.
+9. **La acción sobre la nube de ahora** (corre antes que los píxeles): con
+   la copia de aquí vieja —otro aparato corrigió una y retiró otra—, mover
+   espera a la nube, lleva el texto de allá más el estante nuevo y no
+   resucita la retirada; y con la última bajada de hace cinco minutos,
+   🤖 Máquina baja antes de escribir. Y retirar una consigna con cambios
+   sin guardar en el compositor lo dice antes del «Sí», la lápida lleva el
+   párrafo y «↩ Devolver» la trae entera.
+
+Fuera de la 23, la única función de pantalla que la sonda llama por dentro
+es `csgAbrirPegar('')` (ver abajo); la 23 llama además a
+`csgAnqQuitarFiltros` para empezar sin filtros y a `csgVerPintar` para
+repintar la hoja de mover después de ponerle a mano doce estantes a una
+pieza. Las acciones, todas, las pulsa.
 
 ⚠️ **Su base de mentira exige lo que exige la de verdad, y lo saca del
 propio `consigna.sql`:** las columnas, sus tipos, los `not null`, los
@@ -2383,6 +2622,19 @@ que ya hay», el 💾 que escribe solo lo cambiado, la versión por uso, las
 dos del borrador, el chip que ensanchaba la pantalla y el pie de Usar) se
 quitó de uno en uno en una copia aparte: la sonda suspende justo en sus
 comprobaciones, y en ninguna otra.
+
+☑ Elegir se probó igual, y cada avería se deshizo después comparando el
+archivo con su copia buena: sin el `!important` del botón de Destellos
+suspende siete veces —en la 18 y en la 23, y a 390 y a 320 «🗑 Retirar» y
+«No» caen encima de `destello-fab`—; con una escritura por pieza, ocho
+(«6 acciones, 15 escrituras»); con ▶ ✎ ⋯ pintados mientras se elige,
+cuatro; sin la línea de `csgElegFuera` en `switchView`, una, que dice que
+la aplicación entera se queda sin Destellos. Sin escribir sobre la nube de
+ahora, seis; y sin guardar al retirar lo que se tenía a medio escribir,
+dos. La prueba de Node lleva además la **3.19**, `csgPersistirVarios`
+—varias ediciones, UN upsert, el reloj puesto y el aparato escrito dos
+veces—, y suspende con un viaje por pieza, sin el reloj y con una
+escritura del aparato por pieza.
 
 Y el SQL, contra un PostgreSQL de verdad, con el servidor de la sesión
 levantado como dice el apartado de La Voz Prestada:

@@ -10,7 +10,8 @@ pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
 <pre id="out">midiendo…</pre>
 <script>
 /* Sonda de 📜 La Consigna (js/tools/consigna.js), con las 22
-   comprobaciones del apartado 11 de PLAN-LA-CONSIGNA.md.
+   comprobaciones del apartado 11 de PLAN-LA-CONSIGNA.md, y la 23, ☑ Elegir
+   varias, que se añadió con él el 23 de septiembre de 2026.
 
    Como las vecinas (Cuadernos, La Voz Prestada): abre el index.html DE
    VERDAD en UN marco, con una base de mentira a nivel de fetch, una sesión
@@ -28,7 +29,9 @@ pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
    midiendo los jsonb como jsonb::text; 22007 si `eliminado_at` no es una
    fecha. Un doble complaciente esconde la costura (La Voz Prestada, regla
    13): una base que aceptara cualquier cosa aprobaría la subida que la de
-   verdad rebota. Si el SQL no se puede leer, la sonda SUSPENDE.
+   verdad rebota. Si el SQL no se puede leer, la sonda SUSPENDE. Y puede
+   hacer ESPERAR las bajadas (puertaBajada): la nube que llega tarde, que
+   es la de una tableta con mala señal.
 
    ⚠️ UN SOLO MARCO. Al cambiar la base (sin tabla → puesta → vieja →
    colgada) se reutiliza y se vuelve a llamar a initConsigna(), como manda
@@ -88,7 +91,7 @@ const NOMBRES = {
   1: 'Veneno: se ve como texto', 2: 'Armado exacto', 3: 'SKILL.md', 4: 'Mermaid', 5: 'Variables', 6: 'Chips',
   7: 'Pegar y repartir', 8: 'Plegado', 9: 'Nube', 10: 'Fusión', 11: 'Lápida', 12: 'Usar', 13: 'Bitácora preguntada',
   14: 'Topes', 15: 'Borrador', 16: 'Repaso', 17: 'Compositor a 320 px', 18: 'Píxeles y colores', 19: 'Las tres hojas por encima',
-  20: '📖 Guardar lo que devolvió', 21: 'Export', 22: 'Choque de nombres', 0: 'Arranque y cierre',
+  20: '📖 Guardar lo que devolvió', 21: 'Export', 22: 'Choque de nombres', 23: '☑ Elegir varias', 0: 'Arranque y cierre',
 };
 let limpiaPantalla = async () => {};
 /* Cada tramo se encierra: una sección que revienta a medias dice SUSPENDE
@@ -193,6 +196,11 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
      ══════════════════════════════════════════════════════════════ */
   let modo = 'sin-tabla';           // sin-tabla | puesta | vieja | cuelga
   let colsFuera = [];               // en 'vieja': las columnas que la tabla aún no tiene
+  /* La nube que TARDA: mientras esta promesa no se cumple, las bajadas
+     (GET) esperan, y al cumplirse contestan con lo que haya ENTONCES en la
+     tabla. Es la tableta con mala señal: el anaquel se pinta con lo del
+     aparato y la nube llega cuando llega (la 23 elige mientras tanto). */
+  let puertaBajada = null;
   const tabla = new Map();          // id → fila, como la guarda la base
   const llamadas = [];
   const rechazos = [];              // cada respuesta de error que dio la base, con su código
@@ -239,6 +247,7 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
     llamadas.push(l);
     if (modo === 'cuelga') return new Promise(() => {});       // la petición que NO VUELVE
     if (modo === 'sin-tabla') return rebota(404, '42P01', 'relation "public.consigna_piezas" does not exist', l);
+    if (metodo === 'GET' && puertaBajada) await puertaBajada;
     const cols = colsVivas();
     if (metodo === 'GET') {
       const pedidas = String(u.searchParams.get('select') || '*').split(',').map(x => x.trim()).filter(Boolean);
@@ -1798,8 +1807,34 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
      ══════════════════════════════════════════════════════════════ */
   await tramo(18, 'Píxeles y colores: 320 px, la barra fija, el <pre>, los fondos y los tonos calculados', async () => {
     await ancho(320);
-    const bN = barraBtn(/Nueva/), bP = barraBtn(/Pegar/);
-    ok(bN && bP && [bN, bP].every(b => { const r = b.getBoundingClientRect(); return r.left >= 0 && r.right <= 320; }), 'a 320 px [＋ Nueva] y [📋 Pegar] están enteros dentro del borde', [bN, bP].map(b => b && Math.round(b.getBoundingClientRect().right)).join('/'));
+    /* ⚠️ ☑ ELEGIR DENTRO DEL BORDE, que es lo que dice el §11: «en la barra
+       del anaquel ☑ Elegir tiene right <= 320», y ＋ Nueva y 📋 Pegar
+       siguen enteros. Si cae fuera, la mitad de «elegir varias» no se ve
+       sin deslizar una barra que no parece deslizarse (La Voz Prestada,
+       regla 33). Y aparte, contra el borde de la PROPIA barra, que recorta
+       lo que se desliza y acaba antes que la pantalla: así lo mide la
+       comprobación 34 de La Voz Prestada, y es lo que de verdad se ve. */
+    const bN = barraBtn(/Nueva/), bP = barraBtn(/Pegar/), bE = barraBtn(/Elegir/);
+    const rr = b => b.getBoundingClientRect();
+    ok(bN && bP && [bN, bP].every(b => rr(b).left >= 0 && rr(b).right <= 320), 'a 320 px [＋ Nueva] y [📋 Pegar] siguen enteros dentro del borde (acaban en ' + [bN, bP].map(b => b && Math.round(rr(b).right)).join('/') + ')', [bN, bP].map(b => b ? Math.round(rr(b).left) + '..' + Math.round(rr(b).right) : 'no está').join(' · '));
+    ok(!!bE && rr(bE).left >= 0 && rr(bE).right <= 320, 'en la barra del anaquel ☑ Elegir tiene right <= 320 (' + (bE && Math.round(rr(bE).right)) + ')', bE ? Math.round(rr(bE).left) + '..' + Math.round(rr(bE).right) + ': ☑ Elegir se sale por la derecha y no se ve sin deslizar la barra' : 'no hay botón ☑ Elegir en la barra');
+    const bar18 = anq().querySelector('.csg-barra');
+    const bordeBarra = bar18 ? rr(bar18).right : 0;
+    ok(bN && bP && bE && bar18 && bar18.scrollLeft === 0 && [bN, bP, bE].every(b => rr(b).right <= bordeBarra + 0.5),
+      '… y los tres acaban antes del borde de la propia barra (' + Math.round(bordeBarra) + '), sin deslizarla', [bN, bP, bE].map(b => b ? Math.round(rr(b).right) : 'no está').join('/') + ' · scrollLeft ' + (bar18 && bar18.scrollLeft));
+    ok(!!bE && rr(bE).height >= 43.5 && bE.previousElementSibling === bP, '☑ Elegir va justo detrás de 📋 Pegar y mide 44 de alto (' + (bE && Math.round(rr(bE).height)) + ')');
+    /* Y #destello-fab display:none CALCULADO en modo elegir (§11): la 23
+       lo mira con todas sus salidas; aquí, lo que dice el §11, a 320. */
+    const fab18 = $('destello-fab');
+    if (bE) {
+      pulsa(bE, '☑ Elegir');
+      await esperar(150);
+      ok(!!fab18 && cs(fab18, 'display') === 'none', '#destello-fab está display:none CALCULADO en modo elegir', fab18 && ('calculado ' + cs(fab18, 'display') + ' · en la etiqueta ' + fab18.style.display));
+      const salir18 = $('csg-eleg-barra') && $('csg-eleg-barra').querySelector('.csg-eleg-salir');
+      pulsa(salir18, '✕ Salir de elegir');
+      await esperar(150);
+      ok(!!fab18 && cs(fab18, 'display') !== 'none' && !d.body.classList.contains('csg-eligiendo'), '… y con ✕ Salir vuelve (' + (fab18 && cs(fab18, 'display')) + ')');
+    } else ok(false, '#destello-fab está display:none CALCULADO en modo elegir', 'no hay ☑ Elegir en la barra que pulsar');
     ok(d.scrollingElement.scrollWidth <= 321, 'y la página no se desliza de lado (scrollWidth ' + d.scrollingElement.scrollWidth + ')');
     const bgs = sel => { const el = d.querySelector(sel); return el ? cs(el, 'background-color') : '(no está)'; };
     const transp = c => !c || c === 'rgba(0, 0, 0, 0)' || c === 'transparent' || c === '(no está)';
@@ -1986,6 +2021,665 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
     ok(bit.some(b => /\n\d{4}-\d{2}-\d{2} · Claude · v\d+ · ✅/.test(b)) && txt.indexOf('«<img src=x onerror=window.__xss=4> "sí" \'no\'»') >= 0, 'y con su bitácora, notas incluidas (como texto)', bit.slice(0, 3).join('\n'));
     pulsa($('csg-ver-close'), '✕');
     await esperar(100);
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     23 · ☑ ELEGIR VARIAS (pedido el 23 de septiembre de 2026)
+     ──────────────────────────────────────────────────────────────
+     Todo PULSANDO —clic sobre el botón, o eventos de puntero de verdad en
+     el punto donde cae el dedo— y midiendo con la vista abierta con
+     switchView y #app-container a la vista, a 390 y a 320 px. Lo que puede
+     salir mal, por gravedad:
+     1. que el toque haga DOS cosas: elegir y, debajo, abrir ▶ Usar, el
+        compositor o el ⋯. La selección se quedaría detrás de una hoja que
+        nadie pidió. Se toca la ficha JUSTO donde iban esos botones, en ▦ y
+        en ☰, y se mira qué hoja quedó abierta;
+     2. que una acción sobre varias haga un viaje por pieza (con la señal de
+        una tableta, eso es lo que hace que mover veinte tarde). La base de
+        mentira cuenta las escrituras: UNA por acción, upsert por id,
+        firmada, con el reloj nuevo en las que cambiaron; y las que no
+        cambiaron ni viajan ni se mueven —su reloj de aquí y su fila de
+        allá, iguales—;
+     3. el interruptor de 🗂 Mover sobre varias: mete las que faltan, saca
+        todas, la que ya tiene doce no entra y se dice, «MAESTRIA» es
+        «Maestría», y el estante creado DENTRO de la hoja va a todas sin
+        perder la selección;
+     4. veneno en el estante creado y en un título elegido;
+     5. 🤖 Máquina: solo cambian las que no la tenían;
+     6. 🗑 Retirar: dos toques, sin confirm(), la lápida que la base acepta,
+        fuera del modo, y se devuelven desde «🗑 Retiradas»;
+     7. la selección sobrevive a los repintados —la nube que llega mientras
+        se elige, el evento `online`, cambiar entre ▦ y ☰— y a buscar, y lo
+        que no se ve se cuenta. (Volver a ENTRAR en la vista no es un
+        repintado: initConsigna abre sin el modo a propósito, y eso se mira
+        al final);
+     8. los píxeles: ☑ Elegir entero a 320; la barra de elegidas ENTERA
+        encima de la de la aplicación (elementFromPoint en cada botón); lo
+        último del anaquel, por encima de ella; y el botón de Destellos con
+        display CALCULADO none dentro del modo y de vuelta al salir con ✕,
+        con Escape y al irse a otra vista —esa última, si falla, deja la
+        aplicación entera sin Destellos, y en una pantalla que no es esta—;
+     9. ⚠️ y la acción se escribe sobre la nube de AHORA (corre antes que
+        los píxeles): con la copia de aquí vieja —otro aparato corrigió una
+        y retiró otra—, mover no puede pisar la corrección ni resucitar la
+        retirada; y retirar no puede tirar lo que la pieza tenía a medio
+        escribir en el compositor, porque «↩ Devolver» tiene que traerla
+        entera. Las dos se añadieron con la revisión del 23 de septiembre
+        de 2026, y se comprobaron quitando cada arreglo: la sonda suspende.
+     Corre la última porque retira: sus piezas son suyas.
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(23, '☑ Elegir: el toque solo elige, un viaje por acción, mover, veneno, máquina, retirar, la selección que sobrevive y los píxeles', async () => {
+    await ancho(390);
+    if (!activa('view-consigna')) await entrar();
+    if (anq().querySelector('.csg-puesto')) { w.csgAnqQuitarFiltros(); await esperar(150); }
+    const T1 = 'Elegir · zafiro', T2 = 'Elegir · con usos', T3 = 'Elegir · "><img src=x onerror=window.__xss23=1>', T4 = 'Elegir · la que no se toca';
+    /* Y tres más para el 9: la que otro aparato corrige, la que otro aparato
+       retira, y la que se deja a medio corregir en el compositor. */
+    const TA = 'Elegir · la corrige la tableta', TB = 'Elegir · la retira la tableta', TC = 'Elegir · a medio corregir';
+    /* T1 ya está en «Maestría» y ya va a NotebookLM; T2 lleva tres usos este
+       mes (su «⚠ 3 usos» es un BOTÓN fuera del modo); T3 trae veneno; T4
+       está en «Maestría» y no se elige nunca: es la que no puede moverse. */
+    w.eval('(' + function (sem) {
+      const ahora = Date.now();
+      sem.forEach(s => {
+        const p = csgNuevaPieza('prompt', 'rapido');
+        p.titulo = s.t;
+        p.bloques.forEach(b => { b.t = b.t || ('Texto de ' + s.t + ' para ' + b.id + '.'); });
+        p.maquina = s.m;
+        p.estantes = s.e;
+        if (s.usos) {
+          p.bitacora = [1, 2, 3].map(i => ({ uid: 'u-eleg-' + i, t: ahora - i * 60000, maquina: 'claude', v: 1, ok: 'si', nota: '' }));
+          p.usos = 3;
+          p.ultima = ahora - 60000;
+        }
+        csgMeteEnLista(p);
+      });
+      csgGuardaLocal();
+    } + ')(' + JSON.stringify([
+      { t: T1, m: 'notebooklm', e: ['Maestría'] },
+      { t: T2, m: 'claude', e: [], usos: true },
+      { t: T3, m: 'claude', e: [] },
+      { t: T4, m: 'claude', e: ['Maestría'] },
+      { t: TA, m: 'claude', e: [] },
+      { t: TB, m: 'claude', e: [] },
+      { t: TC, m: 'claude', e: [] },
+    ]) + ')');
+    await entrar();
+    await respiro();
+    const TT = [T1, T2, T3, T4];
+    const idDe = t => { const p = pieza(t); return p ? p.id : null; };
+    const ids = TT.map(idDe);
+    const tituloDe = id => { const p = g('csgDe(' + JSON.stringify(id) + ')'); return p ? p.titulo : id; };
+    if (!ok(ids.every(Boolean) && ids.every(id => tabla.has(id)), 'las cuatro piezas de la prueba están en el anaquel y en la nube (una con veneno en el título)', ids.join(', '))) return;
+    const vistaChip = v => anq().querySelector('.csg-vistas .csg-chip[aria-label="' + (v === 'lista' ? 'Ver en lista' : 'Ver en fichas') + '"]');
+    if (vistaChip('fichas').getAttribute('aria-pressed') !== 'true') { pulsa(vistaChip('fichas'), '▦'); await esperar(150); }
+
+    const barraE = () => $('csg-eleg-barra');
+    const bB = cls => barraE() && barraE().querySelector('.' + cls);
+    const cuenta = () => { const n = bB('csg-eleg-n'); return n ? n.textContent : '(sin barra)'; };
+    const eligiendo = () => d.body.classList.contains('csg-eligiendo');
+    const filaLista = t => [...anq().querySelectorAll('.csg-fila')].find(x => !x.closest('.csg-retiradas') && x.querySelector('.csg-fila-titulo') && x.querySelector('.csg-fila-titulo').textContent === t);
+    const nodo = t => fichaDe(t) || filaLista(t);
+    const marcada = t => { const x = nodo(t); return !!x && x.getAttribute('aria-checked') === 'true'; };
+    const marcadas = () => TT.filter(marcada).map(t => t === T3 ? 'T3(veneno)' : t).join(', ') || 'ninguna';
+    const fab = $('destello-fab');
+    const fabDisp = () => fab ? cs(fab, 'display') : '(no hay #destello-fab)';
+    /* QUÉ quedó abierto encima del anaquel, dicho con su nombre. */
+    const hojaAbierta = () => {
+      const h = [];
+      if (verAbierta('csg-usar-overlay')) h.push('la hoja ▶ Usar');
+      if (verAbierta('csg-ver-overlay')) h.push('la hoja vertical «' + $('csg-ver-titulo').textContent + '»');
+      if (verAbierta('csg-pegar-overlay')) h.push('la hoja 📋 Pegar');
+      if (!activa('view-consigna')) h.push('otra vista (' + ([...d.querySelectorAll('[id^="view-"].active')].map(v => v.id).join(',') || '?') + ')');
+      return h.join(' y ');
+    };
+    /* Un toque de verdad: el elemento que haya en ese punto recibe
+       pointerdown, pointerup y click, con sus coordenadas, como con un
+       dedo. Si ahí hay un botón escondido, es el botón quien lo recibe. */
+    function toca(x, y) {
+      const el = d.elementFromPoint(x, y);
+      if (!el) return null;
+      const o = { bubbles: true, cancelable: true, composed: true, view: w, clientX: x, clientY: y, screenX: x, screenY: y, pointerId: 23, pointerType: 'touch', isPrimary: true, button: 0, buttons: 1, detail: 1 };
+      el.dispatchEvent(new w.PointerEvent('pointerdown', o));
+      el.dispatchEvent(new w.PointerEvent('pointerup', Object.assign({}, o, { buttons: 0 })));
+      el.dispatchEvent(new w.MouseEvent('click', Object.assign({}, o, { buttons: 0 })));
+      return el;
+    }
+    async function asegurarModo() {
+      if (hojaAbierta()) await limpiaPantalla();
+      if (!activa('view-consigna')) await entrar();
+      if (!g('csgElegActivo()')) { pulsa(barraBtn(/Elegir/), '☑ Elegir'); await esperar(150); }
+    }
+    /* Deja elegidas exactamente esas (clic en la ficha: es preparar, no
+       lo que se prueba). */
+    async function eligeSolo(ts) {
+      await asegurarModo();
+      TT.forEach(t => { const x = nodo(t); if (x && marcada(t) !== (ts.indexOf(t) >= 0)) x.click(); });
+      await esperar(80);
+    }
+    /* Cada acción: lo que viajó desde que se tocó, y el reloj de antes. */
+    const foto = ts => ts.map(t => { const p = pieza(t); return t + ' · aquí ' + (p && p.actualizado) + ' · allá ' + JSON.stringify(p && tabla.get(p.id)); }).join('\n');
+    async function accion(fn, espera) {
+      const p0 = llamadas.length, t0 = Date.now();
+      await fn();
+      await esperar(espera || 450);
+      const ps = posts(p0);
+      return { ps, filas: ps.filter(l => l.estado === 201).map(filasDe).flat(), t0 };
+    }
+    let viajes = 0;
+    /* UN viaje con exactamente estas filas; `quietas` no viajan ni se
+       mueven (su reloj de aquí y su fila de allá, iguales que antes). */
+    function unViaje(r, que, cambian, quietas, antesQuietas, cond, detalleCond) {
+      viajes++;
+      const l = r.ps[0];
+      const van = r.filas.map(f => tituloDe(f.id)).sort();
+      const esperan = cambian.slice().sort();
+      const upsert = !!l && l.onConflict === 'id' && /resolution=merge-duplicates/.test(l.prefer);
+      const firmadas = r.filas.every(f => f.autor === 'josue');
+      const reloj = r.filas.every(f => Number(f.actualizado) >= r.t0);
+      ok(r.ps.length === 1 && l.estado === 201 && upsert && JSON.stringify(van) === JSON.stringify(esperan) && firmadas && reloj,
+        que + ': UN solo viaje, upsert por id, con las ' + esperan.length + ' que cambian y nada más, firmadas y con el reloj nuevo',
+        r.ps.length + ' escritura(s)' + (l ? ' · estado ' + l.estado + ' · on_conflict=' + l.onConflict + ' · ' + l.prefer : '') +
+        '\nviajaron: ' + JSON.stringify(van) + '\nesperadas: ' + JSON.stringify(esperan) +
+        '\nfirmas: ' + r.filas.map(f => f.autor).join(',') + ' · relojes (ms desde el toque): ' + r.filas.map(f => Number(f.actualizado) - r.t0).join(','));
+      if (cond) ok(r.filas.length > 0 && r.filas.every(cond), '… y cada fila que viajó ' + detalleCond, JSON.stringify(r.filas.map(f => ({ t: tituloDe(f.id), estantes: f.estantes, maquina: f.maquina, eliminado: f.eliminado, eliminado_at: f.eliminado_at }))));
+      if (quietas && quietas.length) igual(foto(quietas), antesQuietas, '… y ' + quietas.map(t => '«' + (t === T3 ? 'la del veneno' : t) + '»').join(' y ') +
+        (quietas.length === 1 ? ' no se tocó: ni viajó, ni cambió su reloj aquí, ni su fila allá' : ' no se tocaron: ni viajaron, ni cambió su reloj aquí, ni su fila allá'));
+    }
+
+    /* ── Entrar ── */
+    ok(!!fab && fabDisp() !== 'none', 'antes de elegir, el botón de Destellos se ve (' + fabDisp() + ')');
+    pulsa(barraBtn(/Elegir/), '☑ Elegir');
+    await esperar(150);
+    ok(eligiendo() && !!barraE() && !barraE().hidden && barraBtn(/Elegir/).getAttribute('aria-pressed') === 'true',
+      'pulsado ☑ Elegir, el modo se enciende: la clase en el body, la barra de elegidas a la vista y el botón puesto (aria-pressed)');
+    ok(fabDisp() === 'none' && fab.style.display === 'flex',
+      '#destello-fab está display:none CALCULADO en modo elegir, aunque switchView le escribió display:flex en la etiqueta (por eso el !important)',
+      'calculado: ' + fabDisp() + ' · en la etiqueta: ' + (fab && fab.style.display) + ' → el botón de Destellos se queda encima de la barra de elegidas');
+
+    /* ── 1. EL TOQUE ELIGE Y NADA MÁS ── */
+    const fs = fichas();
+    const conBoton = fs.filter(x => x.querySelector('button, a[href], [role="button"]'));
+    ok(fs.length >= 4 && fs.every(x => x.getAttribute('role') === 'checkbox' && x.getAttribute('aria-checked') === 'false') && !conBoton.length,
+      'las ' + fs.length + ' fichas son casillas (role=checkbox, sin elegir) y no queda dentro NINGÚN botón: ni ▶ Usar, ni ✎ Corregir, ni ⋯, ni «⚠ N usos»',
+      conBoton.map(x => '«' + x.querySelector('.csg-ficha-titulo').textContent + '»: ' + [...x.querySelectorAll('button')].map(b => b.textContent.trim()).join(' / ')).slice(0, 4).join(' · '));
+    ok(/^Ninguna elegida/.test(cuenta()), 'la cuenta dice «Ninguna elegida…» (' + cuenta() + ')');
+    /* Se toca donde iban los botones que ya no están: si alguien los
+       volviera a pintar, ESE toque es el que los pulsaría. */
+    async function tocaPuntos(t, puntos) {
+      const malos = [];
+      for (const [que, pt] of puntos) {
+        const el = nodo(t);
+        if (!el) { malos.push(que + ': la ficha ya no está'); break; }
+        const antes = el.getAttribute('aria-checked');
+        const dio = toca(pt.x, pt.y);
+        await esperar(90);
+        const abierta = hojaAbierta();
+        const ahora = nodo(t) ? nodo(t).getAttribute('aria-checked') : '(ya no está)';
+        if (!dio || !el.contains(dio)) malos.push(que + ': el dedo cayó en ' + (dio ? (dio.id || dio.className || dio.tagName) : 'nada') + ', fuera de la ficha');
+        if (abierta) malos.push('tocar ' + que + ' ABRIÓ ' + abierta);
+        if (ahora === antes) malos.push('tocar ' + que + ' no cambió la marca (' + antes + ')');
+        if (abierta) await asegurarModo();
+      }
+      return malos;
+    }
+    const puntosFicha = el => {
+      const r = el.getBoundingClientRect();
+      const P = [['el título', centro(el.querySelector('.csg-ficha-titulo'))]];
+      const tok = el.querySelector('.csg-ficha-token-uso');
+      if (tok) P.push(['«⚠ 3 usos este mes»', centro(tok)]);
+      P.push(['la esquina de abajo a la izquierda, donde iba ▶ Usar', { x: r.left + 40, y: r.bottom - 20 }]);
+      P.push(['el pie, donde iba ✎ Corregir', { x: (r.left + r.right) / 2, y: r.bottom - 20 }]);
+      P.push(['la esquina de abajo a la derecha, donde iba ⋯', { x: r.right - 24, y: r.bottom - 20 }]);
+      return P;
+    };
+    await esperar(60);
+    const fT2 = fichaDe(T2);
+    ok(!!fT2 && !!fT2.querySelector('.csg-ficha-token-uso') && fT2.querySelector('.csg-ficha-token-uso').tagName === 'SPAN',
+      'la de tres usos enseña «⚠ 3 usos este mes» como TEXTO, no como botón (fuera del modo abre el compositor)', fT2 && fT2.querySelector('.csg-ficha-token-uso') && fT2.querySelector('.csg-ficha-token-uso').tagName);
+    if (fT2) fT2.scrollIntoView({ block: 'center' });
+    await esperar(120);
+    const ptsT2 = fT2 ? puntosFicha(fT2) : [];
+    let malos = fT2 ? await tocaPuntos(T2, ptsT2) : ['no está la ficha'];
+    ok(!malos.length && marcada(T2) && ptsT2.length === 5,
+      'en ▦, ' + ptsT2.length + ' toques sobre la ficha —el título, «⚠ 3 usos», y donde iban ▶ Usar, ✎ Corregir y ⋯— la marcan y desmarcan cada vez, y no abren NADA',
+      malos.join('\n'));
+    /* Con el teclado, Espacio e Intro hacen lo mismo que el dedo. */
+    const fT1 = fichaDe(T1);
+    fT1.dispatchEvent(new w.KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+    const trasEsp = fichaDe(T1).getAttribute('aria-checked');
+    fichaDe(T1).dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+    const trasIntro = fichaDe(T1).getAttribute('aria-checked');
+    fichaDe(T1).dispatchEvent(new w.KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
+    ok(trasEsp === 'true' && trasIntro === 'false' && marcada(T1) && !hojaAbierta(), 'con el teclado, Espacio e Intro la marcan y la desmarcan, y tampoco abren nada');
+    /* ☰: cambiar de vista repinta, y la selección tiene que seguir. */
+    pulsa(vistaChip('lista'), '☰ Ver en lista');
+    await esperar(200);
+    const fl = [...anq().querySelectorAll('.csg-fila')].filter(x => !x.closest('.csg-retiradas'));
+    ok(fl.length >= 4 && fl.every(x => x.getAttribute('role') === 'checkbox' && !x.querySelector('button')) && marcada(T1) && marcada(T2) && !marcada(T3) && eligiendo(),
+      'en ☰ las ' + fl.length + ' filas son casillas sin ▶ ni ⋯, y cambiar de vista NO perdió la selección (' + marcadas() + ')',
+      fl.filter(x => x.getAttribute('role') !== 'checkbox' || x.querySelector('button')).length + ' filas con botón o sin casilla · elegidas: ' + marcadas());
+    const f3 = filaLista(T3);
+    let ptsF = [];
+    if (f3) {
+      f3.scrollIntoView({ block: 'center' });
+      await esperar(80);
+      const r = f3.getBoundingClientRect(), y = (r.top + r.bottom) / 2;
+      ptsF = [['el título de la fila', centro(f3.querySelector('.csg-fila-titulo'))], ['donde iba ▶ en la fila', { x: r.right - 66, y }], ['donde iba ⋯ en la fila', { x: r.right - 22, y }]];
+    }
+    malos = f3 ? await tocaPuntos(T3, ptsF) : ['no está la fila'];
+    ok(!malos.length && marcada(T3),
+      'en ☰, tres toques sobre la fila —el título, y donde iban ▶ y ⋯— la marcan y desmarcan, y no abren nada', malos.join('\n'));
+    pulsa(vistaChip('fichas'), '▦ Ver en fichas');
+    await esperar(200);
+    ok(marcada(T1) && marcada(T2) && marcada(T3) && !marcada(T4) && cuenta() === '3 elegidas' && !!fichaDe(T3) && fichaDe(T3).getAttribute('role') === 'checkbox',
+      'de vuelta en ▦ siguen las tres, y la cuenta dice «3 elegidas» (' + cuenta() + ')', 'elegidas: ' + marcadas());
+    /* «☑ Todas» y «Ninguna»: un solo botón, y no viajan. */
+    let p0 = llamadas.length;
+    pulsa(bB('csg-eleg-todas'), '☑ Todas las que se ven');
+    await esperar(100);
+    const nTodas = fichas().filter(x => x.getAttribute('aria-checked') === 'true').length;
+    const trasTodas = cuenta();
+    pulsa(bB('csg-eleg-todas'), '☐ Ninguna');
+    await esperar(100);
+    ok(nTodas === fichas().length && trasTodas === fichas().length + ' elegidas' && fichas().every(x => x.getAttribute('aria-checked') === 'false') && /^Ninguna elegida/.test(cuenta()) && posts(p0).length === 0,
+      '«☑ Todas» elige las ' + nTodas + ' que se ven, el mismo botón dice «Ninguna» y las suelta, y nada viaja', trasTodas + ' · ' + cuenta() + ' · ' + posts(p0).length + ' escrituras');
+    /* Con cero elegidas, las acciones responden y lo DICEN. */
+    for (const [cls, que] of [['csg-bb-mover', '🗂 Mover'], ['csg-bb-maquina', '🤖 Máquina'], ['csg-bb-retirar', '🗑 Retirar']]) {
+      const a0 = avisos.length;
+      p0 = llamadas.length;
+      pulsa(bB(cls), que + ' sin nada elegido');
+      await esperar(80);
+      ok(!hojaAbierta() && !bB('csg-bb-si') && posts(p0).length === 0 && avisos.slice(a0).some(a => /^Ninguna elegida/.test(a)),
+        'con cero elegidas, ' + que + ' no abre nada, no viaja y dice por qué («' + avisos.slice(a0).join(' | ') + '»)', hojaAbierta());
+    }
+    await eligeSolo([T1, T2, T3]);
+
+    /* ── 2, 3 y 4. 🗂 MOVER A ESTANTE ── */
+    const inicioViajes = llamadas.length;
+    pulsa(bB('csg-bb-mover'), '🗂 Mover a estante');
+    await esperar(150);
+    ok(verAbierta('csg-ver-overlay') && /Mover a estante/.test($('csg-ver-titulo').textContent), 'la hoja 🗂 Mover a estante se abre');
+    const modalV = $('csg-ver-overlay').querySelector('.fin-modal'), enV = enPunto(modalV);
+    ok(!!enV && modalV.contains(enV), '… POR ENCIMA de la barra de elegidas: en su centro (elementFromPoint) hay algo de la hoja', enV && (enV.id || enV.className));
+    const rotM = (g('csgEstantesTodos()').find(e => e.clave === 'maestria') || {}).rotulo;
+    const filaEst = rot => [...d.querySelectorAll('#csg-ver-cuerpo .csg-ver-fila')].find(x => x.querySelector('.csg-ver-txt') && x.querySelector('.csg-ver-txt').textContent === rot);
+    const clM = x => w.csgClave(x) === 'maestria';
+    let fM = filaEst(rotM);
+    ok(!!rotM && !!fM && fM.getAttribute('aria-pressed') === 'mixed' && /1 de 3/.test(fM.textContent) && fM.classList.contains('csg-ver-fila-parte'),
+      '«' + rotM + '», con una de las tres dentro, dice «1 de 3», con su «–» y aria-pressed="mixed"', fM && (fM.textContent + ' · ' + fM.getAttribute('aria-pressed')));
+    let antes = foto([T1, T4]);
+    let r = await accion(async () => { pulsa(filaEst(rotM), '«' + rotM + '» con 1 de 3'); });
+    unViaje(r, 'tocar «' + rotM + '» con una dentro mete las otras DOS', [T2, T3], [T1, T4], antes, f => (f.estantes || []).filter(clM).length === 1 && f.estantes.indexOf(rotM) >= 0, 'lleva «' + rotM + '» una sola vez');
+    ok([T1, T2, T3].every(t => (pieza(t).estantes || []).indexOf(rotM) >= 0) && verAbierta('csg-ver-overlay') && filaEst(rotM) && filaEst(rotM).getAttribute('aria-pressed') === 'true' && cuenta() === '3 elegidas',
+      '… las tres quedan dentro, la hoja sigue abierta con «' + rotM + '» marcado ✓ y la selección no se perdió');
+    antes = foto([T4]);
+    r = await accion(async () => { pulsa(filaEst(rotM), '«' + rotM + '» con las tres'); });
+    unViaje(r, 'volver a tocarlo con las tres dentro las SACA a las tres (el interruptor sobre varias)', [T1, T2, T3], [T4], antes, f => !(f.estantes || []).some(clM), 'va sin «' + rotM + '»');
+    antes = foto([T4]);
+    r = await accion(async () => {
+      escribe(d.querySelector('#csg-ver-cuerpo input.csg-input'), '  MAESTRIA ');
+      pulsa(botonCon($('csg-ver-cuerpo'), /Crear y poner/), '＋ Crear y poner');
+    });
+    unViaje(r, '«  MAESTRIA » escrito en el recuadro es el MISMO estante: mete las tres', [T1, T2, T3], [T4], antes, f => (f.estantes || []).filter(clM).length === 1 && f.estantes.indexOf(rotM) >= 0, 'lleva el rótulo que ya tenía la casa («' + rotM + '»), no «MAESTRIA»');
+    /* Corto a propósito: un estante tiene tope de 40 letras (CSG_TOPES.estante)
+       y uno más largo se guarda cortado, que no es lo que se prueba aquí. */
+    const veneno = 'Lote "><img src=x onerror=__xss23=2>';
+    const a0v = avisos.length;
+    antes = foto([T4]);
+    r = await accion(async () => {
+      escribe(d.querySelector('#csg-ver-cuerpo input.csg-input'), veneno);
+      pulsa(botonCon($('csg-ver-cuerpo'), /Crear y poner/), '＋ Crear y poner');
+    });
+    unViaje(r, 'crear un estante DENTRO de la hoja lo pone en las tres', [T1, T2, T3], [T4], antes, f => (f.estantes || []).indexOf(veneno) >= 0, 'lleva el estante nuevo, tal cual se escribió');
+    const filaVen = filaEst(veneno);
+    ok(verAbierta('csg-ver-overlay') && !!filaVen && filaVen.classList.contains('on') && cuenta() === '3 elegidas' && TT.slice(0, 3).every(marcada) && !!d.activeElement && d.activeElement.matches('#csg-ver-cuerpo input.csg-input'),
+      '… la hoja sigue abierta, el estante nuevo sale con su ✓, la selección sigue puesta (' + cuenta() + ') y el foco está en el recuadro para crear otro',
+      'hoja ' + verAbierta('csg-ver-overlay') + ' · fila ' + !!filaVen + ' · ' + cuenta() + ' · foco en ' + (d.activeElement && (d.activeElement.className || d.activeElement.tagName)));
+    /* ⚠️ Veneno: se ve como TEXTO donde se ve —la hoja, las fichas, la
+       barra, el aviso— y no nace ni un nodo ni un atributo con él. */
+    const zonas = '#csg-ver-overlay, #csg-anaquel, #csg-eleg-barra, #meta-toast';
+    const conAtrib = [...d.querySelectorAll(zonas.split(', ').map(z => z + ', ' + z + ' *').join(', '))]
+      .filter(el => [...el.attributes].some(a => /onerror|<img/i.test(a.value))).map(el => el.tagName + '.' + el.className);
+    const tituloVen = fichaDe(T3) && fichaDe(T3).querySelector('.csg-ficha-titulo');
+    const chipVen = [...anq().querySelectorAll('.csg-ficha-estantes span')].some(s => s.textContent === veneno);
+    ok(w.__xss23 === undefined && !d.querySelector('#csg-ver-overlay img, #csg-anaquel img, #csg-eleg-barra img, #meta-toast img') && !conAtrib.length &&
+      !!tituloVen && tituloVen.textContent === T3 && !!filaVen && filaVen.querySelector('.csg-ver-txt').textContent === veneno && chipVen && avisos.slice(a0v).some(a => a.indexOf(veneno) >= 0),
+      'el veneno —en el título elegido y en el estante creado— se ve como texto en la ficha, en la hoja, en el chip y en el aviso: ni un <img>, ni un atributo con él dentro',
+      'xss ' + w.__xss23 + ' · atributos: ' + conAtrib.join(', ') + ' · título ' + (tituloVen && tituloVen.textContent) + ' · chip ' + chipVen);
+    /* El renglón que se VACÍA no se va de debajo del dedo. El estante recién
+       creado solo lo tienen las tres: sacarlas lo deja sin nadie, y la
+       lista de la hoja sale de las piezas. Si el renglón desapareciera, el
+       de debajo subiría a su sitio y el segundo toque —el que quiere
+       devolverlas, porque es un interruptor— metería la selección en OTRO
+       estante que nadie tocó. */
+    const yVen = filaVen.getBoundingClientRect().top;
+    antes = foto([T4]);
+    r = await accion(async () => { pulsa(filaEst(veneno), '«' + veneno + '» con las tres'); });
+    unViaje(r, 'tocar el estante recién creado, con las tres dentro, las saca', [T1, T2, T3], [T4], antes, f => (f.estantes || []).indexOf(veneno) < 0, 'va sin él');
+    const filaVen2 = filaEst(veneno);
+    ok(!!filaVen2 && filaVen2.getAttribute('aria-pressed') === 'false' && Math.abs(filaVen2.getBoundingClientRect().top - yVen) < 1,
+      '… vacío, su renglón SIGUE en la hoja, sin marcar y en el mismo sitio: el segundo toque no puede caer en otro estante',
+      filaVen2 ? 'aria-pressed ' + filaVen2.getAttribute('aria-pressed') + ' · se movió ' + Math.round(filaVen2.getBoundingClientRect().top - yVen) + ' px' : 'el renglón ya no está en la hoja: ' + [...d.querySelectorAll('#csg-ver-cuerpo .csg-ver-fila')].map(x => x.textContent).join(' | '));
+    antes = foto([T4]);
+    r = await accion(async () => { pulsa(filaEst(veneno), '«' + veneno + '» vacío'); });
+    unViaje(r, 'y el segundo toque en el mismo renglón las vuelve a meter, con el rótulo de siempre', [T1, T2, T3], [T4], antes, f => (f.estantes || []).indexOf(veneno) >= 0, 'lleva el estante otra vez');
+    /* El tope de doce: la que ya está en doce no entra, y se dice cuántas y cuáles. */
+    const doce = [rotM, veneno].concat(Array.from({ length: 10 }, (_, i) => 'Tope ' + i));
+    g('csgDe(' + JSON.stringify(idDe(T2)) + ')').estantes = doce.slice();
+    g('csgGuardaLocal()');
+    w.csgVerPintar();
+    const a0d = avisos.length;
+    antes = foto([T2, T4]);
+    r = await accion(async () => {
+      escribe(d.querySelector('#csg-ver-cuerpo input.csg-input'), 'Uno más');
+      pulsa(botonCon($('csg-ver-cuerpo'), /Crear y poner/), '＋ Crear y poner');
+    });
+    unViaje(r, 'con una de las tres ya en 12 estantes, «Uno más» entra en las otras dos', [T1, T3], [T2, T4], antes, f => (f.estantes || []).indexOf('Uno más') >= 0, 'lleva «Uno más»');
+    ok(pieza(T2).estantes.length === 12 && avisos.slice(a0d).some(a => /1 no cabe: ya está en 12 estantes \(«Elegir · con usos»\)/.test(a)),
+      '… la de doce se queda en doce, y el aviso dice cuántas no cupieron y cuáles («' + avisos.slice(a0d).join(' | ') + '»)');
+    /* Tocar ese estante, ahora con 2 de 3: la que falta no cabe, así que
+       no cambia NADA y no se gasta ningún viaje. */
+    const a0n = avisos.length;
+    r = await accion(async () => { pulsa(filaEst('Uno más'), '«Uno más» con 2 de 3'); });
+    ok(r.ps.length === 0 && avisos.slice(a0n).some(a => /Ninguna entró en «Uno más» · 1 no cabe/.test(a)),
+      'tocar «Uno más» (2 de 3) con la que falta llena no cambia nada: CERO viajes, y lo dice («' + avisos.slice(a0n).join(' | ') + '»)', r.ps.length + ' escrituras');
+    pulsa(botonCon($('csg-ver-cuerpo'), /^Listo$/), 'Listo');
+    await esperar(120);
+    ok(!verAbierta('csg-ver-overlay') && cuenta() === '3 elegidas' && eligiendo(), '«Listo» cierra la hoja y la selección sigue (' + cuenta() + ')');
+
+    /* ── 5. 🤖 MÁQUINA ── */
+    pulsa(bB('csg-bb-maquina'), '🤖 Máquina');
+    await esperar(150);
+    const fN = filaVer(/^🤖NotebookLM/);
+    ok(!!fN && fN.getAttribute('aria-pressed') === 'mixed' && /1 de 3/.test(fN.textContent), 'en la hoja 🤖 Máquina, NotebookLM dice «1 de 3» (la zafiro ya iba ahí)', fN && fN.textContent);
+    const a0m = avisos.length;
+    antes = foto([T1, T4]);
+    r = await accion(async () => { pulsa(filaVer(/^🤖NotebookLM/), 'NotebookLM'); });
+    unViaje(r, '🤖 NotebookLM pasa las otras dos', [T2, T3], [T1, T4], antes, f => f.maquina === 'notebooklm', 'va a notebooklm');
+    ok(!verAbierta('csg-ver-overlay') && avisos.slice(a0m).some(a => /2 consignas pasan a NotebookLM/.test(a)) && [T1, T2, T3].every(t => pieza(t).maquina === 'notebooklm') && cuenta() === '3 elegidas',
+      '… la hoja se cierra, las tres van a NotebookLM, lo dice («' + avisos.slice(a0m).join(' | ') + '») y la selección sigue');
+    /* Ningún viaje de más DESPUÉS: el respiro de una pieza no puede subirla
+       otra vez por detrás (dos upserts en vuelo llegan en cualquier orden). */
+    await respiro();
+    ok(posts(inicioViajes).length === viajes, 'pasado el respiro no viajó nada más: ' + viajes + ' acciones, ' + posts(inicioViajes).length + ' escrituras', posts(inicioViajes).map(l => filasDe(l).map(f => tituloDe(f.id)).join('+')).join(' · '));
+
+    /* ── 7. LA SELECCIÓN SOBREVIVE: buscar, y el evento `online` ── */
+    escribe(anq().querySelector('.csg-busca-input'), 'zafiro');
+    await esperar(400);
+    ok(cuenta() === '3 elegidas · 2 no se ven' && marcada(T1) && !fichaDe(T2),
+      'buscando «zafiro», las que quedan fuera siguen elegidas y la barra lo dice («' + cuenta() + '»)');
+    escribe(anq().querySelector('.csg-busca-input'), '');
+    await esperar(400);
+    ok(cuenta() === '3 elegidas' && [T1, T2, T3].every(marcada), 'y al borrar la búsqueda vuelven las tres marcadas (' + cuenta() + ')');
+    const viejo = fichaDe(T1);
+    w.dispatchEvent(new w.Event('online'));
+    await esperar(500);
+    ok(!viejo.isConnected && [T1, T2, T3].every(marcada) && !marcada(T4) && cuenta() === '3 elegidas' && eligiendo(),
+      'volver la señal (evento `online`) repinta el anaquel y la selección sigue en las fichas NUEVAS (' + marcadas() + ')',
+      (viejo.isConnected ? 'no hubo repintado · ' : '') + 'elegidas: ' + marcadas() + ' · ' + cuenta());
+
+    /* ── 6. 🗑 RETIRAR: dos toques, sin confirm(), la lápida, fuera del modo, y se devuelven ── */
+    fichaDe(T1).click();
+    await esperar(60);
+    const c0 = confirms;
+    p0 = llamadas.length;
+    pulsa(bB('csg-bb-retirar'), '🗑 Retirar');
+    await esperar(100);
+    ok(!!bB('csg-bb-si') && /Sí, retirar 2/.test(bB('csg-bb-si').textContent) && !!bB('csg-bb-no') && d.activeElement === bB('csg-bb-no') && /Retirar las 2/.test(cuenta()) && posts(p0).length === 0,
+      'el primer toque solo ARMA: «Sí, retirar 2 · No», la cuenta dice lo que va a pasar, el foco en «No», y nada viaja', cuenta() + ' · foco en ' + (d.activeElement && d.activeElement.textContent));
+    pulsa(bB('csg-bb-no'), 'No');
+    await esperar(100);
+    ok(!bB('csg-bb-si') && !!bB('csg-bb-retirar') && marcada(T2) && marcada(T3) && posts(p0).length === 0 && eligiendo(), '«No» desarma: vuelve 🗑 Retirar, la selección sigue y nada viaja');
+    pulsa(bB('csg-bb-retirar'), '🗑 Retirar');
+    await esperar(100);
+    antes = foto([T1, T4]);
+    r = await accion(async () => { pulsa(bB('csg-bb-si'), 'Sí, retirar 2'); });
+    unViaje(r, 'el segundo toque retira las dos', [T2, T3], [T1, T4], antes,
+      f => f.eliminado === true && typeof f.eliminado_at === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(f.eliminado_at) && !isNaN(Date.parse(f.eliminado_at)), 'es una lápida: eliminado y eliminado_at como fecha ISO (la base de mentira la aceptó)');
+    ok(confirms === c0, 'y sin pasar por confirm() (' + (confirms - c0) + ' llamadas)');
+    const ret = g('csgRetiradas()').map(p => p.titulo);
+    ok(!eligiendo() && barraE().hidden && fabDisp() !== 'none' && ret.indexOf(T2) >= 0 && ret.indexOf(T3) >= 0 && !fichaDe(T2) && !fichaDe(T3) && !!anq().querySelector('.csg-ficha .csg-ficha-pie'),
+      'y sale del modo: la barra se va, el botón de Destellos vuelve (' + fabDisp() + '), las fichas recuperan sus botones y las dos están en «🗑 Retiradas»');
+    const det = anq().querySelector('details.csg-retiradas');
+    if (det && !det.open) { pulsa(det.querySelector('summary'), '🗑 Retiradas'); await esperar(120); }
+    p0 = llamadas.length;
+    for (const t of [T2, T3]) {
+      const fr = [...anq().querySelectorAll('.csg-retiradas .csg-fila')].find(x => x.querySelector('.csg-fila-titulo').textContent === t);
+      pulsa(fr && botonCon(fr, /Devolver/), '↩ Devolver de «' + t + '»');
+      await esperar(350);
+    }
+    const dev = posts(p0).filter(l => l.estado === 201).map(filasDe).flat();
+    ok([T2, T3].every(t => !!fichaDe(t) && pieza(t) && !pieza(t).eliminado) && [T2, T3].every(t => dev.some(f => f.id === idDe(t) && f.eliminado === false && f.eliminado_at === null && f.autor === 'josue')),
+      'desde «🗑 Retiradas», ↩ Devolver las pone otra vez en el anaquel, y viajan vivas y firmadas', JSON.stringify(dev.map(f => ({ t: tituloDe(f.id), eliminado: f.eliminado, eliminado_at: f.eliminado_at }))));
+    await respiro();
+
+    /* ── 7 (2/2). LA NUBE LLEGA MIENTRAS SE ELIGE ──
+       Se entra con la bajada detenida en la base de mentira, se elige, y
+       entonces llega lo que otro aparato guardó: el anaquel se repinta con
+       la pieza nueva, y lo elegido sigue elegido. Es lo que pasa en una
+       tableta con mala señal: el anaquel se pinta al instante con lo del
+       aparato y la nube contesta cuando contesta. */
+    pulsa(d.querySelector('#bottom-nav .nav-item[data-view="view-inicio"]'), 'Inicio de la barra de abajo');
+    await esperar(150);
+    const TN = 'Elegir · llegó de la tableta', idN = 'csg-sonda-eleg-nube';
+    let abrirPuerta = null;
+    puertaBajada = new Promise(res => { abrirPuerta = res; });
+    const g0 = llamadas.length;
+    pulsa(d.querySelector('[data-qa="view-consigna"]'), 'la baldosa del Acceso Rápido');
+    await esperar(350);
+    const pidio = llamadas.slice(g0).some(l => l.tabla && l.metodo === 'GET');
+    pulsa(barraBtn(/Elegir/), '☑ Elegir');
+    await esperar(120);
+    fichaDe(T1).click();
+    fichaDe(T4).click();
+    await esperar(60);
+    const nodoAntes = fichaDe(T1);
+    tabla.set(idN, filaNube({ id: idN, titulo: TN, bloques: [{ id: 'tarea', rotulo: 'Tarea', t: 'La guardó otro aparato mientras aquí se elegía.' }] }));
+    ok(pidio && !fichaDe(TN) && cuenta() === '2 elegidas', 'al entrar se pidió la nube y se quedó esperando; mientras, se eligen dos (' + cuenta() + ')', 'GET: ' + pidio + ' · ya estaba: ' + !!fichaDe(TN));
+    abrirPuerta();
+    puertaBajada = null;
+    await hasta(() => !!fichaDe(TN), 3000);
+    await esperar(150);
+    const fN2 = fichaDe(TN);
+    ok(!!fN2 && !nodoAntes.isConnected && marcada(T1) && marcada(T4) && !marcada(T2) && fN2.getAttribute('role') === 'checkbox' && fN2.getAttribute('aria-checked') === 'false' && cuenta() === '2 elegidas' && eligiendo() && barraBtn(/Elegir/).getAttribute('aria-pressed') === 'true',
+      'llega la nube: el anaquel se repinta con la pieza del otro aparato (sin elegir) y las dos elegidas SIGUEN elegidas (' + cuenta() + ')',
+      'pieza nueva ' + !!fN2 + ' · repintó ' + !nodoAntes.isConnected + ' · elegidas: ' + marcadas() + ' · ' + cuenta() + ' · modo ' + eligiendo());
+
+    /* ── 9. LA ACCIÓN SE ESCRIBE SOBRE LA NUBE DE AHORA ──
+       ⚠️ Cada acción sube la fila ENTERA con el reloj puesto, así que la
+       copia de aquí GANA. La lista solo se baja al abrir la vista y al
+       volver la señal: una tableta que se quedó en el anaquel desde la
+       mañana elige sobre la copia de la mañana. Aquí otro aparato, con el
+       reloj más nuevo, corrige TA y retira TB sin que este se entere; y la
+       nube TARDA en contestar (la puerta de las bajadas se cierra): se
+       entra, se eligen las dos y se mueven ANTES de que conteste. */
+    const texto = x => ((x && x.bloques) || []).map(b => b.t).join(' | ');
+    const idA = idDe(TA), idB = idDe(TB), idC = idDe(TC);
+    pulsa(bB('csg-eleg-salir'), '✕ Salir');
+    await esperar(150);
+    if (ok(!!idA && !!idB && !!idC && tabla.has(idA) && tabla.has(idB) && tabla.has(idC), 'las tres piezas del 9 están en el anaquel y en la nube', [idA, idB, idC].join(', '))) {
+      const tOtro = Date.now() + 5;
+      const fA = tabla.get(idA);
+      fA.bloques = fA.bloques.map(b => Object.assign({}, b, { t: 'Corregido en la tableta: ' + b.id }));
+      fA.actualizado = tOtro;
+      const fB = tabla.get(idB);
+      fB.eliminado = true; fB.eliminado_at = new Date(tOtro).toISOString(); fB.actualizado = tOtro;
+      await esperar(30);
+      let abreP = null;
+      puertaBajada = new Promise(res => { abreP = res; });
+      const q0 = llamadas.length;
+      pulsa(barraBtn(/Elegir/), '☑ Elegir');
+      await esperar(120);
+      const pidioAlEntrar = llamadas.slice(q0).some(l => l.tabla && l.metodo === 'GET');
+      fichaDe(TA).click();
+      fichaDe(TB).click();
+      await esperar(60);
+      const eleg0 = cuenta();
+      pulsa(bB('csg-bb-mover'), '🗂 Mover a estante');
+      await esperar(150);
+      escribe(d.querySelector('#csg-ver-cuerpo input.csg-input'), 'Lote de la tableta');
+      pulsa(botonCon($('csg-ver-cuerpo'), /Crear y poner/), '＋ Crear y poner');
+      await esperar(300);
+      const antesDeLaNube = posts(q0).length;
+      abreP();
+      puertaBajada = null;
+      await hasta(() => posts(q0).length > 0, 3000);
+      await esperar(300);
+      const escr = posts(q0), filasN = escr.filter(l => l.estado === 201).map(filasDe).flat();
+      ok(pidioAlEntrar && eleg0 === '2 elegidas', '☑ Elegir pide la nube AL ENTRAR (la copia de aquí puede ser de hace horas), y mientras contesta se eligen dos (' + eleg0 + ')', 'bajó al entrar: ' + pidioAlEntrar);
+      ok(antesDeLaNube === 0, '… y 🗂 Mover, tocado antes de que la nube conteste, ESPERA a la nube para escribir', antesDeLaNube + ' escritura(s) antes de que contestara: la copia vieja ya viajó');
+      ok(escr.length === 1 && filasN.length === 1 && filasN[0].id === idA && /Corregido en la tableta/.test(texto(filasN[0])) && (filasN[0].estantes || []).indexOf('Lote de la tableta') >= 0,
+        '… y escribe UN viaje con SOLO la corregida: el texto de la tableta y, encima, el estante de aquí',
+        escr.length + ' escritura(s) · ' + JSON.stringify(filasN.map(x => ({ t: tituloDe(x.id), texto: texto(x).slice(0, 60), estantes: x.estantes, eliminado: x.eliminado }))));
+      ok(/Corregido en la tableta/.test(texto(tabla.get(idA))) && (tabla.get(idA).estantes || []).indexOf('Lote de la tableta') >= 0,
+        '⚠️ en la nube, la corrección del otro aparato SIGUE y el estante se puso encima (no la pisó la copia vieja)', texto(tabla.get(idA)));
+      ok(tabla.get(idB).eliminado === true && !pieza(TB) && !fichaDe(TB) && cuenta() === '1 elegida',
+        '⚠️ la que el otro aparato retiró NO resucita: ni viaja, ni vuelve al anaquel, y sale sola de la selección (' + cuenta() + ')',
+        'nube eliminado=' + tabla.get(idB).eliminado + ' · en el anaquel: ' + !!fichaDe(TB) + ' · ' + cuenta());
+      pulsa(botonCon($('csg-ver-cuerpo'), /^Listo$/), 'Listo');
+      await esperar(120);
+      /* Y con el modo puesto hace rato: otro aparato vuelve a corregir TA, y
+         la última bajada fue hace más de un minuto (se atrasa su hora). La
+         acción tiene que bajar la nube ANTES de escribir. */
+      const fA2 = tabla.get(idA);
+      fA2.bloques = fA2.bloques.map(b => Object.assign({}, b, { t: 'Segunda corrección de la tableta: ' + b.id }));
+      fA2.actualizado = Date.now() + 5;
+      await esperar(30);
+      g('_csgNubeVista = Date.now() - 5 * 60000');
+      const q1 = llamadas.length;
+      pulsa(bB('csg-bb-maquina'), '🤖 Máquina');
+      await esperar(150);
+      pulsa(filaVer(/^🤖Gemini/), 'Gemini');
+      await hasta(() => posts(q1).length > 0, 3000);
+      await esperar(300);
+      const ll = llamadas.slice(q1).filter(l => l.tabla);
+      const iG = ll.findIndex(l => l.metodo === 'GET'), iP = ll.findIndex(l => l.metodo === 'POST');
+      const fil2 = posts(q1).filter(l => l.estado === 201).map(filasDe).flat();
+      ok(iG >= 0 && iP > iG && posts(q1).length === 1 && fil2.length === 1 && fil2[0].maquina === 'gemini' && /Segunda corrección/.test(texto(fil2[0])) && /Segunda corrección/.test(texto(tabla.get(idA))),
+        'con la copia de hace más de un minuto, 🤖 Máquina BAJA la nube antes de escribir, y su único viaje lleva la máquina nueva sobre el texto de la tableta',
+        ll.map(l => l.metodo).join(' → ') + ' · ' + JSON.stringify(fil2.map(x => ({ maquina: x.maquina, texto: texto(x).slice(0, 60) }))));
+
+      /* ⚠️ RETIRAR NO TIRA LO QUE ESTABA A MEDIO ESCRIBIR. Se corrige TC en el
+         compositor, se sale por la barra de abajo SIN guardar —el borrador
+         se queda— y se retira con ☑ Elegir. La barra promete que «se pueden
+         devolver»: devolverla tiene que traer también ese párrafo. */
+      pulsa(bB('csg-eleg-salir'), '✕ Salir');
+      await esperar(150);
+      pulsa(botonCon(fichaDe(TC), /Corregir/), '✎ Corregir de «' + TC + '»');
+      await esperar(300);
+      const tC = await abreBloque('tarea');
+      escribe(tC, tC.value + ' PÁRRAFO QUE NO SE GUARDÓ');
+      await esperar(900);
+      pulsa(d.querySelector('#bottom-nav .nav-item[data-view="view-inicio"]'), 'Inicio de la barra de abajo');
+      await esperar(300);
+      await entrar();
+      pulsa(barraBtn(/Elegir/), '☑ Elegir');
+      await esperar(150);
+      fichaDe(TC).click();
+      await esperar(60);
+      pulsa(bB('csg-bb-retirar'), '🗑 Retirar');
+      await esperar(100);
+      ok(/Tenía cambios sin guardar: se guardan con ella/.test(cuenta()), 'armado, la barra dice ANTES del «Sí» que tenía cambios sin guardar y que se guardan con ella («' + cuenta() + '»)');
+      const r0 = llamadas.length;
+      pulsa(bB('csg-bb-si'), 'Sí, retirar 1');
+      await esperar(600);
+      const lapC = g('csgDe(' + JSON.stringify(idC) + ')');
+      ok(posts(r0).length === 1 && !!lapC && lapC.eliminado === true && /PÁRRAFO QUE NO SE GUARDÓ/.test(texto(lapC)) && tabla.get(idC).eliminado === true && /PÁRRAFO QUE NO SE GUARDÓ/.test(texto(tabla.get(idC))),
+        '⚠️ la lápida —aquí y en la nube, en UN viaje— lleva el párrafo que se había dejado sin guardar',
+        posts(r0).length + ' escritura(s) · aquí: ' + texto(lapC).slice(0, 90) + ' · nube: ' + texto(tabla.get(idC)).slice(0, 90));
+      const det2 = anq().querySelector('details.csg-retiradas');
+      if (det2 && !det2.open) { pulsa(det2.querySelector('summary'), '🗑 Retiradas'); await esperar(120); }
+      const frC = [...anq().querySelectorAll('.csg-retiradas .csg-fila')].find(x => x.querySelector('.csg-fila-titulo').textContent === TC);
+      pulsa(frC && botonCon(frC, /Devolver/), '↩ Devolver de «' + TC + '»');
+      await esperar(400);
+      ok(!!pieza(TC) && /PÁRRAFO QUE NO SE GUARDÓ/.test(texto(pieza(TC))) && /PÁRRAFO QUE NO SE GUARDÓ/.test(texto(tabla.get(idC))) && tabla.get(idC).eliminado === false,
+        '… y «↩ Devolver» la trae ENTERA, con el párrafo, aquí y en la nube', pieza(TC) ? texto(pieza(TC)).slice(0, 90) : 'no volvió');
+      await respiro();
+    }
+    /* De vuelta como estaba: el modo puesto, con T1 y T4 elegidas. */
+    if (!activa('view-consigna')) await entrar();
+    if (!g('csgElegActivo()')) { pulsa(barraBtn(/Elegir/), '☑ Elegir'); await esperar(150); }
+    [T1, T4].forEach(t => { if (!marcada(t)) fichaDe(t).click(); });
+    [T2, T3, TA].forEach(t => { if (marcada(t)) nodo(t).click(); });
+    await esperar(80);
+
+    /* ── 8. LOS PÍXELES ── */
+    for (const px of [390, 320]) {
+      await ancho(px);
+      const nav = $('bottom-nav').getBoundingClientRect(), rb = barraE().getBoundingClientRect();
+      const mide = estado => {
+        const bs = [...barraE().querySelectorAll('button')];
+        const tapados = bs.filter(b => { const e = enPunto(b); return !e || !b.contains(e); }).map(b => '«' + b.textContent.trim() + '» → ' + (enPunto(b) ? (enPunto(b).id || enPunto(b).className || enPunto(b).tagName) : 'nada'));
+        const bajos = bs.filter(b => b.getBoundingClientRect().height < (b.classList.contains('csg-bb') ? 43.5 : 39.5)).map(b => '«' + b.textContent.trim() + '» ' + Math.round(b.getBoundingClientRect().height));
+        ok(bs.length >= 4 && !tapados.length, 'a ' + px + ' px, ' + estado + ': cada uno de los ' + bs.length + ' botones de la barra de elegidas recibe el dedo (elementFromPoint en su centro)', tapados.join(' · '));
+        ok(!bajos.length, '… y miden lo que manda la regla 21: 44 px las acciones (.csg-bb) y 40 como mínimo «Todas» y «Salir» (' + bs.map(b => Math.round(b.getBoundingClientRect().height)).join('/') + ')', bajos.join(' · '));
+      };
+      ok(rb.bottom <= nav.top + 0.5 && rb.top >= 0 && rb.left >= -0.5 && rb.right <= px + 0.5 && barraE().scrollWidth <= barraE().clientWidth + 1,
+        'a ' + px + ' px la barra de elegidas está ENTERA encima de la de la aplicación (acaba en ' + Math.round(rb.bottom) + ', la otra empieza en ' + Math.round(nav.top) + ') y no se desliza de lado',
+        JSON.stringify({ barra: [Math.round(rb.left), Math.round(rb.top), Math.round(rb.right), Math.round(rb.bottom)], nav: Math.round(nav.top), sw: barraE().scrollWidth, cw: barraE().clientWidth }));
+      mide('con Mover, Máquina y Retirar');
+      pulsa(bB('csg-bb-retirar'), '🗑 Retirar (armar)');
+      await esperar(100);
+      mide('con «Sí, retirar 2 · No»');
+      pulsa(bB('csg-bb-no'), 'No');
+      await esperar(100);
+      /* Lo último del anaquel no se queda debajo de la barra: la última
+         ficha —la que se va a tocar— sube por encima de ella. */
+      const sc = d.querySelector('#view-consigna .view-scroll');
+      sc.scrollTop = sc.scrollHeight;
+      await esperar(120);
+      const ult = fichas().slice(-1)[0], fin = anq().lastElementChild;
+      const top = barraE().getBoundingClientRect().top;
+      const eU = ult && enPunto(ult);
+      ok(!!ult && ult.getBoundingClientRect().bottom <= top + 0.5 && fin.getBoundingClientRect().bottom <= top + 0.5 && !!eU && ult.contains(eU),
+        'a ' + px + ' px, con el anaquel al fondo, la última ficha y lo último del anaquel quedan POR ENCIMA de la barra de elegidas, y la ficha recibe el dedo',
+        'ficha hasta ' + (ult && Math.round(ult.getBoundingClientRect().bottom)) + ', lo último hasta ' + Math.round(fin.getBoundingClientRect().bottom) + ', la barra empieza en ' + Math.round(top) + ' · en el centro de la ficha: ' + (eU && (eU.className || eU.tagName)));
+      sc.scrollTop = 0;
+      await esperar(80);
+    }
+    /* ☑ Elegir, entero a 320 (lo mide también la 18, fuera del modo). */
+    const bE = barraBtn(/Elegir/), rE = bE.getBoundingClientRect(), bordeB = anq().querySelector('.csg-barra').getBoundingClientRect().right;
+    ok(rE.left >= 0 && rE.right <= 320 && rE.right <= bordeB + 0.5, 'a 320 px, con el modo puesto, ☑ Elegir sigue entero: acaba en ' + Math.round(rE.right) + ' (la barra, en ' + Math.round(bordeB) + ')');
+
+    /* ── 8 (2/2). EL BOTÓN DE DESTELLOS VUELVE, POR LAS TRES SALIDAS ── */
+    ok(fabDisp() === 'none', 'a 320 px y eligiendo, #destello-fab sigue display:none calculado', fabDisp());
+    pulsa(bB('csg-eleg-salir'), '✕ Salir');
+    await esperar(150);
+    ok(!eligiendo() && !g('csgElegActivo()') && fabDisp() !== 'none' && barraE().hidden && !!anq().querySelector('.csg-ficha .csg-ficha-pie') && !anq().querySelector('[role="checkbox"]'),
+      '✕ Salir apaga el modo: el botón de Destellos vuelve (' + fabDisp() + '), la barra se va y las fichas recuperan sus botones');
+    /* Escape es UN paso cada vez: con la hoja de mover abierta, el primero
+       la cierra y la selección sigue; el segundo sale del modo. */
+    pulsa(barraBtn(/Elegir/), '☑ Elegir');
+    await esperar(120);
+    fichaDe(T1).click();
+    await esperar(60);
+    pulsa(bB('csg-bb-mover'), '🗂 Mover a estante');
+    await esperar(150);
+    const conModo = fabDisp();
+    const escape = () => d.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+    escape();
+    await esperar(150);
+    ok(!verAbierta('csg-ver-overlay') && eligiendo() && marcada(T1) && cuenta() === '1 elegida',
+      'con la hoja de mover abierta, el primer Escape cierra LA HOJA y la selección sigue (' + cuenta() + ')', 'hoja ' + verAbierta('csg-ver-overlay') + ' · modo ' + eligiendo() + ' · ' + cuenta());
+    escape();
+    await esperar(150);
+    ok(conModo === 'none' && !eligiendo() && fabDisp() !== 'none' && !anq().querySelector('[role="checkbox"]'),
+      'el segundo Escape sale del modo y el botón de Destellos vuelve (' + conModo + ' → ' + fabDisp() + ')');
+    pulsa(barraBtn(/Elegir/), '☑ Elegir');
+    await esperar(120);
+    fichaDe(T1).click();
+    await esperar(60);
+    pulsa(d.querySelector('#bottom-nav .nav-item[data-view="view-inicio"]'), 'Inicio de la barra de abajo');
+    await esperar(250);
+    ok(activa('view-inicio') && !eligiendo() && !g('csgElegActivo()') && fabDisp() !== 'none',
+      '⚠️ irse a Inicio con el modo puesto (switchView) lo apaga: FUERA de La Consigna el botón de Destellos se ve (' + fabDisp() + ')',
+      'body.csg-eligiendo: ' + eligiendo() + ' · modo: ' + g('csgElegActivo()') + ' · #destello-fab calculado: ' + fabDisp() + ' → la aplicación entera se queda sin Destellos');
+    await entrar();
+    ok(!g('csgElegActivo()') && !eligiendo() && !anq().querySelector('[role="checkbox"]') && barraBtn(/Elegir/).getAttribute('aria-pressed') === 'false',
+      'y al volver a entrar, el anaquel abre SIN el modo: una selección no sobrevive a irse de la vista');
+    await ancho(390);
+    await respiro();
   });
 
   /* ══════════════════════════════════════════════════════════════

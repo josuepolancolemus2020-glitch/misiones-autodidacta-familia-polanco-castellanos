@@ -11,7 +11,7 @@ visualmente atractivo, botones modernos etc.»
 
 ---
 
-## ✅ TERMINADA: solo falta correr el SQL y publicar
+## ✅ TERMINADA, PUBLICADA Y CON SU SQL CORRIDO
 
 **La Consigna se construyó entera el 23 de septiembre de 2026**, retomada
 donde se había parado el 22 (se acabó el crédito del modelo a media tanda;
@@ -22,7 +22,7 @@ revisión y la documentación están hechos y comprobados.
 
 | Qué | Dónde | Estado |
 |---|---|---|
-| **El diseño entero** | este archivo, de aquí para abajo | ✅ Salió de un taller de tres diseñadores con tres lentes (la tableta, la biblioteca, los formatos), dos jueces que puntuaron, una síntesis y un crítico que encontró 21 faltas, todas cerradas. Es lo que se implementó, con los dos cambios de abajo. |
+| **El diseño entero** | este archivo, de aquí para abajo | ✅ Salió de un taller de tres diseñadores con tres lentes (la tableta, la biblioteca, los formatos), dos jueces que puntuaron, una síntesis y un crítico que encontró 21 faltas, todas cerradas. Es lo que se implementó, con lo que dice «Lo que cambió sobre la especificación», más abajo. |
 | **La tabla y su puerta** | `supabase/sql/consigna.sql` | ✅ 21 columnas, tres políticas con `es_familia()`, seguridad por fila puesta, sin borrado, sin puerta pública, disparador de la hora. |
 | **La comprobación aparte** | `supabase/sql/consigna_comprueba.sql` | ✅ Devuelve doce filas en vertical. |
 | **La prueba del SQL** | `_dev/prueba-consigna-sql.sql` | ✅ **RESULTADO: APRUEBA**, vuelta a correr el 23 de septiembre de 2026. Mira la guardia, la idempotencia, los checks que muerden y la puerta dos veces en el orden bueno. |
@@ -31,32 +31,38 @@ revisión y la documentación están hechos y comprobados.
 | **El cableado** | `index.html`, `js/app.js`, `sw.js` | ✅ Commit `6b16cd5`: el `<link>`, el `<script>`, el botón del Acceso Rápido, las dos vistas y las tres hojas; `initConsigna` en `switchView` y el destello apartado del compositor. `CACHE_NAME` en `faro-app-v129`: el v128 ya lo había gastado `main` el 22 de septiembre («Redes: remarcar y corregir…»), y con el mismo número el navegador no ve ningún cambio en `sw.js` y la versión nueva no llega a ningún aparato. El bucle de nombres repetidos devuelve vacío. |
 | **La sonda** | `_dev/probe-consigna.html` | ✅ Las 22 comprobaciones del apartado 11, pulsando los botones con el `index.html` entero: **APRUEBA, 313 comprobaciones**, sin un solo `pageerror`. Muerde: averiado a propósito (sin el `[hidden]` del plegado, sin `noopener`, sin la parada de Copiar, sin la unión por `uid`) suspende donde tiene que suspender. |
 | **La revisión** | cinco revisores adversariales, uno por lente | ✅ 32 hallazgos, ocho de ellos de los que paran: lo escrito que se perdía al guardar con otro aparato corrigiendo, al abrir otra pieza, al escribir con la franja «Tenías cambios sin guardar» o al elegir «Abrir la que ya hay»; una versión nueva por cada 💾; un chip que ensanchaba la pantalla; lo que se escribía en Usar, escondido debajo del pie; y el número de `sw.js` que ya había gastado `main`. Arreglados, cada uno con su comprobación en la sonda (menos el de `sw.js`, que un navegador no puede ver). |
-| **La documentación** | `CLAUDE.md` y `PLAN-FARO-PRIVADO.md` | ✅ La normativa «las consignas a las máquinas se escriben en La Consigna», antes de la de La Voz Prestada, con sus 34 reglas; y la entrada del SQL en la lista de lo que falta correr. |
+| **La documentación** | `CLAUDE.md` y `PLAN-FARO-PRIVADO.md` | ✅ La normativa «las consignas a las máquinas se escriben en La Consigna», antes de la de La Voz Prestada, con sus 34 reglas (35 desde ☑ Elegir); y la entrada del SQL en la lista de lo que falta correr. |
+| **☑ Elegir** | `js/tools/consigna.js` («ELEGIR VARIAS Y MOVERLAS DE UNA VEZ»), `css/consigna.css` y la línea de `csgElegFuera` en `switchView` (`js/app.js`) | ✅ Entró el 23 de septiembre de 2026, pedido por el autor con la herramienta ya publicada: «Añade ☑ Elegir para mover varias de golpe». Marcar varias y, desde la barra de elegidas, 🗂 Mover a estante (con el estante nuevo creado dentro), 🤖 Máquina y 🗑 Retirar con dos toques, cada acción en UN viaje (`csgPersistirVarios`). Sin una línea de SQL. La sonda lo mira en su comprobación 23: **APRUEBA, 413 comprobaciones**, 95 de ellas la 23; la prueba de Node, **APRUEBA, 664**, con la 3.19 para `csgPersistirVarios`. `CACHE_NAME` en `faro-app-v130`. Es la regla 35 de la normativa. |
 
 ### Lo que FALTA
 
-1. **Correr el SQL en Supabase, desde la tableta:** `supabase/sql/consigna.sql`
-   entero, una sola vez, mirando la tabla vertical del final; y otro día, si
-   hace falta, `consigna_comprueba.sql`. Está apuntado con todo su detalle en
-   `PLAN-FARO-PRIVADO.md`, y el archivo se pega en el chat, como siempre.
-   Hasta entonces la herramienta funciona entera en el aparato y lo dice
-   («📴 Solo en este aparato: falta correr consigna.sql»).
-2. **Publicar:** el commit —con `_dev/probe-consigna.html`, que todavía no
-   está en git—, empujar y comprobar que el despliegue salió («Empujar no es
-   publicar», en `CLAUDE.md`). ⚠️ Al fusionar con `main`, la primera línea
-   de `sw.js` da conflicto, y es lo buscado: se resuelve dejando
-   `faro-app-v129` o más.
+Nada de lo que se pidió. El 23 de septiembre de 2026 el autor corrió
+`supabase/sql/consigna.sql` en Supabase y la herramienta se publicó en
+`main` (pull request #17, construcción de Pages en verde); la abrió en la
+tableta y funciona. «☑ Elegir» se pidió y se construyó esa misma tarde
+(`faro-app-v130`), sin tocar el SQL: los estantes y la máquina ya viajaban
+por la tabla. Lo que se cambie de aquí en adelante sigue la normativa de
+`CLAUDE.md` y pasa antes por la sonda.
 
-### Dos cambios que mandan sobre la especificación de abajo
+### Lo que cambió sobre la especificación de abajo
 
-- **«☑ Elegir» no va en esta versión** (marcar varias piezas y moverlas de
-  golpe, §8). La barra del anaquel es [＋ Nueva] · [📋 Pegar] · | ·
+- **«☑ Elegir» entró el 23 de septiembre de 2026** (marcar varias piezas y
+  moverlas de golpe, §8). Se había recortado de la primera versión, y el
+  autor la pidió ese mismo día, con la herramienta ya publicada: «Añade
+  ☑ Elegir para mover varias de golpe». Entró como la describe el §8, que
+  está corregido en los dos sitios donde el diseño no aguantó la medida:
+  **☑ Elegir va justo detrás de 📋 Pegar** —detrás de ⇅ Orden empezaba en
+  el píxel 477 de una pantalla de 320, fuera de la vista en cualquier
+  teléfono—, así que la barra es [＋ Nueva] · [📋 Pegar] · [☑ Elegir] · | ·
   [🗂 Estantes] · [⇅ Orden] · | · [📋 Exportar], y al final las vistas ▦ ☰;
-  la hoja 🗂 Estantes no crea estantes y dice dónde se crean.
+  y **la barra de elegidas es FIJA encima de la de la aplicación**, no
+  `sticky; bottom: 0`, que la dejaba tapada por ella. La hoja 🗂 Estantes
+  sigue sin crear estantes: se crean dentro de la hoja de 🗂 Mover.
 - **La cabecera del compositor lleva a la derecha el estado de guardado, no
   un 👁** (§5, paso 2): la vista previa ya está en la barra fija.
 
-El porqué de los dos está en la normativa de `CLAUDE.md`.
+El porqué de cada uno está en la normativa de `CLAUDE.md` (☑ Elegir es su
+regla 35).
 
 ### Cómo se lee este archivo desde ahora
 
@@ -650,18 +656,18 @@ Cada pieza sale en forma `md` sin material; las piezas en varios estantes salen 
 La forma de Cuadernos, con dos vistas y no tres.
 
 - **Cabecera compacta:** ‹ · «📜 La Consigna» · [＋]. Sin bloque de presentación mientras haya piezas: la cuenta la dicen los chips y solo ellos (en la v1 se decía dos veces; es lo que la regla 11 de Cuadernos quitó).
-- **La barra:** UNA fila `nowrap` deslizable con degradado (`.csg-barra`, calcada de `.rcu-barra`), botones PRIMERO con icono en baldosa y palabra (crear lleno, traer teñido, mirar neutro, sacar ámbar): [＋ Nueva] · [📋 Pegar] · | · [🗂 Estantes] · [⇅ Orden] · [☑ Elegir] · | · [📋 Exportar] · y al final las vistas ▦ ☰. La sonda 18 mide a 320 px que ☑ Elegir queda dentro del borde (comprobación 34 de La Voz Prestada).
+- **La barra:** UNA fila `nowrap` deslizable con degradado (`.csg-barra`, calcada de `.rcu-barra`), botones PRIMERO con icono en baldosa y palabra (crear lleno, traer teñido, mirar neutro, sacar ámbar): [＋ Nueva] · [📋 Pegar] · [☑ Elegir] · | · [🗂 Estantes] · [⇅ Orden] · | · [📋 Exportar] · y al final las vistas ▦ ☰. La sonda 18 mide a 320 px que ☑ Elegir queda dentro del borde (comprobación 34 de La Voz Prestada). (Corregido el 23 de septiembre de 2026, al construirlo: este plan lo ponía detrás de ⇅ Orden, y medido con la vista abierta ahí empezaba en el píxel 477 de una pantalla de 320. Detrás de 📋 Pegar, y con la barra ceñida por debajo de 390 px, acaba en el 274.)
 - **El buscador** (sin tildes ni mayúsculas; título, bloques, estantes, variables, máquina, notas de bitácora) con el único mando de la lista al lado (▾ Abrir todos / ▴ Cerrar todos, solo con grupos).
 - **Chips de clase con su cuenta**, una fila `nowrap`: «Todas 12» · «🟡 Borradores 2» · «⏳ Sin probar 4» · «💬 Prompt 7» · «🧰 Habilidad 3» · «🕸 Grafo 1» · «🔁 Bucle 1». «Sin probar» (ningún uso con `ok`) va tercero: el trabajo no es ver los prompts, es saber cuáles faltan por probar. El chip tocado se trae a la vista.
 - **Los filtros puestos**, cada uno con su ✕, y al final de esa misma fila la cuenta «3 de 12»; sin ninguno, la fila no existe.
 - **El renglón de la bitácora** (`.csg-pregunta`, 44 px medidos, `display: flex`, texto con elipsis y cuatro botones de 36 px): va DEBAJO de los chips y de los filtros puestos y ENCIMA de la primera ficha o grupo, solo cuando hay un uso de los últimos 7 días sin contestar. Cuenta como «lo que está puesto»: antes de la primera ficha hay como máximo cinco cosas —barra, buscador, chips, filtros puestos, renglón de bitácora—, y las dos últimas solo existen cuando tienen contenido. La sonda 13 cuenta los hijos y mide el renglón.
-- **🗂 Estantes** (`#csg-ver-overlay`, renglones `.csg-ver-fila` de 44 px con su cuenta, como `rcuVerFila`): «Todas», los ESTANTES con su tono, «Sin estante», las MÁQUINAS, «🟡 Borradores», «⏳ Sin probar». Elegir uno cierra la hoja. Un estante vacío no existe —los estantes salen de las piezas—, así que uno nuevo se crea al archivar (⋯ → Estantes, o «＋ estante» en el compositor), y la hoja lo dice debajo de la lista. (Decidido el 23 de septiembre de 2026: «crear dentro» venía de la hoja de mover de «☑ Elegir», que no va en esta versión.)
+- **🗂 Estantes** (`#csg-ver-overlay`, renglones `.csg-ver-fila` de 44 px con su cuenta, como `rcuVerFila`): «Todas», los ESTANTES con su tono, «Sin estante», las MÁQUINAS, «🟡 Borradores», «⏳ Sin probar». Elegir uno cierra la hoja. Un estante vacío no existe —los estantes salen de las piezas—, así que uno nuevo se crea al archivar (⋯ → Estantes, «＋ estante» en el compositor, o a varias de golpe con ☑ Elegir → 🗂 Mover), y la hoja lo dice debajo de la lista. (Decidido el 23 de septiembre de 2026: «crear dentro» vive en la hoja de 🗂 Mover de «☑ Elegir», que es donde hay consignas elegidas a las que ponérselo; esta hoja es la de mirar.)
 - **⇅ Orden** (`faro_consigna_anaquel_v1`): 🕘 Última usada (por defecto) · 🔥 Más usadas · 👍 Mejor valoradas (✅ menos ❌; con menos de dos usos contestados, al final y «pocos usos») · 🔤 Título · 🆕 Recientes. **Agrupar:** ☰ Sin agrupar (por defecto) · 🗂 Por estante · 💬 Por clase · 🤖 Por máquina. Grupos PLEGADOS con las cuatro reglas del anaquel; `.csg-grupo[hidden] { display: none !important; }` mirado calculado; lo abierto con el eje delante (`estante:maestria`). Plegado, el rótulo enseña los emojis de clase de lo que hay dentro, pegados a la cuenta.
 - **Tonos:** por CLASE, fijos: `.csg-clase-prompt { --csg-t: #1d4ed8; --csg-tf: #eff6ff; --csg-tb: #bfdbfe; }` (azul), `.csg-clase-habilidad { --csg-t: #15803d; --csg-tf: #f0fdf4; --csg-tb: #bbf7d0; }` (verde), `.csg-clase-grafo { --csg-t: #7e22ce; --csg-tf: #faf5ff; --csg-tb: #e9d5ff; }` (violeta), `.csg-clase-bucle { --csg-t: #b45309; --csg-tf: #fffbeb; --csg-tb: #fde68a; }` (ámbar). Estantes con `csgTono` (copia de `rcuTono`, ocho tonos `.csg-tono-0..7` en el CSS); máquinas y «Sin estante» en gris. Todo fondo de chip y de ficha es `var(--surface)` o un `--csg-tf`, nunca `--card`.
 - **La ficha** (`▦`, `grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); align-items: start`, vertical): (1) baldosa con el emoji de la clase en su tono + título; (2) UNA sola línea corrida `.csg-ficha-meta`: «Encargo completo · Claude · v3 · 7 usos · 👍 5 · 👎 1 · hace 3 d», con un token delante solo cuando toca: «🟡 borrador: falta Formato» (ámbar) o «⚠ 3 usos este mes ▸» (tocable; nunca los dos, borrador manda); (3) chips de los OTROS estantes, solo si hay; (4) el primer bloque obligatorio en dos líneas grises; (5) al pie, sin hueco: [▶ Usar] lleno del tono de la clase · [✎ Corregir] neutro · [⋯]. Copiar vive en Usar y en ⋯: cuatro botones eran las cajitas que el autor rechazó. Con ratón, `@media (hover: hover)`.
 - **☰ Lista:** una fila de 44 px por pieza: punto de color, título, máquina, «hace 3 d», ▶ y ⋯ (estos dos de 36 px dentro de la fila, como los de la bitácora: con 44 la lista dejaría de ser compacta, que es a lo que se viene a ☰).
 - **El menú ⋯:** Usar · Copiar (texto armado para su máquina; con huecos los deja y lo dice) · Corregir · Duplicar en otro molde… · Versiones · Bitácora · Estantes · 📓 Ligar al cuaderno (lee `rcuVivos()` si existe; guarda `id` en `cuaderno` y el título en `notas`; con él, ↗ de NotebookLM abre ESE cuaderno por su dirección comprobada con `URL()`; desde Cuadernos no se enseña nada) · Retirar (dos toques «Sí, retirar · No», sin `confirm()`). Las retiradas al final, en un `<details>`, y desde ahí se devuelven.
-- **☑ Elegir:** un toque marca; barra `position: sticky; bottom: 0` con 🗂 Mover a estante (interruptor sobre varios, «crear estante» dentro), 🤖 Cambiar la máquina, 🗑 Retirar (dos toques). Mientras se elige, el toque elige y nada más; `body.csg-eligiendo #destello-fab { display: none !important; }`.
+- **☑ Elegir:** un toque marca; barra FIJA encima de la de la aplicación, como la del compositor, con 🗂 Mover a estante (interruptor sobre varios, «crear estante» dentro), 🤖 Cambiar la máquina, 🗑 Retirar (dos toques), y cada acción en UN viaje. Mientras se elige, el toque elige y nada más; `body.csg-eligiendo #destello-fab { display: none !important; }`. (Corregido el 23 de septiembre de 2026, al construirlo: este plan decía `position: sticky; bottom: 0`, y dentro del `.view-scroll` esa barra caía debajo de la barra de la aplicación, tapada justo donde van sus botones.)
 - **La nube:** franja `.csg-nube-no` SOLO con algo que arreglar («📴 Solo en este aparato: falta correr consigna.sql», «sin sesión: se firmará al entrar», «sin señal · reintentar», «la base va vieja: vuelve a correr consigna.sql», «“X” no cabe en la nube: recorta N caracteres»); si va bien, un renglón discreto al pie.
 - **Vista vacía:** el bloque de presentación (`msug-intro`) y una tarjeta con 📜 grande: «Todavía no hay consignas. Cada consigna es lo que le pides a una máquina, con forma: un prompt, una habilidad, un grafo de agentes o un bucle. Se escribe una vez, se guarda y se vuelve a usar en dos toques.» con [＋ Nueva] y [📋 Pegar una que ya tengas].
 

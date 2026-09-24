@@ -214,7 +214,7 @@ const CONTRATO = {
   lector: ['csgClaveEtiqueta', 'csgEsArista', 'csgLeer', 'csgProponerMolde', 'csgPalabras', 'csgDatosDeCasa', 'csgRevisar'],
   nube: ['csgNuevoId', 'csgSb', 'csgAutor', 'csgConReloj', 'csgLeeLocal', 'csgGuardaLocal', 'csgDesdeFila', 'csgAFila', 'csgPodar', 'csgFusiona',
     'csgMotivoDe', 'csgBajar', 'csgSubir', 'csgSubirVarios', 'csgSubirPendientes', 'csgPersistir', 'csgSubirLuego', 'csgRotuloNube', 'csgVivas',
-    'csgRetiradas', 'csgDe', 'csgApuntarUso', 'csgContestarUso', 'csgNuevaVersion', 'csgVolverAVersion'],
+    'csgRetiradas', 'csgDe', 'csgApuntarUso', 'csgContestarUso', 'csgNuevaVersion', 'csgVolverAVersion', 'csgPersistirVarios'],
   estado: ['_csgLista', '_csgCargada', '_csgNube', '_csgHayTabla', '_csgColsFuera', '_csgInitEnCurso', '_csgSinEspacio'],
   /* Lo que se añadió al juntar los trozos, y que la pantalla va a usar:
      una sola manera de quitar tildes y de escribir miles, el texto crudo
@@ -845,9 +845,13 @@ async function parte3() {
      segundos para ver que una petición colgada acaba en «sin señal»), una
      sesión de mentira y un cliente de Supabase de mentira. ── */
   const almacen = {};
+  /* Cuántas veces se escribió la copia de las piezas en el aparato: la
+     3.19 exige que guardar veinte piezas de golpe no sean veinte
+     escrituras. */
+  let escriturasPiezas = 0;
   const localStorage = {
     getItem: k => (k in almacen ? almacen[k] : null),
-    setItem: (k, v) => { almacen[k] = String(v); },
+    setItem: (k, v) => { if (k === 'faro_consigna_v1') escriturasPiezas++; almacen[k] = String(v); },
     removeItem: k => { delete almacen[k]; },
   };
   const documentoTrampa = new Proxy({}, { get(_, k) { throw new Error('se tocó document.' + String(k)); } });
@@ -1621,6 +1625,67 @@ async function parte3() {
     ok(base.filas.has(ino.id) && ino.subida === true && cul.subida === false && cul.motivo === 'rechazada' && rl.subidas === 1 && !rl.ok,
       'un lote que la base rechaza se reintenta de una en una: sube la inocente y solo la culpable se queda', JSON.stringify(rl));
     ok(/la base rechazó «Culpable»/.test(G('csgRotuloNube')().t), '… y la franja nombra a la culpable, no a la primera de la lista', G('csgRotuloNube')().t);
+  });
+
+  /* ⚠️ VARIAS EDICIONES DE GOLPE, EN UN SOLO VIAJE (csgPersistirVarios).
+     Es la puerta de «☑ Elegir» del anaquel: mover veinte consignas a un
+     estante, cambiarles la máquina o retirarlas. Con una escritura por
+     pieza, con la señal de una tableta, mover veinte tarda; y veinte
+     upserts en vuelo llegan en cualquier orden. Se comprobó rompiendo el
+     ayudante (una subida por pieza, el reloj sin poner, una escritura del
+     aparato por pieza): la sección suspende con cada una. */
+  await seccionA('3.19 csgPersistirVarios: varias ediciones, UN upsert, el reloj puesto y el aparato una vez', async () => {
+    reinicia('puesta');
+    S('_csgHayTabla', true); S('_csgNube', 'puesta'); S('_csgCargada', true);
+    const viejas = [1, 2, 3, 4, 5].map(i => pieza({ titulo: 'Varias ' + i, autor: 'josue', actualizado: 1000 + i, subida: true }));
+    viejas.forEach(p => G('csgMeteEnLista')(p));
+    viejas.forEach(p => base.filas.set(p.id, G('csgAFila')(p)));
+    const [a, b, c, dd, e] = viejas;
+    a.estantes = ['Maestría', 'Lote']; b.estantes = ['Lote']; c.maquina = 'gemini';
+    const antes = Date.now();
+    escriturasPiezas = 0;
+    const r = await G('csgPersistirVarios')([a, b, c, a, null, { titulo: 'sin id' }]);
+    ok(r && r.ok === true && r.subidas === 3 && r.local === true, 'devuelve {ok, subidas: 3, local}: la repetida y las que no son piezas no cuentan', JSON.stringify(r));
+    ok(base.upserts.length === 1 && base.upserts[0].filas.length === 3 && base.upserts[0].opciones.onConflict === 'id', 'las tres suben en UN solo upsert por id (' + base.upserts.length + ' upserts)', JSON.stringify(base.upserts.map(u => u.filas.length)));
+    ok([a, b, c].every(p => p.actualizado >= antes && p.subida === true) && base.upserts[0].filas.every(f => f.actualizado >= antes && f.autor === 'josue'),
+      'cada una lleva el reloj de AHORA (es una edición) y viaja firmada; y queda subida', JSON.stringify([a, b, c].map(p => [p.actualizado, p.subida])));
+    ok(dd.actualizado === 1004 && e.actualizado === 1005 && !base.upserts[0].filas.some(f => f.id === dd.id || f.id === e.id), 'las que no se pasaron no se tocan: ni reloj ni viaje');
+    ok(escriturasPiezas === 2, 'el aparato se escribe DOS veces —antes del viaje y al volver—, no una por pieza (' + escriturasPiezas + ')');
+    ok(base.filas.get(a.id).estantes.join('|') === 'Maestría|Lote' && base.filas.get(c.id).maquina === 'gemini', 'y la nube tiene lo nuevo');
+    escriturasPiezas = 0; base.upserts = [];
+    const r0 = await G('csgPersistirVarios')([]);
+    ok(r0.ok === true && r0.subidas === 0 && base.upserts.length === 0 && escriturasPiezas === 0, 'una lista vacía no viaja ni escribe nada', JSON.stringify(r0));
+    /* Sin señal: nada se pierde, todo queda aquí y pendiente. */
+    base.modo = 'colgada'; base.upserts = [];
+    dd.estantes = ['Sin señal']; e.estantes = ['Sin señal'];
+    const rs = await G('csgPersistirVarios')([dd, e]);
+    ok(rs.ok === false && rs.motivo === 'sin-senal' && rs.subidas === 0 && dd.subida === false && e.subida === false, 'sin señal dice «sin-senal» y las deja pendientes', JSON.stringify(rs));
+    const guardadas = JSON.parse(almacen.faro_consigna_v1).piezas.filter(p => p.id === dd.id || p.id === e.id);
+    ok(guardadas.length === 2 && guardadas.every(p => (p.estantes || []).join() === 'Sin señal'), '… y el aparato ya las tiene con el cambio: al volver la señal suben solas');
+    base.modo = 'puesta'; base.upserts = [];
+    const n1 = await G('csgSubirPendientes')();
+    ok(n1 === 2 && base.upserts.length === 1 && base.filas.get(dd.id).estantes.join() === 'Sin señal', 'al volver la señal, las dos suben en UN viaje', n1 + ' · ' + base.upserts.length);
+    /* Retirar varias: la lápida con su fecha, que la base acepta. */
+    base.upserts = [];
+    const cuando = new Date().toISOString();
+    [a, b].forEach(p => { p.eliminado = true; p.eliminado_at = cuando; });
+    const rr = await G('csgPersistirVarios')([a, b]);
+    ok(rr.ok && base.upserts.length === 1 && [a.id, b.id].every(id => base.filas.get(id).eliminado === true && base.filas.get(id).eliminado_at === cuando), 'retirar dos es UN viaje con las dos lápidas', JSON.stringify(rr));
+    /* Un respiro pendiente de una de ellas se suelta: no viaja dos veces. */
+    base.upserts = [];
+    const pr = G('csgSubirLuego')(c);
+    c.maquina = 'claude';
+    await G('csgPersistirVarios')([c]);
+    const rl = await pr;
+    await espera(80);
+    ok(base.upserts.length === 1 && rl.ok === true && !G('_csgLuego')[c.id], 'si una esperaba su respiro, sube con el lote y el respiro se suelta: UN viaje, no dos', base.upserts.length + ' · ' + JSON.stringify(rl));
+    /* Sin sesión ni firma: espera, sin perder nada. */
+    base.upserts = [];
+    sesion = null;
+    const sf = pieza({ titulo: 'Sin firma varias', autor: '' });
+    const rf = await G('csgPersistirVarios')([sf]);
+    ok(rf.ok === false && rf.motivo === 'sin-sesion' && base.upserts.length === 0 && G('csgDe')(sf.id) === sf, 'sin firma no viaja: se queda en la lista esperando la sesión', JSON.stringify(rf));
+    sesion = { user: 'josue', nombre: 'Josué' };
   });
 }
 

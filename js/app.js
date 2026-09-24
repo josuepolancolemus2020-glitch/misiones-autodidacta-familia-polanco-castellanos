@@ -929,6 +929,10 @@ function switchView(id) {
     const sala = document.getElementById('voz-lector');
     if (sala && !sala.hidden) vozCerrarLector();
   }
+  /* ☑ Elegir de La Consigna no sobrevive a irse de su anaquel, y salir le
+     quita al `body` la clase que esconde el botón de Destellos: si se
+     quedara puesta, el destello desaparecería de TODA la aplicación. */
+  if (id !== 'view-consigna' && typeof csgElegFuera === 'function') csgElegFuera();
 
   // El FAB de Destellos vive en toda la app, excepto en el Chat
   // (estorbaría sobre la barra de escritura), el editor de Redacción
