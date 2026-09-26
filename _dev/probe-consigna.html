@@ -10,8 +10,9 @@ pre{background:#111;color:#7f7;padding:10px;font-size:12px;white-space:pre-wrap}
 <pre id="out">midiendo…</pre>
 <script>
 /* Sonda de 📜 La Consigna (js/tools/consigna.js), con las 22
-   comprobaciones del apartado 11 de PLAN-LA-CONSIGNA.md, y la 23, ☑ Elegir
-   varias, que se añadió con él el 23 de septiembre de 2026.
+   comprobaciones del apartado 11 de PLAN-LA-CONSIGNA.md, la 23, ☑ Elegir
+   varias, que se añadió con él el 23 de septiembre de 2026, y la 24, el
+   cuento para Gemini Storybook, del 26 de septiembre.
 
    Como las vecinas (Cuadernos, La Voz Prestada): abre el index.html DE
    VERDAD en UN marco, con una base de mentira a nivel de fetch, una sesión
@@ -91,7 +92,7 @@ const NOMBRES = {
   1: 'Veneno: se ve como texto', 2: 'Armado exacto', 3: 'SKILL.md', 4: 'Mermaid', 5: 'Variables', 6: 'Chips',
   7: 'Pegar y repartir', 8: 'Plegado', 9: 'Nube', 10: 'Fusión', 11: 'Lápida', 12: 'Usar', 13: 'Bitácora preguntada',
   14: 'Topes', 15: 'Borrador', 16: 'Repaso', 17: 'Compositor a 320 px', 18: 'Píxeles y colores', 19: 'Las tres hojas por encima',
-  20: '📖 Guardar lo que devolvió', 21: 'Export', 22: 'Choque de nombres', 23: '☑ Elegir varias', 0: 'Arranque y cierre',
+  20: '📖 Guardar lo que devolvió', 21: 'Export', 22: 'Choque de nombres', 23: '☑ Elegir varias', 24: '🧸 Cuento para Storybook', 0: 'Arranque y cierre',
 };
 let limpiaPantalla = async () => {};
 /* Cada tramo se encierra: una sección que revienta a medias dice SUSPENDE
@@ -506,6 +507,7 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
     md: ejemplo('**El mismo Encargo en `md` (ChatGPT, Gemini, Otra):**'),
     seguida: ejemplo('**El mismo Encargo en `seguida` (NotebookLM):**'),
     skill: ejemplo('**SKILL.md de ejemplo**'),
+    cuento: ejemplo('**Cuento que enseña en `seguida` (Storybook)**'),
     mmdCadena: ejemplo('**Mermaid de ejemplo (Cadena):**'),
     mmdEstrella: ejemplo('**Mermaid en estrella (Coordinador):**'),
     chatCadena: ejemplo('Ejemplo completo, Cadena en `md`:'),
@@ -525,7 +527,7 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
     tono: 'Directo y sin adornos.',
   }, { material: '(el texto pegado)' });
 
-  await tramo(2, 'Armado exacto: el §7 carácter por carácter, las reglas de forma y los 17 moldes', async () => {
+  await tramo(2, 'Armado exacto: el §7 carácter por carácter, las reglas de forma y los 18 moldes', async () => {
     const faltan = Object.keys(EJ).filter(k => !EJ[k]);
     if (!ok(!faltan.length, 'los ' + Object.keys(EJ).length + ' ejemplos del §7 salen de PLAN-LA-CONSIGNA.md', 'no están: ' + faltan.join(', '))) return;
     const eXml = armar(ENCARGO, 'claude');
@@ -549,7 +551,7 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
     const EJEM = P('prompt', 'ejemplos', { tarea: 'Convierte cada cita.', ejemplos: 'Harari 2014 página 45 → (Harari, 2014, p. 45)\nBID 2023 -> (BID, 2023)', caso: 'Ahora haz lo mismo con cada renglón.', formato: 'Un renglón por caso.' });
     igual(heads(armar(EJEM, 'chatgpt').principal).join(' | '), 'Tarea | Ejemplos | Formato de salida | Ahora tú', '«Ahora tú» sale el ÚLTIMO en Con ejemplos');
     ok(/<caso>\n[^<]*\n<\/caso>$/.test(armar(EJEM, 'claude').principal), '… también en xml');
-    /* Los 17 moldes, con TODOS sus bloques llenos, en las tres formas (y
+    /* Los 18 moldes, con TODOS sus bloques llenos, en las tres formas (y
        con cada máquina): ni un bloque, un par o el material se pierden. */
     const M = g('CSG_MOLDES');
     const perdidos = [], raros = [];
@@ -564,7 +566,7 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
           : 'MARCA_' + b.id + '_' + id + ' con 3 vueltas.';
       });
       const pz = P(m.clase, id, bl, { titulo: 'Título ' + id, material: 'MATERIAL_' + id });
-      [['claude'], ['chatgpt'], ['notebooklm'], ['otra', 'xml'], ['otra', 'md'], ['otra', 'seguida']].forEach(([maq, forma]) => {
+      [['claude'], ['chatgpt'], ['notebooklm'], ['storybook'], ['otra', 'xml'], ['otra', 'md'], ['otra', 'seguida']].forEach(([maq, forma]) => {
         cuenta++;
         const a = armar(pz, maq, {}, forma ? { forma } : {});
         Object.values(bl).forEach(t => (t.match(/(?:MARCA2?|ENTRADA|SALIDA)_[a-z_]+|marca-nombre-[a-z]+/g) || []).forEach(mk => { if (a.principal.indexOf(mk) < 0) perdidos.push(id + '/' + maq + (forma ? '/' + forma : '') + ': ' + mk); }));
@@ -572,7 +574,7 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
         if (/undefined|\[object |NaN|null/.test(['principal', 'sistema', 'encargo', 'skill', 'mermaid', 'plan'].map(k => a[k]).join('\n'))) raros.push(id + '/' + maq);
       });
     });
-    ok(Object.keys(M).length === 17 && !perdidos.length, 'los 17 moldes × 6 armados (' + cuenta + ', con xml, md y seguida forzadas): ningún bloque, par ni material perdido', perdidos.slice(0, 10).join('\n'));
+    ok(Object.keys(M).length === 18 && !perdidos.length, 'los 18 moldes × 7 armados (' + cuenta + ', con xml, md y seguida forzadas): ningún bloque, par ni material perdido', perdidos.slice(0, 10).join('\n'));
     ok(!raros.length, 'ningún armado escribe undefined, null, NaN ni [object …]', raros.join(', '));
   });
 
@@ -2066,7 +2068,8 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
         escribir en el compositor, porque «↩ Devolver» tiene que traerla
         entera. Las dos se añadieron con la revisión del 23 de septiembre
         de 2026, y se comprobaron quitando cada arreglo: la sonda suspende.
-     Corre la última porque retira: sus piezas son suyas.
+     Corre al final porque retira: sus piezas son suyas. Detrás solo va la
+     24, que crea las suyas y no retira nada.
      ══════════════════════════════════════════════════════════════ */
   await tramo(23, '☑ Elegir: el toque solo elige, un viaje por acción, mover, veneno, máquina, retirar, la selección que sobrevive y los píxeles', async () => {
     await ancho(390);
@@ -2680,6 +2683,220 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
       'y al volver a entrar, el anaquel abre SIN el modo: una selección no sobrevive a irse de la vista');
     await ancho(390);
     await respiro();
+  });
+
+  /* ══════════════════════════════════════════════════════════════
+     24 · EL CUENTO PARA GEMINI STORYBOOK (pedido el 26 de septiembre de
+     2026: «prompts específicamente para Gemini Storybook… el tema de la
+     historia, la extensión, las sensaciones, la edad del público, el
+     aprendizaje o lección»)
+     ──────────────────────────────────────────────────────────────
+     Ordenado por gravedad:
+     1. que se abra ANTES de copiar, o que lo copiado no sea lo que se ve:
+        Storybook no recibe el texto en la dirección, así que lo que no
+        está en el portapapeles no llega a ninguna parte;
+     2. que Storybook se quede como «la última máquina» del aparato: el
+        Rápido siguiente nacería para una máquina que solo hace libros;
+     3. que el renglón del cuento no se vea o no se pueda tocar a 320 px;
+     4. que el cuento no abra con sus cinco obligatorios abiertos y el foco
+        dentro del toque;
+     5. que lo armado para Storybook, pegado otra vez, no vuelva a ser un
+        cuento;
+     6. que «¿Cuál elijo?» no lleve a él, o que cambiar de molde cambie la
+        máquina sin decirlo.
+     Corre después de la 23: crea piezas, y la 23 cuenta las suyas.
+     ══════════════════════════════════════════════════════════════ */
+  await tramo(24, '🧸 El cuento para Gemini Storybook: el renglón, el molde, la máquina, copiar antes de abrir y la última que no cambia', async () => {
+    await ancho(320);
+    if (!activa('view-consigna')) await entrar();
+    const ultimaAntes = g('csgMaquinaUltima()');
+    ok(ultimaAntes === 'claude', 'la última máquina de este aparato, antes de empezar, es Claude (la dejó así la 12)', ultimaAntes);
+
+    /* 3 · El renglón, a 320 px. */
+    pulsa($('csg-nueva-btn'), '＋ de la cabecera');
+    await esperar(150);
+    const fila = d.querySelector('#csg-ver-cuerpo .csg-ver-fila-cuento');
+    const hoja = $('csg-ver-overlay').querySelector('.fin-modal').getBoundingClientRect();
+    const rf = fila ? fila.getBoundingClientRect() : null;
+    const bal = [...d.querySelectorAll('#csg-ver-cuerpo .csg-clase-baldosa')].map(b => b.getBoundingClientRect());
+    ok(!!fila && /Un cuento para Gemini Storybook/.test(fila.textContent) && /diez páginas ilustradas que emocionan y enseñan/.test(fila.textContent),
+      'en ＋ Nueva está el renglón «🧸 Un cuento para Gemini Storybook», con lo que hace', fila && fila.textContent);
+    ok(!!rf && rf.height >= 44 && rf.left >= hoja.left - 0.5 && rf.right <= hoja.right + 0.5 && rf.right <= 320.5 && bal.length === 4 && bal.every(b => b.bottom <= rf.top + 0.5),
+      'a 320 px mide ' + (rf ? Math.round(rf.height) : '?') + ' de alto, cabe en la hoja y va DEBAJO de las cuatro baldosas', JSON.stringify(rf && [rf.left, rf.right, rf.top, rf.height].map(Math.round)));
+    const enF = fila ? enPunto(fila) : null;
+    ok(!!enF && fila.contains(enF), 'y en su centro está el propio renglón (elementFromPoint): no lo tapa nada', enF && (enF.className || enF.tagName));
+
+    /* 4 · El compositor, con el foco dentro del toque. */
+    fila.click();
+    const focoEnSeguida = d.activeElement === ta('tema');
+    ok(activa('view-consigna-editor') && g('_csgEdPieza.molde') === 'cuento' && g('_csgEdPieza.maquina') === 'storybook', 'un toque abre el compositor con el Cuento que enseña y la máquina Storybook');
+    ok(focoEnSeguida, 'con «Tema de la historia» enfocado DENTRO del toque', 'el foco está en: ' + (d.activeElement && (d.activeElement.className || d.activeElement.tagName)));
+    const chM = d.querySelector('#csg-ed .csg-ed-molde');
+    ok(!!chM && /Molde: Cuento que enseña/.test(chM.textContent), 'el chip dice «' + (chM && chM.textContent) + '»');
+    const chS = [...d.querySelectorAll('#csg-ed .csg-chip')].find(c => c.textContent === 'Storybook');
+    ok(!!chS && chS.getAttribute('aria-pressed') === 'true', 'y el chip de máquina «Storybook» va puesto');
+    const abiertos = ['tema', 'audiencia', 'leccion', 'emociones', 'extension'];
+    const plegados = ['personaje', 'escenario', 'concepto', 'tono', 'desenlace', 'ilustracion', 'reglas'];
+    ok(abiertos.every(id => !!ta(id)) && plegados.every(id => !ta(id) && !!carta(id)), 'los cinco obligatorios —los que pidió el autor— abiertos; los siete del oficio, plegados',
+      'abiertos: ' + abiertos.filter(id => ta(id)).join(',') + ' · plegados: ' + plegados.filter(id => !ta(id)).join(','));
+    igual(ta('extension') ? ta('extension').value : '', 'Diez páginas, una escena por página, con el texto justo para leerlo en voz alta sin cansar.', 'la Extensión nace rellena');
+    escribe(ta('tema'), 'Un cuento que explique por qué llueve, contado por una gota de agua que tiene miedo de caer.');
+    escribe(ta('audiencia'), 'Niños de 6 a 8 años que empiezan a leer solos.');
+    escribe(ta('leccion'), 'Que el agua que cae es la misma que subió.');
+    escribe(ta('emociones'), 'Curiosidad al principio y asombro al final.');
+    const repC = () => w.csgRevisar(g('_csgEdPieza'), 'storybook');
+    const r0 = repC();
+    ok(!r0.para.length && r0.avisa.some(x => x.bloque === 'personaje') && r0.avisa.some(x => x.bloque === 'concepto'),
+      'con los cinco obligatorios no para nada, y avisa de lo que falta para que sea un cuento: el protagonista y lo que explica', JSON.stringify(r0.para.concat(r0.avisa).map(x => x.msg)));
+    escribe(await abreBloque('personaje'), 'Gotita, una gota de agua redonda y transparente.');
+    escribe(await abreBloque('concepto'), 'El ciclo del agua: el sol calienta el agua y la vuelve vapor.');
+    await abreBloque('ilustracion');
+    const chipAc = [...carta('ilustracion').querySelectorAll('.csg-frase')].find(c => /En acuarela, con colores suaves\./.test(c.title || c.textContent));
+    pulsa(chipAc, 'el chip «En acuarela, con colores suaves.»');
+    await esperar(60);
+    ok(/En acuarela, con colores suaves\./.test(ta('ilustracion').value), 'un toque en el chip de estilo lo mete en «Ilustraciones»', ta('ilustracion').value);
+    const r1 = repC();
+    ok(!r1.para.length && !r1.avisa.length, 'lleno así, el repaso con Storybook ni para ni avisa', JSON.stringify(r1.avisa.map(x => x.msg)));
+
+    /* La vista previa ES lo que se va a copiar: la cabecera delante. */
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    const pre = (d.querySelector('#csg-ed .csg-pre') || {}).textContent || '';
+    ok(pre.startsWith('Crea un cuento ilustrado con estas indicaciones.\n\nTema de la historia: Un cuento que explique por qué llueve') && /\n\nIlustraciones: En acuarela, con colores suaves\.$/.test(pre),
+      'la vista previa con Storybook: la cabecera, un párrafo por bloque y las Ilustraciones al final', pre.slice(0, 160));
+    igual(pre, w.csgArmar(g('_csgEdPieza'), 'storybook', {}, {}).principal, 'y es carácter por carácter lo que arma csgArmar');
+    /* Storybook es la cuarta máquina: a 320 px caía cortada por el borde, y
+       el cuento no enseñaba a quién iba. La fila se desliza sola hasta ella. */
+    const entero = (fl, nombre) => {
+      const ch = fl && [...fl.querySelectorAll('.csg-chip')].find(c => c.textContent === nombre);
+      if (!ch) return 'no está el chip';
+      const a = fl.getBoundingClientRect(), r = ch.getBoundingClientRect();
+      return r.left >= a.left - 0.5 && r.right <= a.right - 22 + 0.5 ? '' : 'chip ' + Math.round(r.left) + '..' + Math.round(r.right) + ' en una fila ' + Math.round(a.left) + '..' + Math.round(a.right) + ' (los últimos 22 son el degradado)';
+    };
+    const fPrev = entero(d.querySelector('#csg-ed .csg-prev-maquinas'), 'Storybook');
+    ok(!fPrev, 'a 320 px, en la vista previa el chip «Storybook» se ve ENTERO: la fila se deslizó sola hasta él', fPrev);
+    pulsa($('csg-ed-ver'), '✎ Bloques');
+    await esperar(120);
+    titulo('La gota que tenía miedo de caer');
+
+    /* 1 · Usar: copiar ANTES de abrir, el Gem, noopener, y lo que dice el botón. */
+    pulsa($('csg-ed-usar'), '▶ Usar');
+    await esperar(300);
+    ok(verAbierta('csg-usar-overlay'), 'se abre la hoja de Usar');
+    const chU = [...d.querySelectorAll('#csg-usar-cuerpo .csg-usar-maquinas .csg-chip')].find(c => c.textContent === 'Storybook');
+    ok(!!chU && chU.getAttribute('aria-pressed') === 'true', 'con Storybook marcada: es la máquina de la pieza');
+    const fUsar = entero(d.querySelector('#csg-usar-cuerpo .csg-usar-maquinas'), 'Storybook');
+    ok(!fUsar, '… y a 320 px se ve ENTERA en la fila de máquinas de Usar', fUsar);
+    const notaU = (d.querySelector('#csg-usar-cuerpo .csg-nota') || {}).textContent || '';
+    ok(/con el clip/.test(notaU) && /diez páginas/.test(notaU), 'la nota de la máquina dice qué hace Storybook y que el dibujo de referencia se sube allí', notaU);
+    const bA = pieBtn(/Abrir/);
+    ok(!!bA && /Abrir Storybook \(copiado: pega ahí\)/.test(bA.textContent), 'el botón dice «' + (bA && bA.textContent.trim()) + '»: el texto no va en la dirección');
+    for (const px of [390, 320]) {
+      await ancho(px);
+      const bs = [...$('csg-usar-pie').querySelectorAll('.csg-btn')];
+      const malos = bs.filter(b => { const e = enPunto(b); return !e || !b.contains(e); }).map(b => b.textContent.trim());
+      ok(bs.length === 3 && !malos.length && bs.every(b => b.getBoundingClientRect().right <= px + 0.5), 'a ' + px + ' px los tres botones del pie, con «Abrir Storybook…», se ven y caben', 'tapados: ' + malos.join(', ') + ' · right: ' + bs.map(b => Math.round(b.getBoundingClientRect().right)).join('/'));
+    }
+    seq.length = 0;
+    const na = abiertas.length, a0 = avisos.length;
+    pulsa(bA, '↗ Abrir Storybook');
+    await esperar(200);
+    const texto = $('csg-usar-pre').textContent;
+    const ab = abiertas[na] || {};
+    ok(seq.join(',') === 'clip,open', 'el portapapeles se escribe ANTES de abrir la ventana', seq.join(','));
+    igual(ab.u, 'https://gemini.google.com/gem/storybook', 'se abre el Gem de Storybook, pelado (el literal, sin el texto)');
+    ok(ab.t === '_blank' && ab.feat === 'noopener,noreferrer', 'en otra pestaña y con noopener,noreferrer', JSON.stringify([ab.t, ab.feat]));
+    ok(copiado === texto && texto.startsWith('Crea un cuento ilustrado con estas indicaciones.'), 'lo copiado es lo que se ve, con la cabecera delante');
+    ok(avisos.slice(a0).some(t => /Copiado\. Si no se abrió, ve a gemini\.google\.com\/gem\/storybook y pega\./.test(t)), 'y el aviso dice adónde ir si la ventana no se abrió', avisos.slice(a0).join(' | '));
+    const p = pieza('La gota que tenía miedo de caer');
+    ok(!!p && p.maquina === 'storybook' && p.molde === 'cuento' && p.bitacora.length === 1 && p.bitacora[0].maquina === 'storybook',
+      'la pieza se guardó para Storybook y el uso se apuntó con su máquina', JSON.stringify(p && { maquina: p.maquina, molde: p.molde, uso: p.bitacora[0] }));
+
+    /* 2 · Storybook NO es la última máquina. */
+    ok(g('csgMaquinaUltima()') === ultimaAntes && w.localStorage.getItem('faro_consigna_maquina_v1') !== 'storybook',
+      'usar Storybook NO la apunta como la última: el Rápido siguiente sigue naciendo para ' + ultimaAntes, g('csgMaquinaUltima()') + ' · guardado: ' + w.localStorage.getItem('faro_consigna_maquina_v1'));
+    await cierraUsar();
+    await ancho(390);
+    await volver();
+    await nueva('prompt');
+    ok(g('_csgEdPieza.maquina') === ultimaAntes && g('_csgEdPieza.molde') === 'rapido', 'y en efecto: un Rápido nuevo nace para ' + ultimaAntes + ', no para Storybook', g('_csgEdPieza.maquina'));
+
+    /* 6 · «¿Cuál elijo?» lleva al cuento, y cambiar de molde cambia la
+       máquina DICIÉNDOLO, de ida y de vuelta. */
+    pulsa(d.querySelector('#csg-ed .csg-ed-molde'), 'el chip «Molde ▾»');
+    await esperar(120);
+    const filaC = filaMolde('Cuento que enseña');
+    ok(!!filaC && /diez páginas para Gemini Storybook/.test(filaC.textContent), 'la hoja de moldes de Prompt tiene el Cuento que enseña, con su «cuándo»', filaC && filaC.textContent);
+    const cual = filaVer(/¿Cuál elijo\?/);
+    ok(!!cual && /cuatro preguntas de sí o no/.test(cual.textContent), '«¿Cuál elijo?» dice que son cuatro preguntas (sale de la lista, no escrito a mano)', cual && cual.textContent);
+    pulsa(cual, '❓ ¿Cuál elijo?');
+    await esperar(120);
+    const preg = d.querySelector('#csg-ver-cuerpo .csg-cual-preg');
+    ok(!!preg && /¿Es un cuento, para emocionar o para enseñar algo\?/.test(preg.textContent), 'la primera pregunta es la del cuento, la más concreta', preg && preg.textContent);
+    pulsa(botonCon(preg, /^Sí$/), 'Sí');
+    await esperar(120);
+    ok(/Te sirve «Cuento que enseña»/.test($('csg-ver-cuerpo').textContent), 'un «Sí» dice «Te sirve «Cuento que enseña»»');
+    const a1 = avisos.length;
+    pulsa(filaMolde('Cuento que enseña'), 'el Cuento que enseña');
+    await esperar(250);
+    ok(g('_csgEdPieza.molde') === 'cuento' && g('_csgEdPieza.maquina') === 'storybook' && avisos.slice(a1).some(t => /Molde: Cuento que enseña · máquina: Storybook/.test(t)),
+      'cambiar al Cuento que enseña pone Storybook, y el aviso lo dice', avisos.slice(a1).join(' | '));
+    const a2 = avisos.length;
+    await molde('Rápido');
+    ok(g('_csgEdPieza.molde') === 'rapido' && g('_csgEdPieza.maquina') === ultimaAntes && avisos.slice(a2).some(t => new RegExp('máquina: ' + (ultimaAntes === 'claude' ? 'Claude' : '')).test(t)),
+      'y volver a Rápido devuelve la última de este aparato (' + ultimaAntes + '), diciéndolo', g('_csgEdPieza.maquina') + ' · ' + avisos.slice(a2).join(' | '));
+
+    /* ⚠️ Y la de antes de entrar, no «la última»: con una máquina elegida A
+       MANO que no es la última del aparato, la ida y vuelta por el cuento
+       tiene que volver a ella. Con la misma máquina que la última, esta
+       comprobación aprobaba sin mirar nada. */
+    const aMano = ultimaAntes === 'gemini' ? 'chatgpt' : 'gemini';
+    const nombreAMano = aMano === 'gemini' ? 'Gemini' : 'ChatGPT';
+    const chipMaq = nombre => [...d.querySelectorAll('#csg-ed .csg-chip-maq')].find(c => c.textContent === nombre);
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    pulsa(chipMaq(nombreAMano), 'el chip de ' + nombreAMano);
+    await esperar(150);
+    pulsa($('csg-ed-ver'), '👁 Vista previa (volver a los bloques)');
+    await esperar(200);
+    ok(g('_csgEdPieza.maquina') === aMano, 'en el Rápido se elige ' + nombreAMano + ' a mano (no es la última del aparato, ' + ultimaAntes + ')', g('_csgEdPieza.maquina'));
+    await molde('Cuento que enseña');
+    ok(g('_csgEdPieza.maquina') === 'storybook', 'al Cuento que enseña: Storybook', g('_csgEdPieza.maquina'));
+    const a3 = avisos.length;
+    await molde('Rápido');
+    ok(g('_csgEdPieza.maquina') === aMano && avisos.slice(a3).some(t => new RegExp('máquina: ' + nombreAMano).test(t)),
+      'y de vuelta a Rápido, ' + nombreAMano + ' OTRA VEZ —la de antes de entrar, no la última del aparato—, diciéndolo', g('_csgEdPieza.maquina') + ' · ' + avisos.slice(a3).join(' | '));
+    /* Una Storybook elegida a mano en otro molde la eligió alguien: salir
+       de ese molde no la toca. */
+    await molde('Libre');
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    pulsa(chipMaq('Storybook'), 'el chip de Storybook, a mano, en un Libre');
+    await esperar(150);
+    pulsa($('csg-ed-ver'), '👁 Vista previa (volver a los bloques)');
+    await esperar(200);
+    const a4 = avisos.length;
+    await molde('Rápido');
+    ok(g('_csgEdPieza.molde') === 'rapido' && g('_csgEdPieza.maquina') === 'storybook' && !avisos.slice(a4).some(t => /máquina:/.test(t)),
+      'un Libre con Storybook elegida a mano, pasado a Rápido, sigue para Storybook y el aviso no habla de máquinas', g('_csgEdPieza.maquina') + ' · ' + avisos.slice(a4).join(' | '));
+    await volver();
+
+    /* 5 · Lo armado para Storybook, pegado otra vez, vuelve a ser un cuento. */
+    pulsa(barraBtn(/Pegar/), '📋 Pegar de la barra');
+    await esperar(150);
+    d.querySelector('#csg-pegar-cuerpo .csg-pegar-ta').value = EJ.cuento || '';
+    pulsa(botonCon($('csg-pegar-cuerpo'), /Leer$/), 'Leer');
+    await esperar(150);
+    const prop = (d.querySelector('#csg-pegar-cuerpo .csg-pegar-propuesta') || {}).textContent || '';
+    ok(!!EJ.cuento && /Cuento que enseña · 12 de 12 bloques/.test(prop), 'el cuento del §7 pegado se lee como «' + prop + '»');
+    const notaP = [...d.querySelectorAll('#csg-pegar-cuerpo .csg-nota')].map(n => n.textContent).join(' ');
+    ok(/Este molde va para Storybook/.test(notaP), 'y la nota de la propuesta dice que va para Storybook ANTES de abrir: la máquina no cambia callada', notaP);
+    pulsa(botonCon($('csg-pegar-cuerpo'), /Abrir en el compositor/), 'Abrir en el compositor');
+    await esperar(300);
+    ok(activa('view-consigna-editor') && g('_csgEdPieza.molde') === 'cuento' && g('_csgEdPieza.maquina') === 'storybook', 'y abre el compositor en el Cuento que enseña, para Storybook');
+    igual(w.csgArmar(g('_csgEdPieza'), 'storybook', {}, {}).principal, EJ.cuento || '(sin ejemplo)', 'armado otra vez para Storybook, sale EXACTAMENTE lo que se pegó');
+    await volver();
+    await ancho(390);
   });
 
   /* ══════════════════════════════════════════════════════════════
