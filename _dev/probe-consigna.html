@@ -2845,6 +2845,40 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
     await molde('Rápido');
     ok(g('_csgEdPieza.molde') === 'rapido' && g('_csgEdPieza.maquina') === ultimaAntes && avisos.slice(a2).some(t => new RegExp('máquina: ' + (ultimaAntes === 'claude' ? 'Claude' : '')).test(t)),
       'y volver a Rápido devuelve la última de este aparato (' + ultimaAntes + '), diciéndolo', g('_csgEdPieza.maquina') + ' · ' + avisos.slice(a2).join(' | '));
+
+    /* ⚠️ Y la de antes de entrar, no «la última»: con una máquina elegida A
+       MANO que no es la última del aparato, la ida y vuelta por el cuento
+       tiene que volver a ella. Con la misma máquina que la última, esta
+       comprobación aprobaba sin mirar nada. */
+    const aMano = ultimaAntes === 'gemini' ? 'chatgpt' : 'gemini';
+    const nombreAMano = aMano === 'gemini' ? 'Gemini' : 'ChatGPT';
+    const chipMaq = nombre => [...d.querySelectorAll('#csg-ed .csg-chip-maq')].find(c => c.textContent === nombre);
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    pulsa(chipMaq(nombreAMano), 'el chip de ' + nombreAMano);
+    await esperar(150);
+    pulsa($('csg-ed-ver'), '👁 Vista previa (volver a los bloques)');
+    await esperar(200);
+    ok(g('_csgEdPieza.maquina') === aMano, 'en el Rápido se elige ' + nombreAMano + ' a mano (no es la última del aparato, ' + ultimaAntes + ')', g('_csgEdPieza.maquina'));
+    await molde('Cuento que enseña');
+    ok(g('_csgEdPieza.maquina') === 'storybook', 'al Cuento que enseña: Storybook', g('_csgEdPieza.maquina'));
+    const a3 = avisos.length;
+    await molde('Rápido');
+    ok(g('_csgEdPieza.maquina') === aMano && avisos.slice(a3).some(t => new RegExp('máquina: ' + nombreAMano).test(t)),
+      'y de vuelta a Rápido, ' + nombreAMano + ' OTRA VEZ —la de antes de entrar, no la última del aparato—, diciéndolo', g('_csgEdPieza.maquina') + ' · ' + avisos.slice(a3).join(' | '));
+    /* Una Storybook elegida a mano en otro molde la eligió alguien: salir
+       de ese molde no la toca. */
+    await molde('Libre');
+    pulsa($('csg-ed-ver'), '👁 Vista previa');
+    await esperar(200);
+    pulsa(chipMaq('Storybook'), 'el chip de Storybook, a mano, en un Libre');
+    await esperar(150);
+    pulsa($('csg-ed-ver'), '👁 Vista previa (volver a los bloques)');
+    await esperar(200);
+    const a4 = avisos.length;
+    await molde('Rápido');
+    ok(g('_csgEdPieza.molde') === 'rapido' && g('_csgEdPieza.maquina') === 'storybook' && !avisos.slice(a4).some(t => /máquina:/.test(t)),
+      'un Libre con Storybook elegida a mano, pasado a Rápido, sigue para Storybook y el aviso no habla de máquinas', g('_csgEdPieza.maquina') + ' · ' + avisos.slice(a4).join(' | '));
     await volver();
 
     /* 5 · Lo armado para Storybook, pegado otra vez, vuelve a ser un cuento. */
@@ -2855,6 +2889,8 @@ const bolsa = t => (String(t || '').replace(ETQ, ' ').match(/[\p{L}\p{N}]+/gu) |
     await esperar(150);
     const prop = (d.querySelector('#csg-pegar-cuerpo .csg-pegar-propuesta') || {}).textContent || '';
     ok(!!EJ.cuento && /Cuento que enseña · 12 de 12 bloques/.test(prop), 'el cuento del §7 pegado se lee como «' + prop + '»');
+    const notaP = [...d.querySelectorAll('#csg-pegar-cuerpo .csg-nota')].map(n => n.textContent).join(' ');
+    ok(/Este molde va para Storybook/.test(notaP), 'y la nota de la propuesta dice que va para Storybook ANTES de abrir: la máquina no cambia callada', notaP);
     pulsa(botonCon($('csg-pegar-cuerpo'), /Abrir en el compositor/), 'Abrir en el compositor');
     await esperar(300);
     ok(activa('view-consigna-editor') && g('_csgEdPieza.molde') === 'cuento' && g('_csgEdPieza.maquina') === 'storybook', 'y abre el compositor en el Cuento que enseña, para Storybook');

@@ -519,7 +519,7 @@ const CSG_BLOQUES = {
     rotulo: 'Protagonista',
     para_que: 'Quién vive la historia, qué quiere y qué se lo impide: sin un deseo y algo que lo estorbe no hay cuento, hay una lección con dibujos. Di también cómo es por fuera, para que salga igual en todas las páginas.',
     ejemplo: 'Gotita, una gota de agua redonda y transparente, con las mejillas rosadas. Quiere quedarse para siempre en su nube, porque le da miedo caer; pero cada vez pesa más.',
-    frases: ['Se llama {{protagonista}} y quiere {{deseo}}, pero {{obstaculo}}.', 'Quiere {{deseo}}, pero lo que de verdad necesita es {{necesidad}}.', 'Tiene un defecto que lo hace querible: {{defecto}}.', 'Por fuera es {{aspecto}}, y así sale en todas las páginas.', 'Lo acompaña {{amigo}}, que lo ayuda pero no le resuelve nada.', 'Que se parezca a la foto o al dibujo que voy a subir.'],
+    frases: ['Se llama {{protagonista}} y quiere {{deseo}}, pero {{obstaculo}}.', 'Quiere {{deseo}}, pero lo que de verdad necesita es {{necesidad}}.', 'Tiene un defecto que lo hace entrañable: {{defecto}}.', 'Por fuera es {{aspecto}}, y así sale en todas las páginas.', 'Lo acompaña {{amigo}}, que lo ayuda pero no le resuelve nada.', 'Que se parezca a la foto o al dibujo que voy a subir.'],
   },
   escenario: {
     rotulo: 'Dónde pasa',
@@ -597,8 +597,9 @@ const CSG_BLOQUES_PROMPT = ['rol', 'contexto', 'tarea', 'reglas', 'formato', 'ej
    · `forma`: la fuerza el molde y no la máquina. Un SKILL.md es un
      archivo con su formato, lo pida quien lo pida; y un recuadro de
      instrucciones de sistema es texto plano en todas las máquinas.
-   · `rotuloMayus`, `cabecera`: cómo se escriben los párrafos en forma
-     seguida (§7).
+   · `rotuloMayus`: cómo se escriben los rótulos en forma seguida (§7).
+   · `cabecera`: el renglón que va delante de todo, en las tres formas
+     (csgArmForma): en el Cuento que enseña es lo que se pide.
    · `reordena`: `ultimo` son los bloques que salen al final pase lo que
      pase (el «Ahora tú» de Con ejemplos: si no va el último, la máquina
      lo toma por un ejemplo más); `porMaquina` es el orden entero para una
@@ -764,9 +765,10 @@ const CSG_MOLDES = {
      y la extensión. Los otros siete son el oficio de contar, plegados
      para quien los quiera: sin ellos sale un cuento; con ellos, uno que se
      recuerda. No fuerza ninguna forma: con Storybook sale en `seguida`
-     (la de la máquina) y la cabecera va delante; con Claude, el mismo
-     cuento sale en xml, porque también se le puede pedir como texto para
-     leerlo en voz alta. */
+     (la de la máquina); con Claude, el mismo cuento sale en xml, porque
+     también se le puede pedir como texto para leerlo en voz alta. La
+     cabecera va delante en las tres: el molde no tiene Tarea, y es lo
+     único que pide algo. */
   cuento: {
     id: 'cuento', clase: 'prompt', nombre: 'Cuento que enseña', recomendado: false,
     cuando: 'un cuento ilustrado de unas diez páginas para Gemini Storybook, que emocione y que explique un tema.',
@@ -1078,6 +1080,51 @@ const CSG_EQUIVALE = {
 };
 
 /* ══════════════════════════════════════════════════════════════════
+   LOS RÓTULOS DEL CUENTO QUE ENSEÑA (§3.1 y §5): los con que se arma
+   —«Para quién:», «Lo que debe sentir el lector:»— para que lo que salió
+   de aquí para Storybook vuelva a entrar a su sitio, y los que se
+   escriben de verdad en un prompt de cuento, en español y en inglés
+   («Trama:», «Moraleja:», «Art style:», «Target age:»). Los de cuatro
+   palabras o más solo ascienden si casan enteros (CSG_LEC_ROTULOS_LARGOS).
+
+   ⚠️ VIVEN APARTE PORQUE SOLO ASCIENDEN DENTRO DE UN CUENTO. Es la
+   asimetría de la regla 8 con la cara que puso el cuento el 26 de
+   septiembre de 2026, cazada por la revisión antes de publicarlo: con
+   ellas mezcladas en CSG_SINONIMOS, «Edad: 3 años» en un prompt a un
+   pediatra salía de su Contexto para ir a «Audiencia» (la máquina
+   leería que la respuesta es para un niño de tres años), «Concepto:
+   inflación» en un glosario pasaba a llamarse «Lo que el cuento
+   explica», «Setting: B2C» se volvía «Dónde pasa», un juego de rol con
+   «Personaje:» y «Escenario:» se proponía como cuento para Storybook, y
+   la cuenta de palabras decía «no se perdió ninguna» porque la palabra
+   de la persona iba a la estructura. Partir y rebautizar parece que
+   funcionó. Ahora un texto que no se propone como cuento se lee
+   EXACTAMENTE como se leía antes de que el cuento existiera (csgLeer),
+   salvo el arreglo a propósito de «Nunca:» (CSG_LEC_NO_MUDA).
+   ⚠️ «final» NO: es el «Fin» de un grafo o de un bucle dicho de otra
+   manera, y ascenderlo partiría esas consignas en un bloque que no es
+   suyo. Por lo mismo el id es `desenlace`.
+   ⚠️ Y «edad» y «concept» tampoco, ni dentro de un cuento: «Edad: 6
+   años» puede ser la del lector o la del protagonista, y «Concept:» en
+   inglés es tanto la idea de la historia como lo que explica. Colocarlos
+   en un bloque sería adivinar cuál de las dos; se quedan donde están,
+   nombrados.
+   ══════════════════════════════════════════════════════════════════ */
+const CSG_SINONIMOS_CUENTO = {
+  'tema de la historia': 'tema', 'de que trata': 'tema', 'trama': 'tema', 'plot': 'tema', 'story idea': 'tema',
+  'para quien': 'audiencia', 'edad del lector': 'audiencia', 'publico objetivo': 'audiencia', 'target age': 'audiencia', 'target audience': 'audiencia',
+  'protagonista': 'personaje', 'protagonistas': 'personaje', 'personaje': 'personaje', 'personajes': 'personaje', 'protagonist': 'personaje', 'protagonists': 'personaje', 'character': 'personaje', 'characters': 'personaje', 'main character': 'personaje',
+  'escenario': 'escenario', 'donde pasa': 'escenario', 'ambientacion': 'escenario', 'setting': 'escenario',
+  'concepto': 'concepto', 'lo que el cuento explica': 'concepto', 'que explica': 'concepto',
+  'leccion': 'leccion', 'lo que se aprende': 'leccion', 'aprendizaje': 'leccion', 'moraleja': 'leccion', 'ensenanza': 'leccion', 'lesson': 'leccion', 'moral': 'leccion', 'moral of the story': 'leccion',
+  'emociones': 'emociones', 'emocion': 'emociones', 'lo que debe sentir el lector': 'emociones', 'lo que debe sentir': 'emociones', 'sensaciones': 'emociones', 'sentimientos': 'emociones', 'sentimiento': 'emociones', 'emotions': 'emociones', 'feelings': 'emociones',
+  'como se cuenta': 'tono', 'narrador': 'tono', 'voz narrativa': 'tono', 'narrator': 'tono',
+  'desenlace': 'desenlace', 'como termina': 'desenlace', 'final del cuento': 'desenlace', 'ending': 'desenlace',
+  'extension': 'extension', 'paginas': 'extension', 'numero de paginas': 'extension', 'pages': 'extension', 'number of pages': 'extension',
+  'ilustracion': 'ilustracion', 'ilustraciones': 'ilustracion', 'estilo de ilustracion': 'ilustracion', 'estilo de las ilustraciones': 'ilustracion', 'estilo visual': 'ilustracion', 'estilo artistico': 'ilustracion', 'dibujos': 'ilustracion', 'art style': 'ilustracion', 'illustrations': 'ilustracion', 'illustration style': 'ilustracion',
+};
+
+/* ══════════════════════════════════════════════════════════════════
    SINÓNIMOS (§5): la palabra con que alguien rotula una parte de su
    prompt, en español o en inglés, y el bloque al que va. Las claves van
    YA NORMALIZADAS como las deja csgClaveEtiqueta —sin tildes, en
@@ -1177,27 +1224,30 @@ const CSG_SINONIMOS = {
      prompt se proponía como Libre en vez de Rápido o Encargo. */
   'instructions': 'tarea',
 
-  /* Y los del CUENTO QUE ENSEÑA (§3.1), con los rótulos con que se arma
-     —«Para quién:», «Lo que debe sentir el lector:»— para que lo que salió
-     de aquí para Storybook vuelva a entrar a su sitio, y los que se
-     escriben de verdad en un prompt de cuento, en español y en inglés
-     («Trama:», «Moraleja:», «Art style:», «Target age:»). Los de cuatro
-     palabras o más solo ascienden si casan enteros (CSG_LEC_ROTULOS_LARGOS).
-     ⚠️ «final» NO: es el «Fin» de un grafo o de un bucle dicho de otra
-     manera, y ascenderlo partiría esas consignas en un bloque que no es
-     suyo. Por lo mismo el id es `desenlace`. */
-  'tema de la historia': 'tema', 'de que trata': 'tema', 'trama': 'tema', 'plot': 'tema', 'story idea': 'tema',
-  'para quien': 'audiencia', 'edad': 'audiencia', 'edad del lector': 'audiencia', 'publico objetivo': 'audiencia', 'target age': 'audiencia', 'target audience': 'audiencia',
-  'protagonista': 'personaje', 'protagonistas': 'personaje', 'personaje': 'personaje', 'personajes': 'personaje', 'protagonist': 'personaje', 'character': 'personaje', 'characters': 'personaje', 'main character': 'personaje',
-  'escenario': 'escenario', 'donde pasa': 'escenario', 'ambientacion': 'escenario', 'setting': 'escenario',
-  'concepto': 'concepto', 'lo que el cuento explica': 'concepto', 'que explica': 'concepto', 'concept': 'concepto',
-  'leccion': 'leccion', 'lo que se aprende': 'leccion', 'aprendizaje': 'leccion', 'moraleja': 'leccion', 'ensenanza': 'leccion', 'lesson': 'leccion', 'moral': 'leccion',
-  'emociones': 'emociones', 'lo que debe sentir el lector': 'emociones', 'lo que debe sentir': 'emociones', 'sensaciones': 'emociones', 'sentimientos': 'emociones', 'emotions': 'emociones', 'feelings': 'emociones',
-  'como se cuenta': 'tono', 'narrador': 'tono', 'voz narrativa': 'tono', 'narrator': 'tono',
-  'desenlace': 'desenlace', 'como termina': 'desenlace', 'final del cuento': 'desenlace', 'ending': 'desenlace',
-  'extension': 'extension', 'paginas': 'extension', 'numero de paginas': 'extension',
-  'ilustracion': 'ilustracion', 'ilustraciones': 'ilustracion', 'estilo de ilustracion': 'ilustracion', 'estilo de las ilustraciones': 'ilustracion', 'estilo visual': 'ilustracion', 'estilo artistico': 'ilustracion', 'dibujos': 'ilustracion', 'art style': 'ilustracion', 'illustrations': 'ilustracion', 'illustration style': 'ilustracion',
+  /* Y los del CUENTO QUE ENSEÑA, que viven aparte (CSG_SINONIMOS_CUENTO,
+     arriba) porque solo ascienden dentro de un cuento. */
+  ...CSG_SINONIMOS_CUENTO,
 };
+
+/* ══════════════════════════════════════════════════════════════════
+   CÓMO SE LEEN LOS RÓTULOS DEL CUENTO (ver CSG_SINONIMOS_CUENTO).
+   · CSG_LEC_CLAVES_CUENTO: todas. Fuera de un cuento no son de nadie
+     (csgLecIdDeClave), y el lector las trata como a cualquier rótulo que
+     no entiende: se quedan donde están, nombradas.
+   · CSG_LEC_SENALES_CUENTO: las que solo escribe quien pide una historia
+     —«Moraleja», «Desenlace», «Tema de la historia», «Lo que el cuento
+     explica»—. Tampoco ascienden en la primera lectura, pero la APUNTAN:
+     una de ellas, o la cabecera del molde («Crea un cuento ilustrado…»,
+     que el armado escribe en las tres formas), dice que el texto puede
+     ser un cuento, y csgLeer lo vuelve a leer con todas.
+   · CSG_LEC_IDS_CUENTO: los bloques que solo tiene el molde del cuento.
+     Salen de los moldes, no de una lista escrita, y no votan la clase
+     (csgLecClaseVotada). */
+const CSG_LEC_CLAVES_CUENTO = new Set(Object.keys(CSG_SINONIMOS_CUENTO));
+const CSG_LEC_SENALES_CUENTO = new Set(['tema de la historia', 'story idea', 'moraleja', 'moral of the story',
+  'desenlace', 'final del cuento', 'lo que el cuento explica']);
+const CSG_LEC_IDS_CUENTO = CSG_MOLDES.cuento.bloques.map(b => b.id)
+  .filter(id => Object.keys(CSG_MOLDES).every(k => k === 'cuento' || !CSG_MOLDES[k].bloques.some(b => b.id === id)));
 
 /* ══════════════════════════════════════════════════════════════════
    LOS PATRONES DEL BUCLE (§5, paso 6), literales. Solo se miran sobre
@@ -1894,9 +1944,18 @@ function csgArmEtiqueta(id) {
      «## Tarea» delante de una sola frase es ruido. El plan lo dice solo
      de md, y solo en md se aplica: en xml la etiqueta no es un
      encabezado sino la estructura que Claude lee.
-   · seguida: un párrafo por bloque, «Rótulo: frase»; `rotuloMayus` y
-     `cabecera` son del molde (Instrucción de sistema, Receta corta). */
+   · seguida: un párrafo por bloque, «Rótulo: frase»; `rotuloMayus` es
+     del molde (Instrucción de sistema, Receta corta).
+   ⚠️ LA `cabecera` DEL MOLDE VA DELANTE EN LAS TRES FORMAS. En el Cuento
+   que enseña es lo único que PIDE algo —su molde no tiene Tarea—, y
+   saliendo solo en `seguida`, Claude y ChatGPT recibían «Tema de la
+   historia», «Para quién»… y ninguna petición: datos rotulados sin decir
+   qué hacer con ellos. En xml va pelada encima de las etiquetas y dentro
+   del encargo (es lo que se pide en el chat, no una instrucción de
+   Proyecto). Y es además la firma con que el lector reconoce que lo pegado
+   salió de aquí (ver csgLeer). */
 function csgArmForma(bloques, forma, molde, material) {
+  const cabecera = molde && molde.cabecera ? molde.cabecera : '';
   if (forma === 'xml') {
     /* Un libre con el nombre de una etiqueta de estructura (una pieza
        guardada antes de que el lector los apartara) sale rebautizado, y
@@ -1907,13 +1966,14 @@ function csgArmForma(bloques, forma, molde, material) {
       if (b.libre && CSG_ETIQUETAS_ARMADO.indexOf(tag) >= 0) { tag = csgSlugId(tag, ocupados); ocupados.add(tag); }
       return { sistema: !!b.sistema, txt: '<' + tag + '>\n' + csgCuerpo(b, b.t, 'xml') + '\n</' + tag + '>' };
     });
+    if (cabecera) trozos.unshift({ sistema: false, txt: cabecera });
     if (material) trozos.push({ sistema: false, txt: '<material>\n' + csgArmMaterialNeutro(material, 'xml') + '\n</material>' });
     const une = ls => ls.map(x => x.txt).join('\n\n');
     return { principal: une(trozos), sistema: une(trozos.filter(x => x.sistema)), encargo: une(trozos.filter(x => !x.sistema)) };
   }
   const trozos = [];
+  if (cabecera) trozos.push(cabecera);
   if (forma === 'seguida') {
-    if (molde && molde.cabecera) trozos.push(molde.cabecera);
     const mayus = !!(molde && molde.rotuloMayus);
     bloques.forEach(b => trozos.push((mayus ? b.rotulo.toUpperCase() : b.rotulo) + ': ' + csgCuerpo(b, b.t, 'seguida')));
   } else {
@@ -2249,6 +2309,32 @@ function csgArmGrafo(molde, pieza, rellena) {
 
 /* ── Bucle: el tope, el plan y el «cómo» ───────────────────────────── */
 
+/* Los números escritos con letras, en UNA tabla (regla 1: una sola copia
+   de cada decisión). La usan el {N} de los bucles (csgArmTope) y las
+   páginas del cuento (csgRevPaginas); estaban escritos dos veces, y el
+   día que uno aprendiera «veintidós» el otro seguiría sin saberlo. Sin
+   tildes, que es como se comparan, y en español y en inglés, porque en
+   los dos se pegan los prompts. Las decenas compuestas («treinta y dos»,
+   «thirty-two») son dos palabras y las junta quien lee. */
+const CSG_NUMEROS = {
+  un: 1, una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9,
+  diez: 10, once: 11, doce: 12, trece: 13, catorce: 14, quince: 15, dieciseis: 16, diecisiete: 17,
+  dieciocho: 18, diecinueve: 19, veinte: 20, veintiun: 21, veintiuno: 21, veintiuna: 21, veintidos: 22,
+  veintitres: 23, veinticuatro: 24, veinticinco: 25, veintiseis: 26, veintisiete: 27, veintiocho: 28,
+  veintinueve: 29, treinta: 30, cuarenta: 40, cincuenta: 50, sesenta: 60, setenta: 70, ochenta: 80,
+  noventa: 90, cien: 100,
+  one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11,
+  twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18,
+  nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90,
+};
+/* El valor de UNA palabra ya sin tildes: una cifra o un número escrito;
+   0 si no es un número. Por la llave propia: CSG_NUMEROS['constructor']
+   es una función heredada. */
+function csgNumeroDe(w) {
+  if (/^\d+$/.test(w)) return parseInt(w, 10);
+  return Object.prototype.hasOwnProperty.call(CSG_NUMEROS, w) ? CSG_NUMEROS[w] : 0;
+}
+
 /* El {N} del pseudocódigo: cuántas vueltas dice el Tope (§7). «El primer
    entero» tomado al pie de la letra daría 150 en «Tres rondas: apertura,
    réplica y cierre. Cada turno, 150 palabras.», que es el ejemplo del
@@ -2263,14 +2349,15 @@ function csgArmGrafo(molde, pieza, rellena) {
    vueltas» no es 1. */
 function csgArmTope(texto) {
   const s = csgSinTildes(texto).toLowerCase();
-  const palabras = {
-    un: 1, una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9,
-    diez: 10, once: 11, doce: 12, trece: 13, catorce: 14, quince: 15, dieciseis: 16, diecisiete: 17,
-    dieciocho: 18, diecinueve: 19, veinte: 20, treinta: 30, cuarenta: 40, cincuenta: 50, cien: 100,
-  };
-  const num = w => /^\d+$/.test(w) ? String(parseInt(w, 10)) : String(palabras[w]);
-  const todas = Object.keys(palabras).join('|');
-  const sinUn = Object.keys(palabras).filter(w => palabras[w] > 1).join('|');
+  const num = w => String(csgNumeroDe(w));
+  /* Las más largas primero: con «six» delante, «sixteen rounds» probaba
+     «six» y tenía que volver atrás; así casa a la primera. */
+  const claves = Object.keys(CSG_NUMEROS).sort((a, b) => b.length - a.length);
+  const todas = claves.join('|');
+  /* ⚠️ Suelto, «ten» no es diez: es el imperativo de tener («Ten en cuenta
+     que…»), y un tope que dijera 10 sin que nadie lo escribiera sería un
+     número fingido. Pegado a su unidad («ten rounds») sí cuenta. */
+  const sinUn = claves.filter(w => CSG_NUMEROS[w] > 1 && w !== 'ten').join('|');
   const unidad = '(?:vueltas?|veces|vez|rondas?|intentos?|iteracion(?:es)?|pasadas?|ciclos?|iterations?|rounds?|attempts?|loops?|times)';
   let m = new RegExp('(?:^|[^a-z0-9ñ])(\\d+|' + todas + ')\\s+' + unidad + '(?![a-z0-9ñ])').exec(s);
   if (m) return num(m[1]);
@@ -2655,9 +2742,15 @@ const CSG_LEC_ROTULOS_LARGOS = new Set(Object.keys(CSG_SINONIMOS).filter(k => k.
 
 /* El id al que va una clave: el de CSG_SINONIMOS, o el propio id del
    vocabulario si alguien escribe «## postura_a» (así se llaman las
-   etiquetas XML que arma esta misma herramienta). */
-function csgLecIdDeClave(clave) {
+   etiquetas XML que arma esta misma herramienta).
+   ⚠️ `cuento`: si el texto ya trae una señal de cuento. Sin ella, las
+   claves del cuento no son de nadie (CSG_LEC_CLAVES_CUENTO), y la guarda
+   va ANTES de las dos búsquedas: los ids del cuento («concepto»,
+   «escenario»…) son también claves por sí mismos, y por la segunda
+   búsqueda una etiqueta <concepto> se colaba igual. */
+function csgLecIdDeClave(clave, cuento) {
   if (!clave) return '';
+  if (!cuento && CSG_LEC_CLAVES_CUENTO.has(clave)) return '';
   if (Object.prototype.hasOwnProperty.call(CSG_SINONIMOS, clave)) return CSG_SINONIMOS[clave];
   if (Object.prototype.hasOwnProperty.call(CSG_BLOQUES, clave)) return clave;
   return '';
@@ -2921,11 +3014,15 @@ function csgLecClasesDeId(id) {
    a dos de «citas» y de «nodos», y ninguna de las dos es lo que alguien
    quiso escribir. Por eso la distancia, además de ≤ 2, no pasa de un
    tercio del largo: una errata en «ejemplo» (7) o en «contexto» (8) se
-   sugiere; «notas» (5) solo se sugeriría a un cambio, y no hay ninguna. */
-function csgLecSugerencia(clave, clase) {
+   sugiere; «notas» (5) solo se sugeriría a un cambio, y no hay ninguna.
+   ⚠️ Y fuera de un cuento no se sugiere una clave del cuento: «Escenario:»
+   en un juego de rol no ascendió porque no es un cuento, y un «¿Querías
+   Dónde pasa?» mandaría a colocarlo justo donde no va. */
+function csgLecSugerencia(clave, clase, cuento) {
   if (!clave || clave.length < 3) return '';
   let mejor = '', dMejor = 3;
   Object.keys(CSG_SINONIMOS).forEach(k => {
+    if (!cuento && CSG_LEC_CLAVES_CUENTO.has(k)) return;
     if (clase && !csgLecClasesDeId(CSG_SINONIMOS[k]).has(clase)) return;
     const d = csgLecDistancia(clave, k);
     if (d <= 2 && d * 3 <= clave.length && (d < dMejor || (d === dMejor && k.length < mejor.length))) { mejor = k; dMejor = d; }
@@ -3001,8 +3098,39 @@ function csgLecLeeFrontmatter(lineas) {
    y el cuerpo sin encabezados de un SKILL.md es lo mismo. No va en
    CSG_EQUIVALE porque esa lista es la del §2, la que consulta «Duplicar en
    otro molde», y allí una Tarea de un prompt que se gradúa a SKILL.md no
-   se convierte sola en sus pasos numerados. */
-const CSG_LEC_MUDA = { tarea: ['pasos'] };
+   se convierte sola en sus pasos numerados.
+   Y en el Cuento que enseña, lo que se pide ES el tema: el molde no tiene
+   Tarea, y «Crea un cuento sobre el ciclo del agua.» es su «Tema de la
+   historia». Solo si el Tema está vacío, como toda mudanza, y se dice.
+   ⚠️ Solo en el cuento, aunque Voz prestada tampoco tenga Tarea: fuera
+   del cuento, Pegar lee exactamente como leía antes de que el cuento
+   existiera (csgLeer), y esa frase tiene que seguir siendo verdad. */
+const CSG_LEC_MUDA = {
+  todos: { tarea: ['pasos'] },
+  cuento: { tarea: ['tema'] },
+};
+
+/* ⚠️ Y LO QUE LA MUDANZA DE csgLeer NO TOMA DE CSG_EQUIVALE. Esa lista es
+   la de «Duplicar en otro molde»: allí la persona eligió el destino y lo
+   ve entero antes de guardar, así que vale «el sitio más parecido». Aquí
+   nadie eligió nada y lo movido cambia de nombre, así que solo se muda lo
+   que es LA MISMA COSA con otro nombre. No lo son:
+   · En cualquier molde, «Nunca:» y «Siempre:» a las Reglas: la palabra
+     del rótulo ES la regla, y «Nunca: uses jerga técnica.» se quedaba en
+     «uses jerga técnica.», que manda lo contrario. Como bloque propio
+     siguen diciendo «Nunca».
+   · En el cuento, «Género: fábula» a la Extensión: una es qué es y la
+     otra cuánto mide, y la fábula pisaba las diez páginas del `inicial`.
+   · En el cuento, «Estilo:» a «Cómo se cuenta»: ahí el estilo es tan a
+     menudo el de los dibujos («Estilo: acuarela suave») como el de la voz,
+     y adivinar cuál es colocarlo donde no va. En un encargo sigue yendo al
+     Tono, como siempre: allí no hay dibujos que confundir.
+   Un bloque que no se muda se queda aparte con su rótulo, que es lo que
+   pasa con cualquier bloque sin sitio: nada se pierde. */
+const CSG_LEC_NO_MUDA = {
+  todos: { nunca: ['reglas'], siempre: ['reglas'] },
+  cuento: { genero: ['extension'], estilo: ['tono'] },
+};
 
 const CSG_LEC_MAT_INI = /^\s*={3,}\s*material\s*={3,}\s*$/i;
 const CSG_LEC_MAT_FIN = /^\s*={3,}\s*fin del material\s*={3,}\s*$/i;
@@ -3024,7 +3152,7 @@ function csgLecMaterialDesescapa(s, modo) {
   return t;
 }
 
-function csgLeer(texto) {
+function csgLecLeer(texto, cuento) {
   /* ── Paso 0: normalizar. Los finales de renglón de Windows, las
      tabulaciones y los espacios duros no se ven, y sin quitarlos un
      «Tarea:» con un espacio duro detrás no casa con nada. La marca BOM
@@ -3053,6 +3181,19 @@ function csgLeer(texto) {
     return b;
   };
   const tieneTexto = b => b && b.lineas.some(l => l.t.trim());
+
+  /* La señal de cuento (ver CSG_LEC_SENALES_CUENTO): un rótulo de los que
+     solo escribe quien pide una historia, o la cabecera del Cuento que
+     enseña. En la primera lectura ese rótulo NO asciende —fuera de un
+     cuento se lee como antes—, pero se apunta. Todo rótulo pasa por
+     `idDe`, así que la señal sale de lo que tiene forma de rótulo y no de
+     una segunda búsqueda a ojo, que algún día diría otra cosa. */
+  let senal = false;
+  const idDe = clave => {
+    if (CSG_LEC_SENALES_CUENTO.has(clave)) senal = true;
+    return csgLecIdDeClave(clave, cuento);
+  };
+  const cabeceraCuento = csgClave(CSG_MOLDES.cuento.cabecera || '');
 
   /* ── Paso 1: frontmatter. `---` en el primer renglón con algo, un
      `name:` y el cierre `---`, todo dentro de los 30 primeros renglones:
@@ -3240,7 +3381,7 @@ function csgLeer(texto) {
     if (/^(```|~~~)/.test(tt)) { enCodigoPre = !enCodigoPre; return; }
     if (enCodigoPre) return;
     const h = csgLecEncabezado(tt);
-    if (h && csgLecIdDeClave(csgClaveEtiqueta(h.etiqueta))) nivelConocido = Math.min(nivelConocido, h.nivel);
+    if (h && idDe(csgClaveEtiqueta(h.etiqueta))) nivelConocido = Math.min(nivelConocido, h.nivel);
   });
   const hayEncabezadoConocido = nivelConocido < Infinity;
 
@@ -3365,7 +3506,7 @@ function csgLeer(texto) {
     if (sg.tipo === 'xml') {
       let id = '';
       if (sg.tag === 'ejemplo' || sg.tag === 'example') id = 'ejemplos';
-      else id = csgLecIdDeClave(sg.tag) || csgLecIdDeClave(sg.tag.replace(/_/g, ' '));
+      else id = idDe(sg.tag) || idDe(sg.tag.replace(/_/g, ' '));
       let dentro = sg.t;
       if (id === 'ejemplos') {
         /* <ejemplo><entrada>a</entrada><salida>b</salida></ejemplo> es un
@@ -3427,7 +3568,11 @@ function csgLeer(texto) {
       continue;
     }
 
-    if (cabeceras.has(csgClave(tt))) { estructura.push(tt); continue; }
+    if (cabeceras.has(csgClave(tt))) {
+      estructura.push(tt);
+      if (csgClave(tt) === cabeceraCuento) senal = true;
+      continue;
+    }
 
     const mc = csgSinTildes(tt).match(comoSeguido);
     if (mc) {
@@ -3447,7 +3592,7 @@ function csgLeer(texto) {
     if (h) {
       const nivel = h.nivel;
       const etiqueta = h.etiqueta;
-      const id = csgLecIdDeClave(csgClaveEtiqueta(etiqueta));
+      const id = idDe(csgClaveEtiqueta(etiqueta));
       if (id) { abrir(id, etiqueta, sg, true); continue; }
       /* El primer «# Título» que no es una palabra de bloque es el título
          de la pieza (§5, paso 7). */
@@ -3461,7 +3606,7 @@ function csgLeer(texto) {
     let m = tt.match(/^\*\*([^*]{2,40})\*\*:?\s*$/);
     if (m) {
       const etiqueta = m[1].replace(/\s*:\s*$/, '').trim();
-      const id = csgLecIdDeClave(csgClaveEtiqueta(etiqueta));
+      const id = idDe(csgClaveEtiqueta(etiqueta));
       if (id) { abrir(id, etiqueta, sg, true); continue; }
       if (hayEncabezadoConocido) { empuja(sg); continue; }
       abrirLibre(etiqueta, sg);
@@ -3511,7 +3656,7 @@ function csgLeer(texto) {
     const puedeC = !conMarca || actual === '__fuera' || porMarca === actual;
     if (etiquetaC && puedeC && (largoC || etiquetaC.split(/\s+/).length <= 3)) {
       const clave = csgClaveEtiqueta(etiquetaC);
-      const id = csgLecIdDeClave(clave);
+      const id = idDe(clave);
       if (id && id === actual && recienEncabezado === id && !tieneTexto(bloques.get(id))) { empuja(sg); continue; }
       if (id) {
         abrir(id, prefijoC + escritoC, sg, false, conMarca);
@@ -3529,7 +3674,7 @@ function csgLeer(texto) {
     const baseD = tt.replace(CSG_LEC_PICTOS_IZQ, '');
     if (/^[\p{Lu} ]{3,30}$/u.test(baseD) && /\p{Lu}/u.test(baseD)) {
       const clave = csgClaveEtiqueta(baseD);
-      const id = csgLecIdDeClave(clave);
+      const id = idDe(clave);
       if (id) { abrir(id, tt, sg); continue; }
       const r = empuja(sg);
       candidatosNombrar.push({ renglon: r, etiqueta: tt, clave, forma: 'mayusculas', resto: '' });
@@ -3766,8 +3911,12 @@ function csgLeer(texto) {
   if (frontmatter) { clase = 'habilidad'; molde = 'skill'; }
   else if (aristasMovidas) { clase = 'grafo'; molde = csgProponerMolde('grafo', ids, paraProponer); }
   else if (bucle) { clase = 'bucle'; molde = csgProponerMolde('bucle', ids, paraProponer); }
-  else { clase = csgLecClaseVotada(ids); molde = csgProponerMolde(clase, ids, paraProponer); }
+  else { clase = csgLecClaseVotada(ids); molde = csgProponerMolde(clase, ids, paraProponer, cuento); }
   let moldeDef = CSG_MOLDES[molde];
+  /* Lo que veta el cuento se mira aquí, ANTES de la mudanza: después, un
+     «Objetivo» mudado a la Tarea ya no estaría para vetarlo, y la segunda
+     propuesta de abajo vería un cuento donde había un CO-STAR. */
+  const vetado = CSG_LEC_CUENTO_VETO.some(x => ids.indexOf(x) >= 0);
 
   /* ── La mudanza. ⚠️ Un rótulo que existe pero es de OTRA clase caía en
      un bloque que el molde propuesto no tiene, y el repaso paraba por el
@@ -3787,7 +3936,11 @@ function csgLeer(texto) {
       .filter(b => b.id && !b.libre && CSG_BLOQUES[b.id] && idsM.indexOf(b.id) < 0 && tieneTexto(b))
       .sort((x, y) => x.orden - y.orden)
       .forEach(b => {
-        const cands = (CSG_EQUIVALE[b.id] || []).concat(CSG_LEC_MUDA[b.id] || []);
+        const no = (CSG_LEC_NO_MUDA.todos[b.id] || [])
+          .concat(molde === 'cuento' ? (CSG_LEC_NO_MUDA.cuento[b.id] || []) : []);
+        const mas = (CSG_LEC_MUDA.todos[b.id] || [])
+          .concat(molde === 'cuento' ? (CSG_LEC_MUDA.cuento[b.id] || []) : []);
+        const cands = (CSG_EQUIVALE[b.id] || []).filter(c => no.indexOf(c) < 0).concat(mas);
         const dest = cands.find(c => idsM.indexOf(c) >= 0 && !(bloques.has(c) && tieneTexto(bloques.get(c))));
         if (!dest) return;
         const d = bloque(dest, { id: dest });
@@ -3799,7 +3952,7 @@ function csgLeer(texto) {
       });
     if (mudados.length && !frontmatter) {
       const pres = [...bloques.values()].filter(b => b.id && CSG_BLOQUES[b.id] && (b.etiquetado || tieneTexto(b)));
-      const otro = csgProponerMolde(clase, [...new Set(pres.map(b => b.id))], pres.map(b => ({ id: b.id, t: textoDe(b) })));
+      const otro = csgProponerMolde(clase, [...new Set(pres.map(b => b.id))], pres.map(b => ({ id: b.id, t: textoDe(b) })), cuento && !vetado);
       if (otro !== molde && CSG_MOLDES[otro]) { molde = otro; moldeDef = CSG_MOLDES[otro]; }
     }
   }
@@ -3872,7 +4025,7 @@ function csgLeer(texto) {
        decir nada, y es justo el caso para el que existe la sugerencia.
        Una palabra a dos letras de un rótulo no es una frase cualquiera
        («Viaja:», «Investigador:» no están cerca de ninguno). */
-    if (!sugerencias.has(c.clave)) sugerencias.set(c.clave, csgLecSugerencia(c.clave, clase));
+    if (!sugerencias.has(c.clave)) sugerencias.set(c.clave, csgLecSugerencia(c.clave, clase, cuento));
     const sug = sugerencias.get(c.clave);
     const intentaba = c.forma === 'mayusculas' ||
       (!esLista && (c.forma === 'negrita' || usaDosPuntos || !!sug));
@@ -3908,10 +4061,14 @@ function csgLeer(texto) {
   });
   mudados.forEach(x => {
     const n = x.de.renglon !== undefined ? x.de.renglon : ((x.de.lineas[0] || {}).n || 0);
-    const escrito = String(x.de.escrito || CSG_BLOQUES[x.de.id].rotulo).replace(/[\s:]+$/, '');
+    /* Lo que venía SIN rótulo (la frase de arriba de un cuento, que el
+       lector junta en una Tarea) no se nombra con un «Tarea» que nadie
+       escribió: se dice lo que es. */
+    const escrito = x.de.escrito ? '«' + String(x.de.escrito).replace(/[\s:]+$/, '') + '»'
+      : x.de.etiquetado ? '«' + CSG_BLOQUES[x.de.id].rotulo + '»' : 'lo que venía sin rótulo';
     avisos.push({
       renglon: n,
-      texto: 'renglón ' + n + ': «' + escrito + '» se leyó como «' + csgBloqueDef(molde, x.a).rotulo +
+      texto: 'renglón ' + n + ': ' + escrito + ' se leyó como «' + csgBloqueDef(molde, x.a).rotulo +
         '», que es el bloque que tiene ' + moldeDef.nombre + '.',
       sugerencia: '',
     });
@@ -3949,26 +4106,61 @@ function csgLeer(texto) {
 
   const reconocidos = idsMolde.filter(id => salida.some(s => s.id === id && s.t.trim())).length;
   return {
-    clase,
-    molde,
-    titulo,
-    bloques: salida.map(s => ({ id: s.id, rotulo: s.rotulo, t: s.t })),
-    material,
-    variables,
-    avisos,
-    propuesta: { clase, molde, reconocidos, total: idsMolde.length },
-    estructura,
-    anadido,
+    r: {
+      clase,
+      molde,
+      titulo,
+      bloques: salida.map(s => ({ id: s.id, rotulo: s.rotulo, t: s.t })),
+      material,
+      variables,
+      avisos,
+      propuesta: { clase, molde, reconocidos, total: idsMolde.length },
+      estructura,
+      anadido,
+    },
+    /* Si vale la pena una segunda lectura con las claves del cuento: hubo
+       una señal, es un prompt (un cuento no es una habilidad, un grafo ni
+       un bucle) y no trae nada que lo vete. Con veto, lo que ya se leyó se
+       queda: fuera del cuento, esas palabras son prosa. */
+    otraVuelta: !cuento && senal && clase === 'prompt' && !frontmatter && !vetado,
   };
+}
+
+/* ⚠️ LA LECTURA DE VERDAD, EN DOS VUELTAS: una sin los rótulos del cuento
+   y, SOLO si esa vio una señal de cuento y nada que lo vete, otra con
+   ellos. Y la segunda solo se queda si propone el Cuento que enseña: si
+   no (un «Desenlace:» en un encargo de analizar una película), vale la
+   primera. Así, un texto que no se propone como cuento se lee EXACTAMENTE
+   como se leía antes de que el cuento existiera —un juego de rol con
+   «Personaje:» y «Escenario:», un glosario con «Concepto:», un ensayo con
+   «Extensión:», un anuncio con «Emociones:»—, y un cuento con su
+   «Moraleja» lee también su «Protagonista». La única diferencia fuera del
+   cuento es a propósito: «Nunca:» ya no se muda a las Reglas perdiendo su
+   palabra (CSG_LEC_NO_MUDA), que era un fallo de antes. La segunda vuelta
+   cuesta lo que la primera, y solo la pagan los textos con señal. */
+function csgLeer(texto) {
+  const uno = csgLecLeer(texto, false);
+  if (!uno.otraVuelta) return uno.r;
+  const dos = csgLecLeer(texto, true);
+  return dos.r.molde === 'cuento' ? dos.r : uno.r;
 }
 
 /* La clase que proponen los rótulos reconocidos: la que tenga más de
    ellos entre sus moldes. A igualdad gana Prompt, que es la de los
    moldes que aceptan de todo (Encargo, Libre): proponer Habilidad por un
-   empate sería forzar un SKILL.md donde había un prompt. */
+   empate sería forzar un SKILL.md donde había un prompt.
+   ⚠️ LOS BLOQUES DEL CUENTO NO VOTAN (CSG_LEC_IDS_CUENTO). Hablan de la
+   historia, no de la forma de la consigna, y son de un solo molde: con
+   voto, las instrucciones de un Gem que cuenta cuentos («Identidad»,
+   «Misión», «Nunca» y debajo «Personajes», «Escenario», «Extensión») se
+   proponían como un prompt, porque tres rótulos de cuento le ganaban a
+   tres de sistema. */
 function csgLecClaseVotada(ids) {
   const cuenta = { prompt: 0, habilidad: 0, grafo: 0, bucle: 0 };
-  (ids || []).forEach(id => csgLecClasesDeId(id).forEach(c => { if (c in cuenta) cuenta[c]++; }));
+  (ids || []).forEach(id => {
+    if (CSG_LEC_IDS_CUENTO.indexOf(id) >= 0) return;
+    csgLecClasesDeId(id).forEach(c => { if (c in cuenta) cuenta[c]++; });
+  });
   let mejor = 'prompt';
   ['habilidad', 'grafo', 'bucle'].forEach(c => { if (cuenta[c] > cuenta[mejor]) mejor = c; });
   return mejor;
@@ -3983,18 +4175,32 @@ function csgLecClaseVotada(ids) {
    por los ids, no por lo escrito).
    ══════════════════════════════════════════════════════════════════ */
 
-/* Los rótulos del Cuento que enseña que solo escribe un cuento, y los
-   otros dos, que salen también en un encargo cualquiera («Concepto:» en
-   un glosario, «Extensión: 800 palabras» en un ensayo). Hacen falta DOS
-   rótulos de cuento y uno de ellos de los primeros: con uno solo, «Tema:
-   las fracciones. Aprendizaje: que las sumen» —un plan de clase— se
-   propondría como cuento. Es una propuesta con chip, y aun así se
-   propone con cuidado: un molde equivocado deja los bloques del bueno
-   como libres, y eso hay que colocarlo a mano. */
-const CSG_LEC_CUENTO_FUERTES = ['personaje', 'escenario', 'leccion', 'emociones', 'desenlace', 'ilustracion'];
-const CSG_LEC_CUENTO = CSG_LEC_CUENTO_FUERTES.concat(['concepto', 'extension']);
+/* ⚠️ EL CUENTO SE PROPONE CON TRES CONDICIONES, Y LAS TRES HACEN FALTA.
+   · `cuento`: el lector ya vio una señal (CSG_LEC_SENALES_CUENTO: una
+     «Moraleja», un «Desenlace», la cabecera del molde…). Los ids solos no
+     lo dicen —«Personaje» y «Escenario» los tiene un juego de rol, y
+     «Tema», «Audiencia» y «Aprendizaje» un plan de clase—, así que sin
+     ella no se propone nunca, tampoco a quien llame con ids.
+   · Nada de otra forma de consigna (CSG_LEC_CUENTO_VETO): un «Rol», un
+     «Objetivo» o un «Formato» dicen que es un prompt para un chat —un
+     anuncio en CO-STAR con sus «Emociones» y su «Extensión», un juego de
+     rol con su escenario—, y proponerlo como cuento le pondría Storybook
+     a un anuncio. Con una voz que imitar o la etiqueta de la casa es un
+     Voz prestada: lo que devuelva va a La Voz Prestada (regla 14).
+   · Dos de los cinco OBLIGATORIOS del molde (tema, audiencia, lección,
+     emociones, extensión), que son lo que el autor pidió que se supiera
+     de todo cuento: «Tarea: analiza la película» con su «Desenlace» es una
+     señal y no es un encargo de cuento. «Tema / Edad / Moraleja», sí. Y
+     una Tarea cuenta como el Tema cuando no hay Tema: un cuento no tiene
+     Tarea, lo que se le pide ES su tema («Crea un cuento sobre el ciclo del
+     agua.»), y la mudanza lo lleva ahí (CSG_LEC_MUDA).
+   Es una propuesta con chip, y aun así se propone con cuidado: un molde
+   equivocado deja los bloques del bueno como libres, que hay que colocar
+   a mano, y le pone a la pieza una máquina que nadie eligió. */
+const CSG_LEC_CUENTO_VETO = ['rol', 'identidad', 'mision', 'objetivo', 'formato', 'voz', 'etiqueta',
+  'ejemplos', 'caso', 'pregunta', 'fuentes', 'citas', 'pasos', 'responde'];
 
-function csgProponerMolde(clase, ids, bloques) {
+function csgProponerMolde(clase, ids, bloques, cuento) {
   const tiene = new Set(ids || []);
   const hay = (...xs) => xs.some(x => tiene.has(x));
   if (clase === 'habilidad') {
@@ -4012,14 +4218,9 @@ function csgProponerMolde(clase, ids, bloques) {
     if (hay('postura_a', 'postura_b', 'juez')) return 'careo';
     return 'hasta';
   }
-  /* Prompt. El cuento va primero: sus rótulos no son de ningún otro molde,
-     y un cuento que dice también «Para quién» y «Objetivo» no es un
-     CO-STAR. Pero si trae una voz que imitar o la etiqueta de la casa, es
-     un Voz prestada: lo que devuelva va a La Voz Prestada con su etiqueta
-     (regla 14), y eso no lo hace el Cuento que enseña. */
-  const fuertes = CSG_LEC_CUENTO_FUERTES.filter(x => tiene.has(x)).length;
-  const deCuento = CSG_LEC_CUENTO.filter(x => tiene.has(x)).length;
-  if (!hay('voz', 'etiqueta') && fuertes >= 1 && deCuento >= 2) return 'cuento';
+  /* Prompt. El cuento va primero, con sus tres condiciones (arriba). */
+  const obligatorios = CSG_MOLDES.cuento.bloques.filter(b => b.ob && (tiene.has(b.id) || (b.id === 'tema' && tiene.has('tarea')))).length;
+  if (cuento && !hay(...CSG_LEC_CUENTO_VETO) && obligatorios >= 2) return 'cuento';
   let paresBastan = true;
   if (Array.isArray(bloques)) {
     const e = bloques.filter(b => b && b.id === 'ejemplos').map(b => b.t || '').join('\n');
@@ -4230,16 +4431,22 @@ const CSG_REV_PROPIOS = ['rol', 'contexto', 'tarea', 'ejemplos', 'pregunta', 'vo
    rachas. */
 const CSG_REV_CONCEPTO_MAX = 120;
 const CSG_STORYBOOK_PAGINAS = 12;
-const CSG_REV_NUMEROS = { una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9,
-  diez: 10, once: 11, doce: 12, trece: 13, catorce: 14, quince: 15, dieciseis: 16, diecisiete: 17, dieciocho: 18,
-  diecinueve: 19, veinte: 20, veinticinco: 25, treinta: 30, cuarenta: 40, cincuenta: 50 };
 /* Las palabras que dicen una edad, sin tildes: «niños», «adultos»,
-   «primaria», «años». Con una cifra basta también («de 6 a 8»). */
-const CSG_REV_EDADES = new Set(['nino', 'ninos', 'nina', 'ninas', 'ninez', 'infantil', 'infantiles', 'bebe', 'bebes',
-  'adolescente', 'adolescentes', 'joven', 'jovenes', 'adulto', 'adultos', 'adulta', 'adultas', 'mayores', 'abuelo',
-  'abuelos', 'abuela', 'abuelas', 'primaria', 'secundaria', 'preescolar', 'prekinder', 'kinder', 'colegio',
-  'bachillerato', 'universitario', 'universitarios', 'universitaria', 'universitarias', 'grado', 'anos', 'meses',
-  'kids', 'children', 'teen', 'teens', 'teenagers', 'adult', 'adults', 'years']);
+   «primaria», «años», el curso («de sexto», «de tercero») o la edad
+   dicha con su nombre («tercera edad»). Con una cifra basta también
+   («de 6 a 8»). ⚠️ Mejor de más que de menos: este aviso existe para el
+   «Para quién» que no dice ninguna edad, y uno que salta con «Alumnos de
+   sexto» o «Toddlers» enseña a no leer los avisos. */
+const CSG_REV_EDADES = new Set(['nino', 'ninos', 'nina', 'ninas', 'ninez', 'infancia', 'infantil', 'infantiles',
+  'bebe', 'bebes', 'lactantes', 'adolescente', 'adolescentes', 'joven', 'jovenes', 'adulto', 'adultos', 'adulta',
+  'adultas', 'mayores', 'anciano', 'ancianos', 'abuelo', 'abuelos', 'abuela', 'abuelas', 'edad', 'edades',
+  'primaria', 'secundaria', 'preescolar', 'preescolares', 'escolar', 'escolares', 'prekinder', 'kinder', 'colegio',
+  'bachillerato', 'universitario', 'universitarios', 'universitaria', 'universitarias', 'grado', 'curso',
+  'primero', 'primer', 'segundo', 'tercero', 'tercer', 'cuarto', 'quinto', 'sexto', 'septimo', 'setimo',
+  'octavo', 'noveno', 'decimo', 'anos', 'meses',
+  'kids', 'kid', 'child', 'children', 'toddler', 'toddlers', 'baby', 'babies', 'infant', 'infants',
+  'preschool', 'preschooler', 'preschoolers', 'kindergarten', 'grade', 'grader', 'graders', 'elementary',
+  'teen', 'teens', 'teenager', 'teenagers', 'adult', 'adults', 'elderly', 'seniors', 'age', 'ages', 'years']);
 
 function csgRevPalabrasDe(t) {
   return csgSinTildes(String(t == null ? '' : t)).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
@@ -4249,21 +4456,55 @@ function csgRevDiceEdad(t) {
   return csgRevPalabrasDe(t).some(w => /^\d/.test(w) || CSG_REV_EDADES.has(w));
 }
 /* ¿El tema dice que el cuento explica o enseña algo? «Un cuento que
-   explique por qué llueve», «para enseñar las fracciones». */
+   explique por qué llueve», «para enseñar las fracciones», «¿Por qué
+   llueve?», «Cómo funciona un volcán».
+   ⚠️ SOLO EXPLICAR Y ENSEÑAR, Y NO NEGADOS. La primera versión contaba
+   también «aprender» y «entender» y cualquier «por qué», y avisaba en
+   los cuentos de emociones, que son justo los bien hechos: «Una niña que
+   aprende a andar en bicicleta» es lo que le pasa a la protagonista, «no
+   entiende por qué su abuelo ya no está» es un duelo, y «sin enseñar
+   nada» dice lo contrario. Por eso «por qué» solo cuenta al PRINCIPIO de
+   una frase —ahí es la pregunta que el cuento contesta; en medio suele
+   ser de un personaje—, una palabra negada dos antes («no», «sin»…) lo
+   apaga, y «enseñanza» (la de un valor, que no tiene datos que
+   inventar) no cuenta. Y «explique» se escribe con qu: `expli[cq]`. */
+const CSG_REV_NIEGA = new Set(['no', 'sin', 'ni', 'nunca', 'jamas', 'not', 'without', 'never', 't']);
 function csgRevExplica(t) {
   const ws = csgRevPalabrasDe(t);
-  return ws.some((w, i) => /^(?:explic|ensen|aprend|entiend|entend)/.test(w) ||
-    (w === 'por' && ws[i + 1] === 'que') || (w === 'como' && /^funcion/.test(ws[i + 1] || '')));
+  const negada = i => CSG_REV_NIEGA.has(ws[i - 1]) || CSG_REV_NIEGA.has(ws[i - 2]);
+  /* Con el último «works» apuntado una vez: buscarlo desde cada «how»
+     sería cuadrático, y esto corre en cada tecla (regla 28). */
+  const ultimoWorks = ws.lastIndexOf('works');
+  const explica = ws.some((w, i) => !negada(i) && (
+    (/^(?:expli[cq]|ensen|explain|teach)/.test(w) && !/^ensenanz/.test(w)) ||
+    (w === 'como' && /^funcion/.test(ws[i + 1] || '')) || (w === 'how' && i < ultimoWorks)));
+  if (explica) return true;
+  /* «Por qué» al principio de una frase. Se parte con split (lineal), no
+     con una expresión que case frases enteras. */
+  return String(t == null ? '' : t).split(/[.!?¡¿\n]/).some(f => {
+    const fw = csgRevPalabrasDe(f);
+    return (fw[0] === 'por' && fw[1] === 'que') || fw[0] === 'why';
+  });
 }
-/* Cuántas páginas pide la Extensión: la cifra o el número escrito que va
-   delante de «páginas». 0 si no lo dice. */
+/* Cuántas páginas pide la Extensión: el número que va delante de
+   «páginas», en cifra o con letras. 0 si no lo dice.
+   ⚠️ Con las decenas compuestas: «treinta y dos páginas» son 32, no 2, y
+   «veintidós» y «fourteen» también son números. Y un número SOLO también:
+   «Páginas: 20» pegado deja «20» en la Extensión (el rótulo ya dijo qué
+   contaba), y leerlo como cero callaba el aviso justo cuando hacía falta. */
+const CSG_REV_PAGINA = new Set(['paginas', 'pagina', 'pags', 'pag', 'pages', 'page']);
 function csgRevPaginas(t) {
   const ws = csgRevPalabrasDe(t);
+  if (ws.length === 1) return csgNumeroDe(ws[0]);
+  const decena = w => { const n = csgNumeroDe(w); return n >= 20 && n <= 90 && n % 10 === 0 && !/^\d/.test(w) ? n : 0; };
   for (let i = 1; i < ws.length; i++) {
-    if (ws[i] !== 'paginas' && ws[i] !== 'pages') continue;
-    const w = ws[i - 1];
-    if (/^\d+$/.test(w)) return Number(w);
-    if (Object.prototype.hasOwnProperty.call(CSG_REV_NUMEROS, w)) return CSG_REV_NUMEROS[w];
+    if (!CSG_REV_PAGINA.has(ws[i])) continue;
+    let n = csgNumeroDe(ws[i - 1]);
+    if (n > 0 && n < 10 && !/^\d/.test(ws[i - 1])) {
+      if (ws[i - 2] === 'y') n += decena(ws[i - 3] || '');
+      else n += decena(ws[i - 2] || '');
+    }
+    if (n) return n;
   }
   return 0;
 }
@@ -4564,7 +4805,7 @@ function csgRevisar(pieza, maquinaId) {
     });
   }
 
-  /* El Cuento que enseña (§3.1): cuatro cosas que se escapan escribiendo
+  /* El Cuento que enseña (§3.1): cinco cosas que se escapan escribiendo
      un cuento, y ninguna PARA —un cuento sin protagonista se puede pedir,
      y la máquina lo inventa—, pero cada una se nota en el libro. Solo en
      su molde: en otro, esos bloques son libres y nadie los pidió. */
@@ -8852,6 +9093,11 @@ let _csgEdSeq       = 0;
 let _csgEdBorradorT = null;
 let _csgEdPreviaT   = null;
 let _csgEdEnganchado = false;   // los cables del compositor, puestos una vez (ver csgEdEngancha)
+/* La máquina que había ANTES de que un molde pusiera la suya (el Cuento
+   que enseña pone Storybook), para devolverla al salir de él. Es de la
+   sesión del compositor y no de la pieza: no es un dato suyo, y un campo
+   de más viajaría a la nube en la fila. */
+let _csgEdMaqDelMolde = '';
 
 /* Pistas que viajan con una pieza recién hecha (de un duplicado) y que
    no son datos de la pieza: qué `name` propuso la máquina, para no
@@ -9124,11 +9370,14 @@ function csgDuplicarEnMolde(pieza, moldeId) {
   }
   nueva.titulo = titulo;
   /* La máquina de UN molde (Storybook, del Cuento que enseña) no viaja a
-     otro: un Encargo para Storybook no lo pide nadie. El destino que trae
-     la suya la pone; si no, la de la pieza de origen, y si esa era la de
-     otro molde, se queda la que puso csgNuevaPieza (la última del aparato). */
+     otro cuando la puso ESE molde: un Encargo duplicado de un cuento no se
+     lo pide nadie a Storybook. El destino que trae la suya la pone; si no,
+     la de la pieza de origen, salvo que sea la del molde de origen, y
+     entonces se queda la que puso csgNuevaPieza (la última del aparato).
+     ⚠️ Una Storybook elegida A MANO en otro molde (un Libre) sí viaja:
+     esa la eligió alguien, y tirarla al duplicar sería decidir por él. */
   if (destino.maquina) nueva.maquina = destino.maquina;
-  else if (src.maquina && !csgMaquinaDeMolde(src.maquina)) nueva.maquina = String(src.maquina);
+  else if (src.maquina && !(origen && origen.maquina && String(src.maquina) === origen.maquina)) nueva.maquina = String(src.maquina);
   nueva.estantes = Array.isArray(src.estantes) ? src.estantes.filter(x => typeof x === 'string') : [];
   nueva.material = String(src.material || '');
   nueva.cuaderno = String(src.cuaderno || '');
@@ -9715,6 +9964,7 @@ function csgEdEmpezar(copia, cfg) {
   _csgEdAvisosAbiertos = true;
   _csgEdRecuperar = cfg.recuperar || null;
   _csgEdAuto = { tituloMano: !!cfg.tituloMano, nombre: String(cfg.autoNombre || '') };
+  _csgEdMaqDelMolde = '';
   _csgEdIgual = '';
   _csgEdCual = null;
   _csgEdScroll = 0;
@@ -10632,13 +10882,24 @@ function csgEdCambiarMolde(id) {
   p.molde = nuevo.id;
   p.clase = nuevo.clase;
   /* La máquina de UN molde (§4): cambiar AL Cuento que enseña pone
-     Storybook, y salir de él con Storybook puesto devuelve la última de
-     este aparato, que Storybook nunca es. Y se dice en el mismo aviso:
+     Storybook, y salir de él con la Storybook que ÉL puso devuelve la que
+     había antes de entrar (o, si se abrió ya como cuento, la última de
+     este aparato, que Storybook nunca es). Y se dice en el mismo aviso:
      una máquina que cambia sola y callada es un prompt que sale con otra
-     forma sin que nadie sepa por qué. */
+     forma sin que nadie sepa por qué.
+     ⚠️ SOLO se devuelve la que el molde puso. Revirtiendo cualquier
+     Storybook, un Libre para Storybook elegida a mano salía de Libre a
+     Rápido para Claude; y devolviendo siempre «la última del aparato», un
+     Encargo para Gemini que se asomaba al cuento volvía para Claude. Una
+     máquina elegida a mano, dentro o fuera del cuento, se queda. */
   const maqAntes = String(p.maquina || '');
-  if (nuevo.maquina) p.maquina = nuevo.maquina;
-  else if (csgMaquinaDeMolde(maqAntes)) p.maquina = csgMaquinaUltima();
+  if (nuevo.maquina) {
+    if (maqAntes !== nuevo.maquina && !csgMaquinaDeMolde(maqAntes)) _csgEdMaqDelMolde = maqAntes;
+    p.maquina = nuevo.maquina;
+  } else if (viejo && viejo.maquina && maqAntes === viejo.maquina) {
+    p.maquina = _csgEdMaqDelMolde || csgMaquinaUltima();
+    _csgEdMaqDelMolde = '';
+  }
   const maqDicha = String(p.maquina || '') !== maqAntes ? ' · máquina: ' + csgMaquina(p.maquina).nombre : '';
   _csgEdTab = '';
   csgEdProponerNombre();
@@ -12652,9 +12913,15 @@ function csgPegPintar() {
   chip.type = 'button';
   chip.addEventListener('click', csgPegCambiar);
   res.appendChild(chip);
-  res.appendChild(csgEl('p', 'csg-nota', propio
+  /* Un molde que trae su máquina (el Cuento que enseña, Storybook) se la
+     pone a lo pegado: se dice aquí, antes de abrir, porque una máquina
+     que cambia sola y callada es un prompt que sale con otra forma sin que
+     nadie sepa por qué. */
+  const suMaquina = molde && molde.maquina && p.maquina === molde.maquina
+    ? ' Este molde va para ' + csgMaquina(molde.maquina).nombre + '; la máquina se cambia en la vista previa del compositor.' : '';
+  res.appendChild(csgEl('p', 'csg-nota', (propio
     ? 'Es una propuesta: tócala para elegir otra forma. Cambiarla no pierde nada.'
-    : 'La forma la elegiste tú. Lo que no encontró sitio va al final, marcado para colocarlo o quitarlo.'));
+    : 'La forma la elegiste tú. Lo que no encontró sitio va al final, marcado para colocarlo o quitarlo.') + suMaquina));
 
   /* 2 · La cuenta, a la vista: que no se perdió nada no hay que
      creérselo. Si un día no cuadra, lo dice en rojo antes de abrir. */
