@@ -505,12 +505,72 @@ const CSG_BLOQUES = {
     ejemplo: 'Puntúa cada ronda por evidencia y no por retórica; nombra cada falacia que veas.',
     frases: ['Puntúa por evidencia, no por retórica.', 'Nombra cada falacia que veas.', 'No decide hasta la última ronda.', 'Resume lo mejor de cada lado antes de fallar.'],
   },
+
+  /* ── Los del Cuento que enseña (§3.1) ──────────────────────────────
+     Son el oficio de contar un cuento que emocione y enseñe, y por eso
+     son ids propios y no sobreescrituras: `personaje` no es el `rol`
+     (quién es la máquina) ni `concepto` es la `tarea`. Solo los usa ese
+     molde; en otro, un bloque suyo sale como libre con su rótulo, como
+     cualquier id que el molde no tiene. `desenlace` y no `final`: «Final:»
+     es el «Fin» de un grafo o de un bucle dicho de otra manera, y un id es
+     también una clave del lector (csgLecIdDeClave): con `final`, esas
+     consignas se partirían en un bloque que no es suyo. */
+  personaje: {
+    rotulo: 'Protagonista',
+    para_que: 'Quién vive la historia, qué quiere y qué se lo impide: sin un deseo y algo que lo estorbe no hay cuento, hay una lección con dibujos. Di también cómo es por fuera, para que salga igual en todas las páginas.',
+    ejemplo: 'Gotita, una gota de agua redonda y transparente, con las mejillas rosadas. Quiere quedarse para siempre en su nube, porque le da miedo caer; pero cada vez pesa más.',
+    frases: ['Se llama {{protagonista}} y quiere {{deseo}}, pero {{obstaculo}}.', 'Quiere {{deseo}}, pero lo que de verdad necesita es {{necesidad}}.', 'Tiene un defecto que lo hace querible: {{defecto}}.', 'Por fuera es {{aspecto}}, y así sale en todas las páginas.', 'Lo acompaña {{amigo}}, que lo ayuda pero no le resuelve nada.', 'Que se parezca a la foto o al dibujo que voy a subir.'],
+  },
+  escenario: {
+    rotulo: 'Dónde pasa',
+    para_que: 'El lugar y el momento, con detalles que el lector reconozca: un cuento se siente verdadero por lo concreto —un olor, una comida, una palabra de aquí—, no por los adjetivos.',
+    ejemplo: 'Una aldea de Copán en temporada de lluvias: techos de lámina, olor a tierra mojada y el río crecido.',
+    frases: ['En un lugar que el lector reconozca: {{lugar}}.', 'En Honduras, con cosas de aquí: la comida, las plantas y las palabras.', 'En la escuela, un día normal que deja de serlo.', 'En un mundo inventado, pero con reglas que no cambian.', 'En una casa como la del lector, hoy.'],
+  },
+  concepto: {
+    rotulo: 'Lo que el cuento explica',
+    para_que: 'Si el cuento enseña algo difícil, lo que tiene que quedar bien explicado, con sus datos exactos y la comparación que lo vuelve fácil. Si simplificas, que siga siendo verdad: un cuento que enseña algo falso lo enseña igual de bien.',
+    ejemplo: 'El ciclo del agua: el sol calienta el agua y la vuelve vapor; el vapor sube, se enfría y se vuelve gotitas que forman las nubes; las gotitas se juntan, pesan y caen como lluvia. Como el vapor de la olla de los frijoles, que se vuelve gotas en la tapa.',
+    frases: ['Explícalo con una comparación de la vida diaria del lector.', 'Un paso del concepto en cada página, en orden.', 'Que entender el concepto sea lo que resuelve el problema del protagonista.', 'Compáralo con {{comparacion}}, y que la comparación no enseñe nada falso.', 'Usa la palabra {{termino}} y que se entienda por lo que pasa en el cuento.', 'Al final, que el lector pueda explicarlo con sus propias palabras.'],
+  },
+  leccion: {
+    rotulo: 'Lo que se aprende',
+    para_que: 'Lo que el lector se lleva: una idea que entiende o un valor. Se escribe para la máquina, no para el cuento: la historia lo muestra con lo que hace el protagonista, y no lo dice al final como moraleja.',
+    ejemplo: 'Que el agua que cae es la misma que subió: nada se pierde, todo da vueltas.',
+    frases: ['Que entienda {{idea}} sin que nadie se la explique como en una clase.', 'Que la lección se note en lo que hace el protagonista, sin moraleja al final.', 'Que equivocarse es parte de aprender.', 'Que pedir ayuda no es rendirse.', 'Que lo que da miedo se entiende mejor cuando se conoce.'],
+  },
+  emociones: {
+    rotulo: 'Lo que debe sentir el lector',
+    para_que: 'Las sensaciones que se buscan y en qué orden: un cuento conmueve cuando lleva al lector de una emoción a otra, y uno que se queda en un solo tono se olvida al cerrar el libro.',
+    ejemplo: 'Curiosidad al principio, un miedo que se pueda aguantar a mitad del cuento, y al final alivio y asombro.',
+    frases: ['Que empiece con curiosidad y termine en asombro.', 'Un miedo pequeño que se resuelve pronto, y al final calma.', 'Ternura y un poco de risa, sin tristeza.', 'Que se sienta acompañado: lo que le pasa al protagonista le podría pasar a quien lo lee.', 'Tristeza de verdad, contada con cuidado, y al final esperanza.', 'Que se ría en la página del error y se emocione al final.', 'Que conmueva sin chantaje: la emoción sale de lo que pasa, no de adjetivos que la pidan.'],
+  },
+  desenlace: {
+    rotulo: 'Cómo termina',
+    para_que: 'La última página es la que se queda: que cierre el problema con lo que el protagonista aprendió y deje una imagen o una pregunta, no un sermón.',
+    ejemplo: 'Gotita vuelve a subir convertida en vapor y, desde su nube, ve el río lleno: la última página repite la primera, pero ya sin miedo.',
+    frases: ['Que la última página repita la imagen de la primera, pero cambiada.', 'Un final feliz que el protagonista se haya ganado, no uno que le llegue de regalo.', 'Un final abierto que invite a imaginar qué pasa después.', 'Que termine invitando al lector a comprobarlo en su casa.', 'Que termine con una pregunta para conversar: {{pregunta}}'],
+  },
+  extension: {
+    rotulo: 'Extensión',
+    para_que: 'Storybook hace libros de unas diez páginas, con una ilustración en cada una. Lo que se decide aquí es cuánto texto lleva cada página, y eso lo dice la edad.',
+    inicial: 'Diez páginas, una escena por página, con el texto justo para leerlo en voz alta sin cansar.',
+    ejemplo: 'Diez páginas, con dos o tres frases cortas en cada una; que cada página termine con ganas de pasar a la siguiente.',
+    frases: ['Diez páginas, con una o dos frases cortas en cada una.', 'Diez páginas, con dos o tres frases cortas en cada una.', 'Diez páginas, con un párrafo corto en cada una.', 'Que se lea en voz alta en unos cinco minutos.', 'Que cada página termine con ganas de pasar a la siguiente.', 'Que cada página se ate a la anterior con un «pero» o un «por eso», nunca con un «y entonces».', 'Una escena por página: el mundo del protagonista, el problema, dos intentos que fallan, lo que aprende y cómo lo resuelve.'],
+  },
+  ilustracion: {
+    rotulo: 'Ilustraciones',
+    para_que: 'Un solo estilo para todo el libro: dicho aquí, Storybook lo usa. Un dibujo o una foto de referencia no se pega aquí: se sube en Storybook, con el clip.',
+    ejemplo: 'Acuarela suave, con colores cálidos y mucha luz de mañana.',
+    frases: ['En acuarela, con colores suaves.', 'En plastilina, como una película de animación.', 'Como un cómic, con viñetas y globos de diálogo.', 'En pixel art, como un videojuego antiguo.', 'Como un libro para colorear, en blanco y negro.', 'Tejidas a ganchillo, como muñecos de lana.', 'Inspiradas en el dibujo que voy a subir.'],
+  },
 };
 
 /* Los bloques que hacen de una pieza un PROMPT. Si el lector reconoce
    uno de estos por su rótulo, no propone un bucle (§5 paso 6): «Repite
    esto para cada tema» dentro de una Tarea es una frase de la tarea. */
-const CSG_BLOQUES_PROMPT = ['rol', 'contexto', 'tarea', 'reglas', 'formato', 'ejemplos', 'comprobacion', 'tono', 'objetivo', 'estilo', 'audiencia', 'pregunta', 'fuentes', 'citas', 'voz', 'genero', 'tema'];
+const CSG_BLOQUES_PROMPT = ['rol', 'contexto', 'tarea', 'reglas', 'formato', 'ejemplos', 'comprobacion', 'tono', 'objetivo', 'estilo', 'audiencia', 'pregunta', 'fuentes', 'citas', 'voz', 'genero', 'tema',
+  'personaje', 'escenario', 'concepto', 'leccion', 'emociones', 'desenlace', 'extension', 'ilustracion'];
 
 /* ══════════════════════════════════════════════════════════════════
    LOS MOLDES (§3.1 a §3.4). Un molde es un formato con nombre: una
@@ -550,6 +610,10 @@ const CSG_BLOQUES_PROMPT = ['rol', 'contexto', 'tarea', 'reglas', 'formato', 'ej
      (CSG_TEXTOS).
    · `vozPrestada`: lo que la máquina devuelva va a La Voz Prestada, y
      Usar ofrece «📖 Guardar lo que devolvió».
+   · `maquina`: la máquina con que nace una pieza de este molde (el
+     Cuento que enseña nace para Storybook). Es la máquina de ESE molde y
+     no la costumbre del aparato: no se apunta como «la última»
+     (csgMaquinaDeMolde), y salir del molde la devuelve (§4).
    · `cuando`: la línea que se lee en la hoja «Molde ▾». Donde la
      especificación no trae una línea de «cuándo» (los grafos y tres de
      los bucles) se escribió con lo que dice el encabezado de su clase:
@@ -692,6 +756,45 @@ const CSG_MOLDES = {
       { id: 'genero',   ob: true },
       { id: 'tema',     ob: true },
       { id: 'etiqueta', ob: true },
+    ],
+  },
+
+  /* ⚠️ LOS CINCO OBLIGATORIOS SON LOS CINCO QUE EL AUTOR NOMBRÓ: el tema,
+     para quién (la edad), lo que se aprende, lo que debe sentir el lector
+     y la extensión. Los otros siete son el oficio de contar, plegados
+     para quien los quiera: sin ellos sale un cuento; con ellos, uno que se
+     recuerda. No fuerza ninguna forma: con Storybook sale en `seguida`
+     (la de la máquina) y la cabecera va delante; con Claude, el mismo
+     cuento sale en xml, porque también se le puede pedir como texto para
+     leerlo en voz alta. */
+  cuento: {
+    id: 'cuento', clase: 'prompt', nombre: 'Cuento que enseña', recomendado: false,
+    cuando: 'un cuento ilustrado de unas diez páginas para Gemini Storybook, que emocione y que explique un tema.',
+    maquina: 'storybook', cabecera: 'Crea un cuento ilustrado con estas indicaciones.',
+    bloques: [
+      { id: 'tema', ob: true, rotulo: 'Tema de la historia',
+        para_que: 'De qué trata el cuento y lo que tiene que pasar sí o sí. Si explica algo difícil, dilo aquí con una frase; los datos van en «Lo que el cuento explica».',
+        ejemplo: 'Un cuento que explique por qué llueve, contado por una gota de agua que tiene miedo de caer.',
+        frases: ['Un cuento que explique {{tema}} a través de una aventura.', 'Un cuento para acompañar a quien está viviendo {{situacion}}.', 'Basado en algo que pasó de verdad: {{lo_que_paso}}.', 'Tiene que pasar esto: {{hecho}}.', 'Un cuento para contar antes de dormir sobre {{tema}}.'] },
+      { id: 'audiencia', ob: true, rotulo: 'Para quién',
+        para_que: 'La edad manda en todo lo demás: cuántas palabras lleva cada página, qué palabras se entienden, cuánto miedo se aguanta y qué comparación sirve.',
+        ejemplo: 'Niños de 6 a 8 años que empiezan a leer solos; muchas veces se lo leerá un adulto en voz alta.',
+        frases: ['Niños de 3 a 5 años: se lo lee un adulto en voz alta.', 'Niños de 6 a 8 años que empiezan a leer solos.', 'Niños de 9 a 12 años que ya leen bien.', 'Adolescentes que creen que el tema no les interesa.', 'Adultos que nunca entendieron el tema.', 'Un niño de {{edad}} años que se llama {{nombre}}.'] },
+      { id: 'personaje',   ob: false },
+      { id: 'escenario',   ob: false },
+      { id: 'concepto',    ob: false },
+      { id: 'leccion',     ob: true },
+      { id: 'emociones',   ob: true },
+      { id: 'tono', ob: false, rotulo: 'Cómo se cuenta',
+        para_que: 'La voz del narrador y cómo suena leído en voz alta, que es como se lee un cuento (y como lo lee Storybook).',
+        ejemplo: 'Como lo contaría una abuela en el corredor: cálido, sin prisa, con una frase que se repite para que los más pequeños la digan con ella.',
+        frases: ['Cálido y sin prisa, como un cuento antes de dormir.', 'Con humor suave y una frase que se repite en varias páginas.', 'Con rima suave, sin forzarla.', 'Contado por el propio protagonista, en primera persona.', 'Si algo es triste, se dice con cuidado y sin mentir.'] },
+      { id: 'desenlace',   ob: false },
+      { id: 'extension',   ob: true },
+      { id: 'ilustracion', ob: false },
+      { id: 'reglas', ob: false,
+        ejemplo: 'Nada de sustos que no se resuelvan en la misma página.\nNo inventes datos; si simplificas, que siga siendo verdad.\nSin moraleja al final.',
+        frases: ['Nada de sustos que no se resuelvan en la misma página.', 'No inventes datos, fechas ni cifras: si simplificas, que siga siendo verdad.', 'Sin moraleja al final; que se entienda por lo que pasa.', 'Que sea el protagonista quien resuelva el problema; los adultos ayudan, pero no lo resuelven por él.', 'Sin marcas ni personajes de otros cuentos o películas.', 'No le mientas al lector para suavizar algo triste.', 'Si es una historia real, no inventes nada que se lea como si hubiera pasado.'] },
     ],
   },
 
@@ -929,7 +1032,7 @@ const CSG_MOLDES = {
    depende de cómo se escribió, y el día que alguien añada un molde al
    final del archivo saldría el último de su clase aunque fuera el bueno. */
 const CSG_MOLDES_ORDEN = {
-  prompt:    ['rapido', 'encargo', 'costar', 'ejemplos', 'razonado', 'fuentes', 'voz', 'libre'],
+  prompt:    ['rapido', 'encargo', 'costar', 'ejemplos', 'razonado', 'fuentes', 'voz', 'cuento', 'libre'],
   habilidad: ['skill', 'sistema', 'receta'],
   grafo:     ['cadena', 'coordinador'],
   bucle:     ['hasta', 'critica', 'lotes', 'careo'],
@@ -956,8 +1059,16 @@ const CSG_EQUIVALE = {
   siempre:      ['reglas'],
   nunca:        ['reglas'],
   limites:      ['reglas'],
-  objetivo:     ['meta', 'tarea'],
+  objetivo:     ['meta', 'tarea', 'leccion'],
   meta:         ['objetivo'],
+  /* Lo que el cuento enseña es lo que la respuesta tiene que LOGRAR, y
+     el «Género y largo» de Voz prestada es, de un cuento, su extensión.
+     Nada más: el protagonista no es el Rol (quién es la máquina) ni el
+     concepto es la Tarea, y colocarlos ahí sería inventar; se quedan
+     como libres, a la vista. */
+  leccion:      ['objetivo', 'meta'],
+  extension:    ['genero', 'limites'],
+  genero:       ['extension'],
   responde:     ['formato'],
   salida:       ['formato', 'fin'],
   fin:          ['salida'],
@@ -1065,6 +1176,27 @@ const CSG_SINONIMOS = {
      Sin ella, ese bloque entraba por «Pegar» como un bloque libre y el
      prompt se proponía como Libre en vez de Rápido o Encargo. */
   'instructions': 'tarea',
+
+  /* Y los del CUENTO QUE ENSEÑA (§3.1), con los rótulos con que se arma
+     —«Para quién:», «Lo que debe sentir el lector:»— para que lo que salió
+     de aquí para Storybook vuelva a entrar a su sitio, y los que se
+     escriben de verdad en un prompt de cuento, en español y en inglés
+     («Trama:», «Moraleja:», «Art style:», «Target age:»). Los de cuatro
+     palabras o más solo ascienden si casan enteros (CSG_LEC_ROTULOS_LARGOS).
+     ⚠️ «final» NO: es el «Fin» de un grafo o de un bucle dicho de otra
+     manera, y ascenderlo partiría esas consignas en un bloque que no es
+     suyo. Por lo mismo el id es `desenlace`. */
+  'tema de la historia': 'tema', 'de que trata': 'tema', 'trama': 'tema', 'plot': 'tema', 'story idea': 'tema',
+  'para quien': 'audiencia', 'edad': 'audiencia', 'edad del lector': 'audiencia', 'publico objetivo': 'audiencia', 'target age': 'audiencia', 'target audience': 'audiencia',
+  'protagonista': 'personaje', 'protagonistas': 'personaje', 'personaje': 'personaje', 'personajes': 'personaje', 'protagonist': 'personaje', 'character': 'personaje', 'characters': 'personaje', 'main character': 'personaje',
+  'escenario': 'escenario', 'donde pasa': 'escenario', 'ambientacion': 'escenario', 'setting': 'escenario',
+  'concepto': 'concepto', 'lo que el cuento explica': 'concepto', 'que explica': 'concepto', 'concept': 'concepto',
+  'leccion': 'leccion', 'lo que se aprende': 'leccion', 'aprendizaje': 'leccion', 'moraleja': 'leccion', 'ensenanza': 'leccion', 'lesson': 'leccion', 'moral': 'leccion',
+  'emociones': 'emociones', 'lo que debe sentir el lector': 'emociones', 'lo que debe sentir': 'emociones', 'sensaciones': 'emociones', 'sentimientos': 'emociones', 'emotions': 'emociones', 'feelings': 'emociones',
+  'como se cuenta': 'tono', 'narrador': 'tono', 'voz narrativa': 'tono', 'narrator': 'tono',
+  'desenlace': 'desenlace', 'como termina': 'desenlace', 'final del cuento': 'desenlace', 'ending': 'desenlace',
+  'extension': 'extension', 'paginas': 'extension', 'numero de paginas': 'extension',
+  'ilustracion': 'ilustracion', 'ilustraciones': 'ilustracion', 'estilo de ilustracion': 'ilustracion', 'estilo de las ilustraciones': 'ilustracion', 'estilo visual': 'ilustracion', 'estilo artistico': 'ilustracion', 'dibujos': 'ilustracion', 'art style': 'ilustracion', 'illustrations': 'ilustracion', 'illustration style': 'ilustracion',
 };
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1107,9 +1239,9 @@ const CSG_PATRONES_BUCLE = {
 /* ══════════════════════════════════════════════════════════════════
    LAS MÁQUINAS (§4). Una lista en el JS y nunca en la base: añadir una
    es una línea aquí con `abrir` vacío, no una migración pegada desde
-   una tableta. Son las cuatro de VOZ_MAQUINAS más NotebookLM y «Otra»;
-   Copilot y Claude Code se quedan fuera porque nadie de la casa los
-   nombró (el SKILL.md sale por Claude).
+   una tableta. Son las cuatro de VOZ_MAQUINAS más NotebookLM, Storybook
+   y «Otra»; Copilot y Claude Code se quedan fuera porque nadie de la casa
+   los nombró (el SKILL.md sale por Claude).
 
    · `forma`: cómo se arma cuando el molde no la fuerza. xml en Claude
      porque es lo que mejor sigue y separa instrucción de material; md
@@ -1125,6 +1257,14 @@ const CSG_PATRONES_BUCLE = {
      no dice adónde ir deja a la persona con el texto en el portapapeles
      y sin saber qué hacer con él.
    · `nota`: la línea que se lee bajo el chip de la máquina.
+   ⚠️ STORYBOOK ES LA MÁQUINA DE UN MOLDE (el Cuento que enseña la trae
+   declarada): es el Gem de Gemini que hace un libro ilustrado de unas
+   diez páginas, y no hace otra cosa. Por eso no se apunta como «la
+   última» (csgMaquinaDeMolde): si se apuntara, el Rápido siguiente
+   nacería para Storybook. `seguida` porque un párrafo por bloque es lo
+   que mejor se lee en su recuadro, y la cabecera del molde va delante.
+   Su dirección es la del Gem, no la de Gemini: abrir Gemini a secas
+   obligaría a ir a buscar el Gem, y ese paso es el que se falla.
    ══════════════════════════════════════════════════════════════════ */
 const CSG_MAQUINAS = [
   { id: 'claude', nombre: 'Claude', forma: 'xml',
@@ -1136,6 +1276,9 @@ const CSG_MAQUINAS = [
   { id: 'gemini', nombre: 'Gemini', forma: 'md',
     abrir: 'https://gemini.google.com/app', param: '', donde: 'gemini.google.com',
     nota: 'Se abre con el texto copiado: pégalo al llegar. El sistema va a un Gem.' },
+  { id: 'storybook', nombre: 'Storybook', forma: 'seguida',
+    abrir: 'https://gemini.google.com/gem/storybook', param: '', donde: 'gemini.google.com/gem/storybook',
+    nota: 'El Gem de Gemini que hace el libro: unas diez páginas ilustradas y una voz que lo lee. Se abre con el texto copiado: pégalo al llegar. Un dibujo o una foto de referencia se sube allí, con el clip; y para cambiar algo, se le pide en el mismo chat.' },
   { id: 'perplexity', nombre: 'Perplexity', forma: 'md',
     abrir: 'https://www.perplexity.ai/search', param: 'q', donde: 'perplexity.ai',
     nota: 'Pídele las direcciones; las trae. En Investigación, Fuentes y Citas van primero.' },
@@ -1405,6 +1548,17 @@ function csgMaquina(id) {
   for (let i = 0; i < CSG_MAQUINAS.length; i++) if (CSG_MAQUINAS[i].id === id) return CSG_MAQUINAS[i];
   for (let i = 0; i < CSG_MAQUINAS.length; i++) if (CSG_MAQUINAS[i].id === 'otra') return CSG_MAQUINAS[i];
   return { id: 'otra', nombre: 'Otra', forma: 'md', abrir: '', param: '', donde: '', nota: '' };
+}
+
+/* ¿Es la máquina de UN molde? (§4) Storybook lo es: el Cuento que enseña
+   la trae declarada, y no hace otra cosa que libros ilustrados. Una
+   máquina así no se apunta como «la última» del aparato ni se la lleva
+   «Duplicar» a otro molde: si no, el Rápido siguiente nacería para
+   Storybook. Sale de los moldes, no de una lista escrita aquí. */
+function csgMaquinaDeMolde(id) {
+  const v = String(id == null ? '' : id);
+  if (!v) return false;
+  return Object.keys(CSG_MOLDES).some(k => CSG_MOLDES[k].maquina === v);
 }
 
 /* Un molde por su id, preguntando por la llave PROPIA del objeto:
@@ -3828,6 +3982,18 @@ function csgLecClaseVotada(ids) {
    si tuviera los que hacen falta (quien llama sin texto está preguntando
    por los ids, no por lo escrito).
    ══════════════════════════════════════════════════════════════════ */
+
+/* Los rótulos del Cuento que enseña que solo escribe un cuento, y los
+   otros dos, que salen también en un encargo cualquiera («Concepto:» en
+   un glosario, «Extensión: 800 palabras» en un ensayo). Hacen falta DOS
+   rótulos de cuento y uno de ellos de los primeros: con uno solo, «Tema:
+   las fracciones. Aprendizaje: que las sumen» —un plan de clase— se
+   propondría como cuento. Es una propuesta con chip, y aun así se
+   propone con cuidado: un molde equivocado deja los bloques del bueno
+   como libres, y eso hay que colocarlo a mano. */
+const CSG_LEC_CUENTO_FUERTES = ['personaje', 'escenario', 'leccion', 'emociones', 'desenlace', 'ilustracion'];
+const CSG_LEC_CUENTO = CSG_LEC_CUENTO_FUERTES.concat(['concepto', 'extension']);
+
 function csgProponerMolde(clase, ids, bloques) {
   const tiene = new Set(ids || []);
   const hay = (...xs) => xs.some(x => tiene.has(x));
@@ -3846,7 +4012,14 @@ function csgProponerMolde(clase, ids, bloques) {
     if (hay('postura_a', 'postura_b', 'juez')) return 'careo';
     return 'hasta';
   }
-  /* Prompt. */
+  /* Prompt. El cuento va primero: sus rótulos no son de ningún otro molde,
+     y un cuento que dice también «Para quién» y «Objetivo» no es un
+     CO-STAR. Pero si trae una voz que imitar o la etiqueta de la casa, es
+     un Voz prestada: lo que devuelva va a La Voz Prestada con su etiqueta
+     (regla 14), y eso no lo hace el Cuento que enseña. */
+  const fuertes = CSG_LEC_CUENTO_FUERTES.filter(x => tiene.has(x)).length;
+  const deCuento = CSG_LEC_CUENTO.filter(x => tiene.has(x)).length;
+  if (!hay('voz', 'etiqueta') && fuertes >= 1 && deCuento >= 2) return 'cuento';
   let paresBastan = true;
   if (Array.isArray(bloques)) {
     const e = bloques.filter(b => b && b.id === 'ejemplos').map(b => b.t || '').join('\n');
@@ -4042,7 +4215,58 @@ function csgLecFrasesDe(id) {
    y un bloque nuevo del vocabulario no entra aquí hasta que alguien
    decida si una frase de chip sola es ahí un hueco o una respuesta. */
 const CSG_REV_PROPIOS = ['rol', 'contexto', 'tarea', 'ejemplos', 'pregunta', 'voz', 'tema', 'texto',
-  'identidad', 'mision', 'meta', 'nodos', 'coordinador', 'paso', 'borrador', 'postura_a', 'postura_b'];
+  'identidad', 'mision', 'meta', 'nodos', 'coordinador', 'paso', 'borrador', 'postura_a', 'postura_b',
+  /* Del Cuento que enseña, estos dos: un protagonista hecho solo de «Que
+     se parezca a la foto…» no dice quién es ni qué quiere, y un «Lo que el
+     cuento explica» hecho de «Un paso del concepto en cada página» dice
+     CÓMO explicar y no QUÉ. La lección, las emociones, la voz o el final
+     de un chip sí son una respuesta: «Que pedir ayuda no es rendirse.» es
+     una lección entera. */
+  'personaje', 'concepto'];
+
+/* ── Lo que mira el repaso del Cuento que enseña (§3.1) ────────────────
+   ⚠️ Corre en cada tecla, así que nada de aquí vuelve atrás (regla 28):
+   se parte en palabras y se mira cada una, sin expresiones que casen
+   rachas. */
+const CSG_REV_CONCEPTO_MAX = 120;
+const CSG_STORYBOOK_PAGINAS = 12;
+const CSG_REV_NUMEROS = { una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9,
+  diez: 10, once: 11, doce: 12, trece: 13, catorce: 14, quince: 15, dieciseis: 16, diecisiete: 17, dieciocho: 18,
+  diecinueve: 19, veinte: 20, veinticinco: 25, treinta: 30, cuarenta: 40, cincuenta: 50 };
+/* Las palabras que dicen una edad, sin tildes: «niños», «adultos»,
+   «primaria», «años». Con una cifra basta también («de 6 a 8»). */
+const CSG_REV_EDADES = new Set(['nino', 'ninos', 'nina', 'ninas', 'ninez', 'infantil', 'infantiles', 'bebe', 'bebes',
+  'adolescente', 'adolescentes', 'joven', 'jovenes', 'adulto', 'adultos', 'adulta', 'adultas', 'mayores', 'abuelo',
+  'abuelos', 'abuela', 'abuelas', 'primaria', 'secundaria', 'preescolar', 'prekinder', 'kinder', 'colegio',
+  'bachillerato', 'universitario', 'universitarios', 'universitaria', 'universitarias', 'grado', 'anos', 'meses',
+  'kids', 'children', 'teen', 'teens', 'teenagers', 'adult', 'adults', 'years']);
+
+function csgRevPalabrasDe(t) {
+  return csgSinTildes(String(t == null ? '' : t)).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+}
+/* ¿«Para quién» dice una edad? */
+function csgRevDiceEdad(t) {
+  return csgRevPalabrasDe(t).some(w => /^\d/.test(w) || CSG_REV_EDADES.has(w));
+}
+/* ¿El tema dice que el cuento explica o enseña algo? «Un cuento que
+   explique por qué llueve», «para enseñar las fracciones». */
+function csgRevExplica(t) {
+  const ws = csgRevPalabrasDe(t);
+  return ws.some((w, i) => /^(?:explic|ensen|aprend|entiend|entend)/.test(w) ||
+    (w === 'por' && ws[i + 1] === 'que') || (w === 'como' && /^funcion/.test(ws[i + 1] || '')));
+}
+/* Cuántas páginas pide la Extensión: la cifra o el número escrito que va
+   delante de «páginas». 0 si no lo dice. */
+function csgRevPaginas(t) {
+  const ws = csgRevPalabrasDe(t);
+  for (let i = 1; i < ws.length; i++) {
+    if (ws[i] !== 'paginas' && ws[i] !== 'pages') continue;
+    const w = ws[i - 1];
+    if (/^\d+$/.test(w)) return Number(w);
+    if (Object.prototype.hasOwnProperty.call(CSG_REV_NUMEROS, w)) return CSG_REV_NUMEROS[w];
+  }
+  return 0;
+}
 
 function csgRevisar(pieza, maquinaId) {
   const p = pieza || {};
@@ -4338,6 +4562,32 @@ function csgRevisar(pieza, maquinaId) {
       const m = String(b.t || '').match(/<\/?[A-Za-z_][\w-]*>/);
       if (m) mete(avisa, { bloque: b.id, msg: 'NotebookLM enseña el texto tal cual: «' + m[0] + '», en «' + rotulo(b.id) + '», le llegará como texto. Quita las etiquetas.', arreglo: { tipo: 'ir', bloque: b.id } });
     });
+  }
+
+  /* El Cuento que enseña (§3.1): cuatro cosas que se escapan escribiendo
+     un cuento, y ninguna PARA —un cuento sin protagonista se puede pedir,
+     y la máquina lo inventa—, pero cada una se nota en el libro. Solo en
+     su molde: en otro, esos bloques son libres y nadie los pidió. */
+  if (moldeId === 'cuento') {
+    if (!textoDe('personaje').trim()) {
+      mete(avisa, { bloque: 'personaje', msg: 'Sin «' + rotulo('personaje') + '», la máquina lo inventa. Dile quién es, qué quiere y qué se lo impide: sin un deseo y algo que lo estorbe no hay cuento, hay una lección con dibujos.', arreglo: { tipo: 'ir', bloque: 'personaje' } });
+    }
+    const aud = textoDe('audiencia');
+    if (aud.trim() && !csgRevDiceEdad(aud)) {
+      mete(avisa, { bloque: 'audiencia', msg: '«' + rotulo('audiencia') + '» no dice la edad, y la edad manda en todo: cuántas palabras lleva cada página, qué palabras se entienden y cuánto miedo se aguanta.', arreglo: { tipo: 'ir', bloque: 'audiencia' } });
+    }
+    const concepto = textoDe('concepto');
+    if (!concepto.trim() && csgRevExplica(textoDe('tema'))) {
+      mete(avisa, { bloque: 'concepto', msg: 'El tema dice que el cuento explica algo, y «' + rotulo('concepto') + '» está vacío: sin los datos exactos, la máquina los inventa o los simplifica hasta que dejan de ser verdad.', arreglo: { tipo: 'ir', bloque: 'concepto' } });
+    }
+    const nc = csgPalabras(concepto);
+    if (nc > CSG_REV_CONCEPTO_MAX) {
+      mete(avisa, { bloque: 'concepto', msg: '«' + rotulo('concepto') + '» tiene ' + nc + ' palabras: es mucho para un cuento breve, y lo que no cabe sale explicado a medias. Deja lo esencial; si todo lo es, quizá son dos cuentos.', arreglo: { tipo: 'ir', bloque: 'concepto' } });
+    }
+    const pag = csgRevPaginas(textoDe('extension'));
+    if (maq.id === 'storybook' && pag > CSG_STORYBOOK_PAGINAS) {
+      mete(avisa, { bloque: 'extension', msg: 'Storybook hace libros de unas diez páginas: con ' + pag + ' pedidas, lo más probable es que haga diez igual y el cuento se quede a medias. Si es más largo, pártelo en dos cuentos.', arreglo: { tipo: 'ir', bloque: 'extension' } });
+    }
   }
 
   /* Mismo título que otra pieza viva: casi siempre es la misma pegada dos
@@ -5907,20 +6157,24 @@ function csgAnqCopiarViejo(t) {
 /* La última máquina es una costumbre de ESTE aparato (CSG_CLAVES.maquina)
    y no viaja: en la tableta del autor es Claude y en el teléfono de su
    hija puede ser Gemini. Si lo guardado ya no es una máquina conocida, se
-   vuelve a Claude en vez de proponer una que no existe. */
+   vuelve a Claude en vez de proponer una que no existe.
+   ⚠️ Y la máquina de UN molde (Storybook) no es una costumbre: es la de
+   su molde. No se apunta, y si una versión vieja la dejó apuntada, no se
+   devuelve: el Rápido siguiente nacería para una máquina que solo hace
+   libros ilustrados. */
 function csgMaquinaUltima() {
   try {
     let v = localStorage.getItem(CSG_CLAVES.maquina);
     if (v) {
       v = String(v).replace(/^"+|"+$/g, '');
-      for (let i = 0; i < CSG_MAQUINAS.length; i++) if (CSG_MAQUINAS[i].id === v) return v;
+      if (!csgMaquinaDeMolde(v)) for (let i = 0; i < CSG_MAQUINAS.length; i++) if (CSG_MAQUINAS[i].id === v) return v;
     }
   } catch (e) {}
   return 'claude';
 }
 function csgMaquinaApunta(id) {
   const v = String(id == null ? '' : id);
-  if (!CSG_MAQUINAS.some(m => m.id === v)) return;
+  if (!CSG_MAQUINAS.some(m => m.id === v) || csgMaquinaDeMolde(v)) return;
   try { localStorage.setItem(CSG_CLAVES.maquina, v); } catch (e) {}
 }
 
@@ -7439,7 +7693,7 @@ function csgMenuCopiar(p) {
   Promise.resolve(r).then(() => csgPintarAnaquel(), () => csgPintarAnaquel());
 }
 
-/* Los diecisiete moldes, por clase y con su «cuándo»: el nombre solo no
+/* Los dieciocho moldes, por clase y con su «cuándo»: el nombre solo no
    dice cuál elegir. Abre el compositor con una pieza NUEVA sin guardar
    (§6.9); la original no se toca. */
 function csgMenuDuplicar(p) {
@@ -8618,16 +8872,25 @@ const CSG_ED_TITULO_DE = ['tarea', 'pregunta', 'nombre', 'meta', 'paso', 'borrad
    escribir el almacén en cada tecla de una ráfaga. */
 const CSG_ED_RESPIRO_BORRADOR = 350;
 
-/* «❓ ¿Cuál elijo?» (§5, paso 2): tres preguntas de sí o no, en orden;
+/* «❓ ¿Cuál elijo?» (§5, paso 2): cuatro preguntas de sí o no, en orden;
    la primera que se contesta con un sí decide, y si ninguna, Encargo
-   completo. En ese orden porque va de lo más concreto (tener ejemplos)
-   a lo más general: quien tiene ejemplos casi siempre puede decir
-   también que «se va a reusar», y entonces saldría el molde peor. */
+   completo. En ese orden porque va de lo más concreto (un cuento, tener
+   ejemplos) a lo más general: quien tiene ejemplos casi siempre puede
+   decir también que «se va a reusar», y entonces saldría el molde peor.
+   El renglón dice cuántas son sacándolo de aquí (csgEdCualCuantas): con
+   la cuenta escrita a mano, añadir la del cuento lo dejó diciendo «tres». */
 const CSG_ED_CUAL = [
+  { preg: '¿Es un cuento, para emocionar o para enseñar algo?', molde: 'cuento' },
   { preg: '¿Tienes ejemplos de cómo quieres la salida?', molde: 'ejemplos' },
   { preg: '¿Tiene que calcular algo o decidir entre opciones?', molde: 'razonado' },
   { preg: '¿Se va a quedar puesta en un Proyecto, un Gem o un GPT?', molde: 'sistema' },
 ];
+
+function csgEdCualCuantas() {
+  const n = CSG_ED_CUAL.length;
+  const dicho = ['ninguna', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho'][n] || String(n);
+  return dicho + (n === 1 ? ' pregunta' : ' preguntas') + ' de sí o no';
+}
 
 /* ══════════════════════════════════════════════════════════════════
    PASO 1 · «¿QUÉ LE VAS A PEDIR?»
@@ -8692,6 +8955,18 @@ function csgNuevaPintar(cuerpo) {
     clases.appendChild(bt);
   });
   cuerpo.appendChild(clases);
+
+  /* 🧸 El cuento, con renglón propio: es un molde de Prompt, pero quien lo
+     busca no piensa en «un prompt», piensa en un cuento, y escondido en la
+     hoja de moldes no lo encontraría nadie. Abre DIRECTO el Cuento que
+     enseña con Storybook puesta, y con el mismo cuidado que las baldosas:
+     nada asíncrono entre el toque y el foco. */
+  const cuento = csgVerFila('🧸', 'Un cuento para Gemini Storybook', null, null, () => {
+    csgVerCerrar();
+    csgAbrirCompositor(null, { molde: 'cuento' });
+  }, 'diez páginas ilustradas que emocionan y enseñan');
+  cuento.classList.add('csg-ver-fila-tenida', 'csg-ver-fila-cuento');
+  cuerpo.appendChild(cuento);
 }
 
 /* Un botón que pide dos toques en el mismo sitio: el primero lo vuelve
@@ -8740,7 +9015,9 @@ function csgEdMolde(p) { return csgEdMoldeDe(p && p.molde); }
 function csgNuevaPieza(clase, moldeId) {
   const c = csgClaseDe(clase || 'prompt');
   const molde = csgEdMoldeDe(moldeId) || csgEdMoldeDe(c && c.molde) || CSG_MOLDES.rapido;
-  const maq = typeof csgMaquinaUltima === 'function' ? csgMaquinaUltima() : 'claude';
+  /* La del molde si trae una (el Cuento que enseña nace para Storybook);
+     si no, la última de este aparato. */
+  const maq = molde.maquina || (typeof csgMaquinaUltima === 'function' ? csgMaquinaUltima() : 'claude');
   return {
     id: csgNuevoId(),
     clase: molde.clase,
@@ -8846,7 +9123,12 @@ function csgDuplicarEnMolde(pieza, moldeId) {
     titulo = csgCorta(csgEdTituloSinMolde(titulo) + ' (' + destino.nombre + ')', CSG_TOPES.titulo);
   }
   nueva.titulo = titulo;
-  if (src.maquina) nueva.maquina = String(src.maquina);
+  /* La máquina de UN molde (Storybook, del Cuento que enseña) no viaja a
+     otro: un Encargo para Storybook no lo pide nadie. El destino que trae
+     la suya la pone; si no, la de la pieza de origen, y si esa era la de
+     otro molde, se queda la que puso csgNuevaPieza (la última del aparato). */
+  if (destino.maquina) nueva.maquina = destino.maquina;
+  else if (src.maquina && !csgMaquinaDeMolde(src.maquina)) nueva.maquina = String(src.maquina);
   nueva.estantes = Array.isArray(src.estantes) ? src.estantes.filter(x => typeof x === 'string') : [];
   nueva.material = String(src.material || '');
   nueva.cuaderno = String(src.cuaderno || '');
@@ -9320,14 +9602,17 @@ function csgBorradorSeguir() {
 
 /* Abre el compositor con una pieza de la lista (corregir), una nueva sin
    guardar (de csgNuevaPieza, de lo pegado o de un duplicado) o null con
-   opts.clase (el molde recomendado de esa clase). opts: { clase, avisos
-   (del lector), foco (id de bloque) }. Devuelve la copia de trabajo. */
+   opts.clase (el molde recomendado de esa clase) u opts.molde (ese molde:
+   «🧸 Un cuento para Gemini Storybook» abre el Cuento que enseña). opts:
+   { clase, molde, avisos (del lector), foco (id de bloque) }. Devuelve la
+   copia de trabajo. */
 function csgAbrirCompositor(pieza, opts) {
   const op = (opts && typeof opts === 'object') ? opts : {};
   let entrada = (pieza && typeof pieza === 'object') ? pieza : null;
   if (!entrada) {
-    const c = csgClaseDe(op.clase || 'prompt');
-    entrada = csgNuevaPieza(c.id, c.molde);
+    const pedido = op.molde ? csgEdMoldeDe(op.molde) : null;
+    const c = csgClaseDe((pedido && pedido.clase) || op.clase || 'prompt');
+    entrada = csgNuevaPieza(c.id, pedido ? pedido.id : c.molde);
   }
 
   /* La MISMA pieza, abierta y con cambios sin guardar (se salió por la
@@ -10261,13 +10546,13 @@ function csgEdPintarHojaMolde(cuerpo) {
   }
 
   /* «❓ ¿Cuál elijo?» solo donde sus respuestas viven (Prompt y
-     Habilidad): en un grafo o un bucle, las tres preguntas mandarían a
-     otra clase de consigna por una razón que no tiene que ver. */
+     Habilidad): en un grafo o un bucle, las preguntas mandarían a otra
+     clase de consigna por una razón que no tiene que ver. */
   if (clase !== 'prompt' && clase !== 'habilidad') return;
   cuerpo.appendChild(csgVerFila('❓', '¿Cuál elijo?', null, !!_csgEdCual, () => {
     _csgEdCual = _csgEdCual ? null : { paso: 0, dichas: [], resultado: '' };
     csgVerPintar();
-  }, 'tres preguntas de sí o no'));
+  }, csgEdCualCuantas()));
   if (!_csgEdCual) return;
 
   const caja = csgEl('div', 'csg-cual');
@@ -10346,12 +10631,21 @@ function csgEdCambiarMolde(id) {
     .concat(p.bloques.filter(b => ids.indexOf(b.id) < 0));
   p.molde = nuevo.id;
   p.clase = nuevo.clase;
+  /* La máquina de UN molde (§4): cambiar AL Cuento que enseña pone
+     Storybook, y salir de él con Storybook puesto devuelve la última de
+     este aparato, que Storybook nunca es. Y se dice en el mismo aviso:
+     una máquina que cambia sola y callada es un prompt que sale con otra
+     forma sin que nadie sepa por qué. */
+  const maqAntes = String(p.maquina || '');
+  if (nuevo.maquina) p.maquina = nuevo.maquina;
+  else if (csgMaquinaDeMolde(maqAntes)) p.maquina = csgMaquinaUltima();
+  const maqDicha = String(p.maquina || '') !== maqAntes ? ' · máquina: ' + csgMaquina(p.maquina).nombre : '';
   _csgEdTab = '';
   csgEdProponerNombre();
   if (!_csgEdAuto.tituloMano) csgEdProponerTitulo();
   csgEdPintar();
   csgEdTocado();
-  csgAviso('Molde: ' + nuevo.nombre + (libres.length
+  csgAviso('Molde: ' + nuevo.nombre + maqDicha + (libres.length
     ? ' · quedan como bloques libres, al final: ' + libres.map(b => b.rotulo || b.id).join(', ')
     : ''));
 }
@@ -10498,7 +10792,7 @@ function csgEdPintarPrevia(root) {
   const fila = csgEl('div', 'csg-prev-maquinas csg-desliza');
   CSG_MAQUINAS.forEach(m => {
     const on = m.id === maq.id;
-    const ch = csgEl('button', 'csg-chip' + (on ? ' on' : ''), m.nombre);
+    const ch = csgEl('button', 'csg-chip csg-chip-maq' + (on ? ' on' : ''), m.nombre);
     ch.type = 'button';
     ch.setAttribute('aria-pressed', on ? 'true' : 'false');
     ch.addEventListener('click', () => csgEdPonerMaquina(m.id));
@@ -10562,6 +10856,26 @@ function csgEdPintarPrevia(root) {
   try { rep = csgRevisar(p, maq.id); } catch (e) { rep = null; }
   if (rep) caja.appendChild(csgEdRepaso(rep, maq));
   root.appendChild(caja);
+  csgChipALaVista(fila);
+}
+
+/* ⚠️ EL CHIP DE LA MÁQUINA PUESTA, A LA VISTA. La fila de máquinas se
+   desliza, y a 390 px solo caben tres: Storybook, la cuarta, salía
+   cortada por el borde, así que un cuento que iba para Storybook no lo
+   enseñaba en la pantalla donde se elige a quién va. Se mueve la FILA
+   (scrollLeft) y no la página —scrollIntoView arrastraría también el
+   desplazamiento vertical—, contando el degradado del borde, que se come
+   los últimos 22 px. Y si el chip ya se ve entero no se toca nada: una
+   fila que se mueve sola bajo el dedo hace tocar el chip de al lado. */
+function csgChipALaVista(fila) {
+  if (!fila) return;
+  const ch = fila.querySelector('.csg-chip-maq.on');
+  if (!ch) return;
+  const rf = fila.getBoundingClientRect(), rc = ch.getBoundingClientRect();
+  if (!rf.width || !rc.width) return;
+  const borde = 30;
+  if (rc.left < rf.left) fila.scrollLeft -= rf.left - rc.left + 8;
+  else if (rc.right > rf.right - borde) fila.scrollLeft += rc.right - (rf.right - borde);
 }
 
 /* El texto armado en un <pre>, con cada {{hueco}} sin rellenar en su
@@ -11445,7 +11759,7 @@ function csgUsarPintarCuerpo(cuerpo, pie) {
      de la máquina (regla 2), y lo que se ve cambia con ella. */
   el.maquinas = csgEl('div', 'csg-usar-maquinas csg-desliza');
   el.chips = CSG_MAQUINAS.map(m => {
-    const b = csgEl('button', 'csg-chip', m.nombre);
+    const b = csgEl('button', 'csg-chip csg-chip-maq', m.nombre);
     b.type = 'button';
     b.addEventListener('click', () => csgUsarPonMaquina(m.id));
     el.maquinas.appendChild(b);
@@ -11669,6 +11983,7 @@ function csgUsarRefrescar() {
     c.el.classList.toggle('on', on);
     c.el.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
+  csgChipALaVista(el.maquinas);
   let a = null;
   try { a = csgArmar(p, maq.id, _csgUsarValores, { material: _csgUsarMaterial }); } catch (e) { a = null; }
   if (!a) a = { forma: maq.forma, principal: '', sistema: '', encargo: '', skill: '', mermaid: '', plan: '' };
@@ -12409,7 +12724,7 @@ function csgPegPintar() {
   res.appendChild(csgEl('p', 'csg-nota', vars.length ? 'Variables: ' + vars.map(v => '{{' + v + '}}').join(' · ') : 'Sin variables.'));
 }
 
-/* «cambiar»: los diecisiete moldes, por clase y con su «cuándo», en la
+/* «cambiar»: los dieciocho moldes, por clase y con su «cuándo», en la
    hoja vertical (que va encima de esta). Se reparte SIEMPRE desde lo que
    leyó el lector, no desde el último cambio: ir y volver entre dos moldes
    no puede ir acumulando bloques «traídos». */

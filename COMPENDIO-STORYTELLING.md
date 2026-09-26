@@ -142,6 +142,38 @@ mismo pedido.
 
 ---
 
+## 2-ter. El cuento que enseña: la consigna para Gemini Storybook
+
+**Añadido el 26 de septiembre de 2026**, a petición del autor: prompts
+«específicamente para Gemini Storybook», con «todos los elementos de
+Storytelling» —el tema, la extensión, las sensaciones que se buscan, la edad
+del público y la lección—, para «historias verdaderas que conmuevan» y que
+expliquen en un cuento breve un contenido complejo.
+
+Vive en 📜 **La Consigna** (`js/tools/consigna.js`), en el Acceso Rápido: es
+el molde **Cuento que enseña** y la máquina **Storybook**, y sus reglas de
+construcción están en `CLAUDE.md` (la regla 36 de la normativa de La
+Consigna). Lo que hace falta saber aquí es que **sus frases hechas salen de
+esta materia**, y por eso esta sección existe: si una etapa del Hilo que Tira
+se corrige, el chip que la resume se corrige con ella.
+
+| Lo que enseña la materia | Dónde está en el cuento |
+|---|---|
+| La ficha de hilo: quién, qué quiere, qué se lo impide (etapas 1 y 2) | El «para qué» de **Protagonista**, y el chip «Quiere {{deseo}}, pero lo que de verdad necesita es {{necesidad}}.» (querer contra necesitar) |
+| La prueba del conector: «pero» y «por eso», nunca «y entonces» (etapa 1) | Un chip de **Extensión**: cada página se ata a la anterior |
+| Emoción sin chantaje (etapa 8) | Un chip de **Lo que debe sentir el lector**: la emoción sale de lo que pasa, no de adjetivos que la pidan |
+| La historia de verdad y su ética (etapa 10) | Un chip de **Reglas**: si es una historia real, no se inventa nada que se lea como si hubiera pasado |
+| La regla de oro: si no se pudo comprobar, no entra (§1) | El «para qué» de **Lo que el cuento explica**: si se simplifica, que siga siendo verdad |
+
+Y una advertencia que es de la materia y no de la herramienta: **un cuento
+hace creer lo que cuenta, sea verdad o no** —es lo que la etapa 8 enseña con
+el transporte narrativo y su freno ético—, así que lo verdadero lo tiene que
+poner quien escribe el encargo. Por eso el repaso de La Consigna avisa
+cuando el tema dice que el cuento explica algo y el bloque de lo que explica
+está vacío: sin los datos exactos, la máquina los inventa.
+
+---
+
 ## 3. El mapa: las ocho rutas de un vistazo
 
 | # | Ruta | Dominio | Etapas | Estado |

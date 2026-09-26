@@ -20,7 +20,8 @@ Lo largo está en otros documentos y aquí solo se apunta dónde:
   Sus reglas, con lo que se aprendió al construirla, están aquí abajo, en
   «Normativa: las consignas a las máquinas se escriben en La Consigna». Su
   SQL **ya está corrido** (23 de septiembre de 2026) y está **publicada**
-  desde ese día; ☑ Elegir entró la misma tarde.
+  desde ese día; ☑ Elegir entró la misma tarde, y el 🧸 cuento para Gemini
+  Storybook, el 26.
 
 ## Normativa: el SQL de Supabase se pega en el chat, SIEMPRE
 
@@ -1779,7 +1780,7 @@ acceso rápido. Siempre visualmente atractivo, botones modernos etc.»
 Vive en `js/tools/consigna.js` y `css/consigna.css`, con su tabla en
 `supabase/sql/consigna.sql` y la comprobación aparte en
 `supabase/sql/consigna_comprueba.sql`. El JavaScript va en dos partes:
-primero el **núcleo** —el vocabulario de bloques, los diecisiete moldes, el
+primero el **núcleo** —el vocabulario de bloques, los dieciocho moldes, el
 armado, el lector de lo pegado, el repaso, la poda, la fusión y la nube—, que
 no toca la pantalla; y detrás del cartel «PANTALLA», el anaquel, el
 compositor y las hojas. En `index.html` son dos vistas —`#view-consigna`, el
@@ -1827,12 +1828,12 @@ guiados; la forma la pone la máquina elegida en el momento de usarla; se
 guarda con su bitácora y sus versiones; y volver a usarla son dos toques
 (▶ · 📋 Copiar).
 
-**Treinta y cinco reglas, y ninguna es de adorno.** Las veintidós primeras
+**Treinta y seis reglas, y ninguna es de adorno.** Las veintidós primeras
 son las del §10 del plan, con lo que se aprendió al construirlas; las doce
 siguientes salieron de construirla, revisarla y sondearla el 23 de
-septiembre de 2026, y cada una está escrita porque su avería ya pasó; y la
-última, ☑ Elegir, la pidió el autor ese mismo día, con la herramienta ya en
-su tableta.
+septiembre de 2026, y cada una está escrita porque su avería ya pasó; la
+35, ☑ Elegir, la pidió el autor ese mismo día, con la herramienta ya en su
+tableta; y la 36, el cuento para Gemini Storybook, el 26.
 
 1. ⚠️ **LO QUE SE COPIA ES LO QUE SE VE, CARÁCTER POR CARÁCTER.** La vista
    previa, 📋 Copiar, ↗ Abrir, 📤 Compartir y el repaso salen de la MISMA
@@ -2611,6 +2612,107 @@ su tableta.
     **Y no hizo falta correr ni una línea de SQL**: estantes, máquina y
     lápida ya viajaban en `consigna_piezas`.
 
+36. 🧸 **EL CUENTO QUE ENSEÑA: UN MOLDE PARA GEMINI STORYBOOK, CON EL OFICIO
+    DE CONTAR DENTRO.** Pedido por el autor el 26 de septiembre de 2026:
+    «agregues la posibilidad de hacer prompt específicamente para Gemini
+    Storybook… hay que saber el tema de la historia, la extensión de la
+    misma, las sensaciones que se buscan que el lector tenga, la edad del
+    público al que podría ir dirigido, el aprendizaje o lección que se
+    pretende… historias verdaderas que conmuevan, que ayuden al aprendizaje
+    de una temática que, si un contenido es complejo, a través de un breve
+    cuento se explique».
+
+    Es el molde `cuento` de la clase 💬 Prompt, con doce bloques. ⚠️ **Los
+    cinco obligatorios son los cinco que el autor nombró** —Tema de la
+    historia, Para quién (la edad), Lo que se aprende, Lo que debe sentir el
+    lector y Extensión—; los otros siete son el oficio de contar, plegados
+    para quien los quiera: Protagonista, Dónde pasa, Lo que el cuento
+    explica, Cómo se cuenta, Cómo termina, Ilustraciones y Reglas. Se llega
+    por cuatro sitios: el renglón **🧸 Un cuento para Gemini Storybook** de
+    ＋ Nueva, debajo de las baldosas (es un molde de Prompt, pero quien lo
+    busca piensa en un cuento y no en «un prompt», y escondido en la hoja de
+    moldes no lo encontraría); la hoja de moldes; la primera pregunta de
+    «¿Cuál elijo?»; y Pegar, que lo propone.
+
+    - ⚠️ **STORYBOOK ES UNA MÁQUINA, Y ES LA DE UN SOLO MOLDE.** Es el Gem
+      de Gemini que hace el libro —unas diez páginas ilustradas y una voz
+      que lo lee—, y se abre en `https://gemini.google.com/gem/storybook`,
+      no en Gemini a secas: abrir Gemini obligaría a ir a buscar el Gem, y
+      ese es el paso que se falla. No recibe el texto en la dirección, así
+      que ↗ copia primero y abre pelado (regla 16). Se arma en `seguida`, un
+      párrafo por bloque, con la cabecera del molde delante («Crea un cuento
+      ilustrado con estas indicaciones.»). El molde la declara (`maquina:
+      'storybook'`) y NO fuerza la forma: el mismo cuento se le puede pedir
+      a Claude, en `xml`, para leerlo en voz alta.
+    - ⚠️ **Y NO SE APUNTA COMO «LA ÚLTIMA MÁQUINA» DEL APARATO**
+      (`csgMaquinaDeMolde`, en `csgMaquinaApunta` y en `csgMaquinaUltima`):
+      si se apuntara, el Rápido siguiente nacería para Storybook, que no
+      hace otra cosa que libros. Por lo mismo, «Duplicar en otro molde» no
+      se la lleva, y cambiar de molde la pone al entrar en el cuento y
+      devuelve la última al salir, **diciéndolo** en el aviso: una máquina
+      que cambia sola y callada es un prompt que sale con otra forma sin que
+      nadie sepa por qué. Sale en todas las filas de máquinas como una más,
+      porque un Libre pegado de otro sitio también se le puede llevar.
+    - ⚠️ **LOS BLOQUES NUEVOS SON DEL VOCABULARIO, NO SOBREESCRITURAS**
+      (`personaje`, `escenario`, `concepto`, `leccion`, `emociones`,
+      `desenlace`, `extension`, `ilustracion`): el protagonista no es el
+      `rol` (quién es la máquina) ni el concepto es la `tarea`. Tema, Para
+      quién, Cómo se cuenta y Reglas sí son `tema`, `audiencia`, `tono` y
+      `reglas`, con sus palabras. ⚠️ **Y el id es `desenlace`, no
+      `final`**: un id es también una clave del lector (`csgLecIdDeClave`),
+      y «Final:» es el «Fin» de un grafo o de un bucle dicho de otra manera;
+      con `final`, esas consignas se partirían en un bloque que no es suyo
+      (la asimetría de la regla 8). «final» tampoco es sinónimo, y la prueba
+      de Node lo vigila.
+    - ⚠️ **PEGAR LO PROPONE CON CUIDADO:** hacen falta dos rótulos de
+      cuento, y al menos uno de los que solo escribe un cuento
+      (Protagonista, Dónde pasa, Lo que se aprende, Lo que debe sentir,
+      Cómo termina, Ilustraciones). «Tema: las fracciones / Aprendizaje: que
+      las sumen» es un plan de clase, y «Extensión: 800 palabras», un
+      ensayo: ninguno se propone como cuento. Con una voz que imitar o la
+      etiqueta de la casa es Voz prestada, porque lo que devuelva va a La
+      Voz Prestada con su etiqueta (regla 14). Y lo armado para Storybook,
+      pegado otra vez, vuelve como el mismo cuento: los rótulos largos
+      («Lo que debe sentir el lector:») casan enteros y la cabecera se lee
+      como forma.
+    - ⚠️ **EL REPASO AVISA DE CINCO COSAS Y NO PARA NINGUNA**, y ninguna sale
+      en un cuento bien hecho: sin Protagonista (la máquina lo inventa);
+      «Para quién» sin ninguna edad, ni una cifra ni una palabra de edad; un
+      tema que dice que el cuento explica algo con «Lo que el cuento
+      explica» vacío (sin los datos exactos, la máquina los inventa o los
+      simplifica hasta que dejan de ser verdad); ese bloque con más de 120
+      palabras; y, solo con Storybook, una Extensión de más de doce páginas,
+      que Storybook no hace. `personaje` y `concepto` están además en
+      `CSG_REV_PROPIOS`: un concepto hecho de un chip dice CÓMO explicar y no
+      QUÉ. Todo se mira palabra por palabra, sin expresiones que vuelvan
+      atrás (regla 28): una que volvía atrás se probó, y la prueba de Node
+      la caza por el reloj.
+    - ⚠️ **LAS FRASES HECHAS SALEN DE LA MATERIA DE LA CASA**
+      (`COMPENDIO-STORYTELLING.md`, la Ruta del Hilo que Tira), no de una
+      lista de internet. La ficha de hilo —quién, qué quiere, qué se lo
+      impide— es el «para qué» de Protagonista, y ahí está también querer
+      contra necesitar; la prueba del conector («pero» o «por eso», nunca
+      «y entonces») va en Extensión; la emoción sin chantaje, en Lo que debe
+      sentir el lector; y la ética de la historia de verdad («Si es una
+      historia real, no inventes nada que se lea como si hubiera pasado.»),
+      en Reglas. La regla de oro de la casa está en el concepto: si se
+      simplifica, que siga siendo verdad, porque un cuento que enseña algo
+      falso lo enseña igual de bien.
+    - **La máquina puesta se ve** (`csgChipALaVista`). Storybook es la
+      cuarta, y a 390 px salía cortada por el borde en la vista previa y en
+      Usar: un cuento que iba para Storybook no lo enseñaba. La fila se
+      desliza sola hasta ella —la fila, no la página—, y si ya se ve entera
+      no se toca.
+    - **Lo que NO hace, dicho:** el libro lo hace Storybook. No hay API ni
+      texto en la dirección, así que se copia y se pega; la foto o el dibujo
+      de referencia se sube allí, con el clip, y lo que haya que cambiar se
+      pide en el mismo chat. Ningún botón de aquí le pide a una IA que
+      escriba el cuento (regla 20).
+
+    **Y no hizo falta correr ni una línea de SQL**: `molde` y `maquina` son
+    texto libre en `consigna_piezas`, y el molde y la máquina viven en el
+    JavaScript (regla 4).
+
 **Y un cambio más sobre el plan: la cabecera del compositor lleva a la
 derecha el ESTADO, no un 👁.** «Sin guardar», «🟡 Borrador», «📴 Solo aquí»
 o «Guardado ✓», leído de la pieza (regla 23). La vista previa ya está en la
@@ -2622,14 +2724,14 @@ guardado y si llegó a la nube.
 
 ```
 node _dev/servidor-estatico.js       (en otra terminal)
-_dev/probe-consigna.html             (en el navegador: las 22 del §11 y la 23, ☑ Elegir)
+_dev/probe-consigna.html             (en el navegador: las 22 del §11, la 23, ☑ Elegir, y la 24, el cuento)
 node _dev/test-consigna-node.js      (el núcleo, sin navegador)
 ```
 
 Desde una sesión sin pantalla, la sonda se corre así, y con el `SONDA_MS`
-puesto: tarda unos tres minutos (183 s medidos con la 23 dentro; eran 103
-antes de ☑ Elegir, casi todo en los respiros de dos segundos de las subidas
-y nueve en la petición que no vuelve), y el tope por omisión de
+puesto: tarda unos tres minutos (192 s medidos con la 24 dentro; 183 con la
+23, y 103 antes de ☑ Elegir, casi todo en los respiros de dos segundos de
+las subidas y nueve en la petición que no vuelve), y el tope por omisión de
 `corre-sonda.js` es de 90.
 
 ```
@@ -2646,12 +2748,12 @@ quedaría vieja el día que alguien corrigiera el plan— y que `csgArmar` sea
 pura; que no se pierda nada en la nube, con una base de mentira que exige
 lo que la de verdad; que pegar no parta ni descarte nada, cuadrando la BOLSA
 de palabras de entrada y de salida (una cuenta puede cuadrar por
-casualidad; una bolsa, no) y volviendo a pegar los diecisiete moldes
+casualidad; una bolsa, no) y volviendo a pegar los dieciocho moldes
 armados; que el repaso pare lo que tiene que parar y no congele la
 pantalla; y que cada frase, ejemplo y rótulo del JavaScript esté escrito tal
 cual en el plan. Con `CONSIGNA_RUTA=<copia>` se corre contra una copia
 averiada a propósito: así se comprobó que muerde, con 89 averías, y
-suspendió con todas.
+suspendió con todas; y el cuento, con diecisiete más.
 
 La sonda abre el `index.html` de verdad en UN marco de 390 px, que estrecha
 a 320 (y a 320×568) cuando mide; PULSA los botones y mide con
@@ -2668,7 +2770,8 @@ con un hueco vacío y deje cada recuadro encima del pie a 320×568; el armado
 del §7 visto en la vista previa; los topes leídos de `consigna.sql`; el
 plegado con el `display` CALCULADO; y los píxeles y los colores a 320 px.
 Termina con APRUEBA o SUSPENDE delante en el título, con un resumen por cada
-una de las veintidós comprobaciones del §11 del plan y por la 23, ☑ Elegir.
+una de las veintidós comprobaciones del §11 del plan, por la 23, ☑ Elegir, y
+por la 24, el cuento para Storybook.
 
 La **18** mide la barra del anaquel fuera del modo: ＋ Nueva y 📋 Pegar
 enteros a 320 px, ☑ Elegir justo detrás de Pegar, de 44 de alto, con
@@ -2677,8 +2780,9 @@ Prestada— dentro del borde de la propia barra (300); y el botón de
 Destellos con `display` CALCULADO `none` en el compositor y en el modo, y
 de vuelta tras ✕ Salir.
 
-La **23** es ☑ Elegir (95 de las 413 comprobaciones), y corre la última
-porque retira: sus piezas son suyas. Todo PULSADO, con clics o eventos de
+La **23** es ☑ Elegir (95 de las 453 comprobaciones), y corre al final
+porque retira: sus piezas son suyas. Detrás solo va la 24, que crea las
+suyas y no retira nada. Todo PULSADO, con clics o eventos de
 puntero, a 390 y a 320 px, y ordenado por gravedad:
 
 1. **Que el toque solo elija.** En ▦ toca el título, el «⚠ 3 usos» y donde
@@ -2766,6 +2870,41 @@ dos. La prueba de Node lleva además la **3.19**, `csgPersistirVarios`
 —varias ediciones, UN upsert, el reloj puesto y el aparato escrito dos
 veces—, y suspende con un viaje por pieza, sin el reloj y con una
 escritura del aparato por pieza.
+
+La **24** es el cuento para Gemini Storybook (40 de las 453), y está
+ordenada por gravedad: que ↗ Abrir copie ANTES de abrir, que abra el Gem
+pelado y con `noopener,noreferrer`, y que lo copiado sea lo que se ve, con
+la cabecera delante; que usar Storybook NO la apunte como la última (y que
+un Rápido nuevo nazca, en efecto, para la de antes); el renglón 🧸 a 320 px,
+de 44 como mínimo, debajo de las baldosas y sin nada encima
+(`elementFromPoint`); el foco en «Tema de la historia» DENTRO del toque, los
+cinco obligatorios abiertos y los siete del oficio plegados; el repaso, que
+con los obligatorios no para y avisa del protagonista y del concepto, y
+lleno no dice nada; la vista previa carácter por carácter igual a
+`csgArmar`, con el chip de Storybook ENTERO a 320 px allí y en Usar;
+«¿Cuál elijo?» con sus cuatro preguntas y la del cuento primero, y el
+cambio de molde que pone la máquina y la devuelve diciéndolo; y el cuento
+del §7 pegado, que se propone como «Cuento que enseña · 12 de 12 bloques»
+y vuelve a armarse exactamente igual. Averiada, suspende donde tiene que
+suspender: sin `csgChipALaVista`, dos veces («chip 292..397 en una fila
+20..300»); apuntando Storybook como la última, una.
+
+En la prueba de Node, el cuento vive en la **2.15** (el §7 en Storybook, y
+el mismo cuento en `xml` y en `md` sin la cabecera), la **4.16** (Pegar: lo
+armado vuelve entero; un prompt en inglés; lo que NO es un cuento; «Final:»
+que no asciende), la **5.7** (el repaso, con su reloj) y la **6.6** (la
+máquina de un molde, en un salón con un almacén de verdad). Se averió de
+diecisiete maneras —Storybook apuntada como la última o devuelta por ella,
+la pieza nueva sin la máquina del molde, Duplicar llevándosela, el lector
+que no lo propone o que lo propone con un solo rótulo, «final» como clave,
+sin los avisos, la edad dada siempre por dicha, las páginas escritas en
+letra sin leer, el aviso de páginas con cualquier máquina, el concepto
+fuera de los propios, una expresión que vuelve atrás, una frase que no está
+en el plan, sin la cabecera, Storybook con el texto en la dirección y la
+lección sin su equivalencia— y suspendió con todas. La expresión que vuelve
+atrás de forma exponencial no llega ni a suspender: cuelga la prueba, que
+es lo mismo que haría con la tableta; se probó con una cuadrática, que la
+prueba caza por el reloj.
 
 Y el SQL, contra un PostgreSQL de verdad, con el servidor de la sesión
 levantado como dice el apartado de La Voz Prestada:

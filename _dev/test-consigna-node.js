@@ -43,7 +43,7 @@
 //     ni avise en falso; y que no congele la pantalla, porque corre en
 //     cada tecla: se cronometra con textos hechos para que una expresión
 //     regular vuelva atrás desde cada carácter.
-//  6. QUE LOS DATOS SIGAN A LA ESPECIFICACIÓN: los 17 moldes con sus
+//  6. QUE LOS DATOS SIGAN A LA ESPECIFICACIÓN: los 18 moldes con sus
 //     marcas, los sinónimos del §5 enteros, las máquinas, los topes contra
 //     los `check` de consigna.sql, y cada texto literal del JS (frases,
 //     ejemplos, rótulos, textos de los bucles) escrito tal cual en el plan.
@@ -347,6 +347,7 @@ function parte2() {
     autoCritica: ejemplo('**Borrador y crítica, auto-bucle en `md`:**'),
     autoCareo: ejemplo('**Careo, auto-bucle en `md`**'),
     export: ejemplo('**Export del inventario**'),
+    cuento: ejemplo('**Cuento que enseña en `seguida` (Storybook)**'),
   };
   let seguir = true;
   seccion('2.1 Los ejemplos se sacaron del plan', () => {
@@ -416,9 +417,23 @@ function parte2() {
     tope: 'Tres rondas: apertura, réplica y cierre. Cada turno, 150 palabras.',
     etiqueta: L('csgBloqueDef')('careo', 'etiqueta').inicial,
   }, { titulo: 'Careo jornada extendida' });
-  PIEZAS7 = { ENCARGO, CADENA, COORD, SKILL, HASTA, CRITICA, CAREO };
+  const CUENTO = P('prompt', 'cuento', {
+    tema: 'Un cuento que explique por qué llueve, contado por una gota de agua que tiene miedo de caer.',
+    audiencia: 'Niños de 6 a 8 años que empiezan a leer solos; muchas veces se lo leerá un adulto en voz alta.',
+    personaje: 'Gotita, una gota de agua redonda y transparente, con las mejillas rosadas. Quiere quedarse para siempre en su nube, porque le da miedo caer; pero cada vez pesa más.',
+    escenario: 'Una aldea de Copán en temporada de lluvias: techos de lámina, olor a tierra mojada y el río crecido.',
+    concepto: 'El ciclo del agua: el sol calienta el agua y la vuelve vapor; el vapor sube, se enfría y se vuelve gotitas que forman las nubes; las gotitas se juntan, pesan y caen como lluvia. Como el vapor de la olla de los frijoles, que se vuelve gotas en la tapa.',
+    leccion: 'Que el agua que cae es la misma que subió: nada se pierde, todo da vueltas.',
+    emociones: 'Curiosidad al principio, un miedo que se pueda aguantar a mitad del cuento, y al final alivio y asombro.',
+    tono: 'Cálido y sin prisa, como un cuento antes de dormir.',
+    desenlace: 'Que la última página repita la imagen de la primera, pero cambiada.',
+    extension: 'Diez páginas, con dos o tres frases cortas en cada una.',
+    ilustracion: 'En acuarela, con colores suaves.',
+    reglas: 'Nada de sustos que no se resuelvan en la misma página.\nNo inventes datos, fechas ni cifras: si simplificas, que siga siendo verdad.\nSin moraleja al final; que se entienda por lo que pasa.',
+  }, { titulo: 'La gota que tenía miedo de caer', maquina: 'storybook' });
+  PIEZAS7 = { ENCARGO, CADENA, COORD, SKILL, HASTA, CRITICA, CAREO, CUENTO };
   seccion('2.2 Las piezas de prueba están escritas en el plan', () => {
-    const conTexto = [ENCARGO, CADENA, COORD, SKILL, HASTA, CRITICA, CAREO].map(p => p.bloques.filter(b => b.t && b.id !== 'etiqueta').map(b => b.t)).flat();
+    const conTexto = [ENCARGO, CADENA, COORD, SKILL, HASTA, CRITICA, CAREO, CUENTO].map(p => p.bloques.filter(b => b.t && b.id !== 'etiqueta').map(b => b.t)).flat();
     ok(conTexto.every(enPlan), 'cada texto de las piezas de prueba está escrito tal cual en el plan', conTexto.filter(t => !enPlan(t)).join('\n'));
   });
 
@@ -615,7 +630,7 @@ function parte2() {
     ok(armar(null, 'claude').principal === '' && armar({}, '').forma === 'md', 'una pieza vacía o nula no revienta');
   });
 
-  seccion('2.8 Los 17 moldes con todos sus bloques llenos, en las tres formas', () => {
+  seccion('2.8 Los 18 moldes con todos sus bloques llenos, en las tres formas', () => {
     const M = L('CSG_MOLDES');
     const perdidos = [], raros = [];
     let cuenta = 0;
@@ -630,7 +645,7 @@ function parte2() {
           : 'MARCA_' + b.id + '_' + id + ' con 3 vueltas.';
       }
       const pieza = P(m.clase, id, bl, { titulo: 'Título ' + id, material: 'MATERIAL_' + id });
-      const pruebas = [['claude'], ['chatgpt'], ['notebooklm'], ['otra', 'xml'], ['otra', 'md'], ['otra', 'seguida']];
+      const pruebas = [['claude'], ['chatgpt'], ['notebooklm'], ['storybook'], ['otra', 'xml'], ['otra', 'md'], ['otra', 'seguida']];
       for (const [maq, forma] of pruebas) {
         cuenta++;
         const a = armar(pieza, maq, {}, forma ? { forma } : {});
@@ -646,7 +661,7 @@ function parte2() {
         if ((m.clase === 'grafo' || m.clase === 'bucle') && !a.plan) perdidos.push(id + ': el plan');
       }
     }
-    ok(Object.keys(M).length === 17 && !perdidos.length, 'los 17 moldes × 6 armados (' + cuenta + '): ningún bloque, par, material ni «como» perdido', perdidos.slice(0, 12).join('\n'));
+    ok(Object.keys(M).length === 18 && !perdidos.length, 'los 18 moldes × 7 armados (' + cuenta + '): ningún bloque, par, material ni «como» perdido', perdidos.slice(0, 12).join('\n'));
     ok(!raros.length, 'ningún armado escribe undefined, null, NaN ni [object …]', raros.join(', '));
   });
 
@@ -831,6 +846,28 @@ function parte2() {
     ok(armar(P('habilidad', 'skill', { nombre: 'x', disparador: 'd', pasos: 'a\n5) b\nc' }), 'claude').skill.includes('## Pasos\n1. a\n5) b\n6. c'),
       '… y un número que sigue subiendo se respeta, con su paréntesis');
     ok(!toques.length, 'y nada de esto tocó el DOM, el almacén ni la red', 'tocados: ' + [...new Set(toques)].join(', '));
+  });
+
+  /* El Cuento que enseña (pedido el 26 de septiembre de 2026): en
+     Storybook sale en texto seguido con la cabecera delante, y con otra
+     máquina en la forma de esa máquina, sin la cabecera, que es de la
+     forma seguida. */
+  seccion('2.15 Cuento que enseña (§7): Storybook en seguida, con su cabecera', () => {
+    const a = armar(CUENTO, 'storybook');
+    igual(a.principal, EJ.cuento, 'seguida (Storybook) = el ejemplo del plan, carácter por carácter');
+    igual(a.forma, 'seguida', 'la forma dicha es seguida: la de la máquina, porque el molde no fuerza ninguna');
+    ok(a.principal.startsWith('Crea un cuento ilustrado con estas indicaciones.\n\nTema de la historia: '), 'la cabecera va delante, separada por una línea en blanco');
+    const x = armar(CUENTO, 'claude'), m = armar(CUENTO, 'chatgpt'), g = armar(CUENTO, 'gemini');
+    ok(x.forma === 'xml' && x.principal.startsWith('<tema>\n') && x.principal.includes('\n<desenlace>\n') && !x.principal.includes('Crea un cuento ilustrado'),
+      'con Claude, el mismo cuento en xml, cada bloque en su etiqueta y sin la cabecera', x.principal.slice(0, 120));
+    ok(m.principal.startsWith('## Tema de la historia\n') && m.principal.includes('\n## Lo que debe sentir el lector\n') && !m.principal.includes('Crea un cuento ilustrado') && g.principal === m.principal,
+      'con ChatGPT y con Gemini, en md con sus rótulos del molde', m.principal.slice(0, 120));
+    /* Tono y Reglas son de sistema: con Claude salen en «📋 Copiar sistema». */
+    ok(/^<tono>\n/.test(x.sistema) && x.sistema.includes('\n<reglas>\n') && !x.encargo.includes('<tono>') && x.encargo.startsWith('<tema>\n'),
+      'en xml, «Cómo se cuenta» y «Reglas» van en la mitad de sistema; el resto, en el encargo');
+    const ns = L('csgPalabras')(a.principal);
+    ok(ns > 150 && ns < 400, 'el cuento de ejemplo son ' + ns + ' palabras: un prompt de Storybook de verdad, no un telegrama ni un ensayo');
+    ok(!toques.length, 'y el armado del cuento no tocó el DOM, el almacén ni la red', 'tocados: ' + [...new Set(toques)].join(', '));
   });
 }
 
@@ -2090,7 +2127,7 @@ function parte4() {
     ok(!revienta, 'textos rotos no revientan el lector', revienta);
   });
 
-  seccion('4.14 Los 17 moldes, llenos con sus ejemplos y armados por csgArmar, vuelven a entrar enteros', () => {
+  seccion('4.14 Los 18 moldes, llenos con sus ejemplos y armados por csgArmar, vuelven a entrar enteros', () => {
     /* La prueba más dura de la costura entre el armado y el lector: cada
        molde con todos sus bloques llenos (su ejemplo, o su texto inicial),
        armado en XML (Claude) y en Markdown (ChatGPT) —o en la forma que el
@@ -2113,7 +2150,10 @@ function parte4() {
       const molde = M[mid];
       const p = { id: 'csg-p', clase: molde.clase, molde: mid, titulo: 'Prueba ' + molde.nombre, material: '',
         bloques: molde.bloques.map(b => { const d = def(mid, b.id); return { id: b.id, rotulo: d.rotulo, t: d.inicial || d.ejemplo || '' }; }) };
-      const formas = molde.forma ? [['claude', molde.forma]] : [['claude', 'xml'], ['chatgpt', 'md']];
+      /* Y el molde que trae su máquina (el Cuento que enseña, Storybook),
+         también en la forma de ella: es la que de verdad se va a pegar. */
+      const formas = molde.forma ? [['claude', molde.forma]] : [['claude', 'xml'], ['chatgpt', 'md']]
+        .concat(molde.maquina ? [[molde.maquina, L('csgMaquina')(molde.maquina).forma]] : []);
       formas.forEach(([maq, forma]) => {
         vueltas++;
         const txt = armar(p, maq, {}, {}).principal;
@@ -2137,7 +2177,7 @@ function parte4() {
         if (fallo.length) malos.push(mid + ' en ' + forma + ': ' + fallo.join('; '));
       });
     });
-    ok(!malos.length, vueltas + ' vueltas (los 17 moldes en sus formas): mismo molde, mismo texto, ningún nodo inventado, ningún aviso de más, palabras cuadradas', malos.join('\n'));
+    ok(!malos.length, vueltas + ' vueltas (los 18 moldes en sus formas): mismo molde, mismo texto, ningún nodo inventado, ningún aviso de más, palabras cuadradas', malos.join('\n'));
   });
 
   /* Lo que encontró la revisión del lector del 23 de septiembre de 2026,
@@ -2262,10 +2302,56 @@ function parte4() {
       if (d) fallo.push(d);
       if (fallo.length) malos.push(mid + ': ' + fallo.join('; '));
     });
-    ok(!malos.length, 'los 17 moldes armados para NotebookLM (texto seguido) vuelven como el mismo molde, cada texto en su bloque, sin avisos', malos.join('\n'));
+    ok(!malos.length, 'los 18 moldes armados para NotebookLM (texto seguido) vuelven como el mismo molde, cada texto en su bloque, sin avisos', malos.join('\n'));
     const l1 = csgLeer('Contexto: el colegio abre en enero.\nLo que me dijo mi asesor ayer: que avance.');
     ok(bl(l1, 'contexto') && tx(l1, 'contexto') === 'el colegio abre en enero.\nLo que me dijo mi asesor ayer: que avance.', '… y una frase larga con dos puntos que no es un rótulo del vocabulario sigue siendo prosa', muestra(l1));
     ok(SL.toques.length === 0, 'y nada de esto tocó el navegador', SL.toques.slice(0, 5).join(', '));
+  });
+
+  /* El Cuento que enseña por la puerta de Pegar. La asimetría manda
+     también aquí: se propone con DOS rótulos de cuento y uno de ellos de
+     los que solo escribe un cuento, porque «Tema» y «Aprendizaje» sueltos
+     son un plan de clase y «Extensión: 800 palabras» es un ensayo. */
+  seccion('4.16 El cuento se reconoce, vuelve a entrar entero y no se inventa', () => {
+    const tx = (r, id) => (bl(r, id) || {}).t;
+    const EJC = ejemplo('**Cuento que enseña en `seguida` (Storybook)**');
+    const r1 = csgLeer(EJC || '');
+    ok(!!EJC && r1.clase === 'prompt' && r1.molde === 'cuento', 'lo armado para Storybook, pegado otra vez, vuelve como Prompt · Cuento que enseña', muestra(r1));
+    ok(tx(r1, 'tema') === 'Un cuento que explique por qué llueve, contado por una gota de agua que tiene miedo de caer.' &&
+       tx(r1, 'emociones') === 'Curiosidad al principio, un miedo que se pueda aguantar a mitad del cuento, y al final alivio y asombro.' &&
+       tx(r1, 'concepto') === 'El ciclo del agua: el sol calienta el agua y la vuelve vapor; el vapor sube, se enfría y se vuelve gotitas que forman las nubes; las gotitas se juntan, pesan y caen como lluvia. Como el vapor de la olla de los frijoles, que se vuelve gotas en la tapa.' &&
+       tx(r1, 'desenlace') === 'Que la última página repita la imagen de la primera, pero cambiada.' && tx(r1, 'ilustracion') === 'En acuarela, con colores suaves.',
+      '… con cada texto en su bloque: «Lo que debe sentir el lector:» (seis palabras) y «Lo que el cuento explica: El ciclo del agua: …» con sus dos pares de dos puntos', muestra(r1));
+    ok(ids(r1) === 'tema,audiencia,personaje,escenario,concepto,leccion,emociones,tono,desenlace,extension,ilustracion,reglas' && !r1.avisos.length && !r1.anadido.length,
+      '… los doce, en su orden, sin un aviso y sin añadir nada', ids(r1) + ' · ' + JSON.stringify(r1.avisos));
+    cuadra('el cuento de Storybook vuelto a pegar', EJC || '', r1);
+    ok((r1.estructura || []).some(t => /^Crea un cuento ilustrado/.test(t)), 'la cabecera «Crea un cuento ilustrado con estas indicaciones.» se lee como forma, no como texto de la Tarea');
+
+    /* Un prompt de cuento escrito en inglés, como los que circulan. */
+    const EN = 'Story idea: a shy turtle who is afraid of the sea.\nTarget age: 4-6\nProtagonist: Tuga, a small green turtle with a yellow shell.\nArt style: watercolor\nTone: gentle and warm\nLesson: being brave does not mean not being afraid.';
+    const r2 = csgLeer(EN);
+    ok(r2.molde === 'cuento' && tx(r2, 'tema') === 'a shy turtle who is afraid of the sea.' && tx(r2, 'audiencia') === '4-6' && !!bl(r2, 'personaje') && tx(r2, 'ilustracion') === 'watercolor' && !!bl(r2, 'tono') && !!bl(r2, 'leccion'),
+      'en inglés («Story idea», «Target age», «Art style», «Lesson»): Cuento que enseña con cada cosa en su bloque', muestra(r2));
+    cuadra('el cuento en inglés', EN, r2);
+
+    /* Lo que NO es un cuento, aunque use una palabra suya. */
+    const clase_ = csgLeer('Tema: las fracciones.\nAprendizaje: que sepan sumarlas.\nFormato: una tabla de tres columnas.');
+    ok(clase_.molde !== 'cuento' && tx(clase_, 'leccion') === 'que sepan sumarlas.', 'un plan de clase («Tema» y «Aprendizaje») NO se propone como cuento, aunque «Aprendizaje» vaya a su bloque', clase_.molde);
+    const ensayo = csgLeer('Tema: la deuda externa de Honduras.\nExtensión: 800 palabras.\nFormato: un ensayo con subtítulos.');
+    ok(ensayo.molde !== 'cuento', 'un ensayo con «Extensión: 800 palabras» NO es un cuento', ensayo.molde);
+    const voz = csgLeer('Voz: Juan Rulfo, frases cortas y pueblo seco.\nTema: un pueblo que espera la lluvia.\nProtagonista: una niña que cuenta los días.\nMoraleja: la paciencia también cansa.');
+    ok(voz.molde === 'voz', 'con una voz que imitar es Voz prestada aunque traiga protagonista y moraleja: lo suyo va a La Voz Prestada con la etiqueta', voz.molde);
+    const P = L('csgProponerMolde');
+    ok(P('prompt', ['personaje', 'emociones']) === 'cuento' && P('prompt', ['leccion', 'extension']) === 'cuento' && P('prompt', ['concepto', 'extension']) !== 'cuento' &&
+       P('prompt', ['leccion']) !== 'cuento' && P('prompt', ['personaje', 'leccion', 'etiqueta']) === 'voz',
+      'csgProponerMolde: dos de cuento con uno fuerte → cuento; dos flojos, o uno solo, no; con la etiqueta de la casa, Voz prestada');
+
+    /* «Final:» no es un rótulo: es el «Fin» de un bucle dicho de otra
+       manera, y ascenderlo partiría la consigna en un bloque que no es suyo. */
+    const bu = csgLeer('Para cuando el crítico diga APROBADO.\nMáximo 3 vueltas.\nFinal: entrega la versión aprobada.');
+    ok(!bl(bu, 'desenlace') && !r1.bloques.some(b => b.id === 'final') && !bu.bloques.some(b => b.id === 'final') && /Final: entrega la versión aprobada\./.test(bu.bloques.map(b => b.t).join('\n')),
+      '«Final: …» se queda como texto donde estaba: ni `final` ni `desenlace`', muestra(bu));
+    ok(SL.toques.length === 0, 'y el lector del cuento no tocó el navegador', SL.toques.slice(0, 5).join(', '));
   });
 }
 
@@ -2455,13 +2541,24 @@ function parte5() {
     csgRevisar({ id: 'x', clase: 'prompt', molde: 'ejemplos', titulo: 't', bloques: [{ id: 'tarea', t: 'Convierte.' }, { id: 'ejemplos', t: 'a' + ' '.repeat(60000) + 'b\nc → d' }, { id: 'caso', t: 'Ahora.' }], material: '' }, 'claude');
     const tEj = Date.now() - t0;
     ok(tEj <= TOPE, 'un renglón de Ejemplos con 60.000 espacios y sin flecha se repasa y se arma en menos de ' + TOPE + ' ms (' + tEj + ' ms)');
+    /* Y el repaso del Cuento que enseña, que mira la edad, las páginas y
+       si el tema dice que explica: con 60.000 letras seguidas, con 30.000
+       palabras cortas y con 60.000 espacios en cada uno de sus bloques. */
+    const lentosC = [];
+    [['60.000 letras', 'x'.repeat(60000)], ['30.000 palabras', 'a '.repeat(30000)], ['60.000 espacios', ' '.repeat(60000) + 'páginas'], ['30.000 «páginas»', 'páginas '.repeat(30000)]].forEach(([nombre, t]) => {
+      const t0c = Date.now();
+      csgRevisar({ id: 'x', clase: 'prompt', molde: 'cuento', titulo: 't', material: '', bloques: ['tema', 'audiencia', 'personaje', 'concepto', 'leccion', 'emociones', 'extension'].map(id => ({ id, rotulo: id, t })) }, 'storybook');
+      const tc = Date.now() - t0c;
+      if (tc > TOPE) lentosC.push(nombre + ': ' + tc + ' ms');
+    });
+    ok(!lentosC.length, 'el repaso del cuento (edad, páginas, «explica») con cuatro formas de texto largo en cada bloque: menos de ' + TOPE + ' ms', lentosC.join('\n'));
   });
 
   /* Lo que encontró la revisión del repaso del 23 de septiembre de 2026.
      Cada comprobación se probó quitando su arreglo: sin él, suspende. */
   seccion('5.6 Lo que cazó la revisión del repaso', () => {
     const csgLeer = L('csgLeer');
-    const MAQS = ['claude', 'chatgpt', 'gemini', 'notebooklm', 'perplexity', 'otra'];
+    const MAQS = ['claude', 'chatgpt', 'gemini', 'storybook', 'notebooklm', 'perplexity', 'otra'];
 
     /* Libre existe para lo que no se entiende como bloques: no para con
        «Falta Texto» un prompt pegado con sus propios encabezados. */
@@ -2487,7 +2584,7 @@ function parte5() {
     else {
       const ruido = [];
       Object.entries(PIEZAS7).forEach(([n, p]) => MAQS.forEach(m => { csgRevisar(p, m).avisa.filter(x => /frases hechas/.test(x.msg)).forEach(x => ruido.push(n + ' en ' + m + ': ' + x.msg)); }));
-      ok(!ruido.length, 'las siete piezas del §7, en las seis máquinas: ni un «hecho solo de frases hechas»', ruido.join('\n'));
+      ok(!ruido.length, 'las ocho piezas del §7, en las siete máquinas: ni un «hecho solo de frases hechas»', ruido.join('\n'));
     }
     const Mo = L('CSG_MOLDES'), def = L('csgBloqueDef');
     const ruidoM = [];
@@ -2496,7 +2593,7 @@ function parte5() {
         bloques: Mo[mid].bloques.map(b => { const d = def(mid, b.id); return { id: b.id, rotulo: d.rotulo, t: d.inicial || d.ejemplo || '' }; }) };
       MAQS.forEach(m => { const r = csgRevisar(p, m); r.avisa.filter(x => /frases hechas/.test(x.msg)).concat(r.para).forEach(x => ruidoM.push(mid + ' en ' + m + ': ' + x.msg)); });
     });
-    ok(!ruidoM.length, 'los 17 moldes llenos con su ejemplo, en las seis máquinas: ni paran ni avisan de frases hechas', ruidoM.join('\n'));
+    ok(!ruidoM.length, 'los 18 moldes llenos con su ejemplo, en las siete máquinas: ni paran ni avisan de frases hechas', ruidoM.join('\n'));
 
     /* «Parece que se repite» no salta con un «para cada» o un «como mucho»
        cualquiera. */
@@ -2530,6 +2627,58 @@ function parte5() {
     ok(!hay(csgRevisar(pieza('skill', { nombre: 'x', disparador: 'd', pasos: '1. Lee.\n   - con calma\n2. Corrige.', comprobacion: 'c' }), 'claude').avisa, /sin número/),
       '… y una sub-viñeta sangrada bajo un paso numerado no cuenta');
   });
+
+  /* El repaso del Cuento que enseña: cuatro cosas que se escapan
+     escribiendo un cuento. Ninguna PARA —guardar y usar se siguen
+     pudiendo— y ninguna salta en un cuento bien hecho. */
+  seccion('5.7 El repaso del Cuento que enseña', () => {
+    const lleno = {
+      tema: 'Un cuento que explique por qué llueve, contado por una gota de agua que tiene miedo de caer.',
+      audiencia: 'Niños de 6 a 8 años que empiezan a leer solos.',
+      personaje: 'Gotita, una gota de agua redonda y transparente.',
+      concepto: 'El ciclo del agua: el sol calienta el agua y la vuelve vapor.',
+      leccion: 'Que el agua que cae es la misma que subió.',
+      emociones: 'Curiosidad al principio y asombro al final.',
+      extension: 'Diez páginas, con dos o tres frases cortas en cada una.',
+    };
+    const cuento = cambios => pieza('cuento', Object.assign({}, lleno, cambios || {}), { maquina: 'storybook' });
+    const bueno = csgRevisar(cuento(), 'storybook');
+    ok(!bueno.para.length && !bueno.avisa.length, 'un cuento bien hecho, con Storybook: ni para ni avisa', JSON.stringify(bueno.para.concat(bueno.avisa)));
+
+    const vacio = csgRevisar(pieza('cuento', { tema: '', audiencia: '', leccion: '', emociones: '', extension: '' }), 'storybook');
+    ok(['tema', 'audiencia', 'leccion', 'emociones', 'extension'].every(id => hay(vacio.para, /Falta «/, id)) && vacio.para.filter(x => /Falta «/.test(x.msg)).length === 5,
+      'los cinco obligatorios —los cinco que pidió el autor— PARAN si faltan, nombrados', JSON.stringify(vacio.para.map(x => x.msg)));
+
+    const sinProta = csgRevisar(cuento({ personaje: '' }), 'storybook');
+    ok(hay(sinProta.avisa, /Sin «Protagonista», la máquina lo inventa/, 'personaje') && !sinProta.para.length, 'sin «Protagonista»: AVISA (no para), con el porqué y un toque que lleva al bloque');
+
+    const edad = t => hay(csgRevisar(cuento({ audiencia: t }), 'storybook').avisa, /no dice la edad/, 'audiencia');
+    ok(edad('Para mi hijo, que se aburre con los libros.') && edad('Toda la familia.'), '«Para quién» sin ninguna edad: AVISA');
+    ok(!edad('Niños de 6 a 8 años.') && !edad('Adolescentes que creen que el tema no les interesa.') && !edad('Un niño de {{edad}} años que se llama {{nombre}}.') && !edad('Estudiantes de sexto grado.') && !edad('Adultos que nunca entendieron el tema.') && !edad('Niñas de primaria.'),
+      '… y con una cifra o una palabra de edad (niños, adolescentes, años, grado, adultos, primaria) no avisa');
+
+    const expl = (tema, concepto) => hay(csgRevisar(cuento({ tema, concepto }), 'storybook').avisa, /dice que el cuento explica algo/, 'concepto');
+    ok(expl('Un cuento que explique por qué llueve.', '') && expl('Para enseñar las fracciones a un niño.', '') && expl('Cómo funciona el corazón, contado por un glóbulo rojo.', ''),
+      'el tema dice que explica o enseña y «Lo que el cuento explica» está vacío: AVISA (sin los datos exactos, la máquina los inventa)');
+    ok(!expl('Un cuento que explique por qué llueve.', 'El ciclo del agua.') && !expl('Un cuento para contar antes de dormir sobre la luna.', ''),
+      '… y no avisa con el concepto escrito, ni en un cuento que no dice explicar nada');
+
+    const largo = n => csgRevisar(cuento({ concepto: 'palabra '.repeat(n).trim() }), 'storybook').avisa.filter(x => /es mucho para un cuento breve/.test(x.msg));
+    ok(largo(121).length === 1 && /121 palabras/.test(largo(121)[0].msg) && !largo(120).length, '«Lo que el cuento explica» de 121 palabras AVISA diciendo cuántas; de 120, no');
+
+    const pags = (t, m) => hay(csgRevisar(cuento({ extension: t }), m).avisa, /Storybook hace libros de unas diez páginas/, 'extension');
+    ok(pags('Veinte páginas, una escena por página.', 'storybook') && pags('Que sean 15 páginas.', 'storybook') && /con 20 pedidas/.test(csgRevisar(cuento({ extension: 'Veinte páginas.' }), 'storybook').avisa.map(x => x.msg).join()),
+      'con Storybook, una Extensión de más de doce páginas AVISA con el número que se pidió (en cifra o en letra)');
+    ok(!pags('Veinte páginas.', 'claude') && !pags('Doce páginas.', 'storybook') && !pags('Diez páginas, con dos o tres frases cortas en cada una.', 'storybook'),
+      '… y no con Claude (que escribe lo que se le pida), ni con doce, ni con diez');
+
+    const soloFrases = csgRevisar(cuento({ concepto: 'Un paso del concepto en cada página, en orden.', leccion: 'Que pedir ayuda no es rendirse.' }), 'storybook');
+    ok(hay(soloFrases.avisa, /solo de frases hechas/, 'concepto') && !soloFrases.avisa.some(x => /frases hechas/.test(x.msg) && /Lo que se aprende/.test(x.msg)),
+      'un «Lo que el cuento explica» hecho solo de un chip dice CÓMO y no QUÉ: AVISA; una lección de un chip es una lección entera: no', JSON.stringify(soloFrases.avisa.map(x => x.msg)));
+
+    const otro = csgRevisar(pieza('encargo', { tarea: 'Escribe algo.', formato: 'Texto.', personaje: '' }), 'storybook');
+    ok(!otro.avisa.some(x => /Protagonista|no dice la edad|páginas/.test(x.msg)), 'fuera de su molde, esos avisos no salen: allí nadie pidió un protagonista');
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -2543,11 +2692,13 @@ function parte6() {
   const S = L('CSG_SINONIMOS'), P = L('CSG_PATRONES_BUCLE'), Q = L('CSG_MAQUINAS'), E = L('CSG_EQUIVALE');
   const mezcla = (m, b) => Object.assign({}, B[b.id] || { rotulo: b.id }, b);
 
-  seccion('6.1 Los 17 moldes y su orden', () => {
-    const IDS = 'rapido encargo costar ejemplos razonado fuentes voz libre skill sistema receta cadena coordinador hasta critica lotes careo'.split(' ');
-    ok(IDS.every(i => M[i] && M[i].id === i) && Object.keys(M).length === 17, 'los 17 moldes existen con su id');
+  seccion('6.1 Los 18 moldes y su orden', () => {
+    const IDS = 'rapido encargo costar ejemplos razonado fuentes voz cuento libre skill sistema receta cadena coordinador hasta critica lotes careo'.split(' ');
+    ok(IDS.every(i => M[i] && M[i].id === i) && Object.keys(M).length === 18, 'los 18 moldes existen con su id');
     const nombrados = [].concat(...Object.values(O));
-    ok(nombrados.length === 17 && new Set(nombrados).size === 17 && IDS.every(i => nombrados.includes(i)), 'CSG_MOLDES_ORDEN nombra a los 17 una vez');
+    ok(nombrados.length === 18 && new Set(nombrados).size === 18 && IDS.every(i => nombrados.includes(i)), 'CSG_MOLDES_ORDEN nombra a los 18 una vez');
+    ok(O.prompt.join() === 'rapido,encargo,costar,ejemplos,razonado,fuentes,voz,cuento,libre', 'el Cuento que enseña va delante de Libre, que es donde cae lo que no se entiende');
+    ok(Object.values(M).every(m => !m.maquina || Q.some(q => q.id === m.maquina)), 'la máquina que declara un molde existe en CSG_MAQUINAS');
     ok(Object.entries(O).every(([cl, ls]) => ls.every(i => M[i].clase === cl)), 'cada molde está en el orden de su clase');
     ok(Object.values(O).every(ls => M[ls[0]].recomendado), 'el recomendado va primero en su clase');
   });
@@ -2585,13 +2736,18 @@ function parte6() {
     const norm = s => sinTildesP(s).toLowerCase().replace(/\s+/g, ' ').trim();
     const malS = Object.entries(S).filter(([k, v]) => k !== norm(k) || !B[v] || /[0-9[\]{}()#→]/.test(k));
     ok(!malS.length, 'CSG_SINONIMOS normalizado y apuntando al vocabulario (' + Object.keys(S).length + ' claves)', JSON.stringify(malS));
-    const ESPERADAS = 'rol|role|persona|eres|contexto|context|background|situacion|tarea|task|instruccion|instrucciones|instruction|goal|pedido|encargo|objetivo|objective|reglas|rules|constraints|restricciones|guidelines|no hagas|formato|formato de salida|format|output|output format|respuesta|response|ejemplos|examples|few-shot|comprobacion|comprobaciones|checks|verification|validation|como se comprueba|que revisas|tono|tone|estilo|style|audiencia|audience|publico|ahora tu|ahora|caso|caso nuevo|now|pasos|steps|como pensarlo|que haces|luego responde|responde|answer|pregunta|question|research question|fuentes|fuentes permitidas|sources|citas|reglas de cita|citations|limites|limits|scope|voz|voice|genero|genre|genero y largo|tema|topic|tema o encargo|etiqueta|etiqueta de la casa|nombre|name|description|descripcion|cuando se dispara|cuando|when|trigger|cuando usarla|when to use|recursos|resources|herramientas|tools|identidad|identity|mision|mission|siempre|always|nunca|never|meta|goal final|nodos|nodes|agentes|agents|especialistas|aristas|edges|flujo|flow|pasos y condiciones|estado|state|lo que viaja|fin|fin y entrega|end|salida del grafo|coordinador|orquestador|orchestrator|reparto|como se reparte|juntar|como se junta|paso|paso que se repite|step|vuelta|parada|criterio de parada|stop|para cuando|tope|rondas|max|limit|memoria|memory|acumulado|entre vueltas|verificacion|verify|salida|que sale al final|deliverable|borrador|draft|critico|critic|revision|revise|lista|list|elementos|postura a|postura b|juez|judge|texto|text|prompt'.split('|');
+    const ESPERADAS = 'rol|role|persona|eres|contexto|context|background|situacion|tarea|task|instruccion|instrucciones|instruction|goal|pedido|encargo|objetivo|objective|reglas|rules|constraints|restricciones|guidelines|no hagas|formato|formato de salida|format|output|output format|respuesta|response|ejemplos|examples|few-shot|comprobacion|comprobaciones|checks|verification|validation|como se comprueba|que revisas|tono|tone|estilo|style|audiencia|audience|publico|ahora tu|ahora|caso|caso nuevo|now|pasos|steps|como pensarlo|que haces|luego responde|responde|answer|pregunta|question|research question|fuentes|fuentes permitidas|sources|citas|reglas de cita|citations|limites|limits|scope|voz|voice|genero|genre|genero y largo|tema|topic|tema o encargo|etiqueta|etiqueta de la casa|nombre|name|description|descripcion|cuando se dispara|cuando|when|trigger|cuando usarla|when to use|recursos|resources|herramientas|tools|identidad|identity|mision|mission|siempre|always|nunca|never|meta|goal final|nodos|nodes|agentes|agents|especialistas|aristas|edges|flujo|flow|pasos y condiciones|estado|state|lo que viaja|fin|fin y entrega|end|salida del grafo|coordinador|orquestador|orchestrator|reparto|como se reparte|juntar|como se junta|paso|paso que se repite|step|vuelta|parada|criterio de parada|stop|para cuando|tope|rondas|max|limit|memoria|memory|acumulado|entre vueltas|verificacion|verify|salida|que sale al final|deliverable|borrador|draft|critico|critic|revision|revise|lista|list|elementos|postura a|postura b|juez|judge|texto|text|prompt|tema de la historia|de que trata|trama|plot|story idea|para quien|edad|edad del lector|publico objetivo|target age|target audience|protagonista|protagonistas|personaje|personajes|protagonist|character|characters|main character|escenario|donde pasa|ambientacion|setting|concepto|lo que el cuento explica|que explica|concept|leccion|lo que se aprende|aprendizaje|moraleja|ensenanza|lesson|moral|emociones|lo que debe sentir el lector|lo que debe sentir|sensaciones|sentimientos|emotions|feelings|como se cuenta|narrador|voz narrativa|narrator|desenlace|como termina|final del cuento|ending|extension|paginas|numero de paginas|ilustracion|ilustraciones|estilo de ilustracion|estilo de las ilustraciones|estilo visual|estilo artistico|dibujos|art style|illustrations|illustration style'.split('|');
     ok(ESPERADAS.every(k => k in S), 'están todas las claves del §5', ESPERADAS.filter(k => !(k in S)).join(', '));
+    ok(!('final' in S) && !B.final, '«final» no es clave ni id: es el «Fin» de un grafo o de un bucle dicho de otra manera (por eso el id es `desenlace`)');
+    ok(['tema de la historia', 'lo que el cuento explica', 'lo que se aprende', 'lo que debe sentir el lector', 'estilo de las ilustraciones'].every(k => L('CSG_LEC_ROTULOS_LARGOS').has(k)),
+      'los rótulos largos del cuento solo ascienden si casan enteros (CSG_LEC_ROTULOS_LARGOS)');
     for (const i of ['hasta', 'critica', 'lotes', 'careo']) ok(['auto', 'pseudo', 'cierre'].every(k => typeof M[i][k] === 'string' && M[i][k].length > 20) && (i === 'lotes' || M[i].pseudo.includes('{N}')), 'bucle ' + i + ': auto, pseudo con {N} y cierre');
     ok(M.cadena.orquestar === 'cadena' && M.coordinador.orquestar === 'coordinador', 'los grafos llevan orquestar');
-    ok(Q.map(m => m.id).join() === 'claude,chatgpt,gemini,perplexity,notebooklm,otra', 'CSG_MAQUINAS en su orden');
+    ok(Q.map(m => m.id).join() === 'claude,chatgpt,gemini,storybook,perplexity,notebooklm,otra', 'CSG_MAQUINAS en su orden (Storybook pegada a Gemini, que es de donde sale)');
     ok(Q.every(m => ['xml', 'md', 'seguida'].includes(m.forma) && (m.abrir === '' || /^https:\/\//.test(m.abrir)) && typeof m.param === 'string' && typeof m.donde === 'string' && m.nota), 'CSG_MAQUINAS con forma, abrir, param, donde y nota');
-    ok(Object.values(E).every(l => l.every(i => B[i])) && Object.keys(E).every(i => B[i]) && Object.keys(E).length === 20, 'CSG_EQUIVALE: 20 entradas del vocabulario');
+    ok(Object.values(E).every(l => l.every(i => B[i])) && Object.keys(E).every(i => B[i]) && Object.keys(E).length === 23, 'CSG_EQUIVALE: 23 entradas del vocabulario');
+    ok(String(E.leccion) === 'objetivo,meta' && String(E.objetivo) === 'meta,tarea,leccion' && String(E.extension) === 'genero,limites' && String(E.genero) === 'extension' && !E.personaje && !E.concepto,
+      'las equivalencias del cuento: la lección es lo que se quiere LOGRAR y el «Género y largo» es su extensión; el protagonista y el concepto no se colocan a la fuerza');
     ok(Object.values(P).every(l => l.every(r => Object.prototype.toString.call(r) === '[object RegExp]')), 'patrones de bucle son RegExp');
     ok(P.tope[0].test('Máximo 4 vueltas') && P.parada[0].test('Para cuando el párrafo tenga menos') && P.paso[0].test('Repite el paso') && P.lotes[0].test('Para cada tema, tres preguntas') && !P.parada[0].test('Pasa la sal'), 'los patrones muerden lo que tienen que morder');
   });
@@ -2644,6 +2800,55 @@ function parte6() {
       if (b.inicial) miraV(id + '.inicial', b.inicial);
     }
     ok(nv > 250 && !fv.length, 'y los ' + nv + ' del vocabulario (rótulos, ejemplos, frases e iniciales del §3)', fv.join('\n'));
+  });
+
+  /* Storybook es la máquina de UN molde (§4): el Cuento que enseña nace con
+     ella, pero no se apunta como «la última» del aparato —el Rápido
+     siguiente nacería para una máquina que solo hace libros— ni viaja con
+     «Duplicar» a un molde que no es el suyo. En un salón con un almacén de
+     verdad, que es donde vive «la última». */
+  seccion('6.6 Storybook, la máquina de un molde', () => {
+    const almacen = new Map();
+    const LS = cargaEn({ console, document: { addEventListener() {}, getElementById: () => null, querySelector: () => null }, window: {},
+      localStorage: { getItem: k => (almacen.has(k) ? almacen.get(k) : null), setItem: (k, v) => almacen.set(k, String(v)), removeItem: k => almacen.delete(k) } });
+    const deMolde = LS('csgMaquinaDeMolde'), ultima = LS('csgMaquinaUltima'), apunta = LS('csgMaquinaApunta');
+    const sb = LS('csgMaquina')('storybook');
+    ok(sb.id === 'storybook' && sb.forma === 'seguida' && sb.abrir === 'https://gemini.google.com/gem/storybook' && sb.param === '' && /gem\/storybook/.test(sb.donde),
+      'Storybook: forma seguida, se abre en el Gem (no en Gemini a secas) y sin texto en la dirección', JSON.stringify(sb));
+    const d = LS('csgUsarDestino')('storybook', 'Crea un cuento.', {});
+    ok(d.url === 'https://gemini.google.com/gem/storybook' && d.lleno === false, '↗ abre el Gem pelado: el texto va copiado, no en la dirección', JSON.stringify(d));
+    ok(deMolde('storybook') && !deMolde('claude') && !deMolde('gemini') && !deMolde('') && !deMolde(null), 'csgMaquinaDeMolde: Storybook sí; Claude, Gemini y nada, no');
+
+    apunta('chatgpt');
+    ok(ultima() === 'chatgpt', 'apuntar ChatGPT la deja como la última');
+    apunta('storybook');
+    ok(ultima() === 'chatgpt', 'apuntar Storybook NO la pisa: la última sigue siendo ChatGPT');
+    almacen.set(LS('CSG_CLAVES').maquina, 'storybook');
+    ok(ultima() === 'claude', 'y si una versión vieja dejó Storybook apuntada, no se devuelve: se vuelve a Claude');
+    apunta('chatgpt');
+
+    const nuevo = LS('csgNuevaPieza');
+    const cu = nuevo('prompt', 'cuento'), ra = nuevo('prompt', 'rapido');
+    ok(cu.maquina === 'storybook' && cu.molde === 'cuento' && ra.maquina === 'chatgpt', 'una pieza nueva del Cuento que enseña nace para Storybook; un Rápido, para la última (ChatGPT)', cu.maquina + ' / ' + ra.maquina);
+    const ext = cu.bloques.find(b => b.id === 'extension');
+    ok(!!ext && ext.t === 'Diez páginas, una escena por página, con el texto justo para leerlo en voz alta sin cansar.' && cu.bloques.filter(b => b.t).length === 1,
+      'y nace con la Extensión rellena (el `inicial`) y lo demás vacío', JSON.stringify(cu.bloques.filter(b => b.t)));
+    ok(cu.bloques.map(b => b.rotulo).join(' · ') === 'Tema de la historia · Para quién · Protagonista · Dónde pasa · Lo que el cuento explica · Lo que se aprende · Lo que debe sentir el lector · Cómo se cuenta · Cómo termina · Extensión · Ilustraciones · Reglas',
+      'con sus doce rótulos, en el orden del storytelling', cu.bloques.map(b => b.rotulo).join(' · '));
+
+    const dup = LS('csgDuplicarEnMolde');
+    cu.bloques.find(b => b.id === 'leccion').t = 'Que pedir ayuda no es rendirse.';
+    cu.bloques.find(b => b.id === 'personaje').t = 'Tuga, una tortuga tímida.';
+    const aCostar = dup(cu, 'costar');
+    ok(aCostar.maquina === 'chatgpt', 'Duplicar un cuento en CO-STAR no se lleva Storybook: se queda la última del aparato', aCostar.maquina);
+    ok((aCostar.bloques.find(b => b.id === 'objetivo') || {}).t === 'Que pedir ayuda no es rendirse.' && aCostar.bloques.some(b => b.rotulo === 'Protagonista' && b.t === 'Tuga, una tortuga tímida.' && b.traido),
+      '… la lección va al Objetivo (CSG_EQUIVALE) y el protagonista, a la vista como bloque libre traído', JSON.stringify(aCostar.bloques));
+    const vz = nuevo('prompt', 'voz');
+    vz.maquina = 'gemini';
+    vz.bloques.find(b => b.id === 'genero').t = 'Un cuento de unas 1.200 palabras, en tres capítulos.';
+    const aCuento = dup(vz, 'cuento');
+    ok(aCuento.maquina === 'storybook' && (aCuento.bloques.find(b => b.id === 'extension') || {}).t === 'Un cuento de unas 1.200 palabras, en tres capítulos.',
+      'Duplicar un Voz prestada en el Cuento que enseña pone Storybook, y su «Género y largo» va a la Extensión', aCuento.maquina + ' · ' + JSON.stringify(aCuento.bloques.find(b => b.id === 'extension')));
   });
 }
 
