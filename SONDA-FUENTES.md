@@ -1,6 +1,6 @@
 # Sonda de fuentes · La Criba 🪶
 
-**2026-09-01** · 43 fuentes, 116 direcciones candidatas probadas.
+**2026-10-01** · 43 fuentes, 116 direcciones candidatas probadas.
 
 > ℹ️ Sin `CRIBA_MAILTO`: no se usó la cola educada de Crossref y OpenAlex. Funciona igual, con menos prioridad.
 
@@ -12,11 +12,11 @@ lo que se esperaba de ellas.
 
 | | | Qué significa |
 |---|---|---|
-| ✅ Sirven | **27** | Hay canal y trae artículos |
+| ✅ Sirven | **26** | Hay canal y trae artículos |
 | ⁉️ Dudosas | **0** | Responden con ítems, pero sin fecha, sin DOI y sin resumen: casi seguro **no son artículos** |
-| ⚠️ Sin canal | **6** | La institución está en pie y no publica canal legible |
-| 🚫 Rechazan | **6** | 403: rechazan recolectores a propósito |
-| ⏳ Limitadas | **1** | 429: hay cola. Se puede, más despacio o con clave |
+| ⚠️ Sin canal | **7** | La institución está en pie y no publica canal legible |
+| 🚫 Rechazan | **5** | 403: rechazan recolectores a propósito |
+| ⏳ Limitadas | **2** | 429: hay cola. Se puede, más despacio o con clave |
 | ❌ Mudas | **3** | No contestan |
 
 Ninguna de las cinco últimas es «no existe», y la diferencia es lo que importa:
@@ -28,35 +28,35 @@ Ninguna de las cinco últimas es «no existe», y la diferencia es lo que import
 
 | Fuente | Racimo | Formato | Ítems | Resumen | DOI | Idioma | Ritmo |
 |---|---|---|---|---|---|---|---|
-| The Conversation (español) | A·C·G | `atom` | 34 | ✅ | ✅ | en⚠es | 16.2/día |
+| The Conversation (español) | A·C·G | `atom` | 32 | ✅ | ✅ | en⚠es | 21.8/día |
 | Agencia SINC | A·G | **⚠️ sin canal** | · | · | · | · | · |
 | Nada es Gratis (FEDEA) | C | `rss` | 15 | ✅ | · | es | 0.8/día |
-| SciELO | A·C | **🚫 rechaza recolectores** | · | · | · | · | · |
+| SciELO | A·C | `rss` | 10 | ✅ | ✅ | en⚠es | 0.1/día |
 | Redalyc | A·C | **⚠️ sin canal** | · | · | · | · | · |
 | Dialnet | A·C·G | `oai-pmh` | 100 | ✅ | · | es~ | ? |
 | CEPAL | C | **⚠️ sin canal** | · | · | · | · | · |
 | BID · Banco Interamericano de Desarrollo | C | **🚫 rechaza recolectores** | · | · | · | · | · |
-| SIECA | C | `rss` | 10 | ✅ | · | es | 0.7/día |
+| SIECA | C | `rss` | 10 | ✅ | · | es | 0.3/día |
 | Banco Central de Honduras | C·HN | **⚠️ sin canal** | · | · | · | · | · |
 | CNBS · Comisión Nacional de Bancos y Seguros | C·HN | `rss` | 10 | ✅ | · | es | 0.1/día |
 | INE Honduras | C·HN | **🚫 rechaza recolectores** | · | · | · | · | · |
 | COHEP | C·HN | `rss` | 10 | ✅ | · | es | 0/día |
 | FOSDEH | C·HN | **❌ no responde** | · | · | · | · | · |
-| Bolsa Centroamericana de Valores | C·HN | `rss` | 10 | ✅ | · | en⚠es | 0.9/día |
+| Bolsa Centroamericana de Valores | C·HN | `rss` | 10 | ✅ | · | en⚠es | 1.3/día |
 
 ### Fase 2
 
 | Fuente | Racimo | Formato | Ítems | Resumen | DOI | Idioma | Ritmo |
 |---|---|---|---|---|---|---|---|
-| OpenAlex | todos | `json` | 5 | ✅ | ✅ | en | ? |
+| OpenAlex | todos | **⏳ limitada (429)** | · | · | · | · | · |
 | Crossref | todos | `json` | 5 | · | ✅ | es~ | ? |
 | Semantic Scholar | todos | **⏳ limitada (429)** | · | · | · | · | · |
 | Europe PMC | A·D | `json` | 5 | ✅ | ✅ | en | ? |
 | Cochrane Library | A | **❌ no responde** | · | · | · | · | · |
-| Nature Human Behaviour | A | `rss1` | 8 | ✅ | ✅ | en~ | 1.3/día |
+| Nature Human Behaviour | A | `rss1` | 8 | ✅ | ✅ | en~ | 0.8/día |
 | NEP · New Economics Papers | C | **⚠️ sin canal** | · | · | · | · | · |
-| NBER Working Papers | C | `rss` | 31 | ✅ | · | en~ | ? |
-| Retraction Watch | G | `rss` | 10 | ✅ | ✅ | en | 0.9/día |
+| NBER Working Papers | C | `rss` | 43 | ✅ | · | en~ | ? |
+| Retraction Watch | G | `rss` | 10 | ✅ | ✅ | en | 0.7/día |
 | Data Colada | G | `rss` | 50 | ✅ | · | en | 0/día |
 | Royal Society Open Science | G | **🚫 rechaza recolectores** | · | · | · | · | · |
 | World Inequality Lab | C | `rss` | 1 | · | · | en | 2024-08-23 |
@@ -73,11 +73,6 @@ fuente cabe en una edición diaria o la ahoga.
   - `https://www.agenciasinc.es/rss/Noticias/` → 404 · html · 0 ítems
   - `https://www.agenciasinc.es/feed` → 200 · rss · 0 ítems
   - `https://www.agenciasinc.es/` → 200 · html · 0 ítems
-- **SciELO** — rechaza
-  - `https://search.scielo.org/?q=*&lang=es&output=rss` → 403 · html · 0 ítems
-  - `https://www.scielo.org/php/index.php?lang=es&format=rss` → 200 · html · 0 ítems
-  - `https://blog.scielo.org/es/feed/` → 403 · html · 0 ítems
-  - `https://articlemeta.scielo.org/api/v1/article/identifiers/?collection=scl&limit=10` → 200 · json · 0 ítems
 - **Redalyc** — sin canal
   - `https://www.redalyc.org/oai?verb=ListRecords&metadataPrefix=oai_dc` → 404 · text/html · 0 ítems
   - `https://www.redalyc.org/oai/?verb=ListRecords&metadataPrefix=oai_dc` → 404 · text/html · 0 ítems
@@ -107,6 +102,8 @@ fuente cabe en una edición diaria o la ahoga.
   - `https://www.fosdeh.net/feed/` → ⚠️ fetch failed
   - `https://fosdeh.com/feed/` → ⚠️ fetch failed
   - `https://fosdeh.org/feed/` → ⚠️ fetch failed
+- **OpenAlex** — limitada
+  - `https://api.openalex.org/works?per-page=5&sort=publication_date:desc` → 429 · json · 0 ítems
 - **Semantic Scholar** — limitada
   - `https://api.semanticscholar.org/graph/v1/paper/search?query=decision%20making&limit=5&fields=title,abstract,externalIds,year,publicationDate` → 429 · json · 0 ítems
 - **Cochrane Library** — no responde
@@ -130,9 +127,12 @@ fuente cabe en una edición diaria o la ahoga.
   - `https://nuso.org/feed/` → 500 · html · 0 ítems
   - `https://nuso.org/rss.xml` → 500 · html · 0 ítems
 - **CTXT · Contexto y Acción** — rechaza
-  - `https://ctxt.es/rss/` → 403 · html · 0 ítems
+  - `https://ctxt.es/rss/` → 404 · html · 0 ítems
   - `https://ctxt.es/es/rss` → 403 · html · 0 ítems
-  - `https://ctxt.es/feed` → 403 · html · 0 ítems
+  - `https://ctxt.es/feed` → 404 · html · 0 ítems
+- **Filosofía&co** — sin canal
+  - `https://www.filco.es/feed/` → 200 · html · 0 ítems
+  - `https://filco.es/feed/` → 200 · html · 0 ítems
 - **Agencia SINC** — sin canal
   - `https://www.agenciasinc.es/rss` → 404 · html · 0 ítems
   - `https://www.agenciasinc.es/rss/todas` → 404 · html · 0 ítems
@@ -140,4 +140,4 @@ fuente cabe en una edición diaria o la ahoga.
   - `https://www.agenciasinc.es/feed` → 200 · rss · 0 ítems
 
 ---
-Generado por `node _dev/sonda-fuentes.js` · 2026-09-01
+Generado por `node _dev/sonda-fuentes.js` · 2026-10-01
