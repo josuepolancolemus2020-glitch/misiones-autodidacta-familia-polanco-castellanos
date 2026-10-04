@@ -4468,6 +4468,310 @@ function filasHoja(d){
   w.eval('vozCerrarLector()');
   await esperar(300);
 
+  log('── 44. 🔢👁 Cada número de cita lleva a su fuente, y su documento se ve sin salir ──');
+  /* Pedido por el autor el 4 de octubre de 2026: «que las referencias no
+     solo estén abajo del documento sino hipervinculadas entre cada número
+     que caza del subíndice o entre corchetes», y que el número «abra y,
+     si se puede, visualizar el documento de donde es la referencia».
+     Ordenado por gravedad:
+
+     1. QUE UN NÚMERO QUE NO ES CITA LLEVE A UNA FUENTE. «100 m²», «10³»
+        y «H₂O» con una bibliografía puesta casaban con la fuente 2 o 3:
+        la ficha enseñaba un libro que no tiene nada que ver con la frase.
+     2. QUE SE NUMERE SOLA UNA BIBLIOGRAFÍA SIN NÚMEROS (regla 27). Se
+        ofrece, con la entrada a la vista, y solo la persona decide.
+     3. QUE NUMERAR O CONSULTAR MUEVA LA LECTURA, o le cambie un carácter
+        al párrafo (y con él, los subrayados).
+     4. QUE EL VISOR DEJE A LA PÁGINA DE DENTRO LLEVARSE A F.A.R.O, o que
+        se quede sonando detrás al cerrarlo, o que enseñe dentro una
+        dirección de la propia casa. */
+  const base44 = nuevaBase(w, {});
+  await w.eval('vozYo()');
+  let confirms44 = 0;
+  w.confirm = () => { confirms44++; return true; };
+
+  /* 1. El lector, puro. */
+  const ll44 = JSON.parse(w.eval(`(function(){
+    const caps = [{ t: '', p: [{ k: 'p', t: 'x' }] }, { t: 'Referencias', ref: true,
+      p: [1, 2, 3, 4, 5].map(i => ({ k: 'fuente', n: i, t: 'Autor' + i + ', A. (201' + i + '). Obra ' + i + '.' })) }];
+    const idx = vozIndiceFuentes({ cid: '__ll44__', capitulos: caps });
+    const t = 'Uno[1, 3]. Rango[2–4]. Sobra [1-500]. Aula.² Grupo₃. Pero 100 m², 10³, E = mc², x² y H₂O y CO₂. Dentro (véase [5]).';
+    const r = vozLlamadasEn(t, idx);
+    vozOlvidaFuentes();
+    return JSON.stringify({ res: r.res.map(x => x.t + '=' + x.fuentes.map(f => f.n).join(',')), hue: r.huerfanas.map(x => x.t) });
+  })()`));
+  ok(JSON.stringify(ll44.res) === JSON.stringify(['[1, 3]=1,3', '[2–4]=2,3,4', '²=2', '₃=3', '[5]=5']),
+     '⚠️ caza «[1, 3]», «[2–4]», el superíndice detrás de un signo, el SUBÍNDICE detrás de una palabra y la llamada DENTRO de un paréntesis que no es cita (' + ll44.res.join(' · ') + ')',
+     '⚠️ las llamadas no son las que tocan: ' + JSON.stringify(ll44));
+  ok(ll44.hue.length === 0,
+     '⚠️ y NO toma por cita «100 m²», «10³», «mc²», «x²», «H₂O», «CO₂» ni un «[1-500]»: ni botón ni huérfana',
+     '⚠️ un exponente o un rango absurdo pasó por cita: ' + JSON.stringify(ll44));
+  const lec44 = JSON.parse(w.eval(`(function(){
+    const a = vozLeer('Voz: X\\nMáquina: Y\\n\\nDato.[1] Otro.[2]\\n\\nObras citadas\\n\\n1. Uno, A. https://example.org/a\\n\\n2. Wikipedia, https://example.org/w\\n');
+    const b = vozLeer('Dato[1][2].\\n\\nCitations:\\n[1] https://example.org/a\\n[2] https://example.org/b\\n');
+    const m = c => { const x = vozMapaCitas({ cid: '__lec44' + Math.random(), capitulos: c }); vozOlvidaFuentes(); return x.donde.size; };
+    return JSON.stringify({ a: m(a.capitulos), b: m(b.capitulos), ca: a.capitulos.map(c => c.t + (c.ref ? '/ref' : '')), cb: b.capitulos.map(c => c.t + (c.ref ? '/ref' : '')) });
+  })()`));
+  ok(lec44.a === 2 && lec44.b === 2,
+     '⚠️ un «Obras citadas» pelado —como llega al copiar un informe— y el «Citations:» de Perplexity se leen como bibliografía, y sus llamadas casan',
+     '⚠️ la bibliografía pelada no se reconoció: ' + JSON.stringify(lec44));
+
+  /* 2. Un texto con su bibliografía SIN números, como llega pegada. */
+  const P44a = 'Los docentes dedican el 78 % de su tiempo a enseñar.[1] En la región la cifra baja[2, 3], ' +
+    'aunque las aulas miden 100 m², hay 10³ trámites al año y el H₂O no llega a todas las escuelas.';
+  const P44b = 'Un tercer dato sobre la carga educativa.² Y una llamada que la lista no tiene [4], que tiene que seguir diciéndolo.';
+  /* ⚠️ Una cursiva parte el texto en nodos: el «²» de «*km*²» empieza su
+     propio nodo sin nada delante. Mirado a solas sería una llamada; en el
+     bloque —que es como cuenta el panel— es un exponente. */
+  const P44c = 'Con una cursiva delante del exponente, 30 *km*² de bosque, y una llamada dentro de un paréntesis (véase [1]).';
+  const fu44 = [
+    { k: 'fuente', n: null, t: 'TALIS 2018: resultados para docentes. OCDE. https://example.org/talis', url: 'https://example.org/talis' },
+    { k: 'fuente', n: null, t: 'Educación 2020 (2019). Menos carga administrativa. https://example.org/e2020.pdf', url: 'https://example.org/e2020.pdf' },
+    { k: 'fuente', n: null, t: 'Urban (2021). Retention. <img src=x onerror="window.__veneno44=1"> sin dirección' },
+  ];
+  const relleno44 = [...Array(8)].map((_, i) => ({ k: 'p', t: 'Párrafo de relleno ' + (i + 1) + '. ' +
+    'La jornada de los docentes se reparte entre el aula, los formularios y las reuniones, y lo que se mide no siempre es lo que importa. '.repeat(3) }));
+  const hace44 = (cid, quien) => Object.assign(cuentoLargo(cid), {
+    titulo: 'El impuesto sobre el tiempo', voz: 'un informe de investigación', maquina: 'Gemini', genero: 'ensayo',
+    puesto_por: quien, actualizado: Date.now(),
+    capitulos: [{ t: 'Capítulo 1', p: [{ k: 'p', t: P44a }, { k: 'p', t: P44b }, { k: 'p', t: P44c }].concat(relleno44) },
+                { t: 'Obras citadas', ref: true, p: JSON.parse(JSON.stringify(fu44)) }],
+  });
+  w.eval(`_vozCuentos = [${JSON.stringify(hace44('c44', VOZ_UID))}, ${JSON.stringify(hace44('c44-ajeno', 'de-otra-persona'))}];
+          vozGuardaLocal(); vozOlvidaFuentes();
+          _vozAj.modo = 'paginas'; _vozAj.paso = 'deslizar'; _vozAj.tam = 19; _vozAj.tema = 'papel'; vozGuardaAjustes();
+          vozRender(); vozAbrirLector('c44')`);
+  await esperar(900);
+  w.eval('vozIrA(0, 0, 0)');
+  await esperar(400);
+  const par44 = () => d.querySelector('#voz-texto .voz-p[data-cap="0"][data-vp="0"]');
+  const par44b = () => d.querySelector('#voz-texto .voz-p[data-cap="0"][data-vp="1"]');
+  const par44c = () => d.querySelector('#voz-texto .voz-p[data-cap="0"][data-vp="2"]');
+  const en01 = sel => [...d.querySelectorAll('#voz-texto .voz-p[data-vp="0"] ' + sel + ', #voz-texto .voz-p[data-vp="1"] ' + sel)].map(x => x.textContent);
+  const sinAntes = en01('.voz-cit-sin');
+  ok(d.querySelectorAll('#voz-texto .voz-cit').length === 0 && JSON.stringify(sinAntes) === JSON.stringify(['[1]', '[2, 3]', '²', '[4]']),
+     '⚠️ sin números en la bibliografía, NADA se casa por su cuenta (regla 27): las cuatro llamadas salen como «sin entrada» y ningún exponente entre ellas',
+     '⚠️ se casó algo sin números, o un exponente salió como llamada: cit=' + d.querySelectorAll('#voz-texto .voz-cit').length + ' sin=' + JSON.stringify(sinAntes));
+  ok(par44() && par44().textContent === P44a && par44b().textContent === P44b,
+     '⚠️ y el texto pintado sigue siendo el guardado carácter por carácter: los subrayados no se mueven',
+     '⚠️ marcar las llamadas sin entrada le cambió el texto al párrafo');
+  const pag44 = Number(w.eval('_vozPagina')), ancla44 = Number(w.eval('_vozAncla'));
+  /* ⚠️ Un botón que falta es un fallo, no un reventón: una sonda que
+     revienta en la primera avería esconde las de detrás. */
+  const toca = el => { if (el) el.click(); return !!el; };
+  toca(d.querySelector('#voz-texto .voz-cit-sin'));
+  await esperar(250);
+  const cb44 = d.getElementById('voz-citbar');
+  ok(cb44 && !cb44.hidden && /Sin entrada/i.test(cb44.textContent) && /TALIS 2018/.test(cb44.textContent) &&
+     !!cb44.querySelector('.voz-citbar-numerar'),
+     'tocar el «[1]» sin entrada dice por qué, enseña la entrada que le TOCARÍA por el orden y ofrece numerar (no lo hace)',
+     'la ficha de la llamada sin entrada no explica, no propone o no ofrece numerar: ' + (cb44 ? cb44.textContent.slice(0, 200) : 'sin ficha'));
+  ok(!/alfab/i.test(cb44.textContent) && /\[4\]/.test(cb44.textContent),
+     'y dice que el texto cita hasta la [4] con tres entradas; sin aviso de abecedario, porque la lista no lo es',
+     'los avisos de la propuesta no cuadran: ' + cb44.textContent.slice(0, 300));
+  ok(Number(w.eval('_vozPagina')) === pag44 && Number(w.eval('_vozAncla')) === ancla44 && base44.escritas.length === 0,
+     '⚠️ y consultar no mueve la lectura ni escribe nada', '⚠️ consultar movió la lectura o escribió en la nube');
+
+  toca(cb44.querySelector('.voz-citbar-numerar'));
+  await esperar(700);
+  const fila44 = base44.escritas.filter(x => x.cid === 'c44').pop();
+  const nums44 = fila44 ? fila44.capitulos[1].p.map(b => b.n) : null;
+  ok(fila44 && fila44.puesto_por === VOZ_UID && JSON.stringify(nums44) === '[1,2,3]' &&
+     fila44.capitulos[1].p[0].t === fu44[0].t,
+     '⚠️ «Sí, numerar» numera 1, 2, 3 SIN tocar una letra de las entradas, y sube FIRMADO a la nube',
+     '⚠️ la numeración no llegó a la nube como debía: ' + JSON.stringify(fila44 && { n: nums44, pp: fila44.puesto_por }));
+  ok(!cb44.hidden && /TALIS 2018/.test(cb44.textContent) && !/Sin entrada/i.test(cb44.textContent) && !!cb44.querySelector('.voz-citbar-ver'),
+     'y en el acto la ficha es la de la fuente de verdad, con «👁 Ver el documento»',
+     'después de numerar no salió la ficha de la fuente: ' + cb44.textContent.slice(0, 160));
+  const citDesp = en01('.voz-cit');
+  const sinDesp = en01('.voz-cit-sin');
+  ok(JSON.stringify(citDesp) === JSON.stringify(['[1]', '[2, 3]', '²']) && JSON.stringify(sinDesp) === JSON.stringify(['[4]']),
+     '⚠️ ahora cada número lleva a su fuente —«[1]», «[2, 3]» y el «²»— y la [4], que no existe, sigue diciéndolo; «m²», «10³» y «H₂O», como texto',
+     '⚠️ después de numerar las llamadas no son las que tocan: cit=' + JSON.stringify(citDesp) + ' sin=' + JSON.stringify(sinDesp));
+  ok(par44().textContent === P44a && par44b().textContent === P44b &&
+     Number(w.eval('_vozPagina')) === pag44 && Number(w.eval('_vozAncla')) === ancla44,
+     '⚠️ y numerar no movió la página ni un carácter del párrafo', '⚠️ numerar movió la lectura o cambió el texto');
+  const enC = [...par44c().querySelectorAll('.voz-cit, .voz-cit-sin')].map(x => x.className + '=' + x.textContent);
+  ok(JSON.stringify(enC) === JSON.stringify(['voz-cit voz-cit-n=[1]']),
+     '⚠️ y la página dice lo mismo que la cuenta: «*km*²» detrás de una cursiva sigue siendo exponente, y «(véase [1])» lleva a la 1',
+     '⚠️ la página y la cuenta no dicen lo mismo en el párrafo con cursiva: ' + JSON.stringify(enC));
+  ok(confirms44 === 0, 'sin pasar por confirm() ni una vez', 'pasó por confirm() ' + confirms44 + ' veces');
+
+  /* 3. La ficha de dos fuentes: una es un PDF, la otra no trae dirección. */
+  w.eval('vozCitCerrar()');
+  toca([...d.querySelectorAll('#voz-texto .voz-cit')].find(x => x.textContent === '[2, 3]'));
+  await esperar(250);
+  const filas44 = [...cb44.querySelectorAll('.voz-citbar-f')];
+  const busca44 = cb44.querySelector('a.voz-citbar-busca[href^="https://scholar.google.com/scholar?q="]');
+  ok(filas44.length === 2 && filas44[0].querySelector('.voz-citbar-ver') && !filas44[1].querySelector('.voz-citbar-ver') && !!busca44,
+     '«[2, 3]» abre las DOS fuentes; la que no trae dirección no promete un documento: ofrece «🔎 Buscarla»',
+     'la ficha de dos fuentes no es la que toca: ' + cb44.textContent.slice(0, 200));
+  ok(busca44 && busca44.getAttribute('rel') === 'noopener noreferrer' && busca44.getAttribute('target') === '_blank' &&
+     /scholar\?q=Urban/.test(busca44.getAttribute('href')),
+     'con un literal delante y la entrada codificada detrás, y con noopener', 'el enlace de buscar no es seguro: ' + (busca44 && busca44.getAttribute('href')));
+  ok(cb44.querySelectorAll('img').length === 0 && !w.__veneno44,
+     'y el veneno de la entrada sale como texto', '⚠️ la entrada escribió HTML en la ficha');
+
+  /* 4. El visor. Primero el PDF, que NO se enseña en un marco. */
+  toca(filas44[0] && filas44[0].querySelector('.voz-citbar-ver'));
+  await esperar(200);
+  const ov44 = d.getElementById('voz-doc-overlay');
+  const fuera44 = d.getElementById('voz-doc-fuera');
+  ok(ov44.style.display === 'flex' && !d.querySelector('#voz-doc-caja iframe') && /PDF/.test(d.getElementById('voz-doc-caja').textContent) &&
+     !fuera44.hidden && fuera44.getAttribute('href') === 'https://example.org/e2020.pdf' && fuera44.getAttribute('rel') === 'noopener noreferrer',
+     '⚠️ un PDF no se mete en un marco (el visor no funciona protegido): se dice, y «↗ Abrir aparte» lleva a él con noopener',
+     '⚠️ el PDF se metió en un marco o no se explicó: ' + d.getElementById('voz-doc-caja').textContent.slice(0, 120));
+  d.getElementById('voz-doc-cerrar').click();
+  await esperar(150);
+  ok(ov44.style.display !== 'flex', 'la ✕ cierra el visor', 'la ✕ no cerró el visor');
+
+  /* Ahora una página web, desde el «[1]». */
+  toca([...d.querySelectorAll('#voz-texto .voz-cit')].find(x => x.textContent === '[1]'));
+  await esperar(250);
+  toca(cb44.querySelector('.voz-citbar-ver'));
+  await esperar(300);
+  const fr44 = d.querySelector('#voz-doc-caja iframe');
+  const sb44 = fr44 ? (fr44.getAttribute('sandbox') || '') : '';
+  ok(!!fr44 && fr44.getAttribute('src') === 'https://example.org/talis' && cb44.hidden,
+     '«👁 Ver el documento» enseña la página de la fuente DENTRO de la lectura, y la ficha se aparta',
+     'el visor no cargó la fuente: ' + (fr44 ? fr44.getAttribute('src') : 'sin marco'));
+  ok(sb44 === w.eval('VOZ_DOC_SANDBOX') && !/allow-top-navigation/.test(sb44) && /allow-scripts/.test(sb44),
+     '⚠️ con el marco PROTEGIDO y sin «allow-top-navigation»: la página de dentro no puede llevarse a F.A.R.O a otra dirección',
+     '⚠️ el marco no va protegido como debe: «' + sb44 + '»');
+  ok(fr44 && fr44.getAttribute('referrerpolicy') === 'no-referrer',
+     'y sin decirle de dónde la abrieron (referrerpolicy no-referrer)', 'el marco manda la dirección de F.A.R.O como referencia');
+  const caja44 = d.getElementById('voz-doc-caja').getBoundingClientRect();
+  const enCentro = d.elementFromPoint(caja44.left + caja44.width / 2, caja44.top + caja44.height / 2);
+  ok(caja44.height > 150 && enCentro === fr44,
+     'y el documento está ENCIMA de todo (elementFromPoint en su centro da el marco, de ' + Math.round(caja44.height) + ' px de alto)',
+     '⚠️ el visor queda debajo de otra cosa, o sin alto: ' + (enCentro ? enCentro.tagName + '.' + enCentro.className : 'nada') + ' · ' + Math.round(caja44.height));
+  ok(/\[1\]/.test(d.getElementById('voz-doc-tit').textContent) && /TALIS 2018/.test(d.getElementById('voz-doc-ref').textContent) &&
+     fuera44.getAttribute('href') === 'https://example.org/talis' && fuera44.getAttribute('target') === '_blank',
+     'arriba dice qué fuente es, y «↗ Abrir aparte» está siempre a mano para la página que no se deja enseñar',
+     'la cabecera del visor no dice qué fuente es o falta la salida');
+  ok(Number(w.eval('_vozPagina')) === pag44 && Number(w.eval('_vozAncla')) === ancla44,
+     '⚠️ y ver el documento NO mueve la lectura', '⚠️ abrir el documento movió la lectura');
+  d.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+  await esperar(150);
+  ok(ov44.style.display !== 'flex' && !d.getElementById('voz-lector').hidden,
+     'Escape cierra el documento y deja la sala abierta, en la misma página', 'Escape cerró la sala o no cerró el documento');
+  ok(d.querySelectorAll('#voz-doc-caja iframe').length === 0,
+     '⚠️ y el marco se QUITA al cerrar: una página con audio no se queda sonando detrás de la lectura',
+     '⚠️ al cerrar quedaron ' + d.querySelectorAll('#voz-doc-caja iframe').length + ' marcos vivos');
+  w.eval('vozDocAbrir({ t: "Una página de la casa", n: 9, url: location.origin + "/index.html" })');
+  await esperar(150);
+  ok(!d.querySelector('#voz-doc-caja iframe') && /F\.A\.R\.O/.test(d.getElementById('voz-doc-caja').textContent),
+     '⚠️ una dirección de la propia F.A.R.O no se enseña en el marco (podría quitarse la protección): se abre aparte',
+     '⚠️ una página de la casa se metió en el marco');
+  w.eval('vozDocCerrar()');
+
+  /* Y desde la bibliografía de abajo: cada entrada con dirección trae su 👁. */
+  w.eval('vozIrA(1, 0, 0)');
+  await esperar(400);
+  const ojos44 = [...d.querySelectorAll('#voz-texto .voz-fuente-ver')];
+  ok(ojos44.length === 2, 'en la bibliografía, las dos entradas con dirección traen su 👁 (la que no tiene, no)',
+     'la bibliografía tiene ' + ojos44.length + ' botones de ver');
+  if (ojos44[0]) ojos44[0].click();
+  await esperar(250);
+  ok(ov44.style.display === 'flex' && d.querySelector('#voz-doc-caja iframe') &&
+     d.querySelector('#voz-doc-caja iframe').getAttribute('src') === 'https://example.org/talis',
+     'y tocarlo abre su documento sin salir', 'el 👁 de la bibliografía no abrió el documento');
+  w.eval('vozDocCerrar(); vozCerrarLector()');
+  await esperar(300);
+
+  /* 5. Lo ajeno: se dice y no se ofrece (lo rechazaría la base). */
+  base44.escritas.length = 0;
+  w.eval(`vozAbrirLector('c44-ajeno')`);
+  await esperar(900);
+  w.eval('vozIrA(0, 0, 0)');
+  await esperar(300);
+  toca(d.querySelector('#voz-texto .voz-cit-sin'));
+  await esperar(250);
+  ok(!cb44.hidden && !cb44.querySelector('.voz-citbar-numerar') && !!cb44.querySelector('.voz-citbar-ajeno'),
+     'en un texto de otra persona de la casa la propuesta sale, pero el botón no: se dice que solo ella puede numerarlo',
+     'en lo ajeno se ofreció numerar, o no se dijo por qué no');
+  w.eval(`vozCitCerrar(); vozAbrirPanel('voz-panel-ind'); vozPintarPanelInd('fuentes')`);
+  await esperar(250);
+  const cajaAj = d.querySelector('#voz-panel-ind .voz-fu-numerar');
+  ok(cajaAj && /otra persona/.test(cajaAj.textContent) && !cajaAj.querySelector('button') && base44.escritas.length === 0,
+     'y en 📚 Fuentes igual: la explicación, sin botón y sin escribir nada', 'el panel ofreció numerar un texto ajeno');
+  w.eval('vozCerrarPaneles(); vozCerrarLector()');
+  await esperar(300);
+
+  /* 6. El panel 📚 Fuentes, con lo propio: dos toques en el mismo sitio. */
+  w.eval(`_vozCuentos = _vozCuentos.filter(c => c.cid !== 'c44p').concat([${JSON.stringify(hace44('c44p', VOZ_UID))}]);
+          vozGuardaLocal(); vozOlvidaFuentes(); vozAbrirLector('c44p')`);
+  await esperar(900);
+  w.eval(`vozAbrirPanel('voz-panel-ind'); vozPintarPanelInd('fuentes')`);
+  await esperar(250);
+  const cajaNum = d.querySelector('#voz-panel-ind .voz-fu-numerar');
+  const bNum = cajaNum && [...cajaNum.querySelectorAll('button')].find(b => /Numerar 1 a 3/.test(b.textContent));
+  ok(!!bNum && /\[1\]/.test(cajaNum.textContent) && /TALIS/.test(cajaNum.textContent),
+     '📚 Fuentes ofrece «🔢 Numerar 1 a 3» y enseña cuál sería la [1] antes del toque', 'el panel no ofrece numerar');
+  const xAntes = bNum ? bNum.getBoundingClientRect().left : -1;
+  if (bNum) bNum.click();
+  await esperar(150);
+  const noB = cajaNum && [...cajaNum.querySelectorAll('button')].find(b => b.textContent === 'No' && !b.hidden);
+  const siB = cajaNum && [...cajaNum.querySelectorAll('button')].find(b => /Sí, numerarlas/.test(b.textContent) && !b.hidden);
+  ok(!!noB && !!siB && d.activeElement === noB && Math.abs(noB.getBoundingClientRect().left - xAntes) < 2 && base44.escritas.length === 0,
+     '⚠️ el primer toque NO numera: pone «No» donde estaba el botón, con el foco (un doble toque sin querer cae en «No»)',
+     '⚠️ el primer toque numeró, o el «No» no quedó en su sitio: no=' + !!noB + ' si=' + !!siB + ' foco=' + (d.activeElement && d.activeElement.textContent));
+  if (siB) siB.click();
+  await esperar(700);
+  const filaP = base44.escritas.filter(x => x.cid === 'c44p').pop();
+  ok(filaP && JSON.stringify(filaP.capitulos[1].p.map(b => b.n)) === '[1,2,3]' && confirms44 === 0,
+     'y «Sí, numerarlas» numera y sube, sin confirm()', 'el segundo toque no numeró: ' + JSON.stringify(filaP && filaP.capitulos[1].p.map(b => b.n)));
+  ok(!d.querySelector('#voz-panel-ind .voz-fu-numerar') && d.querySelectorAll('#voz-texto .voz-cit').length === 4,
+     'y la propuesta desaparece: ya no hay nada que numerar', 'la propuesta siguió ahí después de numerar');
+  w.eval('vozCerrarPaneles(); vozCerrarLector()');
+  await esperar(300);
+
+  /* 7. La hoja de pegar: se ofrece ANTES de guardar, y se deshace. */
+  base44.escritas.length = 0;
+  w.eval('vozAbrirPegar(null)');
+  await esperar(200);
+  const ta44 = d.getElementById('voz-pegar-txt');
+  ta44.value = 'Voz: un informe\nMáquina: Gemini\n\nLos docentes enseñan el 78 % del tiempo.[1] Y la carga crece.[2]';
+  d.getElementById('voz-f-fuentes').value = 'Fuentes usadas en el informe\nexample.org\nPrimera fuente sobre docentes\nexample.net\nSegunda fuente sobre carga';
+  w.eval('vozRepasar()');
+  await esperar(250);
+  const nP = () => JSON.parse(w.eval('JSON.stringify(_vozPegado.capitulos[_vozPegado.capitulos.length - 1].p.map(b => b.n))'));
+  const bPeg = () => [...d.querySelectorAll('#voz-pegar-repaso .voz-rep-numerar button')];
+  ok(bPeg().some(b => /Numerar la lista por su orden/.test(b.textContent)) && JSON.stringify(nP()) === '[null,null]',
+     'el repaso del pegado lo ve antes de guardar —llamadas con número y lista sin números— y ofrece numerar sin hacerlo',
+     'el repaso no ofreció numerar: ' + d.getElementById('voz-pegar-repaso').textContent.slice(0, 200));
+  toca(bPeg()[0]);
+  await esperar(200);
+  ok(JSON.stringify(nP()) === '[1,2]' && /Numeradas por su orden/.test(d.getElementById('voz-pegar-repaso').textContent) &&
+     /2 fuentes quedan enlazadas/.test(d.getElementById('voz-pegar-repaso').textContent),
+     'un toque las numera y el repaso lo dice, con las dos llamadas ya enlazadas', 'numerar en el pegado no funcionó: ' + JSON.stringify(nP()));
+  ta44.value += ' Una frase más.';
+  ta44.dispatchEvent(new w.Event('input', { bubbles: true }));
+  w.eval('vozRepasar()');
+  await esperar(200);
+  ok(JSON.stringify(nP()) === '[1,2]', 'y sigue numerada al seguir escribiendo (el lector relee en cada tecla)', 'la numeración se perdió con la siguiente tecla');
+  toca(bPeg().find(b => /Quitar los números/.test(b.textContent)));
+  await esperar(200);
+  ok(JSON.stringify(nP()) === '[null,null]', '«↶ Quitar los números» la deja como vino', 'no se pudo deshacer la numeración');
+  toca(bPeg()[0]);
+  await esperar(200);
+  d.getElementById('voz-f-titulo').value = 'El informe numerado';
+  w.eval('vozPintarBotonGuardar()');
+  await w.eval('vozGuardarPegado()');
+  await esperar(500);
+  const filaPeg = base44.escritas.find(x => x.titulo === 'El informe numerado');
+  const capPeg = filaPeg && filaPeg.capitulos[filaPeg.capitulos.length - 1];
+  ok(capPeg && JSON.stringify(capPeg.p.map(b => b.n)) === '[1,2]',
+     'y se guarda con sus números, que es lo que hace que en la sala cada llamada lleve a su fuente', 'se guardó sin los números');
+  w.eval(`vozAbrirPegar(_vozCuentos.find(c => c.titulo === 'El informe numerado'))`);
+  await esperar(250);
+  ok(/^\[1\] /.test(d.getElementById('voz-f-fuentes').value) && /\n\[2\] /.test(d.getElementById('voz-f-fuentes').value),
+     'y al corregirlo, la caja de fuentes enseña los números escritos: la ida y la vuelta dicen lo mismo',
+     'la caja de fuentes no trae los números: ' + JSON.stringify(d.getElementById('voz-f-fuentes').value.slice(0, 80)));
+  w.eval('vozCerrarPegar()');
+  delete w.confirm;
+  await esperar(200);
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

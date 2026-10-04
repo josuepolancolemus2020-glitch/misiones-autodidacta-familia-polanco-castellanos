@@ -1375,6 +1375,16 @@ button.voz-grupo-tit:focus-visible { outline: 2px solid var(--story); outline-of
 }
 .voz-cit-n:hover { text-decoration: underline; }
 .voz-cit-ap { white-space: normal; }
+/* ⚠️ LA LLAMADA SIN ENTRADA (4 de octubre de 2026): se puede tocar para
+   que diga por qué no lleva a ninguna parte, y se distingue de las
+   buenas a simple vista —gris y con raya cortada— para que nadie la
+   confunda con una fuente comprobada. Solo color, raya y cursor: ni
+   tamaño ni relleno, que moverían la página (la regla del marcador). */
+.voz-cit-sin {
+  display: inline; font: inherit; color: var(--muted); cursor: help;
+  text-decoration: underline dashed; text-decoration-thickness: 1px; text-underline-offset: 2px;
+}
+.voz-cit-sin:focus-visible { outline: 2px dashed var(--muted); outline-offset: 2px; border-radius: 3px; }
 
 /* ─── La ficha de la fuente, encima de la lectura ───────────────── */
 .voz-citbar {
@@ -1418,6 +1428,18 @@ button.voz-grupo-tit:focus-visible { outline: 2px solid var(--story); outline-of
   display: inline-flex; align-items: center;
 }
 .voz-citbar-ir { color: var(--story); border-color: var(--story); font-weight: 600; }
+/* 👁 Ver el documento es lo que se viene a hacer: va lleno. Y estos se
+   tocan con el dedo encima de un párrafo, así que miden 36 de alto. */
+.voz-citbar-acc .voz-citbar-b, .voz-citbar-acc .voz-citbar-ir { min-height: 36px; }
+.voz-citbar-ver { background: var(--story); border-color: var(--story); color: #fff; font-weight: 700; }
+.voz-citbar-rot-sin { color: var(--muted); }
+.voz-citbar-txt { margin: 0; font-size: 12.5px; line-height: 1.45; }
+.voz-citbar-ojo { margin: 0; font-size: 12px; line-height: 1.45; color: #b45309; }
+.voz-citbar-ajeno { font-size: 11.5px; color: var(--muted); align-self: center; }
+.voz-citbar-f-sup {
+  padding: 7px 8px; border-radius: 10px; border: 1px dashed var(--border);
+  background: rgba(127,127,127,.06);
+}
 
 /* ─── La bibliografía, dentro del texto ─────────────────────────── */
 /* Sangría francesa: la segunda línea entrada, como en cualquier norma
@@ -1433,6 +1455,12 @@ button.voz-grupo-tit:focus-visible { outline: 2px solid var(--story); outline-of
 }
 .voz-fuente-t { overflow-wrap: anywhere; }
 .voz-fuente-ir { color: var(--story); text-decoration: none; margin-left: .3em; }
+/* El 👁 de la entrada: un botón sin caja, del tamaño de la letra, para
+   que no rompa la sangría francesa ni el reparto en páginas. */
+.voz-fuente-ver {
+  font: inherit; background: none; border: 0; padding: 0 .15em; margin-left: .2em;
+  color: var(--story); cursor: pointer; text-indent: 0;
+}
 
 /* ─── Las tablas ────────────────────────────────────────────────── */
 /* `break-inside: avoid` para que la paginación por columnas no parta
@@ -1739,6 +1767,22 @@ body.voz-eligiendo .destello-fab { display: none !important; }
   background: var(--story-bg, #fdf6ec); border: 1px solid var(--border);
   border-radius: 10px; padding: 8px 10px;
 }
+/* 🔢 Numerar una bibliografía sin números: en la hoja de pegar y en el
+   panel 📚 Fuentes. El texto encima y el botón debajo, que en un
+   teléfono de 320 px uno al lado del otro no caben. */
+.voz-rep-numerar, .voz-fu-numerar {
+  margin-top: 8px; display: flex; flex-direction: column; gap: 7px; align-items: flex-start;
+  font-size: 12px; line-height: 1.45; color: var(--text);
+  border: 1px dashed var(--story, #b45309); border-radius: 10px; padding: 8px 10px;
+  background: rgba(127,127,127,.05);
+}
+.voz-fu-numerar { margin: 4px 0 10px; }
+.voz-fu-numerar-t, .voz-fu-numerar-ej, .voz-fu-numerar-ojo { margin: 0; }
+.voz-fu-numerar-ej { font-family: var(--voz-fam, Georgia, serif); overflow-wrap: anywhere; }
+.voz-fu-numerar-ojo { color: #b45309; }
+.voz-fu-numerar-acc { display: flex; gap: 6px; flex-wrap: wrap; }
+.voz-rep-numerar .voz-btn, .voz-fu-numerar .voz-btn { min-height: 40px; }
+.voz-fu-numerar-acc [hidden] { display: none; }
 
 /* ─── El panel 🔗 Recursos ──────────────────────────────────────────
    ⚠️ TODO CUELGA DENTRO DE #voz-lector, así que se tiñe solo con el
@@ -1835,6 +1879,43 @@ body.voz-eligiendo .destello-fab { display: none !important; }
 .voz-yt-caja iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .voz-yt-fuera { display: block; text-align: center; margin-top: 8px; text-decoration: none; }
 .voz-yt-fuera[hidden] { display: none; }
+
+/* ── 👁 El documento de una fuente dentro de la lectura ──────────
+   Casi a pantalla completa: un documento se lee, y un marco pequeño
+   obliga a desplazar dentro de otro desplazamiento. La referencia va
+   arriba, en dos renglones como mucho, para saber qué se está
+   comprobando sin quitarle sitio al documento. */
+#voz-doc-overlay .fin-modal {
+  width: min(980px, 98vw); height: 94vh; max-height: 94vh;
+  display: flex; flex-direction: column; gap: 6px; overflow: hidden;
+}
+#voz-doc-overlay .fin-modal.voz-doc-corto { height: auto; }
+.voz-doc-x { flex: 0 0 auto; width: 40px; height: 40px; font-size: 17px; }
+.voz-doc-ref {
+  margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--text);
+  font-family: var(--voz-fam, Georgia, serif); overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.voz-doc-barra { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.voz-doc-fuera { text-decoration: none; min-height: 40px; display: inline-flex; align-items: center; }
+.voz-doc-fuera[hidden] { display: none; }
+.voz-doc-dom { font-size: 11.5px; color: var(--muted); overflow-wrap: anywhere; }
+.voz-doc-caja {
+  position: relative; flex: 1 1 auto; min-height: 0;
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  background: #fff;
+}
+.voz-doc-caja iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+/* Debajo del marco, mientras carga. El marco tiene fondo blanco, así que
+   en cuanto pinta lo tapa; y al cargar se quita. */
+.voz-doc-cargando {
+  position: absolute; inset: 0; margin: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #64748b;
+}
+.voz-doc-sin { flex: 0 0 auto; background: rgba(127,127,127,.06); }
+.voz-doc-aviso { margin: 0; padding: 14px; font-size: 13.5px; line-height: 1.5; color: var(--text); }
+.voz-doc-nota { margin: 0; }
+.voz-doc-nota:empty { display: none; }
 .voz-rec-ver { white-space: nowrap; }
 
 /* ── La hoja de lo compartido ───────────────────────────────

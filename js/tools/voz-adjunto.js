@@ -178,6 +178,108 @@ function vadjEsLista(p) {
   return !!(pPr && [...pPr.children].some(x => x.localName === 'numPr'));
 }
 
+/* ⚠️ UNA LISTA NUMERADA DE WORD LLEGA CON SUS NÚMEROS, NO CON VIÑETAS.
+   Descubierto el 4 de octubre de 2026, buscando por qué los «[3]» de un
+   informe adjuntado no llevaban a su fuente: en Word, el «1.» de una
+   lista no es texto —lo dibuja la numeración del documento, que vive
+   aparte, en `word/numbering.xml`—, y aquí cada ítem salía como «- ».
+   Para una lista de la compra da igual; para las «Obras citadas» de un
+   informe es TODO: sin el número escrito, la bibliografía entra sin
+   números, el «[3]» del cuerpo no casa con nada, y la regla 27 —que no
+   numera sola, con razón— lo deja como texto.
+
+   Así que se lee esa numeración: qué listas son de NÚMEROS (`decimal`)
+   y por cuál empiezan, y se cuenta como cuenta Word. Las de viñetas, de
+   letras o de romanos siguen saliendo con «- »: el lector solo casa
+   llamadas con números, y escribir «a.» sería inventarle una forma. */
+function vadjNumeracion(xml) {
+  const nums = new Map();
+  if (!xml) return nums;
+  const raiz = vadjXml(xml).documentElement;
+  if (!raiz) return nums;
+  const abs = new Map();
+  const val = (el, def) => {
+    const v = el.getAttributeNS(VADJ_W, 'val');
+    return v == null || v === '' ? def : v;
+  };
+  for (const a of raiz.children) {
+    if (a.localName !== 'abstractNum') continue;
+    const niveles = new Map();
+    for (const l of a.children) {
+      if (l.localName !== 'lvl') continue;
+      let fmt = '', ini = 1;
+      for (const h of l.children) {
+        if (h.localName === 'numFmt') fmt = val(h, '');
+        if (h.localName === 'start') ini = parseInt(val(h, '1'), 10) || 1;
+      }
+      niveles.set(l.getAttributeNS(VADJ_W, 'ilvl') || '0', { fmt: fmt, ini: ini });
+    }
+    abs.set(a.getAttributeNS(VADJ_W, 'abstractNumId'), niveles);
+  }
+  for (const n of raiz.children) {
+    if (n.localName !== 'num') continue;
+    let absId = null;
+    const desde = new Map();
+    for (const h of n.children) {
+      if (h.localName === 'abstractNumId') absId = val(h, null);
+      if (h.localName === 'lvlOverride') {
+        for (const so of h.children) {
+          if (so.localName === 'startOverride') desde.set(h.getAttributeNS(VADJ_W, 'ilvl') || '0', parseInt(val(so, '1'), 10) || 1);
+        }
+      }
+    }
+    nums.set(n.getAttributeNS(VADJ_W, 'numId'), { niveles: abs.get(absId) || new Map(), desde: desde });
+  }
+  return nums;
+}
+
+/* El número que Word dibujaría delante de este párrafo, o null si no es
+   de una lista de números. `cuentas` lleva por dónde va cada lista
+   (por `numId`, que es como Word sigue una lista aunque la corte un
+   párrafo suelto), y al bajar de nivel se reinician los de debajo. */
+function vadjNumeroDe(p, numeracion, cuentas) {
+  const pPr = [...p.children].find(x => x.localName === 'pPr');
+  const np = pPr && [...pPr.children].find(x => x.localName === 'numPr');
+  if (!np || !numeracion || !numeracion.size) return null;
+  let id = null, il = '0';
+  for (const h of np.children) {
+    if (h.localName === 'numId') id = h.getAttributeNS(VADJ_W, 'val');
+    if (h.localName === 'ilvl') il = h.getAttributeNS(VADJ_W, 'val') || '0';
+  }
+  const def = id != null ? numeracion.get(id) : null;
+  const nivel = def && def.niveles.get(il);
+  if (!nivel || nivel.fmt !== 'decimal') return null;
+  if (!cuentas.has(id)) cuentas.set(id, {});
+  const c = cuentas.get(id);
+  const k = parseInt(il, 10) || 0;
+  c[k] = (c[k] == null) ? (def.desde.has(il) ? def.desde.get(il) : nivel.ini) : c[k] + 1;
+  Object.keys(c).forEach(x => { if (+x > k) delete c[x]; });
+  return c[k];
+}
+
+/* ⚠️ UN SUPERÍNDICE DE NÚMEROS ES UNA O VARIAS LLAMADAS. «3», «1, 2»,
+   «1 2» o «3–5» —que es como salen dos o tres respaldos en un informe
+   exportado— se escriben «[3]», «[1][2]», «[3][4][5]», que es lo que el
+   lector casa con la bibliografía. Antes solo se entendían las comas: un
+   «1 2» o un «3–5» entraban como texto pelado pegado a la palabra, y
+   esas citas no llevaban a ninguna parte. El rango tiene tope (veinte),
+   como en el lector. Lo que no sean números se devuelve null. */
+function vadjLlamadas(t) {
+  const s = String(t || '').trim();
+  /* Entre número y número tiene que haber algo —una coma, un guion o
+     un espacio—: «2019» en superíndice es un año, no la 201 y la 9. */
+  if (!/^\d{1,3}(?:(?:\s*[,;]\s*|\s*[-–—]\s*|\s+)\d{1,3})*$/.test(s)) return null;
+  let out = '';
+  (s.match(/\d{1,3}\s*[-–—]\s*\d{1,3}|\d{1,3}/g) || []).forEach(tok => {
+    const m = tok.match(/^(\d{1,3})\s*[-–—]\s*(\d{1,3})$/);
+    if (!m) { out += '[' + tok + ']'; return; }
+    const a = parseInt(m[1], 10), b = parseInt(m[2], 10);
+    if (b <= a || b - a > 20) { out += '[' + a + '][' + b + ']'; return; }
+    for (let k = a; k <= b; k++) out += '[' + k + ']';
+  });
+  return out;
+}
+
 function vadjEsCita(p) {
   const pPr = [...p.children].find(x => x.localName === 'pPr');
   if (!pPr) return false;
@@ -231,10 +333,8 @@ function vadjTextoP(p, ctx) {
           /* Solo los dígitos: un superíndice que dice «er» («1.er») o un
              asterisco no es una llamada a nada, y convertirlo en «[er]»
              sería inventarse una cita. */
-          if (/^\d{1,3}(\s*[,;]\s*\d{1,3})*$/.test(t)) {
-            t.split(/[,;]/).forEach(x => { out += '[' + x.trim() + ']'; });
-            continue;
-          }
+          const ll = vadjLlamadas(t);
+          if (ll) { out += ll; continue; }
           out += t;
           continue;
         }
@@ -318,6 +418,8 @@ async function vadjLeerDocx(buf) {
   const doc = vadjXml(xml);
   const cuerpo = [...doc.getElementsByTagName('*')].find(x => x.localName === 'body');
   if (!cuerpo) throw new Error('no-docx');
+  const numeracion = vadjNumeracion(await vadjZipSacar(zip, 'word/numbering.xml'));
+  const cuentas = new Map();
 
   const bloques = [];
   const cuenta = { cabeceras: 0, tablas: 0, listas: 0, notas: 0, citas: 0 };
@@ -354,7 +456,12 @@ async function vadjLeerDocx(buf) {
       return;
     }
     if (vadjEsCita(x.el)) { cuenta.citas++; t.split('\n').forEach(l => bloques.push('> ' + l)); return; }
-    if (vadjEsLista(x.el)) { cuenta.listas++; bloques.push('- ' + t.replace(/\n/g, ' ')); return; }
+    if (vadjEsLista(x.el)) {
+      cuenta.listas++;
+      const n = vadjNumeroDe(x.el, numeracion, cuentas);
+      bloques.push((n != null ? n + '. ' : '- ') + t.replace(/\n/g, ' '));
+      return;
+    }
     bloques.push(t);
     bloques.push('');
   });
@@ -452,7 +559,8 @@ async function vadjLeerHtml(txt) {
         const et = h.tagName.toLowerCase();
         if (et === 'sup') {
           const t = limpio(h.textContent);
-          if (/^\d{1,3}(\s*[,;]\s*\d{1,3})*$/.test(t)) { t.split(/[,;]/).forEach(x => { out += '[' + x.trim() + ']'; }); continue; }
+          const ll = vadjLlamadas(t);
+          if (ll) { out += ll; continue; }
           out += t;
           continue;
         }
@@ -488,7 +596,10 @@ async function vadjLeerHtml(txt) {
         if (t) { cuenta.citas++; t.split('\n').forEach(l => bloques.push('> ' + l)); bloques.push(''); }
       } else if (et === 'li') {
         const t = conLlamadas(h).replace(/\n/g, ' ');
-        if (t) { cuenta.listas++; bloques.push('- ' + t); }
+        /* Y en una página web, el número de un <ol> tampoco es texto: se
+           cuenta, con su «start» —Documentos de Google parte una lista en
+           varios <ol> y sigue la cuenta con él—. Ver `vadjNumeracion`. */
+        if (t) { cuenta.listas++; const n = vadjNumeroLi(h); bloques.push((n != null ? n + '. ' : '- ') + t); }
       } else if (et === 'table') {
         const filas = [...h.querySelectorAll('tr')].map(tr =>
           [...tr.children].map(td => limpio(conLlamadas(td)).replace(/\|/g, '/')));
@@ -503,6 +614,25 @@ async function vadjLeerHtml(txt) {
   };
   recorre(cuerpo);
   return { texto: vadjJuntar(bloques), cuenta: cuenta };
+}
+
+function vadjNumeroLi(li) {
+  const ol = li.parentElement;
+  if (!ol || ol.tagName.toLowerCase() !== 'ol') return null;
+  const tipo = (ol.getAttribute('type') || '1');
+  if (tipo !== '1') return null;
+  const propio = parseInt(li.getAttribute('value') || '', 10);
+  if (!isNaN(propio)) return propio;
+  let n = parseInt(ol.getAttribute('start') || '1', 10);
+  if (isNaN(n)) n = 1;
+  for (const h of ol.children) {
+    if (h === li) return n;
+    if (h.tagName.toLowerCase() === 'li') {
+      const v = parseInt(h.getAttribute('value') || '', 10);
+      n = isNaN(v) ? n + 1 : v + 1;
+    }
+  }
+  return null;
 }
 
 /* ══════════════ EL PDF, Y POR QUÉ NO ══════════════

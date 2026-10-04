@@ -234,6 +234,79 @@ const RELS =
      '⚠️ y las DOS llamadas del cuerpo —el superíndice «[3]» y la nota «[^1]»— casan con sus fuentes',
      'las llamadas del .docx no casaron: ' + JSON.stringify(mapa));
 
+  log('── 3-bis. ⚠️ LAS «OBRAS CITADAS» DE UN INFORME LLEGAN CON SUS NÚMEROS ──');
+  /* Descubierto el 4 de octubre de 2026, buscando por qué los «[3]» de
+     un informe adjuntado no llevaban a su fuente: en Word, el «1.» de
+     una lista NO ES TEXTO —lo dibuja la numeración del documento, que
+     vive aparte, en word/numbering.xml—, y aquí cada ítem salía como
+     «- ». Sin el número escrito la bibliografía entraba sin números y
+     ninguna llamada casaba. Se fabrica un .docx de verdad CON SU
+     numbering.xml: una lista de números cortada por un párrafo suelto
+     (Word sigue la cuenta), una de viñetas que tiene que seguir siendo
+     viñeta, y superíndices «1, 2», «3–5» y un año que NO es llamada. */
+  const sup = s => '<w:r><w:rPr><w:vertAlign w:val="superscript"/></w:rPr><w:t xml:space="preserve">' + s + '</w:t></w:r>';
+  const num = (id, il) => '<w:numPr><w:ilvl w:val="' + il + '"/><w:numId w:val="' + id + '"/></w:numPr>';
+  const DOC_NUM =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document ' + W + ' ' + R + '><w:body>' +
+      p(estilo('Title'), t('Informe con obras citadas')) +
+      p('', t('El dato principal.') + sup('1, 2') + t(' Tres respaldos seguidos.') + sup('3–5') +
+            t(' Un año en superíndice no es una cita: 1990') + sup('2019') + t('.')) +
+      p(num(2, 0), t('una viñeta que sigue siendo viñeta')) +
+      p(estilo('Heading1'), t('Obras citadas')) +
+      p(num(1, 0), t('Uno, A. (2010). Primera obra. https://example.org/uno')) +
+      p(num(1, 0), t('Dos, B. (2011). Segunda obra. https://example.org/dos')) +
+      p('', t('(un párrafo suelto en medio, que Word no cuenta)')) +
+      p(num(1, 0), t('Tres, C. (2012). Tercera obra. https://example.org/tres')) +
+      p(num(1, 0), t('Cuatro, D. (2013). Cuarta obra.')) +
+      p(num(1, 0), t('Cinco, E. (2014). Quinta obra.')) +
+    '</w:body></w:document>';
+  const NUMERACION =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:numbering ' + W + '>' +
+      '<w:abstractNum w:abstractNumId="10"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/></w:lvl></w:abstractNum>' +
+      '<w:abstractNum w:abstractNumId="20"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/></w:lvl></w:abstractNum>' +
+      '<w:num w:numId="1"><w:abstractNumId w:val="10"/></w:num>' +
+      '<w:num w:numId="2"><w:abstractNumId w:val="20"/></w:num>' +
+    '</w:numbering>';
+  const blobNum = await hacerZip([
+    ['[Content_Types].xml', '<?xml version="1.0"?><Types/>'],
+    ['word/document.xml', DOC_NUM],
+    ['word/numbering.xml', NUMERACION],
+  ], w);
+  const rNum = await w.VozAdjunto.leer(new w.File([blobNum], 'obras.docx'));
+  const tNum = rNum.texto || '';
+  ok(/^1\. Uno, A\./m.test(tNum) && /^2\. Dos, B\./m.test(tNum) && /^3\. Tres, C\./m.test(tNum) && /^5\. Cinco, E\./m.test(tNum),
+     '⚠️ la lista numerada de Word sale CON SUS NÚMEROS (1, 2, 3, 4, 5), y la cuenta sigue aunque la corte un párrafo suelto',
+     '⚠️ la lista numerada perdió sus números:\n' + tNum);
+  ok(/^- una viñeta que sigue siendo viñeta$/m.test(tNum),
+     'y una lista de viñetas sigue saliendo con «- »: solo se escribe el número cuando es de números',
+     'la lista de viñetas salió numerada');
+  ok(/El dato principal\.\[1\]\[2\]/.test(tNum) && /seguidos\.\[3\]\[4\]\[5\]/.test(tNum),
+     '⚠️ un superíndice «1, 2» sale «[1][2]» y un «3–5» sale «[3][4][5]»: antes solo se entendían las comas',
+     '⚠️ los superíndices de varias llamadas no salieron como llamadas: ' + (tNum.match(/El dato.{0,80}/) || [''])[0]);
+  ok(/1990 ?2019\./.test(tNum) && !/\[2019\]|\[201\]/.test(tNum),
+     'y un año en superíndice se queda como texto: «2019» no es la 201 y la 9',
+     'un año en superíndice se convirtió en llamada: ' + (tNum.match(/1990.{0,20}/) || [''])[0]);
+  const lNum = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(tNum)}))`));
+  const mNum = JSON.parse(w.eval(`(function(){ const m = vozMapaCitas({ cid:'__adjnum__', capitulos: ${JSON.stringify(lNum.capitulos)} }); vozOlvidaFuentes();
+    return JSON.stringify({ enlazadas: m.donde.size, huerfanas: m.huerfanas.length }); })()`));
+  ok(mNum.enlazadas === 5 && mNum.huerfanas === 0,
+     '⚠️ y las CINCO llamadas del cuerpo casan con sus cinco obras citadas: el «[3]» ya lleva a su fuente',
+     '⚠️ las llamadas no casaron con las obras citadas: ' + JSON.stringify(mNum));
+
+  /* Y la página web de Documentos de Google: el número de un <ol> tampoco
+     es texto, y Google parte la lista en varios <ol> con su «start». */
+  const html = '<html><body><p>Dato<sup>2</sup> y otro<sup>3</sup>.</p><h2>Obras citadas</h2>' +
+    '<ol start="1"><li>Uno, A. (2010). Primera.</li><li>Dos, B. (2011). Segunda.</li></ol>' +
+    '<p>un párrafo suelto</p><ol start="3"><li>Tres, C. (2012). Tercera.</li></ol>' +
+    '<ul><li>una viñeta</li></ul></body></html>';
+  const rHtml = await w.VozAdjunto.leer(new w.File([new w.Blob([html])], 'informe.html', { type: 'text/html' }));
+  const tHtml = rHtml.texto || '';
+  ok(/^1\. Uno/m.test(tHtml) && /^2\. Dos/m.test(tHtml) && /^3\. Tres/m.test(tHtml) && /^- una viñeta$/m.test(tHtml),
+     'y en una página web, los <ol> salen con sus números —siguiendo el «start» de Google— y los <ul> con viñeta',
+     'los números de la lista web se perdieron:\n' + tHtml);
+
   log('── 4. ⚠️ UN PDF DICE QUE NO, Y DICE QUÉ HACER ──');
   const pdf = new w.File([new w.Blob(['%PDF-1.7\n1 0 obj\n'])], 'informe.pdf', { type: 'application/pdf' });
   const rp = await w.VozAdjunto.leer(pdf);

@@ -3075,7 +3075,7 @@ y no había forma de leerlo sin perder el sitio en cada arranque—. Y traía un
 segundo problema, más caro y más lento de aparecer, que es el que manda en todo
 el diseño.
 
-**Cuarenta y una reglas, y ninguna es de adorno:**
+**Cuarenta y dos reglas, y ninguna es de adorno:**
 
 1. ⚠️ **LA ETIQUETA NO SE APAGA, Y ES LA HERRAMIENTA ENTERA.**
    Un cuento escrito por una máquina «al modo de» Rulfo **no es de Rulfo**.
@@ -4997,6 +4997,120 @@ el diseño.
      para no tapar el trozo que se manda. Con la nota abierta los destinos
      se cierran, y al revés: apiladas, la barra se saldría de la hoja.
 
+42. 🔢👁 **CADA NÚMERO DE CITA LLEVA A SU FUENTE, Y SU DOCUMENTO SE VE
+   SIN SALIR DE LA LECTURA.** Pedido por el autor el 4 de octubre de
+   2026: que el número entre corchetes o en superíndice «abra y, si se
+   puede, visualizar el documento de donde es la referencia, para en el
+   momento de estar leyendo poder confirmar dicha cita», y que las
+   referencias «no solo estén abajo del documento sino hipervinculadas
+   entre cada número que caza».
+
+   ⚠️ **LA CAUSA DE QUE NO LO ESTUVIERAN NO ERA LA FICHA: ERA QUE LA
+   BIBLIOGRAFÍA LLEGABA SIN NÚMEROS.** La regla 27 casa «[3]» con la
+   entrada 3, y no numera sola (con razón). Pero los números se perdían
+   antes, por dos sitios:
+
+   - **Al adjuntar un Word**, la lista numerada de «Obras citadas»
+     entraba como viñetas: en Word el «1.» no es texto, lo dibuja la
+     numeración del documento, que vive aparte, en `word/numbering.xml`.
+     Ahora `voz-adjunto.js` la lee (`vadjNumeracion`, `vadjNumeroDe`) y
+     escribe «1.», «2.»… solo en las listas de NÚMEROS (`decimal`),
+     siguiendo la cuenta aunque la corte un párrafo suelto, como Word; las
+     de viñetas, letras o romanos siguen con «- ». En una página web, lo
+     mismo con los `<ol>` y su `start` (Documentos de Google parte una
+     lista en varios). Y un superíndice «1 2» o «3–5» entra ahora como
+     «[1][2]» y «[3][4][5]» (`vadjLlamadas`); antes solo se entendían las
+     comas. Un «2019» en superíndice sigue siendo texto: entre número y
+     número tiene que haber algo.
+   - **Al pegar**, la lista de «📚 Las fuentes del informe» llega sin
+     número (así la enseñan los informes), y un rótulo pelado en
+     minúsculas —«Obras citadas», el «Citations:» de Perplexity, el
+     «Sources» de ChatGPT— se quedaba como prosa (regla 3), así que la
+     lista de debajo ni siquiera era bibliografía. Ahora un rótulo de
+     bibliografía que es la línea ENTERA, tras un blanco, con texto
+     encima y **ninguna cabecera detrás** abre la bibliografía
+     (`vozEsRotuloBibliografia`, `vozHayCabeceraDespues`): un «Fuentes» a
+     media obra es una sección sobre otra cosa. Y las palabras inglesas
+     entran en `vozEsTituloBibliografia`. Dentro de una bibliografía,
+     «3. Wikipedia» a solas es la entrada 3, no un capítulo.
+
+   ⚠️ **Y LO QUE SIGA SIN NÚMEROS SE NUMERA SI LO DICE UNA PERSONA, NUNCA
+   SOLO.** Es la regla 27 en pie: en una lista APA el orden es
+   alfabético, y casar por el orden enseñaría a OTRO autor. Lo que cambia
+   es que ahora se OFRECE (`vozNumerable`, `vozNumerarFuentes`), con lo
+   que va a pasar escrito antes del toque, en tres sitios:
+
+   - **En el propio número.** Un «[3]» sin entrada ya no es texto muerto:
+     se toca (`.voz-cit-sin`, gris y con raya cortada, y con el texto de
+     dentro idéntico al escrito, carácter por carácter) y dice por qué no
+     lleva a ninguna parte. Si la causa es la de casi siempre, enseña la
+     entrada que le TOCARÍA por el orden —«esta llamada sería: …»— y
+     «🔢 Sí, numerar la lista así». Quien mira la entrada y la frase sabe
+     en un segundo si casan; el programa no lo sabe nunca. Es la
+     diferencia entre adivinar y proponer. Si la lista va en orden
+     alfabético se avisa, y si el texto cita más allá de la última
+     entrada, también.
+   - **En 📚 Fuentes**, con dos toques en el mismo sitio y sin
+     `confirm()`, «No» donde estaba el botón y con el foco (regla 22).
+   - **En la hoja de pegar**, antes de guardar: «🔢 Numerar la lista por
+     su orden» y «↶ Quitar los números». Es una decisión de la hoja
+     abierta (`_vozNumerarPeg`), porque el lector relee en cada tecla.
+
+   Solo con TODAS las entradas sin número (si unas lo traen y otras no,
+   el orden no dice nada) y solo en lo propio: lo ajeno se explica y no
+   se ofrece (regla 14). El número va APARTE de la entrada, como siempre:
+   numerar no cambia ni una letra de la bibliografía, ni del párrafo, ni
+   la página, y sube por `vozSubir`.
+
+   ⚠️ **«100 m²», «10³», «E = mc²», «H₂O» Y «CO₂» NO SON LLAMADAS.** Con la
+   bibliografía puesta, el «²» de unos metros cuadrados casaba con la
+   fuente 2: una atribución falsa con cara de cita. Un superíndice o un
+   SUBÍNDICE (el autor dijo «subíndice», y ahora se leen) es llamada
+   detrás de una palabra entera o de un signo; detrás de una cifra o de
+   una o dos letras sueltas es un exponente o un símbolo químico
+   (`vozEsExponente`). Y en un corchete caben varias —«[1, 3]», «[2–5]»,
+   que es como cita Perplexity—, con un rango de veinte como mucho: un
+   «[1-500]» no es una llamada y se queda como texto
+   (`vozNumerosDeLlamada`).
+
+   ⚠️ **👁 EL DOCUMENTO SE VE DENTRO DE LA LECTURA, «SI SE PUEDE», Y LA
+   PANTALLA DICE CUÁNDO NO.** La ficha de la fuente lleva «👁 Ver el
+   documento» y «↗ Abrir aparte»; la entrada de la bibliografía de abajo
+   y el panel 📚 Fuentes, su 👁. Abre `#voz-doc-overlay`, colgado de
+   `#voz-lector` por el z-index (regla 35), casi a pantalla completa, con
+   la referencia arriba para saber qué se está comprobando. Consultar no
+   mueve la lectura (regla 27) y Escape cierra el documento antes que la
+   sala.
+   - ⚠️ **El marco va PROTEGIDO** (`VOZ_DOC_SANDBOX`) y lo que importa es
+     lo que NO lleva: sin `allow-top-navigation`, la página de dentro no
+     puede llevarse a F.A.R.O a otra dirección —que es lo que haría una
+     página que quisiera hacerse pasar por la nuestra—. Con
+     `referrerpolicy="no-referrer"` y la dirección que ya comprobó `URL()`
+     (solo http y https), puesta con `setAttribute`.
+   - ⚠️ **Una dirección de la propia F.A.R.O no entra en el marco:** con
+     permiso de guion y de origen propio podría quitarse la protección y
+     tocar la sala, y detrás de la sala está la Bóveda. Se abre aparte.
+   - ⚠️ **Un PDF no se enseña en el marco, y se dice antes:** el visor de
+     PDF del navegador no funciona dentro de un marco protegido, y en el
+     teléfono no existe dentro de una página. Se abre aparte.
+   - ⚠️ **Muchas páginas prohíben que las enseñen dentro de otra, y desde
+     aquí NO SE PUEDE SABER**: un marco de otro dominio no deja mirar
+     dentro, y uno rechazado dispara el mismo `load` que uno bueno. No se
+     finge: debajo se dice qué hacer si sale en blanco, y «↗ Abrir aparte»
+     está siempre arriba (la regla 3 de Videos M.E.T.A.S).
+   - **Al cerrar, el marco se QUITA**, no se esconde (regla 39): una página
+     con audio seguiría sonando detrás de la lectura.
+   - **La ✕ es una letra de verdad**, no el icono de Font Awesome: esta
+     hoja ocupa casi toda la pantalla, y si el icono no llega del CDN no
+     queda fondo que tocar para salir.
+   - **Sin dirección no hay documento, y se dice:** la ficha ofrece
+     «🔎 Buscarla» en Google Académico, con un literal delante y la
+     entrada codificada detrás, con clase propia (no la de «abrir la
+     fuente»: una búsqueda no es la fuente).
+
+   **Y no hizo falta correr ni una línea de SQL**: el número de una
+   entrada ya viajaba dentro de `capitulos` (regla 27).
+
 **Antes de publicar un cambio de La Voz Prestada:**
 
 ```
@@ -5022,7 +5136,11 @@ darle a las funciones un XML ya descomprimido. Es la misma lección que la
 sonda del banco de cortes, que se fabrica un WAV y lo corta: lo que puede
 fallar aquí es el FORMATO, y eso no se ve nunca llamando funciones. Y
 escribe los tamaños de la cabecera **en cero, como los escribe Word**,
-que es la trampa que deja un documento vacío sin dar ningún error.
+que es la trampa que deja un documento vacío sin dar ningún error. Desde
+el 4 de octubre de 2026 fabrica otro **con su `word/numbering.xml`**
+(sección 3-bis), porque el número de una lista de Word no es texto: sin
+leer la numeración, las «Obras citadas» llegaban sin números y ningún
+«[3]» casaba (regla 42).
 
 La comprobación **2** le pega un párrafo de prosa cuyos siete renglones
 empiezan por siete palabras que nombran una parte de un libro, y exige que
@@ -5179,6 +5297,18 @@ no compartan llave, que abrir no escriba **ni una fila** en la nube, que
 buscando se abran y que al borrar la búsqueda vuelvan a estar como
 estaban, y que con un solo montón no haya mando ninguno. Los rótulos **se
 pulsan**, y el alto del botón se mide en píxeles (44).
+
+La comprobación **44** es la regla 42, por gravedad: que un exponente
+(«100 m²», «10³», «mc²», «H₂O») no salga como llamada; que una
+bibliografía sin números no case NADA por su cuenta; que tocar el «[1]»
+sin entrada proponga sin hacer, y que «Sí, numerar» suba FIRMADO con los
+números 1, 2, 3 sin cambiar una letra ni la página; que en lo ajeno no se
+ofrezca; que el primer toque de 📚 Fuentes deje «No» donde estaba el
+botón; que la hoja de pegar numere, siga numerada al teclear y se pueda
+deshacer; y el visor: el PDF fuera del marco, el `sandbox` exacto y sin
+`allow-top-navigation`, `no-referrer`, ENCIMA de todo medido con
+`elementFromPoint`, la casa propia fuera del marco, Escape que deja la
+sala abierta y el marco QUITADO al cerrar. Los botones se pulsan.
 
 La comprobación **43** es 📣 A redes, de punta a punta y por gravedad:
 que el trozo llegue a la tabla de Redes **sin su etiqueta** (se mira lo

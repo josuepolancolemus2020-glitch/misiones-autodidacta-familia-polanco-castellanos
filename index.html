@@ -2765,6 +2765,31 @@ Toca «Ponme un ejemplo» si quieres ver la forma y escribir encima."></textarea
         <p class="voz-aj-nota">Si sale un cuadro negro, el dueño del video no permite incrustarlo: ábrelo en YouTube.</p>
       </div>
     </div>
+
+    <!-- 👁 El documento de una fuente, DENTRO de la lectura, para
+         confirmar una cita sin perder la página. Cuelga de #voz-lector
+         por lo mismo que el video (el z-index), y el marco se CREA al
+         abrir y se QUITA al cerrar. «↗ Abrir aparte» va arriba y siempre
+         a la vista: hay páginas que no se dejan enseñar dentro de otra,
+         y desde aquí no se puede saber cuáles (ver `vozDocAbrir`). -->
+    <div id="voz-doc-overlay" class="fin-modal-overlay voz-doc-overlay" style="display:none;">
+      <div class="fin-modal voz-doc-modal" role="dialog" aria-modal="true" aria-labelledby="voz-doc-tit">
+        <div class="msug-det-head">
+          <div class="msug-det-titulo" id="voz-doc-tit">📄 La fuente</div>
+          <!-- Una ✕ de verdad y no el icono de Font Awesome: ese viene de
+               un CDN, y esta hoja ocupa casi toda la pantalla, así que si
+               el icono no llega no queda fondo que tocar para salir. -->
+          <button type="button" class="msug-det-cerrar voz-doc-x" id="voz-doc-cerrar" aria-label="Volver a la lectura">✕</button>
+        </div>
+        <p class="voz-doc-ref" id="voz-doc-ref"></p>
+        <div class="voz-doc-barra">
+          <a class="voz-btn voz-btn-chico voz-doc-fuera" id="voz-doc-fuera" hidden>↗ Abrir aparte</a>
+          <span class="voz-doc-dom" id="voz-doc-dom"></span>
+        </div>
+        <div class="voz-doc-caja" id="voz-doc-caja"></div>
+        <p class="voz-aj-nota voz-doc-nota" id="voz-doc-nota"></p>
+      </div>
+    </div>
   </div>
 
   <!-- Pegar un texto, y corregirlo: es la MISMA hoja. Con dos
