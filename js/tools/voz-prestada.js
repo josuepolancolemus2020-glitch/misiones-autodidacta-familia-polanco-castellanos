@@ -784,8 +784,11 @@ function vozItemLista(l) {
    «Sources Cited», «References (APA)», «Notes and References»): sin
    ellas esos títulos dejaban de ser bibliografía (revisión del 4 de
    octubre de 2026). Lo que se admite detrás es solo vocabulario de
-   bibliografía, así que «Sources of energy» sigue siendo prosa. */
-const VOZ_TIT_BIBLIO_EN = /^(?:(?:references|bibliography|works cited|works consulted|sources|citations|literature cited|further reading)(?:\s*(?:and|&)\s*(?:further reading|notes|references|sources|bibliography|works consulted|consulted|citations)|\s+(?:cited|consulted|used in the report))?|notes\s*(?:and|&)\s*(?:references|sources|bibliography|citations))(?:\s*\([^)]{0,30}\))?$/;
+   bibliografía, así que «Sources of energy» sigue siendo prosa. Y
+   «Further reading» SOLO como coletilla: suelto es muchas veces una
+   sección de prosa («lecturas para seguir»), y como título de
+   bibliografía se llevaba a las fuentes todo lo que venía detrás. */
+const VOZ_TIT_BIBLIO_EN = /^(?:(?:references|bibliography|works cited|works consulted|sources|citations|literature cited)(?:\s*(?:and|&)\s*(?:further reading|notes|references|sources|bibliography|works consulted|consulted|citations)|\s+(?:cited|consulted|used in the report))?|notes\s*(?:and|&)\s*(?:references|sources|bibliography|citations))(?:\s*\([^)]{0,30}\))?$/;
 
 function vozEsTituloBibliografia(t) {
   const s = vozSinTildes(String(t || '')).toLowerCase()
@@ -854,6 +857,14 @@ function vozListaBajoRotulo(lineas, desde) {
   const v = [];
   for (let j = desde + 1; j < lineas.length; j++) {
     const l = lineas[j].trim();
+    /* Las notas al pie («[^1]: …») el lector las saca de aquí y las
+       cuelga aparte: no son ni entradas ni prosa de esta lista. Y lo que
+       venga detrás de una raya («---» y la línea de compartir de
+       Perplexity) es otra cosa: no decide nada. Sin las dos, una
+       bibliografía clarísima se leía como prosa (segunda revisión del 4
+       de octubre de 2026). */
+    if (/^\[\^[^\]]{1,12}\]:/.test(l)) continue;
+    if (l && v.length && vozEsSeparador(l)) break;
     if (l) v.push(l);
   }
   if (v.length && VOZ_FIN.test(v[v.length - 1])) v.pop();
@@ -882,9 +893,30 @@ function vozListaBajoRotulo(lineas, desde) {
    como prosa y la lista de debajo no se leía como bibliografía. Se le
    pide ser la frase entera (no «Referencias a la infancia en Comala»),
    ir sola tras un blanco y no ser lo primero del texto. */
+const VOZ_ROT_BIBLIO_ES = /^(referencias|bibliografia|obras citadas|obras consultadas|fuentes|fuentes consultadas|fuentes citadas|fuentes de consulta|fuentes de informacion|fuentes usadas en el informe|referencias bibliograficas|referencias citadas|bibliografia consultada|bibliografia citada|bibliografia basica|bibliografia recomendada|referencias y notas|notas y referencias)$/;
+
 function vozEsRotuloBibliografia(t) {
   const s = vozSinTildes(vozDesnuda(String(t || ''))).toLowerCase().replace(/[.:]+$/, '').trim();
-  return /^(referencias|bibliografia|obras citadas|obras consultadas|fuentes|fuentes consultadas|fuentes citadas|fuentes usadas en el informe|referencias bibliograficas|references|bibliography|works cited|works consulted|sources|sources used in the report|citations)$/.test(s);
+  return VOZ_ROT_BIBLIO_ES.test(s) || VOZ_TIT_BIBLIO_EN.test(s);
+}
+
+/* ⚠️ EL TÍTULO DE UNA BIBLIOGRAFÍA, CERRADO: la frase entera (con su
+   número de sección delante si lo trae: «5. Referencias», «IV.
+   BIBLIOGRAFÍA»), y las «Notas» solo si se llaman así y nada más. Es
+   lo que se usa donde equivocarse hacia «sí» pone NÚMEROS: en el
+   adjunto, en la caja de fuentes y para leer «3. Wikipedia» suelto
+   como la entrada 3. La segunda revisión del 4 de octubre de 2026 lo
+   cazó con la prueba por delante (`vozEsTituloBibliografia`): «Notas
+   para el docente» y «Fuentes de energía renovable» abrían una
+   bibliografía, sus listas salían numeradas 1, 2, 3, y esos números le
+   ganaban a los de las «Referencias» de verdad: el «[1]» del texto
+   llevaba a un paso de la metodología. La prueba por delante se queda
+   donde ya estaba antes de esto (los capítulos del final, regla 27). */
+function vozEsTituloBiblioEstricto(t) {
+  const s = vozSinTildes(vozDesnuda(String(t || ''))).toLowerCase()
+    .replace(/^(?:\d{1,3}(?:\.\d{1,3})*|[ivxlcdm]{1,6})[.)]?\s+/, '').replace(/[.:]+$/, '').trim();
+  return VOZ_ROT_BIBLIO_ES.test(s) || VOZ_TIT_BIBLIO_EN.test(s) ||
+         /^(notas|notas al pie|notas finales|notes|footnotes|endnotes)$/.test(s);
 }
 
 /* ⚠️ UNA DIRECCIÓN SE COMPRUEBA CON `URL()`, NUNCA CON UN GREP:
@@ -1048,8 +1080,10 @@ function vozFuentesDeLista(txt) {
     const n0 = nDe(c);
     const sigue = n0 != null && nDe(lineas[1]) === n0 + 1;
     const c0 = c.replace(/^(?:\d{1,3}|[ivxlcdm]{1,6})[.)]\s+/i, '');
-    if (!sigue && (vozEsRotuloBibliografia(c0) ||
-        (vozEsTituloFuentes(c0) && c0.split(/\s+/).length <= 6 && !/\d/.test(c0) && !vozPareceReferencia(c0)))) lineas.shift();
+    /* Y con la lista CERRADA de títulos (`vozEsTituloBiblioEstricto`):
+       con la prueba por delante, «Notas sobre el método» —una primera
+       fuente de verdad— se perdía como si fuera el rótulo. */
+    if (!sigue && vozEsTituloBiblioEstricto(c)) lineas.shift();
   }
   const juntas = [];
   for (let i = 0; i < lineas.length; i++) {
@@ -1172,40 +1206,50 @@ function vozNumerosDeLlamada(s) {
      leen el texto guardado («30 *km*²») y la página lee el pintado
      («30 km²»); sin saltarlas, la cuenta decía «llamada» donde la página
      decía «exponente», y la página y la cuenta tienen que decir lo mismo.
-   ⚠️ Y TRES QUE NO SON EXPONENTES aunque vayan detrás de una cifra o de
-     dos letras, porque ahí lo que va es una CITA (la segunda revisión del
-     mismo día, sobre Word): un año («desde 2019⁵»), un código con guion
-     («COVID-19⁴») y dos MAYÚSCULAS, que son una sigla («la IA⁶», «la
-     UE⁴»). Una letra sola sí es variable o unidad, también en mayúscula
-     («R²»). Y el signo volado de un exponente negativo se salta: en
-     «10⁻³» el «³» va detrás de «⁻», y sin saltarlo era la llamada 3.
+   ⚠️ Y DOS QUE NO SON EXPONENTES aunque vayan detrás de una cifra,
+     porque ahí lo que va es una CITA: un año («desde 2019⁵», de 1500 a
+     2039) y un código con guion («COVID-19⁴»). Las siglas («la IA⁶») se
+     probaron como cita y se retiraron: arrastraban el «CO²». Y el signo
+     volado de un exponente negativo se salta: en «10⁻³» el «³» va
+     detrás de «⁻», y sin saltarlo era la llamada 3.
      Esta función la usa también el lector de archivos (`vadjExponente`):
      una sola decisión para lo pegado y lo adjuntado. */
 function vozEsExponente(txt, ini) {
   const sub = /[₀-₉]/.test(txt[ini] || '');
-  while (ini > 0 && (txt[ini - 1] === '*' || txt[ini - 1] === '_')) ini--;
-  while (ini > 0 && (txt[ini - 1] === '⁻' || txt[ini - 1] === '⁺')) ini--;
+  /* El énfasis y el signo volado se saltan juntos y en cualquier orden:
+     «10*⁻*³» y «10⁻*³*» son el mismo exponente. */
+  while (ini > 0 && /[*_⁻⁺]/.test(txt[ini - 1])) ini--;
   if (ini <= 0) return false;
   const antes = txt[ini - 1];
+  if (sub) {
+    /* ⚠️ Un subíndice detrás de una cifra, una letra GRIEGA, un acento
+       suelto (x̄₁), una barra (t₁/₂) o un paréntesis es notación, y lo
+       mismo detrás de una función («log₂»): la segunda revisión del 4 de
+       octubre de 2026 cazó la estadística entera enlazada a fuentes. */
+    if (/[\d\/)\]\u0370-\u03FF\u0300-\u036F]/.test(antes)) return true;
+    let j = ini;
+    while (j > 0 && /[A-Za-z0-9₀-₉()]/.test(txt[j - 1])) j--;
+    const run = txt.slice(j, ini);
+    if (/[A-Z]/.test(run) && /^(?:[A-Z][a-z]?|[0-9₀-₉()])+$/.test(run)) return true;
+    if (/^(log|ln|lg|lim|max|min|sen|sin|cos|tan|mod)$/i.test(run)) return true;
+  }
   if (/\d/.test(antes)) {
     if (sub) return true;
     let j = ini;
     while (j > 0 && /\d/.test(txt[j - 1])) j--;
     const cifras = txt.slice(j, ini);
-    if (/^(1[5-9]|20)\d\d$/.test(cifras) && !/[\d.,]/.test(txt[j - 1] || '')) return false;
+    if (/^(1[5-9]\d\d|20[0-3]\d)$/.test(cifras) && !/[\d.,]/.test(txt[j - 1] || '')) return false;
     if (txt[j - 1] === '-' && /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(txt[j - 2] || '')) return false;
     return true;
   }
-  if (sub) {
-    let j = ini;
-    while (j > 0 && /[A-Za-z0-9₀-₉()]/.test(txt[j - 1])) j--;
-    const run = txt.slice(j, ini);
-    if (/[A-Z]/.test(run) && /^(?:[A-Z][a-z]?|[0-9₀-₉()])+$/.test(run)) return true;
-  }
+  /* Una o dos letras (latinas o griegas, con su acento suelto si lo
+     llevan): unidad, variable o símbolo. Con dos MAYÚSCULAS también: la
+     regla de «sigla = cita» que probó la primera revisión enlazaba el
+     «CO²» mal escrito, el «AB²» de un segmento y el «KM²», y entre una
+     cita perdida y una inventada, se pierde la cita. */
   let k = ini;
-  while (k > 0 && /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(txt[k - 1])) k--;
-  const letras = ini - k;
-  if (letras === 2 && !sub && /^[A-ZÁÉÍÓÚÜÑ]{2}$/.test(txt.slice(k, ini))) return false;
+  while (k > 0 && /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\u0370-\u03FF\u0300-\u036F]/.test(txt[k - 1])) k--;
+  const letras = txt.slice(k, ini).replace(/[\u0300-\u036F]/g, '').length;
   return letras >= 1 && letras <= 2;
 }
 
@@ -1348,7 +1392,22 @@ function vozPareceCita(dentro) {
    sigue sin tocarse —regla 27—: un corchete con tres números de los que
    solo existe uno enseña ese uno, y los otros dos se cuentan como
    huérfanos para el repaso. */
-const VOZ_PAL_MATE = /(?:^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])(escalas?|intervalos?|rangos?|vectore?s?|matriz|matrices|conjuntos?|segmentos?|dominio|recorrido|puntuaci[oó]n|puntajes?|calificaci[oó]n|valores|coordenadas|entre|scales?|intervals?|ranges?|vectors?|matrix|sets?|between)$/i;
+/* Solo palabras que en un ensayo casi no salen fuera de las
+   matemáticas: «entre», «valores», «conjunto» o «dominio» son prosa
+   corriente, y mirando tres palabras atrás se habrían comido las citas
+   de «los valores democráticos [2, 3]». */
+const VOZ_PAL_MATE = /^(escalas?|intervalos?|rangos?|vectore?s?|matriz|matrices|segmentos?|puntuaci[oó]n|puntuaciones|puntajes?|calificaci[oó]n|calificaciones|coordenadas|likert|scales?|intervals?|ranges?|vectors?|matrix|scores?)$/i;
+
+/* ¿Lo de delante de un corchete de varios números es de matemáticas?
+   Una de las TRES últimas palabras («una escala de [1-5]», «los valores
+   en [1, 5]», «Escala Likert: [1-5]») o un «∈» o un «=» pegado. Con
+   solo la palabra de justo delante, la segunda revisión del 4 de
+   octubre de 2026 cazó las escalas Likert enlazadas a cinco fuentes. */
+function vozDelanteEsMate(antes) {
+  const a = String(antes || '').replace(/[\s*_]+$/, '');
+  if (/[∈=]$/.test(a)) return true;
+  return (a.match(/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+/g) || []).slice(-3).some(w => VOZ_PAL_MATE.test(w));
+}
 
 function vozLlamadasEn(s, idx) {
   const res = [], huerfanas = [];
@@ -1376,7 +1435,7 @@ function vozLlamadasEn(s, idx) {
          Perplexity, y un intervalo no se escribe así. */
       let k0 = ini;
       while (k0 > 0 && (txt[k0 - 1] === '*' || txt[k0 - 1] === '_')) k0--;
-      if (m[1] != null && nums.length > 1 && /\s/.test(txt[k0 - 1] || '') && VOZ_PAL_MATE.test(txt.slice(Math.max(0, ini - 40), ini).replace(/[\s*_]+$/, ''))) {
+      if (m[1] != null && nums.length > 1 && /\s/.test(txt[k0 - 1] || '') && vozDelanteEsMate(txt.slice(Math.max(0, ini - 60), ini))) {
         re.lastIndex = fin; continue;
       }
       numero = nums.length && !isNaN(nums[0]) ? nums[0] : null;
@@ -1606,6 +1665,11 @@ function vozLeer(texto, opciones) {
      la excepción a «renglones seguidos son un párrafo», y se permite
      porque el rótulo del capítulo la corrobora sin ninguna duda. */
   let enBiblio = false;
+  /* Y aparte, si la bibliografía es SEGURA (título cerrado o rótulo
+     suelto corroborado): solo entonces un «3. Wikipedia» suelto entre
+     blancos es la entrada 3 y no un capítulo (ver
+     `vozEsTituloBiblioEstricto`). */
+  let enBiblioFuerte = false;
   /* Las notas al pie definidas por el camino («[^3]: …»): se juntan
      aquí y se cuelgan al final, como en un libro. */
   const notas = [];
@@ -1662,6 +1726,7 @@ function vozLeer(texto, opciones) {
     if (cap) out.capitulos.push(cap);
     cap = { t: String(t || '').trim(), p: [] };
     enBiblio = vozEsTituloBibliografia(cap.t);
+    enBiblioFuerte = vozEsTituloBiblioEstricto(cap.t);
   };
   const marca = (p) => { cierra(); asegura(); cap.p.push(p); frente = false; };
   /* Un subtítulo puede ser también la cabecera de la bibliografía: con
@@ -1672,6 +1737,7 @@ function vozLeer(texto, opciones) {
     marca({ k: 'h3', t: t });
     out.cuenta.subt++;
     if (vozEsTituloBibliografia(t)) enBiblio = true;
+    if (vozEsTituloBiblioEstricto(t)) enBiblioFuerte = true;
   };
 
   for (let i = 0; i < lineas.length; i++) {
@@ -1835,7 +1901,7 @@ function vozLeer(texto, opciones) {
     /* Dentro de una bibliografía, «3. Wikipedia» a solas es la entrada 3
        y no un capítulo numerado: las listas de un informe llegan muchas
        veces con un blanco entre entrada y entrada. */
-    if (item && (enBiblio || !(item.n != null && sola && item.t.length <= 60 && vozSinPuntoFinal(item.t)))) {
+    if (item && (enBiblioFuerte || !(item.n != null && sola && item.t.length <= 60 && vozSinPuntoFinal(item.t)))) {
       marca({ k: 'li', t: item.t, n: item.n });
       out.cuenta.listas++;
       continue;

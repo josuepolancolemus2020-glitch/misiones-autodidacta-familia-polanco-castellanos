@@ -4896,9 +4896,18 @@ function filasHoja(d){
   ok(JSON.stringify(pagCuenta) === '[[0,0],[1,1],[0,0]]',
      '⚠️ y la página y la cuenta dicen lo mismo aunque haya una cursiva o una negrita junto al corchete (se decide con el bloque entero)',
      '⚠️ la página y la cuenta no coinciden con énfasis al lado: ' + JSON.stringify(pagCuenta));
-  ok(JSON.stringify(llam44('Durante la COVID-19⁴ y desde 2019⁵ crece la IA⁶. Pero R², 10⁻³ y 100 m² no.', 9)) === '["⁴","⁵","⁶"]',
-     '⚠️ «COVID-19⁴», «2019⁵» y «la IA⁶» son citas; «R²», «10⁻³» y «m²» son exponentes',
-     '⚠️ un exponente o una cita se leyeron al revés: ' + JSON.stringify(llam44('Durante la COVID-19⁴ y desde 2019⁵ crece la IA⁶. Pero R², 10⁻³ y 100 m² no.', 9)));
+  const expo44 = 'Durante la COVID-19⁴ y desde 2019⁵ crece la IA⁶. Pero R², 10⁻³, 10*⁻*³, CO², AB², 2048², χ² y 100 m² no.';
+  ok(JSON.stringify(llam44(expo44, 9)) === '["⁴","⁵"]',
+     '⚠️ «COVID-19⁴» y «2019⁵» son citas; «R²», «10⁻³», «CO²», «AB²», «2048²», «χ²» y «m²» son exponentes, y la sigla («la IA⁶») también: entre una cita perdida y una inventada, se pierde la cita',
+     '⚠️ un exponente o una cita se leyeron al revés: ' + JSON.stringify(llam44(expo44, 9)));
+  const subs44 = 'log₂ n, t₁/₂, μ₁, β₂, x̄₁ y σ₂, pero del grupo₃ y del aula₄.';
+  ok(JSON.stringify(llam44(subs44, 6)) === '["₃","₄"]',
+     '⚠️ un subíndice detrás de una función, una barra, una letra griega o un acento suelto es notación («log₂», «t₁/₂», «μ₁», «x̄₁»); detrás de una palabra, una cita',
+     '⚠️ la notación estadística se enlazó a fuentes: ' + JSON.stringify(llam44(subs44, 6)));
+  const lik44 = 'Respondieron en una escala de [1-5], en la escala Likert [1, 5], con x ∈ [1, 3] y Escala: [1-5]. Los valores democráticos [2, 3] importan, entre los estudios [2, 4].';
+  ok(JSON.stringify(llam44(lik44, 6)) === '["[2, 3]","[2, 4]"]',
+     '⚠️ y una escala Likert o un intervalo («escala de [1-5]», «x ∈ [1, 3]») no son citas, pero «los valores democráticos [2, 3]» sí: se miran las tres palabras de delante, y solo palabras de matemáticas',
+     '⚠️ una escala se enlazó a fuentes, o se perdió una cita: ' + JSON.stringify(llam44(lik44, 6)));
   const enTit = ['References and Further Reading', 'Sources Cited', 'Notes and References', 'Works Cited and Consulted'].map(T =>
     !!leer44('## Intro\n\nTeachers report stress[1] and more[2].\n\n## ' + T + '\n\n1. Smith, J. (2019). Stress. https://a.org/x\n2. Jones, K. (2020). More. https://b.org/y').find(c => c.ref));
   const enProsa = !!leer44('## La energía\n\nUn ensayo.\n\n## Sources of energy\n\nThe sun is the first.\nThe wind, the second.').find(c => c.ref);
@@ -4923,6 +4932,25 @@ function filasHoja(d){
   ok(JSON.stringify(cruce) === '["[1]","[^1]"]',
      '⚠️ y «[^2]», sin nota 2 en unas notas que sí existen, no cae en la obra 2: se queda sin fuente',
      '⚠️ una nota al pie que falta cayó en la bibliografía: ' + JSON.stringify(cruce));
+
+  /* 10. Y lo de la TERCERA revisión, sobre los arreglos de la segunda. */
+  const lNot = leer44('Voz: X\nMáquina: Y\n\nDato[1] y dato[2] y una nota[^1].\n\nObras citadas\n\n1. TALIS 2018\n\n2. Wikipedia\n\n[^1]: Una nota.\n');
+  const lRaya = leer44('Respuesta con dato[1] y otro[2].\n\nSources\n\n[1] https://a.org/uno\n[2] https://b.org/dos\n\n---\n\nCompartir esta respuesta\n');
+  ok(lNot.some(c => c.ref && c.p.length >= 2) && lRaya.some(c => c.ref && c.p.length >= 2),
+     '⚠️ las notas al pie («[^1]: …») detrás de la lista y lo que viene tras una raya final («---» y «Compartir») no tumban una bibliografía clarísima',
+     '⚠️ una nota al pie o una raya final dejaron la bibliografía en prosa: ' + JSON.stringify([lNot, lRaya]));
+  const energia = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes();
+    const o = vozLeer(${JSON.stringify('Voz: X\nMáquina: Y\n\n## Introducción\n\nDato[1] y dato[2].\n\n## Fuentes de energía renovable\n\n1. Solar\n\n2. Eólica\n\n## Referencias\n\n1. Uno, A. (2010). Primera. https://a.org\n2. Dos, B. (2011). Segunda. https://b.org\n')});
+    const r = vozLlamadasEn('Dato[1] y dato[2].', vozIndiceFuentes({ cid: '__en44__', capitulos: o.capitulos }));
+    vozOlvidaFuentes(); return JSON.stringify(r.res.map(x => x.t + '=' + x.fuentes[0].t.slice(0, 6))); })()`));
+  ok(JSON.stringify(energia) === JSON.stringify(['[1]=Uno, A', '[2]=Dos, B']),
+     '⚠️ un capítulo «Fuentes de energía renovable» con sus apartados numerados NO le roba los números a las «Referencias»: el «[1]» lleva a la obra 1',
+     '⚠️ los apartados de un capítulo le robaron los números a la bibliografía: ' + JSON.stringify(energia));
+  const notasMet = lista44('Notas sobre el método\nAlfa, A. (2010). Primera.');
+  const furth = leer44('## Ensayo\n\nTexto.\n\n### Further reading\n\nUn párrafo de prosa sobre lecturas.\n\n### Final thoughts\n\nCierre.');
+  ok(notasMet.length === 2 && !furth.some(c => c.ref),
+     'y la caja de fuentes no se come «Notas sobre el método» (una primera fuente de verdad), y un «Further reading» suelto es prosa',
+     'se perdió una primera fuente, o «Further reading» se leyó como bibliografía: ' + JSON.stringify([notasMet, furth]));
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

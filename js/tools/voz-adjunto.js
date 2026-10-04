@@ -273,20 +273,17 @@ function vadjNumeroDe(p, numeracion, cuentas) {
   return c[k];
 }
 
-/* ¿Este texto es el rótulo de una bibliografía? Los números de una
+/* ¿Este texto es el título de una bibliografía? Los números de una
    lista solo se escriben DENTRO de una (ver `vadjLeerDocx`). La
-   decisión es la del lector —una sola copia—, y si el lector no está
-   cargado no se escribe ningún número: es lo de antes. Para una
-   cabecera vale lo mismo que el lector toma por capítulo de fuentes
-   (`vozEsTituloFuentes`), «Notas» incluidas: unas notas numeradas a
-   mano bajo «Notas» son lo que citan los «¹ ²» del cuerpo (lo cazó la
-   segunda revisión del 4 de octubre de 2026). */
-function vadjEsBiblio(t, estricto) {
-  const s = String(t || '').replace(/^\s*(?:\d+(?:\.\d+)*[.)]?|[ivxlcdm]+[.)])\s+/i, '').trim();
-  if (!s || s.length > 60) return false;
-  if (typeof vozEsRotuloBibliografia === 'function' && vozEsRotuloBibliografia(s)) return true;
-  if (!estricto && typeof vozEsTituloFuentes === 'function' && vozEsTituloFuentes(s)) return true;
-  return false;
+   decisión es la del lector —una sola copia— y con su lista CERRADA de
+   títulos (`vozEsTituloBiblioEstricto`): con la prueba por delante,
+   «Notas para el docente» o «Fuentes de energía» abrían una
+   bibliografía, sus listas salían numeradas y esos números le ganaban a
+   los de las «Referencias» de verdad (segunda revisión del 4 de octubre
+   de 2026). «Notas» a secas sí cuenta: son lo que citan los «¹ ²». Si el
+   lector no está cargado no se escribe ningún número: es lo de antes. */
+function vadjEsBiblio(t) {
+  return typeof vozEsTituloBiblioEstricto === 'function' && vozEsTituloBiblioEstricto(t);
 }
 
 /* ⚠️ UN SUPERÍNDICE DETRÁS DE UNA CIFRA O DE UNA O DOS LETRAS ES UN
@@ -389,7 +386,14 @@ function vadjTextoP(p, ctx) {
       if (ln === 'noBreakHyphen') { out += '-'; continue; }
       if (ln === 'footnoteReference' || ln === 'endnoteReference') {
         const id = h.getAttributeNS(VADJ_W, 'id');
-        if (id && id !== '-1' && id !== '0' && id !== '1') {
+        /* ⚠️ Sin filtrar por número: los separadores de las notas viven
+           en `footnotes.xml` y el cuerpo NUNCA los llama. El filtro de
+           antes (fuera el 0 y el 1) era de Word 2007; en los Word de
+           ahora los separadores son el -1 y el 0, la primera nota de
+           verdad es la 1, y se perdía entera, llamada y texto, sin dar
+           ningún error (lo vio la segunda revisión del 4 de octubre de
+           2026, al pasar). */
+        if (id) {
           const clave = (ln === 'endnoteReference' ? 'e' : 'n') + id;
           ctx.notasUsadas.add(clave);
           out += '[^' + ctx.numeroNota(clave) + ']';
@@ -397,7 +401,10 @@ function vadjTextoP(p, ctx) {
         continue;
       }
       if (ln === 'r') {
-        if (vadjEsSuper(h)) {
+        /* Una llamada a nota con formato de superíndice puesto a mano es
+           una NOTA, no un número volado: se lee por dentro. */
+        const llamaNota = [...h.children].some(x => x.localName === 'footnoteReference' || x.localName === 'endnoteReference');
+        if (vadjEsSuper(h) && !llamaNota) {
           /* ⚠️ Los trozos volados SEGUIDOS se leen juntos. Word parte un
              mismo número en varios trozos a la mínima (una corrección,
              una revisión ortográfica), y leído trozo a trozo un «12» de
@@ -407,7 +414,7 @@ function vadjTextoP(p, ctx) {
           let j = i + 1;
           while (j < hijos.length) {
             const x = hijos[j];
-            if (x.localName === 'r' && vadjEsSuper(x)) { t += textoDe(x); j++; continue; }
+            if (x.localName === 'r' && vadjEsSuper(x) && ![...x.children].some(y => y.localName === 'footnoteReference' || y.localName === 'endnoteReference')) { t += textoDe(x); j++; continue; }
             if (/^(proofErr|bookmarkStart|bookmarkEnd|permStart|permEnd)$/.test(x.localName)) { j++; continue; }
             break;
           }
@@ -556,7 +563,7 @@ async function vadjLeerDocx(buf) {
     if (!t) { bloques.push(''); return; }
     if (x.nivel) {
       if (!enBiblio || !nivelBiblio || x.nivel <= nivelBiblio) {
-        enBiblio = vadjEsBiblio(t.replace(/\n/g, ' '), false);
+        enBiblio = vadjEsBiblio(t.replace(/\n/g, ' '));
         nivelBiblio = enBiblio ? x.nivel : 0;
       }
       const nivel = (soloUnH1 && x.nivel === 2 && i === primerH1) ? 1 : x.nivel;
@@ -572,7 +579,7 @@ async function vadjLeerDocx(buf) {
       bloques.push((n != null && enBiblio ? n + '. ' : '- ') + t.replace(/\n/g, ' '));
       return;
     }
-    if (vadjEsBiblio(t, true)) { enBiblio = true; nivelBiblio = 0; }
+    if (vadjEsBiblio(t)) { enBiblio = true; nivelBiblio = 0; }
     bloques.push(t);
     bloques.push('');
   });
@@ -668,7 +675,11 @@ async function vadjLeerHtml(txt) {
      citadas» numeradas la nota 1 llevaba a la obra 1: una atribución
      falsa (segunda revisión del 4 de octubre de 2026). Como en Word:
      la llamada «[^3]» y la nota «[^3]: …», que el lector guarda aparte. */
-  const notaDe = a => { const m = (a.getAttribute('href') || '').match(/^#ftnt(\d{1,3})$/); return m ? m[1] : null; };
+  /* Y las de Word guardado como página («#_ftn3», «#_edn3») y las de
+     LibreOffice («#sdfootnote3sym»), que también llegan: una llamada de
+     esas leída como «[3]» le roba el número a la obra 3. */
+  const notaDe = a => { const m = (a.getAttribute('href') || '').match(/^#(?:ftnt|_ftn|_edn|sdfootnote|sdendnote)(\d{1,3})(?:sym)?$/); return m ? m[1] : null; };
+  const VADJ_VUELTA = /^#(?:ftnt_ref|_ftnref|_ednref|sdfootnote|sdendnote)(\d{1,3})(?:anc)?$/;
   const conLlamadas = el => {
     let out = '';
     const rec = n => {
@@ -679,7 +690,7 @@ async function vadjLeerHtml(txt) {
         if (h.nodeType !== 1) continue;
         const et = h.tagName.toLowerCase();
         if (et === 'a' && notaDe(h)) { out += '[^' + notaDe(h) + ']'; continue; }
-        if (et === 'a' && /^#ftnt_ref\d/.test(h.getAttribute('href') || '')) continue;
+        if (et === 'a' && VADJ_VUELTA.test(h.getAttribute('href') || '')) continue;
         if (et === 'sup') {
           const enlaces = [...h.querySelectorAll('a')].map(notaDe).filter(Boolean);
           if (enlaces.length) { out += enlaces.map(x => '[^' + x + ']').join(''); continue; }
@@ -733,18 +744,18 @@ async function vadjLeerHtml(txt) {
         const nv = parseInt(et[1], 10);
         if (t) {
           /* Un subtítulo DENTRO de la bibliografía no la cierra (ver Word). */
-          if (!enBiblio || !nivelBiblio || nv <= nivelBiblio) { enBiblio = vadjEsBiblio(t, false); nivelBiblio = enBiblio ? nv : 0; }
+          if (!enBiblio || !nivelBiblio || nv <= nivelBiblio) { enBiblio = vadjEsBiblio(t); nivelBiblio = enBiblio ? nv : 0; }
           cuenta.cabeceras++; bloques.push(''); bloques.push('#'.repeat(Math.min(3, nv)) + ' ' + t); bloques.push('');
         }
       } else if (et === 'p') {
         /* El párrafo de una nota de Google empieza por su ancla de vuelta
            («[3]» que lleva a `#ftnt_ref3`): sale «[^3]: …». */
         const primero = [...h.querySelectorAll('a')][0];
-        const mv = primero && (primero.getAttribute('href') || '').match(/^#ftnt_ref(\d{1,3})$/);
+        const mv = primero && (primero.getAttribute('href') || '').match(VADJ_VUELTA);
         const delante = mv ? limpio((h.textContent || '').slice(0, Math.max(0, (h.textContent || '').indexOf(primero.textContent)))) : '';
         const t = conLlamadas(h);
         if (mv && !delante) { if (t) { cuenta.notas++; bloques.push('[^' + mv[1] + ']: ' + t.replace(/\n/g, ' ')); } continue; }
-        if (t && vadjEsBiblio(t, true)) { enBiblio = true; nivelBiblio = 0; }
+        if (t && vadjEsBiblio(t)) { enBiblio = true; nivelBiblio = 0; }
         if (t) { bloques.push(t); bloques.push(''); } else bloques.push('');
       } else if (et === 'blockquote') {
         const t = conLlamadas(h);

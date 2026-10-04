@@ -5045,11 +5045,25 @@ el diseño.
      al pie de Documentos de Google salían «[1]» y chocaban con la obra 1
      (ahora «[^1]» y «[^1]: …», como en Word); un subtítulo dentro de la
      bibliografía («Libros», «Artículos») la cerraba (ahora solo la cierra
-     una cabecera de su nivel o más alta); «Notas» no contaba como
-     bibliografía (ahora vale lo que el lector toma por capítulo de
-     fuentes); un ítem BORRADO con control de cambios seguía contando
-     (`vadjParrafoFantasma`); y los trozos volados seguidos se leían por
-     separado —un «12» de cita salía «[1][2]»—, y ahora se leen juntos.
+     una cabecera de su nivel o más alta); un ítem BORRADO con control de
+     cambios seguía contando (`vadjParrafoFantasma`); y los trozos
+     volados seguidos se leían por separado —un «12» de cita salía
+     «[1][2]»—, y ahora se leen juntos.
+
+     ⚠️ **Y el título que abre una bibliografía es de una lista CERRADA**
+     (`vozEsTituloBiblioEstricto`: «Referencias», «Bibliografía
+     consultada», «Obras citadas», «Notas» a secas, «Works Cited»…, con
+     su número de sección delante si lo trae), no «empieza por»: la
+     tercera revisión cazó «Notas para el docente» y «Fuentes de
+     energía» abriendo una bibliografía, con sus listas numeradas 1, 2, 3
+     ganándole los números a las «Referencias» de verdad. Lo mismo vale
+     en la caja de fuentes para quitar el rótulo de arriba («Notas sobre
+     el método» es una fuente) y en el lector para leer «3. Wikipedia»
+     suelto como la entrada 3. Y las notas al pie de LibreOffice
+     («#sdfootnote1sym») y de Word guardado como página («#_ftn1») salen
+     «[^1]» como las de Google; la primera nota de un Word actual (con
+     los separadores en el -1 y el 0) ya no se pierde entera, y una
+     llamada a nota con superíndice puesto a mano es una nota.
    - **Al pegar**, la lista de «📚 Las fuentes del informe» llega sin
      número (así la enseñan los informes), y un rótulo pelado en
      minúsculas —«Obras citadas», el «Citations:» de Perplexity, el
@@ -5082,7 +5096,11 @@ el diseño.
      Fuentes publicó La región más transparente (1958).»— partía el resto
      del ensayo en «entradas», y una lista de Gemini sin años salía en
      tres capítulos vacíos. Un «2. Segundo» con su prosa debajo es un
-     capítulo, y no la fuente 2. Y del principio de la caja de fuentes se
+     capítulo, y no la fuente 2. Las notas al pie («[^1]: …») de debajo
+     de la lista no cuentan —el lector las saca aparte—, y lo que viene
+     tras una raya final («---» y el «Compartir» de Perplexity) no
+     decide nada; una línea de despedida pegada a la lista, sin raya, sí
+     la deja en prosa, que es el lado seguro. Y del principio de la caja de fuentes se
      quita el rótulo solo si tiene cara de rótulo —empieza por una palabra
      de bibliografía, es corto y no trae cifras ni dirección—: «Bibliografía
      consultada» se quita y «Sources of the Nile, by Speke (1863)…» se
@@ -5137,9 +5155,12 @@ el diseño.
    arreglo ya puesto—; un «[0, 1]» es un intervalo
    (no hay fuente 0); un corchete de VARIOS números detrás de una
    palabra de matemáticas y con un blanco delante —«una escala [1-10] de
-   dolor», «el vector [1, 2, 3]»— es un intervalo (`VOZ_PAL_MATE`: se
-   mira la palabra de DELANTE; mirando lo de detrás se perdían las citas
-   de verdad, «los estudios [2, 3] muestran…»); y **una nota al pie no es
+   dolor», «el vector [1, 2, 3]», «una escala de [1-5]», «x ∈ [1, 3]»— es
+   un intervalo (`vozDelanteEsMate`: se miran las TRES palabras de
+   DELANTE, y solo palabras que casi no salen fuera de las matemáticas
+   —«entre» o «valores» se comerían «los valores democráticos [2, 3]»—;
+   mirando lo de detrás se perdían las citas de verdad, «los estudios
+   [2, 3] muestran…»); y **una nota al pie no es
    una entrada de la bibliografía**: con las dos numeradas desde 1, «[1]»
    llevaba a la nota y «[^1]» a la obra. Ahora cada una va a lo suyo
    (`porN` y `porPie` en `vozIndiceFuentes`), «[^2]» no cae en la obra 2
@@ -5148,13 +5169,18 @@ el diseño.
    propósito: con notas «¹» y una bibliografía APA, quitarlo ofrecía
    numerar la lista APA para casar el «¹» con un autor.
 
-   ⚠️ **Y tres que NO son exponentes aunque vayan detrás de una cifra o
-   de dos letras** (la segunda revisión, sobre Word): un año («desde
-   2019⁵»), un código con guion («COVID-19⁴») y dos MAYÚSCULAS, que son
-   una sigla («la IA⁶»). Una letra sola sí («R²»), y en «10⁻³» el signo
-   volado se salta. Y la página decide con el BLOQUE ENTERO
-   (`vozCitasEn`), no con el texto «hasta aquí»: con una cursiva al lado
-   del corchete, la página enlazaba lo que la cuenta no.
+   ⚠️ **Y dos que NO son exponentes aunque vayan detrás de una cifra**
+   (la segunda revisión, sobre Word): un año («desde 2019⁵», de 1500 a
+   2039) y un código con guion («COVID-19⁴»). Las siglas («la IA⁶») se
+   probaron como cita y se RETIRARON en la tercera revisión: arrastraban
+   el «CO²» mal escrito, el «AB²» de un segmento y el «KM²», y entre una
+   cita perdida y una inventada se pierde la cita. Una o dos letras
+   latinas o griegas son exponente («R²», «χ²»), y en «10⁻³» el signo
+   volado se salta. Un SUBÍNDICE detrás de una función, una barra, una
+   letra griega o un acento suelto es notación («log₂», «t₁/₂», «μ₁»,
+   «x̄₁»). Y la página decide con el BLOQUE ENTERO (`vozCitasEn`), no con
+   el texto «hasta aquí»: con una cursiva al lado del corchete, la
+   página enlazaba lo que la cuenta no.
 
    ⚠️ **👁 EL DOCUMENTO SE VE DENTRO DE LA LECTURA, «SI SE PUEDE», Y LA
    PANTALLA DICE CUÁNDO NO.** La ficha de la fuente lleva «👁 Ver el
@@ -5251,7 +5277,11 @@ número). Y al final de esa sección, lo de la segunda revisión: «COVID-19»,
 un año y una sigla con su cita, el superíndice partido en dos trozos, el
 ítem borrado con control de cambios, los subtítulos dentro de la
 bibliografía, las «Notas» numeradas, y una página de Documentos de Google
-con su nota al pie, que el lector lleva a la nota y no a la obra.
+con su nota al pie, que el lector lleva a la nota y no a la obra. Y lo de
+la tercera revisión: la primera nota de un Word actual, la llamada a nota
+con superíndice puesto a mano, «Notas para el docente» y «Fuentes de
+energía» sin números, y las notas al pie de LibreOffice y de Word
+guardado como página.
 
 La comprobación **2** le pega un párrafo de prosa cuyos siete renglones
 empiezan por siete palabras que nombran una parte de un libro, y exige que
@@ -5439,7 +5469,10 @@ de Gemini sin años, Vancouver y Chicago, el «2. Segundo» que es un
 capítulo, «estudios [2, 3] muestran» frente a «escala [1-10]», la página
 y la cuenta con una cursiva al lado del corchete, «COVID-19⁴» y «R²», los
 títulos ingleses con coletilla, el rótulo de la caja de fuentes y la nota
-al pie que falta.
+al pie que falta. Y el apartado 10, lo de la tercera: las notas al pie y
+la raya final debajo de la lista, el capítulo «Fuentes de energía» que no
+roba números, «Notas sobre el método» que es una fuente, «Further
+reading» suelto, las escalas Likert, la notación estadística y «CO²».
 
 La comprobación **43** es 📣 A redes, de punta a punta y por gravedad:
 que el trozo llegue a la tabla de Redes **sin su etiqueta** (se mira lo

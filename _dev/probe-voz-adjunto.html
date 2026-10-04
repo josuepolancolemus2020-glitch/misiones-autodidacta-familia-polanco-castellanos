@@ -428,9 +428,9 @@ const RELS =
     ['word/document.xml', DOC_4],
     ['word/numbering.xml', NUM_4],
   ], w)], 'cuatro.docx'))).texto || '';
-  ok(/COVID-19\[4\]/.test(t4) && /2019\[5\]/.test(t4) && /la IA\[6\]/.test(t4),
-     '⚠️ detrás de «COVID-19», de un año o de una sigla («IA») el superíndice es una CITA: «[4]», «[5]», «[6]»',
-     '⚠️ una cita detrás de un código, un año o una sigla salió como exponente: ' + (t4.match(/Durante.{0,80}/) || [''])[0]);
+  ok(/COVID-19\[4\]/.test(t4) && /2019\[5\]/.test(t4) && /la IA⁶/.test(t4),
+     '⚠️ detrás de «COVID-19» o de un año el superíndice es una CITA («[4]», «[5]»); detrás de una sigla de dos letras («IA⁶») se queda volado, como «CO²»: la misma decisión que el lector',
+     '⚠️ una cita detrás de un código o un año salió como exponente, o la sigla salió como cita: ' + (t4.match(/Durante.{0,80}/) || [''])[0]);
   ok(/área de 10¹² m/.test(t4) && /un dato\[12\] partido/.test(t4),
      '⚠️ los trozos volados SEGUIDOS se leen juntos: «10¹²» es un exponente entero y el «12» de una cita es la [12], no la [1][2]',
      '⚠️ un superíndice partido en dos trozos se leyó por separado: ' + (t4.match(/área.{0,60}/) || [''])[0]);
@@ -456,6 +456,52 @@ const RELS =
   ok(JSON.stringify(mGoo) === JSON.stringify(['[^1]=Aclaración d', '[2]=Dos, B. (201']),
      '⚠️ y el lector lleva la nota a la nota y el «[2]» a la obra 2: ninguna se cruza',
      '⚠️ la nota y la obra se cruzaron en el lector: ' + JSON.stringify(mGoo));
+
+  /* Y lo de la TERCERA revisión: títulos que solo EMPIEZAN como una
+     bibliografía, las notas al pie de LibreOffice y de Word guardado como
+     página, y la primera nota de un Word actual. */
+  const DOC_5 =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document ' + W + ' ' + R + '><w:body>' +
+      p('', t('Una idea') + '<w:r><w:footnoteReference w:id="1"/></w:r>' + t(' y otra') +
+            '<w:r><w:rPr><w:vertAlign w:val="superscript"/></w:rPr><w:footnoteReference w:id="2"/></w:r>' + t('.')) +
+      p(estilo('Heading1'), t('Notas para el docente')) +
+      p(num(1, 0), t('Repartir la hoja')) +
+      p(estilo('Heading1'), t('Fuentes de energía')) +
+      p(num(3, 0), t('Solar')) +
+    '</w:body></w:document>';
+  const NOTAS_5 =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:footnotes ' + W + '>' +
+      '<w:footnote w:type="separator" w:id="-1">' + p('', t('separador')) + '</w:footnote>' +
+      '<w:footnote w:type="continuationSeparator" w:id="0">' + p('', t('continuación')) + '</w:footnote>' +
+      '<w:footnote w:id="1">' + p('', t('Primera nota del autor.')) + '</w:footnote>' +
+      '<w:footnote w:id="2">' + p('', t('Segunda nota del autor.')) + '</w:footnote>' +
+    '</w:footnotes>';
+  const NUM_5 = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering ' + W + '>' +
+    '<w:abstractNum w:abstractNumId="10"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl></w:abstractNum>' +
+    '<w:num w:numId="1"><w:abstractNumId w:val="10"/></w:num><w:num w:numId="3"><w:abstractNumId w:val="10"/></w:num></w:numbering>';
+  const t5 = (await w.VozAdjunto.leer(new w.File([await hacerZip([
+    ['[Content_Types].xml', '<?xml version="1.0"?><Types/>'],
+    ['word/document.xml', DOC_5],
+    ['word/footnotes.xml', NOTAS_5],
+    ['word/numbering.xml', NUM_5],
+  ], w)], 'cinco.docx'))).texto || '';
+  ok(/Una idea\[\^1\] y otra\[\^2\]\./.test(t5) && /^\[\^1\]: Primera nota del autor\.$/m.test(t5) && /^\[\^2\]: Segunda nota del autor\.$/m.test(t5),
+     '⚠️ la PRIMERA nota de un Word actual (separadores en -1 y 0, la nota 1 de verdad) llega entera, y una llamada a nota con superíndice puesto a mano es una nota',
+     '⚠️ se perdió la primera nota al pie o la llamada con superíndice:\n' + t5);
+  ok(/^- Repartir la hoja$/m.test(t5) && /^- Solar$/m.test(t5),
+     '⚠️ «Notas para el docente» y «Fuentes de energía» no son bibliografías: sus listas no se numeran (le robarían los números a las obras)',
+     '⚠️ una lista bajo un título que solo empieza como bibliografía salió numerada:\n' + t5);
+  const htmlLO = '<html><body><h1>Texto</h1><p>Dato<a class="sdfootnoteanc" name="sdfootnote1anc" href="#sdfootnote1sym"><sup>1</sup></a> y otro' +
+    '<a style="mso-footnote-id:ftn1" href="#_ftn1" name="_ftnref1"><span>[1]</span></a>.</p>' +
+    '<h1>Referencias</h1><ol><li>Uno, A. (2010). Primera.</li></ol>' +
+    '<div id="sdfootnote1"><p><a class="sdfootnotesym" name="sdfootnote1sym" href="#sdfootnote1anc">1</a>Nota de LibreOffice.</p></div>' +
+    '<div id="ftn1"><p><a href="#_ftnref1" name="_ftn1"><span>[1]</span></a> Nota de Word.</p></div></body></html>';
+  const tLO = (await w.VozAdjunto.leer(new w.File([new w.Blob([htmlLO])], 'lo.html', { type: 'text/html' }))).texto || '';
+  ok(/Dato\[\^1\] y otro\[\^1\]\./.test(tLO) && /^\[\^1\]: Nota de LibreOffice\.$/m.test(tLO) && /^\[\^1\]: Nota de Word\.$/m.test(tLO) && /^1\. Uno, A\./m.test(tLO),
+     '⚠️ las notas al pie de LibreOffice («#sdfootnote1sym») y de Word guardado como página («#_ftn1») también salen «[^1]»: no le roban el número a la obra 1',
+     '⚠️ una nota al pie de LibreOffice o de Word se leyó como cita:\n' + tLO);
 
   log('── 4. ⚠️ UN PDF DICE QUE NO, Y DICE QUÉ HACER ──');
   const pdf = new w.File([new w.Blob(['%PDF-1.7\n1 0 obj\n'])], 'informe.pdf', { type: 'application/pdf' });
