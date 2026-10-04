@@ -1037,10 +1037,19 @@ function vozFuentesDeLista(txt) {
      consultada» entraba como la fuente 1 y numerar la lista corría todas
      las llamadas una posición. Las dos son la misma atribución falsa,
      cada una por un lado (revisión del 4 de octubre de 2026). */
+  /* Y con su número de sección delante también («5. Referencias»,
+     «IV. BIBLIOGRAFÍA»): quedándose, se llevaba el número 5 y el «[5]»
+     del texto abría el rótulo en vez de la obra. Salvo que ese número
+     empiece la serie de la lista —«1. Fuentes de energía» seguido de
+     «2. …» es la entrada 1, no un rótulo—. */
   if (lineas.length) {
     const c = lineas[0];
-    if (vozEsRotuloBibliografia(c) ||
-        (vozEsTituloFuentes(c) && c.split(/\s+/).length <= 6 && !/\d/.test(c) && !vozPareceReferencia(c))) lineas.shift();
+    const nDe = l => { const m = String(l || '').match(/^(?:\[(\d{1,3})\]|\((\d{1,3})\)|(\d{1,3})[.)])\s/); return m ? parseInt(m[1] || m[2] || m[3], 10) : null; };
+    const n0 = nDe(c);
+    const sigue = n0 != null && nDe(lineas[1]) === n0 + 1;
+    const c0 = c.replace(/^(?:\d{1,3}|[ivxlcdm]{1,6})[.)]\s+/i, '');
+    if (!sigue && (vozEsRotuloBibliografia(c0) ||
+        (vozEsTituloFuentes(c0) && c0.split(/\s+/).length <= 6 && !/\d/.test(c0) && !vozPareceReferencia(c0)))) lineas.shift();
   }
   const juntas = [];
   for (let i = 0; i < lineas.length; i++) {

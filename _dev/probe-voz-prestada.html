@@ -4908,6 +4908,11 @@ function filasHoja(d){
   const lista44 = t => JSON.parse(w.eval(`JSON.stringify(vozFuentesDeLista(${JSON.stringify(t)}).map(f => f.t))`));
   const lc = lista44('Bibliografía consultada\nAlfa, A. (2010). Primera.\nBeta, B. (2011). Segunda.');
   const ls = lista44('Sources of teacher stress, Smith (2019). https://x.org/a\nOther (2020). https://y.org');
+  const ln = JSON.parse(w.eval(`JSON.stringify(vozFuentesDeLista(${JSON.stringify('5. Referencias\n[1] Harari, Y. (2014). Sapiens.\n[5] Graeber, D. (2011). Deuda.')}).map(f => f.n + '|' + f.t))`));
+  const l1 = JSON.parse(w.eval(`JSON.stringify(vozFuentesDeLista(${JSON.stringify('1. Fuentes de energía\n2. Otra fuente')}).map(f => f.n + '|' + f.t))`));
+  ok(JSON.stringify(ln) === JSON.stringify(['1|Harari, Y. (2014). Sapiens.', '5|Graeber, D. (2011). Deuda.']) && l1.length === 2,
+     '⚠️ y con su número de sección delante («5. Referencias») también es rótulo: no le roba el número 5 a la obra; pero «1. Fuentes de energía» seguido de la 2 es la entrada 1',
+     '⚠️ un rótulo numerado se quedó con un número, o se perdió una entrada: ' + JSON.stringify([ln, l1]));
   ok(lc.length === 2 && /^Alfa/.test(lc[0]) && ls.length === 2 && /^Sources of/.test(ls[0]),
      '⚠️ en la caja de fuentes, «Bibliografía consultada» es el rótulo (se quita) y «Sources of teacher stress, Smith (2019)…» es la primera entrada (se queda): numerar no corre ninguna llamada',
      '⚠️ la caja de fuentes se comió una entrada o se quedó con el rótulo: ' + JSON.stringify([lc, ls]));
