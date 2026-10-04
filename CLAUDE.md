@@ -5103,8 +5103,12 @@ el diseño.
 
    ⚠️ **Y la revisión del 4 de octubre de 2026 cazó cuatro más de la
    misma familia**, todas atribuciones falsas con cara de cita: un
-   subíndice detrás de una mayúscula o de un paréntesis también es
-   química («CaCO₃», «KMnO₄», «Ca(OH)₂»); un «[0, 1]» es un intervalo
+   subíndice detrás de una FÓRMULA también es química aunque lleve más
+   de dos letras delante («CaCO₃», «KMnO₄», «MgCl₂», «Ca(OH)₂»: símbolos
+   de elemento, cifras y paréntesis), pero no detrás de una palabra
+   cualquiera —«del grupo₃» sigue siendo una llamada, y tomar cualquier
+   letra por química la dejaba sin enlace: lo cazó la sonda con el
+   arreglo ya puesto—; un «[0, 1]» es un intervalo
    (no hay fuente 0); un corchete de VARIOS números entre espacios y con
    una palabra detrás —«una escala [1-10] de dolor»— es un rango del
    texto; y **una nota al pie no es una entrada de la bibliografía**:

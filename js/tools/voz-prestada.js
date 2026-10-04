@@ -1110,10 +1110,13 @@ function vozNumerosDeLlamada(s) {
    y aquí equivocarse hacia «no era una llamada» cuesta un botón que no
    sale. */
 /* ⚠️ Y DOS COSAS QUE CAZÓ LA REVISIÓN (4 de octubre de 2026):
-   · un SUBÍNDICE pegado a una letra, a una cifra o a un paréntesis que
-     cierra es química o un índice, nunca una cita: «CaCO₃», «KMnO₄» y
-     «Ca(OH)₂» tienen más de dos letras delante y se colaban. Un subíndice
-     de cita, si alguna vez se escribe, va detrás de un signo o un blanco.
+   · un SUBÍNDICE detrás de una FÓRMULA es química, aunque lleve más de
+     dos letras delante: «CaCO₃», «KMnO₄», «MgCl₂» y «Ca(OH)₂» se colaban.
+     Fórmula es lo que se escribe con símbolos de elemento —una mayúscula
+     y como mucho una minúscula detrás—, cifras y paréntesis. Y NO una
+     palabra cualquiera: «del grupo₃» es una llamada de verdad, y tomar
+     cualquier letra por química la dejaba sin enlace (lo cazó la sonda,
+     comprobación 44, con el arreglo ya puesto).
    · las marcas de énfasis se SALTAN antes de mirar: el panel y el repaso
      leen el texto guardado («30 *km*²») y la página lee el pintado
      («30 km²»); sin saltarlas, la cuenta decía «llamada» donde la página
@@ -1124,7 +1127,12 @@ function vozEsExponente(txt, ini) {
   if (ini <= 0) return false;
   const antes = txt[ini - 1];
   if (/\d/.test(antes)) return true;
-  if (sub && /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ)\]]/.test(antes)) return true;
+  if (sub) {
+    let j = ini;
+    while (j > 0 && /[A-Za-z0-9₀-₉()]/.test(txt[j - 1])) j--;
+    const run = txt.slice(j, ini);
+    if (/[A-Z]/.test(run) && /^(?:[A-Z][a-z]?|[0-9₀-₉()])+$/.test(run)) return true;
+  }
   let k = ini;
   while (k > 0 && /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(txt[k - 1])) k--;
   const letras = ini - k;

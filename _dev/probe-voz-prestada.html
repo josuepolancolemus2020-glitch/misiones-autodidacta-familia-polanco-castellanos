@@ -4830,9 +4830,9 @@ function filasHoja(d){
     const caps = [{ t: '', p: [] }, { t: 'Referencias', ref: true, p: Array.from({ length: ${n} }, (_, i) => ({ k: 'fuente', t: 'Autor' + (i + 1) + ', A. (20' + (10 + i) + '). Obra.', n: i + 1 })) }];
     const r = vozLlamadasEn(${JSON.stringify(txt)}, vozIndiceFuentes({ cid: '__l44__' + Math.random(), capitulos: caps }));
     vozOlvidaFuentes(); return JSON.stringify(r.res.map(x => x.t)); })()`));
-  ok(JSON.stringify(llam44('El CaCO₃, el KMnO₄ y el Ca(OH)₂ reaccionan. Dato[2].', 5)) === '["[2]"]',
-     '⚠️ «CaCO₃», «KMnO₄» y «Ca(OH)₂» son fórmulas, no llamadas: solo el «[2]» lleva a una fuente',
-     '⚠️ un subíndice químico casó con una fuente: ' + JSON.stringify(llam44('El CaCO₃, el KMnO₄ y el Ca(OH)₂ reaccionan. Dato[2].', 5)));
+  ok(JSON.stringify(llam44('El CaCO₃, el KMnO₄, el MgCl₂ y el Ca(OH)₂ reaccionan con el del grupo₃. Dato[2].', 5)) === '["₃","[2]"]',
+     '⚠️ «CaCO₃», «KMnO₄», «MgCl₂» y «Ca(OH)₂» son fórmulas, no llamadas; «del grupo₃» y «[2]» sí lo son',
+     '⚠️ un subíndice químico casó con una fuente: ' + JSON.stringify(llam44('El CaCO₃, el KMnO₄, el MgCl₂ y el Ca(OH)₂ reaccionan con el del grupo₃. Dato[2].', 5)));
   ok(JSON.stringify(llam44('En una escala [1-10] de dolor, un par [0, 1] binario y un dato [1, 3].', 12)) === '["[1, 3]"]',
      '⚠️ «escala [1-10] de» es un rango y «[0, 1]» un intervalo: solo «[1, 3]» es una llamada',
      '⚠️ un rango o un intervalo salió como llamada: ' + JSON.stringify(llam44('En una escala [1-10] de dolor, un par [0, 1] binario y un dato [1, 3].', 12)));
