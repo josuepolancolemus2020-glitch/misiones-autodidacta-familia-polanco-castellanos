@@ -307,6 +307,92 @@ const RELS =
      'y en una página web, los <ol> salen con sus números —siguiendo el «start» de Google— y los <ul> con viñeta',
      'los números de la lista web se perdieron:\n' + tHtml);
 
+  log('── 3-ter. ⚠️ LOS NÚMEROS, SOLO DENTRO DE UNA BIBLIOGRAFÍA, Y BIEN CONTADOS ──');
+  /* Revisión del 4 de octubre de 2026. Cada caso, un número que se
+     escribía donde no tocaba o que salía corrido: fuera de una
+     bibliografía «1. Objetivos» tiene cara de capítulo; un ítem vacío
+     también cuenta en Word; una viñeta reinicia la sublista de debajo;
+     «%1.%2.» no es el número de una entrada; y «m²» no es una cita. */
+  const DOC_TER =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document ' + W + ' ' + R + '><w:body>' +
+      p(estilo('Title'), t('Informe de prueba')) +
+      p(num(1, 0), t('Objetivos')) +
+      p(num(1, 0), t('Método')) +
+      p('', t('Un área de 100 m') + sup('2') + t(' y 10') + sup('3') + t(' y un dato.') + sup('4') +
+            t(' Y E = mc') + sup('2') + t(' y 10') + sup('-3') + t(' y otro dato') + sup('5') + t('.')) +
+      p('', t('Referencias')) +
+      p(num(3, 0), t('Uno, A. (2010). Primera.')) +
+      p(num(3, 0), '') +
+      p(num(3, 0), t('Tres, C. (2012). Tercera.')) +
+      p(num(4, 0), t('Grupo A')) +
+      p(num(4, 1), t('Sub uno')) +
+      p(num(4, 1), t('Sub dos')) +
+      p(num(4, 0), t('Grupo B')) +
+      p(num(4, 1), t('Sub otra')) +
+      p(num(5, 1), t('Compuesto')) +
+    '</w:body></w:document>';
+  const NUM_TER =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:numbering ' + W + '>' +
+      '<w:abstractNum w:abstractNumId="10"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl></w:abstractNum>' +
+      '<w:abstractNum w:abstractNumId="40"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/></w:lvl>' +
+        '<w:lvl w:ilvl="1"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%2."/></w:lvl></w:abstractNum>' +
+      '<w:abstractNum w:abstractNumId="50"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl>' +
+        '<w:lvl w:ilvl="1"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1.%2."/></w:lvl></w:abstractNum>' +
+      '<w:num w:numId="1"><w:abstractNumId w:val="10"/></w:num>' +
+      '<w:num w:numId="3"><w:abstractNumId w:val="10"/></w:num>' +
+      '<w:num w:numId="4"><w:abstractNumId w:val="40"/></w:num>' +
+      '<w:num w:numId="5"><w:abstractNumId w:val="50"/></w:num>' +
+    '</w:numbering>';
+  const rTer = await w.VozAdjunto.leer(new w.File([await hacerZip([
+    ['[Content_Types].xml', '<?xml version="1.0"?><Types/>'],
+    ['word/document.xml', DOC_TER],
+    ['word/numbering.xml', NUM_TER],
+  ], w)], 'prueba.docx'));
+  const tTer = rTer.texto || '';
+  ok(/^- Objetivos$/m.test(tTer) && /^- Método$/m.test(tTer),
+     '⚠️ una lista de números FUERA de una bibliografía sale con «- », como antes: «1. Objetivos» a solas tiene cara de capítulo',
+     '⚠️ una lista del cuerpo salió numerada:\n' + tTer);
+  ok(/^1\. Uno, A\./m.test(tTer) && /^3\. Tres, C\./m.test(tTer),
+     '⚠️ y dentro de «Referencias» (un rótulo suelto, sin estilo de título) sí: el ítem VACÍO de en medio también cuenta, como en Word',
+     '⚠️ la cuenta se corrió con el ítem vacío:\n' + tTer);
+  ok(/^1\. Sub uno$/m.test(tTer) && /^2\. Sub dos$/m.test(tTer) && /^- Grupo B$/m.test(tTer) && /^1\. Sub otra$/m.test(tTer),
+     '⚠️ una viñeta reinicia la sublista de números que cuelga de ella: «Sub otra» vuelve a ser la 1',
+     '⚠️ la sublista siguió contando por encima de la viñeta:\n' + tTer);
+  ok(/^- Compuesto$/m.test(tTer),
+     'y un número compuesto («%1.%2.», que Word dibuja «1.1.») no se escribe a medias', 'un número compuesto salió como uno simple:\n' + tTer);
+  ok(/100 m² y 10³ y un dato\.\[4\]/.test(tTer) && /mc² y 10⁻³ y otro dato\[5\]\./.test(tTer),
+     '⚠️ un superíndice detrás de una cifra o de una o dos letras es un EXPONENTE («m²», «10³», «mc²», «10⁻³»), no una cita; detrás de una palabra o de un punto, sí',
+     '⚠️ un exponente salió como llamada (o una llamada como exponente): ' + (tTer.match(/Un área.{0,120}/) || [''])[0]);
+  const rRoto = await w.VozAdjunto.leer(new w.File([await hacerZip([
+    ['[Content_Types].xml', '<?xml version="1.0"?><Types/>'],
+    ['word/document.xml', DOC_TER],
+    ['word/numbering.xml', '<?xml version="1.0"?><w:numbering ' + W + '><w:abstractNum w:abstractNumId="10"><w:lvl'],
+  ], w)], 'roto.docx'));
+  ok(!rRoto.error && /Uno, A\./.test(rRoto.texto || ''),
+     'y una numeración rota no tumba el documento: se lee entero', '⚠️ una numeración rota tumbó la lectura: ' + (rRoto.error || ''));
+
+  const htmlTer = '<html><head><style>.lst-kix_aaa-0>li:before{content:"" counter(lst-ctn-kix_aaa-0,lower-latin) ". "}' +
+    '.lst-kix_bbb-0>li:before{content:"" counter(lst-ctn-kix_bbb-0,decimal) ". "}' +
+    '.lst-kix_ddd-1>li:before{content:"" counter(lst-ctn-kix_ddd-0,decimal) "." counter(lst-ctn-kix_ddd-1,decimal) ". "}</style></head><body>' +
+    '<p>Área de 9 m<sup>2</sup> y un dato.<sup>1</sup></p><ol><li>Paso fuera</li></ol><h2>Referencias</h2>' +
+    '<ol class="c1 lst-kix_aaa-0 start" start="1"><li>Letra uno</li></ol>' +
+    '<ol class="c1 lst-kix_bbb-0 start" start="1"><li>Kix uno</li><li>Kix dos</li></ol>' +
+    '<ol class="lst-kix_ddd-1"><li>Kix compuesto</li></ol>' +
+    '<ol reversed><li>Atrás</li></ol><ol style="list-style-type: lower-roman"><li>Romano</li></ol>' +
+    '<ol class="lst-kix_ccc-0"><li>Sin regla</li></ol><ol start="5"><li>Cinco normal</li></ol></body></html>';
+  const tHt = (await w.VozAdjunto.leer(new w.File([new w.Blob([htmlTer])], 'g.html', { type: 'text/html' }))).texto || '';
+  ok(/9 m² y un dato\.\[1\]/.test(tHt) && /^- Paso fuera$/m.test(tHt),
+     'en una página web, lo mismo: «m²» es exponente, «dato.¹» es llamada y una lista del cuerpo sale con «- »',
+     'la página web no distingue exponente, llamada o lista del cuerpo:\n' + tHt);
+  ok(/^- Letra uno$/m.test(tHt) && /^1\. Kix uno$/m.test(tHt) && /^2\. Kix dos$/m.test(tHt) && /^- Kix compuesto$/m.test(tHt) && /^- Sin regla$/m.test(tHt),
+     '⚠️ en Documentos de Google el formato de la lista está en su hoja de estilo: la de letras sale con «- » y la de números con sus números',
+     '⚠️ una lista de Documentos de Google salió con el formato equivocado:\n' + tHt);
+  ok(/^- Atrás$/m.test(tHt) && /^- Romano$/m.test(tHt) && /^5\. Cinco normal$/m.test(tHt),
+     'y una lista que cuenta hacia atrás o de romanos no se numera; una normal con «start» sí',
+     'una lista invertida o de romanos salió numerada:\n' + tHt);
+
   log('── 4. ⚠️ UN PDF DICE QUE NO, Y DICE QUÉ HACER ──');
   const pdf = new w.File([new w.Blob(['%PDF-1.7\n1 0 obj\n'])], 'informe.pdf', { type: 'application/pdf' });
   const rp = await w.VozAdjunto.leer(pdf);

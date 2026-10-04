@@ -4651,6 +4651,18 @@ function filasHoja(d){
      'la cabecera del visor no dice qué fuente es o falta la salida');
   ok(Number(w.eval('_vozPagina')) === pag44 && Number(w.eval('_vozAncla')) === ancla44,
      '⚠️ y ver el documento NO mueve la lectura', '⚠️ abrir el documento movió la lectura');
+  /* ⚠️ Leyendo el documento, Espacio y Fin son las teclas de bajar: con
+     el visor abierto pasaban la página de la lectura por debajo, sin
+     que se viera (revisión del 4 de octubre de 2026). */
+  for (const k of [' ', 'End', 'ArrowRight', 'PageDown', 'ArrowDown'])
+    d.dispatchEvent(new w.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+  await esperar(300);
+  ok(Number(w.eval('_vozPagina')) === pag44 && ov44.style.display === 'flex',
+     '⚠️ con el documento abierto, Espacio, Fin, las flechas y AvPág NO pasan la página de debajo',
+     '⚠️ las teclas pasaron la página de la lectura con el documento encima: ' + w.eval('_vozPagina') + ' ≠ ' + pag44);
+  ok(w.getComputedStyle(ov44.querySelector('.fin-modal')).maxWidth === 'none',
+     'y la hoja del visor no hereda el tope de 480 px de la casa: en una pantalla ancha el documento se lee a lo ancho',
+     '⚠️ el visor lleva max-width ' + w.getComputedStyle(ov44.querySelector('.fin-modal')).maxWidth + ': el documento sale en una columna de móvil');
   d.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
   await esperar(150);
   ok(ov44.style.display !== 'flex' && !d.getElementById('voz-lector').hidden,
@@ -4658,6 +4670,18 @@ function filasHoja(d){
   ok(d.querySelectorAll('#voz-doc-caja iframe').length === 0,
      '⚠️ y el marco se QUITA al cerrar: una página con audio no se queda sonando detrás de la lectura',
      '⚠️ al cerrar quedaron ' + d.querySelectorAll('#voz-doc-caja iframe').length + ' marcos vivos');
+  /* El «⏳ Trayendo el documento…» se VE mientras carga: debajo del marco
+     no se veía nunca (el marco es blanco). Encima, sin recibir el dedo. */
+  const cg44 = JSON.parse(w.eval(`(function(){ vozDocAbrir({ t: 'Una página lenta', n: 7, url: 'https://example.org/lenta' });
+    const c = document.querySelector('#voz-doc-caja .voz-doc-cargando'); const s = c && getComputedStyle(c);
+    const r = c ? JSON.stringify({ z: s.zIndex, pe: s.pointerEvents }) : 'null'; vozDocCerrar(); return r; })()`));
+  ok(cg44 && cg44.z === '1' && cg44.pe === 'none',
+     'el «⏳ Trayendo el documento…» va ENCIMA del marco mientras carga, y sin recibir el dedo',
+     '⚠️ el aviso de carga queda debajo del marco (no se ve) o recibe el dedo: ' + JSON.stringify(cg44));
+  let errBusca = '';
+  try { w.eval(`vozBuscarFuenteUrl(${JSON.stringify('a'.repeat(219) + '😀 b')})`); } catch (e) { errBusca = e.message; }
+  ok(!errBusca, 'y «🔎 Buscarla» corta la entrada por letras, no por mitades: un emoji en el corte no revienta',
+     '⚠️ un emoji en el corte de 220 hizo reventar la búsqueda: ' + errBusca);
   w.eval('vozDocAbrir({ t: "Una página de la casa", n: 9, url: location.origin + "/index.html" })');
   await esperar(150);
   ok(!d.querySelector('#voz-doc-caja iframe') && /F\.A\.R\.O/.test(d.getElementById('voz-doc-caja').textContent),
@@ -4769,8 +4793,73 @@ function filasHoja(d){
      'y al corregirlo, la caja de fuentes enseña los números escritos: la ida y la vuelta dicen lo mismo',
      'la caja de fuentes no trae los números: ' + JSON.stringify(d.getElementById('voz-f-fuentes').value.slice(0, 80)));
   w.eval('vozCerrarPegar()');
+  await esperar(200);
+
+  /* ⚠️ «Numerar» vale para LA LISTA para la que se pidió. Con un «sí»
+     suelto, pegar otra lista encima —una en orden alfabético— la
+     numeraba en el acto y sin el aviso del abecedario. */
+  w.eval('vozAbrirPegar(null)');
+  await esperar(200);
+  ta44.value = 'Voz: un informe\nMáquina: Gemini\n\nPrimer dato.[1] Segundo dato.[2]';
+  d.getElementById('voz-f-fuentes').value = 'Zeta, D. (2013). Cuarta.\nAlfa, A. (2010). Primera.\nGama, C. (2012). Tercera.\nBeta, B. (2011). Segunda.';
+  w.eval('vozRepasar()');
+  await esperar(200);
+  toca(bPeg().find(b => /Numerar la lista por su orden/.test(b.textContent)));
+  await esperar(200);
+  ok(JSON.stringify(nP()) === '[1,2,3,4]', 'una lista numerada en el pegado…', 'no se numeró la primera lista: ' + JSON.stringify(nP()));
+  d.getElementById('voz-f-fuentes').value = 'Alfa, A. (2010). Primera.\nBeta, B. (2011). Segunda.\nGama, C. (2012). Tercera.\nZeta, D. (2013). Cuarta.';
+  w.eval('vozRepasar()');
+  await esperar(200);
+  const repTxt = () => d.getElementById('voz-pegar-repaso').textContent;
+  ok(JSON.stringify(nP()) === '[null,null,null,null]' && bPeg().some(b => /Numerar la lista por su orden/.test(b.textContent)) && /orden alfabético/.test(repTxt()),
+     '⚠️ …y con OTRA lista pegada encima, la numeración se suelta y se vuelve a proponer, con el aviso del abecedario delante',
+     '⚠️ la lista nueva salió numerada sin preguntar, o sin el aviso: ' + JSON.stringify(nP()) + ' · ' + repTxt().slice(0, 160));
+  toca(bPeg().find(b => /Numerar la lista por su orden/.test(b.textContent)));
+  await esperar(200);
+  ok(JSON.stringify(nP()) === '[1,2,3,4]' && /Numeradas por su orden/.test(repTxt()) && /orden alfabético/.test(repTxt()),
+     'y numerada a sabiendas, el aviso del abecedario sigue a la vista hasta guardar',
+     'numerada, el aviso del abecedario desapareció: ' + repTxt().slice(0, 200));
+  w.eval('vozCerrarPegar()');
   delete w.confirm;
   await esperar(200);
+
+  /* 8. Lo que NO es una cita ni una bibliografía (revisión del 4 de
+     octubre de 2026): cada caso, una atribución falsa con cara de cita o
+     un texto partido que parece haber funcionado. */
+  const llam44 = (txt, n) => JSON.parse(w.eval(`(function(){ vozOlvidaFuentes();
+    const caps = [{ t: '', p: [] }, { t: 'Referencias', ref: true, p: Array.from({ length: ${n} }, (_, i) => ({ k: 'fuente', t: 'Autor' + (i + 1) + ', A. (20' + (10 + i) + '). Obra.', n: i + 1 })) }];
+    const r = vozLlamadasEn(${JSON.stringify(txt)}, vozIndiceFuentes({ cid: '__l44__' + Math.random(), capitulos: caps }));
+    vozOlvidaFuentes(); return JSON.stringify(r.res.map(x => x.t)); })()`));
+  ok(JSON.stringify(llam44('El CaCO₃, el KMnO₄ y el Ca(OH)₂ reaccionan. Dato[2].', 5)) === '["[2]"]',
+     '⚠️ «CaCO₃», «KMnO₄» y «Ca(OH)₂» son fórmulas, no llamadas: solo el «[2]» lleva a una fuente',
+     '⚠️ un subíndice químico casó con una fuente: ' + JSON.stringify(llam44('El CaCO₃, el KMnO₄ y el Ca(OH)₂ reaccionan. Dato[2].', 5)));
+  ok(JSON.stringify(llam44('En una escala [1-10] de dolor, un par [0, 1] binario y un dato [1, 3].', 12)) === '["[1, 3]"]',
+     '⚠️ «escala [1-10] de» es un rango y «[0, 1]» un intervalo: solo «[1, 3]» es una llamada',
+     '⚠️ un rango o un intervalo salió como llamada: ' + JSON.stringify(llam44('En una escala [1-10] de dolor, un par [0, 1] binario y un dato [1, 3].', 12)));
+  const pieBib = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes();
+    const caps = [{ t: '', p: [] }, { t: 'Referencias', ref: true, p: [{ k: 'fuente', t: 'Libro, A. (2010). Obra.', n: 1 }] },
+                  { t: 'Notas', ref: true, p: [{ k: 'fuente', t: 'Nota uno, que aclara.', n: 1, pie: 1 }] }];
+    const r = vozLlamadasEn('La obra[1] y la nota[^1].', vozIndiceFuentes({ cid: '__pie44__', capitulos: caps }));
+    vozOlvidaFuentes(); return JSON.stringify(r.res.map(x => x.fuentes.map(f => f.t)[0])); })()`));
+  ok(pieBib[0] === 'Libro, A. (2010). Obra.' && pieBib[1] === 'Nota uno, que aclara.',
+     '⚠️ con una bibliografía numerada Y notas al pie, «[1]» lleva a la obra 1 y «[^1]» a la nota 1: no se cruzan',
+     '⚠️ la llamada y la nota al pie se cruzaron: ' + JSON.stringify(pieBib));
+  const leer44 = t => JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const r = vozLeer(${JSON.stringify(t)}); vozOlvidaFuentes();
+    return JSON.stringify(r.capitulos.map(c => ({ t: c.t, ref: !!c.ref, p: c.p.map(b => b.t || '') }))); })()`));
+  const lApe = leer44('Voz: X\nMáquina: Y\n\n## Familia\n\nSe llamaban así.\n\nFuentes\n\nJuan Fuentes vino de lejos\ny se quedó en el valle\nhasta que murió.\n');
+  ok(!lApe.some(c => c.ref), '⚠️ un «Fuentes» suelto seguido de prosa (o de versos) no abre una bibliografía: es un apellido o un subtítulo',
+     '⚠️ la prosa debajo de «Fuentes» se partió en entradas: ' + JSON.stringify(lApe));
+  const lPoe = leer44('Voz: X\nMáquina: Y\nGénero: poema\n\nVersos del río\n\nReferencias\n\nmis manos (2014)\nsobre el agua, 2015\n');
+  ok(!lPoe.some(c => c.ref), 'y en un poema tampoco: sus versos no son entradas aunque lleven un año', 'un poema se partió en bibliografía: ' + JSON.stringify(lPoe));
+  const lCap = leer44('Voz: X\nMáquina: Y\n\n1. Primero\n\nTexto uno[1].\n\nReferencias\n\nAutor, A. (2010). Obra.\n\n2. Segundo\n\nTexto dos.\n');
+  ok(!lCap.some(c => c.ref) && lCap.length === 2,
+     'un «Referencias» a media obra, con un capítulo detrás, no se lleva el resto del texto a la bibliografía',
+     '⚠️ el capítulo de después acabó dentro de la bibliografía: ' + JSON.stringify(lCap));
+  const lSrc = leer44('Voz: X\nMáquina: Y\n\nUn dato[1].\n\nSources\n\nSources of the Nile, by Speke (1863). https://a.org/nile\nOther, B. (2001). https://b.org\n');
+  const rSrc = lSrc.find(c => c.ref);
+  ok(rSrc && rSrc.p.length === 2 && /Nile/.test(rSrc.p[0]),
+     'y la primera entrada que empieza por «Sources of…» se queda: solo se quita el rótulo cuando es el renglón ENTERO',
+     '⚠️ se perdió la primera entrada de la bibliografía: ' + JSON.stringify(lSrc));
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de

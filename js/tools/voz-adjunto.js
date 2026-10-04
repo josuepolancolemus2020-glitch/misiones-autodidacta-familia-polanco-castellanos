@@ -193,6 +193,12 @@ function vadjEsLista(p) {
    letras o de romanos siguen saliendo con «- »: el lector solo casa
    llamadas con números, y escribir «a.» sería inventarle una forma. */
 function vadjNumeracion(xml) {
+  /* Un numbering.xml raro no puede tumbar la lectura del documento
+     entero: sin numeración, las listas salen con «- », como antes. */
+  try { return vadjNumeracionLee(xml); } catch (e) { return new Map(); }
+}
+
+function vadjNumeracionLee(xml) {
   const nums = new Map();
   if (!xml) return nums;
   const raiz = vadjXml(xml).documentElement;
@@ -207,12 +213,13 @@ function vadjNumeracion(xml) {
     const niveles = new Map();
     for (const l of a.children) {
       if (l.localName !== 'lvl') continue;
-      let fmt = '', ini = 1;
+      let fmt = '', ini = 1, txt = null;
       for (const h of l.children) {
         if (h.localName === 'numFmt') fmt = val(h, '');
         if (h.localName === 'start') ini = parseInt(val(h, '1'), 10) || 1;
+        if (h.localName === 'lvlText') txt = val(h, '');
       }
-      niveles.set(l.getAttributeNS(VADJ_W, 'ilvl') || '0', { fmt: fmt, ini: ini });
+      niveles.set(l.getAttributeNS(VADJ_W, 'ilvl') || '0', { fmt: fmt, ini: ini, txt: txt });
     }
     abs.set(a.getAttributeNS(VADJ_W, 'abstractNumId'), niveles);
   }
@@ -248,13 +255,56 @@ function vadjNumeroDe(p, numeracion, cuentas) {
   }
   const def = id != null ? numeracion.get(id) : null;
   const nivel = def && def.niveles.get(il);
-  if (!nivel || nivel.fmt !== 'decimal') return null;
+  if (!nivel) return null;
+  /* ⚠️ Se cuenta y se reinicia lo de debajo en TODOS los párrafos de la
+     lista, también en los de viñeta: un ítem de nivel 0 con viñeta
+     reinicia la sublista de números que cuelga de él, como en Word. Con
+     la viñeta saliendo antes de contar, la sublista de debajo del
+     segundo ítem seguía en 4, 5, 6 (revisión del 4 de octubre de 2026). */
   if (!cuentas.has(id)) cuentas.set(id, {});
   const c = cuentas.get(id);
   const k = parseInt(il, 10) || 0;
   c[k] = (c[k] == null) ? (def.desde.has(il) ? def.desde.get(il) : nivel.ini) : c[k] + 1;
   Object.keys(c).forEach(x => { if (+x > k) delete c[x]; });
+  if (nivel.fmt !== 'decimal') return null;
+  /* Y un número compuesto («%1.%2.», que Word dibuja «1.2.») no es el
+     número de una entrada: escribir solo el «2» sería inventar uno. */
+  if (nivel.txt != null && (nivel.txt.match(/%/g) || []).length !== 1) return null;
   return c[k];
+}
+
+/* ¿Este texto es el rótulo de una bibliografía? Los números de una
+   lista solo se escriben DENTRO de una (ver `vadjLeerDocx`). La
+   decisión es la del lector —una sola copia—, y si el lector no está
+   cargado no se escribe ningún número: es lo de antes. */
+function vadjEsBiblio(t, estricto) {
+  const s = String(t || '').replace(/^\s*(?:\d+(?:\.\d+)*[.)]?|[ivxlcdm]+[.)])\s+/i, '').trim();
+  if (!s || s.length > 60) return false;
+  if (typeof vozEsRotuloBibliografia === 'function' && vozEsRotuloBibliografia(s)) return true;
+  if (!estricto && typeof vozEsTituloBibliografia === 'function' && vozEsTituloBibliografia(s)) return true;
+  return false;
+}
+
+/* ⚠️ UN SUPERÍNDICE DETRÁS DE UNA CIFRA O DE UNA O DOS LETRAS ES UN
+   EXPONENTE, NO UNA CITA: «m²», «10³», «mc²». Escrito «[2]», el lector
+   lo casaba con la fuente 2: una atribución falsa con cara de cita. Se
+   escribe con los dígitos volados de Unicode, que es lo que el lector
+   ya sabe que no es llamada (`vozEsExponente`): la misma regla, de los
+   dos lados. */
+const VADJ_VOLADOS = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻', '−': '⁻', '–': '⁻' };
+
+function vadjExponente(antes, t) {
+  const s = String(t || '').trim();
+  if (!/^[-−–]?\d{1,3}$/.test(s)) return null;
+  const a = String(antes || '');
+  const ult = a.slice(-1);
+  let esExp = /\d/.test(ult);
+  if (!esExp) {
+    const m = a.match(/(^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{1,2})$/);
+    esExp = !!m;
+  }
+  if (!esExp) return null;
+  return Array.from(s).map(ch => VADJ_VOLADOS[ch] || ch).join('');
 }
 
 /* ⚠️ UN SUPERÍNDICE DE NÚMEROS ES UNA O VARIAS LLAMADAS. «3», «1, 2»,
@@ -333,6 +383,8 @@ function vadjTextoP(p, ctx) {
           /* Solo los dígitos: un superíndice que dice «er» («1.er») o un
              asterisco no es una llamada a nada, y convertirlo en «[er]»
              sería inventarse una cita. */
+          const ex = vadjExponente(out, t);
+          if (ex) { out += ex; continue; }
           const ll = vadjLlamadas(t);
           if (ll) { out += ll; continue; }
           out += t;
@@ -439,6 +491,17 @@ async function vadjLeerDocx(buf) {
      título, y al lector hay que dárselo con una sola almohadilla. */
   const soloUnH1 = (h1 === 1 && primerH1 <= 1 && !parrafos.some(x => x.nivel === 1));
 
+  /* ⚠️ LOS NÚMEROS DE UNA LISTA SOLO SE ESCRIBEN DENTRO DE UNA
+     BIBLIOGRAFÍA. Es para lo único que hacen falta —que el «[3]» case con
+     la entrada 3— y fuera de ahí cambian cómo lee el lector: «1.
+     Objetivos» a solas tiene la cara de una cabecera de capítulo, y la
+     regla 3 de La Voz Prestada manda equivocarse hacia la prosa. Fuera
+     de una bibliografía, las listas salen con «- », como antes de esto
+     (revisión del 4 de octubre de 2026). La bibliografía empieza en una
+     cabecera o en un rótulo suelto («Obras citadas») y acaba en la
+     siguiente cabecera que no lo sea. */
+  let enBiblio = false;
+
   parrafos.forEach((x, i) => {
     if (x.tipo === 'tbl') {
       const L = vadjTablaDocx(x.el, ctx);
@@ -446,8 +509,14 @@ async function vadjLeerDocx(buf) {
       return;
     }
     const t = vadjTextoP(x.el, ctx);
+    /* Se cuenta ANTES de mirar si está vacío: Word dibuja un número
+       también delante de un ítem vacío, y saltárselo desplazaba en uno
+       todas las entradas de debajo. */
+    const enLista = vadjEsLista(x.el);
+    const n = enLista ? vadjNumeroDe(x.el, numeracion, cuentas) : null;
     if (!t) { bloques.push(''); return; }
     if (x.nivel) {
+      enBiblio = vadjEsBiblio(t.replace(/\n/g, ' '), false);
       const nivel = (soloUnH1 && x.nivel === 2 && i === primerH1) ? 1 : x.nivel;
       cuenta.cabeceras++;
       bloques.push('');
@@ -456,12 +525,12 @@ async function vadjLeerDocx(buf) {
       return;
     }
     if (vadjEsCita(x.el)) { cuenta.citas++; t.split('\n').forEach(l => bloques.push('> ' + l)); return; }
-    if (vadjEsLista(x.el)) {
+    if (enLista) {
       cuenta.listas++;
-      const n = vadjNumeroDe(x.el, numeracion, cuentas);
-      bloques.push((n != null ? n + '. ' : '- ') + t.replace(/\n/g, ' '));
+      bloques.push((n != null && enBiblio ? n + '. ' : '- ') + t.replace(/\n/g, ' '));
       return;
     }
+    if (vadjEsBiblio(t, true)) enBiblio = true;
     bloques.push(t);
     bloques.push('');
   });
@@ -559,6 +628,8 @@ async function vadjLeerHtml(txt) {
         const et = h.tagName.toLowerCase();
         if (et === 'sup') {
           const t = limpio(h.textContent);
+          const ex = vadjExponente(out, t);
+          if (ex) { out += ex; continue; }
           const ll = vadjLlamadas(t);
           if (ll) { out += ll; continue; }
           out += t;
@@ -582,14 +653,20 @@ async function vadjLeerHtml(txt) {
   };
 
   const cuerpo = doc.body || doc.documentElement;
+  /* Los números solo dentro de una bibliografía, como en Word (ver
+     `vadjLeerDocx`). Y el formato de las listas de Documentos de Google
+     no está en el <ol>: lo dibuja su hoja de estilo (`vadjListasKix`). */
+  let enBiblio = false;
+  const kix = vadjListasKix(doc);
   const recorre = nodo => {
     for (const h of nodo.children) {
       const et = h.tagName.toLowerCase();
       if (/^h[1-6]$/.test(et)) {
         const t = conLlamadas(h).replace(/\n/g, ' ');
-        if (t) { cuenta.cabeceras++; bloques.push(''); bloques.push('#'.repeat(Math.min(3, parseInt(et[1], 10))) + ' ' + t); bloques.push(''); }
+        if (t) { enBiblio = vadjEsBiblio(t, false); cuenta.cabeceras++; bloques.push(''); bloques.push('#'.repeat(Math.min(3, parseInt(et[1], 10))) + ' ' + t); bloques.push(''); }
       } else if (et === 'p') {
         const t = conLlamadas(h);
+        if (t && vadjEsBiblio(t, true)) enBiblio = true;
         if (t) { bloques.push(t); bloques.push(''); } else bloques.push('');
       } else if (et === 'blockquote') {
         const t = conLlamadas(h);
@@ -599,7 +676,7 @@ async function vadjLeerHtml(txt) {
         /* Y en una página web, el número de un <ol> tampoco es texto: se
            cuenta, con su «start» —Documentos de Google parte una lista en
            varios <ol> y sigue la cuenta con él—. Ver `vadjNumeracion`. */
-        if (t) { cuenta.listas++; const n = vadjNumeroLi(h); bloques.push((n != null ? n + '. ' : '- ') + t); }
+        if (t) { cuenta.listas++; const n = enBiblio ? vadjNumeroLi(h, kix) : null; bloques.push((n != null ? n + '. ' : '- ') + t); }
       } else if (et === 'table') {
         const filas = [...h.querySelectorAll('tr')].map(tr =>
           [...tr.children].map(td => limpio(conLlamadas(td)).replace(/\|/g, '/')));
@@ -616,11 +693,51 @@ async function vadjLeerHtml(txt) {
   return { texto: vadjJuntar(bloques), cuenta: cuenta };
 }
 
-function vadjNumeroLi(li) {
+/* ⚠️ EN UNA PÁGINA DE DOCUMENTOS DE GOOGLE, EL FORMATO DE LA LISTA NO
+   ESTÁ EN EL <ol>. Google pone `list-style-type: none` y dibuja el
+   número con un `:before` de su hoja de estilo, con un contador
+   (`counter(lst-ctn-kix_…, lower-latin)`), así que una lista de letras
+   llega como un <ol> sin `type` y salía numerada 1, 2, 3 (revisión del 4
+   de octubre de 2026). Se lee esa hoja: cada clase `lst-kix_…` con lo
+   que dibuja delante. */
+function vadjListasKix(doc) {
+  const m = new Map();
+  try {
+    const css = [...doc.querySelectorAll('style')].map(x => x.textContent || '').join('\n');
+    const re = /([^{}]+)\{([^{}]*)\}/g;
+    let r;
+    while ((r = re.exec(css))) {
+      const sel = r[1], cuerpo = r[2];
+      const ct = cuerpo.match(/content\s*:\s*([^;]*)/);
+      if (!ct) continue;
+      sel.split(',').forEach(x => {
+        const c = x.match(/\.(lst-kix_[\w-]+)\s*>\s*li:{1,2}before/);
+        if (c) m.set(c[1], ct[1]);
+      });
+    }
+  } catch (e) {}
+  return m;
+}
+
+function vadjNumeroLi(li, kix) {
   const ol = li.parentElement;
   if (!ol || ol.tagName.toLowerCase() !== 'ol') return null;
   const tipo = (ol.getAttribute('type') || '1');
   if (tipo !== '1') return null;
+  /* Una lista que cuenta hacia atrás, o con un estilo que no es de
+     números, no se numera aquí: se escribiría al revés o en otra forma. */
+  if (ol.hasAttribute('reversed')) return null;
+  const est = (ol.getAttribute('style') || '').match(/list-style(?:-type)?\s*:\s*([a-z-]+)/i);
+  if (est && est[1].toLowerCase() !== 'decimal') return null;
+  const clase = [...(ol.classList || [])].find(c => /^lst-kix_/.test(c));
+  if (clase) {
+    const ct = kix && kix.get(clase);
+    if (!ct) return null;
+    const cs = ct.match(/counter\s*\(\s*[\w-]+\s*(?:,\s*([a-z-]+)\s*)?\)/gi) || [];
+    if (cs.length !== 1) return null;
+    const f = cs[0].match(/,\s*([a-z-]+)/i);
+    if (f && f[1].toLowerCase() !== 'decimal') return null;
+  }
   const propio = parseInt(li.getAttribute('value') || '', 10);
   if (!isNaN(propio)) return propio;
   let n = parseInt(ol.getAttribute('start') || '1', 10);

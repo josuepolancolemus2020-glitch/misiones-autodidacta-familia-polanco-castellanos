@@ -189,8 +189,19 @@ let _vozEditando = null;   // cid del texto que se está corrigiendo
 /* 🔢 «Numerar la lista por su orden», pedido en la hoja de pegar con un
    toque. Es una decisión de la persona y dura mientras la hoja esté
    abierta: el lector relee en cada tecla, y sin esto la numeración se
-   perdería en la siguiente letra. Ver `vozNumerable`. */
+   perdería en la siguiente letra. Ver `vozNumerable`.
+   ⚠️ Y vale para LA LISTA para la que se pidió: guarda su huella
+   (`vozFirmaFuentes`), no un «sí» suelto. Con un «sí» suelto, pegar otro
+   texto encima —uno con la lista en orden alfabético— lo numeraba en el
+   acto y sin enseñar el aviso de abecedario (revisión del 4 de octubre
+   de 2026). Lista distinta, propuesta de nuevo, con sus avisos. */
 let _vozNumerarPeg = false;
+
+function vozFirmaFuentes(caps) {
+  const L = [];
+  (caps || []).forEach(cap => (cap.p || []).forEach(b => { if (b && b.k === 'fuente' && !b.pie) L.push(b.t || ''); }));
+  return L.length ? L.join('\n') : '';
+}
 let _vozEstantesForm = []; // los estantes puestos en la hoja de pegar
 
 /* ══════════════ COSAS PEQUEÑAS ══════════════ */
@@ -766,31 +777,66 @@ function vozItemLista(l) {
    informe de Gemini exportado sale con «Works cited» si la cuenta está
    en inglés. Sin estas palabras la lista entraba como prosa, y ninguna
    de sus llamadas llevaba a ninguna parte. */
+/* Las palabras inglesas casan con el título ENTERO, no por delante: un
+   «## Sources of energy» al final de un ensayo es un capítulo de prosa,
+   y con un prefijo se habría leído entero como bibliografía. */
+const VOZ_TIT_BIBLIO_EN = /^(references|bibliography|works cited|works consulted|sources|citations)$/;
+
 function vozEsTituloBibliografia(t) {
   const s = vozSinTildes(String(t || '')).toLowerCase()
     .replace(/^[ivxlcdm\d]+[.)\s-]+/, '').replace(/[.:]+$/, '').trim();
-  return /^(referencias|bibliografia|obras citadas|obras consultadas|fuentes|fuentes consultadas|fuentes citadas|referencias bibliograficas|references|bibliography|works cited|works consulted|sources|citations)\b/.test(s);
+  return /^(referencias|bibliografia|obras citadas|obras consultadas|fuentes|fuentes consultadas|fuentes citadas|referencias bibliograficas)\b/.test(s) ||
+         VOZ_TIT_BIBLIO_EN.test(s);
 }
 
 function vozEsTituloFuentes(t) {
   const s = vozSinTildes(String(t || '')).toLowerCase()
     .replace(/^[ivxlcdm\d]+[.)\s-]+/, '').replace(/[.:]+$/, '').trim();
-  return /^(referencias|bibliografia|fuentes|obras citadas|obras consultadas|notas|notas al pie|referencias bibliograficas|fuentes consultadas|fuentes citadas|references|bibliography|works cited|works consulted|sources|citations|notes|footnotes|endnotes)\b/.test(s);
+  return /^(referencias|bibliografia|fuentes|obras citadas|obras consultadas|notas|notas al pie|referencias bibliograficas|fuentes consultadas|fuentes citadas)\b/.test(s) ||
+         VOZ_TIT_BIBLIO_EN.test(s) || /^(notes|footnotes|endnotes)$/.test(s);
+}
+
+/* ¿Esta línea tiene cara de REFERENCIA? Una dirección, un dominio o un
+   año dicho como se dice en una cita —«(2014)», «, 2014»—; «en 1958» es
+   prosa. Y corta: una entrada no es un párrafo de cuatrocientas letras. */
+function vozPareceReferencia(l) {
+  const s = String(l || '').trim();
+  if (!s || s.length > 400) return false;
+  if (vozUrlEn(s) || /\bwww\.|\b[a-z0-9-]+\.(org|com|net|edu|gov|gob|int|es|hn|mx|cl|ar|co|pe|io|info)\b/i.test(s)) return true;
+  return /\(\s*(1[5-9]|20)\d{2}[a-z]?\s*\)|,\s*(1[5-9]|20)\d{2}\b/.test(s);
+}
+
+/* ¿Lo que viene debajo es una LISTA DE REFERENCIAS? Se miran los seis
+   primeros renglones con algo: el primero tiene que parecerlo y, de
+   todos, la mitad o más. Es lo que separa «Obras citadas» encima de
+   «1. TALIS 2018… https://…» de un subtítulo «Fuentes» (Carlos Fuentes)
+   encima de un párrafo, o de un verso «Fuentes» encima de otro verso. */
+function vozSiguePareceBiblio(lineas, desde) {
+  const v = [];
+  for (let j = desde + 1; j < lineas.length && v.length < 6; j++) {
+    const l = lineas[j].trim();
+    if (l) v.push(l);
+  }
+  if (!v.length || !vozPareceReferencia(v[0])) return false;
+  return v.filter(vozPareceReferencia).length * 2 >= v.length;
 }
 
 /* ¿Viene alguna cabecera más abajo? Con almohadilla o pelada de
-   capítulo («Capítulo 3», «IV»): si viene, lo de aquí no es el final. */
+   capítulo —«Capítulo 3», «IV», «2. El pozo», un rótulo EN MAYÚSCULAS o
+   una negrita sola—: si viene, lo de aquí no es el final. Una entrada de
+   la propia lista no cuenta: tiene cara de referencia («1. Wikipedia,
+   https://…»), aunque vaya sola entre blancos. */
 function vozHayCabeceraDespues(lineas, desde) {
   for (let j = desde + 1; j < lineas.length; j++) {
     const l = lineas[j].trim();
     if (!l) continue;
     if (/^#{1,6}\s+\S/.test(l)) return true;
-    /* Una entrada numerada de la propia lista («1. Wikipedia») no es un
-       capítulo, aunque vaya sola entre blancos. */
-    if (vozItemLista(l)) continue;
+    if (vozPareceReferencia(l)) continue;
     const sola = !lineas[j - 1].trim() && (j === lineas.length - 1 || !(lineas[j + 1] || '').trim());
+    const it = vozItemLista(l);
+    if (it && !(it.n != null && sola && it.t.length <= 60 && vozSinPuntoFinal(it.t))) continue;
     const k = vozCabeceraPelada(l, sola, false);
-    if (k === 'cap:pal' || k === 'cap:num') return true;
+    if (k && k.indexOf('cap:') === 0) return true;
   }
   return false;
 }
@@ -804,7 +850,7 @@ function vozHayCabeceraDespues(lineas, desde) {
    ir sola tras un blanco y no ser lo primero del texto. */
 function vozEsRotuloBibliografia(t) {
   const s = vozSinTildes(vozDesnuda(String(t || ''))).toLowerCase().replace(/[.:]+$/, '').trim();
-  return /^(referencias|bibliografia|obras citadas|obras consultadas|fuentes|fuentes consultadas|fuentes citadas|fuentes usadas en el informe|referencias bibliograficas|references|bibliography|works cited|works consulted|sources|citations)$/.test(s);
+  return /^(referencias|bibliografia|obras citadas|obras consultadas|fuentes|fuentes consultadas|fuentes citadas|fuentes usadas en el informe|referencias bibliograficas|references|bibliography|works cited|works consulted|sources|sources used in the report|citations)$/.test(s);
 }
 
 /* ⚠️ UNA DIRECCIÓN SE COMPRUEBA CON `URL()`, NUNCA CON UN GREP:
@@ -840,8 +886,14 @@ function vozFuenteDeTexto(t, n) {
   let s = String(t || '').trim();
   let num = (n != null) ? n : null;
   const m = s.match(/^(?:\[\^?(\d{1,3})\]|\((\d{1,3})\)|(\d{1,3})[.)])\s+(.*)$/);
+  /* «[^3] …» es una NOTA AL PIE que vuelve del recuadro de corregir: se
+     marca (`pie`) para que su número no se cruce con el de la
+     bibliografía (ver `vozLlamadasEn`). */
+  const pie = !!m && /^\[\^/.test(s);
   if (m) { num = parseInt(m[1] || m[2] || m[3], 10); s = m[4].trim(); }
-  return { k: 'fuente', t: s, n: (num != null && !isNaN(num)) ? num : null, url: vozUrlEn(s) || vozDominioAlFinal(s) };
+  const f = { k: 'fuente', t: s, n: (num != null && !isNaN(num)) ? num : null, url: vozUrlEn(s) || vozDominioAlFinal(s) };
+  if (pie) f.pie = 1;
+  return f;
 }
 
 /* ⚠️ Y UNA ENTRADA QUE TERMINA EN UN DOMINIO PELADO TAMBIÉN DA ENLACE.
@@ -942,7 +994,12 @@ function vozFuentesDeLista(txt) {
     .map(l => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
   /* Un «Fuentes usadas en el informe» pegado de cabecera es el rótulo
      de la lista, no la primera fuente. */
-  if (lineas.length && vozEsTituloFuentes(lineas[0])) lineas.shift();
+  /* ⚠️ Y solo si es el renglón ENTERO: con un prefijo, la primera
+     entrada de una lista que empezara por «Sources of teacher stress…» o
+     «Fuentes de financiación…» desaparecía sin aviso, y numerar la lista
+     por su orden corría después todas las llamadas una posición. */
+  if (lineas.length && (vozEsRotuloBibliografia(lineas[0]) ||
+      /^(notas|notas al pie|notes|footnotes|endnotes)$/.test(vozSinTildes(lineas[0]).toLowerCase().replace(/[.:]+$/, '').trim()))) lineas.shift();
   const juntas = [];
   for (let i = 0; i < lineas.length; i++) {
     let l = lineas[i];
@@ -980,7 +1037,7 @@ function vozComponerFuentes(r, txt) {
 function vozFuentesTexto(c) {
   const L = [];
   (c.capitulos || []).forEach(cap => (cap.p || []).forEach(b => {
-    if (b.k === 'fuente') L.push((b.n != null ? '[' + b.n + '] ' : '') + b.t);
+    if (b.k === 'fuente') L.push((b.n != null ? (b.pie ? '[^' : '[') + b.n + '] ' : '') + b.t);
   }));
   return L.join('\n');
 }
@@ -1034,7 +1091,9 @@ function vozNumerosDeLlamada(s) {
     const m = trozo.replace(/\^/g, '').trim().match(/^(\d{1,3})(?:\s*[-–—]\s*(\d{1,3}))?$/);
     if (!m) { raro = true; return; }
     const a = parseInt(m[1], 10), b = m[2] != null ? parseInt(m[2], 10) : a;
-    if (b < a || b - a > 20) { raro = true; return; }
+    /* Y un 0 no es el número de ninguna entrada: «[0, 1]» y «[0-10]» son
+       intervalos (lo cazó la revisión del 4 de octubre de 2026). */
+    if (a < 1 || b < a || b - a > 20) { raro = true; return; }
     for (let k = a; k <= b; k++) if (out.indexOf(k) < 0) out.push(k);
   });
   return raro ? [] : out;
@@ -1050,9 +1109,22 @@ function vozNumerosDeLlamada(s) {
    símbolo químico). Ante la duda, texto: es la asimetría de la regla 3,
    y aquí equivocarse hacia «no era una llamada» cuesta un botón que no
    sale. */
+/* ⚠️ Y DOS COSAS QUE CAZÓ LA REVISIÓN (4 de octubre de 2026):
+   · un SUBÍNDICE pegado a una letra, a una cifra o a un paréntesis que
+     cierra es química o un índice, nunca una cita: «CaCO₃», «KMnO₄» y
+     «Ca(OH)₂» tienen más de dos letras delante y se colaban. Un subíndice
+     de cita, si alguna vez se escribe, va detrás de un signo o un blanco.
+   · las marcas de énfasis se SALTAN antes de mirar: el panel y el repaso
+     leen el texto guardado («30 *km*²») y la página lee el pintado
+     («30 km²»); sin saltarlas, la cuenta decía «llamada» donde la página
+     decía «exponente», y la página y la cuenta tienen que decir lo mismo. */
 function vozEsExponente(txt, ini) {
+  const sub = /[₀-₉]/.test(txt[ini] || '');
+  while (ini > 0 && (txt[ini - 1] === '*' || txt[ini - 1] === '_')) ini--;
   if (ini <= 0) return false;
-  if (/\d/.test(txt[ini - 1])) return true;
+  const antes = txt[ini - 1];
+  if (/\d/.test(antes)) return true;
+  if (sub && /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ)\]]/.test(antes)) return true;
   let k = ini;
   while (k > 0 && /[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(txt[k - 1])) k--;
   const letras = ini - k;
@@ -1112,10 +1184,18 @@ function vozIndiceFuentes(c) {
          y poco para que un apellido del TÍTULO case por casualidad. */
       cabeza: vozSinTildes(t).toLowerCase().slice(0, 90),
       anios: vozAniosEn(t),
+      pie: !!b.pie,
     });
   }));
-  const porN = new Map();
-  lista.forEach(f => { if (f.n != null && !porN.has(f.n)) porN.set(f.n, f); });
+  /* Las notas al pie («[^n]: …») van en su propio mapa: ver
+     `vozLlamadasEn`. `bib` es la bibliografía sin ellas, que es la que se
+     numera y la que se enseña al proponer la numeración. */
+  const porN = new Map(), porPie = new Map();
+  lista.forEach(f => {
+    const m = f.pie ? porPie : porN;
+    if (f.n != null && !m.has(f.n)) m.set(f.n, f);
+  });
+  const bib = lista.filter(f => !f.pie);
   /* ⚠️ Y UNA BIBLIOGRAFÍA SIN NÚMEROS NO SE NUMERA SOLA. Sería fácil
      contar 1, 2, 3 por el orden de la lista y casar así los «[2]» del
      cuerpo; y sería adivinar. En una bibliografía de estilo APA el
@@ -1126,7 +1206,7 @@ function vozIndiceFuentes(c) {
      el repaso la cuenta entre las que no tienen fuente, que es lo que
      dice qué hay que arreglar —numerar la bibliografía— en vez de
      taparlo con una suposición. */
-  _vozIdxFuentes = { cid: c.cid, lista: lista, porN: porN };
+  _vozIdxFuentes = { cid: c.cid, lista: lista, porN: porN, porPie: porPie, bib: bib };
   return _vozIdxFuentes;
 }
 
@@ -1199,14 +1279,35 @@ function vozLlamadasEn(s, idx) {
   while ((m = re.exec(txt)) !== null) {
     const ini = m.index, fin = re.lastIndex;
     let fuentes = [], numero = null, parecia = false, faltan = [];
+    let pie = false;
     if (m[1] != null || m[3] != null) {
       if (m[3] != null && vozEsExponente(txt, ini)) continue;
       const nums = m[1] != null ? vozNumerosDeLlamada(m[1])
         : [parseInt(String(m[3]).split('').map(ch => VOZ_SUPER[ch] || '').join(''), 10)];
+      /* ⚠️ Un corchete con VARIOS números separado por un blanco y
+         seguido de una palabra es matemática, no una cita: «el vector
+         [1, 2, 3] tiene», «una escala [1-10] de dolor». Una cita va
+         pegada a lo que respalda («baja[2, 3]») o cierra la frase
+         («baja [2, 3].»). Ante la duda, texto (regla 3). */
+      if (m[1] != null && nums.length > 1 && /\s/.test(txt[ini - 1] || ' ') &&
+          !/^(\s*$|[.,;:)\]»”'"!?])/.test(txt.slice(fin, fin + 2))) {
+        re.lastIndex = fin; continue;
+      }
       numero = nums.length && !isNaN(nums[0]) ? nums[0] : null;
       parecia = !!numero;
+      /* ⚠️ LAS NOTAS AL PIE TIENEN SU PROPIA CUENTA. «[^1]» es la nota 1
+         y «[1]» la entrada 1 de la bibliografía: un Word con notas al pie
+         y unas «Obras citadas» numeradas trae las dos, y casadas por un
+         solo número la ficha enseñaba la fuente equivocada (revisión del
+         4 de octubre de 2026). Sin bibliografía numerada, una llamada
+         pelada sigue llevando a la nota, como antes. */
+      pie = m[1] != null && m[1].indexOf('^') >= 0;
       nums.forEach(n => {
-        const f = idx && !isNaN(n) ? idx.porN.get(n) : null;
+        let f = null;
+        if (idx && !isNaN(n)) {
+          f = pie ? (idx.porPie.get(n) || idx.porN.get(n))
+                  : (idx.porN.get(n) || (idx.porN.size ? null : idx.porPie.get(n)));
+        }
         if (f) { if (fuentes.indexOf(f) < 0) fuentes.push(f); }
         else if (n) faltan.push(n);
       });
@@ -1221,9 +1322,9 @@ function vozLlamadasEn(s, idx) {
     }
     if (fuentes.length) {
       res.push({ i: ini, f: fin, t: txt.slice(ini, fin), fuentes: fuentes, n: numero });
-      if (faltan.length) huerfanas.push({ i: ini, f: fin, t: txt.slice(ini, fin), nums: faltan });
+      if (faltan.length) huerfanas.push({ i: ini, f: fin, t: txt.slice(ini, fin), nums: faltan, pie: pie });
     } else if (parecia) {
-      huerfanas.push({ i: ini, f: fin, t: txt.slice(ini, fin), nums: faltan });
+      huerfanas.push({ i: ini, f: fin, t: txt.slice(ini, fin), nums: faltan, pie: pie });
     }
   }
   return { res: res, huerfanas: huerfanas };
@@ -1253,7 +1354,7 @@ function vozMapaCitas(c) {
         const l = donde.get(f.fid);
         if (!l.some(y => y.cap === ci && y.vp === i)) l.push({ cap: ci, vp: i, t: x.t });
       }));
-      ll.huerfanas.forEach(x => huerfanas.push({ cap: ci, vp: i, t: x.t, nums: x.nums || [] }));
+      ll.huerfanas.forEach(x => huerfanas.push({ cap: ci, vp: i, t: x.t, nums: x.nums || [], pie: !!x.pie }));
     });
   });
   return { idx: idx, donde: donde, huerfanas: huerfanas };
@@ -1286,19 +1387,22 @@ function vozMapaCitas(c) {
    necesita para decirlo, o null. */
 function vozNumerable(mapa) {
   const idx = mapa && mapa.idx;
-  if (!idx || !idx.lista.length) return null;
-  if (idx.lista.some(f => f.n != null)) return null;
+  /* Solo la BIBLIOGRAFÍA: las notas al pie traen su número de serie y
+     las llamadas «[^n]» no son de ella (ver `vozLlamadasEn`). */
+  const bib = idx ? (idx.bib || idx.lista) : [];
+  if (!bib.length) return null;
+  if (bib.some(f => f.n != null)) return null;
   const vistos = new Set();
-  (mapa.huerfanas || []).forEach(h => (h.nums || []).forEach(n => vistos.add(n)));
+  (mapa.huerfanas || []).forEach(h => { if (!h.pie) (h.nums || []).forEach(n => vistos.add(n)); });
   if (!vistos.size) return null;
-  const N = idx.lista.length;
+  const N = bib.length;
   const nums = [...vistos].sort((a, b) => a - b);
   const dentro = nums.filter(n => n >= 1 && n <= N);
   if (!dentro.length) return null;
   /* ¿Alfabética? Las cabezas en orden de abecedario, con cuatro o más
      entradas: con tres pasaría por casualidad una de cada seis veces. No
      para nada; se dice, que es lo que pone a la persona a comprobar. */
-  const cab = idx.lista.map(f => String(f.cabeza || '').replace(/^[^a-z0-9]+/, ''));
+  const cab = bib.map(f => String(f.cabeza || '').replace(/^[^a-z0-9]+/, ''));
   const alfabetica = N >= 4 && cab.every((x, i) => !i || cab[i - 1].localeCompare(x, 'es') <= 0);
   return { n: N, dentro: dentro.length, fuera: nums.filter(n => n < 1 || n > N), alfabetica: alfabetica };
 }
@@ -1309,7 +1413,7 @@ function vozNumerable(mapa) {
    pegar (sobre lo que se está pegando) y la sala (sobre lo guardado). */
 function vozNumerarFuentes(caps) {
   const fu = [];
-  (caps || []).forEach(cap => (cap.p || []).forEach(b => { if (b && b.k === 'fuente') fu.push(b); }));
+  (caps || []).forEach(cap => (cap.p || []).forEach(b => { if (b && b.k === 'fuente' && !b.pie) fu.push(b); }));
   if (!fu.length || fu.some(b => b.n != null)) return 0;
   fu.forEach((b, i) => { b.n = i + 1; });
   return fu.length;
@@ -1650,9 +1754,17 @@ function vozLeer(texto, opciones) {
           «Citations:»), con texto ya encima, un blanco delante y NINGUNA
           cabecera detrás: una bibliografía va al final, y un «Fuentes» a
           media obra es el título de una sección sobre otra cosa. Lo que
-          viene debajo es la lista, aunque llegue sin blanco en medio. */
+          viene debajo es la lista, aunque llegue sin blanco en medio.
+          ⚠️ Y SE CORROBORA POR LO DE DEBAJO, no solo por la palabra:
+          «Fuentes» es también un apellido —el subtítulo de un ensayo
+          sobre el Boom— y el primer verso de una estrofa, y sin mirar
+          debajo partía el resto del texto en «entradas» (lo cazó la
+          revisión del 4 de octubre de 2026: la regla 3, mordiendo). En
+          un poema no se mira nunca. */
     if ((i === 0 || !lineas[i - 1].trim()) && hayContenido() && !vozItemLista(l) &&
-        vozEsRotuloBibliografia(l) && !vozHayCabeceraDespues(lineas, i)) {
+        versos !== 'si' && out.genero !== 'poema' &&
+        vozEsRotuloBibliografia(l) && vozSiguePareceBiblio(lineas, i) &&
+        !vozHayCabeceraDespues(lineas, i)) {
       const t = vozDesnuda(l).replace(/:\s*$/, '');
       if (conAlmohadillas) marcaSub(t); else abreCap(t);
       continue;
@@ -1781,7 +1893,7 @@ function vozLeer(texto, opciones) {
      al final, como en un libro. Si el texto ya traía uno de fuentes,
      se le suman ahí en vez de abrir otro que diría casi lo mismo. */
   if (notas.length) {
-    const bloques = notas.map(x => vozFuenteDeTexto(x.t, x.n));
+    const bloques = notas.map(x => Object.assign(vozFuenteDeTexto(x.t, x.n), { pie: 1 }));
     out.cuenta.fuentes += bloques.length;
     const ultimo = out.capitulos[out.capitulos.length - 1];
     if (ultimo && ultimo.ref) ultimo.p = (ultimo.p || []).concat(bloques);
@@ -4018,6 +4130,7 @@ function vozNodoLlamada(x) {
 function vozNodoLlamadaSin(x) {
   const b = vozNodo('span', 'voz-cit-sin', x.t);
   b.dataset.nums = (x.nums || []).join(',');
+  if (x.pie) b.dataset.pie = '1';
   b.tabIndex = 0;
   b.setAttribute('role', 'button');
   b.setAttribute('aria-label', 'Esta llamada no tiene entrada en la bibliografía');
@@ -4156,8 +4269,12 @@ function vozCitAbrirSin(span) {
   const cajaSpan = span.getBoundingClientRect();
   const mapa = vozMapaCitas(c);
   const idx = mapa.idx;
-  const num = vozNumerable(mapa);
-  const N = idx ? idx.lista.length : 0;
+  const bib = idx ? (idx.bib || idx.lista) : [];
+  /* Una llamada a una NOTA («[^3]») no se arregla numerando la
+     bibliografía: son cuentas distintas. */
+  const esNota = span.dataset.pie === '1';
+  const num = esNota ? null : vozNumerable(mapa);
+  const N = bib.length;
 
   const cab = vozNodo('div', 'voz-citbar-cab');
   cab.appendChild(vozNodo('span', 'voz-citbar-rot voz-citbar-rot-sin', 'Sin entrada'));
@@ -4171,7 +4288,7 @@ function vozCitAbrirSin(span) {
     b.appendChild(vozNodo('p', 'voz-citbar-txt',
       'Ninguna de las ' + N + ' entradas trae su número. Si están en el orden en que se citan —así salen los informes de Gemini, Perplexity o ChatGPT—, esta llamada sería:'));
     enRango.forEach(n => {
-      const f = idx.lista[n - 1];
+      const f = bib[n - 1];
       const fila = vozNodo('div', 'voz-citbar-f voz-citbar-f-sup');
       fila.appendChild(vozNodo('span', 'voz-citbar-n', String(n)));
       const t = vozNodo('p', 'voz-citbar-t');
@@ -4211,7 +4328,9 @@ function vozCitAbrirSin(span) {
     b.appendChild(acc);
   } else {
     b.appendChild(vozNodo('p', 'voz-citbar-txt',
-      N && idx.lista.some(f => f.n != null)
+      esNota
+        ? 'Es una llamada a una nota al pie, y las notas de este texto no tienen la ' + nums[0] + '. Si existe, añádela al corregir el texto (✏️), escrita como «[^' + nums[0] + ']: …».'
+        : N && bib.some(f => f.n != null)
         ? 'La bibliografía no tiene ninguna entrada con ese número. Si la fuente existe, añádela al corregir el texto (✏️), con su número delante: «[' + nums[0] + '] Autor, título…».'
         : 'La lista tiene ' + N + (N === 1 ? ' entrada' : ' entradas') + ' y el texto cita la [' + nums[0] + ']: por el orden no se puede casar. Añade las que faltan al corregir el texto (✏️), con su número delante.'));
     const acc = vozNodo('div', 'voz-citbar-acc');
@@ -4231,7 +4350,11 @@ function vozCitAbrirSin(span) {
    entrada codificada detrás: nada de lo pegado decide a dónde se va. Sin
    los asteriscos de las cursivas, que en un buscador solo estorban. */
 function vozBuscarFuenteUrl(t) {
-  const q = String(t || '').replace(/\*+/g, '').replace(/\s+/g, ' ').trim().slice(0, 220);
+  /* Se corta por PUNTOS DE CÓDIGO, no por unidades: un `slice` a pelo
+     puede partir un emoji o una letra de fuera del plano básico en dos
+     mitades, y `encodeURIComponent` revienta con una mitad suelta
+     («URI malformed»): el botón no haría nada. */
+  const q = Array.from(String(t || '').replace(/\*+/g, '').replace(/\s+/g, ' ').trim()).slice(0, 220).join('');
   return 'https://scholar.google.com/scholar?q=' + encodeURIComponent(q);
 }
 
@@ -4282,6 +4405,10 @@ function vozDocComoSeVe(url) {
   try { x = new URL(u); } catch (e) { return { ok: false, motivo: 'mala', url: '' }; }
   if (typeof location !== 'undefined' && x.origin === location.origin) return { ok: false, motivo: 'casa', url: u, host: x.host };
   if (/\.pdf$/i.test(x.pathname)) return { ok: false, motivo: 'pdf', url: u, host: x.host };
+  /* ⚠️ Una dirección `http:` dentro de una página `https:` la bloquea el
+     navegador (contenido mixto) y el marco se queda en blanco SIN avisar
+     de nada: se dice antes y se abre aparte. */
+  if (x.protocol === 'http:' && typeof location !== 'undefined' && location.protocol === 'https:') return { ok: false, motivo: 'http', url: u, host: x.host.replace(/^www\./, '') };
   return { ok: true, url: u, host: x.host.replace(/^www\./, '') };
 }
 
@@ -4341,10 +4468,15 @@ function vozDocAbrir(f) {
     fr.setAttribute('title', 'Documento de la fuente');
     fr.setAttribute('sandbox', VOZ_DOC_SANDBOX);
     fr.setAttribute('referrerpolicy', 'no-referrer');
-    fr.addEventListener('load', () => {
+    const quitaCargando = () => {
       const cg = caja.querySelector('.voz-doc-cargando');
       if (cg) cg.remove();
-    });
+    };
+    fr.addEventListener('load', quitaCargando);
+    /* Y por si el `load` no llega nunca (hay rechazos que no lo
+       disparan): el «⏳ Trayendo…» no se queda puesto para siempre
+       diciendo algo que ya no es verdad. */
+    setTimeout(() => { if (fr.isConnected) quitaCargando(); }, 15000);
     fr.setAttribute('src', v.url);
     caja.appendChild(fr);
     if (nota) nota.textContent = 'Si se queda en blanco o dice que rechazó la conexión, esa página no deja que la enseñen dentro de otra: ábrela con «↗ Abrir aparte». La lectura se queda en esta página.';
@@ -4355,6 +4487,8 @@ function vozDocAbrir(f) {
         ? '📄 Es un PDF, y un PDF no se puede enseñar dentro de la lectura: el visor del navegador no funciona dentro de un marco protegido, y en el teléfono no existe. Ábrelo aparte: la lectura se queda en esta página.'
         : v.motivo === 'casa'
           ? 'Es una dirección de la propia F.A.R.O: no se enseña dentro de la lectura. Ábrela aparte.'
+          : v.motivo === 'http'
+            ? '🔓 Es una página sin cifrar (http), y el navegador no deja enseñarla dentro de una que sí lo está: saldría en blanco. Ábrela aparte: la lectura se queda en esta página.'
           : 'Esta entrada no trae una dirección que se pueda abrir.'));
     if (nota) nota.textContent = '';
   }
@@ -5523,6 +5657,19 @@ function vozEngancharSala() {
 document.addEventListener('keydown', e => {
   const sala = document.getElementById('voz-lector');
   if (!sala || sala.hidden) return;
+  /* ⚠️ Con el documento de una fuente o un video encima, las teclas NO
+     pasan página por debajo. Leyendo el documento, la barra espaciadora
+     y Fin son las de bajar: pasaban la página de la lectura sin que se
+     viera, y al cerrar uno aparecía en otro sitio, que es justo lo que
+     el visor existe para evitar (revisión del 4 de octubre de 2026).
+     Escape cierra lo de encima y nada más; lo demás se deja al botón
+     que tenga el foco. */
+  const yov = document.getElementById('voz-yt-overlay');
+  const ytAbierto = !!(yov && yov.style.display === 'flex');
+  if (vozDocAbierto() || ytAbierto) {
+    if (e.key === 'Escape') { e.preventDefault(); if (!vozDocCerrar()) vozRecCerrarVideo(); }
+    return;
+  }
   const dentroDeCampo = /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '');
   if (dentroDeCampo) { if (e.key === 'Escape') { vozCerrarPaneles(); vozSubCerrarBarra(); } return; }
   /* Con el foco en una llamada, Enter y el espacio la abren en vez de
@@ -8547,7 +8694,7 @@ function vozCajaNumerar(c, num, idx) {
   caja.appendChild(vozNodo('p', 'voz-fu-numerar-t',
     '🔢 El texto cita con números —«[1]», «[2]»…— y ninguna de las ' + num.n +
     ' entradas trae el suyo, así que esas llamadas no llevan a ninguna parte. Si la lista está en el orden en que se cita (así salen los informes de Gemini, Perplexity o ChatGPT), numérala: la primera entrada será la [1].'));
-  const prim = idx.lista[0];
+  const prim = (idx.bib || idx.lista)[0];
   if (prim) {
     const ej = vozNodo('p', 'voz-fu-numerar-ej');
     ej.appendChild(vozNodo('strong', null, '[1] '));
@@ -9070,7 +9217,7 @@ function vozTextoCuerpo(c, op) {
          bibliografía, el lector las dos las vuelve a entender como
          fuentes — que es lo que exige la comprobación 16: el alfabeto
          de ida tiene que ser el de vuelta. */
-      else if (p.k === 'fuente') L.push((p.n != null ? '[' + p.n + '] ' : '- ') + p.t);
+      else if (p.k === 'fuente') L.push((p.n != null ? (p.pie ? '[^' : '[') + p.n + '] ' : '- ') + p.t);
       else if (p.k === 'tabla') vozTablaEnTexto(p).forEach(x => L.push(x));
       else if (p.k === 'cita') L.push(p.t.split('\n').map(x => '> ' + x).join('\n'));
       else L.push(p.t);
@@ -9213,6 +9360,12 @@ function vozRepasar() {
      relectura, la del poema incluida—, ANTES de contar las llamadas: así
      el repaso cuenta las que ya enlazan. Si la lista ya trae números,
      `vozNumerarFuentes` no toca nada. */
+  if (_vozNumerarPeg && _vozNumerarPeg !== vozFirmaFuentes(r.capitulos)) _vozNumerarPeg = false;
+  let numAntesPeg = null;
+  if (_vozNumerarPeg) {
+    numAntesPeg = vozNumerable(vozMapaCitas({ cid: '__pegado_antes__', capitulos: r.capitulos }));
+    vozOlvidaFuentes();
+  }
   const numeradasPeg = _vozNumerarPeg ? vozNumerarFuentes(r.capitulos) : 0;
   _vozPegado = r;
 
@@ -9282,8 +9435,14 @@ function vozRepasar() {
   if (numPeg || numeradasPeg) {
     const cn = vozNodo('div', 'voz-rep-numerar');
     if (numeradasPeg) {
+      /* Y los avisos de antes de numerar siguen a la vista: numerada,
+         la lista ya no es «numerable» y se perderían justo cuando más
+         falta hacen, antes de guardar. */
+      const na = numAntesPeg;
       cn.appendChild(vozNodo('span', 'voz-rep-numerar-t',
-        '🔢 Numeradas por su orden: la primera entrada es la [1] y la última la [' + numeradasPeg + ']. Se guardan con su número.'));
+        '🔢 Numeradas por su orden: la primera entrada es la [1] y la última la [' + numeradasPeg + ']. Se guardan con su número.' +
+        (na && na.alfabetica ? ' ⚠ Ojo: la lista va en orden alfabético, que es el de las normas APA y no el de las llamadas.' : '') +
+        (na && na.fuera.length ? ' ⚠ El texto cita hasta la [' + na.fuera[na.fuera.length - 1] + '] y la lista tiene ' + na.n + '.' : '')));
       cn.appendChild(vozBoton('voz-btn voz-btn-chico', '↶ Quitar los números', () => {
         _vozNumerarPeg = false;
         vozRepasar();
@@ -9294,8 +9453,9 @@ function vozRepasar() {
         'Si la lista está en el orden en que se cita (así salen los informes de Gemini, Perplexity o ChatGPT), numérala: la primera será la [1].' +
         (numPeg.alfabetica ? ' ⚠ Ojo: va en orden alfabético, que es el de las normas APA y no el de las llamadas.' : '') +
         (numPeg.fuera.length ? ' ⚠ El texto cita hasta la [' + numPeg.fuera[numPeg.fuera.length - 1] + '] y la lista tiene ' + numPeg.n + '.' : '')));
+      const firma = vozFirmaFuentes(r.capitulos);
       cn.appendChild(vozBoton('voz-btn voz-btn-chico', '🔢 Numerar la lista por su orden', () => {
-        _vozNumerarPeg = true;
+        _vozNumerarPeg = firma;
         vozRepasar();
       }, 'Numerar la bibliografía 1, 2, 3… por el orden en que está escrita'));
     }
