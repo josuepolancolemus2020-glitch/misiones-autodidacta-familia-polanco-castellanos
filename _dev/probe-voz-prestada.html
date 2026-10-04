@@ -4989,8 +4989,12 @@ function filasHoja(d){
   const caso6 = 'Enseñar historia con documentos\n\n1. Introducción\n\nLa historia se enseña como un relato cerrado [1]. Trabajar con documentos cambia la pregunta [3].\n\n2. Fuentes bibliográficas\n\nUna fuente primaria es un testimonio del momento; una secundaria interpreta a las primarias [2].\n\n3. Una secuencia para sexto grado\n\nLa secuencia dura tres sesiones:\n1. Leer el acta de 1821.\n2. Comparar dos manuales.\n3. Escribir lo que callan.\n\n4. Conclusiones\n\nLa historia es una conversación con pruebas [4].\n\n5. Referencias\n\n1. Wineburg, S. (2001). Historical Thinking. Temple.\n2. Prats, J. (2011). Didáctica. Graó.\n3. Seixas, P. (2013). The Big Six. Nelson.\n4. Barton, K. (2004). Teaching History. Erlbaum.';
   const l6 = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const o = vozLeer(${JSON.stringify(caso6)});
     const r = vozLlamadasEn('[1] y [2] y [3] y [4]', vozIndiceFuentes({ cid: '__c6__', capitulos: o.capitulos })); vozOlvidaFuentes();
-    return JSON.stringify({ caps: o.capitulos.length, res: r.res.map(x => x.t + '=' + x.fuentes[0].t.slice(0, 7)) }); })()`));
-  ok(l6.caps === 5 && JSON.stringify(l6.res) === JSON.stringify(['[1]=Winebur', '[2]=Prats, ', '[3]=Seixas,', '[4]=Barton,']),
+    return JSON.stringify({ caps: o.capitulos.map(c => c.t), res: r.res.map(x => x.t + '=' + x.fuentes[0].t.slice(0, 7)) }); })()`));
+  /* Se miran los TÍTULOS de los capítulos y no cuántos son: la primera
+     línea del texto, sin etiquetas debajo, va en su propio bloque sin
+     título, y contar capítulos suspendía por eso y no por lo que importa. */
+  ok(['2. Fuentes bibliográficas', '3. Una secuencia para sexto grado', '4. Conclusiones', '5. Referencias'].every(t => l6.caps.indexOf(t) >= 0) &&
+     JSON.stringify(l6.res) === JSON.stringify(['[1]=Winebur', '[2]=Prats, ', '[3]=Seixas,', '[4]=Barton,']),
      '⚠️ en un ensayo con los capítulos numerados a mano, un capítulo llamado como una bibliografía no se traga los de después: «3. …» sigue a «2. …» y es un capítulo, y cada número lleva a su obra',
      '⚠️ un capítulo con nombre de bibliografía se tragó el resto o robó los números: ' + JSON.stringify(l6));
   const cbib5 = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const o = vozLeer(${JSON.stringify('Voz: X\nMáquina: Y\n\n4. Desarrollo\n\nTexto [6] y [7].\n\n5. Referencias\n\n' + [1, 2, 3, 4, 5, 6, 7].map(n => n + '. Autor' + n + ' obra').join('\n\n') + '\n')});
