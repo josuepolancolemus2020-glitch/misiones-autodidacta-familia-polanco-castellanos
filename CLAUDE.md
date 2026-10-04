@@ -5065,17 +5065,23 @@ el diseño.
      «Fuentes de energía» o «Notas para el docente». La lista cerrada a
      secas se quedaba corta, y la cuarta revisión lo cazó con un Word:
      bajo «Fuentes bibliográficas» las obras salían sin número.
-     ⚠️ **Y ese vocabulario es ESTRECHO**, porque la quinta revisión
-     encontró la primera versión, más ancha, abriendo huecos: nada de
-     calificativos que nombran un tema («2. Fuentes primarias y
-     secundarias» era el capítulo de prosa de un ensayo de historia, y
-     se tragaba el resto), «Notas» solo con un nombre de bibliografía al
-     lado («Notas generales» numeraba sus notas), y un paréntesis solo se
-     quita si nombra una norma («(APA 7)», no «(para el docente)»). Y
-     vale solo para títulos de cabecera, el adjunto y la caja de fuentes:
+     ⚠️ **Y ese vocabulario depende de la CABEZA**, porque la quinta y
+     la sexta revisión lo encontraron abriendo huecos por los dos lados.
+     Con «Referencias» o «Bibliografía» delante casi cualquier
+     calificativo es de una bibliografía («electrónicas», «utilizada»,
+     «de consulta», «(en orden de aparición)»). Con «Fuentes», no:
+     «Fuentes digitales» o «2. Fuentes primarias y secundarias» son
+     también capítulos de prosa, y el segundo se tragaba el resto de un
+     ensayo de historia. «Notas» solo cuenta con un nombre de bibliografía
+     al lado: «Notas generales» numeraba sus notas. Las listas de LECTURAS
+     («recomendada», «básica», «complementaria») no cuentan nunca, porque
+     no se citan. Y «formato», «estilo» o «normas» solo dentro de un
+     paréntesis: «Fuentes y formato» es un capítulo sobre tipos de letra.
+     Vale solo para títulos de cabecera, el adjunto y la caja de fuentes:
      el rótulo SUELTO de en medio de un texto se queda con su lista
-     cerrada (una «Bibliografía complementaria» suelta se quedaba con los
-     números de las citas). Lo mismo vale
+     cerrada. Y desde que un número repetido no se enlaza, este
+     vocabulario ya no decide si hay citas falsas, solo cuántos enlaces
+     se ganan. Lo mismo vale
      en la caja de fuentes para quitar el rótulo de arriba («Notas sobre
      el método» es una fuente) y en el lector para leer «3. Wikipedia»
      suelto como la entrada 3. Y las notas al pie de LibreOffice
@@ -5118,9 +5124,12 @@ el diseño.
      tres capítulos vacíos. Un «2. Segundo» con su prosa debajo es un
      capítulo, y no la fuente 2. Y dentro de una bibliografía, un «3.
      Título» suelto que SIGUE la numeración de los capítulos («2. …» y
-     luego «3. …») es el capítulo siguiente, salvo que siga la de las
-     entradas: así un ensayo con los capítulos numerados a mano no se
-     queda tragado por el que se llama como una bibliografía. Las notas al pie («[^1]: …») de debajo
+     luego «3. …») es el capítulo siguiente: así un ensayo con los
+     capítulos numerados a mano no se queda tragado por el que se llama
+     como una bibliografía. Si sigue las DOS numeraciones («3.
+     Referencias» con sus entradas 1, 2, 3 y luego un «4. …»), decide la
+     cara de referencia: «4. Wineburg, S. (2001)…» es la entrada 4, y
+     «4. Anexos» es el capítulo 4. Las notas al pie («[^1]: …») de debajo
      de la lista no cuentan —el lector las saca aparte—, y lo que viene
      tras una raya final («---» y el «Compartir» de Perplexity) no
      decide nada; una línea de despedida pegada a la lista, sin raya, sí
@@ -5152,7 +5161,10 @@ el diseño.
      `confirm()`, «No» donde estaba el botón y con el foco (regla 22).
    - **En la hoja de pegar**, antes de guardar: «🔢 Numerar la lista por
      su orden» y «↶ Quitar los números». Es una decisión de la hoja
-     abierta (`_vozNumerarPeg`), porque el lector relee en cada tecla.
+     abierta (`_vozNumerarPeg`), porque el lector relee en cada tecla. Y
+     la oferta dice CUÁL sería la [1], con su texto: si la primera línea
+     de la caja es un rótulo que no se quitó solo, se ve ahí, antes del
+     toque, y no después con todas las llamadas corridas una posición.
 
    Solo con TODAS las entradas sin número (si unas lo traen y otras no,
    el orden no dice nada) y solo en lo propio: lo ajeno se explica y no
@@ -5200,15 +5212,26 @@ el diseño.
    pelado es una cita y nunca cae en una nota, que es lo que pasaba con
    un Word con notas al pie y una bibliografía sin números.
 
-   ⚠️ **Y CON DOS LISTAS CON LOS MISMOS NÚMEROS, GANA LA DE TÍTULO
-   SEGURO** (`vozIndiceFuentes`, con `vozEsTituloBiblioEstricto`), y
-   entre iguales la primera. Es la defensa de fondo contra la familia
-   entera que las cinco revisiones del 4 de octubre de 2026 fueron
-   encontrando una a una: un capítulo que no es una bibliografía («Notas
-   generales», «Fuentes de energía renovable») justo antes de las
-   «Referencias» entra también como fuentes —va entre los dos últimos,
-   regla 27— y su «1.» le ganaba a la obra 1. Mirando el título al
-   casar, eso deja de depender de que cada regla de lectura acierte.
+   ⚠️ **UN NÚMERO QUE ESTÁ EN DOS LISTAS NO SE ENLAZA A NINGUNA, Y LA
+   FICHA DICE POR QUÉ** (`dobles` en `vozIndiceFuentes`). Es el principio
+   que cerró la familia entera que las revisiones del 4 de octubre de
+   2026 fueron encontrando una a una: las «Referencias» y unas «Notas
+   generales», una «Bibliografía recomendada», los apartados de «Fuentes
+   de energía renovable», dos respuestas de Perplexity con su
+   «Citations:» cada una, o una bibliografía partida en «Libros» y
+   «Artículos» numerados desde 1. Decidir cuál es la buena por el orden
+   («gana la primera») o por el título («gana la de título seguro», que
+   se probó en la quinta ronda) es ADIVINAR, y cada regla tuvo su
+   documento verosímil al revés —la sexta revisión encontró la
+   bibliografía de verdad con un título raro y la lista recomendada con
+   uno seguro—. Así que no se decide: ese número sale gris, como una
+   llamada sin fuente, y al tocarlo dice que hay dos entradas con ese
+   número, enseña las dos y no ofrece numerar; el repaso del pegado
+   también lo cuenta aparte. Cuenta como lista, además, una que NO se
+   leyó como bibliografía pero tiene forma de fuentes numeradas («[1]
+   https://…», o un ítem «1. Autor (2014). …»). Un enlace perdido se ve y
+   se explica; uno falso enseña a otro autor, y ya no depende de que
+   cada regla de lectura acierte.
 
    ⚠️ **Y dos que NO son exponentes aunque vayan detrás de una cifra**
    (la segunda revisión, sobre Word): un año («desde 2019⁵», de 1500 a
@@ -5519,10 +5542,13 @@ reading» suelto, las escalas Likert, la notación estadística y «CO²». Y
 el apartado 11, lo de la cuarta: los títulos hechos de palabras de
 bibliografía, «oscila entre [1-5]», el «[1]» que no cae en la nota cuando
 el texto usa «[^1]», y «## Fuentes y referencias» con entradas sueltas.
-Y el apartado 12, lo de la quinta: el vocabulario estrecho, el ensayo de
-historia con los capítulos numerados a mano, la entrada 6 de «5.
-Referencias», «Webgrafía» al corregir, y las dos listas con los mismos
-números, donde gana la de título seguro.
+Y el apartado 12, lo de la quinta y la sexta: el vocabulario según la
+cabeza, el ensayo de historia con los capítulos numerados a mano, la
+entrada 6 de «5. Referencias», «Webgrafía» al corregir, y el número
+repetido en dos listas, que no se enlaza a ninguna —ni en una
+«Bibliografía utilizada» con su «Bibliografía recomendada», ni en un
+hilo de Perplexity con dos «Citations:»— y que, tocado en la sala, enseña
+las dos entradas y no ofrece numerar.
 
 La comprobación **43** es 📣 A redes, de punta a punta y por gravedad:
 que el trozo llegue a la tabla de Redes **sin su etiqueta** (se mira lo

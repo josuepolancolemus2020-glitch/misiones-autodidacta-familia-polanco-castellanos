@@ -4997,7 +4997,7 @@ function filasHoja(d){
      JSON.stringify(l6.res) === JSON.stringify(['[1]=Winebur', '[2]=Prats, ', '[3]=Seixas,', '[4]=Barton,']),
      '⚠️ en un ensayo con los capítulos numerados a mano, un capítulo llamado como una bibliografía no se traga los de después: «3. …» sigue a «2. …» y es un capítulo, y cada número lleva a su obra',
      '⚠️ un capítulo con nombre de bibliografía se tragó el resto o robó los números: ' + JSON.stringify(l6));
-  const cbib5 = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const o = vozLeer(${JSON.stringify('Voz: X\nMáquina: Y\n\n4. Desarrollo\n\nTexto [6] y [7].\n\n5. Referencias\n\n' + [1, 2, 3, 4, 5, 6, 7].map(n => n + '. Autor' + n + ' obra').join('\n\n') + '\n')});
+  const cbib5 = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const o = vozLeer(${JSON.stringify('Voz: X\nMáquina: Y\n\n4. Desarrollo\n\nTexto [6] y [7].\n\n5. Referencias\n\n' + [1, 2, 3, 4, 5, 6, 7].map(n => n + '. Autor' + n + ', A. (201' + n + '). Obra.').join('\n\n') + '\n')});
     vozOlvidaFuentes(); return JSON.stringify(o.capitulos.map(c => [!!c.ref, c.p.length])); })()`));
   ok(JSON.stringify(cbib5) === JSON.stringify([[false, 1], [true, 7]]),
      'y en «5. Referencias» la entrada 6 sigue a la 5 de la lista: es una entrada, no un capítulo',
@@ -5019,9 +5019,44 @@ function filasHoja(d){
     .map(cola => JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const o = vozLeer(${JSON.stringify('## Resultados\n\nDato[1] y dato[2].\n\n')} + ${JSON.stringify(cola)});
       const r = vozLlamadasEn('Dato[1] y dato[2].', vozIndiceFuentes({ cid: '__g5__' + Math.random(), capitulos: o.capitulos })); vozOlvidaFuentes();
       return JSON.stringify(r.res.map(x => x.fuentes[0].t.slice(0, 5))); })()`)));
-  ok(gana5.every(x => JSON.stringify(x) === '["CEPAL","OIT ("]'),
-     '⚠️ con dos listas numeradas al final, gana la de título SEGURO: «Notas generales» o «Fuentes de energía renovable» antes de las «Referencias» no les roban los números, y una «Bibliografía complementaria» después tampoco',
-     '⚠️ un número llevó a la lista equivocada: ' + JSON.stringify(gana5));
+  /* ⚠️ Y desde la sexta revisión NO GANA NINGUNA: con el mismo número en
+     dos listas no se adivina (ver `dobles`). La quinta probó «gana la de
+     título seguro» y la revisión encontró el documento al revés —la
+     bibliografía de verdad con un título raro y una lista recomendada con
+     uno seguro—. Un número sin enlace se ve y se explica; uno falso no. */
+  ok(gana5.every(x => JSON.stringify(x) === '[]'),
+     '⚠️ con el mismo número en dos listas al final (las «Referencias» y unas «Notas generales», una «Bibliografía complementaria» o los apartados de «Fuentes de energía renovable»), ese número NO se enlaza a ninguna: no se adivina',
+     '⚠️ un número repetido se enlazó a una de las dos listas: ' + JSON.stringify(gana5));
+  const amb6 = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes();
+    const o = vozLeer(${JSON.stringify('# La escuela\n\nVoz: X\nMáquina: Y\n\n## 1. Introducción\n\nLa escuela castiga la pregunta [1]. Y [4].\n\n## Bibliografía utilizada\n\n1. Freire, P. (1970). Pedagogía.\n2. Torres, R. (2015). Honduras.\n3. Vygotsky, L. (1978). Procesos.\n4. Morin, E. (1999). Saberes.\n\n## Bibliografía recomendada\n\n1. hooks, b. (1994). Transgredir.\n2. Rancière, J. (1987). Maestro.\n')});
+    const r = vozLlamadasEn('[1] y [4]', vozIndiceFuentes({ cid: '__a6__', capitulos: o.capitulos }));
+    const o2 = vozLeer(${JSON.stringify('Respuesta uno[1][2].\n\nCitations:\n[1] https://a.org/uno\n[2] https://b.org/dos\n\nRespuesta dos[1].\n\nCitations:\n[1] https://c.org/tres\n')});
+    const r2 = vozLlamadasEn('x[1]', vozIndiceFuentes({ cid: '__p6__', capitulos: o2.capitulos })); vozOlvidaFuentes();
+    return JSON.stringify({ res: r.res.map(x => x.t + '=' + x.fuentes[0].t.slice(0, 5)), amb: r.huerfanas.filter(h => h.amb).map(h => h.t), per: r2.res.length }); })()`));
+  ok(JSON.stringify(amb6) === JSON.stringify({ res: ['[4]=Morin'], amb: ['[1]'], per: 0 }),
+     '⚠️ la bibliografía de verdad («Bibliografía utilizada») con una «Bibliografía recomendada» detrás: el «[1]» repetido se queda sin enlace y marcado como ambiguo, el «[4]» (solo en una) sí lleva a su obra; y en un hilo de Perplexity con dos «Citations:» el «[1]» no se adivina',
+     '⚠️ un número repetido se adivinó: ' + JSON.stringify(amb6));
+  /* Y en la sala, tocar el número repetido lo DICE y enseña las dos. */
+  const ambC = Object.assign(cuentoLargo('c44amb'), {
+    titulo: 'Dos listas', voz: 'un ensayo', maquina: 'ChatGPT', genero: 'ensayo', puesto_por: VOZ_UID, actualizado: Date.now(),
+    capitulos: [{ t: 'Capítulo 1', p: [{ k: 'p', t: 'La escuela castiga la pregunta [1], dice el texto.' }] },
+                { t: 'Bibliografía utilizada', ref: true, p: [{ k: 'fuente', t: 'Freire, P. (1970). Pedagogía del oprimido.', n: 1 }] },
+                { t: 'Bibliografía recomendada', ref: true, p: [{ k: 'fuente', t: 'hooks, b. (1994). Enseñar a transgredir.', n: 1 }] }],
+  });
+  w.eval(`_vozCuentos = _vozCuentos.filter(c => c.cid !== 'c44amb').concat([${JSON.stringify(ambC)}]); vozGuardaLocal(); vozOlvidaFuentes(); vozAbrirLector('c44amb')`);
+  await esperar(900);
+  w.eval('vozIrA(0, 0, 0)');
+  await esperar(300);
+  const sinAmb = d.querySelector('#voz-texto .voz-cit-sin[data-amb="1"]');
+  toca(sinAmb);
+  await esperar(250);
+  const cbAmb = d.getElementById('voz-citbar');
+  ok(!!sinAmb && d.querySelectorAll('#voz-texto .voz-cit').length === 0 && cbAmb && !cbAmb.hidden &&
+     /no se adivina/.test(cbAmb.textContent) && /Freire/.test(cbAmb.textContent) && /hooks/.test(cbAmb.textContent) && !cbAmb.querySelector('.voz-citbar-numerar'),
+     '⚠️ en la sala, el «[1]» repetido no enlaza; al tocarlo dice que hay dos entradas con ese número, enseña las dos y no ofrece numerar',
+     '⚠️ la ficha del número repetido no lo explica: ' + (cbAmb ? cbAmb.textContent.slice(0, 200) : 'sin ficha'));
+  w.eval('vozCitCerrar(); vozCerrarLector()');
+  await esperar(300);
 
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
