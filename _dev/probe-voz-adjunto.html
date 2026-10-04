@@ -469,6 +469,10 @@ const RELS =
       p(num(1, 0), t('Repartir la hoja')) +
       p(estilo('Heading1'), t('Fuentes de energía')) +
       p(num(3, 0), t('Solar')) +
+      p(estilo('Heading1'), t('Notas generales')) +
+      p(num(3, 0), t('Las cifras están en dólares corrientes.')) +
+      p(estilo('Heading1'), t('Notas (para el docente)')) +
+      p(num(3, 0), t('Prepare los materiales.')) +
     '</w:body></w:document>';
   const NOTAS_5 =
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -490,8 +494,8 @@ const RELS =
   ok(/Una idea\[\^1\] y otra\[\^2\]\./.test(t5) && /^\[\^1\]: Primera nota del autor\.$/m.test(t5) && /^\[\^2\]: Segunda nota del autor\.$/m.test(t5),
      '⚠️ la PRIMERA nota de un Word actual (separadores en -1 y 0, la nota 1 de verdad) llega entera, y una llamada a nota con superíndice puesto a mano es una nota',
      '⚠️ se perdió la primera nota al pie o la llamada con superíndice:\n' + t5);
-  ok(/^- Repartir la hoja$/m.test(t5) && /^- Solar$/m.test(t5),
-     '⚠️ «Notas para el docente» y «Fuentes de energía» no son bibliografías: sus listas no se numeran (le robarían los números a las obras)',
+  ok(/^- Repartir la hoja$/m.test(t5) && /^- Solar$/m.test(t5) && /^- Las cifras están/m.test(t5) && /^- Prepare los materiales\.$/m.test(t5),
+     '⚠️ «Notas para el docente», «Fuentes de energía», «Notas generales» y «Notas (para el docente)» no son bibliografías: sus listas no se numeran (le robarían los números a las obras)',
      '⚠️ una lista bajo un título que solo empieza como bibliografía salió numerada:\n' + t5);
   const htmlLO = '<html><body><h1>Texto</h1><p>Dato<a class="sdfootnoteanc" name="sdfootnote1anc" href="#sdfootnote1sym"><sup>1</sup></a> y otro' +
     '<a style="mso-footnote-id:ftn1" href="#_ftn1" name="_ftnref1"><span>[1]</span></a>.</p>' +

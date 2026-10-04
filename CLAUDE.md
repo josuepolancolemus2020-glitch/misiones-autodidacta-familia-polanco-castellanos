@@ -5064,7 +5064,18 @@ el diseño.
      referencias» y «Referencias (APA 7.ª edición)», y siguen fuera
      «Fuentes de energía» o «Notas para el docente». La lista cerrada a
      secas se quedaba corta, y la cuarta revisión lo cazó con un Word:
-     bajo «Fuentes bibliográficas» las obras salían sin número. Lo mismo vale
+     bajo «Fuentes bibliográficas» las obras salían sin número.
+     ⚠️ **Y ese vocabulario es ESTRECHO**, porque la quinta revisión
+     encontró la primera versión, más ancha, abriendo huecos: nada de
+     calificativos que nombran un tema («2. Fuentes primarias y
+     secundarias» era el capítulo de prosa de un ensayo de historia, y
+     se tragaba el resto), «Notas» solo con un nombre de bibliografía al
+     lado («Notas generales» numeraba sus notas), y un paréntesis solo se
+     quita si nombra una norma («(APA 7)», no «(para el docente)»). Y
+     vale solo para títulos de cabecera, el adjunto y la caja de fuentes:
+     el rótulo SUELTO de en medio de un texto se queda con su lista
+     cerrada (una «Bibliografía complementaria» suelta se quedaba con los
+     números de las citas). Lo mismo vale
      en la caja de fuentes para quitar el rótulo de arriba («Notas sobre
      el método» es una fuente) y en el lector para leer «3. Wikipedia»
      suelto como la entrada 3. Y las notas al pie de LibreOffice
@@ -5105,11 +5116,17 @@ el diseño.
      Fuentes publicó La región más transparente (1958).»— partía el resto
      del ensayo en «entradas», y una lista de Gemini sin años salía en
      tres capítulos vacíos. Un «2. Segundo» con su prosa debajo es un
-     capítulo, y no la fuente 2. Las notas al pie («[^1]: …») de debajo
+     capítulo, y no la fuente 2. Y dentro de una bibliografía, un «3.
+     Título» suelto que SIGUE la numeración de los capítulos («2. …» y
+     luego «3. …») es el capítulo siguiente, salvo que siga la de las
+     entradas: así un ensayo con los capítulos numerados a mano no se
+     queda tragado por el que se llama como una bibliografía. Las notas al pie («[^1]: …») de debajo
      de la lista no cuentan —el lector las saca aparte—, y lo que viene
      tras una raya final («---» y el «Compartir» de Perplexity) no
      decide nada; una línea de despedida pegada a la lista, sin raya, sí
-     la deja en prosa, que es el lado seguro. Y del principio de la caja de fuentes se
+     la deja en prosa, que es el lado seguro. Al ✏️ corregir, la primera
+     línea de la caja que YA estaba guardada nunca se toma por rótulo:
+     guardar sin tocar nada podía borrar un «Webgrafía» de subtítulo. Y del principio de la caja de fuentes se
      quita el rótulo solo si tiene cara de rótulo —empieza por una palabra
      de bibliografía, es corto y no trae cifras ni dirección—: «Bibliografía
      consultada» se quita y «Sources of the Nile, by Speke (1863)…» se
@@ -5182,6 +5199,16 @@ el diseño.
    texto marca sus notas como «[^1]» (`llamaPie`): entonces un «[1]»
    pelado es una cita y nunca cae en una nota, que es lo que pasaba con
    un Word con notas al pie y una bibliografía sin números.
+
+   ⚠️ **Y CON DOS LISTAS CON LOS MISMOS NÚMEROS, GANA LA DE TÍTULO
+   SEGURO** (`vozIndiceFuentes`, con `vozEsTituloBiblioEstricto`), y
+   entre iguales la primera. Es la defensa de fondo contra la familia
+   entera que las cinco revisiones del 4 de octubre de 2026 fueron
+   encontrando una a una: un capítulo que no es una bibliografía («Notas
+   generales», «Fuentes de energía renovable») justo antes de las
+   «Referencias» entra también como fuentes —va entre los dos últimos,
+   regla 27— y su «1.» le ganaba a la obra 1. Mirando el título al
+   casar, eso deja de depender de que cada regla de lectura acierte.
 
    ⚠️ **Y dos que NO son exponentes aunque vayan detrás de una cifra**
    (la segunda revisión, sobre Word): un año («desde 2019⁵», de 1500 a
@@ -5492,6 +5519,10 @@ reading» suelto, las escalas Likert, la notación estadística y «CO²». Y
 el apartado 11, lo de la cuarta: los títulos hechos de palabras de
 bibliografía, «oscila entre [1-5]», el «[1]» que no cae en la nota cuando
 el texto usa «[^1]», y «## Fuentes y referencias» con entradas sueltas.
+Y el apartado 12, lo de la quinta: el vocabulario estrecho, el ensayo de
+historia con los capítulos numerados a mano, la entrada 6 de «5.
+Referencias», «Webgrafía» al corregir, y las dos listas con los mismos
+números, donde gana la de título seguro.
 
 La comprobación **43** es 📣 A redes, de punta a punta y por gravedad:
 que el trozo llegue a la tabla de Redes **sin su etiqueta** (se mira lo

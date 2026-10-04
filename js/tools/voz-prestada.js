@@ -186,6 +186,7 @@ let _vozPaginas = 1;
 let _vozAj = Object.assign({}, VOZ_AJUSTES_POR_DEFECTO);
 let _vozPegado = null;     // lo último que entendió el lector de texto
 let _vozEditando = null;   // cid del texto que se está corrigiendo
+let _vozCajaPrimera = '';  // la primera línea de la caja de fuentes tal como se GUARDÓ (ver vozFuentesDeLista)
 /* 🔢 «Numerar la lista por su orden», pedido en la hoja de pegar con un
    toque. Es una decisión de la persona y dura mientras la hoja esté
    abierta: el lector relee en cada tecla, y sin esto la numeración se
@@ -897,27 +898,47 @@ const VOZ_ROT_BIBLIO_ES = /^(referencias|bibliografia|obras citadas|obras consul
 
 /* ⚠️ Y LOS TÍTULOS HECHOS SOLO DE PALABRAS DE BIBLIOGRAFÍA: «Fuentes
    bibliográficas», «Bibliografía y webgrafía», «Fuentes y referencias»,
-   «Referencias (APA 7)», «Notas y bibliografía». La lista cerrada a
-   secas se quedaba corta y la cuarta revisión del 4 de octubre de 2026
-   lo cazó con un Word: bajo «Fuentes bibliográficas» la lista salía sin
-   números, y con notas al pie el «[1]» del texto caía en la nota 1. La
-   regla: empieza por una palabra de cabeza y TODAS las demás son de
-   bibliografía. «Fuentes de energía» y «Notas para el docente» siguen
-   fuera, porque «de», «energía» o «docente» no son de ese vocabulario. */
+   «Referencias APA 7», «Notas y bibliografía». La lista cerrada a secas
+   se quedaba corta y la cuarta revisión del 4 de octubre de 2026 lo
+   cazó con un Word: bajo «Fuentes bibliográficas» la lista salía sin
+   números. La regla: empieza por una palabra de cabeza y TODAS las
+   demás son de bibliografía.
+   ⚠️ Y ES ESTRECHA A PROPÓSITO, porque la quinta revisión la encontró
+   abriendo huecos con la primera versión, más ancha:
+     · nada de calificativos que nombran un TEMA y no una lista
+       (primarias, secundarias, digitales, documentales, complementarias,
+       recomendadas…): «2. Fuentes primarias y secundarias» es el
+       capítulo de prosa de un ensayo de historia, y se tragaba el resto;
+     · «Notas» solo con un nombre de bibliografía al lado («Notas y
+       bibliografía»): «Notas generales» numeraba sus notas, que le
+       ganaban los números a las «Referencias»;
+     · el paréntesis solo se quita si nombra una NORMA («(APA 7)»):
+       «Notas (para el docente)» se leía «Notas».
+   Solo vale para títulos de cabecera y para la caja de fuentes
+   (`vozEsTituloBiblioEstricto`), no para el rótulo suelto de en medio
+   de un texto, que se queda con su lista cerrada. */
 const VOZ_TIT_CABEZA = /^(referencias|referencia|bibliografia|fuentes|webgrafia|cibergrafia|notas)$/;
-const VOZ_TIT_PALABRA = /^(referencias|referencia|bibliografia|bibliograficas|bibliograficos|bibliografica|bibliografico|fuentes|webgrafia|cibergrafia|notas|citadas|citados|consultadas|consultados|general|generales|complementaria|complementarias|basica|basicas|recomendada|recomendadas|electronicas|digitales|documentales|primarias|secundarias|finales|al|pie|y|e|apa|mla|chicago|vancouver|ieee)$/;
+const VOZ_TIT_NUCLEO = /^(referencias|referencia|bibliografia|fuentes|webgrafia|cibergrafia)$/;
+const VOZ_TIT_PALABRA = /^(referencias|referencia|bibliografia|bibliograficas|bibliograficos|bibliografica|bibliografico|fuentes|webgrafia|cibergrafia|notas|citadas|citados|consultadas|consultados|general|generales|basica|basicas|y|e)$/;
+const VOZ_TIT_NORMA = /^(apa|mla|chicago|vancouver|ieee|harvard|iso|690|norma|normas|estilo|formato|edicion|ed|version|\d{1,2}(\.?[ªºa])?)$/;
 
-function vozTituloDePalabras(s, conNotas) {
-  const w = String(s || '').replace(/\s*\([^)]{0,30}\)\s*$/, '').split(/[\s,&\/]+/).filter(Boolean)
-    .filter(x => !/^\d{1,2}(\.?ª|a)?$/.test(x));
+function vozTituloDePalabras(s) {
+  let base = String(s || '');
+  const par = base.match(/\s*\(([^)]{0,30})\)\s*$/);
+  if (par) {
+    const dentro = par[1].split(/[\s,;\/]+/).map(x => x.replace(/\.+$/, '')).filter(Boolean);
+    if (!dentro.length || !dentro.every(x => VOZ_TIT_NORMA.test(x))) return false;
+    base = base.slice(0, par.index);
+  }
+  const w = base.split(/[\s,&\/]+/).filter(Boolean);
   if (!w.length || w.length > 6 || !VOZ_TIT_CABEZA.test(w[0])) return false;
-  if (!conNotas && w[0] === 'notas') return false;
-  return w.every(x => VOZ_TIT_PALABRA.test(x));
+  if (w[0] === 'notas' && !w.slice(1).some(x => VOZ_TIT_NUCLEO.test(x))) return false;
+  return w.every(x => VOZ_TIT_PALABRA.test(x) || VOZ_TIT_NORMA.test(x));
 }
 
 function vozEsRotuloBibliografia(t) {
   const s = vozSinTildes(vozDesnuda(String(t || ''))).toLowerCase().replace(/[.:]+$/, '').trim();
-  return VOZ_ROT_BIBLIO_ES.test(s) || VOZ_TIT_BIBLIO_EN.test(s) || vozTituloDePalabras(s, false);
+  return VOZ_ROT_BIBLIO_ES.test(s) || VOZ_TIT_BIBLIO_EN.test(s);
 }
 
 /* ⚠️ EL TÍTULO DE UNA BIBLIOGRAFÍA, CERRADO: la frase entera (con su
@@ -937,7 +958,7 @@ function vozEsTituloBiblioEstricto(t) {
     .replace(/^(?:\d{1,3}(?:\.\d{1,3})*|[ivxlcdm]{1,6})[.)]?\s+/, '').replace(/[.:]+$/, '').trim();
   return VOZ_ROT_BIBLIO_ES.test(s) || VOZ_TIT_BIBLIO_EN.test(s) ||
          /^(notas|notas al pie|notas finales|notes|footnotes|endnotes)$/.test(s) ||
-         vozTituloDePalabras(s, true);
+         vozTituloDePalabras(s);
 }
 
 /* ⚠️ UNA DIRECCIÓN SE COMPRUEBA CON `URL()`, NUNCA CON UN GREP:
@@ -1076,7 +1097,7 @@ function vozTituloTabla(l) {
    Separados serían dos entradas y ninguna de las dos diría nada. */
 const VOZ_SOLO_DOMINIO = /^(https?:\/\/)?[a-z0-9-]+(\.[a-z0-9-]{2,})+\/?$/i;
 
-function vozFuentesDeLista(txt) {
+function vozFuentesDeLista(txt, op) {
   const lineas = String(txt || '').replace(/\r\n?/g, '\n').split('\n')
     .map(l => l.replace(/\s+/g, ' ').trim()).filter(Boolean);
   /* Un «Fuentes usadas en el informe» pegado de cabecera es el rótulo
@@ -1104,7 +1125,13 @@ function vozFuentesDeLista(txt) {
     /* Y con la lista CERRADA de títulos (`vozEsTituloBiblioEstricto`):
        con la prueba por delante, «Notas sobre el método» —una primera
        fuente de verdad— se perdía como si fuera el rótulo. */
-    if (!sigue && vozEsTituloBiblioEstricto(c)) lineas.shift();
+    /* ⚠️ Y al CORREGIR, la primera línea que ya estaba guardada no es un
+       rótulo: es la primera fuente de ese texto, devuelta a la caja por
+       `vozFuentesTexto`. Sin esto, guardar sin tocar nada podía borrar
+       un «Webgrafía» o un «Fuentes primarias» que la bibliografía traía
+       de subtítulo (quinta revisión del 4 de octubre de 2026). */
+    const guardada = op && op.primeraGuardada ? String(op.primeraGuardada).replace(/\s+/g, ' ').trim() : '';
+    if (!sigue && c !== guardada && vozEsTituloBiblioEstricto(c)) lineas.shift();
   }
   const juntas = [];
   for (let i = 0; i < lineas.length; i++) {
@@ -1127,8 +1154,8 @@ function vozFuentesDeLista(txt) {
    capítulo de bibliografía que el texto ya traía, si lo traía, y si no
    en uno nuevo al final. Va aparte del lector a propósito: el lector
    lee UN texto, y aquí son dos cosas pegadas en dos sitios. */
-function vozComponerFuentes(r, txt) {
-  const lista = vozFuentesDeLista(txt);
+function vozComponerFuentes(r, txt, op) {
+  const lista = vozFuentesDeLista(txt, op);
   if (!lista.length) return r;
   const caps = r.capitulos || [];
   const ultimo = caps[caps.length - 1];
@@ -1316,6 +1343,7 @@ function vozIndiceFuentes(c) {
   (c.capitulos || []).forEach((cap, ci) => (cap.p || []).forEach((b, i) => {
     if (b.k !== 'fuente') return;
     const t = b.t || '';
+    const segura = vozEsTituloBiblioEstricto(cap.t || '');
     lista.push({
       fid: 'f' + lista.length,
       n: (b.n != null) ? b.n : null,
@@ -1328,16 +1356,26 @@ function vozIndiceFuentes(c) {
       cabeza: vozSinTildes(t).toLowerCase().slice(0, 90),
       anios: vozAniosEn(t),
       pie: !!b.pie,
+      segura: segura,
     });
   }));
   /* Las notas al pie («[^n]: …») van en su propio mapa: ver
      `vozLlamadasEn`. `bib` es la bibliografía sin ellas, que es la que se
      numera y la que se enseña al proponer la numeración. */
+  /* ⚠️ Y CON DOS LISTAS CON LOS MISMOS NÚMEROS, GANA LA DE TÍTULO SEGURO
+     (`vozEsTituloBiblioEstricto`), y entre iguales la primera. Es la
+     defensa de fondo contra la familia de fallos que las revisiones del 4
+     de octubre de 2026 fueron encontrando una a una: un capítulo que no es
+     una bibliografía («Notas generales», «Fuentes de energía renovable»)
+     justo antes de las «Referencias» entra también como fuentes —va entre
+     los dos últimos—, y su «1.» le ganaba a la obra 1. Mirando el título,
+     eso deja de depender de que cada regla de lectura acierte. */
   const porN = new Map(), porPie = new Map();
-  lista.forEach(f => {
+  [true, false].forEach(seg => lista.forEach(f => {
+    if (!!f.segura !== seg) return;
     const m = f.pie ? porPie : porN;
     if (f.n != null && !m.has(f.n)) m.set(f.n, f);
-  });
+  }));
   const bib = lista.filter(f => !f.pie);
   /* ⚠️ Y UNA BIBLIOGRAFÍA SIN NÚMEROS NO SE NUMERA SOLA. Sería fácil
      contar 1, 2, 3 por el orden de la lista y casar así los «[2]» del
@@ -1708,6 +1746,14 @@ function vozLeer(texto, opciones) {
      blancos es la entrada 3 y no un capítulo (ver
      `vozEsTituloBiblioEstricto`). */
   let enBiblioFuerte = false;
+  /* ⚠️ Y un «3. Título» suelto que SIGUE la numeración de los capítulos
+     («2. …» y luego «3. …») es el capítulo siguiente, no la entrada 3,
+     salvo que siga la de las entradas: un ensayo con los capítulos
+     numerados a mano y uno de ellos llamado como una bibliografía se
+     tragaba todo lo de después, y los números de esos capítulos le
+     ganaban a las «Referencias» de verdad (quinta revisión del 4 de
+     octubre de 2026). */
+  let numCap = null, ultimaEntrada = null;
   /* Las notas al pie definidas por el camino («[^3]: …»): se juntan
      aquí y se cuelgan al final, como en un libro. */
   const notas = [];
@@ -1765,6 +1811,9 @@ function vozLeer(texto, opciones) {
     cap = { t: String(t || '').trim(), p: [] };
     enBiblio = vozEsTituloBibliografia(cap.t);
     enBiblioFuerte = vozEsTituloBiblioEstricto(cap.t);
+    const mn = cap.t.match(/^(\d{1,3})[.)]\s/);
+    numCap = mn ? parseInt(mn[1], 10) : null;
+    ultimaEntrada = null;
   };
   const marca = (p) => { cierra(); asegura(); cap.p.push(p); frente = false; };
   /* Un subtítulo puede ser también la cabecera de la bibliografía: con
@@ -1939,7 +1988,11 @@ function vozLeer(texto, opciones) {
     /* Dentro de una bibliografía, «3. Wikipedia» a solas es la entrada 3
        y no un capítulo numerado: las listas de un informe llegan muchas
        veces con un blanco entre entrada y entrada. */
-    if (item && (enBiblioFuerte || !(item.n != null && sola && item.t.length <= 60 && vozSinPuntoFinal(item.t)))) {
+    const pareceCab = !!item && item.n != null && sola && item.t.length <= 60 && vozSinPuntoFinal(item.t);
+    const sigueCap = pareceCab && numCap != null && item.n === numCap + 1 &&
+                     !(ultimaEntrada != null && item.n === ultimaEntrada + 1);
+    if (item && ((enBiblioFuerte && !sigueCap) || !pareceCab)) {
+      if (item.n != null) ultimaEntrada = item.n;
       marca({ k: 'li', t: item.t, n: item.n });
       out.cuenta.listas++;
       continue;
@@ -9208,6 +9261,7 @@ function vozAbrirPegar(cuento) {
   if (ta) ta.value = cuento ? vozTextoCuerpo(cuento, { sinFuentes: true }) : '';
   const fu = g('voz-f-fuentes');
   if (fu) fu.value = cuento ? vozFuentesTexto(cuento) : '';
+  _vozCajaPrimera = cuento ? ((fu ? fu.value : vozFuentesTexto(cuento)).split('\n').map(l => l.replace(/\s+/g, ' ').trim()).filter(Boolean)[0] || '') : '';
   ['voz-f-titulo', 'voz-f-voz', 'voz-f-maquina', 'voz-f-encargo', 'voz-f-nota']
     .forEach(id => { const e = g(id); if (e) e.value = ''; });
   const versos = g('voz-f-versos');
@@ -9539,7 +9593,8 @@ function vozRepasar() {
 
   let r = vozLeer(ta.value, vozOpcionesLectura());
   const cajaFu = document.getElementById('voz-f-fuentes');
-  r = vozComponerFuentes(r, cajaFu ? cajaFu.value : '');
+  const opFu = { primeraGuardada: _vozCajaPrimera };
+  r = vozComponerFuentes(r, cajaFu ? cajaFu.value : '', opFu);
   const versos = document.getElementById('voz-f-versos');
 
   /* ⚠️ LO QUE EL TEXTO TRAÍA ESCRITO RELLENA EL CAMPO, Y NO PISA LO
@@ -9559,7 +9614,7 @@ function vozRepasar() {
     vozPonGenero(r.genero);
     if (r.genero === 'poema' && versos && !versos.checked && !_vozVersosTocado) {
       versos.checked = true;
-      r = vozComponerFuentes(vozLeer(ta.value, vozOpcionesLectura()), cajaFu ? cajaFu.value : '');
+      r = vozComponerFuentes(vozLeer(ta.value, vozOpcionesLectura()), cajaFu ? cajaFu.value : '', opFu);
     }
   }
   /* La numeración pedida se aplica sobre lo leído —ya con su última

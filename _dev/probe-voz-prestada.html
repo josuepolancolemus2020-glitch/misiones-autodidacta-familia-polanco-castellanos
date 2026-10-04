@@ -4980,6 +4980,45 @@ function filasHoja(d){
      'y «## Fuentes y referencias» con sus entradas sueltas entre blancos es la bibliografía (no tres capítulos), y en la caja de fuentes «Fuentes bibliográficas» es el rótulo',
      'un título de bibliografía de palabras se leyó mal: ' + JSON.stringify([lFyr, cajaFb]));
 
+  /* 12. Y lo de la QUINTA revisión: la regla de vocabulario, estrecha. */
+  const titEst5 = JSON.parse(w.eval(`JSON.stringify(${JSON.stringify(['Fuentes primarias y secundarias', 'Notas generales', 'Notas (para el docente)', 'Bibliografía complementaria', 'Fuentes recomendadas', 'Referencias APA 7', 'Webgrafía'])}.map(vozEsTituloBiblioEstricto))`));
+  const rot5 = JSON.parse(w.eval(`JSON.stringify(${JSON.stringify(['Fuentes bibliográficas', 'Bibliografía complementaria', 'Referencias'])}.map(vozEsRotuloBibliografia))`));
+  ok(JSON.stringify(titEst5) === JSON.stringify([false, false, false, false, false, true, true]) && JSON.stringify(rot5) === JSON.stringify([false, false, true]),
+     '⚠️ la regla de vocabulario es ESTRECHA: nada de temas («Fuentes primarias y secundarias»), «Notas» solo con un nombre de bibliografía, paréntesis solo de norma; y el rótulo suelto de en medio del texto se queda con su lista cerrada',
+     '⚠️ la regla de vocabulario acepta de más: ' + JSON.stringify([titEst5, rot5]));
+  const caso6 = 'Enseñar historia con documentos\n\n1. Introducción\n\nLa historia se enseña como un relato cerrado [1]. Trabajar con documentos cambia la pregunta [3].\n\n2. Fuentes bibliográficas\n\nUna fuente primaria es un testimonio del momento; una secundaria interpreta a las primarias [2].\n\n3. Una secuencia para sexto grado\n\nLa secuencia dura tres sesiones:\n1. Leer el acta de 1821.\n2. Comparar dos manuales.\n3. Escribir lo que callan.\n\n4. Conclusiones\n\nLa historia es una conversación con pruebas [4].\n\n5. Referencias\n\n1. Wineburg, S. (2001). Historical Thinking. Temple.\n2. Prats, J. (2011). Didáctica. Graó.\n3. Seixas, P. (2013). The Big Six. Nelson.\n4. Barton, K. (2004). Teaching History. Erlbaum.';
+  const l6 = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const o = vozLeer(${JSON.stringify(caso6)});
+    const r = vozLlamadasEn('[1] y [2] y [3] y [4]', vozIndiceFuentes({ cid: '__c6__', capitulos: o.capitulos })); vozOlvidaFuentes();
+    return JSON.stringify({ caps: o.capitulos.length, res: r.res.map(x => x.t + '=' + x.fuentes[0].t.slice(0, 7)) }); })()`));
+  ok(l6.caps === 5 && JSON.stringify(l6.res) === JSON.stringify(['[1]=Winebur', '[2]=Prats, ', '[3]=Seixas,', '[4]=Barton,']),
+     '⚠️ en un ensayo con los capítulos numerados a mano, un capítulo llamado como una bibliografía no se traga los de después: «3. …» sigue a «2. …» y es un capítulo, y cada número lleva a su obra',
+     '⚠️ un capítulo con nombre de bibliografía se tragó el resto o robó los números: ' + JSON.stringify(l6));
+  const cbib5 = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const o = vozLeer(${JSON.stringify('Voz: X\nMáquina: Y\n\n4. Desarrollo\n\nTexto [6] y [7].\n\n5. Referencias\n\n' + [1, 2, 3, 4, 5, 6, 7].map(n => n + '. Autor' + n + ' obra').join('\n\n') + '\n')});
+    vozOlvidaFuentes(); return JSON.stringify(o.capitulos.map(c => [!!c.ref, c.p.length])); })()`));
+  ok(JSON.stringify(cbib5) === JSON.stringify([[false, 1], [true, 7]]),
+     'y en «5. Referencias» la entrada 6 sigue a la 5 de la lista: es una entrada, no un capítulo',
+     'una entrada de la bibliografía se leyó como capítulo: ' + JSON.stringify(cbib5));
+  w.eval(`vozAbrirPegar({ cid: '__wb5__', titulo: 'Con webgrafía', voz: 'X', maquina: 'Y', genero: 'ensayo',
+    capitulos: [{ t: '', p: [{ k: 'p', t: 'Un dato.' }] }, { t: 'Referencias', ref: true, p: [{ k: 'fuente', t: 'Webgrafía', n: null }, { k: 'fuente', t: 'Alfa, A. (2010). Primera.', n: null }] }] })`);
+  await esperar(200);
+  w.eval('vozRepasar()');
+  const nWeb = Number(w.eval(`_vozPegado.capitulos.reduce((n, c) => n + (c.p || []).filter(b => b.k === 'fuente').length, 0)`));
+  w.eval('vozCerrarPegar()');
+  await esperar(150);
+  ok(nWeb === 2 && lista44('Webgrafía\nAlfa, A. (2010). Primera.').length === 1,
+     '⚠️ y al ✏️ corregir, la primera línea que YA estaba guardada («Webgrafía») no se toma por rótulo y no se pierde; pegada nueva, sí es rótulo',
+     '⚠️ corregir se comió la primera fuente guardada: ' + nWeb);
+
+  const gana5 = ['## Notas generales\n\n1. Las cifras están en dólares.\n2. Los datos son preliminares.\n\n## Referencias\n\n1. CEPAL (2023). Panorama social.\n2. OIT (2022). Panorama laboral.\n',
+    '## Referencias\n\n1. CEPAL (2023). Panorama social.\n2. OIT (2022). Panorama laboral.\n\n## Bibliografía complementaria\n\n1. Otro, A. (2010). Lectura.\n2. Otra, B. (2011). Lectura.\n',
+    '## Fuentes de energía renovable\n\n1. Solar, la más barata.\n2. Eólica, la más estable.\n\n## Referencias\n\n1. CEPAL (2023). Panorama social.\n2. OIT (2022). Panorama laboral.\n']
+    .map(cola => JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const o = vozLeer(${JSON.stringify('## Resultados\n\nDato[1] y dato[2].\n\n')} + ${JSON.stringify(cola)});
+      const r = vozLlamadasEn('Dato[1] y dato[2].', vozIndiceFuentes({ cid: '__g5__' + Math.random(), capitulos: o.capitulos })); vozOlvidaFuentes();
+      return JSON.stringify(r.res.map(x => x.fuentes[0].t.slice(0, 5))); })()`)));
+  ok(gana5.every(x => JSON.stringify(x) === '["CEPAL","OIT ("]'),
+     '⚠️ con dos listas numeradas al final, gana la de título SEGURO: «Notas generales» o «Fuentes de energía renovable» antes de las «Referencias» no les roban los números, y una «Bibliografía complementaria» después tampoco',
+     '⚠️ un número llevó a la lista equivocada: ' + JSON.stringify(gana5));
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un
