@@ -5036,31 +5036,57 @@ el diseño.
      numerada 1, 2, 3. Y un superíndice detrás de una cifra o de una o
      dos letras («m²», «10³») se escribe con los dígitos volados de
      Unicode, que es lo que el lector ya sabe que no es cita
-     (`vadjExponente`): escrito «[2]», casaba con la fuente 2.
+     (`vadjExponente`, que le pregunta a `vozEsExponente`: una sola
+     decisión para lo pegado y lo adjuntado): escrito «[2]», casaba con la
+     fuente 2.
+
+     ⚠️ **Y la segunda revisión de ese día cazó cinco más en el
+     adjunto**, todas con la cuenta corrida o una cita cruzada: las notas
+     al pie de Documentos de Google salían «[1]» y chocaban con la obra 1
+     (ahora «[^1]» y «[^1]: …», como en Word); un subtítulo dentro de la
+     bibliografía («Libros», «Artículos») la cerraba (ahora solo la cierra
+     una cabecera de su nivel o más alta); «Notas» no contaba como
+     bibliografía (ahora vale lo que el lector toma por capítulo de
+     fuentes); un ítem BORRADO con control de cambios seguía contando
+     (`vadjParrafoFantasma`); y los trozos volados seguidos se leían por
+     separado —un «12» de cita salía «[1][2]»—, y ahora se leen juntos.
    - **Al pegar**, la lista de «📚 Las fuentes del informe» llega sin
      número (así la enseñan los informes), y un rótulo pelado en
      minúsculas —«Obras citadas», el «Citations:» de Perplexity, el
      «Sources» de ChatGPT— se quedaba como prosa (regla 3), así que la
      lista de debajo ni siquiera era bibliografía. Ahora un rótulo de
      bibliografía que es la línea ENTERA, tras un blanco, con texto
-     encima y **ninguna cabecera detrás** abre la bibliografía
-     (`vozEsRotuloBibliografia`, `vozHayCabeceraDespues`): un «Fuentes» a
-     media obra es una sección sobre otra cosa. Y las palabras inglesas
-     entran en `vozEsTituloBibliografia`, pero solo como título ENTERO
-     («Sources of the Nile» no es una bibliografía). Dentro de una
+     encima y **solo entradas debajo, hasta el final** abre la
+     bibliografía (`vozEsRotuloBibliografia`, `vozListaBajoRotulo`): un
+     «Fuentes» a media obra es una sección sobre otra cosa. Y las palabras inglesas
+     entran en `vozEsTituloBibliografia`, pero solo como título ENTERO o
+     con su coletilla de bibliografía («References and Further Reading»,
+     «Sources Cited», «Notes and References»): «Sources of energy» no es
+     una bibliografía. Dentro de una
      bibliografía, «3. Wikipedia» a solas es la entrada 3, no un
      capítulo.
 
-     ⚠️ **Y el rótulo pelado necesita que lo de debajo TENGA CARA DE
-     REFERENCIA** (`vozSiguePareceBiblio`: una dirección, un dominio o un
-     año dicho como en una cita, en la primera entrada y en la mitad de
-     las seis primeras), y nunca en un poema ni con los versos puestos.
-     La revisión del 4 de octubre de 2026 lo cazó con un «Fuentes» que
-     era un apellido —«Juan Fuentes vino de lejos»— y con un poema: sus
-     renglones salían partidos en «entradas», que es el fallo de la regla
-     3 con otra cara. Y del principio de la lista solo se quita el rótulo
-     si es el renglón ENTERO: «Sources of the Nile, by Speke» es la
-     primera entrada, no un rótulo.
+     ⚠️ **Y el rótulo pelado necesita que TODO lo de debajo sea la
+     lista** (`vozListaBajoRotulo`), y nunca en un poema ni con los versos
+     puestos: o una lista numerada 1, 2, 3… sin saltos —con la mitad de
+     sus entradas con cara de referencia, o con el texto de encima citando
+     por número alguna que exista: así entra «1. TALIS 2018 · 2.
+     Wikipedia» de Gemini, que no trae año ni dirección—, o una lista sin
+     números donde TODOS los renglones tienen cara de referencia. Y «cara
+     de referencia» (`vozPareceReferencia`) son las formas en que se
+     escribe una entrada —una dirección, un DOI, el «(2014). » de APA con
+     algo detrás, «Apellido, X.», el año que cierra la entrada de MLA, el
+     «2014;370» de Vancouver—, **no un año cualquiera**: «(1958)» a media
+     frase es prosa. Las dos revisiones del 4 de octubre de 2026 lo
+     cazaron por los dos lados: un «Fuentes» que era un apellido —«Carlos
+     Fuentes publicó La región más transparente (1958).»— partía el resto
+     del ensayo en «entradas», y una lista de Gemini sin años salía en
+     tres capítulos vacíos. Un «2. Segundo» con su prosa debajo es un
+     capítulo, y no la fuente 2. Y del principio de la caja de fuentes se
+     quita el rótulo solo si tiene cara de rótulo —empieza por una palabra
+     de bibliografía, es corto y no trae cifras ni dirección—: «Bibliografía
+     consultada» se quita y «Sources of the Nile, by Speke (1863)…» se
+     queda; al revés, numerar corría todas las llamadas una posición.
 
    ⚠️ **Y LO QUE SIGA SIN NÚMEROS SE NUMERA SI LO DICE UNA PERSONA, NUNCA
    SOLO.** Es la regla 27 en pie: en una lista APA el orden es
@@ -5109,12 +5135,26 @@ el diseño.
    cualquiera —«del grupo₃» sigue siendo una llamada, y tomar cualquier
    letra por química la dejaba sin enlace: lo cazó la sonda con el
    arreglo ya puesto—; un «[0, 1]» es un intervalo
-   (no hay fuente 0); un corchete de VARIOS números entre espacios y con
-   una palabra detrás —«una escala [1-10] de dolor»— es un rango del
-   texto; y **una nota al pie no es una entrada de la bibliografía**:
-   con las dos numeradas desde 1, «[1]» llevaba a la nota y «[^1]» a la
-   obra. Ahora cada una va a lo suyo (`porN` y `porPie` en
-   `vozIndiceFuentes`), y numerar no toca las notas.
+   (no hay fuente 0); un corchete de VARIOS números detrás de una
+   palabra de matemáticas y con un blanco delante —«una escala [1-10] de
+   dolor», «el vector [1, 2, 3]»— es un intervalo (`VOZ_PAL_MATE`: se
+   mira la palabra de DELANTE; mirando lo de detrás se perdían las citas
+   de verdad, «los estudios [2, 3] muestran…»); y **una nota al pie no es
+   una entrada de la bibliografía**: con las dos numeradas desde 1, «[1]»
+   llevaba a la nota y «[^1]» a la obra. Ahora cada una va a lo suyo
+   (`porN` y `porPie` en `vozIndiceFuentes`), «[^2]» no cae en la obra 2
+   si faltaba la nota 2, y numerar no toca las notas. «[1]» sigue
+   llevando a la nota 1 cuando la bibliografía no lleva números, a
+   propósito: con notas «¹» y una bibliografía APA, quitarlo ofrecía
+   numerar la lista APA para casar el «¹» con un autor.
+
+   ⚠️ **Y tres que NO son exponentes aunque vayan detrás de una cifra o
+   de dos letras** (la segunda revisión, sobre Word): un año («desde
+   2019⁵»), un código con guion («COVID-19⁴») y dos MAYÚSCULAS, que son
+   una sigla («la IA⁶»). Una letra sola sí («R²»), y en «10⁻³» el signo
+   volado se salta. Y la página decide con el BLOQUE ENTERO
+   (`vozCitasEn`), no con el texto «hasta aquí»: con una cursiva al lado
+   del corchete, la página enlazaba lo que la cuenta no.
 
    ⚠️ **👁 EL DOCUMENTO SE VE DENTRO DE LA LECTURA, «SI SE PUEDE», Y LA
    PANTALLA DICE CUÁNDO NO.** La ficha de la fuente lleva «👁 Ver el
@@ -5207,7 +5247,11 @@ cuenta, la viñeta que reinicia la sublista, el número compuesto, los
 exponentes («m²», «10³», «10⁻³») que no son llamadas, una numeración rota
 que no tumba el documento, y las listas de Documentos de Google leídas de
 su hoja de estilo (la de letras, la invertida y la de romanos sin
-número).
+número). Y al final de esa sección, lo de la segunda revisión: «COVID-19»,
+un año y una sigla con su cita, el superíndice partido en dos trozos, el
+ítem borrado con control de cambios, los subtítulos dentro de la
+bibliografía, las «Notas» numeradas, y una página de Documentos de Google
+con su nota al pie, que el lector lleva a la nota y no a la obra.
 
 La comprobación **2** le pega un párrafo de prosa cuyos siete renglones
 empiezan por siete palabras que nombran una parte de un libro, y exige que
@@ -5389,7 +5433,13 @@ no se cruza con la obra del mismo número, el «Fuentes» que es un
 apellido, el poema, el «Referencias» a media obra y el «Sources of the
 Nile» que es una entrada—. La dirección `http:` desde una página
 `https:` no se puede probar ahí (la sonda corre en `http://localhost`):
-se comprobó con el núcleo cargado en Node.
+se comprobó con el núcleo cargado en Node. Y su apartado 9 es lo de la
+segunda revisión: el ensayo sobre el Boom con años en la prosa, la lista
+de Gemini sin años, Vancouver y Chicago, el «2. Segundo» que es un
+capítulo, «estudios [2, 3] muestran» frente a «escala [1-10]», la página
+y la cuenta con una cursiva al lado del corchete, «COVID-19⁴» y «R²», los
+títulos ingleses con coletilla, el rótulo de la caja de fuentes y la nota
+al pie que falta.
 
 La comprobación **43** es 📣 A redes, de punta a punta y por gravedad:
 que el trozo llegue a la tabla de Redes **sin su etiqueta** (se mira lo

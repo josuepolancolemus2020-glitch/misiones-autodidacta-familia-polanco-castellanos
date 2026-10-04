@@ -1869,7 +1869,10 @@ body.voz-eligiendo .destello-fab { display: none !important; }
 .voz-recv-crudo { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
 
 /* ── El video dentro de la lectura ──────────────────────── */
-#voz-yt-overlay .fin-modal { max-height: 92vh; overflow-y: auto; width: min(760px, 96vw); }
+/* `max-width: none`, como el visor de documentos: sin eso el tope de 480
+   px de `.fin-modal` dejaba el reproductor a ese ancho en una pantalla
+   ancha y el `width` de aquí no hacía nada. */
+#voz-yt-overlay .fin-modal { max-height: 92vh; overflow-y: auto; width: min(760px, 96vw); max-width: none; }
 /* 16:9 EXACTO. Un reproductor estirado no enseña lo que se va a ver, que
    es la misma razón por la que el monitor de El Rodaje no se estira. */
 .voz-yt-caja {

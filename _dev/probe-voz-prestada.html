@@ -4861,6 +4861,64 @@ function filasHoja(d){
      'y la primera entrada que empieza por «Sources of…» se queda: solo se quita el rótulo cuando es el renglón ENTERO',
      '⚠️ se perdió la primera entrada de la bibliografía: ' + JSON.stringify(lSrc));
 
+  /* 9. Lo que cazó la SEGUNDA revisión del 4 de octubre de 2026, sobre los
+     arreglos de la primera. */
+  const lBoom = leer44('Voz: un ensayista\nMáquina: Claude\n\nEl Boom latinoamericano cambió la novela.\n\nFuentes\n\nCarlos Fuentes publicó La región más transparente (1958).\n\nDespués vino La muerte de Artemio Cruz (1962), su obra mayor.\n\nCortázar\n\nRayuela (1963) rompió el orden de lectura.\n\nY nadie volvió a leer igual.\n');
+  ok(!lBoom.some(c => c.ref),
+     '⚠️ un «Fuentes» sobre Carlos Fuentes, con años entre paréntesis en la prosa, NO abre una bibliografía: «(1958)» a media frase no es una referencia',
+     '⚠️ el ensayo sobre el Boom se partió en entradas: ' + JSON.stringify(lBoom));
+  const lGem = leer44('Voz: X\nMáquina: Y\n\nDato[1] y dato[2] y [3].\n\nObras citadas\n\n1. TALIS 2018\n\n2. Wikipedia\n\n3. Educación 2020\n');
+  const rGem = lGem.find(c => c.ref);
+  ok(rGem && rGem.p.length === 3 && lGem.length === 2,
+     '⚠️ y una lista numerada 1, 2, 3 sin años ni direcciones (como copia Gemini) SÍ es bibliografía si el texto cita por número: no tres capítulos vacíos',
+     '⚠️ la lista numerada sin años se partió en capítulos o se quedó en prosa: ' + JSON.stringify(lGem));
+  const lVan = leer44('Voz: X\nMáquina: Y\n\nDato[1] y dato[2].\n\nReferencias\n\n1. Smith J, Doe A. Efficacy. N Engl J Med. 2014;370(2):123-9.\n2. OECD. TALIS results. Paris: OECD Publishing; 2019.\n');
+  const lChi = leer44('Voz: X\nMáquina: Y\n\nTexto (Graeber 2011).\n\nReferencias\n\nGraeber, David. 2011. Debt. Brooklyn: Melville House.\nHarari, Yuval Noah. 2014. Sapiens. Debate.\n');
+  ok((lVan.find(c => c.ref) || { p: [] }).p.length === 2 && (lChi.find(c => c.ref) || { p: [] }).p.length === 2,
+     'y las formas de cita de verdad cuentan como referencia: Vancouver («2014;370») y Chicago («Graeber, David. 2011.»)',
+     'Vancouver o Chicago no se leyeron como bibliografía: ' + JSON.stringify([lVan, lChi]));
+  const lSeg = leer44('Voz: X\nMáquina: Y\n\nTexto uno[1] y [2].\n\nReferencias\n\n1. Autor, A. (2010). Obra.\n\n2. Segundo\n\nTexto dos.\n');
+  ok(!lSeg.some(c => c.ref),
+     '⚠️ y un «2. Segundo» con su prosa debajo es un capítulo: no se convierte en la fuente 2 (lo de debajo del rótulo tiene que ser TODO entradas)',
+     '⚠️ un capítulo acabó como entrada de la bibliografía: ' + JSON.stringify(lSeg));
+  ok(JSON.stringify(llam44('Varios estudios [2, 3] muestran que crece, como dicen [3–5] otros. Una escala [1-10] de dolor y el vector [1, 2, 3] tiene norma. Rango[2–4].', 12)) === '["[2, 3]","[3–5]","[2–4]"]',
+     '⚠️ «estudios [2, 3] muestran» es una cita (IEEE); «escala [1-10]» y «vector [1, 2, 3]» son matemáticas: se mira la palabra de DELANTE',
+     '⚠️ los corchetes de varios números se leen mal: ' + JSON.stringify(llam44('Varios estudios [2, 3] muestran que crece, como dicen [3–5] otros. Una escala [1-10] de dolor y el vector [1, 2, 3] tiene norma. Rango[2–4].', 12)));
+  const pagCuenta = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes();
+    const c = { cid: '__pc44__', capitulos: [{ t: '', p: [] }, { t: 'Referencias', ref: true, p: Array.from({ length: 12 }, (_, i) => ({ k: 'fuente', t: 'Autor' + (i + 1) + ', A. (2010). Obra.', n: i + 1 })) }] };
+    const idx = vozIndiceFuentes(c);
+    const out = [];
+    ['Una escala [1-10] *de* dolor.', 'Los estudios [2, 3] **muestran** algo.', 'El vector *[1, 2, 3]* tiene norma.'].forEach(t => {
+      const d = document.createElement('div'); vozPintaTexto(d, t); vozCitasEn(d, idx);
+      out.push([d.querySelectorAll('.voz-cit').length, vozLlamadasEn(t, idx).res.length]);
+    });
+    vozOlvidaFuentes(); return JSON.stringify(out); })()`));
+  ok(JSON.stringify(pagCuenta) === '[[0,0],[1,1],[0,0]]',
+     '⚠️ y la página y la cuenta dicen lo mismo aunque haya una cursiva o una negrita junto al corchete (se decide con el bloque entero)',
+     '⚠️ la página y la cuenta no coinciden con énfasis al lado: ' + JSON.stringify(pagCuenta));
+  ok(JSON.stringify(llam44('Durante la COVID-19⁴ y desde 2019⁵ crece la IA⁶. Pero R², 10⁻³ y 100 m² no.', 9)) === '["⁴","⁵","⁶"]',
+     '⚠️ «COVID-19⁴», «2019⁵» y «la IA⁶» son citas; «R²», «10⁻³» y «m²» son exponentes',
+     '⚠️ un exponente o una cita se leyeron al revés: ' + JSON.stringify(llam44('Durante la COVID-19⁴ y desde 2019⁵ crece la IA⁶. Pero R², 10⁻³ y 100 m² no.', 9)));
+  const enTit = ['References and Further Reading', 'Sources Cited', 'Notes and References', 'Works Cited and Consulted'].map(T =>
+    !!leer44('## Intro\n\nTeachers report stress[1] and more[2].\n\n## ' + T + '\n\n1. Smith, J. (2019). Stress. https://a.org/x\n2. Jones, K. (2020). More. https://b.org/y').find(c => c.ref));
+  const enProsa = !!leer44('## La energía\n\nUn ensayo.\n\n## Sources of energy\n\nThe sun is the first.\nThe wind, the second.').find(c => c.ref);
+  ok(enTit.every(Boolean) && !enProsa,
+     'los títulos ingleses con su coletilla de bibliografía («References and Further Reading», «Sources Cited»…) sí son bibliografía; «Sources of energy» no',
+     'un título inglés se leyó mal: ' + JSON.stringify(enTit) + ' · Sources of energy=' + enProsa);
+  const lista44 = t => JSON.parse(w.eval(`JSON.stringify(vozFuentesDeLista(${JSON.stringify(t)}).map(f => f.t))`));
+  const lc = lista44('Bibliografía consultada\nAlfa, A. (2010). Primera.\nBeta, B. (2011). Segunda.');
+  const ls = lista44('Sources of teacher stress, Smith (2019). https://x.org/a\nOther (2020). https://y.org');
+  ok(lc.length === 2 && /^Alfa/.test(lc[0]) && ls.length === 2 && /^Sources of/.test(ls[0]),
+     '⚠️ en la caja de fuentes, «Bibliografía consultada» es el rótulo (se quita) y «Sources of teacher stress, Smith (2019)…» es la primera entrada (se queda): numerar no corre ninguna llamada',
+     '⚠️ la caja de fuentes se comió una entrada o se quedó con el rótulo: ' + JSON.stringify([lc, ls]));
+  const cruce = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes();
+    const caps = [{ t: '', p: [] }, { t: 'R', ref: true, p: [{ k: 'fuente', t: 'Alfa (2010). Libro A.', n: 1 }, { k: 'fuente', t: 'Beta (2011). Libro B.', n: 2 }, { k: 'fuente', t: 'Nota uno.', n: 1, pie: 1 }] }];
+    const r = vozLlamadasEn('Obra[1], nota[^1], nota[^2].', vozIndiceFuentes({ cid: '__cr44__', capitulos: caps }));
+    vozOlvidaFuentes(); return JSON.stringify(r.res.map(x => x.t)); })()`));
+  ok(JSON.stringify(cruce) === '["[1]","[^1]"]',
+     '⚠️ y «[^2]», sin nota 2 en unas notas que sí existen, no cae en la obra 2: se queda sin fuente',
+     '⚠️ una nota al pie que falta cayó en la bibliografía: ' + JSON.stringify(cruce));
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

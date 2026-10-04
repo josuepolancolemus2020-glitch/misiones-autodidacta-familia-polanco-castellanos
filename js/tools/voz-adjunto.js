@@ -276,12 +276,16 @@ function vadjNumeroDe(p, numeracion, cuentas) {
 /* ¿Este texto es el rótulo de una bibliografía? Los números de una
    lista solo se escriben DENTRO de una (ver `vadjLeerDocx`). La
    decisión es la del lector —una sola copia—, y si el lector no está
-   cargado no se escribe ningún número: es lo de antes. */
+   cargado no se escribe ningún número: es lo de antes. Para una
+   cabecera vale lo mismo que el lector toma por capítulo de fuentes
+   (`vozEsTituloFuentes`), «Notas» incluidas: unas notas numeradas a
+   mano bajo «Notas» son lo que citan los «¹ ²» del cuerpo (lo cazó la
+   segunda revisión del 4 de octubre de 2026). */
 function vadjEsBiblio(t, estricto) {
   const s = String(t || '').replace(/^\s*(?:\d+(?:\.\d+)*[.)]?|[ivxlcdm]+[.)])\s+/i, '').trim();
   if (!s || s.length > 60) return false;
   if (typeof vozEsRotuloBibliografia === 'function' && vozEsRotuloBibliografia(s)) return true;
-  if (!estricto && typeof vozEsTituloBibliografia === 'function' && vozEsTituloBibliografia(s)) return true;
+  if (!estricto && typeof vozEsTituloFuentes === 'function' && vozEsTituloFuentes(s)) return true;
   return false;
 }
 
@@ -297,14 +301,15 @@ function vadjExponente(antes, t) {
   const s = String(t || '').trim();
   if (!/^[-−–]?\d{1,3}$/.test(s)) return null;
   const a = String(antes || '');
-  const ult = a.slice(-1);
-  let esExp = /\d/.test(ult);
-  if (!esExp) {
-    const m = a.match(/(^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])([A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{1,2})$/);
-    esExp = !!m;
-  }
-  if (!esExp) return null;
-  return Array.from(s).map(ch => VADJ_VOLADOS[ch] || ch).join('');
+  const vol = Array.from(s).map(ch => VADJ_VOLADOS[ch] || ch).join('');
+  /* La decisión es la del lector (`vozEsExponente`), con el número ya
+     volado delante: así lo adjuntado y lo pegado dicen lo mismo, también
+     en lo que NO es exponente —«COVID-19⁴», «2019⁵», «la IA⁶» son citas—.
+     Sin el lector, la regla corta de siempre. */
+  let es;
+  if (typeof vozEsExponente === 'function') es = vozEsExponente(a + vol, a.length);
+  else es = /\d$/.test(a) || /(^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]{1,2}$/.test(a);
+  return es ? vol : null;
 }
 
 /* ⚠️ UN SUPERÍNDICE DE NÚMEROS ES UNA O VARIAS LLAMADAS. «3», «1, 2»,
@@ -328,6 +333,18 @@ function vadjLlamadas(t) {
     for (let k = a; k <= b; k++) out += '[' + k + ']';
   });
   return out;
+}
+
+/* Un párrafo BORRADO con control de cambios —o escondido— no existe en
+   el documento que se ve: su marca de párrafo lleva `w:del`, `moveFrom`
+   o `vanish`. Su texto ya no se lee (va en `delText`), pero contarlo en
+   la lista corría en uno todas las entradas de debajo, y el «[3]» del
+   cuerpo llevaba a la fuente equivocada (segunda revisión del 4 de
+   octubre de 2026). */
+function vadjParrafoFantasma(p) {
+  const pPr = [...p.children].find(x => x.localName === 'pPr');
+  const rPr = pPr && [...pPr.children].find(x => x.localName === 'rPr');
+  return !!(rPr && [...rPr.children].some(x => /^(del|moveFrom|vanish)$/.test(x.localName)));
 }
 
 function vadjEsCita(p) {
@@ -359,8 +376,11 @@ function vadjEsSuper(r) {
    En un trabajo académico es donde vive la mitad de las citas. */
 function vadjTextoP(p, ctx) {
   let out = '';
+  const textoDe = r => [...r.getElementsByTagName('*')].filter(x => x.localName === 't').map(x => x.textContent).join('');
   const rec = (nodo) => {
-    for (const h of nodo.children) {
+    const hijos = [...nodo.children];
+    for (let i = 0; i < hijos.length; i++) {
+      const h = hijos[i];
       const ln = h.localName;
       if (ln === 'rPr' || ln === 'pPr' || ln === 'sectPr') continue;
       if (ln === 't') { out += h.textContent; continue; }
@@ -378,8 +398,21 @@ function vadjTextoP(p, ctx) {
       }
       if (ln === 'r') {
         if (vadjEsSuper(h)) {
-          const t = [...h.getElementsByTagName('*')].filter(x => x.localName === 't')
-            .map(x => x.textContent).join('').trim();
+          /* ⚠️ Los trozos volados SEGUIDOS se leen juntos. Word parte un
+             mismo número en varios trozos a la mínima (una corrección,
+             una revisión ortográfica), y leído trozo a trozo un «12» de
+             cita salía «[1][2]» y un «10¹²» salía «10¹[2]»: una cita que
+             nadie escribió (segunda revisión del 4 de octubre de 2026). */
+          let t = textoDe(h);
+          let j = i + 1;
+          while (j < hijos.length) {
+            const x = hijos[j];
+            if (x.localName === 'r' && vadjEsSuper(x)) { t += textoDe(x); j++; continue; }
+            if (/^(proofErr|bookmarkStart|bookmarkEnd|permStart|permEnd)$/.test(x.localName)) { j++; continue; }
+            break;
+          }
+          i = j - 1;
+          t = t.trim();
           /* Solo los dígitos: un superíndice que dice «er» («1.er») o un
              asterisco no es una llamada a nada, y convertirlo en «[er]»
              sería inventarse una cita. */
@@ -501,6 +534,12 @@ async function vadjLeerDocx(buf) {
      cabecera o en un rótulo suelto («Obras citadas») y acaba en la
      siguiente cabecera que no lo sea. */
   let enBiblio = false;
+  /* ⚠️ Y SE CIERRA SOLO con una cabecera de su MISMO nivel o más alta:
+     una bibliografía partida en «Libros» y «Artículos» lleva subtítulos
+     dentro, y cerrándola con cualquier cabecera sus entradas salían sin
+     número (segunda revisión del 4 de octubre de 2026). La abierta por
+     un rótulo suelto no tiene nivel: la cierra cualquier cabecera. */
+  let nivelBiblio = 0;
 
   parrafos.forEach((x, i) => {
     if (x.tipo === 'tbl') {
@@ -513,10 +552,13 @@ async function vadjLeerDocx(buf) {
        también delante de un ítem vacío, y saltárselo desplazaba en uno
        todas las entradas de debajo. */
     const enLista = vadjEsLista(x.el);
-    const n = enLista ? vadjNumeroDe(x.el, numeracion, cuentas) : null;
+    const n = (enLista && !vadjParrafoFantasma(x.el)) ? vadjNumeroDe(x.el, numeracion, cuentas) : null;
     if (!t) { bloques.push(''); return; }
     if (x.nivel) {
-      enBiblio = vadjEsBiblio(t.replace(/\n/g, ' '), false);
+      if (!enBiblio || !nivelBiblio || x.nivel <= nivelBiblio) {
+        enBiblio = vadjEsBiblio(t.replace(/\n/g, ' '), false);
+        nivelBiblio = enBiblio ? x.nivel : 0;
+      }
       const nivel = (soloUnH1 && x.nivel === 2 && i === primerH1) ? 1 : x.nivel;
       cuenta.cabeceras++;
       bloques.push('');
@@ -530,7 +572,7 @@ async function vadjLeerDocx(buf) {
       bloques.push((n != null && enBiblio ? n + '. ' : '- ') + t.replace(/\n/g, ' '));
       return;
     }
-    if (vadjEsBiblio(t, true)) enBiblio = true;
+    if (vadjEsBiblio(t, true)) { enBiblio = true; nivelBiblio = 0; }
     bloques.push(t);
     bloques.push('');
   });
@@ -619,15 +661,40 @@ async function vadjLeerHtml(txt) {
 
   /* El superíndice de dígitos, a «[3]», igual que en Word: es lo que
      trae las llamadas de las citas de un informe. */
+  /* ⚠️ LAS NOTAS AL PIE DE DOCUMENTOS DE GOOGLE SE ESCRIBEN «[^3]», NO
+     «[3]». Google las exporta como un enlace «[3]» a `#ftnt3` en el
+     cuerpo y un párrafo «[3] texto» al final; leídas tal cual, eran la
+     llamada 3 y la entrada 3 de la bibliografía, y con las «Obras
+     citadas» numeradas la nota 1 llevaba a la obra 1: una atribución
+     falsa (segunda revisión del 4 de octubre de 2026). Como en Word:
+     la llamada «[^3]» y la nota «[^3]: …», que el lector guarda aparte. */
+  const notaDe = a => { const m = (a.getAttribute('href') || '').match(/^#ftnt(\d{1,3})$/); return m ? m[1] : null; };
   const conLlamadas = el => {
     let out = '';
     const rec = n => {
-      for (const h of n.childNodes) {
+      const hijos = [...n.childNodes];
+      for (let i = 0; i < hijos.length; i++) {
+        const h = hijos[i];
         if (h.nodeType === 3) { out += h.nodeValue; continue; }
         if (h.nodeType !== 1) continue;
         const et = h.tagName.toLowerCase();
+        if (et === 'a' && notaDe(h)) { out += '[^' + notaDe(h) + ']'; continue; }
+        if (et === 'a' && /^#ftnt_ref\d/.test(h.getAttribute('href') || '')) continue;
         if (et === 'sup') {
-          const t = limpio(h.textContent);
+          const enlaces = [...h.querySelectorAll('a')].map(notaDe).filter(Boolean);
+          if (enlaces.length) { out += enlaces.map(x => '[^' + x + ']').join(''); continue; }
+          /* Los <sup> SEGUIDOS se leen juntos, como los trozos volados de
+             Word (ver `vadjTextoP`). */
+          let crudo = h.textContent;
+          let j = i + 1;
+          while (j < hijos.length) {
+            const x = hijos[j];
+            if (x.nodeType === 1 && x.tagName.toLowerCase() === 'sup' && !x.querySelector('a')) { crudo += x.textContent; j++; continue; }
+            if (x.nodeType === 3 && x.nodeValue === '') { j++; continue; }
+            break;
+          }
+          i = j - 1;
+          const t = limpio(crudo);
           const ex = vadjExponente(out, t);
           if (ex) { out += ex; continue; }
           const ll = vadjLlamadas(t);
@@ -656,17 +723,28 @@ async function vadjLeerHtml(txt) {
   /* Los números solo dentro de una bibliografía, como en Word (ver
      `vadjLeerDocx`). Y el formato de las listas de Documentos de Google
      no está en el <ol>: lo dibuja su hoja de estilo (`vadjListasKix`). */
-  let enBiblio = false;
+  let enBiblio = false, nivelBiblio = 0;
   const kix = vadjListasKix(doc);
   const recorre = nodo => {
     for (const h of nodo.children) {
       const et = h.tagName.toLowerCase();
       if (/^h[1-6]$/.test(et)) {
         const t = conLlamadas(h).replace(/\n/g, ' ');
-        if (t) { enBiblio = vadjEsBiblio(t, false); cuenta.cabeceras++; bloques.push(''); bloques.push('#'.repeat(Math.min(3, parseInt(et[1], 10))) + ' ' + t); bloques.push(''); }
+        const nv = parseInt(et[1], 10);
+        if (t) {
+          /* Un subtítulo DENTRO de la bibliografía no la cierra (ver Word). */
+          if (!enBiblio || !nivelBiblio || nv <= nivelBiblio) { enBiblio = vadjEsBiblio(t, false); nivelBiblio = enBiblio ? nv : 0; }
+          cuenta.cabeceras++; bloques.push(''); bloques.push('#'.repeat(Math.min(3, nv)) + ' ' + t); bloques.push('');
+        }
       } else if (et === 'p') {
+        /* El párrafo de una nota de Google empieza por su ancla de vuelta
+           («[3]» que lleva a `#ftnt_ref3`): sale «[^3]: …». */
+        const primero = [...h.querySelectorAll('a')][0];
+        const mv = primero && (primero.getAttribute('href') || '').match(/^#ftnt_ref(\d{1,3})$/);
+        const delante = mv ? limpio((h.textContent || '').slice(0, Math.max(0, (h.textContent || '').indexOf(primero.textContent)))) : '';
         const t = conLlamadas(h);
-        if (t && vadjEsBiblio(t, true)) enBiblio = true;
+        if (mv && !delante) { if (t) { cuenta.notas++; bloques.push('[^' + mv[1] + ']: ' + t.replace(/\n/g, ' ')); } continue; }
+        if (t && vadjEsBiblio(t, true)) { enBiblio = true; nivelBiblio = 0; }
         if (t) { bloques.push(t); bloques.push(''); } else bloques.push('');
       } else if (et === 'blockquote') {
         const t = conLlamadas(h);

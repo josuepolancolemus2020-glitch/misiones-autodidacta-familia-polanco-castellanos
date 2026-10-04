@@ -393,6 +393,70 @@ const RELS =
      'y una lista que cuenta hacia atrás o de romanos no se numera; una normal con «start» sí',
      'una lista invertida o de romanos salió numerada:\n' + tHt);
 
+  /* Y lo que cazó la SEGUNDA revisión, sobre los arreglos de la primera. */
+  const del = '<w:rPr><w:del w:id="9" w:author="x" w:date="2026-10-04T00:00:00Z"/></w:rPr>';
+  const DOC_4 =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document ' + W + ' ' + R + '><w:body>' +
+      p('', t('Durante la COVID-19') + sup('4') + t(' y desde 2019') + sup('5') + t(' crece la IA') + sup('6') +
+            t('. Un área de 10') + sup('1') + sup('2') + t(' m y un dato') + sup('1') + sup('2') + t(' partido.')) +
+      p(estilo('Heading1'), t('Referencias')) +
+      p(estilo('Heading2'), t('Libros')) +
+      p(num(1, 0), t('Uno, A. (2010). Primera.')) +
+      p(num(1, 0) + del, '<w:del w:id="8" w:author="x"><w:r><w:delText>Borrada (2009).</w:delText></w:r></w:del>') +
+      p(num(1, 0), t('Dos, B. (2011). Segunda.')) +
+      p(estilo('Heading2'), t('Artículos')) +
+      p(num(1, 0), t('Tres, C. (2012). Tercera.')) +
+      p(estilo('Heading1'), t('Notas')) +
+      p(num(3, 0), t('Véase Pérez, que lo cuenta mejor.')) +
+      p(num(3, 0), t('Según López, al revés.')) +
+      p(estilo('Heading1'), t('Anexo')) +
+      p(num(5, 0), t('Paso del anexo')) +
+    '</w:body></w:document>';
+  const NUM_4 =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:numbering ' + W + '>' +
+      '<w:abstractNum w:abstractNumId="10"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl></w:abstractNum>' +
+      '<w:abstractNum w:abstractNumId="11"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl></w:abstractNum>' +
+      '<w:abstractNum w:abstractNumId="12"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl></w:abstractNum>' +
+      '<w:num w:numId="1"><w:abstractNumId w:val="10"/></w:num>' +
+      '<w:num w:numId="3"><w:abstractNumId w:val="11"/></w:num>' +
+      '<w:num w:numId="5"><w:abstractNumId w:val="12"/></w:num>' +
+    '</w:numbering>';
+  const t4 = (await w.VozAdjunto.leer(new w.File([await hacerZip([
+    ['[Content_Types].xml', '<?xml version="1.0"?><Types/>'],
+    ['word/document.xml', DOC_4],
+    ['word/numbering.xml', NUM_4],
+  ], w)], 'cuatro.docx'))).texto || '';
+  ok(/COVID-19\[4\]/.test(t4) && /2019\[5\]/.test(t4) && /la IA\[6\]/.test(t4),
+     '⚠️ detrás de «COVID-19», de un año o de una sigla («IA») el superíndice es una CITA: «[4]», «[5]», «[6]»',
+     '⚠️ una cita detrás de un código, un año o una sigla salió como exponente: ' + (t4.match(/Durante.{0,80}/) || [''])[0]);
+  ok(/área de 10¹² m/.test(t4) && /un dato\[12\] partido/.test(t4),
+     '⚠️ los trozos volados SEGUIDOS se leen juntos: «10¹²» es un exponente entero y el «12» de una cita es la [12], no la [1][2]',
+     '⚠️ un superíndice partido en dos trozos se leyó por separado: ' + (t4.match(/área.{0,60}/) || [''])[0]);
+  ok(/^1\. Uno, A\./m.test(t4) && /^2\. Dos, B\./m.test(t4) && /^3\. Tres, C\./m.test(t4) && !/Borrada/.test(t4),
+     '⚠️ un ítem BORRADO con control de cambios no cuenta, y los subtítulos «Libros» y «Artículos» no cierran la bibliografía: 1, 2, 3',
+     '⚠️ la cuenta de la bibliografía se corrió o se cerró en un subtítulo:\n' + t4);
+  ok(/^1\. Véase Pérez/m.test(t4) && /^2\. Según López/m.test(t4) && /^- Paso del anexo$/m.test(t4),
+     'y las «Notas» numeradas a mano llevan sus números (es lo que citan los superíndices), pero el «Anexo» que viene después ya no',
+     'las notas perdieron sus números o el anexo se numeró:\n' + t4);
+
+  const htmlGoo = '<html><head><style>.lst-kix_q-0>li:before{content:"" counter(lst-ctn-kix_q-0,decimal) ". "}</style></head><body>' +
+    '<h1>Desarrollo</h1><p>Según el informe, el dato sube<sup><a href="#ftnt1" id="ftnt_ref1">[1]</a></sup> y baja<sup>2</sup>.</p>' +
+    '<h1>Referencias</h1><h2>Libros</h2><ol class="lst-kix_q-0 start" start="1"><li>Uno, A. (2010). Primera obra.</li><li>Dos, B. (2011). Segunda obra.</li></ol>' +
+    '<hr><div><p><a href="#ftnt_ref1" id="ftnt1">[1]</a><span>&nbsp;Aclaración del autor sobre el dato.</span></p></div></body></html>';
+  const tGoo = (await w.VozAdjunto.leer(new w.File([new w.Blob([htmlGoo])], 'google.html', { type: 'text/html' }))).texto || '';
+  ok(/sube\[\^1\] y baja\[2\]/.test(tGoo) && /^\[\^1\]: Aclaración del autor/m.test(tGoo) && /^1\. Uno, A\./m.test(tGoo) && /^2\. Dos, B\./m.test(tGoo),
+     '⚠️ las notas al pie de Documentos de Google salen «[^1]» y «[^1]: …», aparte de las obras numeradas (y el subtítulo «Libros» no cierra la bibliografía)',
+     '⚠️ la nota al pie de Google se confundió con la bibliografía:\n' + tGoo);
+  const lGoo = JSON.parse(w.eval(`JSON.stringify(vozLeer(${JSON.stringify(tGoo)}))`));
+  const mGoo = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const c = { cid: '__goo__', capitulos: ${JSON.stringify(lGoo.capitulos)} };
+    const idx = vozIndiceFuentes(c); const txt = c.capitulos.map(x => (x.p || []).filter(b => b.k === 'p').map(b => b.t).join(' ')).join(' ');
+    const r = vozLlamadasEn(txt, idx); vozOlvidaFuentes(); return JSON.stringify(r.res.map(x => x.t + '=' + x.fuentes[0].t.slice(0, 12))); })()`));
+  ok(JSON.stringify(mGoo) === JSON.stringify(['[^1]=Aclaración d', '[2]=Dos, B. (201']),
+     '⚠️ y el lector lleva la nota a la nota y el «[2]» a la obra 2: ninguna se cruza',
+     '⚠️ la nota y la obra se cruzaron en el lector: ' + JSON.stringify(mGoo));
+
   log('── 4. ⚠️ UN PDF DICE QUE NO, Y DICE QUÉ HACER ──');
   const pdf = new w.File([new w.Blob(['%PDF-1.7\n1 0 obj\n'])], 'informe.pdf', { type: 'application/pdf' });
   const rp = await w.VozAdjunto.leer(pdf);
