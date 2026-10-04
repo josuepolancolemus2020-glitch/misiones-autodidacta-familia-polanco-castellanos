@@ -4952,6 +4952,34 @@ function filasHoja(d){
      'y la caja de fuentes no se come «Notas sobre el método» (una primera fuente de verdad), y un «Further reading» suelto es prosa',
      'se perdió una primera fuente, o «Further reading» se leyó como bibliografía: ' + JSON.stringify([notasMet, furth]));
 
+  /* 11. Y lo de la CUARTA revisión: la lista cerrada de títulos se quedaba
+     corta, y las palabras ambiguas de las escalas hacían falta justo
+     delante del corchete. */
+  const titEst = JSON.parse(w.eval(`JSON.stringify(${JSON.stringify(['Fuentes bibliográficas', 'Bibliografía y webgrafía', 'Referencias (APA 7.ª edición)', 'Notas y bibliografía', 'Fuentes y referencias', 'Bibliografía general', 'Fuentes de energía', 'Notas para el docente', 'Notas sobre el método', 'Bibliografía de Borges'])}.map(vozEsTituloBiblioEstricto))`));
+  ok(JSON.stringify(titEst) === JSON.stringify([true, true, true, true, true, true, false, false, false, false]),
+     '⚠️ un título hecho SOLO de palabras de bibliografía lo es («Fuentes bibliográficas», «Bibliografía y webgrafía», «Referencias (APA 7.ª edición)»…); «Fuentes de energía» o «Notas para el docente», no',
+     '⚠️ la lista de títulos de bibliografía se equivoca: ' + JSON.stringify(titEst));
+  const entre44 = 'El índice oscila entre [1-5] según el país, con dominio [1, 4] y los valores [1, 5] como extremos. Los valores democráticos [2, 3] importan, y las diferencias entre países [2, 4] también.';
+  ok(JSON.stringify(llam44(entre44, 12)) === '["[2, 3]","[2, 4]"]',
+     '⚠️ «oscila entre [1-5]», «dominio [1, 4]» y «los valores [1, 5]» son intervalos (la palabra de JUSTO delante); «los valores democráticos [2, 3]» y «entre países [2, 4]» son citas',
+     '⚠️ un intervalo se enlazó o una cita se perdió: ' + JSON.stringify(llam44(entre44, 12)));
+  const llamaPie44 = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes();
+    const c = { cid: '__lp44__', capitulos: [{ t: '', p: [{ k: 'p', t: 'La tasa bajó[1]. Esto se discute aparte[^1].' }] },
+      { t: 'Fuentes bibliográficas', ref: true, p: [{ k: 'fuente', t: 'Banco Mundial (2019). Informe.', n: null }, { k: 'fuente', t: 'El autor no comparte esta lectura.', n: 1, pie: 1 }] }] };
+    const r = vozLlamadasEn(c.capitulos[0].p[0].t, vozIndiceFuentes(c)); vozOlvidaFuentes();
+    return JSON.stringify(r.res.map(x => x.t)); })()`));
+  ok(JSON.stringify(llamaPie44) === '["[^1]"]',
+     '⚠️ si el texto marca sus notas como «[^1]», un «[1]» pelado es una cita y NO cae en la nota 1 aunque la bibliografía venga sin números',
+     '⚠️ el «[1]» de una obra cayó en la nota del autor: ' + JSON.stringify(llamaPie44));
+  const lFyr = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes();
+    const o = vozLeer(${JSON.stringify('## Introducción\n\nDato[1] y dato[2] y [3].\n\n## Fuentes y referencias\n\n1. OCDE – TALIS 2018\n\n2. UNESCO – Informe GEM 2023\n\n3. https://www.oecd.org/education/talis/\n')});
+    const r = vozLlamadasEn('Dato[1] y dato[2] y [3].', vozIndiceFuentes({ cid: '__fyr44__', capitulos: o.capitulos })); vozOlvidaFuentes();
+    return JSON.stringify({ caps: o.capitulos.length, res: r.res.length }); })()`));
+  const cajaFb = lista44('Fuentes bibliográficas\nOCDE (2019). Informe.\nUNESCO (2023). GEM.');
+  ok(lFyr.caps === 2 && lFyr.res === 3 && cajaFb.length === 2,
+     'y «## Fuentes y referencias» con sus entradas sueltas entre blancos es la bibliografía (no tres capítulos), y en la caja de fuentes «Fuentes bibliográficas» es el rótulo',
+     'un título de bibliografía de palabras se leyó mal: ' + JSON.stringify([lFyr, cajaFb]));
+
   log('── 13. Con la base vieja no revienta: dice qué falta ──');
   /* ⚠️ Estas últimas se hacen en EL MISMO marco, cambiándole la base de
      mentira y volviendo a arrancar la herramienta, y no abriendo un

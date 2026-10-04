@@ -678,8 +678,15 @@ async function vadjLeerHtml(txt) {
   /* Y las de Word guardado como página («#_ftn3», «#_edn3») y las de
      LibreOffice («#sdfootnote3sym»), que también llegan: una llamada de
      esas leída como «[3]» le roba el número a la obra 3. */
-  const notaDe = a => { const m = (a.getAttribute('href') || '').match(/^#(?:ftnt|_ftn|_edn|sdfootnote|sdendnote)(\d{1,3})(?:sym)?$/); return m ? m[1] : null; };
-  const VADJ_VUELTA = /^#(?:ftnt_ref|_ftnref|_ednref|sdfootnote|sdendnote)(\d{1,3})(?:anc)?$/;
+  /* ⚠️ Y SE RENUMERAN 1, 2, 3 por orden de aparición y POR CLASE, como en
+     Word (`numeroNota`): con notas al pie Y notas finales, la nota 1 y la
+     nota final 1 salían las dos «[^1]», y una llamada llevaba al texto de
+     la otra (cuarta revisión del 4 de octubre de 2026). */
+  const numerosNota = new Map();
+  const claseNota = f => (/^ftnt/.test(f) ? 'g' : /^_ftn/.test(f) ? 'wf' : /^_edn/.test(f) ? 'we' : /^sdfootnote/.test(f) ? 'lf' : 'le');
+  const numeroNota = (f, n) => { const k = claseNota(f) + ':' + n; if (!numerosNota.has(k)) numerosNota.set(k, numerosNota.size + 1); return String(numerosNota.get(k)); };
+  const notaDe = a => { const m = (a.getAttribute('href') || '').match(/^#(ftnt|_ftn|_edn|sdfootnote|sdendnote)(\d{1,3})(?:sym)?$/); return m ? numeroNota(m[1], m[2]) : null; };
+  const VADJ_VUELTA = /^#(ftnt_ref|_ftnref|_ednref|sdfootnote|sdendnote)(\d{1,3})(?:anc)?$/;
   const conLlamadas = el => {
     let out = '';
     const rec = n => {
@@ -754,7 +761,7 @@ async function vadjLeerHtml(txt) {
         const mv = primero && (primero.getAttribute('href') || '').match(VADJ_VUELTA);
         const delante = mv ? limpio((h.textContent || '').slice(0, Math.max(0, (h.textContent || '').indexOf(primero.textContent)))) : '';
         const t = conLlamadas(h);
-        if (mv && !delante) { if (t) { cuenta.notas++; bloques.push('[^' + mv[1] + ']: ' + t.replace(/\n/g, ' ')); } continue; }
+        if (mv && !delante) { if (t) { cuenta.notas++; bloques.push('[^' + numeroNota(mv[1], mv[2]) + ']: ' + t.replace(/\n/g, ' ')); } continue; }
         if (t && vadjEsBiblio(t)) { enBiblio = true; nivelBiblio = 0; }
         if (t) { bloques.push(t); bloques.push(''); } else bloques.push('');
       } else if (et === 'blockquote') {

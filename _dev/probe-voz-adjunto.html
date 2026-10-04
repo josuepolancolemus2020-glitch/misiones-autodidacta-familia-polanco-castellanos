@@ -499,9 +499,43 @@ const RELS =
     '<div id="sdfootnote1"><p><a class="sdfootnotesym" name="sdfootnote1sym" href="#sdfootnote1anc">1</a>Nota de LibreOffice.</p></div>' +
     '<div id="ftn1"><p><a href="#_ftnref1" name="_ftn1"><span>[1]</span></a> Nota de Word.</p></div></body></html>';
   const tLO = (await w.VozAdjunto.leer(new w.File([new w.Blob([htmlLO])], 'lo.html', { type: 'text/html' }))).texto || '';
-  ok(/Dato\[\^1\] y otro\[\^1\]\./.test(tLO) && /^\[\^1\]: Nota de LibreOffice\.$/m.test(tLO) && /^\[\^1\]: Nota de Word\.$/m.test(tLO) && /^1\. Uno, A\./m.test(tLO),
-     '⚠️ las notas al pie de LibreOffice («#sdfootnote1sym») y de Word guardado como página («#_ftn1») también salen «[^1]»: no le roban el número a la obra 1',
+  ok(/Dato\[\^1\] y otro\[\^2\]\./.test(tLO) && /^\[\^1\]: Nota de LibreOffice\.$/m.test(tLO) && /^\[\^2\]: Nota de Word\.$/m.test(tLO) && /^1\. Uno, A\./m.test(tLO),
+     '⚠️ las notas al pie de LibreOffice («#sdfootnote1sym») y de Word guardado como página («#_ftn1») salen «[^n]» —no le roban el número a la obra 1— y renumeradas por clase: las dos «1» no se cruzan',
      '⚠️ una nota al pie de LibreOffice o de Word se leyó como cita:\n' + tLO);
+
+  /* Y lo de la CUARTA revisión: títulos de bibliografía hechos de
+     palabras de bibliografía, y notas al pie y finales en una página. */
+  const DOC_6 =
+    '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<w:document ' + W + ' ' + R + '><w:body>' +
+      p('', t('La tasa bajó un 12 %') + sup('1') + t('. Esto se discute aparte') + '<w:r><w:footnoteReference w:id="2"/></w:r>' + t('.')) +
+      p(estilo('Heading1'), t('Fuentes bibliográficas')) +
+      p(num(1, 0), t('Banco Mundial (2019). Informe sobre el desarrollo mundial.')) +
+      p(num(1, 0), t('CEPAL (2021). Panorama social.')) +
+    '</w:body></w:document>';
+  const NOTAS_6 = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:footnotes ' + W + '>' +
+    '<w:footnote w:type="separator" w:id="0">' + p('', t('s')) + '</w:footnote><w:footnote w:type="continuationSeparator" w:id="1">' + p('', t('c')) + '</w:footnote>' +
+    '<w:footnote w:id="2">' + p('', t('El autor no comparte esta lectura.')) + '</w:footnote></w:footnotes>';
+  const NUM_6 = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering ' + W + '>' +
+    '<w:abstractNum w:abstractNumId="10"><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl></w:abstractNum>' +
+    '<w:num w:numId="1"><w:abstractNumId w:val="10"/></w:num></w:numbering>';
+  const t6 = (await w.VozAdjunto.leer(new w.File([await hacerZip([
+    ['[Content_Types].xml', '<?xml version="1.0"?><Types/>'],
+    ['word/document.xml', DOC_6], ['word/footnotes.xml', NOTAS_6], ['word/numbering.xml', NUM_6],
+  ], w)], 'seis.docx'))).texto || '';
+  const l6 = JSON.parse(w.eval(`(function(){ vozOlvidaFuentes(); const o = vozLeer(${JSON.stringify(t6)}); const c = { cid: '__seis__', capitulos: o.capitulos };
+    const txt = o.capitulos[0].p.filter(b => b.k === 'p').map(b => b.t).join(' ');
+    const r = vozLlamadasEn(txt, vozIndiceFuentes(c)); vozOlvidaFuentes(); return JSON.stringify(r.res.map(x => x.t + '=' + x.fuentes[0].t.slice(0, 8))); })()`));
+  ok(/^1\. Banco Mundial/m.test(t6) && /^2\. CEPAL/m.test(t6) && JSON.stringify(l6) === JSON.stringify(['[1]=Banco Mu', '[^1]=El autor']),
+     '⚠️ bajo «Fuentes bibliográficas» la lista lleva sus números, y con una nota al pie al lado el «[1]» lleva a la obra 1 y no a la nota',
+     '⚠️ la bibliografía de «Fuentes bibliográficas» perdió sus números o el «[1]» cayó en la nota:\n' + t6 + '\n' + JSON.stringify(l6));
+  const htmlFE = '<html><body><p>La reforma fracasó<a href="#_ftn1" name="_ftnref1"><span>[1]</span></a> según el ministro<a href="#_edn1" name="_ednref1"><span>[i]</span></a>.</p>' +
+    '<div id="ftn1"><p><a href="#_ftnref1" name="_ftn1"><span>[1]</span></a> Opinión del autor, sin fuente.</p></div>' +
+    '<div id="edn1"><p><a href="#_ednref1" name="_edn1"><span>[i]</span></a> Pérez, J. (2019). Entrevista.</p></div></body></html>';
+  const tFE = (await w.VozAdjunto.leer(new w.File([new w.Blob([htmlFE])], 'fe.html', { type: 'text/html' }))).texto || '';
+  ok(/fracasó\[\^1\] según el ministro\[\^2\]\./.test(tFE) && /^\[\^1\]: Opinión del autor/m.test(tFE) && /^\[\^2\]: Pérez/m.test(tFE),
+     '⚠️ con notas al pie Y notas finales en una página de Word, cada una lleva su número: la opinión del autor no sale respaldada por Pérez',
+     '⚠️ la nota al pie y la nota final se cruzaron:\n' + tFE);
 
   log('── 4. ⚠️ UN PDF DICE QUE NO, Y DICE QUÉ HACER ──');
   const pdf = new w.File([new w.Blob(['%PDF-1.7\n1 0 obj\n'])], 'informe.pdf', { type: 'application/pdf' });

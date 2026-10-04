@@ -895,9 +895,29 @@ function vozListaBajoRotulo(lineas, desde) {
    ir sola tras un blanco y no ser lo primero del texto. */
 const VOZ_ROT_BIBLIO_ES = /^(referencias|bibliografia|obras citadas|obras consultadas|fuentes|fuentes consultadas|fuentes citadas|fuentes de consulta|fuentes de informacion|fuentes usadas en el informe|referencias bibliograficas|referencias citadas|bibliografia consultada|bibliografia citada|bibliografia basica|bibliografia recomendada|referencias y notas|notas y referencias)$/;
 
+/* ⚠️ Y LOS TÍTULOS HECHOS SOLO DE PALABRAS DE BIBLIOGRAFÍA: «Fuentes
+   bibliográficas», «Bibliografía y webgrafía», «Fuentes y referencias»,
+   «Referencias (APA 7)», «Notas y bibliografía». La lista cerrada a
+   secas se quedaba corta y la cuarta revisión del 4 de octubre de 2026
+   lo cazó con un Word: bajo «Fuentes bibliográficas» la lista salía sin
+   números, y con notas al pie el «[1]» del texto caía en la nota 1. La
+   regla: empieza por una palabra de cabeza y TODAS las demás son de
+   bibliografía. «Fuentes de energía» y «Notas para el docente» siguen
+   fuera, porque «de», «energía» o «docente» no son de ese vocabulario. */
+const VOZ_TIT_CABEZA = /^(referencias|referencia|bibliografia|fuentes|webgrafia|cibergrafia|notas)$/;
+const VOZ_TIT_PALABRA = /^(referencias|referencia|bibliografia|bibliograficas|bibliograficos|bibliografica|bibliografico|fuentes|webgrafia|cibergrafia|notas|citadas|citados|consultadas|consultados|general|generales|complementaria|complementarias|basica|basicas|recomendada|recomendadas|electronicas|digitales|documentales|primarias|secundarias|finales|al|pie|y|e|apa|mla|chicago|vancouver|ieee)$/;
+
+function vozTituloDePalabras(s, conNotas) {
+  const w = String(s || '').replace(/\s*\([^)]{0,30}\)\s*$/, '').split(/[\s,&\/]+/).filter(Boolean)
+    .filter(x => !/^\d{1,2}(\.?ª|a)?$/.test(x));
+  if (!w.length || w.length > 6 || !VOZ_TIT_CABEZA.test(w[0])) return false;
+  if (!conNotas && w[0] === 'notas') return false;
+  return w.every(x => VOZ_TIT_PALABRA.test(x));
+}
+
 function vozEsRotuloBibliografia(t) {
   const s = vozSinTildes(vozDesnuda(String(t || ''))).toLowerCase().replace(/[.:]+$/, '').trim();
-  return VOZ_ROT_BIBLIO_ES.test(s) || VOZ_TIT_BIBLIO_EN.test(s);
+  return VOZ_ROT_BIBLIO_ES.test(s) || VOZ_TIT_BIBLIO_EN.test(s) || vozTituloDePalabras(s, false);
 }
 
 /* ⚠️ EL TÍTULO DE UNA BIBLIOGRAFÍA, CERRADO: la frase entera (con su
@@ -916,7 +936,8 @@ function vozEsTituloBiblioEstricto(t) {
   const s = vozSinTildes(vozDesnuda(String(t || ''))).toLowerCase()
     .replace(/^(?:\d{1,3}(?:\.\d{1,3})*|[ivxlcdm]{1,6})[.)]?\s+/, '').replace(/[.:]+$/, '').trim();
   return VOZ_ROT_BIBLIO_ES.test(s) || VOZ_TIT_BIBLIO_EN.test(s) ||
-         /^(notas|notas al pie|notas finales|notes|footnotes|endnotes)$/.test(s);
+         /^(notas|notas al pie|notas finales|notes|footnotes|endnotes)$/.test(s) ||
+         vozTituloDePalabras(s, true);
 }
 
 /* ⚠️ UNA DIRECCIÓN SE COMPRUEBA CON `URL()`, NUNCA CON UN GREP:
@@ -1328,7 +1349,16 @@ function vozIndiceFuentes(c) {
      el repaso la cuenta entre las que no tienen fuente, que es lo que
      dice qué hay que arreglar —numerar la bibliografía— en vez de
      taparlo con una suposición. */
-  _vozIdxFuentes = { cid: c.cid, lista: lista, porN: porN, porPie: porPie, bib: bib };
+  /* ¿El texto marca sus notas como «[^n]»? Entonces un «[1]» pelado es
+     una cita y NUNCA cae en la nota 1 (ver `vozLlamadasEn`): un Word con
+     notas al pie y una bibliografía sin números llevaba el «[1]» de una
+     obra a la nota del autor (cuarta revisión del 4 de octubre de 2026). */
+  let llamaPie = false;
+  (c.capitulos || []).forEach(cap => (cap.p || []).forEach(b => {
+    if (llamaPie || !b || b.k === 'fuente') return;
+    if (/\[\^\s*\d/.test(vozTextoDeBloque(b))) llamaPie = true;
+  }));
+  _vozIdxFuentes = { cid: c.cid, lista: lista, porN: porN, porPie: porPie, bib: bib, llamaPie: llamaPie };
   return _vozIdxFuentes;
 }
 
@@ -1403,9 +1433,17 @@ const VOZ_PAL_MATE = /^(escalas?|intervalos?|rangos?|vectore?s?|matriz|matrices|
    en [1, 5]», «Escala Likert: [1-5]») o un «∈» o un «=» pegado. Con
    solo la palabra de justo delante, la segunda revisión del 4 de
    octubre de 2026 cazó las escalas Likert enlazadas a cinco fuentes. */
+/* Y las ambiguas, SOLO como la palabra de JUSTO delante: «oscila entre
+   [1-5]», «con dominio [1, 4]», «los valores [1, 5] son los extremos».
+   Quitadas del todo, la cuarta revisión las encontró enlazadas a cinco
+   fuentes; mirándolas tres palabras atrás se comían «los valores
+   democráticos [2, 3]». Esto solo puede quitar enlaces, nunca ponerlos. */
+const VOZ_PAL_MATE_JUSTO = /(?:^|[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ])(conjuntos?|dominio|recorrido|valores|entre|sets?|between)$/i;
+
 function vozDelanteEsMate(antes) {
   const a = String(antes || '').replace(/[\s*_]+$/, '');
   if (/[∈=]$/.test(a)) return true;
+  if (VOZ_PAL_MATE_JUSTO.test(a)) return true;
   return (a.match(/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+/g) || []).slice(-3).some(w => VOZ_PAL_MATE.test(w));
 }
 
@@ -1460,7 +1498,7 @@ function vozLlamadasEn(s, idx) {
              numerar la lista APA para que el «¹» llevara a un autor, que
              es la atribución falsa contra la que existe todo esto. */
           f = pie ? (idx.porPie.get(n) || (idx.porPie.size ? null : idx.porN.get(n)))
-                  : (idx.porN.get(n) || (idx.porN.size ? null : idx.porPie.get(n)));
+                  : (idx.porN.get(n) || ((idx.porN.size || idx.llamaPie) ? null : idx.porPie.get(n)));
         }
         if (f) { if (fuentes.indexOf(f) < 0) fuentes.push(f); }
         else if (n) faltan.push(n);

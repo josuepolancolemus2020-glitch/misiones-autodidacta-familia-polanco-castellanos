@@ -5056,12 +5056,21 @@ el diseño.
      su número de sección delante si lo trae), no «empieza por»: la
      tercera revisión cazó «Notas para el docente» y «Fuentes de
      energía» abriendo una bibliografía, con sus listas numeradas 1, 2, 3
-     ganándole los números a las «Referencias» de verdad. Lo mismo vale
+     ganándole los números a las «Referencias» de verdad. **O hecho SOLO
+     de palabras de bibliografía** (`vozTituloDePalabras`): empieza por
+     una de cabeza —referencias, bibliografía, fuentes, webgrafía, notas—
+     y todas las demás son también de ese vocabulario, así que entran
+     «Fuentes bibliográficas», «Bibliografía y webgrafía», «Fuentes y
+     referencias» y «Referencias (APA 7.ª edición)», y siguen fuera
+     «Fuentes de energía» o «Notas para el docente». La lista cerrada a
+     secas se quedaba corta, y la cuarta revisión lo cazó con un Word:
+     bajo «Fuentes bibliográficas» las obras salían sin número. Lo mismo vale
      en la caja de fuentes para quitar el rótulo de arriba («Notas sobre
      el método» es una fuente) y en el lector para leer «3. Wikipedia»
      suelto como la entrada 3. Y las notas al pie de LibreOffice
      («#sdfootnote1sym») y de Word guardado como página («#_ftn1») salen
-     «[^1]» como las de Google; la primera nota de un Word actual (con
+     «[^n]» como las de Google, renumeradas 1, 2, 3 por orden y POR
+     CLASE (con notas al pie y notas finales, las dos «1» se cruzaban); la primera nota de un Word actual (con
      los separadores en el -1 y el 0) ya no se pierde entera, y una
      llamada a nota con superíndice puesto a mano es una nota.
    - **Al pegar**, la lista de «📚 Las fuentes del informe» llega sin
@@ -5158,7 +5167,9 @@ el diseño.
    dolor», «el vector [1, 2, 3]», «una escala de [1-5]», «x ∈ [1, 3]»— es
    un intervalo (`vozDelanteEsMate`: se miran las TRES palabras de
    DELANTE, y solo palabras que casi no salen fuera de las matemáticas
-   —«entre» o «valores» se comerían «los valores democráticos [2, 3]»—;
+   —«entre» o «valores» se comerían «los valores democráticos [2, 3]»—,
+   y las ambiguas, «entre», «valores», «dominio», «conjunto», solo como
+   la palabra de JUSTO delante: «oscila entre [1-5]» es un intervalo;
    mirando lo de detrás se perdían las citas de verdad, «los estudios
    [2, 3] muestran…»); y **una nota al pie no es
    una entrada de la bibliografía**: con las dos numeradas desde 1, «[1]»
@@ -5167,7 +5178,10 @@ el diseño.
    si faltaba la nota 2, y numerar no toca las notas. «[1]» sigue
    llevando a la nota 1 cuando la bibliografía no lleva números, a
    propósito: con notas «¹» y una bibliografía APA, quitarlo ofrecía
-   numerar la lista APA para casar el «¹» con un autor.
+   numerar la lista APA para casar el «¹» con un autor. Pero NO si el
+   texto marca sus notas como «[^1]» (`llamaPie`): entonces un «[1]»
+   pelado es una cita y nunca cae en una nota, que es lo que pasaba con
+   un Word con notas al pie y una bibliografía sin números.
 
    ⚠️ **Y dos que NO son exponentes aunque vayan detrás de una cifra**
    (la segunda revisión, sobre Word): un año («desde 2019⁵», de 1500 a
@@ -5281,7 +5295,9 @@ con su nota al pie, que el lector lleva a la nota y no a la obra. Y lo de
 la tercera revisión: la primera nota de un Word actual, la llamada a nota
 con superíndice puesto a mano, «Notas para el docente» y «Fuentes de
 energía» sin números, y las notas al pie de LibreOffice y de Word
-guardado como página.
+guardado como página. Y lo de la cuarta: «Fuentes bibliográficas» con sus
+números y su «[1]» que no cae en la nota al pie, y una página de Word con
+notas al pie y notas finales que no se cruzan.
 
 La comprobación **2** le pega un párrafo de prosa cuyos siete renglones
 empiezan por siete palabras que nombran una parte de un libro, y exige que
@@ -5472,7 +5488,10 @@ títulos ingleses con coletilla, el rótulo de la caja de fuentes y la nota
 al pie que falta. Y el apartado 10, lo de la tercera: las notas al pie y
 la raya final debajo de la lista, el capítulo «Fuentes de energía» que no
 roba números, «Notas sobre el método» que es una fuente, «Further
-reading» suelto, las escalas Likert, la notación estadística y «CO²».
+reading» suelto, las escalas Likert, la notación estadística y «CO²». Y
+el apartado 11, lo de la cuarta: los títulos hechos de palabras de
+bibliografía, «oscila entre [1-5]», el «[1]» que no cae en la nota cuando
+el texto usa «[^1]», y «## Fuentes y referencias» con entradas sueltas.
 
 La comprobación **43** es 📣 A redes, de punta a punta y por gravedad:
 que el trozo llegue a la tabla de Redes **sin su etiqueta** (se mira lo
